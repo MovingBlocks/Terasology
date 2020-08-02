@@ -1,18 +1,6 @@
-/*
- * Copyright 2016 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
+
 package org.terasology.rendering.nui.widgets;
 
 import com.google.common.base.Preconditions;
@@ -41,11 +29,12 @@ import org.terasology.rendering.nui.TextLineBuilder;
 import org.terasology.rendering.nui.WidgetWithOrder;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
+import org.terasology.rendering.nui.events.NUICharEvent;
 import org.terasology.rendering.nui.events.NUIKeyEvent;
 import org.terasology.rendering.nui.events.NUIMouseClickEvent;
+import org.terasology.rendering.nui.events.NUIMouseDoubleClickEvent;
 import org.terasology.rendering.nui.events.NUIMouseDragEvent;
 import org.terasology.rendering.nui.events.NUIMouseReleaseEvent;
-import org.terasology.rendering.nui.events.NUIMouseDoubleClickEvent;
 import org.terasology.utilities.Assets;
 
 import java.awt.Toolkit;
@@ -383,25 +372,15 @@ public class UIText extends WidgetWithOrder {
                     if (event.getKey() == Keyboard.Key.V) {
                         removeSelection();
                         paste();
-                        eventHandled = true;
                     }
                 }
                 if (event.getKey() == Keyboard.Key.ENTER || event.getKey() == Keyboard.Key.NUMPAD_ENTER) {
                     for (ActivateEventListener listener : activationListeners) {
                         listener.onActivated(this);
                     }
-                    eventHandled = true;
-                } else if (event.getKeyCharacter() != 0 && lastFont.hasCharacter(event.getKeyCharacter())) {
-                    String fullText = text.get();
-                    String before = fullText.substring(0, Math.min(getCursorPosition(), selectionStart));
-                    String after = fullText.substring(Math.max(getCursorPosition(), selectionStart));
-                    setText(before + event.getKeyCharacter() + after);
-                    setCursorPosition(Math.min(getCursorPosition(), selectionStart) + 1);
-                    eventHandled = true;
                 }
             } else {
                 String fullText = text.get();
-
                 switch (event.getKey().getId()) {
                     case KeyId.LEFT: {
                         if (hasSelection() && !isSelectionModifierActive(event.getKeyboard())) {
@@ -409,7 +388,6 @@ public class UIText extends WidgetWithOrder {
                         } else if (getCursorPosition() > 0) {
                             decreaseCursorPosition(1, !isSelectionModifierActive(event.getKeyboard()));
                         }
-                        eventHandled = true;
                         break;
                     }
                     case KeyId.RIGHT: {
@@ -418,18 +396,15 @@ public class UIText extends WidgetWithOrder {
                         } else if (getCursorPosition() < fullText.length()) {
                             increaseCursorPosition(1, !isSelectionModifierActive(event.getKeyboard()));
                         }
-                        eventHandled = true;
                         break;
                     }
                     case KeyId.HOME: {
                         setCursorPosition(0, !isSelectionModifierActive(event.getKeyboard()));
                         offset = 0;
-                        eventHandled = true;
                         break;
                     }
                     case KeyId.END: {
                         setCursorPosition(fullText.length(), !isSelectionModifierActive(event.getKeyboard()));
-                        eventHandled = true;
                         break;
                     }
                     default: {
@@ -437,7 +412,6 @@ public class UIText extends WidgetWithOrder {
                                 || event.getKeyboard().isKeyDown(KeyId.RIGHT_CTRL)) {
                             if (event.getKey() == Keyboard.Key.C) {
                                 copySelection();
-                                eventHandled = true;
                                 break;
                             }
                         }
@@ -459,7 +433,6 @@ public class UIText extends WidgetWithOrder {
 
                                 setText(before + after);
                             }
-                            eventHandled = true;
                             break;
                         }
                         case KeyId.DELETE: {
@@ -470,7 +443,6 @@ public class UIText extends WidgetWithOrder {
                                 String after = fullText.substring(getCursorPosition() + 1);
                                 setText(before + after);
                             }
-                            eventHandled = true;
                             break;
                         }
                         case KeyId.ENTER:
@@ -485,7 +457,6 @@ public class UIText extends WidgetWithOrder {
                             for (ActivateEventListener listener : activationListeners) {
                                 listener.onActivated(this);
                             }
-                            eventHandled = true;
                             break;
                         }
                         default: {
@@ -494,29 +465,38 @@ public class UIText extends WidgetWithOrder {
                                 if (event.getKey() == Keyboard.Key.V) {
                                     removeSelection();
                                     paste();
-                                    eventHandled = true;
                                     break;
                                 } else if (event.getKey() == Keyboard.Key.X) {
                                     copySelection();
                                     removeSelection();
-                                    eventHandled = true;
                                     break;
                                 }
-                            }
-                            if (event.getKeyCharacter() != 0 && lastFont.hasCharacter(event.getKeyCharacter())) {
-                                String before = fullText.substring(0, Math.min(getCursorPosition(), selectionStart));
-                                String after = fullText.substring(Math.max(getCursorPosition(), selectionStart));
-                                setText(before + event.getKeyCharacter() + after);
-                                setCursorPosition(Math.min(getCursorPosition(), selectionStart) + 1);
-                                eventHandled = true;
                             }
                             break;
                         }
                     }
                 }
             }
+            eventHandled = true;
         }
         updateOffset();
+        return eventHandled;
+    }
+
+    @Override
+    public boolean onCharEvent(NUICharEvent event) {
+        correctCursor();
+        boolean eventHandled = false;
+        if (isEnabled() && lastFont != null) {
+            if (event.getCharacter() != 0 && lastFont.hasCharacter(event.getCharacter())) {
+                String fullText = text.get();
+                String before = fullText.substring(0, Math.min(getCursorPosition(), selectionStart));
+                String after = fullText.substring(Math.max(getCursorPosition(), selectionStart));
+                setText(before + event.getCharacter() + after);
+                setCursorPosition(Math.min(getCursorPosition(), selectionStart) + 1);
+                eventHandled = true;
+            }
+        }
         return eventHandled;
     }
 

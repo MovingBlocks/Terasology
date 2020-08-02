@@ -16,7 +16,7 @@
 package org.terasology.engine.subsystem.lwjgl;
 
 import com.google.common.base.Charsets;
-import org.lwjgl.LWJGLUtil;
+import org.lwjgl.system.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.context.Context;
@@ -27,6 +27,7 @@ import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 
 /**
+ *
  */
 public abstract class BaseLwjglSubsystem implements EngineSubsystem {
 
@@ -36,32 +37,32 @@ public abstract class BaseLwjglSubsystem implements EngineSubsystem {
     @Override
     public void preInitialise(Context context) {
         if (!initialised) {
-            initLogger();
             LWJGLHelper.initNativeLibs();
+            initLogger();
             initialised = true;
         }
     }
 
     private void initLogger() {
-        if (LWJGLUtil.DEBUG) {
+        if (Configuration.DEBUG.get(false)) {
             try {
-            // Pipes System.out and err to log, because that's where lwjgl writes it to.
-            System.setOut(new PrintStream(System.out, false, Charsets.UTF_8.name()) {
-                private Logger lwjglLogger = LoggerFactory.getLogger("org.lwjgl");
+                // Pipes System.out and err to log, because that's where lwjgl writes it to.
+                System.setOut(new PrintStream(System.out, false, Charsets.UTF_8.name()) {
+                    private Logger lwjglLogger = LoggerFactory.getLogger("org.lwjgl");
 
-                @Override
-                public void print(final String message) {
-                    lwjglLogger.info(message);
-                }
-            });
-            System.setErr(new PrintStream(System.err, false, Charsets.UTF_8.name()) {
-                private Logger lwjglLogger = LoggerFactory.getLogger("org.lwjgl");
+                    @Override
+                    public void print(final String message) {
+                        lwjglLogger.info(message);
+                    }
+                });
+                System.setErr(new PrintStream(System.err, false, Charsets.UTF_8.name()) {
+                    private Logger lwjglLogger = LoggerFactory.getLogger("org.lwjgl");
 
-                @Override
-                public void print(final String message) {
-                    lwjglLogger.error(message);
-                }
-            });
+                    @Override
+                    public void print(final String message) {
+                        lwjglLogger.error(message);
+                    }
+                });
             } catch (UnsupportedEncodingException e) {
                 logger.error("Failed to map lwjgl logging", e);
             }

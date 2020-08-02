@@ -1,18 +1,6 @@
-/*
- * Copyright 2016 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
+
 package org.terasology.rendering.nui;
 
 import org.terasology.input.BindButtonEvent;
@@ -20,6 +8,7 @@ import org.terasology.input.events.MouseButtonEvent;
 import org.terasology.input.events.MouseWheelEvent;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.rendering.nui.databinding.Binding;
+import org.terasology.rendering.nui.events.NUICharEvent;
 import org.terasology.rendering.nui.events.NUIKeyEvent;
 import org.terasology.rendering.nui.skin.UISkin;
 
@@ -95,10 +84,17 @@ public interface UIWidget extends Iterable<UIWidget> {
 
 
     /**
-     *
      * @return Whether the input should be consumed, and thus not propagated to other interaction regions
      */
     boolean onKeyEvent(NUIKeyEvent event);
+
+    /**
+     * Handle text input events.
+     *
+     * @param nuiEvent text input event
+     * @return whether the input should be consumed, and thus not propagted to other interaction regions
+     */
+    boolean onCharEvent(NUICharEvent nuiEvent);
 
     void onBindEvent(BindButtonEvent event);
 

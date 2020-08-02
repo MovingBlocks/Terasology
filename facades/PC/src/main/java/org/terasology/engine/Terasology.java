@@ -1,18 +1,6 @@
-/*
- * Copyright 2020 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
+
 package org.terasology.engine;
 
 import com.google.common.base.Joiner;
@@ -48,32 +36,22 @@ import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameInfo;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameProvider;
 import org.terasology.splash.SplashScreen;
 import org.terasology.splash.SplashScreenBuilder;
-import org.terasology.splash.overlay.AnimatedBoxRowOverlay;
-import org.terasology.splash.overlay.ImageOverlay;
-import org.terasology.splash.overlay.RectOverlay;
-import org.terasology.splash.overlay.TextOverlay;
-import org.terasology.splash.overlay.TriggerImageOverlay;
 
 import java.awt.GraphicsEnvironment;
-import java.awt.Point;
-import java.awt.Rectangle;
 import java.io.IOException;
-import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
-
-import static com.google.common.base.Verify.verifyNotNull;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Class providing the main() method for launching Terasology as a PC app.
  * <br><br>
- * Through the following launch arguments default locations to store logs and
- * game saves can be overridden, by using the current directory or a specified
- * one as the home directory. Furthermore, Terasology can be launched headless,
- * to save resources while acting as a server or to run in an environment with
- * no graphics, audio or input support. Additional arguments are available to
- * reload the latest game on startup and to disable crash reporting.
+ * Through the following launch arguments default locations to store logs and game saves can be overridden, by using the
+ * current directory or a specified one as the home directory. Furthermore, Terasology can be launched headless, to save
+ * resources while acting as a server or to run in an environment with no graphics, audio or input support. Additional
+ * arguments are available to reload the latest game on startup and to disable crash reporting.
  * <br><br>
  * Available launch arguments:
  * <br><br>
@@ -129,8 +107,23 @@ public final class Terasology {
         handlePrintUsageRequest(args);
         handleLaunchArguments(args);
 
-        SplashScreen splashScreen = splashEnabled ? configureSplashScreen() : SplashScreenBuilder.createStub();
-
+        SplashScreen splashScreen;
+        if (splashEnabled) {
+            CountDownLatch splashInitLatch = new CountDownLatch(1);
+            GLFWSplashScreen glfwSplash = new GLFWSplashScreen(splashInitLatch);
+            Thread thread = new Thread(glfwSplash, "splashscreen-loop");
+            thread.setDaemon(true);
+            thread.start();
+            try {
+                // wait splash initialize... we will lose some post messages otherwise.
+                splashInitLatch.await(1, TimeUnit.SECONDS);
+            } catch (InterruptedException e) {
+                // ignore
+            }
+            splashScreen = glfwSplash;
+        } else {
+            splashScreen = SplashScreenBuilder.createStub();
+        }
         splashScreen.post("Java Runtime " + System.getProperty("java.version") + " loaded");
 
         setupLogging();
@@ -168,67 +161,6 @@ public final class Terasology {
             splashScreen.close();
             reportException(e);
         }
-    }
-
-    private static SplashScreen configureSplashScreen() {
-        int imageHeight = 283;
-        int maxTextWidth = 450;
-        int width = 600;
-        int height = 30;
-        int left = 20;
-        int top = imageHeight - height - 20;
-
-        Rectangle rectRc = new Rectangle(left, top, width, height);
-        Rectangle textRc = new Rectangle(left + 10, top + 5, maxTextWidth, height);
-        Rectangle boxRc = new Rectangle(left + maxTextWidth + 10, top, width - maxTextWidth - 20, height);
-
-        SplashScreenBuilder builder = new SplashScreenBuilder();
-
-        String[] imgFiles = new String[] {
-                "splash_1.png",
-                "splash_2.png",
-                "splash_3.png",
-                "splash_4.png",
-                "splash_5.png"
-        };
-
-        Point[] imgOffsets = new Point[] {
-                new Point(0, 0),
-                new Point(150, 0),
-                new Point(300, 0),
-                new Point(450, 0),
-                new Point(630, 0)
-        };
-
-        EngineStatus[] trigger = new EngineStatus[] {
-                TerasologyEngineStatus.PREPARING_SUBSYSTEMS,
-                TerasologyEngineStatus.INITIALIZING_MODULE_MANAGER,
-                TerasologyEngineStatus.INITIALIZING_ASSET_TYPES,
-                TerasologyEngineStatus.INITIALIZING_SUBSYSTEMS,
-                TerasologyEngineStatus.INITIALIZING_ASSET_MANAGEMENT,
-        };
-
-        try {
-            for (int index = 0; index < 5; index++) {
-                URL resource = Terasology.class.getResource("/splash/" + imgFiles[index]);
-                builder.add(new TriggerImageOverlay(verifyNotNull(resource, "resource /splash/%s", imgFiles[index]))
-                        .setTrigger(trigger[index].getDescription())
-                        .setPosition(imgOffsets[index].x, imgOffsets[index].y));
-            }
-
-            builder.add(new ImageOverlay(Terasology.class.getResource("/splash/splash_text.png")));
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        SplashScreen instance = builder
-                .add(new RectOverlay(rectRc))
-                .add(new TextOverlay(textRc))
-                .add(new AnimatedBoxRowOverlay(boxRc))
-                .build();
-
-        return instance;
     }
 
     private static void setupLogging() {
@@ -277,14 +209,19 @@ public final class Terasology {
         System.out.println();
         System.out.println("    terasology" + optText.toString());
         System.out.println();
-        System.out.println("By default Terasology saves data such as game saves and logs into subfolders of a platform-specific \"home directory\".");
+        System.out.println("By default Terasology saves data such as game saves and logs into subfolders of a " +
+                "platform-specific \"home directory\".");
         System.out.println("Saving can be explicitly disabled using the \"" + NO_SAVE_GAMES + "\" flag.");
-        System.out.println("Optionally, the user can override the default by using one of the following launch arguments:");
+        System.out.println("Optionally, the user can override the default by using one of the following launch " +
+                "arguments:");
         System.out.println();
-        System.out.println("    " + USE_CURRENT_DIR_AS_HOME + "        Use the current directory as the home directory.");
-        System.out.println("    " + USE_SPECIFIED_DIR_AS_HOME + "<path> Use the specified directory as the home directory.");
+        System.out.println("    " + USE_CURRENT_DIR_AS_HOME + "        Use the current directory as the home " +
+                "directory.");
+        System.out.println("    " + USE_SPECIFIED_DIR_AS_HOME + "<path> Use the specified directory as the home " +
+                "directory.");
         System.out.println();
-        System.out.println("It is also possible to start Terasology in headless mode (no graphics), i.e. to act as a server.");
+        System.out.println("It is also possible to start Terasology in headless mode (no graphics), i.e. to act as a " +
+                "server.");
         System.out.println("For this purpose use the " + START_HEADLESS + " launch argument.");
         System.out.println();
         System.out.println("To automatically load the latest game on startup,");
@@ -318,7 +255,8 @@ public final class Terasology {
         System.out.println("    Don't start Terasology, just print this help:");
         System.out.println("    terasology " + PRINT_USAGE_FLAGS[1]);
         System.out.println();
-        System.out.println("Alternatively use our standalone Launcher from: https://github.com/MovingBlocks/TerasologyLauncher/releases");
+        System.out.println("Alternatively use our standalone Launcher from: https://github" +
+                ".com/MovingBlocks/TerasologyLauncher/releases");
         System.out.println();
 
         System.exit(0);
@@ -354,7 +292,8 @@ public final class Terasology {
             } else if (arg.startsWith(SERVER_PORT)) {
                 System.setProperty(ConfigurationSubsystem.SERVER_PORT_PROPERTY, arg.substring(SERVER_PORT.length()));
             } else if (arg.startsWith(OVERRIDE_DEFAULT_CONFIG)) {
-                System.setProperty(Config.PROPERTY_OVERRIDE_DEFAULT_CONFIG, arg.substring(OVERRIDE_DEFAULT_CONFIG.length()));
+                System.setProperty(Config.PROPERTY_OVERRIDE_DEFAULT_CONFIG,
+                        arg.substring(OVERRIDE_DEFAULT_CONFIG.length()));
             } else {
                 recognized = false;
             }

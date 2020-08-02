@@ -193,7 +193,7 @@ public class OpenVRStereoCamera extends SubmersibleCamera {
     @Deprecated
     public void loadProjectionMatrix() {
         glMatrixMode(GL_PROJECTION);
-        GL11.glLoadMatrix(getProjectionMatrix().get(BufferUtils.createFloatBuffer(16)));
+        GL11.glLoadMatrixf(getProjectionMatrix().get(BufferUtils.createFloatBuffer(16)));
         glMatrixMode(GL11.GL_MODELVIEW);
     }
 
@@ -201,14 +201,14 @@ public class OpenVRStereoCamera extends SubmersibleCamera {
     @Deprecated
     public void loadModelViewMatrix() {
         glMatrixMode(GL11.GL_MODELVIEW);
-        GL11.glLoadMatrix(getViewMatrix().get(BufferUtils.createFloatBuffer(16)));
+        GL11.glLoadMatrix(MatrixUtils.matrixToFloatBuffer(getViewMatrix()));
     }
 
     @Override
     @Deprecated
     public void loadNormalizedModelViewMatrix() {
         glMatrixMode(GL11.GL_MODELVIEW);
-        GL11.glLoadMatrix(normViewMatrix.get(BufferUtils.createFloatBuffer(16)));
+        GL11.glLoadMatrix(MatrixUtils.matrixToFloatBuffer(normViewMatrix));
     }
 
     @Override

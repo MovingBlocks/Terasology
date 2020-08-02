@@ -201,7 +201,7 @@ public final class Line {
                 x1 + tx + rx, y1 + ty + ry,    //fading edge2
                 x2 + tx + rx, y2 + ty + ry
             };
-        GL11.glVertexPointer(2, 0, wrap(lineVertex));
+        GL11.glVertexPointer(2, 0, 0, wrap(lineVertex));
 
         if (!alphaBlend) {
             float[] lineColor =
@@ -215,7 +215,7 @@ public final class Line {
                     bRed, bGreen, bBlue,
                     bRed, bGreen, bBlue
                 };
-            GL11.glColorPointer(3, 0, wrap(lineColor));
+            GL11.glColorPointer(3, 0,0, wrap(lineColor));
         } else {
             float[] lineColor =
                 {
@@ -228,7 +228,7 @@ public final class Line {
                     cRed, cGreen, cBlue, 0,
                     cRed, cGreen, cBlue, 0
                 };
-            GL11.glColorPointer(4, 0, wrap(lineColor));
+            GL11.glColorPointer(4, 0,0, wrap(lineColor));
         }
 
         if ((Math.abs(dx) < epsilon || Math.abs(dy) < epsilon) && width <= 1.0) {
@@ -251,7 +251,7 @@ public final class Line {
                     x2 - tx - rx, y2 - ty - ry,
                     x2 + tx + rx, y2 + ty + ry
                 };
-            GL11.glVertexPointer(2, 0, wrap(lineVertex));
+            GL11.glVertexPointer(2, 0,0, wrap(lineVertex));
 
             if (!alphaBlend) {
                 float[] lineColor =
@@ -265,7 +265,7 @@ public final class Line {
                         cRed, cGreen, cBlue,
                         cRed, cGreen, cBlue
                     };
-                GL11.glColorPointer(3, 0, wrap(lineColor));
+                GL11.glColorPointer(3, 0,0, wrap(lineColor));
             } else {
                 float[] lineColor =
                     {
@@ -278,7 +278,7 @@ public final class Line {
                         cRed, cGreen, cBlue, a,
                         cRed, cGreen, cBlue, a
                     };
-                GL11.glColorPointer(4, 0, wrap(lineColor));
+                GL11.glColorPointer(4, 0,0, wrap(lineColor));
             }
 
             GL11.glDrawArrays(GL11.GL_TRIANGLE_STRIP, 0, 4);

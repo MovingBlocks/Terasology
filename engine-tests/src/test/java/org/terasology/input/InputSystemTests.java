@@ -1,6 +1,9 @@
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.input;
 
+import com.google.common.collect.Queues;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -16,8 +19,9 @@ import org.terasology.entitySystem.event.Event;
 import org.terasology.input.Keyboard.Key;
 import org.terasology.input.Keyboard.KeyId;
 import org.terasology.input.cameraTarget.CameraTargetSystem;
-import org.terasology.input.device.KeyboardAction;
+import org.terasology.input.device.CharKeyboardAction;
 import org.terasology.input.device.KeyboardDevice;
+import org.terasology.input.device.RawKeyboardAction;
 import org.terasology.input.events.KeyEvent;
 import org.terasology.input.internal.BindableButtonImpl;
 import org.terasology.logic.players.LocalPlayer;
@@ -91,7 +95,7 @@ public class InputSystemTests {
     private void registerEntityKeyCapturing() {
         /*
          * KeyUpEvent and KeyDownEvent are singletons with a single instance that gets reset each time.
-         * Therefore it is not possible to capture multiple events with an ArgumentCaptor 
+         * Therefore it is not possible to capture multiple events with an ArgumentCaptor
          * because previous instances become invalid.
          * For this reason, the data of these events is captured to a separate class.
          */
@@ -145,14 +149,12 @@ public class InputSystemTests {
         assertEquals(clientEntityKeyEvents.size(), 1);
         CapturedKeyEvent clientEvent = clientEntityKeyEvents.get(0);
         assertEquals(clientEvent.key, Key.W);
-        assertEquals(clientEvent.keyCharacter, characterFor(Key.W));
-        assertEquals(clientEvent.delta, delta);
+        assertEquals(clientEvent.delta, delta, 0f);
         assertEquals(clientEvent.buttonState, ButtonState.DOWN);
 
         assertEquals(characterEntityKeyEvents.size(), 1);
         CapturedKeyEvent characterEvent = characterEntityKeyEvents.get(0);
         assertEquals(characterEvent.key, Key.W);
-        assertEquals(characterEvent.keyCharacter, characterFor(Key.W));
         assertEquals(characterEvent.delta, delta);
         assertEquals(characterEvent.buttonState, ButtonState.DOWN);
     }
@@ -167,14 +169,12 @@ public class InputSystemTests {
         assertEquals(clientEntityKeyEvents.size(), 1);
         CapturedKeyEvent clientEvent = clientEntityKeyEvents.get(0);
         assertEquals(clientEvent.key, Key.W);
-        assertEquals(clientEvent.keyCharacter, characterFor(Key.W));
-        assertEquals(clientEvent.delta, delta);
+        assertEquals(clientEvent.delta, delta, 0f);
         assertEquals(clientEvent.buttonState, ButtonState.UP);
 
         assertEquals(characterEntityKeyEvents.size(), 1);
         CapturedKeyEvent characterEvent = characterEntityKeyEvents.get(0);
         assertEquals(characterEvent.key, Key.W);
-        assertEquals(characterEvent.keyCharacter, characterFor(Key.W));
         assertEquals(characterEvent.delta, delta);
         assertEquals(characterEvent.buttonState, ButtonState.UP);
     }
@@ -223,13 +223,13 @@ public class InputSystemTests {
     }
 
     private void pressKey(Key key) {
-        KeyboardAction keyboardAction = new KeyboardAction(key, ButtonState.DOWN, characterFor(key));
-        testKeyboard.add(keyboardAction);
+        RawKeyboardAction rawKeyboardAction = new RawKeyboardAction(key, ButtonState.DOWN);
+        testKeyboard.add(rawKeyboardAction);
     }
 
     private void releaseKey(Key key) {
-        KeyboardAction keyboardAction = new KeyboardAction(key, ButtonState.UP, characterFor(key));
-        testKeyboard.add(keyboardAction);
+        RawKeyboardAction rawKeyboardAction = new RawKeyboardAction(key, ButtonState.UP);
+        testKeyboard.add(rawKeyboardAction);
     }
 
     private static char characterFor(Key key) {
@@ -244,11 +244,16 @@ public class InputSystemTests {
 
     private static class TestKeyboard implements KeyboardDevice {
 
-        private Queue<KeyboardAction> queue = new LinkedBlockingQueue<>();
+        private Queue<RawKeyboardAction> queue = new LinkedBlockingQueue<>();
 
         @Override
-        public Queue<KeyboardAction> getInputQueue() {
+        public Queue<RawKeyboardAction> getInputQueue() {
             return queue;
+        }
+
+        @Override
+        public Queue<CharKeyboardAction> getCharInputQueue() {
+            return Queues.newArrayDeque();
         }
 
         @Override
@@ -256,13 +261,13 @@ public class InputSystemTests {
             return false;
         }
 
-        public void add(KeyboardAction action) {
+        public void add(RawKeyboardAction action) {
             queue.add(action);
         }
 
     }
 
-    @RegisterBindButton(id = "testEvent", description = "${engine-tests:menu#theTestEvent}", repeating = false, category = "tests")
+    @RegisterBindButton(id = "testEvent", description = "${engine-tests:menu#theTestEvent}", category = "tests")
     @DefaultBinding(type = InputType.KEY, id = Keyboard.KeyId.T)
     public class TestEventButton extends BindButtonEvent {
         //the annotations are not used in this tests but represent the way a binding is registered by default
@@ -272,13 +277,11 @@ public class InputSystemTests {
 
         public Input key;
         public float delta;
-        public char keyCharacter;
         private ButtonState buttonState;
 
-        public CapturedKeyEvent(KeyEvent event) {
+        CapturedKeyEvent(KeyEvent event) {
             key = event.getKey();
             delta = event.getDelta();
-            keyCharacter = event.getKeyCharacter();
             buttonState = event.getState();
         }
 

@@ -16,7 +16,6 @@
 
 package org.terasology.utilities;
 
-import org.lwjgl.LWJGLUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.paths.PathManager;
@@ -25,7 +24,6 @@ import java.nio.file.Path;
 
 /**
  * Helper class to have LWJGL loading logic in a central spot
- *
  */
 public final class LWJGLHelper {
 
@@ -43,20 +41,19 @@ public final class LWJGLHelper {
 
     private static void initLibraryPaths() {
         final Path path;
-        switch (LWJGLUtil.getPlatform()) {
-            case LWJGLUtil.PLATFORM_MACOSX:
-                path = PathManager.getInstance().getNativesPath().resolve("macosx");
-                break;
-            case LWJGLUtil.PLATFORM_LINUX:
-                path = PathManager.getInstance().getNativesPath().resolve("linux");
-                break;
-            case LWJGLUtil.PLATFORM_WINDOWS:
+        switch (OS.get()) {
+            case WINDOWS:
                 path = PathManager.getInstance().getNativesPath().resolve("windows");
                 break;
+            case MACOSX:
+                path = PathManager.getInstance().getNativesPath().resolve("macosx");
+                break;
+            case LINUX:
+                path = PathManager.getInstance().getNativesPath().resolve("linux");
+                break;
             default:
-                throw new UnsupportedOperationException("Unsupported operating system: " + LWJGLUtil.getPlatformName());
+                throw new UnsupportedOperationException("Unsupported operating system: " + System.getProperty("os.name"));
         }
-
         final String natives = path.toAbsolutePath().toString();
         System.setProperty("org.lwjgl.librarypath", natives);
         System.setProperty("net.java.games.input.librarypath", natives);  // libjinput

@@ -20,16 +20,9 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.SetMultimap;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.JsonSerializationContext;
-import com.google.gson.JsonSerializer;
-import org.lwjgl.opengl.PixelFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.context.Context;
@@ -55,7 +48,6 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -222,8 +214,6 @@ public final class Config {
                 .registerTypeAdapter(Input.class, new InputHandler())
                 .registerTypeAdapter(Resolution.class, new ResolutionHandler())
                 //.registerTypeAdapter(UniverseConfig.class, new UniverseConfig.Handler())
-
-                .registerTypeAdapter(PixelFormat.class, new PixelFormatHandler())
                 .registerTypeAdapterFactory(new CaseInsensitiveEnumTypeAdapterFactory())
                 .registerTypeAdapterFactory(new UriTypeAdapterFactory())
                 .setPrettyPrinting().create();
@@ -293,21 +283,5 @@ public final class Config {
             map.put(entry.getKey(), json);
         }
         config.getModuleConfigs().put(generatorUri, map);
-    }
-
-    private static class PixelFormatHandler implements JsonSerializer<PixelFormat>, JsonDeserializer<PixelFormat> {
-
-        @Override
-        public PixelFormat deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-            if (json.isJsonPrimitive() && json.getAsJsonPrimitive().isNumber()) {
-                return new PixelFormat().withDepthBits(json.getAsInt());
-            }
-            return new PixelFormat().withDepthBits(24);
-        }
-
-        @Override
-        public JsonElement serialize(PixelFormat src, Type typeOfSrc, JsonSerializationContext context) {
-            return new JsonPrimitive(src.getDepthBits());
-        }
     }
 }
