@@ -216,7 +216,7 @@ public final class LocationComponent implements Component, ReplicationCheck {
 
 
     public org.joml.Vector3f getWorldDirection(org.joml.Vector3f dest) {
-        return dest.set(Direction.FORWARD.asVector3i()).rotate(JomlUtil.from(getWorldRotation()));
+        return dest.set(Direction.FORWARD.asVector3f()).rotate(JomlUtil.from(getWorldRotation()));
     }
 
     /**
