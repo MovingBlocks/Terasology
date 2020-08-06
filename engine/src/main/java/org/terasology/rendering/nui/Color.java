@@ -76,9 +76,9 @@ public class Color {
     /**
      * Create a color with the given red/green/blue values. Alpha is initialised as max.
      *
-     * @param r
-     * @param g
-     * @param b
+     * @param r red in the range of 0-255
+     * @param g green in the range of 0-255
+     * @param b blue in the range of 0-255
      */
     public Color(float r, float g, float b) {
         this((int) (r * MAX), (int) (g * MAX), (int) (b * MAX));
@@ -87,10 +87,10 @@ public class Color {
     /**
      * Creates a color with the given red/green/blue/alpha values.
      *
-     * @param r
-     * @param g
-     * @param b
-     * @param a
+     * @param r red in the range of 0-255
+     * @param g green in the range of 0-255
+     * @param b blue in the range of 0-255
+     * @param a alpha in the range of 0-255
      */
     public Color(float r, float g, float b, float a) {
         this((int) (r * MAX), (int) (g * MAX), (int) (b * MAX), (int) (a * MAX));
@@ -99,9 +99,9 @@ public class Color {
     /**
      * Creates a color with the given red/green/blue values. Alpha is initialised as max.
      *
-     * @param r
-     * @param g
-     * @param b
+     * @param r red in the range of 0-255
+     * @param g green in the range of 0-255
+     * @param b blue in the range of 0-255
      */
     public Color(int r, int g, int b) {
         this(r, g, b, 0xFF);
@@ -110,10 +110,10 @@ public class Color {
     /**
      * Creates a color with the given red/green/blue/alpha values.
      *
-     * @param r
-     * @param g
-     * @param b
-     * @param a
+     * @param r red in the range of 0-255
+     * @param g green in the range of 0-255
+     * @param b blue in the range of 0-255
+     * @param a alpha in the range of 0-255
      */
     public Color(int r, int g, int b, int a) {
         Preconditions.checkArgument(r >= 0 && r <= MAX, "Color values must be in range 0-255");
@@ -151,18 +151,30 @@ public class Color {
         return representation & MAX;
     }
 
+    /**
+     * @return The red component, between 0.0f-1.0f
+     */
     public float rf() {
         return r() / 255.f;
     }
 
+    /**
+     * @return The blue channel, between 0.0f-1.0f
+     */
     public float bf() {
         return b() / 255.f;
     }
 
+    /**
+     * @return The green channel, between 0.0f-1.0f
+     */
     public float gf() {
         return g() / 255.f;
     }
 
+    /**
+     * @return The alpha channel, between 0.0f-1.0f
+     */
     public float af() {
         return a() / 255.f;
     }
@@ -225,22 +237,6 @@ public class Color {
         builder.append(hexString.toUpperCase(Locale.ENGLISH));
         return builder.toString();
     }
-
-    /**
-     * @param color
-     * @return Slick.Color format representation used in old GUI colorStrings.
-     * Remove after Slick.Color is removed or after colorString format changes.
-     */
-    // TODO: Remove
-    public static String toColorString(Color color) {
-        String hex = color.toHex();
-        String rString = hex.substring(0, 2);
-        String gString = hex.substring(2, 4);
-        String bString = hex.substring(4, 6);
-        String aString = hex.substring(6);
-        return "#" + aString + rString + gString + bString;
-    }
-
 
     @Override
     public String toString() {
