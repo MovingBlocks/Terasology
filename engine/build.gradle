@@ -161,23 +161,8 @@ dependencies {
     implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
     runtimeOnly group: 'org.slf4j', name: 'jul-to-slf4j', version: '1.7.21'
 
-    // Dependency on CrashReporter, conditionally either from source or via binary
     // TODO: Consider moving this back to the PC Facade instead of having the engine rely on it?
-    File wouldBeSrcPath = new File(rootDir, 'libs/CrashReporter')
-
-    if (wouldBeSrcPath.exists()) {
-        println "*** Identified CrashReporter source, using that"
-        //compile ':libs:CrashReporter:cr-terasology'
-
-        def targetProject = findProject(':libs:CrashReporter:cr-terasology')
-        println "Found the project? " + targetProject
-        //compile targetProject
-
-        implementation project(':libs:CrashReporter:cr-terasology')
-    } else {
-        logger.debug("*** Setting a CrashReporter binary dependency, not present as source")
-        implementation group: 'org.terasology.crashreporter', name: 'cr-terasology', version: '4.1.0'
-    }
+    implementation group: 'org.terasology.crashreporter', name: 'cr-terasology', version: '4.1.0'
 }
 
 task cacheReflections {

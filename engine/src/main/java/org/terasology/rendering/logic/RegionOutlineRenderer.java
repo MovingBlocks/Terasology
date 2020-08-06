@@ -103,7 +103,7 @@ public class RegionOutlineRenderer extends BaseComponentSystem implements Render
 
         material.setFloat("sunlight", 1.0f, true);
         material.setFloat("blockLight", 1.0f, true);
-        material.setMatrix4("projectionMatrix", new org.joml.Matrix4f(worldRenderer.getActiveCamera().getProjectionMatrix()).transpose());
+        material.setMatrix4("projectionMatrix", worldRenderer.getActiveCamera().getProjectionMatrix());
         Vector3f worldPos = new Vector3f();
 
         Vector3f worldPositionCameraSpace = new Vector3f();
@@ -111,7 +111,7 @@ public class RegionOutlineRenderer extends BaseComponentSystem implements Render
 
         Matrix4f matrixCameraSpace = new Matrix4f(new Quat4f(0, 0, 0, 1), worldPositionCameraSpace, 1.0f);
 
-        Matrix4f modelViewMatrix = MatrixUtils.calcModelViewMatrix(JomlUtil.from(worldRenderer.getActiveCamera().getViewMatrix()), matrixCameraSpace);
+        Matrix4f modelViewMatrix = MatrixUtils.calcModelViewMatrix(worldRenderer.getActiveCamera().getViewMatrix(), matrixCameraSpace);
         MatrixUtils.matrixToFloatBuffer(modelViewMatrix, tempMatrixBuffer44);
 
         material.setMatrix4("worldViewMatrix", tempMatrixBuffer44, true);
