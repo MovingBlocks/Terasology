@@ -33,6 +33,7 @@ import org.terasology.identity.storageServiceClient.StorageServiceWorker;
 import org.terasology.input.Keyboard;
 import org.terasology.module.ModuleRegistry;
 import org.terasology.naming.NameVersion;
+import org.terasology.network.BroadCastServer;
 import org.terasology.network.JoinStatus;
 import org.terasology.network.NetworkSystem;
 import org.terasology.network.PingService;
@@ -91,6 +92,8 @@ public class JoinGameScreen extends CoreScreenLayer {
 
     @In
     private StorageServiceWorker storageServiceWorker;
+
+    private BroadCastServer broadCastServer;
 
     private Map<ServerInfo, Future<ServerInfoMessage>> extInfo = new HashMap<>();
 
@@ -352,6 +355,28 @@ public class JoinGameScreen extends CoreScreenLayer {
             });
             refreshButton.subscribe(button -> {
                 refresh();
+            });
+        }
+
+        UIButton broadCastServerButton = find("broadcast", UIButton.class);
+        if (broadCastServerButton != null) {
+            broadCastServerButton.bindEnabled(new ReadOnlyBinding<Boolean>() {
+                @Override
+                public Boolean get() {
+                    return true;
+                }
+            });
+            broadCastServerButton.subscribe(button -> {
+                broadCastServer=new BroadCastServer();
+                if (!broadCastServer.isActive()) {
+                    broadCastServer.setTurnOnBroadcast(true);
+                    broadCastServerButton.setText(translationSystem.translate("${engine:menu#join-server-terminate-broadcast}"));
+                    broadCastServer.startBroadcast();
+                } else {
+                    broadCastServerButton.setText(translationSystem.translate("${engine:menu#join-server-broadcast}"));
+                    broadCastServer.setTurnOnBroadcast(false);
+                    broadCastServer.stopBroadCast();
+                }
             });
         }
     }
