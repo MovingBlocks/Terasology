@@ -16,9 +16,6 @@
 package org.terasology.rendering.nui;
 
 import com.google.common.base.Preconditions;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector3i;
-import org.terasology.math.geom.Vector4f;
 import org.terasology.module.sandbox.API;
 
 import java.nio.ByteBuffer;
@@ -196,18 +193,6 @@ public class Color {
 
     public int rgba() {
         return representation;
-    }
-
-    public Vector4f toVector4f() {
-        return new Vector4f(rf(), gf(), bf(), af());
-    }
-
-    public Vector3f toVector3f() {
-        return new Vector3f(rf(), gf(), bf());
-    }
-
-    public Vector3i toVector3i() {
-        return new Vector3i(r(), g(), b());
     }
 
     public void addToBuffer(ByteBuffer buffer) {
