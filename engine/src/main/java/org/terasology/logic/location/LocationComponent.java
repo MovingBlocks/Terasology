@@ -93,11 +93,11 @@ public final class LocationComponent implements Component, ReplicationCheck {
     /**
      * set the current local rotation of the component
      *
-     * @param newQuat local rotation
+     * @param rot local rotation
      */
-    public void setLocalRotation(Quaternionfc newQuat) {
+    public void setLocalRotation(Quaternionfc rot) {
         lastRotation.set(rotation);
-        rotation.set(JomlUtil.from(newQuat));
+        rotation.set(JomlUtil.from(rot));
     }
 
 
@@ -110,25 +110,25 @@ public final class LocationComponent implements Component, ReplicationCheck {
     }
 
     /**
-     * @param newPos
+     * @param pos
      * @deprecated This is scheduled for removal in an upcoming version method will be replaced with JOML implementation
      *     {@link #setLocalPosition(Vector3fc)}.
      */
     @Deprecated
-    public void setLocalPosition(Vector3f newPos) {
+    public void setLocalPosition(Vector3f pos) {
         lastPosition.set(position);
-        position.set(newPos);
+        position.set(pos);
     }
 
 
     /**
      * the local position of this location component
      *
-     * @param newPos position to set
+     * @param pos position to set
      */
-    public void setLocalPosition(Vector3fc newPos) {
+    public void setLocalPosition(Vector3fc pos) {
         lastPosition.set(position);
-        position.set(JomlUtil.from(newPos));
+        position.set(JomlUtil.from(pos));
     }
 
     /**
@@ -154,10 +154,18 @@ public final class LocationComponent implements Component, ReplicationCheck {
     }
 
 
+    /**
+     * set the local scale
+     * @param value the scale
+     */
     public void setLocalScale(float value) {
         this.scale = value;
     }
 
+    /**
+     * local scale
+     * @return the scale
+     */
     public float getLocalScale() {
         return scale;
     }
