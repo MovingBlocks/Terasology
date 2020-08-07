@@ -19,7 +19,6 @@ import com.google.common.collect.Lists;
 import org.joml.Quaternionf;
 import org.joml.Quaternionfc;
 import org.joml.Vector3fc;
-import org.joml.Vector3ic;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.math.Direction;
@@ -30,7 +29,6 @@ import org.terasology.network.Replicate;
 import org.terasology.network.ReplicationCheck;
 import org.terasology.reflection.metadata.FieldMetadata;
 import org.terasology.rendering.nui.properties.TextField;
-import org.terasology.world.block.Block;
 
 import java.util.Collection;
 import java.util.List;
@@ -72,7 +70,9 @@ public final class LocationComponent implements Component, ReplicationCheck {
     }
 
     /**
-     * @return local rotation of location component TODO: make this readonly Quaternionfc -- Michael Pollind
+     * @return local rotation of location component
+     *
+     * TODO: make this readonly Quaternionfc -- Michael Pollind
      */
     public Quat4f getLocalRotation() {
         return rotation;
@@ -276,6 +276,7 @@ public final class LocationComponent implements Component, ReplicationCheck {
      * @deprecated This is scheduled for removal in an upcoming version method will be replaced with JOML implementation
      *     {@link #setWorldPosition(Vector3fc)}.
      */
+    @Deprecated
     public void setWorldPosition(Vector3f value) {
         this.setWorldPosition(JomlUtil.from(value));
     }
