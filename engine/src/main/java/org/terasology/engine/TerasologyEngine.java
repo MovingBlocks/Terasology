@@ -66,6 +66,8 @@ import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.reflect.ReflectFactory;
 import org.terasology.reflection.reflect.ReflectionReflectFactory;
 import org.terasology.registry.CoreRegistry;
+import org.terasology.rendering.gltf.ByteBufferAsset;
+import org.terasology.rendering.gltf.ByteBufferData;
 import org.terasology.rendering.nui.asset.UIData;
 import org.terasology.rendering.nui.asset.UIElement;
 import org.terasology.rendering.nui.skin.UISkin;
@@ -356,6 +358,7 @@ public class TerasologyEngine implements GameEngine {
                 (AssetFactory<BehaviorTree, BehaviorTreeData>) BehaviorTree::new, false, "behaviors");
         assetTypeManager.registerCoreAssetType(UIElement.class,
                 (AssetFactory<UIElement, UIData>) UIElement::new, "ui");
+        assetTypeManager.registerCoreAssetType(ByteBufferAsset.class, (AssetFactory<ByteBufferAsset, ByteBufferData>) ByteBufferAsset::new, "mesh");
 
         for (EngineSubsystem subsystem : allSubsystems) {
             subsystem.registerCoreAssetTypes(assetTypeManager);

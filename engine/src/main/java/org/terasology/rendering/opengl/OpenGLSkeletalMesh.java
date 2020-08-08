@@ -26,6 +26,7 @@ import org.terasology.assets.ResourceUrn;
 import org.terasology.engine.GameThread;
 import org.terasology.engine.subsystem.lwjgl.GLBufferPool;
 import org.terasology.math.AABB;
+import org.terasology.math.geom.Matrix4f;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector2f;
 import org.terasology.math.geom.Vector3f;
@@ -166,9 +167,9 @@ public class OpenGLSkeletalMesh extends SkeletalMesh {
         postRender();
     }
 
-    public void render(List<Vector3f> bonePositions, List<Quat4f> boneRotations) {
+    public void render(List<Matrix4f> boneTransforms) {
         preRender();
-        doRender(data.getVertexPositions(bonePositions, boneRotations), data.getVertexNormals(bonePositions, boneRotations));
+        doRender(data.getVertexPositions(boneTransforms), data.getVertexNormals(boneTransforms));
         postRender();
     }
 
