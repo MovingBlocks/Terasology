@@ -155,7 +155,7 @@ public class NewGameScreen extends CoreScreenLayer {
             if (gameName.getText().isEmpty()) {
                 universeWrapper.setGameName(GameProvider.getNextGameName());
             }
-            universeWrapper.setGameName(gameName.getText());
+            universeWrapper.setGameName(GameProvider.getNextGameName(gameName.getText()));
             if (gameplay.getOptions().isEmpty()) {
                 logger.error("No gameplay modules present");
                 MessagePopup errorPopup = getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class);

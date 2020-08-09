@@ -82,6 +82,14 @@ public class ComponentLibrary extends AbstractClassLibrary<Component> {
         return (ComponentMetadata<T>) super.getMetadata(object);
     }
 
+    public <T extends Component> T copyWithOwnedEntities(T object) {
+        ComponentMetadata<T> info = getMetadata(object);
+        if (info != null) {
+            return info.copyWithOwnedEntities(object);
+        }
+        return null;
+    }
+
     @Override
     public ComponentMetadata<? extends Component> getMetadata(ResourceUrn uri) {
         return (ComponentMetadata<? extends Component>) super.getMetadata(uri);
