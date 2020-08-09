@@ -10,6 +10,8 @@ import org.terasology.rendering.nui.CoreLayout;
 import org.terasology.rendering.nui.LayoutConfig;
 import org.terasology.rendering.nui.LayoutHint;
 import org.terasology.rendering.nui.UIWidget;
+import org.terasology.rendering.nui.databinding.Binding;
+import org.terasology.rendering.nui.databinding.DefaultBinding;
 
 import java.util.Iterator;
 import java.util.List;
@@ -56,6 +58,9 @@ public class FlowLayout extends CoreLayout<LayoutHint> {
      */
     @LayoutConfig
     private int horizontalSpacing;
+
+    @LayoutConfig
+    private Binding<Boolean> rightToLeftAlign = new DefaultBinding<>(false);
 
     @Override
     public void addWidget(UIWidget element, LayoutHint hint) {
@@ -184,5 +189,21 @@ public class FlowLayout extends CoreLayout<LayoutHint> {
     public FlowLayout setVerticalSpacing(int spacing) {
         this.verticalSpacing = spacing;
         return this;
+    }
+
+    public boolean isRightToLeftAlign() {
+        return rightToLeftAlign.get();
+    }
+
+    public void setRightToLeftAlign(boolean rightToLeftAlign) {
+        this.rightToLeftAlign.set(rightToLeftAlign);
+    }
+
+    public void bindRightToLeftAlign(Binding<Boolean> binding) {
+        this.rightToLeftAlign = binding;
+    }
+
+    public void clearRightToLeftAlignBinding() {
+        this.rightToLeftAlign = new DefaultBinding<>(false);
     }
 }
