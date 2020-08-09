@@ -59,6 +59,15 @@ public class FlowLayout extends CoreLayout<LayoutHint> {
     @LayoutConfig
     private int horizontalSpacing;
 
+    /**
+     * Whether the directional flow of this layout goes from left-to-right or right-to-left.
+     * <p>
+     * The children are laid out from left-to-right by default (false), aligned at the left border of the canvas. If
+     * this toggle is explicitly enabled (true) the children are laid out right-to-left, aligned at the right border of
+     * the canvas.
+     * <p>
+     * This toggle can be set programmatically or in {@code .ui} files that use the Flow layout.
+     */
     @LayoutConfig
     private Binding<Boolean> rightToLeftAlign = new DefaultBinding<>(false);
 
@@ -129,7 +138,8 @@ public class FlowLayout extends CoreLayout<LayoutHint> {
             }
 
             if (draw) {
-                canvas.drawWidget(widget, Rect2i.createFromMinAndSize(widthOffset, heightOffset, size.x, size.y));
+                int xPosition = isRightToLeftAlign() ? canvas.size().x - widthOffset - size.x : widthOffset;
+                canvas.drawWidget(widget, Rect2i.createFromMinAndSize(xPosition, heightOffset, size.x, size.y));
             }
             widthOffset += size.x;
             rowHeight = Math.max(rowHeight, size.y);
@@ -191,18 +201,50 @@ public class FlowLayout extends CoreLayout<LayoutHint> {
         return this;
     }
 
+    /**
+     * Whether the directional flow of this layout goes from left-to-right or right-to-left.
+     * <p>
+     * If false, the children are laid out from left-to-right and aligned at the left border of the canvas. If true, the
+     * children are laid out right-to-left and aligned at the right border of the canvas.
+     * <p>
+     * This toggle can be set programmatically or in {@code .ui} files that use the Flow layout.
+     *
+     * @return whether the children are laid out right-to-left or aligned to the right
+     */
     public boolean isRightToLeftAlign() {
         return rightToLeftAlign.get();
     }
 
+    /**
+     * Set whether the directional flow of this layout goes from left-to-right or right-to-left.
+     * <p>
+     * The children are laid out from left-to-right by default (false), aligned at the left border of the canvas. If
+     * this toggle is explicitly enabled (true) the children are laid out right-to-left, aligned at the right border of
+     * the canvas.
+     * <p>
+     * This toggle can be set programmatically or in {@code .ui} files that use the Flow layout.
+     *
+     * @param rightToLeftAlign whether the children are laid out right-to-left and aligned to the right
+     */
     public void setRightToLeftAlign(boolean rightToLeftAlign) {
         this.rightToLeftAlign.set(rightToLeftAlign);
     }
 
+    /**
+     * Bind whether the directional flow of this layout goes from left-to-right or right-to-left with given binding.
+     * <p>
+     * The directional will change whenever the given binding changes it's value. See {@link #isRightToLeftAlign()} for
+     * more details on the directional flow.
+     *
+     * @param binding the binding defining whether to to align children right-to-left or left-to-right.
+     */
     public void bindRightToLeftAlign(Binding<Boolean> binding) {
         this.rightToLeftAlign = binding;
     }
 
+    /**
+     * Clear any binding to the the right-to-left align property and reset to the default value (false).
+     */
     public void clearRightToLeftAlignBinding() {
         this.rightToLeftAlign = new DefaultBinding<>(false);
     }
