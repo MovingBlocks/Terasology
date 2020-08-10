@@ -48,7 +48,7 @@ public class BroadcastServer extends TimerTask{
     }
 
     public void startBroadcast() {
-        Timer timer = new Timer();
+        Timer timer = new Timer(true);
         timer.schedule(new BroadcastServer(), 0, 1500);
     }
 
