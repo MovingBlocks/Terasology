@@ -338,6 +338,7 @@
     "sound-volume": "sound-volume",
     "special-keyboards": "special-keyboards",
     "ssao": "ssao",
+    "start-server-broadcast": "start-server-broadcast",
     "start-game": "start-game",
     "start-record": "start-record",
     "start-replay": "start-replay",

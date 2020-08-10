@@ -338,6 +338,18 @@
                                     {
                                         "type": "UIButton",
                                         "id": "broadcast",
+                                        "text": "${engine:menu#start-server-broadcast}",
+                                        "family": "highlight",
+                                        "layoutInfo": {
+                                            "height": 40,
+                                            "position-bottom": {
+                                                "target": "BOTTOM"
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "type": "UIButton",
+                                        "id": "join-broadcast",
                                         "text": "${engine:menu#join-server-broadcast}",
                                         "family": "highlight",
                                         "layoutInfo": {

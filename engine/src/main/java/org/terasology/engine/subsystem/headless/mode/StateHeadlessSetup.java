@@ -42,7 +42,7 @@ import org.terasology.logic.console.commands.CoreCommands;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.module.Module;
 import org.terasology.naming.Name;
-import org.terasology.network.BroadCastServer;
+import org.terasology.network.BroadcastServer;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkMode;
 import org.terasology.recording.DirectionAndOriginPosRecorderList;
@@ -70,7 +70,7 @@ public class StateHeadlessSetup implements GameState {
     private EventSystem eventSystem;
     private ComponentSystemManager componentSystemManager;
     private Context context;
-    private BroadCastServer broadCastServer;
+    private BroadcastServer broadcastServer;
 
     public StateHeadlessSetup() {
     }
@@ -106,7 +106,12 @@ public class StateHeadlessSetup implements GameState {
         componentSystemManager.initialise();
 
         // Get the server to start broadcast
-        broadCastServer.startBroadcast();
+        broadcastServer=new BroadcastServer();
+        try {
+            broadcastServer.startBroadcast();
+        }catch(Exception e){
+
+        }
 
         GameManifest gameManifest;
         List<GameInfo> savedGames = GameProvider.getSavedGames();

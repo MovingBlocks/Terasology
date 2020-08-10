@@ -33,7 +33,8 @@ import org.terasology.identity.storageServiceClient.StorageServiceWorker;
 import org.terasology.input.Keyboard;
 import org.terasology.module.ModuleRegistry;
 import org.terasology.naming.NameVersion;
-import org.terasology.network.BroadCastServer;
+import org.terasology.network.BroadcastServer;
+import org.terasology.network.BroadcastClient;
 import org.terasology.network.JoinStatus;
 import org.terasology.network.NetworkSystem;
 import org.terasology.network.PingService;
@@ -93,7 +94,9 @@ public class JoinGameScreen extends CoreScreenLayer {
     @In
     private StorageServiceWorker storageServiceWorker;
 
-    private BroadCastServer broadCastServer;
+    private BroadcastServer broadcastServer;
+
+    private BroadcastClient broadcastClient;
 
     private Map<ServerInfo, Future<ServerInfoMessage>> extInfo = new HashMap<>();
 
@@ -367,17 +370,33 @@ public class JoinGameScreen extends CoreScreenLayer {
                 }
             });
             broadCastServerButton.subscribe(button -> {
-                broadCastServer=new BroadCastServer();
-                if (!broadCastServer.isActive()) {
-                    broadCastServer.setTurnOnBroadcast(true);
-                    broadCastServerButton.setText(translationSystem.translate("${engine:menu#join-server-terminate-broadcast}"));
-                    broadCastServer.startBroadcast();
-                } else {
-                    broadCastServerButton.setText(translationSystem.translate("${engine:menu#join-server-broadcast}"));
-                    broadCastServer.setTurnOnBroadcast(false);
-                    broadCastServer.stopBroadCast();
+                broadcastServer = new BroadcastServer();
+                broadCastServerButton.setText(translationSystem.translate("${engine:menu#start-server-broadcast}"));
+                try {
+                    broadcastServer.startBroadcast();
+                }catch(Exception e){
+
                 }
             });
+        }
+
+            UIButton joinBroadcastButton = find("join-broadcast", UIButton.class);
+            if (joinBroadcastButton != null) {
+                joinBroadcastButton.bindEnabled(new ReadOnlyBinding<Boolean>() {
+                    @Override
+                    public Boolean get() {
+                        return true;
+                    }
+                });
+                joinBroadcastButton.subscribe(button -> {
+                    broadcastClient = new BroadcastClient();
+                    joinBroadcastButton.setText(translationSystem.translate("${engine:menu#join-server-broadcast}"));
+                    try {
+                        broadcastClient.startBroadcast();
+                    }catch(Exception e){
+
+                    }
+                });
         }
     }
 
