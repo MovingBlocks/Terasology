@@ -3,11 +3,13 @@
 
 package org.terasology.math;
 
+import org.joml.Rectanglei;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.terasology.math.geom.Rect2i;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.nui.Border;
+import org.terasology.nui.util.RectUtility;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -59,8 +61,9 @@ public class BorderTest {
 
     @Test
     public void growBorderMax() {
-        assertEquals(border.grow(JomlUtil.from(Rect2i.createFromMinAndSize(10, 10, Integer.MAX_VALUE,
-            Integer.MAX_VALUE))), JomlUtil.from(Rect2i.createFromMinAndSize(0, 0, Integer.MAX_VALUE,
-            Integer.MAX_VALUE)));
+        assertEquals(
+                RectUtility.createFromMinAndSize(0, 0, Integer.MAX_VALUE, Integer.MAX_VALUE),
+                border.grow(RectUtility.createFromMinAndSize(10, 10, Integer.MAX_VALUE, Integer.MAX_VALUE)),
+                "Growing border should be capped at Integer.MAX_VALUE");
     }
 }
