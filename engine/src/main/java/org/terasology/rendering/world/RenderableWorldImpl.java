@@ -380,10 +380,6 @@ class RenderableWorldImpl implements RenderableWorld {
         return chunk.isReady();
     }
 
-    private boolean areSurroundingChunksLoaded(RenderableChunk chunk) {
-        return worldProvider.getWorldViewAround(chunk.getPosition()) != null;
-    }
-
     private boolean isChunkVisibleFromMainLight(RenderableChunk chunk) {
         return isChunkVisible(shadowMapCamera, chunk); //TODO: find an elegant way
     }
