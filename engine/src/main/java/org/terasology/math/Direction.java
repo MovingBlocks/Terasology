@@ -119,7 +119,7 @@ public enum Direction {
     /**
      * @return The vector3i in the direction of the side. Do not modify.
      * @deprecated This method is scheduled for removal in an upcoming version. Use the JOML implementation instead:
-     *     {@link #vector3i()} .
+     *     {@link #vector3ic()} .
      */
     @Deprecated
     public Vector3i getVector3i() {
@@ -129,7 +129,7 @@ public enum Direction {
     /**
      * @return
      * @deprecated This method is scheduled for removal in an upcoming version. Use the JOML implementation instead:
-     *     {@link #vector3f()}.
+     *     {@link #vector3fc()}.
      */
     @Deprecated
     public Vector3f getVector3f() {
@@ -139,14 +139,14 @@ public enum Direction {
     /**
      * @return The {@link Vector3ic} in the direction of the side. Do not modify.
      */
-    public Vector3ic vector3i() {
+    public Vector3ic vector3ic() {
         return JomlUtil.from(vector3iDir);
     }
 
     /**
      * @return The {@link Vector3fc} in the direction of the side. Do not modify.
      */
-    public Vector3fc vector3f() {
+    public Vector3fc vector3fc() {
         return JomlUtil.from(vector3fDir);
     }
 
