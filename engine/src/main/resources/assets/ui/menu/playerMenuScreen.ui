@@ -30,6 +30,7 @@
                     ],
                     "verticalSpacing": 8,
                     "horizontalSpacing": 8,
+                    "overrideChildEnabledProp" : false,
                     "contents": [
                         {
                             "type": "UILabel",
@@ -63,11 +64,14 @@
                         },
                         {
                             "type": "UILabel",
-                            "text": "Multiplayer identities:"
+                            "text": "Multiplayer identities:",
+                            "enabled": false
                         },
                         {
                             "type": "RowLayout",
                             "horizontalSpacing": 10,
+                            "id": "identitiesLayout",
+                            "enabled": false,
                             "contents": [
                                 {
                                     "type": "UIButton",
@@ -83,11 +87,13 @@
                         },
                         {
                             "type": "UILabel",
-                            "text": "${engine:menu#storage-service}:"
+                            "text": "${engine:menu#storage-service}:",
+                            "enabled": false
                         },
                         {
                             "type": "RowLayout",
                             "horizontalSpacing": 10,
+                            "enabled": false,
                             "contents": [
                                 {
                                     "type": "UILabel",
