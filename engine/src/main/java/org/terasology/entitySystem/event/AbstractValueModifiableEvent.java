@@ -62,8 +62,8 @@ public abstract class AbstractValueModifiableEvent implements Event {
     }
 
     /**
-     * Calls getResultValueWithoutCapping() to obtain the result value calculated from the base value and given
-     * modifiers and multipliers and returns the value if positive and zero if negative.
+     * Uses {@link AbstractValueModifiableEvent#getResultValueWithoutCapping()} to obtain the result value and returns
+     * the same if positive and zero if negative.
      * <pre>
      * result = max(0, ResultValueWithoutCapping)
      * </pre>
