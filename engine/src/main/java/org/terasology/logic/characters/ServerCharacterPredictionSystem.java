@@ -223,6 +223,7 @@ public class ServerCharacterPredictionSystem extends BaseComponentSystem impleme
             }
         }
         characterStates.keySet().removeAll(characterStatesToRemove);
+        characterStatesToRemove.clear();
     }
 
 
