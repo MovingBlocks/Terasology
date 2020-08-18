@@ -42,6 +42,16 @@ public interface TranslationSystem extends Translator {
      */
     String translate(String id, Locale locale, Object... arguments);
 
+    @Override
+    default String translate(String id) {
+        return translate(id, new Object[0]);
+    }
+
+    @Override
+    default String translate(String id, Locale locale) {
+        return translate(id, locale, new Object[0]);
+    }
+
     /**
      * Subscribe to change events. Will be fired when the content of a project is changed.
      * @param changeListener the listener to add
