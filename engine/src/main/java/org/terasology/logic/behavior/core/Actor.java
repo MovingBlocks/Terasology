@@ -18,6 +18,7 @@ package org.terasology.logic.behavior.core;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.engine.ComponentFieldUri;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -91,7 +92,7 @@ public class Actor {
 
     public Object getComponentField(ComponentFieldUri uri) {
         ComponentLibrary componentLibrary = CoreRegistry.get(EntitySystemLibrary.class).getComponentLibrary();
-        ComponentMetadata<? extends Component> metadata = componentLibrary.getMetadata(uri.getComponentUri());
+        ComponentMetadata<? extends Component> metadata = componentLibrary.getMetadata(new ResourceUrn(uri.getComponentUri().toString()));
         if (metadata == null) {
             return null;
         }

@@ -26,8 +26,8 @@ import org.terasology.logic.console.commandSystem.annotations.Command;
 import org.terasology.logic.console.commandSystem.annotations.CommandParam;
 import org.terasology.logic.console.commandSystem.annotations.Sender;
 import org.terasology.network.ColorComponent;
+import org.terasology.nui.Color;
 import org.terasology.registry.In;
-import org.terasology.rendering.nui.Color;
 import org.terasology.world.internal.WorldInfo;
 
 import java.util.Map;

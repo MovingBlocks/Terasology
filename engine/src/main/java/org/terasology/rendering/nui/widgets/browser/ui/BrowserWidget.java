@@ -1,26 +1,13 @@
-/*
- * Copyright 2015 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.rendering.nui.widgets.browser.ui;
 
-import org.terasology.math.geom.Rect2i;
-import org.terasology.math.geom.Vector2i;
-import org.terasology.rendering.nui.BaseInteractionListener;
-import org.terasology.rendering.nui.Canvas;
-import org.terasology.rendering.nui.CoreWidget;
-import org.terasology.rendering.nui.events.NUIMouseClickEvent;
+import org.joml.Rectanglei;
+import org.joml.Vector2i;
+import org.terasology.nui.BaseInteractionListener;
+import org.terasology.nui.Canvas;
+import org.terasology.nui.CoreWidget;
+import org.terasology.nui.events.NUIMouseClickEvent;
 import org.terasology.rendering.nui.widgets.browser.data.DocumentData;
 
 import java.util.LinkedList;
@@ -46,7 +33,7 @@ public class BrowserWidget extends CoreWidget {
                     @Override
                     public boolean onMouseClick(NUIMouseClickEvent event) {
                         for (HyperlinkBox hyperlinkBox : hyperlinkBoxes) {
-                            if (hyperlinkBox.box.contains(event.getRelativeMousePosition())) {
+                            if (hyperlinkBox.box.containsPoint(event.getRelativeMousePosition())) {
                                 for (BrowserHyperlinkListener browserHyperlinkListener : listenerList) {
                                     browserHyperlinkListener.hyperlinkClicked(hyperlinkBox.hyperlink);
                                 }
@@ -59,7 +46,10 @@ public class BrowserWidget extends CoreWidget {
                     }
                 });
         if (displayedPage != null) {
-            DocumentRenderer.drawDocumentInRegion(displayedPage, canvas, canvas.getCurrentStyle().getFont(), canvas.getCurrentStyle().getTextColor(), canvas.size(), register);
+            DocumentRenderer.drawDocumentInRegion(
+                    displayedPage, canvas, canvas.getCurrentStyle().getFont(), canvas.getCurrentStyle().getTextColor(),
+                    canvas.size(), register
+            );
         }
     }
 
@@ -67,10 +57,12 @@ public class BrowserWidget extends CoreWidget {
     @Override
     public Vector2i getPreferredContentSize(Canvas canvas, Vector2i sizeHint) {
         if (displayedPage != null) {
-            return DocumentRenderer.getDocumentPreferredSize(displayedPage, canvas.getCurrentStyle().getFont(), canvas.getCurrentStyle().getTextColor(),
-                    canvas.getRegion().sizeX());
+            return DocumentRenderer.getDocumentPreferredSize(
+                    displayedPage, canvas.getCurrentStyle().getFont(), canvas.getCurrentStyle().getTextColor(),
+                    canvas.getRegion().lengthX()
+            );
         } else {
-            return new Vector2i(0, 0);
+            return new Vector2i();
         }
     }
 
@@ -79,10 +71,10 @@ public class BrowserWidget extends CoreWidget {
     }
 
     private final class HyperlinkBox {
-        private Rect2i box;
+        private Rectanglei box;
         private String hyperlink;
 
-        private HyperlinkBox(Rect2i box, String hyperlink) {
+        private HyperlinkBox(Rectanglei box, String hyperlink) {
             this.box = box;
             this.hyperlink = hyperlink;
         }
@@ -90,7 +82,7 @@ public class BrowserWidget extends CoreWidget {
 
     private class HyperlinkRegisterImpl implements ParagraphRenderable.HyperlinkRegister {
         @Override
-        public void registerHyperlink(Rect2i region, String hyperlink) {
+        public void registerHyperlink(Rectanglei region, String hyperlink) {
             hyperlinkBoxes.add(new HyperlinkBox(region, hyperlink));
         }
     }

@@ -25,12 +25,12 @@ import org.terasology.game.GameManifest;
 import org.terasology.network.NetworkMode;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.nui.animation.MenuAnimationSystems;
-import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
+import org.terasology.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.layers.mainMenu.gameDetailsScreen.GameDetailsScreen;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameInfo;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameProvider;
-import org.terasology.rendering.nui.widgets.UIButton;
-import org.terasology.rendering.nui.widgets.UILabel;
+import org.terasology.nui.widgets.UIButton;
+import org.terasology.nui.widgets.UILabel;
 
 import java.io.IOException;
 import java.nio.file.Files;

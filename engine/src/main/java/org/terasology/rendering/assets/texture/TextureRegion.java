@@ -15,27 +15,28 @@
  */
 package org.terasology.rendering.assets.texture;
 
-import org.terasology.math.geom.Rect2f;
-import org.terasology.math.geom.Rect2i;
-import org.terasology.math.geom.Vector2i;
+import org.joml.Rectanglef;
+import org.joml.Rectanglei;
+import org.joml.Vector2i;
 
 /**
  * Interface for any asset that describes a region of a texture that can be rendered (can include textures themselves).
  *
  */
-public interface TextureRegion {
+// TODO: Remove UITextureRegion extension when NUI is fully re-integrated
+public interface TextureRegion extends org.terasology.nui.UITextureRegion {
 
     Texture getTexture();
 
     /**
      * @return The region of the texture represented by this asset
      */
-    Rect2f getRegion();
+    Rectanglef getRegion();
 
     /**
      * @return The pixel region of the texture represented by this asset
      */
-    Rect2i getPixelRegion();
+    Rectanglei getPixelRegion();
 
     int getWidth();
 

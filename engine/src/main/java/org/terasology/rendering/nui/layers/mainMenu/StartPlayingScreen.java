@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.nui.layers.mainMenu;
 
+import org.joml.Vector2i;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.context.Context;
@@ -26,14 +27,15 @@ import org.terasology.engine.module.ModuleManager;
 import org.terasology.game.GameManifest;
 import org.terasology.i18n.TranslationSystem;
 import org.terasology.network.NetworkMode;
+import org.terasology.nui.Canvas;
+import org.terasology.nui.WidgetUtil;
+import org.terasology.nui.widgets.UIImage;
+import org.terasology.nui.widgets.UILabel;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.nui.CoreScreenLayer;
-import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.animation.MenuAnimationSystems;
 import org.terasology.rendering.nui.layers.mainMenu.videoSettings.RenderingModuleSettingScreen;
-import org.terasology.rendering.nui.widgets.UIImage;
-import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.rendering.world.WorldSetupWrapper;
 import org.terasology.world.internal.WorldInfo;
 import org.terasology.world.time.WorldTime;
@@ -141,5 +143,10 @@ public class StartPlayingScreen extends CoreScreenLayer {
     @Override
     public boolean isLowerLayerVisible() {
         return false;
+    }
+
+    @Override
+    public Vector2i getPreferredContentSize(Canvas canvas, Vector2i vector2i) {
+        return vector2i;
     }
 }
