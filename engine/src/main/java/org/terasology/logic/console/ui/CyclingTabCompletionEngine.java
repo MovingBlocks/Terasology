@@ -27,7 +27,7 @@ import org.terasology.logic.console.commandSystem.ConsoleCommand;
 import org.terasology.logic.console.commandSystem.exceptions.CommandSuggestionException;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.naming.Name;
-import org.terasology.rendering.FontColor;
+import org.terasology.nui.FontColor;
 import org.terasology.utilities.CamelCaseMatcher;
 
 import java.util.Collection;

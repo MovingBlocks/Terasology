@@ -19,6 +19,7 @@ package org.terasology.entitySystem.metadata;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.reflections.Reflections;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.context.Context;
 import org.terasology.context.internal.ContextImpl;
 import org.terasology.engine.SimpleUri;
@@ -52,7 +53,7 @@ public class ComponentMetadataTest {
         Reflections reflections = new Reflections(getClass().getClassLoader());
         EntitySystemLibrary entitySystemLibrary = new EntitySystemLibrary(context, new TypeHandlerLibrary(reflections));
         ComponentLibrary lib = entitySystemLibrary.getComponentLibrary();
-        lib.register(new SimpleUri("unittest:string"), StringComponent.class);
+        lib.register(new ResourceUrn("unittest:string"), StringComponent.class);
         ComponentMetadata<StringComponent> metadata = lib.getMetadata(StringComponent.class);
         assertNull(metadata.getField("STATIC_VALUE"));
     }
@@ -62,7 +63,7 @@ public class ComponentMetadataTest {
         Reflections reflections = new Reflections(getClass().getClassLoader());
         EntitySystemLibrary entitySystemLibrary = new EntitySystemLibrary(context, new TypeHandlerLibrary(reflections));
         ComponentLibrary lib = entitySystemLibrary.getComponentLibrary();
-        lib.register(new SimpleUri("unittest:owner"), OwnerComponent.class);
+        lib.register(new ResourceUrn("unittest:owner"), OwnerComponent.class);
         ComponentMetadata<OwnerComponent> metadata = lib.getMetadata(OwnerComponent.class);
         assertTrue(metadata.isReferenceOwner());
     }

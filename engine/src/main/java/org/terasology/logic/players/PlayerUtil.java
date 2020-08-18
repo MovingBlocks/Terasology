@@ -18,7 +18,7 @@ package org.terasology.logic.players;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.common.DisplayNameComponent;
 import org.terasology.network.ColorComponent;
-import org.terasology.rendering.FontColor;
+import org.terasology.nui.FontColor;
 
 /**
  * Utility class. Currently only used as container for getColoredPlayerName.

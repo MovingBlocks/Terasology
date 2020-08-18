@@ -18,10 +18,12 @@ package org.terasology.entitySystem.metadata;
 import com.google.common.collect.Iterables;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
 import org.terasology.entitySystem.Component;
 import org.terasology.module.Module;
+import org.terasology.module.ModuleEnvironment;
 import org.terasology.naming.Name;
 import org.terasology.reflection.copy.CopyStrategy;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
@@ -36,8 +38,8 @@ public class ComponentLibrary extends AbstractClassLibrary<Component> {
 
     private static final Logger logger = LoggerFactory.getLogger(ComponentLibrary.class);
 
-    public ComponentLibrary(Context context) {
-        super(context);
+    public ComponentLibrary(ModuleEnvironment environment, ReflectFactory reflectFactory, CopyStrategyLibrary copyStrategyLibrary) {
+        super(environment, reflectFactory, copyStrategyLibrary);
     }
 
     private ComponentLibrary(ComponentLibrary componentLibrary, CopyStrategyLibrary newCopyStrategies) {
@@ -53,7 +55,7 @@ public class ComponentLibrary extends AbstractClassLibrary<Component> {
     }
 
     @Override
-    protected <C extends Component> ClassMetadata<C, ?> createMetadata(Class<C> type, ReflectFactory factory, CopyStrategyLibrary copyStrategies, SimpleUri uri) {
+    protected <C extends Component> ClassMetadata<C, ?> createMetadata(Class<C> type, ReflectFactory factory, CopyStrategyLibrary copyStrategies, ResourceUrn uri) {
         ComponentMetadata<C> info;
         try {
             info = new ComponentMetadata<>(uri, type, factory, copyStrategies);
@@ -80,8 +82,16 @@ public class ComponentLibrary extends AbstractClassLibrary<Component> {
         return (ComponentMetadata<T>) super.getMetadata(object);
     }
 
+    public <T extends Component> T copyWithOwnedEntities(T object) {
+        ComponentMetadata<T> info = getMetadata(object);
+        if (info != null) {
+            return info.copyWithOwnedEntities(object);
+        }
+        return null;
+    }
+
     @Override
-    public ComponentMetadata<? extends Component> getMetadata(SimpleUri uri) {
+    public ComponentMetadata<? extends Component> getMetadata(ResourceUrn uri) {
         return (ComponentMetadata<? extends Component>) super.getMetadata(uri);
     }
 
@@ -110,7 +120,7 @@ public class ComponentLibrary extends AbstractClassLibrary<Component> {
      * creates a copy of the data and uses the same instance in multiple threads.
      */
     @Override
-    public void register(SimpleUri uri, Class<? extends Component> clazz) {
+    public void register(ResourceUrn uri, Class<? extends Component> clazz) {
         super.register(uri, clazz);
     }
 }

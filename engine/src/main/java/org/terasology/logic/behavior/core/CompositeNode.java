@@ -16,7 +16,7 @@
 package org.terasology.logic.behavior.core;
 
 import com.google.common.collect.Lists;
-import org.terasology.rendering.nui.properties.PropertyProvider;
+import org.terasology.nui.properties.PropertyProvider;
 
 import java.util.List;
 
