@@ -83,6 +83,7 @@ import static com.google.common.base.Verify.verifyNotNull;
  * <tr><td>-homedir=path</td><td>Use the specified path as the home directory.</td></tr>
  * <tr><td>-headless</td><td>Start headless.</td></tr>
  * <tr><td>-loadlastgame</td><td>Load the latest game on startup.</td></tr>
+ * <tr><td>-createlastgame</td><td>Recreates the world of the latest game with a new save file on startup.</td></tr>
  * <tr><td>-noSaveGames</td><td>Disable writing of save games.</td></tr>
  * <tr><td>-noCrashReport</td><td>Disable crash reporting.</td></tr>
  * <tr><td>-noSound</td><td>Disable sound.</td></tr>
@@ -104,6 +105,7 @@ public final class Terasology {
     private static final String USE_SPECIFIED_DIR_AS_HOME = "-homedir=";
     private static final String START_HEADLESS = "-headless";
     private static final String LOAD_LAST_GAME = "-loadlastgame";
+    private static final String CREATE_LAST_GAME = "-createlastgame";
     private static final String NO_CRASH_REPORT = "-noCrashReport";
     private static final String NO_SAVE_GAMES = "-noSaveGames";
     private static final String PERMISSIVE_SECURITY = "-permissiveSecurity";
@@ -119,6 +121,7 @@ public final class Terasology {
     private static boolean soundEnabled = true;
     private static boolean splashEnabled = true;
     private static boolean loadLastGame;
+    private static boolean createLastGame;
 
 
     private Terasology() {
@@ -150,12 +153,28 @@ public final class Terasology {
             if (isHeadless) {
                 engine.subscribeToStateChange(new HeadlessStateChangeListener(engine));
                 engine.run(new StateHeadlessSetup());
+            } else if (loadLastGame) {
+                engine.initialize(); //initialize the managers first
+                engine.getFromEngineContext(ThreadManager.class).submitTask("loadGame", () -> {
+                    GameManifest gameManifest = getLatestGameManifest();
+                    if (gameManifest != null) {
+                        engine.changeState(new StateLoading(gameManifest, NetworkMode.NONE));
+                    }
+                });
             } else {
-                if (loadLastGame) {
-                    engine.getFromEngineContext(ThreadManager.class).submitTask("loadGame", () -> {
+                if (createLastGame) {
+                    engine.initialize();
+                    engine.getFromEngineContext(ThreadManager.class).submitTask("createLastGame", () -> {
                         GameManifest gameManifest = getLatestGameManifest();
                         if (gameManifest != null) {
-                            engine.changeState(new StateLoading(gameManifest, NetworkMode.NONE));
+                            String title = gameManifest.getTitle();
+                            GameManifest newlyCreatedGM = gameManifest;
+                            if (!title.startsWith("New Created")) { //if first time run
+                                newlyCreatedGM.setTitle("New Created " + title + " 1");
+                            } else { //if not first time run
+                                newlyCreatedGM.setTitle(getNewTitle(title));
+                            }
+                            engine.changeState(new StateLoading(newlyCreatedGM, NetworkMode.NONE));
                         }
                     });
                 }
@@ -167,6 +186,13 @@ public final class Terasology {
             splashScreen.close();
             reportException(e);
         }
+    }
+
+    private static String getNewTitle(String title) {
+        String newTitle = title.substring(0, getPositionOfLastDigit(title));
+        int fileNumber = getLastNumber(title);
+        fileNumber++;
+        return (newTitle + " " + fileNumber);
     }
 
     private static SplashScreen configureSplashScreen() {
@@ -258,6 +284,7 @@ public final class Terasology {
                 USE_CURRENT_DIR_AS_HOME + "|" + USE_SPECIFIED_DIR_AS_HOME + "<path>",
                 START_HEADLESS,
                 LOAD_LAST_GAME,
+                CREATE_LAST_GAME,
                 NO_CRASH_REPORT,
                 NO_SAVE_GAMES,
                 PERMISSIVE_SECURITY,
@@ -288,6 +315,9 @@ public final class Terasology {
         System.out.println();
         System.out.println("To automatically load the latest game on startup,");
         System.out.println("use the " + LOAD_LAST_GAME + " launch argument.");
+        System.out.println();
+        System.out.println("To automatically recreate the last game played with a new save file,");
+        System.out.println("use the " + CREATE_LAST_GAME + "launch argument");
         System.out.println();
         System.out.println("By default Crash Reporting is enabled.");
         System.out.println("To disable this feature use the " + NO_CRASH_REPORT + " launch argument.");
@@ -350,6 +380,8 @@ public final class Terasology {
                 splashEnabled = false;
             } else if (arg.equals(LOAD_LAST_GAME)) {
                 loadLastGame = true;
+            } else if (arg.equals(CREATE_LAST_GAME)) {
+                createLastGame = true;
             } else if (arg.startsWith(SERVER_PORT)) {
                 System.setProperty(ConfigurationSubsystem.SERVER_PORT_PROPERTY, arg.substring(SERVER_PORT.length()));
             } else if (arg.startsWith(OVERRIDE_DEFAULT_CONFIG)) {
@@ -423,6 +455,26 @@ public final class Terasology {
         }
 
         return latestGame.getManifest();
+    }
+
+    private static int getPositionOfLastDigit(String str) {
+        int position;
+        for (position = str.length() - 1; position >= 0; --position) {
+            char c = str.charAt(position);
+            if (!Character.isDigit(c)) {
+                break;
+            }
+        }
+        return position + 1;
+    }
+
+    private static int getLastNumber(String str) {
+        int positionOfLastDigit = getPositionOfLastDigit(str);
+        if (positionOfLastDigit == str.length()) {
+            // string does not end in digits
+            return -1;
+        }
+        return Integer.parseInt(str.substring(positionOfLastDigit));
     }
 
 }

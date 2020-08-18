@@ -15,10 +15,11 @@
  */
 package org.terasology.rendering.nui.widgets.browser.data.basic;
 
-import org.terasology.math.geom.Rect2i;
-import org.terasology.math.geom.Vector2i;
-import org.terasology.rendering.nui.Canvas;
-import org.terasology.rendering.nui.HorizontalAlign;
+import org.joml.Rectanglei;
+import org.joml.Vector2i;
+import org.terasology.nui.Canvas;
+import org.terasology.nui.HorizontalAlign;
+import org.terasology.nui.util.RectUtility;
 import org.terasology.rendering.nui.widgets.browser.data.basic.flow.ContainerRenderSpace;
 import org.terasology.rendering.nui.widgets.browser.data.basic.flow.FlowLineBuilder;
 import org.terasology.rendering.nui.widgets.browser.data.basic.flow.FlowRenderable;
@@ -70,7 +71,7 @@ public class FlowParagraphRenderable implements ParagraphRenderable {
 
             for (FlowRenderable flowRenderable : line.getFlowRenderables()) {
                 int elementWidth = flowRenderable.getWidth(defaultStyle);
-                Rect2i renderableRegion = Rect2i.createFromMinAndSize(insetXAdvance + leftIndent + alignOffset + startPos.x + x, y, elementWidth, lineHeight);
+                Rectanglei renderableRegion = RectUtility.createFromMinAndSize(insetXAdvance + leftIndent + alignOffset + startPos.x + x, y, elementWidth, lineHeight);
                 String hyperlink = flowRenderable.getAction();
                 if (hyperlink != null) {
                     hyperlinkRegister.registerHyperlink(renderableRegion, hyperlink);

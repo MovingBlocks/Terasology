@@ -16,10 +16,10 @@
 package org.terasology.persistence.typeHandling.extensionTypes;
 
 import gnu.trove.list.TIntList;
+import org.terasology.nui.Color;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.PersistedDataArray;
 import org.terasology.persistence.typeHandling.PersistedDataSerializer;
-import org.terasology.rendering.nui.Color;
 
 import java.util.Optional;
 

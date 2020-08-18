@@ -15,7 +15,7 @@
  */
 package org.terasology.rendering.nui.widgets.browser.data.basic.flow;
 
-import org.terasology.math.geom.Rect2i;
+import org.joml.Rectanglei;
 import org.terasology.rendering.nui.widgets.browser.ui.style.ParagraphRenderStyle;
 
 public interface ContainerRenderSpace {
@@ -23,9 +23,9 @@ public interface ContainerRenderSpace {
 
     int getNextWidthChange(int y);
 
-    Rect2i addLeftFloat(int y, int width, int height);
+    Rectanglei addLeftFloat(int y, int width, int height);
 
-    Rect2i addRightFloat(int y, int width, int height);
+    Rectanglei addRightFloat(int y, int width, int height);
 
     int getNextClearYPosition(ParagraphRenderStyle.ClearStyle clearStyle);
 

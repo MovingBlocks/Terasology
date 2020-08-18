@@ -16,8 +16,8 @@
 package org.terasology.rendering.nui.widgets.browser.data.html.basic;
 
 import com.google.common.collect.Maps;
-import org.terasology.rendering.assets.font.Font;
-import org.terasology.rendering.nui.Color;
+import org.terasology.nui.asset.font.Font;
+import org.terasology.nui.Color;
 import org.terasology.rendering.nui.widgets.browser.data.ParagraphData;
 import org.terasology.rendering.nui.widgets.browser.data.basic.FlowParagraphData;
 import org.terasology.rendering.nui.widgets.browser.data.basic.flow.TextFlowRenderable;

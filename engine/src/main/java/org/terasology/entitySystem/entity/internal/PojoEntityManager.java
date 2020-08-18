@@ -265,7 +265,7 @@ public class PojoEntityManager implements EngineEntityManager {
     public Map<Class<? extends Component>, Component> copyComponents(EntityRef other) {
         Map<Class<? extends Component>, Component> result = Maps.newHashMap();
         for (Component c : other.iterateComponents()) {
-            result.put(c.getClass(), componentLibrary.copy(c));
+            result.put(c.getClass(), componentLibrary.copyWithOwnedEntities(c));
         }
         return result;
     }

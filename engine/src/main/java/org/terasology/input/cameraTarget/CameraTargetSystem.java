@@ -67,7 +67,7 @@ public class CameraTargetSystem extends BaseComponentSystem {
     @Override
     public void initialise() {
         super.initialise();
-        targetDistance = config.getRendering().getViewDistance().getChunkDistance().x * 8.0f;
+        targetDistance = config.getRendering().getViewDistance().getChunkDistance().x() * 8.0f;
         // TODO: This should come from somewhere, probably player entity
         //set the target distance to as far as the player can see. Used to get the focal distance for effects such as DOF.
     }

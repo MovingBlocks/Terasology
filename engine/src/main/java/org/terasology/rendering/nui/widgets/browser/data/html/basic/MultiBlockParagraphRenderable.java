@@ -15,9 +15,9 @@
  */
 package org.terasology.rendering.nui.widgets.browser.data.html.basic;
 
-import org.terasology.math.geom.Vector2i;
-import org.terasology.rendering.nui.Canvas;
-import org.terasology.rendering.nui.HorizontalAlign;
+import org.joml.Vector2i;
+import org.terasology.nui.Canvas;
+import org.terasology.nui.HorizontalAlign;
 import org.terasology.rendering.nui.widgets.browser.data.ParagraphData;
 import org.terasology.rendering.nui.widgets.browser.data.basic.flow.ContainerRenderSpace;
 import org.terasology.rendering.nui.widgets.browser.ui.DocumentRenderer;
