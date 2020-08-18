@@ -120,7 +120,6 @@ public class SpriteParticleRenderer implements RenderSystem {
         PerspectiveCamera camera = (PerspectiveCamera) worldRenderer.getActiveCamera();
         Vector3f cameraPosition = camera.getPosition();
         Matrix4f viewProjection = new Matrix4f(camera.getViewProjectionMatrix())
-                .transpose()
                 .translate(-cameraPosition.x, -cameraPosition.y, -cameraPosition.z);
 
         Material material = Assets.getMaterial(PARTICLE_MATERIAL_URI).get();

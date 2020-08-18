@@ -20,7 +20,7 @@ import org.terasology.logic.behavior.core.Actor;
 import org.terasology.logic.behavior.core.BaseAction;
 import org.terasology.logic.behavior.core.BehaviorState;
 import org.terasology.module.sandbox.API;
-import org.terasology.rendering.nui.properties.Range;
+import org.terasology.nui.properties.Range;
 
 /**
  * Sleeps for a given amount of time (RUNNING),
@@ -29,7 +29,6 @@ import org.terasology.rendering.nui.properties.Range;
 @API
 @BehaviorAction(name = "sleep")
 public class SleepAction extends BaseAction {
-
     @Range(min = 0, max = 20)
     private float time;
 

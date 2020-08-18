@@ -34,6 +34,12 @@ public interface MouseDevice extends InputDevice {
     Vector2i getPosition();
 
     /**
+     * TODO: Remove when nui-input is fully integrated
+     * @return The current position of the mouse in screen space
+     */
+    org.joml.Vector2i getMousePosition();
+
+    /**
      * @return The change in mouse position over the last update
      */
     Vector2i getDelta();

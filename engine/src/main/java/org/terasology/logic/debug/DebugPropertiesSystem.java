@@ -19,11 +19,13 @@ import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.module.sandbox.API;
+import org.terasology.nui.properties.OneOfProviderFactory;
+import org.terasology.reflection.reflect.ReflectFactory;
 import org.terasology.registry.In;
 import org.terasology.registry.Share;
 import org.terasology.rendering.nui.NUIManager;
-import org.terasology.rendering.nui.layouts.PropertyLayout;
-import org.terasology.rendering.nui.properties.PropertyProvider;
+import org.terasology.nui.layouts.PropertyLayout;
+import org.terasology.nui.properties.PropertyProvider;
 
 import java.security.AccessController;
 import java.security.PrivilegedAction;
@@ -45,6 +47,11 @@ public class DebugPropertiesSystem extends BaseComponentSystem {
 
     private PropertyLayout properties;
 
+    @In
+    private ReflectFactory reflectFactory;
+    @In
+    private OneOfProviderFactory providerFactory;
+
     @Override
     public void initialise() {
         DebugProperties debugProperties = (DebugProperties) nuiManager.getHUD().addHUDElement("engine:DebugProperties");
@@ -53,7 +60,7 @@ public class DebugPropertiesSystem extends BaseComponentSystem {
     }
 
     public void addProperty(final String group, final Object o) {
-        PropertyProvider propertyProvider = new PropertyProvider();
+        PropertyProvider propertyProvider = new PropertyProvider(reflectFactory, providerFactory);
         AccessController.doPrivileged((PrivilegedAction<Object>) () -> {
             properties.addProperties(group, propertyProvider.createProperties(o));
             return null;

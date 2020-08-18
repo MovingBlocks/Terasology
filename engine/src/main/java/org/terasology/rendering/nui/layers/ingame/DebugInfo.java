@@ -16,7 +16,7 @@
 package org.terasology.rendering.nui.layers.ingame;
 
 import org.terasology.rendering.nui.CoreScreenLayer;
-import org.terasology.rendering.nui.WidgetUtil;
+import org.terasology.nui.WidgetUtil;
 
 public class DebugInfo extends CoreScreenLayer {
 
