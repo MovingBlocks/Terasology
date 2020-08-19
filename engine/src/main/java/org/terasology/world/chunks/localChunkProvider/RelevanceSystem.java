@@ -71,7 +71,7 @@ public class RelevanceSystem implements UpdateSubscriberSystem {
 
     @ReceiveEvent(components = RelevanceRegionComponent.class)
     public void onRelevanceRegionChanged(OnChangedComponent event, EntityRef entity) {
-        updateRelevanceEntity(entity, entity.getComponent(RelevanceRegionComponent.class).distance);
+        updateRelevanceEntityDistance(entity, entity.getComponent(RelevanceRegionComponent.class).distance);
     }
 
     @ReceiveEvent(components = {RelevanceRegionComponent.class, LocationComponent.class})
@@ -98,7 +98,7 @@ public class RelevanceSystem implements UpdateSubscriberSystem {
      * @param entity entity for update distance.
      * @param distance new distance for setting to entity's region.
      */
-    public void updateRelevanceEntity(EntityRef entity, Vector3i distance) {
+    public void updateRelevanceEntityDistance(EntityRef entity, Vector3i distance) {
         regionLock.readLock().lock();
         try {
             ChunkRelevanceRegion region = regions.get(entity);
@@ -193,7 +193,7 @@ public class RelevanceSystem implements UpdateSubscriberSystem {
      * @param pos chunk's position
      * @return {@code true} if chunk in regions, otherwise {@code false}
      */
-    public boolean isKeepChunk(Vector3i pos) {
+    public boolean isChunkInRegions(Vector3i pos) {
         for (ChunkRelevanceRegion region : regions.values()) {
             if (region.getCurrentRegion().expand(UNLOAD_LEEWAY).encompasses(pos)) {
                 return true;

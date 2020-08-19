@@ -61,7 +61,6 @@ import org.terasology.world.chunks.internal.GeneratingChunkProvider;
 import org.terasology.world.chunks.internal.ReadyChunkInfo;
 import org.terasology.world.chunks.pipeline.AbstractChunkTask;
 import org.terasology.world.chunks.pipeline.ChunkGenerationPipeline;
-import org.terasology.world.chunks.pipeline.ChunkTask;
 import org.terasology.world.generation.impl.EntityBufferImpl;
 import org.terasology.world.generator.WorldGenerator;
 import org.terasology.world.internal.ChunkViewCore;
@@ -71,7 +70,6 @@ import org.terasology.world.propagation.light.InternalLightProcessor;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -312,7 +310,7 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
         Iterator<Vector3i> iterator = chunkCache.iterateChunkPositions();
         while (iterator.hasNext()) {
             Vector3i pos = iterator.next();
-            boolean keep = relevanceSystem.isKeepChunk(pos);
+            boolean keep = relevanceSystem.isChunkInRegions(pos);
             if (!keep) {
                 // TODO: need some way to not dispose chunks being edited or processed (or do so safely)
                 // Note: Above won't matter if all changes are on the main thread
