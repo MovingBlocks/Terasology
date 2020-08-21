@@ -97,8 +97,8 @@ val engineVersion = deps.find { it.id.toString() == "engine" }?.versionRange()?.
 
 // Set dependencies. Note that the dependency information from module.txt is used for other Terasology modules
 dependencies {
-    implementation(group = "org.terasology.engine", name = "engine", version = engineVersion) { isChanging = true }
-    implementation(group = "org.terasology.engine", name = "engine-tests", version = engineVersion) { isChanging = true }
+    implementation(group = "org.terasology.engine", name = "engine", version = engineVersion)
+    implementation(group = "org.terasology.engine", name = "engine-tests", version = engineVersion)
 
     for (gestaltDep in moduleDepends) {
         if (!gestaltDep.minVersion.isSnapshot) {
@@ -119,12 +119,12 @@ dependencies {
         if (gestaltDep.isOptional) {
             // `optional` module dependencies are ones it does not require for runtime
             // (but will use opportunistically if available)
-            compileOnly(gradleDep) { isChanging = true }
+            compileOnly(gradleDep)
             // though modules also sometimes use "optional" to describe their test dependencies;
             // they're not required for runtime, but they *are* required for tests.
-            testImplementation(gradleDep) { isChanging = true }
+            testImplementation(gradleDep)
         } else {
-            implementation(gradleDep) { isChanging = true }
+            implementation(gradleDep)
         }
     }
 
