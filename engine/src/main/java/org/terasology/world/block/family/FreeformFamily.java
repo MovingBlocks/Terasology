@@ -16,6 +16,7 @@
 package org.terasology.world.block.family;
 
 import com.google.common.collect.Maps;
+import org.joml.Vector3ic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.math.Rotation;
@@ -44,7 +45,7 @@ public class FreeformFamily extends AbstractBlockFamily implements SideDefinedBl
     private Block archetypeBlock;
 
     public FreeformFamily(BlockFamilyDefinition definition, BlockShape shape, BlockBuilderHelper blockBuilder) {
-        super(definition, shape, blockBuilder);
+        super(definition, blockBuilder);
         BlockUri uri;
         if (CUBE_SHAPE_URN.equals(shape.getUrn())) {
             uri = new BlockUri(definition.getUrn());
@@ -74,7 +75,7 @@ public class FreeformFamily extends AbstractBlockFamily implements SideDefinedBl
     }
 
     @Override
-    public Block getBlockForPlacement(BlockPlacementData data) {
+    protected Block getBlockForPlacement(BlockPlacementData data, Vector3ic position) {
         if (archetypeBlock != null) {
             return archetypeBlock;
         }
@@ -85,21 +86,6 @@ public class FreeformFamily extends AbstractBlockFamily implements SideDefinedBl
             Side blockDirection = Side.inDirection(-data.viewingDirection.x(), 0, -data.viewingDirection.z());
             return blocks.get(blockDirection);
         }
-    }
-
-    @Override
-    public Block getBlockForPlacement(Vector3i location, Side attachmentSide, Side direction) {
-        if (archetypeBlock == null) {
-            if (attachmentSide.isHorizontal()) {
-                return blocks.get(attachmentSide);
-            }
-            if (direction != null) {
-                return blocks.get(direction);
-            } else {
-                return blocks.get(Side.FRONT);
-            }
-        }
-        return archetypeBlock;
     }
 
     @Override

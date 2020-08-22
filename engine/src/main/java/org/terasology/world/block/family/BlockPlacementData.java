@@ -20,9 +20,13 @@ import org.joml.Vector2f;
 import org.joml.Vector2fc;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
-import org.joml.Vector3i;
 import org.joml.Vector3ic;
+import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.Side;
+import org.terasology.world.WorldProvider;
+import org.terasology.world.block.Block;
+import org.terasology.world.block.BlockComponent;
 
 /**
  * BlockPlacementData represents data that is useful for determining the orientation of new block.
@@ -32,9 +36,19 @@ import org.terasology.math.Side;
 public class BlockPlacementData {
 
     /**
-     * The block position, at which the block is supposed to be placed at
+     * The target entity (a block) to which this block is being attached or replaced.
      */
-    public final Vector3ic blockPosition;
+    public final EntityRef target;
+
+    /**
+     * The target block to which this block is being attached or replaced.
+     */
+    public final Block targetBlock;
+
+    /**
+     * The position of the target block to which the new block is being attached.
+     */
+    public final Vector3ic targetPosition;
 
     /**
      * The block side, this block is being attached to, e.g. Top if the block is being placed on the ground
@@ -52,24 +66,18 @@ public class BlockPlacementData {
     public final Vector2fc relativeAttachmentPosition;
 
     /**
-     * @param blockPosition     The block position, at which the block is supposed to be placed at
-     * @param attachmentSide    The side of the block which this block is being attached to, e.g. Top if the block is being placed on the ground
-     * @param viewingDirection  The players viewing direction
-     */
-    public BlockPlacementData(Vector3ic blockPosition, Side attachmentSide, Vector3fc viewingDirection) {
-        this(blockPosition, attachmentSide, viewingDirection, new Vector2f());
-    }
-
-    /**
-     * @param blockPosition     The block position, at which the block is supposed to be placed at
+     * @param target    The target block indicated by the placement
      * @param attachmentSide    The side of the block which this block is being attached to, e.g. Top if the block is being placed on the ground
      * @param viewingDirection  The players viewing direction
      * @param relativeAttachmentPosition The position on the block surface that the user aimed at when placing the block. A vector in the range (0..1, 0..1)
      */
-    public BlockPlacementData(Vector3ic blockPosition, Side attachmentSide, Vector3fc viewingDirection, Vector2fc relativeAttachmentPosition) {
-        this.blockPosition = new Vector3i(Preconditions.checkNotNull(blockPosition));
+    public BlockPlacementData(EntityRef target, Side attachmentSide, Vector3fc viewingDirection,
+                              Vector2fc relativeAttachmentPosition, WorldProvider worldProvider) {
+        this.target = Preconditions.checkNotNull(target);
         this.attachmentSide = Preconditions.checkNotNull(attachmentSide);
         this.viewingDirection = new Vector3f(Preconditions.checkNotNull(viewingDirection));
         this.relativeAttachmentPosition = new Vector2f(Preconditions.checkNotNull(relativeAttachmentPosition));
+        this.targetPosition = JomlUtil.from(target.getComponent(BlockComponent.class).position);
+        this.targetBlock = worldProvider.getBlock(targetPosition.x(), targetPosition.y(), targetPosition.z());
     }
 }

@@ -15,6 +15,7 @@
  */
 package org.terasology.world.block.family;
 
+import org.joml.Vector3ic;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.math.Side;
 import org.terasology.math.geom.Vector3i;
@@ -40,25 +41,13 @@ public interface BlockFamily {
     String getDisplayName();
 
     /**
-     * Get the block that is appropriate for placement in the given situation,
-     * which is determined by the provided block placement data.
+     * Ask the block family to calculate where to place a new block when the block
+     * family is the target block.
      *
-     * @param data block placement data
-     * @return The appropriate block
+     * @param blockPlacementData context data needed to make the placement decision.
+     * @return the block and position
      */
-    Block getBlockForPlacement(BlockPlacementData data);
-
-    /**
-     * Get the block that is appropriate for placement in the given situation
-     *
-     * @param location            The location where the block is going to be placed.
-     * @param attachmentSide      The side of the block which this block is being attached to, e.g. Top if the block is being placed on the ground
-     * @param direction           A secondary direction after the attachment side that determines the facing of the block.
-     * @return The appropriate block
-     * @deprecated This method is scheduled for removal, use this one instead: {@link #getBlockForPlacement(BlockPlacementData)}.
-     */
-    @Deprecated
-    Block getBlockForPlacement(Vector3i location, Side attachmentSide, Side direction);
+    BlockPlacement calculateBlockPlacement(BlockPlacementData blockPlacementData);
 
     /**
      * @return The base block defining the block group. Can be used for orientation-irrelevant behaviours
@@ -82,6 +71,14 @@ public interface BlockFamily {
      * @return An iterator over the categories this block family belongs to
      */
     Iterable<String> getCategories();
+
+    /**
+     * The BlockFamily can determine if a replacingBlock can be
+     * @param targetBlock       Block that would be replaced.
+     * @param replacingBlock    Block that would replace the targetBlock.
+     * @return whether the block family will permit the replacement
+     */
+    boolean canBlockReplace(Block targetBlock, Block replacingBlock);
 
     /**
      * @param category

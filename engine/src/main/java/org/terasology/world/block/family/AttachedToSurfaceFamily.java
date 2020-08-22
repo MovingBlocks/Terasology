@@ -16,6 +16,7 @@
 package org.terasology.world.block.family;
 
 import com.google.common.collect.Maps;
+import org.joml.Vector3ic;
 import org.terasology.math.Pitch;
 import org.terasology.math.Rotation;
 import org.terasology.math.Side;
@@ -38,12 +39,11 @@ import java.util.Map;
         @MultiSection(name = "sides", coversSection = "front", appliesToSections = {"front", "left", "right", "back"})})
 public class AttachedToSurfaceFamily extends AbstractBlockFamily {
 
-
     private Map<Side, Block> blocks = Maps.newEnumMap(Side.class);
     private Block archetype;
 
     public AttachedToSurfaceFamily(BlockFamilyDefinition definition, BlockShape shape, BlockBuilderHelper blockBuilder) {
-        super(definition, shape, blockBuilder);
+        super(definition, blockBuilder);
         throw new UnsupportedOperationException("Freeform blocks not supported");
     }
 
@@ -83,13 +83,8 @@ public class AttachedToSurfaceFamily extends AbstractBlockFamily {
     }
 
     @Override
-    public Block getBlockForPlacement(BlockPlacementData data) {
+    protected Block getBlockForPlacement(BlockPlacementData data, Vector3ic position) {
         return blocks.get(data.attachmentSide);
-    }
-
-    @Override
-    public Block getBlockForPlacement(Vector3i location, Side attachmentSide, Side direction) {
-        return blocks.get(attachmentSide);
     }
 
     @Override

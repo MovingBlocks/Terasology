@@ -16,6 +16,7 @@
 package org.terasology.world.block.family;
 
 import com.google.common.collect.Maps;
+import org.joml.Vector3ic;
 import org.terasology.math.Pitch;
 import org.terasology.math.Roll;
 import org.terasology.math.Rotation;
@@ -121,22 +122,20 @@ public class CeilingSupportingHorizontalFamily extends AbstractBlockFamily {
     }
 
     @Override
-    public Block getBlockForPlacement(BlockPlacementData data) {
+    protected void setBlockUri(BlockUri newUri) {
+        super.setBlockUri(newUri);
+    }
+
+    @Override
+    protected Block getBlockForPlacement(BlockPlacementData data, Vector3ic position) {
         boolean upsideDownPlacement = data.attachmentSide == Side.BOTTOM
                 || data.attachmentSide != Side.TOP && data.relativeAttachmentPosition.y() > 0.5;
         final Side mainSide = upsideDownPlacement ? Side.BOTTOM : Side.TOP;
 
         Side blockDirection = Side.inDirection(-data.viewingDirection.x(), 0, -data.viewingDirection.z());
-        return blocks.get(ExtendedSide.getExtendedSideFor(mainSide, blockDirection));
-    }
+        Block block = blocks.get(ExtendedSide.getExtendedSideFor(mainSide, blockDirection));
 
-    @Override
-    public Block getBlockForPlacement(Vector3i location, Side attachmentSide, Side direction) {
-        if (attachmentSide == Side.BOTTOM) {
-            return blocks.get(ExtendedSide.getExtendedSideFor(Side.BOTTOM, direction));
-        } else {
-            return blocks.get(ExtendedSide.getExtendedSideFor(Side.TOP, direction));
-        }
+        return block;
     }
 
     @Override

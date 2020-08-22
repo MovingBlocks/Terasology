@@ -16,7 +16,12 @@
 package org.terasology.world.block.family;
 
 import com.google.common.collect.Sets;
+import org.joml.Vector3i;
+import org.joml.Vector3ic;
+import org.terasology.math.JomlUtil;
+import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockBuilderHelper;
+import org.terasology.world.block.BlockComponent;
 import org.terasology.world.block.BlockUri;
 import org.terasology.world.block.loader.BlockFamilyDefinition;
 import org.terasology.world.block.shapes.BlockShape;
@@ -28,11 +33,6 @@ public abstract class AbstractBlockFamily implements BlockFamily {
 
     private BlockUri uri;
     private Set<String> categories = Sets.newHashSet();
-
-    protected AbstractBlockFamily(BlockFamilyDefinition definition, BlockShape shape, BlockBuilderHelper blockBuilder) {
-        setBlockUri(new BlockUri(definition.getUrn()));
-        setCategory(definition.getCategories());
-    }
 
     protected AbstractBlockFamily(BlockFamilyDefinition definition, BlockBuilderHelper blockBuilder) {
         setBlockUri(new BlockUri(definition.getUrn()));
@@ -49,6 +49,29 @@ public abstract class AbstractBlockFamily implements BlockFamily {
         uri = newUri;
     }
 
+
+    @Override
+    public BlockPlacement calculateBlockPlacement(BlockPlacementData blockPlacementData) {
+        Vector3i position = calculateStandardAttachmentPosition(blockPlacementData);
+
+        Block block = getBlockForPlacement(blockPlacementData, position);
+
+        return new BlockPlacement(position, block);
+    }
+
+    /**
+     * Get the block that is appropriate for placement in the given situation,
+     * which is determined by the provided block placement data.
+     *
+     * @param data block placement data
+     * @return The appropriate block
+     */
+    protected abstract Block getBlockForPlacement(BlockPlacementData data, Vector3ic position);
+
+    protected Vector3i calculateStandardAttachmentPosition(BlockPlacementData blockPlacementData) {
+        Vector3ic attachmentDirection = blockPlacementData.attachmentSide.direction();
+        return blockPlacementData.targetPosition.add(attachmentDirection, new Vector3i());
+    }
 
     @Override
     public BlockUri getURI() {
@@ -68,6 +91,11 @@ public abstract class AbstractBlockFamily implements BlockFamily {
     @Override
     public boolean hasCategory(String category) {
         return categories.contains(category.toLowerCase(Locale.ENGLISH));
+    }
+
+    @Override
+    public boolean canBlockReplace(Block targetBlock, Block replacingBlock) {
+        return targetBlock.isReplacementAllowed() && !targetBlock.isTargetable();
     }
 
     @Override

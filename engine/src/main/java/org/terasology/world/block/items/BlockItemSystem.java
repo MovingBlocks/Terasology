@@ -15,7 +15,9 @@
  */
 package org.terasology.world.block.items;
 
+import org.jetbrains.annotations.NotNull;
 import org.joml.Vector2f;
+import org.joml.Vector3ic;
 import org.terasology.audio.AudioManager;
 import org.terasology.audio.events.PlaySoundEvent;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -30,7 +32,6 @@ import org.terasology.math.AABB;
 import org.terasology.math.JomlUtil;
 import org.terasology.math.Side;
 import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.network.NetworkSystem;
 import org.terasology.physics.Physics;
 import org.terasology.physics.StandardCollisionGroup;
@@ -44,7 +45,9 @@ import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockComponent;
 import org.terasology.world.block.entity.placement.PlaceBlocks;
 import org.terasology.world.block.family.BlockFamily;
+import org.terasology.world.block.family.BlockPlacement;
 import org.terasology.world.block.family.BlockPlacementData;
+import org.terasology.world.block.typeEntity.BlockTypeComponent;
 
 import java.util.Map;
 
@@ -77,32 +80,29 @@ public class BlockItemSystem extends BaseComponentSystem {
             return;
         }
 
-        BlockItemComponent blockItem = item.getComponent(BlockItemComponent.class);
-        BlockFamily blockFamily = blockItem.blockFamily;
-        Side surfaceSide = Side.inDirection(event.getHitNormal());
-
         BlockComponent blockComponent = event.getTarget().getComponent(BlockComponent.class);
         if (blockComponent == null) {
             // If there is no block there (i.e. it's a BlockGroup, we don't allow placing block, try somewhere else)
             event.consume();
             return;
         }
-        Vector3i targetBlock = new Vector3i(blockComponent.position);
-        Vector3i placementPos = new Vector3i(targetBlock);
-        placementPos.add(surfaceSide.getVector3i());
 
-        Vector2f relativeAttachmentPosition = getRelativeAttachmentPosition(event);
-        Block block = blockFamily.getBlockForPlacement(new BlockPlacementData(
-                JomlUtil.from(placementPos), surfaceSide, JomlUtil.from(event.getDirection()), relativeAttachmentPosition
-        ));
+        BlockItemComponent blockItem = item.getComponent(BlockItemComponent.class);
+        BlockFamily blockFamily = blockItem.blockFamily;
 
-        if (canPlaceBlock(block, targetBlock, placementPos)) {
+        BlockPlacementData blockPlacementData = generateBlockPlacementData(event);
+
+        BlockPlacement blockPlacement = blockFamily.calculateBlockPlacement(blockPlacementData);
+        Block block = blockPlacement.block;
+        Vector3ic placementPos = blockPlacement.position;
+
+        if (canPlaceBlock(blockPlacement, blockPlacementData)) {
             // TODO: Fix this for changes.
             if (networkSystem.getMode().isAuthority()) {
-                PlaceBlocks placeBlocks = new PlaceBlocks(placementPos, block, event.getInstigator());
+                PlaceBlocks placeBlocks = new PlaceBlocks(JomlUtil.from(placementPos), block, event.getInstigator());
                 worldProvider.getWorldEntity().send(placeBlocks);
                 if (!placeBlocks.isConsumed()) {
-                    item.send(new OnBlockItemPlaced(placementPos, blockEntityRegistry.getBlockEntityAt(placementPos), event.getInstigator()));
+                    item.send(new OnBlockItemPlaced(JomlUtil.from(placementPos), blockEntityRegistry.getBlockEntityAt(placementPos), event.getInstigator()));
                 } else {
                     event.consume();
                 }
@@ -112,6 +112,20 @@ public class BlockItemSystem extends BaseComponentSystem {
         } else {
             event.consume();
         }
+    }
+
+    @NotNull
+    private BlockPlacementData generateBlockPlacementData(ActivateEvent event) {
+        Side surfaceSide = Side.inDirection(event.getHitNormal());
+        Vector2f relativeAttachmentPosition = getRelativeAttachmentPosition(event);
+
+        return new BlockPlacementData(
+                event.getTarget(),
+                surfaceSide,
+                JomlUtil.from(event.getDirection()),
+                relativeAttachmentPosition,
+                worldProvider
+        );
     }
 
     private Vector2f getRelativeAttachmentPosition(ActivateEvent event) {
@@ -166,29 +180,26 @@ public class BlockItemSystem extends BaseComponentSystem {
         }
     }
 
-    private boolean canPlaceBlock(Block block, Vector3i targetBlock, Vector3i blockPos) {
-        if (block == null) {
+    private boolean canPlaceBlock(BlockPlacement placement, BlockPlacementData data) {
+
+        if (!data.targetBlock.isAttachmentAllowed()) {
             return false;
         }
 
-        Block centerBlock = worldProvider.getBlock(targetBlock.x, targetBlock.y, targetBlock.z);
-        if (!centerBlock.isAttachmentAllowed()) {
+        Block adjBlock = worldProvider.getBlock(placement.position.x(), placement.position.y(), placement.position.z());
+
+        if (!adjBlock.getBlockFamily().canBlockReplace(adjBlock, placement.block)) {
             return false;
         }
 
-        Block adjBlock = worldProvider.getBlock(blockPos.x, blockPos.y, blockPos.z);
-        if (!adjBlock.isReplacementAllowed() || adjBlock.isTargetable()) {
-            return false;
-        }
-
-        if (block.getBlockFamily().equals(adjBlock.getBlockFamily())) {
+        if (placement.block.getBlockFamily().equals(adjBlock.getBlockFamily())) {
             return false;
         }
 
         // Prevent players from placing blocks inside their bounding boxes
-        if (!block.isPenetrable()) {
+        if (!placement.block.isPenetrable()) {
             Physics physics = CoreRegistry.get(Physics.class);
-            AABB blockBounds = block.getBounds(blockPos);
+            AABB blockBounds = placement.block.getBounds(JomlUtil.from(placement.position));
             Vector3f min = new Vector3f(blockBounds.getMin());
             Vector3f max = new Vector3f(blockBounds.getMax());
 

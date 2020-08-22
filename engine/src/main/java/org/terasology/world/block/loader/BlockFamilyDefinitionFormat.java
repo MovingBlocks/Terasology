@@ -218,6 +218,8 @@ public class BlockFamilyDefinitionFormat extends AbstractAssetFileFormat<BlockFa
             setBoolean(data::setWater, jsonObject, "water");
             setBoolean(data::setGrass, jsonObject, "grass");
             setBoolean(data::setIce, jsonObject, "ice");
+
+            setString(data::setFullBlock, jsonObject, "fullBlock");
         }
 
         private <T> void readBlockPartMap(JsonObject jsonObject, String singleName,

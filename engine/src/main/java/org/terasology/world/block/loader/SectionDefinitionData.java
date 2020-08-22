@@ -66,6 +66,7 @@ public class SectionDefinitionData {
     private boolean water;
     private boolean grass;
     private boolean ice;
+    private String fullBlock;
 
     public SectionDefinitionData() {
     }
@@ -108,6 +109,8 @@ public class SectionDefinitionData {
         this.water = other.water;
         this.grass = other.grass;
         this.ice = other.ice;
+
+        this.fullBlock = other.fullBlock;
     }
 
     public String getDisplayName() {
@@ -334,5 +337,13 @@ public class SectionDefinitionData {
 
     public void setIce(boolean ice) {
         this.ice = ice;
+    }
+
+    public String getFullBlock() {
+        return fullBlock;
+    }
+
+    public void setFullBlock(String fullBlock) {
+        this.fullBlock = fullBlock;
     }
 }

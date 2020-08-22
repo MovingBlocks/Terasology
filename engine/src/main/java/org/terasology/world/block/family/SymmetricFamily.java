@@ -15,6 +15,7 @@
  */
 package org.terasology.world.block.family;
 
+import org.joml.Vector3ic;
 import org.terasology.math.Side;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.world.block.Block;
@@ -34,7 +35,7 @@ public class SymmetricFamily extends AbstractBlockFamily {
     private Block block;
 
     public SymmetricFamily(BlockFamilyDefinition definition, BlockShape shape, BlockBuilderHelper blockBuilder) {
-        super(definition, shape, blockBuilder);
+        super(definition, blockBuilder);
         BlockUri uri;
         if (CUBE_SHAPE_URN.equals(shape.getUrn())) {
             uri = new BlockUri(definition.getUrn());
@@ -53,12 +54,7 @@ public class SymmetricFamily extends AbstractBlockFamily {
     }
 
     @Override
-    public Block getBlockForPlacement(BlockPlacementData data) {
-        return block;
-    }
-
-    @Override
-    public Block getBlockForPlacement(Vector3i location, Side attachmentSide, Side direction) {
+    protected Block getBlockForPlacement(BlockPlacementData data, Vector3ic position) {
         return block;
     }
 
