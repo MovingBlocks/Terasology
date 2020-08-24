@@ -16,6 +16,7 @@
 package org.terasology.rendering.assets.mesh;
 
 import org.terasology.nui.Color;
+import org.terasology.nui.Colorc;
 import org.terasology.utilities.Assets;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.math.geom.Vector2f;
@@ -97,12 +98,12 @@ public class MeshBuilder {
         return this;
     }
 
-    public MeshBuilder addColor(Color c1, Color... colors) {
+    public MeshBuilder addColor(Colorc c1, Colorc... colors) {
         meshData.getColors().add(c1.rf());
         meshData.getColors().add(c1.gf());
         meshData.getColors().add(c1.bf());
         meshData.getColors().add(c1.af());
-        for (Color c : colors) {
+        for (Colorc c : colors) {
             meshData.getColors().add(c.rf());
             meshData.getColors().add(c.gf());
             meshData.getColors().add(c.bf());
