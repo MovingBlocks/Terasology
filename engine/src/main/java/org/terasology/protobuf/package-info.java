@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-//@Generated("com.google.protobuf")
+@Generated("com.google.protobuf")
 package org.terasology.protobuf;
 
-//import javax.annotation.Generated;
+import javax.annotation.Generated;
