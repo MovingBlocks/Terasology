@@ -15,7 +15,6 @@
  */
 package org.terasology.rendering.assets.mesh;
 
-import org.terasology.nui.Color;
 import org.terasology.nui.Colorc;
 import org.terasology.utilities.Assets;
 import org.terasology.assets.ResourceUrn;
@@ -23,8 +22,6 @@ import org.terasology.math.geom.Vector2f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.module.sandbox.API;
 
-/**
- */
 public class MeshBuilder {
     private static final float[] VERTICES = {
             // Front face
@@ -172,6 +169,4 @@ public class MeshBuilder {
 
         Vector2f map(int vertexIndex, float u, float v);
     }
-
-
 }

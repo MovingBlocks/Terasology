@@ -17,7 +17,6 @@ package org.terasology.rendering.assets.font;
 
 import com.google.common.collect.Maps;
 import org.terasology.math.geom.Vector3f;
-import org.terasology.nui.Color;
 import org.terasology.nui.Colorc;
 import org.terasology.nui.HorizontalAlign;
 import org.terasology.nui.FontColor;
@@ -31,8 +30,6 @@ import java.util.Deque;
 import java.util.List;
 import java.util.Map;
 
-/**
- */
 public class FontMeshBuilder {
 
     private static final float SHADOW_DEPTH = -2;

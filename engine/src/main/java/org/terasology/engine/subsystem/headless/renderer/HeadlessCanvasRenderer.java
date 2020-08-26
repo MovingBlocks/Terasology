@@ -11,7 +11,6 @@ import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Rect2i;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.nui.Border;
-import org.terasology.nui.Color;
 import org.terasology.nui.Colorc;
 import org.terasology.nui.HorizontalAlign;
 import org.terasology.nui.ScaleMode;
