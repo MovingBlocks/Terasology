@@ -18,12 +18,9 @@ package org.terasology.rendering.nui.internal;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
-import org.terasology.math.geom.Rect2i;
-import org.terasology.math.geom.Vector2i;
-import org.terasology.nui.Color;
+import org.terasology.nui.Colorc;
 
 import java.nio.FloatBuffer;
-import java.util.Objects;
 
 /**
  *
@@ -49,7 +46,7 @@ public final class LineRenderer {
      * Drawing nearly perfect 2D line segments in OpenGL
      * </a>
      */
-    public static void draw(float x1, float y1, float x2, float y2, float width, Color color, Color background, float alpha) {
+    public static void draw(float x1, float y1, float x2, float y2, float width, Colorc color, Colorc background, float alpha) {
         GL20.glUseProgram(0);
         GL11.glDisable(GL11.GL_CULL_FACE);
         GL11.glEnableClientState(GL11.GL_VERTEX_ARRAY);

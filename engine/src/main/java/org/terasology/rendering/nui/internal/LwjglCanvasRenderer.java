@@ -29,7 +29,7 @@ import org.terasology.math.geom.Rect2i;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.nui.Border;
-import org.terasology.nui.Color;
+import org.terasology.nui.Colorc;
 import org.terasology.nui.HorizontalAlign;
 import org.terasology.nui.ScaleMode;
 import org.terasology.nui.TextLineBuilder;
@@ -247,7 +247,7 @@ public class LwjglCanvasRenderer implements TerasologyCanvasRenderer, PropertyCh
     }
 
     @Override
-    public void drawLine(int sx, int sy, int ex, int ey, Color color) {
+    public void drawLine(int sx, int sy, int ex, int ey, Colorc color) {
         LineRenderer.draw(sx, sy, ex, ey, 2, color, color, 0);
     }
 
@@ -272,7 +272,7 @@ public class LwjglCanvasRenderer implements TerasologyCanvasRenderer, PropertyCh
     }
 
     @Override
-    public void drawTexture(UITextureRegion texture, Color color, ScaleMode mode, Rectanglei absoluteRegionRectangle,
+    public void drawTexture(UITextureRegion texture, Colorc color, ScaleMode mode, Rectanglei absoluteRegionRectangle,
                             float ux, float uy, float uw, float uh, float alpha) {
         if (!((org.terasology.rendering.assets.texture.TextureRegion)texture).getTexture().isLoaded()) {
             return;
@@ -343,7 +343,7 @@ public class LwjglCanvasRenderer implements TerasologyCanvasRenderer, PropertyCh
 
     @Override
     public void drawText(String text, Font font, HorizontalAlign hAlign, VerticalAlign vAlign, Rectanglei absoluteRegionRectangle,
-                         Color color, Color shadowColor, float alpha, boolean underlined) {
+                         Colorc color, Colorc shadowColor, float alpha, boolean underlined) {
         Rect2i absoluteRegion = JomlUtil.from(absoluteRegionRectangle);
 
         TextCacheKey key = new TextCacheKey(text, font, absoluteRegion.width(), hAlign, color, shadowColor, underlined);
@@ -548,11 +548,11 @@ public class LwjglCanvasRenderer implements TerasologyCanvasRenderer, PropertyCh
         private final Font font;
         private final int width;
         private final HorizontalAlign alignment;
-        private final Color baseColor;
-        private final Color shadowColor;
+        private final Colorc baseColor;
+        private final Colorc shadowColor;
         private final boolean underlined;
 
-        TextCacheKey(String text, Font font, int maxWidth, HorizontalAlign alignment, Color baseColor, Color shadowColor, boolean underlined) {
+        TextCacheKey(String text, Font font, int maxWidth, HorizontalAlign alignment, Colorc baseColor, Colorc shadowColor, boolean underlined) {
             this.text = text;
             this.font = font;
             this.width = maxWidth;
