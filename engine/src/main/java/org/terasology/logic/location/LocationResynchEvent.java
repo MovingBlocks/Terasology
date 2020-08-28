@@ -15,20 +15,20 @@
  */
 package org.terasology.logic.location;
 
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 import org.terasology.entitySystem.event.Event;
-import org.terasology.math.geom.Quat4f;
-import org.terasology.math.geom.Vector3f;
 import org.terasology.network.BroadcastEvent;
 
 @BroadcastEvent
 public class LocationResynchEvent implements Event {
     public Vector3f position;
-    public Quat4f rotation;
+    public Quaternionf rotation;
 
     public LocationResynchEvent() {
     }
 
-    public LocationResynchEvent(Vector3f position, Quat4f rotation) {
+    public LocationResynchEvent(Vector3f position, Quaternionf rotation) {
         this.position = position;
         this.rotation = rotation;
     }
@@ -37,7 +37,7 @@ public class LocationResynchEvent implements Event {
         return position;
     }
 
-    public Quat4f getRotation() {
+    public Quaternionf getRotation() {
         return rotation;
     }
 }

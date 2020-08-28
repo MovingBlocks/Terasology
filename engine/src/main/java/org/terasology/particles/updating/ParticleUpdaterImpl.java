@@ -222,7 +222,7 @@ public class ParticleUpdaterImpl implements ParticleUpdater {
             float dist = (vel.length() + 0.5f) * movingAvgDelta * PHYSICS_SKIP_NR * 1.5f;
             vel.normalize();
 
-            HitResult hitResult = physics.rayTrace(curr, vel, dist, StandardCollisionGroup.WORLD);
+            HitResult hitResult = physics.rayTrace(JomlUtil.from(curr), JomlUtil.from(vel), dist, StandardCollisionGroup.WORLD);
             if (hitResult.isHit()) {
                 pool.energy[i] = 0;
             }

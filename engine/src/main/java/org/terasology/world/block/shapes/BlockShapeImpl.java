@@ -15,6 +15,7 @@
  */
 package org.terasology.world.block.shapes;
 
+import org.terasology.math.JomlUtil;
 import org.terasology.physics.shapes.CollisionShape;
 import com.google.common.collect.Maps;
 import org.terasology.assets.AssetType;
@@ -90,7 +91,7 @@ public class BlockShapeImpl extends BlockShape {
         Rotation simplifiedRot = applySymmetry(rot);
         CollisionShape result = collisionShape.get(simplifiedRot);
         if (result == null && baseCollisionShape != null) {
-            result = baseCollisionShape.rotate(simplifiedRot.getQuat4f());
+            result = baseCollisionShape.rotate(JomlUtil.from(simplifiedRot.getQuat4f()));
             collisionShape.put(simplifiedRot, result);
         }
         return result;

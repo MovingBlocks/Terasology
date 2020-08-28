@@ -20,6 +20,7 @@ import org.terasology.assets.ResourceUrn;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.math.AABB;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.Rotation;
 import org.terasology.math.Side;
 import org.terasology.math.TeraMath;
@@ -581,7 +582,7 @@ public final class Block {
     public void setCollision(Vector3f offset, CollisionShape shape) {
         collisionShape = shape;
         collisionOffset = offset;
-        bounds = shape.getAABB(new Transform(offset, new Quat4f(0, 0, 0, 1), 1.0f));
+        bounds = JomlUtil.from(shape.getAABB(new Transform(offset, new Quat4f(0, 0, 0, 1), 1.0f)));
     }
 
     public CollisionShape getCollisionShape() {

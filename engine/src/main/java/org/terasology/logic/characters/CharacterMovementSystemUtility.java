@@ -137,6 +137,6 @@ public final class CharacterMovementSystemUtility {
      */
     private void setPhysicsLocation(EntityRef entity, Vector3f newPos) {
         CharacterCollider collider = physics.getCharacterCollider(entity);
-        collider.setLocation(JomlUtil.from(newPos));
+        collider.setLocation(newPos);
     }
 }

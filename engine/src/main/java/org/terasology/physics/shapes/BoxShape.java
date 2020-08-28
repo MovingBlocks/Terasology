@@ -15,7 +15,7 @@
  */
 package org.terasology.physics.shapes;
 
-import org.terasology.math.geom.Vector3f;
+import org.joml.Vector3f;
 
 /**
  * Represents a box collision shape in the physics engine.
@@ -26,5 +26,6 @@ public interface BoxShape extends CollisionShape {
      *
      * @return The {@link Vector3f} containing the dimensional extents of the box shape.
      */
-    Vector3f getExtents();
+    Vector3f getHalfExtentsWithoutMargin();
+
 }

@@ -150,7 +150,7 @@ public class JsonBlockShapeLoader extends AbstractAssetFileFormat<BlockShapeData
             if (collisionInfo.has(CONVEX_HULL) && collisionInfo.get(CONVEX_HULL).isJsonPrimitive()
                     && collisionInfo.get(CONVEX_HULL).getAsJsonPrimitive().isBoolean()) {
                 List<Vector3f> verts = buildVertList(shape);
-                ConvexHullShape convexHull = COLLISION_SHAPE_FACTORY.getNewConvexHull(verts.stream().map(JomlUtil::from).collect(Collectors.toList()));
+                ConvexHullShape convexHull = COLLISION_SHAPE_FACTORY.getNewConvexHull(new ArrayList<>(verts));
                 shape.setCollisionShape(convexHull);
             } else if (collisionInfo.has(COLLIDERS) && collisionInfo.get(COLLIDERS).isJsonArray()
                     && collisionInfo.get(COLLIDERS).getAsJsonArray().size() > 0) {
@@ -226,7 +226,7 @@ public class JsonBlockShapeLoader extends AbstractAssetFileFormat<BlockShapeData
             }
             extent.absolute();
 
-            return new ColliderInfo(offset, COLLISION_SHAPE_FACTORY.getNewBox(JomlUtil.from(extent)));
+            return new ColliderInfo(offset, COLLISION_SHAPE_FACTORY.getNewBox(extent));
         }
 
         private ColliderInfo processSphereShape(JsonDeserializationContext context, JsonObject colliderDef) {

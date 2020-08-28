@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 MovingBlocks
+ * Copyright 2018 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,13 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.physics.events;
+package org.terasology.physics.bullet.shapes;
 
+import com.badlogic.gdx.physics.bullet.collision.btCylinderShape;
+import org.joml.Quaternionf;
 import org.joml.Vector3f;
-import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.physics.shapes.CollisionShape;
 
-public class EntityImpactEvent extends ImpactEvent {
-    public EntityImpactEvent(Vector3f impactPoint, Vector3f impactNormal, Vector3f impactSpeed, float travelDistance, EntityRef impactEntity) {
-        super(impactPoint, impactNormal, impactSpeed, travelDistance, impactEntity);
+
+public class BulletCylinderShape extends  BulletCollisionShape{
+
+    private final btCylinderShape cylinderShape;
+
+    public BulletCylinderShape(Vector3f halfExtents) {
+
+        this.cylinderShape = new btCylinderShape(halfExtents);
+        this.underlyingShape = cylinderShape;
+    }
+
+    @Override
+    public CollisionShape rotate(Quaternionf rot) {
+        return this;
     }
 }

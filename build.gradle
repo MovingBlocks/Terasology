@@ -73,6 +73,8 @@ repositories {
     mavenCentral()
     mavenLocal()
 
+    mavenLocal()
+
     // MovingBlocks Artifactory instance for libs not readily available elsewhere plus our own libs
     maven {
         name "Terasology Artifactory"
@@ -100,6 +102,7 @@ dependencies {
 
     // Natives for JNLua (Kallisti, KComputers)
     natives group: 'org.terasology.jnlua', name: 'jnlua_natives', version: '0.1.0-SNAPSHOT', ext: 'zip'
+    natives group: 'org.terasology', name: 'JNBullet', version: '0.3.2-SNAPSHOT', ext: 'zip'
 }
 
 task extractWindowsNatives(type: Copy) {
@@ -137,12 +140,22 @@ task extractJNLuaNatives(type: Copy) {
     into("$dirNatives")
 }
 
+task extractNativeBulletNatives(type:Copy) {
+    description = "Extracts the JNBullet natives from the downloaded zip"
+    from {
+        configurations.natives.collect { it.getName().contains('JNBullet') ? zipTree(it) : [] }
+    }
+    into ("$dirNatives")
+}
+
+
 task extractNatives {
     description = "Extracts all the native lwjgl libraries from the downloaded zip"
     dependsOn extractWindowsNatives
     dependsOn extractLinuxNatives
     dependsOn extractMacOSXNatives
     dependsOn extractJNLuaNatives
+    dependsOn extractNativeBulletNatives
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

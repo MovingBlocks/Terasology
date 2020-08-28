@@ -16,11 +16,15 @@
 
 package org.terasology.physics.bullet;
 
-import com.bulletphysics.linearmath.MotionState;
-import com.bulletphysics.linearmath.Transform;
+import com.badlogic.gdx.physics.bullet.linearmath.btMotionState;
+import org.joml.Matrix4f;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.location.LocationComponent;
-import org.terasology.math.VecMath;
+import org.terasology.math.JomlUtil;
 
 /**
  * This motion state is used to connect rigid body entities to their rigid body in the bullet physics engine.
@@ -28,9 +32,13 @@ import org.terasology.math.VecMath;
  * as it moves under physics.
  *
  */
-public class EntityMotionState extends MotionState {
-    private EntityRef entity;
+public class EntityMotionState extends btMotionState {
+    private static final Logger logger = LoggerFactory.getLogger(EntityMotionState.class);
 
+    private EntityRef entity;
+    private Quaternionf rot = new Quaternionf();
+    private Matrix4f trans = new Matrix4f();
+    private Vector3f position = new Vector3f();
     /**
      * Only the BulletPhysics class is expected to create instances.
      *
@@ -38,25 +46,29 @@ public class EntityMotionState extends MotionState {
      *               LocationComponent of.
      */
     EntityMotionState(EntityRef entity) {
+        super();
         this.entity = entity;
+        LocationComponent loc = entity.getComponent(LocationComponent.class);
+        trans.translationRotateScale(JomlUtil.from(loc.getWorldPosition()), JomlUtil.from(loc.getWorldRotation()), 1.0f);
     }
 
     @Override
-    public Transform getWorldTransform(Transform transform) {
-        LocationComponent loc = entity.getComponent(LocationComponent.class);
-        if (loc != null&& !Float.isNaN(loc.getWorldPosition().x)) {
-            // NOTE: JBullet ignores scale anyway
-            transform.set(new javax.vecmath.Matrix4f(VecMath.to(loc.getWorldRotation()), VecMath.to(loc.getWorldPosition()), 1));
-        }
-        return transform;
+    public void getWorldTransform(Matrix4f transform) {
+        transform.set(trans);
+//        LocationComponent loc = entity.getComponent(LocationComponent.class);
+//        transform.set(new Matrix4f(loc.getWorldRotation(),loc.getWorldPosition(),1.0f));
     }
 
     @Override
-    public void setWorldTransform(Transform transform) {
+    public void setWorldTransform(Matrix4f transform) {
+        trans.set(transform);
         LocationComponent loc = entity.getComponent(LocationComponent.class);
-        if (loc != null&& !Float.isNaN(loc.getWorldPosition().x)) {
-            loc.setWorldPosition(VecMath.from(transform.origin));
-            loc.setWorldRotation(VecMath.from(transform.getRotation(new javax.vecmath.Quat4f())));
+        if (loc != null) {
+            rot.setFromNormalized(transform);
+            rot.normalize();
+            transform.getTranslation(position);
+            loc.setWorldRotation(JomlUtil.from(rot));
+            loc.setWorldPosition(JomlUtil.from(position));
         }
     }
 
