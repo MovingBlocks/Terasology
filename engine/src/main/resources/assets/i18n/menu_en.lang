@@ -224,6 +224,7 @@
     "join-server-terminate-broadcast": "Terminate Broadcast",
     "join-server-requested": "Requested",
     "join-server-title": "Join Server",
+    "lan-servers": "LAN",
     "light-shafts": "Light Shafts",
     "listed-servers": "Listed",
     "load-delay-warning": "WARNING: Long Loading Delay",

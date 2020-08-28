@@ -65,6 +65,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -94,9 +96,9 @@ public class JoinGameScreen extends CoreScreenLayer {
     @In
     private StorageServiceWorker storageServiceWorker;
 
-    private BroadcastServer broadcastServer;
+    private BroadcastServer broadcastServer = new BroadcastServer();
 
-    private BroadcastClient broadcastClient;
+    private BroadcastClient broadcastClient = new BroadcastClient();
 
     private Map<ServerInfo, Future<ServerInfoMessage>> extInfo = new HashMap<>();
 
@@ -105,6 +107,8 @@ public class JoinGameScreen extends CoreScreenLayer {
     private ServerListDownloader downloader;
 
     private UIList<ServerInfo> visibleList;
+
+    public  UIList<ServerInfo> lanServerList;
 
     private List<ServerInfo> listedServers = new ArrayList<>();
 
@@ -132,10 +136,17 @@ public class JoinGameScreen extends CoreScreenLayer {
             configureServerList(onlineServerList);
         }
 
+        lanServerList = find("lanServerList", UIList.class);
+        if (lanServerList != null) {
+            lanServerList.setList(broadcastClient.getLanServers());
+            configureServerList(lanServerList);
+        }
+
         ActivateEventListener activateCustom = e -> {
             cards.setDisplayedCard("customServerListScrollArea");
             find("customButton", UIButton.class).setFamily("highlight");
             find("onlineButton", UIButton.class).setFamily("default");
+            find("lanButton", UIButton.class).setFamily("default");
             visibleList = customServerList;
             refresh();
         };
@@ -146,10 +157,23 @@ public class JoinGameScreen extends CoreScreenLayer {
             cards.setDisplayedCard("onlineServerListScrollArea");
             find("customButton", UIButton.class).setFamily("default");
             find("onlineButton", UIButton.class).setFamily("highlight");
+            find("lanButton", UIButton.class).setFamily("default");
             visibleList = onlineServerList;
             refresh();
         };
         WidgetUtil.trySubscribe(this, "onlineButton", activateOnline);
+
+        ActivateEventListener activateLan = e -> {
+            broadcastClient.startBroadcast();
+            cards.setDisplayedCard("lanServerListScrollArea");
+            find("customButton", UIButton.class).setFamily("default");
+            find("onlineButton", UIButton.class).setFamily("default");
+            find("lanButton", UIButton.class).setFamily("highlight");
+            visibleList = lanServerList;
+            refreshLan refresh=new refreshLan();
+            refresh.refresh();
+        };
+        WidgetUtil.trySubscribe(this, "lanButton", activateLan);
 
         bindCustomButtons();
         bindInfoLabels();
@@ -370,7 +394,6 @@ public class JoinGameScreen extends CoreScreenLayer {
                 }
             });
             broadCastServerButton.subscribe(button -> {
-                broadcastServer = new BroadcastServer();
                 broadCastServerButton.setText(translationSystem.translate("${engine:menu#start-server-broadcast}"));
                 try {
                     broadcastServer.startBroadcast();
@@ -378,25 +401,6 @@ public class JoinGameScreen extends CoreScreenLayer {
 
                 }
             });
-        }
-
-            UIButton joinBroadcastButton = find("join-broadcast", UIButton.class);
-            if (joinBroadcastButton != null) {
-                joinBroadcastButton.bindEnabled(new ReadOnlyBinding<Boolean>() {
-                    @Override
-                    public Boolean get() {
-                        return true;
-                    }
-                });
-                joinBroadcastButton.subscribe(button -> {
-                    broadcastClient = new BroadcastClient();
-                    joinBroadcastButton.setText(translationSystem.translate("${engine:menu#join-server-broadcast}"));
-                    try {
-                        broadcastClient.startBroadcast();
-                    }catch(Exception e){
-
-                    }
-                });
         }
     }
 
@@ -558,7 +562,21 @@ public class JoinGameScreen extends CoreScreenLayer {
         return false;
     }
 
-    public void refresh() {
+    private class refreshLan extends TimerTask{
+        @Override
+        public void run(){
+            lanServerList.setList(broadcastClient.getLanServers());
+            logger.info(broadcastClient.getLanServers().toString());
+            configureServerList(lanServerList);
+            visibleList = lanServerList;
+        }
+        public void refresh() {
+            Timer timer = new Timer(true);
+            timer.schedule(new refreshLan(), 0, 1500);
+        }
+    }
+
+    public void refresh() { 
         ServerInfo i = visibleList.getSelection();
         visibleList.setSelection(null);
         extInfo.clear();

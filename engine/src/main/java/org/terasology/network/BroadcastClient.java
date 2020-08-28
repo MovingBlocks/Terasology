@@ -20,18 +20,28 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.Executors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.config.ServerInfo;
 
 public class BroadcastClient extends TimerTask{
 
-    private static final Logger logger = LoggerFactory.getLogger(BroadcastServer.class);
+    private static final Logger logger = LoggerFactory.getLogger(BroadcastClient.class);
     private static final String DISCOVERY_REQUEST= "DISCOVERY_REQUEST";
 
     private DatagramSocket receiveSocket;
+
+    private boolean isReceived;
+
+    public List<ServerInfo> lanServers = new ArrayList<>();
+
+    private static int lanCount=1;
+
 
     @Override
     public void run(){
@@ -39,7 +49,19 @@ public class BroadcastClient extends TimerTask{
             byte[] buffer = DISCOVERY_REQUEST.getBytes(StandardCharsets.UTF_8);
             DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
             getReceiveSocket().receive(packet);
-            logger.info("Discovery package received! -> " + packet.getAddress() + ":" + packet.getPort());
+            ServerInfo serverDetails = new ServerInfo("LAN" + lanCount,packet.getAddress().getHostAddress(),packet.getPort());
+            isReceived = false;
+            for(ServerInfo serverDetail : lanServers){
+                if(serverDetail.getAddress().equals(packet.getAddress().getHostAddress())){
+                    isReceived = true;
+                }
+            }
+            if(!isReceived) {
+                lanServers.add(serverDetails);
+                lanCount++;
+            }
+            logger.info("Discovery package received! -> " + packet.getAddress()+ ":" + packet.getPort()+ ":" + this.getLanServers());
+
         } catch (IOException e) {
             logger.error("Broadcast Exception Encountered" + e.getMessage());
         }
@@ -53,6 +75,10 @@ public class BroadcastClient extends TimerTask{
     public void stopBroadCast() {
         logger.info("Shutting down Broadcast");
         receiveSocket.close();
+    }
+
+    public List<ServerInfo> getLanServers(){
+        return lanServers;
     }
 
     private DatagramSocket getReceiveSocket()  {

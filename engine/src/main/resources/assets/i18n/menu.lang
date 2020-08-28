@@ -219,6 +219,7 @@
     "join-server-refresh": "join-server-refresh",
     "join-server-requested": "join-server-requested",
     "join-server-title": "join-server-title",
+    "lan-servers": "lan-servers",
     "light-shafts": "light-shafts",
     "listed-servers": "listed-servers",
     "load-delay-warning": "load-delay-warning",
