@@ -15,14 +15,12 @@
  */
 package org.terasology.engine.subsystem.lwjgl;
 
-import com.badlogic.gdx.physics.bullet.Bullet;
 import com.google.common.base.Charsets;
 import org.lwjgl.LWJGLUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.context.Context;
 import org.terasology.engine.subsystem.EngineSubsystem;
-import org.terasology.utilities.LWJGLHelper;
 
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
@@ -38,9 +36,6 @@ public abstract class BaseLwjglSubsystem implements EngineSubsystem {
     public void preInitialise(Context context) {
         if (!initialised) {
             initLogger();
-            LWJGLHelper.initNativeLibs();
-            Bullet.init(true, false);
-
             initialised = true;
         }
     }

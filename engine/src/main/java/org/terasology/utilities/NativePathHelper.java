@@ -27,11 +27,11 @@ import java.nio.file.Path;
  * Helper class to have LWJGL loading logic in a central spot
  *
  */
-public final class LWJGLHelper {
+public final class NativePathHelper {
 
-    private static final Logger logger = LoggerFactory.getLogger(LWJGLHelper.class);
+    private static final Logger logger = LoggerFactory.getLogger(NativePathHelper.class);
 
-    private LWJGLHelper() {
+    private NativePathHelper() {
     }
 
     /**
@@ -60,5 +60,6 @@ public final class LWJGLHelper {
         final String natives = path.toAbsolutePath().toString();
         System.setProperty("org.lwjgl.librarypath", natives);
         System.setProperty("net.java.games.input.librarypath", natives);  // libjinput
+        System.setProperty("org.terasology.librarypath", natives); // JNBullet
     }
 }
