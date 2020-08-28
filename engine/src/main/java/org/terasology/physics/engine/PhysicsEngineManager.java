@@ -20,9 +20,6 @@ import org.terasology.physics.bullet.BulletPhysics;
 import org.terasology.physics.bullet.shapes.BulletCollisionShapeFactory;
 import org.terasology.physics.shapes.CollisionShape;
 import org.terasology.physics.shapes.CollisionShapeFactory;
-import org.terasology.world.WorldProvider;
-import org.terasology.world.block.BlockManager;
-import org.terasology.world.chunks.ChunkProvider;
 
 /**
  * Centralizes the various components of the physics engine. To change the physics engine used, this class

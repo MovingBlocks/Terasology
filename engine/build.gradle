@@ -110,8 +110,6 @@ dependencies {
     api group: 'com.miglayout', name: 'miglayout-core', version: '5.0'
     implementation group: 'de.matthiasmann.twl', name: 'PNGDecoder', version: '1111'
 
-    compile group: 'org.terasology', name: 'JNBullet', version: '0.3.2-SNAPSHOT'
-
     // Assembly & Bytecode
     implementation group: 'org.ow2.asm', name: 'asm', version: '5.0.3'
     implementation group: 'org.ow2.asm', name: 'asm-tree', version: '5.0.4'
@@ -142,6 +140,7 @@ dependencies {
     api group: 'org.terasology', name: 'TeraMath', version: '1.5.0'
     api group: 'org.terasology', name: 'splash-screen', version: '1.0.2'
     api group: 'org.terasology.jnlua', name: 'JNLua', version: '0.1.0-SNAPSHOT'
+    api group: 'org.terasology', name: 'JNBullet', version: "${JNBulletVersion}"
     api group: 'org.terasology.nui', name: 'nui', version: '1.2.0'
     api group: 'org.terasology.nui', name: 'nui-reflect', version: '1.2.0'
 

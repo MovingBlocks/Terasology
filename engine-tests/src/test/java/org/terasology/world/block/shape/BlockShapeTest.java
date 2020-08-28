@@ -15,13 +15,13 @@
  */
 package org.terasology.world.block.shape;
 
+import org.joml.Vector3f;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.terasology.TerasologyTestingEnvironment;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.math.Rotation;
 import org.terasology.math.Yaw;
-import org.terasology.math.geom.Vector3f;
 import org.terasology.physics.bullet.shapes.BulletConvexHullShape;
 import org.terasology.physics.shapes.CollisionShape;
 import org.terasology.physics.shapes.ConvexHullShape;
@@ -75,10 +75,11 @@ public class BlockShapeTest extends TerasologyTestingEnvironment {
 
         BulletConvexHullShape bulletConvexHullShape = (BulletConvexHullShape) shape;
 
-//        Vector3f[] points = ((ConvexHullShape) bulletConvexHullShape.underlyingShape).getVertices();
-//        for (int x = 0; x < points.length; x++) {
-//            fuzzVectorTest(test[x], points[x]);
-//        }
+        //TODO: Test fails because native library is not loaded
+        Vector3f[] points = ((ConvexHullShape) bulletConvexHullShape.underlyingShape).getVertices();
+        for (int x = 0; x < points.length; x++) {
+            fuzzVectorTest(test[x], points[x]);
+        }
     }
 
     private void fuzzVectorTest(Vector3f test, Vector3f actual) {

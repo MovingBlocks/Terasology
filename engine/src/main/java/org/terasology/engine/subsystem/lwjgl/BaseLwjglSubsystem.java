@@ -16,7 +16,6 @@
 package org.terasology.engine.subsystem.lwjgl;
 
 import com.badlogic.gdx.physics.bullet.Bullet;
-import com.badlogic.gdx.physics.bullet.BulletBase;
 import com.google.common.base.Charsets;
 import org.lwjgl.LWJGLUtil;
 import org.slf4j.Logger;
@@ -40,7 +39,7 @@ public abstract class BaseLwjglSubsystem implements EngineSubsystem {
         if (!initialised) {
             initLogger();
             LWJGLHelper.initNativeLibs();
-            Bullet.init(true,false);
+            Bullet.init(true, false);
 
             initialised = true;
         }
@@ -49,23 +48,23 @@ public abstract class BaseLwjglSubsystem implements EngineSubsystem {
     private void initLogger() {
         if (LWJGLUtil.DEBUG) {
             try {
-            // Pipes System.out and err to log, because that's where lwjgl writes it to.
-            System.setOut(new PrintStream(System.out, false, Charsets.UTF_8.name()) {
-                private Logger lwjglLogger = LoggerFactory.getLogger("org.lwjgl");
+                // Pipes System.out and err to log, because that's where lwjgl writes it to.
+                System.setOut(new PrintStream(System.out, false, Charsets.UTF_8.name()) {
+                    private Logger lwjglLogger = LoggerFactory.getLogger("org.lwjgl");
 
-                @Override
-                public void print(final String message) {
-                    lwjglLogger.info(message);
-                }
-            });
-            System.setErr(new PrintStream(System.err, false, Charsets.UTF_8.name()) {
-                private Logger lwjglLogger = LoggerFactory.getLogger("org.lwjgl");
+                    @Override
+                    public void print(final String message) {
+                        lwjglLogger.info(message);
+                    }
+                });
+                System.setErr(new PrintStream(System.err, false, Charsets.UTF_8.name()) {
+                    private Logger lwjglLogger = LoggerFactory.getLogger("org.lwjgl");
 
-                @Override
-                public void print(final String message) {
-                    lwjglLogger.error(message);
-                }
-            });
+                    @Override
+                    public void print(final String message) {
+                        lwjglLogger.error(message);
+                    }
+                });
             } catch (UnsupportedEncodingException e) {
                 logger.error("Failed to map lwjgl logging", e);
             }

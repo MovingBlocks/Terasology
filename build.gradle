@@ -73,8 +73,6 @@ repositories {
     mavenCentral()
     mavenLocal()
 
-    mavenLocal()
-
     // MovingBlocks Artifactory instance for libs not readily available elsewhere plus our own libs
     maven {
         name "Terasology Artifactory"
@@ -102,7 +100,9 @@ dependencies {
 
     // Natives for JNLua (Kallisti, KComputers)
     natives group: 'org.terasology.jnlua', name: 'jnlua_natives', version: '0.1.0-SNAPSHOT', ext: 'zip'
-    natives group: 'org.terasology', name: 'JNBullet', version: '0.3.2-SNAPSHOT', ext: 'zip'
+
+    // Natives for JNBullet
+    natives group: 'org.terasology', name: 'JNBullet', version: "${JNBulletVersion}", ext: 'zip'
 }
 
 task extractWindowsNatives(type: Copy) {

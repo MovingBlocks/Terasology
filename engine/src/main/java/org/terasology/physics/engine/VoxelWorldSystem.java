@@ -54,6 +54,9 @@ import java.nio.ByteOrder;
 
 import static org.terasology.physics.bullet.BulletPhysics.AABB_SIZE;
 
+/**
+ * Manages voxel shape and updates collision state between Bullet and Terasology
+ */
 @RegisterSystem
 public class VoxelWorldSystem extends BaseComponentSystem {
 
@@ -66,7 +69,7 @@ public class VoxelWorldSystem extends BaseComponentSystem {
     @In
     private ChunkProvider chunkProvider;
 
-    private TShortHashSet registred = new TShortHashSet();
+    private final TShortHashSet registred = new TShortHashSet();
 
     private btRigidBodyConstructionInfo blockConsInf;
     private btVoxelShape worldShape;
@@ -78,8 +81,10 @@ public class VoxelWorldSystem extends BaseComponentSystem {
         if (physics instanceof BulletPhysics) {
             btDiscreteDynamicsWorld discreteDynamicsWorld = ((BulletPhysics) physics).getDiscreteDynamicsWorld();
 
-            wrapper = new VoxelCollisionAlgorithmWrapper(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z);
-            worldShape = new btVoxelShape(wrapper, new Vector3f(-AABB_SIZE, -AABB_SIZE, -AABB_SIZE), new Vector3f(AABB_SIZE, AABB_SIZE, AABB_SIZE));
+            wrapper = new VoxelCollisionAlgorithmWrapper(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y,
+                ChunkConstants.SIZE_Z);
+            worldShape = new btVoxelShape(wrapper, new Vector3f(-AABB_SIZE, -AABB_SIZE, -AABB_SIZE),
+                new Vector3f(AABB_SIZE, AABB_SIZE, AABB_SIZE));
 
             Matrix4f matrix4f = new Matrix4f();
             btDefaultMotionState blockMotionState = new btDefaultMotionState(matrix4f);
@@ -98,17 +103,20 @@ public class VoxelWorldSystem extends BaseComponentSystem {
         short id = block.getId();
         if (!registred.contains(id)) {
             btCollisionShape shape = ((BulletCollisionShape) block.getCollisionShape()).underlyingShape;
-            btVoxelInfo info = new btVoxelInfo(shape != null && block.isTargetable(), shape != null && !block.isPenetrable(), id, shape, JomlUtil.from(block.getCollisionOffset()), block.getFriction(), block.getRestitution(), block.getFriction());
+            btVoxelInfo info = new btVoxelInfo(shape != null && block.isTargetable(),
+                shape != null && !block.isPenetrable(), id, shape, JomlUtil.from(block.getCollisionOffset()),
+                block.getFriction(), block.getRestitution(), block.getFriction());
             wrapper.setVoxelInfo(info);
             registred.add(id);
         }
     }
 
 
-    @ReceiveEvent(components = {BlockComponent.class})
+    @ReceiveEvent(components = BlockComponent.class)
     public void onBlockChange(OnChangedBlock event, EntityRef entity) {
         tryRegister(event.getNewType());
-        wrapper.setBlock(event.getBlockPosition().x, event.getBlockPosition().y, event.getBlockPosition().z, event.getNewType().getId());
+        wrapper.setBlock(event.getBlockPosition().x, event.getBlockPosition().y, event.getBlockPosition().z,
+            event.getNewType().getId());
     }
 
     @ReceiveEvent(components = WorldComponent.class)
@@ -117,27 +125,26 @@ public class VoxelWorldSystem extends BaseComponentSystem {
         wrapper.freeRegion(chunkPos.x, chunkPos.y, chunkPos.z);
     }
 
-    @ReceiveEvent(components = {WorldComponent.class})
+    @ReceiveEvent(components = WorldComponent.class)
     public void onNewChunk(OnChunkLoaded chunkAvailable, EntityRef worldEntity) {
         Vector3i chunkPos = chunkAvailable.getChunkPos();
         Chunk chunk = chunkProvider.getChunk(chunkPos);
-        ByteBuffer buffer = ByteBuffer.allocateDirect(2 * (ChunkConstants.SIZE_X * ChunkConstants.SIZE_Y * ChunkConstants.SIZE_Z));
+        ByteBuffer buffer =
+            ByteBuffer.allocateDirect(2 * (ChunkConstants.SIZE_X * ChunkConstants.SIZE_Y * ChunkConstants.SIZE_Z));
         buffer.order(ByteOrder.nativeOrder());
         short[] entries = new short[ChunkConstants.SIZE_X * ChunkConstants.SIZE_Y * ChunkConstants.SIZE_Z];
-        for (int x = 0; x < ChunkConstants.SIZE_X; ++x) {
-            for (int y = 0; y < ChunkConstants.SIZE_Y; ++y) {
-                for (int z = 0; z < ChunkConstants.SIZE_Z; ++z) {
+        for (int x = 0; x < ChunkConstants.SIZE_X; x++) {
+            for (int y = 0; y < ChunkConstants.SIZE_Y; y++) {
+                for (int z = 0; z < ChunkConstants.SIZE_Z; z++) {
                     int index = (z * ChunkConstants.SIZE_X * ChunkConstants.SIZE_Y) + (x * ChunkConstants.SIZE_Y) + y;
                     Block block = chunk.getBlock(x, y, z);
-                    short id = block.getId();
                     tryRegister(block);
-                    entries[index] = id;
-
+                    entries[index] = block.getId();
                 }
             }
         }
-        for (int k = 0; k < entries.length; k++) {
-            buffer.putShort(entries[k]);
+        for (short entry : entries) {
+            buffer.putShort(entry);
         }
         buffer.rewind();
         wrapper.setRegion(chunkPos.x, chunkPos.y, chunkPos.z, buffer.asShortBuffer());
