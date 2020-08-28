@@ -278,7 +278,7 @@ public class BulletPhysics implements PhysicsEngine {
         applyPendingImpulsesAndForces();
         try {
             PerformanceMonitor.startActivity("Step Simulation");
-            if (discreteDynamicsWorld.stepSimulation(delta,8) != 0) {
+            if (discreteDynamicsWorld.stepSimulation(delta, 10) != 0) {
                 for (BulletCharacterMoverCollider collider : entityColliders.values()) {
                     collider.pending = false;
                 }

@@ -91,14 +91,18 @@ public class VoxelWorldSystem extends BaseComponentSystem {
 
             blockConsInf = new btRigidBodyConstructionInfo(0, blockMotionState, worldShape, new Vector3f());
             rigidBody = new btRigidBody(blockConsInf);
-            rigidBody.setCollisionFlags(btCollisionObject.CollisionFlags.CF_STATIC_OBJECT | rigidBody.getCollisionFlags());
-            short mask = (short) (~(StandardCollisionGroup.STATIC.getFlag() | StandardCollisionGroup.LIQUID.getFlag()));
-            discreteDynamicsWorld.addRigidBody(rigidBody, physics.combineGroups(StandardCollisionGroup.WORLD), mask);
+            rigidBody.setCollisionFlags(btCollisionObject.CollisionFlags.CF_STATIC_OBJECT | rigidBody.getCollisionFlags()); // voxel world is added to static collision flag
+            short mask = (short) (~(StandardCollisionGroup.STATIC.getFlag() | StandardCollisionGroup.LIQUID.getFlag())); // interacts with anything but static and liquid
+            discreteDynamicsWorld.addRigidBody(rigidBody, physics.combineGroups(StandardCollisionGroup.WORLD), mask); // adds rigid body to world
         }
 
         super.initialise();
     }
 
+    /**
+     * update voxel info for the wrapper for the associated block id
+     * @param block the block
+     */
     private void tryRegister(Block block) {
         short id = block.getId();
         if (!registred.contains(id)) {
@@ -119,12 +123,22 @@ public class VoxelWorldSystem extends BaseComponentSystem {
             event.getNewType().getId());
     }
 
+    /**
+     * free chunk region from bullet
+     * @param beforeChunkUnload
+     * @param worldEntity
+     */
     @ReceiveEvent(components = WorldComponent.class)
     public void onChunkUloaded(BeforeChunkUnload beforeChunkUnload, EntityRef worldEntity) {
         Vector3i chunkPos = beforeChunkUnload.getChunkPos();
         wrapper.freeRegion(chunkPos.x, chunkPos.y, chunkPos.z);
     }
 
+    /**
+     * new chunks that are loaded need to update pass the data to bullet
+     * @param chunkAvailable the chunk
+     * @param worldEntity world entity
+     */
     @ReceiveEvent(components = WorldComponent.class)
     public void onNewChunk(OnChunkLoaded chunkAvailable, EntityRef worldEntity) {
         Vector3i chunkPos = chunkAvailable.getChunkPos();
