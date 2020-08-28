@@ -33,25 +33,25 @@ public class BulletConvexHullShape extends BulletCollisionShape implements Conve
 
     public BulletConvexHullShape(List<Vector3f> vertices) {
         FloatBuffer buffer = BufferUtils.createFloatBuffer(vertices.size() * 3);
-        for(int i = 0; i < vertices.size(); i++){
+        for (int i = 0; i < vertices.size(); i++) {
             Vector3f vertex = vertices.get(i);
             buffer.put(vertex.x);
             buffer.put(vertex.y);
             buffer.put(vertex.z);
         }
-        this.convexHullShape = new btConvexHullShape(buffer,vertices.size(),3 * Float.BYTES);
+        this.convexHullShape = new btConvexHullShape(buffer, vertices.size(), 3 * Float.BYTES);
         this.underlyingShape = convexHullShape;
     }
 
-    public BulletConvexHullShape(FloatBuffer buffer,int numPoints,int stride){
-        this.convexHullShape = new btConvexHullShape(buffer,numPoints,stride);
+    public BulletConvexHullShape(FloatBuffer buffer, int numPoints, int stride) {
+        this.convexHullShape = new btConvexHullShape(buffer, numPoints, stride);
         this.underlyingShape = convexHullShape;
     }
 
     @Override
     public CollisionShape rotate(Quaternionf rot) {
         List<Vector3f> verts = Lists.newArrayList();
-        for(int x = 0; x < convexHullShape.getNumPoints(); x++){
+        for (int x = 0; x < convexHullShape.getNumPoints(); x++) {
             Vector3f p = convexHullShape.getScaledPoint(x);
             p.rotate(rot);
 
@@ -63,7 +63,7 @@ public class BulletConvexHullShape extends BulletCollisionShape implements Conve
     @Override
     public Vector3f[] getVertices() {
         Vector3f[] verts = new Vector3f[convexHullShape.getNumPoints()];
-        for(int x = 0; x < convexHullShape.getNumPoints(); x++){
+        for (int x = 0; x < convexHullShape.getNumPoints(); x++) {
             Vector3f p = convexHullShape.getScaledPoint(x);
             verts[x] = p;
         }

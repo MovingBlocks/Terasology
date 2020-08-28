@@ -21,7 +21,7 @@ import org.joml.Vector3f;
 import org.terasology.physics.shapes.CollisionShape;
 
 
-public class BulletCylinderShape extends  BulletCollisionShape{
+public class BulletCylinderShape extends  BulletCollisionShape {
 
     private final btCylinderShape cylinderShape;
 

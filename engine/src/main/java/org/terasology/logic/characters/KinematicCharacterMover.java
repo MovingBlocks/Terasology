@@ -39,8 +39,6 @@ import org.terasology.physics.events.MovedEvent;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 
-import java.math.RoundingMode;
-
 /**
  * Calculates character movement using a physics-engine provided CharacterCollider.
  * This collider is swept through the world to detect collisions.
