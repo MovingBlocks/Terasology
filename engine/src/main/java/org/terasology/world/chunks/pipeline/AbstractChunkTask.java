@@ -16,24 +16,38 @@
 
 package org.terasology.world.chunks.pipeline;
 
-import org.terasology.math.geom.Vector3i;
+import org.joml.Vector3i;
+import org.terasology.world.chunks.Chunk;
+import org.terasology.world.chunks.Chunk;
 
 /**
  */
 public abstract class AbstractChunkTask implements ChunkTask {
-    private final Vector3i position;
+    protected Chunk chunk;
 
-    public AbstractChunkTask(Vector3i position) {
-        this.position = new Vector3i(position);
+    public AbstractChunkTask() {
+    }
+
+    public AbstractChunkTask(Chunk chunk) {
+        this.chunk = chunk;
     }
 
     @Override
-    public Vector3i getPosition() {
-        return position;
+    public Chunk getChunk() {
+        return chunk;
     }
 
     @Override
     public boolean isTerminateSignal() {
         return false;
+    }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("ChunkTask{");
+        sb.append("name = ").append(getName()).append(",");
+        sb.append("position = ").append(getPosition());
+        sb.append('}');
+        return sb.toString();
     }
 }

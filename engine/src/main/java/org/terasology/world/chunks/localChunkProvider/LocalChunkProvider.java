@@ -17,6 +17,7 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.EntityStore;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.math.ChunkMath;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.Region3i;
 import org.terasology.math.Side;
 import org.terasology.math.TeraMath;
@@ -46,7 +47,8 @@ import org.terasology.world.chunks.internal.ChunkRelevanceRegion;
 import org.terasology.world.chunks.internal.GeneratingChunkProvider;
 import org.terasology.world.chunks.internal.ReadyChunkInfo;
 import org.terasology.world.chunks.pipeline.AbstractChunkTask;
-import org.terasology.world.chunks.pipeline.ChunkGenerationPipeline;
+import org.terasology.world.chunks.pipeline.ChunkProcessingPipeline;
+import org.terasology.world.chunks.pipeline.SupplierChunkTask;
 import org.terasology.world.generation.impl.EntityBufferImpl;
 import org.terasology.world.generator.WorldGenerator;
 import org.terasology.world.internal.ChunkViewCore;
@@ -76,7 +78,7 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
     private final ChunkCache chunkCache;
     private final Supplier<ChunkFinalizer> chunkFinalizerSupplier;
     private StorageManager storageManager;
-    private ChunkGenerationPipeline pipeline;
+    private ChunkProcessingPipeline pipeline;
     private TaskMaster<ChunkUnloadRequest> unloadRequestTaskMaster;
     private WorldGenerator generator;
     private List<ReadyChunkInfo> sortedReadyChunks = Lists.newArrayList();
@@ -482,7 +484,7 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
         preparingChunks.clear();
         worldEntity.send(new PurgeWorldEvent());
 
-        pipeline = new ChunkGenerationPipeline(relevanceSystem.createChunkTaskComporator());
+        pipeline = new ChunkProcessingPipeline(relevanceSystem.createChunkTaskComporator());
         unloadRequestTaskMaster = TaskMaster.createFIFOTaskMaster("Chunk-Unloader", 8);
         chunkFinalizer = chunkFinalizerSupplier.get();
         chunkFinalizer.initialize(this);
@@ -498,22 +500,14 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
     }
 
     protected void createOrLoadChunk(Vector3i chunkPos) {
-        Chunk chunk = chunkCache.get(chunkPos);
-        if (chunk == null && !preparingChunks.contains(chunkPos)) {
+        if (!chunkCache.containsChunkAt(chunkPos)  && !preparingChunks.contains(chunkPos)) {
             preparingChunks.add(chunkPos);
-            pipeline.doTask(new AbstractChunkTask(chunkPos) {
-                @Override
-                public String getName() {
-                    return "Create or Load Chunk";
-                }
-
-                @Override
-                public void run() {
-                    ChunkStore chunkStore = storageManager.loadChunkStore(getPosition());
+            pipeline.doTask(new SupplierChunkTask("Create or Load Chunk", () -> {
+                    ChunkStore chunkStore = storageManager.loadChunkStore(chunkPos);
                     Chunk chunk;
                     EntityBufferImpl buffer = new EntityBufferImpl();
                     if (chunkStore == null) {
-                        chunk = new ChunkImpl(getPosition(), blockManager, extraDataManager);
+                        chunk = new ChunkImpl(chunkPos, blockManager, extraDataManager);
                         generator.createChunk(chunk, buffer);
                     } else {
                         chunk = chunkStore.getChunk();
@@ -523,8 +517,8 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
                     chunk.deflate();
                     TShortObjectMap<TIntList> mappings = createBatchBlockEventMappings(chunk);
                     readyChunks.offer(new ReadyChunkInfo(chunk, mappings, chunkStore, buffer.getAll()));
-                }
-            });
+                    return chunk;
+                }));
         }
     }
 
@@ -550,6 +544,6 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
 
     public void setRelevanceSystem(RelevanceSystem relevanceSystem) {
         this.relevanceSystem = relevanceSystem;
-        this.pipeline = new ChunkGenerationPipeline(relevanceSystem.createChunkTaskComporator());
+        this.pipeline = new ChunkProcessingPipeline(relevanceSystem.createChunkTaskComporator());
     }
 }

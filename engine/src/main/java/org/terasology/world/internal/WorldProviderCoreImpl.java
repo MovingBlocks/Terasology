@@ -72,7 +72,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
     private String seed = "";
     private SimpleUri worldGenerator;
 
-    private GeneratingChunkProvider chunkProvider;
+    private ChunkProvider chunkProvider;
     private WorldTime worldTime;
     private EntityManager entityManager;
 
@@ -84,7 +84,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
     private Block unloadedBlock;
 
     public WorldProviderCoreImpl(String title, String customTitle, String seed, long time, SimpleUri worldGenerator,
-                                 GeneratingChunkProvider chunkProvider, Block unloadedBlock, Context context) {
+                                 ChunkProvider chunkProvider, Block unloadedBlock, Context context) {
         this.title = (title == null) ? seed : title;
         this.customTitle = customTitle;
         this.seed = seed;

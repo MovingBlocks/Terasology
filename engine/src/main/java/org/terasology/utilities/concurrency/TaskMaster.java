@@ -60,11 +60,11 @@ import java.util.concurrent.TimeUnit;
 public final class TaskMaster<T extends Task> {
     private static final Logger logger = LoggerFactory.getLogger(TaskMaster.class);
 
-    private BlockingQueue<T> taskQueue;
+    private final BlockingQueue<T> taskQueue;
     private ExecutorService executorService;
-    private int threads;
+    private final int threads;
     private boolean running;
-    private String name;
+    private final String name;
 
     private TaskMaster(String name, int threads, BlockingQueue<T> queue) {
         this.name = name;

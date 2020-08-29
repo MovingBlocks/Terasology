@@ -72,8 +72,7 @@ public class LightMerger<T> {
         return Collections.emptyList();
     }
 
-    private void merge(Chunk chunk) {
-        Chunk[] localChunks = assembleLocalChunks(chunk);
+    public void merge(Chunk chunk, Chunk[] localChunks) {
         localChunks[CENTER_INDEX] = chunk;
         List<BatchPropagator> propagators = Lists.newArrayList();
         propagators.add(new StandardBatchPropagator(new LightPropagationRules(), new LocalChunkView(localChunks, lightRules)));
@@ -107,6 +106,10 @@ public class LightMerger<T> {
             propagator.process();
         }
         chunk.deflateSunlight();
+    }
+
+    private void merge(Chunk chunk) {
+        merge(chunk, assembleLocalChunks(chunk));
     }
 
     private Chunk[] assembleLocalChunks(Chunk chunk) {

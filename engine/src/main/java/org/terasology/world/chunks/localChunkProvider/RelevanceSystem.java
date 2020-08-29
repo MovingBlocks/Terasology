@@ -10,6 +10,7 @@ import org.terasology.entitySystem.entity.lifecycleEvents.OnChangedComponent;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.logic.location.LocationComponent;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.monitoring.Activity;
 import org.terasology.monitoring.PerformanceMonitor;
@@ -278,7 +279,7 @@ public class RelevanceSystem implements UpdateSubscriberSystem {
             if (task.isTerminateSignal()) {
                 return -1;
             }
-            return RelevanceSystem.this.regionsDistanceScore(task.getPosition());
+            return RelevanceSystem.this.regionsDistanceScore(JomlUtil.from(task.getPosition()));
         }
     }
 
