@@ -239,26 +239,6 @@ public class BetweenChunkPropagationTest extends TerasologyTestingEnvironment {
         }
 
         @Override
-        public void addRelevanceEntity(EntityRef entity, Vector3i distance) {
-            // do nothing
-        }
-
-        @Override
-        public void addRelevanceEntity(EntityRef entity, Vector3i distance, ChunkRegionListener listener) {
-            // do nothing
-        }
-
-        @Override
-        public void updateRelevanceEntity(EntityRef entity, Vector3i distance) {
-            // do nothing
-        }
-
-        @Override
-        public void removeRelevanceEntity(EntityRef entity) {
-            // do nothing
-        }
-
-        @Override
         public void completeUpdate() {
             // do nothing
         }
