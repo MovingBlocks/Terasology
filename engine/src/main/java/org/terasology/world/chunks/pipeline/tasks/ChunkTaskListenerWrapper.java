@@ -3,6 +3,7 @@
 
 package org.terasology.world.chunks.pipeline.tasks;
 
+import org.joml.Vector3i;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.pipeline.ChunkTask;
 import org.terasology.world.chunks.pipeline.ChunkTaskListener;
@@ -19,6 +20,16 @@ public class ChunkTaskListenerWrapper implements ChunkTask {
     @Override
     public Chunk getChunk() {
         return chunkTask.getChunk();
+    }
+
+    @Override
+    public Vector3i getPosition() {
+        return chunkTask.getPosition();
+    }
+
+    @Override
+    public boolean needsRepeat() {
+        return chunkTask.needsRepeat();
     }
 
     @Override

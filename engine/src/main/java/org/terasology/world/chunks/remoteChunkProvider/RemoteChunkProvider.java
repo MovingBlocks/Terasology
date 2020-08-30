@@ -61,15 +61,13 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
 
     private static final Logger logger = LoggerFactory.getLogger(RemoteChunkProvider.class);
     private Map<Vector3i, Chunk> chunkCache = Maps.newHashMap();
-    private final BlockingQueue<Chunk> readyChunks = Queues.newLinkedBlockingQueue();
     private final BlockingQueue<Vector3i> invalidateChunks = Queues.newLinkedBlockingQueue();
-    private List<Chunk> sortedReadyChunks = Lists.newArrayList();
     private ChunkReadyListener listener;
     private EntityRef worldEntity = EntityRef.NULL;
 
     private BlockManager blockManager;
 
-    private ChunkProcessingPipeline pipeline;
+    private ChunkProcessingPipeline loadingPipeline;
 
     private LightMerger<Chunk> lightMerger = new LightMerger<>(this);
 
@@ -78,8 +76,9 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
     public RemoteChunkProvider(BlockManager blockManager, LocalPlayer localPlayer) {
         this.blockManager = blockManager;
         this.localPlayer = localPlayer;
-        pipeline = new ChunkProcessingPipeline(new ChunkTaskRelevanceComparator());
-        pipeline.addStage(GenerateInternalLightningChunkTask::new)
+        loadingPipeline = new ChunkProcessingPipeline(new ChunkTaskRelevanceComparator());
+
+        loadingPipeline.addStage(GenerateInternalLightningChunkTask::new)
                 .addStage(DeflateChunkTask::new)
                 .addStage(LightMergerChunkTask.stage(this, lightMerger))
                 .addStage(NotifyChunkTask.stage("Notify listeners", (chunk) -> {
@@ -90,6 +89,7 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
                         oldChunk.dispose();
                     }
                 }));
+
         ChunkMonitor.fireChunkProviderInitialized(this);
     }
 
@@ -99,7 +99,7 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
 
 
     public void receiveChunk(final Chunk chunk) {
-        pipeline.invokePipeline(chunk);
+        loadingPipeline.invokePipeline(chunk);
     }
 
     public void invalidateChunks(Vector3i pos) {
@@ -109,20 +109,12 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
 
     @Override
     public void completeUpdate() {
-//        lightMerger.completeMerge().forEach(chunk -> {
-//            if (chunkCache.containsKey(chunk.getPosition())) {
-//                chunk.markReady();
-//                listener.onChunkReady(chunk.getPosition());
-//                worldEntity.send(new OnChunkLoaded(chunk.getPosition()));
-//            }
-//        });
     }
 
     @Override
     public void beginUpdate() {
         if (listener != null) {
             checkForUnload();
-//            makeChunksAvailable();
         }
     }
 
@@ -131,50 +123,12 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
         invalidateChunks.drainTo(positions);
         for (Vector3i pos : positions) {
             Chunk removed = chunkCache.remove(pos);
-            if (removed != null && !removed.isReady() && !sortedReadyChunks.remove(removed)) {
+            if (removed != null && !removed.isReady()) {
                 worldEntity.send(new BeforeChunkUnload(pos));
                 removed.dispose();
             }
         }
     }
-
-    //TODO: remove
-    private void makeChunksAvailable() {
-//        List<Chunk> newReadyChunks = Lists.newArrayList();
-//        readyChunks.drainTo(newReadyChunks);
-//        if (!newReadyChunks.isEmpty()) {
-//            sortedReadyChunks.addAll(newReadyChunks);
-//            Collections.sort(sortedReadyChunks, new ReadyChunkRelevanceComparator());
-//            for (Chunk chunk : newReadyChunks) {
-//                Chunk oldChunk = chunkCache.put(chunk.getPosition(), chunk);
-//                if (oldChunk != null) {
-//                    oldChunk.dispose();
-//                }
-//            }
-//        }
-//        if (!sortedReadyChunks.isEmpty()) {
-//            for (int i = sortedReadyChunks.size() - 1; i >= 0; i--) {
-//                Chunk chunkInfo = sortedReadyChunks.get(i);
-//                PerformanceMonitor.startActivity("Make Chunk Available");
-//                if (makeChunkAvailable(chunkInfo)) {
-//                    sortedReadyChunks.remove(i);
-//                }
-//                PerformanceMonitor.endActivity();
-//            }
-//        }
-    }
-
-//    private boolean makeChunkAvailable(final Chunk chunk) {
-////        for (Vector3i pos : Region3i.createFromCenterExtents(chunk.getPosition(), 1)) {
-////            if (chunkCache.get(pos) == null) {
-////                return false;
-////            }
-////        }
-////
-////        lightMerger.beginMerge(chunk, chunk);
-////        return true;
-//    }
-
 
     @Override
     public Chunk getChunk(int x, int y, int z) {
@@ -199,7 +153,7 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
     @Override
     public void dispose() {
         ChunkMonitor.fireChunkProviderDisposed(this);
-        pipeline.shutdown();
+        loadingPipeline.shutdown();
         lightMerger.shutdown();
     }
 
@@ -272,18 +226,14 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
 
     @Override
     public void onChunkIsReady(Chunk chunk) {
-        try {
-            readyChunks.put(chunk);
-        } catch (InterruptedException e) {
-            logger.warn("Failed to add chunk to ready queue", e);
-        }
+      // unused
     }
 
     @Override
     public Chunk getChunkUnready(Vector3i pos) {
         Chunk chunk = chunkCache.get(pos);
         if (chunk == null) {
-            chunk = pipeline.getProcessingChunks().get(pos);
+            chunk = loadingPipeline.getProcessingChunks().get(pos);
         }
         return chunk;
     }
@@ -300,20 +250,6 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
             Vector3i playerChunk = ChunkMath.calcChunkPos(new Vector3i(localPlayer.getPosition(),
                     RoundingMode.HALF_UP));
             return playerChunk.distanceSquared(JomlUtil.from(chunk));
-        }
-    }
-
-    private class ReadyChunkRelevanceComparator implements Comparator<Chunk> {
-
-        @Override
-        public int compare(Chunk o1, Chunk o2) {
-            return TeraMath.floorToInt(Math.signum(score(o2.getPosition())) - score(o1.getPosition()));
-        }
-
-        private float score(Vector3i chunkPos) {
-            Vector3f vec = chunkPos.toVector3f();
-            vec.sub(localPlayer.getPosition());
-            return vec.lengthSquared();
         }
     }
 }

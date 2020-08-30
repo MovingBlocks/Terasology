@@ -43,6 +43,10 @@ public class ChunkProcessingPipeline implements ChunkTaskListener {
                 taskComparator);
     }
 
+    public void invokeGeneratorTask(SupplierChunkTask supplierChunkTask) {
+        doTask(new ChunkTaskListenerWrapper(supplierChunkTask, (chunkTask) -> invokePipeline(chunkTask.getChunk())));
+    }
+
     public void invokePipeline(Chunk chunk) {
         Function<Chunk, ChunkTask> nextStage =
                 chunkNextStages.computeIfAbsent(chunk, c -> new LinkedList<>(stages)).poll();
@@ -76,10 +80,12 @@ public class ChunkProcessingPipeline implements ChunkTaskListener {
     }
 
     public void shutdown() {
+        chunkNextStages.clear();
         chunkProcessor.shutdown(new ShutdownChunkTask(), false);
     }
 
     public void restart() {
+        chunkNextStages.clear();
         chunkProcessor.restart();
     }
 
