@@ -16,9 +16,9 @@
 package org.terasology.rendering.nui.layers.mainMenu;
 
 import org.terasology.rendering.nui.CoreScreenLayer;
-import org.terasology.rendering.nui.widgets.UIDropdown;
-import org.terasology.rendering.nui.widgets.UIDropdownScrollable;
-import org.terasology.rendering.nui.widgets.UIList;
+import org.terasology.nui.widgets.UIDropdown;
+import org.terasology.nui.widgets.UIDropdownScrollable;
+import org.terasology.nui.widgets.UIList;
 
 import java.util.Arrays;
 import java.util.List;

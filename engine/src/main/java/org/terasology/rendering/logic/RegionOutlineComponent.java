@@ -16,7 +16,7 @@
 package org.terasology.rendering.logic;
 
 import org.terasology.math.geom.Vector3i;
-import org.terasology.rendering.nui.Color;
+import org.terasology.nui.Color;
 
 /**
  * Entities with this component will cause a outline be drawn about the specified region in block coordinates.

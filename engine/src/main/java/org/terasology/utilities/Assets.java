@@ -28,6 +28,7 @@ import org.terasology.engine.module.ModuleManager;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.module.sandbox.API;
 import org.terasology.naming.Name;
+import org.terasology.nui.asset.UIElement;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.assets.font.Font;
 import org.terasology.rendering.assets.material.Material;
@@ -35,8 +36,7 @@ import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.rendering.assets.shader.Shader;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.TextureRegionAsset;
-import org.terasology.rendering.nui.asset.UIElement;
-import org.terasology.rendering.nui.skin.UISkin;
+import org.terasology.nui.skin.UISkin;
 
 import java.util.Optional;
 import java.util.Set;

@@ -15,6 +15,7 @@ import org.terasology.input.InputType;
 import org.terasology.input.MouseInput;
 import org.terasology.input.device.MouseAction;
 import org.terasology.input.device.MouseDevice;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Vector2i;
 
 import java.beans.PropertyChangeEvent;
@@ -56,6 +57,12 @@ public class LwjglMouseDevice implements MouseDevice, PropertyChangeListener {
     @Override
     public Vector2i getPosition() {
         return new Vector2i((int) (xpos / this.uiScale), (int)  (ypos / this.uiScale));
+    }
+
+    // TODO: Remove when nui-input is fully integrated
+    @Override
+    public org.joml.Vector2i getMousePosition() {
+        return JomlUtil.from(getPosition());
     }
 
     @Override

@@ -16,25 +16,25 @@
 package org.terasology.logic.behavior.nui;
 
 import com.google.common.collect.Lists;
-import org.terasology.utilities.Assets;
+import org.joml.Vector2f;
+import org.joml.Vector2i;
 import org.terasology.input.Keyboard;
 import org.terasology.input.MouseInput;
 import org.terasology.input.device.KeyboardDevice;
-import org.terasology.math.geom.Vector2i;
 import org.terasology.logic.behavior.core.BehaviorNode;
 import org.terasology.logic.behavior.core.BehaviorState;
-import org.terasology.math.geom.Vector2f;
-import org.terasology.rendering.assets.texture.TextureRegion;
-import org.terasology.rendering.nui.BaseInteractionListener;
-import org.terasology.rendering.nui.Canvas;
-import org.terasology.rendering.nui.CoreWidget;
-import org.terasology.rendering.nui.InteractionListener;
-import org.terasology.rendering.nui.events.NUIMouseClickEvent;
-import org.terasology.rendering.nui.events.NUIMouseDragEvent;
-import org.terasology.rendering.nui.events.NUIMouseOverEvent;
-import org.terasology.rendering.nui.events.NUIMouseReleaseEvent;
-import org.terasology.rendering.nui.layouts.ZoomableLayout;
-import org.terasology.rendering.nui.properties.PropertyProvider;
+import org.terasology.nui.BaseInteractionListener;
+import org.terasology.nui.Canvas;
+import org.terasology.nui.CoreWidget;
+import org.terasology.nui.InteractionListener;
+import org.terasology.nui.UITextureRegion;
+import org.terasology.nui.events.NUIMouseClickEvent;
+import org.terasology.nui.events.NUIMouseDragEvent;
+import org.terasology.nui.events.NUIMouseOverEvent;
+import org.terasology.nui.events.NUIMouseReleaseEvent;
+import org.terasology.nui.layouts.ZoomableLayout;
+import org.terasology.nui.properties.PropertyProvider;
+import org.terasology.utilities.Assets;
 
 import java.util.List;
 
@@ -46,7 +46,7 @@ import java.util.List;
  *
  */
 public class RenderableNode extends CoreWidget implements ZoomableLayout.PositionalWidget<BehaviorEditor>, TreeAccessor<RenderableNode> {
-    private TextureRegion texture = Assets.getTextureRegion("engine:button").get();
+    private UITextureRegion texture = Assets.getTextureRegion("engine:button").get();
 
     private final List<RenderableNode> children = Lists.newArrayList();
     private PortList portList;
