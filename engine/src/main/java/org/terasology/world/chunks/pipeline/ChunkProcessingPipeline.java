@@ -43,8 +43,21 @@ public class ChunkProcessingPipeline implements ChunkTaskListener {
                 taskComparator);
     }
 
-    public void invokeGeneratorTask(SupplierChunkTask supplierChunkTask) {
-        doTask(new ChunkTaskListenerWrapper(supplierChunkTask, (chunkTask) -> invokePipeline(chunkTask.getChunk())));
+    /**
+     * Run generator task and then run pipeline with it.
+     * @param generatorTask ChunkTask which provides new chunk to pipeline
+     */
+    public void invokeGeneratorTask(SupplierChunkTask generatorTask) {
+        doTask(new ChunkTaskListenerWrapper(generatorTask, (chunkTask) -> {
+            // check that we haven't many tasks on one position.
+            if (chunkNextStages
+                    .keySet()
+                    .stream()
+                    .map(Chunk::getPosition)
+                    .noneMatch((p)-> p.equals(chunkTask.getChunk().getPosition()))) {
+                invokePipeline(chunkTask.getChunk());
+            }
+        }));
     }
 
     public void invokePipeline(Chunk chunk) {

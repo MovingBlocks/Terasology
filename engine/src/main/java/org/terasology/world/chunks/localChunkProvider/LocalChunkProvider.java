@@ -74,7 +74,7 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
     private final BlockingQueue<TShortObjectMap<TIntList>> deactivateBlocksQueue = Queues.newLinkedBlockingQueue();
     private final ChunkCache chunkCache;
 
-    private final Map<Chunk, List<EntityStore>> generateQueuedEntities = new HashMap<>();
+    private final Map<org.joml.Vector3i, List<EntityStore>> generateQueuedEntities = new HashMap<>();
 
     private LightMerger<Object> lightMerger;
     private StorageManager storageManager;
@@ -119,7 +119,7 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
 
 
     protected void createOrLoadChunk(Vector3i chunkPos) {
-        if (!chunkCache.containsChunkAt(chunkPos)) {
+        if (getChunkUnready(chunkPos) == null) {
             loadingPipeline.invokeGeneratorTask(new SupplierChunkTask("Create or Load Chunk", () -> {
                 ChunkStore chunkStore = storageManager.loadChunkStore(chunkPos);
                 Chunk chunk;
@@ -127,7 +127,7 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
                 if (chunkStore == null) {
                     chunk = new ChunkImpl(chunkPos, blockManager, extraDataManager);
                     generator.createChunk(chunk, buffer);
-                    generateQueuedEntities.put(chunk, buffer.getAll());
+                    generateQueuedEntities.put(chunk.getPosition(new org.joml.Vector3i()), buffer.getAll());
                 } else {
                     chunk = chunkStore.getChunk();
                 }
@@ -222,7 +222,7 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
             PerformanceMonitor.endActivity();
         } else {
             PerformanceMonitor.startActivity("Generating queued Entities");
-            generateQueuedEntities.get(chunk).forEach(this::generateQueuedEntities);
+            generateQueuedEntities.remove(chunk.getPosition(new org.joml.Vector3i())).forEach(this::generateQueuedEntities);
             PerformanceMonitor.endActivity();
 
             // send on activate
