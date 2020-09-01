@@ -50,7 +50,6 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.stream.Collectors;
 
 import static org.terasology.physics.engine.PhysicsEngineManager.COLLISION_SHAPE_FACTORY;
 

@@ -39,6 +39,7 @@ public class BulletConvexHullShape extends BulletCollisionShape implements Conve
             buffer.put(vertex.y);
             buffer.put(vertex.z);
         }
+        buffer.rewind();
         this.convexHullShape = new btConvexHullShape(buffer, vertices.size(), 3 * Float.BYTES);
         this.underlyingShape = convexHullShape;
     }
@@ -52,9 +53,8 @@ public class BulletConvexHullShape extends BulletCollisionShape implements Conve
     public CollisionShape rotate(Quaternionf rot) {
         List<Vector3f> verts = Lists.newArrayList();
         for (int x = 0; x < convexHullShape.getNumPoints(); x++) {
-            Vector3f p = convexHullShape.getScaledPoint(x);
-            p.rotate(rot);
-
+            Vector3f p = new Vector3f(convexHullShape.getScaledPoint(x));
+            rot.transform(p);
             verts.add(p);
         }
         return new BulletConvexHullShape(verts);
@@ -64,7 +64,7 @@ public class BulletConvexHullShape extends BulletCollisionShape implements Conve
     public Vector3f[] getVertices() {
         Vector3f[] verts = new Vector3f[convexHullShape.getNumPoints()];
         for (int x = 0; x < convexHullShape.getNumPoints(); x++) {
-            Vector3f p = convexHullShape.getScaledPoint(x);
+            Vector3f p = new Vector3f(convexHullShape.getScaledPoint(x));
             verts[x] = p;
         }
         return verts;
