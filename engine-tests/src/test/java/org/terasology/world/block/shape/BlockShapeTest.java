@@ -15,6 +15,7 @@
  */
 package org.terasology.world.block.shape;
 
+import com.badlogic.gdx.physics.bullet.collision.btConvexHullShape;
 import org.joml.Vector3f;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -76,9 +77,8 @@ public class BlockShapeTest extends TerasologyTestingEnvironment {
         BulletConvexHullShape bulletConvexHullShape = (BulletConvexHullShape) shape;
 
         //TODO: Test fails because native library is not loaded
-        Vector3f[] points = ((ConvexHullShape) bulletConvexHullShape.underlyingShape).getVertices();
-        for (int x = 0; x < points.length; x++) {
-            fuzzVectorTest(test[x], points[x]);
+        for (int x = 0; x < ((btConvexHullShape) bulletConvexHullShape.underlyingShape).getNumPoints(); x++) {
+            fuzzVectorTest(test[x],  ((btConvexHullShape) bulletConvexHullShape.underlyingShape).getScaledPoint(x));
         }
     }
 
