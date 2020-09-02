@@ -334,6 +334,27 @@ public final class PathManager {
         }
         sandboxPath = homePath.resolve(SANDBOX_DIR);
         Files.createDirectories(sandboxPath);
+
+        // --------------------------------- Setup native paths ---------------------
+        final Path path;
+        switch (LWJGLUtil.getPlatform()) {
+            case LWJGLUtil.PLATFORM_MACOSX:
+                path = nativesPath.resolve("macosx");
+                break;
+            case LWJGLUtil.PLATFORM_LINUX:
+                path = nativesPath.resolve("linux");
+                break;
+            case LWJGLUtil.PLATFORM_WINDOWS:
+                path = nativesPath.resolve("windows");
+                break;
+            default:
+                throw new UnsupportedOperationException("Unsupported operating system: " + LWJGLUtil.getPlatformName());
+        }
+        final String natives = path.toAbsolutePath().toString();
+        System.setProperty("org.lwjgl.librarypath", natives);
+        System.setProperty("net.java.games.input.librarypath", natives);  // libjinput
+        System.setProperty("org.terasology.librarypath", natives); // JNBullet
+
     }
 
     public Path getHomeModPath() {

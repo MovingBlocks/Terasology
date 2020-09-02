@@ -72,7 +72,6 @@ import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.reflect.ReflectFactory;
 import org.terasology.reflection.reflect.ReflectionReflectFactory;
 import org.terasology.registry.CoreRegistry;
-import org.terasology.utilities.NativePathHelper;
 import org.terasology.version.TerasologyVersion;
 import org.terasology.world.block.loader.BlockFamilyDefinition;
 import org.terasology.world.block.loader.BlockFamilyDefinitionData;
@@ -158,7 +157,7 @@ public class TerasologyEngine implements GameEngine {
      */
     public TerasologyEngine(TimeSubsystem timeSubsystem, Collection<EngineSubsystem> subsystems) {
         // configure native paths
-        NativePathHelper.initNativeLibs();
+        PathManager.getInstance();
         Bullet.init(true, false);
 
         this.rootContext = new ContextImpl();

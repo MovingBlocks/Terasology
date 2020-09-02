@@ -47,7 +47,6 @@ import org.terasology.recording.RecordAndReplaySerializer;
 import org.terasology.recording.RecordAndReplayUtils;
 import org.terasology.recording.RecordedEventStore;
 import org.terasology.reflection.TypeRegistry;
-import org.terasology.utilities.NativePathHelper;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.chunks.blockdata.ExtraBlockDataManager;
 
@@ -75,6 +74,7 @@ public abstract class TerasologyTestingEnvironment {
         final JavaArchive homeArchive = ShrinkWrap.create(JavaArchive.class);
         final FileSystem vfs = ShrinkWrapFileSystems.newFileSystem(homeArchive);
         PathManager.getInstance().useOverrideHomePath(vfs.getPath(""));
+        Bullet.init(true,false);
 
         /*
          * Create at least for each class a new headless environemnt as it is fast and prevents side effects
@@ -88,8 +88,6 @@ public abstract class TerasologyTestingEnvironment {
 
     @BeforeEach
     public void setup() throws Exception {
-        NativePathHelper.initNativeLibs();
-        Bullet.init(true,false);
 
         context.put(ModuleManager.class, moduleManager);
         RecordAndReplayCurrentStatus recordAndReplayCurrentStatus = context.get(RecordAndReplayCurrentStatus.class);
