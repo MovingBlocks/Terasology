@@ -17,9 +17,9 @@ package org.terasology.rendering.nui.contextMenu;
 
 import com.google.common.collect.Lists;
 import org.joml.Rectanglei;
+import org.joml.Vector2i;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.math.JomlUtil;
-import org.terasology.math.geom.Vector2i;
 import org.terasology.nui.BaseInteractionListener;
 import org.terasology.nui.Canvas;
 import org.terasology.nui.InteractionListener;
@@ -80,7 +80,7 @@ public class ContextMenuScreen extends CoreScreenLayer {
                 if (currentPosition == null) {
                     currentPosition = new Vector2i(position);
                 } else {
-                    currentPosition.addX(currentWidth);
+                    currentPosition.x += currentWidth;
                 }
                 org.joml.Vector2i preferredSize = canvas.calculatePreferredSize(level);
                 Rectanglei region = JomlUtil.rectangleiFromMinAndSize(

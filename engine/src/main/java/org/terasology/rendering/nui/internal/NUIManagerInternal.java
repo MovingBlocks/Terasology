@@ -540,7 +540,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
 
     @Override
     public void update(float delta) {
-        canvas.processMousePosition(JomlUtil.from(mouse.getPosition()));
+        canvas.processMousePosition(mouse.getPosition());
 
         // part of the update could be adding/removing screens
         // modifying a collection while iterating of it is typically not supported

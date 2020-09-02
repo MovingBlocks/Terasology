@@ -4,6 +4,7 @@
 package org.terasology.input;
 
 import com.google.common.collect.Queues;
+import org.joml.Vector2i;
 import org.terasology.config.ControllerConfig.ControllerInfo;
 import org.terasology.config.facade.InputDeviceConfiguration;
 import org.terasology.engine.SimpleUri;
@@ -43,7 +44,6 @@ import org.terasology.input.events.RightMouseUpButtonEvent;
 import org.terasology.input.internal.AbstractBindableAxis;
 import org.terasology.input.internal.BindableRealAxis;
 import org.terasology.logic.players.LocalPlayer;
-import org.terasology.math.geom.Vector2i;
 import org.terasology.registry.In;
 
 import java.util.List;
@@ -471,8 +471,9 @@ public class InputSystem extends BaseComponentSystem {
      * @param delta The length of the current frame.
      * @return True if the event has been consumed by an event listener, false otherwise.
      */
-    private boolean sendMouseEvent(MouseInput button, boolean buttonDown, Vector2i position, float delta) {
+    private boolean sendMouseEvent(MouseInput button, boolean buttonDown, Vector2i jomlposition, float delta) {
         MouseButtonEvent event;
+        org.terasology.math.geom.Vector2i position = new org.terasology.math.geom.Vector2i(jomlposition.x, jomlposition.y);
         switch (button) {
             case NONE:
                 return false;
@@ -503,7 +504,7 @@ public class InputSystem extends BaseComponentSystem {
      * @return True if the event has been consumed by an event listener, false otherwise.
      */
     private boolean sendMouseWheelEvent(Vector2i pos, int wheelTurns, float delta) {
-        MouseWheelEvent mouseWheelEvent = new MouseWheelEvent(pos, wheelTurns, delta);
+        MouseWheelEvent mouseWheelEvent = new MouseWheelEvent(new org.terasology.math.geom.Vector2i(pos.x, pos.y) , wheelTurns, delta);
         return send(mouseWheelEvent);
     }
 

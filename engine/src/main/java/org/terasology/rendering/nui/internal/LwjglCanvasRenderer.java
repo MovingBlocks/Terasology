@@ -235,10 +235,8 @@ public class LwjglCanvasRenderer implements TerasologyCanvasRenderer, PropertyCh
     }
 
     @Override
-    public Vector2i getTargetSize() {
-        return new Vector2i(displayDevice.getWidth(), displayDevice.getHeight());
     public org.joml.Vector2i getTargetSize() {
-        return new org.joml.Vector2i(Display.getWidth(), Display.getHeight());
+        return new org.joml.Vector2i(displayDevice.getWidth(), displayDevice.getHeight());
     }
 
     @Override

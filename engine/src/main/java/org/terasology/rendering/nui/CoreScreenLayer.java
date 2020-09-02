@@ -28,12 +28,6 @@ import org.terasology.nui.widgets.UIRadialRing;
 import org.terasology.nui.widgets.UIRadialSection;
 import org.terasology.rendering.nui.animation.MenuAnimationSystem;
 import org.terasology.rendering.nui.animation.MenuAnimationSystemStub;
-import org.terasology.rendering.nui.events.NUIKeyEvent;
-import org.terasology.rendering.nui.events.NUIMouseClickEvent;
-import org.terasology.rendering.nui.events.NUIMouseWheelEvent;
-import org.terasology.rendering.nui.layouts.ScrollableArea;
-import org.terasology.rendering.nui.widgets.UIRadialRing;
-import org.terasology.rendering.nui.widgets.UIRadialSection;
 
 import java.util.ArrayList;
 import java.util.Arrays;
