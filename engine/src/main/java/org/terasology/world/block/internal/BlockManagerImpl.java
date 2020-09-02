@@ -90,9 +90,6 @@ public class BlockManagerImpl extends BlockManager {
      * Put all the existing families and blocks from the manifest back with the
      * same IDs, and if this is the authority (singleplayer or server), check
      * for any other block family definitions and register all of those as well.
-     *
-     * If new shapes were added since the world was saved, or somehow some shapes
-     * from a freeform family were not generated previously, this may fail to add them.
      */
     public void initialise(List<String> registeredBlockFamilies,
                            Map<String, Short> knownBlockMappings) {
