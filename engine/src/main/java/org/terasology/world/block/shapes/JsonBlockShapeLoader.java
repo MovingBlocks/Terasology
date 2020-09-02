@@ -96,7 +96,6 @@ public class JsonBlockShapeLoader extends AbstractAssetFileFormat<BlockShapeData
         public static final String POSITION = "position";
         public static final String EXTENTS = "extents";
         public static final String RADIUS = "radius";
-        public static final String FREEFORMABLE = "freeformUsable";
 
         @Override
         public BlockShapeData deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
@@ -105,10 +104,6 @@ public class JsonBlockShapeLoader extends AbstractAssetFileFormat<BlockShapeData
 
             if (shapeObj.has(DISPLAY_NAME)) {
                 shape.setDisplayName(shapeObj.getAsJsonPrimitive(DISPLAY_NAME).getAsString());
-            }
-            
-            if (shapeObj.has(FREEFORMABLE)) {
-                shape.setFreeformUsable(true);
             }
 
             for (BlockPart part : BlockPart.values()) {

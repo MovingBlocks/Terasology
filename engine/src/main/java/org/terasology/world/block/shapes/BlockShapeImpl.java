@@ -43,7 +43,6 @@ public class BlockShapeImpl extends BlockShape {
     private boolean yawSymmetric;
     private boolean pitchSymmetric;
     private boolean rollSymmetric;
-    private boolean freeformUsable;
 
     private Map<Rotation, CollisionShape> collisionShape = Maps.newHashMap();
 
@@ -84,8 +83,6 @@ public class BlockShapeImpl extends BlockShape {
         yawSymmetric = data.isYawSymmetric();
         pitchSymmetric = data.isPitchSymmetric();
         rollSymmetric = data.isRollSymmetric();
-        
-        freeformUsable = data.isFreeformUsable();
     }
 
     @Override
@@ -115,11 +112,6 @@ public class BlockShapeImpl extends BlockShape {
 
     private Rotation applySymmetry(Rotation rot) {
         return Rotation.rotate(yawSymmetric ? Yaw.NONE : rot.getYaw(), pitchSymmetric ? Pitch.NONE : rot.getPitch(), rollSymmetric ? Roll.NONE : rot.getRoll());
-    }
-
-    @Override
-    public boolean isFreeformUsable() {
-        return freeformUsable;
     }
 }
 

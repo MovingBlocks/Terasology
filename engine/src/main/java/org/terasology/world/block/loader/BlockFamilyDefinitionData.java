@@ -47,10 +47,6 @@ public class BlockFamilyDefinitionData implements AssetData {
         this.categories = Lists.newArrayList(other.categories);
     }
 
-    public boolean isValid() {
-        return family != null;
-    }
-
     public boolean isTemplate() {
         return template;
     }

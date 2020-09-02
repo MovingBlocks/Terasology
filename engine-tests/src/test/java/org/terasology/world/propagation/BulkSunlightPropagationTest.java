@@ -63,15 +63,13 @@ public class BulkSunlightPropagationTest extends TerasologyTestingEnvironment {
 
         regenRules = new SunlightRegenPropagationRules();
         AssetManager assetManager = CoreRegistry.get(AssetManager.class);
-        blockManager = new BlockManagerImpl(new NullWorldAtlas(), assetManager, true);
-        CoreRegistry.put(BlockManager.class, blockManager);
 
         BlockFamilyDefinitionData solidData = new BlockFamilyDefinitionData();
         solidData.getBaseSection().setDisplayName("Stone");
-        solidData.getBaseSection().setShape(assetManager.getAsset("engine:cube", BlockShape.class).get());
         solidData.getBaseSection().setTranslucent(false);
-        solidData.setBlockFamily(SymmetricFamily.class);
         assetManager.loadAsset(new ResourceUrn("engine:stone"), solidData, BlockFamilyDefinition.class);
+        blockManager = new BlockManagerImpl(new NullWorldAtlas(), assetManager, true);
+        CoreRegistry.put(BlockManager.class, blockManager);
         solid = blockManager.getBlock(new BlockUri(new ResourceUrn("engine:stone")));
 
         air = blockManager.getBlock(BlockManager.AIR_ID);

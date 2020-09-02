@@ -113,19 +113,18 @@ public class BlockManagerImpl extends BlockManager {
         }
         if (generateNewIds) {
             Set<ResourceUrn> availableFamilies = assetManager.getAvailableAssets(BlockFamilyDefinition.class);
-            Set<ResourceUrn> availableShapes = assetManager.getAvailableAssets(BlockShape.class);
-            availableShapes.removeIf((ResourceUrn shapeUrn) -> !(assetManager.getAsset(shapeUrn, BlockShape.class).get().isFreeformUsable()));
             for (ResourceUrn familyUrn : availableFamilies) {
                 BlockFamily existingFamily = getBlockFamily(new BlockUri(familyUrn));
                 if (null == existingFamily) {
-                    Optional<BlockFamilyDefinition> def = assetManager.getAsset(familyUrn, BlockFamilyDefinition.class);
-                    if (def.isPresent() && def.get().isFreeform()) {
-                        for(ResourceUrn shapeUrn : availableShapes) {
-                            addFamily(new BlockUri(familyUrn, shapeUrn), knownBlockMappings);
+                    assetManager.getAsset(familyUrn, BlockFamilyDefinition.class).ifPresent(def -> {
+                        if (def.isFreeform()) {
+                            for (BlockShape shape : def.getData().getBaseSection().getShapes()) {
+                                addFamily(new BlockUri(familyUrn, shape.getUrn()), knownBlockMappings);
+                            }
+                        } else {
+                            addFamily(new BlockUri(familyUrn), knownBlockMappings);
                         }
-                    } else if (def.isPresent()) { //not freeform
-                        addFamily(new BlockUri(familyUrn), knownBlockMappings);
-                    }
+                    });
                 }
             }
         }
@@ -279,7 +278,7 @@ public class BlockManagerImpl extends BlockManager {
                 if (shape.isPresent()) {
                     return Optional.of(familyDef.get().createFamily(shape.get(), blockBuilder));
                 }
-            } else if (!familyDef.get().isFreeform()) {
+            } else {
                 return Optional.of(familyDef.get().createFamily(blockBuilder));
             }
         } else {
@@ -311,8 +310,7 @@ public class BlockManagerImpl extends BlockManager {
         }
         Block block = registeredBlockInfo.get().blocksByUri.get(uri);
         if (block == null) {
-            logger.error("Attempt to fetch block with unknown uri '{}'", uri);
-            return getAirBlock();
+            throw new NullPointerException("Attempt to fetch block with unknown uri '" + uri + "'");
         } else {
             return block;
         }

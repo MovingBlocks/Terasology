@@ -171,15 +171,4 @@ public class BlockFamilyLibrary {
         }
         return sections.value();
     }
-
-    public static boolean isFreeformSupported(Class<? extends AbstractBlockFamily> blockFamily) {
-        if (blockFamily == null) {
-            return false;
-        }
-        FreeFormSupported freeFormSupported = blockFamily.getAnnotation(FreeFormSupported.class);
-        if (freeFormSupported == null) {
-            return false;
-        }
-        return freeFormSupported.value();
-    }
 }

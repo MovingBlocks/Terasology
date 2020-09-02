@@ -55,27 +55,22 @@ public class InternalLightGeneratorTest extends TerasologyTestingEnvironment {
     public void setup() throws Exception {
         super.setup();
         AssetManager assetManager = CoreRegistry.get(AssetManager.class);
-        blockManager = new BlockManagerImpl(new NullWorldAtlas(), assetManager);
-        CoreRegistry.put(BlockManager.class, blockManager);
-        airBlock = blockManager.getBlock(BlockManager.AIR_ID);
-
-
         extraDataManager = new ExtraBlockDataManager();
 
         BlockFamilyDefinitionData solidData = new BlockFamilyDefinitionData();
         solidData.getBaseSection().setDisplayName("Stone");
-        solidData.getBaseSection().setShape(assetManager.getAsset("engine:cube", BlockShape.class).get());
         solidData.getBaseSection().setTranslucent(false);
-        solidData.setBlockFamily(SymmetricFamily.class);
         assetManager.loadAsset(new ResourceUrn("engine:stone"), solidData, BlockFamilyDefinition.class);
-        solidBlock = blockManager.getBlock(new BlockUri(new ResourceUrn("engine:stone")));
 
         BlockFamilyDefinitionData fullLightData = new BlockFamilyDefinitionData();
         fullLightData.getBaseSection().setDisplayName("Torch");
-        fullLightData.getBaseSection().setShape(assetManager.getAsset("engine:cube", BlockShape.class).get());
         fullLightData.getBaseSection().setLuminance(ChunkConstants.MAX_LIGHT);
-        fullLightData.setBlockFamily(SymmetricFamily.class);
         assetManager.loadAsset(new ResourceUrn("engine:torch"), fullLightData, BlockFamilyDefinition.class);
+
+        blockManager = new BlockManagerImpl(new NullWorldAtlas(), assetManager);
+        CoreRegistry.put(BlockManager.class, blockManager);
+        airBlock = blockManager.getBlock(BlockManager.AIR_ID);
+        solidBlock = blockManager.getBlock(new BlockUri(new ResourceUrn("engine:stone")));
         fullLight = blockManager.getBlock(new BlockUri(new ResourceUrn("engine:torch")));
     }
 

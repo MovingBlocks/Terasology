@@ -36,7 +36,6 @@ public class BlockShapeData implements AssetData {
     private boolean yawSymmetric;
     private boolean pitchSymmetric;
     private boolean rollSymmetric;
-    private boolean freeformUsable;
 
     public String getDisplayName() {
         if (displayName == null) {
@@ -121,13 +120,5 @@ public class BlockShapeData implements AssetData {
 
     public void setRollSymmetric(boolean rollSymmetric) {
         this.rollSymmetric = rollSymmetric;
-    }
-    
-    public void setFreeformUsable(boolean freeformUsable) {
-        this.freeformUsable = freeformUsable;
-    }
-    
-    public boolean isFreeformUsable() {
-        return freeformUsable;
     }
 }
