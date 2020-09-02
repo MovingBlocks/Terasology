@@ -22,7 +22,6 @@ import org.terasology.assets.module.annotations.RegisterAssetFileFormat;
 import org.terasology.registry.CoreRegistry;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
 
 /**

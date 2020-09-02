@@ -17,7 +17,6 @@
 package org.terasology.math;
 
 import org.terasology.math.geom.Vector3f;
-import org.terasology.physics.engine.PhysicsEngineManager;
 
 /**
  */

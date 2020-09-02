@@ -19,6 +19,7 @@ import com.google.common.collect.Lists;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.reflections.Reflections;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.context.internal.ContextImpl;
 import org.terasology.engine.SimpleUri;
 import org.terasology.entitySystem.entity.EntityRef;

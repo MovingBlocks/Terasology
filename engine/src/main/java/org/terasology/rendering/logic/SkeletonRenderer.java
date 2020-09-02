@@ -248,7 +248,7 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
             skeletalMesh.material.setFloat("blockLight", 1.0f, true);
             skeletalMesh.material.setFloat3("colorOffset", skeletalMesh.color.rf(), skeletalMesh.color.gf(), skeletalMesh.color.bf(), true);
 
-            skeletalMesh.material.setMatrix4("projectionMatrix", new org.joml.Matrix4f(worldRenderer.getActiveCamera().getProjectionMatrix()).transpose());
+            skeletalMesh.material.setMatrix4("projectionMatrix", worldRenderer.getActiveCamera().getProjectionMatrix());
             skeletalMesh.material.bindTextures();
 
 
@@ -259,7 +259,7 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
 
             Matrix4f matrixCameraSpace = new Matrix4f(worldRot, worldPositionCameraSpace, worldScale);
 
-            Matrix4f modelViewMatrix = MatrixUtils.calcModelViewMatrix(JomlUtil.from(worldRenderer.getActiveCamera().getViewMatrix()), matrixCameraSpace);
+            Matrix4f modelViewMatrix = MatrixUtils.calcModelViewMatrix(worldRenderer.getActiveCamera().getViewMatrix(), matrixCameraSpace);
             MatrixUtils.matrixToFloatBuffer(modelViewMatrix, tempMatrixBuffer44);
 
             skeletalMesh.material.setMatrix4("worldViewMatrix", tempMatrixBuffer44, true);
@@ -309,7 +309,7 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
             Material material = Assets.getMaterial("engine:white").get();
             material.setFloat("sunlight", 1.0f, true);
             material.setFloat("blockLight", 1.0f, true);
-            material.setMatrix4("projectionMatrix", new org.joml.Matrix4f(worldRenderer.getActiveCamera().getProjectionMatrix()).transpose());
+            material.setMatrix4("projectionMatrix", worldRenderer.getActiveCamera().getProjectionMatrix());
             Vector3f worldPos = new Vector3f();
 
 
@@ -327,7 +327,7 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
                 float worldScale = location.getWorldScale();
                 Matrix4f matrixCameraSpace = new Matrix4f(new Quat4f(0, 0, 0, 1), worldPositionCameraSpace, worldScale);
 
-                Matrix4f modelViewMatrix = MatrixUtils.calcModelViewMatrix(JomlUtil.from(worldRenderer.getActiveCamera().getViewMatrix()), matrixCameraSpace);
+                Matrix4f modelViewMatrix = MatrixUtils.calcModelViewMatrix(worldRenderer.getActiveCamera().getViewMatrix(), matrixCameraSpace);
                 MatrixUtils.matrixToFloatBuffer(modelViewMatrix, tempMatrixBuffer44);
 
                 material.setMatrix4("worldViewMatrix", tempMatrixBuffer44, true);

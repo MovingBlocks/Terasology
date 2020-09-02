@@ -24,7 +24,7 @@ import org.terasology.recording.RecordAndReplayStatus;
 import org.terasology.recording.RecordAndReplayUtils;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
-import org.terasology.rendering.nui.WidgetUtil;
+import org.terasology.nui.WidgetUtil;
 import org.terasology.rendering.nui.animation.MenuAnimationSystems;
 import org.terasology.telemetry.TelemetryScreen;
 

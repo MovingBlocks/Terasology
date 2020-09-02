@@ -56,7 +56,7 @@ import org.terasology.rendering.assets.texture.TextureData;
 import org.terasology.rendering.assets.texture.TextureUtil;
 import org.terasology.rendering.assets.texture.subtexture.Subtexture;
 import org.terasology.rendering.assets.texture.subtexture.SubtextureData;
-import org.terasology.rendering.nui.internal.CanvasRenderer;
+import org.terasology.nui.canvas.CanvasRenderer;
 import org.terasology.rendering.nui.internal.LwjglCanvasRenderer;
 import org.terasology.rendering.opengl.*;
 
@@ -259,9 +259,6 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
                 GLContext.getCapabilities().OpenGL15,
                 GLContext.getCapabilities().OpenGL20,
                 GLContext.getCapabilities().OpenGL21,   // needed as we use GLSL 1.20
-                GLContext.getCapabilities().OpenGL30,
-                GLContext.getCapabilities().OpenGL32,
-                GLContext.getCapabilities().OpenGL33,
 
                 GLContext.getCapabilities().GL_ARB_framebuffer_object,  // Extensions eventually included in
                 GLContext.getCapabilities().GL_ARB_texture_float,       // OpenGl 3.0 according to
@@ -272,9 +269,6 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
                 "OpenGL15",
                 "OpenGL20",
                 "OpenGL21",
-                "OpenGL30",
-                "OpenGL32",
-                "OpenGL33",
                 "GL_ARB_framebuffer_object",
                 "GL_ARB_texture_float",
                 "GL_ARB_half_float_pixel"};

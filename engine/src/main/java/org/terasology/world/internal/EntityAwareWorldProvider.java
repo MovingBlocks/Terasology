@@ -125,8 +125,12 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
         if (GameThread.isCurrentThread()) {
             EntityRef blockEntity = getBlockEntityAt(JomlUtil.from(pos));
             Block oldType = super.setBlock(pos, type);
+            final Set<Class<? extends Component>> retainComponents =
+                    Optional.ofNullable(blockEntity.getComponent(RetainComponentsComponent.class))
+                            .map(retainComponentsComponent -> retainComponentsComponent.components)
+                            .orElse(Collections.emptySet());
             if (oldType != null) {
-                updateBlockEntity(blockEntity, JomlUtil.from(pos), oldType, type, false, Collections.<Class<? extends Component>>emptySet());
+                updateBlockEntity(blockEntity, JomlUtil.from(pos), oldType, type, false, retainComponents);
             }
             return oldType;
         }

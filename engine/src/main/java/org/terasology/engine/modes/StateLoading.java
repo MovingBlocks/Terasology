@@ -1,18 +1,5 @@
-/*
- * Copyright 2018 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.engine.modes;
 
@@ -22,8 +9,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
 import org.terasology.context.Context;
+import org.terasology.crashreporter.CrashReporter;
 import org.terasology.engine.EngineTime;
 import org.terasology.engine.GameEngine;
+import org.terasology.engine.LoggingContext;
 import org.terasology.engine.Time;
 import org.terasology.engine.modes.loadProcesses.AwaitCharacterSpawn;
 import org.terasology.engine.modes.loadProcesses.CreateRemoteWorldEntity;
@@ -63,8 +52,9 @@ import org.terasology.network.JoinStatus;
 import org.terasology.network.NetworkMode;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.nui.NUIManager;
-import org.terasology.rendering.nui.internal.CanvasRenderer;
+import org.terasology.nui.canvas.CanvasRenderer;
 import org.terasology.rendering.nui.internal.NUIManagerInternal;
+import org.terasology.rendering.nui.internal.TerasologyCanvasRenderer;
 import org.terasology.rendering.nui.layers.mainMenu.loadingScreen.LoadingScreen;
 import org.terasology.world.chunks.event.OnChunkLoaded;
 
@@ -119,7 +109,7 @@ public class StateLoading implements GameState {
 
         config = context.get(Config.class);
 
-        this.nuiManager = new NUIManagerInternal(context.get(CanvasRenderer.class), context);
+        this.nuiManager = new NUIManagerInternal((TerasologyCanvasRenderer) context.get(CanvasRenderer.class), context);
         context.put(NUIManager.class, nuiManager);
 
         EngineTime time = (EngineTime) context.get(Time.class);
@@ -243,8 +233,17 @@ public class StateLoading implements GameState {
         EngineTime time = (EngineTime) context.get(Time.class);
         long startTime = time.getRealTimeInMs();
         while (current != null && time.getRealTimeInMs() - startTime < 20 && !gameEngine.hasPendingState()) {
-            if (current.step()) {
-                popStep();
+            try {
+                if (current.step()) {
+                    popStep();
+                }
+            } catch (Exception e) {
+                logger.error("Error while loading {}", current, e);
+                String errorMessage = String.format("Failed to load game. There was an error during \"%s\".",
+                        current == null ? "the last part" : current.getMessage());
+                gameEngine.changeState(new StateMainMenu(errorMessage));
+                CrashReporter.report(e, LoggingContext.getLoggingPath());
+                return;
             }
         }
         if (current == null) {

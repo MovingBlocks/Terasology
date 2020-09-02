@@ -21,9 +21,9 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSyntaxException;
-import org.terasology.rendering.nui.widgets.UITextEntry;
-import org.terasology.rendering.nui.widgets.treeView.JsonTree;
-import org.terasology.rendering.nui.widgets.treeView.JsonTreeValue;
+import org.terasology.nui.widgets.UITextEntry;
+import org.terasology.nui.widgets.treeView.JsonTree;
+import org.terasology.nui.widgets.treeView.JsonTreeValue;
 
 import java.util.Map;
 

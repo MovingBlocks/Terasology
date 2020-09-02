@@ -16,9 +16,9 @@
 package org.terasology.rendering.nui.layers.mainMenu;
 
 import org.terasology.rendering.nui.CoreScreenLayer;
-import org.terasology.rendering.nui.WidgetUtil;
-import org.terasology.rendering.nui.databinding.Binding;
-import org.terasology.rendering.nui.widgets.UIText;
+import org.terasology.nui.WidgetUtil;
+import org.terasology.nui.databinding.Binding;
+import org.terasology.nui.widgets.UIText;
 
 /**
  */

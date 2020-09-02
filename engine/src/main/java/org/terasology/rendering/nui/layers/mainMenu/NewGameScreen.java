@@ -33,22 +33,22 @@ import org.terasology.module.DependencyResolver;
 import org.terasology.module.Module;
 import org.terasology.naming.Name;
 import org.terasology.network.NetworkMode;
+import org.terasology.nui.Canvas;
 import org.terasology.registry.In;
-import org.terasology.rendering.nui.Canvas;
-import org.terasology.rendering.nui.Color;
+import org.terasology.nui.Color;
 import org.terasology.rendering.nui.CoreScreenLayer;
-import org.terasology.rendering.nui.WidgetUtil;
+import org.terasology.nui.WidgetUtil;
 import org.terasology.rendering.nui.animation.MenuAnimationSystems;
-import org.terasology.rendering.nui.databinding.Binding;
-import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
-import org.terasology.rendering.nui.events.NUIKeyEvent;
-import org.terasology.rendering.nui.itemRendering.StringTextRenderer;
+import org.terasology.nui.databinding.Binding;
+import org.terasology.nui.databinding.ReadOnlyBinding;
+import org.terasology.nui.events.NUIKeyEvent;
+import org.terasology.nui.itemRendering.StringTextRenderer;
 import org.terasology.rendering.nui.layers.mainMenu.advancedGameSetupScreen.AdvancedGameSetupScreen;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameProvider;
-import org.terasology.rendering.nui.widgets.UIDropdown;
-import org.terasology.rendering.nui.widgets.UIDropdownScrollable;
-import org.terasology.rendering.nui.widgets.UILabel;
-import org.terasology.rendering.nui.widgets.UIText;
+import org.terasology.nui.widgets.UIDropdown;
+import org.terasology.nui.widgets.UIDropdownScrollable;
+import org.terasology.nui.widgets.UILabel;
+import org.terasology.nui.widgets.UIText;
 import org.terasology.world.generator.internal.WorldGeneratorInfo;
 import org.terasology.world.generator.internal.WorldGeneratorManager;
 
@@ -155,7 +155,12 @@ public class NewGameScreen extends CoreScreenLayer {
             if (gameName.getText().isEmpty()) {
                 universeWrapper.setGameName(GameProvider.getNextGameName());
             }
-            universeWrapper.setGameName(gameName.getText());
+            universeWrapper.setGameName(GameProvider.getNextGameName(gameName.getText()));
+            if (gameplay.getOptions().isEmpty()) {
+                logger.error("No gameplay modules present");
+                MessagePopup errorPopup = getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class);
+                errorPopup.setMessage("Error", "Can't create new game without modules!");
+            }
             GameManifest gameManifest = GameManifestProvider.createGameManifest(universeWrapper, moduleManager, config);
             if (gameManifest != null) {
                 gameEngine.changeState(new StateLoading(gameManifest, (isLoadingAsServer()) ? NetworkMode.DEDICATED_SERVER : NetworkMode.NONE));
@@ -268,9 +273,7 @@ public class NewGameScreen extends CoreScreenLayer {
         if (defaultGameplayModule != null) {
             gameplay.setSelection(defaultGameplayModule);
 
-            if (configDefaultModuleName.equalsIgnoreCase(DEFAULT_GAME_TEMPLATE_NAME)) {
-                setDefaultGeneratorOfGameplayModule(defaultGameplayModule);
-            }
+            setDefaultGeneratorOfGameplayModule(defaultGameplayModule);
         } else {
             // Find the first gameplay module that is available.
             for (Module module : moduleManager.getRegistry()) {

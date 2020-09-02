@@ -20,17 +20,17 @@ import org.terasology.input.MouseInput;
 import org.terasology.logic.console.Console;
 import org.terasology.logic.console.Message;
 import org.terasology.logic.players.LocalPlayer;
+import org.terasology.nui.BaseInteractionListener;
+import org.terasology.nui.InteractionListener;
 import org.terasology.registry.In;
-import org.terasology.rendering.FontColor;
-import org.terasology.rendering.nui.BaseInteractionListener;
+import org.terasology.nui.FontColor;
 import org.terasology.rendering.nui.CoreScreenLayer;
-import org.terasology.rendering.nui.InteractionListener;
 import org.terasology.rendering.nui.animation.SwipeMenuAnimationSystem;
 import org.terasology.rendering.nui.animation.SwipeMenuAnimationSystem.Direction;
-import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
-import org.terasology.rendering.nui.events.NUIMouseClickEvent;
-import org.terasology.rendering.nui.layouts.ScrollableArea;
-import org.terasology.rendering.nui.widgets.UIText;
+import org.terasology.nui.databinding.ReadOnlyBinding;
+import org.terasology.nui.events.NUIMouseClickEvent;
+import org.terasology.nui.layouts.ScrollableArea;
+import org.terasology.nui.widgets.UIText;
 
 import java.util.List;
 

@@ -18,8 +18,8 @@ package org.terasology.rendering.nui.layers.mainMenu.loadingScreen;
 import org.terasology.i18n.TranslationSystem;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
-import org.terasology.rendering.nui.widgets.UILabel;
-import org.terasology.rendering.nui.widgets.UILoadBar;
+import org.terasology.nui.widgets.UILabel;
+import org.terasology.nui.widgets.UILoadBar;
 
 /**
  */

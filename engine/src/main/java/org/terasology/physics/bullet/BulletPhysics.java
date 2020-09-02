@@ -51,6 +51,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import gnu.trove.iterator.TFloatIterator;
+import org.joml.Vector3fc;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -438,6 +439,15 @@ public class BulletPhysics implements PhysicsEngine {
     }
 
     @Override
+    public void awakenArea(Vector3fc pos, float radius) {
+        Vector3f min = new Vector3f(VecMath.to(pos));
+        min.sub(new Vector3f(0.6f, 0.6f, 0.6f));
+        Vector3f max = new Vector3f(VecMath.to(pos));
+        max.add(new Vector3f(0.6f, 0.6f, 0.6f));
+        discreteDynamicsWorld.awakenRigidBodiesInArea(min, max);
+    }
+
+    @Override
     public float getEpsilon() {
         return BulletGlobals.SIMD_EPSILON;
     }
@@ -673,7 +683,7 @@ public class BulletPhysics implements PhysicsEngine {
         }
         CharacterMovementComponent characterMovementComponent = entity.getComponent(CharacterMovementComponent.class);
         if (characterMovementComponent != null) {
-            return new CapsuleShape(characterMovementComponent.radius, characterMovementComponent.height);
+            return new CapsuleShape(characterMovementComponent.pickupRadius, characterMovementComponent.height - 2 * characterMovementComponent.radius);
         }
         logger.error("Creating physics object that requires a ShapeComponent or CharacterMovementComponent, but has neither. Entity: {}", entity);
         throw new IllegalArgumentException("Creating physics object that requires a ShapeComponent or CharacterMovementComponent, but has neither. Entity: " + entity);

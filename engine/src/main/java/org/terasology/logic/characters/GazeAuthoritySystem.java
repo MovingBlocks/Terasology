@@ -15,6 +15,7 @@
  */
 package org.terasology.logic.characters;
 
+import org.joml.Quaternionf;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
@@ -30,7 +31,6 @@ import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.characters.events.OnScaleEvent;
 import org.terasology.logic.location.Location;
 import org.terasology.logic.location.LocationComponent;
-import org.terasology.math.geom.Quat4f;
 import org.terasology.registry.In;
 
 /**
@@ -55,7 +55,7 @@ public class GazeAuthoritySystem extends BaseComponentSystem {
             entityRef.saveComponent(gazeMountPointComponent);
         }
         gazeMountPointComponent.translate.y = config.getPlayer().getEyeHeight();
-        Location.attachChild(entityRef, gazeMountPointComponent.gazeEntity, gazeMountPointComponent.translate, new Quat4f(Quat4f.IDENTITY));
+        Location.attachChild(entityRef, gazeMountPointComponent.gazeEntity, gazeMountPointComponent.translate, new Quaternionf());
     }
 
     private EntityRef createGazeEntity() {
@@ -72,7 +72,7 @@ public class GazeAuthoritySystem extends BaseComponentSystem {
         gazeMountPoint.translate.y = (event.getNewValue() / 7.5f) * 7f - event.getNewValue() * 0.5f;
 
         Location.removeChild(entity, gazeMountPoint.gazeEntity);
-        Location.attachChild(entity, gazeMountPoint.gazeEntity, gazeMountPoint.translate, new Quat4f(Quat4f.IDENTITY));
+        Location.attachChild(entity, gazeMountPoint.gazeEntity, gazeMountPoint.translate, new Quaternionf());
         entity.saveComponent(gazeMountPoint);
     }
 

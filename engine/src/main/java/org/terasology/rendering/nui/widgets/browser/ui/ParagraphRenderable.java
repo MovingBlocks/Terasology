@@ -15,10 +15,10 @@
  */
 package org.terasology.rendering.nui.widgets.browser.ui;
 
-import org.terasology.math.geom.Rect2i;
-import org.terasology.math.geom.Vector2i;
-import org.terasology.rendering.nui.Canvas;
-import org.terasology.rendering.nui.HorizontalAlign;
+import org.joml.Rectanglei;
+import org.joml.Vector2i;
+import org.terasology.nui.Canvas;
+import org.terasology.nui.HorizontalAlign;
 import org.terasology.rendering.nui.widgets.browser.data.basic.flow.ContainerRenderSpace;
 import org.terasology.rendering.nui.widgets.browser.ui.style.ParagraphRenderStyle;
 
@@ -57,6 +57,6 @@ public interface ParagraphRenderable {
                         ParagraphRenderStyle defaultStyle, HorizontalAlign horizontalAlign, HyperlinkRegister hyperlinkRegister);
 
     public interface HyperlinkRegister {
-        void registerHyperlink(Rect2i region, String hyperlink);
+        void registerHyperlink(Rectanglei region, String hyperlink);
     }
 }

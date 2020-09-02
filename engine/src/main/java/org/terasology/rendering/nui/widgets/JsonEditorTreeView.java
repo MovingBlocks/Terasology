@@ -18,12 +18,13 @@ package org.terasology.rendering.nui.widgets;
 import com.google.common.collect.Lists;
 import org.terasology.input.Keyboard;
 import org.terasology.input.MouseInput;
+import org.terasology.nui.widgets.UITreeView;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.contextMenu.ContextMenuUtils;
 import org.terasology.rendering.nui.contextMenu.MenuTree;
-import org.terasology.rendering.nui.widgets.treeView.JsonTree;
-import org.terasology.rendering.nui.widgets.treeView.JsonTreeValue;
-import org.terasology.rendering.nui.widgets.treeView.Tree;
+import org.terasology.nui.widgets.treeView.JsonTree;
+import org.terasology.nui.widgets.treeView.JsonTreeValue;
+import org.terasology.nui.widgets.treeView.Tree;
 
 import java.util.List;
 import java.util.function.Consumer;
