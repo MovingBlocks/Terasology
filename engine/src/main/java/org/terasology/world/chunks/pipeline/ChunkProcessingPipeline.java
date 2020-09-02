@@ -22,7 +22,8 @@ import java.util.stream.Collectors;
 /**
  * Manages execution of chunk tasks on a queue.
  * <p>
- * Chunk tasks are executing in background threads. Chunk tasks are executeng by priority via {@link Comparable}.
+ * {@link ChunkTask}s are executing in background threads. {@link ChunkTask}s are executing by priority via {@link
+ * Comparable}. {@link Chunk}s will processing on stages {@link ChunkProcessingPipeline#addStage}
  */
 public class ChunkProcessingPipeline implements ChunkTaskListener {
     private static final int NUM_TASK_THREADS = 8;
@@ -30,6 +31,7 @@ public class ChunkProcessingPipeline implements ChunkTaskListener {
 
     private final TaskMaster<ChunkTask> chunkProcessor;
     private final List<Function<Chunk, ChunkTask>> stages = new LinkedList<>();
+    private final List<ChunkTaskListener> chunkTaskListeners = new LinkedList<>();
     private final Map<Chunk, Deque<Function<Chunk, ChunkTask>>> chunkNextStages = new ConcurrentHashMap<>(); // TODO
     // use better collection.
 
@@ -44,7 +46,33 @@ public class ChunkProcessingPipeline implements ChunkTaskListener {
     }
 
     /**
-     * Run generator task and then run pipeline with it.
+     * Add stage to pipeline. If stage instance of {@link ChunkTaskListener} - it's will be register as listener.
+     *
+     * @param stage function for ChunkTask generating by Chunk.
+     * @return self for Fluent api.
+     */
+    public ChunkProcessingPipeline addStage(Function<Chunk, ChunkTask> stage) {
+        stages.add(stage);
+        if (stage instanceof ChunkTaskListener) {
+            addListener((ChunkTaskListener) stage);
+        }
+        return this;
+    }
+
+    /**
+     * Register chink task listener.
+     *
+     * @param listener listener.
+     * @return self for Fluent api.
+     */
+    public ChunkProcessingPipeline addListener(ChunkTaskListener listener) {
+        chunkTaskListeners.add(listener);
+        return this;
+    }
+
+    /**
+     * Run generator task and then run pipeline processing with it.
+     *
      * @param generatorTask ChunkTask which provides new chunk to pipeline
      */
     public void invokeGeneratorTask(SupplierChunkTask generatorTask) {
@@ -54,13 +82,22 @@ public class ChunkProcessingPipeline implements ChunkTaskListener {
                     .keySet()
                     .stream()
                     .map(Chunk::getPosition)
-                    .noneMatch((p)-> p.equals(chunkTask.getChunk().getPosition()))) {
+                    .noneMatch((p) -> p.equals(chunkTask.getChunk().getPosition()))) {
                 invokePipeline(chunkTask.getChunk());
             }
         }));
     }
 
+    /**
+     * Send chunk to processing pipeline. If chunk not processing yet then pipeline will be setted. If chunk processed
+     * then chunk will be processing in next stage;
+     *
+     * @param chunk chunk to process.
+     */
     public void invokePipeline(Chunk chunk) {
+        if (chunk == null) {
+            return;
+        }
         Function<Chunk, ChunkTask> nextStage =
                 chunkNextStages.computeIfAbsent(chunk, c -> new LinkedList<>(stages)).poll();
         if (nextStage == null) {
@@ -68,28 +105,6 @@ public class ChunkProcessingPipeline implements ChunkTaskListener {
             return;
         }
         invokeStage(chunk, nextStage);
-    }
-
-    public ChunkProcessingPipeline addStage(Function<Chunk, ChunkTask> stage) {
-        stages.add(stage);
-        return this;
-    }
-
-    private void invokeStage(Chunk chunk, Function<Chunk, ChunkTask> stage) {
-        doTaskWrapper(stage.apply(chunk));
-    }
-
-    private void doTaskWrapper(ChunkTask task) {
-        ChunkTask wrapper = new ChunkTaskListenerWrapper(task, this);
-        doTask(wrapper);
-    }
-
-    public void doTask(ChunkTask task) {
-        try {
-            chunkProcessor.put(task);
-        } catch (InterruptedException e) {
-            logger.error("Failed to enqueue task {}", task, e);
-        }
     }
 
     public void shutdown() {
@@ -102,16 +117,47 @@ public class ChunkProcessingPipeline implements ChunkTaskListener {
         chunkProcessor.restart();
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @param chunkTask ChunkTask which done processing.
+     */
     @Override
     public void onDone(ChunkTask chunkTask) {
-        if (chunkTask.needsRepeat()) {
-            doTaskWrapper(chunkTask);
-        } else {
-            invokePipeline(chunkTask.getChunk());
+        logger.debug("Task " + chunkTask + " done");
+        invokePipeline(chunkTask.getChunk());
+    }
+
+    /**
+     * Processing chunks.
+     *
+     * @return Map of positions and chunks which currently in processing.
+     */
+    public Map<Vector3i, Chunk> getProcessingChunks() {
+        return chunkNextStages.keySet().stream().collect(Collectors.toMap(k -> k.getPosition(), Function.identity()));
+    }
+
+    /**
+     * Wrap chunktask with this as listener and do it.
+     *
+     * @param task task which wrapping.
+     */
+    void doTaskWrapper(ChunkTask task) {
+        ChunkTask wrapper = new ChunkTaskListenerWrapper(task, this);
+        doTask(wrapper);
+    }
+
+    private void doTask(ChunkTask task) {
+        chunkTaskListeners.forEach((listener) -> listener.onDone(task));
+        try {
+            logger.debug("Start processing task :" + task);
+            chunkProcessor.put(task);
+        } catch (InterruptedException e) {
+            logger.error("Failed to enqueue task {}", task, e);
         }
     }
 
-    public Map<Vector3i, Chunk> getProcessingChunks() {
-        return chunkNextStages.keySet().stream().collect(Collectors.toMap(k -> k.getPosition(), Function.identity()));
+    private void invokeStage(Chunk chunk, Function<Chunk, ChunkTask> stage) {
+        doTaskWrapper(stage.apply(chunk));
     }
 }

@@ -44,10 +44,10 @@ import org.terasology.world.chunks.internal.ChunkRelevanceRegion;
 import org.terasology.world.chunks.internal.GeneratingChunkProvider;
 import org.terasology.world.chunks.internal.ReadyChunkInfo;
 import org.terasology.world.chunks.pipeline.ChunkProcessingPipeline;
+import org.terasology.world.chunks.pipeline.LightMergerChunkTaskProvider;
 import org.terasology.world.chunks.pipeline.SupplierChunkTask;
 import org.terasology.world.chunks.pipeline.tasks.DeflateChunkTask;
 import org.terasology.world.chunks.pipeline.tasks.GenerateInternalLightningChunkTask;
-import org.terasology.world.chunks.pipeline.tasks.LightMergerChunkTask;
 import org.terasology.world.chunks.pipeline.tasks.NotifyChunkTask;
 import org.terasology.world.generation.impl.EntityBufferImpl;
 import org.terasology.world.generator.WorldGenerator;
@@ -61,10 +61,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
-import java.util.function.Supplier;
 
 /**
- *
+ * Provides chunks. Chunks placed in this JVM. Also generated Chunks if needed
  */
 public class LocalChunkProvider implements GeneratingChunkProvider {
 
@@ -76,7 +75,7 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
 
     private final Map<org.joml.Vector3i, List<EntityStore>> generateQueuedEntities = new HashMap<>();
 
-    private LightMerger<Object> lightMerger;
+    private final LightMerger lightMerger = new LightMerger();
     private StorageManager storageManager;
     private ChunkProcessingPipeline loadingPipeline;
     private TaskMaster<ChunkUnloadRequest> unloadRequestTaskMaster;
@@ -97,14 +96,11 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
                 generator,
                 blockManager,
                 extraDataManager,
-                new LightMergingChunkFinalizer(),
-                LightMergingChunkFinalizer::new,
                 new ConcurrentMapChunkCache());
     }
 
     LocalChunkProvider(StorageManager storageManager, EntityManager entityManager, WorldGenerator generator,
                        BlockManager blockManager, ExtraBlockDataManager extraDataManager,
-                       ChunkFinalizer chunkFinalizer, Supplier<ChunkFinalizer> chunkFinalizerSupplier,
                        ChunkCache chunkCache) {
         this.storageManager = storageManager;
         this.entityManager = entityManager;
@@ -113,7 +109,6 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
         this.extraDataManager = extraDataManager;
         this.unloadRequestTaskMaster = TaskMaster.createFIFOTaskMaster("Chunk-Unloader", 4);
         this.chunkCache = chunkCache;
-        this.lightMerger = new LightMerger<Object>(this);
         ChunkMonitor.fireChunkProviderInitialized(this);
     }
 
@@ -186,8 +181,6 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
 
     @Override
     public void completeUpdate() {
-        //List<ReadyChunkInfo> readyChunkInfos = chunkFinalizer.completeFinalization();
-        //readyChunkInfos.forEach(this::processReadyChunk);
     }
 
     private void processReadyChunk(final Chunk chunk) {
@@ -374,14 +367,12 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
     public void restart() {
         loadingPipeline.restart();
         unloadRequestTaskMaster.restart();
-        lightMerger.restart();
     }
 
     @Override
     public void shutdown() {
         loadingPipeline.shutdown();
         unloadRequestTaskMaster.shutdown(new ChunkUnloadRequest(), true);
-        lightMerger.shutdown();
     }
 
     @Override
@@ -420,8 +411,6 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
         ChunkMonitor.fireChunkProviderDisposed(this);
         loadingPipeline.shutdown();
         unloadRequestTaskMaster.shutdown(new ChunkUnloadRequest(), true);
-        lightMerger.shutdown();
-        lightMerger = new LightMerger<>(this);
         chunkCache.getAllChunks().stream().filter(ManagedChunk::isReady).forEach(chunk -> {
             worldEntity.send(new BeforeChunkUnload(chunk.getPosition()));
             storageManager.deactivateChunk(chunk);
@@ -433,6 +422,10 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
         worldEntity.send(new PurgeWorldEvent());
 
         loadingPipeline = new ChunkProcessingPipeline(relevanceSystem.createChunkTaskComporator());
+        loadingPipeline.addStage(GenerateInternalLightningChunkTask::new)
+                .addStage(DeflateChunkTask::new)
+                .addStage(new LightMergerChunkTaskProvider(this, lightMerger, loadingPipeline))
+                .addStage(NotifyChunkTask.stage("Notify listeners", this::processReadyChunk));
         unloadRequestTaskMaster = TaskMaster.createFIFOTaskMaster("Chunk-Unloader", 8);
         ChunkMonitor.fireChunkProviderInitialized(this);
 
@@ -472,7 +465,7 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
         loadingPipeline = new ChunkProcessingPipeline(relevanceSystem.createChunkTaskComporator());
         loadingPipeline.addStage(GenerateInternalLightningChunkTask::new)
                 .addStage(DeflateChunkTask::new)
-                .addStage(LightMergerChunkTask.stage(this, lightMerger))
+                .addStage(new LightMergerChunkTaskProvider(this, lightMerger, loadingPipeline))
                 .addStage(NotifyChunkTask.stage("Notify listeners", this::processReadyChunk));
     }
 }
