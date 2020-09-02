@@ -95,7 +95,6 @@ task copyResourcesToClasses(type:Copy) {
 
 //TODO: Remove it  when gestalt will can to handle ProtectionDomain without classes (Resources)
 test.dependsOn copyResourcesToClasses
-test.dependsOn(':extractNatives')
 
 idea {
     module {
