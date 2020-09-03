@@ -124,6 +124,7 @@ public class ChunkProcessingPipeline implements ChunkTaskListener {
      */
     @Override
     public void onDone(ChunkTask chunkTask) {
+        chunkTaskListeners.forEach((listener) -> listener.onDone(chunkTask));
         logger.debug("Task " + chunkTask + " done");
         invokePipeline(chunkTask.getChunk());
     }
@@ -148,7 +149,6 @@ public class ChunkProcessingPipeline implements ChunkTaskListener {
     }
 
     private void doTask(ChunkTask task) {
-        chunkTaskListeners.forEach((listener) -> listener.onDone(task));
         try {
             logger.debug("Start processing task :" + task);
             chunkProcessor.put(task);
