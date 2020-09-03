@@ -28,11 +28,6 @@ public class ChunkTaskListenerWrapper implements ChunkTask {
     }
 
     @Override
-    public boolean needsRepeat() {
-        return chunkTask.needsRepeat();
-    }
-
-    @Override
     public String getName() {
         return chunkTask.getName();
     }

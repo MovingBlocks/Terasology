@@ -15,7 +15,10 @@ import org.terasology.world.propagation.PropagatorWorldView;
 import org.terasology.world.propagation.StandardBatchPropagator;
 import org.terasology.world.propagation.SunlightRegenBatchPropagator;
 
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Merging light in chunks
@@ -49,11 +52,13 @@ public class LightMerger {
      * @throws IllegalArgumentException if {@code localChunks.length != LOCAL_CHUNKS_ARRAY_LENGTH} or {@code chunk} not in center of {@code localChunks}
      */
     public void merge(Chunk chunk, Chunk[] localChunks) {
-        //TODO may be add sorting?
         Preconditions.checkArgument(localChunks.length == LOCAL_CHUNKS_ARRAY_LENGTH,
                 "Length of parameter [localChunks] must be equals [" + LOCAL_CHUNKS_ARRAY_LENGTH + "]");
-        Preconditions.checkArgument(localChunks[CENTER_INDEX] == chunk,
-                "Parameter [chunk] must be in center of parameter [localChunks]");
+        Preconditions.checkArgument(Arrays.stream(localChunks).noneMatch(Objects::isNull), "Parameter [localChunks] must not contains nulls");
+
+        Arrays.sort(localChunks, Comparator.<Chunk>comparingInt(c -> c.getPosition(new Vector3i()).x)
+                .thenComparingInt(c -> c.getPosition(new Vector3i()).y)
+                .thenComparing(c -> c.getPosition(new Vector3i()).z));
 
         List<BatchPropagator> propagators = Lists.newArrayList();
         propagators.add(new StandardBatchPropagator(new LightPropagationRules(), new LocalChunkView(localChunks,

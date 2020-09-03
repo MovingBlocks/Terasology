@@ -13,6 +13,7 @@ import org.terasology.world.chunks.pipeline.AbstractChunkTask;
 import org.terasology.world.chunks.pipeline.ChunkTask;
 import org.terasology.world.propagation.light.LightMerger;
 
+import java.util.Comparator;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Stream;
@@ -22,12 +23,15 @@ public class LightMergerChunkTask extends AbstractChunkTask {
 
     private final GeneratingChunkProvider chunkProvider;
     private final LightMerger lightMerger;
-    private boolean needsRepeat;
 
     public LightMergerChunkTask(Chunk chunk, GeneratingChunkProvider chunkProvider, LightMerger lightMerger) {
         super(chunk);
         this.chunkProvider = chunkProvider;
         this.lightMerger = lightMerger;
+    }
+
+    public static Function<Chunk, ChunkTask> stage(GeneratingChunkProvider chunkProvider, LightMerger lightMerger) {
+        return (c) -> new LightMergerChunkTask(c, chunkProvider, lightMerger);
     }
 
     @Override
@@ -37,14 +41,8 @@ public class LightMergerChunkTask extends AbstractChunkTask {
 
     @Override
     public void run() {
-        needsRepeat = false;
-        if (!isReadyForLightMerging()) {
-            needsRepeat = true;
-            return;
-        }
-
-        lightMerger.merge(chunk, getNearestChunkStream().toArray(Chunk[]::new));
-        chunk.markReady();
+        lightMerger.merge(chunk, getNearestChunkStream()
+                .toArray(Chunk[]::new));
     }
 
     private Stream<Chunk> getNearestChunkStream() {
@@ -64,15 +62,5 @@ public class LightMergerChunkTask extends AbstractChunkTask {
 
     private boolean isReadyForLightMerging() {
         return getNearestChunkStream().allMatch(Objects::nonNull);
-    }
-
-
-    public static Function<Chunk, ChunkTask> stage(GeneratingChunkProvider chunkProvider, LightMerger lightMerger) {
-        return (c) -> new LightMergerChunkTask(c, chunkProvider, lightMerger);
-    }
-
-    @Override
-    public boolean needsRepeat() {
-        return needsRepeat;
     }
 }

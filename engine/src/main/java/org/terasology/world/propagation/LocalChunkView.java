@@ -51,7 +51,11 @@ public class LocalChunkView implements PropagatorWorldView {
 
     @Override
     public byte getValueAt(Vector3i pos) {
-        Chunk chunk = chunks[chunkIndexOf(pos)];
+        int index = chunkIndexOf(pos);
+        if (index < 0){
+            return UNAVAILABLE; // TODO check where we receive pos out of chunks.
+        }
+        Chunk chunk = chunks[index];
         if (chunk != null) {
             return rules.getValue(chunk, ChunkMath.calcRelativeBlockPos(pos));
         }

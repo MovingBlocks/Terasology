@@ -74,6 +74,7 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
                     if (oldChunk != null) {
                         oldChunk.dispose();
                     }
+                    chunk.markReady();
                 }));
 
         ChunkMonitor.fireChunkProviderInitialized(this);

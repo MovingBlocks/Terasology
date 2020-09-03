@@ -17,9 +17,4 @@ public interface ChunkTask extends Task {
     default Vector3i getPosition() {
         return getChunk().getPosition(new Vector3i());
     }
-
-    default boolean needsRepeat() {
-        return false;
-    }
-
 }
