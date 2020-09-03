@@ -13,9 +13,11 @@ public class SupplierChunkTask implements ChunkTask {
     private final String taskName;
     private final Supplier<Chunk> supplier;
     private Chunk resultChunk;
+    private Vector3i position;
 
-    public SupplierChunkTask(String taskName, Supplier<Chunk> supplier) {
+    public SupplierChunkTask(String taskName, Vector3i position, Supplier<Chunk> supplier) {
         this.taskName = taskName;
+        this.position = position;
         this.supplier = supplier;
     }
 
@@ -42,7 +44,7 @@ public class SupplierChunkTask implements ChunkTask {
     @Override
     public Vector3i getPosition() {
         if (getChunk() == null) {
-            return new Vector3i();
+            return position;
         }
         return ChunkTask.super.getPosition();
     }

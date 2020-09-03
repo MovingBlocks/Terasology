@@ -33,6 +33,4 @@ public interface GeneratingChunkProvider extends ChunkProvider {
      * @param chunk
      */
     void onChunkIsReady(Chunk chunk);
-
-    Chunk getChunkUnready(Vector3i pos);
 }

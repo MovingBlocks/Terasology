@@ -17,6 +17,7 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.EntityStore;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.math.ChunkMath;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.Region3i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Vector3i;
@@ -43,7 +44,6 @@ import org.terasology.world.chunks.event.PurgeWorldEvent;
 import org.terasology.world.chunks.internal.ChunkImpl;
 import org.terasology.world.chunks.internal.ChunkRelevanceRegion;
 import org.terasology.world.chunks.internal.GeneratingChunkProvider;
-import org.terasology.world.chunks.internal.ReadyChunkInfo;
 import org.terasology.world.chunks.pipeline.ChunkProcessingPipeline;
 import org.terasology.world.chunks.pipeline.LightMergerChunkTaskProvider;
 import org.terasology.world.chunks.pipeline.SupplierChunkTask;
@@ -76,7 +76,6 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
 
     private final Map<org.joml.Vector3i, List<EntityStore>> generateQueuedEntities = new HashMap<>();
 
-    private final LightMerger lightMerger = new LightMerger();
     private StorageManager storageManager;
     private ChunkProcessingPipeline loadingPipeline;
     private TaskMaster<ChunkUnloadRequest> unloadRequestTaskMaster;
@@ -114,21 +113,21 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
 
 
     protected void createOrLoadChunk(Vector3i chunkPos) {
-        if (getChunkUnready(chunkPos) == null) {
-            loadingPipeline.invokeGeneratorTask(new SupplierChunkTask("Create or Load Chunk", () -> {
-                ChunkStore chunkStore = storageManager.loadChunkStore(chunkPos);
-                Chunk chunk;
-                EntityBufferImpl buffer = new EntityBufferImpl();
-                if (chunkStore == null) {
-                    chunk = new ChunkImpl(chunkPos, blockManager, extraDataManager);
-                    generator.createChunk(chunk, buffer);
-                    generateQueuedEntities.put(chunk.getPosition(new org.joml.Vector3i()), buffer.getAll());
-                } else {
-                    chunk = chunkStore.getChunk();
-                }
-                return chunk;
-            }));
-        }
+        loadingPipeline.invokeGeneratorTask(new SupplierChunkTask("Create or Load Chunk",
+                JomlUtil.from(chunkPos),
+                () -> {
+                    ChunkStore chunkStore = storageManager.loadChunkStore(chunkPos);
+                    Chunk chunk;
+                    EntityBufferImpl buffer = new EntityBufferImpl();
+                    if (chunkStore == null) {
+                        chunk = new ChunkImpl(chunkPos, blockManager, extraDataManager);
+                        generator.createChunk(chunk, buffer);
+                        generateQueuedEntities.put(chunk.getPosition(new org.joml.Vector3i()), buffer.getAll());
+                    } else {
+                        chunk = chunkStore.getChunk();
+                    }
+                    return chunk;
+                }));
     }
 
     public void setBlockEntityRegistry(BlockEntityRegistry value) {
@@ -184,6 +183,9 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
     }
 
     private void processReadyChunk(final Chunk chunk) {
+        if (chunkCache.get(chunk.getPosition()) != null) {
+            return; // TODO move it in pipeline;
+        }
         chunkCache.put(chunk.getPosition(), chunk);
         chunk.markReady();
         //TODO, it is not clear if the activate/addedBlocks event logic is correct.
@@ -232,7 +234,7 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
 
             worldEntity.send(new OnChunkGenerated(chunk.getPosition()));
         }
-        new OnChunkLoaded(chunk.getPosition());
+        worldEntity.send(new OnChunkLoaded(chunk.getPosition()));
     }
 
     private void generateQueuedEntities(EntityStore store) {
@@ -252,7 +254,6 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
     public void beginUpdate() {
         deactivateBlocks();
         checkForUnload();
-//        makeChunksAvailable();
     }
 
     private void deactivateBlocks() {
@@ -273,14 +274,16 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
         PerformanceMonitor.startActivity("Unloading irrelevant chunks");
         int unloaded = 0;
         logger.debug("Compacting cache");
-        Iterator<Vector3i> iterator = Iterators.concat(chunkCache.iterateChunkPositions(), loadingPipeline.getProcessingChunks().keySet().iterator());
+        Iterator<org.joml.Vector3i> iterator = Iterators.concat(
+                Iterators.transform(chunkCache.iterateChunkPositions(), v -> new org.joml.Vector3i(v.x, v.y, v.z)),
+                loadingPipeline.getProcessingPosition().iterator());
         while (iterator.hasNext()) {
-            Vector3i pos = iterator.next();
-            boolean keep = relevanceSystem.isChunkInRegions(pos); // TODO: move it to relevance system.
+            org.joml.Vector3i pos = iterator.next();
+            boolean keep = relevanceSystem.isChunkInRegions(JomlUtil.from(pos)); // TODO: move it to relevance system.
             if (!keep) {
                 // TODO: need some way to not dispose chunks being edited or processed (or do so safely)
                 // Note: Above won't matter if all changes are on the main thread
-                if (unloadChunkInternal(pos)) {
+                if (unloadChunkInternal(JomlUtil.from(pos))) {
                     iterator.remove();
                     if (++unloaded >= UNLOAD_PER_FRAME) {
                         break;
@@ -292,12 +295,16 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
     }
 
     private boolean unloadChunkInternal(Vector3i pos) {
-        Chunk chunk = getChunkUnready(pos);
-        if (!chunk.isReady()) {
+        if (loadingPipeline.isPositionProcessing(JomlUtil.from(pos))) {
             // Chunk hasn't been finished or changed, so just drop it.
-            loadingPipeline.remove(chunk);
+            loadingPipeline.stopProcessingAt(JomlUtil.from(pos));
             return true;
         }
+        Chunk chunk = chunkCache.get(pos);
+        if (chunk == null) {
+            return true;
+        }
+
         worldEntity.send(new BeforeChunkUnload(pos));
         storageManager.deactivateChunk(chunk);
         chunk.dispose();
@@ -416,7 +423,7 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
         loadingPipeline = new ChunkProcessingPipeline(relevanceSystem.createChunkTaskComporator());
         loadingPipeline.addStage(GenerateInternalLightningChunkTask::new)
                 .addStage(DeflateChunkTask::new)
-                .addStage(new LightMergerChunkTaskProvider(this, lightMerger, loadingPipeline))
+                .addStage(new LightMergerChunkTaskProvider(this, loadingPipeline))
                 .addStage(NotifyChunkTask.stage("Notify listeners", this::processReadyChunk));
         unloadRequestTaskMaster = TaskMaster.createFIFOTaskMaster("Chunk-Unloader", 8);
         ChunkMonitor.fireChunkProviderInitialized(this);
@@ -435,15 +442,6 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
     }
 
     @Override
-    public Chunk getChunkUnready(Vector3i pos) {
-        Chunk chunk = chunkCache.get(pos);
-        if (chunk == null) {
-            chunk = loadingPipeline.getProcessingChunks().get(pos);
-        }
-        return chunk;
-    }
-
-    @Override
     public boolean isChunkReady(Vector3i pos) {
         return isChunkReady(chunkCache.get(pos));
     }
@@ -457,7 +455,7 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
         loadingPipeline = new ChunkProcessingPipeline(relevanceSystem.createChunkTaskComporator());
         loadingPipeline.addStage(GenerateInternalLightningChunkTask::new)
                 .addStage(DeflateChunkTask::new)
-                .addStage(new LightMergerChunkTaskProvider(this, lightMerger, loadingPipeline))
+                .addStage(new LightMergerChunkTaskProvider(this, loadingPipeline))
                 .addStage(NotifyChunkTask.stage("Notify listeners", this::processReadyChunk));
     }
 }

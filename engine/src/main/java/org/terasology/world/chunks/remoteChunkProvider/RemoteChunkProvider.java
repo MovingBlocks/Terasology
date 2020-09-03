@@ -55,8 +55,6 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
 
     private ChunkProcessingPipeline loadingPipeline;
 
-    private LightMerger lightMerger = new LightMerger();
-
     private LocalPlayer localPlayer;
 
     public RemoteChunkProvider(BlockManager blockManager, LocalPlayer localPlayer) {
@@ -66,7 +64,7 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
 
         loadingPipeline.addStage(GenerateInternalLightningChunkTask::new)
                 .addStage(DeflateChunkTask::new)
-                .addStage(new LightMergerChunkTaskProvider(this, lightMerger, loadingPipeline))
+                .addStage(new LightMergerChunkTaskProvider(this, loadingPipeline))
                 .addStage(NotifyChunkTask.stage("Notify listeners", (chunk) -> {
                     listener.onChunkReady(chunk.getPosition());
                     worldEntity.send(new OnChunkLoaded(chunk.getPosition()));
@@ -213,15 +211,6 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
     @Override
     public void onChunkIsReady(Chunk chunk) {
       // unused
-    }
-
-    @Override
-    public Chunk getChunkUnready(Vector3i pos) {
-        Chunk chunk = chunkCache.get(pos);
-        if (chunk == null) {
-            chunk = loadingPipeline.getProcessingChunks().get(pos);
-        }
-        return chunk;
     }
 
 

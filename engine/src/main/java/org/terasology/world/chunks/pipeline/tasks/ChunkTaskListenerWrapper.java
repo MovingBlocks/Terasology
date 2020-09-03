@@ -42,4 +42,9 @@ public class ChunkTaskListenerWrapper implements ChunkTask {
     public boolean isTerminateSignal() {
         return chunkTask.isTerminateSignal();
     }
+
+    @Override
+    public String toString() {
+        return "Wrapped: [" + chunkTask.toString() + "]";
+    }
 }

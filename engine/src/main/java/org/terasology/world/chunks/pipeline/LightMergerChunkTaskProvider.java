@@ -3,6 +3,8 @@
 
 package org.terasology.world.chunks.pipeline;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3i;
 import org.terasology.math.JomlUtil;
@@ -14,70 +16,68 @@ import org.terasology.world.chunks.pipeline.tasks.InterruptChunkTask;
 import org.terasology.world.chunks.pipeline.tasks.LightMergerChunkTask;
 import org.terasology.world.propagation.light.LightMerger;
 
-import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 /**
- * Light Merger Chunk Task Provider.
- * Check requirements and re-invoke {@link LightMergerChunkTask} when requirements meets.
+ * Light Merger Chunk Task Provider. Check requirements and re-invoke {@link LightMergerChunkTask} when requirements
+ * meets.
  */
-public class LightMergerChunkTaskProvider implements Function<Chunk, ChunkTask>, ChunkTaskListener {
+public class LightMergerChunkTaskProvider implements Function<Chunk, ChunkTask>, ChunkTaskListener,
+        ChunkInvalidationListener {
 
     private final GeneratingChunkProvider chunkProvider;
-    private final LightMerger lightMerger;
     private final ChunkProcessingPipeline pipeline;
-    private final Map<Chunk, Set<Vector3i>> requirements = new ConcurrentHashMap<>();
+    private final Set<Chunk> pending = Sets.newConcurrentHashSet();
+    private final Map<Vector3i, Chunk> noticedChunkInProcessing = new ConcurrentHashMap<>();
 
-    public LightMergerChunkTaskProvider(GeneratingChunkProvider chunkProvider, LightMerger lightMerger,
+    public LightMergerChunkTaskProvider(GeneratingChunkProvider chunkProvider,
                                         ChunkProcessingPipeline pipeline) {
         this.chunkProvider = chunkProvider;
-        this.lightMerger = lightMerger;
         this.pipeline = pipeline;
     }
 
     @Override
     public ChunkTask apply(Chunk chunk) {
-        Set<Vector3i> unloaded = getNearestUnloadedChunkPosition(chunk).collect(Collectors.toSet());
-        if (unloaded.isEmpty()) {
-            return makeTask(chunk);
+        if (getLocalChunks(chunk).noneMatch(Objects::isNull)) {
+            return makeTask(chunk, getLocalChunks(chunk).toArray(Chunk[]::new));
         } else {
-            requirements.put(chunk, unloaded);
+            pending.add(chunk);
             return new InterruptChunkTask();
         }
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @param chunkTask ChunkTask which done processing.
+     */
     @Override
     public void onDone(ChunkTask chunkTask) {
-        Set<Chunk> toInvoke = new HashSet<>();
-        for (Map.Entry<Chunk, Set<Vector3i>> entry : requirements.entrySet()) {
-            if (entry.getValue().remove(chunkTask.getPosition())) {
-                if (entry.getValue().isEmpty()) {
-                    toInvoke.add(entry.getKey());
-                }
+        if (!(chunkTask instanceof InterruptChunkTask)) {
+            noticedChunkInProcessing.put(chunkTask.getPosition(), chunkTask.getChunk());
+        }
+        pending.removeIf(chunk -> {
+            if (getLocalChunks(chunk).noneMatch(Objects::isNull)) {
+                pipeline.doTaskWrapper(makeTask(chunk, getLocalChunks(chunk).toArray(Chunk[]::new)));
+                return true;
             }
-            //  Set<Vector3i> unloaded = getNearestUnloadedChunkPosition(entry.getKey()).collect(Collectors.toSet());
-            //            if (unloaded.isEmpty()) {
-            //                toInvoke.add(entry.getKey());
-            //            }
-        }
-        for (Chunk chunk : toInvoke) {
-            requirements.remove(chunk);
-            pipeline.doTaskWrapper(makeTask(chunk));
-        }
+            return false;
+        });
     }
 
     @NotNull
-    private LightMergerChunkTask makeTask(Chunk chunk) {
-        return new LightMergerChunkTask(chunk, chunkProvider, lightMerger);
+    private LightMergerChunkTask makeTask(Chunk chunk, Chunk[] localChunks) {
+        return new LightMergerChunkTask(chunk, localChunks, new LightMerger());
     }
 
-    private Stream<Vector3i> getNearestUnloadedChunkPosition(Chunk chunk) {
+    private Stream<Chunk> getLocalChunks(Chunk chunk) {
         Vector3i chunkPosition = new Vector3i();
         chunk.getPosition(chunkPosition);
         BlockRegion extentsRegion = new BlockRegion(
@@ -89,7 +89,25 @@ public class LightMergerChunkTaskProvider implements Function<Chunk, ChunkTask>,
                         .spliterator(),
                 false)
                 .map(Vector3i::new)
-                .filter((v) -> chunkProvider.getChunkUnready(JomlUtil.from(v)) == null); //TODO make chunkProvider
-        // Joml ready.
+                .map(this::getChunk);
     }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @param pos position of chunk
+     */
+    @Override
+    public void onInvalidation(Vector3i pos) {
+        noticedChunkInProcessing.remove(pos);
+    }
+
+    private Chunk getChunk(Vector3i pos) {
+        Chunk chunk = chunkProvider.getChunk(JomlUtil.from(pos));
+        if (chunk == null) {
+            chunk = noticedChunkInProcessing.get(pos);
+        }
+        return chunk;
+    }
+
 }

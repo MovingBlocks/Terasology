@@ -3,21 +3,23 @@
 
 package org.terasology.world.chunks.pipeline;
 
+import com.google.common.collect.Sets;
+import org.joml.Vector3i;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.utilities.concurrency.TaskMaster;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.pipeline.tasks.ChunkTaskListenerWrapper;
 
 import java.util.Comparator;
 import java.util.Deque;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 /**
  * Manages execution of chunk tasks on a queue.
@@ -32,8 +34,10 @@ public class ChunkProcessingPipeline implements ChunkTaskListener {
     private final TaskMaster<ChunkTask> chunkProcessor;
     private final List<Function<Chunk, ChunkTask>> stages = new LinkedList<>();
     private final List<ChunkTaskListener> chunkTaskListeners = new LinkedList<>();
-    private final Map<Chunk, Deque<Function<Chunk, ChunkTask>>> chunkNextStages = new ConcurrentHashMap<>(); // TODO
-    // use better collection.
+    private final List<ChunkInvalidationListener> chunkInvalidationListeners = new LinkedList<>();
+    private final Map<Chunk, Deque<Function<Chunk, ChunkTask>>> chunkNextStages = new ConcurrentHashMap<>();
+    private final Set<org.joml.Vector3i> processingPositions = Sets.newConcurrentHashSet();
+    private final Set<org.joml.Vector3i> invalidatedPositions = Sets.newConcurrentHashSet();
 
     /**
      * Create ChunkProcessingTaskMaster.
@@ -46,7 +50,8 @@ public class ChunkProcessingPipeline implements ChunkTaskListener {
     }
 
     /**
-     * Add stage to pipeline. If stage instance of {@link ChunkTaskListener} - it's will be register as listener.
+     * Add stage to pipeline. If stage instance of {@link ChunkTaskListener} - it's will be register as listener. If
+     * stage instance of {@link ChunkInvalidationListener} - it's will be register as listener.
      *
      * @param stage function for ChunkTask generating by Chunk.
      * @return self for Fluent api.
@@ -56,11 +61,14 @@ public class ChunkProcessingPipeline implements ChunkTaskListener {
         if (stage instanceof ChunkTaskListener) {
             addListener((ChunkTaskListener) stage);
         }
+        if (stage instanceof ChunkInvalidationListener) {
+            addListener((ChunkInvalidationListener) stage);
+        }
         return this;
     }
 
     /**
-     * Register chink task listener.
+     * Register chunk task listener.
      *
      * @param listener listener.
      * @return self for Fluent api.
@@ -71,20 +79,28 @@ public class ChunkProcessingPipeline implements ChunkTaskListener {
     }
 
     /**
+     * Register chunk task listener.
+     *
+     * @param listener listener.
+     * @return self for Fluent api.
+     */
+    public ChunkProcessingPipeline addListener(ChunkInvalidationListener listener) {
+        chunkInvalidationListeners.add(listener);
+        return this;
+    }
+
+    /**
      * Run generator task and then run pipeline processing with it.
      *
      * @param generatorTask ChunkTask which provides new chunk to pipeline
      */
     public void invokeGeneratorTask(SupplierChunkTask generatorTask) {
+        if (processingPositions.contains(generatorTask.getPosition())) {
+            return;
+        }
+        processingPositions.add(generatorTask.getPosition());
         doTask(new ChunkTaskListenerWrapper(generatorTask, (chunkTask) -> {
-            // check that we haven't many tasks on one position.
-            if (chunkNextStages
-                    .keySet()
-                    .stream()
-                    .map(Chunk::getPosition)
-                    .noneMatch((p) -> p.equals(chunkTask.getChunk().getPosition()))) {
-                invokePipeline(chunkTask.getChunk());
-            }
+            invokePipeline(chunkTask.getChunk());
         }));
     }
 
@@ -100,8 +116,12 @@ public class ChunkProcessingPipeline implements ChunkTaskListener {
         }
         Function<Chunk, ChunkTask> nextStage =
                 chunkNextStages.computeIfAbsent(chunk, c -> new LinkedList<>(stages)).poll();
-        if (nextStage == null) {
+        Vector3i position = chunk.getPosition(new Vector3i());
+
+        if (chunk.isReady() || invalidatedPositions.remove(position) || nextStage == null) {
+            processingPositions.remove(position);
             chunkNextStages.remove(chunk);
+            chunkInvalidationListeners.forEach(l -> l.onInvalidation(position));
             return;
         }
         invokeStage(chunk, nextStage);
@@ -109,11 +129,13 @@ public class ChunkProcessingPipeline implements ChunkTaskListener {
 
     public void shutdown() {
         chunkNextStages.clear();
+        processingPositions.clear();
         chunkProcessor.shutdown(new ShutdownChunkTask(), false);
     }
 
     public void restart() {
         chunkNextStages.clear();
+        processingPositions.clear();
         chunkProcessor.restart();
     }
 
@@ -128,18 +150,35 @@ public class ChunkProcessingPipeline implements ChunkTaskListener {
         logger.debug("Task " + chunkTask + " done");
         invokePipeline(chunkTask.getChunk());
     }
-    
-    public void remove(Chunk chunk) {
-        chunkNextStages.remove(chunk);
+
+    /**
+     * Stop processing chunk at position.
+     *
+     * @param pos position of chunk to stop processing.
+     */
+    public void stopProcessingAt(Vector3i pos) {
+        invalidatedPositions.add(pos);
+        processingPositions.remove(pos);
+        chunkInvalidationListeners.forEach(l -> l.onInvalidation(pos));
     }
 
     /**
-     * Processing chunks.
+     * Check is position processing.
      *
-     * @return Map of positions and chunks which currently in processing.
+     * @param pos position for check
+     * @return true if position processing, false otherwise
      */
-    public Map<Vector3i, Chunk> getProcessingChunks() {
-        return chunkNextStages.keySet().stream().collect(Collectors.toMap(k -> k.getPosition(), Function.identity()));
+    public boolean isPositionProcessing(org.joml.Vector3i pos) {
+        return processingPositions.contains(pos);
+    }
+
+    /**
+     * Get processing positions.
+     *
+     * @return copy of processing positions
+     */
+    public List<org.joml.Vector3i> getProcessingPosition() {
+        return new LinkedList<>(processingPositions);
     }
 
     /**
