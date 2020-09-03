@@ -38,6 +38,8 @@ import org.terasology.world.block.tiles.NullWorldAtlas;
 import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.propagation.light.LightPropagationRules;
 
+import java.util.Collections;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class BulkLightPropagationTest extends TerasologyTestingEnvironment {
@@ -65,32 +67,38 @@ public class BulkLightPropagationTest extends TerasologyTestingEnvironment {
         fullLightData.getBaseSection().setDisplayName("Torch");
         fullLightData.getBaseSection().setLuminance(ChunkConstants.MAX_LIGHT);
         fullLightData.getBaseSection().setTranslucent(true);
+        fullLightData.setBlockFamily(SymmetricFamily.class);
         assetManager.loadAsset(new ResourceUrn("engine:torch"), fullLightData, BlockFamilyDefinition.class);
 
         BlockFamilyDefinitionData weakLightData = new BlockFamilyDefinitionData();
         weakLightData.getBaseSection().setDisplayName("PartLight");
         weakLightData.getBaseSection().setLuminance((byte) 2);
         weakLightData.getBaseSection().setTranslucent(true);
+        weakLightData.setBlockFamily(SymmetricFamily.class);
         assetManager.loadAsset(new ResourceUrn("engine:weakLight"), weakLightData, BlockFamilyDefinition.class);
 
         BlockFamilyDefinitionData mediumLightData = new BlockFamilyDefinitionData();
         mediumLightData.getBaseSection().setDisplayName("MediumLight");
         mediumLightData.getBaseSection().setLuminance((byte) 5);
         mediumLightData.getBaseSection().setTranslucent(true);
+        mediumLightData.setBlockFamily(SymmetricFamily.class);
         assetManager.loadAsset(new ResourceUrn("engine:mediumLight"), mediumLightData, BlockFamilyDefinition.class);
 
         BlockFamilyDefinitionData solidData = new BlockFamilyDefinitionData();
         solidData.getBaseSection().setDisplayName("Stone");
         solidData.getBaseSection().setTranslucent(false);
+        solidData.setBlockFamily(SymmetricFamily.class);
         assetManager.loadAsset(new ResourceUrn("engine:stone"), solidData, BlockFamilyDefinition.class);
 
         BlockFamilyDefinitionData solidMediumLightData = new BlockFamilyDefinitionData();
         solidMediumLightData.getBaseSection().setDisplayName("SolidMediumLight");
         solidMediumLightData.getBaseSection().setTranslucent(false);
         solidMediumLightData.getBaseSection().setLuminance((byte) 5);
+        solidMediumLightData.setBlockFamily(SymmetricFamily.class);
         assetManager.loadAsset(new ResourceUrn("engine:solidMediumLight"), solidMediumLightData, BlockFamilyDefinition.class);
 
         blockManager = new BlockManagerImpl(new NullWorldAtlas(), assetManager, true);
+        blockManager.initialise(Collections.EMPTY_LIST, Collections.EMPTY_MAP);
         CoreRegistry.put(BlockManager.class, blockManager);
 
         fullLight = blockManager.getBlock(new BlockUri(new ResourceUrn("engine:torch")));
