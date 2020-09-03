@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.world.chunks.localChunkProvider;
 
+import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Queues;
 import gnu.trove.list.TIntList;
@@ -80,7 +81,6 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
     private ChunkProcessingPipeline loadingPipeline;
     private TaskMaster<ChunkUnloadRequest> unloadRequestTaskMaster;
     private WorldGenerator generator;
-    private List<ReadyChunkInfo> sortedReadyChunks = Lists.newArrayList();
     private EntityRef worldEntity = EntityRef.NULL;
     private BlockManager blockManager;
     private ExtraBlockDataManager extraDataManager;
@@ -273,10 +273,10 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
         PerformanceMonitor.startActivity("Unloading irrelevant chunks");
         int unloaded = 0;
         logger.debug("Compacting cache");
-        Iterator<Vector3i> iterator = chunkCache.iterateChunkPositions();
+        Iterator<Vector3i> iterator = Iterators.concat(chunkCache.iterateChunkPositions(), loadingPipeline.getProcessingChunks().keySet().iterator());
         while (iterator.hasNext()) {
             Vector3i pos = iterator.next();
-            boolean keep = relevanceSystem.isChunkInRegions(pos);
+            boolean keep = relevanceSystem.isChunkInRegions(pos); // TODO: move it to relevance system.
             if (!keep) {
                 // TODO: need some way to not dispose chunks being edited or processed (or do so safely)
                 // Note: Above won't matter if all changes are on the main thread
@@ -292,17 +292,10 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
     }
 
     private boolean unloadChunkInternal(Vector3i pos) {
-        Chunk chunk = chunkCache.get(pos);
+        Chunk chunk = getChunkUnready(pos);
         if (!chunk.isReady()) {
             // Chunk hasn't been finished or changed, so just drop it.
-            Iterator<ReadyChunkInfo> infoIterator = sortedReadyChunks.iterator();
-            while (infoIterator.hasNext()) {
-                ReadyChunkInfo next = infoIterator.next();
-                if (next.getPos().equals(chunk.getPosition())) {
-                    infoIterator.remove();
-                    break;
-                }
-            }
+            loadingPipeline.remove(chunk);
             return true;
         }
         worldEntity.send(new BeforeChunkUnload(pos));
@@ -417,7 +410,6 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
             chunk.dispose();
         });
         chunkCache.clear();
-        sortedReadyChunks.clear();
         storageManager.deleteWorld();
         worldEntity.send(new PurgeWorldEvent());
 

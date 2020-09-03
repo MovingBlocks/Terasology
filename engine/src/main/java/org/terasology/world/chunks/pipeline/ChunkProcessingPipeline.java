@@ -128,6 +128,10 @@ public class ChunkProcessingPipeline implements ChunkTaskListener {
         logger.debug("Task " + chunkTask + " done");
         invokePipeline(chunkTask.getChunk());
     }
+    
+    public void remove(Chunk chunk) {
+        chunkNextStages.remove(chunk);
+    }
 
     /**
      * Processing chunks.
