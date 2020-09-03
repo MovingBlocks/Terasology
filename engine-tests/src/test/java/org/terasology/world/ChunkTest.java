@@ -54,8 +54,6 @@ public class ChunkTest extends TerasologyTestingEnvironment {
 
         ExtraBlockDataManager extraDataManager = new ExtraBlockDataManager();
 
-        chunk = new ChunkImpl(new Vector3i(0, 0, 0), blockManager, extraDataManager);
-
         BlockFamilyDefinitionData solidData = new BlockFamilyDefinitionData();
         solidData.getBaseSection().setDisplayName("Stone");
         solidData.getBaseSection().setTranslucent(false);
@@ -65,6 +63,8 @@ public class ChunkTest extends TerasologyTestingEnvironment {
         blockManager.initialise(Collections.EMPTY_LIST, Collections.EMPTY_MAP);
         CoreRegistry.put(BlockManager.class, blockManager);
         solid = blockManager.getBlock(new BlockUri(new ResourceUrn("engine:stone")));
+
+        chunk = new ChunkImpl(new Vector3i(0, 0, 0), blockManager, extraDataManager);
     }
 
     @Test

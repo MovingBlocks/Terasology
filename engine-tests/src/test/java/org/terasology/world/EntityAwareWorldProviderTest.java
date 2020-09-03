@@ -93,9 +93,6 @@ public class EntityAwareWorldProviderTest extends TerasologyTestingEnvironment {
         AssetManager assetManager = context.get(AssetManager.class);
         BlockManager blockManager = context.get(BlockManager.class);
 
-        worldStub = new WorldProviderCoreStub(airBlock);
-        worldProvider = new EntityAwareWorldProvider(worldStub, context);
-
         createBlock("test:plainblock", assetManager);
         prefabWithString = createPrefabWithString("test:prefabWithString", "Test", assetManager);
         createBlockWithPrefab("test:blockWithString", prefabWithString, false, assetManager);
@@ -122,6 +119,9 @@ public class EntityAwareWorldProviderTest extends TerasologyTestingEnvironment {
         blockInFamilyOne = iterator.next();
         blockInFamilyTwo = iterator.next();
         blockWithRetainedComponent = blockManager.getBlock("test:blockWithRetainedComponent");
+
+        worldStub = new WorldProviderCoreStub(airBlock);
+        worldProvider = new EntityAwareWorldProvider(worldStub, context);
 
         worldProvider.initialise();
     }
