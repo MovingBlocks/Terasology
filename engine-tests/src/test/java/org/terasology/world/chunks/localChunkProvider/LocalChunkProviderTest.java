@@ -54,6 +54,8 @@ import static org.mockito.Mockito.verify;
 
 public class LocalChunkProviderTest {
 
+    private static final int WAIT_CHUNK_IS_READY_IN_SECONDS = 10;
+
     private LocalChunkProvider chunkProvider;
     private EntityManager entityManager;
     private BlockManager blockManager;
@@ -283,12 +285,10 @@ public class LocalChunkProviderTest {
 
 
     private void waitChunkReadyAt(Vector3i chunkPosition) {
-        Assertions.assertTimeoutPreemptively(Duration.of(3, ChronoUnit.SECONDS),
+        Assertions.assertTimeoutPreemptively(Duration.of(WAIT_CHUNK_IS_READY_IN_SECONDS, ChronoUnit.SECONDS),
                 () -> {
-                    while (chunkCache.get(chunkPosition) == null) {
-                    }
-                    while (!chunkCache.get(chunkPosition).isReady()) {
-                    }
+                    while (chunkCache.get(chunkPosition) == null) {}
+                    while (!chunkCache.get(chunkPosition).isReady()) {}
                 });
     }
 
