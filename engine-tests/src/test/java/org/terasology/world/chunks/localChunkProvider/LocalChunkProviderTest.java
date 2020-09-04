@@ -40,7 +40,6 @@ import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.blockdata.ExtraBlockDataManager;
 import org.terasology.world.chunks.event.OnChunkGenerated;
 import org.terasology.world.chunks.event.OnChunkLoaded;
-import org.terasology.world.chunks.internal.ReadyChunkInfo;
 
 import java.util.Collections;
 import java.util.List;
@@ -59,7 +58,6 @@ import static org.mockito.Mockito.when;
 public class LocalChunkProviderTest {
 
     private LocalChunkProvider chunkProvider;
-    private ChunkFinalizer chunkFinalizer;
     private EntityManager entityManager;
     private BlockManager blockManager;
     private ExtraBlockDataManager extraDataManager;
@@ -70,7 +68,6 @@ public class LocalChunkProviderTest {
     @BeforeEach
     public void setUp() {
         entityManager = mock(EntityManager.class);
-        chunkFinalizer = mock(ChunkFinalizer.class);
         blockManager = mock(BlockManager.class);
         extraDataManager = new ExtraBlockDataManager();
         blockEntityRegistry = mock(BlockEntityRegistry.class);
@@ -85,8 +82,7 @@ public class LocalChunkProviderTest {
     @Test
     public void testCompleteUpdateMarksChunkReady() throws Exception {
         final Chunk chunk = mockChunkAt(0, 0, 0);
-        final ReadyChunkInfo readyChunkInfo = ReadyChunkInfo.createForNewChunk(chunk, new TShortObjectHashMap<>(), Collections.emptyList());
-        when(chunkFinalizer.completeFinalization()).thenReturn(Collections.singletonList(readyChunkInfo));
+
 
         chunkProvider.completeUpdate();
 
@@ -96,8 +92,6 @@ public class LocalChunkProviderTest {
     @Test
     public void testCompleteUpdateHandlesFinalizedChunkIfReady() throws Exception {
         final Chunk chunk = mockChunkAt(0, 0, 0);
-        final ReadyChunkInfo readyChunkInfo = ReadyChunkInfo.createForNewChunk(chunk, new TShortObjectHashMap<>(), Collections.emptyList());
-        when(chunkFinalizer.completeFinalization()).thenReturn(Collections.singletonList(readyChunkInfo));
 
         chunkProvider.completeUpdate();
 
@@ -112,8 +106,7 @@ public class LocalChunkProviderTest {
         final ChunkProviderTestComponent testComponent = new ChunkProviderTestComponent();
         final EntityStore entityStore = createEntityStoreWithComponents(testComponent);
         final List<EntityStore> entityStores = Collections.singletonList(entityStore);
-        final ReadyChunkInfo readyChunkInfo = ReadyChunkInfo.createForNewChunk(chunk, new TShortObjectHashMap<>(), entityStores);
-        when(chunkFinalizer.completeFinalization()).thenReturn(Collections.singletonList(readyChunkInfo));
+
         final EntityRef mockEntity = mock(EntityRef.class);
         when(entityManager.create()).thenReturn(mockEntity);
 
@@ -129,8 +122,7 @@ public class LocalChunkProviderTest {
         final ChunkProviderTestComponent testComponent = new ChunkProviderTestComponent();
         final EntityStore entityStore = createEntityStoreWithPrefabAndComponents(prefab, testComponent);
         final List<EntityStore> entityStores = Collections.singletonList(entityStore);
-        final ReadyChunkInfo readyChunkInfo = ReadyChunkInfo.createForNewChunk(chunk, new TShortObjectHashMap<>(), entityStores);
-        when(chunkFinalizer.completeFinalization()).thenReturn(Collections.singletonList(readyChunkInfo));
+
         final EntityRef mockEntity = mock(EntityRef.class);
         when(entityManager.create(any(Prefab.class))).thenReturn(mockEntity);
 
@@ -144,8 +136,7 @@ public class LocalChunkProviderTest {
     public void testCompleteUpdateRestoresEntitiesForRestoredChunks() throws Exception {
         final Chunk chunk = mockChunkAt(0, 0, 0);
         final ChunkStore chunkStore = mock(ChunkStore.class);
-        final ReadyChunkInfo readyChunkInfo = ReadyChunkInfo.createForRestoredChunk(chunk, new TShortObjectHashMap<>(), chunkStore, Collections.emptyList());
-        when(chunkFinalizer.completeFinalization()).thenReturn(Collections.singletonList(readyChunkInfo));
+
 
         chunkProvider.completeUpdate();
 
@@ -160,8 +151,7 @@ public class LocalChunkProviderTest {
         registerBlockWithIdAndEntity(blockId, blockEntity, blockManager);
         final TShortObjectHashMap<TIntList> blockPositionMappings = new TShortObjectHashMap<>();
         blockPositionMappings.put(blockId, withPositions(new Vector3i(1, 2, 3)));
-        final ReadyChunkInfo readyChunkInfo = ReadyChunkInfo.createForRestoredChunk(chunk, blockPositionMappings, mock(ChunkStore.class), Collections.emptyList());
-        when(chunkFinalizer.completeFinalization()).thenReturn(Collections.singletonList(readyChunkInfo));
+
 
         chunkProvider.completeUpdate();
 
@@ -181,8 +171,7 @@ public class LocalChunkProviderTest {
         final EntityRef blockEntity = mock(EntityRef.class);
         registerBlockWithIdAndEntity(blockId, blockEntity, blockManager);
         blockPositionMappings.put(blockId, withPositions(new Vector3i(1, 2, 3)));
-        final ReadyChunkInfo readyChunkInfo = ReadyChunkInfo.createForRestoredChunk(chunk, blockPositionMappings, mock(ChunkStore.class), Collections.emptyList());
-        when(chunkFinalizer.completeFinalization()).thenReturn(Collections.singletonList(readyChunkInfo));
+
 
         chunkProvider.completeUpdate();
 

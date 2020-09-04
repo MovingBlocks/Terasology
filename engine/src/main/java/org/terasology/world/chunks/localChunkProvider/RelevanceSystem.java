@@ -21,7 +21,6 @@ import org.terasology.world.chunks.ChunkRegionListener;
 import org.terasology.world.chunks.event.BeforeChunkUnload;
 import org.terasology.world.chunks.event.OnChunkLoaded;
 import org.terasology.world.chunks.internal.ChunkRelevanceRegion;
-import org.terasology.world.chunks.internal.ReadyChunkInfo;
 import org.terasology.world.chunks.pipeline.ChunkTask;
 
 import java.util.Collection;
@@ -199,14 +198,6 @@ public class RelevanceSystem implements UpdateSubscriberSystem {
     }
 
     /**
-     * Create comporator for ReadyChunkInfo, which compare by distance from region centers
-     * @return Comporator.
-     */
-    public Comparator<ReadyChunkInfo> createReadyChunkInfoComporator() {
-        return new ReadyChunkRelevanceComparator();
-    }
-
-    /**
      * @param delta The time (in seconds) since the last engine update.
      */
     @Override
@@ -280,17 +271,6 @@ public class RelevanceSystem implements UpdateSubscriberSystem {
                 return -1;
             }
             return RelevanceSystem.this.regionsDistanceScore(JomlUtil.from(task.getPosition()));
-        }
-    }
-
-    /**
-     * Compare ReaduChunkInfo by distance from region's centers.
-     */
-    private class ReadyChunkRelevanceComparator implements Comparator<ReadyChunkInfo> {
-
-        @Override
-        public int compare(ReadyChunkInfo o1, ReadyChunkInfo o2) {
-            return regionsDistanceScore(o2.getPos()) - regionsDistanceScore(o1.getPos());
         }
     }
 }
