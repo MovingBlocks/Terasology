@@ -16,7 +16,7 @@
 
 package org.terasology.world.viewer.layers;
 
-import org.terasology.rendering.nui.Color;
+import org.terasology.nui.Color;
 import org.terasology.world.generation.Region;
 import org.terasology.world.generation.facets.base.ObjectFacet2D;
 import org.terasology.world.viewer.color.ColorBlender;

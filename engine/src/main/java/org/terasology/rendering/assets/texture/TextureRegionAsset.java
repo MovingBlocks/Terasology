@@ -19,6 +19,7 @@ import org.terasology.assets.Asset;
 import org.terasology.assets.AssetData;
 import org.terasology.assets.AssetType;
 import org.terasology.assets.ResourceUrn;
+import org.terasology.nui.UITextureRegion;
 
 /**
  */

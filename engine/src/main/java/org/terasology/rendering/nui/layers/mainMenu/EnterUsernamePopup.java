@@ -22,10 +22,10 @@ import org.terasology.config.PlayerConfig;
 import org.terasology.i18n.TranslationSystem;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
-import org.terasology.rendering.nui.WidgetUtil;
-import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
-import org.terasology.rendering.nui.widgets.UIButton;
-import org.terasology.rendering.nui.widgets.UIText;
+import org.terasology.nui.WidgetUtil;
+import org.terasology.nui.databinding.ReadOnlyBinding;
+import org.terasology.nui.widgets.UIButton;
+import org.terasology.nui.widgets.UIText;
 
 public class EnterUsernamePopup extends CoreScreenLayer {
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:enterUsernamePopup");

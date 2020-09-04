@@ -21,6 +21,7 @@ import org.lwjgl.Sys;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
+import org.lwjgl.opengl.GLContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.utilities.Assets;
@@ -102,7 +103,11 @@ public class ShaderManagerLwjgl implements ShaderManager {
         addShaderProgram("toneMapping");
         addShaderProgram("sky");
         addShaderProgram("chunk");
-        addShaderProgram("particle");
+        if (GLContext.getCapabilities().OpenGL33) { //TODO remove this "if" when rendering will use OpenGL3 by default
+            addShaderProgram("particle");
+        } else {
+            logger.warn("Your GPU or driver not supports OpenGL 3.3 , particles disabled");
+        }
         addShaderProgram("shadowMap");
         addShaderProgram("lightBufferPass");
         addShaderProgram("lightGeometryPass");
@@ -146,15 +151,21 @@ public class ShaderManagerLwjgl implements ShaderManager {
 
     // TODO: discuss having a `public removeShaderProgram`, to dispose shader programs no longer in use by any node
     public GLSLMaterial addShaderProgram(String title) {
-        String uri = "engine:" + title;
+        return addShaderProgram(title, "engine");
+    }
+
+    public GLSLMaterial addShaderProgram(String title, String providingModule) {
+
+        String uri = providingModule + ":" + title;
         Optional<? extends Shader> shader = Assets.getShader(uri);
         checkState(shader.isPresent(), "Failed to resolve %s", uri);
         shader.get().recompile();
-        GLSLMaterial material = (GLSLMaterial) Assets.generateAsset(new ResourceUrn("engine:prog." + title), new MaterialData(shader.get()), Material.class);
+        GLSLMaterial material = (GLSLMaterial) Assets.generateAsset(new ResourceUrn(providingModule + ":prog." + title), new MaterialData(shader.get()), Material.class);
         progamaticShaders.add(material);
 
         return material;
     }
+
 
     /**
      * Enables the default shader program.

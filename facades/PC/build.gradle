@@ -25,6 +25,9 @@ apply from: "$rootDir/config/gradle/publish.gradle"
 
 import org.apache.tools.ant.taskdefs.condition.Os
 import org.apache.tools.ant.filters.FixCrLfFilter
+import org.gradle.internal.logging.text.StyledTextOutput
+import org.gradle.internal.logging.text.StyledTextOutputFactory
+
 import java.text.SimpleDateFormat;
 import groovy.json.JsonBuilder
 
@@ -96,22 +99,7 @@ dependencies {
     implementation group: 'org.reflections', name: 'reflections', version: '0.9.10'
 
     // TODO: Consider whether we can move the CR dependency back here from the engine, where it is referenced from the main menu
-    // Dependency on CrashReporter, conditionally either from source or via binary
-    File wouldBeSrcPath = new File(rootDir, 'libs/CrashReporter')
-
-    if (wouldBeSrcPath.exists()) {
-        println "*** Identified CrashReporter source, using that"
-        //compile ':libs:CrashReporter:cr-terasology'
-
-        def targetProject = findProject(':libs:CrashReporter:cr-terasology')
-        println "Found the project? " + targetProject
-        //compile targetProject
-
-        implementation project(':libs:CrashReporter:cr-terasology')
-    } else {
-        logger.debug("*** Setting a CrashReporter binary dependency, not present as source")
-        implementation group: 'org.terasology.crashreporter', name: 'cr-terasology', version: '4.1.0'
-    }
+    implementation group: 'org.terasology.crashreporter', name: 'cr-terasology', version: '4.1.0'
 }
 
 // Instructions for packaging a jar file for the PC facade
@@ -147,6 +135,12 @@ run {
 task game(type:JavaExec) {
     description = "Run 'Terasology' to play the game as a standard PC application"
     group = "terasology run"
+
+    // If there are no actual source modules let the user know, just in case ..
+    if (project(':modules').subprojects.size() == 0) {
+        def out = services.get(StyledTextOutputFactory).create("an-ouput")
+        out.withStyle(StyledTextOutput.Style.FailureHeader).println("NOTE: You're running the game from source without any source modules - that may be intentional (got jar modules?) but maybe not. Consider running `groovyw init` or a variant (see `groovyw usage`)")
+    }
 
     // Dependencies: natives + all modules & the PC facade itself (which will trigger the engine)
     dependsOn rootProject.extractNatives

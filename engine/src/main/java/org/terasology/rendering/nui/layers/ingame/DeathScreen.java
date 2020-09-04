@@ -21,8 +21,8 @@ import org.terasology.logic.players.LocalPlayer;
 import org.terasology.logic.players.event.RespawnRequestEvent;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.nui.CoreScreenLayer;
-import org.terasology.rendering.nui.WidgetUtil;
-import org.terasology.rendering.nui.widgets.UILabel;
+import org.terasology.nui.WidgetUtil;
+import org.terasology.nui.widgets.UILabel;
 
 /**
  * This screen is displayed when the player dies.
