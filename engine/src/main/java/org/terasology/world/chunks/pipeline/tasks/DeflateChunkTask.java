@@ -6,6 +6,9 @@ package org.terasology.world.chunks.pipeline.tasks;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.pipeline.AbstractChunkTask;
 
+/**
+ * ChunkTask for run {@link Chunk#deflate()}
+ */
 public class DeflateChunkTask extends AbstractChunkTask {
 
     public DeflateChunkTask(Chunk chunk) {

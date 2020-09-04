@@ -7,6 +7,9 @@ import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.pipeline.AbstractChunkTask;
 import org.terasology.world.propagation.light.LightMerger;
 
+/**
+ * Chunk task for run {@link LightMerger#merge(Chunk, Chunk[])};
+ */
 public class LightMergerChunkTask extends AbstractChunkTask {
 
     private final Chunk[] localChunks;

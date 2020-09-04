@@ -4,10 +4,13 @@
 package org.terasology.world.chunks.pipeline.tasks;
 
 import org.terasology.world.chunks.Chunk;
-import org.terasology.world.chunks.Chunk;
+import org.terasology.world.chunks.LitChunk;
 import org.terasology.world.chunks.pipeline.AbstractChunkTask;
 import org.terasology.world.propagation.light.InternalLightProcessor;
 
+/**
+ * Chunk task for run {@link InternalLightProcessor#generateInternalLighting(LitChunk)}
+ */
 public class GenerateInternalLightningChunkTask extends AbstractChunkTask {
 
     public GenerateInternalLightningChunkTask(Chunk chunk) {

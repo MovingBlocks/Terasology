@@ -23,8 +23,11 @@ import java.util.function.Function;
 /**
  * Manages execution of chunk tasks on a queue.
  * <p>
- * {@link ChunkTask}s are executing in background threads. {@link ChunkTask}s are executing by priority via {@link
- * Comparable}. {@link Chunk}s will processing on stages {@link ChunkProcessingPipeline#addStage}
+ * {@link ChunkTask}s are executing in background threads.
+ * <p>
+ * {@link ChunkTask}s are executing by priority via {@link Comparable}.
+ * <p>
+ * {@link Chunk}s will processing on stages {@link ChunkProcessingPipeline#addStage}
  */
 public class ChunkProcessingPipeline implements ChunkTaskListener {
     private static final int NUM_TASK_THREADS = 8;
@@ -98,9 +101,7 @@ public class ChunkProcessingPipeline implements ChunkTaskListener {
             return;
         }
         processingPositions.add(generatorTask.getPosition());
-        doTask(new ChunkTaskListenerWrapper(generatorTask, (chunkTask) -> {
-            invokePipeline(chunkTask.getChunk());
-        }));
+        doTask(new ChunkTaskListenerWrapper(generatorTask, (chunkTask) -> invokePipeline(chunkTask.getChunk())));
     }
 
     /**

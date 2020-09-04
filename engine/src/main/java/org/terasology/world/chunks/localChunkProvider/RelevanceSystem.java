@@ -30,10 +30,13 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
- * RelevanceSystem loads, holds and unloads chunks around "players" (entity with {@link RelevanceRegionComponent} and {@link LocationComponent}).
+ * RelevanceSystem loads, holds and unloads chunks around "players" (entity with {@link RelevanceRegionComponent} and
+ * {@link LocationComponent}).
+ * <p>
  * Uses in singleplayer or multiplayer on server-side.
+ * <p>
  * Client side multiplayer downloads and displays the chunks sent by the server.
- *
+ * <p>
  * It is uses {@link RelevanceRegionComponent} for determinate "view distance".
  */
 public class RelevanceSystem implements UpdateSubscriberSystem {
@@ -66,7 +69,7 @@ public class RelevanceSystem implements UpdateSubscriberSystem {
         removeRelevanceEntity(entity);
     }
 
-    @ReceiveEvent(components = {WorldComponent.class})
+    @ReceiveEvent(components = WorldComponent.class)
     public void onNewChunk(OnChunkLoaded chunkAvailable, EntityRef worldEntity) {
         for (ChunkRelevanceRegion region : regions.values()) {
             region.checkIfChunkIsRelevant(chunkProvider.getChunk(chunkAvailable.getChunkPos()));
@@ -82,6 +85,7 @@ public class RelevanceSystem implements UpdateSubscriberSystem {
 
     /**
      * Update distance of relative entity, if exists.
+     *
      * @param entity entity for update distance.
      * @param distance new distance for setting to entity's region.
      */
@@ -99,6 +103,7 @@ public class RelevanceSystem implements UpdateSubscriberSystem {
 
     /**
      * Remove Entity from relevance system.
+     *
      * @param entity entity for remove.
      */
     public void removeRelevanceEntity(EntityRef entity) {
@@ -133,9 +138,8 @@ public class RelevanceSystem implements UpdateSubscriberSystem {
     }
 
     /**
-     * Add entity to relevance system. create region for it.
-     * Update distance if region exists already.
-     * Create/Load chunks for region.
+     * Add entity to relevance system. create region for it. Update distance if region exists already. Create/Load
+     * chunks for region.
      *
      * @param entity entity to add.
      * @param distance region's distance.
@@ -177,6 +181,7 @@ public class RelevanceSystem implements UpdateSubscriberSystem {
 
     /**
      * Check that chunk contains in any regions.
+     *
      * @param pos chunk's position
      * @return {@code true} if chunk in regions, otherwise {@code false}
      */
@@ -191,6 +196,7 @@ public class RelevanceSystem implements UpdateSubscriberSystem {
 
     /**
      * Create comporator for ChunkTasks, which compare by distance from region centers
+     *
      * @return Comporator.
      */
     public Comparator<ChunkTask> createChunkTaskComporator() {

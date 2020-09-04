@@ -8,7 +8,7 @@ import org.terasology.utilities.concurrency.Task;
 import org.terasology.world.chunks.Chunk;
 
 /**
- *
+ * Common interface for {@link ChunkProcessingPipeline}
  */
 public interface ChunkTask extends Task {
 

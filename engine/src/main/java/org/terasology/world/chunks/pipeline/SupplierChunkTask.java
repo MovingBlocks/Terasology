@@ -8,6 +8,11 @@ import org.terasology.world.chunks.Chunk;
 
 import java.util.function.Supplier;
 
+/**
+ * Chunk task which can be used as entry point in {@link ChunkProcessingPipeline}
+ * <p>
+ * Useful for generation chunks to pipeline or recieve chunks from any other source.
+ */
 public class SupplierChunkTask implements ChunkTask {
 
     private final String taskName;

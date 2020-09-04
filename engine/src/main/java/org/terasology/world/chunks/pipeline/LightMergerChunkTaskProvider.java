@@ -24,8 +24,9 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 /**
- * Light Merger Chunk Task Provider. Check requirements and re-invoke {@link LightMergerChunkTask} when requirements
- * meets.
+ * Light Merger Chunk Task Provider.
+ * <p>
+ * Check requirements and re-invoke {@link LightMergerChunkTask} when requirements meets.
  */
 public class LightMergerChunkTaskProvider implements Function<Chunk, ChunkTask>, ChunkTaskListener,
         ChunkRemoveFromPipelineListener {

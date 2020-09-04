@@ -64,14 +64,23 @@ import java.util.concurrent.BlockingQueue;
 
 /**
  * Provides chunks. Chunks placed in this JVM. Also generated Chunks if needed.
+ * <p>
  * Loading/Unload chunks dependent on {@link RelevanceSystem}
  * <p/>
  * Produces events:
+ * <p>
  * {@link OnChunkGenerated} when chunk was generated {@link WorldGenerator}
+ * <p>
  * {@link OnChunkLoaded} when chunk was loaded from {@link StorageManager}
- * {@link OnActivatedBlocks} when load/generate chunk and chunk have blocks with lifecycle (?) {@see  https://github.com/MovingBlocks/Terasology/issues/3244}
- * {@link OnAddedBlocks} when load/generate chunk and chunk have blocks with lifecycle (?) {@see  https://github.com/MovingBlocks/Terasology/issues/3244}
+ * <p>
+ * {@link OnActivatedBlocks} when load/generate chunk and chunk have blocks with lifecycle (?) {@see
+ * https://github.com/MovingBlocks/Terasology/issues/3244}
+ * <p>
+ * {@link OnAddedBlocks} when load/generate chunk and chunk have blocks with lifecycle (?) {@see
+ * https://github.com/MovingBlocks/Terasology/issues/3244}
+ * <p>
  * {@link BeforeChunkUnload} when chunk ready to remove from provider.
+ * <p>
  * {@link BeforeDeactivateBlocks} when chunk ready to remove and have block lifecycle.
  */
 public class LocalChunkProvider implements ChunkProvider {
@@ -96,8 +105,8 @@ public class LocalChunkProvider implements ChunkProvider {
     private RelevanceSystem relevanceSystem;
 
     public LocalChunkProvider(StorageManager storageManager, EntityManager entityManager, WorldGenerator generator,
-                       BlockManager blockManager, ExtraBlockDataManager extraDataManager,
-                       ChunkCache chunkCache) {
+                              BlockManager blockManager, ExtraBlockDataManager extraDataManager,
+                              ChunkCache chunkCache) {
         this.storageManager = storageManager;
         this.entityManager = entityManager;
         this.generator = generator;

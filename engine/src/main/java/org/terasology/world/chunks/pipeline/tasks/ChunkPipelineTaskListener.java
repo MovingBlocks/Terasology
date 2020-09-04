@@ -5,6 +5,9 @@ package org.terasology.world.chunks.pipeline.tasks;
 
 import org.terasology.world.chunks.Chunk;
 
+/**
+ * Functional interface for {@link NotifyChunkTask}
+ */
 @FunctionalInterface
 public interface ChunkPipelineTaskListener {
 

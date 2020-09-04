@@ -40,17 +40,20 @@ import java.util.concurrent.BlockingQueue;
 
 /**
  * Provides chunks received from remote source.
+ * <p>
  * Loading/Unload chunks dependent on {@link org.terasology.network.Server}
  * <p/>
  * Produce events:
+ * <p>
  * {@link OnChunkLoaded} when chunk received from server and processed.
+ * <p>
  * {@link BeforeChunkUnload} when {@link org.terasology.network.Server} send invalidate chunk and chunk removing
  */
 public class RemoteChunkProvider implements ChunkProvider {
 
     private static final Logger logger = LoggerFactory.getLogger(RemoteChunkProvider.class);
-    private Map<Vector3i, Chunk> chunkCache = Maps.newHashMap();
     private final BlockingQueue<Vector3i> invalidateChunks = Queues.newLinkedBlockingQueue();
+    private Map<Vector3i, Chunk> chunkCache = Maps.newHashMap();
     private ChunkReadyListener listener;
     private EntityRef worldEntity = EntityRef.NULL;
 

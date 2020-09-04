@@ -8,6 +8,11 @@ import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.pipeline.ChunkTask;
 import org.terasology.world.chunks.pipeline.ChunkTaskListener;
 
+/**
+ * Wrapper for {@link ChunkTask} with {@link ChunkTaskListener} feature.
+ * <p>
+ * Fire {@link ChunkTaskListener#onDone(ChunkTask)}  after wrapped {@link ChunkTask}
+ */
 public class ChunkTaskListenerWrapper implements ChunkTask {
     private final ChunkTask chunkTask;
     private final ChunkTaskListener listener;
