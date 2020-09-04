@@ -3,7 +3,6 @@
 
 package org.terasology.world.chunks.pipeline;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3i;
@@ -11,12 +10,11 @@ import org.terasology.math.JomlUtil;
 import org.terasology.world.block.BlockRegion;
 import org.terasology.world.block.BlockRegionIterable;
 import org.terasology.world.chunks.Chunk;
-import org.terasology.world.chunks.internal.GeneratingChunkProvider;
+import org.terasology.world.chunks.ChunkProvider;
 import org.terasology.world.chunks.pipeline.tasks.InterruptChunkTask;
 import org.terasology.world.chunks.pipeline.tasks.LightMergerChunkTask;
 import org.terasology.world.propagation.light.LightMerger;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -32,12 +30,12 @@ import java.util.stream.StreamSupport;
 public class LightMergerChunkTaskProvider implements Function<Chunk, ChunkTask>, ChunkTaskListener,
         ChunkInvalidationListener {
 
-    private final GeneratingChunkProvider chunkProvider;
+    private final ChunkProvider chunkProvider;
     private final ChunkProcessingPipeline pipeline;
     private final Set<Chunk> pending = Sets.newConcurrentHashSet();
     private final Map<Vector3i, Chunk> noticedChunkInProcessing = new ConcurrentHashMap<>();
 
-    public LightMergerChunkTaskProvider(GeneratingChunkProvider chunkProvider,
+    public LightMergerChunkTaskProvider(ChunkProvider chunkProvider,
                                         ChunkProcessingPipeline pipeline) {
         this.chunkProvider = chunkProvider;
         this.pipeline = pipeline;

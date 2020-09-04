@@ -22,7 +22,6 @@ import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.ChunkProvider;
 import org.terasology.world.chunks.event.BeforeChunkUnload;
 import org.terasology.world.chunks.event.OnChunkLoaded;
-import org.terasology.world.chunks.internal.GeneratingChunkProvider;
 import org.terasology.world.chunks.pipeline.ChunkProcessingPipeline;
 import org.terasology.world.chunks.pipeline.ChunkTask;
 import org.terasology.world.chunks.pipeline.LightMergerChunkTaskProvider;
@@ -31,7 +30,6 @@ import org.terasology.world.chunks.pipeline.tasks.GenerateInternalLightningChunk
 import org.terasology.world.chunks.pipeline.tasks.NotifyChunkTask;
 import org.terasology.world.internal.ChunkViewCore;
 import org.terasology.world.internal.ChunkViewCoreImpl;
-import org.terasology.world.propagation.light.LightMerger;
 
 import java.math.RoundingMode;
 import java.util.Collection;
@@ -43,7 +41,7 @@ import java.util.concurrent.BlockingQueue;
 /**
  * Provides chunks received from remote source (e.g. server)
  */
-public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvider {
+public class RemoteChunkProvider implements ChunkProvider {
 
     private static final Logger logger = LoggerFactory.getLogger(RemoteChunkProvider.class);
     private Map<Vector3i, Chunk> chunkCache = Maps.newHashMap();
@@ -206,11 +204,6 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
     @Override
     public void setWorldEntity(EntityRef entity) {
         this.worldEntity = entity;
-    }
-
-    @Override
-    public void onChunkIsReady(Chunk chunk) {
-      // unused
     }
 
 

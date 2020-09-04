@@ -35,6 +35,7 @@ import org.terasology.world.block.OnAddedBlocks;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkBlockIterator;
 import org.terasology.world.chunks.ChunkConstants;
+import org.terasology.world.chunks.ChunkProvider;
 import org.terasology.world.chunks.ManagedChunk;
 import org.terasology.world.chunks.blockdata.ExtraBlockDataManager;
 import org.terasology.world.chunks.event.BeforeChunkUnload;
@@ -43,7 +44,6 @@ import org.terasology.world.chunks.event.OnChunkLoaded;
 import org.terasology.world.chunks.event.PurgeWorldEvent;
 import org.terasology.world.chunks.internal.ChunkImpl;
 import org.terasology.world.chunks.internal.ChunkRelevanceRegion;
-import org.terasology.world.chunks.internal.GeneratingChunkProvider;
 import org.terasology.world.chunks.pipeline.ChunkProcessingPipeline;
 import org.terasology.world.chunks.pipeline.LightMergerChunkTaskProvider;
 import org.terasology.world.chunks.pipeline.SupplierChunkTask;
@@ -54,7 +54,6 @@ import org.terasology.world.generation.impl.EntityBufferImpl;
 import org.terasology.world.generator.WorldGenerator;
 import org.terasology.world.internal.ChunkViewCore;
 import org.terasology.world.internal.ChunkViewCoreImpl;
-import org.terasology.world.propagation.light.LightMerger;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -66,7 +65,7 @@ import java.util.concurrent.BlockingQueue;
 /**
  * Provides chunks. Chunks placed in this JVM. Also generated Chunks if needed
  */
-public class LocalChunkProvider implements GeneratingChunkProvider {
+public class LocalChunkProvider implements ChunkProvider {
 
     private static final Logger logger = LoggerFactory.getLogger(LocalChunkProvider.class);
     private static final int UNLOAD_PER_FRAME = 64;
@@ -434,11 +433,6 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
             }
             chunkRelevanceRegion.setUpToDate();
         }
-    }
-
-    @Override
-    public void onChunkIsReady(Chunk chunk) {
-        //readyChunks.offer(new ReadyChunkInfo(chunk, createBatchBlockEventMappings(chunk), Collections.emptyList()));
     }
 
     @Override
