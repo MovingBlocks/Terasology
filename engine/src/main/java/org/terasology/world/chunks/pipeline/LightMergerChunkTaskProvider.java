@@ -28,7 +28,7 @@ import java.util.stream.StreamSupport;
  * meets.
  */
 public class LightMergerChunkTaskProvider implements Function<Chunk, ChunkTask>, ChunkTaskListener,
-        ChunkInvalidationListener {
+        ChunkRemoveFromPipelineListener {
 
     private final ChunkProvider chunkProvider;
     private final ChunkProcessingPipeline pipeline;
@@ -96,7 +96,7 @@ public class LightMergerChunkTaskProvider implements Function<Chunk, ChunkTask>,
      * @param pos position of chunk
      */
     @Override
-    public void onInvalidation(Vector3i pos) {
+    public void onRemove(Vector3i pos) {
         noticedChunkInProcessing.remove(pos);
     }
 

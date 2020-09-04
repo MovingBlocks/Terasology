@@ -13,7 +13,6 @@ import org.terasology.world.chunks.pipeline.tasks.ChunkTaskListenerWrapper;
 
 import java.util.Comparator;
 import java.util.Deque;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -34,7 +33,7 @@ public class ChunkProcessingPipeline implements ChunkTaskListener {
     private final TaskMaster<ChunkTask> chunkProcessor;
     private final List<Function<Chunk, ChunkTask>> stages = new LinkedList<>();
     private final List<ChunkTaskListener> chunkTaskListeners = new LinkedList<>();
-    private final List<ChunkInvalidationListener> chunkInvalidationListeners = new LinkedList<>();
+    private final List<ChunkRemoveFromPipelineListener> chunkRemoveFromPipelineListeners = new LinkedList<>();
     private final Map<Chunk, Deque<Function<Chunk, ChunkTask>>> chunkNextStages = new ConcurrentHashMap<>();
     private final Set<org.joml.Vector3i> processingPositions = Sets.newConcurrentHashSet();
     private final Set<org.joml.Vector3i> invalidatedPositions = Sets.newConcurrentHashSet();
@@ -51,7 +50,7 @@ public class ChunkProcessingPipeline implements ChunkTaskListener {
 
     /**
      * Add stage to pipeline. If stage instance of {@link ChunkTaskListener} - it's will be register as listener. If
-     * stage instance of {@link ChunkInvalidationListener} - it's will be register as listener.
+     * stage instance of {@link ChunkRemoveFromPipelineListener} - it's will be register as listener.
      *
      * @param stage function for ChunkTask generating by Chunk.
      * @return self for Fluent api.
@@ -61,8 +60,8 @@ public class ChunkProcessingPipeline implements ChunkTaskListener {
         if (stage instanceof ChunkTaskListener) {
             addListener((ChunkTaskListener) stage);
         }
-        if (stage instanceof ChunkInvalidationListener) {
-            addListener((ChunkInvalidationListener) stage);
+        if (stage instanceof ChunkRemoveFromPipelineListener) {
+            addListener((ChunkRemoveFromPipelineListener) stage);
         }
         return this;
     }
@@ -84,8 +83,8 @@ public class ChunkProcessingPipeline implements ChunkTaskListener {
      * @param listener listener.
      * @return self for Fluent api.
      */
-    public ChunkProcessingPipeline addListener(ChunkInvalidationListener listener) {
-        chunkInvalidationListeners.add(listener);
+    public ChunkProcessingPipeline addListener(ChunkRemoveFromPipelineListener listener) {
+        chunkRemoveFromPipelineListeners.add(listener);
         return this;
     }
 
@@ -121,7 +120,7 @@ public class ChunkProcessingPipeline implements ChunkTaskListener {
         if (chunk.isReady() || invalidatedPositions.remove(position) || nextStage == null) {
             processingPositions.remove(position);
             chunkNextStages.remove(chunk);
-            chunkInvalidationListeners.forEach(l -> l.onInvalidation(position));
+            chunkRemoveFromPipelineListeners.forEach(l -> l.onRemove(position));
             return;
         }
         invokeStage(chunk, nextStage);
@@ -159,7 +158,7 @@ public class ChunkProcessingPipeline implements ChunkTaskListener {
     public void stopProcessingAt(Vector3i pos) {
         invalidatedPositions.add(pos);
         processingPositions.remove(pos);
-        chunkInvalidationListeners.forEach(l -> l.onInvalidation(pos));
+        chunkRemoveFromPipelineListeners.forEach(l -> l.onRemove(pos));
     }
 
     /**

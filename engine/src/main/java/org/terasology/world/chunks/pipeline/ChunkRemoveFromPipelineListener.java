@@ -7,13 +7,13 @@ import org.joml.Vector3i;
 import org.terasology.world.chunks.Chunk;
 
 /**
- * Notified on invalidation {@link Chunk} at position.
+ * Notified on removing {@link Chunk} from {@link ChunkProcessingPipeline} at position.
  */
 @FunctionalInterface
-public interface ChunkInvalidationListener {
+public interface ChunkRemoveFromPipelineListener {
     /**
      * Fire on invalidation chunk
      * @param pos position of chunk
      */
-    void onInvalidation(Vector3i pos);
+    void onRemove(Vector3i pos);
 }

@@ -63,7 +63,16 @@ import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 
 /**
- * Provides chunks. Chunks placed in this JVM. Also generated Chunks if needed
+ * Provides chunks. Chunks placed in this JVM. Also generated Chunks if needed.
+ * Loading/Unload chunks dependent on {@link RelevanceSystem}
+ * <p/>
+ * Produces events:
+ * {@link OnChunkGenerated} when chunk was generated {@link WorldGenerator}
+ * {@link OnChunkLoaded} when chunk was loaded from {@link StorageManager}
+ * {@link OnActivatedBlocks} when load/generate chunk and chunk have blocks with lifecycle (?) {@see  https://github.com/MovingBlocks/Terasology/issues/3244}
+ * {@link OnAddedBlocks} when load/generate chunk and chunk have blocks with lifecycle (?) {@see  https://github.com/MovingBlocks/Terasology/issues/3244}
+ * {@link BeforeChunkUnload} when chunk ready to remove from provider.
+ * {@link BeforeDeactivateBlocks} when chunk ready to remove and have block lifecycle.
  */
 public class LocalChunkProvider implements ChunkProvider {
 

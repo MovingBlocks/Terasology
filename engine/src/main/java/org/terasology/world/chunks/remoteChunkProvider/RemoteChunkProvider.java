@@ -39,7 +39,12 @@ import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 
 /**
- * Provides chunks received from remote source (e.g. server)
+ * Provides chunks received from remote source.
+ * Loading/Unload chunks dependent on {@link org.terasology.network.Server}
+ * <p/>
+ * Produce events:
+ * {@link OnChunkLoaded} when chunk received from server and processed.
+ * {@link BeforeChunkUnload} when {@link org.terasology.network.Server} send invalidate chunk and chunk removing
  */
 public class RemoteChunkProvider implements ChunkProvider {
 
@@ -88,7 +93,6 @@ public class RemoteChunkProvider implements ChunkProvider {
     public void invalidateChunks(Vector3i pos) {
         invalidateChunks.offer(pos);
     }
-
 
     @Override
     public void completeUpdate() {
