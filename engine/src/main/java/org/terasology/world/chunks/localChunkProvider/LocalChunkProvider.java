@@ -86,18 +86,7 @@ public class LocalChunkProvider implements ChunkProvider {
 
     private RelevanceSystem relevanceSystem;
 
-    //TODO Remove this old constructor at the end of the chunk overhaul
     public LocalChunkProvider(StorageManager storageManager, EntityManager entityManager, WorldGenerator generator,
-                              BlockManager blockManager, ExtraBlockDataManager extraDataManager) {
-        this(storageManager,
-                entityManager,
-                generator,
-                blockManager,
-                extraDataManager,
-                new ConcurrentMapChunkCache());
-    }
-
-    LocalChunkProvider(StorageManager storageManager, EntityManager entityManager, WorldGenerator generator,
                        BlockManager blockManager, ExtraBlockDataManager extraDataManager,
                        ChunkCache chunkCache) {
         this.storageManager = storageManager;

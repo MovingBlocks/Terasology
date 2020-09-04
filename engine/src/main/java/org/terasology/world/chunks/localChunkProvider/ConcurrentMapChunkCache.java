@@ -23,7 +23,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 
-class ConcurrentMapChunkCache implements ChunkCache {
+public class ConcurrentMapChunkCache implements ChunkCache {
 
     private Map<Vector3i, Chunk> cache = Maps.newConcurrentMap();
 

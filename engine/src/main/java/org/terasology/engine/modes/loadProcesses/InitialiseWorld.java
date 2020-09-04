@@ -52,6 +52,7 @@ import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.chunks.blockdata.ExtraBlockDataManager;
+import org.terasology.world.chunks.localChunkProvider.ConcurrentMapChunkCache;
 import org.terasology.world.chunks.localChunkProvider.LocalChunkProvider;
 import org.terasology.world.chunks.localChunkProvider.RelevanceSystem;
 import org.terasology.world.generator.UnresolvedWorldGeneratorException;
@@ -137,8 +138,12 @@ public class InitialiseWorld extends SingleStepLoadProcess {
             return true; // We need to return true, otherwise the loading state will just call us again immediately
         }
         context.put(StorageManager.class, storageManager);
-        LocalChunkProvider chunkProvider = new LocalChunkProvider(storageManager, entityManager, worldGenerator,
-                blockManager, extraDataManager);
+        LocalChunkProvider chunkProvider = new LocalChunkProvider(storageManager,
+                entityManager,
+                worldGenerator,
+                blockManager,
+                extraDataManager,
+                        new ConcurrentMapChunkCache());
         RelevanceSystem relevanceSystem = new RelevanceSystem(chunkProvider);
         context.put(RelevanceSystem.class, relevanceSystem);
         context.get(ComponentSystemManager.class).register(relevanceSystem, "engine:relevanceSystem");
