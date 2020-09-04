@@ -1,18 +1,5 @@
-/*
- * Copyright 2018 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.world.chunks.localChunkProvider;
 
 import org.junit.jupiter.api.AfterEach;
@@ -245,13 +232,30 @@ public class LocalChunkProviderTest {
     }
 
     @Test
-    public void testUnloadChunkAndDeactivationBlock() {
+    public void testUnloadChunkAndDeactivationBlock() throws InterruptedException {
         Vector3i chunkPosition = new Vector3i(0, 0, 0);
         blockAtBlockManager.setLifecycleEventsRequired(true);
         blockAtBlockManager.setEntity(mock(EntityRef.class));
 
         requestCreatingOrLoadingArea(chunkPosition);
         waitChunkReadyAt(chunkPosition);
+
+        //Wait BeforeDeactivateBlocks event
+        Assertions.assertTimeoutPreemptively(Duration.of(WAIT_CHUNK_IS_READY_IN_SECONDS, ChronoUnit.SECONDS),
+                () -> {
+                    ArgumentCaptor<Event> blockEventCaptor = ArgumentCaptor.forClass(Event.class);
+                    while (!blockEventCaptor.getAllValues()
+                            .stream()
+                            .filter((e) -> e instanceof BeforeDeactivateBlocks)
+                            .map((e) -> (BeforeDeactivateBlocks) e)
+                            .findFirst().isPresent()) {
+                        chunkProvider.beginUpdate();
+                        blockEventCaptor = ArgumentCaptor.forClass(Event.class);
+                        verify(blockAtBlockManager.getEntity(), atLeast(1)).send(blockEventCaptor.capture());
+
+                    }
+                }
+        );
 
         final ArgumentCaptor<Event> eventArgumentCaptor = ArgumentCaptor.forClass(Event.class);
         verify(worldEntity, atLeast(1)).send(eventArgumentCaptor.capture());
@@ -270,8 +274,7 @@ public class LocalChunkProviderTest {
         //TODO, it is not clear if the activate/addedBlocks event logic is correct.
         //See https://github.com/MovingBlocks/Terasology/issues/3244
         final ArgumentCaptor<Event> blockEventCaptor = ArgumentCaptor.forClass(Event.class);
-        verify(blockAtBlockManager.getEntity(), atLeast(1)).send(blockEventCaptor.capture());
-
+        verify(blockAtBlockManager.getEntity(), atLeast(2)).send(blockEventCaptor.capture());
         Optional<BeforeDeactivateBlocks> beforeDeactivateBlocks = blockEventCaptor.getAllValues()
                 .stream()
                 .filter((e) -> e instanceof BeforeDeactivateBlocks)
@@ -283,12 +286,12 @@ public class LocalChunkProviderTest {
                 "BeforeDeactivateBlocks must have block count more then zero");
     }
 
-
     private void waitChunkReadyAt(Vector3i chunkPosition) {
         Assertions.assertTimeoutPreemptively(Duration.of(WAIT_CHUNK_IS_READY_IN_SECONDS, ChronoUnit.SECONDS),
                 () -> {
-                    while (chunkCache.get(chunkPosition) == null) {}
-                    while (!chunkCache.get(chunkPosition).isReady()) {}
+                    while (chunkCache.get(chunkPosition) == null || !chunkCache.get(chunkPosition).isReady()) {
+                        Thread.yield();
+                    }
                 });
     }
 
