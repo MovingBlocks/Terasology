@@ -21,6 +21,7 @@ import org.joml.Vector2fc;
 import org.joml.Vector3fc;
 import org.joml.Vector4fc;
 import org.terasology.gestalt.assets.AssetType;
+import org.terasology.gestalt.assets.DisposableResource;
 import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.math.geom.Matrix3f;
 import org.terasology.math.geom.Matrix4f;
@@ -35,8 +36,8 @@ import java.nio.FloatBuffer;
 
 public abstract class BaseMaterial extends Material {
 
-    protected BaseMaterial(ResourceUrn urn, AssetType<?, MaterialData> assetType) {
-        super(urn, assetType);
+    protected BaseMaterial(ResourceUrn urn, AssetType<?, MaterialData> assetType, DisposableResource disposableHook) {
+        super(urn, assetType, disposableHook);
     }
 
     @Override

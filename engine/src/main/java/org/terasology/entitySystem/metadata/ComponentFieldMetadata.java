@@ -15,15 +15,13 @@
  */
 package org.terasology.entitySystem.metadata;
 
-import org.terasology.reflection.copy.CopyStrategyLibrary;
-import org.terasology.reflection.copy.strategy.EntityCopyStrategy;
-import org.terasology.reflection.metadata.ClassMetadata;
-import org.terasology.reflection.copy.CopyStrategy;
-import org.terasology.reflection.reflect.InaccessibleFieldException;
-import org.terasology.reflection.reflect.ReflectFactory;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.Owns;
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.reflection.copy.CopyStrategy;
+import org.terasology.reflection.metadata.ClassMetadata;
+import org.terasology.reflection.reflect.InaccessibleFieldException;
+import org.terasology.reflection.reflect.ReflectFactory;
 import org.terasology.utilities.ReflectionUtil;
 
 import java.lang.reflect.Field;
@@ -41,16 +39,16 @@ public class ComponentFieldMetadata<T extends Component, U> extends ReplicatedFi
 
     private CopyStrategy<U> copyWithOwnedEntitiesStrategy;
 
-    public ComponentFieldMetadata(ClassMetadata<T, ?> owner, Field field, CopyStrategyLibrary copyStrategyLibrary, ReflectFactory factory, boolean replicatedByDefault)
+    public ComponentFieldMetadata(ClassMetadata<T, ?> owner, Field field, CopyStrategy<U> copyStrategy, ReflectFactory factory, boolean replicatedByDefault)
             throws InaccessibleFieldException {
-        super(owner, field, copyStrategyLibrary, factory, replicatedByDefault);
+        super(owner, field, copyStrategy, factory, replicatedByDefault);
         ownedReference = field.getAnnotation(Owns.class) != null && (EntityRef.class.isAssignableFrom(field.getType())
                 || isCollectionOf(EntityRef.class, field.getGenericType()));
-        if (ownedReference) {
-            copyWithOwnedEntitiesStrategy = (CopyStrategy<U>) copyStrategyLibrary.createCopyOfLibraryWithStrategy(EntityRef.class, EntityCopyStrategy.INSTANCE).getStrategy(field.getGenericType());
-        } else {
+//        if (ownedReference) { // TODO check it - gestalt v7
+//            copyWithOwnedEntitiesStrategy = (CopyStrategy<U>) copyStrategy.createCopyOfLibraryWithStrategy(EntityRef.class, EntityCopyStrategy.INSTANCE).getStrategy(field.getGenericType());
+//        } else {
             copyWithOwnedEntitiesStrategy = copyStrategy;
-        }
+//        }
     }
 
     /**

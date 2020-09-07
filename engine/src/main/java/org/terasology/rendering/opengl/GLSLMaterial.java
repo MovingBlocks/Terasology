@@ -34,6 +34,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.GameThread;
 import org.terasology.gestalt.assets.AssetType;
+import org.terasology.gestalt.assets.DisposableResource;
 import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.math.MatrixUtils;
 import org.terasology.math.geom.Matrix3f;
@@ -56,31 +57,30 @@ import java.util.Set;
 public class GLSLMaterial extends BaseMaterial {
 
     private static final Logger logger = LoggerFactory.getLogger(GLSLMaterial.class);
-
+    private final ShaderManager shaderManager;
     private int textureIndex;
-
     private TObjectIntMap<String> bindMap = new TObjectIntHashMap<>();
     private TIntObjectMap<Texture> textureMap = new TIntObjectHashMap<>();
-
     private GLSLShader shader;
     private boolean activeFeaturesChanged;
     private TObjectIntMap<UniformId> uniformLocationMap = new TObjectIntHashMap<>();
-
-    private EnumSet<ShaderProgramFeature> activeFeatures = Sets.newEnumSet(Collections.emptyList(), ShaderProgramFeature.class);
+    private EnumSet<ShaderProgramFeature> activeFeatures = Sets.newEnumSet(Collections.emptyList(),
+            ShaderProgramFeature.class);
     private int activeFeaturesMask;
-
-    private final ShaderManager shaderManager;
-
     private DisposalAction disposalAction;
     private MaterialData materialData;
 
-    public GLSLMaterial(ResourceUrn urn, AssetType<?, MaterialData> assetType, MaterialData data) {
-        super(urn, assetType);
-        disposalAction = new DisposalAction(urn);
-        getDisposalHook().setDisposeAction(disposalAction);
+    public GLSLMaterial(ResourceUrn urn, AssetType<?, MaterialData> assetType, MaterialData data,
+                        DisposalAction disposalAction) {
+        super(urn, assetType, disposalAction);
+        this.disposalAction = disposalAction;
         this.materialData = data;
         shaderManager = CoreRegistry.get(ShaderManager.class);
         reload(data);
+    }
+
+    public static GLSLMaterial create(ResourceUrn urn, AssetType<?, MaterialData> assetType, MaterialData data) {
+        return new GLSLMaterial(urn, assetType, data, new DisposalAction(urn));
     }
 
     @Override
@@ -150,7 +150,7 @@ public class GLSLMaterial extends BaseMaterial {
     public final void doReload(MaterialData data) {
         try {
             GameThread.synch(() -> {
-                disposalAction.run();
+                disposalAction.close();
                 uniformLocationMap.clear();
 
                 shader = (GLSLShader) data.getShader();
@@ -231,7 +231,8 @@ public class GLSLMaterial extends BaseMaterial {
             activeFeaturesMask = ShaderProgramFeature.getBitset(activeFeatures);
             activeFeaturesChanged = true;
         } else {
-            logger.error("Attempt to activate unsupported feature {} for material {} using shader {}", feature, getUrn(), shader.getUrn());
+            logger.error("Attempt to activate unsupported feature {} for material {} using shader {}", feature,
+                    getUrn(), shader.getUrn());
         }
     }
 
@@ -678,7 +679,7 @@ public class GLSLMaterial extends BaseMaterial {
         }
     }
 
-    private static class DisposalAction implements Runnable {
+    private static class DisposalAction implements DisposableResource {
 
         private final ResourceUrn urn;
 
@@ -690,9 +691,9 @@ public class GLSLMaterial extends BaseMaterial {
         }
 
         @Override
-        public void run() {
+        public void close() {
             try {
-                GameThread.synch(() -> {
+                GameThread.synch(() -> { // TODO: check that needs - gestalt v7
                     logger.debug("Disposing material {}.", urn);
                     TIntIntIterator it = shaderPrograms.iterator();
                     while (it.hasNext()) {

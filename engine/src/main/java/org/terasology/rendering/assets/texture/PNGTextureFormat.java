@@ -20,21 +20,22 @@ import de.matthiasmann.twl.utils.PNGDecoder;
 import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.gestalt.assets.format.AbstractAssetFileFormat;
 import org.terasology.gestalt.assets.format.AssetDataFile;
+import org.terasology.gestalt.module.resources.FileReference;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
-import java.nio.file.PathMatcher;
 import java.util.List;
+import java.util.function.Predicate;
 
 /**
  */
 public class PNGTextureFormat extends AbstractAssetFileFormat<TextureData> {
 
     private Texture.FilterMode defaultFilterMode;
-    private PathMatcher pathMatcher;
+    private Predicate<FileReference> pathMatcher;
 
-    public PNGTextureFormat(Texture.FilterMode defaultFilterMode, PathMatcher pathMatcher) {
+    public PNGTextureFormat(Texture.FilterMode defaultFilterMode, Predicate<FileReference> pathMatcher) {
         super("png");
         this.defaultFilterMode = defaultFilterMode;
         this.pathMatcher = pathMatcher;
@@ -62,7 +63,7 @@ public class PNGTextureFormat extends AbstractAssetFileFormat<TextureData> {
     }
 
     @Override
-    public PathMatcher getFileMatcher() {
-        return path -> super.getFileMatcher().matches(path) && pathMatcher.matches(path);
+    public Predicate<FileReference> getFileMatcher() {
+        return path -> super.getFileMatcher().test(path) && pathMatcher.test(path);
     }
 }

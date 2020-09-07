@@ -16,17 +16,13 @@
 
 package org.terasology.engine.module;
 
-import com.google.gson.stream.JsonReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.engine.TerasologyConstants;
-import org.terasology.gestalt.module.ModuleMetadata;
 import org.terasology.gestalt.module.ModuleMetadataJsonAdapter;
 import org.terasology.gestalt.module.ModuleRegistry;
 import org.terasology.gestalt.module.TableModuleRegistry;
 
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.concurrent.Callable;
 
@@ -55,24 +51,25 @@ public class ModuleListDownloader implements Callable<ModuleRegistry> {
 
         TableModuleRegistry modules = new TableModuleRegistry();
         URL url = new URL("http", serverAddress, "/modules/list/latest");
-        try (JsonReader reader = new JsonReader(new InputStreamReader(url.openStream(), TerasologyConstants.CHARSET))) {
-
-            logger.info("Parsing content ..");
-
-            reader.beginArray();
-
-            while (reader.hasNext()) {
-                ModuleMetadata meta = metaReader.read(reader);
-                logger.debug("Read module {} - {}", meta.getId(), meta.getVersion());
-                RemoteModule remoteModule = new RemoteModule(meta);
-                modules.add(remoteModule);
-            }
-
-            reader.endArray();
-
-            int count = modules.size();
-            logger.info(String.format("Retrieved %d %s", count, (count == 1) ? "entry" : "entries"));
-        }
+        //FIXME: reimplement we haven't BaseModule now - gestalt v7
+//        try (JsonReader reader = new JsonReader(new InputStreamReader(url.openStream(), TerasologyConstants.CHARSET))) {
+//
+//            logger.info("Parsing content ..");
+//
+//            reader.beginArray();
+//
+//            while (reader.hasNext()) {
+//                ModuleMetadata meta = metaReader.read(reader);
+//                logger.debug("Read module {} - {}", meta.getId(), meta.getVersion());
+//                RemoteModule remoteModule = new RemoteModule(meta);
+//                modules.add(remoteModule);
+//            }
+//
+//            reader.endArray();
+//
+//            int count = modules.size();
+//            logger.info(String.format("Retrieved %d %s", count, (count == 1) ? "entry" : "entries"));
+//        }
         return modules;
     }
 }

@@ -27,7 +27,7 @@ import org.terasology.engine.module.ModuleManager;
 import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.gestalt.assets.exceptions.InvalidUrnException;
 import org.terasology.gestalt.assets.format.AssetDataFile;
-import org.terasology.gestalt.module.PathModule;
+import org.terasology.gestalt.module.resources.DirectoryFileSource;
 import org.terasology.gestalt.naming.Name;
 import org.terasology.input.Keyboard;
 import org.terasology.input.device.KeyboardDevice;
@@ -57,6 +57,7 @@ import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 
@@ -342,14 +343,16 @@ public abstract class AbstractEditorScreen extends CoreScreenLayer {
     protected Path getPath(AssetDataFile source) {
         List<String> path = source.getPath();
         Name moduleName = new Name(path.get(0));
-        if (moduleManager.getEnvironment().get(moduleName) instanceof PathModule) {
+        if (moduleManager.getEnvironment().get(moduleName).getResources() instanceof DirectoryFileSource) {
             path.add(source.getFilename());
             String[] pathArray = path.toArray(new String[path.size()]);
 
             // Copy all the elements after the first to a separate array for getPath().
             String first = pathArray[0];
             String[] more = Arrays.copyOfRange(pathArray, 1, pathArray.length);
-            return moduleManager.getEnvironment().getFileSystem().getPath(first, more);
+            return Paths.get("", moduleManager.getEnvironment().getResources()
+                    .getFile(first, more)
+                    .orElseThrow(()-> new RuntimeException("Cannot get path for "+source.getFilename())).getPath().stream().toArray(String[]::new));
         }
         return null;
     }

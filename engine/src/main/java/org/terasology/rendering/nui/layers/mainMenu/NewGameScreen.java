@@ -29,6 +29,7 @@ import org.terasology.game.GameManifest;
 import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.gestalt.module.Module;
 import org.terasology.gestalt.module.dependencyresolution.DependencyResolver;
+import org.terasology.gestalt.module.resources.DirectoryFileSource;
 import org.terasology.gestalt.naming.Name;
 import org.terasology.i18n.TranslationSystem;
 import org.terasology.input.Keyboard;
@@ -198,7 +199,7 @@ public class NewGameScreen extends CoreScreenLayer {
         List<Module> gameplayModules = Lists.newArrayList();
         for (Name moduleId : moduleManager.getRegistry().getModuleIds()) {
             Module latestVersion = moduleManager.getRegistry().getLatestModuleVersion(moduleId);
-            if (!latestVersion.isOnClasspath()) {
+            if (!(latestVersion.getResources() instanceof DirectoryFileSource)) {
                 if (StandardModuleExtension.isGameplayModule(latestVersion)) {
                     gameplayModules.add(latestVersion);
                 }

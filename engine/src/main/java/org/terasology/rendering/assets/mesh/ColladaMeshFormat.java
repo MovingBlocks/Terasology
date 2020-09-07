@@ -26,8 +26,8 @@ import org.terasology.gestalt.assets.module.annotations.RegisterAssetFileFormat;
 import org.terasology.rendering.collada.ColladaLoader;
 import org.terasology.rendering.collada.ColladaParseException;
 
-import java.io.BufferedInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
 /**
@@ -53,7 +53,7 @@ public class ColladaMeshFormat extends AbstractAssetFileFormat<MeshData> {
 
         ColladaLoader loader = new ColladaLoader();
 
-        try (BufferedInputStream stream = inputs.get(0).openStream()) {
+        try (InputStream stream = inputs.get(0).openStream()) {
             loader.parseMeshData(stream);
         } catch (ColladaParseException e) {
             throw new IOException("Error loading collada mesh for " + urn, e);

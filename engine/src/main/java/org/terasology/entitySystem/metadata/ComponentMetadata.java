@@ -21,6 +21,7 @@ import com.google.common.collect.Lists;
 import org.terasology.entitySystem.Component;
 import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.network.Replicate;
+import org.terasology.reflection.copy.CopyStrategy;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.metadata.ClassMetadata;
 import org.terasology.reflection.reflect.InaccessibleFieldException;
@@ -79,8 +80,8 @@ public class ComponentMetadata<T extends Component> extends ClassMetadata<T, Com
     }
 
     @Override
-    protected ComponentFieldMetadata<T, ?> createField(Field field, CopyStrategyLibrary copyStrategyLibrary, ReflectFactory factory) throws InaccessibleFieldException {
-        return new ComponentFieldMetadata<>(this, field, copyStrategyLibrary, factory, false);
+    protected <V> ComponentFieldMetadata<T, V> createField(Field field, CopyStrategy<V> copyStrategy, ReflectFactory factory) throws InaccessibleFieldException {
+        return new ComponentFieldMetadata<>(this, field, copyStrategy, factory, false);
     }
 
     /**
@@ -136,9 +137,9 @@ public class ComponentMetadata<T extends Component> extends ClassMetadata<T, Com
      * @return A copy of the given object
      */
     public T copyWithOwnedEntities(T object) {
-        T result = constructor.construct();
+        T result = newInstance();
         if (result != null) {
-            for (ComponentFieldMetadata<T,?> field : fields.values()) {
+            for (ComponentFieldMetadata<T,?> field : getFields()) {
                 field.setValue(result, field.getCopyOfValueWithOwnedEntities(object));
             }
         }

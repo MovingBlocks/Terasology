@@ -18,6 +18,7 @@ package org.terasology.engine.module;
 
 import org.terasology.gestalt.module.Module;
 import org.terasology.gestalt.module.ModuleEnvironment;
+import org.terasology.gestalt.module.ModuleFactory;
 import org.terasology.gestalt.module.ModuleMetadataJsonAdapter;
 import org.terasology.gestalt.module.ModuleRegistry;
 
@@ -37,4 +38,6 @@ public interface ModuleManager {
     ModuleEnvironment loadEnvironment(Set<Module> modules, boolean asPrimary);
 
     ModuleMetadataJsonAdapter getModuleMetadataReader();
+
+    ModuleFactory getModuleFactory();
 }

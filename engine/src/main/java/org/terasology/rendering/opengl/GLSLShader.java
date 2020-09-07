@@ -33,6 +33,7 @@ import org.terasology.engine.GameThread;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.gestalt.assets.AssetType;
+import org.terasology.gestalt.assets.DisposableResource;
 import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.assets.shader.Shader;
@@ -63,11 +64,7 @@ import java.util.Set;
 public class GLSLShader extends Shader {
 
     private static final Logger logger = LoggerFactory.getLogger(GLSLShader.class);
-
-    // TODO this should be handled another way, we need to get ssao parameters here
-    public int ssaoKernelElements = 32;
     public static int ssaoNoiseSize = 4;
-
     private static String includedFunctionsVertex = "";
     private static String includedFunctionsFragment = "";
     private static String includedDefines = "";
@@ -75,10 +72,14 @@ public class GLSLShader extends Shader {
 
     static {
         try (
-                InputStreamReader vertStream = getInputStreamReaderFromResource("org/terasology/include/globalFunctionsVertIncl.glsl");
-                InputStreamReader fragStream = getInputStreamReaderFromResource("org/terasology/include/globalFunctionsFragIncl.glsl");
-                InputStreamReader uniformsStream = getInputStreamReaderFromResource("org/terasology/include/globalUniformsIncl.glsl");
-                InputStreamReader definesStream = getInputStreamReaderFromResource("org/terasology/include/globalDefinesIncl.glsl")
+                InputStreamReader vertStream = getInputStreamReaderFromResource("org/terasology/include" +
+                        "/globalFunctionsVertIncl.glsl");
+                InputStreamReader fragStream = getInputStreamReaderFromResource("org/terasology/include" +
+                        "/globalFunctionsFragIncl.glsl");
+                InputStreamReader uniformsStream = getInputStreamReaderFromResource("org/terasology/include" +
+                        "/globalUniformsIncl.glsl");
+                InputStreamReader definesStream = getInputStreamReaderFromResource("org/terasology/include" +
+                        "/globalDefinesIncl.glsl")
         ) {
             includedFunctionsVertex = CharStreams.toString(vertStream);
             includedFunctionsFragment = CharStreams.toString(fragStream);
@@ -89,20 +90,24 @@ public class GLSLShader extends Shader {
         }
     }
 
-    private EnumSet<ShaderProgramFeature> availableFeatures = Sets.newEnumSet(Collections.emptyList(), ShaderProgramFeature.class);
-
+    private final DisposalAction disposalAction;
+    // TODO this should be handled another way, we need to get ssao parameters here
+    public int ssaoKernelElements = 32;
+    private EnumSet<ShaderProgramFeature> availableFeatures = Sets.newEnumSet(Collections.emptyList(),
+            ShaderProgramFeature.class);
     private ShaderData shaderProgramBase;
     private Map<String, ShaderParameterMetadata> parameters = Maps.newHashMap();
-
     private Config config = CoreRegistry.get(Config.class);
 
-    private DisposalAction disposalAction;
-
-    public GLSLShader(ResourceUrn urn, AssetType<?, ShaderData> assetType, ShaderData data) {
-        super(urn, assetType);
-        disposalAction = new DisposalAction(urn);
-        getDisposalHook().setDisposeAction(disposalAction);
+    public GLSLShader(ResourceUrn urn, AssetType<?, ShaderData> assetType, ShaderData data,
+                      DisposalAction disposalAction) {
+        super(urn, assetType, disposalAction);
+        this.disposalAction = disposalAction;
         reload(data);
+    }
+
+    public static GLSLShader create(ResourceUrn urn, AssetType<?, ShaderData> assetType, ShaderData data) {
+        return new GLSLShader(urn, assetType, data, new DisposalAction(urn));
     }
 
     private static InputStreamReader getInputStreamReaderFromResource(String resource) {
@@ -255,8 +260,8 @@ public class GLSLShader extends Shader {
     }
 
     /**
-     * Compiles all combination of available features and stores them in two maps for
-     * lookup based on a unique hash of features.
+     * Compiles all combination of available features and stores them in two maps for lookup based on a unique hash of
+     * features.
      */
     private void registerAllShaderPermutations() {
         Set<Set<ShaderProgramFeature>> allPermutations = Sets.powerSet(availableFeatures);
@@ -356,7 +361,8 @@ public class GLSLShader extends Shader {
     }
 
     private String getLogInfo(int shaderId) {
-        int length = ARBShaderObjects.glGetObjectParameteriARB(shaderId, ARBShaderObjects.GL_OBJECT_INFO_LOG_LENGTH_ARB);
+        int length = ARBShaderObjects.glGetObjectParameteriARB(shaderId,
+                ARBShaderObjects.GL_OBJECT_INFO_LOG_LENGTH_ARB);
 
         if (length > 0) {
             return ARBShaderObjects.glGetInfoLogARB(shaderId, length);
@@ -366,9 +372,12 @@ public class GLSLShader extends Shader {
     }
 
     private boolean compileSuccess(int shaderId) {
-        int compileStatus = ARBShaderObjects.glGetObjectParameteriARB(shaderId, ARBShaderObjects.GL_OBJECT_COMPILE_STATUS_ARB);
-        //int linkStatus = ARBShaderObjects.glGetObjectParameteriARB(shaderId, ARBShaderObjects.GL_OBJECT_LINK_STATUS_ARB);
-        //int validateStatus = ARBShaderObjects.glGetObjectParameteriARB(shaderId, ARBShaderObjects.GL_OBJECT_VALIDATE_STATUS_ARB);
+        int compileStatus = ARBShaderObjects.glGetObjectParameteriARB(shaderId,
+                ARBShaderObjects.GL_OBJECT_COMPILE_STATUS_ARB);
+        //int linkStatus = ARBShaderObjects.glGetObjectParameteriARB(shaderId, ARBShaderObjects
+        // .GL_OBJECT_LINK_STATUS_ARB);
+        //int validateStatus = ARBShaderObjects.glGetObjectParameteriARB(shaderId, ARBShaderObjects
+        // .GL_OBJECT_VALIDATE_STATUS_ARB);
 
 
         if (compileStatus == 0 /*|| linkStatus == 0 || validateStatus == 0*/) {
@@ -403,7 +412,7 @@ public class GLSLShader extends Shader {
         }
     }
 
-    private static class DisposalAction implements Runnable {
+    private static class DisposalAction implements DisposableResource {
 
         private final ResourceUrn urn;
 
@@ -417,7 +426,7 @@ public class GLSLShader extends Shader {
         }
 
         @Override
-        public void run() {
+        public void close() {
             logger.debug("Disposing shader {}.", urn);
             try {
                 GameThread.synch(this::disposeData);

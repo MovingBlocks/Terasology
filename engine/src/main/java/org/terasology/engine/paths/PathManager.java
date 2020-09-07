@@ -19,9 +19,11 @@ package org.terasology.engine.paths;
 import com.google.common.collect.ImmutableList;
 import com.sun.jna.platform.win32.KnownFolders;
 import com.sun.jna.platform.win32.Shell32Util;
-
 import org.lwjgl.LWJGLUtil;
+import org.terasology.context.Context;
+import org.terasology.engine.subsystem.DisplayDevice;
 
+import javax.swing.JFileChooser;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -30,10 +32,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
-
-import javax.swing.JFileChooser;
-import org.terasology.context.Context;
-import org.terasology.engine.subsystem.DisplayDevice;
+import java.util.stream.Collectors;
 
 
 /**
@@ -268,6 +267,10 @@ public final class PathManager {
      */
     public List<Path> getModulePaths() {
         return modPaths;
+    }
+
+    public List<File> getModulePathFiles() {
+        return modPaths.stream().map(Path::toFile).collect(Collectors.toList());
     }
 
     /**

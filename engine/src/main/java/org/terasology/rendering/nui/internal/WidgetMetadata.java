@@ -19,6 +19,7 @@ import com.google.common.base.Predicate;
 import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.nui.LayoutConfig;
 import org.terasology.nui.UIWidget;
+import org.terasology.reflection.copy.CopyStrategy;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.metadata.ClassMetadata;
 import org.terasology.reflection.metadata.FieldMetadata;
@@ -45,7 +46,7 @@ public class WidgetMetadata<T extends UIWidget> extends ClassMetadata<T, FieldMe
     }
 
     @Override
-    protected FieldMetadata<T, ?> createField(Field field, CopyStrategyLibrary copyStrategyLibrary, ReflectFactory factory) throws InaccessibleFieldException {
+    protected <V> FieldMetadata<T, ?> createField(Field field, CopyStrategy<V> copyStrategyLibrary, ReflectFactory factory) throws InaccessibleFieldException {
         return new FieldMetadata<>(this, field, copyStrategyLibrary, factory);
     }
 

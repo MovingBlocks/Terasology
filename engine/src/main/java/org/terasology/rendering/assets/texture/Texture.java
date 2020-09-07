@@ -17,6 +17,7 @@
 package org.terasology.rendering.assets.texture;
 
 import org.terasology.gestalt.assets.AssetType;
+import org.terasology.gestalt.assets.DisposableResource;
 import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.math.geom.Rect2f;
 
@@ -26,8 +27,8 @@ public abstract class Texture extends TextureRegionAsset<TextureData> {
 
     public static final Rect2f FULL_TEXTURE_REGION = Rect2f.createFromMinAndSize(0, 0, 1, 1);
 
-    protected Texture(ResourceUrn urn, AssetType<?, TextureData> assetType) {
-        super(urn, assetType);
+    protected Texture(ResourceUrn urn, AssetType<?, TextureData> assetType, DisposableResource disposableResource) {
+        super(urn, assetType,disposableResource);
     }
 
     public enum WrapMode {
@@ -59,8 +60,8 @@ public abstract class Texture extends TextureRegionAsset<TextureData> {
 
     public abstract boolean isLoaded();
 
-    public abstract void subscribeToDisposal(Runnable subscriber);
+    public abstract void subscribeToDisposal(DisposableResource subscriber);
 
-    public abstract void unsubscribeToDisposal(Runnable subscriber);
+    public abstract void unsubscribeToDisposal(DisposableResource subscriber);
 
 }

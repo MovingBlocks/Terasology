@@ -35,34 +35,25 @@ import org.terasology.engine.GameThread;
 import org.terasology.engine.modes.GameState;
 import org.terasology.engine.subsystem.DisplayDevice;
 import org.terasology.engine.subsystem.RenderingSubsystemFactory;
-import org.terasology.gestalt.assets.AssetFactory;
-import org.terasology.gestalt.assets.module.ModuleAssetDataProducer;
+import org.terasology.gestalt.assets.AssetType;
 import org.terasology.gestalt.assets.module.ModuleAwareAssetTypeManager;
 import org.terasology.nui.canvas.CanvasRenderer;
 import org.terasology.rendering.ShaderManager;
 import org.terasology.rendering.ShaderManagerLwjgl;
 import org.terasology.rendering.assets.animation.MeshAnimation;
-import org.terasology.rendering.assets.animation.MeshAnimationData;
 import org.terasology.rendering.assets.animation.MeshAnimationImpl;
 import org.terasology.rendering.assets.atlas.Atlas;
-import org.terasology.rendering.assets.atlas.AtlasData;
 import org.terasology.rendering.assets.font.Font;
-import org.terasology.rendering.assets.font.FontData;
 import org.terasology.rendering.assets.font.FontImpl;
 import org.terasology.rendering.assets.material.Material;
-import org.terasology.rendering.assets.material.MaterialData;
 import org.terasology.rendering.assets.mesh.Mesh;
-import org.terasology.rendering.assets.mesh.MeshData;
 import org.terasology.rendering.assets.shader.Shader;
-import org.terasology.rendering.assets.shader.ShaderData;
 import org.terasology.rendering.assets.skeletalmesh.SkeletalMesh;
-import org.terasology.rendering.assets.skeletalmesh.SkeletalMeshData;
 import org.terasology.rendering.assets.texture.PNGTextureFormat;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.TextureData;
 import org.terasology.rendering.assets.texture.TextureUtil;
 import org.terasology.rendering.assets.texture.subtexture.Subtexture;
-import org.terasology.rendering.assets.texture.subtexture.SubtextureData;
 import org.terasology.rendering.nui.internal.LwjglCanvasRenderer;
 import org.terasology.rendering.opengl.GLSLMaterial;
 import org.terasology.rendering.opengl.GLSLShader;
@@ -95,6 +86,8 @@ import static org.lwjgl.opengl.GL11.glViewport;
 
 public class LwjglGraphics extends BaseLwjglSubsystem {
     private static final Logger logger = LoggerFactory.getLogger(LwjglGraphics.class);
+    @Deprecated // TODO: to remove gestalt v7
+    private static final String OVERRIDE_FOLDER = "override";
 
     private GLBufferPool bufferPool = new GLBufferPool(false);
 
@@ -126,40 +119,35 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
     public void registerCoreAssetTypes(ModuleAwareAssetTypeManager assetTypeManager) {
 
         // cast lambdas explicitly to avoid inconsistent compiler behavior wrt. type inference
-        assetTypeManager.registerCoreAssetType(Font.class,
-                (AssetFactory<Font, FontData>) FontImpl::new, "fonts");
-        assetTypeManager.registerCoreAssetType(Texture.class, (AssetFactory<Texture, TextureData>)
-                (urn, assetType, data) -> (new OpenGLTexture(urn, assetType, data, this)), "textures", "fonts");
-        assetTypeManager.registerCoreFormat(Texture.class,
+        assetTypeManager.createAssetType(Font.class, FontImpl::new, "fonts");
+        AssetType<Texture, TextureData> texture = assetTypeManager.createAssetType(Texture.class,
+                (urn, assetType, data) -> (OpenGLTexture.create(urn, assetType, data, this)), "textures", "fonts");
+        assetTypeManager.getAssetFileDataProducer(texture).addAssetFormat(
                 new PNGTextureFormat(Texture.FilterMode.NEAREST, path -> {
-                    if (path.getName(1).toString().equals(ModuleAssetDataProducer.OVERRIDE_FOLDER)) {
-                        return path.getName(3).toString().equals("textures");
+                    if (path.getPath().get(1).equals(OVERRIDE_FOLDER)) {
+                        return path.getPath().get(3).equals("textures");
                     } else {
-                        return path.getName(2).toString().equals("textures");
+                        return path.getPath().get(2).equals("textures");
                     }
-                    }));
-        assetTypeManager.registerCoreFormat(Texture.class,
+                })
+        );
+        assetTypeManager.getAssetFileDataProducer(texture).addAssetFormat(
                 new PNGTextureFormat(Texture.FilterMode.LINEAR, path -> {
-                    if (path.getName(1).toString().equals(ModuleAssetDataProducer.OVERRIDE_FOLDER)) {
-                        return path.getName(3).toString().equals("fonts");
+                    if (path.getPath().get(1).equals(OVERRIDE_FOLDER)) {
+                        return path.getPath().get(3).equals("fonts");
                     } else {
-                        return path.getName(2).toString().equals("fonts");
+                        return path.getPath().get(2).equals("fonts");
                     }
                 }));
-        assetTypeManager.registerCoreAssetType(Shader.class,
-                (AssetFactory<Shader, ShaderData>) GLSLShader::new, "shaders");
-        assetTypeManager.registerCoreAssetType(Material.class,
-                (AssetFactory<Material, MaterialData>) GLSLMaterial::new, "materials");
-        assetTypeManager.registerCoreAssetType(Mesh.class, (AssetFactory<Mesh, MeshData>)
-                (urn, assetType, data) -> new OpenGLMesh(urn, assetType, bufferPool, data), "mesh");
-        assetTypeManager.registerCoreAssetType(SkeletalMesh.class, (AssetFactory<SkeletalMesh, SkeletalMeshData>)
-                (urn, assetType, data) -> new OpenGLSkeletalMesh(urn, assetType, data, bufferPool), "skeletalMesh");
-        assetTypeManager.registerCoreAssetType(MeshAnimation.class,
-                (AssetFactory<MeshAnimation, MeshAnimationData>) MeshAnimationImpl::new, "animations");
-        assetTypeManager.registerCoreAssetType(Atlas.class,
-                (AssetFactory<Atlas, AtlasData>) Atlas::new, "atlas");
-        assetTypeManager.registerCoreAssetType(Subtexture.class,
-                (AssetFactory<Subtexture, SubtextureData>) Subtexture::new);
+        assetTypeManager.createAssetType(Shader.class, GLSLShader::create, "shaders");
+        assetTypeManager.createAssetType(Material.class, GLSLMaterial::create, "materials");
+        assetTypeManager.createAssetType(Mesh.class,
+                (urn, assetType, data) ->OpenGLMesh.create(urn, assetType, bufferPool, data), "mesh");
+        assetTypeManager.createAssetType(SkeletalMesh.class, (
+                urn, assetType, data) -> OpenGLSkeletalMesh.create(urn, assetType, data, bufferPool), "skeletalMesh");
+        assetTypeManager.createAssetType(MeshAnimation.class, MeshAnimationImpl::new, "animations");
+        assetTypeManager.createAssetType(Atlas.class, Atlas::new, "atlas");
+        assetTypeManager.createAssetType(Subtexture.class, Subtexture::new);
     }
 
     @Override

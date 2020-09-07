@@ -20,6 +20,7 @@ import org.joml.Rectanglei;
 import org.joml.Vector2i;
 import org.terasology.gestalt.assets.Asset;
 import org.terasology.gestalt.assets.AssetType;
+import org.terasology.gestalt.assets.DisposableResource;
 import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.math.JomlUtil;
 import org.terasology.math.TeraMath;
@@ -30,12 +31,13 @@ import org.terasology.rendering.assets.texture.TextureRegionAsset;
 import java.util.Optional;
 
 /**
+ *
  */
 public class Subtexture extends TextureRegionAsset<SubtextureData> {
 
     private Texture texture;
     private Rect2f subregion;
-    private Runnable disposalAction;
+    private DisposableResource disposalAction;
 
     public Subtexture(ResourceUrn urn, AssetType<?, SubtextureData> assetType, SubtextureData data) {
         super(urn, assetType);
@@ -47,7 +49,7 @@ public class Subtexture extends TextureRegionAsset<SubtextureData> {
     protected void doReload(SubtextureData data) {
         data.getTexture().subscribeToDisposal(disposalAction);
         if (texture != null) {
-              texture.unsubscribeToDisposal(disposalAction);
+            texture.unsubscribeToDisposal(disposalAction);
         }
         this.texture = data.getTexture();
         this.subregion = data.getRegion();

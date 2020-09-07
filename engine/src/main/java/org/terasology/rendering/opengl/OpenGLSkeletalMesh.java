@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import org.terasology.engine.GameThread;
 import org.terasology.engine.subsystem.lwjgl.GLBufferPool;
 import org.terasology.gestalt.assets.AssetType;
+import org.terasology.gestalt.assets.DisposableResource;
 import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.math.AABB;
 import org.terasology.math.geom.Quat4f;
@@ -51,6 +52,7 @@ import static org.lwjgl.opengl.GL11.glTexCoordPointer;
 import static org.lwjgl.opengl.GL11.glVertexPointer;
 
 /**
+ *
  */
 public class OpenGLSkeletalMesh extends SkeletalMesh {
 
@@ -68,11 +70,15 @@ public class OpenGLSkeletalMesh extends SkeletalMesh {
 
     private DisposalAction disposalAction;
 
-    public OpenGLSkeletalMesh(ResourceUrn urn, AssetType<?, SkeletalMeshData> assetType, SkeletalMeshData data, GLBufferPool bufferPool) {
-        super(urn, assetType);
-        disposalAction = new DisposalAction(urn, bufferPool);
-        getDisposalHook().setDisposeAction(disposalAction);
+    public OpenGLSkeletalMesh(ResourceUrn urn, AssetType<?, SkeletalMeshData> assetType, SkeletalMeshData data, DisposalAction disposalAction) {
+        super(urn, assetType, disposalAction);
+        this.disposalAction = disposalAction;
         reload(data);
+    }
+
+    public static OpenGLSkeletalMesh create(ResourceUrn urn, AssetType<?, SkeletalMeshData> assetType,
+                                            SkeletalMeshData data, GLBufferPool bufferPool) {
+        return new OpenGLSkeletalMesh(urn, assetType, data, new DisposalAction(urn, bufferPool));
     }
 
     public void setScaleTranslate(Vector3f newScale, Vector3f newTranslate) {
@@ -96,7 +102,8 @@ public class OpenGLSkeletalMesh extends SkeletalMesh {
                 if (disposalAction.vboIndexBuffer == 0) {
                     disposalAction.vboIndexBuffer = disposalAction.bufferPool.get(getUrn().toString());
                 }
-                VertexBufferObjectUtil.bufferVboElementData(disposalAction.vboIndexBuffer, indexBuffer, GL15.GL_STATIC_DRAW);
+                VertexBufferObjectUtil.bufferVboElementData(disposalAction.vboIndexBuffer, indexBuffer,
+                        GL15.GL_STATIC_DRAW);
 
                 FloatBuffer uvBuffer = BufferUtils.createFloatBuffer(newData.getUVs().size() * 2);
                 for (Vector2f uv : newData.getUVs()) {
@@ -168,7 +175,8 @@ public class OpenGLSkeletalMesh extends SkeletalMesh {
 
     public void render(List<Vector3f> bonePositions, List<Quat4f> boneRotations) {
         preRender();
-        doRender(data.getVertexPositions(bonePositions, boneRotations), data.getVertexNormals(bonePositions, boneRotations));
+        doRender(data.getVertexPositions(bonePositions, boneRotations), data.getVertexNormals(bonePositions,
+                boneRotations));
         postRender();
     }
 
@@ -192,7 +200,7 @@ public class OpenGLSkeletalMesh extends SkeletalMesh {
         return data.getStaticAABB();
     }
 
-    private static class DisposalAction implements Runnable {
+    private static class DisposalAction implements DisposableResource {
 
         private final ResourceUrn urn;
         private GLBufferPool bufferPool;
@@ -201,13 +209,13 @@ public class OpenGLSkeletalMesh extends SkeletalMesh {
         private int vboUVBuffer;
         private int vboIndexBuffer;
 
-         DisposalAction(ResourceUrn urn, GLBufferPool bufferPool) {
+        DisposalAction(ResourceUrn urn, GLBufferPool bufferPool) {
             this.urn = urn;
             this.bufferPool = bufferPool;
         }
 
         @Override
-        public void run() {
+        public void close() {
             try {
                 GameThread.synch(() -> {
                     if (vboIndexBuffer != 0) {

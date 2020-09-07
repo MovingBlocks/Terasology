@@ -18,9 +18,9 @@ package org.terasology.engine.module;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.gestalt.module.Module;
 import org.terasology.gestalt.module.ModuleRegistry;
-import org.terasology.gestalt.module.PathModule;
 import org.terasology.gestalt.module.dependencyresolution.DependencyResolver;
 import org.terasology.gestalt.module.dependencyresolution.ResolutionResult;
+import org.terasology.gestalt.module.resources.DirectoryFileSource;
 import org.terasology.gestalt.naming.Name;
 import org.terasology.gestalt.naming.Version;
 
@@ -63,7 +63,7 @@ class ModuleDownloadListGenerator {
      * source.
      */
     private boolean isSourceModule(Module module) {
-        return module instanceof PathModule;
+        return module.getResources() instanceof DirectoryFileSource;
     }
 
     private boolean isOnlineVersionNewer(Module localVersion, Module onlineVersion) {

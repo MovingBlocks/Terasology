@@ -23,6 +23,7 @@ import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.network.BroadcastEvent;
 import org.terasology.network.OwnerEvent;
 import org.terasology.network.ServerEvent;
+import org.terasology.reflection.copy.CopyStrategy;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.metadata.ClassMetadata;
 import org.terasology.reflection.reflect.InaccessibleFieldException;
@@ -85,7 +86,8 @@ public class EventMetadata<T extends Event> extends ClassMetadata<T, ReplicatedF
     }
 
     @Override
-    protected ReplicatedFieldMetadata<T, ?> createField(Field field, CopyStrategyLibrary copyStrategyLibrary, ReflectFactory factory) throws InaccessibleFieldException {
-        return new ReplicatedFieldMetadata<>(this, field, copyStrategyLibrary, factory, true);
+    protected <V> ReplicatedFieldMetadata<T, ?> createField(Field field, CopyStrategy<V> copyStrategy,
+                                                            ReflectFactory factory) throws InaccessibleFieldException {
+        return new ReplicatedFieldMetadata<>(this, field, copyStrategy, factory, true);
     }
 }

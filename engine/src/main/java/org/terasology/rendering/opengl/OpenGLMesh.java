@@ -30,6 +30,7 @@ import org.slf4j.LoggerFactory;
 import org.terasology.engine.GameThread;
 import org.terasology.engine.subsystem.lwjgl.GLBufferPool;
 import org.terasology.gestalt.assets.AssetType;
+import org.terasology.gestalt.assets.DisposableResource;
 import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.math.AABB;
 import org.terasology.rendering.VertexBufferObjectUtil;
@@ -53,6 +54,7 @@ import static org.lwjgl.opengl.GL11.glTexCoordPointer;
 import static org.lwjgl.opengl.GL11.glVertexPointer;
 
 /**
+ *
  */
 public class OpenGLMesh extends Mesh {
     private static final Logger logger = LoggerFactory.getLogger(OpenGLMesh.class);
@@ -77,10 +79,16 @@ public class OpenGLMesh extends Mesh {
 
     private DisposalAction disposalAction;
 
-    public OpenGLMesh(ResourceUrn urn, AssetType<?, MeshData> assetType, GLBufferPool bufferPool, MeshData data) {
-        super(urn, assetType);
-        this.disposalAction = new DisposalAction(urn, bufferPool);
+    public OpenGLMesh(ResourceUrn urn, AssetType<?, MeshData> assetType, GLBufferPool bufferPool, MeshData data,
+                      DisposalAction disposalAction) {
+        super(urn, assetType, disposalAction);
+        this.disposalAction = disposalAction;
         reload(data);
+    }
+
+    public static OpenGLMesh create(ResourceUrn urn, AssetType<?, MeshData> assetType, GLBufferPool bufferPool,
+                                    MeshData data) {
+        return new OpenGLMesh(urn, assetType, bufferPool, data, new DisposalAction(urn, bufferPool));
     }
 
     @Override
@@ -260,7 +268,7 @@ public class OpenGLMesh extends Mesh {
         indexBuffer.flip();
     }
 
-    private static class DisposalAction implements Runnable {
+    private static class DisposalAction implements DisposableResource {
 
         private final ResourceUrn urn;
         private final GLBufferPool bufferPool;
@@ -274,7 +282,7 @@ public class OpenGLMesh extends Mesh {
         }
 
         @Override
-        public void run() {
+        public void close() {
             try {
                 GameThread.synch(() -> {
                     if (vboVertexBuffer != 0) {

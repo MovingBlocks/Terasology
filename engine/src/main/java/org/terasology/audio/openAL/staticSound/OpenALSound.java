@@ -24,6 +24,7 @@ import org.terasology.audio.openAL.OpenALException;
 import org.terasology.audio.openAL.OpenALManager;
 import org.terasology.engine.GameThread;
 import org.terasology.gestalt.assets.AssetType;
+import org.terasology.gestalt.assets.DisposableResource;
 import org.terasology.gestalt.assets.ResourceUrn;
 
 import java.lang.ref.WeakReference;
@@ -48,11 +49,11 @@ public final class OpenALSound extends StaticSound {
     // TODO: Do we have proper support for unloading sounds (as mods are changed?)
     private int bufferId;
 
-    public OpenALSound(ResourceUrn urn, AssetType<?, StaticSoundData> assetType, StaticSoundData data, OpenALManager audioManager) {
-        super(urn, assetType);
+    public OpenALSound(ResourceUrn urn, AssetType<?, StaticSoundData> assetType, StaticSoundData data, OpenALManager audioManager, OpenALSound.DisposalAction disposalAction) {
+        super(urn, assetType, disposalAction);
         this.audioManager = audioManager;
-        disposalAction = new DisposalAction(urn, this);
-        getDisposalHook().setDisposeAction(disposalAction);
+        this.disposalAction = disposalAction;
+        disposalAction.setAsset(this);
         reload(data);
     }
 
@@ -119,21 +120,28 @@ public final class OpenALSound extends StaticSound {
         }
     }
 
-    private static class DisposalAction implements Runnable {
+    public static class DisposalAction implements DisposableResource {
         private final ResourceUrn urn;
         private int bufferId;
-        private final WeakReference<OpenALSound> asset;
+        private WeakReference<OpenALSound> asset;
 
-        DisposalAction(ResourceUrn urn, OpenALSound openALSound) {
+        public DisposalAction(ResourceUrn urn) {
             this.urn = urn;
-             asset = new WeakReference<>(openALSound);
+        }
+
+        public OpenALSound getAsset() {
+            return asset.get();
+        }
+
+        public void setAsset(OpenALSound asset) {
+            this.asset = new WeakReference<>(asset);
         }
 
         @Override
-        public void run() {
+        public void close() {
             try {
                 GameThread.synch(() -> {
-                    OpenALSound sound = asset.get();
+                    OpenALSound sound = getAsset();
                     if (bufferId != 0) {
                         if (sound != null) {
                             sound.audioManager.purgeSound(sound);

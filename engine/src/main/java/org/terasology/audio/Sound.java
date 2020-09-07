@@ -18,18 +18,33 @@ package org.terasology.audio;
 import org.terasology.gestalt.assets.Asset;
 import org.terasology.gestalt.assets.AssetData;
 import org.terasology.gestalt.assets.AssetType;
+import org.terasology.gestalt.assets.DisposableResource;
 import org.terasology.gestalt.assets.ResourceUrn;
 
 /**
  * An abstract class
+ *
  * @param <T> The asset type this asset belongs to
  */
 public abstract class Sound<T extends AssetData> extends Asset<T> implements org.terasology.nui.asset.Sound {
 
     /**
-     * The constructor for an asset. It is suggested that implementing classes provide a constructor taking both the urn, and an initial AssetData to load.
+     * The constructor for an asset. It is suggested that implementing classes provide a constructor taking both the
+     * urn, and an initial AssetData to load.
      *
-     * @param urn       The urn identifying the asset.
+     * @param urn The urn identifying the asset.
+     * @param assetType The asset type this asset belongs to.
+     * @param disposableResource The disposable handler for asset
+     */
+    protected Sound(ResourceUrn urn, AssetType<?, T> assetType, DisposableResource disposableResource) {
+        super(urn, assetType, disposableResource);
+    }
+
+    /**
+     * The constructor for an asset. It is suggested that implementing classes provide a constructor taking both the
+     * urn, and an initial AssetData to load.
+     *
+     * @param urn The urn identifying the asset.
      * @param assetType The asset type this asset belongs to.
      */
     protected Sound(ResourceUrn urn, AssetType<?, T> assetType) {
@@ -58,6 +73,7 @@ public abstract class Sound<T extends AssetData> extends Asset<T> implements org
 
     /**
      * Plays the sound at the given volume.
+     *
      * @param volume
      */
     public abstract void play(float volume);

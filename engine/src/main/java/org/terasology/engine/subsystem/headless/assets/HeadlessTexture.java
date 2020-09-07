@@ -20,6 +20,7 @@ import org.joml.Rectanglef;
 import org.joml.Rectanglei;
 import org.joml.Vector2i;
 import org.terasology.gestalt.assets.AssetType;
+import org.terasology.gestalt.assets.DisposableResource;
 import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.math.JomlUtil;
 import org.terasology.rendering.assets.texture.Texture;
@@ -31,17 +32,20 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class HeadlessTexture extends Texture {
 
     private static final AtomicInteger ID_COUNTER = new AtomicInteger();
-
+    private final DisposalAction disposalAction;
     private TextureData textureData;
     private int id;
-    private final DisposalAction disposalAction;
 
-    public HeadlessTexture(ResourceUrn urn, AssetType<?, TextureData> assetType, TextureData data) {
-        super(urn, assetType);
-        disposalAction = new DisposalAction();
-        getDisposalHook().setDisposeAction(disposalAction);
+    public HeadlessTexture(ResourceUrn urn, AssetType<?, TextureData> assetType, TextureData data,
+                           DisposalAction disposableResource) {
+        super(urn, assetType, disposableResource);
+        disposalAction = disposableResource;
         reload(data);
         id = ID_COUNTER.getAndIncrement();
+    }
+
+    public static HeadlessTexture create(ResourceUrn urn, AssetType<?, TextureData> assetType, TextureData data) {
+        return new HeadlessTexture(urn, assetType, data, new DisposalAction());
     }
 
     @Override
@@ -60,7 +64,6 @@ public class HeadlessTexture extends Texture {
     }
 
     /**
-     *
      * @return
      */
     @Override
@@ -124,22 +127,22 @@ public class HeadlessTexture extends Texture {
     }
 
     @Override
-    public synchronized void subscribeToDisposal(Runnable subscriber) {
+    public synchronized void subscribeToDisposal(DisposableResource subscriber) {
         disposalAction.disposalListeners.add(subscriber);
     }
 
     @Override
-    public synchronized void unsubscribeToDisposal(Runnable subscriber) {
+    public synchronized void unsubscribeToDisposal(DisposableResource subscriber) {
         disposalAction.disposalListeners.remove(subscriber);
     }
 
-    private static class DisposalAction implements Runnable {
+    private static class DisposalAction implements DisposableResource {
 
-        private final List<Runnable> disposalListeners = Lists.newArrayList();
+        private final List<DisposableResource> disposalListeners = Lists.newArrayList();
 
         @Override
-        public void run() {
-            disposalListeners.forEach(java.lang.Runnable::run);
+        public void close() {
+            disposalListeners.forEach(DisposableResource::close);
         }
     }
 }

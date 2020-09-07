@@ -25,12 +25,12 @@ import org.terasology.context.internal.ContextImpl;
 import org.terasology.engine.bootstrap.EnvironmentSwitchHandler;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.entitySystem.prefab.Prefab;
-import org.terasology.entitySystem.prefab.PrefabData;
 import org.terasology.entitySystem.prefab.internal.PojoPrefab;
-import org.terasology.gestalt.assets.AssetFactory;
+import org.terasology.gestalt.assets.AssetType;
 import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.gestalt.assets.management.AssetManager;
 import org.terasology.gestalt.assets.module.ModuleAwareAssetTypeManager;
+import org.terasology.gestalt.assets.module.autoreload.AutoReloadAssetTypeManager;
 import org.terasology.gestalt.module.Module;
 import org.terasology.gestalt.module.ModuleEnvironment;
 import org.terasology.gestalt.module.dependencyresolution.DependencyInfo;
@@ -38,15 +38,12 @@ import org.terasology.gestalt.module.dependencyresolution.DependencyResolver;
 import org.terasology.gestalt.module.dependencyresolution.ResolutionResult;
 import org.terasology.gestalt.naming.Name;
 import org.terasology.logic.behavior.asset.BehaviorTree;
-import org.terasology.logic.behavior.asset.BehaviorTreeData;
 import org.terasology.nui.WidgetUtil;
-import org.terasology.nui.asset.UIData;
 import org.terasology.nui.asset.UIElement;
 import org.terasology.nui.databinding.Binding;
 import org.terasology.nui.databinding.ReadOnlyBinding;
 import org.terasology.nui.itemRendering.StringTextRenderer;
 import org.terasology.nui.skin.UISkin;
-import org.terasology.nui.skin.UISkinData;
 import org.terasology.nui.widgets.UIDropdownScrollable;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.reflect.ReflectFactory;
@@ -62,12 +59,9 @@ import org.terasology.world.block.loader.BlockFamilyDefinition;
 import org.terasology.world.block.loader.BlockFamilyDefinitionData;
 import org.terasology.world.block.loader.BlockFamilyDefinitionFormat;
 import org.terasology.world.block.shapes.BlockShape;
-import org.terasology.world.block.shapes.BlockShapeData;
 import org.terasology.world.block.shapes.BlockShapeImpl;
 import org.terasology.world.block.sounds.BlockSounds;
-import org.terasology.world.block.sounds.BlockSoundsData;
 import org.terasology.world.block.tiles.BlockTile;
-import org.terasology.world.block.tiles.TileData;
 import org.terasology.world.generator.UnresolvedWorldGeneratorException;
 import org.terasology.world.generator.internal.WorldGeneratorInfo;
 import org.terasology.world.generator.internal.WorldGeneratorManager;
@@ -334,7 +328,7 @@ public class UniverseSetupScreen extends CoreScreenLayer {
         context.put(CopyStrategyLibrary.class, copyStrategyLibrary);
         context.put(NUIManager.class, getManager());
         context.put(UniverseSetupScreen.class, this);
-        assetTypeManager = new ModuleAwareAssetTypeManager();
+        assetTypeManager = new AutoReloadAssetTypeManager();
         context.put(AssetManager.class, assetTypeManager.getAssetManager());
         context.put(ModuleAwareAssetTypeManager.class, assetTypeManager);
         context.put(ModuleManager.class, moduleManager);
@@ -378,24 +372,17 @@ public class UniverseSetupScreen extends CoreScreenLayer {
         BlockFamilyLibrary library =  new BlockFamilyLibrary(environment, context);
 
         // cast lambdas explicitly to avoid inconsistent compiler behavior wrt. type inference
-        assetTypeManager.registerCoreAssetType(Prefab.class,
-                (AssetFactory<Prefab, PrefabData>) PojoPrefab::new, false, "prefabs");
-        assetTypeManager.registerCoreAssetType(BlockShape.class,
-                (AssetFactory<BlockShape, BlockShapeData>) BlockShapeImpl::new, "shapes");
-        assetTypeManager.registerCoreAssetType(BlockSounds.class,
-                (AssetFactory<BlockSounds, BlockSoundsData>) BlockSounds::new, "blockSounds");
-        assetTypeManager.registerCoreAssetType(BlockTile.class,
-                (AssetFactory<BlockTile, TileData>) BlockTile::new, "blockTiles");
-        assetTypeManager.registerCoreAssetType(BlockFamilyDefinition.class,
-                (AssetFactory<BlockFamilyDefinition, BlockFamilyDefinitionData>) BlockFamilyDefinition::new, "blocks");
-        assetTypeManager.registerCoreFormat(BlockFamilyDefinition.class,
+        assetTypeManager.createAssetType(Prefab.class, PojoPrefab::new, "prefabs"); //TODO check - gestalt v7
+        assetTypeManager.createAssetType(BlockShape.class, BlockShapeImpl::new, "shapes");
+        assetTypeManager.createAssetType(BlockSounds.class, BlockSounds::new, "blockSounds");
+        assetTypeManager.createAssetType(BlockTile.class, BlockTile::new, "blockTiles");
+        AssetType<BlockFamilyDefinition, BlockFamilyDefinitionData> blockFamilyDefinitionDataAssetType = assetTypeManager.createAssetType(
+                BlockFamilyDefinition.class, BlockFamilyDefinition::new, "blocks");
+        assetTypeManager.getAssetFileDataProducer(blockFamilyDefinitionDataAssetType).addAssetFormat(
                 new BlockFamilyDefinitionFormat(assetTypeManager.getAssetManager()));
-        assetTypeManager.registerCoreAssetType(UISkin.class,
-                (AssetFactory<UISkin, UISkinData>) UISkin::new, "skins");
-        assetTypeManager.registerCoreAssetType(BehaviorTree.class,
-                (AssetFactory<BehaviorTree, BehaviorTreeData>) BehaviorTree::new, false, "behaviors");
-        assetTypeManager.registerCoreAssetType(UIElement.class,
-                (AssetFactory<UIElement, UIData>) UIElement::new, "ui");
+        assetTypeManager.createAssetType(UISkin.class, UISkin::new, "skins");
+        assetTypeManager.createAssetType(BehaviorTree.class, BehaviorTree::new,  "behaviors"); //TODO check - gestalt v7
+        assetTypeManager.createAssetType(UIElement.class, UIElement::new, "ui");
     }
 
     /**

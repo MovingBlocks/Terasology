@@ -42,6 +42,7 @@ import org.terasology.gestalt.module.ModuleMetadata;
 import org.terasology.gestalt.module.dependencyresolution.DependencyInfo;
 import org.terasology.gestalt.module.dependencyresolution.DependencyResolver;
 import org.terasology.gestalt.module.dependencyresolution.ResolutionResult;
+import org.terasology.gestalt.module.resources.DirectoryFileSource;
 import org.terasology.gestalt.naming.Name;
 import org.terasology.i18n.TranslationSystem;
 import org.terasology.network.NetworkMode;
@@ -155,7 +156,7 @@ public class AdvancedGameSetupScreen extends CoreScreenLayer {
         sortedModules = Lists.newArrayList();
         for (Name moduleId : moduleManager.getRegistry().getModuleIds()) {
             Module latestVersion = moduleManager.getRegistry().getLatestModuleVersion(moduleId);
-            if (!latestVersion.isOnClasspath()) {
+            if (!(latestVersion.getResources() instanceof DirectoryFileSource)) {
                 ModuleSelectionInfo info = ModuleSelectionInfo.local(latestVersion);
                 modulesLookup.put(info.getMetadata().getId(), info);
                 sortedModules.add(info);

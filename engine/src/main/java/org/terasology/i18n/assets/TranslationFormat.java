@@ -28,14 +28,15 @@ import org.terasology.gestalt.assets.exceptions.InvalidAssetFilenameException;
 import org.terasology.gestalt.assets.format.AssetDataFile;
 import org.terasology.gestalt.assets.format.AssetFileFormat;
 import org.terasology.gestalt.assets.module.annotations.RegisterAssetFileFormat;
+import org.terasology.gestalt.module.resources.FileReference;
 import org.terasology.gestalt.naming.Name;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.nio.file.PathMatcher;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -76,9 +77,9 @@ public class TranslationFormat implements AssetFileFormat<TranslationData> {
     private final Gson gson = new GsonBuilder().registerTypeAdapter(String.class, stringArraySerializer).create();
 
     @Override
-    public PathMatcher getFileMatcher() {
+    public Predicate<FileReference> getFileMatcher() {
         return path -> {
-            String name = path.getFileName().toString();
+            String name = path.getName();
             return FILENAME_PATTERN.matcher(name).matches();
         };
     }

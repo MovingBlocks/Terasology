@@ -18,11 +18,17 @@ package org.terasology.rendering.assets.shader;
 
 import org.terasology.gestalt.assets.Asset;
 import org.terasology.gestalt.assets.AssetType;
+import org.terasology.gestalt.assets.DisposableResource;
 import org.terasology.gestalt.assets.ResourceUrn;
 
 /**
+ *
  */
 public abstract class Shader extends Asset<ShaderData> {
+
+    protected Shader(ResourceUrn urn, AssetType<?, ShaderData> assetType, DisposableResource disposableResource) {
+        super(urn, assetType, disposableResource);
+    }
 
     protected Shader(ResourceUrn urn, AssetType<?, ShaderData> assetType) {
         super(urn, assetType);

@@ -18,6 +18,7 @@ package org.terasology.rendering.assets.mesh;
 import gnu.trove.list.TFloatList;
 import org.terasology.gestalt.assets.Asset;
 import org.terasology.gestalt.assets.AssetType;
+import org.terasology.gestalt.assets.DisposableResource;
 import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.math.AABB;
 
@@ -31,6 +32,10 @@ public abstract class Mesh extends Asset<MeshData> {
 
     protected Mesh(ResourceUrn urn, AssetType<?, MeshData> assetType) {
         super(urn, assetType);
+    }
+
+    protected Mesh(ResourceUrn urn, AssetType<?, MeshData> assetType, DisposableResource disposableResource) {
+        super(urn, assetType, disposableResource);
     }
 
     public abstract AABB getAABB();

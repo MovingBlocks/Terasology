@@ -33,7 +33,8 @@ public class HeadlessMaterial extends BaseMaterial {
     private MaterialData data;
 
     public HeadlessMaterial(ResourceUrn urn, AssetType<?, MaterialData> assetType, MaterialData data) {
-        super(urn, assetType);
+        super(urn, assetType, () -> {
+        });
         reload(data);
     }
 

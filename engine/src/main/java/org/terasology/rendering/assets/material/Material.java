@@ -23,6 +23,7 @@ import org.joml.Vector3fc;
 import org.joml.Vector4fc;
 import org.terasology.gestalt.assets.Asset;
 import org.terasology.gestalt.assets.AssetType;
+import org.terasology.gestalt.assets.DisposableResource;
 import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.math.geom.Matrix3f;
 import org.terasology.math.geom.Matrix4f;
@@ -39,8 +40,8 @@ import java.nio.FloatBuffer;
  */
 public abstract class Material extends Asset<MaterialData> {
 
-    protected Material(ResourceUrn urn, AssetType<?, MaterialData> assetType) {
-        super(urn, assetType);
+    protected Material(ResourceUrn urn, AssetType<?, MaterialData> assetType, DisposableResource disposable) {
+        super(urn, assetType, disposable);
     }
 
     /**

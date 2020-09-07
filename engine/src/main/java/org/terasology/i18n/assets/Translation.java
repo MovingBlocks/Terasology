@@ -21,6 +21,7 @@ import com.google.common.base.Preconditions;
 import org.terasology.engine.Uri;
 import org.terasology.gestalt.assets.Asset;
 import org.terasology.gestalt.assets.AssetType;
+import org.terasology.gestalt.assets.DisposableResource;
 import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.gestalt.naming.Name;
 
@@ -37,22 +38,34 @@ import java.util.function.Consumer;
  */
 public class Translation extends Asset<TranslationData> {
 
+    private final DisposalAction disposalAction;
     private Map<String, String> dictionary = new HashMap<>();
     private Locale locale;
     private Uri projectUri;
 
-    private final DisposalAction disposalAction;
+    /**
+     * @param urn The urn identifying the asset. Never <code>null</code>.
+     * @param assetType The asset type this asset belongs to. Never <code>null</code>.
+     * @param data The actual translation data. Never <code>null</code>.
+     * @param disposalAction The handler for dispose Translation. Never <code>null</code>.
+     */
+    public Translation(ResourceUrn urn, AssetType<?, TranslationData> assetType, TranslationData data,
+                       DisposalAction disposalAction) {
+        super(urn, assetType, disposalAction);
+        this.disposalAction = disposalAction;
+        this.disposalAction.setAsset(this);
+        reload(data);
+    }
 
     /**
-     * @param urn       The urn identifying the asset. Never <code>null</code>.
+     * Factory method for Translation
+     *
+     * @param urn The urn identifying the asset. Never <code>null</code>.
      * @param assetType The asset type this asset belongs to. Never <code>null</code>.
-     * @param data      The actual translation data. Never <code>null</code>.
+     * @param data The actual translation data. Never <code>null</code>.
      */
-    public Translation(ResourceUrn urn, AssetType<?, TranslationData> assetType, TranslationData data) {
-        super(urn, assetType);
-        this.disposalAction = new DisposalAction(this);
-        getDisposalHook().setDisposeAction(disposalAction);
-        reload(data);
+    public static Translation create(ResourceUrn urn, AssetType<?, TranslationData> assetType, TranslationData data) {
+        return new Translation(urn, assetType, data, new DisposalAction());
     }
 
     /**
@@ -61,6 +74,7 @@ public class Translation extends Asset<TranslationData> {
     public Uri getProjectUri() {
         return projectUri;
     }
+
     /**
      * @return the locale of the translation data
      */
@@ -70,6 +84,7 @@ public class Translation extends Asset<TranslationData> {
 
     /**
      * Subscribe to reload/dispose events.
+     *
      * @param changeListener the listener to add
      */
     public void subscribe(Consumer<Translation> changeListener) {
@@ -78,6 +93,7 @@ public class Translation extends Asset<TranslationData> {
 
     /**
      * Unsubscribe from reload/dispose events.
+     *
      * @param changeListener the listener to remove. Non-existing entries will be ignored.
      */
     public void unsubscribe(Consumer<Translation> changeListener) {
@@ -86,6 +102,7 @@ public class Translation extends Asset<TranslationData> {
 
     /**
      * Retrieves the matching entry for the given key.
+     *
      * @param id the id of the entry
      * @return the translated string
      */
@@ -118,17 +135,21 @@ public class Translation extends Asset<TranslationData> {
         }
     }
 
-    private static class DisposalAction implements Runnable {
+    private static class DisposalAction implements DisposableResource {
 
         private final List<Consumer<Translation>> changeListeners = new CopyOnWriteArrayList<>();
-        private final WeakReference<Translation> asset;
+        private WeakReference<Translation> asset;
 
-         DisposalAction(Translation asset) {
+        public Translation getAsset() {
+            return asset.get();
+        }
+
+        public void setAsset(Translation asset) {
             this.asset = new WeakReference<>(asset);
         }
 
         @Override
-        public void run() {
+        public void close() {
             Translation translation = asset.get();
             if (translation != null) {
                 for (Consumer<Translation> listener : changeListeners) {

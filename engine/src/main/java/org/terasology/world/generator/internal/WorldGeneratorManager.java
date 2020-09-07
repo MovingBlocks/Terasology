@@ -26,6 +26,7 @@ import org.terasology.gestalt.module.Module;
 import org.terasology.gestalt.module.ModuleEnvironment;
 import org.terasology.gestalt.module.dependencyresolution.DependencyResolver;
 import org.terasology.gestalt.module.dependencyresolution.ResolutionResult;
+import org.terasology.gestalt.module.resources.DirectoryFileSource;
 import org.terasology.gestalt.naming.Name;
 import org.terasology.registry.InjectionHelper;
 import org.terasology.world.generator.RegisterWorldGenerator;
@@ -55,7 +56,7 @@ public class WorldGeneratorManager {
         List<WorldGeneratorInfo> infos = Lists.newArrayList();
         for (Name moduleId : moduleManager.getRegistry().getModuleIds()) {
             Module module = moduleManager.getRegistry().getLatestModuleVersion(moduleId);
-            if (module.isCodeModule()) {
+            if (module.getResources() instanceof DirectoryFileSource) {
                 DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
                 ResolutionResult resolutionResult = resolver.resolve(module.getId());
                 if (resolutionResult.isSuccess()) {

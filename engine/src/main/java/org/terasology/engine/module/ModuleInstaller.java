@@ -17,10 +17,8 @@ package org.terasology.engine.module;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.gestalt.module.Module;
-import org.terasology.gestalt.module.ModuleLoader;
 import org.terasology.gestalt.module.ModuleMetadata;
 import org.terasology.utilities.download.MultiFileDownloader;
 import org.terasology.utilities.download.MultiFileTransferProgressListener;
@@ -58,11 +56,10 @@ public class ModuleInstaller implements Callable<List<Module>> {
         List<Path> downloadedModulesPaths = downloader.call();
         logger.info("Module download completed, loading the new modules...");
         List<Module> newInstalledModules = new ArrayList<>(downloadedModulesPaths.size());
-        ModuleLoader loader = new ModuleLoader(moduleManager.getModuleMetadataReader());
-        loader.setModuleInfoPath(TerasologyConstants.MODULE_INFO_FILENAME);
+
         for (Path filePath : downloadedModulesPaths) {
             try {
-                Module module = loader.load(filePath);
+                Module module = moduleManager.getModuleFactory().createModule(filePath.toFile());
                 moduleManager.getRegistry().add(module);
                 newInstalledModules.add(module);
             } catch (IOException e) {

@@ -64,7 +64,7 @@ public class BindsSubsystemTest {
         ModuleRegistry moduleRegistry = new TableModuleRegistry();
 
         Module module = mock(Module.class);
-        when(module.isCodeModule()).thenReturn(true);
+//        when(module.isCodeModule()).thenReturn(true); // TODO rewrite it ! - gestalt v7
         when(module.getId()).thenReturn(new Name(TEST_MODULE));
         when(module.getVersion()).thenReturn(new Version(0, 0, 1, true));
         when(module.getMetadata()).thenReturn(new ModuleMetadata());

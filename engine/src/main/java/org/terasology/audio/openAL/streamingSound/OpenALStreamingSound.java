@@ -25,6 +25,7 @@ import org.terasology.audio.openAL.OpenALManager;
 import org.terasology.engine.GameThread;
 import org.terasology.gestalt.assets.Asset;
 import org.terasology.gestalt.assets.AssetType;
+import org.terasology.gestalt.assets.DisposableResource;
 import org.terasology.gestalt.assets.ResourceUrn;
 
 import java.lang.ref.WeakReference;
@@ -47,11 +48,10 @@ public final class OpenALStreamingSound extends StreamingSound {
     private InternalResources internalResources;
     private int lastUpdatedBuffer;
 
-    public OpenALStreamingSound(ResourceUrn urn, AssetType<?, StreamingSoundData> assetType, StreamingSoundData data, OpenALManager audioManager) {
-        super(urn, assetType);
-        this.internalResources = new InternalResources(urn, this);
+    public OpenALStreamingSound(ResourceUrn urn, AssetType<?, StreamingSoundData> assetType, StreamingSoundData data, OpenALManager audioManager, InternalResources resources) {
+        super(urn, assetType, resources);
+        this.internalResources = resources;
         this.audioManager = audioManager;
-        getDisposalHook().setDisposeAction(internalResources);
         reload(data);
     }
 
@@ -140,23 +140,26 @@ public final class OpenALStreamingSound extends StreamingSound {
 
     @Override
     protected Optional<? extends Asset<StreamingSoundData>> doCreateCopy(ResourceUrn copyUrn, AssetType<?, StreamingSoundData> parentAssetType) {
-        return Optional.of(new OpenALStreamingSound(copyUrn, parentAssetType, stream, audioManager));
+        return Optional.of(new OpenALStreamingSound(copyUrn, parentAssetType, stream, audioManager, new InternalResources(copyUrn)));
     }
 
-    private static class InternalResources implements Runnable {
+    public static class InternalResources implements DisposableResource {
 
         protected int[] buffers = new int[0];
 
         private final ResourceUrn urn;
-        private final WeakReference<OpenALStreamingSound> asset;
+        private WeakReference<OpenALStreamingSound> asset;
 
-        InternalResources(ResourceUrn urn, OpenALStreamingSound asset) {
+        public InternalResources(ResourceUrn urn) {
             this.urn = urn;
+        }
+
+        public void setAsset(OpenALStreamingSound asset) {
             this.asset = new WeakReference<>(asset);
         }
 
         @Override
-        public void run() {
+        public void close() {
             try {
                 GameThread.synch(() -> {
                     OpenALStreamingSound sound = asset.get();

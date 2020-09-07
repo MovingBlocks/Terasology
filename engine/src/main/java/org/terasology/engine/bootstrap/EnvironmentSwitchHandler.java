@@ -32,6 +32,7 @@ import org.terasology.entitySystem.systems.internal.DoNotAutoRegister;
 import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.gestalt.assets.module.ModuleAwareAssetTypeManager;
 import org.terasology.gestalt.module.ModuleEnvironment;
+import org.terasology.gestalt.util.reflection.GenericsUtil;
 import org.terasology.persistence.typeHandling.RegisterTypeHandler;
 import org.terasology.persistence.typeHandling.RegisterTypeHandlerFactory;
 import org.terasology.persistence.typeHandling.TypeHandler;
@@ -47,7 +48,6 @@ import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.copy.RegisterCopyStrategy;
 import org.terasology.reflection.reflect.ReflectFactory;
 import org.terasology.registry.InjectionHelper;
-import org.terasology.util.reflection.GenericsUtil;
 import org.terasology.utilities.ReflectionUtil;
 
 import java.lang.reflect.Type;
@@ -122,9 +122,15 @@ public final class EnvironmentSwitchHandler {
          */
         unregisterPrefabFormats(assetTypeManager);
         registeredPrefabFormat = new PrefabFormat(componentLibrary, typeHandlerLibrary);
-        assetTypeManager.registerCoreFormat(Prefab.class, registeredPrefabFormat);
+        assetTypeManager.getAssetFileDataProducer(assetTypeManager
+                .getAssetType(Prefab.class)
+                .orElseThrow(()-> new RuntimeException("Cannot get Prefab Asset typee")))
+                .addAssetFormat(registeredPrefabFormat);
         registeredPrefabDeltaFormat = new PrefabDeltaFormat(componentLibrary, typeHandlerLibrary);
-        assetTypeManager.registerCoreDeltaFormat(Prefab.class, registeredPrefabDeltaFormat);
+        assetTypeManager.getAssetFileDataProducer(assetTypeManager
+                .getAssetType(Prefab.class)
+                .orElseThrow(()-> new RuntimeException("Cannot get Prefab Asset type")))
+                .addDeltaFormat(registeredPrefabDeltaFormat);
 
         assetTypeManager.switchEnvironment(environment);
 
@@ -175,11 +181,17 @@ public final class EnvironmentSwitchHandler {
 
     private void unregisterPrefabFormats(ModuleAwareAssetTypeManager assetTypeManager) {
         if (registeredPrefabFormat != null) {
-            assetTypeManager.removeCoreFormat(Prefab.class, registeredPrefabFormat);
+            assetTypeManager.getAssetFileDataProducer(assetTypeManager
+                    .getAssetType(Prefab.class)
+                    .orElseThrow(()-> new RuntimeException("Cannot get Prefab Asset type")))
+                    .removeAssetFormat(registeredPrefabFormat);
             registeredPrefabFormat = null;
         }
         if (registeredPrefabDeltaFormat != null) {
-            assetTypeManager.removeCoreDeltaFormat(Prefab.class, registeredPrefabDeltaFormat);
+            assetTypeManager.getAssetFileDataProducer(assetTypeManager
+                    .getAssetType(Prefab.class)
+                    .orElseThrow(()-> new RuntimeException("Cannot get Prefab Asset type")))
+                    .removeDeltaFormat(registeredPrefabDeltaFormat);
             registeredPrefabDeltaFormat = null;
         }
     }
