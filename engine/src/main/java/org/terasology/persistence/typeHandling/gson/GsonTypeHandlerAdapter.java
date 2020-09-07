@@ -20,10 +20,8 @@
 package org.terasology.persistence.typeHandling.gson;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import com.google.gson.TypeAdapter;
 import com.google.gson.internal.Streams;
@@ -31,7 +29,6 @@ import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import org.terasology.persistence.typeHandling.TypeHandler;
-import org.terasology.utilities.ReflectionUtil;
 
 import java.io.IOException;
 
@@ -75,7 +72,7 @@ public final class GsonTypeHandlerAdapter<T> extends TypeAdapter<T> {
             return null;
         }
 
-        return deserializer.deserialize(value, typeToken.getType(), (JsonDeserializationContext) ReflectionUtil.readField(gson, "deserializationContext"));
+        return deserializer.deserialize(value, typeToken.getType(), null);
     }
 
     @Override
@@ -84,7 +81,7 @@ public final class GsonTypeHandlerAdapter<T> extends TypeAdapter<T> {
             out.nullValue();
             return;
         }
-        JsonElement tree = serializer.serialize(value, typeToken.getType(), (JsonSerializationContext) ReflectionUtil.readField(gson, "serializationContext"));
+        JsonElement tree = serializer.serialize(value, typeToken.getType(), null);
         Streams.write(tree, out);
     }
 }

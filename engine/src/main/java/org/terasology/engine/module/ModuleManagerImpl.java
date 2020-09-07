@@ -88,7 +88,7 @@ public class ModuleManagerImpl implements ModuleManager {
 //            throw new RuntimeException("Failed to convert engine library location to path", e);
 //        }
 
-        Module engineModule = moduleFactory.createPackageModule("org.terasology.engine");
+        Module engineModule = moduleFactory.createPackageModule("org.terasology");
 
         registry = new TableModuleRegistry();
         registry.add(engineModule); // TODO: really needs?

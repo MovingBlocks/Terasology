@@ -62,7 +62,7 @@ public final class TerasologyConstants {
     /**
      * Name of a module's assets directory.
      */
-    public static final String ASSETS_SUBDIRECTORY = "assets";
+    public static final String ASSETS_SUBDIRECTORY = "org/terasology/assets";
     /**
      * Name of a module's overrides directory.
      * Overrides replace an entire existing prefab.

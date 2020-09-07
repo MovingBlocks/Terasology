@@ -58,9 +58,9 @@ public class HeadlessGraphics implements EngineSubsystem {
         assetTypeManager.createAssetType(Font.class,  FontImpl::new, "fonts");
         AssetType<Texture, TextureData> texture = assetTypeManager.createAssetType(Texture.class, HeadlessTexture::create, "textures", "fonts");
         assetTypeManager.getAssetFileDataProducer(texture)
-                .addAssetFormat(new PNGTextureFormat(Texture.FilterMode.NEAREST, path -> path.getPath().get(2).equals("textures")));
+                .addAssetFormat(new PNGTextureFormat(Texture.FilterMode.NEAREST, path -> path.getPath().get(1).equals("textures")));
         assetTypeManager.getAssetFileDataProducer(texture)
-                .addAssetFormat(new PNGTextureFormat(Texture.FilterMode.LINEAR, path -> path.getPath().get(2).equals("fonts")));
+                .addAssetFormat(new PNGTextureFormat(Texture.FilterMode.LINEAR, path -> path.getPath().get(1).equals("fonts")));
         assetTypeManager.createAssetType(Shader.class, HeadlessShader::new, "shaders");
         assetTypeManager.createAssetType(Material.class, HeadlessMaterial::new, "materials");
         assetTypeManager.createAssetType(Mesh.class, HeadlessMesh::new, "mesh");

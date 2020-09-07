@@ -45,10 +45,10 @@ public class AWTTextureFormat extends AbstractAssetFileFormat<TextureData> {
 
     public AWTTextureFormat() {
         this(Texture.FilterMode.NEAREST, path -> {
-                if (path.getPath().get(1).equals(OVERRIDE_FOLDER)) {
-                    return path.getPath().get(3).equals("textures");
-                } else {
+                if (path.getPath().get(0).equals(OVERRIDE_FOLDER)) {
                     return path.getPath().get(2).equals("textures");
+                } else {
+                    return path.getPath().get(1).equals("textures");
                 }
             });
     }

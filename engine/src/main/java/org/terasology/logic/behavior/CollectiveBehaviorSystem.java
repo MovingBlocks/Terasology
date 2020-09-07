@@ -121,7 +121,8 @@ public class CollectiveBehaviorSystem extends BaseComponentSystem implements Upd
         Path savePath;
         ResourceUrn uri = tree.getUrn();
         if (BEHAVIORS.equals(uri.getModuleName())) {
-            savePath = PathManager.getInstance().getHomeModPath().resolve(BEHAVIORS.toString()).resolve("assets").resolve("behaviors");
+            savePath = PathManager.getInstance().getHomeModPath().resolve(BEHAVIORS.toString()).resolve("org" +
+                    "/terasology/assets").resolve("behaviors");
         } else {
             Path overridesPath = PathManager.getInstance().getHomeModPath().resolve(BEHAVIORS.toString()).resolve("overrides");
             savePath = overridesPath.resolve(uri.getModuleName().toString()).resolve("behaviors");

@@ -124,19 +124,19 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
                 (urn, assetType, data) -> (OpenGLTexture.create(urn, assetType, data, this)), "textures", "fonts");
         assetTypeManager.getAssetFileDataProducer(texture).addAssetFormat(
                 new PNGTextureFormat(Texture.FilterMode.NEAREST, path -> {
-                    if (path.getPath().get(1).equals(OVERRIDE_FOLDER)) {
-                        return path.getPath().get(3).equals("textures");
-                    } else {
+                    if (path.getPath().get(0).equals(OVERRIDE_FOLDER)) {
                         return path.getPath().get(2).equals("textures");
+                    } else {
+                        return path.getPath().get(1).equals("textures");
                     }
                 })
         );
         assetTypeManager.getAssetFileDataProducer(texture).addAssetFormat(
                 new PNGTextureFormat(Texture.FilterMode.LINEAR, path -> {
-                    if (path.getPath().get(1).equals(OVERRIDE_FOLDER)) {
-                        return path.getPath().get(3).equals("fonts");
-                    } else {
+                    if (path.getPath().get(0).equals(OVERRIDE_FOLDER)) {
                         return path.getPath().get(2).equals("fonts");
+                    } else {
+                        return path.getPath().get(1).equals("fonts");
                     }
                 }));
         assetTypeManager.createAssetType(Shader.class, GLSLShader::create, "shaders");
