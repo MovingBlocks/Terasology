@@ -15,9 +15,9 @@
  */
 package org.terasology.world.zones;
 
+import org.terasology.gestalt.module.sandbox.API;
 import org.terasology.math.geom.BaseVector3i;
 import org.terasology.math.geom.ImmutableVector3i;
-import org.terasology.module.sandbox.API;
 import org.terasology.rendering.nui.layers.mainMenu.preview.FacetLayerPreview;
 import org.terasology.rendering.nui.layers.mainMenu.preview.PreviewGenerator;
 import org.terasology.world.block.Block;

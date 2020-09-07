@@ -18,7 +18,7 @@ package org.terasology.entitySystem.metadata;
 
 import org.terasology.context.Context;
 import org.terasology.engine.module.ModuleManager;
-import org.terasology.module.ModuleEnvironment;
+import org.terasology.gestalt.module.ModuleEnvironment;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.reflect.ReflectFactory;

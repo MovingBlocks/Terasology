@@ -15,7 +15,7 @@
  */
 package org.terasology.input.device;
 
-import org.terasology.module.sandbox.API;
+import org.terasology.gestalt.module.sandbox.API;
 
 import java.util.Queue;
 

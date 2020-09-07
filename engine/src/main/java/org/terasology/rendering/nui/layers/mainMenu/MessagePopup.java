@@ -15,12 +15,12 @@
  */
 package org.terasology.rendering.nui.layers.mainMenu;
 
-import org.terasology.assets.ResourceUrn;
-import org.terasology.module.sandbox.API;
-import org.terasology.rendering.nui.CoreScreenLayer;
+import org.terasology.gestalt.assets.ResourceUrn;
+import org.terasology.gestalt.module.sandbox.API;
 import org.terasology.nui.WidgetUtil;
 import org.terasology.nui.widgets.ActivateEventListener;
 import org.terasology.nui.widgets.UILabel;
+import org.terasology.rendering.nui.CoreScreenLayer;
 
 /**
  */

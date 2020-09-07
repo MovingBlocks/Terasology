@@ -15,7 +15,7 @@
  */
 package org.terasology.world.block.tiles;
 
-import org.terasology.assets.AssetData;
+import org.terasology.gestalt.assets.AssetData;
 
 import java.awt.image.BufferedImage;
 

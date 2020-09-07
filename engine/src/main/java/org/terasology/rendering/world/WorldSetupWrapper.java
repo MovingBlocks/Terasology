@@ -15,7 +15,7 @@
  */
 package org.terasology.rendering.world;
 
-import org.terasology.naming.Name;
+import org.terasology.gestalt.naming.Name;
 import org.terasology.world.generator.WorldConfigurator;
 import org.terasology.world.generator.WorldGenerator;
 import org.terasology.world.generator.internal.WorldGeneratorInfo;

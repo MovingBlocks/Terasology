@@ -19,6 +19,7 @@ import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.gestalt.naming.Name;
 import org.terasology.logic.console.Console;
 import org.terasology.logic.console.ConsoleColors;
 import org.terasology.logic.console.CoreMessageType;
@@ -26,7 +27,6 @@ import org.terasology.logic.console.Message;
 import org.terasology.logic.console.commandSystem.ConsoleCommand;
 import org.terasology.logic.console.commandSystem.exceptions.CommandSuggestionException;
 import org.terasology.logic.players.LocalPlayer;
-import org.terasology.naming.Name;
 import org.terasology.nui.FontColor;
 import org.terasology.utilities.CamelCaseMatcher;
 

@@ -18,14 +18,14 @@ package org.terasology.logic.debug;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
-import org.terasology.module.sandbox.API;
+import org.terasology.gestalt.module.sandbox.API;
+import org.terasology.nui.layouts.PropertyLayout;
 import org.terasology.nui.properties.OneOfProviderFactory;
+import org.terasology.nui.properties.PropertyProvider;
 import org.terasology.reflection.reflect.ReflectFactory;
 import org.terasology.registry.In;
 import org.terasology.registry.Share;
 import org.terasology.rendering.nui.NUIManager;
-import org.terasology.nui.layouts.PropertyLayout;
-import org.terasology.nui.properties.PropertyProvider;
 
 import java.security.AccessController;
 import java.security.PrivilegedAction;

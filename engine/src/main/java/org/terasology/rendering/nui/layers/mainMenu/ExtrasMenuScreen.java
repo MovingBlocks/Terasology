@@ -15,16 +15,16 @@
  */
 package org.terasology.rendering.nui.layers.mainMenu;
 
-import org.terasology.assets.ResourceUrn;
 import org.terasology.crashreporter.CrashReporter;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.LoggingContext;
+import org.terasology.gestalt.assets.ResourceUrn;
+import org.terasology.nui.WidgetUtil;
 import org.terasology.recording.RecordAndReplayCurrentStatus;
 import org.terasology.recording.RecordAndReplayStatus;
 import org.terasology.recording.RecordAndReplayUtils;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
-import org.terasology.nui.WidgetUtil;
 import org.terasology.rendering.nui.animation.MenuAnimationSystems;
 import org.terasology.telemetry.TelemetryScreen;
 

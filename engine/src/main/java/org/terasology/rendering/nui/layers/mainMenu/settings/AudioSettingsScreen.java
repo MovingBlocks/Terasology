@@ -15,14 +15,14 @@
  */
 package org.terasology.rendering.nui.layers.mainMenu.settings;
 
-import org.terasology.assets.ResourceUrn;
 import org.terasology.config.AudioConfig;
-import org.terasology.registry.In;
-import org.terasology.rendering.nui.CoreScreenLayer;
+import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.nui.WidgetUtil;
-import org.terasology.rendering.nui.animation.MenuAnimationSystems;
 import org.terasology.nui.databinding.Binding;
 import org.terasology.nui.widgets.UISlider;
+import org.terasology.registry.In;
+import org.terasology.rendering.nui.CoreScreenLayer;
+import org.terasology.rendering.nui.animation.MenuAnimationSystems;
 
 /**
  */

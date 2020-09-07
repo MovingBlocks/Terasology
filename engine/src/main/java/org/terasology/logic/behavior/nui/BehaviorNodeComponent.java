@@ -16,7 +16,7 @@
 package org.terasology.logic.behavior.nui;
 
 import org.terasology.entitySystem.Component;
-import org.terasology.module.sandbox.API;
+import org.terasology.gestalt.module.sandbox.API;
 import org.terasology.nui.Color;
 
 /**

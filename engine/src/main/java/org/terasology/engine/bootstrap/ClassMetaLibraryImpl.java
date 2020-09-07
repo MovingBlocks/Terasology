@@ -16,11 +16,11 @@
 
 package org.terasology.engine.bootstrap;
 
-import java.lang.annotation.Annotation;
-
 import org.terasology.context.Context;
 import org.terasology.engine.module.ModuleManager;
-import org.terasology.naming.Name;
+import org.terasology.gestalt.naming.Name;
+
+import java.lang.annotation.Annotation;
 
 public class ClassMetaLibraryImpl implements ClassMetaLibrary {
 

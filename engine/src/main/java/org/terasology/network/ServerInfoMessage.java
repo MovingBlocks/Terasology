@@ -16,7 +16,7 @@
 
 package org.terasology.network;
 
-import org.terasology.naming.NameVersion;
+import org.terasology.gestalt.naming.NameVersion;
 import org.terasology.world.internal.WorldInfo;
 
 import java.util.List;

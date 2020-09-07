@@ -16,12 +16,12 @@
 
 package org.terasology.i18n;
 
+import org.terasology.gestalt.naming.Name;
+import org.terasology.i18n.assets.Translation;
+
 import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
-
-import org.terasology.i18n.assets.Translation;
-import org.terasology.naming.Name;
 
 /**
  * Describes a translation project. It aggregates individual translations (one per {@link Locale}).

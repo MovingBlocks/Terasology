@@ -19,4 +19,4 @@
  */
 @API package org.terasology.rendering.nui.widgets.browser.data;
 
-import org.terasology.module.sandbox.API;
+import org.terasology.gestalt.module.sandbox.API;

@@ -16,17 +16,17 @@
 package org.terasology.rendering.nui.editor.layers;
 
 import com.google.common.collect.Lists;
-import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.engine.SimpleUri;
+import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.i18n.TranslationProject;
 import org.terasology.i18n.TranslationSystem;
-import org.terasology.registry.In;
-import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.nui.WidgetUtil;
 import org.terasology.nui.databinding.BindHelper;
-import org.terasology.rendering.nui.layers.mainMenu.settings.LocaleRenderer;
 import org.terasology.nui.widgets.UIDropdownScrollable;
+import org.terasology.registry.In;
+import org.terasology.rendering.nui.CoreScreenLayer;
+import org.terasology.rendering.nui.layers.mainMenu.settings.LocaleRenderer;
 
 import java.util.ArrayList;
 import java.util.Collections;

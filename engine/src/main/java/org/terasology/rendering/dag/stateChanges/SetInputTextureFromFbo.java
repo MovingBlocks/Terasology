@@ -15,8 +15,8 @@
  */
 package org.terasology.rendering.dag.stateChanges;
 
-import org.terasology.assets.ResourceUrn;
 import org.terasology.engine.SimpleUri;
+import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.dag.StateChange;
 import org.terasology.rendering.opengl.BaseFboManager;

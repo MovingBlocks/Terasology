@@ -17,17 +17,16 @@ package org.terasology.rendering.iconmesh;
 
 import org.joml.Rectanglei;
 import org.joml.Vector4f;
-import org.terasology.math.JomlUtil;
-import org.terasology.utilities.Assets;
-import org.terasology.assets.Asset;
-import org.terasology.assets.ResourceUrn;
-import org.terasology.module.sandbox.API;
-import org.terasology.naming.Name;
+import org.terasology.gestalt.assets.Asset;
+import org.terasology.gestalt.assets.ResourceUrn;
+import org.terasology.gestalt.module.sandbox.API;
+import org.terasology.gestalt.naming.Name;
 import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.rendering.assets.mesh.MeshData;
 import org.terasology.rendering.assets.texture.TextureRegion;
 import org.terasology.rendering.primitives.Tessellator;
 import org.terasology.rendering.primitives.TessellatorHelper;
+import org.terasology.utilities.Assets;
 
 import java.nio.ByteBuffer;
 

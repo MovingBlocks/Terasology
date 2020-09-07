@@ -15,7 +15,7 @@
  */
 package org.terasology.logic.console.commandSystem.adapter;
 
-import org.terasology.naming.Name;
+import org.terasology.gestalt.naming.Name;
 
 /**
  */

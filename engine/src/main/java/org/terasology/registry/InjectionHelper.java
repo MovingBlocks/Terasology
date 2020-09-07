@@ -19,8 +19,8 @@ import org.reflections.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.context.Context;
-import org.terasology.util.reflection.ParameterProvider;
-import org.terasology.util.reflection.SimpleClassFactory;
+import org.terasology.gestalt.util.reflection.ParameterProvider;
+import org.terasology.gestalt.util.reflection.SimpleClassFactory;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;

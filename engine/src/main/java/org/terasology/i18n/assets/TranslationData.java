@@ -15,15 +15,14 @@
  */
 package org.terasology.i18n.assets;
 
+import com.google.common.base.Preconditions;
+import org.terasology.engine.Uri;
+import org.terasology.gestalt.assets.AssetData;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-
-import org.terasology.assets.AssetData;
-import org.terasology.engine.Uri;
-
-import com.google.common.base.Preconditions;
 
 
 /**

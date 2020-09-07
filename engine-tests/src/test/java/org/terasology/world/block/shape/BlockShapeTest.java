@@ -19,7 +19,7 @@ import com.bulletphysics.util.ObjectArrayList;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.terasology.TerasologyTestingEnvironment;
-import org.terasology.assets.management.AssetManager;
+import org.terasology.gestalt.assets.management.AssetManager;
 import org.terasology.math.Rotation;
 import org.terasology.math.VecMath;
 import org.terasology.math.Yaw;

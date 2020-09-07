@@ -16,21 +16,22 @@
 
 package org.terasology.rendering.assets.texture;
 
-import org.terasology.assets.module.annotations.RegisterAssetFileFormat;
-import org.terasology.assets.module.ModuleAssetDataProducer;
-import org.terasology.assets.ResourceUrn;
-import org.terasology.assets.format.AbstractAssetFileFormat;
-import org.terasology.assets.format.AssetDataFile;
+import org.terasology.gestalt.assets.ResourceUrn;
+import org.terasology.gestalt.assets.format.AbstractAssetFileFormat;
+import org.terasology.gestalt.assets.format.AssetDataFile;
+import org.terasology.gestalt.assets.module.ModuleAssetDataProducer;
+import org.terasology.gestalt.assets.module.annotations.RegisterAssetFileFormat;
+
+import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.DataBufferByte;
 import java.awt.image.WritableRaster;
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.file.PathMatcher;
 import java.util.List;
-import javax.imageio.ImageIO;
 
 /**
  */

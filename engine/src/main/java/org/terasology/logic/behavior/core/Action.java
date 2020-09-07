@@ -15,7 +15,7 @@
  */
 package org.terasology.logic.behavior.core;
 
-import org.terasology.module.sandbox.API;
+import org.terasology.gestalt.module.sandbox.API;
 
 /**
  * The action that is used by an action or decorator node. Every action node of a behavior tree has its own action

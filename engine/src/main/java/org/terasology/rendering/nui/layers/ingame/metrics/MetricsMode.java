@@ -15,7 +15,7 @@
  */
 package org.terasology.rendering.nui.layers.ingame.metrics;
 
-import org.terasology.module.sandbox.API;
+import org.terasology.gestalt.module.sandbox.API;
 
 /**
  * A metrics mode is a named entry in the {@link DebugOverlay}.

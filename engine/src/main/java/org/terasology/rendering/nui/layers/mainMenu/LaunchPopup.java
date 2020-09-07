@@ -15,14 +15,14 @@
  */
 package org.terasology.rendering.nui.layers.mainMenu;
 
-import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
-import org.terasology.registry.In;
-import org.terasology.rendering.nui.CoreScreenLayer;
+import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.nui.WidgetUtil;
 import org.terasology.nui.databinding.BindHelper;
 import org.terasology.nui.widgets.UIButton;
 import org.terasology.nui.widgets.UILabel;
+import org.terasology.registry.In;
+import org.terasology.rendering.nui.CoreScreenLayer;
 
 /**
  * LaunchPopup will appear when game launches.

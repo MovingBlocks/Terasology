@@ -15,7 +15,7 @@
  */
 package org.terasology.engine.subsystem.common;
 
-import org.terasology.module.sandbox.API;
+import org.terasology.gestalt.module.sandbox.API;
 
 @API
 @FunctionalInterface

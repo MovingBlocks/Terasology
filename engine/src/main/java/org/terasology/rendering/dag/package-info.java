@@ -34,4 +34,4 @@
 @API
 package org.terasology.rendering.dag;
 
-import org.terasology.module.sandbox.API;
+import org.terasology.gestalt.module.sandbox.API;

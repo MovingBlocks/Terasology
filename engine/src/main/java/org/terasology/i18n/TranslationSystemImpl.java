@@ -16,6 +16,19 @@
 
 package org.terasology.i18n;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.terasology.config.Config;
+import org.terasology.config.SystemConfig;
+import org.terasology.context.Context;
+import org.terasology.engine.SimpleUri;
+import org.terasology.engine.Uri;
+import org.terasology.gestalt.assets.ResourceUrn;
+import org.terasology.gestalt.assets.management.AssetManager;
+import org.terasology.i18n.assets.Translation;
+import org.terasology.persistence.TemplateEngine;
+import org.terasology.persistence.TemplateEngineImpl;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -24,19 +37,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.terasology.assets.ResourceUrn;
-import org.terasology.assets.management.AssetManager;
-import org.terasology.config.Config;
-import org.terasology.config.SystemConfig;
-import org.terasology.context.Context;
-import org.terasology.engine.SimpleUri;
-import org.terasology.engine.Uri;
-import org.terasology.i18n.assets.Translation;
-import org.terasology.persistence.TemplateEngine;
-import org.terasology.persistence.TemplateEngineImpl;
 
 /**
  * A translation system that uses {@link Translation} data assets to

@@ -19,10 +19,10 @@ import com.google.common.collect.Sets;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.module.ModuleManagerImpl;
-import org.terasology.module.ClasspathModule;
-import org.terasology.module.ModuleMetadata;
-import org.terasology.module.ModuleMetadataReader;
-import org.terasology.naming.Name;
+import org.terasology.gestalt.module.ClasspathModule;
+import org.terasology.gestalt.module.ModuleMetadata;
+import org.terasology.gestalt.module.ModuleMetadataReader;
+import org.terasology.gestalt.naming.Name;
 
 import java.io.InputStreamReader;
 import java.io.Reader;

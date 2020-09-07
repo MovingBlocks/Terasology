@@ -16,12 +16,12 @@
 
 package org.terasology.engine.module;
 
+import com.google.common.collect.ImmutableList;
+import org.terasology.gestalt.module.BaseModule;
+import org.terasology.gestalt.module.ModuleMetadata;
+
 import java.net.URL;
 import java.util.Collections;
-
-import org.terasology.module.BaseModule;
-import org.terasology.module.ModuleMetadata;
-import com.google.common.collect.ImmutableList;
 
 /**
  * A module that lives in a remote location.

@@ -15,7 +15,7 @@
  */
 package org.terasology.world.block;
 
-import org.terasology.assets.management.AssetManager;
+import org.terasology.gestalt.assets.management.AssetManager;
 import org.terasology.world.block.loader.BlockFamilyDefinition;
 
 import java.util.Optional;

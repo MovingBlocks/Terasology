@@ -16,8 +16,8 @@
 package org.terasology.entitySystem.sectors;
 
 import org.terasology.entitySystem.event.Event;
+import org.terasology.gestalt.module.sandbox.API;
 import org.terasology.math.geom.Vector3i;
-import org.terasology.module.sandbox.API;
 
 import java.util.Set;
 

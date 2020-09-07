@@ -16,7 +16,7 @@
 
 package org.terasology.audio;
 
-import org.terasology.assets.AssetData;
+import org.terasology.gestalt.assets.AssetData;
 
 import java.nio.ByteBuffer;
 

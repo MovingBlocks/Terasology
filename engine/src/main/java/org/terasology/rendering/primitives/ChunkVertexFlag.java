@@ -15,7 +15,7 @@
  */
 package org.terasology.rendering.primitives;
 
-import org.terasology.module.sandbox.API;
+import org.terasology.gestalt.module.sandbox.API;
 
 /**
  */

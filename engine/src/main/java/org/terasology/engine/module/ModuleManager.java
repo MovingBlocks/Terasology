@@ -16,12 +16,12 @@
 
 package org.terasology.engine.module;
 
-import java.util.Set;
+import org.terasology.gestalt.module.Module;
+import org.terasology.gestalt.module.ModuleEnvironment;
+import org.terasology.gestalt.module.ModuleMetadataJsonAdapter;
+import org.terasology.gestalt.module.ModuleRegistry;
 
-import org.terasology.module.Module;
-import org.terasology.module.ModuleEnvironment;
-import org.terasology.module.ModuleMetadataJsonAdapter;
-import org.terasology.module.ModuleRegistry;
+import java.util.Set;
 
 /**
  * TODO Type description

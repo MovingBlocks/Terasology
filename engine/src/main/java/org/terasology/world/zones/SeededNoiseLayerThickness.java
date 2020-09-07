@@ -15,7 +15,7 @@
  */
 package org.terasology.world.zones;
 
-import org.terasology.module.sandbox.API;
+import org.terasology.gestalt.module.sandbox.API;
 import org.terasology.utilities.procedural.Noise;
 
 import java.util.function.LongFunction;

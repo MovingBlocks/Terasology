@@ -16,8 +16,8 @@
 
 package org.terasology.audio;
 
-import org.terasology.assets.AssetType;
-import org.terasology.assets.ResourceUrn;
+import org.terasology.gestalt.assets.AssetType;
+import org.terasology.gestalt.assets.ResourceUrn;
 
 /**
  * Interface for a sound that is streamed from storage. The entire sound is not loaded into memory

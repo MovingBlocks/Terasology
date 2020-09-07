@@ -15,10 +15,10 @@
  */
 package org.terasology.rendering.nui.layers.mainMenu;
 
-import org.terasology.assets.ResourceUrn;
-import org.terasology.rendering.nui.CoreScreenLayer;
+import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.nui.WidgetUtil;
 import org.terasology.nui.widgets.UILabel;
+import org.terasology.rendering.nui.CoreScreenLayer;
 
 /**
  * Ask the user to confirm or cancel an action.

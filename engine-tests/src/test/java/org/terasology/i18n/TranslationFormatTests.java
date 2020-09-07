@@ -18,14 +18,14 @@ package org.terasology.i18n;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.terasology.assets.ResourceUrn;
-import org.terasology.assets.exceptions.InvalidAssetFilenameException;
-import org.terasology.assets.format.AssetDataFile;
-import org.terasology.assets.format.FileFormat;
 import org.terasology.engine.SimpleUri;
+import org.terasology.gestalt.assets.ResourceUrn;
+import org.terasology.gestalt.assets.exceptions.InvalidAssetFilenameException;
+import org.terasology.gestalt.assets.format.AssetDataFile;
+import org.terasology.gestalt.assets.format.FileFormat;
+import org.terasology.gestalt.naming.Name;
 import org.terasology.i18n.assets.TranslationData;
 import org.terasology.i18n.assets.TranslationFormat;
-import org.terasology.naming.Name;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;

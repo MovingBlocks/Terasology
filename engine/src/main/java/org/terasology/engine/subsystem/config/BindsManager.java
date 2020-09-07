@@ -4,6 +4,7 @@ package org.terasology.engine.subsystem.config;
 import org.terasology.config.BindsConfig;
 import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
+import org.terasology.gestalt.module.ModuleEnvironment;
 import org.terasology.input.BindAxisEvent;
 import org.terasology.input.BindButtonEvent;
 import org.terasology.input.BindableButton;
@@ -17,7 +18,6 @@ import org.terasology.input.RegisterBindButton;
 import org.terasology.input.RegisterRealBindAxis;
 import org.terasology.input.internal.AbstractBindableAxis;
 import org.terasology.input.internal.BindableRealAxis;
-import org.terasology.module.ModuleEnvironment;
 
 import java.util.List;
 import java.util.Map;

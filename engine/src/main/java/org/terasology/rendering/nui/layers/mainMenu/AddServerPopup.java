@@ -16,15 +16,15 @@
 package org.terasology.rendering.nui.layers.mainMenu;
 
 import com.google.common.primitives.Ints;
-import org.terasology.assets.ResourceUrn;
 import org.terasology.config.ServerInfo;
 import org.terasology.engine.TerasologyConstants;
-import org.terasology.rendering.nui.CoreScreenLayer;
+import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.nui.databinding.ReadOnlyBinding;
 import org.terasology.nui.widgets.ActivateEventListener;
 import org.terasology.nui.widgets.UIButton;
 import org.terasology.nui.widgets.UILabel;
 import org.terasology.nui.widgets.UIText;
+import org.terasology.rendering.nui.CoreScreenLayer;
 
 import java.util.function.Consumer;
 

@@ -17,15 +17,15 @@ package org.terasology.logic.console.ui;
 
 import com.google.common.collect.Iterables;
 import org.codehaus.plexus.util.StringUtils;
-import org.terasology.assets.ResourceUrn;
+import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.logic.console.Console;
 import org.terasology.logic.console.CoreMessageType;
 import org.terasology.logic.console.Message;
 import org.terasology.nui.Canvas;
-import org.terasology.registry.In;
-import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.nui.databinding.ReadOnlyBinding;
 import org.terasology.nui.widgets.UILabel;
+import org.terasology.registry.In;
+import org.terasology.rendering.nui.CoreScreenLayer;
 
 
 /**

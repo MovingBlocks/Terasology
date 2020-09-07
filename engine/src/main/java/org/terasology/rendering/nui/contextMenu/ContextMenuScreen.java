@@ -17,7 +17,7 @@ package org.terasology.rendering.nui.contextMenu;
 
 import com.google.common.collect.Lists;
 import org.joml.Rectanglei;
-import org.terasology.assets.ResourceUrn;
+import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.nui.BaseInteractionListener;

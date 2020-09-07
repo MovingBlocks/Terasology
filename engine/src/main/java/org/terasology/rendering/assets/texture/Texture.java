@@ -16,8 +16,8 @@
 
 package org.terasology.rendering.assets.texture;
 
-import org.terasology.assets.AssetType;
-import org.terasology.assets.ResourceUrn;
+import org.terasology.gestalt.assets.AssetType;
+import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.math.geom.Rect2f;
 
 /**

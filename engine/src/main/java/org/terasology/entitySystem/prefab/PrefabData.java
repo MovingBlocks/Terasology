@@ -16,9 +16,9 @@
 package org.terasology.entitySystem.prefab;
 
 import com.google.common.collect.Maps;
-import org.terasology.assets.AssetData;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.MutableComponentContainer;
+import org.terasology.gestalt.assets.AssetData;
 
 import java.util.Collections;
 import java.util.List;

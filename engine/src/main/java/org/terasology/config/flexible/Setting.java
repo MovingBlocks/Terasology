@@ -16,7 +16,7 @@
 package org.terasology.config.flexible;
 
 import org.terasology.config.flexible.constraints.SettingConstraint;
-import org.terasology.module.sandbox.API;
+import org.terasology.gestalt.module.sandbox.API;
 import org.terasology.reflection.TypeInfo;
 
 /**

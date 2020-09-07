@@ -17,8 +17,8 @@ package org.terasology.world.block.loader;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import org.terasology.assets.AssetData;
-import org.terasology.module.sandbox.API;
+import org.terasology.gestalt.assets.AssetData;
+import org.terasology.gestalt.module.sandbox.API;
 import org.terasology.world.block.family.AbstractBlockFamily;
 
 import java.util.List;

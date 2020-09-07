@@ -15,7 +15,7 @@
  */
 package org.terasology.world.zones;
 
-import org.terasology.module.sandbox.API;
+import org.terasology.gestalt.module.sandbox.API;
 
 /**
  * This function is used to determine the thickness of a {@link LayeredZoneRegionFunction} at each point on the layer.

@@ -16,11 +16,11 @@
 
 package org.terasology.audio.nullAudio;
 
-import org.terasology.assets.Asset;
-import org.terasology.assets.AssetType;
-import org.terasology.assets.ResourceUrn;
 import org.terasology.audio.StreamingSound;
 import org.terasology.audio.StreamingSoundData;
+import org.terasology.gestalt.assets.Asset;
+import org.terasology.gestalt.assets.AssetType;
+import org.terasology.gestalt.assets.ResourceUrn;
 
 import java.util.Optional;
 

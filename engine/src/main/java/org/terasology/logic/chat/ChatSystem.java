@@ -18,12 +18,12 @@ package org.terasology.logic.chat;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.assets.ResourceUrn;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
+import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.input.ButtonState;
 import org.terasology.input.binds.general.ChatButton;
 import org.terasology.logic.common.DisplayNameComponent;
@@ -38,8 +38,8 @@ import org.terasology.logic.console.suggesters.OnlineUsernameSuggester;
 import org.terasology.logic.console.ui.NotificationOverlay;
 import org.terasology.logic.permission.PermissionManager;
 import org.terasology.network.ClientComponent;
-import org.terasology.registry.In;
 import org.terasology.nui.FontColor;
+import org.terasology.registry.In;
 import org.terasology.rendering.nui.NUIManager;
 
 import java.util.Arrays;

@@ -16,10 +16,10 @@
 package org.terasology.entitySystem.sectors;
 
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.gestalt.module.sandbox.API;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.ChunkMath;
 import org.terasology.math.geom.Vector3i;
-import org.terasology.module.sandbox.API;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkProvider;
 

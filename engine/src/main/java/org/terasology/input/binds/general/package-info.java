@@ -20,5 +20,5 @@
         displayName = "${engine:menu#category-general}"
         ) package org.terasology.input.binds.general;
 
-import org.terasology.module.sandbox.API;
+import org.terasology.gestalt.module.sandbox.API;
 import org.terasology.input.InputCategory;

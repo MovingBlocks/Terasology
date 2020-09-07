@@ -16,4 +16,4 @@
 
 @API package org.terasology.utilities.concurrency;
 
-import org.terasology.module.sandbox.API;
+import org.terasology.gestalt.module.sandbox.API;

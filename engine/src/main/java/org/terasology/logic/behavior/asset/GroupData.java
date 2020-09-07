@@ -15,7 +15,7 @@
  */
 package org.terasology.logic.behavior.asset;
 
-import org.terasology.assets.AssetData;
+import org.terasology.gestalt.assets.AssetData;
 
 /**
  * Every Group asset is described by a GroupData class.

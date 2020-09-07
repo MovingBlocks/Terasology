@@ -16,4 +16,4 @@
 
 @API package org.terasology.rendering.assets.shader;
 
-import org.terasology.module.sandbox.API;
+import org.terasology.gestalt.module.sandbox.API;

@@ -16,16 +16,14 @@
 package org.terasology.rendering.nui.internal;
 
 import com.google.common.base.Predicate;
-import org.terasology.assets.ResourceUrn;
-import org.terasology.engine.SimpleUri;
-import org.terasology.reflection.copy.CopyStrategy;
+import org.terasology.gestalt.assets.ResourceUrn;
+import org.terasology.nui.LayoutConfig;
+import org.terasology.nui.UIWidget;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.metadata.ClassMetadata;
 import org.terasology.reflection.metadata.FieldMetadata;
 import org.terasology.reflection.reflect.InaccessibleFieldException;
 import org.terasology.reflection.reflect.ReflectFactory;
-import org.terasology.nui.LayoutConfig;
-import org.terasology.nui.UIWidget;
 
 import java.lang.reflect.Field;
 

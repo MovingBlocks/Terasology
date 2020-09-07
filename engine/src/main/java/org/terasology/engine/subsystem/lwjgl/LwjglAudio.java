@@ -19,7 +19,6 @@ import org.lwjgl.LWJGLException;
 import org.lwjgl.openal.OpenALException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.assets.module.ModuleAwareAssetTypeManager;
 import org.terasology.audio.AudioManager;
 import org.terasology.audio.StaticSound;
 import org.terasology.audio.StreamingSound;
@@ -29,6 +28,7 @@ import org.terasology.config.AudioConfig;
 import org.terasology.context.Context;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.modes.GameState;
+import org.terasology.gestalt.assets.module.ModuleAwareAssetTypeManager;
 
 public class LwjglAudio extends BaseLwjglSubsystem {
 

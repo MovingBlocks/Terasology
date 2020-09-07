@@ -17,14 +17,14 @@ package org.terasology.rendering.nui.editor.layers;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
-import org.terasology.assets.ResourceUrn;
-import org.terasology.rendering.nui.CoreScreenLayer;
+import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.nui.WidgetUtil;
 import org.terasology.nui.databinding.ReadOnlyBinding;
 import org.terasology.nui.widgets.UIButton;
 import org.terasology.nui.widgets.UIDropdownScrollable;
 import org.terasology.nui.widgets.UpdateListener;
 import org.terasology.nui.widgets.treeView.JsonTree;
+import org.terasology.rendering.nui.CoreScreenLayer;
 
 import java.util.Arrays;
 import java.util.List;

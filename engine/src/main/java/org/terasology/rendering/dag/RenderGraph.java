@@ -20,18 +20,19 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.MutableGraph;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
-import org.terasology.naming.Name;
+import org.terasology.gestalt.naming.Name;
 import org.terasology.rendering.ShaderManager;
 import org.terasology.rendering.dag.dependencyConnections.BufferPairConnection;
 import org.terasology.rendering.dag.dependencyConnections.DependencyConnection;
 import org.terasology.rendering.dag.dependencyConnections.FboConnection;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * TODO: Add javadocs

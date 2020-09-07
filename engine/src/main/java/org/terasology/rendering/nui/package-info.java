@@ -29,4 +29,4 @@
  */
 @API package org.terasology.rendering.nui;
 
-import org.terasology.module.sandbox.API;
+import org.terasology.gestalt.module.sandbox.API;

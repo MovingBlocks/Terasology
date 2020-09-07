@@ -16,16 +16,16 @@
 
 package org.terasology.world.viewer.layers;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.terasology.gestalt.module.ModuleEnvironment;
+import org.terasology.world.generation.WorldFacet;
+
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.terasology.module.ModuleEnvironment;
-import org.terasology.world.generation.WorldFacet;
 
 /**
  * Additional functionality around the {@link FacetLayer} interface that is

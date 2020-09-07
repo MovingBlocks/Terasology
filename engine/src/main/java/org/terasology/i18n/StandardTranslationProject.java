@@ -16,8 +16,8 @@
 
 package org.terasology.i18n;
 
+import org.terasology.gestalt.naming.Name;
 import org.terasology.i18n.assets.Translation;
-import org.terasology.naming.Name;
 
 import java.util.HashMap;
 import java.util.HashSet;

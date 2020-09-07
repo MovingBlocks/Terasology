@@ -70,6 +70,10 @@ repositories {
         url "http://maven.snplow.com/releases"
         allowInsecureProtocol true  // 😱
     }
+    google()
+    maven {
+        url 'https://heisluft.tk/maven'
+    }
 }
 
 dependencies {

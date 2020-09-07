@@ -20,8 +20,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.context.Context;
 import org.terasology.engine.module.ModuleManager;
-import org.terasology.module.ModuleEnvironment;
-import org.terasology.module.sandbox.API;
+import org.terasology.gestalt.module.ModuleEnvironment;
+import org.terasology.gestalt.module.sandbox.API;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
 

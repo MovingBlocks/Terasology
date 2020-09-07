@@ -16,13 +16,13 @@
 
 package org.terasology.engine.modes.loadProcesses;
 
-import org.terasology.assets.management.AssetManager;
 import org.terasology.config.Config;
 import org.terasology.context.Context;
 import org.terasology.engine.modes.SingleStepLoadProcess;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.game.GameManifest;
-import org.terasology.module.ModuleEnvironment;
+import org.terasology.gestalt.assets.management.AssetManager;
+import org.terasology.gestalt.module.ModuleEnvironment;
 import org.terasology.network.NetworkSystem;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.persistence.typeHandling.extensionTypes.BlockFamilyTypeHandler;

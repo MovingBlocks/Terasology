@@ -16,4 +16,4 @@
 
 @API package org.terasology.world.block.entity.neighbourUpdate;
 
-import org.terasology.module.sandbox.API;
+import org.terasology.gestalt.module.sandbox.API;

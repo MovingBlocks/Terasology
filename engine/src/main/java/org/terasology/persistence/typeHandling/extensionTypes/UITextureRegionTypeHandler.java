@@ -17,7 +17,7 @@ package org.terasology.persistence.typeHandling.extensionTypes;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.assets.Asset;
+import org.terasology.gestalt.assets.Asset;
 import org.terasology.nui.UITextureRegion;
 import org.terasology.persistence.typeHandling.StringRepresentationTypeHandler;
 import org.terasology.rendering.assets.texture.TextureRegionAsset;

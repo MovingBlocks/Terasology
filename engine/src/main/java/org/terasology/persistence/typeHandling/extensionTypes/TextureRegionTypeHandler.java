@@ -17,11 +17,11 @@ package org.terasology.persistence.typeHandling.extensionTypes;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.utilities.Assets;
-import org.terasology.assets.Asset;
+import org.terasology.gestalt.assets.Asset;
 import org.terasology.persistence.typeHandling.StringRepresentationTypeHandler;
 import org.terasology.rendering.assets.texture.TextureRegion;
 import org.terasology.rendering.assets.texture.TextureRegionAsset;
+import org.terasology.utilities.Assets;
 
 import java.util.Optional;
 

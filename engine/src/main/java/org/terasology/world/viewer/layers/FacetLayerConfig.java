@@ -16,7 +16,7 @@
 
 package org.terasology.world.viewer.layers;
 
-import org.terasology.module.sandbox.API;
+import org.terasology.gestalt.module.sandbox.API;
 
 @API
 public interface FacetLayerConfig {

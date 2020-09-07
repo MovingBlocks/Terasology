@@ -17,8 +17,9 @@ package org.terasology.rendering.nui.layers.mainMenu;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.assets.ResourceUrn;
 import org.terasology.engine.paths.PathManager;
+import org.terasology.gestalt.assets.ResourceUrn;
+import org.terasology.nui.widgets.UIButton;
 import org.terasology.recording.RecordAndReplayCurrentStatus;
 import org.terasology.recording.RecordAndReplayStatus;
 import org.terasology.recording.RecordAndReplayUtils;
@@ -26,7 +27,6 @@ import org.terasology.registry.In;
 import org.terasology.rendering.nui.animation.MenuAnimationSystems;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameInfo;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameProvider;
-import org.terasology.nui.widgets.UIButton;
 
 import java.util.Objects;
 import java.util.stream.Stream;

@@ -15,4 +15,4 @@
  */
 @API package org.terasology.config.flexible.constraints;
 
-import org.terasology.module.sandbox.API;
+import org.terasology.gestalt.module.sandbox.API;

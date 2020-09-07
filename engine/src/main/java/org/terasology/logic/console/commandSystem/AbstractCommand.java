@@ -23,12 +23,12 @@ import com.google.common.collect.Sets;
 import com.google.common.primitives.Primitives;
 import org.terasology.context.Context;
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.gestalt.naming.Name;
 import org.terasology.logic.console.commandSystem.exceptions.CommandExecutionException;
 import org.terasology.logic.console.commandSystem.exceptions.CommandInitializationException;
 import org.terasology.logic.console.commandSystem.exceptions.CommandParameterParseException;
 import org.terasology.logic.console.commandSystem.exceptions.CommandSuggestionException;
 import org.terasology.logic.permission.PermissionManager;
-import org.terasology.naming.Name;
 import org.terasology.utilities.reflection.SpecificAccessibleObject;
 
 import java.lang.reflect.InvocationTargetException;

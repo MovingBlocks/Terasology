@@ -17,4 +17,4 @@
 @API
 package org.terasology.rendering.opengl;
 
-import org.terasology.module.sandbox.API;
+import org.terasology.gestalt.module.sandbox.API;

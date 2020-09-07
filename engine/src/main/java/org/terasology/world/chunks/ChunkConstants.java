@@ -16,10 +16,10 @@
 
 package org.terasology.world.chunks;
 
+import org.terasology.gestalt.module.sandbox.API;
 import org.terasology.math.Region3i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Vector3i;
-import org.terasology.module.sandbox.API;
 
 /**
  */

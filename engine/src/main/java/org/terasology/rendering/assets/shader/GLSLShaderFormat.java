@@ -24,12 +24,12 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
-import org.terasology.assets.ResourceUrn;
-import org.terasology.assets.exceptions.InvalidAssetFilenameException;
-import org.terasology.assets.format.AssetDataFile;
-import org.terasology.assets.format.AssetFileFormat;
-import org.terasology.assets.module.annotations.RegisterAssetFileFormat;
-import org.terasology.naming.Name;
+import org.terasology.gestalt.assets.ResourceUrn;
+import org.terasology.gestalt.assets.exceptions.InvalidAssetFilenameException;
+import org.terasology.gestalt.assets.format.AssetDataFile;
+import org.terasology.gestalt.assets.format.AssetFileFormat;
+import org.terasology.gestalt.assets.module.annotations.RegisterAssetFileFormat;
+import org.terasology.gestalt.naming.Name;
 
 import java.io.IOException;
 import java.io.InputStreamReader;

@@ -15,16 +15,16 @@
  */
 package org.terasology.rendering.nui.layers.ingame;
 
-import org.terasology.assets.ResourceUrn;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.Time;
 import org.terasology.engine.modes.StateMainMenu;
+import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
+import org.terasology.nui.WidgetUtil;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
-import org.terasology.nui.WidgetUtil;
 import org.terasology.rendering.nui.animation.MenuAnimationSystems;
 import org.terasology.rendering.nui.layers.mainMenu.settings.SettingsMenuScreen;
 

@@ -5,7 +5,7 @@ package org.terasology.engine.subsystem.headless.renderer;
 
 import org.joml.Rectanglei;
 import org.joml.Vector2i;
-import org.terasology.assets.ResourceUrn;
+import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.math.geom.BaseVector2i;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Rect2i;

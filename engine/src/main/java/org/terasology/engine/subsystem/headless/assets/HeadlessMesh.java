@@ -16,8 +16,8 @@
 package org.terasology.engine.subsystem.headless.assets;
 
 import gnu.trove.list.TFloatList;
-import org.terasology.assets.AssetType;
-import org.terasology.assets.ResourceUrn;
+import org.terasology.gestalt.assets.AssetType;
+import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.math.AABB;
 import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.rendering.assets.mesh.MeshData;

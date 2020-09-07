@@ -15,11 +15,11 @@
  */
 package org.terasology.logic.behavior;
 
+import org.terasology.gestalt.module.sandbox.API;
 import org.terasology.logic.behavior.asset.BehaviorTree;
 import org.terasology.logic.behavior.core.Actor;
 import org.terasology.logic.behavior.core.BehaviorTreeRunner;
 import org.terasology.logic.common.DisplayNameComponent;
-import org.terasology.module.sandbox.API;
 
 /**
  * An interpreter evaluates a behavior tree. Uses BehaviorTreeRunner to actually evaluate the tree. The runner

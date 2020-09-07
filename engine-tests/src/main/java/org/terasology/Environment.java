@@ -19,10 +19,10 @@ package org.terasology;
 import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.assets.management.AssetManager;
 import org.terasology.context.Context;
 import org.terasology.context.internal.ContextImpl;
-import org.terasology.naming.Name;
+import org.terasology.gestalt.assets.management.AssetManager;
+import org.terasology.gestalt.naming.Name;
 import org.terasology.recording.RecordAndReplayCurrentStatus;
 import org.terasology.registry.CoreRegistry;
 

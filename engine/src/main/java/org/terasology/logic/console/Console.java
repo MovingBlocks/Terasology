@@ -16,8 +16,8 @@
 package org.terasology.logic.console;
 
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.gestalt.naming.Name;
 import org.terasology.logic.console.commandSystem.ConsoleCommand;
-import org.terasology.naming.Name;
 
 import java.util.Collection;
 import java.util.List;

@@ -15,7 +15,7 @@
  */
 package org.terasology.utilities;
 
-import org.terasology.module.sandbox.API;
+import org.terasology.gestalt.module.sandbox.API;
 
 /**
  *         Contains functions to get the ordinal indicator string for an integer.

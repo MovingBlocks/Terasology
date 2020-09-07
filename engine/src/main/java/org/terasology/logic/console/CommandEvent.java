@@ -16,7 +16,7 @@
 package org.terasology.logic.console;
 
 import org.terasology.entitySystem.event.Event;
-import org.terasology.naming.Name;
+import org.terasology.gestalt.naming.Name;
 import org.terasology.network.ServerEvent;
 
 import java.util.List;

@@ -15,14 +15,14 @@
  */
 package org.terasology.rendering.nui.layers.ingame;
 
-import org.terasology.assets.ResourceUrn;
 import org.terasology.crashreporter.CrashReporter;
 import org.terasology.engine.LoggingContext;
 import org.terasology.engine.Time;
+import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.network.NetworkSystem;
+import org.terasology.nui.WidgetUtil;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
-import org.terasology.nui.WidgetUtil;
 import org.terasology.rendering.nui.animation.MenuAnimationSystems;
 import org.terasology.telemetry.TelemetryScreen;
 

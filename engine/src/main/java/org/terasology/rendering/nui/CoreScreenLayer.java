@@ -17,7 +17,7 @@ package org.terasology.rendering.nui;
 
 import org.joml.Rectanglei;
 import org.joml.Vector2i;
-import org.terasology.assets.ResourceUrn;
+import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.input.ButtonState;
 import org.terasology.input.Keyboard;
 import org.terasology.math.JomlUtil;

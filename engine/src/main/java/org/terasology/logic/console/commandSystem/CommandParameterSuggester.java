@@ -16,7 +16,7 @@
 package org.terasology.logic.console.commandSystem;
 
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.module.sandbox.API;
+import org.terasology.gestalt.module.sandbox.API;
 
 import java.util.Set;
 

@@ -16,11 +16,11 @@
 
 package org.terasology.persistence;
 
+import org.terasology.gestalt.module.sandbox.API;
+
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.terasology.module.sandbox.API;
 
 /**
  * A simple template engine that replaces <code>${text}<code> expressions

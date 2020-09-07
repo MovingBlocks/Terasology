@@ -15,13 +15,10 @@
  */
 package org.terasology.reflection;
 
-import org.junit.Ignore;
-import org.junit.jupiter.api.Test;
 import org.reflections.Reflections;
-import org.terasology.ModuleEnvironmentTest;
 import org.terasology.engine.module.ExternalApiWhitelist;
 import org.terasology.entitySystem.Component;
-import org.terasology.naming.Name;
+import org.terasology.gestalt.naming.Name;
 
 import java.util.Collection;
 import java.util.LinkedHashMap;

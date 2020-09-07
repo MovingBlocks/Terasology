@@ -17,9 +17,10 @@ package org.terasology.rendering.dag.nodes;
 
 import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
-import org.terasology.naming.Name;
-import org.terasology.rendering.dag.AbstractNode;
+import org.terasology.gestalt.naming.Name;
 import org.terasology.nui.properties.Range;
+import org.terasology.rendering.dag.AbstractNode;
+
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 

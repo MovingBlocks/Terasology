@@ -15,21 +15,21 @@
  */
 package org.terasology.rendering.nui.layers.mainMenu.inputSettings;
 
-import org.terasology.assets.ResourceUrn;
 import org.terasology.config.BindsConfig;
 import org.terasology.config.Config;
 import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.subsystem.config.BindsManager;
+import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.i18n.TranslationSystem;
 import org.terasology.input.Input;
 import org.terasology.input.RegisterBindButton;
-import org.terasology.registry.In;
-import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.nui.WidgetUtil;
 import org.terasology.nui.widgets.UIButton;
 import org.terasology.nui.widgets.UILabel;
+import org.terasology.registry.In;
+import org.terasology.rendering.nui.CoreScreenLayer;
 
 import java.util.List;
 

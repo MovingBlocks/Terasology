@@ -15,7 +15,7 @@
  */
 package org.terasology.world.block;
 
-import org.terasology.assets.ResourceUrn;
+import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.world.block.family.BlockFamily;
 
 import java.util.Collection;

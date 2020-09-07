@@ -15,7 +15,7 @@
  */
 package org.terasology.logic.console.commandSystem.adapter;
 
-import org.terasology.module.sandbox.API;
+import org.terasology.gestalt.module.sandbox.API;
 
 /**
  * Used for providing parameters to {@code execute} and {@code suggest} methods of {@link org.terasology.logic.console.commandSystem.AbstractCommand}

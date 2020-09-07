@@ -17,8 +17,7 @@ package org.terasology.entitySystem.metadata.internal;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.terasology.assets.ResourceUrn;
-import org.terasology.engine.SimpleUri;
+import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.metadata.DefaultClassMetadata;
 import org.terasology.reflection.metadata.FieldMetadata;

@@ -17,7 +17,7 @@
 package org.terasology.i18n;
 
 import org.terasology.engine.Uri;
-import org.terasology.module.sandbox.API;
+import org.terasology.gestalt.module.sandbox.API;
 import org.terasology.nui.translate.Translator;
 
 import java.util.Locale;

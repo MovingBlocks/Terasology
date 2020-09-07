@@ -17,16 +17,16 @@ package org.terasology.rendering.dag;
 
 //TODO: consider removing the word "Node" from the name of all Node implementations now that they are in the dag.nodes package.
 
-import java.util.Map;
-import java.util.Set;
-
 import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
-import org.terasology.naming.Name;
+import org.terasology.gestalt.naming.Name;
 import org.terasology.rendering.dag.dependencyConnections.BufferPair;
 import org.terasology.rendering.dag.dependencyConnections.BufferPairConnection;
 import org.terasology.rendering.dag.dependencyConnections.DependencyConnection;
 import org.terasology.rendering.dag.dependencyConnections.RunOrderConnection;
+
+import java.util.Map;
+import java.util.Set;
 
 /**
  * A node is the processing unit within the Renderer.

@@ -20,10 +20,10 @@ import com.google.gson.stream.JsonReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.TerasologyConstants;
-import org.terasology.module.ModuleMetadata;
-import org.terasology.module.ModuleMetadataJsonAdapter;
-import org.terasology.module.ModuleRegistry;
-import org.terasology.module.TableModuleRegistry;
+import org.terasology.gestalt.module.ModuleMetadata;
+import org.terasology.gestalt.module.ModuleMetadataJsonAdapter;
+import org.terasology.gestalt.module.ModuleRegistry;
+import org.terasology.gestalt.module.TableModuleRegistry;
 
 import java.io.IOException;
 import java.io.InputStreamReader;

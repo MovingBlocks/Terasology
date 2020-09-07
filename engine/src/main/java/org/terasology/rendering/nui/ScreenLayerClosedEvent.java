@@ -15,9 +15,9 @@
  */
 package org.terasology.rendering.nui;
 
-import org.terasology.assets.ResourceUrn;
 import org.terasology.entitySystem.event.Event;
-import org.terasology.module.sandbox.API;
+import org.terasology.gestalt.assets.ResourceUrn;
+import org.terasology.gestalt.module.sandbox.API;
 import org.terasology.network.OwnerEvent;
 
 /**

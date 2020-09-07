@@ -19,5 +19,5 @@
         displayName = "${engine:menu#category-behavior}"
         ) package org.terasology.logic.behavior.nui;
 
-import org.terasology.module.sandbox.API;
+import org.terasology.gestalt.module.sandbox.API;
 import org.terasology.input.InputCategory;

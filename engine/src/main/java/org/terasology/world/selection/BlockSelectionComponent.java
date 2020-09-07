@@ -16,9 +16,9 @@
 package org.terasology.world.selection;
 
 import org.terasology.entitySystem.Component;
+import org.terasology.gestalt.module.sandbox.API;
 import org.terasology.math.Region3i;
 import org.terasology.math.geom.Vector3i;
-import org.terasology.module.sandbox.API;
 import org.terasology.rendering.assets.texture.Texture;
 
 /**

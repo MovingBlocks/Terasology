@@ -16,19 +16,16 @@
 package org.terasology.persistence.serializers;
 
 import org.junit.jupiter.api.Test;
-import org.terasology.ModuleEnvironmentTest;
+import org.terasology.gestalt.naming.Name;
 import org.terasology.math.geom.Vector2f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector4f;
-import org.terasology.naming.Name;
 import org.terasology.persistence.ModuleContext;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.reflection.TypeInfo;
 import org.terasology.testUtil.TeraAssert;
 
 import java.io.IOException;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class VectorTypeSerializerTest extends ModuleEnvironmentTest {
 

@@ -15,8 +15,8 @@
  */
 package org.terasology.logic.selection;
 
-import org.terasology.module.sandbox.API;
 import org.terasology.entitySystem.event.Event;
+import org.terasology.gestalt.module.sandbox.API;
 
 /**
  * This event should be sent by a system after it receives a {@link ApplyBlockSelectionEvent} which marks the end of a

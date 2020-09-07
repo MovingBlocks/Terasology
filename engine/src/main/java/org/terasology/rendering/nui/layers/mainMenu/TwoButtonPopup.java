@@ -15,11 +15,11 @@
  */
 package org.terasology.rendering.nui.layers.mainMenu;
 
-import org.terasology.assets.ResourceUrn;
-import org.terasology.rendering.nui.CoreScreenLayer;
+import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.nui.WidgetUtil;
 import org.terasology.nui.widgets.UIButton;
 import org.terasology.nui.widgets.UILabel;
+import org.terasology.rendering.nui.CoreScreenLayer;
 
 public class TwoButtonPopup extends CoreScreenLayer {
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:twoButtonPopup!instance");

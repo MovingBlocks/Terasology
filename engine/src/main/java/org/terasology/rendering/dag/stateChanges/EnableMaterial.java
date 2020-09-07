@@ -16,7 +16,7 @@
 package org.terasology.rendering.dag.stateChanges;
 
 import com.google.common.base.Objects;
-import org.terasology.assets.ResourceUrn;
+import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.ShaderManager;
 import org.terasology.rendering.assets.material.Material;

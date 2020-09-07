@@ -17,7 +17,7 @@
 package org.terasology.config;
 
 import com.google.common.collect.Lists;
-import org.terasology.naming.Name;
+import org.terasology.gestalt.naming.Name;
 
 import java.util.List;
 

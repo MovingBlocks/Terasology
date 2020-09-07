@@ -16,10 +16,10 @@
 package org.terasology.rendering.assets.atlas;
 
 import com.google.common.collect.Maps;
-import org.terasology.assets.Asset;
-import org.terasology.assets.AssetType;
-import org.terasology.assets.ResourceUrn;
-import org.terasology.naming.Name;
+import org.terasology.gestalt.assets.Asset;
+import org.terasology.gestalt.assets.AssetType;
+import org.terasology.gestalt.assets.ResourceUrn;
+import org.terasology.gestalt.naming.Name;
 import org.terasology.rendering.assets.texture.subtexture.SubtextureData;
 
 import java.util.Map;

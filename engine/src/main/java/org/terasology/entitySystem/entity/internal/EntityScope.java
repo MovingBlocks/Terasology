@@ -15,7 +15,7 @@
  */
 package org.terasology.entitySystem.entity.internal;
 
-import org.terasology.module.sandbox.API;
+import org.terasology.gestalt.module.sandbox.API;
 
 @API
 public enum EntityScope {

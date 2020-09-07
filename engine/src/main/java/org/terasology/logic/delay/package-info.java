@@ -15,4 +15,4 @@
  */
 @API package org.terasology.logic.delay;
 
-import org.terasology.module.sandbox.API;
+import org.terasology.gestalt.module.sandbox.API;

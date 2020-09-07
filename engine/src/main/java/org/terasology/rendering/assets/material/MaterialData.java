@@ -16,7 +16,7 @@
 package org.terasology.rendering.assets.material;
 
 import com.google.common.collect.Maps;
-import org.terasology.assets.AssetData;
+import org.terasology.gestalt.assets.AssetData;
 import org.terasology.rendering.assets.shader.Shader;
 import org.terasology.rendering.assets.texture.Texture;
 

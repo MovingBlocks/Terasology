@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 package org.terasology.engine.subsystem.openvr;
-import org.terasology.assets.module.ModuleAwareAssetTypeManager;
+
 import org.terasology.config.Config;
 import org.terasology.context.Context;
 import org.terasology.engine.modes.GameState;
 import org.terasology.engine.subsystem.EngineSubsystem;
+import org.terasology.gestalt.assets.module.ModuleAwareAssetTypeManager;
 import org.terasology.input.InputSystem;
 import org.terasology.input.lwjgl.LwjglKeyboardDevice;
 import org.terasology.input.lwjgl.LwjglMouseDevice;

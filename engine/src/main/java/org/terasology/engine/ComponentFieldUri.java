@@ -15,8 +15,8 @@
  */
 package org.terasology.engine;
 
-import org.terasology.module.sandbox.API;
-import org.terasology.naming.Name;
+import org.terasology.gestalt.module.sandbox.API;
+import org.terasology.gestalt.naming.Name;
 
 import java.util.Objects;
 

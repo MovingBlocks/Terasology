@@ -15,7 +15,7 @@
  */
 package org.terasology.engine.module;
 
-import org.terasology.module.sandbox.API;
+import org.terasology.gestalt.module.sandbox.API;
 
 import java.io.IOException;
 import java.io.OutputStream;

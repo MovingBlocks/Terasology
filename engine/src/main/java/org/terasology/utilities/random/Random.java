@@ -16,7 +16,7 @@
 
 package org.terasology.utilities.random;
 
-import org.terasology.module.sandbox.API;
+import org.terasology.gestalt.module.sandbox.API;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Vector3f;
 

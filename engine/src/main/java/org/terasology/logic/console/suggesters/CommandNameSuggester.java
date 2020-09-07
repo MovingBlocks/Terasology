@@ -17,10 +17,10 @@ package org.terasology.logic.console.suggesters;
 
 import com.google.common.collect.Sets;
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.gestalt.naming.Name;
 import org.terasology.logic.console.Console;
 import org.terasology.logic.console.commandSystem.CommandParameterSuggester;
 import org.terasology.logic.console.commandSystem.ConsoleCommand;
-import org.terasology.naming.Name;
 
 import java.util.Collection;
 import java.util.Set;

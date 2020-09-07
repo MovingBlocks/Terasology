@@ -15,7 +15,7 @@
  */
 package org.terasology.world.block.loader;
 
-import org.terasology.module.sandbox.API;
+import org.terasology.gestalt.module.sandbox.API;
 
 /**
  */

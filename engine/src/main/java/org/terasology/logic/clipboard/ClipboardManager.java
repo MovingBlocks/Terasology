@@ -15,7 +15,7 @@
  */
 package org.terasology.logic.clipboard;
 
-import org.terasology.module.sandbox.API;
+import org.terasology.gestalt.module.sandbox.API;
 
 @API // Temporarily in base permission set, until fixed - (permissionSet = "clipboard")
 public interface ClipboardManager {

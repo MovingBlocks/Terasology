@@ -16,8 +16,8 @@
 package org.terasology.persistence;
 
 import org.terasology.engine.module.ModuleManager;
-import org.terasology.module.Module;
-import org.terasology.naming.Name;
+import org.terasology.gestalt.module.Module;
+import org.terasology.gestalt.naming.Name;
 import org.terasology.registry.CoreRegistry;
 
 /**

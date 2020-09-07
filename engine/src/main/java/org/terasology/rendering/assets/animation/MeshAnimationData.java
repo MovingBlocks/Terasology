@@ -18,7 +18,7 @@ package org.terasology.rendering.assets.animation;
 import com.google.common.collect.ImmutableList;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
-import org.terasology.assets.AssetData;
+import org.terasology.gestalt.assets.AssetData;
 import org.terasology.math.AABB;
 
 import java.util.List;

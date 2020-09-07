@@ -18,9 +18,9 @@ package org.terasology.rendering.assets.texture;
 
 import com.google.common.primitives.UnsignedBytes;
 import org.joml.Rectanglei;
-import org.terasology.assets.ResourceUrn;
 import org.terasology.engine.TerasologyConstants;
-import org.terasology.naming.Name;
+import org.terasology.gestalt.assets.ResourceUrn;
+import org.terasology.gestalt.naming.Name;
 import org.terasology.nui.Color;
 
 import java.awt.image.BufferedImage;

@@ -17,7 +17,7 @@ package org.terasology.entitySystem.sectors;
 
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.Event;
-import org.terasology.module.sandbox.API;
+import org.terasology.gestalt.module.sandbox.API;
 
 /**
  * This is the event sent to all sector-level entities by the {@link SectorSimulationSystem}, allowing them to do simulation. It

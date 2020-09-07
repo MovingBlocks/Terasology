@@ -15,11 +15,10 @@
  */
 package org.terasology.rendering.assets.texture;
 
-import org.terasology.assets.Asset;
-import org.terasology.assets.AssetData;
-import org.terasology.assets.AssetType;
-import org.terasology.assets.ResourceUrn;
-import org.terasology.nui.UITextureRegion;
+import org.terasology.gestalt.assets.Asset;
+import org.terasology.gestalt.assets.AssetData;
+import org.terasology.gestalt.assets.AssetType;
+import org.terasology.gestalt.assets.ResourceUrn;
 
 /**
  */

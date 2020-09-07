@@ -15,9 +15,9 @@
  */
 package org.terasology.world.block.sounds;
 
-import org.terasology.assets.AssetData;
 import org.terasology.audio.StaticSound;
-import org.terasology.module.sandbox.API;
+import org.terasology.gestalt.assets.AssetData;
+import org.terasology.gestalt.module.sandbox.API;
 
 import java.util.ArrayList;
 import java.util.List;

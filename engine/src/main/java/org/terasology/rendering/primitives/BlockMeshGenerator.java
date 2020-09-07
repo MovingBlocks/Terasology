@@ -15,7 +15,7 @@
  */
 package org.terasology.rendering.primitives;
 
-import org.terasology.module.sandbox.API;
+import org.terasology.gestalt.module.sandbox.API;
 import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.world.ChunkView;
 

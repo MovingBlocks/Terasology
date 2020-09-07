@@ -17,10 +17,10 @@
 package org.terasology.world.block;
 
 import com.google.common.base.Objects;
-import org.terasology.assets.ResourceUrn;
-import org.terasology.assets.exceptions.InvalidUrnException;
 import org.terasology.engine.Uri;
-import org.terasology.naming.Name;
+import org.terasology.gestalt.assets.ResourceUrn;
+import org.terasology.gestalt.assets.exceptions.InvalidUrnException;
+import org.terasology.gestalt.naming.Name;
 
 import java.util.Optional;
 

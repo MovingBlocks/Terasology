@@ -16,9 +16,9 @@
 
 package org.terasology.rendering.assets.skeletalmesh;
 
-import org.terasology.assets.Asset;
-import org.terasology.assets.AssetType;
-import org.terasology.assets.ResourceUrn;
+import org.terasology.gestalt.assets.Asset;
+import org.terasology.gestalt.assets.AssetType;
+import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.math.AABB;
 
 import java.util.Collection;

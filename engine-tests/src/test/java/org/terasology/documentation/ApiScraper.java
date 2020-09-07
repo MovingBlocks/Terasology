@@ -19,8 +19,8 @@ import com.google.common.collect.Multimaps;
 import com.google.common.collect.SortedSetMultimap;
 import org.terasology.engine.module.ExternalApiWhitelist;
 import org.terasology.engine.module.ModuleManager;
-import org.terasology.module.ModuleEnvironment;
-import org.terasology.module.sandbox.API;
+import org.terasology.gestalt.module.ModuleEnvironment;
+import org.terasology.gestalt.module.sandbox.API;
 import org.terasology.testUtil.ModuleManagerFactory;
 
 import java.net.URL;

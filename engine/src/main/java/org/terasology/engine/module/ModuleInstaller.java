@@ -19,9 +19,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.paths.PathManager;
-import org.terasology.module.Module;
-import org.terasology.module.ModuleLoader;
-import org.terasology.module.ModuleMetadata;
+import org.terasology.gestalt.module.Module;
+import org.terasology.gestalt.module.ModuleLoader;
+import org.terasology.gestalt.module.ModuleMetadata;
 import org.terasology.utilities.download.MultiFileDownloader;
 import org.terasology.utilities.download.MultiFileTransferProgressListener;
 

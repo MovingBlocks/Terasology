@@ -17,8 +17,8 @@ package org.terasology.engine;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
-import org.terasology.module.sandbox.API;
-import org.terasology.naming.Name;
+import org.terasology.gestalt.module.sandbox.API;
+import org.terasology.gestalt.naming.Name;
 
 /**
  * A URI to identify standard objects in Terasology - components, events, etc.

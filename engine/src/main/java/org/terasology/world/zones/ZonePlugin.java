@@ -15,8 +15,8 @@
  */
 package org.terasology.world.zones;
 
+import org.terasology.gestalt.module.sandbox.API;
 import org.terasology.math.geom.BaseVector3i;
-import org.terasology.module.sandbox.API;
 import org.terasology.world.generation.Region;
 import org.terasology.world.generator.plugin.WorldGeneratorPlugin;
 

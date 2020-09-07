@@ -15,9 +15,8 @@
  */
 package org.terasology.utilities.random;
 
-import org.terasology.module.sandbox.API;
-
 import ec.util.MersenneTwisterFast;
+import org.terasology.gestalt.module.sandbox.API;
 
 /**
  * Random number generator based on the Mersenne Primer Twister implementation of Sean Luke.

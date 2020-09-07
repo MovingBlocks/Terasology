@@ -15,12 +15,12 @@
  */
 package org.terasology.rendering.nui.layers.mainMenu.inputSettings;
 
-import org.terasology.assets.ResourceUrn;
+import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.i18n.TranslationSystem;
-import org.terasology.registry.In;
-import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.nui.WidgetUtil;
 import org.terasology.nui.widgets.UILabel;
+import org.terasology.registry.In;
+import org.terasology.rendering.nui.CoreScreenLayer;
 
 public class ConfirmChangePopup extends CoreScreenLayer {
 

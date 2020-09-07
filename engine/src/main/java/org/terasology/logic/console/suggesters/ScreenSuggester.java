@@ -15,7 +15,7 @@
  */
 package org.terasology.logic.console.suggesters;
 
-import org.terasology.assets.management.AssetManager;
+import org.terasology.gestalt.assets.management.AssetManager;
 import org.terasology.nui.asset.UIElement;
 
 public final class ScreenSuggester extends AssetSuggester {

@@ -17,11 +17,11 @@
 package org.terasology.rendering;
 
 import org.lwjgl.opengl.GL11;
+import org.terasology.gestalt.module.sandbox.API;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.AABB;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector4f;
-import org.terasology.module.sandbox.API;
 import org.terasology.registry.CoreRegistry;
 
 import static org.lwjgl.opengl.GL11.GL_BLEND;

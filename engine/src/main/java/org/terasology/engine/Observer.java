@@ -16,7 +16,7 @@
 
 package org.terasology.engine;
 
-import org.terasology.module.sandbox.API;
+import org.terasology.gestalt.module.sandbox.API;
 
 /**
  * A general interface for observers

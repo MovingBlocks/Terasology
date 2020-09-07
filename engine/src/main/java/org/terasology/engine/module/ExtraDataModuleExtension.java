@@ -15,7 +15,7 @@
  */
 package org.terasology.engine.module;
 
-import org.terasology.module.Module;
+import org.terasology.gestalt.module.Module;
 
 /**
  * A set of extra module extensions.

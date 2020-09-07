@@ -16,7 +16,7 @@
 package org.terasology.rendering.nui.contextMenu;
 
 import com.google.common.collect.Lists;
-import org.terasology.module.sandbox.API;
+import org.terasology.gestalt.module.sandbox.API;
 
 import java.util.List;
 import java.util.function.Consumer;

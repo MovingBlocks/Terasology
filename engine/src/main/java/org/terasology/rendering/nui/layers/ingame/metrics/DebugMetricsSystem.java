@@ -18,7 +18,7 @@ package org.terasology.rendering.nui.layers.ingame.metrics;
 import com.google.common.base.Preconditions;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
-import org.terasology.module.sandbox.API;
+import org.terasology.gestalt.module.sandbox.API;
 import org.terasology.registry.Share;
 
 import java.util.ArrayList;

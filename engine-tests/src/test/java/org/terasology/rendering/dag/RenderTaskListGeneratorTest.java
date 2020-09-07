@@ -18,13 +18,12 @@ package org.terasology.rendering.dag;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-
-import org.terasology.context.Context;
 import org.junit.jupiter.api.Test;
+import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
-import org.terasology.naming.Name;
-import org.terasology.rendering.dag.dependencyConnections.BufferPairConnection;
+import org.terasology.gestalt.naming.Name;
 import org.terasology.rendering.dag.dependencyConnections.BufferPair;
+import org.terasology.rendering.dag.dependencyConnections.BufferPairConnection;
 import org.terasology.rendering.dag.dependencyConnections.DependencyConnection;
 import org.terasology.rendering.dag.dependencyConnections.FboConnection;
 import org.terasology.rendering.dag.dependencyConnections.RunOrderConnection;

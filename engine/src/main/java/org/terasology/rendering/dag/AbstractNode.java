@@ -19,20 +19,27 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.assets.ResourceUrn;
 import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.module.ModuleManager;
-import org.terasology.naming.Name;
+import org.terasology.gestalt.assets.ResourceUrn;
+import org.terasology.gestalt.naming.Name;
 import org.terasology.rendering.assets.material.Material;
-import org.terasology.rendering.dag.dependencyConnections.*;
+import org.terasology.rendering.dag.dependencyConnections.BufferPair;
+import org.terasology.rendering.dag.dependencyConnections.BufferPairConnection;
+import org.terasology.rendering.dag.dependencyConnections.DependencyConnection;
+import org.terasology.rendering.dag.dependencyConnections.FboConnection;
+import org.terasology.rendering.dag.dependencyConnections.RunOrderConnection;
 import org.terasology.rendering.opengl.BaseFboManager;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FboConfig;
 import org.terasology.utilities.Assets;
 
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * This class implements a number of default methods for the convenience of classes

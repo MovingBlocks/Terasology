@@ -15,7 +15,7 @@
  */
 package org.terasology.world.zones;
 
-import org.terasology.module.sandbox.API;
+import org.terasology.gestalt.module.sandbox.API;
 
 /**
  * This is a {@link LayerThickness} for a layer that has a constant, predetermined thickness at all paints.

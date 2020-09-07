@@ -15,7 +15,7 @@
  */
 package org.terasology;
 
-import org.terasology.naming.Name;
+import org.terasology.gestalt.naming.Name;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;

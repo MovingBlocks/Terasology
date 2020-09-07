@@ -16,7 +16,7 @@
 package org.terasology.logic.nameTags;
 
 import org.terasology.entitySystem.Component;
-import org.terasology.module.sandbox.API;
+import org.terasology.gestalt.module.sandbox.API;
 import org.terasology.network.Replicate;
 import org.terasology.nui.Color;
 

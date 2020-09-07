@@ -18,7 +18,7 @@ package org.terasology.telemetry;
 import com.snowplowanalytics.snowplow.tracker.DevicePlatform;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.module.sandbox.API;
+import org.terasology.gestalt.module.sandbox.API;
 
 import java.net.InetAddress;
 import java.net.NetworkInterface;

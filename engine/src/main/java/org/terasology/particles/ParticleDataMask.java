@@ -15,7 +15,7 @@
  */
 package org.terasology.particles;
 
-import org.terasology.module.sandbox.API;
+import org.terasology.gestalt.module.sandbox.API;
 
 /**
  * Data mask used internally by the particle system.

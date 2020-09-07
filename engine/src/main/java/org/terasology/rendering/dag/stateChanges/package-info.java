@@ -24,4 +24,4 @@
 @API
 package org.terasology.rendering.dag.stateChanges;
 
-import org.terasology.module.sandbox.API;
+import org.terasology.gestalt.module.sandbox.API;

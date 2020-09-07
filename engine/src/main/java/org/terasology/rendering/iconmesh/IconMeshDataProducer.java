@@ -18,11 +18,11 @@ package org.terasology.rendering.iconmesh;
 import com.google.common.base.Function;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableSet;
-import org.terasology.assets.AssetDataProducer;
-import org.terasology.assets.ResourceUrn;
-import org.terasology.assets.management.AssetManager;
-import org.terasology.assets.module.annotations.RegisterAssetDataProducer;
-import org.terasology.naming.Name;
+import org.terasology.gestalt.assets.AssetDataProducer;
+import org.terasology.gestalt.assets.ResourceUrn;
+import org.terasology.gestalt.assets.management.AssetManager;
+import org.terasology.gestalt.assets.module.annotations.RegisterAssetDataProducer;
+import org.terasology.gestalt.naming.Name;
 import org.terasology.rendering.assets.mesh.MeshData;
 import org.terasology.rendering.assets.texture.TextureRegionAsset;
 
