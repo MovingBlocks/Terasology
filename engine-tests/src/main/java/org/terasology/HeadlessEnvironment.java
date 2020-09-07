@@ -44,8 +44,10 @@ import org.terasology.engine.subsystem.headless.assets.HeadlessTexture;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.internal.PojoPrefab;
+import org.terasology.gestalt.assets.AssetType;
 import org.terasology.gestalt.assets.management.AssetManager;
 import org.terasology.gestalt.assets.module.ModuleAwareAssetTypeManager;
+import org.terasology.gestalt.assets.module.ModuleAwareAssetTypeManagerImpl;
 import org.terasology.gestalt.module.ModuleEnvironment;
 import org.terasology.gestalt.module.ModuleRegistry;
 import org.terasology.gestalt.module.dependencyresolution.DependencyResolver;
@@ -79,6 +81,7 @@ import org.terasology.rendering.assets.shader.Shader;
 import org.terasology.rendering.assets.skeletalmesh.SkeletalMesh;
 import org.terasology.rendering.assets.texture.PNGTextureFormat;
 import org.terasology.rendering.assets.texture.Texture;
+import org.terasology.rendering.assets.texture.TextureData;
 import org.terasology.rendering.assets.texture.subtexture.Subtexture;
 import org.terasology.testUtil.ModuleManagerFactory;
 import org.terasology.world.WorldProvider;
@@ -88,6 +91,7 @@ import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.family.BlockFamilyLibrary;
 import org.terasology.world.block.internal.BlockManagerImpl;
 import org.terasology.world.block.loader.BlockFamilyDefinition;
+import org.terasology.world.block.loader.BlockFamilyDefinitionData;
 import org.terasology.world.block.loader.BlockFamilyDefinitionFormat;
 import org.terasology.world.block.shapes.BlockShape;
 import org.terasology.world.block.shapes.BlockShapeImpl;
@@ -113,9 +117,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
- * Setup a headless ( = no graphics ) environment.
- * Based on TerasologyTestingEnvironment code.
- *
+ * Setup a headless ( = no graphics ) environment. Based on TerasologyTestingEnvironment code.
  */
 public class HeadlessEnvironment extends Environment {
 
@@ -142,12 +144,13 @@ public class HeadlessEnvironment extends Environment {
         RecordAndReplayCurrentStatus recordAndReplayCurrentStatus = context.get(RecordAndReplayCurrentStatus.class);
 
         ModuleEnvironment environment = context.get(ModuleManager.class).getEnvironment();
-        context.put(BlockFamilyLibrary.class, new BlockFamilyLibrary(environment,context));
-        
+        context.put(BlockFamilyLibrary.class, new BlockFamilyLibrary(environment, context));
+
         ExtraBlockDataManager extraDataManager = context.get(ExtraBlockDataManager.class);
 
         context.put(StorageManager.class, new ReadWriteStorageManager(savePath, moduleManager.getEnvironment(),
-                engineEntityManager, blockManager, extraDataManager, recordAndReplaySerializer, recordAndReplayUtils, recordAndReplayCurrentStatus));
+                engineEntityManager, blockManager, extraDataManager, recordAndReplaySerializer, recordAndReplayUtils,
+                recordAndReplayCurrentStatus));
     }
 
     @Override
@@ -167,7 +170,8 @@ public class HeadlessEnvironment extends Environment {
     protected void setupCollisionManager() {
         CollisionGroupManager collisionGroupManager = new CollisionGroupManager();
         context.put(CollisionGroupManager.class, collisionGroupManager);
-        context.get(TypeHandlerLibrary.class).addTypeHandler(CollisionGroup.class, new CollisionGroupTypeHandler(collisionGroupManager));
+        context.get(TypeHandlerLibrary.class).addTypeHandler(CollisionGroup.class,
+                new CollisionGroupTypeHandler(collisionGroupManager));
     }
 
     @Override
@@ -179,7 +183,7 @@ public class HeadlessEnvironment extends Environment {
         typeHandlerLibrary.addTypeHandler(BlockFamily.class, new BlockFamilyTypeHandler(blockManager));
         typeHandlerLibrary.addTypeHandler(Block.class, new BlockTypeHandler(blockManager));
     }
-    
+
     @Override
     protected void setupExtraDataManager(Context context) {
         context.put(ExtraBlockDataManager.class, new ExtraBlockDataManager(context));
@@ -187,7 +191,7 @@ public class HeadlessEnvironment extends Environment {
 
     @Override
     protected AssetManager setupEmptyAssetManager() {
-        ModuleAwareAssetTypeManager assetTypeManager = new ModuleAwareAssetTypeManager();
+        ModuleAwareAssetTypeManager assetTypeManager = new ModuleAwareAssetTypeManagerImpl();
         assetTypeManager.switchEnvironment(context.get(ModuleManager.class).getEnvironment());
 
         context.put(ModuleAwareAssetTypeManager.class, assetTypeManager);
@@ -197,55 +201,59 @@ public class HeadlessEnvironment extends Environment {
 
     @Override
     protected AssetManager setupAssetManager() {
-        ModuleAwareAssetTypeManager assetTypeManager = new ModuleAwareAssetTypeManager();
+        ModuleAwareAssetTypeManager assetTypeManager = new ModuleAwareAssetTypeManagerImpl();
 
         // cast lambdas explicitly to avoid inconsistent compiler behavior wrt. type inference
-        assetTypeManager.registerCoreAssetType(Prefab.class,
-                PojoPrefab::new, false, "prefabs");
-        assetTypeManager.registerCoreAssetType(BlockShape.class,
+        assetTypeManager.createAssetType(Prefab.class,
+                PojoPrefab::new,  "prefabs");
+        assetTypeManager.createAssetType(BlockShape.class,
                 BlockShapeImpl::new, "shapes");
-        assetTypeManager.registerCoreAssetType(BlockSounds.class,
+        assetTypeManager.createAssetType(BlockSounds.class,
                 BlockSounds::new, "blockSounds");
-        assetTypeManager.registerCoreAssetType(BlockTile.class,
+        assetTypeManager.createAssetType(BlockTile.class,
                 BlockTile::new, "blockTiles");
-        assetTypeManager.registerCoreAssetType(BlockFamilyDefinition.class,
-                BlockFamilyDefinition::new, "blocks");
+        AssetType<BlockFamilyDefinition, BlockFamilyDefinitionData> blockFamilyDefinitionDataAssetType =
+                assetTypeManager.createAssetType(BlockFamilyDefinition.class,
+                        BlockFamilyDefinition::new, "blocks");
 
-        assetTypeManager.registerCoreAssetType(StaticSound.class, NullSound::new, "sounds");
-        assetTypeManager.registerCoreAssetType(StreamingSound.class, NullStreamingSound::new, "music");
 
-        assetTypeManager.registerCoreFormat(BlockFamilyDefinition.class,
+        assetTypeManager.getAssetFileDataProducer(blockFamilyDefinitionDataAssetType).addAssetFormat(
                 new BlockFamilyDefinitionFormat(assetTypeManager.getAssetManager()));
 
-        assetTypeManager.registerCoreAssetType(UISkin.class,
-                UISkin::new, "skins");
-        assetTypeManager.registerCoreAssetType(BehaviorTree.class,
-                BehaviorTree::new, false, "behaviors");
-        assetTypeManager.registerCoreAssetType(UIElement.class,
-                UIElement::new, "ui");
-        assetTypeManager.registerCoreAssetType(Font.class,
-                FontImpl::new, "fonts");
-        assetTypeManager.registerCoreAssetType(Texture.class,
-                HeadlessTexture::new, "textures", "fonts");
-        assetTypeManager.registerCoreFormat(Texture.class,
-                new PNGTextureFormat(Texture.FilterMode.NEAREST, path -> path.getName(2).toString().equals("textures")));
-        assetTypeManager.registerCoreFormat(Texture.class,
-                new PNGTextureFormat(Texture.FilterMode.LINEAR, path -> path.getName(2).toString().equals("fonts")));
 
-        assetTypeManager.registerCoreAssetType(Shader.class,
+        assetTypeManager.createAssetType(StaticSound.class, NullSound::new, "sounds");
+        assetTypeManager.createAssetType(StreamingSound.class, NullStreamingSound::new, "music");
+
+        assetTypeManager.createAssetType(UISkin.class,
+                UISkin::new, "skins");
+        assetTypeManager.createAssetType(BehaviorTree.class,
+                BehaviorTree::new, "behaviors");
+        assetTypeManager.createAssetType(UIElement.class,
+                UIElement::new, "ui");
+        assetTypeManager.createAssetType(Font.class,
+                FontImpl::new, "fonts");
+        AssetType<Texture, TextureData>  textureDataAssetType = assetTypeManager.createAssetType(Texture.class,
+                HeadlessTexture::create, "textures", "fonts");
+        assetTypeManager.getAssetFileDataProducer(textureDataAssetType).addAssetFormat(
+                new PNGTextureFormat(Texture.FilterMode.NEAREST,
+                        path -> path.getPath().get(1).equals("textures")));
+        assetTypeManager.getAssetFileDataProducer(textureDataAssetType).addAssetFormat(
+                new PNGTextureFormat(Texture.FilterMode.LINEAR, path -> path.getPath().get(1).equals("fonts")));
+
+        assetTypeManager.createAssetType(Shader.class,
                 HeadlessShader::new, "shaders");
-        assetTypeManager.registerCoreAssetType(Material.class,
+        assetTypeManager.createAssetType(Material.class,
                 HeadlessMaterial::new, "materials");
-        assetTypeManager.registerCoreAssetType(Mesh.class,
+        assetTypeManager.createAssetType(Mesh.class,
                 HeadlessMesh::new, "mesh");
-        assetTypeManager.registerCoreAssetType(SkeletalMesh.class,
+        assetTypeManager.createAssetType(SkeletalMesh.class,
                 HeadlessSkeletalMesh::new, "skeletalMesh");
-        assetTypeManager.registerCoreAssetType(MeshAnimation.class,
+        assetTypeManager.createAssetType(MeshAnimation.class,
                 MeshAnimationImpl::new, "animations");
 
-        assetTypeManager.registerCoreAssetType(Atlas.class,
+        assetTypeManager.createAssetType(Atlas.class,
                 Atlas::new, "atlas");
-        assetTypeManager.registerCoreAssetType(Subtexture.class,
+        assetTypeManager.createAssetType(Subtexture.class,
                 Subtexture::new);
 
         assetTypeManager.switchEnvironment(context.get(ModuleManager.class).getEnvironment());
@@ -271,7 +279,8 @@ public class HeadlessEnvironment extends Environment {
     @Override
     protected void setupModuleManager(Set<Name> moduleNames) throws Exception {
         TypeRegistry typeRegistry = new TypeRegistry();
-        TypeRegistry.WHITELISTED_CLASSES = ExternalApiWhitelist.CLASSES.stream().map(Class::getName).collect(Collectors.toSet());
+        TypeRegistry.WHITELISTED_CLASSES =
+                ExternalApiWhitelist.CLASSES.stream().map(Class::getName).collect(Collectors.toSet());
         context.put(TypeRegistry.class, typeRegistry);
 
         ModuleManager moduleManager = ModuleManagerFactory.create();

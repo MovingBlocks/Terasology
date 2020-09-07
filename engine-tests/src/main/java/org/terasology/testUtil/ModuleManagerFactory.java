@@ -19,11 +19,11 @@ import com.google.common.collect.Sets;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.module.ModuleManagerImpl;
-import org.terasology.gestalt.module.ClasspathModule;
 import org.terasology.gestalt.module.ModuleMetadata;
-import org.terasology.gestalt.module.ModuleMetadataReader;
+import org.terasology.gestalt.module.ModuleMetadataJsonAdapter;
 import org.terasology.gestalt.naming.Name;
 
+import java.io.File;
 import java.io.InputStreamReader;
 import java.io.Reader;
 
@@ -36,8 +36,9 @@ public final class ModuleManagerFactory {
     public static ModuleManager create() throws Exception {
         ModuleManager moduleManager = new ModuleManagerImpl("");
         try (Reader reader = new InputStreamReader(ModuleManagerFactory.class.getResourceAsStream("/module.txt"), TerasologyConstants.CHARSET)) {
-            ModuleMetadata metadata = new ModuleMetadataReader().read(reader);
-            moduleManager.getRegistry().add(ClasspathModule.create(metadata, ModuleManagerFactory.class));
+            ModuleMetadata metadata = new ModuleMetadataJsonAdapter().read(reader);
+            //FIXME: implement new loading for tests - gestalt v7
+            moduleManager.getRegistry().add(moduleManager.getModuleFactory().createModule(metadata, new File(ModuleManagerFactory.class.getClassLoader().getResource("/").getFile())));
         }
         moduleManager.loadEnvironment(Sets.newHashSet(moduleManager.getRegistry().getLatestModuleVersion(new Name("engine"))), true);
         return moduleManager;
