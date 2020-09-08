@@ -18,6 +18,7 @@ package org.terasology.reflection.reflect;
 import com.esotericsoftware.reflectasm.FieldAccess;
 import com.esotericsoftware.reflectasm.MethodAccess;
 import javassist.CannotCompileException;
+import javassist.ClassClassPath;
 import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.CtMethod;
@@ -46,6 +47,7 @@ public class ByteCodeReflectFactory implements ReflectFactory {
         try {
             ClassPool.doPruning = true;
             pool = ClassPool.getDefault();
+            pool.insertClassPath(new ClassClassPath(ObjectConstructor.class));
             objectConstructorInterface = pool.get(ObjectConstructor.class.getName());
         } catch (NotFoundException e) {
             throw new RuntimeException("Error establishing reflection factory", e);

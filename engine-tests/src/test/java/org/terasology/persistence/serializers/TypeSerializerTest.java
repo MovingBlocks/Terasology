@@ -18,6 +18,7 @@ package org.terasology.persistence.serializers;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.junit.jupiter.api.Test;
+import org.terasology.ModuleEnvironmentTest;
 import org.terasology.gestalt.naming.Name;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.nui.Color;

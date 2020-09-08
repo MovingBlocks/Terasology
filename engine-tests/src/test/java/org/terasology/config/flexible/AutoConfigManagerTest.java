@@ -15,9 +15,6 @@
  */
 package org.terasology.config.flexible;
 
-import org.jboss.shrinkwrap.api.ShrinkWrap;
-import org.jboss.shrinkwrap.api.nio.file.ShrinkWrapFileSystems;
-import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -29,8 +26,9 @@ import org.terasology.gestalt.module.ModuleEnvironment;
 import org.terasology.gestalt.naming.Name;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 
-import java.nio.file.FileSystem;
+import java.nio.file.Paths;
 import java.util.Collections;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -51,9 +49,10 @@ public class AutoConfigManagerTest {
 
     @BeforeEach
     public void setUp() throws Exception {
-        final JavaArchive homeArchive = ShrinkWrap.create(JavaArchive.class);
-        final FileSystem vfs = ShrinkWrapFileSystems.newFileSystem(homeArchive);
-        PathManager.getInstance().useOverrideHomePath(vfs.getPath(""));
+        PathManager.getInstance().useOverrideHomePath(
+                Paths.get(System.getProperty("java.io.tmpdir"),
+                        "terasology",
+                        UUID.randomUUID().toString()));
 
         when(environment.getModuleProviding(any())).thenReturn(PROVIDING_MODULE);
         when(environment.getSubtypesOf(eq(AutoConfig.class))).thenReturn(Collections.singleton(TestAutoConfig.class));

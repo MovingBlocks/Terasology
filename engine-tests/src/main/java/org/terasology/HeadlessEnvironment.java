@@ -15,9 +15,6 @@
  */
 package org.terasology;
 
-import org.jboss.shrinkwrap.api.ShrinkWrap;
-import org.jboss.shrinkwrap.api.nio.file.ShrinkWrapFileSystems;
-import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.audio.AudioManager;
@@ -110,7 +107,9 @@ import org.terasology.world.time.WorldTimeImpl;
 import java.io.IOException;
 import java.nio.file.FileSystem;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static org.mockito.Mockito.mock;
@@ -307,9 +306,10 @@ public class HeadlessEnvironment extends Environment {
      */
     @Override
     protected void setupPathManager() throws IOException {
-        final JavaArchive homeArchive = ShrinkWrap.create(JavaArchive.class);
-        final FileSystem vfs = ShrinkWrapFileSystems.newFileSystem(homeArchive);
-        PathManager.getInstance().useOverrideHomePath(vfs.getPath(""));
+        PathManager.getInstance().useOverrideHomePath(
+                Paths.get(System.getProperty("java.io.tmpdir"),
+                        "terasology",
+                        UUID.randomUUID().toString()));
     }
 
     @Override

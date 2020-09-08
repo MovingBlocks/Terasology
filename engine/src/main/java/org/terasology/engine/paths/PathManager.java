@@ -261,14 +261,10 @@ public final class PathManager {
         return shaderLogPath;
     }
 
-    /**
+     /**
      *
-     * @return List of paths to all of the modules.
+     * @return List of files to all of the modules.
      */
-    public List<Path> getModulePaths() {
-        return modPaths;
-    }
-
     public List<File> getModulePathFiles() {
         return modPaths.stream().map(Path::toFile).collect(Collectors.toList());
     }

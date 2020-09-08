@@ -91,8 +91,7 @@ public class ModuleManagerImpl implements ModuleManager {
         Module engineModule = moduleFactory.createPackageModule("org.terasology");
 
         registry = new TableModuleRegistry();
-        registry.add(engineModule); // TODO: really needs?
-        registry = new TableModuleRegistry();
+        registry.add(engineModule);
 
         ModulePathScanner scanner = new ModulePathScanner(moduleFactory);
         scanner.scan(registry, PathManager.getInstance().getModulePathFiles());

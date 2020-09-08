@@ -16,9 +16,6 @@
 
 package org.terasology;
 
-import org.jboss.shrinkwrap.api.ShrinkWrap;
-import org.jboss.shrinkwrap.api.nio.file.ShrinkWrapFileSystems;
-import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -49,8 +46,9 @@ import org.terasology.reflection.TypeRegistry;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.chunks.blockdata.ExtraBlockDataManager;
 
-import java.nio.file.FileSystem;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import static org.mockito.Mockito.mock;
 
@@ -70,9 +68,9 @@ public abstract class TerasologyTestingEnvironment {
 
     @BeforeAll
     public static void setupEnvironment() throws Exception {
-        final JavaArchive homeArchive = ShrinkWrap.create(JavaArchive.class);
-        final FileSystem vfs = ShrinkWrapFileSystems.newFileSystem(homeArchive);
-        PathManager.getInstance().useOverrideHomePath(vfs.getPath(""));
+        Path systemTempDir= Paths.get(System.getProperty("java.io.tmpdir"));
+        Path tempDirectory = Files.createTempDirectory(systemTempDir, "terasologyTTE");
+        PathManager.getInstance().useOverrideHomePath(tempDirectory);
         /*
          * Create at least for each class a new headless environemnt as it is fast and prevents side effects
          * (Reusing a headless environment after other tests have modified the core registry isn't really clean)

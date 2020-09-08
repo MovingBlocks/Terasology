@@ -20,6 +20,7 @@ import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.module.ModuleManagerImpl;
 import org.terasology.gestalt.module.ModuleMetadata;
+import org.terasology.gestalt.module.Module;
 import org.terasology.gestalt.module.ModuleMetadataJsonAdapter;
 import org.terasology.gestalt.naming.Name;
 
@@ -37,8 +38,9 @@ public final class ModuleManagerFactory {
         ModuleManager moduleManager = new ModuleManagerImpl("");
         try (Reader reader = new InputStreamReader(ModuleManagerFactory.class.getResourceAsStream("/module.txt"), TerasologyConstants.CHARSET)) {
             ModuleMetadata metadata = new ModuleMetadataJsonAdapter().read(reader);
-            //FIXME: implement new loading for tests - gestalt v7
-            moduleManager.getRegistry().add(moduleManager.getModuleFactory().createModule(metadata, new File(ModuleManagerFactory.class.getClassLoader().getResource("/").getFile())));
+            Module unittestModule = moduleManager.getModuleFactory().createModule(metadata,
+                    new File(ModuleManagerFactory.class.getResource("/").getFile())); // some hack to load current directory. TODO: moving to package module
+            moduleManager.getRegistry().add(unittestModule);
         }
         moduleManager.loadEnvironment(Sets.newHashSet(moduleManager.getRegistry().getLatestModuleVersion(new Name("engine"))), true);
         return moduleManager;

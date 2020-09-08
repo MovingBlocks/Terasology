@@ -16,6 +16,7 @@
 package org.terasology.persistence.typeHandling.reflection;
 
 import org.junit.jupiter.api.Test;
+import org.terasology.ModuleEnvironmentTest;
 import org.terasology.physics.CollisionGroup;
 import org.terasology.physics.StandardCollisionGroup;
 

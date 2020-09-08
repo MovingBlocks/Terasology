@@ -39,6 +39,7 @@ import org.terasology.gestalt.assets.AssetFactory;
 import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.gestalt.assets.management.AssetManager;
 import org.terasology.gestalt.assets.module.ModuleAwareAssetTypeManager;
+import org.terasology.gestalt.assets.module.ModuleAwareAssetTypeManagerImpl;
 import org.terasology.network.NetworkSystem;
 import org.terasology.persistence.serializers.EntitySerializer;
 import org.terasology.protobuf.EntityData;
@@ -74,9 +75,8 @@ public class EntitySerializerTest {
         moduleManager = ModuleManagerFactory.create();
         context.put(ModuleManager.class, moduleManager);
 
-        ModuleAwareAssetTypeManager assetTypeManager = new ModuleAwareAssetTypeManager();
-        assetTypeManager.registerCoreAssetType(Prefab.class,
-                (AssetFactory<Prefab, PrefabData>) PojoPrefab::new, "prefabs");
+        ModuleAwareAssetTypeManager assetTypeManager = new ModuleAwareAssetTypeManagerImpl();
+        assetTypeManager.createAssetType(Prefab.class, PojoPrefab::new, "prefabs");
         assetTypeManager.switchEnvironment(moduleManager.getEnvironment());
         context.put(AssetManager.class, assetTypeManager.getAssetManager());
     }

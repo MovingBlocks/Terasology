@@ -16,6 +16,7 @@
 package org.terasology.reflection;
 
 import org.reflections.Reflections;
+import org.terasology.ModuleEnvironmentTest;
 import org.terasology.engine.module.ExternalApiWhitelist;
 import org.terasology.entitySystem.Component;
 import org.terasology.gestalt.naming.Name;

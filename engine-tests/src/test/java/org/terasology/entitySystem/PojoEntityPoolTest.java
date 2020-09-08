@@ -32,6 +32,7 @@ import org.terasology.entitySystem.prefab.internal.PojoPrefab;
 import org.terasology.gestalt.assets.AssetFactory;
 import org.terasology.gestalt.assets.management.AssetManager;
 import org.terasology.gestalt.assets.module.ModuleAwareAssetTypeManager;
+import org.terasology.gestalt.assets.module.ModuleAwareAssetTypeManagerImpl;
 import org.terasology.network.NetworkSystem;
 import org.terasology.recording.RecordAndReplayCurrentStatus;
 import org.terasology.registry.CoreRegistry;
@@ -54,9 +55,8 @@ public class PojoEntityPoolTest {
         context = new ContextImpl();
         ModuleManager moduleManager = ModuleManagerFactory.create();
         context.put(ModuleManager.class, moduleManager);
-        ModuleAwareAssetTypeManager assetTypeManager = new ModuleAwareAssetTypeManager();
-        assetTypeManager.registerCoreAssetType(Prefab.class,
-                (AssetFactory<Prefab, PrefabData>) PojoPrefab::new, "prefabs");
+        ModuleAwareAssetTypeManager assetTypeManager = new ModuleAwareAssetTypeManagerImpl();
+        assetTypeManager.createAssetType(Prefab.class, PojoPrefab::new, "prefabs");
         assetTypeManager.switchEnvironment(moduleManager.getEnvironment());
         context.put(AssetManager.class, assetTypeManager.getAssetManager());
         context.put(RecordAndReplayCurrentStatus.class, new RecordAndReplayCurrentStatus());

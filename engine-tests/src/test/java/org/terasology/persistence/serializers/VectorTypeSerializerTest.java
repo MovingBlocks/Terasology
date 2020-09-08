@@ -16,6 +16,7 @@
 package org.terasology.persistence.serializers;
 
 import org.junit.jupiter.api.Test;
+import org.terasology.ModuleEnvironmentTest;
 import org.terasology.gestalt.naming.Name;
 import org.terasology.math.geom.Vector2f;
 import org.terasology.math.geom.Vector3f;

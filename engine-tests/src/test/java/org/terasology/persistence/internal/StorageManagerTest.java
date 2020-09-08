@@ -16,9 +16,6 @@
 package org.terasology.persistence.internal;
 
 import com.google.common.collect.Lists;
-import org.jboss.shrinkwrap.api.ShrinkWrap;
-import org.jboss.shrinkwrap.api.nio.file.ShrinkWrapFileSystems;
-import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.MethodOrderer;
@@ -69,7 +66,6 @@ import org.terasology.world.internal.WorldInfo;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.FileSystem;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
@@ -114,12 +110,10 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
     @BeforeEach
     public void setup() throws Exception {
         super.setup();
-        JavaArchive homeArchive = ShrinkWrap.create(JavaArchive.class);
-        FileSystem vfs = ShrinkWrapFileSystems.newFileSystem(homeArchive);
         PathManager.getInstance().useOverrideHomePath(temporaryFolder.toPath());
         savePath = PathManager.getInstance().getSavePath("testSave");
 
-        assert !Files.isRegularFile(vfs.getPath("global.dat"));
+        assert !Files.isRegularFile(savePath.resolve("global.dat"));
 
         entityManager = context.get(EngineEntityManager.class);
         moduleEnvironment = mock(ModuleEnvironment.class);

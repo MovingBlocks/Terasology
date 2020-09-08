@@ -15,9 +15,6 @@
  */
 package org.terasology;
 
-import org.jboss.shrinkwrap.api.ShrinkWrap;
-import org.jboss.shrinkwrap.api.nio.file.ShrinkWrapFileSystems;
-import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.jupiter.api.BeforeEach;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.paths.PathManager;
@@ -28,6 +25,8 @@ import org.terasology.reflection.TypeRegistry;
 import org.terasology.testUtil.ModuleManagerFactory;
 
 import java.nio.file.FileSystem;
+import java.nio.file.Paths;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
@@ -37,9 +36,10 @@ public abstract class ModuleEnvironmentTest {
 
     @BeforeEach
     public void before() throws Exception {
-        final JavaArchive homeArchive = ShrinkWrap.create(JavaArchive.class);
-        final FileSystem vfs = ShrinkWrapFileSystems.newFileSystem(homeArchive);
-        PathManager.getInstance().useOverrideHomePath(vfs.getPath(""));
+        PathManager.getInstance().useOverrideHomePath(
+                Paths.get(System.getProperty("java.io.tmpdir"),
+                        "terasology",
+                        UUID.randomUUID().toString()));
 
         moduleManager = ModuleManagerFactory.create();
 

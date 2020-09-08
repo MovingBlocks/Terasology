@@ -31,6 +31,7 @@ import org.terasology.gestalt.assets.AssetFactory;
 import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.gestalt.assets.management.AssetManager;
 import org.terasology.gestalt.assets.module.ModuleAwareAssetTypeManager;
+import org.terasology.gestalt.assets.module.ModuleAwareAssetTypeManagerImpl;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
@@ -68,8 +69,8 @@ public class PojoPrefabManagerTest {
         entitySystemLibrary = new EntitySystemLibrary(context, lib);
         componentLibrary = entitySystemLibrary.getComponentLibrary();
 
-        ModuleAwareAssetTypeManager assetTypeManager = new ModuleAwareAssetTypeManager();
-        assetTypeManager.registerCoreAssetType(Prefab.class,
+        ModuleAwareAssetTypeManager assetTypeManager = new ModuleAwareAssetTypeManagerImpl();
+        assetTypeManager.createAssetType(Prefab.class,
                 (AssetFactory<Prefab, PrefabData>) PojoPrefab::new, "prefabs");
 
         assetTypeManager.switchEnvironment(moduleManager.getEnvironment());

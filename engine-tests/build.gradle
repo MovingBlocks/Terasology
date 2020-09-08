@@ -83,9 +83,6 @@ dependencies {
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.5.2")
 
     implementation group: 'junit', name: 'junit', version: '4.12'
-
-    //TODO: Remove shrinkwrap from code, you have FileSystem in java 8
-    implementation group: 'org.jboss.shrinkwrap', name: 'shrinkwrap-depchain-java7', version: '1.2.1'
 }
 
 task copyResourcesToClasses(type:Copy) {

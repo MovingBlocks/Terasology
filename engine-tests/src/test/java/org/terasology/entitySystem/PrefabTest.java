@@ -35,8 +35,10 @@ import org.terasology.entitySystem.stubs.MappedContainerComponent;
 import org.terasology.entitySystem.stubs.OrderedMapTestComponent;
 import org.terasology.entitySystem.stubs.StringComponent;
 import org.terasology.gestalt.assets.AssetFactory;
+import org.terasology.gestalt.assets.AssetType;
 import org.terasology.gestalt.assets.management.AssetManager;
 import org.terasology.gestalt.assets.module.ModuleAwareAssetTypeManager;
+import org.terasology.gestalt.assets.module.ModuleAwareAssetTypeManagerImpl;
 import org.terasology.math.Side;
 import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
@@ -74,13 +76,12 @@ public class PrefabTest {
 
         EntitySystemSetupUtil.addReflectionBasedLibraries(context);
 
-        ModuleAwareAssetTypeManager assetTypeManager = new ModuleAwareAssetTypeManager();
-        assetTypeManager.registerCoreAssetType(Prefab.class,
-                (AssetFactory<Prefab, PrefabData>) PojoPrefab::new, "prefabs");
+        ModuleAwareAssetTypeManager assetTypeManager = new ModuleAwareAssetTypeManagerImpl();
+        AssetType<Prefab, PrefabData> prefabDataAssetType = assetTypeManager.createAssetType(Prefab.class, PojoPrefab::new, "prefabs");
         ComponentLibrary componentLibrary = context.get(ComponentLibrary.class);
         TypeHandlerLibrary typeHandlerLibrary = context.get(TypeHandlerLibrary.class);
         PrefabFormat prefabFormat = new PrefabFormat(componentLibrary, typeHandlerLibrary);
-        assetTypeManager.registerCoreFormat(Prefab.class, prefabFormat);
+        assetTypeManager.getAssetFileDataProducer(prefabDataAssetType).addAssetFormat(prefabFormat);
         assetTypeManager.switchEnvironment(moduleManager.getEnvironment());
         context.put(AssetManager.class, assetTypeManager.getAssetManager());
 
