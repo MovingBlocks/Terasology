@@ -42,9 +42,6 @@ public abstract class AbstractWidget implements UIWidget {
     private UISkin skin;
 
     @LayoutConfig
-    private boolean overrideChildEnabledProp = true;
-
-    @LayoutConfig
     private Binding<String> family = new DefaultBinding<>();
 
     @LayoutConfig
@@ -71,14 +68,6 @@ public abstract class AbstractWidget implements UIWidget {
 
     public AbstractWidget(String id) {
         this.id = id;
-    }
-
-    public boolean isOverrideChildEnabledProp() {
-        return overrideChildEnabledProp;
-    }
-
-    public void setOverrideChildEnabledProp(boolean overrideChildEnabledProp) {
-        this.overrideChildEnabledProp = overrideChildEnabledProp;
     }
 
     @Override
@@ -180,13 +169,12 @@ public abstract class AbstractWidget implements UIWidget {
         this.enabled.set(enabled);
 
         for (UIWidget child : this) {
-            if (overrideChildEnabledProp) {
-                if (child instanceof AbstractWidget) {
-                    AbstractWidget widget = (AbstractWidget) child;
-                    widget.setEnabled(this.isEnabled());
-                }
+            if (child instanceof AbstractWidget) {
+                AbstractWidget widget = (AbstractWidget) child;
+                widget.setEnabled(this.isEnabled());
             }
         }
+
     }
 
     public void bindEnabled(Binding<Boolean> binding) {
