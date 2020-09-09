@@ -1,18 +1,5 @@
-/*
- * Copyright 2013 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.benchmark;
 
 import com.google.common.base.Preconditions;
@@ -23,24 +10,26 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Benchmarks contains methods to execute one or many benchmarks with support for a progress callback as well as
- * a simple pretty printer for benchmark results.
- *
+ * Benchmarks contains methods to execute one or many benchmarks with support for a progress callback as well as a
+ * simple pretty printer for benchmark results.
  */
 public final class Benchmarks {
 
     private Benchmarks() {
     }
 
-    public static BenchmarkResult execute(Benchmark benchmark, int benchmarkIndex, int benchmarkCount, BenchmarkCallback callback) {
+    public static BenchmarkResult execute(Benchmark benchmark, int benchmarkIndex, int benchmarkCount,
+                                          BenchmarkCallback callback) {
 
         if (callback != null) {
             callback.begin(benchmark, benchmarkIndex, benchmarkCount);
         }
 
         final BenchmarkResult result = new BasicBenchmarkResult(benchmark);
-        final int[] repetitions = Preconditions.checkNotNull(benchmark.getRepetitions(), "Benchmark::getRepetitions() must not return null");
-        Preconditions.checkState(repetitions.length > 0, "Benchmark::getRepetitions() must return an array of size greater than zero");
+        final int[] repetitions = Preconditions.checkNotNull(benchmark.getRepetitions(), "Benchmark::getRepetitions()" +
+                " must not return null");
+        Preconditions.checkState(repetitions.length > 0, "Benchmark::getRepetitions() must return an array of size " +
+                "greater than zero");
 
         try {
             benchmark.setup();
@@ -243,7 +232,8 @@ public final class Benchmarks {
         b.append("\n");
     }
 
-    private static void printFieldValues(BenchmarkResult result, int repIndex, BenchmarkResult.Column<?>[] columns, StringBuilder b) {
+    private static void printFieldValues(BenchmarkResult result, int repIndex, BenchmarkResult.Column<?>[] columns,
+                                         StringBuilder b) {
         boolean first = true;
         for (BenchmarkResult.Column<?> col : columns) {
             if (first) {

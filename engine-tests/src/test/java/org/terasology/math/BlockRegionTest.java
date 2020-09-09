@@ -1,28 +1,14 @@
-/*
- * Copyright 2013 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.math;
 
 import com.google.common.collect.Sets;
-import org.joml.AABBi;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.junit.jupiter.api.Test;
-import org.terasology.world.block.BlockRegion;
-import org.terasology.world.block.BlockRegionIterable;
+import org.terasology.engine.world.block.BlockRegion;
+import org.terasology.engine.world.block.BlockRegionIterable;
 
 import java.util.Arrays;
 import java.util.List;
@@ -55,7 +41,8 @@ public class BlockRegionTest {
     @Test
     public void testCreateRegionWithMinMax() {
         List<Vector3i> mins = Arrays.asList(new Vector3i(), new Vector3i(1, 1, 1), new Vector3i(3, 4, 5));
-        List<Vector3i> expectedSize = Arrays.asList(new Vector3i(1, 1, 1), new Vector3i(3, 3, 3), new Vector3i(8, 5, 2));
+        List<Vector3i> expectedSize = Arrays.asList(new Vector3i(1, 1, 1), new Vector3i(3, 3, 3), new Vector3i(8, 5,
+                2));
         List<Vector3i> max = Arrays.asList(new Vector3i(), new Vector3i(3, 3, 3), new Vector3i(10, 8, 6));
         for (int i = 0; i < mins.size(); ++i) {
             BlockRegion region = new BlockRegion(mins.get(i), max.get(i));
@@ -68,10 +55,12 @@ public class BlockRegionTest {
     @Test
     public void testCreateRegionWithBounds() {
         BlockRegion expectedRegion = new BlockRegion(new Vector3i(-2, 4, -16), new Vector3i(4, 107, 0));
-        List<Vector3i> vec1 = Arrays.asList(new Vector3i(-2, 4, -16), new Vector3i(4, 4, -16), new Vector3i(-2, 107, -16), new Vector3i(-2, 4, 0),
-            new Vector3i(4, 107, -16), new Vector3i(4, 4, 0), new Vector3i(-2, 107, 0), new Vector3i(4, 107, 0));
-        List<Vector3i> vec2 = Arrays.asList(new Vector3i(4, 107, 0), new Vector3i(-2, 107, 0), new Vector3i(4, 4, 0), new Vector3i(4, 107, -16),
-            new Vector3i(-2, 4, 0), new Vector3i(-2, 107, -16), new Vector3i(4, 4, -16), new Vector3i(-2, 4, -16));
+        List<Vector3i> vec1 = Arrays.asList(new Vector3i(-2, 4, -16), new Vector3i(4, 4, -16), new Vector3i(-2, 107,
+                        -16), new Vector3i(-2, 4, 0),
+                new Vector3i(4, 107, -16), new Vector3i(4, 4, 0), new Vector3i(-2, 107, 0), new Vector3i(4, 107, 0));
+        List<Vector3i> vec2 = Arrays.asList(new Vector3i(4, 107, 0), new Vector3i(-2, 107, 0), new Vector3i(4, 4, 0),
+                new Vector3i(4, 107, -16),
+                new Vector3i(-2, 4, 0), new Vector3i(-2, 107, -16), new Vector3i(4, 4, -16), new Vector3i(-2, 4, -16));
         for (int i = 0; i < vec1.size(); ++i) {
             BlockRegion target = new BlockRegion().union(vec1.get(i)).union(vec2.get(i));
             assertEquals(expectedRegion, target);
@@ -88,7 +77,7 @@ public class BlockRegionTest {
     public void testIterateRegion() {
         Vector3i min = new Vector3i(2, 5, 7);
         Vector3i max = new Vector3i(10, 11, 12);
-        BlockRegion region = new BlockRegion(min,max);
+        BlockRegion region = new BlockRegion(min, max);
 
         Set<Vector3ic> expected = Sets.newHashSet();
         for (int x = min.x; x <= max.x; ++x) {

@@ -1,0 +1,11 @@
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
+
+@API
+@InputCategory(id = "behavior",
+        displayName = "${engine:menu#category-behavior}"
+)
+package org.terasology.engine.logic.behavior.nui;
+
+import org.terasology.gestalt.module.sandbox.API;
+import org.terasology.nui.input.InputCategory;

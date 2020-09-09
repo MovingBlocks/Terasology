@@ -1,18 +1,5 @@
-/*
- * Copyright 2020 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 
 // The PC facade is responsible for the primary distribution - a plain Java application runnable on PCs
 
@@ -23,13 +10,14 @@ plugins {
 // Grab all the common stuff like plugins to use, artifact repositories, code analysis config
 apply from: "$rootDir/config/gradle/publish.gradle"
 
-import org.apache.tools.ant.taskdefs.condition.Os
+
+import groovy.json.JsonBuilder
 import org.apache.tools.ant.filters.FixCrLfFilter
+import org.apache.tools.ant.taskdefs.condition.Os
 import org.gradle.internal.logging.text.StyledTextOutput
 import org.gradle.internal.logging.text.StyledTextOutputFactory
 
-import java.text.SimpleDateFormat;
-import groovy.json.JsonBuilder
+import java.text.SimpleDateFormat
 
 def dateTimeFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX")
 dateTimeFormat.timeZone = TimeZone.getTimeZone("UTC")
@@ -43,7 +31,7 @@ dateTimeFormat.timeZone = TimeZone.getTimeZone("UTC")
  *
  * @return
  */
-def String nativeSubdirectoryName() {
+String nativeSubdirectoryName() {
     if (Os.isFamily(Os.FAMILY_WINDOWS)) {
         return "windows"
     } else if (Os.isFamily(Os.FAMILY_MAC)) {
@@ -108,7 +96,7 @@ jar {
         //TODO: Maybe later add the engine's version number into here?
         def manifestClasspath = configurations.runtimeClasspath.collect { it.getName() }.join(" ")
         attributes("Main-Class": mainClassName)
-        attributes("Class-Path" : manifestClasspath)
+        attributes("Class-Path": manifestClasspath)
         attributes("Implementation-Title": "Terasology-" + project.name)
         attributes("Implementation-Version": env.BUILD_NUMBER + ", " + env.GIT_BRANCH + ", " + env.BUILD_ID)
     }
@@ -132,7 +120,7 @@ run {
     dependsOn rootProject.moduleClasses
 }
 
-task game(type:JavaExec) {
+task game(type: JavaExec) {
     description = "Run 'Terasology' to play the game as a standard PC application"
     group = "terasology run"
 
@@ -151,7 +139,7 @@ task game(type:JavaExec) {
     main = mainClassName
     workingDir = rootDir
     args "-homedir"
-    jvmArgs ["-Xmx1536m"]
+    jvmArgs["-Xmx1536m"]
 
     // Classpath: PC itself, engine classes, engine dependencies. Not modules or natives since the engine finds those
     classpath sourceSets.main.output.classesDirs
@@ -161,7 +149,7 @@ task game(type:JavaExec) {
     classpath project(':engine').configurations.runtimeClasspath
 }
 
-task profile(type:JavaExec) {
+task profile(type: JavaExec) {
     description = "Run 'Terasology' to play the game as a standard PC application (with Java FlightRecorder profiling)"
     group = "terasology run"
 
@@ -185,7 +173,7 @@ task profile(type:JavaExec) {
     classpath project(':engine').configurations.runtimeClasspath
 }
 
-task debug(type:JavaExec) {
+task debug(type: JavaExec) {
     description = "Run 'Terasology' to play the game as a standard PC application (in debug mode)"
     group = "terasology run"
 
@@ -209,7 +197,7 @@ task debug(type:JavaExec) {
     classpath project(':engine').configurations.runtimeClasspath
 }
 
-task permissiveNatives(type:JavaExec) {
+task permissiveNatives(type: JavaExec) {
     description = "Run 'Terasology' with security set to permissive and natives loading a second way (for KComputers)"
     group = "terasology run"
 
@@ -222,7 +210,7 @@ task permissiveNatives(type:JavaExec) {
     main = mainClassName
     workingDir = rootDir
     args "-homedir", "-permissiveSecurity"
-    jvmArgs ["-Xmx1536m"]
+    jvmArgs["-Xmx1536m"]
 
     systemProperty("java.library.path", rootProject.file(dirNatives + "/" + nativeSubdirectoryName()))
 
@@ -241,7 +229,7 @@ task setupServerConfig {
 
     def json = new JsonBuilder()
 
-    def serverRoot = rootProject.file(localServerDataPath);
+    def serverRoot = rootProject.file(localServerDataPath)
     def config = new File(serverRoot, 'config.cfg')
 
     if (!config.exists()) {
@@ -252,17 +240,17 @@ task setupServerConfig {
         json {
             worldGeneration {
                 if (project.hasProperty('seed')) {
-                    logger.lifecycle("  Seed value: $seed");
+                    logger.lifecycle("  Seed value: $seed")
                     defaultSeed seed
                 }
                 if (project.hasProperty('worldGen')) {
-                    logger.lifecycle("  World Generator: $worldGen");
+                    logger.lifecycle("  World Generator: $worldGen")
                     defaultGenerator worldGen
                 }
             }
             defaultModSelection {
                 if (project.hasProperty('extraModules')) {
-                    logger.lifecycle("  Enabling modules: $extraModules");
+                    logger.lifecycle("  Enabling modules: $extraModules")
                     modules extraModules.tokenize(" ,")
                 }
             }
@@ -290,7 +278,7 @@ task setupServerModules(type: Sync) {
 }
 
 // TODO: Make a task to reset server / game data
-task server(type:JavaExec) {
+task server(type: JavaExec) {
     description "Starts a headless multiplayer server with data stored in [project-root]/$localServerDataPath"
     group = "terasology run"
 
@@ -306,7 +294,7 @@ task server(type:JavaExec) {
     workingDir = rootDir
     String[] runArgs = ["-headless", "-homedir=$localServerDataPath"]
     args runArgs
-    jvmArgs ["-Xmx1536"]
+    jvmArgs["-Xmx1536"]
 
     // Classpath: PC itself, engine classes, engine dependencies. Not modules or natives since the engine finds those
     classpath sourceSets.main.output.classesDirs
@@ -324,7 +312,7 @@ task createVersionFile(type: Copy) {
     into "$buildDir"
     include versionFileName
     expand(buildNumber: env.BUILD_NUMBER, buildUrl: env.BUILD_URL, gitBranch: env.GIT_BRANCH, dateTime: startDateTimeString, displayVersion: displayVersion)
-    filter(FixCrLfFilter, eol:FixCrLfFilter.CrLf.newInstance("crlf"))
+    filter(FixCrLfFilter, eol: FixCrLfFilter.CrLf.newInstance("crlf"))
 }
 
 // TODO: This could probably be done more Gradley (engine project resource dir instead of direct path?) and with some variables
@@ -336,7 +324,7 @@ task copyCreditsFile(type: Copy) {
 }
 
 // Main application dist target. Does NOT include any modules.
-task distApp (type: Sync) {
+task distApp(type: Sync) {
     description = "Creates an application package for distribution"
     group = "terasology dist"
 
@@ -345,16 +333,16 @@ task distApp (type: Sync) {
     dependsOn rootProject.extractNatives
     dependsOn jar
 
-    into ("${distsDirectory.get().asFile}/app")
-    from ("$rootDir/README.markdown") {
-        filter(FixCrLfFilter, eol:FixCrLfFilter.CrLf.newInstance("crlf"))
+    into("${distsDirectory.get().asFile}/app")
+    from("$rootDir/README.markdown") {
+        filter(FixCrLfFilter, eol: FixCrLfFilter.CrLf.newInstance("crlf"))
         rename('README.markdown', 'README')
     }
-    from ("$rootDir/LICENSE") {
-        filter(FixCrLfFilter, eol:FixCrLfFilter.CrLf.newInstance("crlf"))
+    from("$rootDir/LICENSE") {
+        filter(FixCrLfFilter, eol: FixCrLfFilter.CrLf.newInstance("crlf"))
     }
-    from ("$rootDir/NOTICE") {
-        filter(FixCrLfFilter, eol:FixCrLfFilter.CrLf.newInstance("crlf"))
+    from("$rootDir/NOTICE") {
+        filter(FixCrLfFilter, eol: FixCrLfFilter.CrLf.newInstance("crlf"))
     }
     from('launchScripts') {
         exclude('TeraEd.exe')
@@ -365,7 +353,7 @@ task distApp (type: Sync) {
     into(subDirLibs) {
         from configurations.runtimeClasspath
         from project(':engine').jar
-        from ("$buildDir/libs") {
+        from("$buildDir/libs") {
             include "*.jar"
             rename {
                 'Terasology.jar'
@@ -378,7 +366,7 @@ task distApp (type: Sync) {
 }
 
 // Distribute modules - only grabs Core in Jenkins but locally will grab any present. "Distros" now handle Jenkins packs
-task distModules (type: Sync) {
+task distModules(type: Sync) {
     description = "Prepares local modules for distribution"
     dependsOn distApp
     dependsOn rootProject.moduleJars
@@ -391,7 +379,7 @@ task distModules (type: Sync) {
     }
 }
 
-task distPCZip (type: Zip) {
+task distPCZip(type: Zip) {
     group = "terasology dist"
     dependsOn distApp
     dependsOn distModules
@@ -399,15 +387,15 @@ task distPCZip (type: Zip) {
     archiveFileName = "Terasology.zip"
 }
 
-task distForLauncher (type: Sync) {
+task distForLauncher(type: Sync) {
     group = "terasology dist"
 
     into rootDirDist
     from distPCZip
 
-    into ("../resources/main/org/terasology/version") {
-        from ("$rootDir/engine/build/classes/org/terasology/version") {
-            include ('versionInfo.properties')
+    into("../resources/main/org/terasology/version") {
+        from("$rootDir/engine/build/classes/org/terasology/version") {
+            include('versionInfo.properties')
         }
     }
 }

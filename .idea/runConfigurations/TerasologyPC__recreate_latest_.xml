@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="TerasologyPC (recreate latest)" type="Application" factoryName="Application">
-    <option name="MAIN_CLASS_NAME" value="org.terasology.engine.Terasology" />
+    <option name="MAIN_CLASS_NAME" value="org.terasology.core.Terasology" />
     <module name="Terasology.facades.PC.main" />
     <option name="PROGRAM_PARAMETERS" value="-homedir -noCrashReport -createlastgame" />
     <shortenClasspath name="MANIFEST" />

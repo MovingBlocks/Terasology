@@ -1,37 +1,23 @@
-/*
- * Copyright 2014 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License"){ }
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *  http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 
 package org.terasology;
 
 import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.context.Context;
-import org.terasology.context.internal.ContextImpl;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.context.internal.ContextImpl;
+import org.terasology.engine.recording.RecordAndReplayCurrentStatus;
+import org.terasology.engine.registry.CoreRegistry;
 import org.terasology.gestalt.assets.management.AssetManager;
 import org.terasology.gestalt.naming.Name;
-import org.terasology.recording.RecordAndReplayCurrentStatus;
-import org.terasology.registry.CoreRegistry;
 
 import java.io.IOException;
 import java.util.Set;
 
 /**
  * Setup an empty Terasology environment
- *
  */
 public class Environment {
 
@@ -72,7 +58,7 @@ public class Environment {
         AssetManager assetManager = setupAssetManager();
 
         setupBlockManager(assetManager);
-        
+
         setupExtraDataManager(context);
 
         setupCollisionManager();
@@ -133,7 +119,7 @@ public class Environment {
     protected void setupBlockManager(AssetManager assetManager) {
         // empty
     }
-    
+
     protected void setupExtraDataManager(Context context) {
         // empty
     }

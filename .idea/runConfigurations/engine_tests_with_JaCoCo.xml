@@ -4,7 +4,7 @@
     <useClassPathOnly />
     <extension name="coverage" runner="jacoco">
       <pattern>
-        <option name="PATTERN" value="org.terasology.engine.*" />
+        <option name="PATTERN" value="org.terasology.core.*" />
         <option name="ENABLED" value="true" />
       </pattern>
     </extension>

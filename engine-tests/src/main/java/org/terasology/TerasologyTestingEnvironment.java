@@ -1,50 +1,37 @@
-/*
- * Copyright 2013 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 
 package org.terasology;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
-import org.terasology.context.Context;
-import org.terasology.engine.ComponentSystemManager;
-import org.terasology.engine.EngineTime;
-import org.terasology.engine.Time;
-import org.terasology.engine.bootstrap.EntitySystemSetupUtil;
-import org.terasology.engine.modes.loadProcesses.LoadPrefabs;
-import org.terasology.engine.module.ModuleManager;
-import org.terasology.engine.paths.PathManager;
-import org.terasology.entitySystem.entity.internal.EngineEntityManager;
-import org.terasology.game.Game;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.core.ComponentSystemManager;
+import org.terasology.engine.core.EngineTime;
+import org.terasology.engine.core.Time;
+import org.terasology.engine.core.bootstrap.EntitySystemSetupUtil;
+import org.terasology.engine.core.modes.loadProcesses.LoadPrefabs;
+import org.terasology.engine.core.module.ModuleManager;
+import org.terasology.engine.core.paths.PathManager;
+import org.terasology.engine.entitySystem.entity.internal.EngineEntityManager;
+import org.terasology.engine.game.Game;
+import org.terasology.engine.logic.console.Console;
+import org.terasology.engine.logic.console.ConsoleImpl;
+import org.terasology.engine.network.NetworkSystem;
+import org.terasology.engine.network.internal.NetworkSystemImpl;
+import org.terasology.engine.persistence.StorageManager;
+import org.terasology.engine.persistence.internal.ReadWriteStorageManager;
+import org.terasology.engine.recording.CharacterStateEventPositionMap;
+import org.terasology.engine.recording.DirectionAndOriginPosRecorderList;
+import org.terasology.engine.recording.RecordAndReplayCurrentStatus;
+import org.terasology.engine.recording.RecordAndReplaySerializer;
+import org.terasology.engine.recording.RecordAndReplayUtils;
+import org.terasology.engine.recording.RecordedEventStore;
+import org.terasology.engine.world.block.BlockManager;
+import org.terasology.engine.world.chunks.blockdata.ExtraBlockDataManager;
 import org.terasology.gestalt.naming.Name;
-import org.terasology.logic.console.Console;
-import org.terasology.logic.console.ConsoleImpl;
-import org.terasology.network.NetworkSystem;
-import org.terasology.network.internal.NetworkSystemImpl;
-import org.terasology.persistence.StorageManager;
-import org.terasology.persistence.internal.ReadWriteStorageManager;
-import org.terasology.recording.CharacterStateEventPositionMap;
-import org.terasology.recording.DirectionAndOriginPosRecorderList;
-import org.terasology.recording.RecordAndReplayCurrentStatus;
-import org.terasology.recording.RecordAndReplaySerializer;
-import org.terasology.recording.RecordAndReplayUtils;
-import org.terasology.recording.RecordedEventStore;
 import org.terasology.reflection.TypeRegistry;
-import org.terasology.world.block.BlockManager;
-import org.terasology.world.chunks.blockdata.ExtraBlockDataManager;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -54,7 +41,6 @@ import static org.mockito.Mockito.mock;
 
 /**
  * A base class for unit test classes to inherit to run in a Terasology environment - with LWJGL set up and so forth
- *
  */
 public abstract class TerasologyTestingEnvironment {
     protected static Context context;
@@ -68,7 +54,7 @@ public abstract class TerasologyTestingEnvironment {
 
     @BeforeAll
     public static void setupEnvironment() throws Exception {
-        Path systemTempDir= Paths.get(System.getProperty("java.io.tmpdir"));
+        Path systemTempDir = Paths.get(System.getProperty("java.io.tmpdir"));
         Path tempDirectory = Files.createTempDirectory(systemTempDir, "terasologyTTE");
         PathManager.getInstance().useOverrideHomePath(tempDirectory);
         /*
@@ -79,6 +65,11 @@ public abstract class TerasologyTestingEnvironment {
         context = env.getContext();
         moduleManager = context.get(ModuleManager.class);
 
+    }
+
+    @AfterAll
+    public static void tearDown() throws Exception {
+        env.close();
     }
 
     @BeforeEach
@@ -103,12 +94,15 @@ public abstract class TerasologyTestingEnvironment {
         context.put(CharacterStateEventPositionMap.class, characterStateEventPositionMap);
         DirectionAndOriginPosRecorderList directionAndOriginPosRecorderList = new DirectionAndOriginPosRecorderList();
         context.put(DirectionAndOriginPosRecorderList.class, directionAndOriginPosRecorderList);
-        RecordAndReplaySerializer recordAndReplaySerializer = new RecordAndReplaySerializer(engineEntityManager, recordedEventStore, recordAndReplayUtils, characterStateEventPositionMap, directionAndOriginPosRecorderList, moduleManager, context.get(TypeRegistry.class));
+        RecordAndReplaySerializer recordAndReplaySerializer = new RecordAndReplaySerializer(engineEntityManager,
+                recordedEventStore, recordAndReplayUtils, characterStateEventPositionMap,
+                directionAndOriginPosRecorderList, moduleManager, context.get(TypeRegistry.class));
         context.put(RecordAndReplaySerializer.class, recordAndReplaySerializer);
 
         Path savePath = PathManager.getInstance().getSavePath("world1");
         context.put(StorageManager.class, new ReadWriteStorageManager(savePath, moduleManager.getEnvironment(),
-                engineEntityManager, mockBlockManager, extraDataManager, recordAndReplaySerializer, recordAndReplayUtils, recordAndReplayCurrentStatus));
+                engineEntityManager, mockBlockManager, extraDataManager, recordAndReplaySerializer,
+                recordAndReplayUtils, recordAndReplayCurrentStatus));
 
         ComponentSystemManager componentSystemManager = new ComponentSystemManager(context);
         context.put(ComponentSystemManager.class, componentSystemManager);
@@ -122,12 +116,6 @@ public abstract class TerasologyTestingEnvironment {
         context.get(ComponentSystemManager.class).initialise();
         context.put(Console.class, new ConsoleImpl(context));
     }
-
-    @AfterAll
-    public static void tearDown() throws Exception {
-        env.close();
-    }
-
 
     public EngineEntityManager getEntityManager() {
         return engineEntityManager;
