@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="TerasologyPC (Splash disabled)" type="Application" factoryName="Application">
-    <option name="MAIN_CLASS_NAME" value="org.terasology.core.Terasology" />
+    <option name="MAIN_CLASS_NAME" value="org.terasology.engine.Terasology" />
     <module name="Terasology.facades.PC.main" />
     <option name="PROGRAM_PARAMETERS" value="-homedir -noCrashReport -noSplash" />
     <shortenClasspath name="MANIFEST" />

@@ -170,8 +170,9 @@ task cacheReflections {
         // Without the .mkdirs() we might hit a scenario where the classes dir doesn't exist yet
         Reflections reflections = new org.reflections.Reflections(new org.reflections.util.ConfigurationBuilder()
             .addUrls(inputs.files.collect { it.toURI().toURL() })
+            .forPackages("org.terasology.engine")
             .setScanners(new TypeAnnotationsScanner(), new SubTypesScanner()))
-        reflections.save("$buildDir/classes/reflections.cache")
+        reflections.save("$buildDir/classes/org/terasology/engine/manifest.json")
     }
 }
 
@@ -200,7 +201,7 @@ task cleanReflections(type: Delete) {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // First read the internal version out of the engine's engine-module.txt
-def moduleFile = file('src/main/resources/org/terasology/engine-module.txt')
+def moduleFile = file('src/main/resources/org/terasology/engine/engine-module.txt')
 
 if (!moduleFile.exists()) {
     println "Failed to find engine-module.txt for engine"
@@ -257,6 +258,7 @@ task copyResourcesToClasses(type:Copy) {
 }
 
 jar.dependsOn createVersionInfoFile
+cacheReflections.mustRunAfter(classes)
 jar.dependsOn cacheReflections
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
