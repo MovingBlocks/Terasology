@@ -123,6 +123,9 @@ public final class ExternalApiWhitelist {
             .add(java.io.DataOutputStream.class)
             .add(java.io.FilterOutputStream.class)
             .add(java.io.PipedOutputStream.class)
+            // gestalt module
+            .add(org.terasology.gestalt.naming.Name.class)
+            .add(org.terasology.gestalt.assets.management.AssetManager.class)
             .build();
 
     private ExternalApiWhitelist() {

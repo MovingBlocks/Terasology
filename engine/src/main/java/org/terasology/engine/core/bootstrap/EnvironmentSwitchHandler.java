@@ -159,6 +159,7 @@ public final class EnvironmentSwitchHandler {
                 .addDeltaFormat(registeredPrefabDeltaFormat);
 
         assetTypeManager.switchEnvironment(environment);
+        assetTypeManager.reloadAssets();
 
     }
 

@@ -3,6 +3,7 @@
 package org.terasology.engine.core.module;
 
 import com.google.common.collect.Sets;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.config.Config;
@@ -12,6 +13,7 @@ import org.terasology.engine.core.paths.PathManager;
 import org.terasology.gestalt.module.Module;
 import org.terasology.gestalt.module.ModuleEnvironment;
 import org.terasology.gestalt.module.ModuleFactory;
+import org.terasology.gestalt.module.ModuleMetadata;
 import org.terasology.gestalt.module.ModuleMetadataJsonAdapter;
 import org.terasology.gestalt.module.ModulePathScanner;
 import org.terasology.gestalt.module.ModuleRegistry;
@@ -23,6 +25,8 @@ import org.terasology.gestalt.module.sandbox.ModuleSecurityPolicy;
 import org.terasology.gestalt.module.sandbox.PermissionProviderFactory;
 import org.terasology.gestalt.module.sandbox.StandardPermissionProviderFactory;
 import org.terasology.gestalt.module.sandbox.WarnOnlyProviderFactory;
+import org.terasology.gestalt.naming.Name;
+import org.terasology.gestalt.naming.Version;
 
 import java.lang.reflect.ReflectPermission;
 import java.security.Policy;
@@ -80,6 +84,7 @@ public class ModuleManagerImpl implements ModuleManager {
 //        }
 
         Module engineModule = moduleFactory.createPackageModule("org.terasology.engine");
+        Module nuiModule = createSyntheticPackageModule(engineModule, "nui", "0.0.0", "org.terasology.nui");
 
         registry = new TableModuleRegistry();
         registry.add(engineModule);
@@ -96,8 +101,10 @@ public class ModuleManagerImpl implements ModuleManager {
 
         registry.stream().filter(mod -> mod != engineModule).forEach(mod -> mod.getMetadata().getDependencies().add(engineDep));
 
+        registry.add(nuiModule);
+
         setupSandbox();
-        loadEnvironment(Sets.newHashSet(engineModule), true);
+        loadEnvironment(Sets.newHashSet(engineModule, nuiModule), true);
         installManager = new ModuleInstallManager(this, masterServerAddress);
     }
 
@@ -107,6 +114,21 @@ public class ModuleManagerImpl implements ModuleManager {
 
     public ModuleManagerImpl(Config config, List<Class<?>> classesOnClasspathsToAddToEngine) {
         this(config.getNetwork().getMasterServer(), classesOnClasspathsToAddToEngine);
+    }
+
+    @NotNull
+    private Module createSyntheticPackageModule(Module engineModule, String nui, String version, String packageName) {
+        Module module = moduleFactory.createPackageModule(
+                new ModuleMetadata(
+                        new Name(nui),
+                        new Version(version)),
+                packageName);
+        DependencyInfo moduleDep = new DependencyInfo();
+        moduleDep.setId(module.getId());
+        moduleDep.setMinVersion(module.getVersion());
+        moduleDep.setMaxVersion(module.getVersion().getNextPatchVersion());
+        engineModule.getMetadata().getDependencies().add(moduleDep);
+        return module;
     }
 
     /**

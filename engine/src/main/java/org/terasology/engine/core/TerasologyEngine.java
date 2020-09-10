@@ -421,9 +421,6 @@ public class TerasologyEngine implements GameEngine {
             return false;
         }
 
-//        assetTypeManager.switchEnvironment(moduleEnvironment); // TODO check reloading - gestalt v7 - it is from docs.
-        assetTypeManager.reloadAssets();
-
         processPendingState();
 
         if (currentState == null) {
