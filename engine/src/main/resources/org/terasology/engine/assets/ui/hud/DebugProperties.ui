@@ -10,7 +10,7 @@
                     "type": "propertyLayout",
                     "id": "properties",
                     "rowConstraints": "[min]"
-                },4
+                },
                 "layoutInfo": {
                     "width": 400,
                     "position-right": {

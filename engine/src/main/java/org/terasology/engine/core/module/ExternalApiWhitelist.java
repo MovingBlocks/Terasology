@@ -123,9 +123,16 @@ public final class ExternalApiWhitelist {
             .add(java.io.DataOutputStream.class)
             .add(java.io.FilterOutputStream.class)
             .add(java.io.PipedOutputStream.class)
+            // terasology math
+            .add(org.terasology.math.TeraMath.class)
             // gestalt module
             .add(org.terasology.gestalt.naming.Name.class)
             .add(org.terasology.gestalt.assets.management.AssetManager.class)
+            .add(org.terasology.gestalt.assets.Asset.class)
+            .add(org.terasology.gestalt.assets.AssetData.class)
+            .add(org.terasology.gestalt.assets.AssetDataProducer.class)
+            .add(org.terasology.gestalt.assets.module.annotations.RegisterAssetDataProducer.class)
+            .add(org.terasology.gestalt.assets.ResourceUrn.class)
             .build();
 
     private ExternalApiWhitelist() {
