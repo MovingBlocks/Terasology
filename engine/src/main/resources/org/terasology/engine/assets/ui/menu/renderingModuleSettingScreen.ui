@@ -15,7 +15,7 @@
     "id": "settingPage",
     "contents": [
       {
-        "type": "engine:RelativeLayout",
+        "type": "nui:RelativeLayout",
         "id": "newWidget",
         "contents": [
           {

@@ -32,7 +32,7 @@
                 }
             },
             {
-                "type": "engine:flowLayout",
+                "type": "nui:flowLayout",
                 "layoutInfo": {
                     "use-content-width": true,
                     "use-content-height": true,
@@ -60,7 +60,7 @@
                 ]
             },
             {
-                "type": "engine:columnLayout",
+                "type": "nui:columnLayout",
                 "layoutInfo": {
                     "use-content-width": true,
                     "use-content-height": true,
