@@ -6,11 +6,11 @@ import com.google.common.collect.Lists;
 import org.terasology.engine.context.Context;
 import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.gestalt.module.ModuleEnvironment;
-import org.terasology.reflection.copy.CopyStrategyLibrary;
-import org.terasology.reflection.metadata.ClassLibrary;
-import org.terasology.reflection.metadata.ClassMetadata;
-import org.terasology.reflection.metadata.DefaultClassLibrary;
-import org.terasology.reflection.reflect.ReflectFactory;
+import org.terasology.nui.reflection.copy.CopyStrategyLibrary;
+import org.terasology.nui.reflection.metadata.ClassLibrary;
+import org.terasology.nui.reflection.metadata.ClassMetadata;
+import org.terasology.nui.reflection.metadata.DefaultClassLibrary;
+import org.terasology.nui.reflection.reflect.ReflectFactory;
 
 import java.util.List;
 

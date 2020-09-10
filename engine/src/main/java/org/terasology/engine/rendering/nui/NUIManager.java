@@ -9,7 +9,7 @@ import org.terasology.nui.FocusManager;
 import org.terasology.nui.UIWidget;
 import org.terasology.nui.asset.UIElement;
 import org.terasology.nui.canvas.CanvasControl;
-import org.terasology.reflection.metadata.ClassLibrary;
+import org.terasology.nui.reflection.metadata.ClassLibrary;
 import org.terasology.engine.rendering.nui.layers.hud.HUDScreenLayer;
 
 import java.util.Deque;

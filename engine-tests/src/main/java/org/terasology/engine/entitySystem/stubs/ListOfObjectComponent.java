@@ -4,7 +4,7 @@
 package org.terasology.engine.entitySystem.stubs;
 
 import org.terasology.engine.entitySystem.Component;
-import org.terasology.reflection.MappedContainer;
+import org.terasology.nui.reflection.MappedContainer;
 
 import java.util.ArrayList;
 import java.util.List;

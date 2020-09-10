@@ -30,12 +30,12 @@ import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.gestalt.assets.module.ModuleAwareAssetTypeManager;
 import org.terasology.gestalt.module.ModuleEnvironment;
 import org.terasology.gestalt.util.reflection.GenericsUtil;
-import org.terasology.reflection.TypeInfo;
-import org.terasology.reflection.TypeRegistry;
-import org.terasology.reflection.copy.CopyStrategy;
-import org.terasology.reflection.copy.CopyStrategyLibrary;
-import org.terasology.reflection.copy.RegisterCopyStrategy;
-import org.terasology.reflection.reflect.ReflectFactory;
+import org.terasology.nui.reflection.TypeInfo;
+import org.terasology.nui.reflection.TypeRegistry;
+import org.terasology.nui.reflection.copy.CopyStrategy;
+import org.terasology.nui.reflection.copy.CopyStrategyLibrary;
+import org.terasology.nui.reflection.copy.RegisterCopyStrategy;
+import org.terasology.nui.reflection.reflect.ReflectFactory;
 
 import java.lang.reflect.Type;
 import java.util.Optional;

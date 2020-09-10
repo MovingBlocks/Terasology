@@ -3,7 +3,7 @@
 package org.terasology.engine.persistence.typeHandling.reflection;
 
 import org.terasology.engine.persistence.typeHandling.TypeHandler;
-import org.terasology.reflection.TypeInfo;
+import org.terasology.nui.reflection.TypeInfo;
 
 import java.util.Optional;
 

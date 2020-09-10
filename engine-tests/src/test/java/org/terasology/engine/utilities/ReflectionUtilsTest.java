@@ -5,8 +5,8 @@ package org.terasology.engine.utilities;
 import org.junit.jupiter.api.Test;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.logic.location.LocationComponent;
-import org.terasology.reflection.TypeInfo;
-import org.terasology.reflection.copy.CopyStrategy;
+import org.terasology.nui.reflection.TypeInfo;
+import org.terasology.nui.reflection.copy.CopyStrategy;
 
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.ParameterizedType;

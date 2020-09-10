@@ -4,9 +4,9 @@ package org.terasology.engine.reflection.reflect;
 
 import org.terasology.engine.persistence.typeHandling.InstanceCreator;
 import org.terasology.engine.persistence.typeHandling.SerializationException;
-import org.terasology.reflection.TypeInfo;
-import org.terasology.reflection.reflect.ObjectConstructor;
-import org.terasology.reflection.reflect.internal.UnsafeAllocator;
+import org.terasology.nui.reflection.TypeInfo;
+import org.terasology.nui.reflection.reflect.ObjectConstructor;
+import org.terasology.nui.reflection.reflect.internal.UnsafeAllocator;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;

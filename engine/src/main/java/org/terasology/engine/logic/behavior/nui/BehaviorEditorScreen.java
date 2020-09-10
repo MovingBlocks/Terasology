@@ -28,7 +28,7 @@ import org.terasology.nui.properties.Property;
 import org.terasology.nui.properties.PropertyProvider;
 import org.terasology.nui.widgets.UIDropdown;
 import org.terasology.nui.widgets.UIList;
-import org.terasology.reflection.reflect.ReflectFactory;
+import org.terasology.nui.reflection.reflect.ReflectFactory;
 
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;

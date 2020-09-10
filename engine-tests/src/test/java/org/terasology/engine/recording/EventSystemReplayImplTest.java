@@ -26,7 +26,7 @@ import org.terasology.engine.network.NetworkSystem;
 import org.terasology.engine.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.engine.registry.CoreRegistry;
 import org.terasology.gestalt.module.ModuleEnvironment;
-import org.terasology.reflection.TypeRegistry;
+import org.terasology.nui.reflection.TypeRegistry;
 
 import java.util.ArrayList;
 import java.util.List;

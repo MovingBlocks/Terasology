@@ -59,10 +59,10 @@ import org.terasology.gestalt.assets.module.ModuleAwareAssetTypeManager;
 import org.terasology.gestalt.assets.module.autoreload.AutoReloadAssetTypeManager;
 import org.terasology.nui.asset.UIElement;
 import org.terasology.nui.skin.UISkin;
-import org.terasology.reflection.TypeRegistry;
-import org.terasology.reflection.copy.CopyStrategyLibrary;
-import org.terasology.reflection.reflect.ReflectFactory;
-import org.terasology.reflection.reflect.ReflectionReflectFactory;
+import org.terasology.nui.reflection.TypeRegistry;
+import org.terasology.nui.reflection.copy.CopyStrategyLibrary;
+import org.terasology.nui.reflection.reflect.ReflectFactory;
+import org.terasology.nui.reflection.reflect.ReflectionReflectFactory;
 
 import java.util.ArrayList;
 import java.util.Collection;

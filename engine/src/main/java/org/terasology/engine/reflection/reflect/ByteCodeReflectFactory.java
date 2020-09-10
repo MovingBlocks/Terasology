@@ -14,11 +14,11 @@ import javassist.NotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.utilities.ReflectionUtil;
-import org.terasology.reflection.reflect.FieldAccessor;
-import org.terasology.reflection.reflect.InaccessibleFieldException;
-import org.terasology.reflection.reflect.ObjectConstructor;
-import org.terasology.reflection.reflect.ReflectFactory;
-import org.terasology.reflection.reflect.ReflectionReflectFactory;
+import org.terasology.nui.reflection.reflect.FieldAccessor;
+import org.terasology.nui.reflection.reflect.InaccessibleFieldException;
+import org.terasology.nui.reflection.reflect.ObjectConstructor;
+import org.terasology.nui.reflection.reflect.ReflectFactory;
+import org.terasology.nui.reflection.reflect.ReflectionReflectFactory;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;

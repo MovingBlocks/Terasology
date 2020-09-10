@@ -5,11 +5,11 @@ package org.terasology.engine.entitySystem.metadata.internal;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.terasology.gestalt.assets.ResourceUrn;
-import org.terasology.reflection.copy.CopyStrategyLibrary;
-import org.terasology.reflection.metadata.DefaultClassMetadata;
-import org.terasology.reflection.metadata.FieldMetadata;
-import org.terasology.reflection.reflect.ReflectFactory;
-import org.terasology.reflection.reflect.ReflectionReflectFactory;
+import org.terasology.nui.reflection.copy.CopyStrategyLibrary;
+import org.terasology.nui.reflection.metadata.DefaultClassMetadata;
+import org.terasology.nui.reflection.metadata.FieldMetadata;
+import org.terasology.nui.reflection.reflect.ReflectFactory;
+import org.terasology.nui.reflection.reflect.ReflectionReflectFactory;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;

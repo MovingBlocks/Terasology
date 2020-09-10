@@ -5,7 +5,7 @@ package org.terasology.engine.persistence.serializers;
 import org.terasology.engine.persistence.typeHandling.PersistedData;
 import org.terasology.engine.persistence.typeHandling.PersistedDataSerializer;
 import org.terasology.engine.persistence.typeHandling.TypeHandlerLibrary;
-import org.terasology.reflection.TypeInfo;
+import org.terasology.nui.reflection.TypeInfo;
 
 import java.util.Optional;
 

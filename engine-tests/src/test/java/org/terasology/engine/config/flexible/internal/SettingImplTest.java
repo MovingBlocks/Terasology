@@ -12,7 +12,7 @@ import org.terasology.engine.config.flexible.constraints.NumberRangeConstraint;
 import org.terasology.engine.core.SimpleUri;
 import org.terasology.engine.utilities.random.FastRandom;
 import org.terasology.engine.utilities.random.Random;
-import org.terasology.reflection.TypeInfo;
+import org.terasology.nui.reflection.TypeInfo;
 
 import java.util.List;
 

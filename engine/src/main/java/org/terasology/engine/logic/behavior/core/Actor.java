@@ -14,7 +14,7 @@ import org.terasology.engine.entitySystem.metadata.EntitySystemLibrary;
 import org.terasology.engine.registry.CoreRegistry;
 import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.gestalt.module.sandbox.API;
-import org.terasology.reflection.metadata.FieldMetadata;
+import org.terasology.nui.reflection.metadata.FieldMetadata;
 
 import java.lang.reflect.Field;
 import java.util.Map;

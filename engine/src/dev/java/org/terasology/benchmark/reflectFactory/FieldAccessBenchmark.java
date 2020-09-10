@@ -6,9 +6,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.benchmark.AbstractBenchmark;
 import org.terasology.engine.logic.common.DisplayNameComponent;
-import org.terasology.reflection.reflect.FieldAccessor;
-import org.terasology.reflection.reflect.InaccessibleFieldException;
-import org.terasology.reflection.reflect.ReflectFactory;
+import org.terasology.nui.reflection.reflect.FieldAccessor;
+import org.terasology.nui.reflection.reflect.InaccessibleFieldException;
+import org.terasology.nui.reflection.reflect.ReflectFactory;
 
 /**
  *

@@ -6,7 +6,7 @@ import org.terasology.engine.persistence.typeHandling.TypeHandler;
 import org.terasology.engine.persistence.typeHandling.TypeHandlerFactory;
 import org.terasology.engine.persistence.typeHandling.TypeHandlerContext;
 import org.terasology.engine.persistence.typeHandling.coreTypes.EnumTypeHandler;
-import org.terasology.reflection.TypeInfo;
+import org.terasology.nui.reflection.TypeInfo;
 
 import java.util.Optional;
 

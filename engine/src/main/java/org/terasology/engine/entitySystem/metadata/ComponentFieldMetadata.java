@@ -5,10 +5,10 @@ package org.terasology.engine.entitySystem.metadata;
 import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.entitySystem.Owns;
 import org.terasology.engine.entitySystem.entity.EntityRef;
-import org.terasology.reflection.copy.CopyStrategy;
-import org.terasology.reflection.metadata.ClassMetadata;
-import org.terasology.reflection.reflect.InaccessibleFieldException;
-import org.terasology.reflection.reflect.ReflectFactory;
+import org.terasology.nui.reflection.copy.CopyStrategy;
+import org.terasology.nui.reflection.metadata.ClassMetadata;
+import org.terasology.nui.reflection.reflect.InaccessibleFieldException;
+import org.terasology.nui.reflection.reflect.ReflectFactory;
 import org.terasology.engine.utilities.ReflectionUtil;
 
 import java.lang.reflect.Field;

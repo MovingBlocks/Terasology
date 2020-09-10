@@ -15,8 +15,8 @@ import org.terasology.nui.widgets.UIDropdownScrollable;
 import org.terasology.nui.widgets.UpdateListener;
 import org.terasology.nui.widgets.treeView.JsonTree;
 import org.terasology.nui.widgets.treeView.JsonTreeValue;
-import org.terasology.reflection.metadata.ClassLibrary;
-import org.terasology.reflection.metadata.ClassMetadata;
+import org.terasology.nui.reflection.metadata.ClassLibrary;
+import org.terasology.nui.reflection.metadata.ClassMetadata;
 import org.terasology.engine.rendering.nui.CoreScreenLayer;
 import org.terasology.engine.rendering.nui.editor.utils.NUIEditorNodeUtils;
 

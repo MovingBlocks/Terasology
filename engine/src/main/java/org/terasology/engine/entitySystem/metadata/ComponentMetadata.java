@@ -8,11 +8,11 @@ import com.google.common.collect.Lists;
 import org.terasology.engine.entitySystem.Component;
 import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.engine.network.Replicate;
-import org.terasology.reflection.copy.CopyStrategy;
-import org.terasology.reflection.copy.CopyStrategyLibrary;
-import org.terasology.reflection.metadata.ClassMetadata;
-import org.terasology.reflection.reflect.InaccessibleFieldException;
-import org.terasology.reflection.reflect.ReflectFactory;
+import org.terasology.nui.reflection.copy.CopyStrategy;
+import org.terasology.nui.reflection.copy.CopyStrategyLibrary;
+import org.terasology.nui.reflection.metadata.ClassMetadata;
+import org.terasology.nui.reflection.reflect.InaccessibleFieldException;
+import org.terasology.nui.reflection.reflect.ReflectFactory;
 import org.terasology.engine.world.block.ForceBlockActive;
 import org.terasology.engine.world.block.RequiresBlockLifecycleEvents;
 

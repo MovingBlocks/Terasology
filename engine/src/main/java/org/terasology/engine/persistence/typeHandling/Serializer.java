@@ -5,8 +5,8 @@ package org.terasology.engine.persistence.typeHandling;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.persistence.serializers.DeserializeFieldCheck;
-import org.terasology.reflection.metadata.ClassMetadata;
-import org.terasology.reflection.metadata.FieldMetadata;
+import org.terasology.nui.reflection.metadata.ClassMetadata;
+import org.terasology.nui.reflection.metadata.FieldMetadata;
 
 import java.util.Map;
 

@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.persistence.serializers;
 
-import org.terasology.reflection.metadata.ClassMetadata;
-import org.terasology.reflection.metadata.FieldMetadata;
+import org.terasology.nui.reflection.metadata.ClassMetadata;
+import org.terasology.nui.reflection.metadata.FieldMetadata;
 
 /**
  * Interface for checks as whether a component should be deserialized

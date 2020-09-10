@@ -7,7 +7,7 @@ import org.terasology.engine.persistence.typeHandling.TypeHandlerFactory;
 import org.terasology.engine.persistence.typeHandling.TypeHandlerContext;
 import org.terasology.engine.persistence.typeHandling.coreTypes.ArrayTypeHandler;
 import org.terasology.engine.persistence.typeHandling.coreTypes.RuntimeDelegatingTypeHandler;
-import org.terasology.reflection.TypeInfo;
+import org.terasology.nui.reflection.TypeInfo;
 
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Type;

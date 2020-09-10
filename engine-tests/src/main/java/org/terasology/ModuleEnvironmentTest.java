@@ -8,7 +8,7 @@ import org.terasology.engine.core.paths.PathManager;
 import org.terasology.gestalt.module.ModuleEnvironment;
 import org.terasology.gestalt.module.dependencyresolution.DependencyResolver;
 import org.terasology.gestalt.module.dependencyresolution.ResolutionResult;
-import org.terasology.reflection.TypeRegistry;
+import org.terasology.nui.reflection.TypeRegistry;
 import org.terasology.testUtil.ModuleManagerFactory;
 
 import java.nio.file.Paths;

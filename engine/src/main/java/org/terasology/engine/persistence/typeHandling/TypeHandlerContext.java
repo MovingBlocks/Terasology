@@ -3,7 +3,7 @@
 package org.terasology.engine.persistence.typeHandling;
 
 import org.terasology.engine.persistence.typeHandling.reflection.SerializationSandbox;
-import org.terasology.reflection.TypeInfo;
+import org.terasology.nui.reflection.TypeInfo;
 
 /**
  * Represents the context in which a {@link TypeHandlerFactory} creates {@link TypeHandler} instances.

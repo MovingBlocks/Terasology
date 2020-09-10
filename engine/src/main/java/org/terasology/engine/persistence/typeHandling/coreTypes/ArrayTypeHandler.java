@@ -6,7 +6,7 @@ import com.google.common.collect.Lists;
 import org.terasology.engine.persistence.typeHandling.PersistedData;
 import org.terasology.engine.persistence.typeHandling.PersistedDataSerializer;
 import org.terasology.engine.persistence.typeHandling.TypeHandler;
-import org.terasology.reflection.TypeInfo;
+import org.terasology.nui.reflection.TypeInfo;
 
 import java.lang.reflect.Array;
 import java.util.List;

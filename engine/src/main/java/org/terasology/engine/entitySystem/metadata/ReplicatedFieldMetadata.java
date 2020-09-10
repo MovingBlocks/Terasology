@@ -4,11 +4,11 @@ package org.terasology.engine.entitySystem.metadata;
 
 import org.terasology.engine.network.NoReplicate;
 import org.terasology.engine.network.Replicate;
-import org.terasology.reflection.copy.CopyStrategy;
-import org.terasology.reflection.metadata.ClassMetadata;
-import org.terasology.reflection.metadata.FieldMetadata;
-import org.terasology.reflection.reflect.InaccessibleFieldException;
-import org.terasology.reflection.reflect.ReflectFactory;
+import org.terasology.nui.reflection.copy.CopyStrategy;
+import org.terasology.nui.reflection.metadata.ClassMetadata;
+import org.terasology.nui.reflection.metadata.FieldMetadata;
+import org.terasology.nui.reflection.reflect.InaccessibleFieldException;
+import org.terasology.nui.reflection.reflect.ReflectFactory;
 
 import java.lang.reflect.Field;
 

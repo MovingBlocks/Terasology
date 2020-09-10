@@ -21,7 +21,7 @@ import org.terasology.engine.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.engine.persistence.typeHandling.protobuf.ProtobufPersistedData;
 import org.terasology.engine.persistence.typeHandling.protobuf.ProtobufPersistedDataSerializer;
 import org.terasology.engine.protobuf.EntityData;
-import org.terasology.reflection.metadata.FieldMetadata;
+import org.terasology.nui.reflection.metadata.FieldMetadata;
 
 import java.util.Map;
 

@@ -5,7 +5,7 @@ package org.terasology.engine.rendering.logic;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.engine.network.Replicate;
 import org.terasology.engine.network.ReplicationCheck;
-import org.terasology.reflection.metadata.FieldMetadata;
+import org.terasology.nui.reflection.metadata.FieldMetadata;
 
 /**
  * Add this component to an entity for it to transmit light from its location.  By default the component is configured to act similarly to a placed torch block.

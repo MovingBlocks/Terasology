@@ -9,7 +9,7 @@ import org.terasology.engine.persistence.typeHandling.TypeHandlerContext;
 import org.terasology.engine.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.engine.persistence.typeHandling.coreTypes.StringMapTypeHandler;
 import org.terasology.engine.persistence.typeHandling.reflection.SerializationSandbox;
-import org.terasology.reflection.TypeInfo;
+import org.terasology.nui.reflection.TypeInfo;
 
 import java.util.HashMap;
 import java.util.Map;

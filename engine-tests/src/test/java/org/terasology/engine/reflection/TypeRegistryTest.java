@@ -1,6 +1,6 @@
 // Copyright 2020 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.reflection;
+package org.terasology.engine.reflection;
 
 import org.reflections.Reflections;
 import org.terasology.ModuleEnvironmentTest;

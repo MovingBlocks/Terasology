@@ -11,7 +11,7 @@ import org.terasology.engine.persistence.typeHandling.PersistedDataSerializer;
 import org.terasology.engine.persistence.typeHandling.TypeHandler;
 import org.terasology.engine.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.engine.persistence.typeHandling.annotations.SerializedName;
-import org.terasology.reflection.reflect.ObjectConstructor;
+import org.terasology.nui.reflection.reflect.ObjectConstructor;
 
 import java.lang.reflect.Field;
 import java.util.Map;

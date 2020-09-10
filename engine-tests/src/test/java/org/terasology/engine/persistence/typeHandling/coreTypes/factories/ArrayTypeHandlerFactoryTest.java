@@ -8,7 +8,7 @@ import org.terasology.engine.persistence.typeHandling.TypeHandlerContext;
 import org.terasology.engine.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.engine.persistence.typeHandling.coreTypes.ArrayTypeHandler;
 import org.terasology.engine.persistence.typeHandling.reflection.SerializationSandbox;
-import org.terasology.reflection.TypeInfo;
+import org.terasology.nui.reflection.TypeInfo;
 
 import java.util.List;
 import java.util.Optional;

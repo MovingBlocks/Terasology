@@ -4,7 +4,7 @@ package org.terasology.engine.config.flexible.internal;
 
 import org.terasology.engine.config.flexible.Setting;
 import org.terasology.engine.config.flexible.constraints.SettingConstraint;
-import org.terasology.reflection.TypeInfo;
+import org.terasology.nui.reflection.TypeInfo;
 
 public class SettingImplBuilder<T> implements SettingBuilder<T> {
     private T defaultValue;

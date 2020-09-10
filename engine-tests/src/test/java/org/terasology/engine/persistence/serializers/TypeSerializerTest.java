@@ -12,7 +12,7 @@ import org.terasology.engine.persistence.typeHandling.annotations.SerializedName
 import org.terasology.gestalt.naming.Name;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.nui.Color;
-import org.terasology.reflection.TypeInfo;
+import org.terasology.nui.reflection.TypeInfo;
 
 import java.io.IOException;
 import java.util.List;

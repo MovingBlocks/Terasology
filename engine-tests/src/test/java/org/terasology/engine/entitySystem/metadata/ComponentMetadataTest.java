@@ -12,9 +12,9 @@ import org.terasology.engine.entitySystem.stubs.OwnerComponent;
 import org.terasology.engine.entitySystem.stubs.StringComponent;
 import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.engine.persistence.typeHandling.TypeHandlerLibrary;
-import org.terasology.reflection.copy.CopyStrategyLibrary;
-import org.terasology.reflection.reflect.ReflectFactory;
-import org.terasology.reflection.reflect.ReflectionReflectFactory;
+import org.terasology.nui.reflection.copy.CopyStrategyLibrary;
+import org.terasology.nui.reflection.reflect.ReflectFactory;
+import org.terasology.nui.reflection.reflect.ReflectionReflectFactory;
 
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;

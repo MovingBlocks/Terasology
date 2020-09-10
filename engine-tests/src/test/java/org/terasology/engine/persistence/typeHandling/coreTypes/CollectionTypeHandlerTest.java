@@ -10,7 +10,7 @@ import org.mockito.stubbing.Answer;
 import org.terasology.engine.persistence.typeHandling.PersistedData;
 import org.terasology.engine.persistence.typeHandling.PersistedDataSerializer;
 import org.terasology.engine.persistence.typeHandling.gson.GsonPersistedDataArray;
-import org.terasology.reflection.reflect.ObjectConstructor;
+import org.terasology.nui.reflection.reflect.ObjectConstructor;
 
 import java.util.Collection;
 import java.util.Collections;

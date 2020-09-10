@@ -3,7 +3,7 @@
 package org.terasology.engine.config.flexible;
 
 import com.google.common.collect.ImmutableList;
-import org.terasology.reflection.TypeInfo;
+import org.terasology.nui.reflection.TypeInfo;
 
 import static org.terasology.engine.config.flexible.SettingArgument.defaultValue;
 import static org.terasology.engine.config.flexible.SettingArgument.name;

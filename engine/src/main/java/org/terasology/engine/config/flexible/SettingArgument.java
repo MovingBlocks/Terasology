@@ -4,7 +4,7 @@ package org.terasology.engine.config.flexible;
 
 import org.terasology.engine.config.flexible.constraints.SettingConstraint;
 import org.terasology.engine.config.flexible.internal.SettingBuilder;
-import org.terasology.reflection.TypeInfo;
+import org.terasology.nui.reflection.TypeInfo;
 
 import java.util.function.BiConsumer;
 

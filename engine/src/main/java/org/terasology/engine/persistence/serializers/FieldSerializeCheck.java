@@ -3,8 +3,8 @@
 
 package org.terasology.engine.persistence.serializers;
 
-import org.terasology.reflection.metadata.ClassMetadata;
-import org.terasology.reflection.metadata.FieldMetadata;
+import org.terasology.nui.reflection.metadata.ClassMetadata;
+import org.terasology.nui.reflection.metadata.FieldMetadata;
 import org.terasology.engine.entitySystem.metadata.ReplicatedFieldMetadata;
 
 /**

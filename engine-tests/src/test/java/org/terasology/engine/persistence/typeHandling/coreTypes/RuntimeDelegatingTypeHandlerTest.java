@@ -15,7 +15,7 @@ import org.terasology.engine.persistence.typeHandling.inMemory.AbstractPersisted
 import org.terasology.engine.persistence.typeHandling.inMemory.PersistedMap;
 import org.terasology.engine.persistence.typeHandling.inMemory.PersistedString;
 import org.terasology.engine.persistence.typeHandling.reflection.ReflectionsSandbox;
-import org.terasology.reflection.TypeInfo;
+import org.terasology.nui.reflection.TypeInfo;
 
 import java.lang.reflect.Type;
 import java.util.Map;

@@ -9,8 +9,8 @@ import org.terasology.gestalt.module.ModuleEnvironment;
 import org.terasology.gestalt.naming.Name;
 import org.terasology.engine.persistence.ModuleContext;
 import org.terasology.engine.persistence.typeHandling.TypeHandler;
-import org.terasology.reflection.TypeInfo;
-import org.terasology.reflection.TypeRegistry;
+import org.terasology.nui.reflection.TypeInfo;
+import org.terasology.nui.reflection.TypeRegistry;
 
 import java.util.Iterator;
 import java.util.Objects;

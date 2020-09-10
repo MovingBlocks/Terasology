@@ -49,7 +49,7 @@ import org.terasology.gestalt.assets.management.AssetManager;
 import org.terasology.gestalt.module.ModuleEnvironment;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
-import org.terasology.reflection.TypeRegistry;
+import org.terasology.nui.reflection.TypeRegistry;
 
 import java.io.File;
 import java.io.IOException;

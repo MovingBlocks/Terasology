@@ -40,10 +40,10 @@ import org.terasology.engine.recording.RecordedEventStore;
 import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.gestalt.module.ModuleEnvironment;
 import org.terasology.nui.properties.OneOfProviderFactory;
-import org.terasology.reflection.TypeRegistry;
-import org.terasology.reflection.copy.CopyStrategyLibrary;
-import org.terasology.reflection.reflect.ReflectFactory;
-import org.terasology.reflection.reflect.ReflectionReflectFactory;
+import org.terasology.nui.reflection.TypeRegistry;
+import org.terasology.nui.reflection.copy.CopyStrategyLibrary;
+import org.terasology.nui.reflection.reflect.ReflectFactory;
+import org.terasology.nui.reflection.reflect.ReflectionReflectFactory;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -4,7 +4,7 @@ package org.terasology.engine.config.flexible;
 
 import org.terasology.engine.config.flexible.constraints.SettingConstraint;
 import org.terasology.gestalt.module.sandbox.API;
-import org.terasology.reflection.TypeInfo;
+import org.terasology.nui.reflection.TypeInfo;
 
 /**
  * Represents a setting containing a value that can be stored in a config and notifies

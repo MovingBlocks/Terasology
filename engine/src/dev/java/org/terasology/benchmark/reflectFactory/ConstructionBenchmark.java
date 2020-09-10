@@ -7,8 +7,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.benchmark.AbstractBenchmark;
 import org.terasology.engine.logic.location.LocationComponent;
-import org.terasology.reflection.reflect.ObjectConstructor;
-import org.terasology.reflection.reflect.ReflectFactory;
+import org.terasology.nui.reflection.reflect.ObjectConstructor;
+import org.terasology.nui.reflection.reflect.ReflectFactory;
 
 /**
  *

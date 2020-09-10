@@ -1,9 +1,10 @@
 // Copyright 2020 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.math;
+package org.terasology.engine.math;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -11,6 +12,7 @@ import org.terasology.engine.config.Config;
 import org.terasology.engine.context.internal.ContextImpl;
 import org.terasology.engine.context.internal.MockContext;
 import org.terasology.engine.registry.CoreRegistry;
+import org.terasology.math.TeraMath;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -73,7 +75,7 @@ public class IntMathTest {
 
         int largestIntegerPowerOfTwo = powersOfTwo.get(powersOfTwo.size() - 1);
         //test other boundary values
-        assertEquals(0, TeraMath.ceilPowerOfTwo(0), "0");
+        Assertions.assertEquals(0, TeraMath.ceilPowerOfTwo(0), "0");
         assertEquals(0, TeraMath.ceilPowerOfTwo(0), "-1");
         assertEquals(0, TeraMath.ceilPowerOfTwo(Integer.MIN_VALUE), "Integer.MIN_VALUE");
         assertEquals(0, TeraMath.ceilPowerOfTwo(Integer.MAX_VALUE), "Integer.MAX_VALUE");

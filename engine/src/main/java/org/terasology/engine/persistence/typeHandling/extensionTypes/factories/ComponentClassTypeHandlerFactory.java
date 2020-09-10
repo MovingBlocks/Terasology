@@ -7,7 +7,7 @@ import org.terasology.engine.persistence.typeHandling.SpecificTypeHandlerFactory
 import org.terasology.engine.persistence.typeHandling.TypeHandler;
 import org.terasology.engine.persistence.typeHandling.TypeHandlerContext;
 import org.terasology.engine.persistence.typeHandling.extensionTypes.ComponentClassTypeHandler;
-import org.terasology.reflection.TypeInfo;
+import org.terasology.nui.reflection.TypeInfo;
 
 public class ComponentClassTypeHandlerFactory extends SpecificTypeHandlerFactory<Class<? extends Component>> {
 

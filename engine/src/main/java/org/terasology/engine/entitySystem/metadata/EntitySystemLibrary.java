@@ -7,8 +7,8 @@ import org.terasology.engine.context.Context;
 import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.gestalt.module.ModuleEnvironment;
 import org.terasology.engine.persistence.typeHandling.TypeHandlerLibrary;
-import org.terasology.reflection.copy.CopyStrategyLibrary;
-import org.terasology.reflection.reflect.ReflectFactory;
+import org.terasology.nui.reflection.copy.CopyStrategyLibrary;
+import org.terasology.nui.reflection.reflect.ReflectFactory;
 
 /**
  * The set of metadata libraries used by the entity system

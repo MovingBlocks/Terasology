@@ -31,7 +31,7 @@ import org.terasology.engine.recording.RecordedEventStore;
 import org.terasology.engine.world.block.BlockManager;
 import org.terasology.engine.world.chunks.blockdata.ExtraBlockDataManager;
 import org.terasology.gestalt.naming.Name;
-import org.terasology.reflection.TypeRegistry;
+import org.terasology.nui.reflection.TypeRegistry;
 
 import java.nio.file.Files;
 import java.nio.file.Path;

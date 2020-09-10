@@ -4,7 +4,7 @@
 package org.terasology.engine.reflection.copy.strategy;
 
 import org.terasology.engine.entitySystem.entity.EntityRef;
-import org.terasology.reflection.copy.CopyStrategy;
+import org.terasology.nui.reflection.copy.CopyStrategy;
 
 /**
  * Provides a deep copy of an entity, including any owned entities recursively.

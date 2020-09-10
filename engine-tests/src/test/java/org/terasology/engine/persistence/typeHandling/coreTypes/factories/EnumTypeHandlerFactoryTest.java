@@ -5,7 +5,7 @@ package org.terasology.engine.persistence.typeHandling.coreTypes.factories;
 import org.junit.jupiter.api.Test;
 import org.terasology.engine.persistence.typeHandling.TypeHandler;
 import org.terasology.engine.persistence.typeHandling.coreTypes.EnumTypeHandler;
-import org.terasology.reflection.TypeInfo;
+import org.terasology.nui.reflection.TypeInfo;
 
 import java.util.Optional;
 

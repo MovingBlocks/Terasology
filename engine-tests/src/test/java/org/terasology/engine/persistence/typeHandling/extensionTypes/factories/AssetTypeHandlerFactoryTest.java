@@ -11,7 +11,7 @@ import org.terasology.nui.asset.UIElement;
 import org.terasology.engine.persistence.typeHandling.TypeHandler;
 import org.terasology.engine.persistence.typeHandling.TypeHandlerFactory;
 import org.terasology.engine.persistence.typeHandling.extensionTypes.AssetTypeHandler;
-import org.terasology.reflection.TypeInfo;
+import org.terasology.nui.reflection.TypeInfo;
 import org.terasology.engine.rendering.assets.texture.Texture;
 
 import java.util.List;

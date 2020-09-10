@@ -7,7 +7,7 @@ import org.reflections.ReflectionUtils;
 import org.terasology.engine.config.flexible.internal.SettingBuilder;
 import org.terasology.engine.config.flexible.internal.SettingImplBuilder;
 import org.terasology.engine.core.SimpleUri;
-import org.terasology.reflection.TypeInfo;
+import org.terasology.nui.reflection.TypeInfo;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;

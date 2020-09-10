@@ -9,8 +9,8 @@ import org.terasology.engine.persistence.typeHandling.coreTypes.EnumTypeHandler;
 import org.terasology.engine.persistence.typeHandling.coreTypes.ObjectFieldMapTypeHandler;
 import org.terasology.engine.persistence.typeHandling.coreTypes.RuntimeDelegatingTypeHandler;
 import org.terasology.engine.persistence.typeHandling.coreTypes.StringMapTypeHandler;
-import org.terasology.reflection.MappedContainer;
-import org.terasology.reflection.TypeInfo;
+import org.terasology.nui.reflection.MappedContainer;
+import org.terasology.nui.reflection.TypeInfo;
 
 import java.util.List;
 import java.util.Map;

@@ -12,8 +12,8 @@ import org.terasology.engine.persistence.serializers.GsonSerializer;
 import org.terasology.engine.persistence.typeHandling.SerializationException;
 import org.terasology.engine.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.engine.persistence.typeHandling.extensionTypes.EntityRefTypeHandler;
-import org.terasology.reflection.TypeInfo;
-import org.terasology.reflection.TypeRegistry;
+import org.terasology.nui.reflection.TypeInfo;
+import org.terasology.nui.reflection.TypeRegistry;
 
 import java.io.File;
 import java.io.IOException;

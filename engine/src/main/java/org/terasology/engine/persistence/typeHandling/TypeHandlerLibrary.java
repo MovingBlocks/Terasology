@@ -63,10 +63,10 @@ import org.terasology.engine.persistence.typeHandling.mathTypes.legacy.LegacyVec
 import org.terasology.engine.persistence.typeHandling.reflection.ModuleEnvironmentSandbox;
 import org.terasology.engine.persistence.typeHandling.reflection.ReflectionsSandbox;
 import org.terasology.engine.persistence.typeHandling.reflection.SerializationSandbox;
-import org.terasology.reflection.TypeInfo;
-import org.terasology.reflection.TypeRegistry;
-import org.terasology.reflection.metadata.ClassMetadata;
-import org.terasology.reflection.metadata.FieldMetadata;
+import org.terasology.nui.reflection.TypeInfo;
+import org.terasology.nui.reflection.TypeRegistry;
+import org.terasology.nui.reflection.metadata.ClassMetadata;
+import org.terasology.nui.reflection.metadata.FieldMetadata;
 import org.terasology.engine.reflection.reflect.ConstructorLibrary;
 import org.terasology.engine.rendering.assets.texture.TextureRegion;
 

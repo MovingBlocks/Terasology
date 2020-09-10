@@ -3,8 +3,8 @@
 package org.terasology.engine.reflection.copy.legacy;
 
 import org.terasology.math.geom.Vector3f;
-import org.terasology.reflection.copy.CopyStrategy;
-import org.terasology.reflection.copy.RegisterCopyStrategy;
+import org.terasology.nui.reflection.copy.CopyStrategy;
+import org.terasology.nui.reflection.copy.RegisterCopyStrategy;
 
 /**
  */

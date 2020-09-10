@@ -6,7 +6,7 @@ import org.terasology.engine.persistence.typeHandling.TypeHandler;
 import org.terasology.engine.persistence.typeHandling.TypeHandlerFactory;
 import org.terasology.engine.persistence.typeHandling.TypeHandlerContext;
 import org.terasology.engine.persistence.typeHandling.extensionTypes.TextureRegionAssetTypeHandler;
-import org.terasology.reflection.TypeInfo;
+import org.terasology.nui.reflection.TypeInfo;
 import org.terasology.engine.rendering.assets.texture.TextureRegionAsset;
 
 import java.util.Optional;

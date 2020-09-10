@@ -29,7 +29,7 @@ import org.terasology.gestalt.assets.management.AssetManager;
 import org.terasology.nui.databinding.ReadOnlyBinding;
 import org.terasology.nui.itemRendering.StringTextRenderer;
 import org.terasology.nui.properties.OneOfProviderFactory;
-import org.terasology.reflection.metadata.FieldMetadata;
+import org.terasology.nui.reflection.metadata.FieldMetadata;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;

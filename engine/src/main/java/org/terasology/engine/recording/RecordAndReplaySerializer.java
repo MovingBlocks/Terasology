@@ -14,7 +14,7 @@ import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.engine.core.paths.PathManager;
 import org.terasology.engine.entitySystem.entity.EntityManager;
 import org.terasology.math.geom.Vector3f;
-import org.terasology.reflection.TypeRegistry;
+import org.terasology.nui.reflection.TypeRegistry;
 
 import java.io.FileWriter;
 import java.io.FileReader;

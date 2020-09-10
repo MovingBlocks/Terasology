@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.terasology.engine.config.flexible.Setting;
 import org.terasology.engine.config.flexible.SettingChangeListener;
 import org.terasology.engine.config.flexible.constraints.SettingConstraint;
-import org.terasology.reflection.TypeInfo;
+import org.terasology.nui.reflection.TypeInfo;
 
 import java.util.Set;
 

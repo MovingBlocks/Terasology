@@ -88,7 +88,7 @@ import org.terasology.gestalt.module.dependencyresolution.ResolutionResult;
 import org.terasology.gestalt.naming.Name;
 import org.terasology.nui.asset.UIElement;
 import org.terasology.nui.skin.UISkin;
-import org.terasology.reflection.TypeRegistry;
+import org.terasology.nui.reflection.TypeRegistry;
 import org.terasology.testUtil.ModuleManagerFactory;
 
 import java.io.IOException;

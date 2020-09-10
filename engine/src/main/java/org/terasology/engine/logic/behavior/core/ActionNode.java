@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.terasology.engine.registry.CoreRegistry;
 import org.terasology.nui.properties.OneOfProviderFactory;
 import org.terasology.nui.properties.PropertyProvider;
-import org.terasology.reflection.reflect.ReflectFactory;
+import org.terasology.nui.reflection.reflect.ReflectFactory;
 
 /**
  * An action node uses a associated Action to control the result state. It is a leaf node - it cannot have any

@@ -12,7 +12,7 @@ import org.terasology.gestalt.module.sandbox.API;
 import org.terasology.nui.layouts.PropertyLayout;
 import org.terasology.nui.properties.OneOfProviderFactory;
 import org.terasology.nui.properties.PropertyProvider;
-import org.terasology.reflection.reflect.ReflectFactory;
+import org.terasology.nui.reflection.reflect.ReflectFactory;
 
 import java.security.AccessController;
 import java.security.PrivilegedAction;

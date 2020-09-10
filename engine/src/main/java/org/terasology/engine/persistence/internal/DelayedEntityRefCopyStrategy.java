@@ -3,7 +3,7 @@
 package org.terasology.engine.persistence.internal;
 
 import org.terasology.engine.entitySystem.entity.EntityRef;
-import org.terasology.reflection.copy.CopyStrategy;
+import org.terasology.nui.reflection.copy.CopyStrategy;
 
 /**
  * This copy strategy return {@link DelayedEntityRef}s for persistent entities that exists.

@@ -5,9 +5,9 @@ package org.terasology.engine.entitySystem.metadata;
 import org.junit.jupiter.api.Test;
 import org.terasology.engine.entitySystem.stubs.OwnerComponent;
 import org.terasology.gestalt.assets.ResourceUrn;
-import org.terasology.reflection.copy.CopyStrategyLibrary;
-import org.terasology.reflection.reflect.ReflectFactory;
-import org.terasology.reflection.reflect.ReflectionReflectFactory;
+import org.terasology.nui.reflection.copy.CopyStrategyLibrary;
+import org.terasology.nui.reflection.reflect.ReflectFactory;
+import org.terasology.nui.reflection.reflect.ReflectionReflectFactory;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
