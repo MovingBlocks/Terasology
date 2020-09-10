@@ -29,6 +29,7 @@ import org.terasology.gestalt.module.ModuleEnvironment;
 import org.terasology.engine.i18n.TranslationSystem;
 import org.terasology.engine.input.BindButtonEvent;
 import org.terasology.engine.input.InputSystem;
+import org.terasology.gestalt.naming.Name;
 import org.terasology.nui.input.device.KeyboardDevice;
 import org.terasology.nui.input.device.MouseDevice;
 import org.terasology.engine.input.events.KeyEvent;
@@ -331,7 +332,11 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
                 }
                 return screen;
             } else {
-                logger.error("Screen '{}' is a '{}' and not a '{}'", screenUri, root.getClass(), expectedType);
+                if (root != null) {
+                    logger.error("Screen '{}' is a '{}' and not a '{}'", screenUri, root.getClass(), expectedType);
+                } else {
+                    logger.error("Root of screen '{}' not found", screenUri);
+                }
             }
         }
         return null;
@@ -455,7 +460,11 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
                 addOverlay(overlay, overlayUri);
                 return overlay;
             } else {
-                logger.error("Screen '{}' is a '{}' and not a '{}'", overlayUri, root.getClass(), expectedType);
+                if (root != null) {
+                    logger.error("Screen '{}' is a '{}' and not a '{}'", overlayUri, root.getClass(), expectedType);
+                } else {
+                    logger.error("Root of screen '{}' not found", overlayUri);
+                }
             }
         }
         return null;

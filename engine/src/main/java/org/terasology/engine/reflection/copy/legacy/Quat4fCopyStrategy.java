@@ -1,20 +1,20 @@
 // Copyright 2020 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.reflection.copy.legacy;
+package org.terasology.engine.reflection.copy.legacy;
 
-import org.terasology.math.geom.Vector3f;
+import org.terasology.math.geom.Quat4f;
 import org.terasology.reflection.copy.CopyStrategy;
 import org.terasology.reflection.copy.RegisterCopyStrategy;
 
 /**
  */
 @RegisterCopyStrategy
-public class Vector3fCopyStrategy implements CopyStrategy<Vector3f> {
+public class Quat4fCopyStrategy implements CopyStrategy<Quat4f> {
 
     @Override
-    public Vector3f copy(Vector3f value) {
+    public Quat4f copy(Quat4f value) {
         if (value != null) {
-            return new Vector3f(value);
+            return new Quat4f(value);
         }
         return null;
     }

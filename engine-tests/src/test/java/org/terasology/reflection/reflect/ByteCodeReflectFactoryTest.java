@@ -8,6 +8,7 @@ import org.terasology.engine.entitySystem.stubs.IntegerComponent;
 import org.terasology.engine.entitySystem.stubs.StringComponent;
 import org.terasology.engine.logic.characters.events.AttackRequest;
 import org.terasology.engine.logic.location.LocationComponent;
+import org.terasology.engine.reflection.reflect.ByteCodeReflectFactory;
 import org.terasology.math.geom.Vector3f;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

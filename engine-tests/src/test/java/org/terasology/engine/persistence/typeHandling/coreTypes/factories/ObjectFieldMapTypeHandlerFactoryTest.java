@@ -10,7 +10,7 @@ import org.terasology.engine.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.engine.persistence.typeHandling.coreTypes.ObjectFieldMapTypeHandler;
 import org.terasology.engine.persistence.typeHandling.reflection.SerializationSandbox;
 import org.terasology.reflection.TypeInfo;
-import org.terasology.reflection.reflect.ConstructorLibrary;
+import org.terasology.engine.reflection.reflect.ConstructorLibrary;
 
 import java.util.List;
 import java.util.Optional;

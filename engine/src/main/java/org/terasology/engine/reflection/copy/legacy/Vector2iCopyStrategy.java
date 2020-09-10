@@ -1,6 +1,6 @@
 // Copyright 2020 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.reflection.copy.legacy;
+package org.terasology.engine.reflection.copy.legacy;
 
 import org.terasology.math.geom.Vector2i;
 import org.terasology.reflection.copy.CopyStrategy;

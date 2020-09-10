@@ -1,10 +1,11 @@
 // Copyright 2020 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.reflection.reflect;
+package org.terasology.engine.reflection.reflect;
 
 import org.terasology.engine.persistence.typeHandling.InstanceCreator;
 import org.terasology.engine.persistence.typeHandling.SerializationException;
 import org.terasology.reflection.TypeInfo;
+import org.terasology.reflection.reflect.ObjectConstructor;
 import org.terasology.reflection.reflect.internal.UnsafeAllocator;
 
 import java.lang.reflect.Constructor;

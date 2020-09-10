@@ -11,7 +11,7 @@ import org.terasology.engine.persistence.typeHandling.TypeHandlerContext;
 import org.terasology.engine.persistence.typeHandling.coreTypes.ObjectFieldMapTypeHandler;
 import org.terasology.engine.persistence.typeHandling.coreTypes.RuntimeDelegatingTypeHandler;
 import org.terasology.reflection.TypeInfo;
-import org.terasology.reflection.reflect.ConstructorLibrary;
+import org.terasology.engine.reflection.reflect.ConstructorLibrary;
 import org.terasology.engine.utilities.ReflectionUtil;
 
 import java.lang.reflect.Field;

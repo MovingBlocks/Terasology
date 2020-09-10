@@ -10,7 +10,7 @@ import org.terasology.engine.persistence.typeHandling.TypeHandlerContext;
 import org.terasology.engine.persistence.typeHandling.coreTypes.CollectionTypeHandler;
 import org.terasology.engine.persistence.typeHandling.coreTypes.RuntimeDelegatingTypeHandler;
 import org.terasology.reflection.TypeInfo;
-import org.terasology.reflection.reflect.ConstructorLibrary;
+import org.terasology.engine.reflection.reflect.ConstructorLibrary;
 import org.terasology.reflection.reflect.ObjectConstructor;
 import org.terasology.engine.utilities.ReflectionUtil;
 

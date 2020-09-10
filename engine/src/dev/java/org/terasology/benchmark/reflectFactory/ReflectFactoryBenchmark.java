@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.terasology.benchmark.Benchmark;
 import org.terasology.benchmark.Benchmarks;
 import org.terasology.benchmark.PrintToConsoleCallback;
-import org.terasology.reflection.reflect.ByteCodeReflectFactory;
+import org.terasology.engine.reflection.reflect.ByteCodeReflectFactory;
 import org.terasology.reflection.reflect.ReflectionReflectFactory;
 
 import java.util.List;

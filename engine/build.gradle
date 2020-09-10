@@ -12,8 +12,10 @@ apply from: "$rootDir/config/gradle/publish.gradle"
 
 import groovy.json.JsonSlurper
 import org.reflections.Reflections
+import org.reflections.scanners.ResourcesScanner
 import org.reflections.scanners.SubTypesScanner
 import org.reflections.scanners.TypeAnnotationsScanner
+import org.reflections.serializers.JsonSerializer
 
 import java.text.SimpleDateFormat
 
@@ -163,16 +165,23 @@ task cacheReflections {
             configurations."${sourceSets.main.runtimeClasspathConfigurationName}"
 
     outputs.upToDateWhen(classes.outputs.upToDateSpec)
-    outputs.file("$buildDir/resources/main/reflections.cache")
+    outputs.file("$buildDir/classes/org/terasology/engine/manifest.json")
     dependsOn classes
 
     doLast {
         // Without the .mkdirs() we might hit a scenario where the classes dir doesn't exist yet
         Reflections reflections = new org.reflections.Reflections(new org.reflections.util.ConfigurationBuilder()
             .addUrls(inputs.files.collect { it.toURI().toURL() })
-            .forPackages("org.terasology.engine")
-            .setScanners(new TypeAnnotationsScanner(), new SubTypesScanner()))
-        reflections.save("$buildDir/classes/org/terasology/engine/manifest.json")
+            .filterInputsBy {
+                it.startsWith("org/terasology/engine/") || // engine module itself
+                    it.startsWith("org/terasology/nui") // nui's widget library
+            }
+            .setScanners(
+                    new TypeAnnotationsScanner(), 
+                    new SubTypesScanner(),
+                    new ResourcesScanner())
+        )
+        reflections.save("$buildDir/classes/org/terasology/engine/manifest.json", new JsonSerializer())
     }
 }
 
@@ -258,7 +267,7 @@ task copyResourcesToClasses(type:Copy) {
 }
 
 jar.dependsOn createVersionInfoFile
-cacheReflections.mustRunAfter(classes)
+compileJava.finalizedBy(cacheReflections)
 jar.dependsOn cacheReflections
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
