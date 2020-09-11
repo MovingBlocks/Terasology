@@ -3,15 +3,15 @@
 package org.terasology.engine.reflection.reflect;
 
 import org.junit.jupiter.api.Test;
-import org.terasology.engine.entitySystem.stubs.GetterSetterComponent;
-import org.terasology.engine.entitySystem.stubs.IntegerComponent;
-import org.terasology.engine.entitySystem.stubs.StringComponent;
 import org.terasology.engine.logic.characters.events.AttackRequest;
 import org.terasology.engine.logic.location.LocationComponent;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.nui.reflection.reflect.FieldAccessor;
 import org.terasology.nui.reflection.reflect.ObjectConstructor;
 import org.terasology.nui.reflection.reflect.ReflectFactory;
+import org.terasology.unittest.entitySystem.stubs.GetterSetterComponent;
+import org.terasology.unittest.entitySystem.stubs.IntegerComponent;
+import org.terasology.unittest.entitySystem.stubs.StringComponent;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;

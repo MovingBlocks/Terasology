@@ -16,8 +16,6 @@ import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.engine.core.paths.PathManager;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.entity.internal.EngineEntityManager;
-import org.terasology.engine.entitySystem.stubs.EntityRefComponent;
-import org.terasology.engine.entitySystem.stubs.StringComponent;
 import org.terasology.engine.logic.location.LocationComponent;
 import org.terasology.engine.network.Client;
 import org.terasology.engine.network.ClientComponent;
@@ -50,6 +48,8 @@ import org.terasology.gestalt.module.ModuleEnvironment;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.nui.reflection.TypeRegistry;
+import org.terasology.unittest.entitySystem.stubs.EntityRefComponent;
+import org.terasology.unittest.entitySystem.stubs.StringComponent;
 
 import java.io.File;
 import java.io.IOException;
@@ -100,7 +100,8 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
         PathManager.getInstance().useOverrideHomePath(temporaryFolder.toPath());
         savePath = PathManager.getInstance().getSavePath("testSave");
 
-        assert !Files.isRegularFile(savePath.resolve("global.dat"));
+        Path globalDat = savePath.resolve("global.dat");
+        assert !(Files.exists(globalDat) && !Files.isRegularFile(globalDat));
 
         entityManager = context.get(EngineEntityManager.class);
         moduleEnvironment = mock(ModuleEnvironment.class);

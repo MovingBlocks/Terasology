@@ -1,8 +1,10 @@
 // Copyright 2020 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.engine.config.flexible;
+package org.terasology.unittest.config.flexible;
 
 import com.google.common.collect.ImmutableList;
+import org.terasology.engine.config.flexible.AutoConfig;
+import org.terasology.engine.config.flexible.Setting;
 import org.terasology.nui.reflection.TypeInfo;
 
 import static org.terasology.engine.config.flexible.SettingArgument.defaultValue;

@@ -7,6 +7,7 @@ import com.google.common.collect.Sets;
 import org.junit.jupiter.api.Test;
 import org.terasology.engine.config.flexible.constraints.NumberRangeConstraint;
 import org.terasology.nui.reflection.TypeInfo;
+import org.terasology.unittest.config.flexible.TestAutoConfig;
 
 import java.lang.reflect.Field;
 import java.util.Set;

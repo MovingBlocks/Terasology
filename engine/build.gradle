@@ -177,8 +177,7 @@ task cacheReflections {
         Reflections reflections = new org.reflections.Reflections(new org.reflections.util.ConfigurationBuilder()
             .addUrls(inputs.files.collect { it.toURI().toURL() })
             .filterInputsBy {
-                it.startsWith("org/terasology/engine/") || // engine module itself
-                    it.startsWith("org/terasology/nui") // nui's widget library
+                it.startsWith("org/terasology/engine/")
             }
             .setScanners(
                     new TypeAnnotationsScanner(), 

@@ -24,6 +24,7 @@ import org.terasology.engine.world.propagation.light.LightPropagationRules;
 import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.gestalt.assets.management.AssetManager;
 import org.terasology.math.geom.Vector3i;
+import org.terasology.unittest.world.propagation.StubPropagatorWorldView;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

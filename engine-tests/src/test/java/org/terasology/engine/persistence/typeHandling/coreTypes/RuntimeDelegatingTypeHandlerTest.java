@@ -5,7 +5,7 @@ package org.terasology.engine.persistence.typeHandling.coreTypes;
 import com.google.common.collect.ImmutableMap;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatcher;
-import org.reflections.Reflections;
+import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.engine.persistence.typeHandling.PersistedData;
 import org.terasology.engine.persistence.typeHandling.PersistedDataSerializer;
 import org.terasology.engine.persistence.typeHandling.TypeHandler;
@@ -15,7 +15,12 @@ import org.terasology.engine.persistence.typeHandling.inMemory.AbstractPersisted
 import org.terasology.engine.persistence.typeHandling.inMemory.PersistedMap;
 import org.terasology.engine.persistence.typeHandling.inMemory.PersistedString;
 import org.terasology.engine.persistence.typeHandling.reflection.ReflectionsSandbox;
+import org.terasology.gestalt.naming.Name;
 import org.terasology.nui.reflection.TypeInfo;
+import org.terasology.testUtil.ModuleManagerFactory;
+import org.terasology.unittest.typeHandling.runtimeDelegate.Base;
+import org.terasology.unittest.typeHandling.runtimeDelegate.Sub;
+import org.terasology.unittest.typeHandling.runtimeDelegate.SubHandler;
 
 import java.lang.reflect.Type;
 import java.util.Map;
@@ -32,9 +37,10 @@ import static org.mockito.Mockito.when;
 
 public class RuntimeDelegatingTypeHandlerTest {
     private final TypeHandlerLibrary typeHandlerLibrary = mock(TypeHandlerLibrary.class);
-
+    ModuleManager moduleManager = ModuleManagerFactory.create();
     private final TypeHandlerContext context =
-        new TypeHandlerContext(typeHandlerLibrary, new ReflectionsSandbox(new Reflections(getClass().getClassLoader())));
+            new TypeHandlerContext(typeHandlerLibrary,
+                    new ReflectionsSandbox(moduleManager.getEnvironment().get(new Name("unittest")).getModuleManifest()));
 
     private TypeHandler baseTypeHandler;
     private TypeHandler subTypeHandler;
@@ -42,19 +48,9 @@ public class RuntimeDelegatingTypeHandlerTest {
     private Type baseType;
     private RuntimeDelegatingTypeHandler<Base> runtimeDelegatingTypeHandler;
 
-    private static class Base {
-        int x;
-    }
-
-    private static class Sub extends Base {
-        float y;
-    }
-
     private void setupHandlers() {
         subType = Sub.class;
         baseType = TypeInfo.of(Base.class).getType();
-
-        abstract class SubHandler extends TypeHandler<Sub> {}
 
         baseTypeHandler = mockTypeHandler();
         subTypeHandler = mockTypeHandler(SubHandler.class);

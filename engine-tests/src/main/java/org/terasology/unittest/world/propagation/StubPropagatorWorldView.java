@@ -1,12 +1,13 @@
 // Copyright 2020 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.engine.world.propagation;
+package org.terasology.unittest.world.propagation;
 
 import com.google.common.collect.Maps;
 import gnu.trove.map.TObjectByteMap;
 import gnu.trove.map.hash.TObjectByteHashMap;
 import org.terasology.engine.math.Region3i;
 import org.terasology.engine.world.block.Block;
+import org.terasology.engine.world.propagation.PropagatorWorldView;
 import org.terasology.math.geom.Vector3i;
 
 import java.util.Map;

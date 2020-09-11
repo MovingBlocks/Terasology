@@ -19,8 +19,6 @@ import org.terasology.engine.entitySystem.event.internal.EventSystemImpl;
 import org.terasology.engine.entitySystem.metadata.ComponentLibrary;
 import org.terasology.engine.entitySystem.metadata.EntitySystemLibrary;
 import org.terasology.engine.entitySystem.prefab.internal.PojoPrefabManager;
-import org.terasology.engine.entitySystem.stubs.IntegerComponent;
-import org.terasology.engine.entitySystem.stubs.StringComponent;
 import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
 import org.terasology.engine.network.NetworkMode;
 import org.terasology.engine.network.NetworkSystem;
@@ -28,6 +26,8 @@ import org.terasology.engine.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.engine.recording.EventCatcher;
 import org.terasology.engine.recording.RecordAndReplayCurrentStatus;
 import org.terasology.engine.registry.CoreRegistry;
+import org.terasology.unittest.entitySystem.stubs.IntegerComponent;
+import org.terasology.unittest.entitySystem.stubs.StringComponent;
 
 import java.util.List;
 

@@ -31,7 +31,6 @@ import org.terasology.gestalt.module.ModuleEnvironment;
 import org.terasology.gestalt.module.dependencyresolution.DependencyResolver;
 import org.terasology.gestalt.module.dependencyresolution.ResolutionResult;
 import org.terasology.gestalt.module.predicates.FromModule;
-import org.terasology.gestalt.module.resources.DirectoryFileSource;
 import org.terasology.gestalt.naming.Name;
 import org.terasology.nui.input.ControllerInput;
 import org.terasology.nui.input.Input;
@@ -137,7 +136,8 @@ public class BindsSubsystem implements EngineSubsystem, BindsManager {
         ModuleManager moduleManager = passedContext.get(ModuleManager.class);
         DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
         for (Name moduleId : moduleManager.getRegistry().getModuleIds()) {
-            if (moduleManager.getRegistry().getLatestModuleVersion(moduleId).getResources() instanceof DirectoryFileSource) {
+//            if (moduleManager.getRegistry().getLatestModuleVersion(moduleId).getResources() instanceof
+//            DirectoryFileSource) {
                 ResolutionResult result = resolver.resolve(moduleId);
                 if (result.isSuccess()) {
                     try (ModuleEnvironment environment = moduleManager.loadEnvironment(result.getModules(), false)) {
@@ -149,7 +149,7 @@ public class BindsSubsystem implements EngineSubsystem, BindsManager {
                         addAxisDefaultsFor(moduleId, axes, config);
                     }
                 }
-            }
+//            }
         }
     }
 

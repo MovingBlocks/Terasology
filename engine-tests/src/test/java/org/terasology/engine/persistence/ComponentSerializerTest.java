@@ -14,12 +14,6 @@ import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.engine.entitySystem.metadata.ComponentLibrary;
-import org.terasology.engine.entitySystem.stubs.GetterSetterComponent;
-import org.terasology.engine.entitySystem.stubs.IntegerComponent;
-import org.terasology.engine.entitySystem.stubs.StringComponent;
-import org.terasology.gestalt.assets.ResourceUrn;
-import org.terasology.math.geom.Quat4f;
-import org.terasology.math.geom.Vector3f;
 import org.terasology.engine.network.NetworkSystem;
 import org.terasology.engine.persistence.serializers.ComponentSerializer;
 import org.terasology.engine.persistence.typeHandling.TypeHandlerLibrary;
@@ -28,7 +22,13 @@ import org.terasology.engine.persistence.typeHandling.mathTypes.legacy.LegacyVec
 import org.terasology.engine.protobuf.EntityData;
 import org.terasology.engine.recording.RecordAndReplayCurrentStatus;
 import org.terasology.engine.registry.CoreRegistry;
+import org.terasology.gestalt.assets.ResourceUrn;
+import org.terasology.math.geom.Quat4f;
+import org.terasology.math.geom.Vector3f;
 import org.terasology.testUtil.ModuleManagerFactory;
+import org.terasology.unittest.entitySystem.stubs.GetterSetterComponent;
+import org.terasology.unittest.entitySystem.stubs.IntegerComponent;
+import org.terasology.unittest.entitySystem.stubs.StringComponent;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;

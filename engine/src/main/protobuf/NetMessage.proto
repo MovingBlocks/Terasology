@@ -1,6 +1,6 @@
 import "EntityData.proto";
 
-option java_package = "org.terasology.protobuf";
+option java_package = "org.terasology.engine.protobuf";
 option java_outer_classname = "NetData";
 option optimize_for = SPEED;
 

@@ -29,7 +29,7 @@ import java.util.Set;
  */
 public final class MethodCommand extends AbstractCommand {
     private static final Logger logger = LoggerFactory.getLogger(MethodCommand.class);
-    private static final String ENTITY_REF_NAME = "org.terasology.entitySystem.entity.EntityRef";
+    private static final String ENTITY_REF_NAME = "org.terasology.engine.entitySystem.entity.EntityRef";
 
     private MethodCommand(Name name, String requiredPermission, boolean runOnServer, String description,
                           String helpText,

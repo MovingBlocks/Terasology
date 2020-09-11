@@ -12,6 +12,7 @@ import org.terasology.engine.core.paths.PathManager;
 import org.terasology.engine.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.gestalt.module.ModuleEnvironment;
 import org.terasology.gestalt.naming.Name;
+import org.terasology.unittest.config.flexible.TestAutoConfig;
 
 import java.nio.file.Paths;
 import java.util.Collections;
@@ -24,6 +25,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+//TODO move to testpackagemodule - gestalt v7.
 public class AutoConfigManagerTest {
     private static final Name PROVIDING_MODULE = new Name("unittest");
 
