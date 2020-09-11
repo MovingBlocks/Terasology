@@ -1,22 +1,11 @@
-/*
- * Copyright 2020 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
+import com.sun.jna.Platform;
+import com.sun.jna.platform.unix.LibC;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
@@ -59,8 +48,10 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.List;
 
 import static com.google.common.base.Verify.verifyNotNull;
@@ -131,6 +122,8 @@ public final class Terasology {
 
         handlePrintUsageRequest(args);
         handleLaunchArguments(args);
+        setMemoryLimit(1024 * 8);  // TODO: make arg
+        adjustOutOfMemoryScore(200);  // TODO: make arg
 
         SplashScreen splashScreen = splashEnabled ? configureSplashScreen() : SplashScreenBuilder.createStub();
 
@@ -477,4 +470,26 @@ public final class Terasology {
         return Integer.parseInt(str.substring(positionOfLastDigit));
     }
 
+    private static void setMemoryLimit(long maxMegabytes) {
+        // Memory-limiting techniques are highly platform-specific.
+        if (Platform.isLinux()) {
+            final LibC.Rlimit dataLimit = new LibC.Rlimit();
+            long maxBytes = maxMegabytes * 1024 * 1024;
+            dataLimit.rlim_cur = maxBytes;
+            dataLimit.rlim_max = maxBytes;
+            // Under Linux ≥ 4.7, we can limit the maximum size of the process's data segment, which includes its
+            // heap. Note we cannot directly limit its resident set size, see setrlimit(3).
+            LibC.INSTANCE.setrlimit(LibC.RLIMIT_DATA, dataLimit);
+        }
+    }
+
+    private static void adjustOutOfMemoryScore(int adjustment) {
+        Path procFile = Paths.get("/proc", "self", "oom_score_adj");
+        try {
+            Files.write(procFile, String.valueOf(adjustment).getBytes(),
+                    StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }
