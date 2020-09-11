@@ -19,6 +19,7 @@ import org.terasology.gestalt.module.ModulePathScanner;
 import org.terasology.gestalt.module.ModuleRegistry;
 import org.terasology.gestalt.module.TableModuleRegistry;
 import org.terasology.gestalt.module.dependencyresolution.DependencyInfo;
+import org.terasology.gestalt.module.resources.ClasspathFileSource;
 import org.terasology.gestalt.module.sandbox.APIScanner;
 import org.terasology.gestalt.module.sandbox.ModuleSecurityManager;
 import org.terasology.gestalt.module.sandbox.ModuleSecurityPolicy;
@@ -33,6 +34,7 @@ import java.security.Policy;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class ModuleManagerImpl implements ModuleManager {
     private static final Logger logger = LoggerFactory.getLogger(ModuleManagerImpl.class);
@@ -225,8 +227,7 @@ public class ModuleManagerImpl implements ModuleManager {
     @Override
     public ModuleEnvironment loadEnvironment(Set<Module> modules, boolean asPrimary) {
         Set<Module> finalModules = Sets.newLinkedHashSet(modules);
-//        finalModules.addAll(registry.stream().filter(Module::isOnClasspath).collect(Collectors.toList())); // TODO:
-//         to remove - classpath modules depricated by gestalt
+        finalModules.addAll(registry.stream().filter((m)-> m.getResources() instanceof ClasspathFileSource).collect(Collectors.toList()));
         ModuleEnvironment newEnvironment;
         boolean permissiveSecurityEnabled =
                 Boolean.parseBoolean(System.getProperty(SystemConfig.PERMISSIVE_SECURITY_ENABLED_PROPERTY));
