@@ -6,12 +6,13 @@ package org.terasology.world.chunks.pipeline.tasks;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.pipeline.AbstractChunkTask;
 
+import java.util.concurrent.ForkJoinTask;
+
 /**
  * ChunkTask for run {@link Chunk#deflate()}
  */
 public class DeflateChunkTask extends AbstractChunkTask {
-
-    public DeflateChunkTask(Chunk chunk) {
+    public DeflateChunkTask(ForkJoinTask<Chunk> chunk) {
         super(chunk);
     }
 
@@ -22,8 +23,13 @@ public class DeflateChunkTask extends AbstractChunkTask {
 
     @Override
     public void run() {
-        chunk.deflate();
+
     }
 
-
+    @Override
+    protected boolean exec() {
+        setRawResult(chunkFuture.fork().join());
+        getRawResult().deflate();
+        return true;
+    }
 }

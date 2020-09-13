@@ -7,9 +7,7 @@ import com.google.common.collect.Sets;
 import org.joml.Vector3i;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.utilities.concurrency.TaskMaster;
 import org.terasology.world.chunks.Chunk;
-import org.terasology.world.chunks.pipeline.tasks.ChunkTaskListenerWrapper;
 
 import java.util.Comparator;
 import java.util.Deque;
@@ -18,6 +16,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.ForkJoinTask;
+import java.util.concurrent.Future;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.function.Function;
 
 /**
@@ -33,8 +35,8 @@ public class ChunkProcessingPipeline implements ChunkTaskListener {
     private static final int NUM_TASK_THREADS = 8;
     private static final Logger logger = LoggerFactory.getLogger(ChunkProcessingPipeline.class);
 
-    private final TaskMaster<ChunkTask> chunkProcessor;
-    private final List<Function<Chunk, ChunkTask>> stages = new LinkedList<>();
+    private final ForkJoinPool chunkProcessor;
+    private final List<Function<ForkJoinTask<Chunk>, AbstractChunkTask>> stages = new LinkedList<>();
     private final List<ChunkTaskListener> chunkTaskListeners = new LinkedList<>();
     private final List<ChunkRemoveFromPipelineListener> chunkRemoveFromPipelineListeners = new LinkedList<>();
     private final Map<Chunk, Deque<Function<Chunk, ChunkTask>>> chunkNextStages = new ConcurrentHashMap<>();
@@ -42,13 +44,28 @@ public class ChunkProcessingPipeline implements ChunkTaskListener {
     private final Set<org.joml.Vector3i> invalidatedPositions = Sets.newConcurrentHashSet();
 
     /**
-     * Create ChunkProcessingTaskMaster.
+     * Create ChunkProcessingPipeline.
      *
      * @param taskComparator using by TaskMaster for priority ordering task.
      */
-    public ChunkProcessingPipeline(Comparator<ChunkTask> taskComparator) {
-        chunkProcessor = TaskMaster.createDynamicPriorityTaskMaster("Chunk-Processing", NUM_TASK_THREADS,
-                taskComparator);
+    public ChunkProcessingPipeline(Comparator<Runnable> taskComparator) {
+        chunkProcessor = new ForkJoinPool(NUM_TASK_THREADS);
+    }
+
+    private static void onRejectExecution(Runnable runnable, ThreadPoolExecutor threadPoolExecutor) {
+        logger.error("Cannot execute task: " + runnable);
+    }
+
+    /**
+     * An method that creates new threads on demand. {@link java.util.concurrent.ThreadFactory}
+     *
+     * @param firstRunnable a runnable to be executed by new thread instance
+     * @return constructed thread, or {@code null} if the request to create a thread is rejected
+     */
+    private static Thread threadFactory(Runnable firstRunnable) {
+        Thread thread = new Thread(firstRunnable, "Chunk-Processing");
+        thread.setDaemon(true);
+        return thread;
     }
 
     /**
@@ -58,7 +75,7 @@ public class ChunkProcessingPipeline implements ChunkTaskListener {
      * @param stage function for ChunkTask generating by Chunk.
      * @return self for Fluent api.
      */
-    public ChunkProcessingPipeline addStage(Function<Chunk, ChunkTask> stage) {
+    public ChunkProcessingPipeline addStage(Function<ForkJoinTask<Chunk>, AbstractChunkTask> stage) {
         stages.add(stage);
         if (stage instanceof ChunkTaskListener) {
             addListener((ChunkTaskListener) stage);
@@ -96,12 +113,14 @@ public class ChunkProcessingPipeline implements ChunkTaskListener {
      *
      * @param generatorTask ChunkTask which provides new chunk to pipeline
      */
-    public void invokeGeneratorTask(SupplierChunkTask generatorTask) {
-        if (processingPositions.contains(generatorTask.getPosition())) {
-            return;
-        }
+    public Future<Chunk> invokeGeneratorTask(SupplierChunkTask generatorTask) {
         processingPositions.add(generatorTask.getPosition());
-        doTask(new ChunkTaskListenerWrapper(generatorTask, (chunkTask) -> invokePipeline(chunkTask.getChunk())));
+
+        ForkJoinTask<Chunk> last = generatorTask;
+        for (Function<ForkJoinTask<Chunk>, AbstractChunkTask> stage : stages) {
+            last = stage.apply(last);
+        }
+        return chunkProcessor.submit(last);
     }
 
     /**
@@ -110,33 +129,19 @@ public class ChunkProcessingPipeline implements ChunkTaskListener {
      *
      * @param chunk chunk to process.
      */
-    public void invokePipeline(Chunk chunk) {
-        if (chunk == null) {
-            return;
-        }
-        Function<Chunk, ChunkTask> nextStage =
-                chunkNextStages.computeIfAbsent(chunk, c -> new LinkedList<>(stages)).poll();
-        Vector3i position = chunk.getPosition(new Vector3i());
-
-        if (chunk.isReady() || invalidatedPositions.remove(position) || nextStage == null) {
-            processingPositions.remove(position);
-            chunkNextStages.remove(chunk);
-            chunkRemoveFromPipelineListeners.forEach(l -> l.onRemove(position));
-            return;
-        }
-        invokeStage(chunk, nextStage);
+    public Future<Chunk> invokePipeline(Chunk chunk) {
+        return invokeGeneratorTask(new SupplierChunkTask("dummy", chunk.getPosition(new Vector3i()), () -> chunk));
     }
 
     public void shutdown() {
         chunkNextStages.clear();
         processingPositions.clear();
-        chunkProcessor.shutdown(new ShutdownChunkTask(), false);
+        chunkProcessor.shutdown();
     }
 
     public void restart() {
         chunkNextStages.clear();
         processingPositions.clear();
-        chunkProcessor.restart();
     }
 
     /**
@@ -181,26 +186,10 @@ public class ChunkProcessingPipeline implements ChunkTaskListener {
         return new LinkedList<>(processingPositions);
     }
 
-    /**
-     * Wrap chunktask with this as listener and do it.
-     *
-     * @param task task which wrapping.
-     */
-    void doTaskWrapper(ChunkTask task) {
-        ChunkTask wrapper = new ChunkTaskListenerWrapper(task, this);
-        doTask(wrapper);
+
+    private Future<?> doTask(AbstractChunkTask task) {
+        logger.debug("Start processing task :" + task);
+        return chunkProcessor.submit(task);
     }
 
-    private void doTask(ChunkTask task) {
-        try {
-            logger.debug("Start processing task :" + task);
-            chunkProcessor.put(task);
-        } catch (InterruptedException e) {
-            logger.error("Failed to enqueue task {}", task, e);
-        }
-    }
-
-    private void invokeStage(Chunk chunk, Function<Chunk, ChunkTask> stage) {
-        doTaskWrapper(stage.apply(chunk));
-    }
 }

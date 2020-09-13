@@ -21,7 +21,7 @@ import org.terasology.world.chunks.ChunkRegionListener;
 import org.terasology.world.chunks.event.BeforeChunkUnload;
 import org.terasology.world.chunks.event.OnChunkLoaded;
 import org.terasology.world.chunks.internal.ChunkRelevanceRegion;
-import org.terasology.world.chunks.pipeline.ChunkTask;
+import org.terasology.world.chunks.pipeline.PositionFuture;
 
 import java.util.Collection;
 import java.util.Comparator;
@@ -44,7 +44,7 @@ public class RelevanceSystem implements UpdateSubscriberSystem {
     private static final Vector3i UNLOAD_LEEWAY = Vector3i.one();
     private final ReadWriteLock regionLock = new ReentrantReadWriteLock();
     private final Map<EntityRef, ChunkRelevanceRegion> regions = Maps.newHashMap();
-    private LocalChunkProvider chunkProvider;
+    private final LocalChunkProvider chunkProvider;
 
     public RelevanceSystem(LocalChunkProvider chunkProvider) {
         this.chunkProvider = chunkProvider;
@@ -199,7 +199,7 @@ public class RelevanceSystem implements UpdateSubscriberSystem {
      *
      * @return Comporator.
      */
-    public Comparator<ChunkTask> createChunkTaskComporator() {
+    public Comparator<Runnable> createChunkTaskComporator() {
         return new ChunkTaskRelevanceComparator();
     }
 
@@ -265,17 +265,14 @@ public class RelevanceSystem implements UpdateSubscriberSystem {
     /**
      * Compare ChunkTasks by distance from region's centers.
      */
-    private class ChunkTaskRelevanceComparator implements Comparator<ChunkTask> {
+    private class ChunkTaskRelevanceComparator implements Comparator<Runnable> {
 
         @Override
-        public int compare(ChunkTask o1, ChunkTask o2) {
-            return score(o1) - score(o2);
+        public int compare(Runnable o1, Runnable o2) {
+            return score((PositionFuture<?>) o1) - score((PositionFuture<?>) o2);
         }
 
-        private int score(ChunkTask task) {
-            if (task.isTerminateSignal()) {
-                return -1;
-            }
+        private int score(PositionFuture<?> task) {
             return RelevanceSystem.this.regionsDistanceScore(JomlUtil.from(task.getPosition()));
         }
     }

@@ -61,6 +61,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.Future;
 
 /**
  * Provides chunks. Chunks placed in this JVM. Also generated Chunks if needed.
@@ -93,13 +94,13 @@ public class LocalChunkProvider implements ChunkProvider {
 
     private final Map<org.joml.Vector3i, List<EntityStore>> generateQueuedEntities = new HashMap<>();
 
-    private StorageManager storageManager;
+    private final StorageManager storageManager;
     private ChunkProcessingPipeline loadingPipeline;
     private TaskMaster<ChunkUnloadRequest> unloadRequestTaskMaster;
-    private WorldGenerator generator;
+    private final WorldGenerator generator;
     private EntityRef worldEntity = EntityRef.NULL;
-    private BlockManager blockManager;
-    private ExtraBlockDataManager extraDataManager;
+    private final BlockManager blockManager;
+    private final ExtraBlockDataManager extraDataManager;
     private BlockEntityRegistry registry;
 
     private RelevanceSystem relevanceSystem;
@@ -118,8 +119,8 @@ public class LocalChunkProvider implements ChunkProvider {
     }
 
 
-    protected void createOrLoadChunk(Vector3i chunkPos) {
-        loadingPipeline.invokeGeneratorTask(new SupplierChunkTask("Create or Load Chunk",
+    protected Future<Chunk> createOrLoadChunk(Vector3i chunkPos) {
+        return loadingPipeline.invokeGeneratorTask(new SupplierChunkTask("Create or Load Chunk",
                 JomlUtil.from(chunkPos),
                 () -> {
                     ChunkStore chunkStore = storageManager.loadChunkStore(chunkPos);

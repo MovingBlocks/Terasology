@@ -237,7 +237,9 @@ public class LocalChunkProviderTest {
         blockAtBlockManager.setLifecycleEventsRequired(true);
         blockAtBlockManager.setEntity(mock(EntityRef.class));
 
+        long time = System.currentTimeMillis();
         requestCreatingOrLoadingArea(chunkPosition);
+        long next = System.currentTimeMillis();
         waitChunkReadyAt(chunkPosition);
 
         //Wait BeforeDeactivateBlocks event

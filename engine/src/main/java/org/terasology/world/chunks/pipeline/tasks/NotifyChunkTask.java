@@ -5,8 +5,8 @@ package org.terasology.world.chunks.pipeline.tasks;
 
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.pipeline.AbstractChunkTask;
-import org.terasology.world.chunks.pipeline.ChunkTask;
 
+import java.util.concurrent.ForkJoinTask;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -23,14 +23,16 @@ public class NotifyChunkTask extends AbstractChunkTask {
     private final String notifierName;
     private final ChunkPipelineTaskListener chunkPipelineListener;
 
-    public NotifyChunkTask(Chunk chunk, String notifierName, ChunkPipelineTaskListener chunkPipelineListener) {
+    public NotifyChunkTask(ForkJoinTask<Chunk> chunk, String notifierName,
+                           ChunkPipelineTaskListener chunkPipelineListener) {
         super(chunk);
         this.notifierName = notifierName;
         this.chunkPipelineListener = chunkPipelineListener;
     }
 
-    public static Function<Chunk, ChunkTask> stage(String notifierName, ChunkPipelineTaskListener listener) {
-        return (chunk) -> new NotifyChunkTask(chunk, notifierName, listener);
+    public static Function<ForkJoinTask<Chunk>, AbstractChunkTask> stage(String notifyListeners,
+                                                                         ChunkPipelineTaskListener processReadyChunk) {
+        return (future) -> new NotifyChunkTask(future, notifyListeners, processReadyChunk);
     }
 
     @Override
@@ -40,6 +42,13 @@ public class NotifyChunkTask extends AbstractChunkTask {
 
     @Override
     public void run() {
-        chunkPipelineListener.fire(chunk);
+
+    }
+
+    @Override
+    protected boolean exec() {
+        setRawResult(chunkFuture.join());
+        chunkPipelineListener.fire(getRawResult());
+        return true;
     }
 }

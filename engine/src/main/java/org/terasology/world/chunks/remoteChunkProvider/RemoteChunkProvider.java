@@ -23,8 +23,8 @@ import org.terasology.world.chunks.ChunkProvider;
 import org.terasology.world.chunks.event.BeforeChunkUnload;
 import org.terasology.world.chunks.event.OnChunkLoaded;
 import org.terasology.world.chunks.pipeline.ChunkProcessingPipeline;
-import org.terasology.world.chunks.pipeline.ChunkTask;
 import org.terasology.world.chunks.pipeline.LightMergerChunkTaskProvider;
+import org.terasology.world.chunks.pipeline.PositionFuture;
 import org.terasology.world.chunks.pipeline.tasks.DeflateChunkTask;
 import org.terasology.world.chunks.pipeline.tasks.GenerateInternalLightningChunkTask;
 import org.terasology.world.chunks.pipeline.tasks.NotifyChunkTask;
@@ -53,15 +53,15 @@ public class RemoteChunkProvider implements ChunkProvider {
 
     private static final Logger logger = LoggerFactory.getLogger(RemoteChunkProvider.class);
     private final BlockingQueue<Vector3i> invalidateChunks = Queues.newLinkedBlockingQueue();
-    private Map<Vector3i, Chunk> chunkCache = Maps.newHashMap();
+    private final Map<Vector3i, Chunk> chunkCache = Maps.newHashMap();
     private ChunkReadyListener listener;
     private EntityRef worldEntity = EntityRef.NULL;
 
-    private BlockManager blockManager;
+    private final BlockManager blockManager;
 
-    private ChunkProcessingPipeline loadingPipeline;
+    private final ChunkProcessingPipeline loadingPipeline;
 
-    private LocalPlayer localPlayer;
+    private final LocalPlayer localPlayer;
 
     public RemoteChunkProvider(BlockManager blockManager, LocalPlayer localPlayer) {
         this.blockManager = blockManager;
@@ -217,11 +217,11 @@ public class RemoteChunkProvider implements ChunkProvider {
     /**
      * ChunkTask's comparation based on distance from local player position.
      */
-    private class ChunkTaskRelevanceComparator implements Comparator<ChunkTask> {
+    private class ChunkTaskRelevanceComparator implements Comparator<Runnable> {
 
         @Override
-        public int compare(ChunkTask o1, ChunkTask o2) {
-            return score(o1.getPosition()) - score(o2.getPosition());
+        public int compare(Runnable o1, Runnable o2) {
+            return score(((PositionFuture<?>) o1).getPosition()) - score(((PositionFuture<?>) o2).getPosition());
         }
 
         private int score(org.joml.Vector3i chunk) {

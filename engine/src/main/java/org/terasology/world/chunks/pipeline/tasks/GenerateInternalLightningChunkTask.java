@@ -8,12 +8,14 @@ import org.terasology.world.chunks.LitChunk;
 import org.terasology.world.chunks.pipeline.AbstractChunkTask;
 import org.terasology.world.propagation.light.InternalLightProcessor;
 
+import java.util.concurrent.ForkJoinTask;
+
 /**
  * Chunk task for run {@link InternalLightProcessor#generateInternalLighting(LitChunk)}
  */
 public class GenerateInternalLightningChunkTask extends AbstractChunkTask {
 
-    public GenerateInternalLightningChunkTask(Chunk chunk) {
+    public GenerateInternalLightningChunkTask(ForkJoinTask<Chunk> chunk) {
         super(chunk);
     }
 
@@ -24,7 +26,13 @@ public class GenerateInternalLightningChunkTask extends AbstractChunkTask {
 
     @Override
     public void run() {
-        InternalLightProcessor.generateInternalLighting(chunk);
     }
 
+
+    @Override
+    protected boolean exec() {
+        setRawResult(chunkFuture.fork().join());
+        InternalLightProcessor.generateInternalLighting(getRawResult());
+        return true;
+    }
 }
