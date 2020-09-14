@@ -90,11 +90,6 @@ public class ModuleEnvironmentSandbox implements SerializationSandbox {
     }
 
     @Override
-    public <T> String getSubTypeIdentifier(Class<? extends T> subType, Class<T> baseType) {
-        return subType.getName();
-    }
-
-    @Override
     public <T> boolean isValidTypeHandlerDeclaration(TypeInfo<T> type, TypeHandler<T> typeHandler) {
         Name moduleDeclaringHandler = getModuleProviding(typeHandler.getClass());
 
