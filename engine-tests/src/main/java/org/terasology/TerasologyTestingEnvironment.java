@@ -61,7 +61,7 @@ public abstract class TerasologyTestingEnvironment {
          * Create at least for each class a new headless environemnt as it is fast and prevents side effects
          * (Reusing a headless environment after other tests have modified the core registry isn't really clean)
          */
-        env = new HeadlessEnvironment(new Name("engine"));
+        env = new HeadlessEnvironment(new Name("engine"), new Name("nui"));
         context = env.getContext();
         moduleManager = context.get(ModuleManager.class);
 

@@ -1,18 +1,5 @@
-/*
- * Copyright 2020 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 
 // Simple build file for modules - the one under the Core module is the template, will be copied as needed to modules
 
@@ -22,6 +9,7 @@ import org.gradle.plugins.ide.idea.model.IdeaModel
 import org.reflections.Reflections
 import org.reflections.scanners.SubTypesScanner
 import org.reflections.scanners.TypeAnnotationsScanner
+import org.reflections.serializers.JsonSerializer
 import org.reflections.util.ConfigurationBuilder
 import org.reflections.util.FilterBuilder
 
@@ -169,7 +157,7 @@ tasks.register("createSkeleton") {
 tasks.register("cacheReflections") {
     description = "Caches reflection output to make regular startup faster. May go stale and need cleanup at times."
     inputs.files(mainSourceSet.output.classesDirs)
-    outputs.file(File(mainSourceSet.output.classesDirs.first(), "reflections.cache"))
+    outputs.file(File(mainSourceSet.output.classesDirs.first(), "manifest.json"))
     dependsOn(tasks.named("classes"))
 
     doFirst {
@@ -178,7 +166,7 @@ tasks.register("cacheReflections") {
                     .filterInputsBy(FilterBuilder.parsePackages("+org"))
                     .addUrls(inputs.getFiles().getSingleFile().toURI().toURL())
                     .setScanners(TypeAnnotationsScanner(), SubTypesScanner()))
-            reflections.save(outputs.getFiles().getAsPath())
+            reflections.save(outputs.getFiles().getAsPath(), JsonSerializer())
         } catch (e: java.net.MalformedURLException) {
             getLogger().error("Cannot parse input to url", e);
         }
@@ -206,10 +194,13 @@ tasks.register<Sync>("syncDeltas") {
     into("${mainSourceSet.output.classesDirs.first()}/deltas")
 }
 
+tasks.named("compileJava") {
+    finalizedBy("cacheReflections")
+}
+
 // Instructions for packaging a jar file - is a manifest even needed for modules?
 tasks.named("jar") {
     // Make sure the assets directory is included
-    dependsOn("cacheReflections")
     dependsOn("syncAssets")
     dependsOn("syncOverrides")
     dependsOn("syncDeltas")
@@ -222,7 +213,7 @@ tasks.named("jar") {
         }
     }
 
-    finalizedBy("cleanReflections")
+//    finalizedBy("cleanReflections")
 }
 
 // Prep an IntelliJ module for the Terasology module - yes, might want to read that twice :D

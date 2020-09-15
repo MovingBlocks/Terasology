@@ -32,7 +32,7 @@ public abstract class ModuleEnvironmentTest {
         DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
         ResolutionResult result = resolver.resolve(moduleManager.getRegistry().getModuleIds());
 
-        assumeTrue(result.isSuccess());
+        assumeTrue(result.isSuccess(), "ModuleEnvironmentTest initialization failed");
 
         ModuleEnvironment environment = moduleManager.loadEnvironment(result.getModules(), true);
         typeRegistry = new TypeRegistry(environment);

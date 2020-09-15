@@ -79,7 +79,7 @@ public class OpenALStreamingSoundSource extends BaseSoundSource<OpenALStreamingS
         }
 
         alSourceQueueBuffers(this.getSourceId(),
-                BufferUtils.createIntBuffer(buffers.length).put(buffers).flip());
+                (IntBuffer) BufferUtils.createIntBuffer(buffers.length).put(buffers).flip());
 
         if (isPlaying) {
             this.play();
