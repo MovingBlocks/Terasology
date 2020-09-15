@@ -18,6 +18,7 @@ package org.terasology.i18n;
 
 import org.terasology.engine.Uri;
 import org.terasology.module.sandbox.API;
+import org.terasology.nui.translate.Translator;
 
 import java.util.Locale;
 import java.util.function.Consumer;
@@ -27,7 +28,8 @@ import java.util.function.Consumer;
  * contain a project URI or be used directly in a project.
  */
 @API
-public interface TranslationSystem {
+// TODO: Remove extends Translator when NUI is properly integrated
+public interface TranslationSystem extends Translator {
 
     /**
      * @param name

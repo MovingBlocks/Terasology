@@ -16,8 +16,8 @@
 package org.terasology.logic.debug;
 
 import org.terasology.rendering.nui.layers.hud.CoreHudWidget;
-import org.terasology.rendering.nui.layouts.ColumnLayout;
-import org.terasology.rendering.nui.layouts.PropertyLayout;
+import org.terasology.nui.layouts.ColumnLayout;
+import org.terasology.nui.layouts.PropertyLayout;
 
 /**
  * Simple NUI HUD widget, that comes up when pressing F1 ingame. Shows a property layout panel with all registered

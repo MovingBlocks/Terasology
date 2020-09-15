@@ -17,12 +17,15 @@ package org.terasology.world.block.family;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
 import org.terasology.module.ModuleEnvironment;
+import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.metadata.ClassLibrary;
 import org.terasology.reflection.metadata.ClassMetadata;
 import org.terasology.reflection.metadata.DefaultClassLibrary;
+import org.terasology.reflection.reflect.ReflectFactory;
 import org.terasology.registry.InjectionHelper;
 import org.terasology.util.reflection.ParameterProvider;
 import org.terasology.util.reflection.SimpleClassFactory;
@@ -44,7 +47,7 @@ public class BlockFamilyLibrary {
     private ClassLibrary<BlockFamily> library;
 
     public BlockFamilyLibrary(ModuleEnvironment moduleEnvironment, Context context) {
-        library = new DefaultClassLibrary<>(context);
+        library = new DefaultClassLibrary<>(moduleEnvironment, context.get(ReflectFactory.class), context.get(CopyStrategyLibrary.class));
         for (Class<?> entry : moduleEnvironment.getTypesAnnotatedWith(RegisterBlockFamily.class)) {
 
             if (!BlockFamily.class.isAssignableFrom(entry)) {
@@ -54,7 +57,7 @@ public class BlockFamilyLibrary {
             RegisterBlockFamily registerInfo = entry.getAnnotation(RegisterBlockFamily.class);
             String id = registerInfo.value();
             logger.debug("Registering blockFamily {}", id);
-            library.register(new SimpleUri(moduleEnvironment.getModuleProviding(entry), registerInfo.value()), (Class<? extends BlockFamily>) entry);
+            library.register(new ResourceUrn(moduleEnvironment.getModuleProviding(entry).toString(), registerInfo.value()), (Class<? extends BlockFamily>) entry);
 
         }
     }

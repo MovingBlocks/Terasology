@@ -23,11 +23,11 @@ import org.terasology.identity.storageServiceClient.StorageServiceWorker;
 import org.terasology.identity.storageServiceClient.StorageServiceWorkerStatus;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
-import org.terasology.rendering.nui.WidgetUtil;
+import org.terasology.nui.WidgetUtil;
 import org.terasology.rendering.nui.animation.MenuAnimationSystems;
 import org.terasology.rendering.nui.layers.mainMenu.settings.PlayerSettingsScreen;
 import org.terasology.rendering.nui.layers.mainMenu.settings.SettingsMenuScreen;
-import org.terasology.rendering.nui.widgets.UILabel;
+import org.terasology.nui.widgets.UILabel;
 import org.terasology.version.TerasologyVersion;
 
 import static org.terasology.identity.storageServiceClient.StatusMessageTranslator.getLocalizedStatusMessage;
