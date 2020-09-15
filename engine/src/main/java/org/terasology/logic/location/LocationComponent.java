@@ -20,7 +20,6 @@ import org.joml.Quaternionf;
 import org.joml.Quaternionfc;
 import org.joml.Vector3fc;
 import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.Owns;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.math.Direction;
 import org.terasology.math.JomlUtil;
@@ -209,6 +208,22 @@ public final class LocationComponent implements Component, ReplicationCheck {
             parentLoc = parentLoc.parent.getComponent(LocationComponent.class);
         }
         return dest;
+    }
+
+    /**
+     * Populates out with the transform of this entity relative to the given entity, or the world transform if entity
+     * is not in this entity's parent hierarchy
+     * @param out
+     * @param entity
+     */
+    public void getRelativeTransform(org.terasology.math.geom.Matrix4f out, EntityRef entity) {
+        if (!(entity.equals(parent))) {
+            LocationComponent loc = parent.getComponent(LocationComponent.class);
+            if (loc != null) {
+                loc.getRelativeTransform(out, entity);
+            }
+        }
+        out.mul(new org.terasology.math.geom.Matrix4f(rotation, position, scale));
     }
 
     /**
