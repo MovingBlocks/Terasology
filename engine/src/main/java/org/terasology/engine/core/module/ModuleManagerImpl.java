@@ -10,6 +10,7 @@ import org.terasology.engine.config.Config;
 import org.terasology.engine.config.SystemConfig;
 import org.terasology.engine.core.TerasologyConstants;
 import org.terasology.engine.core.paths.PathManager;
+import org.terasology.gestalt.i18n.I18nMap;
 import org.terasology.gestalt.module.Module;
 import org.terasology.gestalt.module.ModuleEnvironment;
 import org.terasology.gestalt.module.ModuleFactory;
@@ -97,11 +98,13 @@ public class ModuleManagerImpl implements ModuleManager {
     }
 
     @NotNull
-    private Module createSyntheticPackageModule(Module engineModule, String nui, String version, String packageName) {
+    private Module createSyntheticPackageModule(Module engineModule, String id, String version, String packageName) {
+        ModuleMetadata metadata = new ModuleMetadata(
+                new Name(id),
+                new Version(version));
+        metadata.setDisplayName(new I18nMap(id));
         Module module = moduleFactory.createPackageModule(
-                new ModuleMetadata(
-                        new Name(nui),
-                        new Version(version)),
+                metadata,
                 packageName);
         DependencyInfo moduleDep = new DependencyInfo();
         moduleDep.setId(module.getId());

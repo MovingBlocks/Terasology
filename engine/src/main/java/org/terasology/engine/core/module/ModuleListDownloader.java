@@ -52,7 +52,7 @@ public class ModuleListDownloader implements Callable<ModuleRegistry> {
 
         try (InputStreamReader inputStreamReader = new InputStreamReader(url.openStream(), TerasologyConstants
                 .CHARSET)) {
-            JsonArray jsonArray = (JsonArray) gson.toJsonTree(inputStreamReader, JsonArray.class);
+            JsonArray jsonArray = gson.fromJson(inputStreamReader, JsonArray.class);
             for (JsonElement jObject : jsonArray) {
                 String json = gson.toJson(jObject);
                 ModuleMetadata meta = metaReader.read(new StringReader(json));

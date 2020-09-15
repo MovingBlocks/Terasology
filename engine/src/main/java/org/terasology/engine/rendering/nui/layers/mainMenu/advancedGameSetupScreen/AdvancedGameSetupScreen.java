@@ -23,28 +23,8 @@ import org.terasology.engine.core.module.ModuleInstaller;
 import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.engine.core.module.StandardModuleExtension;
 import org.terasology.engine.game.GameManifest;
-import org.terasology.gestalt.assets.ResourceUrn;
-import org.terasology.gestalt.module.Module;
-import org.terasology.gestalt.module.ModuleMetadata;
-import org.terasology.gestalt.module.dependencyresolution.DependencyInfo;
-import org.terasology.gestalt.module.dependencyresolution.DependencyResolver;
-import org.terasology.gestalt.module.dependencyresolution.ResolutionResult;
-import org.terasology.gestalt.module.resources.DirectoryFileSource;
-import org.terasology.gestalt.naming.Name;
 import org.terasology.engine.i18n.TranslationSystem;
 import org.terasology.engine.network.NetworkMode;
-import org.terasology.nui.Canvas;
-import org.terasology.nui.WidgetUtil;
-import org.terasology.nui.databinding.Binding;
-import org.terasology.nui.databinding.ReadOnlyBinding;
-import org.terasology.nui.itemRendering.AbstractItemRenderer;
-import org.terasology.nui.widgets.ResettableUIText;
-import org.terasology.nui.widgets.TextChangeEventListener;
-import org.terasology.nui.widgets.UIButton;
-import org.terasology.nui.widgets.UICheckbox;
-import org.terasology.nui.widgets.UILabel;
-import org.terasology.nui.widgets.UIList;
-import org.terasology.nui.widgets.UIText;
 import org.terasology.engine.registry.In;
 import org.terasology.engine.rendering.nui.CoreScreenLayer;
 import org.terasology.engine.rendering.nui.animation.MenuAnimationSystems;
@@ -57,6 +37,25 @@ import org.terasology.engine.rendering.nui.layers.mainMenu.WaitPopup;
 import org.terasology.engine.rendering.nui.layers.mainMenu.moduleDetailsScreen.ModuleDetailsScreen;
 import org.terasology.engine.utilities.random.FastRandom;
 import org.terasology.engine.world.generator.internal.WorldGeneratorManager;
+import org.terasology.gestalt.assets.ResourceUrn;
+import org.terasology.gestalt.module.Module;
+import org.terasology.gestalt.module.ModuleMetadata;
+import org.terasology.gestalt.module.dependencyresolution.DependencyInfo;
+import org.terasology.gestalt.module.dependencyresolution.DependencyResolver;
+import org.terasology.gestalt.module.dependencyresolution.ResolutionResult;
+import org.terasology.gestalt.naming.Name;
+import org.terasology.nui.Canvas;
+import org.terasology.nui.WidgetUtil;
+import org.terasology.nui.databinding.Binding;
+import org.terasology.nui.databinding.ReadOnlyBinding;
+import org.terasology.nui.itemRendering.AbstractItemRenderer;
+import org.terasology.nui.widgets.ResettableUIText;
+import org.terasology.nui.widgets.TextChangeEventListener;
+import org.terasology.nui.widgets.UIButton;
+import org.terasology.nui.widgets.UICheckbox;
+import org.terasology.nui.widgets.UILabel;
+import org.terasology.nui.widgets.UIList;
+import org.terasology.nui.widgets.UIText;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -73,18 +72,18 @@ import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
 /**
- * This screen loads up all the modules, local and remote. The modules
- * are displayed in different colours according to their state of selection.
- * For downloading remote modules list a FutureTask is used. The modules can also be filtered and the choice
- * of filtering is saved in the config.
+ * This screen loads up all the modules, local and remote. The modules are displayed in different colours according to
+ * their state of selection. For downloading remote modules list a FutureTask is used. The modules can also be filtered
+ * and the choice of filtering is saved in the config.
  */
 public class AdvancedGameSetupScreen extends CoreScreenLayer {
 
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:advancedGameSetupScreen");
 
     private static final Logger logger = LoggerFactory.getLogger(AdvancedGameSetupScreen.class);
-    private final Comparator<? super ModuleSelectionInfo> moduleInfoComparator = Comparator.comparing(o -> o.getMetadata()
-            .getDisplayName().toString());
+    private final Comparator<? super ModuleSelectionInfo> moduleInfoComparator =
+            Comparator.comparing(o -> o.getMetadata()
+                    .getDisplayName().toString());
     @In
     private ModuleManager moduleManager;
     @In
@@ -143,11 +142,9 @@ public class AdvancedGameSetupScreen extends CoreScreenLayer {
         sortedModules = Lists.newArrayList();
         for (Name moduleId : moduleManager.getRegistry().getModuleIds()) {
             Module latestVersion = moduleManager.getRegistry().getLatestModuleVersion(moduleId);
-            if (!(latestVersion.getResources() instanceof DirectoryFileSource)) {
-                ModuleSelectionInfo info = ModuleSelectionInfo.local(latestVersion);
-                modulesLookup.put(info.getMetadata().getId(), info);
-                sortedModules.add(info);
-            }
+            ModuleSelectionInfo info = ModuleSelectionInfo.local(latestVersion);
+            modulesLookup.put(info.getMetadata().getId(), info);
+            sortedModules.add(info);
         }
 
         sortedModules.sort(moduleInfoComparator);
@@ -474,7 +471,8 @@ public class AdvancedGameSetupScreen extends CoreScreenLayer {
                         }
                     });
                     moduleDetails.subscribe(b -> {
-                        final ModuleDetailsScreen moduleDetailsScreen = getManager().createScreen(ModuleDetailsScreen.ASSET_URI, ModuleDetailsScreen.class);
+                        final ModuleDetailsScreen moduleDetailsScreen =
+                                getManager().createScreen(ModuleDetailsScreen.ASSET_URI, ModuleDetailsScreen.class);
                         final Collection<Module> modules = sortedModules.stream()
                                 .map(ModuleSelectionInfo::getMetadata)
                                 .filter(Objects::nonNull)
@@ -497,7 +495,8 @@ public class AdvancedGameSetupScreen extends CoreScreenLayer {
         }
 
         WidgetUtil.trySubscribe(this, "createWorld", button -> {
-            final UniverseSetupScreen universeSetupScreen = getManager().createScreen(UniverseSetupScreen.ASSET_URI, UniverseSetupScreen.class);
+            final UniverseSetupScreen universeSetupScreen = getManager().createScreen(UniverseSetupScreen.ASSET_URI,
+                    UniverseSetupScreen.class);
             universeWrapper.setSeed(seed.getText());
             saveConfiguration();
             universeSetupScreen.setEnvironment(universeWrapper);
@@ -506,15 +505,19 @@ public class AdvancedGameSetupScreen extends CoreScreenLayer {
 
         WidgetUtil.trySubscribe(this, "play", button -> {
             if (StringUtils.isBlank(seed.getText())) {
-                getManager().createScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Error", "Game seed cannot be empty!");
+                getManager().createScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Error", "Game seed " +
+                        "cannot be empty!");
             } else {
                 universeWrapper.setSeed(seed.getText());
                 saveConfiguration();
-                final GameManifest gameManifest = GameManifestProvider.createGameManifest(universeWrapper, moduleManager, config);
+                final GameManifest gameManifest = GameManifestProvider.createGameManifest(universeWrapper,
+                        moduleManager, config);
                 if (gameManifest != null) {
-                    gameEngine.changeState(new StateLoading(gameManifest, (universeWrapper.getLoadingAsServer()) ? NetworkMode.DEDICATED_SERVER : NetworkMode.NONE));
+                    gameEngine.changeState(new StateLoading(gameManifest, (universeWrapper.getLoadingAsServer()) ?
+                            NetworkMode.DEDICATED_SERVER : NetworkMode.NONE));
                 } else {
-                    getManager().createScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Error", "Can't create new game!");
+                    getManager().createScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Error", "Can't " +
+                            "create new game!");
                 }
             }
         });
@@ -563,7 +566,8 @@ public class AdvancedGameSetupScreen extends CoreScreenLayer {
             }
 
             boolean isUncategorized = true;
-            Set<StandardModuleExtension> booleanStandardModuleExtensionEnumSet = StandardModuleExtension.booleanPropertySet();
+            Set<StandardModuleExtension> booleanStandardModuleExtensionEnumSet =
+                    StandardModuleExtension.booleanPropertySet();
             for (StandardModuleExtension standardModuleExtension : booleanStandardModuleExtensionEnumSet) {
                 if (standardModuleExtension.isProvidedBy(module)) {
                     isUncategorized = false;
@@ -699,13 +703,15 @@ public class AdvancedGameSetupScreen extends CoreScreenLayer {
         if (needsUpdate && remoteModuleRegistryUpdater.isDone() && !selectModulesConfig.isLocalOnlySelected()) {
             needsUpdate = false;
             try {
-                // it'a a Callable<Void> so just a null is returned, but it's used instead of a runnable because it can throw exceptions
+                // it'a a Callable<Void> so just a null is returned, but it's used instead of a runnable because it
+                // can throw exceptions
                 remoteModuleRegistryUpdater.get();
             } catch (CancellationException | InterruptedException | ExecutionException ex) {
                 logger.warn("Failed to retrieve module list from meta server", ex);
                 MessagePopup message = getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class);
                 message.setMessage("Warning",
-                        "Failed to retrieve a module list from the master server. Only locally installed modules are available.");
+                        "Failed to retrieve a module list from the master server. Only locally installed modules are " +
+                                "available.");
                 return;
             }
             updateModuleInformation();
