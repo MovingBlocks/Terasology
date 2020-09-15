@@ -13,28 +13,7 @@ import org.terasology.engine.core.bootstrap.EnvironmentSwitchHandler;
 import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.engine.entitySystem.prefab.Prefab;
 import org.terasology.engine.entitySystem.prefab.internal.PojoPrefab;
-import org.terasology.gestalt.assets.AssetType;
-import org.terasology.gestalt.assets.ResourceUrn;
-import org.terasology.gestalt.assets.management.AssetManager;
-import org.terasology.gestalt.assets.module.ModuleAwareAssetTypeManager;
-import org.terasology.gestalt.assets.module.autoreload.AutoReloadAssetTypeManager;
-import org.terasology.gestalt.module.Module;
-import org.terasology.gestalt.module.ModuleEnvironment;
-import org.terasology.gestalt.module.dependencyresolution.DependencyInfo;
-import org.terasology.gestalt.module.dependencyresolution.DependencyResolver;
-import org.terasology.gestalt.module.dependencyresolution.ResolutionResult;
-import org.terasology.gestalt.naming.Name;
 import org.terasology.engine.logic.behavior.asset.BehaviorTree;
-import org.terasology.nui.WidgetUtil;
-import org.terasology.nui.asset.UIElement;
-import org.terasology.nui.databinding.Binding;
-import org.terasology.nui.databinding.ReadOnlyBinding;
-import org.terasology.nui.itemRendering.StringTextRenderer;
-import org.terasology.nui.skin.UISkin;
-import org.terasology.nui.widgets.UIDropdownScrollable;
-import org.terasology.nui.reflection.copy.CopyStrategyLibrary;
-import org.terasology.nui.reflection.reflect.ReflectFactory;
-import org.terasology.nui.reflection.reflect.ReflectionReflectFactory;
 import org.terasology.engine.registry.CoreRegistry;
 import org.terasology.engine.registry.In;
 import org.terasology.engine.rendering.nui.CoreScreenLayer;
@@ -54,6 +33,27 @@ import org.terasology.engine.world.generator.internal.WorldGeneratorInfo;
 import org.terasology.engine.world.generator.internal.WorldGeneratorManager;
 import org.terasology.engine.world.generator.plugin.TempWorldGeneratorPluginLibrary;
 import org.terasology.engine.world.generator.plugin.WorldGeneratorPluginLibrary;
+import org.terasology.gestalt.assets.AssetType;
+import org.terasology.gestalt.assets.ResourceUrn;
+import org.terasology.gestalt.assets.management.AssetManager;
+import org.terasology.gestalt.assets.module.ModuleAwareAssetTypeManager;
+import org.terasology.gestalt.assets.module.autoreload.AutoReloadAssetTypeManager;
+import org.terasology.gestalt.module.Module;
+import org.terasology.gestalt.module.ModuleEnvironment;
+import org.terasology.gestalt.module.dependencyresolution.DependencyInfo;
+import org.terasology.gestalt.module.dependencyresolution.DependencyResolver;
+import org.terasology.gestalt.module.dependencyresolution.ResolutionResult;
+import org.terasology.gestalt.naming.Name;
+import org.terasology.nui.WidgetUtil;
+import org.terasology.nui.asset.UIElement;
+import org.terasology.nui.databinding.Binding;
+import org.terasology.nui.databinding.ReadOnlyBinding;
+import org.terasology.nui.itemRendering.StringTextRenderer;
+import org.terasology.nui.reflection.copy.CopyStrategyLibrary;
+import org.terasology.nui.reflection.reflect.ReflectFactory;
+import org.terasology.nui.reflection.reflect.ReflectionReflectFactory;
+import org.terasology.nui.skin.UISkin;
+import org.terasology.nui.widgets.UIDropdownScrollable;
 
 import java.util.HashSet;
 import java.util.List;
@@ -359,7 +359,7 @@ public class UniverseSetupScreen extends CoreScreenLayer {
         BlockFamilyLibrary library =  new BlockFamilyLibrary(environment, context);
 
         // cast lambdas explicitly to avoid inconsistent compiler behavior wrt. type inference
-        assetTypeManager.createAssetType(Prefab.class, PojoPrefab::new, "prefabs"); //TODO check - gestalt v7
+        assetTypeManager.createAssetType(Prefab.class, PojoPrefab::new, "prefabs");
         assetTypeManager.createAssetType(BlockShape.class, BlockShapeImpl::new, "shapes");
         assetTypeManager.createAssetType(BlockSounds.class, BlockSounds::new, "blockSounds");
         assetTypeManager.createAssetType(BlockTile.class, BlockTile::new, "blockTiles");
@@ -368,7 +368,7 @@ public class UniverseSetupScreen extends CoreScreenLayer {
         assetTypeManager.getAssetFileDataProducer(blockFamilyDefinitionDataAssetType).addAssetFormat(
                 new BlockFamilyDefinitionFormat(assetTypeManager.getAssetManager()));
         assetTypeManager.createAssetType(UISkin.class, UISkin::new, "skins");
-        assetTypeManager.createAssetType(BehaviorTree.class, BehaviorTree::new,  "behaviors"); //TODO check - gestalt v7
+        assetTypeManager.createAssetType(BehaviorTree.class, BehaviorTree::new, "behaviors");
         assetTypeManager.createAssetType(UIElement.class, UIElement::new, "ui");
     }
 

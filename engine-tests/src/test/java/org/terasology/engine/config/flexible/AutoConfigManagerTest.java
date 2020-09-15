@@ -25,7 +25,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-//TODO move to testpackagemodule - gestalt v7.
 public class AutoConfigManagerTest {
     private static final Name PROVIDING_MODULE = new Name("unittest");
 
