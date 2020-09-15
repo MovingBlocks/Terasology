@@ -22,14 +22,12 @@ import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.ChunkProvider;
 import org.terasology.world.chunks.event.BeforeChunkUnload;
 import org.terasology.world.chunks.event.OnChunkLoaded;
+import org.terasology.world.chunks.localChunkProvider.LightMergerFunction;
 import org.terasology.world.chunks.pipeline.ChunkProcessingPipeline;
-import org.terasology.world.chunks.pipeline.LightMergerChunkTaskProvider;
 import org.terasology.world.chunks.pipeline.PositionFuture;
-import org.terasology.world.chunks.pipeline.tasks.DeflateChunkTask;
-import org.terasology.world.chunks.pipeline.tasks.GenerateInternalLightningChunkTask;
-import org.terasology.world.chunks.pipeline.tasks.NotifyChunkTask;
 import org.terasology.world.internal.ChunkViewCore;
 import org.terasology.world.internal.ChunkViewCoreImpl;
+import org.terasology.world.propagation.light.InternalLightProcessor;
 
 import java.math.RoundingMode;
 import java.util.Collection;
@@ -68,10 +66,10 @@ public class RemoteChunkProvider implements ChunkProvider {
         this.localPlayer = localPlayer;
         loadingPipeline = new ChunkProcessingPipeline(new ChunkTaskRelevanceComparator());
 
-        loadingPipeline.addStage(GenerateInternalLightningChunkTask::new)
-                .addStage(DeflateChunkTask::new)
-                .addStage(new LightMergerChunkTaskProvider(this, loadingPipeline))
-                .addStage(NotifyChunkTask.stage("Notify listeners", (chunk) -> {
+        loadingPipeline.addStage(InternalLightProcessor::generateInternalLighting)
+                .addStage(Chunk::deflate)
+                .addStage(new LightMergerFunction())
+                .addStage((chunk) -> {
                     listener.onChunkReady(chunk.getPosition());
                     worldEntity.send(new OnChunkLoaded(chunk.getPosition()));
                     Chunk oldChunk = chunkCache.put(chunk.getPosition(), chunk);
@@ -79,7 +77,7 @@ public class RemoteChunkProvider implements ChunkProvider {
                         oldChunk.dispose();
                     }
                     chunk.markReady();
-                }));
+                });
 
         ChunkMonitor.fireChunkProviderInitialized(this);
     }

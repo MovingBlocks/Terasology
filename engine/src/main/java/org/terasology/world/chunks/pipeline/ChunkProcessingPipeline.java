@@ -15,12 +15,17 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.ForkJoinTask;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 /**
  * Manages execution of chunk tasks on a queue.
@@ -35,8 +40,8 @@ public class ChunkProcessingPipeline implements ChunkTaskListener {
     private static final int NUM_TASK_THREADS = 8;
     private static final Logger logger = LoggerFactory.getLogger(ChunkProcessingPipeline.class);
 
-    private final ForkJoinPool chunkProcessor;
-    private final List<Function<ForkJoinTask<Chunk>, AbstractChunkTask>> stages = new LinkedList<>();
+    private final ExecutorService chunkProcessor;
+    private final List<Function<Chunk, Chunk>> stages = new LinkedList<>();
     private final List<ChunkTaskListener> chunkTaskListeners = new LinkedList<>();
     private final List<ChunkRemoveFromPipelineListener> chunkRemoveFromPipelineListeners = new LinkedList<>();
     private final Map<Chunk, Deque<Function<Chunk, ChunkTask>>> chunkNextStages = new ConcurrentHashMap<>();
@@ -49,7 +54,10 @@ public class ChunkProcessingPipeline implements ChunkTaskListener {
      * @param taskComparator using by TaskMaster for priority ordering task.
      */
     public ChunkProcessingPipeline(Comparator<Runnable> taskComparator) {
-        chunkProcessor = new ForkJoinPool(NUM_TASK_THREADS);
+        chunkProcessor = new ThreadPoolExecutor(
+                NUM_TASK_THREADS, NUM_TASK_THREADS,
+                0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>(),
+                Executors.defaultThreadFactory(), ChunkProcessingPipeline::onRejectExecution);
     }
 
     private static void onRejectExecution(Runnable runnable, ThreadPoolExecutor threadPoolExecutor) {
@@ -75,14 +83,16 @@ public class ChunkProcessingPipeline implements ChunkTaskListener {
      * @param stage function for ChunkTask generating by Chunk.
      * @return self for Fluent api.
      */
-    public ChunkProcessingPipeline addStage(Function<ForkJoinTask<Chunk>, AbstractChunkTask> stage) {
+    public ChunkProcessingPipeline addStage(Function<Chunk, Chunk> stage) {
         stages.add(stage);
-        if (stage instanceof ChunkTaskListener) {
-            addListener((ChunkTaskListener) stage);
-        }
-        if (stage instanceof ChunkRemoveFromPipelineListener) {
-            addListener((ChunkRemoveFromPipelineListener) stage);
-        }
+        return this;
+    }
+
+    public ChunkProcessingPipeline addStage(Consumer<Chunk> stage) {
+        addStage((c) -> {
+            stage.accept(c);
+            return c;
+        });
         return this;
     }
 
@@ -113,14 +123,18 @@ public class ChunkProcessingPipeline implements ChunkTaskListener {
      *
      * @param generatorTask ChunkTask which provides new chunk to pipeline
      */
-    public Future<Chunk> invokeGeneratorTask(SupplierChunkTask generatorTask) {
-        processingPositions.add(generatorTask.getPosition());
+    public Future<Chunk> invokeGeneratorTask(Vector3i position, Supplier<Chunk> generatorTask) {
+        processingPositions.add(position);
+        CompletableFuture<Chunk> completableFuture = CompletableFuture.supplyAsync(generatorTask, chunkProcessor);
 
-        ForkJoinTask<Chunk> last = generatorTask;
-        for (Function<ForkJoinTask<Chunk>, AbstractChunkTask> stage : stages) {
-            last = stage.apply(last);
+        for (Function<Chunk, Chunk> stage : stages) {
+            completableFuture = completableFuture.thenApplyAsync(stage, chunkProcessor);
         }
-        return chunkProcessor.submit(last);
+        completableFuture.thenApplyAsync((c) -> {
+            processingPositions.remove(c.getPosition(new Vector3i()));
+            return c;
+        }, chunkProcessor);
+        return completableFuture;
     }
 
     /**
@@ -130,7 +144,7 @@ public class ChunkProcessingPipeline implements ChunkTaskListener {
      * @param chunk chunk to process.
      */
     public Future<Chunk> invokePipeline(Chunk chunk) {
-        return invokeGeneratorTask(new SupplierChunkTask("dummy", chunk.getPosition(new Vector3i()), () -> chunk));
+        return invokeGeneratorTask(chunk.getPosition(new Vector3i()), () -> chunk);
     }
 
     public void shutdown() {
@@ -185,11 +199,4 @@ public class ChunkProcessingPipeline implements ChunkTaskListener {
     public List<org.joml.Vector3i> getProcessingPosition() {
         return new LinkedList<>(processingPositions);
     }
-
-
-    private Future<?> doTask(AbstractChunkTask task) {
-        logger.debug("Start processing task :" + task);
-        return chunkProcessor.submit(task);
-    }
-
 }

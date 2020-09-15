@@ -28,6 +28,7 @@ import java.util.Comparator;
 import java.util.Map;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.stream.StreamSupport;
 
 /**
  * RelevanceSystem loads, holds and unloads chunks around "players" (entity with {@link RelevanceRegionComponent} and
@@ -169,14 +170,18 @@ public class RelevanceSystem implements UpdateSubscriberSystem {
         } finally {
             regionLock.writeLock().unlock();
         }
-        for (Vector3i pos : region.getCurrentRegion()) {
-            Chunk chunk = chunkProvider.getChunk(pos);
-            if (chunk != null) {
-                region.checkIfChunkIsRelevant(chunk);
-            } else {
-                chunkProvider.createOrLoadChunk(pos);
-            }
-        }
+        StreamSupport.stream(region.getCurrentRegion().spliterator(), false)
+                .sorted(new PositionRelevanceComparator())
+                .forEach(
+                        pos -> {
+                            Chunk chunk = chunkProvider.getChunk(pos);
+                            if (chunk != null) {
+                                region.checkIfChunkIsRelevant(chunk);
+                            } else {
+                                chunkProvider.createOrLoadChunk(pos);
+                            }
+                        }
+                );
     }
 
     /**
@@ -274,6 +279,22 @@ public class RelevanceSystem implements UpdateSubscriberSystem {
 
         private int score(PositionFuture<?> task) {
             return RelevanceSystem.this.regionsDistanceScore(JomlUtil.from(task.getPosition()));
+        }
+    }
+
+
+    /**
+     * Compare ChunkTasks by distance from region's centers.
+     */
+    private class PositionRelevanceComparator implements Comparator<Vector3i> {
+
+        @Override
+        public int compare(Vector3i o1, Vector3i o2) {
+            return score(o1) - score(o2);
+        }
+
+        private int score(Vector3i position) {
+            return RelevanceSystem.this.regionsDistanceScore(position);
         }
     }
 }
