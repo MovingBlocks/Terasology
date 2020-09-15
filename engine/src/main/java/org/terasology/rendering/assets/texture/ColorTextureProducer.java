@@ -22,7 +22,7 @@ import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.module.annotations.RegisterAssetDataProducer;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.naming.Name;
-import org.terasology.rendering.nui.Color;
+import org.terasology.nui.Color;
 
 import java.io.IOException;
 import java.util.Collections;

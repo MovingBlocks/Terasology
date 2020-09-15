@@ -24,8 +24,8 @@ import org.terasology.logic.common.DisplayNameComponent;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.ColorComponent;
+import org.terasology.nui.Color;
 import org.terasology.registry.CoreRegistry;
-import org.terasology.rendering.nui.Color;
 import org.terasology.rendering.world.viewDistance.ViewDistance;
 import org.terasology.world.chunks.Chunk;
 

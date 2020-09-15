@@ -33,27 +33,29 @@ import org.terasology.module.DependencyResolver;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.module.ResolutionResult;
 import org.terasology.module.exceptions.UnresolvedDependencyException;
+import org.terasology.nui.properties.OneOfProviderFactory;
 import org.terasology.reflection.metadata.FieldMetadata;
+import org.terasology.reflection.reflect.ReflectFactory;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.TextureData;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.NUIManager;
-import org.terasology.rendering.nui.WidgetUtil;
+import org.terasology.nui.WidgetUtil;
 import org.terasology.rendering.nui.animation.MenuAnimationSystems;
-import org.terasology.rendering.nui.databinding.Binding;
+import org.terasology.nui.databinding.Binding;
 import org.terasology.rendering.nui.layers.mainMenu.preview.FacetLayerPreview;
 import org.terasology.rendering.nui.layers.mainMenu.preview.PreviewGenerator;
-import org.terasology.rendering.nui.layouts.PropertyLayout;
-import org.terasology.rendering.nui.properties.Property;
-import org.terasology.rendering.nui.properties.PropertyOrdering;
-import org.terasology.rendering.nui.properties.PropertyProvider;
-import org.terasology.rendering.nui.widgets.UIButton;
-import org.terasology.rendering.nui.widgets.UIDropdown;
-import org.terasology.rendering.nui.widgets.UIImage;
-import org.terasology.rendering.nui.widgets.UISlider;
-import org.terasology.rendering.nui.widgets.UIText;
+import org.terasology.nui.layouts.PropertyLayout;
+import org.terasology.nui.properties.Property;
+import org.terasology.nui.properties.PropertyOrdering;
+import org.terasology.nui.widgets.UIButton;
+import org.terasology.nui.widgets.UIDropdown;
+import org.terasology.nui.widgets.UIImage;
+import org.terasology.nui.widgets.UISlider;
+import org.terasology.nui.widgets.UIText;
+import org.terasology.nui.properties.PropertyProvider;
 import org.terasology.utilities.Assets;
 import org.terasology.world.generator.WorldConfigurator;
 import org.terasology.world.generator.WorldGenerator;
@@ -200,7 +202,7 @@ public class PreviewWorldScreen extends CoreScreenLayer {
 
         for (String label : params.keySet()) {
 
-            PropertyProvider provider = new PropertyProvider() {
+            PropertyProvider provider = new PropertyProvider(context.get(ReflectFactory.class), context.get(OneOfProviderFactory.class)) {
                 @Override
                 protected <T> Binding<T> createTextBinding(Object target, FieldMetadata<Object, T> fieldMetadata) {
                     return new WorldConfigBinding<>(worldConfig, label, compLib, fieldMetadata);

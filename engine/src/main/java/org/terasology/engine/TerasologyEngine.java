@@ -29,6 +29,7 @@ import org.terasology.context.Context;
 import org.terasology.context.internal.ContextImpl;
 import org.terasology.engine.bootstrap.EnvironmentSwitchHandler;
 import org.terasology.engine.modes.GameState;
+import org.terasology.engine.module.ExternalApiWhitelist;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.module.ModuleManagerImpl;
 import org.terasology.engine.paths.PathManager;
@@ -56,6 +57,10 @@ import org.terasology.logic.behavior.asset.BehaviorTreeData;
 import org.terasology.monitoring.Activity;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.network.NetworkSystem;
+import org.terasology.nui.asset.UIData;
+import org.terasology.nui.asset.UIElement;
+import org.terasology.nui.skin.UISkin;
+import org.terasology.nui.skin.UISkinData;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.recording.CharacterStateEventPositionMap;
 import org.terasology.recording.DirectionAndOriginPosRecorderList;
@@ -68,10 +73,6 @@ import org.terasology.reflection.reflect.ReflectionReflectFactory;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.gltf.ByteBufferAsset;
 import org.terasology.rendering.gltf.ByteBufferData;
-import org.terasology.rendering.nui.asset.UIData;
-import org.terasology.rendering.nui.asset.UIElement;
-import org.terasology.rendering.nui.skin.UISkin;
-import org.terasology.rendering.nui.skin.UISkinData;
 import org.terasology.version.TerasologyVersion;
 import org.terasology.world.block.loader.BlockFamilyDefinition;
 import org.terasology.world.block.loader.BlockFamilyDefinitionData;
@@ -92,6 +93,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -316,6 +318,8 @@ public class TerasologyEngine implements GameEngine {
 
         changeStatus(TerasologyEngineStatus.INITIALIZING_MODULE_MANAGER);
         TypeRegistry typeRegistry = new TypeRegistry();
+        TypeRegistry.WHITELISTED_CLASSES = ExternalApiWhitelist.CLASSES.stream().map(Class::getName).collect(Collectors.toSet());
+        TypeRegistry.WHITELISTED_PACKAGES = ExternalApiWhitelist.PACKAGES;
         rootContext.put(TypeRegistry.class, typeRegistry);
 
         ModuleManager moduleManager = new ModuleManagerImpl(rootContext.get(Config.class), classesOnClasspathsToAddToEngine);

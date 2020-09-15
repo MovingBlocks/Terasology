@@ -27,8 +27,8 @@ import org.terasology.network.events.SubscribePingEvent;
 import org.terasology.network.events.UnSubscribePingEvent;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
-import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
-import org.terasology.rendering.nui.widgets.UIText;
+import org.terasology.nui.databinding.ReadOnlyBinding;
+import org.terasology.nui.widgets.UIText;
 
 import java.util.Map;
 

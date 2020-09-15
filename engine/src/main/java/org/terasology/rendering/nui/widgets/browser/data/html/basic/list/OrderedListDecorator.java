@@ -15,11 +15,12 @@
  */
 package org.terasology.rendering.nui.widgets.browser.data.html.basic.list;
 
-import org.terasology.math.geom.Rect2i;
-import org.terasology.math.geom.Vector2i;
-import org.terasology.rendering.assets.font.Font;
-import org.terasology.rendering.nui.Canvas;
-import org.terasology.rendering.nui.HorizontalAlign;
+import org.joml.Rectanglei;
+import org.joml.Vector2i;
+import org.terasology.nui.Canvas;
+import org.terasology.nui.HorizontalAlign;
+import org.terasology.nui.asset.font.Font;
+import org.terasology.nui.util.RectUtility;
 import org.terasology.rendering.nui.widgets.browser.data.ParagraphData;
 import org.terasology.rendering.nui.widgets.browser.data.basic.flow.ContainerRenderSpace;
 import org.terasology.rendering.nui.widgets.browser.data.html.basic.DefaultParagraphData;
@@ -80,8 +81,8 @@ public class OrderedListDecorator implements ListDecorator {
 
         @Override
         public void renderContents(Canvas canvas, Vector2i startPos, ContainerRenderSpace containerRenderSpace,
-                int leftIndent, int rightIndent, ParagraphRenderStyle defaultStyle, HorizontalAlign horizontalAlign,
-                HyperlinkRegister hyperlinkRegister) {
+                                   int leftIndent, int rightIndent, ParagraphRenderStyle defaultStyle, HorizontalAlign horizontalAlign,
+                                   HyperlinkRegister hyperlinkRegister) {
             FallbackParagraphRenderStyle fallbackStyle = new FallbackParagraphRenderStyle(defaultStyle, paragraphData.getParagraphRenderStyle());
             Font font = fallbackStyle.getFont(false);
 
@@ -89,7 +90,8 @@ public class OrderedListDecorator implements ListDecorator {
 
             String text = (index + 1) + ".";
 
-            Rect2i bounds = Rect2i.createFromMinAndSize(startPos.x + leftIndent + advance, startPos.y, font.getWidth(text), font.getLineHeight());
+            Rectanglei bounds = RectUtility.createFromMinAndSize(
+                    startPos.x + leftIndent + advance, startPos.y, font.getWidth(text), font.getLineHeight());
             canvas.drawTextRaw(text, font, fallbackStyle.getColor(false), bounds);
 
             int maxIndent = getMaxIndent(font);

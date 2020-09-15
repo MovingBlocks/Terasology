@@ -23,7 +23,7 @@ import org.terasology.network.Client;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.ClientInfoComponent;
 import org.terasology.network.ColorComponent;
-import org.terasology.rendering.nui.Color;
+import org.terasology.nui.Color;
 
 import java.util.HashSet;
 import java.util.Set;

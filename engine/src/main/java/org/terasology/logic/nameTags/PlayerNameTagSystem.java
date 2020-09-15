@@ -30,8 +30,8 @@ import org.terasology.network.ClientComponent;
 import org.terasology.network.ClientInfoComponent;
 import org.terasology.network.ColorComponent;
 import org.terasology.network.NetworkSystem;
+import org.terasology.nui.Color;
 import org.terasology.registry.In;
-import org.terasology.rendering.nui.Color;
 
 
 /**

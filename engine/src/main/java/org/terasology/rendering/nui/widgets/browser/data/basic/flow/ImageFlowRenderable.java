@@ -15,18 +15,18 @@
  */
 package org.terasology.rendering.nui.widgets.browser.data.basic.flow;
 
-import org.terasology.math.geom.Rect2i;
-import org.terasology.rendering.assets.texture.TextureRegion;
-import org.terasology.rendering.nui.Canvas;
+import org.joml.Rectanglei;
+import org.terasology.nui.Canvas;
+import org.terasology.nui.UITextureRegion;
 import org.terasology.rendering.nui.widgets.browser.ui.style.TextRenderStyle;
 
 public class ImageFlowRenderable implements FlowRenderable<ImageFlowRenderable> {
-    private TextureRegion textureRegion;
+    private UITextureRegion textureRegion;
     private int imageWidth;
     private int imageHeight;
     private String hyperlink;
 
-    public ImageFlowRenderable(TextureRegion textureRegion, Integer width, Integer height, String hyperlink) {
+    public ImageFlowRenderable(UITextureRegion textureRegion, Integer width, Integer height, String hyperlink) {
         this.textureRegion = textureRegion;
         if (width != null && height != null) {
             this.imageWidth = width;
@@ -45,7 +45,7 @@ public class ImageFlowRenderable implements FlowRenderable<ImageFlowRenderable> 
     }
 
     @Override
-    public void render(Canvas canvas, Rect2i bounds, TextRenderStyle defaultRenderStyle) {
+    public void render(Canvas canvas, Rectanglei bounds, TextRenderStyle defaultRenderStyle) {
         canvas.drawTexture(textureRegion, bounds);
     }
 
