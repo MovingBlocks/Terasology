@@ -4,6 +4,8 @@
 package org.terasology.engine.math;
 
 import com.google.common.collect.Maps;
+import org.joml.Vector3fc;
+import org.joml.Vector3ic;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
@@ -12,6 +14,7 @@ import java.util.EnumMap;
 
 /**
  * An enumeration of the axis of the world from the player perspective. There is also
+ *
  */
 public enum Direction {
     UP(Vector3i.up(), new Vector3f(0, 1, 0)),
@@ -23,6 +26,9 @@ public enum Direction {
 
     private static final EnumMap<Direction, Direction> REVERSE_MAP;
     private static final EnumMap<Direction, Side> CONVERSION_MAP;
+
+    private final Vector3i vector3iDir;
+    private final Vector3f vector3fDir;
 
     static {
         REVERSE_MAP = new EnumMap<>(Direction.class);
@@ -40,9 +46,6 @@ public enum Direction {
         CONVERSION_MAP.put(LEFT, Side.RIGHT);
         CONVERSION_MAP.put(RIGHT, Side.LEFT);
     }
-
-    private final Vector3i vector3iDir;
-    private final Vector3f vector3fDir;
 
     Direction(Vector3i vector3i, Vector3f vector3f) {
         this.vector3iDir = vector3i;
@@ -62,6 +65,10 @@ public enum Direction {
 
     public static Direction inDirection(Vector3f dir) {
         return inDirection(dir.x, dir.y, dir.z);
+    }
+
+    public Side toSide() {
+        return CONVERSION_MAP.get(this);
     }
 
     /**
@@ -97,17 +104,40 @@ public enum Direction {
         return (z > 0) ? FORWARD : BACKWARD;
     }
 
-    public Side toSide() {
-        return CONVERSION_MAP.get(this);
+
+    /**
+     * readonly normalized {@link Vector3ic} in the given {@link Direction}
+     *
+     * @return vector pointing in the direction
+     */
+    public Vector3fc asVector3i() {
+        return JomlUtil.from(vector3fDir);
+    }
+
+
+    /**
+     * readonly normalized {@link Vector3fc} in the given {@link Direction}
+     *
+     * @return vector pointing in the direction
+     */
+    public Vector3ic asVector3f() {
+        return JomlUtil.from(vector3iDir);
     }
 
     /**
      * @return The vector3i in the direction of the side. Do not modify.
+     * @deprecated This is scheduled for removal in an upcoming version method will be replaced with JOML implementation
+     *         {@link #asVector3i()}.
      */
     public Vector3i getVector3i() {
         return new Vector3i(vector3iDir);
     }
 
+    /**
+     * @return
+     * @deprecated This is scheduled for removal in an upcoming version method will be replaced with JOML implementation
+     *         {@link #asVector3f()}
+     */
     public Vector3f getVector3f() {
         return new Vector3f(vector3fDir);
     }
