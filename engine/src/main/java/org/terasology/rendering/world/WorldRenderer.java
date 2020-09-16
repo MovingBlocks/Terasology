@@ -19,7 +19,6 @@ import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.module.sandbox.API;
 import org.terasology.rendering.assets.material.Material;
-import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.cameras.SubmersibleCamera;
 import org.terasology.rendering.dag.RenderGraph;
 import org.terasology.rendering.world.viewDistance.ViewDistance;
@@ -106,14 +105,6 @@ public interface WorldRenderer {
     SubmersibleCamera getActiveCamera();
 
     /**
-     * Retrieves the camera positioned and oriented to look down on the world from the point of view
-     * of the main light source. This camera is used to produce the shadow map.
-     *
-     * @return a Camera object
-     */
-    Camera getLightCamera();
-
-    /**
      * Called potentially multiple times per frame, this method allows the renderer to trigger the update
      * of any data it requires with a higher frequency than just once per frame.
      *
@@ -169,7 +160,7 @@ public interface WorldRenderer {
      * @return Returns True if all necessary chunks have been loaded and their meshes have been generated, False otherwise.
      */
     // TODO: it might be desirable to separate the loading of chunks and mesh generation. The former may concern
-    // TODO: systems dealing with beyond-the-horizon simulations. The latter usually only concerns the renderer.
+    //       systems dealing with beyond-the-horizon simulations. The latter usually only concerns the renderer.
     boolean pregenerateChunks();
 
     /**

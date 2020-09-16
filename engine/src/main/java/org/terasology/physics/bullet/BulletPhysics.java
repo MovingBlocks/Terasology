@@ -51,6 +51,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import gnu.trove.iterator.TFloatIterator;
+import org.joml.Vector3fc;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -300,7 +301,7 @@ public class BulletPhysics implements PhysicsEngine {
         RigidBodyComponent rb = entity.getComponent(RigidBodyComponent.class);
         BulletRigidBody rigidBody = entityRigidBodies.get(entity);
 
-        if (location == null) {
+        if (location == null || Float.isNaN(location.getWorldPosition().x)) {
             logger.warn("Updating rigid body of entity that has no "
                     + "LocationComponent?! Nothing is done, except log this"
                     + " warning instead. Entity: {}", entity);
@@ -365,7 +366,7 @@ public class BulletPhysics implements PhysicsEngine {
         LocationComponent location = entity.getComponent(LocationComponent.class);
         PairCachingGhostObject triggerObj = entityTriggers.get(entity);
 
-        if (location == null) {
+        if (location == null || Float.isNaN(location.getWorldPosition().x)) {
             logger.warn("Trying to update or create trigger of entity that has no LocationComponent?! Entity: {}", entity);
             return false;
         }
@@ -438,6 +439,15 @@ public class BulletPhysics implements PhysicsEngine {
     }
 
     @Override
+    public void awakenArea(Vector3fc pos, float radius) {
+        Vector3f min = new Vector3f(VecMath.to(pos));
+        min.sub(new Vector3f(0.6f, 0.6f, 0.6f));
+        Vector3f max = new Vector3f(VecMath.to(pos));
+        max.add(new Vector3f(0.6f, 0.6f, 0.6f));
+        discreteDynamicsWorld.awakenRigidBodiesInArea(min, max);
+    }
+
+    @Override
     public float getEpsilon() {
         return BulletGlobals.SIMD_EPSILON;
     }
@@ -453,7 +463,7 @@ public class BulletPhysics implements PhysicsEngine {
         LocationComponent location = entity.getComponent(LocationComponent.class);
         TriggerComponent trigger = entity.getComponent(TriggerComponent.class);
         ConvexShape shape = getShapeFor(entity);
-        if (shape != null && location != null && trigger != null) {
+        if (shape != null && location != null && trigger != null && !Float.isNaN(location.getWorldPosition().x)) {
             float scale = location.getWorldScale();
             shape.setLocalScaling(new Vector3f(scale, scale, scale));
             List<CollisionGroup> detectGroups = Lists.newArrayList(trigger.detectGroups);
@@ -508,7 +518,7 @@ public class BulletPhysics implements PhysicsEngine {
         LocationComponent location = entity.getComponent(LocationComponent.class);
         RigidBodyComponent rigidBody = entity.getComponent(RigidBodyComponent.class);
         ConvexShape shape = getShapeFor(entity);
-        if (location != null && rigidBody != null && shape != null) {
+        if (location != null && rigidBody != null && shape != null && !Float.isNaN(location.getWorldPosition().x)) {
             float scale = location.getWorldScale();
             shape.setLocalScaling(new Vector3f(scale, scale, scale));
 
@@ -673,7 +683,7 @@ public class BulletPhysics implements PhysicsEngine {
         }
         CharacterMovementComponent characterMovementComponent = entity.getComponent(CharacterMovementComponent.class);
         if (characterMovementComponent != null) {
-            return new CapsuleShape(characterMovementComponent.radius, characterMovementComponent.height);
+            return new CapsuleShape(characterMovementComponent.pickupRadius, characterMovementComponent.height - 2 * characterMovementComponent.radius);
         }
         logger.error("Creating physics object that requires a ShapeComponent or CharacterMovementComponent, but has neither. Entity: {}", entity);
         throw new IllegalArgumentException("Creating physics object that requires a ShapeComponent or CharacterMovementComponent, but has neither. Entity: " + entity);

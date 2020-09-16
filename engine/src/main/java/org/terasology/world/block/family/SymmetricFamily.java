@@ -23,7 +23,7 @@ import org.terasology.world.block.BlockUri;
 import org.terasology.world.block.loader.BlockFamilyDefinition;
 import org.terasology.world.block.shapes.BlockShape;
 
-import java.util.Arrays;
+import java.util.Collections;
 
 /**
  * The standard block family consisting of a single symmetrical block that doesn't have unique rotations.
@@ -52,6 +52,10 @@ public class SymmetricFamily extends AbstractBlockFamily {
         block = blockBuilder.constructSimpleBlock(definition, new BlockUri(definition.getUrn()), this);
     }
 
+    @Override
+    public Block getBlockForPlacement(BlockPlacementData data) {
+        return block;
+    }
 
     @Override
     public Block getBlockForPlacement(Vector3i location, Side attachmentSide, Side direction) {
@@ -74,6 +78,6 @@ public class SymmetricFamily extends AbstractBlockFamily {
 
     @Override
     public Iterable<Block> getBlocks() {
-        return Arrays.asList(block);
+        return Collections.singletonList(block);
     }
 }

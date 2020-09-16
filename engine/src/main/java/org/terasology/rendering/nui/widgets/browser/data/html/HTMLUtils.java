@@ -15,8 +15,8 @@
  */
 package org.terasology.rendering.nui.widgets.browser.data.html;
 
-import org.terasology.rendering.nui.Color;
-import org.terasology.rendering.nui.HorizontalAlign;
+import org.terasology.nui.Color;
+import org.terasology.nui.HorizontalAlign;
 import org.terasology.rendering.nui.widgets.browser.ui.style.ContainerInteger;
 import org.terasology.rendering.nui.widgets.browser.ui.style.FixedContainerInteger;
 import org.terasology.rendering.nui.widgets.browser.ui.style.ParagraphRenderStyle;

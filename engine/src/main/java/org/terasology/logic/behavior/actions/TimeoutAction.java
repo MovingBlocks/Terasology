@@ -22,7 +22,7 @@ import org.terasology.logic.behavior.core.Actor;
 import org.terasology.logic.behavior.core.BaseAction;
 import org.terasology.logic.behavior.core.BehaviorState;
 import org.terasology.module.sandbox.API;
-import org.terasology.rendering.nui.properties.Range;
+import org.terasology.nui.properties.Range;
 
 /**
  * Runs the child for a given time.

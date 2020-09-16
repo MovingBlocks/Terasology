@@ -18,37 +18,40 @@ package org.terasology.rendering.nui.layers.mainMenu.gameDetailsScreen;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.codehaus.plexus.util.StringUtils;
+import org.joml.Vector2i;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.context.Context;
+import org.terasology.engine.SimpleUri;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.i18n.TranslationSystem;
-import org.terasology.math.geom.Vector2i;
 import org.terasology.module.DependencyInfo;
 import org.terasology.module.Module;
 import org.terasology.module.ModuleMetadata;
 import org.terasology.naming.NameVersion;
+import org.terasology.nui.Canvas;
+import org.terasology.nui.databinding.Binding;
+import org.terasology.nui.databinding.ReadOnlyBinding;
+import org.terasology.nui.itemRendering.AbstractItemRenderer;
+import org.terasology.nui.widgets.UIButton;
+import org.terasology.nui.widgets.UIImage;
+import org.terasology.nui.widgets.UIImageSlideshow;
+import org.terasology.nui.widgets.UILabel;
+import org.terasology.nui.widgets.UIList;
+import org.terasology.nui.widgets.UITabBox;
+import org.terasology.nui.widgets.UIText;
 import org.terasology.registry.In;
-import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.animation.MenuAnimationSystems;
-import org.terasology.rendering.nui.databinding.Binding;
-import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
-import org.terasology.rendering.nui.itemRendering.AbstractItemRenderer;
 import org.terasology.rendering.nui.layers.mainMenu.MessagePopup;
 import org.terasology.rendering.nui.layers.mainMenu.SelectGameScreen;
 import org.terasology.rendering.nui.layers.mainMenu.moduleDetailsScreen.ModuleDetailsScreen;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameInfo;
-import org.terasology.rendering.nui.widgets.UIButton;
-import org.terasology.rendering.nui.widgets.UIImage;
-import org.terasology.rendering.nui.widgets.UIImageSlideshow;
-import org.terasology.rendering.nui.widgets.UILabel;
-import org.terasology.rendering.nui.widgets.UIList;
-import org.terasology.rendering.nui.widgets.UITabBox;
-import org.terasology.rendering.nui.widgets.UIText;
 import org.terasology.utilities.time.DateTimeHelper;
+import org.terasology.world.generator.internal.WorldGeneratorInfo;
+import org.terasology.world.generator.internal.WorldGeneratorManager;
 import org.terasology.world.internal.WorldInfo;
 
 import java.text.DateFormat;
@@ -78,6 +81,8 @@ public class GameDetailsScreen extends CoreScreenLayer {
     private List<String> errors;
     private Map<String, List<String>> blockFamilyIds;
 
+    @In
+    private WorldGeneratorManager worldGeneratorManager;
     @In
     private ModuleManager moduleManager;
     @In
@@ -239,7 +244,9 @@ public class GameDetailsScreen extends CoreScreenLayer {
             @Override
             public Vector2i getPreferredSize(WorldInfo value, Canvas canvas) {
                 String text = value.getCustomTitle();
-                return new Vector2i(canvas.getCurrentStyle().getFont().getWidth(text), canvas.getCurrentStyle().getFont().getLineHeight());
+                return new Vector2i(
+                        canvas.getCurrentStyle().getFont().getWidth(text),
+                        canvas.getCurrentStyle().getFont().getLineHeight());
             }
         });
     }
@@ -253,7 +260,7 @@ public class GameDetailsScreen extends CoreScreenLayer {
         }
         return translationSystem.translate("${engine:menu#game-details-game-title} ") + gameTitle + '\n' + '\n' +
                 translationSystem.translate("${engine:menu#game-details-game-seed} ") + worldInfo.getSeed() + '\n' + '\n' +
-                translationSystem.translate("${engine:menu#game-details-world-generator}: ") + worldInfo.getWorldGenerator().toString() + '\n' + '\n' +
+                translationSystem.translate("${engine:menu#game-details-world-generator}: ") + worldGeneratorManager.getWorldGeneratorInfo(worldInfo.getWorldGenerator()).getDisplayName() + '\n' + '\n' +
                 translationSystem.translate("${engine:menu#game-details-game-duration} ")
                 + DateTimeHelper.getDeltaBetweenTimestamps(new Date(0).getTime(), worldInfo.getTime());
     }
@@ -330,7 +337,8 @@ public class GameDetailsScreen extends CoreScreenLayer {
             @Override
             public Vector2i getPreferredSize(ModuleSelectionInfo value, Canvas canvas) {
                 String text = getString(value);
-                return new Vector2i(canvas.getCurrentStyle().getFont().getWidth(text),
+                return new Vector2i(
+                        canvas.getCurrentStyle().getFont().getWidth(text),
                         canvas.getCurrentStyle().getFont().getLineHeight());
             }
         });
@@ -392,13 +400,19 @@ public class GameDetailsScreen extends CoreScreenLayer {
     }
 
     private String getGeneralInfo(final GameInfo theGameInfo) {
+        SimpleUri name = theGameInfo.getManifest().getWorldInfo(TerasologyConstants.MAIN_WORLD).getWorldGenerator();
+        WorldGeneratorInfo wgi = worldGeneratorManager.getWorldGeneratorInfo(name);
+        String display = "ERROR: generator " + name + " not found.";
+        if (wgi != null) {
+            display = wgi.getDisplayName();
+        }
         return translationSystem.translate("${engine:menu#game-details-game-title} ") + theGameInfo.getManifest().getTitle() + '\n' + '\n' +
                 translationSystem.translate("${engine:menu#game-details-last-play}: ") + DATE_FORMAT.format(theGameInfo.getTimestamp()) + '\n' + '\n' +
                 translationSystem.translate("${engine:menu#game-details-game-duration} ") + DateTimeHelper
                 .getDeltaBetweenTimestamps(new Date(0).getTime(), theGameInfo.getManifest().getTime()) + '\n' + '\n' +
                 translationSystem.translate("${engine:menu#game-details-game-seed} ") + theGameInfo.getManifest().getSeed() + '\n' + '\n' +
                 translationSystem.translate("${engine:menu#game-details-world-generator}: ") + '\t'
-                + theGameInfo.getManifest().getWorldInfo(TerasologyConstants.MAIN_WORLD).getWorldGenerator().getObjectName().toString();
+                + display;
     }
 
     private void loadGameWorlds() {

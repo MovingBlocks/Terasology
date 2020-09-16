@@ -28,15 +28,16 @@ import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.RenderSystem;
 import org.terasology.logic.location.LocationComponent;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Vector3f;
+import org.terasology.nui.Color;
+import org.terasology.nui.HorizontalAlign;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.font.Font;
 import org.terasology.rendering.assets.font.FontMeshBuilder;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.rendering.cameras.Camera;
-import org.terasology.rendering.nui.Color;
-import org.terasology.rendering.nui.HorizontalAlign;
 import org.terasology.rendering.opengl.OpenGLUtils;
 import org.terasology.world.WorldProvider;
 
@@ -82,11 +83,11 @@ public class FloatingTextRenderer extends BaseComponentSystem implements RenderS
     }
 
     private void render(Iterable<EntityRef> floatingTextEntities) {
-        Vector3f cameraPosition = camera.getPosition();
+        Vector3f cameraPosition = JomlUtil.from(camera.getPosition());
 
         for (EntityRef entity : floatingTextEntities) {
             LocationComponent location = entity.getComponent(LocationComponent.class);
-            if (location == null) {
+            if (location == null || Float.isNaN(location.getWorldPosition().x)) {
                 continue;
             }
 

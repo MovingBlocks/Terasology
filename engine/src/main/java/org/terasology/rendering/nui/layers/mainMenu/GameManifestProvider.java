@@ -58,7 +58,7 @@ public class GameManifestProvider {
     public static GameManifest createGameManifest(final UniverseWrapper universeWrapper, final ModuleManager moduleManager, final Config config) {
         GameManifest gameManifest = new GameManifest();
         if (StringUtils.isNotBlank(universeWrapper.getGameName())) {
-            gameManifest.setTitle(universeWrapper.getGameName());
+            gameManifest.setTitle(GameProvider.getNextGameName(universeWrapper.getGameName()));
         } else {
             gameManifest.setTitle(GameProvider.getNextGameName());
         }
@@ -79,11 +79,12 @@ public class GameManifestProvider {
         if (universeWrapper.getTargetWorld() != null) {
             uri = universeWrapper.getTargetWorld().getWorldGenerator().getUri();
             seed = universeWrapper.getTargetWorld().getWorldGenerator().getWorldSeed();
-            gameManifest.setSeed(seed);
         } else {
             uri = config.getWorldGeneration().getDefaultGenerator();
             seed = universeWrapper.getSeed();
         }
+        gameManifest.setSeed(seed);
+
         String targetWorldName = "";
         if (universeWrapper.getTargetWorld() != null) {
             targetWorldName = universeWrapper.getTargetWorld().getWorldName().toString();

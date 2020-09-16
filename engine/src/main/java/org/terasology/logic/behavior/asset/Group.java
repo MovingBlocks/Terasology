@@ -19,7 +19,6 @@ import org.terasology.assets.Asset;
 import org.terasology.assets.AssetType;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.module.annotations.RegisterAssetType;
-import org.terasology.module.sandbox.API;
 
 /**
  * The main Group asset class. This is the reference type

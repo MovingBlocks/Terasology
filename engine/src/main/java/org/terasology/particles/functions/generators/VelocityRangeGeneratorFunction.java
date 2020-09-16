@@ -18,22 +18,25 @@ package org.terasology.particles.functions.generators;
 import org.terasology.particles.ParticleData;
 import org.terasology.particles.ParticleDataMask;
 import org.terasology.particles.components.generators.VelocityRangeGeneratorComponent;
+import org.terasology.particles.functions.RegisterParticleSystemFunction;
 import org.terasology.utilities.random.Random;
 
 /**
  * Created by Linus on 11-3-2015.
  */
+@RegisterParticleSystemFunction()
 public final class VelocityRangeGeneratorFunction extends GeneratorFunction<VelocityRangeGeneratorComponent> {
     public VelocityRangeGeneratorFunction() {
-        super(VelocityRangeGeneratorComponent.class, ParticleDataMask.VELOCITY);
+        super(ParticleDataMask.VELOCITY);
     }
 
     @Override
     public void onEmission(final VelocityRangeGeneratorComponent component,
                            final ParticleData particleData,
                            final Random random) {
-        particleData.velocity.setX(random.nextFloat(component.minVelocity.x(), component.maxVelocity.x()));
-        particleData.velocity.setY(random.nextFloat(component.minVelocity.y(), component.maxVelocity.y()));
-        particleData.velocity.setZ(random.nextFloat(component.minVelocity.z(), component.maxVelocity.z()));
+        particleData.velocity.set(
+            random.nextFloat(component.minVelocity.x(), component.maxVelocity.x()),
+            random.nextFloat(component.minVelocity.y(), component.maxVelocity.y()),
+            random.nextFloat(component.minVelocity.z(), component.maxVelocity.z()));
     }
 }

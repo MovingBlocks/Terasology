@@ -15,8 +15,7 @@
  */
 package org.terasology.world.block.items;
 
-import org.terasology.telemetry.GamePlayStatsComponent;
-import org.terasology.utilities.Assets;
+import org.joml.Vector2f;
 import org.terasology.audio.AudioManager;
 import org.terasology.audio.events.PlaySoundEvent;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -28,7 +27,7 @@ import org.terasology.logic.characters.KinematicCharacterMover;
 import org.terasology.logic.common.ActivateEvent;
 import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.math.AABB;
-import org.terasology.math.ChunkMath;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.Side;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
@@ -37,12 +36,15 @@ import org.terasology.physics.Physics;
 import org.terasology.physics.StandardCollisionGroup;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
+import org.terasology.telemetry.GamePlayStatsComponent;
+import org.terasology.utilities.Assets;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockComponent;
 import org.terasology.world.block.entity.placement.PlaceBlocks;
 import org.terasology.world.block.family.BlockFamily;
+import org.terasology.world.block.family.BlockPlacementData;
 
 import java.util.Map;
 
@@ -76,9 +78,8 @@ public class BlockItemSystem extends BaseComponentSystem {
         }
 
         BlockItemComponent blockItem = item.getComponent(BlockItemComponent.class);
-        BlockFamily type = blockItem.blockFamily;
+        BlockFamily blockFamily = blockItem.blockFamily;
         Side surfaceSide = Side.inDirection(event.getHitNormal());
-        Side secondaryDirection = ChunkMath.getSecondaryPlacementDirection(event.getDirection(), event.getHitNormal());
 
         BlockComponent blockComponent = event.getTarget().getComponent(BlockComponent.class);
         if (blockComponent == null) {
@@ -90,7 +91,10 @@ public class BlockItemSystem extends BaseComponentSystem {
         Vector3i placementPos = new Vector3i(targetBlock);
         placementPos.add(surfaceSide.getVector3i());
 
-        Block block = type.getBlockForPlacement(placementPos, surfaceSide, secondaryDirection);
+        Vector2f relativeAttachmentPosition = getRelativeAttachmentPosition(event);
+        Block block = blockFamily.getBlockForPlacement(new BlockPlacementData(
+                JomlUtil.from(placementPos), surfaceSide, JomlUtil.from(event.getDirection()), relativeAttachmentPosition
+        ));
 
         if (canPlaceBlock(block, targetBlock, placementPos)) {
             // TODO: Fix this for changes.
@@ -103,10 +107,42 @@ public class BlockItemSystem extends BaseComponentSystem {
                     event.consume();
                 }
             }
-            recordBlockPlaced(event, type);
+            recordBlockPlaced(event, blockFamily);
             event.getInstigator().send(new PlaySoundEvent(Assets.getSound("engine:PlaceBlock").get(), 0.5f));
         } else {
             event.consume();
+        }
+    }
+
+    private Vector2f getRelativeAttachmentPosition(ActivateEvent event) {
+        Vector3f targetPosition = event.getTargetLocation();
+        if (event.getHitPosition() != null && targetPosition != null) {
+            return getSideHitPosition(event.getHitPosition(), targetPosition);
+        } else {
+            return new Vector2f();
+        }
+    }
+
+    /**
+     * Returns the position at which the block side was hit, relative to the side.
+     * <p/>
+     * The specified hit position is expected to be on the surface of the cubic block at the specified position.
+     * Example: The front side was hit right in the center.
+     * The result will be (0.5, 0.5), representing the relative hit position on the side's surface.
+     * @param hitPosition the hit position
+     * @param blockPosition the block position relative to its center (block (0, 0, 0) has block position (0.5, 0.5, 0.5))
+     * @return the 2D hit position relative to the side that was hit
+     */
+    private Vector2f getSideHitPosition(Vector3f hitPosition, Vector3f blockPosition) {
+        float epsilon = 0.0001f;
+        Vector3f relativeHitPosition = new Vector3f(hitPosition).sub(blockPosition);
+
+        if (Math.abs(relativeHitPosition.x) > 0.5f - epsilon) {
+            return new Vector2f(relativeHitPosition.z, relativeHitPosition.y).add(0.5f, 0.5f);
+        } else if (Math.abs(relativeHitPosition.y) > 0.5f - epsilon) {
+            return new Vector2f(relativeHitPosition.x, relativeHitPosition.z).add(0.5f, 0.5f);
+        } else {
+            return new Vector2f(relativeHitPosition.x, relativeHitPosition.y).add(0.5f, 0.5f);
         }
     }
 
@@ -171,7 +207,6 @@ public class BlockItemSystem extends BaseComponentSystem {
             /*
              * Calculations aren't exact and in the corner cases it is better to let the user place the block.
              */
-            float additionalAllowedPenetration = 0.04f; // ignore small rounding mistakes
             min.add(ADDITIONAL_ALLOWED_PENETRATION, ADDITIONAL_ALLOWED_PENETRATION, ADDITIONAL_ALLOWED_PENETRATION);
             max.sub(ADDITIONAL_ALLOWED_PENETRATION, ADDITIONAL_ALLOWED_PENETRATION, ADDITIONAL_ALLOWED_PENETRATION);
 

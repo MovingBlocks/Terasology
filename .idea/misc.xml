@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="EntryPointsManager">
+    <list size="4">
+      <item index="0" class="java.lang.String" itemvalue="org.terasology.entitySystem.event.ReceiveEvent" />
+      <item index="1" class="java.lang.String" itemvalue="org.terasology.entitySystem.systems.RegisterSystem" />
+      <item index="2" class="java.lang.String" itemvalue="org.terasology.logic.console.commandSystem.annotations.Command" />
+      <item index="3" class="java.lang.String" itemvalue="org.terasology.registry.In" />
+    </list>
+    <writeAnnotations>
+      <writeAnnotation name="org.terasology.registry.In" />
+    </writeAnnotations>
+  </component>
+  <component name="ExternalStorageConfigurationManager" enabled="true" />
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_8" default="true" project-jdk-name="11" project-jdk-type="JavaSDK" />
+</project>

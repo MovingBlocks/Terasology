@@ -49,6 +49,7 @@ import org.terasology.network.ColorComponent;
 import org.terasology.network.NetMetricSource;
 import org.terasology.network.NetworkComponent;
 import org.terasology.network.serialization.ServerComponentFieldCheck;
+import org.terasology.nui.Color;
 import org.terasology.persistence.serializers.EventSerializer;
 import org.terasology.persistence.serializers.NetworkEntitySerializer;
 import org.terasology.persistence.typeHandling.DeserializationException;
@@ -56,7 +57,6 @@ import org.terasology.persistence.typeHandling.SerializationException;
 import org.terasology.protobuf.EntityData;
 import org.terasology.protobuf.NetData;
 import org.terasology.registry.CoreRegistry;
-import org.terasology.rendering.nui.Color;
 import org.terasology.rendering.world.viewDistance.ViewDistance;
 import org.terasology.world.WorldChangeListener;
 import org.terasology.world.WorldProvider;
@@ -251,7 +251,7 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
                 chunkSendCounter -= 1.0f;
                 Vector3i center = new Vector3i();
                 LocationComponent loc = getEntity().getComponent(ClientComponent.class).character.getComponent(LocationComponent.class);
-                if (loc != null) {
+                if (loc != null&& !Float.isNaN(loc.getWorldPosition().x)) {
                     center.set(ChunkMath.calcChunkPos(new Vector3i(loc.getWorldPosition(), RoundingMode.HALF_UP)));
                 }
                 Vector3i pos = null;

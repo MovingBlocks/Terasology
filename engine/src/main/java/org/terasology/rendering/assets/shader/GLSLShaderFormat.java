@@ -44,6 +44,7 @@ import java.util.List;
 public class GLSLShaderFormat implements AssetFileFormat<ShaderData> {
     public static final String FRAGMENT_SUFFIX = "_frag.glsl";
     public static final String VERTEX_SUFFIX = "_vert.glsl";
+    public static final String GEOMETRY_SUFFIX = "_geom.glsl";
     public static final String METADATA_SUFFIX = ".info";
     private Gson gson;
 
@@ -57,7 +58,10 @@ public class GLSLShaderFormat implements AssetFileFormat<ShaderData> {
     public PathMatcher getFileMatcher() {
         return path -> {
             String name = path.getFileName().toString();
-            return name.endsWith(FRAGMENT_SUFFIX) || path.getFileName().toString().endsWith(VERTEX_SUFFIX) || path.getFileName().toString().endsWith(METADATA_SUFFIX);
+            return name.endsWith(FRAGMENT_SUFFIX)
+                    || name.endsWith(VERTEX_SUFFIX)
+                    || name.endsWith(GEOMETRY_SUFFIX)
+                    || name.endsWith(METADATA_SUFFIX);
         };
     }
 
@@ -74,19 +78,24 @@ public class GLSLShaderFormat implements AssetFileFormat<ShaderData> {
     public ShaderData load(ResourceUrn urn, List<AssetDataFile> inputs) throws IOException {
         String vertProgram = null;
         String fragProgram = null;
+        String geomProgram = null;
         ShaderMetadata metadata = new ShaderMetadata();
 
         for (AssetDataFile input : inputs) {
-            if (input.getFilename().endsWith(VERTEX_SUFFIX)) {
+            String fileName = input.getFilename();
+
+            if (fileName.endsWith(VERTEX_SUFFIX)) {
                 vertProgram = readInput(input);
-            } else if (input.getFilename().endsWith(FRAGMENT_SUFFIX)) {
+            } else if (fileName.endsWith(FRAGMENT_SUFFIX)) {
                 fragProgram = readInput(input);
+            } else if (fileName.endsWith(GEOMETRY_SUFFIX)) {
+                geomProgram = readInput(input);
             } else {
                 metadata = readMetadata(input);
             }
         }
         if (vertProgram != null && fragProgram != null) {
-            return new ShaderData(vertProgram, fragProgram, metadata.getParameters());
+            return new ShaderData(vertProgram, fragProgram, geomProgram, metadata.getParameters());
         }
         throw new IOException("Failed to load shader '" + urn + "' - missing vertex or fragment program");
     }

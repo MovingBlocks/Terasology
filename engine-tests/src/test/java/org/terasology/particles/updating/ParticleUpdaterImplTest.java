@@ -15,26 +15,22 @@
  */
 package org.terasology.particles.updating;
 
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.terasology.engine.module.ModuleManager;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.particles.components.ParticleEmitterComponent;
 import org.terasology.particles.components.affectors.VelocityAffectorComponent;
 import org.terasology.particles.components.generators.EnergyRangeGeneratorComponent;
-import org.terasology.particles.functions.affectors.AffectorFunction;
-import org.terasology.particles.functions.affectors.VelocityAffectorFunction;
-import org.terasology.particles.functions.generators.EnergyRangeGeneratorFunction;
-import org.terasology.particles.functions.generators.GeneratorFunction;
 import org.terasology.physics.Physics;
 import org.terasology.physics.engine.PhysicsEngine;
 
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
+
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -45,30 +41,28 @@ import static org.mockito.Mockito.when;
 public class ParticleUpdaterImplTest {
 
     private ParticleUpdater particleUpdater;
-    private BiMap<Class<Component>, GeneratorFunction> registeredGeneratorFunctions;
-    private BiMap<Class<Component>, AffectorFunction> registeredAffectorFunctions;
 
     @BeforeEach
     public void setUp() throws Exception {
         Physics physics = mock(PhysicsEngine.class);
-        particleUpdater = new ParticleUpdaterImpl(physics);
-        registeredGeneratorFunctions = HashBiMap.create();
-        registeredAffectorFunctions = HashBiMap.create();
+        ModuleManager moduleManager = mock(ModuleManager.class);
+        particleUpdater = new ParticleUpdaterImpl(physics, moduleManager);
     }
 
     @Test
     public void testNullEmitterRegistration() {
-        Assertions.assertThrows(IllegalArgumentException.class,
-                () -> particleUpdater.register(null));
+        Assertions.assertThrows(IllegalArgumentException.class,() -> {
+            particleUpdater.addEmitter(null);
+        });
     }
 
     @Test
     public void testNonEmitterRegistration() {
         EntityRef emitterEntity = mock(EntityRef.class);
         when(emitterEntity.getComponent(ParticleEmitterComponent.class)).thenReturn(null);
-
-        Assertions.assertThrows(IllegalArgumentException.class,
-                ()-> particleUpdater.register(emitterEntity));
+        Assertions.assertThrows(IllegalArgumentException.class,() -> {
+            particleUpdater.addEmitter(emitterEntity);
+        });
     }
 
     @Test
@@ -76,19 +70,13 @@ public class ParticleUpdaterImplTest {
         EntityRef emitterEntity = mock(EntityRef.class);
         when(emitterEntity.getComponent(ParticleEmitterComponent.class)).thenReturn(new ParticleEmitterComponent());
 
-        particleUpdater.register(emitterEntity);
+        particleUpdater.addEmitter(emitterEntity);
     }
 
     private Iterator<Component> getTestGeneratorsAndAffectors() {
         Collection<Component> components = new LinkedList<>();
         components.add(new EnergyRangeGeneratorComponent(0.5f, 1f));
         components.add(new VelocityAffectorComponent());
-
-        EnergyRangeGeneratorFunction energyRangeGeneratorFunction = new EnergyRangeGeneratorFunction();
-        registeredGeneratorFunctions.put(((GeneratorFunction) energyRangeGeneratorFunction).getComponentClass(), energyRangeGeneratorFunction);
-
-        VelocityAffectorFunction velocityAffectorFunction = new VelocityAffectorFunction();
-        registeredAffectorFunctions.put(((AffectorFunction) velocityAffectorFunction).getComponentClass(), velocityAffectorFunction);
 
         return components.iterator();
     }
@@ -103,14 +91,14 @@ public class ParticleUpdaterImplTest {
         particleEmitterComponent.ownerEntity = emitterEntity;
         when(emitterEntity.getComponent(ParticleEmitterComponent.class)).thenReturn(particleEmitterComponent);
 
-        particleUpdater.register(emitterEntity);
-        particleUpdater.configureEmitter(particleEmitterComponent, registeredAffectorFunctions, registeredGeneratorFunctions);
+        particleUpdater.addEmitter(emitterEntity);
+        particleUpdater.configureEmitter(particleEmitterComponent);
 
         for (Component component : (Iterable<Component>) () -> componentIterator) {
-            if (registeredGeneratorFunctions.containsKey(component.getClass())) {
+            if (component.getClass() == EnergyRangeGeneratorComponent.class) {
                 assertTrue(particleEmitterComponent.generatorFunctionMap.containsKey(component));
-            } else if (registeredGeneratorFunctions.containsKey(component.getClass())) {
-                assertTrue(particleEmitterComponent.generatorFunctionMap.containsKey(component));
+            } else if (component.getClass() == VelocityAffectorComponent.class) {
+                assertTrue(particleEmitterComponent.affectorFunctionMap.containsKey(component));
             }
         }
     }

@@ -32,7 +32,7 @@ import java.security.PrivilegedExceptionAction;
  */
 public class OggStreamingSoundData implements StreamingSoundData {
 
-    private static Logger logger = LoggerFactory.getLogger(OggStreamingSoundData.class);
+    private static final Logger logger = LoggerFactory.getLogger(OggStreamingSoundData.class);
 
     private final AssetDataFile stream;
     private OggReader reader;

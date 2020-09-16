@@ -26,8 +26,8 @@ import org.terasology.logic.console.commandSystem.annotations.Command;
 import org.terasology.logic.console.commandSystem.annotations.CommandParam;
 import org.terasology.logic.console.commandSystem.annotations.Sender;
 import org.terasology.network.ColorComponent;
+import org.terasology.nui.Color;
 import org.terasology.registry.In;
-import org.terasology.rendering.nui.Color;
 import org.terasology.world.internal.WorldInfo;
 
 import java.util.Map;
@@ -45,7 +45,6 @@ public class WorldCommands extends BaseComponentSystem {
         int worldCount = entityManager.getWorldPools().size();
         StringBuilder message = new StringBuilder();
         message.append("Number of worlds is " + worldCount + "\n");
-        Map<EngineEntityPool, Long> poolCounts = entityManager.getPoolCounts();
         for (Map.Entry<WorldInfo, EngineEntityPool> entry : entityManager.getWorldPoolsMap().entrySet()) {
             message.append("Pool for " + entry.getKey().getTitle() + " has " + entry.getValue().getActiveEntityCount() + " entities \n");
         }

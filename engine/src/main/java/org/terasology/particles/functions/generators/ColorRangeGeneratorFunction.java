@@ -18,15 +18,17 @@ package org.terasology.particles.functions.generators;
 import org.terasology.particles.ParticleData;
 import org.terasology.particles.ParticleDataMask;
 import org.terasology.particles.components.generators.ColorRangeGeneratorComponent;
+import org.terasology.particles.functions.RegisterParticleSystemFunction;
 import org.terasology.utilities.random.Random;
 
 /**
  * Created by Linus on 11-3-2015.
  */
+@RegisterParticleSystemFunction()
 public final class ColorRangeGeneratorFunction extends GeneratorFunction<ColorRangeGeneratorComponent> {
 
     public ColorRangeGeneratorFunction() {
-        super(ColorRangeGeneratorComponent.class, ParticleDataMask.COLOR);
+        super(ParticleDataMask.COLOR);
     }
 
     @Override
@@ -34,9 +36,9 @@ public final class ColorRangeGeneratorFunction extends GeneratorFunction<ColorRa
                            final ParticleData particleData,
                            final Random random
     ) {
-        particleData.color.setX(random.nextFloat(component.minColorComponents.x(), component.maxColorComponents.x()));
-        particleData.color.setY(random.nextFloat(component.minColorComponents.y(), component.maxColorComponents.y()));
-        particleData.color.setZ(random.nextFloat(component.minColorComponents.z(), component.maxColorComponents.z()));
-        particleData.color.setW(random.nextFloat(component.minColorComponents.w(), component.maxColorComponents.w()));
+        particleData.color.set(random.nextFloat(component.minColorComponents.x(), component.maxColorComponents.x()),
+            random.nextFloat(component.minColorComponents.y(), component.maxColorComponents.y()),
+            random.nextFloat(component.minColorComponents.z(), component.maxColorComponents.z()),
+            random.nextFloat(component.minColorComponents.w(), component.maxColorComponents.w()));
     }
 }

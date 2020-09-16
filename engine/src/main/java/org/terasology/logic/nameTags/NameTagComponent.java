@@ -17,7 +17,8 @@ package org.terasology.logic.nameTags;
 
 import org.terasology.entitySystem.Component;
 import org.terasology.module.sandbox.API;
-import org.terasology.rendering.nui.Color;
+import org.terasology.network.Replicate;
+import org.terasology.nui.Color;
 
 /**
  * Will make the entity have a name tag overhead in the 3D view.
@@ -29,11 +30,15 @@ import org.terasology.rendering.nui.Color;
 @API
 public class NameTagComponent implements Component {
 
+    @Replicate
     public float yOffset = 0.3f;
 
+    @Replicate
     public String text;
 
+    @Replicate
     public Color textColor = Color.WHITE;
 
+    @Replicate
     public float scale = 1f;
 }

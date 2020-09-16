@@ -19,6 +19,7 @@ package org.terasology.engine.modes.loadProcesses;
 import org.terasology.config.Config;
 import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
+import org.terasology.engine.modes.SingleStepLoadProcess;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;

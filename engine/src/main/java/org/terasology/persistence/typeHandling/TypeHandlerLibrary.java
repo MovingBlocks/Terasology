@@ -18,6 +18,7 @@ package org.terasology.persistence.typeHandling;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.joml.Quaternionf;
 import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,6 +32,8 @@ import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.math.geom.Vector4f;
 import org.terasology.naming.Name;
+import org.terasology.nui.Color;
+import org.terasology.nui.UITextureRegion;
 import org.terasology.persistence.typeHandling.coreTypes.BooleanTypeHandler;
 import org.terasology.persistence.typeHandling.coreTypes.ByteArrayTypeHandler;
 import org.terasology.persistence.typeHandling.coreTypes.ByteTypeHandler;
@@ -51,10 +54,12 @@ import org.terasology.persistence.typeHandling.extensionTypes.ColorTypeHandler;
 import org.terasology.persistence.typeHandling.extensionTypes.NameTypeHandler;
 import org.terasology.persistence.typeHandling.extensionTypes.PrefabTypeHandler;
 import org.terasology.persistence.typeHandling.extensionTypes.TextureRegionTypeHandler;
+import org.terasology.persistence.typeHandling.extensionTypes.UITextureRegionTypeHandler;
 import org.terasology.persistence.typeHandling.extensionTypes.factories.AssetTypeHandlerFactory;
+import org.terasology.persistence.typeHandling.extensionTypes.factories.ComponentClassTypeHandlerFactory;
 import org.terasology.persistence.typeHandling.extensionTypes.factories.TextureRegionAssetTypeHandlerFactory;
 import org.terasology.persistence.typeHandling.mathTypes.IntegerRangeHandler;
-import org.terasology.persistence.typeHandling.mathTypes.Quat4fTypeHandler;
+import org.terasology.persistence.typeHandling.mathTypes.QuaternionfTypeHandler;
 import org.terasology.persistence.typeHandling.mathTypes.Vector2fTypeHandler;
 import org.terasology.persistence.typeHandling.mathTypes.Vector2iTypeHandler;
 import org.terasology.persistence.typeHandling.mathTypes.Vector3fTypeHandler;
@@ -62,6 +67,12 @@ import org.terasology.persistence.typeHandling.mathTypes.Vector3iTypeHandler;
 import org.terasology.persistence.typeHandling.mathTypes.Vector4fTypeHandler;
 import org.terasology.persistence.typeHandling.mathTypes.factories.Rect2fTypeHandlerFactory;
 import org.terasology.persistence.typeHandling.mathTypes.factories.Rect2iTypeHandlerFactory;
+import org.terasology.persistence.typeHandling.mathTypes.legacy.LegacyQuat4fTypeHandler;
+import org.terasology.persistence.typeHandling.mathTypes.legacy.LegacyVector2fTypeHandler;
+import org.terasology.persistence.typeHandling.mathTypes.legacy.LegacyVector2iTypeHandler;
+import org.terasology.persistence.typeHandling.mathTypes.legacy.LegacyVector3fTypeHandler;
+import org.terasology.persistence.typeHandling.mathTypes.legacy.LegacyVector3iTypeHandler;
+import org.terasology.persistence.typeHandling.mathTypes.legacy.LegacyVector4fTypeHandler;
 import org.terasology.persistence.typeHandling.reflection.ModuleEnvironmentSandbox;
 import org.terasology.persistence.typeHandling.reflection.ReflectionsSandbox;
 import org.terasology.persistence.typeHandling.reflection.SerializationSandbox;
@@ -71,7 +82,6 @@ import org.terasology.reflection.metadata.ClassMetadata;
 import org.terasology.reflection.metadata.FieldMetadata;
 import org.terasology.reflection.reflect.ConstructorLibrary;
 import org.terasology.rendering.assets.texture.TextureRegion;
-import org.terasology.rendering.nui.Color;
 
 import java.lang.reflect.Type;
 import java.util.HashMap;
@@ -138,6 +148,7 @@ public class TypeHandlerLibrary {
         addTypeHandlerFactory(new CollectionTypeHandlerFactory(constructorLibrary));
         addTypeHandlerFactory(new StringMapTypeHandlerFactory());
 
+        addTypeHandlerFactory(new ComponentClassTypeHandlerFactory());
     }
 
     /**
@@ -181,20 +192,29 @@ public class TypeHandlerLibrary {
 
     private static void populateWithDefaultHandlers(TypeHandlerLibrary serializationLibrary) {
         serializationLibrary.addTypeHandler(Color.class, new ColorTypeHandler());
-        serializationLibrary.addTypeHandler(Quat4f.class, new Quat4fTypeHandler());
+        serializationLibrary.addTypeHandler(Quat4f.class, new LegacyQuat4fTypeHandler());
+        serializationLibrary.addTypeHandler(Quaternionf.class, new QuaternionfTypeHandler());
 
         serializationLibrary.addTypeHandlerFactory(new AssetTypeHandlerFactory());
 
         serializationLibrary.addTypeHandler(Name.class, new NameTypeHandler());
         serializationLibrary.addTypeHandler(TextureRegion.class, new TextureRegionTypeHandler());
+        serializationLibrary.addTypeHandler(UITextureRegion.class, new UITextureRegionTypeHandler());
 
         serializationLibrary.addTypeHandlerFactory(new TextureRegionAssetTypeHandlerFactory());
 
-        serializationLibrary.addTypeHandler(Vector4f.class, new Vector4fTypeHandler());
-        serializationLibrary.addTypeHandler(Vector3f.class, new Vector3fTypeHandler());
-        serializationLibrary.addTypeHandler(Vector2f.class, new Vector2fTypeHandler());
-        serializationLibrary.addTypeHandler(Vector3i.class, new Vector3iTypeHandler());
-        serializationLibrary.addTypeHandler(Vector2i.class, new Vector2iTypeHandler());
+        serializationLibrary.addTypeHandler(Vector4f.class, new LegacyVector4fTypeHandler());
+        serializationLibrary.addTypeHandler(Vector3f.class, new LegacyVector3fTypeHandler());
+        serializationLibrary.addTypeHandler(Vector2f.class, new LegacyVector2fTypeHandler());
+        serializationLibrary.addTypeHandler(Vector3i.class, new LegacyVector3iTypeHandler());
+        serializationLibrary.addTypeHandler(Vector2i.class, new LegacyVector2iTypeHandler());
+
+        serializationLibrary.addTypeHandler(org.joml.Vector4f.class, new Vector4fTypeHandler());
+        serializationLibrary.addTypeHandler(org.joml.Vector3f.class, new Vector3fTypeHandler());
+        serializationLibrary.addTypeHandler(org.joml.Vector2f.class, new Vector2fTypeHandler());
+        serializationLibrary.addTypeHandler(org.joml.Vector3i.class, new Vector3iTypeHandler());
+        serializationLibrary.addTypeHandler(org.joml.Vector2i.class, new Vector2iTypeHandler());
+
         serializationLibrary.addTypeHandlerFactory(new Rect2iTypeHandlerFactory());
         serializationLibrary.addTypeHandlerFactory(new Rect2fTypeHandlerFactory());
         serializationLibrary.addTypeHandler(Prefab.class, new PrefabTypeHandler());
@@ -262,15 +282,12 @@ public class TypeHandlerLibrary {
             return false;
         }
 
-        TypeHandlerFactory factory = new TypeHandlerFactory() {
-            @SuppressWarnings("unchecked")
+        addTypeHandlerFactory(new SpecificTypeHandlerFactory<T>(type) {
             @Override
-            public <R> Optional<TypeHandler<R>> create(TypeInfo<R> typeInfo, TypeHandlerContext context) {
-                return typeInfo.equals(type) ? Optional.of((TypeHandler<R>) typeHandler) : Optional.empty();
+            protected TypeHandler<T> createHandler(TypeHandlerContext context) {
+                return typeHandler;
             }
-        };
-
-        addTypeHandlerFactory(factory);
+        });
 
         return true;
     }
@@ -398,7 +415,7 @@ public class TypeHandlerLibrary {
      *
      * @param typeInfo The {@link TypeInfo} describing the base type for which to return a
      *                 {@link TypeHandler}.
-     * @param <T> The base type for which to return a {@link TypeHandler}.
+     * @param <T>      The base type for which to return a {@link TypeHandler}.
      */
     public <T> TypeHandler<T> getBaseTypeHandler(TypeInfo<T> typeInfo) {
         TypeHandler<T> delegateHandler = getTypeHandler(typeInfo).orElse(null);

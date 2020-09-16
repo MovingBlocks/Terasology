@@ -15,7 +15,6 @@
  */
 package org.terasology.persistence.typeHandling;
 
-import org.reflections.Reflections;
 import org.terasology.persistence.typeHandling.reflection.SerializationSandbox;
 import org.terasology.reflection.TypeInfo;
 

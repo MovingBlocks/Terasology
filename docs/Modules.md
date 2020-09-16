@@ -32,13 +32,12 @@ Here's a list of modules bundled with the game by default (this line-up will cha
 * [Apiculture](https://github.com/Terasology/Apiculture) - BEES! RUN! Well, eventually, they're still being trained to do stuff. GSOC 2019
 * [BasicCrafting](https://github.com/Terasology/BasicCrafting) - a basic crafting system
 * [Behaviors](https://github.com/Terasology/Behaviors) - library module containing various behavior trees for use in our AI system
-* BiomesAPI - library module for basic Biome functionality
+* [BiomesAPI](https://github.com/Terasology/BiomesAPI) - library module for basic Biome functionality
 * [BlockDetector](https://github.com/Terasology/BlockDetector) - adds a simple little tool that can detect specific blocks (beeping in proximity)
 * [BlockNetwork](https://github.com/Terasology/BlockNetwork) - a framework to support blocks that can communicate with each other in some fashion
 * [BlockPicker](https://github.com/Terasology/BlockPicker) - allows the player access to an infinite block inventory with the `B` key
 * [Books](https://github.com/Terasology/Books) - books and bookcases
 * [Breathing](https://github.com/Terasology/Breathing) - without this you can't breathe! But you also don't need to. Enable it to drown properly in water (or not!)
-* BuilderSampleGameplay - gameplay front for engine alone to show lack of inventory and health can work
 * [CakeLie](https://github.com/Terasology/CakeLie) - the cake may be a lie, but these cake and candy blocks are delicious!
 * [Caves](https://github.com/Terasology/Caves) - a cave generation module (actually an ore vein generator placing air veins!) based on CustomOreGen
 * [ChangingBlocks](https://github.com/Terasology/ChangingBlocks) - allows blocks to change over time (such as switching to a more dusty / worn looking block after x amount of days)
@@ -54,10 +53,9 @@ Here's a list of modules bundled with the game by default (this line-up will cha
 * [ComputerMonitors](https://github.com/Terasology/ComputerMonitors) - allows for the creation of functional multi-block monitors in-game - ModularComputers puts them to work!
 * [Cooking](https://github.com/Terasology/Cooking) - cook stuff!
 * [CopperAndBronze](https://github.com/Terasology/CopperAndBronze) - another era for throughout the ages, this time copper and bronze (comes after wood and stone)
-* Core - mandatory content needed for normal game launch
 * [CoreAssets](https://github.com/Terasology/CoreAssets) - base assets extracted from Core
 * [CoreBlocks](https://github.com/Terasology/CoreBlocks) - base blocks extracted from Core
-* CoreSampleGameplay - gameplay front for Core - allows modules to depend on Core without the default starting inventory
+* [CoreSampleGameplay](https://github.com/Terasology/CoreSampleGameplay) - default gameplay with a few core modules enabled
 * [CustomOreGen](https://github.com/Terasology/CustomOreGen) - library containing an ore distribution algorithm based on [JRoush's CustomOreGen](http://www.minecraftforum.net/forums/mapping-and-modding/minecraft-mods/1282294-1-4-6-v2-custom-ore-generation-updated-jan-5th)
 * [DamagingBlocks](https://github.com/Terasology/DamagingBlocks) - allows blocks like lava to hurt the player
 * [Dialogs](https://github.com/Terasology/Dialogs) - supports opening dialogs for interactions with NPCs and such
@@ -156,6 +154,7 @@ Here's a list of modules bundled with the game by default (this line-up will cha
 * [TutorialAssetSystem](https://github.com/Terasology/TutorialAssetSystem) - a tutorial module covering our asset system, see also its [wiki](https://github.com/Terasology/TutorialAssetSystem/wiki)
 * [TutorialBehaviors](https://github.com/Terasology/TutorialBehaviors) - a tutorial module covering our behavior tree system
 * [TutorialDynamicCities](https://github.com/Terasology/TutorialDynamicCities) - GSOC 2016 project tutorial / docs. Covers how dynamic cities function. [Shared wiki with DynamicCities](https://github.com/Terasology/DynamicCities/wiki)
+* [TutorialMinimalEngineDemo](https://github.com/Terasology/TutorialMinimalEngineDemo) - A module demonstrating how to build a minimal "game" with the barebone Terasology engine
 * [TutorialNui](https://github.com/Terasology/TutorialNui) - GSOC 2016 project tutorial / docs. Includes details both on NUI itself as well as its editor in the [wiki](https://github.com/Terasology/TutorialNui/wiki)
 * [TutorialSectors](https://github.com/Terasology/TutorialSectors) - a tutorial module covering our sector system (separated entity pools based on geographic location and differing entity scope)
 * [TutorialWorldGeneration](https://github.com/Terasology/TutorialWorldGeneration) - a world generation tutorial module, goes with a guide in its [wiki](https://github.com/Terasology/TutorialWorldGeneration/wiki)

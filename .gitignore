@@ -16,10 +16,6 @@ extensions
 !/facades/TeraEd
 !/facades/subprojects.gradle
 /modules/*
-!/modules/BiomesAPI
-!/modules/Core
-!/modules/CoreSampleGameplay
-!/modules/BuilderSampleGameplay
 !/modules/subprojects.gradle
 /metas/*
 !/metas/subprojects.gradle
@@ -31,20 +27,13 @@ build/
 /gradle.properties
 /override.cfg
 
-# Ignore IntelliJ - could use "/**/*.iml" to catch all .iml files, but that requires a somewhat recent Git version
-/out/
-modules/Core/Core.iml
-modules/CoreSampleGameplay/CoreSampleGameplay.iml
-modules/BuilderSampleGameplay/BuilderSampleGameplay.iml
-facades/PC/PC.iml
-facades/TeraEd/TeraEd.iml
-engine/engine.iml
-engine-tests/engine-tests.iml
-/*.iml
-/*.ipr
+# Do share some IntelliJ settings (see .idea/.gitignore for specifics)
+!/.idea
+# But not build outputs, or things it will regenerate when it syncs with gradle.
+out/
 /*.iws
 /projectFilesBackup*
-/**/*.iml
+*.iml
 
 # Ignore Eclipse
 .checkstyle
@@ -111,3 +100,4 @@ blacklist.json
 # Profiling related
 terasology.jfr
 local.properties
+*.hprof

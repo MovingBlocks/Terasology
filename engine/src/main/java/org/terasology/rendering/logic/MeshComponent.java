@@ -16,9 +16,9 @@
 package org.terasology.rendering.logic;
 
 import org.terasology.network.Replicate;
+import org.terasology.nui.Color;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.mesh.Mesh;
-import org.terasology.rendering.nui.Color;
 import org.terasology.world.block.ForceBlockActive;
 
 /**
