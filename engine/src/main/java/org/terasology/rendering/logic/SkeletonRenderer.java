@@ -96,24 +96,25 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
                 EntityRef boneEntity = entityManager.create(loc);
                 skeleton.boneEntities.put(bone.getName(), boneEntity);
             }
-            for (Bone bone : skeleton.mesh.getBones()) {
-                EntityRef boneEntity = skeleton.boneEntities.get(bone.getName());
-                EntityRef parent = (bone.getParent() != null) ? skeleton.boneEntities.get(bone.getParent().getName()) : entity;
-                Location.attachChild(parent, boneEntity);
-            }
-            for (Bone bone : skeleton.mesh.getBones()) {
-                EntityRef boneEntity = skeleton.boneEntities.get(bone.getName());
-                LocationComponent loc = boneEntity.getComponent(LocationComponent.class);
-                loc.setLocalPosition(bone.getLocalPosition());
-                loc.setLocalRotation(bone.getLocalRotation());
-                loc.setLocalScale(bone.getLocalScale().x);
-                boneEntity.saveComponent(loc);
-                if (bone.getParent() == null) {
-                    skeleton.rootBone = boneEntity;
-                }
-            }
-            entity.saveComponent(skeleton);
         }
+
+        for (Bone bone : skeleton.mesh.getBones()) {
+            EntityRef boneEntity = skeleton.boneEntities.get(bone.getName());
+            EntityRef parent = (bone.getParent() != null) ? skeleton.boneEntities.get(bone.getParent().getName()) : entity;
+            Location.attachChild(parent, boneEntity);
+        }
+        for (Bone bone : skeleton.mesh.getBones()) {
+            EntityRef boneEntity = skeleton.boneEntities.get(bone.getName());
+            LocationComponent loc = boneEntity.getComponent(LocationComponent.class);
+            loc.setLocalPosition(bone.getLocalPosition());
+            loc.setLocalRotation(bone.getLocalRotation());
+            loc.setLocalScale(bone.getLocalScale().x);
+            boneEntity.saveComponent(loc);
+            if (bone.getParent() == null) {
+                skeleton.rootBone = boneEntity;
+            }
+        }
+        entity.saveComponent(skeleton);
     }
 
     @Override
@@ -321,7 +322,6 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
             material.setFloat("blockLight", 1.0f, true);
             material.setMatrix4("projectionMatrix", worldRenderer.getActiveCamera().getProjectionMatrix());
             Vector3f worldPos = new Vector3f();
-
 
             FloatBuffer tempMatrixBuffer44 = BufferUtils.createFloatBuffer(16);
             FloatBuffer tempMatrixBuffer33 = BufferUtils.createFloatBuffer(12);
