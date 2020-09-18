@@ -4,7 +4,11 @@
 package org.terasology.world.chunks.pipeline.stages;
 
 /**
- * Marker interface.
+ * Marker interface for {@link org.terasology.world.chunks.pipeline.ChunkProcessingPipeline}
+ * <p>
+ * Implementations: {@link FunctionalStage} and {@link StageProvider}
+ * <p>
+ * TODO: candidate to using sealed classes in Java 15 :)
  */
 public interface ProcessingStage {
 }
