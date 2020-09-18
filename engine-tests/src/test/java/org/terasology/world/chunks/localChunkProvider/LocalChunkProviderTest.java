@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.world.chunks.localChunkProvider;
 
+import com.google.common.collect.Maps;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -33,13 +34,14 @@ import org.terasology.world.chunks.internal.ChunkImpl;
 
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-public class LocalChunkProviderTest {
+class LocalChunkProviderTest {
 
     private static final int WAIT_CHUNK_IS_READY_IN_SECONDS = 10;
 
@@ -49,7 +51,7 @@ public class LocalChunkProviderTest {
     private ExtraBlockDataManager extraDataManager;
     private BlockEntityRegistry blockEntityRegistry;
     private EntityRef worldEntity;
-    private ChunkCache chunkCache;
+    private Map<Vector3i, Chunk> chunkCache;
     private Block blockAtBlockManager;
     private TestStorageManager storageManager;
     private TestWorldGenerator generator;
@@ -65,7 +67,7 @@ public class LocalChunkProviderTest {
         extraDataManager = new ExtraBlockDataManager();
         blockEntityRegistry = mock(BlockEntityRegistry.class);
         worldEntity = mock(EntityRef.class);
-        chunkCache = new ConcurrentMapChunkCache();
+        chunkCache = Maps.newConcurrentMap();
         storageManager = new TestStorageManager();
         generator = new TestWorldGenerator(blockManager);
         chunkProvider = new LocalChunkProvider(storageManager,
@@ -96,7 +98,7 @@ public class LocalChunkProviderTest {
     }
 
     @Test
-    public void testGenerateSingleChunk() {
+    void testGenerateSingleChunk() {
         Vector3i chunkPosition = new Vector3i(0, 0, 0);
         requestCreatingOrLoadingArea(chunkPosition);
         waitChunkReadyAt(chunkPosition);
@@ -123,7 +125,7 @@ public class LocalChunkProviderTest {
     }
 
     @Test
-    public void testGenerateSingleChunkWithBlockLifeCycle() {
+    void testGenerateSingleChunkWithBlockLifeCycle() {
         Vector3i chunkPosition = new Vector3i(0, 0, 0);
         blockAtBlockManager.setLifecycleEventsRequired(true);
         blockAtBlockManager.setEntity(mock(EntityRef.class));
@@ -163,7 +165,7 @@ public class LocalChunkProviderTest {
     }
 
     @Test
-    public void testLoadSingleChunk() {
+    void testLoadSingleChunk() {
         Vector3i chunkPosition = new Vector3i(0, 0, 0);
         Chunk chunk = new ChunkImpl(chunkPosition, blockManager, extraDataManager);
         generator.createChunk(chunk, null);
@@ -186,7 +188,7 @@ public class LocalChunkProviderTest {
     }
 
     @Test
-    public void testLoadSingleChunkWithBlockLifecycle() {
+    void testLoadSingleChunkWithBlockLifecycle() {
         Vector3i chunkPosition = new Vector3i(0, 0, 0);
         Chunk chunk = new ChunkImpl(chunkPosition, blockManager, extraDataManager);
         generator.createChunk(chunk, null);
@@ -232,14 +234,12 @@ public class LocalChunkProviderTest {
     }
 
     @Test
-    public void testUnloadChunkAndDeactivationBlock() throws InterruptedException {
+    void testUnloadChunkAndDeactivationBlock() throws InterruptedException {
         Vector3i chunkPosition = new Vector3i(0, 0, 0);
         blockAtBlockManager.setLifecycleEventsRequired(true);
         blockAtBlockManager.setEntity(mock(EntityRef.class));
 
-        long time = System.currentTimeMillis();
         requestCreatingOrLoadingArea(chunkPosition);
-        long next = System.currentTimeMillis();
         waitChunkReadyAt(chunkPosition);
 
         //Wait BeforeDeactivateBlocks event
@@ -289,12 +289,13 @@ public class LocalChunkProviderTest {
     }
 
     private void waitChunkReadyAt(Vector3i chunkPosition) {
-        Assertions.assertTimeoutPreemptively(Duration.of(WAIT_CHUNK_IS_READY_IN_SECONDS, ChronoUnit.SECONDS),
-                () -> {
-                    while (chunkCache.get(chunkPosition) == null || !chunkCache.get(chunkPosition).isReady()) {
-                        Thread.yield();
-                    }
-                });
+        while (chunkCache.get(chunkPosition) == null || !chunkCache.get(chunkPosition).isReady()) {
+            Thread.yield();
+        }
+//        Assertions.assertTimeoutPreemptively(Duration.of(WAIT_CHUNK_IS_READY_IN_SECONDS, ChronoUnit.SECONDS),
+//                () -> {
+//
+//                });
     }
 
 }

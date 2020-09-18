@@ -9,7 +9,6 @@ import com.google.common.collect.Queues;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.ChunkMath;
 import org.terasology.math.JomlUtil;
 import org.terasology.math.Region3i;
@@ -22,16 +21,14 @@ import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.ChunkProvider;
 import org.terasology.world.chunks.event.BeforeChunkUnload;
 import org.terasology.world.chunks.event.OnChunkLoaded;
-import org.terasology.world.chunks.localChunkProvider.LightMergerFunction;
 import org.terasology.world.chunks.pipeline.ChunkProcessingPipeline;
-import org.terasology.world.chunks.pipeline.PositionFuture;
+import org.terasology.world.chunks.pipeline.stages.FunctionalStage;
+import org.terasology.world.chunks.pipeline.stages.LightMergerProcessingStageProvider;
 import org.terasology.world.internal.ChunkViewCore;
 import org.terasology.world.internal.ChunkViewCoreImpl;
 import org.terasology.world.propagation.light.InternalLightProcessor;
 
-import java.math.RoundingMode;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
@@ -52,24 +49,20 @@ public class RemoteChunkProvider implements ChunkProvider {
     private static final Logger logger = LoggerFactory.getLogger(RemoteChunkProvider.class);
     private final BlockingQueue<Vector3i> invalidateChunks = Queues.newLinkedBlockingQueue();
     private final Map<Vector3i, Chunk> chunkCache = Maps.newHashMap();
+    private final BlockManager blockManager;
+    private final ChunkProcessingPipeline loadingPipeline;
     private ChunkReadyListener listener;
     private EntityRef worldEntity = EntityRef.NULL;
 
-    private final BlockManager blockManager;
-
-    private final ChunkProcessingPipeline loadingPipeline;
-
-    private final LocalPlayer localPlayer;
-
-    public RemoteChunkProvider(BlockManager blockManager, LocalPlayer localPlayer) {
+    public RemoteChunkProvider(BlockManager blockManager) {
         this.blockManager = blockManager;
-        this.localPlayer = localPlayer;
-        loadingPipeline = new ChunkProcessingPipeline(new ChunkTaskRelevanceComparator());
+        loadingPipeline = new ChunkProcessingPipeline(this::getChunk);
 
-        loadingPipeline.addStage(InternalLightProcessor::generateInternalLighting)
-                .addStage(Chunk::deflate)
-                .addStage(new LightMergerFunction())
-                .addStage((chunk) -> {
+        loadingPipeline.addStage(FunctionalStage.create("Chunk generate internal lightning",
+                InternalLightProcessor::generateInternalLighting))
+                .addStage(FunctionalStage.create("Chunk deflate", Chunk::deflate))
+                .addStage(new LightMergerProcessingStageProvider())
+                .addStage(FunctionalStage.create("", chunk -> {
                     listener.onChunkReady(chunk.getPosition());
                     worldEntity.send(new OnChunkLoaded(chunk.getPosition()));
                     Chunk oldChunk = chunkCache.put(chunk.getPosition(), chunk);
@@ -77,7 +70,7 @@ public class RemoteChunkProvider implements ChunkProvider {
                         oldChunk.dispose();
                     }
                     chunk.markReady();
-                });
+                }));
 
         ChunkMonitor.fireChunkProviderInitialized(this);
     }
@@ -97,6 +90,7 @@ public class RemoteChunkProvider implements ChunkProvider {
 
     @Override
     public void completeUpdate() {
+        //TODO remove this
     }
 
     @Override
@@ -144,6 +138,11 @@ public class RemoteChunkProvider implements ChunkProvider {
         loadingPipeline.shutdown();
     }
 
+
+    public Chunk getChunk(org.joml.Vector3ic pos) {
+        return getChunk(JomlUtil.from(pos));
+    }
+
     @Override
     public boolean reloadChunk(Vector3i pos) {
         return false;
@@ -151,6 +150,7 @@ public class RemoteChunkProvider implements ChunkProvider {
 
     @Override
     public void purgeWorld() {
+        // RemoteChunkProvider is slave of server. It cannot purge world "projection"
     }
 
     @Override
@@ -211,21 +211,4 @@ public class RemoteChunkProvider implements ChunkProvider {
         this.worldEntity = entity;
     }
 
-
-    /**
-     * ChunkTask's comparation based on distance from local player position.
-     */
-    private class ChunkTaskRelevanceComparator implements Comparator<Runnable> {
-
-        @Override
-        public int compare(Runnable o1, Runnable o2) {
-            return score(((PositionFuture<?>) o1).getPosition()) - score(((PositionFuture<?>) o2).getPosition());
-        }
-
-        private int score(org.joml.Vector3i chunk) {
-            Vector3i playerChunk = ChunkMath.calcChunkPos(new Vector3i(localPlayer.getPosition(),
-                    RoundingMode.HALF_UP));
-            return playerChunk.distanceSquared(JomlUtil.from(chunk));
-        }
-    }
 }

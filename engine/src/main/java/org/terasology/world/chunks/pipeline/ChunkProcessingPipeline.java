@@ -3,29 +3,36 @@
 
 package org.terasology.world.chunks.pipeline;
 
+import com.google.api.client.util.Lists;
+import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Sets;
+import com.google.common.collect.Table;
 import org.joml.Vector3i;
+import org.joml.Vector3ic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.world.block.BlockRegion;
+import org.terasology.world.block.BlockRegionIterable;
 import org.terasology.world.chunks.Chunk;
+import org.terasology.world.chunks.pipeline.stages.FunctionalStage;
+import org.terasology.world.chunks.pipeline.stages.ProcessingStage;
+import org.terasology.world.chunks.pipeline.stages.StageProvider;
 
-import java.util.Comparator;
-import java.util.Deque;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.ForkJoinWorkerThread;
 import java.util.concurrent.Future;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 /**
  * Manages execution of chunk tasks on a queue.
@@ -36,76 +43,55 @@ import java.util.function.Supplier;
  * <p>
  * {@link Chunk}s will processing on stages {@link ChunkProcessingPipeline#addStage}
  */
-public class ChunkProcessingPipeline implements ChunkTaskListener {
+public class ChunkProcessingPipeline {
+
     private static final int NUM_TASK_THREADS = 8;
     private static final Logger logger = LoggerFactory.getLogger(ChunkProcessingPipeline.class);
 
     private final ExecutorService chunkProcessor;
-    private final List<Function<Chunk, Chunk>> stages = new LinkedList<>();
-    private final List<ChunkTaskListener> chunkTaskListeners = new LinkedList<>();
+    private final Function<Vector3ic, Chunk> chunkProvider;
+    private final List<ProcessingStage> stages = Lists.newArrayList();
     private final List<ChunkRemoveFromPipelineListener> chunkRemoveFromPipelineListeners = new LinkedList<>();
-    private final Map<Chunk, Deque<Function<Chunk, ChunkTask>>> chunkNextStages = new ConcurrentHashMap<>();
-    private final Set<org.joml.Vector3i> processingPositions = Sets.newConcurrentHashSet();
-    private final Set<org.joml.Vector3i> invalidatedPositions = Sets.newConcurrentHashSet();
+    private final Table<Vector3ic, ProcessingStage, CompletableFuture<Chunk>> processingTable
+            = HashBasedTable.create();
+    private final Set<Vector3ic> processingPosition = Sets.newConcurrentHashSet();
+    private final Set<Vector3ic> invalidatedPositions = Sets.newConcurrentHashSet();
+    private final Table<Vector3ic, ProcessingStage, CompletableFuture<Chunk>> waitingNewFutures =
+            HashBasedTable.create();
 
     /**
      * Create ChunkProcessingPipeline.
-     *
-     * @param taskComparator using by TaskMaster for priority ordering task.
      */
-    public ChunkProcessingPipeline(Comparator<Runnable> taskComparator) {
-        chunkProcessor = new ThreadPoolExecutor(
-                NUM_TASK_THREADS, NUM_TASK_THREADS,
-                0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>(),
-                Executors.defaultThreadFactory(), ChunkProcessingPipeline::onRejectExecution);
+    public ChunkProcessingPipeline(Function<Vector3ic, Chunk> chunkProvider) {
+        this.chunkProvider = chunkProvider;
+
+        chunkProcessor = new ForkJoinPool(NUM_TASK_THREADS,
+                ChunkProcessingPipeline::threadFactory,
+                ChunkProcessingPipeline::onRejectExecution,
+                true);
     }
 
-    private static void onRejectExecution(Runnable runnable, ThreadPoolExecutor threadPoolExecutor) {
-        logger.error("Cannot execute task: " + runnable);
+    private static ForkJoinWorkerThread threadFactory(ForkJoinPool pool) {
+        final ForkJoinWorkerThread worker = ForkJoinPool.defaultForkJoinWorkerThreadFactory.newThread(pool);
+        worker.setName("Chunk-Processing-" + worker.getPoolIndex());
+        return worker;
+    }
+
+    private static void onRejectExecution(Thread thread, Throwable throwable) {
+        logger.error("Cannot execute task: {}", throwable, throwable);
     }
 
     /**
-     * An method that creates new threads on demand. {@link java.util.concurrent.ThreadFactory}
-     *
-     * @param firstRunnable a runnable to be executed by new thread instance
-     * @return constructed thread, or {@code null} if the request to create a thread is rejected
-     */
-    private static Thread threadFactory(Runnable firstRunnable) {
-        Thread thread = new Thread(firstRunnable, "Chunk-Processing");
-        thread.setDaemon(true);
-        return thread;
-    }
-
-    /**
-     * Add stage to pipeline. If stage instance of {@link ChunkTaskListener} - it's will be register as listener. If
-     * stage instance of {@link ChunkRemoveFromPipelineListener} - it's will be register as listener.
+     * Add stage to pipeline.
      *
      * @param stage function for ChunkTask generating by Chunk.
      * @return self for Fluent api.
      */
-    public ChunkProcessingPipeline addStage(Function<Chunk, Chunk> stage) {
+    public ChunkProcessingPipeline addStage(ProcessingStage stage) {
         stages.add(stage);
         return this;
     }
 
-    public ChunkProcessingPipeline addStage(Consumer<Chunk> stage) {
-        addStage((c) -> {
-            stage.accept(c);
-            return c;
-        });
-        return this;
-    }
-
-    /**
-     * Register chunk task listener.
-     *
-     * @param listener listener.
-     * @return self for Fluent api.
-     */
-    public ChunkProcessingPipeline addListener(ChunkTaskListener listener) {
-        chunkTaskListeners.add(listener);
-        return this;
-    }
 
     /**
      * Register chunk task listener.
@@ -124,17 +110,78 @@ public class ChunkProcessingPipeline implements ChunkTaskListener {
      * @param generatorTask ChunkTask which provides new chunk to pipeline
      */
     public Future<Chunk> invokeGeneratorTask(Vector3i position, Supplier<Chunk> generatorTask) {
-        processingPositions.add(position);
+        processingPosition.add(position);
         CompletableFuture<Chunk> completableFuture = CompletableFuture.supplyAsync(generatorTask, chunkProcessor);
 
-        for (Function<Chunk, Chunk> stage : stages) {
-            completableFuture = completableFuture.thenApplyAsync(stage, chunkProcessor);
+        for (ProcessingStage stage : stages) {
+            FunctionalStage functionalStage;
+            if (stage instanceof FunctionalStage) {
+                functionalStage = (FunctionalStage) stage;
+            } else if (stage instanceof StageProvider) {
+                StageProvider stageProvider = (StageProvider) stage;
+                Collection<CompletableFuture<Chunk>> nearbyFutures = getNearbyPositions(position)
+                        .map(p -> getFutureAt(p, stage))
+                        .collect(Collectors.toList());
+
+                functionalStage = stageProvider.apply(nearbyFutures);
+            } else {
+                throw new UnsupportedOperationException("Pipeline not handling this type of Processing Stage");
+            }
+            CompletableFuture<Chunk> waiting = waitingNewFutures.get(position, stage);
+            if (waiting != null) {
+                completableFuture.thenAcceptAsync(waiting::complete, chunkProcessor);
+            }
+
+            completableFuture = functionalStage.apply(chunkProcessor, completableFuture);
+
+            processingTable.put(position, stage, completableFuture);
         }
-        completableFuture.thenApplyAsync((c) -> {
-            processingPositions.remove(c.getPosition(new Vector3i()));
+        completableFuture = clean(completableFuture);
+        return completableFuture.handleAsync((c, e) -> {
+            if (e != null) {
+                logger.error("Task ended with error", e);
+            }
             return c;
         }, chunkProcessor);
-        return completableFuture;
+    }
+
+    private CompletableFuture<Chunk> clean(CompletableFuture<Chunk> completableFuture) {
+        return completableFuture.thenApplyAsync(c -> {
+            Vector3i pos = c.getPosition(new Vector3i());
+            Set<ProcessingStage> columns = new HashSet<>(processingTable.row(pos).keySet());
+            columns.forEach(column -> processingTable.remove(pos, column));
+            processingPosition.remove(pos);
+            return c;
+        }, chunkProcessor);
+    }
+
+    private Stream<Vector3ic> getNearbyPositions(Vector3i pos) {
+        return StreamSupport.stream(BlockRegionIterable.region(new BlockRegion(
+                pos.x - 1, pos.y - 1, pos.z - 1,
+                pos.x + 1, pos.y + 1, pos.z + 1
+        )).build().spliterator(), false).map(Vector3i::new);
+    }
+
+    private CompletableFuture<Chunk> getFutureAt(Vector3ic pos, ProcessingStage currentStage) {
+        Chunk chunk = chunkProvider.apply(pos);
+        if (chunk != null) {
+            return CompletableFuture.completedFuture(chunk);
+        }
+        if (isPositionProcessing(pos)) {
+            ProcessingStage previosStage = stages.get(stages.indexOf(currentStage) - 1);
+            CompletableFuture<Chunk> futureFromPreviosStage = processingTable.get(pos, previosStage);
+            if (futureFromPreviosStage != null) {
+                return futureFromPreviosStage;
+            }
+        }
+        CompletableFuture<Chunk> waitingFuture = waitingNewFutures.get(pos, currentStage);
+        if (waitingFuture == null) {
+            CompletableFuture<Chunk> candidate = new CompletableFuture<>();
+            waitingNewFutures.put(pos, currentStage, candidate);
+            return candidate;
+        } else {
+            return waitingFuture;
+        }
     }
 
     /**
@@ -148,26 +195,14 @@ public class ChunkProcessingPipeline implements ChunkTaskListener {
     }
 
     public void shutdown() {
-        chunkNextStages.clear();
-        processingPositions.clear();
+        processingTable.clear();
+        processingPosition.clear();
         chunkProcessor.shutdown();
     }
 
     public void restart() {
-        chunkNextStages.clear();
-        processingPositions.clear();
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @param chunkTask ChunkTask which done processing.
-     */
-    @Override
-    public void onDone(ChunkTask chunkTask) {
-        chunkTaskListeners.forEach((listener) -> listener.onDone(chunkTask));
-        logger.debug("Task " + chunkTask + " done");
-        invokePipeline(chunkTask.getChunk());
+        processingTable.clear();
+        processingPosition.clear();
     }
 
     /**
@@ -177,7 +212,9 @@ public class ChunkProcessingPipeline implements ChunkTaskListener {
      */
     public void stopProcessingAt(Vector3i pos) {
         invalidatedPositions.add(pos);
-        processingPositions.remove(pos);
+        Set<ProcessingStage> columns = new HashSet<>(processingTable.row(pos).keySet());
+        columns.forEach(column -> processingTable.remove(pos, column));
+        processingPosition.remove(pos);
         chunkRemoveFromPipelineListeners.forEach(l -> l.onRemove(pos));
     }
 
@@ -187,8 +224,8 @@ public class ChunkProcessingPipeline implements ChunkTaskListener {
      * @param pos position for check
      * @return true if position processing, false otherwise
      */
-    public boolean isPositionProcessing(org.joml.Vector3i pos) {
-        return processingPositions.contains(pos);
+    public boolean isPositionProcessing(Vector3ic pos) {
+        return processingPosition.contains(pos);
     }
 
     /**
@@ -196,7 +233,7 @@ public class ChunkProcessingPipeline implements ChunkTaskListener {
      *
      * @return copy of processing positions
      */
-    public List<org.joml.Vector3i> getProcessingPosition() {
-        return new LinkedList<>(processingPositions);
+    public List<Vector3ic> getProcessingPosition() {
+        return new LinkedList<>(processingPosition);
     }
 }
