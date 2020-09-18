@@ -36,6 +36,10 @@ import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.mock;
@@ -86,22 +90,27 @@ class LocalChunkProviderTest {
         chunkProvider.shutdown();
     }
 
-    private void requestCreatingOrLoadingArea(Vector3i chunkPosition, int radius) {
+    private Future<Chunk> requestCreatingOrLoadingArea(Vector3i chunkPosition, int radius) {
+        Future<Chunk> chunkFuture = chunkProvider.createOrLoadChunk(chunkPosition);
         BlockRegion extentsRegion = new BlockRegion(
                 chunkPosition.x - radius, chunkPosition.y - radius, chunkPosition.z - radius,
                 chunkPosition.x + radius, chunkPosition.y + radius, chunkPosition.z + radius);
-        BlockRegionIterable.region(extentsRegion).build().iterator().forEachRemaining(chunkPos -> chunkProvider.createOrLoadChunk(JomlUtil.from(chunkPos)));
+        BlockRegionIterable.region(extentsRegion).subtract(
+                new BlockRegion( // remove center. we takes future for it already.
+                        chunkPosition.x, chunkPosition.y, chunkPosition.z,
+                        chunkPosition.x, chunkPosition.y, chunkPosition.z)
+        ).build().iterator().forEachRemaining(chunkPos -> chunkProvider.createOrLoadChunk(JomlUtil.from(chunkPos)));
+        return chunkFuture;
     }
 
-    private void requestCreatingOrLoadingArea(Vector3i chunkPosition) {
-        requestCreatingOrLoadingArea(chunkPosition, 1);
+    private Future<Chunk> requestCreatingOrLoadingArea(Vector3i chunkPosition) {
+        return requestCreatingOrLoadingArea(chunkPosition, 1);
     }
 
     @Test
-    void testGenerateSingleChunk() {
+    void testGenerateSingleChunk() throws InterruptedException, ExecutionException, TimeoutException {
         Vector3i chunkPosition = new Vector3i(0, 0, 0);
-        requestCreatingOrLoadingArea(chunkPosition);
-        waitChunkReadyAt(chunkPosition);
+        requestCreatingOrLoadingArea(chunkPosition).get(WAIT_CHUNK_IS_READY_IN_SECONDS, TimeUnit.SECONDS);
 
         final ArgumentCaptor<Event> eventArgumentCaptor = ArgumentCaptor.forClass(Event.class);
         verify(worldEntity, atLeast(2)).send(eventArgumentCaptor.capture());
@@ -125,12 +134,11 @@ class LocalChunkProviderTest {
     }
 
     @Test
-    void testGenerateSingleChunkWithBlockLifeCycle() {
+    void testGenerateSingleChunkWithBlockLifeCycle() throws InterruptedException, ExecutionException, TimeoutException {
         Vector3i chunkPosition = new Vector3i(0, 0, 0);
         blockAtBlockManager.setLifecycleEventsRequired(true);
         blockAtBlockManager.setEntity(mock(EntityRef.class));
-        requestCreatingOrLoadingArea(chunkPosition);
-        waitChunkReadyAt(chunkPosition);
+        requestCreatingOrLoadingArea(chunkPosition).get(WAIT_CHUNK_IS_READY_IN_SECONDS, TimeUnit.SECONDS);
 
         final ArgumentCaptor<Event> worldEventCaptor = ArgumentCaptor.forClass(Event.class);
         verify(worldEntity, atLeast(2)).send(worldEventCaptor.capture());
@@ -165,14 +173,13 @@ class LocalChunkProviderTest {
     }
 
     @Test
-    void testLoadSingleChunk() {
+    void testLoadSingleChunk() throws InterruptedException, ExecutionException, TimeoutException {
         Vector3i chunkPosition = new Vector3i(0, 0, 0);
         Chunk chunk = new ChunkImpl(chunkPosition, blockManager, extraDataManager);
         generator.createChunk(chunk, null);
         storageManager.add(chunk);
 
-        requestCreatingOrLoadingArea(chunkPosition);
-        waitChunkReadyAt(chunkPosition);
+        requestCreatingOrLoadingArea(chunkPosition).get(WAIT_CHUNK_IS_READY_IN_SECONDS, TimeUnit.SECONDS);
 
         Assertions.assertTrue(((TestChunkStore) storageManager.loadChunkStore(chunkPosition)).isEntityRestored(),
                 "Entities must be restored by loading");
@@ -188,7 +195,7 @@ class LocalChunkProviderTest {
     }
 
     @Test
-    void testLoadSingleChunkWithBlockLifecycle() {
+    void testLoadSingleChunkWithBlockLifecycle() throws InterruptedException, ExecutionException, TimeoutException {
         Vector3i chunkPosition = new Vector3i(0, 0, 0);
         Chunk chunk = new ChunkImpl(chunkPosition, blockManager, extraDataManager);
         generator.createChunk(chunk, null);
@@ -196,8 +203,7 @@ class LocalChunkProviderTest {
         blockAtBlockManager.setLifecycleEventsRequired(true);
         blockAtBlockManager.setEntity(mock(EntityRef.class));
 
-        requestCreatingOrLoadingArea(chunkPosition);
-        waitChunkReadyAt(chunkPosition);
+        requestCreatingOrLoadingArea(chunkPosition).get(WAIT_CHUNK_IS_READY_IN_SECONDS, TimeUnit.SECONDS);
 
         Assertions.assertTrue(((TestChunkStore) storageManager.loadChunkStore(chunkPosition)).isEntityRestored(),
                 "Entities must be restored by loading");
@@ -234,13 +240,12 @@ class LocalChunkProviderTest {
     }
 
     @Test
-    void testUnloadChunkAndDeactivationBlock() throws InterruptedException {
+    void testUnloadChunkAndDeactivationBlock() throws InterruptedException, TimeoutException, ExecutionException {
         Vector3i chunkPosition = new Vector3i(0, 0, 0);
         blockAtBlockManager.setLifecycleEventsRequired(true);
         blockAtBlockManager.setEntity(mock(EntityRef.class));
 
-        requestCreatingOrLoadingArea(chunkPosition);
-        waitChunkReadyAt(chunkPosition);
+        requestCreatingOrLoadingArea(chunkPosition).get(WAIT_CHUNK_IS_READY_IN_SECONDS, TimeUnit.SECONDS);
 
         //Wait BeforeDeactivateBlocks event
         Assertions.assertTimeoutPreemptively(Duration.of(WAIT_CHUNK_IS_READY_IN_SECONDS, ChronoUnit.SECONDS),
@@ -287,15 +292,4 @@ class LocalChunkProviderTest {
         Assertions.assertTrue(beforeDeactivateBlocks.get().blockCount() > 0,
                 "BeforeDeactivateBlocks must have block count more then zero");
     }
-
-    private void waitChunkReadyAt(Vector3i chunkPosition) {
-        while (chunkCache.get(chunkPosition) == null || !chunkCache.get(chunkPosition).isReady()) {
-            Thread.yield();
-        }
-//        Assertions.assertTimeoutPreemptively(Duration.of(WAIT_CHUNK_IS_READY_IN_SECONDS, ChronoUnit.SECONDS),
-//                () -> {
-//
-//                });
-    }
-
 }
