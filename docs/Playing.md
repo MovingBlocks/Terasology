@@ -85,6 +85,8 @@ Press the `F1` or `grave` key (usually the \` key immediately above `tab`) to sh
 
 ## Multiplayer
 
+_A note on stability: while generally Terasology multiplayer is stable enough for us to run play tests on the first Saturday of each month there are regularly recurring bugs that will get in the way (still "Alpha" level software after all). Expect for it to be difficult to keep a server stable over the long term until Beta_ 
+
 To name yourself for a multiplayer game use Settings / Player. You can also pick a color, which will affect your placeholder monkey head player avatar, name in chat, and floating name tag.
 
 You can host a local server using the game client and have friends connect to your IP. Game port is 25777 which needs to be open and forwarded to your PC.
