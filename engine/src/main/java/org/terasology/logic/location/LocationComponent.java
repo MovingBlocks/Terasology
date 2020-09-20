@@ -211,6 +211,22 @@ public final class LocationComponent implements Component, ReplicationCheck {
     }
 
     /**
+     * Populates out with the transform of this entity relative to the given entity, or the world transform if entity
+     * is not in this entity's parent hierarchy
+     * @param out
+     * @param entity
+     */
+    public void getRelativeTransform(org.terasology.math.geom.Matrix4f out, EntityRef entity) {
+        if (!(entity.equals(parent))) {
+            LocationComponent loc = parent.getComponent(LocationComponent.class);
+            if (loc != null) {
+                loc.getRelativeTransform(out, entity);
+            }
+        }
+        out.mul(new org.terasology.math.geom.Matrix4f(rotation, position, scale));
+    }
+
+    /**
      * @deprecated This is scheduled for removal in an upcoming version method will be replaced with JOML implementation
      *     {@link #getWorldDirection(org.joml.Vector3f)}.
      */
