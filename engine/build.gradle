@@ -140,7 +140,7 @@ dependencies {
     api group: 'org.terasology', name: 'TeraMath', version: '1.5.0'
     api group: 'org.terasology', name: 'splash-screen', version: '1.0.2'
     api group: 'org.terasology.jnlua', name: 'JNLua', version: '0.1.0-SNAPSHOT'
-    api group: 'org.terasology.jnbullet', name: 'JNBullet', version: '1.0.2-SNAPSHOT'
+    api group: 'org.terasology.jnbullet', name: 'JNBullet', version: '1.0.2'
     api group: 'org.terasology.nui', name: 'nui', version: '1.2.0'
     api group: 'org.terasology.nui', name: 'nui-reflect', version: '1.2.0'
 
