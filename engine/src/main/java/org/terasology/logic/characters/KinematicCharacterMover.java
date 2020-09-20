@@ -39,8 +39,6 @@ import org.terasology.physics.events.MovedEvent;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 
-import java.math.RoundingMode;
-
 /**
  * Calculates character movement using a physics-engine provided CharacterCollider.
  * This collider is swept through the world to detect collisions.
@@ -306,7 +304,7 @@ public class KinematicCharacterMover implements CharacterMover {
         if (!stepped) {
             stepped = true;
 
-            boolean moveUpStep = callback.checkForStep(JomlUtil.from(direction), stepHeight, slopeFactor, CHECK_FORWARD_DIST);
+            boolean moveUpStep = callback.checkForStep(direction, stepHeight, slopeFactor, CHECK_FORWARD_DIST);
 
             if (moveUpStep) {
                 steppedUpDist = moveUp(stepHeight, collider, position);
@@ -390,7 +388,7 @@ public class KinematicCharacterMover implements CharacterMover {
         boolean hit = false;
         int iteration = 0;
         while (remainingDist > physics.getEpsilon() && iteration++ < 10) {
-            SweepCallback callback = collider.sweep(JomlUtil.from(position), JomlUtil.from(targetPos), VERTICAL_PENETRATION, -1.0f);
+            SweepCallback callback = collider.sweep(position, targetPos, VERTICAL_PENETRATION, -1.0f);
             float actualDist = Math.max(0,
                     (remainingDist + VERTICAL_PENETRATION_LEEWAY) * callback.getClosestHitFraction() - VERTICAL_PENETRATION_LEEWAY);
             Vector3f expectedMove = new Vector3f(targetPos);
@@ -405,14 +403,14 @@ public class KinematicCharacterMover implements CharacterMover {
                 break;
             }
             if (callback.hasHit()) {
-                float originalSlope = callback.getHitNormalWorld().dot(JomlUtil.from(new Vector3f(0, 1, 0)));
+                float originalSlope = callback.getHitNormalWorld().dot(new Vector3f(0, 1, 0));
                 if (originalSlope < slopeFactor) {
                     float slope = callback.calculateAverageSlope(originalSlope, CHECK_FORWARD_DIST);
                     if (slope < slopeFactor) {
                         remainingDist -= actualDist;
                         expectedMove.set(targetPos);
                         expectedMove.sub(position);
-                        extractResidualMovement(JomlUtil.from(callback.getHitNormalWorld()), expectedMove);
+                        extractResidualMovement(callback.getHitNormalWorld(), expectedMove);
                         float sqrDist = expectedMove.lengthSquared();
                         if (sqrDist > physics.getEpsilon()) {
                             expectedMove.normalize();
@@ -459,8 +457,9 @@ public class KinematicCharacterMover implements CharacterMover {
         }
         boolean horizontalHit = false;
         Vector3f normalizedDir = horizMove.normalize();
-        if(!normalizedDir.isFinite())
+        if(!normalizedDir.isFinite()) {
             normalizedDir.set(0);
+        }
 
         if (collider == null) {
             // ignore collision
@@ -475,7 +474,7 @@ public class KinematicCharacterMover implements CharacterMover {
         int iteration = 0;
         Vector3f lastHitNormal = new Vector3f(0, 1, 0);
         while (remainingFraction >= 0.01f && iteration++ < 10) {
-            SweepCallback callback = collider.sweep(JomlUtil.from(position), JomlUtil.from(targetPos), HORIZONTAL_PENETRATION, slopeFactor);
+            SweepCallback callback = collider.sweep(position, targetPos, HORIZONTAL_PENETRATION, slopeFactor);
 
             /* Note: this isn't quite correct (after the first iteration the closestHitFraction is only for part of the moment)
              but probably close enough */
@@ -493,7 +492,7 @@ public class KinematicCharacterMover implements CharacterMover {
                 dist -= actualDist;
                 Vector3f newDir = new Vector3f(normalizedDir);
                 newDir.mul(dist);
-                float slope = callback.getHitNormalWorld().dot(JomlUtil.from(new Vector3f(0, 1, 0)));
+                float slope = callback.getHitNormalWorld().dot(new Vector3f(0, 1, 0));
 
                 // We step up if we're hitting a big slope, or if we're grazing
                 // the ground, otherwise we move up a shallow slope.
@@ -517,7 +516,7 @@ public class KinematicCharacterMover implements CharacterMover {
                 } else {
                     // Hitting a shallow slope, move up it
                     Vector3f newHorizDir = new Vector3f(newDir.x, 0, newDir.z);
-                    extractResidualMovement(JomlUtil.from(callback.getHitNormalWorld()), newDir);
+                    extractResidualMovement(callback.getHitNormalWorld(), newDir);
                     Vector3f modHorizDir = new Vector3f(newDir);
                     modHorizDir.y = 0;
                     newDir.mul(newHorizDir.length() / modHorizDir.length());
@@ -548,7 +547,7 @@ public class KinematicCharacterMover implements CharacterMover {
     private float moveUp(float riseAmount, CharacterCollider collider, Vector3f position) {
         Vector3f to = new Vector3f(position.x, position.y + riseAmount + VERTICAL_PENETRATION_LEEWAY, position.z);
         if (collider != null) {
-            SweepCallback callback = collider.sweep(JomlUtil.from(position), JomlUtil.from(to), VERTICAL_PENETRATION_LEEWAY, -1f);
+            SweepCallback callback = collider.sweep(position, to, VERTICAL_PENETRATION_LEEWAY, -1f);
             if (callback.hasHit()) {
                 float actualDist = Math.max(0,
                         ((riseAmount + VERTICAL_PENETRATION_LEEWAY) * callback.getClosestHitFraction()) - VERTICAL_PENETRATION_LEEWAY);

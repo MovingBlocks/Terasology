@@ -15,6 +15,7 @@
  */
 package org.terasology.engine;
 
+import com.badlogic.gdx.physics.bullet.Bullet;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.Queues;
@@ -155,6 +156,9 @@ public class TerasologyEngine implements GameEngine {
      *                   audio and input subsystems.
      */
     public TerasologyEngine(TimeSubsystem timeSubsystem, Collection<EngineSubsystem> subsystems) {
+        // configure native paths
+        PathManager.getInstance();
+        Bullet.init(true, false);
 
         this.rootContext = new ContextImpl();
         rootContext.put(GameEngine.class, this);

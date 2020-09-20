@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 MovingBlocks
+ * Copyright 2018 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,26 +15,24 @@
  */
 package org.terasology.physics.bullet.shapes;
 
-import com.badlogic.gdx.physics.bullet.collision.btSphereShape;
+import com.badlogic.gdx.physics.bullet.collision.btCylinderShape;
 import org.joml.Quaternionf;
+import org.joml.Vector3f;
 import org.terasology.physics.shapes.CollisionShape;
-import org.terasology.physics.shapes.SphereShape;
 
-public class BulletSphereShape extends BulletCollisionShape implements SphereShape {
-    private final btSphereShape sphereShape;
 
-    public BulletSphereShape(float radius) {
-        sphereShape = new btSphereShape(radius);
-        underlyingShape = sphereShape;
+public class BulletCylinderShape extends  BulletCollisionShape {
+
+    private final btCylinderShape cylinderShape;
+
+    public BulletCylinderShape(Vector3f halfExtents) {
+
+        this.cylinderShape = new btCylinderShape(halfExtents);
+        this.underlyingShape = cylinderShape;
     }
 
     @Override
     public CollisionShape rotate(Quaternionf rot) {
         return this;
-    }
-
-    @Override
-    public float getRadius() {
-        return sphereShape.getRadius();
     }
 }
