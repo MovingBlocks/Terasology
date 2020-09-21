@@ -47,18 +47,20 @@ public class LightMerger {
     /**
      * Merge light for chunk.
      *
-     * @param chunk target chunk
      * @param localChunks nearest chunks with target chunk
-     * @throws IllegalArgumentException if {@code localChunks.length != LOCAL_CHUNKS_ARRAY_LENGTH} or {@code chunk} not in center of {@code localChunks}
+     * @throws IllegalArgumentException if {@code localChunks.length != LOCAL_CHUNKS_ARRAY_LENGTH} or {@code
+     *         chunk} not in center of {@code localChunks}
      */
-    public void merge(Chunk chunk, Chunk[] localChunks) {
+    public Chunk merge(Chunk[] localChunks) {
         Preconditions.checkArgument(localChunks.length == LOCAL_CHUNKS_ARRAY_LENGTH,
                 "Length of parameter [localChunks] must be equals [" + LOCAL_CHUNKS_ARRAY_LENGTH + "]");
-        Preconditions.checkArgument(Arrays.stream(localChunks).noneMatch(Objects::isNull), "Parameter [localChunks] must not contains nulls");
+        Preconditions.checkArgument(Arrays.stream(localChunks).noneMatch(Objects::isNull), "Parameter [localChunks] " +
+                "must not contains nulls");
 
         Arrays.sort(localChunks, Comparator.<Chunk>comparingInt(c -> c.getPosition(new Vector3i()).x)
                 .thenComparingInt(c -> c.getPosition(new Vector3i()).y)
                 .thenComparing(c -> c.getPosition(new Vector3i()).z));
+        Chunk chunk = localChunks[CENTER_INDEX];
 
         List<BatchPropagator> propagators = Lists.newArrayList();
         propagators.add(new StandardBatchPropagator(new LightPropagationRules(), new LocalChunkView(localChunks,
@@ -92,5 +94,6 @@ public class LightMerger {
             propagator.process();
         }
         chunk.deflateSunlight();
+        return chunk;
     }
 }

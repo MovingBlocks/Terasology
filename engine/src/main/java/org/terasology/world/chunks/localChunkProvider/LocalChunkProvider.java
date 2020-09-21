@@ -5,6 +5,7 @@ package org.terasology.world.chunks.localChunkProvider;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Queues;
+import com.google.common.collect.Sets;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.map.TShortObjectMap;
@@ -445,8 +446,7 @@ public class LocalChunkProvider implements ChunkProvider {
                 .addStage(ChunkTaskProvider.createMulti("Light merging",
                         chunks -> {
                             Chunk[] localchunks = chunks.toArray(new Chunk[0]);
-                            new LightMerger().merge(localchunks[13], localchunks);
-                            return localchunks[13];
+                            return new LightMerger().merge(localchunks);
                         },
                         pos -> StreamSupport.stream(BlockRegionIterable.region(new BlockRegion(
                                 pos.x() - 1, pos.y() - 1, pos.z() - 1,
@@ -487,15 +487,14 @@ public class LocalChunkProvider implements ChunkProvider {
                 .addStage(ChunkTaskProvider.createMulti("Light merging",
                         chunks -> {
                             Chunk[] localchunks = chunks.toArray(new Chunk[0]);
-                            new LightMerger().merge(localchunks[13], localchunks);
-                            return localchunks[13];
+                            return new LightMerger().merge(localchunks);
                         },
                         pos -> StreamSupport.stream(BlockRegionIterable.region(new BlockRegion(
                                 pos.x() - 1, pos.y() - 1, pos.z() - 1,
                                 pos.x() + 1, pos.y() + 1, pos.z() + 1
                         )).build().spliterator(), false)
                                 .map(org.joml.Vector3i::new)
-                                .collect(Collectors.toSet())
+                                .collect(Collectors.toCollection(Sets::newLinkedHashSet))
                 ))
                 .addStage(ChunkTaskProvider.create("Chunk ready", this::processReadyChunk));
     }

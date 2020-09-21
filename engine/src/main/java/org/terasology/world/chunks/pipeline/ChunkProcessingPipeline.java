@@ -42,7 +42,7 @@ public class ChunkProcessingPipeline {
     private static final int NUM_TASK_THREADS = 8;
     private static final Logger logger = LoggerFactory.getLogger(ChunkProcessingPipeline.class);
 
-    private final ExecutorCompletionService chunkProcessor;
+    private final ExecutorCompletionService<Chunk> chunkProcessor;
     private final Function<Vector3ic, Chunk> chunkProvider;
     private final Thread reactor;
     private final List<ChunkTaskProvider> stages = Lists.newArrayList();
@@ -67,8 +67,8 @@ public class ChunkProcessingPipeline {
                 TimeUnit.MILLISECONDS,
                 new LinkedBlockingQueue<>(),
                 this::threadFactory,
-                this::rejectQuequeHandler);
-        chunkProcessor = new ExecutorCompletionService(executor);
+                this::rejectQueueHandler);
+        chunkProcessor = new ExecutorCompletionService<>(executor);
         reactor = new Thread(this::reactor);
         reactor.setName("Chunk-Processing-Reactor");
         reactor.start();
@@ -86,29 +86,37 @@ public class ChunkProcessingPipeline {
                     Vector3i position = chunk.getPosition(new Vector3i());
                     ChunkTaskProvider chunkTaskProvider = currentStages.get(chunk);
 
+                    //Try get next stage for this chunk.
                     ChunkTaskProvider nextChunkProvider;
                     if (chunkTaskProvider == null) {
+                        // If it new chunk in processing (received from generator)
                         nextChunkProvider = stages.get(0);
                         positions.put(position, chunk);
                     } else {
+                        // else if this old chunk, get next stage
                         int stageIndex = stages.indexOf(chunkTaskProvider);
                         if (stageIndex + 1 < stages.size()) {
                             nextChunkProvider = stages.get(stageIndex + 1);
                         } else {
+                            // haven't next stage, time to exit
                             nextChunkProvider = null;
                         }
                     }
-
-
                     if (nextChunkProvider != null) {
+                        // set new chunk stage and create next new stage's task
                         currentStages.put(chunk, nextChunkProvider);
                         pendingChunkTasks.put(nextChunkProvider.createChunkTask(position), nextChunkProvider);
                     } else {
+                        // exit for chunk and clean pipeline after chunk.
                         exitFutures.get(position).set(chunk);
+                        clean(chunk);
                     }
+                    // Process pending chunk task
                     processChunkTasks();
                 } catch (ExecutionException e) {
                     logger.error("ChunkTask catch error: ", e); // TODO fetch Position and stage.
+                } catch (Exception e) {
+                    logger.error("Exception catched:", e);
                 }
             }
         } catch (InterruptedException e) {
@@ -116,16 +124,25 @@ public class ChunkProcessingPipeline {
         }
     }
 
+    private void clean(Chunk chunk) {
+        processingPosition.remove(chunk.getPosition(new Vector3i()));
+        currentStages.remove(chunk);
+        exitFutures.remove(chunk.getPosition(new Vector3i()));
+    }
+
     private void processChunkTasks() {
         for (Map.Entry<ChunkTask, ChunkTaskProvider> entry : pendingChunkTasks.entrySet()) {
             ChunkTask chunkTask = entry.getKey();
             ChunkTaskProvider chunkTaskProvider = entry.getValue();
             Set<Vector3ic> requirements = chunkTask.getRequirements();
+
             Set<Chunk> gatheredChunks = requirements.stream()
                     .map(pos -> getChunkBy(chunkTaskProvider, pos))
                     .filter(Objects::nonNull)
                     .collect(Collectors.toSet());
+
             if (gatheredChunks.size() == requirements.size()) {
+
                 runTask(chunkTask, gatheredChunks);
                 pendingChunkTasks.remove(chunkTask, chunkTaskProvider);
             }
@@ -163,11 +180,9 @@ public class ChunkProcessingPipeline {
         return thread;
     }
 
-
-    private void rejectQuequeHandler(Runnable runnable, ThreadPoolExecutor threadPoolExecutor) {
-        logger.error("Cannot run {}  because queueu is full", runnable);
+    private void rejectQueueHandler(Runnable runnable, ThreadPoolExecutor threadPoolExecutor) {
+        logger.error("Cannot run {}  because queue is full", runnable);
     }
-
 
     /**
      * Add stage to pipeline.
@@ -227,8 +242,12 @@ public class ChunkProcessingPipeline {
      */
     public void stopProcessingAt(Vector3i pos) {
         processingPosition.remove(pos);
-        positions.remove(pos).dispose();
-        currentStages.remove(pos);
+        Chunk chunk = positions.remove(pos);
+        if (chunk != null) {
+            chunk.dispose();
+            currentStages.remove(chunk);
+        }
+        pendingChunkTasks.keySet().removeIf((t) -> t.getPosition().equals(pos));
         exitFutures.remove(pos).cancel(true);
 
     }
