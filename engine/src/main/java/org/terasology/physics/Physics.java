@@ -15,9 +15,9 @@
  */
 package org.terasology.physics;
 
+import org.joml.Vector3f;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.math.AABB;
-import org.terasology.math.geom.Vector3f;
 
 import java.util.List;
 import java.util.Set;

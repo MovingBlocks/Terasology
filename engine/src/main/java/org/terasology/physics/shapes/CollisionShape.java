@@ -15,6 +15,8 @@
  */
 package org.terasology.physics.shapes;
 
+import org.joml.AABBf;
+import org.joml.Quaternionf;
 import org.terasology.math.AABB;
 import org.terasology.math.Transform;
 import org.terasology.math.geom.Quat4f;
@@ -27,9 +29,9 @@ public interface CollisionShape {
      * Returns the axis-aligned bounding box ({@link AABB}) of the transformed shape.
      *
      * @param transform The {@link Transform} pertaining to the space in which the AABB is to be calculated.
-     * @return The {@link AABB} bounding the shape.
+     * @return The {@link AABBf} bounding the shape.
      */
-    AABB getAABB(Transform transform);
+    AABBf getAABB(Transform transform);
 
     /**
      * Returns an identical shape rotated through the rotation angles represented by {@code rot}.
@@ -37,5 +39,5 @@ public interface CollisionShape {
      * @param rot The quaternion representation of the rotation.
      * @return The rotated shape.
      */
-    CollisionShape rotate(Quat4f rot);
+    CollisionShape rotate(Quaternionf rot);
 }

@@ -48,6 +48,7 @@ import org.terasology.logic.health.EngineDamageTypes;
 import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.PlayerCharacterComponent;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkSystem;
@@ -236,7 +237,7 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
                 originPos = data[1];
             }
 
-            HitResult result = physics.rayTrace(originPos, direction, characterComponent.interactionRange, Sets.newHashSet(character), DEFAULTPHYSICSFILTER);
+            HitResult result = physics.rayTrace(JomlUtil.from(originPos), JomlUtil.from(direction), characterComponent.interactionRange, Sets.newHashSet(character), DEFAULTPHYSICSFILTER);
 
             if (result.isHit()) {
                 result.getEntity().send(new AttackEvent(character, event.getItem()));
@@ -371,7 +372,7 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
                 return false; // can happen if target existed on client
             }
 
-            HitResult result = physics.rayTrace(originPos, direction, characterComponent.interactionRange, Sets.newHashSet(character), DEFAULTPHYSICSFILTER);
+            HitResult result = physics.rayTrace(JomlUtil.from(originPos), JomlUtil.from(direction), characterComponent.interactionRange, Sets.newHashSet(character), DEFAULTPHYSICSFILTER);
             if (!result.isHit()) {
                 String msg = "Denied activation attempt by {} since at the authority there was nothing to activate at that place";
                 logger.info(msg, getPlayerNameFromCharacter(character));
@@ -389,7 +390,7 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
                 return false;
             }
 
-            if (!(vectorsAreAboutEqual(event.getHitPosition(), result.getHitPoint()))) {
+            if (!(vectorsAreAboutEqual(event.getHitPosition(), JomlUtil.from(result.getHitPoint())))) {
                 String msg = "Denied activation attempt by {} since at the authority the object got hit at a differnt position";
                 logger.info(msg, getPlayerNameFromCharacter(character));
                 return false;

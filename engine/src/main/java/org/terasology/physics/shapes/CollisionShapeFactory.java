@@ -15,7 +15,8 @@
  */
 package org.terasology.physics.shapes;
 
-import org.terasology.math.geom.Vector3f;
+
+import org.joml.Vector3f;
 
 import java.util.List;
 
@@ -45,7 +46,7 @@ public interface CollisionShapeFactory {
      * @return The created unit cube box shape.
      */
     default BoxShape getNewUnitCube() {
-        return getNewBox(Vector3f.one());
+        return getNewBox(new Vector3f(1,1,1));
     }
 
     /**
