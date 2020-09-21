@@ -8,8 +8,9 @@ import org.terasology.utilities.concurrency.Task;
 import org.terasology.world.chunks.Chunk;
 
 /**
- * Common interface for {@link ChunkProcessingPipeline}
+ * @deprecated Use {@link org.terasology.world.chunks.pipeline.stages.ChunkTask} instead
  */
+@Deprecated
 public interface ChunkTask extends Task {
 
     Chunk getChunk();

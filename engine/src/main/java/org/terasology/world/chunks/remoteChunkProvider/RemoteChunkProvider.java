@@ -16,22 +16,26 @@ import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.monitoring.chunk.ChunkMonitor;
 import org.terasology.world.block.BlockManager;
+import org.terasology.world.block.BlockRegion;
+import org.terasology.world.block.BlockRegionIterable;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.ChunkProvider;
 import org.terasology.world.chunks.event.BeforeChunkUnload;
 import org.terasology.world.chunks.event.OnChunkLoaded;
 import org.terasology.world.chunks.pipeline.ChunkProcessingPipeline;
-import org.terasology.world.chunks.pipeline.stages.FunctionalStage;
-import org.terasology.world.chunks.pipeline.stages.LightMergerProcessingStageProvider;
+import org.terasology.world.chunks.pipeline.stages.ChunkTaskProvider;
 import org.terasology.world.internal.ChunkViewCore;
 import org.terasology.world.internal.ChunkViewCoreImpl;
 import org.terasology.world.propagation.light.InternalLightProcessor;
+import org.terasology.world.propagation.light.LightMerger;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 /**
  * Provides chunks received from remote source.
@@ -58,11 +62,24 @@ public class RemoteChunkProvider implements ChunkProvider {
         this.blockManager = blockManager;
         loadingPipeline = new ChunkProcessingPipeline(this::getChunk);
 
-        loadingPipeline.addStage(FunctionalStage.create("Chunk generate internal lightning",
-                InternalLightProcessor::generateInternalLighting))
-                .addStage(FunctionalStage.create("Chunk deflate", Chunk::deflate))
-                .addStage(new LightMergerProcessingStageProvider())
-                .addStage(FunctionalStage.create("", chunk -> {
+        loadingPipeline.addStage(
+                ChunkTaskProvider.create("Chunk generate internal lightning",
+                        InternalLightProcessor::generateInternalLighting))
+                .addStage(ChunkTaskProvider.create("Chunk deflate", Chunk::deflate))
+                .addStage(ChunkTaskProvider.createMulti("Light merging",
+                        chunks -> {
+                            Chunk[] localchunks = chunks.toArray(new Chunk[0]);
+                            new LightMerger().merge(localchunks[13], localchunks);
+                            return localchunks[13];
+                        },
+                        pos -> StreamSupport.stream(BlockRegionIterable.region(new BlockRegion(
+                                pos.x() - 1, pos.y() - 1, pos.z() - 1,
+                                pos.x() + 1, pos.y() + 1, pos.z() + 1
+                        )).build().spliterator(), false)
+                                .map(org.joml.Vector3i::new)
+                                .collect(Collectors.toSet())
+                ))
+                .addStage(ChunkTaskProvider.create("", chunk -> {
                     listener.onChunkReady(chunk.getPosition());
                     worldEntity.send(new OnChunkLoaded(chunk.getPosition()));
                     Chunk oldChunk = chunkCache.put(chunk.getPosition(), chunk);
