@@ -55,7 +55,7 @@ public class InitialiseRemoteWorld extends SingleStepLoadProcess {
         BlockManager blockManager = context.get(BlockManager.class);
         ExtraBlockDataManager extraDataManager = context.get(ExtraBlockDataManager.class);
 
-        RemoteChunkProvider chunkProvider = new RemoteChunkProvider(blockManager);
+        RemoteChunkProvider chunkProvider = new RemoteChunkProvider(blockManager, localPlayer);
 
         WorldProviderCoreImpl worldProviderCore = new WorldProviderCoreImpl(gameManifest.getWorldInfo(TerasologyConstants.MAIN_WORLD), chunkProvider,
                 blockManager.getBlock(BlockManager.UNLOADED_ID), context);

@@ -4,7 +4,7 @@
 package org.terasology.world.chunks.pipeline;
 
 import org.jetbrains.annotations.NotNull;
-import org.joml.Vector3i;
+import org.joml.Vector3ic;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.RunnableFuture;
@@ -14,14 +14,14 @@ import java.util.concurrent.TimeoutException;
 public class PositionFuture<T> implements RunnableFuture<T> {
 
     private final RunnableFuture<T> delegate;
-    private final Vector3i position;
+    private final Vector3ic position;
 
-    public PositionFuture(RunnableFuture<T> delegate, Vector3i position) {
+    public PositionFuture(RunnableFuture<T> delegate, Vector3ic position) {
         this.delegate = delegate;
         this.position = position;
     }
 
-    public Vector3i getPosition() {
+    public Vector3ic getPosition() {
         return position;
     }
 

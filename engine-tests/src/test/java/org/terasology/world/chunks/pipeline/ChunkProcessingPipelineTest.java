@@ -34,6 +34,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -48,7 +49,7 @@ class ChunkProcessingPipelineTest extends TerasologyTestingEnvironment {
 
     @Test
     void simpleProcessingSuccess() throws ExecutionException, InterruptedException {
-        pipeline = new ChunkProcessingPipeline((p) -> null);
+        pipeline = new ChunkProcessingPipeline((p) -> null, (o1, o2) -> 0);
 
         org.terasology.math.geom.Vector3i chunkPos = new org.terasology.math.geom.Vector3i(0, 0, 0);
         Chunk chunk = createChunkAt(chunkPos);
@@ -78,7 +79,7 @@ class ChunkProcessingPipelineTest extends TerasologyTestingEnvironment {
                                 Function.identity()
                         ));
 
-        pipeline = new ChunkProcessingPipeline(chunkCache::get);
+        pipeline = new ChunkProcessingPipeline(chunkCache::get, (o1, o2) -> 0);
         pipeline.addStage(ChunkTaskProvider.createMulti(
                 "flat merging task",
                 (chunks) -> chunks.stream()
@@ -112,7 +113,7 @@ class ChunkProcessingPipelineTest extends TerasologyTestingEnvironment {
                                 Function.identity()
                         ));
 
-        pipeline = new ChunkProcessingPipeline((p) -> null);
+        pipeline = new ChunkProcessingPipeline((p) -> null, (o1, o2) -> 0);
         pipeline.addStage(ChunkTaskProvider.createMulti(
                 "flat merging task",
                 (chunks) -> chunks.stream()
@@ -138,9 +139,16 @@ class ChunkProcessingPipelineTest extends TerasologyTestingEnvironment {
 
     @Test
     void emulateEntityMoving() throws InterruptedException {
+        final AtomicReference<Vector3ic> position = new AtomicReference<>();
         Map<Vector3ic, Future<Chunk>> futures = Maps.newHashMap();
         Map<Vector3ic, Chunk> chunkCache = Maps.newConcurrentMap();
-        pipeline = new ChunkProcessingPipeline(chunkCache::get);
+        pipeline = new ChunkProcessingPipeline(chunkCache::get, (o1, o2) -> {
+            if (position.get() != null) {
+                Vector3ic entityPos = position.get();
+                return (int) (entityPos.distance(((PositionFuture<?>) o1).getPosition()) - entityPos.distance(((PositionFuture<?>) o2).getPosition()));
+            }
+            return 0;
+        });
         pipeline.addStage(ChunkTaskProvider.createMulti(
                 "flat merging task",
                 (chunks) -> chunks.stream()
@@ -157,11 +165,11 @@ class ChunkProcessingPipelineTest extends TerasologyTestingEnvironment {
             chunkCache.put(c.getPosition(new Vector3i()), c);
         }));
 
-        Vector3ic position;
+
         Set<Vector3ic> relativeRegion = Collections.emptySet();
         for (int i = 0; i < 10; i++) {
-            position = new Vector3i(i, 0, 0);
-            Set<Vector3ic> newRegion = getNearChunkPositions(position, 10);
+            position.set(new Vector3i(i, 0, 0));
+            Set<Vector3ic> newRegion = getNearChunkPositions(position.get(), 10);
             Sets.difference(newRegion, relativeRegion).forEach(// load new chunks.
                     (pos) -> {
                         Future<Chunk> future = pipeline.invokeGeneratorTask(new Vector3i(pos),

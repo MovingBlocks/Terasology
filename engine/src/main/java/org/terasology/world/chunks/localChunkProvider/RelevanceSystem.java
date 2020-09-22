@@ -26,6 +26,7 @@ import org.terasology.world.chunks.pipeline.PositionFuture;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Map;
+import java.util.concurrent.Future;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.StreamSupport;
@@ -204,7 +205,7 @@ public class RelevanceSystem implements UpdateSubscriberSystem {
      *
      * @return Comporator.
      */
-    public Comparator<Runnable> createChunkTaskComporator() {
+    public Comparator<Future<Chunk>> createChunkTaskComporator() {
         return new ChunkTaskRelevanceComparator();
     }
 
@@ -270,10 +271,10 @@ public class RelevanceSystem implements UpdateSubscriberSystem {
     /**
      * Compare ChunkTasks by distance from region's centers.
      */
-    private class ChunkTaskRelevanceComparator implements Comparator<Runnable> {
+    private class ChunkTaskRelevanceComparator implements Comparator<Future<Chunk>> {
 
         @Override
-        public int compare(Runnable o1, Runnable o2) {
+        public int compare(Future<Chunk> o1, Future<Chunk> o2) {
             return score((PositionFuture<?>) o1) - score((PositionFuture<?>) o2);
         }
 

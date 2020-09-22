@@ -9,6 +9,7 @@ import com.google.common.collect.Queues;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.ChunkMath;
 import org.terasology.math.JomlUtil;
 import org.terasology.math.Region3i;
@@ -24,6 +25,7 @@ import org.terasology.world.chunks.ChunkProvider;
 import org.terasology.world.chunks.event.BeforeChunkUnload;
 import org.terasology.world.chunks.event.OnChunkLoaded;
 import org.terasology.world.chunks.pipeline.ChunkProcessingPipeline;
+import org.terasology.world.chunks.pipeline.PositionFuture;
 import org.terasology.world.chunks.pipeline.stages.ChunkTaskProvider;
 import org.terasology.world.internal.ChunkViewCore;
 import org.terasology.world.internal.ChunkViewCoreImpl;
@@ -31,9 +33,11 @@ import org.terasology.world.propagation.light.InternalLightProcessor;
 import org.terasology.world.propagation.light.LightMerger;
 
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -55,12 +59,13 @@ public class RemoteChunkProvider implements ChunkProvider {
     private final Map<Vector3i, Chunk> chunkCache = Maps.newHashMap();
     private final BlockManager blockManager;
     private final ChunkProcessingPipeline loadingPipeline;
-    private ChunkReadyListener listener;
     private EntityRef worldEntity = EntityRef.NULL;
+    private ChunkReadyListener listener;
 
-    public RemoteChunkProvider(BlockManager blockManager) {
+    public RemoteChunkProvider(BlockManager blockManager, LocalPlayer localPlayer) {
         this.blockManager = blockManager;
-        loadingPipeline = new ChunkProcessingPipeline(this::getChunk);
+        loadingPipeline = new ChunkProcessingPipeline(this::getChunk,
+                new LocalPlayerRelativeChunkComparator(localPlayer));
 
         loadingPipeline.addStage(
                 ChunkTaskProvider.create("Chunk generate internal lightning",
@@ -227,4 +232,20 @@ public class RemoteChunkProvider implements ChunkProvider {
         this.worldEntity = entity;
     }
 
+    private class LocalPlayerRelativeChunkComparator implements Comparator<Future<Chunk>> {
+        private final LocalPlayer localPlayer;
+
+        private LocalPlayerRelativeChunkComparator(LocalPlayer localPlayer) {
+            this.localPlayer = localPlayer;
+        }
+
+        @Override
+        public int compare(Future<Chunk> o1, Future<Chunk> o2) {
+            return score((PositionFuture<?>) o1) - score((PositionFuture<?>) o2);
+        }
+
+        private int score(PositionFuture<?> task) {
+            return (int) ChunkMath.calcChunkPos(JomlUtil.from(localPlayer.getPosition()), new org.joml.Vector3i()).distance(task.getPosition());
+        }
+    }
 }

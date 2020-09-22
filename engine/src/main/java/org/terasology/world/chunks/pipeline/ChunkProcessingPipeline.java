@@ -17,15 +17,19 @@ import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.pipeline.stages.ChunkTask;
 import org.terasology.world.chunks.pipeline.stages.ChunkTaskProvider;
 
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.PriorityBlockingQueue;
+import java.util.concurrent.RunnableFuture;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
@@ -58,17 +62,23 @@ public class ChunkProcessingPipeline {
     /**
      * Create ChunkProcessingPipeline.
      */
-    public ChunkProcessingPipeline(Function<Vector3ic, Chunk> chunkProvider) {
+    public ChunkProcessingPipeline(Function<Vector3ic, Chunk> chunkProvider, Comparator<Future<Chunk>> comparable) {
         this.chunkProvider = chunkProvider;
 
-        executor = new ThreadPoolExecutor(//TODO return Comparable.
+        executor = new ThreadPoolExecutor(
                 NUM_TASK_THREADS,
                 NUM_TASK_THREADS, 0L,
                 TimeUnit.MILLISECONDS,
                 new LinkedBlockingQueue<>(),
                 this::threadFactory,
-                this::rejectQueueHandler);
-        chunkProcessor = new ExecutorCompletionService<>(executor);
+                this::rejectQueueHandler) {
+            protected <T> RunnableFuture<T> newTaskFor(Callable<T> callable) {
+                RunnableFuture<T> newTaskFor = super.newTaskFor(callable);
+                return new PositionFuture<>(newTaskFor, ((PositionalCallable) callable).getPosition());
+            }
+        };
+        chunkProcessor = new ExecutorCompletionService<>(executor,
+                new PriorityBlockingQueue<>(800, comparable));
         reactor = new Thread(this::chunkTaskHandler);
         reactor.setName("Chunk-Processing-Reactor");
         reactor.start();
@@ -161,6 +171,9 @@ public class ChunkProcessingPipeline {
             ChunkTaskProvider chunkTaskProvider = entry.getValue();
             Set<Vector3ic> requirements = chunkTask.getRequirements();
 
+            if (!processingPosition.contains(chunkTask.getPosition())) {
+                continue; // chunktask invalidated.
+            }
             Set<Chunk> gatheredChunks = requirements.stream()
                     .map(pos -> getChunkBy(chunkTaskProvider, pos))
                     .filter(Objects::nonNull)
@@ -190,11 +203,11 @@ public class ChunkProcessingPipeline {
     }
 
     private Future<Chunk> runTask(ChunkTask task, Set<Chunk> chunks) {
-        return chunkProcessor.submit(() -> {
+        return chunkProcessor.submit(new PositionalCallable(() -> {
             try (ThreadActivity ignored = ThreadMonitor.startThreadActivity(task.getName())) {
                 return task.apply(chunks);
             }
-        });
+        }, task.getPosition()));
     }
 
 
@@ -234,7 +247,7 @@ public class ChunkProcessingPipeline {
         }
         processingPosition.add(position);
 
-        chunkProcessor.submit(generatorTask::get);
+        chunkProcessor.submit(new PositionalCallable(generatorTask::get, position));
 
         SettableFuture<Chunk> exitFuture = SettableFuture.create();
         exitFutures.put(position, exitFuture);
@@ -318,4 +331,28 @@ public class ChunkProcessingPipeline {
     public List<Vector3ic> getProcessingPosition() {
         return new LinkedList<>(processingPosition);
     }
+
+    /**
+     * Dummy callable for passthru position for {@link java.util.concurrent.ThreadPoolExecutor}#newTaskFor
+     */
+    private static final class PositionalCallable implements Callable<Chunk> {
+        private final Callable<Chunk> callable;
+        private final Vector3ic position;
+
+        private PositionalCallable(Callable<Chunk> callable, Vector3ic position) {
+            this.callable = callable;
+            this.position = position;
+        }
+
+        public Vector3ic getPosition() {
+            return position;
+        }
+
+        @Override
+        public Chunk call() throws Exception {
+            return callable.call();
+        }
+
+    }
+
 }
