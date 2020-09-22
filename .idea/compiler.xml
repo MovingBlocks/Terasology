@@ -2,7 +2,17 @@
 <project version="4">
   <component name="CompilerConfiguration">
     <annotationProcessing>
-      <profile default="true" name="Default" enabled="true" />
+      <profile default="true" name="Default" enabled="true">
+        <outputRelativeToContentRoot value="true" />
+      </profile>
+      <profile name="Gradle Imported" enabled="true">
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/info.picocli/picocli-codegen/4.5.1/cafc543418928d5b76370409348d40a76d9c5b6a/picocli-codegen-4.5.1.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/info.picocli/picocli/4.5.1/ff913b736b6ffc7cdf8144401b02a501554ba0c5/picocli-4.5.1.jar" />
+        </processorPath>
+        <module name="Terasology.facades.PC.main" />
+      </profile>
     </annotationProcessing>
     <bytecodeTargetLevel target="1.8" />
   </component>
