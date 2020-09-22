@@ -5,7 +5,6 @@ package org.terasology.world.chunks.pipeline;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.junit.jupiter.api.Assertions;
@@ -215,12 +214,10 @@ class ChunkProcessingPipelineTest extends TerasologyTestingEnvironment {
         }
     }
 
-    @NotNull
     private Set<Vector3ic> getNearChunkPositions(Vector3ic p) {
         return getNearChunkPositions(p, 1);
     }
 
-    @NotNull
     private Set<Vector3ic> getNearChunkPositions(Vector3ic p, int distance) {
         Set<Vector3ic> requirements = new HashSet<>();
         for (int x = -distance; x <= distance; x++) {
@@ -235,7 +232,6 @@ class ChunkProcessingPipelineTest extends TerasologyTestingEnvironment {
         return createChunkAt(JomlUtil.from(pos));
     }
 
-    @NotNull
     private ChunkImpl createChunkAt(org.terasology.math.geom.Vector3i chunkPos) {
         return new ChunkImpl(chunkPos, blockManager, extraDataManager);
     }
