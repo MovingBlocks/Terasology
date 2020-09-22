@@ -3,12 +3,10 @@
 
 package org.terasology.world.chunks.pipeline;
 
-import com.google.api.client.util.Lists;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.SettableFuture;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.slf4j.Logger;
@@ -111,7 +109,7 @@ public class ChunkProcessingPipeline {
      * @param chunk processing chunk
      * @param nextChunkProvider next chunk task provider.
      */
-    private void handleNextChunkProvider(@NotNull Chunk chunk, @Nullable ChunkTaskProvider nextChunkProvider) {
+    private void handleNextChunkProvider(Chunk chunk, ChunkTaskProvider nextChunkProvider) {
         Vector3i position = chunk.getPosition(new Vector3i());
         if (nextChunkProvider != null) {
             // set new chunk stage and create next new stage's task
@@ -137,7 +135,6 @@ public class ChunkProcessingPipeline {
      * @param chunk processing chunk
      * @return next {@link ChunkTaskProvider} if found, null otherwise.
      */
-    @Nullable
     private ChunkTaskProvider getNextChunkTaskProvider(Chunk chunk) {
         ChunkTaskProvider nextChunkProvider;
         ChunkTaskProvider chunkTaskProvider = currentStages.get(chunk);
