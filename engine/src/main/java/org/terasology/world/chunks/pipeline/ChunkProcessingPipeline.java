@@ -7,6 +7,8 @@ import com.google.api.client.util.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.SettableFuture;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.slf4j.Logger;
@@ -52,7 +54,7 @@ public class ChunkProcessingPipeline {
     private final Map<ChunkTask, ChunkTaskProvider> pendingChunkTasks = Maps.newConcurrentMap();
     private final Map<Vector3ic, SettableFuture<Chunk>> exitFutures = Maps.newConcurrentMap();
     private final Set<Vector3ic> processingPosition = Sets.newConcurrentHashSet();
-    private int threadIndex = 0;
+    private int threadIndex;
 
 
     /**
@@ -61,7 +63,7 @@ public class ChunkProcessingPipeline {
     public ChunkProcessingPipeline(Function<Vector3ic, Chunk> chunkProvider) {
         this.chunkProvider = chunkProvider;
 
-        executor = new ThreadPoolExecutor( //TODO return Comparable.
+        executor = new ThreadPoolExecutor(//TODO return Comparable.
                 NUM_TASK_THREADS,
                 NUM_TASK_THREADS, 0L,
                 TimeUnit.MILLISECONDS,
@@ -69,7 +71,7 @@ public class ChunkProcessingPipeline {
                 this::threadFactory,
                 this::rejectQueueHandler);
         chunkProcessor = new ExecutorCompletionService<>(executor);
-        reactor = new Thread(this::reactor);
+        reactor = new Thread(this::chunkTaskHandler);
         reactor.setName("Chunk-Processing-Reactor");
         reactor.start();
     }
@@ -77,40 +79,14 @@ public class ChunkProcessingPipeline {
     /**
      * Reactor thread. Handles all ChunkTask dependency logic and running.
      */
-    private void reactor() {
+    private void chunkTaskHandler() {
         try {
             while (!executor.isTerminated()) {
                 Future<Chunk> future = chunkProcessor.take();
                 try {
                     Chunk chunk = future.get();
-                    Vector3i position = chunk.getPosition(new Vector3i());
-                    ChunkTaskProvider chunkTaskProvider = currentStages.get(chunk);
-
-                    //Try get next stage for this chunk.
-                    ChunkTaskProvider nextChunkProvider;
-                    if (chunkTaskProvider == null) {
-                        // If it new chunk in processing (received from generator)
-                        nextChunkProvider = stages.get(0);
-                        positions.put(position, chunk);
-                    } else {
-                        // else if this old chunk, get next stage
-                        int stageIndex = stages.indexOf(chunkTaskProvider);
-                        if (stageIndex + 1 < stages.size()) {
-                            nextChunkProvider = stages.get(stageIndex + 1);
-                        } else {
-                            // haven't next stage, time to exit
-                            nextChunkProvider = null;
-                        }
-                    }
-                    if (nextChunkProvider != null) {
-                        // set new chunk stage and create next new stage's task
-                        currentStages.put(chunk, nextChunkProvider);
-                        pendingChunkTasks.put(nextChunkProvider.createChunkTask(position), nextChunkProvider);
-                    } else {
-                        // exit for chunk and clean pipeline after chunk.
-                        exitFutures.get(position).set(chunk);
-                        clean(chunk);
-                    }
+                    ChunkTaskProvider nextChunkProvider = getNextChunkTaskProvider(chunk);
+                    handleNextChunkProvider(chunk, nextChunkProvider);
                     // Process pending chunk task
                     processChunkTasks();
                 } catch (ExecutionException e) {
@@ -121,13 +97,65 @@ public class ChunkProcessingPipeline {
             }
         } catch (InterruptedException e) {
             logger.error("Reactor thread was interrupted", e);
+            reactor.interrupt();
         }
     }
 
-    private void clean(Chunk chunk) {
-        processingPosition.remove(chunk.getPosition(new Vector3i()));
-        currentStages.remove(chunk);
-        exitFutures.remove(chunk.getPosition(new Vector3i()));
+    /**
+     * Handle next chunk task provider.
+     * <p>
+     * If {@code nextChunkProvider} is non {@code null} - create {@link ChunkTask} for processing.
+     * <p>
+     * If {@code nextChunkProvider} is {@code null} - end processing for chunk and cleanup pipeline.
+     *
+     * @param chunk processing chunk
+     * @param nextChunkProvider next chunk task provider.
+     */
+    private void handleNextChunkProvider(@NotNull Chunk chunk, @Nullable ChunkTaskProvider nextChunkProvider) {
+        Vector3i position = chunk.getPosition(new Vector3i());
+        if (nextChunkProvider != null) {
+            // set new chunk stage and create next new stage's task
+            currentStages.put(chunk, nextChunkProvider);
+            pendingChunkTasks.put(nextChunkProvider.createChunkTask(position), nextChunkProvider);
+        } else {
+            // exit for chunk and clean pipeline after chunk.
+            SettableFuture<Chunk> chunkSettableFuture = exitFutures.get(position);
+            if (chunkSettableFuture != null) {
+                chunkSettableFuture.set(chunk);
+                cleanup(chunk);
+            }
+        }
+    }
+
+    /**
+     * Get next {@link ChunkTaskProvider} for chunk.
+     * <p>
+     * If it is new chunk in processing (after generation) - first stage.
+     * <p>
+     * If chunk passing last stage - returns {@code null}
+     *
+     * @param chunk processing chunk
+     * @return next {@link ChunkTaskProvider} if found, null otherwise.
+     */
+    @Nullable
+    private ChunkTaskProvider getNextChunkTaskProvider(Chunk chunk) {
+        ChunkTaskProvider nextChunkProvider;
+        ChunkTaskProvider chunkTaskProvider = currentStages.get(chunk);
+        if (chunkTaskProvider == null) {
+            // If it new chunk in processing (received from generator)
+            nextChunkProvider = stages.get(0);
+            positions.put(chunk.getPosition(new Vector3i()), chunk);
+        } else {
+            // else if this old chunk, get next stage
+            int stageIndex = stages.indexOf(chunkTaskProvider);
+            if (stageIndex + 1 < stages.size()) {
+                nextChunkProvider = stages.get(stageIndex + 1);
+            } else {
+                // haven't next stage, time to exit
+                nextChunkProvider = null;
+            }
+        }
+        return nextChunkProvider;
     }
 
     private void processChunkTasks() {
@@ -204,7 +232,11 @@ public class ChunkProcessingPipeline {
      * @return Future of chunk processing.
      */
     public Future<Chunk> invokeGeneratorTask(Vector3i position, Supplier<Chunk> generatorTask) {
+        if (processingPosition.contains(position)) {
+            return exitFutures.get(position);
+        }
         processingPosition.add(position);
+
         chunkProcessor.submit(generatorTask::get);
 
         SettableFuture<Chunk> exitFuture = SettableFuture.create();
@@ -223,16 +255,23 @@ public class ChunkProcessingPipeline {
     }
 
     public void shutdown() {
+        executor.shutdown();
+        processingPosition.forEach(this::stopProcessingAt);
         processingPosition.clear();
+        pendingChunkTasks.clear();
         positions.clear();
         currentStages.clear();
-        exitFutures.clear(); // TODO cancel all futures.
-        executor.shutdown();
+        exitFutures.clear();
     }
 
     public void restart() {
+        pendingChunkTasks.clear();
+        executor.getQueue().clear();
+        processingPosition.forEach(this::stopProcessingAt);
         processingPosition.clear();
-        executor.shutdown();
+        positions.clear();
+        currentStages.clear();
+        exitFutures.clear();
     }
 
     /**
@@ -240,17 +279,29 @@ public class ChunkProcessingPipeline {
      *
      * @param pos position of chunk to stop processing.
      */
-    public void stopProcessingAt(Vector3i pos) {
+    public void stopProcessingAt(Vector3ic pos) {
         processingPosition.remove(pos);
         Chunk chunk = positions.remove(pos);
         if (chunk != null) {
             chunk.dispose();
             currentStages.remove(chunk);
         }
-        pendingChunkTasks.keySet().removeIf((t) -> t.getPosition().equals(pos));
+        pendingChunkTasks.keySet().removeIf(chunkTask -> chunkTask.getPosition().equals(pos));
         exitFutures.remove(pos).cancel(true);
-
     }
+
+    /**
+     * Cleanuping Chunk processing after done.
+     *
+     * @param chunk chunk to cleanup
+     */
+    private void cleanup(Chunk chunk) {
+        Vector3i position = chunk.getPosition(new Vector3i());
+        processingPosition.remove(position);
+        currentStages.remove(chunk);
+        exitFutures.remove(position);
+    }
+
 
     /**
      * Check is position processing.
