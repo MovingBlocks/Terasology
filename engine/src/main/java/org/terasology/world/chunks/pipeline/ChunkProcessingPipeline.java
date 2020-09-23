@@ -3,9 +3,9 @@
 
 package org.terasology.world.chunks.pipeline;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.SettableFuture;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
@@ -46,18 +46,14 @@ public class ChunkProcessingPipeline {
     private static final int NUM_TASK_THREADS = 8;
     private static final Logger logger = LoggerFactory.getLogger(ChunkProcessingPipeline.class);
 
-    private final ExecutorCompletionService<Chunk> chunkProcessor;
-    private final Function<Vector3ic, Chunk> chunkProvider;
-    private final Thread reactor;
     private final List<ChunkTaskProvider> stages = Lists.newArrayList();
+    private final Thread reactor;
+    private final ExecutorCompletionService<Chunk> chunkProcessor;
     private final ThreadPoolExecutor executor;
-    private final Map<Vector3ic, Chunk> positions = Maps.newConcurrentMap();
-    private final Map<Chunk, ChunkTaskProvider> currentStages = Maps.newConcurrentMap();
-    private final Map<ChunkTask, ChunkTaskProvider> pendingChunkTasks = Maps.newConcurrentMap();
-    private final Map<Vector3ic, SettableFuture<Chunk>> exitFutures = Maps.newConcurrentMap();
-    private final Set<Vector3ic> processingPosition = Sets.newConcurrentHashSet();
     private int threadIndex;
 
+    private final Function<Vector3ic, Chunk> chunkProvider;
+    private final Map<Vector3ic, ChunkProcessingInfo> chunkProcessingInfoMap = Maps.newConcurrentMap();
 
     /**
      * Create ChunkProcessingPipeline.
@@ -72,6 +68,7 @@ public class ChunkProcessingPipeline {
                 new LinkedBlockingQueue<>(),
                 this::threadFactory,
                 this::rejectQueueHandler) {
+            @Override
             protected <T> RunnableFuture<T> newTaskFor(Callable<T> callable) {
                 RunnableFuture<T> newTaskFor = super.newTaskFor(callable);
                 return new PositionFuture<>(newTaskFor, ((PositionalCallable) callable).getPosition());
@@ -90,18 +87,12 @@ public class ChunkProcessingPipeline {
     private void chunkTaskHandler() {
         try {
             while (!executor.isTerminated()) {
-                Future<Chunk> future = chunkProcessor.take();
-                try {
-                    Chunk chunk = future.get();
-                    ChunkTaskProvider nextChunkProvider = getNextChunkTaskProvider(chunk);
-                    handleNextChunkProvider(chunk, nextChunkProvider);
-                    // Process pending chunk task
-                    processChunkTasks();
-                } catch (ExecutionException e) {
-                    logger.error("ChunkTask catch error: ", e); // TODO fetch Position and stage.
-                } catch (Exception e) {
-                    logger.error("Exception catched:", e);
+                PositionFuture<Chunk> future = (PositionFuture<Chunk>) chunkProcessor.take();
+                ChunkProcessingInfo chunkProcessingInfo = chunkProcessingInfoMap.get(future.getPosition());
+                if (chunkProcessingInfo == null) {
+                    continue; // chunk processing was cancelled.
                 }
+                onStageDone(future, chunkProcessingInfo);
             }
         } catch (InterruptedException e) {
             logger.error("Reactor thread was interrupted", e);
@@ -109,94 +100,60 @@ public class ChunkProcessingPipeline {
         }
     }
 
-    /**
-     * Handle next chunk task provider.
-     * <p>
-     * If {@code nextChunkProvider} is non {@code null} - create {@link ChunkTask} for processing.
-     * <p>
-     * If {@code nextChunkProvider} is {@code null} - end processing for chunk and cleanup pipeline.
-     *
-     * @param chunk processing chunk
-     * @param nextChunkProvider next chunk task provider.
-     */
-    private void handleNextChunkProvider(Chunk chunk, ChunkTaskProvider nextChunkProvider) {
-        Vector3i position = chunk.getPosition(new Vector3i());
-        if (nextChunkProvider != null) {
-            // set new chunk stage and create next new stage's task
-            currentStages.put(chunk, nextChunkProvider);
-            pendingChunkTasks.put(nextChunkProvider.createChunkTask(position), nextChunkProvider);
-        } else {
-            // exit for chunk and clean pipeline after chunk.
-            SettableFuture<Chunk> chunkSettableFuture = exitFutures.get(position);
-            if (chunkSettableFuture != null) {
-                chunkSettableFuture.set(chunk);
-                cleanup(chunk);
-            }
-        }
-    }
+    private void onStageDone(PositionFuture<Chunk> future, ChunkProcessingInfo chunkProcessingInfo) throws InterruptedException {
+        try {
+            chunkProcessingInfo.resetTaskState();
+            chunkProcessingInfo.setChunk(future.get());
 
-    /**
-     * Get next {@link ChunkTaskProvider} for chunk.
-     * <p>
-     * If it is new chunk in processing (after generation) - first stage.
-     * <p>
-     * If chunk passing last stage - returns {@code null}
-     *
-     * @param chunk processing chunk
-     * @return next {@link ChunkTaskProvider} if found, null otherwise.
-     */
-    private ChunkTaskProvider getNextChunkTaskProvider(Chunk chunk) {
-        ChunkTaskProvider nextChunkProvider;
-        ChunkTaskProvider chunkTaskProvider = currentStages.get(chunk);
-        if (chunkTaskProvider == null) {
-            // If it new chunk in processing (received from generator)
-            nextChunkProvider = stages.get(0);
-            positions.put(chunk.getPosition(new Vector3i()), chunk);
-        } else {
-            // else if this old chunk, get next stage
-            int stageIndex = stages.indexOf(chunkTaskProvider);
-            if (stageIndex + 1 < stages.size()) {
-                nextChunkProvider = stages.get(stageIndex + 1);
+            //Move by stage.
+            if (chunkProcessingInfo.hasNextStage(stages)) {
+                chunkProcessingInfo.nextStage(stages);
+                chunkProcessingInfo.makeChunkTask();
             } else {
-                // haven't next stage, time to exit
-                nextChunkProvider = null;
+                // haven't next stage
+                chunkProcessingInfo.endProcessing();
+                cleanup(chunkProcessingInfo);
             }
+            processChunkTasks();
+
+        } catch (ExecutionException e) {
+            String stageName =
+                    chunkProcessingInfo.getChunkTaskProvider() == null
+                            ? "Generation or Loading"
+                            : chunkProcessingInfo.getChunkTaskProvider().getName();
+            logger.error(
+                    String.format("ChunkTask at position %s and stage [%s] catch error: ",
+                            chunkProcessingInfo.getPosition(), stageName),
+                    e);
+            chunkProcessingInfo.getExternalFuture().setException(e);
         }
-        return nextChunkProvider;
     }
 
     private void processChunkTasks() {
-        for (Map.Entry<ChunkTask, ChunkTaskProvider> entry : pendingChunkTasks.entrySet()) {
-            ChunkTask chunkTask = entry.getKey();
-            ChunkTaskProvider chunkTaskProvider = entry.getValue();
-            Set<Vector3ic> requirements = chunkTask.getRequirements();
-
-            if (!processingPosition.contains(chunkTask.getPosition())) {
-                continue; // chunktask invalidated.
-            }
-            Set<Chunk> gatheredChunks = requirements.stream()
-                    .map(pos -> getChunkBy(chunkTaskProvider, pos))
-                    .filter(Objects::nonNull)
-                    .collect(Collectors.toSet());
-
-            if (gatheredChunks.size() == requirements.size()) {
-
-                runTask(chunkTask, gatheredChunks);
-                pendingChunkTasks.remove(chunkTask, chunkTaskProvider);
-            }
-        }
+        chunkProcessingInfoMap.values().stream()
+                .filter(chunkProcessingInfo -> chunkProcessingInfo.getChunkTask() != null && chunkProcessingInfo.getCurrentFuture() == null)
+                .forEach(chunkProcessingInfo -> {
+                    ChunkTask chunkTask = chunkProcessingInfo.getChunkTask();
+                    Set<Chunk> providedChunks = chunkTask.getRequirements().stream()
+                            .map(pos -> getChunkBy(chunkProcessingInfo.getChunkTaskProvider(), pos))
+                            .filter(Objects::nonNull)
+                            .collect(Collectors.toSet());
+                    if (providedChunks.size() == chunkTask.getRequirements().size()) {
+                        chunkProcessingInfo.setCurrentFuture(runTask(chunkTask, providedChunks));
+                    }
+                });
     }
 
     private Chunk getChunkBy(ChunkTaskProvider requiredStage, Vector3ic position) {
         Chunk chunk = chunkProvider.apply(position);
         if (chunk == null) {
-            Chunk candidate = positions.get(position);
+            ChunkProcessingInfo candidate = chunkProcessingInfoMap.get(position);
             if (candidate == null) {
                 return null;
             }
-            ChunkTaskProvider candidateCurrentStage = currentStages.get(candidate);
+            ChunkTaskProvider candidateCurrentStage = candidate.getChunkTaskProvider();
             if (stages.indexOf(candidateCurrentStage) >= stages.indexOf(requiredStage)) {
-                chunk = candidate;
+                chunk = candidate.getChunk();
             }
         }
         return chunk;
@@ -209,7 +166,6 @@ public class ChunkProcessingPipeline {
             }
         }, task.getPosition()));
     }
-
 
     private Thread threadFactory(Runnable runnable) {
         Thread thread = new Thread(runnable);
@@ -242,16 +198,18 @@ public class ChunkProcessingPipeline {
      * @return Future of chunk processing.
      */
     public Future<Chunk> invokeGeneratorTask(Vector3i position, Supplier<Chunk> generatorTask) {
-        if (processingPosition.contains(position)) {
-            return exitFutures.get(position);
+        Preconditions.checkState(!stages.isEmpty(), "ChunkProcessingPipeline must to have at least one stage");
+        ChunkProcessingInfo chunkProcessingInfo = chunkProcessingInfoMap.get(position);
+        if (chunkProcessingInfo != null) {
+            return chunkProcessingInfo.getExternalFuture();
+        } else {
+            SettableFuture<Chunk> exitFuture = SettableFuture.create();
+            chunkProcessingInfo = new ChunkProcessingInfo(position, exitFuture);
+            chunkProcessingInfoMap.put(position, chunkProcessingInfo);
+            chunkProcessingInfo.setCurrentFuture(chunkProcessor.submit(new PositionalCallable(generatorTask::get,
+                    position)));
+            return exitFuture;
         }
-        processingPosition.add(position);
-
-        chunkProcessor.submit(new PositionalCallable(generatorTask::get, position));
-
-        SettableFuture<Chunk> exitFuture = SettableFuture.create();
-        exitFutures.put(position, exitFuture);
-        return exitFuture;
     }
 
     /**
@@ -266,22 +224,15 @@ public class ChunkProcessingPipeline {
 
     public void shutdown() {
         executor.shutdown();
-        processingPosition.forEach(this::stopProcessingAt);
-        processingPosition.clear();
-        pendingChunkTasks.clear();
-        positions.clear();
-        currentStages.clear();
-        exitFutures.clear();
+
+        chunkProcessingInfoMap.keySet().forEach(this::stopProcessingAt);
+        chunkProcessingInfoMap.clear();
     }
 
     public void restart() {
-        pendingChunkTasks.clear();
+        chunkProcessingInfoMap.clear();
         executor.getQueue().clear();
-        processingPosition.forEach(this::stopProcessingAt);
-        processingPosition.clear();
-        positions.clear();
-        currentStages.clear();
-        exitFutures.clear();
+        chunkProcessingInfoMap.keySet().forEach(this::stopProcessingAt);
     }
 
     /**
@@ -290,28 +241,28 @@ public class ChunkProcessingPipeline {
      * @param pos position of chunk to stop processing.
      */
     public void stopProcessingAt(Vector3ic pos) {
-        processingPosition.remove(pos);
-        Chunk chunk = positions.remove(pos);
+        ChunkProcessingInfo removed = chunkProcessingInfoMap.remove(pos);
+        removed.getExternalFuture().cancel(true);
+
+        Future<Chunk> currentFuture = removed.getCurrentFuture();
+        if (currentFuture != null) {
+            currentFuture.cancel(true);
+        }
+
+        Chunk chunk = removed.getChunk();
         if (chunk != null) {
             chunk.dispose();
-            currentStages.remove(chunk);
         }
-        pendingChunkTasks.keySet().removeIf(chunkTask -> chunkTask.getPosition().equals(pos));
-        exitFutures.remove(pos).cancel(true);
     }
 
     /**
      * Cleanuping Chunk processing after done.
      *
-     * @param chunk chunk to cleanup
+     * @param chunkProcessingInfo chunk to cleanup
      */
-    private void cleanup(Chunk chunk) {
-        Vector3i position = chunk.getPosition(new Vector3i());
-        processingPosition.remove(position);
-        currentStages.remove(chunk);
-        exitFutures.remove(position);
+    private void cleanup(ChunkProcessingInfo chunkProcessingInfo) {
+        chunkProcessingInfoMap.remove(chunkProcessingInfo.getPosition(), chunkProcessingInfo);
     }
-
 
     /**
      * Check is position processing.
@@ -320,7 +271,7 @@ public class ChunkProcessingPipeline {
      * @return true if position processing, false otherwise
      */
     public boolean isPositionProcessing(Vector3ic pos) {
-        return processingPosition.contains(pos);
+        return chunkProcessingInfoMap.containsKey(pos);
     }
 
     /**
@@ -329,7 +280,7 @@ public class ChunkProcessingPipeline {
      * @return copy of processing positions
      */
     public List<Vector3ic> getProcessingPosition() {
-        return new LinkedList<>(processingPosition);
+        return new LinkedList<>(chunkProcessingInfoMap.keySet());
     }
 
     /**
@@ -352,7 +303,5 @@ public class ChunkProcessingPipeline {
         public Chunk call() throws Exception {
             return callable.call();
         }
-
     }
-
 }

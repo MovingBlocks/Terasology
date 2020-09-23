@@ -29,6 +29,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -47,7 +48,7 @@ class ChunkProcessingPipelineTest extends TerasologyTestingEnvironment {
     private ChunkProcessingPipeline pipeline;
 
     @Test
-    void simpleProcessingSuccess() throws ExecutionException, InterruptedException {
+    void simpleProcessingSuccess() throws ExecutionException, InterruptedException, TimeoutException {
         pipeline = new ChunkProcessingPipeline((p) -> null, (o1, o2) -> 0);
 
         org.terasology.math.geom.Vector3i chunkPos = new org.terasology.math.geom.Vector3i(0, 0, 0);
@@ -56,10 +57,35 @@ class ChunkProcessingPipelineTest extends TerasologyTestingEnvironment {
         pipeline.addStage(ChunkTaskProvider.create("dummy task", (c) -> c));
 
         Future<Chunk> chunkFuture = pipeline.invokeGeneratorTask(new Vector3i(0, 0, 0), () -> chunk);
-        Chunk chunkAfterProcessing = chunkFuture.get();
+        Chunk chunkAfterProcessing = chunkFuture.get(1, TimeUnit.SECONDS);
 
         Assertions.assertEquals(chunkAfterProcessing.getPosition(new Vector3i()), chunk.getPosition(new Vector3i()),
                 "Chunk after processing must have equals position, probably pipeline lost you chunk");
+    }
+
+    @Test
+    void simpleStopProcessingSuccess() {
+        pipeline = new ChunkProcessingPipeline((p) -> null, (o1, o2) -> 0);
+
+        Vector3i position = new Vector3i(0, 0, 0);
+        Chunk chunk = createChunkAt(position);
+
+
+        pipeline.addStage(ChunkTaskProvider.create("dummy long executing task", (c) -> {
+            try {
+                Thread.sleep(1_000);
+            } catch (InterruptedException e) {
+            }
+            return c;
+        }));
+
+        Future<Chunk> chunkFuture = pipeline.invokeGeneratorTask(position, () -> chunk);
+        pipeline.stopProcessingAt(position);
+        Assertions.assertThrows(
+                CancellationException.class,
+                () -> chunkFuture.get(1, TimeUnit.SECONDS),
+                "chunkFuture must be cancelled, when processing stopped"
+        );
     }
 
     /**
