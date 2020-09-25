@@ -72,13 +72,24 @@
                                         "id": "onlineButton",
                                         "text": "${engine:menu#listed-servers}",
                                         "layoutInfo": {
-                                            "relativeWidth": 0.5
+                                            "relativeWidth": 0.35
                                         }
                                     },
                                     {
                                         "type": "UIButton",
                                         "id": "customButton",
-                                        "text": "${engine:menu#custom-servers}"
+                                        "text": "${engine:menu#custom-servers}",
+                                        "layoutInfo": {
+                                            "relativeWidth": 0.35
+                                        }
+                                    },
+                                    {
+                                        "type": "UIButton",
+                                        "id": "lanButton",
+                                        "text": "${engine:menu#lan-servers}",
+                                        "layoutInfo": {
+                                            "relativeWidth": 0.3
+                                        }
                                     }
                                 ],
                                 "layoutInfo": {
@@ -191,6 +202,25 @@
                                                     "position-bottom": {
                                                         "target": "BOTTOM",
                                                         "offset": 4
+                                                    }
+                                                }
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "type": "RelativeLayout",
+                                        "id": "lanServerListScrollArea",
+                                        "contents": [
+                                            {
+                                                "type": "ScrollableArea",
+                                                "content": {
+                                                    "type": "UIList",
+                                                    "id": "lanServerList",
+                                                    "family": "module-list"
+                                                },
+                                                "layoutInfo": {
+                                                    "position-top": {
+                                                        "target": "TOP"
                                                     }
                                                 }
                                             }
@@ -327,6 +357,18 @@
                                         "type": "UIButton",
                                         "id": "join",
                                         "text": "${engine:menu#join-server-action}",
+                                        "family": "highlight",
+                                        "layoutInfo": {
+                                            "height": 40,
+                                            "position-bottom": {
+                                                "target": "BOTTOM"
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "type": "UIButton",
+                                        "id": "broadcast",
+                                        "text": "${engine:menu#start-server-broadcast}",
                                         "family": "highlight",
                                         "layoutInfo": {
                                             "height": 40,
