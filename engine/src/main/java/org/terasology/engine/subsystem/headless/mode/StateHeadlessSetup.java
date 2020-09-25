@@ -107,11 +107,8 @@ public class StateHeadlessSetup implements GameState {
 
         // Get the server to start broadcast
         BroadcastServer broadcastServer = new BroadcastServer();
-        try {
-            broadcastServer.startBroadcast();
-        } catch (Exception e) {
+        broadcastServer.startBroadcast();
 
-        }
 
         GameManifest gameManifest;
         List<GameInfo> savedGames = GameProvider.getSavedGames();
