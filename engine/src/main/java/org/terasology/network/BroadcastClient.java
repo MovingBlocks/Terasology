@@ -24,43 +24,40 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.Executors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.ServerInfo;
 
-public class BroadcastClient extends TimerTask{
+public class BroadcastClient extends TimerTask {
 
     private static final Logger logger = LoggerFactory.getLogger(BroadcastClient.class);
-    private static final String DISCOVERY_REQUEST= "DISCOVERY_REQUEST";
+    private static final String DISCOVERY_REQUEST = "DISCOVERY_REQUEST";
+
+    private static int lanCount = 1;
+
+    public static List<ServerInfo> lanServers = new ArrayList<>();
 
     private DatagramSocket receiveSocket;
 
-    private boolean isReceived;
-
-    public List<ServerInfo> lanServers = new ArrayList<>();
-
-    private static int lanCount=1;
-
 
     @Override
-    public void run(){
+    public void run() {
         try {
             byte[] buffer = DISCOVERY_REQUEST.getBytes(StandardCharsets.UTF_8);
             DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
             getReceiveSocket().receive(packet);
-            ServerInfo serverDetails = new ServerInfo("LAN" + lanCount,packet.getAddress().getHostAddress(),packet.getPort());
-            isReceived = false;
-            for(ServerInfo serverDetail : lanServers){
-                if(serverDetail.getAddress().equals(packet.getAddress().getHostAddress())){
+            ServerInfo serverDetails = new ServerInfo("LAN-" + lanCount, packet.getAddress().getHostAddress(), packet.getPort());
+            boolean isReceived = false;
+            for (ServerInfo serverDetail : lanServers) {
+                if (serverDetail.getAddress().equals(packet.getAddress().getHostAddress())) {
                     isReceived = true;
                 }
             }
-            if(!isReceived) {
+            if (!isReceived) {
                 lanServers.add(serverDetails);
                 lanCount++;
             }
-            logger.info("Discovery package received! -> " + packet.getAddress()+ ":" + packet.getPort()+ ":" + this.getLanServers());
+            logger.info("Discovery package received! -> " + packet.getAddress() + ":" + packet.getPort() + ":" + this.getLanServers());
 
         } catch (IOException e) {
             logger.error("Broadcast Exception Encountered" + e.getMessage());
@@ -77,7 +74,7 @@ public class BroadcastClient extends TimerTask{
         receiveSocket.close();
     }
 
-    public List<ServerInfo> getLanServers(){
+    public List<ServerInfo> getLanServers() {
         return lanServers;
     }
 

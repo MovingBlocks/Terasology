@@ -96,9 +96,9 @@ public class JoinGameScreen extends CoreScreenLayer {
     @In
     private StorageServiceWorker storageServiceWorker;
 
-    private BroadcastServer broadcastServer = new BroadcastServer();
+    private final BroadcastServer broadcastServer = new BroadcastServer();
 
-    private BroadcastClient broadcastClient = new BroadcastClient();
+    private final BroadcastClient broadcastClient = new BroadcastClient();
 
     private Map<ServerInfo, Future<ServerInfoMessage>> extInfo = new HashMap<>();
 
@@ -106,13 +106,13 @@ public class JoinGameScreen extends CoreScreenLayer {
 
     private ServerListDownloader downloader;
 
+    private  UIList<ServerInfo> lanServerList;
+
     private UIList<ServerInfo> visibleList;
 
-    public  UIList<ServerInfo> lanServerList;
+    private Predicate<ServerInfo> activeServersOnly = ServerInfo::isActive;
 
     private List<ServerInfo> listedServers = new ArrayList<>();
-
-    private Predicate<ServerInfo> activeServersOnly = ServerInfo::isActive;
 
     private boolean updateComplete;
 
@@ -138,7 +138,7 @@ public class JoinGameScreen extends CoreScreenLayer {
 
         lanServerList = find("lanServerList", UIList.class);
         if (lanServerList != null) {
-            lanServerList.setList(broadcastClient.getLanServers());
+            lanServerList.setList(BroadcastClient.lanServers);
             configureServerList(lanServerList);
         }
 
@@ -170,7 +170,7 @@ public class JoinGameScreen extends CoreScreenLayer {
             find("onlineButton", UIButton.class).setFamily("default");
             find("lanButton", UIButton.class).setFamily("highlight");
             visibleList = lanServerList;
-            refreshLan refresh=new refreshLan();
+            RefreshLan refresh=new RefreshLan();
             refresh.refresh();
         };
         WidgetUtil.trySubscribe(this, "lanButton", activateLan);
@@ -397,7 +397,7 @@ public class JoinGameScreen extends CoreScreenLayer {
                 broadCastServerButton.setText(translationSystem.translate("${engine:menu#start-server-broadcast}"));
                 try {
                     broadcastServer.startBroadcast();
-                }catch(Exception e){
+                } catch (Exception e) {
 
                 }
             });
@@ -538,8 +538,9 @@ public class JoinGameScreen extends CoreScreenLayer {
             } catch (IOException e) {
                 String text = translationSystem.translate("${engine:menu#connection-failed}");
                 // Check if selection name is same as earlier when response is received before updating ping field
-                if (name.equals(visibleList.getSelection().getName()))
-                GameThread.asynch(() -> ping.setText(FontColor.getColored(text, Color.RED)));
+                if (name.equals(visibleList.getSelection().getName())) {
+                    GameThread.asynch(() -> ping.setText(FontColor.getColored(text, Color.RED)));
+                }
             }
         });
 
@@ -562,25 +563,25 @@ public class JoinGameScreen extends CoreScreenLayer {
         return false;
     }
 
-    private class refreshLan extends TimerTask{
+    public void refresh() {
+        ServerInfo i = visibleList.getSelection();
+        visibleList.setSelection(null);
+        extInfo.clear();
+        visibleList.setSelection(i);
+    }
+
+    private class RefreshLan extends TimerTask {
         @Override
-        public void run(){
-            lanServerList.setList(broadcastClient.getLanServers());
+        public void run() {
+            lanServerList.setList(BroadcastClient.lanServers);
             logger.info(broadcastClient.getLanServers().toString());
             configureServerList(lanServerList);
             visibleList = lanServerList;
         }
         public void refresh() {
             Timer timer = new Timer(true);
-            timer.schedule(new refreshLan(), 0, 1500);
+            timer.schedule(new RefreshLan(), 0, 1500);
         }
-    }
-
-    public void refresh() { 
-        ServerInfo i = visibleList.getSelection();
-        visibleList.setSelection(null);
-        extInfo.clear();
-        visibleList.setSelection(i);
     }
 
 }

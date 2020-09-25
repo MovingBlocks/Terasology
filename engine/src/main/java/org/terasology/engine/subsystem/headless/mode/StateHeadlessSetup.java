@@ -71,7 +71,6 @@ public class StateHeadlessSetup implements GameState {
     private EventSystem eventSystem;
     private ComponentSystemManager componentSystemManager;
     private Context context;
-    private BroadcastServer broadcastServer;
 
     public StateHeadlessSetup() {
     }
@@ -107,10 +106,10 @@ public class StateHeadlessSetup implements GameState {
         componentSystemManager.initialise();
 
         // Get the server to start broadcast
-        broadcastServer=new BroadcastServer();
+        BroadcastServer broadcastServer = new BroadcastServer();
         try {
             broadcastServer.startBroadcast();
-        }catch(Exception e){
+        } catch (Exception e) {
 
         }
 

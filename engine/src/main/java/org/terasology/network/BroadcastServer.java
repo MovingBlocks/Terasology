@@ -22,20 +22,19 @@ import java.net.InetAddress;
 import java.nio.charset.StandardCharsets;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.Executors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class BroadcastServer extends TimerTask{
+public class BroadcastServer extends TimerTask {
 
     private static final Logger logger = LoggerFactory.getLogger(BroadcastServer.class);
-    private static final String DISCOVERY_REQUEST= "DISCOVERY_REQUEST";
+    private static final String DISCOVERY_REQUEST = "DISCOVERY_REQUEST";
 
     private DatagramSocket sendSocket;
 
 
     @Override
-    public void run(){
+    public void run() {
         try {
             // Discovery request command
             byte[] data = DISCOVERY_REQUEST.getBytes(StandardCharsets.UTF_8);
