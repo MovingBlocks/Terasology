@@ -19,7 +19,6 @@ import com.google.common.collect.Maps;
 import org.joml.Vector3ic;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.math.Side;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.world.ChunkView;
 import org.terasology.world.block.Block;
