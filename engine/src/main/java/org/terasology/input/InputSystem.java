@@ -315,9 +315,9 @@ public class InputSystem extends BaseComponentSystem {
             pressed,
             delta, inputEntities,
             targetSystem.getTarget(),
-            JomlUtil.from(targetSystem.getTargetBlockPosition()),
-            JomlUtil.from(targetSystem.getHitPosition()),
-            JomlUtil.from(targetSystem.getHitNormal()),
+            targetSystem.getTargetBlockPosition(),
+            targetSystem.getHitPosition(),
+            targetSystem.getHitNormal(),
             consumed,
             time.getGameTimeInMs());
     }
@@ -419,9 +419,9 @@ public class InputSystem extends BaseComponentSystem {
             button.update(inputEntities,
                     delta,
                     targetSystem.getTarget(),
-                    JomlUtil.from(targetSystem.getTargetBlockPosition()),
-                    JomlUtil.from(targetSystem.getHitPosition()),
-                    JomlUtil.from(targetSystem.getHitNormal()),
+                    targetSystem.getTargetBlockPosition(),
+                    targetSystem.getHitPosition(),
+                    targetSystem.getHitNormal(),
                     time.getGameTimeInMs());
         }
     }
