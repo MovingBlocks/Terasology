@@ -111,6 +111,11 @@ configurations {
     }
 }
 
+compileJava {
+    // according to https://picocli.info/#_gradle_2
+    options.compilerArgs += ["-Aproject=${project.group}/${project.name}"]
+}
+
 run {
     description = "Run 'Terasology' to play the game as a standard PC application"
     group = "terasology run"
