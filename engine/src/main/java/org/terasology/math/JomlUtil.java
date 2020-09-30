@@ -41,6 +41,7 @@ import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Rect2f;
 import org.terasology.math.geom.Rect2i;
 import org.terasology.math.geom.Vector3f;
+import org.terasology.world.block.BlockRegion;
 
 public class JomlUtil {
 
@@ -127,6 +128,12 @@ public class JomlUtil {
     public static AABBf from(AABB aabb) {
         return new AABBf(aabb.minX(), aabb.minY(), aabb.minZ(), aabb.maxX(), aabb.maxY(), aabb.maxZ());
     }
+
+
+    public static BlockRegion from(Region3i aabb) {
+        return new BlockRegion(aabb.minX(), aabb.minY(), aabb.minZ(), aabb.maxX(), aabb.maxY(), aabb.maxZ());
+    }
+
 
     public static Rectanglei from(Rect2i rect) {
         return new Rectanglei(rect.minX(), rect.minY(), rect.maxX(), rect.maxY());
