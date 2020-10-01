@@ -34,6 +34,8 @@ import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.math.geom.Vector4f;
 import org.terasology.naming.Name;
+import org.terasology.nui.Color;
+import org.terasology.nui.UITextureRegion;
 import org.terasology.persistence.typeHandling.coreTypes.BooleanTypeHandler;
 import org.terasology.persistence.typeHandling.coreTypes.ByteArrayTypeHandler;
 import org.terasology.persistence.typeHandling.coreTypes.ByteTypeHandler;
@@ -54,6 +56,7 @@ import org.terasology.persistence.typeHandling.extensionTypes.ColorTypeHandler;
 import org.terasology.persistence.typeHandling.extensionTypes.NameTypeHandler;
 import org.terasology.persistence.typeHandling.extensionTypes.PrefabTypeHandler;
 import org.terasology.persistence.typeHandling.extensionTypes.TextureRegionTypeHandler;
+import org.terasology.persistence.typeHandling.extensionTypes.UITextureRegionTypeHandler;
 import org.terasology.persistence.typeHandling.extensionTypes.factories.AssetTypeHandlerFactory;
 import org.terasology.persistence.typeHandling.extensionTypes.factories.ComponentClassTypeHandlerFactory;
 import org.terasology.persistence.typeHandling.extensionTypes.factories.TextureRegionAssetTypeHandlerFactory;
@@ -86,6 +89,7 @@ import org.terasology.reflection.reflect.ConstructorLibrary;
 import org.terasology.rendering.assets.texture.TextureRegion;
 import org.terasology.rendering.nui.Color;
 import org.terasology.world.block.BlockRegion;
+
 
 import java.lang.reflect.Type;
 import java.util.HashMap;
@@ -203,6 +207,7 @@ public class TypeHandlerLibrary {
 
         serializationLibrary.addTypeHandler(Name.class, new NameTypeHandler());
         serializationLibrary.addTypeHandler(TextureRegion.class, new TextureRegionTypeHandler());
+        serializationLibrary.addTypeHandler(UITextureRegion.class, new UITextureRegionTypeHandler());
 
         serializationLibrary.addTypeHandlerFactory(new TextureRegionAssetTypeHandlerFactory());
 

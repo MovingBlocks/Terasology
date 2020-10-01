@@ -16,7 +16,7 @@
 
 package org.terasology.rendering.nui.layers.mainMenu.settings;
 
-import org.terasology.rendering.nui.Color;
+import org.terasology.nui.Color;
 
 import com.google.common.collect.ImmutableList;
 

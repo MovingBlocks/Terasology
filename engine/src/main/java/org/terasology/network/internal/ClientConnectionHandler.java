@@ -60,7 +60,7 @@ public class ClientConnectionHandler extends SimpleChannelUpstreamHandler {
     private long lengthReceived;
     private Timer timeoutTimer = new Timer();
     private long timeoutPoint = System.currentTimeMillis();
-    private final long timeoutThreshold = 10000;
+    private final long timeoutThreshold = 120000;
     private Channel channel;
 
     /**

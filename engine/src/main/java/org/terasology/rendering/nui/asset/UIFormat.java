@@ -34,6 +34,7 @@ import org.terasology.assets.format.AbstractAssetFileFormat;
 import org.terasology.assets.format.AssetDataFile;
 import org.terasology.assets.module.annotations.RegisterAssetFileFormat;
 import org.terasology.i18n.TranslationSystem;
+import org.terasology.nui.asset.UIData;
 import org.terasology.persistence.ModuleContext;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.persistence.typeHandling.extensionTypes.AssetTypeHandler;
@@ -41,12 +42,12 @@ import org.terasology.persistence.typeHandling.gson.GsonTypeSerializationLibrary
 import org.terasology.reflection.metadata.ClassMetadata;
 import org.terasology.reflection.metadata.FieldMetadata;
 import org.terasology.registry.CoreRegistry;
-import org.terasology.rendering.nui.LayoutHint;
+import org.terasology.nui.LayoutHint;
 import org.terasology.rendering.nui.NUIManager;
-import org.terasology.rendering.nui.UILayout;
-import org.terasology.rendering.nui.UIWidget;
-import org.terasology.rendering.nui.skin.UISkin;
-import org.terasology.rendering.nui.widgets.UILabel;
+import org.terasology.nui.UILayout;
+import org.terasology.nui.UIWidget;
+import org.terasology.nui.skin.UISkin;
+import org.terasology.nui.widgets.UILabel;
 import org.terasology.utilities.ReflectionUtil;
 import org.terasology.utilities.gson.CaseInsensitiveEnumTypeAdapterFactory;
 

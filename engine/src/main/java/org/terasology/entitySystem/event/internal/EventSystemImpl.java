@@ -30,6 +30,7 @@ import com.google.common.collect.Sets;
 import org.reflections.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.engine.SimpleUri;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -122,7 +123,7 @@ public class EventSystemImpl implements EventSystem {
             }
         }
         if (shouldAddToLibrary(eventType)) {
-            eventLibrary.register(uri, eventType);
+            eventLibrary.register(new ResourceUrn(uri.getModuleName(), uri.getObjectName()), eventType);
         }
     }
 

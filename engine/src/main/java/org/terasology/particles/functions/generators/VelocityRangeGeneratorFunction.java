@@ -34,8 +34,9 @@ public final class VelocityRangeGeneratorFunction extends GeneratorFunction<Velo
     public void onEmission(final VelocityRangeGeneratorComponent component,
                            final ParticleData particleData,
                            final Random random) {
-        particleData.velocity.setX(random.nextFloat(component.minVelocity.x(), component.maxVelocity.x()));
-        particleData.velocity.setY(random.nextFloat(component.minVelocity.y(), component.maxVelocity.y()));
-        particleData.velocity.setZ(random.nextFloat(component.minVelocity.z(), component.maxVelocity.z()));
+        particleData.velocity.set(
+            random.nextFloat(component.minVelocity.x(), component.maxVelocity.x()),
+            random.nextFloat(component.minVelocity.y(), component.maxVelocity.y()),
+            random.nextFloat(component.minVelocity.z(), component.maxVelocity.z()));
     }
 }

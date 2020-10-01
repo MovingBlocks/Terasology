@@ -270,26 +270,6 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
     }
 
     @Override
-    public void addRelevanceEntity(EntityRef entity, Vector3i distance) {
-        // RemoteChunkProvider not track Entities(players) by region now
-    }
-
-    @Override
-    public void addRelevanceEntity(EntityRef entity, Vector3i distance, ChunkRegionListener chunkRegionListener) {
-        // RemoteChunkProvider not track Entities(players) by region now
-    }
-
-    @Override
-    public void updateRelevanceEntity(EntityRef entity, Vector3i distance) {
-        // RemoteChunkProvider not track Entities(players) by region now
-    }
-
-    @Override
-    public void removeRelevanceEntity(EntityRef entity) {
-        // RemoteChunkProvider not track Entities(players) by region now
-    }
-
-    @Override
     public void onChunkIsReady(Chunk chunk) {
         try {
             readyChunks.put(chunk);

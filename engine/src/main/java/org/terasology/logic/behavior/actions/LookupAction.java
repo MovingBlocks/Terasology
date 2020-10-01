@@ -22,7 +22,7 @@ import org.terasology.logic.behavior.core.BaseAction;
 import org.terasology.logic.behavior.core.BehaviorNode;
 import org.terasology.logic.behavior.core.BehaviorState;
 import org.terasology.module.sandbox.API;
-import org.terasology.rendering.nui.properties.OneOf;
+import org.terasology.nui.properties.OneOf;
 
 /**
  * Runs a given behavior tree.

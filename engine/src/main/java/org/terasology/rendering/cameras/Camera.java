@@ -1,18 +1,5 @@
-/*
- * Copyright 2013 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.rendering.cameras;
 
 import org.joml.AxisAngle4f;
@@ -20,18 +7,13 @@ import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
+import org.lwjgl.BufferUtils;
 import org.terasology.config.Config;
 import org.terasology.math.AABB;
 import org.terasology.math.Direction;
 import org.terasology.math.JomlUtil;
-import org.terasology.math.MatrixUtils;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.registry.CoreRegistry;
-
-/**
- * Provides global access to fonts.
- *
- */
 
 /**
  * Camera base class.
@@ -81,7 +63,7 @@ public abstract class Camera {
     protected float cachedReflectionHeight;
 
     /* (Water) Reflection */
-    private boolean reflected;
+    protected boolean reflected;
     private float reflectionHeight = 32;
 
     /**
@@ -105,8 +87,8 @@ public abstract class Camera {
             return;
         }
 
-        viewFrustum.updateFrustum(MatrixUtils.matrixToFloatBuffer(viewMatrix), MatrixUtils.matrixToFloatBuffer(projectionMatrix));
-        viewFrustumReflected.updateFrustum(MatrixUtils.matrixToFloatBuffer(viewMatrixReflected), MatrixUtils.matrixToFloatBuffer(projectionMatrix));
+        viewFrustum.updateFrustum(viewMatrix.get(BufferUtils.createFloatBuffer(16)), projectionMatrix.get(BufferUtils.createFloatBuffer(16)));
+        viewFrustumReflected.updateFrustum(viewMatrixReflected.get(BufferUtils.createFloatBuffer(16)), projectionMatrix.get(BufferUtils.createFloatBuffer(16)));
     }
 
     public abstract boolean isBobbingAllowed();

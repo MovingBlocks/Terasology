@@ -18,7 +18,13 @@ package org.terasology.engine.subsystem.lwjgl;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Queues;
 import org.lwjgl.LWJGLException;
-import org.lwjgl.opengl.*;
+import org.lwjgl.opengl.ContextAttribs;
+import org.lwjgl.opengl.Display;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL12;
+import org.lwjgl.opengl.GL43;
+import org.lwjgl.opengl.GLContext;
+import org.lwjgl.opengl.KHRDebugCallback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.AssetFactory;
@@ -35,6 +41,8 @@ import org.terasology.engine.subsystem.RenderingSubsystemFactory;
 import org.terasology.rendering.ShaderManager;
 import org.terasology.rendering.ShaderManagerLwjgl;
 import org.terasology.rendering.assets.animation.MeshAnimation;
+import org.terasology.rendering.assets.animation.MeshAnimationBundle;
+import org.terasology.rendering.assets.animation.MeshAnimationBundleData;
 import org.terasology.rendering.assets.animation.MeshAnimationData;
 import org.terasology.rendering.assets.animation.MeshAnimationImpl;
 import org.terasology.rendering.assets.atlas.Atlas;
@@ -56,9 +64,13 @@ import org.terasology.rendering.assets.texture.TextureData;
 import org.terasology.rendering.assets.texture.TextureUtil;
 import org.terasology.rendering.assets.texture.subtexture.Subtexture;
 import org.terasology.rendering.assets.texture.subtexture.SubtextureData;
-import org.terasology.rendering.nui.internal.CanvasRenderer;
+import org.terasology.nui.canvas.CanvasRenderer;
 import org.terasology.rendering.nui.internal.LwjglCanvasRenderer;
-import org.terasology.rendering.opengl.*;
+import org.terasology.rendering.opengl.GLSLMaterial;
+import org.terasology.rendering.opengl.GLSLShader;
+import org.terasology.rendering.opengl.OpenGLMesh;
+import org.terasology.rendering.opengl.OpenGLSkeletalMesh;
+import org.terasology.rendering.opengl.OpenGLTexture;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -114,7 +126,7 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
                     } else {
                         return path.getName(2).toString().equals("textures");
                     }
-                    }));
+                }));
         assetTypeManager.registerCoreFormat(Texture.class,
                 new PNGTextureFormat(Texture.FilterMode.LINEAR, path -> {
                     if (path.getName(1).toString().equals(ModuleAssetDataProducer.OVERRIDE_FOLDER)) {
@@ -132,9 +144,11 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
         assetTypeManager.registerCoreAssetType(SkeletalMesh.class, (AssetFactory<SkeletalMesh, SkeletalMeshData>)
                 (urn, assetType, data) -> new OpenGLSkeletalMesh(urn, assetType, data, bufferPool), "skeletalMesh");
         assetTypeManager.registerCoreAssetType(MeshAnimation.class,
-                (AssetFactory<MeshAnimation, MeshAnimationData>) MeshAnimationImpl::new, "animations");
+                (AssetFactory<MeshAnimation, MeshAnimationData>) MeshAnimationImpl::new, "animations", "skeletalMesh");
         assetTypeManager.registerCoreAssetType(Atlas.class,
                 (AssetFactory<Atlas, AtlasData>) Atlas::new, "atlas");
+        assetTypeManager.registerCoreAssetType(MeshAnimationBundle.class,
+                (AssetFactory<MeshAnimationBundle, MeshAnimationBundleData>) MeshAnimationBundle::new, "skeletalMesh", "animations");
         assetTypeManager.registerCoreAssetType(Subtexture.class,
                 (AssetFactory<Subtexture, SubtextureData>) Subtexture::new);
     }

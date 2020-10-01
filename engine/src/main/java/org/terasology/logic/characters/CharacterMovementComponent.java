@@ -21,15 +21,15 @@ import org.terasology.entitySystem.Component;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.network.FieldReplicateType;
 import org.terasology.network.Replicate;
+import org.terasology.nui.properties.Range;
 import org.terasology.physics.CollisionGroup;
 import org.terasology.physics.StandardCollisionGroup;
-import org.terasology.rendering.nui.properties.Range;
 
 import java.util.List;
 
 /**
  * This component is attached to all character entities. It governs movement and stores
- * associated paramenters. <br/>
+ * associated paramenters, and can be used instead of a CapsuleShapeComponent by the physics system to define the collision shape. <br/>
  * The {@link AliveCharacterComponent} should necessarily be attached to the character entity for the movement systems to work.
  */
 public final class CharacterMovementComponent implements Component {
@@ -41,6 +41,8 @@ public final class CharacterMovementComponent implements Component {
     public float radius = 0.3f;
     public CollisionGroup collisionGroup = StandardCollisionGroup.CHARACTER;
     public List<CollisionGroup> collidesWith = Lists.<CollisionGroup>newArrayList(StandardCollisionGroup.WORLD, StandardCollisionGroup.SENSOR);
+    @Range(min = 0, max = 5)
+    public float pickupRadius = 1.5f;
 
     // Speed settings
     @Replicate(FieldReplicateType.SERVER_TO_OWNER)

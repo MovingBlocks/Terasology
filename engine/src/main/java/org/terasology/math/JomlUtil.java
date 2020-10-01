@@ -21,6 +21,8 @@ import org.joml.Matrix3fc;
 import org.joml.Matrix4fc;
 import org.joml.Quaternionf;
 import org.joml.Quaternionfc;
+import org.joml.Rectanglef;
+import org.joml.Rectanglei;
 import org.joml.Vector2fc;
 import org.joml.Vector2ic;
 import org.joml.Vector3fc;
@@ -31,11 +33,15 @@ import org.terasology.math.geom.BaseMatrix3f;
 import org.terasology.math.geom.BaseMatrix4f;
 import org.terasology.math.geom.BaseQuat4f;
 import org.terasology.math.geom.BaseVector2f;
+import org.terasology.math.geom.BaseVector2i;
 import org.terasology.math.geom.BaseVector3f;
 import org.terasology.math.geom.BaseVector3i;
 import org.terasology.math.geom.BaseVector4f;
 import org.terasology.math.geom.Quat4f;
+import org.terasology.math.geom.Rect2f;
+import org.terasology.math.geom.Rect2i;
 import org.terasology.math.geom.Vector3f;
+import org.terasology.world.block.BlockRegion;
 
 public class JomlUtil {
 
@@ -99,6 +105,10 @@ public class JomlUtil {
         return new org.joml.Vector2f(vec.x(), vec.y());
     }
 
+    public static org.joml.Vector2i from (BaseVector2i vec) {
+        return new org.joml.Vector2i(vec.x(), vec.y());
+    }
+
     public static org.joml.Vector3i from(BaseVector3i vec) {
         return new org.joml.Vector3i(vec.x(), vec.y(), vec.z());
     }
@@ -117,5 +127,35 @@ public class JomlUtil {
 
     public static AABBf from(AABB aabb) {
         return new AABBf(aabb.minX(), aabb.minY(), aabb.minZ(), aabb.maxX(), aabb.maxY(), aabb.maxZ());
+    }
+
+
+    public static BlockRegion from(Region3i aabb) {
+        return new BlockRegion(aabb.minX(), aabb.minY(), aabb.minZ(), aabb.maxX(), aabb.maxY(), aabb.maxZ());
+    }
+
+
+    public static Rectanglei from(Rect2i rect) {
+        return new Rectanglei(rect.minX(), rect.minY(), rect.maxX(), rect.maxY());
+    }
+
+    public static Rect2i from(Rectanglei rect) {
+        return Rect2i.createFromMinAndMax(rect.minX, rect.minY, rect.maxX, rect.maxY);
+    }
+
+    public static Rectanglef from(Rect2f rect) {
+        return new Rectanglef(rect.minX(), rect.minY(), rect.maxX(), rect.maxY());
+    }
+
+    public static Rect2f from(Rectanglef rect) {
+        return Rect2f.createFromMinAndMax(rect.minX, rect.minY, rect.maxX, rect.maxY);
+    }
+
+    public static Rectanglei rectangleiFromMinAndSize(int minX, int minY, int width, int height) {
+        return new Rectanglei(minX, minY, minX + width, minY + height);
+    }
+
+    public static Rectanglef rectanglefFromMinAndSize(float minX, float minY, float width, float height) {
+        return new Rectanglef(minX, minY, minX + width, minY + height);
     }
 }

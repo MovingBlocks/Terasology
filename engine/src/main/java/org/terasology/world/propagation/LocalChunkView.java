@@ -44,16 +44,16 @@ public class LocalChunkView implements PropagatorWorldView {
      * @return The index of the chunk in the array
      */
     private int chunkIndexOf(Vector3i blockPos) {
-        return ChunkMath.calcChunkPosX(blockPos.x, ChunkConstants.POWER_X) - topLeft.x
-                + 3 * (ChunkMath.calcChunkPosY(blockPos.y, ChunkConstants.POWER_Y) - topLeft.y
-                + 3 * (ChunkMath.calcChunkPosZ(blockPos.z, ChunkConstants.POWER_Z) - topLeft.z));
+        return ChunkMath.calcChunkPos(blockPos.x, ChunkConstants.POWER_X) - topLeft.x
+                + 3 * (ChunkMath.calcChunkPos(blockPos.y, ChunkConstants.POWER_Y) - topLeft.y
+                + 3 * (ChunkMath.calcChunkPos(blockPos.z, ChunkConstants.POWER_Z) - topLeft.z));
     }
 
     @Override
     public byte getValueAt(Vector3i pos) {
         Chunk chunk = chunks[chunkIndexOf(pos)];
         if (chunk != null) {
-            return rules.getValue(chunk, ChunkMath.calcBlockPos(pos));
+            return rules.getValue(chunk, ChunkMath.calcRelativeBlockPos(pos));
         }
         return UNAVAILABLE;
     }
@@ -62,7 +62,7 @@ public class LocalChunkView implements PropagatorWorldView {
     public void setValueAt(Vector3i pos, byte value) {
         Chunk chunk = chunks[chunkIndexOf(pos)];
         if (chunk != null) {
-            rules.setValue(chunk, ChunkMath.calcBlockPos(pos), value);
+            rules.setValue(chunk, ChunkMath.calcRelativeBlockPos(pos), value);
         }
     }
 
@@ -71,7 +71,7 @@ public class LocalChunkView implements PropagatorWorldView {
         int index = chunkIndexOf(pos);
         Chunk chunk = chunks[index];
         if (chunk != null) {
-            return chunk.getBlock(ChunkMath.calcBlockPos(pos));
+            return chunk.getBlock(ChunkMath.calcRelativeBlockPos(pos));
         }
         return null;
     }

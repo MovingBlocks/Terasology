@@ -1,18 +1,5 @@
-/*
- * Copyright 2018 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.logic.console.commands;
 
 import com.google.common.collect.Ordering;
@@ -49,6 +36,7 @@ import org.terasology.logic.console.suggesters.CommandNameSuggester;
 import org.terasology.logic.console.suggesters.ScreenSuggester;
 import org.terasology.logic.console.suggesters.SkinSuggester;
 import org.terasology.logic.inventory.events.DropItemEvent;
+import org.terasology.logic.location.Location;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.permission.PermissionManager;
 import org.terasology.math.Direction;
@@ -61,19 +49,19 @@ import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
 import org.terasology.network.PingService;
 import org.terasology.network.Server;
+import org.terasology.nui.FontColor;
+import org.terasology.nui.asset.UIElement;
+import org.terasology.nui.skin.UISkin;
 import org.terasology.persistence.WorldDumper;
 import org.terasology.persistence.serializers.PrefabSerializer;
 import org.terasology.registry.In;
-import org.terasology.rendering.FontColor;
 import org.terasology.rendering.nui.NUIManager;
-import org.terasology.rendering.nui.asset.UIElement;
 import org.terasology.rendering.nui.editor.layers.NUIEditorScreen;
 import org.terasology.rendering.nui.editor.layers.NUISkinEditorScreen;
 import org.terasology.rendering.nui.editor.systems.NUIEditorSystem;
 import org.terasology.rendering.nui.editor.systems.NUISkinEditorSystem;
 import org.terasology.rendering.nui.layers.mainMenu.MessagePopup;
 import org.terasology.rendering.nui.layers.mainMenu.WaitPopup;
-import org.terasology.rendering.nui.skin.UISkin;
 import org.terasology.utilities.Assets;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.BlockUri;
@@ -83,12 +71,12 @@ import org.terasology.world.block.loader.BlockFamilyDefinition;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
-import java.util.List;
-import java.util.Set;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
-import java.util.Arrays;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -254,22 +242,19 @@ public class CoreCommands extends BaseComponentSystem {
      */
     private List<String> findBlockMatches(String searchLowercase) {
         ResourceUrn curUrn;
-        List<String> outputList=new ArrayList<String>();
+        List<String> outputList = new ArrayList<>();
         for (ResourceUrn urn : assetManager.getAvailableAssets(BlockFamilyDefinition.class)) {
             // Current urn for logging purposes to find the broken urn
             curUrn = urn;
-            try{
+            try {
                 Optional<BlockFamilyDefinition> def = assetManager.getAsset(urn, BlockFamilyDefinition.class);
                 if (def.isPresent() && def.get().isLoadable() && matchesSearch(searchLowercase, def.get())) {
                     outputList.add(new BlockUri(def.get().getUrn()).toString());
                 }
-            }
-            // If a prefab is broken , it will throw an exception
-            catch(Exception e){
+            } catch (Exception e) {  // If a prefab is broken , it will throw an exception
                 console.addMessage("Note : Search may not return results if invalid assets are present");
-                console.addMessage("Error parsing : "+curUrn.toString());
+                console.addMessage("Error parsing : " + curUrn.toString());
                 console.addMessage(e.toString());
-                continue;
             }
         }
         return outputList;
@@ -540,17 +525,16 @@ public class CoreCommands extends BaseComponentSystem {
         } else {
             dir.set(Direction.FORWARD.getVector3f());
         }
-        Quat4f rotation = Quat4f.shortestArcQuat(Direction.FORWARD.getVector3f(), dir);
 
-        Optional<Prefab> prefab = Assets.getPrefab(prefabName);
-        if (prefab.isPresent() && prefab.get().getComponent(LocationComponent.class) != null) {
-            entityManager.create(prefab.get(), spawnPos, rotation);
-            return "Done";
-        } else if (!prefab.isPresent()) {
-            return "Unknown prefab";
-        } else {
-            return "Prefab cannot be spawned (no location component)";
-        }
+        return Assets.getPrefab(prefabName).map(prefab -> {
+            LocationComponent loc = prefab.getComponent(LocationComponent.class);
+            if (loc != null) {
+                entityManager.create(prefab, spawnPos);
+                return "Done";
+            } else {
+                return "Prefab cannot be spawned (no location component)";
+            }
+        }).orElse("Unknown prefab");
     }
 
     /**

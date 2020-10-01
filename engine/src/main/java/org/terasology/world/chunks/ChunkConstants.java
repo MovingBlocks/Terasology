@@ -37,8 +37,8 @@ public final class ChunkConstants {
     public static final int POWER_Y = TeraMath.sizeOfPower(SIZE_Y);
     public static final int POWER_Z = TeraMath.sizeOfPower(SIZE_Z);
 
-    public static final byte MAX_LIGHT = 0x0f;
-    public static final byte MAX_SUNLIGHT = 0x0f;
+    public static final byte MAX_LIGHT = 0x0f; // max light for a light source 0-15
+    public static final byte MAX_SUNLIGHT = 0x0f; // max sunlight for sunlight bounded 0-15
     public static final byte MAX_SUNLIGHT_REGEN = 63;
     public static final byte SUNLIGHT_REGEN_THRESHOLD = 48;
 

@@ -91,6 +91,11 @@ public class Interpreter {
         if (actor.hasComponent(DisplayNameComponent.class)) {
             return actor.getComponent(DisplayNameComponent.class).name;
         }
+
+        if (actor.getEntity() == null || actor.getEntity().getParentPrefab() == null) {
+            return "no entity";
+        }
+
         return "unnamed " + actor.getEntity().getParentPrefab().getName();
     }
 

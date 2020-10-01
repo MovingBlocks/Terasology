@@ -21,6 +21,7 @@ import org.terasology.config.Config;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.logic.players.LocalPlayer;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
@@ -67,7 +68,7 @@ public class CameraTargetSystem extends BaseComponentSystem {
     @Override
     public void initialise() {
         super.initialise();
-        targetDistance = config.getRendering().getViewDistance().getChunkDistance().x * 8.0f;
+        targetDistance = config.getRendering().getViewDistance().getChunkDistance().x() * 8.0f;
         // TODO: This should come from somewhere, probably player entity
         //set the target distance to as far as the player can see. Used to get the focal distance for effects such as DOF.
     }
@@ -111,18 +112,18 @@ public class CameraTargetSystem extends BaseComponentSystem {
         }
 
 
-        HitResult hitInfo = physics.rayTrace(new Vector3f(localPlayer.getViewPosition()),
-                new Vector3f(localPlayer.getViewDirection()), targetDistance, filter);
+        HitResult hitInfo = physics.rayTrace(JomlUtil.from(localPlayer.getViewPosition()),
+            JomlUtil.from(localPlayer.getViewDirection()), targetDistance, filter);
         updateFocalDistance(hitInfo, delta);
         Vector3i newBlockPos = null;
 
         EntityRef newTarget = EntityRef.NULL;
         if (hitInfo.isHit()) {
             newTarget = hitInfo.getEntity();
-            hitPosition = hitInfo.getHitPoint();
-            hitNormal = hitInfo.getHitNormal();
+            hitPosition = JomlUtil.from(hitInfo.getHitPoint());
+            hitNormal = JomlUtil.from(hitInfo.getHitNormal());
             if (hitInfo.isWorldHit()) {
-                newBlockPos = new Vector3i(hitInfo.getBlockPosition());
+                newBlockPos = new Vector3i(JomlUtil.from(hitInfo.getBlockPosition()));
             }
         }
         if (!Objects.equal(target, newTarget) || lostTarget) {
@@ -143,7 +144,7 @@ public class CameraTargetSystem extends BaseComponentSystem {
         if (hitInfo.isHit()) {
             Vector3f playerToTargetRay = new Vector3f();
             //calculate the distance from the player to the hit point
-            playerToTargetRay.sub(hitInfo.getHitPoint(), localPlayer.getViewPosition());
+            playerToTargetRay.sub(JomlUtil.from(hitInfo.getHitPoint()), localPlayer.getViewPosition());
             //gradually adjust focalDistance from it's current value to the hit point distance
             focalDistance = TeraMath.lerp(focalDistance, playerToTargetRay.length(), delta * focusRate);
             //if nothing was hit, gradually adjust the focusDistance to the maximum length of the update function trace

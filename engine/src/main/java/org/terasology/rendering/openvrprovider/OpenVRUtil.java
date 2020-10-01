@@ -33,19 +33,19 @@ public final class OpenVRUtil {
 
     static void setSteamVRMatrix3ToMatrix4f(HmdMatrix34_t hmdMatrix, Matrix4f matrixToSet) {
         matrixToSet.set(
-                hmdMatrix.m[0], hmdMatrix.m[4], hmdMatrix.m[8], 0,
-                hmdMatrix.m[1], hmdMatrix.m[5], hmdMatrix.m[9], 0,
-                hmdMatrix.m[2], hmdMatrix.m[6], hmdMatrix.m[10], 0,
-                hmdMatrix.m[3], hmdMatrix.m[7], hmdMatrix.m[11], 1f
+            hmdMatrix.m[0], hmdMatrix.m[4], hmdMatrix.m[8], 0,
+            hmdMatrix.m[1], hmdMatrix.m[5], hmdMatrix.m[9], 0,
+            hmdMatrix.m[2], hmdMatrix.m[6], hmdMatrix.m[10], 0,
+            hmdMatrix.m[3], hmdMatrix.m[7], hmdMatrix.m[11], 1f
         );
     }
 
     static void setSteamVRMatrix44ToMatrix4f(HmdMatrix44_t hmdMatrix, Matrix4f matrixToSet) {
         matrixToSet.set(
-                hmdMatrix.m[0], hmdMatrix.m[4], hmdMatrix.m[8], hmdMatrix.m[12],
-                hmdMatrix.m[1], hmdMatrix.m[5], hmdMatrix.m[9], hmdMatrix.m[13],
-                hmdMatrix.m[2], hmdMatrix.m[6], hmdMatrix.m[10], hmdMatrix.m[14],
-                hmdMatrix.m[3], hmdMatrix.m[7], hmdMatrix.m[11], hmdMatrix.m[15]
+            hmdMatrix.m[0], hmdMatrix.m[4], hmdMatrix.m[8], hmdMatrix.m[12],
+            hmdMatrix.m[1], hmdMatrix.m[5], hmdMatrix.m[9], hmdMatrix.m[13],
+            hmdMatrix.m[2], hmdMatrix.m[6], hmdMatrix.m[10], hmdMatrix.m[14],
+            hmdMatrix.m[3], hmdMatrix.m[7], hmdMatrix.m[11], hmdMatrix.m[15]
         );
     }
 
@@ -76,12 +76,12 @@ public final class OpenVRUtil {
     }
 
     /*
-    * Takes 3 unit vectors, representing an orthonormal basis, and generates a unit quaternion.
+     * Takes 3 unit vectors, representing an orthonormal basis, and generates a unit quaternion.
      */
     public static Vector4f getQuaternion(boolean normalizeAxes,
-                                  float xxInput, float xyInput, float xzInput,
-                                  float yxInput, float yyInput, float yzInput,
-                                  float zxInput, float zyInput, float zzInput) {
+                                         float xxInput, float xyInput, float xzInput,
+                                         float yxInput, float yyInput, float yzInput,
+                                         float zxInput, float zyInput, float zzInput) {
         float xx = xxInput;
         float xy = xyInput;
         float xz = xzInput;
@@ -147,15 +147,15 @@ public final class OpenVRUtil {
     }
 
     /*
-    * Converts the rotation portion of a 4x4 matrix into a unit quaternion.
+     * Converts the rotation portion of a 4x4 matrix into a unit quaternion.
      */
     public static Vector4f convertToQuaternion(Matrix4f m1) {
         return getQuaternion(true,
-                m1.m00(), m1.m10(), m1.m20(),
-                m1.m01(), m1.m11(), m1.m21(),
-                m1.m02(), m1.m12(), m1.m22()
+            m1.m00(), m1.m10(), m1.m20(),
+            m1.m01(), m1.m11(), m1.m21(),
+            m1.m02(), m1.m12(), m1.m22()
         );
-}
+    }
 
     static Matrix4f createIdentityMatrix4f() {
         return new Matrix4f(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);

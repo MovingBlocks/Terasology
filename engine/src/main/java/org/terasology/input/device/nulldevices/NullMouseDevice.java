@@ -31,6 +31,12 @@ public class NullMouseDevice implements MouseDevice {
         return new Vector2i();
     }
 
+    // TODO: Remove when nui-input is fully integrated
+    @Override
+    public org.joml.Vector2i getMousePosition() {
+        return new org.joml.Vector2i();
+    }
+
     @Override
     public Vector2i getDelta() {
         return new Vector2i();

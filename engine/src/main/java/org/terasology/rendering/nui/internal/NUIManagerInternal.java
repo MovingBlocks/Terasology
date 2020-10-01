@@ -20,17 +20,20 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
+import org.joml.Vector2i;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.assets.module.ModuleAwareAssetTypeManager;
+import org.terasology.audio.StaticSound;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.subsystem.DisplayDevice;
+import org.terasology.engine.subsystem.config.BindsManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.EventPriority;
 import org.terasology.entitySystem.event.ReceiveEvent;
@@ -45,21 +48,31 @@ import org.terasology.input.events.MouseAxisEvent;
 import org.terasology.input.events.MouseButtonEvent;
 import org.terasology.input.events.MouseWheelEvent;
 import org.terasology.logic.players.LocalPlayer;
+import org.terasology.math.JomlUtil;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.network.ClientComponent;
+import org.terasology.nui.AbstractWidget;
+import org.terasology.nui.ControlWidget;
+import org.terasology.nui.TabbingManager;
+import org.terasology.nui.UIWidget;
+import org.terasology.nui.asset.UIElement;
+import org.terasology.nui.canvas.CanvasControl;
+import org.terasology.nui.events.NUIBindButtonEvent;
+import org.terasology.nui.events.NUIKeyEvent;
+import org.terasology.nui.events.NUIMouseButtonEvent;
+import org.terasology.nui.events.NUIMouseWheelEvent;
+import org.terasology.nui.widgets.UIButton;
+import org.terasology.nui.widgets.UIText;
+import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.metadata.ClassLibrary;
+import org.terasology.reflection.reflect.ReflectFactory;
 import org.terasology.registry.InjectionHelper;
-import org.terasology.rendering.nui.AbstractWidget;
-import org.terasology.rendering.nui.ControlWidget;
+import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.ScreenLayerClosedEvent;
 import org.terasology.rendering.nui.SortOrderSystem;
-import org.terasology.rendering.nui.TabbingManager;
 import org.terasology.rendering.nui.UIScreenLayer;
-import org.terasology.rendering.nui.UIWidget;
-import org.terasology.rendering.nui.asset.UIElement;
-import org.terasology.rendering.nui.events.NUIKeyEvent;
 import org.terasology.rendering.nui.layers.hud.HUDScreenLayer;
 import org.terasology.rendering.nui.layers.ingame.OnlinePlayersOverlay;
 import org.terasology.utilities.Assets;
@@ -94,14 +107,16 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     private Map<ResourceUrn, ControlWidget> overlays = Maps.newLinkedHashMap();
     private Context context;
     private AssetManager assetManager;
+    private BindsManager bindsManager;
 
-    public NUIManagerInternal(CanvasRenderer renderer, Context context) {
+    public NUIManagerInternal(TerasologyCanvasRenderer renderer, Context context) {
         this.context = context;
         this.hudScreenLayer = new HUDScreenLayer();
         InjectionHelper.inject(hudScreenLayer, context);
-        this.canvas = new CanvasImpl(this, context, renderer);
+        this.canvas = new TerasologyCanvasImpl(this, context, renderer);
         this.keyboard = context.get(InputSystem.class).getKeyboard();
         this.mouse = context.get(InputSystem.class).getMouseDevice();
+        this.bindsManager = context.get(BindsManager.class);
 
         this.renderingConfig = context.get(Config.class).getRendering();
         this.uiScale = this.renderingConfig.getUiScale() / 100f;
@@ -119,6 +134,25 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
         // and UI screens should be created on demand anyway.
         ModuleAwareAssetTypeManager maaTypeManager = context.get(ModuleAwareAssetTypeManager.class);
         maaTypeManager.getAssetType(UIElement.class).ifPresent(type -> type.disposeAll());
+
+        // NOTE: Taken from the original UIText source.
+        UIText.DEFAULT_CURSOR_TEXTURE = assetManager.getAsset("engine:white", Texture.class).get();
+
+        // NOTE: Taken from the original UIButton source.
+        UIButton.DEFAULT_CLICK_SOUND = assetManager.getAsset("engine:click", StaticSound.class).get();
+
+        // TODO: This is a work-around for-now to fix tabbing
+        TabbingManager.setFocusManager(this);
+
+        // NOTE: Fix for tests
+        if (bindsManager != null
+                && bindsManager.getBindsConfig().hasBinds(new SimpleUri("engine:tabbingUI"))
+                && bindsManager.getBindsConfig().hasBinds(new SimpleUri("engine:tabbingModifier"))
+                && bindsManager.getBindsConfig().hasBinds(new SimpleUri("engine:activate"))) {
+            TabbingManager.tabForwardInput = bindsManager.getBindsConfig().getBinds(new SimpleUri("engine:tabbingUI")).get(0);
+            TabbingManager.tabBackInputModifier = bindsManager.getBindsConfig().getBinds(new SimpleUri("engine:tabbingModifier")).get(0);
+            TabbingManager.activateInput = bindsManager.getBindsConfig().getBinds(new SimpleUri("engine:activate")).get(0);
+        }
     }
 
     @Override
@@ -132,10 +166,10 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     }
 
     public void refreshWidgetsLibrary() {
-        widgetsLibrary = new WidgetLibrary(context);
+        widgetsLibrary = new WidgetLibrary(context.get(ModuleManager.class).getEnvironment(), context.get(ReflectFactory.class), context.get(CopyStrategyLibrary.class));
         ModuleEnvironment environment = context.get(ModuleManager.class).getEnvironment();
         for (Class<? extends UIWidget> type : environment.getSubtypesOf(UIWidget.class)) {
-            widgetsLibrary.register(new SimpleUri(environment.getModuleProviding(type), type.getSimpleName()), type);
+            widgetsLibrary.register(new ResourceUrn(environment.getModuleProviding(type).toString(), type.getSimpleName()), type);
         }
     }
 
@@ -516,7 +550,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
 
     @Override
     public void update(float delta) {
-        canvas.processMousePosition(mouse.getPosition());
+        canvas.processMousePosition(JomlUtil.from(mouse.getPosition()));
 
         // part of the update could be adding/removing screens
         // modifying a collection while iterating of it is typically not supported
@@ -596,18 +630,20 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
         if (!mouse.isVisible()) {
             return;
         }
+
+        Vector2i mousePosition = JomlUtil.from(event.getMousePosition());
         if (focus != null) {
-            focus.onMouseButtonEvent(event);
+            focus.onMouseButtonEvent(new NUIMouseButtonEvent(event.getButton(), event.getState(), mousePosition));
             if (event.isConsumed()) {
                 return;
             }
         }
         if (event.isDown()) {
-            if (canvas.processMouseClick(event.getButton(), event.getMousePosition())) {
+            if (canvas.processMouseClick(event.getButton(), mousePosition)) {
                 event.consume();
             }
         } else {
-            if (canvas.processMouseRelease(event.getButton(), event.getMousePosition())) {
+            if (canvas.processMouseRelease(event.getButton(), mousePosition)) {
                 event.consume();
             }
         }
@@ -623,16 +659,17 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
             return;
         }
 
+        Vector2i mousePosition = JomlUtil.from(event.getMousePosition());
         if (focus != null) {
-            focus.onMouseWheelEvent(event);
-            if (event.isConsumed()) {
+            NUIMouseWheelEvent nuiEvent = new NUIMouseWheelEvent(mouse, keyboard, mousePosition, event.getWheelTurns());
+            focus.onMouseWheelEvent(nuiEvent);
+            if (nuiEvent.isConsumed()) {
+                event.consume();
                 return;
             }
         }
 
-
-
-        if (canvas.processMouseWheel(event.getWheelTurns(), mouse.getPosition())) {
+        if (canvas.processMouseWheel(event.getWheelTurns(), mousePosition)) {
             event.consume();
         }
         if (isReleasingMouse()) {
@@ -669,14 +706,21 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     //bind input events (will be send after raw input events, if a bind button was pressed and the raw input event hasn't consumed the event)
     @ReceiveEvent(components = ClientComponent.class, priority = EventPriority.PRIORITY_HIGH)
     public void bindEvent(BindButtonEvent event, EntityRef entity) {
+        NUIBindButtonEvent nuiEvent = new NUIBindButtonEvent(mouse, keyboard, new ResourceUrn(event.getId().getModuleName(), event.getId().getObjectName()), event.getState());
+
         if (focus != null) {
-            focus.onBindEvent(event);
+            focus.onBindEvent(nuiEvent);
         }
         if (!event.isConsumed()) {
             for (UIScreenLayer layer : screens) {
                 if (layer.isReleasingMouse()) {
-                    layer.onBindEvent(event);
-                    if (event.isConsumed() || !layer.isLowerLayerVisible()) {
+                    layer.onBindEvent(nuiEvent);
+                    if (nuiEvent.isConsumed()) {
+                        event.consume();
+                        break;
+                    }
+
+                    if (!layer.isLowerLayerVisible()) {
                         break;
                     }
                 }

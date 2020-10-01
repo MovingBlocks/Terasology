@@ -48,8 +48,9 @@ import org.terasology.recording.DirectionAndOriginPosRecorderList;
 import org.terasology.recording.RecordAndReplayCurrentStatus;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.nui.NUIManager;
-import org.terasology.rendering.nui.internal.CanvasRenderer;
+import org.terasology.nui.canvas.CanvasRenderer;
 import org.terasology.rendering.nui.internal.NUIManagerInternal;
+import org.terasology.rendering.nui.internal.TerasologyCanvasRenderer;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameInfo;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameProvider;
 import org.terasology.world.internal.WorldInfo;
@@ -85,7 +86,7 @@ public class StateHeadlessSetup implements GameState {
         eventSystem = context.get(EventSystem.class);
         context.put(Console.class, new ConsoleImpl(context));
 
-        NUIManager nuiManager = new NUIManagerInternal(context.get(CanvasRenderer.class), context);
+        NUIManager nuiManager = new NUIManagerInternal((TerasologyCanvasRenderer) context.get(CanvasRenderer.class), context);
         context.put(NUIManager.class, nuiManager);
 
         componentSystemManager = new ComponentSystemManager(context);

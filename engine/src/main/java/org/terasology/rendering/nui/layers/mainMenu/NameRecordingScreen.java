@@ -32,9 +32,9 @@ import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.animation.MenuAnimationSystems;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameInfo;
-import org.terasology.rendering.nui.widgets.UIButton;
-import org.terasology.rendering.nui.widgets.UILabel;
-import org.terasology.rendering.nui.widgets.UIText;
+import org.terasology.nui.widgets.UIButton;
+import org.terasology.nui.widgets.UILabel;
+import org.terasology.nui.widgets.UIText;
 
 import java.io.File;
 import java.io.IOException;

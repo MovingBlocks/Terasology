@@ -24,7 +24,8 @@ import org.slf4j.LoggerFactory;
 import org.terasology.assets.format.AbstractAssetAlterationFileFormat;
 import org.terasology.assets.format.AssetDataFile;
 import org.terasology.assets.module.annotations.RegisterAssetDeltaFileFormat;
-import org.terasology.rendering.nui.skin.UISkin;
+import org.terasology.nui.asset.UIData;
+import org.terasology.nui.skin.UISkin;
 import org.terasology.utilities.Assets;
 
 import java.io.IOException;

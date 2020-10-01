@@ -97,7 +97,7 @@ public class SpriteParticleRenderer implements RenderSystem {
 
         if (particleSystem.particleData.texture != null) {
             material.setBoolean("use_texture", true);
-            material.setFloat2("texture_size", particleData.textureSize.x, particleData.textureSize.y);
+            material.setFloat2("texture_size", particleData.textureSize);
             material.setInt("texture_sampler", 0);
 
             GL13.glActiveTexture(GL13.GL_TEXTURE0);
@@ -120,7 +120,6 @@ public class SpriteParticleRenderer implements RenderSystem {
         PerspectiveCamera camera = (PerspectiveCamera) worldRenderer.getActiveCamera();
         Vector3f cameraPosition = camera.getPosition();
         Matrix4f viewProjection = new Matrix4f(camera.getViewProjectionMatrix())
-                .transpose()
                 .translate(-cameraPosition.x, -cameraPosition.y, -cameraPosition.z);
 
         Material material = Assets.getMaterial(PARTICLE_MATERIAL_URI).get();

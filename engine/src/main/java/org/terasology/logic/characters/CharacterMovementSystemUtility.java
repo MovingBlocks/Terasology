@@ -15,13 +15,12 @@
  */
 package org.terasology.logic.characters;
 
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.location.LocationComponent;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.TeraMath;
-import org.terasology.math.geom.BaseQuat4f;
-import org.terasology.math.geom.BaseVector3f;
-import org.terasology.math.geom.Quat4f;
-import org.terasology.math.geom.Vector3f;
 import org.terasology.physics.engine.CharacterCollider;
 import org.terasology.physics.engine.PhysicsEngine;
 
@@ -63,27 +62,27 @@ public final class CharacterMovementSystemUtility {
         movementComp.footstepDelta = state.getFootstepDelta();
         entity.saveComponent(movementComp);
 
-        setPhysicsLocation(entity, state.getPosition());
+        setPhysicsLocation(entity, JomlUtil.from(state.getPosition()));
 
         // set the pitch to the character's gaze entity
-        Quat4f rotation = new Quat4f(0f, TeraMath.DEG_TO_RAD * state.getPitch(), 0f);
+        Quaternionf rotation = new Quaternionf().rotationX(TeraMath.DEG_TO_RAD * state.getPitch());
         EntityRef gazeEntity = GazeAuthoritySystem.getGazeEntityForCharacter(entity);
         if (!gazeEntity.equals(entity)) {
             // Only set the gaze entity rotation if it is not the same as the main entity.
             // The character is assumed to only rotate side to side, introducing pitch makes things act strangely
             LocationComponent gazeLocation = gazeEntity.getComponent(LocationComponent.class);
-            gazeLocation.setLocalRotation(rotation);
+            gazeLocation.setLocalRotation(JomlUtil.from(rotation));
             gazeEntity.saveComponent(gazeLocation);
         }
     }
 
     public void setToInterpolateState(EntityRef entity, CharacterStateEvent a, CharacterStateEvent b, long time) {
         float t = (float) (time - a.getTime()) / (b.getTime() - a.getTime());
-        Vector3f newPos = BaseVector3f.lerp(a.getPosition(), b.getPosition(), t);
-        Quat4f newRot = BaseQuat4f.interpolate(a.getRotation(), b.getRotation(), t);
+        Vector3f newPos = JomlUtil.from(a.getPosition()).lerp(JomlUtil.from(b.getPosition()),t);
+        Quaternionf newRot = JomlUtil.from(a.getRotation()).nlerp(JomlUtil.from(b.getRotation()),t);
         LocationComponent location = entity.getComponent(LocationComponent.class);
-        location.setWorldPosition(newPos);
-        location.setWorldRotation(newRot);
+        location.setWorldPosition(JomlUtil.from(newPos));
+        location.setWorldRotation(JomlUtil.from(newRot));
         entity.saveComponent(location);
 
         CharacterMovementComponent movementComponent = entity.getComponent(CharacterMovementComponent.class);
@@ -105,9 +104,9 @@ public final class CharacterMovementSystemUtility {
 
     public void setToExtrapolateState(EntityRef entity, CharacterStateEvent state, long time) {
         float t = (time - state.getTime()) * 0.0001f;
-        Vector3f newPos = new Vector3f(state.getVelocity());
-        newPos.scale(t);
-        newPos.add(state.getPosition());
+        Vector3f newPos = new Vector3f(JomlUtil.from(state.getVelocity()));
+        newPos.mul(t);
+        newPos.add(JomlUtil.from(state.getPosition()));
         extrapolateLocationComponent(entity, state, newPos);
 
         extrapolateCharacterMovementComponent(entity, state);
@@ -117,7 +116,7 @@ public final class CharacterMovementSystemUtility {
 
     private void extrapolateLocationComponent(EntityRef entity, CharacterStateEvent state, Vector3f newPos) {
         LocationComponent location = entity.getComponent(LocationComponent.class);
-        location.setWorldPosition(newPos);
+        location.setWorldPosition(JomlUtil.from(newPos));
         location.setWorldRotation(state.getRotation());
         entity.saveComponent(location);
     }

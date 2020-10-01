@@ -16,9 +16,11 @@
 package org.terasology.testUtil;
 
 import com.google.common.collect.Lists;
+import org.joml.Quaternionfc;
 import org.joml.Vector2fc;
 import org.joml.Vector3fc;
 import org.joml.Vector4fc;
+import org.junit.jupiter.api.Assertions;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector2f;
 import org.terasology.math.geom.Vector3f;
@@ -59,9 +61,9 @@ public final class TeraAssert {
         } else {
             assertNotNull(actual);
             Supplier<String> errorMessageSupplier = () -> "Expected " + expected + ", actual" + actual;
-            org.junit.jupiter.api.Assertions.assertEquals(expected.x, actual.x, error, errorMessageSupplier);
-            org.junit.jupiter.api.Assertions.assertEquals(expected.y, actual.y, error, errorMessageSupplier);
-            org.junit.jupiter.api.Assertions.assertEquals(expected.z, actual.z, error, errorMessageSupplier);
+            Assertions.assertEquals(expected.x, actual.x, error, errorMessageSupplier);
+            Assertions.assertEquals(expected.y, actual.y, error, errorMessageSupplier);
+            Assertions.assertEquals(expected.z, actual.z, error, errorMessageSupplier);
         }
     }
 
@@ -71,8 +73,8 @@ public final class TeraAssert {
         } else {
             assertNotNull(actual);
             Supplier<String> errorMessageSupplier = () -> "Expected " + expected + ", actual" + actual;
-            org.junit.jupiter.api.Assertions.assertEquals(expected.x, actual.x, error, errorMessageSupplier);
-            org.junit.jupiter.api.Assertions.assertEquals(expected.y, actual.y, error, errorMessageSupplier);
+            Assertions.assertEquals(expected.x, actual.x, error, errorMessageSupplier);
+            Assertions.assertEquals(expected.y, actual.y, error, errorMessageSupplier);
         }
     }
 
@@ -82,8 +84,8 @@ public final class TeraAssert {
         } else {
             assertNotNull(actual);
             Supplier<String> errorMessageSupplier = () -> "Expected " + expected + ", actual" + actual;
-            org.junit.jupiter.api.Assertions.assertEquals(expected.x(), actual.x(), error, errorMessageSupplier);
-            org.junit.jupiter.api.Assertions.assertEquals(expected.y(), actual.y(), error, errorMessageSupplier);
+            Assertions.assertEquals(expected.x(), actual.x(), error, errorMessageSupplier);
+            Assertions.assertEquals(expected.y(), actual.y(), error, errorMessageSupplier);
         }
     }
 
@@ -94,9 +96,9 @@ public final class TeraAssert {
         } else {
             assertNotNull(actual);
             Supplier<String> errorMessageSupplier = () -> "Expected " + expected + ", actual" + actual;
-            org.junit.jupiter.api.Assertions.assertEquals(expected.x(), actual.x(), error, errorMessageSupplier);
-            org.junit.jupiter.api.Assertions.assertEquals(expected.y(), actual.y(), error, errorMessageSupplier);
-            org.junit.jupiter.api.Assertions.assertEquals(expected.z(), actual.z(), error, errorMessageSupplier);
+            Assertions.assertEquals(expected.x(), actual.x(), error, errorMessageSupplier);
+            Assertions.assertEquals(expected.y(), actual.y(), error, errorMessageSupplier);
+            Assertions.assertEquals(expected.z(), actual.z(), error, errorMessageSupplier);
         }
     }
 
@@ -106,10 +108,10 @@ public final class TeraAssert {
         } else {
             assertNotNull(actual);
             Supplier<String> errorMessageSupplier = () -> "Expected " + expected + ", actual" + actual;
-            org.junit.jupiter.api.Assertions.assertEquals(expected.x, actual.x, error, errorMessageSupplier);
-            org.junit.jupiter.api.Assertions.assertEquals(expected.y, actual.y, error, errorMessageSupplier);
-            org.junit.jupiter.api.Assertions.assertEquals(expected.z, actual.z, error, errorMessageSupplier);
-            org.junit.jupiter.api.Assertions.assertEquals(expected.w, actual.w, error, errorMessageSupplier);
+            Assertions.assertEquals(expected.x, actual.x, error, errorMessageSupplier);
+            Assertions.assertEquals(expected.y, actual.y, error, errorMessageSupplier);
+            Assertions.assertEquals(expected.z, actual.z, error, errorMessageSupplier);
+            Assertions.assertEquals(expected.w, actual.w, error, errorMessageSupplier);
         }
     }
 
@@ -119,23 +121,24 @@ public final class TeraAssert {
         } else {
             assertNotNull(actual);
             Supplier<String> errorMessageSupplier = () -> "Expected " + expected + ", actual" + actual;
-            org.junit.jupiter.api.Assertions.assertEquals(expected.x(), actual.x(), error, errorMessageSupplier);
-            org.junit.jupiter.api.Assertions.assertEquals(expected.y(), actual.y(), error, errorMessageSupplier);
-            org.junit.jupiter.api.Assertions.assertEquals(expected.z(), actual.z(), error, errorMessageSupplier);
-            org.junit.jupiter.api.Assertions.assertEquals(expected.w(), actual.w(), error, errorMessageSupplier);
+            Assertions.assertEquals(expected.x(), actual.x(), error, errorMessageSupplier);
+            Assertions.assertEquals(expected.y(), actual.y(), error, errorMessageSupplier);
+            Assertions.assertEquals(expected.z(), actual.z(), error, errorMessageSupplier);
+            Assertions.assertEquals(expected.w(), actual.w(), error, errorMessageSupplier);
         }
     }
 
-    public static void assertEquals(Quat4f expected, Quat4f actual, float error) {
+
+    public static void assertEquals(Quaternionfc expected, Quaternionfc actual, float error) {
         if (expected == null) {
             assertNull(actual);
         } else {
             assertNotNull(actual);
             Supplier<String> errorMessageSupplier = () -> "Expected " + expected + ", actual" + actual;
-            org.junit.jupiter.api.Assertions.assertEquals(expected.x, actual.x, error, errorMessageSupplier);
-            org.junit.jupiter.api.Assertions.assertEquals(expected.y, actual.y, error, errorMessageSupplier);
-            org.junit.jupiter.api.Assertions.assertEquals(expected.z, actual.z, error, errorMessageSupplier);
-            org.junit.jupiter.api.Assertions.assertEquals(expected.w, actual.w, error, errorMessageSupplier);
+            Assertions.assertEquals(expected.x(), actual.x(), error, errorMessageSupplier);
+            Assertions.assertEquals(expected.y(), actual.y(), error, errorMessageSupplier);
+            Assertions.assertEquals(expected.z(), actual.z(), error, errorMessageSupplier);
+            Assertions.assertEquals(expected.w(), actual.w(), error, errorMessageSupplier);
         }
     }
 }

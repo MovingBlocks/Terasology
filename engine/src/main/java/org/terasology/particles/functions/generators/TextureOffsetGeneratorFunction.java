@@ -15,7 +15,7 @@
  */
 package org.terasology.particles.functions.generators;
 
-import org.terasology.math.geom.Vector2f;
+import org.joml.Vector2f;
 import org.terasology.particles.ParticleData;
 import org.terasology.particles.ParticleDataMask;
 import org.terasology.particles.components.generators.TextureOffsetGeneratorComponent;
@@ -40,6 +40,6 @@ public class TextureOffsetGeneratorFunction extends GeneratorFunction<TextureOff
 
         final int randomOffsetIndex = random.nextInt(component.validOffsets.size());
         final Vector2f randomOffset = component.validOffsets.get(randomOffsetIndex);
-        particleData.textureOffset.set(randomOffset.getX(), randomOffset.getY());
+        particleData.textureOffset.set(randomOffset);
     }
 }

@@ -18,7 +18,7 @@ package org.terasology.rendering.animation;
 import java.util.List;
 import java.util.function.Consumer;
 
-import org.terasology.rendering.nui.Color;
+import org.terasology.nui.Color;
 import org.terasology.rendering.nui.layers.mainMenu.settings.CieCamColors;
 
 /**

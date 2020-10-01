@@ -16,15 +16,16 @@
 package org.terasology.rendering.primitives;
 
 import com.google.common.base.Preconditions;
-import org.terasology.math.JomlUtil;
-import org.terasology.utilities.Assets;
+import org.joml.Vector2f;
+import org.joml.Vector2fc;
+import org.joml.Vector3f;
+import org.joml.Vector3fc;
+import org.joml.Vector4f;
 import org.terasology.assets.ResourceUrn;
-import org.terasology.math.geom.Vector2f;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector4f;
 import org.terasology.module.sandbox.API;
 import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.rendering.assets.mesh.MeshData;
+import org.terasology.utilities.Assets;
 import org.terasology.world.block.shapes.BlockMeshPart;
 
 @API
@@ -112,24 +113,24 @@ public class Tessellator {
 
     private void addMeshPart(BlockMeshPart part, boolean doubleSided) {
         for (int i = 0; i < part.size(); ++i) {
-            Vector3f vertex = JomlUtil.from(part.getVertex(i));
-            meshData.getVertices().add(vertex.x);
-            meshData.getVertices().add(vertex.y);
-            meshData.getVertices().add(vertex.z);
+            Vector3fc vertex = part.getVertex(i);
+            meshData.getVertices().add(vertex.x());
+            meshData.getVertices().add(vertex.y());
+            meshData.getVertices().add(vertex.z());
 
             meshData.getColors().add(activeColor.x);
             meshData.getColors().add(activeColor.y);
             meshData.getColors().add(activeColor.z);
             meshData.getColors().add(activeColor.w);
 
-            Vector3f normal = JomlUtil.from(part.getNormal(i));
-            meshData.getNormals().add(normal.x);
-            meshData.getNormals().add(normal.y);
-            meshData.getNormals().add(normal.z);
+            Vector3fc normal = part.getNormal(i);
+            meshData.getNormals().add(normal.x());
+            meshData.getNormals().add(normal.y());
+            meshData.getNormals().add(normal.z());
 
-            Vector2f uv = JomlUtil.from(part.getTexCoord(i));
-            meshData.getTexCoord0().add(uv.x);
-            meshData.getTexCoord0().add(uv.y);
+            Vector2fc uv = part.getTexCoord(i);
+            meshData.getTexCoord0().add(uv.x());
+            meshData.getTexCoord0().add(uv.y());
 
             meshData.getTexCoord1().add(lighting.x);
             meshData.getTexCoord1().add(lighting.y);

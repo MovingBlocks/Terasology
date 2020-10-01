@@ -27,9 +27,9 @@ import org.terasology.engine.module.ModuleManager;
 import org.terasology.identity.PublicIdentityCertificate;
 import org.terasology.module.Module;
 import org.terasology.naming.Name;
+import org.terasology.nui.Color;
 import org.terasology.protobuf.NetData;
 import org.terasology.registry.CoreRegistry;
-import org.terasology.rendering.nui.Color;
 import org.terasology.rendering.world.viewDistance.ViewDistance;
 
 import java.io.BufferedInputStream;

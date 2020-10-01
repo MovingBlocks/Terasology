@@ -19,9 +19,9 @@ import com.google.common.collect.Lists;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.module.sandbox.API;
 import org.terasology.rendering.nui.NUIManager;
-import org.terasology.rendering.nui.databinding.Binding;
-import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
-import org.terasology.rendering.nui.widgets.UIList;
+import org.terasology.nui.databinding.Binding;
+import org.terasology.nui.databinding.ReadOnlyBinding;
+import org.terasology.nui.widgets.UIList;
 
 import java.util.List;
 

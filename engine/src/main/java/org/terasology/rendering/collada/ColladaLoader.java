@@ -345,7 +345,7 @@ public class ColladaLoader {
                 throw new ColladaParseException("no joint orientation for joint with element id " + joint.element.id());
             }
             // index argument is not used for anything currently, so we'll just set it to -1
-            joint.bone = new Bone(-1, joint.name, joint.position, joint.orientation);
+            joint.bone = new Bone(-1, joint.name, new Matrix4f(joint.orientation, joint.position, 1));
         }
 
         for (MD5Joint joint : md5JointList) {

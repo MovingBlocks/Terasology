@@ -114,7 +114,7 @@ public class MapWorldProvider implements WorldProviderCore {
             chunks.put(chunkPos, chunk);
         }
         if (chunk != null) {
-            return chunk.getBlock(ChunkMath.calcBlockPos(pos.x, pos.y, pos.z));
+            return chunk.getBlock(ChunkMath.calcRelativeBlockPos(pos.x, pos.y, pos.z));
         }
         return null;
     }

@@ -55,37 +55,6 @@ public interface ChunkProvider {
     void setWorldEntity(EntityRef entity);
 
     /**
-     * Requests that a region around the given entity be maintained in near cache
-     *
-     * @param entity
-     * @param distance The region (in chunks) around the entity that should be near cached
-     */
-    void addRelevanceEntity(EntityRef entity, Vector3i distance);
-
-    /**
-     * Requests that a region around the given entity be maintained in near cache
-     *
-     * @param entity
-     * @param distance The region (in chunks) around the entity that should be near cached
-     * @param listener A listener to chunk region events
-     */
-    void addRelevanceEntity(EntityRef entity, Vector3i distance, ChunkRegionListener listener);
-
-    /**
-     * Retrieves the ChunkRelevanceRegion object for the given entity
-     *
-     * @param entity
-     */
-    void updateRelevanceEntity(EntityRef entity, Vector3i distance);
-
-    /**
-     * Removes an entity from producing a caching region
-     *
-     * @param entity
-     */
-    void removeRelevanceEntity(EntityRef entity);
-
-    /**
      * Finish adding any pending chunks
      */
     void completeUpdate();

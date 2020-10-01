@@ -50,10 +50,10 @@ public class ConditionAction extends BaseAction {
     protected String[] values;
 
     @In
-    private ModuleManager moduleManager;
+    private transient ModuleManager moduleManager;
 
     @In
-    private ComponentLibrary componentLibrary;
+    private transient ComponentLibrary componentLibrary;
 
     @Override
     public void construct(Actor actor) {
