@@ -32,7 +32,6 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
-import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.physics.StandardCollisionGroup;
 import org.terasology.physics.bullet.BulletPhysics;
@@ -108,7 +107,7 @@ public class VoxelWorldSystem extends BaseComponentSystem {
         if (!registred.contains(id)) {
             btCollisionShape shape = ((BulletCollisionShape) block.getCollisionShape()).underlyingShape;
             btVoxelInfo info = new btVoxelInfo(shape != null && block.isTargetable(),
-                shape != null && !block.isPenetrable(), id, shape, JomlUtil.from(block.getCollisionOffset()),
+                shape != null && !block.isPenetrable(), id, shape, block.getCollisionOffset(),
                 block.getFriction(), block.getRestitution(), block.getFriction());
             wrapper.setVoxelInfo(info);
             registred.add(id);
