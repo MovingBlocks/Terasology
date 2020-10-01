@@ -181,8 +181,8 @@ public class KinematicCharacterMover implements CharacterMover {
         top.y += 0.5f * movementComp.height;
         bottom.y -= 0.5f * movementComp.height;
 
-        final boolean topUnderwater = worldProvider.getBlock(JomlUtil.from(top)).isLiquid();
-        final boolean bottomUnderwater = worldProvider.getBlock(JomlUtil.from(bottom)).isLiquid();
+        final boolean topUnderwater = worldProvider.getBlock(top).isLiquid();
+        final boolean bottomUnderwater = worldProvider.getBlock(bottom).isLiquid();
 
         final boolean newSwimming = !topUnderwater && bottomUnderwater;
         final boolean newDiving = topUnderwater && bottomUnderwater;
@@ -252,7 +252,7 @@ public class KinematicCharacterMover implements CharacterMover {
         float distance = 100f;
 
         for (Vector3f side : sides) {
-            Block block = worldProvider.getBlock(JomlUtil.from(side));
+            Block block = worldProvider.getBlock(side);
             if (block.isClimbable()) {
                 //If any of our sides are near a climbable block, check if we are near to the side
                 Vector3i myPos = new Vector3i(worldPos, org.joml.RoundingMode.HALF_UP);
