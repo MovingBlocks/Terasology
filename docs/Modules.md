@@ -66,7 +66,7 @@ Here's a list of modules bundled with the game by default (this line-up will cha
 * [EdibleFlora](https://github.com/Terasology/EdibleFlora) - basic growth system providing plant stuff you can eat
 * [EdibleSubstance](https://github.com/Terasology/EdibleSubstance) - allows substances to be tagged as edible and consumed
 * [Equipment](https://github.com/Terasology/Equipment) - an equipment system with a character screen (`c`) showing stats and slots for various equipment types
-* [EquipmentSmithing](https://github.com/Terasology/EquipmentSmithing) - acts as a bridge between Equipment and Smithing modules so that a player can forge weaponry and armor 
+* [EquipmentSmithing](https://github.com/Terasology/EquipmentSmithing) - acts as a bridge between Equipment and Smithing modules so that a player can forge weaponry and armor
 * [EventualSkills](https://github.com/Terasology/EventualSkills) - a time-based skill system, a bit akin to EVE Online's system
 * [Exoplanet](https://github.com/Terasology/Exoplanet) - a new world with a second "dimension" you can travel to through a portal
 * [Explosives](https://github.com/Terasology/Explosives) - a library which allows things to explode
@@ -104,7 +104,6 @@ Here's a list of modules bundled with the game by default (this line-up will cha
 * [LightAndShadowResources](https://github.com/Terasology/LightAndShadowResources) - IMMA FIRIN’ MAH LASR!! Art assets for the Light & Shadow concept
 * [Lost](https://github.com/Terasology/Lost) - gameplay template for a survival / exploration focused setting
 * [Machines](https://github.com/Terasology/Machines) - machine infrastructure library module
-
 * [ManualLabor](https://github.com/Terasology/ManualLabor) - tools and logic for manual labor (digging, chopping, etc)
 * [ManualLaborEventualSkills](https://github.com/Terasology/ManualLaborEventualSkills) - bridge module for adding EventualSkills to ManualLabor
 * [MarkovChains](https://github.com/Terasology/MarkovChains) - Library module with some pseudo random math stuff
