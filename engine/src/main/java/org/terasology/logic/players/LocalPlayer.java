@@ -25,7 +25,6 @@ import org.terasology.logic.characters.events.ActivationPredicted;
 import org.terasology.logic.characters.events.ActivationRequest;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.Direction;
-import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.network.ClientComponent;
@@ -331,32 +330,32 @@ public class LocalPlayer {
     private boolean activateTargetOrOwnedEntity(EntityRef usedOwnedEntity) {
         EntityRef character = getCharacterEntity();
         CharacterComponent characterComponent = character.getComponent(CharacterComponent.class);
-        Vector3f direction = getViewDirection();
-        Vector3f originPos = getViewPosition();
+        org.joml.Vector3f direction = getViewDirection(new org.joml.Vector3f());
+        org.joml.Vector3f originPos = getViewPosition(new org.joml.Vector3f());
         if (recordAndReplayCurrentStatus.getStatus() == RecordAndReplayStatus.RECORDING) {
             this.directionAndOriginPosRecorderList.getTargetOrOwnedEntityDirectionAndOriginPosRecorder().add(direction, originPos);
         } else if (recordAndReplayCurrentStatus.getStatus() == RecordAndReplayStatus.REPLAYING) {
-            Vector3f[] data = this.directionAndOriginPosRecorderList.getTargetOrOwnedEntityDirectionAndOriginPosRecorder().poll();
+            org.joml.Vector3f[] data = this.directionAndOriginPosRecorderList.getTargetOrOwnedEntityDirectionAndOriginPosRecorder().poll();
             direction = data[0];
             originPos = data[1];
         }
         boolean ownedEntityUsage = usedOwnedEntity.exists();
         int activationId = nextActivationId++;
         Physics physics = CoreRegistry.get(Physics.class);
-        HitResult result = physics.rayTrace(JomlUtil.from(originPos), JomlUtil.from(direction), characterComponent.interactionRange, Sets.newHashSet(character), CharacterSystem.DEFAULTPHYSICSFILTER);
+        HitResult result = physics.rayTrace(originPos, direction, characterComponent.interactionRange, Sets.newHashSet(character), CharacterSystem.DEFAULTPHYSICSFILTER);
         boolean eventWithTarget = result.isHit();
         if (eventWithTarget) {
             EntityRef activatedObject = usedOwnedEntity.exists() ? usedOwnedEntity : result.getEntity();
             activatedObject.send(new ActivationPredicted(character, result.getEntity(), originPos, direction,
-                JomlUtil.from(result.getHitPoint()), JomlUtil.from(result.getHitNormal()), activationId));
+                result.getHitPoint(), result.getHitNormal(), activationId));
             character.send(new ActivationRequest(character, ownedEntityUsage, usedOwnedEntity, eventWithTarget, result.getEntity(),
-                originPos, direction, JomlUtil.from(result.getHitPoint()), JomlUtil.from(result.getHitNormal()), activationId));
+                originPos, direction, result.getHitPoint(), result.getHitNormal(), activationId));
             return true;
         } else if (ownedEntityUsage) {
             usedOwnedEntity.send(new ActivationPredicted(character, EntityRef.NULL, originPos, direction,
-                originPos, new Vector3f(), activationId));
+                originPos, new org.joml.Vector3f(), activationId));
             character.send(new ActivationRequest(character, ownedEntityUsage, usedOwnedEntity, eventWithTarget, EntityRef.NULL,
-                originPos, direction, originPos, new Vector3f(), activationId));
+                originPos, direction, originPos, new org.joml.Vector3f(), activationId));
             return true;
         }
         return false;
