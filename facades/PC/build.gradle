@@ -82,7 +82,7 @@ println "PC VERSION: $version"
 group = 'org.terasology.facades'
 
 dependencies {
-    compile 'info.picocli:picocli:4.5.1'
+    implementation 'info.picocli:picocli:4.5.1'
     annotationProcessor 'info.picocli:picocli-codegen:4.5.1'
 
     implementation project(':engine')
