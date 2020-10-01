@@ -180,7 +180,7 @@ Some of the modules in action:
 * [Malicious](https://github.com/Terasology/Malicious) - a series of module security tests to check that modules cannot do naughty things when running
 * [MarcinScIncubator](https://github.com/Terasology-Archived/MarcinScIncubator) - parking lot for tools used in @MarcinSc's many modules without a more explicit home yet. Currently archived
 * [SimpleLiquids](https://github.com/Terasology/SimpleLiquids) - lets water propagate in the world - beware of floods! Currently archived
-* [ThroughoutTheAges](https://github.com/Terasology/ThroughoutTheAges) - gameplay module for a large content series letting you slowly climb a tech tree to improve your available tools, foods, and so on. Superseded by [NeoTTA](https://github.com/Terasology/NeoTTA)
+* [ThroughoutTheAges](https://github.com/Terasology/ThroughoutTheAges) - gameplay module for a large content series letting you slowly climb a tech tree to improve your available tools, foods, and so on. Currently buggy and superseded by [NeoTTA](https://github.com/Terasology/NeoTTA)
 
 # Tutorials
 
@@ -191,6 +191,6 @@ These modules are more likely for some time to be for developers/modders to lear
 * [TutorialDynamicCities](https://github.com/Terasology/TutorialDynamicCities) - GSOC 2016 project tutorial / docs. Covers how dynamic cities function. [Shared wiki with DynamicCities](https://github.com/Terasology/DynamicCities/wiki)
 * [TutorialMinimalEngineDemo](https://github.com/Terasology/TutorialMinimalEngineDemo) - A module demonstrating how to build a minimal "game" with the barebone Terasology engine
 * [TutorialNui](https://github.com/Terasology/TutorialNui) - GSOC 2016 project tutorial / docs. Includes details both on NUI itself as well as its editor in the [wiki](https://github.com/Terasology/TutorialNui/wiki)
-* [TutorialQuests](https://github.com/Terasology/TutorialQuests) - Provides sample quests based on the Tasks module.
+* [TutorialQuests](https://github.com/Terasology/TutorialQuests) - Provides sample quests based on the Tasks module
 * [TutorialSectors](https://github.com/Terasology/TutorialSectors) - a tutorial module covering our sector system (separated entity pools based on geographic location and differing entity scope)
 * [TutorialWorldGeneration](https://github.com/Terasology/TutorialWorldGeneration) - a world generation tutorial module, goes with a guide in its [wiki](https://github.com/Terasology/TutorialWorldGeneration/wiki)
