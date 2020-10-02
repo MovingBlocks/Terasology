@@ -47,7 +47,7 @@ public class VectorEventSerializer {
     private CopyStrategyLibrary copyStrategies = new CopyStrategyLibrary(reflectFactory);
     HashMap<Class<? extends Event>, Integer> eventMap = new HashMap<>();
     int indexCount = 0;
-    public static class Vector3fConstant implements Event {
+    public static class Vector3fTestEvent implements Event {
         public Vector3f v1;
         public Vector4f v2;
         public Vector2f v3;
@@ -69,7 +69,7 @@ public class VectorEventSerializer {
 
         serializer = new EventSerializer(entitySystemLibrary.getEventLibrary(), typeHandlerLibrary);
 
-        registerEvent(Vector3fConstant.class);
+        registerEvent(Vector3fTestEvent.class);
 
         serializer.setIdMapping(eventMap);
     }
@@ -90,16 +90,16 @@ public class VectorEventSerializer {
     @Test
     public void testEventSerializationConstant() throws IOException {
 
-        Vector3fConstant a = new Vector3fConstant();
+        Vector3fTestEvent a = new Vector3fTestEvent();
         a.v1 = new org.joml.Vector3f(1.0f, 2.0f, 3.0f);
         a.v2 = new org.joml.Vector4f(1.0f, 2.0f, 3.0f, 5.0f);
         a.v3 = new org.joml.Vector2f(1.0f, 2.0f);
 
         EntityData.Event ev = serializer.serialize(a);
         Event dev = serializer.deserialize(ev);
-        assumeTrue(dev instanceof Vector3fConstant);
-        TeraAssert.assertEquals(((Vector3fConstant) dev).v1, new org.joml.Vector3f(1.0f, 2.0f, 3.0f), .00001f);
-        TeraAssert.assertEquals(((Vector3fConstant) dev).v2, new org.joml.Vector4f(1.0f, 2.0f, 3.0f, 5.0f), .00001f);
-        TeraAssert.assertEquals(((Vector3fConstant) dev).v3, new org.joml.Vector2f(1.0f, 2.0f), .00001f);
+        assumeTrue(dev instanceof Vector3fTestEvent);
+        TeraAssert.assertEquals(((Vector3fTestEvent) dev).v1, new Vector3f(1.0f, 2.0f, 3.0f), .00001f);
+        TeraAssert.assertEquals(((Vector3fTestEvent) dev).v2, new Vector4f(1.0f, 2.0f, 3.0f, 5.0f), .00001f);
+        TeraAssert.assertEquals(((Vector3fTestEvent) dev).v3, new Vector2f(1.0f, 2.0f), .00001f);
     }
 }
