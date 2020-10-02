@@ -25,6 +25,7 @@ import org.terasology.persistence.ModuleContext;
 import org.terasology.persistence.serializers.EventSerializer;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.protobuf.EntityData;
+import org.terasology.reflection.TypeRegistry;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.metadata.FieldMetadata;
 import org.terasology.reflection.reflect.ReflectFactory;
@@ -47,10 +48,15 @@ public class VectorEventSerializer {
     private CopyStrategyLibrary copyStrategies = new CopyStrategyLibrary(reflectFactory);
     HashMap<Class<? extends Event>, Integer> eventMap = new HashMap<>();
     int indexCount = 0;
+
     public static class Vector3fTestEvent implements Event {
         public Vector3f v1;
         public Vector4f v2;
         public Vector2f v3;
+
+        public Vector3fc v1c;
+        public Vector4fc v2c;
+        public Vector2fc v3c;
     }
 
     @BeforeEach
@@ -58,12 +64,12 @@ public class VectorEventSerializer {
         ContextImpl context = new ContextImpl();
         CoreRegistry.setContext(context);
         ModuleManager moduleManager = ModuleManagerFactory.create();
-        context.put(ModuleManager.class,moduleManager);
+        context.put(ModuleManager.class, moduleManager);
         context.put(ReflectFactory.class, reflectFactory);
         context.put(CopyStrategyLibrary.class, copyStrategies);
 
-        Reflections reflections = new Reflections(getClass().getClassLoader());
-        TypeHandlerLibrary typeHandlerLibrary = new TypeHandlerLibrary(reflections);
+        TypeRegistry typeRegistry = new TypeRegistry(moduleManager.getEnvironment());
+        TypeHandlerLibrary typeHandlerLibrary = TypeHandlerLibrary.forModuleEnvironment(moduleManager, typeRegistry);
 
         entitySystemLibrary = new EntitySystemLibrary(context, typeHandlerLibrary);
 
@@ -84,7 +90,7 @@ public class VectorEventSerializer {
             field.setId((byte) fieldId);
             fieldId++;
         }
-        eventMap.put(clazz,++indexCount);
+        eventMap.put(clazz, ++indexCount);
     }
 
 
@@ -92,9 +98,13 @@ public class VectorEventSerializer {
     public void testEventSerializationConstant() throws IOException {
 
         Vector3fTestEvent a = new Vector3fTestEvent();
-        a.v1 = new org.joml.Vector3f(1.0f, 2.0f, 3.0f);
-        a.v2 = new org.joml.Vector4f(1.0f, 2.0f, 3.0f, 5.0f);
-        a.v3 = new org.joml.Vector2f(1.0f, 2.0f);
+        a.v1 = new Vector3f(1.0f, 2.0f, 3.0f);
+        a.v2 = new Vector4f(1.0f, 2.0f, 3.0f, 5.0f);
+        a.v3 = new Vector2f(1.0f, 2.0f);
+
+        a.v1c = new Vector3f(1.0f, 1.0f, 1.0f);
+        a.v2c = new Vector4f(1.0f, 1.0f, 2.0f, 2.0f);
+        a.v3c = new Vector2f(1.0f, 1.0f);
 
         EntityData.Event ev = serializer.serialize(a);
         Event dev = serializer.deserialize(ev);
@@ -102,5 +112,9 @@ public class VectorEventSerializer {
         TeraAssert.assertEquals(((Vector3fTestEvent) dev).v1, new Vector3f(1.0f, 2.0f, 3.0f), .00001f);
         TeraAssert.assertEquals(((Vector3fTestEvent) dev).v2, new Vector4f(1.0f, 2.0f, 3.0f, 5.0f), .00001f);
         TeraAssert.assertEquals(((Vector3fTestEvent) dev).v3, new Vector2f(1.0f, 2.0f), .00001f);
+
+        TeraAssert.assertEquals(((Vector3fTestEvent) dev).v1c, new Vector3f(1.0f, 1.0f, 1.0f), .00001f);
+        TeraAssert.assertEquals(((Vector3fTestEvent) dev).v2c, new Vector4f(1.0f, 1.0f, 2.0f, 2.0f), .00001f);
+        TeraAssert.assertEquals(((Vector3fTestEvent) dev).v3c, new Vector2f(1.0f, 1.0f), .00001f);
     }
 }
