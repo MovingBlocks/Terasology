@@ -4,6 +4,7 @@
 package org.terasology.persistence.typeHandling.event;
 
 import org.junit.jupiter.api.Test;
+import org.reflections.Reflections;
 import org.terasology.ModuleEnvironmentTest;
 import org.terasology.context.internal.ContextImpl;
 import org.terasology.entitySystem.event.Event;
@@ -22,7 +23,6 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 public class VectorEventSerializer extends ModuleEnvironmentTest {
 
-    private TypeHandlerLibrary typeHandlerLibrary;
     private EntitySystemLibrary entitySystemLibrary;
     private EventSerializer serializer;
 
@@ -33,7 +33,8 @@ public class VectorEventSerializer extends ModuleEnvironmentTest {
 
         ModuleContext.setContext(moduleManager.getEnvironment().get(new Name("unittest")));
 
-        typeHandlerLibrary = TypeHandlerLibrary.forModuleEnvironment(moduleManager, typeRegistry);
+        Reflections reflections = new Reflections(getClass().getClassLoader());
+        TypeHandlerLibrary typeHandlerLibrary = new TypeHandlerLibrary(reflections);
 
         entitySystemLibrary = new EntitySystemLibrary(context, typeHandlerLibrary);
         serializer = new EventSerializer(entitySystemLibrary.getEventLibrary(), typeHandlerLibrary);
