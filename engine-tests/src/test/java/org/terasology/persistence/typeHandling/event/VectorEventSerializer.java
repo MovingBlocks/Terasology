@@ -6,9 +6,6 @@ package org.terasology.persistence.typeHandling.event;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.nio.file.ShrinkWrapFileSystems;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
-import org.joml.Vector2fc;
-import org.joml.Vector3fc;
-import org.joml.Vector4fc;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.terasology.TerasologyTestingEnvironment;
@@ -38,12 +35,6 @@ public class VectorEventSerializer extends TerasologyTestingEnvironment {
     private ModuleManager moduleManager;
     private TypeRegistry typeRegistry;
 
-    static class Vector3Constant implements Event {
-        public Vector3fc v1;
-        public Vector4fc v2;
-        public Vector2fc v3;
-    }
-
     @Override
     @BeforeEach
     public void setup() throws Exception {
@@ -62,8 +53,6 @@ public class VectorEventSerializer extends TerasologyTestingEnvironment {
 
         ModuleEnvironment environment = moduleManager.loadEnvironment(result.getModules(), true);
         typeRegistry = new TypeRegistry(environment);
-
-
         typeHandlerLibrary = TypeHandlerLibrary.forModuleEnvironment(moduleManager, typeRegistry);
 
         this.serializer = new EventSerializer(context.get(EventLibrary.class), typeHandlerLibrary);
@@ -72,16 +61,17 @@ public class VectorEventSerializer extends TerasologyTestingEnvironment {
 
     @Test
     public void testEventSerializationConstant() throws IOException {
-        Vector3Constant a = new Vector3Constant();
+
+        Vector3fConstant a = new Vector3fConstant();
         a.v1 = new org.joml.Vector3f(1.0f, 2.0f, 3.0f);
         a.v2 = new org.joml.Vector4f(1.0f, 2.0f, 3.0f, 5.0f);
         a.v3 = new org.joml.Vector2f(1.0f, 2.0f);
 
         EntityData.Event ev = serializer.serialize(a);
         Event dev = serializer.deserialize(ev);
-        assumeTrue(dev instanceof Vector3Constant);
-        TeraAssert.assertEquals(((Vector3Constant) dev).v1, new org.joml.Vector3f(1.0f, 2.0f, 3.0f), .00001f);
-        TeraAssert.assertEquals(((Vector3Constant) dev).v2, new org.joml.Vector4f(1.0f, 2.0f, 3.0f, 5.0f), .00001f);
-        TeraAssert.assertEquals(((Vector3Constant) dev).v3, new org.joml.Vector2f(1.0f, 2.0f), .00001f);
+        assumeTrue(dev instanceof Vector3fConstant);
+        TeraAssert.assertEquals(((Vector3fConstant) dev).v1, new org.joml.Vector3f(1.0f, 2.0f, 3.0f), .00001f);
+        TeraAssert.assertEquals(((Vector3fConstant) dev).v2, new org.joml.Vector4f(1.0f, 2.0f, 3.0f, 5.0f), .00001f);
+        TeraAssert.assertEquals(((Vector3fConstant) dev).v3, new org.joml.Vector2f(1.0f, 2.0f), .00001f);
     }
 }
