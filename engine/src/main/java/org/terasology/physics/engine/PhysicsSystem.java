@@ -107,21 +107,21 @@ public class PhysicsSystem extends BaseComponentSystem implements UpdateSubscrib
 
     @ReceiveEvent(components = {RigidBodyComponent.class})
     public void onImpulse(ImpulseEvent event, EntityRef entity) {
-        physics.getRigidBody(entity).applyImpulse(JomlUtil.from(event.getImpulse()));
+        physics.getRigidBody(entity).applyImpulse(event.getImpulse());
     }
 
     @ReceiveEvent(components = {RigidBodyComponent.class})
     public void onForce(ForceEvent event, EntityRef entity) {
-        physics.getRigidBody(entity).applyForce(JomlUtil.from(event.getForce()));
+        physics.getRigidBody(entity).applyForce(event.getForce());
     }
 
     @ReceiveEvent(components = {RigidBodyComponent.class})
     public void onChangeVelocity(ChangeVelocityEvent event, EntityRef entity) {
         if (event.getAngularVelocity() != null) {
-            physics.getRigidBody(entity).setAngularVelocity(JomlUtil.from(event.getAngularVelocity()));
+            physics.getRigidBody(entity).setAngularVelocity(event.getAngularVelocity());
         }
         if (event.getLinearVelocity() != null) {
-            physics.getRigidBody(entity).setLinearVelocity(JomlUtil.from(event.getLinearVelocity()));
+            physics.getRigidBody(entity).setLinearVelocity(event.getLinearVelocity());
         }
     }
 
