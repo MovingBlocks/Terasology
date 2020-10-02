@@ -3,14 +3,16 @@
 
 package org.terasology.persistence.typeHandling.event;
 
+import org.joml.Vector2fc;
+import org.joml.Vector3fc;
+import org.joml.Vector4fc;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.reflections.Reflections;
 import org.terasology.ModuleEnvironmentTest;
 import org.terasology.context.internal.ContextImpl;
 import org.terasology.entitySystem.event.Event;
 import org.terasology.entitySystem.metadata.EntitySystemLibrary;
-import org.terasology.naming.Name;
-import org.terasology.persistence.ModuleContext;
 import org.terasology.persistence.serializers.EventSerializer;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.protobuf.EntityData;
@@ -21,17 +23,21 @@ import java.io.IOException;
 
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
-public class VectorEventSerializer extends ModuleEnvironmentTest {
+public class VectorEventSerializer {
 
     private EntitySystemLibrary entitySystemLibrary;
     private EventSerializer serializer;
 
-    @Override
+    public static class Vector3fConstant implements Event {
+        public Vector3fc v1;
+        public Vector4fc v2;
+        public Vector2fc v3;
+    }
+
+    @BeforeEach
     public void setup() {
         ContextImpl context = new ContextImpl();
         CoreRegistry.setContext(context);
-
-        ModuleContext.setContext(moduleManager.getEnvironment().get(new Name("unittest")));
 
         Reflections reflections = new Reflections(getClass().getClassLoader());
         TypeHandlerLibrary typeHandlerLibrary = new TypeHandlerLibrary(reflections);
