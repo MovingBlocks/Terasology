@@ -74,6 +74,7 @@ public class VectorEventSerializer {
         serializer.setIdMapping(eventMap);
     }
 
+    //TODO: resolve hidden coupling in NetworkSystemImpl for fieldId's and EventSerializer
     private void registerEvent(Class<? extends Event> clazz) {
 
         entitySystemLibrary.getEventLibrary().register(new ResourceUrn("unittest", clazz.getName()), clazz);
