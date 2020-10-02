@@ -3,59 +3,40 @@
 
 package org.terasology.persistence.typeHandling.event;
 
-import org.jboss.shrinkwrap.api.ShrinkWrap;
-import org.jboss.shrinkwrap.api.nio.file.ShrinkWrapFileSystems;
-import org.jboss.shrinkwrap.api.spec.JavaArchive;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.terasology.TerasologyTestingEnvironment;
-import org.terasology.engine.module.ModuleManager;
-import org.terasology.engine.paths.PathManager;
+import org.terasology.ModuleEnvironmentTest;
+import org.terasology.context.internal.ContextImpl;
 import org.terasology.entitySystem.event.Event;
-import org.terasology.entitySystem.metadata.EventLibrary;
-import org.terasology.module.DependencyResolver;
-import org.terasology.module.ModuleEnvironment;
-import org.terasology.module.ResolutionResult;
+import org.terasology.entitySystem.metadata.EntitySystemLibrary;
+import org.terasology.naming.Name;
+import org.terasology.persistence.ModuleContext;
 import org.terasology.persistence.serializers.EventSerializer;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.protobuf.EntityData;
-import org.terasology.reflection.TypeRegistry;
-import org.terasology.testUtil.ModuleManagerFactory;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.testUtil.TeraAssert;
 
 import java.io.IOException;
-import java.nio.file.FileSystem;
 
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
-public class VectorEventSerializer extends TerasologyTestingEnvironment {
+public class VectorEventSerializer extends ModuleEnvironmentTest {
 
     private TypeHandlerLibrary typeHandlerLibrary;
+    private EntitySystemLibrary entitySystemLibrary;
     private EventSerializer serializer;
-    private ModuleManager moduleManager;
-    private TypeRegistry typeRegistry;
 
     @Override
-    @BeforeEach
-    public void setup() throws Exception {
-        super.setup();
+    public void setup() {
+        ContextImpl context = new ContextImpl();
+        CoreRegistry.setContext(context);
 
-        final JavaArchive homeArchive = ShrinkWrap.create(JavaArchive.class);
-        final FileSystem vfs = ShrinkWrapFileSystems.newFileSystem(homeArchive);
-        PathManager.getInstance().useOverrideHomePath(vfs.getPath(""));
+        ModuleContext.setContext(moduleManager.getEnvironment().get(new Name("unittest")));
 
-        moduleManager = ModuleManagerFactory.create();
-
-        DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
-        ResolutionResult result = resolver.resolve(moduleManager.getRegistry().getModuleIds());
-
-        assumeTrue(result.isSuccess());
-
-        ModuleEnvironment environment = moduleManager.loadEnvironment(result.getModules(), true);
-        typeRegistry = new TypeRegistry(environment);
         typeHandlerLibrary = TypeHandlerLibrary.forModuleEnvironment(moduleManager, typeRegistry);
 
-        this.serializer = new EventSerializer(context.get(EventLibrary.class), typeHandlerLibrary);
+        entitySystemLibrary = new EntitySystemLibrary(context, typeHandlerLibrary);
+        serializer = new EventSerializer(entitySystemLibrary.getEventLibrary(), typeHandlerLibrary);
     }
 
 
