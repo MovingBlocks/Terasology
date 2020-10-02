@@ -16,8 +16,6 @@
 
 package org.terasology.math;
 
-import java.math.RoundingMode;
-
 import org.joml.Math;
 import org.joml.Vector3fc;
 import org.joml.Vector3ic;
@@ -25,6 +23,8 @@ import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.world.block.BlockRegion;
 import org.terasology.world.chunks.ChunkConstants;
+
+import java.math.RoundingMode;
 
 /**
  * Collection of math functions.
@@ -389,12 +389,31 @@ public final class ChunkMath {
     }
 
     // TODO: This doesn't belong in this class, move it.
+    /**
+     *
+     * @param direction
+     * @param normal
+     * @return
+     * @deprecated This is scheduled for removal in an upcoming version
+     *             method will be replaced with JOML implementation {@link #getSecondaryPlacementDirection(Vector3fc, Vector3fc)}.
+     */
+    @Deprecated
     public static Side getSecondaryPlacementDirection(Vector3f direction, Vector3f normal) {
         Side surfaceDir = Side.inDirection(normal);
         Vector3f attachDir = surfaceDir.reverse().getVector3i().toVector3f();
         Vector3f rawDirection = new Vector3f(direction);
         float dot = rawDirection.dot(attachDir);
         rawDirection.sub(new Vector3f(dot * attachDir.x, dot * attachDir.y, dot * attachDir.z));
+        return Side.inDirection(rawDirection.x, rawDirection.y, rawDirection.z).reverse();
+    }
+
+
+    public static Side getSecondaryPlacementDirection(Vector3fc direction, Vector3fc normal) {
+        Side surfaceDir = Side.inDirection(normal);
+        org.joml.Vector3f attachDir = new org.joml.Vector3f(surfaceDir.reverse().direction());
+        org.joml.Vector3f rawDirection = new org.joml.Vector3f(direction);
+        float dot = rawDirection.dot(attachDir);
+        rawDirection.sub(dot * attachDir.x, dot * attachDir.y, dot * attachDir.z);
         return Side.inDirection(rawDirection.x, rawDirection.y, rawDirection.z).reverse();
     }
 

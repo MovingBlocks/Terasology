@@ -16,6 +16,7 @@
 package org.terasology.world.block.items;
 
 import org.joml.Vector2f;
+import org.joml.Vector3fc;
 import org.terasology.audio.AudioManager;
 import org.terasology.audio.events.PlaySoundEvent;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -93,7 +94,7 @@ public class BlockItemSystem extends BaseComponentSystem {
 
         Vector2f relativeAttachmentPosition = getRelativeAttachmentPosition(event);
         Block block = blockFamily.getBlockForPlacement(new BlockPlacementData(
-                JomlUtil.from(placementPos), surfaceSide, JomlUtil.from(event.getDirection()), relativeAttachmentPosition
+                JomlUtil.from(placementPos), surfaceSide, event.getDirection(), relativeAttachmentPosition
         ));
 
         if (canPlaceBlock(block, targetBlock, placementPos)) {
@@ -115,7 +116,7 @@ public class BlockItemSystem extends BaseComponentSystem {
     }
 
     private Vector2f getRelativeAttachmentPosition(ActivateEvent event) {
-        Vector3f targetPosition = event.getTargetLocation();
+        org.joml.Vector3f targetPosition = event.getTargetLocation();
         if (event.getHitPosition() != null && targetPosition != null) {
             return getSideHitPosition(event.getHitPosition(), targetPosition);
         } else {
@@ -133,9 +134,9 @@ public class BlockItemSystem extends BaseComponentSystem {
      * @param blockPosition the block position relative to its center (block (0, 0, 0) has block position (0.5, 0.5, 0.5))
      * @return the 2D hit position relative to the side that was hit
      */
-    private Vector2f getSideHitPosition(Vector3f hitPosition, Vector3f blockPosition) {
+    private Vector2f getSideHitPosition(Vector3fc hitPosition, Vector3fc blockPosition) {
         float epsilon = 0.0001f;
-        Vector3f relativeHitPosition = new Vector3f(hitPosition).sub(blockPosition);
+        org.joml.Vector3f relativeHitPosition = new org.joml.Vector3f(hitPosition).sub(blockPosition);
 
         if (Math.abs(relativeHitPosition.x) > 0.5f - epsilon) {
             return new Vector2f(relativeHitPosition.z, relativeHitPosition.y).add(0.5f, 0.5f);
