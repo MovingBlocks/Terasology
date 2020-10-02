@@ -25,6 +25,7 @@ import org.terasology.logic.characters.events.ActivationPredicted;
 import org.terasology.logic.characters.events.ActivationRequest;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.Direction;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.network.ClientComponent;
@@ -286,13 +287,26 @@ public class LocalPlayer {
         Vector3f dir = Direction.FORWARD.getVector3f();
         return rot.rotate(dir, dir);
     }
-
+    /**
+     * @return
+     * @deprecated This is scheduled for removal in an upcoming version method will be replaced with JOML implementation
+     *     {@link #getVelocity(org.joml.Vector3f)}
+     */
+    @Deprecated
     public Vector3f getVelocity() {
         CharacterMovementComponent movement = getCharacterEntity().getComponent(CharacterMovementComponent.class);
         if (movement != null) {
-            return new Vector3f(movement.getVelocity());
+            return JomlUtil.from(movement.getVelocity());
         }
         return new Vector3f();
+    }
+
+    public org.joml.Vector3f getVelocity(org.joml.Vector3f dest) {
+        CharacterMovementComponent movement = getCharacterEntity().getComponent(CharacterMovementComponent.class);
+        if (movement != null) {
+            return dest.set(movement.getVelocity());
+        }
+        return dest;
     }
 
 
