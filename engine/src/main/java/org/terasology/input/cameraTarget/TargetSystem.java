@@ -82,7 +82,7 @@ public class TargetSystem {
 
         if (hitInfo.isWorldHit()) {
             if (targetBlockPos != null) {
-                if (targetBlockPos.equals(JomlUtil.from(hitInfo.getBlockPosition()))) {
+                if (targetBlockPos.equals(hitInfo.getBlockPosition())) {
                     return false;
                 }
             }
