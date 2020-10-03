@@ -18,11 +18,12 @@ package org.terasology.input.cameraTarget;
 
 import java.util.Arrays;
 
+import org.joml.Vector3f;
+import org.joml.Vector3i;
+import org.joml.Vector3ic;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.JomlUtil;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.physics.CollisionGroup;
 import org.terasology.physics.HitResult;
 import org.terasology.physics.Physics;
@@ -50,7 +51,7 @@ public class TargetSystem {
      * a null reference (isTargetAvailable() would have returned false in this case).
      * @return the target block position in world coordinates, a vector of 3 integers.
      */
-    public Vector3i getTargetBlockPosition() {
+    public Vector3ic getTargetBlockPosition() {
         return targetBlockPos;
     }
 
@@ -76,7 +77,7 @@ public class TargetSystem {
             target = blockRegistry.getEntityAt(targetBlockPos);
         }
 
-        HitResult hitInfo = physics.rayTrace(JomlUtil.from(pos), JomlUtil.from(dir), maxDist, filter);
+        HitResult hitInfo = physics.rayTrace(pos, dir, maxDist, filter);
         EntityRef newTarget = hitInfo.getEntity();
 
         if (hitInfo.isWorldHit()) {
@@ -85,7 +86,7 @@ public class TargetSystem {
                     return false;
                 }
             }
-            targetBlockPos = JomlUtil.from(hitInfo.getBlockPosition());
+            targetBlockPos = hitInfo.getBlockPosition();
         } else {
             if (target.equals(newTarget)) {
                 return false;
@@ -98,7 +99,7 @@ public class TargetSystem {
 
         LocationComponent location = target.getComponent(LocationComponent.class);
         if (location != null && targetBlockPos != null) {
-            location.setLocalPosition(targetBlockPos.toVector3f());
+            location.setLocalPosition(new Vector3f(targetBlockPos));
         }
 
         return true;
