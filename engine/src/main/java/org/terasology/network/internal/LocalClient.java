@@ -16,6 +16,7 @@
 
 package org.terasology.network.internal;
 
+import org.joml.Vector3ic;
 import org.terasology.config.Config;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -105,10 +106,10 @@ public class LocalClient extends AbstractClient {
     }
 
     @Override
-    public void onChunkRelevant(Vector3i pos, Chunk chunk) {
+    public void onChunkRelevant(Vector3ic pos, Chunk chunk) {
     }
 
     @Override
-    public void onChunkIrrelevant(Vector3i pos) {
+    public void onChunkIrrelevant(Vector3ic pos) {
     }
 }
