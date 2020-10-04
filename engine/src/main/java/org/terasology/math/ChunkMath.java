@@ -425,27 +425,27 @@ public final class ChunkMath {
      * @return
      */
     public static Region3i getEdgeRegion(Region3i region, Side side) {
-        Vector3i sideDir = side.getVector3i();
+        Vector3ic sideDir = side.direction();
         Vector3i min = region.min();
         Vector3i max = region.max();
         Vector3i edgeMin = new Vector3i(min);
         Vector3i edgeMax = new Vector3i(max);
-        if (sideDir.x < 0) {
+        if (sideDir.x() < 0) {
             edgeMin.x = min.x;
             edgeMax.x = min.x;
-        } else if (sideDir.x > 0) {
+        } else if (sideDir.x() > 0) {
             edgeMin.x = max.x;
             edgeMax.x = max.x;
-        } else if (sideDir.y < 0) {
+        } else if (sideDir.y() < 0) {
             edgeMin.y = min.y;
             edgeMax.y = min.y;
-        } else if (sideDir.y > 0) {
+        } else if (sideDir.y() > 0) {
             edgeMin.y = max.y;
             edgeMax.y = max.y;
-        } else if (sideDir.z < 0) {
+        } else if (sideDir.z() < 0) {
             edgeMin.z = min.z;
             edgeMax.z = min.z;
-        } else if (sideDir.z > 0) {
+        } else if (sideDir.z() > 0) {
             edgeMin.z = max.z;
             edgeMax.z = max.z;
         }
