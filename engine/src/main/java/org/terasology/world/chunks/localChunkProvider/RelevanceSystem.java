@@ -171,8 +171,9 @@ public class RelevanceSystem implements UpdateSubscriberSystem {
         } finally {
             regionLock.writeLock().unlock();
         }
+
         StreamSupport.stream(region.getCurrentRegion().spliterator(), false)
-//                .sorted(new PositionRelevanceComparator()) <-- this is n^2 cost. not sure why this needs to be sorted like this.
+                .sorted(new PositionRelevanceComparator()) //<-- this is n^2 cost. not sure why this needs to be sorted like this.
                 .forEach(
                         pos -> {
                             Chunk chunk = chunkProvider.getChunk(pos);
@@ -252,10 +253,14 @@ public class RelevanceSystem implements UpdateSubscriberSystem {
 
         regionLock.readLock().lock();
         try {
+
             for (ChunkRelevanceRegion region : regions.values()) {
                 int dist = distFromRegion(chunk, region.getCenter());
                 if (dist < score) {
                     score = dist;
+                }
+                if (score == 0) {
+                    break;
                 }
             }
             return score;
