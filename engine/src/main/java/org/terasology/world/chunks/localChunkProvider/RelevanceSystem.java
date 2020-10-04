@@ -172,7 +172,7 @@ public class RelevanceSystem implements UpdateSubscriberSystem {
             regionLock.writeLock().unlock();
         }
         StreamSupport.stream(region.getCurrentRegion().spliterator(), false)
-                .sorted(new PositionRelevanceComparator())
+//                .sorted(new PositionRelevanceComparator()) <-- this is n^2 cost. not sure why this needs to be sorted like this.
                 .forEach(
                         pos -> {
                             Chunk chunk = chunkProvider.getChunk(pos);
