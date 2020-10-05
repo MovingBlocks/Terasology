@@ -352,28 +352,112 @@ public final class ChunkMath {
     }
 
 
+    /**
+     * the relative position from the x axis from the (0,0,0) corner
+     * @param blockX absolute x position
+     * @return relative position for x axis
+     */
     public static int calcBlockPosX(int blockX) {
-        return calcRelativeBlockPos(blockX, ChunkConstants.INNER_CHUNK_POS_FILTER.x);
+        return calcRelativeBlockPos(blockX, ChunkConstants.INNER_CHUNK_POS_FILTER.x());
     }
 
+    /**
+     * the relative position from the y axis from the (0,0,0) corner
+     * @param blockY absolute y position
+     * @return relative position for y axis
+     */
     public static int calcBlockPosY(int blockY) {
-        return calcRelativeBlockPos(blockY, ChunkConstants.INNER_CHUNK_POS_FILTER.y);
+        return calcRelativeBlockPos(blockY, ChunkConstants.INNER_CHUNK_POS_FILTER.y());
     }
 
+    /**
+     * the relative position from the z axis from the (0,0,0) corner
+     * @param blockZ absolute z position
+     * @return relative position for z axis
+     */
     public static int calcBlockPosZ(int blockZ) {
-        return calcRelativeBlockPos(blockZ, ChunkConstants.INNER_CHUNK_POS_FILTER.z);
+        return calcRelativeBlockPos(blockZ, ChunkConstants.INNER_CHUNK_POS_FILTER.z());
     }
 
+    /**
+     * the relative position in the nearest chunk from the (0,0,0) corner
+     *
+     * @param worldPos world position
+     * @return relative chunk position
+     * @deprecated This method is scheduled for removal in an upcoming version. Use the JOML implementation instead:
+     *     {@link #calcRelativeBlockPos(Vector3ic, org.joml.Vector3i)}.
+     */
+    @Deprecated
     public static Vector3i calcRelativeBlockPos(Vector3i worldPos) {
-        return calcRelativeBlockPos(worldPos.x, worldPos.y, worldPos.z, ChunkConstants.INNER_CHUNK_POS_FILTER);
+        return calcRelativeBlockPos(worldPos.x, worldPos.y, worldPos.z, JomlUtil.from(ChunkConstants.INNER_CHUNK_POS_FILTER));
     }
 
+    /**
+     * the relative position in the nearest chunk from the (0,0,0) corner
+     * @param x the x world position
+     * @param y the y world position
+     * @param z the z world position
+     * @return relative chunk position
+     * @deprecated This method is scheduled for removal in an upcoming version. Use the JOML implementation instead:
+     *     {@link #calcRelativeBlockPos(int,int,int,org.joml.Vector3i)}.
+     */
+    @Deprecated
     public static Vector3i calcRelativeBlockPos(int x, int y, int z) {
-        return calcRelativeBlockPos(x, y, z, ChunkConstants.INNER_CHUNK_POS_FILTER);
+        return calcRelativeBlockPos(x, y, z, JomlUtil.from(ChunkConstants.INNER_CHUNK_POS_FILTER));
     }
 
+    /**
+     * the relative position in the nearest chunk from the (0,0,0) corner
+     * @param x
+     * @param y
+     * @param z
+     * @param chunkFilterSize
+     * @return
+     * @deprecated This method is scheduled for removal in an upcoming version. Use the JOML implementation instead:
+     *     {@link #calcRelativeBlockPos(int,int,int,org.joml.Vector3i)}.
+     */
+    @Deprecated
     public static Vector3i calcRelativeBlockPos(int x, int y, int z, Vector3i chunkFilterSize) {
         return new Vector3i(calcRelativeBlockPos(x, chunkFilterSize.x), calcRelativeBlockPos(y, chunkFilterSize.y), calcRelativeBlockPos(z, chunkFilterSize.z));
+    }
+
+
+    /**
+     * the relative position in the nearest chunk from the (0,0,0) corner
+     * default chunk size of (32, 64, 32).
+     * @param worldPos world position
+     * @param dest will hold the result
+     * @return dest
+     */
+    public static org.joml.Vector3i calcRelativeBlockPos(Vector3ic worldPos, org.joml.Vector3i dest) {
+        return calcRelativeBlockPos(worldPos.x(), worldPos.y(), worldPos.z(), ChunkConstants.INNER_CHUNK_POS_FILTER, dest);
+    }
+
+    /**
+     * the relative position in the nearest chunk from the (0,0,0) corner.
+     * default chunk size of (32, 64, 32).
+     * @param x the x world position
+     * @param y the y world position
+     * @param z the z world position
+     * @param dest will hold the result
+     * @return dest
+     */
+    public static org.joml.Vector3i calcRelativeBlockPos(int x, int y, int z, org.joml.Vector3i dest) {
+        return calcRelativeBlockPos(x, y, z, ChunkConstants.INNER_CHUNK_POS_FILTER, dest);
+    }
+
+    /**
+     * the relative position in the nearest chunk from the (0,0,0) corner.
+     * default chunk size of (32, 64, 32).
+     * @param x the x world position
+     * @param y the y world position
+     * @param z the z world position
+     * @param chunkFilterSize relative within a chunk for (x - 1, y - 1, z - 1)
+     * @param dest will hold the result
+     * @return dest
+     */
+    public static org.joml.Vector3i calcRelativeBlockPos(int x, int y, int z, Vector3ic chunkFilterSize, org.joml.Vector3i dest) {
+        return dest.set(calcRelativeBlockPos(x, chunkFilterSize.x()), calcRelativeBlockPos(y, chunkFilterSize.y()), calcRelativeBlockPos(z, chunkFilterSize.z()));
     }
 
     public static Region3i getChunkRegionAroundWorldPos(Vector3i pos, int extent) {
