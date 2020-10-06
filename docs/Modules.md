@@ -188,9 +188,19 @@ These modules are more likely for some time to be for developers/modders to lear
 
 * [TutorialAssetSystem](https://github.com/Terasology/TutorialAssetSystem) - a tutorial module covering our asset system, see also its [wiki](https://github.com/Terasology/TutorialAssetSystem/wiki)
 * [TutorialBehaviors](https://github.com/Terasology/TutorialBehaviors) - a tutorial module covering our behavior tree system
+* [TutorialBlockFamily](https://github.com/Terasology/TutorialBlockFamily) - provides understanding of the block family system
 * [TutorialDynamicCities](https://github.com/Terasology/TutorialDynamicCities) - GSOC 2016 project tutorial / docs. Covers how dynamic cities function. [Shared wiki with DynamicCities](https://github.com/Terasology/DynamicCities/wiki)
+* [TutorialEntitySystem](https://github.com/Terasology/TutorialEntitySystem) - information on the Entity Component System (ECS)
+* [TutorialEventsInteractions](TutorialEventsInteractions) - covers using events in the Entity Component System
+* [TutorialI18n](https://github.com/Terasology/TutorialI18n) - covers i18n, which lowers language barriers
 * [TutorialMinimalEngineDemo](https://github.com/Terasology/TutorialMinimalEngineDemo) - A module demonstrating how to build a minimal "game" with the barebone Terasology engine
+* [TutorialMultiplayerExtras](https://github.com/Terasology/TutorialMultiplayerExtras) - covers using the ECS in multiplayer
 * [TutorialNui](https://github.com/Terasology/TutorialNui) - GSOC 2016 project tutorial / docs. Includes details both on NUI itself as well as its editor in the [wiki](https://github.com/Terasology/TutorialNui/wiki)
+* [TutorialParticleSystem](https://github.com/Terasology/TutorialParticleSystem) - a tutorial module covering the particle system
+* [TutorialPathfinding](https://github.com/Terasology/TutorialPathfinding) - tutorial that outlines several pathfinding topics including floor highlighting and paths
+* [TutorialProfiling](https://github.com/Terasology/TutorialProfiling) - a performance focused tutotial module
 * [TutorialQuests](https://github.com/Terasology/TutorialQuests) - Provides sample quests based on the Tasks module
 * [TutorialSectors](https://github.com/Terasology/TutorialSectors) - a tutorial module covering our sector system (separated entity pools based on geographic location and differing entity scope)
+* [TutorialTelemetry](https://github.com/Terasology/TutorialTelemetry) - telemetry tutorial for tracking metrics and gathering useful info
 * [TutorialWorldGeneration](https://github.com/Terasology/TutorialWorldGeneration) - a world generation tutorial module, goes with a guide in its [wiki](https://github.com/Terasology/TutorialWorldGeneration/wiki)
+
