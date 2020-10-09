@@ -49,7 +49,7 @@ public final class BlockComponent implements Component {
     /**
      * @deprecated Deprecated on 21/Sep/2018, because it is error prone (no defensive copy) and needlessly verbose.
      * @deprecated This is scheduled for removal in an upcoming version method will be replaced with JOML implementation
-     *     {@link #getPosition(org.joml.Vector3i)}.
+     *     {@link #getPositionConst()}.
      */
     @Deprecated
     public Vector3i getPosition() {
@@ -82,15 +82,9 @@ public final class BlockComponent implements Component {
         return block;
     }
 
-    /**
-     * get the position
-     *
-     * @param dest will hold the result
-     * @return dest
-     */
-    public org.joml.Vector3i getPosition(org.joml.Vector3i dest) {
-        dest.set(JomlUtil.from(position));
-        return dest;
+    // TODO: rename to `getPosition` after removal of deprecated method
+    public org.joml.Vector3ic getPositionConst() {
+        return JomlUtil.from(position);
     }
 
     /**

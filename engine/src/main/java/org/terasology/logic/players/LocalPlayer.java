@@ -106,7 +106,7 @@ public class LocalPlayer {
     /**
      * @return
      * @deprecated This is scheduled for removal in an upcoming version method will be replaced with JOML implementation
-     *     {@link #getPosition(org.joml.Vector3f)}.
+     *     {@link #getPositionConst()}.
      */
     @Deprecated
     public Vector3f getPosition() {
@@ -117,7 +117,7 @@ public class LocalPlayer {
      * @param out
      * @return
      * @deprecated This is scheduled for removal in an upcoming version method will be replaced with JOML implementation
-     *     {@link #getPosition(org.joml.Vector3f)}.
+     *     {@link #getPositionConst()}.
      */
     @Deprecated
     public Vector3f getPosition(Vector3f out) {
@@ -130,14 +130,14 @@ public class LocalPlayer {
 
     /**
      * the position of the local player
-     *
-     * @param dest will hold the result
-     * @return dest
      */
-    public org.joml.Vector3f getPosition(org.joml.Vector3f dest) {
+    // TODO: rename to `getPosition` after removal of deprecated method
+    public org.joml.Vector3fc getPositionConst() {
         LocationComponent location = getCharacterEntity().getComponent(LocationComponent.class);
+        org.joml.Vector3f dest = new org.joml.Vector3f();
         if (location != null) {
-            org.joml.Vector3f result = location.getWorldPosition(new org.joml.Vector3f());
+            org.joml.Vector3f result = new org.joml.Vector3f();
+            result.set(location.getWorldPositionConst());
             if (result.isFinite()) { //TODO: MP finite check seems to hide a larger underlying problem
                 dest.set(result);
             }
@@ -184,7 +184,7 @@ public class LocalPlayer {
      * @param out
      * @return
      * @deprecated This is scheduled for removal in an upcoming version method will be replaced with JOML implementation
-     *     {@link #getViewPosition(org.joml.Vector3f)}.
+     *     {@link #getViewPositionConst()}.
      */
     @Deprecated
     public Vector3f getViewPosition(Vector3f out) {
@@ -201,25 +201,25 @@ public class LocalPlayer {
     }
 
     /**
-     * position of camera if one is present else use {@link #getPosition(org.joml.Vector3f)}
-     *
-     * @param dest will hold the result
-     * @return dest
+     * position of camera if one is present else use {@link #getPositionConst()}
      */
-    public org.joml.Vector3f getViewPosition(org.joml.Vector3f dest) {
+    // TODO: rename to `getViewPosition` after removal of deprecated method
+    public org.joml.Vector3fc getViewPositionConst() {
+        org.joml.Vector3f dest = new org.joml.Vector3f();
         ClientComponent clientComponent = getClientEntity().getComponent(ClientComponent.class);
         if (clientComponent == null) {
             return dest;
         }
         LocationComponent location = clientComponent.camera.getComponent(LocationComponent.class);
         if (location != null) {
-            org.joml.Vector3f result = location.getWorldPosition(new org.joml.Vector3f());
+            org.joml.Vector3f result = new org.joml.Vector3f();
+            result.set(location.getWorldPositionConst());
             if (result.isFinite()) { //TODO: MP finite check seems to hide a larger underlying problem
                 dest.set(result);
                 return dest;
             }
         }
-        return getPosition(dest);
+        return getPositionConst();
     }
 
     /**
@@ -242,7 +242,7 @@ public class LocalPlayer {
     }
 
     /**
-     * orientation of camera if one is present else use {@link #getPosition(org.joml.Vector3f)}
+     * orientation of camera if one is present else use {@link #getPositionConst()}
      *
      * @param dest will hold the result
      * @return dest
@@ -265,19 +265,19 @@ public class LocalPlayer {
 
     /**
      * forward view direction of camera view
-     *
-     * @param dest will hold the result
-     * @return dest
      */
-    public org.joml.Vector3f getViewDirection(org.joml.Vector3f dest) {
+    // TODO: rename to `getViewDirection` after removal of deprecated method
+    public org.joml.Vector3fc getViewDirectionConst() {
+        org.joml.Vector3f dest = new org.joml.Vector3f();
         Quaternionf rot = getViewRotation(new Quaternionf());
-        return rot.transform(Direction.FORWARD.asVector3f(), dest);
+        rot.transform(Direction.FORWARD.asVector3f(), dest);
+        return dest;
     }
 
     /**
      * @return
      * @deprecated This is scheduled for removal in an upcoming version method will be replaced with JOML implementation
-     *     {@link #getViewDirection(org.joml.Vector3f)}
+     *     {@link #getViewDirectionConst()}
      */
     @Deprecated
     public Vector3f getViewDirection() {
@@ -290,7 +290,7 @@ public class LocalPlayer {
     /**
      * @return
      * @deprecated This is scheduled for removal in an upcoming version method will be replaced with JOML implementation
-     *     {@link #getVelocity(org.joml.Vector3f)}
+     *     {@link #getVelocityConst()}
      */
     @Deprecated
     public Vector3f getVelocity() {
@@ -301,7 +301,9 @@ public class LocalPlayer {
         return new Vector3f();
     }
 
-    public org.joml.Vector3f getVelocity(org.joml.Vector3f dest) {
+    // TODO: rename to `getVelocity` after removal of deprecated method
+    public org.joml.Vector3fc getVelocityConst() {
+        org.joml.Vector3f dest = new org.joml.Vector3f();
         CharacterMovementComponent movement = getCharacterEntity().getComponent(CharacterMovementComponent.class);
         if (movement != null) {
             return dest.set(movement.getVelocity());
@@ -344,8 +346,10 @@ public class LocalPlayer {
     private boolean activateTargetOrOwnedEntity(EntityRef usedOwnedEntity) {
         EntityRef character = getCharacterEntity();
         CharacterComponent characterComponent = character.getComponent(CharacterComponent.class);
-        org.joml.Vector3f direction = getViewDirection(new org.joml.Vector3f());
-        org.joml.Vector3f originPos = getViewPosition(new org.joml.Vector3f());
+        org.joml.Vector3f direction = new org.joml.Vector3f();
+        org.joml.Vector3f originPos = new org.joml.Vector3f();
+        direction.set(getViewDirectionConst());
+        originPos.set(getViewPositionConst());
         if (recordAndReplayCurrentStatus.getStatus() == RecordAndReplayStatus.RECORDING) {
             this.directionAndOriginPosRecorderList.getTargetOrOwnedEntityDirectionAndOriginPosRecorder().add(direction, originPos);
         } else if (recordAndReplayCurrentStatus.getStatus() == RecordAndReplayStatus.REPLAYING) {

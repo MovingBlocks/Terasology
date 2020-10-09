@@ -21,6 +21,7 @@ import org.joml.Vector3ic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.math.AABB;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.Region3i;
 import org.terasology.math.geom.BaseVector3i;
 import org.terasology.math.geom.Vector3f;
@@ -113,8 +114,9 @@ public class ChunkImpl implements Chunk {
     }
 
     @Override
-    public org.joml.Vector3i getPosition(org.joml.Vector3i dest) {
-        return dest.set(chunkPos.x,chunkPos.y,chunkPos.z);
+    // TODO: rename to `getPosition` after removal of deprecated method
+    public org.joml.Vector3ic getPositionConst() {
+        return JomlUtil.from(chunkPos);
     }
 
     @Override
@@ -282,8 +284,9 @@ public class ChunkImpl implements Chunk {
     }
 
     @Override
-    public org.joml.Vector3i getChunkWorldOffset(org.joml.Vector3i dest) {
-        return dest.set(getChunkWorldOffsetX(), getChunkWorldOffsetY(), getChunkWorldOffsetZ());
+    // TODO: rename to `getChunkWorldOffset` after removal of deprecated method
+    public org.joml.Vector3ic getChunkWorldOffsetConst() {
+        return new org.joml.Vector3i(getChunkWorldOffsetX(), getChunkWorldOffsetY(), getChunkWorldOffsetZ());
     }
 
     @Override

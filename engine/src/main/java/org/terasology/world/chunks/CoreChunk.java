@@ -43,18 +43,16 @@ public interface CoreChunk {
     /**
      * @return Position of the chunk in world, where units of distance from origin are blocks
      * @deprecated This method is scheduled for removal in an upcoming version.
-     *             Use the JOML implementation instead: {@link #getPosition(org.joml.Vector3i)}.
+     *             Use the JOML implementation instead: {@link #getPositionConst()}.
      */
     @Deprecated
     Vector3i getPosition();
 
     /**
      * Position of the chunk in world, where units of distance from origin are blocks
-     *
-     * @param dest will hold the result
-     * @return dest
      */
-    org.joml.Vector3i getPosition(org.joml.Vector3i dest);
+    // TODO: rename to `getPosition` after removal of deprecated method
+    org.joml.Vector3ic getPositionConst();
 
     /**
      * Returns block at given position relative to the chunk.
@@ -194,7 +192,7 @@ public interface CoreChunk {
      *
      * @return Offset of this chunk from world center in chunks
      * @deprecated This method is scheduled for removal in an upcoming version.
-     *             Use the JOML implementation instead: {@link #getChunkWorldOffset(org.joml.Vector3i)}.
+     *             Use the JOML implementation instead: {@link #getChunkWorldOffsetConst()}.
      */
     @Deprecated
     Vector3i getChunkWorldOffset();
@@ -204,7 +202,8 @@ public interface CoreChunk {
      *
      * @return Offset of this chunk from world center in chunks
      */
-    org.joml.Vector3i getChunkWorldOffset(org.joml.Vector3i pos);
+    // TODO: rename to `getChunkWorldOffset` after removal of deprecated method
+    org.joml.Vector3ic getChunkWorldOffsetConst();
 
 
     /**

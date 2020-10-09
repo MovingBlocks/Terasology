@@ -19,6 +19,7 @@ import com.google.common.collect.Lists;
 import org.joml.Quaternionf;
 import org.joml.Quaternionfc;
 import org.joml.Vector3fc;
+import org.joml.Vector3i;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.math.Direction;
@@ -134,7 +135,7 @@ public final class LocationComponent implements Component, ReplicationCheck {
     /**
      * @return
      * @deprecated This is scheduled for removal in an upcoming version method will be replaced with JOML implementation
-     *     {@link #getLocalDirection(org.joml.Vector3f)}.
+     *     {@link #getLocalDirectionConst()}.
      */
     @Deprecated
     public Vector3f getLocalDirection() {
@@ -144,13 +145,12 @@ public final class LocationComponent implements Component, ReplicationCheck {
     }
 
     /**
-     * gets the local direction of the given entity in
-     *
-     * @param dest will hold the result
-     * @return dest
+     * gets the local direction of the given entity
      */
-    public org.joml.Vector3f getLocalDirection(org.joml.Vector3f dest) {
-        return dest.set(Direction.FORWARD.asVector3i()).rotate(JomlUtil.from(getLocalRotation()));
+    public org.joml.Vector3fc getLocalDirectionConst() {
+        org.joml.Vector3f dest = new org.joml.Vector3f();
+        dest.set(Direction.FORWARD.asVector3i()).rotate(JomlUtil.from(getLocalRotation()));
+        return dest;
     }
 
 
@@ -173,7 +173,7 @@ public final class LocationComponent implements Component, ReplicationCheck {
     /**
      * @return A new vector containing the world location.
      * @deprecated This is scheduled for removal in an upcoming version method will be replaced with JOML implementation
-     *     {@link #getWorldPosition(org.joml.Vector3f)}.
+     *     {@link #getWorldPositionConst()}.
      */
     @Deprecated
     public Vector3f getWorldPosition() {
@@ -184,21 +184,17 @@ public final class LocationComponent implements Component, ReplicationCheck {
      * @param output
      * @return
      * @deprecated This is scheduled for removal in an upcoming version method will be replaced with JOML implementation
-     *     {@link #getWorldPosition(org.joml.Vector3f)}.
+     *     {@link #getWorldPositionConst()}.
      */
     @Deprecated
     public Vector3f getWorldPosition(Vector3f output) {
-        output.set(JomlUtil.from(getWorldPosition(new org.joml.Vector3f())));
+        output.set(JomlUtil.from(getWorldPositionConst()));
         return output;
     }
 
-    /**
-     * get the world position
-     *
-     * @param dest will hold the result
-     * @return dest
-     */
-    public org.joml.Vector3f getWorldPosition(org.joml.Vector3f dest) {
+    // TODO: rename to `getWorldPosition` after removal of deprecated method
+    public org.joml.Vector3fc getWorldPositionConst() {
+        org.joml.Vector3f dest = new org.joml.Vector3f();
         dest.set(JomlUtil.from(position));
         LocationComponent parentLoc = parent.getComponent(LocationComponent.class);
         while (parentLoc != null) {
@@ -228,7 +224,7 @@ public final class LocationComponent implements Component, ReplicationCheck {
 
     /**
      * @deprecated This is scheduled for removal in an upcoming version method will be replaced with JOML implementation
-     *     {@link #getWorldDirection(org.joml.Vector3f)}.
+     *     {@link #getWorldDirectionConst()}.
      */
     @Deprecated
     public Vector3f getWorldDirection() {
@@ -237,9 +233,10 @@ public final class LocationComponent implements Component, ReplicationCheck {
         return result;
     }
 
-
-    public org.joml.Vector3f getWorldDirection(org.joml.Vector3f dest) {
-        return dest.set(Direction.FORWARD.asVector3f()).rotate(JomlUtil.from(getWorldRotation()));
+    public org.joml.Vector3fc getWorldDirectionConst() {
+        org.joml.Vector3f dest = new org.joml.Vector3f();
+        dest.set(Direction.FORWARD.asVector3f()).rotate(JomlUtil.from(getWorldRotation()));
+        return dest;
     }
 
     /**
