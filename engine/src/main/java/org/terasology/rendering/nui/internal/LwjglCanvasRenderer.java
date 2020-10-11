@@ -181,8 +181,7 @@ public class LwjglCanvasRenderer implements TerasologyCanvasRenderer, PropertyCh
         if (!material.isRenderable()) {
             return;
         }
-
-        AABB meshAABB = mesh.getAABB();
+        AABB meshAABB = JomlUtil.from(mesh.getAABB());
         Vector3f meshExtents = meshAABB.getExtents();
         float fitScale = 0.35f * Math.min(drawRegion.width(), drawRegion.height()) / Math.max(meshExtents.x, Math.max(meshExtents.y, meshExtents.z));
         Vector3f centerOffset = meshAABB.getCenter();

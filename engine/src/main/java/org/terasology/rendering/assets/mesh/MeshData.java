@@ -19,6 +19,7 @@ import gnu.trove.list.TFloatList;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TFloatArrayList;
 import gnu.trove.list.array.TIntArrayList;
+import org.joml.AABBf;
 import org.terasology.assets.AssetData;
 
 /**
@@ -37,6 +38,25 @@ public class MeshData implements AssetData {
 
     public TFloatList getVertices() {
         return vertices;
+    }
+
+    public AABBf calculateBounds() {
+        AABBf aabb = new AABBf();
+        int vertexCount = vertices.size() / 3;
+        if (vertexCount == 0) {
+            return aabb.setMin(0, 0, 0).setMax(0, 0, 0);
+        }
+        aabb.setMin(vertices.get(0), vertices.get(1), vertices.get(2));
+        aabb.setMax(vertices.get(0), vertices.get(1), vertices.get(2));
+        for (int index = 1; index < vertexCount; ++index) {
+            aabb.minX = Math.min(aabb.minX, vertices.get(3 * index));
+            aabb.maxX = Math.max(aabb.maxX, vertices.get(3 * index));
+            aabb.minY = Math.min(aabb.minY, vertices.get(3 * index + 1));
+            aabb.maxY = Math.max(aabb.maxY, vertices.get(3 * index + 1));
+            aabb.minZ = Math.min(aabb.minZ, vertices.get(3 * index + 2));
+            aabb.maxZ = Math.max(aabb.maxZ, vertices.get(3 * index + 2));
+        }
+        return aabb;
     }
 
     public TFloatList getTexCoord0() {
