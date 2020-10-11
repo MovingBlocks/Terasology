@@ -15,6 +15,7 @@
  */
 package org.terasology.world.propagation.light;
 
+import org.joml.Vector3ic;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.world.chunks.ChunkProvider;
 import org.terasology.world.chunks.LitChunk;

@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.world.propagation;
 
+import org.joml.Vector3ic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.math.ChunkMath;
@@ -33,14 +34,14 @@ public class LocalChunkView implements PropagatorWorldView {
      * @param blockPos The position of the block in world coordinates
      * @return The index of the chunk in the array
      */
-    private int chunkIndexOf(Vector3i blockPos) {
-        return ChunkMath.calcChunkPos(blockPos.x, ChunkConstants.POWER_X) - topLeft.x
-                + 3 * (ChunkMath.calcChunkPos(blockPos.y, ChunkConstants.POWER_Y) - topLeft.y
-                + 3 * (ChunkMath.calcChunkPos(blockPos.z, ChunkConstants.POWER_Z) - topLeft.z));
+    private int chunkIndexOf(Vector3ic blockPos) {
+        return ChunkMath.calcChunkPos(blockPos.x(), ChunkConstants.POWER_X) - topLeft.x
+            + 3 * (ChunkMath.calcChunkPos(blockPos.y(), ChunkConstants.POWER_Y) - topLeft.y
+            + 3 * (ChunkMath.calcChunkPos(blockPos.z(), ChunkConstants.POWER_Z) - topLeft.z));
     }
 
     @Override
-    public byte getValueAt(Vector3i pos) {
+    public byte getValueAt(Vector3ic pos) {
         int index = chunkIndexOf(pos);
         if (index < 0) {
             logger.warn("Position is out of chunks");
@@ -48,25 +49,25 @@ public class LocalChunkView implements PropagatorWorldView {
         }
         Chunk chunk = chunks[index];
         if (chunk != null) {
-            return rules.getValue(chunk, ChunkMath.calcRelativeBlockPos(pos));
+            return rules.getValue(chunk, ChunkMath.calcRelativeBlockPos(pos, new org.joml.Vector3i()));
         }
         return UNAVAILABLE;
     }
 
     @Override
-    public void setValueAt(Vector3i pos, byte value) {
+    public void setValueAt(Vector3ic pos, byte value) {
         Chunk chunk = chunks[chunkIndexOf(pos)];
         if (chunk != null) {
-            rules.setValue(chunk, ChunkMath.calcRelativeBlockPos(pos), value);
+            rules.setValue(chunk, ChunkMath.calcRelativeBlockPos(pos, new org.joml.Vector3i()), value);
         }
     }
 
     @Override
-    public Block getBlockAt(Vector3i pos) {
+    public Block getBlockAt(Vector3ic pos) {
         int index = chunkIndexOf(pos);
         Chunk chunk = chunks[index];
         if (chunk != null) {
-            return chunk.getBlock(ChunkMath.calcRelativeBlockPos(pos));
+            return chunk.getBlock(ChunkMath.calcRelativeBlockPos(pos, new org.joml.Vector3i()));
         }
         return null;
     }

@@ -15,6 +15,8 @@
  */
 package org.terasology.world.propagation;
 
+import org.joml.Vector3ic;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.world.block.Block;
 import org.terasology.world.internal.ChunkViewCore;
@@ -35,15 +37,15 @@ public abstract class AbstractChunkView implements PropagatorWorldView {
     }
 
     @Override
-    public byte getValueAt(Vector3i pos) {
-        if (isInBounds(pos)) {
-            return getValueAt(chunkView, pos);
+    public byte getValueAt(Vector3ic pos) {
+        if (isInBounds(JomlUtil.from(pos))) {
+            return getValueAt(chunkView, JomlUtil.from(pos));
         }
         return UNAVAILABLE;
     }
 
     /**
-     * Equivalent to {@link #getValueAt(Vector3i)}
+     * Equivalent to {@link #getValueAt(Vector3ic)}
      *
      * @param view The chunk the position is within
      * @param pos  The position of to get the value at
@@ -52,12 +54,12 @@ public abstract class AbstractChunkView implements PropagatorWorldView {
     protected abstract byte getValueAt(ChunkViewCore view, Vector3i pos);
 
     @Override
-    public void setValueAt(Vector3i pos, byte value) {
-        setValueAt(chunkView, pos, value);
+    public void setValueAt(Vector3ic pos, byte value) {
+        setValueAt(chunkView, JomlUtil.from(pos), value);
     }
 
     /**
-     * Equivalent to {@link #setValueAt(Vector3i, byte)}
+     * Equivalent to {@link #setValueAt(Vector3ic, byte)}
      *
      * @param view  The chunk the position is in
      * @param pos   The position to set the value at
@@ -66,9 +68,9 @@ public abstract class AbstractChunkView implements PropagatorWorldView {
     protected abstract void setValueAt(ChunkViewCore view, Vector3i pos, byte value);
 
     @Override
-    public Block getBlockAt(Vector3i pos) {
-        if (isInBounds(pos)) {
-            return chunkView.getBlock(pos);
+    public Block getBlockAt(Vector3ic pos) {
+        if (isInBounds(JomlUtil.from(pos))) {
+            return chunkView.getBlock(JomlUtil.from(pos));
         }
         return null;
     }

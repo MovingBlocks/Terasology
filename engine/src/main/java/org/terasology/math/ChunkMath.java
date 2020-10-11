@@ -364,17 +364,82 @@ public final class ChunkMath {
         return calcRelativeBlockPos(blockZ, ChunkConstants.INNER_CHUNK_POS_FILTER.z);
     }
 
+    /**
+     *
+     * @param worldPos
+     * @return
+     * @deprecated This is scheduled for removal in an upcoming version
+     *          method will be replaced with JOML implementation {@link #calcRelativeBlockPos(Vector3ic, org.joml.Vector3i)}.
+     */
+    @Deprecated
     public static Vector3i calcRelativeBlockPos(Vector3i worldPos) {
         return calcRelativeBlockPos(worldPos.x, worldPos.y, worldPos.z, ChunkConstants.INNER_CHUNK_POS_FILTER);
     }
 
+    /**
+     *
+     * @param x
+     * @param y
+     * @param z
+     * @return
+     * @deprecated This is scheduled for removal in an upcoming version
+     *          method will be replaced with JOML implementation {@link #calcRelativeBlockPos(int, int, int, org.joml.Vector3i)}.
+     */
+    @Deprecated
     public static Vector3i calcRelativeBlockPos(int x, int y, int z) {
         return calcRelativeBlockPos(x, y, z, ChunkConstants.INNER_CHUNK_POS_FILTER);
     }
-
+    /**
+     *
+     * @param x
+     * @param y
+     * @param z
+     * @return
+     * @deprecated This is scheduled for removal in an upcoming version
+     *          method will be replaced with JOML implementation {@link #calcRelativeBlockPos(int, int, int, Vector3ic, org.joml.Vector3i)}.
+     */
+    @Deprecated
     public static Vector3i calcRelativeBlockPos(int x, int y, int z, Vector3i chunkFilterSize) {
         return new Vector3i(calcRelativeBlockPos(x, chunkFilterSize.x), calcRelativeBlockPos(y, chunkFilterSize.y), calcRelativeBlockPos(z, chunkFilterSize.z));
     }
+
+    /**
+     * the relative position within a containing chunk given chunk that contains the given absolution position.
+     *
+     * @param worldPos the position in the world
+     * @param dest will hold the result
+     * @return dest
+     */
+    public static org.joml.Vector3i calcRelativeBlockPos(Vector3ic worldPos, org.joml.Vector3i dest) {
+        return calcRelativeBlockPos(worldPos.x(), worldPos.y(), worldPos.z(), JomlUtil.from(ChunkConstants.INNER_CHUNK_POS_FILTER), dest);
+    }
+
+    /**
+     * the relative position within a containing chunk given chunk that contains the given absolution position.
+     *
+     * @param x absolute x position
+     * @param y absolute y position
+     * @param z absolute z position
+     * @param dest will hold the result
+     * @return dest
+     */
+    public static org.joml.Vector3i calcRelativeBlockPos(int x, int y, int z, org.joml.Vector3i dest) {
+        return calcRelativeBlockPos(x, y, z, JomlUtil.from(ChunkConstants.INNER_CHUNK_POS_FILTER),dest);
+    }
+
+    /**
+     *  the relative position within a containing chunk given chunk that contains the given absolution position.
+     * @param x absolute x position
+     * @param y absolute y position
+     * @param z absolute z position
+     * @param chunkFilterSize the size of the chunk minus 1
+     * @param dest will hold the result
+     * @return dest
+     */
+    public static org.joml.Vector3i calcRelativeBlockPos(int x, int y, int z, Vector3ic chunkFilterSize, org.joml.Vector3i dest) {
+        return dest.set(calcRelativeBlockPos(x, chunkFilterSize.x()), calcRelativeBlockPos(y, chunkFilterSize.y()), calcRelativeBlockPos(z, chunkFilterSize.z()));
+    }
+
 
     public static Region3i getChunkRegionAroundWorldPos(Vector3i pos, int extent) {
         Vector3i minPos = new Vector3i(-extent, -extent, -extent);
@@ -423,7 +488,10 @@ public final class ChunkMath {
      * @param region
      * @param side
      * @return
+     * @deprecated This is scheduled for removal in an upcoming version
+     *             method will be replaced with JOML implementation {@link #getEdgeRegion(BlockRegion, Side, BlockRegion)}.
      */
+    @Deprecated
     public static Region3i getEdgeRegion(Region3i region, Side side) {
         Vector3ic sideDir = side.direction();
         Vector3i min = region.min();
@@ -450,6 +518,84 @@ public final class ChunkMath {
             edgeMax.z = max.z;
         }
         return Region3i.createFromMinMax(edgeMin, edgeMax);
+    }
+
+    /**
+     * A 1 wide region that borders the provided {@link Side} of a chunk
+     *
+     * @param region the current region
+     * @param side the side to border
+     * @param dest will hold the result
+     * @return dest
+     */
+    public static BlockRegion getEdgeRegion(BlockRegion region, Side side, BlockRegion dest) {
+        switch (side) {
+            case TOP:
+                return dest.setMin(
+                    region.getMinX(),
+                    region.getMaxY(),
+                    region.getMinZ()
+                ).setMax(
+                    region.getMaxX(),
+                    region.getMaxY(),
+                    region.getMaxZ());
+            case BOTTOM:
+                return dest.setMin(
+                    region.getMinX(),
+                    region.getMinY(),
+                    region.getMinZ()
+                ).setMax(
+                    region.getMaxX(),
+                    region.getMinY(),
+                    region.getMaxZ());
+            case LEFT:
+                return dest.setMin(
+                    region.getMinX(),
+                    region.getMinY(),
+                    region.getMinZ()
+                ).setMax(
+                    region.getMinX(),
+                    region.getMaxY(),
+                    region.getMaxZ());
+            case RIGHT:
+                return dest.setMin(
+                    region.getMaxX(),
+                    region.getMinY(),
+                    region.getMinZ()
+                ).setMax(
+                    region.getMaxX(),
+                    region.getMaxY(),
+                    region.getMaxZ());
+            case FRONT:
+                return dest.setMin(
+                    region.getMinX(),
+                    region.getMinY(),
+                    region.getMaxZ()
+                ).setMax(
+                    region.getMaxX(),
+                    region.getMaxY(),
+                    region.getMaxZ());
+            case BACK:
+                return dest.setMin(
+                    region.getMinX(),
+                    region.getMinY(),
+                    region.getMinZ()
+                ).setMax(
+                    region.getMaxX(),
+                    region.getMaxY(),
+                    region.getMinZ());
+            default:
+                return dest.setMin(
+                    region.getMinX(),
+                    region.getMinY(),
+                    region.getMinZ()
+                ).setMax(
+                    region.getMaxX(),
+                    region.getMaxY(),
+                    region.getMaxZ()
+                );
+
+        }
     }
 
     /**

@@ -15,7 +15,9 @@
  */
 package org.terasology.world.propagation;
 
+import org.joml.Vector3ic;
 import org.terasology.math.ChunkMath;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.world.block.Block;
 import org.terasology.world.chunks.Chunk;
@@ -46,10 +48,10 @@ public abstract class AbstractFullWorldView implements PropagatorWorldView {
     }
 
     @Override
-    public byte getValueAt(Vector3i pos) {
-        LitChunk chunk = getChunk(pos);
+    public byte getValueAt(Vector3ic pos) {
+        LitChunk chunk = getChunk(JomlUtil.from(pos));
         if (chunk != null) {
-            return getValueAt(chunk, ChunkMath.calcRelativeBlockPos(pos.x, pos.y, pos.z));
+            return getValueAt(chunk, ChunkMath.calcRelativeBlockPos(pos.x(), pos.y(), pos.z()));
         }
         return UNAVAILABLE;
     }
@@ -64,9 +66,9 @@ public abstract class AbstractFullWorldView implements PropagatorWorldView {
     protected abstract byte getValueAt(LitChunk chunk, Vector3i pos);
 
     @Override
-    public void setValueAt(Vector3i pos, byte value) {
-        setValueAt(getChunk(pos), ChunkMath.calcRelativeBlockPos(pos.x, pos.y, pos.z), value);
-        for (Vector3i affectedChunkPos : ChunkMath.getChunkRegionAroundWorldPos(pos, 1)) {
+    public void setValueAt(Vector3ic pos, byte value) {
+        setValueAt(getChunk(JomlUtil.from(pos)), ChunkMath.calcRelativeBlockPos(pos.x(), pos.y(), pos.z()), value);
+        for (Vector3i affectedChunkPos : ChunkMath.getChunkRegionAroundWorldPos(JomlUtil.from(pos), 1)) {
             Chunk dirtiedChunk = chunkProvider.getChunk(affectedChunkPos);
             if (dirtiedChunk != null) {
                 dirtiedChunk.setDirty(true);
@@ -84,10 +86,10 @@ public abstract class AbstractFullWorldView implements PropagatorWorldView {
     protected abstract void setValueAt(LitChunk chunk, Vector3i pos, byte value);
 
     @Override
-    public Block getBlockAt(Vector3i pos) {
-        CoreChunk chunk = chunkProvider.getChunk(ChunkMath.calcChunkPos(pos));
+    public Block getBlockAt(Vector3ic pos) {
+        CoreChunk chunk = chunkProvider.getChunk(ChunkMath.calcChunkPos(JomlUtil.from(pos)));
         if (chunk != null) {
-            return chunk.getBlock(ChunkMath.calcRelativeBlockPos(pos));
+            return chunk.getBlock(ChunkMath.calcRelativeBlockPos(JomlUtil.from(pos)));
         }
         return null;
     }

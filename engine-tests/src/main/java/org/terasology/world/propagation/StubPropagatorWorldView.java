@@ -18,6 +18,8 @@ package org.terasology.world.propagation;
 import com.google.common.collect.Maps;
 import gnu.trove.map.TObjectByteMap;
 import gnu.trove.map.hash.TObjectByteHashMap;
+import org.joml.Vector3ic;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.Region3i;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.world.block.Block;
@@ -43,24 +45,24 @@ public class StubPropagatorWorldView implements PropagatorWorldView {
     }
 
     @Override
-    public byte getValueAt(Vector3i pos) {
-        if (!relevantRegion.encompasses(pos)) {
+    public byte getValueAt(Vector3ic pos) {
+        if (!relevantRegion.encompasses(JomlUtil.from(pos))) {
             return UNAVAILABLE;
         }
         return lightData.get(pos);
     }
 
     @Override
-    public void setValueAt(Vector3i pos, byte value) {
-        if (!relevantRegion.encompasses(pos)) {
+    public void setValueAt(Vector3ic pos, byte value) {
+        if (!relevantRegion.encompasses(JomlUtil.from(pos))) {
             throw new IllegalArgumentException("Position out of bounds: " + pos);
         }
-        lightData.put(new Vector3i(pos), value);
+        lightData.put(new Vector3i(JomlUtil.from(pos)), value);
     }
 
     @Override
-    public Block getBlockAt(Vector3i pos) {
-        if (!relevantRegion.encompasses(pos)) {
+    public Block getBlockAt(Vector3ic pos) {
+        if (!relevantRegion.encompasses(JomlUtil.from(pos))) {
             throw new IllegalArgumentException("Position out of bounds: " + pos);
         }
 

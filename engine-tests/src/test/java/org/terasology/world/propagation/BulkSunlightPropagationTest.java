@@ -90,14 +90,14 @@ public class BulkSunlightPropagationTest extends TerasologyTestingEnvironment {
     @Test
     public void testAllowSunlightVertical() {
         for (Vector3i pos : Region3i.createBounded(new Vector3i(0, 16, 0), new Vector3i(ChunkConstants.SIZE_X - 1, ChunkConstants.SIZE_Y - 1, ChunkConstants.SIZE_Z - 1))) {
-            regenWorldView.setValueAt(pos, ChunkConstants.MAX_SUNLIGHT_REGEN);
-            lightWorldView.setValueAt(pos, ChunkConstants.MAX_SUNLIGHT);
+            regenWorldView.setValueAt(JomlUtil.from(pos), ChunkConstants.MAX_SUNLIGHT_REGEN);
+            lightWorldView.setValueAt(JomlUtil.from(pos), ChunkConstants.MAX_SUNLIGHT);
         }
         for (Vector3i pos : Region3i.createBounded(new Vector3i(0, 15, 0), new Vector3i(ChunkConstants.SIZE_X - 1, 15, ChunkConstants.SIZE_Z - 1))) {
             regenWorldView.setBlockAt(pos, solid);
         }
         for (Vector3i pos : Region3i.createBounded(new Vector3i(0, 0, 0), new Vector3i(ChunkConstants.SIZE_X - 1, 14, ChunkConstants.SIZE_Z - 1))) {
-            regenWorldView.setValueAt(pos, (byte) (14 - pos.y));
+            regenWorldView.setValueAt(JomlUtil.from(pos), (byte) (14 - pos.y));
         }
 
         regenWorldView.setBlockAt(new Vector3i(16, 15, 16), air);
@@ -105,25 +105,25 @@ public class BulkSunlightPropagationTest extends TerasologyTestingEnvironment {
         sunlightPropagator.process(new BlockChange(JomlUtil.from(new Vector3i(16, 15, 16)), solid, air));
 
         for (int y = 0; y < 16; y++) {
-            assertEquals(ChunkConstants.MAX_SUNLIGHT_REGEN, regenWorldView.getValueAt(new Vector3i(16, y, 16)), "Incorrect value at " + y);
-            assertEquals(ChunkConstants.MAX_SUNLIGHT, lightWorldView.getValueAt(new Vector3i(16, y, 16)));
+            assertEquals(ChunkConstants.MAX_SUNLIGHT_REGEN, regenWorldView.getValueAt(JomlUtil.from(new Vector3i(16, y, 16))), "Incorrect value at " + y);
+            assertEquals(ChunkConstants.MAX_SUNLIGHT, lightWorldView.getValueAt(JomlUtil.from(new Vector3i(16, y, 16))));
         }
         for (int y = 0; y < 15; y++) {
-            assertEquals(ChunkConstants.MAX_SUNLIGHT - 1, lightWorldView.getValueAt(new Vector3i(15, y, 16)));
+            assertEquals(ChunkConstants.MAX_SUNLIGHT - 1, lightWorldView.getValueAt(JomlUtil.from(new Vector3i(15, y, 16))));
         }
     }
 
     @Test
     public void testStopSunlightVertical() {
         for (Vector3i pos : Region3i.createBounded(new Vector3i(0, 16, 0), new Vector3i(ChunkConstants.SIZE_X - 1, ChunkConstants.SIZE_Y - 1, ChunkConstants.SIZE_Z - 1))) {
-            regenWorldView.setValueAt(pos, ChunkConstants.MAX_SUNLIGHT_REGEN);
-            lightWorldView.setValueAt(pos, ChunkConstants.MAX_SUNLIGHT);
+            regenWorldView.setValueAt(JomlUtil.from(pos), ChunkConstants.MAX_SUNLIGHT_REGEN);
+            lightWorldView.setValueAt(JomlUtil.from(pos), ChunkConstants.MAX_SUNLIGHT);
         }
         for (Vector3i pos : Region3i.createBounded(new Vector3i(0, 15, 0), new Vector3i(ChunkConstants.SIZE_X - 1, 15, ChunkConstants.SIZE_Z - 1))) {
             regenWorldView.setBlockAt(pos, solid);
         }
         for (Vector3i pos : Region3i.createBounded(new Vector3i(0, 0, 0), new Vector3i(ChunkConstants.SIZE_X - 1, 14, ChunkConstants.SIZE_Z - 1))) {
-            regenWorldView.setValueAt(pos, (byte) (14 - pos.y));
+            regenWorldView.setValueAt(JomlUtil.from(pos), (byte) (14 - pos.y));
         }
 
         regenWorldView.setBlockAt(new Vector3i(16, 15, 16), air);
@@ -135,8 +135,8 @@ public class BulkSunlightPropagationTest extends TerasologyTestingEnvironment {
         sunlightPropagator.process(new BlockChange(JomlUtil.from(new Vector3i(16, 15, 16)), air, solid));
 
         for (Vector3i pos : Region3i.createBounded(new Vector3i(0, 0, 0), new Vector3i(ChunkConstants.SIZE_X - 1, 15, ChunkConstants.SIZE_Z - 1))) {
-            assertEquals(Math.max(0, 14 - pos.y), regenWorldView.getValueAt(pos), "Incorrect value at " + pos);
-            assertEquals(0, lightWorldView.getValueAt(pos), "Incorrect value at " + pos);
+            assertEquals(Math.max(0, 14 - pos.y), regenWorldView.getValueAt(JomlUtil.from(pos)), "Incorrect value at " + pos);
+            assertEquals(0, lightWorldView.getValueAt(JomlUtil.from(pos)), "Incorrect value at " + pos);
         }
     }
 

@@ -15,6 +15,8 @@
  */
 package org.terasology.world.propagation;
 
+import org.joml.Vector3ic;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.world.block.Block;
 import org.terasology.world.chunks.ChunkConstants;
@@ -34,21 +36,21 @@ public class SingleChunkView implements PropagatorWorldView {
     }
 
     @Override
-    public byte getValueAt(Vector3i pos) {
-        if (ChunkConstants.CHUNK_REGION.encompasses(pos)) {
+    public byte getValueAt(Vector3ic pos) {
+        if (JomlUtil.from(ChunkConstants.CHUNK_REGION).containsBlock(pos)) {
             return rules.getValue(chunk, pos);
         }
         return UNAVAILABLE;
     }
 
     @Override
-    public void setValueAt(Vector3i pos, byte value) {
+    public void setValueAt(Vector3ic pos, byte value) {
         rules.setValue(chunk, pos, value);
     }
 
     @Override
-    public Block getBlockAt(Vector3i pos) {
-        if (ChunkConstants.CHUNK_REGION.encompasses(pos)) {
+    public Block getBlockAt(Vector3ic pos) {
+        if (JomlUtil.from(ChunkConstants.CHUNK_REGION).containsBlock(pos)) {
             return chunk.getBlock(pos);
         }
         return null;

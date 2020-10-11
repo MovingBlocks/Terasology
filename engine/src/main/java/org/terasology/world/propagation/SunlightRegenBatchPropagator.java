@@ -16,10 +16,11 @@
 package org.terasology.world.propagation;
 
 import com.google.common.collect.Sets;
+import org.joml.Vector3i;
+import org.joml.Vector3ic;
 import org.terasology.math.ChunkMath;
 import org.terasology.math.JomlUtil;
 import org.terasology.math.Side;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.world.block.Block;
 import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.LitChunk;
@@ -78,12 +79,12 @@ public class SunlightRegenBatchPropagator implements BatchPropagator {
 
     private void reviewChangeToBottom(BlockChange blockChange) {
         PropagationComparison comparison = regenRules.comparePropagation(blockChange.getTo(), blockChange.getFrom(), Side.BOTTOM);
-        Vector3i blockChangePosition = JomlUtil.from(blockChange.getPosition());
+        Vector3ic blockChangePosition = blockChange.getPosition();
         if (comparison.isPermitting()) {
             byte existingValue = regenWorld.getValueAt(blockChangePosition);
             queueSpreadRegen(blockChangePosition, existingValue);
         } else if (comparison.isRestricting()) {
-            Vector3i adjPos = Side.BOTTOM.getAdjacentPos(blockChangePosition);
+            Vector3i adjPos = Side.BOTTOM.getAdjacentPos(blockChangePosition, new Vector3i());
             byte existingValue = regenWorld.getValueAt(adjPos);
             reduce(adjPos, existingValue);
         }
@@ -91,9 +92,9 @@ public class SunlightRegenBatchPropagator implements BatchPropagator {
 
     private void reviewChangeToTop(BlockChange blockChange) {
         PropagationComparison comparison = regenRules.comparePropagation(blockChange.getTo(), blockChange.getFrom(), Side.TOP);
-        Vector3i blockChangePosition = JomlUtil.from(blockChange.getPosition());
+        Vector3ic blockChangePosition = blockChange.getPosition();
         if (comparison.isPermitting()) {
-            Vector3i adjPos = Side.TOP.getAdjacentPos(blockChangePosition);
+            Vector3i adjPos = Side.TOP.getAdjacentPos(blockChangePosition, new Vector3i());
             byte adjValue = regenWorld.getValueAt(adjPos);
             if (adjValue != PropagatorWorldView.UNAVAILABLE) {
                 queueSpreadRegen(adjPos, adjValue);
@@ -104,8 +105,8 @@ public class SunlightRegenBatchPropagator implements BatchPropagator {
         }
     }
 
-    private void queueSpreadRegen(Vector3i position, byte value) {
-        increaseQueues[value].add(position);
+    private void queueSpreadRegen(Vector3ic position, byte value) {
+        increaseQueues[value].add(new Vector3i(position));
     }
 
     private void processRegenReduction() {
@@ -182,9 +183,9 @@ public class SunlightRegenBatchPropagator implements BatchPropagator {
     private void cleanUp() {
     }
 
-    private void reduce(Vector3i position, byte oldValue) {
+    private void reduce(Vector3ic position, byte oldValue) {
         if (oldValue > 0) {
-            reduceQueues[oldValue].add(position);
+            reduceQueues[oldValue].add(new Vector3i(position));
         }
     }
 
@@ -217,6 +218,7 @@ public class SunlightRegenBatchPropagator implements BatchPropagator {
 
     private void markForPropagation(LitChunk toChunk, int[] depth, int[] startingRegen, int[] adjDepths, int[] adjStartingRegen) {
         Vector3i pos = new Vector3i();
+        Vector3i target = new Vector3i();
         for (int z = 0; z < ChunkConstants.SIZE_Z; ++z) {
             for (int x = 0; x < ChunkConstants.SIZE_X; ++x) {
                 int depthIndex = x + ChunkConstants.SIZE_X * z;
@@ -229,8 +231,8 @@ public class SunlightRegenBatchPropagator implements BatchPropagator {
                     int strength = Math.min(start + initialDepth - ChunkConstants.SUNLIGHT_REGEN_THRESHOLD + 1, ChunkConstants.MAX_SUNLIGHT);
 
                     for (int i = initialDepth; i <= finalDepth; ++i) {
-                        sunlightPropagator.propagateFrom(toChunk.chunkToWorldPosition(x, ChunkConstants.SIZE_Y - i - 1, z),
-                                (byte) (strength));
+                        sunlightPropagator.propagateFrom(toChunk.chunkToWorldPosition(x, ChunkConstants.SIZE_Y - i - 1, z, target),
+                            (byte) (strength));
                         if (strength < ChunkConstants.MAX_SUNLIGHT) {
                             strength++;
                         }
@@ -239,7 +241,7 @@ public class SunlightRegenBatchPropagator implements BatchPropagator {
                     int initialDepth = Math.max(adjDepths[depthIndex], ChunkConstants.SUNLIGHT_REGEN_THRESHOLD - start);
                     byte strength = (byte) Math.min(ChunkConstants.MAX_SUNLIGHT, start + initialDepth - ChunkConstants.SUNLIGHT_REGEN_THRESHOLD + 1);
                     for (int i = initialDepth; i <= depth[depthIndex]; ++i) {
-                        sunlightPropagator.propagateFrom(toChunk.chunkToWorldPosition(x, ChunkConstants.SIZE_Y - i - 1, z), strength);
+                        sunlightPropagator.propagateFrom(toChunk.chunkToWorldPosition(x, ChunkConstants.SIZE_Y - i - 1, z, target), strength);
                         if (strength < ChunkConstants.MAX_SUNLIGHT) {
                             strength++;
                         }
@@ -271,8 +273,8 @@ public class SunlightRegenBatchPropagator implements BatchPropagator {
                     regenRules.setValue(toChunk, pos, expectedValue);
                     depth[depthIndex]++;
                     byte sunlight = (byte) (expectedValue - ChunkConstants.SUNLIGHT_REGEN_THRESHOLD);
-                    if (sunlight > 0 && sunlight > toChunk.getSunlight(pos)) {
-                        toChunk.setSunlight(pos, sunlight);
+                    if (sunlight > 0 && sunlight > toChunk.getSunlight(JomlUtil.from(pos))) {
+                        toChunk.setSunlight(JomlUtil.from(pos), sunlight);
                     }
                     if (expectedValue < ChunkConstants.MAX_SUNLIGHT_REGEN) {
                         expectedValue++;
@@ -286,17 +288,17 @@ public class SunlightRegenBatchPropagator implements BatchPropagator {
     }
 
     @Override
-    public void propagateFrom(Vector3i pos, Block block) {
+    public void propagateFrom(Vector3ic pos, Block block) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public void propagateFrom(Vector3i pos, byte value) {
+    public void propagateFrom(Vector3ic pos, byte value) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public void regenerate(Vector3i pos, byte value) {
+    public void regenerate(Vector3ic pos, byte value) {
         throw new UnsupportedOperationException();
     }
 
