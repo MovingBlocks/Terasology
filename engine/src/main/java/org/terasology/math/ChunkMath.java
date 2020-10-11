@@ -570,20 +570,20 @@ public final class ChunkMath {
                 return dest.setMin(
                     region.getMinX(),
                     region.getMinY(),
-                    region.getMaxZ()
-                ).setMax(
-                    region.getMaxX(),
-                    region.getMaxY(),
-                    region.getMaxZ());
-            case BACK:
-                return dest.setMin(
-                    region.getMinX(),
-                    region.getMinY(),
                     region.getMinZ()
                 ).setMax(
                     region.getMaxX(),
                     region.getMaxY(),
                     region.getMinZ());
+            case BACK:
+                return dest.setMin(
+                    region.getMinX(),
+                    region.getMinY(),
+                    region.getMaxZ()
+                ).setMax(
+                    region.getMaxX(),
+                    region.getMaxY(),
+                    region.getMaxZ());
             default:
                 return dest.setMin(
                     region.getMinX(),

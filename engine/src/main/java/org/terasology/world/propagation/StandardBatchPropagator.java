@@ -19,6 +19,8 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.math.ChunkMath;
 import org.terasology.math.JomlUtil;
 import org.terasology.math.Side;
@@ -311,7 +313,7 @@ public class StandardBatchPropagator implements BatchPropagator {
         IndexProvider indexProvider = createIndexProvider(side);
 
 
-        BlockRegion edgeRegion = ChunkMath.getEdgeRegion(new BlockRegion(new Vector3i(), JomlUtil.from(ChunkConstants.CHUNK_SIZE)), side, new BlockRegion());
+        BlockRegion edgeRegion = ChunkMath.getEdgeRegion(new BlockRegion(new Vector3i(), new Vector3i()).setSize(JomlUtil.from(ChunkConstants.CHUNK_SIZE)), side, new BlockRegion());
         int edgeSize = edgeRegion.getSizeX() * edgeRegion.getSizeY() * edgeRegion.getSizeZ();
         int[] depth = new int[edgeSize];
 
@@ -356,9 +358,9 @@ public class StandardBatchPropagator implements BatchPropagator {
 
     private void propagateSide(LitChunk chunk, LitChunk adjChunk, Side side, IndexProvider indexProvider, BlockRegion edgeRegion, int[] depths) {
         Vector3i adjPos = new Vector3i();
-        for (int x = edgeRegion.getMinX(); x < edgeRegion.getMaxX(); ++x) {
-            for (int y = edgeRegion.getMinY(); y < edgeRegion.getMaxY(); ++y) {
-                for (int z = edgeRegion.getMinZ(); z < edgeRegion.getMaxZ(); ++z) {
+        for (int x = edgeRegion.getMinX(); x <= edgeRegion.getMaxX(); ++x) {
+            for (int y = edgeRegion.getMinY(); y <= edgeRegion.getMaxY(); ++y) {
+                for (int z = edgeRegion.getMinZ(); z <= edgeRegion.getMaxZ(); ++z) {
 
                     byte expectedValue = (byte) (rules.getValue(chunk, x, y, z) - 1);
                     if (expectedValue < 1) {
@@ -368,7 +370,6 @@ public class StandardBatchPropagator implements BatchPropagator {
                     int depthIndex = indexProvider.getIndexFor(x, y, z);
                     adjPos.set(x, y, z);
                     adjPos.add(chunkEdgeDeltas.get(side));
-
 
                     int depth = 0;
                     Block lastBlock = chunk.getBlock(x, y, z);

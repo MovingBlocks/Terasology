@@ -21,6 +21,7 @@ import org.terasology.context.internal.ContextImpl;
 import org.terasology.context.internal.MockContext;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.registry.CoreRegistry;
+import org.terasology.world.block.BlockRegion;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -29,8 +30,8 @@ public class ChunkMathTest {
 
     @Test
     public void testGetEdgeRegion() {
-        Region3i region = Region3i.createFromMinAndSize(new Vector3i(16, 0, 16), new Vector3i(16, 128, 16));
-        assertEquals(Region3i.createFromMinMax(new Vector3i(16, 0, 16), new Vector3i(16, 127, 31)), ChunkMath.getEdgeRegion(region, Side.LEFT));
+        BlockRegion region = new BlockRegion(new org.joml.Vector3i(16, 0, 16),new org.joml.Vector3i(16, 0, 16)).setSize(new  org.joml.Vector3i(16, 128, 16));
+        assertEquals(new BlockRegion(new org.joml.Vector3i(16, 0, 16), new org.joml.Vector3i(16, 127, 31)), ChunkMath.getEdgeRegion(region, Side.LEFT,new BlockRegion()));
     }
 
     @Test
