@@ -18,6 +18,7 @@ package org.terasology.world.block.items;
 import org.joml.AABBf;
 import org.joml.Vector2f;
 import org.joml.Vector3fc;
+import org.joml.Vector3i;
 import org.terasology.audio.AudioManager;
 import org.terasology.audio.events.PlaySoundEvent;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -28,11 +29,8 @@ import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.characters.KinematicCharacterMover;
 import org.terasology.logic.common.ActivateEvent;
 import org.terasology.logic.inventory.ItemComponent;
-import org.terasology.math.AABB;
 import org.terasology.math.JomlUtil;
 import org.terasology.math.Side;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.network.NetworkSystem;
 import org.terasology.physics.Physics;
 import org.terasology.physics.StandardCollisionGroup;
@@ -89,22 +87,22 @@ public class BlockItemSystem extends BaseComponentSystem {
             event.consume();
             return;
         }
-        Vector3i targetBlock = new Vector3i(blockComponent.position);
+        Vector3i targetBlock = new Vector3i(blockComponent.getPosition(new Vector3i()));
         Vector3i placementPos = new Vector3i(targetBlock);
-        placementPos.add(surfaceSide.getVector3i());
+        placementPos.add(surfaceSide.direction());
 
         Vector2f relativeAttachmentPosition = getRelativeAttachmentPosition(event);
         Block block = blockFamily.getBlockForPlacement(new BlockPlacementData(
-            JomlUtil.from(placementPos), surfaceSide, event.getDirection(), relativeAttachmentPosition
+            placementPos, surfaceSide, event.getDirection(), relativeAttachmentPosition
         ));
 
         if (canPlaceBlock(block, targetBlock, placementPos)) {
             // TODO: Fix this for changes.
             if (networkSystem.getMode().isAuthority()) {
-                PlaceBlocks placeBlocks = new PlaceBlocks(placementPos, block, event.getInstigator());
+                PlaceBlocks placeBlocks = new PlaceBlocks(JomlUtil.from(placementPos), block, event.getInstigator());
                 worldProvider.getWorldEntity().send(placeBlocks);
                 if (!placeBlocks.isConsumed()) {
-                    item.send(new OnBlockItemPlaced(placementPos, blockEntityRegistry.getBlockEntityAt(placementPos), event.getInstigator()));
+                    item.send(new OnBlockItemPlaced(JomlUtil.from(placementPos), blockEntityRegistry.getBlockEntityAt(placementPos), event.getInstigator()));
                 } else {
                     event.consume();
                 }
@@ -192,30 +190,33 @@ public class BlockItemSystem extends BaseComponentSystem {
         // Prevent players from placing blocks inside their bounding boxes
         if (!block.isPenetrable()) {
             Physics physics = CoreRegistry.get(Physics.class);
-            AABBf blockBounds = block.getBounds(JomlUtil.from(blockPos));
-            Vector3f min = new Vector3f(blockBounds.minX, blockBounds.minY, blockBounds.minZ);
-            Vector3f max = new Vector3f(blockBounds.maxX, blockBounds.maxY, blockBounds.maxZ);
+            AABBf blockBounds = block.getBounds(blockPos);
 
             /**
              * Characters can enter other solid objects/blocks for certain amount. This is does to detect collsion
              * start and end without noise. So if the user walked as close to a block as possible it is only natural
              * to let it place a block exactly above it even if that technically would mean a collision start.
              */
-            min.x += KinematicCharacterMover.HORIZONTAL_PENETRATION;
-            max.x -= KinematicCharacterMover.HORIZONTAL_PENETRATION;
-            min.y += KinematicCharacterMover.VERTICAL_PENETRATION;
-            max.y -= KinematicCharacterMover.VERTICAL_PENETRATION;
-            min.z += KinematicCharacterMover.HORIZONTAL_PENETRATION;
-            max.z -= KinematicCharacterMover.HORIZONTAL_PENETRATION;
+            blockBounds.minX += KinematicCharacterMover.HORIZONTAL_PENETRATION;
+            blockBounds.maxX -= KinematicCharacterMover.HORIZONTAL_PENETRATION;
+            blockBounds.minY += KinematicCharacterMover.VERTICAL_PENETRATION;
+            blockBounds.maxY -= KinematicCharacterMover.VERTICAL_PENETRATION;
+            blockBounds.minZ += KinematicCharacterMover.HORIZONTAL_PENETRATION;
+            blockBounds.maxZ -= KinematicCharacterMover.HORIZONTAL_PENETRATION;
 
             /*
              * Calculations aren't exact and in the corner cases it is better to let the user place the block.
              */
-            min.add(ADDITIONAL_ALLOWED_PENETRATION, ADDITIONAL_ALLOWED_PENETRATION, ADDITIONAL_ALLOWED_PENETRATION);
-            max.sub(ADDITIONAL_ALLOWED_PENETRATION, ADDITIONAL_ALLOWED_PENETRATION, ADDITIONAL_ALLOWED_PENETRATION);
+            blockBounds.minX += ADDITIONAL_ALLOWED_PENETRATION;
+            blockBounds.minY += ADDITIONAL_ALLOWED_PENETRATION;
+            blockBounds.minZ += ADDITIONAL_ALLOWED_PENETRATION;
 
-            AABB newBounds = AABB.createMinMax(min, max);
-            return physics.scanArea(newBounds, StandardCollisionGroup.DEFAULT, StandardCollisionGroup.CHARACTER).isEmpty();
+            blockBounds.maxX += ADDITIONAL_ALLOWED_PENETRATION;
+            blockBounds.maxY += ADDITIONAL_ALLOWED_PENETRATION;
+            blockBounds.maxZ += ADDITIONAL_ALLOWED_PENETRATION;
+
+
+            return physics.scanArea(blockBounds, StandardCollisionGroup.DEFAULT, StandardCollisionGroup.CHARACTER).isEmpty();
         }
         return true;
     }
