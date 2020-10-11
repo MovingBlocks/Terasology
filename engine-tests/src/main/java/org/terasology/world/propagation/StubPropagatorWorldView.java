@@ -66,7 +66,7 @@ public class StubPropagatorWorldView implements PropagatorWorldView {
             throw new IllegalArgumentException("Position out of bounds: " + pos);
         }
 
-        Block result = blockData.get(pos);
+        Block result = blockData.get(JomlUtil.from(pos));
         if (result == null) {
             return defaultBlock;
         }
