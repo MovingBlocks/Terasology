@@ -17,12 +17,15 @@ package org.terasology.world.propagation;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import org.joml.Vector3ic;
 import org.terasology.math.ChunkMath;
 import org.terasology.math.JomlUtil;
 import org.terasology.math.Region3i;
 import org.terasology.math.Side;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.world.block.Block;
+import org.terasology.world.block.BlockRegion;
+import org.terasology.world.block.BlockRegionIterable;
 import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.LitChunk;
 
@@ -306,16 +309,17 @@ public class StandardBatchPropagator implements BatchPropagator {
     public void propagateBetween(LitChunk chunk, LitChunk adjChunk, Side side, boolean propagateExternal) {
         IndexProvider indexProvider = createIndexProvider(side);
 
-        Region3i edgeRegion = ChunkMath.getEdgeRegion(Region3i.createFromMinAndSize(Vector3i.zero(), ChunkConstants.CHUNK_SIZE), side);
+        BlockRegion edgeRegion = ChunkMath.getEdgeRegion(
+            new BlockRegion(0,0,0,0,0,0).setSize(JomlUtil.from(ChunkConstants.CHUNK_SIZE)), side, new BlockRegion());
 
-        int edgeSize = edgeRegion.size().x * edgeRegion.size().y * edgeRegion.size().z;
+        int edgeSize = edgeRegion.getSizeX() * edgeRegion.getSizeY() * edgeRegion.getSizeZ();
         int[] depth = new int[edgeSize];
 
         propagateSide(chunk, adjChunk, side, indexProvider, edgeRegion, depth);
         propagateDepth(adjChunk, side, propagateExternal, indexProvider, edgeRegion, depth);
     }
 
-    private void propagateDepth(LitChunk adjChunk, Side side, boolean propagateExternal, IndexProvider indexProvider, Region3i edgeRegion, int[] depths) {
+    private void propagateDepth(LitChunk adjChunk, Side side, boolean propagateExternal, IndexProvider indexProvider, BlockRegion edgeRegion, int[] depths) {
         Vector3i adjPos = new Vector3i();
 
         int[] adjDepth = new int[depths.length];
@@ -334,13 +338,13 @@ public class StandardBatchPropagator implements BatchPropagator {
             }
         }
 
-        for (Vector3i pos : edgeRegion) {
-            int depthIndex = indexProvider.getIndexFor(pos);
+        for (Vector3ic pos : BlockRegionIterable.region(edgeRegion).build()) {
+            int depthIndex = indexProvider.getIndexFor(JomlUtil.from(pos));
             int adjacentDepth = adjDepth[depthIndex];
             for (int i = adjacentDepth; i < depths[depthIndex]; ++i) {
                 adjPos.set(side.getVector3i());
                 adjPos.mul(i + 1);
-                adjPos.add(pos);
+                adjPos.add(JomlUtil.from(pos));
                 adjPos.add(chunkEdgeDeltas.get(side));
                 byte value = rules.getValue(adjChunk, adjPos);
                 if (value > 1) {
@@ -350,11 +354,11 @@ public class StandardBatchPropagator implements BatchPropagator {
         }
     }
 
-    private void propagateSide(LitChunk chunk, LitChunk adjChunk, Side side, IndexProvider indexProvider, Region3i edgeRegion, int[] depths) {
+    private void propagateSide(LitChunk chunk, LitChunk adjChunk, Side side, IndexProvider indexProvider, BlockRegion edgeRegion, int[] depths) {
         Vector3i adjPos = new Vector3i();
-        for (int x = edgeRegion.minX(); x <= edgeRegion.maxX(); ++x) {
-            for (int y = edgeRegion.minY(); y <= edgeRegion.maxY(); ++y) {
-                for (int z = edgeRegion.minZ(); z <= edgeRegion.maxZ(); ++z) {
+        for (int x = edgeRegion.getMinX(); x <= edgeRegion.getMaxX(); ++x) {
+            for (int y = edgeRegion.getMinY(); y <= edgeRegion.getMaxY(); ++y) {
+                for (int z = edgeRegion.getMinZ(); z <= edgeRegion.getMaxZ(); ++z) {
 
                     byte expectedValue = (byte) (rules.getValue(chunk, x, y, z) - 1);
                     if (expectedValue < 1) {
