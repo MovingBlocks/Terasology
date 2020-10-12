@@ -6,7 +6,7 @@ If you hit issues look for the game log files. By default they go into your user
 
 You can run the game with `-homedir` to instead store all game data in the directory you ran from. Or just use the [Launcher](https://github.com/MovingBlocks/TerasologyLauncher/releases) - it handles all that stuff!
 
-Report issues in the [support forum](http://forum.terasology.org/forum/support.20) or ask on [IRC](https://github.com/MovingBlocks/Terasology/wiki/Using-IRC) (`#terasology` on Freenode)
+Report issues on [GitHub](https://github.com/MovingBlocks/Terasology/issues/new) or ask on [Discord](https://discord.com/channels/270264625419911192/713903952764207164).
 
 ## Controls
 
@@ -85,7 +85,9 @@ Press the `F1` or `grave` key (usually the \` key immediately above `tab`) to sh
 
 ## Multiplayer
 
-To name yourself for a multiplayer game use Settings / Player. You can also pick a color, which will affect your placeholder monkey head player avatar, name in chat, and floating name tag.
+_A note on stability: while generally Terasology multiplayer is stable enough for us to run play tests on the first Saturday of each month there are regularly recurring bugs that will get in the way (still "Alpha" level software after all). Expect for it to be difficult to keep a server stable over the long term until Beta. The game client may also leave an orphaned process after trying to exit that you may need to close manually via task manager._ 
+
+To name yourself for a multiplayer game use Settings / Player. You can also pick a color for your name in chat and floating name tag.
 
 You can host a local server using the game client and have friends connect to your IP. Game port is 25777 which needs to be open and forwarded to your PC.
 
@@ -93,9 +95,7 @@ Unlike in single player in a multiplayer setting permissions are enforced for co
 
 ### Headless Server
 
-You can also run a headless server, but this is harder to configure at the moment. You need to launch the game via command line, for example with a downloaded version:
-
-*Note: This changed to include the `/libs` after stable 49. The name of the .exe also may differ*
+You can also run a headless server, but need to do so via command line, for example with a downloaded version:
 
 `java -jar libs/Terasology.jar -headless -homedir=server`
 
@@ -164,4 +164,3 @@ See all available images at https://hub.docker.com/r/qwick/terasology/tags/
 Example: `docker pull qwick/terasology:latest`
 
 The Docker server starts with no extra modules configured, you would have to go update the game server's config accordingly if desired.
-

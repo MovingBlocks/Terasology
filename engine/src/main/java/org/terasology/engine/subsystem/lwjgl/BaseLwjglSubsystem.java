@@ -21,7 +21,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.context.Context;
 import org.terasology.engine.subsystem.EngineSubsystem;
-import org.terasology.utilities.LWJGLHelper;
 
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
@@ -37,7 +36,6 @@ public abstract class BaseLwjglSubsystem implements EngineSubsystem {
     @Override
     public void preInitialise(Context context) {
         if (!initialised) {
-            LWJGLHelper.initNativeLibs();
             initLogger();
             initialised = true;
         }

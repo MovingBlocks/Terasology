@@ -16,8 +16,6 @@
 
 package org.terasology.math;
 
-import java.math.RoundingMode;
-
 import org.joml.Math;
 import org.joml.Vector3fc;
 import org.joml.Vector3ic;
@@ -25,6 +23,8 @@ import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.world.block.BlockRegion;
 import org.terasology.world.chunks.ChunkConstants;
+
+import java.math.RoundingMode;
 
 /**
  * Collection of math functions.
@@ -389,12 +389,31 @@ public final class ChunkMath {
     }
 
     // TODO: This doesn't belong in this class, move it.
+    /**
+     *
+     * @param direction
+     * @param normal
+     * @return
+     * @deprecated This is scheduled for removal in an upcoming version
+     *             method will be replaced with JOML implementation {@link #getSecondaryPlacementDirection(Vector3fc, Vector3fc)}.
+     */
+    @Deprecated
     public static Side getSecondaryPlacementDirection(Vector3f direction, Vector3f normal) {
         Side surfaceDir = Side.inDirection(normal);
         Vector3f attachDir = surfaceDir.reverse().getVector3i().toVector3f();
         Vector3f rawDirection = new Vector3f(direction);
         float dot = rawDirection.dot(attachDir);
         rawDirection.sub(new Vector3f(dot * attachDir.x, dot * attachDir.y, dot * attachDir.z));
+        return Side.inDirection(rawDirection.x, rawDirection.y, rawDirection.z).reverse();
+    }
+
+
+    public static Side getSecondaryPlacementDirection(Vector3fc direction, Vector3fc normal) {
+        Side surfaceDir = Side.inDirection(normal);
+        org.joml.Vector3f attachDir = new org.joml.Vector3f(surfaceDir.reverse().direction());
+        org.joml.Vector3f rawDirection = new org.joml.Vector3f(direction);
+        float dot = rawDirection.dot(attachDir);
+        rawDirection.sub(dot * attachDir.x, dot * attachDir.y, dot * attachDir.z);
         return Side.inDirection(rawDirection.x, rawDirection.y, rawDirection.z).reverse();
     }
 
@@ -406,27 +425,27 @@ public final class ChunkMath {
      * @return
      */
     public static Region3i getEdgeRegion(Region3i region, Side side) {
-        Vector3i sideDir = side.getVector3i();
+        Vector3ic sideDir = side.direction();
         Vector3i min = region.min();
         Vector3i max = region.max();
         Vector3i edgeMin = new Vector3i(min);
         Vector3i edgeMax = new Vector3i(max);
-        if (sideDir.x < 0) {
+        if (sideDir.x() < 0) {
             edgeMin.x = min.x;
             edgeMax.x = min.x;
-        } else if (sideDir.x > 0) {
+        } else if (sideDir.x() > 0) {
             edgeMin.x = max.x;
             edgeMax.x = max.x;
-        } else if (sideDir.y < 0) {
+        } else if (sideDir.y() < 0) {
             edgeMin.y = min.y;
             edgeMax.y = min.y;
-        } else if (sideDir.y > 0) {
+        } else if (sideDir.y() > 0) {
             edgeMin.y = max.y;
             edgeMax.y = max.y;
-        } else if (sideDir.z < 0) {
+        } else if (sideDir.z() < 0) {
             edgeMin.z = min.z;
             edgeMax.z = min.z;
-        } else if (sideDir.z > 0) {
+        } else if (sideDir.z() > 0) {
             edgeMin.z = max.z;
             edgeMax.z = max.z;
         }

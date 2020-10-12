@@ -16,7 +16,6 @@ import org.terasology.splash.glfw.widgets.AnimatedBoxRow;
 import org.terasology.splash.glfw.widgets.BorderedRectangle;
 import org.terasology.splash.glfw.widgets.Image;
 import org.terasology.splash.glfw.widgets.Widget;
-import org.terasology.utilities.LWJGLHelper;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -27,7 +26,7 @@ import java.util.concurrent.CountDownLatch;
 public class GLFWSplashScreen implements SplashScreen, Runnable {
 
     private final CountDownLatch countDownLatch;
-    private List<Widget> widgets = new LinkedList<>();
+    private final List<Widget> widgets = new LinkedList<>();
     private Texture pixel;
     private Window window;
     private String message = "Loading...";
@@ -55,7 +54,6 @@ public class GLFWSplashScreen implements SplashScreen, Runnable {
 
     @Override
     public void run() {
-        LWJGLHelper.initNativeLibs();
         if (!GLFW.glfwInit()) {
             throw new RuntimeException("Cannot init GLFW!");
         }

@@ -17,6 +17,8 @@ package org.terasology.math;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
+import org.joml.Quaternionfc;
+import org.joml.Vector3fc;
 import org.joml.Vector3ic;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
@@ -120,7 +122,7 @@ public enum Side {
     private final boolean canPitch;
     private final boolean canRoll;
 
-     Side(Vector3i vector3i, boolean canPitch, boolean canYaw, boolean canRoll) {
+    Side(Vector3i vector3i, boolean canPitch, boolean canYaw, boolean canRoll) {
         this.vector3iDir = vector3i;
         this.canPitch = canPitch;
         this.canYaw = canYaw;
@@ -152,8 +154,25 @@ public enum Side {
         return (z > 0) ? BACK : FRONT;
     }
 
+    /**
+     * @param dir
+     * @return
+     * @deprecated This method is scheduled for removal in an upcoming version. Use the JOML implementation instead:
+     *     {@link #inDirection(Vector3fc)}.
+     */
+    @Deprecated
     public static Side inDirection(Vector3f dir) {
         return inDirection(dir.x, dir.y, dir.z);
+    }
+
+    /**
+     * The side normal closes to dir
+     * 
+     * @param dir direction
+     * @return side
+     */
+    public static Side inDirection(Vector3fc dir) {
+        return inDirection(dir.x(), dir.y(), dir.z());
     }
 
     /**
@@ -191,9 +210,10 @@ public enum Side {
 
     /**
      * This provides a static EnumSet of all Sides defined in the enumeration. The result contains the same values as
-     * calling {@code Side#values} but this does not create a new copy on every call.
-     * <br/>
-     * <b>Warning:</b> Do not change the content of the returned enum set! It will be reflected on all calls to this method.
+     * calling {@code Side#values} but this does not create a new copy on every call. <br/>
+     * <b>Warning:</b> Do not change the content of the returned enum set! It will be reflected on all calls to this
+     * method.
+     *
      * @return All available sides
      */
     public static EnumSet<Side> getAllSides() {
@@ -202,8 +222,8 @@ public enum Side {
 
     /**
      * @return The vector3i in the direction of the side. Do not modify.
-     * @deprecated This method is scheduled for removal in an upcoming version.
-     *             Use the JOML implementation instead: {@link #direction()} .
+     * @deprecated This method is scheduled for removal in an upcoming version. Use the JOML implementation instead:
+     *     {@link #direction()} .
      */
     @Deprecated
     public Vector3i getVector3i() {
@@ -212,6 +232,7 @@ public enum Side {
 
     /**
      * the normal vector in the direction of the side
+     *
      * @return a normalized vector
      */
     public Vector3ic direction() {
@@ -307,12 +328,10 @@ public enum Side {
     }
 
     /**
-     * 
      * @param position
      * @return
-     * @deprecated This method is scheduled for removal in an upcoming version.
-     *             Use the JOML implementation instead: {@link #getAdjacentPos(Vector3ic, org.joml.Vector3i)} .
-     *      
+     * @deprecated This method is scheduled for removal in an upcoming version. Use the JOML implementation instead:
+     *     {@link #getAdjacentPos(Vector3ic, org.joml.Vector3i)} .
      **/
     @Deprecated
     public Vector3i getAdjacentPos(Vector3i position) {
@@ -328,7 +347,7 @@ public enum Side {
      * @param dest will hold the result
      * @return dest
      */
-    public org.joml.Vector3i getAdjacentPos(Vector3ic pos, org.joml.Vector3i dest){
+    public org.joml.Vector3i getAdjacentPos(Vector3ic pos, org.joml.Vector3i dest) {
         return dest.set(pos).add(direction());
     }
 

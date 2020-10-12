@@ -366,9 +366,9 @@ task distApp(type: Sync) {
     dependsOn rootProject.extractNatives
     dependsOn jar
 
-    into("$distsDirectory/app")
-    from("$rootDir/README.markdown") {
-        filter(FixCrLfFilter, eol: FixCrLfFilter.CrLf.newInstance("crlf"))
+    into ("${distsDirectory.get().asFile}/app")
+    from ("$rootDir/README.markdown") {
+        filter(FixCrLfFilter, eol:FixCrLfFilter.CrLf.newInstance("crlf"))
         rename('README.markdown', 'README')
     }
     from("$rootDir/LICENSE") {
@@ -405,7 +405,7 @@ task distModules(type: Sync) {
     dependsOn rootProject.moduleJars
 
     // So this is probably a hack, but it works ;-) It does not work if it is in distApp, default "into" quirk ?
-    into("$distsDirectory/app/modules")
+    into("${distsDirectory.get().asFile}/app/modules")
     rootProject.terasologyModules().each {
         from "$rootDir/modules/${it.name}/build/libs"
         include "*.jar"
@@ -416,7 +416,7 @@ task distPCZip(type: Zip) {
     group = "terasology dist"
     dependsOn distApp
     dependsOn distModules
-    from "$distsDirectory/app"
+    from "${distsDirectory.get().asFile}/app"
     archiveFileName = "Terasology.zip"
 }
 

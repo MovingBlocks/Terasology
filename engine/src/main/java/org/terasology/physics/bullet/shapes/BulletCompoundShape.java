@@ -15,27 +15,28 @@
  */
 package org.terasology.physics.bullet.shapes;
 
-
-import com.bulletphysics.collision.shapes.CompoundShape;
-import com.bulletphysics.collision.shapes.CompoundShapeChild;
-import com.bulletphysics.linearmath.Transform;
-import org.terasology.math.Rotation;
-import org.terasology.math.VecMath;
+import com.badlogic.gdx.physics.bullet.collision.btCollisionShape;
+import com.badlogic.gdx.physics.bullet.collision.btCompoundShape;
+import org.joml.Quaternionf;
+import org.terasology.math.JomlUtil;
+import org.terasology.math.Transform;
+import org.terasology.math.geom.Matrix4f;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.physics.shapes.CollisionShape;
+import org.terasology.physics.shapes.CompoundShape;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class BulletCompoundShape extends BulletCollisionShape implements org.terasology.physics.shapes.CompoundShape {
-    private final CompoundShape compoundShape;
+public class BulletCompoundShape extends BulletCollisionShape implements CompoundShape {
+    private final btCompoundShape compoundShape;
     private List<BulletCompoundShapeChild> childList;
 
     public BulletCompoundShape() {
-        this(new CompoundShape());
+        this(new btCompoundShape());
     }
 
-    private BulletCompoundShape(CompoundShape compoundShape) {
+    private BulletCompoundShape(btCompoundShape compoundShape) {
         this.compoundShape = compoundShape;
         underlyingShape = compoundShape;
 
@@ -43,35 +44,31 @@ public class BulletCompoundShape extends BulletCollisionShape implements org.ter
     }
 
     @Override
-    public void addChildShape(org.terasology.math.Transform transform, CollisionShape collisionShape) {
+    public void addChildShape(Transform transform, CollisionShape collisionShape) {
         BulletCollisionShape bulletCollisionShape = (BulletCollisionShape) collisionShape;
-        Transform bulletTransform = toBulletTransform(transform);
-        compoundShape.addChildShape(bulletTransform, bulletCollisionShape.underlyingShape);
-
-        childList.add(new BulletCompoundShapeChild(bulletTransform, bulletCollisionShape,
-                compoundShape.getChildList().get(compoundShape.getNumChildShapes() - 1)));
+        compoundShape.addChildShape(JomlUtil.from(new Matrix4f(transform.rotation,transform.origin,transform.scale)),((BulletCollisionShape) collisionShape).underlyingShape);
+        childList.add(new BulletCompoundShapeChild(new Transform(transform.origin,transform.rotation,transform.scale), bulletCollisionShape,compoundShape.getChildShape(compoundShape.getNumChildShapes() -1 )));
     }
 
     // TODO: Add removeChildShape if needed
 
     @Override
-    public CollisionShape rotate(Quat4f rot) {
-        CompoundShape newShape = new CompoundShape();
+    public CollisionShape rotate(Quaternionf rot) {
+        BulletCompoundShape shape = new BulletCompoundShape();
         for (BulletCompoundShapeChild child : childList) {
             CollisionShape rotatedChild = child.childShape.rotate(rot);
-            javax.vecmath.Vector3f offset = com.bulletphysics.linearmath.QuaternionUtil.quatRotate(VecMath.to(rot), child.transform.origin, new javax.vecmath.Vector3f());
-            newShape.addChildShape(new Transform(new javax.vecmath.Matrix4f(VecMath.to(Rotation.none().getQuat4f()), offset, 1.0f)), ((BulletCollisionShape) rotatedChild).underlyingShape);
+            shape.addChildShape(new Transform(child.transform.origin,new Quat4f(),child.transform.scale),rotatedChild);
         }
-        return new BulletCompoundShape(newShape);
+        return shape;
     }
 
     private static class BulletCompoundShapeChild {
         public Transform transform;
         public BulletCollisionShape childShape;
 
-        public CompoundShapeChild compoundShapeChild;
+        public btCollisionShape compoundShapeChild;
 
-        private BulletCompoundShapeChild(Transform transform, BulletCollisionShape childShape, CompoundShapeChild compoundShapeChild) {
+        private BulletCompoundShapeChild(Transform transform, BulletCollisionShape childShape, btCollisionShape compoundShapeChild) {
             this.transform = transform;
             this.childShape = childShape;
             this.compoundShapeChild = compoundShapeChild;

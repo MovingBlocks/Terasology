@@ -109,6 +109,9 @@ dependencies {
 
     // Natives for JNLua (Kallisti, KComputers)
     natives group: 'org.terasology.jnlua', name: 'jnlua_natives', version: '0.1.0-SNAPSHOT', ext: 'zip'
+
+    // Natives for JNBullet
+    natives group: 'org.terasology.jnbullet', name: 'JNBullet', version: '1.0.2', ext: 'zip'
 }
 
 task extractWindowsNatives(type: Copy) {
@@ -146,12 +149,22 @@ task extractJNLuaNatives(type: Copy) {
     into("$dirNatives")
 }
 
+task extractNativeBulletNatives(type:Copy) {
+    description = "Extracts the JNBullet natives from the downloaded zip"
+    from {
+        configurations.natives.collect { it.getName().contains('JNBullet') ? zipTree(it) : [] }
+    }
+    into ("$dirNatives")
+}
+
+
 task extractNatives {
     description = "Extracts all the native lwjgl libraries from the downloaded zip"
     dependsOn extractWindowsNatives
     dependsOn extractLinuxNatives
     dependsOn extractMacOSXNatives
     dependsOn extractJNLuaNatives
+    dependsOn extractNativeBulletNatives
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
