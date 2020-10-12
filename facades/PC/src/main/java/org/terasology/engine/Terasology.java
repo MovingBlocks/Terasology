@@ -161,13 +161,12 @@ public final class Terasology {
                         GameManifest gameManifest = getLatestGameManifest();
                         if (gameManifest != null) {
                             String title = gameManifest.getTitle();
-                            GameManifest newlyCreatedGM = gameManifest;
                             if (!title.startsWith("New Created")) { //if first time run
-                                newlyCreatedGM.setTitle("New Created " + title + " 1");
+                                gameManifest.setTitle("New Created " + title + " 1");
                             } else { //if not first time run
-                                newlyCreatedGM.setTitle(getNewTitle(title));
+                                gameManifest.setTitle(getNewTitle(title));
                             }
-                            engine.changeState(new StateLoading(newlyCreatedGM, NetworkMode.NONE));
+                            engine.changeState(new StateLoading(gameManifest, NetworkMode.NONE));
                         }
                     });
                 }
@@ -200,7 +199,7 @@ public final class Terasology {
     private static void handlePrintUsageRequest(String[] args) {
         for (String arg : args) {
             for (String usageArg : PRINT_USAGE_FLAGS) {
-                if (usageArg.equals(arg.toLowerCase())) {
+                if (usageArg.equalsIgnoreCase(arg)) {
                     printUsageAndExit();
                 }
             }

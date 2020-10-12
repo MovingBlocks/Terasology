@@ -40,9 +40,9 @@ public class GLFWSplashScreen implements SplashScreen, Runnable {
     public void post(String msg) {
         this.message = msg;
         widgets.stream()
-                .filter((w) -> w instanceof ActivatableImage)
-                .map((w) -> (ActivatableImage) w)
-                .forEach((i) -> i.post(msg));
+                .filter(w -> w instanceof ActivatableImage)
+                .map(w -> (ActivatableImage) w)
+                .forEach(i -> i.post(msg));
     }
 
     @Override
@@ -108,14 +108,14 @@ public class GLFWSplashScreen implements SplashScreen, Runnable {
                 double dTime = GLFW.glfwGetTime() - last;
                 last = GLFW.glfwGetTime();
                 renderer.clear();
-                widgets.forEach((widget -> widget.update(dTime)));
-                widgets.forEach((i) -> i.render(renderer));
+                widgets.forEach(widget -> widget.update(dTime));
+                widgets.forEach(i -> i.render(renderer));
                 renderer.drawText(message, 30, 25, Color.BLACK);
                 window.update();
             }
         } finally {
             widgets.stream()
-                    .filter((w) -> w instanceof Image)
+                    .filter(w -> w instanceof Image)
                     .map(w -> (Image) w)
                     .forEach(Image::delete);
             pixel.delete();
