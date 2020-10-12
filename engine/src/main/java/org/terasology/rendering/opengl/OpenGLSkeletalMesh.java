@@ -64,8 +64,8 @@ public class OpenGLSkeletalMesh extends SkeletalMesh {
 
     private SkeletalMeshData data;
 
-    private Vector3f scale;
-    private Vector3f translate;
+    private org.joml.Vector3f scale;
+    private org.joml.Vector3f translate;
 
     private DisposalAction disposalAction;
 
@@ -76,7 +76,7 @@ public class OpenGLSkeletalMesh extends SkeletalMesh {
         reload(data);
     }
 
-    public void setScaleTranslate(Vector3f newScale, Vector3f newTranslate) {
+    public void setScaleTranslate(org.joml.Vector3f newScale, org.joml.Vector3f newTranslate) {
         this.scale = newScale;
         this.translate = newTranslate;
     }
