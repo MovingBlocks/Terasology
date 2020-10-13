@@ -128,7 +128,7 @@ run {
 
     args "-homedir", "-noCrashReport"
     if (System.getProperty("os.name").startsWith("Mac OS X") || System.getProperty("os.name").startsWith("Darwin")){
-        jvmArgs "-XstartOnFirstThread", "-Xmx1536m"
+        jvmArgs "-XstartOnFirstThread", "-Djava.awt.headless=true", "-Xmx1536m"
     } else {
         jvmArgs "-Xmx1536m"
     }
@@ -157,7 +157,7 @@ task game(type: JavaExec) {
     workingDir = rootDir
     args "-homedir"
     if (System.getProperty("os.name").startsWith("Mac OS X") || System.getProperty("os.name").startsWith("Darwin")){
-        jvmArgs "-XstartOnFirstThread", "-Xmx1536m"
+        jvmArgs "-XstartOnFirstThread", "-Djava.awt.headless=true", "-Xmx1536m"
     } else {
         jvmArgs "-Xmx1536m"
     }
@@ -181,7 +181,7 @@ task profile(type: JavaExec) {
 
     // Run arguments
     if (System.getProperty("os.name").startsWith("Mac OS X") || System.getProperty("os.name").startsWith("Darwin")){
-        jvmArgs "-XstartOnFirstThread", "-Xms256m", "-Xmx1536m", "-XX:+UnlockCommercialFeatures", "-XX:+FlightRecorder", "-XX:+UnlockDiagnosticVMOptions", "-XX:+DebugNonSafepoints", "-XX:StartFlightRecording=filename=terasology.jfr,dumponexit=true"
+        jvmArgs "-XstartOnFirstThread","-Djava.awt.headless=true", "-Xms256m", "-Xmx1536m", "-XX:+UnlockCommercialFeatures", "-XX:+FlightRecorder", "-XX:+UnlockDiagnosticVMOptions", "-XX:+DebugNonSafepoints", "-XX:StartFlightRecording=filename=terasology.jfr,dumponexit=true"
     } else {
         jvmArgs "-Xms256m", "-Xmx1536m", "-XX:+UnlockCommercialFeatures", "-XX:+FlightRecorder", "-XX:+UnlockDiagnosticVMOptions", "-XX:+DebugNonSafepoints", "-XX:StartFlightRecording=filename=terasology.jfr,dumponexit=true"
     }
@@ -209,7 +209,7 @@ task debug(type: JavaExec) {
 
     // Run arguments
     if (System.getProperty("os.name").startsWith("Mac OS X") || System.getProperty("os.name").startsWith("Darwin")){
-        jvmArgs "-XstartOnFirstThread", "-Xmx1536m", "-Xdebug", "-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=1044"
+        jvmArgs "-XstartOnFirstThread", "-Djava.awt.headless=true", "-Xmx1536m", "-Xdebug", "-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=1044"
     } else {
         jvmArgs "-Xmx1536m", "-Xdebug", "-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=1044"
     }
@@ -240,7 +240,7 @@ task permissiveNatives(type: JavaExec) {
     workingDir = rootDir
     args "-homedir", "-permissiveSecurity"
     if (System.getProperty("os.name").startsWith("Mac OS X") || System.getProperty("os.name").startsWith("Darwin")){
-        jvmArgs "-XstartOnFirstThread", "-Xmx1536m"
+        jvmArgs "-XstartOnFirstThread", "-Djava.awt.headless=true", "-Xmx1536m"
     } else {
         jvmArgs "-Xmx1536m"
     }

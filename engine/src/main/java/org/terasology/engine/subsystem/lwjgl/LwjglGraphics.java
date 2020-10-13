@@ -240,6 +240,7 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
         GLFW.glfwDefaultWindowHints();
         GLFW.glfwWindowHint(GLFW.GLFW_VISIBLE, GLFW.GLFW_FALSE);
         GLFW.glfwWindowHint(GLFW.GLFW_COCOA_GRAPHICS_SWITCHING, GLFW.GLFW_TRUE);
+        GLFW.glfwWindowHint(GLFW.GLFW_COCOA_RETINA_FRAMEBUFFER, GLFW.GLFW_FALSE);
         GLFW.glfwWindowHint(GLFW.GLFW_DEPTH_BITS, config.getPixelFormat());
 
         if (config.getDebug().isEnabled()) {
