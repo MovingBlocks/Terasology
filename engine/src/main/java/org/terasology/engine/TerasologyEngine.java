@@ -104,23 +104,21 @@ public class TerasologyEngine implements GameEngine {
 
     private final List<Class<?>> classesOnClasspathsToAddToEngine = new ArrayList<>();
     private final List<EngineStatusSubscriber> statusSubscriberList = new CopyOnWriteArrayList<>();
-    private GameState currentState;
-    private GameState pendingState;
     private final Set<StateChangeSubscriber> stateChangeSubscribers = Sets.newLinkedHashSet();
-    private EngineStatus status = StandardGameStatus.UNSTARTED;
-    private volatile boolean shutdownRequested;
-    private volatile boolean running;
-
     private final TimeSubsystem timeSubsystem;
     private final Deque<EngineSubsystem> allSubsystems;
     private final ContextAwareClassFactory classFactory = ContextAwareClassFactory.create(null);
-    private ModuleAwareAssetTypeManager assetTypeManager;
-    private boolean initialisedAlready;
-
     /**
      * Contains objects that live for the duration of this engine.
      */
     private final Context rootContext;
+    private GameState currentState;
+    private GameState pendingState;
+    private EngineStatus status = StandardGameStatus.UNSTARTED;
+    private volatile boolean shutdownRequested;
+    private volatile boolean running;
+    private ModuleAwareAssetTypeManager assetTypeManager;
+    private boolean initialisedAlready;
 
     /**
      * This constructor initializes the engine by initializing its systems, subsystems and managers. It also verifies
@@ -137,22 +135,14 @@ public class TerasologyEngine implements GameEngine {
         rootContext.put(GameEngine.class, this);
         this.timeSubsystem = timeSubsystem;
 
-        //Record and Replay classes
-        RecordAndReplayCurrentStatus recordAndReplayCurrentStatus = new RecordAndReplayCurrentStatus();
-        rootContext.put(RecordAndReplayCurrentStatus.class, recordAndReplayCurrentStatus);
-        RecordAndReplayUtils recordAndReplayUtils = new RecordAndReplayUtils();
-        rootContext.put(RecordAndReplayUtils.class, recordAndReplayUtils);
-        CharacterStateEventPositionMap characterStateEventPositionMap = new CharacterStateEventPositionMap();
-        rootContext.put(CharacterStateEventPositionMap.class, characterStateEventPositionMap);
-        DirectionAndOriginPosRecorderList directionAndOriginPosRecorderList = new DirectionAndOriginPosRecorderList();
-        rootContext.put(DirectionAndOriginPosRecorderList.class, directionAndOriginPosRecorderList);
-        /*
-         * We can't load the engine without core registry yet.
-         * e.g. the statically created MaterialLoader needs the CoreRegistry to get the AssetManager.
-         * And the engine loads assets while it gets created.
-         */
-        // TODO: Remove
         updateContext(rootContext);
+        rootContext.put(ContextAwareClassFactory.class, classFactory);
+
+        //Record and Replay classes
+        classFactory.createInjectableInstance(RecordAndReplayCurrentStatus.class);
+        classFactory.createInjectableInstance(RecordAndReplayUtils.class);
+        classFactory.createInjectableInstance(CharacterStateEventPositionMap.class);
+        classFactory.createInjectableInstance(DirectionAndOriginPosRecorderList.class);
 
         this.allSubsystems = Queues.newArrayDeque();
         this.allSubsystems.add(new ConfigurationSubsystem());
@@ -297,27 +287,23 @@ public class TerasologyEngine implements GameEngine {
     private void initManagers() {
 
         changeStatus(TerasologyEngineStatus.INITIALIZING_MODULE_MANAGER);
-        TypeRegistry typeRegistry = new TypeRegistry();
         TypeRegistry.WHITELISTED_CLASSES =
                 ExternalApiWhitelist.CLASSES.stream().map(Class::getName).collect(Collectors.toSet());
         TypeRegistry.WHITELISTED_PACKAGES = ExternalApiWhitelist.PACKAGES;
-        rootContext.put(TypeRegistry.class, typeRegistry);
+        TypeRegistry typeRegistry = classFactory.createInjectableInstance(TypeRegistry.class);
 
         ModuleManager moduleManager = new ModuleManagerImpl(rootContext.get(Config.class),
                 classesOnClasspathsToAddToEngine);
         rootContext.put(ModuleManager.class, moduleManager);
 
         changeStatus(TerasologyEngineStatus.INITIALIZING_LOWLEVEL_OBJECT_MANIPULATION);
-        ReflectFactory reflectFactory = new ReflectionReflectFactory();
-        rootContext.put(ReflectFactory.class, reflectFactory);
 
-        CopyStrategyLibrary copyStrategyLibrary = new CopyStrategyLibrary(reflectFactory);
-        rootContext.put(CopyStrategyLibrary.class, copyStrategyLibrary);
-
+        classFactory.createInjectableInstance(ReflectFactory.class, ReflectionReflectFactory.class);
+        classFactory.createInjectableInstance(CopyStrategyLibrary.class);
         rootContext.put(TypeHandlerLibrary.class, TypeHandlerLibrary.forModuleEnvironment(moduleManager, typeRegistry));
 
         changeStatus(TerasologyEngineStatus.INITIALIZING_ASSET_TYPES);
-        assetTypeManager = new ModuleAwareAssetTypeManager(classFactory);
+        assetTypeManager = classFactory.createInjectableInstance(ModuleAwareAssetTypeManager.class);
         rootContext.put(ModuleAwareAssetTypeManager.class, assetTypeManager);
         rootContext.put(AssetManager.class, assetTypeManager.getAssetManager());
     }
@@ -473,6 +459,12 @@ public class TerasologyEngine implements GameEngine {
     }
 
     private void updateContext(Context context) {
+        /*
+         * We can't load the engine without core registry yet.
+         * e.g. the statically created MaterialLoader needs the CoreRegistry to get the AssetManager.
+         * And the engine loads assets while it gets created.
+         */
+        // TODO: Remove
         CoreRegistry.setContext(context);
         classFactory.setCurrentContext(context);
     }

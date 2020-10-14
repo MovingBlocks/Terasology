@@ -40,6 +40,16 @@ public class ContextAwareClassFactory extends SimpleClassFactory {
         });
     }
 
+    public <T> T createInjectableInstance(Class<T> type) {
+        return createInjectableInstance(type, type);
+    }
+
+    public <T, R extends T> T createInjectableInstance(Class<T> iface, Class<R> type) {
+        T instance = instantiateClass(type).get();
+        getCurrentContext().put(iface, instance);
+        return instance;
+    }
+
     private static class ContextParameterProvider implements ParameterProvider {
         private ContextAwareClassFactory factory;
 
