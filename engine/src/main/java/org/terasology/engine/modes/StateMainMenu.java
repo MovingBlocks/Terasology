@@ -26,13 +26,13 @@ import org.terasology.logic.players.LocalPlayer;
 import org.terasology.network.ClientComponent;
 import org.terasology.recording.DirectionAndOriginPosRecorderList;
 import org.terasology.recording.RecordAndReplayCurrentStatus;
+import org.terasology.registry.ContextAwareClassFactory;
 import org.terasology.registry.CoreRegistry;
+import org.terasology.registry.In;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.editor.systems.NUIEditorSystem;
 import org.terasology.rendering.nui.editor.systems.NUISkinEditorSystem;
-import org.terasology.nui.canvas.CanvasRenderer;
 import org.terasology.rendering.nui.internal.NUIManagerInternal;
-import org.terasology.rendering.nui.internal.TerasologyCanvasRenderer;
 import org.terasology.rendering.nui.layers.mainMenu.LaunchPopup;
 import org.terasology.rendering.nui.layers.mainMenu.MessagePopup;
 import org.terasology.telemetry.TelemetryScreen;
@@ -47,14 +47,29 @@ import org.terasology.utilities.Assets;
  * @version 0.3
  */
 public class StateMainMenu implements GameState {
-    private Context context;
-    private EngineEntityManager entityManager;
+
+    @In
+    DirectionAndOriginPosRecorderList directionAndOriginPosRecorderList;
+    @In
+    RecordAndReplayCurrentStatus recordAndReplayCurrentStatus;
+    @In
+    private InputSystem inputSystem;
+    @In
+    private ContextAwareClassFactory classFactory;
+    @In
+    private StorageServiceWorker storageServiceWorker;
+    @In
+    private AudioManager audioManager;
+    @In
+    private Config config;
+    @In
+    private TranslationSystem translationSystem;
     private EventSystem eventSystem;
+    private EngineEntityManager entityManager;
+    private Context context;
     private ComponentSystemManager componentSystemManager;
     private NUIManager nuiManager;
-    private InputSystem inputSystem;
     private Console console;
-    private StorageServiceWorker storageServiceWorker;
 
     private String messageOnLoad = "";
 
@@ -69,62 +84,51 @@ public class StateMainMenu implements GameState {
     @Override
     public void init(GameEngine gameEngine) {
         context = gameEngine.createChildContext();
-        CoreRegistry.setContext(context);
+        updateContext(context);
 
         //let's get the entity event system running
-        EntitySystemSetupUtil.addEntityManagementRelatedClasses(context);
+        EntitySystemSetupUtil.addEntityManagementRelatedClasses(context); // provides EngineEntityManager and
+        // EventSystem
         entityManager = context.get(EngineEntityManager.class);
-
         eventSystem = context.get(EventSystem.class);
-        console = new ConsoleImpl(context);
-        context.put(Console.class, console);
 
-        nuiManager = new NUIManagerInternal((TerasologyCanvasRenderer) context.get(CanvasRenderer.class), context);
-        context.put(NUIManager.class, nuiManager);
+        console = classFactory.createInjectableInstance(Console.class, ConsoleImpl.class);
 
+        nuiManager = classFactory.createInjectableInstance(NUIManager.class, NUIManagerInternal.class); // TODO
+        // handle context in NuiManager.
         eventSystem.registerEventHandler(nuiManager);
 
-        componentSystemManager = new ComponentSystemManager(context);
-        context.put(ComponentSystemManager.class, componentSystemManager);
+        componentSystemManager = classFactory.createInjectableInstance(ComponentSystemManager.class); // TODO handle
+        // context in ComponentSystemManager
 
         // TODO: Reduce coupling between Input system and CameraTargetSystem,
         // TODO: potentially eliminating the following lines. See Issue #1126
-        CameraTargetSystem cameraTargetSystem = new CameraTargetSystem();
-        context.put(CameraTargetSystem.class, cameraTargetSystem);
 
-        componentSystemManager.register(cameraTargetSystem, "engine:CameraTargetSystem");
+        componentSystemManager.register(classFactory.createInjectableInstance(CameraTargetSystem.class),
+                "engine:CameraTargetSystem");
         componentSystemManager.register(new ConsoleSystem(), "engine:ConsoleSystem");
         componentSystemManager.register(new CoreCommands(), "engine:CoreCommands");
-
-        NUIEditorSystem nuiEditorSystem = new NUIEditorSystem();
-        context.put(NUIEditorSystem.class, nuiEditorSystem);
-        componentSystemManager.register(nuiEditorSystem, "engine:NUIEditorSystem");
-
-        NUISkinEditorSystem nuiSkinEditorSystem = new NUISkinEditorSystem();
-        context.put(NUISkinEditorSystem.class, nuiSkinEditorSystem);
-        componentSystemManager.register(nuiSkinEditorSystem, "engine:NUISkinEditorSystem");
-
-        inputSystem = context.get(InputSystem.class);
+        componentSystemManager.register(classFactory.createInjectableInstance(NUIEditorSystem.class),
+                "engine:NUIEditorSystem");
+        componentSystemManager.register(classFactory.createInjectableInstance(NUISkinEditorSystem.class),
+                "engine:NUISkinEditorSystem");
 
         // TODO: REMOVE this and handle refreshing of core game state at the engine level - see Issue #1127
         new RegisterInputSystem(context).step();
 
         EntityRef localPlayerEntity = entityManager.create(new ClientComponent());
+
         LocalPlayer localPlayer = new LocalPlayer();
-        localPlayer.setRecordAndReplayClasses(context.get(DirectionAndOriginPosRecorderList.class), context.get(RecordAndReplayCurrentStatus.class));
+        localPlayer.setRecordAndReplayClasses(directionAndOriginPosRecorderList, recordAndReplayCurrentStatus);
         context.put(LocalPlayer.class, localPlayer);
         localPlayer.setClientEntity(localPlayerEntity);
 
         componentSystemManager.initialise();
 
-        storageServiceWorker = context.get(StorageServiceWorker.class);
-
         playBackgroundMusic();
 
-        //guiManager.openWindow("main");
-        context.get(NUIManager.class).pushScreen("engine:mainMenuScreen");
+        nuiManager.pushScreen("engine:mainMenuScreen");
         if (!messageOnLoad.isEmpty()) {
-            TranslationSystem translationSystem = context.get(TranslationSystem.class);
             MessagePopup popup = nuiManager.pushScreen(MessagePopup.ASSET_URI, MessagePopup.class);
             popup.setMessage("Error", translationSystem.translate(messageOnLoad));
         }
@@ -134,9 +138,7 @@ public class StateMainMenu implements GameState {
     }
 
     private void pushLaunchPopup() {
-        Config config = context.get(Config.class);
         TelemetryConfig telemetryConfig = config.getTelemetryConfig();
-        TranslationSystem translationSystem = context.get(TranslationSystem.class);
         TelemetryLogstashAppender appender = TelemetryUtils.fetchTelemetryLogstashAppender();
         if (!telemetryConfig.isLaunchPopupDisabled()) {
             String telemetryTitle = translationSystem.translate("${engine:menu#telemetry-launch-popup-title}");
@@ -156,9 +158,9 @@ public class StateMainMenu implements GameState {
                 appender.stop();
             });
             telemetryConfirmPopup.setOptionButtonText(translationSystem.translate("${engine:menu#telemetry-button}"));
-            telemetryConfirmPopup.setOptionHandler(()-> {
-                nuiManager.pushScreen(TelemetryScreen.ASSET_URI, TelemetryScreen.class);
-            });
+            telemetryConfirmPopup.setOptionHandler(() ->
+                    nuiManager.pushScreen(TelemetryScreen.ASSET_URI, TelemetryScreen.class)
+            );
         }
     }
 
@@ -183,11 +185,11 @@ public class StateMainMenu implements GameState {
     }
 
     private void playBackgroundMusic() {
-        context.get(AudioManager.class).loopMusic(Assets.getMusic("engine:MenuTheme").get());
+        audioManager.loopMusic(Assets.getMusic("engine:MenuTheme").get());
     }
 
     private void stopBackgroundMusic() {
-        context.get(AudioManager.class).stopAllSounds();
+        audioManager.stopAllSounds();
     }
 
     @Override
@@ -226,5 +228,16 @@ public class StateMainMenu implements GameState {
 
     private void updateUserInterface(float delta) {
         nuiManager.update(delta);
+    }
+
+    private void updateContext(Context context) {
+        /*
+         * We can't load the engine without core registry yet.
+         * e.g. the statically created MaterialLoader needs the CoreRegistry to get the AssetManager.
+         * And the engine loads assets while it gets created.
+         */
+        // TODO: Remove
+        CoreRegistry.setContext(context);
+        classFactory.setCurrentContext(context);
     }
 }

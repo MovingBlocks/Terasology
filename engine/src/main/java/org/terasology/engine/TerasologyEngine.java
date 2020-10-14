@@ -539,6 +539,7 @@ public class TerasologyEngine implements GameEngine {
         }
         currentState = newState;
         LoggingContext.setGameState(newState);
+        InjectionHelper.inject(newState, rootContext);
         newState.init(this);
         stateChangeSubscribers.forEach(StateChangeSubscriber::onStateChange);
         InputSystem inputSystem = rootContext.get(InputSystem.class);

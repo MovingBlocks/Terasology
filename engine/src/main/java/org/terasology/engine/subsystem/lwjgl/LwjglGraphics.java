@@ -44,6 +44,7 @@ import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.TextureUtil;
 import org.terasology.rendering.assets.texture.subtexture.Subtexture;
 import org.terasology.rendering.nui.internal.LwjglCanvasRenderer;
+import org.terasology.rendering.nui.internal.TerasologyCanvasRenderer;
 import org.terasology.rendering.opengl.GLSLMaterial;
 import org.terasology.rendering.opengl.GLSLShader;
 import org.terasology.rendering.opengl.OpenGLMesh;
@@ -161,7 +162,9 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
                 () -> new LwjglRenderingSubsystemFactory(bufferPool));
         initDisplay();
         initOpenGL();
-        classFactory.createInjectableInstance(CanvasRenderer.class, LwjglCanvasRenderer.class);
+        CanvasRenderer renderer = classFactory.createInjectableInstance(CanvasRenderer.class,
+                LwjglCanvasRenderer.class);
+        rootContext.put(TerasologyCanvasRenderer.class, (TerasologyCanvasRenderer) renderer);
     }
 
     @Override

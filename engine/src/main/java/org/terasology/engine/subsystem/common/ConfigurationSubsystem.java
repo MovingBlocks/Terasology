@@ -82,9 +82,7 @@ public class ConfigurationSubsystem implements EngineSubsystem {
 
     @Override
     public void postInitialise(Context rootContext) {
-        StorageServiceWorker storageServiceWorker = new StorageServiceWorker(rootContext);
-        storageServiceWorker.initializeFromConfig();
-        rootContext.put(StorageServiceWorker.class, storageServiceWorker);
+        classFactory.createInjectableInstance(StorageServiceWorker.class).initializeFromConfig();
     }
 
     private void checkServerIdentity() {

@@ -1,18 +1,5 @@
-/*
- * Copyright 2013 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.subsystem.headless.mode;
 
 import org.slf4j.Logger;
@@ -46,11 +33,10 @@ import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkMode;
 import org.terasology.recording.DirectionAndOriginPosRecorderList;
 import org.terasology.recording.RecordAndReplayCurrentStatus;
+import org.terasology.registry.ContextAwareClassFactory;
 import org.terasology.registry.CoreRegistry;
-import org.terasology.rendering.nui.NUIManager;
-import org.terasology.nui.canvas.CanvasRenderer;
+import org.terasology.registry.In;
 import org.terasology.rendering.nui.internal.NUIManagerInternal;
-import org.terasology.rendering.nui.internal.TerasologyCanvasRenderer;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameInfo;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameProvider;
 import org.terasology.world.internal.WorldInfo;
@@ -60,45 +46,50 @@ import java.util.List;
 
 /**
  * The class is game selection menu replacement for the headless server.
- *
  */
 public class StateHeadlessSetup implements GameState {
 
     private static final Logger logger = LoggerFactory.getLogger(StateHeadlessSetup.class);
+    @In
+    DirectionAndOriginPosRecorderList directionAndOriginPosRecorderList;
+    @In
+    RecordAndReplayCurrentStatus recordAndReplayCurrentStatus;
+    @In
+    private ContextAwareClassFactory classFactory;
+    @In
+    private InputSystem inputSystem;
+    @In
+    private Config config;
+    @In
+    private ModuleManager moduleManager;
 
     private EngineEntityManager entityManager;
     private EventSystem eventSystem;
     private ComponentSystemManager componentSystemManager;
     private Context context;
 
-    public StateHeadlessSetup() {
-    }
-
     @Override
     public void init(GameEngine gameEngine) {
         context = gameEngine.createChildContext();
-        CoreRegistry.setContext(context);
+        updateContext(context);
 
         // let's get the entity event system running
         EntitySystemSetupUtil.addEntityManagementRelatedClasses(context);
         entityManager = context.get(EngineEntityManager.class);
-
         eventSystem = context.get(EventSystem.class);
-        context.put(Console.class, new ConsoleImpl(context));
 
-        NUIManager nuiManager = new NUIManagerInternal((TerasologyCanvasRenderer) context.get(CanvasRenderer.class), context);
-        context.put(NUIManager.class, nuiManager);
+        classFactory.createInjectableInstance(Console.class, ConsoleImpl.class);
 
-        componentSystemManager = new ComponentSystemManager(context);
-        context.put(ComponentSystemManager.class, componentSystemManager);
+        classFactory.createInjectableInstance(NUIManagerInternal.class);
 
+        componentSystemManager = classFactory.createInjectableInstance(ComponentSystemManager.class);
         componentSystemManager.register(new ConsoleSystem(), "engine:ConsoleSystem");
         componentSystemManager.register(new CoreCommands(), "engine:CoreCommands");
-        componentSystemManager.register(context.get(InputSystem.class), "engine:InputSystem");
+        componentSystemManager.register(inputSystem, "engine:InputSystem");
 
         EntityRef localPlayerEntity = entityManager.create(new ClientComponent());
         LocalPlayer localPlayer = new LocalPlayer();
-        localPlayer.setRecordAndReplayClasses(context.get(DirectionAndOriginPosRecorderList.class), context.get(RecordAndReplayCurrentStatus.class));
+        localPlayer.setRecordAndReplayClasses(directionAndOriginPosRecorderList, recordAndReplayCurrentStatus);
         context.put(LocalPlayer.class, localPlayer);
         localPlayer.setClientEntity(localPlayerEntity);
 
@@ -106,13 +97,12 @@ public class StateHeadlessSetup implements GameState {
 
         GameManifest gameManifest;
         List<GameInfo> savedGames = GameProvider.getSavedGames();
-        if (savedGames.size() > 0) {
+        if (!savedGames.isEmpty()) {
             gameManifest = savedGames.get(0).getManifest();
         } else {
             gameManifest = createGameManifest();
         }
 
-        Config config = context.get(Config.class);
         WorldInfo worldInfo = gameManifest.getWorldInfo(TerasologyConstants.MAIN_WORLD);
         config.getUniverseConfig().addWorldManager(worldInfo);
         config.getUniverseConfig().setSpawnWorldTitle(worldInfo.getTitle());
@@ -123,9 +113,6 @@ public class StateHeadlessSetup implements GameState {
 
     public GameManifest createGameManifest() {
         GameManifest gameManifest = new GameManifest();
-
-        Config config = context.get(Config.class);
-        ModuleManager moduleManager = context.get(ModuleManager.class);
         for (Name moduleName : config.getDefaultModSelection().listModules()) {
             Module module = moduleManager.getRegistry().getLatestModuleVersion(moduleName);
             if (module != null) {
@@ -154,7 +141,8 @@ public class StateHeadlessSetup implements GameState {
 
         gameManifest.setTitle(worldGenConfig.getWorldTitle());
         gameManifest.setSeed(worldGenConfig.getDefaultSeed());
-        WorldInfo worldInfo = new WorldInfo(TerasologyConstants.MAIN_WORLD, worldGenConfig.getWorldTitle(), gameManifest.getSeed(),
+        WorldInfo worldInfo = new WorldInfo(TerasologyConstants.MAIN_WORLD, worldGenConfig.getWorldTitle(),
+                gameManifest.getSeed(),
                 (long) (WorldTime.DAY_LENGTH * WorldTime.NOON_OFFSET), worldGeneratorUri);
         gameManifest.addWorld(worldInfo);
         return gameManifest;
@@ -171,6 +159,7 @@ public class StateHeadlessSetup implements GameState {
 
     @Override
     public void handleInput(float delta) {
+        // headless haven't input
     }
 
     @Override
@@ -180,6 +169,7 @@ public class StateHeadlessSetup implements GameState {
 
     @Override
     public void render() {
+        // headless haven't output
     }
 
     @Override
@@ -195,5 +185,16 @@ public class StateHeadlessSetup implements GameState {
     @Override
     public Context getContext() {
         return context;
+    }
+
+    private void updateContext(Context context) {
+        /*
+         * We can't load the engine without core registry yet.
+         * e.g. the statically created MaterialLoader needs the CoreRegistry to get the AssetManager.
+         * And the engine loads assets while it gets created.
+         */
+        // TODO: Remove
+        CoreRegistry.setContext(context);
+        classFactory.setCurrentContext(context);
     }
 }

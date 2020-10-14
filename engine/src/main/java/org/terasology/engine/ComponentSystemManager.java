@@ -1,18 +1,5 @@
-/*
- * Copyright 2017 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine;
 
 import com.google.common.collect.ArrayListMultimap;
@@ -60,13 +47,13 @@ public class ComponentSystemManager {
 
     private static final Logger logger = LoggerFactory.getLogger(ComponentSystemManager.class);
 
-    private Map<String, ComponentSystem> namedLookup = Maps.newHashMap();
-    private List<UpdateSubscriberSystem> updateSubscribers = Lists.newArrayList();
-    private List<RenderSystem> renderSubscribers = Lists.newArrayList();
-    private List<ComponentSystem> store = Lists.newArrayList();
+    private final Map<String, ComponentSystem> namedLookup = Maps.newHashMap();
+    private final List<UpdateSubscriberSystem> updateSubscribers = Lists.newArrayList();
+    private final List<RenderSystem> renderSubscribers = Lists.newArrayList();
+    private final List<ComponentSystem> store = Lists.newArrayList();
 
     private Console console;
-    private Context context;
+    private final Context context;
 
     private boolean initialised;
 
@@ -131,7 +118,7 @@ public class ComponentSystemManager {
         context.get(EntityManager.class).getEventSystem().registerEventHandler(object);
 
         if (initialised) {
-            logger.warn("System " + object.getClass().getName() + " registered post-init.");
+            logger.warn("System {} registered post-init.", object.getClass().getName());
             initialiseSystem(object);
         }
     }
@@ -154,7 +141,7 @@ public class ComponentSystemManager {
     }
 
     private void initialiseSystem(ComponentSystem system) {
-        InjectionHelper.inject(system);
+        InjectionHelper.inject(system, context);
 
         if (console != null) {
             MethodCommand.registerAvailable(system, console, context);

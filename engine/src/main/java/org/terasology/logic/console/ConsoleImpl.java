@@ -1,18 +1,5 @@
-/*
- * Copyright 2017 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.logic.console;
 
@@ -25,7 +12,6 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.context.Context;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.console.commandSystem.ConsoleCommand;
 import org.terasology.logic.console.commandSystem.exceptions.CommandExecutionException;
@@ -35,6 +21,7 @@ import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkSystem;
 import org.terasology.nui.FontColor;
 import org.terasology.nui.FontUnderline;
+import org.terasology.registry.In;
 import org.terasology.utilities.collection.CircularBuffer;
 
 import java.util.Arrays;
@@ -58,13 +45,10 @@ public class ConsoleImpl implements Console {
     private final Map<Name, ConsoleCommand> commandRegistry = Maps.newHashMap();
     private final Set<ConsoleSubscriber> messageSubscribers = Sets.newHashSet();
 
+    @In
     private NetworkSystem networkSystem;
-    private Context context;
-
-    public ConsoleImpl(Context context) {
-        this.networkSystem = context.get(NetworkSystem.class);
-        this.context = context;
-    }
+    @In
+    private PermissionManager permissionManager;
 
     /**
      * Registers a {@link org.terasology.logic.console.commandSystem.ConsoleCommand}.
@@ -292,8 +276,6 @@ public class ConsoleImpl implements Console {
 
     private boolean clientHasPermission(EntityRef callingClient, String requiredPermission) {
         Preconditions.checkNotNull(callingClient, "The calling client must not be null!");
-
-        PermissionManager permissionManager = context.get(PermissionManager.class);
         boolean hasPermission = true;
 
         if (permissionManager != null && requiredPermission != null

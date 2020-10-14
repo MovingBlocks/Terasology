@@ -33,6 +33,7 @@ import org.terasology.rendering.assets.skeletalmesh.SkeletalMesh;
 import org.terasology.rendering.assets.texture.PNGTextureFormat;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.subtexture.Subtexture;
+import org.terasology.rendering.nui.internal.TerasologyCanvasRenderer;
 
 public class HeadlessGraphics implements EngineSubsystem {
 
@@ -69,7 +70,9 @@ public class HeadlessGraphics implements EngineSubsystem {
         classFactory.createInjectableInstance(RenderingSubsystemFactory.class, HeadlessRenderingSubsystemFactory.class);
         classFactory.createInjectableInstance(DisplayDevice.class, HeadlessDisplayDevice.class);
         classFactory.createInjectableInstance(ShaderManager.class, ShaderManagerHeadless.class);
-        classFactory.createInjectableInstance(CanvasRenderer.class, HeadlessCanvasRenderer.class);
+        CanvasRenderer renderer = classFactory.createInjectableInstance(CanvasRenderer.class,
+                HeadlessCanvasRenderer.class);
+        context.put(TerasologyCanvasRenderer.class, (TerasologyCanvasRenderer) renderer);
     }
 
 }

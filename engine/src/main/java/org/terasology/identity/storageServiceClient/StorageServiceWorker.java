@@ -1,18 +1,5 @@
-/*
- * Copyright 2017 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.identity.storageServiceClient;
 
 import com.google.common.collect.ImmutableMap;
@@ -22,7 +9,6 @@ import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
 import org.terasology.config.IdentityStorageServiceConfig;
 import org.terasology.config.SecurityConfig;
-import org.terasology.context.Context;
 import org.terasology.i18n.TranslationSystem;
 import org.terasology.identity.ClientIdentity;
 import org.terasology.identity.PublicIdentityCertificate;
@@ -57,11 +43,11 @@ public final class StorageServiceWorker {
     private final Deque<ConsoleNotification> notificationBuffer;
     private Map<PublicIdentityCertificate, ClientIdentity> conflictSolutionsToUpload;
 
-    public StorageServiceWorker(Context context) {
-        this.config = context.get(Config.class);
+    public StorageServiceWorker(Config config, TranslationSystem translationSystem) {
+        this.config = config;
+        this.translationSystem = translationSystem;
         this.storageConfig = this.config.getIdentityStorageService();
         this.securityConfig = this.config.getSecurity();
-        this.translationSystem = context.get(TranslationSystem.class);
         this.notificationBuffer = new LinkedBlockingDeque<>();
         this.conflictingRemoteIdentities = new ArrayDeque<>();
     }
@@ -191,8 +177,9 @@ public final class StorageServiceWorker {
     }
 
     private static final class ConsoleNotification {
-        private String messageId;
-        private Object[] args;
+        private final String messageId;
+        private final Object[] args;
+
         private ConsoleNotification(String messageId, Object[] args) {
             this.messageId = messageId;
             this.args = args;
