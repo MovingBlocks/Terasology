@@ -8,6 +8,7 @@ import org.terasology.util.reflection.ParameterProvider;
 import org.terasology.util.reflection.SimpleClassFactory;
 
 import java.util.Optional;
+import java.util.function.Supplier;
 
 public class ContextAwareClassFactory extends SimpleClassFactory {
     private Context currentContext;
@@ -45,9 +46,20 @@ public class ContextAwareClassFactory extends SimpleClassFactory {
     }
 
     public <T, R extends T> T createInjectableInstance(Class<T> iface, Class<R> type) {
-        T instance = instantiateClass(type).get();
+        T instance = createWithContext(type);
         getCurrentContext().put(iface, instance);
         return instance;
+    }
+
+    public <T, R extends T> T createInjectable(Class<T> iface, Supplier<R> creator) {
+        T instance = creator.get();
+        InjectionHelper.inject(instance, currentContext);
+        getCurrentContext().put(iface, instance);
+        return instance;
+    }
+
+    public <T> T createWithContext(Class<T> type) {
+        return instantiateClass(type).get();
     }
 
     private static class ContextParameterProvider implements ParameterProvider {

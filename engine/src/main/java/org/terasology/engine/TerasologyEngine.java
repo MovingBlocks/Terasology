@@ -55,6 +55,7 @@ import org.terasology.reflection.reflect.ReflectFactory;
 import org.terasology.reflection.reflect.ReflectionReflectFactory;
 import org.terasology.registry.ContextAwareClassFactory;
 import org.terasology.registry.CoreRegistry;
+import org.terasology.registry.InjectionHelper;
 import org.terasology.rendering.gltf.ByteBufferAsset;
 import org.terasology.version.TerasologyVersion;
 import org.terasology.world.block.loader.BlockFamilyDefinition;
@@ -250,6 +251,7 @@ public class TerasologyEngine implements GameEngine {
         changeStatus(TerasologyEngineStatus.PREPARING_SUBSYSTEMS);
         for (EngineSubsystem subsystem : getSubsystems()) {
             changeStatus(() -> "Pre-initialising " + subsystem.getName() + " subsystem");
+            InjectionHelper.inject(subsystem, rootContext);
             subsystem.preInitialise(rootContext);
         }
     }
@@ -258,6 +260,7 @@ public class TerasologyEngine implements GameEngine {
         changeStatus(TerasologyEngineStatus.INITIALIZING_SUBSYSTEMS);
         for (EngineSubsystem subsystem : getSubsystems()) {
             changeStatus(() -> "Initialising " + subsystem.getName() + " subsystem");
+            InjectionHelper.inject(subsystem, rootContext);
             subsystem.initialise(this, rootContext);
         }
     }
@@ -268,6 +271,7 @@ public class TerasologyEngine implements GameEngine {
     private void postInitSubsystems() {
         for (EngineSubsystem subsystem : getSubsystems()) {
             changeStatus(() -> "Post-Initialising " + subsystem.getName() + " subsystem");
+            InjectionHelper.inject(subsystem, rootContext);
             subsystem.postInitialise(rootContext);
         }
     }
@@ -309,8 +313,6 @@ public class TerasologyEngine implements GameEngine {
     }
 
     private void initAssets() {
-
-
         // cast lambdas explicitly to avoid inconsistent compiler behavior wrt. type inference
         assetTypeManager.registerCoreAssetType(Prefab.class,
                 PojoPrefab::new, false, "prefabs");

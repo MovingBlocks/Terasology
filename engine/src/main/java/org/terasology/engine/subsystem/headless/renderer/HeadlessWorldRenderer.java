@@ -1,18 +1,5 @@
-/*
- * Copyright 2017 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.subsystem.headless.renderer;
 
 import com.google.common.collect.Lists;
@@ -24,12 +11,13 @@ import org.terasology.math.Region3i;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.monitoring.PerformanceMonitor;
+import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.cameras.SubmersibleCamera;
 import org.terasology.rendering.dag.RenderGraph;
-import org.terasology.rendering.world.viewDistance.ViewDistance;
 import org.terasology.rendering.world.WorldRenderer;
+import org.terasology.rendering.world.viewDistance.ViewDistance;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.ChunkProvider;
@@ -42,26 +30,26 @@ import java.util.List;
 
 public class HeadlessWorldRenderer implements WorldRenderer {
 
-    private static final int MAX_CHUNKS = ViewDistance.MEGA.getChunkDistance().x() * ViewDistance.MEGA.getChunkDistance().y() * ViewDistance.MEGA.getChunkDistance().z();
+    private static final int MAX_CHUNKS =
+            ViewDistance.MEGA.getChunkDistance().x() * ViewDistance.MEGA.getChunkDistance().y() * ViewDistance.MEGA.getChunkDistance().z();
 
+    @In
     private WorldProvider worldProvider;
+    @In
     private ChunkProvider chunkProvider;
+    @In
+    private Config config;
 
-    private Camera noCamera = new NullCamera(null, null);
+    private final Camera noCamera = new NullCamera(null, null);
 
     /* CHUNKS */
     private boolean pendingChunks;
     private final List<RenderableChunk> chunksInProximity = Lists.newArrayListWithCapacity(MAX_CHUNKS);
-    private Vector3i chunkPos = new Vector3i();
-
-    private Config config;
+    private final Vector3i chunkPos = new Vector3i();
 
     public HeadlessWorldRenderer(Context context) {
-        this.worldProvider = context.get(WorldProvider.class);
-        this.chunkProvider = context.get(ChunkProvider.class);
         LocalPlayerSystem localPlayerSystem = context.get(LocalPlayerSystem.class);
         localPlayerSystem.setPlayerCamera(noCamera);
-        config = context.get(Config.class);
     }
 
     @Override
@@ -208,7 +196,7 @@ public class HeadlessWorldRenderer implements WorldRenderer {
         if (!newChunkPos.equals(chunkPos) || force || pendingChunks) {
             Vector3ic viewingDistance = config.getRendering().getViewDistance().getChunkDistance();
             Region3i viewRegion = Region3i.createFromCenterExtents(newChunkPos, new Vector3i(viewingDistance.x() / 2, viewingDistance.y() / 2, viewingDistance.z() / 2));
-            if (chunksInProximity.size() == 0 || force || pendingChunks) {
+            if (chunksInProximity.isEmpty() || force || pendingChunks) {
                 // just add all visible chunks
                 chunksInProximity.clear();
                 for (Vector3i chunkPosition : viewRegion) {

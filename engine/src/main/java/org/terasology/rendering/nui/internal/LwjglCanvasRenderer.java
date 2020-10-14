@@ -15,7 +15,6 @@ import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
-import org.terasology.context.Context;
 import org.terasology.math.AABB;
 import org.terasology.math.JomlUtil;
 import org.terasology.math.MatrixUtils;
@@ -78,39 +77,39 @@ public class LwjglCanvasRenderer implements TerasologyCanvasRenderer, PropertyCh
     private static final String CROPPING_BOUNDARIES_PARAM = "croppingBoundaries";
     private static final Rect2f FULL_REGION = Rect2f.createFromMinAndSize(0, 0, 1, 1);
     private Matrix4f modelView;
-    private FloatBuffer matrixBuffer = BufferUtils.createFloatBuffer(16);
-    private Mesh billboard;
+    private final FloatBuffer matrixBuffer = BufferUtils.createFloatBuffer(16);
+    private final Mesh billboard;
 
-    private Material textureMat;
+    private final Material textureMat;
 
     private final FontMeshBuilder fontMeshBuilder;
 
     // Text mesh caching
-    private Map<TextCacheKey, Map<Material, Mesh>> cachedText = Maps.newLinkedHashMap();
-    private Set<TextCacheKey> usedText = Sets.newHashSet();
+    private final Map<TextCacheKey, Map<Material, Mesh>> cachedText = Maps.newLinkedHashMap();
+    private final Set<TextCacheKey> usedText = Sets.newHashSet();
 
     // Texutre mesh caching
-    private Map<TextureCacheKey, Mesh> cachedTextures = Maps.newLinkedHashMap();
-    private Set<TextureCacheKey> usedTextures = Sets.newHashSet();
+    private final Map<TextureCacheKey, Mesh> cachedTextures = Maps.newLinkedHashMap();
+    private final Set<TextureCacheKey> usedTextures = Sets.newHashSet();
 
     private Rect2i requestedCropRegion;
     private Rect2i currentTextureCropRegion;
 
-    private Map<ResourceUrn, LwjglFrameBufferObject> fboMap = Maps.newHashMap();
-    private RenderingConfig renderingConfig;
+    private final Map<ResourceUrn, LwjglFrameBufferObject> fboMap = Maps.newHashMap();
+    private final RenderingConfig renderingConfig;
     private float uiScale = 1f;
 
-    public LwjglCanvasRenderer(Context context) {
+    public LwjglCanvasRenderer(Config config, AssetManager assetManager) {
         // TODO use context to get assets instead of static methods
         this.textureMat = Assets.getMaterial("engine:UITexture").orElseThrow(
                 // Extra attention to how this is reported because it's often the first texture
                 // engine tries to load; the build is probably broken.
                 () -> new RuntimeException("Failing to find engine textures"));
         this.billboard = Assets.getMesh("engine:UIBillboard").get();
-        this.fontMeshBuilder = new FontMeshBuilder(context.get(AssetManager.class).getAsset("engine:UIUnderline", Material.class).get());
+        this.fontMeshBuilder = new FontMeshBuilder(assetManager.getAsset("engine:UIUnderline", Material.class).get());
         // failure to load these can be due to failing shaders or missing resources
 
-        this.renderingConfig = context.get(Config.class).getRendering();
+        this.renderingConfig = config.getRendering();
         this.uiScale = this.renderingConfig.getUiScale() / 100f;
 
         this.renderingConfig.subscribe(RenderingConfig.UI_SCALE, this);
@@ -584,14 +583,15 @@ public class LwjglCanvasRenderer implements TerasologyCanvasRenderer, PropertyCh
     }
 
     /**
-     * A key that identifies an entry in the texture cache. It contains the elements that affect the generation of mesh for texture rendering.
+     * A key that identifies an entry in the texture cache. It contains the elements that affect the generation of mesh
+     * for texture rendering.
      */
     private static class TextureCacheKey {
 
-        private Vector2i textureSize;
-        private Vector2i areaSize;
-        private Border border;
-        private boolean tiled;
+        private final Vector2i textureSize;
+        private final Vector2i areaSize;
+        private final Border border;
+        private final boolean tiled;
 
         TextureCacheKey(Vector2i textureSize, Vector2i areaSize) {
             this.textureSize = new Vector2i(textureSize);

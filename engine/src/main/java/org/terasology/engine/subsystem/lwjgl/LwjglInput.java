@@ -1,24 +1,10 @@
-/*
- * Copyright 2014 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *  http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.subsystem.lwjgl;
 
 import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
-import org.terasology.assets.module.ModuleAwareAssetTypeManager;
 import org.terasology.config.Config;
 import org.terasology.config.ControllerConfig;
 import org.terasology.context.Context;
@@ -28,18 +14,22 @@ import org.terasology.input.InputSystem;
 import org.terasology.input.lwjgl.JInputControllerDevice;
 import org.terasology.input.lwjgl.LwjglKeyboardDevice;
 import org.terasology.input.lwjgl.LwjglMouseDevice;
+import org.terasology.registry.ContextAwareClassFactory;
+import org.terasology.registry.In;
 
 public class LwjglInput extends BaseLwjglSubsystem {
 
+    @In
+    private ContextAwareClassFactory classFactory;
+    @In
+    private Config config;
+
     private Context context;
+
 
     @Override
     public String getName() {
         return "Input";
-    }
-
-    @Override
-    public void registerCoreAssetTypes(ModuleAwareAssetTypeManager assetTypeManager) {
     }
 
     @Override
@@ -66,12 +56,11 @@ public class LwjglInput extends BaseLwjglSubsystem {
             Keyboard.create();
             Keyboard.enableRepeatEvents(true);
             Mouse.create();
-            InputSystem inputSystem = new InputSystem();
-            context.put(InputSystem.class, inputSystem);
+            InputSystem inputSystem = classFactory.createInjectableInstance(InputSystem.class);
             inputSystem.setMouseDevice(new LwjglMouseDevice(context));
             inputSystem.setKeyboardDevice(new LwjglKeyboardDevice());
 
-            ControllerConfig controllerConfig = context.get(Config.class).getInput().getControllers();
+            ControllerConfig controllerConfig = config.getInput().getControllers();
             JInputControllerDevice controllerDevice = new JInputControllerDevice(controllerConfig);
             inputSystem.setControllerDevice(controllerDevice);
         } catch (LWJGLException e) {

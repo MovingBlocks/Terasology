@@ -1,18 +1,5 @@
-/*
- * Copyright 2018 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.subsystem.rpc;
 
 import ch.qos.logback.classic.Level;
@@ -28,6 +15,7 @@ import org.terasology.config.Config;
 import org.terasology.context.Context;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.subsystem.EngineSubsystem;
+import org.terasology.registry.In;
 
 import java.time.OffsetDateTime;
 
@@ -45,15 +33,17 @@ public class DiscordRPCSubSystem implements EngineSubsystem, IPCListener, Runnab
     private static final int RECONNECT_TRIES = 5;
     private static DiscordRPCSubSystem instance;
 
+    @In
+    private Config config;
+
     private IPCClient ipcClient;
     private boolean ready;
     private boolean autoReconnect;
-    private Thread reconnectThread;
+    private final Thread reconnectThread;
     private RichPresence lastRichPresence;
     private boolean reconnecting;
     private int reconnectTries = 1;
     private boolean connectedBefore;
-    private Config config;
     private String lastState;
     private boolean dontTryAgain;
     private boolean enabled;
@@ -178,8 +168,7 @@ public class DiscordRPCSubSystem implements EngineSubsystem, IPCListener, Runnab
         disableLogger(IPCClient.class);
         disableLogger(WindowsPipe.class);
         disableLogger(Pipe.class);
-        Config c = rootContext.get(Config.class);
-        enabled = c.getPlayer().isDiscordPresence();
+        enabled = config.getPlayer().isDiscordPresence();
         if (!enabled) {
             return;
         }
@@ -192,7 +181,6 @@ public class DiscordRPCSubSystem implements EngineSubsystem, IPCListener, Runnab
 
     @Override
     public void postInitialise(Context context) {
-        config = context.get(Config.class);
         setState("In Lobby");
     }
 

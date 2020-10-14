@@ -1,18 +1,5 @@
-/*
- * Copyright 2017 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.subsystem.common;
 
 import ch.qos.logback.classic.LoggerContext;
@@ -25,6 +12,8 @@ import org.terasology.config.facade.TelemetryConfiguration;
 import org.terasology.config.facade.TelemetryConfigurationImpl;
 import org.terasology.context.Context;
 import org.terasology.engine.subsystem.EngineSubsystem;
+import org.terasology.registry.ContextAwareClassFactory;
+import org.terasology.registry.In;
 import org.terasology.telemetry.Metrics;
 import org.terasology.telemetry.TelemetryEmitter;
 import org.terasology.telemetry.logstash.TelemetryLogstashAppender;
@@ -37,14 +26,23 @@ import static org.terasology.telemetry.TelemetryEmitter.DEFAULT_COLLECTOR_PORT;
 import static org.terasology.telemetry.TelemetryEmitter.DEFAULT_COLLECTOR_PROTOCOL;
 
 /**
- * This is a telemetry engine sub system.
- * It will initialise all the telemetry stuff such as the {@link com.snowplowanalytics.snowplow.tracker.emitter.Emitter} and configure the {@link org.terasology.telemetry.logstash.TelemetryLogstashAppender}.
- * It will also adds the {@link org.terasology.telemetry.Metrics} and the {@link org.terasology.telemetry.TelemetryEmitter} to the context so that we can be use them later in other class for telemetry.
+ * This is a telemetry engine sub system. It will initialise all the telemetry stuff such as the {@link
+ * com.snowplowanalytics.snowplow.tracker.emitter.Emitter} and configure the {@link
+ * org.terasology.telemetry.logstash.TelemetryLogstashAppender}. It will also adds the {@link
+ * org.terasology.telemetry.Metrics} and the {@link org.terasology.telemetry.TelemetryEmitter} to the context so that we
+ * can be use them later in other class for telemetry.
+ *
  * @see <a href="https://github.com/GabrielXia/telemetry/wiki">https://github.com/GabrielXia/telemetry/wiki</a>
  */
 public class TelemetrySubSystem implements EngineSubsystem {
 
     private static final Logger logger = LoggerFactory.getLogger(TelemetrySubSystem.class);
+
+    @In
+    private ContextAwareClassFactory classFactory;
+
+    @In
+    private Config config;
 
     private Metrics metrics;
 
@@ -57,11 +55,6 @@ public class TelemetrySubSystem implements EngineSubsystem {
 
     @Override
     public void preInitialise(Context rootContext) {
-
-        // Add metrics to context, this helps show metric values in ui
-        metrics = new Metrics();
-        rootContext.put(Metrics.class, metrics);
-
         // Add snowplow emitter to context, contributors can use this emitter to emit other event
         emitter = TelemetryEmitter.builder().build();
         rootContext.put(Emitter.class, emitter);
@@ -69,17 +62,16 @@ public class TelemetrySubSystem implements EngineSubsystem {
 
     @Override
     public void postInitialise(Context rootContext) {
-
-        metrics.initialise(rootContext);
+        metrics = classFactory.createInjectableInstance(Metrics.class);
+        metrics.initialise();
 
         // Add the telemetryConfig adapter to context. It could be used in modules.
-        Config config = rootContext.get(Config.class);
         TelemetryConfig telemetryConfig = config.getTelemetryConfig();
         TelemetryConfiguration telemetryConfiguration = new TelemetryConfigurationImpl(telemetryConfig);
         rootContext.put(TelemetryConfiguration.class, telemetryConfiguration);
 
         addTelemetryLogstashAppender(rootContext);
-        setTelemetryDestination(rootContext);
+        setTelemetryDestination();
     }
 
     private void addTelemetryLogstashAppender(Context rootContext) {
@@ -87,7 +79,7 @@ public class TelemetrySubSystem implements EngineSubsystem {
         TelemetryLogstashAppender telemetryLogstashAppender = new TelemetryLogstashAppender(rootContext);
         lc.getLogger(Logger.ROOT_LOGGER_NAME).addAppender(telemetryLogstashAppender);
 
-        Config config = rootContext.get(Config.class);
+
         TelemetryConfig telemetryConfig = config.getTelemetryConfig();
         String errorReportingDestination = telemetryConfig.getErrorReportingDestination();
         if (errorReportingDestination == null) {
@@ -100,8 +92,7 @@ public class TelemetrySubSystem implements EngineSubsystem {
         }
     }
 
-    private void setTelemetryDestination(Context rootContext) {
-        Config config = rootContext.get(Config.class);
+    private void setTelemetryDestination() {
         TelemetryConfig telemetryConfig = config.getTelemetryConfig();
         String telemetryDestination = telemetryConfig.getTelemetryDestination();
         if (telemetryDestination != null) {
