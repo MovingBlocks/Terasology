@@ -507,7 +507,10 @@ public final class ChunkMath {
      * @param region
      * @param side
      * @return
+     * @deprecated This is scheduled for removal in an upcoming version
+     *             method will be replaced with JOML implementation {@link #getEdgeRegion(BlockRegion, Side, BlockRegion)}.
      */
+    @Deprecated
     public static Region3i getEdgeRegion(Region3i region, Side side) {
         Vector3ic sideDir = side.direction();
         Vector3i min = region.min();
@@ -534,6 +537,84 @@ public final class ChunkMath {
             edgeMax.z = max.z;
         }
         return Region3i.createFromMinMax(edgeMin, edgeMax);
+    }
+
+    /**
+     * A 1 wide region that borders the provided {@link Side} of a chunk
+     *
+     * @param region the current region
+     * @param side the side to border
+     * @param dest will hold the result
+     * @return dest
+     */
+    public static BlockRegion getEdgeRegion(BlockRegion region, Side side, BlockRegion dest) {
+        switch (side) {
+            case TOP:
+                return dest.setMin(
+                    region.getMinX(),
+                    region.getMaxY(),
+                    region.getMinZ()
+                ).setMax(
+                    region.getMaxX(),
+                    region.getMaxY(),
+                    region.getMaxZ());
+            case BOTTOM:
+                return dest.setMin(
+                    region.getMinX(),
+                    region.getMinY(),
+                    region.getMinZ()
+                ).setMax(
+                    region.getMaxX(),
+                    region.getMinY(),
+                    region.getMaxZ());
+            case LEFT:
+                return dest.setMin(
+                    region.getMinX(),
+                    region.getMinY(),
+                    region.getMinZ()
+                ).setMax(
+                    region.getMinX(),
+                    region.getMaxY(),
+                    region.getMaxZ());
+            case RIGHT:
+                return dest.setMin(
+                    region.getMaxX(),
+                    region.getMinY(),
+                    region.getMinZ()
+                ).setMax(
+                    region.getMaxX(),
+                    region.getMaxY(),
+                    region.getMaxZ());
+            case FRONT:
+                return dest.setMin(
+                    region.getMinX(),
+                    region.getMinY(),
+                    region.getMinZ()
+                ).setMax(
+                    region.getMaxX(),
+                    region.getMaxY(),
+                    region.getMinZ());
+            case BACK:
+                return dest.setMin(
+                    region.getMinX(),
+                    region.getMinY(),
+                    region.getMaxZ()
+                ).setMax(
+                    region.getMaxX(),
+                    region.getMaxY(),
+                    region.getMaxZ());
+            default:
+                return dest.setMin(
+                    region.getMinX(),
+                    region.getMinY(),
+                    region.getMinZ()
+                ).setMax(
+                    region.getMaxX(),
+                    region.getMaxY(),
+                    region.getMaxZ()
+                );
+
+        }
     }
 
     /**
