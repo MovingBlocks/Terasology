@@ -58,7 +58,7 @@ public class ChunkRelevanceRegion {
     }
 
     public Vector3i getCenter() {
-        return new Vector3i(center);
+        return center;
     }
 
     public void setRelevanceDistance(Vector3i distance) {
