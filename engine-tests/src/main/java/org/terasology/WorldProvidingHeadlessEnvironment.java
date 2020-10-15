@@ -3,6 +3,7 @@
 package org.terasology;
 
 import org.terasology.engine.ComponentSystemManager;
+import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.naming.Name;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.world.BlockEntityRegistry;
@@ -30,7 +31,7 @@ public class WorldProvidingHeadlessEnvironment extends HeadlessEnvironment {
         WorldProvider world = new WorldProviderWrapper(stub, context.get(ExtraBlockDataManager.class));
         CoreRegistry.put(WorldProvider.class, world);
         CoreRegistry.put(BlockEntityRegistry.class, new EntityAwareWorldProvider(stub,
-                context.get(ComponentSystemManager.class)));
+                context.get(ComponentSystemManager.class), context.get(EngineEntityManager.class)));
     }
 
 }

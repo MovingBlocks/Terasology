@@ -70,9 +70,6 @@ public class WorldAtlasImpl implements WorldAtlas {
 
     private final Consumer<BlockTile> tileReloadListener = reloadQueue::add;
 
-    /**
-     * @param maxAtlasSize The maximum dimensions of the atlas (both width and height, in pixels)
-     */
     public WorldAtlasImpl(Config config) {
         this.maxAtlasSize = config.getRendering().getMaxTextureAtlasResolution();
         Assets.list(BlockTile.class).forEach(this::indexTile);

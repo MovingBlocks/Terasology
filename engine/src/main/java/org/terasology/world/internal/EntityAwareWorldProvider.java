@@ -37,7 +37,6 @@ import org.terasology.math.geom.Vector3i;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.network.NetworkComponent;
 import org.terasology.reflection.metadata.FieldMetadata;
-import org.terasology.registry.In;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.OnChangedBlock;
 import org.terasology.world.block.Block;
@@ -52,13 +51,14 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator implements BlockEntityRegistry, UpdateSubscriberSystem, EntityChangeSubscriber {
+public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator implements BlockEntityRegistry,
+        UpdateSubscriberSystem, EntityChangeSubscriber {
     private static final Logger logger = LoggerFactory.getLogger(EntityAwareWorldProvider.class);
     private static final Set<Class<? extends Component>> COMMON_BLOCK_COMPONENTS =
             ImmutableSet.of(NetworkComponent.class, BlockComponent.class, LocationComponent.class);
 
-    @In
-    private EngineEntityManager entityManager;
+
+    private final EngineEntityManager entityManager;
 
     // TODO: Perhaps a better datastructure for spatial lookups
     // TODO: Or perhaps a build in indexing system for entities
@@ -69,9 +69,11 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
 
     private final Set<EntityRef> temporaryBlockEntities = Sets.newLinkedHashSet();
 
-    public EntityAwareWorldProvider(WorldProviderCore base, ComponentSystemManager componentSystemManager) {
+    public EntityAwareWorldProvider(WorldProviderCore base, ComponentSystemManager componentSystemManager,
+                                    EngineEntityManager entityManager) {
         super(base);
         componentSystemManager.register(getTime());
+        this.entityManager = entityManager;
     }
 
     @Override
