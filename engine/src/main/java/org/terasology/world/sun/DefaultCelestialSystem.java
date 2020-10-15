@@ -1,23 +1,10 @@
-/*
-  * Copyright 2017 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *  http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.world.sun;
 
+import com.google.common.collect.Iterables;
 import com.google.common.math.LongMath;
-import org.terasology.context.Context;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
@@ -36,20 +23,15 @@ import static org.terasology.world.time.WorldTime.DAY_LENGTH;
 public class DefaultCelestialSystem extends BaseComponentSystem implements CelestialSystem, UpdateSubscriberSystem {
 
     private final WorldTime worldTime;
-
-    private long lastUpdate;
-
     private final CelestialModel model;
-
     private final EntityManager entityManager;
-
+    private long lastUpdate;
     private boolean haltSunPosition = false;
 
     private float haltedTime = 0f;
 
-    public DefaultCelestialSystem(CelestialModel model, Context context) {
-        WorldProvider worldProvider = context.get(WorldProvider.class);
-        entityManager = context.get(EntityManager.class);
+    public DefaultCelestialSystem(CelestialModel model, WorldProvider worldProvider, EntityManager entityManager) {
+        this.entityManager = entityManager;
         worldTime = worldProvider.getTime();
         lastUpdate = worldTime.getMilliseconds();
         this.model = model;
@@ -68,7 +50,7 @@ public class DefaultCelestialSystem extends BaseComponentSystem implements Celes
         } else {
             days = getWorldTime().getDays();
         }
-        return  model.getSunPosAngle(days);
+        return model.getSunPosAngle(days);
     }
 
     @Override
@@ -77,14 +59,14 @@ public class DefaultCelestialSystem extends BaseComponentSystem implements Celes
     }
 
     @Override
-    public void toggleSunHalting (float timeInDays) {
+    public void toggleSunHalting(float timeInDays) {
         haltSunPosition = !haltSunPosition;
         haltedTime = timeInDays;
     }
+
     /**
-     * Updates the game perception of the time of day via launching a new OnMiddayEvent(),
-     * OnDuskEvent(), OnMidnightEvent(), or OnDawnEvent() based on the time of day when
-     * this method is called upon.
+     * Updates the game perception of the time of day via launching a new OnMiddayEvent(), OnDuskEvent(),
+     * OnMidnightEvent(), or OnDawnEvent() based on the time of day when this method is called upon.
      */
     protected void fireEvents() {
         long startTime = worldTime.getMilliseconds();
@@ -127,9 +109,8 @@ public class DefaultCelestialSystem extends BaseComponentSystem implements Celes
     }
 
     protected EntityRef getWorldEntity() {
-        for (EntityRef entity : entityManager.getEntitiesWith(WorldComponent.class)) {
-            return entity;
-        }
-        return EntityRef.NULL;
+        return Iterables.getFirst(
+                entityManager.getEntitiesWith(WorldComponent.class),
+                EntityRef.NULL);
     }
 }

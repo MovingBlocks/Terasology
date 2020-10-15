@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.world.chunks.localChunkProvider;
 
-import com.google.common.collect.Maps;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -71,15 +70,13 @@ class LocalChunkProviderTest {
         extraDataManager = new ExtraBlockDataManager();
         blockEntityRegistry = mock(BlockEntityRegistry.class);
         worldEntity = mock(EntityRef.class);
-        chunkCache = Maps.newConcurrentMap();
         storageManager = new TestStorageManager();
         generator = new TestWorldGenerator(blockManager);
         chunkProvider = new LocalChunkProvider(storageManager,
                 entityManager,
                 generator,
                 blockManager,
-                extraDataManager,
-                chunkCache);
+                extraDataManager);
         chunkProvider.setBlockEntityRegistry(blockEntityRegistry);
         chunkProvider.setWorldEntity(worldEntity);
         chunkProvider.setRelevanceSystem(new RelevanceSystem(chunkProvider)); // workaround. initialize loading pipeline

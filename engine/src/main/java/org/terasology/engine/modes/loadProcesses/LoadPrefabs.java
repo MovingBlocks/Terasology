@@ -1,36 +1,22 @@
-/*
- * Copyright 2013 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.engine.modes.loadProcesses;
 
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
-import org.terasology.context.Context;
+import org.terasology.engine.modes.ExpectedCost;
 import org.terasology.engine.modes.StepBasedLoadProcess;
 import org.terasology.entitySystem.prefab.Prefab;
+import org.terasology.registry.In;
 
 import java.util.Iterator;
 
+@ExpectedCost(1)
 public class LoadPrefabs extends StepBasedLoadProcess {
-    private final AssetManager assetManager;
+    @In
+    private AssetManager assetManager;
     private Iterator<ResourceUrn> prefabs;
-
-    public LoadPrefabs(Context context) {
-        this.assetManager = context.get(AssetManager.class);
-    }
 
     @Override
     public String getMessage() {
@@ -50,10 +36,5 @@ public class LoadPrefabs extends StepBasedLoadProcess {
     public void begin() {
         prefabs = assetManager.getAvailableAssets(Prefab.class).iterator();
         setTotalSteps(assetManager.getAvailableAssets(Prefab.class).size());
-    }
-
-    @Override
-    public int getExpectedCost() {
-        return 1;
     }
 }

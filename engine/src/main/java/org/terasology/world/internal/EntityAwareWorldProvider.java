@@ -1,18 +1,5 @@
-/*
- * Copyright 2016 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.world.internal;
 
@@ -25,13 +12,11 @@ import org.joml.Vector3fc;
 import org.joml.Vector3ic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.context.Context;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.GameThread;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.ComponentContainer;
 import org.terasology.entitySystem.entity.EntityBuilder;
-import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.entitySystem.entity.internal.EntityChangeSubscriber;
@@ -52,6 +37,7 @@ import org.terasology.math.geom.Vector3i;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.network.NetworkComponent;
 import org.terasology.reflection.metadata.FieldMetadata;
+import org.terasology.registry.In;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.OnChangedBlock;
 import org.terasology.world.block.Block;
@@ -69,24 +55,23 @@ import java.util.Set;
 public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator implements BlockEntityRegistry, UpdateSubscriberSystem, EntityChangeSubscriber {
     private static final Logger logger = LoggerFactory.getLogger(EntityAwareWorldProvider.class);
     private static final Set<Class<? extends Component>> COMMON_BLOCK_COMPONENTS =
-        ImmutableSet.of(NetworkComponent.class, BlockComponent.class, LocationComponent.class);
-    private static final float BLOCK_REGEN_SECONDS = 4.0f;
+            ImmutableSet.of(NetworkComponent.class, BlockComponent.class, LocationComponent.class);
 
+    @In
     private EngineEntityManager entityManager;
 
     // TODO: Perhaps a better datastructure for spatial lookups
     // TODO: Or perhaps a build in indexing system for entities
-    private Map<Vector3i, EntityRef> blockEntityLookup = Maps.newHashMap();
+    private final Map<Vector3i, EntityRef> blockEntityLookup = Maps.newHashMap();
 
-    private Map<Vector3i, EntityRef> blockRegionLookup = Maps.newHashMap();
-    private Map<EntityRef, Region3i> blockRegions = Maps.newHashMap();
+    private final Map<Vector3i, EntityRef> blockRegionLookup = Maps.newHashMap();
+    private final Map<EntityRef, Region3i> blockRegions = Maps.newHashMap();
 
-    private Set<EntityRef> temporaryBlockEntities = Sets.newLinkedHashSet();
+    private final Set<EntityRef> temporaryBlockEntities = Sets.newLinkedHashSet();
 
-    public EntityAwareWorldProvider(WorldProviderCore base, Context context) {
+    public EntityAwareWorldProvider(WorldProviderCore base, ComponentSystemManager componentSystemManager) {
         super(base);
-        entityManager = (EngineEntityManager) context.get(EntityManager.class);
-        context.get(ComponentSystemManager.class).register(getTime());
+        componentSystemManager.register(getTime());
     }
 
     @Override
@@ -96,18 +81,22 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
 
     @Override
     public void preBegin() {
+        // Not needed
     }
 
     @Override
     public void postBegin() {
+        // Not needed
     }
 
     @Override
     public void preSave() {
+        // Not needed
     }
 
     @Override
     public void postSave() {
+        // Not needed
     }
 
     @Override
@@ -240,7 +229,7 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
             EntityRef blockEntity = getBlockEntityAt(position);
             Block oldType = super.setBlock(position, type);
             if (oldType != null) {
-                updateBlockEntity(blockEntity, JomlUtil.from(position), oldType, type, true, Collections.<Class<? extends Component>>emptySet());
+                updateBlockEntity(blockEntity, JomlUtil.from(position), oldType, type, true, Collections.emptySet());
             }
             return oldType;
         }
@@ -557,6 +546,7 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
 
     @Override
     public void onEntityComponentChange(EntityRef entity, Class<? extends Component> component) {
+        // blank
     }
 
     @Override

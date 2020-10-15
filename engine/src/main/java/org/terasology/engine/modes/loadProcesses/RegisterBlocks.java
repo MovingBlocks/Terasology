@@ -1,32 +1,20 @@
-/*
- * Copyright 2013 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.engine.modes.loadProcesses;
 
+import org.jetbrains.annotations.NotNull;
 import org.terasology.assets.management.AssetManager;
-import org.terasology.config.Config;
-import org.terasology.context.Context;
+import org.terasology.engine.modes.ExpectedCost;
 import org.terasology.engine.modes.SingleStepLoadProcess;
-import org.terasology.engine.module.ModuleManager;
 import org.terasology.game.GameManifest;
-import org.terasology.module.ModuleEnvironment;
+import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.persistence.typeHandling.extensionTypes.BlockFamilyTypeHandler;
 import org.terasology.persistence.typeHandling.extensionTypes.BlockTypeHandler;
+import org.terasology.registry.ContextAwareClassFactory;
+import org.terasology.registry.In;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.family.BlockFamily;
@@ -35,16 +23,21 @@ import org.terasology.world.block.internal.BlockManagerImpl;
 import org.terasology.world.block.tiles.WorldAtlas;
 import org.terasology.world.block.tiles.WorldAtlasImpl;
 
-/**
- */
+@ExpectedCost(1)
 public class RegisterBlocks extends SingleStepLoadProcess {
-    private final Context context;
-    private final GameManifest gameManifest;
 
-    public RegisterBlocks(Context context, GameManifest gameManifest) {
-        this.context = context;
-        this.gameManifest = gameManifest;
-    }
+    @In
+    private ContextAwareClassFactory classFactory;
+    @In
+    private GameManifest gameManifest;
+    @In
+    private NetworkSystem networkSystem;
+    @In
+    private TypeHandlerLibrary typeHandlerLibrary;
+    @In
+    private AssetManager assetManager;
+    @In
+    private NetworkMode networkMode;
 
     @Override
     public String getMessage() {
@@ -53,33 +46,29 @@ public class RegisterBlocks extends SingleStepLoadProcess {
 
     @Override
     public boolean step() {
-        NetworkSystem networkSystem = context.get(NetworkSystem.class);
-        WorldAtlas atlas = new WorldAtlasImpl(context.get(Config.class).getRendering().getMaxTextureAtlasResolution());
-        context.put(WorldAtlas.class, atlas);
+        WorldAtlas atlas = classFactory.createInjectableInstance(WorldAtlasImpl.class, WorldAtlas.class);
+        classFactory.createInjectableInstance(BlockFamilyLibrary.class);
 
-        ModuleEnvironment environment = context.get(ModuleManager.class).getEnvironment();
-        context.put(BlockFamilyLibrary.class, new BlockFamilyLibrary(environment, context));
+        BlockManagerImpl blockManager = classFactory.createInjectable(BlockManager.class,
+                () -> createBlockManager(atlas));
 
-
-        BlockManagerImpl blockManager;
-        if (networkSystem.getMode().isAuthority()) {
-            blockManager = new BlockManagerImpl(atlas, context.get(AssetManager.class), true);
-            blockManager.subscribe(context.get(NetworkSystem.class));
-        } else {
-            blockManager = new BlockManagerImpl(atlas, context.get(AssetManager.class), false);
-        }
-        context.put(BlockManager.class, blockManager);
-        context.get(TypeHandlerLibrary.class).addTypeHandler(Block.class, new BlockTypeHandler(blockManager));
-        context.get(TypeHandlerLibrary.class).addTypeHandler(BlockFamily.class, new BlockFamilyTypeHandler(blockManager));
+        typeHandlerLibrary.addTypeHandler(Block.class, new BlockTypeHandler(blockManager));
+        typeHandlerLibrary.addTypeHandler(BlockFamily.class, new BlockFamilyTypeHandler(blockManager));
 
         blockManager.initialise(gameManifest.getRegisteredBlockFamilies(), gameManifest.getBlockIdMap());
 
         return true;
     }
 
-    @Override
-    public int getExpectedCost() {
-        return 1;
+    @NotNull
+    private BlockManagerImpl createBlockManager(WorldAtlas atlas) {
+        BlockManagerImpl blockManager;
+        if (networkMode.isAuthority()) {
+            blockManager = new BlockManagerImpl(atlas, assetManager, true);
+            blockManager.subscribe(networkSystem);
+        } else {
+            blockManager = new BlockManagerImpl(atlas, assetManager, false);
+        }
+        return blockManager;
     }
-
 }

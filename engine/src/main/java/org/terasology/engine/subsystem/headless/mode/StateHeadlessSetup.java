@@ -51,9 +51,9 @@ public class StateHeadlessSetup implements GameState {
 
     private static final Logger logger = LoggerFactory.getLogger(StateHeadlessSetup.class);
     @In
-    DirectionAndOriginPosRecorderList directionAndOriginPosRecorderList;
+    private DirectionAndOriginPosRecorderList directionAndOriginPosRecorderList;
     @In
-    RecordAndReplayCurrentStatus recordAndReplayCurrentStatus;
+    private RecordAndReplayCurrentStatus recordAndReplayCurrentStatus;
     @In
     private ContextAwareClassFactory classFactory;
     @In
@@ -78,7 +78,7 @@ public class StateHeadlessSetup implements GameState {
         entityManager = context.get(EngineEntityManager.class);
         eventSystem = context.get(EventSystem.class);
 
-        classFactory.createInjectableInstance(Console.class, ConsoleImpl.class);
+        classFactory.createInjectableInstance(ConsoleImpl.class, Console.class);
 
         classFactory.createInjectableInstance(NUIManagerInternal.class);
 

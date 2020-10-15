@@ -109,8 +109,8 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
         logger.info("Starting initialization of LWJGL");
         this.engine = gameEngine;
         this.renderingConfig = config.getRendering();
-        lwjglDisplay = (LwjglDisplayDevice) classFactory.createInjectableInstance(DisplayDevice.class,
-                LwjglDisplayDevice.class);
+        lwjglDisplay = classFactory.createInjectableInstance(LwjglDisplayDevice.class, DisplayDevice.class
+        );
         logger.info("Initial initialization complete");
     }
 
@@ -162,8 +162,8 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
                 () -> new LwjglRenderingSubsystemFactory(bufferPool));
         initDisplay();
         initOpenGL();
-        CanvasRenderer renderer = classFactory.createInjectableInstance(CanvasRenderer.class,
-                LwjglCanvasRenderer.class);
+        CanvasRenderer renderer = classFactory.createInjectableInstance(LwjglCanvasRenderer.class, CanvasRenderer.class
+        );
         rootContext.put(TerasologyCanvasRenderer.class, (TerasologyCanvasRenderer) renderer);
     }
 
@@ -269,7 +269,7 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
         checkOpenGL();
         glViewport(0, 0, Display.getWidth(), Display.getHeight());
         initOpenGLParams();
-        classFactory.createInjectableInstance(ShaderManager.class, ShaderManagerLwjgl.class);
+        classFactory.createInjectableInstance(ShaderManagerLwjgl.class, ShaderManager.class);
     }
 
     private void checkOpenGL() {

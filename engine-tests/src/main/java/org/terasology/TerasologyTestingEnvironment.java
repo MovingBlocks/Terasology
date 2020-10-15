@@ -34,6 +34,7 @@ import org.terasology.recording.RecordAndReplaySerializer;
 import org.terasology.recording.RecordAndReplayUtils;
 import org.terasology.recording.RecordedEventStore;
 import org.terasology.reflection.TypeRegistry;
+import org.terasology.registry.ContextAwareClassFactory;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.chunks.blockdata.ExtraBlockDataManager;
 
@@ -75,7 +76,7 @@ public abstract class TerasologyTestingEnvironment {
 
     @BeforeEach
     public void setup() throws Exception {
-
+        ContextAwareClassFactory classFactory = ContextAwareClassFactory.create(context);
         context.put(ModuleManager.class, moduleManager);
         RecordAndReplayCurrentStatus recordAndReplayCurrentStatus = context.get(RecordAndReplayCurrentStatus.class);
 
@@ -105,7 +106,7 @@ public abstract class TerasologyTestingEnvironment {
 
         ComponentSystemManager componentSystemManager = new ComponentSystemManager(context);
         context.put(ComponentSystemManager.class, componentSystemManager);
-        LoadPrefabs prefabLoadStep = new LoadPrefabs(context);
+        LoadPrefabs prefabLoadStep = classFactory.createWithContext(LoadPrefabs.class);
 
         boolean complete = false;
         prefabLoadStep.begin();

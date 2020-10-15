@@ -20,7 +20,6 @@ import org.terasology.identity.CertificatePair;
 import org.terasology.identity.PrivateIdentityCertificate;
 import org.terasology.identity.PublicIdentityCertificate;
 import org.terasology.identity.storageServiceClient.StorageServiceWorker;
-import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.registry.ContextAwareClassFactory;
 import org.terasology.registry.In;
 
@@ -66,16 +65,15 @@ public class ConfigurationSubsystem implements EngineSubsystem {
         logger.info("Video Settings: {}", config.renderConfigAsJson(config.getRendering()));
 
         //add facades
-        classFactory.createInjectableInstance(InputDeviceConfiguration.class, InputDeviceConfigurationImpl.class);
-        classFactory.createInjectableInstance(BindsConfiguration.class, BindsConfigurationImpl.class);
+        classFactory.createInjectableInstance(InputDeviceConfigurationImpl.class, InputDeviceConfiguration.class);
+        classFactory.createInjectableInstance(BindsConfigurationImpl.class, BindsConfiguration.class);
     }
 
     @Override
     public void initialise(GameEngine engine, Context rootContext) {
         // TODO: Put here because of TypeHandlerLibrary dependency,
         //  might need to move to preInitialise or elsewhere
-        autoConfigManager = new AutoConfigManager(rootContext.get(TypeHandlerLibrary.class));
-        rootContext.put(AutoConfigManager.class, autoConfigManager);
+        autoConfigManager = classFactory.createInjectableInstance(AutoConfigManager.class);
 
         autoConfigManager.loadConfigsIn(rootContext);
     }

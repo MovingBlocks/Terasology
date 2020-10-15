@@ -28,7 +28,7 @@ public class HeadlessAudio implements EngineSubsystem {
 
     @Override
     public void initialise(GameEngine engine, Context context) {
-        initNoSound(context);
+        audioManager = classFactory.createInjectableInstance(NullAudioManager.class, AudioManager.class);
     }
 
     @Override
@@ -45,10 +45,6 @@ public class HeadlessAudio implements EngineSubsystem {
     @Override
     public void shutdown() {
         audioManager.dispose();
-    }
-
-    private void initNoSound(Context context) {
-        audioManager = classFactory.createInjectableInstance(AudioManager.class, NullAudioManager.class);
     }
 
 }

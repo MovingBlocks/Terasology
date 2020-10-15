@@ -13,7 +13,6 @@ import org.terasology.crashreporter.CrashReporter;
 import org.terasology.engine.EngineTime;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.LoggingContext;
-import org.terasology.engine.Time;
 import org.terasology.engine.modes.loadProcesses.AwaitCharacterSpawn;
 import org.terasology.engine.modes.loadProcesses.CreateRemoteWorldEntity;
 import org.terasology.engine.modes.loadProcesses.CreateWorldEntity;
@@ -50,11 +49,11 @@ import org.terasology.game.Game;
 import org.terasology.game.GameManifest;
 import org.terasology.network.JoinStatus;
 import org.terasology.network.NetworkMode;
+import org.terasology.registry.ContextAwareClassFactory;
 import org.terasology.registry.CoreRegistry;
+import org.terasology.registry.In;
 import org.terasology.rendering.nui.NUIManager;
-import org.terasology.nui.canvas.CanvasRenderer;
 import org.terasology.rendering.nui.internal.NUIManagerInternal;
-import org.terasology.rendering.nui.internal.TerasologyCanvasRenderer;
 import org.terasology.rendering.nui.layers.mainMenu.loadingScreen.LoadingScreen;
 import org.terasology.world.chunks.event.OnChunkLoaded;
 
@@ -64,18 +63,28 @@ public class StateLoading implements GameState {
 
     private static final Logger logger = LoggerFactory.getLogger(StateLoading.class);
 
+    @In
+    private ContextAwareClassFactory classFactory;
+    @In
+    private Config config;
+    @In
+    private EngineTime time;
+    @In
+    private Game game;
+    @In
+    private GameEngine gameEngine;
+
+
     private Context context;
-    private GameManifest gameManifest;
-    private NetworkMode netMode;
-    private Queue<LoadProcess> loadProcesses = Queues.newArrayDeque();
+    private final GameManifest gameManifest;
+    private final NetworkMode netMode;
+    private final Queue<Class<? extends LoadProcess>> loadProcesses = Queues.newArrayDeque();
     private LoadProcess current;
     private JoinStatus joinStatus;
 
     private NUIManager nuiManager;
 
     private LoadingScreen loadingScreen;
-
-    private Config config;
 
     private int progress;
     private int maxProgress;
@@ -105,18 +114,15 @@ public class StateLoading implements GameState {
     @Override
     public void init(GameEngine engine) {
         this.context = engine.createChildContext();
-        CoreRegistry.setContext(context);
+        updateContext(context);
 
-        config = context.get(Config.class);
+        this.nuiManager = classFactory.createInjectableInstance(NUIManagerInternal.class, NUIManager.class);
 
-        this.nuiManager = new NUIManagerInternal((TerasologyCanvasRenderer) context.get(CanvasRenderer.class), context);
-        context.put(NUIManager.class, nuiManager);
-
-        EngineTime time = (EngineTime) context.get(Time.class);
         time.setPaused(true);
         time.setGameTime(gameManifest.getTime());
 
-        context.get(Game.class).load(gameManifest);
+        game.load(gameManifest);
+
         switch (netMode) {
             case CLIENT:
                 initClient();
@@ -128,8 +134,13 @@ public class StateLoading implements GameState {
 
         progress = 0;
         maxProgress = 0;
-        for (LoadProcess process : loadProcesses) {
-            maxProgress += process.getExpectedCost();
+        for (Class<? extends LoadProcess> processClass : loadProcesses) {
+            maxProgress += getExpectedCost(processClass);
+        }
+        context.put(NetworkMode.class, netMode);
+        context.put(GameManifest.class, gameManifest);
+        if (joinStatus != null) {
+            context.put(JoinStatus.class, joinStatus);
         }
 
         popStep();
@@ -140,78 +151,71 @@ public class StateLoading implements GameState {
     }
 
     private void initClient() {
-        loadProcesses.add(new JoinServer(context, gameManifest, joinStatus));
-        loadProcesses.add(new InitialiseEntitySystem(context));
-        loadProcesses.add(new RegisterBlocks(context, gameManifest));
-        loadProcesses.add(new InitialiseGraphics(context));
-        loadProcesses.add(new LoadPrefabs(context));
-        loadProcesses.add(new ProcessBlockPrefabs(context));
-        loadProcesses.add(new LoadExtraBlockData(context));
-        loadProcesses.add(new InitialiseComponentSystemManager(context));
-        loadProcesses.add(new RegisterInputSystem(context));
-        loadProcesses.add(new RegisterSystems(context, netMode));
-        loadProcesses.add(new InitialiseCommandSystem(context));
-        loadProcesses.add(new InitialiseRemoteWorld(context, gameManifest));
-        loadProcesses.add(new InitialisePhysics(context));
-        loadProcesses.add(new InitialiseSystems(context));
-        loadProcesses.add(new PreBeginSystems(context));
-        loadProcesses.add(new CreateRemoteWorldEntity(context));
-        loadProcesses.add(new PostBeginSystems(context));
-        loadProcesses.add(new SetupRemotePlayer(context));
-        loadProcesses.add(new AwaitCharacterSpawn(context));
-        loadProcesses.add(new RegisterBlockFamilies(context));
-        loadProcesses.add(new PrepareWorld(context));
+        loadProcesses.add(JoinServer.class);
+        loadProcesses.add(InitialiseEntitySystem.class);
+        loadProcesses.add(RegisterBlocks.class);
+        loadProcesses.add(InitialiseGraphics.class);
+        loadProcesses.add(LoadPrefabs.class);
+        loadProcesses.add(ProcessBlockPrefabs.class);
+        loadProcesses.add(LoadExtraBlockData.class);
+        loadProcesses.add(InitialiseComponentSystemManager.class);
+        loadProcesses.add(RegisterInputSystem.class);
+        loadProcesses.add(RegisterSystems.class);
+        loadProcesses.add(InitialiseCommandSystem.class);
+        loadProcesses.add(InitialiseRemoteWorld.class);
+        loadProcesses.add(InitialisePhysics.class);
+        loadProcesses.add(InitialiseSystems.class);
+        loadProcesses.add(PreBeginSystems.class);
+        loadProcesses.add(CreateRemoteWorldEntity.class);
+        loadProcesses.add(PostBeginSystems.class);
+        loadProcesses.add(SetupRemotePlayer.class);
+        loadProcesses.add(AwaitCharacterSpawn.class);
+        loadProcesses.add(RegisterBlockFamilies.class);
+        loadProcesses.add(PrepareWorld.class);
     }
 
     private void initHost() {
-        loadProcesses.add(new RegisterMods(context, gameManifest));
-        loadProcesses.add(new InitialiseEntitySystem(context));
-        loadProcesses.add(new RegisterBlocks(context, gameManifest));
-        loadProcesses.add(new InitialiseGraphics(context));
-        loadProcesses.add(new LoadPrefabs(context));
-        loadProcesses.add(new ProcessBlockPrefabs(context));
-        loadProcesses.add(new InitialiseComponentSystemManager(context));
-        loadProcesses.add(new RegisterInputSystem(context));
-        loadProcesses.add(new RegisterSystems(context, netMode));
-        loadProcesses.add(new InitialiseCommandSystem(context));
-        loadProcesses.add(new LoadExtraBlockData(context));
-        loadProcesses.add(new InitialiseWorld(gameManifest, context));
-        loadProcesses.add(new RegisterBlockFamilies(context));
-        loadProcesses.add(new EnsureSaveGameConsistency(context));
-        loadProcesses.add(new InitialisePhysics(context));
-        loadProcesses.add(new InitialiseSystems(context));
-        loadProcesses.add(new PreBeginSystems(context));
-        loadProcesses.add(new LoadEntities(context));
-        loadProcesses.add(new InitialiseBlockTypeEntities(context));
-        loadProcesses.add(new CreateWorldEntity(context, gameManifest));
-        loadProcesses.add(new InitialiseWorldGenerator(context));
-        loadProcesses.add(new InitialiseRecordAndReplay(context));
+        loadProcesses.add(RegisterMods.class);
+        loadProcesses.add(InitialiseEntitySystem.class);
+        loadProcesses.add(RegisterBlocks.class);
+        loadProcesses.add(InitialiseGraphics.class);
+        loadProcesses.add(LoadPrefabs.class);
+        loadProcesses.add(ProcessBlockPrefabs.class);
+        loadProcesses.add(InitialiseComponentSystemManager.class);
+        loadProcesses.add(RegisterInputSystem.class);
+        loadProcesses.add(RegisterSystems.class);
+        loadProcesses.add(InitialiseCommandSystem.class);
+        loadProcesses.add(LoadExtraBlockData.class);
+        loadProcesses.add(InitialiseWorld.class);
+        loadProcesses.add(RegisterBlockFamilies.class);
+        loadProcesses.add(EnsureSaveGameConsistency.class);
+        loadProcesses.add(InitialisePhysics.class);
+        loadProcesses.add(InitialiseSystems.class);
+        loadProcesses.add(PreBeginSystems.class);
+        loadProcesses.add(LoadEntities.class);
+        loadProcesses.add(InitialiseBlockTypeEntities.class);
+        loadProcesses.add(CreateWorldEntity.class);
+        loadProcesses.add(InitialiseWorldGenerator.class);
+        loadProcesses.add(InitialiseRecordAndReplay.class);
         if (netMode.isServer()) {
-            boolean dedicated;
-            if (netMode == NetworkMode.DEDICATED_SERVER) {
-                dedicated = true;
-            } else if (netMode == NetworkMode.LISTEN_SERVER) {
-                dedicated = false;
-            } else {
-                throw new IllegalStateException("Invalid server mode: " + netMode);
-            }
-            loadProcesses.add(new StartServer(context, dedicated));
+            loadProcesses.add(StartServer.class);
         }
-        loadProcesses.add(new PostBeginSystems(context));
+        loadProcesses.add(PostBeginSystems.class);
         if (netMode.hasLocalClient()) {
-            loadProcesses.add(new SetupLocalPlayer(context));
-            loadProcesses.add(new AwaitCharacterSpawn(context));
+            loadProcesses.add(SetupLocalPlayer.class);
+            loadProcesses.add(AwaitCharacterSpawn.class);
         }
-        loadProcesses.add(new PrepareWorld(context));
+        loadProcesses.add(PrepareWorld.class);
     }
 
     private void popStep() {
         if (current != null) {
-            progress += current.getExpectedCost();
+            progress += getExpectedCost(current.getClass());
         }
         current = null;
         if (!loadProcesses.isEmpty()) {
-            current = loadProcesses.remove();
+            Class<? extends LoadProcess> nextProcesses = loadProcesses.remove();
+            current = classFactory.createWithContext(nextProcesses);
             logger.debug(current.getMessage());
             current.begin();
         }
@@ -219,18 +223,16 @@ public class StateLoading implements GameState {
 
     @Override
     public void dispose(boolean shuttingDown) {
-        EngineTime time = (EngineTime) context.get(Time.class);
         time.setPaused(false);
     }
 
     @Override
     public void handleInput(float delta) {
+        // Loading not handle any input. Relax and watch progress.
     }
 
     @Override
     public void update(float delta) {
-        GameEngine gameEngine = context.get(GameEngine.class);
-        EngineTime time = (EngineTime) context.get(Time.class);
         long startTime = time.getRealTimeInMs();
         while (current != null && time.getRealTimeInMs() - startTime < 20 && !gameEngine.hasPendingState()) {
             try {
@@ -249,9 +251,10 @@ public class StateLoading implements GameState {
         if (current == null) {
             nuiManager.closeScreen(loadingScreen);
             nuiManager.setHUDVisible(true);
-            context.get(GameEngine.class).changeState(new StateIngame(gameManifest, context));
+            gameEngine.changeState(new StateIngame(gameManifest, context));
         } else {
-            float progressValue = (progress + current.getExpectedCost() * current.getProgress()) / maxProgress;
+            float progressValue =
+                    (progress + getExpectedCost(current.getClass()) * current.getProgress()) / maxProgress;
             loadingScreen.updateStatus(current.getMessage(), progressValue);
             nuiManager.update(delta);
 
@@ -295,7 +298,22 @@ public class StateLoading implements GameState {
 
     @Override
     public void onChunkLoaded(OnChunkLoaded chunkAvailable, EntityRef worldEntity) {
-        EngineTime time = (EngineTime) context.get(Time.class);
         timeLastChunkGenerated = time.getRealTimeInMs();
+    }
+
+    private int getExpectedCost(Class<? extends LoadProcess> process) {
+        ExpectedCost expectedCost = process.getAnnotation(ExpectedCost.class);
+        return expectedCost != null ? expectedCost.value() : 0;
+    }
+
+    private void updateContext(Context context) {
+        /*
+         * We can't load the engine without core registry yet.
+         * e.g. the statically created MaterialLoader needs the CoreRegistry to get the AssetManager.
+         * And the engine loads assets while it gets created.
+         */
+        // TODO: Remove
+        CoreRegistry.setContext(context);
+        classFactory.setCurrentContext(context);
     }
 }

@@ -4,6 +4,7 @@ package org.terasology.world.chunks.localChunkProvider;
 
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
 import com.google.common.collect.Sets;
 import gnu.trove.list.TIntList;
@@ -93,7 +94,7 @@ public class LocalChunkProvider implements ChunkProvider {
     private static final int UNLOAD_PER_FRAME = 64;
     private final EntityManager entityManager;
     private final BlockingQueue<TShortObjectMap<TIntList>> deactivateBlocksQueue = Queues.newLinkedBlockingQueue();
-    private final Map<Vector3i, Chunk> chunkCache;
+    private final Map<Vector3i, Chunk> chunkCache = Maps.newConcurrentMap();
 
     private final Map<org.joml.Vector3i, List<EntityStore>> generateQueuedEntities = new HashMap<>();
 
@@ -109,15 +110,13 @@ public class LocalChunkProvider implements ChunkProvider {
     private RelevanceSystem relevanceSystem;
 
     public LocalChunkProvider(StorageManager storageManager, EntityManager entityManager, WorldGenerator generator,
-                              BlockManager blockManager, ExtraBlockDataManager extraDataManager,
-                              Map<Vector3i, Chunk> chunkCache) {
+                              BlockManager blockManager, ExtraBlockDataManager extraDataManager) {
         this.storageManager = storageManager;
         this.entityManager = entityManager;
         this.generator = generator;
         this.blockManager = blockManager;
         this.extraDataManager = extraDataManager;
         this.unloadRequestTaskMaster = TaskMaster.createFIFOTaskMaster("Chunk-Unloader", 4);
-        this.chunkCache = chunkCache;
         ChunkMonitor.fireChunkProviderInitialized(this);
     }
 

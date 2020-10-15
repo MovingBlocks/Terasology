@@ -6,6 +6,7 @@ package org.terasology.engine.modes.loadProcesses;
 import org.terasology.context.Context;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.TerasologyConstants;
+import org.terasology.engine.modes.ExpectedCost;
 import org.terasology.engine.modes.SingleStepLoadProcess;
 import org.terasology.engine.subsystem.RenderingSubsystemFactory;
 import org.terasology.game.GameManifest;
@@ -13,6 +14,8 @@ import org.terasology.logic.players.LocalPlayer;
 import org.terasology.network.NetworkSystem;
 import org.terasology.recording.DirectionAndOriginPosRecorderList;
 import org.terasology.recording.RecordAndReplayCurrentStatus;
+import org.terasology.registry.ContextAwareClassFactory;
+import org.terasology.registry.In;
 import org.terasology.rendering.backdrop.BackdropProvider;
 import org.terasology.rendering.backdrop.BackdropRenderer;
 import org.terasology.rendering.backdrop.Skysphere;
@@ -21,24 +24,42 @@ import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.BlockManager;
+import org.terasology.world.chunks.ChunkProvider;
 import org.terasology.world.chunks.blockdata.ExtraBlockDataManager;
 import org.terasology.world.chunks.remoteChunkProvider.RemoteChunkProvider;
 import org.terasology.world.internal.EntityAwareWorldProvider;
+import org.terasology.world.internal.WorldInfo;
+import org.terasology.world.internal.WorldProviderCore;
 import org.terasology.world.internal.WorldProviderCoreImpl;
 import org.terasology.world.internal.WorldProviderWrapper;
 import org.terasology.world.sun.BasicCelestialModel;
+import org.terasology.world.sun.CelestialModel;
 import org.terasology.world.sun.CelestialSystem;
 import org.terasology.world.sun.DefaultCelestialSystem;
 
+@ExpectedCost(1)
 public class InitialiseRemoteWorld extends SingleStepLoadProcess {
-    private final Context context;
-    private final GameManifest gameManifest;
 
-
-    public InitialiseRemoteWorld(Context context, GameManifest gameManifest) {
-        this.context = context;
-        this.gameManifest = gameManifest;
-    }
+    @In
+    private GameManifest gameManifest;
+    @In
+    private DirectionAndOriginPosRecorderList directionAndOriginPosRecorderList;
+    @In
+    private RecordAndReplayCurrentStatus recordAndReplayCurrentStatus;
+    @In
+    private BlockManager blockManager;
+    @In
+    private ContextAwareClassFactory classFactory;
+    @In
+    private ExtraBlockDataManager extraDataManager;
+    @In
+    private NetworkSystem networkSystem;
+    @In
+    private ComponentSystemManager componentSystemManager;
+    @In
+    private RenderingSubsystemFactory engineSubsystemFactory;
+    @In
+    private Context context;
 
     @Override
     public String getMessage() {
@@ -49,48 +70,37 @@ public class InitialiseRemoteWorld extends SingleStepLoadProcess {
     public boolean step() {
 
         // TODO: These shouldn't be done here, nor so strongly tied to the world renderer
-        LocalPlayer localPlayer = new LocalPlayer();
-        localPlayer.setRecordAndReplayClasses(context.get(DirectionAndOriginPosRecorderList.class), context.get(RecordAndReplayCurrentStatus.class));
-        context.put(LocalPlayer.class, localPlayer);
-        BlockManager blockManager = context.get(BlockManager.class);
-        ExtraBlockDataManager extraDataManager = context.get(ExtraBlockDataManager.class);
+        LocalPlayer localPlayer = classFactory.createInjectableInstance(LocalPlayer.class);
+        localPlayer.setRecordAndReplayClasses(directionAndOriginPosRecorderList, recordAndReplayCurrentStatus);
+        RemoteChunkProvider chunkProvider = classFactory.createInjectableInstance(RemoteChunkProvider.class,
+                ChunkProvider.class);
 
-        RemoteChunkProvider chunkProvider = new RemoteChunkProvider(blockManager, localPlayer);
+        context.put(WorldInfo.class, gameManifest.getWorldInfo(TerasologyConstants.MAIN_WORLD));
+        classFactory.createInjectableInstance(WorldProviderCoreImpl.class, WorldProviderCore.class);
+        EntityAwareWorldProvider entityWorldProvider =
+                classFactory.createInjectableInstance(EntityAwareWorldProvider.class,
+                        BlockEntityRegistry.class);
+        classFactory.createInjectableInstance(WorldProviderWrapper.class, WorldProvider.class);
+        componentSystemManager.register(entityWorldProvider, "engine:BlockEntityRegistry");
 
-        WorldProviderCoreImpl worldProviderCore = new WorldProviderCoreImpl(gameManifest.getWorldInfo(TerasologyConstants.MAIN_WORLD), chunkProvider,
-                blockManager.getBlock(BlockManager.UNLOADED_ID), context);
-        EntityAwareWorldProvider entityWorldProvider = new EntityAwareWorldProvider(worldProviderCore, context);
-        WorldProvider worldProvider = new WorldProviderWrapper(entityWorldProvider, extraDataManager);
-        context.put(WorldProvider.class, worldProvider);
-        context.put(BlockEntityRegistry.class, entityWorldProvider);
-        context.get(ComponentSystemManager.class).register(entityWorldProvider, "engine:BlockEntityRegistry");
-
-        DefaultCelestialSystem celestialSystem = new DefaultCelestialSystem(new BasicCelestialModel(), context);
-        context.put(CelestialSystem.class, celestialSystem);
-        context.get(ComponentSystemManager.class).register(celestialSystem);
+        classFactory.createInjectableInstance(BasicCelestialModel.class, CelestialModel.class);
+        DefaultCelestialSystem celestialSystem = classFactory.createInjectableInstance(DefaultCelestialSystem.class,
+                CelestialSystem.class
+        );
+        componentSystemManager.register(celestialSystem);
 
         // Init. a new world
-        Skysphere skysphere = new Skysphere(context);
-        BackdropProvider backdropProvider = skysphere;
-        BackdropRenderer backdropRenderer = skysphere;
-        context.put(BackdropProvider.class, backdropProvider);
-        context.put(BackdropRenderer.class, backdropRenderer);
+        classFactory.createInjectableInstance(Skysphere.class,
+                BackdropProvider.class, BackdropRenderer.class);
 
-        RenderingSubsystemFactory engineSubsystemFactory = context.get(RenderingSubsystemFactory.class);
-        WorldRenderer worldRenderer = engineSubsystemFactory.createWorldRenderer(context);
-        float reflectionHeight = context.get(NetworkSystem.class).getServer().getInfo().getReflectionHeight();
+        WorldRenderer worldRenderer = classFactory.createInjectable(WorldRenderer.class,
+                engineSubsystemFactory::createWorldRenderer);
+        float reflectionHeight = networkSystem.getServer().getInfo().getReflectionHeight();
         worldRenderer.getActiveCamera().setReflectionHeight(reflectionHeight);
-        context.put(WorldRenderer.class, worldRenderer);
         // TODO: These shouldn't be done here, nor so strongly tied to the world renderer
-        context.put(Camera.class, worldRenderer.getActiveCamera());
-        context.get(NetworkSystem.class).setRemoteWorldProvider(chunkProvider);
+        classFactory.createInjectable(Camera.class, worldRenderer::getActiveCamera);
+        networkSystem.setRemoteWorldProvider(chunkProvider);
 
         return true;
     }
-
-    @Override
-    public int getExpectedCost() {
-        return 1;
-    }
-
 }

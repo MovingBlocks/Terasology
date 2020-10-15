@@ -29,7 +29,7 @@ public class NetworkSubsystem implements EngineSubsystem {
 
     @Override
     public void initialise(GameEngine engine, Context rootContext) {
-        networkSystem = classFactory.createInjectableInstance(NetworkSystem.class, NetworkSystemImpl.class);
+        networkSystem = classFactory.createInjectableInstance(NetworkSystemImpl.class, NetworkSystem.class);
     }
 
     @Override

@@ -32,7 +32,7 @@ public class I18nSubsystem implements EngineSubsystem {
 
     @Override
     public void initialise(GameEngine engine, Context rootContext) {
-        classFactory.createInjectableInstance(TranslationSystem.class, TranslationSystemImpl.class);
+        classFactory.createInjectableInstance(TranslationSystemImpl.class, TranslationSystem.class);
     }
 
     @Override

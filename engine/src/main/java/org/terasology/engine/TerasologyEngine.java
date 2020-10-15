@@ -302,7 +302,7 @@ public class TerasologyEngine implements GameEngine {
 
         changeStatus(TerasologyEngineStatus.INITIALIZING_LOWLEVEL_OBJECT_MANIPULATION);
 
-        classFactory.createInjectableInstance(ReflectFactory.class, ReflectionReflectFactory.class);
+        classFactory.createInjectableInstance(ReflectionReflectFactory.class, ReflectFactory.class);
         classFactory.createInjectableInstance(CopyStrategyLibrary.class);
         rootContext.put(TypeHandlerLibrary.class, TypeHandlerLibrary.forModuleEnvironment(moduleManager, typeRegistry));
 

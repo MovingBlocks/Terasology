@@ -24,7 +24,8 @@ public class HeadlessTimer implements TimeSubsystem {
 
     @Override
     public void preInitialise(Context context) {
-        time = (EngineTime) classFactory.createInjectableInstance(Time.class, TimeSystem.class);
+        time = classFactory.createInjectableInstance(TimeSystem.class, Time.class);
+        context.put(EngineTime.class, time);
     }
 
     @Override

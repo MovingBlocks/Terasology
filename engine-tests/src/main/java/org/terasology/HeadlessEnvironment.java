@@ -1,18 +1,5 @@
-/*
- * Copyright 2018 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology;
 
 import org.jboss.shrinkwrap.api.ShrinkWrap;
@@ -43,6 +30,7 @@ import org.terasology.engine.subsystem.headless.assets.HeadlessMesh;
 import org.terasology.engine.subsystem.headless.assets.HeadlessShader;
 import org.terasology.engine.subsystem.headless.assets.HeadlessSkeletalMesh;
 import org.terasology.engine.subsystem.headless.assets.HeadlessTexture;
+import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.internal.PojoPrefab;
@@ -68,6 +56,9 @@ import org.terasology.recording.RecordAndReplayCurrentStatus;
 import org.terasology.recording.RecordAndReplaySerializer;
 import org.terasology.recording.RecordAndReplayUtils;
 import org.terasology.reflection.TypeRegistry;
+import org.terasology.reflection.copy.CopyStrategyLibrary;
+import org.terasology.reflection.reflect.ReflectFactory;
+import org.terasology.registry.ContextAwareClassFactory;
 import org.terasology.rendering.assets.animation.MeshAnimation;
 import org.terasology.rendering.assets.animation.MeshAnimationImpl;
 import org.terasology.rendering.assets.atlas.Atlas;
@@ -113,9 +104,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
- * Setup a headless ( = no graphics ) environment.
- * Based on TerasologyTestingEnvironment code.
- *
+ * Setup a headless ( = no graphics ) environment. Based on TerasologyTestingEnvironment code.
  */
 public class HeadlessEnvironment extends Environment {
 
@@ -142,12 +131,14 @@ public class HeadlessEnvironment extends Environment {
         RecordAndReplayCurrentStatus recordAndReplayCurrentStatus = context.get(RecordAndReplayCurrentStatus.class);
 
         ModuleEnvironment environment = context.get(ModuleManager.class).getEnvironment();
-        context.put(BlockFamilyLibrary.class, new BlockFamilyLibrary(environment,context));
-        
+        context.put(BlockFamilyLibrary.class, new BlockFamilyLibrary(environment, context.get(ReflectFactory.class),
+                context.get(CopyStrategyLibrary.class)));
+
         ExtraBlockDataManager extraDataManager = context.get(ExtraBlockDataManager.class);
 
         context.put(StorageManager.class, new ReadWriteStorageManager(savePath, moduleManager.getEnvironment(),
-                engineEntityManager, blockManager, extraDataManager, recordAndReplaySerializer, recordAndReplayUtils, recordAndReplayCurrentStatus));
+                engineEntityManager, blockManager, extraDataManager, recordAndReplaySerializer, recordAndReplayUtils,
+                recordAndReplayCurrentStatus));
     }
 
     @Override
@@ -167,7 +158,8 @@ public class HeadlessEnvironment extends Environment {
     protected void setupCollisionManager() {
         CollisionGroupManager collisionGroupManager = new CollisionGroupManager();
         context.put(CollisionGroupManager.class, collisionGroupManager);
-        context.get(TypeHandlerLibrary.class).addTypeHandler(CollisionGroup.class, new CollisionGroupTypeHandler(collisionGroupManager));
+        context.get(TypeHandlerLibrary.class).addTypeHandler(CollisionGroup.class,
+                new CollisionGroupTypeHandler(collisionGroupManager));
     }
 
     @Override
@@ -179,7 +171,7 @@ public class HeadlessEnvironment extends Environment {
         typeHandlerLibrary.addTypeHandler(BlockFamily.class, new BlockFamilyTypeHandler(blockManager));
         typeHandlerLibrary.addTypeHandler(Block.class, new BlockTypeHandler(blockManager));
     }
-    
+
     @Override
     protected void setupExtraDataManager(Context context) {
         context.put(ExtraBlockDataManager.class, new ExtraBlockDataManager(context));
@@ -228,7 +220,8 @@ public class HeadlessEnvironment extends Environment {
         assetTypeManager.registerCoreAssetType(Texture.class,
                 HeadlessTexture::new, "textures", "fonts");
         assetTypeManager.registerCoreFormat(Texture.class,
-                new PNGTextureFormat(Texture.FilterMode.NEAREST, path -> path.getName(2).toString().equals("textures")));
+                new PNGTextureFormat(Texture.FilterMode.NEAREST,
+                        path -> path.getName(2).toString().equals("textures")));
         assetTypeManager.registerCoreFormat(Texture.class,
                 new PNGTextureFormat(Texture.FilterMode.LINEAR, path -> path.getName(2).toString().equals("fonts")));
 
@@ -271,7 +264,8 @@ public class HeadlessEnvironment extends Environment {
     @Override
     protected void setupModuleManager(Set<Name> moduleNames) throws Exception {
         TypeRegistry typeRegistry = new TypeRegistry();
-        TypeRegistry.WHITELISTED_CLASSES = ExternalApiWhitelist.CLASSES.stream().map(Class::getName).collect(Collectors.toSet());
+        TypeRegistry.WHITELISTED_CLASSES =
+                ExternalApiWhitelist.CLASSES.stream().map(Class::getName).collect(Collectors.toSet());
         context.put(TypeRegistry.class, typeRegistry);
 
         ModuleManager moduleManager = ModuleManagerFactory.create();
@@ -320,14 +314,15 @@ public class HeadlessEnvironment extends Environment {
 
     @Override
     protected void setupCelestialSystem() {
-        DefaultCelestialSystem celestialSystem = new DefaultCelestialSystem(new BasicCelestialModel(), context);
+        DefaultCelestialSystem celestialSystem = new DefaultCelestialSystem(new BasicCelestialModel(),
+                context.get(WorldProvider.class), context.get(EntityManager.class));
         context.put(CelestialSystem.class, celestialSystem);
     }
 
     @Override
     protected void loadPrefabs() {
-
-        LoadPrefabs prefabLoadStep = new LoadPrefabs(context);
+        ContextAwareClassFactory classFactory = ContextAwareClassFactory.create(context);
+        LoadPrefabs prefabLoadStep = classFactory.createWithContext(LoadPrefabs.class);
 
         boolean complete = false;
         prefabLoadStep.begin();

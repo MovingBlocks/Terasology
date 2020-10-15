@@ -47,6 +47,8 @@ import java.util.stream.Collectors;
 @RegisterSystem
 public class SectorSimulationSystem extends BaseComponentSystem {
 
+    public static final String SECTOR_SIMULATION_ACTION = "sector:simulationAction";
+
     @In
     private EntityManager entityManager;
 
@@ -59,14 +61,8 @@ public class SectorSimulationSystem extends BaseComponentSystem {
     @In
     private ChunkProvider chunkProvider;
 
-    public static final String SECTOR_SIMULATION_ACTION = "sector:simulationAction";
 
-    public SectorSimulationSystem() {
-        time.getFps();
-    }
     /* Set periodic events for each entity */
-
-
     @ReceiveEvent(components = SectorSimulationComponent.class)
     public void simulationComponentAdded(OnAddedComponent event, EntityRef entity) {
         registerSimulationComponent(entity);

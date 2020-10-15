@@ -3,13 +3,9 @@
 
 package org.terasology.world.internal;
 
-import com.google.common.base.Function;
-import com.google.common.base.Predicate;
-import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.joml.Vector3ic;
-import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -17,10 +13,11 @@ import org.terasology.math.ChunkMath;
 import org.terasology.math.JomlUtil;
 import org.terasology.math.Region3i;
 import org.terasology.math.geom.Vector3i;
+import org.terasology.registry.In;
 import org.terasology.world.WorldChangeListener;
 import org.terasology.world.WorldComponent;
 import org.terasology.world.block.Block;
-import org.terasology.world.chunks.Chunk;
+import org.terasology.world.block.BlockManager;
 import org.terasology.world.chunks.ChunkProvider;
 import org.terasology.world.chunks.CoreChunk;
 import org.terasology.world.chunks.LitChunk;
@@ -48,37 +45,38 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
+ *
  */
 public class WorldProviderCoreImpl implements WorldProviderCore {
 
-    private String title;
-    private String customTitle;
+    private final String title;
+    private final String customTitle;
     private String seed = "";
-    private SimpleUri worldGenerator;
+    private final SimpleUri worldGenerator;
 
-    private ChunkProvider chunkProvider;
-    private WorldTime worldTime;
+    private final ChunkProvider chunkProvider;
+    private final WorldTime worldTime;
+    @In
     private EntityManager entityManager;
 
     private final List<WorldChangeListener> listeners = Lists.newArrayList();
 
     private final Map<Vector3i, BlockChange> blockChanges = Maps.newHashMap();
-    private List<BatchPropagator> propagators = Lists.newArrayList();
+    private final List<BatchPropagator> propagators = Lists.newArrayList();
 
-    private Block unloadedBlock;
+    private final Block unloadedBlock;
 
     public WorldProviderCoreImpl(String title, String customTitle, String seed, long time, SimpleUri worldGenerator,
-                                 ChunkProvider chunkProvider, Block unloadedBlock, Context context) {
+                                 ChunkProvider chunkProvider, Block unloadedBlock) {
         this.title = (title == null) ? seed : title;
         this.customTitle = customTitle;
         this.seed = seed;
         this.worldGenerator = worldGenerator;
         this.chunkProvider = chunkProvider;
         this.unloadedBlock = unloadedBlock;
-        this.entityManager = context.get(EntityManager.class);
-        context.put(ChunkProvider.class, chunkProvider);
 
         this.worldTime = new WorldTimeImpl();
         worldTime.setMilliseconds(time);
@@ -88,14 +86,15 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
         PropagationRules sunlightRules = new SunlightPropagationRules(regenWorldView);
         PropagatorWorldView sunlightWorldView = new SunlightWorldView(chunkProvider);
         BatchPropagator sunlightPropagator = new StandardBatchPropagator(sunlightRules, sunlightWorldView);
-        propagators.add(new SunlightRegenBatchPropagator(new SunlightRegenPropagationRules(), regenWorldView, sunlightPropagator, sunlightWorldView));
+        propagators.add(new SunlightRegenBatchPropagator(new SunlightRegenPropagationRules(), regenWorldView,
+                sunlightPropagator, sunlightWorldView));
         propagators.add(sunlightPropagator);
     }
 
-    public WorldProviderCoreImpl(WorldInfo info, ChunkProvider chunkProvider, Block unloadedBlock,
-                                 Context context) {
-        this(info.getTitle(), info.getCustomTitle(), info.getSeed(), info.getTime(), info.getWorldGenerator(), chunkProvider,
-                unloadedBlock, context);
+    public WorldProviderCoreImpl(WorldInfo info, ChunkProvider chunkProvider, BlockManager blockManager) {
+        this(info.getTitle(), info.getCustomTitle(), info.getSeed(), info.getTime(), info.getWorldGenerator(),
+                chunkProvider,
+                blockManager.getBlock(BlockManager.UNLOADED_ID));
     }
 
     @Override
@@ -351,11 +350,9 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
 
     @Override
     public Collection<Region3i> getRelevantRegions() {
-        Collection<Chunk> chunks = chunkProvider.getAllChunks();
-        Function<Chunk, Region3i> mapping = CoreChunk::getRegion;
-
-        Predicate<Chunk> isReady = ManagedChunk::isReady;
-
-        return FluentIterable.from(chunks).filter(isReady).transform(mapping).toList();
+        return chunkProvider.getAllChunks().stream()
+                .filter(ManagedChunk::isReady)
+                .map(CoreChunk::getRegion)
+                .collect(Collectors.toList());
     }
 }

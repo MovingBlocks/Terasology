@@ -1,18 +1,5 @@
-/*
- * Copyright 2013 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.engine.modes.loadProcesses;
 
@@ -23,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.terasology.context.Context;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.bootstrap.EnvironmentSwitchHandler;
+import org.terasology.engine.modes.ExpectedCost;
 import org.terasology.engine.modes.StateMainMenu;
 import org.terasology.engine.modes.VariableStepLoadProcess;
 import org.terasology.engine.module.ModuleManager;
@@ -35,6 +23,7 @@ import org.terasology.network.JoinStatus;
 import org.terasology.network.NetworkSystem;
 import org.terasology.network.Server;
 import org.terasology.network.ServerInfoMessage;
+import org.terasology.registry.In;
 import org.terasology.world.internal.WorldInfo;
 
 import java.util.Map;
@@ -42,23 +31,29 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 //TODO document this!
+@ExpectedCost(10)
 public class JoinServer extends VariableStepLoadProcess {
     private static final Logger logger = LoggerFactory.getLogger(JoinServer.class);
 
-    private Context context;
+    @In
+    private ModuleManager moduleManager;
+    @In
     private NetworkSystem networkSystem;
+    @In
     private GameManifest gameManifest;
+    @In
     private JoinStatus joinStatus;
+    @In
+    private GameEngine gameEngine;
+    @In
+    private Game game;
+    @In
+    private EnvironmentSwitchHandler environmentSwitchHandler;
+    @In
+    private Context context;
 
     private Thread applyModuleThread;
     private ModuleEnvironment oldEnvironment;
-
-    public JoinServer(Context context, GameManifest gameManifest, JoinStatus joinStatus) {
-        this.context = context;
-        this.networkSystem = context.get(NetworkSystem.class);
-        this.gameManifest = gameManifest;
-        this.joinStatus = joinStatus;
-    }
 
     @Override
     public String getMessage() {
@@ -107,14 +102,12 @@ public class JoinServer extends VariableStepLoadProcess {
             gameManifest.setBlockIdMap(blockMap);
             gameManifest.setTime(networkSystem.getServer().getInfo().getTime());
 
-            ModuleManager moduleManager = context.get(ModuleManager.class);
-
             Set<Module> moduleSet = Sets.newLinkedHashSet();
             for (NameVersion moduleInfo : networkSystem.getServer().getInfo().getModuleList()) {
                 Module module = moduleManager.getRegistry().getModule(moduleInfo.getName(), moduleInfo.getVersion());
                 if (module == null) {
                     StateMainMenu mainMenu = new StateMainMenu("Missing required module: " + moduleInfo);
-                    context.get(GameEngine.class).changeState(mainMenu);
+                    gameEngine.changeState(mainMenu);
                     return false;
                 } else {
                     logger.info("Activating module: {}:{}", moduleInfo.getName(), moduleInfo.getVersion());
@@ -126,32 +119,22 @@ public class JoinServer extends VariableStepLoadProcess {
             oldEnvironment = moduleManager.getEnvironment();
             moduleManager.loadEnvironment(moduleSet, true);
 
-            context.get(Game.class).load(gameManifest);
+            game.load(gameManifest);
 
-            EnvironmentSwitchHandler environmentSwitchHandler = context.get(EnvironmentSwitchHandler.class);
             applyModuleThread = new Thread(() -> environmentSwitchHandler.handleSwitchToGameEnvironment(context));
             applyModuleThread.start();
 
             return false;
         } else if (joinStatus.getStatus() == JoinStatus.Status.FAILED) {
             StateMainMenu mainMenu = new StateMainMenu("Failed to connect to server: " + joinStatus.getErrorMessage());
-            context.get(GameEngine.class).changeState(mainMenu);
+            gameEngine.changeState(mainMenu);
             networkSystem.shutdown();
         }
         return false;
     }
 
     @Override
-    public void begin() {
-    }
-
-    @Override
     public float getProgress() {
         return joinStatus.getCurrentActivityProgress();
-    }
-
-    @Override
-    public int getExpectedCost() {
-        return 10;
     }
 }

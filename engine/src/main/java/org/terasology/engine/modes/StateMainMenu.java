@@ -92,9 +92,9 @@ public class StateMainMenu implements GameState {
         entityManager = context.get(EngineEntityManager.class);
         eventSystem = context.get(EventSystem.class);
 
-        console = classFactory.createInjectableInstance(Console.class, ConsoleImpl.class);
+        console = classFactory.createInjectableInstance(ConsoleImpl.class, Console.class);
 
-        nuiManager = classFactory.createInjectableInstance(NUIManager.class, NUIManagerInternal.class); // TODO
+        nuiManager = classFactory.createInjectableInstance(NUIManagerInternal.class, NUIManager.class); // TODO
         // handle context in NuiManager.
         eventSystem.registerEventHandler(nuiManager);
 
@@ -114,7 +114,7 @@ public class StateMainMenu implements GameState {
                 "engine:NUISkinEditorSystem");
 
         // TODO: REMOVE this and handle refreshing of core game state at the engine level - see Issue #1127
-        new RegisterInputSystem(context).step();
+        classFactory.createWithContext(RegisterInputSystem.class).step();
 
         EntityRef localPlayerEntity = entityManager.create(new ClientComponent());
 

@@ -1,18 +1,5 @@
-/*
- * Copyright 2013 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.world.block.tiles;
 
 import com.google.common.collect.Lists;
@@ -25,6 +12,7 @@ import gnu.trove.map.hash.TObjectIntHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
+import org.terasology.config.Config;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Rect2f;
@@ -40,7 +28,9 @@ import org.terasology.rendering.assets.texture.subtexture.SubtextureData;
 import org.terasology.utilities.Assets;
 
 import javax.imageio.ImageIO;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
@@ -69,22 +59,22 @@ public class WorldAtlasImpl implements WorldAtlas {
     private int atlasSize = 256;
     private int tileSize = 16;
 
-    private TObjectIntMap<ResourceUrn> tileIndexes = new TObjectIntHashMap<>();
-    private List<BlockTile> tiles = Lists.newArrayList();
-    private List<BlockTile> tilesNormal = Lists.newArrayList();
-    private List<BlockTile> tilesHeight = Lists.newArrayList();
-    private List<BlockTile> tilesGloss = Lists.newArrayList();
+    private final TObjectIntMap<ResourceUrn> tileIndexes = new TObjectIntHashMap<>();
+    private final List<BlockTile> tiles = Lists.newArrayList();
+    private final List<BlockTile> tilesNormal = Lists.newArrayList();
+    private final List<BlockTile> tilesHeight = Lists.newArrayList();
+    private final List<BlockTile> tilesGloss = Lists.newArrayList();
     private int numFrames = 0;
 
-    private BlockingQueue<BlockTile> reloadQueue = Queues.newLinkedBlockingQueue();
+    private final BlockingQueue<BlockTile> reloadQueue = Queues.newLinkedBlockingQueue();
 
-    private Consumer<BlockTile> tileReloadListener = reloadQueue::add;
+    private final Consumer<BlockTile> tileReloadListener = reloadQueue::add;
 
     /**
      * @param maxAtlasSize The maximum dimensions of the atlas (both width and height, in pixels)
      */
-    public WorldAtlasImpl(int maxAtlasSize) {
-        this.maxAtlasSize = maxAtlasSize;
+    public WorldAtlasImpl(Config config) {
+        this.maxAtlasSize = config.getRendering().getMaxTextureAtlasResolution();
         Assets.list(BlockTile.class).forEach(this::indexTile);
         buildAtlas();
     }

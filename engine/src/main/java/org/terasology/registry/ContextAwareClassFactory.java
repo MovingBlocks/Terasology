@@ -8,6 +8,7 @@ import org.terasology.util.reflection.ParameterProvider;
 import org.terasology.util.reflection.SimpleClassFactory;
 
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class ContextAwareClassFactory extends SimpleClassFactory {
@@ -41,25 +42,36 @@ public class ContextAwareClassFactory extends SimpleClassFactory {
         });
     }
 
-    public <T> T createInjectableInstance(Class<T> type) {
-        return createInjectableInstance(type, type);
-    }
-
-    public <T, R extends T> T createInjectableInstance(Class<T> iface, Class<R> type) {
+    @SafeVarargs
+    public final <T> T createInjectableInstance(Class<T> type, Class<? super T>... registerAs) {
         T instance = createWithContext(type);
-        getCurrentContext().put(iface, instance);
+        if (registerAs.length == 0) {
+            getCurrentContext().put(type, instance);
+        } else {
+            for (Class<? super T> iface : registerAs) {
+                getCurrentContext().put(iface, instance);
+            }
+        }
+
         return instance;
     }
 
-    public <T, R extends T> T createInjectable(Class<T> iface, Supplier<R> creator) {
+    public <T> T createInjectable(Class<? super T> iface, Supplier<T> creator) {
         T instance = creator.get();
         InjectionHelper.inject(instance, currentContext);
         getCurrentContext().put(iface, instance);
         return instance;
     }
 
+    public <T> T createInjectable(Class<T> iface, Function<Context, ? extends T> creator) {
+        T instance = creator.apply(getCurrentContext());
+        InjectionHelper.inject(instance, currentContext);
+        getCurrentContext().put(iface, instance);
+        return instance;
+    }
+
     public <T> T createWithContext(Class<T> type) {
-        return instantiateClass(type).get();
+        return instantiateClass(type).orElseThrow(() -> new RuntimeException("Cannot create instance of [" + type.getCanonicalName() + "], cannot find dependency beans in context"));
     }
 
     private static class ContextParameterProvider implements ParameterProvider {

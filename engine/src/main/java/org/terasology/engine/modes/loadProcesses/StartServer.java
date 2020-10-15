@@ -1,42 +1,38 @@
-/*
- * Copyright 2013 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.engine.modes.loadProcesses;
 
 import org.terasology.config.Config;
-import org.terasology.context.Context;
+import org.terasology.engine.modes.ExpectedCost;
 import org.terasology.engine.modes.SingleStepLoadProcess;
+import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
 import org.terasology.network.exceptions.HostingFailedException;
+import org.terasology.registry.In;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.layers.mainMenu.MessagePopup;
 
-/**
- */
+@ExpectedCost(1)
 public class StartServer extends SingleStepLoadProcess {
 
-    private final Context context;
+    @In
+    private Config config;
+    @In
+    private NUIManager nuiManager;
+    @In
+    private NetworkSystem networkSystem;
+
     private final boolean dedicated;
 
-    /**
-     * @param dedicated true, if server should be dedicated (i.e. with local client)
-     */
-    public StartServer(Context context, boolean dedicated) {
-        this.context = context;
-        this.dedicated = dedicated;
+    public StartServer(NetworkMode netMode) {
+        if (netMode == NetworkMode.DEDICATED_SERVER) {
+            dedicated = true;
+        } else if (netMode == NetworkMode.LISTEN_SERVER) {
+            dedicated = false;
+        } else {
+            throw new IllegalStateException("Invalid server mode: " + netMode);
+        }
     }
 
     @Override
@@ -47,18 +43,12 @@ public class StartServer extends SingleStepLoadProcess {
     @Override
     public boolean step() {
         try {
-            Config config = context.get(Config.class);
             int port = config.getNetwork().getServerPort();
-            context.get(NetworkSystem.class).host(port, dedicated);
+            networkSystem.host(port, dedicated);
         } catch (HostingFailedException e) {
-            context.get(NUIManager.class).pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Failed to Host",
+            nuiManager.pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Failed to Host",
                     e.getMessage() + " - Reverting to single player");
         }
         return true;
-    }
-
-    @Override
-    public int getExpectedCost() {
-        return 1;
     }
 }
