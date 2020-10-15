@@ -32,9 +32,9 @@ public class RegisterInputSystem extends SingleStepLoadProcess {
 
     @Override
     public boolean step() {
-        componentSystemManager.register(classFactory.createInjectableInstance(LocalPlayerSystem.class), "engine" +
+        componentSystemManager.register(classFactory.createToContext(LocalPlayerSystem.class), "engine" +
                 ":localPlayerSystem");
-        componentSystemManager.register(classFactory.createInjectableInstance(CameraTargetSystem.class), "engine" +
+        componentSystemManager.register(classFactory.createToContext(CameraTargetSystem.class), "engine" +
                 ":CameraTargetSystem");
         componentSystemManager.register(inputSystem, "engine:InputSystem");
         return true;

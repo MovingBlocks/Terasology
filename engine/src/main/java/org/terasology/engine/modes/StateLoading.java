@@ -116,7 +116,7 @@ public class StateLoading implements GameState {
         this.context = engine.createChildContext();
         updateContext(context);
 
-        this.nuiManager = classFactory.createInjectableInstance(NUIManagerInternal.class, NUIManager.class);
+        this.nuiManager = classFactory.createToContext(NUIManagerInternal.class, NUIManager.class);
 
         time.setPaused(true);
         time.setGameTime(gameManifest.getTime());

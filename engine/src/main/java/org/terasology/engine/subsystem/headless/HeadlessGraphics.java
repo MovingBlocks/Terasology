@@ -67,10 +67,10 @@ public class HeadlessGraphics implements EngineSubsystem {
 
     @Override
     public void postInitialise(Context context) {
-        classFactory.createInjectableInstance(HeadlessRenderingSubsystemFactory.class, RenderingSubsystemFactory.class);
-        classFactory.createInjectableInstance(HeadlessDisplayDevice.class, DisplayDevice.class);
-        classFactory.createInjectableInstance(ShaderManagerHeadless.class, ShaderManager.class);
-        CanvasRenderer renderer = classFactory.createInjectableInstance(HeadlessCanvasRenderer.class,
+        classFactory.createToContext(HeadlessRenderingSubsystemFactory.class, RenderingSubsystemFactory.class);
+        classFactory.createToContext(HeadlessDisplayDevice.class, DisplayDevice.class);
+        classFactory.createToContext(ShaderManagerHeadless.class, ShaderManager.class);
+        CanvasRenderer renderer = classFactory.createToContext(HeadlessCanvasRenderer.class,
                 CanvasRenderer.class
         );
         context.put(TerasologyCanvasRenderer.class, (TerasologyCanvasRenderer) renderer);

@@ -66,7 +66,7 @@ public class Metrics {
 
     private void initializeMetrics(Set<Class> metricsClassSet) {
         for (Class clazz : metricsClassSet) {
-            classFactory.createInjectableInstance(clazz);
+            classFactory.createToContext(clazz);
         }
     }
 

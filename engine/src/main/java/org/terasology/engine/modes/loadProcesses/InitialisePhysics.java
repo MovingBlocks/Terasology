@@ -29,7 +29,7 @@ public class InitialisePhysics extends SingleStepLoadProcess {
 
     @Override
     public boolean step() {
-        PhysicsEngine physicsEngine = classFactory.createInjectable(PhysicsEngine.class,
+        PhysicsEngine physicsEngine = classFactory.createToContext(PhysicsEngine.class,
                 () -> PhysicsEngineManager.getNewPhysicsEngine(context));
         context.put(Physics.class, physicsEngine);
         return true;

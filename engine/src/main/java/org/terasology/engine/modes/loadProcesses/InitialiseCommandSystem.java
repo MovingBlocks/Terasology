@@ -23,7 +23,7 @@ public class InitialiseCommandSystem extends SingleStepLoadProcess {
 
     @Override
     public boolean step() {
-        classFactory.createInjectableInstance(ConsoleImpl.class, Console.class);
+        classFactory.createToContext(ConsoleImpl.class, Console.class);
         return true;
     }
 }

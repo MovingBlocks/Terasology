@@ -20,7 +20,7 @@ public class HeadlessInput implements EngineSubsystem {
 
     @Override
     public void postInitialise(Context context) {
-        classFactory.createInjectableInstance(InputSystem.class);
+        classFactory.createToContext(InputSystem.class);
     }
 
 }

@@ -92,25 +92,25 @@ public class StateMainMenu implements GameState {
         entityManager = context.get(EngineEntityManager.class);
         eventSystem = context.get(EventSystem.class);
 
-        console = classFactory.createInjectableInstance(ConsoleImpl.class, Console.class);
+        console = classFactory.createToContext(ConsoleImpl.class, Console.class);
 
-        nuiManager = classFactory.createInjectableInstance(NUIManagerInternal.class, NUIManager.class); // TODO
+        nuiManager = classFactory.createToContext(NUIManagerInternal.class, NUIManager.class); // TODO
         // handle context in NuiManager.
         eventSystem.registerEventHandler(nuiManager);
 
-        componentSystemManager = classFactory.createInjectableInstance(ComponentSystemManager.class); // TODO handle
+        componentSystemManager = classFactory.createToContext(ComponentSystemManager.class); // TODO handle
         // context in ComponentSystemManager
 
         // TODO: Reduce coupling between Input system and CameraTargetSystem,
         // TODO: potentially eliminating the following lines. See Issue #1126
 
-        componentSystemManager.register(classFactory.createInjectableInstance(CameraTargetSystem.class),
+        componentSystemManager.register(classFactory.createToContext(CameraTargetSystem.class),
                 "engine:CameraTargetSystem");
         componentSystemManager.register(new ConsoleSystem(), "engine:ConsoleSystem");
         componentSystemManager.register(new CoreCommands(), "engine:CoreCommands");
-        componentSystemManager.register(classFactory.createInjectableInstance(NUIEditorSystem.class),
+        componentSystemManager.register(classFactory.createToContext(NUIEditorSystem.class),
                 "engine:NUIEditorSystem");
-        componentSystemManager.register(classFactory.createInjectableInstance(NUISkinEditorSystem.class),
+        componentSystemManager.register(classFactory.createToContext(NUISkinEditorSystem.class),
                 "engine:NUISkinEditorSystem");
 
         // TODO: REMOVE this and handle refreshing of core game state at the engine level - see Issue #1127

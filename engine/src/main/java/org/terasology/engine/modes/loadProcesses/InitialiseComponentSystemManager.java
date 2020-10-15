@@ -22,7 +22,7 @@ public class InitialiseComponentSystemManager extends SingleStepLoadProcess {
 
     @Override
     public boolean step() {
-        classFactory.createInjectableInstance(ComponentSystemManager.class);
+        classFactory.createToContext(ComponentSystemManager.class);
         return true;
     }
 }

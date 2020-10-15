@@ -25,6 +25,6 @@ public class GameSubsystem implements EngineSubsystem {
 
     @Override
     public void initialise(GameEngine engine, Context rootContext) {
-        classFactory.createInjectableInstance(Game.class);
+        classFactory.createToContext(Game.class);
     }
 }

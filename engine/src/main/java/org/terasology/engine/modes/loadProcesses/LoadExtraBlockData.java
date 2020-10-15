@@ -25,7 +25,7 @@ public class LoadExtraBlockData extends SingleStepLoadProcess {
 
     @Override
     public boolean step() {
-        classFactory.createInjectableInstance(ExtraBlockDataManager.class);
+        classFactory.createToContext(ExtraBlockDataManager.class);
         return true;
     }
 }

@@ -32,7 +32,7 @@ public class HibernationSubsystem implements EngineSubsystem {
 
     @Override
     public void preInitialise(Context rootContext) {
-        hibernationManager = classFactory.createInjectableInstance(HibernationManager.class);
+        hibernationManager = classFactory.createToContext(HibernationManager.class);
     }
 
     @Override

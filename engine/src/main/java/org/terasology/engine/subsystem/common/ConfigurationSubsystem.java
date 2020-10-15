@@ -43,7 +43,7 @@ public class ConfigurationSubsystem implements EngineSubsystem {
 
     @Override
     public void preInitialise(Context rootContext) {
-        config = classFactory.createInjectableInstance(Config.class);
+        config = classFactory.createToContext(Config.class);
         config.load();
 
         String serverPortProperty = System.getProperty(SERVER_PORT_PROPERTY);
@@ -65,22 +65,22 @@ public class ConfigurationSubsystem implements EngineSubsystem {
         logger.info("Video Settings: {}", config.renderConfigAsJson(config.getRendering()));
 
         //add facades
-        classFactory.createInjectableInstance(InputDeviceConfigurationImpl.class, InputDeviceConfiguration.class);
-        classFactory.createInjectableInstance(BindsConfigurationImpl.class, BindsConfiguration.class);
+        classFactory.createToContext(InputDeviceConfigurationImpl.class, InputDeviceConfiguration.class);
+        classFactory.createToContext(BindsConfigurationImpl.class, BindsConfiguration.class);
     }
 
     @Override
     public void initialise(GameEngine engine, Context rootContext) {
         // TODO: Put here because of TypeHandlerLibrary dependency,
         //  might need to move to preInitialise or elsewhere
-        autoConfigManager = classFactory.createInjectableInstance(AutoConfigManager.class);
+        autoConfigManager = classFactory.createToContext(AutoConfigManager.class);
 
         autoConfigManager.loadConfigsIn(rootContext);
     }
 
     @Override
     public void postInitialise(Context rootContext) {
-        classFactory.createInjectableInstance(StorageServiceWorker.class).initializeFromConfig();
+        classFactory.createToContext(StorageServiceWorker.class).initializeFromConfig();
     }
 
     private void checkServerIdentity() {

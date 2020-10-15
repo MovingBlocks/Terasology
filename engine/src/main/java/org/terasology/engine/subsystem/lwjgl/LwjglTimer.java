@@ -25,7 +25,7 @@ public class LwjglTimer extends BaseLwjglSubsystem implements TimeSubsystem {
     @Override
     public void preInitialise(Context context) {
         super.preInitialise(context);
-        time = classFactory.createInjectableInstance(TimeLwjgl.class, Time.class, EngineTime.class);
+        time = classFactory.createToContext(TimeLwjgl.class, Time.class, EngineTime.class);
     }
 
     @Override

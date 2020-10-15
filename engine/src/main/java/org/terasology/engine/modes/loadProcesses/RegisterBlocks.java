@@ -46,10 +46,10 @@ public class RegisterBlocks extends SingleStepLoadProcess {
 
     @Override
     public boolean step() {
-        WorldAtlas atlas = classFactory.createInjectableInstance(WorldAtlasImpl.class, WorldAtlas.class);
-        classFactory.createInjectableInstance(BlockFamilyLibrary.class);
+        WorldAtlas atlas = classFactory.createToContext(WorldAtlasImpl.class, WorldAtlas.class);
+        classFactory.createToContext(BlockFamilyLibrary.class);
 
-        BlockManagerImpl blockManager = classFactory.createInjectable(BlockManager.class,
+        BlockManagerImpl blockManager = classFactory.createToContext(BlockManager.class,
                 () -> createBlockManager(atlas));
 
         typeHandlerLibrary.addTypeHandler(Block.class, new BlockTypeHandler(blockManager));

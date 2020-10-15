@@ -25,6 +25,6 @@ public class CommandSubsystem implements EngineSubsystem {
     @Override
     public void initialise(GameEngine engine, Context rootContext) {
         // TODO make ParameterAdapterManager injects to adapters
-        classFactory.createInjectable(ParameterAdapterManager.class, ParameterAdapterManager::createCore);
+        classFactory.createToContext(ParameterAdapterManager.class, ParameterAdapterManager::createCore);
     }
 }

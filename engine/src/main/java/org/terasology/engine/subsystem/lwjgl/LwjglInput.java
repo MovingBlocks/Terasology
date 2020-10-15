@@ -56,7 +56,7 @@ public class LwjglInput extends BaseLwjglSubsystem {
             Keyboard.create();
             Keyboard.enableRepeatEvents(true);
             Mouse.create();
-            InputSystem inputSystem = classFactory.createInjectableInstance(InputSystem.class);
+            InputSystem inputSystem = classFactory.createToContext(InputSystem.class);
             inputSystem.setMouseDevice(new LwjglMouseDevice(context));
             inputSystem.setKeyboardDevice(new LwjglKeyboardDevice());
 

@@ -24,7 +24,7 @@ public class ModuleRenderingSubsystem implements EngineSubsystem {
 
     @Override
     public void initialise(GameEngine engine, Context rootContext) {
-        classFactory.createInjectableInstance(RenderingModuleRegistry.class);
+        classFactory.createToContext(RenderingModuleRegistry.class);
     }
 
 }

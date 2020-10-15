@@ -108,7 +108,7 @@ public class InitialiseWorld extends SingleStepLoadProcess {
     public boolean step() {
 
         ModuleEnvironment environment = moduleManager.getEnvironment();
-        classFactory.createInjectableInstance(DefaultWorldGeneratorPluginLibrary.class,
+        classFactory.createToContext(DefaultWorldGeneratorPluginLibrary.class,
                 WorldGeneratorPluginLibrary.class
         );
 
@@ -153,35 +153,35 @@ public class InitialiseWorld extends SingleStepLoadProcess {
         }
         context.put(StorageManager.class, storageManager);
 
-        LocalChunkProvider chunkProvider = classFactory.createInjectableInstance(LocalChunkProvider.class,
+        LocalChunkProvider chunkProvider = classFactory.createToContext(LocalChunkProvider.class,
                 ChunkProvider.class, LocalChunkProvider.class);
-        RelevanceSystem relevanceSystem = classFactory.createInjectableInstance(RelevanceSystem.class);
+        RelevanceSystem relevanceSystem = classFactory.createToContext(RelevanceSystem.class);
         componentSystemManager.register(relevanceSystem, "engine:relevanceSystem");
         chunkProvider.setRelevanceSystem(relevanceSystem);
 
-        classFactory.createInjectableInstance(WorldProviderCoreImpl.class, WorldProviderCore.class);
+        classFactory.createToContext(WorldProviderCoreImpl.class, WorldProviderCore.class);
         EntityAwareWorldProvider entityWorldProvider =
-                classFactory.createInjectableInstance(EntityAwareWorldProvider.class,
+                classFactory.createToContext(EntityAwareWorldProvider.class,
                         BlockEntityRegistry.class);
-        classFactory.createInjectableInstance(WorldProviderWrapper.class, WorldProvider.class);
+        classFactory.createToContext(WorldProviderWrapper.class, WorldProvider.class);
         chunkProvider.setBlockEntityRegistry(entityWorldProvider);
         componentSystemManager.register(entityWorldProvider, "engine:BlockEntityRegistry");
 
-        classFactory.createInjectableInstance(BasicCelestialModel.class, CelestialModel.class);
-        DefaultCelestialSystem celestialSystem = classFactory.createInjectableInstance(DefaultCelestialSystem.class,
+        classFactory.createToContext(BasicCelestialModel.class, CelestialModel.class);
+        DefaultCelestialSystem celestialSystem = classFactory.createToContext(DefaultCelestialSystem.class,
                 CelestialSystem.class);
         componentSystemManager.register(celestialSystem);
 
-        classFactory.createInjectableInstance(Skysphere.class,
+        classFactory.createToContext(Skysphere.class,
                 BackdropProvider.class, BackdropRenderer.class);
 
-        WorldRenderer worldRenderer = classFactory.createInjectable(WorldRenderer.class,
+        WorldRenderer worldRenderer = classFactory.createToContext(WorldRenderer.class,
                 engineSubsystemFactory::createWorldRenderer);
 
         // TODO: These shouldn't be done here, nor so strongly tied to the world renderer
-        LocalPlayer localPlayer = classFactory.createInjectableInstance(LocalPlayer.class);
+        LocalPlayer localPlayer = classFactory.createToContext(LocalPlayer.class);
         localPlayer.setRecordAndReplayClasses(directionAndOriginPosRecorderList, recordAndReplayCurrentStatus);
-        classFactory.createInjectable(Camera.class, worldRenderer::getActiveCamera);
+        classFactory.createToContext(Camera.class, worldRenderer::getActiveCamera);
 
         return true;
     }

@@ -33,10 +33,10 @@ public class LwjglAudio extends BaseLwjglSubsystem {
     @Override
     public void initialise(GameEngine engine, Context rootContext) {
         try {
-            audioManager = classFactory.createInjectableInstance(OpenALManager.class, AudioManager.class);
+            audioManager = classFactory.createToContext(OpenALManager.class, AudioManager.class);
         } catch (Exception e) {
             logger.warn("Could not load OpenAL manager - sound is disabled", e);
-            audioManager = classFactory.createInjectableInstance(NullAudioManager.class, AudioManager.class);
+            audioManager = classFactory.createToContext(NullAudioManager.class, AudioManager.class);
         }
     }
 

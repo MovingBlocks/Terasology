@@ -140,10 +140,10 @@ public class TerasologyEngine implements GameEngine {
         rootContext.put(ContextAwareClassFactory.class, classFactory);
 
         //Record and Replay classes
-        classFactory.createInjectableInstance(RecordAndReplayCurrentStatus.class);
-        classFactory.createInjectableInstance(RecordAndReplayUtils.class);
-        classFactory.createInjectableInstance(CharacterStateEventPositionMap.class);
-        classFactory.createInjectableInstance(DirectionAndOriginPosRecorderList.class);
+        classFactory.createToContext(RecordAndReplayCurrentStatus.class);
+        classFactory.createToContext(RecordAndReplayUtils.class);
+        classFactory.createToContext(CharacterStateEventPositionMap.class);
+        classFactory.createToContext(DirectionAndOriginPosRecorderList.class);
 
         this.allSubsystems = Queues.newArrayDeque();
         this.allSubsystems.add(new ConfigurationSubsystem());
@@ -294,7 +294,7 @@ public class TerasologyEngine implements GameEngine {
         TypeRegistry.WHITELISTED_CLASSES =
                 ExternalApiWhitelist.CLASSES.stream().map(Class::getName).collect(Collectors.toSet());
         TypeRegistry.WHITELISTED_PACKAGES = ExternalApiWhitelist.PACKAGES;
-        TypeRegistry typeRegistry = classFactory.createInjectableInstance(TypeRegistry.class);
+        TypeRegistry typeRegistry = classFactory.createToContext(TypeRegistry.class);
 
         ModuleManager moduleManager = new ModuleManagerImpl(rootContext.get(Config.class),
                 classesOnClasspathsToAddToEngine);
@@ -302,12 +302,12 @@ public class TerasologyEngine implements GameEngine {
 
         changeStatus(TerasologyEngineStatus.INITIALIZING_LOWLEVEL_OBJECT_MANIPULATION);
 
-        classFactory.createInjectableInstance(ReflectionReflectFactory.class, ReflectFactory.class);
-        classFactory.createInjectableInstance(CopyStrategyLibrary.class);
+        classFactory.createToContext(ReflectionReflectFactory.class, ReflectFactory.class);
+        classFactory.createToContext(CopyStrategyLibrary.class);
         rootContext.put(TypeHandlerLibrary.class, TypeHandlerLibrary.forModuleEnvironment(moduleManager, typeRegistry));
 
         changeStatus(TerasologyEngineStatus.INITIALIZING_ASSET_TYPES);
-        assetTypeManager = classFactory.createInjectableInstance(ModuleAwareAssetTypeManager.class);
+        assetTypeManager = classFactory.createToContext(ModuleAwareAssetTypeManager.class);
         rootContext.put(ModuleAwareAssetTypeManager.class, assetTypeManager);
         rootContext.put(AssetManager.class, assetTypeManager.getAssetManager());
     }

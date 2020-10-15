@@ -24,6 +24,6 @@ public class WorldGenerationSubsystem implements EngineSubsystem {
 
     @Override
     public void initialise(GameEngine engine, Context rootContext) {
-        classFactory.createInjectableInstance(WorldGeneratorManager.class);
+        classFactory.createToContext(WorldGeneratorManager.class);
     }
 }

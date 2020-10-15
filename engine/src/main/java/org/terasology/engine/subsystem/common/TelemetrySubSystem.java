@@ -62,7 +62,7 @@ public class TelemetrySubSystem implements EngineSubsystem {
 
     @Override
     public void postInitialise(Context rootContext) {
-        metrics = classFactory.createInjectableInstance(Metrics.class);
+        metrics = classFactory.createToContext(Metrics.class);
         metrics.initialise();
 
         // Add the telemetryConfig adapter to context. It could be used in modules.

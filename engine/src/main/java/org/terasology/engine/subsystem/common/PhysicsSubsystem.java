@@ -24,6 +24,6 @@ public class PhysicsSubsystem implements EngineSubsystem {
 
     @Override
     public void initialise(GameEngine engine, Context rootContext) {
-        classFactory.createInjectableInstance(CollisionGroupManager.class);
+        classFactory.createToContext(CollisionGroupManager.class);
     }
 }

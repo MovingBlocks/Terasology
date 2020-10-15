@@ -70,35 +70,35 @@ public class InitialiseRemoteWorld extends SingleStepLoadProcess {
     public boolean step() {
 
         // TODO: These shouldn't be done here, nor so strongly tied to the world renderer
-        LocalPlayer localPlayer = classFactory.createInjectableInstance(LocalPlayer.class);
+        LocalPlayer localPlayer = classFactory.createToContext(LocalPlayer.class);
         localPlayer.setRecordAndReplayClasses(directionAndOriginPosRecorderList, recordAndReplayCurrentStatus);
-        RemoteChunkProvider chunkProvider = classFactory.createInjectableInstance(RemoteChunkProvider.class,
+        RemoteChunkProvider chunkProvider = classFactory.createToContext(RemoteChunkProvider.class,
                 ChunkProvider.class);
 
         context.put(WorldInfo.class, gameManifest.getWorldInfo(TerasologyConstants.MAIN_WORLD));
-        classFactory.createInjectableInstance(WorldProviderCoreImpl.class, WorldProviderCore.class);
+        classFactory.createToContext(WorldProviderCoreImpl.class, WorldProviderCore.class);
         EntityAwareWorldProvider entityWorldProvider =
-                classFactory.createInjectableInstance(EntityAwareWorldProvider.class,
+                classFactory.createToContext(EntityAwareWorldProvider.class,
                         BlockEntityRegistry.class);
-        classFactory.createInjectableInstance(WorldProviderWrapper.class, WorldProvider.class);
+        classFactory.createToContext(WorldProviderWrapper.class, WorldProvider.class);
         componentSystemManager.register(entityWorldProvider, "engine:BlockEntityRegistry");
 
-        classFactory.createInjectableInstance(BasicCelestialModel.class, CelestialModel.class);
-        DefaultCelestialSystem celestialSystem = classFactory.createInjectableInstance(DefaultCelestialSystem.class,
+        classFactory.createToContext(BasicCelestialModel.class, CelestialModel.class);
+        DefaultCelestialSystem celestialSystem = classFactory.createToContext(DefaultCelestialSystem.class,
                 CelestialSystem.class
         );
         componentSystemManager.register(celestialSystem);
 
         // Init. a new world
-        classFactory.createInjectableInstance(Skysphere.class,
+        classFactory.createToContext(Skysphere.class,
                 BackdropProvider.class, BackdropRenderer.class);
 
-        WorldRenderer worldRenderer = classFactory.createInjectable(WorldRenderer.class,
+        WorldRenderer worldRenderer = classFactory.createToContext(WorldRenderer.class,
                 engineSubsystemFactory::createWorldRenderer);
         float reflectionHeight = networkSystem.getServer().getInfo().getReflectionHeight();
         worldRenderer.getActiveCamera().setReflectionHeight(reflectionHeight);
         // TODO: These shouldn't be done here, nor so strongly tied to the world renderer
-        classFactory.createInjectable(Camera.class, worldRenderer::getActiveCamera);
+        classFactory.createToContext(Camera.class, worldRenderer::getActiveCamera);
         networkSystem.setRemoteWorldProvider(chunkProvider);
 
         return true;

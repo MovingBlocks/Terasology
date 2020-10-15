@@ -78,11 +78,11 @@ public class StateHeadlessSetup implements GameState {
         entityManager = context.get(EngineEntityManager.class);
         eventSystem = context.get(EventSystem.class);
 
-        classFactory.createInjectableInstance(ConsoleImpl.class, Console.class);
+        classFactory.createToContext(ConsoleImpl.class, Console.class);
 
-        classFactory.createInjectableInstance(NUIManagerInternal.class);
+        classFactory.createToContext(NUIManagerInternal.class);
 
-        componentSystemManager = classFactory.createInjectableInstance(ComponentSystemManager.class);
+        componentSystemManager = classFactory.createToContext(ComponentSystemManager.class);
         componentSystemManager.register(new ConsoleSystem(), "engine:ConsoleSystem");
         componentSystemManager.register(new CoreCommands(), "engine:CoreCommands");
         componentSystemManager.register(inputSystem, "engine:InputSystem");
