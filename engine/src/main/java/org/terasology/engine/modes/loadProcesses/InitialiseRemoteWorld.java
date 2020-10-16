@@ -80,7 +80,11 @@ public class InitialiseRemoteWorld extends SingleStepLoadProcess {
         EntityAwareWorldProvider entityWorldProvider =
                 classFactory.createToContext(EntityAwareWorldProvider.class,
                         BlockEntityRegistry.class);
-        classFactory.createToContext(WorldProviderWrapper.class, WorldProvider.class);
+        // EntityAwareWorldProvider implements WorldProviderCore too but not expose as it. must used in
+        // WorldProviderWrapper.
+        classFactory.createToContext(WorldProvider.class, () -> new WorldProviderWrapper(entityWorldProvider,
+                extraDataManager));
+
         componentSystemManager.register(entityWorldProvider, "engine:BlockEntityRegistry");
 
         classFactory.createToContext(BasicCelestialModel.class, CelestialModel.class);
