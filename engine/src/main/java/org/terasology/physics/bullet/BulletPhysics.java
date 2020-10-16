@@ -186,24 +186,7 @@ public class BulletPhysics implements PhysicsEngine {
 
     @Override
     public List<EntityRef> scanArea(AABB area, Iterable<CollisionGroup> collisionFilter) {
-        // TODO: Add the aabbTest method from newer versions of bullet to TeraBullet, use that instead
-
-        btBoxShape shape = new btBoxShape(JomlUtil.from(area.getExtents()));
-        btGhostObject scanObject = createCollider(JomlUtil.from(area.getCenter()), shape,StandardCollisionGroup.SENSOR.getFlag(),
-                combineGroups(collisionFilter), btCollisionObject.CollisionFlags.CF_NO_CONTACT_RESPONSE);
-
-        // This in particular is overkill
-        broadphase.calculateOverlappingPairs(dispatcher);
-        List<EntityRef> result = Lists.newArrayList();
-        for (int i = 0; i < scanObject.getNumOverlappingObjects(); ++i) {
-            btCollisionObject other = scanObject.getOverlappingObject(i);
-            Object userObj = other.getUserPointer();
-            if (userObj instanceof EntityRef) {
-                result.add((EntityRef) userObj);
-            }
-        }
-        removeCollider(scanObject);
-        return result;
+        return scanArea(JomlUtil.from(area), collisionFilter);
     }
 
     @Override
@@ -228,7 +211,7 @@ public class BulletPhysics implements PhysicsEngine {
         }
         removeCollider(scanObject);
         return result;
-    }{}
+    }
 
     @Override
     public HitResult rayTrace(Vector3f from1, Vector3f direction, float distance, CollisionGroup... collisionGroups) {

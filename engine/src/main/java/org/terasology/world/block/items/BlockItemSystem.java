@@ -207,9 +207,9 @@ public class BlockItemSystem extends BaseComponentSystem {
             /*
              * Calculations aren't exact and in the corner cases it is better to let the user place the block.
              */
-            blockBounds.minX += ADDITIONAL_ALLOWED_PENETRATION;
-            blockBounds.minY += ADDITIONAL_ALLOWED_PENETRATION;
-            blockBounds.minZ += ADDITIONAL_ALLOWED_PENETRATION;
+            blockBounds.minX -= ADDITIONAL_ALLOWED_PENETRATION;
+            blockBounds.minY -= ADDITIONAL_ALLOWED_PENETRATION;
+            blockBounds.minZ -= ADDITIONAL_ALLOWED_PENETRATION;
 
             blockBounds.maxX += ADDITIONAL_ALLOWED_PENETRATION;
             blockBounds.maxY += ADDITIONAL_ALLOWED_PENETRATION;
