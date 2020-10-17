@@ -43,9 +43,10 @@ import org.terasology.math.geom.Rect2i;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.world.block.BlockRegion;
 
-public class JomlUtil {
+public final class JomlUtil {
+    private JomlUtil() {
 
-
+    }
     public static org.terasology.math.geom.Matrix4f from(Matrix4fc mat) {
         if (mat == null) {
             return null;
