@@ -160,9 +160,9 @@ public class BindableButtonImpl implements BindableButton {
                 if (!keyConsumed) {
                     buttonEvent.prepare(id, ButtonState.DOWN, delta);
                     buttonEvent.setTargetInfo(target,
-                        targetBlockPos == null ? null : JomlUtil.from(targetBlockPos),
-                        hitPosition == null ? null : JomlUtil.from(hitPosition),
-                        hitNormal == null ? null : JomlUtil.from(hitNormal));
+                        JomlUtil.from(targetBlockPos),
+                        JomlUtil.from(hitPosition),
+                        JomlUtil.from(hitNormal));
                     for (EntityRef entity : inputEntities) {
                         entity.send(buttonEvent);
                         if (buttonEvent.isConsumed()) {
