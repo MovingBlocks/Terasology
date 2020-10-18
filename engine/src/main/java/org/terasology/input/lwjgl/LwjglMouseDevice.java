@@ -50,7 +50,6 @@ public class LwjglMouseDevice implements MouseDevice, PropertyChangeListener {
 
         // GLFW callback
         long window = GLFW.glfwGetCurrentContext();
-//        GLFW.glfwSetCursorPosCallback(window, this::cursorPosCallback);
         GLFW.glfwSetMouseButtonCallback(window, this::mouseButtonCallback);
         GLFW.glfwSetScrollCallback(window, this::scrollCallback);
 
@@ -123,13 +122,6 @@ public class LwjglMouseDevice implements MouseDevice, PropertyChangeListener {
             this.uiScale = this.renderingConfig.getUiScale() / 100f;
         }
     }
-//
-//    private void cursorPosCallback(long window, double newX, double newY) {
-//        xposDelta = newX - this.xpos;
-//        yposDelta = newY - this.ypos;
-//        this.xpos = newX;
-//        this.ypos = newY;
-//    }
 
     private void mouseButtonCallback(long window, int button, int action, int mods) {
         ButtonState state;
