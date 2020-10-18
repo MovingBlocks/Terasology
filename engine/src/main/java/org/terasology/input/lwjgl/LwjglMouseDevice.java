@@ -6,7 +6,9 @@ package org.terasology.input.lwjgl;
 import com.google.common.collect.Lists;
 import gnu.trove.set.TIntSet;
 import gnu.trove.set.hash.TIntHashSet;
+import org.joml.Vector2d;
 import org.joml.Vector2i;
+import org.lwjgl.BufferUtils;
 import org.lwjgl.glfw.GLFW;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
@@ -19,6 +21,7 @@ import org.terasology.input.device.MouseDevice;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.nio.DoubleBuffer;
 import java.util.Queue;
 
 /**
@@ -47,10 +50,29 @@ public class LwjglMouseDevice implements MouseDevice, PropertyChangeListener {
 
         // GLFW callback
         long window = GLFW.glfwGetCurrentContext();
-        GLFW.glfwSetCursorPosCallback(window, this::cursorPosCallback);
         GLFW.glfwSetMouseButtonCallback(window, this::mouseButtonCallback);
         GLFW.glfwSetScrollCallback(window, this::scrollCallback);
 
+    }
+
+
+    @Override
+    public void  update() {
+        long window = GLFW.glfwGetCurrentContext();
+        DoubleBuffer mouseX = BufferUtils.createDoubleBuffer(1);
+        DoubleBuffer mouseY = BufferUtils.createDoubleBuffer(1);
+
+        GLFW.glfwGetCursorPos(window, mouseX, mouseY);
+        mouseX.rewind();
+        mouseY.rewind();
+
+        double x = mouseX.get(0);
+        double y = mouseY.get(0);
+
+        xposDelta = x - this.xpos;
+        yposDelta = y - this.ypos;
+        this.xpos = x;
+        this.ypos = y;
     }
 
     @Override
@@ -59,10 +81,9 @@ public class LwjglMouseDevice implements MouseDevice, PropertyChangeListener {
     }
 
     @Override
-    public Vector2i getDelta() {
-        Vector2i result = new Vector2i((int) xposDelta, (int) yposDelta);
-        xposDelta = 0.0;
-        yposDelta = 0.0;
+    public Vector2d getDelta() {
+
+        Vector2d result = new Vector2d(xposDelta, yposDelta);
         return result;
     }
 
@@ -100,13 +121,6 @@ public class LwjglMouseDevice implements MouseDevice, PropertyChangeListener {
         if (evt.getPropertyName().equals(RenderingConfig.UI_SCALE)) {
             this.uiScale = this.renderingConfig.getUiScale() / 100f;
         }
-    }
-
-    private void cursorPosCallback(long window, double newX, double newY) {
-        xposDelta = newX - this.xpos;
-        yposDelta = newY - this.ypos;
-        this.xpos = newX;
-        this.ypos = newY;
     }
 
     private void mouseButtonCallback(long window, int button, int action, int mods) {

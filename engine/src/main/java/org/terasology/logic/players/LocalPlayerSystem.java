@@ -122,9 +122,9 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
 
     private boolean jump;
     private float lookPitch;
-    private float lookPitchDelta;
+    private double lookPitchDelta;
     private float lookYaw;
-    private float lookYawDelta;
+    private double lookYawDelta;
 
     @In
     private Time time;
@@ -156,9 +156,9 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
     }
 
     private void processInput(EntityRef entity, CharacterMovementComponent characterMovementComponent) {
-        lookYaw = (lookYaw - lookYawDelta) % 360;
+        lookYaw = (float) ((lookYaw - lookYawDelta) % 360);
         lookYawDelta = 0f;
-        lookPitch = TeraMath.clamp(lookPitch + lookPitchDelta, -89, 89);
+        lookPitch = (float) TeraMath.clamp(lookPitch + lookPitchDelta, -89, 89);
         lookPitchDelta = 0f;
 
         Vector3f relMove = new Vector3f(relativeMovement);
@@ -285,7 +285,7 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
 
     @ReceiveEvent(components = {ClientComponent.class})
     public void updateForwardsMovement(ForwardsMovementAxis event, EntityRef entity) {
-        relativeMovement.z = event.getValue();
+        relativeMovement.z = (float) event.getValue();
         if (relativeMovement.z == 0f && isAutoMove) {
             stopAutoMove();
         }
@@ -294,31 +294,31 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
 
     @ReceiveEvent(components = {ClientComponent.class})
     public void updateStrafeMovement(StrafeMovementAxis event, EntityRef entity) {
-        relativeMovement.x = event.getValue();
+        relativeMovement.x =  (float)event.getValue();
         event.consume();
     }
 
     @ReceiveEvent(components = {ClientComponent.class})
     public void updateVerticalMovement(VerticalMovementAxis event, EntityRef entity) {
-        relativeMovement.y = event.getValue();
+        relativeMovement.y = (float) event.getValue();
         event.consume();
     }
 
     @ReceiveEvent(components = {ClientComponent.class})
     public void updateForwardsMovement(ForwardsRealMovementAxis event, EntityRef entity) {
-        relativeMovement.z = event.getValue();
+        relativeMovement.z =  (float)event.getValue();
         event.consume();
     }
 
     @ReceiveEvent(components = {ClientComponent.class})
     public void updateStrafeMovement(StrafeRealMovementAxis event, EntityRef entity) {
-        relativeMovement.x = event.getValue();
+        relativeMovement.x = (float) event.getValue();
         event.consume();
     }
 
     @ReceiveEvent(components = {ClientComponent.class})
     public void updateVerticalMovement(VerticalRealMovementAxis event, EntityRef entity) {
-        relativeMovement.y = event.getValue();
+        relativeMovement.y =  (float)event.getValue();
         event.consume();
     }
 

@@ -4,6 +4,7 @@
 package org.terasology.input;
 
 import com.google.common.collect.Queues;
+import org.joml.Vector2d;
 import org.joml.Vector2i;
 import org.terasology.config.ControllerConfig.ControllerInfo;
 import org.terasology.config.facade.InputDeviceConfiguration;
@@ -167,19 +168,20 @@ public class InputSystem extends BaseComponentSystem {
         if (!isCapturingMouse()) {
             return;
         }
+        this.mouse.update();
 
-        Vector2i deltaMouse = mouse.getDelta();
+        Vector2d deltaMouse = mouse.getDelta();
         //process mouse movement x axis
         if (deltaMouse.x != 0) {
-            float xValue = deltaMouse.x * inputDeviceConfig.getMouseSensitivity();
+            double xValue = deltaMouse.x * inputDeviceConfig.getMouseSensitivity();
             MouseAxisEvent event = MouseAxisEvent.create(MouseAxis.X, xValue, delta);
             send(event);
         }
 
         //process mouse movement y axis
         if (deltaMouse.y != 0) {
-            int yMovement = inputDeviceConfig.isMouseYAxisInverted() ? deltaMouse.y * -1 : deltaMouse.y;
-            float yValue = yMovement * inputDeviceConfig.getMouseSensitivity();
+            double yMovement = inputDeviceConfig.isMouseYAxisInverted() ? deltaMouse.y * -1 : deltaMouse.y;
+            double yValue = yMovement * inputDeviceConfig.getMouseSensitivity();
             MouseAxisEvent event = MouseAxisEvent.create(MouseAxis.Y, yValue, delta);
             send(event);
         }
