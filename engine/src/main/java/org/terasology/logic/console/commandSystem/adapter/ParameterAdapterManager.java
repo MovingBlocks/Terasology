@@ -1,18 +1,5 @@
-/*
- * Copyright 2014 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.logic.console.commandSystem.adapter;
 
 import com.google.common.base.Preconditions;
@@ -20,49 +7,48 @@ import com.google.common.collect.Maps;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.module.sandbox.API;
 import org.terasology.naming.Name;
+import org.terasology.registry.ContextAwareClassFactory;
+import org.terasology.registry.In;
 import org.terasology.world.block.family.BlockFamily;
 
 import java.util.Map;
 
-/**
- */
 @API
 public class ParameterAdapterManager {
     private final Map<Class<?>, ParameterAdapter> adapters = Maps.newHashMap();
 
+    @In
+    private ContextAwareClassFactory classFactory;
+
     /**
-     * @return A manager with basic adapters for wrapped primitives and {@link String}
+     * Command adapter registration.
      */
-    @SuppressWarnings("unchecked")
-    public static ParameterAdapterManager createBasic() {
-        ParameterAdapterManager manager = new ParameterAdapterManager();
+    public void registerBaseAdapters() {
+        Preconditions.checkState(adapters.isEmpty(), "ParameterAdapterManager already registered");
 
         for (Map.Entry<Class, ParameterAdapter> entry : PrimitiveAdapters.MAP.entrySet()) {
-            manager.registerAdapter(entry.getKey(), entry.getValue());
+            registerAdapter(entry.getKey(), entry.getValue());
         }
 
-        return manager;
+        registerAdapter(Name.class, NameAdapter.class);
+        registerAdapter(Prefab.class, PrefabAdapter.class);
+        registerAdapter(BlockFamily.class, BlockFamilyAdapter.class);
     }
 
     /**
-     * @return A manager with basic adapters and following classes:
-     * {@link org.terasology.entitySystem.prefab.Prefab}
+     * @return {@code true}, if the adapter didn't override a previously present adapter
+     * @deprecated Use {@link ParameterAdapterManager#registerAdapter(Class, Class)} istead. adds DI feature for
+     *         ParameterAdapter.
      */
-    public static ParameterAdapterManager createCore() {
-        ParameterAdapterManager manager = createBasic();
-
-        manager.registerAdapter(Name.class, new NameAdapter());
-        manager.registerAdapter(Prefab.class, new PrefabAdapter());
-        manager.registerAdapter(BlockFamily.class, new BlockFamilyAdapter());
-
-        return manager;
+    public <T> boolean registerAdapter(Class<? extends T> clazz, ParameterAdapter<T> adapter) {
+        return adapters.put(clazz, adapter) == null;
     }
 
     /**
      * @return {@code true}, if the adapter didn't override a previously present adapter
      */
-    public <T> boolean registerAdapter(Class<? extends T> clazz, ParameterAdapter<T> adapter) {
-        return adapters.put(clazz, adapter) == null;
+    public <T> boolean registerAdapter(Class<T> clazz, Class<? extends ParameterAdapter<T>> implementationClazz) {
+        return adapters.put(clazz, classFactory.createWithContext(implementationClazz)) == null;
     }
 
     public boolean isAdapterRegistered(Class<?> clazz) {
@@ -73,7 +59,8 @@ public class ParameterAdapterManager {
      * @param clazz The type of the returned object
      * @param raw The string from which to parse
      * @return The parsed object
-     * @throws ClassCastException If the {@link ParameterAdapter} is linked with an incorrect {@link java.lang.Class}.
+     * @throws ClassCastException If the {@link ParameterAdapter} is linked with an incorrect {@link
+     *         java.lang.Class}.
      */
     @SuppressWarnings("unchecked")
     public <T> T parse(Class<T> clazz, String raw) throws ClassCastException {
@@ -90,7 +77,8 @@ public class ParameterAdapterManager {
      * @param value The object to convertToString
      * @param clazz The class pointing to the desired adapter
      * @return The composed object
-     * @throws ClassCastException If the {@link ParameterAdapter} is linked with an incorrect {@link java.lang.Class}.
+     * @throws ClassCastException If the {@link ParameterAdapter} is linked with an incorrect {@link
+     *         java.lang.Class}.
      */
     @SuppressWarnings("unchecked")
     public <T> String convertToString(T value, Class<? super T> clazz) throws ClassCastException {
@@ -106,7 +94,8 @@ public class ParameterAdapterManager {
     /**
      * @param value The object to convertToString
      * @return The composed object
-     * @throws ClassCastException If the {@link ParameterAdapter} is linked with an incorrect {@link java.lang.Class}.
+     * @throws ClassCastException If the {@link ParameterAdapter} is linked with an incorrect {@link
+     *         java.lang.Class}.
      */
     @SuppressWarnings("unchecked")
     public String convertToString(Object value) throws ClassCastException {
