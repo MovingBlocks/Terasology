@@ -1,18 +1,5 @@
-/*
- * Copyright 2020 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 
 // The PC facade is responsible for the primary distribution - a plain Java application runnable on PCs
 
@@ -44,7 +31,7 @@ dateTimeFormat.timeZone = TimeZone.getTimeZone("UTC")
  *
  * @return
  */
-def String nativeSubdirectoryName() {
+String nativeSubdirectoryName() {
     if (Os.isFamily(Os.FAMILY_WINDOWS)) {
         return "windows"
     } else if (Os.isFamily(Os.FAMILY_MAC)) {
@@ -55,6 +42,10 @@ def String nativeSubdirectoryName() {
         logger.warn("What kind of libraries do you use on this? {}", System.properties["os.name"])
         return "UNKNOWN"
     }
+}
+
+def isMacOS() {
+    System.getProperty("os.name").startsWith("Mac OS X") || System.getProperty("os.name").startsWith("Darwin")
 }
 
 
@@ -127,10 +118,10 @@ run {
     group = "terasology run"
 
     args "-homedir", "-noCrashReport"
-    if (System.getProperty("os.name").startsWith("Mac OS X") || System.getProperty("os.name").startsWith("Darwin")){
-        jvmArgs "-XstartOnFirstThread", "-Djava.awt.headless=true", "-Xmx1536m"
-    } else {
-        jvmArgs "-Xmx1536m"
+    jvmArgs "-Xmx1536m"
+    if (isMacOS()) {
+        jvmArgs += ["-XstartOnFirstThread", "-Djava.awt.headless=true"]
+        args += "-noSplash"
     }
     workingDir rootDir
 
@@ -156,10 +147,10 @@ task game(type: JavaExec) {
     main = mainClassName
     workingDir = rootDir
     args "-homedir"
-    if (System.getProperty("os.name").startsWith("Mac OS X") || System.getProperty("os.name").startsWith("Darwin")){
-        jvmArgs "-XstartOnFirstThread", "-Djava.awt.headless=true", "-Xmx1536m"
-    } else {
-        jvmArgs "-Xmx1536m"
+    jvmArgs "-Xmx1536m"
+    if (isMacOS()) {
+        jvmArgs += ["-XstartOnFirstThread", "-Djava.awt.headless=true"]
+        args += "-noSplash"
     }
 
     // Classpath: PC itself, engine classes, engine dependencies. Not modules or natives since the engine finds those
@@ -180,10 +171,10 @@ task profile(type: JavaExec) {
     dependsOn classes
 
     // Run arguments
-    if (System.getProperty("os.name").startsWith("Mac OS X") || System.getProperty("os.name").startsWith("Darwin")){
-        jvmArgs "-XstartOnFirstThread","-Djava.awt.headless=true", "-Xms256m", "-Xmx1536m", "-XX:+UnlockCommercialFeatures", "-XX:+FlightRecorder", "-XX:+UnlockDiagnosticVMOptions", "-XX:+DebugNonSafepoints", "-XX:StartFlightRecording=filename=terasology.jfr,dumponexit=true"
-    } else {
-        jvmArgs "-Xms256m", "-Xmx1536m", "-XX:+UnlockCommercialFeatures", "-XX:+FlightRecorder", "-XX:+UnlockDiagnosticVMOptions", "-XX:+DebugNonSafepoints", "-XX:StartFlightRecording=filename=terasology.jfr,dumponexit=true"
+    jvmArgs "-Xms256m", "-Xmx1536m", "-XX:+UnlockCommercialFeatures", "-XX:+FlightRecorder", "-XX:+UnlockDiagnosticVMOptions", "-XX:+DebugNonSafepoints", "-XX:StartFlightRecording=filename=terasology.jfr,dumponexit=true"
+    if (isMacOS()) {
+        jvmArgs += ["-XstartOnFirstThread", "-Djava.awt.headless=true"]
+        args += "-noSplash"
     }
     main = mainClassName
     workingDir = rootDir
@@ -208,10 +199,10 @@ task debug(type: JavaExec) {
     dependsOn classes
 
     // Run arguments
-    if (System.getProperty("os.name").startsWith("Mac OS X") || System.getProperty("os.name").startsWith("Darwin")){
-        jvmArgs "-XstartOnFirstThread", "-Djava.awt.headless=true", "-Xmx1536m", "-Xdebug", "-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=1044"
-    } else {
-        jvmArgs "-Xmx1536m", "-Xdebug", "-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=1044"
+    jvmArgs "-Xmx1536m", "-Xdebug", "-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=1044"
+    if (isMacOS()) {
+        jvmArgs += ["-XstartOnFirstThread", "-Djava.awt.headless=true"]
+        args += "-noSplash"
     }
     main = mainClassName
     workingDir = rootDir
@@ -239,10 +230,10 @@ task permissiveNatives(type: JavaExec) {
     main = mainClassName
     workingDir = rootDir
     args "-homedir", "-permissiveSecurity"
-    if (System.getProperty("os.name").startsWith("Mac OS X") || System.getProperty("os.name").startsWith("Darwin")){
-        jvmArgs "-XstartOnFirstThread", "-Djava.awt.headless=true", "-Xmx1536m"
-    } else {
-        jvmArgs "-Xmx1536m"
+    jvmArgs "-Xmx1536m"
+    if (isMacOS()) {
+        jvmArgs += ["-XstartOnFirstThread", "-Djava.awt.headless=true"]
+        args += "-noSplash"
     }
 
     systemProperty("java.library.path", rootProject.file(dirNatives + "/" + nativeSubdirectoryName()))
@@ -262,7 +253,7 @@ task setupServerConfig {
 
     def json = new JsonBuilder()
 
-    def serverRoot = rootProject.file(localServerDataPath);
+    def serverRoot = rootProject.file(localServerDataPath)
     def config = new File(serverRoot, 'config.cfg')
 
     if (!config.exists()) {
@@ -273,17 +264,17 @@ task setupServerConfig {
         json {
             worldGeneration {
                 if (project.hasProperty('seed')) {
-                    logger.lifecycle("  Seed value: $seed");
+                    logger.lifecycle("  Seed value: $seed")
                     defaultSeed seed
                 }
                 if (project.hasProperty('worldGen')) {
-                    logger.lifecycle("  World Generator: $worldGen");
+                    logger.lifecycle("  World Generator: $worldGen")
                     defaultGenerator worldGen
                 }
             }
             defaultModSelection {
                 if (project.hasProperty('extraModules')) {
-                    logger.lifecycle("  Enabling modules: $extraModules");
+                    logger.lifecycle("  Enabling modules: $extraModules")
                     modules extraModules.tokenize(" ,")
                 }
             }
@@ -366,9 +357,9 @@ task distApp(type: Sync) {
     dependsOn rootProject.extractNatives
     dependsOn jar
 
-    into ("${distsDirectory.get().asFile}/app")
-    from ("$rootDir/README.markdown") {
-        filter(FixCrLfFilter, eol:FixCrLfFilter.CrLf.newInstance("crlf"))
+    into("${distsDirectory.get().asFile}/app")
+    from("$rootDir/README.markdown") {
+        filter(FixCrLfFilter, eol: FixCrLfFilter.CrLf.newInstance("crlf"))
         rename('README.markdown', 'README')
     }
     from("$rootDir/LICENSE") {
