@@ -15,10 +15,10 @@
  */
 package org.terasology.logic.characters.events;
 
+import org.joml.Vector3f;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.AbstractConsumableEvent;
 import org.terasology.logic.location.LocationComponent;
-import org.terasology.math.geom.Vector3f;
 
 /**
  */
@@ -76,16 +76,24 @@ public class ActivationPredicted extends AbstractConsumableEvent {
 
     public Vector3f getTargetLocation() {
         LocationComponent loc = target.getComponent(LocationComponent.class);
-        if (loc != null&& !Float.isNaN(loc.getWorldPosition().x)) {
-            return loc.getWorldPosition();
+        if (loc != null) {
+            Vector3f result = loc.getWorldPosition(new Vector3f());
+            if (result.isFinite()) {
+                return result;
+            }
         }
         return null;
     }
 
     public Vector3f getInstigatorLocation() {
         LocationComponent loc = instigator.getComponent(LocationComponent.class);
-        if (loc != null&& !Float.isNaN(loc.getWorldPosition().x)) {
-            return loc.getWorldPosition();
+        if (loc != null) {
+            Vector3f result = loc.getWorldPosition(new Vector3f());
+            if (result.isFinite()) {
+                return result;
+            }
+            result.set(0, 0, 0);
+            return result;
         }
         return new Vector3f();
     }

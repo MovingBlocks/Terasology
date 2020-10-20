@@ -15,6 +15,7 @@
  */
 package org.terasology.world.block.entity;
 
+import org.joml.Vector3f;
 import org.terasology.audio.AudioManager;
 import org.terasology.audio.StaticSound;
 import org.terasology.audio.events.PlaySoundEvent;
@@ -135,7 +136,7 @@ public class BlockEntitySystem extends BaseComponentSystem {
                 if (blockDamageModifierComponent != null) {
                     impulsePower = blockDamageModifierComponent.impulsePower;
                 }
-                
+
                 processDropping(item, location, impulsePower);
             }
         }
@@ -183,7 +184,7 @@ public class BlockEntitySystem extends BaseComponentSystem {
 
     private void processDropping(EntityRef item, Vector3i location, float impulsePower) {
         item.send(new DropItemEvent(location.toVector3f()));
-        item.send(new ImpulseEvent(random.nextVector3f(impulsePower)));
+        item.send(new ImpulseEvent(random.nextVector3f(impulsePower, new Vector3f())));
     }
 
 }

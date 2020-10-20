@@ -19,6 +19,12 @@ package org.terasology.persistence.typeHandling;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.joml.Quaternionf;
+import org.joml.Vector2fc;
+import org.joml.Vector2ic;
+import org.joml.Vector3fc;
+import org.joml.Vector3ic;
+import org.joml.Vector4fc;
+import org.joml.Vector4ic;
 import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,10 +67,17 @@ import org.terasology.persistence.typeHandling.extensionTypes.factories.TextureR
 import org.terasology.persistence.typeHandling.mathTypes.IntegerRangeHandler;
 import org.terasology.persistence.typeHandling.mathTypes.QuaternionfTypeHandler;
 import org.terasology.persistence.typeHandling.mathTypes.Vector2fTypeHandler;
+import org.terasology.persistence.typeHandling.mathTypes.Vector2fcTypeHandler;
 import org.terasology.persistence.typeHandling.mathTypes.Vector2iTypeHandler;
+import org.terasology.persistence.typeHandling.mathTypes.Vector2icTypeHandler;
 import org.terasology.persistence.typeHandling.mathTypes.Vector3fTypeHandler;
+import org.terasology.persistence.typeHandling.mathTypes.Vector3fcTypeHandler;
 import org.terasology.persistence.typeHandling.mathTypes.Vector3iTypeHandler;
+import org.terasology.persistence.typeHandling.mathTypes.Vector3icTypeHandler;
 import org.terasology.persistence.typeHandling.mathTypes.Vector4fTypeHandler;
+import org.terasology.persistence.typeHandling.mathTypes.Vector4fcTypeHandler;
+import org.terasology.persistence.typeHandling.mathTypes.Vector4iTypeHandler;
+import org.terasology.persistence.typeHandling.mathTypes.Vector4icTypeHandler;
 import org.terasology.persistence.typeHandling.mathTypes.factories.Rect2fTypeHandlerFactory;
 import org.terasology.persistence.typeHandling.mathTypes.factories.Rect2iTypeHandlerFactory;
 import org.terasology.persistence.typeHandling.mathTypes.legacy.LegacyQuat4fTypeHandler;
@@ -210,10 +223,23 @@ public class TypeHandlerLibrary {
         serializationLibrary.addTypeHandler(Vector2i.class, new LegacyVector2iTypeHandler());
 
         serializationLibrary.addTypeHandler(org.joml.Vector4f.class, new Vector4fTypeHandler());
+        serializationLibrary.addTypeHandler(Vector4fc.class, new Vector4fcTypeHandler());
+
         serializationLibrary.addTypeHandler(org.joml.Vector3f.class, new Vector3fTypeHandler());
+        serializationLibrary.addTypeHandler(Vector3fc.class, new Vector3fcTypeHandler());
+
         serializationLibrary.addTypeHandler(org.joml.Vector2f.class, new Vector2fTypeHandler());
+        serializationLibrary.addTypeHandler(Vector2fc.class, new Vector2fcTypeHandler());
+
         serializationLibrary.addTypeHandler(org.joml.Vector3i.class, new Vector3iTypeHandler());
+        serializationLibrary.addTypeHandler(Vector3ic.class, new Vector3icTypeHandler());
+
         serializationLibrary.addTypeHandler(org.joml.Vector2i.class, new Vector2iTypeHandler());
+        serializationLibrary.addTypeHandler(Vector2ic.class, new Vector2icTypeHandler());
+
+        serializationLibrary.addTypeHandler(org.joml.Vector4i.class, new Vector4iTypeHandler());
+        serializationLibrary.addTypeHandler(Vector4ic.class, new Vector4icTypeHandler());
+
 
         serializationLibrary.addTypeHandlerFactory(new Rect2iTypeHandlerFactory());
         serializationLibrary.addTypeHandlerFactory(new Rect2fTypeHandlerFactory());

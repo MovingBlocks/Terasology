@@ -6,7 +6,7 @@ If you hit issues look for the game log files. By default they go into your user
 
 You can run the game with `-homedir` to instead store all game data in the directory you ran from. Or just use the [Launcher](https://github.com/MovingBlocks/TerasologyLauncher/releases) - it handles all that stuff!
 
-Report issues in the [support forum](http://forum.terasology.org/forum/support.20) or ask on [IRC](https://github.com/MovingBlocks/Terasology/wiki/Using-IRC) (`#terasology` on Freenode)
+Report issues on [GitHub](https://github.com/MovingBlocks/Terasology/issues/new) or ask on [Discord](https://discord.com/channels/270264625419911192/713903952764207164).
 
 ## Controls
 
