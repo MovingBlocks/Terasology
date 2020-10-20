@@ -17,6 +17,7 @@ package org.terasology.logic.players;
 
 import com.google.common.collect.Sets;
 import org.joml.Quaternionf;
+import org.terasology.context.Context;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.characters.CharacterMovementComponent;
@@ -38,8 +39,8 @@ import org.terasology.registry.In;
 
 public class LocalPlayer {
 
-    @In
-    private Physics physics;
+    @In // used for Physics, which creates after LocalPlayer.
+    private Context context;
 
     private EntityRef clientEntity = EntityRef.NULL;
     private int nextActivationId;
@@ -354,7 +355,7 @@ public class LocalPlayer {
         }
         boolean ownedEntityUsage = usedOwnedEntity.exists();
         int activationId = nextActivationId++;
-        HitResult result = physics.rayTrace(originPos, direction, characterComponent.interactionRange, Sets.newHashSet(character), CharacterSystem.DEFAULTPHYSICSFILTER);
+        HitResult result = context.get(Physics.class).rayTrace(originPos, direction, characterComponent.interactionRange, Sets.newHashSet(character), CharacterSystem.DEFAULTPHYSICSFILTER);
         boolean eventWithTarget = result.isHit();
         if (eventWithTarget) {
             EntityRef activatedObject = usedOwnedEntity.exists() ? usedOwnedEntity : result.getEntity();
