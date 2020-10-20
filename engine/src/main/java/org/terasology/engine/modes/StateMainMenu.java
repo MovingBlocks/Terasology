@@ -118,9 +118,8 @@ public class StateMainMenu implements GameState {
 
         EntityRef localPlayerEntity = entityManager.create(new ClientComponent());
 
-        LocalPlayer localPlayer = new LocalPlayer();
+        LocalPlayer localPlayer = classFactory.createToContext(LocalPlayer.class);
         localPlayer.setRecordAndReplayClasses(directionAndOriginPosRecorderList, recordAndReplayCurrentStatus);
-        context.put(LocalPlayer.class, localPlayer);
         localPlayer.setClientEntity(localPlayerEntity);
 
         componentSystemManager.initialise();

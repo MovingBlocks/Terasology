@@ -34,9 +34,12 @@ import org.terasology.physics.Physics;
 import org.terasology.recording.DirectionAndOriginPosRecorderList;
 import org.terasology.recording.RecordAndReplayCurrentStatus;
 import org.terasology.recording.RecordAndReplayStatus;
-import org.terasology.registry.CoreRegistry;
+import org.terasology.registry.In;
 
 public class LocalPlayer {
+
+    @In
+    private Physics physics;
 
     private EntityRef clientEntity = EntityRef.NULL;
     private int nextActivationId;
@@ -44,10 +47,6 @@ public class LocalPlayer {
     //Record and Replay classes
     private DirectionAndOriginPosRecorderList directionAndOriginPosRecorderList;
     private RecordAndReplayCurrentStatus recordAndReplayCurrentStatus;
-
-    public LocalPlayer() {
-
-    }
 
     // TODO: As per Immortius answer in Pull Request #1088,
     // TODO: there appears to be situations in which LocalPlayer is instantiated
@@ -355,7 +354,6 @@ public class LocalPlayer {
         }
         boolean ownedEntityUsage = usedOwnedEntity.exists();
         int activationId = nextActivationId++;
-        Physics physics = CoreRegistry.get(Physics.class);
         HitResult result = physics.rayTrace(originPos, direction, characterComponent.interactionRange, Sets.newHashSet(character), CharacterSystem.DEFAULTPHYSICSFILTER);
         boolean eventWithTarget = result.isHit();
         if (eventWithTarget) {

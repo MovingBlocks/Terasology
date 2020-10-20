@@ -88,9 +88,8 @@ public class StateHeadlessSetup implements GameState {
         componentSystemManager.register(inputSystem, "engine:InputSystem");
 
         EntityRef localPlayerEntity = entityManager.create(new ClientComponent());
-        LocalPlayer localPlayer = new LocalPlayer();
+        LocalPlayer localPlayer = classFactory.createToContext(LocalPlayer.class);
         localPlayer.setRecordAndReplayClasses(directionAndOriginPosRecorderList, recordAndReplayCurrentStatus);
-        context.put(LocalPlayer.class, localPlayer);
         localPlayer.setClientEntity(localPlayerEntity);
 
         componentSystemManager.initialise();
