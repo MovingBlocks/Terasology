@@ -58,7 +58,6 @@ import org.terasology.recording.RecordAndReplayUtils;
 import org.terasology.reflection.TypeRegistry;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.reflect.ReflectFactory;
-import org.terasology.registry.ContextAwareClassFactory;
 import org.terasology.rendering.assets.animation.MeshAnimation;
 import org.terasology.rendering.assets.animation.MeshAnimationImpl;
 import org.terasology.rendering.assets.atlas.Atlas;
@@ -145,8 +144,9 @@ public class HeadlessEnvironment extends Environment {
     protected void setupNetwork() {
         EngineTime mockTime = mock(EngineTime.class);
         context.put(Time.class, mockTime);
-        NetworkSystem networkSystem = new NetworkSystemImpl(mockTime, getContext());
-        context.put(NetworkSystem.class, networkSystem);
+        classFactory.createToContext(NetworkSystem.class, (cntx ->
+            new NetworkSystemImpl(mockTime, cntx.get(Config.class), null, cntx.get(ModuleManager.class), null, null)
+        ));
     }
 
     @Override
@@ -321,7 +321,6 @@ public class HeadlessEnvironment extends Environment {
 
     @Override
     protected void loadPrefabs() {
-        ContextAwareClassFactory classFactory = ContextAwareClassFactory.create(context);
         LoadPrefabs prefabLoadStep = classFactory.createWithContext(LoadPrefabs.class);
 
         boolean complete = false;

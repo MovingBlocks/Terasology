@@ -25,10 +25,12 @@ import org.jboss.netty.handler.codec.protobuf.ProtobufDecoder;
 import org.jboss.netty.handler.codec.protobuf.ProtobufEncoder;
 import org.jboss.netty.handler.codec.protobuf.ProtobufVarint32FrameDecoder;
 import org.jboss.netty.handler.codec.protobuf.ProtobufVarint32LengthFieldPrepender;
+import org.terasology.config.Config;
+import org.terasology.identity.storageServiceClient.StorageServiceWorker;
 import org.terasology.network.internal.ClientHandshakeHandler;
-import org.terasology.network.internal.ServerInfoRequestHandler;
 import org.terasology.network.internal.JoinStatusImpl;
 import org.terasology.network.internal.MetricRecordingHandler;
+import org.terasology.network.internal.ServerInfoRequestHandler;
 import org.terasology.protobuf.NetData;
 
 /**
@@ -36,6 +38,14 @@ import org.terasology.protobuf.NetData;
  * This is similar to {@link TerasologyClientPipelineFactory}.
  */
 public class InfoRequestPipelineFactory implements ChannelPipelineFactory {
+
+    private final Config config;
+    private final StorageServiceWorker storageSericeWorker;
+
+    public InfoRequestPipelineFactory(Config config, StorageServiceWorker storageSericeWorker) {
+        this.config = config;
+        this.storageSericeWorker = storageSericeWorker;
+    }
 
     @Override
     public ChannelPipeline getPipeline() throws Exception {
@@ -51,7 +61,7 @@ public class InfoRequestPipelineFactory implements ChannelPipelineFactory {
 
         p.addLast("frameEncoder", new ProtobufVarint32LengthFieldPrepender());
         p.addLast("protobufEncoder", new ProtobufEncoder());
-        p.addLast("authenticationHandler", new ClientHandshakeHandler(joinStatus));
+        p.addLast("authenticationHandler", new ClientHandshakeHandler(config, storageSericeWorker, joinStatus));
         p.addLast("connectionHandler", new ServerInfoRequestHandler());
 
         return p;

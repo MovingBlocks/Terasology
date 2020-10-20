@@ -10,6 +10,7 @@ import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.terasology.config.Config;
 import org.terasology.context.Context;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.EngineTime;
@@ -82,9 +83,10 @@ public abstract class TerasologyTestingEnvironment {
 
         mockTime = mock(EngineTime.class);
         context.put(Time.class, mockTime);
-        NetworkSystemImpl networkSystem = new NetworkSystemImpl(mockTime, context);
+        classFactory.createToContext(NetworkSystem.class, (cntx ->
+                new NetworkSystemImpl(mockTime, cntx.get(Config.class), null, cntx.get(ModuleManager.class), null, null)
+        ));
         context.put(Game.class, new Game());
-        context.put(NetworkSystem.class, networkSystem);
         EntitySystemSetupUtil.addReflectionBasedLibraries(context);
         EntitySystemSetupUtil.addEntityManagementRelatedClasses(context);
         engineEntityManager = context.get(EngineEntityManager.class);

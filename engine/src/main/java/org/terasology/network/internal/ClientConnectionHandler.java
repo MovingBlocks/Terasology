@@ -25,7 +25,6 @@ import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
 import org.terasology.engine.EngineTime;
 import org.terasology.engine.TerasologyConstants;
-import org.terasology.engine.Time;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.module.ModuleLoader;
@@ -33,7 +32,6 @@ import org.terasology.naming.Name;
 import org.terasology.naming.Version;
 import org.terasology.network.JoinStatus;
 import org.terasology.protobuf.NetData;
-import org.terasology.registry.CoreRegistry;
 
 import java.io.BufferedOutputStream;
 import java.io.IOException;
@@ -49,6 +47,8 @@ public class ClientConnectionHandler extends SimpleChannelUpstreamHandler {
     private static final Logger logger = LoggerFactory.getLogger(ClientConnectionHandler.class);
 
     private final JoinStatusImpl joinStatus;
+    private final Config config;
+    private final EngineTime engineTime;
     private NetworkSystemImpl networkSystem;
     private ServerImpl server;
     private ModuleManager moduleManager;
@@ -68,12 +68,14 @@ public class ClientConnectionHandler extends SimpleChannelUpstreamHandler {
      * @param joinStatus
      * @param networkSystem
      */
-    public ClientConnectionHandler(JoinStatusImpl joinStatus, NetworkSystemImpl networkSystem) {
+    public ClientConnectionHandler(JoinStatusImpl joinStatus, NetworkSystemImpl networkSystem, ModuleManager moduleManager, Config config, EngineTime engineTime) {
         this.networkSystem = networkSystem;
         this.joinStatus = joinStatus;
         // TODO: implement translation of errorMessage in messageReceived once context is available
         // See https://github.com/MovingBlocks/Terasology/pull/3332#discussion_r187081375
-        this.moduleManager = CoreRegistry.get(ModuleManager.class);
+        this.moduleManager = moduleManager;
+        this.config = config;
+        this.engineTime = engineTime;
     }
 
     /**
@@ -272,8 +274,8 @@ public class ClientConnectionHandler extends SimpleChannelUpstreamHandler {
      */
     private void receivedServerInfo(ChannelHandlerContext channelHandlerContext, NetData.ServerInfoMessage message) {
         logger.info("Received server info");
-        ((EngineTime) CoreRegistry.get(Time.class)).setGameTime(message.getTime());
-        this.server = new ServerImpl(networkSystem, channelHandlerContext.getChannel());
+        engineTime.setGameTime(message.getTime());
+        this.server = new ServerImpl(networkSystem, channelHandlerContext.getChannel(), engineTime);
         server.setServerInfo(message);
 
         // Request missing modules
@@ -302,7 +304,6 @@ public class ClientConnectionHandler extends SimpleChannelUpstreamHandler {
      * @param channelHandlerContext
      */
     private void sendJoin(ChannelHandlerContext channelHandlerContext) {
-        Config config = CoreRegistry.get(Config.class);
         NetData.JoinMessage.Builder bldr = NetData.JoinMessage.newBuilder();
         NetData.Color.Builder clrbldr = NetData.Color.newBuilder();
 

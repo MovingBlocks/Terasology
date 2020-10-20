@@ -24,7 +24,6 @@ import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.modes.StateMainMenu;
 
@@ -38,16 +37,17 @@ public class ClientHandler extends SimpleChannelUpstreamHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(ClientHandler.class);
 
-    private NetworkSystemImpl networkSystem;
+    private final GameEngine gameEngine;
+    private final NetworkSystemImpl networkSystem;
     private ServerImpl server;
 
-    public ClientHandler(NetworkSystemImpl networkSystem) {
+    public ClientHandler(NetworkSystemImpl networkSystem, GameEngine gameEngine) {
         this.networkSystem = networkSystem;
+        this.gameEngine = gameEngine;
     }
 
     @Override
     public void channelDisconnected(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
-        GameEngine gameEngine = CoreRegistry.get(GameEngine.class);
         if (gameEngine != null) {
             gameEngine.changeState(new StateMainMenu("Disconnected From Server"));
         }

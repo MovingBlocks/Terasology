@@ -24,6 +24,11 @@ import org.jboss.netty.handler.codec.protobuf.ProtobufDecoder;
 import org.jboss.netty.handler.codec.protobuf.ProtobufEncoder;
 import org.jboss.netty.handler.codec.protobuf.ProtobufVarint32FrameDecoder;
 import org.jboss.netty.handler.codec.protobuf.ProtobufVarint32LengthFieldPrepender;
+import org.terasology.config.Config;
+import org.terasology.engine.EngineTime;
+import org.terasology.engine.GameEngine;
+import org.terasology.engine.module.ModuleManager;
+import org.terasology.identity.storageServiceClient.StorageServiceWorker;
 import org.terasology.network.internal.ClientConnectionHandler;
 import org.terasology.network.internal.ClientHandler;
 import org.terasology.network.internal.ClientHandshakeHandler;
@@ -40,10 +45,22 @@ import static org.jboss.netty.channel.Channels.pipeline;
  */
 public class TerasologyClientPipelineFactory implements ChannelPipelineFactory {
 
-    private NetworkSystemImpl networkSystem;
+    private final Config config;
+    private final GameEngine gameEngine;
+    private final EngineTime engineTime;
+    private final ModuleManager moduleManager;
+    private final StorageServiceWorker storageServiceWorker;
+    private final NetworkSystemImpl networkSystem;
 
-    public TerasologyClientPipelineFactory(NetworkSystemImpl networkSystem) {
+    public TerasologyClientPipelineFactory(NetworkSystemImpl networkSystem, Config config,
+                                           GameEngine gameEngine, EngineTime engineTime, ModuleManager moduleManager,
+                                           StorageServiceWorker storageServiceWorker) {
         this.networkSystem = networkSystem;
+        this.config = config;
+        this.gameEngine = gameEngine;
+        this.engineTime = engineTime;
+        this.moduleManager = moduleManager;
+        this.storageServiceWorker = storageServiceWorker;
     }
 
     @Override
@@ -59,9 +76,10 @@ public class TerasologyClientPipelineFactory implements ChannelPipelineFactory {
 
         p.addLast("frameEncoder", new ProtobufVarint32LengthFieldPrepender());
         p.addLast("protobufEncoder", new ProtobufEncoder());
-        p.addLast("authenticationHandler", new ClientHandshakeHandler(joinStatus));
-        p.addLast("connectionHandler", new ClientConnectionHandler(joinStatus, networkSystem));
-        p.addLast("handler", new ClientHandler(networkSystem));
+        p.addLast("authenticationHandler", new ClientHandshakeHandler(config, storageServiceWorker, joinStatus));
+        p.addLast("connectionHandler", new ClientConnectionHandler(
+                joinStatus, networkSystem, moduleManager, config, engineTime));
+        p.addLast("handler", new ClientHandler(networkSystem, gameEngine));
         return p;
     }
 }

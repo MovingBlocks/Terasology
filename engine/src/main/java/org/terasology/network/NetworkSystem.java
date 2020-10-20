@@ -23,7 +23,10 @@ import org.terasology.entitySystem.metadata.EventLibrary;
 import org.terasology.network.exceptions.HostingFailedException;
 import org.terasology.nui.Color;
 import org.terasology.world.BlockEntityRegistry;
+import org.terasology.world.WorldProvider;
+import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.internal.BlockRegistrationListener;
+import org.terasology.world.chunks.blockdata.ExtraBlockDataManager;
 import org.terasology.world.chunks.remoteChunkProvider.RemoteChunkProvider;
 
 /**
@@ -53,7 +56,10 @@ public interface NetworkSystem extends BlockRegistrationListener {
 
     EntityRef getOwnerEntity(EntityRef entity);
 
-    void setRemoteWorldProvider(RemoteChunkProvider remoteWorldProvider);
+    void connectToWorldSystems(RemoteChunkProvider remoteWorldProvider,
+                               WorldProvider newWorldProvider,
+                               BlockManager newBlockProvider,
+                               ExtraBlockDataManager newExtraBlockDataManager);
 
     void connectToEntitySystem(EngineEntityManager entityManager, EventLibrary library, BlockEntityRegistry blockEntityRegistry);
 

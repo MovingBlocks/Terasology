@@ -43,8 +43,8 @@ import org.terasology.config.Config;
 import org.terasology.config.NetworkConfig;
 import org.terasology.context.Context;
 import org.terasology.engine.ComponentSystemManager;
-import org.terasology.engine.SimpleUri;
-import org.terasology.engine.Time;
+import org.terasology.engine.EngineTime;
+import org.terasology.engine.GameEngine;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.module.StandardModuleExtension;
 import org.terasology.engine.subsystem.common.hibernation.HibernationManager;
@@ -58,6 +58,8 @@ import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.metadata.ComponentMetadata;
 import org.terasology.entitySystem.metadata.EventLibrary;
 import org.terasology.entitySystem.metadata.EventMetadata;
+import org.terasology.identity.storageServiceClient.StorageServiceWorker;
+import org.terasology.logic.characters.PredictionSystem;
 import org.terasology.module.Module;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.network.Client;
@@ -83,11 +85,11 @@ import org.terasology.protobuf.NetData;
 import org.terasology.reflection.metadata.ClassLibrary;
 import org.terasology.reflection.metadata.ClassMetadata;
 import org.terasology.reflection.metadata.FieldMetadata;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.family.BlockFamily;
+import org.terasology.world.chunks.blockdata.ExtraBlockDataManager;
 import org.terasology.world.chunks.remoteChunkProvider.RemoteChunkProvider;
 import org.terasology.world.generator.WorldGenerator;
 
@@ -119,7 +121,9 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     // Shared
     private Context context;
     private Optional<HibernationManager> hibernationSettings;
-    private NetworkConfig config;
+    private NetworkConfig networkConfig;
+    private Config config;
+    private ModuleManager moduleManager;
     private NetworkMode mode = NetworkMode.NONE;
     private EngineEntityManager entityManager;
     private ComponentLibrary componentLibrary;
@@ -132,7 +136,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     private ChannelFactory factory;
     private TIntLongMap netIdToEntityId = new TIntLongHashMap();
 
-    private Time time;
+    private EngineTime time;
     private long nextNetworkTick;
 
     private boolean kicked;
@@ -151,11 +155,19 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
 
     // Client only
     private ServerImpl server;
+    private GameEngine gameEngine;
+    private StorageServiceWorker storageServiceWorker;
 
-    public NetworkSystemImpl(Time time, Context context) {
+    public NetworkSystemImpl(EngineTime time, Config config, HibernationManager hibernationManager,
+                             ModuleManager moduleManager, StorageServiceWorker storageServiceWorker,
+                             GameEngine gameEngine) {
         this.time = time;
-        this.config = context.get(Config.class).getNetwork();
-        this.hibernationSettings = Optional.ofNullable(context.get(HibernationManager.class));
+        this.config = config;
+        this.networkConfig = config.getNetwork();
+        this.hibernationSettings = Optional.ofNullable(hibernationManager);
+        this.moduleManager = moduleManager;
+        this.gameEngine = gameEngine;
+        this.storageServiceWorker = storageServiceWorker;
     }
 
     @Override
@@ -173,14 +185,15 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
 
                 factory = new NioServerSocketChannelFactory(Executors.newCachedThreadPool(), Executors.newCachedThreadPool());
                 ServerBootstrap bootstrap = new ServerBootstrap(factory);
-                bootstrap.setPipelineFactory(new TerasologyServerPipelineFactory(this));
+                bootstrap.setPipelineFactory(new TerasologyServerPipelineFactory(this, config, moduleManager, time,
+                        context.get(WorldProvider.class), context.get(PredictionSystem.class)));
                 bootstrap.setOption("child.tcpNoDelay", true);
                 bootstrap.setOption("child.keepAlive", true);
                 Channel listenChannel = bootstrap.bind(new InetSocketAddress(port));
                 allChannels.add(listenChannel);
                 logger.info("Started server on port {}", port);
-                if (config.getServerMOTD() != null) {
-                    logger.info("Server MOTD is \"{}\"", config.getServerMOTD());
+                if (networkConfig.getServerMOTD() != null) {
+                    logger.info("Server MOTD is \"{}\"", networkConfig.getServerMOTD());
                 } else {
                     logger.info("No server MOTD is defined");
                 }
@@ -220,7 +233,8 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
             }
             factory = new NioClientSocketChannelFactory(Executors.newCachedThreadPool(), Executors.newCachedThreadPool());
             ClientBootstrap bootstrap = new ClientBootstrap(factory);
-            bootstrap.setPipelineFactory(new TerasologyClientPipelineFactory(this));
+            bootstrap.setPipelineFactory(new TerasologyClientPipelineFactory(this, config, gameEngine,
+                    time, moduleManager, storageServiceWorker));
             bootstrap.setOption("tcpNoDelay", true);
             bootstrap.setOption("keepAlive", true);
             ChannelFuture connectCheck = bootstrap.connect(new InetSocketAddress(address, port));
@@ -292,7 +306,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
 
     @Override
     public Client joinLocal(String preferredName, Color color) {
-        Client localClient = new LocalClient(preferredName, color, entityManager);
+        Client localClient = new LocalClient(config, preferredName, color, entityManager);
         clientList.add(localClient);
         clientPlayerLookup.put(localClient.getEntity(), localClient);
         connectClient(localClient);
@@ -370,9 +384,9 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
 
     public int getBandwidthPerClient() {
         if (netClientList.size() > 0) {
-            return config.getUpstreamBandwidth() / netClientList.size();
+            return networkConfig.getUpstreamBandwidth() / netClientList.size();
         }
-        return config.getUpstreamBandwidth();
+        return networkConfig.getUpstreamBandwidth();
     }
 
     @Override
@@ -392,8 +406,11 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     }
 
     @Override
-    public void setRemoteWorldProvider(RemoteChunkProvider remoteWorldProvider) {
-        server.setRemoteWorldProvider(remoteWorldProvider);
+    public void connectToWorldSystems(RemoteChunkProvider remoteWorldProvider,
+                                      WorldProvider newWorldProvider,
+                                      BlockManager newBlockProvider,
+                                      ExtraBlockDataManager newExtraBlockDataManager) {
+        server.connectToWorldSystems(remoteWorldProvider, newWorldProvider, newBlockProvider, newExtraBlockDataManager);
     }
 
     public void registerClientNetworkEntity(int netId, long entityId) {
@@ -847,8 +864,8 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     private NetData.ServerInfoMessage getServerInfoMessage(String errorMessage) {
         NetData.ServerInfoMessage.Builder serverInfoMessageBuilder = NetData.ServerInfoMessage.newBuilder();
         serverInfoMessageBuilder.setTime(time.getGameTimeInMs());
-        if (config.getServerMOTD() != null) {
-            serverInfoMessageBuilder.setMOTD(config.getServerMOTD());
+        if (networkConfig.getServerMOTD() != null) {
+            serverInfoMessageBuilder.setMOTD(networkConfig.getServerMOTD());
         }
         serverInfoMessageBuilder.setOnlinePlayersAmount(clientList.size());
         WorldProvider worldProvider = context.get(WorldProvider.class);
@@ -862,7 +879,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
         if (worldGen != null) {
             serverInfoMessageBuilder.setReflectionHeight(worldGen.getWorld().getSeaLevel() + 0.5f);
         }
-        for (Module module : CoreRegistry.get(ModuleManager.class).getEnvironment()) {
+        for (Module module : moduleManager.getEnvironment()) {
             if (!StandardModuleExtension.isServerSideOnly(module)) {
                 serverInfoMessageBuilder.addModule(NetData.ModuleInfo.newBuilder()
                         .setModuleId(module.getId().toString())

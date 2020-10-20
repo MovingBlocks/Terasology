@@ -30,7 +30,6 @@ import org.jboss.netty.channel.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.EngineTime;
-import org.terasology.engine.Time;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
@@ -48,7 +47,6 @@ import org.terasology.persistence.typeHandling.DeserializationException;
 import org.terasology.persistence.typeHandling.SerializationException;
 import org.terasology.protobuf.EntityData;
 import org.terasology.protobuf.NetData;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
@@ -90,7 +88,7 @@ public class ServerImpl implements Server {
     private NetworkEntitySerializer entitySerializer;
     private EventSerializer eventSerializer;
     private BlockManagerImpl blockManager;
-    private ExtraBlockDataManager extraDataManager;
+    private ExtraBlockDataManager extraBlockDataManager;
 
     private BlockEntityRegistry blockEntityRegistry;
     private RemoteChunkProvider remoteWorldProvider;
@@ -101,13 +99,22 @@ public class ServerImpl implements Server {
     private ListMultimap<Vector3i, NetData.ExtraDataChangeMessage> awaitingChunkReadyExtraDataUpdates = ArrayListMultimap.create();
 
     private EngineTime time;
+    private WorldProvider worldProvider;
 
 
-    public ServerImpl(NetworkSystemImpl system, Channel channel) {
+    public ServerImpl(NetworkSystemImpl system, Channel channel, EngineTime engineTime) {
         this.channel = channel;
         metricsSource = (NetMetricSource) channel.getPipeline().get(MetricRecordingHandler.NAME);
         this.networkSystem = system;
-        this.time = (EngineTime) CoreRegistry.get(Time.class);
+        this.time = engineTime;
+      
+    }
+
+    void connectToWorldSystems(RemoteChunkProvider newRemoteWorldProvider, WorldProvider newWorldProvider, BlockManager newBlockProvider, ExtraBlockDataManager newExtraBlockDataManager) {
+        setRemoteWorldProvider(newRemoteWorldProvider);
+        this.worldProvider = newWorldProvider;
+        this.blockManager = (BlockManagerImpl)newBlockProvider;
+        this.extraBlockDataManager = newExtraBlockDataManager;
     }
 
     void connectToEntitySystem(EngineEntityManager newEntityManager, NetworkEntitySerializer newEntitySerializer,
@@ -116,8 +123,6 @@ public class ServerImpl implements Server {
         this.eventSerializer = newEventSerializer;
         this.entitySerializer = newEntitySerializer;
         this.blockEntityRegistry = newBlockEntityRegistry;
-        blockManager = (BlockManagerImpl) CoreRegistry.get(BlockManager.class);
-        extraDataManager = CoreRegistry.get(ExtraBlockDataManager.class);
     }
 
     void setServerInfo(NetData.ServerInfoMessage serverInfo) {
@@ -300,7 +305,6 @@ public class ServerImpl implements Server {
             Block newBlock = blockManager.getBlock((short) blockChange.getNewBlock());
             logger.debug("Received block change to {}", newBlock);
             // TODO: Store changes to blocks that aren't ready to be modified (the surrounding chunks aren't available)
-            WorldProvider worldProvider = CoreRegistry.get(WorldProvider.class);
             Vector3i pos = NetMessageUtil.convert(blockChange.getPos());
             if (worldProvider.isBlockRelevant(pos)) {
                 worldProvider.setBlock(pos, newBlock);
@@ -315,7 +319,6 @@ public class ServerImpl implements Server {
      */
     private void processExtraDataChanges(NetData.NetMessage message) {
         for (NetData.ExtraDataChangeMessage extraDataChange : message.getExtraDataChangeList()) {
-            WorldProvider worldProvider = CoreRegistry.get(WorldProvider.class);
             Vector3i pos = NetMessageUtil.convert(extraDataChange.getPos());
             if (worldProvider.isBlockRelevant(pos)) {
                 worldProvider.setExtraData(extraDataChange.getIndex(), pos, extraDataChange.getNewData());
@@ -336,7 +339,7 @@ public class ServerImpl implements Server {
 
     private void processReceivedChunks(NetData.NetMessage message) {
         for (EntityData.ChunkStore chunkInfo : message.getChunkInfoList()) {
-            Chunk chunk = ChunkSerializer.decode(chunkInfo, blockManager, extraDataManager);
+            Chunk chunk = ChunkSerializer.decode(chunkInfo, blockManager, extraBlockDataManager);
             chunkQueue.offer(chunk);
         }
     }
@@ -411,8 +414,6 @@ public class ServerImpl implements Server {
 
     @Override
     public void onChunkReady(Vector3i chunkPos) {
-        WorldProvider worldProvider = CoreRegistry.get(WorldProvider.class);
-
         List<NetData.BlockChangeMessage> updateBlockMessages = awaitingChunkReadyBlockUpdates.removeAll(chunkPos);
         for (NetData.BlockChangeMessage message : updateBlockMessages) {
             Vector3i pos = NetMessageUtil.convert(message.getPos());

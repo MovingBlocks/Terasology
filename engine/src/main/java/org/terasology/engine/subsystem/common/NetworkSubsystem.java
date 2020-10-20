@@ -3,7 +3,6 @@
 package org.terasology.engine.subsystem.common;
 
 import org.terasology.context.Context;
-import org.terasology.engine.GameEngine;
 import org.terasology.engine.modes.GameState;
 import org.terasology.engine.subsystem.EngineSubsystem;
 import org.terasology.network.NetworkSystem;
@@ -28,12 +27,8 @@ public class NetworkSubsystem implements EngineSubsystem {
     }
 
     @Override
-    public void initialise(GameEngine engine, Context rootContext) {
-        networkSystem = classFactory.createToContext(NetworkSystemImpl.class, NetworkSystem.class);
-    }
-
-    @Override
     public void postInitialise(Context rootContext) {
+        networkSystem = classFactory.createToContext(NetworkSystemImpl.class, NetworkSystem.class);
         classFactory.createToContext(ServerConnectListManager.class);
     }
 

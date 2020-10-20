@@ -24,12 +24,17 @@ import org.jboss.netty.handler.codec.protobuf.ProtobufDecoder;
 import org.jboss.netty.handler.codec.protobuf.ProtobufEncoder;
 import org.jboss.netty.handler.codec.protobuf.ProtobufVarint32FrameDecoder;
 import org.jboss.netty.handler.codec.protobuf.ProtobufVarint32LengthFieldPrepender;
+import org.terasology.config.Config;
+import org.terasology.engine.Time;
+import org.terasology.engine.module.ModuleManager;
+import org.terasology.logic.characters.PredictionSystem;
 import org.terasology.network.internal.MetricRecordingHandler;
 import org.terasology.network.internal.NetworkSystemImpl;
 import org.terasology.network.internal.ServerConnectionHandler;
 import org.terasology.network.internal.ServerHandler;
 import org.terasology.network.internal.ServerHandshakeHandler;
 import org.terasology.protobuf.NetData;
+import org.terasology.world.WorldProvider;
 
 import static org.jboss.netty.channel.Channels.pipeline;
 
@@ -39,10 +44,21 @@ import static org.jboss.netty.channel.Channels.pipeline;
  */
 public class TerasologyServerPipelineFactory implements ChannelPipelineFactory {
 
-    private NetworkSystemImpl networkSystem;
+    private final NetworkSystemImpl networkSystem;
+    private final Config config;
+    private final ModuleManager moduleManager;
+    private final Time time;
+    private final WorldProvider worldProvider;
+    private final PredictionSystem predictionSystem;
+    
 
-    public TerasologyServerPipelineFactory(NetworkSystemImpl networkSystem) {
+    public TerasologyServerPipelineFactory(NetworkSystemImpl networkSystem, Config config, ModuleManager moduleManager, Time time, WorldProvider worldProvider, PredictionSystem predictionSystem) {
         this.networkSystem = networkSystem;
+        this.config = config;
+        this.moduleManager = moduleManager;
+        this.time = time;
+        this.worldProvider = worldProvider;
+        this.predictionSystem = predictionSystem;
     }
 
     @Override
@@ -58,8 +74,8 @@ public class TerasologyServerPipelineFactory implements ChannelPipelineFactory {
         p.addLast("frameEncoder", new ProtobufVarint32LengthFieldPrepender());
         p.addLast("protobufEncoder", new ProtobufEncoder());
 
-        p.addLast("authenticationHandler", new ServerHandshakeHandler());
-        p.addLast("connectionHandler", new ServerConnectionHandler(networkSystem));
+        p.addLast("authenticationHandler", new ServerHandshakeHandler(config));
+        p.addLast("connectionHandler", new ServerConnectionHandler(moduleManager, time, worldProvider, predictionSystem, networkSystem));
         p.addLast("handler", new ServerHandler(networkSystem));
         return p;
     }

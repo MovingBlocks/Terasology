@@ -18,7 +18,6 @@ package org.terasology.rendering.nui.layers.mainMenu;
 import com.google.common.base.Joiner;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
@@ -38,12 +37,9 @@ import org.terasology.network.NetworkSystem;
 import org.terasology.network.PingService;
 import org.terasology.network.ServerInfoMessage;
 import org.terasology.network.ServerInfoService;
-import org.terasology.registry.In;
-import org.terasology.nui.FontColor;
 import org.terasology.nui.Color;
-import org.terasology.rendering.nui.CoreScreenLayer;
+import org.terasology.nui.FontColor;
 import org.terasology.nui.WidgetUtil;
-import org.terasology.rendering.nui.animation.MenuAnimationSystems;
 import org.terasology.nui.databinding.BindHelper;
 import org.terasology.nui.databinding.IntToStringBinding;
 import org.terasology.nui.databinding.ReadOnlyBinding;
@@ -54,6 +50,9 @@ import org.terasology.nui.widgets.ActivateEventListener;
 import org.terasology.nui.widgets.UIButton;
 import org.terasology.nui.widgets.UILabel;
 import org.terasology.nui.widgets.UIList;
+import org.terasology.registry.In;
+import org.terasology.rendering.nui.CoreScreenLayer;
+import org.terasology.rendering.nui.animation.MenuAnimationSystems;
 import org.terasology.world.internal.WorldInfo;
 import org.terasology.world.time.WorldTime;
 
@@ -160,7 +159,7 @@ public class JoinGameScreen extends CoreScreenLayer {
     public void onOpened() {
         super.onOpened();
 
-        infoService = new ServerInfoService();
+        infoService = new ServerInfoService(config, storageServiceWorker);
 
         if (!config.getPlayer().hasEnteredUsername()) {
             getManager().pushScreen(EnterUsernamePopup.ASSET_URI, EnterUsernamePopup.class);

@@ -56,7 +56,6 @@ import org.terasology.persistence.typeHandling.DeserializationException;
 import org.terasology.persistence.typeHandling.SerializationException;
 import org.terasology.protobuf.EntityData;
 import org.terasology.protobuf.NetData;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.world.viewDistance.ViewDistance;
 import org.terasology.world.WorldChangeListener;
 import org.terasology.world.WorldProvider;
@@ -83,6 +82,8 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
     private static final float NET_TICK_RATE = 0.05f;
 
     private Time time;
+    private WorldProvider worldProvider;
+    private PredictionSystem predictionSystem;
     private NetworkSystemImpl networkSystem;
     private Channel channel;
     private NetworkEntitySerializer entitySerializer;
@@ -137,13 +138,14 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
      * @param networkSystem
      * @param identity Publice certificate for the client.
      */
-    public NetClient(Channel channel, NetworkSystemImpl networkSystem, PublicIdentityCertificate identity) {
+    public NetClient(Channel channel, NetworkSystemImpl networkSystem, PublicIdentityCertificate identity, Time time, WorldProvider worldProvider, PredictionSystem predictionSystem) {
         this.channel = channel;
         metricSource = (NetMetricSource) channel.getPipeline().get(MetricRecordingHandler.NAME);
         this.networkSystem = networkSystem;
-        this.time = CoreRegistry.get(Time.class);
+        this.predictionSystem = predictionSystem;
+        this.worldProvider = worldProvider;
+        this.time = time;
         this.identity = identity;
-        WorldProvider worldProvider = CoreRegistry.get(WorldProvider.class);
         if (worldProvider != null) {
             worldProvider.registerListener(this);
         }
@@ -207,7 +209,6 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
             channel.close().awaitUninterruptibly();
         }
 
-        WorldProvider worldProvider = CoreRegistry.get(WorldProvider.class);
         if (worldProvider != null) {
             worldProvider.unregisterListener(this);
         }
@@ -504,7 +505,6 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
 
     private void processEvents(NetData.NetMessage message) {
         boolean lagCompensated = false;
-        PredictionSystem predictionSystem = CoreRegistry.get(PredictionSystem.class);
         for (NetData.EventMessage eventMessage : message.getEventList()) {
             try {
                 Event event = eventSerializer.deserialize(eventMessage.getEvent());

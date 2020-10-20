@@ -19,6 +19,7 @@ package org.terasology.network.internal;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.terasology.TerasologyTestingEnvironment;
+import org.terasology.config.Config;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.EngineTime;
 import org.terasology.engine.bootstrap.EntitySystemSetupUtil;
@@ -56,7 +57,7 @@ public class NetworkOwnershipTest extends TerasologyTestingEnvironment {
         ModuleManager moduleManager = ModuleManagerFactory.create();
         context.put(ModuleManager.class, moduleManager);
         EngineTime mockTime = mock(EngineTime.class);
-        networkSystem = new NetworkSystemImpl(mockTime, context);
+        networkSystem = new NetworkSystemImpl(mockTime, context.get(Config.class), null, moduleManager, null, null);
         networkSystem.setContext(context);
         context.put(NetworkSystem.class, networkSystem);
 

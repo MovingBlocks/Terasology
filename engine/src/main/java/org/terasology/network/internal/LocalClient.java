@@ -25,7 +25,6 @@ import org.terasology.math.geom.Vector3i;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.ColorComponent;
 import org.terasology.nui.Color;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.world.viewDistance.ViewDistance;
 import org.terasology.world.chunks.Chunk;
 
@@ -35,7 +34,7 @@ import org.terasology.world.chunks.Chunk;
  */
 public class LocalClient extends AbstractClient {
 
-    private Config config = CoreRegistry.get(Config.class);
+    private final Config config;
 
     /**
      * Creates an entity for the new local client.
@@ -43,7 +42,8 @@ public class LocalClient extends AbstractClient {
      * @param color Clients preferred color.
      * @param entityManager Entity manager for the clients entity creation.
      */
-    public LocalClient(String preferredName, Color color, EntityManager entityManager) {
+    public LocalClient(Config config, String preferredName, Color color, EntityManager entityManager) {
+        this.config = config;
         createEntity(preferredName, color, entityManager);
     }
 

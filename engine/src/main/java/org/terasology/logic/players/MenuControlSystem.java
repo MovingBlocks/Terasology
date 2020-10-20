@@ -17,6 +17,7 @@
 package org.terasology.logic.players;
 
 import org.terasology.audio.AudioManager;
+import org.terasology.engine.Time;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
@@ -31,14 +32,12 @@ import org.terasology.logic.characters.events.PlayerDeathEvent;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.layers.ingame.DeathScreen;
 import org.terasology.rendering.nui.layers.ingame.OnlinePlayersOverlay;
 import org.terasology.rendering.opengl.ScreenGrabber;
 import org.terasology.utilities.Assets;
-import org.terasology.engine.Time;
 
 
 /**
@@ -55,6 +54,12 @@ public class MenuControlSystem extends BaseComponentSystem {
 
     @In
     private NetworkSystem networkSystem;
+
+    @In
+    private ScreenGrabber screenGrabber;
+
+    @In
+    private AudioManager audioManager;
 
     @Override
     public void initialise() {
@@ -80,8 +85,8 @@ public class MenuControlSystem extends BaseComponentSystem {
     @ReceiveEvent(components = ClientComponent.class)
     public void onScreenshotCapture(ScreenshotButton event, EntityRef entity) {
         if (event.getState() == ButtonState.DOWN) {
-            CoreRegistry.get(ScreenGrabber.class).takeScreenshot();
-            CoreRegistry.get(AudioManager.class).playSound(Assets.getSound("engine:camera").get());
+            screenGrabber.takeScreenshot();
+            audioManager.playSound(Assets.getSound("engine:camera").get());
             event.consume();
         }
     }

@@ -24,6 +24,7 @@ import org.terasology.context.Context;
 import org.terasology.context.internal.ContextImpl;
 import org.terasology.naming.Name;
 import org.terasology.recording.RecordAndReplayCurrentStatus;
+import org.terasology.registry.ContextAwareClassFactory;
 import org.terasology.registry.CoreRegistry;
 
 import java.io.IOException;
@@ -38,6 +39,7 @@ public class Environment {
     private static final Logger logger = LoggerFactory.getLogger(Environment.class);
 
     protected Context context;
+    protected ContextAwareClassFactory classFactory;
 
     /**
      * Default setup order
@@ -58,6 +60,7 @@ public class Environment {
         RecordAndReplayCurrentStatus recordAndReplayCurrentStatus = new RecordAndReplayCurrentStatus();
         context.put(RecordAndReplayCurrentStatus.class, recordAndReplayCurrentStatus);
         CoreRegistry.setContext(context);
+        classFactory = ContextAwareClassFactory.create(context);
 
         setupPathManager();
 

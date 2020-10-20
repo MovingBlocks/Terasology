@@ -20,6 +20,8 @@ import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelFuture;
 import org.jboss.netty.channel.socket.nio.NioClientSocketChannelFactory;
+import org.terasology.config.Config;
+import org.terasology.identity.storageServiceClient.StorageServiceWorker;
 import org.terasology.network.internal.ServerInfoRequestHandler;
 import org.terasology.network.internal.pipelineFactory.InfoRequestPipelineFactory;
 
@@ -37,11 +39,11 @@ public class ServerInfoService implements AutoCloseable {
     private final NioClientSocketChannelFactory factory;
     private final ExecutorService pool;
 
-    public ServerInfoService() {
+    public ServerInfoService(Config config, StorageServiceWorker storageServiceWorker) {
         pool = Executors.newCachedThreadPool();
         factory = new NioClientSocketChannelFactory(pool, pool, 1, 1);
         bootstrap = new ClientBootstrap(factory);
-        bootstrap.setPipelineFactory(new InfoRequestPipelineFactory());
+        bootstrap.setPipelineFactory(new InfoRequestPipelineFactory(config, storageServiceWorker));
         bootstrap.setOption("tcpNoDelay", true);
         bootstrap.setOption("keepAlive", true);
     }

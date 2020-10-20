@@ -23,14 +23,16 @@ import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.engine.Time;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.identity.PublicIdentityCertificate;
+import org.terasology.logic.characters.PredictionSystem;
 import org.terasology.module.Module;
 import org.terasology.naming.Name;
 import org.terasology.nui.Color;
 import org.terasology.protobuf.NetData;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.world.viewDistance.ViewDistance;
+import org.terasology.world.WorldProvider;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -45,16 +47,23 @@ public class ServerConnectionHandler extends SimpleChannelUpstreamHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(ServerConnectionHandler.class);
 
-    private NetworkSystemImpl networkSystem;
+    private final Time time;
+    private final WorldProvider worldProvider;
+    private final ModuleManager moduleManager;
+    private final NetworkSystemImpl networkSystem;
+    private final PredictionSystem predictionSystem;
+
     private ServerHandler serverHandler;
     private ChannelHandlerContext channelHandlerContext;
 
     private PublicIdentityCertificate identity;
 
-    private ModuleManager moduleManager = CoreRegistry.get(ModuleManager.class);
-
-    public ServerConnectionHandler(NetworkSystemImpl networkSystem) {
+    public ServerConnectionHandler(ModuleManager moduleManager, Time time, WorldProvider worldProvider, PredictionSystem predictionSystem, NetworkSystemImpl networkSystem) {
+        this.time = time;
+        this.worldProvider = worldProvider;
+        this.predictionSystem = predictionSystem;
         this.networkSystem = networkSystem;
+        this.moduleManager = moduleManager;
     }
 
     @Override
@@ -128,7 +137,7 @@ public class ServerConnectionHandler extends SimpleChannelUpstreamHandler {
 
     private void receivedConnect(NetData.JoinMessage message) {
         logger.info("Received Start Join");
-        NetClient client = new NetClient(channelHandlerContext.getChannel(), networkSystem, identity);
+        NetClient client = new NetClient(channelHandlerContext.getChannel(), networkSystem, identity, time, worldProvider, predictionSystem);
         client.setPreferredName(message.getName());
         client.setColor(new Color(message.getColor().getRgba()));
         client.setViewDistanceMode(ViewDistance.forIndex(message.getViewDistanceLevel()));

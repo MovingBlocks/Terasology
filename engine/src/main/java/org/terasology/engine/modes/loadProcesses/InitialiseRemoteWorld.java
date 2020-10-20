@@ -82,7 +82,7 @@ public class InitialiseRemoteWorld extends SingleStepLoadProcess {
                         BlockEntityRegistry.class);
         // EntityAwareWorldProvider implements WorldProviderCore too but not expose as it. must used in
         // WorldProviderWrapper.
-        classFactory.createToContext(WorldProvider.class, () -> new WorldProviderWrapper(entityWorldProvider,
+        WorldProvider worldProvider = classFactory.createToContext(WorldProvider.class, () -> new WorldProviderWrapper(entityWorldProvider,
                 extraDataManager));
 
         componentSystemManager.register(entityWorldProvider, "engine:BlockEntityRegistry");
@@ -103,7 +103,7 @@ public class InitialiseRemoteWorld extends SingleStepLoadProcess {
         worldRenderer.getActiveCamera().setReflectionHeight(reflectionHeight);
         // TODO: These shouldn't be done here, nor so strongly tied to the world renderer
         classFactory.createToContext(Camera.class, worldRenderer::getActiveCamera);
-        networkSystem.setRemoteWorldProvider(chunkProvider);
+        networkSystem.connectToWorldSystems(chunkProvider, worldProvider, blockManager, extraDataManager);
 
         return true;
     }

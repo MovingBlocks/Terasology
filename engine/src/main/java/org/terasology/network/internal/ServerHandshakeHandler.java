@@ -23,7 +23,6 @@ import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.identity.BadEncryptedDataException;
 import org.terasology.identity.CertificateGenerator;
 import org.terasology.identity.CertificatePair;
@@ -46,10 +45,14 @@ import java.security.SecureRandom;
 public class ServerHandshakeHandler extends SimpleChannelUpstreamHandler {
     private static final Logger logger = LoggerFactory.getLogger(ServerHandshakeHandler.class);
 
-    private Config config = CoreRegistry.get(Config.class);
+    private final Config config;
     private ServerConnectionHandler serverConnectionHandler;
     private byte[] serverRandom = new byte[IdentityConstants.SERVER_CLIENT_RANDOM_LENGTH];
     private NetData.HandshakeHello serverHello;
+
+    public ServerHandshakeHandler(Config config) {
+        this.config = config;
+    }
 
     @Override
     public void channelOpen(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
