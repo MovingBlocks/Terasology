@@ -5,7 +5,6 @@
 import groovy.json.JsonBuilder
 
 
-// By delaying this task to doLast (the << bit) we don't get the headless server dir set up unless actually wanting it
 // TODO: This is not the Gradle Way. Needs more declared output-fu to determine up-to-date instead of the if
 tasks.register("setupServerConfig") {
     description "Parses parameters passed via Gradle and writes them to the local run-from-source server dir's config.cfg"
