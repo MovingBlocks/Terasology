@@ -71,7 +71,7 @@ public class PlayerTargetSystem extends BaseComponentSystem implements UpdateSub
     public void update(float delta) {
         EntityRef charEntity = player.getCharacterEntity();
         if (charEntity.exists()) {
-            Vector3f cameraPos = player.getViewPosition(new org.joml.Vector3f());
+            Vector3f cameraPos = player.getViewPosition(new Vector3f());
             CharacterComponent charComp = charEntity.getComponent(CharacterComponent.class);
 
             if (charComp != null) {
