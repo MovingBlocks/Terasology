@@ -255,7 +255,7 @@ tasks.register<JavaExec>("server") {
     main = mainClassName
     workingDir = rootDir
     args = listOf("-headless", "-homedir=$localServerDataPath")
-    jvmArgs = listOf("-Xmx1536")
+    jvmArgs = listOf("-Xmx1536m")
 
     // Classpath: PC itself, engine classes, engine dependencies. Not modules or natives since the engine finds those
     classpath(sourceSets["main"].output.classesDirs)
