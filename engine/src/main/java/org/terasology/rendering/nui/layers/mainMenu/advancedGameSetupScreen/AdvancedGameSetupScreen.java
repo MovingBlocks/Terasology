@@ -125,6 +125,7 @@ public class AdvancedGameSetupScreen extends CoreScreenLayer {
         for (ModuleSelectionInfo info : sortedModules) {
             info.setExplicitSelection(config.getDefaultModSelection().hasModule(info.getMetadata().getId()));
         }
+        refreshSelection();
 
         filterModules();
     }
@@ -753,9 +754,7 @@ public class AdvancedGameSetupScreen extends CoreScreenLayer {
         if (target.isValidToSelect() && !target.isExplicitSelection()) {
             boolean previouslySelected = target.isSelected();
             target.setExplicitSelection(true);
-            if (!previouslySelected) {
-                refreshSelection();
-            }
+            refreshSelection();
         }
     }
 
