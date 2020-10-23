@@ -312,6 +312,12 @@ class RemoteModuleGatherer implements DependencyResolutionListener {
 gradle.addListener(new RemoteModuleGatherer(rootDir.toPath().resolve("modules")))
 
 
+tasks.named('wrapper') {
+    // ALL distributionType because IntelliJ prefers having its sources for analysis and reference.
+    distributionType = Wrapper.DistributionType.ALL
+}
+
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // General IDE customization                                                                                         //
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
