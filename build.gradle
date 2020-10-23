@@ -28,6 +28,9 @@ plugins {
     // Needed for extending the "clean" task to also delete custom stuff defined here like natives
     id "base"
 
+    // needs for native platform("org.lwjgl") handling.
+    id "java-platform"
+
     // The root project should not be an eclipse project. It keeps eclipse (4.2) from finding the sub-projects.
     //apply plugin: 'eclipse'
     id "idea"
