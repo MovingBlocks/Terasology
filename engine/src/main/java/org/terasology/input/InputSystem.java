@@ -469,7 +469,6 @@ public class InputSystem extends BaseComponentSystem {
      *
      * @param button The specific input to be sent.
      * @param buttonDown True if the button is pressed, false if not.
-     * @param position The position of the mouse.
      * @param delta The length of the current frame.
      * @return True if the event has been consumed by an event listener, false otherwise.
      */
