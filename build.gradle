@@ -162,7 +162,7 @@ task extractNativeBulletNatives(type:Copy) {
     into ("$dirNatives")
 }
 
-task extractNativesjinpuLinux(type:Copy) {
+task extractNativesJInputLinux(type:Copy) {
     description = "Extracts the jinput natives from the downloaded zip"
     from {
         configurations.natives.collect { it.getName().contains('jinput') ? zipTree(it) : [] }
@@ -172,7 +172,7 @@ task extractNativesjinpuLinux(type:Copy) {
     include('*.so')
 }
 
-task extractNativesjinpuWindows(type:Copy) {
+task extractNativesJInputWindows(type:Copy) {
     description = "Extracts the jinput natives from the downloaded zip"
     from {
         configurations.natives.collect { it.getName().contains('jinput') ? zipTree(it) : [] }
@@ -182,7 +182,7 @@ task extractNativesjinpuWindows(type:Copy) {
     include('*.dll')
 }
 
-task extractNativesjinpuMacOSX(type:Copy) {
+task extractNativesJInputMacOSX(type:Copy) {
     description = "Extracts the jinput natives from the downloaded zip"
     from {
         configurations.natives.collect { it.getName().contains('jinput') ? zipTree(it) : [] }
@@ -201,9 +201,9 @@ task extractNatives {
     dependsOn extractMacOSXNatives
     dependsOn extractJNLuaNatives
     dependsOn extractNativeBulletNatives
-    dependsOn extractNativesjinpuLinux
-    dependsOn extractNativesjinpuWindows
-    dependsOn extractNativesjinpuMacOSX
+    dependsOn extractNativesJInputLinux
+    dependsOn extractNativesJInputWindows
+    dependsOn extractNativesJInputMacOSX
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
