@@ -115,6 +115,8 @@ dependencies {
 
     // Natives for JNBullet
     natives group: 'org.terasology.jnbullet', name: 'JNBullet', version: '1.0.2', ext: 'zip'
+
+    natives group: 'net.java.jinput', name: 'jinput', version: '2.0.9', classifier: 'natives-all'
 }
 
 task extractWindowsNatives(type: Copy) {
@@ -160,6 +162,37 @@ task extractNativeBulletNatives(type:Copy) {
     into ("$dirNatives")
 }
 
+task extractNativesjinpuLinux(type:Copy) {
+    description = "Extracts the jinput natives from the downloaded zip"
+    from {
+        configurations.natives.collect { it.getName().contains('jinput') ? zipTree(it) : [] }
+    }
+    into ("$dirNatives/linux")
+    exclude('META-INF/**')
+    include('*.so')
+}
+
+task extractNativesjinpuWindows(type:Copy) {
+    description = "Extracts the jinput natives from the downloaded zip"
+    from {
+        configurations.natives.collect { it.getName().contains('jinput') ? zipTree(it) : [] }
+    }
+    into ("$dirNatives/windows")
+    exclude('META-INF/**')
+    include('*.dll')
+}
+
+task extractNativesjinpuMacOSX(type:Copy) {
+    description = "Extracts the jinput natives from the downloaded zip"
+    from {
+        configurations.natives.collect { it.getName().contains('jinput') ? zipTree(it) : [] }
+    }
+    into ("$dirNatives/macosx")
+    exclude('META-INF/**')
+    include('*.jnilib')
+}
+
+
 
 task extractNatives {
     description = "Extracts all the native lwjgl libraries from the downloaded zip"
@@ -168,6 +201,9 @@ task extractNatives {
     dependsOn extractMacOSXNatives
     dependsOn extractJNLuaNatives
     dependsOn extractNativeBulletNatives
+    dependsOn extractNativesjinpuLinux
+    dependsOn extractNativesjinpuWindows
+    dependsOn extractNativesjinpuMacOSX
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
