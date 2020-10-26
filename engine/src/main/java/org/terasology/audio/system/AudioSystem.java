@@ -71,7 +71,7 @@ public class AudioSystem extends BaseComponentSystem implements UpdateSubscriber
      */
     @Command(shortDescription = "Plays a test sound")
     public void playTestSound(@Sender EntityRef sender, @CommandParam("xOffset") float xOffset, @CommandParam("zOffset") float zOffset) {
-        org.joml.Vector3f position = localPlayer.getPosition(new Vector3f());
+Vector3f position = localPlayer.getPosition(new Vector3f());
         position.x += xOffset;
         position.z += zOffset;
         audioManager.playSound(Assets.getSound("engine:dig").get(), position);
