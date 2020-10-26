@@ -40,6 +40,10 @@ fun nativeSubdirectoryName(): String {
     }
 }
 
+fun isMacOS() : Boolean {
+    return Os.isFamily(Os.FAMILY_MAC)
+}
+
 
 // Default path to store server data if running headless via Gradle
 val localServerDataPath by extra("terasology-server")
@@ -107,17 +111,6 @@ configurations {
     }
 }
 
-tasks.named<JavaExec>("run") {
-    description = "Run 'Terasology' to play the game as a standard PC application"
-    group = "terasology run"
-
-    args = listOf("-homedir", "-noCrashReport")
-    jvmArgs = listOf("-Xmx1536m")
-    workingDir = rootDir
-
-    dependsOn(":moduleClasses")
-}
-
 tasks.register<JavaExec>("game") {
     description = "Run 'Terasology' to play the game as a standard PC application"
     group = "terasology run"
@@ -135,8 +128,14 @@ tasks.register<JavaExec>("game") {
     // Run arguments
     main = mainClassName
     workingDir = rootDir
-    args = listOf("-homedir")
-    jvmArgs = listOf("-Xmx1536m")
+
+    if (isMacOS()) {
+        args = listOf("-homedir", "-noSplash")
+        jvmArgs = listOf("-Xmx1536m", "-XstartOnFirstThread", "-Djava.awt.headless=true")
+    } else {
+        args = listOf("-homedir")
+        jvmArgs = listOf("-Xmx1536m")
+    }
 
     // Classpath: PC itself, engine classes, engine dependencies. Not modules or natives since the engine finds those
     classpath(sourceSets["main"].output.classesDirs)
@@ -158,8 +157,14 @@ tasks.register<JavaExec>("profile") {
     // Run arguments
     main = mainClassName
     workingDir = rootDir
-    args = listOf("-homedir")
-    jvmArgs = listOf("-Xms256m", "-Xmx1536m", "-XX:+UnlockCommercialFeatures", "-XX:+FlightRecorder", "-XX:+UnlockDiagnosticVMOptions", "-XX:+DebugNonSafepoints", "-XX:StartFlightRecording=filename=terasology.jfr,dumponexit=true")
+
+    if (isMacOS()) {
+        args = listOf("-homedir", "-noSplash")
+        jvmArgs = listOf("-Xmx1536m", "-XstartOnFirstThread", "-Djava.awt.headless=true", "-XX:+UnlockCommercialFeatures", "-XX:+FlightRecorder", "-XX:+UnlockDiagnosticVMOptions", "-XX:+DebugNonSafepoints", "-XX:StartFlightRecording=filename=terasology.jfr,dumponexit=true")
+    } else {
+        args = listOf("-homedir")
+        jvmArgs = listOf("-Xmx1536m", "-XX:+UnlockCommercialFeatures", "-XX:+FlightRecorder", "-XX:+UnlockDiagnosticVMOptions", "-XX:+DebugNonSafepoints", "-XX:StartFlightRecording=filename=terasology.jfr,dumponexit=true")
+    }
 
     // Classpath: PC itself, engine classes, engine dependencies. Not modules or natives since the engine finds those
     classpath(sourceSets["main"].output.classesDirs)
@@ -181,8 +186,14 @@ tasks.register<JavaExec>("debug") {
     // Run arguments
     main = mainClassName
     workingDir = rootDir
-    args = listOf("-homedir")
-    jvmArgs = listOf("-Xmx1536m", "-Xdebug", "-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=1044")
+
+    if (isMacOS()) {
+        args = listOf("-homedir", "-noSplash")
+        jvmArgs = listOf("-Xmx1536m", "-XstartOnFirstThread", "-Djava.awt.headless=true", "-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=1044")
+    } else {
+        args = listOf("-homedir")
+        jvmArgs = listOf("-Xmx1536m", "-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=1044")
+    }
 
     // Classpath: PC itself, engine classes, engine dependencies. Not modules or natives since the engine finds those
     classpath(sourceSets["main"].output.classesDirs)
@@ -204,8 +215,14 @@ tasks.register<JavaExec>("permissiveNatives") {
     // Run arguments
     main = mainClassName
     workingDir = rootDir
-    args = listOf("-homedir", "-permissiveSecurity")
-    jvmArgs = listOf("-Xmx1536m")
+
+    if (isMacOS()) {
+        args = listOf("-homedir", "-noSplash", "-permissiveSecurity")
+        jvmArgs = listOf("-Xmx1536m", "-XstartOnFirstThread", "-Djava.awt.headless=true")
+    } else {
+        args = listOf("-homedir", "-permissiveSecurity")
+        jvmArgs = listOf("-Xmx1536m")
+    }
 
     systemProperty("java.library.path", rootProject.file(dirNatives + "/" + nativeSubdirectoryName()))
 
@@ -254,8 +271,15 @@ tasks.register<JavaExec>("server") {
     // Run arguments
     main = mainClassName
     workingDir = rootDir
-    args = listOf("-headless", "-homedir=$localServerDataPath")
-    jvmArgs = listOf("-Xmx1536m")
+
+    // This isn't strictly necessary since the headless flag bypasses threading issues on Macs anyway, but ...
+    if (isMacOS()) {
+        args = listOf("-headless", "-homedir=$localServerDataPath", "-noSplash")
+        jvmArgs = listOf("-Xmx1536m", "-XstartOnFirstThread", "-Djava.awt.headless=true")
+    } else {
+        args = listOf("-headless", "-homedir=$localServerDataPath")
+        jvmArgs = listOf("-Xmx1536m")
+    }
 
     // Classpath: PC itself, engine classes, engine dependencies. Not modules or natives since the engine finds those
     classpath(sourceSets["main"].output.classesDirs)

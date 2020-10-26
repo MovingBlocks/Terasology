@@ -1,10 +1,10 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="TerasologyPC" type="Application" factoryName="Application">
+  <configuration default="false" name="TerasologyPC (2nd client) for Mac" type="Application" factoryName="Application">
     <option name="MAIN_CLASS_NAME" value="org.terasology.engine.Terasology" />
     <module name="Terasology.facades.PC.main" />
-    <option name="PROGRAM_PARAMETERS" value="-homedir -noCrashReport " />
+    <option name="PROGRAM_PARAMETERS" value="-homedir=terasology-2ndclient -noCrashReport -noSplash" />
     <shortenClasspath name="MANIFEST" />
-    <option name="VM_PARAMETERS" value="-Xms256m -Xmx1536m" />
+    <option name="VM_PARAMETERS" value="-Xms256m -Xmx1536m -XstartOnFirstThread -Djava.awt.headless=true" />
     <extension name="coverage">
       <pattern>
         <option name="PATTERN" value="org.terasology.engine.*" />

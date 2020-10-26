@@ -25,5 +25,5 @@ public abstract class AxisEvent extends InputEvent {
         super(delta);
     }
 
-    public abstract float getValue();
+    public abstract double getValue();
 }

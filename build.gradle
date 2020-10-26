@@ -28,6 +28,9 @@ plugins {
     // Needed for extending the "clean" task to also delete custom stuff defined here like natives
     id "base"
 
+    // needs for native platform("org.lwjgl") handling.
+    id "java-platform"
+
     // The root project should not be an eclipse project. It keeps eclipse (4.2) from finding the sub-projects.
     //apply plugin: 'eclipse'
     id "idea"
@@ -63,7 +66,7 @@ ext {
     // Lib dir for use in manifest entries etc (like in :engine). A separate "libsDir" exists, auto-created by Gradle
     subDirLibs = 'libs'
 
-    LwjglVersion = '2.9.3'
+    LwjglVersion = '3.2.3'
 }
 
 // Declare remote repositories we're interested in - library files will be fetched from here
@@ -93,7 +96,16 @@ configurations {
 
 dependencies {
     // For the "natives" configuration make it depend on the native files from LWJGL
-    natives group: 'org.lwjgl.lwjgl', name: 'lwjgl', version: LwjglVersion
+    natives platform("org.lwjgl:lwjgl-bom:$LwjglVersion")
+    ["natives-linux","natives-windows","natives-macos"].forEach {
+        natives "org.lwjgl:lwjgl::$it"
+        natives "org.lwjgl:lwjgl-assimp::$it"
+        natives "org.lwjgl:lwjgl-glfw::$it"
+        natives "org.lwjgl:lwjgl-openal::$it"
+        natives "org.lwjgl:lwjgl-opengl::$it"
+        natives "org.lwjgl:lwjgl-stb::$it"
+    }
+
 
     // Config for our code analytics lives in a centralized repo: https://github.com/MovingBlocks/TeraConfig
     codeMetrics group: 'org.terasology.config', name: 'codemetrics', version: '1.3.2', ext: 'zip'
@@ -108,7 +120,7 @@ dependencies {
 task extractWindowsNatives(type: Copy) {
     description = "Extracts the Windows natives from the downloaded zip"
     from {
-        configurations.natives.collect { it.getName().contains('-natives-window') ? zipTree(it) : [] }
+        configurations.natives.collect { it.getName().contains('natives-windows') ? zipTree(it) : [] }
     }
     into("$dirNatives/windows")
     exclude('META-INF/**')
@@ -117,7 +129,7 @@ task extractWindowsNatives(type: Copy) {
 task extractMacOSXNatives(type: Copy) {
     description = "Extracts the OSX natives from the downloaded zip"
     from {
-        configurations.natives.collect { it.getName().contains('-natives-osx') ? zipTree(it) : [] }
+        configurations.natives.collect { it.getName().contains('natives-macos') ? zipTree(it) : [] }
     }
     into("$dirNatives/macosx")
     exclude('META-INF/**')
@@ -126,7 +138,7 @@ task extractMacOSXNatives(type: Copy) {
 task extractLinuxNatives(type: Copy) {
     description = "Extracts the Linux natives from the downloaded zip"
     from {
-        configurations.natives.collect { it.getName().contains('-natives-linux') ? zipTree(it) : [] }
+        configurations.natives.collect { it.getName().contains('natives-linux') ? zipTree(it) : [] }
     }
     into("$dirNatives/linux")
     exclude('META-INF/**')
