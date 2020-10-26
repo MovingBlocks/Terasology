@@ -16,12 +16,12 @@
 package org.terasology.rendering;
 
 import com.google.common.collect.Sets;
-import org.lwjgl.LWJGLUtil;
-import org.lwjgl.Sys;
+import org.lwjgl.Version;
+import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
-import org.lwjgl.opengl.GLContext;
+import org.lwjgl.system.Platform;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.utilities.Assets;
@@ -53,7 +53,7 @@ public class ShaderManagerLwjgl implements ShaderManager {
 
     public ShaderManagerLwjgl() {
         logger.info("Loading Terasology shader manager...");
-        logger.info("LWJGL: {} / {}", Sys.getVersion(), LWJGLUtil.getPlatformName());
+        logger.info("LWJGL: {} / {}", Version.getVersion(), Platform.get().getName());
         logger.info("GL_VENDOR: {}", GL11.glGetString(GL11.GL_VENDOR));
         logger.info("GL_RENDERER: {}", GL11.glGetString(GL11.GL_RENDERER));
         logger.info("GL_VERSION: {}", GL11.glGetString(GL11.GL_VERSION));
@@ -103,7 +103,7 @@ public class ShaderManagerLwjgl implements ShaderManager {
         addShaderProgram("toneMapping");
         addShaderProgram("sky");
         addShaderProgram("chunk");
-        if (GLContext.getCapabilities().OpenGL33) { //TODO remove this "if" when rendering will use OpenGL3 by default
+        if (GL.createCapabilities().OpenGL33) { //TODO remove this "if" when rendering will use OpenGL3 by default
             addShaderProgram("particle");
         } else {
             logger.warn("Your GPU or driver not supports OpenGL 3.3 , particles disabled");

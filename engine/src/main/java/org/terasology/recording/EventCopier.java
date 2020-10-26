@@ -66,7 +66,7 @@ class EventCopier {
         } else if (toBeCopied instanceof BindAxisEvent) {
             BindAxisEvent originalEvent = (BindAxisEvent) toBeCopied;
             BindAxisEvent newEvent = (BindAxisEvent) createNewBindEvent(originalEvent);
-            newEvent.prepare(originalEvent.getId(), originalEvent.getValue(), originalEvent.getDelta());
+            newEvent.prepare(originalEvent.getId(), (float) originalEvent.getValue(), originalEvent.getDelta());
             inputEventSetup(newEvent, originalEvent);
             return newEvent;
         } else if (toBeCopied instanceof MouseAxisEvent) {
