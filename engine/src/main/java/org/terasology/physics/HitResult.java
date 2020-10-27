@@ -16,11 +16,10 @@
 
 package org.terasology.physics;
 
+import org.joml.RoundingMode;
+import org.joml.Vector3f;
+import org.joml.Vector3i;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector3i;
-
-import java.math.RoundingMode;
 
 /**
  * A HitResult holds the result of a ray-trace.

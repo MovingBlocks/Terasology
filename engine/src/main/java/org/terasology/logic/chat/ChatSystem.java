@@ -39,7 +39,7 @@ import org.terasology.logic.console.ui.NotificationOverlay;
 import org.terasology.logic.permission.PermissionManager;
 import org.terasology.network.ClientComponent;
 import org.terasology.registry.In;
-import org.terasology.rendering.FontColor;
+import org.terasology.nui.FontColor;
 import org.terasology.rendering.nui.NUIManager;
 
 import java.util.Arrays;

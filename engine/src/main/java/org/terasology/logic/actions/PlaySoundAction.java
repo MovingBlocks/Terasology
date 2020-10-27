@@ -15,6 +15,7 @@
  */
 package org.terasology.logic.actions;
 
+import org.joml.Vector3f;
 import org.terasology.audio.AudioManager;
 import org.terasology.audio.StaticSound;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -25,7 +26,6 @@ import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.characters.events.ActivationPredicted;
 import org.terasology.logic.common.ActivateEvent;
 import org.terasology.logic.players.LocalPlayer;
-import org.terasology.math.geom.Vector3f;
 import org.terasology.registry.In;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.utilities.random.Random;
@@ -47,6 +47,7 @@ public class PlaySoundAction extends BaseComponentSystem {
 
     /**
      * This method plays sound in prediction for preventing not playing song because of server lags
+     *
      * @param event contains the details for the predicted event, used here for location purposes
      * @param entity is source of the playsound
      */
@@ -55,7 +56,7 @@ public class PlaySoundAction extends BaseComponentSystem {
         PlaySoundActionComponent playSound = entity.getComponent(PlaySoundActionComponent.class);
         StaticSound sound = random.nextItem(playSound.sounds);
         if (sound != null) {
-            Vector3f pos = null;
+            Vector3f pos;
             switch (playSound.relativeTo) {
                 case Target:
                     pos = event.getTargetLocation();
@@ -73,6 +74,7 @@ public class PlaySoundAction extends BaseComponentSystem {
 
     /**
      * This method plays sound if it wasn't played by prediction system
+     *
      * @param event contains the details for the active event, used here for location purposes
      * @param entity is source of the playsound
      */
@@ -84,7 +86,7 @@ public class PlaySoundAction extends BaseComponentSystem {
         PlaySoundActionComponent playSound = entity.getComponent(PlaySoundActionComponent.class);
         StaticSound sound = random.nextItem(playSound.sounds);
         if (sound != null) {
-            Vector3f pos = null;
+            Vector3f pos;
             switch (playSound.relativeTo) {
                 case Target:
                     pos = event.getTargetLocation();

@@ -20,7 +20,7 @@ import com.google.common.collect.Lists;
 import org.terasology.config.BindsConfig;
 import org.terasology.engine.SimpleUri;
 import org.terasology.input.Input;
-import org.terasology.rendering.nui.databinding.Binding;
+import org.terasology.nui.databinding.Binding;
 
 import java.util.List;
 

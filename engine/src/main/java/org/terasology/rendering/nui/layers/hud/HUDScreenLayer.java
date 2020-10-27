@@ -16,20 +16,21 @@
 package org.terasology.rendering.nui.layers.hud;
 
 import com.google.common.collect.Maps;
+import org.joml.Rectanglei;
+import org.joml.Vector2i;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
-import org.terasology.math.geom.Rect2f;
-import org.terasology.math.geom.Rect2i;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.TeraMath;
-import org.terasology.math.geom.Vector2i;
+import org.terasology.math.geom.Rect2f;
+import org.terasology.nui.Canvas;
+import org.terasology.nui.ControlWidget;
+import org.terasology.nui.UIWidget;
+import org.terasology.nui.asset.UIElement;
 import org.terasology.registry.In;
 import org.terasology.registry.InjectionHelper;
-import org.terasology.rendering.nui.Canvas;
-import org.terasology.rendering.nui.ControlWidget;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.NUIManager;
-import org.terasology.rendering.nui.UIWidget;
-import org.terasology.rendering.nui.asset.UIElement;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -158,7 +159,7 @@ public class HUDScreenLayer extends CoreScreenLayer {
             int minY = TeraMath.floorToInt(element.region.minY() * canvas.size().y);
             int sizeX = TeraMath.floorToInt(element.region.width() * canvas.size().x);
             int sizeY = TeraMath.floorToInt(element.region.height() * canvas.size().y);
-            Rect2i region = Rect2i.createFromMinAndSize(minX, minY, sizeX, sizeY);
+            Rectanglei region = JomlUtil.rectangleiFromMinAndSize(minX, minY, sizeX, sizeY);
             canvas.drawWidget(element.widget, region);
         }
     }

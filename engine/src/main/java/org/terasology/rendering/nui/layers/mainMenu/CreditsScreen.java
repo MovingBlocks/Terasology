@@ -22,9 +22,9 @@ import org.terasology.config.Config;
 import org.terasology.i18n.TranslationSystem;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
-import org.terasology.rendering.nui.WidgetUtil;
+import org.terasology.nui.WidgetUtil;
 import org.terasology.rendering.nui.animation.MenuAnimationSystems;
-import org.terasology.rendering.nui.widgets.UIScrollingText;
+import org.terasology.nui.widgets.UIScrollingText;
 
 import java.io.BufferedReader;
 import java.io.IOException;

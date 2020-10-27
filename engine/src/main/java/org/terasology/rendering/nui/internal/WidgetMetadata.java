@@ -16,6 +16,7 @@
 package org.terasology.rendering.nui.internal;
 
 import com.google.common.base.Predicate;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.engine.SimpleUri;
 import org.terasology.reflection.copy.CopyStrategy;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
@@ -23,8 +24,8 @@ import org.terasology.reflection.metadata.ClassMetadata;
 import org.terasology.reflection.metadata.FieldMetadata;
 import org.terasology.reflection.reflect.InaccessibleFieldException;
 import org.terasology.reflection.reflect.ReflectFactory;
-import org.terasology.rendering.nui.LayoutConfig;
-import org.terasology.rendering.nui.UIWidget;
+import org.terasology.nui.LayoutConfig;
+import org.terasology.nui.UIWidget;
 
 import java.lang.reflect.Field;
 
@@ -41,7 +42,7 @@ public class WidgetMetadata<T extends UIWidget> extends ClassMetadata<T, FieldMe
      * @param copyStrategyLibrary A copy strategy library
      * @throws NoSuchMethodException If the class has no default constructor
      */
-    public WidgetMetadata(SimpleUri uri, Class<T> type, ReflectFactory factory, CopyStrategyLibrary copyStrategyLibrary) throws NoSuchMethodException {
+    public WidgetMetadata(ResourceUrn uri, Class<T> type, ReflectFactory factory, CopyStrategyLibrary copyStrategyLibrary) throws NoSuchMethodException {
         super(uri, type, factory, copyStrategyLibrary, IsConfigField.INSTANCE);
     }
 

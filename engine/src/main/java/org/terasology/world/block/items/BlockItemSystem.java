@@ -15,7 +15,9 @@
  */
 package org.terasology.world.block.items;
 
+import org.joml.AABBf;
 import org.joml.Vector2f;
+import org.joml.Vector3fc;
 import org.terasology.audio.AudioManager;
 import org.terasology.audio.events.PlaySoundEvent;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -53,8 +55,8 @@ import java.util.Map;
 public class BlockItemSystem extends BaseComponentSystem {
 
     /**
-     * Margin and other allowed penetration is also 0.03 or 0.04.
-     * Since precision is only float it needs to be that high.
+     * Margin and other allowed penetration is also 0.03 or 0.04. Since precision is only float it needs to be that
+     * high.
      */
     private static final float ADDITIONAL_ALLOWED_PENETRATION = 0.4f;
 
@@ -93,7 +95,7 @@ public class BlockItemSystem extends BaseComponentSystem {
 
         Vector2f relativeAttachmentPosition = getRelativeAttachmentPosition(event);
         Block block = blockFamily.getBlockForPlacement(new BlockPlacementData(
-                JomlUtil.from(placementPos), surfaceSide, JomlUtil.from(event.getDirection()), relativeAttachmentPosition
+            JomlUtil.from(placementPos), surfaceSide, event.getDirection(), relativeAttachmentPosition
         ));
 
         if (canPlaceBlock(block, targetBlock, placementPos)) {
@@ -115,7 +117,7 @@ public class BlockItemSystem extends BaseComponentSystem {
     }
 
     private Vector2f getRelativeAttachmentPosition(ActivateEvent event) {
-        Vector3f targetPosition = event.getTargetLocation();
+        org.joml.Vector3f targetPosition = event.getTargetLocation();
         if (event.getHitPosition() != null && targetPosition != null) {
             return getSideHitPosition(event.getHitPosition(), targetPosition);
         } else {
@@ -127,15 +129,17 @@ public class BlockItemSystem extends BaseComponentSystem {
      * Returns the position at which the block side was hit, relative to the side.
      * <p/>
      * The specified hit position is expected to be on the surface of the cubic block at the specified position.
-     * Example: The front side was hit right in the center.
-     * The result will be (0.5, 0.5), representing the relative hit position on the side's surface.
+     * Example: The front side was hit right in the center. The result will be (0.5, 0.5), representing the relative hit
+     * position on the side's surface.
+     *
      * @param hitPosition the hit position
-     * @param blockPosition the block position relative to its center (block (0, 0, 0) has block position (0.5, 0.5, 0.5))
+     * @param blockPosition the block position relative to its center (block (0, 0, 0) has block position (0.5, 0.5,
+     *     0.5))
      * @return the 2D hit position relative to the side that was hit
      */
-    private Vector2f getSideHitPosition(Vector3f hitPosition, Vector3f blockPosition) {
+    private Vector2f getSideHitPosition(Vector3fc hitPosition, Vector3fc blockPosition) {
         float epsilon = 0.0001f;
-        Vector3f relativeHitPosition = new Vector3f(hitPosition).sub(blockPosition);
+        org.joml.Vector3f relativeHitPosition = new org.joml.Vector3f(hitPosition).sub(blockPosition);
 
         if (Math.abs(relativeHitPosition.x) > 0.5f - epsilon) {
             return new Vector2f(relativeHitPosition.z, relativeHitPosition.y).add(0.5f, 0.5f);
@@ -188,9 +192,9 @@ public class BlockItemSystem extends BaseComponentSystem {
         // Prevent players from placing blocks inside their bounding boxes
         if (!block.isPenetrable()) {
             Physics physics = CoreRegistry.get(Physics.class);
-            AABB blockBounds = block.getBounds(blockPos);
-            Vector3f min = new Vector3f(blockBounds.getMin());
-            Vector3f max = new Vector3f(blockBounds.getMax());
+            AABBf blockBounds = block.getBounds(JomlUtil.from(blockPos));
+            Vector3f min = new Vector3f(blockBounds.minX, blockBounds.minY, blockBounds.minZ);
+            Vector3f max = new Vector3f(blockBounds.maxX, blockBounds.maxY, blockBounds.maxZ);
 
             /**
              * Characters can enter other solid objects/blocks for certain amount. This is does to detect collsion

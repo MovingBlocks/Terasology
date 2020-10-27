@@ -22,8 +22,8 @@ import org.junit.jupiter.api.Test;
 import org.reflections.Reflections;
 import org.terasology.math.geom.Rect2i;
 import org.terasology.math.geom.Vector4f;
+import org.terasology.nui.Color;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
-import org.terasology.rendering.nui.Color;
 
 import java.util.Map;
 import java.util.Objects;

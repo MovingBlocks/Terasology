@@ -20,6 +20,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.reflections.Reflections;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.context.Context;
 import org.terasology.context.internal.ContextImpl;
 import org.terasology.engine.SimpleUri;
@@ -78,9 +79,9 @@ public class ComponentSerializerTest {
         EntitySystemSetupUtil.addReflectionBasedLibraries(context);
         EntitySystemSetupUtil.addEntityManagementRelatedClasses(context);
         EngineEntityManager entityManager = context.get(EngineEntityManager.class);
-        entityManager.getComponentLibrary().register(new SimpleUri("test", "gettersetter"), GetterSetterComponent.class);
-        entityManager.getComponentLibrary().register(new SimpleUri("test", "string"), StringComponent.class);
-        entityManager.getComponentLibrary().register(new SimpleUri("test", "integer"), IntegerComponent.class);
+        entityManager.getComponentLibrary().register(new ResourceUrn("test", "gettersetter"), GetterSetterComponent.class);
+        entityManager.getComponentLibrary().register(new ResourceUrn("test", "string"), StringComponent.class);
+        entityManager.getComponentLibrary().register(new ResourceUrn("test", "integer"), IntegerComponent.class);
         ComponentLibrary componentLibrary = entityManager.getComponentLibrary();
         componentSerializer = new ComponentSerializer(componentLibrary, serializationLibrary);
 

@@ -16,6 +16,7 @@
 
 package org.terasology;
 
+import com.badlogic.gdx.physics.bullet.Bullet;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.nio.file.ShrinkWrapFileSystems;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
@@ -73,6 +74,8 @@ public abstract class TerasologyTestingEnvironment {
         final JavaArchive homeArchive = ShrinkWrap.create(JavaArchive.class);
         final FileSystem vfs = ShrinkWrapFileSystems.newFileSystem(homeArchive);
         PathManager.getInstance().useOverrideHomePath(vfs.getPath(""));
+        Bullet.init(true,false);
+
         /*
          * Create at least for each class a new headless environemnt as it is fast and prevents side effects
          * (Reusing a headless environment after other tests have modified the core registry isn't really clean)
@@ -85,6 +88,7 @@ public abstract class TerasologyTestingEnvironment {
 
     @BeforeEach
     public void setup() throws Exception {
+
         context.put(ModuleManager.class, moduleManager);
         RecordAndReplayCurrentStatus recordAndReplayCurrentStatus = context.get(RecordAndReplayCurrentStatus.class);
 

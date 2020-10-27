@@ -16,40 +16,48 @@
 
 package org.terasology.rendering.assets.skeletalmesh;
 
-import org.terasology.math.geom.Vector3f;
+import com.google.common.base.Preconditions;
+import gnu.trove.list.TFloatList;
+import gnu.trove.list.TIntList;
 
 /**
  */
 public class BoneWeight {
-    private Vector3f position = new Vector3f();
-    private float bias;
-    private int boneIndex;
-    private Vector3f normal = new Vector3f();
+    private float[] biases;
+    private int[] boneIndices;
 
-    public BoneWeight(Vector3f position, float bias, int boneIndex) {
-        this.position.set(position);
-        this.bias = bias;
-        this.boneIndex = boneIndex;
+    public BoneWeight(float[] biases, int[] boneIndices) {
+        Preconditions.checkArgument(biases.length == boneIndices.length);
+        this.biases = biases;
+        this.boneIndices = boneIndices;
     }
 
-    public Vector3f getPosition() {
-        return position;
+    public BoneWeight(TFloatList biases, TIntList boneIndices) {
+        Preconditions.checkArgument(biases.size() == boneIndices.size());
+        this.biases = biases.toArray();
+        this.boneIndices = boneIndices.toArray();
     }
 
-    public float getBias() {
-        return bias;
+    public void normalise() {
+        float totalBias = 0;
+        for (float bias : biases) {
+            totalBias += bias;
+        }
+        for (int i = 0; i < biases.length; ++i) {
+            biases[i] /= totalBias;
+        }
     }
 
-    public int getBoneIndex() {
-        return boneIndex;
+    public int jointCount() {
+        return biases.length;
     }
 
-    public Vector3f getNormal() {
-        return normal;
+    public int getJoint(int weight) {
+        return boneIndices[weight];
     }
 
-    public void setNormal(Vector3f normal) {
-        this.normal.set(normal);
+    public float getBias(int weight) {
+        return biases[weight];
     }
 }
 
