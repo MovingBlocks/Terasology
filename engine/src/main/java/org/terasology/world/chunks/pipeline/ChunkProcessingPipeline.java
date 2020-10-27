@@ -227,6 +227,7 @@ public class ChunkProcessingPipeline {
 
         chunkProcessingInfoMap.keySet().forEach(this::stopProcessingAt);
         chunkProcessingInfoMap.clear();
+        executor.getQueue().clear();
     }
 
     public void restart() {
