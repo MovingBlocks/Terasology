@@ -17,14 +17,15 @@
 package org.terasology.input.cameraTarget;
 
 import com.google.common.base.Objects;
+import org.joml.RoundingMode;
+import org.joml.Vector3f;
+import org.joml.Vector3i;
 import org.terasology.config.Config;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.JomlUtil;
 import org.terasology.math.TeraMath;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.physics.CollisionGroup;
 import org.terasology.physics.HitResult;
 import org.terasology.physics.Physics;
@@ -34,7 +35,6 @@ import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.block.BlockComponent;
 
-import java.math.RoundingMode;
 import java.util.Arrays;
 
 /**
@@ -120,10 +120,10 @@ public class CameraTargetSystem extends BaseComponentSystem {
         EntityRef newTarget = EntityRef.NULL;
         if (hitInfo.isHit()) {
             newTarget = hitInfo.getEntity();
-            hitPosition = JomlUtil.from(hitInfo.getHitPoint());
-            hitNormal = JomlUtil.from(hitInfo.getHitNormal());
+            hitPosition = hitInfo.getHitPoint();
+            hitNormal = hitInfo.getHitNormal();
             if (hitInfo.isWorldHit()) {
-                newBlockPos = new Vector3i(JomlUtil.from(hitInfo.getBlockPosition()));
+                newBlockPos = new Vector3i(hitInfo.getBlockPosition());
             }
         }
         if (!Objects.equal(target, newTarget) || lostTarget) {
@@ -144,7 +144,7 @@ public class CameraTargetSystem extends BaseComponentSystem {
         if (hitInfo.isHit()) {
             Vector3f playerToTargetRay = new Vector3f();
             //calculate the distance from the player to the hit point
-            playerToTargetRay.sub(JomlUtil.from(hitInfo.getHitPoint()), localPlayer.getViewPosition());
+            hitInfo.getHitPoint().sub(JomlUtil.from(localPlayer.getViewPosition()), playerToTargetRay);
             //gradually adjust focalDistance from it's current value to the hit point distance
             focalDistance = TeraMath.lerp(focalDistance, playerToTargetRay.length(), delta * focusRate);
             //if nothing was hit, gradually adjust the focusDistance to the maximum length of the update function trace
