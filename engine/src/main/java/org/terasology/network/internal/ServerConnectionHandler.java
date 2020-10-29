@@ -17,10 +17,8 @@ package org.terasology.network.internal;
 
 import com.google.common.io.ByteStreams;
 import com.google.protobuf.ByteString;
-import org.jboss.netty.channel.ChannelHandlerContext;
-import org.jboss.netty.channel.ChannelStateEvent;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.module.ModuleManager;
@@ -40,8 +38,9 @@ import java.nio.file.Path;
 import java.util.List;
 
 /**
+ *
  */
-public class ServerConnectionHandler extends SimpleChannelUpstreamHandler {
+public class ServerConnectionHandler extends ChannelInboundHandlerAdapter {
 
     private static final Logger logger = LoggerFactory.getLogger(ServerConnectionHandler.class);
 
@@ -58,22 +57,18 @@ public class ServerConnectionHandler extends SimpleChannelUpstreamHandler {
     }
 
     @Override
-    public void channelOpen(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
-        super.channelOpen(ctx, e);
+    public void channelActive(ChannelHandlerContext ctx) throws Exception {
+        super.channelActive(ctx);
         this.channelHandlerContext = ctx;
-        serverHandler = ctx.getPipeline().get(ServerHandler.class);
-    }
-
-    public void channelAuthenticated(PublicIdentityCertificate id) {
-        this.identity = id;
+        serverHandler = ctx.pipeline().get(ServerHandler.class);
     }
 
     @Override
-    public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) {
-        NetData.NetMessage message = (NetData.NetMessage) e.getMessage();
+    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+        NetData.NetMessage message = (NetData.NetMessage) msg;
         if (message.hasServerInfoRequest()) {
             NetData.ServerInfoMessage serverInfo = networkSystem.getServerInfoMessage();
-            ctx.getChannel().write(NetData.NetMessage.newBuilder().setServerInfo(serverInfo).setTime(serverInfo.getTime()).build());
+            ctx.channel().write(NetData.NetMessage.newBuilder().setServerInfo(serverInfo).setTime(serverInfo.getTime()).build());
         } else if (message.hasJoin()) {
             receivedConnect(message.getJoin());
         } else if (message.getModuleRequestCount() > 0) {
@@ -81,6 +76,10 @@ public class ServerConnectionHandler extends SimpleChannelUpstreamHandler {
         } else {
             logger.error("Received unexpected message");
         }
+    }
+
+    public void channelAuthenticated(PublicIdentityCertificate id) {
+        this.identity = id;
     }
 
     private void sendModules(List<NetData.ModuleRequest> moduleRequestList) {
@@ -95,10 +94,10 @@ public class ServerConnectionHandler extends SimpleChannelUpstreamHandler {
                 try {
                     result.setVersion(module.getVersion().toString());
                     result.setSize(Files.size(location));
-                    channelHandlerContext.getChannel().write(NetData.NetMessage.newBuilder().setModuleDataHeader(result).build());
+                    channelHandlerContext.channel().write(NetData.NetMessage.newBuilder().setModuleDataHeader(result).build());
                 } catch (IOException e) {
                     logger.error("Error sending module data header", e);
-                    channelHandlerContext.getChannel().close();
+                    channelHandlerContext.channel().close();
                     break;
                 }
 
@@ -110,16 +109,17 @@ public class ServerConnectionHandler extends SimpleChannelUpstreamHandler {
                     while (remainingData > 0) {
                         int nextBlock = (int) Math.min(remainingData, 1024);
                         ByteStreams.read(stream, data, 0, nextBlock);
-                        channelHandlerContext.getChannel().write(
+                        channelHandlerContext.channel().write(
                                 NetData.NetMessage.newBuilder().setModuleData(
-                                        NetData.ModuleData.newBuilder().setModule(ByteString.copyFrom(data, 0, nextBlock))
+                                        NetData.ModuleData.newBuilder().setModule(ByteString.copyFrom(data, 0,
+                                                nextBlock))
                                 ).build()
                         );
                         remainingData -= nextBlock;
                     }
                 } catch (IOException e) {
                     logger.error("Error sending module", e);
-                    channelHandlerContext.getChannel().close();
+                    channelHandlerContext.channel().close();
                     break;
                 }
             }
@@ -128,11 +128,11 @@ public class ServerConnectionHandler extends SimpleChannelUpstreamHandler {
 
     private void receivedConnect(NetData.JoinMessage message) {
         logger.info("Received Start Join");
-        NetClient client = new NetClient(channelHandlerContext.getChannel(), networkSystem, identity);
+        NetClient client = new NetClient(channelHandlerContext.channel(), networkSystem, identity);
         client.setPreferredName(message.getName());
         client.setColor(new Color(message.getColor().getRgba()));
         client.setViewDistanceMode(ViewDistance.forIndex(message.getViewDistanceLevel()));
-        channelHandlerContext.getPipeline().remove(this);
+        channelHandlerContext.pipeline().remove(this);
         serverHandler.connectionComplete(client);
     }
 

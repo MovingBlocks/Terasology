@@ -26,7 +26,7 @@ import com.google.common.collect.SetMultimap;
 import gnu.trove.iterator.TIntIterator;
 import gnu.trove.set.TIntSet;
 import gnu.trove.set.hash.TIntHashSet;
-import org.jboss.netty.channel.Channel;
+import io.netty.channel.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.EngineTime;
@@ -105,7 +105,7 @@ public class ServerImpl implements Server {
 
     public ServerImpl(NetworkSystemImpl system, Channel channel) {
         this.channel = channel;
-        metricsSource = (NetMetricSource) channel.getPipeline().get(MetricRecordingHandler.NAME);
+        metricsSource = (NetMetricSource) channel.pipeline().get(MetricRecordingHandler.NAME);
         this.networkSystem = system;
         this.time = (EngineTime) CoreRegistry.get(Time.class);
     }
@@ -135,7 +135,7 @@ public class ServerImpl implements Server {
 
     @Override
     public String getRemoteAddress() {
-        SocketAddress socketAddress = channel.getRemoteAddress();
+        SocketAddress socketAddress = channel.remoteAddress();
 
         // Cast to InetSocketAddress to retrieve remote address
         InetSocketAddress inetSocketAddress = (InetSocketAddress) socketAddress;

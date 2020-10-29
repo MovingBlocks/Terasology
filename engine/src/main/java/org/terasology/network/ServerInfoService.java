@@ -16,16 +16,18 @@
 
 package org.terasology.network;
 
-import org.jboss.netty.bootstrap.ClientBootstrap;
-import org.jboss.netty.channel.Channel;
-import org.jboss.netty.channel.ChannelFuture;
-import org.jboss.netty.channel.socket.nio.NioClientSocketChannelFactory;
+import com.google.common.util.concurrent.SettableFuture;
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelOption;
+import io.netty.channel.EventLoopGroup;
+import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.nio.NioSocketChannel;
 import org.terasology.network.internal.ServerInfoRequestHandler;
 import org.terasology.network.internal.pipelineFactory.InfoRequestPipelineFactory;
 
 import java.net.InetSocketAddress;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 /**
@@ -33,37 +35,39 @@ import java.util.concurrent.Future;
  */
 public class ServerInfoService implements AutoCloseable {
 
-    private final ClientBootstrap bootstrap;
-    private final NioClientSocketChannelFactory factory;
-    private final ExecutorService pool;
+    private final Bootstrap bootstrap;
+    private final EventLoopGroup eventLoopGroup;
 
     public ServerInfoService() {
-        pool = Executors.newCachedThreadPool();
-        factory = new NioClientSocketChannelFactory(pool, pool, 1, 1);
-        bootstrap = new ClientBootstrap(factory);
-        bootstrap.setPipelineFactory(new InfoRequestPipelineFactory());
-        bootstrap.setOption("tcpNoDelay", true);
-        bootstrap.setOption("keepAlive", true);
+        eventLoopGroup = new NioEventLoopGroup();
+        bootstrap = new Bootstrap();
+        bootstrap.group(eventLoopGroup);
+        bootstrap.channel(NioSocketChannel.class);
+        bootstrap.handler(new InfoRequestPipelineFactory());
+        bootstrap.option(ChannelOption.TCP_NODELAY, true);
+        bootstrap.option(ChannelOption.SO_KEEPALIVE, true);
     }
 
     public Future<ServerInfoMessage> requestInfo(final String address, final int port) {
-        return pool.submit(() -> {
-            InetSocketAddress remoteAddress = new InetSocketAddress(address, port);
-            ChannelFuture connectCheck = bootstrap.connect(remoteAddress);
-            connectCheck.syncUninterruptibly();
-            Channel channel = connectCheck.getChannel();
-            channel.getCloseFuture().syncUninterruptibly();
-
-            ServerInfoRequestHandler handler = channel.getPipeline().get(ServerInfoRequestHandler.class);
-            ServerInfoMessage serverInfo = handler.getServerInfo();
-            return serverInfo;
-
+        SettableFuture<ServerInfoMessage> resultFuture = SettableFuture.create();
+        InetSocketAddress remoteAddress = new InetSocketAddress(address, port);
+        ChannelFuture connectCheck = bootstrap.connect(remoteAddress);
+        connectCheck.syncUninterruptibly();
+        Channel channel = connectCheck.channel();
+        channel.close().addListener(channelFuture -> {
+            if (channelFuture.isSuccess()) {
+                ServerInfoRequestHandler handler = channel.pipeline().get(ServerInfoRequestHandler.class);
+                resultFuture.set(handler.getServerInfo());
+            } else {
+                resultFuture.setException(channelFuture.cause());
+            }
         });
+
+        return resultFuture;
     }
 
     @Override
     public void close() {
-        factory.releaseExternalResources();
-        pool.shutdown();
+        eventLoopGroup.shutdownGracefully().syncUninterruptibly();
     }
 }

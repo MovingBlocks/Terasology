@@ -18,21 +18,19 @@ package org.terasology.network.internal;
 import com.google.common.primitives.Bytes;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
-import org.jboss.netty.channel.ChannelHandlerContext;
-import org.jboss.netty.channel.ChannelStateEvent;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.identity.ClientIdentity;
 import org.terasology.config.Config;
-import org.terasology.identity.storageServiceClient.StorageServiceWorker;
-import org.terasology.identity.storageServiceClient.StorageServiceWorkerStatus;
-import org.terasology.registry.CoreRegistry;
+import org.terasology.identity.ClientIdentity;
 import org.terasology.identity.IdentityConstants;
 import org.terasology.identity.PrivateIdentityCertificate;
 import org.terasology.identity.PublicIdentityCertificate;
+import org.terasology.identity.storageServiceClient.StorageServiceWorker;
+import org.terasology.identity.storageServiceClient.StorageServiceWorkerStatus;
 import org.terasology.protobuf.NetData;
+import org.terasology.registry.CoreRegistry;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -47,7 +45,7 @@ import java.security.SecureRandom;
 /**
  * Authentication handler for the client end of the authentication handshake.
  */
-public class ClientHandshakeHandler extends SimpleChannelUpstreamHandler {
+public class ClientHandshakeHandler extends ChannelInboundHandlerAdapter {
 
     private static final Logger logger = LoggerFactory.getLogger(ClientHandshakeHandler.class);
     private static final String AUTHENTICATION_FAILURE = "Authentication failure";
@@ -70,14 +68,14 @@ public class ClientHandshakeHandler extends SimpleChannelUpstreamHandler {
     }
 
     @Override
-    public void channelOpen(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
-        super.channelOpen(ctx, e);
+    public void channelActive(ChannelHandlerContext ctx) throws Exception {
+        super.channelActive(ctx);
         joinStatus.setCurrentActivity("Authenticating with server");
     }
 
     @Override
-    public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) {
-        NetData.NetMessage message = (NetData.NetMessage) e.getMessage();
+    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+        NetData.NetMessage message = (NetData.NetMessage) msg;
         if (message.hasHandshakeHello()) {
             processServerHello(message.getHandshakeHello(), ctx);
         } else if (message.hasProvisionIdentity()) {
@@ -97,19 +95,19 @@ public class ClientHandshakeHandler extends SimpleChannelUpstreamHandler {
         if (serverHello == null || clientHello == null) {
             logger.error("Received server verification without requesting it: cancelling authentication");
             joinStatus.setErrorMessage(AUTHENTICATION_FAILURE);
-            ctx.getChannel().close();
+            ctx.channel().close();
             return;
         }
 
         if (!serverCertificate.verify(HandshakeCommon.getSignatureData(serverHello, clientHello), handshakeVerification.getSignature().toByteArray())) {
             logger.error("Server failed verification: cancelling authentication");
             joinStatus.setErrorMessage(AUTHENTICATION_FAILURE);
-            ctx.getChannel().close();
+            ctx.channel().close();
             return;
         }
 
         // And we're authenticated.
-        ctx.getPipeline().remove(this);
+        ctx.pipeline().remove(this);
         channelAuthenticated(ctx);
     }
 
@@ -123,7 +121,7 @@ public class ClientHandshakeHandler extends SimpleChannelUpstreamHandler {
         if (!requestedCertificate) {
             logger.error("Received identity without requesting it: cancelling authentication");
             joinStatus.setErrorMessage(AUTHENTICATION_FAILURE);
-            ctx.getChannel().close();
+            ctx.channel().close();
             return;
         }
 
@@ -137,7 +135,7 @@ public class ClientHandshakeHandler extends SimpleChannelUpstreamHandler {
             } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | BadPaddingException | IllegalBlockSizeException e) {
                 logger.error("Unexpected error decrypting received certificate, ending connection attempt", e);
                 joinStatus.setErrorMessage(AUTHENTICATION_FAILURE);
-                ctx.getChannel().close();
+                ctx.channel().close();
                 return;
             }
 
@@ -149,7 +147,7 @@ public class ClientHandshakeHandler extends SimpleChannelUpstreamHandler {
             if (!publicCert.verifySignedBy(serverCertificate)) {
                 logger.error("Received invalid certificate, not signed by server: cancelling authentication");
                 joinStatus.setErrorMessage(AUTHENTICATION_FAILURE);
-                ctx.getChannel().close();
+                ctx.channel().close();
                 return;
             }
 
@@ -168,12 +166,12 @@ public class ClientHandshakeHandler extends SimpleChannelUpstreamHandler {
             }
 
             // And we're authenticated.
-            ctx.getPipeline().remove(this);
+            ctx.pipeline().remove(this);
             channelAuthenticated(ctx);
         } catch (InvalidProtocolBufferException e) {
             logger.error("Received invalid certificate data: cancelling authentication", e);
             joinStatus.setErrorMessage(AUTHENTICATION_FAILURE);
-            ctx.getChannel().close();
+            ctx.channel().close();
         }
     }
 
@@ -182,7 +180,7 @@ public class ClientHandshakeHandler extends SimpleChannelUpstreamHandler {
      * @param ctx Channel Handler Context.
      */
     private void channelAuthenticated(ChannelHandlerContext ctx) {
-        ctx.getChannel().write(NetData.NetMessage.newBuilder()
+        ctx.channel().write(NetData.NetMessage.newBuilder()
                 .setServerInfoRequest(NetData.ServerInfoRequest.newBuilder()).build());
         joinStatus.setCurrentActivity("Requesting server info");
     }
@@ -203,7 +201,7 @@ public class ClientHandshakeHandler extends SimpleChannelUpstreamHandler {
             if (!serverCertificate.verifySelfSigned()) {
                 logger.error("Received invalid server certificate: cancelling authentication");
                 joinStatus.setErrorMessage(AUTHENTICATION_FAILURE);
-                ctx.getChannel().close();
+                ctx.channel().close();
                 return;
             }
 
@@ -219,7 +217,7 @@ public class ClientHandshakeHandler extends SimpleChannelUpstreamHandler {
         } else {
             logger.error("Received multiple hello messages from server: cancelling authentication");
             joinStatus.setErrorMessage(AUTHENTICATION_FAILURE);
-            ctx.getChannel().close();
+            ctx.channel().close();
         }
 
     }
@@ -242,7 +240,7 @@ public class ClientHandshakeHandler extends SimpleChannelUpstreamHandler {
         byte[] dataToSign = Bytes.concat(helloMessage.toByteArray(), clientHello.toByteArray());
         byte[] signature = identity.getPlayerPrivateCertificate().sign(dataToSign);
 
-        ctx.getChannel().write(NetData.NetMessage.newBuilder()
+        ctx.channel().write(NetData.NetMessage.newBuilder()
                 .setHandshakeHello(clientHello)
                 .setHandshakeVerification(NetData.HandshakeVerification.newBuilder()
                         .setSignature(ByteString.copyFrom(signature)))
@@ -262,7 +260,7 @@ public class ClientHandshakeHandler extends SimpleChannelUpstreamHandler {
 
         masterSecret = HandshakeCommon.generateMasterSecret(preMasterSecret, clientRandom, serverRandom);
 
-        ctx.getChannel().write(NetData.NetMessage.newBuilder()
+        ctx.channel().write(NetData.NetMessage.newBuilder()
                 .setNewIdentityRequest(NetData.NewIdentityRequest.newBuilder()
                         .setPreMasterSecret(ByteString.copyFrom(encryptedPreMasterSecret))
                         .setRandom(ByteString.copyFrom(clientRandom)))

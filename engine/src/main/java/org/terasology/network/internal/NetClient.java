@@ -26,7 +26,7 @@ import com.google.common.collect.Sets;
 import gnu.trove.iterator.TIntIterator;
 import gnu.trove.set.TIntSet;
 import gnu.trove.set.hash.TIntHashSet;
-import org.jboss.netty.channel.Channel;
+import io.netty.channel.Channel;
 import org.joml.RoundingMode;
 import org.joml.Vector3f;
 import org.joml.Vector3i;
@@ -142,7 +142,7 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
      */
     public NetClient(Channel channel, NetworkSystemImpl networkSystem, PublicIdentityCertificate identity) {
         this.channel = channel;
-        metricSource = (NetMetricSource) channel.getPipeline().get(MetricRecordingHandler.NAME);
+        metricSource = (NetMetricSource) channel.pipeline().get(MetricRecordingHandler.NAME);
         this.networkSystem = networkSystem;
         this.time = CoreRegistry.get(Time.class);
         this.identity = identity;
