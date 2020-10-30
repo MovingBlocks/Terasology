@@ -18,9 +18,10 @@ package org.terasology.utilities.gson;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
-import org.lwjgl.opengl.DisplayMode;
+import org.lwjgl.glfw.GLFWVidMode;
 import org.terasology.engine.subsystem.Resolution;
 import org.terasology.engine.subsystem.headless.device.HeadlessResolution;
 import org.terasology.engine.subsystem.lwjgl.LwjglResolution;
@@ -34,13 +35,13 @@ public final class ResolutionHandler implements JsonSerializer<Resolution>, Json
         if (json.isJsonNull()) {
             return HeadlessResolution.getInstance();
         }
-        return new LwjglResolution(context.deserialize(json, DisplayMode.class));
+        return context.deserialize(json, LwjglResolution.class);
     }
 
     @Override
     public JsonElement serialize(Resolution src, Type typeOfSrc, JsonSerializationContext context) {
         if (src instanceof LwjglResolution) {
-            return context.serialize(((LwjglResolution) src).getDisplayMode());
+            return context.serialize(src);
         } else {
             return null;
         }

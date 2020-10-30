@@ -1,21 +1,7 @@
-/*
- * Copyright 2017 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.rendering.opengl.fbms;
 
-import org.lwjgl.opengl.Display;
 import org.terasology.config.RenderingConfig;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.subsystem.DisplayDevice;
@@ -35,13 +21,13 @@ import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
 
 /**
  * An instance of this class manages FBOs that need to be regenerated on resolution changes.
- *
+ * <p>
  * The FBOs are regenerated when the display resolution changes or when a screenshot is triggered
  * and the screenshot resolution differs from the display resolution.
- *
+ * <p>
  * Before and after regeneration an event is fired to any subscribers of the instance.
  * See method propertyChange(PropertyChangeEvent) for details.
- *
+ * <p>
  * An instance of this class also generates a number of default FBOs: see the constructor for details.
  */
 public class DisplayResolutionDependentFbo extends AbstractFboManager implements PropertyChangeListener {
@@ -53,30 +39,31 @@ public class DisplayResolutionDependentFbo extends AbstractFboManager implements
 
     private FBO.Dimensions fullScale = new FBO.Dimensions();
     private RenderingConfig renderingConfig;
+    private DisplayDevice displayDevice;
     private ScreenGrabber screenGrabber;
 
     private boolean wasTakingScreenshotLastFrame;
 
     /**
      * The constructor: returns an instance of this class, subscribes it and generates the default FBOs.
-     *
+     * <p>
      * The returned instance is subscribed to the RenderingConfig.FBO_SCALE and DisplayDevice.DISPLAY_RESOLUTION_CHANGE
      * settings, so that changes to either properties trigger the regeneration of the FBOs handled by this manager,
      * if necessary.
-     *
+     * <p>
      * This constructor also initializes the SwappableFBOs of the GBuffer and the buffer identified by the
      * SimpleUri stored in DisplayResolutionDependentFbo.FINAL_BUFFER.
      *
      * @param renderingConfig the RenderingConfig instance.
-     * @param screenGrabber the ScreenGrabber instance.
-     * @param displayDevice the DisplayDevice instance
+     * @param screenGrabber   the ScreenGrabber instance.
+     * @param displayDevice   the DisplayDevice instance
      */
     public DisplayResolutionDependentFbo(RenderingConfig renderingConfig, ScreenGrabber screenGrabber, DisplayDevice displayDevice) {
         this.renderingConfig = renderingConfig;
         this.screenGrabber = screenGrabber;
 
         renderingConfig.subscribe(FBO_SCALE, this);
-
+        this.displayDevice = displayDevice;
         displayDevice.subscribe(DISPLAY_RESOLUTION_CHANGE, this);
 
         updateFullScale();
@@ -110,7 +97,7 @@ public class DisplayResolutionDependentFbo extends AbstractFboManager implements
     }
 
     private void updateFullScale() {
-        fullScale.setDimensions(Display.getWidth(), Display.getHeight());
+        fullScale.setDimensions(displayDevice.getWidth(), displayDevice.getHeight());
         fullScale.multiplySelfBy(renderingConfig.getFboScale() / 100f);
     }
 
@@ -127,9 +114,9 @@ public class DisplayResolutionDependentFbo extends AbstractFboManager implements
             }
         } else {
             ScreenshotSize screenshotSize = renderingConfig.getScreenshotSize();
-            // TODO: Remove dependency on Display
-            fullScale.setDimensions(screenshotSize.getWidth(Display.getWidth()),
-                    screenshotSize.getHeight(Display.getHeight()));
+
+            fullScale.setDimensions(screenshotSize.getWidth(displayDevice.getWidth()),
+                    screenshotSize.getHeight(displayDevice.getHeight()));
             regenerateFbos();
 
             wasTakingScreenshotLastFrame = true;
@@ -149,7 +136,7 @@ public class DisplayResolutionDependentFbo extends AbstractFboManager implements
 
         // Note that the "old" and "new" values (0 and 1) in the above calls aren't actually
         // used: they are only necessary to ensure that the event is fired up correctly.
-   }
+    }
 
     private void disposeAllFbos() {
         // TODO: This should be public, and should be called while disposing an object of this class, to prevent leaks.
@@ -161,7 +148,7 @@ public class DisplayResolutionDependentFbo extends AbstractFboManager implements
 
     /**
      * Returns the GBuffer FBOs as a SwappableFBO instance.
-     *
+     * <p>
      * The GBuffer is constituted by a special pair of FBOs working in tandem: rendering nodes can use one of the
      * FBOs to read from while writing to the other FBO in the pair.
      *
@@ -173,10 +160,10 @@ public class DisplayResolutionDependentFbo extends AbstractFboManager implements
 
     /**
      * This method triggers the regeneration of the managed FBOs.
-     *
+     * <p>
      * The regeneration takes place only if the PropertyChangeEvent passed to the method has
      * a property name equal to LwjglDisplayDevice.DISPLAY_RESOLUTION_CHANGE or RenderingConfig.FBO_SCALE.
-     *
+     * <p>
      * Before and after the FBO regeneration event are fired to all subscribers of the manager, with
      * property names PRE_FBO_REGENERATION and POST_FBO_REGENERATION respectively.
      *

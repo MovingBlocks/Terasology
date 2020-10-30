@@ -16,10 +16,10 @@
 
 package org.terasology.input;
 
+import org.joml.Vector3fc;
+import org.joml.Vector3ic;
 import org.terasology.engine.SimpleUri;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector3i;
 
 /**
  */
@@ -103,19 +103,20 @@ public interface BindableButton {
      * @param gameTimeInMs The game time in milliseconds.
      * @return Whether the button's event has been consumed
      */
-    public boolean updateBindState(Input input,
-                                   boolean pressed,
-                                   float delta,
-                                   EntityRef[] inputEntities,
-                                   EntityRef target,
-                                   Vector3i targetBlockPos,
-                                   Vector3f hitPosition,
-                                   Vector3f hitNormal,
-                                   boolean initialKeyConsumed,
-                                   long gameTimeInMs);
+    boolean updateBindState(Input input,
+                            boolean pressed,
+                            float delta,
+                            EntityRef[] inputEntities,
+                            EntityRef target,
+                            Vector3ic targetBlockPos,
+                            Vector3fc hitPosition,
+                            Vector3fc hitNormal,
+                            boolean initialKeyConsumed,
+                            long gameTimeInMs);
 
     /**
-     * Updates this bind. If the binding is repeating, this will trigger the binding event with the {@link ButtonState#REPEAT} state.
+     * Updates this bind. If the binding is repeating, this will trigger the binding event with the {@link
+     * ButtonState#REPEAT} state.
      *
      * @param inputEntities The entities which receive the input events
      * @param delta The length of the current frame
@@ -125,12 +126,12 @@ public interface BindableButton {
      * @param hitNormal The current hit normal
      * @param gameTimeInMs The game time in milliseconds.
      */
-    public void update(EntityRef[] inputEntities,
-                       float delta,
-                       EntityRef target,
-                       Vector3i targetBlockPos,
-                       Vector3f hitPosition,
-                       Vector3f hitNormal,
-                       long gameTimeInMs);
+    void update(EntityRef[] inputEntities,
+                float delta,
+                EntityRef target,
+                Vector3ic targetBlockPos,
+                Vector3fc hitPosition,
+                Vector3fc hitNormal,
+                long gameTimeInMs);
 
 }
