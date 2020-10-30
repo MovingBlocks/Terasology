@@ -290,7 +290,7 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
 
         ChunkStore restored = esm.loadChunkStore(JomlUtil.from(CHUNK_POS));
         assertNotNull(restored);
-        assertEquals(JomlUtil.from(CHUNK_POS), JomlUtil.from(restored.getChunkPosition()));
+        assertEquals(CHUNK_POS, restored.getChunkPosition());
         assertNotNull(restored.getChunk());
         assertEquals(testBlock, restored.getChunk().getBlock(0, 0, 0));
     }
@@ -321,7 +321,7 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
 
         ChunkStore restored = newSM.loadChunkStore(JomlUtil.from(CHUNK_POS));
         assertNotNull(restored);
-        assertEquals(JomlUtil.from(CHUNK_POS), JomlUtil.from(restored.getChunkPosition()));
+        assertEquals(CHUNK_POS, restored.getChunkPosition());
         assertNotNull(restored.getChunk());
         assertEquals(testBlock, restored.getChunk().getBlock(0, 0, 0));
         assertEquals(testBlock2, restored.getChunk().getBlock(0, 4, 2));
