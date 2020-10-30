@@ -460,6 +460,15 @@ public final class ChunkMath {
         return dest.set(calcRelativeBlockPos(x, chunkFilterSize.x()), calcRelativeBlockPos(y, chunkFilterSize.y()), calcRelativeBlockPos(z, chunkFilterSize.z()));
     }
 
+    /**
+     * get chunks contained within a center point and extent
+     * @param pos the world position
+     * @param extent the extent
+     * @return chunk region
+     * @deprecated This method is scheduled for removal in an upcoming version. Use the JOML implementation instead:
+     *     {@link #getChunkRegionAroundWorldPos(Vector3ic, int)}.
+     */
+    @Deprecated
     public static Region3i getChunkRegionAroundWorldPos(Vector3i pos, int extent) {
         Vector3i minPos = new Vector3i(-extent, -extent, -extent);
         minPos.add(pos);
@@ -471,6 +480,20 @@ public final class ChunkMath {
 
         return Region3i.createFromMinMax(minChunk, maxChunk);
     }
+
+    /**
+     * get chunks contained within a center point and extent
+     * @param pos the world position
+     * @param extent the extent
+     * @return chunk region
+     */
+    public static BlockRegion getChunkRegionAroundWorldPos(Vector3ic pos, int extent) {
+        org.joml.Vector3i temp = new org.joml.Vector3i();
+        org.joml.Vector3i minChunk = calcChunkPos(temp.set(pos).add(-extent, -extent, -extent), new org.joml.Vector3i());
+        org.joml.Vector3i maxChunk = calcChunkPos(temp.set(pos).add(extent, extent, extent), new org.joml.Vector3i());
+        return new BlockRegion(minChunk, maxChunk);
+    }
+
 
     // TODO: This doesn't belong in this class, move it.
     /**
