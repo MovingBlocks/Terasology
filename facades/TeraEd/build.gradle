@@ -1,3 +1,6 @@
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
+
 // The Editor facade is responsible for the (shader) editor - a plain Java application runnable on PCs
 
 plugins {
@@ -26,7 +29,7 @@ dependencies {
 }
 
 application {
-    mainClassName "org.terasology.editor.TeraEd"
+    mainClass = "org.terasology.editor.TeraEd"
 }
 
 run {

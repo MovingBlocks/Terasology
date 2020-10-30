@@ -18,6 +18,7 @@ package org.terasology.world.block.entity;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
+import org.joml.Vector3f;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.entitySystem.entity.EntityManager;
@@ -203,7 +204,7 @@ public class BlockCommands extends BaseComponentSystem {
         EntityRef gazeEntity = GazeAuthoritySystem.getGazeEntityForCharacter(playerEntity);
         LocationComponent gazeLocation = gazeEntity.getComponent(LocationComponent.class);
         Set<ResourceUrn> matchingUris = Assets.resolveAssetUri(uri, BlockFamilyDefinition.class);
-        targetSystem.updateTarget(gazeLocation.getWorldPosition(), gazeLocation.getWorldDirection(), maxDistance);
+        targetSystem.updateTarget(gazeLocation.getWorldPosition(new Vector3f()), gazeLocation.getWorldDirection(new Vector3f()), maxDistance);
         EntityRef target = targetSystem.getTarget();
         BlockComponent targetLocation = target.getComponent(BlockComponent.class);
         if (matchingUris.size() == 1) {
