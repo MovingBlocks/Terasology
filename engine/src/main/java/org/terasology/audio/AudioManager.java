@@ -138,6 +138,14 @@ public interface AudioManager {
      */
     @Deprecated
     void updateListener(Vector3f position, Quat4f orientation, Vector3f velocity);
+
+    /**
+     * Set the position, orientation and velocity of the listener to updated values.
+     *
+     * @param position The new position
+     * @param orientation The new orientation (in a quaternion)
+     * @param velocity The new velocity
+     */
     void updateListener(Vector3fc position, Quaternionfc orientation, Vector3fc velocity);
 
     /**
