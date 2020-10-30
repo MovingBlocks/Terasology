@@ -176,7 +176,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
                 b.group(bossGroup, workerGroup)
                         .channel(NioServerSocketChannel.class)
                         .option(ChannelOption.SO_BACKLOG, 100)
-                        .localAddress(8080)
+                        .localAddress(port)
                         .childOption(ChannelOption.TCP_NODELAY, true)
                         .childOption(ChannelOption.SO_KEEPALIVE, true)
                         .childHandler(new TerasologyServerPipelineFactory(this));
