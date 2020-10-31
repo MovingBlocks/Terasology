@@ -21,7 +21,6 @@ import org.terasology.math.Roll;
 import org.terasology.math.Rotation;
 import org.terasology.math.Side;
 import org.terasology.math.Yaw;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.naming.Name;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockBuilderHelper;
@@ -128,15 +127,6 @@ public class CeilingSupportingHorizontalFamily extends AbstractBlockFamily {
 
         Side blockDirection = Side.inDirection(-data.viewingDirection.x(), 0, -data.viewingDirection.z());
         return blocks.get(ExtendedSide.getExtendedSideFor(mainSide, blockDirection));
-    }
-
-    @Override
-    public Block getBlockForPlacement(Vector3i location, Side attachmentSide, Side direction) {
-        if (attachmentSide == Side.BOTTOM) {
-            return blocks.get(ExtendedSide.getExtendedSideFor(Side.BOTTOM, direction));
-        } else {
-            return blocks.get(ExtendedSide.getExtendedSideFor(Side.TOP, direction));
-        }
     }
 
     @Override

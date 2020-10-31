@@ -20,7 +20,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.math.Rotation;
 import org.terasology.math.Side;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.naming.Name;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockBuilderHelper;
@@ -85,21 +84,6 @@ public class FreeformFamily extends AbstractBlockFamily implements SideDefinedBl
             Side blockDirection = Side.inDirection(-data.viewingDirection.x(), 0, -data.viewingDirection.z());
             return blocks.get(blockDirection);
         }
-    }
-
-    @Override
-    public Block getBlockForPlacement(Vector3i location, Side attachmentSide, Side direction) {
-        if (archetypeBlock == null) {
-            if (attachmentSide.isHorizontal()) {
-                return blocks.get(attachmentSide);
-            }
-            if (direction != null) {
-                return blocks.get(direction);
-            } else {
-                return blocks.get(Side.FRONT);
-            }
-        }
-        return archetypeBlock;
     }
 
     @Override

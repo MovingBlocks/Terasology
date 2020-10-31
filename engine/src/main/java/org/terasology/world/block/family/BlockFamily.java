@@ -16,8 +16,6 @@
 package org.terasology.world.block.family;
 
 import org.terasology.assets.ResourceUrn;
-import org.terasology.math.Side;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockUri;
 
@@ -47,18 +45,6 @@ public interface BlockFamily {
      * @return The appropriate block
      */
     Block getBlockForPlacement(BlockPlacementData data);
-
-    /**
-     * Get the block that is appropriate for placement in the given situation
-     *
-     * @param location            The location where the block is going to be placed.
-     * @param attachmentSide      The side of the block which this block is being attached to, e.g. Top if the block is being placed on the ground
-     * @param direction           A secondary direction after the attachment side that determines the facing of the block.
-     * @return The appropriate block
-     * @deprecated This method is scheduled for removal, use this one instead: {@link #getBlockForPlacement(BlockPlacementData)}.
-     */
-    @Deprecated
-    Block getBlockForPlacement(Vector3i location, Side attachmentSide, Side direction);
 
     /**
      * @return The base block defining the block group. Can be used for orientation-irrelevant behaviours

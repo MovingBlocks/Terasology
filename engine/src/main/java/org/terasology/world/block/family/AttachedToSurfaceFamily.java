@@ -88,11 +88,6 @@ public class AttachedToSurfaceFamily extends AbstractBlockFamily {
     }
 
     @Override
-    public Block getBlockForPlacement(Vector3i location, Side attachmentSide, Side direction) {
-        return blocks.get(attachmentSide);
-    }
-
-    @Override
     public Block getArchetypeBlock() {
         return archetype;
     }

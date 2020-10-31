@@ -18,15 +18,12 @@ package org.terasology.world.block.family;
 import com.google.common.collect.Sets;
 import gnu.trove.map.TByteObjectMap;
 import gnu.trove.map.hash.TByteObjectHashMap;
-import org.joml.Vector3f;
 import org.joml.Vector3ic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.math.JomlUtil;
 import org.terasology.math.Rotation;
 import org.terasology.math.Side;
 import org.terasology.math.SideBitFlag;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.naming.Name;
 import org.terasology.registry.In;
 import org.terasology.world.BlockEntityRegistry;
@@ -80,18 +77,6 @@ public abstract class MultiConnectFamily extends AbstractBlockFamily implements 
         super(definition, blockBuilder);
     }
 
-    /**
-     * A condition to return true if the block should have a connection on the given side
-     *
-     * @param blockLocation The position of the block in question
-     * @param connectSide The side to determine connection for
-     *
-     * @return A boolean indicating if the block should connect on the given side
-     * @deprecated This method is scheduled for removal in an upcoming version.
-     *             Use the JOML implementation instead: {@link #connectionCondition(Vector3ic, Side)}.
-     */
-    @Deprecated
-    protected abstract boolean connectionCondition(Vector3i blockLocation, Side connectSide);
 
     /**
      * A condition to return true if the block should have a connection on the given side
@@ -179,21 +164,13 @@ public abstract class MultiConnectFamily extends AbstractBlockFamily implements 
     public Block getBlockForPlacement(BlockPlacementData data) {
         byte connections = 0;
         for (Side connectSide : SideBitFlag.getSides(getConnectionSides())) {
-            if (this.connectionCondition(JomlUtil.from(data.blockPosition), connectSide)) {
+            if (this.connectionCondition(data.blockPosition, connectSide)) {
                 connections += SideBitFlag.getSide(connectSide);
             }
         }
         return blocks.get(connections);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Block getBlockForPlacement(Vector3i location, Side attachmentSide, Side direction) {
-        BlockPlacementData data = new BlockPlacementData(JomlUtil.from(location), null, new Vector3f());
-        return getBlockForPlacement(data);
-    }
 
     /**
      * Update the block then a neighbor changes
@@ -203,17 +180,6 @@ public abstract class MultiConnectFamily extends AbstractBlockFamily implements 
      *
      * @return The block from the family to be placed
      */
-    @Override
-    public Block getBlockForNeighborUpdate(Vector3i location, Block oldBlock) {
-        byte connections = 0;
-        for (Side connectSide : SideBitFlag.getSides(getConnectionSides())) {
-            if (this.connectionCondition(location, connectSide)) {
-                connections += SideBitFlag.getSide(connectSide);
-            }
-        }
-        return blocks.get(connections);
-    }
-
     @Override
     public Block getBlockForNeighborUpdate(Vector3ic location, Block oldBlock) {
         byte connections = 0;
