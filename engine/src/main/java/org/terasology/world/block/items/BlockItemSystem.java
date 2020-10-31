@@ -99,7 +99,7 @@ public class BlockItemSystem extends BaseComponentSystem {
         if (canPlaceBlock(block, targetBlock, placementPos)) {
             // TODO: Fix this for changes.
             if (networkSystem.getMode().isAuthority()) {
-                PlaceBlocks placeBlocks = new PlaceBlocks(JomlUtil.from(placementPos), block, event.getInstigator());
+                PlaceBlocks placeBlocks = new PlaceBlocks(placementPos, block, event.getInstigator());
                 worldProvider.getWorldEntity().send(placeBlocks);
                 if (!placeBlocks.isConsumed()) {
                     item.send(new OnBlockItemPlaced(JomlUtil.from(placementPos), blockEntityRegistry.getBlockEntityAt(placementPos), event.getInstigator()));
