@@ -15,10 +15,11 @@
  */
 package org.terasology.persistence.internal;
 
+import org.joml.Vector3f;
+import org.joml.Vector3fc;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.logic.location.LocationComponent;
-import org.terasology.math.geom.Vector3f;
 import org.terasology.persistence.PlayerStore;
 import org.terasology.protobuf.EntityData;
 
@@ -73,8 +74,13 @@ final class PlayerStoreInternal implements PlayerStore {
         this.character = character;
         hasCharacter = character.exists();
         LocationComponent location = character.getComponent(LocationComponent.class);
-        if (location != null && !Float.isNaN(location.getWorldPosition().x)) {
-            setRelevanceLocation(location.getWorldPosition());
+        if (location == null) {
+            return;
+        }
+
+        Vector3f position = location.getWorldPosition(new Vector3f());
+        if (position.isFinite()) {
+            setRelevanceLocation(position);
         }
     }
 
@@ -84,12 +90,12 @@ final class PlayerStoreInternal implements PlayerStore {
     }
 
     @Override
-    public void setRelevanceLocation(Vector3f location) {
+    public void setRelevanceLocation(Vector3fc location) {
         relevanceLocation.set(location);
     }
 
     @Override
-    public Vector3f getRelevanceLocation() {
+    public Vector3fc getRelevanceLocation() {
         return relevanceLocation;
     }
 

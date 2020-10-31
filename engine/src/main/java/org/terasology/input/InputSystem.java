@@ -45,6 +45,7 @@ import org.terasology.input.events.RightMouseUpButtonEvent;
 import org.terasology.input.internal.AbstractBindableAxis;
 import org.terasology.input.internal.BindableRealAxis;
 import org.terasology.logic.players.LocalPlayer;
+import org.terasology.math.JomlUtil;
 import org.terasology.registry.In;
 
 import java.util.List;
@@ -310,15 +311,15 @@ public class InputSystem extends BaseComponentSystem {
      */
     private void updateBindState(BindableButton bind, Input input, boolean pressed, float delta, boolean consumed) {
         bind.updateBindState(
-                input,
-                pressed,
-                delta, inputEntities,
-                targetSystem.getTarget(),
-                targetSystem.getTargetBlockPosition(),
-                targetSystem.getHitPosition(),
-                targetSystem.getHitNormal(),
-                consumed,
-                time.getGameTimeInMs());
+            input,
+            pressed,
+            delta, inputEntities,
+            targetSystem.getTarget(),
+            targetSystem.getTargetBlockPosition(),
+            targetSystem.getHitPosition(),
+            targetSystem.getHitNormal(),
+            consumed,
+            time.getGameTimeInMs());
     }
 
     public void simulateTextInput(String text) {
@@ -401,8 +402,10 @@ public class InputSystem extends BaseComponentSystem {
      */
     private void processBindAxis(float delta) {
         for (AbstractBindableAxis axis : bindsManager.getAxisBinds()) {
-            axis.update(inputEntities, delta, targetSystem.getTarget(), targetSystem.getTargetBlockPosition(),
-                    targetSystem.getHitPosition(), targetSystem.getHitNormal());
+            axis.update(inputEntities, delta, targetSystem.getTarget(),
+                JomlUtil.from(targetSystem.getTargetBlockPosition()),
+                JomlUtil.from(targetSystem.getHitPosition()),
+                JomlUtil.from(targetSystem.getHitNormal()));
         }
     }
 
@@ -533,8 +536,10 @@ public class InputSystem extends BaseComponentSystem {
      */
     private void setupTarget(InputEvent event) {
         if (targetSystem.isTargetAvailable()) {
-            event.setTargetInfo(targetSystem.getTarget(), targetSystem.getTargetBlockPosition(),
-                    targetSystem.getHitPosition(), targetSystem.getHitNormal());
+            event.setTargetInfo(targetSystem.getTarget(),
+                JomlUtil.from(targetSystem.getTargetBlockPosition()),
+                JomlUtil.from(targetSystem.getHitPosition()),
+                JomlUtil.from(targetSystem.getHitNormal()));
         }
     }
 
