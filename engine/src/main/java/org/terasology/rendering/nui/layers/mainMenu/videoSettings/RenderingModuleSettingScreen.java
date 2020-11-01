@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.nui.layers.mainMenu.videoSettings;
 
+import org.joml.Vector2i;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
@@ -26,18 +27,18 @@ import org.terasology.i18n.TranslationSystem;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.registry.In;
 import org.terasology.rendering.dag.ModuleRendering;
-import org.terasology.rendering.nui.Canvas;
+import org.terasology.nui.Canvas;
 import org.terasology.rendering.nui.CoreScreenLayer;
-import org.terasology.rendering.nui.WidgetUtil;
-import org.terasology.rendering.nui.databinding.Binding;
-import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
-import org.terasology.rendering.nui.itemRendering.StringTextRenderer;
+import org.terasology.nui.WidgetUtil;
+import org.terasology.nui.databinding.Binding;
+import org.terasology.nui.databinding.ReadOnlyBinding;
+import org.terasology.nui.itemRendering.StringTextRenderer;
 import org.terasology.rendering.nui.layers.mainMenu.StartPlayingScreen;
-import org.terasology.rendering.nui.widgets.UIButton;
-import org.terasology.rendering.nui.widgets.UIDropdownScrollable;
-import org.terasology.rendering.nui.widgets.UISlider;
-import org.terasology.rendering.nui.widgets.UISliderOnChangeTriggeredListener;
-import org.terasology.rendering.nui.widgets.UIText;
+import org.terasology.nui.widgets.UIButton;
+import org.terasology.nui.widgets.UIDropdownScrollable;
+import org.terasology.nui.widgets.UISlider;
+import org.terasology.nui.widgets.UISliderOnChangeTriggeredListener;
+import org.terasology.nui.widgets.UIText;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -212,5 +213,10 @@ public class RenderingModuleSettingScreen extends CoreScreenLayer implements UIS
 
     public void setSubContext(Context subContext) {
         this.subContext = subContext;
+    }
+
+    @Override
+    public Vector2i getPreferredContentSize(Canvas canvas, Vector2i vector2i) {
+        return vector2i;
     }
 }

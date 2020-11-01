@@ -23,6 +23,7 @@ import org.terasology.config.Config;
 import org.terasology.config.SystemConfig;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.paths.PathManager;
+import org.terasology.input.device.KeyboardDevice;
 import org.terasology.module.ClasspathModule;
 import org.terasology.module.DependencyInfo;
 import org.terasology.module.Module;
@@ -41,6 +42,8 @@ import org.terasology.module.sandbox.PermissionProviderFactory;
 import org.terasology.module.sandbox.StandardPermissionProviderFactory;
 import org.terasology.module.sandbox.WarnOnlyProviderFactory;
 import org.terasology.naming.Name;
+import org.terasology.nui.UIWidget;
+import org.terasology.reflection.TypeRegistry;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -86,6 +89,9 @@ public class ModuleManagerImpl implements ModuleManager {
             List<Class<?>> additionalClassesList = new ArrayList<>(classesOnClasspathsToAddToEngine.size() + 2);
             additionalClassesList.add(Module.class); // provide access to gestalt-module.jar
             additionalClassesList.add(Asset.class); // provide access to gestalt-asset-core.jar
+            additionalClassesList.add(UIWidget.class); // provide access to nui.jar
+            additionalClassesList.add(TypeRegistry.class); // provide access to nui-reflect.jar
+            additionalClassesList.add(KeyboardDevice.class); // provide access to nui-input.jar
             additionalClassesList.addAll(classesOnClasspathsToAddToEngine); // provide access to any facade-provided classes
             Class<?>[] additionalClassesArray = new Class[additionalClassesList.size()];
             additionalClassesArray = additionalClassesList.toArray(additionalClassesArray);

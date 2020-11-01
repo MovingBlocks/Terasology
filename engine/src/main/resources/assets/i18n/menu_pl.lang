@@ -286,7 +286,6 @@
     "storage-service-sync-ok": "Synchronizacja ukończona - %d pobranych, %d wysłanych, %d kolidujących.",
     "storage-service-sync-previous-conflicts": "Pojawiły się konflikty podczas ostatniej synchronizacji. Aby móc zacząć nowy proces synchronizacji, rozwiąż obecne konflikty.",
     "storage-service-token-fail": "Uwierzytelnianie z zachowanego klucza i URL nie powiodło się - %s.",
-    "storage-service-token-not-present": "Brak danych konfiguracyjnych - pozostajesz niezalogowany.",
     "storage-service-token-ok": "Udało się zalogować używając przechowanych danych logowania.",
     "storage-service-upload-fail": "Wysłanie tożsamości nie powiodło się - %s.",
     "storage-service-upload-ok": "Udało się wysłać nowe tożsamości.",

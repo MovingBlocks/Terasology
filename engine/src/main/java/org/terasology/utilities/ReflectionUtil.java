@@ -23,7 +23,7 @@ import org.reflections.ReflectionUtils;
 import org.terasology.engine.SimpleUri;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.naming.Name;
-import org.terasology.rendering.nui.UIWidget;
+import org.terasology.nui.UIWidget;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;

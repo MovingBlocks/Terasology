@@ -27,6 +27,10 @@ import gnu.trove.iterator.TIntIterator;
 import gnu.trove.set.TIntSet;
 import gnu.trove.set.hash.TIntHashSet;
 import org.jboss.netty.channel.Channel;
+import org.joml.RoundingMode;
+import org.joml.Vector3f;
+import org.joml.Vector3i;
+import org.joml.Vector3ic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.Time;
@@ -42,13 +46,14 @@ import org.terasology.logic.characters.PredictionSystem;
 import org.terasology.logic.common.DisplayNameComponent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.ChunkMath;
-import org.terasology.math.geom.Vector3i;
+import org.terasology.math.JomlUtil;
 import org.terasology.network.Client;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.ColorComponent;
 import org.terasology.network.NetMetricSource;
 import org.terasology.network.NetworkComponent;
 import org.terasology.network.serialization.ServerComponentFieldCheck;
+import org.terasology.nui.Color;
 import org.terasology.persistence.serializers.EventSerializer;
 import org.terasology.persistence.serializers.NetworkEntitySerializer;
 import org.terasology.persistence.typeHandling.DeserializationException;
@@ -56,7 +61,6 @@ import org.terasology.persistence.typeHandling.SerializationException;
 import org.terasology.protobuf.EntityData;
 import org.terasology.protobuf.NetData;
 import org.terasology.registry.CoreRegistry;
-import org.terasology.rendering.nui.Color;
 import org.terasology.rendering.world.viewDistance.ViewDistance;
 import org.terasology.world.WorldChangeListener;
 import org.terasology.world.WorldProvider;
@@ -65,7 +69,6 @@ import org.terasology.world.block.BlockComponent;
 import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.chunks.Chunk;
 
-import java.math.RoundingMode;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
@@ -251,13 +254,17 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
                 chunkSendCounter -= 1.0f;
                 Vector3i center = new Vector3i();
                 LocationComponent loc = getEntity().getComponent(ClientComponent.class).character.getComponent(LocationComponent.class);
-                if (loc != null&& !Float.isNaN(loc.getWorldPosition().x)) {
-                    center.set(ChunkMath.calcChunkPos(new Vector3i(loc.getWorldPosition(), RoundingMode.HALF_UP)));
+                if (loc != null) {
+                    Vector3f target = loc.getWorldPosition(new Vector3f());
+                    if (target.isFinite()) {
+                        center.set(target, RoundingMode.HALF_UP); // use center as temporary variable
+                        ChunkMath.calcChunkPos(center, center); // update center to chunkPos
+                    }
                 }
                 Vector3i pos = null;
-                int distance = Integer.MAX_VALUE;
+                long distance = Integer.MAX_VALUE;
                 for (Vector3i chunkPos : readyChunks.keySet()) {
-                    int chunkDistance = chunkPos.distanceSquared(center);
+                    long chunkDistance = chunkPos.distanceSquared(center);
                     if (pos == null || chunkDistance < distance) {
                         pos = chunkPos;
                         distance = chunkDistance;
@@ -341,18 +348,18 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
         try {
             BlockComponent blockComp = target.getComponent(BlockComponent.class);
             if (blockComp != null) {
-                if (relevantChunks.contains(ChunkMath.calcChunkPos(blockComp.position))) {
+                if (relevantChunks.contains(ChunkMath.calcChunkPos(JomlUtil.from(blockComp.position), new Vector3i()))) {
                     queuedOutgoingEvents.add(NetData.EventMessage.newBuilder()
-                            .setTargetBlockPos(NetMessageUtil.convert(blockComp.position))
-                            .setEvent(eventSerializer.serialize(event)).build());
+                        .setTargetBlockPos(NetMessageUtil.convert(blockComp.position))
+                        .setEvent(eventSerializer.serialize(event)).build());
                 }
             } else {
                 NetworkComponent networkComponent = target.getComponent(NetworkComponent.class);
                 if (networkComponent != null) {
                     if (netRelevant.contains(networkComponent.getNetworkId()) || netInitial.contains(networkComponent.getNetworkId())) {
                         queuedOutgoingEvents.add(NetData.EventMessage.newBuilder()
-                                .setTargetId(networkComponent.getNetworkId())
-                                .setEvent(eventSerializer.serialize(event)).build());
+                            .setTargetId(networkComponent.getNetworkId())
+                            .setEvent(eventSerializer.serialize(event)).build());
                     }
                 }
             }
@@ -379,39 +386,43 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
     }
 
     @Override
-    public void onChunkRelevant(Vector3i pos, Chunk chunk) {
-        invalidatedChunks.remove(pos);
-        readyChunks.put(pos, chunk);
+    public void onChunkRelevant(Vector3ic pos, Chunk chunk) {
+        Vector3i result = new Vector3i(pos);
+        invalidatedChunks.remove(result);
+        readyChunks.put(result, chunk);
     }
 
     @Override
-    public void onChunkIrrelevant(Vector3i pos) {
-        readyChunks.remove(pos);
-        invalidatedChunks.add(pos);
+    public void onChunkIrrelevant(Vector3ic pos) {
+        Vector3i result = new Vector3i(pos);
+        readyChunks.remove(result);
+        invalidatedChunks.add(result);
     }
 
+
     @Override
-    public void onBlockChanged(Vector3i pos, Block newBlock, Block originalBlock) {
-        Vector3i chunkPos = ChunkMath.calcChunkPos(pos);
+    public void onBlockChanged(Vector3ic pos, Block newBlock, Block originalBlock) {
+        org.joml.Vector3i chunkPos = ChunkMath.calcChunkPos(pos, new org.joml.Vector3i());
         if (relevantChunks.contains(chunkPos)) {
             queuedOutgoingBlockChanges.add(NetData.BlockChangeMessage.newBuilder()
-                    .setPos(NetMessageUtil.convert(pos))
-                    .setNewBlock(newBlock.getId())
-                    .build());
+                .setPos(NetMessageUtil.convert(pos))
+                .setNewBlock(newBlock.getId())
+                .build());
         }
     }
 
     @Override
-    public void onExtraDataChanged(int i, Vector3i pos, int newData, int oldData) {
-        Vector3i chunkPos = ChunkMath.calcChunkPos(pos);
+    public void onExtraDataChanged(int i, Vector3ic pos, int newData, int oldData) {
+        org.joml.Vector3i chunkPos = ChunkMath.calcChunkPos(pos, new org.joml.Vector3i());
         if (relevantChunks.contains(chunkPos)) {
             queuedOutgoingExtraDataChanges.add(NetData.ExtraDataChangeMessage.newBuilder()
-                    .setIndex(i)
-                    .setPos(NetMessageUtil.convert(pos))
-                    .setNewData(newData)
-                    .build());
+                .setIndex(i)
+                .setPos(NetMessageUtil.convert(pos))
+                .setNewData(newData)
+                .build());
         }
     }
+
 
     private void processReceivedMessages() {
         List<NetData.NetMessage> messages = Lists.newArrayListWithExpectedSize(queuedIncomingMessage.size());
@@ -430,7 +441,7 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
         List<NetData.BlockChangeMessage> blockChanges = Lists.newArrayListWithExpectedSize(queuedOutgoingBlockChanges.size());
         queuedOutgoingBlockChanges.drainTo(blockChanges);
         message.addAllBlockChange(blockChanges);
-        
+
         List<NetData.ExtraDataChangeMessage> extraDataChanges = Lists.newArrayListWithExpectedSize(queuedOutgoingExtraDataChanges.size());
         queuedOutgoingExtraDataChanges.drainTo(extraDataChanges);
         message.addAllExtraDataChange(extraDataChanges);
@@ -562,4 +573,6 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
             newlyRegisteredFamilies.add(family);
         }
     }
+
+
 }

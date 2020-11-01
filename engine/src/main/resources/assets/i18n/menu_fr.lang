@@ -372,7 +372,6 @@
     "storage-service-sync-ok": "Synchronisation terminée - %d téléchargés, %d chargés, %d en conflit.",
     "storage-service-sync-previous-conflicts": "Des conflits ont été détectés lors de la dernière synchronisation. Il n'est pas possible de démarrer une nouvelle synchronisation tant que les conflits ne sont pas résolus.",
     "storage-service-token-fail": "L'authentification à partir du jeton stocké et de l'URL a échoué - %s.",
-    "storage-service-token-not-present": "Aucune donnée de configuration n'est présente, reste déconnectée.",
     "storage-service-token-ok": "Connexion réussie à l'aide des informations d'identification stockées.",
     "storage-service-upload-fail": "Échec du téléchargement des identités - %s.",
     "storage-service-upload-ok": "Téléchargement des nouvelles identités effectué avec succés.",

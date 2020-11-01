@@ -16,12 +16,12 @@
 package org.terasology.world.block;
 
 import org.terasology.entitySystem.Component;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.network.Replicate;
 
 /**
  * Used for entities representing a block in the world
- *
  */
 public final class BlockComponent implements Component {
     @Replicate
@@ -31,14 +31,25 @@ public final class BlockComponent implements Component {
 
     public BlockComponent() {
     }
-
+    /**
+     * @deprecated This is scheduled for removal in an upcoming version method will be replaced with JOML implementation
+     *     {@link #BlockComponent(Block, org.joml.Vector3i)}.
+     */
+    @Deprecated
     public BlockComponent(Block block, Vector3i pos) {
         this.block = block;
         this.position.set(pos);
     }
 
+    public BlockComponent(Block block, org.joml.Vector3i pos) {
+        this.block = block;
+        this.position.set(JomlUtil.from(pos));
+    }
+
     /**
      * @deprecated Deprecated on 21/Sep/2018, because it is error prone (no defensive copy) and needlessly verbose.
+     * @deprecated This is scheduled for removal in an upcoming version method will be replaced with JOML implementation
+     *     {@link #getPosition(org.joml.Vector3i)}.
      */
     @Deprecated
     public Vector3i getPosition() {
@@ -47,6 +58,8 @@ public final class BlockComponent implements Component {
 
     /**
      * @deprecated Deprecated on 21/Sep/2018, because it is needlessly verbose.
+     * @deprecated This is scheduled for removal in an upcoming version method will be replaced with JOML implementation
+     *     {@link #setPosition(org.joml.Vector3i)}.
      */
     @Deprecated
     public void setPosition(Vector3i pos) {
@@ -67,5 +80,25 @@ public final class BlockComponent implements Component {
     @Deprecated
     public Block getBlock() {
         return block;
+    }
+
+    /**
+     * get the position
+     *
+     * @param dest will hold the result
+     * @return dest
+     */
+    public org.joml.Vector3i getPosition(org.joml.Vector3i dest) {
+        dest.set(JomlUtil.from(position));
+        return dest;
+    }
+
+    /**
+     * set the position of the {@link BlockComponent}
+     *
+     * @param pos position to set
+     */
+    public void setPosition(org.joml.Vector3i pos) {
+        position.set(JomlUtil.from(pos));
     }
 }

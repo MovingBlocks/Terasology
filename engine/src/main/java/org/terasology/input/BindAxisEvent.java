@@ -30,7 +30,7 @@ public class BindAxisEvent extends AxisEvent {
     }
 
     @Override
-    public float getValue() {
+    public double getValue() {
         return value;
     }
 

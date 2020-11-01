@@ -16,8 +16,8 @@
 package org.terasology.logic.behavior.nui;
 
 import com.google.common.collect.Lists;
-import org.terasology.math.geom.Rect2i;
-import org.terasology.rendering.nui.Canvas;
+import org.joml.Rectanglei;
+import org.terasology.nui.Canvas;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,20 +38,20 @@ public class PortList implements TreeAccessor<RenderableNode> {
     }
 
     public void onDraw(Canvas canvas) {
-        Rect2i region = canvas.getRegion();
+        Rectanglei region = canvas.getRegion();
         inputPort.updateRect();
-        canvas.drawWidget(inputPort, Rect2i.createFromMinAndMax(
-                (int) (inputPort.rect.minX() / 10.f * region.width()),
-                (int) (inputPort.rect.minY() / 5.f * region.height()),
-                (int) (inputPort.rect.maxX() / 10.f * region.width()),
-                (int) (inputPort.rect.maxY() / 5.f * region.height())));
+        canvas.drawWidget(inputPort, new Rectanglei(
+                (int) (inputPort.rect.minX() / 10.f * region.lengthX()),
+                (int) (inputPort.rect.minY() / 5.f * region.lengthY()),
+                (int) (inputPort.rect.maxX() / 10.f * region.lengthX()),
+                (int) (inputPort.rect.maxY() / 5.f * region.lengthY())));
         for (Port port : ports) {
             port.updateRect();
-            canvas.drawWidget(port, Rect2i.createFromMinAndMax(
-                    (int) (port.rect.minX() / 10.f * region.width()),
-                    (int) (port.rect.minY() / 5.f * region.height()),
-                    (int) (port.rect.maxX() / 10.f * region.width()),
-                    (int) (port.rect.maxY() / 5.f * region.height())));
+            canvas.drawWidget(port, new Rectanglei(
+                    (int) (port.rect.minX() / 10.f * region.lengthX()),
+                    (int) (port.rect.minY() / 5.f * region.lengthY()),
+                    (int) (port.rect.maxX() / 10.f * region.lengthX()),
+                    (int) (port.rect.maxY() / 5.f * region.lengthY())));
         }
     }
 

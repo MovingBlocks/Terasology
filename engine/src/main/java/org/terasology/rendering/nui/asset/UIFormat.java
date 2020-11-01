@@ -34,6 +34,7 @@ import org.terasology.assets.format.AbstractAssetFileFormat;
 import org.terasology.assets.format.AssetDataFile;
 import org.terasology.assets.module.annotations.RegisterAssetFileFormat;
 import org.terasology.i18n.TranslationSystem;
+import org.terasology.nui.asset.UIData;
 import org.terasology.persistence.ModuleContext;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.persistence.typeHandling.extensionTypes.AssetTypeHandler;
@@ -42,12 +43,12 @@ import org.terasology.reflection.metadata.ClassMetadata;
 import org.terasology.reflection.metadata.FieldMetadata;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.nui.CoreScreenLayer;
-import org.terasology.rendering.nui.LayoutHint;
+import org.terasology.nui.LayoutHint;
 import org.terasology.rendering.nui.NUIManager;
-import org.terasology.rendering.nui.UILayout;
-import org.terasology.rendering.nui.UIWidget;
-import org.terasology.rendering.nui.skin.UISkin;
-import org.terasology.rendering.nui.widgets.UILabel;
+import org.terasology.nui.UILayout;
+import org.terasology.nui.UIWidget;
+import org.terasology.nui.skin.UISkin;
+import org.terasology.nui.widgets.UILabel;
 import org.terasology.utilities.ReflectionUtil;
 import org.terasology.utilities.gson.CaseInsensitiveEnumTypeAdapterFactory;
 
@@ -72,6 +73,7 @@ public class UIFormat extends AbstractAssetFileFormat<UIData> {
     public static final String LAYOUT_INFO_FIELD = "layoutInfo";
     public static final String ID_FIELD = "id";
     public static final String TYPE_FIELD = "type";
+    public static final String ENABLED_FIELD = "enabled";
 
     private static final Logger logger = LoggerFactory.getLogger(UIFormat.class);
 
@@ -207,6 +209,10 @@ public class UIFormat extends AbstractAssetFileFormat<UIData> {
                     if (field.getName().equals(CONTENTS_FIELD) && UILayout.class.isAssignableFrom(elementMetadata.getType())) {
                         continue;
                     }
+                    // added new if block instead of modifying previous block conditions to avoid ruining code readability
+                    if (field.getName().equals(ENABLED_FIELD) && UILayout.class.isAssignableFrom(elementMetadata.getType())) {
+                        continue;
+                    }
                     try {
                         if (List.class.isAssignableFrom(field.getType())) {
                             Type contentType = ReflectionUtil.getTypeParameter(field.getField().getGenericType(), 0);
@@ -236,7 +242,7 @@ public class UIFormat extends AbstractAssetFileFormat<UIData> {
                 UILayout<LayoutHint> layout = (UILayout<LayoutHint>) element;
 
                 Class<? extends LayoutHint> layoutHintType = (Class<? extends LayoutHint>)
-                    ReflectionUtil.getTypeParameter(elementMetadata.getType().getGenericSuperclass(), 0);
+                        ReflectionUtil.getTypeParameter(elementMetadata.getType().getGenericSuperclass(), 0);
                 if (jsonObject.has(CONTENTS_FIELD)) {
                     for (JsonElement child : jsonObject.getAsJsonArray(CONTENTS_FIELD)) {
                         UIWidget childElement = context.deserialize(child, UIWidget.class);
@@ -245,13 +251,19 @@ public class UIFormat extends AbstractAssetFileFormat<UIData> {
                             if (child.isJsonObject()) {
                                 JsonObject childObject = child.getAsJsonObject();
                                 if (layoutHintType != null && !layoutHintType.isInterface() && !Modifier.isAbstract(layoutHintType.getModifiers())
-                                    && childObject.has(LAYOUT_INFO_FIELD)) {
+                                        && childObject.has(LAYOUT_INFO_FIELD)) {
                                     hint = context.deserialize(childObject.get(LAYOUT_INFO_FIELD), layoutHintType);
                                 }
                             }
                             layout.addWidget(childElement, hint);
                         }
                     }
+                }
+                if (jsonObject.has(ENABLED_FIELD)) {
+                    FieldMetadata<? extends UIWidget, ?> enabledField = elementMetadata.getField(ENABLED_FIELD);
+                    enabledField.setValue(element,
+                            context.deserialize(jsonObject.get(enabledField.getSerializationName()),
+                                    enabledField.getType()));
                 }
             }
 

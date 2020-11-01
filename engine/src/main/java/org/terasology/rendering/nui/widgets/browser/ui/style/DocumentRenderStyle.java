@@ -15,7 +15,7 @@
  */
 package org.terasology.rendering.nui.widgets.browser.ui.style;
 
-import org.terasology.rendering.nui.Color;
+import org.terasology.nui.Color;
 
 public interface DocumentRenderStyle extends ParagraphRenderStyle {
     default ContainerInteger getDocumentMarginTop() {

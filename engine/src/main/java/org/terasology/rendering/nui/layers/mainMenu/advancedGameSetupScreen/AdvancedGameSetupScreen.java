@@ -21,6 +21,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.codehaus.plexus.util.StringUtils;
+import org.joml.Vector2i;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
@@ -37,7 +38,6 @@ import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.module.StandardModuleExtension;
 import org.terasology.game.GameManifest;
 import org.terasology.i18n.TranslationSystem;
-import org.terasology.math.geom.Vector2i;
 import org.terasology.module.DependencyInfo;
 import org.terasology.module.DependencyResolver;
 import org.terasology.module.Module;
@@ -45,14 +45,21 @@ import org.terasology.module.ModuleMetadata;
 import org.terasology.module.ResolutionResult;
 import org.terasology.naming.Name;
 import org.terasology.network.NetworkMode;
+import org.terasology.nui.Canvas;
+import org.terasology.nui.WidgetUtil;
+import org.terasology.nui.databinding.Binding;
+import org.terasology.nui.databinding.ReadOnlyBinding;
+import org.terasology.nui.itemRendering.AbstractItemRenderer;
+import org.terasology.nui.widgets.ResettableUIText;
+import org.terasology.nui.widgets.TextChangeEventListener;
+import org.terasology.nui.widgets.UIButton;
+import org.terasology.nui.widgets.UICheckbox;
+import org.terasology.nui.widgets.UILabel;
+import org.terasology.nui.widgets.UIList;
+import org.terasology.nui.widgets.UIText;
 import org.terasology.registry.In;
-import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreScreenLayer;
-import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.animation.MenuAnimationSystems;
-import org.terasology.rendering.nui.databinding.Binding;
-import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
-import org.terasology.rendering.nui.itemRendering.AbstractItemRenderer;
 import org.terasology.rendering.nui.layers.mainMenu.ConfirmPopup;
 import org.terasology.rendering.nui.layers.mainMenu.GameManifestProvider;
 import org.terasology.rendering.nui.layers.mainMenu.MessagePopup;
@@ -60,13 +67,6 @@ import org.terasology.rendering.nui.layers.mainMenu.UniverseSetupScreen;
 import org.terasology.rendering.nui.layers.mainMenu.UniverseWrapper;
 import org.terasology.rendering.nui.layers.mainMenu.WaitPopup;
 import org.terasology.rendering.nui.layers.mainMenu.moduleDetailsScreen.ModuleDetailsScreen;
-import org.terasology.rendering.nui.widgets.ResettableUIText;
-import org.terasology.rendering.nui.widgets.TextChangeEventListener;
-import org.terasology.rendering.nui.widgets.UIButton;
-import org.terasology.rendering.nui.widgets.UICheckbox;
-import org.terasology.rendering.nui.widgets.UILabel;
-import org.terasology.rendering.nui.widgets.UIList;
-import org.terasology.rendering.nui.widgets.UIText;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.world.generator.internal.WorldGeneratorManager;
 
@@ -125,6 +125,7 @@ public class AdvancedGameSetupScreen extends CoreScreenLayer {
         for (ModuleSelectionInfo info : sortedModules) {
             info.setExplicitSelection(config.getDefaultModSelection().hasModule(info.getMetadata().getId()));
         }
+        refreshSelection();
 
         filterModules();
     }
@@ -195,7 +196,8 @@ public class AdvancedGameSetupScreen extends CoreScreenLayer {
                 @Override
                 public Vector2i getPreferredSize(ModuleSelectionInfo value, Canvas canvas) {
                     String text = getString(value);
-                    return new Vector2i(canvas.getCurrentStyle().getFont().getWidth(text),
+                    return new Vector2i(
+                            canvas.getCurrentStyle().getFont().getWidth(text),
                             canvas.getCurrentStyle().getFont().getLineHeight());
                 }
             });
@@ -752,9 +754,7 @@ public class AdvancedGameSetupScreen extends CoreScreenLayer {
         if (target.isValidToSelect() && !target.isExplicitSelection()) {
             boolean previouslySelected = target.isSelected();
             target.setExplicitSelection(true);
-            if (!previouslySelected) {
-                refreshSelection();
-            }
+            refreshSelection();
         }
     }
 

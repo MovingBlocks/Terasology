@@ -21,6 +21,7 @@ import org.terasology.context.internal.ContextImpl;
 import org.terasology.context.internal.MockContext;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.registry.CoreRegistry;
+import org.terasology.world.block.BlockRegion;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -91,6 +92,16 @@ public class ChunkMathTest {
         assertTrue(ChunkMath.calcChunkPos(200, 700, -1, temp).equals(6, 10, -1));
         assertTrue(ChunkMath.calcChunkPos(200, 200, 200, temp).equals(6, 3, 6));
         assertTrue(ChunkMath.calcChunkPos(10, 10, 10, temp).equals(0, 0, 0));
+    }
+
+    @Test
+    public void testChunkRegionAroundWorldPos() {
+        assertEquals(ChunkMath.getChunkRegionAroundWorldPos(new org.joml.Vector3i(0, 0, 0), 100),
+            new BlockRegion(-4, -2, -4, 3, 1, 3));
+        assertEquals(ChunkMath.getChunkRegionAroundWorldPos(new org.joml.Vector3i(-30, -30, -30), 100),
+            new BlockRegion(-5, -3, -5, 2, 1, 2));
+        assertEquals(ChunkMath.getChunkRegionAroundWorldPos(new org.joml.Vector3i(0, 0, 0), 10),
+            new BlockRegion(-1, -1, -1, 0, 0, 0));
     }
 
 

@@ -18,6 +18,7 @@ package org.terasology.rendering.nui.layers.mainMenu.gameDetailsScreen;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.codehaus.plexus.util.StringUtils;
+import org.joml.Vector2i;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
@@ -26,29 +27,28 @@ import org.terasology.engine.SimpleUri;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.i18n.TranslationSystem;
-import org.terasology.math.geom.Vector2i;
 import org.terasology.module.DependencyInfo;
 import org.terasology.module.Module;
 import org.terasology.module.ModuleMetadata;
 import org.terasology.naming.NameVersion;
+import org.terasology.nui.Canvas;
+import org.terasology.nui.databinding.Binding;
+import org.terasology.nui.databinding.ReadOnlyBinding;
+import org.terasology.nui.itemRendering.AbstractItemRenderer;
+import org.terasology.nui.widgets.UIButton;
+import org.terasology.nui.widgets.UIImage;
+import org.terasology.nui.widgets.UIImageSlideshow;
+import org.terasology.nui.widgets.UILabel;
+import org.terasology.nui.widgets.UIList;
+import org.terasology.nui.widgets.UITabBox;
+import org.terasology.nui.widgets.UIText;
 import org.terasology.registry.In;
-import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.animation.MenuAnimationSystems;
-import org.terasology.rendering.nui.databinding.Binding;
-import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
-import org.terasology.rendering.nui.itemRendering.AbstractItemRenderer;
 import org.terasology.rendering.nui.layers.mainMenu.MessagePopup;
 import org.terasology.rendering.nui.layers.mainMenu.SelectGameScreen;
 import org.terasology.rendering.nui.layers.mainMenu.moduleDetailsScreen.ModuleDetailsScreen;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameInfo;
-import org.terasology.rendering.nui.widgets.UIButton;
-import org.terasology.rendering.nui.widgets.UIImage;
-import org.terasology.rendering.nui.widgets.UIImageSlideshow;
-import org.terasology.rendering.nui.widgets.UILabel;
-import org.terasology.rendering.nui.widgets.UIList;
-import org.terasology.rendering.nui.widgets.UITabBox;
-import org.terasology.rendering.nui.widgets.UIText;
 import org.terasology.utilities.time.DateTimeHelper;
 import org.terasology.world.generator.internal.WorldGeneratorInfo;
 import org.terasology.world.generator.internal.WorldGeneratorManager;
@@ -244,7 +244,9 @@ public class GameDetailsScreen extends CoreScreenLayer {
             @Override
             public Vector2i getPreferredSize(WorldInfo value, Canvas canvas) {
                 String text = value.getCustomTitle();
-                return new Vector2i(canvas.getCurrentStyle().getFont().getWidth(text), canvas.getCurrentStyle().getFont().getLineHeight());
+                return new Vector2i(
+                        canvas.getCurrentStyle().getFont().getWidth(text),
+                        canvas.getCurrentStyle().getFont().getLineHeight());
             }
         });
     }
@@ -335,7 +337,8 @@ public class GameDetailsScreen extends CoreScreenLayer {
             @Override
             public Vector2i getPreferredSize(ModuleSelectionInfo value, Canvas canvas) {
                 String text = getString(value);
-                return new Vector2i(canvas.getCurrentStyle().getFont().getWidth(text),
+                return new Vector2i(
+                        canvas.getCurrentStyle().getFont().getWidth(text),
                         canvas.getCurrentStyle().getFont().getLineHeight());
             }
         });

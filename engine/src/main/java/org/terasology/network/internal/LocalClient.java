@@ -16,6 +16,7 @@
 
 package org.terasology.network.internal;
 
+import org.joml.Vector3ic;
 import org.terasology.config.Config;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -24,8 +25,8 @@ import org.terasology.logic.common.DisplayNameComponent;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.ColorComponent;
+import org.terasology.nui.Color;
 import org.terasology.registry.CoreRegistry;
-import org.terasology.rendering.nui.Color;
 import org.terasology.rendering.world.viewDistance.ViewDistance;
 import org.terasology.world.chunks.Chunk;
 
@@ -105,10 +106,10 @@ public class LocalClient extends AbstractClient {
     }
 
     @Override
-    public void onChunkRelevant(Vector3i pos, Chunk chunk) {
+    public void onChunkRelevant(Vector3ic pos, Chunk chunk) {
     }
 
     @Override
-    public void onChunkIrrelevant(Vector3i pos) {
+    public void onChunkIrrelevant(Vector3ic pos) {
     }
 }

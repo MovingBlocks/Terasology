@@ -24,19 +24,22 @@ import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.i18n.TranslationSystem;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.naming.Name;
+import org.terasology.nui.properties.OneOfProviderFactory;
 import org.terasology.reflection.metadata.FieldMetadata;
+import org.terasology.reflection.reflect.ReflectFactory;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
-import org.terasology.rendering.nui.WidgetUtil;
+import org.terasology.nui.WidgetUtil;
 import org.terasology.rendering.nui.animation.MenuAnimationSystems;
-import org.terasology.rendering.nui.databinding.Binding;
-import org.terasology.rendering.nui.layouts.PropertyLayout;
-import org.terasology.rendering.nui.properties.Property;
-import org.terasology.rendering.nui.properties.PropertyOrdering;
-import org.terasology.rendering.nui.properties.PropertyProvider;
-import org.terasology.rendering.nui.widgets.UIDropdownScrollable;
-import org.terasology.rendering.nui.widgets.UILabel;
-import org.terasology.rendering.nui.widgets.UIText;
+import org.terasology.nui.databinding.Binding;
+import org.terasology.nui.layouts.PropertyLayout;
+import org.terasology.nui.properties.Property;
+import org.terasology.nui.properties.PropertyOrdering;
+import org.terasology.nui.properties.PropertyProvider;
+import org.terasology.nui.widgets.UIDropdownScrollable;
+import org.terasology.nui.widgets.UILabel;
+import org.terasology.nui.widgets.UIText;
+import org.terasology.nui.properties.PropertyProvider;
 import org.terasology.rendering.world.WorldSetupWrapper;
 import org.terasology.world.generator.UnresolvedWorldGeneratorException;
 import org.terasology.world.generator.WorldConfigurator;
@@ -185,7 +188,7 @@ public class WorldSetupScreen extends CoreScreenLayer {
 
         for (String label : params.keySet()) {
 
-            PropertyProvider provider = new PropertyProvider() {
+            PropertyProvider provider = new PropertyProvider(context.get(ReflectFactory.class), context.get(OneOfProviderFactory.class)) {
                 @Override
                 protected <T> Binding<T> createTextBinding(Object target, FieldMetadata<Object, T> fieldMetadata) {
                     return new WorldSetupScreen.WorldConfigBinding<>(worldConfig, label, compLib, fieldMetadata);

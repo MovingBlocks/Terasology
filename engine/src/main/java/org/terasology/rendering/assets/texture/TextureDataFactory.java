@@ -19,9 +19,9 @@ package org.terasology.rendering.assets.texture;
 import java.nio.ByteBuffer;
 
 import org.terasology.math.TeraMath;
+import org.terasology.nui.Color;
 import org.terasology.rendering.assets.texture.Texture.FilterMode;
 import org.terasology.rendering.assets.texture.Texture.WrapMode;
-import org.terasology.rendering.nui.Color;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.utilities.random.Random;
 

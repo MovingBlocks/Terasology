@@ -17,6 +17,7 @@ package org.terasology.engine.bootstrap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.module.ModuleAwareAssetTypeManager;
 import org.terasology.config.flexible.AutoConfigManager;
 import org.terasology.context.Context;
@@ -45,6 +46,7 @@ import org.terasology.reflection.TypeRegistry;
 import org.terasology.reflection.copy.CopyStrategy;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.copy.RegisterCopyStrategy;
+import org.terasology.reflection.reflect.ReflectFactory;
 import org.terasology.registry.InjectionHelper;
 import org.terasology.util.reflection.GenericsUtil;
 import org.terasology.utilities.ReflectionUtil;
@@ -154,7 +156,7 @@ public final class EnvironmentSwitchHandler {
 
     public void handleSwitchToPreviewEnvironment(Context context, ModuleEnvironment environment) {
         cheapAssetManagerUpdate(context, environment);
-        ComponentLibrary library = new ComponentLibrary(context);
+        ComponentLibrary library = new ComponentLibrary(environment, context.get(ReflectFactory.class), context.get(CopyStrategyLibrary.class));
         context.put(ComponentLibrary.class, library);
 
         registerComponents(library, environment);
@@ -188,7 +190,7 @@ public final class EnvironmentSwitchHandler {
         for (Class<? extends Component> componentType : environment.getSubtypesOf(Component.class)) {
             if (componentType.getAnnotation(DoNotAutoRegister.class) == null) {
                 String componentName = MetadataUtil.getComponentClassName(componentType);
-                library.register(new SimpleUri(environment.getModuleProviding(componentType), componentName), componentType);
+                library.register(new ResourceUrn(environment.getModuleProviding(componentType).toString(), componentName), componentType);
             }
         }
     }

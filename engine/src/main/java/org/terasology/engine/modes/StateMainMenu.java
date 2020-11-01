@@ -30,8 +30,9 @@ import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.editor.systems.NUIEditorSystem;
 import org.terasology.rendering.nui.editor.systems.NUISkinEditorSystem;
-import org.terasology.rendering.nui.internal.CanvasRenderer;
+import org.terasology.nui.canvas.CanvasRenderer;
 import org.terasology.rendering.nui.internal.NUIManagerInternal;
+import org.terasology.rendering.nui.internal.TerasologyCanvasRenderer;
 import org.terasology.rendering.nui.layers.mainMenu.LaunchPopup;
 import org.terasology.rendering.nui.layers.mainMenu.MessagePopup;
 import org.terasology.telemetry.TelemetryScreen;
@@ -78,7 +79,7 @@ public class StateMainMenu implements GameState {
         console = new ConsoleImpl(context);
         context.put(Console.class, console);
 
-        nuiManager = new NUIManagerInternal(context.get(CanvasRenderer.class), context);
+        nuiManager = new NUIManagerInternal((TerasologyCanvasRenderer) context.get(CanvasRenderer.class), context);
         context.put(NUIManager.class, nuiManager);
 
         eventSystem.registerEventHandler(nuiManager);

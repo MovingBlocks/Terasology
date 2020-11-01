@@ -21,20 +21,20 @@ import com.google.gson.annotations.SerializedName;
 import org.reflections.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.math.Border;
-import org.terasology.rendering.assets.font.Font;
-import org.terasology.rendering.assets.texture.TextureRegion;
-import org.terasology.rendering.nui.AbstractWidget;
-import org.terasology.rendering.nui.Color;
-import org.terasology.rendering.nui.LayoutConfig;
+import org.terasology.nui.Border;
+import org.terasology.nui.asset.font.Font;
+import org.terasology.nui.UITextureRegion;
+import org.terasology.nui.AbstractWidget;
+import org.terasology.nui.Color;
+import org.terasology.nui.LayoutConfig;
 import org.terasology.rendering.nui.NUIManager;
-import org.terasology.rendering.nui.UILayout;
-import org.terasology.rendering.nui.UIWidget;
+import org.terasology.nui.UILayout;
+import org.terasology.nui.UIWidget;
 import org.terasology.rendering.nui.contextMenu.MenuTree;
-import org.terasology.rendering.nui.databinding.Binding;
-import org.terasology.rendering.nui.skin.UISkin;
-import org.terasology.rendering.nui.widgets.treeView.JsonTree;
-import org.terasology.rendering.nui.widgets.treeView.JsonTreeValue;
+import org.terasology.nui.databinding.Binding;
+import org.terasology.nui.skin.UISkin;
+import org.terasology.nui.widgets.treeView.JsonTree;
+import org.terasology.nui.widgets.treeView.JsonTreeValue;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -390,7 +390,7 @@ public class NUIEditorMenuTreeBuilder {
         if (String.class.isAssignableFrom(clazz)) {
             return "";
         }
-        if (TextureRegion.class.isAssignableFrom(clazz)) {
+        if (UITextureRegion.class.isAssignableFrom(clazz)) {
             return "";
         }
         return clazz.newInstance();

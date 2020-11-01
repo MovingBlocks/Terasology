@@ -21,11 +21,11 @@ import org.junit.jupiter.api.Test;
 import org.terasology.ModuleEnvironmentTest;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.naming.Name;
+import org.terasology.nui.Color;
 import org.terasology.persistence.ModuleContext;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.persistence.typeHandling.annotations.SerializedName;
 import org.terasology.reflection.TypeInfo;
-import org.terasology.rendering.nui.Color;
 
 import java.io.IOException;
 import java.util.List;

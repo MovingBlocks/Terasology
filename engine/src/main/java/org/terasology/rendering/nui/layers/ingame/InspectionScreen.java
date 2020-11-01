@@ -20,8 +20,8 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.common.InspectionToolComponent;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.nui.BaseInteractionScreen;
-import org.terasology.rendering.nui.widgets.UIButton;
-import org.terasology.rendering.nui.widgets.UIText;
+import org.terasology.nui.widgets.UIButton;
+import org.terasology.nui.widgets.UIText;
 
 /**
  */
