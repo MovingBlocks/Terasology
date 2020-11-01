@@ -42,6 +42,7 @@ import org.terasology.persistence.typeHandling.gson.GsonTypeSerializationLibrary
 import org.terasology.reflection.metadata.ClassMetadata;
 import org.terasology.reflection.metadata.FieldMetadata;
 import org.terasology.registry.CoreRegistry;
+import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.nui.LayoutHint;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.nui.UILayout;
@@ -59,6 +60,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -263,6 +265,11 @@ public class UIFormat extends AbstractAssetFileFormat<UIData> {
                             context.deserialize(jsonObject.get(enabledField.getSerializationName()),
                                     enabledField.getType()));
                 }
+            }
+
+            //This allows screens to have access to nuiManager after editing .ui file
+            if (element instanceof CoreScreenLayer && Objects.isNull(((CoreScreenLayer) element).getManager())) {
+                ((CoreScreenLayer) element).setManager(nuiManager);
             }
             return element;
         }
