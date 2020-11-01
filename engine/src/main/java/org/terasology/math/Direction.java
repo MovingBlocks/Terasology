@@ -17,10 +17,8 @@
 package org.terasology.math;
 
 import com.google.common.collect.Maps;
-import org.joml.Quaternionfc;
 import org.joml.Vector3fc;
 import org.joml.Vector3ic;
-import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
 
@@ -124,8 +122,8 @@ public enum Direction {
      *
      * @return vector pointing in the direction
      */
-    public Vector3fc asVector3i() {
-        return JomlUtil.from(vector3fDir);
+    public Vector3ic asVector3i() {
+        return JomlUtil.from(vector3iDir);
     }
 
 
@@ -134,8 +132,8 @@ public enum Direction {
      *
      * @return vector pointing in the direction
      */
-    public Vector3ic asVector3f() {
-        return JomlUtil.from(vector3iDir);
+    public Vector3fc asVector3f() {
+        return JomlUtil.from(vector3fDir);
     }
 
     /**

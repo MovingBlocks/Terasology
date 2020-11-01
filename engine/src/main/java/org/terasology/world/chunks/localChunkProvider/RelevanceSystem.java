@@ -10,6 +10,7 @@ import org.terasology.entitySystem.entity.lifecycleEvents.OnChangedComponent;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.logic.location.LocationComponent;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.monitoring.Activity;
 import org.terasology.monitoring.PerformanceMonitor;
@@ -20,20 +21,24 @@ import org.terasology.world.chunks.ChunkRegionListener;
 import org.terasology.world.chunks.event.BeforeChunkUnload;
 import org.terasology.world.chunks.event.OnChunkLoaded;
 import org.terasology.world.chunks.internal.ChunkRelevanceRegion;
-import org.terasology.world.chunks.internal.ReadyChunkInfo;
-import org.terasology.world.chunks.pipeline.ChunkTask;
+import org.terasology.world.chunks.pipeline.PositionFuture;
 
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Map;
+import java.util.concurrent.Future;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.stream.StreamSupport;
 
 /**
- * RelevanceSystem loads, holds and unloads chunks around "players" (entity with {@link RelevanceRegionComponent} and {@link LocationComponent}).
+ * RelevanceSystem loads, holds and unloads chunks around "players" (entity with {@link RelevanceRegionComponent} and
+ * {@link LocationComponent}).
+ * <p>
  * Uses in singleplayer or multiplayer on server-side.
+ * <p>
  * Client side multiplayer downloads and displays the chunks sent by the server.
- *
+ * <p>
  * It is uses {@link RelevanceRegionComponent} for determinate "view distance".
  */
 public class RelevanceSystem implements UpdateSubscriberSystem {
@@ -41,7 +46,7 @@ public class RelevanceSystem implements UpdateSubscriberSystem {
     private static final Vector3i UNLOAD_LEEWAY = Vector3i.one();
     private final ReadWriteLock regionLock = new ReentrantReadWriteLock();
     private final Map<EntityRef, ChunkRelevanceRegion> regions = Maps.newHashMap();
-    private LocalChunkProvider chunkProvider;
+    private final LocalChunkProvider chunkProvider;
 
     public RelevanceSystem(LocalChunkProvider chunkProvider) {
         this.chunkProvider = chunkProvider;
@@ -66,7 +71,7 @@ public class RelevanceSystem implements UpdateSubscriberSystem {
         removeRelevanceEntity(entity);
     }
 
-    @ReceiveEvent(components = {WorldComponent.class})
+    @ReceiveEvent(components = WorldComponent.class)
     public void onNewChunk(OnChunkLoaded chunkAvailable, EntityRef worldEntity) {
         for (ChunkRelevanceRegion region : regions.values()) {
             region.checkIfChunkIsRelevant(chunkProvider.getChunk(chunkAvailable.getChunkPos()));
@@ -82,6 +87,7 @@ public class RelevanceSystem implements UpdateSubscriberSystem {
 
     /**
      * Update distance of relative entity, if exists.
+     *
      * @param entity entity for update distance.
      * @param distance new distance for setting to entity's region.
      */
@@ -99,6 +105,7 @@ public class RelevanceSystem implements UpdateSubscriberSystem {
 
     /**
      * Remove Entity from relevance system.
+     *
      * @param entity entity for remove.
      */
     public void removeRelevanceEntity(EntityRef entity) {
@@ -133,9 +140,8 @@ public class RelevanceSystem implements UpdateSubscriberSystem {
     }
 
     /**
-     * Add entity to relevance system. create region for it.
-     * Update distance if region exists already.
-     * Create/Load chunks for region.
+     * Add entity to relevance system. create region for it. Update distance if region exists already. Create/Load
+     * chunks for region.
      *
      * @param entity entity to add.
      * @param distance region's distance.
@@ -165,18 +171,24 @@ public class RelevanceSystem implements UpdateSubscriberSystem {
         } finally {
             regionLock.writeLock().unlock();
         }
-        for (Vector3i pos : region.getCurrentRegion()) {
-            Chunk chunk = chunkProvider.getChunk(pos);
-            if (chunk != null) {
-                region.checkIfChunkIsRelevant(chunk);
-            } else {
-                chunkProvider.createOrLoadChunk(pos);
-            }
-        }
+
+        StreamSupport.stream(region.getCurrentRegion().spliterator(), false)
+                .sorted(new PositionRelevanceComparator()) //<-- this is n^2 cost. not sure why this needs to be sorted like this.
+                .forEach(
+                        pos -> {
+                            Chunk chunk = chunkProvider.getChunk(pos);
+                            if (chunk != null) {
+                                region.checkIfChunkIsRelevant(chunk);
+                            } else {
+                                chunkProvider.createOrLoadChunk(pos);
+                            }
+                        }
+                );
     }
 
     /**
      * Check that chunk contains in any regions.
+     *
      * @param pos chunk's position
      * @return {@code true} if chunk in regions, otherwise {@code false}
      */
@@ -191,18 +203,11 @@ public class RelevanceSystem implements UpdateSubscriberSystem {
 
     /**
      * Create comporator for ChunkTasks, which compare by distance from region centers
+     *
      * @return Comporator.
      */
-    public Comparator<ChunkTask> createChunkTaskComporator() {
+    public Comparator<Future<Chunk>> createChunkTaskComporator() {
         return new ChunkTaskRelevanceComparator();
-    }
-
-    /**
-     * Create comporator for ReadyChunkInfo, which compare by distance from region centers
-     * @return Comporator.
-     */
-    public Comparator<ReadyChunkInfo> createReadyChunkInfoComporator() {
-        return new ReadyChunkRelevanceComparator();
     }
 
     /**
@@ -248,10 +253,14 @@ public class RelevanceSystem implements UpdateSubscriberSystem {
 
         regionLock.readLock().lock();
         try {
+
             for (ChunkRelevanceRegion region : regions.values()) {
                 int dist = distFromRegion(chunk, region.getCenter());
                 if (dist < score) {
                     score = dist;
+                }
+                if (score == 0) {
+                    break;
                 }
             }
             return score;
@@ -267,29 +276,31 @@ public class RelevanceSystem implements UpdateSubscriberSystem {
     /**
      * Compare ChunkTasks by distance from region's centers.
      */
-    private class ChunkTaskRelevanceComparator implements Comparator<ChunkTask> {
+    private class ChunkTaskRelevanceComparator implements Comparator<Future<Chunk>> {
 
         @Override
-        public int compare(ChunkTask o1, ChunkTask o2) {
-            return score(o1) - score(o2);
+        public int compare(Future<Chunk> o1, Future<Chunk> o2) {
+            return score((PositionFuture<?>) o1) - score((PositionFuture<?>) o2);
         }
 
-        private int score(ChunkTask task) {
-            if (task.isTerminateSignal()) {
-                return -1;
-            }
-            return RelevanceSystem.this.regionsDistanceScore(task.getPosition());
+        private int score(PositionFuture<?> task) {
+            return RelevanceSystem.this.regionsDistanceScore(JomlUtil.from(task.getPosition()));
         }
     }
 
+
     /**
-     * Compare ReaduChunkInfo by distance from region's centers.
+     * Compare ChunkTasks by distance from region's centers.
      */
-    private class ReadyChunkRelevanceComparator implements Comparator<ReadyChunkInfo> {
+    private class PositionRelevanceComparator implements Comparator<Vector3i> {
 
         @Override
-        public int compare(ReadyChunkInfo o1, ReadyChunkInfo o2) {
-            return regionsDistanceScore(o2.getPos()) - regionsDistanceScore(o1.getPos());
+        public int compare(Vector3i o1, Vector3i o2) {
+            return score(o1) - score(o2);
+        }
+
+        private int score(Vector3i position) {
+            return RelevanceSystem.this.regionsDistanceScore(position);
         }
     }
 }

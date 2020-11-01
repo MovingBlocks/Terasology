@@ -9,13 +9,13 @@ import org.joml.Rectanglef;
 import org.joml.Rectanglei;
 import org.joml.Vector2f;
 import org.lwjgl.BufferUtils;
-import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.context.Context;
+import org.terasology.engine.subsystem.DisplayDevice;
 import org.terasology.math.AABB;
 import org.terasology.math.JomlUtil;
 import org.terasology.math.MatrixUtils;
@@ -65,7 +65,7 @@ import static org.lwjgl.opengl.GL11.glClear;
 import static org.lwjgl.opengl.GL11.glDisable;
 import static org.lwjgl.opengl.GL11.glEnable;
 import static org.lwjgl.opengl.GL11.glLoadIdentity;
-import static org.lwjgl.opengl.GL11.glLoadMatrix;
+import static org.lwjgl.opengl.GL11.glLoadMatrixf;
 import static org.lwjgl.opengl.GL11.glMatrixMode;
 import static org.lwjgl.opengl.GL11.glOrtho;
 import static org.lwjgl.opengl.GL11.glPopMatrix;
@@ -98,6 +98,7 @@ public class LwjglCanvasRenderer implements TerasologyCanvasRenderer, PropertyCh
 
     private Map<ResourceUrn, LwjglFrameBufferObject> fboMap = Maps.newHashMap();
     private RenderingConfig renderingConfig;
+    private DisplayDevice displayDevice;
     private float uiScale = 1f;
 
     public LwjglCanvasRenderer(Context context) {
@@ -111,6 +112,7 @@ public class LwjglCanvasRenderer implements TerasologyCanvasRenderer, PropertyCh
         // failure to load these can be due to failing shaders or missing resources
 
         this.renderingConfig = context.get(Config.class).getRendering();
+        this.displayDevice = context.get(DisplayDevice.class);
         this.uiScale = this.renderingConfig.getUiScale() / 100f;
 
         this.renderingConfig.subscribe(RenderingConfig.UI_SCALE, this);
@@ -125,7 +127,7 @@ public class LwjglCanvasRenderer implements TerasologyCanvasRenderer, PropertyCh
         glMatrixMode(GL_PROJECTION);
         glPushMatrix();
         glLoadIdentity();
-        glOrtho(0, Display.getWidth(), Display.getHeight(), 0, 0, 2048f);
+        glOrtho(0, displayDevice.getWidth(), displayDevice.getHeight(), 0, 0, 2048f);
         glMatrixMode(GL_MODELVIEW);
         glPushMatrix();
 
@@ -134,12 +136,12 @@ public class LwjglCanvasRenderer implements TerasologyCanvasRenderer, PropertyCh
         modelView.setTranslation(new Vector3f(0, 0, -1024f));
 
         MatrixUtils.matrixToFloatBuffer(modelView, matrixBuffer);
-        glLoadMatrix(matrixBuffer);
+        glLoadMatrixf(matrixBuffer);
         matrixBuffer.rewind();
 
         glScalef(uiScale, uiScale, uiScale);
 
-        requestedCropRegion = Rect2i.createFromMinAndSize(0, 0, Display.getWidth(), Display.getHeight());
+        requestedCropRegion = Rect2i.createFromMinAndSize(0, 0,displayDevice.getWidth(), displayDevice.getHeight());
         currentTextureCropRegion = requestedCropRegion;
         textureMat.setFloat4(CROPPING_BOUNDARIES_PARAM, requestedCropRegion.minX(), requestedCropRegion.maxX(),
                 requestedCropRegion.minY(), requestedCropRegion.maxY());
@@ -192,7 +194,7 @@ public class LwjglCanvasRenderer implements TerasologyCanvasRenderer, PropertyCh
         Matrix4f userTransform = new Matrix4f(rotation, offset, -fitScale * scale);
         Matrix4f translateTransform = new Matrix4f(BaseQuat4f.IDENTITY,
                 new Vector3f((drawRegion.minX() + drawRegion.width() / 2) * uiScale,
-                    (drawRegion.minY() + drawRegion.height() / 2) * uiScale, 0), 1);
+                        (drawRegion.minY() + drawRegion.height() / 2) * uiScale, 0), 1);
 
         userTransform.mul(centerTransform);
         translateTransform.mul(userTransform);
@@ -202,17 +204,17 @@ public class LwjglCanvasRenderer implements TerasologyCanvasRenderer, PropertyCh
         MatrixUtils.matrixToFloatBuffer(finalMat, matrixBuffer);
 
         material.setFloat4(
-            CROPPING_BOUNDARIES_PARAM,
-            cropRegion.minX() * uiScale,
-            cropRegion.maxX() * uiScale,
-            cropRegion.minY() * uiScale,
-            cropRegion.maxY() * uiScale);
+                CROPPING_BOUNDARIES_PARAM,
+                cropRegion.minX() * uiScale,
+                cropRegion.maxX() * uiScale,
+                cropRegion.minY() * uiScale,
+                cropRegion.maxY() * uiScale);
         material.setMatrix4("posMatrix", translateTransform);
         glEnable(GL11.GL_DEPTH_TEST);
         glClear(GL11.GL_DEPTH_BUFFER_BIT);
         glMatrixMode(GL11.GL_MODELVIEW);
         glPushMatrix();
-        glLoadMatrix(matrixBuffer);
+        glLoadMatrixf(matrixBuffer);
 
         glScalef(this.uiScale, this.uiScale, this.uiScale);
         matrixBuffer.rewind();
@@ -234,7 +236,7 @@ public class LwjglCanvasRenderer implements TerasologyCanvasRenderer, PropertyCh
 
     @Override
     public org.joml.Vector2i getTargetSize() {
-        return new org.joml.Vector2i(Display.getWidth(), Display.getHeight());
+        return new org.joml.Vector2i(displayDevice.getWidth(), displayDevice.getHeight());
     }
 
     @Override
@@ -265,7 +267,7 @@ public class LwjglCanvasRenderer implements TerasologyCanvasRenderer, PropertyCh
             if (frameBufferObject != null) {
                 frameBufferObject.dispose();
             }
-            frameBufferObject = new LwjglFrameBufferObject(urn, size);
+            frameBufferObject = new LwjglFrameBufferObject(displayDevice, urn, size);
             fboMap.put(urn, frameBufferObject);
         }
         return frameBufferObject;
@@ -541,7 +543,8 @@ public class LwjglCanvasRenderer implements TerasologyCanvasRenderer, PropertyCh
     }
 
     /**
-     * A key that identifies an entry in the text cache. It contains the elements that affect the generation of mesh for text rendering.
+     * A key that identifies an entry in the text cache. It contains the elements that affect the generation of mesh for
+     * text rendering.
      */
     private static class TextCacheKey {
         private final String text;
@@ -584,7 +587,8 @@ public class LwjglCanvasRenderer implements TerasologyCanvasRenderer, PropertyCh
     }
 
     /**
-     * A key that identifies an entry in the texture cache. It contains the elements that affect the generation of mesh for texture rendering.
+     * A key that identifies an entry in the texture cache. It contains the elements that affect the generation of mesh
+     * for texture rendering.
      */
     private static class TextureCacheKey {
 
