@@ -15,9 +15,9 @@
  */
 package org.terasology.math;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  */
@@ -26,7 +26,7 @@ public class SideTest {
     @Test
     public void testSideInDirection() {
         for (Side side : Side.getAllSides()) {
-            assertEquals(side, Side.inDirection(side.getVector3i().x, side.getVector3i().y, side.getVector3i().z));
+            assertEquals(side, Side.inDirection(side.direction().x(), side.direction().y(), side.direction().z()));
         }
     }
 

@@ -18,6 +18,7 @@ package org.terasology.engine.modes.loadProcesses;
 
 import org.terasology.config.Config;
 import org.terasology.context.Context;
+import org.terasology.engine.modes.SingleStepLoadProcess;
 import org.terasology.network.NetworkSystem;
 import org.terasology.network.exceptions.HostingFailedException;
 import org.terasology.rendering.nui.NUIManager;

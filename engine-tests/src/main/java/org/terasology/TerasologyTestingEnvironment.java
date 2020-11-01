@@ -16,12 +16,13 @@
 
 package org.terasology;
 
+import com.badlogic.gdx.physics.bullet.Bullet;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.nio.file.ShrinkWrapFileSystems;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.terasology.context.Context;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.EngineTime;
@@ -45,7 +46,7 @@ import org.terasology.recording.RecordAndReplayCurrentStatus;
 import org.terasology.recording.RecordAndReplaySerializer;
 import org.terasology.recording.RecordAndReplayUtils;
 import org.terasology.recording.RecordedEventStore;
-import org.terasology.world.biomes.BiomeManager;
+import org.terasology.reflection.TypeRegistry;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.chunks.blockdata.ExtraBlockDataManager;
 
@@ -68,11 +69,13 @@ public abstract class TerasologyTestingEnvironment {
     protected EngineTime mockTime;
     private EngineEntityManager engineEntityManager;
 
-    @BeforeClass
+    @BeforeAll
     public static void setupEnvironment() throws Exception {
         final JavaArchive homeArchive = ShrinkWrap.create(JavaArchive.class);
         final FileSystem vfs = ShrinkWrapFileSystems.newFileSystem(homeArchive);
         PathManager.getInstance().useOverrideHomePath(vfs.getPath(""));
+        Bullet.init(true,false);
+
         /*
          * Create at least for each class a new headless environemnt as it is fast and prevents side effects
          * (Reusing a headless environment after other tests have modified the core registry isn't really clean)
@@ -83,8 +86,9 @@ public abstract class TerasologyTestingEnvironment {
 
     }
 
-    @Before
+    @BeforeEach
     public void setup() throws Exception {
+
         context.put(ModuleManager.class, moduleManager);
         RecordAndReplayCurrentStatus recordAndReplayCurrentStatus = context.get(RecordAndReplayCurrentStatus.class);
 
@@ -97,7 +101,6 @@ public abstract class TerasologyTestingEnvironment {
         EntitySystemSetupUtil.addEntityManagementRelatedClasses(context);
         engineEntityManager = context.get(EngineEntityManager.class);
         BlockManager mockBlockManager = context.get(BlockManager.class); // 'mock' added to avoid hiding a field
-        BiomeManager biomeManager = context.get(BiomeManager.class);
         ExtraBlockDataManager extraDataManager = context.get(ExtraBlockDataManager.class);
         RecordedEventStore recordedEventStore = new RecordedEventStore();
         RecordAndReplayUtils recordAndReplayUtils = new RecordAndReplayUtils();
@@ -106,12 +109,12 @@ public abstract class TerasologyTestingEnvironment {
         context.put(CharacterStateEventPositionMap.class, characterStateEventPositionMap);
         DirectionAndOriginPosRecorderList directionAndOriginPosRecorderList = new DirectionAndOriginPosRecorderList();
         context.put(DirectionAndOriginPosRecorderList.class, directionAndOriginPosRecorderList);
-        RecordAndReplaySerializer recordAndReplaySerializer = new RecordAndReplaySerializer(engineEntityManager, recordedEventStore, recordAndReplayUtils, characterStateEventPositionMap, directionAndOriginPosRecorderList, moduleManager.getEnvironment());
+        RecordAndReplaySerializer recordAndReplaySerializer = new RecordAndReplaySerializer(engineEntityManager, recordedEventStore, recordAndReplayUtils, characterStateEventPositionMap, directionAndOriginPosRecorderList, moduleManager, context.get(TypeRegistry.class));
         context.put(RecordAndReplaySerializer.class, recordAndReplaySerializer);
 
         Path savePath = PathManager.getInstance().getSavePath("world1");
         context.put(StorageManager.class, new ReadWriteStorageManager(savePath, moduleManager.getEnvironment(),
-                engineEntityManager, mockBlockManager, biomeManager, extraDataManager, recordAndReplaySerializer, recordAndReplayUtils, recordAndReplayCurrentStatus));
+                engineEntityManager, mockBlockManager, extraDataManager, recordAndReplaySerializer, recordAndReplayUtils, recordAndReplayCurrentStatus));
 
         ComponentSystemManager componentSystemManager = new ComponentSystemManager(context);
         context.put(ComponentSystemManager.class, componentSystemManager);
@@ -126,7 +129,7 @@ public abstract class TerasologyTestingEnvironment {
         context.put(Console.class, new ConsoleImpl(context));
     }
 
-    @AfterClass
+    @AfterAll
     public static void tearDown() throws Exception {
         env.close();
     }

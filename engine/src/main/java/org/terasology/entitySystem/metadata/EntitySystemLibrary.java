@@ -17,7 +17,11 @@
 package org.terasology.entitySystem.metadata;
 
 import org.terasology.context.Context;
-import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
+import org.terasology.engine.module.ModuleManager;
+import org.terasology.module.ModuleEnvironment;
+import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
+import org.terasology.reflection.copy.CopyStrategyLibrary;
+import org.terasology.reflection.reflect.ReflectFactory;
 
 /**
  * The set of metadata libraries used by the entity system
@@ -25,15 +29,23 @@ import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
  */
 public class EntitySystemLibrary {
 
-    private final TypeSerializationLibrary typeSerializationLibrary;
+    private final TypeHandlerLibrary typeHandlerLibrary;
     private final ComponentLibrary componentLibrary;
     private final EventLibrary eventLibrary;
 
-    public EntitySystemLibrary(Context context, TypeSerializationLibrary typeSerializationLibrary) {
-        this.typeSerializationLibrary = typeSerializationLibrary;
-        this.componentLibrary = new ComponentLibrary(context);
-        this.eventLibrary = new EventLibrary(context);
+    public EntitySystemLibrary(Context context, TypeHandlerLibrary typeHandlerLibrary) {
+        // NOTE: Work-around to fix tests
+        ModuleManager manager = context.get(ModuleManager.class);
+        ModuleEnvironment environment = null;
+        if (manager != null) {
+            environment = manager.getEnvironment();
+        }
+        ReflectFactory reflectFactory = context.get(ReflectFactory.class);
+        CopyStrategyLibrary copyStrategyLibrary = context.get(CopyStrategyLibrary.class);
 
+        this.typeHandlerLibrary = typeHandlerLibrary;
+        this.componentLibrary = new ComponentLibrary(environment, reflectFactory, copyStrategyLibrary);
+        this.eventLibrary = new EventLibrary(environment, reflectFactory, copyStrategyLibrary);
     }
 
     /**
@@ -46,8 +58,8 @@ public class EntitySystemLibrary {
     /**
      * @return The library of serializers
      */
-    public TypeSerializationLibrary getSerializationLibrary() {
-        return typeSerializationLibrary;
+    public TypeHandlerLibrary getSerializationLibrary() {
+        return typeHandlerLibrary;
     }
 
     /**

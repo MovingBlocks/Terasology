@@ -18,6 +18,7 @@ package org.terasology.rendering.nui.layers.mainMenu.inputSettings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import org.joml.Vector2i;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.BindsConfig;
 import org.terasology.config.ControllerConfig.ControllerInfo;
@@ -31,28 +32,30 @@ import org.terasology.input.BindButtonEvent;
 import org.terasology.input.Input;
 import org.terasology.input.InputCategory;
 import org.terasology.input.InputSystem;
+import org.terasology.input.InputType;
+import org.terasology.input.Keyboard.KeyId;
 import org.terasology.input.RegisterBindButton;
-import org.terasology.math.geom.Vector2i;
+import org.terasology.input.internal.BindCommands;
 import org.terasology.module.DependencyResolver;
 import org.terasology.module.Module;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.module.ResolutionResult;
 import org.terasology.module.predicates.FromModule;
 import org.terasology.naming.Name;
+import org.terasology.nui.TabbingManager;
+import org.terasology.nui.WidgetUtil;
+import org.terasology.nui.databinding.BindHelper;
+import org.terasology.nui.databinding.ReadOnlyBinding;
+import org.terasology.nui.layouts.ColumnLayout;
+import org.terasology.nui.layouts.RowLayout;
+import org.terasology.nui.widgets.UIButton;
+import org.terasology.nui.widgets.UICheckbox;
+import org.terasology.nui.widgets.UILabel;
+import org.terasology.nui.widgets.UISlider;
+import org.terasology.nui.widgets.UISpace;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
-import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.animation.MenuAnimationSystems;
-import org.terasology.rendering.nui.databinding.BindHelper;
-import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
-import org.terasology.rendering.nui.layouts.ColumnLayout;
-import org.terasology.rendering.nui.layouts.RowLayout;
-import org.terasology.rendering.nui.layouts.ScrollableArea;
-import org.terasology.rendering.nui.widgets.UIButton;
-import org.terasology.rendering.nui.widgets.UICheckbox;
-import org.terasology.rendering.nui.widgets.UILabel;
-import org.terasology.rendering.nui.widgets.UISlider;
-import org.terasology.rendering.nui.widgets.UISpace;
 
 import java.util.Collections;
 import java.util.List;
@@ -61,10 +64,13 @@ import java.util.Objects;
 import java.util.Set;
 
 /**
+ *
  */
 public class InputSettingsScreen extends CoreScreenLayer {
 
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:inputSettingsScreen");
+    private static final int PRIMARY_BIND_INDEX = 0;
+    private static final int SECONDARY_BIND_INDEX = 1;
 
     private int horizontalSpacing = 12;
 
@@ -89,26 +95,51 @@ public class InputSettingsScreen extends CoreScreenLayer {
     @Override
     public void initialise() {
         setAnimationSystem(MenuAnimationSystems.createDefaultSwipeAnimation());
-        ColumnLayout mainLayout = new ColumnLayout();
-        mainLayout.setHorizontalSpacing(8);
-        mainLayout.setVerticalSpacing(8);
-        mainLayout.setFamily("option-grid");
+        ColumnLayout mainLayout = find("main", ColumnLayout.class);
+
+        UIButton azerty = find("azerty", UIButton.class);
+        if (azerty != null) {
+            azerty.subscribe(event -> {
+                BindCommands.AZERTY.forEach(this::setPrimaryBind);
+                bindsManager.registerBinds();
+            });
+        }
+        UIButton dvorak = find("dvorak", UIButton.class);
+        if (dvorak != null) {
+            dvorak.subscribe(event -> {
+                BindCommands.DVORAK.forEach(this::setPrimaryBind);
+                bindsManager.registerBinds();
+            });
+        }
+        UIButton neo = find("neo", UIButton.class);
+        if (neo != null) {
+            neo.subscribe(event -> {
+                BindCommands.NEO.forEach(this::setPrimaryBind);
+                bindsManager.registerBinds();
+            });
+        }
 
         UISlider mouseSensitivity = new UISlider("mouseSensitivity");
-        mouseSensitivity.bindValue(BindHelper.bindBeanProperty("mouseSensitivity", inputDeviceConfiguration, Float.TYPE));
+        mouseSensitivity.bindValue(BindHelper.bindBeanProperty("mouseSensitivity", inputDeviceConfiguration,
+                Float.TYPE));
         mouseSensitivity.setIncrement(0.025f);
         mouseSensitivity.setPrecision(3);
 
         UICheckbox mouseInverted = new UICheckbox("mouseYAxisInverted");
-        mouseInverted.bindChecked(BindHelper.bindBeanProperty("mouseYAxisInverted", inputDeviceConfiguration, Boolean.TYPE));
+        mouseInverted.bindChecked(BindHelper.bindBeanProperty("mouseYAxisInverted", inputDeviceConfiguration,
+                Boolean.TYPE));
 
-        mainLayout.addWidget(new UILabel("mouseLabel", "subheading", translationSystem.translate("${engine:menu#category-mouse}")));
-        mainLayout.addWidget(new RowLayout(new UILabel(translationSystem.translate("${engine:menu#mouse-sensitivity}") + ":"), mouseSensitivity)
-                .setColumnRatios(0.4f)
-                .setHorizontalSpacing(horizontalSpacing));
-        mainLayout.addWidget(new RowLayout(new UILabel(translationSystem.translate("${engine:menu#invert-mouse}") + ":"), mouseInverted)
-                .setColumnRatios(0.4f)
-                .setHorizontalSpacing(horizontalSpacing));
+        if (mainLayout != null) {
+            mainLayout.addWidget(new UILabel("mouseLabel", "subheading", translationSystem.translate("${engine:menu" +
+                    "#category-mouse}")));
+            mainLayout.addWidget(new RowLayout(new UILabel(translationSystem.translate("${engine:menu#mouse" +
+                    "-sensitivity}") + ":"), mouseSensitivity)
+                    .setColumnRatios(0.4f)
+                    .setHorizontalSpacing(horizontalSpacing));
+            mainLayout.addWidget(new RowLayout(new UILabel(translationSystem.translate("${engine:menu#invert-mouse}") + ":"), mouseInverted)
+                    .setColumnRatios(0.4f)
+                    .setHorizontalSpacing(horizontalSpacing));
+        }
 
         Map<String, InputCategory> inputCategories = Maps.newHashMap();
         Map<SimpleUri, RegisterBindButton> inputsById = Maps.newHashMap();
@@ -119,11 +150,13 @@ public class InputSettingsScreen extends CoreScreenLayer {
                 ResolutionResult result = resolver.resolve(moduleId);
                 if (result.isSuccess()) {
                     try (ModuleEnvironment environment = moduleManager.loadEnvironment(result.getModules(), false)) {
-                        for (Class<?> holdingType : environment.getTypesAnnotatedWith(InputCategory.class, new FromModule(environment, moduleId))) {
+                        for (Class<?> holdingType : environment.getTypesAnnotatedWith(InputCategory.class,
+                                new FromModule(environment, moduleId))) {
                             InputCategory inputCategory = holdingType.getAnnotation(InputCategory.class);
                             inputCategories.put(module.getId() + ":" + inputCategory.id(), inputCategory);
                         }
-                        for (Class<?> bindEvent : environment.getTypesAnnotatedWith(RegisterBindButton.class, new FromModule(environment, moduleId))) {
+                        for (Class<?> bindEvent : environment.getTypesAnnotatedWith(RegisterBindButton.class,
+                                new FromModule(environment, moduleId))) {
                             if (BindButtonEvent.class.isAssignableFrom(bindEvent)) {
                                 RegisterBindButton bindRegister = bindEvent.getAnnotation(RegisterBindButton.class);
                                 inputsById.put(new SimpleUri(module.getId(), bindRegister.id()), bindRegister);
@@ -135,23 +168,22 @@ public class InputSettingsScreen extends CoreScreenLayer {
             }
         }
 
-        addInputSection(inputCategories.remove("engine:movement"), mainLayout, inputsById);
-        addInputSection(inputCategories.remove("engine:interaction"), mainLayout, inputsById);
-        addInputSection(inputCategories.remove("engine:inventory"), mainLayout, inputsById);
-        addInputSection(inputCategories.remove("engine:general"), mainLayout, inputsById);
-        for (InputCategory category : inputCategories.values()) {
-            addInputSection(category, mainLayout, inputsById);
-        }
-        mainLayout.addWidget(new UISpace(new Vector2i(1, 16)));
+        if (mainLayout != null) {
+            addInputSection(inputCategories.remove("engine:movement"), mainLayout, inputsById);
+            addInputSection(inputCategories.remove("engine:interaction"), mainLayout, inputsById);
+            addInputSection(inputCategories.remove("engine:inventory"), mainLayout, inputsById);
+            addInputSection(inputCategories.remove("engine:general"), mainLayout, inputsById);
+            for (InputCategory category : inputCategories.values()) {
+                addInputSection(category, mainLayout, inputsById);
+            }
+            mainLayout.addWidget(new UISpace(new Vector2i(1, 16)));
 
-        List<String> controllers = inputSystem.getControllerDevice().getControllers();
-        for (String name : controllers) {
-            ControllerInfo cfg = inputDeviceConfiguration.getController(name);
-            addInputSection(mainLayout, name, cfg);
+            List<String> controllers = inputSystem.getControllerDevice().getControllers();
+            for (String name : controllers) {
+                ControllerInfo cfg = inputDeviceConfiguration.getController(name);
+                addInputSection(mainLayout, name, cfg);
+            }
         }
-
-        ScrollableArea area = find("area", ScrollableArea.class);
-        area.setContent(mainLayout);
 
         WidgetUtil.trySubscribe(this, "reset", button -> {
             inputDeviceConfiguration.reset();
@@ -160,7 +192,19 @@ public class InputSettingsScreen extends CoreScreenLayer {
         WidgetUtil.trySubscribe(this, "back", button -> triggerBackAnimation());
     }
 
-    private void addInputSection(InputCategory category, ColumnLayout layout, Map<SimpleUri, RegisterBindButton> inputsById) {
+    /**
+     * Binds button to key while ensuring visual feedback on the user interface
+     *
+     * @param key one constant from the {@link KeyId}s.
+     * @param bindId the uri for the binding, e.g. <code>engine:forwards</code>.
+     */
+    private void setPrimaryBind(int key, SimpleUri bindId) {
+        final BindsConfig bindConfig = bindsManager.getBindsConfig();
+        new InputConfigBinding(bindConfig, bindId, PRIMARY_BIND_INDEX).set(InputType.KEY.getInput(key));
+    }
+
+    private void addInputSection(InputCategory category, ColumnLayout layout,
+                                 Map<SimpleUri, RegisterBindButton> inputsById) {
         if (category != null) {
             layout.addWidget(new UISpace(new Vector2i(0, 16)));
 
@@ -225,7 +269,8 @@ public class InputSettingsScreen extends CoreScreenLayer {
         mvmtDeadZone.setRange(1);
         mvmtDeadZone.setPrecision(2);
         mvmtDeadZone.bindValue(BindHelper.bindBeanProperty("movementDeadZone", info, Float.TYPE));
-        layout.addWidget(new RowLayout(new UILabel(translationSystem.translate("${engine:menu#movement-dead-zone}")), mvmtDeadZone)
+        layout.addWidget(new RowLayout(new UILabel(translationSystem.translate("${engine:menu#movement-dead-zone}")),
+                mvmtDeadZone)
                 .setColumnRatios(columnRatio)
                 .setHorizontalSpacing(horizontalSpacing));
 
@@ -236,7 +281,8 @@ public class InputSettingsScreen extends CoreScreenLayer {
         rotDeadZone.setPrecision(2);
         rotDeadZone.bindValue(BindHelper.bindBeanProperty("rotationDeadZone", info, Float.TYPE));
 
-        layout.addWidget(new RowLayout(new UILabel(translationSystem.translate("${engine:menu#rotation-dead-zone}")), rotDeadZone)
+        layout.addWidget(new RowLayout(new UILabel(translationSystem.translate("${engine:menu#rotation-dead-zone}")),
+                rotDeadZone)
                 .setColumnRatios(columnRatio)
                 .setHorizontalSpacing(horizontalSpacing));
 
@@ -246,27 +292,43 @@ public class InputSettingsScreen extends CoreScreenLayer {
     private void addInputBindRow(SimpleUri uri, RegisterBindButton bind, ColumnLayout layout) {
         BindsConfig bindConfig = bindsManager.getBindsConfig();
         List<Input> binds = bindConfig.getBinds(uri);
-        UIButton primaryInputBind = new UIButton();
-        primaryInputBind.bindText(new BindingText(binds, 0));
-        primaryInputBind.subscribe(event -> {
-            ChangeBindingPopup popup = getManager().pushScreen(ChangeBindingPopup.ASSET_URI, ChangeBindingPopup.class);
-            popup.setBindingData(uri, bind, 0);
-        });
+        UIButton primaryInputBind = makeInputBindButton(uri, bind, binds, PRIMARY_BIND_INDEX);
+        UIButton secondaryInputBind = makeInputBindButton(uri, bind, binds, SECONDARY_BIND_INDEX);
 
-        UIButton secondaryInputBind = new UIButton();
-        secondaryInputBind.bindText(new BindingText(binds, 1));
-        secondaryInputBind.subscribe(event -> {
-            ChangeBindingPopup popup = getManager().pushScreen(ChangeBindingPopup.ASSET_URI, ChangeBindingPopup.class);
-            popup.setBindingData(uri, bind, 1);
-        });
-        layout.addWidget(new RowLayout(new UILabel(translationSystem.translate(bind.description())), primaryInputBind, secondaryInputBind)
+        layout.addWidget(new RowLayout(new UILabel(translationSystem.translate(bind.description())), primaryInputBind
+                , secondaryInputBind)
                 .setColumnRatios(0.4f)
                 .setHorizontalSpacing(horizontalSpacing));
     }
 
+    private UIButton makeInputBindButton(SimpleUri uri, RegisterBindButton bind, List<Input> binds, int index) {
+        UIButton inputBind = new UIButton();
+        inputBind.bindText(new BindingText(binds, index));
+        inputBind.subscribe(event -> {
+            ChangeBindingPopup popup = getManager().pushScreen(ChangeBindingPopup.ASSET_URI, ChangeBindingPopup.class);
+            popup.setBindingData(uri, bind, index);
+        });
+        return inputBind;
+    }
+
     @Override
     public void onClosed() {
+        super.onClosed();
         bindsManager.registerBinds();
+
+        // TODO: Find a better place to do this in.
+        BindsConfig bindsConf = bindsManager.getBindsConfig();
+        if (bindsConf != null) {
+            bindsConf.getBinds(new SimpleUri("engine:tabbingUI")).stream().findFirst().ifPresent(input -> {
+                TabbingManager.tabForwardInput = input;
+            });
+            bindsConf.getBinds(new SimpleUri("engine:tabbingModifier")).stream().findFirst().ifPresent(input -> {
+                TabbingManager.tabBackInputModifier = input;
+            });
+            bindsConf.getBinds(new SimpleUri("engine:activate")).stream().findFirst().ifPresent(input -> {
+                TabbingManager.activateInput = input;
+            });
+        }
     }
 
     @Override

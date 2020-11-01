@@ -17,8 +17,8 @@ package org.terasology.persistence;
 
 import com.google.common.collect.Lists;
 import com.google.protobuf.ByteString;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.persistence.serializers.EntityDataJSONFormat;
 import org.terasology.protobuf.EntityData;
@@ -31,8 +31,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  */
@@ -45,7 +45,7 @@ public class EntityDataJSONFormatTest {
     private EntityData.Component.Builder componentBuilder;
     private EntityData.NameValue.Builder nameValueBuilder;
 
-    @Before
+    @BeforeEach
     public void setup() {
         worldBuilder = EntityData.GlobalStore.newBuilder();
         entityBuilder = EntityData.Entity.newBuilder();

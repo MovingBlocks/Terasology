@@ -377,7 +377,10 @@ public final class EntityDataJSONFormat {
                         }
                     }
                 }
-                value.setBytes(ByteString.copyFrom(byteList.toArray()));
+
+                if (byteList.size() > 0) {
+                    value.setBytes(ByteString.copyFrom(byteList.toArray()));
+                }
             }
             return value.build();
         }

@@ -15,8 +15,8 @@
  */
 package org.terasology.entitySystem;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.AssetFactory;
@@ -40,7 +40,7 @@ import org.terasology.entitySystem.stubs.StringComponent;
 import org.terasology.math.Side;
 import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
-import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
+import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.recording.RecordAndReplayCurrentStatus;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.testUtil.ModuleManagerFactory;
@@ -50,9 +50,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -64,7 +64,7 @@ public class PrefabTest {
 
     private PrefabManager prefabManager;
 
-    @Before
+    @BeforeEach
     public void setup() throws Exception {
         ContextImpl context = new ContextImpl();
         context.put(RecordAndReplayCurrentStatus.class, new RecordAndReplayCurrentStatus());
@@ -78,8 +78,8 @@ public class PrefabTest {
         assetTypeManager.registerCoreAssetType(Prefab.class,
                 (AssetFactory<Prefab, PrefabData>) PojoPrefab::new, "prefabs");
         ComponentLibrary componentLibrary = context.get(ComponentLibrary.class);
-        TypeSerializationLibrary typeSerializationLibrary = context.get(TypeSerializationLibrary.class);
-        PrefabFormat prefabFormat = new PrefabFormat(componentLibrary, typeSerializationLibrary);
+        TypeHandlerLibrary typeHandlerLibrary = context.get(TypeHandlerLibrary.class);
+        PrefabFormat prefabFormat = new PrefabFormat(componentLibrary, typeHandlerLibrary);
         assetTypeManager.registerCoreFormat(Prefab.class, prefabFormat);
         assetTypeManager.switchEnvironment(moduleManager.getEnvironment());
         context.put(AssetManager.class, assetTypeManager.getAssetManager());

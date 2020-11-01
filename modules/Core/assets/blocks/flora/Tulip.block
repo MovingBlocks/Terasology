@@ -1,9 +1,0 @@
-/**
- * The tulip is a perennial (a plant that lives for more than two years),
- * bulbous plant with showy flowers in the genus Tulipa, which comprises
- * 109 species and belongs to the family Liliaceae.
- */
-{
-    "basedOn": "core:plant",
-    "waving": true
-}

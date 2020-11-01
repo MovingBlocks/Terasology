@@ -16,9 +16,8 @@
 
 package org.terasology.config;
 
-import org.lwjgl.opengl.DisplayMode;
-import org.lwjgl.opengl.PixelFormat;
 import org.terasology.engine.subsystem.Resolution;
+import org.terasology.module.sandbox.API;
 import org.terasology.rendering.cameras.PerspectiveCameraSettings;
 import org.terasology.rendering.nui.layers.mainMenu.videoSettings.DisplayModeSetting;
 import org.terasology.rendering.nui.layers.mainMenu.videoSettings.ScreenshotSize;
@@ -27,6 +26,7 @@ import org.terasology.utilities.subscribables.AbstractSubscribable;
 
 import java.beans.PropertyChangeListener;
 
+@API
 public class RenderingConfig extends AbstractSubscribable {
 
     public static final String PIXEL_FORMAT = "PixelFormat";
@@ -71,13 +71,14 @@ public class RenderingConfig extends AbstractSubscribable {
     public static final String V_SYNC = "VSync";
     public static final String FRAME_LIMIT = "FrameLimit";
     public static final String FBO_SCALE = "FboScale";
+    public static final String UI_SCALE = "UiScale";
     public static final String CLAMP_LIGHTING = "ClampLighting";
     public static final String SCREENSHOT_SIZE = "screenshotSize";
     public static final String SCREENSHOT_FORMAT = "ScreenshotFormat";
     public static final String DUMP_SHADERS = "DumpShaders";
     public static final String VOLUMETRIC_FOG = "VolumetricFog";
 
-    private PixelFormat pixelFormat;
+    private int pixelFormat;
     private int windowPosX;
     private int windowPosY;
     private int windowWidth;
@@ -120,6 +121,7 @@ public class RenderingConfig extends AbstractSubscribable {
     private boolean vSync;
     private boolean clampLighting;
     private int fboScale;
+    private int uiScale = 100;
     private boolean dumpShaders;
     private boolean volumetricFog;
     private ScreenshotSize screenshotSize;
@@ -132,12 +134,12 @@ public class RenderingConfig extends AbstractSubscribable {
         return cameraSettings;
     }
 
-    public PixelFormat getPixelFormat() {
+    public int getPixelFormat() {
         return pixelFormat;
     }
 
-    public void setPixelFormat(PixelFormat pixelFormat) {
-        PixelFormat oldFormat = this.pixelFormat;
+    public void setPixelFormat(int pixelFormat) {
+        int oldFormat = this.pixelFormat;
         this.pixelFormat = pixelFormat;
         propertyChangeSupport.firePropertyChange(PIXEL_FORMAT, oldFormat, this.pixelFormat);
         // propertyChangeSupport fires only if oldObject != newObject.
@@ -184,10 +186,6 @@ public class RenderingConfig extends AbstractSubscribable {
             int oldValue = this.windowHeight;
             this.windowHeight = windowHeight;
             propertyChangeSupport.firePropertyChange(WINDOW_HEIGHT, oldValue, this.windowHeight);
-    }
-
-    public DisplayMode getDisplayMode() {
-        return new DisplayMode(windowWidth, windowHeight);
     }
 
     public void setDisplayModeSetting(DisplayModeSetting displayModeSetting) {
@@ -606,6 +604,19 @@ public class RenderingConfig extends AbstractSubscribable {
         int oldScale = this.fboScale;
         this.fboScale = fboScale;
         propertyChangeSupport.firePropertyChange(FBO_SCALE, oldScale, this.fboScale);
+    }
+
+    public int getUiScale() {
+        if (uiScale == 0) {
+            return 100;
+        }
+        return uiScale;
+    }
+
+    public void setUiScale(int uiScale) {
+        int oldScale = this.uiScale;
+        this.uiScale = uiScale;
+        propertyChangeSupport.firePropertyChange(UI_SCALE, oldScale, this.uiScale);
     }
 
     public boolean isClampLighting() {

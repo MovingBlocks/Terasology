@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 MovingBlocks
+ * Copyright 2019 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,50 +18,46 @@ package org.terasology.rendering.nui.layers.mainMenu.gameDetailsScreen;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.codehaus.plexus.util.StringUtils;
+import org.joml.Vector2i;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.context.Context;
+import org.terasology.engine.SimpleUri;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.i18n.TranslationSystem;
-import org.terasology.math.geom.Vector2i;
 import org.terasology.module.DependencyInfo;
-import org.terasology.module.DependencyResolver;
 import org.terasology.module.Module;
-import org.terasology.module.ModuleEnvironment;
 import org.terasology.module.ModuleMetadata;
-import org.terasology.module.ResolutionResult;
-import org.terasology.naming.Name;
 import org.terasology.naming.NameVersion;
+import org.terasology.nui.Canvas;
+import org.terasology.nui.databinding.Binding;
+import org.terasology.nui.databinding.ReadOnlyBinding;
+import org.terasology.nui.itemRendering.AbstractItemRenderer;
+import org.terasology.nui.widgets.UIButton;
+import org.terasology.nui.widgets.UIImage;
+import org.terasology.nui.widgets.UIImageSlideshow;
+import org.terasology.nui.widgets.UILabel;
+import org.terasology.nui.widgets.UIList;
+import org.terasology.nui.widgets.UITabBox;
+import org.terasology.nui.widgets.UIText;
 import org.terasology.registry.In;
-import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.animation.MenuAnimationSystems;
-import org.terasology.rendering.nui.databinding.Binding;
-import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
-import org.terasology.rendering.nui.itemRendering.AbstractItemRenderer;
 import org.terasology.rendering.nui.layers.mainMenu.MessagePopup;
 import org.terasology.rendering.nui.layers.mainMenu.SelectGameScreen;
 import org.terasology.rendering.nui.layers.mainMenu.moduleDetailsScreen.ModuleDetailsScreen;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameInfo;
-import org.terasology.rendering.nui.widgets.UIButton;
-import org.terasology.rendering.nui.widgets.UIImage;
-import org.terasology.rendering.nui.widgets.UIImageSlideshow;
-import org.terasology.rendering.nui.widgets.UILabel;
-import org.terasology.rendering.nui.widgets.UIList;
-import org.terasology.rendering.nui.widgets.UITabBox;
-import org.terasology.rendering.nui.widgets.UIText;
 import org.terasology.utilities.time.DateTimeHelper;
-import org.terasology.world.biomes.Biome;
-import org.terasology.world.biomes.BiomeManager;
+import org.terasology.world.generator.internal.WorldGeneratorInfo;
+import org.terasology.world.generator.internal.WorldGeneratorManager;
 import org.terasology.world.internal.WorldInfo;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
@@ -79,12 +75,14 @@ public class GameDetailsScreen extends CoreScreenLayer {
 
     private static final Logger logger = LoggerFactory.getLogger(SelectGameScreen.class);
 
-    private static final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     private GameInfo gameInfo;
     private List<String> errors;
     private Map<String, List<String>> blockFamilyIds;
 
+    @In
+    private WorldGeneratorManager worldGeneratorManager;
     @In
     private ModuleManager moduleManager;
     @In
@@ -103,7 +101,6 @@ public class GameDetailsScreen extends CoreScreenLayer {
         }
     };
     private UIList<WorldInfo> gameWorlds;
-    private UIList<Biome> biomes;
     private UIList<String> blocks;
     private UIText description;
     private UIText generalInfo;
@@ -129,7 +126,6 @@ public class GameDetailsScreen extends CoreScreenLayer {
             setUpGameModules();
             setUpGameWorlds();
             setUpBlocks();
-            setUpBiomes();
             setUpPreviewSlideshow();
             setUpOpenModuleDetails();
 
@@ -147,7 +143,6 @@ public class GameDetailsScreen extends CoreScreenLayer {
 
             loadGeneralInfo();
             loadGameModules();
-            loadBiomes();
             loadBlocks();
             loadGameWorlds();
 
@@ -159,7 +154,8 @@ public class GameDetailsScreen extends CoreScreenLayer {
             showErrors.setEnabled(!errors.isEmpty());
         } else {
             final MessagePopup popup = getManager().createScreen(MessagePopup.ASSET_URI, MessagePopup.class);
-            popup.setMessage(translationSystem.translate("${engine:menu#game-details-errors-message-title}"), translationSystem.translate("${engine:menu#game-details-errors-message-body}"));
+            popup.setMessage(translationSystem.translate("${engine:menu#game-details-errors-message-title}"),
+                    translationSystem.translate("${engine:menu#game-details-errors-message-body}"));
             popup.subscribeButton(e -> triggerBackAnimation());
             getManager().pushScreen(popup);
             // disable child widgets
@@ -170,7 +166,6 @@ public class GameDetailsScreen extends CoreScreenLayer {
     private void initWidgets() {
         gameModules = find("modules", UIList.class);
         gameWorlds = find("worlds", UIList.class);
-        biomes = find("biomes", UIList.class);
         blocks = find("blocks", UIList.class);
 
         description = find("description", UIText.class);
@@ -196,52 +191,8 @@ public class GameDetailsScreen extends CoreScreenLayer {
                 .append(". ")
                 .append(error)
                 .append('\n'));
-        getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage(translationSystem.translate("${engine:menu#game-details-errors-message-title}"), errorMessageBuilder.toString());
-    }
-
-    private void setUpBiomes() {
-        biomes.subscribeSelection(((widget, biome) -> {
-            if (biome == null) {
-                return;
-            }
-
-            descriptionTitle.setText(translationSystem.translate("${engine:menu#game-details-biomes}"));
-            description.setText(getBiomeDescription(biome));
-
-            gameModules.setSelection(null);
-            gameWorlds.setSelection(null);
-            blocks.setSelection(null);
-        }));
-
-        biomes.setItemRenderer(new AbstractItemRenderer<Biome>() {
-            String getString(Biome biome) {
-                return biome.getId();
-            }
-
-            @Override
-            public void draw(Biome value, Canvas canvas) {
-                if (value.getId().contains("Core:")) {
-                    canvas.setMode("internal");
-                } else {
-                    canvas.setMode("external");
-                }
-                canvas.drawText(getString(value), canvas.getRegion());
-            }
-
-            @Override
-            public Vector2i getPreferredSize(Biome biome, Canvas canvas) {
-                String text = getString(biome);
-                return new Vector2i(canvas.getCurrentStyle().getFont().getWidth(text),
-                        canvas.getCurrentStyle().getFont().getLineHeight());
-            }
-        });
-    }
-
-    private String getBiomeDescription(final Biome biome) {
-        return translationSystem.translate("${engine:menu#biome-name}: ") + biome.getId() + '\n' + '\n' +
-                translationSystem.translate("${engine:menu#biome-fog}: ") + biome.getFog() + '\n' + '\n' +
-                translationSystem.translate("${engine:menu#biome-humidity}: ") + biome.getHumidity() + '\n' + '\n' +
-                translationSystem.translate("${engine:menu#biome-temperature}: ") + biome.getTemperature();
+        getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage(translationSystem.translate(
+                "${engine:menu#game-details-errors-message-title}"), errorMessageBuilder.toString());
     }
 
     private void setUpBlocks() {
@@ -255,7 +206,6 @@ public class GameDetailsScreen extends CoreScreenLayer {
 
             gameModules.setSelection(null);
             gameWorlds.setSelection(null);
-            biomes.setSelection(null);
         }));
     }
 
@@ -278,16 +228,41 @@ public class GameDetailsScreen extends CoreScreenLayer {
             description.setText(getWorldDescription(worldInfo));
 
             gameModules.setSelection(null);
-            biomes.setSelection(null);
             blocks.setSelection(null);
+        });
+
+        gameWorlds.setItemRenderer(new AbstractItemRenderer<WorldInfo>() {
+            @Override
+            public void draw(WorldInfo value, Canvas canvas) {
+                if (value.getCustomTitle().isEmpty()) {
+                    canvas.drawText(value.getTitle());
+                } else {
+                    canvas.drawText(value.getCustomTitle());
+                }
+            }
+
+            @Override
+            public Vector2i getPreferredSize(WorldInfo value, Canvas canvas) {
+                String text = value.getCustomTitle();
+                return new Vector2i(
+                        canvas.getCurrentStyle().getFont().getWidth(text),
+                        canvas.getCurrentStyle().getFont().getLineHeight());
+            }
         });
     }
 
     private String getWorldDescription(final WorldInfo worldInfo) {
-        return translationSystem.translate("${engine:menu#game-details-game-title} ") + worldInfo.getTitle() + '\n' + '\n' +
+        String gameTitle;
+        if (worldInfo.getCustomTitle().isEmpty()) {
+            gameTitle = worldInfo.getTitle();
+        } else {
+            gameTitle = worldInfo.getCustomTitle();
+        }
+        return translationSystem.translate("${engine:menu#game-details-game-title} ") + gameTitle + '\n' + '\n' +
                 translationSystem.translate("${engine:menu#game-details-game-seed} ") + worldInfo.getSeed() + '\n' + '\n' +
-                translationSystem.translate("${engine:menu#game-details-world-generator}: ") + worldInfo.getWorldGenerator().toString() + '\n' + '\n' +
-                translationSystem.translate("${engine:menu#game-details-game-duration} ") + DateTimeHelper.getDeltaBetweenTimestamps(new Date(0).getTime(), worldInfo.getTime());
+                translationSystem.translate("${engine:menu#game-details-world-generator}: ") + worldGeneratorManager.getWorldGeneratorInfo(worldInfo.getWorldGenerator()).getDisplayName() + '\n' + '\n' +
+                translationSystem.translate("${engine:menu#game-details-game-duration} ")
+                + DateTimeHelper.getDeltaBetweenTimestamps(new Date(0).getTime(), worldInfo.getTime());
     }
 
     private void setUpPreviewSlideshow() {
@@ -334,7 +309,6 @@ public class GameDetailsScreen extends CoreScreenLayer {
             description.setText(getModuleDescription(moduleSelectionInfo));
 
             gameWorlds.setSelection(null);
-            biomes.setSelection(null);
             blocks.setSelection(null);
         });
 
@@ -363,7 +337,8 @@ public class GameDetailsScreen extends CoreScreenLayer {
             @Override
             public Vector2i getPreferredSize(ModuleSelectionInfo value, Canvas canvas) {
                 String text = getString(value);
-                return new Vector2i(canvas.getCurrentStyle().getFont().getWidth(text),
+                return new Vector2i(
+                        canvas.getCurrentStyle().getFont().getWidth(text),
                         canvas.getCurrentStyle().getFont().getLineHeight());
             }
         });
@@ -403,7 +378,8 @@ public class GameDetailsScreen extends CoreScreenLayer {
                         module = moduleManager.getRegistry().getLatestModuleVersion(nameVersion.getName());
                         if (module != null) {
                             logger.debug("Get the latest available version of module {} in your classpath", nameVersion.getName());
-                            errors.add(String.format("Can't find module %s:%s in your classpath; loaded description for the latest available version.", nameVersion.getName(), nameVersion.getVersion()));
+                            errors.add(String.format("Can't find module %s:%s in your classpath; loaded description for the latest available version.",
+                                    nameVersion.getName(), nameVersion.getVersion()));
                             return ModuleSelectionInfo.latestVersion(module);
                         }
                         logger.error("Can't find any versions of module {} in your classpath!", nameVersion.getName());
@@ -423,41 +399,20 @@ public class GameDetailsScreen extends CoreScreenLayer {
         title.setText(translationSystem.translate("${engine:menu#game-details-title}") + " : " + gameInfo.getManifest().getTitle());
     }
 
-    private String getGeneralInfo(final GameInfo gameInfo) {
-        return translationSystem.translate("${engine:menu#game-details-game-title} ") + gameInfo.getManifest().getTitle() + '\n' + '\n' +
-                translationSystem.translate("${engine:menu#game-details-last-play}: ") + dateFormat.format(gameInfo.getTimestamp()) + '\n' + '\n' +
-                translationSystem.translate("${engine:menu#game-details-game-duration} ") + DateTimeHelper
-                .getDeltaBetweenTimestamps(new Date(0).getTime(), gameInfo.getManifest().getTime()) + '\n' + '\n' +
-                translationSystem.translate("${engine:menu#game-details-game-seed} ") + gameInfo.getManifest().getSeed() + '\n' + '\n' +
-                translationSystem.translate("${engine:menu#game-details-world-generator}: ") + '\t' + gameInfo.getManifest().getWorldInfo(TerasologyConstants.MAIN_WORLD).getWorldGenerator().getObjectName().toString();
-    }
-
-    private void loadBiomes() {
-        List<Biome> biomesList = Collections.emptyList();
-        final List<Name> moduleIds = gameInfo.getManifest().getModules().stream()
-                .map(NameVersion::getName)
-                .collect(Collectors.toCollection(ArrayList::new));
-
-        final DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
-        final ResolutionResult result = resolver.resolve(moduleIds);
-        if (result.isSuccess()) {
-            ModuleEnvironment env = moduleManager.loadEnvironment(result.getModules(), true);
-            BiomeManager biomeManager = null;
-            try {
-                biomeManager = new BiomeManager(env, gameInfo.getManifest().getBiomeIdMap());
-            } catch (Exception ex) {
-                errors.add(translationSystem.translate("${engine:menu#game-details-biomes-error}") + " - " + ex.getMessage());
-                logger.error("Couldn't load biomes: {}", ex.getMessage());
-            }
-            if (biomeManager != null) {
-                biomesList = biomeManager.getBiomes().stream()
-                        .sorted(Comparator.comparing(Biome::getName))
-                        .collect(Collectors.toList());
-            }
-        } else {
-            errors.add(translationSystem.translate("${engine:menu#game-details-biomes-error}"));
+    private String getGeneralInfo(final GameInfo theGameInfo) {
+        SimpleUri name = theGameInfo.getManifest().getWorldInfo(TerasologyConstants.MAIN_WORLD).getWorldGenerator();
+        WorldGeneratorInfo wgi = worldGeneratorManager.getWorldGeneratorInfo(name);
+        String display = "ERROR: generator " + name + " not found.";
+        if (wgi != null) {
+            display = wgi.getDisplayName();
         }
-        biomes.setList(biomesList);
+        return translationSystem.translate("${engine:menu#game-details-game-title} ") + theGameInfo.getManifest().getTitle() + '\n' + '\n' +
+                translationSystem.translate("${engine:menu#game-details-last-play}: ") + DATE_FORMAT.format(theGameInfo.getTimestamp()) + '\n' + '\n' +
+                translationSystem.translate("${engine:menu#game-details-game-duration} ") + DateTimeHelper
+                .getDeltaBetweenTimestamps(new Date(0).getTime(), theGameInfo.getManifest().getTime()) + '\n' + '\n' +
+                translationSystem.translate("${engine:menu#game-details-game-seed} ") + theGameInfo.getManifest().getSeed() + '\n' + '\n' +
+                translationSystem.translate("${engine:menu#game-details-world-generator}: ") + '\t'
+                + display;
     }
 
     private void loadGameWorlds() {
@@ -557,12 +512,17 @@ public class GameDetailsScreen extends CoreScreenLayer {
     }
 
     private boolean isScreenValid() {
-        if (Stream.of(gameModules, gameWorlds, biomes, blocks, description, descriptionTitle, openModuleDetails,
+        if (Stream.of(gameModules, gameWorlds, blocks, description, descriptionTitle, openModuleDetails,
                 previewSlideshow, tabs, showErrors, close, slideLeft, slideRight, slideStop, title)
                 .anyMatch(Objects::isNull)) {
             logger.error("Can't initialize screen correctly. At least one widget was missed!");
             return false;
         }
         return true;
+    }
+
+    @Override
+    public boolean isLowerLayerVisible() {
+        return false;
     }
 }

@@ -16,7 +16,6 @@
 
 package org.terasology.logic.players;
 
-import org.lwjgl.input.Mouse;
 import org.terasology.config.Config;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.EventPriority;
@@ -26,6 +25,7 @@ import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.input.Keyboard;
 import org.terasology.input.binds.general.HideHUDButton;
+import org.terasology.input.device.MouseDevice;
 import org.terasology.input.events.KeyDownEvent;
 import org.terasology.input.events.KeyEvent;
 import org.terasology.input.events.MouseAxisEvent;
@@ -41,6 +41,8 @@ import org.terasology.world.WorldProvider;
 @RegisterSystem(RegisterMode.CLIENT)
 public class DebugControlSystem extends BaseComponentSystem {
 
+    private static final String DEBUG_INFO_URN = "engine:DebugInfo";
+
     @In
     private WorldProvider world;
     
@@ -49,6 +51,9 @@ public class DebugControlSystem extends BaseComponentSystem {
 
     @In
     private NUIManager nuiManager;
+
+    @In
+    private MouseDevice mouseDevice;
     
     private DebugOverlay overlay;
     
@@ -113,6 +118,10 @@ public class DebugControlSystem extends BaseComponentSystem {
         // Features for debug mode only
         if (debugEnabled) {
             switch (event.getKey().getId()) {
+                case Keyboard.KeyId.H:
+                    nuiManager.toggleScreen(DEBUG_INFO_URN);
+                    event.consume();
+                    break;
                 case Keyboard.KeyId.F6:
                     config.getRendering().getDebug().setEnabled(!config.getRendering().getDebug().isEnabled());
                     event.consume();
@@ -131,11 +140,11 @@ public class DebugControlSystem extends BaseComponentSystem {
         }
 
         switch (event.getKey().getId()) {
-            case Keyboard.KeyId.F2:
+            case Keyboard.KeyId.F11:
                 mouseGrabbed = !mouseGrabbed;
                 DebugProperties debugProperties = (DebugProperties) nuiManager.getHUD().getHUDElement("engine:DebugProperties");
                 debugProperties.setVisible(!mouseGrabbed);
-                Mouse.setGrabbed(mouseGrabbed);
+                mouseDevice.setGrabbed(mouseGrabbed);
                 event.consume();
                 break;
             case Keyboard.KeyId.F3:

@@ -31,17 +31,18 @@ import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
 import org.terasology.rendering.ShaderManager;
 import org.terasology.rendering.nui.CoreScreenLayer;
-import org.terasology.rendering.nui.WidgetUtil;
+import org.terasology.nui.WidgetUtil;
 import org.terasology.rendering.nui.animation.MenuAnimationSystems;
-import org.terasology.rendering.nui.databinding.BindHelper;
-import org.terasology.rendering.nui.databinding.Binding;
-import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
-import org.terasology.rendering.nui.events.NUIKeyEvent;
-import org.terasology.rendering.nui.itemRendering.StringTextRenderer;
-import org.terasology.rendering.nui.itemRendering.ToStringTextRenderer;
+import org.terasology.nui.databinding.BindHelper;
+import org.terasology.nui.databinding.Binding;
+import org.terasology.nui.databinding.ReadOnlyBinding;
+import org.terasology.nui.events.NUIKeyEvent;
+import org.terasology.nui.itemRendering.StringTextRenderer;
+import org.terasology.nui.itemRendering.ToStringTextRenderer;
 import org.terasology.rendering.nui.layers.mainMenu.WaitPopup;
-import org.terasology.rendering.nui.widgets.UIDropdown;
-import org.terasology.rendering.nui.widgets.UISlider;
+import org.terasology.nui.widgets.UIDropdown;
+import org.terasology.nui.widgets.UILabel;
+import org.terasology.nui.widgets.UISlider;
 import org.terasology.rendering.world.viewDistance.ViewDistance;
 
 import javax.imageio.ImageIO;
@@ -237,6 +238,21 @@ public class VideoSettingsScreen extends CoreScreenLayer {
                 }
             });
         }
+
+        final UILabel uiScaleLabel = find("uiScaleLabel", UILabel.class);
+        uiScaleLabel.setText(" " + config.getRendering().getUiScale() + "% ");
+
+        WidgetUtil.trySubscribe(this, "uiScaleSmaller", button -> {
+            int newScale = Math.max(50, config.getRendering().getUiScale() - 25);
+            config.getRendering().setUiScale(newScale);
+            uiScaleLabel.setText(" " + config.getRendering().getUiScale() + "% ");
+        });
+
+        WidgetUtil.trySubscribe(this, "uiScaleLarger", button -> {
+            int newScale = Math.min(250, config.getRendering().getUiScale() + 25);
+            config.getRendering().setUiScale(newScale);
+            uiScaleLabel.setText(" " + config.getRendering().getUiScale() + "% ");
+        });
 
         UIDropdown<CameraSetting> cameraSetting = find("camera", UIDropdown.class);
         if (cameraSetting != null) {

@@ -1,28 +1,14 @@
-/*
- * Copyright 2017 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.rendering.cameras;
 
-import org.lwjgl.opengl.Display;
+import org.joml.Vector3f;
+import org.joml.Vector4f;
+import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.terasology.config.RenderingConfig;
 import org.terasology.engine.subsystem.DisplayDevice;
-import org.terasology.math.MatrixUtils;
 import org.terasology.math.TeraMath;
-import org.terasology.math.geom.Matrix4f;
-import org.terasology.math.geom.Vector3f;
 import org.terasology.rendering.nui.layers.mainMenu.videoSettings.CameraSetting;
 import org.terasology.world.WorldProvider;
 
@@ -51,11 +37,14 @@ public class PerspectiveCamera extends SubmersibleCamera implements PropertyChan
     private float bobbingVerticalOffsetFactor;
     private float cachedBobbingRotationOffsetFactor;
     private float cachedBobbingVerticalOffsetFactor;
+    private final DisplayDevice displayDevice;
 
     private Vector3f tempRightVector = new Vector3f();
 
-    public PerspectiveCamera(WorldProvider worldProvider, RenderingConfig renderingConfig, DisplayDevice displayDevice) {
+    public PerspectiveCamera(WorldProvider worldProvider, RenderingConfig renderingConfig,
+                             DisplayDevice displayDevice) {
         super(worldProvider, renderingConfig);
+        this.displayDevice = displayDevice;
         this.cameraSettings = renderingConfig.getCameraSettings();
 
         displayDevice.subscribe(DISPLAY_RESOLUTION_CHANGE, this);
@@ -69,20 +58,20 @@ public class PerspectiveCamera extends SubmersibleCamera implements PropertyChan
     @Override
     public void loadProjectionMatrix() {
         glMatrixMode(GL_PROJECTION);
-        GL11.glLoadMatrix(MatrixUtils.matrixToFloatBuffer(getProjectionMatrix()));
+        GL11.glLoadMatrixf(getProjectionMatrix().get(BufferUtils.createFloatBuffer(16)));
         glMatrixMode(GL11.GL_MODELVIEW);
     }
 
     @Override
     public void loadModelViewMatrix() {
         glMatrixMode(GL11.GL_MODELVIEW);
-        GL11.glLoadMatrix(MatrixUtils.matrixToFloatBuffer(getViewMatrix()));
+        GL11.glLoadMatrixf(getViewMatrix().get(BufferUtils.createFloatBuffer(16)));
     }
 
     @Override
     public void loadNormalizedModelViewMatrix() {
         glMatrixMode(GL11.GL_MODELVIEW);
-        GL11.glLoadMatrix(MatrixUtils.matrixToFloatBuffer(getNormViewMatrix()));
+        GL11.glLoadMatrixf(getNormViewMatrix().get(BufferUtils.createFloatBuffer(16)));
     }
 
     @Override
@@ -115,7 +104,7 @@ public class PerspectiveCamera extends SubmersibleCamera implements PropertyChan
         float factorMult = 0;
 
         for (Vector3f vector : vectors) {
-            double factor = Math.pow(multiplier, i);
+            float factor = (float) Math.pow(multiplier, i);
             factorMult += factor;
             x += vector.x * factor;
             y += vector.y * factor;
@@ -134,42 +123,46 @@ public class PerspectiveCamera extends SubmersibleCamera implements PropertyChan
     @Override
     public void updateMatrices(float fov) {
         // Nothing to do...
-        if (cachedPosition.equals(getPosition()) && cachedViewigDirection.equals(getViewingDirection())
-                && cachedBobbingRotationOffsetFactor == bobbingRotationOffsetFactor && cachedBobbingVerticalOffsetFactor == bobbingVerticalOffsetFactor
-                && cachedFov == fov
-                && cachedZFar == getzFar() && cachedZNear == getzNear()
-                && cachedReflectionHeight == getReflectionHeight()) {
+        if (cachedPosition.equals(getPosition()) && cachedViewigDirection.equals(viewingDirection)
+            && cachedBobbingRotationOffsetFactor == bobbingRotationOffsetFactor && cachedBobbingVerticalOffsetFactor == bobbingVerticalOffsetFactor
+            && cachedFov == fov
+            && cachedZFar == getzFar() && cachedZNear == getzNear()
+            && cachedReflectionHeight == getReflectionHeight()) {
             return;
         }
 
-        tempRightVector.cross(viewingDirection, up);
-        tempRightVector.scale(bobbingRotationOffsetFactor);
+        viewingDirection.cross(up, tempRightVector);
+        tempRightVector.mul(bobbingRotationOffsetFactor);
 
-        projectionMatrix = createPerspectiveProjectionMatrix(fov, getzNear(), getzFar());
+        float aspectRatio = (float) displayDevice.getWidth() / displayDevice.getHeight();
+        float fovY = (float) (2 * Math.atan2(Math.tan(0.5 * fov * TeraMath.DEG_TO_RAD), aspectRatio));
+        projectionMatrix.setPerspective(fovY, aspectRatio, getzNear(), getzFar());
 
-        viewMatrix = MatrixUtils.createViewMatrix(0f, bobbingVerticalOffsetFactor * 2.0f, 0f, viewingDirection.x, viewingDirection.y + bobbingVerticalOffsetFactor * 2.0f,
-                viewingDirection.z, up.x + tempRightVector.x, up.y + tempRightVector.y, up.z + tempRightVector.z);
+        viewMatrix.setLookAt(0f, bobbingVerticalOffsetFactor * 2.0f, 0f, viewingDirection.x,
+            viewingDirection.y + bobbingVerticalOffsetFactor * 2.0f,
+            viewingDirection.z, up.x + tempRightVector.x, up.y + tempRightVector.y, up.z + tempRightVector.z);
 
-        normViewMatrix = MatrixUtils.createViewMatrix(0f, 0f, 0f, viewingDirection.x, viewingDirection.y, viewingDirection.z,
-                up.x + tempRightVector.x, up.y + tempRightVector.y, up.z + tempRightVector.z);
+        normViewMatrix.setLookAt(0f, bobbingVerticalOffsetFactor * 2.0f, 0f, viewingDirection.x,
+            viewingDirection.y + bobbingVerticalOffsetFactor * 2.0f,
+            viewingDirection.z, up.x + tempRightVector.x, up.y + tempRightVector.y, up.z + tempRightVector.z);
 
-        reflectionMatrix.setRow(0, 1.0f, 0.0f, 0.0f, 0.0f);
-        reflectionMatrix.setRow(1, 0.0f, -1.0f, 0.0f, 2f * (-position.y + getReflectionHeight()));
-        reflectionMatrix.setRow(2, 0.0f, 0.0f, 1.0f, 0.0f);
-        reflectionMatrix.setRow(3, 0.0f, 0.0f, 0.0f, 1.0f);
-        viewMatrixReflected.mul(viewMatrix, reflectionMatrix);
+        reflectionMatrix.setRow(0, new Vector4f(1.0f, 0.0f, 0.0f, 0.0f));
+        reflectionMatrix.setRow(1, new Vector4f(0.0f, -1.0f, 0.0f, 2f * (-position.y + getReflectionHeight())));
+        reflectionMatrix.setRow(2, new Vector4f(0.0f, 0.0f, 1.0f, 0.0f));
+        reflectionMatrix.setRow(3, new Vector4f(0.0f, 0.0f, 0.0f, 1.0f));
+        viewMatrix.mul(reflectionMatrix, viewMatrixReflected);
 
-        reflectionMatrix.setRow(1, 0.0f, -1.0f, 0.0f, 0.0f);
-        normViewMatrixReflected.mul(normViewMatrix, reflectionMatrix);
+        reflectionMatrix.setRow(1, new Vector4f(0.0f, -1.0f, 0.0f, 0.0f));
+        normViewMatrix.mul(reflectionMatrix, normViewMatrixReflected);
 
-        viewProjectionMatrix = MatrixUtils.calcViewProjectionMatrix(viewMatrix, projectionMatrix);
+        projectionMatrix.mul(viewMatrix, viewProjectionMatrix);
+        projectionMatrix.invert(inverseProjectionMatrix);
 
-        inverseProjectionMatrix.invert(projectionMatrix);
-        inverseViewProjectionMatrix.invert(viewProjectionMatrix);
+        viewProjectionMatrix.invert(inverseViewProjectionMatrix);
 
         // Used for dirty checks
         cachedPosition.set(getPosition());
-        cachedViewigDirection.set(getViewingDirection());
+        cachedViewigDirection.set(viewingDirection);
         cachedBobbingVerticalOffsetFactor = bobbingVerticalOffsetFactor;
         cachedBobbingRotationOffsetFactor = bobbingRotationOffsetFactor;
         cachedFov = fov;
@@ -186,14 +179,6 @@ public class PerspectiveCamera extends SubmersibleCamera implements PropertyChan
 
     public void setBobbingVerticalOffsetFactor(float f) {
         bobbingVerticalOffsetFactor = f;
-    }
-
-    // TODO: Move the dependency on LWJGL (Display) elsewhere
-    private static Matrix4f createPerspectiveProjectionMatrix(float fov, float zNear, float zFar) {
-        float aspectRatio = (float) Display.getWidth() / Display.getHeight();
-        float fovY = (float) (2 * Math.atan2(Math.tan(0.5 * fov * TeraMath.DEG_TO_RAD), aspectRatio));
-
-        return MatrixUtils.createPerspectiveProjectionMatrix(fovY, aspectRatio, zNear, zFar);
     }
 
     public void propertyChange(PropertyChangeEvent propertyChangeEvent) {

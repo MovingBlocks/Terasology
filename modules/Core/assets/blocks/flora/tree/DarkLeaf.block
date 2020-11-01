@@ -1,9 +1,0 @@
-/**
- * This is a leaf, which can exist in the world just as a block of its own
- * However, more likely it will be used by reference by a Tree
- */
-{
-    "basedOn": "core:leaf",
-    "tile": "core:GreenLeaf",
-    "colorOffset": [0.7, 0.7, 0.7, 1.0]
-}

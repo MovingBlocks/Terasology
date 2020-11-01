@@ -1,5 +1,0 @@
-{
-    "stepSounds": [],
-    "destroySounds": ["core:StoneDestroy"],
-    "digSounds": ["core:Stone"]
-}

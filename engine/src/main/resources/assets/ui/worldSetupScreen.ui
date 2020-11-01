@@ -84,6 +84,30 @@
                 ]
               },
               {
+                "type": "RowLayout",
+                "id": "customNameWorld",
+                "layoutInfo": {
+                  "use-content-height": true,
+                  "position-horizontal-center": {},
+                  "position-top": {
+                    "target": "BOTTOM",
+                    "offset": 8,
+                    "widget": "shape"
+                  }
+                },
+                "contents": [
+                  {
+                    "type": "UILabel",
+                    "text": "World Name"
+                  },
+                  {
+                    "type": "UIText",
+                    "text": "",
+                    "id": "customisedWorldName"
+                  }
+                ]
+              },
+              {
                 "type": "ScrollableArea",
                 "content": {
                   "type": "propertyLayout",
@@ -95,7 +119,7 @@
                   "position-top": {
                     "target": "BOTTOM",
                     "offset": 8,
-                    "widget": "shape"
+                    "widget": "customNameWorld"
                   },
                   "position-bottom": {
                     "target": "TOP",

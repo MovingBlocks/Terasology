@@ -16,17 +16,16 @@
 package org.terasology.persistence.typeHandling.coreTypes;
 
 import com.google.common.collect.Maps;
-import org.terasology.persistence.typeHandling.DeserializationContext;
 import org.terasology.persistence.typeHandling.PersistedData;
-import org.terasology.persistence.typeHandling.SerializationContext;
-import org.terasology.persistence.typeHandling.SimpleTypeHandler;
+import org.terasology.persistence.typeHandling.PersistedDataSerializer;
 import org.terasology.persistence.typeHandling.TypeHandler;
 
 import java.util.Map;
+import java.util.Optional;
 
 /**
  */
-public class StringMapTypeHandler<T> extends SimpleTypeHandler<Map<String, T>> {
+public class StringMapTypeHandler<T> extends TypeHandler<Map<String, T>> {
 
     private TypeHandler<T> contentsHandler;
 
@@ -35,25 +34,30 @@ public class StringMapTypeHandler<T> extends SimpleTypeHandler<Map<String, T>> {
     }
 
     @Override
-    public PersistedData serialize(Map<String, T> value, SerializationContext context) {
+    public PersistedData serializeNonNull(Map<String, T> value, PersistedDataSerializer serializer) {
         Map<String, PersistedData> map = Maps.newLinkedHashMap();
         for (Map.Entry<String, T> entry : value.entrySet()) {
-            PersistedData item = contentsHandler.serialize(entry.getValue(), context);
+            PersistedData item = contentsHandler.serialize(entry.getValue(), serializer);
             if (!item.isNull()) {
                 map.put(entry.getKey(), item);
             }
         }
-        return context.create(map);
+        return serializer.serialize(map);
     }
 
     @Override
-    public Map<String, T> deserialize(PersistedData data, DeserializationContext context) {
-        Map<String, T> result = Maps.newLinkedHashMap();
-        if (data.isValueMap()) {
-            for (Map.Entry<String, PersistedData> item : data.getAsValueMap().entrySet()) {
-                result.put(item.getKey(), contentsHandler.deserialize(item.getValue(), context));
-            }
+    public Optional<Map<String, T>> deserialize(PersistedData data) {
+        if (!data.isValueMap()) {
+            return Optional.empty();
         }
-        return result;
+
+        Map<String, T> result = Maps.newLinkedHashMap();
+
+        for (Map.Entry<String, PersistedData> item : data.getAsValueMap().entrySet()) {
+            Optional<T> optionalValue = contentsHandler.deserialize(item.getValue());
+            optionalValue.ifPresent(value -> result.put(item.getKey(), value));
+        }
+
+        return Optional.of(result);
     }
 }

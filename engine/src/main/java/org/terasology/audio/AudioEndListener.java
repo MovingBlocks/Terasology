@@ -26,7 +26,7 @@ public interface AudioEndListener {
 
     /**
      * Called when the sound or music stops playing
-     * @param interrupted, true when the track was interrupted, e.g. via {@link AudioManager#stopAllSounds()}, false if not.
+     * @param interrupted true when the track was interrupted, e.g. via {@link AudioManager#stopAllSounds()}, false if not.
      */
     void onAudioEnd(boolean interrupted);
 }

@@ -17,7 +17,9 @@ package org.terasology.logic.permission;
 
 import com.google.common.base.Predicate;
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.module.sandbox.API;
 
+@API
 public interface PermissionManager {
     /**
      * Allows the player to use chat commands.

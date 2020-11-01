@@ -115,7 +115,7 @@ public class VisualCharacterSystem extends BaseComponentSystem {
     public void onAwaitedLocalCharacterSpawnEvent(AwaitedLocalCharacterSpawnEvent event, EntityRef entity) {
         awaitedLocalCharacterSpawn = true;
         for (EntityRef character: entityManager.getEntitiesWith(VisualCharacterComponent.class)) {
-            createVisualCharacterIfNotOwnCharacter(character, entity.getComponent(VisualCharacterComponent.class));
+            createVisualCharacterIfNotOwnCharacter(character, character.getComponent(VisualCharacterComponent.class));
         }
     }
 
@@ -127,7 +127,6 @@ public class VisualCharacterSystem extends BaseComponentSystem {
         entityBuilder.addPrefab(prefab);
         event.consume();
     }
-
 
     /**
      * For tests only

@@ -16,7 +16,7 @@
 package org.terasology.engine.modes.loadProcesses;
 
 import org.terasology.context.Context;
-import org.terasology.engine.modes.LoadProcess;
+import org.terasology.engine.modes.SingleStepLoadProcess;
 import org.terasology.recording.RecordAndReplayCurrentStatus;
 import org.terasology.recording.RecordAndReplaySerializer;
 import org.terasology.recording.RecordAndReplayStatus;
@@ -24,7 +24,7 @@ import org.terasology.recording.RecordAndReplayStatus;
 /**
  * Initialises Record and Replay if they were selected in the main menu.
  */
-public class InitialiseRecordAndReplay implements LoadProcess {
+public class InitialiseRecordAndReplay extends SingleStepLoadProcess {
 
     private Context context;
     private RecordAndReplaySerializer recordAndReplaySerializer;
@@ -58,11 +58,6 @@ public class InitialiseRecordAndReplay implements LoadProcess {
     public void begin() {
         this.recordAndReplayCurrentStatus = context.get(RecordAndReplayCurrentStatus.class);
         this.recordAndReplaySerializer = context.get(RecordAndReplaySerializer.class);
-    }
-
-    @Override
-    public float getProgress() {
-        return 0;
     }
 
     @Override

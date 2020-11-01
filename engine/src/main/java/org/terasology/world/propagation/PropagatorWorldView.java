@@ -19,27 +19,23 @@ import org.terasology.math.geom.Vector3i;
 import org.terasology.world.block.Block;
 
 /**
- * A view providing access to the world for batch propagation
- *
+ * A view providing access to the world specifically for batch propagation
  */
 public interface PropagatorWorldView {
 
     byte UNAVAILABLE = -1;
 
     /**
-     * @param pos
-     * @return The value of interest at pos, or UNAVAILABLE if out of bounds
+     * @return The value of interest at pos, or {@link #UNAVAILABLE} if out of bounds
      */
     byte getValueAt(Vector3i pos);
 
     /**
-     * @param pos
      * @param value A new value at pos.
      */
     void setValueAt(Vector3i pos, byte value);
 
     /**
-     * @param pos
      * @return The block at pos, or null if out of bounds
      */
     Block getBlockAt(Vector3i pos);

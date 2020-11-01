@@ -15,8 +15,9 @@
  */
 package org.terasology.entitySystem;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.reflections.Reflections;
 import org.terasology.assets.AssetFactory;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
@@ -32,19 +33,16 @@ import org.terasology.entitySystem.prefab.internal.PojoPrefabManager;
 import org.terasology.entitySystem.stubs.StringComponent;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
-import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
-import org.terasology.persistence.typeHandling.mathTypes.Quat4fTypeHandler;
-import org.terasology.persistence.typeHandling.mathTypes.Vector3fTypeHandler;
-import org.terasology.reflection.copy.CopyStrategyLibrary;
-import org.terasology.reflection.reflect.ReflectFactory;
-import org.terasology.reflection.reflect.ReflectionReflectFactory;
+import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
+import org.terasology.persistence.typeHandling.mathTypes.legacy.LegacyQuat4fTypeHandler;
+import org.terasology.persistence.typeHandling.mathTypes.legacy.LegacyVector3fTypeHandler;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.testUtil.ModuleManagerFactory;
 import org.terasology.utilities.Assets;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
  */
@@ -55,16 +53,18 @@ public class PojoPrefabManagerTest {
     private ComponentLibrary componentLibrary;
     private PojoPrefabManager prefabManager;
 
-    @Before
+    @BeforeEach
     public void setup() throws Exception {
         ContextImpl context = new ContextImpl();
         CoreRegistry.setContext(context);
         ModuleManager moduleManager = ModuleManagerFactory.create();
-        ReflectFactory reflectFactory = new ReflectionReflectFactory();
-        CopyStrategyLibrary copyStrategyLibrary = new CopyStrategyLibrary(reflectFactory);
-        TypeSerializationLibrary lib = new TypeSerializationLibrary(reflectFactory, copyStrategyLibrary);
-        lib.add(Vector3f.class, new Vector3fTypeHandler());
-        lib.add(Quat4f.class, new Quat4fTypeHandler());
+
+        Reflections reflections = new Reflections(getClass().getClassLoader());
+        TypeHandlerLibrary lib = new TypeHandlerLibrary(reflections);
+
+        lib.addTypeHandler(Vector3f.class, new LegacyVector3fTypeHandler());
+        lib.addTypeHandler(Quat4f.class, new LegacyQuat4fTypeHandler());
+
         entitySystemLibrary = new EntitySystemLibrary(context, lib);
         componentLibrary = entitySystemLibrary.getComponentLibrary();
 

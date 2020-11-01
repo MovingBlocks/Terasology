@@ -15,13 +15,13 @@
  */
 package org.terasology.rendering.assets.texture;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.naming.Name;
-import org.terasology.rendering.nui.Color;
+import org.terasology.nui.Color;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  */

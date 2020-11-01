@@ -17,7 +17,7 @@
 package org.terasology.network;
 
 import org.terasology.entitySystem.Component;
-import org.terasology.rendering.nui.Color;
+import org.terasology.nui.Color;
 
 /**
  * A component that provides a color to describe an entity

@@ -17,6 +17,7 @@ package org.terasology.world.block.internal;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
+import org.terasology.math.JomlUtil;
 import org.terasology.utilities.Assets;
 import org.terasology.math.Rotation;
 import org.terasology.math.Side;
@@ -120,11 +121,6 @@ public class BlockBuilder implements BlockBuilderHelper {
         setBlockFullSides(block, shape, rotation);
         block.setCollision(shape.getCollisionOffset(rotation), shape.getCollisionShape(rotation));
 
-        for (BlockPart part : BlockPart.values()) {
-            block.setColorSource(part, section.getColorSources().get(part));
-            block.setColorOffset(part, section.getColorOffsets().get(part));
-        }
-
         block.setUri(uri);
         block.setBlockFamily(blockFamily);
 
@@ -140,7 +136,6 @@ public class BlockBuilder implements BlockBuilderHelper {
         Block block = new Block();
         block.setLiquid(def.isLiquid());
         block.setWater(def.isWater());
-        block.setLava(def.isLava());
         block.setGrass(def.isGrass());
         block.setIce(def.isIce());
         block.setHardness(def.getHardness());
@@ -187,15 +182,21 @@ public class BlockBuilder implements BlockBuilderHelper {
         for (BlockPart part : BlockPart.values()) {
             // TODO: Need to be more sensible with the texture atlas. Because things like block particles read from a part that may not exist, we're being fairly lenient
             Vector2f atlasPos;
-            if (tiles.get(part) == null) {
+            int frameCount;
+            BlockTile tile = tiles.get(part);
+            if (tile == null) {
                 atlasPos = new Vector2f();
+                frameCount = 1;
             } else {
-                atlasPos = worldAtlas.getTexCoords(tiles.get(part), shape.getMeshPart(part) != null);
+                atlasPos = worldAtlas.getTexCoords(tile, shape.getMeshPart(part) != null);
+                frameCount = tile.getLength();
             }
             BlockPart targetPart = part.rotate(rot);
             textureAtlasPositions.put(targetPart, atlasPos);
             if (shape.getMeshPart(part) != null) {
-                meshParts.put(targetPart, shape.getMeshPart(part).rotate(rot.getQuat4f()).mapTexCoords(atlasPos, worldAtlas.getRelativeTileSize()));
+                meshParts.put(targetPart,
+                    shape.getMeshPart(part).rotate(JomlUtil.from(rot.getQuat4f())).mapTexCoords(JomlUtil.from(atlasPos),
+                    worldAtlas.getRelativeTileSize(), frameCount));
             }
         }
         return new BlockAppearance(meshParts, textureAtlasPositions);
@@ -215,11 +216,11 @@ public class BlockBuilder implements BlockBuilderHelper {
             if (blockTile != null) {
                 BlockMeshPart lowMeshPart = lowShape
                         .getMeshPart(part)
-                        .mapTexCoords(worldAtlas.getTexCoords(blockTile, true), worldAtlas.getRelativeTileSize());
+                        .mapTexCoords(JomlUtil.from(worldAtlas.getTexCoords(blockTile, true)), worldAtlas.getRelativeTileSize(), blockTile.getLength());
                 block.setLowLiquidMesh(part.getSide(), lowMeshPart);
                 BlockMeshPart topMeshPart = topShape
                         .getMeshPart(part)
-                        .mapTexCoords(worldAtlas.getTexCoords(blockTile, true), worldAtlas.getRelativeTileSize());
+                        .mapTexCoords(JomlUtil.from(worldAtlas.getTexCoords(blockTile, true)), worldAtlas.getRelativeTileSize(), blockTile.getLength());
                 block.setTopLiquidMesh(part.getSide(), topMeshPart);
             }
         }

@@ -17,10 +17,10 @@ package org.terasology.logic.console.ui;
 
 import com.google.common.collect.Lists;
 import org.terasology.input.Keyboard;
-import org.terasology.rendering.nui.databinding.Binding;
-import org.terasology.rendering.nui.databinding.DefaultBinding;
-import org.terasology.rendering.nui.events.NUIKeyEvent;
-import org.terasology.rendering.nui.widgets.UIText;
+import org.terasology.nui.databinding.Binding;
+import org.terasology.nui.databinding.DefaultBinding;
+import org.terasology.nui.events.NUIKeyEvent;
+import org.terasology.nui.widgets.UIText;
 
 import java.util.List;
 

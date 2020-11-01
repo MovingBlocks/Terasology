@@ -16,11 +16,15 @@
 package org.terasology.logic.console;
 
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.terasology.TerasologyTestingEnvironment;
 
 import java.util.Iterator;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ConsoleTest extends TerasologyTestingEnvironment {
 
@@ -35,7 +39,7 @@ public class ConsoleTest extends TerasologyTestingEnvironment {
         getConsole().clear();
 
         Iterator<Message> it = getConsole().getMessages().iterator();
-        Assert.assertFalse(it.hasNext());
+        assertFalse(it.hasNext());
     }
 
     @Test
@@ -67,12 +71,12 @@ public class ConsoleTest extends TerasologyTestingEnvironment {
     }
 
     private void checkMessage(Iterator<Message> it, boolean hasNewLine) {
-        Assert.assertNotNull(it);
-        Assert.assertTrue(it.hasNext());
+        assertNotNull(it);
+        assertTrue(it.hasNext());
         final Message message = it.next();
-        Assert.assertEquals(MESSAGE_TEXT, message.getMessage());
-        Assert.assertEquals(hasNewLine, message.hasNewLine());
-        Assert.assertFalse(it.hasNext());
+        assertEquals(MESSAGE_TEXT, message.getMessage());
+        assertEquals(hasNewLine, message.hasNewLine());
+        assertFalse(it.hasNext());
     }
 
     private Console getConsole() {

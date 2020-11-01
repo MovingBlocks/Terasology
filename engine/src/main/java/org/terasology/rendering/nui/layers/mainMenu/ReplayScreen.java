@@ -28,9 +28,10 @@ import org.terasology.recording.RecordAndReplayStatus;
 import org.terasology.recording.RecordAndReplayUtils;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
+import org.terasology.rendering.nui.animation.MenuAnimationSystems;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameInfo;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameProvider;
-import org.terasology.rendering.nui.widgets.UIButton;
+import org.terasology.nui.widgets.UIButton;
 
 import java.nio.file.Path;
 import java.util.Objects;
@@ -57,6 +58,8 @@ public class ReplayScreen extends SelectionScreen {
 
     @Override
     public void initialise() {
+        setAnimationSystem(MenuAnimationSystems.createDefaultSwipeAnimation());
+
         initWidgets();
 
         if (isValidScreen()) {
@@ -95,6 +98,7 @@ public class ReplayScreen extends SelectionScreen {
 
     @Override
     public void onOpened() {
+        super.onOpened();
 
         if (isValidScreen()) {
             refreshGameInfoList(GameProvider.getSavedRecordings());
@@ -149,4 +153,8 @@ public class ReplayScreen extends SelectionScreen {
         return true;
     }
 
+    @Override
+    public boolean isLowerLayerVisible() {
+        return false;
+    }
 }

@@ -30,20 +30,19 @@ import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
+import org.joml.Vector3f;
 import org.terasology.assets.Asset;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.format.AbstractAssetFileFormat;
 import org.terasology.assets.format.AssetDataFile;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.entitySystem.prefab.Prefab;
-import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector4f;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.utilities.gson.CaseInsensitiveEnumTypeAdapterFactory;
 import org.terasology.utilities.gson.Vector3fTypeAdapter;
 import org.terasology.utilities.gson.Vector4fTypeAdapter;
 import org.terasology.world.block.BlockPart;
-import org.terasology.world.block.DefaultColorSource;
 import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.family.BlockFamilyLibrary;
 import org.terasology.world.block.family.FreeformFamily;
@@ -197,8 +196,6 @@ public class BlockFamilyDefinitionFormat extends AbstractAssetFileFormat<BlockFa
             setObject(data::setTint, jsonObject, "tint", Vector3f.class, context);
 
             readBlockPartMap(jsonObject, "tile", "tiles", data::getBlockTiles, BlockTile.class, context);
-            readBlockPartMap(jsonObject, "colorSource", "colorSources", data::getColorSources, DefaultColorSource.class, context);
-            readBlockPartMap(jsonObject, "colorOffset", "colorOffsets", data::getColorOffsets, Vector4f.class, context);
 
             setFloat(data::setMass, jsonObject, "mass");
             setBoolean(data::setDebrisOnDestroy, jsonObject, "debrisOnDestroy");
@@ -219,7 +216,6 @@ public class BlockFamilyDefinitionFormat extends AbstractAssetFileFormat<BlockFa
 
             setObject(data::setShape, jsonObject, "shape", BlockShape.class, context);
             setBoolean(data::setWater, jsonObject, "water");
-            setBoolean(data::setLava, jsonObject, "lava");
             setBoolean(data::setGrass, jsonObject, "grass");
             setBoolean(data::setIce, jsonObject, "ice");
         }

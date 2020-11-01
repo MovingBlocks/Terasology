@@ -27,9 +27,9 @@ import org.terasology.input.Input;
 import org.terasology.input.RegisterBindButton;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
-import org.terasology.rendering.nui.WidgetUtil;
-import org.terasology.rendering.nui.widgets.UIButton;
-import org.terasology.rendering.nui.widgets.UILabel;
+import org.terasology.nui.WidgetUtil;
+import org.terasology.nui.widgets.UIButton;
+import org.terasology.nui.widgets.UILabel;
 
 import java.util.List;
 
@@ -90,6 +90,7 @@ public class ChangeBindingPopup extends CoreScreenLayer {
 
     @Override
     public void onClosed() {
+        super.onClosed();
         bindsManager.registerBinds();
     }
 }

@@ -9,7 +9,6 @@
   "persisted": false,
   "location": {},
   "Network": {},
-  "MinionMove": {},
   "Health": {
     "destroyEntityOnNoHealth": true,
     "currentHealth": 7

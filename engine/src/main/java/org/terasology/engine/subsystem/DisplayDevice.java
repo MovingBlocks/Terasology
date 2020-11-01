@@ -15,11 +15,13 @@
  */
 package org.terasology.engine.subsystem;
 
+import org.terasology.module.sandbox.API;
 import org.terasology.rendering.nui.layers.mainMenu.videoSettings.DisplayModeSetting;
 import org.terasology.utilities.subscribables.Subscribable;
 
 import java.util.List;
 
+@API
 public interface DisplayDevice extends Subscribable {
 
     boolean hasFocus();
@@ -43,6 +45,16 @@ public interface DisplayDevice extends Subscribable {
      * @return list of available full-screen resolutions.
      */
     List<Resolution> getResolutions();
+
+    /**
+     * @return display width
+     */
+    int getWidth();
+
+    /**
+     * @return display height
+     */
+    int getHeight();
 
     /**
      * Change currently active full-screen resolution.

@@ -15,8 +15,8 @@
  */
 package org.terasology.logic.location;
 
+import org.joml.Vector3f;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.math.geom.Vector3f;
 
 import java.util.Comparator;
 
@@ -54,12 +54,6 @@ public class DistanceComparator implements Comparator<EntityRef> {
         origin = new Vector3f();
     }
 
-    /**
-     * Creates this Distance comparator and sets the temp to the
-     * given parameter.
-     * The temp is used to calculate distances from.
-     * @param temp used to calculate distances from when comparing entities.
-     */
     /**
      * Creates this Distance comparator and sets the temp to the
      * given parameter.

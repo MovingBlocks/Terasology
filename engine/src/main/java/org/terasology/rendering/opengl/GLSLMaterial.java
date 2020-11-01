@@ -25,6 +25,9 @@ import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TIntIntHashMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
+import org.joml.Matrix3fc;
+import org.joml.Matrix4fc;
+import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
 import org.slf4j.Logger;
@@ -281,7 +284,7 @@ public class GLSLMaterial extends BaseMaterial {
         if (currentOnly) {
             enable();
             int id = getUniformLocation(getActiveShaderProgramId(), desc);
-            GL20.glUniform1(id, buffer);
+            GL20.glUniform1fv(id, buffer);
         } else {
             TIntIntIterator it = disposalAction.shaderPrograms.iterator();
             while (it.hasNext()) {
@@ -289,7 +292,7 @@ public class GLSLMaterial extends BaseMaterial {
 
                 GL20.glUseProgram(it.value());
                 int id = getUniformLocation(it.value(), desc);
-                GL20.glUniform1(id, buffer);
+                GL20.glUniform1fv(id, buffer);
             }
 
             restoreStateAfterUniformsSet();
@@ -327,7 +330,7 @@ public class GLSLMaterial extends BaseMaterial {
         if (currentOnly) {
             enable();
             int id = getUniformLocation(getActiveShaderProgramId(), desc);
-            GL20.glUniform2(id, buffer);
+            GL20.glUniform2fv(id, buffer);
         } else {
             TIntIntIterator it = disposalAction.shaderPrograms.iterator();
             while (it.hasNext()) {
@@ -335,7 +338,7 @@ public class GLSLMaterial extends BaseMaterial {
 
                 GL20.glUseProgram(it.value());
                 int id = getUniformLocation(it.value(), desc);
-                GL20.glUniform2(id, buffer);
+                GL20.glUniform2fv(id, buffer);
             }
 
             restoreStateAfterUniformsSet();
@@ -373,7 +376,7 @@ public class GLSLMaterial extends BaseMaterial {
         if (currentOnly) {
             enable();
             int id = getUniformLocation(getActiveShaderProgramId(), desc);
-            GL20.glUniform3(id, buffer);
+            GL20.glUniform3fv(id, buffer);
         } else {
             TIntIntIterator it = disposalAction.shaderPrograms.iterator();
             while (it.hasNext()) {
@@ -381,7 +384,7 @@ public class GLSLMaterial extends BaseMaterial {
 
                 GL20.glUseProgram(it.value());
                 int id = getUniformLocation(it.value(), desc);
-                GL20.glUniform3(id, buffer);
+                GL20.glUniform3fv(id, buffer);
             }
 
             restoreStateAfterUniformsSet();
@@ -419,7 +422,7 @@ public class GLSLMaterial extends BaseMaterial {
         if (currentOnly) {
             enable();
             int id = getUniformLocation(getActiveShaderProgramId(), desc);
-            GL20.glUniform4(id, buffer);
+            GL20.glUniform4fv(id, buffer);
         } else {
             TIntIntIterator it = disposalAction.shaderPrograms.iterator();
             while (it.hasNext()) {
@@ -427,7 +430,7 @@ public class GLSLMaterial extends BaseMaterial {
 
                 GL20.glUseProgram(it.value());
                 int id = getUniformLocation(it.value(), desc);
-                GL20.glUniform4(id, buffer);
+                GL20.glUniform4fv(id, buffer);
             }
 
             restoreStateAfterUniformsSet();
@@ -488,7 +491,7 @@ public class GLSLMaterial extends BaseMaterial {
         if (currentOnly) {
             enable();
             int id = getUniformLocation(getActiveShaderProgramId(), desc);
-            GL20.glUniformMatrix3(id, false, MatrixUtils.matrixToFloatBuffer(value));
+            GL20.glUniformMatrix3fv(id, false, MatrixUtils.matrixToFloatBuffer(value));
         } else {
             TIntIntIterator it = disposalAction.shaderPrograms.iterator();
             while (it.hasNext()) {
@@ -496,7 +499,32 @@ public class GLSLMaterial extends BaseMaterial {
 
                 GL20.glUseProgram(it.value());
                 int id = getUniformLocation(it.value(), desc);
-                GL20.glUniformMatrix3(id, false, MatrixUtils.matrixToFloatBuffer(value));
+                GL20.glUniformMatrix3fv(id, false, MatrixUtils.matrixToFloatBuffer(value));
+            }
+
+            restoreStateAfterUniformsSet();
+        }
+    }
+
+    @Override
+    public void setMatrix3(String desc, Matrix3fc value, boolean currentOnly) {
+        if (isDisposed()) {
+            return;
+        }
+        FloatBuffer buffer = BufferUtils.createFloatBuffer(16);
+        value.get(buffer);
+        if (currentOnly) {
+            enable();
+            int id = getUniformLocation(getActiveShaderProgramId(), desc);
+            GL20.glUniformMatrix3fv(id, false, buffer);
+        } else {
+            TIntIntIterator it = disposalAction.shaderPrograms.iterator();
+            while (it.hasNext()) {
+                it.advance();
+
+                GL20.glUseProgram(it.value());
+                int id = getUniformLocation(it.value(), desc);
+                GL20.glUniformMatrix3fv(id, false, buffer);
             }
 
             restoreStateAfterUniformsSet();
@@ -511,7 +539,7 @@ public class GLSLMaterial extends BaseMaterial {
         if (currentOnly) {
             enable();
             int id = getUniformLocation(getActiveShaderProgramId(), desc);
-            GL20.glUniformMatrix3(id, false, value);
+            GL20.glUniformMatrix3fv(id, false, value);
         } else {
             TIntIntIterator it = disposalAction.shaderPrograms.iterator();
             while (it.hasNext()) {
@@ -519,7 +547,7 @@ public class GLSLMaterial extends BaseMaterial {
 
                 GL20.glUseProgram(it.value());
                 int id = getUniformLocation(it.value(), desc);
-                GL20.glUniformMatrix3(id, false, value);
+                GL20.glUniformMatrix3fv(id, false, value);
             }
 
             restoreStateAfterUniformsSet();
@@ -534,7 +562,7 @@ public class GLSLMaterial extends BaseMaterial {
         if (currentOnly) {
             enable();
             int id = getUniformLocation(getActiveShaderProgramId(), desc);
-            GL20.glUniformMatrix4(id, false, MatrixUtils.matrixToFloatBuffer(value));
+            GL20.glUniformMatrix4fv(id, false, MatrixUtils.matrixToFloatBuffer(value));
         } else {
             TIntIntIterator it = disposalAction.shaderPrograms.iterator();
             while (it.hasNext()) {
@@ -542,7 +570,32 @@ public class GLSLMaterial extends BaseMaterial {
 
                 GL20.glUseProgram(it.value());
                 int id = getUniformLocation(it.value(), desc);
-                GL20.glUniformMatrix4(id, false, MatrixUtils.matrixToFloatBuffer(value));
+                GL20.glUniformMatrix4fv(id, false, MatrixUtils.matrixToFloatBuffer(value));
+            }
+
+            restoreStateAfterUniformsSet();
+        }
+    }
+
+    @Override
+    public void setMatrix4(String desc, Matrix4fc value, boolean currentOnly) {
+        if (isDisposed()) {
+            return;
+        }
+        FloatBuffer buffer = BufferUtils.createFloatBuffer(16);
+        value.get(buffer);
+        if (currentOnly) {
+            enable();
+            int id = getUniformLocation(getActiveShaderProgramId(), desc);
+            GL20.glUniformMatrix4fv(id, false, buffer);
+        } else {
+            TIntIntIterator it = disposalAction.shaderPrograms.iterator();
+            while (it.hasNext()) {
+                it.advance();
+
+                GL20.glUseProgram(it.value());
+                int id = getUniformLocation(it.value(), desc);
+                GL20.glUniformMatrix4fv(id, false, buffer);
             }
 
             restoreStateAfterUniformsSet();
@@ -557,7 +610,7 @@ public class GLSLMaterial extends BaseMaterial {
         if (currentOnly) {
             enable();
             int id = getUniformLocation(getActiveShaderProgramId(), desc);
-            GL20.glUniformMatrix4(id, false, value);
+            GL20.glUniformMatrix4fv(id, false, value);
         } else {
             TIntIntIterator it = disposalAction.shaderPrograms.iterator();
             while (it.hasNext()) {
@@ -565,7 +618,7 @@ public class GLSLMaterial extends BaseMaterial {
 
                 GL20.glUseProgram(it.value());
                 int id = getUniformLocation(it.value(), desc);
-                GL20.glUniformMatrix4(id, false, value);
+                GL20.glUniformMatrix4fv(id, false, value);
             }
 
             restoreStateAfterUniformsSet();
@@ -653,6 +706,4 @@ public class GLSLMaterial extends BaseMaterial {
             }
         }
     }
-
-
 }

@@ -16,10 +16,9 @@
 package org.terasology.persistence.internal;
 
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
-import org.terasology.math.geom.Vector3i;
+import org.joml.Vector3i;
 import org.terasology.persistence.ChunkStore;
 import org.terasology.protobuf.EntityData;
-import org.terasology.world.biomes.BiomeManager;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.blockdata.ExtraBlockDataManager;
@@ -36,11 +35,11 @@ final class ChunkStoreInternal implements ChunkStore {
     private EntityData.EntityStore entityStore;
 
     ChunkStoreInternal(EntityData.ChunkStore chunkData, EngineEntityManager entityManager,
-            BlockManager blockManager, BiomeManager biomeManager, ExtraBlockDataManager extraDataManager) {
+                       BlockManager blockManager, ExtraBlockDataManager extraDataManager) {
         this.chunkPosition = new Vector3i(chunkData.getX(), chunkData.getY(), chunkData.getZ());
         this.entityManager = entityManager;
 
-        this.chunk = ChunkSerializer.decode(chunkData, blockManager, biomeManager, extraDataManager);
+        this.chunk = ChunkSerializer.decode(chunkData, blockManager, extraDataManager);
         this.entityStore = chunkData.getStore();
     }
 

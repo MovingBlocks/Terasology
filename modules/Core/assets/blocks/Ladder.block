@@ -1,9 +1,0 @@
-{
-    "attachmentAllowed": false,
-    "family": "horizontal",
-    "climbable": true,
-    "penetrable": false,
-    "shape": "engine:verticalOffsetPlane",
-    "translucent": true,
-    "doubleSided": true
-}

@@ -15,76 +15,30 @@
  */
 package org.terasology.config;
 
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
+import org.terasology.config.flexible.AutoConfig;
+import org.terasology.config.flexible.Setting;
+import org.terasology.config.flexible.constraints.NumberRangeConstraint;
 
-public class AudioConfig {
-    public static final String SOUND_VOLUME = "soundVolume";
-    public static final String MUSIC_VOLUME = "musicVolume";
+import static org.terasology.config.flexible.SettingArgument.constraint;
+import static org.terasology.config.flexible.SettingArgument.defaultValue;
+import static org.terasology.config.flexible.SettingArgument.type;
 
-    private float soundVolume;
-    private float musicVolume;
+public class AudioConfig extends AutoConfig {
+    public final Setting<Float> soundVolume =
+        setting(
+            type(Float.class),
+            defaultValue(1.0f),
+            // From AudioSettingsScreen
+            constraint(new NumberRangeConstraint<>(0.0f, 1.0f, true, true))
+        );
+
+    public final Setting<Float> musicVolume =
+        setting(
+            type(Float.class),
+            defaultValue(1.0f),
+            constraint(new NumberRangeConstraint<>(0.0f, 1.0f, true, true))
+        );
+
+    // TODO: Convert into Setting -- no uses yet
     private boolean disableSound;
-
-    private transient PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
-
-    /**
-     * @return the sound volume as a float, with 0 meaning no sound and 100 (or 1?) being the maximum volume.
-     */
-    public float getSoundVolume() {
-        return soundVolume;
-    }
-
-    /**
-     * @param soundVolume Sets the sound volume offering both the new as well as prior value if needed
-     */
-    public void setSoundVolume(float soundVolume) {
-        float oldValue = this.soundVolume;
-        this.soundVolume = soundVolume;
-        propertyChangeSupport.firePropertyChange(SOUND_VOLUME, oldValue, soundVolume);
-    }
-
-    /**
-     * @returns the music volume as a float, 0 meaning no music and 100 (or 1?) meaning music at the highest volume.
-     */
-    public float getMusicVolume() {
-        return musicVolume;
-    }
-
-    /**
-     * @param musicVolume Sets the music volume offering both the new as well as prior value if needed
-     */
-    public void setMusicVolume(float musicVolume) {
-        float oldValue = this.musicVolume;
-        this.musicVolume = musicVolume;
-        propertyChangeSupport.firePropertyChange(MUSIC_VOLUME, oldValue, musicVolume);
-    }
-
-    /**
-     * @return whether sound is disabled
-     */
-    public boolean isDisableSound() {
-        return disableSound;
-    }
-
-    /**
-     * @param disableSound whether sound is disabled
-     */
-    public void setDisableSound(boolean disableSound) {
-        this.disableSound = disableSound;
-    }
-
-    /**
-     * @param changeListener The PropertyChangeListener to subscribe to
-     */
-    public void subscribe(PropertyChangeListener changeListener) {
-        this.propertyChangeSupport.addPropertyChangeListener(changeListener);
-    }
-
-    /**
-     * @param changeListener The PropertyChangeListener to unsusbcribe from
-     */
-    public void unsubscribe(PropertyChangeListener changeListener) {
-        this.propertyChangeSupport.removePropertyChangeListener(changeListener);
-    }
 }

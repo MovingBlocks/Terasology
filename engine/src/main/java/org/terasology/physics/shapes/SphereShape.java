@@ -19,4 +19,8 @@ package org.terasology.physics.shapes;
  * Represents a sphere collision shape in the physics engine.
  */
 public interface SphereShape extends CollisionShape {
+    /**
+     * Returns the radius of the sphere shape.
+     */
+    float getRadius();
 }

@@ -38,6 +38,7 @@ import org.terasology.registry.CoreRegistry;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -88,6 +89,35 @@ public class WorldSerializerImpl implements WorldSerializer {
         return world.build();
     }
 
+    @Override
+    public EntityData.GlobalStore serializeWorld(boolean verbose, List<Class<? extends Component>> filterComponents) {
+        if (filterComponents == null) {
+            return serializeWorld(true);
+        }
+        final EntityData.GlobalStore.Builder world = EntityData.GlobalStore.newBuilder();
+
+        if (!verbose) {
+            writeComponentTypeTable(world);
+        }
+
+        for (Prefab prefab : prefabManager.listPrefabs()) {
+            if (prefab.hasAnyComponents(filterComponents)) {
+                world.addPrefab(prefabSerializer.serialize(prefab));
+            }
+        }
+
+        for (EntityRef entity : entityManager.getAllEntities()) {
+            if ((verbose || entity.isPersistent()) && entity.hasAnyComponents(filterComponents)) {
+                world.addEntity(entitySerializer.serialize(entity));
+            }
+        }
+
+        writeIdInfo(world);
+
+        entitySerializer.removeComponentIdMapping();
+        prefabSerializer.removeComponentIdMapping();
+        return world.build();
+    }
 
     @Override
     public void deserializeWorld(EntityData.GlobalStore world) {

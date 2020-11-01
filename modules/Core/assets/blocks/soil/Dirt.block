@@ -1,6 +1,0 @@
-/**
- * Dirt is pretty basic
- */
-{
-    "basedOn": "core:soil"
-}

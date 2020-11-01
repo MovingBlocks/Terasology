@@ -38,6 +38,7 @@ import org.jboss.netty.channel.socket.nio.NioClientSocketChannelFactory;
 import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.NetworkConfig;
 import org.terasology.context.Context;
@@ -72,21 +73,19 @@ import org.terasology.network.internal.pipelineFactory.TerasologyClientPipelineF
 import org.terasology.network.internal.pipelineFactory.TerasologyServerPipelineFactory;
 import org.terasology.network.serialization.NetComponentSerializeCheck;
 import org.terasology.network.serialization.NetEntityRefTypeHandler;
+import org.terasology.nui.Color;
 import org.terasology.persistence.PlayerStore;
 import org.terasology.persistence.StorageManager;
 import org.terasology.persistence.serializers.EventSerializer;
 import org.terasology.persistence.serializers.NetworkEntitySerializer;
-import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
+import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.protobuf.NetData;
 import org.terasology.reflection.metadata.ClassLibrary;
 import org.terasology.reflection.metadata.ClassMetadata;
 import org.terasology.reflection.metadata.FieldMetadata;
 import org.terasology.registry.CoreRegistry;
-import org.terasology.rendering.nui.Color;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;
-import org.terasology.world.biomes.Biome;
-import org.terasology.world.biomes.BiomeManager;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.chunks.remoteChunkProvider.RemoteChunkProvider;
@@ -119,7 +118,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
 
     // Shared
     private Context context;
-    private Optional<HibernationManager> hibernationSettings = Optional.empty();
+    private Optional<HibernationManager> hibernationSettings;
     private NetworkConfig config;
     private NetworkMode mode = NetworkMode.NONE;
     private EngineEntityManager entityManager;
@@ -128,7 +127,6 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     private EventSerializer eventSerializer;
     private NetworkEntitySerializer entitySerializer;
     private BlockManager blockManager;
-    private BiomeManager biomeManager;
     private OwnershipHelper ownershipHelper;
 
     private ChannelFactory factory;
@@ -285,7 +283,6 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
         clientList.clear();
         netClientList.clear();
         blockManager = null;
-        biomeManager = null;
         ownerLookup.clear();
         ownedLookup.clear();
         ownershipHelper = null;
@@ -531,7 +528,6 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
         this.entityManager = newEntityManager;
         this.entityManager.subscribeForChanges(this);
         this.blockManager = context.get(BlockManager.class);
-        this.biomeManager = context.get(BiomeManager.class);
         this.ownershipHelper = new OwnershipHelper(newEntityManager.getComponentLibrary());
         this.storageManager = context.get(StorageManager.class);
         this.eventLibrary = newEventLibrary;
@@ -539,12 +535,12 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
 
         context.get(ComponentSystemManager.class).register(new NetworkEntitySystem(this), "engine:networkEntitySystem");
 
-        TypeSerializationLibrary typeSerializationLibrary = new TypeSerializationLibrary(entityManager.getTypeSerializerLibrary());
-        typeSerializationLibrary.add(EntityRef.class, new NetEntityRefTypeHandler(this, blockEntityRegistry));
+        TypeHandlerLibrary typeHandlerLibrary = new TypeHandlerLibrary(entityManager.getTypeSerializerLibrary());
+        typeHandlerLibrary.addTypeHandler(EntityRef.class, new NetEntityRefTypeHandler(this, blockEntityRegistry));
         // TODO: Add network override types here (that use id lookup tables)
 
-        eventSerializer = new EventSerializer(eventLibrary, typeSerializationLibrary);
-        entitySerializer = new NetworkEntitySerializer(newEntityManager, entityManager.getComponentLibrary(), typeSerializationLibrary);
+        eventSerializer = new EventSerializer(eventLibrary, typeHandlerLibrary);
+        entitySerializer = new NetworkEntitySerializer(newEntityManager, entityManager.getComponentLibrary(), typeHandlerLibrary);
         entitySerializer.setComponentSerializeCheck(new NetComponentSerializeCheck());
 
         if (mode == NetworkMode.CLIENT) {
@@ -877,11 +873,6 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
             serverInfoMessageBuilder.addBlockId(blockMapping.getValue());
             serverInfoMessageBuilder.addBlockName(blockMapping.getKey());
         }
-        for (Biome biome : biomeManager.getBiomes()) {
-            serverInfoMessageBuilder.addBiomeId(biome.getId());
-            short shortId = biomeManager.getBiomeShortId(biome);
-            serverInfoMessageBuilder.addBiomeShortId(shortId);
-        }
         for (BlockFamily registeredBlockFamily : blockManager.listRegisteredBlockFamilies()) {
             serverInfoMessageBuilder.addRegisterBlockFamily(registeredBlockFamily.getURI().toString());
         }
@@ -971,7 +962,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     private <T> Map<Class<? extends T>, Integer> applySerializationInfo(List<NetData.SerializationInfo> infoList, ClassLibrary<T> classLibrary) {
         Map<Class<? extends T>, Integer> idTable = Maps.newHashMap();
         for (NetData.SerializationInfo info : infoList) {
-            ClassMetadata<? extends T, ?> metadata = classLibrary.getMetadata(new SimpleUri(info.getName()));
+            ClassMetadata<? extends T, ?> metadata = classLibrary.getMetadata(new ResourceUrn(info.getName()));
             if (metadata != null) {
                 idTable.put(metadata.getType(), info.getId());
                 for (int i = 0; i < info.getFieldIds().size(); ++i) {

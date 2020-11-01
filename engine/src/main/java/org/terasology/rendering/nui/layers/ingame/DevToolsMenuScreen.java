@@ -18,7 +18,8 @@ package org.terasology.rendering.nui.layers.ingame;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
-import org.terasology.rendering.nui.WidgetUtil;
+import org.terasology.nui.WidgetUtil;
+import org.terasology.rendering.nui.animation.MenuAnimationSystems;
 import org.terasology.rendering.nui.editor.systems.NUIEditorSystem;
 import org.terasology.rendering.nui.editor.systems.NUISkinEditorSystem;
 
@@ -36,10 +37,12 @@ public class DevToolsMenuScreen extends CoreScreenLayer {
 
     @Override
     public void initialise() {
+        setAnimationSystem(MenuAnimationSystems.createDefaultSwipeAnimation());
+
         WidgetUtil.trySubscribe(this, "nuiEditor", button -> nuiEditorSystem.toggleEditor());
         WidgetUtil.trySubscribe(this, "nuiSkinEditor", button -> nuiSkinEditorSystem.toggleEditor());
         WidgetUtil.trySubscribe(this, "btEditor", button -> getManager().toggleScreen("engine:behaviorEditorScreen"));
-        WidgetUtil.trySubscribe(this, "close", button -> getManager().closeScreen(ASSET_URI));
+        WidgetUtil.trySubscribe(this, "close", button -> triggerBackAnimation());
     }
 
     @Override

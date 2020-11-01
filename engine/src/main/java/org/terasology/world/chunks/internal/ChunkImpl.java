@@ -17,7 +17,7 @@ package org.terasology.world.chunks.internal;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
-
+import org.joml.Vector3ic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.math.AABB;
@@ -28,8 +28,6 @@ import org.terasology.math.geom.Vector3i;
 import org.terasology.monitoring.chunk.ChunkMonitor;
 import org.terasology.protobuf.EntityData;
 import org.terasology.rendering.primitives.ChunkMesh;
-import org.terasology.world.biomes.Biome;
-import org.terasology.world.biomes.BiomeManager;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.chunks.Chunk;
@@ -41,7 +39,6 @@ import org.terasology.world.chunks.blockdata.TeraDenseArray16Bit;
 import org.terasology.world.chunks.blockdata.TeraDenseArray8Bit;
 import org.terasology.world.chunks.deflate.TeraDeflator;
 import org.terasology.world.chunks.deflate.TeraStandardDeflator;
-import org.terasology.world.liquid.LiquidData;
 
 import java.text.DecimalFormat;
 
@@ -63,7 +60,6 @@ public class ChunkImpl implements Chunk {
     private final Vector3i chunkPos = new Vector3i();
 
     private BlockManager blockManager;
-    private BiomeManager biomeManager;
 
     private TeraArray sunlightData;
     private TeraArray sunlightRegenData;
@@ -71,10 +67,6 @@ public class ChunkImpl implements Chunk {
 
     private TeraArray blockData;
     private volatile TeraArray blockDataSnapshot;
-    private TeraArray liquidData;
-    private volatile TeraArray liquidDataSnapshot;
-    private TeraArray biomeData;
-    private volatile TeraArray biomeDataSnapshot;
     private TeraArray[] extraData;
     private volatile TeraArray[] extraDataSnapshots;
 
@@ -89,33 +81,27 @@ public class ChunkImpl implements Chunk {
     // Rendering
     private ChunkMesh activeMesh;
     private ChunkMesh pendingMesh;
-    private boolean adjacentChunksReady;
 
-    public ChunkImpl(int x, int y, int z, BlockManager blockManager, BiomeManager biomeManager, ExtraBlockDataManager extraDataManager) {
-        this(new Vector3i(x, y, z), blockManager, biomeManager, extraDataManager);
+    public ChunkImpl(int x, int y, int z, BlockManager blockManager, ExtraBlockDataManager extraDataManager) {
+        this(new Vector3i(x, y, z), blockManager, extraDataManager);
     }
 
-    public ChunkImpl(Vector3i chunkPos, BlockManager blockManager, BiomeManager biomeManager, ExtraBlockDataManager extraDataManager) {
-        this(chunkPos, new TeraDenseArray16Bit(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z),
-                new TeraDenseArray8Bit(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z),
-                new TeraDenseArray8Bit(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z),
+    public ChunkImpl(Vector3i chunkPos, BlockManager blockManager, ExtraBlockDataManager extraDataManager) {
+        this(chunkPos,
+                new TeraDenseArray16Bit(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z),
                 extraDataManager.makeDataArrays(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z),
-                blockManager, biomeManager);
+                blockManager);
     }
 
-    public ChunkImpl(Vector3i chunkPos, TeraArray blocks, TeraArray liquid, TeraArray biome, TeraArray[] extra, BlockManager blockManager,
-                     BiomeManager biomeManager) {
+    public ChunkImpl(Vector3i chunkPos, TeraArray blocks, TeraArray[] extra, BlockManager blockManager) {
         this.chunkPos.set(Preconditions.checkNotNull(chunkPos));
         this.blockData = Preconditions.checkNotNull(blocks);
-        this.liquidData = Preconditions.checkNotNull(liquid);
-        this.biomeData = Preconditions.checkNotNull(biome);
         this.extraData = Preconditions.checkNotNull(extra);
         sunlightData = new TeraDenseArray8Bit(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
         sunlightRegenData = new TeraDenseArray8Bit(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
         lightData = new TeraDenseArray8Bit(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
         dirty = true;
         this.blockManager = blockManager;
-        this.biomeManager = biomeManager;
         region = Region3i.createFromMinAndSize(new Vector3i(chunkPos.x * ChunkConstants.SIZE_X, chunkPos.y * ChunkConstants.SIZE_Y, chunkPos.z * ChunkConstants.SIZE_Z),
                 ChunkConstants.CHUNK_SIZE);
         ChunkMonitor.fireChunkCreated(this);
@@ -124,6 +110,11 @@ public class ChunkImpl implements Chunk {
     @Override
     public Vector3i getPosition() {
         return new Vector3i(chunkPos);
+    }
+
+    @Override
+    public org.joml.Vector3i getPosition(org.joml.Vector3i dest) {
+        return dest.set(chunkPos.x,chunkPos.y,chunkPos.z);
     }
 
     @Override
@@ -139,20 +130,24 @@ public class ChunkImpl implements Chunk {
     @Override
     public int getEstimatedMemoryConsumptionInBytes() {
         int extraDataSize = 0;
-        for (int i = 0; i < extraData.length; i++) {
-            extraDataSize += extraData[i].getEstimatedMemoryConsumptionInBytes();
+        for (TeraArray extraDatum : extraData) {
+            extraDataSize += extraDatum.getEstimatedMemoryConsumptionInBytes();
         }
         return blockData.getEstimatedMemoryConsumptionInBytes()
                 + sunlightData.getEstimatedMemoryConsumptionInBytes()
                 + sunlightRegenData.getEstimatedMemoryConsumptionInBytes()
                 + lightData.getEstimatedMemoryConsumptionInBytes()
-                + liquidData.getEstimatedMemoryConsumptionInBytes()
-                + biomeData.getEstimatedMemoryConsumptionInBytes()
                 + extraDataSize;
     }
 
     @Override
     public final Block getBlock(BaseVector3i pos) {
+        short id = (short) blockData.get(pos.x(), pos.y(), pos.z());
+        return blockManager.getBlock(id);
+    }
+
+    @Override
+    public Block getBlock(Vector3ic pos) {
         short id = (short) blockData.get(pos.x(), pos.y(), pos.z());
         return blockManager.getBlock(id);
     }
@@ -172,17 +167,17 @@ public class ChunkImpl implements Chunk {
             blockData = blockData.copy();
         }
         int oldValue = blockData.set(x, y, z, block.getId());
-        if (oldValue != block.getId()) {
-            if (!block.isLiquid()) {
-                setLiquid(x, y, z, new LiquidData());
-            }
-        }
         return blockManager.getBlock((short) oldValue);
     }
 
     @Override
     public Block setBlock(BaseVector3i pos, Block block) {
         return setBlock(pos.x(), pos.y(), pos.z(), block);
+    }
+
+    @Override
+    public Block setBlock(Vector3ic pos, Block block) {
+        return setBlock(pos.x(),pos.y(),pos.z(),block);
     }
 
     @Override
@@ -249,64 +244,20 @@ public class ChunkImpl implements Chunk {
     }
 
     @Override
-    public void setLiquid(BaseVector3i pos, LiquidData state) {
-        setLiquid(pos.x(), pos.y(), pos.z(), state);
-    }
-
-    @Override
-    public void setLiquid(int x, int y, int z, LiquidData newState) {
-        byte newValue = newState.toByte();
-        if (liquidData == liquidDataSnapshot) {
-            liquidData = liquidData.copy();
-        }
-        liquidData.set(x, y, z, newValue);
-    }
-
-    @Override
-    public LiquidData getLiquid(BaseVector3i pos) {
-        return getLiquid(pos.x(), pos.y(), pos.z());
-    }
-
-    @Override
-    public LiquidData getLiquid(int x, int y, int z) {
-        return new LiquidData((byte) liquidData.get(x, y, z));
-    }
-
-    @Override
-    public Biome getBiome(int x, int y, int z) {
-        return biomeManager.getBiomeByShortId((short) biomeData.get(x, y, z));
-    }
-
-    @Override
-    public Biome getBiome(BaseVector3i pos) {
-        return getBiome(pos.x(), pos.y(), pos.z());
-    }
-
-    @Override
-    public Biome setBiome(int x, int y, int z, Biome biome) {
-        if (biomeData == biomeDataSnapshot) {
-            biomeData = biomeData.copy();
-        }
-        short shortId = biomeManager.getBiomeShortId(biome);
-        short previousShortId = (short) biomeData.set(x, y, z, shortId);
-        return biomeManager.getBiomeByShortId(previousShortId);
-    }
-
-    @Override
-    public Biome setBiome(BaseVector3i pos, Biome biome) {
-        return setBiome(pos.x(), pos.y(), pos.z(), biome);
-    }
-    
-    @Override
     public int getExtraData(int index, int x, int y, int z) {
         return extraData[index].get(x, y, z);
     }
-    
+
     @Override
     public int getExtraData(int index, BaseVector3i pos) {
         return getExtraData(index, pos.x(), pos.y(), pos.z());
     }
-    
+
+    @Override
+    public int getExtraData(int index, Vector3ic pos) {
+        return getExtraData(index, pos.x(), pos.y(), pos.z());
+    }
+
     @Override
     public void setExtraData(int index, int x, int y, int z, int value) {
         if (extraDataSnapshots != null && extraData[index] == extraDataSnapshots[index]) {
@@ -314,7 +265,12 @@ public class ChunkImpl implements Chunk {
         }
         extraData[index].set(x, y, z, value);
     }
-    
+
+    @Override
+    public void setExtraData(int index, Vector3ic pos, int value) {
+        setExtraData(index, pos.x(), pos.y(), pos.z(), value);
+    }
+
     @Override
     public void setExtraData(int index, BaseVector3i pos, int value) {
         setExtraData(index, pos.x(), pos.y(), pos.z(), value);
@@ -323,6 +279,11 @@ public class ChunkImpl implements Chunk {
     @Override
     public Vector3i getChunkWorldOffset() {
         return new Vector3i(getChunkWorldOffsetX(), getChunkWorldOffsetY(), getChunkWorldOffsetZ());
+    }
+
+    @Override
+    public org.joml.Vector3i getChunkWorldOffset(org.joml.Vector3i dest) {
+        return dest.set(getChunkWorldOffsetX(), getChunkWorldOffsetY(), getChunkWorldOffsetZ());
     }
 
     @Override
@@ -346,8 +307,18 @@ public class ChunkImpl implements Chunk {
     }
 
     @Override
+    public org.joml.Vector3i chunkToWorldPosition(Vector3ic blockPos, org.joml.Vector3i dest) {
+        return chunkToWorldPosition(blockPos.x(), blockPos.y(), blockPos.z(), dest);
+    }
+
+    @Override
     public Vector3i chunkToWorldPosition(int x, int y, int z) {
         return new Vector3i(chunkToWorldPositionX(x), chunkToWorldPositionY(y), chunkToWorldPositionZ(z));
+    }
+
+    @Override
+    public org.joml.Vector3i chunkToWorldPosition(int x, int y, int z, org.joml.Vector3i dest) {
+        return dest.set(chunkToWorldPositionX(x), chunkToWorldPositionY(y), chunkToWorldPositionZ(z));
     }
 
     @Override
@@ -385,36 +356,28 @@ public class ChunkImpl implements Chunk {
             int sunlightSize = sunlightData.getEstimatedMemoryConsumptionInBytes();
             int sunlightRegenSize = sunlightRegenData.getEstimatedMemoryConsumptionInBytes();
             int lightSize = lightData.getEstimatedMemoryConsumptionInBytes();
-            int liquidSize = liquidData.getEstimatedMemoryConsumptionInBytes();
-            int biomeSize = biomeData.getEstimatedMemoryConsumptionInBytes();
             int extraSize = 0;
-            for (int i = 0; i < extraData.length; i++) {
-                extraSize += extraData[i].getEstimatedMemoryConsumptionInBytes();
+            for (TeraArray extraDatum : extraData) {
+                extraSize += extraDatum.getEstimatedMemoryConsumptionInBytes();
             }
-            int totalSize = blocksSize + sunlightRegenSize + sunlightSize + lightSize + liquidSize + biomeSize + extraSize;
+            int totalSize = blocksSize + sunlightRegenSize + sunlightSize + lightSize + extraSize;
 
             blockData = def.deflate(blockData);
             lightData = def.deflate(lightData);
-            liquidData = def.deflate(liquidData);
-            biomeData = def.deflate(biomeData);
             for (int i = 0; i < extraData.length; i++) {
                 extraData[i] = def.deflate(extraData[i]);
             }
 
             int blocksReduced = blockData.getEstimatedMemoryConsumptionInBytes();
             int lightReduced = lightData.getEstimatedMemoryConsumptionInBytes();
-            int liquidReduced = liquidData.getEstimatedMemoryConsumptionInBytes();
-            int biomeReduced = biomeData.getEstimatedMemoryConsumptionInBytes();
             int extraReduced = 0;
-            for (int i = 0; i < extraData.length; i++) {
-                extraReduced += extraData[i].getEstimatedMemoryConsumptionInBytes();
+            for (TeraArray extraDatum : extraData) {
+                extraReduced += extraDatum.getEstimatedMemoryConsumptionInBytes();
             }
-            int totalReduced = blocksReduced + sunlightRegenSize + sunlightSize + lightReduced + liquidReduced + biomeReduced + extraReduced;
+            int totalReduced = blocksReduced + sunlightRegenSize + sunlightSize + lightReduced + extraReduced;
 
             double blocksPercent = 100d - (100d / blocksSize * blocksReduced);
             double lightPercent = 100d - (100d / lightSize * lightReduced);
-            double liquidPercent = 100d - (100d / liquidSize * liquidReduced);
-            double biomePercent = 100d - (100d / biomeSize * biomeReduced);
             double extraPercent = 100d - (100d / extraSize * extraReduced);
             double totalPercent = 100d - (100d / totalSize * totalReduced);
 
@@ -424,8 +387,6 @@ public class ChunkImpl implements Chunk {
                             "bytes, total-deflated-by: {}%, " +
                             "blocks-deflated-by={}%, " +
                             "light-deflated-by={}%, " +
-                            "liquid-deflated-by={}%, " +
-                            "biome-deflated-by={}%, " +
                             "extra-data-deflated-by={}%",
                     chunkPos,
                     SIZE_FORMAT.format(totalSize),
@@ -433,16 +394,12 @@ public class ChunkImpl implements Chunk {
                     PERCENT_FORMAT.format(totalPercent),
                     PERCENT_FORMAT.format(blocksPercent),
                     PERCENT_FORMAT.format(lightPercent),
-                    PERCENT_FORMAT.format(liquidPercent),
-                    PERCENT_FORMAT.format(biomePercent),
                     PERCENT_FORMAT.format(extraPercent));
             ChunkMonitor.fireChunkDeflated(this, totalSize, totalReduced);
         } else {
             final int oldSize = getEstimatedMemoryConsumptionInBytes();
             blockData = def.deflate(blockData);
             lightData = def.deflate(lightData);
-            liquidData = def.deflate(liquidData);
-            biomeData = def.deflate(biomeData);
             for (int i = 0; i < extraData.length; i++) {
                 extraData[i] = def.deflate(extraData[i]);
             }
@@ -458,15 +415,14 @@ public class ChunkImpl implements Chunk {
             int sunlightSize = sunlightData.getEstimatedMemoryConsumptionInBytes();
             int sunlightRegenSize = sunlightRegenData.getEstimatedMemoryConsumptionInBytes();
             int lightSize = lightData.getEstimatedMemoryConsumptionInBytes();
-            int liquidSize = liquidData.getEstimatedMemoryConsumptionInBytes();
-            int totalSize = blocksSize + sunlightRegenSize + sunlightSize + lightSize + liquidSize;
+            int totalSize = blocksSize + sunlightRegenSize + sunlightSize + lightSize;
 
             sunlightData = def.deflate(sunlightData);
             sunlightRegenData = def.deflate(sunlightRegenData);
 
             int sunlightReduced = sunlightData.getEstimatedMemoryConsumptionInBytes();
             int sunlightRegenReduced = sunlightRegenData.getEstimatedMemoryConsumptionInBytes();
-            int totalReduced = blocksSize + sunlightRegenReduced + sunlightReduced + lightSize + liquidSize;
+            int totalReduced = blocksSize + sunlightRegenReduced + sunlightReduced + lightSize;
 
             double sunlightPercent = 100d - (100d / sunlightSize * sunlightReduced);
             double sunlightRegenPercent = 100d - (100d / sunlightRegenSize * sunlightRegenReduced);
@@ -477,8 +433,8 @@ public class ChunkImpl implements Chunk {
                             "bytes, size-after: {} " +
                             "bytes, total-deflated-by: {}%, " +
                             "sunlight-deflated-by={}%, " +
-                            "sunlight-regen-deflated-by={}%, " +
-                            chunkPos,
+                            "sunlight-regen-deflated-by={}%",
+                    chunkPos,
                     SIZE_FORMAT.format(totalSize),
                     SIZE_FORMAT.format(totalReduced),
                     PERCENT_FORMAT.format(totalPercent),
@@ -622,7 +578,7 @@ public class ChunkImpl implements Chunk {
 
     @Override
     public EntityData.ChunkStore.Builder encode() {
-        return ChunkSerializer.encode(chunkPos, blockData, liquidData, biomeData, extraData);
+        return ChunkSerializer.encode(chunkPos, blockData, extraData);
     }
 
     /**
@@ -631,8 +587,6 @@ public class ChunkImpl implements Chunk {
      */
     public void createSnapshot() {
         this.blockDataSnapshot = this.blockData;
-        this.liquidDataSnapshot = this.liquidData;
-        this.biomeDataSnapshot = this.biomeData;
         this.extraDataSnapshots = new TeraArray[extraData.length];
         System.arraycopy(extraData, 0, extraDataSnapshots, 0, extraData.length);
     }
@@ -646,10 +600,8 @@ public class ChunkImpl implements Chunk {
      * @return an encoded version of the snapshot taken with {@link #createSnapshot()}.
      */
     public EntityData.ChunkStore.Builder encodeAndReleaseSnapshot() {
-        EntityData.ChunkStore.Builder result = ChunkSerializer.encode(chunkPos, blockDataSnapshot, liquidDataSnapshot, biomeDataSnapshot, extraDataSnapshots);
+        EntityData.ChunkStore.Builder result = ChunkSerializer.encode(chunkPos, blockDataSnapshot, extraDataSnapshots);
         this.blockDataSnapshot = null;
-        this.liquidDataSnapshot = null;
-        this.biomeDataSnapshot = null;
         this.extraDataSnapshots = null;
         return result;
     }

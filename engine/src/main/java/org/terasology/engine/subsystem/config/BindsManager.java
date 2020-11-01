@@ -53,7 +53,6 @@ public interface BindsManager {
      * 
      * {@link #getBindsConfig()} will only be enhanced with missing values.
      * 
-     * @param context
      */
     void updateConfigWithDefaultBinds();
 

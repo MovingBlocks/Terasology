@@ -25,7 +25,7 @@ import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.prefab.PrefabData;
 import org.terasology.persistence.serializers.EntityDataJSONFormat;
 import org.terasology.persistence.serializers.PrefabSerializer;
-import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
+import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.protobuf.EntityData;
 
 import java.io.BufferedReader;
@@ -37,12 +37,12 @@ public class PrefabFormat extends AbstractAssetFileFormat<PrefabData> {
     private static final Logger logger = LoggerFactory.getLogger(PrefabFormat.class);
 
     private ComponentLibrary componentLibrary;
-    private TypeSerializationLibrary typeSerializationLibrary;
+    private TypeHandlerLibrary typeHandlerLibrary;
 
-    public PrefabFormat(ComponentLibrary componentLibrary, TypeSerializationLibrary typeSerializationLibrary) {
+    public PrefabFormat(ComponentLibrary componentLibrary, TypeHandlerLibrary typeHandlerLibrary) {
         super("prefab");
         this.componentLibrary = componentLibrary;
-        this.typeSerializationLibrary = typeSerializationLibrary;
+        this.typeHandlerLibrary = typeHandlerLibrary;
     }
 
     @Override
@@ -51,7 +51,7 @@ public class PrefabFormat extends AbstractAssetFileFormat<PrefabData> {
             EntityData.Prefab prefabData = EntityDataJSONFormat.readPrefab(reader);
             if (prefabData != null) {
                 logger.info("Attempting to deserialize prefab {} with inputs {}", resourceUrn, inputs);
-                PrefabSerializer serializer = new PrefabSerializer(componentLibrary, typeSerializationLibrary);
+                PrefabSerializer serializer = new PrefabSerializer(componentLibrary, typeHandlerLibrary);
                 return serializer.deserialize(prefabData);
             } else {
                 throw new IOException("Failed to read prefab for '" + resourceUrn + "'");

@@ -25,7 +25,6 @@ import org.terasology.world.chunks.LitChunk;
 
 /**
  * A base world view implementation sitting on ChunkProvider.
- *
  */
 public abstract class AbstractFullWorldView implements PropagatorWorldView {
 
@@ -35,6 +34,12 @@ public abstract class AbstractFullWorldView implements PropagatorWorldView {
         this.chunkProvider = chunkProvider;
     }
 
+    /**
+     * Get's the chunk for a given position
+     *
+     * @param pos The position in the world
+     * @return The chunk for that position
+     */
     private Chunk getChunk(Vector3i pos) {
 
         return chunkProvider.getChunk(ChunkMath.calcChunkPos(pos));
@@ -44,7 +49,7 @@ public abstract class AbstractFullWorldView implements PropagatorWorldView {
     public byte getValueAt(Vector3i pos) {
         LitChunk chunk = getChunk(pos);
         if (chunk != null) {
-            return getValueAt(chunk, ChunkMath.calcBlockPos(pos.x, pos.y, pos.z));
+            return getValueAt(chunk, ChunkMath.calcRelativeBlockPos(pos.x, pos.y, pos.z));
         }
         return UNAVAILABLE;
     }
@@ -52,7 +57,7 @@ public abstract class AbstractFullWorldView implements PropagatorWorldView {
     /**
      * Obtains the relevant value from the given chunk
      *
-     * @param chunk
+     * @param chunk The chunk containing the position
      * @param pos   The internal position of the chunk to get the value from
      * @return The relevant value for this view
      */
@@ -60,7 +65,7 @@ public abstract class AbstractFullWorldView implements PropagatorWorldView {
 
     @Override
     public void setValueAt(Vector3i pos, byte value) {
-        setValueAt(getChunk(pos), ChunkMath.calcBlockPos(pos.x, pos.y, pos.z), value);
+        setValueAt(getChunk(pos), ChunkMath.calcRelativeBlockPos(pos.x, pos.y, pos.z), value);
         for (Vector3i affectedChunkPos : ChunkMath.getChunkRegionAroundWorldPos(pos, 1)) {
             Chunk dirtiedChunk = chunkProvider.getChunk(affectedChunkPos);
             if (dirtiedChunk != null) {
@@ -72,7 +77,7 @@ public abstract class AbstractFullWorldView implements PropagatorWorldView {
     /**
      * Sets the relevant value for the given chunk
      *
-     * @param chunk
+     * @param chunk The chunk containing the position
      * @param pos   The internal position of the chunk to set the value of
      * @param value The new value
      */
@@ -82,7 +87,7 @@ public abstract class AbstractFullWorldView implements PropagatorWorldView {
     public Block getBlockAt(Vector3i pos) {
         CoreChunk chunk = chunkProvider.getChunk(ChunkMath.calcChunkPos(pos));
         if (chunk != null) {
-            return chunk.getBlock(ChunkMath.calcBlockPos(pos));
+            return chunk.getBlock(ChunkMath.calcRelativeBlockPos(pos));
         }
         return null;
     }

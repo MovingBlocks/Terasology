@@ -18,12 +18,13 @@ package org.terasology.persistence.typeHandling.gson;
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.terasology.nui.Color;
 import org.terasology.persistence.typeHandling.extensionTypes.ColorTypeHandler;
-import org.terasology.rendering.nui.Color;
 
 import java.util.Objects;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class GsonTypeHandlerAdapterTest {
     private static final String OBJECT_JSON_ARRAY = "{\"color\":[222,173,190,239],\"i\":-123}";
@@ -45,12 +46,12 @@ public class GsonTypeHandlerAdapterTest {
         // Deserialize object with color as JSON array
         TestClass deserializedObject = gson.fromJson(OBJECT_JSON_ARRAY, TestClass.class);
 
-        Assert.assertEquals(OBJECT, deserializedObject);
+        assertEquals(OBJECT, deserializedObject);
 
         // Deserialize object with color as hex string
         deserializedObject = gson.fromJson(OBJECT_JSON_HEX, TestClass.class);
 
-        Assert.assertEquals(OBJECT, deserializedObject);
+        assertEquals(OBJECT, deserializedObject);
     }
 
     /**
@@ -62,7 +63,7 @@ public class GsonTypeHandlerAdapterTest {
     public void testWrite() {
         String serializedObject = gson.toJson(OBJECT);
 
-        Assert.assertEquals(OBJECT_JSON_ARRAY, serializedObject);
+        assertEquals(OBJECT_JSON_ARRAY, serializedObject);
     }
 
     private static class TestClass {

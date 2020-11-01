@@ -18,6 +18,7 @@ package org.terasology.entitySystem.metadata;
 import com.google.common.base.Predicates;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.reflection.metadata.ClassMetadata;
 import org.terasology.reflection.copy.CopyStrategy;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
@@ -41,7 +42,7 @@ public class EventMetadata<T extends Event> extends ClassMetadata<T, ReplicatedF
     private boolean lagCompensated;
     private boolean skipInstigator;
 
-    public EventMetadata(Class<T> simpleClass, CopyStrategyLibrary copyStrategies, ReflectFactory factory, SimpleUri uri) throws NoSuchMethodException {
+    public EventMetadata(Class<T> simpleClass, CopyStrategyLibrary copyStrategies, ReflectFactory factory, ResourceUrn uri) throws NoSuchMethodException {
         super(uri, simpleClass, factory, copyStrategies, Predicates.<Field>alwaysTrue());
         if (simpleClass.getAnnotation(ServerEvent.class) != null) {
             networkEventType = NetworkEventType.SERVER;
@@ -86,7 +87,7 @@ public class EventMetadata<T extends Event> extends ClassMetadata<T, ReplicatedF
     }
 
     @Override
-    protected <V> ReplicatedFieldMetadata<T, ?> createField(Field field, CopyStrategy<V> copyStrategy, ReflectFactory factory) throws InaccessibleFieldException {
-        return new ReplicatedFieldMetadata<>(this, field, copyStrategy, factory, true);
+    protected ReplicatedFieldMetadata<T, ?> createField(Field field, CopyStrategyLibrary copyStrategyLibrary, ReflectFactory factory) throws InaccessibleFieldException {
+        return new ReplicatedFieldMetadata<>(this, field, copyStrategyLibrary, factory, true);
     }
 }

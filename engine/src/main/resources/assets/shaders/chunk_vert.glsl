@@ -94,6 +94,7 @@ varying mat3 normalMatrix;
 uniform float blockScale = 1.0;
 uniform vec3 chunkPositionWorld;
 
+// waving blocks
 uniform bool animated;
 
 varying vec3 normal;
@@ -111,11 +112,20 @@ void main()
 {
 	gl_TexCoord[0] = gl_MultiTexCoord0;
 	blockHint = int(gl_TexCoord[0].z);
+	/*int*/ float animationFrameCount = gl_TexCoord[0].w;
 
     gl_TexCoord[1] = gl_MultiTexCoord1;
 
 	vertexViewPos = gl_ModelViewMatrix * gl_Vertex;
 	vertexWorldPos = gl_Vertex.xyz + chunkPositionWorld.xyz;
+	
+	if (animationFrameCount > 0) {
+	    /*int*/ float globalFrameIndex = floor(time * 6 *60*60*24/48); // 6Hz at default world time scale
+	    /*int*/ float frameIndex = mod(globalFrameIndex, animationFrameCount);
+	    gl_TexCoord[0].x += frameIndex * TEXTURE_OFFSET;
+	    gl_TexCoord[0].y += floor(gl_TexCoord[0].x) * TEXTURE_OFFSET;
+	    gl_TexCoord[0].x = mod(gl_TexCoord[0].x, 1);
+    }
 
 	sunVecView = (gl_ModelViewMatrix * vec4(sunVec.x, sunVec.y, sunVec.z, 0.0)).xyz;
 
@@ -168,4 +178,11 @@ void main()
 
     vertexProjPos = gl_ProjectionMatrix * vertexViewPos;
     gl_Position = vertexProjPos;
+
+#if defined (FEATURE_ALPHA_REJECT)
+    //TODO: find the right methods to determine which vertices have normals facing away from the viewpoint, and only alter those
+    //if (normal.x * vertexViewPos.x < 0 || normal.y * vertexViewPos.y < 0 || normal.z * vertexViewPos.z < 0) {
+        gl_Position.z -= 0.001;
+    //}
+#endif
 }

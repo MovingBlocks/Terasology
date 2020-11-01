@@ -15,9 +15,9 @@
  */
 package org.terasology.entitySystem;
 
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.terasology.assets.AssetFactory;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.assets.module.ModuleAwareAssetTypeManager;
@@ -37,8 +37,8 @@ import org.terasology.recording.RecordAndReplayCurrentStatus;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.testUtil.ModuleManagerFactory;
 
-import static junit.framework.TestCase.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
 /**
@@ -49,7 +49,7 @@ public class PojoEntityPoolTest {
     private static Context context;
     private PojoEntityManager entityManager;
 
-    @BeforeClass
+    @BeforeAll
     public static void setupClass() throws Exception {
         context = new ContextImpl();
         ModuleManager moduleManager = ModuleManagerFactory.create();
@@ -63,7 +63,7 @@ public class PojoEntityPoolTest {
         CoreRegistry.setContext(context);
     }
 
-    @Before
+    @BeforeEach
     public void setup() {
         context.put(NetworkSystem.class, mock(NetworkSystem.class));
         EntitySystemSetupUtil.addReflectionBasedLibraries(context);

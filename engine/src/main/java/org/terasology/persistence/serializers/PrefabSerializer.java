@@ -26,7 +26,7 @@ import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabData;
 import org.terasology.module.Module;
 import org.terasology.persistence.ModuleContext;
-import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
+import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.protobuf.EntityData;
 
 import java.util.Collections;
@@ -50,9 +50,9 @@ public class PrefabSerializer {
     private ComponentSerializer componentSerializer;
     private ComponentLibrary componentLibrary;
 
-    public PrefabSerializer(ComponentLibrary componentLibrary, TypeSerializationLibrary typeSerializationLibrary) {
+    public PrefabSerializer(ComponentLibrary componentLibrary, TypeHandlerLibrary typeHandlerLibrary) {
         this.componentLibrary = componentLibrary;
-        this.componentSerializer = new ComponentSerializer(componentLibrary, typeSerializationLibrary);
+        this.componentSerializer = new ComponentSerializer(componentLibrary, typeHandlerLibrary);
     }
 
     /**

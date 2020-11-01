@@ -44,7 +44,7 @@ import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.network.Client;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkSystem;
-import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
+import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.protobuf.EntityData;
 import org.terasology.recording.RecordAndReplayCurrentStatus;
 import org.terasology.recording.RecordAndReplaySerializer;
@@ -56,9 +56,6 @@ import org.terasology.utilities.FilesUtil;
 import org.terasology.utilities.concurrency.ShutdownTask;
 import org.terasology.utilities.concurrency.Task;
 import org.terasology.utilities.concurrency.TaskMaster;
-import org.terasology.world.WorldProvider;
-import org.terasology.world.biomes.Biome;
-import org.terasology.world.biomes.BiomeManager;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.chunks.Chunk;
@@ -72,7 +69,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -124,18 +120,18 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
      */
     private ComponentLibrary entityRefReplacingComponentLibrary;
 
-    public ReadWriteStorageManager(Path savePath, ModuleEnvironment environment, EngineEntityManager entityManager, BlockManager blockManager,
-                                   BiomeManager biomeManager, ExtraBlockDataManager extraDataManager, RecordAndReplaySerializer recordAndReplaySerializer,
+    public ReadWriteStorageManager(Path savePath, ModuleEnvironment environment, EngineEntityManager entityManager, BlockManager blockManager
+            , ExtraBlockDataManager extraDataManager, RecordAndReplaySerializer recordAndReplaySerializer,
                                    RecordAndReplayUtils recordAndReplayUtils, RecordAndReplayCurrentStatus recordAndReplayCurrentStatus) throws IOException {
-        this(savePath, environment, entityManager, blockManager, biomeManager, extraDataManager,
+        this(savePath, environment, entityManager, blockManager, extraDataManager,
             true, recordAndReplaySerializer, recordAndReplayUtils, recordAndReplayCurrentStatus);
     }
 
     ReadWriteStorageManager(Path savePath, ModuleEnvironment environment, EngineEntityManager entityManager,
-                                   BlockManager blockManager, BiomeManager biomeManager, ExtraBlockDataManager extraDataManager, boolean storeChunksInZips,
+                                   BlockManager blockManager, ExtraBlockDataManager extraDataManager, boolean storeChunksInZips,
                                    RecordAndReplaySerializer recordAndReplaySerializer, RecordAndReplayUtils recordAndReplayUtils,
                             RecordAndReplayCurrentStatus recordAndReplayCurrentStatus) throws IOException {
-        super(savePath, environment, entityManager, blockManager, biomeManager, extraDataManager, storeChunksInZips);
+        super(savePath, environment, entityManager, blockManager, extraDataManager, storeChunksInZips);
 
         entityManager.subscribeForDestruction(this);
         entityManager.subscribeForChanges(this);
@@ -157,7 +153,7 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
     private static EngineEntityManager createPrivateEntityManager(ComponentLibrary componentLibrary) {
         PojoEntityManager pojoEntityManager = new PojoEntityManager();
         pojoEntityManager.setComponentLibrary(componentLibrary);
-        pojoEntityManager.setTypeSerializerLibrary(CoreRegistry.get(TypeSerializationLibrary.class));
+        pojoEntityManager.setTypeSerializerLibrary(CoreRegistry.get(TypeHandlerLibrary.class));
         return pojoEntityManager;
     }
 
@@ -363,8 +359,6 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
 
     private void addGameManifestToSaveTransaction(SaveTransactionBuilder saveTransactionBuilder) {
         BlockManager blockManager = CoreRegistry.get(BlockManager.class);
-        BiomeManager biomeManager = CoreRegistry.get(BiomeManager.class);
-        WorldProvider worldProvider = CoreRegistry.get(WorldProvider.class);
         UniverseConfig universeConfig = config.getUniverseConfig();
         Time time = CoreRegistry.get(Time.class);
         Game game = CoreRegistry.get(Game.class);
@@ -380,18 +374,10 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
         }
         gameManifest.setRegisteredBlockFamilies(registeredBlockFamilies);
         gameManifest.setBlockIdMap(blockManager.getBlockIdMap());
-        List<Biome> biomes = biomeManager.getBiomes();
-        Map<String, Short> biomeIdMap = new HashMap<>(biomes.size());
-        for (Biome biome : biomes) {
-            short shortId = biomeManager.getBiomeShortId(biome);
-            String id = biomeManager.getBiomeId(biome);
-            biomeIdMap.put(id, shortId);
-        }
         List<WorldInfo> worlds = universeConfig.getWorlds();
         for (WorldInfo worldInfo: worlds) {
             gameManifest.addWorld(worldInfo);
         }
-        gameManifest.setBiomeIdMap(biomeIdMap);
         saveTransactionBuilder.setGameManifest(gameManifest);
     }
 
@@ -422,7 +408,7 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
         logger.info("Saving - Creating game snapshot");
         PerformanceMonitor.startActivity("Saving");
         ComponentSystemManager componentSystemManager = CoreRegistry.get(ComponentSystemManager.class);
-        for (ComponentSystem sys : componentSystemManager.iterateAll()) {
+        for (ComponentSystem sys : componentSystemManager.getAllSystems()) {
             sys.preSave();
         }
 
@@ -434,7 +420,7 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
             saveGamePreviewImage();
         }
 
-        for (ComponentSystem sys : componentSystemManager.iterateAll()) {
+        for (ComponentSystem sys : componentSystemManager.getAllSystems()) {
             sys.postSave();
         }
         PerformanceMonitor.endActivity();
@@ -446,14 +432,14 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
         logger.info("Auto Saving - Creating game snapshot");
         PerformanceMonitor.startActivity("Auto Saving");
         ComponentSystemManager componentSystemManager = CoreRegistry.get(ComponentSystemManager.class);
-        for (ComponentSystem sys : componentSystemManager.iterateAll()) {
+        for (ComponentSystem sys : componentSystemManager.getAllSystems()) {
             sys.preAutoSave();
         }
 
         saveTransaction = createSaveTransaction();
         saveThreadManager.offer(saveTransaction);
 
-        for (ComponentSystem sys : componentSystemManager.iterateAll()) {
+        for (ComponentSystem sys : componentSystemManager.getAllSystems()) {
             sys.postAutoSave();
         }
 

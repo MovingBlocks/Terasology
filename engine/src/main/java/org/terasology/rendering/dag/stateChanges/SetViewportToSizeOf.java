@@ -18,7 +18,7 @@ package org.terasology.rendering.dag.stateChanges;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.dag.StateChange;
 import org.terasology.rendering.opengl.FBO;
-import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
+import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFbo;
 
 import java.util.Objects;
 
@@ -47,7 +47,7 @@ public final class SetViewportToSizeOf implements StateChange {
     @Override
     public StateChange getDefaultInstance() {
         if (defaultInstance == null) {
-            defaultInstance = new SetViewportToSizeOf(CoreRegistry.get(DisplayResolutionDependentFBOs.class).getGBufferPair().getLastUpdatedFbo());
+            defaultInstance = new SetViewportToSizeOf(CoreRegistry.get(DisplayResolutionDependentFbo.class).getGBufferPair().getLastUpdatedFbo());
         }
         return defaultInstance;
     }

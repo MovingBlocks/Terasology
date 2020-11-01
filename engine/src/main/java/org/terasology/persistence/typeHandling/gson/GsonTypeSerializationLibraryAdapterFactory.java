@@ -20,20 +20,21 @@ import com.google.gson.TypeAdapter;
 import com.google.gson.TypeAdapterFactory;
 import com.google.gson.reflect.TypeToken;
 import org.terasology.persistence.typeHandling.TypeHandler;
-import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
+import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
+import org.terasology.persistence.typeHandling.coreTypes.ObjectFieldMapTypeHandler;
 
 import java.lang.reflect.Type;
 
 /**
  * A Gson {@link TypeAdapterFactory} that dynamically looks up the {@link TypeHandler} from a
- * {@link TypeSerializationLibrary} for each type encountered, and creates a {@link GsonTypeHandlerAdapter} with
+ * {@link TypeHandlerLibrary} for each type encountered, and creates a {@link GsonTypeHandlerAdapter} with
  * the retrieved {@link TypeHandler}.
  */
 public class GsonTypeSerializationLibraryAdapterFactory implements TypeAdapterFactory {
-    private final TypeSerializationLibrary typeSerializationLibrary;
+    private final TypeHandlerLibrary typeHandlerLibrary;
 
-    public GsonTypeSerializationLibraryAdapterFactory(TypeSerializationLibrary typeSerializationLibrary) {
-        this.typeSerializationLibrary = typeSerializationLibrary;
+    public GsonTypeSerializationLibraryAdapterFactory(TypeHandlerLibrary typeHandlerLibrary) {
+        this.typeHandlerLibrary = typeHandlerLibrary;
     }
 
     @SuppressWarnings("unchecked")
@@ -41,9 +42,9 @@ public class GsonTypeSerializationLibraryAdapterFactory implements TypeAdapterFa
     public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> type) {
         Type rawType = type.getType();
 
-        TypeHandler<T> typeHandler = (TypeHandler<T>) typeSerializationLibrary.getHandlerFor(rawType);
+        TypeHandler<T> typeHandler = (TypeHandler<T>) typeHandlerLibrary.getTypeHandler(rawType).orElse(null);
 
-        if (typeHandler == null) {
+        if (typeHandler == null || typeHandler instanceof ObjectFieldMapTypeHandler) {
             return null;
         }
 

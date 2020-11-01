@@ -16,20 +16,22 @@
 
 package org.terasology.entitySystem.metadata;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.reflections.Reflections;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.context.Context;
 import org.terasology.context.internal.ContextImpl;
 import org.terasology.engine.SimpleUri;
 import org.terasology.entitySystem.stubs.OwnerComponent;
 import org.terasology.entitySystem.stubs.StringComponent;
-import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
+import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.reflect.ReflectFactory;
 import org.terasology.reflection.reflect.ReflectionReflectFactory;
 
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  */
@@ -39,7 +41,7 @@ public class ComponentMetadataTest {
     private ReflectFactory reflectFactory = new ReflectionReflectFactory();
     private CopyStrategyLibrary copyStrategies = new CopyStrategyLibrary(reflectFactory);
 
-    @Before
+    @BeforeEach
     public void prepare() {
         context = new ContextImpl();
         context.put(ReflectFactory.class, reflectFactory);
@@ -48,18 +50,20 @@ public class ComponentMetadataTest {
 
     @Test
     public void testStaticFieldsIgnored() {
-        EntitySystemLibrary entitySystemLibrary = new EntitySystemLibrary(context, new TypeSerializationLibrary(reflectFactory, copyStrategies));
+        Reflections reflections = new Reflections(getClass().getClassLoader());
+        EntitySystemLibrary entitySystemLibrary = new EntitySystemLibrary(context, new TypeHandlerLibrary(reflections));
         ComponentLibrary lib = entitySystemLibrary.getComponentLibrary();
-        lib.register(new SimpleUri("unittest:string"), StringComponent.class);
+        lib.register(new ResourceUrn("unittest:string"), StringComponent.class);
         ComponentMetadata<StringComponent> metadata = lib.getMetadata(StringComponent.class);
         assertNull(metadata.getField("STATIC_VALUE"));
     }
 
     @Test
     public void testOwnsReferencesPopulated() {
-        EntitySystemLibrary entitySystemLibrary = new EntitySystemLibrary(context, new TypeSerializationLibrary(reflectFactory, copyStrategies));
+        Reflections reflections = new Reflections(getClass().getClassLoader());
+        EntitySystemLibrary entitySystemLibrary = new EntitySystemLibrary(context, new TypeHandlerLibrary(reflections));
         ComponentLibrary lib = entitySystemLibrary.getComponentLibrary();
-        lib.register(new SimpleUri("unittest:owner"), OwnerComponent.class);
+        lib.register(new ResourceUrn("unittest:owner"), OwnerComponent.class);
         ComponentMetadata<OwnerComponent> metadata = lib.getMetadata(OwnerComponent.class);
         assertTrue(metadata.isReferenceOwner());
     }

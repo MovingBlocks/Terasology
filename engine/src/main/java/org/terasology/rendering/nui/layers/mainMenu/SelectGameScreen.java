@@ -24,12 +24,13 @@ import org.terasology.engine.paths.PathManager;
 import org.terasology.game.GameManifest;
 import org.terasology.network.NetworkMode;
 import org.terasology.registry.CoreRegistry;
-import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
+import org.terasology.rendering.nui.animation.MenuAnimationSystems;
+import org.terasology.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.layers.mainMenu.gameDetailsScreen.GameDetailsScreen;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameInfo;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameProvider;
-import org.terasology.rendering.nui.widgets.UIButton;
-import org.terasology.rendering.nui.widgets.UILabel;
+import org.terasology.nui.widgets.UIButton;
+import org.terasology.nui.widgets.UILabel;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -54,6 +55,7 @@ public class SelectGameScreen extends SelectionScreen {
 
     @Override
     public void initialise() {
+        setAnimationSystem(MenuAnimationSystems.createDefaultSwipeAnimation());
 
         initWidgets();
 
@@ -102,7 +104,7 @@ public class SelectGameScreen extends SelectionScreen {
             final NewGameScreen newGameScreen = getManager().createScreen(NewGameScreen.ASSET_URI, NewGameScreen.class);
             create.subscribe(e -> {
                 newGameScreen.setUniverseWrapper(universeWrapper);
-                getManager().pushScreen(newGameScreen);
+                triggerForwardAnimation(newGameScreen);
             });
 
             close.subscribe(e -> triggerBackAnimation());
@@ -132,7 +134,7 @@ public class SelectGameScreen extends SelectionScreen {
             if (GameProvider.isSavesFolderEmpty()) {
                 final NewGameScreen newGameScreen = getManager().createScreen(NewGameScreen.ASSET_URI, NewGameScreen.class);
                 newGameScreen.setUniverseWrapper(universeWrapper);
-                getManager().pushScreen(newGameScreen);
+                triggerForwardAnimation(newGameScreen);
             }
 
             if (isLoadingAsServer() && !super.config.getPlayer().hasEnteredUsername()) {

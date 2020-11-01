@@ -38,6 +38,17 @@ public class Interpreter {
         this.actor = actor;
     }
 
+    /**
+     * Copy constructor to save BT execution state
+     * @param interpreter
+     */
+    public Interpreter(Interpreter interpreter) {
+        this.actor = interpreter.actor;
+        this.treeRunner = interpreter.treeRunner;
+        this.tree = interpreter.tree;
+        this.callback = interpreter.callback;
+    }
+
     public void setCallback(DefaultBehaviorTreeRunner.Callback callback) {
         this.callback = callback;
         reset();
@@ -80,6 +91,11 @@ public class Interpreter {
         if (actor.hasComponent(DisplayNameComponent.class)) {
             return actor.getComponent(DisplayNameComponent.class).name;
         }
+
+        if (actor.getEntity() == null || actor.getEntity().getParentPrefab() == null) {
+            return "no entity";
+        }
+
         return "unnamed " + actor.getEntity().getParentPrefab().getName();
     }
 

@@ -16,11 +16,9 @@
 package org.terasology.persistence.internal;
 
 import org.codehaus.plexus.util.FileUtils;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -31,6 +29,10 @@ import java.nio.file.Paths;
 import java.nio.file.attribute.FileTime;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 public class GamePreviewImageProviderTest {
 
     private static final String PREVIEWS = "previews";
@@ -38,13 +40,13 @@ public class GamePreviewImageProviderTest {
     private static final Path TMP_FOLDER = Paths.get("out", "test", "engine-tests", "tmp", PREVIEWS).toAbsolutePath();
     private static final Path TMP_PREVIEWS_FOLDER = TMP_FOLDER.resolve(PREVIEWS);
 
-    @Before
+    @BeforeEach
     public void setUp() throws IOException {
         FileUtils.forceDelete(new File(TMP_FOLDER.toUri()));
         Files.createDirectories(TMP_FOLDER);
     }
 
-    @AfterClass
+    @AfterAll
     public static void clean() throws IOException {
         FileUtils.forceDelete(new File(Paths.get("out", "test", "engine-tests", "tmp").toUri()));
     }
@@ -53,8 +55,8 @@ public class GamePreviewImageProviderTest {
     public void getAllPreviewImagesEmptyTest() {
         final List<BufferedImage> result = GamePreviewImageProvider.getAllPreviewImages(TMP_FOLDER);
 
-        Assert.assertNotNull(result);
-        Assert.assertTrue(result.isEmpty());
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
     }
 
     @Test
@@ -64,16 +66,16 @@ public class GamePreviewImageProviderTest {
 
         final List<BufferedImage> result = GamePreviewImageProvider.getAllPreviewImages(TMP_FOLDER);
 
-        Assert.assertNotNull(result);
-        Assert.assertTrue(result.isEmpty());
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
     }
 
     @Test
     public void getNextGamePreviewImagePathEmptyFolderTest() {
         final Path imagePath = GamePreviewImageProvider.getNextGamePreviewImagePath(TMP_FOLDER);
 
-        Assert.assertNotNull(imagePath);
-        Assert.assertEquals(TMP_PREVIEWS_FOLDER.resolve(DEFAULT_IMAGE_NAME), imagePath);
+        assertNotNull(imagePath);
+        assertEquals(TMP_PREVIEWS_FOLDER.resolve(DEFAULT_IMAGE_NAME), imagePath);
     }
 
     @Test
@@ -83,8 +85,8 @@ public class GamePreviewImageProviderTest {
 
         final Path imagePath = GamePreviewImageProvider.getNextGamePreviewImagePath(TMP_FOLDER);
 
-        Assert.assertNotNull(imagePath);
-        Assert.assertEquals(TMP_PREVIEWS_FOLDER.resolve("2.jpg"), imagePath);
+        assertNotNull(imagePath);
+        assertEquals(TMP_PREVIEWS_FOLDER.resolve("2.jpg"), imagePath);
     }
 
     @Test
@@ -102,7 +104,7 @@ public class GamePreviewImageProviderTest {
 
         final Path imagePath = GamePreviewImageProvider.getNextGamePreviewImagePath(TMP_FOLDER);
 
-        Assert.assertNotNull(imagePath);
-        Assert.assertEquals(expectedOldestFile, imagePath);
+        assertNotNull(imagePath);
+        assertEquals(expectedOldestFile, imagePath);
     }
 }

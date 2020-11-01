@@ -17,6 +17,8 @@
 package org.terasology.math;
 
 import com.google.common.collect.Maps;
+import org.joml.Vector3fc;
+import org.joml.Vector3ic;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
 
@@ -34,27 +36,27 @@ public enum Direction {
     FORWARD(new Vector3i(0, 0, 1), new Vector3f(0, 0, 1)),
     DOWN(Vector3i.down(), new Vector3f(0, -1, 0));
 
-    private static final EnumMap<Direction, Direction> reverseMap;
-    private static final EnumMap<Direction, Side> conversionMap;
+    private static final EnumMap<Direction, Direction> REVERSE_MAP;
+    private static final EnumMap<Direction, Side> CONVERSION_MAP;
 
     private final Vector3i vector3iDir;
     private final Vector3f vector3fDir;
 
     static {
-        reverseMap = new EnumMap<>(Direction.class);
-        reverseMap.put(UP, DOWN);
-        reverseMap.put(LEFT, RIGHT);
-        reverseMap.put(RIGHT, LEFT);
-        reverseMap.put(FORWARD, BACKWARD);
-        reverseMap.put(BACKWARD, FORWARD);
-        reverseMap.put(DOWN, UP);
-        conversionMap = Maps.newEnumMap(Direction.class);
-        conversionMap.put(UP, Side.TOP);
-        conversionMap.put(DOWN, Side.BOTTOM);
-        conversionMap.put(FORWARD, Side.BACK);
-        conversionMap.put(BACKWARD, Side.FRONT);
-        conversionMap.put(LEFT, Side.RIGHT);
-        conversionMap.put(RIGHT, Side.LEFT);
+        REVERSE_MAP = new EnumMap<>(Direction.class);
+        REVERSE_MAP.put(UP, DOWN);
+        REVERSE_MAP.put(LEFT, RIGHT);
+        REVERSE_MAP.put(RIGHT, LEFT);
+        REVERSE_MAP.put(FORWARD, BACKWARD);
+        REVERSE_MAP.put(BACKWARD, FORWARD);
+        REVERSE_MAP.put(DOWN, UP);
+        CONVERSION_MAP = Maps.newEnumMap(Direction.class);
+        CONVERSION_MAP.put(UP, Side.TOP);
+        CONVERSION_MAP.put(DOWN, Side.BOTTOM);
+        CONVERSION_MAP.put(FORWARD, Side.BACK);
+        CONVERSION_MAP.put(BACKWARD, Side.FRONT);
+        CONVERSION_MAP.put(LEFT, Side.RIGHT);
+        CONVERSION_MAP.put(RIGHT, Side.LEFT);
     }
 
     Direction(Vector3i vector3i, Vector3f vector3f) {
@@ -78,7 +80,7 @@ public enum Direction {
     }
 
     public Side toSide() {
-        return conversionMap.get(this);
+        return CONVERSION_MAP.get(this);
     }
 
     /**
@@ -114,13 +116,40 @@ public enum Direction {
         return (z > 0) ? FORWARD : BACKWARD;
     }
 
+
+    /**
+     * readonly normalized {@link Vector3ic} in the given {@link Direction}
+     *
+     * @return vector pointing in the direction
+     */
+    public Vector3ic asVector3i() {
+        return JomlUtil.from(vector3iDir);
+    }
+
+
+    /**
+     * readonly normalized {@link Vector3fc} in the given {@link Direction}
+     *
+     * @return vector pointing in the direction
+     */
+    public Vector3fc asVector3f() {
+        return JomlUtil.from(vector3fDir);
+    }
+
     /**
      * @return The vector3i in the direction of the side. Do not modify.
+     * @deprecated This is scheduled for removal in an upcoming version method will be replaced with JOML implementation
+     *     {@link #asVector3i()}.
      */
     public Vector3i getVector3i() {
         return new Vector3i(vector3iDir);
     }
 
+    /**
+     * @return
+     * @deprecated This is scheduled for removal in an upcoming version method will be replaced with JOML implementation
+     *     {@link #asVector3f()}
+     */
     public Vector3f getVector3f() {
         return new Vector3f(vector3fDir);
     }
@@ -129,7 +158,7 @@ public enum Direction {
      * @return The opposite side to this side.
      */
     public Direction reverse() {
-        return reverseMap.get(this);
+        return REVERSE_MAP.get(this);
     }
 
 }

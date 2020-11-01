@@ -15,9 +15,6 @@
  */
 package org.terasology.engine.subsystem.lwjgl;
 
-import org.lwjgl.LWJGLException;
-import org.lwjgl.input.Keyboard;
-import org.lwjgl.input.Mouse;
 import org.terasology.assets.module.ModuleAwareAssetTypeManager;
 import org.terasology.config.Config;
 import org.terasology.config.ControllerConfig;
@@ -47,7 +44,6 @@ public class LwjglInput extends BaseLwjglSubsystem {
         this.context = rootContext;
         initControls();
         updateInputConfig();
-        Mouse.setGrabbed(false);
     }
 
     @Override
@@ -55,28 +51,17 @@ public class LwjglInput extends BaseLwjglSubsystem {
         currentState.handleInput(delta);
     }
 
-    @Override
-    public void shutdown() {
-        Mouse.destroy();
-        Keyboard.destroy();
-    }
-
     private void initControls() {
-        try {
-            Keyboard.create();
-            Keyboard.enableRepeatEvents(true);
-            Mouse.create();
-            InputSystem inputSystem = new InputSystem();
-            context.put(InputSystem.class, inputSystem);
-            inputSystem.setMouseDevice(new LwjglMouseDevice());
-            inputSystem.setKeyboardDevice(new LwjglKeyboardDevice());
 
-            ControllerConfig controllerConfig = context.get(Config.class).getInput().getControllers();
-            JInputControllerDevice controllerDevice = new JInputControllerDevice(controllerConfig);
-            inputSystem.setControllerDevice(controllerDevice);
-        } catch (LWJGLException e) {
-            throw new RuntimeException("Could not initialize controls.", e);
-        }
+        InputSystem inputSystem = new InputSystem();
+        context.put(InputSystem.class, inputSystem);
+        inputSystem.setMouseDevice(new LwjglMouseDevice(context));
+        inputSystem.setKeyboardDevice(new LwjglKeyboardDevice());
+
+        ControllerConfig controllerConfig = context.get(Config.class).getInput().getControllers();
+        JInputControllerDevice controllerDevice = new JInputControllerDevice(controllerConfig);
+        inputSystem.setControllerDevice(controllerDevice);
+
     }
 
     private void updateInputConfig() {

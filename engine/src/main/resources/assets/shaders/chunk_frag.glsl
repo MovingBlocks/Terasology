@@ -72,7 +72,6 @@ varying float isUpside;
 
 uniform sampler2D textureAtlas;
 uniform sampler2D textureEffects;
-uniform sampler2D textureLava;
 
 uniform float clip;
 
@@ -173,39 +172,14 @@ void main() {
     vec4 color = vec4(0.0, 0.0, 0.0, 1.0);
 
 #if !defined (FEATURE_REFRACTIVE_PASS)
-    if (checkFlag(BLOCK_HINT_LAVA, blockHint)) {
-        texCoord.x = mod(texCoord.x, TEXTURE_OFFSET) * (1.0 / TEXTURE_OFFSET);
-        texCoord.y = mod(texCoord.y, TEXTURE_OFFSET) / (128.0 / (1.0 / TEXTURE_OFFSET));
-        texCoord.y += mod(timeToTick(time, -0.1), 127.0) * (1.0/128.0);
-
-        color = texture2D(textureLava, texCoord.xy);
-    /* APPLY DEFAULT TEXTURE FROM ATLAS */
-    } else {
-        color = texture2D(textureAtlas, texCoord.xy);
+    color = texture2D(textureAtlas, texCoord.xy);
 
 #if defined FEATURE_ALPHA_REJECT
-        if (color.a < 0.1) {
-            discard;
-        }
+    if (color.a < 0.1) {
+        discard;
+    }
 #endif
-    }
 
-    /* APPLY OVERALL BIOME COLOR OFFSET */
-    if (!checkFlag(BLOCK_HINT_GRASS, blockHint)) {
-        if (gl_Color.r < 0.99 && gl_Color.g < 0.99 && gl_Color.b < 0.99) {
-            if (color.g > 0.5) {
-                color.rgb = vec3(color.g) * gl_Color.rgb;
-            } else {
-                color.rgb *= gl_Color.rgb;
-            }
-        }
-    /* MASK GRASS AND APPLY BIOME COLOR */
-    } else {
-        vec4 maskColor = texture2D(textureEffects, vec2(10.0 * TEXTURE_OFFSET_EFFECTS + mod(texCoord.x, TEXTURE_OFFSET_EFFECTS), mod(texCoord.y, TEXTURE_OFFSET_EFFECTS)));
-
-        // Only use one channel so the color won't be altered
-        if (maskColor.a != 0.0) color.rgb = vec3(color.g) * gl_Color.rgb;
-    }
 #endif
 
     // Calculate daylight lighting value

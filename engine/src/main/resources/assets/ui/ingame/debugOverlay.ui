@@ -26,6 +26,10 @@
                     {
                         "type": "UILabel",
                         "id": "metrics"
+                    },
+                    {
+                        "type": "UILabel",
+                        "id": "debugInfo"
                     }
                 ],
                 "layoutInfo": {
@@ -44,6 +48,34 @@
                     "position-right": {
                         "offset": 8
                     }
+                }
+            },
+            {
+                     "type": "UILabel",
+                     "id": "wireframeMode",
+                     "layoutInfo": {
+                     "use-content-width": true,
+                     "use-content-height": true,
+                     "position-bottom": {
+                         "offset": 5
+                     },
+                     "position-right": {
+                         "offset": 8
+                     }
+                }
+            },
+            {
+                     "type": "UILabel",
+                     "id": "chunkBBRenderMode",
+                     "layoutInfo": {
+                     "use-content-width": true,
+                     "use-content-height": true,
+                     "position-right": {
+                         "offset": 8
+                     },
+                     "position-bottom": {
+                         "offset": 20
+                     }
                 }
             }
         ]

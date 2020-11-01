@@ -1,32 +1,33 @@
-/*
- * Copyright 2014 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *  http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
+
 package org.terasology.rendering.nui;
 
+import org.joml.Rectanglei;
+import org.joml.Vector2i;
 import org.terasology.assets.ResourceUrn;
-import org.terasology.input.BindButtonEvent;
+import org.terasology.input.ButtonState;
 import org.terasology.input.Keyboard;
-import org.terasology.input.events.MouseButtonEvent;
-import org.terasology.input.events.MouseWheelEvent;
-import org.terasology.math.geom.Rect2i;
-import org.terasology.math.geom.Vector2i;
+import org.terasology.math.JomlUtil;
+import org.terasology.nui.AbstractWidget;
+import org.terasology.nui.BaseInteractionListener;
+import org.terasology.nui.Canvas;
+import org.terasology.nui.InteractionListener;
+import org.terasology.nui.LayoutConfig;
+import org.terasology.nui.TabbingManager;
+import org.terasology.nui.UIWidget;
+import org.terasology.nui.WidgetWithOrder;
+import org.terasology.nui.events.NUIBindButtonEvent;
+import org.terasology.nui.events.NUICharEvent;
+import org.terasology.nui.events.NUIKeyEvent;
+import org.terasology.nui.events.NUIMouseButtonEvent;
+import org.terasology.nui.events.NUIMouseClickEvent;
+import org.terasology.nui.events.NUIMouseWheelEvent;
+import org.terasology.nui.layouts.ScrollableArea;
+import org.terasology.nui.widgets.UIRadialRing;
+import org.terasology.nui.widgets.UIRadialSection;
 import org.terasology.rendering.nui.animation.MenuAnimationSystem;
 import org.terasology.rendering.nui.animation.MenuAnimationSystemStub;
-import org.terasology.rendering.nui.events.NUIKeyEvent;
-import org.terasology.rendering.nui.events.NUIMouseClickEvent;
-import org.terasology.rendering.nui.events.NUIMouseWheelEvent;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -51,6 +52,12 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
     private UIWidget contents;
 
     private NUIManager manager;
+
+    private boolean modifyingList;
+
+    private ScrollableArea parentToSet;
+
+    private boolean activateBindEvent;
 
     private MenuAnimationSystem animationSystem = new MenuAnimationSystemStub();
 
@@ -97,8 +104,44 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
                 SortOrderSystem.getUsed().add(depth);
             }
         }
+        modifyingList = false;
+        activateBindEvent = false;
+        TabbingManager.setInitialized(false);
+
         animationSystem.triggerFromPrev();
         onScreenOpened();
+    }
+
+    private void iterateThrough(Iterator<UIWidget> widgets) {
+        modifyingList = true;
+        while (widgets.hasNext()) {
+            UIWidget next = widgets.next();
+            boolean setParent = false;
+            if (next instanceof ScrollableArea) {
+                parentToSet = (ScrollableArea) next;
+            }
+
+            if (next instanceof WidgetWithOrder) {
+                TabbingManager.addToWidgetsList((WidgetWithOrder) next);
+                TabbingManager.addToUsedNums(((WidgetWithOrder) next).getOrder());
+                ((WidgetWithOrder) next).setParent(parentToSet);
+            }
+
+            if (next.iterator().hasNext()) {
+                iterateThrough(next.iterator());
+            } else if (next instanceof UIRadialRing) {
+                Iterator<UIRadialSection> iter = ((UIRadialRing) next).getSections().iterator();
+                while (iter.hasNext()) {
+                    next = iter.next();
+                    TabbingManager.addToWidgetsList((WidgetWithOrder) next);
+                    TabbingManager.addToUsedNums(((WidgetWithOrder) next).getOrder());
+                    if (setParent) {
+                        ((WidgetWithOrder) next).setParent(parentToSet);
+                    }
+                }
+            }
+        }
+        modifyingList = false;
     }
 
     /**
@@ -139,6 +182,8 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
         if (!SortOrderSystem.isInSortOrder()) {
             addOrRemove(true);
         }
+        // TODO: Tabbing
+        //TabbingManager.setOpenScreen(this);
     }
 
     @Override
@@ -157,7 +202,7 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
 
     @Override
     public void onDraw(Canvas canvas) {
-        Rect2i region = animationSystem.animateRegion(canvas.getRegion());
+        Rectanglei region = JomlUtil.from(animationSystem.animateRegion(JomlUtil.from(canvas.getRegion())));
         if (isModal()) {
             canvas.addInteractionRegion(getScreenListener(), region);
         }
@@ -169,11 +214,30 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
     @Override
     public void update(float delta) {
         if (contents != null) {
+            if (!TabbingManager.isInitialized()) {
+                TabbingManager.init();
+                // TODO: Tabbing
+                // TabbingManager.setOpenScreen(this);
+
+                Iterator<UIWidget> widgets = contents.iterator();
+                iterateThrough(widgets);
+            }
+
+            // TODO: Tabbing
+            /*if (TabbingManager.getOpenScreen() == null) {
+                TabbingManager.setOpenScreen(this);
+
+                Iterator<UIWidget> widgets = contents.iterator();
+                iterateThrough(widgets);
+
+            }*/
             contents.update(delta);
             animationSystem.update(delta);
-
             if (depth == SortOrderSystem.DEFAULT_DEPTH) {
                 setDepthAuto();
+            }
+            if (activateBindEvent) {
+                onBindEvent(new NUIBindButtonEvent(null, null, new ResourceUrn("engine:tabbingUI"), ButtonState.DOWN));
             }
         }
     }
@@ -192,6 +256,7 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
         if (!SortOrderSystem.isInSortOrder()) {
             addOrRemove(false);
         }
+        TabbingManager.setInitialized(false);
     }
 
     @Override
@@ -205,6 +270,7 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
         if (!SortOrderSystem.isInSortOrder()) {
             addOrRemove(false);
         }
+        TabbingManager.setInitialized(false);
     }
 
     @Override
@@ -216,11 +282,11 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
     }
 
     @Override
-    public void onMouseButtonEvent(MouseButtonEvent event) {
+    public void onMouseButtonEvent(NUIMouseButtonEvent event) {
     }
 
     @Override
-    public void onMouseWheelEvent(MouseWheelEvent event) {
+    public void onMouseWheelEvent(NUIMouseWheelEvent event) {
     }
 
     @Override
@@ -233,15 +299,16 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
             }
         }
 
+        return super.onKeyEvent(event);
+    }
+
+    @Override
+    public boolean onCharEvent(NUICharEvent nuiEvent) {
         return false;
     }
 
     protected boolean isEscapeToCloseAllowed() {
         return true;
-    }
-
-    @Override
-    public void onBindEvent(BindButtonEvent event) {
     }
 
     @Override
@@ -256,7 +323,7 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
 
     @Override
     public Vector2i getMaxContentSize(Canvas canvas) {
-        return new Vector2i(Integer.MAX_VALUE, Integer.MAX_VALUE);
+        return new Vector2i(Integer.MAX_VALUE);
     }
 
     @Override

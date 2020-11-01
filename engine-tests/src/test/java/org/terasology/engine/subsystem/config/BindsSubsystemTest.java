@@ -1,8 +1,8 @@
 
 package org.terasology.engine.subsystem.config;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.terasology.config.BindsConfig;
 import org.terasology.config.facade.BindsConfiguration;
 import org.terasology.context.Context;
@@ -31,10 +31,8 @@ import org.terasology.naming.Version;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.eq;
@@ -51,7 +49,7 @@ public class BindsSubsystemTest {
     private List<Class<?>> registerBindButtonClasses;
     private List<Class<?>> registerRealBindAxisClasses;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         bindsSubsystem = new BindsSubsystem();
         bindsConfiguration = new BindsConfigAdapter(new BindsConfig());
@@ -87,7 +85,7 @@ public class BindsSubsystemTest {
 
     @Test
     public void testSelfRegisterOnContext() {
-        assertThat(context.get(BindsManager.class), is(bindsSubsystem));
+        assertEquals(context.get(BindsManager.class), bindsSubsystem);
     }
 
     @Test
@@ -97,18 +95,18 @@ public class BindsSubsystemTest {
         bindsSubsystem.updateConfigWithDefaultBinds();
 
         List<Input> defaultBinds = bindsSubsystem.getDefaultBindsConfig().getBinds(new SimpleUri(TEST_MODULE, "testEvent"));
-        assertThat(defaultBinds.size(), is(1));
-        assertThat(defaultBinds.get(0).getType(), is(InputType.KEY));
-        assertThat(defaultBinds.get(0).getId(), is(KeyId.T));
-        assertThat(defaultBinds.get(0).getName(), is(Key.T.getName()));
-        assertThat(defaultBinds.get(0).getDisplayName(), is(Key.T.getDisplayName()));
+        assertEquals(defaultBinds.size(), 1);
+        assertEquals(defaultBinds.get(0).getType(), InputType.KEY);
+        assertEquals(defaultBinds.get(0).getId(), KeyId.T);
+        assertEquals(defaultBinds.get(0).getName(), Key.T.getName());
+        assertEquals(defaultBinds.get(0).getDisplayName(), Key.T.getDisplayName());
 
         List<Input> binds = bindsSubsystem.getBindsConfig().getBinds(new SimpleUri(TEST_MODULE, "testEvent"));
-        assertThat(binds.size(), is(1));
-        assertThat(binds.get(0).getType(), is(InputType.KEY));
-        assertThat(binds.get(0).getId(), is(KeyId.T));
-        assertThat(binds.get(0).getName(), is(Key.T.getName()));
-        assertThat(binds.get(0).getDisplayName(), is(Key.T.getDisplayName()));
+        assertEquals(binds.size(), 1);
+        assertEquals(binds.get(0).getType(), InputType.KEY);
+        assertEquals(binds.get(0).getId(), KeyId.T);
+        assertEquals(binds.get(0).getName(), Key.T.getName());
+        assertEquals(binds.get(0).getDisplayName(), Key.T.getDisplayName());
     }
 
     @Test
@@ -128,9 +126,9 @@ public class BindsSubsystemTest {
 
         BindableButton button = bindsSubsystem.getKeyBinds().get(KeyId.T);
 
-        assertThat(button, is(not(nullValue())));
-        assertThat(button.getId(), is(new SimpleUri(TEST_MODULE, "testEvent")));
-        assertThat(button.getDisplayName(), is("${engine-tests:menu#theTestEvent}"));
+        assertNotNull(button);
+        assertEquals(button.getId(), new SimpleUri(TEST_MODULE, "testEvent"));
+        assertEquals(button.getDisplayName(), "${engine-tests:menu#theTestEvent}");
     }
 
     //test classes, registered during tests

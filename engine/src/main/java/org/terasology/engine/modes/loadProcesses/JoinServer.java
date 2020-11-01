@@ -23,8 +23,8 @@ import org.slf4j.LoggerFactory;
 import org.terasology.context.Context;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.bootstrap.EnvironmentSwitchHandler;
-import org.terasology.engine.modes.LoadProcess;
 import org.terasology.engine.modes.StateMainMenu;
+import org.terasology.engine.modes.VariableStepLoadProcess;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.game.Game;
 import org.terasology.game.GameManifest;
@@ -41,7 +41,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-public class JoinServer implements LoadProcess {
+//TODO document this!
+public class JoinServer extends VariableStepLoadProcess {
     private static final Logger logger = LoggerFactory.getLogger(JoinServer.class);
 
     private Context context;
@@ -102,18 +103,8 @@ public class JoinServer implements LoadProcess {
                     logger.warn("Overwriting Id {} for {} with Id {}", oldId, name, id);
                 }
             }
-            Map<String, Short> biomeMap = Maps.newHashMap();
-            for (Entry<Short, String> entry : serverInfo.getBiomeIds().entrySet()) {
-                String name = entry.getValue();
-                short id = entry.getKey();
-                Short oldId = biomeMap.put(name, id);
-                if (oldId != null && oldId != id) {
-                    logger.warn("Overwriting Biome Id {} for {} with Id {}", oldId, name, id);
-                }
-            }
             gameManifest.setRegisteredBlockFamilies(serverInfo.getRegisterBlockFamilyList());
             gameManifest.setBlockIdMap(blockMap);
-            gameManifest.setBiomeIdMap(biomeMap);
             gameManifest.setTime(networkSystem.getServer().getInfo().getTime());
 
             ModuleManager moduleManager = context.get(ModuleManager.class);

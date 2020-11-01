@@ -15,26 +15,20 @@
  */
 package org.terasology.persistence.typeHandling.coreTypes;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.persistence.typeHandling.DeserializationContext;
 import org.terasology.persistence.typeHandling.PersistedData;
-import org.terasology.persistence.typeHandling.PersistedDataArray;
-import org.terasology.persistence.typeHandling.SerializationContext;
+import org.terasology.persistence.typeHandling.PersistedDataSerializer;
 import org.terasology.persistence.typeHandling.TypeHandler;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 /**
  */
-public class EnumTypeHandler<T extends Enum> implements TypeHandler<T> {
+public class EnumTypeHandler<T extends Enum> extends TypeHandler<T> {
 
     private static final Logger logger = LoggerFactory.getLogger(EnumTypeHandler.class);
     private Class<T> enumType;
@@ -48,41 +42,20 @@ public class EnumTypeHandler<T extends Enum> implements TypeHandler<T> {
     }
 
     @Override
-    public PersistedData serialize(T value, SerializationContext context) {
-        if (value != null) {
-            return context.create(value.toString());
-        }
-        return context.createNull();
+    public PersistedData serializeNonNull(T value, PersistedDataSerializer serializer) {
+        return serializer.serialize(value.toString());
     }
 
     @Override
-    public T deserialize(PersistedData data, DeserializationContext context) {
+    public Optional<T> deserialize(PersistedData data) {
         if (data.isString()) {
             T result = caseInsensitiveLookup.get(data.getAsString().toLowerCase(Locale.ENGLISH));
             if (result == null) {
                 logger.warn("Unknown enum value: '{}' for enum {}", data.getAsString(), enumType.getSimpleName());
             }
-            return result;
+            return Optional.ofNullable(result);
         }
-        return null;
+        return Optional.empty();
     }
 
-    @Override
-    public PersistedData serializeCollection(Collection<T> value, SerializationContext context) {
-        List<String> values = value.stream().map(T::toString).collect(Collectors.toCollection(ArrayList::new));
-        return context.createStrings(values);
-    }
-
-    @Override
-    public List<T> deserializeCollection(PersistedData data, DeserializationContext context) {
-        if (data.isArray()) {
-            PersistedDataArray array = data.getAsArray();
-            List<T> result = Lists.newArrayListWithCapacity(array.size());
-            for (PersistedData item : array) {
-                result.add(deserialize(item, context));
-            }
-            return result;
-        }
-        return Lists.newArrayList();
-    }
 }

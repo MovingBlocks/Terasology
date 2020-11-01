@@ -13,7 +13,6 @@ message NetMessage {
     repeated UpdateEntityMessage updateEntity = 7;
     repeated EventMessage event = 8;
     optional int64 time = 9;
-    repeated BiomeChangeMessage biomeChange = 10;
     repeated ExtraDataChangeMessage extraDataChange = 11;
 
     optional ServerInfoRequest serverInfoRequest = 15;
@@ -98,13 +97,6 @@ message BlockChangeMessage {
     extensions 5000 to max;
 }
 
-message BiomeChangeMessage {
-    optional Vector3iData pos = 1;
-    optional int32 newBiome = 2;
-
-    extensions 5000 to max;
-}
-
 message ExtraDataChangeMessage {
     optional int32 index = 1;
     optional Vector3iData pos = 2;
@@ -153,8 +145,6 @@ message ServerInfoMessage {
     repeated string assetUri = 7;
     repeated string registerBlockFamily = 8;
     repeated WorldInfo worldInfo = 9;
-    repeated sint32 biomeShortId = 10 [packed=true];
-    repeated string biomeId = 11;
 
     optional string errorMessage = 12;
     optional string version = 15;

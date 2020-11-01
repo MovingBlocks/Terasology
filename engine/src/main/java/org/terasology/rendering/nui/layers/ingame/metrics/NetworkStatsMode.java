@@ -31,7 +31,7 @@ final class NetworkStatsMode extends MetricsMode {
 
 
     NetworkStatsMode() {
-        super("Network");
+        super("\n- Network -");
         lastMetric = getName();
         time = CoreRegistry.get(Time.class);
         networkSystem = CoreRegistry.get(NetworkSystem.class);

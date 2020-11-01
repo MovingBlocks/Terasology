@@ -129,9 +129,10 @@ message ChunkStore {
     optional bytes deprecated_data_2 = 8;
     optional bytes deprecated_data_5 = 9;
 
+    optional RunLengthEncoding8 deprecated_data_6 = 11;
+    optional RunLengthEncoding16 deprecated_data_7 = 12;
+
     optional RunLengthEncoding16 block_data = 10;
-    optional RunLengthEncoding8 liquid_data = 11;
-    optional RunLengthEncoding16 biome_data = 12;
     repeated RunLengthEncoding16 extra_data = 13;
 
     extensions 5000 to max;

@@ -15,14 +15,16 @@
  */
 package org.terasology.rendering.nui.layouts;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.terasology.math.geom.Rect2i;
-import org.terasology.math.geom.Vector2i;
-import org.terasology.rendering.nui.Canvas;
-import org.terasology.rendering.nui.UIWidget;
+import org.joml.Vector2i;
+import org.terasology.nui.Canvas;
+import org.terasology.nui.UIWidget;
+import org.terasology.nui.layouts.ColumnLayout;
+import org.terasology.nui.util.RectUtility;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
@@ -44,7 +46,7 @@ public class ColumnLayoutTest {
     private UIWidget itemAt2x2;
     private UIWidget itemAt3x2;
 
-    @Before
+    @BeforeEach
     public void setup() {
         columnLayout = new ColumnLayout();
 
@@ -107,18 +109,18 @@ public class ColumnLayoutTest {
         columnLayout.onDraw(canvas);
 
         // Gets half of entire area
-        verify(canvas).drawWidget(itemAt1x1, Rect2i.createFromMinAndSize(0, ((CANVAS_HEIGHT - 20) / 2), CANVAS_WIDTH / 2, 10));
+        verify(canvas).drawWidget(itemAt1x1, RectUtility.createFromMinAndSize(0, ((CANVAS_HEIGHT - 20) / 2), CANVAS_WIDTH / 2, 10));
         // Gets one-fifth of entire area
-        verify(canvas).drawWidget(itemAt2x1, Rect2i.createFromMinAndSize(CANVAS_WIDTH / 2, ((CANVAS_HEIGHT - 20) / 2), CANVAS_WIDTH * 2 / 10, 10));
+        verify(canvas).drawWidget(itemAt2x1, RectUtility.createFromMinAndSize(CANVAS_WIDTH / 2, ((CANVAS_HEIGHT - 20) / 2), CANVAS_WIDTH * 2 / 10, 10));
         // Gets three-tens of entire area
-        verify(canvas).drawWidget(itemAt3x1, Rect2i.createFromMinAndSize(CANVAS_WIDTH / 2 + CANVAS_WIDTH * 2 / 10, ((CANVAS_HEIGHT - 20) / 2), CANVAS_WIDTH * 3 / 10, 10));
+        verify(canvas).drawWidget(itemAt3x1, RectUtility.createFromMinAndSize(CANVAS_WIDTH / 2 + CANVAS_WIDTH * 2 / 10, ((CANVAS_HEIGHT - 20) / 2), CANVAS_WIDTH * 3 / 10, 10));
 
         // Gets half of entire area
-        verify(canvas).drawWidget(itemAt1x2, Rect2i.createFromMinAndSize(0, ((CANVAS_HEIGHT - 20) / 2) + 10, CANVAS_WIDTH / 2, 10));
+        verify(canvas).drawWidget(itemAt1x2, RectUtility.createFromMinAndSize(0, ((CANVAS_HEIGHT - 20) / 2) + 10, CANVAS_WIDTH / 2, 10));
         // Gets one-fifth of entire area
-        verify(canvas).drawWidget(itemAt2x2, Rect2i.createFromMinAndSize(CANVAS_WIDTH / 2, ((CANVAS_HEIGHT - 20) / 2) + 10, CANVAS_WIDTH * 2 / 10, 10));
+        verify(canvas).drawWidget(itemAt2x2, RectUtility.createFromMinAndSize(CANVAS_WIDTH / 2, ((CANVAS_HEIGHT - 20) / 2) + 10, CANVAS_WIDTH * 2 / 10, 10));
         // Gets three-tens of entire area
-        verify(canvas).drawWidget(itemAt3x2, Rect2i.createFromMinAndSize(CANVAS_WIDTH / 2 + CANVAS_WIDTH * 2 / 10, ((CANVAS_HEIGHT - 20) / 2) + 10, CANVAS_WIDTH * 3 / 10, 10));
+        verify(canvas).drawWidget(itemAt3x2, RectUtility.createFromMinAndSize(CANVAS_WIDTH / 2 + CANVAS_WIDTH * 2 / 10, ((CANVAS_HEIGHT - 20) / 2) + 10, CANVAS_WIDTH * 3 / 10, 10));
     }
 
     @Test
@@ -133,13 +135,13 @@ public class ColumnLayoutTest {
 
         columnLayout.onDraw(canvas);
 
-        verify(canvas).drawWidget(itemAt1x1, Rect2i.createFromMinAndSize(((CANVAS_WIDTH - 75) / 2), ((CANVAS_HEIGHT - 20) / 2), 50, 10));
-        verify(canvas).drawWidget(itemAt2x1, Rect2i.createFromMinAndSize(((CANVAS_WIDTH - 75) / 2) + 50, ((CANVAS_HEIGHT - 20) / 2), 5, 10));
-        verify(canvas).drawWidget(itemAt3x1, Rect2i.createFromMinAndSize(((CANVAS_WIDTH - 75) / 2) + 50 + 5, ((CANVAS_HEIGHT - 20) / 2), 20, 10));
+        verify(canvas).drawWidget(itemAt1x1, RectUtility.createFromMinAndSize(((CANVAS_WIDTH - 75) / 2), ((CANVAS_HEIGHT - 20) / 2), 50, 10));
+        verify(canvas).drawWidget(itemAt2x1, RectUtility.createFromMinAndSize(((CANVAS_WIDTH - 75) / 2) + 50, ((CANVAS_HEIGHT - 20) / 2), 5, 10));
+        verify(canvas).drawWidget(itemAt3x1, RectUtility.createFromMinAndSize(((CANVAS_WIDTH - 75) / 2) + 50 + 5, ((CANVAS_HEIGHT - 20) / 2), 20, 10));
 
-        verify(canvas).drawWidget(itemAt1x2, Rect2i.createFromMinAndSize(((CANVAS_WIDTH - 75) / 2), ((CANVAS_HEIGHT - 20) / 2) + 10, 50, 10));
-        verify(canvas).drawWidget(itemAt2x2, Rect2i.createFromMinAndSize(((CANVAS_WIDTH - 75) / 2) + 50, ((CANVAS_HEIGHT - 20) / 2) + 10, 5, 10));
-        verify(canvas).drawWidget(itemAt3x2, Rect2i.createFromMinAndSize(((CANVAS_WIDTH - 75) / 2) + 50 + 5, ((CANVAS_HEIGHT - 20) / 2) + 10, 20, 10));
+        verify(canvas).drawWidget(itemAt1x2, RectUtility.createFromMinAndSize(((CANVAS_WIDTH - 75) / 2), ((CANVAS_HEIGHT - 20) / 2) + 10, 50, 10));
+        verify(canvas).drawWidget(itemAt2x2, RectUtility.createFromMinAndSize(((CANVAS_WIDTH - 75) / 2) + 50, ((CANVAS_HEIGHT - 20) / 2) + 10, 5, 10));
+        verify(canvas).drawWidget(itemAt3x2, RectUtility.createFromMinAndSize(((CANVAS_WIDTH - 75) / 2) + 50 + 5, ((CANVAS_HEIGHT - 20) / 2) + 10, 20, 10));
     }
 
 }

@@ -16,17 +16,15 @@
 
 package org.terasology.world;
 
-import org.terasology.math.geom.Vector3i;
-import org.terasology.world.biomes.Biome;
+import org.joml.Vector3i;
+import org.joml.Vector3ic;
 import org.terasology.world.block.Block;
 
 /**
  */
 public interface WorldChangeListener {
 
-    void onBlockChanged(Vector3i pos, Block newBlock, Block originalBlock);
+    void onBlockChanged(Vector3ic pos, Block newBlock, Block originalBlock);
 
-    void onBiomeChanged(Vector3i pos, Biome newBiome, Biome originalBiome);
-    
-    void onExtraDataChanged(int i, Vector3i pos, int newData, int oldData);
+    void onExtraDataChanged(int i, Vector3ic pos, int newData, int oldData);
 }

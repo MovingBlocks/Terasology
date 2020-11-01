@@ -346,10 +346,10 @@ public final class FBO {
      * Creates an FBO, allocating the underlying FrameBuffer and the desired attachments on the GPU.
      *
      * Check FBO create(String title, Dimensions dimensions, Type type ...) for more.
-     * @param config A FBOConfig object that stores information used for creating FBO.
+     * @param config A FboConfig object that stores information used for creating FBO.
      * @return The resuting FBO object wrapping a FrameBuffer and its attachments. Use getStatus() before use to verify completeness.
      */
-    public static FBO create(FBOConfig config) {
+    public static FBO create(FboConfig config) {
         return FBO.create(config.getName(),
                 config.getDimensions(),
                 config.getType(),
@@ -437,7 +437,7 @@ public final class FBO {
         return fbo;
     }
 
-    public static void recreate(FBO fbo, FBOConfig fboConfig) {
+    public static void recreate(FBO fbo, FboConfig fboConfig) {
         Type type = fboConfig.getType();
         Dimensions dimensions = fboConfig.getDimensions();
         boolean useNormalBuffer = fboConfig.hasNormalBuffer();
@@ -493,6 +493,11 @@ public final class FBO {
 
         verifyCompleteness(fboConfig.getName(), type, fbo);
         glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+    }
+
+    @Override
+    public String toString(){
+        return "FBO: " + this.fboName;
     }
 
     private static void verifyCompleteness(SimpleUri urn, Type type, FBO fbo) {
@@ -711,8 +716,8 @@ public final class FBO {
          * @param multiplier A float representing a multiplication factor.
          */
         public void multiplySelfBy(float multiplier) {
-            width  *= multiplier;
-            height *= multiplier;
+            width  = (int) (width * multiplier);
+            height = (int) (width * multiplier);
         }
 
         /**

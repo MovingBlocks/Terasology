@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 MovingBlocks
+ * Copyright 2019 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.terasology.rendering.nui.animation;
 
 import org.terasology.math.geom.Rect2i;
@@ -22,9 +21,12 @@ import org.terasology.rendering.animation.AnimationListener;
 import org.terasology.rendering.animation.TimeModifiers;
 
 /**
- * Controls animations to and from different screens
+ * Controls animations to and from different screens.
  */
 public class SwipeMenuAnimationSystem implements MenuAnimationSystem {
+
+    // TODO: Convert away from a faked time interval to handling UI updates to non-game objects in a non-gametime loop?
+    private static final float PAUSED_ANIMATION_FRAME_TICK_TIME = 0.035f;
 
     public enum Direction {
         LEFT_TO_RIGHT(1, 0),
@@ -181,6 +183,11 @@ public class SwipeMenuAnimationSystem implements MenuAnimationSystem {
             // avoid skipping over fast animations on heavy load
             animDelta = 0.1f;
         }
+        if (animDelta < 0.0001f) {
+            // when we are inGameState and get to pauseMenu the time is paused
+            // so we need to fake the time is still running at a set rate
+            animDelta = PAUSED_ANIMATION_FRAME_TICK_TIME;
+        }
 
         flyIn.update(animDelta);
         flyOut.update(animDelta);
@@ -197,5 +204,4 @@ public class SwipeMenuAnimationSystem implements MenuAnimationSystem {
         int top = (int) (direction.getVertScale() * scale * rc.height());
         return Rect2i.createFromMinAndSize(left, top, rc.width(), rc.height());
     }
-
 }

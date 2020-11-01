@@ -119,12 +119,25 @@ public final class InjectionHelper {
      * @throws NoSuchElementException if the injection failed, e.g. if no parameters were available on the context and a default constructor is missing.
      */
     public static <E> E createWithConstructorInjection(Class<? extends E> clazz, Context context) {
+        return safeCreateWithConstructorInjection(clazz, context).get();
+    }
+
+    /**
+     * Similar to {@link #createWithConstructorInjection(Class, Context)}, but returns
+     * {@link Optional#empty()} instead of throwing an exception if the instantiation failed.
+     *
+     * @param clazz   The class to instantiate.
+     * @param context The context to use for injection.
+     * @return A new instance of the class to create.
+     * @see InjectionHelper#createWithConstructorInjection(Class, Context)
+     */
+    public static <E> Optional<E> safeCreateWithConstructorInjection(Class<? extends E> clazz, Context context) {
         SimpleClassFactory simpleClassFactory = new SimpleClassFactory(new ParameterProvider() {
             @Override
             public <T> Optional<T> get(Class<T> x) {
                 return Optional.ofNullable(context.get(x));
             }
         });
-        return simpleClassFactory.instantiateClass(clazz).get();
+        return simpleClassFactory.instantiateClass(clazz);
     }
 }

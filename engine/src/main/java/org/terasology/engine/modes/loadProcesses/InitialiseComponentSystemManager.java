@@ -18,6 +18,7 @@ package org.terasology.engine.modes.loadProcesses;
 
 import org.terasology.context.Context;
 import org.terasology.engine.ComponentSystemManager;
+import org.terasology.engine.modes.SingleStepLoadProcess;
 
 public class InitialiseComponentSystemManager extends SingleStepLoadProcess {
 

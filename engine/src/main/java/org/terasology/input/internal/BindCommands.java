@@ -21,10 +21,15 @@ import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.input.Input;
 import org.terasology.input.Keyboard;
+import org.terasology.input.Keyboard.KeyId;
 import org.terasology.logic.console.commandSystem.annotations.Command;
 import org.terasology.logic.console.commandSystem.annotations.CommandParam;
 import org.terasology.logic.permission.PermissionManager;
 import org.terasology.registry.In;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  */
@@ -39,47 +44,59 @@ public class BindCommands extends BaseComponentSystem {
         Input keyInput = Keyboard.Key.find(key);
         if (keyInput != null) {
             bindsManager.linkBindButtonToKey(keyInput.getId(), new SimpleUri(bind));
-            StringBuilder builder = new StringBuilder();
-            builder.append("Mapped ").append(keyInput.getDisplayName()).append(" to action ");
-            builder.append(bind);
-            return builder.toString();
+            return "Mapped " + keyInput.getDisplayName() + " to action " + bind;
         }
         throw new IllegalArgumentException("Unknown key: " + key);
+    }
+
+    public static Map<Integer, SimpleUri> AZERTY;
+    public static Map<Integer, SimpleUri> DVORAK;
+    public static Map<Integer, SimpleUri> NEO;
+
+    static {
+        AZERTY = new HashMap<>();
+        AZERTY.put(KeyId.Z, new SimpleUri("engine:forwards"));
+        AZERTY.put(KeyId.S, new SimpleUri("engine:backwards"));
+        AZERTY.put(KeyId.Q, new SimpleUri("engine:left"));
+        AZERTY = Collections.unmodifiableMap(AZERTY);
+
+        DVORAK = new HashMap<>();
+        DVORAK.put(KeyId.COMMA, new SimpleUri("engine:forwards"));
+        DVORAK.put(KeyId.A, new SimpleUri("engine:left"));
+        DVORAK.put(KeyId.O, new SimpleUri("engine:backwards"));
+        DVORAK.put(KeyId.E, new SimpleUri("engine:right"));
+        DVORAK.put(KeyId.C, new SimpleUri("engine:inventory"));
+        DVORAK.put(KeyId.PERIOD, new SimpleUri("engine:useItem"));
+        DVORAK = Collections.unmodifiableMap(DVORAK);
+
+        NEO = new HashMap<>();
+        NEO.put(Keyboard.KeyId.V, new SimpleUri("engine:forwards"));
+        NEO.put(Keyboard.KeyId.I, new SimpleUri("engine:backwards"));
+        NEO.put(Keyboard.KeyId.U, new SimpleUri("engine:left"));
+        NEO.put(Keyboard.KeyId.A, new SimpleUri("engine:right"));
+        NEO.put(Keyboard.KeyId.L, new SimpleUri("engine:useItem"));
+        NEO.put(Keyboard.KeyId.G, new SimpleUri("engine:inventory"));
+        NEO = Collections.unmodifiableMap(NEO);
     }
 
     @Command(shortDescription = "Switches to typical key binds for AZERTY",
             requiredPermission = PermissionManager.NO_PERMISSION)
     public String azerty() {
-        bindsManager.linkBindButtonToKey(Keyboard.KeyId.Z, new SimpleUri("engine:forwards"));
-        bindsManager.linkBindButtonToKey(Keyboard.KeyId.S, new SimpleUri("engine:backwards"));
-        bindsManager.linkBindButtonToKey(Keyboard.KeyId.Q, new SimpleUri("engine:left"));
-
+        AZERTY.forEach((key, bindId) -> bindsManager.linkBindButtonToKey(key, bindId));
         return "Changed key bindings to AZERTY keyboard layout.";
     }
 
-    @Command(shortDescription = "Switches to typical keybinds for DVORAK",
+    @Command(shortDescription = "Switches to typical key binds for DVORAK",
             requiredPermission = PermissionManager.NO_PERMISSION)
     public String dvorak() {
-        bindsManager.linkBindButtonToKey(Keyboard.KeyId.COMMA, new SimpleUri("engine:forwards"));
-        bindsManager.linkBindButtonToKey(Keyboard.KeyId.A, new SimpleUri("engine:left"));
-        bindsManager.linkBindButtonToKey(Keyboard.KeyId.O, new SimpleUri("engine:backwards"));
-        bindsManager.linkBindButtonToKey(Keyboard.KeyId.E, new SimpleUri("engine:right"));
-        bindsManager.linkBindButtonToKey(Keyboard.KeyId.C, new SimpleUri("engine:inventory"));
-        bindsManager.linkBindButtonToKey(Keyboard.KeyId.PERIOD, new SimpleUri("engine:useItem"));
-
+        DVORAK.forEach((key, bindId) -> bindsManager.linkBindButtonToKey(key, bindId));
         return "Changed key bindings to DVORAK keyboard layout.";
     }
 
     @Command(shortDescription = "Switches to typical key binds for NEO 2 keyboard layout",
             requiredPermission = PermissionManager.NO_PERMISSION)
     public String neo() {
-        bindsManager.linkBindButtonToKey(Keyboard.KeyId.V, new SimpleUri("engine:forwards"));
-        bindsManager.linkBindButtonToKey(Keyboard.KeyId.I, new SimpleUri("engine:backwards"));
-        bindsManager.linkBindButtonToKey(Keyboard.KeyId.U, new SimpleUri("engine:left"));
-        bindsManager.linkBindButtonToKey(Keyboard.KeyId.A, new SimpleUri("engine:right"));
-        bindsManager.linkBindButtonToKey(Keyboard.KeyId.L, new SimpleUri("engine:useItem"));
-        bindsManager.linkBindButtonToKey(Keyboard.KeyId.G, new SimpleUri("engine:inventory"));
-
+        NEO.forEach((key, bindId) -> bindsManager.linkBindButtonToKey(key, bindId));
         return "Changed key bindings to NEO 2 keyboard layout.";
     }
 }

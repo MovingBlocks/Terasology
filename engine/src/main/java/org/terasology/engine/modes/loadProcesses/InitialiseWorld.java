@@ -1,21 +1,9 @@
-/*
- * Copyright 2016 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.engine.modes.loadProcesses;
 
+import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
@@ -23,6 +11,7 @@ import org.terasology.context.Context;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.TerasologyConstants;
+import org.terasology.engine.modes.SingleStepLoadProcess;
 import org.terasology.engine.modes.StateMainMenu;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.paths.PathManager;
@@ -48,12 +37,11 @@ import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;
-import org.terasology.world.biomes.BiomeManager;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
+import org.terasology.world.chunks.blockdata.ExtraBlockDataManager;
 import org.terasology.world.chunks.localChunkProvider.LocalChunkProvider;
 import org.terasology.world.chunks.localChunkProvider.RelevanceSystem;
-import org.terasology.world.chunks.blockdata.ExtraBlockDataManager;
 import org.terasology.world.generator.UnresolvedWorldGeneratorException;
 import org.terasology.world.generator.WorldGenerator;
 import org.terasology.world.generator.internal.WorldGeneratorManager;
@@ -74,8 +62,8 @@ public class InitialiseWorld extends SingleStepLoadProcess {
 
     private static final Logger logger = LoggerFactory.getLogger(InitialiseWorld.class);
 
-    private GameManifest gameManifest;
-    private Context context;
+    private final GameManifest gameManifest;
+    private final Context context;
 
     public InitialiseWorld(GameManifest gameManifest, Context context) {
         this.gameManifest = gameManifest;
@@ -90,7 +78,6 @@ public class InitialiseWorld extends SingleStepLoadProcess {
     @Override
     public boolean step() {
         BlockManager blockManager = context.get(BlockManager.class);
-        BiomeManager biomeManager = context.get(BiomeManager.class);
         ExtraBlockDataManager extraDataManager = context.get(ExtraBlockDataManager.class);
 
         ModuleEnvironment environment = context.get(ModuleManager.class).getEnvironment();
@@ -130,17 +117,24 @@ public class InitialiseWorld extends SingleStepLoadProcess {
         RecordAndReplayCurrentStatus recordAndReplayCurrentStatus = context.get(RecordAndReplayCurrentStatus.class);
         try {
             storageManager = writeSaveGamesEnabled
-                    ? new ReadWriteStorageManager(saveOrRecordingPath, environment, entityManager, blockManager, biomeManager, extraDataManager, recordAndReplaySerializer, recordAndReplayUtils, recordAndReplayCurrentStatus)
-                    : new ReadOnlyStorageManager(saveOrRecordingPath, environment, entityManager, blockManager, biomeManager, extraDataManager);
+                    ? new ReadWriteStorageManager(saveOrRecordingPath, environment, entityManager, blockManager, extraDataManager, recordAndReplaySerializer, recordAndReplayUtils, recordAndReplayCurrentStatus)
+                    : new ReadOnlyStorageManager(saveOrRecordingPath, environment, entityManager, blockManager, extraDataManager);
         } catch (IOException e) {
             logger.error("Unable to create storage manager!", e);
             context.get(GameEngine.class).changeState(new StateMainMenu("Unable to create storage manager!"));
             return true; // We need to return true, otherwise the loading state will just call us again immediately
         }
         context.put(StorageManager.class, storageManager);
-        LocalChunkProvider chunkProvider = new LocalChunkProvider(storageManager, entityManager, worldGenerator,
-                blockManager, biomeManager, extraDataManager);
-        context.get(ComponentSystemManager.class).register(new RelevanceSystem(chunkProvider), "engine:relevanceSystem");
+        LocalChunkProvider chunkProvider = new LocalChunkProvider(storageManager,
+                entityManager,
+                worldGenerator,
+                blockManager,
+                extraDataManager,
+                Maps.newConcurrentMap());
+        RelevanceSystem relevanceSystem = new RelevanceSystem(chunkProvider);
+        context.put(RelevanceSystem.class, relevanceSystem);
+        context.get(ComponentSystemManager.class).register(relevanceSystem, "engine:relevanceSystem");
+        chunkProvider.setRelevanceSystem(relevanceSystem);
         Block unloadedBlock = blockManager.getBlock(BlockManager.UNLOADED_ID);
         WorldProviderCoreImpl worldProviderCore = new WorldProviderCoreImpl(worldInfo, chunkProvider, unloadedBlock, context);
         EntityAwareWorldProvider entityWorldProvider = new EntityAwareWorldProvider(worldProviderCore, context);

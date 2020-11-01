@@ -32,9 +32,9 @@ import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.animation.MenuAnimationSystems;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameInfo;
-import org.terasology.rendering.nui.widgets.UIButton;
-import org.terasology.rendering.nui.widgets.UILabel;
-import org.terasology.rendering.nui.widgets.UIText;
+import org.terasology.nui.widgets.UIButton;
+import org.terasology.nui.widgets.UILabel;
+import org.terasology.nui.widgets.UIText;
 
 import java.io.File;
 import java.io.IOException;
@@ -76,6 +76,7 @@ public class NameRecordingScreen extends CoreScreenLayer {
 
     @Override
     public void onScreenOpened() {
+        super.onScreenOpened();
         // resets the description from any earlier error messages, in case the user re-opens the screen.
         description.setText(translationSystem.translate("${engine:menu#name-recording-description}"));
     }
@@ -197,5 +198,10 @@ public class NameRecordingScreen extends CoreScreenLayer {
 
     public void setGameInfo(GameInfo gameInfo) {
         this.gameInfo = gameInfo;
+    }
+
+    @Override
+    public boolean isLowerLayerVisible() {
+        return false;
     }
 }

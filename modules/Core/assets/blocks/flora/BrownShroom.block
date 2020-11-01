@@ -1,6 +1,0 @@
-/**
- * A brown mushroom. It isn't magic yet
- */
-{
-    "basedOn": "core:plant"
-}

@@ -19,7 +19,6 @@ import com.google.gson.ExclusionStrategy;
 import com.google.gson.FieldAttributes;
 import org.terasology.utilities.ReflectionUtil;
 
-import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Map;
 
@@ -27,7 +26,7 @@ public class GsonMapExclusionStrategy implements ExclusionStrategy {
     @Override
     public boolean shouldSkipField(FieldAttributes f) {
         Type fieldType = f.getDeclaredType();
-        Class<?> fieldClass = ReflectionUtil.getClassOfType(fieldType);
+        Class<?> fieldClass = ReflectionUtil.getRawType(fieldType);
 
         if (Map.class.isAssignableFrom(fieldClass)) {
             Type mapKeyType = ReflectionUtil.getTypeParameter(fieldType, 0);

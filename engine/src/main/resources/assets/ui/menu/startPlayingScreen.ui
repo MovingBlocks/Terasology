@@ -19,40 +19,47 @@
         }
       },
       {
-        "type": "UIBox",
-        "id": "container",
+        "type": "UILabel",
+        "id": "subtitle",
         "layoutInfo": {
-          "width": 400,
+          "use-content-height": true,
+          "use-content-width": true,
           "position-horizontal-center": {},
           "position-top": {
             "target": "BOTTOM",
-            "offset": 16,
-            "widget": "title"
+            "widget": "title",
+            "offset": 32
+          }
+        }
+      },
+      {
+        "type": "UIBox",
+        "id": "container",
+        "layoutInfo": {
+          "position-horizontal-center": {},
+          "width": 392,
+          "position-top": {
+            "target": "TOP",
+            "offset": -8,
+            "widget": "coreLayout"
           },
           "position-bottom": {
-            "target": "TOP",
-            "widget": "close",
-            "offset": 16
+            "target": "BOTTOM",
+            "offset": -8,
+            "widget": "coreLayout"
           }
         }
       },
       {
         "type": "ColumnLayout",
+        "id": "coreLayout",
         "columns": 1,
         "horizontalSpacing": 8,
         "layoutInfo": {
           "width": 384,
+          "use-content-height": true,
           "position-horizontal-center": {},
-          "position-top": {
-            "target": "TOP",
-            "widget": "container",
-            "offset": 8
-          },
-          "position-bottom": {
-            "target": "TOP",
-            "widget": "close",
-            "offset": 24
-          }
+          "position-vertical-center": {}
         },
         "contents": [
           {
@@ -63,42 +70,86 @@
         ]
       },
       {
-        "type": "UISpace",
+        "type": "UIButton",
+        "text": "${engine:menu#return-pregeneration}",
         "id": "close",
         "layoutInfo": {
-          "width": 128,
-          "height": 32,
-          "position-horizontal-center": {},
-          "position-bottom": {
-            "target": "BOTTOM",
-            "offset": 48
+          "width": 120,
+          "height": 80,
+          "position-vertical-center": {
+            "target": "CENTER",
+            "widget": "container"
+          },
+          "position-right": {
+            "target": "LEFT",
+            "widget": "container",
+            "offset": 16
           }
         }
       },
       {
         "type": "RowLayout",
         "id": "actionsRow",
-        "horizontalSpacing": 4,
+        "horizontalSpacing": 32,
         "contents": [
           {
             "type": "UIButton",
-            "text": "${engine:menu#back}",
-            "id": "close"
+            "text": "${engine:menu#return-main-menu}",
+            "id": "mainMenu"
           },
           {
             "type": "UIButton",
-            "text": "${engine:menu#start-game}",
+            "text": "${engine:menu#rendering-settings}",
+            "id": "renderingSettings"
+          },
+          {
+            "type": "UIButton",
+            "text": "${engine:menu#start-playing}",
             "id": "play"
           }
         ],
         "layoutInfo": {
-          "width": 400,
-          "height": 32,
+          "width": 350,
+          "height": 80,
           "position-horizontal-center": {},
-          "position-bottom": {
+          "position-top": {
             "target": "BOTTOM",
-            "offset": -48,
-            "widget": "container"
+            "widget": "container",
+            "offset": 16
+          }
+        }
+      },
+      {
+        "type": "UIImage",
+        "image": "engine:happyGooey",
+        "layoutInfo": {
+          "width": 87,
+          "height": 40,
+          "position-left": {
+            "target": "RIGHT",
+            "widget": "actionsRow",
+            "offset": 8
+          },
+          "position-vertical-center": {
+            "target": "CENTER",
+            "widget": "actionsRow"
+          }
+        }
+      },
+      {
+        "type": "UIImage",
+        "image": "engine:angryGooey",
+        "layoutInfo": {
+          "width": 87,
+          "height": 40,
+          "position-right": {
+            "target": "LEFT",
+            "widget": "actionsRow",
+            "offset": 8
+          },
+          "position-vertical-center": {
+            "target": "CENTER",
+            "widget": "actionsRow"
           }
         }
       }

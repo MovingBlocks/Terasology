@@ -15,14 +15,16 @@
  */
 package org.terasology.math;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.terasology.config.Config;
 import org.terasology.context.internal.ContextImpl;
 import org.terasology.context.internal.MockContext;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.registry.CoreRegistry;
+import org.terasology.world.block.BlockRegion;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ChunkMathTest {
 
@@ -48,4 +50,70 @@ public class ChunkMathTest {
         assertEquals(new Vector3i(0, 0, 0), chunks[0]);
         assertEquals(new Vector3i(1, 0, 0), chunks[1]);
     }
+
+    @Test
+    public void testCalcChunk() {
+        assertEquals(0, ChunkMath.calcChunkPos(10, 6));
+        assertEquals(-1, ChunkMath.calcChunkPos(-1, 6));
+        assertEquals(1, ChunkMath.calcChunkPos(100, 6));
+        assertEquals(3, ChunkMath.calcChunkPos(200, 6));
+    }
+
+    @Test
+    public void testCalcChunkPosX() {
+        assertEquals(0, ChunkMath.calcChunkPosX(10));
+        assertEquals(-1, ChunkMath.calcChunkPosX(-1));
+        assertEquals(3, ChunkMath.calcChunkPosX(100));
+        assertEquals(6, ChunkMath.calcChunkPosX(200));
+        assertEquals(21, ChunkMath.calcChunkPosX(700));
+    }
+
+    @Test
+    public void testCalcChunkPosY() {
+        assertEquals(0, ChunkMath.calcChunkPosY(10));
+        assertEquals(-1, ChunkMath.calcChunkPosY(-1));
+        assertEquals(1, ChunkMath.calcChunkPosY(100));
+        assertEquals(3, ChunkMath.calcChunkPosY(200));
+        assertEquals(10, ChunkMath.calcChunkPosY(700));
+    }
+
+    @Test
+    public void testCalcChunkPosZ() {
+        assertEquals(0, ChunkMath.calcChunkPosZ(10));
+        assertEquals(-1, ChunkMath.calcChunkPosZ(-1));
+        assertEquals(6, ChunkMath.calcChunkPosZ(200));
+        assertEquals(21, ChunkMath.calcChunkPosZ(700));
+    }
+
+    @Test
+    public void testCalcChunkPos() {
+        org.joml.Vector3i temp = new org.joml.Vector3i();
+        assertTrue(ChunkMath.calcChunkPos(700, 700, 700, temp).equals(21, 10, 21));
+        assertTrue(ChunkMath.calcChunkPos(200, 700, -1, temp).equals(6, 10, -1));
+        assertTrue(ChunkMath.calcChunkPos(200, 200, 200, temp).equals(6, 3, 6));
+        assertTrue(ChunkMath.calcChunkPos(10, 10, 10, temp).equals(0, 0, 0));
+    }
+
+    @Test
+    public void testChunkRegionAroundWorldPos() {
+        assertEquals(ChunkMath.getChunkRegionAroundWorldPos(new org.joml.Vector3i(0, 0, 0), 100),
+            new BlockRegion(-4, -2, -4, 3, 1, 3));
+        assertEquals(ChunkMath.getChunkRegionAroundWorldPos(new org.joml.Vector3i(-30, -30, -30), 100),
+            new BlockRegion(-5, -3, -5, 2, 1, 2));
+        assertEquals(ChunkMath.getChunkRegionAroundWorldPos(new org.joml.Vector3i(0, 0, 0), 10),
+            new BlockRegion(-1, -1, -1, 0, 0, 0));
+    }
+
+
+    @Test
+    public void testFloatingPointCalcChunkPos() {
+        org.joml.Vector3i temp = new org.joml.Vector3i();
+        assertTrue(ChunkMath.calcChunkPos(31.9f, 64.1f, 32.5f, temp).equals(0, 1, 1), temp.toString());
+        assertTrue(ChunkMath.calcChunkPos(32.9f, 63.9f, 32.9f, temp).equals(1, 0, 1), temp.toString());
+        assertTrue(ChunkMath.calcChunkPos(31.3f, 63.9f, 31.9f, temp).equals(0, 0, 0), temp.toString());
+        assertTrue(ChunkMath.calcChunkPos(31.6f, 64.5f, 32.1f, temp).equals(0, 1, 1), temp.toString());
+        assertTrue(ChunkMath.calcChunkPos(.1f, -.2f, -.8f, temp).equals(0, -1, -1), temp.toString());
+        assertTrue(ChunkMath.calcChunkPos(-.1f, -.99f, 2f, temp).equals(-1, -1, 0), temp.toString());
+    }
+
 }

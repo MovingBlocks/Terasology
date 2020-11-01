@@ -15,12 +15,11 @@
  */
 package org.terasology.engine.bootstrap;
 
-import java.lang.reflect.Type;
-import java.util.Optional;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.module.ModuleAwareAssetTypeManager;
+import org.terasology.config.flexible.AutoConfigManager;
 import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.module.ModuleManager;
@@ -35,11 +34,15 @@ import org.terasology.entitySystem.prefab.internal.PrefabFormat;
 import org.terasology.entitySystem.systems.internal.DoNotAutoRegister;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.persistence.typeHandling.RegisterTypeHandler;
+import org.terasology.persistence.typeHandling.RegisterTypeHandlerFactory;
 import org.terasology.persistence.typeHandling.TypeHandler;
-import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
+import org.terasology.persistence.typeHandling.TypeHandlerFactory;
+import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.persistence.typeHandling.extensionTypes.CollisionGroupTypeHandler;
 import org.terasology.physics.CollisionGroup;
 import org.terasology.physics.CollisionGroupManager;
+import org.terasology.reflection.TypeInfo;
+import org.terasology.reflection.TypeRegistry;
 import org.terasology.reflection.copy.CopyStrategy;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.copy.RegisterCopyStrategy;
@@ -47,6 +50,9 @@ import org.terasology.reflection.reflect.ReflectFactory;
 import org.terasology.registry.InjectionHelper;
 import org.terasology.util.reflection.GenericsUtil;
 import org.terasology.utilities.ReflectionUtil;
+
+import java.lang.reflect.Type;
+import java.util.Optional;
 
 /**
  * Handles an environment switch by updating the asset manager, component library, and other context objects.
@@ -63,36 +69,48 @@ public final class EnvironmentSwitchHandler {
     @SuppressWarnings("unchecked")
     public void handleSwitchToGameEnvironment(Context context) {
         ModuleManager moduleManager = context.get(ModuleManager.class);
+        ModuleEnvironment environment = moduleManager.getEnvironment();
+
+        TypeRegistry typeRegistry = context.get(TypeRegistry.class);
+        typeRegistry.reload(environment);
 
         CopyStrategyLibrary copyStrategyLibrary = context.get(CopyStrategyLibrary.class);
         copyStrategyLibrary.clear();
-        for (Class<? extends CopyStrategy> copyStrategy : moduleManager.getEnvironment().getSubtypesOf(CopyStrategy.class)) {
+        for (Class<? extends CopyStrategy> copyStrategy : environment.getSubtypesOf(CopyStrategy.class)) {
             if (copyStrategy.getAnnotation(RegisterCopyStrategy.class) == null) {
                 continue;
             }
-            Class<?> targetType = ReflectionUtil.getTypeParameterForSuper(copyStrategy, CopyStrategy.class, 0);
-            if (targetType != null) {
-                registerCopyStrategy(copyStrategyLibrary, targetType, copyStrategy);
+            Type targetType = ReflectionUtil.getTypeParameterForSuper(copyStrategy, CopyStrategy.class, 0);
+            if (targetType instanceof Class) {
+                registerCopyStrategy(copyStrategyLibrary, (Class<?>) targetType, copyStrategy);
             } else {
                 logger.error("Cannot register CopyStrategy '{}' - unable to determine target type", copyStrategy);
             }
         }
 
-        ReflectFactory reflectFactory = context.get(ReflectFactory.class);
-        TypeSerializationLibrary typeSerializationLibrary = TypeSerializationLibrary.createDefaultLibrary(reflectFactory, copyStrategyLibrary);
-        typeSerializationLibrary.add(CollisionGroup.class, new CollisionGroupTypeHandler(context.get(CollisionGroupManager.class)));
-        context.put(TypeSerializationLibrary.class, typeSerializationLibrary);
+        //TODO: find a permanent fix over just creating a new typehandler
+        // https://github.com/Terasology/JoshariasSurvival/issues/31
+        // TypeHandlerLibrary typeHandlerLibrary = context.get(TypeHandlerLibrary.class);
+        // typeHandlerLibrary.addTypeHandler(CollisionGroup.class, new CollisionGroupTypeHandler(context.get(CollisionGroupManager.class)));
+
+        TypeHandlerLibrary typeHandlerLibrary = TypeHandlerLibrary.forModuleEnvironment(moduleManager,typeRegistry);
+        typeHandlerLibrary.addTypeHandler(CollisionGroup.class, new CollisionGroupTypeHandler(context.get(CollisionGroupManager.class)));
+        context.put(TypeHandlerLibrary.class, typeHandlerLibrary);
 
         // Entity System Library
-        EntitySystemLibrary library = new EntitySystemLibrary(context, typeSerializationLibrary);
+        EntitySystemLibrary library = new EntitySystemLibrary(context, typeHandlerLibrary);
         context.put(EntitySystemLibrary.class, library);
         ComponentLibrary componentLibrary = library.getComponentLibrary();
         context.put(ComponentLibrary.class, componentLibrary);
         context.put(EventLibrary.class, library.getEventLibrary());
         context.put(ClassMetaLibrary.class, new ClassMetaLibraryImpl(context));
 
-        registerComponents(componentLibrary, moduleManager.getEnvironment());
-        registerTypeHandlers(context, typeSerializationLibrary, moduleManager.getEnvironment());
+        registerComponents(componentLibrary, environment);
+        registerTypeHandlers(context, typeHandlerLibrary, environment);
+
+        // Load configs for the new environment
+        AutoConfigManager autoConfigManager = context.get(AutoConfigManager.class);
+        autoConfigManager.loadConfigsIn(context);
 
         ModuleAwareAssetTypeManager assetTypeManager = context.get(ModuleAwareAssetTypeManager.class);
 
@@ -104,12 +122,12 @@ public final class EnvironmentSwitchHandler {
          * existing then yet.
          */
         unregisterPrefabFormats(assetTypeManager);
-        registeredPrefabFormat = new PrefabFormat(componentLibrary, typeSerializationLibrary);
+        registeredPrefabFormat = new PrefabFormat(componentLibrary, typeHandlerLibrary);
         assetTypeManager.registerCoreFormat(Prefab.class, registeredPrefabFormat);
-        registeredPrefabDeltaFormat = new PrefabDeltaFormat(componentLibrary, typeSerializationLibrary);
+        registeredPrefabDeltaFormat = new PrefabDeltaFormat(componentLibrary, typeHandlerLibrary);
         assetTypeManager.registerCoreDeltaFormat(Prefab.class, registeredPrefabDeltaFormat);
 
-        assetTypeManager.switchEnvironment(moduleManager.getEnvironment());
+        assetTypeManager.switchEnvironment(environment);
 
     }
 
@@ -138,7 +156,7 @@ public final class EnvironmentSwitchHandler {
 
     public void handleSwitchToPreviewEnvironment(Context context, ModuleEnvironment environment) {
         cheapAssetManagerUpdate(context, environment);
-        ComponentLibrary library = new ComponentLibrary(context);
+        ComponentLibrary library = new ComponentLibrary(environment, context.get(ReflectFactory.class), context.get(CopyStrategyLibrary.class));
         context.put(ComponentLibrary.class, library);
 
         registerComponents(library, environment);
@@ -172,13 +190,13 @@ public final class EnvironmentSwitchHandler {
         for (Class<? extends Component> componentType : environment.getSubtypesOf(Component.class)) {
             if (componentType.getAnnotation(DoNotAutoRegister.class) == null) {
                 String componentName = MetadataUtil.getComponentClassName(componentType);
-                library.register(new SimpleUri(environment.getModuleProviding(componentType), componentName), componentType);
+                library.register(new ResourceUrn(environment.getModuleProviding(componentType).toString(), componentName), componentType);
             }
         }
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})
-    private static void registerTypeHandlers(Context context, TypeSerializationLibrary library, ModuleEnvironment environment) {
+    private static void registerTypeHandlers(Context context, TypeHandlerLibrary library, ModuleEnvironment environment) {
         for (Class<? extends TypeHandler> handler : environment.getSubtypesOf(TypeHandler.class)) {
             RegisterTypeHandler register = handler.getAnnotation(RegisterTypeHandler.class);
             if (register != null) {
@@ -186,9 +204,19 @@ public final class EnvironmentSwitchHandler {
                 if (opt.isPresent()) {
                     TypeHandler instance = InjectionHelper.createWithConstructorInjection(handler, context);
                     InjectionHelper.inject(instance, context);
-                    library.add((Class) opt.get(), instance);
+                    library.addTypeHandler(TypeInfo.of(opt.get()), instance);
                 }
             }
+        }
+
+        for (Class<? extends TypeHandlerFactory> clazz : environment.getSubtypesOf(TypeHandlerFactory.class)) {
+            if (!clazz.isAnnotationPresent(RegisterTypeHandlerFactory.class)) {
+                continue;
+            }
+
+            TypeHandlerFactory instance = InjectionHelper.createWithConstructorInjection(clazz, context);
+            InjectionHelper.inject(instance, context);
+            library.addTypeHandlerFactory(instance);
         }
     }
 }

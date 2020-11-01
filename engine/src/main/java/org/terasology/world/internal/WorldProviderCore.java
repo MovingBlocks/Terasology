@@ -16,13 +16,12 @@
 package org.terasology.world.internal;
 
 import com.google.common.collect.Maps;
+import org.joml.Vector3ic;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.math.Region3i;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.world.WorldChangeListener;
-import org.terasology.world.biomes.Biome;
 import org.terasology.world.block.Block;
-import org.terasology.world.liquid.LiquidData;
 import org.terasology.world.time.WorldTime;
 
 import java.util.Collection;
@@ -102,8 +101,21 @@ public interface WorldProviderCore {
      * @param pos  The world position to change
      * @param type The type of the block to set
      * @return The previous block type. Null if the change failed (because the necessary chunk was not loaded)
+     * @deprecated This is scheduled for removal in an upcoming version
+     *             method will be replaced with JOML implementation {@link #setBlock(Vector3ic, Block)}.
      */
+    @Deprecated
     Block setBlock(Vector3i pos, Block type);
+
+
+    /**
+     * Places a block of a specific type at a given position
+     *
+     * @param pos  The world position to change
+     * @param type The type of the block to set
+     * @return The previous block type. Null if the change failed (because the necessary chunk was not loaded)
+     */
+    Block setBlock(Vector3ic pos, Block type);
 
     /**
      * Places all given blocks of specific types at their corresponding positions
@@ -122,45 +134,6 @@ public interface WorldProviderCore {
         }
         return resultMap;
     }
-
-
-
-    /**
-     * Changes the biome at the given position.
-     *
-     * @param pos   The world position to change
-     * @param biome The biome to set
-     * @return The previous biome type at the position. Null if the change failed (because the necessary chunk was not loaded)
-     */
-    Biome setBiome(Vector3i pos, Biome biome);
-
-    /**
-     * Returns the biome at a specific world position.
-     *
-     * @param pos The position
-     * @return The biome at the given position.
-     */
-    Biome getBiome(Vector3i pos);
-
-    /**
-     * @param x
-     * @param y
-     * @param z
-     * @param newData
-     * @param oldData
-     * @return Whether the liquid change was made successfully. Will fail if the current data doesn't match the oldData, or if the underlying chunk is not available
-     */
-    boolean setLiquid(int x, int y, int z, LiquidData newData, LiquidData oldData);
-
-    /**
-     * Returns the liquid state at the given position.
-     *
-     * @param x The X-coordinate
-     * @param y The Y-coordinate
-     * @param z The Z-coordinate
-     * @return The liquid data of the block
-     */
-    LiquidData getLiquid(int x, int y, int z);
 
     /**
      * Returns the block at the given position.
@@ -193,7 +166,7 @@ public interface WorldProviderCore {
     byte getSunlight(int x, int y, int z);
 
     byte getTotalLight(int x, int y, int z);
-    
+
     /**
      * Gets one of the per-block custom data values at the given position. Returns 0 outside the view.
      *
@@ -204,9 +177,10 @@ public interface WorldProviderCore {
      * @return The (index)th extra-data value at the given position
      */
     int getExtraData(int index, int x, int y, int z);
-    
+
     /**
      * Sets one of the per-block custom data values at the given position, if it is within the view.
+     * You must not use this method with world gen code, call 'setExtraData' on chunk instead.
      *
      * @param index The index of the extra data field
      * @param pos
@@ -226,4 +200,5 @@ public interface WorldProviderCore {
      * @return an unmodifiable view on the generated relevant regions
      */
     Collection<Region3i> getRelevantRegions();
+
 }

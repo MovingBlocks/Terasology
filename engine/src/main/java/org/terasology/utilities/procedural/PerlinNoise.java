@@ -20,11 +20,14 @@ import org.terasology.utilities.random.FastRandom;
 
 /**
  * Improved Perlin noise based on the reference implementation by Ken Perlin.
+ * @deprecated Prefer using {@link SimplexNoise}, it is comparable to Perlin noise (fewer directional artifacts, lower computational overhead for higher dimensions).
  *
  */
+@Deprecated
 public class PerlinNoise extends AbstractNoise implements Noise2D, Noise3D {
 
     private final int[] noisePermutations;
+    private final int permCount;
 
     /**
      * Init. a new generator with a given seed value.
@@ -32,31 +35,42 @@ public class PerlinNoise extends AbstractNoise implements Noise2D, Noise3D {
      * @param seed The seed value
      */
     public PerlinNoise(long seed) {
+        this(seed, 1 << 8);
+    }
+
+    /**
+     * Init. a new generator with a given seed value and grid dimension.
+     * Supports tileable noise generation
+     *
+     * @param seed The seed value
+     * @param gridDim gridDim x gridDim will be the size of the perlin's grid of vectors, noise will be tiled if an input coordinate crosses a multiple of gridDim
+     */
+    public PerlinNoise(long seed, int gridDim) {
         FastRandom rand = new FastRandom(seed);
 
-        noisePermutations = new int[512];
-        int[] noiseTable = new int[256];
+        permCount = gridDim;
+        noisePermutations = new int[permCount * 2];
+        int[] noiseTable = new int[permCount];
 
         // Init. the noise table
-        for (int i = 0; i < 256; i++) {
+        for (int i = 0; i < permCount; i++) {
             noiseTable[i] = i;
         }
 
         // Shuffle the array
-        for (int i = 0; i < 256; i++) {
-            int j = rand.nextInt(256);
+        for (int i = 0; i < permCount; i++) {
+            int j = rand.nextInt(permCount);
 
             int swap = noiseTable[i];
             noiseTable[i] = noiseTable[j];
             noiseTable[j] = swap;
         }
 
-        // Finally replicate the noise permutations in the remaining 256 index positions
-        for (int i = 0; i < 256; i++) {
+        // Finally replicate the noise permutations in the remaining permCount index positions
+        for (int i = 0; i < permCount; i++) {
             noisePermutations[i] = noiseTable[i];
-            noisePermutations[i + 256] = noiseTable[i];
+            noisePermutations[i + permCount] = noiseTable[i];
         }
-
     }
 
     /**
@@ -69,9 +83,9 @@ public class PerlinNoise extends AbstractNoise implements Noise2D, Noise3D {
      */
     @Override
     public float noise(float posX, float posY, float posZ) {
-        int xInt = (int) TeraMath.fastFloor(posX) & 255;
-        int yInt = (int) TeraMath.fastFloor(posY) & 255;
-        int zInt = (int) TeraMath.fastFloor(posZ) & 255;
+        int xInt = Math.floorMod(TeraMath.floorToInt(posX), permCount);
+        int yInt = Math.floorMod(TeraMath.floorToInt(posY), permCount);
+        int zInt = Math.floorMod(TeraMath.floorToInt(posZ), permCount);
 
         float x = posX - TeraMath.fastFloor(posX);
         float y = posY - TeraMath.fastFloor(posY);

@@ -38,4 +38,12 @@ class facade {
 
         return itemList
     }
+
+    def refreshGradle(File targetDir) {
+        // Copy in the template build.gradle for facades
+        println "In refreshGradle for facade $targetDir - copying in a fresh build.gradle"
+        File targetBuildGradle = new File(targetDir, 'build.gradle')
+        targetBuildGradle.delete()
+        targetBuildGradle << new File('templates/facades.gradle').text
+    }
 }

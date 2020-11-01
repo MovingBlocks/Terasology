@@ -15,21 +15,28 @@
  */
 package org.terasology.testUtil;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
-import java.util.Collection;
-import java.util.List;
-
+import com.google.common.collect.Lists;
+import org.joml.Quaternionfc;
+import org.joml.Vector2fc;
+import org.joml.Vector3fc;
+import org.joml.Vector4fc;
+import org.junit.jupiter.api.Assertions;
 import org.terasology.math.geom.Quat4f;
+import org.terasology.math.geom.Vector2f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector4f;
 
-import com.google.common.collect.Lists;
+import java.util.Collection;
+import java.util.List;
+import java.util.function.Supplier;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 /**
+ *
  */
 public final class TeraAssert {
     private TeraAssert() {
@@ -42,9 +49,9 @@ public final class TeraAssert {
             assertNotNull(actual);
             List<? extends T> copyActual = Lists.newArrayList(actual);
             for (Object obj : expected) {
-                assertTrue("Missing element: " + obj, copyActual.remove(obj));
+                assertTrue(copyActual.remove(obj), () -> "Missing element: " + obj);
             }
-            assertTrue("Unexpected additional elements: " + copyActual.toString(), copyActual.isEmpty());
+            assertTrue(copyActual.isEmpty(), () -> "Unexpected additional elements: " + copyActual.toString());
         }
     }
 
@@ -53,10 +60,45 @@ public final class TeraAssert {
             assertNull(actual);
         } else {
             assertNotNull(actual);
-            String errorMessage = "Expected " + expected + ", actual" + actual;
-            org.junit.Assert.assertEquals(errorMessage, expected.x, actual.x, error);
-            org.junit.Assert.assertEquals(errorMessage, expected.y, actual.y, error);
-            org.junit.Assert.assertEquals(errorMessage, expected.z, actual.z, error);
+            Supplier<String> errorMessageSupplier = () -> "Expected " + expected + ", actual" + actual;
+            Assertions.assertEquals(expected.x, actual.x, error, errorMessageSupplier);
+            Assertions.assertEquals(expected.y, actual.y, error, errorMessageSupplier);
+            Assertions.assertEquals(expected.z, actual.z, error, errorMessageSupplier);
+        }
+    }
+
+    public static void assertEquals(Vector2f expected, Vector2f actual, float error) {
+        if (expected == null) {
+            assertNull(actual);
+        } else {
+            assertNotNull(actual);
+            Supplier<String> errorMessageSupplier = () -> "Expected " + expected + ", actual" + actual;
+            Assertions.assertEquals(expected.x, actual.x, error, errorMessageSupplier);
+            Assertions.assertEquals(expected.y, actual.y, error, errorMessageSupplier);
+        }
+    }
+
+    public static void assertEquals(Vector2fc expected, Vector2fc actual, float error) {
+        if (expected == null) {
+            assertNull(actual);
+        } else {
+            assertNotNull(actual);
+            Supplier<String> errorMessageSupplier = () -> "Expected " + expected + ", actual" + actual;
+            Assertions.assertEquals(expected.x(), actual.x(), error, errorMessageSupplier);
+            Assertions.assertEquals(expected.y(), actual.y(), error, errorMessageSupplier);
+        }
+    }
+
+
+    public static void assertEquals(Vector3fc expected, Vector3fc actual, float error) {
+        if (expected == null) {
+            assertNull(actual);
+        } else {
+            assertNotNull(actual);
+            Supplier<String> errorMessageSupplier = () -> "Expected " + expected + ", actual" + actual;
+            Assertions.assertEquals(expected.x(), actual.x(), error, errorMessageSupplier);
+            Assertions.assertEquals(expected.y(), actual.y(), error, errorMessageSupplier);
+            Assertions.assertEquals(expected.z(), actual.z(), error, errorMessageSupplier);
         }
     }
 
@@ -65,24 +107,38 @@ public final class TeraAssert {
             assertNull(actual);
         } else {
             assertNotNull(actual);
-            String errorMessage = "Expected " + expected + ", actual" + actual;
-            org.junit.Assert.assertEquals(errorMessage, expected.x, actual.x, error);
-            org.junit.Assert.assertEquals(errorMessage, expected.y, actual.y, error);
-            org.junit.Assert.assertEquals(errorMessage, expected.z, actual.z, error);
-            org.junit.Assert.assertEquals(errorMessage, expected.w, actual.w, error);
+            Supplier<String> errorMessageSupplier = () -> "Expected " + expected + ", actual" + actual;
+            Assertions.assertEquals(expected.x, actual.x, error, errorMessageSupplier);
+            Assertions.assertEquals(expected.y, actual.y, error, errorMessageSupplier);
+            Assertions.assertEquals(expected.z, actual.z, error, errorMessageSupplier);
+            Assertions.assertEquals(expected.w, actual.w, error, errorMessageSupplier);
         }
     }
 
-    public static void assertEquals(Quat4f expected, Quat4f actual, float error) {
+    public static void assertEquals(Vector4fc expected, Vector4fc actual, float error) {
         if (expected == null) {
             assertNull(actual);
         } else {
             assertNotNull(actual);
-            String errorMessage = "Expected " + expected + ", actual" + actual;
-            org.junit.Assert.assertEquals(errorMessage, expected.x, actual.x, error);
-            org.junit.Assert.assertEquals(errorMessage, expected.y, actual.y, error);
-            org.junit.Assert.assertEquals(errorMessage, expected.z, actual.z, error);
-            org.junit.Assert.assertEquals(errorMessage, expected.w, actual.w, error);
+            Supplier<String> errorMessageSupplier = () -> "Expected " + expected + ", actual" + actual;
+            Assertions.assertEquals(expected.x(), actual.x(), error, errorMessageSupplier);
+            Assertions.assertEquals(expected.y(), actual.y(), error, errorMessageSupplier);
+            Assertions.assertEquals(expected.z(), actual.z(), error, errorMessageSupplier);
+            Assertions.assertEquals(expected.w(), actual.w(), error, errorMessageSupplier);
+        }
+    }
+
+
+    public static void assertEquals(Quaternionfc expected, Quaternionfc actual, float error) {
+        if (expected == null) {
+            assertNull(actual);
+        } else {
+            assertNotNull(actual);
+            Supplier<String> errorMessageSupplier = () -> "Expected " + expected + ", actual" + actual;
+            Assertions.assertEquals(expected.x(), actual.x(), error, errorMessageSupplier);
+            Assertions.assertEquals(expected.y(), actual.y(), error, errorMessageSupplier);
+            Assertions.assertEquals(expected.z(), actual.z(), error, errorMessageSupplier);
+            Assertions.assertEquals(expected.w(), actual.w(), error, errorMessageSupplier);
         }
     }
 }

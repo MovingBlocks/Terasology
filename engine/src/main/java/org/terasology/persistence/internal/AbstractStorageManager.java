@@ -24,6 +24,7 @@ import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.entitySystem.entity.internal.OwnershipHelper;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.AABB;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.network.ClientComponent;
@@ -32,7 +33,6 @@ import org.terasology.persistence.PlayerStore;
 import org.terasology.persistence.StorageManager;
 import org.terasology.persistence.serializers.PrefabSerializer;
 import org.terasology.protobuf.EntityData;
-import org.terasology.world.biomes.BiomeManager;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.blockdata.ExtraBlockDataManager;
@@ -60,7 +60,6 @@ public abstract class AbstractStorageManager implements StorageManager {
 
     private final StoragePathProvider storagePathProvider;
     private final BlockManager blockManager;
-    private final BiomeManager biomeManager;
     private final ExtraBlockDataManager extraDataManager;
 
     private final ModuleEnvironment environment;
@@ -71,13 +70,12 @@ public abstract class AbstractStorageManager implements StorageManager {
     private boolean storeChunksInZips = true;
 
     public AbstractStorageManager(Path savePath, ModuleEnvironment environment, EngineEntityManager entityManager,
-                                  BlockManager blockManager, BiomeManager biomeManager, ExtraBlockDataManager extraDataManager, boolean storeChunksInZips) {
+                                  BlockManager blockManager, ExtraBlockDataManager extraDataManager, boolean storeChunksInZips) {
         this.entityManager = entityManager;
         this.environment = environment;
         this.storeChunksInZips = storeChunksInZips;
         this.prefabSerializer = new PrefabSerializer(entityManager.getComponentLibrary(), entityManager.getTypeSerializerLibrary());
         this.blockManager = blockManager;
-        this.biomeManager = biomeManager;
         this.extraDataManager = extraDataManager;
 
         this.storagePathProvider = new StoragePathProvider(savePath);
@@ -113,7 +111,7 @@ public abstract class AbstractStorageManager implements StorageManager {
             ByteArrayInputStream bais = new ByteArrayInputStream(chunkData);
             try (GZIPInputStream gzipIn = new GZIPInputStream(bais)) {
                 EntityData.ChunkStore storeData = EntityData.ChunkStore.parseFrom(gzipIn);
-                store = new ChunkStoreInternal(storeData, entityManager, blockManager, biomeManager, extraDataManager);
+                store = new ChunkStoreInternal(storeData, entityManager, blockManager, extraDataManager);
             } catch (IOException e) {
                 logger.error("Failed to read existing saved chunk {}", chunkPos);
             }
@@ -123,11 +121,11 @@ public abstract class AbstractStorageManager implements StorageManager {
 
     protected byte[] loadChunkZip(Vector3i chunkPos) {
         byte[] chunkData = null;
-        Vector3i chunkZipPos = storagePathProvider.getChunkZipPosition(chunkPos);
-        Path chunkPath = storagePathProvider.getChunkZipPath(chunkZipPos);
+        Vector3i chunkZipPos = JomlUtil.from(storagePathProvider.getChunkZipPosition(JomlUtil.from(chunkPos)));
+        Path chunkPath = storagePathProvider.getChunkZipPath(JomlUtil.from(chunkZipPos));
         if (Files.isRegularFile(chunkPath)) {
             try (FileSystem chunkZip = FileSystems.newFileSystem(chunkPath, null)) {
-                Path targetChunk = chunkZip.getPath(storagePathProvider.getChunkFilename(chunkPos));
+                Path targetChunk = chunkZip.getPath(storagePathProvider.getChunkFilename(JomlUtil.from(chunkPos)));
                 if (Files.isRegularFile(targetChunk)) {
                     chunkData = Files.readAllBytes(targetChunk);
                 }
@@ -157,7 +155,7 @@ public abstract class AbstractStorageManager implements StorageManager {
         if (isStoreChunksInZips()) {
             return loadChunkZip(chunkPos);
         } else {
-            Path chunkPath = storagePathProvider.getChunkPath(chunkPos);
+            Path chunkPath = storagePathProvider.getChunkPath(JomlUtil.from(chunkPos));
             if (Files.isRegularFile(chunkPath)) {
                 try {
                     return Files.readAllBytes(chunkPath);
@@ -190,7 +188,7 @@ public abstract class AbstractStorageManager implements StorageManager {
         for (EntityRef entity : getEntityManager().getEntitiesWith(LocationComponent.class)) {
             if (!entity.getOwner().exists() && !entity.isAlwaysRelevant() && !entity.hasComponent(ClientComponent.class)) {
                 LocationComponent loc = entity.getComponent(LocationComponent.class);
-                if (loc != null) {
+                if (loc != null&& !Float.isNaN(loc.getWorldPosition().x)) {
                     if (aabb.contains(loc.getWorldPosition())) {
                         entitiesToStore.add(entity);
                     }

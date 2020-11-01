@@ -21,7 +21,6 @@ import gnu.trove.list.TByteList;
 import gnu.trove.list.array.TByteArrayList;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.protobuf.EntityData;
-import org.terasology.world.biomes.BiomeManager;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkConstants;
@@ -37,12 +36,10 @@ public final class ChunkSerializer {
     private ChunkSerializer() {
     }
 
-    public static EntityData.ChunkStore.Builder encode(Vector3i pos, TeraArray blockData, TeraArray liquidData, TeraArray biomeData, TeraArray[] extraData) {
+    public static EntityData.ChunkStore.Builder encode(Vector3i pos, TeraArray blockData, TeraArray[] extraData) {
         final EntityData.ChunkStore.Builder b = EntityData.ChunkStore.newBuilder()
                 .setX(pos.x).setY(pos.y).setZ(pos.z);
         b.setBlockData(runLengthEncode16(blockData));
-        b.setLiquidData(runLengthEncode8(liquidData));
-        b.setBiomeData(runLengthEncode16(biomeData));
         for (int i = 0; i < extraData.length; i++) {
             b.addExtraData(runLengthEncode16(extraData[i]));
         }
@@ -50,7 +47,7 @@ public final class ChunkSerializer {
         return b;
     }
 
-    public static Chunk decode(EntityData.ChunkStore message, BlockManager blockManager, BiomeManager biomeManager, ExtraBlockDataManager extraDataManager) {
+    public static Chunk decode(EntityData.ChunkStore message, BlockManager blockManager, ExtraBlockDataManager extraDataManager) {
         Preconditions.checkNotNull(message, "The parameter 'message' must not be null");
         if (!message.hasX() || !message.hasY() || !message.hasZ()) {
             throw new IllegalArgumentException("Ill-formed protobuf message. Missing chunk position.");
@@ -59,18 +56,13 @@ public final class ChunkSerializer {
         if (!message.hasBlockData()) {
             throw new IllegalArgumentException("Ill-formed protobuf message. Missing block data.");
         }
-        if (!message.hasLiquidData()) {
-            throw new IllegalArgumentException("Ill-formed protobuf message. Missing liquid data.");
-        }
 
         final TeraArray blockData = runLengthDecode(message.getBlockData());
-        final TeraArray liquidData = runLengthDecode(message.getLiquidData());
-        final TeraArray biomeData = runLengthDecode(message.getBiomeData());
         final TeraArray[] extraData = extraDataManager.makeDataArrays(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z);
         for (int i = 0; i < extraData.length; i++) {
             runLengthDecode(message.getExtraData(i), extraData[i]);
         }
-        return new ChunkImpl(pos, blockData, liquidData, biomeData, extraData, blockManager, biomeManager);
+        return new ChunkImpl(pos, blockData, extraData, blockManager);
     }
 
     private static EntityData.RunLengthEncoding16 runLengthEncode16(TeraArray array) {

@@ -21,7 +21,10 @@ import org.terasology.math.geom.Vector3i;
 import java.util.Iterator;
 
 /**
- */
+ * @deprecated this class is schedules for removal in an upcoming version
+ *             Use the JOML implementation instead: {@link Diamond3iIterable}
+ **/
+@Deprecated
 public final class Diamond3iIterator implements Iterator<Vector3i> {
 
     private final Vector3i origin;

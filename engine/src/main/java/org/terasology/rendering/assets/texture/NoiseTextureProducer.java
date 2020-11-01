@@ -68,7 +68,6 @@ public class NoiseTextureProducer implements AssetDataProducer<TextureData> {
                     long seed = Long.parseLong(parts[2]);
                     int min = Integer.parseInt(parts[3]);
                     int max = Integer.parseInt(parts[4]);
-                    TextureData textureData;
                     switch (type) {
                         case "white":
                             return Optional.of(TextureDataFactory.createWhiteNoiseTexture(size, seed, min, max));

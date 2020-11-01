@@ -16,16 +16,16 @@
 
 package org.terasology.world.internal;
 
-import java.util.Collection;
-import java.util.Map;
+import org.joml.Vector3ic;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.math.Region3i;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.world.WorldChangeListener;
-import org.terasology.world.biomes.Biome;
 import org.terasology.world.block.Block;
-import org.terasology.world.liquid.LiquidData;
 import org.terasology.world.time.WorldTime;
+
+import java.util.Collection;
+import java.util.Map;
 
 /**
  */
@@ -98,33 +98,18 @@ public class AbstractWorldProviderDecorator implements WorldProviderCore {
     }
 
     @Override
+    public Block setBlock(Vector3ic pos, Block type) {
+        return base.setBlock(pos, type);
+    }
+
+    @Override
     public Map<Vector3i, Block> setBlocks(Map<Vector3i, Block> blocks) {
         return base.setBlocks(blocks);
     }
 
     @Override
-    public boolean setLiquid(int x, int y, int z, LiquidData newState, LiquidData oldState) {
-        return base.setLiquid(x, y, z, newState, oldState);
-    }
-
-    @Override
-    public LiquidData getLiquid(int x, int y, int z) {
-        return base.getLiquid(x, y, z);
-    }
-
-    @Override
     public Block getBlock(int x, int y, int z) {
         return base.getBlock(x, y, z);
-    }
-
-    @Override
-    public Biome setBiome(Vector3i pos, Biome biome) {
-        return base.setBiome(pos, biome);
-    }
-
-    @Override
-    public Biome getBiome(Vector3i pos) {
-        return base.getBiome(pos);
     }
 
     @Override
@@ -141,12 +126,12 @@ public class AbstractWorldProviderDecorator implements WorldProviderCore {
     public byte getTotalLight(int x, int y, int z) {
         return base.getTotalLight(x, y, z);
     }
-    
+
     @Override
     public int getExtraData(int index, int x, int y, int z) {
         return base.getExtraData(index, x, y, z);
     }
-    
+
     @Override
     public int setExtraData(int index, Vector3i pos, int value) {
         return base.setExtraData(index, pos, value);

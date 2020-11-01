@@ -15,22 +15,20 @@
  */
 package org.terasology.world.Zones;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.terasology.math.geom.BaseVector3i;
-import org.terasology.world.generation.Region;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.terasology.world.zones.Zone;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class ZoneTest {
 
     private Zone zone;
 
-    @Before
+    @BeforeEach
     public void setup() {
         zone = new Zone("Test", () -> true);
     }

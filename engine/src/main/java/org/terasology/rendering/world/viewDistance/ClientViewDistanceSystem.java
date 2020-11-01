@@ -136,7 +136,7 @@ public class ClientViewDistanceSystem extends BaseComponentSystem {
     /**
      * Fires notification events upon changes to debug parameters.
      * @param message Notification event message.
-     * @param entity  Entities which will receive the notification event.
+     * @param entities Entities which will receive the notification event.
      */
     private void fireChangeEvent(String message, List<EntityRef> entities) {
         for (EntityRef client : entities) {

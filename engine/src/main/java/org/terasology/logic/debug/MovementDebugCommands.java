@@ -15,15 +15,18 @@
  */
 package org.terasology.logic.debug;
 
+import org.joml.Quaternionf;
+import org.terasology.config.Config;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.logic.characters.CharacterImpulseEvent;
-import org.terasology.logic.common.DisplayNameComponent;
+import org.terasology.logic.characters.GazeMountPointComponent;
 import org.terasology.logic.characters.CharacterMovementComponent;
 import org.terasology.logic.characters.CharacterTeleportEvent;
-import org.terasology.logic.characters.GazeMountPointComponent;
+import org.terasology.logic.characters.CharacterImpulseEvent;
 import org.terasology.logic.characters.MovementMode;
+import org.terasology.logic.characters.events.ScaleToRequest;
+import org.terasology.logic.common.DisplayNameComponent;
 import org.terasology.logic.location.Location;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.geom.Quat4f;
@@ -57,6 +60,9 @@ public class MovementDebugCommands extends BaseComponentSystem {
 
     @In
     private EntityManager entityManager;
+
+    @In
+    private Config config;
 
     @Command(shortDescription = "Grants flight and movement through walls", runOnServer = true,
             requiredPermission = PermissionManager.CHEAT_PERMISSION)
@@ -123,8 +129,8 @@ public class MovementDebugCommands extends BaseComponentSystem {
         CharacterMovementComponent move = clientComp.character.getComponent(CharacterMovementComponent.class);
         if (move != null) {
             return "Your SpeedMultiplier:" + move.speedMultiplier + " JumpSpeed:"
-                   + move.jumpSpeed + " SlopeFactor:"
-                   + move.slopeFactor + " RunFactor:" + move.runFactor;
+                    + move.jumpSpeed + " SlopeFactor:"
+                    + move.slopeFactor + " RunFactor:" + move.runFactor;
         }
         return "You're dead I guess.";
     }
@@ -233,29 +239,39 @@ public class MovementDebugCommands extends BaseComponentSystem {
         return "";
     }
 
+    private float getJumpSpeed(float ratio, float defaultValue) {
+        return (float) Math.pow(ratio, 0.74f) * 0.4f * defaultValue + 0.6f * defaultValue;
+    }
+
+    private float getInteractionRange(float ratio, float defaultValue) {
+        return (float) Math.pow(ratio, 0.62f) * defaultValue;
+    }
+
+    private float getRunFactor(float ratio, float defaultValue) {
+        return (float) Math.pow(ratio, 0.68f) * defaultValue;
+    }
+
     @Command(shortDescription = "Sets the height of the player", runOnServer = true,
             requiredPermission = PermissionManager.CHEAT_PERMISSION)
-    public String playerHeight(@Sender EntityRef client, @CommandParam("height") float amount) {
-        try {
-            ClientComponent clientComp = client.getComponent(ClientComponent.class);
-            CharacterMovementComponent move = clientComp.character.getComponent(CharacterMovementComponent.class);
-            if (move != null) {
-                float prevHeight = move.height;
-                move.height = amount;
-                clientComp.character.saveComponent(move);
-                LocationComponent loc = client.getComponent(LocationComponent.class);
-                Vector3f currentPosition = loc.getWorldPosition();
-                clientComp.character
-                        .send(new CharacterTeleportEvent(new Vector3f(currentPosition.getX(), currentPosition.getY() + (amount - prevHeight) / 2, currentPosition.getZ())));
-                physics.removeCharacterCollider(clientComp.character);
-                physics.getCharacterCollider(clientComp.character);
-                return "Height of player set to " + amount + " (was " + prevHeight + ")";
+    public String playerHeight(@Sender EntityRef entity, @CommandParam("height") float newHeight) {
+        if (newHeight > 0.5 && newHeight <= 20) {
+            ClientComponent client = entity.getComponent(ClientComponent.class);
+            if (client != null) {
+                EntityRef character = client.character;
+                CharacterMovementComponent movement = client.character.getComponent(CharacterMovementComponent.class);
+                if (movement != null) {
+                    float currentHeight = movement.height;
+
+                    ScaleToRequest scaleRequest = new ScaleToRequest(newHeight);
+                    character.send(scaleRequest);
+
+                    return "Height of player set to " + newHeight + " (was " + currentHeight + ")";
+                }
             }
-            return "";
-        } catch (NullPointerException e) {
-            e.printStackTrace();
-            return "";
+        } else {
+            return "Invalid input. Accepted values: [1 to 25]";
         }
+        return "";
     }
 
     @Command(shortDescription = "Sets the eye-height of the player", runOnServer = true,
@@ -268,7 +284,7 @@ public class MovementDebugCommands extends BaseComponentSystem {
                 float prevHeight = gazeMountPointComponent.translate.y;
                 gazeMountPointComponent.translate.y = amount;
                 Location.removeChild(player, gazeMountPointComponent.gazeEntity);
-                Location.attachChild(player, gazeMountPointComponent.gazeEntity, gazeMountPointComponent.translate, new Quat4f(Quat4f.IDENTITY));
+                Location.attachChild(player, gazeMountPointComponent.gazeEntity, gazeMountPointComponent.translate, new Quaternionf());
                 player.saveComponent(gazeMountPointComponent);
                 return "Eye-height of player set to " + amount + " (was " + prevHeight + ")";
             }

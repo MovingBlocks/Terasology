@@ -26,15 +26,13 @@ import org.terasology.entitySystem.event.Event;
 import org.terasology.entitySystem.metadata.EventLibrary;
 import org.terasology.entitySystem.metadata.EventMetadata;
 import org.terasology.entitySystem.metadata.ReplicatedFieldMetadata;
-import org.terasology.persistence.typeHandling.DeserializationContext;
 import org.terasology.persistence.typeHandling.DeserializationException;
-import org.terasology.persistence.typeHandling.SerializationContext;
+import org.terasology.persistence.typeHandling.PersistedDataSerializer;
 import org.terasology.persistence.typeHandling.SerializationException;
 import org.terasology.persistence.typeHandling.Serializer;
-import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
-import org.terasology.persistence.typeHandling.protobuf.ProtobufDeserializationContext;
+import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.persistence.typeHandling.protobuf.ProtobufPersistedData;
-import org.terasology.persistence.typeHandling.protobuf.ProtobufSerializationContext;
+import org.terasology.persistence.typeHandling.protobuf.ProtobufPersistedDataSerializer;
 import org.terasology.protobuf.EntityData;
 
 import java.util.Map;
@@ -45,21 +43,19 @@ public class EventSerializer {
     private static final Logger logger = LoggerFactory.getLogger(ComponentSerializer.class);
 
     private EventLibrary eventLibrary;
-    private TypeSerializationLibrary typeSerializationLibrary;
+    private TypeHandlerLibrary typeHandlerLibrary;
     private BiMap<Class<? extends Event>, Integer> idTable = ImmutableBiMap.<Class<? extends Event>, Integer>builder().build();
-    private SerializationContext serializationContext;
-    private DeserializationContext deserializationContext;
+    private PersistedDataSerializer persistedDataSerializer;
 
     /**
      * Creates the event serializer.
      *
      * @param eventLibrary The event library used to provide information on each event and its fields.
      */
-    public EventSerializer(EventLibrary eventLibrary, TypeSerializationLibrary typeSerializationLibrary) {
+    public EventSerializer(EventLibrary eventLibrary, TypeHandlerLibrary typeHandlerLibrary) {
         this.eventLibrary = eventLibrary;
-        this.typeSerializationLibrary = typeSerializationLibrary;
-        this.deserializationContext = new ProtobufDeserializationContext(typeSerializationLibrary);
-        this.serializationContext = new ProtobufSerializationContext(typeSerializationLibrary);
+        this.typeHandlerLibrary = typeHandlerLibrary;
+        this.persistedDataSerializer = new ProtobufPersistedDataSerializer();
     }
 
     /**
@@ -101,7 +97,7 @@ public class EventSerializer {
 
 
     private Event deserializeOnto(Event targetEvent, EntityData.Event eventData, EventMetadata<? extends Event> eventMetadata) {
-        Serializer serializer = typeSerializationLibrary.getSerializerFor(eventMetadata);
+        Serializer serializer = typeHandlerLibrary.getSerializerFor(eventMetadata);
         for (int i = 0; i < eventData.getFieldIds().size(); ++i) {
             byte fieldId = eventData.getFieldIds().byteAt(i);
             ReplicatedFieldMetadata<?, ?> fieldInfo = eventMetadata.getField(fieldId);
@@ -110,7 +106,7 @@ public class EventSerializer {
                 continue;
             }
             if (fieldInfo.isReplicated()) {
-                serializer.deserializeOnto(targetEvent, fieldInfo, new ProtobufPersistedData(eventData.getFieldValue(i)), deserializationContext);
+                serializer.deserializeOnto(targetEvent, fieldInfo, new ProtobufPersistedData(eventData.getFieldValue(i)));
             }
         }
         return targetEvent;
@@ -133,11 +129,11 @@ public class EventSerializer {
         EntityData.Event.Builder eventData = EntityData.Event.newBuilder();
         serializeEventType(event, eventData);
 
-        Serializer eventSerializer = typeSerializationLibrary.getSerializerFor(eventMetadata);
+        Serializer eventSerializer = typeHandlerLibrary.getSerializerFor(eventMetadata);
         ByteString.Output fieldIds = ByteString.newOutput();
         for (ReplicatedFieldMetadata field : eventMetadata.getFields()) {
             if (field.isReplicated()) {
-                EntityData.Value serializedValue = ((ProtobufPersistedData) eventSerializer.serialize(field, event, serializationContext)).getValue();
+                EntityData.Value serializedValue = ((ProtobufPersistedData) eventSerializer.serialize(field, event, persistedDataSerializer)).getValue();
                 if (serializedValue != null) {
                     eventData.addFieldValue(serializedValue);
                     fieldIds.write(field.getId());

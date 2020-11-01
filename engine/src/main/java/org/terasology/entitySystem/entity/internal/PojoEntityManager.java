@@ -24,6 +24,8 @@ import com.google.common.collect.Sets;
 import gnu.trove.iterator.TLongObjectIterator;
 import gnu.trove.set.TLongSet;
 import gnu.trove.set.hash.TLongHashSet;
+import org.joml.Quaternionfc;
+import org.joml.Vector3fc;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.TerasologyConstants;
@@ -43,7 +45,7 @@ import org.terasology.entitySystem.sectors.SectorSimulationComponent;
 import org.terasology.game.GameManifest;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
-import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
+import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.world.internal.WorldInfo;
 
 import java.util.ArrayList;
@@ -81,7 +83,7 @@ public class PojoEntityManager implements EngineEntityManager {
 
     private RefStrategy refStrategy = new DefaultRefStrategy();
 
-    private TypeSerializationLibrary typeSerializerLibrary;
+    private TypeHandlerLibrary typeSerializerLibrary;
 
     @Override
     public RefStrategy getEntityRefStrategy() {
@@ -222,7 +224,22 @@ public class PojoEntityManager implements EngineEntityManager {
     }
 
     @Override
+    public EntityRef create(Prefab prefab, Vector3fc position, Quaternionfc rotation) {
+        return getCurrentWorldPool().create(prefab, position, rotation);
+    }
+
+    @Override
     public EntityRef create(String prefab, Vector3f position) {
+        return getCurrentWorldPool().create(prefab, position);
+    }
+
+    @Override
+    public EntityRef create(Prefab prefab, Vector3fc position) {
+        return getCurrentWorldPool().create(prefab, position);
+    }
+
+    @Override
+    public EntityRef create(String prefab, Vector3fc position) {
         return getCurrentWorldPool().create(prefab, position);
     }
 
@@ -248,7 +265,7 @@ public class PojoEntityManager implements EngineEntityManager {
     public Map<Class<? extends Component>, Component> copyComponents(EntityRef other) {
         Map<Class<? extends Component>, Component> result = Maps.newHashMap();
         for (Component c : other.iterateComponents()) {
-            result.put(c.getClass(), componentLibrary.copy(c));
+            result.put(c.getClass(), componentLibrary.copyWithOwnedEntities(c));
         }
         return result;
     }
@@ -405,11 +422,11 @@ public class PojoEntityManager implements EngineEntityManager {
     }
 
     @Override
-    public TypeSerializationLibrary getTypeSerializerLibrary() {
+    public TypeHandlerLibrary getTypeSerializerLibrary() {
         return typeSerializerLibrary;
     }
 
-    public void setTypeSerializerLibrary(TypeSerializationLibrary serializerLibrary) {
+    public void setTypeSerializerLibrary(TypeHandlerLibrary serializerLibrary) {
         this.typeSerializerLibrary = serializerLibrary;
     }
 
@@ -535,12 +552,6 @@ public class PojoEntityManager implements EngineEntityManager {
         Preconditions.checkNotNull(component);
         Optional<Component> oldComponent = getPool(entityId).map(pool -> pool.getComponentStore().put(entityId, component));
 
-        if (!oldComponent.isPresent()) {
-            notifyComponentAdded(getEntity(entityId), component.getClass());
-        } else {
-            logger.error("Adding a component ({}) over an existing component for entity {}", component.getClass(), entityId);
-            notifyComponentChanged(getEntity(entityId), component.getClass());
-        }
         if (eventSystem != null) {
             EntityRef entityRef = getEntity(entityId);
             if (!oldComponent.isPresent()) {
@@ -550,6 +561,14 @@ public class PojoEntityManager implements EngineEntityManager {
                 eventSystem.send(entityRef, OnChangedComponent.newInstance(), component);
             }
         }
+
+        if (!oldComponent.isPresent()) {
+            notifyComponentAdded(getEntity(entityId), component.getClass());
+        } else {
+            logger.error("Adding a component ({}) over an existing component for entity {}", component.getClass(), entityId);
+            notifyComponentChanged(getEntity(entityId), component.getClass());
+        }
+
         return component;
     }
 

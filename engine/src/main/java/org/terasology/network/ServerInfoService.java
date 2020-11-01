@@ -64,5 +64,6 @@ public class ServerInfoService implements AutoCloseable {
     @Override
     public void close() {
         factory.releaseExternalResources();
+        pool.shutdown();
     }
 }

@@ -25,35 +25,28 @@
           "width": 720,
           "position-horizontal-center": {},
           "position-top": {
-            "target": "BOTTOM",
-            "offset": 16,
-            "widget": "title"
+            "target": "TOP",
+            "offset": -16,
+            "widget": "coreLayout"
           },
           "position-bottom": {
-            "target": "TOP",
-            "widget": "actionsRow",
-            "offset": 16
+            "target": "BOTTOM",
+            "offset": -16,
+            "widget": "coreLayout"
           }
         }
       },
       {
         "type": "ColumnLayout",
+        "id": "coreLayout",
         "columns": 2,
         "horizontalSpacing": 8,
         "column-widths": [0.53, 0.47],
         "layoutInfo": {
           "width": 704,
+          "use-content-height": true,
           "position-horizontal-center": {},
-          "position-top": {
-            "target": "TOP",
-            "widget": "container",
-            "offset": 8
-          },
-          "position-bottom": {
-            "target": "BOTTOM",
-            "widget": "container",
-            "offset": 8
-          }
+          "position-vertical-center": {}
         },
         "contents": [
           {
@@ -68,7 +61,7 @@
             "contents": [
               {
                 "type": "UILabel",
-                "text": "Select a world in the drop-down to see it previewed. Click Re-Roll to randomly pick a new seed or Configure to manually tweak the world further"
+                "text": "${engine:menu#pregeneration-description}"
               },
               {
                 "type": "UILabel",
@@ -175,42 +168,98 @@
       {
         "type": "RowLayout",
         "id": "actionsRow",
-        "horizontalSpacing": 4,
+        "horizontalSpacing": 32,
         "contents": [
           {
             "type": "UIButton",
-            "text": "${engine:menu#continue}",
-            "id": "continue"
+            "text": "${engine:menu#return-main-menu}",
+            "id": "mainMenu"
           },
           {
             "type": "UIButton",
-            "text": "${engine:menu#start-game}",
+            "text": "${engine:menu#start-playing}",
             "id": "play",
             "enabled": false
           }
         ],
         "layoutInfo": {
-          "width": 400,
-          "height": 32,
+          "width": 272,
+          "height": 80,
           "position-horizontal-center": {},
-          "position-bottom": {
+          "position-top": {
             "target": "BOTTOM",
-            "offset": 80
+            "widget": "container",
+            "offset": 16
           }
         }
       },
       {
         "type": "UIButton",
-        "text": "${engine:menu#back}",
+        "text": "${engine:menu#return-universe-setup}",
         "id": "close",
         "layoutInfo": {
-          "width": 128,
-          "height": 32,
-          "position-horizontal-center": {},
-          "position-top": {
-            "target": "BOTTOM",
-            "widget": "actionsRow",
+          "width": 120,
+          "height": 80,
+          "position-vertical-center": {
+            "target": "CENTER",
+            "widget": "container"
+          },
+          "position-right": {
+            "target": "LEFT",
+            "widget": "container",
             "offset": 16
+          }
+        }
+      },
+      {
+        "type": "UIButton",
+        "text": "${engine:menu#continue-spawn-preview}",
+        "id": "continue",
+        "layoutInfo": {
+          "width": 120,
+          "height": 80,
+          "position-vertical-center": {
+            "target": "CENTER",
+            "widget": "container"
+          },
+          "position-left": {
+            "target": "RIGHT",
+            "widget": "container",
+            "offset": 16
+          }
+        }
+      },
+      {
+        "type": "UIImage",
+        "image": "engine:happyGooey",
+        "layoutInfo": {
+          "width": 87,
+          "height": 40,
+          "position-left": {
+            "target": "RIGHT",
+            "widget": "actionsRow",
+            "offset": 8
+          },
+          "position-vertical-center": {
+            "target": "CENTER",
+            "widget": "actionsRow"
+          }
+        }
+      },
+      {
+        "type": "UIImage",
+        "image": "engine:angryGooey",
+        "layoutInfo": {
+          "width": 87,
+          "height": 40,
+          "position-right": {
+            "target": "LEFT",
+            "widget": "actionsRow",
+            "offset": 8
+          },
+          "position-vertical-center": {
+            "target": "CENTER",
+            "widget": "actionsRow"
           }
         }
       }

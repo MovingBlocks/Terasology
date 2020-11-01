@@ -15,6 +15,7 @@
  */
 package org.terasology.world.block.entity;
 
+import org.joml.Vector3f;
 import org.terasology.audio.AudioManager;
 import org.terasology.audio.StaticSound;
 import org.terasology.audio.events.PlaySoundEvent;
@@ -135,7 +136,7 @@ public class BlockEntitySystem extends BaseComponentSystem {
                 if (blockDamageModifierComponent != null) {
                     impulsePower = blockDamageModifierComponent.impulsePower;
                 }
-                
+
                 processDropping(item, location, impulsePower);
             }
         }
@@ -163,8 +164,9 @@ public class BlockEntitySystem extends BaseComponentSystem {
         if (blockDamageModifierComponent == null || !blockDamageModifierComponent.skipPerBlockEffects) {
             // dust particle effect
             if (entity.hasComponent(LocationComponent.class) && block.isDebrisOnDestroy()) {
-                EntityBuilder dustBuilder = entityManager.newBuilder("core:dustEffect");
-                // TODO: particle system stuff should be split out better - this is effectively a stealth dependency on Core from the engine
+                //TODO: particle system stuff should be split out better - this is effectively a stealth dependency on
+                //      'CoreAssets' from the engine
+                EntityBuilder dustBuilder = entityManager.newBuilder("CoreAssets:dustEffect");
                 if (dustBuilder.hasComponent(LocationComponent.class)) {
                     dustBuilder.getComponent(LocationComponent.class).setWorldPosition(entity.getComponent(LocationComponent.class).getWorldPosition());
                     dustBuilder.build();
@@ -182,7 +184,7 @@ public class BlockEntitySystem extends BaseComponentSystem {
 
     private void processDropping(EntityRef item, Vector3i location, float impulsePower) {
         item.send(new DropItemEvent(location.toVector3f()));
-        item.send(new ImpulseEvent(random.nextVector3f(impulsePower)));
+        item.send(new ImpulseEvent(random.nextVector3f(impulsePower, new Vector3f())));
     }
 
 }

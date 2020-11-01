@@ -1,6 +1,0 @@
-/**
- * Harder than normal stone
- */
-{
-    "basedOn": "core:rock2"
-}

@@ -20,6 +20,7 @@ import gnu.trove.list.TFloatList;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TFloatArrayList;
 import gnu.trove.list.array.TIntArrayList;
+import org.joml.Vector3fc;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL15;
@@ -81,9 +82,9 @@ public class ChunkMesh {
 
     // some constants
     private static final int SIZE_VERTEX = 3;   // vertices have 3 positional components, x,y,z
-    private static final int SIZE_TEX0 = 3;     // the first texture has 3 color components, r,g,b
-    private static final int SIZE_TEX1 = 3;     // the second texture is the same
-    private static final int SIZE_COLOR = 1;    // the color field has 4 components, r,g,b,a
+    private static final int SIZE_TEX0 = 4;     // the first texture has 4 components, u,v, flags, animation frame count
+    private static final int SIZE_TEX1 = 3;     // the second texture stores lighting, with components: light, block light, ambient occlusion
+    private static final int SIZE_COLOR = 1;    // the color field's 4 components are packed into 1 float-sized field.
     private static final int SIZE_NORMAL = 3;   // normals are 3-dimensional vectors with u,v,t components
 
     // offset to the beginning of each data field, from the start of the data regarding an individual vertex
@@ -232,11 +233,11 @@ public class ChunkMesh {
      * @param chunkPosition a Vector3f instance holding the world coordinates of a chunk
      * @param chunkIsAnimated a boolean: true if the chunk is animated, false otherwise
      */
-    public void updateMaterial(Material chunkMaterial, Vector3f chunkPosition, boolean chunkIsAnimated) {
+    public void updateMaterial(Material chunkMaterial, Vector3fc chunkPosition, boolean chunkIsAnimated) {
         chunkMaterial.setFloat3("chunkPositionWorld",
-                chunkPosition.x * ChunkConstants.SIZE_X,
-                chunkPosition.y * ChunkConstants.SIZE_Y,
-                chunkPosition.z * ChunkConstants.SIZE_Z,
+                chunkPosition.x() * ChunkConstants.SIZE_X,
+                chunkPosition.y() * ChunkConstants.SIZE_Y,
+                chunkPosition.z() * ChunkConstants.SIZE_Z,
                 true);
         chunkMaterial.setFloat("animated", chunkIsAnimated ? 1.0f : 0.0f, true);
     }
@@ -250,14 +251,14 @@ public class ChunkMesh {
      * @param cameraPosition a Vector3f storing the world position of the point of view from which the chunk is rendered.
      * @return Returns an integer representing the number of triangles rendered.
      */
-    public int render(ChunkMesh.RenderPhase phase, Vector3f chunkPosition, Vector3f cameraPosition) {
+    public int render(ChunkMesh.RenderPhase phase, Vector3fc chunkPosition, Vector3fc cameraPosition) {
         GL11.glPushMatrix();
 
         // chunkPositionRelativeToCamera = chunkCoordinates * chunkDimensions - cameraCoordinate
         final Vector3f chunkPositionRelativeToCamera =
-                new Vector3f(chunkPosition.x * ChunkConstants.SIZE_X - cameraPosition.x,
-                        chunkPosition.y * ChunkConstants.SIZE_Y - cameraPosition.y,
-                        chunkPosition.z * ChunkConstants.SIZE_Z - cameraPosition.z);
+                new Vector3f(chunkPosition.x() * ChunkConstants.SIZE_X - cameraPosition.x(),
+                        chunkPosition.y() * ChunkConstants.SIZE_Y - cameraPosition.y(),
+                        chunkPosition.z() * ChunkConstants.SIZE_Z - cameraPosition.z());
         GL11.glTranslatef(chunkPositionRelativeToCamera.x, chunkPositionRelativeToCamera.y, chunkPositionRelativeToCamera.z);
 
         render(phase);  // this is where the chunk is actually rendered
@@ -370,6 +371,7 @@ public class ChunkMesh {
         public final TFloatList color;
         public final TIntList indices;
         public final TIntList flags;
+        public final TIntList frames;
         public int vertexCount;
 
         public IntBuffer finalVertices;
@@ -383,6 +385,7 @@ public class ChunkMesh {
             color = new TFloatArrayList();
             indices = new TIntArrayList();
             flags = new TIntArrayList();
+            frames = new TIntArrayList();
         }
     }
 }

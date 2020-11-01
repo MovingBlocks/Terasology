@@ -15,10 +15,9 @@
  */
 package org.terasology.world.block.shapes;
 
-import org.terasology.math.geom.Quat4f;
-import org.terasology.math.geom.Vector2f;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector4f;
+import org.joml.Quaternionf;
+import org.joml.Vector2f;
+import org.joml.Vector3f;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.primitives.ChunkVertexFlag;
 
@@ -36,12 +35,18 @@ public class BlockMeshPart {
     private Vector3f[] normals;
     private Vector2f[] texCoords;
     private int[] indices;
+    private int texFrames;
 
     public BlockMeshPart(Vector3f[] vertices, Vector3f[] normals, Vector2f[] texCoords, int[] indices) {
+        this(vertices, normals, texCoords, indices, 1);
+    }
+
+    private BlockMeshPart(Vector3f[] vertices, Vector3f[] normals, Vector2f[] texCoords, int[] indices, int texFrames) {
         this.vertices = Arrays.copyOf(vertices, vertices.length);
         this.normals = Arrays.copyOf(normals, normals.length);
         this.texCoords = Arrays.copyOf(texCoords, texCoords.length);
         this.indices = Arrays.copyOf(indices, indices.length);
+        this.texFrames = texFrames;
     }
 
     public int size() {
@@ -68,17 +73,21 @@ public class BlockMeshPart {
         return indices[i];
     }
 
-    public BlockMeshPart mapTexCoords(Vector2f offset, float width) {
+    public int getTexFrames() {
+        return texFrames;
+    }
+
+    public BlockMeshPart mapTexCoords(Vector2f offset, float width, int frames) {
         float normalisedBorder = BORDER * width;
         Vector2f[] newTexCoords = new Vector2f[texCoords.length];
         for (int i = 0; i < newTexCoords.length; ++i) {
             newTexCoords[i] = new Vector2f(offset.x + normalisedBorder + texCoords[i].x * (width - 2 * normalisedBorder),
                     offset.y + normalisedBorder + texCoords[i].y * (width - 2 * normalisedBorder));
         }
-        return new BlockMeshPart(vertices, normals, newTexCoords, indices);
+        return new BlockMeshPart(vertices, normals, newTexCoords, indices, frames);
     }
 
-    public void appendTo(ChunkMesh chunk, int offsetX, int offsetY, int offsetZ, Vector4f colorOffset, ChunkMesh.RenderType renderType, ChunkVertexFlag flags) {
+    public void appendTo(ChunkMesh chunk, int offsetX, int offsetY, int offsetZ, ChunkMesh.RenderType renderType, ChunkVertexFlag flags) {
         ChunkMesh.VertexElements elements = chunk.getVertexElements(renderType);
         for (Vector2f texCoord : texCoords) {
             elements.tex.add(texCoord.x);
@@ -87,10 +96,10 @@ public class BlockMeshPart {
 
         int nextIndex = elements.vertexCount;
         for (int vIdx = 0; vIdx < vertices.length; ++vIdx) {
-            elements.color.add(colorOffset.x);
-            elements.color.add(colorOffset.y);
-            elements.color.add(colorOffset.z);
-            elements.color.add(colorOffset.w);
+            elements.color.add(1);
+            elements.color.add(1);
+            elements.color.add(1);
+            elements.color.add(1);
             elements.vertices.add(vertices[vIdx].x + offsetX);
             elements.vertices.add(vertices[vIdx].y + offsetY);
             elements.vertices.add(vertices[vIdx].z + offsetZ);
@@ -98,6 +107,7 @@ public class BlockMeshPart {
             elements.normals.add(normals[vIdx].y);
             elements.normals.add(normals[vIdx].z);
             elements.flags.add(flags.getValue());
+            elements.frames.add(texFrames);
         }
         elements.vertexCount += vertices.length;
 
@@ -106,16 +116,16 @@ public class BlockMeshPart {
         }
     }
 
-    public BlockMeshPart rotate(Quat4f rotation) {
+    public BlockMeshPart rotate(Quaternionf rotation) {
         Vector3f[] newVertices = new Vector3f[vertices.length];
         Vector3f[] newNormals = new Vector3f[normals.length];
 
         for (int i = 0; i < newVertices.length; ++i) {
-            newVertices[i] = rotation.rotate(vertices[i], new Vector3f());
-            newNormals[i] = rotation.rotate(normals[i], new Vector3f());
+            newVertices[i] = rotation.transform(vertices[i], new Vector3f());
+            newNormals[i] = rotation.transform(normals[i], new Vector3f());
             newNormals[i].normalize();
         }
 
-        return new BlockMeshPart(newVertices, newNormals, texCoords, indices);
+        return new BlockMeshPart(newVertices, newNormals, texCoords, indices, texFrames);
     }
 }

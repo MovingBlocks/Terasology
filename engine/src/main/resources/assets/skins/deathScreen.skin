@@ -10,7 +10,7 @@
             "min-height": 32
         },
         "UILabel": {
-            "font": "title"
+            "font": "NotoSans-Regular-Title"
         }
     }
 }

@@ -20,11 +20,11 @@ import org.terasology.assets.ResourceUrn;
 import org.terasology.config.ServerInfo;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.rendering.nui.CoreScreenLayer;
-import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
-import org.terasology.rendering.nui.widgets.ActivateEventListener;
-import org.terasology.rendering.nui.widgets.UIButton;
-import org.terasology.rendering.nui.widgets.UILabel;
-import org.terasology.rendering.nui.widgets.UIText;
+import org.terasology.nui.databinding.ReadOnlyBinding;
+import org.terasology.nui.widgets.ActivateEventListener;
+import org.terasology.nui.widgets.UIButton;
+import org.terasology.nui.widgets.UILabel;
+import org.terasology.nui.widgets.UIText;
 
 import java.util.function.Consumer;
 
@@ -60,7 +60,7 @@ public class AddServerPopup extends CoreScreenLayer {
             String name = nameText.getText();
             String owner = ownerText.getText();
             String address = addressText.getText();
-            Integer portBoxed = Ints.tryParse(portText.getText());
+            Integer portBoxed = Ints.tryParse(portText.getText().trim());
             int port = (portBoxed != null) ? portBoxed : TerasologyConstants.DEFAULT_PORT;
 
             if (serverInfo == null) {
@@ -87,7 +87,7 @@ public class AddServerPopup extends CoreScreenLayer {
             public Boolean get() {
                 return !nameText.getText().isEmpty()
                         && !addressText.getText().isEmpty()
-                        && Ints.tryParse(portText.getText()) != null;
+                        && Ints.tryParse(portText.getText().trim()) != null;
             }
         });
 

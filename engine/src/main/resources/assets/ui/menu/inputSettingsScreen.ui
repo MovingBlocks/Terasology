@@ -34,7 +34,72 @@
                         "offset": 32,
                         "widget": "actionsRow"
                     }
-                }
+                },
+                "contents": [
+                    {
+                        "type": "ColumnLayout",
+                        "id": "main",
+                        "horizontalSpacing": 8,
+                        "verticalSpacing": 8,
+                        "family": "option-grid",
+                        "contents": [
+                            {
+                                "type": "UILabel",
+                                "family": "subheading",
+                                "text": "${engine:menu#special-keyboards}",
+                                "id": "specialKeyboards"
+                            },
+                            {
+                                "type": "RowLayout",
+                                "columnRatios": 0.4,
+                                "horizontalSpacing": 12,
+                                "contents": [
+                                    {
+                                        "type": "UILabel",
+                                        "text": "AZERTY"
+                                    },
+                                    {
+                                        "type": "UIButton",
+                                        "text": "${engine:menu#input-settings-apply}",
+                                        "id": "azerty"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "RowLayout",
+                                "columnRatios": 0.4,
+                                "horizontalSpacing": 12,
+                                "contents": [
+                                    {
+                                        "type": "UILabel",
+                                        "text": "DVORAK"
+                                    },
+                                    {
+                                        "type": "UIButton",
+                                        "text": "${engine:menu#input-settings-apply}",
+                                        "id": "dvorak"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "RowLayout",
+                                "columnRatios": 0.4,
+                                "horizontalSpacing": 12,
+                                "contents": [
+                                    {
+                                        "type": "UILabel",
+                                        "text": "NEO"
+                                    },
+                                    {
+                                        "type": "UIButton",
+                                        "text": "${engine:menu#input-settings-apply}",
+                                        "id": "neo"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
             },
             {
                 "type": "RowLayout",

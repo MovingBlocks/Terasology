@@ -16,12 +16,9 @@
 package org.terasology.world.block.loader;
 
 import com.google.common.collect.Maps;
-import org.terasology.math.geom.BaseVector4f;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector4f;
+import org.joml.Vector3f;
 import org.terasology.module.sandbox.API;
 import org.terasology.world.block.BlockPart;
-import org.terasology.world.block.DefaultColorSource;
 import org.terasology.world.block.shapes.BlockShape;
 import org.terasology.world.block.sounds.BlockSounds;
 import org.terasology.world.block.tiles.BlockTile;
@@ -57,10 +54,6 @@ public class SectionDefinitionData {
 
     private EnumMap<BlockPart, BlockTile> blockTiles = Maps.newEnumMap(BlockPart.class);
 
-    private EnumMap<BlockPart, DefaultColorSource> colorSources;
-
-    private EnumMap<BlockPart, Vector4f> colorOffsets;
-
     private float mass = 10f;
     private boolean debrisOnDestroy = true;
     private float friction = 0.5f;
@@ -71,17 +64,10 @@ public class SectionDefinitionData {
 
     private BlockShape shape;
     private boolean water;
-    private boolean lava;
     private boolean grass;
     private boolean ice;
 
     public SectionDefinitionData() {
-        colorSources = Maps.newEnumMap(BlockPart.class);
-        colorOffsets = Maps.newEnumMap(BlockPart.class);
-        for (BlockPart part : BlockPart.values()) {
-            colorSources.put(part, DefaultColorSource.DEFAULT);
-            colorOffsets.put(part, new Vector4f(1, 1, 1, 1));
-        }
     }
 
     public SectionDefinitionData(SectionDefinitionData other) {
@@ -108,8 +94,6 @@ public class SectionDefinitionData {
         this.tint = new Vector3f(other.tint);
 
         this.blockTiles = new EnumMap<>(other.blockTiles);
-        this.colorSources = Maps.newEnumMap(other.colorSources);
-        this.colorOffsets = Maps.newEnumMap(other.colorOffsets);
 
         this.mass = other.mass;
         this.debrisOnDestroy = other.debrisOnDestroy;
@@ -122,7 +106,6 @@ public class SectionDefinitionData {
         this.shape = other.shape;
 
         this.water = other.water;
-        this.lava = other.lava;
         this.grass = other.grass;
         this.ice = other.ice;
     }
@@ -273,26 +256,6 @@ public class SectionDefinitionData {
         }
     }
 
-    public EnumMap<BlockPart, DefaultColorSource> getColorSources() {
-        return colorSources;
-    }
-
-    public void setAllColorSources(DefaultColorSource source) {
-        for (BlockPart part : BlockPart.values()) {
-            colorSources.put(part, source);
-        }
-    }
-
-    public EnumMap<BlockPart, Vector4f> getColorOffsets() {
-        return colorOffsets;
-    }
-
-    public void setAllColorOffsets(BaseVector4f offset) {
-        for (BlockPart part : BlockPart.values()) {
-            colorOffsets.put(part, new Vector4f(offset));
-        }
-    }
-
     public float getMass() {
         return mass;
     }
@@ -355,14 +318,6 @@ public class SectionDefinitionData {
 
     public void setWater(boolean water) {
         this.water = water;
-    }
-
-    public boolean isLava() {
-        return lava;
-    }
-
-    public void setLava(boolean lava) {
-        this.lava = lava;
     }
 
     public boolean isGrass() {

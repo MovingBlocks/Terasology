@@ -18,14 +18,16 @@ package org.terasology.particles.functions.affectors;
 import org.terasology.particles.ParticleData;
 import org.terasology.particles.ParticleDataMask;
 import org.terasology.particles.components.affectors.VelocityAffectorComponent;
+import org.terasology.particles.functions.RegisterParticleSystemFunction;
 import org.terasology.utilities.random.Random;
 
 /**
  *
  */
+@RegisterParticleSystemFunction()
 public final class VelocityAffectorFunction extends AffectorFunction<VelocityAffectorComponent> {
     public VelocityAffectorFunction() {
-        super(VelocityAffectorComponent.class, ParticleDataMask.POSITION, ParticleDataMask.VELOCITY);
+        super(ParticleDataMask.POSITION, ParticleDataMask.VELOCITY);
     }
 
     @Override

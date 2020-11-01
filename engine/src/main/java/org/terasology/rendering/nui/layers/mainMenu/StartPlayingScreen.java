@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.nui.layers.mainMenu;
 
+import org.joml.Vector2i;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.context.Context;
@@ -25,14 +26,16 @@ import org.terasology.engine.modes.StateLoading;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.game.GameManifest;
 import org.terasology.i18n.TranslationSystem;
-import org.terasology.module.Module;
 import org.terasology.network.NetworkMode;
+import org.terasology.nui.Canvas;
+import org.terasology.nui.WidgetUtil;
+import org.terasology.nui.widgets.UIImage;
+import org.terasology.nui.widgets.UILabel;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.nui.CoreScreenLayer;
-import org.terasology.rendering.nui.WidgetUtil;
-import org.terasology.rendering.nui.widgets.UIImage;
-import org.terasology.rendering.nui.widgets.UILabel;
+import org.terasology.rendering.nui.animation.MenuAnimationSystems;
+import org.terasology.rendering.nui.layers.mainMenu.videoSettings.RenderingModuleSettingScreen;
 import org.terasology.rendering.world.WorldSetupWrapper;
 import org.terasology.world.internal.WorldInfo;
 import org.terasology.world.time.WorldTime;
@@ -59,9 +62,11 @@ public class StartPlayingScreen extends CoreScreenLayer {
     private List<WorldSetupWrapper> worldSetupWrappers;
     private UniverseWrapper universeWrapper;
     private WorldSetupWrapper targetWorld;
+    private Context subContext;
 
     @Override
     public void initialise() {
+        setAnimationSystem(MenuAnimationSystems.createDefaultSwipeAnimation());
 
         WidgetUtil.trySubscribe(this, "close", button ->
                 triggerBackAnimation()
@@ -76,7 +81,6 @@ public class StartPlayingScreen extends CoreScreenLayer {
                 getManager().createScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Error", "Can't create new game!");
             }
 
-
             SimpleUri uri;
             WorldInfo worldInfo;
             //gameManifest.addWorld(worldInfo);
@@ -85,7 +89,7 @@ public class StartPlayingScreen extends CoreScreenLayer {
                 if (world != targetWorld) {
                     i++;
                     uri = world.getWorldGeneratorInfo().getUri();
-                    worldInfo = new WorldInfo(TerasologyConstants.MAIN_WORLD + i, world.getWorldGenerator().getWorldSeed(),
+                    worldInfo = new WorldInfo(TerasologyConstants.MAIN_WORLD + i, world.getWorldName().toString(), world.getWorldGenerator().getWorldSeed(),
                             (long) (WorldTime.DAY_LENGTH * WorldTime.NOON_OFFSET), uri);
                     gameManifest.addWorld(worldInfo);
                     config.getUniverseConfig().addWorldManager(worldInfo);
@@ -95,10 +99,26 @@ public class StartPlayingScreen extends CoreScreenLayer {
 
             gameEngine.changeState(new StateLoading(gameManifest, (universeWrapper.getLoadingAsServer()) ? NetworkMode.DEDICATED_SERVER : NetworkMode.NONE));
         });
+
+        WidgetUtil.trySubscribe(this, "mainMenu", button -> {
+            getManager().pushScreen("engine:mainMenuScreen");
+        });
+
+        WidgetUtil.trySubscribe(this, "renderingSettings", button -> {
+            RenderingModuleSettingScreen renderingModuleSettingScreen = (RenderingModuleSettingScreen) getManager().getScreen(RenderingModuleSettingScreen.ASSET_URI);
+            if (renderingModuleSettingScreen == null) {
+                renderingModuleSettingScreen = getManager().createScreen(RenderingModuleSettingScreen.ASSET_URI, RenderingModuleSettingScreen.class);
+                renderingModuleSettingScreen.setSubContext(this.subContext);
+                renderingModuleSettingScreen.postInit();
+            }
+            triggerForwardAnimation(renderingModuleSettingScreen);
+        });
     }
 
     @Override
     public void onOpened() {
+        super.onOpened();
+
         UIImage previewImage = find("preview", UIImage.class);
         previewImage.setImage(texture);
 
@@ -117,5 +137,16 @@ public class StartPlayingScreen extends CoreScreenLayer {
         worldSetupWrappers = worldSetupWrapperList;
         universeWrapper = context.get(UniverseWrapper.class);
         targetWorld = spawnWorld;
+        subContext = context;
+    }
+
+    @Override
+    public boolean isLowerLayerVisible() {
+        return false;
+    }
+
+    @Override
+    public Vector2i getPreferredContentSize(Canvas canvas, Vector2i vector2i) {
+        return vector2i;
     }
 }

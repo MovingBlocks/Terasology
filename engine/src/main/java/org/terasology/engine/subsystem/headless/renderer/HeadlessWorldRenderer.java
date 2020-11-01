@@ -16,6 +16,7 @@
 package org.terasology.engine.subsystem.headless.renderer;
 
 import com.google.common.collect.Lists;
+import org.joml.Vector3ic;
 import org.terasology.config.Config;
 import org.terasology.context.Context;
 import org.terasology.logic.players.LocalPlayerSystem;
@@ -41,7 +42,7 @@ import java.util.List;
 
 public class HeadlessWorldRenderer implements WorldRenderer {
 
-    private static final int MAX_CHUNKS = ViewDistance.MEGA.getChunkDistance().x * ViewDistance.MEGA.getChunkDistance().y * ViewDistance.MEGA.getChunkDistance().z;
+    private static final int MAX_CHUNKS = ViewDistance.MEGA.getChunkDistance().x() * ViewDistance.MEGA.getChunkDistance().y() * ViewDistance.MEGA.getChunkDistance().z();
 
     private WorldProvider worldProvider;
     private ChunkProvider chunkProvider;
@@ -91,11 +92,6 @@ public class HeadlessWorldRenderer implements WorldRenderer {
     @Override
     public SubmersibleCamera getActiveCamera() {
         return (SubmersibleCamera) noCamera;
-    }
-
-    @Override
-    public Camera getLightCamera() {
-        return noCamera;
     }
 
     @Override
@@ -210,8 +206,8 @@ public class HeadlessWorldRenderer implements WorldRenderer {
         // TODO: This should actually be done based on events from the ChunkProvider on new chunk availability/old chunk removal
         boolean chunksCurrentlyPending = false;
         if (!newChunkPos.equals(chunkPos) || force || pendingChunks) {
-            Vector3i viewingDistance = config.getRendering().getViewDistance().getChunkDistance();
-            Region3i viewRegion = Region3i.createFromCenterExtents(newChunkPos, new Vector3i(viewingDistance.x / 2, viewingDistance.y / 2, viewingDistance.z / 2));
+            Vector3ic viewingDistance = config.getRendering().getViewDistance().getChunkDistance();
+            Region3i viewRegion = Region3i.createFromCenterExtents(newChunkPos, new Vector3i(viewingDistance.x() / 2, viewingDistance.y() / 2, viewingDistance.z() / 2));
             if (chunksInProximity.size() == 0 || force || pendingChunks) {
                 // just add all visible chunks
                 chunksInProximity.clear();
@@ -224,7 +220,7 @@ public class HeadlessWorldRenderer implements WorldRenderer {
                     }
                 }
             } else {
-                Region3i oldRegion = Region3i.createFromCenterExtents(chunkPos, new Vector3i(viewingDistance.x / 2, viewingDistance.y / 2, viewingDistance.z / 2));
+                Region3i oldRegion = Region3i.createFromCenterExtents(chunkPos, new Vector3i(viewingDistance.x() / 2, viewingDistance.y() / 2, viewingDistance.z() / 2));
 
                 Iterator<Vector3i> chunksForRemove = oldRegion.subtract(viewRegion);
                 // remove
@@ -273,7 +269,7 @@ public class HeadlessWorldRenderer implements WorldRenderer {
     private float distanceToCamera(RenderableChunk chunk) {
         Vector3f result = new Vector3f((chunk.getPosition().x + 0.5f) * ChunkConstants.SIZE_X, 0, (chunk.getPosition().z + 0.5f) * ChunkConstants.SIZE_Z);
 
-        Vector3f cameraPos = getActiveCamera().getPosition();
+        org.joml.Vector3f cameraPos = getActiveCamera().getPosition();
         result.x -= cameraPos.x;
         result.z -= cameraPos.z;
 

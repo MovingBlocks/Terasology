@@ -24,6 +24,7 @@ import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabData;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -70,6 +71,16 @@ public class PojoPrefab extends Prefab {
     @Override
     public boolean hasComponent(Class<? extends Component> component) {
         return componentMap.containsKey(component);
+    }
+
+    @Override
+    public boolean hasAnyComponents(List<Class<? extends Component>> filterComponents) {
+        return !Collections.disjoint(componentMap.keySet(), filterComponents);
+    }
+
+    @Override
+    public boolean hasAllComponents(List<Class<? extends Component>> filterComponents) {
+        return componentMap.keySet().containsAll(filterComponents);
     }
 
     @Override

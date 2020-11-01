@@ -16,9 +16,9 @@
 package org.terasology.persistence;
 
 import com.google.common.collect.Lists;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.terasology.assets.AssetFactory;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
@@ -48,9 +48,9 @@ import org.terasology.registry.CoreRegistry;
 import org.terasology.testUtil.ModuleManagerFactory;
 import org.terasology.utilities.Assets;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.terasology.entitySystem.entity.internal.EntityScope.CHUNK;
 import static org.terasology.entitySystem.entity.internal.EntityScope.GLOBAL;
@@ -67,7 +67,7 @@ public class EntitySerializerTest {
     private Prefab prefab;
 
 
-    @BeforeClass
+    @BeforeAll
     public static void setupClass() throws Exception {
         context = new ContextImpl();
         CoreRegistry.setContext(context);
@@ -82,16 +82,16 @@ public class EntitySerializerTest {
         context.put(AssetManager.class, assetTypeManager.getAssetManager());
     }
 
-    @Before
+    @BeforeEach
     public void setup() {
         context.put(NetworkSystem.class, mock(NetworkSystem.class));
 
         EntitySystemSetupUtil.addReflectionBasedLibraries(context);
         EntitySystemSetupUtil.addEntityManagementRelatedClasses(context);
         entityManager = context.get(EngineEntityManager.class);
-        entityManager.getComponentLibrary().register(new SimpleUri("test", "gettersetter"), GetterSetterComponent.class);
-        entityManager.getComponentLibrary().register(new SimpleUri("test", "string"), StringComponent.class);
-        entityManager.getComponentLibrary().register(new SimpleUri("test", "integer"), IntegerComponent.class);
+        entityManager.getComponentLibrary().register(new ResourceUrn("test", "gettersetter"), GetterSetterComponent.class);
+        entityManager.getComponentLibrary().register(new ResourceUrn("test", "string"), StringComponent.class);
+        entityManager.getComponentLibrary().register(new ResourceUrn("test", "integer"), IntegerComponent.class);
         entitySerializer = new EntitySerializer(entityManager);
         componentLibrary = entityManager.getComponentLibrary();
 
@@ -270,7 +270,7 @@ public class EntitySerializerTest {
 
     @Test
     public void testMappedTypeHandling() throws Exception {
-        componentLibrary.register(new SimpleUri("test", "mappedtype"), MappedTypeComponent.class);
+        componentLibrary.register(new ResourceUrn("test", "mappedtype"), MappedTypeComponent.class);
 
         EntityRef entity = entityManager.create();
         entity.addComponent(new MappedTypeComponent());

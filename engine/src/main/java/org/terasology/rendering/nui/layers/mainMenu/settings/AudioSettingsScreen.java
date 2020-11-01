@@ -16,13 +16,13 @@
 package org.terasology.rendering.nui.layers.mainMenu.settings;
 
 import org.terasology.assets.ResourceUrn;
-import org.terasology.config.Config;
+import org.terasology.config.AudioConfig;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
-import org.terasology.rendering.nui.WidgetUtil;
+import org.terasology.nui.WidgetUtil;
 import org.terasology.rendering.nui.animation.MenuAnimationSystems;
-import org.terasology.rendering.nui.databinding.BindHelper;
-import org.terasology.rendering.nui.widgets.UISlider;
+import org.terasology.nui.databinding.Binding;
+import org.terasology.nui.widgets.UISlider;
 
 /**
  */
@@ -31,18 +31,31 @@ public class AudioSettingsScreen extends CoreScreenLayer {
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:AudioMenuScreen");
 
     @In
-    private Config config;
+    private AudioConfig config;
 
     @Override
     public void initialise() {
         setAnimationSystem(MenuAnimationSystems.createDefaultSwipeAnimation());
+
+        // TODO: Remove this screen when AutoConfig UI is in place
+
         UISlider sound = find("sound", UISlider.class);
         if (sound != null) {
             sound.setIncrement(0.05f);
             sound.setPrecision(2);
             sound.setMinimum(0);
             sound.setRange(1.0f);
-            sound.bindValue(BindHelper.bindBeanProperty("soundVolume", config.getAudio(), Float.TYPE));
+            sound.bindValue(new Binding<Float>() {
+                @Override
+                public Float get() {
+                    return config.soundVolume.get();
+                }
+
+                @Override
+                public void set(Float value) {
+                    config.soundVolume.set(value);
+                }
+            });
         }
 
         UISlider music = find("music", UISlider.class);
@@ -51,7 +64,17 @@ public class AudioSettingsScreen extends CoreScreenLayer {
             music.setPrecision(2);
             music.setMinimum(0);
             music.setRange(1.0f);
-            music.bindValue(BindHelper.bindBeanProperty("musicVolume", config.getAudio(), Float.TYPE));
+            music.bindValue(new Binding<Float>() {
+                @Override
+                public Float get() {
+                    return config.musicVolume.get();
+                }
+
+                @Override
+                public void set(Float value) {
+                    config.musicVolume.set(value);
+                }
+            });
         }
 
         WidgetUtil.trySubscribe(this, "close", button -> triggerBackAnimation());

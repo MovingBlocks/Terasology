@@ -16,16 +16,15 @@
 package org.terasology.engine.modes.loadProcesses;
 
 import org.terasology.context.Context;
-import org.terasology.engine.modes.LoadProcess;
+import org.terasology.engine.modes.SingleStepLoadProcess;
 import org.terasology.persistence.StorageManager;
 
 import java.io.IOException;
 
 /**
  * Repairs the save game when it is in an inconsistent state after a crash.
- *
  */
-public class EnsureSaveGameConsistency implements LoadProcess {
+public class EnsureSaveGameConsistency extends SingleStepLoadProcess {
     private final Context context;
 
     public EnsureSaveGameConsistency(Context context) {
@@ -45,15 +44,6 @@ public class EnsureSaveGameConsistency implements LoadProcess {
             throw new RuntimeException(e);
         }
         return true;
-    }
-
-    @Override
-    public void begin() {
-    }
-
-    @Override
-    public float getProgress() {
-        return 0;
     }
 
     @Override

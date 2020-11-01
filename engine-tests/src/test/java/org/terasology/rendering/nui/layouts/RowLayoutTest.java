@@ -15,14 +15,16 @@
  */
 package org.terasology.rendering.nui.layouts;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.terasology.math.geom.Rect2i;
-import org.terasology.math.geom.Vector2i;
-import org.terasology.rendering.nui.Canvas;
-import org.terasology.rendering.nui.UIWidget;
+import org.joml.Vector2i;
+import org.terasology.nui.Canvas;
+import org.terasology.nui.UIWidget;
+import org.terasology.nui.layouts.RowLayout;
+import org.terasology.nui.util.RectUtility;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
@@ -41,7 +43,7 @@ public class RowLayoutTest {
     private UIWidget itemAt1x2;
     private UIWidget itemAt1x3;
 
-    @Before
+    @BeforeEach
     public void setup() {
         rowLayout = new RowLayout();
 
@@ -95,9 +97,9 @@ public class RowLayoutTest {
         // Gets 1/10 of the entire area
         final int width3 = CANVAS_WIDTH / 10;
 
-        verify(canvas).drawWidget(itemAt1x1, Rect2i.createFromMinAndSize(0, 0, width1, CANVAS_HEIGHT));
-        verify(canvas).drawWidget(itemAt1x2, Rect2i.createFromMinAndSize(width1, 0, width2, CANVAS_HEIGHT));
-        verify(canvas).drawWidget(itemAt1x3, Rect2i.createFromMinAndSize(width1 + width2, 0, width3, CANVAS_HEIGHT));
+        verify(canvas).drawWidget(itemAt1x1, RectUtility.createFromMinAndSize(0, 0, width1, CANVAS_HEIGHT));
+        verify(canvas).drawWidget(itemAt1x2, RectUtility.createFromMinAndSize(width1, 0, width2, CANVAS_HEIGHT));
+        verify(canvas).drawWidget(itemAt1x3, RectUtility.createFromMinAndSize(width1 + width2, 0, width3, CANVAS_HEIGHT));
     }
 
     @Test
@@ -115,9 +117,9 @@ public class RowLayoutTest {
         rowLayout.onDraw(canvas);
 
         //Width split equally among 3 widgets as they have no relative widths
-        verify(canvas).drawWidget(itemAt1x1, Rect2i.createFromMinAndSize(0, 0, CANVAS_WIDTH / 3, CANVAS_HEIGHT));
-        verify(canvas).drawWidget(itemAt1x2, Rect2i.createFromMinAndSize(CANVAS_WIDTH / 3, 0, CANVAS_WIDTH / 3, CANVAS_HEIGHT));
-        verify(canvas).drawWidget(itemAt1x3, Rect2i.createFromMinAndSize(CANVAS_WIDTH / 3 + CANVAS_WIDTH / 3, 0, CANVAS_WIDTH / 3, CANVAS_HEIGHT));
+        verify(canvas).drawWidget(itemAt1x1, RectUtility.createFromMinAndSize(0, 0, CANVAS_WIDTH / 3, CANVAS_HEIGHT));
+        verify(canvas).drawWidget(itemAt1x2, RectUtility.createFromMinAndSize(CANVAS_WIDTH / 3, 0, CANVAS_WIDTH / 3, CANVAS_HEIGHT));
+        verify(canvas).drawWidget(itemAt1x3, RectUtility.createFromMinAndSize(CANVAS_WIDTH / 3 + CANVAS_WIDTH / 3, 0, CANVAS_WIDTH / 3, CANVAS_HEIGHT));
     }
 
     @Test
@@ -141,8 +143,8 @@ public class RowLayoutTest {
         final int width2 = (CANVAS_WIDTH - width1) / 2;
         final int width3 = (CANVAS_WIDTH - width1) / 2;
 
-        verify(canvas).drawWidget(itemAt1x1, Rect2i.createFromMinAndSize(0, 0, width1, CANVAS_HEIGHT));
-        verify(canvas).drawWidget(itemAt1x2, Rect2i.createFromMinAndSize(width1, 0, width2, CANVAS_HEIGHT));
-        verify(canvas).drawWidget(itemAt1x3, Rect2i.createFromMinAndSize(width1 + width2, 0, width3, CANVAS_HEIGHT));
+        verify(canvas).drawWidget(itemAt1x1, RectUtility.createFromMinAndSize(0, 0, width1, CANVAS_HEIGHT));
+        verify(canvas).drawWidget(itemAt1x2, RectUtility.createFromMinAndSize(width1, 0, width2, CANVAS_HEIGHT));
+        verify(canvas).drawWidget(itemAt1x3, RectUtility.createFromMinAndSize(width1 + width2, 0, width3, CANVAS_HEIGHT));
     }
 }

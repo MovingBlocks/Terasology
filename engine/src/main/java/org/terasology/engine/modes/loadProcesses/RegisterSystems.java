@@ -20,6 +20,7 @@ import org.terasology.context.Context;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.TerasologyEngine;
+import org.terasology.engine.modes.SingleStepLoadProcess;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.subsystem.EngineSubsystem;
 import org.terasology.network.NetworkMode;

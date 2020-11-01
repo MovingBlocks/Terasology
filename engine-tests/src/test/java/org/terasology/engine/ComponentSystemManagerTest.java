@@ -7,8 +7,8 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.classic.spi.LoggingEvent;
 import ch.qos.logback.core.Appender;
 import com.google.common.collect.Iterables;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.slf4j.LoggerFactory;
 import org.terasology.context.Context;
@@ -27,17 +27,18 @@ import org.terasology.logic.console.commandSystem.annotations.Sender;
 import java.util.List;
 
 import static java.util.stream.Collectors.toList;
-import static org.hamcrest.CoreMatchers.hasItem;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class ComponentSystemManagerTest {
 
     private ComponentSystemManager systemUnderTest;
     private Console console;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         Context context = mock(Context.class);
         EntityManager entityManager = mock(EntityManager.class);
@@ -54,7 +55,7 @@ public class ComponentSystemManagerTest {
 
         systemUnderTest.register(system);
 
-        assertThat(Iterables.size(systemUnderTest.iterateUpdateSubscribers()), is(1));
+        assertEquals(Iterables.size(systemUnderTest.iterateUpdateSubscribers()), 1);
     }
 
     @Test
@@ -64,7 +65,7 @@ public class ComponentSystemManagerTest {
         systemUnderTest.register(system);
         systemUnderTest.shutdown();
 
-        assertThat(Iterables.size(systemUnderTest.iterateUpdateSubscribers()), is(0));
+        assertEquals(Iterables.size(systemUnderTest.iterateUpdateSubscribers()), 0);
     }
 
     @Test
@@ -73,7 +74,7 @@ public class ComponentSystemManagerTest {
 
         systemUnderTest.register(system);
 
-        assertThat(Iterables.size(systemUnderTest.iterateRenderSubscribers()), is(1));
+        assertEquals(Iterables.size(systemUnderTest.iterateRenderSubscribers()), 1);
     }
 
     @Test
@@ -84,7 +85,7 @@ public class ComponentSystemManagerTest {
         systemUnderTest.register(system);
         systemUnderTest.shutdown();
 
-        assertThat(Iterables.size(systemUnderTest.iterateRenderSubscribers()), is(0));
+        assertEquals(Iterables.size(systemUnderTest.iterateRenderSubscribers()), 0);
     }
 
     @Test
@@ -96,7 +97,7 @@ public class ComponentSystemManagerTest {
         verify(console).registerCommand(methodCommandArgumentCaptor.capture());
 
         MethodCommand command = methodCommandArgumentCaptor.getValue();
-        assertThat(command.getName().toString(), is("validCommandName"));
+        assertEquals(command.getName().toString(), "validCommandName");
     }
 
     @Test
@@ -109,7 +110,7 @@ public class ComponentSystemManagerTest {
         verify(console).registerCommand(methodCommandArgumentCaptor.capture());
 
         MethodCommand command = methodCommandArgumentCaptor.getValue();
-        assertThat(command.getName().toString(), is("commandWithoutSenderAnnotation"));
+        assertEquals(command.getName().toString(), "commandWithoutSenderAnnotation");
     }
 
     @Test
@@ -130,7 +131,7 @@ public class ComponentSystemManagerTest {
         String expectedMessage = "Command commandWithoutSenderAnnotation provided by " +
                 "SystemWithCommandMissingSenderAnnotation contains a EntityRef without @Sender annotation, " +
                 "may cause a NullPointerException";
-        assertThat(allErrorLogMessages, hasItem(expectedMessage));
+        assertTrue(allErrorLogMessages.contains(expectedMessage));
     }
 
     @SuppressWarnings("unchecked")

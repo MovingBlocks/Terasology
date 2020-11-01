@@ -30,6 +30,7 @@ public class SystemConfig {
     private boolean debugEnabled;
     private boolean monitoringEnabled;
     private boolean writeSaveGamesEnabled;
+    private long chunkGenerationFailTimeoutInMs;
     private String locale;
 
     public long getDayNightLengthInMs() {
@@ -90,6 +91,14 @@ public class SystemConfig {
 
     public void setWriteSaveGamesEnabled(boolean writeSaveGamesEnabled) {
         this.writeSaveGamesEnabled = writeSaveGamesEnabled;
+    }
+
+    public long getChunkGenerationFailTimeoutInMs() {
+        return chunkGenerationFailTimeoutInMs;
+    }
+
+    public void setChunkGenerationFailTimeoutInMs(long chunkGenerationFailTimeoutInMs) {
+        this.chunkGenerationFailTimeoutInMs = chunkGenerationFailTimeoutInMs;
     }
 
     public Locale getLocale() {

@@ -17,8 +17,6 @@ package org.terasology.engine.subsystem.lwjgl;
 
 import java.awt.Canvas;
 
-import org.lwjgl.LWJGLException;
-import org.lwjgl.opengl.Display;
 import org.terasology.context.Context;
 
 public class LwjglPortlet extends BaseLwjglSubsystem {
@@ -32,11 +30,10 @@ public class LwjglPortlet extends BaseLwjglSubsystem {
 
     @Override
     public void postInitialise(Context context) {
-        try {
-            Display.setParent(customViewPort);
-        } catch (LWJGLException e) {
-            throw new RuntimeException("Can not initialize graphics device.", e);
-        }
+        // FIXME: LWJGL 3  haven't classes for working with awt.
+        // Used by TeraED facade only.
+        // Needs rework TeraED rendering part.
+        throw new RuntimeException("Not implemented");
     }
 
     public void setCustomViewport(Canvas canvas) {

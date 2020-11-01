@@ -26,9 +26,9 @@ import java.util.Set;
 public final class ExternalApiWhitelist {
     public static final Set<String> PACKAGES = new ImmutableSet.Builder<String>()
             // TODO: This one org.terasology entry is a hack and needs a proper fix
-            .add("org.terasology.world.biomes")
             .add("org.terasology.math.geom")
             .add("java.lang")
+            .add("java.beans")
             .add("java.lang.invoke")
             .add("java.lang.ref")
             .add("java.math")
@@ -80,7 +80,9 @@ public final class ExternalApiWhitelist {
             .add("org.lwjgl.opengl.GL11")
             .add("org.lwjgl.opengl.GL12")
             .add("org.lwjgl.opengl.GL13")
+            .add("org.lwjgl")
             .add("org.terasology.jnlua")
+            .add("org.joml")
             .build();
 
     public static final Set<Class<?>> CLASSES = new ImmutableSet.Builder<Class<?>>()
@@ -90,7 +92,9 @@ public final class ExternalApiWhitelist {
             .add(Logger.class)
             .add(java.awt.datatransfer.UnsupportedFlavorException.class)
             .add(java.nio.ByteBuffer.class)
+            .add(java.nio.ShortBuffer.class)
             .add(java.nio.IntBuffer.class)
+            .add(java.nio.FloatBuffer.class)
             .add(java.nio.file.attribute.FileTime.class) // java.util.zip dependency
             // This class only operates on Class<?> or Object instances,
             // effectively adding a way to access arrays without knowing their type

@@ -1,9 +1,23 @@
+/*
+ * Copyright 2020 MovingBlocks
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import groovy.json.JsonSlurper
 
 class module {
-
-    // TODO: Eventually add the Terasology org's site repo to the exclude list
-    def excludedItems = ["engine", "Core", "CoreSampleGameplay", "BuilderSampleGameplay", "Index"]
+    def excludedItems = ["engine", "Index", "out", "build"]
 
     def getGithubDefaultHome(Properties properties) {
         return properties.alternativeGithubHome ?: "Terasology"
@@ -12,8 +26,8 @@ class module {
     File targetDirectory = new File("modules")
     def itemType = "module"
 
-    String[] findDependencies(File targetDir) {
-        def foundDependencies = readModuleDependencies(new File(targetDir, "module.txt"))
+    String[] findDependencies(File targetDir, boolean respectExcludedItems = true) {
+        def foundDependencies = readModuleDependencies(new File(targetDir, "module.txt"), respectExcludedItems)
         println "Looked for dependencies, found: " + foundDependencies
         return foundDependencies
     }
@@ -24,7 +38,7 @@ class module {
      * @param targetModuleInfo the target file to check (a module.txt file or similar)
      * @return a String[] containing the next level of dependencies, if any
      */
-    String[] readModuleDependencies(File targetModuleInfo) {
+    String[] readModuleDependencies(File targetModuleInfo, boolean respectExcludedItems = true) {
         def qualifiedDependencies = []
         if (!targetModuleInfo.exists()) {
             println "The module info file did not appear to exist - can't calculate dependencies"
@@ -33,7 +47,7 @@ class module {
         def slurper = new JsonSlurper()
         def moduleConfig = slurper.parseText(targetModuleInfo.text)
         for (dependency in moduleConfig.dependencies) {
-            if (excludedItems.contains(dependency.id)) {
+            if (respectExcludedItems && excludedItems.contains(dependency.id)) {
                 println "Skipping listed dependency $dependency.id as it is in the exclude list (shipped with primary project)"
             } else {
                 println "Accepting listed dependency $dependency.id"
@@ -60,6 +74,7 @@ class module {
         }
 
         // TODO: Copy in a module readme template soon
+        // TODO : Add in the logback.groovy from engine\src\test\resources\logback.groovy ? Local dev only, Jenkins will use the one inside engine-tests.jar. Also add to .gitignore
     }
 
     /**
@@ -72,9 +87,21 @@ class module {
 
         // Modules just consider the item name and excludes those in a specific list
         itemList = possibleItems.findAll {
-            !excludedItems.contains (it.key)
-        }.collect {it.key}
+            !excludedItems.contains(it.key)
+        }.collect { it.key }
 
         return itemList
+    }
+
+    def refreshGradle(File targetDir) {
+        // Copy in the template build.gradle for modules
+        if (!new File(targetDir, "module.txt").exists()) {
+            println "$targetDir has no module.txt, it must not want a fresh build.gradle"
+            return
+        }
+        println "In refreshGradle for module $targetDir - copying in a fresh build.gradle"
+        File targetBuildGradle = new File(targetDir, 'build.gradle')
+        targetBuildGradle.delete()
+        targetBuildGradle << new File('templates/build.gradle').text
     }
 }

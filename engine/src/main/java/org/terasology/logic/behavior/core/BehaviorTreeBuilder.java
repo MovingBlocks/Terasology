@@ -142,7 +142,7 @@ public class BehaviorTreeBuilder implements JsonDeserializer<BehaviorNode>, Json
                     String uri = in.nextString();
                     AssetManager assetManager = CoreRegistry.get(AssetManager.class);
                     return assetManager.getAsset(new ResourceUrn(uri), BehaviorTree.class)
-                            .orElse(assetManager.getAsset(new ResourceUrn("Behaviors:fallback"), BehaviorTree.class).get());
+                            .orElse(assetManager.getAsset(new ResourceUrn("engine:default"), BehaviorTree.class).get());
 
                 }
             });

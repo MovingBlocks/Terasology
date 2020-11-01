@@ -15,8 +15,8 @@
  */
 package org.terasology.logic.characters;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
@@ -37,7 +37,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Tests for {@link VisualCharacterSystem}
@@ -53,7 +53,7 @@ public class VisualCharacterSystemTest {
      */
     private long nextEntityId = 1;
 
-    @Before
+    @BeforeEach
     public void setup() throws Exception {
         this.system = new VisualCharacterSystem();
         Context context = new ContextImpl();
@@ -113,6 +113,8 @@ public class VisualCharacterSystemTest {
         EntityRef otherCharacterEntity = mockEntityWithUniqueId();
         List<Event> otherCharacterEntityEvents = new ArrayList<>();
         recordEntityEventsToList(otherCharacterEntity, otherCharacterEntityEvents);
+        VisualCharacterComponent visualComponentOfOtherCharacter = new VisualCharacterComponent();
+        Mockito.when(otherCharacterEntity.getComponent(VisualCharacterComponent.class)).thenReturn(visualComponentOfOtherCharacter);
 
         clientEntityReturnedByLocalPlayer = EntityRef.NULL;
 
@@ -122,7 +124,7 @@ public class VisualCharacterSystemTest {
          * since the character is not properly linked yet nothing should happen
          */
         system.onActivatedVisualCharacter(OnActivatedComponent.newInstance(), otherCharacterEntity,
-                new VisualCharacterComponent());
+                visualComponentOfOtherCharacter);
         system.onActivatedVisualCharacter(OnActivatedComponent.newInstance(), ownCharacterEntity,
                 visualComponentOfOwnCharacter);
 
@@ -140,12 +142,14 @@ public class VisualCharacterSystemTest {
         EntityRef laterJoiningCharacterEntity = mockEntityWithUniqueId();
         List<Event> laterJoiningCharacterEntityEvents = new ArrayList<>();
         recordEntityEventsToList(laterJoiningCharacterEntity, laterJoiningCharacterEntityEvents);
+        VisualCharacterComponent visualComponentOfLaterJoiningCharacter = new VisualCharacterComponent();
+        Mockito.when(laterJoiningCharacterEntity.getComponent(VisualCharacterComponent.class)).thenReturn(visualComponentOfLaterJoiningCharacter);
 
         // Joined player is not properly linked but it should not matter:
         Mockito.when(laterJoiningCharacterEntity.getOwner()).thenReturn(EntityRef.NULL);
 
         system.onActivatedVisualCharacter(OnActivatedComponent.newInstance(), laterJoiningCharacterEntity,
-                new VisualCharacterComponent());
+                visualComponentOfLaterJoiningCharacter);
 
 
         /*

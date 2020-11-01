@@ -16,7 +16,7 @@
 package org.terasology.rendering.nui.layers.mainMenu.videoSettings;
 
 import org.terasology.config.RenderingConfig;
-import org.terasology.rendering.nui.databinding.Binding;
+import org.terasology.nui.databinding.Binding;
 
 /**
  */

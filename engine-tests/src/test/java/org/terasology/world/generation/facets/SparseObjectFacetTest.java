@@ -17,8 +17,7 @@
 package org.terasology.world.generation.facets;
 
 import com.google.common.collect.ImmutableMap;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.terasology.math.Region3i;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.world.generation.Border3D;
@@ -26,6 +25,8 @@ import org.terasology.world.generation.facets.base.ObjectFacet3D;
 import org.terasology.world.generation.facets.base.SparseObjectFacet3D;
 
 import java.util.Map;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Tests the {@link SparseObjectFacet3D} class.
@@ -47,7 +48,7 @@ public class SparseObjectFacetTest extends ObjectFacetTest {
     @Test
     public void testBoxedGetSetSparse() {
         facet.set(0, 1, 3, 64);
-        Assert.assertEquals(64.0f, facet.get(0, 1, 3), 0.0);
+        assertEquals(64.0f, facet.get(0, 1, 3), 0.0);
     }
 
     @Test
@@ -67,7 +68,7 @@ public class SparseObjectFacetTest extends ObjectFacetTest {
                 new Vector3i(0, 1, 5), 1,
                 new Vector3i(9, 3, 1), 3);
 
-        Assert.assertEquals(expected, facet.getRelativeEntries());
+        assertEquals(expected, facet.getRelativeEntries());
     }
 
     @Test
@@ -87,6 +88,6 @@ public class SparseObjectFacetTest extends ObjectFacetTest {
                 new Vector3i(10, 21, 35), 1,
                 new Vector3i(19, 23, 31), 2);
 
-        Assert.assertEquals(expected, facet.getWorldEntries());
+        assertEquals(expected, facet.getWorldEntries());
     }
 }

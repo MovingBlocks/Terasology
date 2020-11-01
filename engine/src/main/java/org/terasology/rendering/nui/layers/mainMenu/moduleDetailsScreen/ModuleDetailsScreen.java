@@ -16,6 +16,7 @@
 package org.terasology.rendering.nui.layers.mainMenu.moduleDetailsScreen;
 
 import org.codehaus.plexus.util.StringUtils;
+import org.joml.Vector2i;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
@@ -27,28 +28,30 @@ import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.module.RemoteModuleExtension;
 import org.terasology.engine.module.StandardModuleExtension;
 import org.terasology.i18n.TranslationSystem;
-import org.terasology.math.geom.Vector2i;
 import org.terasology.module.DependencyInfo;
+import org.terasology.module.DependencyResolver;
 import org.terasology.module.Module;
 import org.terasology.module.ModuleMetadata;
+import org.terasology.naming.Name;
 import org.terasology.naming.Version;
+import org.terasology.nui.Canvas;
+import org.terasology.nui.Color;
+import org.terasology.nui.databinding.Binding;
+import org.terasology.nui.databinding.ReadOnlyBinding;
+import org.terasology.nui.itemRendering.AbstractItemRenderer;
+import org.terasology.nui.itemRendering.StringTextRenderer;
+import org.terasology.nui.widgets.UIButton;
+import org.terasology.nui.widgets.UILabel;
+import org.terasology.nui.widgets.UIList;
+import org.terasology.nui.widgets.UIText;
 import org.terasology.registry.In;
-import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.animation.MenuAnimationSystems;
-import org.terasology.rendering.nui.databinding.Binding;
-import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
-import org.terasology.rendering.nui.itemRendering.AbstractItemRenderer;
-import org.terasology.rendering.nui.itemRendering.StringTextRenderer;
 import org.terasology.rendering.nui.layers.mainMenu.ConfirmPopup;
 import org.terasology.rendering.nui.layers.mainMenu.MessagePopup;
 import org.terasology.rendering.nui.layers.mainMenu.WaitPopup;
 import org.terasology.rendering.nui.layers.mainMenu.advancedGameSetupScreen.DownloadPopupProgressListener;
-import org.terasology.rendering.nui.widgets.UIButton;
 import org.terasology.rendering.nui.widgets.UIButtonWebBrowser;
-import org.terasology.rendering.nui.widgets.UILabel;
-import org.terasology.rendering.nui.widgets.UIList;
-import org.terasology.rendering.nui.widgets.UIText;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -73,9 +76,9 @@ public class ModuleDetailsScreen extends CoreScreenLayer {
 
     private static final Logger logger = LoggerFactory.getLogger(ModuleDetailsScreen.class);
 
-    private static final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private static final String DEFAULT_GITHUB_MODULE_URL = "https://github.com/Terasology/";
-    private static final List INTERNAL_MODULES = Arrays.asList("Core", "engine", "CoreSampleGameplay", "BuilderSampleGameplay");
+    private static final List<String> INTERNAL_MODULES = Arrays.asList("engine");
     @In
     private ModuleManager moduleManager;
     @In
@@ -163,7 +166,9 @@ public class ModuleDetailsScreen extends CoreScreenLayer {
 
         if (!isScreenValid()) {
             final MessagePopup popup = getManager().createScreen(MessagePopup.ASSET_URI, MessagePopup.class);
-            popup.setMessage(translationSystem.translate("${engine:menu#game-details-errors-message-title}"), translationSystem.translate("${engine:menu#game-details-errors-message-body}"));
+            popup.setMessage(
+                    translationSystem.translate("${engine:menu#game-details-errors-message-title}"),
+                    translationSystem.translate("${engine:menu#game-details-errors-message-body}"));
             popup.subscribeButton(e -> triggerBackAnimation());
             getManager().pushScreen(popup);
             // disable child widgets
@@ -187,6 +192,24 @@ public class ModuleDetailsScreen extends CoreScreenLayer {
                     return value.getMetadata().getDisplayName().toString();
                 }
                 return "";
+            }
+
+            @Override
+            public void draw(Module value, Canvas canvas) {
+                if (!validateModuleDependencies(value.getId())) {
+                    canvas.setMode(("invalid"));
+                } else {
+                    canvas.setMode("available");
+                }
+                canvas.drawText(getString(value), canvas.getRegion());
+            }
+
+            @Override
+            public Vector2i getPreferredSize(Module value, Canvas canvas) {
+                String text = getString(value);
+                return new Vector2i(
+                        canvas.getCurrentStyle().getFont().getWidth(text),
+                        canvas.getCurrentStyle().getFont().getLineHeight());
             }
         });
     }
@@ -228,7 +251,7 @@ public class ModuleDetailsScreen extends CoreScreenLayer {
         installedVersion.bindText(new ReadOnlyBinding<String>() {
             @Override
             public String get() {
-                if (dependencyInfoBinding.get() != null) {
+                if (dependencyInfoBinding.get() != null && moduleManager.getRegistry().getLatestModuleVersion(dependencyInfoBinding.get().getId()) != null) {
                     return String.valueOf(moduleManager.getRegistry().getLatestModuleVersion(dependencyInfoBinding.get().getId()).getVersion());
                 }
                 return "";
@@ -276,6 +299,11 @@ public class ModuleDetailsScreen extends CoreScreenLayer {
         });
     }
 
+    private boolean validateModuleDependencies(Name moduleName) {
+        DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
+        return resolver.resolve(moduleName).isSuccess();
+    }
+
     private void setUpDependencies() {
         dependencies.setList(Collections.emptyList());
         dependencies.setItemRenderer(new AbstractItemRenderer<DependencyInfo>() {
@@ -288,12 +316,21 @@ public class ModuleDetailsScreen extends CoreScreenLayer {
 
             @Override
             public void draw(DependencyInfo value, Canvas canvas) {
+                Module module = moduleManager.getRegistry().getLatestModuleVersion(value.getId());
+
+                if (module == null || !(value.versionRange().contains(module.getVersion()))) {
+                    canvas.setMode("invalid");
+                } else {
+                    canvas.setMode("available");
+                }
+
                 canvas.drawText(getString(value), canvas.getRegion());
             }
 
             @Override
             public Vector2i getPreferredSize(DependencyInfo value, Canvas canvas) {
                 String text = getString(value);
+                canvas.getCurrentStyle().setTextColor(Color.RED);
                 return new Vector2i(
                         canvas.getCurrentStyle().getFont().getWidth(text),
                         canvas.getCurrentStyle().getFont().getLineHeight());
@@ -316,7 +353,7 @@ public class ModuleDetailsScreen extends CoreScreenLayer {
             public Boolean get() {
                 final String online = onlineVersion.getText();
                 final String installed = installedVersion.getText();
-                if (StringUtils.isNotBlank(online)) {
+                if (StringUtils.isNotBlank(online) && StringUtils.isNotBlank(installed)) {
                     return new Version(online).compareTo(new Version(installed)) > 0;
                 }
                 return false;
@@ -453,7 +490,7 @@ public class ModuleDetailsScreen extends CoreScreenLayer {
                 .findFirst()
                 .map(Module::getMetadata)
                 .map(RemoteModuleExtension::getLastUpdated)
-                .map(dateFormat::format)
+                .map(DATE_FORMAT::format)
                 .orElse("");
     }
 
@@ -472,5 +509,10 @@ public class ModuleDetailsScreen extends CoreScreenLayer {
             return false;
         }
         return true;
+    }
+
+    @Override
+    public boolean isLowerLayerVisible() {
+        return false;
     }
 }

@@ -17,37 +17,35 @@
 package org.terasology.testUtil;
 
 import com.google.common.collect.Maps;
+import org.joml.Vector3ic;
+import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.math.JomlUtil;
+import org.terasology.math.Region3i;
+import org.terasology.math.geom.Vector3i;
+import org.terasology.world.WorldChangeListener;
+import org.terasology.world.block.Block;
+import org.terasology.world.internal.ChunkViewCore;
+import org.terasology.world.internal.WorldInfo;
+import org.terasology.world.internal.WorldProviderCore;
+import org.terasology.world.time.WorldTime;
+import org.terasology.world.time.WorldTimeImpl;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.math.Region3i;
-import org.terasology.math.geom.Vector3i;
-import org.terasology.world.WorldChangeListener;
-import org.terasology.world.biomes.Biome;
-import org.terasology.world.block.Block;
-import org.terasology.world.internal.ChunkViewCore;
-import org.terasology.world.internal.WorldInfo;
-import org.terasology.world.internal.WorldProviderCore;
-import org.terasology.world.liquid.LiquidData;
-import org.terasology.world.time.WorldTime;
-import org.terasology.world.time.WorldTimeImpl;
 
 /**
  */
 public class WorldProviderCoreStub implements WorldProviderCore {
 
     private Map<Vector3i, Block> blocks = Maps.newHashMap();
-    private Map<Vector3i, Biome> biomes = Maps.newHashMap();
     private ArrayList<Map<Vector3i, Integer>> extraData = new ArrayList<>();
     private Block air;
-    private Biome defaultBiome;
 
-    public WorldProviderCoreStub(Block air, Biome defaultBiome) {
+    public WorldProviderCoreStub(Block air) {
         this.air = air;
-        this.defaultBiome = defaultBiome;
     }
 
     @Override
@@ -106,7 +104,12 @@ public class WorldProviderCoreStub implements WorldProviderCore {
 
     @Override
     public Block setBlock(Vector3i pos, Block type) {
-        Block old = blocks.put(pos, type);
+        return this.setBlock(JomlUtil.from(pos), type);
+    }
+
+    @Override
+    public Block setBlock(Vector3ic pos, Block type) {
+        Block old = blocks.put(JomlUtil.from(pos), type);
         if (old == null) {
             return air;
         }
@@ -124,38 +127,10 @@ public class WorldProviderCoreStub implements WorldProviderCore {
     }
 
     @Override
-    public boolean setLiquid(int x, int y, int z, LiquidData newData, LiquidData oldData) {
-        return false;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public LiquidData getLiquid(int x, int y, int z) {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
     public Block getBlock(int x, int y, int z) {
         Block result = blocks.get(new Vector3i(x, y, z));
         if (result == null) {
             return air;
-        }
-        return result;
-    }
-
-    @Override
-    public Biome setBiome(Vector3i pos, Biome biome) {
-        Biome oldBiome = biomes.put(pos, biome);
-        if (oldBiome == null) {
-            return defaultBiome;
-        }
-        return oldBiome;
-    }
-
-    @Override
-    public Biome getBiome(Vector3i pos) {
-        Biome result = biomes.get(pos);
-        if (result == null) {
-            return defaultBiome;
         }
         return result;
     }
@@ -174,18 +149,18 @@ public class WorldProviderCoreStub implements WorldProviderCore {
     public byte getTotalLight(int x, int y, int z) {
         return 0;  //To change body of implemented methods use File | Settings | File Templates.
     }
-    
+
     @Override
     public int setExtraData(int index, Vector3i pos, int value) {
         Integer prevValue = getExtraDataLayer(index).put(pos, value);
         return prevValue == null ? 0 : prevValue;
     }
-    
+
     @Override
     public int getExtraData(int index, int x, int y, int z) {
         return getExtraDataLayer(index).getOrDefault(new Vector3i(x, y, z), 0);
     }
-    
+
     private Map<Vector3i, Integer> getExtraDataLayer(int index) {
         while (extraData.size() <= index) {
             extraData.add(Maps.newHashMap());

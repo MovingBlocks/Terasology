@@ -15,16 +15,14 @@
  */
 package org.terasology.world;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.Mockito;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.terasology.TerasologyTestingEnvironment;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.math.Region3i;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.registry.CoreRegistry;
-import org.terasology.world.biomes.BiomeManager;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.BlockUri;
@@ -43,24 +41,21 @@ import org.terasology.world.internal.ChunkViewCoreImpl;
 
 import java.io.IOException;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ChunkViewTest extends TerasologyTestingEnvironment {
 
     Block airBlock;
     Block solidBlock;
     private BlockManager blockManager;
-    private BiomeManager biomeManager;
     private ExtraBlockDataManager extraDataManager;
 
-    @Before
+    @BeforeEach
     public void setup() throws IOException {
         AssetManager assetManager = CoreRegistry.get(AssetManager.class);
         blockManager = new BlockManagerImpl(new NullWorldAtlas(), assetManager);
         CoreRegistry.put(BlockManager.class, blockManager);
         airBlock = blockManager.getBlock(BlockManager.AIR_ID);
-
-        biomeManager = Mockito.mock(BiomeManager.class);
         
         extraDataManager = new ExtraBlockDataManager();
 
@@ -153,6 +148,6 @@ public class ChunkViewTest extends TerasologyTestingEnvironment {
     }
 
     private Chunk createChunk(int x, int y, int z) {
-        return new ChunkImpl(new Vector3i(x, y, z), blockManager, biomeManager, extraDataManager);
+        return new ChunkImpl(new Vector3i(x, y, z), blockManager, extraDataManager);
     }
 }
