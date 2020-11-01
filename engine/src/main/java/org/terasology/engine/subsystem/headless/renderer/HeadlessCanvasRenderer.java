@@ -3,13 +3,12 @@
 
 package org.terasology.engine.subsystem.headless.renderer;
 
+import org.joml.Quaternionfc;
 import org.joml.Rectanglei;
 import org.joml.Vector2i;
+import org.joml.Vector2ic;
+import org.joml.Vector3fc;
 import org.terasology.assets.ResourceUrn;
-import org.terasology.math.geom.BaseVector2i;
-import org.terasology.math.geom.Quat4f;
-import org.terasology.math.geom.Rect2i;
-import org.terasology.math.geom.Vector3f;
 import org.terasology.nui.Border;
 import org.terasology.nui.Colorc;
 import org.terasology.nui.HorizontalAlign;
@@ -35,7 +34,7 @@ public class HeadlessCanvasRenderer implements TerasologyCanvasRenderer {
     }
 
     @Override
-    public void drawMesh(Mesh mesh, Material material, Rect2i drawRegion, Rect2i cropRegion, Quat4f rotation, Vector3f offset, float scale, float alpha) {
+    public void drawMesh(Mesh mesh, Material material, Rectanglei drawRegion, Rectanglei cropRegion, Quaternionfc rotation, Vector3fc offset, float scale, float alpha) {
         // Do nothing
     }
 
@@ -45,7 +44,7 @@ public class HeadlessCanvasRenderer implements TerasologyCanvasRenderer {
     }
 
     @Override
-    public void drawMaterialAt(Material material, Rect2i drawRegion) {
+    public void drawMaterialAt(Material material, Rectanglei drawRegion) {
         // Do nothing
     }
 
@@ -60,7 +59,7 @@ public class HeadlessCanvasRenderer implements TerasologyCanvasRenderer {
     }
 
     @Override
-    public FrameBufferObject getFBO(ResourceUrn uri, BaseVector2i region) {
+    public FrameBufferObject getFBO(ResourceUrn uri, Vector2ic region) {
         return null;
     }
 
