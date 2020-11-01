@@ -19,12 +19,12 @@ import org.terasology.engine.Time;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.input.Keyboard;
 import org.terasology.logic.players.LocalPlayer;
+import org.terasology.nui.databinding.ReadOnlyBinding;
+import org.terasology.nui.events.NUIKeyEvent;
+import org.terasology.nui.widgets.UIBox;
+import org.terasology.nui.widgets.UILabel;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
-import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
-import org.terasology.rendering.nui.events.NUIKeyEvent;
-import org.terasology.rendering.nui.widgets.UIBox;
-import org.terasology.rendering.nui.widgets.UILabel;
 
 public class AfkScreen extends CoreScreenLayer {
 
@@ -61,7 +61,8 @@ public class AfkScreen extends CoreScreenLayer {
                 @Override
                 public String get() {
                     long afkTime = time.getGameTimeInMs() - afkClientSystem.getLastActive();
-                    return String.format("( Press %s to disable the AFK mode )", afkTime <= AfkClientSystem.AFK_FREEDOM ? "ESCAPE" : "anything");
+                    return String.format("( Press %s to disable the AFK mode )",
+                            afkTime <= AfkClientSystem.AFK_FREEDOM ? "ESCAPE" : "anything");
                 }
             });
         }

@@ -26,12 +26,12 @@ import org.terasology.network.ClientComponent;
 import org.terasology.network.PingStockComponent;
 import org.terasology.network.events.SubscribePingEvent;
 import org.terasology.network.events.UnSubscribePingEvent;
-import org.terasology.registry.In;
-import org.terasology.rendering.FontColor;
-import org.terasology.rendering.nui.Color;
-import org.terasology.rendering.nui.CoreScreenLayer;
+import org.terasology.nui.Color;
+import org.terasology.nui.FontColor;
 import org.terasology.nui.databinding.ReadOnlyBinding;
 import org.terasology.nui.widgets.UIText;
+import org.terasology.registry.In;
+import org.terasology.rendering.nui.CoreScreenLayer;
 
 import java.util.Map;
 
@@ -103,7 +103,7 @@ public class OnlinePlayersOverlay extends CoreScreenLayer {
             AfkComponent afkComponent = clientEntity.getComponent(AfkComponent.class);
             if (afkComponent != null) {
                 if (afkComponent.afk) {
-                    sb.append(FontColor.getColored("[AFK]", Color.RED));
+                    sb.append(FontColor.getColored("[AFK]", Color.red));
                     sb.append(" ");
                 }
             }
