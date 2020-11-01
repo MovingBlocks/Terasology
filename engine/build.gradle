@@ -127,7 +127,6 @@ dependencies {
 
     // Small-time 3rd party libs we've stored in our Artifactory for access
     implementation group: 'ec.util', name: 'MersenneTwister', version: '20'
-    implementation group: 'org.eaxy', name: 'eaxy', version: '0.1'
 
     // telemetry
     implementation(group: 'com.snowplowanalytics', name: 'snowplow-java-tracker', version: '0.9.0') {
@@ -146,8 +145,8 @@ dependencies {
     api group: 'org.terasology', name: 'splash-screen', version: '1.1.0-SNAPSHOT'
     api group: 'org.terasology.jnlua', name: 'JNLua', version: '0.1.0-SNAPSHOT'
     api group: 'org.terasology.jnbullet', name: 'JNBullet', version: '1.0.2'
-    api group: 'org.terasology.nui', name: 'nui', version: '1.3.0'
-    api group: 'org.terasology.nui', name: 'nui-reflect', version: '1.3.0'
+    api group: 'org.terasology.nui', name: 'nui', version: '1.3.1'
+    api group: 'org.terasology.nui', name: 'nui-reflect', version: '1.3.1'
 
     // Wildcard dependency to catch any libs provided with the project (remote repo preferred instead)
     api fileTree(dir: 'libs', include: '*.jar')
