@@ -1,29 +1,7 @@
-/*
- * Copyright 2015 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *  http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.i18n;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.function.Consumer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +16,15 @@ import org.terasology.i18n.assets.Translation;
 import org.terasology.persistence.TemplateEngine;
 import org.terasology.persistence.TemplateEngineImpl;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Consumer;
+
 /**
  * A translation system that uses {@link Translation} data assets to
  * perform the lookup.
@@ -51,7 +38,7 @@ public class TranslationSystemImpl implements TranslationSystem {
 
     private final SystemConfig config;
 
-    private AssetManager assetManager;
+    private final AssetManager assetManager;
 
     /**
      * @param context the context to use
@@ -90,31 +77,72 @@ public class TranslationSystemImpl implements TranslationSystem {
     }
 
     @Override
-    public String translate(String id) {
-        return translate(id, config.getLocale());
+    public String translate(String id, Object... arguments) {
+        return translate(id, config.getLocale(), arguments);
     }
 
     @Override
-    public String translate(String text, Locale otherLocale) {
-        TemplateEngine templateEngine = new TemplateEngineImpl(id -> {
-            ResourceUrn uri = new ResourceUrn(id);
-            SimpleUri projectUri = new SimpleUri(uri.getModuleName(), uri.getResourceName());
-            TranslationProject project = getProject(projectUri);
-            if (project != null) {
-                Optional<String> opt = project.translate(uri.getFragmentName(), otherLocale);
-                if (opt.isPresent()) {
-                    return opt.get();
-                } else {
-                    logger.warn("No translation for '{}'", id);
-                    return "?" + uri.getFragmentName() + "?";
-                }
-            } else {
-                logger.warn("Invalid project id '{}'", id);
-                return "?" + uri.getFragmentName() + "?";
-            }
-        });
+    public String translate(String text, Locale otherLocale, Object... arguments) {
+        Object[] expandedArguments = expandFormatArguments(otherLocale, arguments);
+        TemplateEngine templateEngine = new TemplateEngineImpl(id ->
+                translateFragment(otherLocale, id, expandedArguments));
 
         return templateEngine.transform(text);
+    }
+
+    /**
+     * Expand string arguments as if they are translatable templates.
+     *
+     * Leaves non-string arguments as they are.
+     * <p>
+     * One level of expansion only; String arguments may not require arguments of their own.
+     * <p>
+     * Example:
+     * <pre>{@code
+     *     Object[] arguments = {17, "${engine:menu#credits}", new Date(16e11)};
+     *     Object[] expandedArguments = expandFormatArguments(locale, arguments);
+     *
+     *     println(expandedArguments)  // {17, "Credits", Date(16e11)}
+     * }</pre>
+     *
+     * @param otherLocale FIXME: why <em>is</em> this "other" locale and not just "locale"?
+     * @param arguments arguments for {@link java.text.MessageFormat}
+     * @return argument array with replaced Strings
+     */
+    private Object[] expandFormatArguments(Locale otherLocale, Object[] arguments) {
+        Object[] expandedArguments = new Object[arguments.length];
+
+        // This engine is for template-processing each individual argument.
+        // We don't have nested argument providers; these get no argument list.
+        TemplateEngine templateEngine = new TemplateEngineImpl(id ->
+                translateFragment(otherLocale, id));
+
+        for (int i = 0; i < arguments.length; i++) {
+            if (arguments[i] instanceof String) {
+                expandedArguments[i] = templateEngine.transform((String) arguments[i]);
+            } else {
+                expandedArguments[i] = arguments[i];
+            }
+        }
+        return expandedArguments;
+    }
+
+    private String translateFragment(Locale otherLocale, String id, Object... arguments) {
+        ResourceUrn uri = new ResourceUrn(id);
+        SimpleUri projectUri = new SimpleUri(uri.getModuleName(), uri.getResourceName());
+        TranslationProject project = getProject(projectUri);
+        if (project != null) {
+            Optional<String> opt = project.translate(uri.getFragmentName(), otherLocale, arguments);
+            if (opt.isPresent()) {
+                return opt.get();
+            } else {
+                logger.warn("No translation for '{}'", id);
+                return "?" + uri.getFragmentName() + "?";
+            }
+        } else {
+            logger.warn("Invalid project id '{}'", id);
+            return "?" + uri.getFragmentName() + "?";
+        }
     }
 
     @Override

@@ -31,3 +31,9 @@ workspace.xml
 
 # Ignore Sonar linting, if set up locally
 /sonarlint/
+
+# Discord preferences don't need sharing
+/discord.xml
+
+# CodeStream's file has local workspace stuff
+/codestream.xml

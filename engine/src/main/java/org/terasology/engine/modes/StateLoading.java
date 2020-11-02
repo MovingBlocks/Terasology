@@ -239,9 +239,8 @@ public class StateLoading implements GameState {
                 }
             } catch (Exception e) {
                 logger.error("Error while loading {}", current, e);
-                String errorMessage = String.format("Failed to load game. There was an error during \"%s\".",
-                        current == null ? "the last part" : current.getMessage());
-                gameEngine.changeState(new StateMainMenu(errorMessage));
+                String stepDescription = current == null ? "?" : current.getMessage();
+                gameEngine.changeState(new StateMainMenu("${engine:menu#load-game-error}", stepDescription));
                 CrashReporter.report(e, LoggingContext.getLoggingPath());
                 return;
             }
