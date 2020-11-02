@@ -16,6 +16,8 @@
 
 package org.terasology.audio.system;
 
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 import org.terasology.utilities.Assets;
 import org.terasology.audio.AudioManager;
 import org.terasology.audio.events.PlaySoundEvent;
@@ -31,7 +33,6 @@ import org.terasology.logic.console.commandSystem.annotations.Sender;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.permission.PermissionManager;
 import org.terasology.logic.players.LocalPlayer;
-import org.terasology.math.geom.Vector3f;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkSystem;
 import org.terasology.registry.In;
@@ -70,7 +71,7 @@ public class AudioSystem extends BaseComponentSystem implements UpdateSubscriber
      */
     @Command(shortDescription = "Plays a test sound")
     public void playTestSound(@Sender EntityRef sender, @CommandParam("xOffset") float xOffset, @CommandParam("zOffset") float zOffset) {
-        Vector3f position = localPlayer.getPosition();
+Vector3f position = localPlayer.getPosition(new Vector3f());
         position.x += xOffset;
         position.z += zOffset;
         audioManager.playSound(Assets.getSound("engine:dig").get(), position);
@@ -85,16 +86,19 @@ public class AudioSystem extends BaseComponentSystem implements UpdateSubscriber
     @ReceiveEvent
     public void onPlaySound(PlaySoundEvent playSoundEvent, EntityRef entity) {
         LocationComponent location = entity.getComponent(LocationComponent.class);
-        if (location != null && !Float.isNaN(location.getWorldPosition().x)) {
-            audioManager.playSound(playSoundEvent.getSound(), location.getWorldPosition(), playSoundEvent.getVolume(), AudioManager.PRIORITY_NORMAL);
-        } else {
-            audioManager.playSound(playSoundEvent.getSound(), playSoundEvent.getVolume());
+        if (location != null) {
+            Vector3f pos = location.getWorldPosition(new Vector3f());
+            if (pos.isFinite()) {
+                audioManager.playSound(playSoundEvent.getSound(), pos, playSoundEvent.getVolume(), AudioManager.PRIORITY_NORMAL);
+                return;
+            }
         }
+        audioManager.playSound(playSoundEvent.getSound(), playSoundEvent.getVolume());
     }
 
     /**
-     * Receives an event send when a sound should be played for the entity owner as well.
-     * Calls on the AudioManager to play it.
+     * Receives an event send when a sound should be played for the entity owner as well. Calls on the AudioManager to
+     * play it.
      *
      * @param playSoundEvent The sound event.
      * @param entity The entity that instigated the event.
@@ -110,6 +114,9 @@ public class AudioSystem extends BaseComponentSystem implements UpdateSubscriber
 
     @Override
     public void update(float delta) {
-        audioManager.updateListener(localPlayer.getPosition(), localPlayer.getViewRotation(), localPlayer.getVelocity());
+        audioManager.updateListener(
+            localPlayer.getPosition(new Vector3f()),
+            localPlayer.getViewRotation(new Quaternionf()),
+            localPlayer.getVelocity(new Vector3f()));
     }
 }
