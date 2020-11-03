@@ -107,7 +107,6 @@ dependencies {
     api "org.lwjgl:lwjgl-opengl"
     implementation "org.lwjgl:lwjgl-stb"
 
-    implementation 'net.java.jinput:jinput:2.0.9'
     api group: 'java3d', name: 'vecmath', version: '1.3.1'
     api group: 'org.joml', name: 'joml', version: '1.9.25'
     implementation group: 'org.abego.treelayout', name: 'org.abego.treelayout.core', version: '1.0.3'
