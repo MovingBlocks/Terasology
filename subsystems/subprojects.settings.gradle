@@ -1,0 +1,13 @@
+// This magically allows subdirs in this subproject to themselves become sub-subprojects in a proper tree structure
+new File(rootDir, 'subsystems').eachDir { possibleSubprojectDir ->
+    if (!possibleSubprojectDir.name.startsWith(".")) {
+        def subprojectName = 'subsystems:' + possibleSubprojectDir.name
+        println "Processing facade $subprojectName, including it as a sub-project"
+        include subprojectName
+        def subprojectPath = ':' + subprojectName
+        def subproject = project(subprojectPath)
+        subproject.projectDir = possibleSubprojectDir
+    } else {
+        println "Ignoring entry $possibleSubprojectDir as it starts with ."
+    }
+}

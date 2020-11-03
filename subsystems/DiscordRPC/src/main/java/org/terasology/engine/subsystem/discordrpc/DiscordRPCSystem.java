@@ -13,9 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.entitySystem.systems;
+package org.terasology.engine.subsystem.discordrpc;
 
-import org.terasology.engine.subsystem.rpc.DiscordRPCSubSystem;
+import org.terasology.entitySystem.systems.BaseComponentSystem;
+import org.terasology.entitySystem.systems.RegisterMode;
+import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.game.Game;
 import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
