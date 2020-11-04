@@ -2,7 +2,7 @@
 new File(rootDir, 'subsystems').eachDir { possibleSubprojectDir ->
     if (!possibleSubprojectDir.name.startsWith(".")) {
         def subprojectName = 'subsystems:' + possibleSubprojectDir.name
-        println "Processing facade $subprojectName, including it as a sub-project"
+        println "Including '$subprojectName' as a sub-project"
         include subprojectName
         def subprojectPath = ':' + subprojectName
         def subproject = project(subprojectPath)
