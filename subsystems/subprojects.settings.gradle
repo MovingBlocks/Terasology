@@ -8,6 +8,6 @@ new File(rootDir, 'subsystems').eachDir { possibleSubprojectDir ->
         def subproject = project(subprojectPath)
         subproject.projectDir = possibleSubprojectDir
     } else {
-        println "Ignoring entry $possibleSubprojectDir as it starts with ."
+        println "Ignoring hidden folder '$possibleSubprojectDir'"
     }
 }
