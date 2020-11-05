@@ -85,16 +85,6 @@ logger.info("PC VERSION: {}", version)
 // Jenkins-Artifactory integration catches on to this as part of the Maven-type descriptor
 group = "org.terasology.facades"
 
-dependencies {
-    implementation(project(":engine"))
-    implementation(project(":subsystems:DiscordRPC"))
-
-    implementation(group = "org.reflections", name = "reflections", version = "0.9.10")
-
-    // TODO: Consider whether we can move the CR dependency back here from the engine, where it is referenced from the main menu
-    implementation(group = "org.terasology.crashreporter", name = "cr-terasology", version = "4.1.0")
-}
-
 // Instructions for packaging a jar file for the PC facade
 tasks.named<Jar>("jar") {
     manifest {
@@ -111,6 +101,22 @@ configurations {
         description = "for fetching modules for running a server"
         isTransitive = false
     }
+    register("subsystem") {
+        description = "for fetching modules for running a server"
+    }
+    implementation {
+        extendsFrom(configurations["subsystem"])
+    }
+}
+
+dependencies {
+    implementation(project(":engine"))
+    "subsystem"(project(":subsystems:DiscordRPC"))
+
+    implementation(group = "org.reflections", name = "reflections", version = "0.9.10")
+
+    // TODO: Consider whether we can move the CR dependency back here from the engine, where it is referenced from the main menu
+    implementation(group = "org.terasology.crashreporter", name = "cr-terasology", version = "4.1.0")
 }
 
 tasks.register<JavaExec>("game") {
@@ -139,12 +145,13 @@ tasks.register<JavaExec>("game") {
         jvmArgs = listOf("-Xmx1536m")
     }
 
-    // Classpath: PC itself, engine classes, engine dependencies. Not modules or natives since the engine finds those
+    // Classpath: PC itself, engine classes, engine dependencies, subsystems. Not modules or natives since the engine finds those
     classpath(sourceSets["main"].output.classesDirs)
     classpath(sourceSets["main"].output.resourcesDir)
     classpath(project(":engine").sourceSets["main"].output.classesDirs)
     classpath(project(":engine").sourceSets["main"].output.resourcesDir)
     classpath(project(":engine").configurations.runtimeClasspath)
+    classpath(configurations["subsystem"])
 }
 
 tasks.register<JavaExec>("profile") {
@@ -174,6 +181,7 @@ tasks.register<JavaExec>("profile") {
     classpath(project(":engine").sourceSets["main"].output.classesDirs)
     classpath(project(":engine").sourceSets["main"].output.resourcesDir)
     classpath(project(":engine").configurations.runtimeClasspath)
+    classpath(configurations["subsystem"])
 }
 
 tasks.register<JavaExec>("debug") {
@@ -203,6 +211,7 @@ tasks.register<JavaExec>("debug") {
     classpath(project(":engine").sourceSets["main"].output.classesDirs)
     classpath(project(":engine").sourceSets["main"].output.resourcesDir)
     classpath(project(":engine").configurations.runtimeClasspath)
+    classpath(configurations["subsystem"])
 }
 
 tasks.register<JavaExec>("permissiveNatives") {
@@ -234,6 +243,7 @@ tasks.register<JavaExec>("permissiveNatives") {
     classpath(project(":engine").sourceSets["main"].output.classesDirs)
     classpath(project(":engine").sourceSets["main"].output.resourcesDir)
     classpath(project(":engine").configurations.runtimeClasspath)
+    classpath(configurations["subsystem"])
 }
 
 apply(from="server.build.gradle")
@@ -289,6 +299,7 @@ tasks.register<JavaExec>("server") {
     classpath(project(":engine").sourceSets["main"].output.classesDirs)
     classpath(project(":engine").sourceSets["main"].output.resourcesDir)
     classpath(project(":engine").configurations.runtimeClasspath)
+    classpath(configurations["subsystem"])
 }
 
 // Preps a version file to bundle with PC dists. This eventually goes into the root of a zip file
