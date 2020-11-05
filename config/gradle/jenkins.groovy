@@ -2,7 +2,7 @@
 // First prepares Gradle for later execution by providing accurate naming and release info
 
 // Find the true name of the project - probably available within Jenkins but this way can test easier outside
-def settingsGradleFile = new File('settings.gradle')
+def settingsGradleFile = new File('settings.gradle.kts')
 def gradlePropertiesFile = new File('gradle.properties')
 
 // Check on the project name. This defaults to the parent directory name, which can be wrong in some cases
@@ -15,10 +15,10 @@ if (moduleName.equals("workspace")) {
 
 // The "Nano" only relates to test jobs prefixed as such - otherwise it is ignored. Well, unless somebody makes a Nano* module
 moduleName = moduleName - "Nano"
-println "Preparing settings.gradle for module '$moduleName'"
+println "Preparing settings.gradle.kts for module '$moduleName'"
 
 // Make sure no existing files exists, no sneaking in stealthy Gradle stuff (would have to be in Git, Jenkins cleans thoroughly)
-println "Deleting any existing settings.gradle or gradle.properties - build.gradle has already been overwritten"
+println "Deleting any existing settings.gradle.kts or gradle.properties - build.gradle.kts has already been overwritten"
 settingsGradleFile.delete()
 gradlePropertiesFile.delete()
 

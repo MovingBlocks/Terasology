@@ -159,7 +159,6 @@ Here's a list of modules bundled with the game by default (this line-up will cha
 * [WeatherManager](https://github.com/Terasology/WeatherManager) - simple weather foundation, tracks whether, maintains a single cloud layer, and so on 
 * [WildAnimals](https://github.com/Terasology/WildAnimals) - a module containing animals, initially a deer you can spawn in-world via console with `spawnPrefab deer` then watch wander idly
 * [WildAnimalsGenome](https://github.com/Terasology/WildAnimalsGenome) - bridge module using Genome to bring more advanced features to WildAnimals
-* [WildAnimalsMadness](https://github.com/Terasology/WildAnimalsMadness) - these wild animals have acquired some sort of madness! Or at least they seem to be thinking, somehow .. GSOC 2019
 * [WoodAndStone](https://github.com/Terasology/WoodAndStone) - big content module including "from scratch" crafting, starting with wood here
 * [WoodAndStoneCraftingJournal](https://github.com/Terasology/WoodAndStoneCraftingJournal) - a Journal bridging module for WoodCrafting and StoneCrafting (no direct relation with the WoodAndStone module)
 * [WoodCrafting](https://github.com/Terasology/WoodCrafting) - basic woodcrafting, recipes, and crafting stations

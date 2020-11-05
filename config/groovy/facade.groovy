@@ -17,7 +17,7 @@ class facade {
 
     def copyInTemplateFiles(File targetDir) {
         println "In copyInTemplateFiles for facade $targetDir.name - reviewing Gradle needs"
-        File targetBuildGradle = new File(targetDir, 'build.gradle')
+        File targetBuildGradle = new File(targetDir, 'build.gradle.kts')
         if (!targetBuildGradle.exists()) {
             targetBuildGradle << new File('templates/facades.gradle').text
         }
@@ -40,9 +40,9 @@ class facade {
     }
 
     def refreshGradle(File targetDir) {
-        // Copy in the template build.gradle for facades
-        println "In refreshGradle for facade $targetDir - copying in a fresh build.gradle"
-        File targetBuildGradle = new File(targetDir, 'build.gradle')
+        // Copy in the template build.gradle.kts for facades
+        println "In refreshGradle for facade $targetDir - copying in a fresh build.gradle.kts"
+        File targetBuildGradle = new File(targetDir, 'build.gradle.kts')
         targetBuildGradle.delete()
         targetBuildGradle << new File('templates/facades.gradle').text
     }

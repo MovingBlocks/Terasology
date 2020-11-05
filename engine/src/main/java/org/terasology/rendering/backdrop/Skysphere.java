@@ -4,7 +4,10 @@ package org.terasology.rendering.backdrop;
 
 import org.joml.Vector3f;
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.util.glu.Sphere;
+import org.terasology.context.Context;
+import org.terasology.nui.properties.Range;
+import org.terasology.rendering.primitives.Sphere;
+import org.terasology.utilities.Assets;
 import org.terasology.math.TeraMath;
 import org.terasology.nui.properties.Range;
 import org.terasology.registry.In;

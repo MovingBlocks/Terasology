@@ -58,11 +58,11 @@ class module {
     }
 
     def copyInTemplateFiles(File targetDir) {
-        // Copy in the template build.gradle for modules
-        println "In copyInTemplateFiles for module $targetDir.name - copying in a build.gradle then next checking for module.txt"
-        File targetBuildGradle = new File(targetDir, 'build.gradle')
+        // Copy in the template build.gradle.kts for modules
+        println "In copyInTemplateFiles for module $targetDir.name - copying in a build.gradle.kts then next checking for module.txt"
+        File targetBuildGradle = new File(targetDir, 'build.gradle.kts')
         targetBuildGradle.delete()
-        targetBuildGradle << new File('templates/build.gradle').text
+        targetBuildGradle << new File('templates/build.gradle.kts').text
 
         // Copy in the template module.txt for modules (if one doesn't exist yet)
         File moduleManifest = new File(targetDir, 'module.txt')
@@ -94,14 +94,14 @@ class module {
     }
 
     def refreshGradle(File targetDir) {
-        // Copy in the template build.gradle for modules
+        // Copy in the template build.gradle.kts for modules
         if (!new File(targetDir, "module.txt").exists()) {
-            println "$targetDir has no module.txt, it must not want a fresh build.gradle"
+            println "$targetDir has no module.txt, it must not want a fresh build.gradle.kts"
             return
         }
-        println "In refreshGradle for module $targetDir - copying in a fresh build.gradle"
-        File targetBuildGradle = new File(targetDir, 'build.gradle')
+        println "In refreshGradle for module $targetDir - copying in a fresh build.gradle.kts"
+        File targetBuildGradle = new File(targetDir, 'build.gradle.kts')
         targetBuildGradle.delete()
-        targetBuildGradle << new File('templates/build.gradle').text
+        targetBuildGradle << new File('templates/build.gradle.kts').text
     }
 }

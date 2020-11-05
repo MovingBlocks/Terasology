@@ -53,7 +53,7 @@ public final class OpenGLUtils {
     public static void applyBillboardOrientation() {
         // Fetch the current modelview matrix
         final FloatBuffer model = BufferUtils.createFloatBuffer(16);
-        GL11.glGetFloat(GL11.GL_MODELVIEW_MATRIX, model);
+        GL11.glGetFloatv(GL11.GL_MODELVIEW_MATRIX, model);
 
         // And undo all rotations and scaling
         for (int i = 0; i < 3; i++) {
@@ -66,7 +66,7 @@ public final class OpenGLUtils {
             }
         }
 
-        GL11.glLoadMatrix(model);
+        GL11.glLoadMatrixf(model);
     }
 
     /**

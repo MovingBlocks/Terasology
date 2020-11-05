@@ -42,6 +42,7 @@ import org.terasology.persistence.typeHandling.gson.GsonTypeSerializationLibrary
 import org.terasology.reflection.metadata.ClassMetadata;
 import org.terasology.reflection.metadata.FieldMetadata;
 import org.terasology.registry.CoreRegistry;
+import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.nui.LayoutHint;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.nui.UILayout;
@@ -59,6 +60,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -71,6 +73,7 @@ public class UIFormat extends AbstractAssetFileFormat<UIData> {
     public static final String LAYOUT_INFO_FIELD = "layoutInfo";
     public static final String ID_FIELD = "id";
     public static final String TYPE_FIELD = "type";
+    public static final String ENABLED_FIELD = "enabled";
 
     private static final Logger logger = LoggerFactory.getLogger(UIFormat.class);
 
@@ -206,6 +209,10 @@ public class UIFormat extends AbstractAssetFileFormat<UIData> {
                     if (field.getName().equals(CONTENTS_FIELD) && UILayout.class.isAssignableFrom(elementMetadata.getType())) {
                         continue;
                     }
+                    // added new if block instead of modifying previous block conditions to avoid ruining code readability
+                    if (field.getName().equals(ENABLED_FIELD) && UILayout.class.isAssignableFrom(elementMetadata.getType())) {
+                        continue;
+                    }
                     try {
                         if (List.class.isAssignableFrom(field.getType())) {
                             Type contentType = ReflectionUtil.getTypeParameter(field.getField().getGenericType(), 0);
@@ -235,7 +242,7 @@ public class UIFormat extends AbstractAssetFileFormat<UIData> {
                 UILayout<LayoutHint> layout = (UILayout<LayoutHint>) element;
 
                 Class<? extends LayoutHint> layoutHintType = (Class<? extends LayoutHint>)
-                    ReflectionUtil.getTypeParameter(elementMetadata.getType().getGenericSuperclass(), 0);
+                        ReflectionUtil.getTypeParameter(elementMetadata.getType().getGenericSuperclass(), 0);
                 if (jsonObject.has(CONTENTS_FIELD)) {
                     for (JsonElement child : jsonObject.getAsJsonArray(CONTENTS_FIELD)) {
                         UIWidget childElement = context.deserialize(child, UIWidget.class);
@@ -244,7 +251,7 @@ public class UIFormat extends AbstractAssetFileFormat<UIData> {
                             if (child.isJsonObject()) {
                                 JsonObject childObject = child.getAsJsonObject();
                                 if (layoutHintType != null && !layoutHintType.isInterface() && !Modifier.isAbstract(layoutHintType.getModifiers())
-                                    && childObject.has(LAYOUT_INFO_FIELD)) {
+                                        && childObject.has(LAYOUT_INFO_FIELD)) {
                                     hint = context.deserialize(childObject.get(LAYOUT_INFO_FIELD), layoutHintType);
                                 }
                             }
@@ -252,6 +259,17 @@ public class UIFormat extends AbstractAssetFileFormat<UIData> {
                         }
                     }
                 }
+                if (jsonObject.has(ENABLED_FIELD)) {
+                    FieldMetadata<? extends UIWidget, ?> enabledField = elementMetadata.getField(ENABLED_FIELD);
+                    enabledField.setValue(element,
+                            context.deserialize(jsonObject.get(enabledField.getSerializationName()),
+                                    enabledField.getType()));
+                }
+            }
+
+            //This allows screens to have access to nuiManager after editing .ui file
+            if (element instanceof CoreScreenLayer && Objects.isNull(((CoreScreenLayer) element).getManager())) {
+                ((CoreScreenLayer) element).setManager(nuiManager);
             }
             return element;
         }

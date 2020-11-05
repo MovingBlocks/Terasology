@@ -2,9 +2,9 @@ import groovy.io.FileType
 
 rootProject.name = 'Terasology'
 
-include 'engine', 'engine-tests', 'facades', 'metas', 'libs', 'modules'
+include 'engine', 'engine-tests', 'facades', 'metas', 'libs', 'modules', 'subsystems'
 
-// Handy little snippet found online that'll "fake" having nested settings.gradle files under /modules, /libs, etc
+// Handy little snippet found online that'll "fake" having nested settings.gradle.kts files under /modules, /libs, etc
 rootDir.eachDir { possibleSubprojectDir ->
 
     // First scan through all subdirs that has a subprojects.gradle in it and apply that script (recursive search!)

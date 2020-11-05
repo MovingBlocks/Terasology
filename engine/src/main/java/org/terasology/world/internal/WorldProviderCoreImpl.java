@@ -192,7 +192,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
                     oldChange.setTo(type);
                 }
                 setDirtyChunksNear(JomlUtil.from(worldPos));
-                notifyBlockChanged(JomlUtil.from(worldPos), type, oldBlockType);
+                notifyBlockChanged(worldPos, type, oldBlockType);
             }
             return oldBlockType;
 
@@ -235,7 +235,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
         }
 
         for (BlockChange change : changedBlocks) {
-            notifyBlockChanged(JomlUtil.from(change.getPosition()), change.getTo(), change.getFrom());
+            notifyBlockChanged(change.getPosition(), change.getTo(), change.getFrom());
         }
 
         return result;
@@ -250,7 +250,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
         }
     }
 
-    private void notifyBlockChanged(Vector3i pos, Block type, Block oldType) {
+    private void notifyBlockChanged(Vector3ic pos, Block type, Block oldType) {
         // TODO: Could use a read/write writeLock.
         // TODO: Review, should only happen on main thread (as should changes to listeners)
         synchronized (listeners) {
@@ -260,7 +260,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
         }
     }
 
-    private void notifyExtraDataChanged(int index, Vector3i pos, int newData, int oldData) {
+    private void notifyExtraDataChanged(int index, Vector3ic pos, int newData, int oldData) {
         // TODO: Change to match block , if those changes are made.
         synchronized (listeners) {
             for (WorldChangeListener listener : listeners) {
@@ -330,7 +330,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
             chunk.setExtraData(index, blockPos.x, blockPos.y, blockPos.z, value);
             if (oldValue != value) {
                 setDirtyChunksNear(worldPos);
-                notifyExtraDataChanged(index, worldPos, value, oldValue);
+                notifyExtraDataChanged(index, JomlUtil.from(worldPos), value, oldValue);
             }
             return oldValue;
         }

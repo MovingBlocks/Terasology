@@ -43,8 +43,7 @@ public class LocalChunkView implements PropagatorWorldView {
     public byte getValueAt(Vector3i pos) {
         int index = chunkIndexOf(pos);
         if (index < 0) {
-            logger.warn("Position is out of chunks");
-            return UNAVAILABLE; // TODO check where we receive pos out of chunks.
+            return UNAVAILABLE;
         }
         Chunk chunk = chunks[index];
         if (chunk != null) {

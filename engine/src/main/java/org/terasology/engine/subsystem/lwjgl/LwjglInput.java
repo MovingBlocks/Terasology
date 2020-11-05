@@ -2,16 +2,14 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.subsystem.lwjgl;
 
-import org.lwjgl.LWJGLException;
-import org.lwjgl.input.Keyboard;
-import org.lwjgl.input.Mouse;
+import org.terasology.assets.module.ModuleAwareAssetTypeManager;
 import org.terasology.config.Config;
 import org.terasology.config.ControllerConfig;
 import org.terasology.context.Context;
 import org.terasology.engine.modes.GameState;
 import org.terasology.engine.subsystem.config.BindsManager;
 import org.terasology.input.InputSystem;
-import org.terasology.input.lwjgl.JInputControllerDevice;
+import org.terasology.input.lwjgl.LwjglControllerDevice;
 import org.terasology.input.lwjgl.LwjglKeyboardDevice;
 import org.terasology.input.lwjgl.LwjglMouseDevice;
 import org.terasology.registry.ContextAwareClassFactory;
@@ -26,7 +24,6 @@ public class LwjglInput extends BaseLwjglSubsystem {
 
     private Context context;
 
-
     @Override
     public String getName() {
         return "Input";
@@ -37,7 +34,6 @@ public class LwjglInput extends BaseLwjglSubsystem {
         this.context = rootContext;
         initControls();
         updateInputConfig();
-        Mouse.setGrabbed(false);
     }
 
     @Override
@@ -45,27 +41,16 @@ public class LwjglInput extends BaseLwjglSubsystem {
         currentState.handleInput(delta);
     }
 
-    @Override
-    public void shutdown() {
-        Mouse.destroy();
-        Keyboard.destroy();
-    }
-
     private void initControls() {
-        try {
-            Keyboard.create();
-            Keyboard.enableRepeatEvents(true);
-            Mouse.create();
-            InputSystem inputSystem = classFactory.createToContext(InputSystem.class);
-            inputSystem.setMouseDevice(new LwjglMouseDevice(context));
-            inputSystem.setKeyboardDevice(new LwjglKeyboardDevice());
 
-            ControllerConfig controllerConfig = config.getInput().getControllers();
-            JInputControllerDevice controllerDevice = new JInputControllerDevice(controllerConfig);
-            inputSystem.setControllerDevice(controllerDevice);
-        } catch (LWJGLException e) {
-            throw new RuntimeException("Could not initialize controls.", e);
-        }
+        InputSystem inputSystem = classFactory.createToContext(InputSystem.class);
+        inputSystem.setMouseDevice(new LwjglMouseDevice(context));
+        inputSystem.setKeyboardDevice(new LwjglKeyboardDevice());
+
+        ControllerConfig controllerConfig = config.getInput().getControllers();
+        LwjglControllerDevice controllerDevice = new LwjglControllerDevice(controllerConfig);
+        inputSystem.setControllerDevice(controllerDevice);
+
     }
 
     private void updateInputConfig() {
