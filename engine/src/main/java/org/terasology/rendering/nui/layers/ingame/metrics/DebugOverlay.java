@@ -18,6 +18,7 @@ package org.terasology.rendering.nui.layers.ingame.metrics;
 import org.joml.Vector3f;
 import org.joml.Vector3i;
 import org.terasology.config.Config;
+import org.terasology.config.SystemConfig;
 import org.terasology.engine.Time;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.input.cameraTarget.CameraTargetSystem;
@@ -47,6 +48,9 @@ public class DebugOverlay extends CoreScreenLayer {
     private Config config;
 
     @In
+    private SystemConfig systemConfig;
+
+    @In
     private CameraTargetSystem cameraTarget;
 
     @In
@@ -74,7 +78,7 @@ public class DebugOverlay extends CoreScreenLayer {
         bindVisible(new ReadOnlyBinding<Boolean>() {
             @Override
             public Boolean get() {
-                return config.getSystem().isDebugEnabled();
+                return systemConfig.debugEnabled.get();
             }
         });
 

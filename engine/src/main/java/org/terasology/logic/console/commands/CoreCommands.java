@@ -7,7 +7,7 @@ import com.google.common.collect.Streams;
 import org.joml.Vector3f;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
-import org.terasology.config.Config;
+import org.terasology.config.SystemConfig;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.TerasologyConstants;
@@ -125,7 +125,7 @@ public class CoreCommands extends BaseComponentSystem {
     private TranslationSystem translationSystem;
 
     @In
-    private Config config;
+    private SystemConfig systemConfig;
 
     @In
     private ModuleManager moduleManager;
@@ -283,7 +283,7 @@ public class CoreCommands extends BaseComponentSystem {
 
         // Try if language exists
         if (proj.getAvailableLocales().contains(locale)) {
-            config.getSystem().setLocale(locale);
+            systemConfig.locale.set(locale);
             nuiManager.invalidate();
             String nat = translationSystem.translate("${engine:menu#this-language-native}", locale);
             String eng = translationSystem.translate("${engine:menu#this-language-English}", locale);

@@ -97,10 +97,6 @@ public final class Config {
         return config.getPlayer();
     }
 
-    public SystemConfig getSystem() {
-        return config.getSystem();
-    }
-
     public RenderingConfig getRendering() {
         return config.getRendering();
     }

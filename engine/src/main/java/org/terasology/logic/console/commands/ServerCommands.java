@@ -19,6 +19,7 @@ import org.joml.Vector3i;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
+import org.terasology.config.SystemConfig;
 import org.terasology.engine.GameEngine;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -64,6 +65,9 @@ public class ServerCommands extends BaseComponentSystem {
 
     @In
     private Config config;
+
+    @In
+    private SystemConfig systemConfig;
 
     @In
     private GameEngine gameEngine;
@@ -192,7 +196,7 @@ public class ServerCommands extends BaseComponentSystem {
     @Command(shortDescription = "Invalidates the specified chunk and recreates it (requires storage manager disabled)", runOnServer = true)
     public String reloadChunk(@CommandParam("x") int x, @CommandParam("y") int y, @CommandParam("z") int z) {
         Vector3i pos = new Vector3i(x, y, z);
-        if (config.getSystem().isWriteSaveGamesEnabled()) {
+        if (systemConfig.writeSaveGamesEnabled.get()) {
             return "Writing save games is enabled! Invalidating chunk has no effect";
         }
         boolean success = chunkProvider.reloadChunk(pos);
