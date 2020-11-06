@@ -21,6 +21,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.config.flexible.typehandling.LocaleTypeHandler;
 import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.TerasologyConstants;
@@ -36,6 +37,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
 
@@ -48,6 +50,7 @@ public class AutoConfigManager {
 
     public AutoConfigManager(TypeHandlerLibrary typeHandlerLibrary) {
         this.typeHandlerLibrary = typeHandlerLibrary;
+        typeHandlerLibrary.addTypeHandler(Locale.class, new LocaleTypeHandler());
     }
 
     public void loadConfigsIn(Context context) {
