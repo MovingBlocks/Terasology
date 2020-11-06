@@ -28,10 +28,10 @@ public class MouseAxisEvent extends AxisEvent {
         X, Y;
     }
 
-    private float value;
+    private double value;
     private MouseAxis mouseAxis;
 
-    protected MouseAxisEvent(MouseAxis axis, float value, float delta) {
+    protected MouseAxisEvent(MouseAxis axis, double value, float delta) {
         super(delta);
         this.mouseAxis = axis;
         this.value = value;
@@ -42,11 +42,11 @@ public class MouseAxisEvent extends AxisEvent {
     }
 
     @Override
-    public float getValue() {
+    public double getValue() {
         return value;
     }
 
-    public static MouseAxisEvent create(MouseAxis axis, float value, float delta) {
+    public static MouseAxisEvent create(MouseAxis axis, double value, float delta) {
         event.reset(delta);
         event.mouseAxis = axis;
         event.value = value;

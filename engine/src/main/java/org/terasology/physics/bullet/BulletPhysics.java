@@ -47,6 +47,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import gnu.trove.iterator.TFloatIterator;
+import org.joml.AABBf;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
@@ -179,12 +180,24 @@ public class BulletPhysics implements PhysicsEngine {
     }
 
     @Override
+    public List<EntityRef> scanArea(AABBf area, CollisionGroup... collisionFilter) {
+        return scanArea(area, Arrays.asList(collisionFilter));
+    }
+
+    @Override
     public List<EntityRef> scanArea(AABB area, Iterable<CollisionGroup> collisionFilter) {
+        return scanArea(JomlUtil.from(area), collisionFilter);
+    }
+
+    @Override
+    public List<EntityRef> scanArea(AABBf area, Iterable<CollisionGroup> collisionFilter) {
         // TODO: Add the aabbTest method from newer versions of bullet to TeraBullet, use that instead
 
-        btBoxShape shape = new btBoxShape(JomlUtil.from(area.getExtents()));
-        btGhostObject scanObject = createCollider(JomlUtil.from(area.getCenter()), shape,StandardCollisionGroup.SENSOR.getFlag(),
-                combineGroups(collisionFilter), btCollisionObject.CollisionFlags.CF_NO_CONTACT_RESPONSE);
+
+        Vector3f extent = new Vector3f((area.maxX - area.minX) / 2.0f, (area.maxY - area.minY) / 2.0f, (area.maxZ - area.minZ) / 2.0f);
+        btBoxShape shape = new btBoxShape(extent);
+        btGhostObject scanObject = createCollider(new Vector3f(area.minX, area.minY, area.minZ).add(extent), shape, StandardCollisionGroup.SENSOR.getFlag(),
+            combineGroups(collisionFilter), btCollisionObject.CollisionFlags.CF_NO_CONTACT_RESPONSE);
 
         // This in particular is overkill
         broadphase.calculateOverlappingPairs(dispatcher);

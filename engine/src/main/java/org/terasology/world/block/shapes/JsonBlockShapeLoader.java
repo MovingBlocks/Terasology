@@ -193,13 +193,13 @@ public class JsonBlockShapeLoader extends AbstractAssetFileFormat<BlockShapeData
             if (colliders.size() > 1) {
                 ColliderInfo info = processCompoundShape(colliders);
                 shape.setCollisionShape(info.collisionShape);
-                shape.setCollisionOffset(JomlUtil.from(info.offset));
+                shape.setCollisionOffset(info.offset);
             } else if (colliders.size() == 1) {
                 shape.setCollisionShape(colliders.get(0).collisionShape);
-                shape.setCollisionOffset(JomlUtil.from(colliders.get(0).offset));
+                shape.setCollisionOffset(colliders.get(0).offset);
             } else {
                 shape.setCollisionShape(COLLISION_SHAPE_FACTORY.getNewUnitCube());
-                shape.setCollisionOffset(JomlUtil.from(new Vector3f(0, 0, 0)));
+                shape.setCollisionOffset(new Vector3f(0, 0, 0));
                 shape.setCollisionSymmetric(true);
             }
         }
