@@ -102,7 +102,7 @@ configurations {
         isTransitive = false
     }
     register("subsystem") {
-        description = "for fetching modules for running a server"
+        description = "for fetching subsystems"
     }
     implementation {
         extendsFrom(configurations["subsystem"])
