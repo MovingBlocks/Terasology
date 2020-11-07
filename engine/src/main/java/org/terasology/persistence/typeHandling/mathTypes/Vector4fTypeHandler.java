@@ -15,18 +15,18 @@
  */
 package org.terasology.persistence.typeHandling.mathTypes;
 
-
 import gnu.trove.list.TFloatList;
 import org.joml.Vector4f;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.PersistedDataArray;
 import org.terasology.persistence.typeHandling.PersistedDataSerializer;
+import org.terasology.persistence.typeHandling.TypeHandler;
 
 import java.util.Optional;
 
 /**
  */
-public class Vector4fTypeHandler extends org.terasology.persistence.typeHandling.TypeHandler<Vector4f> {
+public class Vector4fTypeHandler extends TypeHandler<Vector4f> {
 
     @Override
     public PersistedData serializeNonNull(Vector4f value, PersistedDataSerializer serializer) {
