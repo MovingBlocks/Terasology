@@ -49,7 +49,7 @@ public class SystemConfig extends AutoConfig {
     public final Setting<Integer> maxUnloadedChunksPercentageTillSave = setting(
             type(Integer.class),
             defaultValue(40),
-            constraint(new NumberRangeConstraint<>(0, Integer.MAX_VALUE, false, false))
+            constraint(new NumberRangeConstraint<>(0, 100, false, false))
     );
     public final Setting<Boolean> debugEnabled = setting(
             type(Boolean.class),
