@@ -20,15 +20,16 @@ import org.terasology.world.generation.Border3D;
 import org.terasology.world.generation.facets.base.BaseFieldFacet2D;
 
 /**
- * This facet represents the height of the ground at each point.
+ * This facet represents the approximate height of the conceptual surface of the ground at each position.
+ * It may exclude local features such as caves. It is intended to be used to determine the altitude relative
+ * to the ground of features that are not placed directly on the surface, such as placing ores at a certain
+ * depth below ground.
  *
- * @deprecated in favour of the SurfacesFacet and the ElevationFacet, which
- * each cover different parts of this facet's purpose, and are a more flexible alternative.
+ * The combination of the SurfacesFacet and the ElevationFacet is a more flexible alternative to the SurfaceHeightFacet.
  */
-@Deprecated
-public class SurfaceHeightFacet extends BaseFieldFacet2D {
+public class ElevationFacet extends BaseFieldFacet2D {
 
-    public SurfaceHeightFacet(Region3i targetRegion, Border3D border) {
+    public ElevationFacet(Region3i targetRegion, Border3D border) {
         super(targetRegion, border);
     }
 }
