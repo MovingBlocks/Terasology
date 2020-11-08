@@ -376,7 +376,6 @@
   "storage-service-sync-ok": "Synchronizace dokončena - %d staženo, %d nahráno, %d v konfliktu.",
   "storage-service-sync-previous-conflicts": "Během poslední synchronizace byly nalezeny konflikty. Není možné znovu synchronizovat dokud nebudou konflikty vyřešeny.",
   "storage-service-token-fail": "Nezdařila se autentifikace z uloženého tokenu a URL - %s.",
-  "storage-service-token-not-present": "Nenalezena data konfigurace, přihlášení neproběhlo.",
   "storage-service-token-ok": "Úspěšné přihlášení uloženými údaji",
   "storage-service-upload-fail": "Náhrání identit se nezdařilo - %s.",
   "storage-service-upload-ok": "Nové identity úspěšně nahrány.",
