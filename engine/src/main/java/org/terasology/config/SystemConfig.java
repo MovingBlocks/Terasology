@@ -41,7 +41,7 @@ public class SystemConfig extends AutoConfig {
     );
     public final Setting<Boolean> debugEnabled = setting(
             type(Boolean.class),
-            defaultValue(true)
+            defaultValue(false)
     );
     public final Setting<Boolean> monitoringEnabled = setting(
             type(Boolean.class),
