@@ -1,23 +1,12 @@
-/*
- * Copyright 2019 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.config.flexible.internal;
 
 import org.terasology.config.flexible.Setting;
 import org.terasology.config.flexible.constraints.SettingConstraint;
 import org.terasology.reflection.TypeInfo;
+
+import java.util.function.Function;
 
 /**
  * A builder for creating a {@link Setting} storing values of type {@link T}.
@@ -66,8 +55,16 @@ public interface SettingBuilder<T> {
     SettingBuilder<T> description(String description);
 
     /**
-     * Builds the {@link Setting} with the components that have already been specified and
-     * returns it.
+     * Specfies the system property of the {@link Setting} being created.
+     *
+     * @param systemProperty This system property which will rewrite value.
+     * @param converter converter for systemProperty: String -> T
+     * @return The builder object.
+     */
+    SettingBuilder<T> systemProperty(String systemProperty, Function<String, T> converter);
+
+    /**
+     * Builds the {@link Setting} with the components that have already been specified and returns it.
      */
     Setting<T> build();
 }

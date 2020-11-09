@@ -1,18 +1,5 @@
-/*
- * Copyright 2019 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.config.flexible.internal;
 
 import com.google.common.base.Preconditions;
@@ -25,6 +12,7 @@ import org.terasology.config.flexible.constraints.SettingConstraint;
 import org.terasology.reflection.TypeInfo;
 
 import java.util.Set;
+import java.util.function.Function;
 
 /**
  * {@inheritDoc}
@@ -39,6 +27,8 @@ class SettingImpl<T> implements Setting<T> {
 
     private final String humanReadableName;
     private final String description;
+    private final String systemProperty;
+    private final Function<String, T> systemPropertyConverter;
 
     private final SettingConstraint<T> constraint;
     private final Set<SettingChangeListener<T>> subscribers = Sets.newHashSet();
@@ -49,24 +39,28 @@ class SettingImpl<T> implements Setting<T> {
      * Creates a new {@link SettingImpl} with the given id, default value and constraint.
      *
      * @param valueType The {@link TypeInfo} describing the type of values t
-     * @param defaultValue      The default value of the setting.
-     * @param constraint        The constraint that the setting values must satisfy.
+     * @param defaultValue The default value of the setting.
+     * @param constraint The constraint that the setting values must satisfy.
      * @param humanReadableName The human readable name of the setting.
-     * @param description       A description of the setting.
+     * @param description A description of the setting.
+     * @param systemProperty
      */
     SettingImpl(TypeInfo<T> valueType, T defaultValue, SettingConstraint<T> constraint,
-                String humanReadableName, String description) {
+                String humanReadableName, String description, String systemProperty,
+                Function<String, T> systemPropertyConverter) {
         this.valueType = valueType;
         this.humanReadableName = humanReadableName;
         this.description = description;
 
         this.constraint = constraint;
+        this.systemProperty = systemProperty;
+        this.systemPropertyConverter = systemPropertyConverter;
 
         Preconditions.checkNotNull(defaultValue, "The default value for a Setting cannot be null.");
 
         if (isConstraintUnsatisfiedBy(defaultValue)) {
             throw new IllegalArgumentException("The default value must be a valid value. " +
-                                                   "Check the logs for more information.");
+                    "Check the logs for more information.");
         }
 
         this.defaultValue = defaultValue;
@@ -85,6 +79,18 @@ class SettingImpl<T> implements Setting<T> {
         } else {
             constraint.warnUnsatisfiedBy(theValue);
             return true;
+        }
+    }
+
+    private T getSystemPropertyValue() {
+        if (systemProperty == null) {
+            return null;
+        }
+        String sysPropValue = System.getProperty(systemProperty);
+        if (sysPropValue != null) {
+            return systemPropertyConverter.apply(sysPropValue);
+        } else {
+            return null;
         }
     }
 
@@ -137,12 +143,22 @@ class SettingImpl<T> implements Setting<T> {
 
     @Override
     public T get() {
+        T systemPropertyValue = getSystemPropertyValue();
+        if (systemPropertyValue != null) {
+            return systemPropertyValue;
+        }
         return value;
     }
 
     @Override
     public boolean set(T newValue) {
         Preconditions.checkNotNull(newValue, "The value of a setting cannot be null.");
+
+        if (getSystemPropertyValue() != null) {
+            LOGGER.warn("An attempt was made to overwrite the value specified in the System property." +
+                    " This will give nothing while the System Property value is supplied");
+            return false;
+        }
 
         if (isConstraintUnsatisfiedBy(newValue)) {
             return false;

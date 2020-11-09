@@ -1,18 +1,5 @@
-/*
- * Copyright 2013 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.config;
 
@@ -25,6 +12,7 @@ import java.util.Locale.Category;
 
 import static org.terasology.config.flexible.SettingArgument.constraint;
 import static org.terasology.config.flexible.SettingArgument.defaultValue;
+import static org.terasology.config.flexible.SettingArgument.systemProperty;
 import static org.terasology.config.flexible.SettingArgument.type;
 
 public class SystemConfig extends AutoConfig {
@@ -60,11 +48,12 @@ public class SystemConfig extends AutoConfig {
             defaultValue(false)
     );
 
-    //TODO add default value from Sys props
     public final Setting<Boolean> writeSaveGamesEnabled = setting(
             type(Boolean.class),
-            defaultValue(true)
+            defaultValue(true),
+            systemProperty(SAVED_GAMES_ENABLED_PROPERTY, Boolean::parseBoolean)
     );
+
     public final Setting<Long> chunkGenerationFailTimeoutInMs = setting(
             type(Long.class),
             defaultValue(1800000L),
