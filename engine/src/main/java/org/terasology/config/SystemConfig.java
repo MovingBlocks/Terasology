@@ -24,25 +24,30 @@ public class SystemConfig extends AutoConfig {
             defaultValue(1800000L),
             constraint(new NumberRangeConstraint<>(0L, Long.MAX_VALUE, false, false))
     );
+
     public final Setting<Integer> maxThreads = setting(
             type(Integer.class),
             defaultValue(Runtime.getRuntime().availableProcessors() - 1),
             constraint(new NumberRangeConstraint<>(0, Integer.MAX_VALUE, false, false))
     );
+
     public final Setting<Integer> maxSecondsBetweenSaves = setting(
             type(Integer.class),
             defaultValue(60),
             constraint(new NumberRangeConstraint<>(0, Integer.MAX_VALUE, false, false))
     );
+
     public final Setting<Integer> maxUnloadedChunksPercentageTillSave = setting(
             type(Integer.class),
             defaultValue(40),
             constraint(new NumberRangeConstraint<>(0, 100, false, false))
     );
+
     public final Setting<Boolean> debugEnabled = setting(
             type(Boolean.class),
             defaultValue(false)
     );
+
     public final Setting<Boolean> monitoringEnabled = setting(
             type(Boolean.class),
             defaultValue(false)
