@@ -24,7 +24,7 @@ public class SettingImplTest {
     private static final SimpleUri SETTING_ID = new SimpleUri("engine-tests:TestSetting");
 
     @Nested
-    public class SetValue {
+    class SetValue {
         private Setting<Integer> setting;
 
         private int eventResult;
@@ -42,14 +42,14 @@ public class SettingImplTest {
         }
 
         @Test
-        public void testSetsValue() {
+        void testSetsValue() {
             assertTrue(setting.set(25));
 
             assertEquals(25, eventResult);
         }
 
         @Test
-        public void testDoesNotSetValue() {
+        void testDoesNotSetValue() {
             assertFalse(setting.set(101));
 
             assertEquals(-1, eventResult);
@@ -57,7 +57,48 @@ public class SettingImplTest {
     }
 
     @Nested
-    public class Subscribers {
+    class SystemProperty {
+        private static final String TEST_CONFIG_SYSTEM_PROPERTY = "foo.bar.config.value";
+        private static final int TEST_CONFIG_SYSTEM_PROPERTY_VALUE = 75;
+
+        private Setting<Integer> setting;
+
+        private int eventResult;
+
+        @BeforeEach
+        public void setUp() {
+            setting = new SettingImpl<>(
+                    TypeInfo.of(Integer.class), 50,
+                    new NumberRangeConstraint<>(0, 100, false, false),
+                    "", "", TEST_CONFIG_SYSTEM_PROPERTY, Integer::valueOf);
+
+            eventResult = -1;
+
+            setting.subscribe((setting1, oldValue) -> eventResult = setting1.get());
+        }
+
+        @Test
+        void testSystemPropertyValue() {
+            System.setProperty(TEST_CONFIG_SYSTEM_PROPERTY, String.valueOf(TEST_CONFIG_SYSTEM_PROPERTY_VALUE));
+            assertEquals(75, setting.get());
+        }
+
+        @Test
+        void testSystemPropertyValueNotPresent() {
+            System.getProperties().remove(TEST_CONFIG_SYSTEM_PROPERTY);
+            assertEquals(50, setting.get());
+        }
+
+        @Test
+        void testDoesNotSetValue() {
+            assertFalse(setting.set(25));
+
+            assertEquals(-1, eventResult);
+        }
+    }
+
+    @Nested
+    class Subscribers {
         private Setting<Integer> setting;
 
         private SettingChangeListener<Integer> listener;
@@ -77,7 +118,7 @@ public class SettingImplTest {
         }
 
         @Test
-        public void testHasSubscribers() {
+        void testHasSubscribers() {
             setting.subscribe(listener);
 
             assertTrue(setting.hasSubscribers());
@@ -88,7 +129,7 @@ public class SettingImplTest {
         }
 
         @Test
-        public void testSetEventCall() {
+        void testSetEventCall() {
             setting.subscribe(listener);
 
             Random random = new FastRandom();
@@ -105,7 +146,7 @@ public class SettingImplTest {
         }
 
         @Test
-        public void testSubscribe() {
+        void testSubscribe() {
             final int subscriberCount = 10;
 
             for (int i = 0; i < subscriberCount; i++) {
@@ -118,7 +159,7 @@ public class SettingImplTest {
         }
 
         @Test
-        public void testUnsubscribe() {
+        void testUnsubscribe() {
             int subscriberCount = 10;
 
             List<SettingChangeListener<Integer>> listeners = Lists.newArrayListWithCapacity(subscriberCount);
