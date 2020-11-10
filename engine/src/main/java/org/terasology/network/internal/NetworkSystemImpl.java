@@ -192,7 +192,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
                 if (serverChannelFuture.isSuccess()) {
                     logger.info("Server started");
                 }
-                serverChannelFuture.sync().channel().closeFuture().sync();
+                serverChannelFuture.sync();
                 nextNetworkTick = time.getRealTimeInMs();
             } catch (SocketException e) {
                 throw new HostingFailedException("Could not identify network interfaces", e);
@@ -255,8 +255,6 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
                 connectCheck.cancel(true);
                 connectCheck.channel().closeFuture().awaitUninterruptibly();
                 throw e;
-            } finally {
-                group.shutdownGracefully().sync();
             }
         }
         return new JoinStatusImpl("Network system already active");

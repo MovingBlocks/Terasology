@@ -69,6 +69,8 @@ public class ClientHandshakeHandler extends ChannelInboundHandlerAdapter {
             processNewIdentity(message.getProvisionIdentity(), ctx);
         } else if (message.hasHandshakeVerification()) {
             processHandshakeVerification(message.getHandshakeVerification(), ctx);
+        } else {
+            super.channelRead(ctx, msg);
         }
     }
 
