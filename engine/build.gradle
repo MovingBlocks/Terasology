@@ -127,7 +127,6 @@ dependencies {
 
     // Small-time 3rd party libs we've stored in our Artifactory for access
     implementation group: 'ec.util', name: 'MersenneTwister', version: '20'
-    implementation group: 'org.eaxy', name: 'eaxy', version: '0.1'
 
     // telemetry
     implementation(group: 'com.snowplowanalytics', name: 'snowplow-java-tracker', version: '0.9.0') {
