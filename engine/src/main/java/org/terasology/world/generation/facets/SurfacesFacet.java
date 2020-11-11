@@ -15,7 +15,7 @@ import java.util.Optional;
  * in one column, for example, where there are overhangs, or floating islands. This facet is intended to
  * be used for placement of features on the surface itself, such as grass, trees and buildings.
  *
- * The combination of the SurfacesFacet and the ElevationFacet is a more flexible alternative to the SurfaceHeightFacet.
+ * The combination of the SurfacesFacet and the {@link ElevationFacet} is a more flexible alternative to the {@link SurfaceHeightFacet}.
  */
 public class SurfacesFacet extends VerticallySparseBooleanFacet3D {
 
