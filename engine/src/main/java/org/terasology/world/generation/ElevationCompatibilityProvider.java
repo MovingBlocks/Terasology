@@ -12,7 +12,7 @@ import org.terasology.world.generation.facets.SurfaceHeightFacet;
 
 /**
  * Converts from {@link SurfaceHeightFacet} to {@link ElevationFacet},
- * to be used for backwards compatibility while transitioning away from [@link SurfaceHeightFacet}.
+ * to be used for backwards compatibility while transitioning away from {@link SurfaceHeightFacet}.
  */
 @Produces(ElevationFacet.class)
 @Requires(@Facet(SurfaceHeightFacet.class))
