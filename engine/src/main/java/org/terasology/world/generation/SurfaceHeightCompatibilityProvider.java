@@ -9,7 +9,7 @@ import org.terasology.world.generation.facets.ElevationFacet;
 import org.terasology.world.generation.facets.SurfaceHeightFacet;
 
 /**
- * Converts from ElevationFacet and SurfacesFacet to SurfaceHeightFacet,
+ * Converts from {@link ElevationFacet} and {@link SurfacesFacet} to {@link SurfaceHeightFacet},
  * to be used for backwards compatibility while transitioning away from SurfaceHeightFacet.
  *
  * The output heights may in some cases depend on the vertical extent of the
