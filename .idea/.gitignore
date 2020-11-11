@@ -31,3 +31,6 @@ workspace.xml
 
 # Ignore Sonar linting, if set up locally
 /sonarlint/
+
+# Automatically created when the checkout directy name is different from git origin?
+/.name
