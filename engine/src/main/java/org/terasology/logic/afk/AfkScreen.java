@@ -49,7 +49,7 @@ public class AfkScreen extends CoreScreenLayer {
                 public String get() {
                     long afkTime = time.getGameTimeInMs() - afkClientSystem.getLastActive();
                     return String.format("( Press %s to disable the AFK mode )",
-                            afkTime <= AfkClientSystem.AFK_FREEDOM ? "ESCAPE" : "anything");
+                            afkTime > AfkClientSystem.AFK_FREEDOM ? "ESCAPE" : "anything");
                 }
             });
         }
