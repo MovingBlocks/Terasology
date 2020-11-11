@@ -13,7 +13,7 @@ import org.terasology.world.generation.facets.base.BaseFieldFacet2D;
  * to the ground of features that are not placed directly on the surface, such as placing ores at a certain
  * depth below ground.
  *
- * The combination of the SurfacesFacet and the ElevationFacet is a more flexible alternative to the SurfaceHeightFacet.
+ * The combination of the {@link SurfacesFacet} and the ElevationFacet is a more flexible alternative to the {@link SurfaceHeightFacet}.
  */
 public class ElevationFacet extends BaseFieldFacet2D {
 
