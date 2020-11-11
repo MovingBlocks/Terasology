@@ -20,7 +20,12 @@ import org.terasology.world.generation.Border3D;
 import org.terasology.world.generation.facets.base.BaseFieldFacet2D;
 
 /**
+ * This facet represents the height of the ground at each point.
+ *
+ * @deprecated in favour of the {@link SurfacesFacet} and the {@link ElevationFacet}, which
+ * each cover different parts of this facet's purpose, and are a more flexible alternative.
  */
+@Deprecated
 public class SurfaceHeightFacet extends BaseFieldFacet2D {
 
     public SurfaceHeightFacet(Region3i targetRegion, Border3D border) {
