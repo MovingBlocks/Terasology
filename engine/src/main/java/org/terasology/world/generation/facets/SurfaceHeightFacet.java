@@ -22,7 +22,7 @@ import org.terasology.world.generation.facets.base.BaseFieldFacet2D;
 /**
  * This facet represents the height of the ground at each point.
  *
- * @deprecated in favour of the SurfacesFacet and the ElevationFacet, which
+ * @deprecated in favour of the {@link SurfacesFacet} and the {@link ElevationFacet}, which
  * each cover different parts of this facet's purpose, and are a more flexible alternative.
  */
 @Deprecated
