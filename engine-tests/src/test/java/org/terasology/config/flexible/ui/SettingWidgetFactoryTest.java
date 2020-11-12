@@ -3,7 +3,7 @@
 package org.terasology.config.flexible.ui;
 
 import com.google.common.collect.Lists;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.assets.management.AssetTypeManager;
 import org.terasology.config.flexible.Setting;
@@ -17,9 +17,9 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class SettingWidgetFactoryTest {
+class SettingWidgetFactoryTest {
     @Test
-    public void testCreateWidgetFor() {
+     void testCreateWidgetFor() {
         ModuleEnvironment environment = mock(ModuleEnvironment.class);
 
         when(environment.getSubtypesOf(eq(ConstraintWidgetFactory.class)))
