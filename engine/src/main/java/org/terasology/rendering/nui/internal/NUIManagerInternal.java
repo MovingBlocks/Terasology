@@ -38,8 +38,8 @@ import org.terasology.input.events.MouseAxisEvent;
 import org.terasology.input.events.MouseButtonEvent;
 import org.terasology.input.events.MouseWheelEvent;
 import org.terasology.logic.players.LocalPlayer;
-import org.terasology.module.Module;
 import org.terasology.math.JomlUtil;
+import org.terasology.module.Module;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.network.ClientComponent;
 import org.terasology.nui.AbstractWidget;
@@ -55,10 +55,14 @@ import org.terasology.nui.events.NUIMouseButtonEvent;
 import org.terasology.nui.events.NUIMouseWheelEvent;
 import org.terasology.nui.widgets.UIButton;
 import org.terasology.nui.widgets.UIText;
+import org.terasology.nui.widgets.types.RegisterTypeWidgetFactory;
+import org.terasology.nui.widgets.types.TypeWidgetFactory;
+import org.terasology.nui.widgets.types.TypeWidgetFactoryRegistry;
+import org.terasology.nui.widgets.types.TypeWidgetLibrary;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.metadata.ClassLibrary;
-import org.terasology.registry.In;
 import org.terasology.reflection.reflect.ReflectFactory;
+import org.terasology.registry.In;
 import org.terasology.registry.InjectionHelper;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.nui.CoreScreenLayer;
@@ -68,10 +72,7 @@ import org.terasology.rendering.nui.SortOrderSystem;
 import org.terasology.rendering.nui.UIScreenLayer;
 import org.terasology.rendering.nui.layers.hud.HUDScreenLayer;
 import org.terasology.rendering.nui.layers.ingame.OnlinePlayersOverlay;
-import org.terasology.rendering.nui.widgets.types.RegisterTypeWidgetFactory;
-import org.terasology.rendering.nui.widgets.types.TypeWidgetFactory;
-import org.terasology.rendering.nui.widgets.types.TypeWidgetFactoryRegistry;
-import org.terasology.rendering.nui.widgets.types.TypeWidgetLibrary;
+import org.terasology.rendering.nui.widgets.TypeWidgetFactoryRegistryImpl;
 import org.terasology.utilities.Assets;
 
 import java.beans.PropertyChangeEvent;
@@ -157,7 +158,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
 
         moduleEnvironment = context.get(ModuleManager.class).getEnvironment();
 
-        typeWidgetFactoryRegistry = new TypeWidgetFactoryRegistry(context);
+        typeWidgetFactoryRegistry = new TypeWidgetFactoryRegistryImpl(context);
         context.put(TypeWidgetFactoryRegistry.class, typeWidgetFactoryRegistry);
 
         registerTypeWidgetFactories();

@@ -1,38 +1,25 @@
-/*
- * Copyright 2019 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-package org.terasology.rendering.nui.widgets.types.builtin.object;
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
+package org.terasology.rendering.nui.widgets.types.object;
 
 import com.google.common.base.Defaults;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.nui.UIWidget;
+import org.terasology.nui.WidgetUtil;
+import org.terasology.nui.databinding.Binding;
+import org.terasology.nui.databinding.DefaultBinding;
+import org.terasology.nui.databinding.NotifyingBinding;
+import org.terasology.nui.itemRendering.StringTextRenderer;
+import org.terasology.nui.layouts.ColumnLayout;
+import org.terasology.nui.widgets.UIBox;
+import org.terasology.nui.widgets.UIButton;
+import org.terasology.nui.widgets.UIDropdownScrollable;
+import org.terasology.nui.widgets.UILabel;
+import org.terasology.nui.widgets.types.TypeWidgetLibrary;
+import org.terasology.nui.widgets.types.builtin.util.ExpandableLayoutBuilder;
+import org.terasology.nui.widgets.types.builtin.util.FieldsWidgetBuilder;
 import org.terasology.reflection.TypeInfo;
-import org.terasology.rendering.nui.UIWidget;
-import org.terasology.rendering.nui.WidgetUtil;
-import org.terasology.rendering.nui.databinding.Binding;
-import org.terasology.rendering.nui.databinding.DefaultBinding;
-import org.terasology.rendering.nui.databinding.NotifyingBinding;
-import org.terasology.rendering.nui.itemRendering.StringTextRenderer;
-import org.terasology.rendering.nui.layouts.ColumnLayout;
-import org.terasology.rendering.nui.widgets.UIBox;
-import org.terasology.rendering.nui.widgets.UIButton;
-import org.terasology.rendering.nui.widgets.UIDropdownScrollable;
-import org.terasology.rendering.nui.widgets.UILabel;
-import org.terasology.rendering.nui.widgets.types.TypeWidgetLibrary;
-import org.terasology.rendering.nui.widgets.types.builtin.util.ExpandableLayoutBuilder;
-import org.terasology.rendering.nui.widgets.types.builtin.util.FieldsWidgetBuilder;
 import org.terasology.utilities.ReflectionUtil;
 
 import java.lang.reflect.Constructor;
@@ -43,7 +30,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static org.terasology.rendering.nui.widgets.types.TypeWidgetFactory.LABEL_WIDGET_ID;
+import static org.terasology.nui.widgets.types.TypeWidgetFactory.LABEL_WIDGET_ID;
 
 public class ObjectLayoutBuilder<T> extends ExpandableLayoutBuilder<T> {
     private static final Logger LOGGER = LoggerFactory.getLogger(ObjectLayoutBuilder.class);
