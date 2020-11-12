@@ -25,6 +25,8 @@ import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.world.generation.Region;
 import org.terasology.world.generation.World;
+import org.terasology.world.generation.facets.SurfacesFacet;
+import org.terasology.world.generation.facets.ElevationFacet;
 import org.terasology.world.generation.facets.SeaLevelFacet;
 import org.terasology.world.generation.facets.SpawnHeightFacet;
 import org.terasology.world.generation.facets.StrictlySparseSeaLevelFacet;
@@ -45,8 +47,8 @@ public abstract class AbstractSpawner implements Spawner {
      */
     protected Vector3f findSpawnPosition(World world, Vector2i pos, int searchRadius) {
 
-        Vector3i ext = new Vector3i(searchRadius, 1, searchRadius);
-        Vector3i desiredPos = new Vector3i(pos.getX(), 1, pos.getY());
+        Vector3i ext = new Vector3i(searchRadius, searchRadius, searchRadius);
+        Vector3i desiredPos = new Vector3i(pos.getX(), getStartHeight(world, pos), pos.getY());
 
         // try and find somewhere in this region a spot to land
         Region3i spawnArea = Region3i.createFromCenterExtents(desiredPos, ext);
@@ -55,17 +57,23 @@ public abstract class AbstractSpawner implements Spawner {
         Function<BaseVector2i, Optional<Float>> getWorld;
 
         // check if generation uses sea level and surface height facets
+        SurfacesFacet surfacesFacet = worldRegion.getFacet(SurfacesFacet.class);
+        ElevationFacet elevationFacet = worldRegion.getFacet(ElevationFacet.class);
         SurfaceHeightFacet surfaceHeightFacet = worldRegion.getFacet(SurfaceHeightFacet.class);
         SpawnHeightFacet spawnHeightFacet = worldRegion.getFacet(SpawnHeightFacet.class);
         
         if (spawnHeightFacet != null) {
             getWorld = v -> spawnHeightFacet.getWorld(v.getX(), v.getY());
-        }
-        else if (surfaceHeightFacet != null) {
+        } else if (elevationFacet != null) {
+            if (surfacesFacet != null) {
+                getWorld = v -> surfacesFacet.getPrimarySurface(elevationFacet, v.getX(), v.getY());
+            } else {
+                getWorld = v -> Optional.of(elevationFacet.getWorld(v.getX(), v.getY()));
+            }
+        } else if (surfaceHeightFacet != null) {
             getWorld = v -> Optional.of(surfaceHeightFacet.getWorld(v.getX(), v.getY()));
-        }
-        else {
-            throw new IllegalStateException("Surface height facet and spawn height facet not found");
+        } else {
+            throw new IllegalStateException("No spawn height facet, elevation facet or surface height facet found. Can't place spawn point.");
         }
 
         Function<BaseVector2i, Optional<Integer>> getSeaLevel;
@@ -75,11 +83,9 @@ public abstract class AbstractSpawner implements Spawner {
 
         if (sparseSeaLevelFacet != null) {
             getSeaLevel = v -> sparseSeaLevelFacet.getSeaLevel(v.getX(), v.getY());
-        }
-        else if (seaLevelFacet != null) {
+        } else if (seaLevelFacet != null) {
             getSeaLevel = v -> Optional.of(seaLevelFacet.getSeaLevel());
-        }
-        else {
+        } else {
             getSeaLevel = v -> Optional.of(0);
         }
 
@@ -87,7 +93,7 @@ public abstract class AbstractSpawner implements Spawner {
         SpiralIterable spiral = SpiralIterable.clockwise(pos).maxRadius(spiralRad).scale(2).build();
         for (BaseVector2i test : spiral) {
             Optional<Float> val = getWorld.apply(test);
-            if(!val.isPresent()) {
+            if (!val.isPresent()) {
                 continue;
             }
             int height = TeraMath.floorToInt(val.get());
@@ -99,12 +105,29 @@ public abstract class AbstractSpawner implements Spawner {
         // nothing above sea level found
         for (BaseVector2i test : spiral) {
             Optional<Float> val = getWorld.apply(test);
-            if(!val.isPresent()) {
+            if (!val.isPresent()) {
                 continue;
             }
             return new Vector3f(test.getX(), TeraMath.floorToInt(val.get()), test.getY());
         }
 
         throw new IllegalStateException("No spawn location found");
+    }
+
+    /**
+     * Get the elevation at a single point, to use as the base point for searching.
+     */
+    private int getStartHeight(World world, Vector2i pos) {
+        Region3i spawnArea = Region3i.createFromCenterExtents(new Vector3i(pos.x(), 0, pos.y()), new Vector3i());
+        Region worldRegion = world.getWorldData(spawnArea);
+
+        ElevationFacet elevationFacet = worldRegion.getFacet(ElevationFacet.class);
+
+        if (elevationFacet != null) {
+            return (int) elevationFacet.getWorld(pos);
+        } else {
+            // We'll have to rely on the SurfaceHeightFacet or SpawnHeightFacet anyway, and those are purely 2D so the height doesn't matter.
+            return 0;
+        }
     }
 }
