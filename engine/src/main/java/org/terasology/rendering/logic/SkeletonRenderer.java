@@ -244,7 +244,7 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
 
 
             //Scale bounding box for skeletalMesh.
-            Vector3f scale = skeletalMesh.scale;
+            Vector3f scale = JomlUtil.from(skeletalMesh.scale);
 
             Vector3f aabbCenter = aabb.getCenter();
             Vector3f scaledExtents = aabb.getExtents().mul(scale.x(), scale.y(), scale.z());
