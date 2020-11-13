@@ -111,127 +111,57 @@ configurations {
     }
 }
 
-tasks.register<JavaExec>("game") {
-    description = "Run 'Terasology' to play the game as a standard PC application"
+// Used for all game configs.
+val commonConfigure : JavaExec.()-> Unit = {
     group = "terasology run"
+
+    dependsOn(":extractNatives")
+    dependsOn(":moduleClasses")
+    dependsOn("classes")
+
+    // Run arguments
+    main = mainClassName
+    workingDir = rootDir
+
+    classpath(sourceSets["main"].runtimeClasspath)
+
+    args("-homeDir")
+    jvmArgs("-Xmx1536m")
+
+    if (isMacOS()) {
+        args("-noSplash")
+        jvmArgs("-XstartOnFirstThread", "-Djava.awt.headless=true")
+    }
+}
+
+tasks.register<JavaExec>("game") {
+    commonConfigure()
+    description = "Run 'Terasology' to play the game as a standard PC application"
 
     // If there are no actual source modules let the user know, just in case ..
     if (project(":modules").subprojects.isEmpty()) {
         logger.warn("NOTE: You're running the game from source without any source modules - that may be intentional (got jar modules?) but maybe not. Consider running `groovyw init` or a variant (see `groovyw usage`)")
     }
-
-    // Dependencies: natives + all modules & the PC facade itself (which will trigger the engine)
-    dependsOn(":extractNatives")
-    dependsOn(":moduleClasses")
-    dependsOn("classes")
-
-    // Run arguments
-    main = mainClassName
-    workingDir = rootDir
-
-    if (isMacOS()) {
-        args = listOf("-homedir", "-noSplash")
-        jvmArgs = listOf("-Xmx1536m", "-XstartOnFirstThread", "-Djava.awt.headless=true")
-    } else {
-        args = listOf("-homedir")
-        jvmArgs = listOf("-Xmx1536m")
-    }
-
-    // Classpath: PC itself, engine classes, engine dependencies. Not modules or natives since the engine finds those
-    classpath(sourceSets["main"].output.classesDirs)
-    classpath(sourceSets["main"].output.resourcesDir)
-    classpath(project(":engine").sourceSets["main"].output.classesDirs)
-    classpath(project(":engine").sourceSets["main"].output.resourcesDir)
-    classpath(project(":engine").configurations.runtimeClasspath)
 }
 
 tasks.register<JavaExec>("profile") {
+    commonConfigure()
     description = "Run 'Terasology' to play the game as a standard PC application (with Java FlightRecorder profiling)"
-    group = "terasology run"
-
-    // Dependencies: natives + all modules & the PC facade itself (which will trigger the engine)
-    dependsOn(":extractNatives")
-    dependsOn(":moduleClasses")
-    dependsOn("classes")
-
-    // Run arguments
-    main = mainClassName
-    workingDir = rootDir
-
-    if (isMacOS()) {
-        args = listOf("-homedir", "-noSplash")
-        jvmArgs = listOf("-Xmx1536m", "-XstartOnFirstThread", "-Djava.awt.headless=true", "-XX:+UnlockCommercialFeatures", "-XX:+FlightRecorder", "-XX:+UnlockDiagnosticVMOptions", "-XX:+DebugNonSafepoints", "-XX:StartFlightRecording=filename=terasology.jfr,dumponexit=true")
-    } else {
-        args = listOf("-homedir")
-        jvmArgs = listOf("-Xmx1536m", "-XX:+UnlockCommercialFeatures", "-XX:+FlightRecorder", "-XX:+UnlockDiagnosticVMOptions", "-XX:+DebugNonSafepoints", "-XX:StartFlightRecording=filename=terasology.jfr,dumponexit=true")
-    }
-
-    // Classpath: PC itself, engine classes, engine dependencies. Not modules or natives since the engine finds those
-    classpath(sourceSets["main"].output.classesDirs)
-    classpath(sourceSets["main"].output.resourcesDir)
-    classpath(project(":engine").sourceSets["main"].output.classesDirs)
-    classpath(project(":engine").sourceSets["main"].output.resourcesDir)
-    classpath(project(":engine").configurations.runtimeClasspath)
+    jvmArgs( "-XX:+UnlockCommercialFeatures", "-XX:+FlightRecorder", "-XX:+UnlockDiagnosticVMOptions", "-XX:+DebugNonSafepoints", "-XX:StartFlightRecording=filename=terasology.jfr,dumponexit=true")
 }
 
 tasks.register<JavaExec>("debug") {
+    commonConfigure()
     description = "Run 'Terasology' to play the game as a standard PC application (in debug mode)"
-    group = "terasology run"
-
-    // Dependencies: natives + all modules & the PC facade itself (which will trigger the engine)
-    dependsOn(":extractNatives")
-    dependsOn(":moduleClasses")
-    dependsOn("classes")
-
-    // Run arguments
-    main = mainClassName
-    workingDir = rootDir
-
-    if (isMacOS()) {
-        args = listOf("-homedir", "-noSplash")
-        jvmArgs = listOf("-Xmx1536m", "-XstartOnFirstThread", "-Djava.awt.headless=true", "-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=1044")
-    } else {
-        args = listOf("-homedir")
-        jvmArgs = listOf("-Xmx1536m", "-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=1044")
-    }
-
-    // Classpath: PC itself, engine classes, engine dependencies. Not modules or natives since the engine finds those
-    classpath(sourceSets["main"].output.classesDirs)
-    classpath(sourceSets["main"].output.resourcesDir)
-    classpath(project(":engine").sourceSets["main"].output.classesDirs)
-    classpath(project(":engine").sourceSets["main"].output.resourcesDir)
-    classpath(project(":engine").configurations.runtimeClasspath)
+    jvmArgs( "-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=1044")
 }
 
 tasks.register<JavaExec>("permissiveNatives") {
+    commonConfigure()
     description = "Run 'Terasology' with security set to permissive and natives loading a second way (for KComputers)"
-    group = "terasology run"
 
-    // Dependencies: natives + all modules & the PC facade itself (which will trigger the engine)
-    dependsOn(":extractNatives")
-    dependsOn(":moduleClasses")
-    dependsOn("classes")
-
-    // Run arguments
-    main = mainClassName
-    workingDir = rootDir
-
-    if (isMacOS()) {
-        args = listOf("-homedir", "-noSplash", "-permissiveSecurity")
-        jvmArgs = listOf("-Xmx1536m", "-XstartOnFirstThread", "-Djava.awt.headless=true")
-    } else {
-        args = listOf("-homedir", "-permissiveSecurity")
-        jvmArgs = listOf("-Xmx1536m")
-    }
-
+    args("-permissiveSecurity")
     systemProperty("java.library.path", rootProject.file(dirNatives + "/" + nativeSubdirectoryName()))
-
-    // Classpath: PC itself, engine classes, engine dependencies. Not modules or natives since the engine finds those
-    classpath(sourceSets["main"].output.classesDirs)
-    classpath(sourceSets["main"].output.resourcesDir)
-    classpath(project(":engine").sourceSets["main"].output.classesDirs)
-    classpath(project(":engine").sourceSets["main"].output.resourcesDir)
-    classpath(project(":engine").configurations.runtimeClasspath)
 }
 
 apply(from="server.build.gradle")
@@ -258,35 +188,11 @@ tasks.register<Sync>("setupServerModules") {
 
 // TODO: Make a task to reset server / game data
 tasks.register<JavaExec>("server") {
+    commonConfigure()
     description = "Starts a headless multiplayer server with data stored in [project-root]/$localServerDataPath"
-    group = "terasology run"
-
-    // Dependencies: natives + all modules & the PC facade itself (which will trigger the engine)
-    dependsOn(":extractNatives")
-    dependsOn(":moduleClasses")
-    dependsOn("classes")
     dependsOn("setupServerConfig")
     dependsOn("setupServerModules")
-
-    // Run arguments
-    main = mainClassName
-    workingDir = rootDir
-
-    // This isn't strictly necessary since the headless flag bypasses threading issues on Macs anyway, but ...
-    if (isMacOS()) {
-        args = listOf("-headless", "-homedir=$localServerDataPath", "-noSplash")
-        jvmArgs = listOf("-Xmx1536m", "-XstartOnFirstThread", "-Djava.awt.headless=true")
-    } else {
-        args = listOf("-headless", "-homedir=$localServerDataPath")
-        jvmArgs = listOf("-Xmx1536m")
-    }
-
-    // Classpath: PC itself, engine classes, engine dependencies. Not modules or natives since the engine finds those
-    classpath(sourceSets["main"].output.classesDirs)
-    classpath(sourceSets["main"].output.resourcesDir)
-    classpath(project(":engine").sourceSets["main"].output.classesDirs)
-    classpath(project(":engine").sourceSets["main"].output.resourcesDir)
-    classpath(project(":engine").configurations.runtimeClasspath)
+    args("-headless", "-homedir=$localServerDataPath")
 }
 
 // Preps a version file to bundle with PC dists. This eventually goes into the root of a zip file
