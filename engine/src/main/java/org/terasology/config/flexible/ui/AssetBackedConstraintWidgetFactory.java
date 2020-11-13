@@ -34,6 +34,12 @@ public abstract class AssetBackedConstraintWidgetFactory<T, C extends SettingCon
             LOGGER.error("Can't find unique UI element '{}'", contentsUri);
             return Optional.empty();
         }
+        uiElement = uiElement.get().createInstance();
+
+        if (!uiElement.isPresent()) {
+            LOGGER.error("Can't create copy of UI element '{}'", contentsUri);
+            return Optional.empty();
+        }
 
         UIWidget settingWidget = uiElement.get().getRootWidget();
 
