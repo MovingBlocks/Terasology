@@ -15,11 +15,11 @@
  */
 package org.terasology.rendering.nui.internal;
 
+import org.joml.Quaternionfc;
+import org.joml.Rectanglei;
+import org.joml.Vector2ic;
+import org.joml.Vector3fc;
 import org.terasology.assets.ResourceUrn;
-import org.terasology.math.geom.BaseVector2i;
-import org.terasology.math.geom.Quat4f;
-import org.terasology.math.geom.Rect2i;
-import org.terasology.math.geom.Vector3f;
 import org.terasology.nui.canvas.CanvasRenderer;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.mesh.Mesh;
@@ -28,9 +28,9 @@ import org.terasology.rendering.opengl.FrameBufferObject;
 /**
  */
 public interface TerasologyCanvasRenderer extends CanvasRenderer {
-    FrameBufferObject getFBO(ResourceUrn urn, BaseVector2i size);
+    FrameBufferObject getFBO(ResourceUrn urn, Vector2ic size);
 
-    void drawMesh(Mesh mesh, Material material, Rect2i drawRegion, Rect2i cropRegion, Quat4f rotation, Vector3f offset, float scale, float alpha);
+    void drawMesh(Mesh mesh, Material material, Rectanglei drawRegion, Rectanglei cropRegion, Quaternionfc rotation, Vector3fc offset, float scale, float alpha);
 
-    void drawMaterialAt(Material material, Rect2i drawRegion);
+    void drawMaterialAt(Material material, Rectanglei drawRegion);
 }

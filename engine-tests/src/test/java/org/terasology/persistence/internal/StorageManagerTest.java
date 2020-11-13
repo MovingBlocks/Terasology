@@ -19,6 +19,8 @@ import com.google.common.collect.Lists;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.nio.file.ShrinkWrapFileSystems;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
+import org.joml.Vector3f;
+import org.joml.Vector3i;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.MethodOrderer;
@@ -37,8 +39,7 @@ import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.entitySystem.stubs.EntityRefComponent;
 import org.terasology.entitySystem.stubs.StringComponent;
 import org.terasology.logic.location.LocationComponent;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector3i;
+import org.terasology.math.JomlUtil;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.network.Client;
 import org.terasology.network.ClientComponent;
@@ -134,7 +135,9 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
         recordAndReplayUtils = new RecordAndReplayUtils();
         CharacterStateEventPositionMap characterStateEventPositionMap = new CharacterStateEventPositionMap();
         DirectionAndOriginPosRecorderList directionAndOriginPosRecorderList = new DirectionAndOriginPosRecorderList();
-        recordAndReplaySerializer = new RecordAndReplaySerializer(entityManager, recordedEventStore, recordAndReplayUtils, characterStateEventPositionMap, directionAndOriginPosRecorderList, moduleManager, mock(TypeRegistry.class));
+        recordAndReplaySerializer = new RecordAndReplaySerializer(entityManager, recordedEventStore,
+                recordAndReplayUtils, characterStateEventPositionMap, directionAndOriginPosRecorderList,
+                moduleManager, mock(TypeRegistry.class));
         recordAndReplayCurrentStatus = context.get(RecordAndReplayCurrentStatus.class);
 
 
@@ -206,7 +209,7 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
     @Test
     public void testPlayerRelevanceLocationSurvivesStorage() {
         Vector3f loc = new Vector3f(1, 2, 3);
-        character.addComponent(new LocationComponent(loc));
+        character.addComponent(new LocationComponent(JomlUtil.from(loc)));
 
         esm.waitForCompletionOfPreviousSaveAndStartSaving();
         esm.finishSavingAndShutdown();
@@ -270,12 +273,12 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
 
     @Test
     public void testGetUnstoredChunkReturnsNothing() {
-        esm.loadChunkStore(CHUNK_POS);
+        esm.loadChunkStore(JomlUtil.from(CHUNK_POS));
     }
 
     @Test
     public void testStoreAndRestoreChunkStore() {
-        Chunk chunk = new ChunkImpl(CHUNK_POS, blockManager, extraDataManager);
+        Chunk chunk = new ChunkImpl(JomlUtil.from(CHUNK_POS), blockManager, extraDataManager);
         chunk.setBlock(0, 0, 0, testBlock);
         chunk.markReady();
         ChunkProvider chunkProvider = mock(ChunkProvider.class);
@@ -285,7 +288,7 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
         esm.waitForCompletionOfPreviousSaveAndStartSaving();
         esm.finishSavingAndShutdown();
 
-        ChunkStore restored = esm.loadChunkStore(CHUNK_POS);
+        ChunkStore restored = esm.loadChunkStore(JomlUtil.from(CHUNK_POS));
         assertNotNull(restored);
         assertEquals(CHUNK_POS, restored.getChunkPosition());
         assertNotNull(restored.getChunk());
@@ -294,13 +297,13 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
 
     @Test
     public void testChunkSurvivesStorageSaveAndRestore() throws Exception {
-        Chunk chunk = new ChunkImpl(CHUNK_POS, blockManager, extraDataManager);
+        Chunk chunk = new ChunkImpl(JomlUtil.from(CHUNK_POS), blockManager, extraDataManager);
         chunk.setBlock(0, 0, 0, testBlock);
         chunk.setBlock(0, 4, 2, testBlock2);
         chunk.markReady();
         ChunkProvider chunkProvider = mock(ChunkProvider.class);
         when(chunkProvider.getAllChunks()).thenReturn(Arrays.asList(chunk));
-        when(chunkProvider.getChunk(Matchers.any(Vector3i.class))).thenReturn(chunk);
+        when(chunkProvider.getChunk(Matchers.any(org.terasology.math.geom.Vector3i.class))).thenReturn(chunk);
         CoreRegistry.put(ChunkProvider.class, chunkProvider);
         boolean storeChunkInZips = true;
 
@@ -312,10 +315,11 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
         EntitySystemSetupUtil.addEntityManagementRelatedClasses(context);
         EngineEntityManager newEntityManager = context.get(EngineEntityManager.class);
         StorageManager newSM = new ReadWriteStorageManager(savePath, moduleEnvironment, newEntityManager, blockManager,
-                extraDataManager, storeChunkInZips, recordAndReplaySerializer, recordAndReplayUtils, recordAndReplayCurrentStatus);
+                extraDataManager, storeChunkInZips, recordAndReplaySerializer, recordAndReplayUtils,
+                recordAndReplayCurrentStatus);
         newSM.loadGlobalStore();
 
-        ChunkStore restored = newSM.loadChunkStore(CHUNK_POS);
+        ChunkStore restored = newSM.loadChunkStore(JomlUtil.from(CHUNK_POS));
         assertNotNull(restored);
         assertEquals(CHUNK_POS, restored.getChunkPosition());
         assertNotNull(restored.getChunk());
@@ -325,7 +329,7 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
 
     @Test
     public void testEntitySurvivesStorageInChunkStore() throws Exception {
-        Chunk chunk = new ChunkImpl(CHUNK_POS, blockManager, extraDataManager);
+        Chunk chunk = new ChunkImpl(JomlUtil.from(CHUNK_POS), blockManager, extraDataManager);
         chunk.setBlock(0, 0, 0, testBlock);
         chunk.markReady();
         ChunkProvider chunkProvider = mock(ChunkProvider.class);
@@ -334,7 +338,7 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
         EntityRef entity = entityManager.create();
         long id = entity.getId();
         LocationComponent locationComponent = new LocationComponent();
-        Vector3f positionInChunk = new Vector3f(chunk.getAABB().getMin());
+        Vector3f positionInChunk = new Vector3f(JomlUtil.from(chunk.getAABB().getMin()));
         positionInChunk.x += 1;
         positionInChunk.y += 1;
         positionInChunk.z += 1;
@@ -350,7 +354,7 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
                 extraDataManager, false, recordAndReplaySerializer, recordAndReplayUtils, recordAndReplayCurrentStatus);
         newSM.loadGlobalStore();
 
-        ChunkStore restored = newSM.loadChunkStore(CHUNK_POS);
+        ChunkStore restored = newSM.loadChunkStore(JomlUtil.from(CHUNK_POS));
         restored.restoreEntities();
         EntityRef ref = newEntityManager.getEntity(id);
         assertTrue(ref.exists());

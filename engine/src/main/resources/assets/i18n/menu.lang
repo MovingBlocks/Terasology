@@ -366,7 +366,6 @@
     "storage-service-sync-ok": "storage-service-sync-ok",
     "storage-service-sync-previous-conflicts": "storage-service-sync-previous-conflicts",
     "storage-service-token-fail": "storage-service-token-fail",
-    "storage-service-token-not-present": "storage-service-token-not-present",
     "storage-service-token-ok": "storage-service-token-ok",
     "storage-service-upload-fail": "storage-service-upload-fail",
     "storage-service-upload-ok": "storage-service-upload-ok",

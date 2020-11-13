@@ -16,6 +16,8 @@
 
 package org.terasology.input.cameraTarget;
 
+import org.joml.Vector3f;
+import org.joml.Vector3ic;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
@@ -24,8 +26,7 @@ import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.players.FirstPersonHeldItemMountPointComponent;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.logic.players.PlayerTargetChangedEvent;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector3i;
+import org.terasology.math.JomlUtil;
 import org.terasology.physics.Physics;
 import org.terasology.registry.In;
 import org.terasology.registry.Share;
@@ -62,7 +63,7 @@ public class PlayerTargetSystem extends BaseComponentSystem implements UpdateSub
      * Get the position of the block that is currently targeted.
      * @return the position of the block, as a Vector3i
      */
-    public Vector3i getTargetBlockPosition() {
+    public Vector3ic getTargetBlockPosition() {
         return targetSystem.getTargetBlockPosition();
     }
 
@@ -70,16 +71,16 @@ public class PlayerTargetSystem extends BaseComponentSystem implements UpdateSub
     public void update(float delta) {
         EntityRef charEntity = player.getCharacterEntity();
         if (charEntity.exists()) {
-            Vector3f cameraPos = player.getViewPosition();
+            Vector3f cameraPos = player.getViewPosition(new Vector3f());
             CharacterComponent charComp = charEntity.getComponent(CharacterComponent.class);
 
             if (charComp != null) {
-                Vector3f dir = player.getViewDirection();
+                Vector3f dir = player.getViewDirection(new Vector3f());
                 float maxDist = charComp.interactionRange;
                 FirstPersonHeldItemMountPointComponent heldItemMountPoint = player.getCameraEntity().getComponent(FirstPersonHeldItemMountPointComponent.class);
                 if (heldItemMountPoint != null && heldItemMountPoint.isTracked()) {
                     maxDist = heldItemMountPoint.translate.length() + 0.25f;
-                    dir = heldItemMountPoint.translate.normalize();
+                    dir = new Vector3f(heldItemMountPoint.translate).normalize();
                 }
                 if (targetSystem.updateTarget(cameraPos, dir, maxDist)) {
                     EntityRef oldTarget = targetSystem.getPreviousTarget();

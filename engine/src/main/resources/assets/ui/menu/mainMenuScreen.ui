@@ -32,34 +32,6 @@
                 }
             },
             {
-                "type": "engine:flowLayout",
-                "layoutInfo": {
-                    "use-content-width": true,
-                    "use-content-height": true,
-                    "position-top": {
-                        "offset": 8
-                    },
-                    "position-right": {
-                        "offset": 8
-                    }
-                },
-                "contents": [
-                    {
-                        "type": "UILabel",
-                        "id": "storageServiceStatus"
-                    },
-                    {
-                        "type": "UISpace",
-                        "size": [8, 0]
-                    },
-                    {
-                        "type": "UIButton",
-                        "id": "storageServiceAction",
-                        "text": "${engine:menu#game-settings}"
-                    }
-                ]
-            },
-            {
                 "type": "engine:columnLayout",
                 "layoutInfo": {
                     "use-content-width": true,
