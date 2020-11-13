@@ -7,6 +7,10 @@ import org.terasology.nui.UIWidget;
 import org.terasology.nui.databinding.Binding;
 import org.terasology.nui.widgets.UISlider;
 
+/**
+ * Creates {@link UISlider} for  {@link Number} types with constraint {@link NumberRangeConstraint}
+ * @param <T> value type of {@link org.terasology.config.flexible.Setting} and {@link org.terasology.config.flexible.constraints.SettingConstraint} used for {@link UISlider}
+ */
 public class NumberRangeConstraintWidgetFactory<T extends Number & Comparable<? super T>>
     extends AssetBackedConstraintWidgetFactory<T, NumberRangeConstraint<T>> {
 

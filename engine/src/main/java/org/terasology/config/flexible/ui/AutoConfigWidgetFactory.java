@@ -16,6 +16,27 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Optional;
 
+/**
+ * Creates {@link UIWidget} for {@link AutoConfig}.
+ * <p>
+ * Created {@link UIWidget}'s binded with source {@link AutoConfig}. Changing values in {@link UIWidget} will change value in related {@link AutoConfig}
+ * <p>
+ * Using {@link SettingWidgetFactory} for creating widgets for individual {@link Setting}.
+ * <p>
+ * Useful for creating settings UI.
+ * <p>
+ * Usage:
+ * <pre>
+ * class SomeScreen extends CoreScreenLayer {
+ *     /@Override
+ *     public void initialise() {
+ *         AutoConfigWidgetFactory configWidgetFactory = new AutoConfigWidgetFactory(moduleManager, assetManager);
+ *         ColumnLayout mainContainer = find("mainContainer", ColumnLayout.class);
+ *         mainContainer.addWidget(configWidgetFactory.buildWidgetFor(config));
+ *     }
+ * }
+ * </pre>
+ */
 public class AutoConfigWidgetFactory {
     private static final Logger logger = LoggerFactory.getLogger(AutoConfigWidgetFactory.class);
 
@@ -27,6 +48,11 @@ public class AutoConfigWidgetFactory {
         this.assetManager = assetManager;
     }
 
+    /**
+     * Creates {@link UIWidget} for {@link AutoConfig}
+     * @param config for creating widget
+     * @return UIWidget created for config
+     */
     public UIWidget buildWidgetFor(AutoConfig config) {
         PropertyLayout container = new PropertyLayout();
         container.setRowConstraints("[min]");
