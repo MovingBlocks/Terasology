@@ -20,12 +20,18 @@ import com.google.common.base.Functions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.math.DoubleMath;
+import org.terasology.assets.ResourceUrn;
+import org.terasology.config.Config;
 import org.terasology.context.Context;
-import org.terasology.engine.subsystem.rpc.DiscordRPCSubSystem;
+import org.terasology.engine.SimpleUri;
+import org.terasology.i18n.TranslationProject;
+import org.terasology.i18n.TranslationSystem;
 import org.terasology.identity.storageServiceClient.StorageServiceWorker;
 import org.terasology.identity.storageServiceClient.StorageServiceWorkerStatus;
-import org.terasology.rendering.nui.layers.mainMenu.StorageServiceLoginPopup;
-import org.terasology.rendering.nui.layers.mainMenu.ThreeButtonPopup;
+import org.terasology.nui.Color;
+import org.terasology.nui.WidgetUtil;
+import org.terasology.nui.databinding.DefaultBinding;
+import org.terasology.nui.databinding.ReadOnlyBinding;
 import org.terasology.nui.widgets.UIButton;
 import org.terasology.nui.widgets.UICheckbox;
 import org.terasology.nui.widgets.UIDropdownScrollable;
@@ -33,27 +39,20 @@ import org.terasology.nui.widgets.UIImage;
 import org.terasology.nui.widgets.UILabel;
 import org.terasology.nui.widgets.UISlider;
 import org.terasology.nui.widgets.UIText;
-import org.terasology.utilities.Assets;
-import org.terasology.assets.ResourceUrn;
-import org.terasology.config.Config;
-import org.terasology.engine.SimpleUri;
-import org.terasology.i18n.TranslationProject;
-import org.terasology.i18n.TranslationSystem;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.TextureUtil;
-import org.terasology.nui.Color;
 import org.terasology.rendering.nui.CoreScreenLayer;
-import org.terasology.nui.WidgetUtil;
 import org.terasology.rendering.nui.animation.MenuAnimationSystems;
-import org.terasology.nui.databinding.DefaultBinding;
-import org.terasology.nui.databinding.ReadOnlyBinding;
+import org.terasology.rendering.nui.layers.mainMenu.StorageServiceLoginPopup;
+import org.terasology.rendering.nui.layers.mainMenu.ThreeButtonPopup;
+import org.terasology.utilities.Assets;
 
 import java.math.RoundingMode;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
-import java.util.Collections;
 
 import static org.terasology.identity.storageServiceClient.StatusMessageTranslator.getLocalizedButtonMessage;
 import static org.terasology.identity.storageServiceClient.StatusMessageTranslator.getLocalizedStatusMessage;
@@ -326,7 +325,6 @@ public class PlayerSettingsScreen extends CoreScreenLayer {
         if (nametext != null) {
             config.getPlayer().setName(nametext.getText().trim());
             config.getPlayer().setHasEnteredUsername(true);
-            DiscordRPCSubSystem.updateState();
         }
         if (!config.getSystem().getLocale().equals(language.getSelection())) {
             config.getSystem().setLocale(language.getSelection());
