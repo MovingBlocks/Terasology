@@ -4,7 +4,6 @@ package org.terasology.logic.afk;
 
 import org.terasology.assets.ResourceUrn;
 import org.terasology.engine.Time;
-import org.terasology.engine.subsystem.rpc.DiscordRPCSubSystem;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.EventPriority;
 import org.terasology.entitySystem.event.ReceiveEvent;
@@ -79,11 +78,9 @@ public class AfkClientSystem extends BaseComponentSystem {
         if (component.afk) {
             nuiManager.pushScreen(SCREEN_URL, AfkScreen.class).setAfkClientSystem(this);
             nuiManager.closeScreen(CONSOLE_SCREEN_URL);
-            enableDiscord();
             console.addMessage("[AFK] You are AFK now!");
         } else {
             nuiManager.closeScreen(SCREEN_URL);
-            disableDiscord();
             console.addMessage("[AFK] You are no longer AFK!");
         }
         AfkRequest request = new AfkRequest(entity, component.afk);
@@ -99,7 +96,6 @@ public class AfkClientSystem extends BaseComponentSystem {
             if (!component.afk) {
                 component.afk = true;
                 nuiManager.pushScreen(SCREEN_URL, AfkScreen.class).setAfkClientSystem(this);
-                enableDiscord();
                 AfkRequest request = new AfkRequest(entity, true);
                 entity.send(request);
             }
@@ -154,27 +150,9 @@ public class AfkClientSystem extends BaseComponentSystem {
         return lastActive;
     }
 
-    private String getGame() {
-        NetworkMode networkMode = networkSystem.getMode();
-        String mode = "Playing Online";
-        if (networkMode == NetworkMode.DEDICATED_SERVER) {
-            mode = "Hosting | " + game.getName();
-        }
-        return mode;
-    }
 
     private void updateActive() {
         lastActive = time.getGameTimeInMs();
-    }
-
-    private void enableDiscord() {
-        DiscordRPCSubSystem.tryToDiscover();
-        DiscordRPCSubSystem.setState("Idle", true);
-    }
-
-    private void disableDiscord() {
-        DiscordRPCSubSystem.tryToDiscover();
-        DiscordRPCSubSystem.setState(getGame(), true);
     }
 
     private boolean disable() {
@@ -186,7 +164,6 @@ public class AfkClientSystem extends BaseComponentSystem {
             clientEntity.addOrSaveComponent(component);
             AfkRequest request = new AfkRequest(clientEntity, false);
             clientEntity.send(request);
-            disableDiscord();
             return true;
         }
         return false;
