@@ -56,7 +56,7 @@ val rootDirDist = File(rootDir, "build/distributions")
 
 // Inherited props
 val dirNatives: String by rootProject.extra
-val distsDirectory: DirectoryProperty by project;
+val distsDirectory: DirectoryProperty by project
 
 // Read environment variables, including variables passed by jenkins continuous integration server
 val env: MutableMap<String, String> = System.getenv()!!
@@ -88,6 +88,7 @@ group = "org.terasology.facades"
 dependencies {
     implementation(project(":engine"))
     implementation(group = "org.reflections", name = "reflections", version = "0.9.10")
+    implementation(project(":subsystems:DiscordRPC"))
 
     // TODO: Consider whether we can move the CR dependency back here from the engine, where it is referenced from the main menu
     implementation(group = "org.terasology.crashreporter", name = "cr-terasology", version = "4.1.0")
@@ -171,7 +172,7 @@ tasks.register<Sync>("setupServerModules") {
     description =
         """Parses "extraModules" - a comma-separated list of modules and puts them into $localServerDataPath"""
 
-    val extraModules: String? by project;
+    val extraModules: String? by project
     extraModules?.let {
         // Grab modules from Artifactory - cheats by declaring them as dependencies
         it.splitToSequence(",").forEach {
