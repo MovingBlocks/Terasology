@@ -42,6 +42,9 @@ public class AfkClientSystem extends BaseComponentSystem {
     private static final long AFK_TIMEOUT = 60 * 1000;
 
     @In
+    private Console console;
+
+    @In
     private LocalPlayer localPlayer;
 
     @In
@@ -80,10 +83,10 @@ public class AfkClientSystem extends BaseComponentSystem {
         entity.addOrSaveComponent(component);
         if (component.afk) {
             enableDiscord();
-            logger.info("[AFK] You are AFK now!");
+            console.addMessage("[AFK] You are AFK now!");
         } else {
             disableDiscord();
-            logger.info("[AFK] You are no longer AFK!");
+            console.addMessage("[AFK] You are no longer AFK!");
         }
         AfkRequest request = new AfkRequest(entity, component.afk);
         entity.send(request);
