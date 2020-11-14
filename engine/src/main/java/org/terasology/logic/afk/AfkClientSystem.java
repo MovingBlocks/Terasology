@@ -73,7 +73,7 @@ public class AfkClientSystem extends BaseComponentSystem {
     )
     public void onCommand() {
         if (requireConnection()) {
-            logger.info("Failed! You need to be connected to use this command.");
+            console.addMessage("Failed! You need to be connected to use this command.");
             return;
         }
         updateActive();
