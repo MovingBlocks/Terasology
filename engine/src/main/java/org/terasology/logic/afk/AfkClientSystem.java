@@ -39,7 +39,7 @@ public class AfkClientSystem extends BaseComponentSystem {
     /**
      * Duration in milliseconds (ms).
      */
-    private static final long AFK_TIMEOUT = 60 * 1000;
+    private static final long AFK_TIMEOUT = 5 * 60 * 1000;
 
     @In
     private Console console;
