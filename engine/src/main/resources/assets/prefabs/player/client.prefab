@@ -3,5 +3,6 @@
     "Location": {},
     "Client": {},
     "Network": {},
-    "AutoMountCamera": {}
+    "AutoMountCamera": {},
+    "Afk": {}
 }

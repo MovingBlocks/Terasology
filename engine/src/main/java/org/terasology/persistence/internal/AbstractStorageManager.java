@@ -24,6 +24,7 @@ import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.entitySystem.entity.internal.OwnershipHelper;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.AABB;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.network.ClientComponent;
@@ -120,11 +121,11 @@ public abstract class AbstractStorageManager implements StorageManager {
 
     protected byte[] loadChunkZip(Vector3i chunkPos) {
         byte[] chunkData = null;
-        Vector3i chunkZipPos = storagePathProvider.getChunkZipPosition(chunkPos);
-        Path chunkPath = storagePathProvider.getChunkZipPath(chunkZipPos);
+        Vector3i chunkZipPos = JomlUtil.from(storagePathProvider.getChunkZipPosition(JomlUtil.from(chunkPos)));
+        Path chunkPath = storagePathProvider.getChunkZipPath(JomlUtil.from(chunkZipPos));
         if (Files.isRegularFile(chunkPath)) {
             try (FileSystem chunkZip = FileSystems.newFileSystem(chunkPath, null)) {
-                Path targetChunk = chunkZip.getPath(storagePathProvider.getChunkFilename(chunkPos));
+                Path targetChunk = chunkZip.getPath(storagePathProvider.getChunkFilename(JomlUtil.from(chunkPos)));
                 if (Files.isRegularFile(targetChunk)) {
                     chunkData = Files.readAllBytes(targetChunk);
                 }
@@ -154,7 +155,7 @@ public abstract class AbstractStorageManager implements StorageManager {
         if (isStoreChunksInZips()) {
             return loadChunkZip(chunkPos);
         } else {
-            Path chunkPath = storagePathProvider.getChunkPath(chunkPos);
+            Path chunkPath = storagePathProvider.getChunkPath(JomlUtil.from(chunkPos));
             if (Files.isRegularFile(chunkPath)) {
                 try {
                     return Files.readAllBytes(chunkPath);

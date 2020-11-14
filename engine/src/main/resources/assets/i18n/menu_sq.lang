@@ -372,7 +372,6 @@
     "storage-service-sync-ok": "Sinkronizimi përfundoi - %d u shkarku, %d u ngarkua, %d kontradiktor.",
     "storage-service-sync-previous-conflicts": "Konfliktet u zbuluan gjatë sinkronizimit të fundit. Nuk është e mundur të filloni një sinkronizim të ri derisa konfliktet të zgjidhen.",
     "storage-service-token-fail": "Autentifikimi nga tokeni e ruajtur dhe URL-ja dështoi - %s.",
-    "storage-service-token-not-present": "Asnjë informacion i konfigurimit nuk është i pranishëm, do qëndroni jashtë.",
     "storage-service-token-ok": "Hyrja është me sukses duke përdorur kredencialet e ruajtura.",
     "storage-service-upload-fail": "Ngarkimi e identiteteve dështoi - %s.",
     "storage-service-upload-ok": "Identitetet të reja u ngarkuan me sukses.",

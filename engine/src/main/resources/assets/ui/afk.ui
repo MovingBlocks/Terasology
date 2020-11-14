@@ -1,0 +1,43 @@
+{
+  "type": "AfkScreen",
+  "skin": "graypopup",
+  "contents": {
+    "type": "relativeLayout",
+    "contents": [
+      {
+        "type": "UIBox",
+        "layoutInfo": {
+          "width": 500,
+          "use-content-height": true,
+          "position-horizontal-center": {},
+          "position-vertical-center": {}
+        },
+        "content": {
+          "type": "ColumnLayout",
+          "columns": 1,
+          "verticalSpacing": 8,
+          "contents": [
+            {
+              "type": "UILabel",
+              "text":  "You are in AFK mode!",
+              "family": "title"
+            },
+            {
+              "type": "UISpace",
+              "size": [1, 16]
+            },
+            {
+              "type": "UILabel",
+              "text": "( Press anything to disable the AFK mode )",
+              "id": "text"
+            },
+            {
+              "type": "UISpace",
+              "size": [1, 16]
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

@@ -18,6 +18,8 @@ package org.terasology.persistence.internal;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.joml.Vector3f;
+import org.joml.Vector3i;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.paths.PathManager;
@@ -27,8 +29,6 @@ import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.game.GameManifest;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.ChunkMath;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.network.ClientComponent;
 import org.terasology.protobuf.EntityData;
 import org.terasology.recording.RecordAndReplayCurrentStatus;
@@ -267,8 +267,8 @@ public class SaveTransaction extends AbstractTask {
                     && !entity.isAlwaysRelevant()) {
                 LocationComponent locationComponent = entity.getComponent(LocationComponent.class);
                 if (locationComponent != null) {
-                    Vector3f loc = locationComponent.getWorldPosition();
-                    Vector3i chunkPos = ChunkMath.calcChunkPos((int) loc.x, (int) loc.y, (int) loc.z);
+                    Vector3f loc = locationComponent.getWorldPosition(new Vector3f());
+                    Vector3i chunkPos = ChunkMath.calcChunkPos((int) loc.x, (int) loc.y, (int) loc.z, new Vector3i());
                     Collection<EntityRef> collection = chunkPosToEntitiesMap.get(chunkPos);
                     if (collection == null) {
                         collection = Lists.newArrayList();

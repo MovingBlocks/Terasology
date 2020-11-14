@@ -77,6 +77,7 @@ public class ChunkProcessingPipeline {
         chunkProcessor = new ExecutorCompletionService<>(executor,
                 new PriorityBlockingQueue<>(800, comparable));
         reactor = new Thread(this::chunkTaskHandler);
+        reactor.setDaemon(true);
         reactor.setName("Chunk-Processing-Reactor");
         reactor.start();
     }
@@ -227,6 +228,7 @@ public class ChunkProcessingPipeline {
 
         chunkProcessingInfoMap.keySet().forEach(this::stopProcessingAt);
         chunkProcessingInfoMap.clear();
+        executor.getQueue().clear();
     }
 
     public void restart() {

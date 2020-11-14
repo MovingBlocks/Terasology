@@ -1,18 +1,6 @@
-/*
- * Copyright 2020 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
+
 package org.terasology.engine;
 
 import com.google.common.base.Joiner;
@@ -30,6 +18,7 @@ import org.terasology.engine.subsystem.common.ConfigurationSubsystem;
 import org.terasology.engine.subsystem.common.ThreadManager;
 import org.terasology.engine.subsystem.common.hibernation.HibernationSubsystem;
 import org.terasology.engine.subsystem.config.BindsSubsystem;
+import org.terasology.engine.subsystem.discordrpc.DiscordRPCSubSystem;
 import org.terasology.engine.subsystem.headless.HeadlessAudio;
 import org.terasology.engine.subsystem.headless.HeadlessGraphics;
 import org.terasology.engine.subsystem.headless.HeadlessInput;
@@ -41,39 +30,28 @@ import org.terasology.engine.subsystem.lwjgl.LwjglGraphics;
 import org.terasology.engine.subsystem.lwjgl.LwjglInput;
 import org.terasology.engine.subsystem.lwjgl.LwjglTimer;
 import org.terasology.engine.subsystem.openvr.OpenVRInput;
-import org.terasology.engine.subsystem.rpc.DiscordRPCSubSystem;
 import org.terasology.game.GameManifest;
 import org.terasology.network.NetworkMode;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameInfo;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameProvider;
 import org.terasology.splash.SplashScreen;
 import org.terasology.splash.SplashScreenBuilder;
-import org.terasology.splash.overlay.AnimatedBoxRowOverlay;
-import org.terasology.splash.overlay.ImageOverlay;
-import org.terasology.splash.overlay.RectOverlay;
-import org.terasology.splash.overlay.TextOverlay;
-import org.terasology.splash.overlay.TriggerImageOverlay;
 
 import java.awt.GraphicsEnvironment;
-import java.awt.Point;
-import java.awt.Rectangle;
 import java.io.IOException;
-import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
-
-import static com.google.common.base.Verify.verifyNotNull;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Class providing the main() method for launching Terasology as a PC app.
  * <br><br>
- * Through the following launch arguments default locations to store logs and
- * game saves can be overridden, by using the current directory or a specified
- * one as the home directory. Furthermore, Terasology can be launched headless,
- * to save resources while acting as a server or to run in an environment with
- * no graphics, audio or input support. Additional arguments are available to
- * reload the latest game on startup and to disable crash reporting.
+ * Through the following launch arguments default locations to store logs and game saves can be overridden, by using the
+ * current directory or a specified one as the home directory. Furthermore, Terasology can be launched headless, to save
+ * resources while acting as a server or to run in an environment with no graphics, audio or input support. Additional
+ * arguments are available to reload the latest game on startup and to disable crash reporting.
  * <br><br>
  * Available launch arguments:
  * <br><br>
@@ -132,8 +110,23 @@ public final class Terasology {
         handlePrintUsageRequest(args);
         handleLaunchArguments(args);
 
-        SplashScreen splashScreen = splashEnabled ? configureSplashScreen() : SplashScreenBuilder.createStub();
-
+        SplashScreen splashScreen;
+        if (splashEnabled) {
+            CountDownLatch splashInitLatch = new CountDownLatch(1);
+            GLFWSplashScreen glfwSplash = new GLFWSplashScreen(splashInitLatch);
+            Thread thread = new Thread(glfwSplash, "splashscreen-loop");
+            thread.setDaemon(true);
+            thread.start();
+            try {
+                // wait splash initialize... we will lose some post messages otherwise.
+                splashInitLatch.await(1, TimeUnit.SECONDS);
+            } catch (InterruptedException e) {
+                // ignore
+            }
+            splashScreen = glfwSplash;
+        } else {
+            splashScreen = SplashScreenBuilder.createStub();
+        }
         splashScreen.post("Java Runtime " + System.getProperty("java.version") + " loaded");
 
         setupLogging();
@@ -168,13 +161,12 @@ public final class Terasology {
                         GameManifest gameManifest = getLatestGameManifest();
                         if (gameManifest != null) {
                             String title = gameManifest.getTitle();
-                            GameManifest newlyCreatedGM = gameManifest;
                             if (!title.startsWith("New Created")) { //if first time run
-                                newlyCreatedGM.setTitle("New Created " + title + " 1");
+                                gameManifest.setTitle("New Created " + title + " 1");
                             } else { //if not first time run
-                                newlyCreatedGM.setTitle(getNewTitle(title));
+                                gameManifest.setTitle(getNewTitle(title));
                             }
-                            engine.changeState(new StateLoading(newlyCreatedGM, NetworkMode.NONE));
+                            engine.changeState(new StateLoading(gameManifest, NetworkMode.NONE));
                         }
                     });
                 }
@@ -195,67 +187,6 @@ public final class Terasology {
         return (newTitle + " " + fileNumber);
     }
 
-    private static SplashScreen configureSplashScreen() {
-        int imageHeight = 283;
-        int maxTextWidth = 450;
-        int width = 600;
-        int height = 30;
-        int left = 20;
-        int top = imageHeight - height - 20;
-
-        Rectangle rectRc = new Rectangle(left, top, width, height);
-        Rectangle textRc = new Rectangle(left + 10, top + 5, maxTextWidth, height);
-        Rectangle boxRc = new Rectangle(left + maxTextWidth + 10, top, width - maxTextWidth - 20, height);
-
-        SplashScreenBuilder builder = new SplashScreenBuilder();
-
-        String[] imgFiles = new String[] {
-                "splash_1.png",
-                "splash_2.png",
-                "splash_3.png",
-                "splash_4.png",
-                "splash_5.png"
-        };
-
-        Point[] imgOffsets = new Point[] {
-                new Point(0, 0),
-                new Point(150, 0),
-                new Point(300, 0),
-                new Point(450, 0),
-                new Point(630, 0)
-        };
-
-        EngineStatus[] trigger = new EngineStatus[] {
-                TerasologyEngineStatus.PREPARING_SUBSYSTEMS,
-                TerasologyEngineStatus.INITIALIZING_MODULE_MANAGER,
-                TerasologyEngineStatus.INITIALIZING_ASSET_TYPES,
-                TerasologyEngineStatus.INITIALIZING_SUBSYSTEMS,
-                TerasologyEngineStatus.INITIALIZING_ASSET_MANAGEMENT,
-        };
-
-        try {
-            for (int index = 0; index < 5; index++) {
-                URL resource = Terasology.class.getResource("/splash/" + imgFiles[index]);
-                builder.add(new TriggerImageOverlay(verifyNotNull(resource, "resource /splash/%s", imgFiles[index]))
-                        .setTrigger(trigger[index].getDescription())
-                        .setPosition(imgOffsets[index].x, imgOffsets[index].y));
-            }
-
-            builder.add(new ImageOverlay(Terasology.class.getResource("/splash/splash_text.png")));
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        SplashScreen instance = builder
-                .add(new RectOverlay(rectRc))
-                .add(new TextOverlay(textRc))
-                .add(new AnimatedBoxRowOverlay(boxRc))
-                .build();
-
-        return instance;
-    }
-
     private static void setupLogging() {
         Path path = PathManager.getInstance().getLogPath();
         if (path == null) {
@@ -268,7 +199,7 @@ public final class Terasology {
     private static void handlePrintUsageRequest(String[] args) {
         for (String arg : args) {
             for (String usageArg : PRINT_USAGE_FLAGS) {
-                if (usageArg.equals(arg.toLowerCase())) {
+                if (usageArg.equalsIgnoreCase(arg)) {
                     printUsageAndExit();
                 }
             }

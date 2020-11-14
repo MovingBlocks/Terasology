@@ -90,7 +90,7 @@ public class TerasologyCanvasImpl extends CanvasImpl implements PropertyChangeLi
             }
             material.setFloat("alpha", state.getAlpha());
             material.bindTextures();
-            ((TerasologyCanvasRenderer) renderer).drawMaterialAt(material, JomlUtil.from(drawRegion));
+            ((TerasologyCanvasRenderer) renderer).drawMaterialAt(material, drawRegion);
         }
     }
 
@@ -110,8 +110,8 @@ public class TerasologyCanvasImpl extends CanvasImpl implements PropertyChangeLi
         }
 
         ((TerasologyCanvasRenderer) renderer).drawMesh(
-                mesh, material, JomlUtil.from(drawRegion), JomlUtil.from(drawRegion.intersection(state.cropRegion)),
-                rotation, offset, scale, state.getAlpha());
+                mesh, material, drawRegion, drawRegion.intersection(state.cropRegion),
+                JomlUtil.from(rotation), JomlUtil.from(offset), scale, state.getAlpha());
     }
 
     public void drawMesh(Mesh mesh, UITextureRegion texture, Rect2i region, Quat4f rotation, Vector3f offset, float scale) {
@@ -133,7 +133,7 @@ public class TerasologyCanvasImpl extends CanvasImpl implements PropertyChangeLi
         private SubRegionFBOImpl(ResourceUrn uri, BaseVector2i size) {
             previousState = state;
 
-            fbo = ((TerasologyCanvasRenderer)renderer).getFBO(uri, size);
+            fbo = ((TerasologyCanvasRenderer)renderer).getFBO(uri, JomlUtil.from(size));
             state = new CanvasState(state, new Rectanglei(0, 0, size.x(), size.y()));
             fbo.bindFrame();
         }

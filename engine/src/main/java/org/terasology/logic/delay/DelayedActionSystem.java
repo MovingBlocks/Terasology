@@ -260,20 +260,4 @@ public class DelayedActionSystem extends BaseComponentSystem implements UpdateSu
             periodicEntity.saveComponent(periodicActionComponent);
         }
     }
-
-    // Deprecated methods
-    @ReceiveEvent(components = {DelayedActionComponent.class})
-    public void getDelayedAction(HasDelayedActionEvent event, EntityRef entity) {
-        event.setResult(hasDelayedAction(entity, event.getActionId()));
-    }
-
-    @ReceiveEvent(components = {DelayedActionComponent.class})
-    public void cancelDelayedAction(CancelDelayedActionEvent event, EntityRef entity) {
-        cancelDelayedAction(entity, event.getActionId());
-    }
-
-    @ReceiveEvent
-    public void addDelayedAction(AddDelayedActionEvent event, EntityRef entity) {
-        addDelayedAction(entity, event.getActionId(), event.getDelay());
-    }
 }

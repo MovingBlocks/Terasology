@@ -1,0 +1,42 @@
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
+
+// This is still in Groovy because the embedded Groovy has a JsonBuilder.
+import groovy.json.JsonBuilder
+
+
+// TODO: This is not the Gradle Way. Needs more declared output-fu to determine up-to-date instead of the if
+tasks.register("setupServerConfig") {
+    description "Parses parameters passed via Gradle and writes them to the local run-from-source server dir's config.cfg"
+
+    def json = new JsonBuilder()
+
+    def serverRoot = rootProject.file(localServerDataPath);
+    def config = new File(serverRoot, 'config.cfg')
+
+    if (!config.exists()) {
+
+        serverRoot.mkdir()
+        logger.lifecycle("Creating config file $config")
+
+        json {
+            worldGeneration {
+                if (project.hasProperty('seed')) {
+                    logger.lifecycle("  Seed value: $seed");
+                    defaultSeed seed
+                }
+                if (project.hasProperty('worldGen')) {
+                    logger.lifecycle("  World Generator: $worldGen");
+                    defaultGenerator worldGen
+                }
+            }
+            defaultModSelection {
+                if (project.hasProperty('extraModules')) {
+                    logger.lifecycle("  Enabling modules: $extraModules");
+                    modules extraModules.tokenize(" ,")
+                }
+            }
+        }
+        config.text = json.toPrettyString()
+    }
+}

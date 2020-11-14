@@ -20,6 +20,7 @@ import org.terasology.nui.Color;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.PersistedDataArray;
 import org.terasology.persistence.typeHandling.PersistedDataSerializer;
+import org.terasology.persistence.typeHandling.TypeHandler;
 
 import java.util.Optional;
 
@@ -27,7 +28,7 @@ import java.util.Optional;
  * Serializes {@link Color} instances to an int array <code>[r, g, b, a]</code>.
  * De-serializing also supports hexadecimal strings such as <code>"AAAAAAFF"</code>.
  */
-public class ColorTypeHandler extends org.terasology.persistence.typeHandling.TypeHandler<Color> {
+public class ColorTypeHandler extends TypeHandler<Color> {
 
     @Override
     public PersistedData serializeNonNull(Color value, PersistedDataSerializer serializer) {

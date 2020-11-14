@@ -16,9 +16,10 @@
 package org.terasology.persistence.internal;
 
 import com.google.common.collect.Maps;
+import org.joml.Vector3i;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.game.GameManifest;
-import org.terasology.math.geom.Vector3i;
+import org.terasology.math.JomlUtil;
 import org.terasology.protobuf.EntityData;
 import org.terasology.recording.RecordAndReplayCurrentStatus;
 import org.terasology.recording.RecordAndReplaySerializer;
@@ -75,13 +76,13 @@ class SaveTransactionBuilder {
         this.globalStoreBuilder = globalStoreBuilder;
     }
 
-    void addUnloadedChunk(final Vector3i chunkPosition, final CompressedChunkBuilder b) {
-        unloadedChunks.put(chunkPosition, b);
+    void addUnloadedChunk(final org.terasology.math.geom.Vector3i chunkPosition, final CompressedChunkBuilder b) {
+        unloadedChunks.put(JomlUtil.from(chunkPosition), b);
     }
 
 
-    void addLoadedChunk(final Vector3i chunkPosition, final ChunkImpl chunk) {
-        loadedChunks.put(chunkPosition, chunk);
+    void addLoadedChunk(final org.terasology.math.geom.Vector3i chunkPosition, final ChunkImpl chunk) {
+        loadedChunks.put(JomlUtil.from(chunkPosition), chunk);
     }
 
     public SaveTransaction build() {

@@ -16,9 +16,9 @@
 package org.terasology.rendering.opengl;
 
 import org.lwjgl.BufferUtils;
-import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL30;
+import org.terasology.engine.subsystem.DisplayDevice;
 import org.terasology.utilities.Assets;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.math.geom.BaseVector2i;
@@ -40,11 +40,13 @@ import static org.lwjgl.opengl.GL11.glOrtho;
  * A OpenGL framebuffer. Generates the fbo and a backing texture.
  */
 public class LwjglFrameBufferObject implements FrameBufferObject {
+    private DisplayDevice displayDevice;
     private int frame;
     private ImmutableVector2i size;
     private IntBuffer vp;
 
-    public LwjglFrameBufferObject(ResourceUrn urn, BaseVector2i size) {
+    public LwjglFrameBufferObject(DisplayDevice displayDevice, ResourceUrn urn, BaseVector2i size) {
+        this.displayDevice = displayDevice;
         this.size = ImmutableVector2i.createOrUse(size);
 
         IntBuffer fboId = BufferUtils.createIntBuffer(1);
@@ -85,7 +87,7 @@ public class LwjglFrameBufferObject implements FrameBufferObject {
         glLoadIdentity();
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
-        glOrtho(0, Display.getWidth(), Display.getHeight(), 0, 0, 2048f);
+        glOrtho(0, displayDevice.getWidth(), displayDevice.getHeight(), 0, 0, 2048f);
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
     }
@@ -93,7 +95,7 @@ public class LwjglFrameBufferObject implements FrameBufferObject {
     @Override
     public void bindFrame() {
         vp = BufferUtils.createIntBuffer(16);
-        GL11.glGetInteger(GL11.GL_VIEWPORT, vp);
+        GL11.glGetIntegerv(GL11.GL_VIEWPORT, vp);
 
         GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, frame);
         GL11.glViewport(0, 0, size.x(), size.y());
