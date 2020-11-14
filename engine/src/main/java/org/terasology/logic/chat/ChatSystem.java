@@ -38,8 +38,8 @@ import org.terasology.logic.console.suggesters.OnlineUsernameSuggester;
 import org.terasology.logic.console.ui.NotificationOverlay;
 import org.terasology.logic.permission.PermissionManager;
 import org.terasology.network.ClientComponent;
-import org.terasology.registry.In;
 import org.terasology.nui.FontColor;
+import org.terasology.registry.In;
 import org.terasology.rendering.nui.NUIManager;
 
 import java.util.Arrays;
@@ -70,7 +70,7 @@ public class ChatSystem extends BaseComponentSystem {
 
     @ReceiveEvent(components = ClientComponent.class)
     public void onToggleChat(ChatButton event, EntityRef entity) {
-        if (event.getState() == ButtonState.DOWN) {
+        if (event.getState() == ButtonState.UP) {
             nuiManager.pushScreen(CHAT_UI);
             overlay.setVisible(false);
             event.consume();

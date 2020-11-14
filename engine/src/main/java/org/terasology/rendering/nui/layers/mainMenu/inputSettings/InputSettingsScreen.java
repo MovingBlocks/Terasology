@@ -120,16 +120,20 @@ public class InputSettingsScreen extends CoreScreenLayer {
         }
 
         UISlider mouseSensitivity = new UISlider("mouseSensitivity");
-        mouseSensitivity.bindValue(BindHelper.bindBeanProperty("mouseSensitivity", inputDeviceConfiguration, Float.TYPE));
+        mouseSensitivity.bindValue(BindHelper.bindBeanProperty("mouseSensitivity", inputDeviceConfiguration,
+                Float.TYPE));
         mouseSensitivity.setIncrement(0.025f);
         mouseSensitivity.setPrecision(3);
 
         UICheckbox mouseInverted = new UICheckbox("mouseYAxisInverted");
-        mouseInverted.bindChecked(BindHelper.bindBeanProperty("mouseYAxisInverted", inputDeviceConfiguration, Boolean.TYPE));
+        mouseInverted.bindChecked(BindHelper.bindBeanProperty("mouseYAxisInverted", inputDeviceConfiguration,
+                Boolean.TYPE));
 
         if (mainLayout != null) {
-            mainLayout.addWidget(new UILabel("mouseLabel", "subheading", translationSystem.translate("${engine:menu#category-mouse}")));
-            mainLayout.addWidget(new RowLayout(new UILabel(translationSystem.translate("${engine:menu#mouse-sensitivity}") + ":"), mouseSensitivity)
+            mainLayout.addWidget(new UILabel("mouseLabel", "subheading", translationSystem.translate("${engine:menu" +
+                    "#category-mouse}")));
+            mainLayout.addWidget(new RowLayout(new UILabel(translationSystem.translate("${engine:menu#mouse" +
+                    "-sensitivity}") + ":"), mouseSensitivity)
                     .setColumnRatios(0.4f)
                     .setHorizontalSpacing(horizontalSpacing));
             mainLayout.addWidget(new RowLayout(new UILabel(translationSystem.translate("${engine:menu#invert-mouse}") + ":"), mouseInverted)
@@ -146,11 +150,13 @@ public class InputSettingsScreen extends CoreScreenLayer {
                 ResolutionResult result = resolver.resolve(moduleId);
                 if (result.isSuccess()) {
                     try (ModuleEnvironment environment = moduleManager.loadEnvironment(result.getModules(), false)) {
-                        for (Class<?> holdingType : environment.getTypesAnnotatedWith(InputCategory.class, new FromModule(environment, moduleId))) {
+                        for (Class<?> holdingType : environment.getTypesAnnotatedWith(InputCategory.class,
+                                new FromModule(environment, moduleId))) {
                             InputCategory inputCategory = holdingType.getAnnotation(InputCategory.class);
                             inputCategories.put(module.getId() + ":" + inputCategory.id(), inputCategory);
                         }
-                        for (Class<?> bindEvent : environment.getTypesAnnotatedWith(RegisterBindButton.class, new FromModule(environment, moduleId))) {
+                        for (Class<?> bindEvent : environment.getTypesAnnotatedWith(RegisterBindButton.class,
+                                new FromModule(environment, moduleId))) {
                             if (BindButtonEvent.class.isAssignableFrom(bindEvent)) {
                                 RegisterBindButton bindRegister = bindEvent.getAnnotation(RegisterBindButton.class);
                                 inputsById.put(new SimpleUri(module.getId(), bindRegister.id()), bindRegister);
@@ -189,7 +195,7 @@ public class InputSettingsScreen extends CoreScreenLayer {
     /**
      * Binds button to key while ensuring visual feedback on the user interface
      *
-     * @param key    one constant from the {@link KeyId}s.
+     * @param key one constant from the {@link KeyId}s.
      * @param bindId the uri for the binding, e.g. <code>engine:forwards</code>.
      */
     private void setPrimaryBind(int key, SimpleUri bindId) {
@@ -197,7 +203,8 @@ public class InputSettingsScreen extends CoreScreenLayer {
         new InputConfigBinding(bindConfig, bindId, PRIMARY_BIND_INDEX).set(InputType.KEY.getInput(key));
     }
 
-    private void addInputSection(InputCategory category, ColumnLayout layout, Map<SimpleUri, RegisterBindButton> inputsById) {
+    private void addInputSection(InputCategory category, ColumnLayout layout,
+                                 Map<SimpleUri, RegisterBindButton> inputsById) {
         if (category != null) {
             layout.addWidget(new UISpace(new Vector2i(0, 16)));
 
@@ -262,7 +269,8 @@ public class InputSettingsScreen extends CoreScreenLayer {
         mvmtDeadZone.setRange(1);
         mvmtDeadZone.setPrecision(2);
         mvmtDeadZone.bindValue(BindHelper.bindBeanProperty("movementDeadZone", info, Float.TYPE));
-        layout.addWidget(new RowLayout(new UILabel(translationSystem.translate("${engine:menu#movement-dead-zone}")), mvmtDeadZone)
+        layout.addWidget(new RowLayout(new UILabel(translationSystem.translate("${engine:menu#movement-dead-zone}")),
+                mvmtDeadZone)
                 .setColumnRatios(columnRatio)
                 .setHorizontalSpacing(horizontalSpacing));
 
@@ -273,7 +281,8 @@ public class InputSettingsScreen extends CoreScreenLayer {
         rotDeadZone.setPrecision(2);
         rotDeadZone.bindValue(BindHelper.bindBeanProperty("rotationDeadZone", info, Float.TYPE));
 
-        layout.addWidget(new RowLayout(new UILabel(translationSystem.translate("${engine:menu#rotation-dead-zone}")), rotDeadZone)
+        layout.addWidget(new RowLayout(new UILabel(translationSystem.translate("${engine:menu#rotation-dead-zone}")),
+                rotDeadZone)
                 .setColumnRatios(columnRatio)
                 .setHorizontalSpacing(horizontalSpacing));
 
@@ -286,7 +295,8 @@ public class InputSettingsScreen extends CoreScreenLayer {
         UIButton primaryInputBind = makeInputBindButton(uri, bind, binds, PRIMARY_BIND_INDEX);
         UIButton secondaryInputBind = makeInputBindButton(uri, bind, binds, SECONDARY_BIND_INDEX);
 
-        layout.addWidget(new RowLayout(new UILabel(translationSystem.translate(bind.description())), primaryInputBind, secondaryInputBind)
+        layout.addWidget(new RowLayout(new UILabel(translationSystem.translate(bind.description())), primaryInputBind
+                , secondaryInputBind)
                 .setColumnRatios(0.4f)
                 .setHorizontalSpacing(horizontalSpacing));
     }
@@ -307,9 +317,18 @@ public class InputSettingsScreen extends CoreScreenLayer {
         bindsManager.registerBinds();
 
         // TODO: Find a better place to do this in.
-        TabbingManager.tabForwardInput = bindsManager.getBindsConfig().getBinds(new SimpleUri("engine:tabbingUI")).get(0);
-        TabbingManager.tabBackInputModifier = bindsManager.getBindsConfig().getBinds(new SimpleUri("engine:tabbingModifier")).get(0);
-        TabbingManager.activateInput = bindsManager.getBindsConfig().getBinds(new SimpleUri("engine:activate")).get(0);
+        BindsConfig bindsConf = bindsManager.getBindsConfig();
+        if (bindsConf != null) {
+            bindsConf.getBinds(new SimpleUri("engine:tabbingUI")).stream().findFirst().ifPresent(input -> {
+                TabbingManager.tabForwardInput = input;
+            });
+            bindsConf.getBinds(new SimpleUri("engine:tabbingModifier")).stream().findFirst().ifPresent(input -> {
+                TabbingManager.tabBackInputModifier = input;
+            });
+            bindsConf.getBinds(new SimpleUri("engine:activate")).stream().findFirst().ifPresent(input -> {
+                TabbingManager.activateInput = input;
+            });
+        }
     }
 
     @Override

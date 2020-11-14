@@ -20,8 +20,8 @@ import org.slf4j.LoggerFactory;
 import org.terasology.math.geom.Rect2f;
 import org.terasology.math.geom.Vector2f;
 import org.terasology.persistence.typeHandling.TypeHandler;
-import org.terasology.persistence.typeHandling.TypeHandlerFactory;
 import org.terasology.persistence.typeHandling.TypeHandlerContext;
+import org.terasology.persistence.typeHandling.TypeHandlerFactory;
 import org.terasology.persistence.typeHandling.mathTypes.Rect2fTypeHandler;
 import org.terasology.reflection.TypeInfo;
 
@@ -37,7 +37,7 @@ public class Rect2fTypeHandlerFactory implements TypeHandlerFactory {
         }
 
         Optional<TypeHandler<Vector2f>> vector2fTypeHandler =
-                context.getTypeHandlerLibrary().getTypeHandler(Vector2f.class);
+            context.getTypeHandlerLibrary().getTypeHandler(Vector2f.class);
 
         if (!vector2fTypeHandler.isPresent()) {
             LOGGER.error("No Vector2f type handler found");
@@ -45,7 +45,7 @@ public class Rect2fTypeHandlerFactory implements TypeHandlerFactory {
         }
 
         Rect2fTypeHandler rect2fTypeHandler =
-                new Rect2fTypeHandler(vector2fTypeHandler.get());
+            new Rect2fTypeHandler(vector2fTypeHandler.get());
 
         return Optional.of((TypeHandler<T>) rect2fTypeHandler);
 
