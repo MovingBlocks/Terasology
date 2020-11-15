@@ -16,9 +16,9 @@
 package org.terasology.rendering.primitives;
 
 import com.google.common.collect.Maps;
+import org.joml.Vector3ic;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.math.Side;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.world.ChunkView;
 import org.terasology.world.block.Block;
@@ -44,8 +44,8 @@ public class BlockMeshGeneratorSingleShape implements BlockMeshGenerator {
         // Gather adjacent blocks
         final Map<Side, Block> adjacentBlocks = Maps.newEnumMap(Side.class);
         for (Side side : Side.getAllSides()) {
-            Vector3i offset = side.getVector3i();
-            Block blockToCheck = view.getBlock(x + offset.x, y + offset.y, z + offset.z);
+            Vector3ic offset = side.direction();
+            Block blockToCheck = view.getBlock(x + offset.x(), y + offset.y(), z + offset.z());
             adjacentBlocks.put(side, blockToCheck);
         }
         for (final Side side : Side.getAllSides()) {
@@ -65,8 +65,8 @@ public class BlockMeshGeneratorSingleShape implements BlockMeshGenerator {
                     final Block topBlock = adjacentBlocks.get(Side.TOP);
                     // Draw horizontal sides if visible from below
                     if (topBlock.isLiquid() && Side.horizontalSides().contains(side)) {
-                        final Vector3i offset = side.getVector3i();
-                        final Block adjacentAbove = view.getBlock(x + offset.x, y + 1, z + offset.z);
+                        final Vector3ic offset = side.direction();
+                        final Block adjacentAbove = view.getBlock(x + offset.x(), y + 1, z + offset.z());
                         final Block adjacent = adjacentBlocks.get(side);
 
                         if (adjacent.isLiquid() && !adjacentAbove.isLiquid()) {
@@ -141,7 +141,7 @@ public class BlockMeshGeneratorSingleShape implements BlockMeshGenerator {
         if (currentBlock.isLiquid() && blockToCheck.isLiquid()) {
             return false;
         }
-        
+
         //TODO: This only fixes the "water under block" issue of the top side not being rendered. (see bug #3889)
         //Note: originally tried .isLiquid() instead of isWater for both checks, but IntelliJ was warning that
         //      !blockToCheck.isWater() is always true, may need further investigation

@@ -15,9 +15,10 @@
  */
 package org.terasology.persistence.internal;
 
+import org.joml.Vector3i;
+import org.joml.Vector3ic;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.game.GameManifest;
-import org.terasology.math.geom.Vector3i;
 
 import java.nio.file.Path;
 
@@ -105,35 +106,35 @@ public class StoragePathProvider {
         return unfinishedSaveTransactionPath.resolve(GLOBAL_ENTITY_STORE);
     }
 
-    public String getChunkFilename(Vector3i pos) {
-        return String.format("%d.%d.%d.chunk", pos.x, pos.y, pos.z);
+    public String getChunkFilename(Vector3ic pos) {
+        return String.format("%d.%d.%d.chunk", pos.x(), pos.y(), pos.z());
     }
 
 
-    private String getChunkZipFilename(Vector3i pos) {
-        return String.format("%d.%d.%d.chunks.zip", pos.x, pos.y, pos.z);
+    private String getChunkZipFilename(Vector3ic pos) {
+        return String.format("%d.%d.%d.chunks.zip", pos.x(), pos.y(), pos.z());
     }
 
-    public Vector3i getChunkZipPosition(Vector3i chunkPos) {
+    public Vector3i getChunkZipPosition(Vector3ic chunkPos) {
         Vector3i result = new Vector3i(chunkPos);
         result.div(CHUNK_ZIP_DIM);
-        if (chunkPos.x < 0) {
+        if (chunkPos.x() < 0) {
             result.x -= 1;
         }
-        if (chunkPos.y < 0) {
+        if (chunkPos.y() < 0) {
             result.y -= 1;
         }
-        if (chunkPos.z < 0) {
+        if (chunkPos.z() < 0) {
             result.z -= 1;
         }
         return result;
     }
 
-    public Path getChunkPath(Vector3i chunkPos) {
+    public Path getChunkPath(Vector3ic chunkPos) {
         return worldPath.resolve(getChunkFilename(chunkPos));
     }
 
-    public Path getChunkTempPath(Vector3i chunkPos) {
+    public Path getChunkTempPath(Vector3ic chunkPos) {
         return getWorldTempPath().resolve(getChunkFilename(chunkPos));
     }
 

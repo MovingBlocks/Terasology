@@ -1,18 +1,6 @@
-/*
- * Copyright 2014 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *  http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
+
 package org.terasology.rendering.nui;
 
 import org.joml.Rectanglei;
@@ -30,6 +18,7 @@ import org.terasology.nui.TabbingManager;
 import org.terasology.nui.UIWidget;
 import org.terasology.nui.WidgetWithOrder;
 import org.terasology.nui.events.NUIBindButtonEvent;
+import org.terasology.nui.events.NUICharEvent;
 import org.terasology.nui.events.NUIKeyEvent;
 import org.terasology.nui.events.NUIMouseButtonEvent;
 import org.terasology.nui.events.NUIMouseClickEvent;
@@ -311,6 +300,11 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
         }
 
         return super.onKeyEvent(event);
+    }
+
+    @Override
+    public boolean onCharEvent(NUICharEvent nuiEvent) {
+        return false;
     }
 
     protected boolean isEscapeToCloseAllowed() {

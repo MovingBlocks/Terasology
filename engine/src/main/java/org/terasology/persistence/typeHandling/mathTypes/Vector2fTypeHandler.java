@@ -21,12 +21,13 @@ import org.joml.Vector2f;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.PersistedDataArray;
 import org.terasology.persistence.typeHandling.PersistedDataSerializer;
+import org.terasology.persistence.typeHandling.TypeHandler;
 
 import java.util.Optional;
 
 /**
  */
-public class Vector2fTypeHandler extends org.terasology.persistence.typeHandling.TypeHandler<Vector2f> {
+public class Vector2fTypeHandler extends TypeHandler<Vector2f> {
 
     @Override
     public PersistedData serializeNonNull(Vector2f value, PersistedDataSerializer serializer) {

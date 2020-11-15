@@ -35,7 +35,7 @@ public class Rect2iTypeHandler extends TypeHandler<Rect2i> {
     private static final String MIN_FIELD = "min";
     private static final String SIZE_FIELD = "size";
 
-    private TypeHandler<Vector2i> vector2iTypeHandler;
+    private final TypeHandler<Vector2i> vector2iTypeHandler;
 
     public Rect2iTypeHandler(TypeHandler<Vector2i> vector2iTypeHandler) {
         this.vector2iTypeHandler = vector2iTypeHandler;

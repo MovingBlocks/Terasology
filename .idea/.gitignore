@@ -34,3 +34,6 @@ workspace.xml
 
 # Discord preferences don't need sharing
 /discord.xml
+
+# Automatically created when the checkout directy name is different from git origin?
+/.name

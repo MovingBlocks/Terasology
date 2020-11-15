@@ -56,7 +56,7 @@ public class ConsoleSystem extends BaseComponentSystem {
 
     @ReceiveEvent(components = ClientComponent.class, priority = EventPriority.PRIORITY_CRITICAL)
     public void onToggleConsole(ConsoleButton event, EntityRef entity) {
-        if (event.getState() == ButtonState.DOWN) {
+        if (event.getState() == ButtonState.UP) {
             nuiManager.toggleScreen("engine:console");
             overlay.setVisible(false);
             event.consume();

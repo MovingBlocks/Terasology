@@ -15,16 +15,16 @@
  */
 package org.terasology.engine.internal;
 
-import org.lwjgl.Sys;
+import org.lwjgl.glfw.GLFW;
 
 public final class TimeLwjgl extends TimeBase {
 
     public TimeLwjgl() {
-        super((Sys.getTime() * 1000) / Sys.getTimerResolution());
+        super((long) (GLFW.glfwGetTime() * 1000));
     }
 
     @Override
     public long getRawTimeInMs() {
-        return (Sys.getTime() * 1000) / Sys.getTimerResolution();
+        return (long) (GLFW.glfwGetTime() * 1000);
     }
 }

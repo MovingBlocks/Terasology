@@ -22,7 +22,9 @@ import gnu.trove.list.array.TFloatArrayList;
 /**
  * A generic event for getting a value for a property.
  * <p>
- * The result value is guaranteed to be greater or equal to zero.
+ * There are 2 different methods which calculate the Result Value for this event:
+ *  1. getResultValue() - The result value is guaranteed to be greater or equal to zero.
+ *  2. getResultValueWithoutCapping() - Negative result values are allowed in this method.
  */
 public abstract class AbstractValueModifiableEvent implements Event {
     private final float baseValue;
@@ -60,11 +62,10 @@ public abstract class AbstractValueModifiableEvent implements Event {
     }
 
     /**
-     * Calculates the result value from the base value and given modifiers and multipliers.
-     * <p>
-     * The value is calculated based on the following formula:
+     * Uses {@link AbstractValueModifiableEvent#getResultValueWithoutCapping()} to obtain the result value and returns
+     * the same if positive and zero if negative.
      * <pre>
-     * result = max(0, (<baseValue> + Σ <modifier>) * Π <multiplier> + Σ <postModifier>)
+     * result = max(0, ResultValueWithoutCapping)
      * </pre>
      *
      * <emph>The result value is guaranteed to be non-negative!</emph>
@@ -73,8 +74,29 @@ public abstract class AbstractValueModifiableEvent implements Event {
         //TODO(skaldarnar): Based on a discussion in https://github.com/MovingBlocks/Terasology/pull/4063 we may want
         // to lift the guarantee/restriction that the result value needs to be non-negative. Systems are still free to
         // apply this restriction if needed.
-        return Math.max(0, (baseValue + modifiers.sum()) * product(multipliers) + postModifiers.sum());
+        return Math.max(0, getResultValueWithoutCapping());
     }
+
+    /**
+     * This is a temporary method to be used in events where negative value support is essential for calculating the
+     * result value.
+     * <p>
+     * Calculates the result value from the base value and given modifiers and multipliers.
+     * <p>
+     * The value is calculated based on the following formula:
+     * <pre>
+     * result = (<baseValue> + Σ <modifier>) * Π <multiplier> + Σ <postModifier>
+     * </pre>
+     *
+     * <emph>Negative result values are allowed here.</emph>
+     */
+    public float getResultValueWithoutCapping() {
+        //TODO: Based on an extended discussion from : https://github.com/MovingBlocks/Terasology/pull/4063
+        // This is a temporary method which should be merged with the getResultValue() after all its uses are
+        // checked out and corrected for(if needed).
+        return (baseValue + modifiers.sum()) * product(multipliers) + postModifiers.sum();
+    }
+
 
     public TFloatList getModifiers() {
         return modifiers;

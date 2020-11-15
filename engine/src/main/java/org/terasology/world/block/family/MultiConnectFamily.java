@@ -19,6 +19,7 @@ import com.google.common.collect.Sets;
 import gnu.trove.map.TByteObjectMap;
 import gnu.trove.map.hash.TByteObjectHashMap;
 import org.joml.Vector3f;
+import org.joml.Vector3ic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.math.JomlUtil;
@@ -52,15 +53,15 @@ public abstract class MultiConnectFamily extends AbstractBlockFamily implements 
 
     @In
     protected WorldProvider worldProvider;
-    
+
     @In
     protected BlockEntityRegistry blockEntityRegistry;
 
     protected TByteObjectMap<Block> blocks = new TByteObjectHashMap<>();
-    
+
     /**
      * Constructor for a block with a specified shape
-     * 
+     *
      * @param definition Family definition
      * @param shape The shape of the block
      * @param blockBuilder The builder to make the blocks for the family
@@ -71,7 +72,7 @@ public abstract class MultiConnectFamily extends AbstractBlockFamily implements 
 
     /**
      * Constructor for a regular block
-     * 
+     *
      * @param definition Family definition
      * @param blockBuilder The builder to make the blocks for the family
      */
@@ -81,20 +82,34 @@ public abstract class MultiConnectFamily extends AbstractBlockFamily implements 
 
     /**
      * A condition to return true if the block should have a connection on the given side
-     * 
+     *
      * @param blockLocation The position of the block in question
      * @param connectSide The side to determine connection for
-     * 
+     *
+     * @return A boolean indicating if the block should connect on the given side
+     * @deprecated This method is scheduled for removal in an upcoming version.
+     *             Use the JOML implementation instead: {@link #connectionCondition(Vector3ic, Side)}.
+     */
+    @Deprecated
+    protected abstract boolean connectionCondition(Vector3i blockLocation, Side connectSide);
+
+    /**
+     * A condition to return true if the block should have a connection on the given side
+     *
+     * @param blockLocation The position of the block in question
+     * @param connectSide The side to determine connection for
+     *
      * @return A boolean indicating if the block should connect on the given side
      */
-    protected abstract boolean connectionCondition(Vector3i blockLocation, Side connectSide);
+    protected abstract boolean connectionCondition(Vector3ic blockLocation, Side connectSide);
+
 
     /**
      * The sides of the block that can be connected to.
      * Example: In a family like RomanColumn, this method only returns SideBitFlag.getSides(Side.TOP, Side.BOTTOM)
      * because a column should only connect on the top and bottom.
      * Example 2: In the signalling module, this returns all of the possible sides because a cable can connect in any direction.
-     * 
+     *
      * @return The sides of the block that can be connected to
      */
     public abstract byte getConnectionSides();
@@ -106,7 +121,7 @@ public abstract class MultiConnectFamily extends AbstractBlockFamily implements 
     public abstract Block getArchetypeBlock();
 
     /**
-     * 
+     *
      * @param root The root block URI of the family
      * @param definition The definition of the block family as passed down from the engine
      * @param blockBuilder The block builder to make the blocks in the family
@@ -182,14 +197,25 @@ public abstract class MultiConnectFamily extends AbstractBlockFamily implements 
 
     /**
      * Update the block then a neighbor changes
-     * 
+     *
      * @param location The location of the block
      * @param oldBlock What the block was before the neighbor updated
-     * 
+     *
      * @return The block from the family to be placed
      */
     @Override
     public Block getBlockForNeighborUpdate(Vector3i location, Block oldBlock) {
+        byte connections = 0;
+        for (Side connectSide : SideBitFlag.getSides(getConnectionSides())) {
+            if (this.connectionCondition(location, connectSide)) {
+                connections += SideBitFlag.getSide(connectSide);
+            }
+        }
+        return blocks.get(connections);
+    }
+
+    @Override
+    public Block getBlockForNeighborUpdate(Vector3ic location, Block oldBlock) {
         byte connections = 0;
         for (Side connectSide : SideBitFlag.getSides(getConnectionSides())) {
             if (this.connectionCondition(location, connectSide)) {

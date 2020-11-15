@@ -1,18 +1,5 @@
-/*
- * Copyright 2013 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.world.internal;
 
@@ -39,7 +26,6 @@ import org.terasology.world.chunks.CoreChunk;
 import org.terasology.world.chunks.LitChunk;
 import org.terasology.world.chunks.ManagedChunk;
 import org.terasology.world.chunks.RenderableChunk;
-import org.terasology.world.chunks.internal.GeneratingChunkProvider;
 import org.terasology.world.propagation.BatchPropagator;
 import org.terasology.world.propagation.BlockChange;
 import org.terasology.world.propagation.PropagationRules;
@@ -72,7 +58,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
     private String seed = "";
     private SimpleUri worldGenerator;
 
-    private GeneratingChunkProvider chunkProvider;
+    private ChunkProvider chunkProvider;
     private WorldTime worldTime;
     private EntityManager entityManager;
 
@@ -84,7 +70,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
     private Block unloadedBlock;
 
     public WorldProviderCoreImpl(String title, String customTitle, String seed, long time, SimpleUri worldGenerator,
-                                 GeneratingChunkProvider chunkProvider, Block unloadedBlock, Context context) {
+                                 ChunkProvider chunkProvider, Block unloadedBlock, Context context) {
         this.title = (title == null) ? seed : title;
         this.customTitle = customTitle;
         this.seed = seed;
@@ -106,7 +92,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
         propagators.add(sunlightPropagator);
     }
 
-    public WorldProviderCoreImpl(WorldInfo info, GeneratingChunkProvider chunkProvider, Block unloadedBlock,
+    public WorldProviderCoreImpl(WorldInfo info, ChunkProvider chunkProvider, Block unloadedBlock,
                                  Context context) {
         this(info.getTitle(), info.getCustomTitle(), info.getSeed(), info.getTime(), info.getWorldGenerator(), chunkProvider,
                 unloadedBlock, context);
@@ -207,7 +193,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
                     oldChange.setTo(type);
                 }
                 setDirtyChunksNear(JomlUtil.from(worldPos));
-                notifyBlockChanged(JomlUtil.from(worldPos), type, oldBlockType);
+                notifyBlockChanged(worldPos, type, oldBlockType);
             }
             return oldBlockType;
 
@@ -250,7 +236,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
         }
 
         for (BlockChange change : changedBlocks) {
-            notifyBlockChanged(JomlUtil.from(change.getPosition()), change.getTo(), change.getFrom());
+            notifyBlockChanged(change.getPosition(), change.getTo(), change.getFrom());
         }
 
         return result;
@@ -265,7 +251,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
         }
     }
 
-    private void notifyBlockChanged(Vector3i pos, Block type, Block oldType) {
+    private void notifyBlockChanged(Vector3ic pos, Block type, Block oldType) {
         // TODO: Could use a read/write writeLock.
         // TODO: Review, should only happen on main thread (as should changes to listeners)
         synchronized (listeners) {
@@ -275,7 +261,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
         }
     }
 
-    private void notifyExtraDataChanged(int index, Vector3i pos, int newData, int oldData) {
+    private void notifyExtraDataChanged(int index, Vector3ic pos, int newData, int oldData) {
         // TODO: Change to match block , if those changes are made.
         synchronized (listeners) {
             for (WorldChangeListener listener : listeners) {
@@ -345,7 +331,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
             chunk.setExtraData(index, blockPos.x, blockPos.y, blockPos.z, value);
             if (oldValue != value) {
                 setDirtyChunksNear(worldPos);
-                notifyExtraDataChanged(index, worldPos, value, oldValue);
+                notifyExtraDataChanged(index, JomlUtil.from(worldPos), value, oldValue);
             }
             return oldValue;
         }

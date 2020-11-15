@@ -26,6 +26,7 @@ import org.joml.Rayf;
 import org.joml.RoundingMode;
 import org.joml.Spheref;
 import org.joml.Vector2f;
+import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
@@ -402,6 +403,20 @@ public class BlockRegion {
      */
     public boolean containsBlock(Vector3ic pos) {
         return containsBlock(pos.x(), pos.y(), pos.z());
+    }
+
+    /**
+     * the center of the region
+     *
+     * @param dest will hold the result
+     * @return dest
+     */
+    public Vector3f center(Vector3f dest) {
+        return dest.set(
+            (aabb.maxX - aabb.minX) / 2.0f,
+            (aabb.maxY - aabb.minY) / 2.0f,
+            (aabb.maxZ - aabb.minZ) / 2.0f
+        );
     }
 
     /**
