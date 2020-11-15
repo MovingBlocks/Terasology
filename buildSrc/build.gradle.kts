@@ -24,5 +24,5 @@ dependencies {
     implementation("dom4j:dom4j:1.6.1")
 
     // for inspecting modules
-    implementation("org.terasology:gestalt-module:5.1.5")   // TODO: sync version w engine?
+    implementation("org.terasology:gestalt-module:5.1.5")
 }
