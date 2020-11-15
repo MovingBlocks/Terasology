@@ -85,11 +85,6 @@ configure<SourceSetContainer> {
 val convention = project.getConvention().getPlugin(JavaPluginConvention::class)
 val mainSourceSet = convention.getSourceSets().getByName("main")
 
-// TODO: Remove when we don't need to rely on snapshots. Needed here for solo builds in Jenkins
-configurations.all {
-    resolutionStrategy.cacheChangingModulesFor(0, "seconds")
-}
-
 
 val deps = moduleConfig.dependencies.filterNotNull()
 val moduleDepends = deps.filterNot { it.id.toString() == "engine" }

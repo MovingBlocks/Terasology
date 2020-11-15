@@ -71,11 +71,6 @@ configurations {
     }
 }
 
-// TODO: Remove when we don't need to rely on snapshots. Wonder why modules respected this set in root project, engine not so much
-configurations.all {
-    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
-}
-
 // Primary dependencies definition
 dependencies {
     // Storage and networking
