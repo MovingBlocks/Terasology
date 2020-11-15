@@ -134,11 +134,11 @@ val commonConfigure : JavaExec.()-> Unit = {
 
     classpath(sourceSets["main"].runtimeClasspath)
 
-    args("-homeDir")
+    args("--homedir=.")
     jvmArgs("-Xmx1536m")
 
     if (isMacOS()) {
-        args("-noSplash")
+        args("--no-splash")
         jvmArgs("-XstartOnFirstThread", "-Djava.awt.headless=true")
     }
 }
@@ -169,7 +169,7 @@ tasks.register<JavaExec>("permissiveNatives") {
     commonConfigure()
     description = "Run 'Terasology' with security set to permissive and natives loading a second way (for KComputers)"
 
-    args("-permissiveSecurity")
+    args("--permissive-security")
     systemProperty("java.library.path", rootProject.file(dirNatives + "/" + nativeSubdirectoryName()))
 }
 
@@ -201,7 +201,7 @@ tasks.register<JavaExec>("server") {
     description = "Starts a headless multiplayer server with data stored in [project-root]/$localServerDataPath"
     dependsOn("setupServerConfig")
     dependsOn("setupServerModules")
-    args("-headless", "-homedir=$localServerDataPath")
+    args("--headless", "--homedir=$localServerDataPath")
 }
 
 // Preps a version file to bundle with PC dists. This eventually goes into the root of a zip file
