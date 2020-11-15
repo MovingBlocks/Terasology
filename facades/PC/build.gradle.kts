@@ -86,6 +86,9 @@ logger.info("PC VERSION: {}", version)
 group = "org.terasology.facades"
 
 dependencies {
+    implementation(group = "info.picocli", name = "picocli", version = "4.5.2")
+    annotationProcessor("info.picocli:picocli-codegen:4.5.2")
+
     implementation(project(":engine"))
     implementation(group = "org.reflections", name = "reflections", version = "0.9.10")
     implementation(project(":subsystems:DiscordRPC"))
@@ -110,6 +113,11 @@ configurations {
         description = "for fetching modules for running a server"
         isTransitive = false
     }
+}
+
+tasks.named<JavaCompile>("compileJava") {
+    // according to https://picocli.info/#_gradle_2
+    options.compilerArgs.add("-Aproject=${project.group}/${project.name}")
 }
 
 // Used for all game configs.
