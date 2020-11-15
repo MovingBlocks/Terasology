@@ -5,6 +5,8 @@
 workspace.xml
 *.iws
 
+/caches
+
 # Shelf is where it put changes you're not ready to share. (it's like git stash)
 /shelf
 
