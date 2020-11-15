@@ -19,16 +19,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.logic.afk.AfkComponent;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.logic.players.PlayerUtil;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.PingStockComponent;
 import org.terasology.network.events.SubscribePingEvent;
 import org.terasology.network.events.UnSubscribePingEvent;
-import org.terasology.registry.In;
-import org.terasology.rendering.nui.CoreScreenLayer;
+import org.terasology.nui.Color;
+import org.terasology.nui.FontColor;
 import org.terasology.nui.databinding.ReadOnlyBinding;
 import org.terasology.nui.widgets.UIText;
+import org.terasology.registry.In;
+import org.terasology.rendering.nui.CoreScreenLayer;
 
 import java.util.Map;
 
@@ -97,6 +100,13 @@ public class OnlinePlayersOverlay extends CoreScreenLayer {
             }
 
             ClientComponent clientComp = clientEntity.getComponent(ClientComponent.class);
+            AfkComponent afkComponent = clientEntity.getComponent(AfkComponent.class);
+            if (afkComponent != null) {
+                if (afkComponent.afk) {
+                    sb.append(FontColor.getColored("[AFK]", Color.red));
+                    sb.append(" ");
+                }
+            }
             sb.append(PlayerUtil.getColoredPlayerName(clientComp.clientInfo));
             sb.append(" ");
             Long pingValue = pingMap.get(clientEntity);

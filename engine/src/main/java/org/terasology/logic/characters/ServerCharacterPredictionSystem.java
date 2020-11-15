@@ -16,6 +16,8 @@
 
 package org.terasology.logic.characters;
 
+
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,6 +45,7 @@ import org.terasology.registry.Share;
 import org.terasology.utilities.collection.CircularBuffer;
 import org.terasology.world.WorldProvider;
 
+import java.util.List;
 import java.util.Map;
 
 @RegisterSystem(RegisterMode.AUTHORITY)
@@ -81,6 +84,7 @@ public class ServerCharacterPredictionSystem extends BaseComponentSystem impleme
 
     private CharacterMover characterMover;
     private Map<EntityRef, CircularBuffer<CharacterStateEvent>> characterStates = Maps.newHashMap();
+    private List<EntityRef> characterStatesToRemove = Lists.newArrayList();
     private Map<EntityRef, CharacterMoveInputEvent> lastInputEvent = Maps.newHashMap();
     private long nextSendState;
     private CharacterMovementSystemUtility characterMovementSystemUtility;
@@ -103,7 +107,7 @@ public class ServerCharacterPredictionSystem extends BaseComponentSystem impleme
     @ReceiveEvent(components = {CharacterMovementComponent.class, LocationComponent.class, AliveCharacterComponent.class})
     public void onDestroy(final BeforeDeactivateComponent event, final EntityRef entity) {
         physics.removeCharacterCollider(entity);
-        characterStates.remove(entity);
+        characterStatesToRemove.add(entity);
         lastInputEvent.remove(entity);
     }
 
@@ -200,7 +204,8 @@ public class ServerCharacterPredictionSystem extends BaseComponentSystem impleme
                         // Haven't received input in a while, repeat last input
                         CharacterMoveInputEvent lastInput = lastInputEvent.get(entry.getKey());
                         if (lastInput != null) {
-                            CharacterMoveInputEvent newInput = new CharacterMoveInputEvent(lastInput, (int) (time.getGameTimeInMs() - state.getTime()));
+                            CharacterMoveInputEvent newInput = new CharacterMoveInputEvent(lastInput,
+                                    (int) (time.getGameTimeInMs() - state.getTime()));
                             onPlayerInput(newInput, entry.getKey());
                         }
                         entry.getKey().send(state);
@@ -214,9 +219,12 @@ public class ServerCharacterPredictionSystem extends BaseComponentSystem impleme
             if (entry.getKey().equals(localPlayer.getCharacterEntity())) {
                 continue;
             }
-
-            setToTime(renderTime, entry.getKey(), entry.getValue());
+            if (!characterStatesToRemove.contains(entry.getKey())) {
+                setToTime(renderTime, entry.getKey(), entry.getValue());
+            }
         }
+        characterStates.keySet().removeAll(characterStatesToRemove);
+        characterStatesToRemove.clear();
     }
 
     private void setToTime(long renderTime, EntityRef entity, CircularBuffer<CharacterStateEvent> buffer) {

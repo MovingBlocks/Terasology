@@ -17,7 +17,7 @@ package org.terasology.rendering.assets.font;
 
 import com.google.common.collect.Maps;
 import org.terasology.math.geom.Vector3f;
-import org.terasology.nui.Color;
+import org.terasology.nui.Colorc;
 import org.terasology.nui.HorizontalAlign;
 import org.terasology.nui.FontColor;
 import org.terasology.nui.FontUnderline;
@@ -30,8 +30,6 @@ import java.util.Deque;
 import java.util.List;
 import java.util.Map;
 
-/**
- */
 public class FontMeshBuilder {
 
     private static final float SHADOW_DEPTH = -2;
@@ -45,7 +43,7 @@ public class FontMeshBuilder {
         this.underlineMaterial = underlineMaterial;
     }
 
-    public Map<Material, Mesh> createTextMesh(Font font, List<String> lines, int width, HorizontalAlign alignment, Color baseColor, Color shadowColor, boolean underline) {
+    public Map<Material, Mesh> createTextMesh(Font font, List<String> lines, int width, HorizontalAlign alignment, Colorc baseColor, Colorc shadowColor, boolean underline) {
         return new Builder(font, lines, width, alignment, baseColor, shadowColor, underline).invoke();
     }
 
@@ -54,7 +52,7 @@ public class FontMeshBuilder {
         private List<String> lines;
         private int width;
         private HorizontalAlign alignment;
-        private Color shadowColor;
+        private Colorc shadowColor;
         private boolean baseUnderline;
 
         private Map<Material, MeshBuilder> meshBuilders = Maps.newLinkedHashMap();
@@ -64,10 +62,10 @@ public class FontMeshBuilder {
         private boolean currentUnderline;
         private int underlineStart = UNKNOWN;
         private int underlineEnd = UNKNOWN;
-        private Deque<Color> previousColors = new ArrayDeque<>();
-        private Color currentColor;
+        private Deque<Colorc> previousColors = new ArrayDeque<>();
+        private Colorc currentColor;
 
-        Builder(Font font, List<String> lines, int width, HorizontalAlign alignment, Color baseColor, Color shadowColor, boolean baseUnderline) {
+        Builder(Font font, List<String> lines, int width, HorizontalAlign alignment, Colorc baseColor, Colorc shadowColor, boolean baseUnderline) {
             this.font = font;
             this.lines = lines;
             this.width = width;
@@ -176,7 +174,7 @@ public class FontMeshBuilder {
             }
         }
 
-        private void addUnderline(MeshBuilder builder, int xStart, int xEnd, int underlineTop, int underlineThickness, Color color, float depth) {
+        private void addUnderline(MeshBuilder builder, int xStart, int xEnd, int underlineTop, int underlineThickness, Colorc color, float depth) {
             float bottom = (float) underlineTop + underlineThickness;
 
             Vector3f v1 = new Vector3f(xStart, underlineTop, depth);
@@ -191,7 +189,7 @@ public class FontMeshBuilder {
             builder.addTexCoord(0, 1);
         }
 
-        private void addCharacter(MeshBuilder builder, FontCharacter character, Color color, float xOffset, float yOffset, float depth) {
+        private void addCharacter(MeshBuilder builder, FontCharacter character, Colorc color, float xOffset, float yOffset, float depth) {
             float top = y + character.getyOffset() + yOffset;
             float bottom = top + character.getHeight() + yOffset;
             float left = x + character.getxOffset() + xOffset;

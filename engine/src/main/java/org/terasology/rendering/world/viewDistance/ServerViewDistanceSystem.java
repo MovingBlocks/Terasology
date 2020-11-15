@@ -25,7 +25,7 @@ import org.terasology.network.Client;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkSystem;
 import org.terasology.registry.In;
-import org.terasology.world.chunks.ChunkProvider;
+import org.terasology.world.chunks.localChunkProvider.RelevanceSystem;
 
 /**
  * Handles view distance changes on the server
@@ -37,14 +37,14 @@ public class ServerViewDistanceSystem extends BaseComponentSystem {
     private NetworkSystem networkSystem;
 
     @In
-    private ChunkProvider chunkProvider;
+    private RelevanceSystem relevanceSystem;
 
     @ReceiveEvent(components = ClientComponent.class)
     public void onChangeViewDistanceChanged(ViewDistanceChangedEvent request, EntityRef entity) {
         Client client = networkSystem.getOwner(entity);
         if (client != null) {
             client.setViewDistanceMode(request.getNewViewRange());
-            chunkProvider.updateRelevanceEntity(entity, JomlUtil.from(client.getViewDistance().getChunkDistance()));
+            relevanceSystem.updateRelevanceEntityDistance(entity, JomlUtil.from(client.getViewDistance().getChunkDistance()));
         }
     }
 

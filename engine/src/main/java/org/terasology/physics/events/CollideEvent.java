@@ -16,9 +16,9 @@
 
 package org.terasology.physics.events;
 
+import org.joml.Vector3f;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.AbstractConsumableEvent;
-import org.terasology.math.geom.Vector3f;
 
 /**
  * TODO Make CollideEvent as a server event.

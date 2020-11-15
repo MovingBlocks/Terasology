@@ -1,29 +1,13 @@
-/*
- * Copyright 2013 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *  http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.rendering.nui.internal;
 
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
-import org.terasology.math.geom.Rect2i;
-import org.terasology.math.geom.Vector2i;
-import org.terasology.nui.Color;
+import org.terasology.nui.Colorc;
 
 import java.nio.FloatBuffer;
-import java.util.Objects;
 
 /**
  *
@@ -49,7 +33,7 @@ public final class LineRenderer {
      * Drawing nearly perfect 2D line segments in OpenGL
      * </a>
      */
-    public static void draw(float x1, float y1, float x2, float y2, float width, Color color, Color background, float alpha) {
+    public static void draw(float x1, float y1, float x2, float y2, float width, Colorc color, Colorc background, float alpha) {
         GL20.glUseProgram(0);
         GL11.glDisable(GL11.GL_CULL_FACE);
         GL11.glEnableClientState(GL11.GL_VERTEX_ARRAY);
@@ -201,7 +185,7 @@ public final class LineRenderer {
                 x1 + tx + rx, y1 + ty + ry,    //fading edge2
                 x2 + tx + rx, y2 + ty + ry
             };
-        GL11.glVertexPointer(2, 0, wrap(lineVertex));
+        GL11.glVertexPointer(2, 0, 0, wrap(lineVertex));
 
         if (!alphaBlend) {
             float[] lineColor =
@@ -215,7 +199,7 @@ public final class LineRenderer {
                     bRed, bGreen, bBlue,
                     bRed, bGreen, bBlue
                 };
-            GL11.glColorPointer(3, 0, wrap(lineColor));
+            GL11.glColorPointer(3, 0,0, wrap(lineColor));
         } else {
             float[] lineColor =
                 {
@@ -228,7 +212,7 @@ public final class LineRenderer {
                     cRed, cGreen, cBlue, 0,
                     cRed, cGreen, cBlue, 0
                 };
-            GL11.glColorPointer(4, 0, wrap(lineColor));
+            GL11.glColorPointer(4, 0,0, wrap(lineColor));
         }
 
         if ((Math.abs(dx) < epsilon || Math.abs(dy) < epsilon) && width <= 1.0) {
@@ -241,17 +225,17 @@ public final class LineRenderer {
         if (width >= 3) {
             //draw cap
             lineVertex = new float[]
-                {
-                    x1 - rx + cx, y1 - ry + cy,    //cap1
-                    x1 + rx + cx, y1 + ry + cy,
-                    x1 - tx - rx, y1 - ty - ry,
-                    x1 + tx + rx, y1 + ty + ry,
-                    x2 - rx - cx, y2 - ry - cy,    //cap2
-                    x2 + rx - cx, y2 + ry - cy,
-                    x2 - tx - rx, y2 - ty - ry,
-                    x2 + tx + rx, y2 + ty + ry
-                };
-            GL11.glVertexPointer(2, 0, wrap(lineVertex));
+                    {
+                            x1 - rx + cx, y1 - ry + cy,    //cap1
+                            x1 + rx + cx, y1 + ry + cy,
+                            x1 - tx - rx, y1 - ty - ry,
+                            x1 + tx + rx, y1 + ty + ry,
+                            x2 - rx - cx, y2 - ry - cy,    //cap2
+                            x2 + rx - cx, y2 + ry - cy,
+                            x2 - tx - rx, y2 - ty - ry,
+                            x2 + tx + rx, y2 + ty + ry
+                    };
+            GL11.glVertexPointer(2, 0, 0, wrap(lineVertex));
 
             if (!alphaBlend) {
                 float[] lineColor =
@@ -265,7 +249,7 @@ public final class LineRenderer {
                         cRed, cGreen, cBlue,
                         cRed, cGreen, cBlue
                     };
-                GL11.glColorPointer(3, 0, wrap(lineColor));
+                GL11.glColorPointer(3, 0, 0, wrap(lineColor));
             } else {
                 float[] lineColor =
                     {
@@ -278,7 +262,7 @@ public final class LineRenderer {
                         cRed, cGreen, cBlue, a,
                         cRed, cGreen, cBlue, a
                     };
-                GL11.glColorPointer(4, 0, wrap(lineColor));
+                GL11.glColorPointer(4, 0, 0, wrap(lineColor));
             }
 
             GL11.glDrawArrays(GL11.GL_TRIANGLE_STRIP, 0, 4);

@@ -36,6 +36,7 @@ import org.terasology.logic.console.suggesters.CommandNameSuggester;
 import org.terasology.logic.console.suggesters.ScreenSuggester;
 import org.terasology.logic.console.suggesters.SkinSuggester;
 import org.terasology.logic.inventory.events.DropItemEvent;
+import org.terasology.logic.location.Location;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.permission.PermissionManager;
 import org.terasology.math.Direction;
@@ -524,17 +525,16 @@ public class CoreCommands extends BaseComponentSystem {
         } else {
             dir.set(Direction.FORWARD.getVector3f());
         }
-        Quat4f rotation = Quat4f.shortestArcQuat(Direction.FORWARD.getVector3f(), dir);
 
-        Optional<Prefab> prefab = Assets.getPrefab(prefabName);
-        if (prefab.isPresent() && prefab.get().getComponent(LocationComponent.class) != null) {
-            entityManager.create(prefab.get(), spawnPos, rotation);
-            return "Done";
-        } else if (!prefab.isPresent()) {
-            return "Unknown prefab";
-        } else {
-            return "Prefab cannot be spawned (no location component)";
-        }
+        return Assets.getPrefab(prefabName).map(prefab -> {
+            LocationComponent loc = prefab.getComponent(LocationComponent.class);
+            if (loc != null) {
+                entityManager.create(prefab, spawnPos);
+                return "Done";
+            } else {
+                return "Prefab cannot be spawned (no location component)";
+            }
+        }).orElse("Unknown prefab");
     }
 
     /**

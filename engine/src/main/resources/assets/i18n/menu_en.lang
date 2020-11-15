@@ -376,7 +376,6 @@
     "storage-service-sync-ok": "Synchronization completed - %d downloaded, %d uploaded, %d conflicting.",
     "storage-service-sync-previous-conflicts": "Conflicts were detected during the latest synchronization. It's not possible to start a new synchronization until the conflicts are resolved.",
     "storage-service-token-fail": "Authentication from stored token and URL failed - %s.",
-    "storage-service-token-not-present": "No configuration data is present, staying logged out.",
     "storage-service-token-ok": "Successfully logged in using stored credentials.",
     "storage-service-upload-fail": "Failed to upload identities - %s.",
     "storage-service-upload-ok": "Successfully uploaded new identities.",
