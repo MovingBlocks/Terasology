@@ -11,6 +11,10 @@ import org.terasology.engine.module.ModuleManager;
 import org.terasology.nui.UIWidget;
 import org.terasology.nui.layouts.PropertyLayout;
 import org.terasology.nui.properties.Property;
+import org.terasology.nui.widgets.types.TypeWidgetBuilder;
+import org.terasology.nui.widgets.types.TypeWidgetFactory;
+import org.terasology.nui.widgets.types.TypeWidgetLibrary;
+import org.terasology.reflection.TypeInfo;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -19,7 +23,8 @@ import java.util.Optional;
 /**
  * Creates {@link UIWidget} for {@link AutoConfig}.
  * <p>
- * Created {@link UIWidget}'s binded with source {@link AutoConfig}. Changing values in {@link UIWidget} will change value in related {@link AutoConfig}
+ * Created {@link UIWidget}'s binded with source {@link AutoConfig}. Changing values in {@link UIWidget} will change
+ * value in related {@link AutoConfig}
  * <p>
  * Using {@link SettingWidgetFactory} for creating widgets for individual {@link Setting}.
  * <p>
@@ -37,7 +42,7 @@ import java.util.Optional;
  * }
  * </pre>
  */
-public class AutoConfigWidgetFactory {
+public class AutoConfigWidgetFactory implements TypeWidgetFactory {
     private static final Logger logger = LoggerFactory.getLogger(AutoConfigWidgetFactory.class);
 
     private final SettingWidgetFactory settingWidgetFactory;
@@ -50,6 +55,7 @@ public class AutoConfigWidgetFactory {
 
     /**
      * Creates {@link UIWidget} for {@link AutoConfig}
+     *
      * @param config for creating widget
      * @return UIWidget created for config
      */
@@ -78,6 +84,14 @@ public class AutoConfigWidgetFactory {
         container.addProperties("config.getDescription()", widgetProperties);
 
         return container;
+    }
+
+    @Override
+    public <T> Optional<TypeWidgetBuilder<T>> create(TypeInfo<T> type, TypeWidgetLibrary library) {
+        if (!AutoConfig.class.isAssignableFrom(type.getRawType())) {
+            return Optional.empty();
+        }
+        return Optional.of(binding -> buildWidgetFor((AutoConfig) binding.get()));
     }
 
 }

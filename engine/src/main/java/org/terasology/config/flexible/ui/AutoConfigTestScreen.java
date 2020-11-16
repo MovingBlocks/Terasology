@@ -7,9 +7,14 @@ import org.terasology.config.flexible.AutoConfig;
 import org.terasology.config.flexible.Setting;
 import org.terasology.config.flexible.constraints.NumberRangeConstraint;
 import org.terasology.engine.module.ModuleManager;
+import org.terasology.nui.databinding.Binding;
+import org.terasology.nui.databinding.DefaultBinding;
 import org.terasology.nui.layouts.ColumnLayout;
 import org.terasology.nui.widgets.UIButton;
 import org.terasology.nui.widgets.UIText;
+import org.terasology.nui.widgets.types.TypeWidgetBuilder;
+import org.terasology.nui.widgets.types.TypeWidgetLibrary;
+import org.terasology.reflection.TypeInfo;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
 
@@ -27,10 +32,14 @@ import static org.terasology.config.flexible.SettingArgument.type;
 public class AutoConfigTestScreen extends CoreScreenLayer {
     private AutoConfig config = new TestConfig();
 
+    @In
     private AutoConfigWidgetFactory configWidgetFactory;
 
     private ColumnLayout mainContainer;
     private UIText bindingsLog;
+
+    @In
+    TypeWidgetLibrary typeWidgetLibrary;
 
     @In
     ModuleManager moduleManager;
@@ -40,8 +49,6 @@ public class AutoConfigTestScreen extends CoreScreenLayer {
 
     @Override
     public void initialise() {
-        configWidgetFactory = new AutoConfigWidgetFactory(moduleManager, assetManager);
-
         mainContainer = find("mainContainer", ColumnLayout.class);
         assert mainContainer != null;
 
