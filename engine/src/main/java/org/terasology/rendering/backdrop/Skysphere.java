@@ -107,7 +107,7 @@ public class Skysphere implements BackdropProvider, BackdropRenderer {
         float daylight = 1.0f;
 
         if (angle < 24.0f) {
-            daylight = 1.0f - (24.0f - angle) / 24.0f;
+            daylight = Math.max(1.0f - (24.0f - angle) / 24.0f, 0.15f);
         }
 
         return daylight;
