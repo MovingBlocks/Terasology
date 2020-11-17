@@ -200,7 +200,7 @@ public abstract class Camera {
     }
 
     public Quaternionf getOrientation(Quaternionf orientation) {
-        return orientation.set(new AxisAngle4f(viewingAngle,viewingAxis));
+        return orientation.set(new AxisAngle4f(viewingAngle, viewingAxis));
     }
 
     public void setOrientation(Quat4f orientation) {

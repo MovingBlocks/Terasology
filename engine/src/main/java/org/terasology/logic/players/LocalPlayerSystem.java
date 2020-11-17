@@ -15,6 +15,7 @@
  */
 package org.terasology.logic.players;
 
+import org.joml.Math;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.terasology.assets.ResourceUrn;
@@ -157,7 +158,7 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
     private void processInput(EntityRef entity, CharacterMovementComponent characterMovementComponent) {
         lookYaw = (float) ((lookYaw - lookYawDelta) % 360);
         lookYawDelta = 0f;
-        lookPitch = (float) TeraMath.clamp(lookPitch + lookPitchDelta, -89, 89);
+        lookPitch = (float) Math.clamp(-89, 89,lookPitch + lookPitchDelta);
         lookPitchDelta = 0f;
 
         Vector3f relMove = new Vector3f(relativeMovement);
@@ -168,7 +169,7 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
             case CROUCHING:
             case WALKING:
                 if (!config.getRendering().isVrSupport()) {
-                    viewRotation.rotationYXZ(TeraMath.DEG_TO_RAD * lookYaw, 0, 0);
+                    viewRotation.rotationYXZ(Math.toRadians(lookYaw), 0, 0);
                     playerCamera.setOrientation(viewRotation);
                 }
                 playerCamera.getOrientation(new Quaternionf()).transform(relMove);
@@ -179,7 +180,7 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
                 break;
             default:
                 if (!config.getRendering().isVrSupport()) {
-                    viewRotation.rotationYXZ(TeraMath.DEG_TO_RAD * lookYaw, TeraMath.DEG_TO_RAD * lookPitch, 0);
+                    viewRotation.rotationYXZ(Math.toRadians(lookYaw), Math.toRadians(lookPitch), 0);
                     playerCamera.setOrientation(viewRotation);
                 }
                 playerCamera.getOrientation(new Quaternionf()).transform(relMove);
