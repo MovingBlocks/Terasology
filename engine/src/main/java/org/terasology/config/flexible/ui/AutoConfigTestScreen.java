@@ -100,5 +100,10 @@ public class AutoConfigTestScreen extends CoreScreenLayer {
                 name("Integer Test Setting"),
                 description("Integer Test Setting with Number Range")
             );
+
+        @Override
+        public String getName() {
+            return "Test Config";
+        }
     }
 }
