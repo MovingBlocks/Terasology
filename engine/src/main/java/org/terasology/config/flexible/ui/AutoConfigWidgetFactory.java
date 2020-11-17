@@ -8,6 +8,7 @@ import org.terasology.assets.management.AssetManager;
 import org.terasology.config.flexible.AutoConfig;
 import org.terasology.config.flexible.Setting;
 import org.terasology.engine.module.ModuleManager;
+import org.terasology.i18n.TranslationSystem;
 import org.terasology.nui.UIWidget;
 import org.terasology.nui.layouts.PropertyLayout;
 import org.terasology.nui.properties.Property;
@@ -15,6 +16,7 @@ import org.terasology.nui.widgets.types.TypeWidgetBuilder;
 import org.terasology.nui.widgets.types.TypeWidgetFactory;
 import org.terasology.nui.widgets.types.TypeWidgetLibrary;
 import org.terasology.reflection.TypeInfo;
+import org.terasology.registry.In;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -44,9 +46,11 @@ import java.util.Optional;
  */
 public class AutoConfigWidgetFactory implements TypeWidgetFactory {
     private static final Logger logger = LoggerFactory.getLogger(AutoConfigWidgetFactory.class);
-
     private final SettingWidgetFactory settingWidgetFactory;
     private final AssetManager assetManager;
+
+    @In
+    private TranslationSystem translationSystem;
 
     public AutoConfigWidgetFactory(ModuleManager moduleManager, AssetManager assetManager) {
         this.settingWidgetFactory = new SettingWidgetFactory(moduleManager.getEnvironment(), assetManager);
@@ -74,14 +78,14 @@ public class AutoConfigWidgetFactory implements TypeWidgetFactory {
             }
 
             widgetProperties.add(
-                    new Property<>(setting.getHumanReadableName(),
+                    new Property<>(translationSystem.translate(setting.getHumanReadableName()),
                             null,
                             settingWidget.get(),
-                            setting.getDescription())
+                            translationSystem.translate(setting.getDescription()))
             );
         }
 
-        container.addProperties("config.getDescription()", widgetProperties);
+        container.addProperties(translationSystem.translate(config.getName()), widgetProperties);
 
         return container;
     }
