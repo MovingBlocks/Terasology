@@ -39,6 +39,11 @@ public interface WorldTime extends ComponentSystem {
      */
     float NOON_OFFSET = 0.50f;
 
+    /**
+     * The offset used by the game to start at sunrise
+     */
+    float SUNRISE_OFFSET = 0.3f;
+
 
     /**
      * @return World time in milliseconds.
