@@ -211,7 +211,7 @@ public class GLTFAnimationFormat extends GLTFCommonFormat<MeshAnimationBundleDat
 
         public void updateFrame(float time, MeshAnimationFrame frame) {
             int upperFrame = 0;
-            while (upperFrame < times.size() && times.get(upperFrame) < time) {
+            while (upperFrame < times.size() - 1 && times.get(upperFrame) < time) {
                 upperFrame++;
             }
             int lowerFrame = Math.max(0, upperFrame - 1);

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.engine.subsystem.rpc;
+package org.terasology.engine.subsystem.discordrpc;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.LoggerContext;
@@ -25,10 +25,13 @@ import com.jagrosh.discordipc.entities.pipe.WindowsPipe;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
+import org.terasology.config.PlayerConfig;
 import org.terasology.context.Context;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.subsystem.EngineSubsystem;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.time.OffsetDateTime;
 
 /**
@@ -37,7 +40,7 @@ import java.time.OffsetDateTime;
  *
  * @see EngineSubsystem
  */
-public class DiscordRPCSubSystem implements EngineSubsystem, IPCListener, Runnable {
+public class DiscordRPCSubSystem implements EngineSubsystem, IPCListener, Runnable, PropertyChangeListener {
 
     private static final Logger logger = LoggerFactory.getLogger(DiscordRPCSubSystem.class);
     private static final long DISCORD_APP_CLIENT_ID = 515274721080639504L;
@@ -193,6 +196,7 @@ public class DiscordRPCSubSystem implements EngineSubsystem, IPCListener, Runnab
     @Override
     public void postInitialise(Context context) {
         config = context.get(Config.class);
+        config.getPlayer().subscribe(this);
         setState("In Lobby");
     }
 
@@ -295,4 +299,20 @@ public class DiscordRPCSubSystem implements EngineSubsystem, IPCListener, Runnab
         return getInstance().enabled;
     }
 
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+        if (evt.getPropertyName().equals(PlayerConfig.DISCORD_PRESENCE)) {
+            boolean discordPresence = (boolean) evt.getNewValue();
+            if (isEnabled() != discordPresence) {
+                if (discordPresence) {
+                    enable();
+                } else {
+                    disable();
+                }
+            }
+        }
+        if (evt.getPropertyName().equals(PlayerConfig.PLAYER_NAME)) {
+            updateState();
+        }
+    }
 }
