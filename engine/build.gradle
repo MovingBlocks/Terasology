@@ -181,11 +181,13 @@ jar {
 
     from(tasks.getByName("cacheReflections").outputs)
 
-    manifest {
-        def manifestClasspath = "$subDirLibs/" + configurations."${sourceSets.main.runtimeClasspathConfigurationName}".collect {
-            it.getName()
-        }.join(" $subDirLibs/")
-        attributes("Class-Path": manifestClasspath, "Implementation-Title": "Terasology-" + project.name, "Implementation-Version": env.BUILD_NUMBER + ", " + convertGitBranch(env.GIT_BRANCH) + ", " + env.BUILD_ID + ", " + displayVersion)
+    doFirst {
+        manifest {
+            def manifestClasspath = "$subDirLibs/" + configurations."${sourceSets.main.runtimeClasspathConfigurationName}".collect {
+                it.getName()
+            }.join(" $subDirLibs/")
+            attributes("Class-Path": manifestClasspath, "Implementation-Title": "Terasology-" + project.name, "Implementation-Version": env.BUILD_NUMBER + ", " + convertGitBranch(env.GIT_BRANCH) + ", " + env.BUILD_ID + ", " + displayVersion)
+        }
     }
 }
 
