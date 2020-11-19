@@ -41,7 +41,7 @@ public class PersistedBooleanArray extends AbstractPersistedArray {
     @Override
     public Iterator<PersistedData> iterator() {
         return new Iterator<PersistedData>() {
-            boolean[] bools = Arrays.copyOf(booleans, booleans.length);
+            final boolean[] bools = Arrays.copyOf(booleans, booleans.length);
             int index = 0;
 
             @Override
