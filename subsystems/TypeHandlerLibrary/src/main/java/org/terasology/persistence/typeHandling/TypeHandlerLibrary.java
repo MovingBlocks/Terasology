@@ -22,7 +22,11 @@ import org.terasology.reflection.metadata.ClassMetadata;
 import java.lang.reflect.Type;
 import java.util.Optional;
 
-
+/**
+ * A library of type handlers. This is used for the construction of class metadata.
+ * This library should be initialised by adding a number of base type handlers, describing how to serialize each supported type.
+ * It will then produce serializers for classes (through their ClassMetadata) on request.
+ */
 public interface TypeHandlerLibrary {
     static void populateBuildinHandlers(TypeHandlerLibrary typeHandlerLibrary) {
         typeHandlerLibrary.addTypeHandler(Boolean.class, new BooleanTypeHandler());

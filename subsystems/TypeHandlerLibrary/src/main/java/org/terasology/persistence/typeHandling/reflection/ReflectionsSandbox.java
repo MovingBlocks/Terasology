@@ -9,6 +9,12 @@ import org.terasology.reflection.TypeInfo;
 import java.util.Optional;
 import java.util.Set;
 
+/**
+ * Provides an interface to the sandboxed environment that serialization may be performed in.
+ * This allows serialization to load types according to the rules specified in the sandbox it
+ * is being executed in.
+ * Uses {@link Reflections} for find and load types.
+ */
 public class ReflectionsSandbox implements SerializationSandbox {
     private final Reflections reflections;
 
@@ -16,6 +22,9 @@ public class ReflectionsSandbox implements SerializationSandbox {
         this.reflections = reflections;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public <T> Optional<Class<? extends T>> findSubTypeOf(String subTypeIdentifier, Class<T> clazz) {
         Set<Class<? extends T>> subTypes = reflections.getSubTypesOf(clazz);
@@ -30,6 +39,9 @@ public class ReflectionsSandbox implements SerializationSandbox {
         return Optional.empty();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public <T> boolean isValidTypeHandlerDeclaration(TypeInfo<T> type, TypeHandler<T> typeHandler) {
         return true;
