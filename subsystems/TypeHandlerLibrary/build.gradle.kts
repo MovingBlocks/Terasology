@@ -16,4 +16,10 @@ dependencies {
     implementation("org.terasology.nui:nui-reflect:1.3.1")
     implementation("org.terasology:gestalt-module:5.1.5")
     implementation("org.terasology:gestalt-asset-core:5.1.5")
+
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.5.2")
+    testImplementation("org.junit.jupiter:junit-jupiter-params:5.5.2")
+    testImplementation("org.mockito:mockito-junit-jupiter:3.2.0")
+
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.5.2")
 }

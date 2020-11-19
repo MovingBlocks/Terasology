@@ -1,26 +1,14 @@
-/*
- * Copyright 2018 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.persistence.typeHandling.coreTypes;
 
-import com.google.gson.JsonArray;
+import gnu.trove.list.TIntList;
+import gnu.trove.list.array.TIntArrayList;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatcher;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.PersistedDataSerializer;
-import org.terasology.persistence.typeHandling.gson.GsonPersistedDataArray;
+import org.terasology.persistence.typeHandling.inMemory.arrays.PersistedIntegerArray;
 import org.terasology.reflection.TypeInfo;
 
 import java.util.Collection;
@@ -67,14 +55,14 @@ public class ArrayTypeHandlerTest {
                 TypeInfo.of(Integer.class)
         );
 
-        JsonArray jsonArray = new JsonArray();
+        TIntList intList = new TIntArrayList(ARRAY_SIZE);
 
         for (Integer i : Collections.nCopies(ARRAY_SIZE, -1)) {
-            jsonArray.add(i);
+            intList.add(i);
         }
 
-        typeHandler.deserialize(new GsonPersistedDataArray(jsonArray));
+        typeHandler.deserialize(new PersistedIntegerArray(intList));
 
-        verify(elementTypeHandler, times(jsonArray.size())).deserialize(any());
+        verify(elementTypeHandler, times(intList.size())).deserialize(any());
     }
 }
