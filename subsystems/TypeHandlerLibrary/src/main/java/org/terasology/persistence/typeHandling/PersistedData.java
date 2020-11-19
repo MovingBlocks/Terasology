@@ -66,7 +66,7 @@ public interface PersistedData {
     /**
      * Retrieves this data as a byte array. This requires that the data is bytes.
      *
-     * @return this data as a boolean value
+     * @return this data as a bytes value
      * @throws DeserializationException if the data is not bytes
      */
     byte[] getAsBytes();

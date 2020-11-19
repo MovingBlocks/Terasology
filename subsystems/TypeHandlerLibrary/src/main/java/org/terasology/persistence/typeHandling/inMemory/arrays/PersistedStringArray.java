@@ -19,6 +19,15 @@ public class PersistedStringArray extends AbstractPersistedArray {
     }
 
     @Override
+    public String getAsString() {
+        if (size() == 1) {
+            return data.get(0);
+        } else {
+            throw new IllegalStateException("Data is an array of size != 1");
+        }
+    }
+
+    @Override
     public int size() {
         return data.size();
     }

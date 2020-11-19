@@ -12,7 +12,7 @@ import org.terasology.persistence.typeHandling.inMemory.PersistedInteger;
 
 import java.util.Iterator;
 
-public class PersistedIntegerArray extends AbstractPersistedArray {
+public class PersistedIntegerArray extends PersistedNumberArray {
 
     private final TIntList data;
 

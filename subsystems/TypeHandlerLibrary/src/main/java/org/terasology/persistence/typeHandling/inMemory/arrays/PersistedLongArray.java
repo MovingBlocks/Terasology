@@ -12,7 +12,7 @@ import org.terasology.persistence.typeHandling.inMemory.PersistedLong;
 
 import java.util.Iterator;
 
-public class PersistedLongArray extends AbstractPersistedArray {
+public class PersistedLongArray extends PersistedNumberArray {
 
     private final TLongList data;
 

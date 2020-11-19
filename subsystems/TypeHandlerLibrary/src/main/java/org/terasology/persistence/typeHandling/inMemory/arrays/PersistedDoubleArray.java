@@ -12,7 +12,7 @@ import org.terasology.persistence.typeHandling.inMemory.PersistedDouble;
 
 import java.util.Iterator;
 
-public class PersistedDoubleArray extends AbstractPersistedArray {
+public class PersistedDoubleArray extends PersistedNumberArray {
 
     private final TDoubleList data;
 
@@ -59,4 +59,5 @@ public class PersistedDoubleArray extends AbstractPersistedArray {
     public Iterator<PersistedData> iterator() {
         return TroveUtils.iteratorFrom(data);
     }
+
 }

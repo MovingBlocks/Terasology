@@ -12,7 +12,7 @@ import org.terasology.persistence.typeHandling.inMemory.PersistedFloat;
 
 import java.util.Iterator;
 
-public class PersistedFloatArray extends AbstractPersistedArray {
+public class PersistedFloatArray extends PersistedNumberArray {
 
     private final TFloatList data;
 

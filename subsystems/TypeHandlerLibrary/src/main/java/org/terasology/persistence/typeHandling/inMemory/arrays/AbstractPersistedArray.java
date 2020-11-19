@@ -26,7 +26,6 @@ public abstract class AbstractPersistedArray extends AbstractPersistedData imple
         return true;
     }
 
-
     @Override
     public boolean isNumberArray() {
         return false;
@@ -66,7 +65,6 @@ public abstract class AbstractPersistedArray extends AbstractPersistedData imple
     public TLongList getAsLongArray() {
         throw new ClassCastException("Data Array is not a Long Array");
     }
-
 
     @Override
     public List<PersistedData> getAsValueArray() {
