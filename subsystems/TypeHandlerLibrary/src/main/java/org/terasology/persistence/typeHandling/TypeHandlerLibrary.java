@@ -20,13 +20,16 @@ import org.terasology.persistence.typeHandling.coreTypes.NumberTypeHandler;
 import org.terasology.persistence.typeHandling.coreTypes.RuntimeDelegatingTypeHandler;
 import org.terasology.persistence.typeHandling.coreTypes.StringTypeHandler;
 import org.terasology.persistence.typeHandling.coreTypes.factories.ArrayTypeHandlerFactory;
+import org.terasology.persistence.typeHandling.coreTypes.factories.CollectionTypeHandlerFactory;
 import org.terasology.persistence.typeHandling.coreTypes.factories.EnumTypeHandlerFactory;
+import org.terasology.persistence.typeHandling.coreTypes.factories.ObjectFieldMapTypeHandlerFactory;
 import org.terasology.persistence.typeHandling.coreTypes.factories.StringMapTypeHandlerFactory;
 import org.terasology.persistence.typeHandling.reflection.ReflectionsSandbox;
 import org.terasology.persistence.typeHandling.reflection.SerializationSandbox;
 import org.terasology.reflection.TypeInfo;
 import org.terasology.reflection.metadata.ClassMetadata;
 import org.terasology.reflection.metadata.FieldMetadata;
+import org.terasology.reflection.reflect.ConstructorLibrary;
 
 import java.lang.reflect.Type;
 import java.util.HashMap;
@@ -48,14 +51,18 @@ public class TypeHandlerLibrary {
      * FutureTypeHandler} which is wired after the {@link TypeHandler} has been created.
      */
     private final ThreadLocal<Map<TypeInfo<?>, FutureTypeHandler<?>>> futureTypeHandlers = new ThreadLocal<>();
-    private SerializationSandbox sandbox;
-    private List<TypeHandlerFactory> typeHandlerFactories = Lists.newArrayList();
-    protected Map<Type, InstanceCreator<?>> instanceCreators = Maps.newHashMap();
+    private final SerializationSandbox sandbox;
+    private final List<TypeHandlerFactory> typeHandlerFactories = Lists.newArrayList();
+    private final Map<Type, InstanceCreator<?>> instanceCreators = Maps.newHashMap();
     private final Map<TypeInfo<?>, TypeHandler<?>> typeHandlerCache = Maps.newHashMap();
     private final Map<ClassMetadata<?, ?>, Serializer> serializerMap = Maps.newHashMap();
 
     protected TypeHandlerLibrary(SerializationSandbox sandbox) {
         this.sandbox = sandbox;
+        ConstructorLibrary constructorLibrary = new ConstructorLibrary(instanceCreators);
+        addTypeHandlerFactory(new ObjectFieldMapTypeHandlerFactory(constructorLibrary));
+        TypeHandlerLibrary.populateBuiltInHandlers(this);
+        addTypeHandlerFactory(new CollectionTypeHandlerFactory(constructorLibrary));
     }
 
 

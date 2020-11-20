@@ -27,8 +27,6 @@ import org.terasology.naming.Name;
 import org.terasology.nui.Color;
 import org.terasology.nui.Colorc;
 import org.terasology.nui.UITextureRegion;
-import org.terasology.persistence.typeHandling.coreTypes.factories.CollectionTypeHandlerFactory;
-import org.terasology.persistence.typeHandling.coreTypes.factories.ObjectFieldMapTypeHandlerFactory;
 import org.terasology.persistence.typeHandling.extensionTypes.ColorTypeHandler;
 import org.terasology.persistence.typeHandling.extensionTypes.ColorcTypeHandler;
 import org.terasology.persistence.typeHandling.extensionTypes.NameTypeHandler;
@@ -67,7 +65,6 @@ import org.terasology.persistence.typeHandling.mathTypes.legacy.LegacyVector4fTy
 import org.terasology.persistence.typeHandling.reflection.ModuleEnvironmentSandbox;
 import org.terasology.persistence.typeHandling.reflection.SerializationSandbox;
 import org.terasology.reflection.TypeRegistry;
-import org.terasology.reflection.reflect.ConstructorLibrary;
 import org.terasology.rendering.assets.texture.TextureRegion;
 import org.terasology.world.block.BlockRegion;
 
@@ -78,23 +75,14 @@ import org.terasology.world.block.BlockRegion;
  */
 public class TypeHandlerLibraryImpl extends TypeHandlerLibrary {
 
-    private ConstructorLibrary constructorLibrary;
 
     public TypeHandlerLibraryImpl(Reflections reflections) {
         super(reflections);
-        constructorLibrary = new ConstructorLibrary(instanceCreators);
-        addTypeHandlerFactory(new ObjectFieldMapTypeHandlerFactory(constructorLibrary));
-        TypeHandlerLibrary.populateBuiltInHandlers(this);
-        addTypeHandlerFactory(new CollectionTypeHandlerFactory(constructorLibrary));
         addTypeHandlerFactory(new ComponentClassTypeHandlerFactory());
     }
 
     protected TypeHandlerLibraryImpl(SerializationSandbox sandbox) {
         super(sandbox);
-        constructorLibrary = new ConstructorLibrary(instanceCreators);
-        TypeHandlerLibrary.populateBuiltInHandlers(this);
-        addTypeHandlerFactory(new ObjectFieldMapTypeHandlerFactory(constructorLibrary));
-        addTypeHandlerFactory(new CollectionTypeHandlerFactory(constructorLibrary));
         addTypeHandlerFactory(new ComponentClassTypeHandlerFactory());
     }
 

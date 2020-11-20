@@ -4,6 +4,7 @@ package org.terasology.persistence.typeHandling;
 
 import com.google.common.collect.Lists;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.reflections.Reflections;
@@ -17,7 +18,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.eq;
-import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -25,7 +25,7 @@ public class FutureTypeHandlerTest {
     private final Reflections reflections = new Reflections(getClass().getClassLoader());
 
     private final TypeHandlerLibrary typeHandlerLibrary =
-            spy(TypeHandlerLibraryImpl.withReflections(reflections));
+            Mockito.spy(new TypeHandlerLibrary(reflections));
 
     private static class RecursiveType<T> {
         final T data;
