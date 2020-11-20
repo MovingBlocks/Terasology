@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-public class StringMapTypeHandlerFactoryTest {
+class StringMapTypeHandlerFactoryTest {
     private final TypeHandlerLibrary typeHandlerLibrary = mock(TypeHandlerLibrary.class);
     private final StringMapTypeHandlerFactory typeHandlerFactory = new StringMapTypeHandlerFactory();
 
@@ -29,7 +29,7 @@ public class StringMapTypeHandlerFactoryTest {
             new TypeHandlerContext(typeHandlerLibrary, mock(SerializationSandbox.class));
 
     @Test
-    public void testStringMap() {
+    void testStringMap() {
         TypeInfo<Map<String, Integer>> listTypeInfo = new TypeInfo<Map<String, Integer>>() {};
 
         Optional<TypeHandler<Map<String, Integer>>> typeHandler =
@@ -43,7 +43,7 @@ public class StringMapTypeHandlerFactoryTest {
     }
 
     @Test
-    public void testNonStringMap() {
+    void testNonStringMap() {
         TypeInfo<Set<Integer>> listTypeInfo = new TypeInfo<Set<Integer>>() {};
 
         Optional<TypeHandler<Set<Integer>>> typeHandler =
@@ -53,7 +53,7 @@ public class StringMapTypeHandlerFactoryTest {
     }
 
     @Test
-    public void testNonGenericMap() {
+    void testNonGenericMap() {
         class IntMap extends HashMap<String, Integer> {}
 
         Optional<TypeHandler<IntMap>> typeHandler =

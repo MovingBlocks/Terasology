@@ -20,11 +20,11 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-public class ArrayTypeHandlerTest {
+class ArrayTypeHandlerTest {
     private static final int ARRAY_SIZE = 500;
 
     @Test
-    public void testSerialize() {
+    void testSerialize() {
         IntTypeHandler elementTypeHandler = mock(IntTypeHandler.class);
 
         ArrayTypeHandler<Integer> typeHandler = new ArrayTypeHandler<>(
@@ -47,7 +47,7 @@ public class ArrayTypeHandlerTest {
     }
 
     @Test
-    public void testDeserialize() {
+    void testDeserialize() {
         IntTypeHandler elementTypeHandler = mock(IntTypeHandler.class);
 
         ArrayTypeHandler<Integer> typeHandler = new ArrayTypeHandler<>(

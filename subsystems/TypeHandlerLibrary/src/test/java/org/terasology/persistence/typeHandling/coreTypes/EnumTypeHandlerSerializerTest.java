@@ -11,16 +11,14 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-/**
- */
-public class EnumTypeHandlerSerializerTest {
+class EnumTypeHandlerSerializerTest {
 
     enum TestEnum {
         NON_NULL
     }
 
     @Test
-    public void testNullValue() throws Exception {
+    void testNullValue() throws Exception {
         PersistedData nullData = mock(PersistedData.class);
         when(nullData.isNull()).thenReturn(true);
 
@@ -34,7 +32,7 @@ public class EnumTypeHandlerSerializerTest {
     }
 
     @Test
-    public void testNonNullValue() throws Exception {
+    void testNonNullValue() throws Exception {
         PersistedData data = mock(PersistedData.class);
         when(data.getAsString()).thenReturn(TestEnum.NON_NULL.toString());
         when(data.isString()).thenReturn(true);

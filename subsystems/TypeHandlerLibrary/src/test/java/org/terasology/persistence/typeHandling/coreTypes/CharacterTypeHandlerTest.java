@@ -16,11 +16,11 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-public class CharacterTypeHandlerTest {
+class CharacterTypeHandlerTest {
     CharacterTypeHandler typeHandler = new CharacterTypeHandler();
 
     @Test
-    public void testSerialize() {
+    void testSerialize() {
         PersistedDataSerializer serializer = mock(PersistedDataSerializer.class);
 
         char linefeedChar = '\n';
@@ -31,7 +31,7 @@ public class CharacterTypeHandlerTest {
     }
 
     @Test
-    public void testDeserialize() {
+    void testDeserialize() {
         Optional<Character> deserializedLinefeed = typeHandler.deserialize(new PersistedString("\n"));
 
         assertTrue(deserializedLinefeed.isPresent());

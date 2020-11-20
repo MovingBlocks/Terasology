@@ -19,14 +19,14 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-public class ArrayTypeHandlerFactoryTest {
+class ArrayTypeHandlerFactoryTest {
     private final TypeHandlerLibrary typeHandlerLibrary = mock(TypeHandlerLibrary.class);
     private final ArrayTypeHandlerFactory typeHandlerFactory = new ArrayTypeHandlerFactory();
     private final TypeHandlerContext context =
             new TypeHandlerContext(typeHandlerLibrary, mock(SerializationSandbox.class));
 
     @Test
-    public void testArray() {
+    void testArray() {
         TypeInfo<int[]> arrayTypeInfo = TypeInfo.of(int[].class);
 
         Optional<TypeHandler<int[]>> typeHandler =
@@ -40,7 +40,7 @@ public class ArrayTypeHandlerFactoryTest {
     }
 
     @Test
-    public void testGenericArray() {
+    void testGenericArray() {
         TypeInfo<List<Integer>[]> arrayTypeInfo = new TypeInfo<List<Integer>[]>() {};
 
         Optional<TypeHandler<List<Integer>[]>> typeHandler =
@@ -54,7 +54,7 @@ public class ArrayTypeHandlerFactoryTest {
     }
 
     @Test
-    public void testNonArray() {
+    void testNonArray() {
         TypeInfo<List<Integer>> arrayTypeInfo = new TypeInfo<List<Integer>>() {};
 
         Optional<TypeHandler<List<Integer>>> typeHandler =

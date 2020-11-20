@@ -23,9 +23,9 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class CollectionTypeHandlerTest {
+class CollectionTypeHandlerTest {
     @Test
-    public void testSerialize() {
+    void testSerialize() {
         IntTypeHandler elementTypeHandler = mock(IntTypeHandler.class);
 
         ObjectConstructor<Collection<Integer>> constructor = Queues::newArrayDeque;
@@ -53,7 +53,7 @@ public class CollectionTypeHandlerTest {
     }
 
     @Test
-    public void testDeserialize() {
+    void testDeserialize() {
         IntTypeHandler elementTypeHandler = mock(IntTypeHandler.class);
 
         ObjectConstructor<Collection<Integer>> constructor = mock(ObjectConstructor.class);

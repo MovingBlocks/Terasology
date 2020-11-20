@@ -30,7 +30,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class RuntimeDelegatingTypeHandlerTest {
+class RuntimeDelegatingTypeHandlerTest {
     private final TypeHandlerLibrary typeHandlerLibrary = mock(TypeHandlerLibrary.class);
 
     private final TypeHandlerContext context =
@@ -86,7 +86,7 @@ public class RuntimeDelegatingTypeHandlerTest {
     }
 
     @Test
-    public void testSerializeBase() {
+    void testSerializeBase() {
         PersistedDataSerializer serializer = mock(PersistedDataSerializer.class);
         when(serializer.serialize(any(String.class)))
             .then(invocation -> new PersistedString((String) invocation.getArguments()[0]));
@@ -109,7 +109,7 @@ public class RuntimeDelegatingTypeHandlerTest {
     }
 
     @Test
-    public void testSerializeSub() {
+    void testSerializeSub() {
         PersistedDataSerializer serializer = mock(PersistedDataSerializer.class);
         when(serializer.serialize(any(String.class)))
             .then(invocation -> new PersistedString((String) invocation.getArguments()[0]));
@@ -136,7 +136,7 @@ public class RuntimeDelegatingTypeHandlerTest {
     }
 
     @Test
-    public void testDeserializeBase() {
+    void testDeserializeBase() {
         setupHandlers();
 
         PersistedData persistedBase = new PersistedMap(ImmutableMap.of());
@@ -150,7 +150,7 @@ public class RuntimeDelegatingTypeHandlerTest {
     }
 
     @Test
-    public void testDeserializeSub() {
+    void testDeserializeSub() {
         setupHandlers();
 
         PersistedData persistedSub = new PersistedMap(
@@ -172,7 +172,7 @@ public class RuntimeDelegatingTypeHandlerTest {
     }
 
     @Test
-    public void testDeserializeNonSub() {
+    void testDeserializeNonSub() {
         setupHandlers();
 
         PersistedData persistedData = new PersistedMap(

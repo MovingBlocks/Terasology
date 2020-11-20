@@ -12,13 +12,13 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class EnumTypeHandlerFactoryTest {
+class EnumTypeHandlerFactoryTest {
     private enum SomeEnum {
         A, B
     }
 
     @Test
-    public void testEnum() {
+    void testEnum() {
         EnumTypeHandlerFactory typeHandlerFactory = new EnumTypeHandlerFactory();
         // EnumTypeHandlerFactory does not require a TypeHandlerLibrary
         Optional<TypeHandler<SomeEnum>> typeHandler = typeHandlerFactory.create(TypeInfo.of(SomeEnum.class), null);
@@ -28,7 +28,7 @@ public class EnumTypeHandlerFactoryTest {
     }
 
     @Test
-    public void testNonEnum() {
+    void testNonEnum() {
         EnumTypeHandlerFactory typeHandlerFactory = new EnumTypeHandlerFactory();
 
         // EnumTypeHandlerFactory does not require a TypeHandlerLibrary
