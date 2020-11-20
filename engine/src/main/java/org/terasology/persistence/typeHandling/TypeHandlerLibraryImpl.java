@@ -84,7 +84,7 @@ public class TypeHandlerLibraryImpl extends TypeHandlerLibrary {
         super(reflections);
         constructorLibrary = new ConstructorLibrary(instanceCreators);
         addTypeHandlerFactory(new ObjectFieldMapTypeHandlerFactory(constructorLibrary));
-        TypeHandlerLibrary.populateBuildinHandlers(this);
+        TypeHandlerLibrary.populateBuiltInHandlers(this);
         addTypeHandlerFactory(new CollectionTypeHandlerFactory(constructorLibrary));
         addTypeHandlerFactory(new ComponentClassTypeHandlerFactory());
     }
@@ -92,7 +92,7 @@ public class TypeHandlerLibraryImpl extends TypeHandlerLibrary {
     protected TypeHandlerLibraryImpl(SerializationSandbox sandbox) {
         super(sandbox);
         constructorLibrary = new ConstructorLibrary(instanceCreators);
-        TypeHandlerLibrary.populateBuildinHandlers(this);
+        TypeHandlerLibrary.populateBuiltInHandlers(this);
         addTypeHandlerFactory(new ObjectFieldMapTypeHandlerFactory(constructorLibrary));
         addTypeHandlerFactory(new CollectionTypeHandlerFactory(constructorLibrary));
         addTypeHandlerFactory(new ComponentClassTypeHandlerFactory());

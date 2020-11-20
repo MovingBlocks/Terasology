@@ -24,7 +24,7 @@ class TypeHandlerLibraryTest {
     public static void setup() {
         reflections = new Reflections(TypeHandlerLibraryTest.class.getClassLoader());
         typeHandlerLibrary = new TypeHandlerLibrary(reflections);
-        TypeHandlerLibrary.populateBuildinHandlers(typeHandlerLibrary);
+        TypeHandlerLibrary.populateBuiltInHandlers(typeHandlerLibrary);
     }
 
     @Test
