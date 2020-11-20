@@ -76,7 +76,7 @@ public class TypeHandlerLibrary {
         this.sandbox = sandbox;
     }
 
-    static void populateBuildinHandlers(TypeHandlerLibrary typeHandlerLibrary) {
+    static void populateBuiltInHandlers(TypeHandlerLibrary typeHandlerLibrary) {
         typeHandlerLibrary.addTypeHandler(Boolean.class, new BooleanTypeHandler());
         typeHandlerLibrary.addTypeHandler(Boolean.TYPE, new BooleanTypeHandler());
         typeHandlerLibrary.addTypeHandler(Byte.class, new ByteTypeHandler());
