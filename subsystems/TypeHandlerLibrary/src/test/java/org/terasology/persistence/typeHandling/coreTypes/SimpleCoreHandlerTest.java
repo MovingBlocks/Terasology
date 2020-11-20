@@ -39,7 +39,7 @@ class SimpleCoreHandlerTest {
     }
 
     @ParameterizedTest(name = "{1}")
-    @DisplayName("Chech simple core types serialization")
+    @DisplayName("Check simple core types serialization")
     @MethodSource("primitives")
     <T> void serialization(T obj, TypeHandler<T> typeHandler, PersistedData expectedData) throws Exception {
         PersistedData data = typeHandler.serialize(obj, new InMemoryPersistedDataSerializer());
