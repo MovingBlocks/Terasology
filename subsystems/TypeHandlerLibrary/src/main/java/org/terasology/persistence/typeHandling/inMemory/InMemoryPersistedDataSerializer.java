@@ -29,6 +29,10 @@ import java.util.Map;
 public class InMemoryPersistedDataSerializer implements PersistedDataSerializer {
 
     public static final PersistedData NULL = new AbstractPersistedData() {
+        @Override
+        public boolean isNull() {
+            return true;
+        }
     };
 
     @Override
@@ -38,7 +42,7 @@ public class InMemoryPersistedDataSerializer implements PersistedDataSerializer 
 
     @Override
     public PersistedData serialize(String... values) {
-        return serialize(values);
+        return serializeStrings(Arrays.asList(values));
     }
 
     @Override

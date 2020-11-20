@@ -39,4 +39,9 @@ public abstract class PersistedNumberArray extends AbstractPersistedArray {
             throw new IllegalStateException("Data is an array of size != 1");
         }
     }
+
+    @Override
+    public boolean isNumberArray() {
+        return true;
+    }
 }

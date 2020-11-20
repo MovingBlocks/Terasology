@@ -3,6 +3,7 @@
 
 package org.terasology.persistence.typeHandling.inMemory.arrays;
 
+import org.terasology.persistence.typeHandling.DeserializationException;
 import org.terasology.persistence.typeHandling.PersistedData;
 
 import java.nio.ByteBuffer;
@@ -109,7 +110,7 @@ public class PersistedValueArray extends AbstractPersistedArray {
             if (persistedData.isBytes()) {
                 return persistedData.getAsBytes();
             } else  {
-                throw new ClassCastException("Data is not a Bytes");
+                throw new DeserializationException("Data is not a Bytes");
             }
         } else {
             throw new IllegalStateException("Data is an array of size != 1");
@@ -118,7 +119,7 @@ public class PersistedValueArray extends AbstractPersistedArray {
 
     @Override
     public ByteBuffer getAsByteBuffer() {
-        return super.getAsByteBuffer();
+        return ByteBuffer.wrap(getAsBytes());
     }
 
     @Override
