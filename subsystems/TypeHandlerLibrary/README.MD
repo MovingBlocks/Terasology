@@ -2,8 +2,12 @@
 
 >It is really not subsystem. but used by them
 
-Our generic (De)Serialization library, 
-which provides interfaces for generic work with any protocol/format.
+A library of type handlers. This is used for the construction of class metadata. This library should be initialised
+by adding a number of base type handlers, describing how to serialize each supported type. It will then produce
+serializers for classes (through their ClassMetadata) on request.
+
+Type handlers provide the algorithms for serializing and deserializing types - this uses an implementation agnostic set of interfaces
+so TypeHandlers can be used for different serialization techniques (Json, Protobuf, etc).
 
 #### Structure
 
