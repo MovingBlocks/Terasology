@@ -48,8 +48,8 @@ public class TypeHandlerLibrary {
      * FutureTypeHandler} which is wired after the {@link TypeHandler} has been created.
      */
     private final ThreadLocal<Map<TypeInfo<?>, FutureTypeHandler<?>>> futureTypeHandlers = new ThreadLocal<>();
-    protected SerializationSandbox sandbox;
-    protected List<TypeHandlerFactory> typeHandlerFactories = Lists.newArrayList();
+    private SerializationSandbox sandbox;
+    private List<TypeHandlerFactory> typeHandlerFactories = Lists.newArrayList();
     protected Map<Type, InstanceCreator<?>> instanceCreators = Maps.newHashMap();
     private final Map<TypeInfo<?>, TypeHandler<?>> typeHandlerCache = Maps.newHashMap();
     private final Map<ClassMetadata<?, ?>, Serializer> serializerMap = Maps.newHashMap();
