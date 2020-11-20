@@ -2,8 +2,11 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.persistence.typeHandling.coreTypes;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.PersistedDataSerializer;
+import org.terasology.persistence.typeHandling.inMemory.InMemoryPersistedDataSerializer;
 import org.terasology.persistence.typeHandling.inMemory.PersistedInteger;
 import org.terasology.persistence.typeHandling.inMemory.PersistedString;
 
@@ -12,22 +15,19 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 
 class CharacterTypeHandlerTest {
     CharacterTypeHandler typeHandler = new CharacterTypeHandler();
 
     @Test
     void testSerialize() {
-        PersistedDataSerializer serializer = mock(PersistedDataSerializer.class);
+        PersistedDataSerializer serializer = new InMemoryPersistedDataSerializer();
 
         char linefeedChar = '\n';
 
-        typeHandler.serializeNonNull(linefeedChar, serializer);
+        PersistedData data = typeHandler.serializeNonNull(linefeedChar, serializer);
 
-        verify(serializer).serialize(eq("\n"));
+        Assertions.assertEquals("\n", data.getAsString());
     }
 
     @Test
