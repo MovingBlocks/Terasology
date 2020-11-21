@@ -475,9 +475,8 @@ public class InputSystem extends BaseComponentSystem {
      * @param delta The length of the current frame.
      * @return True if the event has been consumed by an event listener, false otherwise.
      */
-    private boolean sendMouseEvent(MouseInput button, boolean buttonDown, Vector2i jomlposition, float delta) {
+    private boolean sendMouseEvent(MouseInput button, boolean buttonDown, Vector2i position, float delta) {
         MouseButtonEvent event;
-        org.terasology.math.geom.Vector2i position = new org.terasology.math.geom.Vector2i(jomlposition.x, jomlposition.y);
         switch (button) {
             case NONE:
                 return false;

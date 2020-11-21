@@ -621,7 +621,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
             return;
         }
 
-        Vector2i mousePosition = JomlUtil.from(event.getMousePosition());
+        Vector2i mousePosition = event.getMousePosition();
         if (focus != null) {
             focus.onMouseButtonEvent(new NUIMouseButtonEvent(event.getButton(), event.getState(), mousePosition));
             if (event.isConsumed()) {
