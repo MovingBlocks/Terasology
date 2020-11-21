@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.rendering.cameras;
 
+import org.joml.AABBf;
 import org.joml.AxisAngle4f;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
@@ -235,6 +236,10 @@ public abstract class Camera {
     }
 
     public boolean hasInSight(AABB aabb) {
+        return viewFrustum.intersects(aabb);
+    }
+
+    public boolean hasInSight(AABBf aabb) {
         return viewFrustum.intersects(aabb);
     }
 }

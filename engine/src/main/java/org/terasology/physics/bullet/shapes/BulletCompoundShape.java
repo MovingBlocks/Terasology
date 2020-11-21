@@ -22,8 +22,6 @@ import org.joml.Quaternionf;
 import org.joml.Quaternionfc;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
-import org.terasology.math.JomlUtil;
-import org.terasology.math.Transform;
 import org.terasology.physics.shapes.CollisionShape;
 import org.terasology.physics.shapes.CompoundShape;
 

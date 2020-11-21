@@ -17,6 +17,7 @@ package org.terasology.rendering.logic;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.SetMultimap;
+import org.joml.AABBf;
 import org.joml.Matrix3f;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
@@ -37,9 +38,7 @@ import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.RenderSystem;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.LocalPlayer;
-import org.terasology.math.AABB;
 import org.terasology.math.JomlUtil;
-import org.terasology.math.Transform;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkSystem;
 import org.terasology.registry.In;
@@ -203,17 +202,15 @@ public class MeshRenderer extends BaseComponentSystem implements RenderSystem {
                         continue;
                     }
 
-                    worldRot.set(JomlUtil.from(location.getWorldRotation()));
-                    worldPos.set(JomlUtil.from(location.getWorldPosition()));
+                    worldRot.set(location.getWorldRotation(new Quaternionf()));
+                    worldPos.set(location.getWorldPosition(new Vector3f()));
                     float worldScale = location.getWorldScale();
-
-                    Transform toWorldSpace = new Transform(JomlUtil.from(worldPos), JomlUtil.from(worldRot), worldScale);
 
                     Vector3f offsetFromCamera = worldPos.sub(cameraPosition, new Vector3f());
                     matrixCameraSpace.translationRotateScale(offsetFromCamera, worldRot, worldScale);
 
 
-                    AABB aabb = meshComp.mesh.getAABB().transform(toWorldSpace);
+                    AABBf aabb = JomlUtil.from(meshComp.mesh.getAABB()).transform(new Matrix4f().translationRotateScale(worldPos, worldRot, worldScale));
                     if (worldRenderer.getActiveCamera().hasInSight(aabb)) {
                         if (meshComp.mesh != lastMesh) {
                             if (lastMesh != null) {
