@@ -16,19 +16,18 @@
 
 package org.terasology.network.internal;
 
-import org.jboss.netty.buffer.ChannelBuffer;
-import org.jboss.netty.channel.ChannelHandlerContext;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.channel.SimpleChannelHandler;
+import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelDuplexHandler;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelPromise;
 import org.terasology.network.NetMetricSource;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * A generic Netty handler for recording metrics on sent and received bytes and messages.
- *
  */
-public class MetricRecordingHandler extends SimpleChannelHandler implements NetMetricSource {
+public class MetricRecordingHandler extends ChannelDuplexHandler implements NetMetricSource {
 
     public static final String NAME = "metrics";
 
@@ -38,19 +37,19 @@ public class MetricRecordingHandler extends SimpleChannelHandler implements NetM
     private AtomicInteger sentBytes = new AtomicInteger();
 
     @Override
-    public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
-        ChannelBuffer buf = (ChannelBuffer) e.getMessage();
+    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+        ByteBuf buf = (ByteBuf) msg;
         receivedMessages.incrementAndGet();
         receivedBytes.addAndGet(buf.readableBytes());
-        ctx.sendUpstream(e);
+        super.channelRead(ctx, msg);
     }
 
     @Override
-    public void writeRequested(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
-        ChannelBuffer buf = (ChannelBuffer) e.getMessage();
+    public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
+        ByteBuf buf = (ByteBuf) msg;
         sentMessages.incrementAndGet();
         sentBytes.addAndGet(buf.readableBytes());
-        ctx.sendDownstream(e);
+        super.write(ctx, msg, promise);
     }
 
     @Override
