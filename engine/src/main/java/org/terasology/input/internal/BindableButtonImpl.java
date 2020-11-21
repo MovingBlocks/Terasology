@@ -212,9 +212,9 @@ public class BindableButtonImpl implements BindableButton {
                 if (!consumed) {
                     buttonEvent.prepare(id, ButtonState.REPEAT, delta);
                     buttonEvent.setTargetInfo(target,
-                        targetBlockPos == null ? null : targetBlockPos,
-                        hitPosition == null ? null : hitPosition,
-                        hitNormal == null ? null : hitNormal);
+                        targetBlockPos,
+                        hitPosition,
+                        hitNormal);
                     for (EntityRef entity : inputEntities) {
                         entity.send(buttonEvent);
                         if (buttonEvent.isConsumed()) {
