@@ -503,7 +503,7 @@ public class InputSystem extends BaseComponentSystem {
      * @return True if the event has been consumed by an event listener, false otherwise.
      */
     private boolean sendMouseWheelEvent(Vector2i pos, int wheelTurns, float delta) {
-        MouseWheelEvent mouseWheelEvent = new MouseWheelEvent(new org.terasology.math.geom.Vector2i(pos.x, pos.y),
+        MouseWheelEvent mouseWheelEvent = new MouseWheelEvent(pos,
                 wheelTurns, delta);
         return send(mouseWheelEvent);
     }
