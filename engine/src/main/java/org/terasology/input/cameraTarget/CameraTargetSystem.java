@@ -17,7 +17,6 @@
 package org.terasology.input.cameraTarget;
 
 import com.google.common.base.Objects;
-import org.joml.Math;
 import org.joml.RoundingMode;
 import org.joml.Vector3f;
 import org.joml.Vector3i;
