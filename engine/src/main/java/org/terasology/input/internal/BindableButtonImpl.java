@@ -27,7 +27,6 @@ import org.terasology.input.BindButtonSubscriber;
 import org.terasology.input.BindableButton;
 import org.terasology.input.ButtonState;
 import org.terasology.input.Input;
-import org.terasology.math.JomlUtil;
 
 import java.util.List;
 import java.util.Set;
@@ -160,9 +159,9 @@ public class BindableButtonImpl implements BindableButton {
                 if (!keyConsumed) {
                     buttonEvent.prepare(id, ButtonState.DOWN, delta);
                     buttonEvent.setTargetInfo(target,
-                        JomlUtil.from(targetBlockPos),
-                        JomlUtil.from(hitPosition),
-                        JomlUtil.from(hitNormal));
+                        targetBlockPos,
+                        hitPosition,
+                        hitNormal);
                     for (EntityRef entity : inputEntities) {
                         entity.send(buttonEvent);
                         if (buttonEvent.isConsumed()) {
@@ -181,9 +180,9 @@ public class BindableButtonImpl implements BindableButton {
                 if (!keyConsumed) {
                     buttonEvent.prepare(id, ButtonState.UP, delta);
                     buttonEvent.setTargetInfo(target,
-                        JomlUtil.from(targetBlockPos),
-                        JomlUtil.from(hitPosition),
-                        JomlUtil.from(hitNormal));
+                        targetBlockPos,
+                        hitPosition,
+                        hitNormal);
                     for (EntityRef entity : inputEntities) {
                         entity.send(buttonEvent);
                         if (buttonEvent.isConsumed()) {
@@ -213,9 +212,9 @@ public class BindableButtonImpl implements BindableButton {
                 if (!consumed) {
                     buttonEvent.prepare(id, ButtonState.REPEAT, delta);
                     buttonEvent.setTargetInfo(target,
-                        targetBlockPos == null ? null : JomlUtil.from(targetBlockPos),
-                        hitPosition == null ? null : JomlUtil.from(hitPosition),
-                        hitNormal == null ? null : JomlUtil.from(hitNormal));
+                        targetBlockPos == null ? null : targetBlockPos,
+                        hitPosition == null ? null : hitPosition,
+                        hitNormal == null ? null : hitNormal);
                     for (EntityRef entity : inputEntities) {
                         entity.send(buttonEvent);
                         if (buttonEvent.isConsumed()) {

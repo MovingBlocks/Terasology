@@ -311,15 +311,15 @@ public class InputSystem extends BaseComponentSystem {
      */
     private void updateBindState(BindableButton bind, Input input, boolean pressed, float delta, boolean consumed) {
         bind.updateBindState(
-            input,
-            pressed,
-            delta, inputEntities,
-            targetSystem.getTarget(),
-            targetSystem.getTargetBlockPosition(),
-            targetSystem.getHitPosition(),
-            targetSystem.getHitNormal(),
-            consumed,
-            time.getGameTimeInMs());
+                input,
+                pressed,
+                delta, inputEntities,
+                targetSystem.getTarget(),
+                targetSystem.getTargetBlockPosition(),
+                targetSystem.getHitPosition(),
+                targetSystem.getHitNormal(),
+                consumed,
+                time.getGameTimeInMs());
     }
 
     public void simulateTextInput(String text) {
@@ -403,9 +403,9 @@ public class InputSystem extends BaseComponentSystem {
     private void processBindAxis(float delta) {
         for (AbstractBindableAxis axis : bindsManager.getAxisBinds()) {
             axis.update(inputEntities, delta, targetSystem.getTarget(),
-                JomlUtil.from(targetSystem.getTargetBlockPosition()),
-                JomlUtil.from(targetSystem.getHitPosition()),
-                JomlUtil.from(targetSystem.getHitNormal()));
+                    targetSystem.getTargetBlockPosition(),
+                    targetSystem.getHitPosition(),
+                    targetSystem.getHitNormal());
         }
     }
 
@@ -507,7 +507,8 @@ public class InputSystem extends BaseComponentSystem {
      * @return True if the event has been consumed by an event listener, false otherwise.
      */
     private boolean sendMouseWheelEvent(Vector2i pos, int wheelTurns, float delta) {
-        MouseWheelEvent mouseWheelEvent = new MouseWheelEvent(new org.terasology.math.geom.Vector2i(pos.x, pos.y) , wheelTurns, delta);
+        MouseWheelEvent mouseWheelEvent = new MouseWheelEvent(new org.terasology.math.geom.Vector2i(pos.x, pos.y),
+                wheelTurns, delta);
         return send(mouseWheelEvent);
     }
 
@@ -536,9 +537,9 @@ public class InputSystem extends BaseComponentSystem {
     private void setupTarget(InputEvent event) {
         if (targetSystem.isTargetAvailable()) {
             event.setTargetInfo(targetSystem.getTarget(),
-                JomlUtil.from(targetSystem.getTargetBlockPosition()),
-                JomlUtil.from(targetSystem.getHitPosition()),
-                JomlUtil.from(targetSystem.getHitNormal()));
+                    targetSystem.getTargetBlockPosition(),
+                    targetSystem.getHitPosition(),
+                    targetSystem.getHitNormal());
         }
     }
 

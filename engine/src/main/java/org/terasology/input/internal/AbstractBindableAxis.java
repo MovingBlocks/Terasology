@@ -22,8 +22,8 @@ import org.terasology.input.BindAxisEvent;
 import org.terasology.input.BindAxisSubscriber;
 import org.terasology.input.BindableAxis;
 import org.terasology.input.SendEventMode;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector3i;
+import org.joml.Vector3f;
+import org.joml.Vector3i;
 
 import java.util.List;
 
