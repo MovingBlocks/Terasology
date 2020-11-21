@@ -16,14 +16,15 @@
 
 package org.terasology.network.internal.pipelineFactory;
 
-import org.jboss.netty.channel.ChannelPipeline;
-import org.jboss.netty.channel.ChannelPipelineFactory;
-import org.jboss.netty.handler.codec.compression.ZlibDecoder;
-import org.jboss.netty.handler.codec.frame.LengthFieldBasedFrameDecoder;
-import org.jboss.netty.handler.codec.protobuf.ProtobufDecoder;
-import org.jboss.netty.handler.codec.protobuf.ProtobufEncoder;
-import org.jboss.netty.handler.codec.protobuf.ProtobufVarint32FrameDecoder;
-import org.jboss.netty.handler.codec.protobuf.ProtobufVarint32LengthFieldPrepender;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelPipeline;
+import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
+import io.netty.handler.codec.compression.JdkZlibDecoder;
+import io.netty.handler.codec.protobuf.ProtobufDecoder;
+import io.netty.handler.codec.protobuf.ProtobufEncoder;
+import io.netty.handler.codec.protobuf.ProtobufVarint32FrameDecoder;
+import io.netty.handler.codec.protobuf.ProtobufVarint32LengthFieldPrepender;
 import org.terasology.network.internal.ClientConnectionHandler;
 import org.terasology.network.internal.ClientHandler;
 import org.terasology.network.internal.ClientHandshakeHandler;
@@ -32,13 +33,11 @@ import org.terasology.network.internal.MetricRecordingHandler;
 import org.terasology.network.internal.NetworkSystemImpl;
 import org.terasology.protobuf.NetData;
 
-import static org.jboss.netty.channel.Channels.pipeline;
 
 /**
  * Netty pipeline for Clients
- *
  */
-public class TerasologyClientPipelineFactory implements ChannelPipelineFactory {
+public class TerasologyClientPipelineFactory extends ChannelInitializer {
 
     private NetworkSystemImpl networkSystem;
 
@@ -47,13 +46,13 @@ public class TerasologyClientPipelineFactory implements ChannelPipelineFactory {
     }
 
     @Override
-    public ChannelPipeline getPipeline() throws Exception {
+    protected void initChannel(Channel ch) throws Exception {
         JoinStatusImpl joinStatus = new JoinStatusImpl();
-        ChannelPipeline p = pipeline();
+        ChannelPipeline p = ch.pipeline();
         p.addLast(MetricRecordingHandler.NAME, new MetricRecordingHandler());
 
         p.addLast("lengthFrameDecoder", new LengthFieldBasedFrameDecoder(8388608, 0, 3, 0, 3));
-        p.addLast("inflateDecoder", new ZlibDecoder());
+        p.addLast("inflateDecoder", new JdkZlibDecoder());
         p.addLast("frameDecoder", new ProtobufVarint32FrameDecoder());
         p.addLast("protobufDecoder", new ProtobufDecoder(NetData.NetMessage.getDefaultInstance()));
 
@@ -62,6 +61,5 @@ public class TerasologyClientPipelineFactory implements ChannelPipelineFactory {
         p.addLast("authenticationHandler", new ClientHandshakeHandler(joinStatus));
         p.addLast("connectionHandler", new ClientConnectionHandler(joinStatus, networkSystem));
         p.addLast("handler", new ClientHandler(networkSystem));
-        return p;
     }
 }
