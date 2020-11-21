@@ -12,7 +12,6 @@ import org.terasology.engine.SimpleUri;
 import org.terasology.engine.Time;
 import org.terasology.engine.subsystem.DisplayDevice;
 import org.terasology.engine.subsystem.config.BindsManager;
-import org.terasology.engine.subsystem.config.BindsSubsystem;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
@@ -77,9 +76,6 @@ public class InputSystem extends BaseComponentSystem {
 
     @In
     private CameraTargetSystem targetSystem;
-
-    @In
-    private BindsSubsystem bindsSubsystem;
 
     private MouseDevice mouse = new NullMouseDevice();
     private KeyboardDevice keyboard = new NullKeyboardDevice();
@@ -554,13 +550,15 @@ public class InputSystem extends BaseComponentSystem {
     }
 
     /**
-     * API-exposed caller to {@link BindsSubsystem#getInputsForBindButton(SimpleUri)}. TODO: Restored for API reasons,
-     * may be duplicating code elsewhere. Should be reviewed.
+     * API-exposed caller to {@link BindsManager#getBindsConfig()} and
+     * {@link org.terasology.config.BindsConfig#getBinds(SimpleUri)}.
+     * <p>
+     * TODO: Restored for API reasons, may be duplicating code elsewhere. Should be reviewed.
      *
      * @param bindId the ID.
      * @return a list of keyboard/mouse inputs that trigger the binding.
      */
     public List<Input> getInputsForBindButton(SimpleUri bindId) {
-        return bindsSubsystem.getInputsForBindButton(bindId);
+        return bindsManager.getBindsConfig().getBinds(bindId);
     }
 }
