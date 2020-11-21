@@ -15,6 +15,9 @@
  */
 package org.terasology.rendering.world.selection;
 
+import org.joml.Vector2i;
+import org.joml.Vector3i;
+import org.terasology.math.JomlUtil;
 import org.terasology.utilities.Assets;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -22,8 +25,6 @@ import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.RenderSystem;
-import org.terasology.math.geom.Vector2i;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.world.selection.BlockSelectionComponent;
@@ -79,17 +80,17 @@ public class BlockSelectionRenderSystem extends BaseComponentSystem implements R
         selectionRenderer.beginRenderOverlay();
         if (blockSelectionComponent.currentSelection == null) {
             if (blockSelectionComponent.startPosition != null) {
-                selectionRenderer.renderMark(blockSelectionComponent.startPosition);
+                selectionRenderer.renderMark(JomlUtil.from(blockSelectionComponent.startPosition));
             }
         } else {
-            Vector3i size = blockSelectionComponent.currentSelection.size();
+            Vector3i size = blockSelectionComponent.currentSelection.getSize(new org.joml.Vector3i());
             Vector3i block = new Vector3i();
             for (int z = 0; z < size.z; z++) {
                 for (int y = 0; y < size.y; y++) {
                     for (int x = 0; x < size.x; x++) {
                         block.set(x, y, z);
-                        block.add(blockSelectionComponent.currentSelection.min());
-                        selectionRenderer.renderMark(block);
+                        block.add(blockSelectionComponent.currentSelection.getMin(new Vector3i()));
+                        selectionRenderer.renderMark(JomlUtil.from(block));
                     }
                 }
             }

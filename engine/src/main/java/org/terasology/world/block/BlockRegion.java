@@ -205,6 +205,19 @@ public class BlockRegion {
      * @param x    the x coordinate of the block
      * @param y    the y coordinate of the block
      * @param z    the z coordinate of the block
+     * @return dest
+     */
+    public BlockRegion union(int x, int y, int z) {
+        return union(x, y, z, this);
+    }
+
+
+    /**
+     * Compute the union of <code>this</code> and the given block <code>(x, y, z)</code> and stores the result in <code>dest</code>
+     *
+     * @param x    the x coordinate of the block
+     * @param y    the y coordinate of the block
+     * @param z    the z coordinate of the block
      * @param dest will hold the result
      * @return dest
      */
