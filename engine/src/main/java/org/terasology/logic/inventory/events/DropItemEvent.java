@@ -16,6 +16,7 @@
 package org.terasology.logic.inventory.events;
 
 import org.terasology.entitySystem.event.Event;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.network.ServerEvent;
 
@@ -29,8 +30,16 @@ public class DropItemEvent implements Event {
     public DropItemEvent() {
     }
 
+    /**
+     * @deprecated This method is scheduled for removal in an upcoming version.
+     *             Use the JOML implementation instead: {@link #DropItemEvent(org.joml.Vector3f)}.
+     */
     public DropItemEvent(Vector3f position) {
         this.position = position;
+    }
+
+    public DropItemEvent(org.joml.Vector3f position) {
+        this.position = JomlUtil.from(position);
     }
 
     public Vector3f getPosition() {
