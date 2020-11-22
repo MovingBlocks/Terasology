@@ -399,9 +399,9 @@ public class InputSystem extends BaseComponentSystem {
     private void processBindAxis(float delta) {
         for (AbstractBindableAxis axis : bindsManager.getAxisBinds()) {
             axis.update(inputEntities, delta, targetSystem.getTarget(),
-                    JomlUtil.from(targetSystem.getTargetBlockPosition()),
-                    JomlUtil.from(targetSystem.getHitPosition()),
-                    JomlUtil.from(targetSystem.getHitNormal()));
+                    targetSystem.getTargetBlockPosition(),
+                    targetSystem.getHitPosition(),
+                    targetSystem.getHitNormal());
         }
     }
 
@@ -471,10 +471,8 @@ public class InputSystem extends BaseComponentSystem {
      * @param delta The length of the current frame.
      * @return True if the event has been consumed by an event listener, false otherwise.
      */
-    private boolean sendMouseEvent(MouseInput button, boolean buttonDown, Vector2i jomlposition, float delta) {
+    private boolean sendMouseEvent(MouseInput button, boolean buttonDown, Vector2i position, float delta) {
         MouseButtonEvent event;
-        org.terasology.math.geom.Vector2i position = new org.terasology.math.geom.Vector2i(jomlposition.x,
-                jomlposition.y);
         switch (button) {
             case NONE:
                 return false;
@@ -505,7 +503,7 @@ public class InputSystem extends BaseComponentSystem {
      * @return True if the event has been consumed by an event listener, false otherwise.
      */
     private boolean sendMouseWheelEvent(Vector2i pos, int wheelTurns, float delta) {
-        MouseWheelEvent mouseWheelEvent = new MouseWheelEvent(new org.terasology.math.geom.Vector2i(pos.x, pos.y),
+        MouseWheelEvent mouseWheelEvent = new MouseWheelEvent(pos,
                 wheelTurns, delta);
         return send(mouseWheelEvent);
     }
@@ -535,9 +533,9 @@ public class InputSystem extends BaseComponentSystem {
     private void setupTarget(InputEvent event) {
         if (targetSystem.isTargetAvailable()) {
             event.setTargetInfo(targetSystem.getTarget(),
-                    JomlUtil.from(targetSystem.getTargetBlockPosition()),
-                    JomlUtil.from(targetSystem.getHitPosition()),
-                    JomlUtil.from(targetSystem.getHitNormal()));
+                    targetSystem.getTargetBlockPosition(),
+                    targetSystem.getHitPosition(),
+                    targetSystem.getHitNormal());
         }
     }
 
