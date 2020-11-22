@@ -18,8 +18,8 @@ package org.terasology.rendering.nui.editor;
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;
 import com.google.gson.JsonParser;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.terasology.TerasologyTestingEnvironment;
 import org.terasology.engine.subsystem.headless.renderer.HeadlessCanvasRenderer;
 import org.terasology.i18n.TranslationSystem;
@@ -28,34 +28,35 @@ import org.terasology.input.InputSystem;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.editor.layers.PlaceholderScreen;
 import org.terasology.rendering.nui.editor.utils.NUIEditorNodeUtils;
-import org.terasology.rendering.nui.internal.CanvasRenderer;
+import org.terasology.nui.canvas.CanvasRenderer;
 import org.terasology.rendering.nui.internal.NUIManagerInternal;
-import org.terasology.rendering.nui.layouts.RowLayout;
-import org.terasology.rendering.nui.layouts.RowLayoutHint;
-import org.terasology.rendering.nui.layouts.relative.HorizontalInfo;
-import org.terasology.rendering.nui.layouts.relative.RelativeLayout;
-import org.terasology.rendering.nui.layouts.relative.RelativeLayoutHint;
-import org.terasology.rendering.nui.layouts.relative.VerticalInfo;
-import org.terasology.rendering.nui.widgets.UIButton;
-import org.terasology.rendering.nui.widgets.UILabel;
-import org.terasology.rendering.nui.widgets.treeView.JsonTree;
-import org.terasology.rendering.nui.widgets.treeView.JsonTreeConverter;
+import org.terasology.nui.layouts.RowLayout;
+import org.terasology.nui.layouts.RowLayoutHint;
+import org.terasology.nui.layouts.relative.HorizontalInfo;
+import org.terasology.nui.layouts.relative.RelativeLayout;
+import org.terasology.nui.layouts.relative.RelativeLayoutHint;
+import org.terasology.nui.layouts.relative.VerticalInfo;
+import org.terasology.nui.widgets.UIButton;
+import org.terasology.nui.widgets.UILabel;
+import org.terasology.nui.widgets.treeView.JsonTree;
+import org.terasology.nui.widgets.treeView.JsonTreeConverter;
+import org.terasology.rendering.nui.internal.TerasologyCanvasRenderer;
 
 import java.io.File;
 import java.io.IOException;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class ContextMenuUtilsTest extends TerasologyTestingEnvironment {
     private static JsonTree inputTree;
 
-    @BeforeClass
+    @BeforeAll
     public static void setupInput() {
         context.put(InputSystem.class, new InputSystem());
         context.put(TranslationSystem.class, new TranslationSystemImpl(context));
         context.put(CanvasRenderer.class, new HeadlessCanvasRenderer());
-        context.put(NUIManager.class, new NUIManagerInternal(context.get(CanvasRenderer.class), context));
+        context.put(NUIManager.class, new NUIManagerInternal((TerasologyCanvasRenderer) context.get(CanvasRenderer.class), context));
 
         File file = new File(ContextMenuUtilsTest.class.getClassLoader().getResource("contextMenuBuilderInput.ui").getFile());
         String content = null;

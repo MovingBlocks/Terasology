@@ -17,8 +17,7 @@
 package org.terasology.world.generation.facets;
 
 import com.google.common.collect.ImmutableMap;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.terasology.math.Region3i;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.world.generation.Border3D;
@@ -26,6 +25,8 @@ import org.terasology.world.generation.facets.base.BooleanFieldFacet3D;
 import org.terasology.world.generation.facets.base.SparseBooleanFieldFacet3D;
 
 import java.util.Map;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Tests the {@link SparseBooleanFieldFacet3D} class.
@@ -60,7 +61,7 @@ public class SparseBooleanFacetTest extends BooleanFacetTest {
                 new Vector3i(0, 1, 5), true,
                 new Vector3i(9, 3, 1), true);
 
-        Assert.assertEquals(expected, facet.getRelativeEntries());
+        assertEquals(expected, facet.getRelativeEntries());
     }
 
     @Test
@@ -80,6 +81,6 @@ public class SparseBooleanFacetTest extends BooleanFacetTest {
                 new Vector3i(10, 21, 35), true,
                 new Vector3i(19, 23, 31), true);
 
-        Assert.assertEquals(expected, facet.getWorldEntries());
+        assertEquals(expected, facet.getWorldEntries());
     }
 }

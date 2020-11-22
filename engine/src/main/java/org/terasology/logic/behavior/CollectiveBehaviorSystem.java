@@ -57,7 +57,7 @@ import java.util.*;
  * Modifications made to a behavior tree will reflect to all entities using this tree.
  */
 @RegisterSystem(RegisterMode.AUTHORITY)
-@Share(BehaviorSystem.class)
+@Share(CollectiveBehaviorSystem.class)
 public class CollectiveBehaviorSystem extends BaseComponentSystem implements UpdateSubscriberSystem {
     public static final Name BEHAVIORS = new Name("Behaviors");
     private static final Logger logger = LoggerFactory.getLogger(BehaviorSystem.class);

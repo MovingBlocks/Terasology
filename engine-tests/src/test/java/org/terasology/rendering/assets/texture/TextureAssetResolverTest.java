@@ -16,11 +16,10 @@
 
 package org.terasology.rendering.assets.texture;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.terasology.TerasologyTestingEnvironment;
 import org.terasology.assets.ResourceUrn;
-import org.terasology.rendering.nui.Color;
+import org.terasology.nui.Color;
 import org.terasology.utilities.Assets;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.utilities.random.Random;
@@ -28,7 +27,8 @@ import org.terasology.utilities.random.Random;
 import java.nio.ByteBuffer;
 import java.util.Optional;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests texture asset resolvers.
@@ -50,7 +50,7 @@ public class TextureAssetResolverTest extends TerasologyTestingEnvironment {
             ByteBuffer dataBuffer = tex.get().getData().getBuffers()[0];
             int firstPixel = dataBuffer.asIntBuffer().get(0);
 
-            Assert.assertEquals(rgba, firstPixel);
+            assertEquals(rgba, firstPixel);
         }
     }
 
@@ -64,8 +64,8 @@ public class TextureAssetResolverTest extends TerasologyTestingEnvironment {
         Optional<Texture> tex = Assets.getTexture(simpleString);
 
         assertTrue(tex.isPresent());
-        assertTrue(tex.get().getWidth() == size);
-        assertTrue(tex.get().getHeight() == size);
+        assertEquals(tex.get().getWidth(), size);
+        assertEquals(tex.get().getHeight(), size);
     }
 }
 

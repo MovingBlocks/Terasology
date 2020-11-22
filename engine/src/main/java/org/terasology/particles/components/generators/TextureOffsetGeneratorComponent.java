@@ -15,9 +15,9 @@
  */
 package org.terasology.particles.components.generators;
 
+import org.joml.Vector2f;
+import org.joml.Vector2i;
 import org.terasology.entitySystem.Component;
-import org.terasology.math.geom.Vector2f;
-import org.terasology.math.geom.Vector2i;
 import org.terasology.module.sandbox.API;
 import org.terasology.rendering.assets.texture.Texture;
 
@@ -60,12 +60,12 @@ public class TextureOffsetGeneratorComponent implements Component {
      * @param validTextures Indices of the valid textures
      */
     public TextureOffsetGeneratorComponent(final Texture atlas, final Vector2i atlasSize, final Vector2i[] validTextures) {
-        final float textureWidth = atlas.getWidth() / (float) atlasSize.getX();
-        final float textureHeight = atlas.getHeight() / (float) atlasSize.getY();
+        final float textureWidth = atlas.getWidth() / (float) atlasSize.x();
+        final float textureHeight = atlas.getHeight() / (float) atlasSize.y();
 
         Function<Vector2i, Vector2f> absolute2Relative = (absolute) -> new Vector2f(
-                absolute.getX() * textureWidth,
-                absolute.getY() * textureHeight
+                absolute.x() * textureWidth,
+                absolute.y() * textureHeight
         );
 
         this.validOffsets = new LinkedList<>();

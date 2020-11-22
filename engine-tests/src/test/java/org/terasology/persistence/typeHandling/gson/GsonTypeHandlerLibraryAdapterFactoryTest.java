@@ -18,17 +18,18 @@ package org.terasology.persistence.typeHandling.gson;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.gson.Gson;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.reflections.Reflections;
 import org.terasology.math.geom.Rect2i;
 import org.terasology.math.geom.Vector4f;
+import org.terasology.nui.Color;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
-import org.terasology.rendering.nui.Color;
 
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class GsonTypeHandlerLibraryAdapterFactoryTest {
     private static final TestClass OBJECT = new TestClass(
@@ -58,14 +59,14 @@ public class GsonTypeHandlerLibraryAdapterFactoryTest {
     public void testSerialize() {
         String serializedObject = gson.toJson(OBJECT);
 
-        Assert.assertEquals(OBJECT_JSON, serializedObject);
+        assertEquals(OBJECT_JSON, serializedObject);
     }
 
     @Test
     public void testDeserialize() {
         TestClass deserializedObject = gson.fromJson(OBJECT_JSON, TestClass.class);
 
-        Assert.assertEquals(OBJECT, deserializedObject);
+        assertEquals(OBJECT, deserializedObject);
     }
 
     private static class TestClass {

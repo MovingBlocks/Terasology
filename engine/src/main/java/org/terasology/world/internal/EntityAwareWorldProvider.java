@@ -21,6 +21,8 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import org.joml.Vector3fc;
+import org.joml.Vector3ic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.context.Context;
@@ -41,7 +43,9 @@ import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.metadata.ComponentMetadata;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
+import org.terasology.logic.common.RetainComponentsComponent;
 import org.terasology.logic.location.LocationComponent;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.Region3i;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
@@ -65,7 +69,7 @@ import java.util.Set;
 public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator implements BlockEntityRegistry, UpdateSubscriberSystem, EntityChangeSubscriber {
     private static final Logger logger = LoggerFactory.getLogger(EntityAwareWorldProvider.class);
     private static final Set<Class<? extends Component>> COMMON_BLOCK_COMPONENTS =
-            ImmutableSet.of(NetworkComponent.class, BlockComponent.class, LocationComponent.class);
+        ImmutableSet.of(NetworkComponent.class, BlockComponent.class, LocationComponent.class);
     private static final float BLOCK_REGEN_SECONDS = 4.0f;
 
     private EngineEntityManager entityManager;
@@ -113,13 +117,48 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
 
     @Override
     public Block setBlock(Vector3i pos, Block type) {
+        return this.setBlock(JomlUtil.from(pos), type);
+    }
+
+    @Override
+    public Block setBlock(Vector3ic pos, Block type) {
         if (GameThread.isCurrentThread()) {
-            EntityRef blockEntity = getBlockEntityAt(pos);
+            EntityRef blockEntity = getBlockEntityAt(JomlUtil.from(pos));
             Block oldType = super.setBlock(pos, type);
+            final Set<Class<? extends Component>> retainComponents =
+                    Optional.ofNullable(blockEntity.getComponent(RetainComponentsComponent.class))
+                            .map(retainComponentsComponent -> retainComponentsComponent.components)
+                            .orElse(Collections.emptySet());
             if (oldType != null) {
-                updateBlockEntity(blockEntity, pos, oldType, type, false, Collections.<Class<? extends Component>>emptySet());
+                updateBlockEntity(blockEntity, JomlUtil.from(pos), oldType, type, false, retainComponents);
             }
             return oldType;
+        }
+        return null;
+    }
+
+
+    //SetBlocks, not SetBlock, is currently triggered by the engine whenever a player places a block.
+    //This allows for several useful features, such as quickly synchronizing placement across networks.
+    //However, this means that even if only one block is placed, this is the method being called.
+    //It must be overridden here to allow an OnChangedBlock event to be properly sent for placed blocks.
+    @Override
+    public Map<Vector3i, Block> setBlocks(Map<Vector3i, Block> blocks) {
+        if (GameThread.isCurrentThread()) {
+            Map<Vector3i, Block> oldBlocks = super.setBlocks(blocks);
+            for (Vector3i vec : oldBlocks.keySet()) {
+                if (oldBlocks.get(vec) != null) {
+                    EntityRef blockEntity = getBlockEntityAt(vec);
+
+                    // check for components to be retained when updating the block entity
+                    final Set<Class<? extends Component>> retainComponents =
+                            Optional.ofNullable(blockEntity.getComponent(RetainComponentsComponent.class))
+                                    .map(retainComponentsComponent -> retainComponentsComponent.components)
+                                    .orElse(Collections.emptySet());
+                    updateBlockEntity(blockEntity, vec, oldBlocks.get(vec), blocks.get(vec), false, retainComponents);
+                }
+            }
+            return oldBlocks;
         }
         return null;
     }
@@ -127,11 +166,17 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
     @Override
     @SafeVarargs
     public final Block setBlockRetainComponent(Vector3i pos, Block type, Class<? extends Component>... components) {
+        return setBlockRetainComponent(JomlUtil.from(pos), type, components);
+    }
+
+    @Override
+    @SafeVarargs
+    public final Block setBlockRetainComponent(Vector3ic position, Block type, Class<? extends Component>... components) {
         if (GameThread.isCurrentThread()) {
-            EntityRef blockEntity = getBlockEntityAt(pos);
-            Block oldType = super.setBlock(pos, type);
+            EntityRef blockEntity = getBlockEntityAt(position);
+            Block oldType = super.setBlock(position, type);
             if (oldType != null) {
-                updateBlockEntity(blockEntity, pos, oldType, type, false, Sets.newHashSet(components));
+                updateBlockEntity(blockEntity, JomlUtil.from(position), oldType, type, false, Sets.newHashSet(components));
             }
             return oldType;
         }
@@ -171,8 +216,13 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
 
     @Override
     public EntityRef getExistingBlockEntityAt(Vector3i blockPosition) {
+        return getExistingBlockEntityAt(JomlUtil.from(blockPosition));
+    }
+
+    @Override
+    public EntityRef getExistingBlockEntityAt(Vector3ic blockPosition) {
         if (GameThread.isCurrentThread()) {
-            EntityRef result = blockEntityLookup.get(blockPosition);
+            EntityRef result = blockEntityLookup.get(JomlUtil.from(blockPosition));
             return (result == null) ? EntityRef.NULL : result;
         }
         logger.error("Attempted to get block entity off-thread");
@@ -181,11 +231,16 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
 
     @Override
     public Block setBlockForceUpdateEntity(Vector3i pos, Block type) {
+        return setBlockForceUpdateEntity(JomlUtil.from(pos), type);
+    }
+
+    @Override
+    public Block setBlockForceUpdateEntity(Vector3ic position, Block type) {
         if (GameThread.isCurrentThread()) {
-            EntityRef blockEntity = getBlockEntityAt(pos);
-            Block oldType = super.setBlock(pos, type);
+            EntityRef blockEntity = getBlockEntityAt(position);
+            Block oldType = super.setBlock(position, type);
             if (oldType != null) {
-                updateBlockEntity(blockEntity, pos, oldType, type, true, Collections.<Class<? extends Component>>emptySet());
+                updateBlockEntity(blockEntity, JomlUtil.from(position), oldType, type, true, Collections.<Class<? extends Component>>emptySet());
             }
             return oldType;
         }
@@ -199,18 +254,30 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
     }
 
     @Override
+    public EntityRef getBlockEntityAt(Vector3fc position) {
+        org.joml.Vector3i pos = new org.joml.Vector3i(position, org.joml.RoundingMode.HALF_UP);
+        return getBlockEntityAt(pos);
+    }
+
+    @Override
     public EntityRef getBlockEntityAt(Vector3i blockPosition) {
+        return getBlockEntityAt(JomlUtil.from(blockPosition));
+    }
+
+    @Override
+    public EntityRef getBlockEntityAt(Vector3ic blockPosition) {
         if (GameThread.isCurrentThread()) {
             EntityRef blockEntity = getExistingBlockEntityAt(blockPosition);
-            if ((!blockEntity.exists() || !blockEntity.hasComponent(NetworkComponent.class)) && isBlockRelevant(blockPosition.x, blockPosition.y, blockPosition.z)) {
-                Block block = getBlock(blockPosition.x, blockPosition.y, blockPosition.z);
-                blockEntity = createBlockEntity(blockPosition, block);
+            if ((!blockEntity.exists() || !blockEntity.hasComponent(NetworkComponent.class)) && isBlockRelevant(blockPosition.x(), blockPosition.y(), blockPosition.z())) {
+                Block block = getBlock(blockPosition.x(), blockPosition.y(), blockPosition.z());
+                blockEntity = createBlockEntity(JomlUtil.from(blockPosition), block);
             }
             return blockEntity;
         }
         logger.error("Attempted to get block entity off-thread");
         return EntityRef.NULL;
     }
+
 
     private boolean isTemporaryBlock(ComponentContainer entity, Block block) {
         return isTemporaryBlock(entity, block, null);
@@ -234,10 +301,19 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
     /**
      * Transforms a block entity with the change of block type. This is driven from the delta between the old and new
      * block type prefabs, but takes into account changes made to the block entity.
+     * Components contained in `blockEntity` that
+     * <ul>
+     *     <li>are not "common block components" (e.g. `NetworkComponent`)</li>
+     *     <li>don't have `reatinUnalteredOnBlockChange` metadata</li>
+     *     <li>are not listed in the block prefab</li>
+     *     <li>are not listed in the set of components to be retained</li>
+     * </ul>
+     * will be removed.
      *
-     * @param blockEntity The entity to update
-     * @param oldType     The previous type of the block
-     * @param type        The new type of the block
+     * @param blockEntity      The entity to update
+     * @param oldType          The previous type of the block
+     * @param type             The new type of the block
+     * @param retainComponents List of components to be retained
      */
     private void updateBlockEntityComponents(EntityRef blockEntity, Block oldType, Block type, Set<Class<? extends Component>> retainComponents) {
         BlockComponent blockComponent = blockEntity.getComponent(BlockComponent.class);
@@ -262,8 +338,8 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
 
         for (Component component : blockEntity.iterateComponents()) {
             if (!COMMON_BLOCK_COMPONENTS.contains(component.getClass())
-                    && !entityManager.getComponentLibrary().getMetadata(component.getClass()).isRetainUnalteredOnBlockChange()
-                    && !newEntityBuilder.hasComponent(component.getClass()) && !retainComponents.contains(component.getClass())) {
+                && !entityManager.getComponentLibrary().getMetadata(component.getClass()).isRetainUnalteredOnBlockChange()
+                && !newEntityBuilder.hasComponent(component.getClass()) && !retainComponents.contains(component.getClass())) {
                 blockEntity.removeComponent(component.getClass());
             }
         }
@@ -327,8 +403,13 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
 
     @Override
     public EntityRef getExistingEntityAt(Vector3i blockPosition) {
+        return getExistingEntityAt(JomlUtil.from(blockPosition));
+    }
+
+    @Override
+    public EntityRef getExistingEntityAt(Vector3ic blockPosition) {
         if (GameThread.isCurrentThread()) {
-            EntityRef result = blockRegionLookup.get(blockPosition);
+            EntityRef result = blockRegionLookup.get(JomlUtil.from(blockPosition));
             if (result == null) {
                 return getExistingBlockEntityAt(blockPosition);
             }
@@ -340,6 +421,11 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
 
     @Override
     public EntityRef getEntityAt(Vector3i blockPosition) {
+        return getEntityAt(JomlUtil.from(blockPosition));
+    }
+
+    @Override
+    public EntityRef getEntityAt(Vector3ic blockPosition) {
         if (GameThread.isCurrentThread()) {
             EntityRef entity = getExistingEntityAt(blockPosition);
             if (!entity.exists()) {
@@ -353,8 +439,13 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
 
     @Override
     public boolean hasPermanentBlockEntity(Vector3i blockPos) {
+        return hasPermanentBlockEntity(JomlUtil.from(blockPos));
+    }
+
+    @Override
+    public boolean hasPermanentBlockEntity(Vector3ic blockPos) {
         if (GameThread.isCurrentThread()) {
-            EntityRef blockEntity = blockEntityLookup.get(blockPos);
+            EntityRef blockEntity = blockEntityLookup.get(JomlUtil.from(blockPos));
             return blockEntity != null && !temporaryBlockEntities.contains(blockEntity);
         }
         logger.error("Attempted check whether a block entity is permanent, off thread");

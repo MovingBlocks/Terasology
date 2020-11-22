@@ -15,12 +15,15 @@
  */
 package org.terasology.rendering.assets.texture;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
 import java.io.IOException;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class AWTTextureFormatTest {
     @Test
@@ -28,9 +31,9 @@ public class AWTTextureFormatTest {
         BufferedImage image = createBufferedImage(1, 2, BufferedImage.TYPE_BYTE_GRAY);
         try {
             AWTTextureFormat.convertToTextureData(image, Texture.FilterMode.LINEAR);
-            Assert.fail("IOException should be thrown");
+            fail("IOException should be thrown");
         } catch (IOException ex) {
-            Assert.assertEquals("Unsupported AWT format: " + image.getType(), ex.getMessage());
+            assertEquals("Unsupported AWT format: " + image.getType(), ex.getMessage());
         }
     }
 
@@ -40,10 +43,10 @@ public class AWTTextureFormatTest {
         BufferedImage image = createBufferedImage(2, 3, BufferedImage.TYPE_3BYTE_BGR);
         TextureData textureData = AWTTextureFormat.convertToTextureData(image, Texture.FilterMode.LINEAR);
 
-        Assert.assertNotNull(textureData);
-        Assert.assertEquals(2, textureData.getWidth());
-        Assert.assertEquals(3, textureData.getHeight());
-        Assert.assertEquals(Texture.FilterMode.LINEAR, textureData.getFilterMode());
+        assertNotNull(textureData);
+        assertEquals(2, textureData.getWidth());
+        assertEquals(3, textureData.getHeight());
+        assertEquals(Texture.FilterMode.LINEAR, textureData.getFilterMode());
     }
 
     private BufferedImage createBufferedImage(final int width, final int height, final int imageType) {

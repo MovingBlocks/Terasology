@@ -15,8 +15,7 @@
  */
 package org.terasology.persistence.typeHandling.coreTypes.factories;
 
-import org.junit.Test;
-import org.reflections.Reflections;
+import org.junit.jupiter.api.Test;
 import org.terasology.persistence.typeHandling.TypeHandler;
 import org.terasology.persistence.typeHandling.TypeHandlerContext;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
@@ -27,9 +26,8 @@ import org.terasology.reflection.TypeInfo;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;

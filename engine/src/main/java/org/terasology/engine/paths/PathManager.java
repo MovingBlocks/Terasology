@@ -1,27 +1,16 @@
-/*
- * Copyright 2014 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.engine.paths;
 
 import com.google.common.collect.ImmutableList;
 import com.sun.jna.platform.win32.KnownFolders;
 import com.sun.jna.platform.win32.Shell32Util;
+import org.terasology.context.Context;
+import org.terasology.engine.subsystem.DisplayDevice;
+import org.terasology.utilities.OS;
 
-import org.lwjgl.LWJGLUtil;
-
+import javax.swing.JFileChooser;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -31,7 +20,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
-import javax.swing.JFileChooser;
 
 /**
  * Manager class that keeps track of the game's various paths and save directories.
@@ -52,6 +40,8 @@ public final class PathManager {
     private static final String REGEX = "[^A-Za-z0-9-_ ]";
 
     private static PathManager instance;
+
+    private static Context context;
     private Path installPath;
     private Path homePath;
     private Path savesPath;
@@ -161,29 +151,50 @@ public final class PathManager {
      * @throws IOException Thrown when required directories cannot be accessed.
      */
     public void useDefaultHomePath() throws IOException {
-        switch (LWJGLUtil.getPlatform()) {
-            case LWJGLUtil.PLATFORM_LINUX:
+        switch (OS.get()) {
+            case LINUX:
                 homePath = Paths.get(System.getProperty("user.home")).resolve(LINUX_HOME_SUBPATH);
                 break;
-            case LWJGLUtil.PLATFORM_MACOSX:
+            case MACOSX:
                 homePath = Paths.get(System.getProperty("user.home"), "Library", "Application Support", TERASOLOGY_FOLDER_NAME);
                 break;
-            case LWJGLUtil.PLATFORM_WINDOWS:
-                String savedGamesPath = Shell32Util.getKnownFolderPath(KnownFolders.FOLDERID_SavedGames);
+            case WINDOWS:
+                String savedGamesPath = Shell32Util
+                    .getKnownFolderPath(KnownFolders.FOLDERID_SavedGames);
                 if (savedGamesPath == null) {
-                    savedGamesPath = Shell32Util.getKnownFolderPath(KnownFolders.FOLDERID_Documents);
+                    savedGamesPath = Shell32Util
+                        .getKnownFolderPath(KnownFolders.FOLDERID_Documents);
                 }
                 Path rawPath;
                 if (savedGamesPath != null) {
                     rawPath = Paths.get(savedGamesPath);
                 } else {
-                    rawPath = new JFileChooser().getFileSystemView().getDefaultDirectory().toPath();
+                    rawPath = new JFileChooser().getFileSystemView().getDefaultDirectory()
+                        .toPath();
                 }
                 homePath = rawPath.resolve(TERASOLOGY_FOLDER_NAME);
                 break;
             default:
                 homePath = Paths.get(System.getProperty("user.home")).resolve(LINUX_HOME_SUBPATH);
                 break;
+        }
+        updateDirs();
+    }
+
+    /**
+     * Gives user the option to manually choose home path.
+     * @throws IOException Thrown when required directories cannot be accessed.
+     */
+    public void chooseHomePathManually() throws IOException {
+        DisplayDevice display = context.get(DisplayDevice.class);
+        boolean isHeadless = display.isHeadless();
+        if (!isHeadless) {
+            Path rawPath = new JFileChooser().getFileSystemView().getDefaultDirectory()
+                .toPath();
+            homePath = rawPath.resolve("Terasology");
+        } else {
+            // If the system is headless
+            homePath = Paths.get("").toAbsolutePath();
         }
         updateDirs();
     }
@@ -308,6 +319,28 @@ public final class PathManager {
         }
         sandboxPath = homePath.resolve(SANDBOX_DIR);
         Files.createDirectories(sandboxPath);
+
+        // --------------------------------- Setup native paths ---------------------
+        final Path path;
+        switch (OS.get()) {
+            case WINDOWS:
+                path = PathManager.getInstance().getNativesPath().resolve("windows");
+                break;
+            case MACOSX:
+                path = PathManager.getInstance().getNativesPath().resolve("macosx");
+                break;
+            case LINUX:
+                path = PathManager.getInstance().getNativesPath().resolve("linux");
+                break;
+            default:
+                throw new UnsupportedOperationException("Unsupported operating system: " + System.getProperty("os" +
+                        ".name"));
+        }
+        final String natives = path.toAbsolutePath().toString();
+        System.setProperty("org.lwjgl.librarypath", natives);
+        System.setProperty("net.java.games.input.librarypath", natives);  // libjinput
+        System.setProperty("org.terasology.librarypath", natives); // JNBullet
+
     }
 
     public Path getHomeModPath() {

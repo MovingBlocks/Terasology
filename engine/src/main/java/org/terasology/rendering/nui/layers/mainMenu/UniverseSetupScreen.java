@@ -46,16 +46,16 @@ import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.NUIManager;
-import org.terasology.rendering.nui.WidgetUtil;
+import org.terasology.nui.WidgetUtil;
 import org.terasology.rendering.nui.animation.MenuAnimationSystems;
-import org.terasology.rendering.nui.asset.UIData;
-import org.terasology.rendering.nui.asset.UIElement;
-import org.terasology.rendering.nui.databinding.Binding;
-import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
-import org.terasology.rendering.nui.itemRendering.StringTextRenderer;
-import org.terasology.rendering.nui.skin.UISkin;
-import org.terasology.rendering.nui.skin.UISkinData;
-import org.terasology.rendering.nui.widgets.UIDropdownScrollable;
+import org.terasology.nui.asset.UIData;
+import org.terasology.nui.asset.UIElement;
+import org.terasology.nui.databinding.Binding;
+import org.terasology.nui.databinding.ReadOnlyBinding;
+import org.terasology.nui.itemRendering.StringTextRenderer;
+import org.terasology.nui.skin.UISkin;
+import org.terasology.nui.skin.UISkinData;
+import org.terasology.nui.widgets.UIDropdownScrollable;
 import org.terasology.rendering.world.WorldSetupWrapper;
 import org.terasology.world.block.family.BlockFamilyLibrary;
 import org.terasology.world.block.loader.BlockFamilyDefinition;
@@ -198,7 +198,9 @@ public class UniverseSetupScreen extends CoreScreenLayer {
         });
 
         WidgetUtil.trySubscribe(this, "addGenerator", button -> {
-            if (worldGenerator.getSelection().getUri().toString().equals("Core:heightMap")) {
+            //TODO: there should not be a reference from the engine to some module - the engine must be agnostic to what
+            //      modules may do
+            if (worldGenerator.getSelection().getUri().toString().equals("CoreWorlds:heightMap")) {
                 getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage(
                         "HeightMap not supported", "HeightMap is not supported for advanced setup right now, a game template will be introduced soon.");
             } else {

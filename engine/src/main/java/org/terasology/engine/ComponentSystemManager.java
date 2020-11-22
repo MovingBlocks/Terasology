@@ -32,6 +32,7 @@ import org.terasology.logic.console.Console;
 import org.terasology.logic.console.commandSystem.MethodCommand;
 import org.terasology.module.Module;
 import org.terasology.module.ModuleEnvironment;
+import org.terasology.module.sandbox.API;
 import org.terasology.naming.Name;
 import org.terasology.network.NetworkMode;
 import org.terasology.registry.InjectionHelper;
@@ -53,6 +54,8 @@ import java.util.Map;
  * After a call of shutdown it should not be used anymore.
  *
  */
+// TODO OpaqueObjectsNode needs this, is there a better way?
+@API
 public class ComponentSystemManager {
 
     private static final Logger logger = LoggerFactory.getLogger(ComponentSystemManager.class);
@@ -128,6 +131,7 @@ public class ComponentSystemManager {
         context.get(EntityManager.class).getEventSystem().registerEventHandler(object);
 
         if (initialised) {
+            logger.warn("System " + object.getClass().getName() + " registered post-init.");
             initialiseSystem(object);
         }
     }
@@ -140,7 +144,7 @@ public class ComponentSystemManager {
     public void initialise() {
         if (!initialised) {
             console = context.get(Console.class);
-            for (ComponentSystem system : iterateAll()) {
+            for (ComponentSystem system : getAllSystems()) {
                 initialiseSystem(system);
             }
             initialised = true;
@@ -171,7 +175,7 @@ public class ComponentSystemManager {
         return namedLookup.get(name);
     }
 
-    public Iterable<ComponentSystem> iterateAll() {
+    public List<ComponentSystem> getAllSystems() {
         return store;
     }
 
@@ -184,7 +188,7 @@ public class ComponentSystemManager {
     }
 
     public void shutdown() {
-        for (ComponentSystem system : iterateAll()) {
+        for (ComponentSystem system : getAllSystems()) {
             system.shutdown();
         }
         updateSubscribers.clear();

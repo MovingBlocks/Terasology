@@ -1,15 +1,33 @@
-// This include file is meant for each Java project/module and contains setup for artifact repos, code analysis, etc
+/*
+ * Copyright 2020 MovingBlocks
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
+// language
 apply plugin: 'java'
+
+// IDEs
 apply plugin: 'eclipse'
 apply plugin: 'idea'
+
+// Analytics
 apply plugin: 'project-report'
 apply plugin: 'checkstyle'
 apply plugin: 'pmd'
-apply plugin: 'findbugs'
-
-// Computes code coverage of (unit) tests
+apply plugin: 'com.github.spotbugs'
 apply plugin: 'jacoco'
+apply plugin: 'org.sonarqube'
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
@@ -31,25 +49,32 @@ repositories {
 
     // MovingBlocks Artifactory instance for libs not readily available elsewhere plus our own libs
     maven {
+        def repoViaEnv = System.getenv()["RESOLUTION_REPO"]
         if (rootProject.hasProperty("alternativeResolutionRepo")) {
             // If the user supplies an alternative repo via gradle.properties then use that
+            name "from alternativeResolutionRepo property"
             url alternativeResolutionRepo
+        } else if (repoViaEnv != null && repoViaEnv != "") {
+            name "from \$RESOLUTION_REPO"
+            url = repoViaEnv
         } else {
             // Our default is the main virtual repo containing everything except repos for testing Artifactory itself
+            name "Terasology Artifactory"
             url "http://artifactory.terasology.org/artifactory/virtual-repo-live"
+            allowInsecureProtocol true  // 😱
         }
     }
 
-    // snowplow for telemetry
     maven {
+        name "snowplow (pre-0.9)"
         url "http://maven.snplow.com/releases"
+        allowInsecureProtocol true  // 😱
     }
 }
 
 dependencies {
-    checkstyle ('com.puppycrawl.tools:checkstyle:6.14.1')
-    pmd ('net.sourceforge.pmd:pmd-core:5.4.1')
-    pmd ('net.sourceforge.pmd:pmd-java:5.4.1')
+    pmd('net.sourceforge.pmd:pmd-core:6.15.0')
+    pmd('net.sourceforge.pmd:pmd-java:6.15.0')
     // the FindBugs version is set in the configuration
 }
 
@@ -57,23 +82,26 @@ task sourceJar(type: Jar) {
     description = "Create a JAR with all sources"
     from sourceSets.main.allSource
     from sourceSets.test.allSource
-    classifier = 'sources'
+    archiveClassifier = 'sources'
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
     description = "Create a JAR with the JavaDoc for the java sources"
     from javadoc.destinationDir
-    classifier = 'javadoc'
+    archiveClassifier = 'javadoc'
 }
 
 // Extra details provided for unit tests
 test {
+    useJUnitPlatform()
+
     // ignoreFailures: Specifies whether the build should break when the verifications performed by this task fail.
     ignoreFailures = true
-
     // showStandardStreams: makes the standard streams (err and out) visible at console when running tests
     testLogging.showStandardStreams = true
-
+    reports {
+        junitXml.enabled = true
+    }
     // Arguments to include while running tests
     jvmArgs '-Xms512m', '-Xmx1024m'
 
@@ -83,13 +111,13 @@ test {
     }
 
     jacoco {
-        append = false
-        excludes = ["org.terasology.protobuf.*"]
+        excludes = ["org.terasology.protobuf.*",
+                    "*MethodAccess","*FieldAccess"]
     }
 }
 
 jacoco {
-    toolVersion = "0.7.5.201505241946"
+    toolVersion = "0.8.5"
 }
 
 jacocoTestReport {
@@ -118,10 +146,19 @@ pmd {
     ruleSets = []
 }
 
-findbugs {
+spotbugs {
+    toolVersion = '4.0.0'
     ignoreFailures = true
-    toolVersion = '3.0.1'
     excludeFilter = new File(rootDir, "config/metrics/findbugs/findbugs-exclude.xml")
+}
+
+spotbugsMain {
+    reports {
+        xml {
+            enabled = true
+            destination = file("$buildDir/reports/spotbugs/main/spotbugs.xml")
+        }
+    }
 }
 
 // TODO: Temporary until javadoc has been fixed for Java 8 everywhere

@@ -15,16 +15,16 @@
  */
 package org.terasology.logic.behavior.nui;
 
-import org.terasology.utilities.Assets;
+import org.joml.Vector2i;
 import org.terasology.math.geom.Rect2f;
-import org.terasology.math.geom.Vector2i;
 import org.terasology.math.geom.Vector2f;
-import org.terasology.rendering.assets.texture.TextureRegion;
-import org.terasology.rendering.nui.BaseInteractionListener;
-import org.terasology.rendering.nui.Canvas;
-import org.terasology.rendering.nui.CoreWidget;
-import org.terasology.rendering.nui.InteractionListener;
-import org.terasology.rendering.nui.events.NUIMouseClickEvent;
+import org.terasology.nui.BaseInteractionListener;
+import org.terasology.nui.Canvas;
+import org.terasology.nui.CoreWidget;
+import org.terasology.nui.InteractionListener;
+import org.terasology.nui.UITextureRegion;
+import org.terasology.nui.events.NUIMouseClickEvent;
+import org.terasology.utilities.Assets;
 
 /**
  * Represents a port at a RenderableNode. There are several types of ports:
@@ -39,8 +39,8 @@ import org.terasology.rendering.nui.events.NUIMouseClickEvent;
 public abstract class Port extends CoreWidget {
     protected RenderableNode node;
     protected Rect2f rect;
-    private TextureRegion active = Assets.getTextureRegion("engine:checkboxChecked").get();
-    private TextureRegion inactive = Assets.getTextureRegion("engine:checkbox").get();
+    private UITextureRegion active = Assets.getTextureRegion("engine:checkboxChecked").get();
+    private UITextureRegion inactive = Assets.getTextureRegion("engine:checkbox").get();
 
     private InteractionListener connectListener = new BaseInteractionListener() {
         @Override

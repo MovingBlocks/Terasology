@@ -17,7 +17,7 @@ package org.terasology.persistence.typeHandling.coreTypes;
 
 import com.google.common.collect.Queues;
 import com.google.gson.JsonArray;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatcher;
 import org.mockito.stubbing.Answer;
 import org.terasology.persistence.typeHandling.PersistedData;
@@ -30,7 +30,10 @@ import java.util.Collections;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class CollectionTypeHandlerTest {
     @Test

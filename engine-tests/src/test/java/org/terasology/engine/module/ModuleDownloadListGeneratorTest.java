@@ -16,7 +16,8 @@
 package org.terasology.engine.module;
 
 import com.google.common.collect.ImmutableList;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.module.BaseModule;
 import org.terasology.module.DependencyResolver;
@@ -34,19 +35,20 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class ModuleDownloadListGeneratorTest {
 
-    @Test(expected = DependencyResolutionFailedException.class)
+    @Test
     public void testResolverFailed() throws DependencyResolutionFailedException {
         ModuleRegistry localRegistry = buildRegistry("1.0.0", buildSimpleModule("myModule", "1.0.0"));
         DependencyResolver resolver = mockResolver(false);
         ModuleDownloadListGenerator listGenerator = new ModuleDownloadListGenerator(localRegistry, resolver);
-        buildList(listGenerator);
+        Assertions.assertThrows(DependencyResolutionFailedException.class,
+                ()-> buildList(listGenerator));
     }
 
     @Test

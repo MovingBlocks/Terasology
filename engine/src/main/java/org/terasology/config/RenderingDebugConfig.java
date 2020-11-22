@@ -19,11 +19,13 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.module.sandbox.API;
 import org.terasology.rendering.world.WorldRendererImpl;
 import org.terasology.utilities.subscribables.AbstractSubscribable;
 
 /**
  */
+@API
 public class RenderingDebugConfig extends AbstractSubscribable implements PropertyChangeListener {
     public static final String WIREFRAME = "wireframe";
     public static final String ENABLED = "enabled";

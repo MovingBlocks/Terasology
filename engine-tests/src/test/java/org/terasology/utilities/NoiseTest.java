@@ -16,11 +16,9 @@
 
 package org.terasology.utilities;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
+import com.google.common.collect.Lists;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.terasology.utilities.procedural.BrownianNoise;
 import org.terasology.utilities.procedural.DiscreteWhiteNoise;
 import org.terasology.utilities.procedural.Noise;
@@ -30,36 +28,36 @@ import org.terasology.utilities.procedural.WhiteNoise;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.utilities.random.Random;
 
-import java.util.Arrays;
-import java.util.Collection;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * A few tests for different {@link Noise} implementations.
  */
-@RunWith(Parameterized.class)
 public class NoiseTest {
 
-    private Noise noiseGen;
     private Random rng;
 
-    public NoiseTest(Noise noiseGen) {
-        this.noiseGen = noiseGen;
+    public NoiseTest() {
         this.rng = new FastRandom(0xBEEF);
     }
 
-    @Parameters(name = "{0}")
-    public static Collection<Noise[]> data() {
-        return Arrays.asList(new Noise[][]{
-                {new WhiteNoise(0xCAFE)},
-                {new DiscreteWhiteNoise(0xCAFE)},
-                {new SimplexNoise(0xCAFE)},
-                {new PerlinNoise(0xCAFE)},
-                {new BrownianNoise(new WhiteNoise(0xCAFE), 3)}
-        });
+    public static List<Noise> data() {
+        return Lists.newArrayList(
+                new WhiteNoise(0xCAFE),
+                new DiscreteWhiteNoise(0xCAFE),
+                new SimplexNoise(0xCAFE),
+                new PerlinNoise(0xCAFE),
+                new BrownianNoise(new WhiteNoise(0xCAFE), 3)
+            );
     }
 
-    @Test
-    public void testMinMax() {
+    @ParameterizedTest
+    @MethodSource("data")
+    public void testMinMax(Noise noiseGen) {
 
         float min = Float.POSITIVE_INFINITY;
         float max = Float.NEGATIVE_INFINITY;
@@ -79,15 +77,16 @@ public class NoiseTest {
             }
         }
 
-        Assert.assertTrue(min >= -1);
-        Assert.assertTrue(max <= 1);
+        assertTrue(min >= -1);
+        assertTrue(max <= 1);
 
-        Assert.assertEquals(-1, min, 0.05);
-        Assert.assertEquals(1, max, 0.05);
+        assertEquals(-1, min, 0.05);
+        assertEquals(1, max, 0.05);
     }
 
-    @Test
-    public void testResolution() {
+    @ParameterizedTest
+    @MethodSource("data")
+    public void testResolution(Noise noiseGen) {
 
         for (int i = 0; i < 1000000; i++) {
             float posX = rng.nextFloat() * 100f;
@@ -100,6 +99,6 @@ public class NoiseTest {
             }
         }
 
-        Assert.fail();
+        fail();
     }
 }

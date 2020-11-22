@@ -28,6 +28,7 @@ public final class ExternalApiWhitelist {
             // TODO: This one org.terasology entry is a hack and needs a proper fix
             .add("org.terasology.math.geom")
             .add("java.lang")
+            .add("java.beans")
             .add("java.lang.invoke")
             .add("java.lang.ref")
             .add("java.math")
@@ -79,7 +80,9 @@ public final class ExternalApiWhitelist {
             .add("org.lwjgl.opengl.GL11")
             .add("org.lwjgl.opengl.GL12")
             .add("org.lwjgl.opengl.GL13")
+            .add("org.lwjgl")
             .add("org.terasology.jnlua")
+            .add("org.joml")
             .build();
 
     public static final Set<Class<?>> CLASSES = new ImmutableSet.Builder<Class<?>>()

@@ -36,4 +36,8 @@ class lib {
 
         return itemList
     }
+
+    def refreshGradle(File targetDir) {
+        println "Skipping refreshGradle for lib $targetDir- they vary too much to use any Gradle templates"
+    }
 }

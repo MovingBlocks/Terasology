@@ -16,22 +16,23 @@
 package org.terasology.rendering.nui.widgets.treeView;
 
 import com.google.common.collect.Lists;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.terasology.nui.widgets.treeView.GenericTree;
 
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class GenericTreeTest {
     private List<GenericTree<Integer>> nodes = Lists.newArrayList();
 
-    @Before
+    @BeforeEach
     public void setup() {
         for (int i = 0; i <= 10; i++) {
             nodes.add(new GenericTree<>(i));

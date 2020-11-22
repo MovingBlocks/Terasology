@@ -17,7 +17,10 @@ package org.terasology.logic.behavior.core;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.rendering.nui.properties.PropertyProvider;
+import org.terasology.nui.properties.OneOfProviderFactory;
+import org.terasology.nui.properties.PropertyProvider;
+import org.terasology.reflection.reflect.ReflectFactory;
+import org.terasology.registry.CoreRegistry;
 
 /**
  * An action node uses a associated Action to control the result state.
@@ -36,8 +39,8 @@ public class ActionNode implements BehaviorNode {
 
     @Override
     public PropertyProvider getProperties() {
-
-        PropertyProvider provider = new PropertyProvider();
+        // TODO: The CoreRegistry usage came from the previous code.
+        PropertyProvider provider = new PropertyProvider(CoreRegistry.get(ReflectFactory.class), CoreRegistry.get(OneOfProviderFactory.class));
         provider.createProperties(action);
         return provider;
     }
@@ -66,7 +69,7 @@ public class ActionNode implements BehaviorNode {
             try {
                 action.construct(actor);
             } catch (Exception e) {
-                logger.info("Exception while running construct() of action {} from entity {}:", action, actor.getEntity());
+                logger.info("Exception while running construct() of action {} from entity {}: {}", action, actor.getEntity(), e.getMessage());
             }
         }
     }

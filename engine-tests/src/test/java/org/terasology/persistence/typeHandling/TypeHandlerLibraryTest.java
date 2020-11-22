@@ -15,7 +15,7 @@
  */
 package org.terasology.persistence.typeHandling;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.reflections.Reflections;
 import org.terasology.persistence.typeHandling.coreTypes.CollectionTypeHandler;
 import org.terasology.persistence.typeHandling.coreTypes.EnumTypeHandler;
@@ -31,8 +31,8 @@ import java.util.Optional;
 import java.util.Queue;
 import java.util.Set;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TypeHandlerLibraryTest {
     private final Reflections reflections = new Reflections(getClass().getClassLoader());

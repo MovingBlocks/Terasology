@@ -1,7 +1,14 @@
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
+
 // The Editor facade is responsible for the (shader) editor - a plain Java application runnable on PCs
 
+plugins {
+    id "application"
+}
+
 // Grab all the common stuff like plugins to use, artifact repositories, code analysis config
-apply from: "$rootDir/config/gradle/artifactory.gradle"
+apply from: "$rootDir/config/gradle/publish.gradle"
 
 // Base the engine tests on the same version number as the engine
 version = project(':engine').version
@@ -10,12 +17,32 @@ println "TeraEd VERSION: $version"
 // Jenkins-Artifactory integration catches on to this as part of the Maven-type descriptor
 group = 'org.terasology.facades'
 
+sourceSets {
+    // Adjust output path (changed with the Gradle 6 upgrade, this puts it back)
+    main.java.outputDir = new File("$buildDir/classes")
+    test.java.outputDir = new File("$buildDir/testClasses")
+}
+
 dependencies {
-    compile project(':engine')
+    implementation project(':engine')
+    implementation group: 'org.reflections', name: 'reflections', version: '0.9.10'
+}
+
+application {
+    mainClass = "org.terasology.editor.TeraEd"
+}
+
+run {
+    description = "Run 'TeraEd' to configure graphics shader parameters in a standard PC application"
+    group = "terasology run"
+
+    workingDir = rootDir
+    args "-homedir"
 }
 
 task editor(type:JavaExec) {
     description = "Run 'TeraEd' to configure graphics shader parameters in a standard PC application"
+    group = "terasology run"
 
     // Dependencies: natives + all modules & the PC facade itself (which will trigger the engine)
     dependsOn rootProject.extractNatives
@@ -29,10 +56,10 @@ task editor(type:JavaExec) {
     args runArgs
 
     // Classpath: PC itself, engine classes, engine dependencies. Not modules or natives since the engine finds those
-    classpath sourceSets.main.output.classesDir
+    classpath sourceSets.main.output.classesDirs
     classpath sourceSets.main.output.resourcesDir
-    classpath project(':engine').sourceSets.main.output.classesDir
-    classpath project(':engine').configurations.runtime
+    classpath project(':engine').sourceSets.main.output.classesDirs
+    classpath project(':engine').configurations.runtimeClasspath
 }
 
 // Prep an IntelliJ module for the facade

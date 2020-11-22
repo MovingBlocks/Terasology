@@ -17,6 +17,7 @@ package org.terasology.world.chunks.internal;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
+import org.joml.Vector3ic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.math.AABB;
@@ -34,6 +35,7 @@ import org.terasology.world.chunks.ChunkBlockIterator;
 import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.blockdata.ExtraBlockDataManager;
 import org.terasology.world.chunks.blockdata.TeraArray;
+import org.terasology.world.chunks.blockdata.TeraDenseArray16Bit;
 import org.terasology.world.chunks.blockdata.TeraDenseArray8Bit;
 import org.terasology.world.chunks.deflate.TeraDeflator;
 import org.terasology.world.chunks.deflate.TeraStandardDeflator;
@@ -86,7 +88,7 @@ public class ChunkImpl implements Chunk {
 
     public ChunkImpl(Vector3i chunkPos, BlockManager blockManager, ExtraBlockDataManager extraDataManager) {
         this(chunkPos,
-                new TeraDenseArray8Bit(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z),
+                new TeraDenseArray16Bit(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z),
                 extraDataManager.makeDataArrays(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z),
                 blockManager);
     }
@@ -111,6 +113,11 @@ public class ChunkImpl implements Chunk {
     }
 
     @Override
+    public org.joml.Vector3i getPosition(org.joml.Vector3i dest) {
+        return dest.set(chunkPos.x,chunkPos.y,chunkPos.z);
+    }
+
+    @Override
     public boolean isDirty() {
         return dirty;
     }
@@ -123,8 +130,8 @@ public class ChunkImpl implements Chunk {
     @Override
     public int getEstimatedMemoryConsumptionInBytes() {
         int extraDataSize = 0;
-        for (int i = 0; i < extraData.length; i++) {
-            extraDataSize += extraData[i].getEstimatedMemoryConsumptionInBytes();
+        for (TeraArray extraDatum : extraData) {
+            extraDataSize += extraDatum.getEstimatedMemoryConsumptionInBytes();
         }
         return blockData.getEstimatedMemoryConsumptionInBytes()
                 + sunlightData.getEstimatedMemoryConsumptionInBytes()
@@ -135,6 +142,12 @@ public class ChunkImpl implements Chunk {
 
     @Override
     public final Block getBlock(BaseVector3i pos) {
+        short id = (short) blockData.get(pos.x(), pos.y(), pos.z());
+        return blockManager.getBlock(id);
+    }
+
+    @Override
+    public Block getBlock(Vector3ic pos) {
         short id = (short) blockData.get(pos.x(), pos.y(), pos.z());
         return blockManager.getBlock(id);
     }
@@ -160,6 +173,11 @@ public class ChunkImpl implements Chunk {
     @Override
     public Block setBlock(BaseVector3i pos, Block block) {
         return setBlock(pos.x(), pos.y(), pos.z(), block);
+    }
+
+    @Override
+    public Block setBlock(Vector3ic pos, Block block) {
+        return setBlock(pos.x(),pos.y(),pos.z(),block);
     }
 
     @Override
@@ -229,12 +247,17 @@ public class ChunkImpl implements Chunk {
     public int getExtraData(int index, int x, int y, int z) {
         return extraData[index].get(x, y, z);
     }
-    
+
     @Override
     public int getExtraData(int index, BaseVector3i pos) {
         return getExtraData(index, pos.x(), pos.y(), pos.z());
     }
-    
+
+    @Override
+    public int getExtraData(int index, Vector3ic pos) {
+        return getExtraData(index, pos.x(), pos.y(), pos.z());
+    }
+
     @Override
     public void setExtraData(int index, int x, int y, int z, int value) {
         if (extraDataSnapshots != null && extraData[index] == extraDataSnapshots[index]) {
@@ -242,7 +265,12 @@ public class ChunkImpl implements Chunk {
         }
         extraData[index].set(x, y, z, value);
     }
-    
+
+    @Override
+    public void setExtraData(int index, Vector3ic pos, int value) {
+        setExtraData(index, pos.x(), pos.y(), pos.z(), value);
+    }
+
     @Override
     public void setExtraData(int index, BaseVector3i pos, int value) {
         setExtraData(index, pos.x(), pos.y(), pos.z(), value);
@@ -251,6 +279,11 @@ public class ChunkImpl implements Chunk {
     @Override
     public Vector3i getChunkWorldOffset() {
         return new Vector3i(getChunkWorldOffsetX(), getChunkWorldOffsetY(), getChunkWorldOffsetZ());
+    }
+
+    @Override
+    public org.joml.Vector3i getChunkWorldOffset(org.joml.Vector3i dest) {
+        return dest.set(getChunkWorldOffsetX(), getChunkWorldOffsetY(), getChunkWorldOffsetZ());
     }
 
     @Override
@@ -274,8 +307,18 @@ public class ChunkImpl implements Chunk {
     }
 
     @Override
+    public org.joml.Vector3i chunkToWorldPosition(Vector3ic blockPos, org.joml.Vector3i dest) {
+        return chunkToWorldPosition(blockPos.x(), blockPos.y(), blockPos.z(), dest);
+    }
+
+    @Override
     public Vector3i chunkToWorldPosition(int x, int y, int z) {
         return new Vector3i(chunkToWorldPositionX(x), chunkToWorldPositionY(y), chunkToWorldPositionZ(z));
+    }
+
+    @Override
+    public org.joml.Vector3i chunkToWorldPosition(int x, int y, int z, org.joml.Vector3i dest) {
+        return dest.set(chunkToWorldPositionX(x), chunkToWorldPositionY(y), chunkToWorldPositionZ(z));
     }
 
     @Override
@@ -314,8 +357,8 @@ public class ChunkImpl implements Chunk {
             int sunlightRegenSize = sunlightRegenData.getEstimatedMemoryConsumptionInBytes();
             int lightSize = lightData.getEstimatedMemoryConsumptionInBytes();
             int extraSize = 0;
-            for (int i = 0; i < extraData.length; i++) {
-                extraSize += extraData[i].getEstimatedMemoryConsumptionInBytes();
+            for (TeraArray extraDatum : extraData) {
+                extraSize += extraDatum.getEstimatedMemoryConsumptionInBytes();
             }
             int totalSize = blocksSize + sunlightRegenSize + sunlightSize + lightSize + extraSize;
 
@@ -328,8 +371,8 @@ public class ChunkImpl implements Chunk {
             int blocksReduced = blockData.getEstimatedMemoryConsumptionInBytes();
             int lightReduced = lightData.getEstimatedMemoryConsumptionInBytes();
             int extraReduced = 0;
-            for (int i = 0; i < extraData.length; i++) {
-                extraReduced += extraData[i].getEstimatedMemoryConsumptionInBytes();
+            for (TeraArray extraDatum : extraData) {
+                extraReduced += extraDatum.getEstimatedMemoryConsumptionInBytes();
             }
             int totalReduced = blocksReduced + sunlightRegenSize + sunlightSize + lightReduced + extraReduced;
 
@@ -390,8 +433,8 @@ public class ChunkImpl implements Chunk {
                             "bytes, size-after: {} " +
                             "bytes, total-deflated-by: {}%, " +
                             "sunlight-deflated-by={}%, " +
-                            "sunlight-regen-deflated-by={}%, " +
-                            chunkPos,
+                            "sunlight-regen-deflated-by={}%",
+                    chunkPos,
                     SIZE_FORMAT.format(totalSize),
                     SIZE_FORMAT.format(totalReduced),
                     PERCENT_FORMAT.format(totalPercent),

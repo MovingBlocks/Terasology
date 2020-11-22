@@ -15,6 +15,8 @@
  */
 package org.terasology.audio;
 
+import org.joml.Quaternionfc;
+import org.joml.Vector3fc;
 import org.terasology.assets.AssetFactory;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
@@ -47,11 +49,15 @@ public interface AudioManager {
 
     void playSound(StaticSound sound, float volume, int priority);
 
+    @Deprecated
     void playSound(StaticSound sound, Vector3f position);
+    void playSound(StaticSound sound, Vector3fc position);
 
-    void playSound(StaticSound sound, Vector3f position, float volume);
+    void playSound(StaticSound sound, Vector3fc position, float volume);
 
+    @Deprecated
     void playSound(StaticSound sound, Vector3f position, float volume, int priority);
+    void playSound(StaticSound sound, Vector3fc position, float volume, int priority);
 
     /**
      * Plays a sound at an specified point and volume.
@@ -61,8 +67,12 @@ public interface AudioManager {
      * @param volume The volume
      * @param priority The priority with which this sound should play. Higher values means this sound will be able to override others.
      * @param endListener The listener to call when the sound is finished
+     * @deprecated This method is scheduled for removal in an upcoming version.
+     *             Use the JOML implementation instead: {@link #playSound(StaticSound, Vector3fc, float, int, AudioEndListener)}.
      */
+    @Deprecated
     void playSound(StaticSound sound, Vector3f position, float volume, int priority, AudioEndListener endListener);
+    void playSound(StaticSound sound, Vector3fc position, float volume, int priority, AudioEndListener endListener);
 
     /**
      * Plays music once, this does not have a direction unlike playSound.
@@ -123,8 +133,20 @@ public interface AudioManager {
      * @param position The new position
      * @param orientation The new orientation (in a quaternion)
      * @param velocity The new velocity
+     * @deprecated This method is scheduled for removal in an upcoming version.
+     *             Use the JOML implementation instead: {@link #updateListener(Vector3fc, Quaternionfc, Vector3fc)}.
      */
+    @Deprecated
     void updateListener(Vector3f position, Quat4f orientation, Vector3f velocity);
+
+    /**
+     * Set the position, orientation and velocity of the listener to updated values.
+     *
+     * @param position The new position
+     * @param orientation The new orientation (in a quaternion)
+     * @param velocity The new velocity
+     */
+    void updateListener(Vector3fc position, Quaternionfc orientation, Vector3fc velocity);
 
     /**
      * Gracefully destroy audio subsystem.

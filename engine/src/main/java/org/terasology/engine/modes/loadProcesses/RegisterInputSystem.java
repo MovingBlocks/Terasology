@@ -18,6 +18,7 @@ package org.terasology.engine.modes.loadProcesses;
 
 import org.terasology.context.Context;
 import org.terasology.engine.ComponentSystemManager;
+import org.terasology.engine.modes.SingleStepLoadProcess;
 import org.terasology.input.InputSystem;
 import org.terasology.input.cameraTarget.CameraTargetSystem;
 import org.terasology.logic.players.LocalPlayerSystem;

@@ -19,6 +19,7 @@ package org.terasology.engine.modes.loadProcesses;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.context.Context;
+import org.terasology.engine.modes.SingleStepLoadProcess;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.persistence.StorageManager;

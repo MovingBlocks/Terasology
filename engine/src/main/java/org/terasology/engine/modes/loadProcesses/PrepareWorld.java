@@ -19,16 +19,18 @@ package org.terasology.engine.modes.loadProcesses;
 import org.terasology.context.Context;
 import org.terasology.engine.EngineTime;
 import org.terasology.engine.Time;
-import org.terasology.engine.modes.LoadProcess;
+import org.terasology.engine.modes.VariableStepLoadProcess;
 import org.terasology.rendering.world.WorldRenderer;
 
 /**
+ * Loops until world is pre-generated or 5 seconds elapsed.
  */
-public class PrepareWorld implements LoadProcess {
+public class PrepareWorld extends VariableStepLoadProcess {
 
     private final Context context;
     private long startTime;
     private WorldRenderer worldRenderer;
+    private long timeElapsed;
 
     public PrepareWorld(Context context) {
         this.context = context;
@@ -45,8 +47,8 @@ public class PrepareWorld implements LoadProcess {
             return true;
         }
         EngineTime time = (EngineTime) context.get(Time.class);
-        long totalTime = time.getRealTimeInMs() - startTime;
-        return totalTime > 5000;
+        timeElapsed = time.getRealTimeInMs() - startTime;
+        return timeElapsed > 5000;
     }
 
     @Override
@@ -58,7 +60,7 @@ public class PrepareWorld implements LoadProcess {
 
     @Override
     public float getProgress() {
-        return 0;
+        return (1/Math.max(1f, 5000f / (float) timeElapsed));
     }
 
     @Override

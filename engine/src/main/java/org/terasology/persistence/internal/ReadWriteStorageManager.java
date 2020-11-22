@@ -408,7 +408,7 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
         logger.info("Saving - Creating game snapshot");
         PerformanceMonitor.startActivity("Saving");
         ComponentSystemManager componentSystemManager = CoreRegistry.get(ComponentSystemManager.class);
-        for (ComponentSystem sys : componentSystemManager.iterateAll()) {
+        for (ComponentSystem sys : componentSystemManager.getAllSystems()) {
             sys.preSave();
         }
 
@@ -420,7 +420,7 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
             saveGamePreviewImage();
         }
 
-        for (ComponentSystem sys : componentSystemManager.iterateAll()) {
+        for (ComponentSystem sys : componentSystemManager.getAllSystems()) {
             sys.postSave();
         }
         PerformanceMonitor.endActivity();
@@ -432,14 +432,14 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
         logger.info("Auto Saving - Creating game snapshot");
         PerformanceMonitor.startActivity("Auto Saving");
         ComponentSystemManager componentSystemManager = CoreRegistry.get(ComponentSystemManager.class);
-        for (ComponentSystem sys : componentSystemManager.iterateAll()) {
+        for (ComponentSystem sys : componentSystemManager.getAllSystems()) {
             sys.preAutoSave();
         }
 
         saveTransaction = createSaveTransaction();
         saveThreadManager.offer(saveTransaction);
 
-        for (ComponentSystem sys : componentSystemManager.iterateAll()) {
+        for (ComponentSystem sys : componentSystemManager.getAllSystems()) {
             sys.postAutoSave();
         }
 

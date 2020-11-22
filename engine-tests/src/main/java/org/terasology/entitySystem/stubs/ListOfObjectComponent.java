@@ -16,11 +16,11 @@
 
 package org.terasology.entitySystem.stubs;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.terasology.entitySystem.Component;
 import org.terasology.reflection.MappedContainer;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ListOfObjectComponent implements Component {
     public String shortName;

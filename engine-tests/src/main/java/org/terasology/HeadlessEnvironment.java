@@ -35,6 +35,7 @@ import org.terasology.engine.EngineTime;
 import org.terasology.engine.Time;
 import org.terasology.engine.bootstrap.EntitySystemSetupUtil;
 import org.terasology.engine.modes.loadProcesses.LoadPrefabs;
+import org.terasology.engine.module.ExternalApiWhitelist;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.engine.subsystem.headless.assets.HeadlessMaterial;
@@ -53,6 +54,8 @@ import org.terasology.module.ResolutionResult;
 import org.terasology.naming.Name;
 import org.terasology.network.NetworkSystem;
 import org.terasology.network.internal.NetworkSystemImpl;
+import org.terasology.nui.asset.UIElement;
+import org.terasology.nui.skin.UISkin;
 import org.terasology.persistence.StorageManager;
 import org.terasology.persistence.internal.ReadWriteStorageManager;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
@@ -77,8 +80,6 @@ import org.terasology.rendering.assets.skeletalmesh.SkeletalMesh;
 import org.terasology.rendering.assets.texture.PNGTextureFormat;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.subtexture.Subtexture;
-import org.terasology.rendering.nui.asset.UIElement;
-import org.terasology.rendering.nui.skin.UISkin;
 import org.terasology.testUtil.ModuleManagerFactory;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
@@ -106,6 +107,7 @@ import java.io.IOException;
 import java.nio.file.FileSystem;
 import java.nio.file.Path;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -269,6 +271,7 @@ public class HeadlessEnvironment extends Environment {
     @Override
     protected void setupModuleManager(Set<Name> moduleNames) throws Exception {
         TypeRegistry typeRegistry = new TypeRegistry();
+        TypeRegistry.WHITELISTED_CLASSES = ExternalApiWhitelist.CLASSES.stream().map(Class::getName).collect(Collectors.toSet());
         context.put(TypeRegistry.class, typeRegistry);
 
         ModuleManager moduleManager = ModuleManagerFactory.create();

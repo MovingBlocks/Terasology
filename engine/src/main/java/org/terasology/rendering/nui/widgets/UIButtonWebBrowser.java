@@ -20,10 +20,12 @@ import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
 import org.terasology.config.WebBrowserConfig;
 import org.terasology.i18n.TranslationSystem;
+import org.terasology.nui.widgets.ActivateEventListener;
+import org.terasology.nui.widgets.UIButton;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.nui.NUIManager;
-import org.terasology.rendering.nui.databinding.Binding;
-import org.terasology.rendering.nui.databinding.DefaultBinding;
+import org.terasology.nui.databinding.Binding;
+import org.terasology.nui.databinding.DefaultBinding;
 import org.terasology.rendering.nui.layers.mainMenu.ConfirmUrlPopup;
 import org.terasology.rendering.nui.layers.mainMenu.MessagePopup;
 

@@ -18,9 +18,11 @@ package org.terasology.world.chunks.internal;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.Sets;
+import org.joml.Vector3ic;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.ChunkMath;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.Region3i;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.world.chunks.Chunk;
@@ -47,7 +49,8 @@ public class ChunkRelevanceRegion {
         this.relevanceDistance.set(relevanceDistance);
 
         LocationComponent loc = entity.getComponent(LocationComponent.class);
-        if (loc == null) {
+
+        if (loc == null||Float.isNaN(loc.getWorldPosition().x)) {
             dirty = false;
         } else {
             center.set(ChunkMath.calcChunkPos(loc.getWorldPosition()));
@@ -57,7 +60,7 @@ public class ChunkRelevanceRegion {
     }
 
     public Vector3i getCenter() {
-        return new Vector3i(center);
+        return center;
     }
 
     public void setRelevanceDistance(Vector3i distance) {
@@ -76,7 +79,7 @@ public class ChunkRelevanceRegion {
         while (iter.hasNext()) {
             Vector3i pos = iter.next();
             if (!retainRegion.encompasses(pos)) {
-                sendChunkIrrelevant(pos);
+                sendChunkIrrelevant(JomlUtil.from(pos));
                 iter.remove();
             }
         }
@@ -119,7 +122,7 @@ public class ChunkRelevanceRegion {
 
     private Region3i calculateRegion() {
         LocationComponent loc = entity.getComponent(LocationComponent.class);
-        if (loc != null) {
+        if (loc != null&& !Float.isNaN(loc.getWorldPosition().x)) {
             Vector3i extents = new Vector3i(relevanceDistance.x / 2, relevanceDistance.y / 2, relevanceDistance.z / 2);
             return Region3i.createFromCenterExtents(ChunkMath.calcChunkPos(loc.getWorldPosition()), extents);
         }
@@ -128,7 +131,7 @@ public class ChunkRelevanceRegion {
 
     private Vector3i calculateCenter() {
         LocationComponent loc = entity.getComponent(LocationComponent.class);
-        if (loc != null) {
+        if (loc != null && !Float.isNaN(loc.getWorldPosition().x)) {
             return ChunkMath.calcChunkPos(loc.getWorldPosition());
         }
         return new Vector3i();
@@ -140,11 +143,11 @@ public class ChunkRelevanceRegion {
 
     private void sendChunkRelevant(Chunk chunk) {
         if (listener != null) {
-            listener.onChunkRelevant(chunk.getPosition(), chunk);
+            listener.onChunkRelevant(chunk.getPosition(new org.joml.Vector3i()), chunk);
         }
     }
 
-    private void sendChunkIrrelevant(Vector3i pos) {
+    private void sendChunkIrrelevant(Vector3ic pos) {
         if (listener != null) {
             listener.onChunkIrrelevant(pos);
         }
@@ -191,7 +194,7 @@ public class ChunkRelevanceRegion {
     public void chunkUnloaded(Vector3i pos) {
         if (relevantChunks.contains(pos)) {
             relevantChunks.remove(pos);
-            sendChunkIrrelevant(pos);
+            sendChunkIrrelevant(JomlUtil.from(pos));
         }
     }
 

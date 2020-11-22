@@ -1,267 +1,295 @@
-/*
- * Copyright 2018 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.world.chunks.localChunkProvider;
 
-import gnu.trove.list.TIntList;
-import gnu.trove.list.array.TIntArrayList;
-import gnu.trove.map.hash.TShortObjectHashMap;
-import org.junit.Before;
-import org.junit.Test;
+import com.google.common.collect.Maps;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.InOrder;
-import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.entity.EntityStore;
 import org.terasology.entitySystem.event.Event;
-import org.terasology.entitySystem.prefab.Prefab;
+import org.terasology.fixtures.TestBlockManager;
+import org.terasology.fixtures.TestChunkStore;
+import org.terasology.fixtures.TestStorageManager;
+import org.terasology.fixtures.TestWorldGenerator;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Vector3i;
-import org.terasology.persistence.ChunkStore;
 import org.terasology.world.BlockEntityRegistry;
+import org.terasology.world.block.BeforeDeactivateBlocks;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
+import org.terasology.world.block.BlockRegion;
+import org.terasology.world.block.BlockRegionIterable;
 import org.terasology.world.block.OnActivatedBlocks;
 import org.terasology.world.block.OnAddedBlocks;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.blockdata.ExtraBlockDataManager;
+import org.terasology.world.chunks.event.BeforeChunkUnload;
 import org.terasology.world.chunks.event.OnChunkGenerated;
 import org.terasology.world.chunks.event.OnChunkLoaded;
-import org.terasology.world.chunks.internal.ReadyChunkInfo;
+import org.terasology.world.chunks.internal.ChunkImpl;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
-import static org.hamcrest.CoreMatchers.hasItem;
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.atLeastOnce;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
-public class LocalChunkProviderTest {
+class LocalChunkProviderTest {
+
+    private static final int WAIT_CHUNK_IS_READY_IN_SECONDS = 30;
 
     private LocalChunkProvider chunkProvider;
-    private ChunkFinalizer chunkFinalizer;
     private EntityManager entityManager;
     private BlockManager blockManager;
     private ExtraBlockDataManager extraDataManager;
     private BlockEntityRegistry blockEntityRegistry;
     private EntityRef worldEntity;
-    private ChunkCache chunkCache;
+    private Map<Vector3i, Chunk> chunkCache;
+    private Block blockAtBlockManager;
+    private TestStorageManager storageManager;
+    private TestWorldGenerator generator;
 
-    @Before
-    public void setUp(){
+    @BeforeEach
+    public void setUp() {
         entityManager = mock(EntityManager.class);
-        chunkFinalizer = mock(ChunkFinalizer.class);
-        blockManager = mock(BlockManager.class);
+        blockAtBlockManager = new Block();
+        blockAtBlockManager.setId((short) 1);
+        blockAtBlockManager.setUri(BlockManager.AIR_ID);
+        blockAtBlockManager.setEntity(mock(EntityRef.class));
+        blockManager = new TestBlockManager(blockAtBlockManager);
         extraDataManager = new ExtraBlockDataManager();
         blockEntityRegistry = mock(BlockEntityRegistry.class);
         worldEntity = mock(EntityRef.class);
-        chunkCache = new ConcurrentMapChunkCache();
-        chunkProvider = new LocalChunkProvider(null,
-                entityManager, null, blockManager, extraDataManager, chunkFinalizer, null, chunkCache);
+        chunkCache = Maps.newConcurrentMap();
+        storageManager = new TestStorageManager();
+        generator = new TestWorldGenerator(blockManager);
+        chunkProvider = new LocalChunkProvider(storageManager,
+                entityManager,
+                generator,
+                blockManager,
+                extraDataManager,
+                chunkCache);
         chunkProvider.setBlockEntityRegistry(blockEntityRegistry);
         chunkProvider.setWorldEntity(worldEntity);
+        chunkProvider.setRelevanceSystem(new RelevanceSystem(chunkProvider)); // workaround. initialize loading pipeline
+    }
+
+    @AfterEach
+    public void tearDown() {
+        chunkProvider.shutdown();
+    }
+
+    private Future<Chunk> requestCreatingOrLoadingArea(Vector3i chunkPosition, int radius) {
+        Future<Chunk> chunkFuture = chunkProvider.createOrLoadChunk(chunkPosition);
+        BlockRegion extentsRegion = new BlockRegion(
+                chunkPosition.x - radius, chunkPosition.y - radius, chunkPosition.z - radius,
+                chunkPosition.x + radius, chunkPosition.y + radius, chunkPosition.z + radius);
+        BlockRegionIterable.region(extentsRegion).subtract(
+                new BlockRegion( // remove center. we takes future for it already.
+                        chunkPosition.x, chunkPosition.y, chunkPosition.z,
+                        chunkPosition.x, chunkPosition.y, chunkPosition.z)
+        ).build().iterator().forEachRemaining(chunkPos -> chunkProvider.createOrLoadChunk(JomlUtil.from(chunkPos)));
+        return chunkFuture;
+    }
+
+    private Future<Chunk> requestCreatingOrLoadingArea(Vector3i chunkPosition) {
+        return requestCreatingOrLoadingArea(chunkPosition, 1);
     }
 
     @Test
-    public void testCompleteUpdateMarksChunkReady() throws Exception {
-        final Chunk chunk = mockChunkAt(0, 0, 0);
-        final ReadyChunkInfo readyChunkInfo = ReadyChunkInfo.createForNewChunk(chunk, new TShortObjectHashMap<>(), Collections.emptyList());
-        when(chunkFinalizer.completeFinalization()).thenReturn(readyChunkInfo);
-
-        chunkProvider.completeUpdate();
-
-        verify(chunk).markReady();
-    }
-
-    @Test
-    public void testCompleteUpdateHandlesFinalizedChunkIfReady() throws Exception {
-        final Chunk chunk = mockChunkAt(0, 0, 0);
-        final ReadyChunkInfo readyChunkInfo = ReadyChunkInfo.createForNewChunk(chunk, new TShortObjectHashMap<>(), Collections.emptyList());
-        when(chunkFinalizer.completeFinalization()).thenReturn(readyChunkInfo);
-
-        chunkProvider.completeUpdate();
-
-        final InOrder inOrderVerification = inOrder(worldEntity);
-        inOrderVerification.verify(worldEntity).send(any(OnChunkGenerated.class));
-        inOrderVerification.verify(worldEntity).send(any(OnChunkLoaded.class));
-    }
-
-    @Test
-    public void testCompleteUpdateGeneratesStoredEntities() throws Exception {
-        final Chunk chunk = mockChunkAt(0, 0, 0);
-        final ChunkProviderTestComponent testComponent = new ChunkProviderTestComponent();
-        final EntityStore entityStore = createEntityStoreWithComponents(testComponent);
-        final List<EntityStore> entityStores = Collections.singletonList(entityStore);
-        final ReadyChunkInfo readyChunkInfo = ReadyChunkInfo.createForNewChunk(chunk, new TShortObjectHashMap<>(), entityStores);
-        when(chunkFinalizer.completeFinalization()).thenReturn(readyChunkInfo);
-        final EntityRef mockEntity = mock(EntityRef.class);
-        when(entityManager.create()).thenReturn(mockEntity);
-
-        chunkProvider.completeUpdate();
-
-        verify(mockEntity).addComponent(eq(testComponent));
-    }
-
-    @Test
-    public void testCompleteUpdateGeneratesStoredEntitiesFromPrefab() throws Exception {
-        final Chunk chunk = mockChunkAt(0, 0, 0);
-        final Prefab prefab = mock(Prefab.class);
-        final ChunkProviderTestComponent testComponent = new ChunkProviderTestComponent();
-        final EntityStore entityStore = createEntityStoreWithPrefabAndComponents(prefab, testComponent);
-        final List<EntityStore> entityStores = Collections.singletonList(entityStore);
-        final ReadyChunkInfo readyChunkInfo = ReadyChunkInfo.createForNewChunk(chunk, new TShortObjectHashMap<>(), entityStores);
-        when(chunkFinalizer.completeFinalization()).thenReturn(readyChunkInfo);
-        final EntityRef mockEntity = mock(EntityRef.class);
-        when(entityManager.create(any(Prefab.class))).thenReturn(mockEntity);
-
-        chunkProvider.completeUpdate();
-
-        verify(entityManager).create(eq(prefab));
-        verify(mockEntity).addComponent(eq(testComponent));
-    }
-
-    @Test
-    public void testCompleteUpdateRestoresEntitiesForRestoredChunks() throws Exception {
-        final Chunk chunk = mockChunkAt(0, 0, 0);
-        final ChunkStore chunkStore = mock(ChunkStore.class);
-        final ReadyChunkInfo readyChunkInfo = ReadyChunkInfo.createForRestoredChunk(chunk, new TShortObjectHashMap<>(), chunkStore, Collections.emptyList());
-        when(chunkFinalizer.completeFinalization()).thenReturn(readyChunkInfo);
-
-        chunkProvider.completeUpdate();
-
-        verify(chunkStore).restoreEntities();
-    }
-
-    @Test
-    public void testCompleteUpdateSendsBlockAddedEvents() throws Exception {
-        final Chunk chunk = mockChunkAt(0, 0, 0);
-        final short blockId = 42;
-        final EntityRef blockEntity = mock(EntityRef.class);
-        registerBlockWithIdAndEntity(blockId, blockEntity, blockManager);
-        final TShortObjectHashMap<TIntList> blockPositionMappings = new TShortObjectHashMap<>();
-        blockPositionMappings.put(blockId, withPositions(new Vector3i(1, 2, 3)));
-        final ReadyChunkInfo readyChunkInfo = ReadyChunkInfo.createForRestoredChunk(chunk, blockPositionMappings, mock(ChunkStore.class), Collections.emptyList());
-        when(chunkFinalizer.completeFinalization()).thenReturn(readyChunkInfo);
-
-        chunkProvider.completeUpdate();
+    void testGenerateSingleChunk() throws InterruptedException, ExecutionException, TimeoutException {
+        Vector3i chunkPosition = new Vector3i(0, 0, 0);
+        requestCreatingOrLoadingArea(chunkPosition).get(WAIT_CHUNK_IS_READY_IN_SECONDS, TimeUnit.SECONDS);
 
         final ArgumentCaptor<Event> eventArgumentCaptor = ArgumentCaptor.forClass(Event.class);
-        verify(blockEntity, atLeastOnce()).send(eventArgumentCaptor.capture());
-        final Event event = eventArgumentCaptor.getAllValues().get(0);
-        assertThat(event, instanceOf(OnAddedBlocks.class));
-        assertThat(((OnAddedBlocks) event).getBlockPositions(), hasItem(new Vector3i(1, 2, 3)));
+        verify(worldEntity, atLeast(2)).send(eventArgumentCaptor.capture());
+        Assertions.assertAll("WorldEvents not valid",
+                () -> {
+                    Event mustBeOnGeneratedEvent = eventArgumentCaptor.getAllValues().get(0);
+                    Assertions.assertTrue(mustBeOnGeneratedEvent instanceof OnChunkGenerated,
+                            "First world event must be OnChunkGenerated");
+                    Assertions.assertEquals(((OnChunkGenerated) mustBeOnGeneratedEvent).getChunkPos(),
+                            chunkPosition,
+                            "Chunk position at event not expected");
+                },
+                () -> {
+                    Event mustBeOnLoadedEvent = eventArgumentCaptor.getAllValues().get(1);
+                    Assertions.assertTrue(mustBeOnLoadedEvent instanceof OnChunkLoaded,
+                            "Second world event must be OnChunkLoaded");
+                    Assertions.assertEquals(((OnChunkLoaded) mustBeOnLoadedEvent).getChunkPos(),
+                            chunkPosition,
+                            "Chunk position at event not expected");
+                });
     }
 
     @Test
-    public void testCompleteUpdateSendsBlockActivatedEvents() throws Exception {
-        final Chunk chunk = mockChunkAt(0, 0, 0);
-        final TShortObjectHashMap<TIntList> blockPositionMappings = new TShortObjectHashMap<>();
-        final short blockId = 42;
-        final EntityRef blockEntity = mock(EntityRef.class);
-        registerBlockWithIdAndEntity(blockId, blockEntity, blockManager);
-        blockPositionMappings.put(blockId, withPositions(new Vector3i(1, 2, 3)));
-        final ReadyChunkInfo readyChunkInfo = ReadyChunkInfo.createForRestoredChunk(chunk, blockPositionMappings, mock(ChunkStore.class), Collections.emptyList());
-        when(chunkFinalizer.completeFinalization()).thenReturn(readyChunkInfo);
+    void testGenerateSingleChunkWithBlockLifeCycle() throws InterruptedException, ExecutionException, TimeoutException {
+        Vector3i chunkPosition = new Vector3i(0, 0, 0);
+        blockAtBlockManager.setLifecycleEventsRequired(true);
+        blockAtBlockManager.setEntity(mock(EntityRef.class));
+        requestCreatingOrLoadingArea(chunkPosition).get(WAIT_CHUNK_IS_READY_IN_SECONDS, TimeUnit.SECONDS);
 
-        chunkProvider.completeUpdate();
+        final ArgumentCaptor<Event> worldEventCaptor = ArgumentCaptor.forClass(Event.class);
+        verify(worldEntity, atLeast(2)).send(worldEventCaptor.capture());
+        Assertions.assertAll("World Events not valid",
+                () -> {
+                    Event mustBeOnGeneratedEvent = worldEventCaptor.getAllValues().get(0);
+                    Assertions.assertTrue(mustBeOnGeneratedEvent instanceof OnChunkGenerated,
+                            "First world event must be OnChunkGenerated");
+                    Assertions.assertEquals(((OnChunkGenerated) mustBeOnGeneratedEvent).getChunkPos(),
+                            chunkPosition,
+                            "Chunk position at event not expected");
+                },
+                () -> {
+                    Event mustBeOnLoadedEvent = worldEventCaptor.getAllValues().get(1);
+                    Assertions.assertTrue(mustBeOnLoadedEvent instanceof OnChunkLoaded,
+                            "Second world event must be OnChunkLoaded");
+                    Assertions.assertEquals(((OnChunkLoaded) mustBeOnLoadedEvent).getChunkPos(),
+                            chunkPosition,
+                            "Chunk position at event not expected");
+                });
+
+        //TODO, it is not clear if the activate/addedBlocks event logic is correct.
+        //See https://github.com/MovingBlocks/Terasology/issues/3244
+        final ArgumentCaptor<Event> blockEventCaptor = ArgumentCaptor.forClass(Event.class);
+        verify(blockAtBlockManager.getEntity(), atLeast(1)).send(blockEventCaptor.capture());
+
+        Event mustBeOnActivatedBlocks = blockEventCaptor.getAllValues().get(0);
+        Assertions.assertTrue(mustBeOnActivatedBlocks instanceof OnActivatedBlocks,
+                "First block event must be OnActivatedBlocks");
+        Assertions.assertTrue(((OnActivatedBlocks) mustBeOnActivatedBlocks).blockCount() > 0,
+                "Block count on activate must be non zero");
+    }
+
+    @Test
+    void testLoadSingleChunk() throws InterruptedException, ExecutionException, TimeoutException {
+        Vector3i chunkPosition = new Vector3i(0, 0, 0);
+        Chunk chunk = new ChunkImpl(chunkPosition, blockManager, extraDataManager);
+        generator.createChunk(chunk, null);
+        storageManager.add(chunk);
+
+        requestCreatingOrLoadingArea(chunkPosition).get(WAIT_CHUNK_IS_READY_IN_SECONDS, TimeUnit.SECONDS);
+
+        Assertions.assertTrue(((TestChunkStore) storageManager.loadChunkStore(chunkPosition)).isEntityRestored(),
+                "Entities must be restored by loading");
 
         final ArgumentCaptor<Event> eventArgumentCaptor = ArgumentCaptor.forClass(Event.class);
-        verify(blockEntity, atLeastOnce()).send(eventArgumentCaptor.capture());
-        final Event event = eventArgumentCaptor.getAllValues().get(1);
-        assertThat(event, instanceOf(OnActivatedBlocks.class));
-        assertThat(((OnActivatedBlocks) event).getBlockPositions(), hasItem(new Vector3i(1, 2, 3)));
+        verify(worldEntity, atLeast(1)).send(eventArgumentCaptor.capture());
+        Event mustBeOnLoadedEvent = eventArgumentCaptor.getAllValues().get(0);
+        Assertions.assertTrue(mustBeOnLoadedEvent instanceof OnChunkLoaded,
+                "Second world event must be OnChunkLoaded");
+        Assertions.assertEquals(((OnChunkLoaded) mustBeOnLoadedEvent).getChunkPos(),
+                chunkPosition,
+                "Chunk position at event not expected");
     }
 
-    private static void markAllChunksAsReady(final ChunkCache chunkCache) {
-        markAllChunksAsReadyExcludingPosition(chunkCache, null);
+    @Test
+    void testLoadSingleChunkWithBlockLifecycle() throws InterruptedException, ExecutionException, TimeoutException {
+        Vector3i chunkPosition = new Vector3i(0, 0, 0);
+        Chunk chunk = new ChunkImpl(chunkPosition, blockManager, extraDataManager);
+        generator.createChunk(chunk, null);
+        storageManager.add(chunk);
+        blockAtBlockManager.setLifecycleEventsRequired(true);
+        blockAtBlockManager.setEntity(mock(EntityRef.class));
+
+        requestCreatingOrLoadingArea(chunkPosition).get(WAIT_CHUNK_IS_READY_IN_SECONDS, TimeUnit.SECONDS);
+
+        Assertions.assertTrue(((TestChunkStore) storageManager.loadChunkStore(chunkPosition)).isEntityRestored(),
+                "Entities must be restored by loading");
+
+
+        final ArgumentCaptor<Event> eventArgumentCaptor = ArgumentCaptor.forClass(Event.class);
+        verify(worldEntity, atLeast(1)).send(eventArgumentCaptor.capture());
+        Event mustBeOnLoadedEvent = eventArgumentCaptor.getAllValues().get(0);
+        Assertions.assertTrue(mustBeOnLoadedEvent instanceof OnChunkLoaded,
+                "Second world event must be OnChunkLoaded");
+        Assertions.assertEquals(((OnChunkLoaded) mustBeOnLoadedEvent).getChunkPos(),
+                chunkPosition,
+                "Chunk position at event not expected");
+
+        //TODO, it is not clear if the activate/addedBlocks event logic is correct.
+        //See https://github.com/MovingBlocks/Terasology/issues/3244
+        final ArgumentCaptor<Event> blockEventCaptor = ArgumentCaptor.forClass(Event.class);
+        verify(blockAtBlockManager.getEntity(), atLeast(2)).send(blockEventCaptor.capture());
+        Assertions.assertAll("Block events not valid",
+                () -> {
+                    Event mustBeOnAddedBlocks = blockEventCaptor.getAllValues().get(0);
+                    Assertions.assertTrue(mustBeOnAddedBlocks instanceof OnAddedBlocks,
+                            "First block event must be OnAddedBlocks");
+                    Assertions.assertTrue(((OnAddedBlocks) mustBeOnAddedBlocks).blockCount() > 0,
+                            "Block count on activate must be non zero");
+                },
+                () -> {
+                    Event mustBeOnActivatedBlocks = blockEventCaptor.getAllValues().get(1);
+                    Assertions.assertTrue(mustBeOnActivatedBlocks instanceof OnActivatedBlocks,
+                            "First block event must be OnActivatedBlocks");
+                    Assertions.assertTrue(((OnActivatedBlocks) mustBeOnActivatedBlocks).blockCount() > 0,
+                            "Block count on activate must be non zero");
+                });
     }
 
-    private static void markAllChunksAsReadyExcludingPosition(final ChunkCache chunkCache, final Vector3i positionToExclude) {
-        chunkCache.getAllChunks().stream()
-                .filter(chunk -> !chunk.getPosition().equals(positionToExclude))
-                .forEach(c -> when(c.isReady()).thenReturn(true));
-    }
+    @Test
+    void testUnloadChunkAndDeactivationBlock() throws InterruptedException, TimeoutException, ExecutionException {
+        Vector3i chunkPosition = new Vector3i(0, 0, 0);
+        blockAtBlockManager.setLifecycleEventsRequired(true);
+        blockAtBlockManager.setEntity(mock(EntityRef.class));
 
-    private static void generateMockChunkCubeWithSideWidthAround(final Vector3i position, final int sideWidth, final ChunkCache chunkCache) {
-        for (int x = position.getX() - sideWidth; x <= position.getX() + sideWidth; x++) {
-            for (int y = position.getY() - sideWidth; y <= position.getY() + sideWidth; y++) {
-                for (int z = position.getZ() - sideWidth; z <= position.getZ() + sideWidth; z++) {
-                    if (x == position.getX() && y == position.getY() && z == position.getZ()) {
-                        //dont override the inner chunk
-                        continue;
+        requestCreatingOrLoadingArea(chunkPosition).get(WAIT_CHUNK_IS_READY_IN_SECONDS, TimeUnit.SECONDS);
+
+        //Wait BeforeDeactivateBlocks event
+        Assertions.assertTimeoutPreemptively(Duration.of(WAIT_CHUNK_IS_READY_IN_SECONDS, ChronoUnit.SECONDS),
+                () -> {
+                    ArgumentCaptor<Event> blockEventCaptor = ArgumentCaptor.forClass(Event.class);
+                    while (!blockEventCaptor.getAllValues()
+                            .stream()
+                            .filter((e) -> e instanceof BeforeDeactivateBlocks)
+                            .map((e) -> (BeforeDeactivateBlocks) e)
+                            .findFirst().isPresent()) {
+                        chunkProvider.beginUpdate();
+                        blockEventCaptor = ArgumentCaptor.forClass(Event.class);
+                        verify(blockAtBlockManager.getEntity(), atLeast(1)).send(blockEventCaptor.capture());
+
                     }
-                    chunkCache.put(new Vector3i(x, y, z), mockChunkAt(x, y, z));
                 }
-            }
-        }
-    }
+        );
 
-    private static EntityStore createEntityStoreWithComponents(Component... components) {
-        return createEntityStoreWithPrefabAndComponents(null, components);
-    }
+        final ArgumentCaptor<Event> eventArgumentCaptor = ArgumentCaptor.forClass(Event.class);
+        verify(worldEntity, atLeast(1)).send(eventArgumentCaptor.capture());
+        Optional<BeforeChunkUnload> beforeChunkUnload = eventArgumentCaptor.getAllValues()
+                .stream()
+                .filter((e) -> e instanceof BeforeChunkUnload)
+                .map((e) -> (BeforeChunkUnload) e)
+                .findFirst();
 
-    private static EntityStore createEntityStoreWithPrefabAndComponents(Prefab prefab, Component... components) {
-        final EntityStore entityStore = new EntityStore(prefab);
-        for (Component component : components) {
-            entityStore.addComponent(component);
-        }
-        return entityStore;
-    }
+        Assertions.assertTrue(beforeChunkUnload.isPresent(),
+                "World events must have BeforeChunkUnload event when chunk was unload");
+        Assertions.assertEquals(beforeChunkUnload.get().getChunkPos(),
+                chunkPosition,
+                "Chunk position at event not expected");
 
-    private static Chunk mockChunkAt(final int x, final int y, final int z) {
-        final Chunk chunk = mock(Chunk.class);
-        when(chunk.getPosition()).thenReturn(new Vector3i(x, y, z));
-        return chunk;
-    }
-
-
-    private static Chunk mockChunkWithReadinessStateAt(final int x, final int y, final int z) {
-        final Chunk chunk = mockChunkAt(x, y, z);
-        AtomicBoolean chunkReady = new AtomicBoolean();
-        when(chunk.isReady()).thenAnswer(i -> chunkReady.get());
-        doAnswer(i -> {
-            chunkReady.set(true);
-            return null;
-        }).when(chunk).markReady();
-        return chunk;
-    }
-
-    private static TIntArrayList withPositions(final Vector3i position) {
-        final TIntArrayList positions = new TIntArrayList();
-        positions.add(position.x);
-        positions.add(position.y);
-        positions.add(position.z);
-        return positions;
-    }
-
-    private static void registerBlockWithIdAndEntity(final short blockId, final EntityRef blockEntity, final BlockManager blockManager) {
-        final Block block = new Block();
-        block.setEntity(blockEntity);
-        when(blockManager.getBlock(eq(blockId))).thenReturn(block);
-    }
-
-    private static class ChunkProviderTestComponent implements Component {
-
+        //TODO, it is not clear if the activate/addedBlocks event logic is correct.
+        //See https://github.com/MovingBlocks/Terasology/issues/3244
+        final ArgumentCaptor<Event> blockEventCaptor = ArgumentCaptor.forClass(Event.class);
+        verify(blockAtBlockManager.getEntity(), atLeast(2)).send(blockEventCaptor.capture());
+        Optional<BeforeDeactivateBlocks> beforeDeactivateBlocks = blockEventCaptor.getAllValues()
+                .stream()
+                .filter((e) -> e instanceof BeforeDeactivateBlocks)
+                .map((e) -> (BeforeDeactivateBlocks) e)
+                .findFirst();
+        Assertions.assertTrue(beforeDeactivateBlocks.isPresent(),
+                "World events must have BeforeDeactivateBlocks event when chunk with lifecycle blocks was unload");
+        Assertions.assertTrue(beforeDeactivateBlocks.get().blockCount() > 0,
+                "BeforeDeactivateBlocks must have block count more then zero");
     }
 }

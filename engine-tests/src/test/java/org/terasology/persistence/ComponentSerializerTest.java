@@ -16,10 +16,11 @@
 package org.terasology.persistence;
 
 import com.google.common.collect.ImmutableMap;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.reflections.Reflections;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.context.Context;
 import org.terasology.context.internal.ContextImpl;
 import org.terasology.engine.SimpleUri;
@@ -36,14 +37,16 @@ import org.terasology.math.geom.Vector3f;
 import org.terasology.network.NetworkSystem;
 import org.terasology.persistence.serializers.ComponentSerializer;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
-import org.terasology.persistence.typeHandling.mathTypes.Quat4fTypeHandler;
-import org.terasology.persistence.typeHandling.mathTypes.Vector3fTypeHandler;
+import org.terasology.persistence.typeHandling.mathTypes.legacy.LegacyQuat4fTypeHandler;
+import org.terasology.persistence.typeHandling.mathTypes.legacy.LegacyVector3fTypeHandler;
 import org.terasology.protobuf.EntityData;
 import org.terasology.recording.RecordAndReplayCurrentStatus;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.testUtil.ModuleManagerFactory;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
 /**
@@ -53,12 +56,12 @@ public class ComponentSerializerTest {
     private ComponentSerializer componentSerializer;
     private Context context;
 
-    @BeforeClass
+    @BeforeAll
     public static void setupClass() throws Exception {
         moduleManager = ModuleManagerFactory.create();
     }
 
-    @Before
+    @BeforeEach
     public void setup() {
         context = new ContextImpl();
         context.put(RecordAndReplayCurrentStatus.class, new RecordAndReplayCurrentStatus());
@@ -68,17 +71,17 @@ public class ComponentSerializerTest {
         Reflections reflections = new Reflections(getClass().getClassLoader());
         TypeHandlerLibrary serializationLibrary = new TypeHandlerLibrary(reflections);
 
-        serializationLibrary.addTypeHandler(Vector3f.class, new Vector3fTypeHandler());
-        serializationLibrary.addTypeHandler(Quat4f.class, new Quat4fTypeHandler());
+        serializationLibrary.addTypeHandler(Vector3f.class, new LegacyVector3fTypeHandler());
+        serializationLibrary.addTypeHandler(Quat4f.class, new LegacyQuat4fTypeHandler());
 
         NetworkSystem networkSystem = mock(NetworkSystem.class);
         context.put(NetworkSystem.class, networkSystem);
         EntitySystemSetupUtil.addReflectionBasedLibraries(context);
         EntitySystemSetupUtil.addEntityManagementRelatedClasses(context);
         EngineEntityManager entityManager = context.get(EngineEntityManager.class);
-        entityManager.getComponentLibrary().register(new SimpleUri("test", "gettersetter"), GetterSetterComponent.class);
-        entityManager.getComponentLibrary().register(new SimpleUri("test", "string"), StringComponent.class);
-        entityManager.getComponentLibrary().register(new SimpleUri("test", "integer"), IntegerComponent.class);
+        entityManager.getComponentLibrary().register(new ResourceUrn("test", "gettersetter"), GetterSetterComponent.class);
+        entityManager.getComponentLibrary().register(new ResourceUrn("test", "string"), StringComponent.class);
+        entityManager.getComponentLibrary().register(new ResourceUrn("test", "integer"), IntegerComponent.class);
         ComponentLibrary componentLibrary = entityManager.getComponentLibrary();
         componentSerializer = new ComponentSerializer(componentLibrary, serializationLibrary);
 

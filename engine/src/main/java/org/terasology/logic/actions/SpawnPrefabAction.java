@@ -16,6 +16,7 @@
 
 package org.terasology.logic.actions;
 
+import org.joml.Vector3f;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
@@ -23,7 +24,6 @@ import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.common.ActivateEvent;
-import org.terasology.math.geom.Vector3f;
 import org.terasology.registry.In;
 
 /**

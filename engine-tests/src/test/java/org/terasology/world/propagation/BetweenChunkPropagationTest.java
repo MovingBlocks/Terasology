@@ -16,8 +16,8 @@
 package org.terasology.world.propagation;
 
 import com.google.common.collect.Maps;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.terasology.TerasologyTestingEnvironment;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
@@ -51,7 +51,7 @@ import org.terasology.world.propagation.light.SunlightWorldView;
 import java.util.Collection;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class BetweenChunkPropagationTest extends TerasologyTestingEnvironment {
 
@@ -69,7 +69,7 @@ public class BetweenChunkPropagationTest extends TerasologyTestingEnvironment {
     private BatchPropagator sunlightPropagator;
     private SunlightRegenBatchPropagator propagator;
 
-    @Before
+    @BeforeEach
     @Override
     public void setup() throws Exception {
         super.setup();
@@ -113,8 +113,8 @@ public class BetweenChunkPropagationTest extends TerasologyTestingEnvironment {
         propagator.process();
         sunlightPropagator.process();
         for (Vector3i pos : ChunkConstants.CHUNK_REGION) {
-            assertEquals("Incorrect at position " + pos, ChunkConstants.MAX_SUNLIGHT, bottomChunk.getSunlight(pos));
-            assertEquals("Incorrect at position " + pos, ChunkConstants.MAX_SUNLIGHT_REGEN, bottomChunk.getSunlightRegen(pos));
+            assertEquals(ChunkConstants.MAX_SUNLIGHT, bottomChunk.getSunlight(pos), () -> "Incorrect at position " + pos);
+            assertEquals(ChunkConstants.MAX_SUNLIGHT_REGEN, bottomChunk.getSunlightRegen(pos), () -> "Incorrect at position " + pos);
         }
     }
 
@@ -134,7 +134,7 @@ public class BetweenChunkPropagationTest extends TerasologyTestingEnvironment {
         propagator.propagateBetween(topChunk, bottomChunk, Side.BOTTOM, true);
         propagator.process();
         for (Vector3i pos : ChunkConstants.CHUNK_REGION) {
-            assertEquals("Incorrect at position " + pos, ChunkConstants.MAX_SUNLIGHT_REGEN, bottomChunk.getSunlightRegen(pos));
+            assertEquals(ChunkConstants.MAX_SUNLIGHT_REGEN, bottomChunk.getSunlightRegen(pos), () -> "Incorrect at position " + pos);
         }
     }
 
@@ -188,10 +188,10 @@ public class BetweenChunkPropagationTest extends TerasologyTestingEnvironment {
         propagator.process();
         sunlightPropagator.process();
         for (int i = 0; i < 15; ++i) {
-            assertEquals("Incorrect value at " + (33 + i), 14 - i, bottomChunk.getSunlight(7, 33 + i, 16));
+            assertEquals(14 - i, bottomChunk.getSunlight(7, 33 + i, 16), "Incorrect value at " + (33 + i));
         }
         for (int i = 2; i < 33; ++i) {
-            assertEquals("Incorrect value at " + i, 14, bottomChunk.getSunlight(7, i, 16));
+            assertEquals(14, bottomChunk.getSunlight(7, i, 16), "Incorrect value at " + i);
         }
     }
 
@@ -236,26 +236,6 @@ public class BetweenChunkPropagationTest extends TerasologyTestingEnvironment {
         @Override
         public Collection<Chunk> getAllChunks() {
             return this.chunks.values();
-        }
-
-        @Override
-        public void addRelevanceEntity(EntityRef entity, Vector3i distance) {
-            // do nothing
-        }
-
-        @Override
-        public void addRelevanceEntity(EntityRef entity, Vector3i distance, ChunkRegionListener listener) {
-            // do nothing
-        }
-
-        @Override
-        public void updateRelevanceEntity(EntityRef entity, Vector3i distance) {
-            // do nothing
-        }
-
-        @Override
-        public void removeRelevanceEntity(EntityRef entity) {
-            // do nothing
         }
 
         @Override

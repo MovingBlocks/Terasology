@@ -1,7 +1,7 @@
 import groovy.json.JsonSlurper
 
-@Grab(group='org.slf4j', module='slf4j-api', version='1.6.1')
-@Grab(group='org.slf4j', module='slf4j-nop', version='1.6.1')
+@Grab(group = 'org.slf4j', module = 'slf4j-api', version = '1.6.1')
+@Grab(group = 'org.slf4j', module = 'slf4j-nop', version = '1.6.1')
 
 @GrabResolver(name = 'jcenter', root = 'http://jcenter.bintray.com/')
 @Grab(group = 'org.ajoberstar', module = 'grgit', version = '1.9.3')
@@ -9,6 +9,8 @@ import org.ajoberstar.grgit.Grgit
 import org.ajoberstar.grgit.exception.GrgitException
 import org.ajoberstar.grgit.Remote
 import org.eclipse.jgit.errors.RepositoryNotFoundException
+
+import static Ansi.*
 
 class common {
 
@@ -98,7 +100,7 @@ class common {
      */
     def retrieve(String[] items, boolean recurse) {
         println "Now inside retrieve, user (recursively? $recurse) wants: $items"
-        for (String itemName: items) {
+        for (String itemName : items) {
             println "Starting retrieval for $itemType $itemName, are we recursing? $recurse"
             println "Retrieved so far: $itemsRetrieved"
             retrieveItem(itemName, recurse)
@@ -181,14 +183,34 @@ class common {
     }
 
     /**
+     * Check if an item was updated within the provided time limit
+     * @param file the item's FETCH_HEAD file in the .git directory
+     * @param timeLimit the time limit for considering something recently updated, for example: use(groovy.time.TimeCategory){ 10.minute }
+     */
+    def isRecentlyUpdated(File file, def timeLimit){
+        Date lastUpdate = new Date(file.lastModified())
+        def recentlyUpdated = use(groovy.time.TimeCategory){
+            def timeElapsedSinceUpdate = new Date() - lastUpdate
+            if (timeElapsedSinceUpdate < timeLimit){
+                return true
+            } else {
+                return false
+            }
+        }
+    }
+
+    /**
      * Update a given item.
      * @param itemName the name of the item to update
      */
-    def updateItem(String itemName) {
-        println "Attempting to update $itemType $itemName"
+    def updateItem(String itemName, boolean skipRecentUpdates = false) {
         File targetDir = new File(targetDirectory, itemName)
+        if (!Character.isLetterOrDigit(itemName.charAt(0))){   
+            println color ("Skipping update for $itemName: starts with non-alphanumeric symbol", Ansi.YELLOW)
+            return
+        }
         if (!targetDir.exists()) {
-            println "$itemType \"$itemName\" not found"
+            println color("$itemType \"$itemName\" not found", Ansi.RED)
             return
         }
         try {
@@ -196,30 +218,66 @@ class common {
 
             // Do a check for the default remote before we attempt to update
             def remotes = itemGit.remote.list()
-            def targetUrl = remotes.find{
+            def targetUrl = remotes.find {
                 it.name == defaultRemote
             }?.url
             if (targetUrl == null || !isUrlValid(targetUrl)) {
-                println "While updating $itemName found its '$defaultRemote' remote invalid or its URL unresponsive: $targetUrl"
+                println color("While updating $itemName found its '$defaultRemote' remote invalid or its URL unresponsive: $targetUrl", Ansi.RED)
                 return
             }
 
             // At this point we should have a valid remote to pull from. If local repo is clean then pull!
             def clean = itemGit.status().clean
-            println "Is \"$itemName\" clean? $clean"
-            if (!clean) {
-                println "$itemType has uncommitted changes. Skipping."
-                return
-            }
-            println "Updating $itemType $itemName"
+            def branchName = itemGit.branch.getCurrent().fullName
 
-            try {
-                itemGit.pull remote: defaultRemote
-            } catch (GrgitException exception) {
-                println "Unable to update $itemName, Skipping: ${exception.getMessage()}"
+            print "$itemType '$itemName' [$branchName]: "
+
+            if (!clean) {
+                println color("uncommitted changes. Skipping.", Ansi.YELLOW)
+            } else {
+                println color("updating $itemType $itemName", Ansi.GREEN)
+                
+                File targetDirFetchHead = new File("$targetDir/.git/FETCH_HEAD")
+                if (targetDirFetchHead.exists()){
+                    // If the FETCH_HEAD has been modified within time limit and -skip-recently-updated flag was passed, skip updating
+                    def timeLimit = use(groovy.time.TimeCategory){ 10.minute }
+                    if (skipRecentUpdates && isRecentlyUpdated(targetDirFetchHead, timeLimit)){
+                        println color("Skipping update for $itemName: updated within last $timeLimit", Ansi.YELLOW)
+                        return
+                    }
+                    // Always update modified time for FETCH_HEAD if it exists
+                    targetDirFetchHead.setLastModified(new Date().getTime())
+                }
+                
+                try {
+                    def current_sha = itemGit.log(maxCommits: 1).find().getAbbreviatedId(8)
+                    itemGit.pull remote: defaultRemote
+                    def post_update_sha = itemGit.log(maxCommits: 1).find().getAbbreviatedId(8)
+                        
+                    if (current_sha != post_update_sha){
+                        // TODO this can be probably converted to do one composite diff of the full update 
+                        // once this PR is merged for grgit: https://github.com/ajoberstar/grgit/pull/318 
+                        println color("Updating $current_sha..$post_update_sha", Ansi.GREEN)
+                        def commits = itemGit.log {range(current_sha, post_update_sha)}
+                        for (commit in commits){
+                            println("----${commit.getAbbreviatedId(8)}----")
+                            def diff = itemGit.show(commit: commit.id)
+                            print("added: ${diff.added.size()}, ")
+                            print("copied: ${diff.copied.size()}, ")
+                            print("modified: ${diff.modified.size()}, ")
+                            print("removed: ${diff.removed.size()}, ")
+                            println("renamed: ${diff.renamed.size()}")
+                        }
+                        print("\n")
+                    } else {
+                        println color ("No changes found", Ansi.YELLOW)
+                    }
+                } catch (GrgitException exception) {
+                    println color("Unable to update $itemName, Skipping: ${exception.getMessage()}", Ansi.RED)
+                }
             }
-        } catch(RepositoryNotFoundException exception) {
-            println "Skipping update for $itemName: no repository found (probably engine module)"
+        } catch (RepositoryNotFoundException exception) {
+            println color("Skipping update for $itemName: no repository found (probably engine module)", Ansi.LIGHT_YELLOW)
         }
     }
 
@@ -235,7 +293,7 @@ class common {
         def remoteGit = Grgit.open(dir: "${targetDirectory}/${itemName}")
         def remote = remoteGit.remote.list()
         def index = 1
-        for (Remote item: remote) {
+        for (Remote item : remote) {
             println(index + " " + item.name + " (" + item.url + ")")
             index++
         }
@@ -287,7 +345,8 @@ class common {
                 println "Added the remote '$remoteName' for $itemType '$itemName' - but the URL $url failed a test lookup. Typo? Not created yet?"
             }
         } else {
-            println "Remote already exists"
+            println "Remote already exists, fetching latest"
+            remoteGit.fetch remote: remoteName
         }
     }
 
@@ -324,9 +383,10 @@ class common {
         // TODO: We need better ways to display the result especially when it contains a lot of items
         // However, in some cases heavy filtering could still mean that very few items will actually display ...
         // Another consideration is if we should be more specific in the API request, like only retrieving name + description
-        def githubHomeApiUrl = "https://api.github.com/users/$githubTargetHome/repos?per_page=99" //Note: 99 instead of 100  - see TODO below ..
+        def githubHomeApiUrl = "https://api.github.com/users/$githubTargetHome/repos?per_page=99"
+        //Note: 99 instead of 100  - see TODO below ..
 
-        if(!isUrlValid(githubHomeApiUrl)){
+        if (!isUrlValid(githubHomeApiUrl)) {
             println "Deduced GitHub API URL $githubHomeApiUrl seems inaccessible."
             return []
         }
@@ -414,12 +474,12 @@ class common {
      * Retrieves all the downloaded items in the form of a list.
      * @return a String[] containing the names of downloaded items.
      */
-    String[] retrieveLocalItems(){
-        def localItems =[]
+    String[] retrieveLocalItems() {
+        def localItems = []
         targetDirectory.eachDir() { dir ->
             String itemName = dir.getName()
             // Don't consider excluded items
-            if(!(excludedItems.contains(itemName))){
+            if (!(excludedItems.contains(itemName))) {
                 localItems << itemName
             }
         }
@@ -436,4 +496,94 @@ class common {
     void unCacheItemList() {
         itemListCached = false
     }
+
+    void writeDependencyDotFileForModule(File dependencyFile, File module) {
+        if (module.name.contains(".")) {
+            println "\"" + module.name + "\" is not a valid source (non-jar) module - skipping"
+        } else if (itemsRetrieved.contains(module.name)) {
+            println "Module \"" + module.name + "\" was already handled - skipping"
+        } else if (!module.exists()) {
+            println "Module \"" + module.name + "\" is not locally available - skipping"
+            itemsRetrieved << module.name
+        } else {
+            def foundDependencies = itemTypeScript.findDependencies(module, false)
+            if (foundDependencies.length == 0) {
+                // if no other dependencies exist, depend on engine
+                dependencyFile.append("  \"" + module.name + "\" -> \"engine\"\n")
+                itemsRetrieved << module.name
+            } else {
+                // add each of $foundDependencies as item -> foundDependency lines
+                for (dependency in foundDependencies) {
+                    dependencyFile.append("  \"" + module.name + "\" -> \"$dependency\"\n")
+                }
+                itemsRetrieved << module.name
+
+                // find dependencies to progress with
+                String[] uniqueDependencies = foundDependencies - itemsRetrieved
+                if (uniqueDependencies.length > 0) {
+                    for (dependency in uniqueDependencies) {
+                        writeDependencyDotFileForModule(dependencyFile, new File("modules/$dependency"))
+                    }
+                }
+            }
+        }
+    }
+
+    def refreshGradle() {
+        def localItems = []
+        targetDirectory.eachDir() { dir ->
+            String itemName = dir.getName()
+            // Don't consider excluded items
+            if (!(excludedItems.contains(itemName))) {
+                localItems << itemName
+            } else {
+                println "Skipping $dir as it is in the exclude list"
+            }
+        }
+
+        for (String item : localItems) {
+            itemTypeScript.refreshGradle(new File(targetDirectory, item))
+        }
+    }
+}
+
+/**
+ * Small ANSI coloring utility.
+ * @see https://gist.github.com/tvinke/db4d21dfdbdae49e6f92dcf1ca6120de
+ * @see http://www.bluesock.org/~willg/dev/ansi.html
+ * @see https://gist.github.com/dainkaplan/4651352
+ */
+class Ansi {
+
+    static final String NORMAL         = "\u001B[0m"
+
+    static final String BOLD           = "\u001B[1m"
+    static final String ITALIC         = "\u001B[3m"
+    static final String UNDERLINE      = "\u001B[4m"
+    static final String BLINK          = "\u001B[5m"
+    static final String RAPID_BLINK    = "\u001B[6m"
+    static final String REVERSE_VIDEO  = "\u001B[7m"
+    static final String INVISIBLE_TEXT = "\u001B[8m"
+
+    static final String BLACK          = "\u001B[30m"
+    static final String RED            = "\u001B[31m"
+    static final String GREEN          = "\u001B[32m"
+    static final String YELLOW         = "\u001B[33m"
+    static final String BLUE           = "\u001B[34m"
+    static final String MAGENTA        = "\u001B[35m"
+    static final String CYAN           = "\u001B[36m"
+    static final String WHITE          = "\u001B[37m"
+
+    static final String DARK_GRAY      = "\u001B[1;30m"
+    static final String LIGHT_RED      = "\u001B[1;31m"
+    static final String LIGHT_GREEN    = "\u001B[1;32m"
+    static final String LIGHT_YELLOW   = "\u001B[1;33m"
+    static final String LIGHT_BLUE     = "\u001B[1;34m"
+    static final String LIGHT_PURPLE   = "\u001B[1;35m"
+    static final String LIGHT_CYAN     = "\u001B[1;36m"
+
+    static String color(String text, String ansiValue) {
+        ansiValue + text + NORMAL
+    }
+
 }

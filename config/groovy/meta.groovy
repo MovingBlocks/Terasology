@@ -40,4 +40,8 @@ class meta {
 
         return itemList
     }
+
+    def refreshGradle(File targetDir) {
+        println "Skipping refreshGradle for meta module $targetDir - they don't Gradle"
+    }
 }

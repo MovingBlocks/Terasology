@@ -16,9 +16,9 @@
 package org.terasology.entitySystem;
 
 import com.google.common.collect.Lists;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.terasology.context.internal.ContextImpl;
 import org.terasology.engine.bootstrap.EntitySystemSetupUtil;
 import org.terasology.engine.module.ModuleManager;
@@ -42,12 +42,12 @@ public class OwnershipHelperTest {
 
     EngineEntityManager entityManager;
 
-    @BeforeClass
+    @BeforeAll
     public static void setupClass() throws Exception {
         moduleManager = ModuleManagerFactory.create();
     }
 
-    @Before
+    @BeforeEach
     public void setup() {
         ContextImpl context = new ContextImpl();
         context.put(ModuleManager.class, moduleManager);

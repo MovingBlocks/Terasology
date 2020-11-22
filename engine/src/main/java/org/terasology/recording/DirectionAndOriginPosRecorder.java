@@ -15,7 +15,8 @@
  */
 package org.terasology.recording;
 
-import org.terasology.math.geom.Vector3f;
+
+import org.joml.Vector3f;
 
 import java.util.ArrayDeque;
 import java.util.Deque;

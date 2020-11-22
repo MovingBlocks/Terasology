@@ -37,6 +37,7 @@ import org.terasology.logic.characters.events.AttackEvent;
 import org.terasology.logic.characters.events.AttackRequest;
 import org.terasology.logic.characters.events.DeathEvent;
 import org.terasology.logic.characters.events.OnItemUseEvent;
+import org.terasology.logic.characters.events.OnScaleEvent;
 import org.terasology.logic.characters.events.PlayerDeathEvent;
 import org.terasology.logic.characters.interactions.InteractionUtil;
 import org.terasology.logic.common.ActivateEvent;
@@ -54,6 +55,7 @@ import org.terasology.physics.CollisionGroup;
 import org.terasology.physics.HitResult;
 import org.terasology.physics.Physics;
 import org.terasology.physics.StandardCollisionGroup;
+import org.terasology.physics.engine.PhysicsEngine;
 import org.terasology.recording.DirectionAndOriginPosRecorderList;
 import org.terasology.recording.RecordAndReplayCurrentStatus;
 import org.terasology.recording.RecordAndReplayStatus;
@@ -62,7 +64,10 @@ import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.block.BlockComponent;
 import org.terasology.world.block.regions.ActAsBlockComponent;
 
+import java.util.Optional;
+
 /**
+ *
  */
 @RegisterSystem
 public class CharacterSystem extends BaseComponentSystem implements UpdateSubscriberSystem {
@@ -71,6 +76,9 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
 
     @In
     private Physics physics;
+
+    @In
+    private PhysicsEngine physicsEngine;
 
     @In
     private NetworkSystem networkSystem;
@@ -123,6 +131,7 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
      * If the entity is a character, then the display name from the {@link ClientComponent#clientInfo} is used.
      * Otherwise the entity itself is checked for a {@link DisplayNameComponent}.
      * In the last case, the prefab name of the entity is used, e.g. "engine:player" will be parsed to "Player".
+     *
      * @param instigator The entity for which an instigator name is needed.
      * @return The instigator name.
      */
@@ -157,6 +166,7 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
     /**
      * Extracts the damage type name from a prefab. If the prefab has a {@link DisplayNameComponent}, it will be used.
      * Otherwise the damage type name is parsed, e.g. "engine:directDamage" will become "Direct Damage".
+     *
      * @param damageType The damage type prefab.
      * @return A readable name for the damage type.
      */
@@ -216,17 +226,20 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
         if (!onItemUseEvent.isConsumed()) {
             EntityRef gazeEntity = GazeAuthoritySystem.getGazeEntityForCharacter(character);
             LocationComponent gazeLocation = gazeEntity.getComponent(LocationComponent.class);
-            Vector3f direction = gazeLocation.getWorldDirection();
-            Vector3f originPos = gazeLocation.getWorldPosition();
+            org.joml.Vector3f direction = gazeLocation.getWorldDirection(new org.joml.Vector3f());
+            org.joml.Vector3f originPos = gazeLocation.getWorldPosition(new org.joml.Vector3f());
             if (recordAndReplayCurrentStatus.getStatus() == RecordAndReplayStatus.RECORDING) {
-                directionAndOriginPosRecorderList.getAttackEventDirectionAndOriginPosRecorder().add(direction, originPos);
+                directionAndOriginPosRecorderList.getAttackEventDirectionAndOriginPosRecorder().add(direction,
+                    originPos);
             } else if (recordAndReplayCurrentStatus.getStatus() == RecordAndReplayStatus.REPLAYING) {
-                Vector3f[] data = directionAndOriginPosRecorderList.getAttackEventDirectionAndOriginPosRecorder().poll();
+                org.joml.Vector3f[] data =
+                    directionAndOriginPosRecorderList.getAttackEventDirectionAndOriginPosRecorder().poll();
                 direction = data[0];
                 originPos = data[1];
             }
 
-            HitResult result = physics.rayTrace(originPos, direction, characterComponent.interactionRange, Sets.newHashSet(character), DEFAULTPHYSICSFILTER);
+            HitResult result = physics.rayTrace(originPos, direction, characterComponent.interactionRange,
+                Sets.newHashSet(character), DEFAULTPHYSICSFILTER);
 
             if (result.isHit()) {
                 result.getEntity().send(new AttackEvent(character, event.getItem()));
@@ -289,15 +302,6 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
         }
     }
 
-    private boolean vectorsAreAboutEqual(Vector3f v1, Vector3f v2) {
-        Vector3f delta = new Vector3f();
-        delta.add(v1);
-        delta.sub(v2);
-        float epsilon = 0.0001f;
-        float deltaSquared = delta.lengthSquared();
-        return deltaSquared < epsilon;
-    }
-
     private String getPlayerNameFromCharacter(EntityRef character) {
         CharacterComponent characterComponent = character.getComponent(CharacterComponent.class);
         if (characterComponent == null) {
@@ -320,15 +324,15 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
         CharacterComponent characterComponent = character.getComponent(CharacterComponent.class);
         EntityRef camera = GazeAuthoritySystem.getGazeEntityForCharacter(character);
         LocationComponent location = camera.getComponent(LocationComponent.class);
-        Vector3f direction = location.getWorldDirection();
-        if (!(vectorsAreAboutEqual(event.getDirection(), direction))) {
+        org.joml.Vector3f direction = location.getWorldDirection(new org.joml.Vector3f());
+        if (!(event.getDirection().equals(direction, 0.0001f))) {
             logger.error("Direction at client {} was different than direction at server {}", event.getDirection(), direction);
         }
         // Assume the exact same value in case there are rounding mistakes:
         direction = event.getDirection();
 
-        Vector3f originPos = location.getWorldPosition();
-        if (!(vectorsAreAboutEqual(event.getOrigin(), originPos))) {
+        org.joml.Vector3f originPos = location.getWorldPosition(new org.joml.Vector3f());
+        if (!(event.getOrigin().equals(originPos, 0.0001f))) {
             String msg = "Player {} seems to have cheated: It stated that it performed an action from {} but the predicted position is {}";
             logger.info(msg, getPlayerNameFromCharacter(character), event.getOrigin(), originPos);
             return false;
@@ -379,7 +383,7 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
                 return false;
             }
 
-            if (!(vectorsAreAboutEqual(event.getHitPosition(), result.getHitPoint()))) {
+            if (!(event.getHitPosition().equals(result.getHitPoint(), 0.0001f))) {
                 String msg = "Denied activation attempt by {} since at the authority the object got hit at a differnt position";
                 logger.info(msg, getPlayerNameFromCharacter(character));
                 return false;
@@ -391,7 +395,7 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
                 logger.info(msg, getPlayerNameFromCharacter(character));
                 return false;
             }
-            if (!(vectorsAreAboutEqual(event.getHitPosition(), originPos))) {
+            if (!(event.getHitPosition().equals(originPos, 0.0001f))) {
                 String msg = "Denied activation attempt by {} since the event was not properly labeled as having a hit postion";
                 logger.info(msg, getPlayerNameFromCharacter(character));
                 return false;
@@ -436,6 +440,57 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
         // add a small epsilon to have rounding mistakes be in favor of the player:
         float epsilon = 0.00001f;
         return interactionRangeSquared > maxInteractionRangeSquared + epsilon;
+    }
+
+    @ReceiveEvent
+    public void onScaleCharacter(OnScaleEvent event, EntityRef entity, CharacterComponent character, CharacterMovementComponent movement) {
+        //TODO: We should catch and consume this event somewhere in case there is no space for the character to grow
+
+        Prefab parent = entity.getParentPrefab();
+
+        // adjust movement parameters based on the default values defined by prefab
+        CharacterMovementComponent defaultMovement =
+                Optional.ofNullable(parent.getComponent(CharacterMovementComponent.class))
+                        .orElse(new CharacterMovementComponent());
+
+        final float factor = event.getFactor();
+
+        movement.height = factor * movement.height;
+        movement.jumpSpeed = getJumpSpeed(factor, defaultMovement.jumpSpeed);
+        movement.stepHeight = factor * movement.stepHeight;
+        movement.distanceBetweenFootsteps = factor * movement.distanceBetweenFootsteps;
+        movement.runFactor = getRunFactor(factor, defaultMovement.runFactor);
+        entity.saveComponent(movement);
+
+        // adjust character parameters
+        CharacterComponent defaultCharacter =
+                Optional.ofNullable(parent.getComponent(CharacterComponent.class))
+                        .orElse(new CharacterComponent());
+        character.interactionRange = getInteractionRange(factor, defaultCharacter.interactionRange);
+        entity.saveComponent(character);
+
+        // refresh the entity collider - by retrieving the character collider after removing it we force recreation
+        physicsEngine.removeCharacterCollider(entity);
+        physicsEngine.getCharacterCollider(entity);
+
+        // Scaling a character up will grow them into the ground. We would need to adjust the vertical position to be
+        // safely above ground.
+        Optional.ofNullable(entity.getComponent(LocationComponent.class))
+                .map(LocationComponent::getWorldPosition)
+                .map(location -> location.addY((event.getNewValue() - event.getOldValue()) / 2f))
+                .ifPresent(location -> entity.send(new CharacterTeleportEvent(location)));
+    }
+
+    private float getJumpSpeed(float ratio, float defaultValue) {
+        return (float) Math.pow(ratio, 0.74f) * 0.4f * defaultValue + 0.6f * defaultValue;
+    }
+
+    private float getRunFactor(float ratio, float defaultValue) {
+        return (float) Math.pow(ratio, 0.68f) * defaultValue;
+    }
+
+    private float getInteractionRange(float ratio, float defaultValue) {
+        return (float) Math.pow(ratio, 0.62f) * defaultValue;
     }
 
 }

@@ -19,8 +19,8 @@ import org.terasology.assets.ResourceUrn;
 import org.terasology.i18n.TranslationSystem;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
-import org.terasology.rendering.nui.WidgetUtil;
-import org.terasology.rendering.nui.widgets.UILabel;
+import org.terasology.nui.WidgetUtil;
+import org.terasology.nui.widgets.UILabel;
 
 public class ConfirmChangePopup extends CoreScreenLayer {
 

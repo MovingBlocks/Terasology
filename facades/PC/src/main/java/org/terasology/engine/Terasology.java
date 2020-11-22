@@ -1,22 +1,12 @@
-/*
- * Copyright 2015 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
+
 package org.terasology.engine;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
 import org.terasology.config.SystemConfig;
 import org.terasology.crashreporter.CrashReporter;
@@ -28,6 +18,7 @@ import org.terasology.engine.subsystem.common.ConfigurationSubsystem;
 import org.terasology.engine.subsystem.common.ThreadManager;
 import org.terasology.engine.subsystem.common.hibernation.HibernationSubsystem;
 import org.terasology.engine.subsystem.config.BindsSubsystem;
+import org.terasology.engine.subsystem.discordrpc.DiscordRPCSubSystem;
 import org.terasology.engine.subsystem.headless.HeadlessAudio;
 import org.terasology.engine.subsystem.headless.HeadlessGraphics;
 import org.terasology.engine.subsystem.headless.HeadlessInput;
@@ -39,37 +30,28 @@ import org.terasology.engine.subsystem.lwjgl.LwjglGraphics;
 import org.terasology.engine.subsystem.lwjgl.LwjglInput;
 import org.terasology.engine.subsystem.lwjgl.LwjglTimer;
 import org.terasology.engine.subsystem.openvr.OpenVRInput;
-import org.terasology.engine.subsystem.rpc.DiscordRPCSubSystem;
 import org.terasology.game.GameManifest;
 import org.terasology.network.NetworkMode;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameInfo;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameProvider;
 import org.terasology.splash.SplashScreen;
 import org.terasology.splash.SplashScreenBuilder;
-import org.terasology.splash.overlay.AnimatedBoxRowOverlay;
-import org.terasology.splash.overlay.ImageOverlay;
-import org.terasology.splash.overlay.RectOverlay;
-import org.terasology.splash.overlay.TextOverlay;
-import org.terasology.splash.overlay.TriggerImageOverlay;
 
 import java.awt.GraphicsEnvironment;
-import java.awt.Point;
-import java.awt.Rectangle;
 import java.io.IOException;
-import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Class providing the main() method for launching Terasology as a PC app.
  * <br><br>
- * Through the following launch arguments default locations to store logs and
- * game saves can be overridden, by using the current directory or a specified
- * one as the home directory. Furthermore, Terasology can be launched headless,
- * to save resources while acting as a server or to run in an environment with
- * no graphics, audio or input support. Additional arguments are available to
- * reload the latest game on startup and to disable crash reporting.
+ * Through the following launch arguments default locations to store logs and game saves can be overridden, by using the
+ * current directory or a specified one as the home directory. Furthermore, Terasology can be launched headless, to save
+ * resources while acting as a server or to run in an environment with no graphics, audio or input support. Additional
+ * arguments are available to reload the latest game on startup and to disable crash reporting.
  * <br><br>
  * Available launch arguments:
  * <br><br>
@@ -79,6 +61,7 @@ import java.util.List;
  * <tr><td>-homedir=path</td><td>Use the specified path as the home directory.</td></tr>
  * <tr><td>-headless</td><td>Start headless.</td></tr>
  * <tr><td>-loadlastgame</td><td>Load the latest game on startup.</td></tr>
+ * <tr><td>-createlastgame</td><td>Recreates the world of the latest game with a new save file on startup.</td></tr>
  * <tr><td>-noSaveGames</td><td>Disable writing of save games.</td></tr>
  * <tr><td>-noCrashReport</td><td>Disable crash reporting.</td></tr>
  * <tr><td>-noSound</td><td>Disable sound.</td></tr>
@@ -100,6 +83,7 @@ public final class Terasology {
     private static final String USE_SPECIFIED_DIR_AS_HOME = "-homedir=";
     private static final String START_HEADLESS = "-headless";
     private static final String LOAD_LAST_GAME = "-loadlastgame";
+    private static final String CREATE_LAST_GAME = "-createlastgame";
     private static final String NO_CRASH_REPORT = "-noCrashReport";
     private static final String NO_SAVE_GAMES = "-noSaveGames";
     private static final String PERMISSIVE_SECURITY = "-permissiveSecurity";
@@ -107,12 +91,16 @@ public final class Terasology {
     private static final String NO_SPLASH = "-noSplash";
     private static final String SERVER_PORT = "-serverPort=";
     private static final String OVERRIDE_DEFAULT_CONFIG = "-overrideDefaultConfig=";
+    private static final Logger logger = LoggerFactory.getLogger(Terasology.class);
+
 
     private static boolean isHeadless;
     private static boolean crashReportEnabled = true;
     private static boolean soundEnabled = true;
     private static boolean splashEnabled = true;
     private static boolean loadLastGame;
+    private static boolean createLastGame;
+
 
     private Terasology() {
     }
@@ -122,8 +110,23 @@ public final class Terasology {
         handlePrintUsageRequest(args);
         handleLaunchArguments(args);
 
-        SplashScreen splashScreen = splashEnabled ? configureSplashScreen() : SplashScreenBuilder.createStub();
-
+        SplashScreen splashScreen;
+        if (splashEnabled) {
+            CountDownLatch splashInitLatch = new CountDownLatch(1);
+            GLFWSplashScreen glfwSplash = new GLFWSplashScreen(splashInitLatch);
+            Thread thread = new Thread(glfwSplash, "splashscreen-loop");
+            thread.setDaemon(true);
+            thread.start();
+            try {
+                // wait splash initialize... we will lose some post messages otherwise.
+                splashInitLatch.await(1, TimeUnit.SECONDS);
+            } catch (InterruptedException e) {
+                // ignore
+            }
+            splashScreen = glfwSplash;
+        } else {
+            splashScreen = SplashScreenBuilder.createStub();
+        }
         splashScreen.post("Java Runtime " + System.getProperty("java.version") + " loaded");
 
         setupLogging();
@@ -143,11 +146,26 @@ public final class Terasology {
             if (isHeadless) {
                 engine.subscribeToStateChange(new HeadlessStateChangeListener(engine));
                 engine.run(new StateHeadlessSetup());
+            } else if (loadLastGame) {
+                engine.initialize(); //initialize the managers first
+                engine.getFromEngineContext(ThreadManager.class).submitTask("loadGame", () -> {
+                    GameManifest gameManifest = getLatestGameManifest();
+                    if (gameManifest != null) {
+                        engine.changeState(new StateLoading(gameManifest, NetworkMode.NONE));
+                    }
+                });
             } else {
-                if (loadLastGame) {
-                    engine.getFromEngineContext(ThreadManager.class).submitTask("loadGame", () -> {
+                if (createLastGame) {
+                    engine.initialize();
+                    engine.getFromEngineContext(ThreadManager.class).submitTask("createLastGame", () -> {
                         GameManifest gameManifest = getLatestGameManifest();
                         if (gameManifest != null) {
+                            String title = gameManifest.getTitle();
+                            if (!title.startsWith("New Created")) { //if first time run
+                                gameManifest.setTitle("New Created " + title + " 1");
+                            } else { //if not first time run
+                                gameManifest.setTitle(getNewTitle(title));
+                            }
                             engine.changeState(new StateLoading(gameManifest, NetworkMode.NONE));
                         }
                     });
@@ -162,65 +180,11 @@ public final class Terasology {
         }
     }
 
-    private static SplashScreen configureSplashScreen() {
-        int imageHeight = 283;
-        int maxTextWidth = 450;
-        int width = 600;
-        int height = 30;
-        int left = 20;
-        int top = imageHeight - height - 20;
-
-        Rectangle rectRc = new Rectangle(left, top, width, height);
-        Rectangle textRc = new Rectangle(left + 10, top + 5, maxTextWidth, height);
-        Rectangle boxRc = new Rectangle(left + maxTextWidth + 10, top, width - maxTextWidth - 20, height);
-
-        SplashScreenBuilder builder = new SplashScreenBuilder();
-
-        String[] imgFiles = new String[] {
-                "splash_1.png",
-                "splash_2.png",
-                "splash_3.png",
-                "splash_4.png",
-                "splash_5.png"
-        };
-
-        Point[] imgOffsets = new Point[] {
-                new Point(0, 0),
-                new Point(150, 0),
-                new Point(300, 0),
-                new Point(450, 0),
-                new Point(630, 0)
-        };
-
-        EngineStatus[] trigger = new EngineStatus[] {
-                TerasologyEngineStatus.PREPARING_SUBSYSTEMS,
-                TerasologyEngineStatus.INITIALIZING_MODULE_MANAGER,
-                TerasologyEngineStatus.INITIALIZING_ASSET_TYPES,
-                TerasologyEngineStatus.INITIALIZING_SUBSYSTEMS,
-                TerasologyEngineStatus.INITIALIZING_ASSET_MANAGEMENT,
-        };
-
-        try {
-            for (int index = 0; index < 5; index++) {
-                URL resource = Terasology.class.getResource("/splash/" + imgFiles[index]);
-                builder.add(new TriggerImageOverlay(resource)
-                        .setTrigger(trigger[index].getDescription())
-                        .setPosition(imgOffsets[index].x, imgOffsets[index].y));
-            }
-
-            builder.add(new ImageOverlay(Terasology.class.getResource("/splash/splash_text.png")));
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        SplashScreen instance = builder
-                .add(new RectOverlay(rectRc))
-                .add(new TextOverlay(textRc))
-                .add(new AnimatedBoxRowOverlay(boxRc))
-                .build();
-
-        return instance;
+    private static String getNewTitle(String title) {
+        String newTitle = title.substring(0, getPositionOfLastDigit(title));
+        int fileNumber = getLastNumber(title);
+        fileNumber++;
+        return (newTitle + " " + fileNumber);
     }
 
     private static void setupLogging() {
@@ -235,7 +199,7 @@ public final class Terasology {
     private static void handlePrintUsageRequest(String[] args) {
         for (String arg : args) {
             for (String usageArg : PRINT_USAGE_FLAGS) {
-                if (usageArg.equals(arg.toLowerCase())) {
+                if (usageArg.equalsIgnoreCase(arg)) {
                     printUsageAndExit();
                 }
             }
@@ -251,6 +215,7 @@ public final class Terasology {
                 USE_CURRENT_DIR_AS_HOME + "|" + USE_SPECIFIED_DIR_AS_HOME + "<path>",
                 START_HEADLESS,
                 LOAD_LAST_GAME,
+                CREATE_LAST_GAME,
                 NO_CRASH_REPORT,
                 NO_SAVE_GAMES,
                 PERMISSIVE_SECURITY,
@@ -281,6 +246,9 @@ public final class Terasology {
         System.out.println();
         System.out.println("To automatically load the latest game on startup,");
         System.out.println("use the " + LOAD_LAST_GAME + " launch argument.");
+        System.out.println();
+        System.out.println("To automatically recreate the last game played with a new save file,");
+        System.out.println("use the " + CREATE_LAST_GAME + "launch argument");
         System.out.println();
         System.out.println("By default Crash Reporting is enabled.");
         System.out.println("To disable this feature use the " + NO_CRASH_REPORT + " launch argument.");
@@ -343,6 +311,8 @@ public final class Terasology {
                 splashEnabled = false;
             } else if (arg.equals(LOAD_LAST_GAME)) {
                 loadLastGame = true;
+            } else if (arg.equals(CREATE_LAST_GAME)) {
+                createLastGame = true;
             } else if (arg.startsWith(SERVER_PORT)) {
                 System.setProperty(ConfigurationSubsystem.SERVER_PORT_PROPERTY, arg.substring(SERVER_PORT.length()));
             } else if (arg.startsWith(OVERRIDE_DEFAULT_CONFIG)) {
@@ -362,8 +332,13 @@ public final class Terasology {
             }
 
         } catch (IOException e) {
-            reportException(e);
-            System.exit(0);
+            logger.warn("The game cannot detect default home directory");
+            try {
+                PathManager.getInstance().chooseHomePathManually();
+            } catch (IOException ex) {
+                reportException(ex);
+                System.exit(0);
+            }
         }
     }
 
@@ -411,6 +386,26 @@ public final class Terasology {
         }
 
         return latestGame.getManifest();
+    }
+
+    private static int getPositionOfLastDigit(String str) {
+        int position;
+        for (position = str.length() - 1; position >= 0; --position) {
+            char c = str.charAt(position);
+            if (!Character.isDigit(c)) {
+                break;
+            }
+        }
+        return position + 1;
+    }
+
+    private static int getLastNumber(String str) {
+        int positionOfLastDigit = getPositionOfLastDigit(str);
+        if (positionOfLastDigit == str.length()) {
+            // string does not end in digits
+            return -1;
+        }
+        return Integer.parseInt(str.substring(positionOfLastDigit));
     }
 
 }

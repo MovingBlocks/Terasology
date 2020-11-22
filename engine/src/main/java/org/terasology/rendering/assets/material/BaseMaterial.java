@@ -15,6 +15,11 @@
  */
 package org.terasology.rendering.assets.material;
 
+import org.joml.Matrix3fc;
+import org.joml.Matrix4fc;
+import org.joml.Vector2fc;
+import org.joml.Vector3fc;
+import org.joml.Vector4fc;
 import org.terasology.assets.AssetType;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.math.geom.Matrix3f;
@@ -126,6 +131,16 @@ public abstract class BaseMaterial extends Material {
     }
 
     @Override
+    public void setFloat2(String name, Vector2fc value) {
+        setFloat2(name, value.x(), value.y());
+    }
+
+    @Override
+    public void setFloat2(String name, Vector2fc value, boolean currentOnly) {
+        setFloat2(name, value.x(), value.y(), currentOnly);
+    }
+
+    @Override
     public void setFloat2(String name, FloatBuffer buffer) {
         setFloat2(name, buffer, false);
     }
@@ -143,6 +158,16 @@ public abstract class BaseMaterial extends Material {
     @Override
     public void setFloat3(String name, Vector3f value, boolean currentOnly) {
         setFloat3(name, value.x, value.y, value.z, currentOnly);
+    }
+
+    @Override
+    public void setFloat3(String name, Vector3fc value) {
+        setFloat3(name, value.x(), value.y(), value.z());
+    }
+
+    @Override
+    public void setFloat3(String name, Vector3fc value, boolean currentOnly) {
+        setFloat3(name, value.x(), value.y(), value.z(), currentOnly);
     }
 
     @Override
@@ -166,6 +191,16 @@ public abstract class BaseMaterial extends Material {
     }
 
     @Override
+    public void setFloat4(String name, Vector4fc value) {
+        setFloat4(name, value.x(), value.y(), value.z(), value.w());
+    }
+
+    @Override
+    public void setFloat4(String name, Vector4fc value, boolean currentOnly) {
+        setFloat4(name, value.x(), value.y(), value.z(), value.w(), currentOnly);
+    }
+
+    @Override
     public void setFloat4(String name, FloatBuffer buffer) {
         setFloat4(name, buffer, false);
     }
@@ -186,6 +221,11 @@ public abstract class BaseMaterial extends Material {
     }
 
     @Override
+    public void setMatrix3(String name, Matrix3fc matrix) {
+        setMatrix3(name, matrix, false);
+    }
+
+    @Override
     public void setMatrix3(String name, FloatBuffer buffer) {
         setMatrix3(name, buffer, false);
     }
@@ -196,10 +236,25 @@ public abstract class BaseMaterial extends Material {
     }
 
     @Override
-    public void setMatrix4(String name, FloatBuffer buffer) {
-        setMatrix3(name, buffer, false);
+    public void setMatrix4(String name, Matrix4fc matrix) {
+        setMatrix4(name, matrix, false);
     }
 
+    @Override
+    public void setMatrix4(String name, FloatBuffer buffer) {
+        setMatrix4(name, buffer, false);
+    }
+
+    /**
+     * writes camera into the local material and they include the uniforms listed below:
+     * <pre>{@code
+     * uniform mat4 viewMatrix;
+     * uniform mat4 projMatrix;
+     * uniform mat4 viewProjMatrix;
+     * uniform mat4 invProjMatrix;
+     * }</pre>
+     * @param camera camera to write into material
+     */
     @Override
     public void setCamera(Camera camera) {
         setMatrix4("viewMatrix", camera.getViewMatrix(), true);

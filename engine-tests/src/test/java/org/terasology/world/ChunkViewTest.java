@@ -15,8 +15,8 @@
  */
 package org.terasology.world;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.terasology.TerasologyTestingEnvironment;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
@@ -41,7 +41,7 @@ import org.terasology.world.internal.ChunkViewCoreImpl;
 
 import java.io.IOException;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ChunkViewTest extends TerasologyTestingEnvironment {
 
@@ -50,7 +50,7 @@ public class ChunkViewTest extends TerasologyTestingEnvironment {
     private BlockManager blockManager;
     private ExtraBlockDataManager extraDataManager;
 
-    @Before
+    @BeforeEach
     public void setup() throws IOException {
         AssetManager assetManager = CoreRegistry.get(AssetManager.class);
         blockManager = new BlockManagerImpl(new NullWorldAtlas(), assetManager);

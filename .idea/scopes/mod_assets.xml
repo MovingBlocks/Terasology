@@ -1,0 +1,3 @@
+<component name="DependencyValidationManager">
+  <scope name="mod_assets" pattern="file[Terasology.modules.*]:assets//*" />
+</component>

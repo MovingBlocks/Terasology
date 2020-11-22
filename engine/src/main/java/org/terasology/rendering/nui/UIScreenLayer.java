@@ -15,6 +15,8 @@
  */
 package org.terasology.rendering.nui;
 
+import org.terasology.nui.ControlWidget;
+
 /**
  */
 public interface UIScreenLayer extends ControlWidget {

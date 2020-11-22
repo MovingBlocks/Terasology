@@ -15,13 +15,14 @@
  */
 package org.terasology.math;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.Iterator;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class IntegerRangeTest {
     @Test
@@ -30,10 +31,11 @@ public class IntegerRangeTest {
         validateRange(range);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testIncorrectRange() {
         IntegerRange range = new IntegerRange();
-        range.addNumbers(3, 2);
+        Assertions.assertThrows(IllegalArgumentException.class,
+                () -> range.addNumbers(3, 2));
     }
 
     @Test

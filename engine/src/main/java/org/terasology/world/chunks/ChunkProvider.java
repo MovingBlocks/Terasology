@@ -1,18 +1,5 @@
-/*
- * Copyright 2013 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.world.chunks;
 
@@ -23,6 +10,7 @@ import org.terasology.world.internal.ChunkViewCore;
 import java.util.Collection;
 
 /**
+ * Provides Chunks and view for it.
  */
 public interface ChunkProvider {
 
@@ -53,37 +41,6 @@ public interface ChunkProvider {
      * @param entity
      */
     void setWorldEntity(EntityRef entity);
-
-    /**
-     * Requests that a region around the given entity be maintained in near cache
-     *
-     * @param entity
-     * @param distance The region (in chunks) around the entity that should be near cached
-     */
-    void addRelevanceEntity(EntityRef entity, Vector3i distance);
-
-    /**
-     * Requests that a region around the given entity be maintained in near cache
-     *
-     * @param entity
-     * @param distance The region (in chunks) around the entity that should be near cached
-     * @param listener A listener to chunk region events
-     */
-    void addRelevanceEntity(EntityRef entity, Vector3i distance, ChunkRegionListener listener);
-
-    /**
-     * Retrieves the ChunkRelevanceRegion object for the given entity
-     *
-     * @param entity
-     */
-    void updateRelevanceEntity(EntityRef entity, Vector3i distance);
-
-    /**
-     * Removes an entity from producing a caching region
-     *
-     * @param entity
-     */
-    void removeRelevanceEntity(EntityRef entity);
 
     /**
      * Finish adding any pending chunks

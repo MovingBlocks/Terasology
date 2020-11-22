@@ -178,4 +178,11 @@ void main()
 
     vertexProjPos = gl_ProjectionMatrix * vertexViewPos;
     gl_Position = vertexProjPos;
+
+#if defined (FEATURE_ALPHA_REJECT)
+    //TODO: find the right methods to determine which vertices have normals facing away from the viewpoint, and only alter those
+    //if (normal.x * vertexViewPos.x < 0 || normal.y * vertexViewPos.y < 0 || normal.z * vertexViewPos.z < 0) {
+        gl_Position.z -= 0.001;
+    //}
+#endif
 }

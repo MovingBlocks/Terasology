@@ -16,9 +16,10 @@
 package org.terasology.entitySystem;
 
 import com.google.common.collect.Lists;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.reflections.Reflections;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.context.internal.ContextImpl;
 import org.terasology.engine.SimpleUri;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -44,7 +45,7 @@ import org.terasology.registry.CoreRegistry;
 
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -58,7 +59,7 @@ public class PojoEventSystemTests {
     PojoEntityManager entityManager;
     EntityRef entity;
 
-    @Before
+    @BeforeEach
     public void setup() {
         ContextImpl context = new ContextImpl();
         CoreRegistry.setContext(context);
@@ -82,7 +83,7 @@ public class PojoEventSystemTests {
 
     @Test
     public void testSendEventToEntity() {
-        StringComponent component = entity.addComponent(new StringComponent());
+        entity.addComponent(new StringComponent());
 
         TestEventHandler handler = new TestEventHandler();
         eventSystem.registerEventHandler(handler);
@@ -98,8 +99,8 @@ public class PojoEventSystemTests {
 
     @Test
     public void testSendEventToEntityWithMultipleComponents() {
-        StringComponent stringComponent = entity.addComponent(new StringComponent());
-        IntegerComponent intComponent = entity.addComponent(new IntegerComponent());
+        entity.addComponent(new StringComponent());
+        entity.addComponent(new IntegerComponent());
 
         TestEventHandler handler = new TestEventHandler();
         eventSystem.registerEventHandler(handler);
@@ -117,7 +118,7 @@ public class PojoEventSystemTests {
 
     @Test
     public void testSendEventToEntityComponent() {
-        StringComponent component = entity.addComponent(new StringComponent());
+        entity.addComponent(new StringComponent());
         IntegerComponent intComponent = entity.addComponent(new IntegerComponent());
 
         TestEventHandler handler = new TestEventHandler();
@@ -133,7 +134,7 @@ public class PojoEventSystemTests {
 
     @Test
     public void testNoReceiveEventWhenMissingComponents() {
-        StringComponent component = entity.addComponent(new StringComponent());
+        entity.addComponent(new StringComponent());
 
         TestCompoundComponentEventHandler handler = new TestCompoundComponentEventHandler();
         eventSystem.registerEventHandler(handler);
@@ -146,8 +147,8 @@ public class PojoEventSystemTests {
 
     @Test
     public void testReceiveEventRequiringMultipleComponents() {
-        StringComponent stringComponent = entity.addComponent(new StringComponent());
-        IntegerComponent intComponent = entity.addComponent(new IntegerComponent());
+        entity.addComponent(new StringComponent());
+        entity.addComponent(new IntegerComponent());
 
         TestCompoundComponentEventHandler handler = new TestCompoundComponentEventHandler();
         eventSystem.registerEventHandler(handler);
@@ -162,7 +163,7 @@ public class PojoEventSystemTests {
 
     @Test
     public void testPriorityAndCancel() {
-        StringComponent stringComponent = entity.addComponent(new StringComponent());
+        entity.addComponent(new StringComponent());
 
         TestEventHandler handlerNormal = new TestEventHandler();
         TestHighPriorityEventHandler handlerHigh = new TestHighPriorityEventHandler();

@@ -18,14 +18,15 @@ package org.terasology.persistence.typeHandling.extensionTypes;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.terasology.nui.Color;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.PersistedDataSerializer;
 import org.terasology.persistence.typeHandling.gson.GsonPersistedDataArray;
 import org.terasology.persistence.typeHandling.inMemory.PersistedString;
-import org.terasology.rendering.nui.Color;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Tests the {@link ColorTypeHandler} class.
@@ -45,7 +46,7 @@ public class ColorTypeHandlerTest {
     public void testDeserializeHex() {
         PersistedData data = new PersistedString("DEADBEEF");
         Color color = handler.deserialize(data).get();
-        Assert.assertEquals(0xDEADBEEF, color.rgba());
+        assertEquals(0xDEADBEEF, color.rgba());
     }
 
     @Test
@@ -53,9 +54,9 @@ public class ColorTypeHandlerTest {
         JsonArray array = new Gson().fromJson("[12, 34, 56, 78]", JsonArray.class);
         PersistedData data = new GsonPersistedDataArray(array);
         Color color = handler.deserialize(data).get();
-        Assert.assertEquals(12, color.r());
-        Assert.assertEquals(34, color.g());
-        Assert.assertEquals(56, color.b());
-        Assert.assertEquals(78, color.a());
+        assertEquals(12, color.r());
+        assertEquals(34, color.g());
+        assertEquals(56, color.b());
+        assertEquals(78, color.a());
     }
 }

@@ -30,6 +30,8 @@ import org.terasology.utilities.ReflectionUtil;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.Map;
 import java.util.Optional;
 
@@ -52,8 +54,7 @@ public class ObjectFieldMapTypeHandlerFactory implements TypeHandlerFactory {
             Map<Field, TypeHandler<?>> fieldTypeHandlerMap = Maps.newLinkedHashMap();
 
             getResolvedFields(typeInfo).forEach(
-                    (field, fieldType) ->
-                    {
+                    (field, fieldType) -> {
                         Optional<TypeHandler<?>> declaredFieldTypeHandler =
                                 context.getTypeHandlerLibrary().getTypeHandler(fieldType);
 
@@ -80,25 +81,27 @@ public class ObjectFieldMapTypeHandlerFactory implements TypeHandlerFactory {
     }
 
     private <T> Map<Field, Type> getResolvedFields(TypeInfo<T> typeInfo) {
-        Map<Field, Type> fields = Maps.newLinkedHashMap();
+        return AccessController.doPrivileged((PrivilegedAction<Map<Field, Type>>) () -> {
+            Map<Field, Type> fields = Maps.newLinkedHashMap();
 
-        Type type = typeInfo.getType();
-        Class<? super T> rawType = typeInfo.getRawType();
+            Type type = typeInfo.getType();
+            Class<? super T> rawType = typeInfo.getRawType();
 
-        while (!Object.class.equals(rawType)) {
-            for (Field field : rawType.getDeclaredFields()) {
-                if (Modifier.isTransient(field.getModifiers()) || Modifier.isStatic(field.getModifiers())) {
-                    continue;
+            while (!Object.class.equals(rawType)) {
+                for (Field field : rawType.getDeclaredFields()) {
+                    if (Modifier.isTransient(field.getModifiers()) || Modifier.isStatic(field.getModifiers())) {
+                        continue;
+                    }
+
+                    field.setAccessible(true);
+                    Type fieldType = ReflectionUtil.resolveType(type, field.getGenericType());
+                    fields.put(field, fieldType);
                 }
 
-                field.setAccessible(true);
-                Type fieldType = ReflectionUtil.resolveType(type, field.getGenericType());
-                fields.put(field, fieldType);
+                rawType = rawType.getSuperclass();
             }
 
-            rawType = rawType.getSuperclass();
-        }
-
-        return fields;
+            return fields;
+        });
     }
 }
