@@ -594,7 +594,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
             if (mode.isServer()) {
                 if (metadata.isReplicated()) {
                     for (NetClient client : netClientList) {
-                        logger.info("Component {} added to {}", component, entity);
+                        logger.debug("Component {} added to {}", component, entity);
                         client.setComponentAdded(netComp.getNetworkId(), component);
                     }
                 }
@@ -611,7 +611,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
             if (mode.isServer()) {
                 if (metadata.isReplicated()) {
                     for (NetClient client : netClientList) {
-                        logger.info("Component {} removed from {}", component, entity);
+                        logger.debug("Component {} removed from {}", component, entity);
                         client.setComponentRemoved(netComp.getNetworkId(), component);
                     }
                 }
