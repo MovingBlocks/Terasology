@@ -39,8 +39,13 @@ public class ServerInfoService implements AutoCloseable {
     public Future<ServerInfoMessage> requestInfo(final String address, final int port) {
         SettableFuture<ServerInfoMessage> resultFuture = SettableFuture.create();
         InetSocketAddress remoteAddress = new InetSocketAddress(address, port);
-        ChannelFuture connectCheck = bootstrap.connect(remoteAddress);
-        Channel channel = connectCheck.syncUninterruptibly().channel();
+        ChannelFuture connectCheck = bootstrap.connect(remoteAddress)
+                .addListener(connectFuture -> {
+                    if (!connectFuture.isSuccess()) {
+                        resultFuture.setException(connectFuture.cause().getCause());
+                    }
+                });
+        Channel channel = connectCheck.channel();
         channel.closeFuture().addListener(channelFuture -> {
             if (channelFuture.isSuccess()) {
                 ServerInfoRequestHandler handler = channel.pipeline().get(ServerInfoRequestHandler.class);
