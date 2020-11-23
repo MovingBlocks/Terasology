@@ -42,7 +42,16 @@ public class ServerInfoService implements AutoCloseable {
         ChannelFuture connectCheck = bootstrap.connect(remoteAddress)
                 .addListener(connectFuture -> {
                     if (!connectFuture.isSuccess()) {
-                        resultFuture.setException(connectFuture.cause().getCause());
+                        if (connectFuture.cause() != null && connectFuture.cause().getCause() != null) {
+                            // java's network exception.
+                            resultFuture.setException(connectFuture.cause().getCause());
+                        } else if (connectFuture.cause() != null) {
+                            // netty's exception, if it is not java's
+                            resultFuture.setException(connectFuture.cause());
+                        } else {
+                            // fallback exception when connecting not success.
+                            resultFuture.setException(new RuntimeException("Cannot connect to server"));
+                        }
                     }
                 });
         Channel channel = connectCheck.channel();
