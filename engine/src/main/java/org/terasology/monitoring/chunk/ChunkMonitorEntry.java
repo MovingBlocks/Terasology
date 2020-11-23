@@ -16,7 +16,7 @@
 package org.terasology.monitoring.chunk;
 
 import com.google.common.base.Preconditions;
-import org.terasology.math.geom.Vector3i;
+import org.joml.Vector3i;
 import org.terasology.world.chunks.Chunk;
 
 import java.lang.ref.WeakReference;
@@ -60,7 +60,7 @@ public class ChunkMonitorEntry {
 
     public void addChunk(Chunk value) {
         Preconditions.checkNotNull(value, "The parameter 'value' must not be null");
-        Preconditions.checkArgument(pos.equals(value.getPosition()), "Expected chunk for position {} but got position {} instead", pos, value.getPosition());
+        Preconditions.checkArgument(pos.equals(value.getPosition(new Vector3i())), "Expected chunk for position {} but got position {} instead", pos, value.getPosition(new Vector3i()));
         purge();
         chunks.add(new WeakReference<>(value));
     }
