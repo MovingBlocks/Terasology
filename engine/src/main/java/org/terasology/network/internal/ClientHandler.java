@@ -17,24 +17,20 @@
 package org.terasology.network.internal;
 
 
-import org.jboss.netty.channel.ChannelHandlerContext;
-import org.jboss.netty.channel.ChannelStateEvent;
-import org.jboss.netty.channel.ExceptionEvent;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.modes.StateMainMenu;
+import org.terasology.registry.CoreRegistry;
 
 import static org.terasology.protobuf.NetData.NetMessage;
 
 /**
  * This Netty handler is used on the client side to send and receive messages.
- *
  */
-public class ClientHandler extends SimpleChannelUpstreamHandler {
+public class ClientHandler extends ChannelInboundHandlerAdapter {
 
     private static final Logger logger = LoggerFactory.getLogger(ClientHandler.class);
 
@@ -46,7 +42,7 @@ public class ClientHandler extends SimpleChannelUpstreamHandler {
     }
 
     @Override
-    public void channelDisconnected(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
+    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         GameEngine gameEngine = CoreRegistry.get(GameEngine.class);
         if (gameEngine != null) {
             gameEngine.changeState(new StateMainMenu("Disconnected From Server"));
@@ -54,17 +50,16 @@ public class ClientHandler extends SimpleChannelUpstreamHandler {
     }
 
     @Override
-    public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) {
-        NetMessage message = (NetMessage) e.getMessage();
+    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+        NetMessage message = (NetMessage) msg;
         server.queueMessage(message);
     }
 
     @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e) {
-        logger.warn("Unexpected exception from client", e.getCause());
-        e.getChannel().close();
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        logger.warn("Unexpected exception from client", cause);
+        ctx.channel().close();
     }
-
 
     public void joinComplete(ServerImpl joinedServer) {
         this.server = joinedServer;

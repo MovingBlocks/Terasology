@@ -1,35 +1,20 @@
-/*
- * Copyright 2013 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.network.internal;
 
 import com.google.protobuf.ByteString;
-import org.jboss.netty.channel.ChannelHandlerContext;
-import org.jboss.netty.channel.ChannelStateEvent;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.identity.BadEncryptedDataException;
 import org.terasology.identity.CertificateGenerator;
 import org.terasology.identity.CertificatePair;
 import org.terasology.identity.IdentityConstants;
 import org.terasology.identity.PublicIdentityCertificate;
 import org.terasology.protobuf.NetData;
+import org.terasology.registry.CoreRegistry;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -43,7 +28,7 @@ import java.security.SecureRandom;
 /**
  * Authentication handler for the server end of the handshake
  */
-public class ServerHandshakeHandler extends SimpleChannelUpstreamHandler {
+public class ServerHandshakeHandler extends ChannelInboundHandlerAdapter {
     private static final Logger logger = LoggerFactory.getLogger(ServerHandshakeHandler.class);
 
     private Config config = CoreRegistry.get(Config.class);
@@ -52,14 +37,10 @@ public class ServerHandshakeHandler extends SimpleChannelUpstreamHandler {
     private NetData.HandshakeHello serverHello;
 
     @Override
-    public void channelOpen(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
-        super.channelOpen(ctx, e);
-        serverConnectionHandler = ctx.getPipeline().get(ServerConnectionHandler.class);
-    }
+    public void channelActive(ChannelHandlerContext ctx) throws Exception {
+        super.channelActive(ctx);
+        serverConnectionHandler = ctx.pipeline().get(ServerConnectionHandler.class);
 
-    @Override
-    public void channelConnected(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
-        logger.info("Sending Server Hello");
 
         PublicIdentityCertificate serverPublicCert = config.getSecurity().getServerPublicCertificate();
         new SecureRandom().nextBytes(serverRandom);
@@ -70,14 +51,14 @@ public class ServerHandshakeHandler extends SimpleChannelUpstreamHandler {
                 .setTimestamp(System.currentTimeMillis())
                 .build();
 
-        e.getChannel().write(NetData.NetMessage.newBuilder()
+        ctx.channel().writeAndFlush(NetData.NetMessage.newBuilder()
                 .setHandshakeHello(serverHello)
                 .build());
     }
 
     @Override
-    public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) {
-        NetData.NetMessage message = (NetData.NetMessage) e.getMessage();
+    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+        NetData.NetMessage message = (NetData.NetMessage) msg;
         if (message.hasNewIdentityRequest()) {
             processNewIdentityRequest(message.getNewIdentityRequest(), ctx);
         } else if (message.hasHandshakeHello() && message.hasHandshakeVerification()) {
@@ -91,7 +72,7 @@ public class ServerHandshakeHandler extends SimpleChannelUpstreamHandler {
 
         if (!clientCert.verifySignedBy(config.getSecurity().getServerPublicCertificate())) {
             logger.error("Received invalid client certificate, ending connection attempt");
-            ctx.getChannel().close();
+            ctx.channel().close();
             return;
         }
 
@@ -99,18 +80,18 @@ public class ServerHandshakeHandler extends SimpleChannelUpstreamHandler {
         byte[] signatureData = HandshakeCommon.getSignatureData(serverHello, clientHello);
         if (!clientCert.verify(signatureData, clientSignature)) {
             logger.error("Received invalid verification signature, ending connection attempt");
-            ctx.getChannel().close();
+            ctx.channel().close();
             return;
         }
 
         logger.info("Sending server verification");
         byte[] serverSignature = config.getSecurity().getServerPrivateCertificate().sign(signatureData);
-        ctx.getChannel().write(NetData.NetMessage.newBuilder()
+        ctx.channel().writeAndFlush(NetData.NetMessage.newBuilder()
                 .setHandshakeVerification(NetData.HandshakeVerification.newBuilder()
                         .setSignature(ByteString.copyFrom(serverSignature))).build());
 
         // Identity has been established, inform the server handler and withdraw from the pipeline
-        ctx.getPipeline().remove(this);
+        ctx.pipeline().remove(this);
         serverConnectionHandler.channelAuthenticated(clientCert);
     }
 
@@ -136,21 +117,21 @@ public class ServerHandshakeHandler extends SimpleChannelUpstreamHandler {
                 encryptedCert = cipher.doFinal(certificateData.toByteArray());
             } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | BadPaddingException | IllegalBlockSizeException e) {
                 logger.error("Unexpected error encrypting certificate for sending, ending connection attempt", e);
-                ctx.getChannel().close();
+                ctx.channel().close();
                 return;
             }
 
-            ctx.getChannel().write(NetData.NetMessage.newBuilder()
+            ctx.channel().writeAndFlush(NetData.NetMessage.newBuilder()
                     .setProvisionIdentity(NetData.ProvisionIdentity.newBuilder()
                             .setEncryptedCertificates(ByteString.copyFrom(encryptedCert)))
                     .build());
 
             // Identity has been established, inform the server handler and withdraw from the pipeline
-            ctx.getPipeline().remove(this);
+            ctx.pipeline().remove(this);
             serverConnectionHandler.channelAuthenticated(clientCertificates.getPublicCert());
         } catch (BadEncryptedDataException e) {
             logger.error("Received invalid encrypted pre-master secret, ending connection attempt");
-            ctx.getChannel().close();
+            ctx.channel().close();
         }
     }
 }

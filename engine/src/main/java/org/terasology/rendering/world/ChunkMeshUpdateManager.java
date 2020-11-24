@@ -17,6 +17,7 @@ package org.terasology.rendering.world;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Queues;
+import org.lwjgl.system.CallbackI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.math.ChunkMath;
@@ -172,7 +173,7 @@ public final class ChunkMeshUpdateManager {
                     newMesh = tessellator.generateMesh(chunkView, ChunkConstants.SIZE_Y, 0);
 
                     c.setPendingMesh(newMesh);
-                    ChunkMonitor.fireChunkTessellated(c.getPosition(), newMesh);
+                    ChunkMonitor.fireChunkTessellated(c.getPosition(new org.joml.Vector3i()), newMesh);
                 }
 
             }
