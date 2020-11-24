@@ -1,38 +1,25 @@
-/*
- * Copyright 2018 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-package org.terasology.persistence.typeHandling.gson;
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
+package org.terasology.persistence.serializers.gson;
 
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import org.junit.jupiter.api.Test;
-import org.terasology.nui.Color;
-import org.terasology.persistence.typeHandling.extensionTypes.ColorTypeHandler;
+import org.terasology.persistence.serializers.gson.models.TestColor;
+import org.terasology.persistence.serializers.gson.typehandler.TestColorTypeHandler;
 
 import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class GsonTypeHandlerAdapterTest {
+class GsonTypeHandlerAdapterTest {
     private static final String OBJECT_JSON_ARRAY = "{\"color\":[222,173,190,239],\"i\":-123}";
     private static final String OBJECT_JSON_HEX = "{\"color\":DEADBEEF,\"i\":-123}";
-    private static final TestClass OBJECT = new TestClass(new Color(0xDEADBEEF), -123);
+    private static final TestClass OBJECT = new TestClass(new TestColor(0xDEADBEEF), -123);
 
     private final Gson gson = GsonBuilderFactory.createGsonBuilderWithTypeHandlers(
-            TypeHandlerEntry.of(Color.class, new ColorTypeHandler())
+            TypeHandlerEntry.of(TestColor.class, new TestColorTypeHandler())
     )
             .create();
 
@@ -42,7 +29,7 @@ public class GsonTypeHandlerAdapterTest {
      * {@link GsonTypeHandlerAdapter}.
      */
     @Test
-    public void testRead() {
+    void testRead() {
         // Deserialize object with color as JSON array
         TestClass deserializedObject = gson.fromJson(OBJECT_JSON_ARRAY, TestClass.class);
 
@@ -60,19 +47,24 @@ public class GsonTypeHandlerAdapterTest {
      * {@link GsonTypeHandlerAdapter}.
      */
     @Test
-    public void testWrite() {
+    void testWrite() {
         String serializedObject = gson.toJson(OBJECT);
 
         assertEquals(OBJECT_JSON_ARRAY, serializedObject);
     }
 
     private static class TestClass {
-        private final Color color;
+        private final TestColor color;
         private final int i;
 
-        private TestClass(Color color, int i) {
+        private TestClass(TestColor color, int i) {
             this.color = color;
             this.i = i;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(color, i);
         }
 
         @Override

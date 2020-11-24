@@ -152,7 +152,8 @@ dependencies {
     // TODO: Consider moving this back to the PC Facade instead of having the engine rely on it?
     implementation group: 'org.terasology.crashreporter', name: 'cr-terasology', version: '4.1.0'
     
-   api(project(":subsystems:TypeHandlerLibrary"))
+    api(project(":subsystems:TypeHandlerLibrary"))
+    api(project(":subsystems:GsonSerializer"))
 }
 
 task cacheReflections {
