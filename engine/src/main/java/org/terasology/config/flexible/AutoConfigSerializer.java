@@ -6,13 +6,13 @@ import com.google.common.collect.Maps;
 import com.google.gson.JsonElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.persistence.serializers.gson.GsonPersistedData;
-import org.terasology.persistence.serializers.gson.GsonPersistedDataSerializer;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.PersistedDataMap;
 import org.terasology.persistence.typeHandling.PersistedDataSerializer;
 import org.terasology.persistence.typeHandling.TypeHandler;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
+import org.terasology.persistence.typeHandling.gson.GsonPersistedData;
+import org.terasology.persistence.typeHandling.gson.GsonPersistedDataSerializer;
 import org.terasology.utilities.ReflectionUtil;
 
 import java.lang.reflect.Field;

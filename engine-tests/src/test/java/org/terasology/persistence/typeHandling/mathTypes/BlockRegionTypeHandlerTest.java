@@ -10,9 +10,9 @@ import org.joml.AABBi;
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 import org.reflections.Reflections;
-import org.terasology.persistence.serializers.gson.GsonBuilderFactory;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.persistence.typeHandling.TypeHandlerLibraryImpl;
+import org.terasology.persistence.typeHandling.gson.GsonBuilderFactory;
 import org.terasology.world.block.BlockRegion;
 
 public class BlockRegionTypeHandlerTest extends MathTypeAssert {
