@@ -1,6 +1,6 @@
 // Copyright 2020 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.persistence.serializers.gson;
+package org.terasology.persistence.typeHandling.gson;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -8,14 +8,14 @@ import com.google.gson.Gson;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.reflections.Reflections;
-import org.terasology.persistence.serializers.gson.models.TestClass;
-import org.terasology.persistence.serializers.gson.models.TestColor;
-import org.terasology.persistence.serializers.gson.models.TestRect2i;
-import org.terasology.persistence.serializers.gson.models.TestVector4f;
-import org.terasology.persistence.serializers.gson.typehandler.TestColorTypeHandler;
-import org.terasology.persistence.serializers.gson.typehandler.TestRect2iTypeHandler;
-import org.terasology.persistence.serializers.gson.typehandler.TestVector4fTypeHandler;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
+import org.terasology.persistence.typeHandling.gson.models.TestClass;
+import org.terasology.persistence.typeHandling.gson.models.TestColor;
+import org.terasology.persistence.typeHandling.gson.models.TestRect2i;
+import org.terasology.persistence.typeHandling.gson.models.TestVector4f;
+import org.terasology.persistence.typeHandling.gson.typehandler.TestColorTypeHandler;
+import org.terasology.persistence.typeHandling.gson.typehandler.TestRect2iTypeHandler;
+import org.terasology.persistence.typeHandling.gson.typehandler.TestVector4fTypeHandler;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

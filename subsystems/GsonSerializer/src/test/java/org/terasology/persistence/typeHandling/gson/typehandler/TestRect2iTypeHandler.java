@@ -1,14 +1,14 @@
 // Copyright 2020 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-package org.terasology.persistence.serializers.gson.typehandler;
+package org.terasology.persistence.typeHandling.gson.typehandler;
 
 import com.google.common.collect.Maps;
-import org.terasology.persistence.serializers.gson.models.TestRect2i;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.PersistedDataMap;
 import org.terasology.persistence.typeHandling.PersistedDataSerializer;
 import org.terasology.persistence.typeHandling.TypeHandler;
+import org.terasology.persistence.typeHandling.gson.models.TestRect2i;
 
 import java.util.Map;
 import java.util.Optional;

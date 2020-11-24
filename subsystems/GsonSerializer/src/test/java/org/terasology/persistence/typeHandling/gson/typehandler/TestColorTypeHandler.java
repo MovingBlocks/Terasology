@@ -1,14 +1,14 @@
 // Copyright 2020 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-package org.terasology.persistence.serializers.gson.typehandler;
+package org.terasology.persistence.typeHandling.gson.typehandler;
 
 import gnu.trove.list.TIntList;
-import org.terasology.persistence.serializers.gson.models.TestColor;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.PersistedDataArray;
 import org.terasology.persistence.typeHandling.PersistedDataSerializer;
 import org.terasology.persistence.typeHandling.TypeHandler;
+import org.terasology.persistence.typeHandling.gson.models.TestColor;
 
 import java.util.Optional;
 

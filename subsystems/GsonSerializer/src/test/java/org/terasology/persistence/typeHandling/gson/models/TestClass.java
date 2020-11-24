@@ -1,7 +1,7 @@
 // Copyright 2020 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-package org.terasology.persistence.serializers.gson.models;
+package org.terasology.persistence.typeHandling.gson.models;
 
 import java.util.Map;
 import java.util.Objects;
