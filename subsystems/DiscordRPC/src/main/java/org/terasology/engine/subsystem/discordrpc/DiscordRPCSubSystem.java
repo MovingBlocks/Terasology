@@ -197,7 +197,7 @@ public class DiscordRPCSubSystem implements EngineSubsystem, IPCListener, Runnab
     public void postInitialise(Context context) {
         config = context.get(Config.class);
         config.getPlayer().subscribe(this);
-        setState("In Lobby");
+        setState("In Main Menu", false, false);
     }
 
     @Override
@@ -233,17 +233,21 @@ public class DiscordRPCSubSystem implements EngineSubsystem, IPCListener, Runnab
     }
 
     public static void setState(String state, boolean timestamp) {
+        setState(state, timestamp, true);
+    }
+
+    public static void setState(String state, boolean timestamp, boolean showDetails) {
         if (instance == null) {
             return;
         }
         RichPresence.Builder builder = new RichPresence.Builder();
         if (state != null) {
             builder.setState(state);
-            if (getInstance().lastState == null || (getInstance().lastState != null && !getInstance().lastState.equals(state))) {
+            if (getInstance().lastState == null || !getInstance().lastState.equals(state)) {
                 getInstance().lastState = state;
             }
         }
-        if (getInstance().config != null) {
+        if (showDetails && getInstance().config != null) {
             String playerName = getInstance().config.getPlayer().getName();
             builder.setDetails("Name: " + playerName);
         }

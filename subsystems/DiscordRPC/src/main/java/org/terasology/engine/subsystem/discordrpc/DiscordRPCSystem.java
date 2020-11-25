@@ -87,6 +87,6 @@ public class DiscordRPCSystem extends BaseComponentSystem {
 
     @Override
     public void shutdown() {
-        DiscordRPCSubSystem.setState("In Lobby");
+        DiscordRPCSubSystem.setState("In Main Menu", false, false);
     }
 }
