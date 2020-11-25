@@ -17,7 +17,7 @@ subprojects {
                 // getClassesDir from all sourceSets (for any jvm (seems) language)
                 configurations."${sourceSets.main.runtimeClasspathConfigurationName}"
 
-        outputs.upToDateWhen(classes.outputs.upToDateSpec)
+        outputs.upToDateWhen {classes.state.upToDate}
         outputs.file("$buildDir/resources/main/reflections.cache")
         dependsOn classes
 
