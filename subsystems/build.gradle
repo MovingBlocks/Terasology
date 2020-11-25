@@ -1,0 +1,33 @@
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
+
+import org.reflections.Reflections
+import org.reflections.scanners.SubTypesScanner
+import org.reflections.scanners.TypeAnnotationsScanner
+import org.reflections.util.ConfigurationBuilder
+
+subprojects {
+    // Hack for getting sourcesSets.main.output there. 
+    plugins.apply('java')
+    def sourceSets = project.getConvention().getPlugin(JavaPluginConvention.class).sourceSets
+    
+    task cacheReflections {
+        description = 'Caches reflection output to make regular startup faster. May go stale and need cleanup at times.'
+        inputs.files sourceSets.main.output.classesDirs,
+                // getClassesDir from all sourceSets (for any jvm (seems) language)
+                configurations."${sourceSets.main.runtimeClasspathConfigurationName}"
+
+        outputs.upToDateWhen(classes.outputs.upToDateSpec)
+        outputs.file("$buildDir/resources/main/reflections.cache")
+        dependsOn classes
+
+        doLast {
+            // Without the .mkdirs() we might hit a scenario where the classes dir doesn't exist yet
+            Reflections reflections = new Reflections(new ConfigurationBuilder()
+                    .addUrls(inputs.files.collect { it.toURI().toURL() })
+                    .setScanners(new TypeAnnotationsScanner(), new SubTypesScanner()))
+            reflections.save("$buildDir/classes/reflections.cache")
+        }
+    }
+    tasks.getByName('jar').dependsOn('cacheReflections')
+}
