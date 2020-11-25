@@ -146,19 +146,14 @@ public class VoxelLiquidWorldSystem extends BaseComponentSystem {
         ByteBuffer buffer =
             ByteBuffer.allocateDirect(2 * (ChunkConstants.SIZE_X * ChunkConstants.SIZE_Y * ChunkConstants.SIZE_Z));
         buffer.order(ByteOrder.nativeOrder());
-        short[] entries = new short[ChunkConstants.SIZE_X * ChunkConstants.SIZE_Y * ChunkConstants.SIZE_Z];
-        for (int x = 0; x < ChunkConstants.SIZE_X; x++) {
-            for (int y = 0; y < ChunkConstants.SIZE_Y; y++) {
-                for (int z = 0; z < ChunkConstants.SIZE_Z; z++) {
-                    int index = (z * ChunkConstants.SIZE_X * ChunkConstants.SIZE_Y) + (x * ChunkConstants.SIZE_Y) + y;
+        for (int z = 0; z < ChunkConstants.SIZE_Z; z++) {
+            for (int x = 0; x < ChunkConstants.SIZE_X; x++) {
+                for (int y = 0; y < ChunkConstants.SIZE_Y; y++) {
                     Block block = chunk.getBlock(x, y, z);
                     tryRegister(block);
-                    entries[index] = block.getId();
+                    buffer.putShort(block.getId());
                 }
             }
-        }
-        for (short entry : entries) {
-            buffer.putShort(entry);
         }
         buffer.rewind();
         wrapper.setRegion(chunkPos.x, chunkPos.y, chunkPos.z, buffer.asShortBuffer());
