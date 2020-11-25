@@ -10,7 +10,7 @@ subprojects {
     // Hack for getting sourcesSets.main.output there. 
     plugins.apply('java')
     def sourceSets = project.getConvention().getPlugin(JavaPluginConvention.class).sourceSets
-    
+
     task cacheReflections {
         description = 'Caches reflection output to make regular startup faster. May go stale and need cleanup at times.'
         inputs.files sourceSets.main.output.classesDirs,
@@ -24,6 +24,7 @@ subprojects {
         doLast {
             // Without the .mkdirs() we might hit a scenario where the classes dir doesn't exist yet
             Reflections reflections = new Reflections(new ConfigurationBuilder()
+                    .filterInputsBy { it.startsWith('org/terasology/')}
                     .addUrls(inputs.files.collect { it.toURI().toURL() })
                     .setScanners(new TypeAnnotationsScanner(), new SubTypesScanner()))
             reflections.save("$buildDir/classes/reflections.cache")
