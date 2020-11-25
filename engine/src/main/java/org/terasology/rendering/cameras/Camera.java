@@ -5,6 +5,7 @@ package org.terasology.rendering.cameras;
 import org.joml.AxisAngle4f;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
+import org.joml.Quaternionfc;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.lwjgl.BufferUtils;
@@ -198,10 +199,21 @@ public abstract class Camera {
         return new Quat4f(JomlUtil.from(viewingAxis), viewingAngle);
     }
 
+    public Quaternionf getOrientation(Quaternionf orientation) {
+        return orientation.set(new AxisAngle4f(viewingAngle, viewingAxis));
+    }
+
     public void setOrientation(Quat4f orientation) {
         Quaternionf newOrientation = JomlUtil.from(orientation);
         newOrientation.transform(FORWARD, viewingDirection);
         AxisAngle4f axisAngle = new AxisAngle4f(newOrientation);
+        viewingAxis.set(axisAngle.x, axisAngle.y, axisAngle.z);
+        viewingAngle = axisAngle.angle;
+    }
+
+    public void setOrientation(Quaternionfc orientation) {
+        orientation.transform(FORWARD, viewingDirection);
+        AxisAngle4f axisAngle = new AxisAngle4f(orientation);
         viewingAxis.set(axisAngle.x, axisAngle.y, axisAngle.z);
         viewingAngle = axisAngle.angle;
     }

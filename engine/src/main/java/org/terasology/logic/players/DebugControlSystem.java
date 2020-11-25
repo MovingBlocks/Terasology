@@ -32,6 +32,7 @@ import org.terasology.input.events.MouseAxisEvent;
 import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.debug.DebugProperties;
 import org.terasology.logic.time.TimeResynchEvent;
+import org.terasology.logic.players.event.WorldtimeResetEvent;
 import org.terasology.network.ClientComponent;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.NUIManager;
@@ -92,20 +93,16 @@ public class DebugControlSystem extends BaseComponentSystem {
         if (debugEnabled && event.isDown()) {
             switch (event.getKey().getId()) {
                 case Keyboard.KeyId.UP:
-                	world.getTime().setDays(world.getTime().getDays() + 0.005f);
-                    event.consume();
+                    timeTravel(entity, event, 0.005f);
                     break;
                 case Keyboard.KeyId.DOWN:
-                	world.getTime().setDays(world.getTime().getDays() - 0.005f);
-                    event.consume();
+                    timeTravel(entity, event, -0.005f);
                     break;
                 case Keyboard.KeyId.RIGHT:
-                	world.getTime().setDays(world.getTime().getDays() + 0.02f);
-                    event.consume();
+                	timeTravel(entity, event, 0.02f);
                     break;
                 case Keyboard.KeyId.LEFT:
-                	world.getTime().setDays(world.getTime().getDays() - 0.02f);
-                    event.consume();
+                    timeTravel(entity, event, -0.02f);
                     break;
                 default:
                     break;
@@ -167,6 +164,12 @@ public class DebugControlSystem extends BaseComponentSystem {
         if (!mouseGrabbed) {
             event.consume();
         }
+    }
+    
+    private void timeTravel(EntityRef entity, KeyEvent event, float timeAdded) {
+    	float timeInDays = world.getTime().getDays();
+    	entity.send(new WorldtimeResetEvent(timeInDays + timeAdded));
+        event.consume();
     }
 
 }

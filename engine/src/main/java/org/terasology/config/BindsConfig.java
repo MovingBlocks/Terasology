@@ -54,7 +54,7 @@ import static java.util.stream.Collectors.toList;
  * One example for a binding-input combination is the {@link ForwardsButton} 
  * which is defined in the engine with the id <code>forwards</code>.
  * The default input binding for the forward movement is the W-Key.
- * Therefore the binds for <code>engine:forwards</code> would contain an {@link Input} object with type {@link InputType#KEY} and id {@link KeyId.W}.
+ * Therefore the binds for <code>engine:forwards</code> would contain an {@link Input} object with type {@link InputType#KEY} and id {@link KeyId#W}.
  */
 public final class BindsConfig {
 
