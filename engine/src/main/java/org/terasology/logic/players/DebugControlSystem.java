@@ -31,6 +31,7 @@ import org.terasology.input.events.KeyEvent;
 import org.terasology.input.events.MouseAxisEvent;
 import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.debug.DebugProperties;
+import org.terasology.logic.time.TimeResynchEvent;
 import org.terasology.network.ClientComponent;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.NUIManager;
@@ -91,19 +92,19 @@ public class DebugControlSystem extends BaseComponentSystem {
         if (debugEnabled && event.isDown()) {
             switch (event.getKey().getId()) {
                 case Keyboard.KeyId.UP:
-                    world.getTime().setDays(world.getTime().getDays() + 0.005f);
+                	world.getTime().setDays(world.getTime().getDays() + 0.005f);
                     event.consume();
                     break;
                 case Keyboard.KeyId.DOWN:
-                    world.getTime().setDays(world.getTime().getDays() - 0.005f);
+                	world.getTime().setDays(world.getTime().getDays() - 0.005f);
                     event.consume();
                     break;
                 case Keyboard.KeyId.RIGHT:
-                    world.getTime().setDays(world.getTime().getDays() + 0.02f);
+                	world.getTime().setDays(world.getTime().getDays() + 0.02f);
                     event.consume();
                     break;
                 case Keyboard.KeyId.LEFT:
-                    world.getTime().setDays(world.getTime().getDays() - 0.02f);
+                	world.getTime().setDays(world.getTime().getDays() - 0.02f);
                     event.consume();
                     break;
                 default:
@@ -111,7 +112,7 @@ public class DebugControlSystem extends BaseComponentSystem {
             }
         }
     }
-
+    
     @ReceiveEvent(components = ClientComponent.class)
     public void onKeyDown(KeyDownEvent event, EntityRef entity) {
         boolean debugEnabled = config.getSystem().isDebugEnabled();
