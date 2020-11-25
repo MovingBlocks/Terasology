@@ -1,18 +1,5 @@
-/*
- * Copyright 2018 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine;
 
 import com.badlogic.gdx.physics.bullet.Bullet;
@@ -20,6 +7,9 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.Queues;
 import com.google.common.collect.Sets;
+import org.reflections.Reflections;
+import org.reflections.serializers.Serializer;
+import org.reflections.serializers.XmlSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.AssetFactory;
@@ -55,8 +45,10 @@ import org.terasology.i18n.I18nSubsystem;
 import org.terasology.input.InputSystem;
 import org.terasology.logic.behavior.asset.BehaviorTree;
 import org.terasology.logic.behavior.asset.BehaviorTreeData;
+import org.terasology.module.Module;
 import org.terasology.monitoring.Activity;
 import org.terasology.monitoring.PerformanceMonitor;
+import org.terasology.naming.Name;
 import org.terasology.network.NetworkSystem;
 import org.terasology.nui.asset.UIData;
 import org.terasology.nui.asset.UIElement;
@@ -86,9 +78,12 @@ import org.terasology.world.block.sounds.BlockSoundsData;
 import org.terasology.world.block.tiles.BlockTile;
 import org.terasology.world.block.tiles.TileData;
 
+import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Deque;
+import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -328,6 +323,11 @@ public class TerasologyEngine implements GameEngine {
 
         ModuleManager moduleManager = new ModuleManagerImpl(rootContext.get(Config.class), classesOnClasspathsToAddToEngine);
         rootContext.put(ModuleManager.class, moduleManager);
+        moduleManager.getRegistry()
+                .stream()
+                .filter(m -> m.getId().equals(new Name("engine")))
+                .findFirst()
+                .ifPresent(this::enrichReflectionsWithSubsystems);
 
         changeStatus(TerasologyEngineStatus.INITIALIZING_LOWLEVEL_OBJECT_MANIPULATION);
         ReflectFactory reflectFactory = new ReflectionReflectFactory();
@@ -342,6 +342,20 @@ public class TerasologyEngine implements GameEngine {
         assetTypeManager = new ModuleAwareAssetTypeManager();
         rootContext.put(ModuleAwareAssetTypeManager.class, assetTypeManager);
         rootContext.put(AssetManager.class, assetTypeManager.getAssetManager());
+    }
+
+    private void enrichReflectionsWithSubsystems(Module m) {
+        Serializer serializer = new XmlSerializer();
+        try {
+            Enumeration<URL> urls = TerasologyEngine.class.getClassLoader().getResources("reflections.cache");
+            while (urls.hasMoreElements()) {
+                URL url = urls.nextElement();
+                Reflections subsystemReflections = serializer.read(url.openStream());
+                m.getReflectionsFragment().merge(subsystemReflections);
+            }
+        } catch (IOException e) {
+            logger.error("Cannot enrich engine's reflections with subsystems");
+        }
     }
 
     private void initAssets() {
