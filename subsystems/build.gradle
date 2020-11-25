@@ -18,7 +18,8 @@ subprojects {
                 configurations."${sourceSets.main.runtimeClasspathConfigurationName}"
 
         outputs.upToDateWhen {classes.state.upToDate}
-        outputs.file("$buildDir/resources/main/reflections.cache")
+        def outputDir = sourceSets.main.output.resourcesDir
+        outputs.file("$outputDir/reflections.cache")
         dependsOn classes
 
         doLast {
@@ -27,7 +28,7 @@ subprojects {
                     .filterInputsBy { it.startsWith('org/terasology/')}
                     .addUrls(inputs.files.collect { it.toURI().toURL() })
                     .setScanners(new TypeAnnotationsScanner(), new SubTypesScanner()))
-            reflections.save("$buildDir/classes/reflections.cache")
+            reflections.save("$outputDir/reflections.cache")
         }
     }
     tasks.getByName('jar').dependsOn('cacheReflections')
