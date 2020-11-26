@@ -9,7 +9,20 @@ import org.reflections.util.ConfigurationBuilder
 subprojects {
     // Hack for getting sourcesSets.main.output there. 
     plugins.apply('java')
+    plugins.apply('idea')
     def sourceSets = project.getConvention().getPlugin(JavaPluginConvention.class).sourceSets
+
+    
+    sourceSets.main.java.outputDir = new File("$buildDir/classes")
+    idea {
+        module {
+            // Change around the output a bit
+            inheritOutputDirs = false
+            outputDir = file('build/classes')
+            testOutputDir = file('build/testClasses')
+            downloadSources = true
+        }
+    }
 
     task cacheReflections {
         description = 'Caches reflection output to make regular startup faster. May go stale and need cleanup at times.'
@@ -18,7 +31,7 @@ subprojects {
                 configurations."${sourceSets.main.runtimeClasspathConfigurationName}"
 
         outputs.upToDateWhen {classes.state.upToDate}
-        def outputDir = sourceSets.main.output.resourcesDir
+        def outputDir = sourceSets.main.java.outputDir
         outputs.file("$outputDir/reflections.cache")
         dependsOn classes
 
