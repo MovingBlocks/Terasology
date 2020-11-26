@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.logic.characters;
 
+import com.google.common.collect.Lists;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -89,7 +90,11 @@ public final class CharacterMovementSystemUtility {
             return movementComponent;
         });
 
-        setPhysicsLocation(entity, newPos);
+        // BulletPhysics requires the entity to have both these components. This is not clear from the interfaces we're
+        // using, but the exception thrown in 'BulletPhysics#createCharacterCollider' is pretty self-explanatory...
+        if (entity.hasAllComponents(Lists.newArrayList(CharacterMovementComponent.class, LocationComponent.class))) {
+            setPhysicsLocation(entity, newPos);
+        }
     }
 
     public void setToExtrapolateState(EntityRef entity, CharacterStateEvent state, long time) {
