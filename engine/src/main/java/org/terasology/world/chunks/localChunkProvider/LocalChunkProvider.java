@@ -284,7 +284,6 @@ public class LocalChunkProvider implements ChunkProvider {
     private void checkForUnload() {
         PerformanceMonitor.startActivity("Unloading irrelevant chunks");
         int unloaded = 0;
-        logger.debug("Compacting cache");
         Iterator<org.joml.Vector3ic> iterator = Iterators.concat(
                 Iterators.transform(chunkCache.keySet().iterator(), v -> new org.joml.Vector3i(v.x, v.y, v.z)),
                 loadingPipeline.getProcessingPosition().iterator());
@@ -298,6 +297,9 @@ public class LocalChunkProvider implements ChunkProvider {
                 }
 
             }
+        }
+        if (unloaded > 0) {
+            logger.debug("Unload {} chunks", unloaded);
         }
         PerformanceMonitor.endActivity();
     }
