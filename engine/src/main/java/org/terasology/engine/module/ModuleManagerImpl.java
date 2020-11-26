@@ -12,7 +12,6 @@ import org.terasology.assets.Asset;
 import org.terasology.config.Config;
 import org.terasology.config.SystemConfig;
 import org.terasology.engine.TerasologyConstants;
-import org.terasology.engine.TerasologyEngine;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.input.device.KeyboardDevice;
 import org.terasology.module.ClasspathModule;
@@ -238,11 +237,13 @@ public class ModuleManagerImpl implements ModuleManager {
     private void enrichReflectionsWithSubsystems(Module engineModule) {
         Serializer serializer = new XmlSerializer();
         try {
-            Enumeration<URL> urls = TerasologyEngine.class.getClassLoader().getResources("reflections.cache");
+            Enumeration<URL> urls = ModuleManagerImpl.class.getClassLoader().getResources("reflections.cache");
             while (urls.hasMoreElements()) {
                 URL url = urls.nextElement();
-                Reflections subsystemReflections = serializer.read(url.openStream());
-                engineModule.getReflectionsFragment().merge(subsystemReflections);
+                if (url.getPath().contains("subsystem")) {
+                    Reflections subsystemReflections = serializer.read(url.openStream());
+                    engineModule.getReflectionsFragment().merge(subsystemReflections);
+                }
             }
         } catch (IOException e) {
             logger.error("Cannot enrich engine's reflections with subsystems");
