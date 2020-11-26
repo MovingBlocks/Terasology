@@ -256,7 +256,7 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
         Vector3f spawnPosition = playerFactory.findSpawnPositionFromLocationComponent(location);
 
         playerCharacter.addComponent(new AliveCharacterComponent());
-        playerCharacter.send(new CharacterTeleportEvent(JomlUtil.from(spawnPosition)));
+        playerCharacter.send(new CharacterTeleportEvent(spawnPosition));
 
         logger.debug("Re-spawing player at: {}", spawnPosition);
 
