@@ -45,8 +45,6 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import static com.google.common.base.Verify.verifyNotNull;
-
 /**
  * Class providing the main() method for launching Terasology as a PC app.
  * <br><br>
@@ -301,13 +299,6 @@ public final class Terasology implements Callable<Integer> {
     private void handleLaunchArguments() throws IOException {
         if (homeDir != null) {
             logger.info("homeDir is {}", homeDir);
-            if (homeDir.toString().startsWith("-")) {
-                // picocli shouldn't let this happen, but see
-                // https://github.com/remkop/picocli/issues/1197
-                throw new CommandLine.ParameterException(spec.commandLine(),
-                        "homedir starts with -, is a value missing?",
-                        spec.findOption("--homedir"), homeDir.toString());
-            }
             PathManager.getInstance().useOverrideHomePath(homeDir);
             // TODO: what is this?
             //   PathManager.getInstance().chooseHomePathManually();
