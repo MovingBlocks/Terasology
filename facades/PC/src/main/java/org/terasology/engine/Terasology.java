@@ -79,6 +79,7 @@ import java.util.concurrent.TimeUnit;
 @CommandLine.Command(name = "terasology")
 public final class Terasology implements Callable<Integer> {
 
+    @SuppressWarnings("unused")
     @Option(names = {"--help", "-help", "/help", "-h", "/h", "-?", "/?"}, usageHelp = true, description = "show help")
     private boolean helpRequested;
 
