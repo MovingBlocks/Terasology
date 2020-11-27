@@ -552,6 +552,16 @@ public class PojoEntityManager implements EngineEntityManager {
         Preconditions.checkNotNull(component);
         Optional<Component> oldComponent = getPool(entityId).map(pool -> pool.getComponentStore().put(entityId, component));
 
+        // notify internal users first to get the unobstructed views on the entity as it is at this moment.
+        if (!oldComponent.isPresent()) {
+            notifyComponentAdded(getEntity(entityId), component.getClass());
+        } else {
+            logger.error("Adding a component ({}) over an existing component for entity {}", component.getClass(), entityId);
+            notifyComponentChanged(getEntity(entityId), component.getClass());
+        }
+
+        // Send life cycle events for arbitrary systems to react on.
+        // Note: systems are free to remove the component that was just added, which might cause some trouble here...
         if (eventSystem != null) {
             EntityRef entityRef = getEntity(entityId);
             if (!oldComponent.isPresent()) {
@@ -560,13 +570,6 @@ public class PojoEntityManager implements EngineEntityManager {
             } else {
                 eventSystem.send(entityRef, OnChangedComponent.newInstance(), component);
             }
-        }
-
-        if (!oldComponent.isPresent()) {
-            notifyComponentAdded(getEntity(entityId), component.getClass());
-        } else {
-            logger.error("Adding a component ({}) over an existing component for entity {}", component.getClass(), entityId);
-            notifyComponentChanged(getEntity(entityId), component.getClass());
         }
 
         return component;
