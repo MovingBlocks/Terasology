@@ -109,8 +109,8 @@ public final class Terasology implements Callable<Integer> {
     @Option(names = "--server-port", description = "Change the server port")
     private Integer serverPort;
 
-    @Option(names = "--config", description = "Override default config")
-    private Path configPath;
+    @Option(names = "--override-default-config", description = "Override default config")
+    private Path overrideConfigPath;
 
     @Option(names = "--homedir", description = "Path to home directory")
     private Path homeDir;
@@ -319,8 +319,8 @@ public final class Terasology implements Callable<Integer> {
         if (serverPort != null) {
             System.setProperty(ConfigurationSubsystem.SERVER_PORT_PROPERTY, serverPort.toString());
         }
-        if (configPath != null) {
-            System.setProperty(Config.PROPERTY_OVERRIDE_DEFAULT_CONFIG, configPath.toString());
+        if (overrideConfigPath != null) {
+            System.setProperty(Config.PROPERTY_OVERRIDE_DEFAULT_CONFIG, overrideConfigPath.toString());
         }
     }
 
