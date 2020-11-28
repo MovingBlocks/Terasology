@@ -76,6 +76,10 @@ public class BrownianNoise extends AbstractNoise {
 
             workingX *= (float) getLacunarity();
             workingY *= (float) getLacunarity();
+
+            // Include random offsets so that the origins of all the octaves don't all add up and make a weird feature there.
+            workingX += 10 * other.noise(i + 0.5f, 0.5f);
+            workingY += 10 * other.noise(-i - 0.5f, -0.5f);
         }
 
         return result * scale;
