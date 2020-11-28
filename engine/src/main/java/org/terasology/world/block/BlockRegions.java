@@ -40,7 +40,7 @@ public final class BlockRegions {
      * @return new block region
      */
     public static BlockRegion createFromCenterAndExtents(Vector3ic center, Vector3ic extents) {
-        return new BlockRegion().setMin(center).setMax(center).addExtents(extents);
+        return new BlockRegion().union(center).addExtents(extents);
     }
 
     /**
@@ -55,8 +55,9 @@ public final class BlockRegions {
         Vector3f min = center.sub(extents, new Vector3f());
         Vector3f max = center.add(extents, new Vector3f());
 
-        return new BlockRegion().setMin(new Vector3i(min, RoundingMode.CEILING)).setMax(new Vector3i(max,
-                RoundingMode.FLOOR));
+        return new BlockRegion()
+                .setMin(new Vector3i(min, RoundingMode.CEILING))
+                .setMax(new Vector3i(max, RoundingMode.FLOOR));
     }
 
     /**
