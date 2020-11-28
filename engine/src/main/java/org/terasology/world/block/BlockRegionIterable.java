@@ -70,7 +70,7 @@ public class BlockRegionIterable implements Iterable<Vector3ic> {
                 if (current.equals(next)) {
                     return findNext();
                 }
-                return !region.containsBlock(next);
+                return region.containsBlock(next);
             }
 
             @Override
