@@ -17,12 +17,10 @@
 package org.terasology.math;
 
 import com.google.common.collect.Sets;
-import org.joml.AABBi;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.junit.jupiter.api.Test;
 import org.terasology.world.block.BlockRegion;
-import org.terasology.world.block.BlockRegionIterable;
 import org.terasology.world.block.BlockRegions;
 
 import java.util.Arrays;
@@ -154,5 +152,27 @@ public class BlockRegionTest {
         assertFalse(region.containsBlock(-1, -1, 0));
         assertFalse(region.containsBlock(-1, -1, -1));
         assertFalse(region.containsBlock(0, -1, -1));
+    }
+
+    @Test
+    public void testCorrectBoundsFlip() {
+        Vector3i min = new Vector3i(0, 0, 0);
+        Vector3i max = new Vector3i(1, 1, 1);
+        BlockRegion region = BlockRegions.createFromMinAndMax(max, min);
+        region.correctBounds();
+
+        assertEquals(min, region.getMin(new Vector3i()));
+        assertEquals(max, region.getMax(new Vector3i()));
+    }
+
+    @Test
+    public void testCorrectBoundsMixed() {
+        Vector3i min = new Vector3i(0, 0, 0);
+        Vector3i max = new Vector3i(1, 1, 1);
+        BlockRegion region = BlockRegions.createFromMinAndMax(1,0,1, 0,1,0);
+        region.correctBounds();
+
+        assertEquals(min, region.getMin(new Vector3i()));
+        assertEquals(max, region.getMax(new Vector3i()));
     }
 }
