@@ -279,7 +279,24 @@ public class BlockRegion {
      * @return this
      */
     public BlockRegion correctBounds() {
-        this.aabb.correctBounds();
+        // NOTE: this is basically the same as AABBi#correctBounds, but adjusted for off-by-one semantics here in
+        //       BlockRegion for the max value.
+        int tmp;
+        if (this.aabb.minX > this.aabb.maxX - 1) {
+            tmp = this.aabb.minX;
+            this.aabb.minX = this.aabb.maxX - 1;
+            this.aabb.maxX = tmp + 1;
+        }
+        if (this.aabb.minY > this.aabb.maxY - 1) {
+            tmp = this.aabb.minY;
+            this.aabb.minY = this.aabb.maxY - 1;
+            this.aabb.maxY = tmp + 1;
+        }
+        if (this.aabb.minZ > this.aabb.maxZ - 1) {
+            tmp = this.aabb.minZ;
+            this.aabb.minZ = this.aabb.maxZ - 1;
+            this.aabb.maxZ = tmp + 1;
+        }
         return this;
     }
 
