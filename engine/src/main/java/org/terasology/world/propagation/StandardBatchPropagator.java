@@ -25,6 +25,7 @@ import org.terasology.math.geom.Vector3i;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockRegion;
 import org.terasology.world.block.BlockRegionIterable;
+import org.terasology.world.block.BlockRegions;
 import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.LitChunk;
 
@@ -337,7 +338,7 @@ public class StandardBatchPropagator implements BatchPropagator {
             }
         }
 
-        for (Vector3ic pos : BlockRegionIterable.region(edgeRegion).build()) {
+        for (Vector3ic pos : BlockRegions.iterableInPlace(edgeRegion)) {
             int depthIndex = indexProvider.getIndexFor(JomlUtil.from(pos));
             int adjacentDepth = adjDepth[depthIndex];
             for (int i = adjacentDepth; i < depths[depthIndex]; ++i) {

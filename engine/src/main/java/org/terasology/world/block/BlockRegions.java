@@ -9,6 +9,8 @@ import org.joml.Vector3fc;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
 
+import java.util.Iterator;
+
 public final class BlockRegions {
     private BlockRegions() {
     }
@@ -55,5 +57,46 @@ public final class BlockRegions {
 
         return new BlockRegion().setMin(new Vector3i(min, RoundingMode.CEILING)).setMax(new Vector3i(max,
                 RoundingMode.FLOOR));
+    }
+
+    /**
+     * An iterable over the blocks in the block region, where each position is wrapped in a new {@link Vector3i}.
+     * <p>
+     * If you only need the elements of the block region in the local context of the iterator step without modifications
+     * you may want to consider using {@link #iterableInPlace(BlockRegion)} instead.
+     *
+     * @param region the region to iterate over
+     */
+    public static Iterable<Vector3i> iterable(BlockRegion region) {
+        return () -> {
+            Iterator<Vector3ic> itr = iterableInPlace(region).iterator();
+            return new Iterator<Vector3i>() {
+                @Override
+                public boolean hasNext() {
+                    return itr.hasNext();
+                }
+
+                @Override
+                public Vector3i next() {
+                    return new Vector3i(itr.next());
+                }
+            };
+        };
+    }
+
+    /**
+     * An iterable over the blocks in the block region, where the same {@link Vector3ic} is reused to avoid GC.
+     * <p>
+     * Use this iterable for performance optimized iterations where the positions are only needed within the context of
+     * the iterator sequence.
+     * <p>
+     * Do not store the elements directly or use them outside the context of the iterator as they will change when the
+     * iterator is advanced. You may create new vectors from the elements if necessary, or use {@link
+     * #iterable(BlockRegion)} instead.
+     *
+     * @param region the region to iterate over
+     */
+    public static Iterable<Vector3ic> iterableInPlace(BlockRegion region) {
+        return new BlockRegionIterable(region);
     }
 }
