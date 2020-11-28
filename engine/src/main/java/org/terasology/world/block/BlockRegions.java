@@ -9,7 +9,7 @@ import org.joml.Vector3fc;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
 
-public class BlockRegions {
+public final class BlockRegions {
     private BlockRegions() {
     }
 
@@ -38,7 +38,7 @@ public class BlockRegions {
      * @return new block region
      */
     public static BlockRegion createFromCenterAndExtents(Vector3ic center, Vector3ic extents) {
-        return new BlockRegion().translate(center).addExtents(extents);
+        return new BlockRegion().setMin(center).setMax(center).addExtents(extents);
     }
 
     /**
