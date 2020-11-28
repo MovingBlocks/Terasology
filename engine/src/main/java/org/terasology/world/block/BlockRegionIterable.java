@@ -3,6 +3,7 @@
 package org.terasology.world.block;
 
 import com.google.common.collect.Lists;
+import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
 
@@ -108,7 +109,37 @@ public class BlockRegionIterable implements Iterable<Vector3ic> {
             return this;
         }
 
-        public BlockRegionIterable build() {
+        /**
+         * iterator where each instance is wrapped by a new vector3i
+         * @return
+         */
+        public Iterable<Vector3i> build() {
+            BlockRegionIterable iterable = new BlockRegionIterable(region, subtract);
+            return new Iterable<Vector3i>() {
+                @NotNull
+                @Override
+                public Iterator<Vector3i> iterator() {
+                    Iterator<Vector3ic> itr = iterable.iterator();
+                    return new Iterator<Vector3i>() {
+                        @Override
+                        public boolean hasNext() {
+                            return itr.hasNext();
+                        }
+
+                        @Override
+                        public Vector3i next() {
+                            return new Vector3i(itr.next());
+                        }
+                    };
+                }
+            };
+        }
+
+        /**
+         * iterable with a single vector that is reused to avoid GC
+         * @return
+         */
+        public Iterable<Vector3ic> buildWithReuse() {
             return new BlockRegionIterable(region, subtract);
         }
     }
