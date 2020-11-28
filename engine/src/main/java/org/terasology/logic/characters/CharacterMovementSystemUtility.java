@@ -1,20 +1,8 @@
-/*
- * Copyright 2015 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.logic.characters;
 
+import com.google.common.collect.Lists;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -80,26 +68,33 @@ public final class CharacterMovementSystemUtility {
         float t = (float) (time - a.getTime()) / (b.getTime() - a.getTime());
         Vector3f newPos = JomlUtil.from(a.getPosition()).lerp(JomlUtil.from(b.getPosition()),t);
         Quaternionf newRot = JomlUtil.from(a.getRotation()).nlerp(JomlUtil.from(b.getRotation()),t);
-        LocationComponent location = entity.getComponent(LocationComponent.class);
-        location.setWorldPosition(JomlUtil.from(newPos));
-        location.setWorldRotation(JomlUtil.from(newRot));
-        entity.saveComponent(location);
 
-        CharacterMovementComponent movementComponent = entity.getComponent(CharacterMovementComponent.class);
-        movementComponent.mode = a.getMode();
-        movementComponent.setVelocity(JomlUtil.from(a.getVelocity()));
-        movementComponent.grounded = a.isGrounded();
-        if (b.getFootstepDelta() < a.getFootstepDelta()) {
-            movementComponent.footstepDelta = t * (1 + b.getFootstepDelta() - a.getFootstepDelta()) + a.getFootstepDelta();
-            if (movementComponent.footstepDelta > 1) {
-                movementComponent.footstepDelta -= 1;
+        entity.updateComponent(LocationComponent.class, location -> {
+            location.setWorldPosition(JomlUtil.from(newPos));
+            location.setWorldRotation(JomlUtil.from(newRot));
+            return location;
+        });
+
+        entity.updateComponent(CharacterMovementComponent.class, movementComponent -> {
+            movementComponent.mode = a.getMode();
+            movementComponent.setVelocity(JomlUtil.from(a.getVelocity()));
+            movementComponent.grounded = a.isGrounded();
+            if (b.getFootstepDelta() < a.getFootstepDelta()) {
+                movementComponent.footstepDelta = t * (1 + b.getFootstepDelta() - a.getFootstepDelta()) + a.getFootstepDelta();
+                if (movementComponent.footstepDelta > 1) {
+                    movementComponent.footstepDelta -= 1;
+                }
+            } else {
+                movementComponent.footstepDelta = t * (b.getFootstepDelta() - a.getFootstepDelta()) + a.getFootstepDelta();
             }
-        } else {
-            movementComponent.footstepDelta = t * (b.getFootstepDelta() - a.getFootstepDelta()) + a.getFootstepDelta();
-        }
-        entity.saveComponent(movementComponent);
+            return movementComponent;
+        });
 
-        setPhysicsLocation(entity, newPos);
+        // BulletPhysics requires the entity to have both these components. This is not clear from the interfaces we're
+        // using, but the exception thrown in 'BulletPhysics#createCharacterCollider' is pretty self-explanatory...
+        if (entity.hasAllComponents(Lists.newArrayList(CharacterMovementComponent.class, LocationComponent.class))) {
+            setPhysicsLocation(entity, newPos);
+        }
     }
 
     public void setToExtrapolateState(EntityRef entity, CharacterStateEvent state, long time) {
