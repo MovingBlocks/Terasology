@@ -5,8 +5,13 @@ package org.terasology.world.block;
 
 import com.google.common.collect.ImmutableList;
 import org.joml.Vector3i;
+import org.joml.Vector3ic;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 
 public class BlockRegionIterableTest {
 
@@ -23,7 +28,9 @@ public class BlockRegionIterableTest {
         BlockRegion region = BlockRegions.createFromMinAndMax(new Vector3i(0, 0, 0), new Vector3i(0, 1, 0));
         BlockRegionIterable iterable = BlockRegionIterable.region(region).build();
 
-        Assertions.assertEquals(2, ImmutableList.copyOf(iterable).size());
+        ImmutableList<Vector3ic> actual = ImmutableList.copyOf(iterable);
+        Assertions.assertEquals(2, actual.size());
+        Assertions.assertEquals(new HashSet<>(expectedPositions(region)), new HashSet<>(actual));
     }
 
     @Test
@@ -31,7 +38,9 @@ public class BlockRegionIterableTest {
         BlockRegion region = BlockRegions.createFromMinAndMax(new Vector3i(0, 0, 0), new Vector3i(0, 1, 1));
         BlockRegionIterable iterable = BlockRegionIterable.region(region).build();
 
-        Assertions.assertEquals(4, ImmutableList.copyOf(iterable).size());
+        ImmutableList<Vector3ic> actual = ImmutableList.copyOf(iterable);
+        Assertions.assertEquals(4, actual.size());
+        Assertions.assertEquals(new HashSet<>(expectedPositions(region)), new HashSet<>(actual));
     }
 
     @Test
@@ -39,6 +48,20 @@ public class BlockRegionIterableTest {
         BlockRegion region = BlockRegions.createFromMinAndMax(new Vector3i(0, 0, 0), new Vector3i(1, 1, 1));
         BlockRegionIterable iterable = BlockRegionIterable.region(region).build();
 
-        Assertions.assertEquals(8, ImmutableList.copyOf(iterable).size());
+        ImmutableList<Vector3ic> actual = ImmutableList.copyOf(iterable);
+        Assertions.assertEquals(8, actual.size());
+        Assertions.assertEquals(new HashSet<>(expectedPositions(region)), new HashSet<>(actual));
+    }
+
+    private List<Vector3ic> expectedPositions(BlockRegion region) {
+        List<Vector3ic> result = new ArrayList<>(region.getSizeX() * region.getSizeY() * region.getSizeZ());
+        for (int x = region.getMinX(); x <= region.getMaxX(); x++) {
+            for (int y = region.getMinY(); y <= region.getMaxY(); y++) {
+                for (int z = region.getMinZ(); z <= region.getMaxZ(); z++) {
+                    result.add(new Vector3i(x, y, z));
+                }
+            }
+        }
+        return result;
     }
 }
