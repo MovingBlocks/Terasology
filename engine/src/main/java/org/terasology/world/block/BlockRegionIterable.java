@@ -87,7 +87,7 @@ public class BlockRegionIterable implements Iterable<Vector3ic> {
                     return null;
                 }
                 current.set(next);
-                return current;
+                return next;
             }
         };
     }
