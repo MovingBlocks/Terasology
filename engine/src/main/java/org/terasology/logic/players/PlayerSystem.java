@@ -224,7 +224,7 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
 
         Vector3f spawnPosition;
         if (clientInfo.hasComponent(StaticSpawnLocationComponent.class)) {
-            spawnPosition = JomlUtil.from(clientInfo.getComponent(StaticSpawnLocationComponent.class).position);
+            spawnPosition = clientInfo.getComponent(StaticSpawnLocationComponent.class).position;
         } else {
             spawnPosition = JomlUtil.from(worldGenerator.getSpawnPosition(entity));
         }

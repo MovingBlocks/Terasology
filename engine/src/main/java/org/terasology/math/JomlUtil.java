@@ -26,6 +26,7 @@ import org.joml.Rectanglei;
 import org.joml.Vector2fc;
 import org.joml.Vector2ic;
 import org.joml.Vector3fc;
+import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.joml.Vector4f;
 import org.joml.Vector4fc;
@@ -190,6 +191,14 @@ public final class JomlUtil {
             return null;
         }
         return new BlockRegion(aabb.minX(), aabb.minY(), aabb.minZ(), aabb.maxX(), aabb.maxY(), aabb.maxZ());
+    }
+
+
+    public static Region3i from(BlockRegion aabb) {
+        if (aabb == null) {
+            return null;
+        }
+        return Region3i.createFromMinMax(JomlUtil.from(aabb.getMin(new Vector3i())), JomlUtil.from(aabb.getMax(new Vector3i())));
     }
 
 
