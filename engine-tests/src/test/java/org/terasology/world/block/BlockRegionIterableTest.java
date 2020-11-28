@@ -3,7 +3,6 @@
 
 package org.terasology.world.block;
 
-import com.google.common.collect.ImmutableList;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.junit.jupiter.api.Assertions;
@@ -20,7 +19,13 @@ public class BlockRegionIterableTest {
         BlockRegion region = BlockRegions.createFromMinAndMax(new Vector3i(0, 0, 0), new Vector3i(0, 0, 0));
         BlockRegionIterable iterable = BlockRegionIterable.region(region).build();
 
-        Assertions.assertEquals(1, ImmutableList.copyOf(iterable).size());
+        List<Vector3ic> actual = new ArrayList<>();
+        for (Vector3ic vector3ic : iterable) {
+            actual.add(new Vector3i(vector3ic));
+        }
+
+        Assertions.assertEquals(1, actual.size());
+        Assertions.assertEquals(new HashSet<>(expectedPositions(region)), new HashSet<>(actual));
     }
 
     @Test
@@ -28,7 +33,11 @@ public class BlockRegionIterableTest {
         BlockRegion region = BlockRegions.createFromMinAndMax(new Vector3i(0, 0, 0), new Vector3i(0, 1, 0));
         BlockRegionIterable iterable = BlockRegionIterable.region(region).build();
 
-        ImmutableList<Vector3ic> actual = ImmutableList.copyOf(iterable);
+        List<Vector3ic> actual = new ArrayList<>();
+        for (Vector3ic vector3ic : iterable) {
+            actual.add(new Vector3i(vector3ic));
+        }
+
         Assertions.assertEquals(2, actual.size());
         Assertions.assertEquals(new HashSet<>(expectedPositions(region)), new HashSet<>(actual));
     }
@@ -38,7 +47,11 @@ public class BlockRegionIterableTest {
         BlockRegion region = BlockRegions.createFromMinAndMax(new Vector3i(0, 0, 0), new Vector3i(0, 1, 1));
         BlockRegionIterable iterable = BlockRegionIterable.region(region).build();
 
-        ImmutableList<Vector3ic> actual = ImmutableList.copyOf(iterable);
+        List<Vector3ic> actual = new ArrayList<>();
+        for (Vector3ic vector3ic : iterable) {
+            actual.add(new Vector3i(vector3ic));
+        }
+
         Assertions.assertEquals(4, actual.size());
         Assertions.assertEquals(new HashSet<>(expectedPositions(region)), new HashSet<>(actual));
     }
@@ -48,7 +61,11 @@ public class BlockRegionIterableTest {
         BlockRegion region = BlockRegions.createFromMinAndMax(new Vector3i(0, 0, 0), new Vector3i(1, 1, 1));
         BlockRegionIterable iterable = BlockRegionIterable.region(region).build();
 
-        ImmutableList<Vector3ic> actual = ImmutableList.copyOf(iterable);
+        List<Vector3ic> actual = new ArrayList<>();
+        for (Vector3ic vector3ic : iterable) {
+            actual.add(new Vector3i(vector3ic));
+        }
+
         Assertions.assertEquals(8, actual.size());
         Assertions.assertEquals(new HashSet<>(expectedPositions(region)), new HashSet<>(actual));
     }
