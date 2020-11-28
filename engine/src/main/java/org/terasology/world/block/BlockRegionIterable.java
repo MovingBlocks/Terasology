@@ -27,7 +27,7 @@ public class BlockRegionIterable implements Iterable<Vector3ic> {
     public Iterator<Vector3ic> iterator() {
         return new Iterator<Vector3ic>() {
             private Vector3i current = null;
-            private final Vector3i next = new Vector3i(region.aabb.minX, region.aabb.minY, region.aabb.minZ);
+            private final Vector3i next = new Vector3i(region.getMinX(), region.getMinY(), region.getMinZ());
 
             public boolean isValid(Vector3ic test) {
                 if (subtract != null) {
@@ -44,11 +44,11 @@ public class BlockRegionIterable implements Iterable<Vector3ic> {
                 if (current.equals(next)) {
                     do {
                         next.z++;
-                        if (next.z >= region.aabb.maxZ) {
-                            next.z = region.aabb.minZ;
+                        if (next.z > region.getMaxZ()) {
+                            next.z = region.getMinZ();
                             next.y++;
-                            if (next.y >= region.aabb.maxY) {
-                                next.y = region.aabb.minY;
+                            if (next.y > region.getMaxY()) {
+                                next.y = region.getMinY();
                                 next.x++;
                             }
                         }
@@ -87,7 +87,7 @@ public class BlockRegionIterable implements Iterable<Vector3ic> {
                     return null;
                 }
                 current.set(next);
-                return next;
+                return current;
             }
         };
     }
