@@ -24,5 +24,5 @@ import java.util.Collection;
 
 @FunctionalInterface
 public interface FlowRenderableFactory {
-    Collection<FlowRenderable> create(Attributes attributes, Font font, Color color, String hyperlink);
+    Collection<FlowRenderable<?>> create(Attributes attributes, Font font, Color color, String hyperlink);
 }

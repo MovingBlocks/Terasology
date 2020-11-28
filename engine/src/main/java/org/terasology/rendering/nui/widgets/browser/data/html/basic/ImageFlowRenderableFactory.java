@@ -29,7 +29,7 @@ import java.util.Collections;
 
 public class ImageFlowRenderableFactory implements FlowRenderableFactory {
     @Override
-    public Collection<FlowRenderable> create(Attributes attributes, Font font, Color color, String hyperlink) {
+    public Collection<FlowRenderable<?>> create(Attributes attributes, Font font, Color color, String hyperlink) {
         String src = HTMLUtils.findAttribute(attributes, "src");
         if (src == null) {
             throw new HTMLParseException("Expected src attribute");

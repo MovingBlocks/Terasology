@@ -26,7 +26,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class FlowParagraphData implements ParagraphData {
-    private List<FlowRenderable> data = new LinkedList<>();
+    private List<FlowRenderable<?>> data = new LinkedList<>();
 
     private ParagraphRenderStyle paragraphRenderStyle;
 
@@ -44,11 +44,11 @@ public class FlowParagraphData implements ParagraphData {
         return new FlowParagraphRenderable(Collections.unmodifiableList(data));
     }
 
-    public void append(FlowRenderable flowRenderable) {
+    public void append(FlowRenderable<?> flowRenderable) {
         data.add(flowRenderable);
     }
 
-    public void append(Collection<FlowRenderable> flowRenderable) {
+    public void append(Collection<FlowRenderable<?>> flowRenderable) {
         data.addAll(flowRenderable);
     }
 }
