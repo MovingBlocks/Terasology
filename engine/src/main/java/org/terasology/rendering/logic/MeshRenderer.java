@@ -193,10 +193,14 @@ public class MeshRenderer extends BaseComponentSystem implements RenderSystem {
                 for (EntityRef entity : entities) {
                     MeshComponent meshComp = entity.getComponent(MeshComponent.class);
                     LocationComponent location = entity.getComponent(LocationComponent.class);
-
-                    if (isHidden(entity, meshComp) || location == null || Float.isNaN(location.getWorldPosition().x) || meshComp.mesh == null || !isRelevant(entity, JomlUtil.from(location.getWorldPosition()))) {
+                    if (isHidden(entity, meshComp) || location == null || meshComp.mesh == null) {
                         continue;
                     }
+                    Vector3f worldPosition = location.getWorldPosition(new Vector3f());
+                    if (!worldPosition.isFinite() && !isRelevant(entity, worldPosition)) {
+                        continue;
+                    }
+
                     if (meshComp.mesh.isDisposed()) {
                         logger.error("Attempted to render disposed mesh");
                         continue;
