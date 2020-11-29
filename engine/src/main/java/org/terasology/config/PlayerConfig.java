@@ -31,7 +31,7 @@ public class PlayerConfig extends AbstractSubscribable {
 
     private static final float DEFAULT_PLAYER_HEIGHT = 1.8f;
 
-    private static final float DEFAULT_PLAYER_EYE_HEIGHT = 0.7f;
+    private static final float DEFAULT_PLAYER_EYE_HEIGHT = 0.85f;
 
     private static final boolean DEFAULT_DISCORD_PRESENCE = true;
 
