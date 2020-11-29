@@ -80,7 +80,7 @@ public class DebugControlSystem extends BaseComponentSystem {
 
 
     /**
-     * Creates illusion of time flying by if correspondig key is held down.
+     * Creates illusion of time flying by if corresponding key is held down.
      * Up / Down : Increases / Decreases time of day by 0.005 per keystroke.
      * Right / left : Increases / Decreases time of day by 0.02 per keystroke.
      * @param entity The player entity that triggered the time change.
@@ -165,9 +165,16 @@ public class DebugControlSystem extends BaseComponentSystem {
         }
     }
     
-    private void timeTravel(EntityRef entity, KeyEvent event, float timeAdded) {
+    /**
+     * Ensures every player on the server has their time updated when
+     * a KeyEvent is triggered in Debug mode.
+     * @param entity The player entity that triggered the time change.
+     * @param event The KeyEvent which triggered the time change.
+     * @param timeDiff The time (in days) to add/retrieve.
+     */
+    private void timeTravel(EntityRef entity, KeyEvent event, float timeDiff) {
     	float timeInDays = world.getTime().getDays();
-    	entity.send(new WorldtimeResetEvent(timeInDays + timeAdded));
+    	entity.send(new WorldtimeResetEvent(timeInDays + timeDiff));
         event.consume();
     }
 

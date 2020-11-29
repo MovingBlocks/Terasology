@@ -25,6 +25,7 @@ import org.terasology.logic.console.commandSystem.annotations.Sender;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.permission.PermissionManager;
 import org.terasology.logic.players.StaticSpawnLocationComponent;
+import org.terasology.logic.players.event.WorldtimeResetEvent;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkSystem;
 import org.terasology.registry.In;
@@ -67,8 +68,9 @@ public class ClientCommands extends BaseComponentSystem {
      */
     @Command(shortDescription = "Sets the current world time for the local player in days",
             requiredPermission = PermissionManager.CHEAT_PERMISSION)
-    public String setWorldTime(@CommandParam("day") float day) {
+    public String setWorldTime(@CommandParam("day") float day, @Sender EntityRef sender) {
         worldProvider.getTime().setDays(day);
+        sender.send(new WorldtimeResetEvent(day));
         return "World time changed";
     }
 
