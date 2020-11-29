@@ -31,6 +31,7 @@ import org.terasology.input.events.KeyEvent;
 import org.terasology.input.events.MouseAxisEvent;
 import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.debug.DebugProperties;
+import org.terasology.logic.time.TimeResynchEvent;
 import org.terasology.logic.players.event.WorldtimeResetEvent;
 import org.terasology.network.ClientComponent;
 import org.terasology.registry.In;
@@ -98,7 +99,7 @@ public class DebugControlSystem extends BaseComponentSystem {
                     timeTravel(entity, event, -0.005f);
                     break;
                 case Keyboard.KeyId.RIGHT:
-                    timeTravel(entity, event, 0.02f);
+                	timeTravel(entity, event, 0.02f);
                     break;
                 case Keyboard.KeyId.LEFT:
                     timeTravel(entity, event, -0.02f);
@@ -108,7 +109,7 @@ public class DebugControlSystem extends BaseComponentSystem {
             }
         }
     }
-
+    
     @ReceiveEvent(components = ClientComponent.class)
     public void onKeyDown(KeyDownEvent event, EntityRef entity) {
         boolean debugEnabled = config.getSystem().isDebugEnabled();
