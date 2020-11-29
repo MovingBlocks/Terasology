@@ -22,6 +22,7 @@ import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
 import org.terasology.assets.AssetData;
 import org.terasology.math.AABB;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Matrix4f;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector2f;
@@ -85,7 +86,8 @@ public class SkeletalMeshData implements AssetData {
     public List<Vector3f> getBindPoseVertexPositions() {
         Matrix4f[] transforms = new Matrix4f[bones.size()];
         for (Bone bone : bones) {
-            transforms[bone.getIndex()] = bone.getObjectTransform();
+            transforms[bone.getIndex()] = JomlUtil.from(bone.getObjectTransform());
+            transforms[bone.getIndex()].transpose();
         }
         return getVertexPositions(Arrays.asList(transforms));
     }
@@ -96,7 +98,8 @@ public class SkeletalMeshData implements AssetData {
     public List<Vector3f> getBindPoseVertexNormals() {
         Matrix4f[] transforms = new Matrix4f[bones.size()];
         for (Bone bone : bones) {
-            transforms[bone.getIndex()] = bone.getObjectTransform();
+            transforms[bone.getIndex()] = JomlUtil.from(bone.getObjectTransform());
+            transforms[bone.getIndex()].transpose();
         }
         return getVertexNormals(Arrays.asList(transforms));
     }

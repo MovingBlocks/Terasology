@@ -28,6 +28,7 @@ import org.terasology.assets.format.AssetDataFile;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.assets.module.annotations.RegisterAssetFileFormat;
 import org.terasology.math.AABB;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.rendering.assets.animation.MeshAnimationBundleData;
@@ -143,9 +144,9 @@ public class GLTFAnimationFormat extends GLTFCommonFormat<MeshAnimationBundleDat
             List<Quat4f> boneRotations = new ArrayList<>();
             List<Vector3f> boneScales = new ArrayList<>();
             for (Bone bone : bones) {
-                boneLocations.add(new Vector3f(bone.getLocalPosition()));
-                boneRotations.add(new Quat4f(bone.getLocalRotation()));
-                boneScales.add(new Vector3f(bone.getLocalScale()));
+                boneLocations.add(new Vector3f(JomlUtil.from(bone.getLocalPosition())));
+                boneRotations.add(new Quat4f(JomlUtil.from(bone.getLocalRotation())));
+                boneScales.add(new Vector3f(JomlUtil.from(bone.getLocalScale())));
             }
             MeshAnimationFrame frame = new MeshAnimationFrame(boneLocations, boneRotations, boneScales);
             channelReaders.forEach(x -> x.updateFrame(time, frame));

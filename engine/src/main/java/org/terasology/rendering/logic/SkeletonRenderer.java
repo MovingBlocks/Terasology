@@ -288,7 +288,7 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
                 if (boneLocation != null) {
                     Matrix4f boneTransform = new Matrix4f();
                     boneLocation.getRelativeTransform(boneTransform, entity);
-                    boneTransform.mul(JomlUtil.from(bone.getInverseBindMatrix()).transpose());
+                    boneTransform.mul(bone.getInverseBindMatrix());
                     boneTransforms[bone.getIndex()] = boneTransform;
                 } else {
                     logger.warn("Unable to resolve bone \"{}\"", bone.getName());

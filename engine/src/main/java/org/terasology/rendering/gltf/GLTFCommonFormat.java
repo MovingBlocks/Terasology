@@ -37,6 +37,7 @@ import org.terasology.assets.AssetData;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.format.AbstractAssetFileFormat;
 import org.terasology.assets.management.AssetManager;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.MatrixUtils;
 import org.terasology.math.geom.*;
 import org.terasology.rendering.gltf.deserializers.*;
@@ -249,8 +250,8 @@ public abstract class GLTFCommonFormat<T extends AssetData> extends AbstractAsse
             if (Strings.isNullOrEmpty(boneName)) {
                 boneName = "bone_" + i;
             }
-            Bone bone = new Bone(i, boneName, new Matrix4f(rotation, position, scale.x));
-            bone.setInverseBindMatrix(inverseMats.get(i));
+            Bone bone = new Bone(i, boneName, new org.joml.Matrix4f().translationRotateScale(JomlUtil.from(position), JomlUtil.from(rotation), JomlUtil.from(scale)));
+            bone.setInverseBindMatrix(JomlUtil.from(inverseMats.get(i)));
             bones.add(bone);
             boneToJoint.put(nodeIndex, i);
         }
@@ -273,7 +274,7 @@ public abstract class GLTFCommonFormat<T extends AssetData> extends AbstractAsse
         } else {
             result = new ArrayList<>(size);
             for (int i = 0; i < size; i++) {
-                result.add(new Matrix4f(Matrix4f.IDENTITY));
+                result.add(new Matrix4f());
             }
         }
         return result;
@@ -293,7 +294,7 @@ public abstract class GLTFCommonFormat<T extends AssetData> extends AbstractAsse
                     values.get(i + 8), values.get(i + 9), values.get(i + 10), values.get(i + 11),
                     values.get(i + 12), values.get(i + 13), values.get(i + 14), values.get(i + 15)
             );
-            mat.transpose();
+//            mat.transpose();
             matricies.add(mat);
         }
         return matricies;
