@@ -142,7 +142,7 @@ public class SkeletalMeshData implements AssetData {
                 jointMat.scale(weight.getBias(w));
                 skinMat.add(jointMat);
             }
-            norm.mulTransposeDirection(skinMat);
+            norm.mulTransposePosition(skinMat);
             results.add(norm);
         }
         return results;
@@ -200,7 +200,7 @@ public class SkeletalMeshData implements AssetData {
             vertices.get(indices.get(i * 3 + 2)).sub(baseVert, v2);
             v1.normalize();
             v2.normalize();
-            v1.cross(v2, norm);
+            v2.cross(v1, norm);
             normals.get(indices.get(i * 3)).add(norm);
             normals.get(indices.get(i * 3 + 1)).add(norm);
             normals.get(indices.get(i * 3 + 2)).add(norm);

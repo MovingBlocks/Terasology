@@ -272,7 +272,7 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
             modelViewMatrix.get(tempMatrixBuffer44);
             skeletalMesh.material.setMatrix4("worldViewMatrix", tempMatrixBuffer44, true);
 
-            modelViewMatrix.get3x3(new Matrix3f()).invert().get(tempMatrixBuffer33);
+            modelViewMatrix.normal(new Matrix3f()).get(tempMatrixBuffer33);
             skeletalMesh.material.setMatrix3("normalMatrix", tempMatrixBuffer33, true);
 
             skeletalMesh.material.setFloat("sunlight", worldRenderer.getMainLightIntensityAt(JomlUtil.from(worldPos)), true);
