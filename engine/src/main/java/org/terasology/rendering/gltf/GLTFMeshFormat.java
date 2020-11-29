@@ -16,15 +16,15 @@
 package org.terasology.rendering.gltf;
 
 import gnu.trove.list.TFloatList;
+import org.joml.Matrix4f;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.format.AssetDataFile;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.assets.module.annotations.RegisterAssetFileFormat;
-import org.terasology.math.geom.Matrix4f;
-import org.terasology.math.geom.Quat4f;
-import org.terasology.math.geom.Vector3f;
 import org.terasology.rendering.assets.mesh.MeshData;
 import org.terasology.rendering.gltf.model.GLTF;
 import org.terasology.rendering.gltf.model.GLTFAccessor;
@@ -113,14 +113,14 @@ public class GLTFMeshFormat extends GLTFCommonFormat<MeshData> {
     }
 
     private Matrix4f getMatrix(GLTF gltf, int nodeIndex) {
-        Matrix4f transform = new Matrix4f(Matrix4f.IDENTITY);
+        Matrix4f transform = new Matrix4f();
 
         if (nodeIndex != -1) {
             GLTFNode node = gltf.getNodes().get(nodeIndex);
             if (node.getMatrix() == null) {
                 Vector3f position = new Vector3f();
-                Quat4f rotation = new Quat4f(Quat4f.IDENTITY);
-                Vector3f scale = new Vector3f(Vector3f.one());
+                Quaternionf rotation = new Quaternionf();
+                Vector3f scale = new Vector3f(1,1,1);
 
                 if (node.getTranslation() != null) {
                     position.set(node.getTranslation());
@@ -131,19 +131,19 @@ public class GLTFMeshFormat extends GLTFCommonFormat<MeshData> {
                 if (node.getScale() != null) {
                     scale.set(node.getScale());
                 }
-                transform.set(new Matrix4f(rotation, position, 1.0f));
+                transform.set(new Matrix4f().translationRotateScale(position,rotation, scale));
 
-                transform.set(0, 0, scale.getX() * transform.get(0, 0));
-                transform.set(0, 1, scale.getX() * transform.get(0, 1));
-                transform.set(0, 2, scale.getX() * transform.get(0, 2));
-
-                transform.set(1, 0, scale.getY() * transform.get(1, 0));
-                transform.set(1, 1, scale.getY() * transform.get(1, 1));
-                transform.set(1, 2, scale.getY() * transform.get(1, 2));
-
-                transform.set(2, 0, scale.getZ() * transform.get(2, 0));
-                transform.set(2, 1, scale.getZ() * transform.get(2, 1));
-                transform.set(2, 2, scale.getZ() * transform.get(2, 2));
+//                transform.set(0, 0, scale.getX() * transform.get(0, 0));
+//                transform.set(0, 1, scale.getX() * transform.get(0, 1));
+//                transform.set(0, 2, scale.getX() * transform.get(0, 2));
+//
+//                transform.set(1, 0, scale.getY() * transform.get(1, 0));
+//                transform.set(1, 1, scale.getY() * transform.get(1, 1));
+//                transform.set(1, 2, scale.getY() * transform.get(1, 2));
+//
+//                transform.set(2, 0, scale.getZ() * transform.get(2, 0));
+//                transform.set(2, 1, scale.getZ() * transform.get(2, 1));
+//                transform.set(2, 2, scale.getZ() * transform.get(2, 2));
             } else {
                 transform.set(node.getMatrix());
             }
@@ -171,13 +171,13 @@ public class GLTFMeshFormat extends GLTFCommonFormat<MeshData> {
         Vector3f current = new Vector3f();
         for (int i = 0; i < buffer.size(); i += 3) {
             current.set(buffer.get(i), buffer.get(i + 1), buffer.get(i + 2));
-            transform.transformPoint(current);
+            transform.transformPosition(current);
             if (normalize) {
                 current.normalize();
             }
-            buffer.set(i, current.getX());
-            buffer.set(i + 1, current.getY());
-            buffer.set(i + 2, current.getZ());
+            buffer.set(i, current.x());
+            buffer.set(i + 1, current.y());
+            buffer.set(i + 2, current.z());
         }
     }
 }

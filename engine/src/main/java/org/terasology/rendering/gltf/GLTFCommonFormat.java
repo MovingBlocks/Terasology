@@ -27,9 +27,12 @@ import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TFloatArrayList;
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.map.TIntIntMap;
-import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntIntHashMap;
-import gnu.trove.map.hash.TIntObjectHashMap;
+import org.joml.Matrix4f;
+import org.joml.Quaternionf;
+import org.joml.Vector2f;
+import org.joml.Vector3f;
+import org.joml.Vector4f;
 import org.joml.Vector4i;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,12 +40,31 @@ import org.terasology.assets.AssetData;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.format.AbstractAssetFileFormat;
 import org.terasology.assets.management.AssetManager;
-import org.terasology.math.JomlUtil;
-import org.terasology.math.MatrixUtils;
-import org.terasology.math.geom.*;
-import org.terasology.rendering.gltf.deserializers.*;
-import org.terasology.rendering.gltf.model.*;
 import org.terasology.rendering.assets.skeletalmesh.Bone;
+import org.terasology.rendering.gltf.deserializers.GLTFChannelPathDeserializer;
+import org.terasology.rendering.gltf.deserializers.GLTFComponentTypeDeserializer;
+import org.terasology.rendering.gltf.deserializers.GLTFModeDeserializer;
+import org.terasology.rendering.gltf.deserializers.GLTFTargetBufferDeserializer;
+import org.terasology.rendering.gltf.deserializers.GLTFVersionDeserializer;
+import org.terasology.rendering.gltf.deserializers.Matrix4fDeserializer;
+import org.terasology.rendering.gltf.deserializers.Quat4fDeserializer;
+import org.terasology.rendering.gltf.deserializers.TFloatListDeserializer;
+import org.terasology.rendering.gltf.deserializers.TIntListDeserializer;
+import org.terasology.rendering.gltf.deserializers.Vector3fDeserializer;
+import org.terasology.rendering.gltf.model.GLTF;
+import org.terasology.rendering.gltf.model.GLTFAccessor;
+import org.terasology.rendering.gltf.model.GLTFAttributeType;
+import org.terasology.rendering.gltf.model.GLTFBuffer;
+import org.terasology.rendering.gltf.model.GLTFBufferView;
+import org.terasology.rendering.gltf.model.GLTFChannelPath;
+import org.terasology.rendering.gltf.model.GLTFComponentType;
+import org.terasology.rendering.gltf.model.GLTFMesh;
+import org.terasology.rendering.gltf.model.GLTFMode;
+import org.terasology.rendering.gltf.model.GLTFNode;
+import org.terasology.rendering.gltf.model.GLTFPrimitive;
+import org.terasology.rendering.gltf.model.GLTFSkin;
+import org.terasology.rendering.gltf.model.GLTFTargetBuffer;
+import org.terasology.rendering.gltf.model.GLTFVersion;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -66,7 +88,7 @@ public abstract class GLTFCommonFormat<T extends AssetData> extends AbstractAsse
             .registerTypeAdapter(TIntList.class, new TIntListDeserializer())
             .registerTypeAdapter(TFloatList.class, new TFloatListDeserializer())
             .registerTypeAdapter(Matrix4f.class, new Matrix4fDeserializer())
-            .registerTypeAdapter(Quat4f.class, new Quat4fDeserializer())
+            .registerTypeAdapter(Quaternionf.class, new Quat4fDeserializer())
             .registerTypeAdapter(Vector3f.class, new Vector3fDeserializer())
             .registerTypeAdapter(GLTFComponentType.class, new GLTFComponentTypeDeserializer())
             .registerTypeAdapter(GLTFMode.class, new GLTFModeDeserializer())
@@ -235,8 +257,8 @@ public abstract class GLTFCommonFormat<T extends AssetData> extends AbstractAsse
             int nodeIndex = skin.getJoints().get(i);
             GLTFNode node = gltf.getNodes().get(nodeIndex);
             Vector3f position = new Vector3f();
-            Quat4f rotation = new Quat4f(Quat4f.IDENTITY);
-            Vector3f scale = new Vector3f(Vector3f.one());
+            Quaternionf rotation = new Quaternionf();
+            Vector3f scale = new Vector3f(1,1,1);
             if (node.getTranslation() != null) {
                 position.set(node.getTranslation());
             }
@@ -250,8 +272,8 @@ public abstract class GLTFCommonFormat<T extends AssetData> extends AbstractAsse
             if (Strings.isNullOrEmpty(boneName)) {
                 boneName = "bone_" + i;
             }
-            Bone bone = new Bone(i, boneName, new org.joml.Matrix4f().translationRotateScale(JomlUtil.from(position), JomlUtil.from(rotation), JomlUtil.from(scale)));
-            bone.setInverseBindMatrix(JomlUtil.from(inverseMats.get(i)));
+            Bone bone = new Bone(i, boneName, new org.joml.Matrix4f().translationRotateScale(position, rotation, scale));
+            bone.setInverseBindMatrix(inverseMats.get(i));
             bones.add(bone);
             boneToJoint.put(nodeIndex, i);
         }

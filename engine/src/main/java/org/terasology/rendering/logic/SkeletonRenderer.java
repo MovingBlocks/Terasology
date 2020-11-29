@@ -289,7 +289,7 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
                     Matrix4f boneTransform = new Matrix4f();
                     boneLocation.getRelativeTransform(boneTransform, entity);
                     boneTransform.mul(bone.getInverseBindMatrix());
-                    boneTransforms[bone.getIndex()] = boneTransform;
+                    boneTransforms[bone.getIndex()] = boneTransform.transpose();
                 } else {
                     logger.warn("Unable to resolve bone \"{}\"", bone.getName());
                     boneTransforms[bone.getIndex()] = new Matrix4f();
@@ -297,11 +297,7 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
                 }
             }
             ((OpenGLSkeletalMesh) skeletalMesh.mesh).setScaleTranslate(skeletalMesh.scale, skeletalMesh.translate);
-            ((OpenGLSkeletalMesh) skeletalMesh.mesh).render(Arrays.stream(boneTransforms).map(k -> {
-                org.terasology.math.geom.Matrix4f t = JomlUtil.from(k);
-                t.transpose();
-                return t;
-            }).collect(Collectors.toList()));
+            ((OpenGLSkeletalMesh) skeletalMesh.mesh).render(Arrays.stream(boneTransforms).collect(Collectors.toList()));
         }
     }
 
