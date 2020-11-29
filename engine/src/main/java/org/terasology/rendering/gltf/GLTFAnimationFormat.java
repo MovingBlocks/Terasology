@@ -23,6 +23,7 @@ import gnu.trove.list.array.TFloatArrayList;
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.map.TIntIntMap;
 import gnu.trove.map.hash.TIntIntHashMap;
+import org.joml.Quaternionf;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.format.AssetDataFile;
 import org.terasology.assets.management.AssetManager;
@@ -115,18 +116,18 @@ public class GLTFAnimationFormat extends GLTFCommonFormat<MeshAnimationBundleDat
 
             switch (channel.getTarget().getPath()) {
                 case TRANSLATION: {
-                    List<Vector3f> data = getVector3fs(gltf, loadedBuffers, sampler.getOutput());
+                    List<org.joml.Vector3f> data = getVector3fs(gltf, loadedBuffers, sampler.getOutput());
 
                     channelReaders.add(new BufferChannelReader<>(times, data, sampler.getInterpolation()::interpolate, x -> x.getPosition(bone)));
                     break;
                 }
                 case ROTATION: {
-                    List<Quat4f> data = getQuat4fs(gltf, loadedBuffers, sampler.getOutput());
+                    List<Quaternionf> data = getQuat4fs(gltf, loadedBuffers, sampler.getOutput());
                     channelReaders.add(new BufferChannelReader<>(times, data, sampler.getInterpolation()::interpolate, x -> x.getRotation(bone)));
                     break;
                 }
                 case SCALE: {
-                    List<Vector3f> data = getVector3fs(gltf, loadedBuffers, sampler.getOutput());
+                    List<org.joml.Vector3f> data = getVector3fs(gltf, loadedBuffers, sampler.getOutput());
                     channelReaders.add(new BufferChannelReader<>(times, data, sampler.getInterpolation()::interpolate, x -> x.getBoneScale(bone)));
                     break;
                 }
@@ -140,13 +141,13 @@ public class GLTFAnimationFormat extends GLTFCommonFormat<MeshAnimationBundleDat
 
         for (int i = 0; i < frameCount; i++) {
             float time = i * TIME_PER_FRAME;
-            List<Vector3f> boneLocations = new ArrayList<>();
-            List<Quat4f> boneRotations = new ArrayList<>();
-            List<Vector3f> boneScales = new ArrayList<>();
+            List<org.joml.Vector3f> boneLocations = new ArrayList<>();
+            List<org.joml.Quaternionf> boneRotations = new ArrayList<>();
+            List<org.joml.Vector3f> boneScales = new ArrayList<>();
             for (Bone bone : bones) {
-                boneLocations.add(new Vector3f(JomlUtil.from(bone.getLocalPosition())));
-                boneRotations.add(new Quat4f(JomlUtil.from(bone.getLocalRotation())));
-                boneScales.add(new Vector3f(JomlUtil.from(bone.getLocalScale())));
+                boneLocations.add(new org.joml.Vector3f(bone.getLocalPosition()));
+                boneRotations.add(new Quaternionf(bone.getLocalRotation()));
+                boneScales.add(new org.joml.Vector3f(bone.getLocalScale()));
             }
             MeshAnimationFrame frame = new MeshAnimationFrame(boneLocations, boneRotations, boneScales);
             channelReaders.forEach(x -> x.updateFrame(time, frame));
@@ -164,20 +165,20 @@ public class GLTFAnimationFormat extends GLTFCommonFormat<MeshAnimationBundleDat
         return floats;
     }
 
-    private List<Vector3f> getVector3fs(GLTF gltf, List<byte[]> loadedBuffers, int accessorIndex) throws IOException {
+    private List<org.joml.Vector3f> getVector3fs(GLTF gltf, List<byte[]> loadedBuffers, int accessorIndex) throws IOException {
         TFloatList floats = getFloats(gltf, loadedBuffers, accessorIndex);
-        List<Vector3f> vectors = Lists.newArrayListWithCapacity(floats.size() / 3);
+        List<org.joml.Vector3f> vectors = Lists.newArrayListWithCapacity(floats.size() / 3);
         for (int i = 0; i < floats.size(); i += 3) {
-            vectors.add(new Vector3f(floats.get(i), floats.get(i + 1), floats.get(i + 2)));
+            vectors.add(new org.joml.Vector3f(floats.get(i), floats.get(i + 1), floats.get(i + 2)));
         }
         return vectors;
     }
 
-    private List<Quat4f> getQuat4fs(GLTF gltf, List<byte[]> loadedBuffers, int accessorIndex) throws IOException {
+    private List<Quaternionf> getQuat4fs(GLTF gltf, List<byte[]> loadedBuffers, int accessorIndex) throws IOException {
         TFloatList floats = getFloats(gltf, loadedBuffers, accessorIndex);
-        List<Quat4f> quats = Lists.newArrayListWithCapacity(floats.size() / 4);
+        List<Quaternionf> quats = Lists.newArrayListWithCapacity(floats.size() / 4);
         for (int i = 0; i < floats.size(); i += 4) {
-            quats.add(new Quat4f(floats.get(i), floats.get(i + 1), floats.get(i + 2), floats.get(i + 3)));
+            quats.add(new Quaternionf(floats.get(i), floats.get(i + 1), floats.get(i + 2), floats.get(i + 3)));
         }
         return quats;
     }
