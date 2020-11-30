@@ -15,6 +15,7 @@
  */
 package org.terasology.logic.console.commands;
 
+import org.joml.Vector3f;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
@@ -100,7 +101,7 @@ public class ClientCommands extends BaseComponentSystem {
         if (clientInfo.hasComponent(StaticSpawnLocationComponent.class)) {
             staticSpawnLocationComponent = clientInfo.getComponent(StaticSpawnLocationComponent.class);
         }
-        staticSpawnLocationComponent.position = sender.getComponent(ClientComponent.class).character.getComponent(LocationComponent.class).getWorldPosition();
+        staticSpawnLocationComponent.position = sender.getComponent(ClientComponent.class).character.getComponent(LocationComponent.class).getWorldPosition(new Vector3f());
         clientInfo.addOrSaveComponent(staticSpawnLocationComponent);
         return "Set spawn location to- " + staticSpawnLocationComponent.position;
     }
