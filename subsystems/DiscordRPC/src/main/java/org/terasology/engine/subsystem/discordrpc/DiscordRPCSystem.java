@@ -14,6 +14,8 @@ import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
 import org.terasology.registry.In;
 
+import java.time.OffsetDateTime;
+
 /**
  * It's a system that runs when a single player or multi player game has been started to process some stuff throw the
  * {@link DiscordRPCSubSystem}.
@@ -21,7 +23,7 @@ import org.terasology.registry.In;
  * @see DiscordRPCSubSystem
  */
 @RegisterSystem(RegisterMode.CLIENT)
-public class DiscordRPCSystem extends BaseComponentSystem {
+public final class DiscordRPCSystem extends BaseComponentSystem {
 
     @In
     private Game game;
@@ -31,6 +33,43 @@ public class DiscordRPCSystem extends BaseComponentSystem {
 
     @In
     private NetworkSystem networkSystem;
+
+    @Override
+    public void initialise() {
+        DiscordRPCSubSystem.discover();
+    }
+
+    @Override
+    public void preBegin() {
+        DiscordRPCSubSystem.setState(getGame());
+        DiscordRPCSubSystem.setStartTimestamp(null);
+    }
+
+    @Override
+    public void postBegin() {
+        DiscordRPCSubSystem.setStartTimestamp(OffsetDateTime.now());
+    }
+
+    @Override
+    public void shutdown() {
+        DiscordRPCSubSystem.setState("In Main Menu");
+        DiscordRPCSubSystem.setStartTimestamp(null);
+    }
+
+    @ReceiveEvent
+    public void onAfk(AfkEvent event, EntityRef entityRef) {
+        if (isServer() && player.getClientEntity().equals(entityRef)) {
+            return;
+        }
+
+        if (event.isAfk()) {
+            DiscordRPCSubSystem.setState("Idle");
+            DiscordRPCSubSystem.setStartTimestamp(null);
+        } else {
+            DiscordRPCSubSystem.setState(getGame());
+            DiscordRPCSubSystem.setStartTimestamp(OffsetDateTime.now());
+        }
+    }
 
     public String getGame() {
         NetworkMode networkMode = networkSystem.getMode();
@@ -43,50 +82,8 @@ public class DiscordRPCSystem extends BaseComponentSystem {
         return mode;
     }
 
-    @ReceiveEvent
-    public void onAfk(AfkEvent event, EntityRef entityRef) {
-        if (requireConnection() && player.getClientEntity().equals(entityRef)) {
-            return;
-        }
-        if (event.isAfk()) {
-            disableDiscord();
-        } else {
-            enableDiscord();
-        }
-    }
-
-    private boolean requireConnection() {
+    private boolean isServer() {
         NetworkMode networkMode = networkSystem.getMode();
         return networkMode != NetworkMode.CLIENT && networkMode != NetworkMode.DEDICATED_SERVER;
-    }
-
-    private void enableDiscord() {
-        DiscordRPCSubSystem.tryToDiscover();
-        DiscordRPCSubSystem.setState("Idle", true);
-    }
-
-    private void disableDiscord() {
-        DiscordRPCSubSystem.tryToDiscover();
-        DiscordRPCSubSystem.setState(getGame(), true);
-    }
-
-    @Override
-    public void initialise() {
-        DiscordRPCSubSystem.tryToDiscover();
-    }
-
-    @Override
-    public void preBegin() {
-        DiscordRPCSubSystem.setState(getGame(), false);
-    }
-
-    @Override
-    public void postBegin() {
-        DiscordRPCSubSystem.setState(getGame(), true);
-    }
-
-    @Override
-    public void shutdown() {
-        DiscordRPCSubSystem.setState("In Main Menu", false, false);
     }
 }
