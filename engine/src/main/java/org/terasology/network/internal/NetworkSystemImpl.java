@@ -255,8 +255,10 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
                 connectCheck.channel().closeFuture().sync();
             } catch (Exception e) {
                 shutdown();
-                connectCheck.cancel(true);
-                connectCheck.channel().closeFuture().awaitUninterruptibly();
+                if (connectCheck != null) {
+                    connectCheck.cancel(true);
+                    connectCheck.channel().closeFuture().awaitUninterruptibly();
+                }
                 throw e;
             }
         }
