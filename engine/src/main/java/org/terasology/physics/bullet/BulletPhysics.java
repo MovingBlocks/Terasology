@@ -727,7 +727,7 @@ public class BulletPhysics implements PhysicsEngine {
         CharacterMovementComponent characterMovementComponent =
             entityRef.getComponent(CharacterMovementComponent.class);
         if (characterMovementComponent != null) {
-            return new btCapsuleShape(characterMovementComponent.radius, characterMovementComponent.height);
+            return new btCapsuleShape(characterMovementComponent.pickupRadius, characterMovementComponent.height - 2 * characterMovementComponent.radius);
         }
         logger.error("Creating physics object that requires a ShapeComponent or CharacterMovementComponent, but has " +
             "neither. Entity: {}", entityRef);
