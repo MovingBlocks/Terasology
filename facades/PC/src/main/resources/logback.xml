@@ -48,5 +48,6 @@
   <logger name="org.terasology" level="${logOverrideLevel:-info}" />
   <logger name="org.reflections.Reflections" level="${logOverrideLevel:-error}" />
   <logger name="com.snowplowanalytics" level="${logOverrideLevel:-error}" />
+  <logger name="io.netty" level="${logOverrideLevel:-warn}" />
   
 </configuration>
