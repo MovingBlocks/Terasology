@@ -56,11 +56,11 @@ import org.terasology.world.propagation.light.InternalLightProcessor;
 import org.terasology.world.propagation.light.LightMerger;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -94,7 +94,7 @@ public class LocalChunkProvider implements ChunkProvider {
     private final BlockingQueue<TShortObjectMap<TIntList>> deactivateBlocksQueue = Queues.newLinkedBlockingQueue();
     private final Map<Vector3i, Chunk> chunkCache;
 
-    private final Map<org.joml.Vector3i, List<EntityStore>> generateQueuedEntities = new HashMap<>();
+    private final Map<org.joml.Vector3i, List<EntityStore>> generateQueuedEntities = new ConcurrentHashMap<>();
 
     private final StorageManager storageManager;
     private final WorldGenerator generator;
