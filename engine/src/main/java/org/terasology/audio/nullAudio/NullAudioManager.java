@@ -25,8 +25,6 @@ import org.terasology.audio.StaticSound;
 import org.terasology.audio.StaticSoundData;
 import org.terasology.audio.StreamingSound;
 import org.terasology.audio.StreamingSoundData;
-import org.terasology.math.geom.Quat4f;
-import org.terasology.math.geom.Vector3f;
 
 /**
  * Null implementation of the AudioManager
@@ -54,10 +52,6 @@ public class NullAudioManager implements AudioManager {
     }
 
     @Override
-    public void playSound(StaticSound sound, Vector3f position) {
-    }
-
-    @Override
     public void playSound(StaticSound sound, Vector3fc position) {
     }
 
@@ -66,19 +60,12 @@ public class NullAudioManager implements AudioManager {
     }
 
     @Override
-    public void playSound(StaticSound sound, Vector3f position, float volume, int priority) {
-    }
-
-    @Override
     public void playSound(StaticSound sound, Vector3fc position, float volume, int priority) {
     }
 
     @Override
-    public void playSound(StaticSound sound, Vector3f position, float volume, int priority, AudioEndListener endListener) {
-    }
-
-    @Override
-    public void playSound(StaticSound sound, Vector3fc position, float volume, int priority, AudioEndListener endListener) {
+    public void playSound(StaticSound sound, Vector3fc position, float volume, int priority,
+                          AudioEndListener endListener) {
     }
 
     @Override
@@ -99,10 +86,6 @@ public class NullAudioManager implements AudioManager {
 
     @Override
     public void update(float delta) {
-    }
-
-    @Override
-    public void updateListener(Vector3f position, Quat4f orientation, Vector3f velocity) {
     }
 
     @Override
