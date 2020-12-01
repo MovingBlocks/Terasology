@@ -1,19 +1,5 @@
-/*
- * Copyright 2013 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.logic.players;
 
 import org.terasology.config.Config;
@@ -31,6 +17,8 @@ import org.terasology.input.events.KeyEvent;
 import org.terasology.input.events.MouseAxisEvent;
 import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.debug.DebugProperties;
+import org.terasology.logic.time.TimeResynchEvent;
+import org.terasology.logic.players.event.WorldtimeResetEvent;
 import org.terasology.network.ClientComponent;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.NUIManager;
@@ -79,7 +67,7 @@ public class DebugControlSystem extends BaseComponentSystem {
 
 
     /**
-     * Creates illusion of time flying by if correspondig key is held down.
+     * Creates illusion of time flying by if corresponding key is held down.
      * Up / Down : Increases / Decreases time of day by 0.005 per keystroke.
      * Right / left : Increases / Decreases time of day by 0.02 per keystroke.
      * @param entity The player entity that triggered the time change.
@@ -91,27 +79,23 @@ public class DebugControlSystem extends BaseComponentSystem {
         if (debugEnabled && event.isDown()) {
             switch (event.getKey().getId()) {
                 case Keyboard.KeyId.UP:
-                    world.getTime().setDays(world.getTime().getDays() + 0.005f);
-                    event.consume();
+                    timeTravel(entity, event, 0.005f);
                     break;
                 case Keyboard.KeyId.DOWN:
-                    world.getTime().setDays(world.getTime().getDays() - 0.005f);
-                    event.consume();
+                    timeTravel(entity, event, -0.005f);
                     break;
                 case Keyboard.KeyId.RIGHT:
-                    world.getTime().setDays(world.getTime().getDays() + 0.02f);
-                    event.consume();
+                	timeTravel(entity, event, 0.02f);
                     break;
                 case Keyboard.KeyId.LEFT:
-                    world.getTime().setDays(world.getTime().getDays() - 0.02f);
-                    event.consume();
+                    timeTravel(entity, event, -0.02f);
                     break;
                 default:
                     break;
             }
         }
     }
-
+    
     @ReceiveEvent(components = ClientComponent.class)
     public void onKeyDown(KeyDownEvent event, EntityRef entity) {
         boolean debugEnabled = config.getSystem().isDebugEnabled();
@@ -166,6 +150,19 @@ public class DebugControlSystem extends BaseComponentSystem {
         if (!mouseGrabbed) {
             event.consume();
         }
+    }
+    
+    /**
+     * Ensures every player on the server has their time updated when
+     * a KeyEvent is triggered in Debug mode.
+     * @param entity The player entity that triggered the time change.
+     * @param event The KeyEvent which triggered the time change.
+     * @param timeDiff The time (in days) to add/retrieve.
+     */
+    private void timeTravel(EntityRef entity, KeyEvent event, float timeDiff) {
+    	float timeInDays = world.getTime().getDays();
+    	entity.send(new WorldtimeResetEvent(timeInDays + timeDiff));
+        event.consume();
     }
 
 }
