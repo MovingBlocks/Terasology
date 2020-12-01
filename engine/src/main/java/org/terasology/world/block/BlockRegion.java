@@ -133,6 +133,16 @@ public class BlockRegion {
     }
 
     /**
+     * set source to current region
+     * @param source the source region
+     * @return this
+     */
+    public BlockRegion set(BlockRegion source) {
+        this.aabb.set(source.aabb);
+        return this;
+    }
+
+    /**
      * Sets the minimum coordinate of the first block for <code>this</code> {@link BlockRegion}
      *
      * @param min the first coordinate of the first block
