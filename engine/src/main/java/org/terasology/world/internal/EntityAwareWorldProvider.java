@@ -196,7 +196,7 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
         }
 
         OnChangedBlock changedEvent = new OnChangedBlock(pos, type, oldType);
-        EntityRef regionEntity = blockRegionLookup.get(pos);
+        EntityRef regionEntity = blockRegionLookup.get(JomlUtil.from(pos));
         if (regionEntity != null) {
             regionEntity.send(changedEvent);
         }
@@ -410,7 +410,7 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
     @Override
     public EntityRef getExistingEntityAt(Vector3ic blockPosition) {
         if (GameThread.isCurrentThread()) {
-            EntityRef result = blockRegionLookup.get(JomlUtil.from(blockPosition));
+            EntityRef result = blockRegionLookup.get((org.joml.Vector3i) blockPosition);
             if (result == null) {
                 return getExistingBlockEntityAt(blockPosition);
             }
