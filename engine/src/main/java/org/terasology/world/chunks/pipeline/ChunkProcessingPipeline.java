@@ -96,7 +96,9 @@ public class ChunkProcessingPipeline {
                 onStageDone(future, chunkProcessingInfo);
             }
         } catch (InterruptedException e) {
-            logger.error("Reactor thread was interrupted", e);
+            if (!executor.isTerminated()) {
+                logger.error("Reactor thread was interrupted", e);
+            }
             reactor.interrupt();
         }
     }
@@ -225,10 +227,10 @@ public class ChunkProcessingPipeline {
 
     public void shutdown() {
         executor.shutdown();
-
         chunkProcessingInfoMap.keySet().forEach(this::stopProcessingAt);
         chunkProcessingInfoMap.clear();
         executor.getQueue().clear();
+        reactor.interrupt();
     }
 
     public void restart() {
