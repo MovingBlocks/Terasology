@@ -19,6 +19,7 @@ package org.terasology.world.generator;
 import org.terasology.engine.SimpleUri;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.spawner.FixedSpawner;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.world.chunks.CoreChunk;
 import org.terasology.world.generation.EntityBuffer;
@@ -89,6 +90,6 @@ public interface WorldGenerator {
      * @return the chosen position
      */
     default Vector3f getSpawnPosition(EntityRef entity) {
-        return new FixedSpawner(0, 0).getSpawnPosition(getWorld(), entity);
+        return JomlUtil.from(new FixedSpawner(0, 0).getSpawnPosition(getWorld(), entity));
     }
 }
