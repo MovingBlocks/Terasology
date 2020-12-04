@@ -297,6 +297,9 @@ public class LocalChunkProvider implements ChunkProvider {
 
             }
         }
+        if (unloaded > 0) {
+            logger.debug("Unload {} chunks", unloaded);
+        }
         PerformanceMonitor.endActivity();
     }
 

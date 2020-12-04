@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.monitoring.ThreadActivity;
 import org.terasology.monitoring.ThreadMonitor;
+import org.terasology.utilities.ReflectionUtil;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.pipeline.stages.ChunkTask;
 import org.terasology.world.chunks.pipeline.stages.ChunkTaskProvider;
@@ -24,10 +25,10 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CompletionService;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.Future;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.RunnableFuture;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -43,17 +44,16 @@ import java.util.stream.Collectors;
  */
 public class ChunkProcessingPipeline {
 
-    private static final int NUM_TASK_THREADS = 8;
+    private static final int NUM_TASK_THREADS = 4;
     private static final Logger logger = LoggerFactory.getLogger(ChunkProcessingPipeline.class);
 
     private final List<ChunkTaskProvider> stages = Lists.newArrayList();
     private final Thread reactor;
-    private final ExecutorCompletionService<Chunk> chunkProcessor;
+    private final CompletionService<Chunk> chunkProcessor;
     private final ThreadPoolExecutor executor;
-    private int threadIndex;
-
     private final Function<Vector3ic, Chunk> chunkProvider;
     private final Map<Vector3ic, ChunkProcessingInfo> chunkProcessingInfoMap = Maps.newConcurrentMap();
+    private int threadIndex;
 
     /**
      * Create ChunkProcessingPipeline.
@@ -65,7 +65,7 @@ public class ChunkProcessingPipeline {
                 NUM_TASK_THREADS,
                 NUM_TASK_THREADS, 0L,
                 TimeUnit.MILLISECONDS,
-                new LinkedBlockingQueue<>(),
+                new PriorityBlockingQueue(800, unwrappingComporator(comparable)),
                 this::threadFactory,
                 this::rejectQueueHandler) {
             @Override
@@ -80,6 +80,18 @@ public class ChunkProcessingPipeline {
         reactor.setDaemon(true);
         reactor.setName("Chunk-Processing-Reactor");
         reactor.start();
+    }
+
+    /**
+     * BlackMagic method: {@link ExecutorCompletionService} wraps task with QueueingFuture (private access)
+     * there takes wrapped task for comparing in {@link ThreadPoolExecutor}
+     */
+    private Comparator unwrappingComporator(Comparator<Future<Chunk>> comparable) {
+        return (o1, o2) -> {
+                Object unwrapped1 = ReflectionUtil.readField(o1, "task");
+                Object unwrapped2 = ReflectionUtil.readField(o2, "task");
+                return comparable.compare((Future<Chunk>) unwrapped1, (Future<Chunk>) unwrapped2);
+        };
     }
 
     /**
