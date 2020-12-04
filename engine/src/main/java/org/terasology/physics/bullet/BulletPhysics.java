@@ -579,7 +579,6 @@ public class BulletPhysics implements PhysicsEngine {
 
     private void removeCollider(btCollisionObject collider) {
         discreteDynamicsWorld.removeCollisionObject(collider);
-//        collider.getCollisionShape().dispose();
         collider.dispose();
     }
 
