@@ -9,6 +9,7 @@ import org.joml.Vector3fc;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
 
+import java.util.Arrays;
 import java.util.Iterator;
 
 public final class BlockRegions {
@@ -58,6 +59,16 @@ public final class BlockRegions {
         return new BlockRegion()
                 .setMin(new Vector3i(min, RoundingMode.CEILING))
                 .setMax(new Vector3i(max, RoundingMode.FLOOR));
+    }
+
+    /**
+     * Creates a new region spanning the smallest axis-aligned bounding box (AABB) containing all the given positions.
+     *
+     * @param positions the positions that must be contained in the resulting block region
+     * @return a new block region containing all given positions
+     */
+    public static BlockRegion encompassing(Vector3ic... positions) {
+        return Arrays.stream(positions).reduce(new BlockRegion(), BlockRegion::union, BlockRegion::union);
     }
 
     /**
