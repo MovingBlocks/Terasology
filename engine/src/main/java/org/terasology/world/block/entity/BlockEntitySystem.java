@@ -111,7 +111,7 @@ public class BlockEntitySystem extends BaseComponentSystem {
                     }
                 } else {
                     // just drop the ActAsBlock block
-                    Vector3i location = new Vector3i(JomlUtil.from(blockRegion.region.center(new Vector3f())), RoundingMode.HALF_UP);
+                    Vector3i location = JomlUtil.from(new org.joml.Vector3i(blockRegion.region.center(new Vector3f()), org.joml.RoundingMode.HALF_UP));
                     commonDefaultDropsHandling(event, entity, location, blockComponent.block.getArchetypeBlock());
                 }
             } else if (entity.hasComponent(LocationComponent.class)) {
