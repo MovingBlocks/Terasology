@@ -17,7 +17,13 @@ public final class BlockRegions {
     }
 
     /**
-     * Creates a new region spanning the smallest axis-aligned bounding box (AABB) containing both, min and max
+     * Creates a new region spanning the smallest axis-aligned bounding box (AABB) containing both, min and max.
+     * <p>
+     * Note that each component of {@code min} should be smaller or equal to the respective component in {@code max}. If
+     * a dimension of {@code min} is greater than the respective dimension of {@code max} the resulting block region
+     * will have a size of 0 along that dimension.
+     * <p>
+     * Consider using {@link #encompassing(Vector3ic...)} as an alternative.
      *
      * @return new block region
      */
@@ -26,7 +32,13 @@ public final class BlockRegions {
     }
 
     /**
-     * Creates a new region spanning the smallest axis-aligned bounding box (AABB) containing both, min and max
+     * Creates a new region spanning the smallest axis-aligned bounding box (AABB) containing both, min and max.
+     * <p>
+     * Note that each component of {@code min} should be smaller or equal to the respective component in {@code max}. If
+     * a dimension of {@code min} is greater than the respective dimension of {@code max} the resulting block region
+     * will have a size of 0 along that dimension.
+     * <p>
+     * Consider using {@link #encompassing(Vector3ic...)} as an alternative.
      *
      * @return new block region
      */
