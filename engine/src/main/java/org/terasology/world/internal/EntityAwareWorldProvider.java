@@ -515,6 +515,7 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
         Prefab prefab = entity.getParentPrefab();
 
         for (Component comp : entity.iterateComponents()) {
+            //TODO: should this also check for components listed in `RetainComponentsComponent`?
             if (!COMMON_BLOCK_COMPONENTS.contains(comp.getClass()) && (prefab == null || !prefab.hasComponent(comp.getClass()))) {
                 entity.removeComponent(comp.getClass());
             }
