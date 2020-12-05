@@ -12,7 +12,6 @@ import org.terasology.world.block.BlockRegion;
 public class BlockRegionComponent implements Component {
     @Replicate
     public BlockRegion region = new BlockRegion();
-    public boolean overrideBlockEntities = true;
 
     public BlockRegionComponent() {
     }
