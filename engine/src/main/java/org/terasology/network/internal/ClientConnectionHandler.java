@@ -81,6 +81,7 @@ public class ClientConnectionHandler extends ChannelInboundHandlerAdapter {
                         logger.error("Server timeout threshold of {} ms exceeded.", timeoutThreshold);
                     }
                 }
+                Thread.currentThread().stop();
             }
         }, timeoutThreshold + 200);
     }
