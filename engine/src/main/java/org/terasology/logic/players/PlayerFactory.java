@@ -32,7 +32,6 @@ import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.characters.CharacterMovementComponent;
 import org.terasology.logic.location.Location;
 import org.terasology.logic.location.LocationComponent;
-import org.terasology.math.JomlUtil;
 import org.terasology.math.SpiralIterable;
 import org.terasology.math.TeraMath;
 import org.terasology.world.WorldProvider;
@@ -66,12 +65,12 @@ public class PlayerFactory {
 
         LocationComponent location = controller.getComponent(LocationComponent.class);
         Vector3f spawnPosition = findSpawnPositionFromLocationComponent(location);
-        location.setWorldPosition(JomlUtil.from(spawnPosition));
+        location.setWorldPosition(spawnPosition);
         controller.saveComponent(location);
 
         logger.debug("Spawing player at: {}", spawnPosition);
 
-        builder.getComponent(LocationComponent.class).setWorldPosition(JomlUtil.from(spawnPosition));
+        builder.getComponent(LocationComponent.class).setWorldPosition(spawnPosition);
         builder.setOwner(controller);
 
         CharacterComponent playerComponent = builder.getComponent(CharacterComponent.class);
@@ -88,7 +87,7 @@ public class PlayerFactory {
         EntityBuilder builder = entityManager.newBuilder("engine:player");
         float extraSpace = 0.5f;  // spawn a little bit above the ground
         float entityHeight = getHeightOf(builder) + extraSpace;
-        return findSpawnPos(JomlUtil.from(locationComponent.getWorldPosition()), entityHeight)
+        return findSpawnPos(locationComponent.getWorldPosition(new Vector3f()), entityHeight)
                 // TODO: Handle Optional being empty
                 .orElseThrow(() -> new RuntimeException("Failed to find an acceptable spawn location."));
     }

@@ -23,6 +23,7 @@ import org.terasology.math.geom.Vector3f;
  * Represents a space transformation. Used for transforming points from one space to another space and
  * vice versa.
  */
+@Deprecated
 public class Transform {
     /**
      * The origin vector (in global coordinates) of this transform.

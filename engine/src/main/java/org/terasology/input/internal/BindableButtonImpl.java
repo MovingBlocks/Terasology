@@ -17,6 +17,8 @@ package org.terasology.input.internal;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import org.joml.Vector3fc;
+import org.joml.Vector3ic;
 import org.terasology.engine.SimpleUri;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.input.ActivateMode;
@@ -25,8 +27,6 @@ import org.terasology.input.BindButtonSubscriber;
 import org.terasology.input.BindableButton;
 import org.terasology.input.ButtonState;
 import org.terasology.input.Input;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector3i;
 
 import java.util.List;
 import java.util.Set;
@@ -54,7 +54,7 @@ public class BindableButtonImpl implements BindableButton {
     private boolean consumedActivation;
 
     /**
-     * 
+     *
      * @param id The id of the binding
      * @param displayName Readable name of the binding
      * @param event The event to send when the binding is updated
@@ -141,9 +141,9 @@ public class BindableButtonImpl implements BindableButton {
                                    float delta,
                                    EntityRef[] inputEntities,
                                    EntityRef target,
-                                   Vector3i targetBlockPos,
-                                   Vector3f hitPosition,
-                                   Vector3f hitNormal,
+                                   Vector3ic targetBlockPos,
+                                   Vector3fc hitPosition,
+                                   Vector3fc hitNormal,
                                    boolean initialKeyConsumed,
                                    long gameTimeInMs) {
         boolean keyConsumed = initialKeyConsumed;
@@ -158,7 +158,10 @@ public class BindableButtonImpl implements BindableButton {
                 }
                 if (!keyConsumed) {
                     buttonEvent.prepare(id, ButtonState.DOWN, delta);
-                    buttonEvent.setTargetInfo(target, targetBlockPos, hitPosition, hitNormal);
+                    buttonEvent.setTargetInfo(target,
+                        targetBlockPos,
+                        hitPosition,
+                        hitNormal);
                     for (EntityRef entity : inputEntities) {
                         entity.send(buttonEvent);
                         if (buttonEvent.isConsumed()) {
@@ -176,7 +179,10 @@ public class BindableButtonImpl implements BindableButton {
                 }
                 if (!keyConsumed) {
                     buttonEvent.prepare(id, ButtonState.UP, delta);
-                    buttonEvent.setTargetInfo(target, targetBlockPos, hitPosition, hitNormal);
+                    buttonEvent.setTargetInfo(target,
+                        targetBlockPos,
+                        hitPosition,
+                        hitNormal);
                     for (EntityRef entity : inputEntities) {
                         entity.send(buttonEvent);
                         if (buttonEvent.isConsumed()) {
@@ -194,9 +200,9 @@ public class BindableButtonImpl implements BindableButton {
     public void update(EntityRef[] inputEntities,
                        float delta,
                        EntityRef target,
-                       Vector3i targetBlockPos,
-                       Vector3f hitPosition,
-                       Vector3f hitNormal,
+                       Vector3ic targetBlockPos,
+                       Vector3fc hitPosition,
+                       Vector3fc hitNormal,
                        long gameTimeInMs) {
         long activateTime = gameTimeInMs;
         if (repeating && getState() == ButtonState.DOWN && mode.isActivatedOnPress() && activateTime - lastActivateTime > repeatTime) {
@@ -205,7 +211,10 @@ public class BindableButtonImpl implements BindableButton {
                 boolean consumed = triggerOnRepeat(delta, target);
                 if (!consumed) {
                     buttonEvent.prepare(id, ButtonState.REPEAT, delta);
-                    buttonEvent.setTargetInfo(target, targetBlockPos, hitPosition, hitNormal);
+                    buttonEvent.setTargetInfo(target,
+                        targetBlockPos,
+                        hitPosition,
+                        hitNormal);
                     for (EntityRef entity : inputEntities) {
                         entity.send(buttonEvent);
                         if (buttonEvent.isConsumed()) {

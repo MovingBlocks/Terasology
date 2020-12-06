@@ -48,6 +48,7 @@ import org.terasology.logic.health.EngineDamageTypes;
 import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.PlayerCharacterComponent;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkSystem;
@@ -226,17 +227,20 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
         if (!onItemUseEvent.isConsumed()) {
             EntityRef gazeEntity = GazeAuthoritySystem.getGazeEntityForCharacter(character);
             LocationComponent gazeLocation = gazeEntity.getComponent(LocationComponent.class);
-            Vector3f direction = gazeLocation.getWorldDirection();
-            Vector3f originPos = gazeLocation.getWorldPosition();
+            org.joml.Vector3f direction = gazeLocation.getWorldDirection(new org.joml.Vector3f());
+            org.joml.Vector3f originPos = gazeLocation.getWorldPosition(new org.joml.Vector3f());
             if (recordAndReplayCurrentStatus.getStatus() == RecordAndReplayStatus.RECORDING) {
-                directionAndOriginPosRecorderList.getAttackEventDirectionAndOriginPosRecorder().add(direction, originPos);
+                directionAndOriginPosRecorderList.getAttackEventDirectionAndOriginPosRecorder().add(direction,
+                    originPos);
             } else if (recordAndReplayCurrentStatus.getStatus() == RecordAndReplayStatus.REPLAYING) {
-                Vector3f[] data = directionAndOriginPosRecorderList.getAttackEventDirectionAndOriginPosRecorder().poll();
+                org.joml.Vector3f[] data =
+                    directionAndOriginPosRecorderList.getAttackEventDirectionAndOriginPosRecorder().poll();
                 direction = data[0];
                 originPos = data[1];
             }
 
-            HitResult result = physics.rayTrace(originPos, direction, characterComponent.interactionRange, Sets.newHashSet(character), DEFAULTPHYSICSFILTER);
+            HitResult result = physics.rayTrace(originPos, direction, characterComponent.interactionRange,
+                Sets.newHashSet(character), DEFAULTPHYSICSFILTER);
 
             if (result.isHit()) {
                 result.getEntity().send(new AttackEvent(character, event.getItem()));
@@ -299,15 +303,6 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
         }
     }
 
-    private boolean vectorsAreAboutEqual(Vector3f v1, Vector3f v2) {
-        Vector3f delta = new Vector3f();
-        delta.add(v1);
-        delta.sub(v2);
-        float epsilon = 0.0001f;
-        float deltaSquared = delta.lengthSquared();
-        return deltaSquared < epsilon;
-    }
-
     private String getPlayerNameFromCharacter(EntityRef character) {
         CharacterComponent characterComponent = character.getComponent(CharacterComponent.class);
         if (characterComponent == null) {
@@ -330,15 +325,15 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
         CharacterComponent characterComponent = character.getComponent(CharacterComponent.class);
         EntityRef camera = GazeAuthoritySystem.getGazeEntityForCharacter(character);
         LocationComponent location = camera.getComponent(LocationComponent.class);
-        Vector3f direction = location.getWorldDirection();
-        if (!(vectorsAreAboutEqual(event.getDirection(), direction))) {
+        org.joml.Vector3f direction = location.getWorldDirection(new org.joml.Vector3f());
+        if (!(event.getDirection().equals(direction, 0.0001f))) {
             logger.error("Direction at client {} was different than direction at server {}", event.getDirection(), direction);
         }
         // Assume the exact same value in case there are rounding mistakes:
         direction = event.getDirection();
 
-        Vector3f originPos = location.getWorldPosition();
-        if (!(vectorsAreAboutEqual(event.getOrigin(), originPos))) {
+        org.joml.Vector3f originPos = location.getWorldPosition(new org.joml.Vector3f());
+        if (!(event.getOrigin().equals(originPos, 0.0001f))) {
             String msg = "Player {} seems to have cheated: It stated that it performed an action from {} but the predicted position is {}";
             logger.info(msg, getPlayerNameFromCharacter(character), event.getOrigin(), originPos);
             return false;
@@ -389,7 +384,7 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
                 return false;
             }
 
-            if (!(vectorsAreAboutEqual(event.getHitPosition(), result.getHitPoint()))) {
+            if (!(event.getHitPosition().equals(result.getHitPoint(), 0.0001f))) {
                 String msg = "Denied activation attempt by {} since at the authority the object got hit at a differnt position";
                 logger.info(msg, getPlayerNameFromCharacter(character));
                 return false;
@@ -401,7 +396,7 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
                 logger.info(msg, getPlayerNameFromCharacter(character));
                 return false;
             }
-            if (!(vectorsAreAboutEqual(event.getHitPosition(), originPos))) {
+            if (!(event.getHitPosition().equals(originPos, 0.0001f))) {
                 String msg = "Denied activation attempt by {} since the event was not properly labeled as having a hit postion";
                 logger.info(msg, getPlayerNameFromCharacter(character));
                 return false;
@@ -482,8 +477,8 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
         // Scaling a character up will grow them into the ground. We would need to adjust the vertical position to be
         // safely above ground.
         Optional.ofNullable(entity.getComponent(LocationComponent.class))
-                .map(LocationComponent::getWorldPosition)
-                .map(location -> location.addY((event.getNewValue() - event.getOldValue()) / 2f))
+                .map(k -> k.getWorldPosition(new org.joml.Vector3f()))
+                .map(location -> location.add(0,(event.getNewValue() - event.getOldValue()) / 2f,0))
                 .ifPresent(location -> entity.send(new CharacterTeleportEvent(location)));
     }
 

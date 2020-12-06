@@ -18,9 +18,11 @@ package org.terasology.world.chunks.internal;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.Sets;
+import org.joml.Vector3ic;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.ChunkMath;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.Region3i;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.world.chunks.Chunk;
@@ -58,7 +60,7 @@ public class ChunkRelevanceRegion {
     }
 
     public Vector3i getCenter() {
-        return new Vector3i(center);
+        return center;
     }
 
     public void setRelevanceDistance(Vector3i distance) {
@@ -77,7 +79,7 @@ public class ChunkRelevanceRegion {
         while (iter.hasNext()) {
             Vector3i pos = iter.next();
             if (!retainRegion.encompasses(pos)) {
-                sendChunkIrrelevant(pos);
+                sendChunkIrrelevant(JomlUtil.from(pos));
                 iter.remove();
             }
         }
@@ -141,11 +143,11 @@ public class ChunkRelevanceRegion {
 
     private void sendChunkRelevant(Chunk chunk) {
         if (listener != null) {
-            listener.onChunkRelevant(chunk.getPosition(), chunk);
+            listener.onChunkRelevant(chunk.getPosition(new org.joml.Vector3i()), chunk);
         }
     }
 
-    private void sendChunkIrrelevant(Vector3i pos) {
+    private void sendChunkIrrelevant(Vector3ic pos) {
         if (listener != null) {
             listener.onChunkIrrelevant(pos);
         }
@@ -192,7 +194,7 @@ public class ChunkRelevanceRegion {
     public void chunkUnloaded(Vector3i pos) {
         if (relevantChunks.contains(pos)) {
             relevantChunks.remove(pos);
-            sendChunkIrrelevant(pos);
+            sendChunkIrrelevant(JomlUtil.from(pos));
         }
     }
 

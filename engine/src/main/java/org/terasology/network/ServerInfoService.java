@@ -1,31 +1,20 @@
-/*
- * Copyright 2015 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *  http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.network;
 
-import org.jboss.netty.bootstrap.ClientBootstrap;
-import org.jboss.netty.channel.Channel;
-import org.jboss.netty.channel.ChannelFuture;
-import org.jboss.netty.channel.socket.nio.NioClientSocketChannelFactory;
+import com.google.common.util.concurrent.SettableFuture;
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelOption;
+import io.netty.channel.EventLoopGroup;
+import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.nio.NioSocketChannel;
 import org.terasology.network.internal.ServerInfoRequestHandler;
 import org.terasology.network.internal.pipelineFactory.InfoRequestPipelineFactory;
 
 import java.net.InetSocketAddress;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 /**
@@ -33,37 +22,52 @@ import java.util.concurrent.Future;
  */
 public class ServerInfoService implements AutoCloseable {
 
-    private final ClientBootstrap bootstrap;
-    private final NioClientSocketChannelFactory factory;
-    private final ExecutorService pool;
+    private final Bootstrap bootstrap;
+    private final EventLoopGroup eventLoopGroup;
 
     public ServerInfoService() {
-        pool = Executors.newCachedThreadPool();
-        factory = new NioClientSocketChannelFactory(pool, pool, 1, 1);
-        bootstrap = new ClientBootstrap(factory);
-        bootstrap.setPipelineFactory(new InfoRequestPipelineFactory());
-        bootstrap.setOption("tcpNoDelay", true);
-        bootstrap.setOption("keepAlive", true);
+        eventLoopGroup = new NioEventLoopGroup();
+        bootstrap = new Bootstrap();
+        bootstrap.group(eventLoopGroup);
+        bootstrap.channel(NioSocketChannel.class);
+        bootstrap.handler(new InfoRequestPipelineFactory());
+        bootstrap.option(ChannelOption.TCP_NODELAY, true);
+        bootstrap.option(ChannelOption.SO_KEEPALIVE, true);
+        bootstrap.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 10000);
     }
 
     public Future<ServerInfoMessage> requestInfo(final String address, final int port) {
-        return pool.submit(() -> {
-            InetSocketAddress remoteAddress = new InetSocketAddress(address, port);
-            ChannelFuture connectCheck = bootstrap.connect(remoteAddress);
-            connectCheck.syncUninterruptibly();
-            Channel channel = connectCheck.getChannel();
-            channel.getCloseFuture().syncUninterruptibly();
-
-            ServerInfoRequestHandler handler = channel.getPipeline().get(ServerInfoRequestHandler.class);
-            ServerInfoMessage serverInfo = handler.getServerInfo();
-            return serverInfo;
-
+        SettableFuture<ServerInfoMessage> resultFuture = SettableFuture.create();
+        InetSocketAddress remoteAddress = new InetSocketAddress(address, port);
+        ChannelFuture connectCheck = bootstrap.connect(remoteAddress)
+                .addListener(connectFuture -> {
+                    if (!connectFuture.isSuccess()) {
+                        if (connectFuture.cause() != null && connectFuture.cause().getCause() != null) {
+                            // java's network exception.
+                            resultFuture.setException(connectFuture.cause().getCause());
+                        } else if (connectFuture.cause() != null) {
+                            // netty's exception, if it is not java's
+                            resultFuture.setException(connectFuture.cause());
+                        } else {
+                            // fallback exception when connecting not success.
+                            resultFuture.setException(new RuntimeException("Cannot connect to server"));
+                        }
+                    }
+                });
+        Channel channel = connectCheck.channel();
+        channel.closeFuture().addListener(channelFuture -> {
+            if (channelFuture.isSuccess()) {
+                ServerInfoRequestHandler handler = channel.pipeline().get(ServerInfoRequestHandler.class);
+                resultFuture.set(handler.getServerInfo());
+            } else {
+                resultFuture.setException(channelFuture.cause());
+            }
         });
+        return resultFuture;
     }
 
     @Override
     public void close() {
-        factory.releaseExternalResources();
-        pool.shutdown();
+        eventLoopGroup.shutdownGracefully().syncUninterruptibly();
     }
 }

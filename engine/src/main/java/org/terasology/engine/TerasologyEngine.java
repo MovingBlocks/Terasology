@@ -1,20 +1,8 @@
-/*
- * Copyright 2018 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine;
 
+import com.badlogic.gdx.physics.bullet.Bullet;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.Queues;
@@ -71,6 +59,8 @@ import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.reflect.ReflectFactory;
 import org.terasology.reflection.reflect.ReflectionReflectFactory;
 import org.terasology.registry.CoreRegistry;
+import org.terasology.rendering.gltf.ByteBufferAsset;
+import org.terasology.rendering.gltf.ByteBufferData;
 import org.terasology.version.TerasologyVersion;
 import org.terasology.world.block.loader.BlockFamilyDefinition;
 import org.terasology.world.block.loader.BlockFamilyDefinitionData;
@@ -155,6 +145,9 @@ public class TerasologyEngine implements GameEngine {
      *                   audio and input subsystems.
      */
     public TerasologyEngine(TimeSubsystem timeSubsystem, Collection<EngineSubsystem> subsystems) {
+        // configure native paths
+        PathManager.getInstance();
+        Bullet.init(true, false);
 
         this.rootContext = new ContextImpl();
         rootContext.put(GameEngine.class, this);
@@ -191,6 +184,9 @@ public class TerasologyEngine implements GameEngine {
         this.allSubsystems.add(new I18nSubsystem());
         this.allSubsystems.add(new TelemetrySubSystem());
         this.allSubsystems.add(new ModuleRenderingSubsystem());
+
+        // add all subsystem as engine module part. (needs for ECS classes loaded from external subsystems)
+        allSubsystems.stream().map(Object::getClass).forEach(this::addToClassesOnClasspathsToAddToEngine);
     }
 
     /**
@@ -360,6 +356,7 @@ public class TerasologyEngine implements GameEngine {
                 (AssetFactory<BehaviorTree, BehaviorTreeData>) BehaviorTree::new, false, "behaviors");
         assetTypeManager.registerCoreAssetType(UIElement.class,
                 (AssetFactory<UIElement, UIData>) UIElement::new, "ui");
+        assetTypeManager.registerCoreAssetType(ByteBufferAsset.class, (AssetFactory<ByteBufferAsset, ByteBufferData>) ByteBufferAsset::new, "mesh");
 
         for (EngineSubsystem subsystem : allSubsystems) {
             subsystem.registerCoreAssetTypes(assetTypeManager);

@@ -310,7 +310,6 @@ public class EventSystemImpl implements EventSystem {
     private void networkReplicate(EntityRef entity, Event event) {
         EventMetadata metadata = eventLibrary.getMetadata(event);
         if (metadata != null && metadata.isNetworkEvent()) {
-            logger.debug("Replicating event: {}", event);
             switch (metadata.getNetworkEventType()) {
                 case BROADCAST:
                     broadcastEvent(entity, event, metadata);

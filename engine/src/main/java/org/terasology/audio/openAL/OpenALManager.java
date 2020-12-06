@@ -19,13 +19,13 @@ import com.google.common.collect.Maps;
 import org.joml.Quaternionfc;
 import org.joml.Vector3fc;
 import org.lwjgl.BufferUtils;
-import org.lwjgl.LWJGLException;
 import org.lwjgl.openal.AL;
 import org.lwjgl.openal.AL10;
+import org.lwjgl.openal.ALC;
 import org.lwjgl.openal.ALC10;
 import org.lwjgl.openal.ALC11;
-import org.lwjgl.openal.ALCcontext;
-import org.lwjgl.openal.ALCdevice;
+import org.lwjgl.openal.ALCCapabilities;
+import org.lwjgl.openal.ALCapabilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.AssetFactory;
@@ -43,11 +43,8 @@ import org.terasology.audio.openAL.streamingSound.OpenALStreamingSoundPool;
 import org.terasology.config.AudioConfig;
 import org.terasology.math.Direction;
 import org.terasology.math.JomlUtil;
-import org.terasology.math.geom.Quat4f;
-import org.terasology.math.geom.Vector3f;
 
 import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -69,38 +66,27 @@ public class OpenALManager implements AudioManager {
 
     private Map<SoundSource<?>, AudioEndListener> endListeners = Maps.newHashMap();
 
-    public OpenALManager(AudioConfig config) throws OpenALException, LWJGLException {
+    public OpenALManager(AudioConfig config) throws OpenALException {
         logger.info("Initializing OpenAL audio manager");
 
         config.musicVolume.subscribe((setting, oldValue) -> setMusicVolume(setting.get()));
         config.soundVolume.subscribe((setting, oldValue) -> setSoundVolume(setting.get()));
 
-        AL.create();
-
-        AL10.alGetError();
+        long device = ALC10.alcOpenDevice((java.lang.CharSequence) null);
+        long context = ALC10.alcCreateContext(device, (int[]) null);
+        ALC10.alcMakeContextCurrent(context);
+        ALCCapabilities alcCapabilities = ALC.createCapabilities(device);
+        ALCapabilities alCapabilities = AL.createCapabilities(alcCapabilities);
 
         logger.info("OpenAL {} initialized!", AL10.alGetString(AL10.AL_VERSION));
-
-        ALCcontext context = ALC10.alcGetCurrentContext();
-        ALCdevice device = ALC10.alcGetContextsDevice(context);
 
         logger.info("Using OpenAL: {} by {}", AL10.alGetString(AL10.AL_RENDERER), AL10.alGetString(AL10.AL_VENDOR));
         logger.info("Using device: {}", ALC10.alcGetString(device, ALC10.ALC_DEVICE_SPECIFIER));
         logger.info("Available AL extensions: {}", AL10.alGetString(AL10.AL_EXTENSIONS));
         logger.info("Available ALC extensions: {}", ALC10.alcGetString(device, ALC10.ALC_EXTENSIONS));
-
-        IntBuffer buffer = BufferUtils.createIntBuffer(1);
-        ALC10.alcGetInteger(device, ALC11.ALC_MONO_SOURCES, buffer);
-        logger.info("Max mono sources: {}", buffer.get(0));
-        buffer.rewind();
-
-        ALC10.alcGetInteger(device, ALC11.ALC_STEREO_SOURCES, buffer);
-        logger.info("Max stereo sources: {}", buffer.get(0));
-        buffer.rewind();
-
-        ALC10.alcGetInteger(device, ALC10.ALC_FREQUENCY, buffer);
-        logger.info("Mixer frequency: {}", buffer.get(0));
-        buffer.rewind();
+        logger.info("Max mono sources: {}", ALC10.alcGetInteger(device, ALC11.ALC_MONO_SOURCES));
+        logger.info("Max stereo sources: {}", ALC10.alcGetInteger(device, ALC11.ALC_STEREO_SOURCES));
+        logger.info("Mixer frequency: {}", ALC10.alcGetInteger(device, ALC10.ALC_FREQUENCY));
 
         AL10.alDistanceModel(AL10.AL_INVERSE_DISTANCE_CLAMPED);
 
@@ -113,7 +99,8 @@ public class OpenALManager implements AudioManager {
 
     @Override
     public void dispose() {
-        AL.destroy();
+        ALC10.alcCloseDevice(ALC10.alcGetContextsDevice(ALC10.alcGetCurrentContext()));
+        ALC.destroy();
     }
 
     @Override
@@ -160,11 +147,6 @@ public class OpenALManager implements AudioManager {
     }
 
     @Override
-    public void playSound(StaticSound sound, Vector3f position) {
-        playSound(sound, JomlUtil.from(position));
-    }
-
-    @Override
     public void playSound(StaticSound sound, Vector3fc position) {
         playSound(sound, position, 1.0f, PRIORITY_NORMAL);
     }
@@ -175,22 +157,13 @@ public class OpenALManager implements AudioManager {
     }
 
     @Override
-    public void playSound(StaticSound sound, Vector3f position, float volume, int priority) {
-        playSound(sound, JomlUtil.from(position), volume, priority);
-    }
-
-    @Override
     public void playSound(StaticSound sound, Vector3fc position, float volume, int priority) {
         playSound(sound, position, volume, priority, null);
     }
 
     @Override
-    public void playSound(StaticSound sound, Vector3f position, float volume, int priority, AudioEndListener endListener) {
-        playSound(sound, JomlUtil.from(position), volume, priority, endListener);
-    }
-
-    @Override
-    public void playSound(StaticSound sound, Vector3fc position, float volume, int priority, AudioEndListener endListener) {
+    public void playSound(StaticSound sound, Vector3fc position, float volume, int priority,
+                          AudioEndListener endListener) {
         if (position != null && !checkDistance(position)) {
             return;
         }
@@ -262,11 +235,6 @@ public class OpenALManager implements AudioManager {
     }
 
     @Override
-    public void updateListener(Vector3f position, Quat4f orientation, Vector3f velocity) {
-        updateListener(JomlUtil.from(position), JomlUtil.from(orientation), JomlUtil.from(velocity));
-    }
-
-    @Override
     public void updateListener(Vector3fc position, Quaternionfc orientation, Vector3fc velocity) {
         AL10.alListener3f(AL10.AL_VELOCITY, velocity.x(), velocity.y(), velocity.z());
 
@@ -278,9 +246,9 @@ public class OpenALManager implements AudioManager {
                 .rotate(orientation);
 
         FloatBuffer listenerOri = BufferUtils.createFloatBuffer(6)
-                .put(new float[] {dir.x, dir.y, dir.z, up.x, up.y, up.z});
+                .put(new float[]{dir.x, dir.y, dir.z, up.x, up.y, up.z});
         listenerOri.flip();
-        AL10.alListener(AL10.AL_ORIENTATION, listenerOri);
+        AL10.alListenerfv(AL10.AL_ORIENTATION, listenerOri);
         OpenALException.checkState("Setting listener orientation");
 
         listenerPosition.set(position);

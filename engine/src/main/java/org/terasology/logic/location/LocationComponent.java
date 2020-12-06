@@ -16,6 +16,7 @@
 package org.terasology.logic.location;
 
 import com.google.common.collect.Lists;
+import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Quaternionfc;
 import org.joml.Vector3fc;
@@ -208,6 +209,22 @@ public final class LocationComponent implements Component, ReplicationCheck {
             parentLoc = parentLoc.parent.getComponent(LocationComponent.class);
         }
         return dest;
+    }
+
+    /**
+     * Populates out with the transform of this entity relative to the given entity, or the world transform if entity
+     * is not in this entity's parent hierarchy
+     * @param out
+     * @param entity
+     */
+    public void getRelativeTransform(Matrix4f out, EntityRef entity) {
+        if (!(entity.equals(parent))) {
+            LocationComponent loc = parent.getComponent(LocationComponent.class);
+            if (loc != null) {
+                loc.getRelativeTransform(out, entity);
+            }
+        }
+        out.mul(new Matrix4f().translationRotateScale(JomlUtil.from(position), JomlUtil.from(rotation), scale));
     }
 
     /**

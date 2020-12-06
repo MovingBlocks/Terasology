@@ -19,6 +19,7 @@ package org.terasology.logic.players;
 import com.google.common.collect.Lists;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
+import org.joml.Vector3fc;
 import org.joml.Vector3ic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -135,8 +136,8 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
 
         if (playerStore.hasCharacter()) {
 
-            Vector3f storedLocation = JomlUtil.from(playerStore.getRelevanceLocation());
-            loc.setWorldPosition(JomlUtil.from(storedLocation));
+            Vector3fc storedLocation = playerStore.getRelevanceLocation();
+            loc.setWorldPosition(storedLocation);
             entity.saveComponent(loc);
 
             if (worldProvider.isBlockRelevant(storedLocation)) {
@@ -153,7 +154,7 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
             }
         } else {
             Vector3f spawnPosition = JomlUtil.from(worldGenerator.getSpawnPosition(entity));
-            loc.setWorldPosition(JomlUtil.from(spawnPosition));
+            loc.setWorldPosition(spawnPosition);
             entity.saveComponent(loc);
 
             addRelevanceEntity(entity, minViewDist, owner);
@@ -183,7 +184,7 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
             if (!character.hasComponent(AliveCharacterComponent.class)) {
                 respawnPlayer(entity);
             }
-            Location.attachChild(character, entity, new Vector3f(), new Quaternionf(0, 0, 0, 1));
+            Location.attachChild(character, entity, new Vector3f(), new Quaternionf());
         } else {
             character.destroy();
             spawnPlayer(entity);
@@ -223,19 +224,19 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
 
         Vector3f spawnPosition;
         if (clientInfo.hasComponent(StaticSpawnLocationComponent.class)) {
-            spawnPosition = JomlUtil.from(clientInfo.getComponent(StaticSpawnLocationComponent.class).position);
+            spawnPosition = clientInfo.getComponent(StaticSpawnLocationComponent.class).position;
         } else {
             spawnPosition = JomlUtil.from(worldGenerator.getSpawnPosition(entity));
         }
         LocationComponent loc = character.getComponent(LocationComponent.class);
-        loc.setWorldPosition(JomlUtil.from(spawnPosition));
-        loc.setLocalRotation(JomlUtil.from(new Quaternionf()));  // reset rotation
+        loc.setWorldPosition(spawnPosition);
+        loc.setLocalRotation(new Quaternionf());  // reset rotation
         character.saveComponent(loc);
     }
 
     @ReceiveEvent(priority = EventPriority.PRIORITY_TRIVIAL, components = {ClientComponent.class})
     public void onRespawnRequest(RespawnRequestEvent event, EntityRef entity) {
-        Vector3f spawnPosition = JomlUtil.from(entity.getComponent(LocationComponent.class).getWorldPosition());
+        Vector3f spawnPosition = entity.getComponent(LocationComponent.class).getWorldPosition(new Vector3f());
 
         if (worldProvider.isBlockRelevant(spawnPosition)) {
             respawnPlayer(entity);
@@ -255,7 +256,7 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
         Vector3f spawnPosition = playerFactory.findSpawnPositionFromLocationComponent(location);
 
         playerCharacter.addComponent(new AliveCharacterComponent());
-        playerCharacter.send(new CharacterTeleportEvent(JomlUtil.from(spawnPosition)));
+        playerCharacter.send(new CharacterTeleportEvent(spawnPosition));
 
         logger.debug("Re-spawing player at: {}", spawnPosition);
 
@@ -283,14 +284,14 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
     private static class SpawningClientInfo {
         public EntityRef clientEntity;
         public PlayerStore playerStore;
-        public Vector3f position;
+        public Vector3f position = new Vector3f();
 
-        SpawningClientInfo(EntityRef client, Vector3f position) {
+        SpawningClientInfo(EntityRef client, Vector3fc position) {
             this.clientEntity = client;
-            this.position = position;
+            this.position.set(position);
         }
 
-        SpawningClientInfo(EntityRef client, Vector3f position, PlayerStore playerStore) {
+        SpawningClientInfo(EntityRef client, Vector3fc position, PlayerStore playerStore) {
             this(client, position);
             this.playerStore = playerStore;
         }

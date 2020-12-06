@@ -18,7 +18,7 @@ package org.terasology.monitoring.chunk;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import com.google.common.eventbus.EventBus;
-import org.terasology.math.geom.Vector3i;
+import org.joml.Vector3i;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkProvider;
@@ -40,7 +40,7 @@ public final class ChunkMonitor {
 
     private static synchronized ChunkMonitorEntry registerChunk(Chunk chunk) {
         Preconditions.checkNotNull(chunk, "The parameter 'chunk' must not be null");
-        final Vector3i pos = chunk.getPosition();
+        final Vector3i pos = chunk.getPosition(new Vector3i());
         ChunkMonitorEntry entry = CHUNKS.get(pos);
         if (entry == null) {
             entry = new ChunkMonitorEntry(pos);
@@ -74,17 +74,17 @@ public final class ChunkMonitor {
 
     public static void fireChunkDisposed(Chunk chunk) {
         Preconditions.checkNotNull(chunk, "The parameter 'chunk' must not be null");
-        post(new ChunkMonitorEvent.Disposed(chunk.getPosition()));
+        post(new ChunkMonitorEvent.Disposed(chunk.getPosition(new Vector3i())));
     }
 
     public static void fireChunkRevived(Chunk chunk) {
         Preconditions.checkNotNull(chunk, "The parameter 'chunk' must not be null");
-        post(new ChunkMonitorEvent.Revived(chunk.getPosition()));
+        post(new ChunkMonitorEvent.Revived(chunk.getPosition(new Vector3i())));
     }
 
     public static void fireChunkDeflated(Chunk chunk, int oldSize, int newSize) {
         Preconditions.checkNotNull(chunk, "The parameter 'chunk' must not be null");
-        post(new ChunkMonitorEvent.Deflated(chunk.getPosition(), oldSize, newSize));
+        post(new ChunkMonitorEvent.Deflated(chunk.getPosition(new Vector3i()), oldSize, newSize));
     }
 
     public static void fireChunkTessellated(Vector3i chunkPos, ChunkMesh mesh) {

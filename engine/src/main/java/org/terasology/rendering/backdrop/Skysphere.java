@@ -17,9 +17,9 @@ package org.terasology.rendering.backdrop;
 
 import org.joml.Vector3f;
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.util.glu.Sphere;
 import org.terasology.context.Context;
 import org.terasology.nui.properties.Range;
+import org.terasology.rendering.primitives.Sphere;
 import org.terasology.utilities.Assets;
 import org.terasology.math.TeraMath;
 import org.terasology.rendering.assets.material.Material;
@@ -107,7 +107,7 @@ public class Skysphere implements BackdropProvider, BackdropRenderer {
         float daylight = 1.0f;
 
         if (angle < 24.0f) {
-            daylight = 1.0f - (24.0f - angle) / 24.0f;
+            daylight = Math.max(1.0f - (24.0f - angle) / 24.0f, 0.15f);
         }
 
         return daylight;
