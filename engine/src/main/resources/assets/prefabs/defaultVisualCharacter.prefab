@@ -1,10 +1,14 @@
 {
-    "SkeletalMesh": {
-        "mesh": "floatingCube",
-        "heightOffset": 0.0,
-        "material": "floatingCubeSkin",
-        "animationPool": ["floatingCubeIdle"],
-        "loop": true
-    },
-    "Location": {}
+  "SkeletalMesh": {
+    "mesh": "floatingCube",
+    "heightOffset": 0.5,
+    "material": "floatingCubeSkin",
+    "loop": true,
+    "scale": [
+      0.25,
+      0.25,
+      0.25
+    ]
+  },
+  "Location": {}
 }

@@ -1,18 +1,5 @@
-/*
- * Copyright 2017 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.logic.console.commands;
 
 import org.joml.Vector3f;
@@ -26,6 +13,7 @@ import org.terasology.logic.console.commandSystem.annotations.Sender;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.permission.PermissionManager;
 import org.terasology.logic.players.StaticSpawnLocationComponent;
+import org.terasology.logic.players.event.WorldtimeResetEvent;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkSystem;
 import org.terasology.registry.In;
@@ -68,8 +56,9 @@ public class ClientCommands extends BaseComponentSystem {
      */
     @Command(shortDescription = "Sets the current world time for the local player in days",
             requiredPermission = PermissionManager.CHEAT_PERMISSION)
-    public String setWorldTime(@CommandParam("day") float day) {
+    public String setWorldTime(@CommandParam("day") float day, @Sender EntityRef sender) {
         worldProvider.getTime().setDays(day);
+        sender.send(new WorldtimeResetEvent(day));
         return "World time changed";
     }
 

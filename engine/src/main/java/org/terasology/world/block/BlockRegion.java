@@ -443,9 +443,9 @@ public class BlockRegion {
      */
     public Vector3f center(Vector3f dest) {
         return dest.set(
-                (aabb.maxX - aabb.minX) / 2.0f,
-                (aabb.maxY - aabb.minY) / 2.0f,
-                (aabb.maxZ - aabb.minZ) / 2.0f
+                aabb.minX + ((aabb.maxX - aabb.minX) / 2.0f),
+                aabb.minY + ((aabb.maxY - aabb.minY) / 2.0f),
+                aabb.minZ + ((aabb.maxZ - aabb.minZ) / 2.0f)
         );
     }
 
