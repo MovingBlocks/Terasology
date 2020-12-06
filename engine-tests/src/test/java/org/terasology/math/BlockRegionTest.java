@@ -4,6 +4,8 @@
 package org.terasology.math;
 
 import com.google.common.collect.Sets;
+import org.joml.Vector3f;
+import org.joml.Vector3fc;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.junit.jupiter.api.Test;
@@ -196,5 +198,53 @@ public class BlockRegionTest {
 
         assertEquals(min, region.getMin(new Vector3i()));
         assertEquals(max, region.getMax(new Vector3i()));
+    }
+
+    private static Stream<Arguments> testCenterArgs() {
+        return Stream.of(
+                Arguments.of(
+                        new BlockRegion(),
+                        new Vector3f(Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE)
+                ),
+                // creating from min and max
+                Arguments.of(
+                        BlockRegions.createFromMinAndMax(new Vector3i(0, 0, 0), new Vector3i(0, 0, 0)),
+                        new Vector3f(0.5f, 0.5f, 0.5f)
+                ),
+                Arguments.of(
+                        BlockRegions.createFromMinAndMax(new Vector3i(0, 0, 0), new Vector3i(1, 1, 1)),
+                        new Vector3f(1f, 1f, 1f)
+                ),
+                Arguments.of(
+                        BlockRegions.createFromMinAndMax(new Vector3i(-1, -1, -1), new Vector3i(1, 1, 1)),
+                        new Vector3f(0.5f, 0.5f, 0.5f)
+                ),
+                Arguments.of(
+                        BlockRegions.createFromMinAndMax(new Vector3i(0, 0, 0), new Vector3i(2, 2, 2)),
+                        new Vector3f(1.5f, 1.5f, 1.5f)
+                ),
+                // creating from center and extents
+                Arguments.of(
+                        BlockRegions.createFromCenterAndExtents(new Vector3f(0, 0, 0), new Vector3f(0, 0, 0)),
+                        new Vector3f(0.5f, 0.5f, 0.5f)
+                ),
+                Arguments.of(
+                        BlockRegions.createFromCenterAndExtents(new Vector3f(0.5f, 0.5f, 0.5f), new Vector3f(0.5f,
+                                0.5f, 0.5f)),
+                        new Vector3f(1f, 1f, 1f)
+                ),
+                Arguments.of(
+                        BlockRegions.createFromCenterAndExtents(new Vector3f(0.49f, 0.49f, 0.49f), new Vector3f(0.5f,
+                                0.5f, 0.5f)),
+                        new Vector3f(.5f, .5f, .5f)
+                )
+
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("testCenterArgs")
+    public void testCenter(BlockRegion region, Vector3fc expectedCenter) {
+        assertEquals(expectedCenter, region.center(new Vector3f()));
     }
 }
