@@ -446,12 +446,15 @@ public class BlockRegion {
     }
 
     /**
-     * the center of the region
+     * The center of the region if the region is valid, positive infinity in all dimensions otherwise.
      *
      * @param dest will hold the result
      * @return dest
      */
     public Vector3f center(Vector3f dest) {
+        if (!this.isValid()) {
+            return dest.set(Float.POSITIVE_INFINITY);
+        }
         return dest.set(
                 aabb.minX + ((aabb.maxX - aabb.minX) / 2.0f),
                 aabb.minY + ((aabb.maxY - aabb.minY) / 2.0f),

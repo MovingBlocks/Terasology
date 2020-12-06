@@ -204,7 +204,7 @@ public class BlockRegionTest {
         return Stream.of(
                 Arguments.of(
                         new BlockRegion(),
-                        new Vector3f(0.5f, 0.5f, 0.5f)
+                        new Vector3f(Float.POSITIVE_INFINITY)
                 ),
                 // creating from min and max
                 Arguments.of(
