@@ -19,6 +19,8 @@ package org.terasology.logic.characters;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.Time;
@@ -33,8 +35,6 @@ import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.logic.characters.events.SetMovementModeEvent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.LocalPlayer;
-import org.terasology.math.JomlUtil;
-import org.terasology.math.geom.Vector3f;
 import org.terasology.network.NetworkSystem;
 import org.terasology.physics.engine.CharacterCollider;
 import org.terasology.physics.engine.PhysicsEngine;
@@ -162,7 +162,7 @@ public class ServerCharacterPredictionSystem extends BaseComponentSystem impleme
         CircularBuffer<CharacterStateEvent> stateBuffer = characterStates.get(entity);
         CharacterStateEvent lastState = stateBuffer.getLast();
         CharacterStateEvent newState = new CharacterStateEvent(lastState);
-        newState.setPosition(new Vector3f(JomlUtil.from(event.getTargetPosition())));
+        newState.setPosition(new Vector3f(event.getTargetPosition()));
         newState.setTime(time.getGameTimeInMs());
         stateBuffer.add(newState);
         characterMovementSystemUtility.setToState(entity, newState);
@@ -185,7 +185,7 @@ public class ServerCharacterPredictionSystem extends BaseComponentSystem impleme
 
     private CharacterStateEvent createInitialState(EntityRef entity) {
         LocationComponent location = entity.getComponent(LocationComponent.class);
-        return new CharacterStateEvent(time.getGameTimeInMs(), 0, location.getWorldPosition(), location.getWorldRotation(), new Vector3f(), 0, 0, MovementMode.WALKING, false);
+        return new CharacterStateEvent(time.getGameTimeInMs(), 0, location.getWorldPosition(new Vector3f()), location.getWorldRotation(new Quaternionf()), new Vector3f(), 0, 0, MovementMode.WALKING, false);
     }
 
     private CharacterStateEvent stepState(CharacterMoveInputEvent input, CharacterStateEvent lastState, EntityRef entity) {

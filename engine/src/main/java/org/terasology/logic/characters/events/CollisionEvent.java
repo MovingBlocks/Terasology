@@ -15,8 +15,8 @@
  */
 package org.terasology.logic.characters.events;
 
+import org.joml.Vector3f;
 import org.terasology.entitySystem.event.Event;
-import org.terasology.math.geom.Vector3f;
 
 /**
  */

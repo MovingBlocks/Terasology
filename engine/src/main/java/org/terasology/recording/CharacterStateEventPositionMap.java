@@ -15,8 +15,8 @@
  */
 package org.terasology.recording;
 
+import org.joml.Vector3f;
 import org.terasology.logic.characters.CharacterStateEvent;
-import org.terasology.math.geom.Vector3f;
 
 import java.util.HashMap;
 import java.util.Map;

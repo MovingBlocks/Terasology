@@ -19,6 +19,7 @@ package org.terasology.logic.characters;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
 
+import org.joml.Quaternionf;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.Time;
@@ -140,7 +141,7 @@ public class ClientCharacterPredictionSystem extends BaseComponentSystem impleme
 
     private CharacterStateEvent createInitialState(EntityRef entity) {
         LocationComponent location = entity.getComponent(LocationComponent.class);
-        return new CharacterStateEvent(time.getGameTimeInMs(), 0, location.getWorldPosition(), location.getWorldRotation(), new Vector3f(), 0, 0, MovementMode.WALKING, false);
+        return new CharacterStateEvent(time.getGameTimeInMs(), 0, location.getWorldPosition(new org.joml.Vector3f()), location.getWorldRotation(new Quaternionf()), new org.joml.Vector3f(), 0, 0, MovementMode.WALKING, false);
     }
 
     private CharacterStateEvent stepState(CharacterMoveInputEvent input, CharacterStateEvent lastState, EntityRef entity) {
