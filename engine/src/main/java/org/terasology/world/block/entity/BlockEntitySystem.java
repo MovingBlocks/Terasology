@@ -16,6 +16,7 @@
 package org.terasology.world.block.entity;
 
 import org.joml.Vector3f;
+import org.joml.Vector3ic;
 import org.terasology.audio.AudioManager;
 import org.terasology.audio.StaticSound;
 import org.terasology.audio.events.PlaySoundEvent;
@@ -30,6 +31,7 @@ import org.terasology.logic.health.DoDestroyEvent;
 import org.terasology.logic.inventory.events.DropItemEvent;
 import org.terasology.logic.inventory.events.GiveItemEvent;
 import org.terasology.logic.location.LocationComponent;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.physics.events.ImpulseEvent;
 import org.terasology.registry.In;
@@ -39,6 +41,7 @@ import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockComponent;
 import org.terasology.world.block.BlockManager;
+import org.terasology.world.block.BlockRegions;
 import org.terasology.world.block.entity.damage.BlockDamageModifierComponent;
 import org.terasology.world.block.items.BlockItemFactory;
 import org.terasology.world.block.items.OnBlockToItem;
@@ -102,13 +105,13 @@ public class BlockEntitySystem extends BaseComponentSystem {
                 BlockRegionComponent blockRegion = entity.getComponent(BlockRegionComponent.class);
                 if (blockComponent.dropBlocksInRegion) {
                     // loop through all the blocks in this region and drop them
-                    for (Vector3i location : blockRegion.region) {
+                    for (Vector3ic location : BlockRegions.iterableInPlace(blockRegion.region)) {
                         Block blockInWorld = worldProvider.getBlock(location);
-                        commonDefaultDropsHandling(event, entity, location, blockInWorld.getBlockFamily().getArchetypeBlock());
+                        commonDefaultDropsHandling(event, entity, JomlUtil.from(location), blockInWorld.getBlockFamily().getArchetypeBlock());
                     }
                 } else {
                     // just drop the ActAsBlock block
-                    Vector3i location = new Vector3i(blockRegion.region.center(), RoundingMode.HALF_UP);
+                    Vector3i location = JomlUtil.from(new org.joml.Vector3i(blockRegion.region.center(new Vector3f()), org.joml.RoundingMode.HALF_UP));
                     commonDefaultDropsHandling(event, entity, location, blockComponent.block.getArchetypeBlock());
                 }
             } else if (entity.hasComponent(LocationComponent.class)) {
