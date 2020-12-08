@@ -574,7 +574,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
 
         context.get(ComponentSystemManager.class).register(new NetworkEntitySystem(this), "engine:networkEntitySystem");
 
-        TypeHandlerLibrary typeHandlerLibrary = new TypeHandlerLibrary(entityManager.getTypeSerializerLibrary());
+        TypeHandlerLibrary typeHandlerLibrary = entityManager.getTypeSerializerLibrary().copy();
         typeHandlerLibrary.addTypeHandler(EntityRef.class, new NetEntityRefTypeHandler(this, blockEntityRegistry));
         // TODO: Add network override types here (that use id lookup tables)
 
