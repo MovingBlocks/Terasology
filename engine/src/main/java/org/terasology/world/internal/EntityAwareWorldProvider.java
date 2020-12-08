@@ -483,7 +483,7 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
     @ReceiveEvent(components = {BlockRegionComponent.class})
     public void onBlockRegionChanged(OnChangedComponent event, EntityRef entity) {
         BlockRegion oldRegion = blockRegions.get(entity);
-        for (org.joml.Vector3i pos : BlockRegions.iterableInPlace(oldRegion)) {
+        for (org.joml.Vector3ic pos : BlockRegions.iterableInPlace(oldRegion)) {
             blockRegionLookup.remove(pos);
         }
         BlockRegionComponent regionComp = entity.getComponent(BlockRegionComponent.class);
@@ -496,7 +496,7 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
     @ReceiveEvent(components = {BlockRegionComponent.class})
     public void onBlockRegionDeactivated(BeforeDeactivateComponent event, EntityRef entity) {
         BlockRegion oldRegion = blockRegions.get(entity);
-        for (org.joml.Vector3i pos : BlockRegions.iterableInPlace(oldRegion)) {
+        for (org.joml.Vector3ic pos : BlockRegions.iterableInPlace(oldRegion)) {
             blockRegionLookup.remove(pos);
         }
         blockRegions.remove(entity);
