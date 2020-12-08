@@ -122,12 +122,12 @@ void main() {
     vec3 lightDirNorm = lightDir / lightDist;
 
     float ambTerm = lightAmbientIntensity;
-    float lambTerm = clamp(calcLambLight(normal, lightDirNorm) / (length(lightDirNorm) * length(normal)),0,1);
+    float lambTerm = clamp(max(0.0, dot(normal, lightDirNorm)), 0, 1);
 
     // Apply "back light"
     // TODO: Make intensity a shader parameter
     const float backLightIntens = 0.5;
-    lambTerm += calcLambLight(normal, -lightDirNorm) * backLightIntens;
+    lambTerm += max(0.0, dot(normal, -lightDirNorm)) * backLightIntens;
 
     float specTerm  = calcSpecLightNormalized(normal, lightDirNorm, eyeVec, lightSpecularPower);
 

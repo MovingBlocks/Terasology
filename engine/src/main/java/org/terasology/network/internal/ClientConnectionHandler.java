@@ -44,7 +44,7 @@ public class ClientConnectionHandler extends ChannelInboundHandlerAdapter {
     private Path tempModuleLocation;
     private BufferedOutputStream downloadingModule;
     private long lengthReceived;
-    private Timer timeoutTimer = new Timer();
+    private Timer timeoutTimer = new Timer("Netty-Timeout-Timer", true);
     private long timeoutPoint = System.currentTimeMillis();
     private final long timeoutThreshold = 120000;
     private Channel channel;
@@ -81,6 +81,7 @@ public class ClientConnectionHandler extends ChannelInboundHandlerAdapter {
                         logger.error("Server timeout threshold of {} ms exceeded.", timeoutThreshold);
                     }
                 }
+                Thread.currentThread().stop();
             }
         }, timeoutThreshold + 200);
     }

@@ -43,8 +43,6 @@ import org.terasology.audio.openAL.streamingSound.OpenALStreamingSoundPool;
 import org.terasology.config.AudioConfig;
 import org.terasology.math.Direction;
 import org.terasology.math.JomlUtil;
-import org.terasology.math.geom.Quat4f;
-import org.terasology.math.geom.Vector3f;
 
 import java.nio.FloatBuffer;
 import java.util.Iterator;
@@ -149,11 +147,6 @@ public class OpenALManager implements AudioManager {
     }
 
     @Override
-    public void playSound(StaticSound sound, Vector3f position) {
-        playSound(sound, JomlUtil.from(position));
-    }
-
-    @Override
     public void playSound(StaticSound sound, Vector3fc position) {
         playSound(sound, position, 1.0f, PRIORITY_NORMAL);
     }
@@ -164,22 +157,13 @@ public class OpenALManager implements AudioManager {
     }
 
     @Override
-    public void playSound(StaticSound sound, Vector3f position, float volume, int priority) {
-        playSound(sound, JomlUtil.from(position), volume, priority);
-    }
-
-    @Override
     public void playSound(StaticSound sound, Vector3fc position, float volume, int priority) {
         playSound(sound, position, volume, priority, null);
     }
 
     @Override
-    public void playSound(StaticSound sound, Vector3f position, float volume, int priority, AudioEndListener endListener) {
-        playSound(sound, JomlUtil.from(position), volume, priority, endListener);
-    }
-
-    @Override
-    public void playSound(StaticSound sound, Vector3fc position, float volume, int priority, AudioEndListener endListener) {
+    public void playSound(StaticSound sound, Vector3fc position, float volume, int priority,
+                          AudioEndListener endListener) {
         if (position != null && !checkDistance(position)) {
             return;
         }
@@ -248,11 +232,6 @@ public class OpenALManager implements AudioManager {
             }
         };
         playMusic(music, volume, loopingEndListener);
-    }
-
-    @Override
-    public void updateListener(Vector3f position, Quat4f orientation, Vector3f velocity) {
-        updateListener(JomlUtil.from(position), JomlUtil.from(orientation), JomlUtil.from(velocity));
     }
 
     @Override
