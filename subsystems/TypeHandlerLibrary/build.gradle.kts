@@ -6,7 +6,10 @@ plugins {
     `java-library`
 }
 
-apply(from = "$rootDir/config/gradle/common.gradle")
+apply(from = "$rootDir/config/gradle/publish.gradle")
+
+group = "org.terasology"
+version = project(":engine").version
 
 dependencies {
     implementation("org.slf4j:slf4j-api:1.7.21")
