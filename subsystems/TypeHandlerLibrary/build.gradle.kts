@@ -8,7 +8,7 @@ plugins {
 
 apply(from = "$rootDir/config/gradle/publish.gradle")
 
-group = "org.terasology"
+group = "org.terasology.subsystems"
 version = project(":engine").version
 
 dependencies {
