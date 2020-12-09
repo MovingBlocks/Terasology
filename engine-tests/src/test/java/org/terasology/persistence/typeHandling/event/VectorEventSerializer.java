@@ -19,6 +19,7 @@ import org.terasology.entitySystem.metadata.EntitySystemLibrary;
 import org.terasology.entitySystem.metadata.EventMetadata;
 import org.terasology.persistence.serializers.EventSerializer;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
+import org.terasology.persistence.typeHandling.TypeHandlerLibraryImpl;
 import org.terasology.protobuf.EntityData;
 import org.terasology.reflection.TypeRegistry;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
@@ -64,7 +65,7 @@ public class VectorEventSerializer {
         context.put(CopyStrategyLibrary.class, copyStrategies);
 
         TypeRegistry typeRegistry = new TypeRegistry(moduleManager.getEnvironment());
-        TypeHandlerLibrary typeHandlerLibrary = TypeHandlerLibrary.forModuleEnvironment(moduleManager, typeRegistry);
+        TypeHandlerLibrary typeHandlerLibrary = TypeHandlerLibraryImpl.forModuleEnvironment(moduleManager, typeRegistry);
 
         entitySystemLibrary = new EntitySystemLibrary(context, typeHandlerLibrary);
 

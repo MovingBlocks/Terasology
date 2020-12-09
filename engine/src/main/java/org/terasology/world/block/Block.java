@@ -583,7 +583,7 @@ public final class Block {
     public void setCollision(Vector3f offset, CollisionShape shape) {
         collisionShape = shape;
         collisionOffset = offset;
-        bounds = shape.getAABB(new Transform(JomlUtil.from(offset), JomlUtil.from(new Quaternionf()), 1.0f));
+        bounds = shape.getAABB(offset, new Quaternionf(0, 0, 0, 1), 1.0f);
     }
 
     public CollisionShape getCollisionShape() {

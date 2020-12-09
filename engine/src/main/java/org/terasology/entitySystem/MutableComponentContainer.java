@@ -92,7 +92,7 @@ public interface MutableComponentContainer extends ComponentContainer {
      *     item.updateComponent(ItemComponent.class, MyItemHandler::updateItem);
      *     }
      * </pre>
-     * The same effect can achieved by extracting and saving the component manually:
+     * The same effect can be achieved by extracting and saving the component manually:
      * <pre>
      *     {@code
      *     EntityRef item = entityManager.create("CoreAdvancedAssets:door");
@@ -101,19 +101,30 @@ public interface MutableComponentContainer extends ComponentContainer {
      *     item.saveComponent(doorItemComp);
      *     }
      * </pre>
+     * <p>
+     * If the transformation function {@code f} returns {@code null} the component will be removed from this container.
+     * This can be useful in cases where updating the component leads to a state where it becomes obsolete and should be
+     * removed.
      *
      * <p>
-     * To create or update o component on this container, see {@link MutableComponentContainer#upsertComponent(Class,
+     * To create or update a component on this container, see {@link MutableComponentContainer#upsertComponent(Class,
      * Function)}
      *
      * @param componentClass component class to update
-     * @param f transformation function used to compute the updated component
+     * @param f transformation function used to compute the updated component; returning {@code null} removes
+     *         the component
      * @param <T> type of the component to update
      * @see MutableComponentContainer#upsertComponent(Class, Function)
      */
     default <T extends Component> void updateComponent(Class<T> componentClass, Function<T, T> f) {
         if (hasComponent(componentClass)) {
-            saveComponent(f.apply(getComponent(componentClass)));
+            T component = f.apply(getComponent(componentClass));
+            if (component == null) {
+                removeComponent(componentClass);
+            } else {
+                saveComponent(component);
+            }
+
         }
     }
 
@@ -148,15 +159,23 @@ public interface MutableComponentContainer extends ComponentContainer {
      *     }
      * </pre>
      * <p>
-     * To perform an in-place update only if the component is present, see {@link MutableComponentContainer#updateComponent(Class,
+     * If the transformation function {@code f} returns {@code null} no component will be added to this container.
+     *
+     * <p>
+     * To perform an in-place update only if the component is present, see
+     * {@link MutableComponentContainer#updateComponent(Class,
      * Function)}
      *
      * @param componentClass component class to update or insert
-     * @param f transformation function used to compute the new or updated component
+     * @param f transformation function used to compute the new or updated component; may return {@code null}
      * @param <T> type of the component to insert or update
      * @see MutableComponentContainer#updateComponent(Class, Function)
      */
     default <T extends Component> void upsertComponent(Class<T> componentClass, Function<Optional<T>, T> f) {
-        addOrSaveComponent(f.apply(Optional.ofNullable(getComponent(componentClass))));
+        T component = f.apply(Optional.ofNullable(getComponent(componentClass)));
+        if (component != null) {
+            addOrSaveComponent(component);
+        }
+
     }
 }

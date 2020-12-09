@@ -13,6 +13,7 @@ import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector4f;
 import org.terasology.naming.Name;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
+import org.terasology.persistence.typeHandling.TypeHandlerLibraryImpl;
 import org.terasology.reflection.TypeInfo;
 import org.terasology.testUtil.TeraAssert;
 
@@ -48,7 +49,7 @@ public class VectorTypeSerializerTest extends ModuleEnvironmentTest {
     public void setup() {
         ModuleContext.setContext(moduleManager.getEnvironment().get(new Name("unittest")));
 
-        typeHandlerLibrary = TypeHandlerLibrary.forModuleEnvironment(moduleManager, typeRegistry);
+        typeHandlerLibrary = TypeHandlerLibraryImpl.forModuleEnvironment(moduleManager, typeRegistry);
 
         protobufSerializer = new ProtobufSerializer(typeHandlerLibrary);
         gsonSerializer = new GsonSerializer(typeHandlerLibrary);

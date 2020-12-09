@@ -40,6 +40,10 @@ public class HTMLDocument implements DocumentData {
         paragraphs.add(paragraphData);
     }
 
+    public void addParagraphs(Collection<? extends ParagraphData> paragraphData) {
+        paragraphs.addAll(paragraphData);
+    }
+
     @Override
     public Collection<ParagraphData> getParagraphs() {
         return paragraphs;

@@ -30,11 +30,10 @@ public class AudioConfig extends AutoConfig {
     public final Setting<Float> musicVolume =
             setting(
                     type(Float.class),
-                    defaultValue(1.0f),
+                    defaultValue(0.5f),
                     name("${engine:menu#music-volume}"),
                     constraint(new NumberRangeConstraint<>(0.0f, 1.0f, true, true))
             );
-
 
     // TODO: Convert into Setting -- no uses yet
     private boolean disableSound;

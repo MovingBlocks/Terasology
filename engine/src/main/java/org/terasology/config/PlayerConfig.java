@@ -16,19 +16,22 @@
 
 package org.terasology.config;
 
-import java.util.List;
-
-import org.terasology.engine.subsystem.rpc.DiscordRPCSubSystem;
 import org.terasology.nui.Color;
 import org.terasology.rendering.nui.layers.mainMenu.settings.CieCamColors;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.utilities.random.Random;
+import org.terasology.utilities.subscribables.AbstractSubscribable;
 
-public class PlayerConfig {
+import java.util.List;
+
+public class PlayerConfig extends AbstractSubscribable {
+
+    public static final String DISCORD_PRESENCE = "DISCORD_PRESENCE";
+    public static final String PLAYER_NAME = "PLAYER_NAME";
 
     private static final float DEFAULT_PLAYER_HEIGHT = 1.8f;
 
-    private static final float DEFAULT_PLAYER_EYE_HEIGHT = 0.7f;
+    private static final float DEFAULT_PLAYER_EYE_HEIGHT = 0.85f;
 
     private static final boolean DEFAULT_DISCORD_PRESENCE = true;
 
@@ -49,7 +52,9 @@ public class PlayerConfig {
     }
 
     public void setName(String name) {
+        String oldName = this.name;
         this.name = name;
+        propertyChangeSupport.firePropertyChange(PLAYER_NAME, oldName, name);
     }
 
     public Color getColor() {
@@ -87,14 +92,9 @@ public class PlayerConfig {
     }
 
     public void setDiscordPresence(boolean discordPresence) {
+        boolean oldValue = this.discordPresence;
         this.discordPresence = discordPresence;
-        if (DiscordRPCSubSystem.isEnabled() != discordPresence) {
-            if (discordPresence) {
-                DiscordRPCSubSystem.enable();
-            } else {
-                DiscordRPCSubSystem.disable();
-            }
-        }
+        propertyChangeSupport.firePropertyChange(DISCORD_PRESENCE, oldValue, discordPresence);
     }
 
     public boolean isDiscordPresence() {
