@@ -272,7 +272,7 @@ public abstract class GLTFCommonFormat<T extends AssetData> extends AbstractAsse
             if (Strings.isNullOrEmpty(boneName)) {
                 boneName = "bone_" + i;
             }
-            Bone bone = new Bone(i, boneName, new org.joml.Matrix4f().translationRotateScale(position, rotation, scale));
+            Bone bone = new Bone(i, boneName, new Matrix4f().translationRotateScale(position, rotation, scale));
             bone.setInverseBindMatrix(inverseMats.get(i));
             bones.add(bone);
             boneToJoint.put(nodeIndex, i);

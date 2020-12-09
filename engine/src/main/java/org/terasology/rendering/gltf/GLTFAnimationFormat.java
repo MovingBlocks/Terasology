@@ -170,11 +170,11 @@ public class GLTFAnimationFormat extends GLTFCommonFormat<MeshAnimationBundleDat
         return floats;
     }
 
-    private List<org.joml.Vector3f> getVector3fs(GLTF gltf, List<byte[]> loadedBuffers, int accessorIndex) throws IOException {
+    private List<Vector3f> getVector3fs(GLTF gltf, List<byte[]> loadedBuffers, int accessorIndex) throws IOException {
         TFloatList floats = getFloats(gltf, loadedBuffers, accessorIndex);
-        List<org.joml.Vector3f> vectors = Lists.newArrayListWithCapacity(floats.size() / 3);
+        List<Vector3f> vectors = Lists.newArrayListWithCapacity(floats.size() / 3);
         for (int i = 0; i < floats.size(); i += 3) {
-            vectors.add(new org.joml.Vector3f(floats.get(i), floats.get(i + 1), floats.get(i + 2)));
+            vectors.add(new Vector3f(floats.get(i), floats.get(i + 1), floats.get(i + 2)));
         }
         return vectors;
     }
