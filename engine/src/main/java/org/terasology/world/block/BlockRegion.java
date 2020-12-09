@@ -18,6 +18,7 @@ import org.joml.Vector3fc;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.math.Side;
 
 /**
  * is a bounded box describing blocks contained within. A {@link BlockRegion} is described and backed by an {@link
@@ -800,6 +801,38 @@ public class BlockRegion {
         dest.aabb.maxY = Math.roundUsing(this.aabb.maxY + extentY, RoundingMode.CEILING);
         dest.aabb.maxZ = Math.roundUsing(this.aabb.maxZ + extentZ, RoundingMode.CEILING);
         return dest;
+    }
+
+    /**
+     * calculates a 1 width region that borders the provided {@link Side} of a region
+     *
+     * @param side the side of the region
+     * @param dest will hold the result
+     * @return dest
+     */
+    public BlockRegion edge(Side side, BlockRegion dest) {
+        switch (side) {
+            case TOP:
+                return dest.setMin(this.getMinX(), this.getMaxY(), this.getMinZ()
+                ).setMax(this.getMaxX(), this.getMaxY(), this.getMaxZ());
+            case BOTTOM:
+                return dest.setMin(this.getMinX(), this.getMinY(), this.getMinZ()
+                ).setMax(this.getMaxX(), this.getMinY(), this.getMaxZ());
+            case LEFT:
+                return dest.setMin(this.getMinX(), this.getMinY(), this.getMinZ()
+                ).setMax(this.getMinX(), this.getMaxY(), this.getMaxZ());
+            case RIGHT:
+                return dest.setMin(this.getMaxX(), this.getMinY(), this.getMinZ()
+                ).setMax(this.getMaxX(), this.getMaxY(), this.getMaxZ());
+            case FRONT:
+                return dest.setMin(this.getMinX(), this.getMinY(), this.getMinZ()
+                ).setMax(this.getMaxX(), this.getMaxY(), this.getMinZ());
+            case BACK:
+                return dest.setMin(this.getMinX(), this.getMinY(), this.getMaxZ()
+                ).setMax(this.getMaxX(), this.getMaxY(), this.getMaxZ());
+            default:
+                return dest.set(this);
+        }
     }
 
     @Override

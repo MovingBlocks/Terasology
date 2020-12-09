@@ -486,7 +486,9 @@ public final class ChunkMath {
      * @param pos the world position
      * @param extent the extent
      * @return chunk region
+     *
      */
+    @Deprecated
     public static BlockRegion getChunkRegionAroundWorldPos(Vector3ic pos, int extent) {
         org.joml.Vector3i temp = new org.joml.Vector3i();
         org.joml.Vector3i minChunk = calcChunkPos(temp.set(pos).add(-extent, -extent, -extent), new org.joml.Vector3i());
@@ -569,7 +571,9 @@ public final class ChunkMath {
      * @param side the side to border
      * @param dest will hold the result
      * @return dest
+     * @deprecated use {@link BlockRegion#edge(Side, BlockRegion)}
      */
+    @Deprecated
     public static BlockRegion getEdgeRegion(BlockRegion region, Side side, BlockRegion dest) {
         switch (side) {
             case TOP:
