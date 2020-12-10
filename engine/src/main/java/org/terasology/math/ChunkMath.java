@@ -28,8 +28,10 @@ import java.math.RoundingMode;
 
 /**
  * Collection of math functions.
- *
+ * @deprecated This method is scheduled for removal in an upcoming version.
+ *             Use the JOML implementation instead: {@link org.terasology.world.chunks.Chunks}.
  */
+@Deprecated
 public final class ChunkMath {
 
     private ChunkMath() {

@@ -4,30 +4,27 @@
 package org.terasology.world.chunks;
 
 import org.joml.Math;
+import org.joml.RoundingMode;
 import org.joml.Vector3fc;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
-import org.terasology.math.TeraMath;
 import org.terasology.module.sandbox.API;
 import org.terasology.world.block.BlockRegion;
 import org.terasology.world.block.BlockRegions;
 
 @API
 public final class Chunks {
-    private Chunks() {
-    }
-
     public static final int SIZE_X = 32;
     public static final int SIZE_Y = 64;
     public static final int SIZE_Z = 32;
 
-    public static final int INNER_CHUNK_POS_FILTER_X = TeraMath.ceilPowerOfTwo(SIZE_X) - 1;
-    public static final int INNER_CHUNK_POS_FILTER_Y = TeraMath.ceilPowerOfTwo(SIZE_Y) - 1;
-    public static final int INNER_CHUNK_POS_FILTER_Z = TeraMath.ceilPowerOfTwo(SIZE_Z) - 1;
+    public static final int INNER_CHUNK_POS_FILTER_X = Integer.highestOneBit(SIZE_X) - 1;
+    public static final int INNER_CHUNK_POS_FILTER_Y = Integer.highestOneBit(SIZE_Y) - 1;
+    public static final int INNER_CHUNK_POS_FILTER_Z = Integer.highestOneBit(SIZE_Z) - 1;
 
-    public static final int POWER_X = Integer.highestOneBit(SIZE_X);
-    public static final int POWER_Y = Integer.highestOneBit(SIZE_Y);
-    public static final int POWER_Z = Integer.highestOneBit(SIZE_Z);
+    public static final int POWER_X = Integer.numberOfTrailingZeros(SIZE_X);
+    public static final int POWER_Y = Integer.numberOfTrailingZeros(SIZE_Y);
+    public static final int POWER_Z = Integer.numberOfTrailingZeros(SIZE_Z);
 
     public static final byte MAX_LIGHT = 0x0f; // max light for a light source 0-15
     public static final byte MAX_SUNLIGHT = 0x0f; // max sunlight for sunlight bounded 0-15
@@ -41,35 +38,25 @@ public final class Chunks {
 
     public static final Vector3ic LOCAL_REGION_EXTENTS = new Vector3i(1, 1, 1);
 
+    private Chunks() {
+    }
+
     /**
      * Returns the chunk position of a given coordinate.
      *
-     * @param x The coordinate of the block
+     * @param val The coordinate of the block
      * @param chunkPower the size of the chunk in powers of 2
      * @return The coordinate of the chunk
      */
-    public static int toChunkPos(int x, int chunkPower) {
-        return (x >> chunkPower);
+    public static int toChunkPos(int val, int chunkPower) {
+        return (val >> chunkPower);
     }
-
-    public static int toChunkX(int x) {
-        return toChunkPos(x, ChunkConstants.CHUNK_POWER.x);
-    }
-
-    public static int toChunkY(int y) {
-        return toChunkPos(y, ChunkConstants.CHUNK_POWER.y);
-    }
-
-    public static int toChunkZ(int z) {
-        return toChunkPos(z, ChunkConstants.CHUNK_POWER.z);
-    }
-
 
     /**
      * The position of the chunk given the coordinate and size of chunk in powers of 2.
      *
-     * <p>default chunk size ({@link ChunkConstants#SIZE_X}, {@link ChunkConstants#SIZE_Y}, {@link
-     * ChunkConstants#SIZE_Z}) </p>
+     * <p>default chunk size ({@link Chunks#SIZE_X}, {@link Chunks#SIZE_Y}, {@link
+     * Chunks#SIZE_Z}) </p>
      *
      * @param worldPos absolute position of the block
      * @param dest will hold the result
@@ -80,7 +67,23 @@ public final class Chunks {
     }
 
     /**
-     * The position relative to the size of chunk with the given chunk power
+     * The position of the chunk given the coordinate and size of chunk in powers of 2.
+     * This uses the default power ({@link #POWER_X}, {@link #POWER_Y}, {@link #POWER_Z})
+     *
+     * <p>default chunk size ({@link #SIZE_X}, {@link #SIZE_Y}, {@link #SIZE_Z}) </p>
+     *
+     * @param x absolute x coordinate of the block
+     * @param y absolute y coordinate of the block
+     * @param z absolute z coordinate of the block
+     * @param dest will hold the result
+     * @return dest
+     */
+    public static Vector3i toChunkPos(int x, int y, int z, Vector3i dest) {
+        return toChunkPos(x, y, z, POWER_X, POWER_Y, POWER_Z, dest);
+    }
+
+    /**
+     * The position of the chunk given the coordinate and size of chunk in powers of 2.
      *
      * <p>Chunk size is in powers of 2 (2, 4, 8, 16, ...)</p>
      *
@@ -94,11 +97,33 @@ public final class Chunks {
      * @return dest
      */
     public static Vector3i toChunkPos(float x, float y, float z, int chunkX, int chunkY, int chunkZ, Vector3i dest) {
-        return toChunkPos(Math.roundUsing(x, org.joml.RoundingMode.FLOOR), Math.roundUsing(y, org.joml.RoundingMode.FLOOR), Math.roundUsing(z, org.joml.RoundingMode.FLOOR), chunkX, chunkY, chunkZ, dest);
+        return toChunkPos(
+            Math.roundUsing(x, RoundingMode.FLOOR),
+            Math.roundUsing(y, RoundingMode.FLOOR),
+            Math.roundUsing(z, RoundingMode.FLOOR), chunkX, chunkY, chunkZ, dest);
     }
 
     /**
-     * The position relative to the size of chunk with the given chunk power
+     * The position of the chunk given the coordinate and size of chunk in powers of 2.
+     *
+     * <p>Chunk size is in powers of 2 (2, 4, 8, 16, ...)</p>
+     *
+     * @param x the x coordinate of the block
+     * @param y the y coordinate of the block
+     * @param z the z coordinate of the block
+     * @param dest will hold the result
+     * @return dest
+     */
+    public static Vector3i toChunkPos(float x, float y, float z, Vector3i dest) {
+        return toChunkPos(
+            Math.roundUsing(x, RoundingMode.FLOOR),
+            Math.roundUsing(y, RoundingMode.FLOOR),
+            Math.roundUsing(z, RoundingMode.FLOOR), POWER_X, POWER_Y, POWER_Z, dest);
+    }
+
+
+    /**
+     * The position of the chunk given the coordinate and size of chunk in powers of 2.
      *
      * <p>Chunk size is in powers of 2 (2, 4, 8, 16, ...)</p>
      *
@@ -112,10 +137,13 @@ public final class Chunks {
      * @return dest
      */
     public static Vector3i toChunkPos(int x, int y, int z, int chunkX, int chunkY, int chunkZ, org.joml.Vector3i dest) {
-        return dest.set(toChunkPos(x, chunkX), toChunkPos(y, chunkY), toChunkPos(z, chunkZ));
+        return dest.set(
+            toChunkPos(x, chunkX),
+            toChunkPos(y, chunkY),
+            toChunkPos(z, chunkZ));
     }
     /**
-     * calculates a region that encasing a chunk
+     * Maps a {@link BlockRegion} to the chunks that intersect the {@link BlockRegion}.
      *
      * @param region a bounding box that is contained
      * @param chunkX the x unit size of the chunk in powers of 2
@@ -131,7 +159,7 @@ public final class Chunks {
     }
 
     /**
-     * calculates a region that encasing a chunk
+     * Maps a {@link BlockRegion} to the relative chunks that intersect the {@link BlockRegion}.
      *
      * @param region a bounding box that is contained
      * @param chunkPower  the size of the chunk in powers of 2
@@ -144,15 +172,15 @@ public final class Chunks {
 
 
     /**
-     * calculates a region that encasing a chunk
-     * This uses the default power ({@link ChunkConstants#POWER_X}, {@link ChunkConstants#POWER_Y}, {@link ChunkConstants#POWER_Z})
+     * Maps a {@link BlockRegion} to the chunks that intersect the {@link BlockRegion}.
+     * This uses the default power ({@link Chunks#POWER_X}, {@link Chunks#POWER_Y}, {@link Chunks#POWER_Z})
      *
      * @param region a bounding box that is contained
      * @param dest will hold the result
      * @return dest
      */
     public static BlockRegion toChunkRegion(BlockRegion region, BlockRegion dest) {
-        return toChunkRegion(region, ChunkConstants.POWER_X, ChunkConstants.POWER_Y, ChunkConstants.POWER_Z, dest);
+        return toChunkRegion(region, Chunks.POWER_X, Chunks.POWER_Y, Chunks.POWER_Z, dest);
     }
 
     /**
@@ -168,34 +196,37 @@ public final class Chunks {
 
 
     /**
-     * the relative position from the x axis from the (0,0,0) corner
+     * the relative position from the x axis from the (0,0,0) corner.
+     *
      * @param blockX absolute x position
      * @return relative position for x axis
      */
     public static int toRelativeX(int blockX) {
-        return toRelative(blockX, ChunkConstants.INNER_CHUNK_POS_FILTER.x());
+        return toRelative(blockX, Chunks.INNER_CHUNK_POS_FILTER.x());
     }
 
     /**
-     * the relative position from the y axis from the (0,0,0) corner
+     * the relative position from the y axis from the (0,0,0) corner.
+     *
      * @param blockY absolute y position
      * @return relative position for y axis
      */
     public static int toRelativeY(int blockY) {
-        return toRelative(blockY, ChunkConstants.INNER_CHUNK_POS_FILTER.y());
+        return toRelative(blockY, Chunks.INNER_CHUNK_POS_FILTER.y());
     }
 
     /**
-     * the relative position from the z axis from the (0,0,0) corner
+     * the relative position from the z axis from the (0,0,0) corner.
      * @param blockZ absolute z position
      * @return relative position for z axis
      */
     public static int toRelativeZ(int blockZ) {
-        return toRelative(blockZ, ChunkConstants.INNER_CHUNK_POS_FILTER.z());
+        return toRelative(blockZ, Chunks.INNER_CHUNK_POS_FILTER.z());
     }
     /**
-     * the relative position in the nearest chunk from the (0,0,0) corner
-     * default chunk size of (32, 64, 32).
+     * the relative position in the nearest chunk from the (0,0,0) corner.
+     * Default chunk size of (32, 64, 32).
+     *
      * @param worldPos world position
      * @param dest will hold the result
      * @return dest
@@ -206,7 +237,8 @@ public final class Chunks {
 
     /**
      * the relative position in the nearest chunk from the (0,0,0) corner.
-     * default chunk size of (32, 64, 32).
+     * Default chunk size of (32, 64, 32).
+     *
      * @param x the x world position
      * @param y the y world position
      * @param z the z world position
@@ -233,9 +265,8 @@ public final class Chunks {
      * @return whether the block is inside the chunk
      */
     public static boolean inChunk(Vector3ic blockWorldPos, Vector3ic chunkPos) {
-        return toChunkX(blockWorldPos.x()) == chunkPos.x()
-            && toChunkY(blockWorldPos.y()) == chunkPos.y()
-            && toChunkZ(blockWorldPos.z()) == chunkPos.z();
+        return toChunkPos(blockWorldPos.x(), POWER_X) == chunkPos.x()
+            && toChunkPos(blockWorldPos.y(), POWER_Y) == chunkPos.y()
+            && toChunkPos(blockWorldPos.z(), POWER_Z) == chunkPos.z();
     }
-
 }
