@@ -1,18 +1,5 @@
-/*
- * Copyright 2016 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *  http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.rendering.nui.asset;
 
 import com.google.common.base.Charsets;
@@ -34,7 +21,12 @@ import org.terasology.assets.format.AbstractAssetFileFormat;
 import org.terasology.assets.format.AssetDataFile;
 import org.terasology.assets.module.annotations.RegisterAssetFileFormat;
 import org.terasology.i18n.TranslationSystem;
+import org.terasology.nui.LayoutHint;
+import org.terasology.nui.UILayout;
+import org.terasology.nui.UIWidget;
 import org.terasology.nui.asset.UIData;
+import org.terasology.nui.skin.UISkin;
+import org.terasology.nui.widgets.UILabel;
 import org.terasology.persistence.ModuleContext;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.persistence.typeHandling.extensionTypes.AssetTypeHandler;
@@ -43,12 +35,7 @@ import org.terasology.reflection.metadata.ClassMetadata;
 import org.terasology.reflection.metadata.FieldMetadata;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.nui.CoreScreenLayer;
-import org.terasology.nui.LayoutHint;
 import org.terasology.rendering.nui.NUIManager;
-import org.terasology.nui.UILayout;
-import org.terasology.nui.UIWidget;
-import org.terasology.nui.skin.UISkin;
-import org.terasology.nui.widgets.UILabel;
 import org.terasology.utilities.ReflectionUtil;
 import org.terasology.utilities.gson.CaseInsensitiveEnumTypeAdapterFactory;
 
@@ -98,7 +85,7 @@ public class UIFormat extends AbstractAssetFileFormat<UIData> {
     public UIData load(JsonElement element, Locale otherLocale) throws IOException {
         NUIManager nuiManager = CoreRegistry.get(NUIManager.class);
         TranslationSystem translationSystem = CoreRegistry.get(TranslationSystem.class);
-        TypeHandlerLibrary library = new TypeHandlerLibrary(CoreRegistry.get(TypeHandlerLibrary.class));
+        TypeHandlerLibrary library = CoreRegistry.get(TypeHandlerLibrary.class).copy();
         library.addTypeHandler(UISkin.class, new AssetTypeHandler<>(UISkin.class));
 
         // TODO: Rewrite to use TypeHandlerLibrary

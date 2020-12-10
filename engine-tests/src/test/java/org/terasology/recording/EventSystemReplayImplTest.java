@@ -25,6 +25,7 @@ import org.terasology.module.ModuleEnvironment;
 import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
+import org.terasology.persistence.typeHandling.TypeHandlerLibraryImpl;
 import org.terasology.reflection.TypeRegistry;
 import org.terasology.registry.CoreRegistry;
 
@@ -48,7 +49,7 @@ public class EventSystemReplayImplTest {
         CoreRegistry.setContext(context);
 
         Reflections reflections = new Reflections(getClass().getClassLoader());
-        TypeHandlerLibrary serializationLibrary = new TypeHandlerLibrary(reflections);
+        TypeHandlerLibrary serializationLibrary = new TypeHandlerLibraryImpl(reflections);
 
         EntitySystemLibrary entitySystemLibrary = new EntitySystemLibrary(context, serializationLibrary);
         PojoEntityManager entityManager = new PojoEntityManager();
