@@ -54,15 +54,17 @@ public final class DiscordRPCThread implements IPCListener, Runnable {
     }
 
     public synchronized void stop() {
-        thread.interrupt();
+        synchronized (thread) {
+            thread.interrupt();
+        }
     }
 
-    public synchronized void discover()  {
+    public synchronized void discover() {
         if (enabled && connected) {
             return;
         }
 
-        reset();
+        reset(true);
 
         connectedBefore = true;
     }
@@ -73,8 +75,7 @@ public final class DiscordRPCThread implements IPCListener, Runnable {
         }
 
         enabled = true;
-
-        reset();
+        autoReconnect = true;
 
         if (waiting && thread.isAlive()) {
             synchronized (thread) {
@@ -84,14 +85,20 @@ public final class DiscordRPCThread implements IPCListener, Runnable {
     }
 
     public synchronized void disable() {
+        disable(false);
+    }
+
+    public synchronized void disable(boolean keepConnectionAlive) {
         if (!enabled) {
             return;
         }
 
         enabled = false;
 
-        reset();
-        autoReconnect = false;
+        reset(!keepConnectionAlive);
+        if (!keepConnectionAlive) {
+            autoReconnect = false;
+        }
 
         if (waiting && thread.isAlive()) {
             synchronized (thread) {
@@ -194,14 +201,17 @@ public final class DiscordRPCThread implements IPCListener, Runnable {
             /* Update the rich presence and keeping the connection alive */
             while (connected) {
                 synchronized (this) {
-                    /* Allocate a new rich presence when the buffer has changed */
-                    if (enabled && buffer.hasChanged()) {
-                        lastRichPresence = build();
-                        buffer.resetState();
-                    }
-
                     /* Ping the ipc connection with an rich presnece to keep the connection alive */
                     if (enabled) {
+                        /* Allocate a new rich presence when the buffer has changed */
+                        if (buffer.hasChanged() && buffer.isEmpty()) {
+                            lastRichPresence = null;
+                            buffer.resetState();
+                        } else if (buffer.hasChanged()) {
+                            lastRichPresence = build();
+                            buffer.resetState();
+                        }
+
                         ipcClient.sendRichPresence(lastRichPresence);
                     } else {
                         ipcClient.sendRichPresence(null);
@@ -221,6 +231,14 @@ public final class DiscordRPCThread implements IPCListener, Runnable {
     }
 
     public synchronized void setEnabled(boolean enabled) {
+        if (this.enabled != enabled) {
+            if (enabled) {
+                enable();
+            } else {
+                disable(true);
+            }
+        }
+
         this.enabled = enabled;
     }
 
@@ -235,16 +253,19 @@ public final class DiscordRPCThread implements IPCListener, Runnable {
     private RichPresence build() {
         return new RichPresence.Builder()
                 .setLargeImage(DISCORD_APP_DEFAULT_IMAGE)
+                .setDetails(buffer.getDetails())
                 .setState(buffer.getState())
                 .setStartTimestamp(buffer.getStartTimestamp())
                 .build();
     }
 
-    private void reset() {
+    private void reset(boolean resetConnection) {
         tries = 0;
 
         autoReconnect = true;
-        connectedBefore = false;
-        connected = false;
+        if (resetConnection) {
+            connectedBefore = false;
+            connected = false;
+        }
     }
 }

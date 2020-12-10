@@ -41,7 +41,8 @@ public final class DiscordRPCSystem extends BaseComponentSystem {
 
     @Override
     public void preBegin() {
-        DiscordRPCSubSystem.setState(getGame());
+        DiscordRPCSubSystem.setGameplayName("Custom");
+        DiscordRPCSubSystem.setState(getPartyState());
         DiscordRPCSubSystem.setStartTimestamp(null);
     }
 
@@ -52,6 +53,7 @@ public final class DiscordRPCSystem extends BaseComponentSystem {
 
     @Override
     public void shutdown() {
+        DiscordRPCSubSystem.reset();
         DiscordRPCSubSystem.setState("In Main Menu");
         DiscordRPCSubSystem.setStartTimestamp(null);
     }
@@ -66,18 +68,18 @@ public final class DiscordRPCSystem extends BaseComponentSystem {
             DiscordRPCSubSystem.setState("Idle");
             DiscordRPCSubSystem.setStartTimestamp(null);
         } else {
-            DiscordRPCSubSystem.setState(getGame());
+            DiscordRPCSubSystem.setState(getPartyState());
             DiscordRPCSubSystem.setStartTimestamp(OffsetDateTime.now());
         }
     }
 
-    public String getGame() {
+    public String getPartyState() {
         NetworkMode networkMode = networkSystem.getMode();
         String mode = "Playing Online";
         if (networkMode == NetworkMode.DEDICATED_SERVER) {
-            mode = "Hosting | " + game.getName();
+            mode = "Hosting";
         } else if (networkMode == NetworkMode.NONE) {
-            mode = "Solo | " + game.getName();
+            mode = "Playing Solo";
         }
         return mode;
     }

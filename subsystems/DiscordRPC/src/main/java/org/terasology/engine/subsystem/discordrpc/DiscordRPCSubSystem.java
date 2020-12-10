@@ -109,6 +109,21 @@ public final class DiscordRPCSubSystem implements EngineSubsystem, PropertyChang
     }
 
     /**
+     * Resets the current rich presence data
+     */
+    public static void reset() {
+        getInstance().thread.getBuffer().reset();
+    }
+
+    /**
+     * Sets the name of the gameplay the player is playing (e.g. Custom, Josharias Survival, etc...)
+     * @param name the name of the gameplay
+     */
+    public static void setGameplayName(String name) {
+        getInstance().thread.getBuffer().setDetails("Game: " + name);
+    }
+
+    /**
      * Sets the current game/party status for the player (e.g. Playing Solo, Idle, etc...)
      *
      * @param state The current game/party status
