@@ -54,6 +54,40 @@ public final class Chunks {
 
     /**
      * The position of the chunk given the coordinate and size of chunk in powers of 2.
+     * This uses the default power {@link #POWER_X}.
+     *
+     * @param x the x component
+     * @return The coordinate of the chunk
+     */
+    public static int toChunkPosX(int x) {
+        return toChunkPos(x, CHUNK_POWER.x());
+    }
+
+    /**
+     * The position of the chunk given the coordinate and size of chunk in powers of 2.
+     * This uses the default power {@link #POWER_Y}
+     *
+     * @param y the y component
+     * @return The coordinate of the chunk
+     */
+    public static int toChunkPosY(int y) {
+        return toChunkPos(y, CHUNK_POWER.y());
+    }
+
+    /**
+     * The position of the chunk given the coordinate and size of chunk in powers of 2.
+     * This uses the default power {@link #POWER_Z}
+     *
+     * @param z the z component
+     * @return The coordinate of the chunk
+     */
+    public static int toChunkPosZ(int z) {
+        return toChunkPos(z, CHUNK_POWER.z());
+    }
+
+
+    /**
+     * The position of the chunk given the coordinate and size of chunk in powers of 2.
      *
      * <p>default chunk size ({@link Chunks#SIZE_X}, {@link Chunks#SIZE_Y}, {@link
      * Chunks#SIZE_Z}) </p>
@@ -225,7 +259,7 @@ public final class Chunks {
     }
     /**
      * the relative position in the nearest chunk from the (0,0,0) corner.
-     * Default chunk size of (32, 64, 32).
+     * Default chunk size of ({@link #SIZE_X}, {@link #SIZE_Y}, {@link #SIZE_Z}).
      *
      * @param worldPos world position
      * @param dest will hold the result
@@ -237,7 +271,7 @@ public final class Chunks {
 
     /**
      * the relative position in the nearest chunk from the (0,0,0) corner.
-     * Default chunk size of (32, 64, 32).
+     * Default chunk size of ({@link #SIZE_X}, {@link #SIZE_Y}, {@link #SIZE_Z}).
      *
      * @param x the x world position
      * @param y the y world position
