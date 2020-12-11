@@ -45,6 +45,10 @@ public class Border3D {
         this.sides = sides;
     }
 
+    public Border3D(FacetBorder border) {
+        this(border.top(), border.bottom(), border.sides());
+    }
+
     /**@return Returns the extra space at the top.    */
     public int getTop() {
         return top;
@@ -111,18 +115,29 @@ public class Border3D {
     }
 
     /**
+     * Extends the border by using the sizes of another border.
+     * @param other The border to add to this one
+     * @return The new border with the extra extensions.
+     */
+    public Border3D extendBy(Border3D other) {
+        return new Border3D(top + other.top, bottom + other.bottom, sides + other.sides);
+    }
+
+    /**
      * Returns a new border, using the largest value of each extension for both borders. Border A(Sides=5,Bottom=4,Top=3) maxed with border B (Sides=3,Bottom=4,Top=5)
      * would make a border C with boundries: (5,4,5).
-     * @param topValue The top value to compare with the instance's top value.
-     * @param bottomValue The bottom value to compare with the instance's bottom value.
-     * @param sidesValue The sides value to compare with the instance's sides value.
-     * @return The resulting Border3D.
+     * @param other The top value to compare with the instance's top value.
+     * @return The resulting new Border3D.
      */
-    public Border3D maxWith(int topValue, int bottomValue, int sidesValue) {
-        return new Border3D(
-                Math.max(top, topValue),
-                Math.max(bottom, bottomValue),
-                Math.max(sides, sidesValue));
+    public Border3D maxWith(Border3D other) {
+        if (other == null) {
+            return new Border3D(top, bottom, sides);
+        } else {
+            return new Border3D(
+                    Math.max(top, other.top),
+                    Math.max(bottom, other.bottom),
+                    Math.max(sides, other.sides));
+        }
     }
 
     /**
