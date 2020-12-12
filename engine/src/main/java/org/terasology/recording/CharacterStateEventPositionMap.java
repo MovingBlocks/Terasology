@@ -16,6 +16,7 @@
 package org.terasology.recording;
 
 import org.terasology.logic.characters.CharacterStateEvent;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Vector3f;
 
 import java.util.HashMap;
@@ -70,7 +71,7 @@ public class CharacterStateEventPositionMap {
      */
     public void updateCharacterStateEvent(CharacterStateEvent event) {
         Vector3f[] data = this.idToData.get(event.getSequenceNumber());
-        event.setPosition(data[0]);
-        event.setVelocity(data[1]);
+        event.setPosition(JomlUtil.from(data[0]));
+        event.setVelocity(JomlUtil.from(data[1]));
     }
 }
