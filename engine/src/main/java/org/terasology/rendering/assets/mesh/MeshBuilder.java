@@ -227,6 +227,6 @@ public class MeshBuilder {
     public interface TextureMapper {
         void initialize(org.joml.Vector3f offset, org.joml.Vector3f size);
 
-        Vector2f map(int vertexIndex, float u, float v);
+        org.joml.Vector2fc map(int vertexIndex, float u, float v);
     }
 }
