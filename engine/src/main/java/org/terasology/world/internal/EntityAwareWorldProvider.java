@@ -196,7 +196,7 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
         }
 
         OnChangedBlock changedEvent = new OnChangedBlock(JomlUtil.from(pos), type, oldType);
-        EntityRef regionEntity = blockRegionLookup.get(pos);
+        EntityRef regionEntity = blockRegionLookup.get(JomlUtil.from(pos));
         if (regionEntity != null) {
             regionEntity.send(changedEvent);
         }
