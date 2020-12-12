@@ -13,9 +13,8 @@ import java.util.Optional;
 /**
  * This facet represents the heights of all of the surfaces of the ground. There may be multiple surfaces
  * in one column, for example, where there are overhangs, or floating islands. This facet is intended to
- * be used for placement of features on the surface itself, such as grass, trees and buildings.
- *
- * The combination of the SurfacesFacet and the {@link ElevationFacet} is a more flexible alternative to the {@link SurfaceHeightFacet}.
+ * be used for placement of features on the surface itself, such as grass, trees and buildings. Things that
+ * require a single altitude value should use the {@link ElevationFacet} instead.
  */
 public class SurfacesFacet extends VerticallySparseBooleanFacet3D {
 
