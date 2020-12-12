@@ -206,7 +206,7 @@ public class MeshBuilder {
      * <br><br>
      * Use the texture mapper to change how texture coordinates (u and v) are applied to each vertex.
      */
-    public MeshBuilder addBox(Vector3f offset, Vector3f size, float u, float v) {
+    public MeshBuilder addBox(org.joml.Vector3f offset, org.joml.Vector3f size, float u, float v) {
         int vertexId = vertexCount;
         textureMapper.initialize(offset, size);
         for (int i = 0; i < VERTICES.length / 3; i++) {
@@ -225,7 +225,7 @@ public class MeshBuilder {
 
     @API
     public interface TextureMapper {
-        void initialize(Vector3f offset, Vector3f size);
+        void initialize(org.joml.Vector3f offset, org.joml.Vector3f size);
 
         Vector2f map(int vertexIndex, float u, float v);
     }
