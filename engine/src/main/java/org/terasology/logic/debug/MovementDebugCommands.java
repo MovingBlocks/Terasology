@@ -102,7 +102,7 @@ public class MovementDebugCommands extends BaseComponentSystem {
     public String pushCharacterCommand(@Sender EntityRef sender,
                                        @CommandParam("x") float x, @CommandParam("y") float y, @CommandParam("z") float z) {
         ClientComponent clientComponent = sender.getComponent(ClientComponent.class);
-        clientComponent.character.send(new CharacterImpulseEvent(JomlUtil.from(new Vector3f(x, y, z))));
+        clientComponent.character.send(new CharacterImpulseEvent(new Vector3f(x, y, z)));
         return "Pushing character with " + x + " " + y + " " + z;
     }
 
