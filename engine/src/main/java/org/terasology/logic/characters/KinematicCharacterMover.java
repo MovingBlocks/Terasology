@@ -658,7 +658,6 @@ public class KinematicCharacterMover implements CharacterMover {
                 if (input.isFirstRun()) {
                     Vector3f landVelocity = new Vector3f(JomlUtil.from(state.getVelocity()));
                     landVelocity.y += (distanceMoved.y / moveDelta.y) * (endVelocity.y - state.getVelocity().y);
-                    logger.debug("Landed at " + landVelocity);
                     entity.send(new VerticalCollisionEvent(state.getPosition(), JomlUtil.from(landVelocity)));
                 }
                 state.setGrounded(true);
@@ -691,7 +690,6 @@ public class KinematicCharacterMover implements CharacterMover {
                 if (input.isFirstRun()) {
                     Vector3f hitVelocity = new Vector3f(JomlUtil.from(state.getVelocity()));
                     hitVelocity.y += (distanceMoved.y / moveDelta.y) * (endVelocity.y - state.getVelocity().y);
-                    logger.debug("Hit at " + hitVelocity);
                     entity.send(new VerticalCollisionEvent(state.getPosition(), JomlUtil.from(hitVelocity)));
                 }
                 endVelocity.y = -0.0f * endVelocity.y;
@@ -726,7 +724,6 @@ public class KinematicCharacterMover implements CharacterMover {
             Vector3f hitVelocity = new Vector3f(JomlUtil.from(state.getVelocity()));
             hitVelocity.x += (distanceMoved.x / moveDelta.x) * (endVelocity.x - state.getVelocity().x);
             hitVelocity.z += (distanceMoved.z / moveDelta.z) * (endVelocity.z - state.getVelocity().z);
-            logger.debug("Hit at " + hitVelocity);
             entity.send(new HorizontalCollisionEvent(state.getPosition(), JomlUtil.from(hitVelocity)));
         }
         state.getVelocity().set(JomlUtil.from(endVelocity));

@@ -33,6 +33,7 @@ import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.logic.characters.events.SetMovementModeEvent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.LocalPlayer;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.network.NetworkSystem;
 import org.terasology.physics.engine.CharacterCollider;
@@ -161,7 +162,7 @@ public class ServerCharacterPredictionSystem extends BaseComponentSystem impleme
         CircularBuffer<CharacterStateEvent> stateBuffer = characterStates.get(entity);
         CharacterStateEvent lastState = stateBuffer.getLast();
         CharacterStateEvent newState = new CharacterStateEvent(lastState);
-        newState.setPosition(new Vector3f(event.getTargetPosition()));
+        newState.setPosition(new Vector3f(JomlUtil.from(event.getTargetPosition())));
         newState.setTime(time.getGameTimeInMs());
         stateBuffer.add(newState);
         characterMovementSystemUtility.setToState(entity, newState);

@@ -18,6 +18,7 @@ package org.terasology.logic.players;
 import org.terasology.entitySystem.entity.EntityBuilder;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.entitySystem.entity.internal.EntityScope;
 import org.terasology.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
 import org.terasology.entitySystem.entity.lifecycleEvents.OnChangedComponent;
 import org.terasology.entitySystem.event.ReceiveEvent;
@@ -81,6 +82,7 @@ public class CameraClientSystem extends BaseComponentSystem {
             EntityBuilder builder = entityManager.newBuilder("engine:camera");
             builder.setPersistent(false);
             clientComponent.camera = builder.build();
+            clientComponent.camera.setScope(EntityScope.GLOBAL); // Ensure that the camera isn't destroyed by the purgeWorld command.
             localPlayer.getClientEntity().saveComponent(clientComponent);
         }
     }
