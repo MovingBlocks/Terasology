@@ -1,18 +1,5 @@
-/*
- * Copyright 2020 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.world.block;
 
 import org.joml.AABBd;
@@ -34,8 +21,8 @@ import org.joml.Vector3ic;
 import org.terasology.entitySystem.entity.EntityRef;
 
 /**
- * is a bounded box describing blocks contained within.
- * A {@link BlockRegion} is described and backed by an {@link AABBi}
+ * is a bounded box describing blocks contained within. A {@link BlockRegion} is described and backed by an {@link
+ * AABBi}
  */
 public class BlockRegion {
 
@@ -55,10 +42,18 @@ public class BlockRegion {
         aabb.set(source);
     }
 
+    /**
+     * Deprecated in favor of {@link org.terasology.world.block.BlockRegions#createFromMinAndMax(Vector3ic, Vector3ic)}
+     */
+    @Deprecated
     public BlockRegion(Vector3ic min, Vector3ic max) {
         this(min.x(), min.y(), min.z(), max.x(), max.y(), max.z());
     }
 
+    /**
+     * Deprecated in favor of {@link org.terasology.world.block.BlockRegions#createFromMinAndMax(Vector3ic, Vector3ic)}
+     */
+    @Deprecated
     public BlockRegion(int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
         this.setMin(minX, minY, minZ).setMax(maxX, maxY, maxZ);
     }
@@ -83,22 +78,28 @@ public class BlockRegion {
     public Vector3i getMax(Vector3i dest) {
         return dest.set(aabb.maxX - 1, aabb.maxY - 1, aabb.maxZ - 1);
     }
+
     /**
      * the maximum coordinate of the second block x
+     *
      * @return the minimum coordinate x
      */
     public int getMaxX() {
         return this.aabb.maxX - 1;
     }
+
     /**
      * the maximum coordinate of the second block y
+     *
      * @return the minimum coordinate y
      */
     public int getMaxY() {
         return this.aabb.maxY - 1;
     }
+
     /**
      * the maximum coordinate of the second block z
+     *
      * @return the minimum coordinate z
      */
     public int getMaxZ() {
@@ -107,13 +108,16 @@ public class BlockRegion {
 
     /**
      * the minimum coordinate of the first block x
+     *
      * @return the minimum coordinate x
      */
     public int getMinX() {
         return this.aabb.minX;
     }
+
     /**
      * the minimum coordinate of the first block y
+     *
      * @return the minimum coordinate y
      */
     public int getMinY() {
@@ -122,10 +126,21 @@ public class BlockRegion {
 
     /**
      * the minimum coordinate of the first block z
+     *
      * @return the minimum coordinate z
      */
     public int getMinZ() {
         return this.aabb.minZ;
+    }
+
+    /**
+     * set source to current region
+     * @param source the source region
+     * @return this
+     */
+    public BlockRegion set(BlockRegion source) {
+        this.aabb.set(source.aabb);
+        return this;
     }
 
     /**
@@ -177,7 +192,9 @@ public class BlockRegion {
     }
 
     /**
-     * Set <code>this</code> to the union of <code>this</code> and the given {@link EntityRef} associated with a block <code>p</code>.
+     * Set <code>this</code> to the union of <code>this</code> and the given {@link EntityRef} associated with a block
+     * <code>p</code>.
+     *
      * @param blockRef entityRef that describes a block
      * @param dest will hold the result
      * @return dest
@@ -201,11 +218,12 @@ public class BlockRegion {
     }
 
     /**
-     * Compute the union of <code>this</code> and the given block <code>(x, y, z)</code> and stores the result in <code>dest</code>
+     * Compute the union of <code>this</code> and the given block <code>(x, y, z)</code> and stores the result in
+     * <code>dest</code>
      *
-     * @param x    the x coordinate of the block
-     * @param y    the y coordinate of the block
-     * @param z    the z coordinate of the block
+     * @param x the x coordinate of the block
+     * @param y the y coordinate of the block
+     * @param z the z coordinate of the block
      * @param dest will hold the result
      * @return dest
      */
@@ -221,7 +239,9 @@ public class BlockRegion {
     }
 
     /**
-     * Compute the union of <code>this</code> and the given block <code>(x, y, z)</code> and store the result in <code>dest</code>.
+     * Compute the union of <code>this</code> and the given block <code>(x, y, z)</code> and store the result in
+     * <code>dest</code>.
+     *
      * @param pos the position of the block
      * @param dest will hold the result
      * @return dest
@@ -253,7 +273,7 @@ public class BlockRegion {
     }
 
     /**
-     *  Set <code>this</code> to the union of <code>this</code> and <code>other</code>.
+     * Set <code>this</code> to the union of <code>this</code> and <code>other</code>.
      *
      * @param other the other {@link AABBi}
      * @return this
@@ -264,18 +284,36 @@ public class BlockRegion {
     }
 
     /**
-     * Ensure that the minimum coordinates are strictly less than or equal to the maximum coordinates by swapping
-     * them if necessary.
+     * Ensure that the minimum coordinates are strictly less than or equal to the maximum coordinates by swapping them
+     * if necessary.
      *
      * @return this
      */
     public BlockRegion correctBounds() {
-        this.aabb.correctBounds();
+        // NOTE: this is basically the same as AABBi#correctBounds, but adjusted for off-by-one semantics here in
+        //       BlockRegion for the max value.
+        int tmp;
+        if (this.aabb.minX > this.aabb.maxX - 1) {
+            tmp = this.aabb.minX;
+            this.aabb.minX = this.aabb.maxX - 1;
+            this.aabb.maxX = tmp + 1;
+        }
+        if (this.aabb.minY > this.aabb.maxY - 1) {
+            tmp = this.aabb.minY;
+            this.aabb.minY = this.aabb.maxY - 1;
+            this.aabb.maxY = tmp + 1;
+        }
+        if (this.aabb.minZ > this.aabb.maxZ - 1) {
+            tmp = this.aabb.minZ;
+            this.aabb.minZ = this.aabb.maxZ - 1;
+            this.aabb.maxZ = tmp + 1;
+        }
         return this;
     }
 
     /**
      * set the size of the block region from minimum.
+     *
      * @param x the x coordinate to set the size
      * @param y the y coordinate to set the size
      * @param z the z coordinate to set the size
@@ -290,6 +328,7 @@ public class BlockRegion {
 
     /**
      * set the size of the block region from minimum.
+     *
      * @param size the size to set the {@link BlockRegion}
      * @return this
      */
@@ -299,11 +338,13 @@ public class BlockRegion {
 
     /**
      * the number of blocks for the +x, +y, +z from the minimum to the maximum
+     *
      * @param dest will hold the result
      * @return dest
      */
     public Vector3i getSize(Vector3i dest) {
-        return dest.set(this.aabb.maxX - this.aabb.minX, this.aabb.maxY - this.aabb.minY, this.aabb.maxZ - this.aabb.minZ);
+        return dest.set(this.aabb.maxX - this.aabb.minX, this.aabb.maxY - this.aabb.minY,
+                this.aabb.maxZ - this.aabb.minZ);
     }
 
     /**
@@ -335,9 +376,10 @@ public class BlockRegion {
 
     /**
      * Translate <code>this</code> by the given vector <code>xyz</code>.
-     * @param x  the x coordinate to translate by
-     * @param y  the y coordinate to translate by
-     * @param z  the z coordinate to translate by
+     *
+     * @param x the x coordinate to translate by
+     * @param y the y coordinate to translate by
+     * @param z the z coordinate to translate by
      * @return this
      */
     public BlockRegion translate(int x, int y, int z) {
@@ -347,7 +389,8 @@ public class BlockRegion {
 
     /**
      * Translate <code>this</code> by the given vector <code>xyz</code>.
-     * @param xyz  the vector to translate by
+     *
+     * @param xyz the vector to translate by
      * @param dest will hold the result
      * @return dest
      */
@@ -359,8 +402,7 @@ public class BlockRegion {
     /**
      * Translate <code>this</code> by the given vector <code>xyz</code>.
      *
-     * @param xyz
-     *          the vector to translate by
+     * @param xyz the vector to translate by
      * @return this
      */
     public BlockRegion translate(Vector3ic xyz) {
@@ -373,8 +415,7 @@ public class BlockRegion {
      * <p>
      * The matrix in <code>m</code> <i>must</i> be {@link Matrix4fc#isAffine() affine}.
      *
-     * @param m
-     *          the affine transformation matrix
+     * @param m the affine transformation matrix
      * @return this
      */
     public BlockRegion transform(Matrix4fc m) {
@@ -387,8 +428,7 @@ public class BlockRegion {
      * <p>
      * The matrix in <code>m</code> <i>must</i> be {@link Matrix4fc#isAffine() affine}.
      *
-     * @param m
-     *          the affine transformation matrix
+     * @param m the affine transformation matrix
      * @return this
      */
     public BlockRegion transform(Matrix4fc m, BlockRegion dest) {
@@ -399,7 +439,7 @@ public class BlockRegion {
     /**
      * Test whether the block <code>(x, y, z)</code> lies inside this BlockRegion.
      *
-     * @param pos  the coordinates of the block
+     * @param pos the coordinates of the block
      * @return <code>true</code> iff the given point lies inside this AABB; <code>false</code> otherwise
      */
     public boolean containsBlock(Vector3ic pos) {
@@ -407,16 +447,19 @@ public class BlockRegion {
     }
 
     /**
-     * the center of the region
+     * The center of the region if the region is valid, {@link Float#NaN} in all dimensions otherwise.
      *
      * @param dest will hold the result
      * @return dest
      */
     public Vector3f center(Vector3f dest) {
+        if (!this.isValid()) {
+            return dest.set(Float.NaN);
+        }
         return dest.set(
-            (aabb.maxX - aabb.minX) / 2.0f,
-            (aabb.maxY - aabb.minY) / 2.0f,
-            (aabb.maxZ - aabb.minZ) / 2.0f
+                aabb.minX + ((aabb.maxX - aabb.minX) / 2.0f),
+                aabb.minY + ((aabb.maxY - aabb.minY) / 2.0f),
+                aabb.minZ + ((aabb.maxZ - aabb.minZ) / 2.0f)
         );
     }
 
@@ -516,7 +559,9 @@ public class BlockRegion {
     /**
      * Test whether the plane given via its plane equation <code>a*x + b*y + c*z + d = 0</code> intersects this AABB.
      * <p>
-     * Reference: <a href="http://www.lighthouse3d.com/tutorials/view-frustum-culling/geometric-approach-testing-boxes-ii/">http://www.lighthouse3d.com</a> ("Geometric Approach - Testing Boxes II")
+     * Reference:
+     * <a href="http://www.lighthouse3d.com/tutorials/view-frustum-culling/geometric-approach-testing-boxes-ii/">http://www.lighthouse3d.com</a>
+     * ("Geometric Approach - Testing Boxes II")
      *
      * @param a the x factor in the plane equation
      * @param b the y factor in the plane equation
@@ -531,7 +576,9 @@ public class BlockRegion {
     /**
      * Test whether the given plane intersects this AABB.
      * <p>
-     * Reference: <a href="http://www.lighthouse3d.com/tutorials/view-frustum-culling/geometric-approach-testing-boxes-ii/">http://www.lighthouse3d.com</a> ("Geometric Approach - Testing Boxes II")
+     * Reference:
+     * <a href="http://www.lighthouse3d.com/tutorials/view-frustum-culling/geometric-approach-testing-boxes-ii/">http://www.lighthouse3d.com</a>
+     * ("Geometric Approach - Testing Boxes II")
      *
      * @param plane the plane
      * @return <code>true</code> iff the plane intersects this AABB; <code>false</code> otherwise
@@ -574,7 +621,9 @@ public class BlockRegion {
      * Test whether this AABB intersects the given sphere with equation
      * <code>(x - centerX)^2 + (y - centerY)^2 + (z - centerZ)^2 - radiusSquared = 0</code>.
      * <p>
-     * Reference: <a href="http://stackoverflow.com/questions/4578967/cube-sphere-intersection-test#answer-4579069">http://stackoverflow.com</a>
+     * Reference:
+     * <a href="http://stackoverflow.com/questions/4578967/cube-sphere-intersection-test#answer-4579069">http://stackoverflow.com</a>
+     *
      * @param centerX the x coordinate of the center of the sphere
      * @param centerY the y coordinate of the center of the sphere
      * @param centerZ the z coordinate of the center of the sphere
@@ -582,13 +631,15 @@ public class BlockRegion {
      * @return <code>true</code> iff this AABB and the sphere intersect; <code>false</code> otherwise
      */
     public boolean intersectsSphere(float centerX, float centerY, float centerZ, float radiusSquared) {
-        return Intersectionf.testAabSphere(aabb.minX, aabb.minY, aabb.minZ, aabb.maxX, aabb.maxY, aabb.maxZ, centerX, centerY, centerZ, radiusSquared);
+        return Intersectionf.testAabSphere(aabb.minX, aabb.minY, aabb.minZ, aabb.maxX, aabb.maxY, aabb.maxZ, centerX,
+                centerY, centerZ, radiusSquared);
     }
 
     /**
      * Test whether this AABB intersects the given sphere.
      * <p>
-     * Reference: <a href="http://stackoverflow.com/questions/4578967/cube-sphere-intersection-test#answer-4579069">http://stackoverflow.com</a>
+     * Reference:
+     * <a href="http://stackoverflow.com/questions/4578967/cube-sphere-intersection-test#answer-4579069">http://stackoverflow.com</a>
      *
      * @param sphere the sphere
      * @return <code>true</code> iff this AABB and the sphere intersect; <code>false</code> otherwise
@@ -598,8 +649,8 @@ public class BlockRegion {
     }
 
     /**
-     * Test whether the given ray with the origin <code>(originX, originY, originZ)</code> and direction <code>(dirX, dirY, dirZ)</code>
-     * intersects this AABB.
+     * Test whether the given ray with the origin <code>(originX, originY, originZ)</code> and direction <code>(dirX,
+     * dirY, dirZ)</code> intersects this AABB.
      * <p>
      * This method returns <code>true</code> for a ray whose origin lies inside this AABB.
      * <p>
@@ -614,7 +665,8 @@ public class BlockRegion {
      * @return <code>true</code> if this AABB and the ray intersect; <code>false</code> otherwise
      */
     public boolean intersectsRay(float originX, float originY, float originZ, float dirX, float dirY, float dirZ) {
-        return Intersectionf.testRayAab(originX, originY, originZ, dirX, dirY, dirZ, aabb.minX, aabb.minY, aabb.minZ, aabb.maxX, aabb.maxY, aabb.maxZ);
+        return Intersectionf.testRayAab(originX, originY, originZ, dirX, dirY, dirZ, aabb.minX, aabb.minY, aabb.minZ,
+                aabb.maxX, aabb.maxY, aabb.maxZ);
     }
 
     /**
@@ -632,8 +684,8 @@ public class BlockRegion {
     }
 
     /**
-     * Determine whether the undirected line segment with the end points <code>(p0X, p0Y, p0Z)</code> and <code>(p1X, p1Y, p1Z)</code>
-     * intersects this AABB, and return the values of the parameter <i>t</i> in the ray equation
+     * Determine whether the undirected line segment with the end points <code>(p0X, p0Y, p0Z)</code> and <code>(p1X,
+     * p1Y, p1Z)</code> intersects this AABB, and return the values of the parameter <i>t</i> in the ray equation
      * <i>p(t) = origin + p0 * (p1 - p0)</i> of the near and far point of intersection.
      * <p>
      * This method returns <code>true</code> for a line segment whose either end point lies inside this AABB.
@@ -646,21 +698,23 @@ public class BlockRegion {
      * @param p1X the x coordinate of the line segment's second end point
      * @param p1Y the y coordinate of the line segment's second end point
      * @param p1Z the z coordinate of the line segment's second end point
-     * @param result
-     *              a vector which will hold the resulting values of the parameter
-     *              <i>t</i> in the ray equation <i>p(t) = p0 + t * (p1 - p0)</i> of the near and far point of intersection
-     *              iff the line segment intersects this AABB
-     * @return {@link Intersectionf#INSIDE} if the line segment lies completely inside of this AABB; or
-     *         {@link Intersectionf#OUTSIDE} if the line segment lies completely outside of this AABB; or
-     *         {@link Intersectionf#ONE_INTERSECTION} if one of the end points of the line segment lies inside of this AABB; or
-     *         {@link Intersectionf#TWO_INTERSECTION} if the line segment intersects two sides of this AABB or lies on an edge or a side of this AABB
+     * @param result a vector which will hold the resulting values of the parameter
+     *         <i>t</i> in the ray equation <i>p(t) = p0 + t * (p1 - p0)</i> of the near and far point of intersection
+     *         iff the line segment intersects this AABB
+     * @return {@link Intersectionf#INSIDE} if the line segment lies completely inside of this AABB; or {@link
+     *         Intersectionf#OUTSIDE} if the line segment lies completely outside of this AABB; or {@link
+     *         Intersectionf#ONE_INTERSECTION} if one of the end points of the line segment lies inside of this AABB; or
+     *         {@link Intersectionf#TWO_INTERSECTION} if the line segment intersects two sides of this AABB or lies on
+     *         an edge or a side of this AABB
      */
     public int intersectLineSegment(float p0X, float p0Y, float p0Z, float p1X, float p1Y, float p1Z, Vector2f result) {
-        return Intersectionf.intersectLineSegmentAab(p0X, p0Y, p0Z, p1X, p1Y, p1Z, aabb.minX, aabb.minY, aabb.minZ, aabb.maxX, aabb.maxY, aabb.maxZ, result);
+        return Intersectionf.intersectLineSegmentAab(p0X, p0Y, p0Z, p1X, p1Y, p1Z, aabb.minX, aabb.minY, aabb.minZ,
+                aabb.maxX, aabb.maxY, aabb.maxZ, result);
     }
 
     /**
-     * Determine whether the given undirected line segment intersects this AABB, and return the values of the parameter <i>t</i> in the ray equation
+     * Determine whether the given undirected line segment intersects this AABB, and return the values of the parameter
+     * <i>t</i> in the ray equation
      * <i>p(t) = origin + p0 * (p1 - p0)</i> of the near and far point of intersection.
      * <p>
      * This method returns <code>true</code> for a line segment whose either end point lies inside this AABB.
@@ -668,14 +722,14 @@ public class BlockRegion {
      * Reference: <a href="https://dl.acm.org/citation.cfm?id=1198748">An Efficient and Robust Ray–Box Intersection</a>
      *
      * @param lineSegment the line segment
-     * @param result
-     *              a vector which will hold the resulting values of the parameter
-     *              <i>t</i> in the ray equation <i>p(t) = p0 + t * (p1 - p0)</i> of the near and far point of intersection
-     *              iff the line segment intersects this AABB
-     * @return {@link Intersectionf#INSIDE} if the line segment lies completely inside of this AABB; or
-     *         {@link Intersectionf#OUTSIDE} if the line segment lies completely outside of this AABB; or
-     *         {@link Intersectionf#ONE_INTERSECTION} if one of the end points of the line segment lies inside of this AABB; or
-     *         {@link Intersectionf#TWO_INTERSECTION} if the line segment intersects two sides of this AABB or lies on an edge or a side of this AABB
+     * @param result a vector which will hold the resulting values of the parameter
+     *         <i>t</i> in the ray equation <i>p(t) = p0 + t * (p1 - p0)</i> of the near and far point of intersection
+     *         iff the line segment intersects this AABB
+     * @return {@link Intersectionf#INSIDE} if the line segment lies completely inside of this AABB; or {@link
+     *         Intersectionf#OUTSIDE} if the line segment lies completely outside of this AABB; or {@link
+     *         Intersectionf#ONE_INTERSECTION} if one of the end points of the line segment lies inside of this AABB; or
+     *         {@link Intersectionf#TWO_INTERSECTION} if the line segment intersects two sides of this AABB or lies on
+     *         an edge or a side of this AABB
      */
     public int intersectLineSegment(LineSegmentf lineSegment, Vector2f result) {
         return Intersectionf.intersectLineSegmentAab(lineSegment, aabb, result);
@@ -692,6 +746,7 @@ public class BlockRegion {
 
     /**
      * calculate the BlockRegion that is intersected between another region
+     *
      * @param other the other BlockRegion
      * @param dest holds the result
      * @return dest
@@ -722,6 +777,27 @@ public class BlockRegion {
      */
     public BlockRegion addExtents(int extentX, int extentY, int extentZ) {
         return addExtents(extentX, extentY, extentZ, this);
+    }
+
+    /**
+     * Adds extend for each face of a BlockRegion.
+     *
+     * @param extents extents to grow each face
+     * @param dest holds the result
+     * @return dest
+     */
+    public BlockRegion addExtents(Vector3ic extents, BlockRegion dest) {
+        return addExtents(extents.x(), extents.y(), extents.z(), dest);
+    }
+
+    /**
+     * Adds extend for each face of a BlockRegion.
+     *
+     * @param extents the coordinates to grow the extents
+     * @return this
+     */
+    public BlockRegion addExtents(Vector3ic extents) {
+        return addExtents(extents.x(), extents.y(), extents.z(), this);
     }
 
     /**
@@ -784,6 +860,6 @@ public class BlockRegion {
     @Override
     public String toString() {
         return "(" + this.aabb.minX + " " + this.aabb.minY + " " + this.aabb.minZ + ") < " +
-            "(" + (this.aabb.maxX - 1) + " " + (this.aabb.maxY - 1) + " " + (this.aabb.maxZ - 1) + ")";
+                "(" + (this.aabb.maxX - 1) + " " + (this.aabb.maxY - 1) + " " + (this.aabb.maxZ - 1) + ")";
     }
 }

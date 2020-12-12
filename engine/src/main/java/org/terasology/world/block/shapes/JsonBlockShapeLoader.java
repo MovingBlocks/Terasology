@@ -208,8 +208,7 @@ public class JsonBlockShapeLoader extends AbstractAssetFileFormat<BlockShapeData
             CompoundShape collisionShape = COLLISION_SHAPE_FACTORY.getNewCompoundShape();
 
             for (ColliderInfo collider : colliders) {
-                Transform transform = new Transform(JomlUtil.from(collider.offset), Rotation.none().getQuat4f(), 1.0f);
-                collisionShape.addChildShape(transform, collider.collisionShape);
+                collisionShape.addChildShape(collider.offset, Rotation.none().orientation(), 1.0f, collider.collisionShape);
             }
             return new ColliderInfo(new Vector3f(), collisionShape);
         }

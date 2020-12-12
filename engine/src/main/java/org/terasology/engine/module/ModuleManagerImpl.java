@@ -1,21 +1,11 @@
-/*
- * Copyright 2019 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.module;
 
 import com.google.common.collect.Sets;
+import org.reflections.Reflections;
+import org.reflections.serializers.Serializer;
+import org.reflections.serializers.XmlSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.Asset;
@@ -101,6 +91,8 @@ public class ModuleManagerImpl implements ModuleManager {
         } catch (URISyntaxException e) {
             throw new RuntimeException("Failed to convert engine library location to path", e);
         }
+
+        enrichReflectionsWithSubsystems(engineModule);
 
         registry = new TableModuleRegistry();
         registry.add(engineModule);
@@ -240,5 +232,21 @@ public class ModuleManagerImpl implements ModuleManager {
     @Override
     public ModuleMetadataJsonAdapter getModuleMetadataReader() {
         return metadataReader;
+    }
+
+    private void enrichReflectionsWithSubsystems(Module engineModule) {
+        Serializer serializer = new XmlSerializer();
+        try {
+            Enumeration<URL> urls = ModuleManagerImpl.class.getClassLoader().getResources("reflections.cache");
+            while (urls.hasMoreElements()) {
+                URL url = urls.nextElement();
+                if (url.getPath().contains("subsystem")) {
+                    Reflections subsystemReflections = serializer.read(url.openStream());
+                    engineModule.getReflectionsFragment().merge(subsystemReflections);
+                }
+            }
+        } catch (IOException e) {
+            logger.error("Cannot enrich engine's reflections with subsystems");
+        }
     }
 }

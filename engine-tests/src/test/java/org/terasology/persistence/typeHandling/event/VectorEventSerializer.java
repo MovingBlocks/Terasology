@@ -11,19 +11,15 @@ import org.joml.Vector4f;
 import org.joml.Vector4fc;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.reflections.Reflections;
-import org.terasology.ModuleEnvironmentTest;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.context.internal.ContextImpl;
-import org.terasology.engine.SimpleUri;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.entitySystem.event.Event;
 import org.terasology.entitySystem.metadata.EntitySystemLibrary;
 import org.terasology.entitySystem.metadata.EventMetadata;
-import org.terasology.naming.Name;
-import org.terasology.persistence.ModuleContext;
 import org.terasology.persistence.serializers.EventSerializer;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
+import org.terasology.persistence.typeHandling.TypeHandlerLibraryImpl;
 import org.terasology.protobuf.EntityData;
 import org.terasology.reflection.TypeRegistry;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
@@ -69,7 +65,7 @@ public class VectorEventSerializer {
         context.put(CopyStrategyLibrary.class, copyStrategies);
 
         TypeRegistry typeRegistry = new TypeRegistry(moduleManager.getEnvironment());
-        TypeHandlerLibrary typeHandlerLibrary = TypeHandlerLibrary.forModuleEnvironment(moduleManager, typeRegistry);
+        TypeHandlerLibrary typeHandlerLibrary = TypeHandlerLibraryImpl.forModuleEnvironment(moduleManager, typeRegistry);
 
         entitySystemLibrary = new EntitySystemLibrary(context, typeHandlerLibrary);
 
