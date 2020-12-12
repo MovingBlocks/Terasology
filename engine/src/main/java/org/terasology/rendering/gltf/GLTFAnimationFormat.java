@@ -117,7 +117,7 @@ public class GLTFAnimationFormat extends GLTFCommonFormat<MeshAnimationBundleDat
 
             switch (channel.getTarget().getPath()) {
                 case TRANSLATION: {
-                    List<org.joml.Vector3f> data = getVector3fs(gltf, loadedBuffers, sampler.getOutput());
+                    List<Vector3f> data = getVector3fs(gltf, loadedBuffers, sampler.getOutput());
 
                     channelReaders.add(new BufferChannelReader<>(times, data, sampler.getInterpolation()::interpolate
                         , x -> x.getPosition(bone)));
@@ -130,7 +130,7 @@ public class GLTFAnimationFormat extends GLTFCommonFormat<MeshAnimationBundleDat
                     break;
                 }
                 case SCALE: {
-                    List<org.joml.Vector3f> data = getVector3fs(gltf, loadedBuffers, sampler.getOutput());
+                    List<Vector3f> data = getVector3fs(gltf, loadedBuffers, sampler.getOutput());
                     channelReaders.add(new BufferChannelReader<>(times, data, sampler.getInterpolation()::interpolate
                         , x -> x.getBoneScale(bone)));
                     break;
