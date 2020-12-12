@@ -139,7 +139,7 @@ public class MovementDebugCommands extends BaseComponentSystem {
             requiredPermission = PermissionManager.CHEAT_PERMISSION)
     public String showPosition(@Sender EntityRef client) {
         LocationComponent loc = client.getComponent(LocationComponent.class);
-        return "Your Position: " + loc.getWorldPosition();
+        return "Your Position: " + loc.getWorldPosition(new Vector3f());
     }
 
     @Command(shortDescription = "Show your Height",

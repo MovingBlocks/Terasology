@@ -21,6 +21,7 @@ import gnu.trove.iterator.TIntIterator;
 import gnu.trove.list.TFloatList;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
+import org.joml.AABBf;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
@@ -58,7 +59,7 @@ public class OpenGLMesh extends Mesh {
     private static final Logger logger = LoggerFactory.getLogger(OpenGLMesh.class);
 
     private static final int FLOAT_SIZE = 4;
-    private AABB aabb;
+    private AABBf aabb;
 
     private MeshData data;
 
@@ -93,7 +94,7 @@ public class OpenGLMesh extends Mesh {
     }
 
     @Override
-    public AABB getAABB() {
+    public AABBf getAABB() {
         return aabb;
     }
 
@@ -224,7 +225,7 @@ public class OpenGLMesh extends Mesh {
         createVertexBuffer(parts, partSizes, vertexCount, vertexSize);
         createIndexBuffer(newData.getIndices());
 
-        aabb = AABB.createEncompasing(newData.getVertices());
+        aabb = newData.getBounds();
     }
 
     private void createVertexBuffer(List<TFloatIterator> parts, TIntList partSizes, int vertexCount, int vertexSize) {

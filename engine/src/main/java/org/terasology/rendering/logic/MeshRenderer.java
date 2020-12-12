@@ -17,6 +17,7 @@ package org.terasology.rendering.logic;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.SetMultimap;
+import org.joml.AABBf;
 import org.joml.Matrix3f;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
@@ -213,7 +214,7 @@ public class MeshRenderer extends BaseComponentSystem implements RenderSystem {
                     matrixCameraSpace.translationRotateScale(offsetFromCamera, worldRot, worldScale);
 
 
-                    AABB aabb = meshComp.mesh.getAABB().transform(toWorldSpace);
+                    AABBf aabb = meshComp.mesh.getAABB().transform(toWorldSpace);
                     if (worldRenderer.getActiveCamera().hasInSight(aabb)) {
                         if (meshComp.mesh != lastMesh) {
                             if (lastMesh != null) {

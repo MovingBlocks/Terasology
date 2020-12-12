@@ -66,6 +66,10 @@ repositories {
     }
 
     maven {
+        url "https://oss.sonatype.org/service/local/repositories/snapshots/content/"
+    }
+
+    maven {
         name "snowplow (pre-0.9)"
         url "http://maven.snplow.com/releases"
         allowInsecureProtocol true  // 😱

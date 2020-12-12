@@ -16,10 +16,10 @@
 package org.terasology.rendering.assets.mesh;
 
 import gnu.trove.list.TFloatList;
+import org.joml.AABBf;
 import org.terasology.assets.Asset;
 import org.terasology.assets.AssetType;
 import org.terasology.assets.ResourceUrn;
-import org.terasology.math.AABB;
 
 public abstract class Mesh extends Asset<MeshData> {
 
@@ -33,7 +33,7 @@ public abstract class Mesh extends Asset<MeshData> {
         super(urn, assetType);
     }
 
-    public abstract AABB getAABB();
+    public abstract AABBf getAABB();
 
     public abstract TFloatList getVertices();
 

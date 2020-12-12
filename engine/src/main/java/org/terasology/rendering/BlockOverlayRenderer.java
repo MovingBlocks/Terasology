@@ -16,12 +16,12 @@
 
 package org.terasology.rendering;
 
-import org.terasology.math.AABB;
+import org.joml.AABBf;
 
 /**
  */
 public interface BlockOverlayRenderer {
-    void setAABB(AABB aabb);
+    void setAABB(AABBf aabb);
 
     /**
      * Maintained for API compatibility
