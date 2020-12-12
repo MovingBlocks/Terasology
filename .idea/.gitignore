@@ -5,6 +5,8 @@
 workspace.xml
 *.iws
 
+/caches
+
 # Shelf is where it put changes you're not ready to share. (it's like git stash)
 /shelf
 
@@ -31,6 +33,12 @@ workspace.xml
 
 # Ignore Sonar linting, if set up locally
 /sonarlint/
+
+# Discord preferences don't need sharing
+/discord.xml
+
+# CodeStream's webViewContext looks like local state
+/codestream.xml
 
 # Automatically created when the checkout directy name is different from git origin?
 /.name
