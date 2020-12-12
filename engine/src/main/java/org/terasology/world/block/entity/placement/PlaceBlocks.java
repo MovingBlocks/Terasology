@@ -31,10 +31,21 @@ public class PlaceBlocks extends AbstractConsumableEvent {
     private Map<Vector3i, Block> blocks;
     private EntityRef instigator;
 
+    /**
+     *
+     * @param location
+     * @param block
+     * @deprecated This is scheduled for removal in an upcoming version
+     *             method will be replaced with JOML implementation {@link #PlaceBlocks(org.joml.Vector3i, Block)}.
+     */
     public PlaceBlocks(Vector3i location, Block block) {
         this(location, block, EntityRef.NULL);
     }
 
+    public PlaceBlocks(org.joml.Vector3i location, Block block) {
+        this(location, block, EntityRef.NULL);
+    }
+    
     public PlaceBlocks(Map<Vector3i, Block> blocks) {
         this(blocks, EntityRef.NULL);
     }
