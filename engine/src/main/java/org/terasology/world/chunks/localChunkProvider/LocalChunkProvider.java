@@ -31,8 +31,7 @@ import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.block.BeforeDeactivateBlocks;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
-import org.terasology.world.block.BlockRegion;
-import org.terasology.world.block.BlockRegionIterable;
+import org.terasology.world.block.BlockRegions;
 import org.terasology.world.block.OnActivatedBlocks;
 import org.terasology.world.block.OnAddedBlocks;
 import org.terasology.world.chunks.Chunk;
@@ -57,11 +56,11 @@ import org.terasology.world.propagation.light.InternalLightProcessor;
 import org.terasology.world.propagation.light.LightMerger;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -95,7 +94,7 @@ public class LocalChunkProvider implements ChunkProvider {
     private final BlockingQueue<TShortObjectMap<TIntList>> deactivateBlocksQueue = Queues.newLinkedBlockingQueue();
     private final Map<Vector3i, Chunk> chunkCache;
 
-    private final Map<org.joml.Vector3i, List<EntityStore>> generateQueuedEntities = new HashMap<>();
+    private final Map<org.joml.Vector3i, List<EntityStore>> generateQueuedEntities = new ConcurrentHashMap<>();
 
     private final StorageManager storageManager;
     private final WorldGenerator generator;
@@ -284,7 +283,6 @@ public class LocalChunkProvider implements ChunkProvider {
     private void checkForUnload() {
         PerformanceMonitor.startActivity("Unloading irrelevant chunks");
         int unloaded = 0;
-        logger.debug("Compacting cache");
         Iterator<org.joml.Vector3ic> iterator = Iterators.concat(
                 Iterators.transform(chunkCache.keySet().iterator(), v -> new org.joml.Vector3i(v.x, v.y, v.z)),
                 loadingPipeline.getProcessingPosition().iterator());
@@ -298,6 +296,9 @@ public class LocalChunkProvider implements ChunkProvider {
                 }
 
             }
+        }
+        if (unloaded > 0) {
+            logger.debug("Unload {} chunks", unloaded);
         }
         PerformanceMonitor.endActivity();
     }
@@ -448,10 +449,10 @@ public class LocalChunkProvider implements ChunkProvider {
                             Chunk[] localchunks = chunks.toArray(new Chunk[0]);
                             return new LightMerger().merge(localchunks);
                         },
-                        pos -> StreamSupport.stream(BlockRegionIterable.region(new BlockRegion(
+                        pos -> StreamSupport.stream(BlockRegions.iterableInPlace(BlockRegions.createFromMinAndMax(
                                 pos.x() - 1, pos.y() - 1, pos.z() - 1,
                                 pos.x() + 1, pos.y() + 1, pos.z() + 1
-                        )).build().spliterator(), false)
+                        )).spliterator(), false)
                                 .map(org.joml.Vector3i::new)
                                 .collect(Collectors.toSet())
                 ))
@@ -489,10 +490,10 @@ public class LocalChunkProvider implements ChunkProvider {
                             Chunk[] localchunks = chunks.toArray(new Chunk[0]);
                             return new LightMerger().merge(localchunks);
                         },
-                        pos -> StreamSupport.stream(BlockRegionIterable.region(new BlockRegion(
+                        pos -> StreamSupport.stream(BlockRegions.iterableInPlace(BlockRegions.createFromMinAndMax(
                                 pos.x() - 1, pos.y() - 1, pos.z() - 1,
                                 pos.x() + 1, pos.y() + 1, pos.z() + 1
-                        )).build().spliterator(), false)
+                        )).spliterator(), false)
                                 .map(org.joml.Vector3i::new)
                                 .collect(Collectors.toCollection(Sets::newLinkedHashSet))
                 ))

@@ -1,25 +1,11 @@
-/*
- * Copyright 2016 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.network.internal;
 
 import com.google.common.collect.Sets;
-import org.jboss.netty.channel.Channel;
-import org.jboss.netty.channel.ChannelHandlerContext;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
@@ -44,7 +30,7 @@ import java.util.Locale;
 import java.util.Set;
 import java.util.Timer;
 
-public class ClientConnectionHandler extends SimpleChannelUpstreamHandler {
+public class ClientConnectionHandler extends ChannelInboundHandlerAdapter {
 
     private static final Logger logger = LoggerFactory.getLogger(ClientConnectionHandler.class);
 
@@ -58,7 +44,7 @@ public class ClientConnectionHandler extends SimpleChannelUpstreamHandler {
     private Path tempModuleLocation;
     private BufferedOutputStream downloadingModule;
     private long lengthReceived;
-    private Timer timeoutTimer = new Timer();
+    private Timer timeoutTimer = new Timer("Netty-Timeout-Timer", true);
     private long timeoutPoint = System.currentTimeMillis();
     private final long timeoutThreshold = 120000;
     private Channel channel;
@@ -95,25 +81,26 @@ public class ClientConnectionHandler extends SimpleChannelUpstreamHandler {
                         logger.error("Server timeout threshold of {} ms exceeded.", timeoutThreshold);
                     }
                 }
+                Thread.currentThread().stop();
             }
         }, timeoutThreshold + 200);
     }
 
     @Override
-    public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) {
+    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         // If we timed out, don't handle anymore messages.
         if (joinStatus.getStatus() == JoinStatus.Status.FAILED) {
             return;
         }
-        scheduleTimeout(ctx.getChannel());
+        scheduleTimeout(ctx.channel());
 
         // Handle message
-        NetData.NetMessage message = (NetData.NetMessage) e.getMessage();
+        NetData.NetMessage message = (NetData.NetMessage) msg;
         String errorMessage = message.getServerInfo().getErrorMessage();
         if (errorMessage != null && !errorMessage.isEmpty()) {
             synchronized (joinStatus) {
                 joinStatus.setErrorMessage(errorMessage);
-                ctx.getChannel().close();
+                ctx.channel().close();
                 return;
             }
         }
@@ -147,14 +134,14 @@ public class ClientConnectionHandler extends SimpleChannelUpstreamHandler {
             NetData.ModuleDataHeader moduleDataHeader) {
         if (receivingModule != null) {
             joinStatus.setErrorMessage("Module download error");
-            channelHandlerContext.getChannel().close();
+            channelHandlerContext.channel().close();
             return;
         }
         String moduleId = moduleDataHeader.getId();
         if (missingModules.remove(moduleId.toLowerCase(Locale.ENGLISH))) {
             if (moduleDataHeader.hasError()) {
                 joinStatus.setErrorMessage("Module download error: " + moduleDataHeader.getError());
-                channelHandlerContext.getChannel().close();
+                channelHandlerContext.channel().close();
             } else {
                 String sizeString = getSizeString(moduleDataHeader.getSize());
                 joinStatus.setCurrentActivity(
@@ -172,14 +159,14 @@ public class ClientConnectionHandler extends SimpleChannelUpstreamHandler {
                 } catch (IOException e) {
                     logger.error("Failed to write received module", e);
                     joinStatus.setErrorMessage("Module download error");
-                    channelHandlerContext.getChannel().close();
+                    channelHandlerContext.channel().close();
                 }
             }
         } else {
             logger.error("Received unwanted module {}:{} from server", moduleDataHeader.getId(),
                     moduleDataHeader.getVersion());
             joinStatus.setErrorMessage("Module download error");
-            channelHandlerContext.getChannel().close();
+            channelHandlerContext.channel().close();
         }
     }
 
@@ -207,7 +194,7 @@ public class ClientConnectionHandler extends SimpleChannelUpstreamHandler {
     private void receiveModule(ChannelHandlerContext channelHandlerContext, NetData.ModuleData moduleData) {
         if (receivingModule == null) {
             joinStatus.setErrorMessage("Module download error");
-            channelHandlerContext.getChannel().close();
+            channelHandlerContext.channel().close();
             return;
         }
 
@@ -224,7 +211,7 @@ public class ClientConnectionHandler extends SimpleChannelUpstreamHandler {
                     if (Files.exists(finalPath)) {
                         logger.error("File already exists at {}", finalPath);
                         joinStatus.setErrorMessage("Module download error");
-                        channelHandlerContext.getChannel().close();
+                        channelHandlerContext.channel().close();
                         return;
                     }
 
@@ -241,13 +228,13 @@ public class ClientConnectionHandler extends SimpleChannelUpstreamHandler {
                 } else {
                     logger.error("Module rejected");
                     joinStatus.setErrorMessage("Module download error");
-                    channelHandlerContext.getChannel().close();
+                    channelHandlerContext.channel().close();
                 }
             }
         } catch (IOException e) {
             logger.error("Error saving module", e);
             joinStatus.setErrorMessage("Module download error");
-            channelHandlerContext.getChannel().close();
+            channelHandlerContext.channel().close();
         }
     }
 
@@ -260,8 +247,8 @@ public class ClientConnectionHandler extends SimpleChannelUpstreamHandler {
         logger.info("Join complete received");
         server.setClientId(joinComplete.getClientId());
 
-        channelHandlerContext.getPipeline().remove(this);
-        channelHandlerContext.getPipeline().get(ClientHandler.class).joinComplete(server);
+        channelHandlerContext.pipeline().remove(this);
+        channelHandlerContext.pipeline().get(ClientHandler.class).joinComplete(server);
         joinStatus.setComplete();
     }
 
@@ -273,7 +260,7 @@ public class ClientConnectionHandler extends SimpleChannelUpstreamHandler {
     private void receivedServerInfo(ChannelHandlerContext channelHandlerContext, NetData.ServerInfoMessage message) {
         logger.info("Received server info");
         ((EngineTime) CoreRegistry.get(Time.class)).setGameTime(message.getTime());
-        this.server = new ServerImpl(networkSystem, channelHandlerContext.getChannel());
+        this.server = new ServerImpl(networkSystem, channelHandlerContext.channel());
         server.setServerInfo(message);
 
         // Request missing modules
@@ -293,7 +280,7 @@ public class ClientConnectionHandler extends SimpleChannelUpstreamHandler {
             for (String module : missingModules) {
                 builder.addModuleRequest(NetData.ModuleRequest.newBuilder().setModuleId(module));
             }
-            channelHandlerContext.getChannel().write(builder.build());
+            channelHandlerContext.channel().writeAndFlush(builder.build());
         }
     }
 
@@ -310,7 +297,7 @@ public class ClientConnectionHandler extends SimpleChannelUpstreamHandler {
         bldr.setViewDistanceLevel(config.getRendering().getViewDistance().getIndex());
         bldr.setColor(clrbldr.setRgba(config.getPlayer().getColor().rgba()).build());
 
-        channelHandlerContext.getChannel().write(NetData.NetMessage.newBuilder().setJoin(bldr).build());
+        channelHandlerContext.channel().writeAndFlush(NetData.NetMessage.newBuilder().setJoin(bldr).build());
     }
 
     /**

@@ -1,13 +1,12 @@
 {
-    "texture": "engine:gui",
-    "textureSize": [256, 256],
+    "texture": "engine:crosshair",
+    "textureSize": [220, 22],
     "grid": {
         "tileSize": [22, 22],
-        "gridDimensions": [9, 1],
-        "gridOffset": [24, 23],
+        "gridDimensions": [10, 1],
         "tileNames": [
             "crosshair", "crosshairCharge1", "crosshairCharge2", "crosshairCharge3", "crosshairCharge4",
-            "crosshairCharge5", "crosshairCharge6", "crosshairCharge7", "crosshairCharge8"
+            "crosshairCharge5", "crosshairCharge6", "crosshairCharge7", "crosshairCharge8", ""
         ]
     }
 }

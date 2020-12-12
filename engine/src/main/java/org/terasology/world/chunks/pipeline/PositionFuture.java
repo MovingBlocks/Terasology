@@ -3,7 +3,6 @@
 
 package org.terasology.world.chunks.pipeline;
 
-import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3ic;
 
 import java.util.concurrent.ExecutionException;
@@ -51,7 +50,7 @@ public class PositionFuture<T> implements RunnableFuture<T> {
     }
 
     @Override
-    public T get(long timeout, @NotNull TimeUnit unit) throws InterruptedException, ExecutionException,
+    public T get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException,
             TimeoutException {
         return delegate.get(timeout, unit);
     }

@@ -1,9 +1,21 @@
-// Needed due to the Copy Artifact plugin deciding to implement an obnoxious security feature that can't simply be turned off
-properties([
-    copyArtifactPermission('*')
-]);
+// Minor housekeeping logic
+boolean specialBranch = env.BRANCH_NAME.equals("master") || env.BRANCH_NAME.equals("develop")
 
-node ("default-java || heavy-java") {
+// String to use in a property that determines artifact pruning (has to be a String not a number)
+String artifactBuildsToKeep = "1"
+if (specialBranch) {
+    artifactBuildsToKeep = "10"
+}
+
+properties([
+    // Needed due to the Copy Artifact plugin deciding to implement an obnoxious security feature that can't simply be turned off
+    copyArtifactPermission('*'),
+    // Flag for Jenkins to discard attached artifacts after x builds
+    buildDiscarder(logRotator(artifactNumToKeepStr: artifactBuildsToKeep))
+])
+
+// Main pipeline definition
+node ("heavy-java") {
     stage('Checkout') {
         echo "Going to check out the things !"
         checkout scm
@@ -15,7 +27,7 @@ node ("default-java || heavy-java") {
         archiveArtifacts 'gradlew, gradle/wrapper/*, templates/build.gradle, config/**, facades/PC/build/distributions/Terasology.zip, build/resources/main/org/terasology/version/versionInfo.properties, natives/**, buildSrc/src/**, buildSrc/*.kts'
     }
     stage('Publish') {
-        if (env.BRANCH_NAME.equals("master") || env.BRANCH_NAME.equals("develop")) {
+        if (specialBranch) {
             withCredentials([usernamePassword(credentialsId: 'artifactory-gooey', usernameVariable: 'artifactoryUser', passwordVariable: 'artifactoryPass')]) {
                 sh './gradlew --console=plain -Dorg.gradle.internal.publish.checksums.insecure=true publish -PmavenUser=${artifactoryUser} -PmavenPass=${artifactoryPass}'
             }
