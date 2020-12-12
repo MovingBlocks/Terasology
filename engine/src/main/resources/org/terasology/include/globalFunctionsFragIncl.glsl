@@ -186,7 +186,7 @@ float calcDayAndNightLightingFactor(float daylightValue, float daylight) {
 }
 
 vec3 calcSunlightColorDeferred(float daylightValue, float diffuseLighting, float ambientIntensity, float diffuseIntensity, vec3 ambientColor, vec3 diffuseColor) {
-    vec3 daylightColorValue = vec3(ambientIntensity) + diffuseLighting * diffuseIntensity * diffuseColor;
+    vec3 daylightColorValue = max(vec3(ambientIntensity),diffuseLighting * diffuseIntensity * diffuseColor);
 
     vec3 ambientTint = mix(vec3(MOONLIGHT_AMBIENT_COLOR), vec3(DAYLIGHT_AMBIENT_COLOR), daylight) * ambientColor;
     daylightColorValue.xyz *= ambientTint;
