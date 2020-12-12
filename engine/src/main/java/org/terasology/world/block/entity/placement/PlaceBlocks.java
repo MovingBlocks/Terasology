@@ -17,8 +17,10 @@ package org.terasology.world.block.entity.placement;
 
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.AbstractConsumableEvent;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.world.block.Block;
+import org.terasology.world.block.BlockRegion;
 
 import java.util.Collections;
 import java.util.Map;
@@ -37,8 +39,21 @@ public class PlaceBlocks extends AbstractConsumableEvent {
         this(blocks, EntityRef.NULL);
     }
 
+    /**
+     *
+     * @param location
+     * @param block
+     * @param instigator
+     * @deprecated This is scheduled for removal in an upcoming version
+     *             method will be replaced with JOML implementation {@link #PlaceBlocks(org.joml.Vector3i, Block, EntityRef)}.
+     */
     public PlaceBlocks(Vector3i location, Block block, EntityRef instigator) {
         blocks = Collections.singletonMap(location, block);
+        this.instigator = instigator;
+    }
+
+    public PlaceBlocks(org.joml.Vector3i location, Block block, EntityRef instigator) {
+        blocks = Collections.singletonMap(JomlUtil.from(location), block);
         this.instigator = instigator;
     }
 
