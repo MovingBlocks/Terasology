@@ -247,6 +247,14 @@ public abstract class Camera {
         return reflected;
     }
 
+    /**
+     *
+     * @param aabb
+     * @return
+     * @deprecated This method is scheduled for removal in an upcoming version. Use the JOML implementation instead:
+     *       {@link #hasInSight(AABBf)}.
+     */
+    @Deprecated
     public boolean hasInSight(AABB aabb) {
         return viewFrustum.intersects(aabb);
     }
