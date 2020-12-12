@@ -74,13 +74,22 @@ public final class BlockRegions {
     }
 
     /**
-     * Creates a new region spanning the smallest axis-aligned bounding box (AABB) containing min with size size.
+     * Creates a new region spanning the smallest axis-aligned bounding box (AABB) containing both, min and max.
+     * <p>
+     * Note that each component of {@code min} should be smaller or equal to the respective component in {@code max}. If
+     * a dimension of {@code min} is greater than the respective dimension of {@code max} the resulting block region
+     * will have a size of 0 along that dimension.
+     * <p>
+     * Consider using {@link #encompassing(Vector3ic...)} as an alternative.
      *
      * @return new block region
      */
     public static BlockRegion createFromMinAndSize(Vector3ic min, Vector3ic size) {
-        Vector3i max = min.add(size, new Vector3i());
-        return new BlockRegion().setMin(min).setMax(max);
+        return new BlockRegion().setMin(min).setMax(
+            min.x() + size.x() - 1,
+            min.y() + size.y() - 1,
+            min.z() + size.z() - 1
+        );
     }
 
     /**
