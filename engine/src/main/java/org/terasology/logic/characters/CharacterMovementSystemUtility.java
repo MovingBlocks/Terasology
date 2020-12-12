@@ -37,7 +37,7 @@ public final class CharacterMovementSystemUtility {
         LocationComponent location = entity.getComponent(LocationComponent.class);
         CharacterMovementComponent movementComp = entity.getComponent(CharacterMovementComponent.class);
 
-        if (location == null || Float.isNaN(location.getWorldPosition().x) || movementComp == null) {
+        if (location == null || !location.getWorldPosition(new Vector3f()).isFinite() || movementComp == null) {
             return;
         }
         location.setWorldPosition(state.getPosition());
@@ -45,12 +45,12 @@ public final class CharacterMovementSystemUtility {
         entity.saveComponent(location);
 
         movementComp.mode = state.getMode();
-        movementComp.setVelocity(JomlUtil.from(state.getVelocity()));
+        movementComp.setVelocity(state.getVelocity());
         movementComp.grounded = state.isGrounded();
         movementComp.footstepDelta = state.getFootstepDelta();
         entity.saveComponent(movementComp);
 
-        setPhysicsLocation(entity, JomlUtil.from(state.getPosition()));
+        setPhysicsLocation(entity, state.getPosition());
 
         // set the pitch to the character's gaze entity
         Quaternionf rotation = new Quaternionf().rotationX(TeraMath.DEG_TO_RAD * state.getPitch());
@@ -66,9 +66,9 @@ public final class CharacterMovementSystemUtility {
 
     public void setToInterpolateState(EntityRef entity, CharacterStateEvent a, CharacterStateEvent b, long time) {
         float t = (float) (time - a.getTime()) / (b.getTime() - a.getTime());
-        Vector3f newPos = JomlUtil.from(a.getPosition()).lerp(JomlUtil.from(b.getPosition()),t);
-        Quaternionf newRot = JomlUtil.from(a.getRotation()).nlerp(JomlUtil.from(b.getRotation()),t);
-
+        Vector3f newPos = a.getPosition().lerp(b.getPosition(),t);
+        Quaternionf newRot = a.getRotation().nlerp(b.getRotation(),t);
+      
         entity.updateComponent(LocationComponent.class, location -> {
             location.setWorldPosition(JomlUtil.from(newPos));
             location.setWorldRotation(JomlUtil.from(newRot));
@@ -77,7 +77,7 @@ public final class CharacterMovementSystemUtility {
 
         entity.updateComponent(CharacterMovementComponent.class, movementComponent -> {
             movementComponent.mode = a.getMode();
-            movementComponent.setVelocity(JomlUtil.from(a.getVelocity()));
+            movementComponent.setVelocity(a.getVelocity());
             movementComponent.grounded = a.isGrounded();
             if (b.getFootstepDelta() < a.getFootstepDelta()) {
                 movementComponent.footstepDelta = t * (1 + b.getFootstepDelta() - a.getFootstepDelta()) + a.getFootstepDelta();
@@ -99,9 +99,9 @@ public final class CharacterMovementSystemUtility {
 
     public void setToExtrapolateState(EntityRef entity, CharacterStateEvent state, long time) {
         float t = (time - state.getTime()) * 0.0001f;
-        Vector3f newPos = new Vector3f(JomlUtil.from(state.getVelocity()));
+        Vector3f newPos = new Vector3f(state.getVelocity());
         newPos.mul(t);
-        newPos.add(JomlUtil.from(state.getPosition()));
+        newPos.add(state.getPosition());
         extrapolateLocationComponent(entity, state, newPos);
 
         extrapolateCharacterMovementComponent(entity, state);
@@ -119,7 +119,7 @@ public final class CharacterMovementSystemUtility {
     private void extrapolateCharacterMovementComponent(EntityRef entity, CharacterStateEvent state) {
         CharacterMovementComponent movementComponent = entity.getComponent(CharacterMovementComponent.class);
         movementComponent.mode = state.getMode();
-        movementComponent.setVelocity(JomlUtil.from(state.getVelocity()));
+        movementComponent.setVelocity(state.getVelocity());
         movementComponent.grounded = state.isGrounded();
         entity.saveComponent(movementComponent);
     }
