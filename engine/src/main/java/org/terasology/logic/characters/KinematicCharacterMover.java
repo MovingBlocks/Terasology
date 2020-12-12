@@ -578,7 +578,7 @@ public class KinematicCharacterMover implements CharacterMover {
             float yaw = (float) Math.atan2(result.getVelocity().x, result.getVelocity().z);
             result.getRotation().set(0, 1, 0, yaw);
         } else {
-            result.getRotation().set(JomlUtil.from(new org.terasology.math.geom.Quat4f(TeraMath.DEG_TO_RAD * input.getYaw(), 0, 0)));
+            result.getRotation().set(new Quaternionf().rotationYXZ(org.joml.Math.toRadians(input.getYaw()), 0, 0));
         }
     }
 
