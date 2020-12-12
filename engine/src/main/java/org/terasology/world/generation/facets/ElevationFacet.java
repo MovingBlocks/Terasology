@@ -11,9 +11,8 @@ import org.terasology.world.generation.facets.base.BaseFieldFacet2D;
  * This facet represents the approximate height of the conceptual surface of the ground at each position.
  * It may exclude local features such as caves. It is intended to be used to determine the altitude relative
  * to the ground of features that are not placed directly on the surface, such as placing ores at a certain
- * depth below ground.
- *
- * The combination of the {@link SurfacesFacet} and the ElevationFacet is a more flexible alternative to the {@link SurfaceHeightFacet}.
+ * depth below ground. Things that require more precise details of where all the surfaces are should use the
+ * {@link SurfacesFacet} instead.
  */
 public class ElevationFacet extends BaseFieldFacet2D {
 

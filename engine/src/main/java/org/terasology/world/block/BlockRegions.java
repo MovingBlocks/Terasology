@@ -9,6 +9,7 @@ import org.joml.Vector3fc;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
 
+import java.util.Arrays;
 import java.util.Iterator;
 
 public final class BlockRegions {
@@ -16,7 +17,13 @@ public final class BlockRegions {
     }
 
     /**
-     * Creates a new region spanning the smallest axis-aligned bounding box (AABB) containing both, min and max
+     * Creates a new region spanning the smallest axis-aligned bounding box (AABB) containing both, min and max.
+     * <p>
+     * Note that each component of {@code min} should be smaller or equal to the respective component in {@code max}. If
+     * a dimension of {@code min} is greater than the respective dimension of {@code max} the resulting block region
+     * will have a size of 0 along that dimension.
+     * <p>
+     * Consider using {@link #encompassing(Vector3ic...)} as an alternative.
      *
      * @return new block region
      */
@@ -25,7 +32,13 @@ public final class BlockRegions {
     }
 
     /**
-     * Creates a new region spanning the smallest axis-aligned bounding box (AABB) containing both, min and max
+     * Creates a new region spanning the smallest axis-aligned bounding box (AABB) containing both, min and max.
+     * <p>
+     * Note that each component of {@code min} should be smaller or equal to the respective component in {@code max}. If
+     * a dimension of {@code min} is greater than the respective dimension of {@code max} the resulting block region
+     * will have a size of 0 along that dimension.
+     * <p>
+     * Consider using {@link #encompassing(Vector3ic...)} as an alternative.
      *
      * @return new block region
      */
@@ -58,6 +71,16 @@ public final class BlockRegions {
         return new BlockRegion()
                 .setMin(new Vector3i(min, RoundingMode.CEILING))
                 .setMax(new Vector3i(max, RoundingMode.FLOOR));
+    }
+
+    /**
+     * Creates a new region spanning the smallest axis-aligned bounding box (AABB) containing all the given positions.
+     *
+     * @param positions the positions that must be contained in the resulting block region
+     * @return a new block region containing all given positions
+     */
+    public static BlockRegion encompassing(Vector3ic... positions) {
+        return Arrays.stream(positions).reduce(new BlockRegion(), BlockRegion::union, BlockRegion::union);
     }
 
     /**
