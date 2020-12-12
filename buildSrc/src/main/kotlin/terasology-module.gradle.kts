@@ -180,6 +180,8 @@ tasks.register("cacheReflections") {
     outputs.file(File(mainSourceSet.output.classesDirs.first(), "reflections.cache"))
     dependsOn(tasks.named("classes"))
 
+    outputs.upToDateWhen { tasks.named("classes").get().state.upToDate }
+
     doFirst {
         try {
             val reflections = Reflections(ConfigurationBuilder()
