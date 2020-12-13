@@ -233,7 +233,7 @@ public class BlockRegionTest {
     @Test
     public void testIntersectionBlockRegion() {
     	BlockRegion a = new BlockRegion(0, 0, 0, 1, 1, 1);
-    	BlockRegion b = new BlockRegion(2, 2, 2, 4, 4, 4);
+    	BlockRegion b = new BlockRegion(1, 1, 1, 4, 4, 4);
     	BlockRegion c = new BlockRegion(3, 3, 3, 4, 4, 4);
     	
     	assertTrue(a.intersectsBlockRegion(b));
