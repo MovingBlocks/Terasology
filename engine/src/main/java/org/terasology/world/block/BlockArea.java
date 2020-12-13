@@ -3,6 +3,7 @@
 
 package org.terasology.world.block;
 
+import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import org.joml.Math;
 import org.joml.Rectangled;
@@ -10,8 +11,6 @@ import org.joml.Rectanglef;
 import org.joml.Vector2fc;
 import org.joml.Vector2i;
 import org.joml.Vector2ic;
-
-import java.util.Objects;
 
 /**
  * A bounded axis-aligned rectangle of blocks.
@@ -21,30 +20,39 @@ import java.util.Objects;
  * @see BlockAreas
  */
 public class BlockArea {
-    private final Vector2i min = new Vector2i(Integer.MAX_VALUE);
-    private final Vector2i max = new Vector2i(Integer.MIN_VALUE);
+    private int minX = Integer.MAX_VALUE;
+    private int minY = Integer.MAX_VALUE;
+    private int maxX = Integer.MIN_VALUE;
+    private int maxY = Integer.MIN_VALUE;
+
+    private Rectanglef bounds = new Rectanglef();
 
     public BlockArea() {
-    }
-
-    BlockArea(BlockArea source) {
-        this.min.set(source.min);
-        this.max.set(source.max);
     }
 
     /**
      * @return a copy of this block area
      */
     public BlockArea copy() {
-        return new BlockArea(this);
+        return new BlockArea().set(this);
     }
 
     public boolean isValid() {
-        return min.x <= max.x && min.y <= max.y;
+        return minX <= maxX && minY <= maxY;
     }
 
     public boolean isEmpty() {
         return !isValid();
+    }
+
+    public BlockArea set(BlockArea other) {
+        this.minX = other.minX;
+        this.minY = other.minY;
+        this.maxX = other.maxX;
+        this.maxY = other.maxY;
+
+        Rectangles.set(this.bounds, other.bounds);
+        return this;
     }
 
     /**
@@ -54,7 +62,7 @@ public class BlockArea {
      * @return dest
      */
     public Vector2i getMin(Vector2i dest) {
-        return dest.set(min);
+        return dest.set(minX, minY);
     }
 
     /**
@@ -64,7 +72,7 @@ public class BlockArea {
      * @return dest
      */
     public Vector2i getMax(Vector2i dest) {
-        return dest.set(max);
+        return dest.set(maxX, maxY);
     }
 
     /**
@@ -73,7 +81,7 @@ public class BlockArea {
      * @return the minimum coordinate x
      */
     public int getMaxX() {
-        return max.x;
+        return maxX;
     }
 
     /**
@@ -82,7 +90,7 @@ public class BlockArea {
      * @return the minimum coordinate y
      */
     public int getMaxY() {
-        return max.y;
+        return maxY;
     }
 
     /**
@@ -91,7 +99,7 @@ public class BlockArea {
      * @return the minimum coordinate x
      */
     public int getMinX() {
-        return min.x;
+        return minX;
     }
 
     /**
@@ -100,7 +108,7 @@ public class BlockArea {
      * @return the minimum coordinate y
      */
     public int getMinY() {
-        return min.y;
+        return minY;
     }
 
     /**
@@ -111,7 +119,7 @@ public class BlockArea {
      */
     @SuppressWarnings("checkstyle:HiddenField")
     public BlockArea setMin(Vector2ic min) {
-        return this.setMin(min.x(), min.y());
+        return setMin(min.x(), min.y());
     }
 
     /**
@@ -122,9 +130,11 @@ public class BlockArea {
      * @return this
      */
     public BlockArea setMin(int minX, int minY) {
-        Preconditions.checkArgument(minX <= this.max.x() ^ this.max.x() == Integer.MIN_VALUE);
-        Preconditions.checkArgument(minY <= this.max.y() ^ this.max.y() == Integer.MIN_VALUE);
-        this.min.set(minX, minY);
+        Preconditions.checkArgument(minX <= this.maxX ^ this.maxX == Integer.MIN_VALUE);
+        Preconditions.checkArgument(minY <= this.maxY ^ this.maxY == Integer.MIN_VALUE);
+        this.minX = minX;
+        this.minY = minY;
+        Rectangles.setMin(this.bounds, minX - 0.5f, minY - 0.5f);
         return this;
     }
 
@@ -134,9 +144,8 @@ public class BlockArea {
      * @param max the second coordinate of the second block
      * @return this
      */
-    @SuppressWarnings("checkstyle:HiddenField")
     public BlockArea setMax(Vector2ic max) {
-        return this.setMax(max.x(), max.y());
+        return setMax(max.x(), max.y());
     }
 
     /**
@@ -146,10 +155,13 @@ public class BlockArea {
      * @param maxY the y coordinate of the first block
      * @return this
      */
+    @SuppressWarnings("checkstyle:HiddenField")
     public BlockArea setMax(int maxX, int maxY) {
-        Preconditions.checkArgument(maxX >= this.min.x() ^ this.min.x() == Integer.MAX_VALUE);
-        Preconditions.checkArgument(maxY >= this.min.y() ^ this.min.y() == Integer.MAX_VALUE);
-        this.max.set(maxX, maxY);
+        Preconditions.checkArgument(maxX >= this.minX ^ this.minX == Integer.MAX_VALUE);
+        Preconditions.checkArgument(maxY >= this.minY ^ this.minY == Integer.MAX_VALUE);
+        this.maxX = maxX;
+        this.maxY = maxY;
+        Rectangles.setMax(this.bounds, maxX + 0.5f, maxY + 0.5f);
         return this;
     }
 
@@ -160,7 +172,7 @@ public class BlockArea {
      * @return this
      */
     public BlockArea union(BlockArea other) {
-        return this.union(other.min).union(other.max);
+        return union(other.minX, other.minY).union(other.minX, other.maxY);
     }
 
     /**
@@ -170,7 +182,11 @@ public class BlockArea {
      * @return this
      */
     public BlockArea union(Vector2ic p) {
-        return union(p.x(), p.y(), this);
+        return union(p.x(), p.y());
+    }
+
+    public BlockArea union(int x, int y) {
+        return union(x, y, this);
     }
 
     /**
@@ -183,9 +199,9 @@ public class BlockArea {
      * @return dest
      */
     public BlockArea union(int x, int y, BlockArea dest) {
-        dest.min.set(Math.min(dest.min.x, x), Math.min(dest.min.y, y));
-        dest.max.set(Math.max(dest.max.x, x), Math.max(dest.max.y, y));
-        return dest;
+        return dest
+                .setMin(Math.min(dest.minX, x), Math.min(dest.minY, y))
+                .setMax(Math.max(dest.maxX, x), Math.max(dest.maxY, y));
     }
 
     /**
@@ -196,9 +212,9 @@ public class BlockArea {
      * @return dest
      */
     public BlockArea intersection(BlockArea other, BlockArea dest) {
-        dest.min.set(Math.max(this.min.x(), other.min.x()), Math.max(this.min.y(), other.min.y()));
-        dest.max.set(Math.min(this.max.x(), other.max.x()), Math.min(this.max.y(), other.max.y()));
-        return dest;
+        return dest
+                .setMin(Math.max(this.minX, other.minX), Math.max(this.minY, other.minY))
+                .setMax(Math.min(this.maxX, other.maxX), Math.min(this.maxY, other.maxY));
     }
 
     /**
@@ -208,7 +224,7 @@ public class BlockArea {
      * @return dest
      */
     public Vector2i getSize(Vector2i dest) {
-        return this.max.sub(this.min, dest);
+        return dest.set(getSizeX(), getSizeY());
     }
 
     /**
@@ -217,7 +233,7 @@ public class BlockArea {
      * @return number of blocks in the X axis
      */
     public int getSizeX() {
-        return this.max.x() - this.min.x();
+        return this.maxX - this.minX;
     }
 
     /**
@@ -226,7 +242,7 @@ public class BlockArea {
      * @return number of blocks in the Y axis
      */
     public int getSizeY() {
-        return this.max.y() - this.min.y();
+        return this.maxY - this.minY;
     }
 
     /**
@@ -270,8 +286,11 @@ public class BlockArea {
      * @return dest
      */
     public BlockArea translate(int x, int y, BlockArea dest) {
-        dest.min.add(x, y);
-        dest.max.add(x, y);
+        dest.minX += x;
+        dest.minY += y;
+        dest.maxX += x;
+        dest.maxY += y;
+        dest.bounds.translate(x, y);
         return dest;
     }
 
@@ -293,7 +312,7 @@ public class BlockArea {
      * @return <code>true</code> iff the given point lies inside this AABB; <code>false</code> otherwise
      */
     public boolean containsBlock(int x, int y) {
-        return x >= min.x() && y >= min.y() && x <= max.x() && y <= max.y();
+        return x >= minX && y >= minY && x <= maxX && y <= maxY;
     }
 
     /**
@@ -343,7 +362,7 @@ public class BlockArea {
      * @return <code>true</code> iff the given value lies inside this {@link BlockArea}; <code>false</code> otherwise
      */
     public boolean containsArea(BlockArea area) {
-        return this.containsBlock(area.min) && this.containsBlock(area.max);
+        return this.containsBlock(area.minX, area.minY) && this.containsBlock(area.maxX, area.maxY);
     }
 
     /**
@@ -353,7 +372,7 @@ public class BlockArea {
      * @return <code>true</code> iff both AABBs intersect; <code>false</code> otherwise
      */
     public boolean intersectsArea(BlockArea other) {
-        return this.min.x() <= other.max.x() && this.max.x() >= other.min.x() && this.max.y() >= other.min.y() && this.min.y() <= other.max.y();
+        return this.minX <= other.maxX && this.maxX >= other.minX && this.maxY >= other.minY && this.minY <= other.maxY;
     }
 
     /**
@@ -388,8 +407,11 @@ public class BlockArea {
      */
     public BlockArea addExtents(int extentX, int extentY, BlockArea dest) {
         Preconditions.checkArgument(dest.getSizeX() + 2 * extentX >= 0 && dest.getSizeY() + 2 * extentY >= 0);
-        dest.min.sub(extentX, extentY);
-        dest.max.add(extentX, extentY);
+        dest.minX -= extentX;
+        dest.minY -= extentY;
+        dest.maxX += extentX;
+        dest.maxY += extentY;
+        Rectangles.expand(this.bounds, extentX, extentY);
         return dest;
     }
 
@@ -422,24 +444,65 @@ public class BlockArea {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        BlockArea other = (BlockArea) o;
-        return this.min.equals(other.min) && this.max.equals(other.max);
+        BlockArea blockArea = (BlockArea) o;
+        return minX == blockArea.minX
+                && minY == blockArea.minY
+                && maxX == blockArea.maxX
+                && maxY == blockArea.maxY;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(min, max);
+        return Objects.hashCode(minX, minY, maxX, maxY);
     }
 
     @Override
     public String toString() {
-        return "BlockArea[" + this.min + "..." + this.max + "]";
+        return "BlockArea[(" + this.minX + ", " + this.minY + ")...(" + this.maxX + ", " + this.maxY + ")]";
     }
 
     /**
      * Compute the bounding rectangle in world coordinates (continuous space).
      */
     public Rectanglef getWorldArea() {
-        return new Rectanglef(min.x() - 0.5f, min.y() - 0.5f, max.x() + 0.5f, max.y() + 0.5f);
+        //TODO: would be better to return a Rectanglefc here...
+        return new Rectanglef(bounds);
+    }
+
+    //TODO: replace with JOML-native code
+    static final class Rectangles {
+        private Rectangles() {
+        }
+
+        public static Rectanglef set(Rectanglef rect, Rectanglef other) {
+            return set(rect, other.minX, other.minY, other.maxX, other.maxY);
+        }
+
+        public static Rectanglef set(Rectanglef rect, float minX, float minY, float maxX, float maxY) {
+            setMin(rect, minX, minY);
+            setMax(rect, maxX, maxY);
+            return rect;
+        }
+
+        public static Rectanglef setMin(Rectanglef rect, float minX, float minY) {
+            rect.minX = minX;
+            rect.minY = minY;
+            return rect;
+        }
+
+        public static Rectanglef setMax(Rectanglef rect, float maxX, float maxY) {
+            rect.maxX = maxX;
+            rect.maxY = maxY;
+            return rect;
+        }
+
+        public static Rectanglef expand(Rectanglef rect, float extentX, float extentY) {
+            rect.minX -= extentX;
+            rect.minY -= extentY;
+            rect.maxX += extentX;
+            rect.maxY += extentY;
+            return rect;
+        }
+
     }
 }
