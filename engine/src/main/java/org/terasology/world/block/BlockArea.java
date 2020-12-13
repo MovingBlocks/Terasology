@@ -15,34 +15,37 @@ import org.joml.Vector2ic;
 import org.joml.Vector3ic;
 
 /**
- * is a bounded rectangle describing squares contained within.
- * A {@link RectangularRegion} is described and backed by an {@link org.joml.Rectanglei}
+ * A bounded axis-aligned rectangle of blocks.
+ * A {@link BlockArea} is described and backed by an {@link org.joml.Rectanglei}
  */
-public class RectangularRegion {
+public class BlockArea {
     /**
      * rectangle region that backs a SquareRegion
      */
     public final Rectanglei rectangle = new Rectanglei();
 
-    public RectangularRegion() {
+    public BlockArea() {
     }
 
-    public RectangularRegion(RectangularRegion source) {
+    BlockArea(BlockArea source) {
         RectangleUtility.set(rectangle, source.rectangle);
     }
 
-    public RectangularRegion(Rectanglei source) {
+    /**
+     *
+     * @param source
+     * @see BlockAreas#fromRectangle(Rectanglei)
+     */
+    BlockArea(Rectanglei source) {
         RectangleUtility.set(rectangle, source);
     }
 
-    public RectangularRegion(Vector2ic min, Vector2ic max) {
-        this(min.x(), min.y(), max.x(), max.y());
+    /**
+     * @return a copy of this block area
+     */
+    public BlockArea copy() {
+        return new BlockArea(this);
     }
-
-    public RectangularRegion(int minX, int minY, int maxX, int maxY) {
-        this.setMin(minX, minY).setMax(maxX, maxY);
-    }
-
 
     /**
      * get the minimum block coordinate
@@ -106,7 +109,7 @@ public class RectangularRegion {
      * @param min the first coordinate of the first block
      * @return this
      */
-    public RectangularRegion setMin(Vector2ic min) {
+    public BlockArea setMin(Vector2ic min) {
         RectangleUtility.setMin(this.rectangle, min);
         return this;
     }
@@ -117,7 +120,7 @@ public class RectangularRegion {
      * @param max the second coordinate of the second block
      * @return this
      */
-    public RectangularRegion setMax(Vector2ic max) {
+    public BlockArea setMax(Vector2ic max) {
         this.setMax(max.x(), max.y());
         return this;
     }
@@ -129,7 +132,7 @@ public class RectangularRegion {
      * @param maxY the y coordinate of the first block
      * @return this
      */
-    public RectangularRegion setMax(int maxX, int maxY) {
+    public BlockArea setMax(int maxX, int maxY) {
         RectangleUtility.setMax(this.rectangle, maxX + 1, maxY + 1);
         return this;
     }
@@ -141,7 +144,7 @@ public class RectangularRegion {
      * @param minY the y coordinate of the first block
      * @return this
      */
-    public RectangularRegion setMin(int minX, int minY) {
+    public BlockArea setMin(int minX, int minY) {
         RectangleUtility.setMin(this.rectangle, minX, minY);
         return this;
     }
@@ -152,7 +155,7 @@ public class RectangularRegion {
      * @param p the position of the block
      * @return this
      */
-    public RectangularRegion union(Vector2ic p) {
+    public BlockArea union(Vector2ic p) {
         return union(p.x(), p.y(), this);
     }
 
@@ -165,7 +168,7 @@ public class RectangularRegion {
      * @param dest will hold the result
      * @return dest
      */
-    public RectangularRegion union(int x, int y, RectangularRegion dest) {
+    public BlockArea union(int x, int y, BlockArea dest) {
         // a block is (x,y,z) and (x + 1, y + 1, z + 1)
         dest.rectangle.minX = Math.min(this.rectangle.minX, x);
         dest.rectangle.minY = Math.min(this.rectangle.minY, y);
@@ -182,7 +185,7 @@ public class RectangularRegion {
      * @param dest will hold the result
      * @return dest
      */
-    public RectangularRegion union(Vector3ic pos, RectangularRegion dest) {
+    public BlockArea union(Vector3ic pos, BlockArea dest) {
         return this.union(pos.x(), pos.y(), dest);
     }
 
@@ -192,7 +195,7 @@ public class RectangularRegion {
      * @param other {@link BlockRegion}
      * @return this
      */
-    public RectangularRegion union(RectangularRegion other) {
+    public BlockArea union(BlockArea other) {
         return this.union(other.rectangle);
     }
 
@@ -203,7 +206,7 @@ public class RectangularRegion {
      * @param dest will hold the result
      * @return dest
      */
-    public RectangularRegion union(Rectanglei other, RectangularRegion dest) {
+    public BlockArea union(Rectanglei other, BlockArea dest) {
         dest.union(other);
         return dest;
     }
@@ -214,7 +217,7 @@ public class RectangularRegion {
      * @param other the other {@link AABBi}
      * @return this
      */
-    public RectangularRegion union(Rectanglei other) {
+    public BlockArea union(Rectanglei other) {
         RectangleUtility.union(this.rectangle, other);
         return this;
     }
@@ -225,7 +228,7 @@ public class RectangularRegion {
      *
      * @return this
      */
-    public RectangularRegion correctBounds() {
+    public BlockArea correctBounds() {
         int tmp;
         if (this.rectangle.minX > this.rectangle.maxX) {
             tmp = this.rectangle.minX;
@@ -247,7 +250,7 @@ public class RectangularRegion {
      * @param y the y coordinate to set the size
      * @return this
      */
-    public RectangularRegion setSize(int x, int y) {
+    public BlockArea setSize(int x, int y) {
         this.rectangle.maxX = this.rectangle.minX + x;
         this.rectangle.maxY = this.rectangle.minY + y;
         return this;
@@ -259,7 +262,7 @@ public class RectangularRegion {
      * @param size the size to set the {@link BlockRegion}
      * @return this
      */
-    public RectangularRegion setSize(Vector2ic size) {
+    public BlockArea setSize(Vector2ic size) {
         return setSize(size.x(), size.y());
     }
 
@@ -298,7 +301,7 @@ public class RectangularRegion {
      * @param y the y coordinate to translate by
      * @return this
      */
-    public RectangularRegion translate(int x, int y) {
+    public BlockArea translate(int x, int y) {
         rectangle.translate(x, y);
         return this;
     }
@@ -310,7 +313,7 @@ public class RectangularRegion {
      * @param dest will hold the result
      * @return dest
      */
-    public RectangularRegion translate(Vector2ic xy, RectangularRegion dest) {
+    public BlockArea translate(Vector2ic xy, BlockArea dest) {
         rectangle.translate(xy, dest.rectangle);
         return dest;
     }
@@ -321,7 +324,7 @@ public class RectangularRegion {
      * @param xy the vector to translate by
      * @return this
      */
-    public RectangularRegion translate(Vector2ic xy) {
+    public BlockArea translate(Vector2ic xy) {
         this.rectangle.translate(xy);
         return this;
     }
@@ -391,34 +394,34 @@ public class RectangularRegion {
     }
 
     /**
-     * Test whether the given {@link RectangularRegion}  lies inside the {@link RectangularRegion}
+     * Test whether the given {@link BlockArea}  lies inside the {@link BlockArea}
      * @param region the region to test
-     * @return <code>true</code> iff the given value lies inside this {@link RectangularRegion}; <code>false</code> otherwise
+     * @return <code>true</code> iff the given value lies inside this {@link BlockArea}; <code>false</code> otherwise
      */
-    public boolean containsRectangularRegion(RectangularRegion region) {
+    public boolean containsRectangularRegion(BlockArea region) {
         return this.rectangle.containsRectangle(region.rectangle);
     }
 
     /**
-     * Test whether the given {@link Rectanglei}  lies inside the {@link RectangularRegion}
+     * Test whether the given {@link Rectanglei}  lies inside the {@link BlockArea}
      * @param rect the rectangle to test
-     * @return <code>true</code> iff the given value lies inside this {@link RectangularRegion}; <code>false</code> otherwise
+     * @return <code>true</code> iff the given value lies inside this {@link BlockArea}; <code>false</code> otherwise
      */
     public boolean containsRectangle(Rectanglei rect) {
         return this.rectangle.containsRectangle(rect);
     }
     /**
-     * Test whether the given {@link Rectanglef}  lies inside the {@link RectangularRegion}
+     * Test whether the given {@link Rectanglef}  lies inside the {@link BlockArea}
      * @param rect the rectangle to test
-     * @return <code>true</code> iff the given value lies inside this {@link RectangularRegion}; <code>false</code> otherwise
+     * @return <code>true</code> iff the given value lies inside this {@link BlockArea}; <code>false</code> otherwise
      */
     public boolean containsRectangle(Rectanglef rect) {
         return this.rectangle.containsRectangle(rect);
     }
     /**
-     * Test whether the given {@link Rectangled}  lies inside the {@link RectangularRegion}
+     * Test whether the given {@link Rectangled}  lies inside the {@link BlockArea}
      * @param rect the rectangle to test
-     * @return <code>true</code> iff the given value lies inside this {@link RectangularRegion}; <code>false</code> otherwise
+     * @return <code>true</code> iff the given value lies inside this {@link BlockArea}; <code>false</code> otherwise
      */
     public boolean containsRectangle(Rectangled rect) {
         return this.rectangle.containsRectangle(rect);
@@ -431,7 +434,7 @@ public class RectangularRegion {
      * @param other the other BlockRegion
      * @return <code>true</code> iff both AABBs intersect; <code>false</code> otherwise
      */
-    public boolean intersectsBlockGrid(RectangularRegion other) {
+    public boolean intersectsBlockGrid(BlockArea other) {
         return this.rectangle.intersectsRectangle(other.rectangle);
     }
 
@@ -461,7 +464,7 @@ public class RectangularRegion {
      * @param other the other AABB
      * @return <code>true</code> iff both AABBs intersect; <code>false</code> otherwise
      */
-    public boolean intersectsRegion(RectangularRegion other) {
+    public boolean intersectsRegion(BlockArea other) {
         return this.rectangle.intersectsRectangle(other.rectangle);
     }
 
@@ -482,7 +485,7 @@ public class RectangularRegion {
      * @param dest holds the result
      * @return dest
      */
-    public RectangularRegion intersection(RectangularRegion other, RectangularRegion dest) {
+    public BlockArea intersection(BlockArea other, BlockArea dest) {
         this.rectangle.intersection(other.rectangle, dest.rectangle);
         return dest;
     }
@@ -494,7 +497,7 @@ public class RectangularRegion {
      * @param dest holds the result
      * @return dest
      */
-    public RectangularRegion addExtents(int extent, RectangularRegion dest) {
+    public BlockArea addExtents(int extent, BlockArea dest) {
         return addExtents(extent, extent, dest);
     }
 
@@ -505,7 +508,7 @@ public class RectangularRegion {
      * @param extentY the y coordinate to grow the extents
      * @return this
      */
-    public RectangularRegion addExtents(int extentX, int extentY) {
+    public BlockArea addExtents(int extentX, int extentY) {
         return addExtents(extentX, extentY, this);
     }
 
@@ -517,7 +520,7 @@ public class RectangularRegion {
      * @param dest will hold the result
      * @return dest
      */
-    public RectangularRegion addExtents(int extentX, int extentY, RectangularRegion dest) {
+    public BlockArea addExtents(int extentX, int extentY, BlockArea dest) {
         dest.rectangle.minX = this.rectangle.minX - extentX;
         dest.rectangle.minY = this.rectangle.minY - extentY;
 
@@ -534,7 +537,7 @@ public class RectangularRegion {
      * @param dest will hold the result
      * @return dest
      */
-    public RectangularRegion addExtents(float extentX, float extentY, RectangularRegion dest) {
+    public BlockArea addExtents(float extentX, float extentY, BlockArea dest) {
         dest.rectangle.minX = Math.roundUsing(this.rectangle.minX - extentX, RoundingMode.FLOOR);
         dest.rectangle.minY = Math.roundUsing(this.rectangle.minY - extentY, RoundingMode.FLOOR);
 
@@ -551,7 +554,7 @@ public class RectangularRegion {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        RectangularRegion region = (RectangularRegion) o;
+        BlockArea region = (BlockArea) o;
         return rectangle.equals(region.rectangle);
     }
 
