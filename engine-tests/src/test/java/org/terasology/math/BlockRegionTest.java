@@ -252,6 +252,7 @@ public class BlockRegionTest {
     @MethodSource("testCenterArgs")
     public void testCenter(BlockRegion region, Vector3fc expectedCenter) {
         assertEquals(expectedCenter, region.center(new Vector3f()));
+    }
     
     @Test
     public void testContainsPoint() {
@@ -310,7 +311,7 @@ public class BlockRegionTest {
     	assertFalse(a.intersectsBlockRegion(c));
     }
 
-@Test
+    @Test
     public void testIntersectionAABB() {
     	BlockRegion a = new BlockRegion(0, 0, 0, 1, 1, 1);
     	
