@@ -7,6 +7,7 @@ import org.joml.AABBi;
 import org.joml.Intersectionf;
 import org.joml.LineSegmentf;
 import org.joml.Math;
+import org.joml.Matrix4f;
 import org.joml.Matrix4fc;
 import org.joml.Planef;
 import org.joml.Rayf;
@@ -29,27 +30,27 @@ public class BlockRegion {
     /**
      * The x coordinate of the minimum corner.
      */
-    public int minX = Integer.MAX_VALUE;
+    private int minX = Integer.MAX_VALUE;
     /**
      * The y coordinate of the minimum corner.
      */
-    public int minY = Integer.MAX_VALUE;
+    private int minY = Integer.MAX_VALUE;
     /**
      * The z coordinate of the minimum corner.
      */
-    public int minZ = Integer.MAX_VALUE;
+    private int minZ = Integer.MAX_VALUE;
     /**
      * The x coordinate of the maximum corner.
      */
-    public int maxX = Integer.MIN_VALUE;
+    private int maxX = Integer.MIN_VALUE;
     /**
      * The y coordinate of the maximum corner.
      */
-    public int maxY = Integer.MIN_VALUE;
+    private int maxY = Integer.MIN_VALUE;
     /**
      * The z coordinate of the maximum corner.
      */
-    public int maxZ = Integer.MIN_VALUE;
+    private int maxZ = Integer.MIN_VALUE;
 
     private AABBf bounds = new AABBf();
     private boolean isDirt = true;
@@ -101,8 +102,129 @@ public class BlockRegion {
     /**
      * the maximum coordinate of the second block x
      *
-     * @return the minimum coordinate x
+     * @return the maxX
      */
+    public int maxX() {
+        return this.maxX;
+    }
+
+    /**
+     * the maximum coordinate of the second block y
+     *
+     * @return the maxY
+     */
+    public int maxY() {
+        return this.maxY;
+    }
+
+    /**
+     * the maximum coordinate of the second block Z
+     *
+     * @return the maxZ
+     */
+    public int maxZ() {
+        return this.maxZ;
+    }
+
+    /**
+     * the minimum coordinate of the first block x
+     *
+     * @return the minX
+     */
+    public int minX() {
+        return this.maxX;
+    }
+    /**
+     * the minimum coordinate of the first block y
+     *
+     * @return the minY
+     */
+    public int minY() {
+        return this.maxY;
+    }
+
+    /**
+     * the minimum coordinate of the first block z
+     *
+     * @return the minZ
+     */
+    public int minZ() {
+        return this.maxZ;
+    }
+
+    /**
+     * set the maximum coordinate of the second block x
+     *
+     * @return the minX
+     */
+    public BlockRegion maxX(int x) {
+        this.isDirt = true;
+        this.maxX = x;
+        return this;
+    }
+
+    /**
+     * set the maximum coordinate of the second block y
+     *
+     * @return the minY
+     */
+    public BlockRegion maxY(int y) {
+        this.isDirt = true;
+        this.maxY = y;
+        return this;
+    }
+
+    /**
+     * set the maximum coordinate of the second block z
+     *
+     * @return the minZ
+     */
+    public BlockRegion maxZ(int z) {
+        this.isDirt = true;
+        this.maxZ = z;
+        return this;
+    }
+
+    /**
+     * set the minimum coordinate of the first block x
+     *
+     * @return the minX
+     */
+    public BlockRegion minX(int x) {
+        this.isDirt = true;
+        this.minX = x;
+        return this;
+    }
+
+    /**
+     * set the minimum coordinate of the first block y
+     *
+     * @return the minY
+     */
+    public BlockRegion minY(int y) {
+        this.isDirt = true;
+        this.minY = y;
+        return this;
+    }
+
+    /**
+     * set the minimum coordinate of the first block z
+     *
+     * @return the minZ
+     */
+    public BlockRegion minZ(int z) {
+        this.isDirt = true;
+        this.minZ = z;
+        return this;
+    }
+
+    /**
+     * the maximum coordinate of the second block x
+     *
+     * @return the minimum coordinate x
+     * @deprecated use {@link #maxX()}
+     */
+    @Deprecated
     public int getMaxX() {
         return this.maxX;
     }
@@ -111,7 +233,9 @@ public class BlockRegion {
      * the maximum coordinate of the second block y
      *
      * @return the minimum coordinate y
+     * @deprecated use {@link #maxY()}
      */
+    @Deprecated
     public int getMaxY() {
         return this.maxY;
     }
@@ -120,7 +244,9 @@ public class BlockRegion {
      * the maximum coordinate of the second block z
      *
      * @return the minimum coordinate z
+     * @deprecated use {@link #maxZ()}
      */
+    @Deprecated
     public int getMaxZ() {
         return this.maxZ - 1;
     }
@@ -129,7 +255,9 @@ public class BlockRegion {
      * the minimum coordinate of the first block x
      *
      * @return the minimum coordinate x
+     * @deprecated use {@link #minX()}
      */
+    @Deprecated
     public int getMinX() {
         return this.minX;
     }
@@ -138,7 +266,9 @@ public class BlockRegion {
      * the minimum coordinate of the first block y
      *
      * @return the minimum coordinate y
+     * @deprecated use {@link #minY()}
      */
+    @Deprecated
     public int getMinY() {
         return this.minY;
     }
@@ -147,7 +277,9 @@ public class BlockRegion {
      * the minimum coordinate of the first block z
      *
      * @return the minimum coordinate z
+     * @deprecated use {@link #minZ()}
      */
+    @Deprecated
     public int getMinZ() {
         return this.minZ;
     }
