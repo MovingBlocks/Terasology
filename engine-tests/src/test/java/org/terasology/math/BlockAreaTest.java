@@ -3,6 +3,7 @@
 
 package org.terasology.math;
 
+import org.joml.Vector2i;
 import org.junit.jupiter.api.Test;
 import org.terasology.world.block.BlockArea;
 import org.terasology.world.block.BlockAreas;
@@ -44,27 +45,32 @@ public class BlockAreaTest {
     public void testContainsBlockRegion() {
         BlockArea a = BlockAreas.fromMinAndMax(1, 2, 10, 20);
 
-        assertTrue(a.containsRectangularRegion(BlockAreas.fromMinAndMax(5, 5, 5, 5)));
-        assertFalse(a.containsRectangularRegion(BlockAreas.fromMinAndMax(11, 5, 35, 5)));
-        assertFalse(a.containsRectangularRegion(BlockAreas.fromMinAndMax(1, 21, 5, 95)));
+        assertTrue(a.containsArea(BlockAreas.fromMinAndMax(5, 5, 5, 5)));
+        assertFalse(a.containsArea(BlockAreas.fromMinAndMax(11, 5, 35, 5)));
+        assertFalse(a.containsArea(BlockAreas.fromMinAndMax(1, 21, 5, 95)));
 
-        assertTrue(a.containsRectangularRegion(BlockAreas.fromMinAndMax(1, 2, 3, 3)));
-        assertTrue(a.containsRectangularRegion(BlockAreas.fromMinAndMax(4, 2, 8, 8)));
-        assertTrue(a.containsRectangularRegion(BlockAreas.fromMinAndMax(1, 4, 8, 8)));
-        assertTrue(a.containsRectangularRegion(BlockAreas.fromMinAndMax(5, 12, 9, 19)));
-        assertTrue(a.containsRectangularRegion(BlockAreas.fromMinAndMax(5, 12, 10, 20)));
-        assertFalse(a.containsRectangularRegion(BlockAreas.fromMinAndMax(5, 12, 10, 21)));
-        assertFalse(a.containsRectangularRegion(BlockAreas.fromMinAndMax(5, 12, 11, 20)));
+        assertTrue(a.containsArea(BlockAreas.fromMinAndMax(1, 2, 3, 3)));
+        assertTrue(a.containsArea(BlockAreas.fromMinAndMax(4, 2, 8, 8)));
+        assertTrue(a.containsArea(BlockAreas.fromMinAndMax(1, 4, 8, 8)));
+        assertTrue(a.containsArea(BlockAreas.fromMinAndMax(5, 12, 9, 19)));
+        assertTrue(a.containsArea(BlockAreas.fromMinAndMax(5, 12, 10, 20)));
+        assertFalse(a.containsArea(BlockAreas.fromMinAndMax(5, 12, 10, 21)));
+        assertFalse(a.containsArea(BlockAreas.fromMinAndMax(5, 12, 11, 20)));
     }
 
     @Test
     public void textExtents() {
-        BlockArea rc = BlockAreas.fromMinAndMax(2, 1, 10, 20);
-        rc.addExtents(3, 4);
-        assertEquals(-1, rc.getMinX());
-        assertEquals(-3, rc.getMinY());
-        assertEquals(13, rc.getMaxX());
-        assertEquals(24, rc.getMaxY());
+        BlockArea area = BlockAreas.fromMinAndMax(2, 1, 10, 20).addExtents(3, 4);
+        assertEquals(new Vector2i(-1, -3), area.getMin(new Vector2i()));
+        assertEquals(new Vector2i(13, 24), area.getMax(new Vector2i()));
+    }
+
+    @Test
+    public void testInvalidExtents() {
+        final BlockArea area = BlockAreas.fromMinAndMax(0,0, 3,3);
+        assertThrows(IllegalArgumentException.class, () -> area.addExtents(-2, 1));
+        assertThrows(IllegalArgumentException.class, () -> area.addExtents(1, -2));
+        assertThrows(IllegalArgumentException.class, () -> area.addExtents(-2, -2));
     }
 
     @Test
@@ -73,4 +79,5 @@ public class BlockAreaTest {
         assertThrows(IllegalArgumentException.class, () -> new BlockArea().setMax(3, 0).setMin(0, 3));
         assertThrows(IllegalArgumentException.class, () -> BlockAreas.fromMinAndMax(0, 3, 3, 0));
     }
+
 }

@@ -16,6 +16,8 @@ import org.joml.Vector2i;
 import org.joml.Vector2ic;
 import org.joml.Vector3ic;
 
+import java.util.Objects;
+
 /**
  * A bounded axis-aligned rectangle of blocks.
  * <p>
@@ -145,8 +147,8 @@ public class BlockArea {
      * @return this
      */
     public BlockArea setMax(int maxX, int maxY) {
-        Preconditions.checkArgument(maxX >= this.max.x() ^ this.max.x() == Integer.MAX_VALUE);
-        Preconditions.checkArgument(maxY >= this.max.y() ^ this.max.y() == Integer.MAX_VALUE);
+        Preconditions.checkArgument(maxX >= this.min.x() ^ this.min.x() == Integer.MAX_VALUE);
+        Preconditions.checkArgument(maxY >= this.min.y() ^ this.min.y() == Integer.MAX_VALUE);
         this.max.set(maxX, maxY);
         return this;
     }
@@ -325,21 +327,11 @@ public class BlockArea {
     /**
      * Test whether the given {@link BlockArea}  lies inside the {@link BlockArea}
      *
-     * @param region the region to test
+     * @param area the area to test
      * @return <code>true</code> iff the given value lies inside this {@link BlockArea}; <code>false</code> otherwise
      */
-    public boolean containsRectangularRegion(BlockArea region) {
-        return this.rectangle.containsRectangle(region.rectangle);
-    }
-
-    /**
-     * Test whether the given {@link Rectanglei}  lies inside the {@link BlockArea}
-     *
-     * @param rect the rectangle to test
-     * @return <code>true</code> iff the given value lies inside this {@link BlockArea}; <code>false</code> otherwise
-     */
-    public boolean containsRectangle(Rectanglei rect) {
-        return this.rectangle.containsRectangle(rect);
+    public boolean containsArea(BlockArea area) {
+        return this.containsBlock(area.min) && this.containsBlock(area.max);
     }
 
     /**
@@ -361,7 +353,6 @@ public class BlockArea {
     public boolean containsRectangle(Rectangled rect) {
         return this.rectangle.containsRectangle(rect);
     }
-
 
     /**
      * Test whether <code>this</code> and <code>other</code> intersect.
@@ -446,28 +437,9 @@ public class BlockArea {
      * @return dest
      */
     public BlockArea addExtents(int extentX, int extentY, BlockArea dest) {
-        dest.rectangle.minX = this.rectangle.minX - extentX;
-        dest.rectangle.minY = this.rectangle.minY - extentY;
-
-        dest.rectangle.maxX = this.rectangle.maxX + extentX;
-        dest.rectangle.maxY = this.rectangle.maxY + extentY;
-        return dest;
-    }
-
-    /**
-     * Adds extend for each face of a BlockRegion.
-     *
-     * @param extentX the x coordinate to grow the extents
-     * @param extentY the y coordinate to grow the extents
-     * @param dest will hold the result
-     * @return dest
-     */
-    public BlockArea addExtents(float extentX, float extentY, BlockArea dest) {
-        dest.rectangle.minX = Math.roundUsing(this.rectangle.minX - extentX, RoundingMode.FLOOR);
-        dest.rectangle.minY = Math.roundUsing(this.rectangle.minY - extentY, RoundingMode.FLOOR);
-
-        dest.rectangle.maxX = Math.roundUsing(this.rectangle.maxX + extentX, RoundingMode.CEILING);
-        dest.rectangle.maxY = Math.roundUsing(this.rectangle.maxY + extentY, RoundingMode.CEILING);
+        Preconditions.checkArgument(dest.getSizeX() + 2 * extentX >= 0 &&  dest.getSizeY() + 2 * extentY >= 0);
+        dest.min.sub(extentX, extentY);
+        dest.max.add(extentX, extentY);
         return dest;
     }
 
@@ -479,13 +451,13 @@ public class BlockArea {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        BlockArea region = (BlockArea) o;
-        return rectangle.equals(region.rectangle);
+        BlockArea other = (BlockArea) o;
+        return this.min.equals(other.min) && this.max.equals(other.max);
     }
 
     @Override
     public int hashCode() {
-        return rectangle.hashCode();
+        return Objects.hash(min, max);
     }
 
     @Override
