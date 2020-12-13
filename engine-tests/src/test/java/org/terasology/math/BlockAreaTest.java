@@ -5,8 +5,13 @@ package org.terasology.math;
 
 import org.joml.Vector2i;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.terasology.world.block.BlockArea;
 import org.terasology.world.block.BlockAreas;
+
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -67,7 +72,7 @@ public class BlockAreaTest {
 
     @Test
     public void testInvalidExtents() {
-        final BlockArea area = BlockAreas.fromMinAndMax(0,0, 3,3);
+        final BlockArea area = BlockAreas.fromMinAndMax(0, 0, 3, 3);
         assertThrows(IllegalArgumentException.class, () -> area.addExtents(-2, 1));
         assertThrows(IllegalArgumentException.class, () -> area.addExtents(1, -2));
         assertThrows(IllegalArgumentException.class, () -> area.addExtents(-2, -2));
@@ -80,4 +85,29 @@ public class BlockAreaTest {
         assertThrows(IllegalArgumentException.class, () -> BlockAreas.fromMinAndMax(0, 3, 3, 0));
     }
 
+    static Stream<Arguments> testIntersection() {
+        return Stream.of(
+                Arguments.of(
+                        BlockAreas.fromMinAndMax(0, 0, 2, 2),
+                        BlockAreas.fromMinAndMax(0, 0, 2, 2),
+                        BlockAreas.fromMinAndMax(0, 0, 2, 2)
+                ),
+                Arguments.of(
+                        BlockAreas.fromMinAndMax(0, 0, 2, 2),
+                        BlockAreas.fromMinAndMax(1, 1, 3, 3),
+                        BlockAreas.fromMinAndMax(1, 1, 2, 2)
+                ),
+                Arguments.of(
+                        BlockAreas.fromMinAndMax(0, 0, 2, 2),
+                        BlockAreas.fromMinAndMax(0, 2, 3, 3),
+                        BlockAreas.fromMinAndMax(0, 2, 2, 2)
+                )
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource
+    public void testIntersection(BlockArea a, BlockArea b, BlockArea expected) {
+        assertEquals(expected, a.intersection(b, new BlockArea()));
+    }
 }

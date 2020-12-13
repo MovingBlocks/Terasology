@@ -402,7 +402,8 @@ public class BlockArea {
      * @return dest
      */
     public BlockArea intersection(BlockArea other, BlockArea dest) {
-        this.rectangle.intersection(other.rectangle, dest.rectangle);
+        dest.min.set(Math.max(this.min.x(), other.min.x()), Math.max(this.min.y(), other.min.y()));
+        dest.max.set(Math.min(this.max.x(), other.max.x()), Math.min(this.max.y(), other.max.y()));
         return dest;
     }
 
