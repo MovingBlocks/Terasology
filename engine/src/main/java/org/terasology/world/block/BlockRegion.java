@@ -25,20 +25,39 @@ import org.terasology.entitySystem.entity.EntityRef;
  */
 public class BlockRegion {
 
+
     /**
-     * AABB region that backs a BlockRegion
+     * The x coordinate of the minimum corner.
      */
-    public final AABBi aabb = new AABBi();
+    public int minX = Integer.MAX_VALUE;
+    /**
+     * The y coordinate of the minimum corner.
+     */
+    public int minY = Integer.MAX_VALUE;
+    /**
+     * The z coordinate of the minimum corner.
+     */
+    public int minZ = Integer.MAX_VALUE;
+    /**
+     * The x coordinate of the maximum corner.
+     */
+    public int maxX = Integer.MIN_VALUE;
+    /**
+     * The y coordinate of the maximum corner.
+     */
+    public int maxY = Integer.MIN_VALUE;
+    /**
+     * The z coordinate of the maximum corner.
+     */
+    public int maxZ = Integer.MIN_VALUE;
+
+    private AABBf bounds = new AABBf();
 
     public BlockRegion() {
     }
 
     public BlockRegion(BlockRegion source) {
-        aabb.set(source.aabb);
-    }
-
-    public BlockRegion(AABBi source) {
-        aabb.set(source);
+       this.set(source);
     }
 
     /**
@@ -65,7 +84,7 @@ public class BlockRegion {
      * @return dest
      */
     public Vector3i getMin(Vector3i dest) {
-        return dest.set(aabb.minX, aabb.minY, aabb.minZ);
+        return dest.set(minX, minY, minZ);
     }
 
     /**
@@ -75,7 +94,7 @@ public class BlockRegion {
      * @return dest
      */
     public Vector3i getMax(Vector3i dest) {
-        return dest.set(aabb.maxX - 1, aabb.maxY - 1, aabb.maxZ - 1);
+        return dest.set(maxX, maxY, maxZ);
     }
 
     /**
@@ -84,7 +103,7 @@ public class BlockRegion {
      * @return the minimum coordinate x
      */
     public int getMaxX() {
-        return this.aabb.maxX - 1;
+        return this.maxX;
     }
 
     /**
@@ -93,7 +112,7 @@ public class BlockRegion {
      * @return the minimum coordinate y
      */
     public int getMaxY() {
-        return this.aabb.maxY - 1;
+        return this.maxY;
     }
 
     /**
@@ -102,7 +121,7 @@ public class BlockRegion {
      * @return the minimum coordinate z
      */
     public int getMaxZ() {
-        return this.aabb.maxZ - 1;
+        return this.maxZ - 1;
     }
 
     /**
@@ -111,7 +130,7 @@ public class BlockRegion {
      * @return the minimum coordinate x
      */
     public int getMinX() {
-        return this.aabb.minX;
+        return this.minX;
     }
 
     /**
@@ -120,7 +139,7 @@ public class BlockRegion {
      * @return the minimum coordinate y
      */
     public int getMinY() {
-        return this.aabb.minY;
+        return this.minY;
     }
 
     /**
@@ -129,7 +148,7 @@ public class BlockRegion {
      * @return the minimum coordinate z
      */
     public int getMinZ() {
-        return this.aabb.minZ;
+        return this.minZ;
     }
 
     /**
@@ -138,7 +157,16 @@ public class BlockRegion {
      * @return this
      */
     public BlockRegion set(BlockRegion source) {
-        this.aabb.set(source.aabb);
+        this.minX = source.minX;
+        this.minY = source.minY;
+        this.minZ = source.minZ;
+
+        this.maxX = source.maxX;
+        this.maxY = source.maxY;
+        this.maxZ = source.maxZ;
+
+        this.bounds.set(source.bounds);
+
         return this;
     }
 
@@ -149,7 +177,10 @@ public class BlockRegion {
      * @return this
      */
     public BlockRegion setMin(Vector3ic min) {
-        this.aabb.setMin(min);
+        this.bounds.setMin(min.x() - .5f,min.y() - .5f,min.z() - .5f);
+        this.minX = min.x();
+        this.minY = min.y();
+        this.minZ = min.z();
         return this;
     }
 
@@ -160,7 +191,10 @@ public class BlockRegion {
      * @return this
      */
     public BlockRegion setMax(Vector3ic max) {
-        this.setMax(max.x(), max.y(), max.z());
+        this.bounds.setMax(max.x() + .5f,max.y() + .5f,max.z() + .5f);
+        this.maxX = max.x();
+        this.maxY = max.y();
+        this.maxZ = max.z();
         return this;
     }
 
@@ -173,7 +207,10 @@ public class BlockRegion {
      * @return this
      */
     public BlockRegion setMax(int maxX, int maxY, int maxZ) {
-        this.aabb.setMax(maxX + 1, maxY + 1, maxZ + 1);
+        this.bounds.setMax(maxX + .5f,maxY + .5f,maxZ + .5f);
+        this.maxX = maxX;
+        this.maxY = maxY;
+        this.maxZ = maxZ;
         return this;
     }
 
@@ -186,7 +223,10 @@ public class BlockRegion {
      * @return this
      */
     public BlockRegion setMin(int minX, int minY, int minZ) {
-        aabb.setMin(minX, minY, minZ);
+        this.bounds.setMin(minX - .5f,minY - .5f,minZ - .5f);
+        this.minX = minX;
+        this.minY = minY;
+        this.minZ = minZ;
         return this;
     }
 
@@ -227,13 +267,15 @@ public class BlockRegion {
      * @return dest
      */
     public BlockRegion union(int x, int y, int z, BlockRegion dest) {
-        // a block is (x,y,z) and (x + 1, y + 1, z + 1)
-        dest.aabb.minX = Math.min(this.aabb.minX, x);
-        dest.aabb.minY = Math.min(this.aabb.minY, y);
-        dest.aabb.minZ = Math.min(this.aabb.minZ, z);
-        dest.aabb.maxX = Math.max(this.aabb.maxX, (x + 1));
-        dest.aabb.maxY = Math.max(this.aabb.maxY, (y + 1));
-        dest.aabb.maxZ = Math.max(this.aabb.maxZ, (z + 1));
+        minX = Math.min(this.minX, x);
+        minY = Math.min(this.minY, y);
+        minZ = Math.min(this.minZ, z);
+        maxX = Math.max(this.maxX, x);
+        maxY = Math.max(this.maxY, y);
+        maxZ = Math.max(this.maxZ, z);
+
+        this.bounds.setMin(minX - .5f, minY - .5f, minZ - .5f);
+        this.bounds.setMax(maxX + .5f, maxY + .5f, maxZ + .5f);
         return dest;
     }
 
@@ -256,30 +298,7 @@ public class BlockRegion {
      * @return this
      */
     public BlockRegion union(BlockRegion other) {
-        return this.union(other.aabb);
-    }
-
-    /**
-     * Set <code>this</code> to the union of <code>this</code> and <code>other</code>.
-     *
-     * @param other {@link AABBi}
-     * @param dest will hold the result
-     * @return dest
-     */
-    public BlockRegion union(AABBi other, BlockRegion dest) {
-        dest.union(other);
-        return dest;
-    }
-
-    /**
-     * Set <code>this</code> to the union of <code>this</code> and <code>other</code>.
-     *
-     * @param other the other {@link AABBi}
-     * @return this
-     */
-    public BlockRegion union(AABBi other) {
-        this.aabb.union(other);
-        return this;
+        return this.union(other.minX, other.minY, other.minZ, this).union(other.maxX, other.maxY, other.maxZ, this);
     }
 
     /**
@@ -292,20 +311,20 @@ public class BlockRegion {
         // NOTE: this is basically the same as AABBi#correctBounds, but adjusted for off-by-one semantics here in
         //       BlockRegion for the max value.
         int tmp;
-        if (this.aabb.minX > this.aabb.maxX - 1) {
-            tmp = this.aabb.minX;
-            this.aabb.minX = this.aabb.maxX - 1;
-            this.aabb.maxX = tmp + 1;
+        if (this.minX > this.maxX) {
+            tmp = this.minX;
+            this.minX = this.maxX;
+            this.maxX = tmp;
         }
-        if (this.aabb.minY > this.aabb.maxY - 1) {
-            tmp = this.aabb.minY;
-            this.aabb.minY = this.aabb.maxY - 1;
-            this.aabb.maxY = tmp + 1;
+        if (this.minY > this.maxY) {
+            tmp = this.minY;
+            this.minY = this.maxY;
+            this.maxY = tmp;
         }
-        if (this.aabb.minZ > this.aabb.maxZ - 1) {
-            tmp = this.aabb.minZ;
-            this.aabb.minZ = this.aabb.maxZ - 1;
-            this.aabb.maxZ = tmp + 1;
+        if (this.minZ > this.maxZ) {
+            tmp = this.minZ;
+            this.minZ = this.maxZ;
+            this.maxZ = tmp;
         }
         return this;
     }
@@ -319,9 +338,10 @@ public class BlockRegion {
      * @return this
      */
     public BlockRegion setSize(int x, int y, int z) {
-        this.aabb.maxX = this.aabb.minX + x;
-        this.aabb.maxY = this.aabb.minY + y;
-        this.aabb.maxZ = this.aabb.minZ + z;
+        this.maxX = this.minX + x  - 1;
+        this.maxY = this.minY + y  - 1;
+        this.maxZ = this.minZ + z  - 1;
+        this.bounds.setMax(this.maxX + .5f, this.maxY + .5f, this.maxZ + .5f);
         return this;
     }
 
@@ -342,8 +362,8 @@ public class BlockRegion {
      * @return dest
      */
     public Vector3i getSize(Vector3i dest) {
-        return dest.set(this.aabb.maxX - this.aabb.minX, this.aabb.maxY - this.aabb.minY,
-                this.aabb.maxZ - this.aabb.minZ);
+        return dest.set(this.maxX - this.minX + 1, this.maxY - this.minY + 1,
+                this.maxZ - this.minZ + 1);
     }
 
     /**
@@ -352,7 +372,7 @@ public class BlockRegion {
      * @return number of blocks in the X axis
      */
     public int getSizeX() {
-        return this.aabb.maxX - this.aabb.minX;
+        return this.maxX - this.minX + 1;
     }
 
     /**
@@ -361,7 +381,7 @@ public class BlockRegion {
      * @return number of blocks in the Y axis
      */
     public int getSizeY() {
-        return this.aabb.maxY - this.aabb.minY;
+        return this.maxY - this.minY + 1;
     }
 
     /**
@@ -370,7 +390,7 @@ public class BlockRegion {
      * @return number of blocks in the Z axis
      */
     public int getSizeZ() {
-        return this.aabb.maxZ - this.aabb.minZ;
+        return this.maxZ - this.minZ + 1;
     }
 
     /**
@@ -382,7 +402,33 @@ public class BlockRegion {
      * @return this
      */
     public BlockRegion translate(int x, int y, int z) {
-        aabb.translate(x, y, z);
+        translate(x,y,z,this);
+        return this;
+    }
+
+    /**
+     * Translate <code>this</code> by the given vector <code>xyz</code>.
+     *
+     * @param x the x coordinate to translate by
+     * @param y the y coordinate to translate by
+     * @param z the z coordinate to translate by
+     * @param dest will hold the result
+     * @return this
+     */
+    public BlockRegion translate(int x, int y, int z, BlockRegion dest) {
+        dest.minX = this.minX + x;
+        dest.minY = this.minY + y;
+        dest.minZ = this.minZ + z;
+        dest.maxX = this.maxX + x;
+        dest.maxY = this.maxY + y;
+        dest.maxZ = this.maxZ + z;
+        dest.bounds.minX = this.bounds.minX + x;
+        dest.bounds.minY = this.bounds.minY + y;
+        dest.bounds.minZ = this.bounds.minZ + z;
+
+        dest.bounds.maxX = this.bounds.maxX + x;
+        dest.bounds.maxY = this.bounds.maxY + y;
+        dest.bounds.maxZ = this.bounds.maxZ + z;
         return this;
     }
 
@@ -394,8 +440,7 @@ public class BlockRegion {
      * @return dest
      */
     public BlockRegion translate(Vector3ic xyz, BlockRegion dest) {
-        aabb.translate(xyz, dest.aabb);
-        return dest;
+        return translate(xyz.x(), xyz.y(), xyz.z(), dest);
     }
 
     /**
@@ -405,7 +450,47 @@ public class BlockRegion {
      * @return this
      */
     public BlockRegion translate(Vector3ic xyz) {
-        this.aabb.translate(xyz);
+        return translate(xyz.x(),xyz.y(),xyz.z(), this);
+    }
+
+    /**
+     * Apply the given {@link Matrix4fc#isAffine() affine} transformation to this {@link BlockRegion}.
+     * <p>
+     * The matrix in <code>m</code> <i>must</i> be {@link Matrix4fc#isAffine() affine}.
+     *
+     * @param m the affine transformation matrix
+     * @return this
+     */
+    public BlockRegion transform(Matrix4fc m, BlockRegion dest) {
+        float dx = maxX - minX, dy = maxY - minY, dz = maxZ - minZ;
+        float minx = Float.POSITIVE_INFINITY, miny = Float.POSITIVE_INFINITY, minz = Float.POSITIVE_INFINITY;
+        float maxx = Float.NEGATIVE_INFINITY, maxy = Float.NEGATIVE_INFINITY, maxz = Float.NEGATIVE_INFINITY;
+        for (int i = 0; i < 8; i++) {
+            float x = minX + (i & 1) * dx, y = minY + (i >> 1 & 1) * dy, z = minZ + (i >> 2 & 1) * dz;
+            float tx = m.m00() * x + m.m10() * y + m.m20() * z + m.m30();
+            float ty = m.m01() * x + m.m11() * y + m.m21() * z + m.m31();
+            float tz = m.m02() * x + m.m12() * y + m.m22() * z + m.m32();
+            minx = Math.min(tx, minx);
+            miny = Math.min(ty, miny);
+            minz = Math.min(tz, minz);
+            maxx = Math.max(tx, maxx);
+            maxy = Math.max(ty, maxy);
+            maxz = Math.max(tz, maxz);
+        }
+        dest.minX = Math.roundUsing(minx, RoundingMode.FLOOR);
+        dest.minY = Math.roundUsing(miny, RoundingMode.FLOOR);
+        dest.minZ = Math.roundUsing(minz, RoundingMode.FLOOR);
+        dest.maxX = Math.roundUsing(maxx, RoundingMode.CEILING);
+        dest.maxY = Math.roundUsing(maxy, RoundingMode.CEILING);
+        dest.maxZ = Math.roundUsing(maxz, RoundingMode.CEILING);
+
+        dest.bounds.minX = dest.minX - .5f;
+        dest.bounds.minY = dest.minY - .5f;
+        dest.bounds.minZ = dest.minZ - .5f;
+
+        dest.bounds.maxX = dest.maxX + .5f;
+        dest.bounds.maxY = dest.maxY + .5f;
+        dest.bounds.maxZ = dest.maxZ + .5f;
         return this;
     }
 
@@ -418,21 +503,8 @@ public class BlockRegion {
      * @return this
      */
     public BlockRegion transform(Matrix4fc m) {
-        this.aabb.transform(m);
+        transform(m, this);
         return this;
-    }
-
-    /**
-     * Apply the given {@link Matrix4fc#isAffine() affine} transformation to this {@link BlockRegion}.
-     * <p>
-     * The matrix in <code>m</code> <i>must</i> be {@link Matrix4fc#isAffine() affine}.
-     *
-     * @param m the affine transformation matrix
-     * @return this
-     */
-    public BlockRegion transform(Matrix4fc m, BlockRegion dest) {
-        this.aabb.transform(m, dest.aabb);
-        return dest;
     }
 
     /**
@@ -456,9 +528,9 @@ public class BlockRegion {
             return dest.set(Float.NaN);
         }
         return dest.set(
-                aabb.minX + ((aabb.maxX - aabb.minX) / 2.0f),
-                aabb.minY + ((aabb.maxY - aabb.minY) / 2.0f),
-                aabb.minZ + ((aabb.maxZ - aabb.minZ) / 2.0f)
+                bounds.minX + ((bounds.maxX - bounds.minX) / 2.0f),
+                bounds.minY + ((bounds.maxY - bounds.minY) / 2.0f),
+                bounds.minZ + ((bounds.maxZ - bounds.minZ) / 2.0f)
         );
     }
 
@@ -471,7 +543,7 @@ public class BlockRegion {
      * @return <code>true</code> iff the given point lies inside this AABB; <code>false</code> otherwise
      */
     public boolean containsBlock(int x, int y, int z) {
-        return x >= aabb.minX && y >= aabb.minY && z >= aabb.minZ && x < aabb.maxX && y < aabb.maxY && z < aabb.maxZ;
+        return x >= minX && y >= minY && z >= minZ && x <= maxX && y <= maxY && z <= maxZ;
     }
 
     /**
@@ -483,20 +555,7 @@ public class BlockRegion {
      * @return <code>true</code> iff the given point lies inside this BlockRegion; <code>false</code> otherwise
      */
     public boolean containsPoint(float x, float y, float z) {
-    	AABBf aabbf = new AABBf(this.getMinX() - 0.5f, this.getMinY() - 0.5f, this.getMinZ() - 0.5f, this.getMaxX() + 0.5f, this.getMaxY() + 0.5f, this.getMaxZ() + 0.5f);
-    	return aabbf.containsPoint(x, y, z);
-    }
-
-    /**
-     * Test whether the point <code>(x, y, z)</code> lies inside this AABB.
-     *
-     * @param x the x coordinate of the point
-     * @param y the y coordinate of the point
-     * @param z the z coordinate of the point
-     * @return <code>true</code> iff the given point lies inside this AABB; <code>false</code> otherwise
-     */
-    public boolean containsPoint(int x, int y, int z) {
-        return this.aabb.containsPoint(x, y, z);
+        return this.bounds.containsPoint(x, y, z);
     }
 
     /**
@@ -506,8 +565,7 @@ public class BlockRegion {
      * @return <code>true</code> iff the given point lies inside this AABB; <code>false</code> otherwise
      */
     public boolean containsPoint(Vector3fc point) {
-    	AABBf aabbf = new AABBf(this.getMinX() - 0.5f, this.getMinY() - 0.5f, this.getMinZ() - 0.5f, this.getMaxX() + 0.5f, this.getMaxY() + 0.5f, this.getMaxZ() + 0.5f);
-    	return aabbf.containsPoint(point);
+        return this.bounds.containsPoint(point);
     }
 
     /**
@@ -524,8 +582,7 @@ public class BlockRegion {
      * @return <code>true</code> iff the plane intersects this AABB; <code>false</code> otherwise
      */
     public boolean intersectsPlane(float a, float b, float c, float d) {
-    	AABBf aabbf = new AABBf(this.getMinX() - 0.5f, this.getMinY() - 0.5f, this.getMinZ() - 0.5f, this.getMaxX() + 0.5f, this.getMaxY() + 0.5f, this.getMaxZ() + 0.5f);
-        return aabbf.intersectsPlane(a, b, c, d);
+        return this.bounds.intersectsPlane(a, b, c, d);
     }
 
     /**
@@ -539,8 +596,7 @@ public class BlockRegion {
      * @return <code>true</code> iff the plane intersects this AABB; <code>false</code> otherwise
      */
     public boolean intersectsPlane(Planef plane) {
-    	AABBf aabbf = new AABBf(this.getMinX() - 0.5f, this.getMinY() - 0.5f, this.getMinZ() - 0.5f, this.getMaxX() + 0.5f, this.getMaxY() + 0.5f, this.getMaxZ() + 0.5f);
-    	return aabbf.intersectsPlane(plane);
+        return this.bounds.intersectsPlane(plane);
     }
 
     /**
@@ -550,21 +606,7 @@ public class BlockRegion {
      * @return <code>true</code> iff both AABBs intersect; <code>false</code> otherwise
      */
     public boolean intersectsBlockRegion(BlockRegion other) {
-    	AABBf aabbf = new AABBf(this.getMinX() - 0.5f, this.getMinY() - 0.5f, this.getMinZ() - 0.5f, this.getMaxX() + 0.5f, this.getMaxY() + 0.5f, this.getMaxZ() + 0.5f);
-        AABBf otherAabbf = new AABBf(other.getMinX(), other.getMinY(), other.getMinZ(), other.getMaxX() + 1, other.getMaxY() + 1, other.getMaxZ() + 1);
-    	return aabbf.intersectsAABB(otherAabbf);
-    }
-
-    /**
-     * Test whether <code>this</code> and <code>other</code> intersect.
-     *
-     * @param other the other AABB
-     * @return <code>true</code> iff both AABBs intersect; <code>false</code> otherwise
-     */
-    public boolean intersectsAABB(AABBi other) {
-    	AABBf aabbf = new AABBf(this.getMinX() - 0.5f, this.getMinY() - 0.5f, this.getMinZ() - 0.5f, this.getMaxX() + 0.5f, this.getMaxY() + 0.5f, this.getMaxZ() + 0.5f);
-        AABBf otherAabbf = new AABBf(other.minX, other.minY, other.minZ, other.maxX, other.maxY, other.maxZ);
-    	return aabbf.intersectsAABB(otherAabbf);
+        return this.bounds.intersectsAABB(other.bounds);
     }
 
     /**
@@ -574,8 +616,7 @@ public class BlockRegion {
      * @return <code>true</code> iff both AABBs intersect; <code>false</code> otherwise
      */
     public boolean intersectsAABB(AABBf other) {
-    	AABBf aabbf = new AABBf(this.getMinX() - 0.5f, this.getMinY() - 0.5f, this.getMinZ() - 0.5f, this.getMaxX() + 0.5f, this.getMaxY() + 0.5f, this.getMaxZ() + 0.5f);
-        return aabbf.intersectsAABB(other);
+        return this.bounds.intersectsAABB(other);
     }
 
     /**
@@ -592,8 +633,7 @@ public class BlockRegion {
      * @return <code>true</code> iff this AABB and the sphere intersect; <code>false</code> otherwise
      */
     public boolean intersectsSphere(float centerX, float centerY, float centerZ, float radiusSquared) {
-        return Intersectionf.testAabSphere(this.getMinX() - 0.5f, this.getMinY() - 0.5f, this.getMinZ() - 0.5f, this.getMaxX() + 0.5f, this.getMaxY() + 0.5f, this.getMaxZ() + 0.5f, centerX,
-                centerY, centerZ, radiusSquared);
+        return bounds.intersectsSphere(centerX, centerY, centerZ, radiusSquared);
     }
 
     /**
@@ -606,8 +646,7 @@ public class BlockRegion {
      * @return <code>true</code> iff this AABB and the sphere intersect; <code>false</code> otherwise
      */
     public boolean intersectsSphere(Spheref sphere) {
-    	AABBf aabbf = new AABBf(this.getMinX() - 0.5f, this.getMinY() - 0.5f, this.getMinZ() - 0.5f, this.getMaxX() + 0.5f, this.getMaxY() + 0.5f, this.getMaxZ() + 0.5f);
-    	return Intersectionf.testAabSphere(aabbf, sphere);
+        return bounds.intersectsSphere(sphere);
     }
 
     /**
@@ -627,7 +666,7 @@ public class BlockRegion {
      * @return <code>true</code> if this AABB and the ray intersect; <code>false</code> otherwise
      */
     public boolean intersectsRay(float originX, float originY, float originZ, float dirX, float dirY, float dirZ) {
-        return Intersectionf.testRayAab(originX, originY, originZ, dirX, dirY, dirZ, this.getMinX() - 0.5f, this.getMinY() - 0.5f, this.getMinZ() - 0.5f, this.getMaxX() + 0.5f, this.getMaxY() + 0.5f, this.getMaxZ() + 0.5f);
+        return bounds.intersectsRay(originX, originY, originZ, dirX, dirY, dirZ);
     }
 
     /**
@@ -641,8 +680,7 @@ public class BlockRegion {
      * @return <code>true</code> if this AABB and the ray intersect; <code>false</code> otherwise
      */
     public boolean intersectsRay(Rayf ray) {
-    	AABBf aabbf = new AABBf(this.getMinX() - 0.5f, this.getMinY() - 0.5f, this.getMinZ() - 0.5f, this.getMaxX() + 0.5f, this.getMaxY() + 0.5f, this.getMaxZ() + 0.5f);
-        return Intersectionf.testRayAab(ray, aabbf);
+        return bounds.intersectsRay(ray);
     }
 
     /**
@@ -670,8 +708,7 @@ public class BlockRegion {
      *         an edge or a side of this AABB
      */
     public int intersectLineSegment(float p0X, float p0Y, float p0Z, float p1X, float p1Y, float p1Z, Vector2f result) {
-        return Intersectionf.intersectLineSegmentAab(p0X, p0Y, p0Z, p1X, p1Y, p1Z, this.getMinX() - 0.5f, this.getMinY() - 0.5f, this.getMinZ() - 0.5f,
-                this.getMaxX() + 0.5f, this.getMaxY() + 0.5f, this.getMaxZ() + 0.5f, result);
+        return bounds.intersectsLineSegment(p0X, p0Y, p0Z, p1X, p1Y, p1Z, result);
     }
 
     /**
@@ -694,8 +731,7 @@ public class BlockRegion {
      *         an edge or a side of this AABB
      */
     public int intersectLineSegment(LineSegmentf lineSegment, Vector2f result) {
-    	AABBf aabbf = new AABBf(this.getMinX() - 0.5f, this.getMinY() - 0.5f, this.getMinZ() - 0.5f, this.getMaxX() + 0.5f, this.getMaxY() + 0.5f, this.getMaxZ() + 0.5f);
-        return Intersectionf.intersectLineSegmentAab(lineSegment, aabbf, result);
+        return bounds.intersectsLineSegment(lineSegment, result);
     }
 
     /**
@@ -704,7 +740,7 @@ public class BlockRegion {
      * @return <code>true</code> iff this BlockRegion is valid; <code>false</code> otherwise
      */
     public boolean isValid() {
-        return aabb.isValid();
+        return bounds.isValid();
     }
 
     /**
@@ -715,7 +751,21 @@ public class BlockRegion {
      * @return dest
      */
     public BlockRegion intersection(BlockRegion other, BlockRegion dest) {
-        this.aabb.intersection(other.aabb, dest.aabb);
+        dest.minX = Math.max(minX, other.minX);
+        dest.minY = Math.max(minY, other.minY);
+        dest.minZ = Math.max(minZ, other.minZ);
+
+        dest.maxX = Math.min(maxX, other.maxX);
+        dest.maxY = Math.min(maxY, other.maxY);
+        dest.maxZ = Math.min(maxZ, other.maxZ);
+
+        dest.bounds.minX = dest.bounds.minX - .5f;
+        dest.bounds.minY = dest.bounds.minY - .5f;
+        dest.bounds.minZ = dest.bounds.minZ - .5f;
+
+        dest.bounds.maxX = dest.bounds.maxX + .5f;
+        dest.bounds.maxY = dest.bounds.maxY + .5f;
+        dest.bounds.maxZ = dest.bounds.maxZ + .5f;
         return dest;
     }
 
@@ -773,13 +823,21 @@ public class BlockRegion {
      * @return dest
      */
     public BlockRegion addExtents(int extentX, int extentY, int extentZ, BlockRegion dest) {
-        dest.aabb.minX = this.aabb.minX - extentX;
-        dest.aabb.minY = this.aabb.minY - extentY;
-        dest.aabb.minZ = this.aabb.minZ - extentZ;
+        dest.minX = this.minX - extentX;
+        dest.minY = this.minY - extentY;
+        dest.minZ = this.minZ - extentZ;
 
-        dest.aabb.maxX = this.aabb.maxX + extentX;
-        dest.aabb.maxY = this.aabb.maxY + extentY;
-        dest.aabb.maxZ = this.aabb.maxZ + extentZ;
+        dest.maxX = this.maxX + extentX;
+        dest.maxY = this.maxY + extentY;
+        dest.maxZ = this.maxZ + extentZ;
+
+        dest.bounds.minX = dest.bounds.minX - extentX;
+        dest.bounds.minY = dest.bounds.minY - extentY;
+        dest.bounds.minZ = dest.bounds.minZ - extentZ;
+
+        dest.bounds.maxX = dest.bounds.maxX + extentX;
+        dest.bounds.maxY = dest.bounds.maxY + extentY;
+        dest.bounds.maxZ = dest.bounds.maxZ + extentZ;
         return dest;
     }
 
@@ -793,36 +851,53 @@ public class BlockRegion {
      * @return dest
      */
     public BlockRegion addExtents(float extentX, float extentY, float extentZ, BlockRegion dest) {
-        dest.aabb.minX = Math.roundUsing(this.aabb.minX - extentX, RoundingMode.FLOOR);
-        dest.aabb.minY = Math.roundUsing(this.aabb.minY - extentY, RoundingMode.FLOOR);
-        dest.aabb.minZ = Math.roundUsing(this.aabb.minZ - extentZ, RoundingMode.FLOOR);
+        dest.minX = Math.roundUsing(this.minX - extentX, RoundingMode.FLOOR);
+        dest.minY = Math.roundUsing(this.minY - extentY, RoundingMode.FLOOR);
+        dest.minZ = Math.roundUsing(this.minZ - extentZ, RoundingMode.FLOOR);
 
-        dest.aabb.maxX = Math.roundUsing(this.aabb.maxX + extentX, RoundingMode.CEILING);
-        dest.aabb.maxY = Math.roundUsing(this.aabb.maxY + extentY, RoundingMode.CEILING);
-        dest.aabb.maxZ = Math.roundUsing(this.aabb.maxZ + extentZ, RoundingMode.CEILING);
+        dest.maxX = Math.roundUsing(this.maxX + extentX, RoundingMode.CEILING);
+        dest.maxY = Math.roundUsing(this.maxY + extentY, RoundingMode.CEILING);
+        dest.maxZ = Math.roundUsing(this.maxZ + extentZ, RoundingMode.CEILING);
+
+        dest.bounds.minX = dest.minX - .5f;
+        dest.bounds.minY = dest.minY - .5f;
+        dest.bounds.minZ = dest.minZ - .5f;
+
+        dest.bounds.maxX = dest.maxX + .5f;
+        dest.bounds.maxY = dest.maxY + .5f;
+        dest.bounds.maxZ = dest.maxZ + .5f;
         return dest;
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        BlockRegion region = (BlockRegion) o;
-        return aabb.equals(region.aabb);
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        BlockRegion region = (BlockRegion) obj;
+        return minX == region.minX &&
+            minY == region.minY &&
+            minZ == region.minZ &&
+            maxX == region.maxX &&
+            maxY == region.maxY &&
+            maxZ == region.maxZ;
     }
 
     @Override
     public int hashCode() {
-        return aabb.hashCode();
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + minX;
+        result = prime * result + minY;
+        result = prime * result + minZ;
+        result = prime * result + maxX;
+        result = prime * result + maxY;
+        result = prime * result + maxZ;
+        return result;
     }
 
     @Override
     public String toString() {
-        return "(" + this.aabb.minX + " " + this.aabb.minY + " " + this.aabb.minZ + ") < " +
-                "(" + (this.aabb.maxX - 1) + " " + (this.aabb.maxY - 1) + " " + (this.aabb.maxZ - 1) + ")";
+        return "(" + this.minX + " " + this.minY + " " + this.minZ + ") < " +
+                "(" + (this.maxX - 1) + " " + (this.maxY - 1) + " " + (this.maxZ - 1) + ")";
     }
 }
