@@ -36,11 +36,9 @@ public class AfkAuthoritySystem extends BaseComponentSystem {
     @In
     private NetworkSystem networkSystem;
 
-    private int count;
 
     @ReceiveEvent
     public void onConnected(ConnectedEvent event, EntityRef entity) {
-        count++;
         if (!delayManager.hasPeriodicAction(entity, PERIODIC_ID)) {
             delayManager.addPeriodicAction(entity, PERIODIC_ID, 0, AFK_PERIOD);
         }
@@ -48,13 +46,10 @@ public class AfkAuthoritySystem extends BaseComponentSystem {
 
     @ReceiveEvent
     public void onDisconnected(DisconnectedEvent event, EntityRef entity) {
-        count--;
         if (delayManager.hasPeriodicAction(entity, PERIODIC_ID)) {
             delayManager.cancelPeriodicAction(entity, PERIODIC_ID);
-            if (count >= 1) {
-                for (Client player : networkSystem.getPlayers()) {
-                    delayManager.addPeriodicAction(player.getEntity(), PERIODIC_ID, 0, AFK_PERIOD);
-                }
+            for (Client player : networkSystem.getPlayers()) {
+                delayManager.addPeriodicAction(player.getEntity(), PERIODIC_ID, 0, AFK_PERIOD);
             }
         }
     }

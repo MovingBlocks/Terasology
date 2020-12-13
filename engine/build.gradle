@@ -151,6 +151,8 @@ dependencies {
 
     // TODO: Consider moving this back to the PC Facade instead of having the engine rely on it?
     implementation group: 'org.terasology.crashreporter', name: 'cr-terasology', version: '4.1.0'
+    
+   api(project(":subsystems:TypeHandlerLibrary"))
 }
 
 task cacheReflections {
@@ -179,11 +181,13 @@ jar {
 
     from(tasks.getByName("cacheReflections").outputs)
 
-    manifest {
-        def manifestClasspath = "$subDirLibs/" + configurations."${sourceSets.main.runtimeClasspathConfigurationName}".collect {
-            it.getName()
-        }.join(" $subDirLibs/")
-        attributes("Class-Path": manifestClasspath, "Implementation-Title": "Terasology-" + project.name, "Implementation-Version": env.BUILD_NUMBER + ", " + convertGitBranch(env.GIT_BRANCH) + ", " + env.BUILD_ID + ", " + displayVersion)
+    doFirst {
+        manifest {
+            def manifestClasspath = "$subDirLibs/" + configurations."${sourceSets.main.runtimeClasspathConfigurationName}".collect {
+                it.getName()
+            }.join(" $subDirLibs/")
+            attributes("Class-Path": manifestClasspath, "Implementation-Title": "Terasology-" + project.name, "Implementation-Version": env.BUILD_NUMBER + ", " + convertGitBranch(env.GIT_BRANCH) + ", " + env.BUILD_ID + ", " + displayVersion)
+        }
     }
 }
 
