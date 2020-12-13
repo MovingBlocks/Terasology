@@ -85,7 +85,7 @@ public class BlockAreaTest {
         assertThrows(IllegalArgumentException.class, () -> BlockAreas.fromMinAndMax(0, 3, 3, 0));
     }
 
-    static Stream<Arguments> testIntersection() {
+    static Stream<Arguments> testIntersectionArgs() {
         return Stream.of(
                 Arguments.of(
                         BlockAreas.fromMinAndMax(0, 0, 2, 2),
@@ -106,7 +106,7 @@ public class BlockAreaTest {
     }
 
     @ParameterizedTest
-    @MethodSource
+    @MethodSource("testIntersectionArgs")
     public void testIntersection(BlockArea a, BlockArea b, BlockArea expected) {
         assertEquals(expected, a.intersection(b, new BlockArea()));
     }
