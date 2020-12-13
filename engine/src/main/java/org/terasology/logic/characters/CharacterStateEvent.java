@@ -29,7 +29,7 @@ public class CharacterStateEvent extends NetworkEvent {
     private long time;
     private int sequenceNumber;
     private Vector3f position = new Vector3f();
-    private Quaternionf rotation = new Quaternionf();
+    private Quaternionf rotation = new Quaternionf(0, 0, 0, 1);
     private MovementMode mode = MovementMode.WALKING;
     private boolean grounded;
     private Vector3f velocity = new Vector3f();

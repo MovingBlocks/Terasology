@@ -70,7 +70,7 @@ public class CharacterStateEventPositionMap {
      */
     public void updateCharacterStateEvent(CharacterStateEvent event) {
         Vector3f[] data = this.idToData.get(event.getSequenceNumber());
-        event.setPosition(data[0]);
-        event.setVelocity(data[1]);
+        event.setPosition(JomlUtil.from(data[0]));
+        event.setVelocity(JomlUtil.from(data[1]));
     }
 }

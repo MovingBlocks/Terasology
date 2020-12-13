@@ -35,6 +35,7 @@ import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.logic.characters.events.SetMovementModeEvent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.LocalPlayer;
+import org.terasology.math.JomlUtil;
 import org.terasology.network.NetworkSystem;
 import org.terasology.physics.engine.CharacterCollider;
 import org.terasology.physics.engine.PhysicsEngine;
@@ -147,7 +148,7 @@ public class ServerCharacterPredictionSystem extends BaseComponentSystem impleme
             if (recordAndReplayCurrentStatus.getStatus() == RecordAndReplayStatus.REPLAYING)  {
                 characterStateEventPositionMap.updateCharacterStateEvent(newState);
             } else if (recordAndReplayCurrentStatus.getStatus() == RecordAndReplayStatus.RECORDING) {
-                characterStateEventPositionMap.add(newState.getSequenceNumber(), newState.getPosition(), newState.getVelocity());
+                characterStateEventPositionMap.add(newState.getSequenceNumber(), JomlUtil.from(newState.getPosition()), JomlUtil.from(newState.getVelocity()));
             }
 
             characterMovementSystemUtility.setToState(entity, newState);

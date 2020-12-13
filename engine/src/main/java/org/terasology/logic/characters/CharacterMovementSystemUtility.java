@@ -36,7 +36,7 @@ public final class CharacterMovementSystemUtility {
         LocationComponent location = entity.getComponent(LocationComponent.class);
         CharacterMovementComponent movementComp = entity.getComponent(CharacterMovementComponent.class);
 
-        if (location == null || Float.isNaN(location.getWorldPosition().x) || movementComp == null) {
+        if (location == null || !location.getWorldPosition(new Vector3f()).isFinite() || movementComp == null) {
             return;
         }
         location.setWorldPosition(state.getPosition());

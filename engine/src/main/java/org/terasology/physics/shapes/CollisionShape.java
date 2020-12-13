@@ -20,8 +20,6 @@ import org.joml.Quaternionf;
 import org.joml.Quaternionfc;
 import org.joml.Vector3fc;
 import org.terasology.math.AABB;
-import org.terasology.math.Transform;
-import org.terasology.math.geom.Quat4f;
 
 /**
  * The base type representing a collision shape in the physics engine.
