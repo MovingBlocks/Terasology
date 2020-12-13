@@ -189,6 +189,19 @@ public class BlockArea {
     }
 
     /**
+     * calculate the BlockRegion that is intersected between another region
+     *
+     * @param other the other BlockRegion
+     * @param dest holds the result
+     * @return dest
+     */
+    public BlockArea intersection(BlockArea other, BlockArea dest) {
+        dest.min.set(Math.max(this.min.x(), other.min.x()), Math.max(this.min.y(), other.min.y()));
+        dest.max.set(Math.min(this.max.x(), other.max.x()), Math.min(this.max.y(), other.max.y()));
+        return dest;
+    }
+
+    /**
      * the number of blocks for the +x, +y, +z from the minimum to the maximum
      *
      * @param dest will hold the result
@@ -395,19 +408,6 @@ public class BlockArea {
     }
 
     /**
-     * calculate the BlockRegion that is intersected between another region
-     *
-     * @param other the other BlockRegion
-     * @param dest holds the result
-     * @return dest
-     */
-    public BlockArea intersection(BlockArea other, BlockArea dest) {
-        dest.min.set(Math.max(this.min.x(), other.min.x()), Math.max(this.min.y(), other.min.y()));
-        dest.max.set(Math.min(this.max.x(), other.max.x()), Math.min(this.max.y(), other.max.y()));
-        return dest;
-    }
-
-    /**
      * Adds extend for each face of a BlockRegion.
      *
      * @param extent extents to grow each face
@@ -475,148 +475,6 @@ public class BlockArea {
             rectangle.minY = min.y() - 0.5f;
             rectangle.maxX = max.x() + 0.5f;
             rectangle.maxY = max.y() + 0.5f;
-        }
-    }
-
-    /**
-     * Temporary Utility
-     * <p>
-     * https://github.com/JOML-CI/JOML/pull/244 https://github.com/JOML-CI/JOML/pull/245
-     */
-    public static class RectangleUtility {
-
-        public static Rectanglei set(Rectanglei current, Rectanglei source) {
-            current.minX = source.minX;
-            current.minY = source.minY;
-            current.maxX = source.maxX;
-            current.maxY = source.maxY;
-            return current;
-        }
-
-        /**
-         * Set the minimum corner coordinates.
-         *
-         * @param minX the x coordinate of the minimum corner
-         * @param minY the y coordinate of the minimum corner
-         * @return this
-         */
-        public static Rectanglei setMin(Rectanglei current, int minX, int minY) {
-            current.minX = minX;
-            current.minY = minY;
-            return current;
-        }
-
-        /**
-         * Set the minimum corner coordinates.
-         *
-         * @param min the minimum coordinates
-         * @return this
-         */
-        public static Rectanglei setMin(Rectanglei current, Vector2ic min) {
-            current.minX = min.x();
-            current.minY = min.y();
-            return current;
-        }
-
-
-        /**
-         * Set the maximum corner coordinates.
-         *
-         * @param maxX the x coordinate of the maximum corner
-         * @param maxY the y coordinate of the maximum corner
-         * @return this
-         */
-        public static Rectanglei setMax(Rectanglei current, int maxX, int maxY) {
-            current.maxX = maxX;
-            current.maxY = maxY;
-            return current;
-        }
-
-        /**
-         * Set the maximum corner coordinates.
-         *
-         * @param max the maximum coordinates
-         * @return this
-         */
-        public static Rectanglei setMax(Rectanglei current, Vector2ic max) {
-            current.maxX = max.x();
-            current.maxY = max.y();
-            return current;
-        }
-
-        /**
-         * Set <code>this</code> to the union of <code>this</code> and the given point <code>p</code>.
-         *
-         * @param x the x coordinate of the point
-         * @param y the y coordinate of the point
-         * @return this
-         */
-        public static Rectanglei union(Rectanglei current, int x, int y) {
-            return union(current, x, y, current);
-        }
-
-        /**
-         * Set <code>this</code> to the union of <code>this</code> and the given point <code>p</code>.
-         *
-         * @param p the point
-         * @return this
-         */
-        public static Rectanglei union(Rectanglei current, Vector2ic p) {
-            return union(current, p.x(), p.y(), current);
-        }
-
-        /**
-         * Compute the union of <code>this</code> and the given point <code>(x, y, z)</code> and store the result in
-         * <code>dest</code>.
-         *
-         * @param x the x coordinate of the point
-         * @param y the y coordinate of the point
-         * @param dest will hold the result
-         * @return dest
-         */
-        public static Rectanglei union(Rectanglei current, int x, int y, Rectanglei dest) {
-            dest.minX = current.minX < x ? current.minX : x;
-            dest.minY = current.minY < y ? current.minY : y;
-            dest.maxX = current.maxX > x ? current.maxX : x;
-            dest.maxY = current.maxY > y ? current.maxY : y;
-            return dest;
-        }
-
-        /**
-         * Compute the union of <code>this</code> and the given point <code>p</code> and store the result in
-         * <code>dest</code>.
-         *
-         * @param p the point
-         * @param dest will hold the result
-         * @return dest
-         */
-        public static Rectanglei union(Rectanglei current, Vector2ic p, Rectanglei dest) {
-            return union(current, p.x(), p.y(), dest);
-        }
-
-        /**
-         * Set <code>this</code> to the union of <code>this</code> and <code>other</code>.
-         *
-         * @param other the other {@link Rectanglei}
-         * @return this
-         */
-        public static Rectanglei union(Rectanglei current, Rectanglei other) {
-            return union(current, other, current);
-        }
-
-        /**
-         * Compute the union of <code>this</code> and <code>other</code> and store the result in <code>dest</code>.
-         *
-         * @param other the other {@link Rectanglei}
-         * @param dest will hold the result
-         * @return dest
-         */
-        public static Rectanglei union(Rectanglei current, Rectanglei other, Rectanglei dest) {
-            dest.minX = current.minX < other.minX ? current.minX : other.minX;
-            dest.minY = current.minY < other.minY ? current.minY : other.minY;
-            dest.maxX = current.maxX > other.maxX ? current.maxX : other.maxX;
-            dest.maxY = current.maxY > other.maxY ? current.maxY : other.maxY;
-            return dest;
         }
     }
 }
