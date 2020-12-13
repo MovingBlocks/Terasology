@@ -17,8 +17,4 @@ public final class BlockAreas {
     public static BlockArea fromMinAndMax(int minX, int minY, int maxX, int maxY) {
         return new BlockArea().setMin(minX, minY).setMax(maxX, maxY);
     }
-
-    public static BlockArea fromRectangle(Rectanglei rectangle) {
-        return new BlockArea(rectangle);
-    }
 }

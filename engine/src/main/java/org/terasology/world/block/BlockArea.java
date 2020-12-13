@@ -3,6 +3,8 @@
 
 package org.terasology.world.block;
 
+import com.google.common.base.Preconditions;
+import org.joml.AABBf;
 import org.joml.AABBi;
 import org.joml.Math;
 import org.joml.Rectangled;
@@ -16,28 +18,24 @@ import org.joml.Vector3ic;
 
 /**
  * A bounded axis-aligned rectangle of blocks.
- * A {@link BlockArea} is described and backed by an {@link org.joml.Rectanglei}
+ * <p>
+ * A block area is described and backed by an {@link org.joml.Rectanglei}
+ *
+ * @see BlockAreas
  */
 public class BlockArea {
-    /**
-     * rectangle region that backs a SquareRegion
-     */
-    public final Rectanglei rectangle = new Rectanglei();
+    private final Vector2i min = new Vector2i(Integer.MAX_VALUE);
+    private final Vector2i max = new Vector2i(Integer.MIN_VALUE);
+
+    private boolean dirty = true;
+    private Rectanglef rectangle = new Rectanglef();
 
     public BlockArea() {
     }
 
     BlockArea(BlockArea source) {
-        RectangleUtility.set(rectangle, source.rectangle);
-    }
-
-    /**
-     *
-     * @param source
-     * @see BlockAreas#fromRectangle(Rectanglei)
-     */
-    BlockArea(Rectanglei source) {
-        RectangleUtility.set(rectangle, source);
+        this.min.set(source.min);
+        this.max.set(source.max);
     }
 
     /**
@@ -54,7 +52,7 @@ public class BlockArea {
      * @return dest
      */
     public Vector2i getMin(Vector2i dest) {
-        return dest.set(rectangle.minX, rectangle.minY);
+        return dest.set(min);
     }
 
     /**
@@ -64,7 +62,7 @@ public class BlockArea {
      * @return dest
      */
     public Vector2i getMax(Vector2i dest) {
-        return dest.set(rectangle.maxX - 1, rectangle.maxY - 1);
+        return dest.set(max);
     }
 
     /**
@@ -73,7 +71,7 @@ public class BlockArea {
      * @return the minimum coordinate x
      */
     public int getMaxX() {
-        return this.rectangle.maxX - 1;
+        return max.x;
     }
 
     /**
@@ -82,7 +80,7 @@ public class BlockArea {
      * @return the minimum coordinate y
      */
     public int getMaxY() {
-        return this.rectangle.maxY - 1;
+        return max.y;
     }
 
     /**
@@ -91,7 +89,7 @@ public class BlockArea {
      * @return the minimum coordinate x
      */
     public int getMinX() {
-        return this.rectangle.minX;
+        return min.x;
     }
 
     /**
@@ -100,7 +98,7 @@ public class BlockArea {
      * @return the minimum coordinate y
      */
     public int getMinY() {
-        return this.rectangle.minY;
+        return min.y;
     }
 
     /**
@@ -109,32 +107,9 @@ public class BlockArea {
      * @param min the first coordinate of the first block
      * @return this
      */
+    @SuppressWarnings("checkstyle:HiddenField")
     public BlockArea setMin(Vector2ic min) {
-        RectangleUtility.setMin(this.rectangle, min);
-        return this;
-    }
-
-    /**
-     * Sets the maximum coordinate of the second block for <code>this</code> {@link BlockRegion}
-     *
-     * @param max the second coordinate of the second block
-     * @return this
-     */
-    public BlockArea setMax(Vector2ic max) {
-        this.setMax(max.x(), max.y());
-        return this;
-    }
-
-    /**
-     * sets the maximum block for this {@link BlockRegion}
-     *
-     * @param maxX the x coordinate of the first block
-     * @param maxY the y coordinate of the first block
-     * @return this
-     */
-    public BlockArea setMax(int maxX, int maxY) {
-        RectangleUtility.setMax(this.rectangle, maxX + 1, maxY + 1);
-        return this;
+        return this.setMin(min.x(), min.y());
     }
 
     /**
@@ -145,8 +120,45 @@ public class BlockArea {
      * @return this
      */
     public BlockArea setMin(int minX, int minY) {
-        RectangleUtility.setMin(this.rectangle, minX, minY);
+        Preconditions.checkArgument(minX <= this.max.x() ^ this.max.x() == Integer.MIN_VALUE);
+        Preconditions.checkArgument(minY <= this.max.y() ^ this.max.y() == Integer.MIN_VALUE);
+        this.min.set(minX, minY);
         return this;
+    }
+
+    /**
+     * Sets the maximum coordinate of the second block for <code>this</code> {@link BlockRegion}
+     *
+     * @param max the second coordinate of the second block
+     * @return this
+     */
+    @SuppressWarnings("checkstyle:HiddenField")
+    public BlockArea setMax(Vector2ic max) {
+        return this.setMax(max.x(), max.y());
+    }
+
+    /**
+     * sets the maximum block for this {@link BlockRegion}
+     *
+     * @param maxX the x coordinate of the first block
+     * @param maxY the y coordinate of the first block
+     * @return this
+     */
+    public BlockArea setMax(int maxX, int maxY) {
+        Preconditions.checkArgument(maxX >= this.max.x() ^ this.max.x() == Integer.MAX_VALUE);
+        Preconditions.checkArgument(maxY >= this.max.y() ^ this.max.y() == Integer.MAX_VALUE);
+        this.max.set(maxX, maxY);
+        return this;
+    }
+
+    /**
+     * Set <code>this</code> to the union of <code>this</code> and <code>other</code>.
+     *
+     * @param other {@link BlockRegion}
+     * @return this
+     */
+    public BlockArea union(BlockArea other) {
+        return this.union(other.min).union(other.max);
     }
 
     /**
@@ -169,101 +181,9 @@ public class BlockArea {
      * @return dest
      */
     public BlockArea union(int x, int y, BlockArea dest) {
-        // a block is (x,y,z) and (x + 1, y + 1, z + 1)
-        dest.rectangle.minX = Math.min(this.rectangle.minX, x);
-        dest.rectangle.minY = Math.min(this.rectangle.minY, y);
-        dest.rectangle.maxX = Math.max(this.rectangle.maxX, (x + 1));
-        dest.rectangle.maxY = Math.max(this.rectangle.maxY, (y + 1));
+        dest.min.set(Math.min(dest.min.x, x), Math.min(dest.min.y, y));
+        dest.max.set(Math.max(dest.max.x, x), Math.max(dest.max.y, y));
         return dest;
-    }
-
-    /**
-     * Compute the union of <code>this</code> and the given block <code>(x, y, z)</code> and store the result in
-     * <code>dest</code>.
-     *
-     * @param pos the position of the block
-     * @param dest will hold the result
-     * @return dest
-     */
-    public BlockArea union(Vector3ic pos, BlockArea dest) {
-        return this.union(pos.x(), pos.y(), dest);
-    }
-
-    /**
-     * Set <code>this</code> to the union of <code>this</code> and <code>other</code>.
-     *
-     * @param other {@link BlockRegion}
-     * @return this
-     */
-    public BlockArea union(BlockArea other) {
-        return this.union(other.rectangle);
-    }
-
-    /**
-     * Set <code>this</code> to the union of <code>this</code> and <code>other</code>.
-     *
-     * @param other {@link AABBi}
-     * @param dest will hold the result
-     * @return dest
-     */
-    public BlockArea union(Rectanglei other, BlockArea dest) {
-        dest.union(other);
-        return dest;
-    }
-
-    /**
-     * Set <code>this</code> to the union of <code>this</code> and <code>other</code>.
-     *
-     * @param other the other {@link AABBi}
-     * @return this
-     */
-    public BlockArea union(Rectanglei other) {
-        RectangleUtility.union(this.rectangle, other);
-        return this;
-    }
-
-    /**
-     * Ensure that the minimum coordinates are strictly less than or equal to the maximum coordinates by swapping them
-     * if necessary.
-     *
-     * @return this
-     */
-    public BlockArea correctBounds() {
-        int tmp;
-        if (this.rectangle.minX > this.rectangle.maxX) {
-            tmp = this.rectangle.minX;
-            this.rectangle.minX = this.rectangle.maxX;
-            this.rectangle.maxX = tmp;
-        }
-        if (this.rectangle.minY > this.rectangle.maxY) {
-            tmp = this.rectangle.minY;
-            this.rectangle.minY = this.rectangle.maxY;
-            this.rectangle.maxY = tmp;
-        }
-        return this;
-    }
-
-    /**
-     * set the size of the block region from minimum.
-     *
-     * @param x the x coordinate to set the size
-     * @param y the y coordinate to set the size
-     * @return this
-     */
-    public BlockArea setSize(int x, int y) {
-        this.rectangle.maxX = this.rectangle.minX + x;
-        this.rectangle.maxY = this.rectangle.minY + y;
-        return this;
-    }
-
-    /**
-     * set the size of the block region from minimum.
-     *
-     * @param size the size to set the {@link BlockRegion}
-     * @return this
-     */
-    public BlockArea setSize(Vector2ic size) {
-        return setSize(size.x(), size.y());
     }
 
     /**
@@ -273,7 +193,7 @@ public class BlockArea {
      * @return dest
      */
     public Vector2i getSize(Vector2i dest) {
-        return dest.set(this.rectangle.maxX - this.rectangle.minX, this.rectangle.maxY - this.rectangle.minY);
+        return this.max.sub(this.min, dest);
     }
 
     /**
@@ -282,7 +202,7 @@ public class BlockArea {
      * @return number of blocks in the X axis
      */
     public int getSizeX() {
-        return this.rectangle.maxX - this.rectangle.minX;
+        return this.max.x() - this.min.x();
     }
 
     /**
@@ -291,7 +211,7 @@ public class BlockArea {
      * @return number of blocks in the Y axis
      */
     public int getSizeY() {
-        return this.rectangle.maxY - this.rectangle.minY;
+        return this.max.y() - this.min.y();
     }
 
     /**
@@ -302,8 +222,17 @@ public class BlockArea {
      * @return this
      */
     public BlockArea translate(int x, int y) {
-        rectangle.translate(x, y);
-        return this;
+        return translate(x, y, this);
+    }
+
+    /**
+     * Translate <code>this</code> by the given vector <code>xyz</code>.
+     *
+     * @param xy the vector to translate by
+     * @return this
+     */
+    public BlockArea translate(Vector2ic xy) {
+        return translate(xy, this);
     }
 
     /**
@@ -314,21 +243,22 @@ public class BlockArea {
      * @return dest
      */
     public BlockArea translate(Vector2ic xy, BlockArea dest) {
-        rectangle.translate(xy, dest.rectangle);
-        return dest;
+        return translate(xy.x(), xy.y(), dest);
     }
 
     /**
-     * Translate <code>this</code> by the given vector <code>xyz</code>.
+     * Translate <code>this</code> by the given vector <code>xy</code>.
      *
-     * @param xy the vector to translate by
-     * @return this
+     * @param x the length to translate by along x direction
+     * @param y the length to translate by along y direction
+     * @param dest will hold the result
+     * @return dest
      */
-    public BlockArea translate(Vector2ic xy) {
-        this.rectangle.translate(xy);
-        return this;
+    public BlockArea translate(int x, int y, BlockArea dest) {
+        dest.min.add(x, y);
+        dest.max.add(x, y);
+        return dest;
     }
-
 
     /**
      * Test whether the block <code>(x, y, z)</code> lies inside this BlockRegion.
@@ -336,8 +266,8 @@ public class BlockArea {
      * @param pos the coordinates of the block
      * @return <code>true</code> iff the given point lies inside this AABB; <code>false</code> otherwise
      */
-    public boolean containsSquare(Vector2ic pos) {
-        return containsSquare(pos.x(), pos.y());
+    public boolean containsBlock(Vector2ic pos) {
+        return containsBlock(pos.x(), pos.y());
     }
 
     /**
@@ -347,11 +277,12 @@ public class BlockArea {
      * @param y the y coordinate of the point
      * @return <code>true</code> iff the given point lies inside this AABB; <code>false</code> otherwise
      */
-    public boolean containsSquare(int x, int y) {
-        return x >= rectangle.minX && y >= rectangle.minY && x < rectangle.maxX && y < rectangle.maxY;
+    public boolean containsBlock(int x, int y) {
+        return x >= min.x() && y >= min.y() && x <= max.x() && y <= max.y();
     }
 
     /**
+     * WORLD-COORDINATES
      * Test whether the point <code>(x, y, z)</code> lies inside this BlockRegion.
      *
      * @param x the x coordinate of the point
@@ -359,7 +290,15 @@ public class BlockArea {
      * @return <code>true</code> iff the given point lies inside this BlockRegion; <code>false</code> otherwise
      */
     public boolean containsPoint(float x, float y) {
+        updateRectangle();
         return x >= rectangle.minX && y >= rectangle.minY && x <= rectangle.maxX && y <= rectangle.maxY;
+    }
+    
+    /**
+     * @see #containsPoint(float, float)
+     */
+    public boolean containsPoint(Vector2fc point) {
+        return this.containsPoint(point.x(), point.y());
     }
 
     /**
@@ -370,7 +309,7 @@ public class BlockArea {
      * @return <code>true</code> iff the given point lies inside this AABB; <code>false</code> otherwise
      */
     public boolean containsPoint(int x, int y) {
-        return this.rectangle.containsPoint(x, y);
+        return containsBlock(x, y);
     }
 
     /**
@@ -380,21 +319,12 @@ public class BlockArea {
      * @return <code>true</code> iff the given point lies inside this AABB; <code>false</code> otherwise
      */
     public boolean containsPoint(Vector2ic point) {
-        return this.rectangle.containsPoint(point);
-    }
-
-    /**
-     * Test whether the given point lies inside this AABB.
-     *
-     * @param point the coordinates of the point
-     * @return <code>true</code> iff the given point lies inside this AABB; <code>false</code> otherwise
-     */
-    public boolean containsPoint(Vector2fc point) {
-        return this.containsPoint(point.x(), point.y());
+        return containsPoint(point.x(), point.y());
     }
 
     /**
      * Test whether the given {@link BlockArea}  lies inside the {@link BlockArea}
+     *
      * @param region the region to test
      * @return <code>true</code> iff the given value lies inside this {@link BlockArea}; <code>false</code> otherwise
      */
@@ -404,22 +334,27 @@ public class BlockArea {
 
     /**
      * Test whether the given {@link Rectanglei}  lies inside the {@link BlockArea}
+     *
      * @param rect the rectangle to test
      * @return <code>true</code> iff the given value lies inside this {@link BlockArea}; <code>false</code> otherwise
      */
     public boolean containsRectangle(Rectanglei rect) {
         return this.rectangle.containsRectangle(rect);
     }
+
     /**
      * Test whether the given {@link Rectanglef}  lies inside the {@link BlockArea}
+     *
      * @param rect the rectangle to test
      * @return <code>true</code> iff the given value lies inside this {@link BlockArea}; <code>false</code> otherwise
      */
     public boolean containsRectangle(Rectanglef rect) {
         return this.rectangle.containsRectangle(rect);
     }
+
     /**
      * Test whether the given {@link Rectangled}  lies inside the {@link BlockArea}
+     *
      * @param rect the rectangle to test
      * @return <code>true</code> iff the given value lies inside this {@link BlockArea}; <code>false</code> otherwise
      */
@@ -466,16 +401,6 @@ public class BlockArea {
      */
     public boolean intersectsRegion(BlockArea other) {
         return this.rectangle.intersectsRectangle(other.rectangle);
-    }
-
-
-    /**
-     * Check whether <code>this</code> BlockRegion represents a valid BlockRegion.
-     *
-     * @return <code>true</code> iff this BlockRegion is valid; <code>false</code> otherwise
-     */
-    public boolean isValid() {
-        return rectangle.isValid();
     }
 
     /**
@@ -565,8 +490,19 @@ public class BlockArea {
 
     @Override
     public String toString() {
-        return "(" + this.rectangle.minX + " " + this.rectangle.minY + ") < " +
-            "(" + (this.rectangle.maxX - 1) + " " + (this.rectangle.maxY - 1) + ")";
+        return "BlockArea[" + this.min + "..." + this.max + "]";
+    }
+
+    /**
+     * Recompute the bounding rectangle in world coordinates (continuous space).
+     */
+    private void updateRectangle() {
+        if (dirty) {
+            rectangle.minX = min.x() - 0.5f;
+            rectangle.minY = min.y() - 0.5f;
+            rectangle.maxX = max.x() + 0.5f;
+            rectangle.maxY = max.y() + 0.5f;
+        }
     }
 
     /**
