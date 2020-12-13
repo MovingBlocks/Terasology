@@ -109,7 +109,7 @@ public class CharacterSoundSystem extends BaseComponentSystem {
 
     @ReceiveEvent
     public void onLanded(VerticalCollisionEvent event, EntityRef entity, CharacterSoundComponent characterSounds) {
-        Vector3f velocity = JomlUtil.from(event.getVelocity());
+        Vector3f velocity = event.getVelocity();
         float soundVolumeModifier = (velocity.y * -1 - LANDING_VELOCITY_THRESHOLD) * LANDING_VOLUME_MODIFIER;
 
         if (soundVolumeModifier <= 0f) {

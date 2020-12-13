@@ -12,6 +12,7 @@ import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 import org.reflections.Reflections;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
+import org.terasology.persistence.typeHandling.TypeHandlerLibraryImpl;
 import org.terasology.persistence.typeHandling.gson.GsonBuilderFactory;
 
 public class AABBTypeHandlerTest extends MathTypeAssert {
@@ -30,7 +31,7 @@ public class AABBTypeHandlerTest extends MathTypeAssert {
     }
 
     private final Reflections reflections = new Reflections(getClass().getClassLoader());
-    private final TypeHandlerLibrary typeHandlerLibrary = TypeHandlerLibrary.withReflections(reflections);
+    private final TypeHandlerLibrary typeHandlerLibrary = TypeHandlerLibraryImpl.withReflections(reflections);
     private AABBiTypeHandler handler = new AABBiTypeHandler();
 
     private final Gson gson =
