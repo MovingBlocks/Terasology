@@ -18,14 +18,11 @@ package org.terasology.world.block.entity.placement;
 import org.joml.Vector3i;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.AbstractConsumableEvent;
-import org.terasology.math.JomlUtil;
 import org.terasology.world.block.Block;
 
 import java.util.Collections;
 import java.util.Map;
 
-/**
- */
 public class PlaceBlocks extends AbstractConsumableEvent {
     private Map<Vector3i, Block> blocks;
     private EntityRef instigator;
