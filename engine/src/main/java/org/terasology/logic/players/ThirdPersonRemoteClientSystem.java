@@ -16,6 +16,9 @@
 package org.terasology.logic.players;
 
 import com.google.common.collect.Sets;
+import org.joml.Math;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.Time;
@@ -36,9 +39,6 @@ import org.terasology.logic.console.commandSystem.annotations.Command;
 import org.terasology.logic.console.commandSystem.annotations.CommandParam;
 import org.terasology.logic.location.Location;
 import org.terasology.logic.location.LocationComponent;
-import org.terasology.math.TeraMath;
-import org.terasology.math.geom.Quat4f;
-import org.terasology.math.geom.Vector3f;
 import org.terasology.network.ClientComponent;
 import org.terasology.registry.In;
 import org.terasology.rendering.logic.VisualComponent;
@@ -93,10 +93,10 @@ public class ThirdPersonRemoteClientSystem extends BaseComponentSystem implement
         Location.removeChild(character, remotePersonHeldItemMountPointComponent.mountPointEntity);
         Location.attachChild(character, remotePersonHeldItemMountPointComponent.mountPointEntity,
                 remotePersonHeldItemMountPointComponent.translate,
-                new Quat4f(
-                        TeraMath.DEG_TO_RAD * remotePersonHeldItemMountPointComponent.rotateDegrees.y,
-                        TeraMath.DEG_TO_RAD * remotePersonHeldItemMountPointComponent.rotateDegrees.x,
-                        TeraMath.DEG_TO_RAD * remotePersonHeldItemMountPointComponent.rotateDegrees.z),
+                new Quaternionf().rotationYXZ(
+                        Math.toRadians(remotePersonHeldItemMountPointComponent.rotateDegrees.y),
+                        Math.toRadians(remotePersonHeldItemMountPointComponent.rotateDegrees.x),
+                        Math.toRadians(remotePersonHeldItemMountPointComponent.rotateDegrees.z)),
                 remotePersonHeldItemMountPointComponent.scale);
 
     }
@@ -225,10 +225,10 @@ public class ThirdPersonRemoteClientSystem extends BaseComponentSystem implement
 
                 Location.attachChild(mountPointComponent.mountPointEntity, currentHeldItem,
                         heldItemTransformComponent.translate,
-                        new Quat4f(
-                                TeraMath.DEG_TO_RAD * heldItemTransformComponent.rotateDegrees.y,
-                                TeraMath.DEG_TO_RAD * heldItemTransformComponent.rotateDegrees.x,
-                                TeraMath.DEG_TO_RAD * heldItemTransformComponent.rotateDegrees.z),
+                        new Quaternionf().rotationYXZ(
+                                Math.toRadians(heldItemTransformComponent.rotateDegrees.y),
+                                Math.toRadians(heldItemTransformComponent.rotateDegrees.x),
+                                Math.toRadians(heldItemTransformComponent.rotateDegrees.z)),
                         heldItemTransformComponent.scale);
             }
         } else {
@@ -298,10 +298,10 @@ public class ThirdPersonRemoteClientSystem extends BaseComponentSystem implement
             }
             float addPitch = 15f * animateAmount;
             float addYaw = 10f * animateAmount;
-            locationComponent.setLocalRotation(new Quat4f(
-                    TeraMath.DEG_TO_RAD * (mountPointComponent.rotateDegrees.y + addYaw),
-                    TeraMath.DEG_TO_RAD * (mountPointComponent.rotateDegrees.x + addPitch),
-                    TeraMath.DEG_TO_RAD * mountPointComponent.rotateDegrees.z));
+            locationComponent.setLocalRotation(new Quaternionf().rotationYXZ(
+                Math.toRadians(mountPointComponent.rotateDegrees.y + addYaw),
+                Math.toRadians(mountPointComponent.rotateDegrees.x + addPitch),
+                Math.toRadians(mountPointComponent.rotateDegrees.z)));
             Vector3f offset = new Vector3f(0.05f * animateAmount, -0.24f * animateAmount, 0f);
             offset.add(mountPointComponent.translate);
             locationComponent.setLocalPosition(offset);
