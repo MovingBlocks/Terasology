@@ -810,7 +810,7 @@ public class BlockRegion {
      * @param dest will hold the result
      * @return dest
      */
-    public BlockRegion edge(Side side, BlockRegion dest) {
+    public BlockRegion blockFace(Side side, BlockRegion dest) {
         switch (side) {
             case TOP:
                 return dest.setMin(this.getMinX(), this.getMaxY(), this.getMinZ()

@@ -192,17 +192,17 @@ public class BlockRegionTest {
     @Test
     public void testEdge() {
         BlockRegion region = BlockRegions.createFromMinAndMax(new Vector3i(), new Vector3i(32, 32, 32));
-        assertEquals(region.edge(Side.LEFT, new BlockRegion()), BlockRegions.createFromMinAndMax(new Vector3i(),
+        assertEquals(region.blockFace(Side.LEFT, new BlockRegion()), BlockRegions.createFromMinAndMax(new Vector3i(),
             new Vector3i(0, 32, 32)));
-        assertEquals(region.edge(Side.RIGHT, new BlockRegion()), BlockRegions.createFromMinAndMax(new Vector3i(32, 0,
+        assertEquals(region.blockFace(Side.RIGHT, new BlockRegion()), BlockRegions.createFromMinAndMax(new Vector3i(32, 0,
             0), new Vector3i(32, 32, 32)));
-        assertEquals(region.edge(Side.FRONT, new BlockRegion()), BlockRegions.createFromMinAndMax(new Vector3i(0, 0,
+        assertEquals(region.blockFace(Side.FRONT, new BlockRegion()), BlockRegions.createFromMinAndMax(new Vector3i(0, 0,
             0), new Vector3i(32, 32, 0)));
-        assertEquals(region.edge(Side.BACK, new BlockRegion()), BlockRegions.createFromMinAndMax(new Vector3i(0, 0,
+        assertEquals(region.blockFace(Side.BACK, new BlockRegion()), BlockRegions.createFromMinAndMax(new Vector3i(0, 0,
             32), new Vector3i(32, 32, 32)));
-        assertEquals(region.edge(Side.BOTTOM, new BlockRegion()), BlockRegions.createFromMinAndMax(new Vector3i(),
+        assertEquals(region.blockFace(Side.BOTTOM, new BlockRegion()), BlockRegions.createFromMinAndMax(new Vector3i(),
             new Vector3i(32, 0, 32)));
-        assertEquals(region.edge(Side.TOP, new BlockRegion()), BlockRegions.createFromMinAndMax(new Vector3i(0, 32,
+        assertEquals(region.blockFace(Side.TOP, new BlockRegion()), BlockRegions.createFromMinAndMax(new Vector3i(0, 32,
             0), new Vector3i(32, 32, 32)));
     }
 
