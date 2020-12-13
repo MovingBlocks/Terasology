@@ -21,6 +21,7 @@ import org.joml.Vector3ic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.math.AABB;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.Region3i;
 import org.terasology.math.geom.BaseVector3i;
 import org.terasology.math.geom.Vector3f;
@@ -30,6 +31,8 @@ import org.terasology.protobuf.EntityData;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
+import org.terasology.world.block.BlockRegion;
+import org.terasology.world.block.BlockRegions;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkBlockIterator;
 import org.terasology.world.chunks.ChunkConstants;
@@ -71,7 +74,7 @@ public class ChunkImpl implements Chunk {
     private volatile TeraArray[] extraDataSnapshots;
 
     private AABB aabb;
-    private Region3i region;
+    private BlockRegion region;
 
     private boolean disposed;
     private boolean ready;
@@ -102,8 +105,8 @@ public class ChunkImpl implements Chunk {
         lightData = new TeraDenseArray8Bit(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
         dirty = true;
         this.blockManager = blockManager;
-        region = Region3i.createFromMinAndSize(new Vector3i(chunkPos.x * ChunkConstants.SIZE_X, chunkPos.y * ChunkConstants.SIZE_Y, chunkPos.z * ChunkConstants.SIZE_Z),
-                ChunkConstants.CHUNK_SIZE);
+        region = BlockRegions.createFromMinAndSize(new org.joml.Vector3i(chunkPos.x * ChunkConstants.SIZE_X, chunkPos.y * ChunkConstants.SIZE_Y, chunkPos.z * ChunkConstants.SIZE_Z),
+                JomlUtil.from(ChunkConstants.CHUNK_SIZE));
         ChunkMonitor.fireChunkCreated(this);
     }
 
@@ -552,7 +555,7 @@ public class ChunkImpl implements Chunk {
     }
 
     @Override
-    public Region3i getRegion() {
+    public BlockRegion getRegion() {
         return region;
     }
 

@@ -17,8 +17,9 @@
 package org.terasology.world.generation.facets.base;
 
 import com.google.common.collect.Maps;
-import org.terasology.math.Region3i;
-import org.terasology.math.geom.Vector3i;
+import org.joml.Vector3i;
+import org.joml.Vector3ic;
+import org.terasology.world.block.BlockRegion;
 import org.terasology.world.generation.Border3D;
 
 import java.util.Collections;
@@ -37,11 +38,11 @@ public abstract class SparseFieldFacet3D extends SparseFacet3D implements FieldF
 
     private final float defValue;
 
-    public SparseFieldFacet3D(Region3i targetRegion, Border3D border) {
+    public SparseFieldFacet3D(BlockRegion targetRegion, Border3D border) {
         this(targetRegion, border, 0);
     }
 
-    public SparseFieldFacet3D(Region3i targetRegion, Border3D border, float defValue) {
+    public SparseFieldFacet3D(BlockRegion targetRegion, Border3D border, float defValue) {
         super(targetRegion, border);
         this.defValue = defValue;
     }
@@ -52,8 +53,8 @@ public abstract class SparseFieldFacet3D extends SparseFacet3D implements FieldF
     }
 
     @Override
-    public float get(Vector3i pos) {
-        checkRelativeCoords(pos.x, pos.y, pos.z);
+    public float get(Vector3ic pos) {
+        checkRelativeCoords(pos.x(), pos.y(), pos.z());
 
         Number n = relData.get(pos);
         return (n != null) ? n.floatValue() : defValue;
@@ -65,7 +66,7 @@ public abstract class SparseFieldFacet3D extends SparseFacet3D implements FieldF
     }
 
     @Override
-    public void set(Vector3i pos, float value) {
+    public void set(Vector3ic pos, float value) {
         set(pos, Float.valueOf(value));
     }
 
@@ -82,8 +83,8 @@ public abstract class SparseFieldFacet3D extends SparseFacet3D implements FieldF
     }
 
     @Override
-    public float getWorld(Vector3i pos) {
-        return getWorld(pos.x, pos.y, pos.z);
+    public float getWorld(Vector3ic pos) {
+        return getWorld(pos.x(), pos.y(), pos.z());
     }
 
     @Override
@@ -96,8 +97,8 @@ public abstract class SparseFieldFacet3D extends SparseFacet3D implements FieldF
     }
 
     @Override
-    public void setWorld(Vector3i pos, float value) {
-        setWorld(pos.x, pos.y, pos.z, value);
+    public void setWorld(Vector3ic pos, float value) {
+        setWorld(pos.x(), pos.y(), pos.z(), value);
     }
 
     @Override

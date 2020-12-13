@@ -17,15 +17,16 @@
 package org.terasology.rendering.nui.layers.mainMenu.preview;
 
 import com.google.common.math.IntMath;
+import org.joml.Vector3i;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.math.Region3i;
 import org.terasology.math.geom.ImmutableVector2i;
 import org.terasology.math.geom.Rect2i;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.rendering.assets.texture.TextureData;
 import org.terasology.rendering.nui.layers.mainMenu.ProgressListener;
+import org.terasology.world.block.BlockRegion;
+import org.terasology.world.block.BlockRegions;
 import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.generation.Region;
 import org.terasology.world.generation.World;
@@ -178,7 +179,7 @@ public class FacetLayerPreview implements PreviewGenerator {
         int minX = chunkPos.getX() * TILE_SIZE_X;
         int minZ = chunkPos.getY() * TILE_SIZE_Y;
         int height = vertChunks * ChunkConstants.SIZE_Y;
-        Region3i area3d = Region3i.createFromMinAndSize(new Vector3i(minX, 0, minZ), new Vector3i(TILE_SIZE_X, height, TILE_SIZE_Y));
+        BlockRegion area3d = BlockRegions.createFromMinAndSize(new Vector3i(minX, 0, minZ), new Vector3i(TILE_SIZE_X, height, TILE_SIZE_Y));
         World world = worldGenerator.getWorld();
         Region region = world.getWorldData(area3d);
         return region;
@@ -201,7 +202,7 @@ public class FacetLayerPreview implements PreviewGenerator {
      */
     private BufferedImage rasterize(Region region) {
 
-        Vector3i extent = region.getRegion().size();
+        Vector3i extent = region.getRegion().getSize(new Vector3i());
         int width = extent.x;
         int height = extent.z;
 

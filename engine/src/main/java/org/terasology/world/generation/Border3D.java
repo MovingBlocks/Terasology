@@ -17,8 +17,9 @@ package org.terasology.world.generation;
 
 import com.google.common.base.Preconditions;
 import org.terasology.math.geom.Rect2i;
-import org.terasology.math.Region3i;
-import org.terasology.math.geom.Vector3i;
+import org.joml.Vector3i;
+import org.terasology.world.block.BlockRegion;
+import org.terasology.world.block.BlockRegions;
 
 import java.util.Objects;
 
@@ -65,13 +66,13 @@ public class Border3D {
      * @param region The original region to be used.
      * @return The 2D representation with the additional space added to it.
      */
-    public Rect2i expandTo2D(Region3i region) {
-        return Rect2i.createFromMinAndMax(region.minX() - getSides(), region.minZ() - getSides(),
-                region.maxX() + getSides(), region.maxZ() + getSides());
+    public Rect2i expandTo2D(BlockRegion region) {
+        return Rect2i.createFromMinAndMax(region.getMinX() - getSides(), region.getMinZ() - getSides(),
+                region.getMaxX() + getSides(), region.getMaxZ() + getSides());
     }
 
     /**
-     * Same as {@code {@link #expandTo2D(Region3i)}} but with a Vector3i instead of a Region3i.
+     * Same as {@code {@link #expandTo2D(BlockRegion)}} but with a Vector3i instead of a Region3i.
      * @param size The size used.
      * @return The 2D representation with the additional space added to it with the additional space added to it in the 3 dimensions.
      */
@@ -84,18 +85,18 @@ public class Border3D {
      * @param region The region to be expanded with the borders.
      * @return The 3D world representation with the additional space added to it in the 3 dimensions.
      */
-    public Region3i expandTo3D(Region3i region) {
-        return Region3i.createFromMinMax(new Vector3i(region.minX() - sides, region.minY() - bottom, region.minZ() - sides),
-                new Vector3i(region.maxX() + sides, region.maxY() + top, region.maxZ() + sides));
+    public BlockRegion expandTo3D(BlockRegion region) {
+        return BlockRegions.createFromMinAndMax(new Vector3i(region.getMinX() - sides, region.getMinY() - bottom, region.getMinZ() - sides),
+                new Vector3i(region.getMaxX() + sides, region.getMaxY() + top, region.getMaxZ() + sides));
     }
 
     /**
-     * Same as {@code {@link #expandTo3D(Region3i)}}} but with a Vector3i instead of a Region3i.
+     * Same as {@code {@link #expandTo3D(BlockRegion)}}} but with a Vector3i instead of a Region3i.
      * @param size The size to be used.
      * @return The 3D world representation with the additional space added to it in the 3 dimensions.
      */
-    public Region3i expandTo3D(Vector3i size) {
-        return Region3i.createFromMinMax(new Vector3i(-sides, -bottom, -sides),
+    public BlockRegion expandTo3D(Vector3i size) {
+        return BlockRegions.createFromMinAndMax(new Vector3i(-sides, -bottom, -sides),
                 new Vector3i(size.x + sides - 1, size.y + top - 1, size.z + sides - 1));
     }
 

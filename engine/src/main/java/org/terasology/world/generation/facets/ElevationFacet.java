@@ -4,6 +4,7 @@
 package org.terasology.world.generation.facets;
 
 import org.terasology.math.Region3i;
+import org.terasology.world.block.BlockRegion;
 import org.terasology.world.generation.Border3D;
 import org.terasology.world.generation.facets.base.BaseFieldFacet2D;
 
@@ -16,7 +17,7 @@ import org.terasology.world.generation.facets.base.BaseFieldFacet2D;
  */
 public class ElevationFacet extends BaseFieldFacet2D {
 
-    public ElevationFacet(Region3i targetRegion, Border3D border) {
+    public ElevationFacet(BlockRegion targetRegion, Border3D border) {
         super(targetRegion, border);
     }
 }

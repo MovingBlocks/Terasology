@@ -20,6 +20,7 @@ import org.terasology.math.geom.Vector3i;
 import org.terasology.world.WorldChangeListener;
 import org.terasology.world.WorldComponent;
 import org.terasology.world.block.Block;
+import org.terasology.world.block.BlockRegion;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkProvider;
 import org.terasology.world.chunks.CoreChunk;
@@ -350,9 +351,9 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
     }
 
     @Override
-    public Collection<Region3i> getRelevantRegions() {
+    public Collection<BlockRegion> getRelevantRegions() {
         Collection<Chunk> chunks = chunkProvider.getAllChunks();
-        Function<Chunk, Region3i> mapping = CoreChunk::getRegion;
+        Function<Chunk, BlockRegion> mapping = CoreChunk::getRegion;
 
         Predicate<Chunk> isReady = ManagedChunk::isReady;
 
