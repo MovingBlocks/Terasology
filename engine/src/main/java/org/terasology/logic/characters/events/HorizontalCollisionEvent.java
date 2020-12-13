@@ -15,7 +15,6 @@
  */
 package org.terasology.logic.characters.events;
 
-
 import org.joml.Vector3f;
 
 /**
