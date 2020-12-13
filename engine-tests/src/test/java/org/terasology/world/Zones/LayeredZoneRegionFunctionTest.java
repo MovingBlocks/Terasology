@@ -27,7 +27,7 @@ import org.terasology.world.generation.FacetProvider;
 import org.terasology.world.generation.Region;
 import org.terasology.world.generation.RegionImpl;
 import org.terasology.world.generation.WorldFacet;
-import org.terasology.world.generation.facets.SurfaceHeightFacet;
+import org.terasology.world.generation.facets.ElevationFacet;
 import org.terasology.world.zones.LayeredZoneRegionFunction;
 import org.terasology.world.zones.MinMaxLayerThickness;
 import org.terasology.world.zones.Zone;
@@ -63,19 +63,19 @@ public class LayeredZoneRegionFunctionTest {
 
         ListMultimap<Class<? extends WorldFacet>, FacetProvider> facetProviderChains = ArrayListMultimap.create();
 
-        facetProviderChains.put(SurfaceHeightFacet.class, (generatingRegion) -> {
-                    SurfaceHeightFacet facet = new SurfaceHeightFacet(generatingRegion.getRegion(),
-                            generatingRegion.getBorderForFacet(SurfaceHeightFacet.class));
+        facetProviderChains.put(ElevationFacet.class, (generatingRegion) -> {
+                    ElevationFacet facet = new ElevationFacet(generatingRegion.getRegion(),
+                            generatingRegion.getBorderForFacet(ElevationFacet.class));
 
                     for (BaseVector2i pos : facet.getRelativeRegion().contents()) {
                         facet.set(pos, 100);
                     }
 
-                    generatingRegion.setRegionFacet(SurfaceHeightFacet.class, facet);
+                    generatingRegion.setRegionFacet(ElevationFacet.class, facet);
                 });
 
         Map<Class<? extends WorldFacet>, Border3D> borders = new HashMap<>();
-        borders.put(SurfaceHeightFacet.class, new Border3D(0, 0, 0));
+        borders.put(ElevationFacet.class, new Border3D(0, 0, 0));
 
         region = new RegionImpl(Region3i.createFromCenterExtents(new Vector3i(0, 0, 0), 4),
                 facetProviderChains, borders);
