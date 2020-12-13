@@ -4,17 +4,12 @@
 package org.terasology.world.block;
 
 import com.google.common.base.Preconditions;
-import org.joml.AABBf;
-import org.joml.AABBi;
 import org.joml.Math;
 import org.joml.Rectangled;
 import org.joml.Rectanglef;
-import org.joml.Rectanglei;
-import org.joml.RoundingMode;
 import org.joml.Vector2fc;
 import org.joml.Vector2i;
 import org.joml.Vector2ic;
-import org.joml.Vector3ic;
 
 import java.util.Objects;
 
@@ -29,9 +24,6 @@ public class BlockArea {
     private final Vector2i min = new Vector2i(Integer.MAX_VALUE);
     private final Vector2i max = new Vector2i(Integer.MIN_VALUE);
 
-    private boolean dirty = true;
-    private Rectanglef rectangle = new Rectanglef();
-
     public BlockArea() {
     }
 
@@ -45,6 +37,14 @@ public class BlockArea {
      */
     public BlockArea copy() {
         return new BlockArea(this);
+    }
+
+    public boolean isValid() {
+        return min.x <= max.x && min.y <= max.y;
+    }
+
+    public boolean isEmpty() {
+        return !isValid();
     }
 
     /**
@@ -305,10 +305,9 @@ public class BlockArea {
      * @return <code>true</code> iff the given point lies inside this BlockRegion; <code>false</code> otherwise
      */
     public boolean containsPoint(float x, float y) {
-        updateRectangle();
-        return x >= rectangle.minX && y >= rectangle.minY && x <= rectangle.maxX && y <= rectangle.maxY;
+        return getWorldArea().containsPoint(x, y);
     }
-    
+
     /**
      * @see #containsPoint(float, float)
      */
@@ -348,63 +347,13 @@ public class BlockArea {
     }
 
     /**
-     * Test whether the given {@link Rectanglef}  lies inside the {@link BlockArea}
-     *
-     * @param rect the rectangle to test
-     * @return <code>true</code> iff the given value lies inside this {@link BlockArea}; <code>false</code> otherwise
-     */
-    public boolean containsRectangle(Rectanglef rect) {
-        return this.rectangle.containsRectangle(rect);
-    }
-
-    /**
-     * Test whether the given {@link Rectangled}  lies inside the {@link BlockArea}
-     *
-     * @param rect the rectangle to test
-     * @return <code>true</code> iff the given value lies inside this {@link BlockArea}; <code>false</code> otherwise
-     */
-    public boolean containsRectangle(Rectangled rect) {
-        return this.rectangle.containsRectangle(rect);
-    }
-
-    /**
      * Test whether <code>this</code> and <code>other</code> intersect.
      *
      * @param other the other BlockRegion
      * @return <code>true</code> iff both AABBs intersect; <code>false</code> otherwise
      */
-    public boolean intersectsBlockGrid(BlockArea other) {
-        return this.rectangle.intersectsRectangle(other.rectangle);
-    }
-
-    /**
-     * Test whether <code>this</code> and <code>other</code> intersect.
-     *
-     * @param other the other AABB
-     * @return <code>true</code> iff both AABBs intersect; <code>false</code> otherwise
-     */
-    public boolean intersectsRectangle(Rectanglei other) {
-        return this.rectangle.intersectsRectangle(other);
-    }
-
-    /**
-     * Test whether <code>this</code> and <code>other</code> intersect.
-     *
-     * @param other the other AABB
-     * @return <code>true</code> iff both AABBs intersect; <code>false</code> otherwise
-     */
-    public boolean intersectsRectangle(Rectanglef other) {
-        return this.rectangle.intersectsRectangle(other);
-    }
-
-    /**
-     * Test whether <code>this</code> and <code>other</code> intersect.
-     *
-     * @param other the other AABB
-     * @return <code>true</code> iff both AABBs intersect; <code>false</code> otherwise
-     */
-    public boolean intersectsRegion(BlockArea other) {
-        return this.rectangle.intersectsRectangle(other.rectangle);
+    public boolean intersectsArea(BlockArea other) {
+        return this.min.x() <= other.max.x() && this.max.x() >= other.min.x() && this.max.y() >= other.min.y() && this.min.y() <= other.max.y();
     }
 
     /**
@@ -438,10 +387,31 @@ public class BlockArea {
      * @return dest
      */
     public BlockArea addExtents(int extentX, int extentY, BlockArea dest) {
-        Preconditions.checkArgument(dest.getSizeX() + 2 * extentX >= 0 &&  dest.getSizeY() + 2 * extentY >= 0);
+        Preconditions.checkArgument(dest.getSizeX() + 2 * extentX >= 0 && dest.getSizeY() + 2 * extentY >= 0);
         dest.min.sub(extentX, extentY);
         dest.max.add(extentX, extentY);
         return dest;
+    }
+
+
+    /**
+     * Test whether the given {@link Rectanglef}  lies inside the {@link BlockArea}
+     *
+     * @param rect the rectangle to test
+     * @return <code>true</code> iff the given value lies inside this {@link BlockArea}; <code>false</code> otherwise
+     */
+    public boolean containsRectangle(Rectanglef rect) {
+        return getWorldArea().containsRectangle(rect);
+    }
+
+    /**
+     * Test whether the given {@link Rectangled}  lies inside the {@link BlockArea}
+     *
+     * @param rect the rectangle to test
+     * @return <code>true</code> iff the given value lies inside this {@link BlockArea}; <code>false</code> otherwise
+     */
+    public boolean containsRectangle(Rectangled rect) {
+        return getWorldArea().containsRectangle(rect);
     }
 
     @Override
@@ -467,14 +437,9 @@ public class BlockArea {
     }
 
     /**
-     * Recompute the bounding rectangle in world coordinates (continuous space).
+     * Compute the bounding rectangle in world coordinates (continuous space).
      */
-    private void updateRectangle() {
-        if (dirty) {
-            rectangle.minX = min.x() - 0.5f;
-            rectangle.minY = min.y() - 0.5f;
-            rectangle.maxX = max.x() + 0.5f;
-            rectangle.maxY = max.y() + 0.5f;
-        }
+    public Rectanglef getWorldArea() {
+        return new Rectanglef(min.x() - 0.5f, min.y() - 0.5f, max.x() + 0.5f, max.y() + 0.5f);
     }
 }

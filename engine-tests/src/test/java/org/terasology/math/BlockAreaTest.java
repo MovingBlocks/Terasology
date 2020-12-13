@@ -3,6 +3,7 @@
 
 package org.terasology.math;
 
+import org.joml.Rectanglef;
 import org.joml.Vector2i;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -85,7 +86,7 @@ public class BlockAreaTest {
         assertThrows(IllegalArgumentException.class, () -> BlockAreas.fromMinAndMax(0, 3, 3, 0));
     }
 
-    static Stream<Arguments> testIntersectionArgs() {
+    static Stream<Arguments> testIntersectionWithAreaArgs() {
         return Stream.of(
                 Arguments.of(
                         BlockAreas.fromMinAndMax(0, 0, 2, 2),
@@ -106,8 +107,39 @@ public class BlockAreaTest {
     }
 
     @ParameterizedTest
-    @MethodSource("testIntersectionArgs")
-    public void testIntersection(BlockArea a, BlockArea b, BlockArea expected) {
+    @MethodSource("testIntersectionWithAreaArgs")
+    public void testIntersectionWithArea(BlockArea a, BlockArea b, BlockArea expected) {
         assertEquals(expected, a.intersection(b, new BlockArea()));
+    }
+
+    static Stream<Arguments> testIntersectsAreaArgs() {
+        return Stream.of(
+                // positive cases
+                Arguments.of(BlockAreas.fromMinAndMax(0, 0, 3, 3), true),
+                Arguments.of(BlockAreas.fromMinAndMax(-1, -1, 4, 4), true),
+                Arguments.of(BlockAreas.fromMinAndMax(-1, -1, 1, 1), true),
+                Arguments.of(BlockAreas.fromMinAndMax(1, 1, 2, 2), true),
+                Arguments.of(BlockAreas.fromMinAndMax(3, 1, 4, 2), true),
+                Arguments.of(BlockAreas.fromMinAndMax(1, 3, 2, 4), true),
+                // negative cases
+                Arguments.of(BlockAreas.fromMinAndMax(5, 5, 6, 6), false),
+                Arguments.of(BlockAreas.fromMinAndMax(-2, -2, -1, -1), false),
+                Arguments.of(new BlockArea(), false)
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("testIntersectsAreaArgs")
+    public void testIntersectsArea(BlockArea other, boolean intersecting) {
+        BlockArea area = BlockAreas.fromMinAndMax(0, 0, 3, 3);
+        assertEquals(intersecting, area.intersectsArea(other));
+    }
+
+    @Test
+    public void testIntersectionWithRectangle() {
+        BlockArea area = BlockAreas.fromMinAndMax(0, 0, 2, 2);
+        Rectanglef rect = new Rectanglef(2.3f, 2.49f, 3f, 4f);
+
+        assertTrue(BlockAreas.Intersections.intersectsRectangle(area, rect));
     }
 }
