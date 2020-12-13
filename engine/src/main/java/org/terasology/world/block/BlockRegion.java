@@ -470,7 +470,8 @@ public class BlockRegion {
      * @return <code>true</code> iff the given point lies inside this BlockRegion; <code>false</code> otherwise
      */
     public boolean containsPoint(float x, float y, float z) {
-        return this.aabb.containsPoint(x, y, z);
+    	AABBf aabbf = new AABBf(this.getMinX() - 0.5f, this.getMinY() - 0.5f, this.getMinZ() - 0.5f, this.getMaxX() + 0.5f, this.getMaxY() + 0.5f, this.getMaxZ() + 0.5f);
+    	return aabbf.containsPoint(x, y, z);
     }
 
     /**
@@ -491,18 +492,9 @@ public class BlockRegion {
      * @param point the coordinates of the point
      * @return <code>true</code> iff the given point lies inside this AABB; <code>false</code> otherwise
      */
-    public boolean containsPoint(Vector3ic point) {
-        return this.aabb.containsPoint(point);
-    }
-
-    /**
-     * Test whether the given point lies inside this AABB.
-     *
-     * @param point the coordinates of the point
-     * @return <code>true</code> iff the given point lies inside this AABB; <code>false</code> otherwise
-     */
     public boolean containsPoint(Vector3fc point) {
-        return this.aabb.containsPoint(point);
+    	AABBf aabbf = new AABBf(this.getMinX() - 0.5f, this.getMinY() - 0.5f, this.getMinZ() - 0.5f, this.getMaxX() + 0.5f, this.getMaxY() + 0.5f, this.getMaxZ() + 0.5f);
+    	return aabbf.containsPoint(point);
     }
 
     /**
@@ -519,7 +511,8 @@ public class BlockRegion {
      * @return <code>true</code> iff the plane intersects this AABB; <code>false</code> otherwise
      */
     public boolean intersectsPlane(float a, float b, float c, float d) {
-        return this.aabb.intersectsPlane(a, b, c, d);
+    	AABBf aabbf = new AABBf(this.getMinX() - 0.5f, this.getMinY() - 0.5f, this.getMinZ() - 0.5f, this.getMaxX() + 0.5f, this.getMaxY() + 0.5f, this.getMaxZ() + 0.5f);
+        return aabbf.intersectsPlane(a, b, c, d);
     }
 
     /**
@@ -533,7 +526,8 @@ public class BlockRegion {
      * @return <code>true</code> iff the plane intersects this AABB; <code>false</code> otherwise
      */
     public boolean intersectsPlane(Planef plane) {
-        return this.aabb.intersectsPlane(plane);
+    	AABBf aabbf = new AABBf(this.getMinX() - 0.5f, this.getMinY() - 0.5f, this.getMinZ() - 0.5f, this.getMaxX() + 0.5f, this.getMaxY() + 0.5f, this.getMaxZ() + 0.5f);
+    	return aabbf.intersectsPlane(plane);
     }
 
     /**
@@ -543,7 +537,9 @@ public class BlockRegion {
      * @return <code>true</code> iff both AABBs intersect; <code>false</code> otherwise
      */
     public boolean intersectsBlockRegion(BlockRegion other) {
-        return this.aabb.intersectsAABB(other.aabb);
+    	AABBf aabbf = new AABBf(this.getMinX() - 0.5f, this.getMinY() - 0.5f, this.getMinZ() - 0.5f, this.getMaxX() + 0.5f, this.getMaxY() + 0.5f, this.getMaxZ() + 0.5f);
+        AABBf otherAabbf = new AABBf(other.getMinX(), other.getMinY(), other.getMinZ(), other.getMaxX() + 1, other.getMaxY() + 1, other.getMaxZ() + 1);
+    	return aabbf.intersectsAABB(otherAabbf);
     }
 
     /**
@@ -553,7 +549,9 @@ public class BlockRegion {
      * @return <code>true</code> iff both AABBs intersect; <code>false</code> otherwise
      */
     public boolean intersectsAABB(AABBi other) {
-        return this.aabb.intersectsAABB(other);
+    	AABBf aabbf = new AABBf(this.getMinX() - 0.5f, this.getMinY() - 0.5f, this.getMinZ() - 0.5f, this.getMaxX() + 0.5f, this.getMaxY() + 0.5f, this.getMaxZ() + 0.5f);
+        AABBf otherAabbf = new AABBf(other.minX, other.minY, other.minZ, other.maxX, other.maxY, other.maxZ);
+    	return aabbf.intersectsAABB(otherAabbf);
     }
 
     /**
@@ -563,7 +561,8 @@ public class BlockRegion {
      * @return <code>true</code> iff both AABBs intersect; <code>false</code> otherwise
      */
     public boolean intersectsAABB(AABBf other) {
-        return this.aabb.intersectsAABB(other);
+    	AABBf aabbf = new AABBf(this.getMinX() - 0.5f, this.getMinY() - 0.5f, this.getMinZ() - 0.5f, this.getMaxX() + 0.5f, this.getMaxY() + 0.5f, this.getMaxZ() + 0.5f);
+        return aabbf.intersectsAABB(other);
     }
 
     /**
@@ -580,7 +579,7 @@ public class BlockRegion {
      * @return <code>true</code> iff this AABB and the sphere intersect; <code>false</code> otherwise
      */
     public boolean intersectsSphere(float centerX, float centerY, float centerZ, float radiusSquared) {
-        return Intersectionf.testAabSphere(aabb.minX, aabb.minY, aabb.minZ, aabb.maxX, aabb.maxY, aabb.maxZ, centerX,
+        return Intersectionf.testAabSphere(this.getMinX() - 0.5f, this.getMinY() - 0.5f, this.getMinZ() - 0.5f, this.getMaxX() + 0.5f, this.getMaxY() + 0.5f, this.getMaxZ() + 0.5f, centerX,
                 centerY, centerZ, radiusSquared);
     }
 
@@ -594,7 +593,8 @@ public class BlockRegion {
      * @return <code>true</code> iff this AABB and the sphere intersect; <code>false</code> otherwise
      */
     public boolean intersectsSphere(Spheref sphere) {
-        return Intersectionf.testAabSphere(aabb, sphere);
+    	AABBf aabbf = new AABBf(this.getMinX() - 0.5f, this.getMinY() - 0.5f, this.getMinZ() - 0.5f, this.getMaxX() + 0.5f, this.getMaxY() + 0.5f, this.getMaxZ() + 0.5f);
+    	return Intersectionf.testAabSphere(aabbf, sphere);
     }
 
     /**
@@ -614,8 +614,7 @@ public class BlockRegion {
      * @return <code>true</code> if this AABB and the ray intersect; <code>false</code> otherwise
      */
     public boolean intersectsRay(float originX, float originY, float originZ, float dirX, float dirY, float dirZ) {
-        return Intersectionf.testRayAab(originX, originY, originZ, dirX, dirY, dirZ, aabb.minX, aabb.minY, aabb.minZ,
-                aabb.maxX, aabb.maxY, aabb.maxZ);
+        return Intersectionf.testRayAab(originX, originY, originZ, dirX, dirY, dirZ, this.getMinX() - 0.5f, this.getMinY() - 0.5f, this.getMinZ() - 0.5f, this.getMaxX() + 0.5f, this.getMaxY() + 0.5f, this.getMaxZ() + 0.5f);
     }
 
     /**
@@ -629,7 +628,8 @@ public class BlockRegion {
      * @return <code>true</code> if this AABB and the ray intersect; <code>false</code> otherwise
      */
     public boolean intersectsRay(Rayf ray) {
-        return Intersectionf.testRayAab(ray, aabb);
+    	AABBf aabbf = new AABBf(this.getMinX() - 0.5f, this.getMinY() - 0.5f, this.getMinZ() - 0.5f, this.getMaxX() + 0.5f, this.getMaxY() + 0.5f, this.getMaxZ() + 0.5f);
+        return Intersectionf.testRayAab(ray, aabbf);
     }
 
     /**
@@ -657,8 +657,8 @@ public class BlockRegion {
      *         an edge or a side of this AABB
      */
     public int intersectLineSegment(float p0X, float p0Y, float p0Z, float p1X, float p1Y, float p1Z, Vector2f result) {
-        return Intersectionf.intersectLineSegmentAab(p0X, p0Y, p0Z, p1X, p1Y, p1Z, aabb.minX, aabb.minY, aabb.minZ,
-                aabb.maxX, aabb.maxY, aabb.maxZ, result);
+        return Intersectionf.intersectLineSegmentAab(p0X, p0Y, p0Z, p1X, p1Y, p1Z, this.getMinX() - 0.5f, this.getMinY() - 0.5f, this.getMinZ() - 0.5f,
+                this.getMaxX() + 0.5f, this.getMaxY() + 0.5f, this.getMaxZ() + 0.5f, result);
     }
 
     /**
@@ -681,7 +681,8 @@ public class BlockRegion {
      *         an edge or a side of this AABB
      */
     public int intersectLineSegment(LineSegmentf lineSegment, Vector2f result) {
-        return Intersectionf.intersectLineSegmentAab(lineSegment, aabb, result);
+    	AABBf aabbf = new AABBf(this.getMinX() - 0.5f, this.getMinY() - 0.5f, this.getMinZ() - 0.5f, this.getMaxX() + 0.5f, this.getMaxY() + 0.5f, this.getMaxZ() + 0.5f);
+        return Intersectionf.intersectLineSegmentAab(lineSegment, aabbf, result);
     }
 
     /**
