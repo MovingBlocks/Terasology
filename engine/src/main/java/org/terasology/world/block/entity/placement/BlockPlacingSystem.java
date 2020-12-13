@@ -21,6 +21,7 @@ import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
+import org.terasology.math.JomlUtil;
 import org.terasology.registry.In;
 import org.terasology.world.WorldComponent;
 import org.terasology.world.WorldProvider;
@@ -34,6 +35,6 @@ public class BlockPlacingSystem extends BaseComponentSystem {
 
     @ReceiveEvent(components = {WorldComponent.class}, priority = EventPriority.PRIORITY_TRIVIAL)
     public void placeBlockInWorld(PlaceBlocks event, EntityRef world) {
-        worldProvider.setBlocks(event.getBlocks());
+        worldProvider.setBlocks(JomlUtil.blockMap(event.getBlocks()));
     }
 }

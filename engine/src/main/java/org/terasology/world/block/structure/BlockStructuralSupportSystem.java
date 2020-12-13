@@ -16,6 +16,7 @@
 package org.terasology.world.block.structure;
 
 import com.google.common.collect.Sets;
+import org.joml.Vector3i;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
@@ -24,7 +25,6 @@ import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.health.DestroyEvent;
 import org.terasology.math.Side;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
 import org.terasology.registry.Share;
@@ -104,7 +104,7 @@ public class BlockStructuralSupportSystem extends BaseComponentSystem implements
     }
 
     private void validateSupportForBlockOnSide(Vector3i replacedBlockPosition, Side side) {
-        final Vector3i blockPosition = side.getAdjacentPos(replacedBlockPosition);
+        final Vector3i blockPosition = side.getAdjacentPos(replacedBlockPosition, new Vector3i());
         if (worldProvider.isBlockRelevant(blockPosition)) {
             final Side sideReverse = side.reverse();
 

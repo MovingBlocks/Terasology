@@ -16,9 +16,9 @@
 
 package org.terasology.logic.characters;
 
-import org.terasology.math.geom.Quat4f;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector3i;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
+import org.joml.Vector3i;
 import org.terasology.network.BroadcastEvent;
 import org.terasology.network.NetworkEvent;
 
@@ -27,7 +27,7 @@ public class CharacterStateEvent extends NetworkEvent {
     private long time;
     private int sequenceNumber;
     private Vector3f position = new Vector3f();
-    private Quat4f rotation = new Quat4f(0, 0, 0, 1);
+    private Quaternionf rotation = new Quaternionf(0, 0, 0, 1);
     private MovementMode mode = MovementMode.WALKING;
     private boolean grounded;
     private Vector3f velocity = new Vector3f();
@@ -57,7 +57,7 @@ public class CharacterStateEvent extends NetworkEvent {
             long time,
             int sequenceNumber,
             Vector3f position,
-            Quat4f rotation,
+            Quaternionf rotation,
             Vector3f velocity,
             float yaw,
             float pitch,
@@ -82,7 +82,7 @@ public class CharacterStateEvent extends NetworkEvent {
         return position;
     }
 
-    public Quat4f getRotation() {
+    public Quaternionf getRotation() {
         return rotation;
     }
 
