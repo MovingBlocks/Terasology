@@ -214,34 +214,34 @@ public class BlockRegionTest {
                 // creating from min and max
                 Arguments.of(
                         BlockRegions.createFromMinAndMax(new Vector3i(0, 0, 0), new Vector3i(0, 0, 0)),
-                        new Vector3f(0.5f, 0.5f, 0.5f)
+                        new Vector3f(0f, 0f, 0f)
                 ),
                 Arguments.of(
                         BlockRegions.createFromMinAndMax(new Vector3i(0, 0, 0), new Vector3i(1, 1, 1)),
-                        new Vector3f(1f, 1f, 1f)
+                        new Vector3f(.5f, .5f, .5f)
                 ),
                 Arguments.of(
                         BlockRegions.createFromMinAndMax(new Vector3i(-1, -1, -1), new Vector3i(1, 1, 1)),
-                        new Vector3f(0.5f, 0.5f, 0.5f)
+                        new Vector3f(0f, 0f, 0f)
                 ),
                 Arguments.of(
                         BlockRegions.createFromMinAndMax(new Vector3i(0, 0, 0), new Vector3i(2, 2, 2)),
-                        new Vector3f(1.5f, 1.5f, 1.5f)
+                        new Vector3f(1f, 1f, 1f)
                 ),
                 // creating from center and extents
                 Arguments.of(
                         BlockRegions.createFromCenterAndExtents(new Vector3f(0, 0, 0), new Vector3f(0, 0, 0)),
-                        new Vector3f(0.5f, 0.5f, 0.5f)
+                        new Vector3f(0f, 0f, 0f)
                 ),
                 Arguments.of(
                         BlockRegions.createFromCenterAndExtents(new Vector3f(0.5f, 0.5f, 0.5f), new Vector3f(0.5f,
                                 0.5f, 0.5f)),
-                        new Vector3f(1f, 1f, 1f)
+                        new Vector3f(.5f, .5f, .5f)
                 ),
                 Arguments.of(
                         BlockRegions.createFromCenterAndExtents(new Vector3f(0.49f, 0.49f, 0.49f), new Vector3f(0.5f,
                                 0.5f, 0.5f)),
-                        new Vector3f(.5f, .5f, .5f)
+                        new Vector3f(0f, 0f, 0f)
                 )
 
         );
