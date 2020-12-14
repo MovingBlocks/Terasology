@@ -29,20 +29,17 @@ import org.terasology.world.chunks.Chunks;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ChunkMathTest {
-
-
     @Test
     public void testRegionPositions() {
         CoreRegistry.setContext(new ContextImpl());
         CoreRegistry.put(Config.class, new Config(new MockContext()));
 
-        assertEquals(BlockRegions.createFromMinAndMax(0,0,0,0,0,0), Chunks.toChunkRegion(BlockRegions.createFromMinAndMax(new Vector3i(0, 0, 0), new Vector3i(0, 0, 0)), new BlockRegion()));
-        assertEquals(BlockRegions.createFromMinAndMax(0,0,0,0,0,0), Chunks.toChunkRegion(BlockRegions.createFromMinAndMax(new Vector3i(0, 0, 0), new Vector3i(31, 63, 31)), new BlockRegion()));
-        assertEquals(BlockRegions.createFromMinAndMax(0,0,0,1,0,0), Chunks.toChunkRegion(BlockRegions.createFromMinAndMax(new Vector3i(0, 0, 0), new Vector3i(32, 63, 31)), new BlockRegion()));
-        assertEquals(BlockRegions.createFromMinAndMax(0,0,0,1,0,1), Chunks.toChunkRegion(BlockRegions.createFromMinAndMax(new Vector3i(0, 0, 0), new Vector3i(32, 63, 32)), new BlockRegion()));
-        assertEquals(BlockRegions.createFromMinAndMax(0,0,0,1,1,1), Chunks.toChunkRegion(BlockRegions.createFromMinAndMax(new Vector3i(0, 0, 0), new Vector3i(32, 64, 32)), new BlockRegion()));
-        assertEquals(BlockRegions.createFromMinAndMax(-1,0,0,1,1,1), Chunks.toChunkRegion(BlockRegions.createFromMinAndMax(new Vector3i(-1, 0, 0), new Vector3i(32, 64, 32)), new BlockRegion()));
-
+        assertEquals(BlockRegions.createFromMinAndMax(0, 0, 0, 0, 0, 0), Chunks.toChunkRegion(BlockRegions.createFromMinAndMax(new Vector3i(0, 0, 0), new Vector3i(0, 0, 0)), new BlockRegion()));
+        assertEquals(BlockRegions.createFromMinAndMax(0, 0, 0, 0, 0, 0), Chunks.toChunkRegion(BlockRegions.createFromMinAndMax(new Vector3i(0, 0, 0), new Vector3i(31, 63, 31)), new BlockRegion()));
+        assertEquals(BlockRegions.createFromMinAndMax(0, 0, 0, 1, 0, 0), Chunks.toChunkRegion(BlockRegions.createFromMinAndMax(new Vector3i(0, 0, 0), new Vector3i(32, 63, 31)), new BlockRegion()));
+        assertEquals(BlockRegions.createFromMinAndMax(0, 0, 0, 1, 0, 1), Chunks.toChunkRegion(BlockRegions.createFromMinAndMax(new Vector3i(0, 0, 0), new Vector3i(32, 63, 32)), new BlockRegion()));
+        assertEquals(BlockRegions.createFromMinAndMax(0, 0, 0, 1, 1, 1), Chunks.toChunkRegion(BlockRegions.createFromMinAndMax(new Vector3i(0, 0, 0), new Vector3i(32, 64, 32)), new BlockRegion()));
+        assertEquals(BlockRegions.createFromMinAndMax(-1, 0, 0, 1, 1, 1), Chunks.toChunkRegion(BlockRegions.createFromMinAndMax(new Vector3i(-1, 0, 0), new Vector3i(32, 64, 32)), new BlockRegion()));
     }
 
     @Test
@@ -56,29 +53,27 @@ public class ChunkMathTest {
     @Test
     public void testCalcChunkPos() {
         org.joml.Vector3i temp = new org.joml.Vector3i();
-        assertEquals(Chunks.toChunkPos(700, 700, 700, temp), new Vector3i(21, 10, 21));
-        assertEquals(Chunks.toChunkPos(200, 700, -1, temp), new Vector3i(6, 10, -1));
-        assertEquals(Chunks.toChunkPos(200, 200, 200, temp), new Vector3i(6, 3, 6));
-        assertEquals(Chunks.toChunkPos(10, 10, 10, temp), new Vector3i(0, 0, 0));
+        assertEquals(new Vector3i(21, 10, 21), Chunks.toChunkPos(700, 700, 700, temp));
+        assertEquals(new Vector3i(6, 10, -1), Chunks.toChunkPos(200, 700, -1, temp));
+        assertEquals(new Vector3i(6, 3, 6), Chunks.toChunkPos(200, 200, 200, temp));
+        assertEquals(new Vector3i(0, 0, 0), Chunks.toChunkPos(10, 10, 10, temp));
     }
 
     @Test
     public void testFloatingPointCalcChunkPos() {
         Vector3i temp = new Vector3i();
-        assertEquals(Chunks.toChunkPos(31.9f, 64.1f, 32.5f, temp), new Vector3i(0, 1, 1));
-        assertEquals(Chunks.toChunkPos(32.9f, 63.9f, 32.9f, temp), new Vector3i(1, 0, 1));
-        assertEquals(Chunks.toChunkPos(31.3f, 63.9f, 31.9f, temp), new Vector3i(0, 0, 0));
-        assertEquals(Chunks.toChunkPos(31.6f, 64.5f, 32.1f, temp), new Vector3i(0, 1, 1));
-        assertEquals(Chunks.toChunkPos(.1f, -.2f, -.8f, temp), new Vector3i(0, -1, -1));
-        assertEquals(Chunks.toChunkPos(-.1f, -.99f, 2f, temp), new Vector3i(-1, -1, 0));
+        assertEquals(new Vector3i(0, 1, 1), Chunks.toChunkPos(31.9f, 64.1f, 32.5f, temp));
+        assertEquals(new Vector3i(1, 0, 1), Chunks.toChunkPos(32.9f, 63.9f, 32.9f, temp));
+        assertEquals(new Vector3i(0, 0, 0), Chunks.toChunkPos(31.3f, 63.9f, 31.9f, temp));
+        assertEquals(new Vector3i(0, 1, 1), Chunks.toChunkPos(31.6f, 64.5f, 32.1f, temp));
+        assertEquals(new Vector3i(0, -1, -1), Chunks.toChunkPos(.1f, -.2f, -.8f, temp));
+        assertEquals(new Vector3i(-1, -1, 0), Chunks.toChunkPos(-.1f, -.99f, 2f, temp));
 
-        assertEquals(Chunks.toChunkPos(new Vector3f(31.9f, 64.1f, 32.5f), temp), new Vector3i(0, 1, 1));
-        assertEquals(Chunks.toChunkPos(new Vector3f(32.9f, 63.9f, 32.9f), temp), new Vector3i(1, 0, 1));
-        assertEquals(Chunks.toChunkPos(new Vector3f(31.3f, 63.9f, 31.9f), temp), new Vector3i(0, 0, 0));
-        assertEquals(Chunks.toChunkPos(new Vector3f(31.6f, 64.5f, 32.1f), temp), new Vector3i(0, 1, 1));
-        assertEquals(Chunks.toChunkPos(new Vector3f(.1f, -.2f, -.8f), temp), new Vector3i(0, -1, -1));
-        assertEquals(Chunks.toChunkPos(new Vector3f(-.1f, -.99f, 2f), temp), new Vector3i(-1, -1, 0));
+        assertEquals(new Vector3i(0, 1, 1), Chunks.toChunkPos(new Vector3f(31.9f, 64.1f, 32.5f), temp));
+        assertEquals(new Vector3i(1, 0, 1), Chunks.toChunkPos(new Vector3f(32.9f, 63.9f, 32.9f), temp));
+        assertEquals(new Vector3i(0, 0, 0), Chunks.toChunkPos(new Vector3f(31.3f, 63.9f, 31.9f), temp));
+        assertEquals(new Vector3i(0, 1, 1), Chunks.toChunkPos(new Vector3f(31.6f, 64.5f, 32.1f), temp));
+        assertEquals(new Vector3i(0, -1, -1), Chunks.toChunkPos(new Vector3f(.1f, -.2f, -.8f), temp));
+        assertEquals(new Vector3i(-1, -1, 0), Chunks.toChunkPos(new Vector3f(-.1f, -.99f, 2f), temp));
     }
-
-
 }
