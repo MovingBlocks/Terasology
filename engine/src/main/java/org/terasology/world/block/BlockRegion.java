@@ -755,8 +755,12 @@ public class BlockRegion {
      * @return <code>true</code> iff both AABBs intersect; <code>false</code> otherwise
      */
     public boolean intersectsAABB(AABBf other) {
-        return (this.maxX + .5f) >= other.minX && (this.maxY - .5f) >= other.minY && (this.maxZ + .5f) >= other.minZ &&
-                (this.minX - .5f) <= other.maxX && (this.minY - .5f) <= other.maxY && (this.minZ - .5f) <= other.maxZ;
+        return Intersectionf.testAabAab(
+                this.minX - .5f, this.minY - .5f, this.minZ - .5f,
+                this.maxX + .5f, this.maxY + .5f, this.maxZ + .5f,
+                other.minX, other.minY, other.minZ,
+                other.maxX, other.maxY, other.maxZ
+        );
     }
 
     /**

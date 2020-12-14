@@ -327,15 +327,22 @@ public class BlockRegionTest {
         assertFalse(a.intersectsBlockRegion(c));
     }
 
-    @Test
-    public void testIntersectionAABB() {
-        BlockRegion a = BlockRegions.createFromMinAndMax(0, 0, 0, 1, 1, 1);
 
-        AABBf aabbf1 = new AABBf(1.2f, 1.5f, 1.2f, 2, 2, 2);
-        AABBf aabbf2 = new AABBf(2, 2, 2, 3, 3, 3);
-        assertTrue(a.intersectsAABB(aabbf1));
-        assertFalse(a.intersectsAABB(aabbf2));
+    static Stream<Arguments> testIntersectionAABB() {
+        return Stream.of(
+                Arguments.of(new AABBf(-.5f, -.5f, -.5f, 1.5f, 1.5f, 1.5f), true),
+                Arguments.of(new AABBf(1.2f, 1.4999f, 1.2f, 2, 2, 2), true),
+                Arguments.of(new AABBf(1.2f, 1.5f, 1.2f, 2, 2, 2), true),
+                Arguments.of(new AABBf(1.2f, 1.50001f, 1.2f, 2, 2, 2), false),
+                Arguments.of(new AABBf(2, 2, 2, 3, 3, 3), false)
+        );
+    }
 
+    @ParameterizedTest
+    @MethodSource
+    public void testIntersectionAABB(AABBf aabb, boolean intersects) {
+        BlockRegion region = BlockRegions.createFromMinAndMax(0, 0, 0, 1, 1, 1);
+        assertEquals(intersects, region.intersectsAABB(aabb));
     }
 
     @Test
