@@ -4,14 +4,13 @@
 package org.terasology.math;
 
 import com.google.common.collect.Sets;
-import org.joml.Vector3f;
-import org.joml.Vector3fc;
 import org.joml.AABBf;
-import org.joml.AABBi;
 import org.joml.LineSegmentf;
 import org.joml.Rayf;
 import org.joml.Spheref;
 import org.joml.Vector2f;
+import org.joml.Vector3f;
+import org.joml.Vector3fc;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.junit.jupiter.api.Test;
@@ -51,11 +50,11 @@ public class BlockRegionTest {
 
     private static Stream<Arguments> createFromMinAndMaxArgs() {
         return Stream.of(
-            Arguments.of(new Vector3i(), new Vector3i(1, 1, 1), new Vector3i()),
-            Arguments.of(new Vector3i(1, 1, 1), new Vector3i(3, 3, 3), new Vector3i(3, 3, 3)),
-            Arguments.of(new Vector3i(3, 4, 5), new Vector3i(8, 5, 2), new Vector3i(10, 8, 6)),
-            Arguments.of(new Vector3i(1, 1, 1), new Vector3i(0, 0, 0), new Vector3i(0, 0, 0)),
-            Arguments.of(new Vector3i(0, 1, 0), new Vector3i(2, 0, 2), new Vector3i(1, 0, 1))
+                Arguments.of(new Vector3i(), new Vector3i(1, 1, 1), new Vector3i()),
+                Arguments.of(new Vector3i(1, 1, 1), new Vector3i(3, 3, 3), new Vector3i(3, 3, 3)),
+                Arguments.of(new Vector3i(3, 4, 5), new Vector3i(8, 5, 2), new Vector3i(10, 8, 6)),
+                Arguments.of(new Vector3i(1, 1, 1), new Vector3i(0, 0, 0), new Vector3i(0, 0, 0)),
+                Arguments.of(new Vector3i(0, 1, 0), new Vector3i(2, 0, 2), new Vector3i(1, 0, 1))
         );
     }
 
@@ -70,16 +69,16 @@ public class BlockRegionTest {
 
     private static Stream<Arguments> createEncompassingArgs() {
         return Stream.of(
-            Arguments.of(new Vector3i(1, 1, 1),
-                new Vector3i[]{new Vector3i(), new Vector3i()}),
-            Arguments.of(new Vector3i(3, 3, 3),
-                new Vector3i[]{new Vector3i(1, 1, 1), new Vector3i(3, 3, 3)}),
-            Arguments.of(new Vector3i(3, 3, 3),
-                new Vector3i[]{new Vector3i(3, 3, 3), new Vector3i(1, 1, 1)}),
-            Arguments.of(new Vector3i(2, 2, 2),
-                new Vector3i[]{new Vector3i(0, 1, 0), new Vector3i(1, 0, 1)}),
-            Arguments.of(new Vector3i(2, 3, 4),
-                new Vector3i[]{new Vector3i(0, 1, 0), new Vector3i(1, 0, 1), new Vector3i(0, -1, 3)})
+                Arguments.of(new Vector3i(1, 1, 1),
+                        new Vector3i[]{new Vector3i(), new Vector3i()}),
+                Arguments.of(new Vector3i(3, 3, 3),
+                        new Vector3i[]{new Vector3i(1, 1, 1), new Vector3i(3, 3, 3)}),
+                Arguments.of(new Vector3i(3, 3, 3),
+                        new Vector3i[]{new Vector3i(3, 3, 3), new Vector3i(1, 1, 1)}),
+                Arguments.of(new Vector3i(2, 2, 2),
+                        new Vector3i[]{new Vector3i(0, 1, 0), new Vector3i(1, 0, 1)}),
+                Arguments.of(new Vector3i(2, 3, 4),
+                        new Vector3i[]{new Vector3i(0, 1, 0), new Vector3i(1, 0, 1), new Vector3i(0, -1, 3)})
         );
     }
 
@@ -99,11 +98,11 @@ public class BlockRegionTest {
     public void testCreateRegionWithBounds() {
         BlockRegion expectedRegion = new BlockRegion(new Vector3i(-2, 4, -16), new Vector3i(4, 107, 0));
         List<Vector3i> vec1 = Arrays.asList(new Vector3i(-2, 4, -16), new Vector3i(4, 4, -16), new Vector3i(-2, 107,
-                -16), new Vector3i(-2, 4, 0),
-            new Vector3i(4, 107, -16), new Vector3i(4, 4, 0), new Vector3i(-2, 107, 0), new Vector3i(4, 107, 0));
+                        -16), new Vector3i(-2, 4, 0),
+                new Vector3i(4, 107, -16), new Vector3i(4, 4, 0), new Vector3i(-2, 107, 0), new Vector3i(4, 107, 0));
         List<Vector3i> vec2 = Arrays.asList(new Vector3i(4, 107, 0), new Vector3i(-2, 107, 0), new Vector3i(4, 4, 0),
-            new Vector3i(4, 107, -16),
-            new Vector3i(-2, 4, 0), new Vector3i(-2, 107, -16), new Vector3i(4, 4, -16), new Vector3i(-2, 4, -16));
+                new Vector3i(4, 107, -16),
+                new Vector3i(-2, 4, 0), new Vector3i(-2, 107, -16), new Vector3i(4, 4, -16), new Vector3i(-2, 4, -16));
         for (int i = 0; i < vec1.size(); ++i) {
             BlockRegion target = new BlockRegion().union(vec1.get(i)).union(vec2.get(i));
             assertEquals(expectedRegion, target);
@@ -208,42 +207,42 @@ public class BlockRegionTest {
 
     private static Stream<Arguments> testCenterArgs() {
         return Stream.of(
-            Arguments.of(
-                new BlockRegion(),
-                new Vector3f(Float.NaN)
-            ),
-            // creating from min and max
-            Arguments.of(
-                BlockRegions.createFromMinAndMax(new Vector3i(0, 0, 0), new Vector3i(0, 0, 0)),
-                new Vector3f(0.5f, 0.5f, 0.5f)
-            ),
-            Arguments.of(
-                BlockRegions.createFromMinAndMax(new Vector3i(0, 0, 0), new Vector3i(1, 1, 1)),
-                new Vector3f(1f, 1f, 1f)
-            ),
-            Arguments.of(
-                BlockRegions.createFromMinAndMax(new Vector3i(-1, -1, -1), new Vector3i(1, 1, 1)),
-                new Vector3f(0.5f, 0.5f, 0.5f)
-            ),
-            Arguments.of(
-                BlockRegions.createFromMinAndMax(new Vector3i(0, 0, 0), new Vector3i(2, 2, 2)),
-                new Vector3f(1.5f, 1.5f, 1.5f)
-            ),
-            // creating from center and extents
-            Arguments.of(
-                BlockRegions.createFromCenterAndExtents(new Vector3f(0, 0, 0), new Vector3f(0, 0, 0)),
-                new Vector3f(0.5f, 0.5f, 0.5f)
-            ),
-            Arguments.of(
-                BlockRegions.createFromCenterAndExtents(new Vector3f(0.5f, 0.5f, 0.5f), new Vector3f(0.5f,
-                    0.5f, 0.5f)),
-                new Vector3f(1f, 1f, 1f)
-            ),
-            Arguments.of(
-                BlockRegions.createFromCenterAndExtents(new Vector3f(0.49f, 0.49f, 0.49f), new Vector3f(0.5f,
-                    0.5f, 0.5f)),
-                new Vector3f(.5f, .5f, .5f)
-            )
+                Arguments.of(
+                        new BlockRegion(),
+                        new Vector3f(Float.NaN)
+                ),
+                // creating from min and max
+                Arguments.of(
+                        BlockRegions.createFromMinAndMax(new Vector3i(0, 0, 0), new Vector3i(0, 0, 0)),
+                        new Vector3f(0.5f, 0.5f, 0.5f)
+                ),
+                Arguments.of(
+                        BlockRegions.createFromMinAndMax(new Vector3i(0, 0, 0), new Vector3i(1, 1, 1)),
+                        new Vector3f(1f, 1f, 1f)
+                ),
+                Arguments.of(
+                        BlockRegions.createFromMinAndMax(new Vector3i(-1, -1, -1), new Vector3i(1, 1, 1)),
+                        new Vector3f(0.5f, 0.5f, 0.5f)
+                ),
+                Arguments.of(
+                        BlockRegions.createFromMinAndMax(new Vector3i(0, 0, 0), new Vector3i(2, 2, 2)),
+                        new Vector3f(1.5f, 1.5f, 1.5f)
+                ),
+                // creating from center and extents
+                Arguments.of(
+                        BlockRegions.createFromCenterAndExtents(new Vector3f(0, 0, 0), new Vector3f(0, 0, 0)),
+                        new Vector3f(0.5f, 0.5f, 0.5f)
+                ),
+                Arguments.of(
+                        BlockRegions.createFromCenterAndExtents(new Vector3f(0.5f, 0.5f, 0.5f), new Vector3f(0.5f,
+                                0.5f, 0.5f)),
+                        new Vector3f(1f, 1f, 1f)
+                ),
+                Arguments.of(
+                        BlockRegions.createFromCenterAndExtents(new Vector3f(0.49f, 0.49f, 0.49f), new Vector3f(0.5f,
+                                0.5f, 0.5f)),
+                        new Vector3f(.5f, .5f, .5f)
+                )
 
         );
     }
@@ -369,5 +368,25 @@ public class BlockRegionTest {
         assertEquals(a.intersectLineSegment(0f, 1f, 1.2f, 1f, -0.2f, 0.2f, new Vector2f()), 3);
         LineSegmentf l4 = new LineSegmentf(1f, 1f, 1.2f, -0.2f, 0f, 1f);
         assertEquals(a.intersectLineSegment(l4, new Vector2f()), 3);
+    }
+
+    static Stream<Arguments> testAddExtentsfArgs() {
+        return Stream.of(
+                Arguments.of(.1f, .1f, .1f, BlockRegions.createFromMinAndMax(new Vector3i(), new Vector3i(3, 3, 3))),
+                Arguments.of(-.1f, -.1f, -.1f, BlockRegions.createFromMinAndMax(new Vector3i(1, 1, 1), new Vector3i(2
+                        , 2, 2))),
+                Arguments.of(1f, 1f, 1f, BlockRegions.createFromMinAndMax(new Vector3i(-1, -1, -1), new Vector3i(4, 4
+                        , 4))),
+                Arguments.of(-1f, -1f, -1f, BlockRegions.createFromMinAndMax(new Vector3i(1, 1, 1), new Vector3i(2, 2
+                        , 2))),
+                Arguments.of(1.9f, 1.9f, 1.9f, BlockRegions.createFromMinAndMax(new Vector3i(-1, -1, -1), new Vector3i(4, 4, 4)))
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("testAddExtentsfArgs")
+    void testAddExtentsf(float x, float y, float z, BlockRegion expected) {
+        final BlockRegion region = BlockRegions.createFromMinAndMax(new Vector3i(), new Vector3i(3, 3, 3));
+        assertEquals(expected, region.addExtents(x, y, z, region));
     }
 }
