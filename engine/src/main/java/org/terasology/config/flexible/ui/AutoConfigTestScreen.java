@@ -4,6 +4,7 @@ package org.terasology.config.flexible.ui;
 
 import org.terasology.assets.management.AssetManager;
 import org.terasology.config.flexible.AutoConfig;
+import org.terasology.config.flexible.AutoConfigManager;
 import org.terasology.config.flexible.Setting;
 import org.terasology.config.flexible.constraints.NumberRangeConstraint;
 import org.terasology.engine.module.ModuleManager;
@@ -12,9 +13,7 @@ import org.terasology.nui.databinding.DefaultBinding;
 import org.terasology.nui.layouts.ColumnLayout;
 import org.terasology.nui.widgets.UIButton;
 import org.terasology.nui.widgets.UIText;
-import org.terasology.nui.widgets.types.TypeWidgetBuilder;
 import org.terasology.nui.widgets.types.TypeWidgetLibrary;
-import org.terasology.reflection.TypeInfo;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
 
@@ -30,30 +29,38 @@ import static org.terasology.config.flexible.SettingArgument.name;
 import static org.terasology.config.flexible.SettingArgument.type;
 
 public class AutoConfigTestScreen extends CoreScreenLayer {
-    private AutoConfig config = new TestConfig();
-
     @In
-    private AutoConfigWidgetFactory configWidgetFactory;
+    private TypeWidgetLibrary typeWidgetLibrary;
+    @In
+    private ModuleManager moduleManager;
+    @In
+    private AssetManager assetManager;
+    @In
+    private AutoConfigManager configManager;
+    private AutoConfig testConfig = new TestConfig();
 
     private ColumnLayout mainContainer;
     private UIText bindingsLog;
-
-    @In
-    TypeWidgetLibrary typeWidgetLibrary;
-
-    @In
-    ModuleManager moduleManager;
-
-    @In
-    AssetManager assetManager;
 
     @Override
     public void initialise() {
         mainContainer = find("mainContainer", ColumnLayout.class);
         assert mainContainer != null;
 
-        mainContainer.addWidget(configWidgetFactory.buildWidgetFor(config));
 
+        Binding<AutoConfig> testConfigBinding = new DefaultBinding<>(testConfig);
+        mainContainer.addWidget(typeWidgetLibrary.getWidget(testConfigBinding, AutoConfig.class).get());
+
+        for (AutoConfig config : configManager.getLoadedConfigs()) {
+            if (config instanceof TestConfig) {
+                // skip, used for dump value. below.
+                continue;
+            }
+            Binding<AutoConfig> configBinding = new DefaultBinding<>(config);
+            
+            mainContainer.addWidget(typeWidgetLibrary.getWidget(configBinding, AutoConfig.class).get());
+        }
+        
         UIButton logSettingButton = new UIButton();
         logSettingButton.setText("Log Setting Values");
         logSettingButton.subscribe(widget -> dumpBindings());
@@ -78,7 +85,7 @@ public class AutoConfigTestScreen extends CoreScreenLayer {
     }
 
     private void dumpBindings() {
-        String logs = config.getSettings()
+        String logs = testConfig.getSettings()
                 .stream()
                 .map(setting ->
                         MessageFormat.format(
@@ -99,7 +106,7 @@ public class AutoConfigTestScreen extends CoreScreenLayer {
                 constraint(new NumberRangeConstraint<>(-5, 5, true, true)),
                 name("Integer Test Setting"),
                 description("Integer Test Setting with Number Range")
-            );
+        );
 
         @Override
         public String getName() {

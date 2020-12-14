@@ -6,7 +6,6 @@ package org.terasology.rendering.nui.internal;
 import com.google.common.base.Objects;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
 import org.joml.Vector2i;
@@ -19,6 +18,7 @@ import org.terasology.audio.StaticSound;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.context.Context;
+import org.terasology.context.internal.ContextImpl;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.subsystem.DisplayDevice;
@@ -61,7 +61,6 @@ import org.terasology.nui.widgets.types.TypeWidgetLibrary;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.metadata.ClassLibrary;
 import org.terasology.reflection.reflect.ReflectFactory;
-import org.terasology.registry.In;
 import org.terasology.registry.InjectionHelper;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.nui.CoreScreenLayer;
@@ -159,7 +158,6 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
 
         typeWidgetFactoryRegistry = new TypeWidgetFactoryRegistryImpl(context);
         context.put(TypeWidgetFactoryRegistry.class, typeWidgetFactoryRegistry);
-
         registerTypeWidgetFactories();
     }
 
@@ -496,13 +494,14 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     }
 
     private <T extends ControlWidget> void initialiseControlWidget(T overlay, ResourceUrn screenUri) {
-        InjectionHelper.inject(overlay, context);
+        ContextImpl timedContextForModulesWidgets = new ContextImpl(this.context);
 
         Module declaringModule = moduleEnvironment.get(screenUri.getModuleName());
         TypeWidgetLibrary moduleLibrary =
-            new TypeWidgetLibraryImpl(typeWidgetFactoryRegistry, declaringModule, context);
+                new TypeWidgetLibraryImpl(typeWidgetFactoryRegistry, declaringModule, this.context);
+        context.put(TypeWidgetLibrary.class, moduleLibrary);
 
-        InjectionHelper.inject(overlay, In.class, ImmutableMap.of(TypeWidgetLibrary.class, moduleLibrary));
+        InjectionHelper.inject(overlay, timedContextForModulesWidgets);
 
         overlay.initialise();
     }
