@@ -298,9 +298,9 @@ public class BlockRegion {
         dest.minY = minY - .5f;
         dest.minZ = minZ - .5f;
 
-        dest.maxX = minX + .5f;
-        dest.maxY = minY + .5f;
-        dest.maxZ = minZ + .5f;
+        dest.maxX = maxX + .5f;
+        dest.maxY = maxY + .5f;
+        dest.maxZ = maxZ + .5f;
 
         return dest;
     }

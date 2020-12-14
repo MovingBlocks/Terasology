@@ -379,7 +379,8 @@ public class BlockRegionTest {
                         , 4))),
                 Arguments.of(-1f, -1f, -1f, BlockRegions.createFromMinAndMax(new Vector3i(1, 1, 1), new Vector3i(2, 2
                         , 2))),
-                Arguments.of(1.9f, 1.9f, 1.9f, BlockRegions.createFromMinAndMax(new Vector3i(-1, -1, -1), new Vector3i(4, 4, 4)))
+                Arguments.of(1.9f, 1.9f, 1.9f, BlockRegions.createFromMinAndMax(new Vector3i(-1, -1, -1),
+                        new Vector3i(4, 4, 4)))
         );
     }
 
@@ -388,5 +389,11 @@ public class BlockRegionTest {
     void testAddExtentsf(float x, float y, float z, BlockRegion expected) {
         final BlockRegion region = BlockRegions.createFromMinAndMax(new Vector3i(), new Vector3i(3, 3, 3));
         assertEquals(expected, region.addExtents(x, y, z, region));
+    }
+
+    @Test
+    void testGetBounds() {
+        final BlockRegion region = BlockRegions.createFromMinAndMax(new Vector3i(1, 1, 1), new Vector3i(2, 3, 4));
+        assertEquals(new AABBf(.5f, .5f, .5f, 2.5f, 3.5f, 4.5f), region.getBounds(new AABBf()));
     }
 }
