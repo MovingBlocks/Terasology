@@ -239,7 +239,7 @@ public class BlockRegion {
      */
     @Deprecated
     public int getMaxZ() {
-        return this.maxZ - 1;
+        return this.maxZ;
     }
 
     /**

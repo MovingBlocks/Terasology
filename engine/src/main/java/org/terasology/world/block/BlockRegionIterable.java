@@ -19,7 +19,7 @@ public class BlockRegionIterable implements Iterable<Vector3ic> {
     public Iterator<Vector3ic> iterator() {
         return new Iterator<Vector3ic>() {
             private Vector3i current = null;
-            private final Vector3i next = new Vector3i(region.getMinX(), region.getMinY(), region.getMinZ());
+            private final Vector3i next = region.getMin(new Vector3i());
 
             public boolean findNext() {
                 if (current.equals(next)) {

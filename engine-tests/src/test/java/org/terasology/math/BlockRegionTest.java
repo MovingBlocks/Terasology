@@ -35,6 +35,24 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class BlockRegionTest {
 
     @Test
+    void testBasics() {
+        final Vector3i min = new Vector3i(1, 1, 1);
+        final Vector3i max = new Vector3i(2, 3, 4);
+        final BlockRegion region =
+                BlockRegions.createFromMinAndMax(min, max);
+
+        assertEquals(min, region.getMin(new Vector3i()));
+        assertEquals(max, region.getMax(new Vector3i()));
+
+        assertEquals(min.x, region.getMinX());
+        assertEquals(min.y, region.getMinY());
+        assertEquals(min.z, region.getMinZ());
+        assertEquals(max.x, region.getMaxX());
+        assertEquals(max.y, region.getMaxY());
+        assertEquals(max.z, region.getMaxZ());
+    }
+
+    @Test
     public void testCreateRegionWithMinAndSize() {
         List<Vector3i> mins = Arrays.asList(new Vector3i(), new Vector3i(1, 1, 1), new Vector3i(3, 4, 5));
         List<Vector3i> size = Arrays.asList(new Vector3i(1, 1, 1), new Vector3i(3, 3, 3), new Vector3i(8, 5, 2));
@@ -119,7 +137,7 @@ public class BlockRegionTest {
     public void testIterateRegion() {
         Vector3i min = new Vector3i(2, 5, 7);
         Vector3i max = new Vector3i(10, 11, 12);
-        BlockRegion region = new BlockRegion(min, max);
+        BlockRegion region = BlockRegions.createFromMinAndMax(min, max);
 
         Set<Vector3ic> expected = Sets.newHashSet();
         for (int x = min.x; x <= max.x; ++x) {
@@ -129,7 +147,6 @@ public class BlockRegionTest {
                 }
             }
         }
-
 
         for (Vector3ic pos : BlockRegions.iterableInPlace(region)) {
             assertTrue(expected.contains(pos), "unexpected position: " + pos);
