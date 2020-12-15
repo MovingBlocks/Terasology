@@ -16,9 +16,8 @@
 
 package org.terasology.config;
 
-import org.lwjgl.opengl.DisplayMode;
-import org.lwjgl.opengl.PixelFormat;
 import org.terasology.engine.subsystem.Resolution;
+import org.terasology.module.sandbox.API;
 import org.terasology.rendering.cameras.PerspectiveCameraSettings;
 import org.terasology.rendering.nui.layers.mainMenu.videoSettings.DisplayModeSetting;
 import org.terasology.rendering.nui.layers.mainMenu.videoSettings.ScreenshotSize;
@@ -27,6 +26,7 @@ import org.terasology.utilities.subscribables.AbstractSubscribable;
 
 import java.beans.PropertyChangeListener;
 
+@API
 public class RenderingConfig extends AbstractSubscribable {
 
     public static final String PIXEL_FORMAT = "PixelFormat";
@@ -78,7 +78,7 @@ public class RenderingConfig extends AbstractSubscribable {
     public static final String DUMP_SHADERS = "DumpShaders";
     public static final String VOLUMETRIC_FOG = "VolumetricFog";
 
-    private PixelFormat pixelFormat;
+    private int pixelFormat;
     private int windowPosX;
     private int windowPosY;
     private int windowWidth;
@@ -134,12 +134,12 @@ public class RenderingConfig extends AbstractSubscribable {
         return cameraSettings;
     }
 
-    public PixelFormat getPixelFormat() {
+    public int getPixelFormat() {
         return pixelFormat;
     }
 
-    public void setPixelFormat(PixelFormat pixelFormat) {
-        PixelFormat oldFormat = this.pixelFormat;
+    public void setPixelFormat(int pixelFormat) {
+        int oldFormat = this.pixelFormat;
         this.pixelFormat = pixelFormat;
         propertyChangeSupport.firePropertyChange(PIXEL_FORMAT, oldFormat, this.pixelFormat);
         // propertyChangeSupport fires only if oldObject != newObject.
@@ -186,10 +186,6 @@ public class RenderingConfig extends AbstractSubscribable {
             int oldValue = this.windowHeight;
             this.windowHeight = windowHeight;
             propertyChangeSupport.firePropertyChange(WINDOW_HEIGHT, oldValue, this.windowHeight);
-    }
-
-    public DisplayMode getDisplayMode() {
-        return new DisplayMode(windowWidth, windowHeight);
     }
 
     public void setDisplayModeSetting(DisplayModeSetting displayModeSetting) {

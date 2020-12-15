@@ -17,8 +17,9 @@
 package org.terasology.rendering.nui.layers.mainMenu.settings;
 
 import org.terasology.i18n.TranslationSystem;
+import org.terasology.nui.UITextureRegion;
 import org.terasology.rendering.assets.texture.Texture;
-import org.terasology.rendering.nui.itemRendering.StringTextIconRenderer;
+import org.terasology.nui.itemRendering.StringTextIconRenderer;
 import org.terasology.utilities.Assets;
 
 import java.util.Locale;
@@ -47,12 +48,12 @@ public class LocaleRenderer extends StringTextIconRenderer<Locale> {
     }
 
     @Override
-    public Texture getTexture(Locale value) {
+    public UITextureRegion getTexture(Locale value) {
         Optional<Texture> texture = Assets.getTexture(String.format("engine:flag_%s", value.getLanguage()));
         if (texture.isPresent()) {
-            return texture.get();
+            return (UITextureRegion) texture.get();
         } else {
-            return Assets.getTexture(ICON_BLANK).get();
+            return (UITextureRegion) Assets.getTexture(ICON_BLANK).get();
         }
     }
 }

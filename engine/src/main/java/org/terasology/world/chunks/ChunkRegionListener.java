@@ -16,6 +16,7 @@
 
 package org.terasology.world.chunks;
 
+import org.joml.Vector3ic;
 import org.terasology.math.geom.Vector3i;
 
 /**
@@ -29,12 +30,12 @@ public interface ChunkRegionListener {
      * @param pos
      * @param chunk
      */
-    void onChunkRelevant(Vector3i pos, Chunk chunk);
+    void onChunkRelevant(Vector3ic pos, Chunk chunk);
 
     /**
      * Invoked when a chunk ceases to be relevant for this chunk region (
      *
      * @param pos
      */
-    void onChunkIrrelevant(Vector3i pos);
+    void onChunkIrrelevant(Vector3ic pos);
 }

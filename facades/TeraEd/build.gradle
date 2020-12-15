@@ -1,4 +1,11 @@
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
+
 // The Editor facade is responsible for the (shader) editor - a plain Java application runnable on PCs
+
+plugins {
+    id "application"
+}
 
 // Grab all the common stuff like plugins to use, artifact repositories, code analysis config
 apply from: "$rootDir/config/gradle/publish.gradle"
@@ -19,6 +26,18 @@ sourceSets {
 dependencies {
     implementation project(':engine')
     implementation group: 'org.reflections', name: 'reflections', version: '0.9.10'
+}
+
+application {
+    mainClass = "org.terasology.editor.TeraEd"
+}
+
+run {
+    description = "Run 'TeraEd' to configure graphics shader parameters in a standard PC application"
+    group = "terasology run"
+
+    workingDir = rootDir
+    args "-homedir"
 }
 
 task editor(type:JavaExec) {

@@ -21,6 +21,7 @@ import org.junit.jupiter.api.Test;
 import org.terasology.TerasologyTestingEnvironment;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.Region3i;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.registry.CoreRegistry;
@@ -100,8 +101,8 @@ public class BulkSunlightPropagationTest extends TerasologyTestingEnvironment {
         }
 
         regenWorldView.setBlockAt(new Vector3i(16, 15, 16), air);
-        propagator.process(new BlockChange(new Vector3i(16, 15, 16), solid, air));
-        sunlightPropagator.process(new BlockChange(new Vector3i(16, 15, 16), solid, air));
+        propagator.process(new BlockChange(JomlUtil.from(new Vector3i(16, 15, 16)), solid, air));
+        sunlightPropagator.process(new BlockChange(JomlUtil.from(new Vector3i(16, 15, 16)), solid, air));
 
         for (int y = 0; y < 16; y++) {
             assertEquals(ChunkConstants.MAX_SUNLIGHT_REGEN, regenWorldView.getValueAt(new Vector3i(16, y, 16)), "Incorrect value at " + y);
@@ -126,12 +127,12 @@ public class BulkSunlightPropagationTest extends TerasologyTestingEnvironment {
         }
 
         regenWorldView.setBlockAt(new Vector3i(16, 15, 16), air);
-        propagator.process(new BlockChange(new Vector3i(16, 15, 16), solid, air));
-        sunlightPropagator.process(new BlockChange(new Vector3i(16, 15, 16), solid, air));
+        propagator.process(new BlockChange(JomlUtil.from(new Vector3i(16, 15, 16)), solid, air));
+        sunlightPropagator.process(new BlockChange(JomlUtil.from(new Vector3i(16, 15, 16)), solid, air));
 
         regenWorldView.setBlockAt(new Vector3i(16, 15, 16), solid);
-        propagator.process(new BlockChange(new Vector3i(16, 15, 16), air, solid));
-        sunlightPropagator.process(new BlockChange(new Vector3i(16, 15, 16), air, solid));
+        propagator.process(new BlockChange(JomlUtil.from(new Vector3i(16, 15, 16)), air, solid));
+        sunlightPropagator.process(new BlockChange(JomlUtil.from(new Vector3i(16, 15, 16)), air, solid));
 
         for (Vector3i pos : Region3i.createBounded(new Vector3i(0, 0, 0), new Vector3i(ChunkConstants.SIZE_X - 1, 15, ChunkConstants.SIZE_Z - 1))) {
             assertEquals(Math.max(0, 14 - pos.y), regenWorldView.getValueAt(pos), "Incorrect value at " + pos);

@@ -15,11 +15,12 @@
  */
 package org.terasology.rendering.nui.layouts;
 
+import org.joml.Vector2i;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.terasology.math.geom.Vector2i;
-import org.terasology.rendering.nui.Canvas;
-import org.terasology.rendering.nui.UIWidget;
+import org.terasology.nui.Canvas;
+import org.terasology.nui.UIWidget;
+import org.terasology.nui.layouts.CardLayout;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Matchers.any;

@@ -15,19 +15,17 @@
  */
 package org.terasology.rendering.nui.layers.ingame.metrics;
 
-
 import com.google.common.base.Preconditions;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
+import org.terasology.module.sandbox.API;
 import org.terasology.registry.Share;
 
 import java.util.ArrayList;
 
-
 /**
  * Manages an ordered set of MetricsMode instances.
- *
- *
+ * <p>
  * A number of default metrics modes is instantiated in the initialize() method and becomes immediately available by
  * iterating through the set repeatedly invoking the toggle() method. The getCurrentMode() method can also be used to
  * obtain the mode currently pointed at. Further modes can be added to the set via the register method, while registered
@@ -37,6 +35,7 @@ import java.util.ArrayList;
  */
 @RegisterSystem
 @Share(DebugMetricsSystem.class)
+@API
 public class DebugMetricsSystem extends BaseComponentSystem {
 
     private final MetricsMode defaultMode = new NullMetricsMode();
@@ -62,6 +61,7 @@ public class DebugMetricsSystem extends BaseComponentSystem {
     /**
      * Adds a MetricsMode instance to the set. Use the toggle() and getCurrentMode() methods to iterate over the set and
      * obtain the MetricsMode instances.
+     *
      * @param mode a MetricsMode instance
      */
     public boolean register(MetricsMode mode) {
@@ -76,6 +76,7 @@ public class DebugMetricsSystem extends BaseComponentSystem {
 
     /**
      * Returns current mode, initializes a default {@link NullMetricsMode}, if currentMode is null
+     *
      * @return the current MetricsMode instance
      */
     public MetricsMode getCurrentMode() {
@@ -85,6 +86,7 @@ public class DebugMetricsSystem extends BaseComponentSystem {
     /**
      * Iterates through the set of registered MetricsMode and returns the first instance whose method isAvailable()
      * returns true. Notice that this could be the MetricsMode that was current at the time this method was invoked.
+     *
      * @returns a MetricsMode instance
      */
     public MetricsMode toggle() {
@@ -99,7 +101,7 @@ public class DebugMetricsSystem extends BaseComponentSystem {
 
     /**
      * Removes from the set the MetricsMode instance provided as input.
-     *
+     * <p>
      * If the MetricsMode instance is the mode currently pointed at by the iterator, toggles the iterator forward. Unregistering
      * defaultMode is not allowed, therefore throws {@link IllegalArgumentException}.
      *

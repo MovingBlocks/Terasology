@@ -19,7 +19,7 @@ package org.terasology.world.viewer.layers;
 import java.awt.image.BufferedImage;
 
 import org.terasology.engine.Observer;
-import org.terasology.rendering.nui.Color;
+import org.terasology.nui.Color;
 import org.terasology.world.generation.Region;
 
 /**

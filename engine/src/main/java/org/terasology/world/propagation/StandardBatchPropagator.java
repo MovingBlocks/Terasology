@@ -17,11 +17,15 @@ package org.terasology.world.propagation;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import org.joml.Vector3ic;
 import org.terasology.math.ChunkMath;
-import org.terasology.math.Region3i;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.Side;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.world.block.Block;
+import org.terasology.world.block.BlockRegion;
+import org.terasology.world.block.BlockRegionIterable;
+import org.terasology.world.block.BlockRegions;
 import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.LitChunk;
 
@@ -101,18 +105,19 @@ public class StandardBatchPropagator implements BatchPropagator {
      * @param blockChange The change that was made
      */
     private void reviewChange(BlockChange blockChange) {
-        byte newValue = rules.getFixedValue(blockChange.getTo(), blockChange.getPosition());
-        byte existingValue = world.getValueAt(blockChange.getPosition());
+        Vector3i blockChangePosition = JomlUtil.from(blockChange.getPosition());
+        byte newValue = rules.getFixedValue(blockChange.getTo(), blockChangePosition);
+        byte existingValue = world.getValueAt(blockChangePosition);
 
         /* Handle if the block has an higher fixed value */
         if (newValue > existingValue) {
-            increase(blockChange.getPosition(), newValue);
+            increase(blockChangePosition, newValue);
         }
 
         /* Handle if the block has a lower fixed value */
-        byte oldValue = rules.getFixedValue(blockChange.getFrom(), blockChange.getPosition());
+        byte oldValue = rules.getFixedValue(blockChange.getFrom(), blockChangePosition);
         if (newValue < oldValue) {
-            reduce(blockChange.getPosition(), oldValue);
+            reduce(blockChangePosition, oldValue);
         }
 
         /* Process propagation out to other blocks */
@@ -121,8 +126,8 @@ public class StandardBatchPropagator implements BatchPropagator {
 
             if (comparison.isRestricting() && existingValue > 0) {
                 /* If the propagation of the new value is going to be lower/reduced */
-                reduce(blockChange.getPosition(), existingValue);
-                Vector3i adjPos = side.getAdjacentPos(blockChange.getPosition());
+                reduce(blockChangePosition, existingValue);
+                Vector3i adjPos = side.getAdjacentPos(blockChangePosition);
                 byte adjValue = world.getValueAt(adjPos);
                 if (adjValue == rules.propagateValue(existingValue, side, blockChange.getFrom())) {
                     reduce(adjPos, adjValue);
@@ -132,10 +137,10 @@ public class StandardBatchPropagator implements BatchPropagator {
                 /* If the propagation of the new value is going to be more allowing */
                 if (existingValue > 0) {
                     /* Spread this potentially higher value out */
-                    queueSpreadValue(blockChange.getPosition(), existingValue);
+                    queueSpreadValue(blockChangePosition, existingValue);
                 }
                 /* Spread it out to the block on the side */
-                Vector3i adjPos = side.getAdjacentPos(blockChange.getPosition());
+                Vector3i adjPos = side.getAdjacentPos(blockChangePosition);
                 byte adjValue = world.getValueAt(adjPos);
                 if (adjValue != PropagatorWorldView.UNAVAILABLE) {
                     queueSpreadValue(adjPos, adjValue);
@@ -304,16 +309,17 @@ public class StandardBatchPropagator implements BatchPropagator {
     public void propagateBetween(LitChunk chunk, LitChunk adjChunk, Side side, boolean propagateExternal) {
         IndexProvider indexProvider = createIndexProvider(side);
 
-        Region3i edgeRegion = ChunkMath.getEdgeRegion(Region3i.createFromMinAndSize(Vector3i.zero(), ChunkConstants.CHUNK_SIZE), side);
+        BlockRegion edgeRegion = ChunkMath.getEdgeRegion(
+            new BlockRegion(0,0,0,0,0,0).setSize(JomlUtil.from(ChunkConstants.CHUNK_SIZE)), side, new BlockRegion());
 
-        int edgeSize = edgeRegion.size().x * edgeRegion.size().y * edgeRegion.size().z;
+        int edgeSize = edgeRegion.getSizeX() * edgeRegion.getSizeY() * edgeRegion.getSizeZ();
         int[] depth = new int[edgeSize];
 
         propagateSide(chunk, adjChunk, side, indexProvider, edgeRegion, depth);
         propagateDepth(adjChunk, side, propagateExternal, indexProvider, edgeRegion, depth);
     }
 
-    private void propagateDepth(LitChunk adjChunk, Side side, boolean propagateExternal, IndexProvider indexProvider, Region3i edgeRegion, int[] depths) {
+    private void propagateDepth(LitChunk adjChunk, Side side, boolean propagateExternal, IndexProvider indexProvider, BlockRegion edgeRegion, int[] depths) {
         Vector3i adjPos = new Vector3i();
 
         int[] adjDepth = new int[depths.length];
@@ -332,13 +338,13 @@ public class StandardBatchPropagator implements BatchPropagator {
             }
         }
 
-        for (Vector3i pos : edgeRegion) {
-            int depthIndex = indexProvider.getIndexFor(pos);
+        for (Vector3ic pos : BlockRegions.iterableInPlace(edgeRegion)) {
+            int depthIndex = indexProvider.getIndexFor(JomlUtil.from(pos));
             int adjacentDepth = adjDepth[depthIndex];
             for (int i = adjacentDepth; i < depths[depthIndex]; ++i) {
                 adjPos.set(side.getVector3i());
                 adjPos.mul(i + 1);
-                adjPos.add(pos);
+                adjPos.add(JomlUtil.from(pos));
                 adjPos.add(chunkEdgeDeltas.get(side));
                 byte value = rules.getValue(adjChunk, adjPos);
                 if (value > 1) {
@@ -348,11 +354,11 @@ public class StandardBatchPropagator implements BatchPropagator {
         }
     }
 
-    private void propagateSide(LitChunk chunk, LitChunk adjChunk, Side side, IndexProvider indexProvider, Region3i edgeRegion, int[] depths) {
+    private void propagateSide(LitChunk chunk, LitChunk adjChunk, Side side, IndexProvider indexProvider, BlockRegion edgeRegion, int[] depths) {
         Vector3i adjPos = new Vector3i();
-        for (int x = edgeRegion.minX(); x <= edgeRegion.maxX(); ++x) {
-            for (int y = edgeRegion.minY(); y <= edgeRegion.maxY(); ++y) {
-                for (int z = edgeRegion.minZ(); z <= edgeRegion.maxZ(); ++z) {
+        for (int x = edgeRegion.getMinX(); x <= edgeRegion.getMaxX(); ++x) {
+            for (int y = edgeRegion.getMinY(); y <= edgeRegion.getMaxY(); ++y) {
+                for (int z = edgeRegion.getMinZ(); z <= edgeRegion.getMaxZ(); ++z) {
 
                     byte expectedValue = (byte) (rules.getValue(chunk, x, y, z) - 1);
                     if (expectedValue < 1) {

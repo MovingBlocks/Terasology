@@ -16,6 +16,9 @@
 package org.terasology.logic.players;
 
 import com.google.common.collect.Sets;
+import org.joml.Math;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.Time;
@@ -36,9 +39,6 @@ import org.terasology.logic.console.commandSystem.annotations.Command;
 import org.terasology.logic.console.commandSystem.annotations.CommandParam;
 import org.terasology.logic.location.Location;
 import org.terasology.logic.location.LocationComponent;
-import org.terasology.math.TeraMath;
-import org.terasology.math.geom.Quat4f;
-import org.terasology.math.geom.Vector3f;
 import org.terasology.network.ClientComponent;
 import org.terasology.registry.In;
 import org.terasology.rendering.logic.VisualComponent;
@@ -93,10 +93,10 @@ public class ThirdPersonRemoteClientSystem extends BaseComponentSystem implement
         Location.removeChild(character, remotePersonHeldItemMountPointComponent.mountPointEntity);
         Location.attachChild(character, remotePersonHeldItemMountPointComponent.mountPointEntity,
                 remotePersonHeldItemMountPointComponent.translate,
-                new Quat4f(
-                        TeraMath.DEG_TO_RAD * remotePersonHeldItemMountPointComponent.rotateDegrees.y,
-                        TeraMath.DEG_TO_RAD * remotePersonHeldItemMountPointComponent.rotateDegrees.x,
-                        TeraMath.DEG_TO_RAD * remotePersonHeldItemMountPointComponent.rotateDegrees.z),
+                new Quaternionf().rotationYXZ(
+                        Math.toRadians(remotePersonHeldItemMountPointComponent.rotateDegrees.y),
+                        Math.toRadians(remotePersonHeldItemMountPointComponent.rotateDegrees.x),
+                        Math.toRadians(remotePersonHeldItemMountPointComponent.rotateDegrees.z)),
                 remotePersonHeldItemMountPointComponent.scale);
 
     }
@@ -225,10 +225,10 @@ public class ThirdPersonRemoteClientSystem extends BaseComponentSystem implement
 
                 Location.attachChild(mountPointComponent.mountPointEntity, currentHeldItem,
                         heldItemTransformComponent.translate,
-                        new Quat4f(
-                                TeraMath.DEG_TO_RAD * heldItemTransformComponent.rotateDegrees.y,
-                                TeraMath.DEG_TO_RAD * heldItemTransformComponent.rotateDegrees.x,
-                                TeraMath.DEG_TO_RAD * heldItemTransformComponent.rotateDegrees.z),
+                        new Quaternionf().rotationYXZ(
+                                Math.toRadians(heldItemTransformComponent.rotateDegrees.y),
+                                Math.toRadians(heldItemTransformComponent.rotateDegrees.x),
+                                Math.toRadians(heldItemTransformComponent.rotateDegrees.z)),
                         heldItemTransformComponent.scale);
             }
         } else {
@@ -246,12 +246,10 @@ public class ThirdPersonRemoteClientSystem extends BaseComponentSystem implement
 
         // Make a set of all held items that exist so we can review them and later toss any no longer needed
         Set<EntityRef> heldItemsForReview = Sets.newHashSet(entityManager.getEntitiesWith(ItemIsRemotelyHeldComponent.class));
-        logger.debug("As we start update we got the following known remote items to consider: {}", heldItemsForReview);
 
         // Note that the inclusion of PlayerCharacterComponent excludes "characters" like Gooey. In the future such critters may also want held items
         for (EntityRef remotePlayer : entityManager.getEntitiesWith(CharacterComponent.class, PlayerCharacterComponent.class)) {
             if (relatesToLocalPlayer(remotePlayer)) {
-                logger.debug("ThirdPersonRemoteClientSystem's update is ignoring the local player: {}", remotePlayer);
                 continue;
             }
 
@@ -260,26 +258,20 @@ public class ThirdPersonRemoteClientSystem extends BaseComponentSystem implement
             Iterator<EntityRef> heldItermsIterator = heldItemsForReview.iterator();
             while (heldItermsIterator.hasNext()) {
                 EntityRef heldItemCandidate = heldItermsIterator.next();
-                logger.debug("Checking heldItemCandidate {} for remote player {}", heldItemCandidate, remotePlayer);
                 ItemIsRemotelyHeldComponent itemIsRemotelyHeldComponent = heldItemCandidate.getComponent(ItemIsRemotelyHeldComponent.class);
-                logger.debug("The held item's owner is {}", itemIsRemotelyHeldComponent.remotePlayer);
                 if (itemIsRemotelyHeldComponent.remotePlayer.equals(remotePlayer)) {
-                    logger.debug("Looks like we got a match for an existing item! Removing it from the set and processing it");
                     currentHeldItem = heldItemCandidate;
                     heldItermsIterator.remove();
                     break;
                 }
             }
 
-            logger.debug("After searching for an existing held item the set is now: {}", heldItemsForReview);
 
             // If an associated held item entity does *not* exist yet, consider making one if the player has an item selected
             if (currentHeldItem == EntityRef.NULL) {
-                logger.debug("During update we hit a player without a current held item entity. Checking {} to see if we should make one", remotePlayer);
                 if (remotePlayer.hasComponent(CharacterHeldItemComponent.class)) {
                     CharacterHeldItemComponent characterHeldItemComponent = remotePlayer.getComponent(CharacterHeldItemComponent.class);
                     if (characterHeldItemComponent != null && !characterHeldItemComponent.selectedItem.equals(EntityRef.NULL)) {
-                        logger.debug("Yep that player holds an item. Calling linkHeldItemLocationForRemotePlayer with item {}", characterHeldItemComponent.selectedItem);
                         linkHeldItemLocationForRemotePlayer(remotePlayer.getComponent(CharacterHeldItemComponent.class).selectedItem, remotePlayer);
                     }
                 }
@@ -306,10 +298,10 @@ public class ThirdPersonRemoteClientSystem extends BaseComponentSystem implement
             }
             float addPitch = 15f * animateAmount;
             float addYaw = 10f * animateAmount;
-            locationComponent.setLocalRotation(new Quat4f(
-                    TeraMath.DEG_TO_RAD * (mountPointComponent.rotateDegrees.y + addYaw),
-                    TeraMath.DEG_TO_RAD * (mountPointComponent.rotateDegrees.x + addPitch),
-                    TeraMath.DEG_TO_RAD * mountPointComponent.rotateDegrees.z));
+            locationComponent.setLocalRotation(new Quaternionf().rotationYXZ(
+                Math.toRadians(mountPointComponent.rotateDegrees.y + addYaw),
+                Math.toRadians(mountPointComponent.rotateDegrees.x + addPitch),
+                Math.toRadians(mountPointComponent.rotateDegrees.z)));
             Vector3f offset = new Vector3f(0.05f * animateAmount, -0.24f * animateAmount, 0f);
             offset.add(mountPointComponent.translate);
             locationComponent.setLocalPosition(offset);
@@ -318,7 +310,6 @@ public class ThirdPersonRemoteClientSystem extends BaseComponentSystem implement
         }
 
         heldItemsForReview.forEach(remainingHeldItem -> {
-            logger.debug("After processing held items still had {} - destroying it", remainingHeldItem);
             if (remainingHeldItem.exists()) {
                 remainingHeldItem.destroy();
             }
@@ -353,22 +344,18 @@ public class ThirdPersonRemoteClientSystem extends BaseComponentSystem implement
      */
     private boolean relatesToLocalPlayer(EntityRef entity) {
         if (entity == null || entity.equals(EntityRef.NULL)) {
-            logger.debug("checkForLocalPlayer given a bad entity (null or NullEntityRef - can't relate that to a local player!");
             return false;
         }
 
         if (entity.equals(localPlayer.getClientEntity())) {
-            logger.debug("checkForLocalPlayer found a match to the localPlayer client entity! {}", entity);
             return true;
         }
 
         if (entity.equals(localPlayer.getCharacterEntity())) {
-            logger.debug("checkForLocalPlayer found a match to the localPlayer character entity! {}", entity);
             return true;
         }
 
         if (entity.equals(localPlayer.getClientInfoEntity())) {
-            logger.debug("checkForLocalPlayer found a match to the localPlayer client info entity! {}", entity);
             return true;
         }
 
@@ -384,12 +371,10 @@ public class ThirdPersonRemoteClientSystem extends BaseComponentSystem implement
 
             if (controller != null) {
                 if (controller.equals(localPlayer.getClientEntity())) {
-                    logger.debug("checkForLocalPlayer found its entity to be a character whose controller matched the localPlayer client entity! {}", controller);
                     return true;
                 }
 
                 if (controller.equals(networkSystemProvidedClientEntity)) {
-                    logger.debug("checkForLocalPlayer found its entity to be a character controller matching the network system provided local client entity! {}", controller);
                     return true;
                 }
             }

@@ -15,7 +15,8 @@
  */
 package org.terasology.rendering.backdrop;
 
-import org.terasology.math.geom.Vector3f;
+
+import org.joml.Vector3f;
 
 /**
  * Implementations of this interface provide read and/or write access to the backdrop,

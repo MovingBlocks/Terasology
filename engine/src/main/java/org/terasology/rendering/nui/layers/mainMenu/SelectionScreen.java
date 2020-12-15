@@ -30,12 +30,14 @@ import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.TextureData;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameInfo;
-import org.terasology.rendering.nui.widgets.UIImage;
-import org.terasology.rendering.nui.widgets.UIImageSlideshow;
-import org.terasology.rendering.nui.widgets.UILabel;
-import org.terasology.rendering.nui.widgets.UIList;
+import org.terasology.nui.widgets.UIImage;
+import org.terasology.nui.widgets.UIImageSlideshow;
+import org.terasology.nui.widgets.UILabel;
+import org.terasology.nui.widgets.UIList;
 import org.terasology.utilities.Assets;
 import org.terasology.utilities.FilesUtil;
+import org.terasology.world.generator.internal.WorldGeneratorInfo;
+import org.terasology.world.generator.internal.WorldGeneratorManager;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -61,6 +63,9 @@ public abstract class SelectionScreen extends CoreScreenLayer {
     protected Config config;
 
     @In
+    protected WorldGeneratorManager worldGeneratorManager;
+
+    @In
     protected TranslationSystem translationSystem;
 
     protected UIImageSlideshow previewSlideshow;
@@ -82,11 +87,17 @@ public abstract class SelectionScreen extends CoreScreenLayer {
             return;
         }
 
-        final String mainWorldGenerator = gameInfo.getManifest()
+        final WorldGeneratorInfo wgi = worldGeneratorManager.getWorldGeneratorInfo(
+                gameInfo.getManifest()
                 .getWorldInfo(TerasologyConstants.MAIN_WORLD)
-                .getWorldGenerator()
-                .getObjectName()
-                .toString();
+                .getWorldGenerator());
+
+        String mainWorldGenerator = "ERROR: world generator ";
+        if (wgi != null) {
+            mainWorldGenerator = wgi.getDisplayName();
+        } else {
+            mainWorldGenerator = mainWorldGenerator + gameInfo.getManifest().getWorldInfo(TerasologyConstants.MAIN_WORLD).getWorldGenerator().toString() + " not found";
+        }
 
         final String commaSeparatedModules = gameInfo.getManifest()
                 .getModules()

@@ -21,10 +21,10 @@ import java.net.URL;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.WebBrowserConfig;
 import org.terasology.rendering.nui.CoreScreenLayer;
-import org.terasology.rendering.nui.WidgetUtil;
-import org.terasology.rendering.nui.widgets.UIButton;
-import org.terasology.rendering.nui.widgets.UICheckbox;
-import org.terasology.rendering.nui.widgets.UILabel;
+import org.terasology.nui.WidgetUtil;
+import org.terasology.nui.widgets.UIButton;
+import org.terasology.nui.widgets.UICheckbox;
+import org.terasology.nui.widgets.UILabel;
 
 public class ConfirmUrlPopup extends CoreScreenLayer {
 

@@ -17,6 +17,7 @@ package org.terasology.rendering.world;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
+import org.joml.Vector3ic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
@@ -53,7 +54,7 @@ class RenderableWorldImpl implements RenderableWorld {
 
     private static final int MAX_ANIMATED_CHUNKS = 64;
     private static final int MAX_BILLBOARD_CHUNKS = 64;
-    private static final int MAX_LOADABLE_CHUNKS = ViewDistance.MEGA.getChunkDistance().x * ViewDistance.MEGA.getChunkDistance().y * ViewDistance.MEGA.getChunkDistance().z;
+    private static final int MAX_LOADABLE_CHUNKS = ViewDistance.MEGA.getChunkDistance().x() * ViewDistance.MEGA.getChunkDistance().y() * ViewDistance.MEGA.getChunkDistance().z();
     private static final Vector3f CHUNK_CENTER_OFFSET = new Vector3f(0.5f, 0.5f, 0.5f);
 
     private static final Logger logger = LoggerFactory.getLogger(RenderableWorldImpl.class);
@@ -248,8 +249,8 @@ class RenderableWorldImpl implements RenderableWorld {
 
     private Region3i calculateRenderableRegion(ViewDistance newViewDistance) {
         Vector3i cameraCoordinates = calcCameraCoordinatesInChunkUnits();
-        Vector3i renderableRegionSize = newViewDistance.getChunkDistance();
-        Vector3i renderableRegionExtents = new Vector3i(renderableRegionSize.x / 2, renderableRegionSize.y / 2, renderableRegionSize.z / 2);
+        Vector3ic renderableRegionSize = newViewDistance.getChunkDistance();
+        Vector3i renderableRegionExtents = new Vector3i(renderableRegionSize.x() / 2, renderableRegionSize.y() / 2, renderableRegionSize.z() / 2);
         return Region3i.createFromCenterExtents(cameraCoordinates, renderableRegionExtents);
     }
 
@@ -378,14 +379,14 @@ class RenderableWorldImpl implements RenderableWorld {
     }
 
     private boolean isChunkValidForRender(RenderableChunk chunk) {
-        return chunk.isReady() && areSurroundingChunksLoaded(chunk);
-    }
-
-    private boolean areSurroundingChunksLoaded(RenderableChunk chunk) {
-        return worldProvider.getWorldViewAround(chunk.getPosition()) != null;
+        return chunk.isReady();
     }
 
     private boolean isChunkVisibleFromMainLight(RenderableChunk chunk) {
+        //TODO: need to work out better scheme for shadowMapCamera
+        if (shadowMapCamera == null) {
+            return false;
+        }
         return isChunkVisible(shadowMapCamera, chunk); //TODO: find an elegant way
     }
 

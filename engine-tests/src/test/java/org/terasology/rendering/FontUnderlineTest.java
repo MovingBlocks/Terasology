@@ -17,6 +17,7 @@
 package org.terasology.rendering;
 
 import org.junit.jupiter.api.Test;
+import org.terasology.nui.FontUnderline;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;

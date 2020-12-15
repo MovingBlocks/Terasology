@@ -15,6 +15,8 @@
  */
 package org.terasology.entitySystem.metadata;
 
+import org.terasology.reflection.copy.CopyStrategyLibrary;
+import org.terasology.reflection.copy.strategy.EntityCopyStrategy;
 import org.terasology.reflection.metadata.ClassMetadata;
 import org.terasology.reflection.copy.CopyStrategy;
 import org.terasology.reflection.reflect.InaccessibleFieldException;
@@ -37,11 +39,18 @@ public class ComponentFieldMetadata<T extends Component, U> extends ReplicatedFi
 
     private boolean ownedReference;
 
-    public ComponentFieldMetadata(ClassMetadata<T, ?> owner, Field field, CopyStrategy<U> copyStrategy, ReflectFactory factory, boolean replicatedByDefault)
+    private CopyStrategy<U> copyWithOwnedEntitiesStrategy;
+
+    public ComponentFieldMetadata(ClassMetadata<T, ?> owner, Field field, CopyStrategyLibrary copyStrategyLibrary, ReflectFactory factory, boolean replicatedByDefault)
             throws InaccessibleFieldException {
-        super(owner, field, copyStrategy, factory, replicatedByDefault);
+        super(owner, field, copyStrategyLibrary, factory, replicatedByDefault);
         ownedReference = field.getAnnotation(Owns.class) != null && (EntityRef.class.isAssignableFrom(field.getType())
                 || isCollectionOf(EntityRef.class, field.getGenericType()));
+        if (ownedReference) {
+            copyWithOwnedEntitiesStrategy = (CopyStrategy<U>) copyStrategyLibrary.createCopyOfLibraryWithStrategy(EntityRef.class, EntityCopyStrategy.INSTANCE).getStrategy(field.getGenericType());
+        } else {
+            copyWithOwnedEntitiesStrategy = copyStrategy;
+        }
     }
 
     /**
@@ -54,5 +63,28 @@ public class ComponentFieldMetadata<T extends Component, U> extends ReplicatedFi
     private boolean isCollectionOf(Class<?> targetType, Type genericType) {
         return (Collection.class.isAssignableFrom(getType()) && ReflectionUtil.getTypeParameter(genericType, 0).equals(targetType))
                 || (Map.class.isAssignableFrom(getType()) && ReflectionUtil.getTypeParameter(genericType, 1).equals(targetType));
+    }
+
+    /**
+     * For types that need to be copied (e.g. Vector3f) for safe usage, this method will create a new copy of a field from an object, and if the field is marked @Owns, any EntityRefs in the value are copied too.
+     * Otherwise it behaves the same as getValue
+     *
+     * @param from The object to copy the field from
+     * @return A safe to use copy of the value of this field in the given object
+     */
+    public U getCopyOfValueWithOwnedEntities(Object from) {
+        return copyWithOwnedEntitiesStrategy.copy(getValue(from));
+    }
+
+    /**
+     * For types that need to be copied (e.g. Vector3f) for safe usage, this method will create a new copy of a field from an object, and if the field is marked @Owns, any EntityRefs in the value are copied too.
+     * Otherwise it behaves the same as getValue
+     * This method is checked to conform to the generic parameters of the FieldMetadata
+     *
+     * @param from The object to copy the field from
+     * @return A safe to use copy of the value of this field in the given object
+     */
+    public U getCopyOfValueWithOwnedEntitiesChecked(T from) {
+        return getCopyOfValueWithOwnedEntities(from);
     }
 }

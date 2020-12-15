@@ -16,11 +16,11 @@
 package org.terasology.rendering.nui.editor.utils;
 
 import org.terasology.rendering.assets.texture.Texture;
-import org.terasology.rendering.nui.itemRendering.StringTextIconRenderer;
-import org.terasology.rendering.nui.widgets.treeView.JsonTree;
-import org.terasology.rendering.nui.widgets.treeView.JsonTreeValue;
-import org.terasology.rendering.nui.widgets.treeView.Tree;
-import org.terasology.rendering.nui.widgets.treeView.TreeModel;
+import org.terasology.nui.itemRendering.StringTextIconRenderer;
+import org.terasology.nui.widgets.treeView.JsonTree;
+import org.terasology.nui.widgets.treeView.JsonTreeValue;
+import org.terasology.nui.widgets.treeView.Tree;
+import org.terasology.nui.widgets.treeView.TreeModel;
 import org.terasology.utilities.Assets;
 
 import java.util.Optional;

@@ -22,30 +22,9 @@ import org.terasology.particles.ParticleDataMask;
  */
 public abstract class ParticleSystemFunction<T> {
     private final int rawDataMask;
-    private final Class<T> component;
 
-    public ParticleSystemFunction(Class<T> component, ParticleDataMask dataMask, ParticleDataMask... dataMasks) {
+    public ParticleSystemFunction(ParticleDataMask dataMask, ParticleDataMask... dataMasks) {
         this.rawDataMask = ParticleDataMask.toInt(dataMask, dataMasks);
-        this.component = component;
-    }
-
-    @Override
-    public final int hashCode() {
-        return component.hashCode();
-    }
-
-    @Override
-    public final boolean equals(final Object object) {
-        if (object != null && object.getClass().equals(this.getClass())) {
-            ParticleSystemFunction other = (ParticleSystemFunction) object;
-            return other.getComponentClass().equals(this.getComponentClass());
-        }
-
-        return false;
-    }
-
-    public final Class<T> getComponentClass() {
-        return component;
     }
 
     public final int getDataMask() {

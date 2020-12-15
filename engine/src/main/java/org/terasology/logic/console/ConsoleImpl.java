@@ -33,8 +33,8 @@ import org.terasology.logic.permission.PermissionManager;
 import org.terasology.naming.Name;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkSystem;
-import org.terasology.rendering.FontColor;
-import org.terasology.rendering.FontUnderline;
+import org.terasology.nui.FontColor;
+import org.terasology.nui.FontUnderline;
 import org.terasology.utilities.collection.CircularBuffer;
 
 import java.util.Arrays;

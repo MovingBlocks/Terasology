@@ -15,8 +15,8 @@
  */
 package org.terasology.particles.components.generators;
 
+import org.joml.Vector4f;
 import org.terasology.entitySystem.Component;
-import org.terasology.math.geom.Vector4f;
 import org.terasology.module.sandbox.API;
 
 /**

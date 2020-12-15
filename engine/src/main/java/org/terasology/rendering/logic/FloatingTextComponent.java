@@ -15,7 +15,7 @@
  */
 package org.terasology.rendering.logic;
 
-import org.terasology.rendering.nui.Color;
+import org.terasology.nui.Color;
 
 /**
  * Makes the game render the specified text at the current location of the enitity.

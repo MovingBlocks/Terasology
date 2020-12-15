@@ -1,0 +1,277 @@
+{
+    "asset": {
+        "version": "2.0"
+    },
+    "scene": 0,
+    "scenes": [
+        {
+            "nodes": [
+                0
+            ]
+        }
+    ],
+    "skins" : [
+      {
+          "joints" : [ 1, 2 ],
+          "inverseBindMatrices": 6
+      }
+    ],
+    "nodes": [
+        {
+            "name" : "root",
+            "mesh" : 0,
+            "skin" : 0,
+            "children" : [1]
+        },
+        {
+            "name" : "rootbone",
+            "children" : [2]
+        },
+        {
+            "name" : "childbone",
+            "translation" : [0, 1.1, 0]
+        }
+    ],
+    "meshes": [
+        {
+            "primitives": [
+                {
+                    "attributes": {
+                        "POSITION": 0,
+                        "NORMAL": 1,
+                        "TEXCOORD_0": 2,
+                        "JOINTS_0": 5,
+                        "WEIGHTS_0": 4
+                    },
+                    "indices": 3,
+                    "mode": 4,
+                    "material": 0
+                }
+            ],
+            "name": "cubes"
+        }
+    ],
+    "animations" : [
+      {
+        "name" : "move",
+        "samplers" : [
+            {
+                "input" : 7,
+                "interpolation" : "STEP",
+                "output" : 8
+            }
+        ],
+        "channels" : [ {
+        "sampler" : 0,
+        "target" : {
+          "node" : 2,
+          "path" : "translation"
+        }
+      } ]
+      }
+    ],
+    "accessors": [
+        {
+            "bufferView": 0,
+            "byteOffset": 0,
+            "componentType": 5126,
+            "count": 48,
+            "max": [
+                0.5, 1.6, 0.5
+            ],
+            "min": [
+                -0.5, -0.5, -0.5
+            ],
+            "type": "VEC3",
+            "name": "position"
+        },
+        {
+            "bufferView": 0,
+            "byteOffset": 12,
+            "componentType": 5126,
+            "count": 48,
+            "max": [
+                1, 1, 1
+            ],
+            "min": [
+                -1, -1, -1
+            ],
+            "type": "VEC3",
+            "name": "normals"
+        },
+        {
+            "bufferView": 0,
+            "byteOffset": 24,
+            "componentType": 5126,
+            "count": 48,
+            "max": [
+                1, 1
+            ],
+            "min": [
+                0, 0
+            ],
+            "type": "VEC2"
+        },
+        {
+            "bufferView": 1,
+            "byteOffset": 0,
+            "componentType": 5123,
+            "count": 72,
+            "max": [
+                47
+            ],
+            "min": [
+                0
+            ],
+            "type": "SCALAR"
+        },
+        {
+            "bufferView": 0,
+            "byteOffset": 32,
+            "componentType": 5126,
+            "count": 48,
+            "max": [
+                1, 0, 0, 0
+            ],
+            "min": [
+                1, 0, 0, 0
+            ],
+            "type": "VEC4"
+        },
+        {
+            "bufferView": 2,
+            "byteOffset": 0,
+            "componentType": 5123,
+            "count": 48,
+            "max": [
+                1, 0, 0, 0
+            ],
+            "min": [
+                0, 0, 0, 0
+            ],
+            "type": "VEC4"
+        },
+        {
+            "bufferView": 3,
+            "byteOffset": 0,
+            "componentType": 5126,
+            "count": 2,
+            "max": [
+                1, 0, 0, 0,
+                0, 1, 0, 0,
+                0, 0, 1, 0,
+                0, 0, 0, 1
+            ],
+            "min": [
+                1, 0, 0, 0,
+                0, 1, 0, 0,
+                0, 0, 1, 0,
+                0, -1.1, 0, 1
+            ],
+            "type": "MAT4"
+        },
+        {
+            "bufferView": 4,
+            "componentType": 5126,
+            "count": 3,
+            "max": [
+                2
+            ],
+            "min": [
+                0
+            ],
+            "type": "SCALAR"
+        },
+        {
+            "bufferView": 5,
+            "componentType": 5126,
+            "count": 3,
+            "max": [
+                0, 2.1, 0
+            ],
+            "min": [
+                0, 1.1, 0
+            ],
+            "type": "VEC3"
+        }
+    ],
+    "bufferViews": [
+        {
+            "buffer": 0,
+            "byteOffset": 0,
+            "byteLength": 2304,
+            "target": 34962,
+            "byteStride": 48,
+            "name": "vertices"
+        },
+        {
+            "buffer": 0,
+            "byteOffset": 2304,
+            "byteLength": 144,
+            "target": 34963,
+            "name": "indices"
+        },
+        {
+            "buffer": 0,
+            "byteOffset": 2448,
+            "byteLength": 384,
+            "target": 34962,
+            "name": "joints"
+        },
+        {
+            "buffer": 0,
+            "byteOffset": 2832,
+            "byteLength": 128,
+            "name": "inversebindmat"
+        },
+        {
+            "buffer": 1,
+            "byteOffset": 0,
+            "byteLength": 12,
+            "name": "time"
+        },
+        {
+            "buffer": 1,
+            "byteOffset": 12,
+            "byteLength": 36,
+            "name": "childPos"
+        }
+
+    ],
+    "buffers": [
+        {
+            "byteLength": 2960,
+            "uri": "data:application/octet-stream;base64,AAAAvwAAAD8AAAC/AAAAAAAAgD8AAAAAAAAAAAAAAAAAAIA/AAAAAAAAAAAAAAAAAAAAvwAAAD8AAAA/AAAAAAAAgD8AAAAAAAAAAAAAAD8AAIA/AAAAAAAAAAAAAAAAAAAAPwAAAD8AAAC/AAAAAAAAgD8AAAAAAACAPwAAAAAAAIA/AAAAAAAAAAAAAAAAAAAAPwAAAD8AAAA/AAAAAAAAgD8AAAAAAACAPwAAAD8AAIA/AAAAAAAAAAAAAAAAAAAAvwAAAL8AAAC/AAAAAAAAgL8AAAAAAAAAAAAAAAAAAIA/AAAAAAAAAAAAAAAAAAAAvwAAAL8AAAA/AAAAAAAAgL8AAAAAAAAAAAAAAD8AAIA/AAAAAAAAAAAAAAAAAAAAPwAAAL8AAAC/AAAAAAAAgL8AAAAAAACAPwAAAAAAAIA/AAAAAAAAAAAAAAAAAAAAPwAAAL8AAAA/AAAAAAAAgL8AAAAAAACAPwAAAD8AAIA/AAAAAAAAAAAAAAAAAAAAvwAAAL8AAAC/AACAvwAAAAAAAAAAAAAAAAAAAAAAAIA/AAAAAAAAAAAAAAAAAAAAvwAAAL8AAAA/AACAvwAAAAAAAAAAAAAAAAAAAD8AAIA/AAAAAAAAAAAAAAAAAAAAvwAAAD8AAAC/AACAvwAAAAAAAAAAAACAPwAAAAAAAIA/AAAAAAAAAAAAAAAAAAAAvwAAAD8AAAA/AACAvwAAAAAAAAAAAACAPwAAAD8AAIA/AAAAAAAAAAAAAAAAAAAAPwAAAL8AAAC/AACAPwAAAAAAAAAAAAAAAAAAAAAAAIA/AAAAAAAAAAAAAAAAAAAAPwAAAL8AAAA/AACAPwAAAAAAAAAAAAAAAAAAAD8AAIA/AAAAAAAAAAAAAAAAAAAAPwAAAD8AAAC/AACAPwAAAAAAAAAAAACAPwAAAAAAAIA/AAAAAAAAAAAAAAAAAAAAPwAAAD8AAAA/AACAPwAAAAAAAAAAAACAPwAAAD8AAIA/AAAAAAAAAAAAAAAAAAAAvwAAAL8AAAC/AAAAAAAAAAAAAIC/AAAAAAAAAAAAAIA/AAAAAAAAAAAAAAAAAAAAvwAAAD8AAAC/AAAAAAAAAAAAAIC/AAAAAAAAAD8AAIA/AAAAAAAAAAAAAAAAAAAAPwAAAL8AAAC/AAAAAAAAAAAAAIC/AACAPwAAAAAAAIA/AAAAAAAAAAAAAAAAAAAAPwAAAD8AAAC/AAAAAAAAAAAAAIC/AACAPwAAAD8AAIA/AAAAAAAAAAAAAAAAAAAAvwAAAL8AAAA/AAAAAAAAAAAAAIA/AAAAAAAAAAAAAIA/AAAAAAAAAAAAAAAAAAAAvwAAAD8AAAA/AAAAAAAAAAAAAIA/AAAAAAAAAD8AAIA/AAAAAAAAAAAAAAAAAAAAPwAAAL8AAAA/AAAAAAAAAAAAAIA/AACAPwAAAAAAAIA/AAAAAAAAAAAAAAAAAAAAPwAAAD8AAAA/AAAAAAAAAAAAAIA/AACAPwAAAD8AAIA/AAAAAAAAAAAAAAAAAAAAv83MzD8AAAC/AAAAAAAAgD8AAAAAAAAAAAAAAD8AAIA/AAAAAAAAAAAAAAAAAAAAv83MzD8AAAA/AAAAAAAAgD8AAAAAAAAAAAAAgD8AAIA/AAAAAAAAAAAAAAAAAAAAP83MzD8AAAC/AAAAAAAAgD8AAAAAAACAPwAAAD8AAIA/AAAAAAAAAAAAAAAAAAAAP83MzD8AAAA/AAAAAAAAgD8AAAAAAACAPwAAgD8AAIA/AAAAAAAAAAAAAAAAAAAAv5qZGT8AAAC/AAAAAAAAgL8AAAAAAAAAAAAAAD8AAIA/AAAAAAAAAAAAAAAAAAAAv5qZGT8AAAA/AAAAAAAAgL8AAAAAAAAAAAAAgD8AAIA/AAAAAAAAAAAAAAAAAAAAP5qZGT8AAAC/AAAAAAAAgL8AAAAAAACAPwAAAD8AAIA/AAAAAAAAAAAAAAAAAAAAP5qZGT8AAAA/AAAAAAAAgL8AAAAAAACAPwAAgD8AAIA/AAAAAAAAAAAAAAAAAAAAv5qZGT8AAAC/AACAvwAAAAAAAAAAAAAAAAAAAD8AAIA/AAAAAAAAAAAAAAAAAAAAv5qZGT8AAAA/AACAvwAAAAAAAAAAAAAAAAAAgD8AAIA/AAAAAAAAAAAAAAAAAAAAv83MzD8AAAC/AACAvwAAAAAAAAAAAACAPwAAAD8AAIA/AAAAAAAAAAAAAAAAAAAAv83MzD8AAAA/AACAvwAAAAAAAAAAAACAPwAAgD8AAIA/AAAAAAAAAAAAAAAAAAAAP5qZGT8AAAC/AACAPwAAAAAAAAAAAAAAAAAAAD8AAIA/AAAAAAAAAAAAAAAAAAAAP5qZGT8AAAA/AACAPwAAAAAAAAAAAAAAAAAAgD8AAIA/AAAAAAAAAAAAAAAAAAAAP83MzD8AAAC/AACAPwAAAAAAAAAAAACAPwAAAD8AAIA/AAAAAAAAAAAAAAAAAAAAP83MzD8AAAA/AACAPwAAAAAAAAAAAACAPwAAgD8AAIA/AAAAAAAAAAAAAAAAAAAAv5qZGT8AAAC/AAAAAAAAAAAAAIC/AAAAAAAAAD8AAIA/AAAAAAAAAAAAAAAAAAAAv83MzD8AAAC/AAAAAAAAAAAAAIC/AAAAAAAAgD8AAIA/AAAAAAAAAAAAAAAAAAAAP5qZGT8AAAC/AAAAAAAAAAAAAIC/AACAPwAAAD8AAIA/AAAAAAAAAAAAAAAAAAAAP83MzD8AAAC/AAAAAAAAAAAAAIC/AACAPwAAgD8AAIA/AAAAAAAAAAAAAAAAAAAAv5qZGT8AAAA/AAAAAAAAAAAAAIA/AAAAAAAAAD8AAIA/AAAAAAAAAAAAAAAAAAAAv83MzD8AAAA/AAAAAAAAAAAAAIA/AAAAAAAAgD8AAIA/AAAAAAAAAAAAAAAAAAAAP5qZGT8AAAA/AAAAAAAAAAAAAIA/AACAPwAAAD8AAIA/AAAAAAAAAAAAAAAAAAAAP83MzD8AAAA/AAAAAAAAAAAAAIA/AACAPwAAgD8AAIA/AAAAAAAAAAAAAAAAAAABAAIAAgABAAMABAAGAAUABQAGAAcACAAJAAoACgAJAAsADAAOAA0ADQAOAA8AEAARABIAEgARABMAFAAWABUAFQAWABcAGAAZABoAGgAZABsAHAAeAB0AHQAeAB8AIAAhACIAIgAhACMAJAAmACUAJQAmACcAKAApACoAKgApACsALAAuAC0ALQAuAC8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAABAAAAAAAAAAEAAAAAAAAAAQAAAAAAAAABAAAAAAAAAAEAAAAAAAAAAQAAAAAAAAABAAAAAAAAAAEAAAAAAAAAAQAAAAAAAAABAAAAAAAAAAEAAAAAAAAAAQAAAAAAAAABAAAAAAAAAAEAAAAAAAAAAQAAAAAAAAABAAAAAAAAAAEAAAAAAAAAAQAAAAAAAAABAAAAAAAAAAEAAAAAAAAAAQAAAAAAAAABAAAAAAAAAAEAAAAAAAAAAACAPwAAAAAAAAAAAAAAAAAAAAAAAIA/AAAAAAAAAAAAAAAAAAAAAAAAgD8AAAAAAAAAAAAAAAAAAAAAAACAPwAAgD8AAAAAAAAAAAAAAAAAAAAAAACAPwAAAAAAAAAAAAAAAAAAAAAAAIA/AAAAAAAAAADNzIy/AAAAAAAAgD8="
+        },
+        {
+            "byteLength": 48,
+            "uri": "data:application/octet-stream;base64,AAAAAAAAgD8AAABAAAAAAM3MjD8AAAAAAAAAAGZmBkAAAAAAAAAAAM3MjD8AAAAA"
+        }
+    ],
+    "materials": [
+        {
+            "pbrMetallicRoughness": {
+                "baseColorTexture": {
+                    "index": 0
+                },
+                "metallicFactor": 0.0
+            },
+            "emissiveFactor": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "name": "cubecolors"
+        }
+    ],
+    "textures": [
+        {
+            "source": 0
+        }
+    ],
+    "images": [
+        {
+            "uri": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQAAAAEACAYAAABccqhmAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAYdEVYdFNvZnR3YXJlAHBhaW50Lm5ldCA0LjEuNv1OCegAAAM8SURBVHhe7dYxFUJBAAPBE/BL6PFvCikHAuJgp5hmBeTl3PO+QJMBgDADAGEGAMIMAIQZAAgzABBmACDMAECYAYAwAwBhBgDCDACEGQAIMwAQZgAgzABAmAGAMAMAYQYAwgwAhBkACDMAEGYAIMwAQJgBgDADAGEGAMIMAIQZAAgzABBmACDMAECYAYAwAwBhBgDCDACEGQAIMwAQZgAgzABAmAGAMAMAYQYAwgwAhBkACDMAEGYAIMwAQJgBgDADAGEGAMIMAIQZAAgzABBmACDMAECYAYAwAwBhBgDCDACEGQAIMwAQZgAgzABAmAGAMAMAYQYAwgwAhBkACDMAEGYAIMwAQJgBgDADAGEGAMIMAIQZAAgzABBmACDMAECYAYAwAwBhBgDCDACEGQAIMwAQZgAgzABAmAGAMAMAYQYAwgwAhBkACDMAEGYAIMwAQJgBgDADAGEGAMIMAIQZAAgzABBmACDMAECYAYAwAwBhBgDCDACEGQAIMwAQZgAgzABAmAGAMAMAYQYAwgwAhBkACDMAEGYAIMwAQJgBgDADAGEGAMIMAIQZAAgzABB2vp/XBZrOuc//BgBJMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwINMwIBz/0BG02d096WHSgAAAAASUVORK5CYII="
+        }
+    ]
+}

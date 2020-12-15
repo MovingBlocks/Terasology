@@ -16,11 +16,21 @@
 package org.terasology.rendering.dag;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+
+import org.terasology.context.Context;
 import org.junit.jupiter.api.Test;
 import org.terasology.engine.SimpleUri;
+import org.terasology.naming.Name;
+import org.terasology.rendering.dag.dependencyConnections.BufferPairConnection;
+import org.terasology.rendering.dag.dependencyConnections.BufferPair;
+import org.terasology.rendering.dag.dependencyConnections.DependencyConnection;
+import org.terasology.rendering.dag.dependencyConnections.FboConnection;
+import org.terasology.rendering.dag.dependencyConnections.RunOrderConnection;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -104,6 +114,8 @@ public class RenderTaskListGeneratorTest {
     private abstract class DummyNode implements Node {
         private SimpleUri nodeUri;
         private Set<StateChange> desiredStateChanges = Sets.newLinkedHashSet();
+        private Map<String, DependencyConnection> inputConnections = Maps.newHashMap();
+        private Map<String, DependencyConnection> outputConnections = Maps.newHashMap();
         private boolean enabled;
 
         DummyNode(String nodeUri) {
@@ -145,6 +157,128 @@ public class RenderTaskListGeneratorTest {
         public String toString() {
             return String.format("%s (%s)", getUri(), this.getClass().getSimpleName());
         }
+
+        public void connectFbo(int inputFboId, DependencyConnection from) {
+            // TODO: null checks everywhere
+           // addInputFboConnection(inputFboId, from);
+        }
+
+        public FboConnection getOutputFboConnection(int outputFboId) {
+            return null; // (FboConnection) getOutputConnection(FboConnection.getConnectionName(outputFboId));
+        }
+
+        public FboConnection getInputFboConnection(int inputFboId) {
+            return null; // (FboConnection) getInputFboConnection(FboConnection.getConnectionName(inputFboId));
+        }
+
+        public void reconnectInputFboToOutput(int inputId, Node fromNode, DependencyConnection fromConnection) {
+            // ???
+        }
+
+        public void resetDesiredStateChanges() {
+
+        }
+
+        public void clearDesiredStateChanges() {
+
+        }
+
+        public void setRenderGraph(RenderGraph renderGraph) {
+
+        }
+
+        public boolean isDependentOn(Node anotherNode) {
+            return false;
+        }
+
+        @Override
+        public boolean addInputConnection(int id, DependencyConnection connection) {
+            return false;
+        }
+
+        public boolean addInputBufferPairConnection(int id, BufferPairConnection from) {
+            return false;
+        }
+
+        public boolean addInputBufferPairConnection(int id, BufferPair fboPair) {
+            return false;
+        }
+
+        public BufferPairConnection getOutputBufferPairConnection(int outputBufferPairId) {
+            return null;
+        }
+
+        public BufferPairConnection getInputBufferPairConnection(int inputBufferPairId) {
+            return null;
+        }
+
+        public boolean addInputRunOrderConnection(RunOrderConnection from, int inputId) {
+            return false;
+        }
+
+        public boolean addOutputRunOrderConnection(int outputId) {
+            return false;
+        }
+
+        public RunOrderConnection getOutputRunOrderConnection(int outputId) {
+            return null;
+        }
+
+        public RunOrderConnection getInputRunOrderConnection(int inputId) {
+            return null;
+        }
+
+        public Name getAka() {
+            return new Name("test");
+        }
+
+        public Map<String, DependencyConnection> getInputConnections() {
+            return Maps.newHashMap();
+        }
+
+        public Map<String, DependencyConnection> getOutputConnections() {
+            return Maps.newHashMap();
+        }
+
+        public void setInputConnections(Map<String, DependencyConnection> inputConnections) {
+
+        }
+
+        public void setOutputConnections(Map<String, DependencyConnection> outputConnections) {
+
+        }
+
+        public void postInit(Context context) {
+            setDependencies(context);
+        }
+
+        public boolean addOutputFboConnection(int id) {
+            return false;
+        }
+
+        public boolean addOutputBufferPairConnection(int id) {
+            return false;
+        }
+
+        public boolean addOutputBufferPairConnection(int id, BufferPairConnection bufferPairConnection) {
+            return false;
+        }
+
+        public boolean addOutputBufferPairConnection(int id, BufferPair bufferPair) {
+            return false;
+        }
+
+        public void removeFboConnection(int id, DependencyConnection.Type type) {
+
+        }
+
+        public void removeBufferPairConnection(int id, DependencyConnection.Type type) {
+
+        }
+
+        public void removeRunOrderConnection(int id, DependencyConnection.Type type) {
+
+        }
     }
 
     private class AlphaNode extends DummyNode {
@@ -155,6 +289,11 @@ public class RenderTaskListGeneratorTest {
 
         @Override
         public void process() { }
+
+        @Override
+        public void setDependencies(Context context) {
+
+        }
     }
 
     private class BravoNode extends DummyNode {
@@ -165,6 +304,11 @@ public class RenderTaskListGeneratorTest {
 
         @Override
         public void process() { }
+
+        @Override
+        public void setDependencies(Context context) {
+
+        }
     }
 
     private class CharlieNode extends DummyNode {
@@ -175,6 +319,11 @@ public class RenderTaskListGeneratorTest {
 
         @Override
         public void process() { }
+
+        @Override
+        public void setDependencies(Context context) {
+
+        }
     }
 
     private class DeltaNode extends DummyNode {
@@ -185,6 +334,11 @@ public class RenderTaskListGeneratorTest {
 
         @Override
         public void process() { }
+
+        @Override
+        public void setDependencies(Context context) {
+
+        }
     }
 
     private class EchoNode extends DummyNode {
@@ -194,6 +348,11 @@ public class RenderTaskListGeneratorTest {
 
         @Override
         public void process() { }
+
+        @Override
+        public void setDependencies(Context context) {
+
+        }
     }
 
     // TODO: Add new tests with varying state changes

@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 MovingBlocks
+ * Copyright 2020 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,9 @@
  */
 package org.terasology.logic.players;
 
+import org.joml.Math;
 import org.joml.Quaternionf;
+import org.joml.Vector3f;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.engine.SimpleUri;
@@ -52,20 +54,17 @@ import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.characters.CharacterHeldItemComponent;
 import org.terasology.logic.characters.CharacterMoveInputEvent;
 import org.terasology.logic.characters.CharacterMovementComponent;
-import org.terasology.logic.characters.GazeMountPointComponent;
 import org.terasology.logic.characters.MovementMode;
 import org.terasology.logic.characters.events.OnItemUseEvent;
+import org.terasology.logic.characters.events.ScaleToRequest;
 import org.terasology.logic.characters.interactions.InteractionUtil;
-import org.terasology.logic.debug.MovementDebugCommands;
 import org.terasology.logic.delay.DelayManager;
 import org.terasology.logic.location.LocationComponent;
+import org.terasology.logic.players.event.LocalPlayerInitializedEvent;
 import org.terasology.logic.players.event.OnPlayerSpawnedEvent;
 import org.terasology.math.AABB;
-import org.terasology.math.Direction;
 import org.terasology.math.JomlUtil;
 import org.terasology.math.TeraMath;
-import org.terasology.math.geom.Quat4f;
-import org.terasology.math.geom.Vector3f;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
@@ -94,9 +93,6 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
     private LocalPlayer localPlayer;
     @In
     private WorldProvider worldProvider;
-    private Camera playerCamera;
-    @In
-    private MovementDebugCommands movementDebugCommands;
     @In
     private PhysicsEngine physics;
     @In
@@ -109,6 +105,9 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
 
     @In
     private BindsManager bindsManager;
+
+    private Camera playerCamera;
+    private boolean localPlayerInitialized = false;
 
     private float bobFactor;
     private float lastStepDelta;
@@ -123,9 +122,9 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
 
     private boolean jump;
     private float lookPitch;
-    private float lookPitchDelta;
+    private double lookPitchDelta;
     private float lookYaw;
-    private float lookYawDelta;
+    private double lookYawDelta;
 
     @In
     private Time time;
@@ -142,35 +141,38 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
 
     @Override
     public void update(float delta) {
-        if (!localPlayer.isValid()) {
-            return;
+        if (!localPlayerInitialized && localPlayer.isValid()) {
+            localPlayer.getClientEntity().send(new LocalPlayerInitializedEvent());
+            localPlayerInitialized = true;
         }
 
-        EntityRef entity = localPlayer.getCharacterEntity();
-        CharacterMovementComponent characterMovementComponent = entity.getComponent(CharacterMovementComponent.class);
+        if (localPlayerInitialized) {
+            EntityRef entity = localPlayer.getCharacterEntity();
+            CharacterMovementComponent characterMovementComponent = entity.getComponent(CharacterMovementComponent.class);
 
-        processInput(entity, characterMovementComponent);
-        updateCamera(characterMovementComponent, localPlayer.getViewPosition(), JomlUtil.from(localPlayer.getViewRotation()));
+            processInput(entity, characterMovementComponent);
+            updateCamera(characterMovementComponent, localPlayer.getViewPosition(new Vector3f()), localPlayer.getViewRotation(new Quaternionf()));
+        }
     }
 
     private void processInput(EntityRef entity, CharacterMovementComponent characterMovementComponent) {
-        lookYaw = (lookYaw - lookYawDelta) % 360;
+        lookYaw = (float) ((lookYaw - lookYawDelta) % 360);
         lookYawDelta = 0f;
-        lookPitch = TeraMath.clamp(lookPitch + lookPitchDelta, -89, 89);
+        lookPitch = (float) Math.clamp(-89, 89,lookPitch + lookPitchDelta);
         lookPitchDelta = 0f;
 
         Vector3f relMove = new Vector3f(relativeMovement);
         relMove.y = 0;
 
-        Quat4f viewRotation;
+        Quaternionf viewRotation =  new Quaternionf();
         switch (characterMovementComponent.mode) {
             case CROUCHING:
             case WALKING:
                 if (!config.getRendering().isVrSupport()) {
-                    viewRotation = new Quat4f(TeraMath.DEG_TO_RAD * lookYaw, 0, 0);
+                    viewRotation.rotationYXZ(Math.toRadians(lookYaw), 0, 0);
                     playerCamera.setOrientation(viewRotation);
                 }
-                playerCamera.getOrientation().rotate(relMove, relMove);
+                playerCamera.getOrientation(new Quaternionf()).transform(relMove);
                 break;
             case CLIMBING:
                 // Rotation is applied in KinematicCharacterMover
@@ -178,16 +180,16 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
                 break;
             default:
                 if (!config.getRendering().isVrSupport()) {
-                    viewRotation = new Quat4f(TeraMath.DEG_TO_RAD * lookYaw, TeraMath.DEG_TO_RAD * lookPitch, 0);
+                    viewRotation.rotationYXZ(Math.toRadians(lookYaw), Math.toRadians(lookPitch), 0);
                     playerCamera.setOrientation(viewRotation);
                 }
-                playerCamera.getOrientation().rotate(relMove, relMove);
+                playerCamera.getOrientation(new Quaternionf()).transform(relMove);
                 relMove.y += relativeMovement.y;
                 break;
         }
         // For some reason, Quat4f.rotate is returning NaN for valid inputs. This prevents those NaNs from causing trouble down the line.
-        if (!Float.isNaN(relMove.getX()) && !Float.isNaN(relMove.getY()) && !Float.isNaN(relMove.getZ())) {
-            entity.send(new CharacterMoveInputEvent(inputSequenceNumber++, lookPitch, lookYaw, relMove, run, crouch, jump, time.getGameDeltaInMs()));
+        if (relMove.isFinite()) {
+            entity.send(new CharacterMoveInputEvent(inputSequenceNumber++, lookPitch, lookYaw, JomlUtil.from(relMove), run, crouch, jump, time.getGameDeltaInMs()));
         }
         jump = false;
     }
@@ -234,14 +236,9 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
     @ReceiveEvent
     public void onPlayerSpawn(OnPlayerSpawnedEvent event, EntityRef character) {
         if (character.equals(localPlayer.getCharacterEntity())) {
-
-            // Change height as per PlayerSettings
-            Float height = config.getPlayer().getHeight();
-            movementDebugCommands.playerHeight(localPlayer.getClientEntity(), height);
-            // Change eyeHeight as per PlayerSettings
-            Float eyeHeight = config.getPlayer().getEyeHeight();
-            GazeMountPointComponent gazeMountPointComponent = character.getComponent(GazeMountPointComponent.class);
-            gazeMountPointComponent.translate = new Vector3f(0, eyeHeight, 0);
+            // update character height as given in player settings
+            ScaleToRequest scaleRequest = new ScaleToRequest(config.getPlayer().getHeight());
+            localPlayer.getCharacterEntity().send(scaleRequest);
 
             // Trigger updating the player camera position as soon as the local player is spawned.
             // This is not done while the game is still loading, since systems are not updated.
@@ -288,7 +285,7 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
 
     @ReceiveEvent(components = {ClientComponent.class})
     public void updateForwardsMovement(ForwardsMovementAxis event, EntityRef entity) {
-        relativeMovement.z = event.getValue();
+        relativeMovement.z = (float) event.getValue();
         if (relativeMovement.z == 0f && isAutoMove) {
             stopAutoMove();
         }
@@ -297,31 +294,31 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
 
     @ReceiveEvent(components = {ClientComponent.class})
     public void updateStrafeMovement(StrafeMovementAxis event, EntityRef entity) {
-        relativeMovement.x = event.getValue();
+        relativeMovement.x =  (float)event.getValue();
         event.consume();
     }
 
     @ReceiveEvent(components = {ClientComponent.class})
     public void updateVerticalMovement(VerticalMovementAxis event, EntityRef entity) {
-        relativeMovement.y = event.getValue();
+        relativeMovement.y = (float) event.getValue();
         event.consume();
     }
 
     @ReceiveEvent(components = {ClientComponent.class})
     public void updateForwardsMovement(ForwardsRealMovementAxis event, EntityRef entity) {
-        relativeMovement.z = event.getValue();
+        relativeMovement.z =  (float)event.getValue();
         event.consume();
     }
 
     @ReceiveEvent(components = {ClientComponent.class})
     public void updateStrafeMovement(StrafeRealMovementAxis event, EntityRef entity) {
-        relativeMovement.x = event.getValue();
+        relativeMovement.x = (float) event.getValue();
         event.consume();
     }
 
     @ReceiveEvent(components = {ClientComponent.class})
     public void updateVerticalMovement(VerticalRealMovementAxis event, EntityRef entity) {
-        relativeMovement.y = event.getValue();
+        relativeMovement.y =  (float)event.getValue();
         event.consume();
     }
 
@@ -379,9 +376,9 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
                 BlockComponent blockComp = target.getComponent(BlockComponent.class);
                 BlockRegionComponent blockRegion = target.getComponent(BlockRegionComponent.class);
                 if (blockComp != null || blockRegion != null) {
-                    Vector3f blockPos = location.getWorldPosition();
+                    Vector3f blockPos = location.getWorldPosition(new Vector3f());
                     Block block = worldProvider.getBlock(blockPos);
-                    aabb = block.getBounds(blockPos);
+                    aabb = JomlUtil.from(block.getBounds(blockPos));
                 } else {
                     MeshComponent mesh = target.getComponent(MeshComponent.class);
                     if (mesh != null && mesh.mesh != null) {
@@ -415,9 +412,8 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
     }
 
     private void updateCamera(CharacterMovementComponent charMovementComp, Vector3f position, Quaternionf rotation) {
-        playerCamera.getPosition().set(JomlUtil.from(position));
-        Vector3f viewDir = Direction.FORWARD.getVector3f();
-        rotation.transform(JomlUtil.from(viewDir), playerCamera.getViewingDirection());
+        playerCamera.getPosition().set(position);
+        playerCamera.setOrientation(JomlUtil.from(rotation));
 
         float stepDelta = charMovementComp.footstepDelta - lastStepDelta;
         if (stepDelta < 0) {

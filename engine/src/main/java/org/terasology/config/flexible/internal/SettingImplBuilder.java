@@ -17,7 +17,6 @@ package org.terasology.config.flexible.internal;
 
 import org.terasology.config.flexible.Setting;
 import org.terasology.config.flexible.constraints.SettingConstraint;
-import org.terasology.engine.SimpleUri;
 import org.terasology.reflection.TypeInfo;
 
 public class SettingImplBuilder<T> implements SettingBuilder<T> {

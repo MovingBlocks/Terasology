@@ -16,14 +16,8 @@
 
 package org.terasology.utilities;
 
-import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.File;
-import java.lang.reflect.Field;
-import java.nio.file.Path;
-import java.util.List;
 
 /**
  */
@@ -37,31 +31,6 @@ public final class NativeHelper {
     private NativeHelper() {
     }
 
-    public static void addLibraryPath(Path libPath) {
-        try {
-            String envPath = System.getProperty("java.library.path");
-
-            if (envPath == null || envPath.isEmpty()) {
-                System.setProperty("java.library.path", libPath.toAbsolutePath().toString());
-            } else {
-                System.setProperty("java.library.path", libPath.toAbsolutePath().toString() + File.pathSeparator + envPath);
-            }
-
-            final Field usrPathsField = ClassLoader.class.getDeclaredField("usr_paths");
-            usrPathsField.setAccessible(true);
-
-            List<String> paths = Lists.newArrayList((String[]) usrPathsField.get(null));
-            if (paths.contains(libPath.toAbsolutePath().toString())) {
-                return;
-            }
-            paths.add(0, libPath.toAbsolutePath().toString()); // Add to beginning, to override system libraries
-
-            usrPathsField.set(null, paths.toArray(new String[paths.size()]));
-        } catch (Exception e) {
-            logger.error("Couldn't link static libraries. ", e);
-            System.exit(1);
-        }
-    }
 
     public static boolean isWin64() {
 
@@ -113,7 +82,7 @@ public final class NativeHelper {
     }
 
     public static String getOpenVRLibPath() {
-        logger.debug("OS string" + OS.toString());
+        logger.debug("OS string" + OS);
         if (isWindows()) {
             return USER_DIRECTORY + "\\openvr_natives\\" + getOsString();
         }

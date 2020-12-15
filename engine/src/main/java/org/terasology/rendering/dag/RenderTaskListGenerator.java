@@ -82,7 +82,6 @@ public final class RenderTaskListGenerator {
      * @return an optimized list of RenderPipelineTask instances,
      *         ready to be iterated over to execute a frame worth of rendering
      */
-
     public List<RenderPipelineTask> generateFrom(List<Node> orderedNodes) {
 
         long startTimeInNanoSeconds = System.nanoTime();
@@ -180,7 +179,7 @@ public final class RenderTaskListGenerator {
 
         long endTimeInNanoSeconds = System.nanoTime();
 
-        if (logger.isDebugEnabled()) {
+        // if (logger.isDebugEnabled()) {
             logger.debug("===== INTERMEDIATE RENDERER LIST =========================");
             logIntermediateRendererListForDebugging(orderedNodes);
             logger.debug("===== RENDERER TASK LIST =================================");
@@ -190,7 +189,7 @@ public final class RenderTaskListGenerator {
             logger.debug(String.format("%s nodes, %s enabled - %s tasks (excluding marker tasks) out of %s potential tasks.",
                     nodeList.size(), enabledNodes, taskList.size() - enabledNodes, potentialTasks));
             logger.debug("----------------------------------------------------------");
-        }
+        // }
 
         return taskList;
     }

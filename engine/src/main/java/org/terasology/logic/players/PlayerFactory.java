@@ -15,6 +15,13 @@
  */
 package org.terasology.logic.players;
 
+import org.joml.Quaternionf;
+import org.joml.Vector2i;
+import org.joml.Vector2ic;
+import org.joml.Vector3f;
+import org.joml.Vector3fc;
+import org.joml.Vector3i;
+import org.joml.Vector3ic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.ComponentContainer;
@@ -22,21 +29,11 @@ import org.terasology.entitySystem.entity.EntityBuilder;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.characters.CharacterComponent;
+import org.terasology.logic.characters.CharacterMovementComponent;
 import org.terasology.logic.location.Location;
 import org.terasology.logic.location.LocationComponent;
-import org.terasology.math.AABB;
+import org.terasology.math.SpiralIterable;
 import org.terasology.math.TeraMath;
-import org.terasology.math.geom.BaseVector2i;
-import org.terasology.math.geom.Quat4f;
-import org.terasology.math.geom.SpiralIterable;
-import org.terasology.math.geom.Vector2i;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector3i;
-import org.terasology.physics.components.shapes.BoxShapeComponent;
-import org.terasology.physics.components.shapes.CapsuleShapeComponent;
-import org.terasology.physics.components.shapes.CylinderShapeComponent;
-import org.terasology.physics.components.shapes.HullShapeComponent;
-import org.terasology.physics.components.shapes.SphereShapeComponent;
 import org.terasology.world.WorldProvider;
 
 import java.util.Optional;
@@ -81,7 +78,7 @@ public class PlayerFactory {
 
         EntityRef player = builder.build();
 
-        Location.attachChild(player, controller, new Vector3f(), new Quat4f(0, 0, 0, 1));
+        Location.attachChild(player, controller, new Vector3f(), new Quaternionf(0, 0, 0, 1));
 
         return player;
     }
@@ -90,51 +87,32 @@ public class PlayerFactory {
         EntityBuilder builder = entityManager.newBuilder("engine:player");
         float extraSpace = 0.5f;  // spawn a little bit above the ground
         float entityHeight = getHeightOf(builder) + extraSpace;
-        return findSpawnPos(locationComponent.getWorldPosition(), entityHeight).get(); // TODO: Handle Optional being empty
+        return findSpawnPos(locationComponent.getWorldPosition(new Vector3f()), entityHeight)
+                // TODO: Handle Optional being empty
+                .orElseThrow(() -> new RuntimeException("Failed to find an acceptable spawn location."));
     }
 
     private float getHeightOf(ComponentContainer prefab) {
-        BoxShapeComponent box = prefab.getComponent(BoxShapeComponent.class);
-        if (box != null) {
-            return box.extents.getY();
+        CharacterMovementComponent movementComponent = prefab.getComponent(CharacterMovementComponent.class);
+        if (movementComponent != null) {
+            return movementComponent.height;
         }
 
-        CylinderShapeComponent cylinder = prefab.getComponent(CylinderShapeComponent.class);
-        if (cylinder != null) {
-            return cylinder.height;
-        }
-
-        CapsuleShapeComponent capsule = prefab.getComponent(CapsuleShapeComponent.class);
-        if (capsule != null) {
-            return capsule.height;
-        }
-
-        SphereShapeComponent sphere = prefab.getComponent(SphereShapeComponent.class);
-        if (sphere != null) {
-            return sphere.radius * 2.0f;
-        }
-
-        HullShapeComponent hull = prefab.getComponent(HullShapeComponent.class);
-        if (hull != null) {
-            AABB aabb = hull.sourceMesh.getAABB();
-            return aabb.maxY() - aabb.minY();
-        }
-
-        logger.warn("entity {} does not have any known extent specification - using default", prefab);
+        logger.warn("entity {} does not have a CharacterMovementComponent - using default height", prefab);
         return 1.0f;
     }
 
-    private Optional<Vector3f> findSpawnPos(Vector3f targetPos, float entityHeight) {
-        int targetBlockX = TeraMath.floorToInt(targetPos.x);
-        int targetBlockY = TeraMath.floorToInt(targetPos.y);
-        int targetBlockZ = TeraMath.floorToInt(targetPos.z);
+    private Optional<Vector3f> findSpawnPos(Vector3fc targetPos, float entityHeight) {
+        int targetBlockX = TeraMath.floorToInt(targetPos.x());
+        int targetBlockY = TeraMath.floorToInt(targetPos.y());
+        int targetBlockZ = TeraMath.floorToInt(targetPos.z());
         Vector2i center = new Vector2i(targetBlockX, targetBlockZ);
-        for (BaseVector2i pos : SpiralIterable.clockwise(center).maxRadius(32).scale(2).build()) {
+        for (Vector2ic pos : SpiralIterable.clockwise(center).maxRadius(32).scale(2).build()) {
 
-            Vector3i testPos = new Vector3i(pos.getX(), targetBlockY, pos.getY());
+            Vector3i testPos = new Vector3i(pos.x(), targetBlockY, pos.y());
             Vector3i spawnPos = findOpenVerticalPosition(testPos, entityHeight);
             if (spawnPos != null) {
-                return Optional.of(new Vector3f(spawnPos.getX(), spawnPos.getY() + entityHeight, spawnPos.getZ()));
+                return Optional.of(new Vector3f(spawnPos.x(), spawnPos.y() + entityHeight, spawnPos.z()));
             }
         }
         return Optional.empty();
@@ -146,7 +124,7 @@ public class PlayerFactory {
      * @param height the height of the entity to spawn
      * @return the topmost solid block <code>null</code> if none was found
      */
-    private Vector3i findOpenVerticalPosition(Vector3i spawnPos, float height) {
+    private Vector3i findOpenVerticalPosition(Vector3ic spawnPos, float height) {
         int consecutiveAirBlocks = 0;
         Vector3i newSpawnPos = new Vector3i(spawnPos);
 
@@ -160,7 +138,7 @@ public class PlayerFactory {
                 }
 
                 if (consecutiveAirBlocks >= height) {
-                    newSpawnPos.subY(consecutiveAirBlocks);
+                    newSpawnPos.y -= consecutiveAirBlocks;
                     return newSpawnPos;
                 }
                 newSpawnPos.add(0, 1, 0);

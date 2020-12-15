@@ -48,6 +48,11 @@ public class ShaderManagerHeadless implements ShaderManager {
     }
 
     @Override
+    public Material addShaderProgram(String title, String providingModule) {
+        return null;
+    }
+
+    @Override
     public void enableDefault() {
         // Do nothing
     }

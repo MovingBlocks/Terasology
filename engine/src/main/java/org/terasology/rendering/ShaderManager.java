@@ -30,6 +30,8 @@ public interface ShaderManager {
 
     void recompileAllShaders();
 
+    Material addShaderProgram(String title, String providingModule);
+
     /**
      * Enables the default shader program.
      */

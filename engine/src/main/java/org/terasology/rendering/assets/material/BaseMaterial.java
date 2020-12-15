@@ -242,9 +242,19 @@ public abstract class BaseMaterial extends Material {
 
     @Override
     public void setMatrix4(String name, FloatBuffer buffer) {
-        setMatrix3(name, buffer, false);
+        setMatrix4(name, buffer, false);
     }
 
+    /**
+     * writes camera into the local material and they include the uniforms listed below:
+     * <pre>{@code
+     * uniform mat4 viewMatrix;
+     * uniform mat4 projMatrix;
+     * uniform mat4 viewProjMatrix;
+     * uniform mat4 invProjMatrix;
+     * }</pre>
+     * @param camera camera to write into material
+     */
     @Override
     public void setCamera(Camera camera) {
         setMatrix4("viewMatrix", camera.getViewMatrix(), true);

@@ -80,6 +80,16 @@ public class HorizontalFamily extends AbstractBlockFamily implements SideDefined
     }
 
     @Override
+    public Block getBlockForPlacement(BlockPlacementData data) {
+        if (data.attachmentSide.isHorizontal()) {
+            return blocks.get(data.attachmentSide);
+        } else {
+            Side secondaryDirection = Side.inDirection(-data.viewingDirection.x(), 0, -data.viewingDirection.z());
+            return blocks.get(secondaryDirection);
+        }
+    }
+
+    @Override
     public Block getBlockForPlacement(Vector3i location, Side attachmentSide, Side direction) {
         if (attachmentSide.isHorizontal()) {
             return blocks.get(attachmentSide);

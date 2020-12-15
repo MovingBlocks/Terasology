@@ -18,14 +18,16 @@ package org.terasology.particles.functions.generators;
 import org.terasology.particles.ParticleData;
 import org.terasology.particles.ParticleDataMask;
 import org.terasology.particles.components.generators.ScaleRangeGeneratorComponent;
+import org.terasology.particles.functions.RegisterParticleSystemFunction;
 import org.terasology.utilities.random.Random;
 
 /**
  * Created by Linus on 11-3-2015.
  */
+@RegisterParticleSystemFunction()
 public final class ScaleRangeGeneratorFunction extends GeneratorFunction<ScaleRangeGeneratorComponent> {
     public ScaleRangeGeneratorFunction() {
-        super(ScaleRangeGeneratorComponent.class, ParticleDataMask.SCALE);
+        super(ParticleDataMask.SCALE);
     }
 
     @Override

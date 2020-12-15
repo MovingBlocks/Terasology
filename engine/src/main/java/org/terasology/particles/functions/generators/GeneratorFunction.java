@@ -27,8 +27,8 @@ import org.terasology.utilities.random.Random;
  */
 @API
 public abstract class GeneratorFunction<T extends Component> extends ParticleSystemFunction<T> {
-    public GeneratorFunction(Class<T> component, ParticleDataMask dataMask, ParticleDataMask... dataMasks) {
-        super(component, dataMask, dataMasks);
+    public GeneratorFunction(ParticleDataMask dataMask, ParticleDataMask... dataMasks) {
+        super(dataMask, dataMasks);
     }
 
     public abstract void onEmission(T component, ParticleData particleData, Random random);

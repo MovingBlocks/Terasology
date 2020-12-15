@@ -49,7 +49,7 @@ public abstract class AbstractFullWorldView implements PropagatorWorldView {
     public byte getValueAt(Vector3i pos) {
         LitChunk chunk = getChunk(pos);
         if (chunk != null) {
-            return getValueAt(chunk, ChunkMath.calcBlockPos(pos.x, pos.y, pos.z));
+            return getValueAt(chunk, ChunkMath.calcRelativeBlockPos(pos.x, pos.y, pos.z));
         }
         return UNAVAILABLE;
     }
@@ -65,7 +65,7 @@ public abstract class AbstractFullWorldView implements PropagatorWorldView {
 
     @Override
     public void setValueAt(Vector3i pos, byte value) {
-        setValueAt(getChunk(pos), ChunkMath.calcBlockPos(pos.x, pos.y, pos.z), value);
+        setValueAt(getChunk(pos), ChunkMath.calcRelativeBlockPos(pos.x, pos.y, pos.z), value);
         for (Vector3i affectedChunkPos : ChunkMath.getChunkRegionAroundWorldPos(pos, 1)) {
             Chunk dirtiedChunk = chunkProvider.getChunk(affectedChunkPos);
             if (dirtiedChunk != null) {
@@ -87,7 +87,7 @@ public abstract class AbstractFullWorldView implements PropagatorWorldView {
     public Block getBlockAt(Vector3i pos) {
         CoreChunk chunk = chunkProvider.getChunk(ChunkMath.calcChunkPos(pos));
         if (chunk != null) {
-            return chunk.getBlock(ChunkMath.calcBlockPos(pos));
+            return chunk.getBlock(ChunkMath.calcRelativeBlockPos(pos));
         }
         return null;
     }

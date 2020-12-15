@@ -1,18 +1,5 @@
-/*
- * Copyright 2013 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.world.internal;
 
@@ -21,14 +8,15 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.joml.Vector3ic;
 import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.math.ChunkMath;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.Region3i;
 import org.terasology.math.geom.Vector3i;
-import org.terasology.world.OnChangedBlock;
 import org.terasology.world.WorldChangeListener;
 import org.terasology.world.WorldComponent;
 import org.terasology.world.block.Block;
@@ -38,7 +26,6 @@ import org.terasology.world.chunks.CoreChunk;
 import org.terasology.world.chunks.LitChunk;
 import org.terasology.world.chunks.ManagedChunk;
 import org.terasology.world.chunks.RenderableChunk;
-import org.terasology.world.chunks.internal.GeneratingChunkProvider;
 import org.terasology.world.propagation.BatchPropagator;
 import org.terasology.world.propagation.BlockChange;
 import org.terasology.world.propagation.PropagationRules;
@@ -71,19 +58,19 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
     private String seed = "";
     private SimpleUri worldGenerator;
 
-    private GeneratingChunkProvider chunkProvider;
+    private ChunkProvider chunkProvider;
     private WorldTime worldTime;
     private EntityManager entityManager;
 
     private final List<WorldChangeListener> listeners = Lists.newArrayList();
 
-    private Map<Vector3i, BlockChange> blockChanges = Maps.newHashMap();
+    private final Map<Vector3i, BlockChange> blockChanges = Maps.newHashMap();
     private List<BatchPropagator> propagators = Lists.newArrayList();
 
     private Block unloadedBlock;
 
     public WorldProviderCoreImpl(String title, String customTitle, String seed, long time, SimpleUri worldGenerator,
-                                 GeneratingChunkProvider chunkProvider, Block unloadedBlock, Context context) {
+                                 ChunkProvider chunkProvider, Block unloadedBlock, Context context) {
         this.title = (title == null) ? seed : title;
         this.customTitle = customTitle;
         this.seed = seed;
@@ -105,7 +92,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
         propagators.add(sunlightPropagator);
     }
 
-    public WorldProviderCoreImpl(WorldInfo info, GeneratingChunkProvider chunkProvider, Block unloadedBlock,
+    public WorldProviderCoreImpl(WorldInfo info, ChunkProvider chunkProvider, Block unloadedBlock,
                                  Context context) {
         this(info.getTitle(), info.getCustomTitle(), info.getSeed(), info.getTime(), info.getWorldGenerator(), chunkProvider,
                 unloadedBlock, context);
@@ -184,23 +171,28 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
 
     @Override
     public Block setBlock(Vector3i worldPos, Block type) {
+       return this.setBlock(JomlUtil.from(worldPos),type);
+    }
+
+    @Override
+    public Block setBlock(Vector3ic worldPos, Block type) {
         /*
          * Hint: This method has a benchmark available in the BenchmarkScreen, The screen can be opened ingame via the
          * command "showSCreen BenchmarkScreen".
          */
-        Vector3i chunkPos = ChunkMath.calcChunkPos(worldPos);
+        Vector3i chunkPos = ChunkMath.calcChunkPos(JomlUtil.from(worldPos));
         CoreChunk chunk = chunkProvider.getChunk(chunkPos);
         if (chunk != null) {
-            Vector3i blockPos = ChunkMath.calcBlockPos(worldPos);
+            Vector3i blockPos = ChunkMath.calcRelativeBlockPos(JomlUtil.from(worldPos));
             Block oldBlockType = chunk.setBlock(blockPos, type);
             if (oldBlockType != type) {
-                BlockChange oldChange = blockChanges.get(worldPos);
+                BlockChange oldChange = blockChanges.get(JomlUtil.from(worldPos));
                 if (oldChange == null) {
-                    blockChanges.put(worldPos, new BlockChange(worldPos, oldBlockType, type));
+                    blockChanges.put(JomlUtil.from(worldPos), new BlockChange(worldPos, oldBlockType, type));
                 } else {
                     oldChange.setTo(type);
                 }
-                setDirtyChunksNear(worldPos);
+                setDirtyChunksNear(JomlUtil.from(worldPos));
                 notifyBlockChanged(worldPos, type, oldBlockType);
             }
             return oldBlockType;
@@ -225,17 +217,17 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
 
             if (chunk != null) {
                 Block type = entry.getValue();
-                Vector3i blockPos = ChunkMath.calcBlockPos(worldPos);
+                Vector3i blockPos = ChunkMath.calcRelativeBlockPos(worldPos);
                 Block oldBlockType = chunk.setBlock(blockPos, type);
                 if (oldBlockType != type) {
                     BlockChange oldChange = blockChanges.get(worldPos);
                     if (oldChange == null) {
-                        blockChanges.put(worldPos, new BlockChange(worldPos, oldBlockType, type));
+                        blockChanges.put(worldPos, new BlockChange(JomlUtil.from(worldPos), oldBlockType, type));
                     } else {
                         oldChange.setTo(type);
                     }
                     setDirtyChunksNear(worldPos);
-                    changedBlocks.add(new BlockChange(worldPos, oldBlockType, type));
+                    changedBlocks.add(new BlockChange(JomlUtil.from(worldPos), oldBlockType, type));
                 }
                 result.put(worldPos, oldBlockType);
             } else {
@@ -249,7 +241,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
 
         return result;
     }
-    
+
     private void setDirtyChunksNear(Vector3i pos0) {
         for (Vector3i pos : ChunkMath.getChunkRegionAroundWorldPos(pos0, 1)) {
             RenderableChunk dirtiedChunk = chunkProvider.getChunk(pos);
@@ -259,7 +251,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
         }
     }
 
-    private void notifyBlockChanged(Vector3i pos, Block type, Block oldType) {
+    private void notifyBlockChanged(Vector3ic pos, Block type, Block oldType) {
         // TODO: Could use a read/write writeLock.
         // TODO: Review, should only happen on main thread (as should changes to listeners)
         synchronized (listeners) {
@@ -268,8 +260,8 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
             }
         }
     }
-    
-    private void notifyExtraDataChanged(int index, Vector3i pos, int newData, int oldData) {
+
+    private void notifyExtraDataChanged(int index, Vector3ic pos, int newData, int oldData) {
         // TODO: Change to match block , if those changes are made.
         synchronized (listeners) {
             for (WorldChangeListener listener : listeners) {
@@ -292,7 +284,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
         Vector3i chunkPos = ChunkMath.calcChunkPos(x, y, z);
         LitChunk chunk = chunkProvider.getChunk(chunkPos);
         if (chunk != null) {
-            Vector3i blockPos = ChunkMath.calcBlockPos(x, y, z);
+            Vector3i blockPos = ChunkMath.calcRelativeBlockPos(x, y, z);
             return chunk.getLight(blockPos);
         }
         return 0;
@@ -303,7 +295,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
         Vector3i chunkPos = ChunkMath.calcChunkPos(x, y, z);
         LitChunk chunk = chunkProvider.getChunk(chunkPos);
         if (chunk != null) {
-            Vector3i blockPos = ChunkMath.calcBlockPos(x, y, z);
+            Vector3i blockPos = ChunkMath.calcRelativeBlockPos(x, y, z);
             return chunk.getSunlight(blockPos);
         }
         return 0;
@@ -314,7 +306,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
         Vector3i chunkPos = ChunkMath.calcChunkPos(x, y, z);
         LitChunk chunk = chunkProvider.getChunk(chunkPos);
         if (chunk != null) {
-            Vector3i blockPos = ChunkMath.calcBlockPos(x, y, z);
+            Vector3i blockPos = ChunkMath.calcRelativeBlockPos(x, y, z);
             return (byte) Math.max(chunk.getSunlight(blockPos), chunk.getLight(blockPos));
         }
         return 0;
@@ -334,12 +326,12 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
         Vector3i chunkPos = ChunkMath.calcChunkPos(worldPos);
         CoreChunk chunk = chunkProvider.getChunk(chunkPos);
         if (chunk != null) {
-            Vector3i blockPos = ChunkMath.calcBlockPos(worldPos);
+            Vector3i blockPos = ChunkMath.calcRelativeBlockPos(worldPos);
             int oldValue = chunk.getExtraData(index, blockPos.x, blockPos.y, blockPos.z);
             chunk.setExtraData(index, blockPos.x, blockPos.y, blockPos.z, value);
             if (oldValue != value) {
                 setDirtyChunksNear(worldPos);
-                notifyExtraDataChanged(index, worldPos, value, oldValue);
+                notifyExtraDataChanged(index, JomlUtil.from(worldPos), value, oldValue);
             }
             return oldValue;
         }

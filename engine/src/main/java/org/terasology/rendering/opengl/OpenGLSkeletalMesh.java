@@ -26,6 +26,7 @@ import org.terasology.assets.ResourceUrn;
 import org.terasology.engine.GameThread;
 import org.terasology.engine.subsystem.lwjgl.GLBufferPool;
 import org.terasology.math.AABB;
+import org.terasology.math.geom.Matrix4f;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector2f;
 import org.terasology.math.geom.Vector3f;
@@ -63,8 +64,8 @@ public class OpenGLSkeletalMesh extends SkeletalMesh {
 
     private SkeletalMeshData data;
 
-    private Vector3f scale;
-    private Vector3f translate;
+    private org.joml.Vector3f scale;
+    private org.joml.Vector3f translate;
 
     private DisposalAction disposalAction;
 
@@ -75,7 +76,7 @@ public class OpenGLSkeletalMesh extends SkeletalMesh {
         reload(data);
     }
 
-    public void setScaleTranslate(Vector3f newScale, Vector3f newTranslate) {
+    public void setScaleTranslate(org.joml.Vector3f newScale, org.joml.Vector3f newTranslate) {
         this.scale = newScale;
         this.translate = newTranslate;
     }
@@ -166,9 +167,9 @@ public class OpenGLSkeletalMesh extends SkeletalMesh {
         postRender();
     }
 
-    public void render(List<Vector3f> bonePositions, List<Quat4f> boneRotations) {
+    public void render(List<Matrix4f> boneTransforms) {
         preRender();
-        doRender(data.getVertexPositions(bonePositions, boneRotations), data.getVertexNormals(bonePositions, boneRotations));
+        doRender(data.getVertexPositions(boneTransforms), data.getVertexNormals(boneTransforms));
         postRender();
     }
 

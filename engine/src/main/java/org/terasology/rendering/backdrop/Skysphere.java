@@ -15,15 +15,15 @@
  */
 package org.terasology.rendering.backdrop;
 
+import org.joml.Vector3f;
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.util.glu.Sphere;
 import org.terasology.context.Context;
+import org.terasology.nui.properties.Range;
+import org.terasology.rendering.primitives.Sphere;
 import org.terasology.utilities.Assets;
 import org.terasology.math.TeraMath;
-import org.terasology.math.geom.Vector3f;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.cameras.Camera;
-import org.terasology.rendering.nui.properties.Range;
 import org.terasology.world.sun.CelestialSystem;
 
 import static org.lwjgl.opengl.GL11.GL_BACK;
@@ -107,7 +107,7 @@ public class Skysphere implements BackdropProvider, BackdropRenderer {
         float daylight = 1.0f;
 
         if (angle < 24.0f) {
-            daylight = 1.0f - (24.0f - angle) / 24.0f;
+            daylight = Math.max(1.0f - (24.0f - angle) / 24.0f, 0.15f);
         }
 
         return daylight;
@@ -130,7 +130,7 @@ public class Skysphere implements BackdropProvider, BackdropRenderer {
 
         // Moonlight flip
         if (moonlightFlip && sunDirection.y < 0.0f) {
-            sunDirection.scale(-1.0f);
+            sunDirection.mul(-1.0f);
         }
 
         return sunDirection;

@@ -29,17 +29,21 @@ import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.format.AbstractAssetFileFormat;
 import org.terasology.assets.format.AssetDataFile;
 import org.terasology.assets.module.annotations.RegisterAssetFileFormat;
+import org.terasology.nui.skin.UISkin;
+import org.terasology.nui.skin.UISkinBuilder;
+import org.terasology.nui.skin.UISkinData;
+import org.terasology.nui.skin.UIStyleFragment;
 import org.terasology.persistence.ModuleContext;
 import org.terasology.persistence.typeHandling.extensionTypes.ColorTypeHandler;
 import org.terasology.persistence.typeHandling.gson.GsonTypeHandlerAdapterFactory;
 import org.terasology.reflection.metadata.ClassLibrary;
 import org.terasology.reflection.metadata.ClassMetadata;
 import org.terasology.registry.CoreRegistry;
-import org.terasology.rendering.assets.font.Font;
-import org.terasology.rendering.assets.texture.TextureRegion;
-import org.terasology.rendering.nui.Color;
+import org.terasology.nui.asset.font.Font;
+import org.terasology.nui.UITextureRegion;
+import org.terasology.nui.Color;
 import org.terasology.rendering.nui.NUIManager;
-import org.terasology.rendering.nui.UIWidget;
+import org.terasology.nui.UIWidget;
 import org.terasology.utilities.Assets;
 import org.terasology.utilities.gson.AssetTypeAdapter;
 import org.terasology.utilities.gson.CaseInsensitiveEnumTypeAdapterFactory;
@@ -63,9 +67,9 @@ public class UISkinFormat extends AbstractAssetFileFormat<UISkinData> {
         super("skin");
         gson = new GsonBuilder()
             .registerTypeAdapterFactory(new CaseInsensitiveEnumTypeAdapterFactory())
-            .registerTypeAdapter(Font.class, new AssetTypeAdapter<>(Font.class))
+            .registerTypeAdapter(Font.class, new AssetTypeAdapter<>(org.terasology.rendering.assets.font.Font.class))
             .registerTypeAdapter(UISkinData.class, new UISkinTypeAdapter())
-            .registerTypeAdapter(TextureRegion.class, new TextureRegionTypeAdapter())
+            .registerTypeAdapter(UITextureRegion.class, new TextureRegionTypeAdapter())
             .registerTypeAdapterFactory(new GsonTypeHandlerAdapterFactory() {
                 {
                     addTypeHandler(Color.class, new ColorTypeHandler());
@@ -91,10 +95,10 @@ public class UISkinFormat extends AbstractAssetFileFormat<UISkinData> {
         return gson.fromJson(element, UISkinData.class);
     }
 
-    private static class TextureRegionTypeAdapter implements JsonDeserializer<TextureRegion> {
+    private static class TextureRegionTypeAdapter implements JsonDeserializer<UITextureRegion> {
 
         @Override
-        public TextureRegion deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+        public UITextureRegion deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
             String uri = json.getAsString();
             return Assets.getTextureRegion(uri).orElse(null);
         }

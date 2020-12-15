@@ -15,6 +15,8 @@
  */
 package org.terasology.physics.engine;
 
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.Time;
@@ -31,8 +33,7 @@ import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.location.LocationResynchEvent;
-import org.terasology.math.geom.Quat4f;
-import org.terasology.math.geom.Vector3f;
+import org.terasology.math.JomlUtil;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.network.NetworkComponent;
 import org.terasology.network.NetworkSystem;
@@ -146,7 +147,7 @@ public class PhysicsSystem extends BaseComponentSystem implements UpdateSubscrib
 
     @ReceiveEvent(components = {BlockComponent.class})
     public void onBlockAltered(OnChangedBlock event, EntityRef entity) {
-        physics.awakenArea(event.getBlockPosition().toVector3f(), 0.6f);
+        physics.awakenArea(new Vector3f(event.getBlockPosition()), 0.6f);
     }
 
     @ReceiveEvent
@@ -195,8 +196,7 @@ public class PhysicsSystem extends BaseComponentSystem implements UpdateSubscrib
                 body.getLinearVelocity(comp.velocity);
                 body.getAngularVelocity(comp.angularVelocity);
 
-                Vector3f vLocation = Vector3f.zero();
-                body.getLocation(vLocation);
+                Vector3f vLocation = body.getLocation(new org.joml.Vector3f());
 
                 Vector3f vDirection = new Vector3f(comp.velocity);
                 float fDistanceThisFrame = vDirection.length();
@@ -256,7 +256,7 @@ public class PhysicsSystem extends BaseComponentSystem implements UpdateSubscrib
                 short bCollidesWith = getCollidesWithGroupFlag(pair.b);
                 if ((aCollisionGroup & bCollidesWith) != 0
                         || (pair.a.hasComponent(BlockComponent.class) && !pair.b.hasComponent(BlockComponent.class))) {
-                    pair.b.send(new CollideEvent(pair.a, pair.pointB, pair.pointA, pair.distance, new Vector3f(pair.normal).invert()));
+                    pair.b.send(new CollideEvent(pair.a, pair.pointB, pair.pointA, pair.distance, new Vector3f(pair.normal).mul(-1.0f)));
                 }
             }
         }
@@ -300,7 +300,7 @@ public class PhysicsSystem extends BaseComponentSystem implements UpdateSubscrib
                 //TODO after implementing rigidbody interface
                 RigidBody body = physics.getRigidBody(entity);
                 if (body.isActive()) {
-                    entity.send(new LocationResynchEvent(body.getLocation(new Vector3f()), body.getOrientation(new Quat4f())));
+                    entity.send(new LocationResynchEvent(body.getLocation(new Vector3f()), body.getOrientation(new Quaternionf())));
                     entity.send(new PhysicsResynchEvent(body.getLinearVelocity(new Vector3f()), body.getAngularVelocity(new Vector3f())));
                 }
             }

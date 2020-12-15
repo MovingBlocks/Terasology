@@ -19,16 +19,19 @@ package org.terasology.math;
 import org.joml.Matrix3fc;
 import org.joml.Matrix4fc;
 import org.lwjgl.BufferUtils;
+import org.terasology.math.geom.BaseMatrix4f;
 import org.terasology.math.geom.Matrix3f;
 import org.terasology.math.geom.Matrix4f;
-import org.terasology.math.geom.Vector3f;
+import org.terasology.math.geom.Quat4f;
 
+import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 
 /**
  * Collection of matrix utilities.
  *
  */
+@Deprecated
 public final class MatrixUtils {
 
     private MatrixUtils() {
@@ -40,14 +43,19 @@ public final class MatrixUtils {
      *
      * @param m the matrix to copy
      * @return A new FloatBuffer containing the matrix in column-major form.
-     * @deprecated used JOML method that uses Matrix4fc
+     * @deprecated used JOML method that uses {@link Matrix4fc}
      */
+    @Deprecated
     public static FloatBuffer matrixToFloatBuffer(Matrix4f m) {
         FloatBuffer buffer = BufferUtils.createFloatBuffer(16);
         matrixToFloatBuffer(m, buffer);
         return buffer;
     }
 
+    /**
+     * @deprecated used JOML method that uses {@link Matrix4fc}
+     */
+    @Deprecated
     public static FloatBuffer matrixToFloatBuffer(Matrix4fc m) {
         return m.getTransposed(BufferUtils.createFloatBuffer(16));
     }
@@ -59,14 +67,20 @@ public final class MatrixUtils {
      *
      * @param m the matrix to copy
      * @return A new FloatBuffer containing the matrix in column-major form.
-     * @deprecated used JOML method that uses Matrix3fc
+     * @deprecated used JOML method that uses {@link Matrix3fc}
      */
+    @Deprecated
     public static FloatBuffer matrixToFloatBuffer(Matrix3f m) {
         FloatBuffer buffer = BufferUtils.createFloatBuffer(9);
         matrixToFloatBuffer(m, buffer);
         return buffer;
     }
 
+    /**
+     * @deprecated This is scheduled for removal in an upcoming version
+     *      method will be replaced with JOML implementation {@link Matrix3fc#get(ByteBuffer)}
+     */
+    @Deprecated
     public static FloatBuffer matrixToFloatBuffer(Matrix3fc m) {
         return m.getTransposed(BufferUtils.createFloatBuffer(9));
     }
@@ -78,7 +92,9 @@ public final class MatrixUtils {
      * @param m  the matrix to copy
      * @param fb the float buffer to copy the matrix into
      * @return The provided float buffer.
+     * @deprecated This is being replaced with JOML methods
      */
+    @Deprecated
     public static FloatBuffer matrixToFloatBuffer(Matrix3f m, FloatBuffer fb) {
         fb.put(m.m00);
         fb.put(m.m10);
@@ -101,7 +117,9 @@ public final class MatrixUtils {
      * @param m  the matrix to copy
      * @param fb the float buffer to copy the matrix into
      * @return The provided float buffer.
+     * @deprecated This is being replaced with JOML methods
      */
+    @Deprecated
     public static FloatBuffer matrixToFloatBuffer(Matrix4f m, FloatBuffer fb) {
         fb.put(m.m00);
         fb.put(m.m10);
@@ -124,10 +142,22 @@ public final class MatrixUtils {
         return fb;
     }
 
+    /**
+     *
+     * @deprecated This is scheduled for removal in an upcoming version
+     *          method will be replaced with JOML implementation {@link org.joml.Matrix4f#setLookAt(float, float, float, float, float, float, float, float, float)}.
+     */
+    @Deprecated
     public static org.joml.Matrix4f createViewMatrix(float eyeX, float eyeY, float eyeZ, float centerX, float centerY, float centerZ, float upX, float upY, float upZ) {
         return createViewMatrix(new org.joml.Vector3f(eyeX, eyeY, eyeZ), new org.joml.Vector3f(centerX, centerY, centerZ), new org.joml.Vector3f(upX, upY, upZ));
     }
 
+    /**
+     *
+     * @deprecated This is scheduled for removal in an upcoming version
+     *          method will be replaced with JOML implementation {@link org.joml.Matrix4f#setLookAt(float, float, float, float, float, float, float, float, float)}.
+     */
+    @Deprecated
     public static org.joml.Matrix4f createViewMatrix(org.joml.Vector3f eye, org.joml.Vector3f center, org.joml.Vector3f up) {
         org.joml.Matrix4f m = new org.joml.Matrix4f();
 
@@ -172,6 +202,12 @@ public final class MatrixUtils {
     }
 
 
+    /**
+     *
+     * @deprecated This is scheduled for removal in an upcoming version
+     *          method will be replaced with JOML implementation {@link org.joml.Matrix4f#setOrtho(float, float, float, float, float, float)}.
+     */
+    @Deprecated
     public static org.joml.Matrix4f createOrthogonalProjectionMatrix(float left, float right, float top, float bottom, float near, float far) {
         org.joml.Matrix4f m = new org.joml.Matrix4f();
 
@@ -204,6 +240,12 @@ public final class MatrixUtils {
         return m;
     }
 
+    /**
+     *
+     * @deprecated This is scheduled for removal in an upcoming version
+     *          method will be replaced with JOML implementation {@link org.joml.Matrix4f#setPerspective(float, float, float, float)}.
+     */
+    @Deprecated
     public static org.joml.Matrix4f createPerspectiveProjectionMatrix(float fovY, float aspectRatio, float zNear, float zFar) {
         org.joml.Matrix4f m = new org.joml.Matrix4f();
 
@@ -231,16 +273,43 @@ public final class MatrixUtils {
         return m;
     }
 
+    /**
+     *
+     * @deprecated This is scheduled for removal in an upcoming version use JOML multiplication.
+     */
+    @Deprecated
     public static org.joml.Matrix4f calcViewProjectionMatrix(org.joml.Matrix4f vm, org.joml.Matrix4f p) {
         return new org.joml.Matrix4f(p).mul(vm);
     }
 
+    /**
+     *
+     * @deprecated This is scheduled for removal in an upcoming version use JOML multiplication.
+     */
+    @Deprecated
     public static Matrix4f calcModelViewMatrix(Matrix4f m, Matrix4f vm) {
         Matrix4f result = new Matrix4f();
         result.mul(m, vm);
         return result;
     }
 
+    /**
+     *
+     * @deprecated This is scheduled for removal in an upcoming version use JOML multiplication.
+     */
+    @Deprecated
+    public static Matrix4f calcModelViewMatrix(Matrix4fc m, Matrix4f vm) {
+        Matrix4f result = new Matrix4f(JomlUtil.from(m));
+        result.transpose();
+        result.mul(vm);
+        return result;
+    }
+
+    /**
+     * @return This is scheduled for removal in an upcoming version use JOML get3x3 invert and transpose.
+     * @deprecated This is scheduled for removal in an upcoming version use JOML methods.
+     */
+    @Deprecated
     public static Matrix3f calcNormalMatrix(Matrix4f mv) {
         Matrix3f result = new Matrix3f();
         result.m00 = mv.m00;
@@ -256,5 +325,22 @@ public final class MatrixUtils {
         result.invert();
         result.transpose();
         return result;
+    }
+
+    /**
+     * This method pulls out the rotation component of a transformation matrix - that is a matrix
+     * which is the composition of a translation, rotation and scale. It will produce odd results
+     * on other matrices.
+     * It works by determining and removing the scale element (which is represented along the diagonal
+     * of the matrix - the rotation part of the matrix remains on upper left 3x3 portion of the matrix
+     * (translation is on the fourth column). See
+     * <a href="https://en.wikipedia.org/wiki/Rotation_matrix">Rotation matrix</a>
+     * @param m The transformation matrix to extract rotation from
+     * @return The rotation component of a transformation matrix
+     */
+    public static Quat4f extractRotation(BaseMatrix4f m) {
+        float w = (float) (Math.sqrt(1 + m.getM00() + m.getM11() + m.getM22()) / 2.0f);
+        float denom = 4 * w;
+        return new Quat4f((m.getM21() - m.getM12()) / denom, (m.getM02() - m.getM20()) / denom, (m.getM10() - m.getM01()) / denom, w);
     }
 }

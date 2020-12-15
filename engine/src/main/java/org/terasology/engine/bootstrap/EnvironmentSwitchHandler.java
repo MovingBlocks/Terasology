@@ -1,26 +1,13 @@
-/*
- * Copyright 2018 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *  http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.bootstrap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.module.ModuleAwareAssetTypeManager;
 import org.terasology.config.flexible.AutoConfigManager;
 import org.terasology.context.Context;
-import org.terasology.engine.SimpleUri;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
@@ -37,13 +24,16 @@ import org.terasology.persistence.typeHandling.RegisterTypeHandlerFactory;
 import org.terasology.persistence.typeHandling.TypeHandler;
 import org.terasology.persistence.typeHandling.TypeHandlerFactory;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
+import org.terasology.persistence.typeHandling.TypeHandlerLibraryImpl;
 import org.terasology.persistence.typeHandling.extensionTypes.CollisionGroupTypeHandler;
 import org.terasology.physics.CollisionGroup;
 import org.terasology.physics.CollisionGroupManager;
+import org.terasology.reflection.TypeInfo;
 import org.terasology.reflection.TypeRegistry;
 import org.terasology.reflection.copy.CopyStrategy;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.copy.RegisterCopyStrategy;
+import org.terasology.reflection.reflect.ReflectFactory;
 import org.terasology.registry.InjectionHelper;
 import org.terasology.util.reflection.GenericsUtil;
 import org.terasology.utilities.ReflectionUtil;
@@ -85,8 +75,14 @@ public final class EnvironmentSwitchHandler {
             }
         }
 
-        TypeHandlerLibrary typeHandlerLibrary = context.get(TypeHandlerLibrary.class);
+        //TODO: find a permanent fix over just creating a new typehandler
+        // https://github.com/Terasology/JoshariasSurvival/issues/31
+        // TypeHandlerLibrary typeHandlerLibrary = context.get(TypeHandlerLibrary.class);
+        // typeHandlerLibrary.addTypeHandler(CollisionGroup.class, new CollisionGroupTypeHandler(context.get(CollisionGroupManager.class)));
+
+        TypeHandlerLibrary typeHandlerLibrary = TypeHandlerLibraryImpl.forModuleEnvironment(moduleManager, typeRegistry);
         typeHandlerLibrary.addTypeHandler(CollisionGroup.class, new CollisionGroupTypeHandler(context.get(CollisionGroupManager.class)));
+        context.put(TypeHandlerLibrary.class, typeHandlerLibrary);
 
         // Entity System Library
         EntitySystemLibrary library = new EntitySystemLibrary(context, typeHandlerLibrary);
@@ -147,7 +143,7 @@ public final class EnvironmentSwitchHandler {
 
     public void handleSwitchToPreviewEnvironment(Context context, ModuleEnvironment environment) {
         cheapAssetManagerUpdate(context, environment);
-        ComponentLibrary library = new ComponentLibrary(context);
+        ComponentLibrary library = new ComponentLibrary(environment, context.get(ReflectFactory.class), context.get(CopyStrategyLibrary.class));
         context.put(ComponentLibrary.class, library);
 
         registerComponents(library, environment);
@@ -181,7 +177,7 @@ public final class EnvironmentSwitchHandler {
         for (Class<? extends Component> componentType : environment.getSubtypesOf(Component.class)) {
             if (componentType.getAnnotation(DoNotAutoRegister.class) == null) {
                 String componentName = MetadataUtil.getComponentClassName(componentType);
-                library.register(new SimpleUri(environment.getModuleProviding(componentType), componentName), componentType);
+                library.register(new ResourceUrn(environment.getModuleProviding(componentType).toString(), componentName), componentType);
             }
         }
     }
@@ -195,7 +191,7 @@ public final class EnvironmentSwitchHandler {
                 if (opt.isPresent()) {
                     TypeHandler instance = InjectionHelper.createWithConstructorInjection(handler, context);
                     InjectionHelper.inject(instance, context);
-                    library.addTypeHandler((Class) opt.get(), instance);
+                    library.addTypeHandler(TypeInfo.of(opt.get()), instance);
                 }
             }
         }

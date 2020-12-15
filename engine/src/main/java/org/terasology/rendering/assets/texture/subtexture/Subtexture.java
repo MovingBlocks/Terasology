@@ -15,13 +15,15 @@
  */
 package org.terasology.rendering.assets.texture.subtexture;
 
+import org.joml.Rectanglef;
+import org.joml.Rectanglei;
+import org.joml.Vector2i;
 import org.terasology.assets.Asset;
 import org.terasology.assets.AssetType;
 import org.terasology.assets.ResourceUrn;
-import org.terasology.math.geom.Rect2f;
-import org.terasology.math.geom.Rect2i;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.TeraMath;
-import org.terasology.math.geom.Vector2i;
+import org.terasology.math.geom.Rect2f;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.TextureRegionAsset;
 
@@ -62,13 +64,14 @@ public class Subtexture extends TextureRegionAsset<SubtextureData> {
     }
 
     @Override
-    public Rect2f getRegion() {
-        return subregion;
+    public Rectanglef getRegion() {
+        return JomlUtil.from(subregion);
     }
 
     @Override
-    public Rect2i getPixelRegion() {
-        return Rect2i.createFromMinAndSize(TeraMath.floorToInt(subregion.minX() * texture.getWidth()),
+    public Rectanglei getPixelRegion() {
+        return JomlUtil.rectangleiFromMinAndSize(
+                TeraMath.floorToInt(subregion.minX() * texture.getWidth()),
                 TeraMath.floorToInt(subregion.minY() * texture.getHeight()), getWidth(), getHeight());
     }
 

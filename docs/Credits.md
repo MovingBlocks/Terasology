@@ -275,7 +275,12 @@ Contributors
  [PAndaContron](https://github.com/PAndaContron),
  [sin3point14](https://github.com/sin3point14),
  [agent-q1](https://github.com/agent-q1),
- [otradovec](https://github.com/otradovec)
+ [otradovec](https://github.com/otradovec),
+ [jankeromnes](https://github.com/jankeromnes),
+ [wytrem](https://github.com/wytrem),
+ [ayrustogaru](https://github.com/ayrustogaru),
+ [IsaiahBlanks](https://github.com/IsaiahBlanks),
+ [Elyahu41](https://github.com/Elyahu41)
 * GUI Team:
  [Anton "small-jeeper" Kireev](https://github.com/small-jeeper),
  [miniME89](https://github.com/miniME89),

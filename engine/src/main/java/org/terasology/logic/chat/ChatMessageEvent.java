@@ -24,8 +24,9 @@ import org.terasology.logic.players.PlayerUtil;
 import org.terasology.network.OwnerEvent;
 
 /**
- * A chat message
- *
+ * Indicate that a message should be printed to the chat console.
+ * <p>
+ * Needs to be sent against a client entity, e.g., the targeted entity should have a {@link org.terasology.network.ClientComponent}.
  */
 @OwnerEvent
 public class ChatMessageEvent implements MessageEvent {
@@ -35,6 +36,17 @@ public class ChatMessageEvent implements MessageEvent {
     protected ChatMessageEvent() {
     }
 
+    /**
+     * A chat message is associated with the entity that sent it.
+     * <p>
+     * This entity may often be a player, but it can be any entity with a {@link org.terasology.logic.common.DisplayNameComponent}.
+     * If the entity also has a {@link org.terasology.network.ColorComponent}, the sender's name will be colorized.
+     * <p>
+     * Note: The exact representation of sender and message is up to the processing system.
+     *
+     * @param message the message to display in the chat console
+     * @param from    the sender of this message (should have a display name component)
+     */
     public ChatMessageEvent(String message, EntityRef from) {
         this.message = message;
         this.from = from;

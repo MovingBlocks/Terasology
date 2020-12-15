@@ -15,9 +15,11 @@
  */
 package org.terasology.engine.subsystem.lwjgl;
 
-import org.lwjgl.opengl.KHRDebugCallback;
+import org.lwjgl.system.MemoryUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Locale;
 
 import static org.lwjgl.opengl.GL43.GL_DEBUG_SEVERITY_HIGH;
 import static org.lwjgl.opengl.GL43.GL_DEBUG_SEVERITY_LOW;
@@ -42,14 +44,19 @@ import static org.lwjgl.opengl.GL43.GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR;
 /**
  * Callback used by the OpenGL driver to output additional debug information about our use of the API.
  */
-class DebugCallback implements KHRDebugCallback.Handler {
+public class DebugCallback implements org.lwjgl.opengl.GLDebugMessageCallbackI {
 
     private static final Logger logger = LoggerFactory.getLogger("OpenGL");
 
     @Override
-    public void handleMessage(int source, int type, int id, int severity, String message) {
-        String logFormat = "[{}] [{}] {}";
-        Object[] args = new Object[]{getSourceString(source), getTypeString(type), message};
+    public void invoke(int source, int type, int id, int severity, int length, long message, long userParam) {
+        String logFormat = "[{}] [{}] [{}] {}";
+        Object[] args = new Object[]{
+                "0x" + Integer.toHexString(id).toUpperCase(Locale.ROOT),
+                getSourceString(source),
+                getTypeString(type),
+                MemoryUtil.memASCII(message).trim()
+        };
 
         switch (severity) {
             case GL_DEBUG_SEVERITY_HIGH:

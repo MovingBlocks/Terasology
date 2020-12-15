@@ -1,21 +1,9 @@
-/*
- * Copyright 2017 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.engine.bootstrap;
 
+import org.terasology.assets.ResourceUrn;
 import org.terasology.audio.events.PlaySoundEvent;
 import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
@@ -40,7 +28,9 @@ import org.terasology.input.events.InputEvent;
 import org.terasology.logic.characters.CharacterMoveInputEvent;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.network.NetworkSystem;
+import org.terasology.nui.properties.OneOfProviderFactory;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
+import org.terasology.persistence.typeHandling.TypeHandlerLibraryImpl;
 import org.terasology.persistence.typeHandling.extensionTypes.EntityRefTypeHandler;
 import org.terasology.recording.CharacterStateEventPositionMap;
 import org.terasology.recording.DirectionAndOriginPosRecorderList;
@@ -55,7 +45,6 @@ import org.terasology.reflection.TypeRegistry;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.reflect.ReflectFactory;
 import org.terasology.reflection.reflect.ReflectionReflectFactory;
-import org.terasology.rendering.nui.properties.OneOfProviderFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -78,7 +67,7 @@ public final class EntitySystemSetupUtil {
 
         ModuleManager moduleManager = context.get(ModuleManager.class);
         TypeRegistry typeRegistry = context.get(TypeRegistry.class);
-        TypeHandlerLibrary typeHandlerLibrary = TypeHandlerLibrary.forModuleEnvironment(moduleManager, typeRegistry);
+        TypeHandlerLibrary typeHandlerLibrary = TypeHandlerLibraryImpl.forModuleEnvironment(moduleManager, typeRegistry);
         context.put(TypeHandlerLibrary.class, typeHandlerLibrary);
 
         EntitySystemLibrary library = new EntitySystemLibrary(context, typeHandlerLibrary);
@@ -171,7 +160,7 @@ public final class EntitySystemSetupUtil {
         for (Class<? extends Component> componentType : environment.getSubtypesOf(Component.class)) {
             if (componentType.getAnnotation(DoNotAutoRegister.class) == null) {
                 String componentName = MetadataUtil.getComponentClassName(componentType);
-                library.register(new SimpleUri(environment.getModuleProviding(componentType), componentName), componentType);
+                library.register(new ResourceUrn(environment.getModuleProviding(componentType).toString(), componentName), componentType);
             }
         }
     }

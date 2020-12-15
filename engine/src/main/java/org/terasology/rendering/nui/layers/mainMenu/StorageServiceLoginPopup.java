@@ -21,9 +21,9 @@ import org.terasology.i18n.TranslationSystem;
 import org.terasology.identity.storageServiceClient.StorageServiceWorker;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
-import org.terasology.rendering.nui.WidgetUtil;
-import org.terasology.rendering.nui.widgets.UILabel;
-import org.terasology.rendering.nui.widgets.UIText;
+import org.terasology.nui.WidgetUtil;
+import org.terasology.nui.widgets.UILabel;
+import org.terasology.nui.widgets.UIText;
 
 import java.net.MalformedURLException;
 import java.net.URL;

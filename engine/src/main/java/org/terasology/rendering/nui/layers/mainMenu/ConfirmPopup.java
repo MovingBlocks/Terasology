@@ -17,8 +17,8 @@ package org.terasology.rendering.nui.layers.mainMenu;
 
 import org.terasology.assets.ResourceUrn;
 import org.terasology.rendering.nui.CoreScreenLayer;
-import org.terasology.rendering.nui.WidgetUtil;
-import org.terasology.rendering.nui.widgets.UILabel;
+import org.terasology.nui.WidgetUtil;
+import org.terasology.nui.widgets.UILabel;
 
 /**
  * Ask the user to confirm or cancel an action.

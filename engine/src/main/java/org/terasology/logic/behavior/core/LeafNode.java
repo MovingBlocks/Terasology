@@ -15,7 +15,7 @@
  */
 package org.terasology.logic.behavior.core;
 
-import org.terasology.rendering.nui.properties.PropertyProvider;
+import org.terasology.nui.properties.PropertyProvider;
 
 /**
  * Node without children.

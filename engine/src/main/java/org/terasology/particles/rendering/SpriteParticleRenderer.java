@@ -15,6 +15,10 @@
  */
 package org.terasology.particles.rendering;
 
+import org.joml.Matrix4f;
+import org.joml.Vector3f;
+import org.lwjgl.BufferUtils;
+import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.terasology.engine.subsystem.DisplayDevice;
@@ -22,15 +26,15 @@ import org.terasology.engine.subsystem.lwjgl.LwjglDisplayDevice;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.RenderSystem;
-import org.terasology.math.JomlUtil;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.particles.ParticlePool;
 import org.terasology.particles.ParticleSystemManager;
 import org.terasology.particles.components.ParticleDataSpriteComponent;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
+import org.terasology.rendering.cameras.PerspectiveCamera;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.utilities.Assets;
+
+import java.nio.FloatBuffer;
 
 import static org.lwjgl.opengl.GL11.GL_TRIANGLE_FAN;
 import static org.lwjgl.opengl.GL11.glBegin;
@@ -41,9 +45,6 @@ import static org.lwjgl.opengl.GL11.glEnd;
 import static org.lwjgl.opengl.GL11.glEndList;
 import static org.lwjgl.opengl.GL11.glGenLists;
 import static org.lwjgl.opengl.GL11.glNewList;
-import static org.lwjgl.opengl.GL11.glPopMatrix;
-import static org.lwjgl.opengl.GL11.glPushMatrix;
-import static org.lwjgl.opengl.GL11.glTranslatef;
 
 /**
  * ParticleRenderer for basic sprite particle systems.
@@ -52,6 +53,8 @@ import static org.lwjgl.opengl.GL11.glTranslatef;
 public class SpriteParticleRenderer implements RenderSystem {
 
     protected static final String PARTICLE_MATERIAL_URI = "engine:prog.particle";
+
+    private final FloatBuffer matrixBuffer = BufferUtils.createFloatBuffer(16);
 
     /**
      * Vertices of a unit quad on the xy plane, centered on the origin.
@@ -76,7 +79,6 @@ public class SpriteParticleRenderer implements RenderSystem {
 
     private DisplayList drawUnitQuad;
 
-
     public void finalize() throws Throwable {
         super.finalize();
         if (null != drawUnitQuad) {
@@ -90,55 +92,19 @@ public class SpriteParticleRenderer implements RenderSystem {
         }
     }
 
-    //"BIG" TODO: Have all of the work done in this method be done on the GPU by a shader. Use GPU instancing to just send some particle data after particles are already instanced and have the whole cloud rendered at once.
-    public void drawParticles(Material material, ParticleRenderingData<ParticleDataSpriteComponent> particleSystem, Vector3f camera) {
-        ParticlePool particlePool = particleSystem.particlePool;
+    public void drawParticles(Material material, ParticleRenderingData<ParticleDataSpriteComponent> particleSystem) {
+        ParticleDataSpriteComponent particleData = particleSystem.particleData;
 
-        material.setBoolean("useTexture", particleSystem.particleData.texture != null);
         if (particleSystem.particleData.texture != null) {
+            material.setBoolean("use_texture", true);
+            material.setFloat2("texture_size", particleData.textureSize);
+            material.setInt("texture_sampler", 0);
+
             GL13.glActiveTexture(GL13.GL_TEXTURE0);
-            glBindTexture(GL11.GL_TEXTURE_2D, particleSystem.particleData.texture.getId());
-
-            material.setFloat2("texSize", particleSystem.particleData.textureSize.getX(), particleSystem.particleData.textureSize.getY());
+            glBindTexture(GL11.GL_TEXTURE_2D, particleData.texture.getId());
         }
 
-        glPushMatrix();
-        glTranslatef(-camera.x(), -camera.y(), -camera.z());
-
-        for (int i = 0; i < particlePool.livingParticles(); i++) {
-            final int i2 = i * 2;
-            final int i3 = i * 3;
-            final int i4 = i * 4;
-
-            material.setFloat3("position",
-                    particlePool.position[i3],
-                    particlePool.position[i3 + 1],
-                    particlePool.position[i3 + 2]
-            );
-
-            material.setFloat3("scale",
-                    particlePool.scale[i3],
-                    particlePool.scale[i3 + 1],
-                    particlePool.scale[i3 + 2]
-            );
-
-            material.setFloat4("color",
-                    particlePool.color[i4],
-                    particlePool.color[i4 + 1],
-                    particlePool.color[i4 + 2],
-                    particlePool.color[i4 + 3]
-            );
-
-
-            material.setFloat2("texOffset",
-                    particlePool.textureOffset[i2],
-                    particlePool.textureOffset[i2 + 1]
-            );
-
-            drawUnitQuad.call();
-        }
-
-        glPopMatrix();
+        particleSystem.particlePool.draw();
     }
 
     @Override
@@ -148,11 +114,21 @@ public class SpriteParticleRenderer implements RenderSystem {
 
     @Override
     public void renderAlphaBlend() {
+        if(!GL.createCapabilities().OpenGL33) {
+            return;
+        }
+        PerspectiveCamera camera = (PerspectiveCamera) worldRenderer.getActiveCamera();
+        Vector3f cameraPosition = camera.getPosition();
+        Matrix4f viewProjection = new Matrix4f(camera.getViewProjectionMatrix())
+                .translate(-cameraPosition.x, -cameraPosition.y, -cameraPosition.z);
+
         Material material = Assets.getMaterial(PARTICLE_MATERIAL_URI).get();
         material.enable();
-        org.joml.Vector3f camPos = worldRenderer.getActiveCamera().getPosition();
+        material.setFloat3("camera_position", cameraPosition.x, cameraPosition.y, cameraPosition.z);
+        material.setMatrix4("view_projection", viewProjection.get(matrixBuffer));
 
-        particleSystemManager.getParticleEmittersByDataComponent(ParticleDataSpriteComponent.class).forEach(p -> drawParticles(material, p, JomlUtil.from(camPos)));
+        particleSystemManager.getParticleEmittersByDataComponent(ParticleDataSpriteComponent.class)
+                .forEach(particleSystem -> drawParticles(material, particleSystem));
     }
 
     @Override

@@ -30,8 +30,8 @@ import org.terasology.network.ClientComponent;
 import org.terasology.network.ClientInfoComponent;
 import org.terasology.network.ColorComponent;
 import org.terasology.network.NetworkSystem;
+import org.terasology.nui.Color;
 import org.terasology.registry.In;
-import org.terasology.rendering.nui.Color;
 
 
 /**
@@ -42,7 +42,7 @@ import org.terasology.rendering.nui.Color;
  */
 @RegisterSystem(RegisterMode.CLIENT)
 public class PlayerNameTagSystem extends BaseComponentSystem {
-    private static final Logger logger = LoggerFactory.getLogger(NameTagClientSystem.class);
+    private static final Logger logger = LoggerFactory.getLogger(PlayerNameTagSystem.class);
 
     @In
     private NetworkSystem networkSystem;

@@ -1,18 +1,5 @@
-/*
- * Copyright 2018 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.persistence.serializers;
 
 import com.google.common.collect.Lists;
@@ -21,11 +8,12 @@ import org.junit.jupiter.api.Test;
 import org.terasology.ModuleEnvironmentTest;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.naming.Name;
+import org.terasology.nui.Color;
 import org.terasology.persistence.ModuleContext;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
+import org.terasology.persistence.typeHandling.TypeHandlerLibraryImpl;
 import org.terasology.persistence.typeHandling.annotations.SerializedName;
 import org.terasology.reflection.TypeInfo;
-import org.terasology.rendering.nui.Color;
 
 import java.io.IOException;
 import java.util.List;
@@ -36,12 +24,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TypeSerializerTest extends ModuleEnvironmentTest {
     private static final SomeClass<Integer> INSTANCE = new SomeClass<>(0xdeadbeef);
-    private static final String INSTANCE_JSON = "{\"generic-t\":-559038737,\"list\":[50,51,-52,-53],\"animals\":[{\"class\":\"org.terasology.persistence.serializers.TypeSerializerTest$Dog\",\"tailPosition\":[3.15,54.51,-0.001],\"data\":{\"class\":\"java.lang.Integer\",\"content\":1}},{\"class\":\"org.terasology.persistence.serializers.TypeSerializerTest$Cheetah\",\"spotColor\":[255,0,255,255],\"data\":{\"class\":\"java.lang.Integer\",\"content\":2}}]}";
+    private static final String INSTANCE_JSON = "{\"generic-t\":-559038737,\"list\":[50,51,-52,-53],\"animals\":[{\"class\":\"org.terasology.persistence.serializers.TypeSerializerTest$Dog\",\"tailPosition\":[3.15,54.51,-0.001],\"headPosition\":[10.0,30.0,-0.001],\"data\":{\"class\":\"java.lang.Integer\",\"content\":1}},{\"class\":\"org.terasology.persistence.serializers.TypeSerializerTest$Cheetah\",\"spotColor\":[255,0,255,255],\"data\":{\"class\":\"java.lang.Integer\",\"content\":2}}]}";
 
     static {
         INSTANCE.list.addAll(Lists.newArrayList(50, 51, -52, -53));
 
-        INSTANCE.animals.add(new Dog<>(1, new Vector3f(3.15f, 54.51f, -0.001f)));
+        INSTANCE.animals.add(new Dog<>(1, new Vector3f(3.15f, 54.51f, -0.001f), new org.joml.Vector3f(10.0f,30.0f,-0.001f)));
 
         INSTANCE.animals.add(new Cheetah<>(2, Color.MAGENTA));
     }
@@ -54,7 +42,7 @@ public class TypeSerializerTest extends ModuleEnvironmentTest {
     public void setup() {
         ModuleContext.setContext(moduleManager.getEnvironment().get(new Name("unittest")));
 
-        typeHandlerLibrary = TypeHandlerLibrary.forModuleEnvironment(moduleManager, typeRegistry);
+        typeHandlerLibrary = TypeHandlerLibraryImpl.forModuleEnvironment(moduleManager, typeRegistry);
 
         protobufSerializer = new ProtobufSerializer(typeHandlerLibrary);
         gsonSerializer = new GsonSerializer(typeHandlerLibrary);
@@ -154,10 +142,12 @@ public class TypeSerializerTest extends ModuleEnvironmentTest {
 
     private static class Dog<T> extends Animal<T> {
         private final Vector3f tailPosition;
+        private final org.joml.Vector3f headPosition;
 
-        private Dog(T data, Vector3f tailPosition) {
+        private Dog(T data, Vector3f tailPosition,org.joml.Vector3f headPosition) {
             super(data);
             this.tailPosition = tailPosition;
+            this.headPosition = headPosition;
         }
 
         @Override
@@ -172,20 +162,21 @@ public class TypeSerializerTest extends ModuleEnvironmentTest {
                 return false;
             }
             Dog dog = (Dog) o;
-            return Objects.equals(tailPosition, dog.tailPosition);
+            return Objects.equals(tailPosition, dog.tailPosition) &&  Objects.equals(headPosition, dog.headPosition);
         }
 
         @Override
         public String toString() {
             return "Dog{" +
-                    "name='" + data + '\'' +
-                    ", tailPosition=" + tailPosition +
-                    '}';
+                "name='" + data + '\'' +
+                ", tailPosition=" + tailPosition +
+                ", headPosition=" + headPosition +
+                '}';
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(super.hashCode(), tailPosition);
+            return Objects.hash(super.hashCode(), tailPosition, headPosition);
         }
     }
 

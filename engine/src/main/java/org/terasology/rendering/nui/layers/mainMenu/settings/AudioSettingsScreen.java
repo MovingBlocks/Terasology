@@ -19,10 +19,10 @@ import org.terasology.assets.ResourceUrn;
 import org.terasology.config.AudioConfig;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
-import org.terasology.rendering.nui.WidgetUtil;
+import org.terasology.nui.WidgetUtil;
 import org.terasology.rendering.nui.animation.MenuAnimationSystems;
-import org.terasology.rendering.nui.databinding.Binding;
-import org.terasology.rendering.nui.widgets.UISlider;
+import org.terasology.nui.databinding.Binding;
+import org.terasology.nui.widgets.UISlider;
 
 /**
  */

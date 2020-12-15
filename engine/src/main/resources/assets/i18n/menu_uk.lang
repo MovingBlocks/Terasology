@@ -372,7 +372,6 @@
     "storage-service-sync-ok": "Синхронізацію завершено - %d завантажено, %d вивантажено, %d конфліктів.",
     "storage-service-sync-previous-conflicts": "Протягом останньої синхронізації виявлено конфлікти. Виправіть їх перед початком нової.",
     "storage-service-token-fail": "Не вдалось увійти зі збереженими токеном та URL - %s.",
-    "storage-service-token-not-present": "Немає даних для конфігурації, вхід не здійснено.",
     "storage-service-token-ok": "Вхід зі збереженими даними успішний.",
     "storage-service-upload-fail": "Не вдалось вивантажити ідентичності - %s.",
     "storage-service-upload-ok": "Вивантаження ідентичностей успішне.",
