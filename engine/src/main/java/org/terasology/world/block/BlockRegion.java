@@ -133,6 +133,16 @@ public class BlockRegion {
     }
 
     /**
+     * set source to current region
+     * @param source the source region
+     * @return this
+     */
+    public BlockRegion set(BlockRegion source) {
+        this.aabb.set(source.aabb);
+        return this;
+    }
+
+    /**
      * Sets the minimum coordinate of the first block for <code>this</code> {@link BlockRegion}
      *
      * @param min the first coordinate of the first block
@@ -436,12 +446,15 @@ public class BlockRegion {
     }
 
     /**
-     * the center of the region
+     * The center of the region if the region is valid, {@link Float#NaN} in all dimensions otherwise.
      *
      * @param dest will hold the result
      * @return dest
      */
     public Vector3f center(Vector3f dest) {
+        if (!this.isValid()) {
+            return dest.set(Float.NaN);
+        }
         return dest.set(
                 aabb.minX + ((aabb.maxX - aabb.minX) / 2.0f),
                 aabb.minY + ((aabb.maxY - aabb.minY) / 2.0f),

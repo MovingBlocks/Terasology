@@ -24,7 +24,6 @@ import org.terasology.config.Config;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.logic.players.LocalPlayer;
-import org.terasology.math.JomlUtil;
 import org.terasology.math.TeraMath;
 import org.terasology.physics.CollisionGroup;
 import org.terasology.physics.HitResult;
@@ -112,8 +111,8 @@ public class CameraTargetSystem extends BaseComponentSystem {
         }
 
 
-        HitResult hitInfo = physics.rayTrace(JomlUtil.from(localPlayer.getViewPosition()),
-            JomlUtil.from(localPlayer.getViewDirection()), targetDistance, filter);
+        HitResult hitInfo = physics.rayTrace(localPlayer.getViewPosition(new Vector3f()),
+            localPlayer.getViewDirection(new Vector3f()), targetDistance, filter);
         updateFocalDistance(hitInfo, delta);
         Vector3i newBlockPos = null;
 
@@ -144,7 +143,7 @@ public class CameraTargetSystem extends BaseComponentSystem {
         if (hitInfo.isHit()) {
             Vector3f playerToTargetRay = new Vector3f();
             //calculate the distance from the player to the hit point
-            hitInfo.getHitPoint().sub(JomlUtil.from(localPlayer.getViewPosition()), playerToTargetRay);
+            hitInfo.getHitPoint().sub(localPlayer.getViewPosition(new Vector3f()), playerToTargetRay);
             //gradually adjust focalDistance from it's current value to the hit point distance
             focalDistance = TeraMath.lerp(focalDistance, playerToTargetRay.length(), delta * focusRate);
             //if nothing was hit, gradually adjust the focusDistance to the maximum length of the update function trace
@@ -157,13 +156,15 @@ public class CameraTargetSystem extends BaseComponentSystem {
     public String toString() {
 
         if (targetBlockPos != null) {
+            Vector3f pos = localPlayer.getViewPosition(new Vector3f());
+            Vector3f dir = localPlayer.getViewDirection(new Vector3f());
             return String.format("From: %f %f %f, Dir: %f %f %f, Hit %d %d %d %f %f %f",
-                    localPlayer.getViewPosition().x,
-                    localPlayer.getViewPosition().y,
-                    localPlayer.getViewPosition().z,
-                    localPlayer.getViewDirection().x,
-                    localPlayer.getViewDirection().y,
-                    localPlayer.getViewDirection().z,
+                    pos.x,
+                    pos.y,
+                    pos.z,
+                    dir.x,
+                    dir.y,
+                    dir.z,
                     targetBlockPos.x,
                     targetBlockPos.y,
                     targetBlockPos.z,

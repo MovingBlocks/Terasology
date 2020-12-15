@@ -15,8 +15,8 @@
  */
 package org.terasology.recording;
 
+import org.joml.Vector3f;
 import org.terasology.logic.characters.CharacterStateEvent;
-import org.terasology.math.geom.Vector3f;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -28,7 +28,10 @@ import java.util.Map;
  */
 public class CharacterStateEventPositionMap {
 
-    /** Map in which the key is the "sequenceNumber" of the CharacterStateEvent and the value is an array with the "position" and "velocity" variables. */
+    /**
+     * Map in which the key is the "sequenceNumber" of the CharacterStateEvent and the value is an array with the
+     * "position" and "velocity" variables.
+     */
     private Map<Integer, Vector3f[]> idToData;
 
     public CharacterStateEventPositionMap() {
@@ -37,6 +40,7 @@ public class CharacterStateEventPositionMap {
 
     /**
      * Add a new "position" and "velocity" to the map.
+     *
      * @param sequenceNumber the sequenceNumber of the CharacterStateEvent.
      * @param position the position of the event.
      * @param velocity the velocity of the event.
@@ -66,6 +70,7 @@ public class CharacterStateEventPositionMap {
 
     /**
      * Used in a replay to update a CharacterStateEvent with the correct values of "position" and "velocity".
+     *
      * @param event the event to be updated.
      */
     public void updateCharacterStateEvent(CharacterStateEvent event) {
