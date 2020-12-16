@@ -26,10 +26,10 @@ public final class Serializer<D extends PersistedData> {
 
     private static final Logger logger = LoggerFactory.getLogger(Serializer.class);
 
-    protected final TypeHandlerLibrary typeHandlerLibrary;
-    protected final PersistedDataSerializer persistedDataSerializer;
-    protected final PersistedDataWriter<D> writer;
-    protected final PersistedDataReader<D> reader;
+    private final TypeHandlerLibrary typeHandlerLibrary;
+    private final PersistedDataSerializer persistedDataSerializer;
+    private final PersistedDataWriter<D> writer;
+    private final PersistedDataReader<D> reader;
 
     public Serializer(TypeHandlerLibrary typeHandlerLibrary, PersistedDataSerializer persistedDataSerializer,
                          PersistedDataWriter<D> writer, PersistedDataReader<D> reader) {
