@@ -15,6 +15,7 @@ import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.naming.Name;
+import org.terasology.persistence.serializers.Serializer;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.persistence.typeHandling.gson.GsonPersistedDataReader;
 import org.terasology.persistence.typeHandling.gson.GsonPersistedDataSerializer;
@@ -35,12 +36,12 @@ class AutoConfigManagerTest {
     private final Gson gson = new Gson();
 
     private final TypeHandlerLibrary typeHandlerLibrary = mock(TypeHandlerLibrary.class);
-    private final AutoConfigManager autoConfigManager = new AutoConfigManager(
-            typeHandlerLibrary, 
+    private final AutoConfigManager autoConfigManager = new AutoConfigManager(new Serializer<>(
+            typeHandlerLibrary,
+            new GsonPersistedDataSerializer(),
             new GsonPersistedDataWriter(gson),
-            new GsonPersistedDataReader(gson),
-            new GsonPersistedDataSerializer()
-    );
+            new GsonPersistedDataReader(gson)
+    ));
 
     private final Context context = mock(Context.class);
     private final ModuleManager moduleManager = mock(ModuleManager.class);

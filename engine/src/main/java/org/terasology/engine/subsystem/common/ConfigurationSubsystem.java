@@ -23,7 +23,9 @@ import org.terasology.identity.CertificatePair;
 import org.terasology.identity.PrivateIdentityCertificate;
 import org.terasology.identity.PublicIdentityCertificate;
 import org.terasology.identity.storageServiceClient.StorageServiceWorker;
+import org.terasology.persistence.serializers.Serializer;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
+import org.terasology.persistence.typeHandling.gson.GsonPersistedData;
 import org.terasology.persistence.typeHandling.gson.GsonPersistedDataReader;
 import org.terasology.persistence.typeHandling.gson.GsonPersistedDataSerializer;
 import org.terasology.persistence.typeHandling.gson.GsonPersistedDataWriter;
@@ -76,14 +78,15 @@ public class ConfigurationSubsystem implements EngineSubsystem {
     public void initialise(GameEngine engine, Context rootContext) {
         // TODO: Put here because of TypeHandlerLibrary dependency,
         //  might need to move to preInitialise or elsewhere
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
-
         TypeHandlerLibrary typeHandlerLibrary = rootContext.get(TypeHandlerLibrary.class);
-        autoConfigManager = new AutoConfigManager(typeHandlerLibrary,
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        Serializer<GsonPersistedData> serializer = new Serializer<>(
+                typeHandlerLibrary,
+                new GsonPersistedDataSerializer(),
                 new GsonPersistedDataWriter(gson),
-                new GsonPersistedDataReader(gson),
-                new GsonPersistedDataSerializer()
+                new GsonPersistedDataReader(gson)
         );
+        autoConfigManager = new AutoConfigManager(serializer);
         typeHandlerLibrary.addTypeHandlerFactory(new AutoConfigTypeHandlerFactory(typeHandlerLibrary));
         rootContext.put(AutoConfigManager.class, autoConfigManager);
 

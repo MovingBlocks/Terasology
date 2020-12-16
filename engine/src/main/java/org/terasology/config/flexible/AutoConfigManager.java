@@ -10,12 +10,8 @@ import org.terasology.engine.SimpleUri;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.module.ModuleEnvironment;
-import org.terasology.persistence.serializers.PersistedDataReader;
-import org.terasology.persistence.serializers.PersistedDataWriter;
-import org.terasology.persistence.typeHandling.PersistedData;
-import org.terasology.persistence.typeHandling.PersistedDataSerializer;
-import org.terasology.persistence.typeHandling.TypeHandler;
-import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
+import org.terasology.persistence.serializers.Serializer;
+import org.terasology.reflection.TypeInfo;
 import org.terasology.registry.InjectionHelper;
 import org.terasology.utilities.ReflectionUtil;
 
@@ -29,22 +25,14 @@ import java.nio.file.StandardOpenOption;
 import java.util.Optional;
 import java.util.Set;
 
-public class AutoConfigManager<T extends PersistedData> {
+public class AutoConfigManager {
     private static final Logger logger = LoggerFactory.getLogger(AutoConfigManager.class);
 
     private final Set<AutoConfig> loadedConfigs = Sets.newHashSet();
-    private final TypeHandlerLibrary typeHandlerLibrary;
-    private final PersistedDataWriter<T> persistedDataWriter;
-    private final PersistedDataReader<T> persistedDataReader;
-    private final PersistedDataSerializer persistedDataSerializer;
+    private final Serializer<?> serializer;
 
-    public AutoConfigManager(TypeHandlerLibrary typeHandlerLibrary, PersistedDataWriter<T> persistedDataWriter,
-                             PersistedDataReader<T> persistedDataReader,
-                             PersistedDataSerializer persistedDataSerializer) {
-        this.typeHandlerLibrary = typeHandlerLibrary;
-        this.persistedDataWriter = persistedDataWriter;
-        this.persistedDataReader = persistedDataReader;
-        this.persistedDataSerializer = persistedDataSerializer;
+    public AutoConfigManager(Serializer<?> serializer) {
+        this.serializer = serializer;
     }
 
     public void loadConfigsIn(Context context) {
@@ -86,8 +74,7 @@ public class AutoConfigManager<T extends PersistedData> {
             return;
         }
         try (InputStream inputStream = Files.newInputStream(configPath, StandardOpenOption.READ)) {
-            PersistedData persistedData = persistedDataReader.read(inputStream);
-            T loadedConfig = (T) typeHandlerLibrary.getTypeHandler(configClass).get().deserialize(persistedData).get();
+            T loadedConfig = (T) serializer.deserialize(TypeInfo.of(configClass), inputStream).get();
             mergeConfig(configClass, loadedConfig, config);
         } catch (IOException e) {
             logger.error("Error while loading config {} from disk", config.getId(), e);
@@ -98,10 +85,10 @@ public class AutoConfigManager<T extends PersistedData> {
         Set<Field> fields = AutoConfig.getSettingFieldsIn(configClass);
         for (Field field : fields) {
             try {
-                Object value = ((Setting)field.get(loadedConfig)).get();
-                ((Setting)field.get(config)).set(value);
+                Object value = ((Setting) field.get(loadedConfig)).get();
+                ((Setting) field.get(config)).set(value);
             } catch (IllegalAccessException e) {
-               // ignore `AutoConfig.getSettingFieldIn` returns PUBLIC fields
+                // ignore `AutoConfig.getSettingFieldIn` returns PUBLIC fields
             }
         }
     }
@@ -117,14 +104,8 @@ public class AutoConfigManager<T extends PersistedData> {
     private void saveConfigToDisk(AutoConfig config) {
         // TODO: Save when screen for config closed
         Path configPath = getConfigPath(config.getId());
-
-        TypeHandler<AutoConfig> typeHandler = (TypeHandler<AutoConfig>) typeHandlerLibrary
-                .getTypeHandler(config.getClass()).get();
-        T persistedData = (T) typeHandler
-                .serialize(config, persistedDataSerializer);
         try (OutputStream output = Files.newOutputStream(configPath, StandardOpenOption.CREATE)) {
-            persistedDataWriter.writeTo(persistedData, output);
-            output.flush();
+            serializer.serialize(config, TypeInfo.of(AutoConfig.class), output);
         } catch (IOException e) {
             logger.error("Error while saving config {} to disk", config.getId(), e);
         }
