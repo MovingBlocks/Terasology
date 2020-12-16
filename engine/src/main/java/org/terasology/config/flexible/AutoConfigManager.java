@@ -1,53 +1,50 @@
-/*
- * Copyright 2019 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.config.flexible;
 
 import com.google.common.collect.Sets;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
-import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.module.ModuleEnvironment;
+import org.terasology.persistence.serializers.PersistedDataReader;
+import org.terasology.persistence.serializers.PersistedDataWriter;
+import org.terasology.persistence.typeHandling.PersistedData;
+import org.terasology.persistence.typeHandling.PersistedDataSerializer;
+import org.terasology.persistence.typeHandling.TypeHandler;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.registry.InjectionHelper;
 import org.terasology.utilities.ReflectionUtil;
 
-import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.Reader;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.Optional;
 import java.util.Set;
 
-public class AutoConfigManager {
+public class AutoConfigManager<T extends PersistedData> {
     private static final Logger logger = LoggerFactory.getLogger(AutoConfigManager.class);
-    private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
     private final Set<AutoConfig> loadedConfigs = Sets.newHashSet();
     private final TypeHandlerLibrary typeHandlerLibrary;
+    private final PersistedDataWriter<T> persistedDataWriter;
+    private final PersistedDataReader<T> persistedDataReader;
+    private final PersistedDataSerializer persistedDataSerializer;
 
-    public AutoConfigManager(TypeHandlerLibrary typeHandlerLibrary) {
+    public AutoConfigManager(TypeHandlerLibrary typeHandlerLibrary, PersistedDataWriter<T> persistedDataWriter,
+                             PersistedDataReader<T> persistedDataReader,
+                             PersistedDataSerializer persistedDataSerializer) {
         this.typeHandlerLibrary = typeHandlerLibrary;
+        this.persistedDataWriter = persistedDataWriter;
+        this.persistedDataReader = persistedDataReader;
+        this.persistedDataSerializer = persistedDataSerializer;
     }
 
     public void loadConfigsIn(Context context) {
@@ -82,18 +79,30 @@ public class AutoConfigManager {
     }
 
     private <T extends AutoConfig> void loadSettingsFromDisk(Class<T> configClass, T config) {
-        AutoConfigSerializer<T> serializer = new AutoConfigSerializer<>(configClass, typeHandlerLibrary);
 
         Path configPath = getConfigPath(config.getId());
 
         if (!Files.exists(configPath)) {
             return;
         }
-
-        try (Reader reader = Files.newBufferedReader(configPath, TerasologyConstants.CHARSET)) {
-            serializer.deserializeOnto(config, gson.fromJson(reader, JsonElement.class));
+        try (InputStream inputStream = Files.newInputStream(configPath, StandardOpenOption.READ)) {
+            PersistedData persistedData = persistedDataReader.read(inputStream);
+            T loadedConfig = (T) typeHandlerLibrary.getTypeHandler(configClass).get().deserialize(persistedData).get();
+            mergeConfig(configClass, loadedConfig, config);
         } catch (IOException e) {
             logger.error("Error while loading config {} from disk", config.getId(), e);
+        }
+    }
+
+    private <T extends AutoConfig> void mergeConfig(Class<T> configClass, T loadedConfig, T config) {
+        Set<Field> fields = AutoConfig.getSettingFieldsIn(configClass);
+        for (Field field : fields) {
+            try {
+                Object value = ((Setting)field.get(loadedConfig)).get();
+                ((Setting)field.get(config)).set(value);
+            } catch (IllegalAccessException e) {
+               // ignore `AutoConfig.getSettingFieldIn` returns PUBLIC fields
+            }
         }
     }
 
@@ -105,16 +114,17 @@ public class AutoConfigManager {
         }
     }
 
-    private <T extends AutoConfig> void saveConfigToDisk(T config) {
+    private void saveConfigToDisk(AutoConfig config) {
         // TODO: Save when screen for config closed
-        Class<T> configClass = (Class<T>) config.getClass();
-        AutoConfigSerializer<T> serializer = new AutoConfigSerializer<>(configClass, typeHandlerLibrary);
-
         Path configPath = getConfigPath(config.getId());
 
-        try (BufferedWriter writer = Files.newBufferedWriter(configPath, TerasologyConstants.CHARSET)) {
-            JsonElement json = serializer.serialize(config);
-            gson.toJson(json, writer);
+        TypeHandler<AutoConfig> typeHandler = (TypeHandler<AutoConfig>) typeHandlerLibrary
+                .getTypeHandler(config.getClass()).get();
+        T persistedData = (T) typeHandler
+                .serialize(config, persistedDataSerializer);
+        try (OutputStream output = Files.newOutputStream(configPath, StandardOpenOption.CREATE)) {
+            persistedDataWriter.writeTo(persistedData, output);
+            output.flush();
         } catch (IOException e) {
             logger.error("Error while saving config {} to disk", config.getId(), e);
         }
@@ -122,9 +132,9 @@ public class AutoConfigManager {
 
     private Path getConfigPath(SimpleUri configId) {
         Path filePath = PathManager.getInstance()
-                            .getConfigsPath()
-                            .resolve(configId.getModuleName().toString())
-                            .resolve(configId.getObjectName().toString() + ".cfg");
+                .getConfigsPath()
+                .resolve(configId.getModuleName().toString())
+                .resolve(configId.getObjectName().toString() + ".cfg");
 
         // This call ensures that the entire directory structure (like configs/engine/) exists.
         ensureDirectoryExists(filePath);

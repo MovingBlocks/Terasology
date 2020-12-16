@@ -1,20 +1,8 @@
-/*
- * Copyright 2019 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.config.flexible;
 
+import com.google.gson.Gson;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.nio.file.ShrinkWrapFileSystems;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
@@ -28,6 +16,9 @@ import org.terasology.engine.paths.PathManager;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.naming.Name;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
+import org.terasology.persistence.typeHandling.gson.GsonPersistedDataReader;
+import org.terasology.persistence.typeHandling.gson.GsonPersistedDataSerializer;
+import org.terasology.persistence.typeHandling.gson.GsonPersistedDataWriter;
 
 import java.nio.file.FileSystem;
 import java.util.Collections;
@@ -39,11 +30,17 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class AutoConfigManagerTest {
+class AutoConfigManagerTest {
     private static final Name PROVIDING_MODULE = new Name("unittest");
+    private final Gson gson = new Gson();
 
     private final TypeHandlerLibrary typeHandlerLibrary = mock(TypeHandlerLibrary.class);
-    private final AutoConfigManager autoConfigManager = new AutoConfigManager(typeHandlerLibrary);
+    private final AutoConfigManager autoConfigManager = new AutoConfigManager(
+            typeHandlerLibrary, 
+            new GsonPersistedDataWriter(gson),
+            new GsonPersistedDataReader(gson),
+            new GsonPersistedDataSerializer()
+    );
 
     private final Context context = mock(Context.class);
     private final ModuleManager moduleManager = mock(ModuleManager.class);

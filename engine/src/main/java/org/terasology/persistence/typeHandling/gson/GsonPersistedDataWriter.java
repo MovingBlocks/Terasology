@@ -35,9 +35,9 @@ public class GsonPersistedDataWriter implements PersistedDataWriter<GsonPersiste
 
     @Override
     public void writeTo(GsonPersistedData data, OutputStream outputStream) throws IOException {
-        gson.toJson(
-                data.getElement(),
-                new JsonWriter(new OutputStreamWriter(outputStream))
-        );
+        try (JsonWriter writer = new JsonWriter(new OutputStreamWriter(outputStream))) {
+            gson.toJson(data.getElement(), writer);
+        }
+
     }
 }
