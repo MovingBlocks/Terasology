@@ -23,6 +23,7 @@ import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.world.generator.plugin.WorldGeneratorListenerLibrary;
+//import org.terasology.world.generator.plugin.WorldGeneratorListenerLibrary;
 import org.terasology.world.generator.plugin.WorldGeneratorPluginLibrary;
 import org.terasology.world.zones.ProviderStore;
 import org.terasology.world.zones.Zone;
@@ -62,6 +63,7 @@ public class WorldBuilder extends ProviderStore {
                         WorldGeneratorListenerLibrary listenerLibrary) {
         this.pluginLibrary = pluginLibrary;
         this.listenerLibrary = listenerLibrary;
+        addListeners();
     }
 
     public WorldBuilder addProvider(FacetProvider provider) {
