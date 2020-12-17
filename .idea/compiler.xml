@@ -4,6 +4,13 @@
     <annotationProcessing>
       <profile default="true" name="Default" enabled="true" />
     </annotationProcessing>
-    <bytecodeTargetLevel target="1.8" />
+    <bytecodeTargetLevel target="1.8">
+      <module name="Terasology.subsystems.NetworkApi" target="11" />
+      <module name="Terasology.subsystems.NetworkApi.main" target="11" />
+      <module name="Terasology.subsystems.NetworkApi.test" target="11" />
+      <module name="Terasology.subsystems.NetworkNetty" target="11" />
+      <module name="Terasology.subsystems.NetworkNetty.main" target="11" />
+      <module name="Terasology.subsystems.NetworkNetty.test" target="11" />
+    </bytecodeTargetLevel>
   </component>
 </project>
