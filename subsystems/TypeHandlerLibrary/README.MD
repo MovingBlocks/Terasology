@@ -52,7 +52,7 @@ so TypeHandlers can be used for different serialization techniques (Json, Protob
     ```
     or 
     ```java
-   byte[] bytes; your format data in bytes; 
+   byte[] bytes; // your format data in bytes; 
    Optional<YourClass> obj =  serializer.deserialize(
                        TypeInfo.of(YourClass.class), // Type of obj (also can handle generic types)
                        bytes);     
