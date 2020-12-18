@@ -15,9 +15,10 @@ dependencies {
     
     implementation("com.google.guava:guava:23.0")
 
+    testImplementation("org.reflections:reflections:0.9.10")
+
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.5.2")
     testImplementation("org.junit.jupiter:junit-jupiter-params:5.5.2")
     testImplementation("org.mockito:mockito-junit-jupiter:3.2.0")
-
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.5.2")
 }
