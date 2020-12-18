@@ -18,8 +18,8 @@ so TypeHandlers can be used for different serialization techniques (Json, Protob
 * `TypeHandler` - interface for handling convertiong from `<your class>` to PersistentData and otherwise. 
 * `PersistedData` - interface for target format/protocol(e.g. gson/protobuf)
 * `PersistedDataSerializer` - interface for creating/filling `PersistedData`
-* `PresistedDataWriter` - interface for writing `PersistedData` to bytes or outputStream
-* `PresistedDataReader` - interface for reading `PersistedData` from bytes or inputStream
+* `PersistedDataWriter` - interface for writing `PersistedData` to bytes or outputStream
+* `PersistedDataReader` - interface for reading `PersistedData` from bytes or inputStream
 
 #### Usage
 1. Create `Serializer`:
