@@ -309,7 +309,7 @@ public class StandardBatchPropagator implements BatchPropagator {
                         JomlUtil.from(ChunkConstants.CHUNK_SIZE)),
                 side, new BlockRegion());
 
-        int edgeSize = edgeRegion.getSizeX() * edgeRegion.getSizeY() * edgeRegion.getSizeZ();
+        int edgeSize = edgeRegion.sizeX() * edgeRegion.sizeY() * edgeRegion.sizeZ();
         int[] depth = new int[edgeSize];
 
         propagateSide(chunk, adjChunk, side, indexProvider, edgeRegion, depth);

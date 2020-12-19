@@ -85,11 +85,7 @@ public final class BlockRegions {
      * @return new block region
      */
     public static BlockRegion createFromMinAndSize(Vector3ic min, Vector3ic size) {
-        return new BlockRegion().setMin(min).setMax(
-            min.x() + size.x() - 1,
-            min.y() + size.y() - 1,
-            min.z() + size.z() - 1
-        );
+        return new BlockRegion().setMin(min).setSize(size);
     }
 
     /**

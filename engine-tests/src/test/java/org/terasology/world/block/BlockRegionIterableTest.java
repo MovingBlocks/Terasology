@@ -71,7 +71,7 @@ public class BlockRegionIterableTest {
     }
 
     private List<Vector3ic> expectedPositions(BlockRegion region) {
-        List<Vector3ic> result = new ArrayList<>(region.getSizeX() * region.getSizeY() * region.getSizeZ());
+        List<Vector3ic> result = new ArrayList<>(region.sizeX() * region.sizeY() * region.sizeZ());
         for (int x = region.getMinX(); x <= region.getMaxX(); x++) {
             for (int y = region.getMinY(); y <= region.getMaxY(); y++) {
                 for (int z = region.getMinZ(); z <= region.getMaxZ(); z++) {

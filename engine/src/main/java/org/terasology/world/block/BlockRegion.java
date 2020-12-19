@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.world.block;
 
+import com.google.common.base.Preconditions;
 import org.joml.AABBf;
 import org.joml.Intersectionf;
 import org.joml.LineSegmentf;
@@ -66,137 +67,10 @@ public class BlockRegion {
     }
 
     /**
-     * get the minimum block coordinate
-     *
-     * @param dest will hold the result
-     * @return dest
-     */
-    public Vector3i getMin(Vector3i dest) {
-        return dest.set(minX, minY, minZ);
-    }
-
-    /**
-     * get the maximum block coordinate
-     *
-     * @param dest will hold the result
-     * @return dest
-     */
-    public Vector3i getMax(Vector3i dest) {
-        return dest.set(maxX, maxY, maxZ);
-    }
-
-    /**
-     * the maximum coordinate of the second block x
-     *
-     * @return the maxX
+     * The x-coordinate of the maximum corner
      */
     public int maxX() {
         return this.maxX;
-    }
-
-    /**
-     * the maximum coordinate of the second block y
-     *
-     * @return the maxY
-     */
-    public int maxY() {
-        return this.maxY;
-    }
-
-    /**
-     * the maximum coordinate of the second block Z
-     *
-     * @return the maxZ
-     */
-    public int maxZ() {
-        return this.maxZ;
-    }
-
-    /**
-     * the minimum coordinate of the first block x
-     *
-     * @return the minX
-     */
-    public int minX() {
-        return this.maxX;
-    }
-
-    /**
-     * the minimum coordinate of the first block y
-     *
-     * @return the minY
-     */
-    public int minY() {
-        return this.maxY;
-    }
-
-    /**
-     * the minimum coordinate of the first block z
-     *
-     * @return the minZ
-     */
-    public int minZ() {
-        return this.maxZ;
-    }
-
-    /**
-     * set the maximum coordinate of the second block x
-     *
-     * @return the minX
-     */
-    public BlockRegion maxX(int x) {
-        this.maxX = x;
-        return this;
-    }
-
-    /**
-     * set the maximum coordinate of the second block y
-     *
-     * @return the minY
-     */
-    public BlockRegion maxY(int y) {
-        this.maxY = y;
-        return this;
-    }
-
-    /**
-     * set the maximum coordinate of the second block z
-     *
-     * @return the minZ
-     */
-    public BlockRegion maxZ(int z) {
-        this.maxZ = z;
-        return this;
-    }
-
-    /**
-     * set the minimum coordinate of the first block x
-     *
-     * @return the minX
-     */
-    public BlockRegion minX(int x) {
-        this.minX = x;
-        return this;
-    }
-
-    /**
-     * set the minimum coordinate of the first block y
-     *
-     * @return the minY
-     */
-    public BlockRegion minY(int y) {
-        this.minY = y;
-        return this;
-    }
-
-    /**
-     * set the minimum coordinate of the first block z
-     *
-     * @return the minZ
-     */
-    public BlockRegion minZ(int z) {
-        this.minZ = z;
-        return this;
     }
 
     /**
@@ -211,6 +85,24 @@ public class BlockRegion {
     }
 
     /**
+     * set the maximum coordinate of the second block x
+     *
+     * @return the minX
+     */
+    public BlockRegion maxX(int x) {
+        Preconditions.checkArgument(x >= this.minX || this.minX == Integer.MAX_VALUE);
+        this.maxX = x;
+        return this;
+    }
+
+    /**
+     * The y-coordinate of the maximum corner
+     */
+    public int maxY() {
+        return this.maxY;
+    }
+
+    /**
      * the maximum coordinate of the second block y
      *
      * @return the minimum coordinate y
@@ -219,6 +111,24 @@ public class BlockRegion {
     @Deprecated
     public int getMaxY() {
         return this.maxY;
+    }
+
+    /**
+     * set the maximum coordinate of the second block y
+     *
+     * @return the minY
+     */
+    public BlockRegion maxY(int y) {
+        Preconditions.checkArgument(y >= this.minY || this.minY == Integer.MAX_VALUE);
+        this.maxY = y;
+        return this;
+    }
+
+    /**
+     * The z-coordinate of the maximum corner
+     */
+    public int maxZ() {
+        return this.maxZ;
     }
 
     /**
@@ -233,6 +143,61 @@ public class BlockRegion {
     }
 
     /**
+     * set the maximum coordinate of the second block z
+     *
+     * @return the minZ
+     */
+    public BlockRegion maxZ(int z) {
+        Preconditions.checkArgument(z >= this.minZ || this.minZ == Integer.MAX_VALUE);
+        this.maxZ = z;
+        return this;
+    }
+
+    /**
+     * Get the block coordinate of the maximum corner.
+     *
+     * @param dest will hold the result
+     */
+    public Vector3i getMax(Vector3i dest) {
+        return dest.set(maxX, maxY, maxZ);
+    }
+
+    /**
+     * Sets the maximum coordinate of the second block for <code>this</code> {@link BlockRegion}
+     *
+     * @param max the second coordinate of the second block
+     * @return this
+     */
+    public BlockRegion setMax(Vector3ic max) {
+        return this.setMax(max.x(), max.y(), max.z());
+    }
+
+    /**
+     * sets the maximum block for this {@link BlockRegion}
+     *
+     * @param maxX the x coordinate of the first block
+     * @param maxY the y coordinate of the first block
+     * @param maxZ the z coordinate of the first block
+     * @return this
+     */
+    public BlockRegion setMax(int maxX, int maxY, int maxZ) {
+        Preconditions.checkArgument(maxX >= this.minX || this.minX == Integer.MAX_VALUE);
+        Preconditions.checkArgument(maxY >= this.minY || this.minY == Integer.MAX_VALUE);
+        Preconditions.checkArgument(maxZ >= this.minZ || this.minZ == Integer.MAX_VALUE);
+        this.maxX = maxX;
+        this.maxY = maxY;
+        this.maxZ = maxZ;
+        return this;
+    }
+
+    /**
+     * The x-coordinate of the minimum corner
+     */
+    public int minX() {
+        return this.minX;
+    }
+
+    /**
      * the minimum coordinate of the first block x
      *
      * @return the minimum coordinate x
@@ -241,6 +206,24 @@ public class BlockRegion {
     @Deprecated
     public int getMinX() {
         return this.minX;
+    }
+
+    /**
+     * set the minimum coordinate of the first block x
+     *
+     * @return the minX
+     */
+    public BlockRegion minX(int x) {
+        Preconditions.checkArgument(x <= this.maxX || this.maxX == Integer.MIN_VALUE);
+        this.minX = x;
+        return this;
+    }
+
+    /**
+     * The y-coordinate of the minimum corner
+     */
+    public int minY() {
+        return this.minY;
     }
 
     /**
@@ -255,6 +238,24 @@ public class BlockRegion {
     }
 
     /**
+     * set the minimum coordinate of the first block y
+     *
+     * @return the minY
+     */
+    public BlockRegion minY(int y) {
+        Preconditions.checkArgument(y <= this.maxY || this.maxY == Integer.MIN_VALUE);
+        this.minY = y;
+        return this;
+    }
+
+    /**
+     * The z-coordinate of the minimum corner
+     */
+    public int minZ() {
+        return this.minZ;
+    }
+
+    /**
      * the minimum coordinate of the first block z
      *
      * @return the minimum coordinate z
@@ -266,19 +267,50 @@ public class BlockRegion {
     }
 
     /**
-     * set source to current region
+     * set the minimum coordinate of the first block z
      *
-     * @param source the source region
+     * @return the minZ
+     */
+    public BlockRegion minZ(int z) {
+        Preconditions.checkArgument(z <= this.maxZ || this.maxZ == Integer.MIN_VALUE);
+        this.minZ = z;
+        return this;
+    }
+
+    /**
+     * Get the block coordinate minimum corner.
+     *
+     * @param dest will hold the result
+     */
+    public Vector3i getMin(Vector3i dest) {
+        return dest.set(minX, minY, minZ);
+    }
+
+    /**
+     * Sets the minimum coordinate of the first block for <code>this</code> {@link BlockRegion}
+     *
+     * @param min the first coordinate of the first block
      * @return this
      */
-    public BlockRegion set(BlockRegion source) {
-        this.minX = source.minX;
-        this.minY = source.minY;
-        this.minZ = source.minZ;
+    public BlockRegion setMin(Vector3ic min) {
+        return this.setMin(min.x(), min.y(), min.z());
+    }
 
-        this.maxX = source.maxX;
-        this.maxY = source.maxY;
-        this.maxZ = source.maxZ;
+    /**
+     * sets the minimum block for this {@link BlockRegion}
+     *
+     * @param minX the x coordinate of the first block
+     * @param minY the y coordinate of the first block
+     * @param minZ the z coordinate of the first block
+     * @return this
+     */
+    public BlockRegion setMin(int minX, int minY, int minZ) {
+        Preconditions.checkArgument(minX <= this.maxX || this.maxX == Integer.MIN_VALUE);
+        Preconditions.checkArgument(minY <= this.maxY || this.maxX == Integer.MIN_VALUE);
+        Preconditions.checkArgument(minZ <= this.maxZ || this.maxX == Integer.MIN_VALUE);
+        this.minX = minX;
+        this.minY = minY;
+        this.minZ = minZ;
         return this;
     }
 
@@ -296,58 +328,19 @@ public class BlockRegion {
     }
 
     /**
-     * Sets the minimum coordinate of the first block for <code>this</code> {@link BlockRegion}
+     * set source to current region
      *
-     * @param min the first coordinate of the first block
+     * @param source the source region
      * @return this
      */
-    public BlockRegion setMin(Vector3ic min) {
-        this.minX = min.x();
-        this.minY = min.y();
-        this.minZ = min.z();
-        return this;
-    }
+    public BlockRegion set(BlockRegion source) {
+        this.minX = source.minX;
+        this.minY = source.minY;
+        this.minZ = source.minZ;
 
-    /**
-     * Sets the maximum coordinate of the second block for <code>this</code> {@link BlockRegion}
-     *
-     * @param max the second coordinate of the second block
-     * @return this
-     */
-    public BlockRegion setMax(Vector3ic max) {
-        this.maxX = max.x();
-        this.maxY = max.y();
-        this.maxZ = max.z();
-        return this;
-    }
-
-    /**
-     * sets the maximum block for this {@link BlockRegion}
-     *
-     * @param maxX the x coordinate of the first block
-     * @param maxY the y coordinate of the first block
-     * @param maxZ the z coordinate of the first block
-     * @return this
-     */
-    public BlockRegion setMax(int maxX, int maxY, int maxZ) {
-        this.maxX = maxX;
-        this.maxY = maxY;
-        this.maxZ = maxZ;
-        return this;
-    }
-
-    /**
-     * sets the minimum block for this {@link BlockRegion}
-     *
-     * @param minX the x coordinate of the first block
-     * @param minY the y coordinate of the first block
-     * @param minZ the z coordinate of the first block
-     * @return this
-     */
-    public BlockRegion setMin(int minX, int minY, int minZ) {
-        this.minX = minX;
-        this.minY = minY;
-        this.minZ = minZ;
+        this.maxX = source.maxX;
+        this.maxY = source.maxY;
+        this.maxZ = source.maxZ;
         return this;
     }
 
@@ -450,14 +443,17 @@ public class BlockRegion {
     }
 
     /**
-     * set the size of the block region from minimum.
+     * Set the size of the block region from minimum the minimum corner.
      *
-     * @param x the x coordinate to set the size
-     * @param y the y coordinate to set the size
-     * @param z the z coordinate to set the size
-     * @return this
+     * @param x the x coordinate to set the size; must be > 0
+     * @param y the y coordinate to set the size; must be > 0
+     * @param z the z coordinate to set the size; must be > 0
+     * @return this after modification
      */
     public BlockRegion setSize(int x, int y, int z) {
+        Preconditions.checkArgument(x > 0);
+        Preconditions.checkArgument(y > 0);
+        Preconditions.checkArgument(z > 0);
         this.maxX = this.minX + x - 1;
         this.maxY = this.minY + y - 1;
         this.maxZ = this.minZ + z - 1;
@@ -465,10 +461,10 @@ public class BlockRegion {
     }
 
     /**
-     * set the size of the block region from minimum.
+     * Set the size of the block region from minimum the minimum corner.
      *
-     * @param size the size to set the {@link BlockRegion}
-     * @return this
+     * @param size the size to set; all dimensions must be > 0
+     * @return this after modification
      */
     public BlockRegion setSize(Vector3ic size) {
         return setSize(size.x(), size.y(), size.z());
@@ -481,8 +477,7 @@ public class BlockRegion {
      * @return dest
      */
     public Vector3i getSize(Vector3i dest) {
-        return dest.set(this.maxX - this.minX + 1, this.maxY - this.minY + 1,
-                this.maxZ - this.minZ + 1);
+        return dest.set(sizeX(), sizeY(), sizeZ());
     }
 
     /**
@@ -490,8 +485,8 @@ public class BlockRegion {
      *
      * @return number of blocks in the X axis
      */
-    public int getSizeX() {
-        return this.maxX - this.minX + 1;
+    public int sizeX() {
+        return isEmpty() ? 0 : this.maxX - this.minX + 1;
     }
 
     /**
@@ -499,8 +494,8 @@ public class BlockRegion {
      *
      * @return number of blocks in the Y axis
      */
-    public int getSizeY() {
-        return this.maxY - this.minY + 1;
+    public int sizeY() {
+        return isEmpty() ? 0 : this.maxY - this.minY + 1;
     }
 
     /**
@@ -508,8 +503,8 @@ public class BlockRegion {
      *
      * @return number of blocks in the Z axis
      */
-    public int getSizeZ() {
-        return this.maxZ - this.minZ + 1;
+    public int sizeZ() {
+        return isEmpty() ? 0 : this.maxZ - this.minZ + 1;
     }
 
     /**
@@ -934,6 +929,13 @@ public class BlockRegion {
      */
     public boolean isValid() {
         return minX <= maxX && minY <= maxY && minZ <= maxZ;
+    }
+
+    /**
+     * Whether this BlockRegion is empty.
+     */
+    public boolean isEmpty() {
+        return !isValid();
     }
 
     /**

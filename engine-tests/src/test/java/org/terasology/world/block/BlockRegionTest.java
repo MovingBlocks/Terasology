@@ -22,12 +22,12 @@ import org.junit.jupiter.params.provider.MethodSource;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -61,7 +61,7 @@ public class BlockRegionTest {
     }
 
     @Test
-    void testCreateEmpty() {
+    void createEmpty() {
         BlockRegion empty = new BlockRegion();
 
         final ArrayList<Vector3i> blockPositions = Lists.newArrayList(BlockRegions.iterable(empty));
@@ -71,27 +71,41 @@ public class BlockRegionTest {
         assertEquals(new Vector3i(0, 0, 0), empty.getSize(new Vector3i()), "empty region should have a size of 0");
     }
 
-    @Test
-    public void testCreateRegionWithMinAndSize() {
-        List<Vector3i> mins = Arrays.asList(new Vector3i(), new Vector3i(1, 1, 1), new Vector3i(3, 4, 5));
-        List<Vector3i> size = Arrays.asList(new Vector3i(1, 1, 1), new Vector3i(3, 3, 3), new Vector3i(8, 5, 2));
-        List<Vector3i> expectedMax = Arrays.asList(new Vector3i(), new Vector3i(3, 3, 3), new Vector3i(10, 8, 6));
+    static Stream<Arguments> fromMinAndSizeArgs() {
+        return Stream.of(
+                Arguments.of(new Vector3i(), new Vector3i(1, 1, 1), new Vector3i()),
+                Arguments.of(new Vector3i(1, 1, 1), new Vector3i(3, 3, 3), new Vector3i(3, 3, 3)),
+                Arguments.of(new Vector3i(3, 4, 5), new Vector3i(8, 5, 2), new Vector3i(10, 8, 6))
+        );
+    }
 
-        for (int i = 0; i < mins.size(); ++i) {
-            BlockRegion region = new BlockRegion().setMin(mins.get(i)).setSize(size.get(i));
-            assertEquals(mins.get(i), region.getMin(new Vector3i()));
-            assertEquals(size.get(i), region.getSize(new Vector3i()));
-            assertEquals(expectedMax.get(i), region.getMax(new Vector3i()));
-        }
+    @ParameterizedTest
+    @MethodSource("fromMinAndSizeArgs")
+    public void createFromMinAndSize(Vector3i min, Vector3i size, Vector3i expectedMax) {
+        BlockRegion region = BlockRegions.createFromMinAndSize(min, size);
+        BlockRegion expected = new BlockRegion().setMin(min).setSize(size);
+
+        assertEquals(min, region.getMin(new Vector3i()));
+        assertEquals(size, region.getSize(new Vector3i()));
+        assertEquals(expectedMax, region.getMax(new Vector3i()));
+        assertEquals(expected, region);
+    }
+
+    @Test
+    public void createFromMinAndSizeInvalid() {
+        assertThrows(IllegalArgumentException.class, () -> BlockRegions.createFromMinAndSize(new Vector3i(),
+                new Vector3i(-1, 1, 1)));
+        assertThrows(IllegalArgumentException.class, () -> BlockRegions.createFromMinAndSize(new Vector3i(),
+                new Vector3i(1, -1, 1)));
+        assertThrows(IllegalArgumentException.class, () -> BlockRegions.createFromMinAndSize(new Vector3i(),
+                new Vector3i(1, 1, -1)));
     }
 
     private static Stream<Arguments> createFromMinAndMaxArgs() {
         return Stream.of(
                 Arguments.of(new Vector3i(), new Vector3i(1, 1, 1), new Vector3i()),
                 Arguments.of(new Vector3i(1, 1, 1), new Vector3i(3, 3, 3), new Vector3i(3, 3, 3)),
-                Arguments.of(new Vector3i(3, 4, 5), new Vector3i(8, 5, 2), new Vector3i(10, 8, 6)),
-                Arguments.of(new Vector3i(1, 1, 1), new Vector3i(0, 0, 0), new Vector3i(0, 0, 0)),
-                Arguments.of(new Vector3i(0, 1, 0), new Vector3i(2, 0, 2), new Vector3i(1, 0, 1))
+                Arguments.of(new Vector3i(3, 4, 5), new Vector3i(8, 5, 2), new Vector3i(10, 8, 6))
         );
     }
 
@@ -102,6 +116,19 @@ public class BlockRegionTest {
         assertEquals(min, region.getMin(new Vector3i()), "min");
         assertEquals(max, region.getMax(new Vector3i()), "max");
         assertEquals(expectedSize, region.getSize(new Vector3i()), "size");
+    }
+
+    private static Stream<Arguments> createFromMinAndMaxInvalidArgs() {
+        return Stream.of(
+                Arguments.of(new Vector3i(1, 1, 1), new Vector3i(0, 0, 0)),
+                Arguments.of(new Vector3i(0, 1, 0), new Vector3i(1, 0, 1))
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("createFromMinAndMaxInvalidArgs")
+    public void createFromMinAndMaxInvalid(Vector3i min, Vector3i max) {
+        assertThrows(IllegalArgumentException.class, () -> BlockRegions.createFromMinAndMax(min, max));
     }
 
     private static Stream<Arguments> createEncompassingArgs() {
@@ -121,7 +148,7 @@ public class BlockRegionTest {
 
     @ParameterizedTest
     @MethodSource("createEncompassingArgs")
-    public void createEncompassingTest(Vector3i expectedSize, Vector3i[] positions) {
+    public void createEncompassing(Vector3i expectedSize, Vector3i[] positions) {
         Vector3i min = Arrays.stream(positions).reduce(new Vector3i(Integer.MAX_VALUE), Vector3i::min);
         Vector3i max = Arrays.stream(positions).reduce(new Vector3i(Integer.MIN_VALUE), Vector3i::max);
 
@@ -131,20 +158,28 @@ public class BlockRegionTest {
         assertEquals(expectedSize, region.getSize(new Vector3i()), "size of " + region);
     }
 
-    @Test
-    public void testCreateRegionWithBounds() {
-        BlockRegion expectedRegion = BlockRegions.createFromMinAndMax(new Vector3i(-2, 4, -16), new Vector3i(4, 107,
-                0));
-        List<Vector3i> vec1 = Arrays.asList(new Vector3i(-2, 4, -16), new Vector3i(4, 4, -16), new Vector3i(-2, 107,
-                        -16), new Vector3i(-2, 4, 0),
-                new Vector3i(4, 107, -16), new Vector3i(4, 4, 0), new Vector3i(-2, 107, 0), new Vector3i(4, 107, 0));
-        List<Vector3i> vec2 = Arrays.asList(new Vector3i(4, 107, 0), new Vector3i(-2, 107, 0), new Vector3i(4, 4, 0),
-                new Vector3i(4, 107, -16),
-                new Vector3i(-2, 4, 0), new Vector3i(-2, 107, -16), new Vector3i(4, 4, -16), new Vector3i(-2, 4, -16));
-        for (int i = 0; i < vec1.size(); ++i) {
-            BlockRegion target = new BlockRegion().union(vec1.get(i)).union(vec2.get(i));
-            assertEquals(expectedRegion, target);
-        }
+    static Stream<Arguments> unionArgs() {
+        return Stream.of(
+                Arguments.of(new Vector3i(-2, 4, -16), new Vector3i(4, 107, 0)),
+                Arguments.of(new Vector3i(4, 4, -16), new Vector3i(-2, 107, 0)),
+                Arguments.of(new Vector3i(-2, 107, -16), new Vector3i(4, 4, 0)),
+                Arguments.of(new Vector3i(-2, 4, 0), new Vector3i(4, 107, -16)),
+                Arguments.of(new Vector3i(4, 107, -16), new Vector3i(-2, 4, 0)),
+                Arguments.of(new Vector3i(4, 4, 0), new Vector3i(-2, 107, -16)),
+                Arguments.of(new Vector3i(-2, 107, 0), new Vector3i(4, 4, -16)),
+                Arguments.of(new Vector3i(4, 107, 0), new Vector3i(-2, 4, -16))
+        );
+    }
+
+
+    @ParameterizedTest
+    @MethodSource("unionArgs")
+    public void union(Vector3i vec1, Vector3i vec2) {
+        BlockRegion expectedRegion =
+                BlockRegions.createFromMinAndMax(new Vector3i(-2, 4, -16), new Vector3i(4, 107, 0));
+
+        BlockRegion actual = new BlockRegion().union(vec1).union(vec2);
+        assertEquals(expectedRegion, actual);
     }
 
     @Test
