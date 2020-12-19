@@ -3,7 +3,6 @@
 package org.terasology.world.block;
 
 import org.joml.AABBf;
-import org.joml.AABBi;
 import org.joml.Intersectionf;
 import org.joml.LineSegmentf;
 import org.joml.Math;
@@ -20,11 +19,9 @@ import org.joml.Vector3ic;
 import org.terasology.entitySystem.entity.EntityRef;
 
 /**
- * is a bounded box describing blocks contained within. A {@link BlockRegion} is described and backed by an {@link
- * AABBi}
+ * A bounded, axis-aligned volume in space denoting a collection of blocks contained within.
  */
 public class BlockRegion {
-
 
     /**
      * The x coordinate of the minimum corner.
@@ -51,29 +48,22 @@ public class BlockRegion {
      */
     private int maxZ = Integer.MIN_VALUE;
 
+    /**
+     * Creates an empty block region with invalid minimum/maximum corners.
+     * <p>
+     * {@link #isValid()} will return {@code false} for an empty block region created via this constructor.
+     */
     public BlockRegion() {
     }
 
+    /**
+     * Create a new copy of the given block region {@code source}.
+     *
+     * @param source the block region to copy.
+     */
     public BlockRegion(BlockRegion source) {
         this.set(source);
     }
-
-    /**
-     * Deprecated in favor of {@link org.terasology.world.block.BlockRegions#createFromMinAndMax(Vector3ic, Vector3ic)}
-     */
-    @Deprecated
-    public BlockRegion(Vector3ic min, Vector3ic max) {
-        this(min.x(), min.y(), min.z(), max.x(), max.y(), max.z());
-    }
-
-    /**
-     * Deprecated in favor of {@link org.terasology.world.block.BlockRegions#createFromMinAndMax(Vector3ic, Vector3ic)}
-     */
-    @Deprecated
-    public BlockRegion(int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
-        this.setMin(minX, minY, minZ).setMax(maxX, maxY, maxZ);
-    }
-
 
     /**
      * get the minimum block coordinate
@@ -584,12 +574,19 @@ public class BlockRegion {
      * @return this
      */
     public BlockRegion transform(Matrix4fc m, BlockRegion dest) {
-
-        float dx = maxX - minX, dy = maxY - minY, dz = maxZ - minZ;
-        float minx = Float.POSITIVE_INFINITY, miny = Float.POSITIVE_INFINITY, minz = Float.POSITIVE_INFINITY;
-        float maxx = Float.NEGATIVE_INFINITY, maxy = Float.NEGATIVE_INFINITY, maxz = Float.NEGATIVE_INFINITY;
+        float dx = maxX - minX;
+        float dy = maxY - minY;
+        float dz = maxZ - minZ;
+        float minx = Float.POSITIVE_INFINITY;
+        float miny = Float.POSITIVE_INFINITY;
+        float minz = Float.POSITIVE_INFINITY;
+        float maxx = Float.NEGATIVE_INFINITY;
+        float maxy = Float.NEGATIVE_INFINITY;
+        float maxz = Float.NEGATIVE_INFINITY;
         for (int i = 0; i < 8; i++) {
-            float x = minX + (i & 1) * dx, y = minY + (i >> 1 & 1) * dy, z = minZ + (i >> 2 & 1) * dz;
+            float x = minX + (i & 1) * dx;
+            float y = minY + (i >> 1 & 1) * dy;
+            float z = minZ + (i >> 2 & 1) * dz;
             float tx = m.m00() * x + m.m10() * y + m.m20() * z + m.m30();
             float ty = m.m01() * x + m.m11() * y + m.m21() * z + m.m31();
             float tz = m.m02() * x + m.m12() * y + m.m22() * z + m.m32();

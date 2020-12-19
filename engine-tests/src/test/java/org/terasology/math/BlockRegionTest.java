@@ -114,7 +114,7 @@ public class BlockRegionTest {
 
     @Test
     public void testCreateRegionWithBounds() {
-        BlockRegion expectedRegion = new BlockRegion(new Vector3i(-2, 4, -16), new Vector3i(4, 107, 0));
+        BlockRegion expectedRegion = BlockRegions.createFromMinAndMax(new Vector3i(-2, 4, -16), new Vector3i(4, 107, 0));
         List<Vector3i> vec1 = Arrays.asList(new Vector3i(-2, 4, -16), new Vector3i(4, 4, -16), new Vector3i(-2, 107,
                         -16), new Vector3i(-2, 4, 0),
                 new Vector3i(4, 107, -16), new Vector3i(4, 4, 0), new Vector3i(-2, 107, 0), new Vector3i(4, 107, 0));
@@ -129,7 +129,7 @@ public class BlockRegionTest {
 
     @Test
     public void testRegionInvalidIfMaxLessThanMin() {
-        BlockRegion region = new BlockRegion(new Vector3i(0, 0, 0), new Vector3i(-1, 0, 0));
+        BlockRegion region = BlockRegions.createFromMinAndMax(new Vector3i(0, 0, 0), new Vector3i(-1, 0, 0));
         assertFalse(region.isValid());
     }
 
@@ -158,15 +158,15 @@ public class BlockRegionTest {
 
     @Test
     public void testSimpleIntersect() {
-        BlockRegion region1 = new BlockRegion(new Vector3i(), new Vector3i(32, 32, 32));
-        BlockRegion region2 = new BlockRegion(new Vector3i(1, 1, 1), new Vector3i(17, 17, 17));
+        BlockRegion region1 = BlockRegions.createFromMinAndMax(new Vector3i(), new Vector3i(32, 32, 32));
+        BlockRegion region2 = BlockRegions.createFromMinAndMax(new Vector3i(1, 1, 1), new Vector3i(17, 17, 17));
         assertEquals(region2, region1.intersection(region2, new BlockRegion()));
     }
 
     @Test
     public void testNonTouchingIntersect() {
-        BlockRegion region1 = new BlockRegion(new Vector3i(), new Vector3i(32, 32, 32));
-        BlockRegion region2 = new BlockRegion(new Vector3i(103, 103, 103), new Vector3i(170, 170, 170));
+        BlockRegion region1 = BlockRegions.createFromMinAndMax(new Vector3i(), new Vector3i(32, 32, 32));
+        BlockRegion region2 = BlockRegions.createFromMinAndMax(new Vector3i(103, 103, 103), new Vector3i(170, 170, 170));
         assertFalse(region1.intersection(region2, new BlockRegion()).isValid());
     }
 
@@ -272,7 +272,7 @@ public class BlockRegionTest {
 
     @Test
     public void testContainsPoint() {
-        BlockRegion a = new BlockRegion(0, 0, 0, 1, 1, 1);
+        BlockRegion a = BlockRegions.createFromMinAndMax(0, 0, 0, 1, 1, 1);
 
         assertTrue(a.containsPoint(1.0f, 1.0f, 1.0f));
 
@@ -312,16 +312,16 @@ public class BlockRegionTest {
 
     @Test
     public void testIntersectionPlane() {
-        BlockRegion a = new BlockRegion(0, 0, 0, 1, 1, 1);
+        BlockRegion a = BlockRegions.createFromMinAndMax(0, 0, 0, 1, 1, 1);
         assertTrue(a.intersectsPlane(1, 1, 1, 1));
         assertFalse(a.intersectsPlane(1, 1, 1, 2));
     }
 
     @Test
     public void testIntersectionBlockRegion() {
-        BlockRegion a = new BlockRegion(0, 0, 0, 1, 1, 1);
-        BlockRegion b = new BlockRegion(1, 1, 1, 4, 4, 4);
-        BlockRegion c = new BlockRegion(3, 3, 3, 4, 4, 4);
+        BlockRegion a = BlockRegions.createFromMinAndMax(0, 0, 0, 1, 1, 1);
+        BlockRegion b = BlockRegions.createFromMinAndMax(1, 1, 1, 4, 4, 4);
+        BlockRegion c = BlockRegions.createFromMinAndMax(3, 3, 3, 4, 4, 4);
 
         assertTrue(a.intersectsBlockRegion(b));
         assertFalse(a.intersectsBlockRegion(c));
@@ -347,7 +347,7 @@ public class BlockRegionTest {
 
     @Test
     public void testIntersectionSphere() {
-        BlockRegion a = new BlockRegion(0, 0, 0, 1, 1, 1);
+        BlockRegion a = BlockRegions.createFromMinAndMax(0, 0, 0, 1, 1, 1);
         Spheref s1 = new Spheref(0, 0, 1, 2);
         Spheref s2 = new Spheref(3, 3, 3, 1);
 
@@ -359,7 +359,7 @@ public class BlockRegionTest {
 
     @Test
     public void testIntersectionRay() {
-        BlockRegion a = new BlockRegion(0, 0, 0, 1, 1, 1);
+        BlockRegion a = BlockRegions.createFromMinAndMax(0, 0, 0, 1, 1, 1);
         Rayf r1 = new Rayf(0, 0, 3, 1, 1, -2);
         Rayf r2 = new Rayf(0, 2, 2, 1, 0, 0);
 
@@ -371,7 +371,7 @@ public class BlockRegionTest {
 
     @Test
     void testIntersectionLineSegment() {
-        BlockRegion a = new BlockRegion(0, 0, 0, 1, 1, 1);
+        BlockRegion a = BlockRegions.createFromMinAndMax(0, 0, 0, 1, 1, 1);
 
         //no intersection
         assertEquals(a.intersectLineSegment(3f, 3f, 3f, 2f, 3f, 3f, new Vector2f()), -1);
