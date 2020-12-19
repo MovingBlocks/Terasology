@@ -15,6 +15,7 @@
  */
 package org.terasology.logic.characters;
 
+import org.joml.Math;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.joml.Vector3i;
@@ -155,7 +156,7 @@ public class KinematicCharacterMover implements CharacterMover {
 
             for (int y = 0; y < characterHeightInBlocks; y++) {
                 // send a block enter/leave event for this character
-                entity.send(new OnEnterBlockEvent(oldBlocks[y], newBlocks[y], JomlUtil.from(new Vector3i(0, y, 0))));
+                entity.send(new OnEnterBlockEvent(oldBlocks[y], newBlocks[y], new Vector3i(0, y, 0)));
             }
         }
     }
@@ -338,10 +339,11 @@ public class KinematicCharacterMover implements CharacterMover {
     private void followToParent(final CharacterStateEvent state, EntityRef entity) {
         LocationComponent locationComponent = entity.getComponent(LocationComponent.class);
         if (!locationComponent.getParent().equals(EntityRef.NULL)) {
-            Vector3f velocity = new Vector3f(locationComponent.getWorldPosition(new Vector3f()));
+            Vector3f position = locationComponent.getWorldPosition(new Vector3f());
+            Vector3f velocity = new Vector3f(position);
             velocity.sub(state.getPosition());
             state.getVelocity().set(velocity);
-            state.getPosition().set(locationComponent.getWorldPosition(new Vector3f()));
+            state.getPosition().set(position);
         }
     }
 
@@ -576,9 +578,9 @@ public class KinematicCharacterMover implements CharacterMover {
                                 CharacterMoveInputEvent input) {
         if (movementComp.faceMovementDirection && result.getVelocity().lengthSquared() > 0.01f) {
             float yaw = (float) Math.atan2(result.getVelocity().x, result.getVelocity().z);
-            result.getRotation().set(0, 1, 0, yaw);
+            result.getRotation().setAngleAxis(yaw, 0, 1, 0);
         } else {
-            result.getRotation().set(new Quaternionf().rotationYXZ(org.joml.Math.toRadians(input.getYaw()), 0, 0));
+            result.getRotation().set(new Quaternionf().rotationYXZ(Math.toRadians(input.getYaw()), 0, 0));
         }
     }
 
@@ -645,7 +647,7 @@ public class KinematicCharacterMover implements CharacterMover {
         distanceMoved.sub(state.getPosition());
         state.getPosition().set(moveResult.getFinalPosition());
         if (input.isFirstRun() && distanceMoved.length() > 0) {
-            entity.send(new MovedEvent(new Vector3f(distanceMoved), new Vector3f(state.getPosition())));
+            entity.send(new MovedEvent(distanceMoved, state.getPosition()));
         }
 
         // Upon hitting solid ground, reset the number of jumps back to the maximum value.
