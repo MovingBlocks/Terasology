@@ -345,6 +345,23 @@ public class BlockRegion {
     }
 
     /**
+     * Create a copy of this block region into {@code dest}.
+     *
+     * @param dest will be modified to be a copy of this region
+     * @return {@code dest} after modification
+     */
+    public BlockRegion copy(BlockRegion dest) {
+        return dest.set(this);
+    }
+
+    /**
+     * Create a copy of this block region.
+     */
+    public BlockRegion copy() {
+        return copy(new BlockRegion());
+    }
+
+    /**
      * Set <code>this</code> to the union of <code>this</code> and the given {@link EntityRef} associated with a block
      * <code>p</code>.
      *
@@ -358,6 +375,10 @@ public class BlockRegion {
             return this.union(component.position.x(), component.position.y(), component.position.z(), dest);
         }
         return dest;
+    }
+
+    public BlockRegion union(EntityRef blockRef) {
+        return this.union(blockRef, this);
     }
 
     /**

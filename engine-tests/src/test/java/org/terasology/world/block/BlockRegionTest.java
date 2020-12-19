@@ -18,6 +18,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.entitySystem.entity.internal.PojoEntityManager;
+import org.terasology.entitySystem.entity.internal.PojoEntityRef;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -471,9 +474,50 @@ public class BlockRegionTest {
         assertEquals(expected, region.addExtents(x, y, z, region));
     }
 
+    static Stream<Arguments> getBoundsArgs() {
+        return Stream.of(
+                Arguments.of(
+                        BlockRegions.createFromMinAndMax(new Vector3i(1, 1, 1), new Vector3i(2, 3, 4)),
+                        new AABBf(.5f, .5f, .5f, 2.5f, 3.5f, 4.5f)
+                ),
+                Arguments.of(
+                        BlockRegions.createFromMinAndMax(-1, -1, -1, 1, 1, 1),
+                        new AABBf(-1.5f, -1.5f, -1.5f, 1.5f, 1.5f, 1.5f)
+                ),
+                Arguments.of(
+                        new BlockRegion(),
+                        new AABBf()
+                )
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("getBoundsArgs")
+    void getBounds(BlockRegion region, AABBf bounds) {
+        assertEquals(bounds, region.getBounds(new AABBf()));
+    }
+
     @Test
-    void testGetBounds() {
-        final BlockRegion region = BlockRegions.createFromMinAndMax(new Vector3i(1, 1, 1), new Vector3i(2, 3, 4));
-        assertEquals(new AABBf(.5f, .5f, .5f, 2.5f, 3.5f, 4.5f), region.getBounds(new AABBf()));
+    void copyRegion() {
+        BlockRegion original = BlockRegions.encompassing(new Vector3i(1, 1, 1), new Vector3i(2, 2, 2));
+
+        BlockRegion source = BlockRegions.encompassing(new Vector3i(1, 1, 1), new Vector3i(2, 2, 2));
+        BlockRegion copy = new BlockRegion().set(source);
+
+        assertEquals(original, copy);
+
+        copy.setMax(2, 3, 4);
+        assertEquals(original, source, "source should not be modified");
+        assertEquals(new Vector3i(2,3,4), copy.getMax(new Vector3i()));
+    }
+
+    @Test
+    public void unionWithBlockEntity() {
+        Vector3i pos = new Vector3i(1,2,3);
+        final EntityRef entity = new PojoEntityManager().create(new BlockComponent(new Block(), pos));
+
+        BlockRegion region = new BlockRegion().union(entity);
+        assertTrue(region.containsBlock(pos));
+        assertEquals(Collections.singletonList(pos), Lists.newArrayList(BlockRegions.iterable(region)));
     }
 }
