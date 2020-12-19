@@ -16,6 +16,7 @@
 package org.terasology.world.block.entity.neighbourUpdate;
 
 import com.google.common.collect.Sets;
+import org.joml.Vector3i;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -24,8 +25,8 @@ import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.Side;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.registry.In;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.OnChangedBlock;
@@ -80,7 +81,7 @@ public class NeighbourBlockFamilyUpdateSystem extends BaseComponentSystem implem
             return;
         }
 
-        processUpdateForBlockLocation(blockComponent.position);
+        processUpdateForBlockLocation(JomlUtil.from(blockComponent.position));
     }
 
     private void notifyNeighboursOfChangedBlocks() {
@@ -110,7 +111,7 @@ public class NeighbourBlockFamilyUpdateSystem extends BaseComponentSystem implem
     private void processUpdateForBlockLocation(Vector3i blockLocation) {
         for (Side side : Side.getAllSides()) {
             Vector3i neighborLocation = new Vector3i(blockLocation);
-            neighborLocation.add(side.getVector3i());
+            neighborLocation.add(side.direction());
             if (worldProvider.isBlockRelevant(neighborLocation)) {
                 Block neighborBlock = worldProvider.getBlock(neighborLocation);
                 final BlockFamily blockFamily = neighborBlock.getBlockFamily();
