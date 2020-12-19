@@ -1,8 +1,9 @@
 // Copyright 2020 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-package org.terasology.math;
+package org.terasology.world.block;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.joml.AABBf;
 import org.joml.LineSegmentf;
@@ -17,10 +18,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.terasology.world.block.BlockRegion;
-import org.terasology.world.block.BlockRegions;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -35,9 +36,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class BlockRegionTest {
 
     @Test
-    void testBasics() {
-        final Vector3i min = new Vector3i(1, 1, 1);
-        final Vector3i max = new Vector3i(2, 3, 4);
+    void testMinMax() {
+        final Vector3i min = new Vector3i(1, 2, 3);
+        final Vector3i max = new Vector3i(7, 8, 9);
         final BlockRegion region =
                 BlockRegions.createFromMinAndMax(min, max);
 
@@ -45,11 +46,29 @@ public class BlockRegionTest {
         assertEquals(max, region.getMax(new Vector3i()));
 
         assertEquals(min.x, region.getMinX());
+        assertEquals(region.getMinX(), region.minX());
         assertEquals(min.y, region.getMinY());
+        assertEquals(region.getMinY(), region.minY());
         assertEquals(min.z, region.getMinZ());
+        assertEquals(region.getMinZ(), region.minZ());
+
         assertEquals(max.x, region.getMaxX());
+        assertEquals(region.getMaxX(), region.maxX());
         assertEquals(max.y, region.getMaxY());
+        assertEquals(region.getMaxY(), region.maxY());
         assertEquals(max.z, region.getMaxZ());
+        assertEquals(region.getMaxZ(), region.maxZ());
+    }
+
+    @Test
+    void testCreateEmpty() {
+        BlockRegion empty = new BlockRegion();
+
+        final ArrayList<Vector3i> blockPositions = Lists.newArrayList(BlockRegions.iterable(empty));
+
+        assertFalse(empty.isValid(), "empty region should be invalid");
+        assertEquals(Collections.emptyList(), blockPositions, "empty region should contain no block positions");
+        assertEquals(new Vector3i(0, 0, 0), empty.getSize(new Vector3i()), "empty region should have a size of 0");
     }
 
     @Test
@@ -78,7 +97,7 @@ public class BlockRegionTest {
 
     @ParameterizedTest
     @MethodSource("createFromMinAndMaxArgs")
-    public void createFromMinAndMaxArgs(Vector3i min, Vector3i expectedSize, Vector3i max) {
+    public void createFromMinAndMax(Vector3i min, Vector3i expectedSize, Vector3i max) {
         BlockRegion region = BlockRegions.createFromMinAndMax(min, max);
         assertEquals(min, region.getMin(new Vector3i()), "min");
         assertEquals(max, region.getMax(new Vector3i()), "max");
@@ -114,7 +133,8 @@ public class BlockRegionTest {
 
     @Test
     public void testCreateRegionWithBounds() {
-        BlockRegion expectedRegion = BlockRegions.createFromMinAndMax(new Vector3i(-2, 4, -16), new Vector3i(4, 107, 0));
+        BlockRegion expectedRegion = BlockRegions.createFromMinAndMax(new Vector3i(-2, 4, -16), new Vector3i(4, 107,
+                0));
         List<Vector3i> vec1 = Arrays.asList(new Vector3i(-2, 4, -16), new Vector3i(4, 4, -16), new Vector3i(-2, 107,
                         -16), new Vector3i(-2, 4, 0),
                 new Vector3i(4, 107, -16), new Vector3i(4, 4, 0), new Vector3i(-2, 107, 0), new Vector3i(4, 107, 0));
@@ -166,7 +186,8 @@ public class BlockRegionTest {
     @Test
     public void testNonTouchingIntersect() {
         BlockRegion region1 = BlockRegions.createFromMinAndMax(new Vector3i(), new Vector3i(32, 32, 32));
-        BlockRegion region2 = BlockRegions.createFromMinAndMax(new Vector3i(103, 103, 103), new Vector3i(170, 170, 170));
+        BlockRegion region2 = BlockRegions.createFromMinAndMax(new Vector3i(103, 103, 103), new Vector3i(170, 170,
+                170));
         assertFalse(region1.intersection(region2, new BlockRegion()).isValid());
     }
 
