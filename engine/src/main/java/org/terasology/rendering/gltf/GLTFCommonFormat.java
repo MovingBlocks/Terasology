@@ -316,7 +316,6 @@ public abstract class GLTFCommonFormat<T extends AssetData> extends AbstractAsse
                     values.get(i + 8), values.get(i + 9), values.get(i + 10), values.get(i + 11),
                     values.get(i + 12), values.get(i + 13), values.get(i + 14), values.get(i + 15)
             );
-//            mat.transpose();
             matricies.add(mat);
         }
         return matricies;
