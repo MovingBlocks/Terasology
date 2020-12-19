@@ -42,7 +42,7 @@ public final class Chunks {
     }
 
     /**
-     * Returns the chunk position of a given coordinate.
+     * Returns the chunk coordinate given the position and the chunk power.
      *
      * @param val The coordinate of the block
      * @param chunkPower the size of the chunk in powers of 2
