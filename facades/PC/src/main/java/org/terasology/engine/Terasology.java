@@ -78,6 +78,9 @@ import java.util.concurrent.TimeUnit;
 
 @CommandLine.Command(name = "terasology")
 public final class Terasology implements Callable<Integer> {
+    private static final Logger logger = LoggerFactory.getLogger(Terasology.class);
+
+    @CommandLine.Spec CommandLine.Model.CommandSpec spec;
 
     @SuppressWarnings("unused")
     @Option(names = {"--help", "-help", "/help", "-h", "/h", "-?", "/?"}, usageHelp = true, description = "show help")
@@ -116,10 +119,6 @@ public final class Terasology implements Callable<Integer> {
     @Option(names = "--homedir", description = "Path to home directory")
     private Path homeDir;
 
-    @CommandLine.Spec CommandLine.Model.CommandSpec spec;
-
-    private static final Logger logger = LoggerFactory.getLogger(Terasology.class);
-
     private Terasology() {
     }
 
@@ -141,6 +140,7 @@ public final class Terasology implements Callable<Integer> {
             thread.start();
             try {
                 // wait splash initialize... we will lose some post messages otherwise.
+                //noinspection ResultOfMethodCallIgnored
                 splashInitLatch.await(1, TimeUnit.SECONDS);
             } catch (InterruptedException e) {
                 // ignore
