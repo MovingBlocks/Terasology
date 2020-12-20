@@ -519,11 +519,12 @@ public class BlockRegion {
     // -- IN-PLACE MUTATION ------------------------------------------------------------------------------------------//
 
     /**
-     * Compute the union of <code>this</code> and the given block <code>(x, y, z)</code>.
+     * Compute the union of this region and the given block coordinate.
      *
      * @param x the x coordinate of the block
      * @param y the y coordinate of the block
      * @param z the z coordinate of the block
+     * @return this region (after modification)
      */
     public BlockRegion union(int x, int y, int z) {
         this.minX = Math.min(this.minX, x);
@@ -537,30 +538,33 @@ public class BlockRegion {
     }
 
     /**
-     * Set <code>this</code> to the union of <code>this</code> and the given block <code>pos</code>.
+     * Compute the union of this region and the given block coordinate.
      *
      * @param pos the position of the block
-     * @return this
+     * @return this region (after modification)
      */
     public BlockRegion union(Vector3ic pos) {
         return union(pos.x(), pos.y(), pos.z());
     }
 
     /**
-     * Set <code>this</code> to the union of <code>this</code> and <code>other</code>.
+     * Compute the union of this region and the other region.
      *
      * @param other {@link BlockRegion}
-     * @return this
+     * @return this region (after modification)
      */
     public BlockRegion union(BlockRegion other) {
         return this.union(other.minX, other.minY, other.minZ).union(other.maxX, other.maxY, other.maxZ);
     }
 
     /**
-     * Set <code>this</code> to the union of <code>this</code> and the given {@link EntityRef} associated with a block
-     * <code>p</code>.
+     * Compute the union of this region and the given block entity.
+     * <p>
+     * An entity is a block entity if it has the {@link BlockComponent}. This region will not be modified if the given
+     * entity does not have a {@link BlockComponent}.
      *
      * @param blockRef entityRef that describes a block
+     * @return this region (after modification)
      */
     public BlockRegion union(EntityRef blockRef) {
         BlockComponent component = blockRef.getComponent(BlockComponent.class);
