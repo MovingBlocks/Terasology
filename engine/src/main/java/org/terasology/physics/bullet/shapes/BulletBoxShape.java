@@ -32,7 +32,7 @@ public class BulletBoxShape extends BulletCollisionShape implements BoxShape {
     @Override
     public CollisionShape rotate(Quaternionf rot) {
         Vector3f halfExtentsWithMargin = new Vector3f(boxShape.getHalfExtentsWithMargin());
-        return new BulletBoxShape(halfExtentsWithMargin.rotate(rot));
+        return new BulletBoxShape(halfExtentsWithMargin.rotate(rot).absolute());
     }
 
     @Override

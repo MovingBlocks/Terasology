@@ -92,18 +92,13 @@ class LocalChunkProviderTest {
 
     private Future<Chunk> requestCreatingOrLoadingArea(Vector3i chunkPosition, int radius) {
         Future<Chunk> chunkFuture = chunkProvider.createOrLoadChunk(chunkPosition);
-        BlockRegion extentsRegion = new BlockRegion(
+        BlockRegion extentsRegion = BlockRegions.createFromMinAndMax(
                 chunkPosition.x - radius, chunkPosition.y - radius, chunkPosition.z - radius,
                 chunkPosition.x + radius, chunkPosition.y + radius, chunkPosition.z + radius);
 
-
-        BlockRegion subtract = new BlockRegion( // remove center. we takes future for it already.
-                chunkPosition.x, chunkPosition.y, chunkPosition.z,
-                chunkPosition.x, chunkPosition.y, chunkPosition.z);
-
         BlockRegions.iterableInPlace(extentsRegion).iterator()
                 .forEachRemaining(pos -> {
-                    if (!pos.equals(JomlUtil.from(chunkPosition))) {
+                    if (!pos.equals(JomlUtil.from(chunkPosition))) { // remove center. we takes future for it already.
                         chunkProvider.createOrLoadChunk(JomlUtil.from(pos));
                     }
                 });

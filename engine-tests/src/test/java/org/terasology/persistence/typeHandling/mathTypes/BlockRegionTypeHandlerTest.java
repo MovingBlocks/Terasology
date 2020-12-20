@@ -14,6 +14,7 @@ import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.persistence.typeHandling.TypeHandlerLibraryImpl;
 import org.terasology.persistence.typeHandling.gson.GsonBuilderFactory;
 import org.terasology.world.block.BlockRegion;
+import org.terasology.world.block.BlockRegions;
 
 public class BlockRegionTypeHandlerTest extends MathTypeAssert {
     public static class AABBBlockRegion1Test {
@@ -23,16 +24,14 @@ public class BlockRegionTypeHandlerTest extends MathTypeAssert {
 
     private final Reflections reflections = new Reflections(getClass().getClassLoader());
     private final TypeHandlerLibrary typeHandlerLibrary = TypeHandlerLibraryImpl.withReflections(reflections);
-    private AABBiTypeHandler handler = new AABBiTypeHandler();
 
     private final Gson gson =
-        GsonBuilderFactory.createGsonBuilderWithTypeSerializationLibrary(typeHandlerLibrary)
-            .create();
+            GsonBuilderFactory.createGsonBuilderWithTypeSerializationLibrary(typeHandlerLibrary).create();
 
     @Test
     public void testSerializeBlockRegion() {
         AABBBlockRegion1Test aabb1 = new AABBBlockRegion1Test();
-        aabb1.a1 = new BlockRegion(5, 5, 5, 13, 12, 14);
+        aabb1.a1 = BlockRegions.createFromMinAndMax(5, 5, 5, 13, 12, 14);
         aabb1.a2 = new AABBi(3, 5, 5, 22, 12, 14);
 
         JsonElement tree = gson.toJsonTree(aabb1);
