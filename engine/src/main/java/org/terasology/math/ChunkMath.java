@@ -492,7 +492,7 @@ public final class ChunkMath {
         org.joml.Vector3i temp = new org.joml.Vector3i();
         org.joml.Vector3i minChunk = calcChunkPos(temp.set(pos).add(-extent, -extent, -extent), new org.joml.Vector3i());
         org.joml.Vector3i maxChunk = calcChunkPos(temp.set(pos).add(extent, extent, extent), new org.joml.Vector3i());
-        return BlockRegions.createFromMinAndMax(minChunk, maxChunk);
+        return BlockRegions.fromMinAndMax(minChunk, maxChunk);
     }
 
 

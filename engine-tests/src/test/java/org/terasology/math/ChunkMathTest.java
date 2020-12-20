@@ -97,11 +97,11 @@ public class ChunkMathTest {
     @Test
     public void testChunkRegionAroundWorldPos() {
         assertEquals(ChunkMath.getChunkRegionAroundWorldPos(new org.joml.Vector3i(0, 0, 0), 100),
-            BlockRegions.createFromMinAndMax(-4, -2, -4, 3, 1, 3));
+            BlockRegions.fromMinAndMax(-4, -2, -4, 3, 1, 3));
         assertEquals(ChunkMath.getChunkRegionAroundWorldPos(new org.joml.Vector3i(-30, -30, -30), 100),
-            BlockRegions.createFromMinAndMax(-5, -3, -5, 2, 1, 2));
+            BlockRegions.fromMinAndMax(-5, -3, -5, 2, 1, 2));
         assertEquals(ChunkMath.getChunkRegionAroundWorldPos(new org.joml.Vector3i(0, 0, 0), 10),
-            BlockRegions.createFromMinAndMax(-1, -1, -1, 0, 0, 0));
+            BlockRegions.fromMinAndMax(-1, -1, -1, 0, 0, 0));
     }
 
 

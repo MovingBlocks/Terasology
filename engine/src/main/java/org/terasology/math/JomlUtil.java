@@ -195,7 +195,7 @@ public final class JomlUtil {
         if (aabb == null) {
             return null;
         }
-        return BlockRegions.createFromMinAndMax(aabb.minX(), aabb.minY(), aabb.minZ(), aabb.maxX(), aabb.maxY(), aabb.maxZ());
+        return BlockRegions.fromMinAndMax(aabb.minX(), aabb.minY(), aabb.minZ(), aabb.maxX(), aabb.maxY(), aabb.maxZ());
     }
 
 

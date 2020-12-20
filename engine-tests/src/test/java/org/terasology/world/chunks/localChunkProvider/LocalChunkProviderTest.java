@@ -92,7 +92,7 @@ class LocalChunkProviderTest {
 
     private Future<Chunk> requestCreatingOrLoadingArea(Vector3i chunkPosition, int radius) {
         Future<Chunk> chunkFuture = chunkProvider.createOrLoadChunk(chunkPosition);
-        BlockRegion extentsRegion = BlockRegions.createFromMinAndMax(
+        BlockRegion extentsRegion = BlockRegions.fromMinAndMax(
                 chunkPosition.x - radius, chunkPosition.y - radius, chunkPosition.z - radius,
                 chunkPosition.x + radius, chunkPosition.y + radius, chunkPosition.z + radius);
 

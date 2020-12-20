@@ -449,7 +449,7 @@ public class LocalChunkProvider implements ChunkProvider {
                             Chunk[] localchunks = chunks.toArray(new Chunk[0]);
                             return new LightMerger().merge(localchunks);
                         },
-                        pos -> StreamSupport.stream(BlockRegions.iterableInPlace(BlockRegions.createFromMinAndMax(
+                        pos -> StreamSupport.stream(BlockRegions.iterableInPlace(BlockRegions.fromMinAndMax(
                                 pos.x() - 1, pos.y() - 1, pos.z() - 1,
                                 pos.x() + 1, pos.y() + 1, pos.z() + 1
                         )).spliterator(), false)
@@ -490,7 +490,7 @@ public class LocalChunkProvider implements ChunkProvider {
                             Chunk[] localchunks = chunks.toArray(new Chunk[0]);
                             return new LightMerger().merge(localchunks);
                         },
-                        pos -> StreamSupport.stream(BlockRegions.iterableInPlace(BlockRegions.createFromMinAndMax(
+                        pos -> StreamSupport.stream(BlockRegions.iterableInPlace(BlockRegions.fromMinAndMax(
                                 pos.x() - 1, pos.y() - 1, pos.z() - 1,
                                 pos.x() + 1, pos.y() + 1, pos.z() + 1
                         )).spliterator(), false)

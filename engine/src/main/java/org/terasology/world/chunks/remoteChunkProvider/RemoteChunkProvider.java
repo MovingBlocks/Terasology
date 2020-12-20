@@ -17,8 +17,6 @@ import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.monitoring.chunk.ChunkMonitor;
 import org.terasology.world.block.BlockManager;
-import org.terasology.world.block.BlockRegion;
-import org.terasology.world.block.BlockRegionIterable;
 import org.terasology.world.block.BlockRegions;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkConstants;
@@ -77,7 +75,7 @@ public class RemoteChunkProvider implements ChunkProvider {
                             Chunk[] localchunks = chunks.toArray(new Chunk[0]);
                             return new LightMerger().merge(localchunks);
                         },
-                        pos -> StreamSupport.stream(BlockRegions.iterableInPlace(BlockRegions.createFromMinAndMax(
+                        pos -> StreamSupport.stream(BlockRegions.iterableInPlace(BlockRegions.fromMinAndMax(
                                 pos.x() - 1, pos.y() - 1, pos.z() - 1,
                                 pos.x() + 1, pos.y() + 1, pos.z() + 1
                         )).spliterator(), false)

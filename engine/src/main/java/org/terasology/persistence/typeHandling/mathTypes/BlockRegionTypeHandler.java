@@ -43,7 +43,7 @@ public class BlockRegionTypeHandler extends TypeHandler<BlockRegion> {
                 PersistedDataArray sizedataArray = map.get(SIZE_FIELD).getAsArray();
                 TIntList sizeArr = sizedataArray.getAsIntegerArray();
                 return Optional.of(
-                        BlockRegions.createFromMinAndMax(
+                        BlockRegions.fromMinAndMax(
                                 minArr.get(0), minArr.get(1), minArr.get(2),
                                 minArr.get(0) + sizeArr.get(0) - 1, minArr.get(1) + sizeArr.get(1) - 1,
                                 minArr.get(2) + sizeArr.get(2) - 1));
@@ -52,7 +52,7 @@ public class BlockRegionTypeHandler extends TypeHandler<BlockRegion> {
             TIntList maxArr = maxDataArr.getAsIntegerArray();
 
             return Optional.of(
-                    BlockRegions.createFromMinAndMax(
+                    BlockRegions.fromMinAndMax(
                             minArr.get(0), minArr.get(1), minArr.get(2),
                             maxArr.get(0), maxArr.get(1), maxArr.get(2)));
         }

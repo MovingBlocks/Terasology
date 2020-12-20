@@ -3,6 +3,7 @@
 
 package org.terasology.world.block;
 
+import com.google.common.base.Preconditions;
 import org.joml.RoundingMode;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
@@ -22,52 +23,51 @@ public final class BlockRegions {
     /**
      * Creates a new region spanning the smallest axis-aligned bounding box (AABB) containing both, min and max.
      * <p>
-     * Note that each component of {@code min} should be smaller or equal to the respective component in {@code max}. If
-     * a dimension of {@code min} is greater than the respective dimension of {@code max} the resulting block region
-     * will have a size of 0 along that dimension.
+     * Note that each component of {@code min} MUST be smaller or equal to the respective component in {@code max}. If a
+     * dimension of {@code min} is greater than the respective dimension of {@code max} an {@link
+     * IllegalArgumentException} will be thrown.
      * <p>
-     * Consider using {@link #encompassing(Vector3ic...)} as an alternative.
-     *
-     * @return new block region
+     * Consider using {@link #encompassing(Vector3ic, Vector3ic...)} as an alternative.
      */
-    public static BlockRegion createFromMinAndMax(Vector3ic min, Vector3ic max) {
+    public static BlockRegion fromMinAndMax(Vector3ic min, Vector3ic max) {
         return new BlockRegion(min, max);
     }
 
     /**
      * Creates a new region spanning the smallest axis-aligned bounding box (AABB) containing both, min and max.
      * <p>
-     * Note that each component of {@code min} should be smaller or equal to the respective component in {@code max}. If
-     * a dimension of {@code min} is greater than the respective dimension of {@code max} the resulting block region
-     * will have a size of 0 along that dimension.
+     * Note that each component of {@code min} MUST be smaller or equal to the respective component in {@code max}. If a
+     * dimension of {@code min} is greater than the respective dimension of {@code max} an {@link
+     * IllegalArgumentException} will be thrown.
      * <p>
-     * Consider using {@link #encompassing(Vector3ic...)} as an alternative.
+     * Consider using {@link #encompassing(Vector3ic, Vector3ic...)} as an alternative.
      *
      * @return new block region
      */
-    public static BlockRegion createFromMinAndMax(int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
+    public static BlockRegion fromMinAndMax(int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
         return new BlockRegion(minX, minY, minZ, maxX, maxY, maxZ);
     }
 
     /**
-     * Creates a new region centered around {@code center} extending each side by {@code extents}. The resulting
-     * axis-aligned bounding box (AABB) will have a size of {@code 2 * extents}
-     *
-     * @return new block region
+     * Creates a new region centered around {@code center} extending each side by {@code extents}.
+     * <p>
+     * The resulting axis-aligned bounding box (AABB) will have a size of {@code 2 * extents}
+     * <p>
+     * The {@code extents} MUST be non-negative in every dimension, otherwise an {@link IllegalArgumentException} will
+     * be thrown.
      */
-    public static BlockRegion createFromCenterAndExtents(Vector3ic center, Vector3ic extents) {
+    public static BlockRegion fromCenterAndExtents(Vector3ic center, Vector3ic extents) {
         return new BlockRegion(center).extend(extents);
     }
 
     /**
-     * Creates a new region centered around {@code center} extending each side by {@code extents}. The computed min is
-     * rounded up (ceil), the computed max is rounded down (floor). Thus, the resulting axis-aligned bounding box (AABB)
-     * will only include integer points that are within the floating point area and have a size of {@code <= 2 *
-     * extents}
-     *
-     * @return new block region
+     * Creates a new region centered around {@code center} extending each side by {@code extents}.
+     * <p>
+     * The computed min is rounded up (ceil), the computed max is rounded down (floor). Thus, the resulting axis-aligned
+     * bounding box (AABB) will only include integer points that are within the floating point area and have a size of
+     * {@code <= 2 * extents}.
      */
-    public static BlockRegion createFromCenterAndExtents(Vector3fc center, Vector3fc extents) {
+    public static BlockRegion fromCenterAndExtents(Vector3fc center, Vector3fc extents) {
         Vector3f min = center.sub(extents, new Vector3f());
         Vector3f max = center.add(extents, new Vector3f());
 
@@ -75,39 +75,61 @@ public final class BlockRegions {
     }
 
     /**
-     * Creates a new region spanning the smallest axis-aligned bounding box (AABB) containing both, min and max.
+     * Creates a new region spanning from the minimum corner {@code min} with given {@code size}.
      * <p>
-     * Note that each component of {@code min} should be smaller or equal to the respective component in {@code max}. If
-     * a dimension of {@code min} is greater than the respective dimension of {@code max} the resulting block region
-     * will have a size of 0 along that dimension.
-     * <p>
-     * Consider using {@link #encompassing(Vector3ic, Vector3ic...)} as an alternative.
-     *
-     * @return new block region
+     * The {@code size} MUST be positive (> 0) in all dimensions, otherwise an {@link IllegalArgumentException} will be
+     * thrown.
      */
     public static BlockRegion createFromMinAndSize(Vector3ic min, Vector3ic size) {
         return new BlockRegion(min).setSize(size);
     }
 
+    /**
+     * Creates a new region spanning the smallest axis-aligned bounding box (AABB) containing all the given positions.
+     *
+     * @param positions the positions that should be encompassed by the block region
+     * @return a block region containing all given positions
+     * @throws IllegalArgumentException if the stream contains no positions
+     */
     public static BlockRegion encompassing(Stream<? extends Vector3ic> positions) {
-        return positions.reduce(new BlockRegion(), BlockRegion::union, BlockRegion::union);
+        BlockRegion result = positions.reduce(new BlockRegion(), BlockRegion::union, BlockRegion::union);
+        if (!result.isValid()) {
+            throw new IllegalArgumentException("A BlockRegion must encompass at least one block.");
+        }
+        return result;
     }
 
     /**
      * Creates a new region spanning the smallest axis-aligned bounding box (AABB) containing all the given positions.
      *
-     * @param positions the positions that must be contained in the resulting block region
+     * @param first the first position (to ensure that the region is not empty)
+     * @param positions the other positions that must be contained in the resulting block region
      * @return a new block region containing all given positions
      */
     public static BlockRegion encompassing(Vector3ic first, Vector3ic... positions) {
         return encompassing(Stream.concat(Stream.of(first), Arrays.stream(positions)));
     }
 
+    /**
+     * Creates a new region spanning the smallest axis-aligned bounding box (AABB) containing all the given positions.
+     *
+     * @param positions the positions that should be encompassed by the block region
+     * @return a block region containing all given positions
+     * @throws IllegalArgumentException if the iterable contains no positions
+     */
     public static BlockRegion encompassing(Iterable<? extends Vector3ic> positions) {
         return encompassing(StreamSupport.stream(positions.spliterator(), false));
     }
 
+    /**
+     * Creates a new region spanning the smallest axis-aligned bounding box (AABB) containing all the given positions.
+     *
+     * @param positions the positions that should be encompassed by the block region
+     * @return a block region containing all given positions
+     * @throws IllegalArgumentException if the collection is empty
+     */
     public static BlockRegion encompassing(Collection<? extends Vector3ic> positions) {
+        Preconditions.checkArgument(!positions.isEmpty(), "A BlockRegion must encompass at least one block.");
         return encompassing(positions.stream());
     }
 

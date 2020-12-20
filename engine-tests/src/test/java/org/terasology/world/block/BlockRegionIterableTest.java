@@ -16,7 +16,7 @@ public class BlockRegionIterableTest {
 
     @Test
     public void testSingleBlockRegion() {
-        BlockRegion region = BlockRegions.createFromMinAndMax(new Vector3i(0, 0, 0), new Vector3i(0, 0, 0));
+        BlockRegion region = BlockRegions.fromMinAndMax(new Vector3i(0, 0, 0), new Vector3i(0, 0, 0));
         Iterable<Vector3i> iterable = BlockRegions.iterable(region);
 
         List<Vector3ic> actual = new ArrayList<>();
@@ -30,7 +30,7 @@ public class BlockRegionIterableTest {
 
     @Test
     public void testLineOfBlocksRegion() {
-        BlockRegion region = BlockRegions.createFromMinAndMax(new Vector3i(0, 0, 0), new Vector3i(0, 1, 0));
+        BlockRegion region = BlockRegions.fromMinAndMax(new Vector3i(0, 0, 0), new Vector3i(0, 1, 0));
         Iterable<Vector3i> iterable = BlockRegions.iterable(region);
 
         List<Vector3ic> actual = new ArrayList<>();
@@ -44,7 +44,7 @@ public class BlockRegionIterableTest {
 
     @Test
     public void testPlaneOfBlocksRegion() {
-        BlockRegion region = BlockRegions.createFromMinAndMax(new Vector3i(0, 0, 0), new Vector3i(0, 1, 1));
+        BlockRegion region = BlockRegions.fromMinAndMax(new Vector3i(0, 0, 0), new Vector3i(0, 1, 1));
         Iterable<Vector3i> iterable = BlockRegions.iterable(region);
 
         List<Vector3ic> actual = new ArrayList<>();
@@ -58,7 +58,7 @@ public class BlockRegionIterableTest {
 
     @Test
     public void testBoxOfBlocksRegion() {
-        BlockRegion region = BlockRegions.createFromMinAndMax(new Vector3i(0, 0, 0), new Vector3i(1, 1, 1));
+        BlockRegion region = BlockRegions.fromMinAndMax(new Vector3i(0, 0, 0), new Vector3i(1, 1, 1));
         Iterable<Vector3i> iterable = BlockRegions.iterable(region);
 
         List<Vector3ic> actual = new ArrayList<>();
