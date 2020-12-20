@@ -15,9 +15,9 @@
  */
 package org.terasology.world.block.structure;
 
+import org.joml.Vector3i;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.math.Side;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;
@@ -90,7 +90,7 @@ public class AttachSupportRequired implements BlockStructuralSupport {
     }
 
     private boolean hasSupportFromBlockOnSide(Vector3i blockPosition, Side side, Map<Vector3i, Block> blockOverrides) {
-        final Vector3i sideBlockPosition = side.getAdjacentPos(blockPosition);
+        final Vector3i sideBlockPosition = side.getAdjacentPos(blockPosition, new Vector3i());
         if (!getWorldProvider().isBlockRelevant(sideBlockPosition)) {
             return true;
         }

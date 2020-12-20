@@ -147,7 +147,7 @@ public class PhysicsSystem extends BaseComponentSystem implements UpdateSubscrib
 
     @ReceiveEvent(components = {BlockComponent.class})
     public void onBlockAltered(OnChangedBlock event, EntityRef entity) {
-        physics.awakenArea(new Vector3f(JomlUtil.from(event.getBlockPosition())), 0.6f);
+        physics.awakenArea(new Vector3f(event.getBlockPosition()), 0.6f);
     }
 
     @ReceiveEvent

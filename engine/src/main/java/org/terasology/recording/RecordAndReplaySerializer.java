@@ -21,16 +21,16 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonWriter;
+import org.joml.Vector3f;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.entitySystem.entity.EntityManager;
-import org.terasology.math.geom.Vector3f;
 import org.terasology.reflection.TypeRegistry;
 
-import java.io.FileWriter;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -80,6 +80,7 @@ public final class RecordAndReplaySerializer {
 
     /**
      * Serialize RecordedEvents.
+     *
      * @param recordingPath path where the data should be saved.
      */
     public void serializeRecordedEvents(String recordingPath) {
@@ -104,6 +105,7 @@ public final class RecordAndReplaySerializer {
 
     /**
      * Deserialize RecordedEvents.
+     *
      * @param recordingPath path where the data was saved.
      */
     void deserializeRecordedEvents(String recordingPath) {
@@ -125,10 +127,11 @@ public final class RecordAndReplaySerializer {
     }
 
     private void deserializeFileAmount(Gson gson, String recordingPath) {
-        try (FileReader fileReader = new FileReader(recordingPath + FILE_AMOUNT)){
+        try (FileReader fileReader = new FileReader(recordingPath + FILE_AMOUNT)) {
             JsonParser parser = new JsonParser();
             JsonElement jsonElement = parser.parse(fileReader);
-            Type typeOfCount = new TypeToken<Integer>() { }.getType();
+            Type typeOfCount = new TypeToken<Integer>() {
+            }.getType();
             recordAndReplayUtils.setFileAmount(gson.fromJson(jsonElement, typeOfCount));
             logger.info("File Amount Deserialization completed!");
         } catch (Exception e) {
@@ -152,7 +155,8 @@ public final class RecordAndReplaySerializer {
         try (FileReader fileReader = new FileReader(recordingPath + STATE_EVENT_POSITION)) {
             JsonParser parser = new JsonParser();
             JsonElement jsonElement = parser.parse(fileReader);
-            Type typeOfHashMap = new TypeToken<HashMap<Integer, Vector3f[]>>() { }.getType();
+            Type typeOfHashMap = new TypeToken<HashMap<Integer, Vector3f[]>>() {
+            }.getType();
             Map<Integer, Vector3f[]> previousMap = gson.fromJson(jsonElement, typeOfHashMap);
             characterStateEventPositionMap.setIdToData(previousMap);
             logger.info("CharacterStateEvent positions Deserialization completed!");
@@ -172,12 +176,13 @@ public final class RecordAndReplaySerializer {
             logger.error("Error while serializing AttackEvent extras:", e);
         }
     }
-    
+
     private void deserializeAttackEventExtraRecorder(Gson gson, String recordingPath) {
         try (FileReader fileReader = new FileReader(recordingPath + DIRECTION_ORIGIN_LIST)) {
             JsonParser parser = new JsonParser();
             JsonElement jsonElement = parser.parse(fileReader);
-            Type type = new TypeToken<ArrayList<DirectionAndOriginPosRecorder>>() {}.getType();
+            Type type = new TypeToken<ArrayList<DirectionAndOriginPosRecorder>>() {
+            }.getType();
             ArrayList<DirectionAndOriginPosRecorder> list = gson.fromJson(jsonElement, type);
             directionAndOriginPosRecorderList.setList(list);
             logger.info("AttackEvent extras deserialization completed!");
@@ -185,5 +190,4 @@ public final class RecordAndReplaySerializer {
             logger.error("Error while deserializing AttackEvent extras:", e);
         }
     }
-
 }

@@ -16,16 +16,17 @@
 
 package org.terasology.physics.events;
 
-import org.terasology.entitySystem.event.Event;
+import org.joml.Vector3f;
 import org.joml.Vector3fc;
+import org.terasology.entitySystem.event.Event;
 
 public class MovedEvent implements Event {
-    private Vector3fc delta;
-    private Vector3fc finalPosition;
+    private Vector3f delta = new Vector3f();
+    private Vector3f finalPosition = new Vector3f();
 
     public MovedEvent(Vector3fc delta, Vector3fc finalPosition) {
-        this.delta = delta;
-        this.finalPosition = finalPosition;
+        this.delta.set(delta);
+        this.finalPosition.set(finalPosition);
     }
 
     public Vector3fc getDelta() {
