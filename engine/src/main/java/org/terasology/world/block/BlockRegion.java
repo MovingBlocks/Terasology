@@ -1065,6 +1065,13 @@ public class BlockRegion {
                 maxZ + .5f, result);
     }
 
+    // ---------------------------------------------------------------------------------------------------------------//
+
+    /**
+     * Compare this region to another object for equality.
+     * <p>
+     * Two regions are equal iff their minimum and maximum corner are the equal.
+     */
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {
@@ -1097,7 +1104,7 @@ public class BlockRegion {
 
     @Override
     public String toString() {
-        return "(" + this.minX + " " + this.minY + " " + this.minZ + ") < " +
-                "(" + (this.maxX - 1) + " " + (this.maxY - 1) + " " + (this.maxZ - 1) + ")";
+        return "BlockRegion[(" + this.minX + " " + this.minY + " " + this.minZ + ")..." +
+                "(" + (this.maxX) + " " + (this.maxY) + " " + (this.maxZ) + ")]";
     }
 }
