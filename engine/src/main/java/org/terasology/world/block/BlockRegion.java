@@ -603,7 +603,7 @@ public class BlockRegion {
     // ---------------------------------------------------------------------------------------------------------------//
 
     /**
-     * Translate <code>this</code> by the given vector <code>xyz</code>.
+     * Translate this region by the given vector {@code xyz}.
      *
      * @param x the x coordinate to translate by
      * @param y the y coordinate to translate by
@@ -620,7 +620,7 @@ public class BlockRegion {
     }
 
     /**
-     * Translate <code>this</code> by the given vector <code>vec</code>.
+     * Translate this region by the given vector {@code vec}.
      *
      * @param vec the vector to translate by
      * @return this
@@ -683,7 +683,7 @@ public class BlockRegion {
     /**
      * Apply the given {@link Matrix4fc#isAffine() affine} transformation to this {@link BlockRegion}.
      * <p>
-     * The matrix in <code>m</code> <i>must</i> be {@link Matrix4fc#isAffine() affine}.
+     * The matrix in {@code m} <i>must</i> be {@link Matrix4fc#isAffine() affine}.
      *
      * @param m the affine transformation matrix
      * @return this
@@ -725,7 +725,7 @@ public class BlockRegion {
     /**
      * Apply the given {@link Matrix4fc#isAffine() affine} transformation to this {@link BlockRegion}.
      * <p>
-     * The matrix in <code>m</code> <i>must</i> be {@link Matrix4fc#isAffine() affine}.
+     * The matrix in {@code m} <i>must</i> be {@link Matrix4fc#isAffine() affine}.
      *
      * @param m the affine transformation matrix
      * @return this
@@ -737,9 +737,9 @@ public class BlockRegion {
     // -- CHECKS -----------------------------------------------------------------------------------------------------//
 
     /**
-     * Check whether <code>this</code> BlockRegion represents a valid BlockRegion.
+     * Check whether this region BlockRegion represents a valid BlockRegion.
      *
-     * @return <code>true</code> iff this BlockRegion is valid; <code>false</code> otherwise
+     * @return {@code true} iff this BlockRegion is valid; {@code false} otherwise
      */
     public boolean isValid() {
         return minX <= maxX && minY <= maxY && minZ <= maxZ;
@@ -752,7 +752,7 @@ public class BlockRegion {
      * Test whether the block <code>(x, y, z)</code> lies inside this BlockRegion.
      *
      * @param pos the coordinates of the block
-     * @return <code>true</code> iff the given point lies inside this AABB; <code>false</code> otherwise
+     * @return {@code true} iff the given point lies inside this AABB; {@code false} otherwise
      */
     public boolean containsBlock(Vector3ic pos) {
         return containsBlock(pos.x(), pos.y(), pos.z());
@@ -764,7 +764,7 @@ public class BlockRegion {
      * @param x the x coordinate of the point
      * @param y the y coordinate of the point
      * @param z the z coordinate of the point
-     * @return <code>true</code> iff the given point lies inside this AABB; <code>false</code> otherwise
+     * @return {@code true} iff the given point lies inside this AABB; {@code false} otherwise
      */
     public boolean containsBlock(int x, int y, int z) {
         return x >= minX && y >= minY && z >= minZ && x <= maxX && y <= maxY && z <= maxZ;
@@ -776,7 +776,7 @@ public class BlockRegion {
      * @param x the x coordinate of the point
      * @param y the y coordinate of the point
      * @param z the z coordinate of the point
-     * @return <code>true</code> iff the given point lies inside this BlockRegion; <code>false</code> otherwise
+     * @return {@code true} iff the given point lies inside this BlockRegion; {@code false} otherwise
      */
     public boolean containsPoint(float x, float y, float z) {
         return x >= (this.minX - .5f)
@@ -791,7 +791,7 @@ public class BlockRegion {
      * Test whether the given point lies inside this AABB.
      *
      * @param point the coordinates of the point
-     * @return <code>true</code> iff the given point lies inside this AABB; <code>false</code> otherwise
+     * @return {@code true} iff the given point lies inside this AABB; {@code false} otherwise
      */
     public boolean containsPoint(Vector3fc point) {
         return this.containsPoint(point.x(), point.y(), point.z());
@@ -810,7 +810,7 @@ public class BlockRegion {
      * @param b the y factor in the plane equation
      * @param c the z factor in the plane equation
      * @param d the constant in the plane equation
-     * @return <code>true</code> iff the plane intersects this AABB; <code>false</code> otherwise
+     * @return {@code true} iff the plane intersects this AABB; {@code false} otherwise
      */
     public boolean intersectsPlane(float a, float b, float c, float d) {
         return Intersectionf.testAabPlane(
@@ -830,7 +830,7 @@ public class BlockRegion {
      * ("Geometric Approach - Testing Boxes II")
      *
      * @param plane the plane
-     * @return <code>true</code> iff the plane intersects this AABB; <code>false</code> otherwise
+     * @return {@code true} iff the plane intersects this AABB; {@code false} otherwise
      */
     public boolean intersectsPlane(Planef plane) {
         return Intersectionf.testAabPlane(
@@ -848,10 +848,10 @@ public class BlockRegion {
     }
 
     /**
-     * Test whether <code>this</code> and <code>other</code> intersect.
+     * Test whether this region and {@code other} intersect.
      *
      * @param other the other BlockRegion
-     * @return <code>true</code> iff both AABBs intersect; <code>false</code> otherwise
+     * @return {@code true} iff both AABBs intersect; {@code false} otherwise
      */
     public boolean intersectsBlockRegion(BlockRegion other) {
         return this.maxX >= other.minX && this.maxY >= other.minY && this.maxZ >= other.minZ &&
@@ -859,10 +859,10 @@ public class BlockRegion {
     }
 
     /**
-     * Test whether <code>this</code> and <code>other</code> intersect.
+     * Test whether this region and {@code other} intersect.
      *
      * @param other the other AABB
-     * @return <code>true</code> iff both AABBs intersect; <code>false</code> otherwise
+     * @return {@code true} iff both AABBs intersect; {@code false} otherwise
      */
     public boolean intersectsAABB(AABBf other) {
         return Intersectionf.testAabAab(
@@ -884,7 +884,7 @@ public class BlockRegion {
      * @param centerY the y coordinate of the center of the sphere
      * @param centerZ the z coordinate of the center of the sphere
      * @param radiusSquared the square radius of the sphere
-     * @return <code>true</code> iff this AABB and the sphere intersect; <code>false</code> otherwise
+     * @return {@code true} iff this AABB and the sphere intersect; {@code false} otherwise
      */
     public boolean intersectsSphere(float centerX, float centerY, float centerZ, float radiusSquared) {
         return Intersectionf.testAabSphere(
@@ -908,7 +908,7 @@ public class BlockRegion {
      * <a href="http://stackoverflow.com/questions/4578967/cube-sphere-intersection-test#answer-4579069">http://stackoverflow.com</a>
      *
      * @param sphere the sphere
-     * @return <code>true</code> iff this AABB and the sphere intersect; <code>false</code> otherwise
+     * @return {@code true} iff this AABB and the sphere intersect; {@code false} otherwise
      */
     public boolean intersectsSphere(Spheref sphere) {
         return Intersectionf.testAabSphere(
@@ -929,7 +929,7 @@ public class BlockRegion {
      * Test whether the given ray with the origin <code>(originX, originY, originZ)</code> and direction <code>(dirX,
      * dirY, dirZ)</code> intersects this AABB.
      * <p>
-     * This method returns <code>true</code> for a ray whose origin lies inside this AABB.
+     * This method returns {@code true} for a ray whose origin lies inside this AABB.
      * <p>
      * Reference: <a href="https://dl.acm.org/citation.cfm?id=1198748">An Efficient and Robust Ray–Box Intersection</a>
      *
@@ -939,7 +939,7 @@ public class BlockRegion {
      * @param dirX the x coordinate of the ray's direction
      * @param dirY the y coordinate of the ray's direction
      * @param dirZ the z coordinate of the ray's direction
-     * @return <code>true</code> if this AABB and the ray intersect; <code>false</code> otherwise
+     * @return {@code true} if this AABB and the ray intersect; {@code false} otherwise
      */
     public boolean intersectsRay(float originX, float originY, float originZ, float dirX, float dirY, float dirZ) {
         return Intersectionf.testRayAab(
@@ -956,12 +956,12 @@ public class BlockRegion {
     /**
      * Test whether the given ray intersects this AABB.
      * <p>
-     * This method returns <code>true</code> for a ray whose origin lies inside this AABB.
+     * This method returns {@code true} for a ray whose origin lies inside this AABB.
      * <p>
      * Reference: <a href="https://dl.acm.org/citation.cfm?id=1198748">An Efficient and Robust Ray–Box Intersection</a>
      *
      * @param ray the ray
-     * @return <code>true</code> if this AABB and the ray intersect; <code>false</code> otherwise
+     * @return {@code true} if this AABB and the ray intersect; {@code false} otherwise
      */
     public boolean intersectsRay(Rayf ray) {
         return Intersectionf.testRayAab(
@@ -980,7 +980,7 @@ public class BlockRegion {
      * p1Y, p1Z)</code> intersects this AABB, and return the values of the parameter <i>t</i> in the ray equation
      * <i>p(t) = origin + p0 * (p1 - p0)</i> of the near and far point of intersection.
      * <p>
-     * This method returns <code>true</code> for a line segment whose either end point lies inside this AABB.
+     * This method returns {@code true} for a line segment whose either end point lies inside this AABB.
      * <p>
      * Reference: <a href="https://dl.acm.org/citation.cfm?id=1198748">An Efficient and Robust Ray–Box Intersection</a>
      *
@@ -1015,7 +1015,7 @@ public class BlockRegion {
      * <i>t</i> in the ray equation
      * <i>p(t) = origin + p0 * (p1 - p0)</i> of the near and far point of intersection.
      * <p>
-     * This method returns <code>true</code> for a line segment whose either end point lies inside this AABB.
+     * This method returns {@code true} for a line segment whose either end point lies inside this AABB.
      * <p>
      * Reference: <a href="https://dl.acm.org/citation.cfm?id=1198748">An Efficient and Robust Ray–Box Intersection</a>
      *
