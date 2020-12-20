@@ -54,15 +54,25 @@ public class BlockRegion {
     // -- CONSTRUCTORS -----------------------------------------------------------------------------------------------//
 
     /**
-     * Creates an empty block region with invalid minimum/maximum corners.
+     * INTERNAL: Creates an empty block region with invalid minimum/maximum corners.
      * <p>
      * {@link #isValid()} will return {@code false} for an empty block region created via this constructor.
      */
-    @Deprecated
     BlockRegion() {
     }
 
-    BlockRegion(int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
+    /**
+     * Creates a new region spanning the smallest axis-aligned bounding box (AABB) containing both, min and max.
+     * <p>
+     * Note that each component of the minimum corner MUST be smaller or equal to the respective component of the
+     * maximum corner. If a dimension of {@code min} is greater than the respective dimension of {@code max} an {@link
+     * IllegalArgumentException} will be thrown.
+     * <p>
+     * Consider using {@link BlockRegions#encompassing(Vector3ic, Vector3ic...)} as an alternative.
+     *
+     * @throws IllegalArgumentException if any min component is greater than the corresponding max component
+     */
+    public BlockRegion(int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
         Preconditions.checkArgument(minX <= maxX);
         Preconditions.checkArgument(minY <= maxY);
         Preconditions.checkArgument(minZ <= maxZ);
@@ -76,15 +86,32 @@ public class BlockRegion {
         this.maxZ = maxZ;
     }
 
-    BlockRegion(Vector3ic min, Vector3ic max) {
+    /**
+     * Creates a new region spanning the smallest axis-aligned bounding box (AABB) containing both, min and max.
+     * <p>
+     * Note that each component of the minimum corner MUST be smaller or equal to the respective component of the
+     * maximum corner. If a dimension of {@code min} is greater than the respective dimension of {@code max} an {@link
+     * IllegalArgumentException} will be thrown.
+     * <p>
+     * Consider using {@link BlockRegions#encompassing(Vector3ic, Vector3ic...)} as an alternative.
+     *
+     * @throws IllegalArgumentException if any min component is greater than the corresponding max component
+     */
+    public BlockRegion(Vector3ic min, Vector3ic max) {
         this(min.x(), min.y(), min.z(), max.x(), max.y(), max.z());
     }
 
-    BlockRegion(int x, int y, int z) {
+    /**
+     * Creates a new region containing the single block given by the coordinates.
+     */
+    public BlockRegion(int x, int y, int z) {
         this(x, y, z, x, y, z);
     }
 
-    BlockRegion(Vector3ic block) {
+    /**
+     * Creates a new region containing the single block given by the coordinates.
+     */
+    public BlockRegion(Vector3ic block) {
         this(block.x(), block.y(), block.z());
     }
 
@@ -92,6 +119,8 @@ public class BlockRegion {
      * Create a new copy of the given block region {@code source}.
      *
      * @param source the block region to copy.
+     *
+     * @see #copy()
      */
     public BlockRegion(BlockRegion source) {
         this.set(source);
