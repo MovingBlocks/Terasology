@@ -633,11 +633,13 @@ public class BlockRegion {
     // ---------------------------------------------------------------------------------------------------------------//
 
     /**
-     * Adds extend for each face of a BlockRegion
+     * Extend this region by adding the given {@code extents} for each face of a region.
      *
-     * @param extentX the x coordinate to grow the extents
-     * @param extentY the y coordinate to grow the extents
-     * @param extentZ the z coordinate to grow the extents
+     * @param extentX the amount of blocks to extend this region by along the x axis in both directions
+     * @param extentY the amount of blocks to extend this region by along the y axis in both directions
+     * @param extentZ the amount of blocks to extend this region by along the z axis in both directions
+     * @return this region (after modification)
+     * @throws IllegalArgumentException if extending this region would result in any non-positive dimension
      */
     public BlockRegion extend(int extentX, int extentY, int extentZ) {
         Preconditions.checkArgument(sizeX() + 2 * extentX > 0);
@@ -655,28 +657,45 @@ public class BlockRegion {
     }
 
     /**
-     * Adds extend for each face of a BlockRegion.
+     * Extend this region by adding the given {@code extents} for each face of a region.
      *
-     * @param extents the coordinates to grow the extents
-     * @return this
+     * @param extents the amount of blocks to extend this region by
+     * @return this region (after modification)
+     * @throws IllegalArgumentException if extending this region would result in any non-positive dimension
      */
     public BlockRegion extend(Vector3ic extents) {
         return extend(extents.x(), extents.y(), extents.z());
     }
 
     /**
-     * Adds extend for each face of a BlockRegion.
+     * Extend this region by adding the given {@code extents} for each face of a region.
+     * <p>
+     * The extents will be floored for each dimension.
      *
-     * @param extentX the x coordinate to grow the extents
-     * @param extentY the y coordinate to grow the extents
-     * @param extentZ the z coordinate to grow the extents
-     * @return dest
+     * @param extentX the amount of blocks to extend this region by along the x axis in both directions
+     * @param extentY the amount of blocks to extend this region by along the y axis in both directions
+     * @param extentZ the amount of blocks to extend this region by along the z axis in both directions
+     * @return this region (after modification)
+     * @throws IllegalArgumentException if extending this region would result in any non-positive dimension
      */
     public BlockRegion extend(float extentX, float extentY, float extentZ) {
         return extend(
                 Math.roundUsing(extentX, RoundingMode.FLOOR),
                 Math.roundUsing(extentY, RoundingMode.FLOOR),
                 Math.roundUsing(extentZ, RoundingMode.FLOOR));
+    }
+
+    /**
+     * Extend this region by adding the given {@code extents} for each face of a region.
+     * <p>
+     * The extents will be floored for each dimension.
+     *
+     * @param extents the amount of blocks to extend this region by
+     * @return this region (after modification)
+     * @throws IllegalArgumentException if extending this region would result in any non-positive dimension
+     */
+    public BlockRegion extend(Vector3f extents) {
+        return extend(extents.x(), extents.y(), extents.z());
     }
 
     // ---------------------------------------------------------------------------------------------------------------//
