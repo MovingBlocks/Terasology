@@ -577,9 +577,12 @@ public class BlockRegion {
     // ---------------------------------------------------------------------------------------------------------------//
 
     /**
-     * calculate the BlockRegion that is intersected between another region
+     * Compute the intersection of this region with the {@code other} region.
+     * <p>
+     * NOTE: If the regions don't intersect this region will become invalid!
      *
-     * @param other the other BlockRegion
+     * @param other the other region
+     * @return this region (after modification) or {@link Optional#empty()} if the regions don't intersect
      */
     public Optional<BlockRegion> intersect(BlockRegion other) {
         this.minX = Math.max(minX, other.minX);
