@@ -698,7 +698,7 @@ public class BlockRegion {
         return extend(extents.x(), extents.y(), extents.z());
     }
 
-    // ---------------------------------------------------------------------------------------------------------------//
+    // -- transform --------------------------------------------------------------------------------------------------//
 
     /**
      * Apply the given {@link Matrix4fc#isAffine() affine} transformation to this {@link BlockRegion}.
@@ -706,9 +706,12 @@ public class BlockRegion {
      * The matrix in {@code m} <i>must</i> be {@link Matrix4fc#isAffine() affine}.
      *
      * @param m the affine transformation matrix
-     * @return this
+     * @param dest will hold the result
+     * @return {@code dest} (after modification)
+     * @throws IllegalArgumentException if the matrix {@code m} is not {@link Matrix4fc#isAffine() affine}
      */
     public BlockRegion transform(Matrix4fc m, BlockRegion dest) {
+        Preconditions.checkArgument(m.isAffine());
         float dx = maxX - minX;
         float dy = maxY - minY;
         float dz = maxZ - minZ;
@@ -748,7 +751,8 @@ public class BlockRegion {
      * The matrix in {@code m} <i>must</i> be {@link Matrix4fc#isAffine() affine}.
      *
      * @param m the affine transformation matrix
-     * @return this
+     * @return this region (after modification)
+     * @throws IllegalArgumentException if the matrix {@code m} is not {@link Matrix4fc#isAffine() affine}
      */
     public BlockRegion transform(Matrix4fc m) {
         return transform(m, this);
