@@ -477,6 +477,15 @@ public class BlockRegion {
 
     // -- world ------------------------------------------------------------------------------------------------------//
 
+    /**
+     * The bounding box in world coordinates.
+     * <p>
+     * The bounding box of a single block at {@code (x, y, z)} is centered at the integer coordinate {@code (x, y, z)}
+     * and extents by {@code 0.5} in each dimension.
+     *
+     * @param dest will hold the result
+     * @return {@code dest}
+     */
     //TODO: 1.9.26 has a constant interface for aabbf
     public AABBf getBounds(AABBf dest) {
         dest.minX = minX - .5f;
@@ -491,10 +500,10 @@ public class BlockRegion {
     }
 
     /**
-     * The center of the region if the region is valid, {@link Float#NaN} in all dimensions otherwise.
+     * The center of the region in world coordinates if the region is valid; {@link Float#NaN} otherwise.
      *
      * @param dest will hold the result
-     * @return dest
+     * @return {@code dest}
      */
     public Vector3f center(Vector3f dest) {
         if (!this.isValid()) {
