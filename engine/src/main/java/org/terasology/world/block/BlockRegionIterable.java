@@ -32,7 +32,7 @@ public class BlockRegionIterable implements Iterable<Vector3ic> {
                             next.x++;
                         }
                     }
-                    return region.containsBlock(next);
+                    return region.contains(next);
                 }
                 return true;
             }
@@ -49,7 +49,7 @@ public class BlockRegionIterable implements Iterable<Vector3ic> {
                 if (current.equals(next)) {
                     return findNext();
                 }
-                return region.containsBlock(next);
+                return region.contains(next);
             }
 
             @Override

@@ -258,31 +258,31 @@ public class BlockRegionTest {
     @Test
     public void testEncompasses() {
         BlockRegion region = new BlockRegion().union(new Vector3i()).setSize(new Vector3i(1, 1, 1));
-        assertTrue(region.containsBlock(0, 0, 0));
+        assertTrue(region.contains(0, 0, 0));
 
-        assertFalse(region.containsBlock(1, 0, 0));
-        assertFalse(region.containsBlock(1, 0, 1));
-        assertFalse(region.containsBlock(0, 0, 1));
-        assertFalse(region.containsBlock(-1, 0, -1));
-        assertFalse(region.containsBlock(-1, 0, 0));
-        assertFalse(region.containsBlock(-1, 0, -1));
-        assertFalse(region.containsBlock(0, 0, -1));
+        assertFalse(region.contains(1, 0, 0));
+        assertFalse(region.contains(1, 0, 1));
+        assertFalse(region.contains(0, 0, 1));
+        assertFalse(region.contains(-1, 0, -1));
+        assertFalse(region.contains(-1, 0, 0));
+        assertFalse(region.contains(-1, 0, -1));
+        assertFalse(region.contains(0, 0, -1));
 
-        assertFalse(region.containsBlock(1, 1, 0));
-        assertFalse(region.containsBlock(1, 1, 1));
-        assertFalse(region.containsBlock(0, 1, 1));
-        assertFalse(region.containsBlock(-1, 1, -1));
-        assertFalse(region.containsBlock(-1, 1, 0));
-        assertFalse(region.containsBlock(-1, 1, -1));
-        assertFalse(region.containsBlock(0, 1, -1));
+        assertFalse(region.contains(1, 1, 0));
+        assertFalse(region.contains(1, 1, 1));
+        assertFalse(region.contains(0, 1, 1));
+        assertFalse(region.contains(-1, 1, -1));
+        assertFalse(region.contains(-1, 1, 0));
+        assertFalse(region.contains(-1, 1, -1));
+        assertFalse(region.contains(0, 1, -1));
 
-        assertFalse(region.containsBlock(1, -1, 0));
-        assertFalse(region.containsBlock(1, -1, 1));
-        assertFalse(region.containsBlock(0, -1, 1));
-        assertFalse(region.containsBlock(-1, -1, -1));
-        assertFalse(region.containsBlock(-1, -1, 0));
-        assertFalse(region.containsBlock(-1, -1, -1));
-        assertFalse(region.containsBlock(0, -1, -1));
+        assertFalse(region.contains(1, -1, 0));
+        assertFalse(region.contains(1, -1, 1));
+        assertFalse(region.contains(0, -1, 1));
+        assertFalse(region.contains(-1, -1, -1));
+        assertFalse(region.contains(-1, -1, 0));
+        assertFalse(region.contains(-1, -1, -1));
+        assertFalse(region.contains(0, -1, -1));
     }
 
     private static Stream<Arguments> testCenterArgs() {
@@ -372,9 +372,9 @@ public class BlockRegionTest {
         BlockRegion region = BlockRegions.fromMinAndMax(0, 0, 0, 1, 1, 1);
 
         if (shouldBeContained) {
-            assertTrue(region.containsPoint(point), "point should be within region");
+            assertTrue(region.contains(point), "point should be within region");
         } else {
-            assertFalse(region.containsPoint(point), "point should not be within region");
+            assertFalse(region.contains(point), "point should not be within region");
         }
     }
 
@@ -604,7 +604,7 @@ public class BlockRegionTest {
         final EntityRef entity = new PojoEntityManager().create(new BlockComponent(new Block(), pos));
 
         BlockRegion region = new BlockRegion().union(entity);
-        assertTrue(region.containsBlock(pos));
+        assertTrue(region.contains(pos));
         assertEquals(Collections.singletonList(pos), Lists.newArrayList(BlockRegions.iterable(region)));
     }
 

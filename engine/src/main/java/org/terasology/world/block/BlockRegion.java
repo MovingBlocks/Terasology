@@ -777,8 +777,8 @@ public class BlockRegion {
      * @param pos the coordinates of the block
      * @return {@code true} iff the given point lies inside this region; {@code false} otherwise
      */
-    public boolean containsBlock(Vector3ic pos) {
-        return containsBlock(pos.x(), pos.y(), pos.z());
+    public boolean contains(Vector3ic pos) {
+        return contains(pos.x(), pos.y(), pos.z());
     }
 
     /**
@@ -789,7 +789,7 @@ public class BlockRegion {
      * @param z the z coordinate of the block
      * @return {@code true} iff the given point lies inside this region; {@code false} otherwise
      */
-    public boolean containsBlock(int x, int y, int z) {
+    public boolean contains(int x, int y, int z) {
         return x >= minX && y >= minY && z >= minZ && x <= maxX && y <= maxY && z <= maxZ;
     }
 
@@ -802,7 +802,7 @@ public class BlockRegion {
      * @return {@code true} iff the given point lies inside this region; {@code false} otherwise
      * @see #getBounds(AABBf)
      */
-    public boolean containsPoint(float x, float y, float z) {
+    public boolean contains(float x, float y, float z) {
         return x >= (this.minX - .5f)
                 && y >= (this.minY - .5f)
                 && z >= (this.minZ - .5f)
@@ -817,8 +817,8 @@ public class BlockRegion {
      * @param point the coordinates of the point
      * @return {@code true} iff the given point lies inside this region; {@code false} otherwise
      */
-    public boolean containsPoint(Vector3fc point) {
-        return this.containsPoint(point.x(), point.y(), point.z());
+    public boolean contains(Vector3fc point) {
+        return this.contains(point.x(), point.y(), point.z());
     }
 
     // -- intersects -------------------------------------------------------------------------------------------------//
