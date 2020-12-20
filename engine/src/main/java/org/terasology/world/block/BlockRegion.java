@@ -418,7 +418,7 @@ public class BlockRegion {
      * @return number of blocks in the X axis
      */
     public int sizeX() {
-        return isEmpty() ? 0 : this.maxX - this.minX + 1;
+        return this.maxX - this.minX + 1;
     }
 
     /**
@@ -427,7 +427,7 @@ public class BlockRegion {
      * @return number of blocks in the Y axis
      */
     public int sizeY() {
-        return isEmpty() ? 0 : this.maxY - this.minY + 1;
+        return this.maxY - this.minY + 1;
     }
 
     /**
@@ -436,10 +436,10 @@ public class BlockRegion {
      * @return number of blocks in the Z axis
      */
     public int sizeZ() {
-        return isEmpty() ? 0 : this.maxZ - this.minZ + 1;
+        return this.maxZ - this.minZ + 1;
     }
 
-    // -- bounds -----------------------------------------------------------------------------------------------------//
+    // -- world ------------------------------------------------------------------------------------------------------//
 
     //TODO: 1.9.26 has a constant interface for aabbf
     public AABBf getBounds(AABBf dest) {
@@ -452,6 +452,23 @@ public class BlockRegion {
         dest.maxZ = maxZ + .5f;
 
         return dest;
+    }
+
+    /**
+     * The center of the region if the region is valid, {@link Float#NaN} in all dimensions otherwise.
+     *
+     * @param dest will hold the result
+     * @return dest
+     */
+    public Vector3f center(Vector3f dest) {
+        if (!this.isValid()) {
+            return dest.set(Float.NaN);
+        }
+        return dest.set(
+                (this.minX - .5f) + ((this.maxX - this.minX + 1.0f) / 2.0f),
+                (this.minY - .5f) + ((this.maxY - this.minY + 1.0f) / 2.0f),
+                (this.minZ - .5f) + ((this.maxZ - this.minZ + 1.0f) / 2.0f)
+        );
     }
 
     // -- IN-PLACE MUTATION ------------------------------------------------------------------------------------------//
@@ -570,9 +587,9 @@ public class BlockRegion {
      * @param extentZ the z coordinate to grow the extents
      */
     public BlockRegion extend(int extentX, int extentY, int extentZ) {
-        Preconditions.checkArgument(2 * extentX <= sizeX());
-        Preconditions.checkArgument(2 * extentY <= sizeY());
-        Preconditions.checkArgument(2 * extentZ <= sizeZ());
+        Preconditions.checkArgument(sizeX() + 2 * extentX > 0);
+        Preconditions.checkArgument(sizeY() + 2 * extentY > 0);
+        Preconditions.checkArgument(sizeZ() + 2 * extentZ > 0);
         this.minX = this.minX - extentX;
         this.minY = this.minY - extentY;
         this.minZ = this.minZ - extentZ;
@@ -650,7 +667,7 @@ public class BlockRegion {
         dest.maxY = Math.roundUsing(maxy, RoundingMode.CEILING);
         dest.maxZ = Math.roundUsing(maxz, RoundingMode.CEILING);
 
-        return this;
+        return dest;
     }
 
     /**
@@ -662,11 +679,22 @@ public class BlockRegion {
      * @return this
      */
     public BlockRegion transform(Matrix4fc m) {
-        transform(m, this);
-        return this;
+        return transform(m, this);
     }
 
     // -- CHECKS -----------------------------------------------------------------------------------------------------//
+
+    /**
+     * Check whether <code>this</code> BlockRegion represents a valid BlockRegion.
+     *
+     * @return <code>true</code> iff this BlockRegion is valid; <code>false</code> otherwise
+     */
+    public boolean isValid() {
+        return minX <= maxX && minY <= maxY && minZ <= maxZ;
+    }
+
+
+    // -- contains ---------------------------------------------------------------------------------------------------//
 
     /**
      * Test whether the block <code>(x, y, z)</code> lies inside this BlockRegion.
@@ -676,23 +704,6 @@ public class BlockRegion {
      */
     public boolean containsBlock(Vector3ic pos) {
         return containsBlock(pos.x(), pos.y(), pos.z());
-    }
-
-    /**
-     * The center of the region if the region is valid, {@link Float#NaN} in all dimensions otherwise.
-     *
-     * @param dest will hold the result
-     * @return dest
-     */
-    public Vector3f center(Vector3f dest) {
-        if (!this.isValid()) {
-            return dest.set(Float.NaN);
-        }
-        return dest.set(
-                (this.minX - .5f) + ((this.maxX - this.minX + 1.0f) / 2.0f),
-                (this.minY - .5f) + ((this.maxY - this.minY + 1.0f) / 2.0f),
-                (this.minZ - .5f) + ((this.maxZ - this.minZ + 1.0f) / 2.0f)
-        );
     }
 
     /**
@@ -733,6 +744,8 @@ public class BlockRegion {
     public boolean containsPoint(Vector3fc point) {
         return this.containsPoint(point.x(), point.y(), point.z());
     }
+
+    // -- intersects -------------------------------------------------------------------------------------------------//
 
     /**
      * Test whether the plane given via its plane equation <code>a*x + b*y + c*z + d = 0</code> intersects this AABB.
@@ -975,22 +988,6 @@ public class BlockRegion {
                 maxZ + .5f, result);
     }
 
-    /**
-     * Check whether <code>this</code> BlockRegion represents a valid BlockRegion.
-     *
-     * @return <code>true</code> iff this BlockRegion is valid; <code>false</code> otherwise
-     */
-    public boolean isValid() {
-        return minX <= maxX && minY <= maxY && minZ <= maxZ;
-    }
-
-    /**
-     * Whether this BlockRegion is empty.
-     */
-    public boolean isEmpty() {
-        return !isValid();
-    }
-
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {
@@ -1000,12 +997,12 @@ public class BlockRegion {
             return false;
         }
         BlockRegion region = (BlockRegion) obj;
-        return minX == region.minX &&
-                minY == region.minY &&
-                minZ == region.minZ &&
-                maxX == region.maxX &&
-                maxY == region.maxY &&
-                maxZ == region.maxZ;
+        return minX == region.minX
+                && minY == region.minY
+                && minZ == region.minZ
+                && maxX == region.maxX
+                && maxY == region.maxY
+                && maxZ == region.maxZ;
     }
 
     @Override
