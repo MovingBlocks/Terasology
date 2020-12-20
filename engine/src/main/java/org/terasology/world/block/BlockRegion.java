@@ -630,7 +630,7 @@ public class BlockRegion {
         return translate(vec.x(), vec.y(), vec.z());
     }
 
-    // ---------------------------------------------------------------------------------------------------------------//
+    // -- extend -----------------------------------------------------------------------------------------------------//
 
     /**
      * Extend this region by adding the given {@code extents} for each face of a region.
@@ -769,38 +769,38 @@ public class BlockRegion {
         return minX <= maxX && minY <= maxY && minZ <= maxZ;
     }
 
-
     // -- contains ---------------------------------------------------------------------------------------------------//
 
     /**
-     * Test whether the block <code>(x, y, z)</code> lies inside this BlockRegion.
+     * Test whether the block at position {@code pos} lies inside this region.
      *
      * @param pos the coordinates of the block
-     * @return {@code true} iff the given point lies inside this AABB; {@code false} otherwise
+     * @return {@code true} iff the given point lies inside this region; {@code false} otherwise
      */
     public boolean containsBlock(Vector3ic pos) {
         return containsBlock(pos.x(), pos.y(), pos.z());
     }
 
     /**
-     * Test whether the block <code>(x, y, z)</code> lies inside this BlockRegion.
+     * Test whether the block {@code (x, y, z)} lies inside this region.
      *
-     * @param x the x coordinate of the point
-     * @param y the y coordinate of the point
-     * @param z the z coordinate of the point
-     * @return {@code true} iff the given point lies inside this AABB; {@code false} otherwise
+     * @param x the x coordinate of the block
+     * @param y the y coordinate of the block
+     * @param z the z coordinate of the block
+     * @return {@code true} iff the given point lies inside this region; {@code false} otherwise
      */
     public boolean containsBlock(int x, int y, int z) {
         return x >= minX && y >= minY && z >= minZ && x <= maxX && y <= maxY && z <= maxZ;
     }
 
     /**
-     * Test whether the point <code>(x, y, z)</code> lies inside this BlockRegion.
+     * Test whether the point {@code (x, y, z)} lies inside this region.
      *
      * @param x the x coordinate of the point
      * @param y the y coordinate of the point
      * @param z the z coordinate of the point
-     * @return {@code true} iff the given point lies inside this BlockRegion; {@code false} otherwise
+     * @return {@code true} iff the given point lies inside this region; {@code false} otherwise
+     * @see #getBounds(AABBf)
      */
     public boolean containsPoint(float x, float y, float z) {
         return x >= (this.minX - .5f)
@@ -812,10 +812,10 @@ public class BlockRegion {
     }
 
     /**
-     * Test whether the given point lies inside this AABB.
+     * Test whether the {@code point} lies inside this region.
      *
      * @param point the coordinates of the point
-     * @return {@code true} iff the given point lies inside this AABB; {@code false} otherwise
+     * @return {@code true} iff the given point lies inside this region; {@code false} otherwise
      */
     public boolean containsPoint(Vector3fc point) {
         return this.containsPoint(point.x(), point.y(), point.z());
