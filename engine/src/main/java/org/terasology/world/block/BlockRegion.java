@@ -603,11 +603,12 @@ public class BlockRegion {
     // ---------------------------------------------------------------------------------------------------------------//
 
     /**
-     * Translate this region by the given vector {@code xyz}.
+     * Translate this region by the given vector {@code (x, y, z))}.
      *
      * @param x the x coordinate to translate by
      * @param y the y coordinate to translate by
      * @param z the z coordinate to translate by
+     * @return this region (after modification)
      */
     public BlockRegion translate(int x, int y, int z) {
         this.minX = this.minX + x;
@@ -623,7 +624,7 @@ public class BlockRegion {
      * Translate this region by the given vector {@code vec}.
      *
      * @param vec the vector to translate by
-     * @return this
+     * @return this region (after modification)
      */
     public BlockRegion translate(Vector3ic vec) {
         return translate(vec.x(), vec.y(), vec.z());
