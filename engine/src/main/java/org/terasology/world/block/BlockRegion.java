@@ -119,7 +119,6 @@ public class BlockRegion {
      * Create a new copy of the given block region {@code source}.
      *
      * @param source the block region to copy.
-     *
      * @see #copy()
      */
     public BlockRegion(BlockRegion source) {
@@ -129,10 +128,9 @@ public class BlockRegion {
     // -- GETTERS & SETTERS ------------------------------------------------------------------------------------------//
 
     /**
-     * set source to current region
+     * Reset this region to have the same minimum and maximum corner as the {@code source} region.
      *
-     * @param source the source region
-     * @return this
+     * @return this region (after modification)
      */
     public BlockRegion set(BlockRegion source) {
         this.minX = source.minX;
@@ -145,6 +143,11 @@ public class BlockRegion {
         return this;
     }
 
+    /**
+     * Create a fresh copy of this block region.
+     *
+     * @see BlockRegion#BlockRegion(BlockRegion)
+     */
     public BlockRegion copy() {
         return new BlockRegion(this);
     }
@@ -170,9 +173,10 @@ public class BlockRegion {
     }
 
     /**
-     * set the minimum coordinate of the first block x
+     * Set the minimum x-coordinate of this region.
      *
-     * @return the minX
+     * @return this region (after modification)
+     * @throws IllegalArgumentException if {@code x} is greater than the maximum x-coordinate
      */
     public BlockRegion minX(int x) {
         Preconditions.checkArgument(x <= this.maxX || this.maxX == Integer.MIN_VALUE);
@@ -199,9 +203,10 @@ public class BlockRegion {
     }
 
     /**
-     * set the minimum coordinate of the first block y
+     * Set the minimum y-coordinate of this region.
      *
-     * @return the minY
+     * @return this region (after modification)
+     * @throws IllegalArgumentException if {@code y} is greater than the maximum y-coordinate
      */
     public BlockRegion minY(int y) {
         Preconditions.checkArgument(y <= this.maxY || this.maxY == Integer.MIN_VALUE);
@@ -228,9 +233,10 @@ public class BlockRegion {
     }
 
     /**
-     * set the minimum coordinate of the first block z
+     * Set the minimum z-coordinate of this region.
      *
-     * @return the minZ
+     * @return this region (after modification)
+     * @throws IllegalArgumentException if {@code z} is greater than the maximum z-coordinate
      */
     public BlockRegion minZ(int z) {
         Preconditions.checkArgument(z <= this.maxZ || this.maxZ == Integer.MIN_VALUE);
@@ -239,31 +245,32 @@ public class BlockRegion {
     }
 
     /**
-     * Get the block coordinate minimum corner.
+     * Get the block coordinate of the minimum corner.
      *
      * @param dest will hold the result
+     * @return {@code dest} after the result has been set
      */
     public Vector3i getMin(Vector3i dest) {
         return dest.set(minX, minY, minZ);
     }
 
     /**
-     * Sets the minimum coordinate of the first block for <code>this</code> {@link BlockRegion}
+     * Set the coordinates of the minimum corner for this region.
      *
-     * @param min the first coordinate of the first block
-     * @return this
+     * @return this region (after modification)
+     * @throws IllegalArgumentException if any dimension is greater than the respective component of the max
+     *         corner
      */
     public BlockRegion setMin(Vector3ic min) {
         return this.setMin(min.x(), min.y(), min.z());
     }
 
     /**
-     * sets the minimum block for this {@link BlockRegion}
+     * Set the coordinates of the minimum corner for this region.
      *
-     * @param minX the x coordinate of the first block
-     * @param minY the y coordinate of the first block
-     * @param minZ the z coordinate of the first block
-     * @return this
+     * @return this region (after modification)
+     * @throws IllegalArgumentException if any dimension is greater than the respective component of the max
+     *         corner
      */
     public BlockRegion setMin(int minX, int minY, int minZ) {
         Preconditions.checkArgument(minX <= this.maxX || this.maxX == Integer.MIN_VALUE);
