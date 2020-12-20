@@ -303,9 +303,10 @@ public class BlockRegion {
     }
 
     /**
-     * set the maximum coordinate of the second block x
+     * Set the maximum x-coordinate of this region.
      *
-     * @return the minX
+     * @return this region (after modification)
+     * @throws IllegalArgumentException if {@code x} is smaller than the minimum x-coordinate
      */
     public BlockRegion maxX(int x) {
         Preconditions.checkArgument(x >= this.minX || this.minX == Integer.MAX_VALUE);
@@ -332,9 +333,10 @@ public class BlockRegion {
     }
 
     /**
-     * set the maximum coordinate of the second block y
+     * Set the maximum y-coordinate of this region.
      *
-     * @return the minY
+     * @return this region (after modification)
+     * @throws IllegalArgumentException if {@code y} is smaller than the minimum y-coordinate
      */
     public BlockRegion maxY(int y) {
         Preconditions.checkArgument(y >= this.minY || this.minY == Integer.MAX_VALUE);
@@ -361,9 +363,10 @@ public class BlockRegion {
     }
 
     /**
-     * set the maximum coordinate of the second block z
+     * Set the maximum z-coordinate of this region.
      *
-     * @return the minZ
+     * @return this region (after modification)
+     * @throws IllegalArgumentException if {@code z} is smaller than the minimum z-coordinate
      */
     public BlockRegion maxZ(int z) {
         Preconditions.checkArgument(z >= this.minZ || this.minZ == Integer.MAX_VALUE);
@@ -375,28 +378,29 @@ public class BlockRegion {
      * Get the block coordinate of the maximum corner.
      *
      * @param dest will hold the result
+     * @return {@code dest} after the result has been set
      */
     public Vector3i getMax(Vector3i dest) {
         return dest.set(maxX, maxY, maxZ);
     }
 
     /**
-     * Sets the maximum coordinate of the second block for <code>this</code> {@link BlockRegion}
+     * Set the coordinates of the maximum corner for this region.
      *
-     * @param max the second coordinate of the second block
-     * @return this
+     * @return this region (after modification)
+     * @throws IllegalArgumentException if any dimension is smaller than the respective component of the minimum
+     *         corner
      */
     public BlockRegion setMax(Vector3ic max) {
         return this.setMax(max.x(), max.y(), max.z());
     }
 
     /**
-     * sets the maximum block for this {@link BlockRegion}
+     * Set the coordinates of the maximum corner for this region.
      *
-     * @param maxX the x coordinate of the first block
-     * @param maxY the y coordinate of the first block
-     * @param maxZ the z coordinate of the first block
-     * @return this
+     * @return this region (after modification)
+     * @throws IllegalArgumentException if any dimension is smaller than the respective component of the minimum
+     *         corner
      */
     public BlockRegion setMax(int maxX, int maxY, int maxZ) {
         Preconditions.checkArgument(maxX >= this.minX || this.minX == Integer.MAX_VALUE);
