@@ -824,7 +824,7 @@ public class BlockRegion {
     // -- intersects -------------------------------------------------------------------------------------------------//
 
     /**
-     * Test whether the plane given via its plane equation <code>a*x + b*y + c*z + d = 0</code> intersects this AABB.
+     * Test whether the plane given via its plane equation <code>a*x + b*y + c*z + d = 0</code> intersects this region.
      * <p>
      * Reference:
      * <a href="http://www.lighthouse3d.com/tutorials/view-frustum-culling/geometric-approach-testing-boxes-ii/">http://www.lighthouse3d.com</a>
@@ -834,7 +834,7 @@ public class BlockRegion {
      * @param b the y factor in the plane equation
      * @param c the z factor in the plane equation
      * @param d the constant in the plane equation
-     * @return {@code true} iff the plane intersects this AABB; {@code false} otherwise
+     * @return {@code true} iff the plane intersects this region; {@code false} otherwise
      */
     public boolean intersectsPlane(float a, float b, float c, float d) {
         return Intersectionf.testAabPlane(
@@ -847,14 +847,14 @@ public class BlockRegion {
     }
 
     /**
-     * Test whether the given plane intersects this AABB.
+     * Test whether the given plane intersects this region.
      * <p>
      * Reference:
      * <a href="http://www.lighthouse3d.com/tutorials/view-frustum-culling/geometric-approach-testing-boxes-ii/">http://www.lighthouse3d.com</a>
      * ("Geometric Approach - Testing Boxes II")
      *
      * @param plane the plane
-     * @return {@code true} iff the plane intersects this AABB; {@code false} otherwise
+     * @return {@code true} iff the plane intersects this region; {@code false} otherwise
      */
     public boolean intersectsPlane(Planef plane) {
         return Intersectionf.testAabPlane(
@@ -875,15 +875,15 @@ public class BlockRegion {
      * Test whether this region and {@code other} intersect.
      *
      * @param other the other BlockRegion
-     * @return {@code true} iff both AABBs intersect; {@code false} otherwise
+     * @return {@code true} iff both regions intersect; {@code false} otherwise
      */
     public boolean intersectsBlockRegion(BlockRegion other) {
-        return this.maxX >= other.minX && this.maxY >= other.minY && this.maxZ >= other.minZ &&
-                this.minX <= other.maxX && this.minY <= other.maxY && this.minZ <= other.maxZ;
+        return this.maxX >= other.minX && this.maxY >= other.minY && this.maxZ >= other.minZ
+                && this.minX <= other.maxX && this.minY <= other.maxY && this.minZ <= other.maxZ;
     }
 
     /**
-     * Test whether this region and {@code other} intersect.
+     * Test whether this region and the AABB {@code other} intersect.
      *
      * @param other the other AABB
      * @return {@code true} iff both AABBs intersect; {@code false} otherwise
@@ -898,7 +898,7 @@ public class BlockRegion {
     }
 
     /**
-     * Test whether this AABB intersects the given sphere with equation
+     * Test whether this region intersects the given sphere with equation
      * <code>(x - centerX)^2 + (y - centerY)^2 + (z - centerZ)^2 - radiusSquared = 0</code>.
      * <p>
      * Reference:
@@ -908,7 +908,7 @@ public class BlockRegion {
      * @param centerY the y coordinate of the center of the sphere
      * @param centerZ the z coordinate of the center of the sphere
      * @param radiusSquared the square radius of the sphere
-     * @return {@code true} iff this AABB and the sphere intersect; {@code false} otherwise
+     * @return {@code true} iff this region and the sphere intersect; {@code false} otherwise
      */
     public boolean intersectsSphere(float centerX, float centerY, float centerZ, float radiusSquared) {
         return Intersectionf.testAabSphere(
@@ -926,13 +926,13 @@ public class BlockRegion {
     }
 
     /**
-     * Test whether this AABB intersects the given sphere.
+     * Test whether this region intersects the given sphere.
      * <p>
      * Reference:
      * <a href="http://stackoverflow.com/questions/4578967/cube-sphere-intersection-test#answer-4579069">http://stackoverflow.com</a>
      *
      * @param sphere the sphere
-     * @return {@code true} iff this AABB and the sphere intersect; {@code false} otherwise
+     * @return {@code true} iff this region and the sphere intersect; {@code false} otherwise
      */
     public boolean intersectsSphere(Spheref sphere) {
         return Intersectionf.testAabSphere(
@@ -953,7 +953,7 @@ public class BlockRegion {
      * Test whether the given ray with the origin <code>(originX, originY, originZ)</code> and direction <code>(dirX,
      * dirY, dirZ)</code> intersects this AABB.
      * <p>
-     * This method returns {@code true} for a ray whose origin lies inside this AABB.
+     * This method returns {@code true} for a ray whose origin lies inside this region.
      * <p>
      * Reference: <a href="https://dl.acm.org/citation.cfm?id=1198748">An Efficient and Robust Ray–Box Intersection</a>
      *
@@ -963,7 +963,7 @@ public class BlockRegion {
      * @param dirX the x coordinate of the ray's direction
      * @param dirY the y coordinate of the ray's direction
      * @param dirZ the z coordinate of the ray's direction
-     * @return {@code true} if this AABB and the ray intersect; {@code false} otherwise
+     * @return {@code true} if this region and the ray intersect; {@code false} otherwise
      */
     public boolean intersectsRay(float originX, float originY, float originZ, float dirX, float dirY, float dirZ) {
         return Intersectionf.testRayAab(
@@ -978,9 +978,9 @@ public class BlockRegion {
     }
 
     /**
-     * Test whether the given ray intersects this AABB.
+     * Test whether the given ray intersects this region.
      * <p>
-     * This method returns {@code true} for a ray whose origin lies inside this AABB.
+     * This method returns {@code true} for a ray whose origin lies inside this region.
      * <p>
      * Reference: <a href="https://dl.acm.org/citation.cfm?id=1198748">An Efficient and Robust Ray–Box Intersection</a>
      *
@@ -1001,7 +1001,7 @@ public class BlockRegion {
 
     /**
      * Determine whether the undirected line segment with the end points <code>(p0X, p0Y, p0Z)</code> and <code>(p1X,
-     * p1Y, p1Z)</code> intersects this AABB, and return the values of the parameter <i>t</i> in the ray equation
+     * p1Y, p1Z)</code> intersects this region, and return the values of the parameter <i>t</i> in the ray equation
      * <i>p(t) = origin + p0 * (p1 - p0)</i> of the near and far point of intersection.
      * <p>
      * This method returns {@code true} for a line segment whose either end point lies inside this AABB.
@@ -1035,11 +1035,12 @@ public class BlockRegion {
     }
 
     /**
-     * Determine whether the given undirected line segment intersects this AABB, and return the values of the parameter
+     * Determine whether the given undirected line segment intersects this region, and return the values of the
+     * parameter
      * <i>t</i> in the ray equation
      * <i>p(t) = origin + p0 * (p1 - p0)</i> of the near and far point of intersection.
      * <p>
-     * This method returns {@code true} for a line segment whose either end point lies inside this AABB.
+     * This method returns {@code true} for a line segment whose either end point lies inside this regiono.
      * <p>
      * Reference: <a href="https://dl.acm.org/citation.cfm?id=1198748">An Efficient and Robust Ray–Box Intersection</a>
      *
