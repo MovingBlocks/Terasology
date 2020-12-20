@@ -59,7 +59,8 @@ import java.util.concurrent.TimeUnit;
  *
  */
 
-@CommandLine.Command(name = "terasology")
+@CommandLine.Command(name = "terasology", usageHelpAutoWidth = true,
+footer = "%nAlternatively use our standalone Launcher from%n https://github.com/MovingBlocks/TerasologyLauncher/releases")
 public final class Terasology implements Callable<Integer> {
     private static final Logger logger = LoggerFactory.getLogger(Terasology.class);
 
@@ -69,7 +70,7 @@ public final class Terasology implements Callable<Integer> {
     @Option(names = {"--help", "-help", "/help", "-h", "/h", "-?", "/?"}, usageHelp = true, description = "show help")
     private boolean helpRequested;
 
-    @Option(names = "--headless", description = "Start headless")
+    @Option(names = "--headless", description = "Start headless (no graphics)")
     private boolean isHeadless;
 
     @Option(names = "--crash-report", defaultValue = "true", negatable = true, description = "Enable crash reporting")
@@ -199,85 +200,6 @@ public final class Terasology implements Callable<Integer> {
         }
 
         LoggingContext.initialize(path);
-    }
-
-    private static void printUsageAndExit() {
-        // TODO: Add all this stuff back in to the help text.
-//
-//        String printUsageFlags = Joiner.on("|").join(PRINT_USAGE_FLAGS);
-//
-//        List<String> opts = ImmutableList.of(
-//                printUsageFlags,
-//                USE_CURRENT_DIR_AS_HOME + "|" + USE_SPECIFIED_DIR_AS_HOME + "<path>",
-//                START_HEADLESS,
-//                LOAD_LAST_GAME,
-//                CREATE_LAST_GAME,
-//                NO_CRASH_REPORT,
-//                NO_SAVE_GAMES,
-//                PERMISSIVE_SECURITY,
-//                NO_SOUND,
-//                NO_SPLASH,
-//                OVERRIDE_DEFAULT_CONFIG + "<path>",
-//                SERVER_PORT + "<port>");
-//
-//        StringBuilder optText = new StringBuilder();
-//
-//        for (String opt : opts) {
-//            optText.append(" [").append(opt).append("]");
-//        }
-//
-//        System.out.println("Usage:");
-//        System.out.println();
-//        System.out.println("    terasology" + optText.toString());
-//        System.out.println();
-//        System.out.println("By default Terasology saves data such as game saves and logs into subfolders of a platform-specific \"home directory\".");
-//        System.out.println("Saving can be explicitly disabled using the \"" + NO_SAVE_GAMES + "\" flag.");
-//        System.out.println("Optionally, the user can override the default by using one of the following launch arguments:");
-//        System.out.println();
-//        System.out.println("    " + USE_CURRENT_DIR_AS_HOME + "        Use the current directory as the home directory.");
-//        System.out.println("    " + USE_SPECIFIED_DIR_AS_HOME + "<path> Use the specified directory as the home directory.");
-//        System.out.println();
-//        System.out.println("It is also possible to start Terasology in headless mode (no graphics), i.e. to act as a server.");
-//        System.out.println("For this purpose use the " + START_HEADLESS + " launch argument.");
-//        System.out.println();
-//        System.out.println("To automatically load the latest game on startup,");
-//        System.out.println("use the " + LOAD_LAST_GAME + " launch argument.");
-//        System.out.println();
-//        System.out.println("To automatically recreate the last game played with a new save file,");
-//        System.out.println("use the " + CREATE_LAST_GAME + "launch argument");
-//        System.out.println();
-//        System.out.println("By default Crash Reporting is enabled.");
-//        System.out.println("To disable this feature use the " + NO_CRASH_REPORT + " launch argument.");
-//        System.out.println();
-//        System.out.println("To disable sound use the " + NO_SOUND + " launch argument (default in headless mode).");
-//        System.out.println();
-//        System.out.println("To disable the splash screen use the " + NO_SPLASH + " launch argument.");
-//        System.out.println();
-//        System.out.println("To change the port the server is hosted on use the " + SERVER_PORT + " launch argument.");
-//        System.out.println();
-//        System.out.println("To override the default generated config (useful for headless server) use the " + OVERRIDE_DEFAULT_CONFIG + " launch argument");
-//        System.out.println();
-//        System.out.println("Examples:");
-//        System.out.println();
-//        System.out.println("    Use the current directory as the home directory:");
-//        System.out.println("    terasology " + USE_CURRENT_DIR_AS_HOME);
-//        System.out.println();
-//        System.out.println("    Use \"myPath\" as the home directory:");
-//        System.out.println("    terasology " + USE_SPECIFIED_DIR_AS_HOME + "myPath");
-//        System.out.println();
-//        System.out.println("    Start terasology in headless mode (no graphics) and enforce using the default port:");
-//        System.out.println("    terasology " + START_HEADLESS + " " + SERVER_PORT + TerasologyConstants.DEFAULT_PORT);
-//        System.out.println();
-//        System.out.println("    Load the latest game on startup and disable crash reporting");
-//        System.out.println("    terasology " + LOAD_LAST_GAME + " " + NO_CRASH_REPORT);
-//        System.out.println();
-//        System.out.println("    Don't start Terasology, just print this help:");
-//        System.out.println("    terasology " + PRINT_USAGE_FLAGS[1]);
-//        System.out.println();
-//        System.out.println("Alternatively use our standalone Launcher from: https://github.com/MovingBlocks/TerasologyLauncher/releases");
-//        System.out.println();
-//
-        System.exit(0);
     }
 
     private void handleLaunchArguments() throws IOException {
