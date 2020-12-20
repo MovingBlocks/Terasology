@@ -10,7 +10,10 @@ import org.joml.Vector3i;
 import org.joml.Vector3ic;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Iterator;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 public final class BlockRegions {
     private BlockRegions() {
@@ -28,7 +31,7 @@ public final class BlockRegions {
      * @return new block region
      */
     public static BlockRegion createFromMinAndMax(Vector3ic min, Vector3ic max) {
-        return new BlockRegion().setMin(min).setMax(max);
+        return new BlockRegion(min, max);
     }
 
     /**
@@ -43,7 +46,7 @@ public final class BlockRegions {
      * @return new block region
      */
     public static BlockRegion createFromMinAndMax(int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
-        return new BlockRegion().setMin(minX, minY, minZ).setMax(maxX, maxY, maxZ);
+        return new BlockRegion(minX, minY, minZ, maxX, maxY, maxZ);
     }
 
     /**
@@ -53,7 +56,7 @@ public final class BlockRegions {
      * @return new block region
      */
     public static BlockRegion createFromCenterAndExtents(Vector3ic center, Vector3ic extents) {
-        return new BlockRegion().union(center).addExtents(extents);
+        return new BlockRegion(center).extend(extents);
     }
 
     /**
@@ -68,9 +71,7 @@ public final class BlockRegions {
         Vector3f min = center.sub(extents, new Vector3f());
         Vector3f max = center.add(extents, new Vector3f());
 
-        return new BlockRegion()
-                .setMin(new Vector3i(min, RoundingMode.CEILING))
-                .setMax(new Vector3i(max, RoundingMode.FLOOR));
+        return new BlockRegion(new Vector3i(min, RoundingMode.CEILING), new Vector3i(max, RoundingMode.FLOOR));
     }
 
     /**
@@ -80,12 +81,16 @@ public final class BlockRegions {
      * a dimension of {@code min} is greater than the respective dimension of {@code max} the resulting block region
      * will have a size of 0 along that dimension.
      * <p>
-     * Consider using {@link #encompassing(Vector3ic...)} as an alternative.
+     * Consider using {@link #encompassing(Vector3ic, Vector3ic...)} as an alternative.
      *
      * @return new block region
      */
     public static BlockRegion createFromMinAndSize(Vector3ic min, Vector3ic size) {
-        return new BlockRegion().setMin(min).setSize(size);
+        return new BlockRegion(min).setSize(size);
+    }
+
+    public static BlockRegion encompassing(Stream<? extends Vector3ic> positions) {
+        return positions.reduce(new BlockRegion(), BlockRegion::union, BlockRegion::union);
     }
 
     /**
@@ -94,8 +99,16 @@ public final class BlockRegions {
      * @param positions the positions that must be contained in the resulting block region
      * @return a new block region containing all given positions
      */
-    public static BlockRegion encompassing(Vector3ic... positions) {
-        return Arrays.stream(positions).reduce(new BlockRegion(), BlockRegion::union, BlockRegion::union);
+    public static BlockRegion encompassing(Vector3ic first, Vector3ic... positions) {
+        return encompassing(Stream.concat(Stream.of(first), Arrays.stream(positions)));
+    }
+
+    public static BlockRegion encompassing(Iterable<? extends Vector3ic> positions) {
+        return encompassing(StreamSupport.stream(positions.spliterator(), false));
+    }
+
+    public static BlockRegion encompassing(Collection<? extends Vector3ic> positions) {
+        return encompassing(positions.stream());
     }
 
     /**

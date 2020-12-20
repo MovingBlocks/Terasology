@@ -19,6 +19,8 @@ import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.terasology.entitySystem.entity.EntityRef;
 
+import java.util.Optional;
+
 /**
  * A bounded, axis-aligned volume in space denoting a collection of blocks contained within.
  */
@@ -49,12 +51,41 @@ public class BlockRegion {
      */
     private int maxZ = Integer.MIN_VALUE;
 
+    // -- CONSTRUCTORS -----------------------------------------------------------------------------------------------//
+
     /**
      * Creates an empty block region with invalid minimum/maximum corners.
      * <p>
      * {@link #isValid()} will return {@code false} for an empty block region created via this constructor.
      */
-    public BlockRegion() {
+    @Deprecated
+    BlockRegion() {
+    }
+
+    BlockRegion(int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
+        Preconditions.checkArgument(minX <= maxX);
+        Preconditions.checkArgument(minY <= maxY);
+        Preconditions.checkArgument(minZ <= maxZ);
+
+        this.minX = minX;
+        this.minY = minY;
+        this.minZ = minZ;
+
+        this.maxX = maxX;
+        this.maxY = maxY;
+        this.maxZ = maxZ;
+    }
+
+    BlockRegion(Vector3ic min, Vector3ic max) {
+        this(min.x(), min.y(), min.z(), max.x(), max.y(), max.z());
+    }
+
+    BlockRegion(int x, int y, int z) {
+        this(x, y, z, x, y, z);
+    }
+
+    BlockRegion(Vector3ic block) {
+        this(block.x(), block.y(), block.z());
     }
 
     /**
@@ -66,129 +97,30 @@ public class BlockRegion {
         this.set(source);
     }
 
-    /**
-     * The x-coordinate of the maximum corner
-     */
-    public int maxX() {
-        return this.maxX;
-    }
+    // -- GETTERS & SETTERS ------------------------------------------------------------------------------------------//
 
     /**
-     * the maximum coordinate of the second block x
+     * set source to current region
      *
-     * @return the minimum coordinate x
-     * @deprecated use {@link #maxX()}
-     */
-    @Deprecated
-    public int getMaxX() {
-        return this.maxX;
-    }
-
-    /**
-     * set the maximum coordinate of the second block x
-     *
-     * @return the minX
-     */
-    public BlockRegion maxX(int x) {
-        Preconditions.checkArgument(x >= this.minX || this.minX == Integer.MAX_VALUE);
-        this.maxX = x;
-        return this;
-    }
-
-    /**
-     * The y-coordinate of the maximum corner
-     */
-    public int maxY() {
-        return this.maxY;
-    }
-
-    /**
-     * the maximum coordinate of the second block y
-     *
-     * @return the minimum coordinate y
-     * @deprecated use {@link #maxY()}
-     */
-    @Deprecated
-    public int getMaxY() {
-        return this.maxY;
-    }
-
-    /**
-     * set the maximum coordinate of the second block y
-     *
-     * @return the minY
-     */
-    public BlockRegion maxY(int y) {
-        Preconditions.checkArgument(y >= this.minY || this.minY == Integer.MAX_VALUE);
-        this.maxY = y;
-        return this;
-    }
-
-    /**
-     * The z-coordinate of the maximum corner
-     */
-    public int maxZ() {
-        return this.maxZ;
-    }
-
-    /**
-     * the maximum coordinate of the second block z
-     *
-     * @return the minimum coordinate z
-     * @deprecated use {@link #maxZ()}
-     */
-    @Deprecated
-    public int getMaxZ() {
-        return this.maxZ;
-    }
-
-    /**
-     * set the maximum coordinate of the second block z
-     *
-     * @return the minZ
-     */
-    public BlockRegion maxZ(int z) {
-        Preconditions.checkArgument(z >= this.minZ || this.minZ == Integer.MAX_VALUE);
-        this.maxZ = z;
-        return this;
-    }
-
-    /**
-     * Get the block coordinate of the maximum corner.
-     *
-     * @param dest will hold the result
-     */
-    public Vector3i getMax(Vector3i dest) {
-        return dest.set(maxX, maxY, maxZ);
-    }
-
-    /**
-     * Sets the maximum coordinate of the second block for <code>this</code> {@link BlockRegion}
-     *
-     * @param max the second coordinate of the second block
+     * @param source the source region
      * @return this
      */
-    public BlockRegion setMax(Vector3ic max) {
-        return this.setMax(max.x(), max.y(), max.z());
-    }
+    public BlockRegion set(BlockRegion source) {
+        this.minX = source.minX;
+        this.minY = source.minY;
+        this.minZ = source.minZ;
 
-    /**
-     * sets the maximum block for this {@link BlockRegion}
-     *
-     * @param maxX the x coordinate of the first block
-     * @param maxY the y coordinate of the first block
-     * @param maxZ the z coordinate of the first block
-     * @return this
-     */
-    public BlockRegion setMax(int maxX, int maxY, int maxZ) {
-        Preconditions.checkArgument(maxX >= this.minX || this.minX == Integer.MAX_VALUE);
-        Preconditions.checkArgument(maxY >= this.minY || this.minY == Integer.MAX_VALUE);
-        Preconditions.checkArgument(maxZ >= this.minZ || this.minZ == Integer.MAX_VALUE);
-        this.maxX = maxX;
-        this.maxY = maxY;
-        this.maxZ = maxZ;
+        this.maxX = source.maxX;
+        this.maxY = source.maxY;
+        this.maxZ = source.maxZ;
         return this;
     }
+
+    public BlockRegion copy() {
+        return new BlockRegion(this);
+    }
+
+    // -- min --------------------------------------------------------------------------------------------------------//
 
     /**
      * The x-coordinate of the minimum corner
@@ -314,154 +246,133 @@ public class BlockRegion {
         return this;
     }
 
-    //TODO: 1.9.26 has a constant interface for aabbf
-    public AABBf getBounds(AABBf dest) {
-        dest.minX = minX - .5f;
-        dest.minY = minY - .5f;
-        dest.minZ = minZ - .5f;
+    // -- max --------------------------------------------------------------------------------------------------------//
 
-        dest.maxX = maxX + .5f;
-        dest.maxY = maxY + .5f;
-        dest.maxZ = maxZ + .5f;
-
-        return dest;
+    /**
+     * The x-coordinate of the maximum corner
+     */
+    public int maxX() {
+        return this.maxX;
     }
 
     /**
-     * set source to current region
+     * the maximum coordinate of the second block x
      *
-     * @param source the source region
-     * @return this
+     * @return the minimum coordinate x
+     * @deprecated use {@link #maxX()}
      */
-    public BlockRegion set(BlockRegion source) {
-        this.minX = source.minX;
-        this.minY = source.minY;
-        this.minZ = source.minZ;
+    @Deprecated
+    public int getMaxX() {
+        return this.maxX;
+    }
 
-        this.maxX = source.maxX;
-        this.maxY = source.maxY;
-        this.maxZ = source.maxZ;
+    /**
+     * set the maximum coordinate of the second block x
+     *
+     * @return the minX
+     */
+    public BlockRegion maxX(int x) {
+        Preconditions.checkArgument(x >= this.minX || this.minX == Integer.MAX_VALUE);
+        this.maxX = x;
         return this;
     }
 
     /**
-     * Create a copy of this block region into {@code dest}.
-     *
-     * @param dest will be modified to be a copy of this region
-     * @return {@code dest} after modification
+     * The y-coordinate of the maximum corner
      */
-    public BlockRegion copy(BlockRegion dest) {
-        return dest.set(this);
+    public int maxY() {
+        return this.maxY;
     }
 
     /**
-     * Create a copy of this block region.
+     * the maximum coordinate of the second block y
+     *
+     * @return the minimum coordinate y
+     * @deprecated use {@link #maxY()}
      */
-    public BlockRegion copy() {
-        return copy(new BlockRegion());
+    @Deprecated
+    public int getMaxY() {
+        return this.maxY;
     }
 
     /**
-     * Set <code>this</code> to the union of <code>this</code> and the given {@link EntityRef} associated with a block
-     * <code>p</code>.
+     * set the maximum coordinate of the second block y
      *
-     * @param blockRef entityRef that describes a block
-     * @param dest will hold the result
-     * @return dest
+     * @return the minY
      */
-    public BlockRegion union(EntityRef blockRef, BlockRegion dest) {
-        BlockComponent component = blockRef.getComponent(BlockComponent.class);
-        if (component != null) {
-            return this.union(component.position.x(), component.position.y(), component.position.z(), dest);
-        }
-        return dest;
-    }
-
-    public BlockRegion union(EntityRef blockRef) {
-        return this.union(blockRef, this);
-    }
-
-    /**
-     * Set <code>this</code> to the union of <code>this</code> and the given block <code>p</code>.
-     *
-     * @param p the position of the block
-     * @return this
-     */
-    public BlockRegion union(Vector3ic p) {
-        return union(p.x(), p.y(), p.z(), this);
-    }
-
-    /**
-     * Compute the union of <code>this</code> and the given block <code>(x, y, z)</code> and stores the result in
-     * <code>dest</code>
-     *
-     * @param x the x coordinate of the block
-     * @param y the y coordinate of the block
-     * @param z the z coordinate of the block
-     * @param dest will hold the result
-     * @return dest
-     */
-    public BlockRegion union(int x, int y, int z, BlockRegion dest) {
-        dest.minX = Math.min(this.minX, x);
-        dest.minY = Math.min(this.minY, y);
-        dest.minZ = Math.min(this.minZ, z);
-
-        dest.maxX = Math.max(this.maxX, x);
-        dest.maxY = Math.max(this.maxY, y);
-        dest.maxZ = Math.max(this.maxZ, z);
-        return dest;
-    }
-
-    /**
-     * Compute the union of <code>this</code> and the given block <code>(x, y, z)</code> and store the result in
-     * <code>dest</code>.
-     *
-     * @param pos the position of the block
-     * @param dest will hold the result
-     * @return dest
-     */
-    public BlockRegion union(Vector3ic pos, BlockRegion dest) {
-        return this.union(pos.x(), pos.y(), pos.z(), dest);
-    }
-
-    /**
-     * Set <code>this</code> to the union of <code>this</code> and <code>other</code>.
-     *
-     * @param other {@link BlockRegion}
-     * @return this
-     */
-    public BlockRegion union(BlockRegion other) {
-        return this.union(other.minX, other.minY, other.minZ, this)
-                .union(other.maxX, other.maxY, other.maxZ, this);
-    }
-
-    /**
-     * Ensure that the minimum coordinates are strictly less than or equal to the maximum coordinates by swapping them
-     * if necessary.
-     *
-     * @return this
-     */
-    public BlockRegion correctBounds() {
-        // NOTE: this is basically the same as AABBi#correctBounds, but adjusted for off-by-one semantics here in
-        //       BlockRegion for the max value.
-        int tmp;
-        if (this.minX > this.maxX) {
-            tmp = this.minX;
-            this.minX = this.maxX;
-            this.maxX = tmp;
-        }
-        if (this.minY > this.maxY) {
-            tmp = this.minY;
-            this.minY = this.maxY;
-            this.maxY = tmp;
-        }
-        if (this.minZ > this.maxZ) {
-            tmp = this.minZ;
-            this.minZ = this.maxZ;
-            this.maxZ = tmp;
-        }
+    public BlockRegion maxY(int y) {
+        Preconditions.checkArgument(y >= this.minY || this.minY == Integer.MAX_VALUE);
+        this.maxY = y;
         return this;
     }
+
+    /**
+     * The z-coordinate of the maximum corner
+     */
+    public int maxZ() {
+        return this.maxZ;
+    }
+
+    /**
+     * the maximum coordinate of the second block z
+     *
+     * @return the minimum coordinate z
+     * @deprecated use {@link #maxZ()}
+     */
+    @Deprecated
+    public int getMaxZ() {
+        return this.maxZ;
+    }
+
+    /**
+     * set the maximum coordinate of the second block z
+     *
+     * @return the minZ
+     */
+    public BlockRegion maxZ(int z) {
+        Preconditions.checkArgument(z >= this.minZ || this.minZ == Integer.MAX_VALUE);
+        this.maxZ = z;
+        return this;
+    }
+
+    /**
+     * Get the block coordinate of the maximum corner.
+     *
+     * @param dest will hold the result
+     */
+    public Vector3i getMax(Vector3i dest) {
+        return dest.set(maxX, maxY, maxZ);
+    }
+
+    /**
+     * Sets the maximum coordinate of the second block for <code>this</code> {@link BlockRegion}
+     *
+     * @param max the second coordinate of the second block
+     * @return this
+     */
+    public BlockRegion setMax(Vector3ic max) {
+        return this.setMax(max.x(), max.y(), max.z());
+    }
+
+    /**
+     * sets the maximum block for this {@link BlockRegion}
+     *
+     * @param maxX the x coordinate of the first block
+     * @param maxY the y coordinate of the first block
+     * @param maxZ the z coordinate of the first block
+     * @return this
+     */
+    public BlockRegion setMax(int maxX, int maxY, int maxZ) {
+        Preconditions.checkArgument(maxX >= this.minX || this.minX == Integer.MAX_VALUE);
+        Preconditions.checkArgument(maxY >= this.minY || this.minY == Integer.MAX_VALUE);
+        Preconditions.checkArgument(maxZ >= this.minZ || this.minZ == Integer.MAX_VALUE);
+        this.maxX = maxX;
+        this.maxY = maxY;
+        this.maxZ = maxZ;
+        return this;
+    }
+
+    // -- size -------------------------------------------------------------------------------------------------------//
 
     /**
      * Set the size of the block region from minimum the minimum corner.
@@ -528,58 +439,177 @@ public class BlockRegion {
         return isEmpty() ? 0 : this.maxZ - this.minZ + 1;
     }
 
+    // -- bounds -----------------------------------------------------------------------------------------------------//
+
+    //TODO: 1.9.26 has a constant interface for aabbf
+    public AABBf getBounds(AABBf dest) {
+        dest.minX = minX - .5f;
+        dest.minY = minY - .5f;
+        dest.minZ = minZ - .5f;
+
+        dest.maxX = maxX + .5f;
+        dest.maxY = maxY + .5f;
+        dest.maxZ = maxZ + .5f;
+
+        return dest;
+    }
+
+    // -- IN-PLACE MUTATION ------------------------------------------------------------------------------------------//
+
+    /**
+     * Compute the union of <code>this</code> and the given block <code>(x, y, z)</code>.
+     *
+     * @param x the x coordinate of the block
+     * @param y the y coordinate of the block
+     * @param z the z coordinate of the block
+     */
+    public BlockRegion union(int x, int y, int z) {
+        this.minX = Math.min(this.minX, x);
+        this.minY = Math.min(this.minY, y);
+        this.minZ = Math.min(this.minZ, z);
+
+        this.maxX = Math.max(this.maxX, x);
+        this.maxY = Math.max(this.maxY, y);
+        this.maxZ = Math.max(this.maxZ, z);
+        return this;
+    }
+
+    /**
+     * Set <code>this</code> to the union of <code>this</code> and the given block <code>pos</code>.
+     *
+     * @param pos the position of the block
+     * @return this
+     */
+    public BlockRegion union(Vector3ic pos) {
+        return union(pos.x(), pos.y(), pos.z());
+    }
+
+    /**
+     * Set <code>this</code> to the union of <code>this</code> and <code>other</code>.
+     *
+     * @param other {@link BlockRegion}
+     * @return this
+     */
+    public BlockRegion union(BlockRegion other) {
+        return this.union(other.minX, other.minY, other.minZ).union(other.maxX, other.maxY, other.maxZ);
+    }
+
+    /**
+     * Set <code>this</code> to the union of <code>this</code> and the given {@link EntityRef} associated with a block
+     * <code>p</code>.
+     *
+     * @param blockRef entityRef that describes a block
+     */
+    public BlockRegion union(EntityRef blockRef) {
+        BlockComponent component = blockRef.getComponent(BlockComponent.class);
+        if (component != null) {
+            return this.union(component.position.x(), component.position.y(), component.position.z());
+        }
+        return this;
+    }
+
+    // ---------------------------------------------------------------------------------------------------------------//
+
+    /**
+     * calculate the BlockRegion that is intersected between another region
+     *
+     * @param other the other BlockRegion
+     */
+    public Optional<BlockRegion> intersect(BlockRegion other) {
+        this.minX = Math.max(minX, other.minX);
+        this.minY = Math.max(minY, other.minY);
+        this.minZ = Math.max(minZ, other.minZ);
+
+        this.maxX = Math.min(maxX, other.maxX);
+        this.maxY = Math.min(maxY, other.maxY);
+        this.maxZ = Math.min(maxZ, other.maxZ);
+
+        if (this.isValid()) {
+            return Optional.of(this);
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    // ---------------------------------------------------------------------------------------------------------------//
+
     /**
      * Translate <code>this</code> by the given vector <code>xyz</code>.
      *
      * @param x the x coordinate to translate by
      * @param y the y coordinate to translate by
      * @param z the z coordinate to translate by
-     * @return this
      */
     public BlockRegion translate(int x, int y, int z) {
-        translate(x, y, z, this);
+        this.minX = this.minX + x;
+        this.minY = this.minY + y;
+        this.minZ = this.minZ + z;
+        this.maxX = this.maxX + x;
+        this.maxY = this.maxY + y;
+        this.maxZ = this.maxZ + z;
         return this;
     }
 
     /**
-     * Translate <code>this</code> by the given vector <code>xyz</code>.
+     * Translate <code>this</code> by the given vector <code>vec</code>.
      *
-     * @param x the x coordinate to translate by
-     * @param y the y coordinate to translate by
-     * @param z the z coordinate to translate by
-     * @param dest will hold the result
+     * @param vec the vector to translate by
      * @return this
      */
-    public BlockRegion translate(int x, int y, int z, BlockRegion dest) {
-        dest.minX = this.minX + x;
-        dest.minY = this.minY + y;
-        dest.minZ = this.minZ + z;
-        dest.maxX = this.maxX + x;
-        dest.maxY = this.maxY + y;
-        dest.maxZ = this.maxZ + z;
+    public BlockRegion translate(Vector3ic vec) {
+        return translate(vec.x(), vec.y(), vec.z());
+    }
+
+    // ---------------------------------------------------------------------------------------------------------------//
+
+    /**
+     * Adds extend for each face of a BlockRegion
+     *
+     * @param extentX the x coordinate to grow the extents
+     * @param extentY the y coordinate to grow the extents
+     * @param extentZ the z coordinate to grow the extents
+     */
+    public BlockRegion extend(int extentX, int extentY, int extentZ) {
+        Preconditions.checkArgument(2 * extentX <= sizeX());
+        Preconditions.checkArgument(2 * extentY <= sizeY());
+        Preconditions.checkArgument(2 * extentZ <= sizeZ());
+        this.minX = this.minX - extentX;
+        this.minY = this.minY - extentY;
+        this.minZ = this.minZ - extentZ;
+
+        this.maxX = this.maxX + extentX;
+        this.maxY = this.maxY + extentY;
+        this.maxZ = this.maxZ + extentZ;
+
         return this;
     }
 
     /**
-     * Translate <code>this</code> by the given vector <code>xyz</code>.
+     * Adds extend for each face of a BlockRegion.
      *
-     * @param xyz the vector to translate by
-     * @param dest will hold the result
+     * @param extents the coordinates to grow the extents
+     * @return this
+     */
+    public BlockRegion extend(Vector3ic extents) {
+        return extend(extents.x(), extents.y(), extents.z());
+    }
+
+    /**
+     * Adds extend for each face of a BlockRegion.
+     *
+     * @param extentX the x coordinate to grow the extents
+     * @param extentY the y coordinate to grow the extents
+     * @param extentZ the z coordinate to grow the extents
      * @return dest
      */
-    public BlockRegion translate(Vector3ic xyz, BlockRegion dest) {
-        return translate(xyz.x(), xyz.y(), xyz.z(), dest);
+    public BlockRegion extend(float extentX, float extentY, float extentZ) {
+        return extend(
+                Math.roundUsing(extentX, RoundingMode.FLOOR),
+                Math.roundUsing(extentY, RoundingMode.FLOOR),
+                Math.roundUsing(extentZ, RoundingMode.FLOOR));
     }
 
-    /**
-     * Translate <code>this</code> by the given vector <code>xyz</code>.
-     *
-     * @param xyz the vector to translate by
-     * @return this
-     */
-    public BlockRegion translate(Vector3ic xyz) {
-        return translate(xyz.x(), xyz.y(), xyz.z(), this);
-    }
+    // ---------------------------------------------------------------------------------------------------------------//
 
     /**
      * Apply the given {@link Matrix4fc#isAffine() affine} transformation to this {@link BlockRegion}.
@@ -635,6 +665,8 @@ public class BlockRegion {
         transform(m, this);
         return this;
     }
+
+    // -- CHECKS -----------------------------------------------------------------------------------------------------//
 
     /**
      * Test whether the block <code>(x, y, z)</code> lies inside this BlockRegion.
@@ -957,105 +989,6 @@ public class BlockRegion {
      */
     public boolean isEmpty() {
         return !isValid();
-    }
-
-    /**
-     * calculate the BlockRegion that is intersected between another region
-     *
-     * @param other the other BlockRegion
-     * @param dest holds the result
-     * @return dest
-     */
-    public BlockRegion intersection(BlockRegion other, BlockRegion dest) {
-        dest.minX = Math.max(minX, other.minX);
-        dest.minY = Math.max(minY, other.minY);
-        dest.minZ = Math.max(minZ, other.minZ);
-
-        dest.maxX = Math.min(maxX, other.maxX);
-        dest.maxY = Math.min(maxY, other.maxY);
-        dest.maxZ = Math.min(maxZ, other.maxZ);
-        return dest;
-    }
-
-    /**
-     * Adds extend for each face of a BlockRegion.
-     *
-     * @param extent extents to grow each face
-     * @param dest holds the result
-     * @return dest
-     */
-    public BlockRegion addExtents(int extent, BlockRegion dest) {
-        return addExtents(extent, extent, extent, dest);
-    }
-
-    /**
-     * Adds extend for each face of a BlockRegion.
-     *
-     * @param extentX the x coordinate to grow the extents
-     * @param extentY the y coordinate to grow the extents
-     * @param extentZ the z coordinate to grow the extents
-     * @return this
-     */
-    public BlockRegion addExtents(int extentX, int extentY, int extentZ) {
-        return addExtents(extentX, extentY, extentZ, this);
-    }
-
-    /**
-     * Adds extend for each face of a BlockRegion.
-     *
-     * @param extents extents to grow each face
-     * @param dest holds the result
-     * @return dest
-     */
-    public BlockRegion addExtents(Vector3ic extents, BlockRegion dest) {
-        return addExtents(extents.x(), extents.y(), extents.z(), dest);
-    }
-
-    /**
-     * Adds extend for each face of a BlockRegion.
-     *
-     * @param extents the coordinates to grow the extents
-     * @return this
-     */
-    public BlockRegion addExtents(Vector3ic extents) {
-        return addExtents(extents.x(), extents.y(), extents.z(), this);
-    }
-
-    /**
-     * Adds extend for each face of a BlockRegion
-     *
-     * @param extentX the x coordinate to grow the extents
-     * @param extentY the y coordinate to grow the extents
-     * @param extentZ the z coordinate to grow the extents
-     * @param dest will hold the result
-     * @return dest
-     */
-    public BlockRegion addExtents(int extentX, int extentY, int extentZ, BlockRegion dest) {
-        dest.minX = this.minX - extentX;
-        dest.minY = this.minY - extentY;
-        dest.minZ = this.minZ - extentZ;
-
-        dest.maxX = this.maxX + extentX;
-        dest.maxY = this.maxY + extentY;
-        dest.maxZ = this.maxZ + extentZ;
-
-        return dest;
-    }
-
-    /**
-     * Adds extend for each face of a BlockRegion.
-     *
-     * @param extentX the x coordinate to grow the extents
-     * @param extentY the y coordinate to grow the extents
-     * @param extentZ the z coordinate to grow the extents
-     * @param dest will hold the result
-     * @return dest
-     */
-    public BlockRegion addExtents(float extentX, float extentY, float extentZ, BlockRegion dest) {
-        return addExtents(
-                Math.roundUsing(extentX, RoundingMode.FLOOR),
-                Math.roundUsing(extentY, RoundingMode.FLOOR),
-                Math.roundUsing(extentZ, RoundingMode.FLOOR), dest);
     }
 
     @Override

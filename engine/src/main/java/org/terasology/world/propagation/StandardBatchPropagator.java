@@ -304,10 +304,8 @@ public class StandardBatchPropagator implements BatchPropagator {
     public void propagateBetween(LitChunk chunk, LitChunk adjChunk, Side side, boolean propagateExternal) {
         IndexProvider indexProvider = createIndexProvider(side);
 
-        BlockRegion edgeRegion = ChunkMath.getEdgeRegion(
-                BlockRegions.createFromMinAndSize(new org.joml.Vector3i(0, 0, 0),
-                        JomlUtil.from(ChunkConstants.CHUNK_SIZE)),
-                side, new BlockRegion());
+        BlockRegion edgeRegion = BlockRegions.createFromMinAndSize(new org.joml.Vector3i(0, 0, 0), JomlUtil.from(ChunkConstants.CHUNK_SIZE));
+        ChunkMath.getEdgeRegion(edgeRegion, side, edgeRegion);
 
         int edgeSize = edgeRegion.sizeX() * edgeRegion.sizeY() * edgeRegion.sizeZ();
         int[] depth = new int[edgeSize];
