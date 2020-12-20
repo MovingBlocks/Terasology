@@ -415,12 +415,13 @@ public class BlockRegion {
     // -- size -------------------------------------------------------------------------------------------------------//
 
     /**
-     * Set the size of the block region from minimum the minimum corner.
+     * Set the size of the block region from the minimum corner.
      *
      * @param x the x coordinate to set the size; must be > 0
      * @param y the y coordinate to set the size; must be > 0
      * @param z the z coordinate to set the size; must be > 0
-     * @return this after modification
+     * @return this region (after modification)
+     * @throws IllegalArgumentException if the size is smaller than or equal to 0 in any dimension
      */
     public BlockRegion setSize(int x, int y, int z) {
         Preconditions.checkArgument(x > 0);
@@ -433,17 +434,18 @@ public class BlockRegion {
     }
 
     /**
-     * Set the size of the block region from minimum the minimum corner.
+     * Set the size of the block region from the minimum corner.
      *
      * @param size the size to set; all dimensions must be > 0
-     * @return this after modification
+     * @return this region (after modification)
+     * @throws IllegalArgumentException if the size is smaller than or equal to 0 in any dimension
      */
     public BlockRegion setSize(Vector3ic size) {
         return setSize(size.x(), size.y(), size.z());
     }
 
     /**
-     * the number of blocks for the +x, +y, +z from the minimum to the maximum
+     * The number of blocks in this region along the +x, +y, +z  axis from the minimum to the maximum corner.
      *
      * @param dest will hold the result
      * @return dest
@@ -453,27 +455,21 @@ public class BlockRegion {
     }
 
     /**
-     * The number of blocks on the X axis
-     *
-     * @return number of blocks in the X axis
+     * The number of blocks on the x axis.
      */
     public int sizeX() {
         return this.maxX - this.minX + 1;
     }
 
     /**
-     * The number of blocks on the Y axis
-     *
-     * @return number of blocks in the Y axis
+     * The number of blocks on the y axis.
      */
     public int sizeY() {
         return this.maxY - this.minY + 1;
     }
 
     /**
-     * The number of blocks on the Z axis
-     *
-     * @return number of blocks in the Z axis
+     * The number of blocks on the z axis.
      */
     public int sizeZ() {
         return this.maxZ - this.minZ + 1;
