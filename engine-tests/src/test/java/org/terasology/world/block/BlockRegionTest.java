@@ -86,6 +86,21 @@ public class BlockRegionTest {
         assertThrows(IllegalArgumentException.class, () -> region.maxZ(-1));
     }
 
+    static Stream<Arguments> sizeArgs() {
+        return Stream.of(
+                Arguments.of(new BlockRegion(-10, -10, -10, -5, -5, -5), new Vector3i(6)),
+                Arguments.of(new BlockRegion(0, 0, 0, 0, 0, 0), new Vector3i(1)),
+                Arguments.of(new BlockRegion(0, 0, 0, 1, 2, 3), new Vector3i(2, 3, 4)),
+                Arguments.of(new BlockRegion(new Vector3i(-1), new Vector3i(1)), new Vector3i(3))
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("sizeArgs")
+    void size(BlockRegion region, Vector3i expected) {
+        assertEquals(expected, region.getSize(new Vector3i()));
+    }
+
     // -- creation  --------------------------------------------------------------------------------------------------//
 
     @Test
