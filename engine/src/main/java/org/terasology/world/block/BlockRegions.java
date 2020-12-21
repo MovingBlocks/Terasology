@@ -71,8 +71,21 @@ public final class BlockRegions {
      * The {@code extents} MUST be non-negative in every dimension, otherwise an {@link IllegalArgumentException} will
      * be thrown.
      */
+    public static BlockRegion fromCenterAndExtents(int centerX, int centerY, int centerZ,
+                                                   int extentsX, int extentsY, int extentsZ) {
+        return new BlockRegion(centerX, centerY, centerZ).extend(extentsX, extentsY, extentsZ);
+    }
+
+    /**
+     * Creates a new region centered around {@code center} extending each side by {@code extents}.
+     * <p>
+     * The resulting axis-aligned bounding box (AABB) will have a size of {@code 2 * extents}
+     * <p>
+     * The {@code extents} MUST be non-negative in every dimension, otherwise an {@link IllegalArgumentException} will
+     * be thrown.
+     */
     public static BlockRegion fromCenterAndExtents(Vector3ic center, Vector3ic extents) {
-        return new BlockRegion(center).extend(extents);
+        return fromCenterAndExtents(center.x(), center.y(), center.z(), extents.x(), extents.y(), extents.z());
     }
 
     /**
