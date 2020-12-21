@@ -462,6 +462,13 @@ public class BlockRegion {
     }
 
     /**
+     * @see #sizeX()
+     */
+    public int getSizeX() {
+        return sizeX();
+    }
+
+    /**
      * The number of blocks on the y axis.
      */
     public int sizeY() {
@@ -469,10 +476,24 @@ public class BlockRegion {
     }
 
     /**
+     * @see #sizeY()
+     */
+    public int getSizeY() {
+        return sizeY();
+    }
+
+    /**
      * The number of blocks on the z axis.
      */
     public int sizeZ() {
         return this.maxZ - this.minZ + 1;
+    }
+
+    /**
+     * @see #sizeZ()
+     */
+    public int getSizeZ() {
+        return sizeZ();
     }
 
     // -- world ------------------------------------------------------------------------------------------------------//
