@@ -42,7 +42,12 @@ import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Rect2f;
 import org.terasology.math.geom.Rect2i;
 import org.terasology.math.geom.Vector3f;
+import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockRegion;
+import org.terasology.world.block.BlockRegions;
+
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public final class JomlUtil {
     private JomlUtil() {
@@ -190,7 +195,7 @@ public final class JomlUtil {
         if (aabb == null) {
             return null;
         }
-        return new BlockRegion(aabb.minX(), aabb.minY(), aabb.minZ(), aabb.maxX(), aabb.maxY(), aabb.maxZ());
+        return BlockRegions.createFromMinAndMax(aabb.minX(), aabb.minY(), aabb.minZ(), aabb.maxX(), aabb.maxY(), aabb.maxZ());
     }
 
 
@@ -236,5 +241,9 @@ public final class JomlUtil {
 
     public static Rectanglef rectanglefFromMinAndSize(float minX, float minY, float width, float height) {
         return new Rectanglef(minX, minY, minX + width, minY + height);
+    }
+
+    public static Map<org.terasology.math.geom.Vector3i, Block> blockMap(Map<Vector3i, Block> maps) {
+        return maps.entrySet().stream().collect(Collectors.toMap(k -> JomlUtil.from(k.getKey()), Map.Entry::getValue));
     }
 }
