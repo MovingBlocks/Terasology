@@ -45,6 +45,7 @@ import java.util.Optional;
  */
 @RegisterAssetFileFormat
 public class AtlasFormat extends AbstractAssetFileFormat<AtlasData> {
+    public static final float BORDER_SIZE = 0.0001f;
 
     private static final Logger logger = LoggerFactory.getLogger(AtlasFormat.class);
 
@@ -108,10 +109,10 @@ public class AtlasFormat extends AbstractAssetFileFormat<AtlasData> {
         Vector2f min = new Vector2f((float) freeform.getMin().x / size.x, (float) freeform.getMin().y / size.y);
         if (freeform.getSize() != null) {
             Vector2f itemSize = new Vector2f((float) freeform.getSize().x / size.x, (float) freeform.getSize().y / size.y);
-            out.put(new Name(freeform.getName()), new SubtextureData(texture, Rect2f.createFromMinAndSize(min, itemSize)));
+            out.put(new Name(freeform.getName()), new SubtextureData(texture, shrinkRegion(Rect2f.createFromMinAndSize(min, itemSize))));
         } else if (freeform.getMax() != null) {
             Vector2f max = new Vector2f((float) freeform.getMax().x / size.x, (float) freeform.getMax().y / size.y);
-            out.put(new Name(freeform.getName()), new SubtextureData(texture, Rect2f.createFromMinAndMax(min, max)));
+            out.put(new Name(freeform.getName()), new SubtextureData(texture, shrinkRegion(Rect2f.createFromMinAndMax(min, max))));
         }
     }
 
@@ -138,7 +139,7 @@ public class AtlasFormat extends AbstractAssetFileFormat<AtlasData> {
                 pos.x += tileX * tileSize.x;
                 pos.y += tileY * tileSize.y;
                 Rect2f tileLocation = Rect2f.createFromMinAndSize(offset.x + tileX * tileSize.x, offset.y + tileY * tileSize.y, tileSize.x, tileSize.y);
-                out.put(new Name(name), new SubtextureData(texture, tileLocation));
+                out.put(new Name(name), new SubtextureData(texture, shrinkRegion(tileLocation)));
             }
 
             tileX++;
@@ -149,4 +150,14 @@ public class AtlasFormat extends AbstractAssetFileFormat<AtlasData> {
         }
     }
 
+    /**
+     * Make the region slightly smaller to make sure the adjacent pixels don't leak in.
+     */
+    private Rect2f shrinkRegion(Rect2f region) {
+        return  Rect2f.createFromMinAndSize(
+            region.minX() + region.width() * BORDER_SIZE,
+            region.minY() + region.height() * BORDER_SIZE,
+            region.width() * (1 - 2 * BORDER_SIZE),
+            region.height() * (1 - 2 * BORDER_SIZE));
+    }
 }

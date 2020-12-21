@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.rendering.cameras;
 
+import org.joml.AABBf;
 import org.joml.AxisAngle4f;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
@@ -246,7 +247,19 @@ public abstract class Camera {
         return reflected;
     }
 
+    /**
+     *
+     * @param aabb
+     * @return
+     * @deprecated This method is scheduled for removal in an upcoming version. Use the JOML implementation instead:
+     *       {@link #hasInSight(AABBf)}.
+     */
+    @Deprecated
     public boolean hasInSight(AABB aabb) {
+        return viewFrustum.intersects(aabb);
+    }
+
+    public boolean hasInSight(AABBf aabb) {
         return viewFrustum.intersects(aabb);
     }
 }

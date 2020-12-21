@@ -7,7 +7,6 @@ import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.location.LocationComponent;
-import org.terasology.math.JomlUtil;
 import org.terasology.math.TeraMath;
 import org.terasology.physics.engine.CharacterCollider;
 import org.terasology.physics.engine.PhysicsEngine;
@@ -59,19 +58,19 @@ public final class CharacterMovementSystemUtility {
             // Only set the gaze entity rotation if it is not the same as the main entity.
             // The character is assumed to only rotate side to side, introducing pitch makes things act strangely
             LocationComponent gazeLocation = gazeEntity.getComponent(LocationComponent.class);
-            gazeLocation.setLocalRotation(JomlUtil.from(rotation));
+            gazeLocation.setLocalRotation(rotation);
             gazeEntity.saveComponent(gazeLocation);
         }
     }
 
     public void setToInterpolateState(EntityRef entity, CharacterStateEvent a, CharacterStateEvent b, long time) {
         float t = (float) (time - a.getTime()) / (b.getTime() - a.getTime());
-        Vector3f newPos = a.getPosition().lerp(b.getPosition(),t);
-        Quaternionf newRot = a.getRotation().nlerp(b.getRotation(),t);
-      
+        Vector3f newPos = a.getPosition().lerp(b.getPosition(), t, new Vector3f());
+        Quaternionf newRot = a.getRotation().nlerp(b.getRotation(), t, new Quaternionf());
+
         entity.updateComponent(LocationComponent.class, location -> {
-            location.setWorldPosition(JomlUtil.from(newPos));
-            location.setWorldRotation(JomlUtil.from(newRot));
+            location.setWorldPosition(newPos);
+            location.setWorldRotation(newRot);
             return location;
         });
 
@@ -111,7 +110,7 @@ public final class CharacterMovementSystemUtility {
 
     private void extrapolateLocationComponent(EntityRef entity, CharacterStateEvent state, Vector3f newPos) {
         LocationComponent location = entity.getComponent(LocationComponent.class);
-        location.setWorldPosition(JomlUtil.from(newPos));
+        location.setWorldPosition(newPos);
         location.setWorldRotation(state.getRotation());
         entity.saveComponent(location);
     }

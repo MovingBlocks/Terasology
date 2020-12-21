@@ -22,6 +22,7 @@ import org.joml.Vector3ic;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.world.block.BlockRegion;
+import org.terasology.world.block.BlockRegions;
 import org.terasology.world.chunks.ChunkConstants;
 
 import java.math.RoundingMode;
@@ -491,7 +492,7 @@ public final class ChunkMath {
         org.joml.Vector3i temp = new org.joml.Vector3i();
         org.joml.Vector3i minChunk = calcChunkPos(temp.set(pos).add(-extent, -extent, -extent), new org.joml.Vector3i());
         org.joml.Vector3i maxChunk = calcChunkPos(temp.set(pos).add(extent, extent, extent), new org.joml.Vector3i());
-        return new BlockRegion(minChunk, maxChunk);
+        return BlockRegions.createFromMinAndMax(minChunk, maxChunk);
     }
 
 
