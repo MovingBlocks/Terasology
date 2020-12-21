@@ -17,6 +17,21 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 public final class BlockRegions {
+    /**
+     * An invalid block region.
+     * <p>
+     * CAUTION: Behavior for this region may be undeterministic for some operations. Avoid extensive use and encode an
+     * <i>empty region</i> by other means, e.g., by using {@code null} or {@link java.util.Optional}.
+     * <p>
+     * This region may be used as initial value for reductions on block regions. For instance, to compute the union (the
+     * region that encompasses all regions in some collection {@code regions}) the following Stream-API snippet can be
+     * used:
+     * <pre>
+     *     BlockRegion union = regions.stream().reduce(BlockRegions.INVALID, BlockRegion::union, BlockRegion::union);
+     * </pre>
+     */
+    public static final BlockRegion INVALID = new BlockRegion();
+
     private BlockRegions() {
     }
 
