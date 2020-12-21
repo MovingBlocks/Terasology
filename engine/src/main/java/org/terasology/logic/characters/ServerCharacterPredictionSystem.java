@@ -19,6 +19,8 @@ package org.terasology.logic.characters;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.Time;
@@ -33,7 +35,7 @@ import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.logic.characters.events.SetMovementModeEvent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.LocalPlayer;
-import org.terasology.math.geom.Vector3f;
+import org.terasology.math.JomlUtil;
 import org.terasology.network.NetworkSystem;
 import org.terasology.physics.engine.CharacterCollider;
 import org.terasology.physics.engine.PhysicsEngine;
@@ -50,7 +52,8 @@ import java.util.Map;
 
 @RegisterSystem(RegisterMode.AUTHORITY)
 @Share(PredictionSystem.class)
-public class ServerCharacterPredictionSystem extends BaseComponentSystem implements UpdateSubscriberSystem, PredictionSystem {
+public class ServerCharacterPredictionSystem extends BaseComponentSystem implements UpdateSubscriberSystem,
+        PredictionSystem {
     public static final int RENDER_DELAY = 100;
     public static final int MAX_INPUT_OVERFLOW = 100;
     public static final int MAX_INPUT_UNDERFLOW = 100;
@@ -96,7 +99,8 @@ public class ServerCharacterPredictionSystem extends BaseComponentSystem impleme
         characterMovementSystemUtility = new CharacterMovementSystemUtility(physics);
     }
 
-    @ReceiveEvent(components = {CharacterMovementComponent.class, LocationComponent.class, AliveCharacterComponent.class})
+    @ReceiveEvent(components = {CharacterMovementComponent.class, LocationComponent.class,
+            AliveCharacterComponent.class})
     public void onCreate(final OnActivatedComponent event, final EntityRef entity) {
         physics.getCharacterCollider(entity);
         CircularBuffer<CharacterStateEvent> stateBuffer = CircularBuffer.create(BUFFER_SIZE);
@@ -104,7 +108,8 @@ public class ServerCharacterPredictionSystem extends BaseComponentSystem impleme
         characterStates.put(entity, stateBuffer);
     }
 
-    @ReceiveEvent(components = {CharacterMovementComponent.class, LocationComponent.class, AliveCharacterComponent.class})
+    @ReceiveEvent(components = {CharacterMovementComponent.class, LocationComponent.class,
+            AliveCharacterComponent.class})
     public void onDestroy(final BeforeDeactivateComponent event, final EntityRef entity) {
         physics.removeCharacterCollider(entity);
         characterStatesToRemove.add(entity);
@@ -112,7 +117,8 @@ public class ServerCharacterPredictionSystem extends BaseComponentSystem impleme
     }
 
     @ReceiveEvent(components = {AliveCharacterComponent.class})
-    public void onSetMovementModeEvent(SetMovementModeEvent event, EntityRef character, CharacterMovementComponent movementComponent) {
+    public void onSetMovementModeEvent(SetMovementModeEvent event, EntityRef character,
+                                       CharacterMovementComponent movementComponent) {
         CircularBuffer<CharacterStateEvent> stateBuffer = characterStates.get(character);
         CharacterStateEvent lastState = stateBuffer.getLast();
         CharacterStateEvent newState = new CharacterStateEvent(lastState);
@@ -126,7 +132,8 @@ public class ServerCharacterPredictionSystem extends BaseComponentSystem impleme
         characterMovementSystemUtility.setToState(character, newState);
     }
 
-    @ReceiveEvent(components = {CharacterMovementComponent.class, LocationComponent.class, AliveCharacterComponent.class})
+    @ReceiveEvent(components = {CharacterMovementComponent.class, LocationComponent.class,
+            AliveCharacterComponent.class})
     public void onPlayerInput(CharacterMoveInputEvent input, EntityRef entity) {
         CharacterCollider characterCollider = physics.getCharacterCollider(entity);
         if (characterCollider.isPending()) {
@@ -135,7 +142,7 @@ public class ServerCharacterPredictionSystem extends BaseComponentSystem impleme
         }
         CircularBuffer<CharacterStateEvent> stateBuffer = characterStates.get(entity);
         CharacterStateEvent lastState = stateBuffer.getLast();
-        float delta = input.getDeltaMs() + lastState.getTime() - (time.getGameTimeInMs() + MAX_INPUT_OVERFLOW );
+        float delta = input.getDeltaMs() + lastState.getTime() - (time.getGameTimeInMs() + MAX_INPUT_OVERFLOW);
         if (recordAndReplayCurrentStatus.getStatus() == RecordAndReplayStatus.REPLAYING) {
             delta -= MAX_INPUT_OVERFLOW_REPLAY_INCREASE;
         }
@@ -143,10 +150,11 @@ public class ServerCharacterPredictionSystem extends BaseComponentSystem impleme
             CharacterStateEvent newState = stepState(input, lastState, entity);
             stateBuffer.add(newState);
 
-            if (recordAndReplayCurrentStatus.getStatus() == RecordAndReplayStatus.REPLAYING)  {
+            if (recordAndReplayCurrentStatus.getStatus() == RecordAndReplayStatus.REPLAYING) {
                 characterStateEventPositionMap.updateCharacterStateEvent(newState);
             } else if (recordAndReplayCurrentStatus.getStatus() == RecordAndReplayStatus.RECORDING) {
-                characterStateEventPositionMap.add(newState.getSequenceNumber(), newState.getPosition(), newState.getVelocity());
+                characterStateEventPositionMap.add(newState.getSequenceNumber(), newState.getPosition(),
+                        newState.getVelocity());
             }
 
             characterMovementSystemUtility.setToState(entity, newState);
@@ -156,7 +164,8 @@ public class ServerCharacterPredictionSystem extends BaseComponentSystem impleme
         }
     }
 
-    @ReceiveEvent(components = {CharacterMovementComponent.class, LocationComponent.class, AliveCharacterComponent.class})
+    @ReceiveEvent(components = {CharacterMovementComponent.class, LocationComponent.class,
+            AliveCharacterComponent.class})
     public void onTeleport(CharacterTeleportEvent event, EntityRef entity) {
         CircularBuffer<CharacterStateEvent> stateBuffer = characterStates.get(entity);
         CharacterStateEvent lastState = stateBuffer.getLast();
@@ -168,7 +177,8 @@ public class ServerCharacterPredictionSystem extends BaseComponentSystem impleme
 
     }
 
-    @ReceiveEvent(components = {CharacterMovementComponent.class, LocationComponent.class, AliveCharacterComponent.class})
+    @ReceiveEvent(components = {CharacterMovementComponent.class, LocationComponent.class,
+            AliveCharacterComponent.class})
     public void onImpulse(CharacterImpulseEvent event, EntityRef entity) {
         Vector3f impulse = event.getDirection();
 
@@ -184,10 +194,12 @@ public class ServerCharacterPredictionSystem extends BaseComponentSystem impleme
 
     private CharacterStateEvent createInitialState(EntityRef entity) {
         LocationComponent location = entity.getComponent(LocationComponent.class);
-        return new CharacterStateEvent(time.getGameTimeInMs(), 0, location.getWorldPosition(), location.getWorldRotation(), new Vector3f(), 0, 0, MovementMode.WALKING, false);
+        return new CharacterStateEvent(time.getGameTimeInMs(), 0, location.getWorldPosition(new Vector3f()),
+                location.getWorldRotation(new Quaternionf()), new Vector3f(), 0, 0, MovementMode.WALKING, false);
     }
 
-    private CharacterStateEvent stepState(CharacterMoveInputEvent input, CharacterStateEvent lastState, EntityRef entity) {
+    private CharacterStateEvent stepState(CharacterMoveInputEvent input, CharacterStateEvent lastState,
+                                          EntityRef entity) {
         return characterMover.step(lastState, input, entity);
     }
 

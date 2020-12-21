@@ -71,11 +71,6 @@ configurations {
     }
 }
 
-// TODO: Remove when we don't need to rely on snapshots. Wonder why modules respected this set in root project, engine not so much
-configurations.all {
-    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
-}
-
 // Primary dependencies definition
 dependencies {
     // Storage and networking
@@ -151,6 +146,8 @@ dependencies {
 
     // TODO: Consider moving this back to the PC Facade instead of having the engine rely on it?
     implementation group: 'org.terasology.crashreporter', name: 'cr-terasology', version: '4.1.0'
+    
+   api(project(":subsystems:TypeHandlerLibrary"))
 }
 
 task cacheReflections {
@@ -159,7 +156,7 @@ task cacheReflections {
             // getClassesDir from all sourceSets (for any jvm (seems) language)
             configurations."${sourceSets.main.runtimeClasspathConfigurationName}"
 
-    outputs.upToDateWhen(classes.outputs.upToDateSpec)
+    outputs.upToDateWhen {classes.state.upToDate}
     outputs.file("$buildDir/resources/main/reflections.cache")
     dependsOn classes
 
@@ -179,11 +176,13 @@ jar {
 
     from(tasks.getByName("cacheReflections").outputs)
 
-    manifest {
-        def manifestClasspath = "$subDirLibs/" + configurations."${sourceSets.main.runtimeClasspathConfigurationName}".collect {
-            it.getName()
-        }.join(" $subDirLibs/")
-        attributes("Class-Path": manifestClasspath, "Implementation-Title": "Terasology-" + project.name, "Implementation-Version": env.BUILD_NUMBER + ", " + convertGitBranch(env.GIT_BRANCH) + ", " + env.BUILD_ID + ", " + displayVersion)
+    doFirst {
+        manifest {
+            def manifestClasspath = "$subDirLibs/" + configurations."${sourceSets.main.runtimeClasspathConfigurationName}".collect {
+                it.getName()
+            }.join(" $subDirLibs/")
+            attributes("Class-Path": manifestClasspath, "Implementation-Title": "Terasology-" + project.name, "Implementation-Version": env.BUILD_NUMBER + ", " + convertGitBranch(env.GIT_BRANCH) + ", " + env.BUILD_ID + ", " + displayVersion)
+        }
     }
 }
 
@@ -210,11 +209,6 @@ def moduleConfig = slurper.parseText(moduleFile.text)
 
 // Gradle uses the magic version variable when creating the jar name (unless explicitly set differently)
 version = moduleConfig.version
-
-// The only case in which we make non-snapshots is when BRANCH_NAME exists and contains "master" - otherwise snapshots
-if (env.BRANCH_NAME == null || !env.BRANCH_NAME.equals("master")) {
-    version += "-SNAPSHOT"
-}
 
 // Jenkins-Artifactory integration catches on to this as part of the Maven-type descriptor
 group = 'org.terasology.engine'

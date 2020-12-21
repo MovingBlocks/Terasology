@@ -42,7 +42,7 @@ import org.terasology.registry.In;
  */
 @RegisterSystem(RegisterMode.CLIENT)
 public class PlayerNameTagSystem extends BaseComponentSystem {
-    private static final Logger logger = LoggerFactory.getLogger(NameTagClientSystem.class);
+    private static final Logger logger = LoggerFactory.getLogger(PlayerNameTagSystem.class);
 
     @In
     private NetworkSystem networkSystem;

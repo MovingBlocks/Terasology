@@ -15,8 +15,8 @@
  */
 package org.terasology.logic.characters;
 
+import org.joml.Vector3f;
 import org.terasology.entitySystem.event.Event;
-import org.terasology.math.geom.Vector3f;
 
 public class CharacterImpulseEvent implements Event {
     Vector3f direction;

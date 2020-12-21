@@ -175,7 +175,12 @@ public class LocalPlayer {
         }
         return dest;
     }
-
+    /**
+     * @return
+     * @deprecated This is scheduled for removal in an upcoming version method will be replaced with JOML implementation
+     *     {@link #getViewPosition(org.joml.Vector3f)}.
+     */
+    @Deprecated
     public Vector3f getViewPosition() {
         return getViewPosition(new Vector3f());
     }

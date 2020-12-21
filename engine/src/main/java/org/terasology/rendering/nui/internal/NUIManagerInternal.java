@@ -37,7 +37,6 @@ import org.terasology.input.events.MouseAxisEvent;
 import org.terasology.input.events.MouseButtonEvent;
 import org.terasology.input.events.MouseWheelEvent;
 import org.terasology.logic.players.LocalPlayer;
-import org.terasology.math.JomlUtil;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.network.ClientComponent;
 import org.terasology.nui.AbstractWidget;
@@ -621,7 +620,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
             return;
         }
 
-        Vector2i mousePosition = JomlUtil.from(event.getMousePosition());
+        Vector2i mousePosition = event.getMousePosition();
         if (focus != null) {
             focus.onMouseButtonEvent(new NUIMouseButtonEvent(event.getButton(), event.getState(), mousePosition));
             if (event.isConsumed()) {
@@ -649,7 +648,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
             return;
         }
 
-        Vector2i mousePosition = JomlUtil.from(event.getMousePosition());
+        Vector2i mousePosition = event.getMousePosition();
         if (focus != null) {
             NUIMouseWheelEvent nuiEvent = new NUIMouseWheelEvent(mouse, keyboard, mousePosition, event.getWheelTurns());
             focus.onMouseWheelEvent(nuiEvent);

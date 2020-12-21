@@ -22,7 +22,7 @@ import org.terasology.world.block.BeforeDeactivateBlocks;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.BlockRegion;
-import org.terasology.world.block.BlockRegionIterable;
+import org.terasology.world.block.BlockRegions;
 import org.terasology.world.block.OnActivatedBlocks;
 import org.terasology.world.block.OnAddedBlocks;
 import org.terasology.world.chunks.Chunk;
@@ -92,14 +92,16 @@ class LocalChunkProviderTest {
 
     private Future<Chunk> requestCreatingOrLoadingArea(Vector3i chunkPosition, int radius) {
         Future<Chunk> chunkFuture = chunkProvider.createOrLoadChunk(chunkPosition);
-        BlockRegion extentsRegion = new BlockRegion(
+        BlockRegion extentsRegion = BlockRegions.createFromMinAndMax(
                 chunkPosition.x - radius, chunkPosition.y - radius, chunkPosition.z - radius,
                 chunkPosition.x + radius, chunkPosition.y + radius, chunkPosition.z + radius);
-        BlockRegionIterable.region(extentsRegion).subtract(
-                new BlockRegion( // remove center. we takes future for it already.
-                        chunkPosition.x, chunkPosition.y, chunkPosition.z,
-                        chunkPosition.x, chunkPosition.y, chunkPosition.z)
-        ).build().iterator().forEachRemaining(chunkPos -> chunkProvider.createOrLoadChunk(JomlUtil.from(chunkPos)));
+
+        BlockRegions.iterableInPlace(extentsRegion).iterator()
+                .forEachRemaining(pos -> {
+                    if (!pos.equals(JomlUtil.from(chunkPosition))) { // remove center. we takes future for it already.
+                        chunkProvider.createOrLoadChunk(JomlUtil.from(pos));
+                    }
+                });
         return chunkFuture;
     }
 

@@ -16,36 +16,36 @@
 package org.terasology.logic.debug;
 
 import org.joml.Quaternionf;
-import org.terasology.config.Config;
-import org.terasology.entitySystem.entity.EntityManager;
+import org.joml.Vector3f;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.logic.characters.GazeMountPointComponent;
-import org.terasology.logic.characters.CharacterMovementComponent;
-import org.terasology.logic.characters.CharacterTeleportEvent;
-import org.terasology.logic.characters.CharacterImpulseEvent;
-import org.terasology.logic.characters.MovementMode;
-import org.terasology.logic.characters.events.ScaleToRequest;
-import org.terasology.logic.common.DisplayNameComponent;
-import org.terasology.logic.location.Location;
-import org.terasology.logic.location.LocationComponent;
-import org.terasology.math.geom.Quat4f;
-import org.terasology.physics.engine.PhysicsEngine;
-import org.terasology.registry.In;
-import org.terasology.registry.Share;
-import org.terasology.utilities.Assets;
 import org.terasology.assets.ResourceUrn;
+import org.terasology.config.Config;
+import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
+import org.terasology.logic.characters.CharacterImpulseEvent;
+import org.terasology.logic.characters.CharacterMovementComponent;
+import org.terasology.logic.characters.CharacterTeleportEvent;
+import org.terasology.logic.characters.GazeMountPointComponent;
+import org.terasology.logic.characters.MovementMode;
+import org.terasology.logic.characters.events.ScaleToRequest;
 import org.terasology.logic.characters.events.SetMovementModeEvent;
+import org.terasology.logic.common.DisplayNameComponent;
 import org.terasology.logic.console.commandSystem.annotations.Command;
 import org.terasology.logic.console.commandSystem.annotations.CommandParam;
 import org.terasology.logic.console.commandSystem.annotations.Sender;
+import org.terasology.logic.location.Location;
+import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.permission.PermissionManager;
-import org.terasology.math.geom.Vector3f;
+import org.terasology.math.JomlUtil;
 import org.terasology.network.ClientComponent;
+import org.terasology.physics.engine.PhysicsEngine;
+import org.terasology.registry.In;
+import org.terasology.registry.Share;
+import org.terasology.utilities.Assets;
 
 import java.util.Optional;
 
@@ -314,7 +314,7 @@ public class MovementDebugCommands extends BaseComponentSystem {
             if (username.equalsIgnoreCase(name.name)) {
                 LocationComponent locationComponent = clientEntity.getComponent(LocationComponent.class);
                 if (locationComponent != null) {
-                    Vector3f vLocation = locationComponent.getWorldPosition();
+                    Vector3f vLocation = locationComponent.getWorldPosition(new Vector3f());
                     ClientComponent clientComp = sender.getComponent(ClientComponent.class);
                     if (clientComp != null) {
                         clientComp.character.send(new CharacterTeleportEvent(vLocation));
@@ -338,7 +338,7 @@ public class MovementDebugCommands extends BaseComponentSystem {
             if (username.equalsIgnoreCase(name.name)) {
                 LocationComponent locationComponent = sender.getComponent(LocationComponent.class);
                 if (locationComponent != null) {
-                    Vector3f vLocation = locationComponent.getWorldPosition();
+                    Vector3f vLocation = locationComponent.getWorldPosition(new Vector3f());
                     ClientComponent clientComp = clientEntity.getComponent(ClientComponent.class);
                     if (clientComp != null) {
                         clientComp.character.send(new CharacterTeleportEvent(vLocation));
@@ -390,7 +390,7 @@ public class MovementDebugCommands extends BaseComponentSystem {
 
         LocationComponent locationComponent = entityTo.getComponent(LocationComponent.class);
         if (locationComponent != null) {
-            Vector3f vLocation = locationComponent.getWorldPosition();
+            Vector3f vLocation = locationComponent.getWorldPosition(new Vector3f());
             ClientComponent clientComp = entityFrom.getComponent(ClientComponent.class);
             if (clientComp != null) {
                 clientComp.character.send(new CharacterTeleportEvent(vLocation));
@@ -419,7 +419,7 @@ public class MovementDebugCommands extends BaseComponentSystem {
             requiredPermission = PermissionManager.USER_MANAGEMENT_PERMISSION)
     public String teleportAllPlayersToPlayer(@CommandParam("username") String username) {
 
-        Vector3f vPlayerLocation = Vector3f.zero();
+        Vector3f vPlayerLocation = new Vector3f();
         boolean bPlayerLocationWasFound = false;
         EntityRef playerEntity = null;
 
@@ -430,7 +430,7 @@ public class MovementDebugCommands extends BaseComponentSystem {
             if (username.equalsIgnoreCase(name.name)) {
                 LocationComponent locationComponent = clientEntity.getComponent(LocationComponent.class);
                 if (locationComponent != null) {
-                    vPlayerLocation = locationComponent.getWorldPosition();
+                    vPlayerLocation = locationComponent.getWorldPosition(new Vector3f());
                     bPlayerLocationWasFound = true;
                     playerEntity = clientEntity;
                 }

@@ -11,6 +11,7 @@ import org.terasology.persistence.typeHandling.PersistedDataMap;
 import org.terasology.persistence.typeHandling.PersistedDataSerializer;
 import org.terasology.persistence.typeHandling.TypeHandler;
 import org.terasology.world.block.BlockRegion;
+import org.terasology.world.block.BlockRegions;
 
 import java.util.Map;
 import java.util.Optional;
@@ -18,6 +19,7 @@ import java.util.Optional;
 public class BlockRegionTypeHandler extends TypeHandler<BlockRegion> {
     private static final String MIN_FIELD = "min";
     private static final String MAX_FIELD = "max";
+    private static final String SIZE_FIELD = "size";
 
     public BlockRegionTypeHandler() {
     }
@@ -25,8 +27,8 @@ public class BlockRegionTypeHandler extends TypeHandler<BlockRegion> {
     @Override
     protected PersistedData serializeNonNull(BlockRegion value, PersistedDataSerializer serializer) {
         Map<String, PersistedData> map = Maps.newLinkedHashMap();
-        map.put(MIN_FIELD, serializer.serialize(value.getMinX(), value.getMinY(), value.getMinZ()));
-        map.put(MAX_FIELD, serializer.serialize(value.getMaxX(), value.getMaxY(), value.getMaxZ()));
+        map.put(MIN_FIELD, serializer.serialize(value.minX(), value.minY(), value.minZ()));
+        map.put(MAX_FIELD, serializer.serialize(value.maxX(), value.maxY(), value.maxZ()));
         return serializer.serialize(map);
     }
 
@@ -36,12 +38,23 @@ public class BlockRegionTypeHandler extends TypeHandler<BlockRegion> {
             PersistedDataMap map = data.getAsValueMap();
 
             PersistedDataArray minDataArr = map.get(MIN_FIELD).getAsArray();
-            PersistedDataArray maxDataArr = map.get(MIN_FIELD).getAsArray();
-
             TIntList minArr = minDataArr.getAsIntegerArray();
+            if (map.has(SIZE_FIELD)) {
+                PersistedDataArray sizedataArray = map.get(SIZE_FIELD).getAsArray();
+                TIntList sizeArr = sizedataArray.getAsIntegerArray();
+                return Optional.of(
+                        BlockRegions.createFromMinAndMax(
+                                minArr.get(0), minArr.get(1), minArr.get(2),
+                                minArr.get(0) + sizeArr.get(0) - 1, minArr.get(1) + sizeArr.get(1) - 1,
+                                minArr.get(2) + sizeArr.get(2) - 1));
+            }
+            PersistedDataArray maxDataArr = map.get(MAX_FIELD).getAsArray();
             TIntList maxArr = maxDataArr.getAsIntegerArray();
 
-            return Optional.of(new BlockRegion(minArr.get(0), minArr.get(1), minArr.get(2), maxArr.get(0), maxArr.get(1), maxArr.get(2)));
+            return Optional.of(
+                    BlockRegions.createFromMinAndMax(
+                            minArr.get(0), minArr.get(1), minArr.get(2),
+                            maxArr.get(0), maxArr.get(1), maxArr.get(2)));
         }
         return Optional.empty();
     }

@@ -1,22 +1,8 @@
-/*
- * Copyright 2020 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 
 // Simple build file for modules - the one under the Core module is the template, will be copied as needed to modules
 
-import groovy.json.JsonSlurper
 import org.gradle.plugins.ide.eclipse.model.EclipseModel
 import org.gradle.plugins.ide.idea.model.IdeaModel
 import org.reflections.Reflections
@@ -24,7 +10,7 @@ import org.reflections.scanners.SubTypesScanner
 import org.reflections.scanners.TypeAnnotationsScanner
 import org.reflections.util.ConfigurationBuilder
 import org.reflections.util.FilterBuilder
-
+import org.terasology.module.ModuleMetadataJsonAdapter
 
 plugins {
     id("java")
@@ -32,18 +18,6 @@ plugins {
     id("eclipse")
 }
 
-// Read environment variables, including variables passed by jenkins continuous integration server
-val env by extra { System.getenv( )}
-// This is a fun one ... when versions switched to dynamic -SNAPSHOT or not based on branch existing modules using `master` would suddenly try publishing releases
-// This won't work without additionally doing constant version bumps (perhaps via Git tags) - but too much work to switch around all modules at once
-// Complicating things more the use of publish.gradle to centralize logic means modules and engine bits are treated the same, yet we need to vary modules
-// Temporary workaround: default modules to bypass release management: master branch builds will still make snapshot builds for the snapshot repo
-// If a module actually wants release management simply include `"isReleaseManaged" : true` in module.txt - this is needed for the engine repo embedded modules
-// One option would be to slowly convert modulespace to default to a `develop` + `master` setup living in harmony with associated automation/github tweaks
-// Alternatively one more round of refactoring could switch to Git tags, a single `master` branch, and possible other things to help match snaps/PR builds somehow?
-val bypassModuleReleaseManagement by extra("true")
-
-val moduleDepends = mutableListOf<String>()
 val moduleFile = file("module.txt")
 
 // The module file should always exist if the module was correctly created or cloned using Gradle
@@ -52,39 +26,48 @@ if (!moduleFile.exists()) {
     throw GradleException("Failed to find module.txt for " + project.name)
 }
 
-//println "Scanning for dependencies in module.txt for " + project.name
-val slurper = JsonSlurper()  // 😂 using groovy's json parser in kotlin
-val moduleConfig: Map<String, Any> = slurper.parseText(moduleFile.readText())!! as Map<String, Any>
-for (dependency in moduleConfig["dependencies"] as List<Map<String, String>>) {
-    if (dependency["id"] != "engine") {
-        moduleDepends.add(dependency["id"]!!)
+class ModuleInfoException(
+    cause: Throwable,
+    @Suppress("MemberVisibilityCanBePrivate") val file: File? = null,
+    private val project: Project? = null
+) : RuntimeException(cause) {
+    override val message: String
+        get() {
+            // trying to get the fully-qualified-class-name-mess off the front and just show
+            // the useful part.
+            val detail = cause?.cause?.localizedMessage ?: cause?.localizedMessage
+            return "Error while reading module info from ${describeFile()}:\n  ${detail}"
+        }
+
+    private fun describeFile(): String {
+        return if (project != null && file != null) {
+            project.rootProject.relativePath(file)
+        } else if (file != null) {
+            file.toString()
+        } else {
+            "[unnamed file]"
+        }
+    }
+
+    override fun toString(): String {
+        val causeType = cause?.let { it::class.simpleName }
+        return "ModuleInfoException(file=${describeFile()}, cause=${causeType})"
     }
 }
 
-// Gradle uses the magic version variable when creating the jar name (unless explicitly set somewhere else I guess)
-version = moduleConfig["version"] as String
-
-// Check for an outright -SNAPSHOT in the loaded version - for ease of use we want to get rid of that everywhere, so warn about it and remove for the variable
-val undesiredSnapshotTag = version.toString().endsWith("-SNAPSHOT")
-if (undesiredSnapshotTag) {
-    println("Taking off undesired -SNAPSHOT")
-    version = version.toString().removeSuffix("-SNAPSHOT")
-    println("WARNING: Module ${project.name} is explicitly versioned as a snapshot in module.txt, please remove '-SNAPSHOT'")
+val moduleConfig = try {
+    moduleFile.reader().use {
+        ModuleMetadataJsonAdapter().read(it)!!
+    }
+} catch (e: Exception) {
+    throw ModuleInfoException(e, moduleFile, project)
 }
 
-// The only case in which we make module non-snapshots is if release management is enabled and BRANCH_NAME is "master"
-if (moduleConfig["isReleaseManaged"].toString().toBoolean() && env["BRANCH_NAME"] == "master") {
-    // This is mildly awkward since we need to bypass by default, yet if release management is on (true) then we set the bypass to false ..
-    val bypassModuleReleaseManagement by extra(false)
-} else {
-    // In the case where we actually are building a snapshot we load -SNAPSHOT into the version variable, even if it wasn't there in module.txt
-    version = "${version}-SNAPSHOT"
-}
-
+project.version = moduleConfig.version
 // Jenkins-Artifactory integration catches on to this as part of the Maven-type descriptor
-group = "org.terasology.modules"
+project.group = "org.terasology.modules"
 
-println("Version for $project.name loaded as $version for group $group")
+logger.info("Version for {} loaded as {} for group {}", project.name, project.version, project.group)
 
 // Grab all the common stuff like plugins to use, artifact repositories, code analysis config, Artifactory settings, Git magic
 // Note that this statement is down a ways because it is affected by the stuff higher in this file like setting versioning
@@ -100,21 +83,44 @@ configure<SourceSetContainer> {
     }
 }
 val convention = project.getConvention().getPlugin(JavaPluginConvention::class)
-val mainSourceSet = convention.getSourceSets().getByName("main");
+val mainSourceSet = convention.getSourceSets().getByName("main")
 
-// TODO: Remove when we don't need to rely on snapshots. Needed here for solo builds in Jenkins
-configurations.all {
-    resolutionStrategy.cacheChangingModulesFor(0, "seconds")
-}
+
+val deps = moduleConfig.dependencies.filterNotNull()
+val moduleDepends = deps.filterNot { it.id.toString() == "engine" }
+val engineVersion = deps.find { it.id.toString() == "engine" }?.versionRange()?.toString() ?: "+"
 
 // Set dependencies. Note that the dependency information from module.txt is used for other Terasology modules
 dependencies {
-    // Check to see if this module is not the root Gradle project - if so we are in a multi-project workspace
-    implementation(group = "org.terasology.engine", name = "engine", version = "+") { isChanging = true }
-    implementation(group = "org.terasology.engine", name = "engine-tests", version = "+") { isChanging = true }
+    implementation(group = "org.terasology.engine", name = "engine", version = engineVersion)
+    implementation(group = "org.terasology.engine", name = "engine-tests", version = engineVersion)
 
-    for (dependency in moduleDepends) {
-        implementation(group = "org.terasology.modules", name = dependency, version = "+") { isChanging = true }
+    for (gestaltDep in moduleDepends) {
+        if (!gestaltDep.minVersion.isSnapshot) {
+            // gestalt considers snapshots to satisfy a minimum requirement:
+            // https://github.com/MovingBlocks/gestalt/blob/fe1893821127/gestalt-module/src/main/java/org/terasology/naming/VersionRange.java#L58-L59
+            gestaltDep.minVersion = gestaltDep.minVersion.snapshot
+            // (maybe there's some way to do that with a custom gradle resolver?
+            // but making a resolver that only works that way on gestalt modules specifically
+            // sounds complicated.)
+        }
+
+        val gradleDep = create(
+            group = "org.terasology.modules",
+            name = gestaltDep.id.toString(),
+            version = gestaltDep.versionRange().toString()
+        )
+
+        if (gestaltDep.isOptional) {
+            // `optional` module dependencies are ones it does not require for runtime
+            // (but will use opportunistically if available)
+            compileOnly(gradleDep)
+            // though modules also sometimes use "optional" to describe their test dependencies;
+            // they're not required for runtime, but they *are* required for tests.
+            testImplementation(gradleDep)
+        } else {
+            implementation(gradleDep)
+        }
     }
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.6.2")
@@ -174,6 +180,8 @@ tasks.register("cacheReflections") {
     outputs.file(File(mainSourceSet.output.classesDirs.first(), "reflections.cache"))
     dependsOn(tasks.named("classes"))
 
+    outputs.upToDateWhen { tasks.named("classes").get().state.upToDate }
+
     doFirst {
         try {
             val reflections = Reflections(ConfigurationBuilder()
@@ -182,7 +190,7 @@ tasks.register("cacheReflections") {
                     .setScanners(TypeAnnotationsScanner(), SubTypesScanner()))
             reflections.save(outputs.getFiles().getAsPath())
         } catch (e: java.net.MalformedURLException) {
-            getLogger().error("Cannot parse input to url", e);
+            logger.error("Cannot parse input to url", e)
         }
     }
 }
