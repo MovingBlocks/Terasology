@@ -69,10 +69,14 @@ public class OpenGLSkeletalMesh extends SkeletalMesh {
 
     private DisposalAction disposalAction;
 
-    public OpenGLSkeletalMesh(ResourceUrn urn, AssetType<?, SkeletalMeshData> assetType, SkeletalMeshData data, GLBufferPool bufferPool) {
+    public OpenGLSkeletalMesh(ResourceUrn urn, AssetType<?, SkeletalMeshData> assetType, GLBufferPool bufferPool, SkeletalMeshData data) {
         super(urn, assetType);
         disposalAction = new DisposalAction(urn, bufferPool);
         getDisposalHook().setDisposeAction(disposalAction);
+        this.data = data;
+    }
+
+    public void glInitialize() {
         reload(data);
     }
 

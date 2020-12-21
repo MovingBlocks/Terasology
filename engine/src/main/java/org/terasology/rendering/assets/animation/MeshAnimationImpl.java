@@ -32,6 +32,10 @@ public class MeshAnimationImpl extends MeshAnimation {
 
     public MeshAnimationImpl(ResourceUrn urn, AssetType<?, MeshAnimationData> assetType, MeshAnimationData data) {
         super(urn, assetType);
+        this.data = data;
+    }
+
+    public void glInitialize() {
         reload(data);
     }
 
@@ -86,7 +90,9 @@ public class MeshAnimationImpl extends MeshAnimation {
 
     @Override
     protected Optional<? extends Asset<MeshAnimationData>> doCreateCopy(ResourceUrn copyUrn, AssetType<?, MeshAnimationData> parentAssetType) {
-        return Optional.of(new MeshAnimationImpl(copyUrn, parentAssetType, data));
+        MeshAnimationImpl meshAnimationImpl = new MeshAnimationImpl(copyUrn, parentAssetType, data);
+        meshAnimationImpl.glInitialize();
+        return Optional.of(meshAnimationImpl);
     }
 
 }

@@ -13,6 +13,9 @@ import org.lwjgl.glfw.GLFW;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.context.Context;
+import org.terasology.engine.subsystem.DisplayDevice;
+import org.terasology.engine.subsystem.lwjgl.LwjglDisplayDevice;
+import org.terasology.engine.subsystem.lwjgl.LwjglGraphics;
 import org.terasology.input.ButtonState;
 import org.terasology.input.InputType;
 import org.terasology.input.MouseInput;
@@ -33,6 +36,7 @@ public class LwjglMouseDevice implements MouseDevice, PropertyChangeListener {
     private RenderingConfig renderingConfig;
     private float uiScale;
     private boolean mouseGrabbed;
+    private boolean handleMouse = false;
     private Queue<MouseAction> queue = Lists.newLinkedList();
 
     private TIntSet buttonStates = new TIntHashSet();
@@ -48,27 +52,34 @@ public class LwjglMouseDevice implements MouseDevice, PropertyChangeListener {
         this.uiScale = this.renderingConfig.getUiScale() / 100f;
         this.renderingConfig.subscribe(RenderingConfig.UI_SCALE, this);
 
-        // GLFW callback
-        long window = GLFW.glfwGetCurrentContext();
-        GLFW.glfwSetMouseButtonCallback(window, this::mouseButtonCallback);
-        GLFW.glfwSetScrollCallback(window, this::scrollCallback);
+        DisplayDevice displayDevice = context.get(DisplayDevice.class);
+        handleMouse = displayDevice instanceof LwjglDisplayDevice;
+        if (handleMouse) {
+            // GLFW callback
+            long window = GLFW.glfwGetCurrentContext();
 
+            GLFW.glfwSetMouseButtonCallback(window, this::mouseButtonCallback);
+            GLFW.glfwSetScrollCallback(window, this::scrollCallback);
+        }
     }
 
 
     @Override
-    public void  update() {
-        long window = GLFW.glfwGetCurrentContext();
-        DoubleBuffer mouseX = BufferUtils.createDoubleBuffer(1);
-        DoubleBuffer mouseY = BufferUtils.createDoubleBuffer(1);
+    public void update() {
+        if (handleMouse) {
+            long window = GLFW.glfwGetCurrentContext();
+            DoubleBuffer mouseX = BufferUtils.createDoubleBuffer(1);
+            DoubleBuffer mouseY = BufferUtils.createDoubleBuffer(1);
 
-        GLFW.glfwGetCursorPos(window, mouseX, mouseY);
-        mouseX.rewind();
-        mouseY.rewind();
+            GLFW.glfwGetCursorPos(window, mouseX, mouseY);
+            mouseX.rewind();
+            mouseY.rewind();
 
-        double x = mouseX.get(0);
-        double y = mouseY.get(0);
+            updateMouse(mouseX.get(0), mouseY.get(0));
+        }
+    }
 
+    public void updateMouse(double x, double y) {
         xposDelta = x - this.xpos;
         yposDelta = y - this.ypos;
         this.xpos = x;
@@ -123,7 +134,7 @@ public class LwjglMouseDevice implements MouseDevice, PropertyChangeListener {
         }
     }
 
-    private void mouseButtonCallback(long window, int button, int action, int mods) {
+    public void mouseButtonCallback(long window, int button, int action, int mods) {
         ButtonState state;
         if (action == GLFW.GLFW_PRESS) {
             state = ButtonState.DOWN;
@@ -138,7 +149,7 @@ public class LwjglMouseDevice implements MouseDevice, PropertyChangeListener {
         queue.offer(new MouseAction(mouseInput, state, getPosition()));
     }
 
-    private void scrollCallback(long windows, double xoffset, double yoffset) {
+    public void scrollCallback(long windows, double xoffset, double yoffset) {
         if (yoffset != 0.0) {
             int id = (yoffset > 0) ? 1 : -1;
             queue.offer(new MouseAction(InputType.MOUSE_WHEEL.getInput(id), 1, getPosition()));

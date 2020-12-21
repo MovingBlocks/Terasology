@@ -175,7 +175,7 @@ public class LwjglControllerDevice implements ControllerDevice {
                             controllerActions.add(new ControllerAction(input, controllerName, ButtonState.UP,
                                     axisValue));
                         }
-                        logger.error("Recieved unknown/unhandled buttonId for GLFW: {}", buttonIndex);
+                        logger.error("Received unknown/unhandled buttonId for GLFW: {}", buttonIndex);
                     } else {
                         Input input = InputType.CONTROLLER_BUTTON.getInput(teraButtonId);
 

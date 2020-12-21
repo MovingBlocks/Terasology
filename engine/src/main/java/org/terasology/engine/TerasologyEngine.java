@@ -34,6 +34,8 @@ import org.terasology.engine.subsystem.common.TelemetrySubSystem;
 import org.terasology.engine.subsystem.common.ThreadManagerSubsystem;
 import org.terasology.engine.subsystem.common.TimeSubsystem;
 import org.terasology.engine.subsystem.common.WorldGenerationSubsystem;
+import org.terasology.engine.subsystem.lwjgl.LwjglGraphics;
+import org.terasology.engine.subsystem.lwjgl.LwjglGraphicsManager;
 import org.terasology.engine.subsystem.rendering.ModuleRenderingSubsystem;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabData;
@@ -397,15 +399,41 @@ public class TerasologyEngine implements GameEngine {
      */
     @Override
     public synchronized void run(GameState initialState) {
+        initializeRun(initialState);
+        runMain();
+    }
+
+    @Override
+    public synchronized void initializeRun(GameState initialState) {
         Preconditions.checkState(!running);
         running = true;
+        changeStatus(StandardGameStatus.INITIALIZING);
         initialize();
-        changeStatus(StandardGameStatus.RUNNING);
 
         try {
             rootContext.put(GameEngine.class, this);
             changeState(initialState);
+        } catch (Throwable e) {
+            logger.error("Uncaught exception, attempting clean game shutdown", e);
 
+            try {
+                cleanup();
+            } catch (RuntimeException t) {
+                logger.error("Clean game shutdown after an uncaught exception failed", t);
+            }
+            running = false;
+            shutdownRequested = false;
+            changeStatus(StandardGameStatus.UNSTARTED);
+
+            throw e;
+        }
+    }
+
+    @Override
+    public synchronized void runMain() {
+        Preconditions.checkState(running);
+        changeStatus(StandardGameStatus.RUNNING);
+        try {
             mainLoop(); // -THE- MAIN LOOP. Most of the application time and resources are spent here.
         } catch (Throwable e) {
             logger.error("Uncaught exception, attempting clean game shutdown", e);

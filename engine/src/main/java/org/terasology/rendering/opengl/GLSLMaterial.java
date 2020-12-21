@@ -69,7 +69,7 @@ public class GLSLMaterial extends BaseMaterial {
     private EnumSet<ShaderProgramFeature> activeFeatures = Sets.newEnumSet(Collections.emptyList(), ShaderProgramFeature.class);
     private int activeFeaturesMask;
 
-    private final ShaderManager shaderManager;
+    private ShaderManager shaderManager;
 
     private DisposalAction disposalAction;
     private MaterialData materialData;
@@ -80,7 +80,13 @@ public class GLSLMaterial extends BaseMaterial {
         getDisposalHook().setDisposeAction(disposalAction);
         this.materialData = data;
         shaderManager = CoreRegistry.get(ShaderManager.class);
-        reload(data);
+    }
+
+    public void glInitialize() {
+        if (shaderManager == null) {
+            shaderManager = CoreRegistry.get(ShaderManager.class);
+        }
+        reload(materialData);
     }
 
     @Override

@@ -16,6 +16,7 @@
 package org.terasology.engine.subsystem.headless.device;
 
 import org.terasology.engine.subsystem.DisplayDevice;
+import org.terasology.engine.subsystem.DisplayDeviceInfo;
 import org.terasology.engine.subsystem.Resolution;
 import org.terasology.rendering.nui.layers.mainMenu.videoSettings.DisplayModeSetting;
 import org.terasology.utilities.subscribables.AbstractSubscribable;
@@ -96,5 +97,25 @@ public class HeadlessDisplayDevice extends AbstractSubscribable implements Displ
 
     @Override
     public void update() {
+    }
+
+    @Override
+    public DisplayDeviceInfo getInfo() {
+        return new DisplayDeviceInfo() {
+            @Override
+            public String getOpenGlVendor() {
+                return "headless";
+            }
+
+            @Override
+            public String getOpenGLVersion() {
+                return "headless";
+            }
+
+            @Override
+            public String getOpenGLRenderer() {
+                return "headless";
+            }
+        };
     }
 }

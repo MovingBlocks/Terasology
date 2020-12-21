@@ -80,6 +80,10 @@ public class OpenGLMesh extends Mesh {
     public OpenGLMesh(ResourceUrn urn, AssetType<?, MeshData> assetType, GLBufferPool bufferPool, MeshData data) {
         super(urn, assetType);
         this.disposalAction = new DisposalAction(urn, bufferPool);
+        this.data = data;
+    }
+
+    public void glInitialize() {
         reload(data);
     }
 

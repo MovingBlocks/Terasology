@@ -18,11 +18,13 @@ package org.terasology.engine.subsystem.lwjgl;
 import com.google.common.base.Suppliers;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWVidMode;
+import org.lwjgl.opengl.GL11;
 import org.lwjgl.system.MemoryUtil;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.context.Context;
 import org.terasology.engine.subsystem.DisplayDevice;
+import org.terasology.engine.subsystem.DisplayDeviceInfo;
 import org.terasology.engine.subsystem.Resolution;
 import org.terasology.rendering.nui.layers.mainMenu.videoSettings.DisplayModeSetting;
 import org.terasology.utilities.subscribables.AbstractSubscribable;
@@ -179,6 +181,11 @@ public class LwjglDisplayDevice extends AbstractSubscribable implements DisplayD
     public void prepareToRender() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glLoadIdentity();
+    }
+
+    @Override
+    public DisplayDeviceInfo getInfo() {
+        return LwjglGraphicsUtil.getDisplayDeviceInfo();
     }
 
     public void update() {

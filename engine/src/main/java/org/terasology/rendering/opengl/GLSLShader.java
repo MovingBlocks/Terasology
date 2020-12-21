@@ -102,7 +102,11 @@ public class GLSLShader extends Shader {
         super(urn, assetType);
         disposalAction = new DisposalAction(urn);
         getDisposalHook().setDisposeAction(disposalAction);
-        reload(data);
+        shaderProgramBase = data;
+    }
+
+    public void glInitialize() {
+        reload(shaderProgramBase);
     }
 
     private static InputStreamReader getInputStreamReaderFromResource(String resource) {

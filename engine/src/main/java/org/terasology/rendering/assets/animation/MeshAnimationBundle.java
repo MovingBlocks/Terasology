@@ -30,6 +30,10 @@ public class MeshAnimationBundle extends Asset<MeshAnimationBundleData> {
 
     public MeshAnimationBundle(ResourceUrn urn, AssetType<?, MeshAnimationBundleData> assetType, MeshAnimationBundleData data) {
         super(urn, assetType);
+        this.data = data;
+    }
+
+    public void glInitialize() {
         reload(data);
     }
 
