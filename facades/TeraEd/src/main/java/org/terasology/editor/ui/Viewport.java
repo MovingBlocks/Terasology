@@ -22,7 +22,8 @@ import org.slf4j.LoggerFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
 
 /**
  * TeraEd main class.
@@ -37,7 +38,6 @@ public final class Viewport extends JPanel {
         setLayout(new BorderLayout());
         setSize(1280, 720);
         setMinimumSize(new Dimension(640, 480));
-        setPreferredSize(new Dimension(1280, 720));
         setPreferredSize(new Dimension(1280, 720));
         setOpaque(false);
         startingLabel.setHorizontalAlignment(SwingConstants.CENTER);

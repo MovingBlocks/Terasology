@@ -3,10 +3,45 @@
 
 package org.terasology.engine.subsystem;
 
-public interface DisplayDeviceInfo {
-    String getOpenGlVendor();
+public class DisplayDeviceInfo {
 
-    String getOpenGLVersion();
+    private String openGlVendor;
+    private String openGlVersion;
+    private String openGlRenderer;
 
-    String getOpenGLRenderer();
+    public DisplayDeviceInfo(String openGlVendor, String openGlVersion, String openGlRenderer) {
+        this.openGlVendor = openGlVendor;
+        this.openGlVersion = openGlVersion;
+        this.openGlRenderer = openGlRenderer;
+    }
+
+    public DisplayDeviceInfo(String unknown) {
+        this.openGlVendor = unknown;
+        this.openGlVersion = unknown;
+        this.openGlRenderer = unknown;
+    }
+
+    public String getOpenGlVendor() {
+        return openGlVendor;
+    }
+
+    public String getOpenGLVersion() {
+        return openGlVersion;
+    }
+
+    public String getOpenGLRenderer() {
+        return openGlRenderer;
+    }
+
+    public void setOpenGlVendor(String openGlVendor) {
+        this.openGlVendor = openGlVendor;
+    }
+
+    public void setOpenGlVersion(String openGlVersion) {
+        this.openGlVersion = openGlVersion;
+    }
+
+    public void setOpenGlRenderer(String openGlRenderer) {
+        this.openGlRenderer = openGlRenderer;
+    }
 }

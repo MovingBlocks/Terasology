@@ -7,18 +7,16 @@ import org.lwjgl.opengl.awt.AWTGLCanvas;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.editor.properties.SceneProperties;
+import org.terasology.editor.subsystem.AwtInput;
 import org.terasology.editor.subsystem.LwjglPortlet;
 import org.terasology.editor.ui.MainWindow;
-import org.terasology.editor.ui.Viewport;
 import org.terasology.engine.GameEngine;
-import org.terasology.engine.GameThread;
 import org.terasology.engine.TerasologyEngine;
 import org.terasology.engine.TerasologyEngineBuilder;
 import org.terasology.engine.modes.StateMainMenu;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.engine.subsystem.config.BindsSubsystem;
 import org.terasology.engine.subsystem.lwjgl.LwjglAudio;
-import org.terasology.engine.subsystem.lwjgl.LwjglInput;
 import org.terasology.engine.subsystem.lwjgl.LwjglTimer;
 import org.terasology.monitoring.PerformanceMonitor;
 
@@ -26,7 +24,6 @@ import javax.swing.JPopupMenu;
 import javax.swing.JWindow;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
-import java.awt.BorderLayout;
 
 /**
  * TeraEd main class.
@@ -66,7 +63,7 @@ public final class TeraEd extends JWindow {
             engine = new TerasologyEngineBuilder()
                     .add(new LwjglTimer())
                     .add(new LwjglAudio())
-                    .add(new LwjglInput())
+                    .add(new AwtInput())
                     .add(new BindsSubsystem())
                     .add(portlet).build();
             sceneProperties = new SceneProperties(engine);

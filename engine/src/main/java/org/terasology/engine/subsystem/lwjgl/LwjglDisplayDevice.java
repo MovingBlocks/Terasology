@@ -18,7 +18,6 @@ package org.terasology.engine.subsystem.lwjgl;
 import com.google.common.base.Suppliers;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWVidMode;
-import org.lwjgl.opengl.GL11;
 import org.lwjgl.system.MemoryUtil;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
@@ -49,6 +48,7 @@ public class LwjglDisplayDevice extends AbstractSubscribable implements DisplayD
     private final Supplier<List<GLFWVidMode>> availableResolutions = createAvailableResolutionSupplier();
 
     private RenderingConfig config;
+    private DisplayDeviceInfo displayDeviceInfo = new DisplayDeviceInfo("unknown");
 
     public LwjglDisplayDevice(Context context) {
         this.config = context.get(Config.class).getRendering();
@@ -185,7 +185,8 @@ public class LwjglDisplayDevice extends AbstractSubscribable implements DisplayD
 
     @Override
     public DisplayDeviceInfo getInfo() {
-        return LwjglGraphicsUtil.getDisplayDeviceInfo();
+        LwjglGraphicsUtil.updateDisplayDeviceInfo(displayDeviceInfo);
+        return displayDeviceInfo;
     }
 
     public void update() {

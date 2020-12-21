@@ -174,39 +174,9 @@ public final class LwjglGraphicsUtil {
                 "If that fails you might need to use a different GPU (graphics card). Sorry!\n";
     }
 
-    public static DisplayDeviceInfo getDisplayDeviceInfo() {
-        return new DisplayDeviceInfoPojo(
-                GL11.glGetString(GL11.GL_VENDOR),
-                GL11.glGetString(GL11.GL_VERSION),
-                GL11.glGetString(GL11.GL_RENDERER)
-        );
-    }
-
-    private static final class DisplayDeviceInfoPojo implements DisplayDeviceInfo {
-
-        private final String openGlVendor;
-        private final String openGlVersion;
-        private final String openGlRenderer;
-
-        public DisplayDeviceInfoPojo(String openGlVendor, String openGlVersion, String openGlRenderer) {
-            this.openGlVendor = openGlVendor;
-            this.openGlVersion = openGlVersion;
-            this.openGlRenderer = openGlRenderer;
-        }
-
-        @Override
-        public String getOpenGlVendor() {
-            return openGlVendor;
-        }
-
-        @Override
-        public String getOpenGLVersion() {
-            return openGlVersion;
-        }
-
-        @Override
-        public String getOpenGLRenderer() {
-            return openGlRenderer;
-        }
+    public static void updateDisplayDeviceInfo(DisplayDeviceInfo deviceInfo) {
+        deviceInfo.setOpenGlVendor(GL11.glGetString(GL11.GL_VENDOR));
+        deviceInfo.setOpenGlVersion(GL11.glGetString(GL11.GL_VERSION));
+        deviceInfo.setOpenGlRenderer(GL11.glGetString(GL11.GL_RENDERER));
     }
 }

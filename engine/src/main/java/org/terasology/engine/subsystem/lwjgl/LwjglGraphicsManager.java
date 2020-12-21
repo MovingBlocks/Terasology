@@ -24,6 +24,7 @@ import org.terasology.assets.module.ModuleAssetDataProducer;
 import org.terasology.assets.module.ModuleAwareAssetTypeManager;
 import org.terasology.context.Context;
 import org.terasology.engine.GameThread;
+import org.terasology.engine.subsystem.DisplayDeviceInfo;
 import org.terasology.engine.subsystem.RenderingSubsystemFactory;
 import org.terasology.rendering.assets.animation.MeshAnimation;
 import org.terasology.rendering.assets.animation.MeshAnimationBundle;
@@ -71,6 +72,7 @@ public class LwjglGraphicsManager {
 
     private final BlockingDeque<Runnable> displayThreadActions = Queues.newLinkedBlockingDeque();
 
+    private DisplayDeviceInfo displayDeviceInfo = new DisplayDeviceInfo("unknown");
     private ThreadMode threadMode = ThreadMode.GAME_THREAD;
 
     public void setThreadMode(ThreadMode threadMode) {
@@ -114,7 +116,7 @@ public class LwjglGraphicsManager {
                     final GLSLMaterial material = new GLSLMaterial(urn, assetType, data);
 
                     asynchToDisplayThread(() -> {
-                       material.glInitialize();
+                        material.glInitialize();
                     });
                     return material;
                 }, "materials");
@@ -161,6 +163,8 @@ public class LwjglGraphicsManager {
     }
 
     public void processActions() {
+        LwjglGraphicsUtil.updateDisplayDeviceInfo(displayDeviceInfo);
+
         if (!displayThreadActions.isEmpty()) {
             List<Runnable> actions = Lists.newArrayListWithExpectedSize(displayThreadActions.size());
             displayThreadActions.drainTo(actions);
@@ -244,6 +248,10 @@ public class LwjglGraphicsManager {
 
     public void disposeTexture(int id) {
         asynchToDisplayThread(() -> glDeleteTextures(id));
+    }
+
+    public DisplayDeviceInfo getDisplayDeviceInfo() {
+        return displayDeviceInfo;
     }
 
     public enum ThreadMode {

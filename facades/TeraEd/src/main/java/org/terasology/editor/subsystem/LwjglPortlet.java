@@ -15,6 +15,8 @@ import org.terasology.assets.module.ModuleAwareAssetTypeManager;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.context.Context;
+import org.terasology.editor.input.AwtKeyboardDevice;
+import org.terasology.editor.input.AwtMouseDevice;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.GameThread;
 import org.terasology.engine.TerasologyEngine;
@@ -26,8 +28,6 @@ import org.terasology.engine.subsystem.lwjgl.LwjglGraphicsManager;
 import org.terasology.engine.subsystem.lwjgl.LwjglGraphicsUtil;
 import org.terasology.entitySystem.event.internal.EventSystem;
 import org.terasology.input.InputSystem;
-import org.terasology.input.lwjgl.LwjglKeyboardDevice;
-import org.terasology.input.lwjgl.LwjglMouseDevice;
 import org.terasology.nui.canvas.CanvasRenderer;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.ShaderManager;
@@ -35,13 +35,6 @@ import org.terasology.rendering.ShaderManagerLwjgl;
 import org.terasology.rendering.nui.internal.LwjglCanvasRenderer;
 
 import javax.imageio.ImageIO;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
-import java.awt.event.MouseWheelEvent;
-import java.awt.event.MouseWheelListener;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
@@ -192,70 +185,8 @@ public class LwjglPortlet extends BaseLwjglSubsystem {
     public void initInputs() {
         final InputSystem inputSystem = context.get(InputSystem.class);
         Preconditions.checkNotNull(inputSystem);
-        canvas.addKeyListener(new KeyListener() {
-            @Override
-            public void keyTyped(KeyEvent e) {
-                ((LwjglKeyboardDevice) inputSystem.getKeyboard()).glfwCharCallback(0, e.getKeyChar());
-            }
-
-            @Override
-            public void keyPressed(KeyEvent e) {
-                ((LwjglKeyboardDevice) inputSystem.getKeyboard()).glfwKeyCallback(0, e.getKeyChar(),
-                        e.getExtendedKeyCode(), GLFW.GLFW_PRESS, e.getModifiersEx());
-            }
-
-            @Override
-            public void keyReleased(KeyEvent e) {
-                ((LwjglKeyboardDevice) inputSystem.getKeyboard()).glfwKeyCallback(0, e.getKeyChar(),
-                        e.getExtendedKeyCode(), GLFW.GLFW_RELEASE, e.getModifiersEx());
-            }
-        });
-
-        canvas.addMouseListener(new MouseListener() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-            }
-
-            @Override
-            public void mousePressed(MouseEvent e) {
-                ((LwjglMouseDevice) inputSystem.getMouseDevice()).mouseButtonCallback(0, e.getButton() - 1,
-                        GLFW.GLFW_PRESS, e.getModifiersEx());
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                ((LwjglMouseDevice) inputSystem.getMouseDevice()).mouseButtonCallback(0, e.getButton() - 1,
-                        GLFW.GLFW_RELEASE, e.getModifiersEx());
-            }
-
-            @Override
-            public void mouseEntered(MouseEvent e) {
-
-            }
-
-            @Override
-            public void mouseExited(MouseEvent e) {
-
-            }
-        });
-        canvas.addMouseMotionListener(new MouseMotionListener() {
-            @Override
-            public void mouseDragged(MouseEvent e) {
-                ((LwjglMouseDevice) inputSystem.getMouseDevice()).updateMouse(e.getX(), e.getY());
-            }
-
-            @Override
-            public void mouseMoved(MouseEvent e) {
-                ((LwjglMouseDevice) inputSystem.getMouseDevice()).updateMouse(e.getX(), e.getY());
-            }
-        });
-
-        canvas.addMouseWheelListener(new MouseWheelListener() {
-            @Override
-            public void mouseWheelMoved(MouseWheelEvent e) {
-                ((LwjglMouseDevice) inputSystem.getMouseDevice()).scrollCallback(0, 0, e.getUnitsToScroll());
-            }
-        });
+        ((AwtMouseDevice) inputSystem.getMouseDevice()).registerToAwtGlCanvas(canvas);
+        ((AwtKeyboardDevice) inputSystem.getKeyboard()).registerToAwtGlCanvas(canvas);
     }
 
     @Override

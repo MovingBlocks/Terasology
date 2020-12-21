@@ -173,15 +173,12 @@ public class LwjglKeyboardDevice implements KeyboardDevice {
     private Queue<CharKeyboardAction> charQueue = Lists.newLinkedList();
     private TIntSet buttonStates = new TIntHashSet();
 
-    public LwjglKeyboardDevice(Context context) {
-        DisplayDevice displayDevice = context.get(DisplayDevice.class);
-        if (displayDevice instanceof LwjglDisplayDevice) {
-            // GLFW callback
-            long window = GLFW.glfwGetCurrentContext();
+    public LwjglKeyboardDevice() {
+    }
 
-            GLFW.glfwSetKeyCallback(window, this::glfwKeyCallback);
-            GLFW.glfwSetCharCallback(window, this::glfwCharCallback);
-        }
+    public void registerToLwjglWindow(long window) {
+        GLFW.glfwSetKeyCallback(window, this::glfwKeyCallback);
+        GLFW.glfwSetCharCallback(window, this::glfwCharCallback);
     }
 
     /**
@@ -191,7 +188,7 @@ public class LwjglKeyboardDevice implements KeyboardDevice {
      * @param window window's pointer
      * @param chr received char, affected by keyboard layout and modifications.
      */
-    public void glfwCharCallback(long window, int chr) {
+    private void glfwCharCallback(long window, int chr) {
         charQueue.offer(new CharKeyboardAction((char) chr));
     }
 
@@ -206,7 +203,7 @@ public class LwjglKeyboardDevice implements KeyboardDevice {
      *         GLFW#GLFW_REPEAT}
      * @param mods - modification keys: {@link GLFW#GLFW_MOD_SHIFT} and etc.
      */
-    public void glfwKeyCallback(long window, int key, int scancode, int action, int mods) {
+    private void glfwKeyCallback(long window, int key, int scancode, int action, int mods) {
         int teraKey = GLFW_TO_TERA_MAPPING.get(key);
         Input input = InputType.KEY.getInput(teraKey);
 

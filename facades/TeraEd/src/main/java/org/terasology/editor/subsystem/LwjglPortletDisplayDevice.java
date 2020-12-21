@@ -26,7 +26,6 @@ public class LwjglPortletDisplayDevice extends AbstractSubscribable implements D
 
     private final AWTGLCanvas canvas;
     private final LwjglGraphicsManager graphics;
-    private DisplayDeviceInfo displayDeviceInfo;
 
     public LwjglPortletDisplayDevice(AWTGLCanvas canvas, LwjglGraphicsManager graphics) {
         this.canvas = canvas;
@@ -36,9 +35,6 @@ public class LwjglPortletDisplayDevice extends AbstractSubscribable implements D
             public void componentResized(ComponentEvent e) {
                 updateViewport();
             }
-        });
-        graphics.asynchToDisplayThread(() -> {
-            displayDeviceInfo = LwjglGraphicsUtil.getDisplayDeviceInfo();
         });
     }
 
@@ -102,7 +98,6 @@ public class LwjglPortletDisplayDevice extends AbstractSubscribable implements D
     @Override
     public void processMessages() {
         GLFW.glfwPollEvents();
-        //canvas.render();
     }
 
     @Override
@@ -120,7 +115,6 @@ public class LwjglPortletDisplayDevice extends AbstractSubscribable implements D
     }
 
     protected void updateViewport(int width, int height) {
-        // canvas.paintGL(); //
         graphics.asynchToDisplayThread(() -> {
             GL11.glViewport(0, 0, width, height);
             propertyChangeSupport.firePropertyChange(LwjglDisplayDevice.DISPLAY_RESOLUTION_CHANGE, 0, 1);
@@ -135,6 +129,6 @@ public class LwjglPortletDisplayDevice extends AbstractSubscribable implements D
 
     @Override
     public DisplayDeviceInfo getInfo() {
-        return displayDeviceInfo;
+        return graphics.getDisplayDeviceInfo();
     }
 }
