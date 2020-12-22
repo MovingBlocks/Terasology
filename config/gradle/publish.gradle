@@ -8,6 +8,46 @@ apply from: "$rootDir/config/gradle/common.gradle"
 apply plugin: 'maven-publish'
 
 publishing {
+    repositories {
+        maven {
+            name = 'TerasologyOrg'
+
+            if (rootProject.hasProperty("publishRepo")) {
+                // This first option is good for local testing, you can set a full explicit target repo in gradle.properties
+                url = "http://artifactory.terasology.org/artifactory/$publishRepo"
+                allowInsecureProtocol true // 😱
+                logger.info("Changing PUBLISH repoKey set via Gradle property to {}", publishRepo)
+            } else {
+                // Support override from the environment to use a different target publish org
+                String deducedPublishRepo = System.getenv()["PUBLISH_ORG"]
+                if (deducedPublishRepo == null || deducedPublishRepo == "") {
+                    // If not then default
+                    deducedPublishRepo = "terasology"
+                }
+
+                if (project.version.toString().endsWith("-SNAPSHOT")) {
+                    deducedPublishRepo += "-snapshot-local"
+                } else {
+                    deducedPublishRepo += "-release-local"
+                }
+
+                logger.info("The final deduced publish repo is {}", deducedPublishRepo)
+                url = "http://artifactory.terasology.org/artifactory/$deducedPublishRepo"
+                allowInsecureProtocol true
+            }
+
+            if (rootProject.hasProperty("mavenUser") && rootProject.hasProperty("mavenPass")) {
+                credentials {
+                    username = "$mavenUser"
+                    password = "$mavenPass"
+                }
+                authentication {
+                    basic(BasicAuthentication)
+                }
+            }
+        }
+    }
+
     publications {
         "$project.name"(MavenPublication) {
             // Without this we get a .pom with no dependencies
@@ -15,46 +55,6 @@ publishing {
 
             artifact source: sourceJar, classifier: 'sources'
             artifact source: javadocJar, classifier: 'javadoc'
-
-            repositories {
-                maven {
-                    name = 'TerasologyOrg'
-
-                    if (rootProject.hasProperty("publishRepo")) {
-                        // This first option is good for local testing, you can set a full explicit target repo in gradle.properties
-                        url = "http://artifactory.terasology.org/artifactory/$publishRepo"
-                        allowInsecureProtocol true // 😱
-                        logger.info("Changing PUBLISH repoKey set via Gradle property to {}", publishRepo)
-                    } else {
-                        // Support override from the environment to use a different target publish org
-                        String deducedPublishRepo = System.getenv()["PUBLISH_ORG"]
-                        if (deducedPublishRepo == null || deducedPublishRepo == "") {
-                            // If not then default
-                            deducedPublishRepo = "terasology"
-                        }
-
-                        if (project.version.toString().endsWith("-SNAPSHOT")) {
-                            deducedPublishRepo += "-snapshot-local"
-                        } else {
-                            deducedPublishRepo += "-release-local"
-                        }
-
-                        logger.info("The final deduced publish repo is {}", deducedPublishRepo)
-                        url = "http://artifactory.terasology.org/artifactory/$deducedPublishRepo"
-                        allowInsecureProtocol true
-                    }
-
-                    if (rootProject.hasProperty("mavenUser") && rootProject.hasProperty("mavenPass")) {
-                        credentials {
-                            username = "$mavenUser"
-                            password = "$mavenPass"
-                        }
-                        authentication {
-                            basic(BasicAuthentication)
-                        }
-                    }
-                }
-            }
         }
     }
 }
