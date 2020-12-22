@@ -3,6 +3,7 @@
 
 package org.terasology.editor;
 
+import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.awt.AWTGLCanvas;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,6 +68,12 @@ public final class TeraEd extends JWindow {
                     .add(new BindsSubsystem())
                     .add(portlet).build();
             sceneProperties = new SceneProperties(engine);
+
+            if (!GLFW.glfwInit()) {
+                throw new RuntimeException("Failed to initialize GLFW");
+            }
+            sceneProperties = new SceneProperties(engine);
+
             mainWindow = new MainWindow(this, engine);
             portlet.createCanvas();
             AWTGLCanvas canvas = portlet.getCanvas();

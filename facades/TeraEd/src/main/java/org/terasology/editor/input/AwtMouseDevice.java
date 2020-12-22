@@ -8,7 +8,6 @@ import gnu.trove.set.TIntSet;
 import gnu.trove.set.hash.TIntHashSet;
 import org.joml.Vector2d;
 import org.joml.Vector2i;
-import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.awt.AWTGLCanvas;
 import org.terasology.config.RenderingConfig;
 import org.terasology.input.ButtonState;
@@ -137,8 +136,7 @@ public class AwtMouseDevice implements MouseDevice, PropertyChangeListener {
     public void setGrabbed(boolean newGrabbed) {
         if (newGrabbed != mouseGrabbed) {
             mouseGrabbed = newGrabbed;
-            GLFW.glfwSetInputMode(GLFW.glfwGetCurrentContext(), GLFW.GLFW_CURSOR,
-                    newGrabbed ? GLFW.GLFW_CURSOR_DISABLED : GLFW.GLFW_CURSOR_NORMAL);
+            // TODO handle swing mouse grabbing
         }
     }
 

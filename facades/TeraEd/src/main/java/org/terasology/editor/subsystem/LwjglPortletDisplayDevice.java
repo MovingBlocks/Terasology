@@ -11,7 +11,6 @@ import org.terasology.engine.subsystem.DisplayDeviceInfo;
 import org.terasology.engine.subsystem.Resolution;
 import org.terasology.engine.subsystem.lwjgl.LwjglDisplayDevice;
 import org.terasology.engine.subsystem.lwjgl.LwjglGraphicsManager;
-import org.terasology.engine.subsystem.lwjgl.LwjglGraphicsUtil;
 import org.terasology.engine.subsystem.lwjgl.LwjglResolution;
 import org.terasology.rendering.nui.layers.mainMenu.videoSettings.DisplayModeSetting;
 import org.terasology.utilities.subscribables.AbstractSubscribable;
@@ -107,7 +106,6 @@ public class LwjglPortletDisplayDevice extends AbstractSubscribable implements D
 
     @Override
     public void prepareToRender() {
-        canvas.paintGL();
     }
 
     private void updateViewport() {
