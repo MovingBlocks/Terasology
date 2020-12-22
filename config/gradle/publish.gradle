@@ -25,15 +25,22 @@ publishing {
                     deducedPublishRepo = "terasology"
                 }
 
-                if (project.version.toString().endsWith("-SNAPSHOT")) {
-                    deducedPublishRepo += "-snapshot-local"
-                } else {
-                    deducedPublishRepo += "-release-local"
-                }
+                afterEvaluate {
+                    // depends on project.version, so must be delayed until project is configured
+                    if (!project.version || project.version == "unspecified") {
+                        throw new GradleException("Project ${project} does not have a version set yet: ${project.version}")
+                    }
 
-                logger.info("The final deduced publish repo is {}", deducedPublishRepo)
-                url = "http://artifactory.terasology.org/artifactory/$deducedPublishRepo"
-                allowInsecureProtocol true
+                    if (project.version.toString().endsWith("-SNAPSHOT")) {
+                        deducedPublishRepo += "-snapshot-local"
+                    } else {
+                        deducedPublishRepo += "-release-local"
+                    }
+
+                    logger.info("The final deduced publish repo is {}", deducedPublishRepo)
+                    url = "http://artifactory.terasology.org/artifactory/$deducedPublishRepo"
+                    allowInsecureProtocol true
+                }
             }
 
             if (rootProject.hasProperty("mavenUser") && rootProject.hasProperty("mavenPass")) {
