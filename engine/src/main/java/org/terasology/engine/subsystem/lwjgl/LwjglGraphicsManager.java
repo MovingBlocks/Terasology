@@ -104,58 +104,46 @@ public class LwjglGraphicsManager {
         assetTypeManager.registerCoreAssetType(Shader.class,
                 (AssetFactory<Shader, ShaderData>) (urn, assetType, data) -> {
                     GLSLShader slShader = new GLSLShader(urn, assetType, data);
-
-                    asynchToDisplayThread(() -> {
-                        slShader.glInitialize();
-                    });
-
+                    asynchToDisplayThread(slShader::glInitialize);
                     return slShader;
                 }, "shaders");
         assetTypeManager.registerCoreAssetType(Material.class,
                 (AssetFactory<Material, MaterialData>) (urn, assetType, data) -> {
                     final GLSLMaterial material = new GLSLMaterial(urn, assetType, data);
-
-                    asynchToDisplayThread(() -> {
-                        material.glInitialize();
-                    });
+                    asynchToDisplayThread(material::glInitialize);
                     return material;
                 }, "materials");
         assetTypeManager.registerCoreAssetType(Mesh.class, (AssetFactory<Mesh, MeshData>)
                 (urn, assetType, data) -> {
                     final OpenGLMesh mesh = new OpenGLMesh(urn, assetType, bufferPool, data);
-
-                    asynchToDisplayThread(() -> {
-                        mesh.glInitialize();
-                    });
+                    asynchToDisplayThread(mesh::glInitialize);
                     return mesh;
                 }, "mesh");
         assetTypeManager.registerCoreAssetType(SkeletalMesh.class, (AssetFactory<SkeletalMesh, SkeletalMeshData>)
                 (urn, assetType, data) -> {
                     OpenGLSkeletalMesh skeletalMesh = new OpenGLSkeletalMesh(urn, assetType, bufferPool, data);
-
-                    asynchToDisplayThread(() -> {
-                        skeletalMesh.glInitialize();
-                    });
+                    asynchToDisplayThread(skeletalMesh::glInitialize);
                     return skeletalMesh;
                 }, "skeletalMesh");
         assetTypeManager.registerCoreAssetType(MeshAnimation.class,
                 (urn, assetType, data) -> {
                     MeshAnimationImpl meshAnimation = new MeshAnimationImpl(urn, assetType, data);
-
-                    asynchToDisplayThread(() -> {
-                        meshAnimation.glInitialize();
-                    });
+                    asynchToDisplayThread(meshAnimation::glInitialize);
                     return meshAnimation;
                 }, "animations", "skeletalMesh");
         assetTypeManager.registerCoreAssetType(Atlas.class, Atlas::new, "atlas");
         assetTypeManager.registerCoreAssetType(MeshAnimationBundle.class,
                 (AssetFactory<MeshAnimationBundle, MeshAnimationBundleData>) (urn, assetType, data) -> {
                     MeshAnimationBundle meshAnimationBundle = new MeshAnimationBundle(urn, assetType, data);
-                    meshAnimationBundle.glInitialize();
+                    asynchToDisplayThread(meshAnimationBundle::glInitialize);
                     return meshAnimationBundle;
                 }, "skeletalMesh", "animations");
         assetTypeManager.registerCoreAssetType(Subtexture.class,
-                (AssetFactory<Subtexture, SubtextureData>) Subtexture::new);
+                (AssetFactory<Subtexture, SubtextureData>) (urn, assetType, data) -> {
+                    Subtexture subtexture = new Subtexture(urn, assetType, data);
+                    asynchToDisplayThread(subtexture::glInitialize);
+                    return subtexture;
+                });
     }
 
     public void registerRenderingSubsystem(Context context) {

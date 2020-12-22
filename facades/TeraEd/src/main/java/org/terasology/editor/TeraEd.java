@@ -56,6 +56,7 @@ public final class TeraEd extends JWindow {
             // If Nimbus is not available, you can set the GUI to another look and feel.
             logger.warn("Failed to set look and feel to Nimbus", e);
         }
+
         try {
             LwjglPortlet portlet = new LwjglPortlet();
 
@@ -67,7 +68,6 @@ public final class TeraEd extends JWindow {
                     .add(new AwtInput())
                     .add(new BindsSubsystem())
                     .add(portlet).build();
-            sceneProperties = new SceneProperties(engine);
 
             if (!GLFW.glfwInit()) {
                 throw new RuntimeException("Failed to initialize GLFW");

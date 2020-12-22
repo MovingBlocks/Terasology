@@ -96,7 +96,6 @@ public class LwjglPortletDisplayDevice extends AbstractSubscribable implements D
 
     @Override
     public void processMessages() {
-        GLFW.glfwPollEvents();
     }
 
     @Override
