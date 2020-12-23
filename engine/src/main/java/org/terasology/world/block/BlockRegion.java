@@ -67,17 +67,7 @@ public class BlockRegion implements BlockRegionc {
      * @throws IllegalArgumentException if any min component is greater than the corresponding max component
      */
     public BlockRegion(int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
-        Preconditions.checkArgument(minX <= maxX);
-        Preconditions.checkArgument(minY <= maxY);
-        Preconditions.checkArgument(minZ <= maxZ);
-
-        this.minX = minX;
-        this.minY = minY;
-        this.minZ = minZ;
-
-        this.maxX = maxX;
-        this.maxY = maxY;
-        this.maxZ = maxZ;
+        this.set(minX, minY, minZ, maxX, maxY, maxZ);
     }
 
     /**
@@ -92,14 +82,14 @@ public class BlockRegion implements BlockRegionc {
      * @throws IllegalArgumentException if any min component is greater than the corresponding max component
      */
     public BlockRegion(Vector3ic min, Vector3ic max) {
-        this(min.x(), min.y(), min.z(), max.x(), max.y(), max.z());
+        this.set(min.x(), min.y(), min.z(), max.x(), max.y(), max.z());
     }
 
     /**
      * Creates a new region containing the single block given by the coordinates.
      */
     public BlockRegion(int x, int y, int z) {
-        this(x, y, z, x, y, z);
+        this.set(x, y, z, x, y, z);
     }
 
     /**
@@ -240,9 +230,7 @@ public class BlockRegion implements BlockRegionc {
 
     @Override
     public BlockRegion minX(int x, BlockRegion dest) {
-        Preconditions.checkArgument(x <= this.maxX || this.maxX == Integer.MIN_VALUE);
-        dest.minX = x;
-        return dest;
+        return dest.set(x, this.minY, this.minZ, this.maxX, this.maxY, this.maxZ);
     }
 
     public BlockRegion minX(int x) {
@@ -251,9 +239,7 @@ public class BlockRegion implements BlockRegionc {
 
     @Override
     public BlockRegion minY(int y, BlockRegion dest) {
-        Preconditions.checkArgument(y <= this.maxY || this.maxY == Integer.MIN_VALUE);
-        dest.minY = y;
-        return dest;
+        return dest.set(this.minX, y, this.minZ, this.maxX, this.maxY, this.maxZ);
     }
 
     public BlockRegion minY(int y) {
@@ -262,9 +248,7 @@ public class BlockRegion implements BlockRegionc {
 
     @Override
     public BlockRegion minZ(int z, BlockRegion dest) {
-        Preconditions.checkArgument(z <= this.maxZ || this.maxZ == Integer.MIN_VALUE);
-        dest.minZ = z;
-        return dest;
+        return dest.set(this.minX, this.minY, z, this.maxX, this.maxY, this.maxZ);
     }
 
     public BlockRegion minZ(int z) {
@@ -273,13 +257,7 @@ public class BlockRegion implements BlockRegionc {
 
     @Override
     public BlockRegion setMin(int minX, int minY, int minZ, BlockRegion dest) {
-        Preconditions.checkArgument(minX <= this.maxX || this.maxX == Integer.MIN_VALUE);
-        Preconditions.checkArgument(minY <= this.maxY || this.maxX == Integer.MIN_VALUE);
-        Preconditions.checkArgument(minZ <= this.maxZ || this.maxX == Integer.MIN_VALUE);
-        dest.minX = minX;
-        dest.minY = minY;
-        dest.minZ = minZ;
-        return dest;
+        return dest.set(minX, minY, minZ, this.maxX, this.maxY, this.maxZ);
     }
 
     public BlockRegion setMin(int x, int y, int z) {
@@ -318,9 +296,7 @@ public class BlockRegion implements BlockRegionc {
 
     @Override
     public BlockRegion maxX(int x, BlockRegion dest) {
-        Preconditions.checkArgument(x >= this.minX || this.minX == Integer.MAX_VALUE);
-        dest.maxX = x;
-        return dest;
+        return dest.set(this.minX, this.minY, this.minZ, x, this.maxY, this.maxZ);
     }
 
     public BlockRegion maxX(int x) {
@@ -329,9 +305,7 @@ public class BlockRegion implements BlockRegionc {
 
     @Override
     public BlockRegion maxY(int y, BlockRegion dest) {
-        Preconditions.checkArgument(y >= this.minY || this.minY == Integer.MAX_VALUE);
-        dest.maxY = y;
-        return dest;
+        return dest.set(this.minX, this.minY, this.minZ, this.maxX, y, this.maxZ);
     }
 
     public BlockRegion maxY(int y) {
@@ -340,9 +314,7 @@ public class BlockRegion implements BlockRegionc {
 
     @Override
     public BlockRegion maxZ(int z, BlockRegion dest) {
-        Preconditions.checkArgument(z >= this.minZ || this.minZ == Integer.MAX_VALUE);
-        dest.maxZ = z;
-        return dest;
+        return dest.set(this.minX, this.minY, this.minZ, this.maxX, this.maxY, z);
     }
 
     public BlockRegion maxZ(int z) {
@@ -351,13 +323,7 @@ public class BlockRegion implements BlockRegionc {
 
     @Override
     public BlockRegion setMax(int x, int y, int z, BlockRegion dest) {
-        Preconditions.checkArgument(x >= this.minX || this.minX == Integer.MAX_VALUE);
-        Preconditions.checkArgument(y >= this.minY || this.minY == Integer.MAX_VALUE);
-        Preconditions.checkArgument(z >= this.minZ || this.minZ == Integer.MAX_VALUE);
-        dest.maxX = x;
-        dest.maxY = y;
-        dest.maxZ = z;
-        return dest;
+        return dest.set(this.minX, this.minY, this.minZ, maxX, maxY, maxZ);
     }
 
     public BlockRegion setMax(int x, int y, int z) {
@@ -380,13 +346,7 @@ public class BlockRegion implements BlockRegionc {
 
     @Override
     public BlockRegion setSize(int x, int y, int z, BlockRegion dest) {
-        Preconditions.checkArgument(x > 0);
-        Preconditions.checkArgument(y > 0);
-        Preconditions.checkArgument(z > 0);
-        dest.maxX = this.minX + x - 1;
-        dest.maxY = this.minY + y - 1;
-        dest.maxZ = this.minZ + z - 1;
-        return dest;
+        return dest.set(this.minX, this.minY, this.minZ, this.minX + x, this.minY + y, this.minZ + z);
     }
 
     public BlockRegion setSize(int x, int y, int z) {
@@ -470,18 +430,8 @@ public class BlockRegion implements BlockRegionc {
 
     @Override
     public BlockRegion expand(int dx, int dy, int dz, BlockRegion dest) {
-        Preconditions.checkArgument(getSizeX() + 2 * dx > 0);
-        Preconditions.checkArgument(getSizeY() + 2 * dy > 0);
-        Preconditions.checkArgument(getSizeZ() + 2 * dz > 0);
-        dest.minX = this.minX - dx;
-        dest.minY = this.minY - dy;
-        dest.minZ = this.minZ - dz;
-
-        dest.maxX = this.maxX + dx;
-        dest.maxY = this.maxY + dy;
-        dest.maxZ = this.maxZ + dz;
-
-        return dest;
+        return dest.set(this.minX - dx, this.minY - dy, this.minZ - dz,
+                this.maxX + dx, this.maxY + dy, this.maxZ + dz);
     }
 
     public BlockRegion expand(int dx, int dy, int dz) {
