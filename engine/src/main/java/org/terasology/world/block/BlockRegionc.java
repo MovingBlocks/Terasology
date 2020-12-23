@@ -128,7 +128,7 @@ public interface BlockRegionc extends Iterable<Vector3ic> {
      * @return {@code dest} (after modification)
      * @throws IllegalArgumentException if the resulting region would be {@link #isValid() invalid}.
      */
-    default BlockRegion addMin(int dx, int dy, int dz, BlockRegion dest) {
+    default BlockRegion addToMin(int dx, int dy, int dz, BlockRegion dest) {
         return this.setMin(minX() + dx, minY() + dy, minZ() + dz, dest);
     }
 
@@ -140,8 +140,8 @@ public interface BlockRegionc extends Iterable<Vector3ic> {
      * @return {@code dest} (after modification)
      * @throws IllegalArgumentException if the resulting region would be {@link #isValid() invalid}.
      */
-    default BlockRegion addMin(Vector3ic dmin, BlockRegion dest) {
-        return this.addMin(dmin.x(), dmin.y(), dmin.z(), dest);
+    default BlockRegion addToMin(Vector3ic dmin, BlockRegion dest) {
+        return this.addToMin(dmin.x(), dmin.y(), dmin.z(), dest);
     }
 
     // -- max -------------------------------------------------------------------------------------------------------//
@@ -230,7 +230,7 @@ public interface BlockRegionc extends Iterable<Vector3ic> {
      * @return {@code dest} (after modification)
      * @throws IllegalArgumentException if the resulting region would be {@link #isValid() invalid}.
      */
-    default BlockRegion addMax(int dx, int dy, int dz, BlockRegion dest) {
+    default BlockRegion addToMax(int dx, int dy, int dz, BlockRegion dest) {
         return this.setMax(maxX() + dx, maxY() + dy, maxZ() + dz, dest);
     }
 
@@ -241,8 +241,8 @@ public interface BlockRegionc extends Iterable<Vector3ic> {
      * @return {@code dest} (after modification)
      * @throws IllegalArgumentException if the resulting region would be {@link #isValid() invalid}.
      */
-    default BlockRegion addMax(Vector3ic dmax, BlockRegion dest) {
-        return this.addMax(dmax.x(), dmax.y(), dmax.z(), dest);
+    default BlockRegion addToMax(Vector3ic dmax, BlockRegion dest) {
+        return this.addToMax(dmax.x(), dmax.y(), dmax.z(), dest);
     }
 
     // -- size ------------------------------------------------------------------------------------------------------//
