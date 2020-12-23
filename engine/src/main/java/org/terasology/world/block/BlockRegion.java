@@ -62,7 +62,7 @@ public class BlockRegion implements BlockRegionc {
      * maximum corner. If a dimension of {@code min} is greater than the respective dimension of {@code max} an {@link
      * IllegalArgumentException} will be thrown.
      * <p>
-     * Consider using {@link BlockRegions#encompassing(Vector3ic, Vector3ic...)} as an alternative.
+     * Consider using {@link #union(Vector3ic)} as an alternative.
      *
      * @throws IllegalArgumentException if any min component is greater than the corresponding max component
      */
@@ -87,7 +87,7 @@ public class BlockRegion implements BlockRegionc {
      * maximum corner. If a dimension of {@code min} is greater than the respective dimension of {@code max} an {@link
      * IllegalArgumentException} will be thrown.
      * <p>
-     * Consider using {@link BlockRegions#encompassing(Vector3ic, Vector3ic...)} as an alternative.
+     * Consider using {@link #union(Vector3ic)} as an alternative.
      *
      * @throws IllegalArgumentException if any min component is greater than the corresponding max component
      */
@@ -114,7 +114,7 @@ public class BlockRegion implements BlockRegionc {
      *
      * @param source the block region to copy.
      */
-    public BlockRegion(BlockRegion source) {
+    public BlockRegion(BlockRegionc source) {
         this.set(source);
     }
 
@@ -186,9 +186,9 @@ public class BlockRegion implements BlockRegionc {
      *         invalid}.
      */
     public BlockRegion set(int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
-        Preconditions.checkArgument(minX <= maxX);
-        Preconditions.checkArgument(minY <= maxY);
-        Preconditions.checkArgument(minZ <= maxZ);
+        Preconditions.checkArgument(minX <= maxX || (minX == INVALID.minX() && maxX == INVALID.maxX()));
+        Preconditions.checkArgument(minY <= maxY || (minY == INVALID.minY() && maxY == INVALID.maxY()));
+        Preconditions.checkArgument(minZ <= maxZ || (minZ == INVALID.minZ() && maxZ == INVALID.maxZ()));
         this.minX = minX;
         this.minY = minY;
         this.minZ = minZ;
@@ -217,7 +217,7 @@ public class BlockRegion implements BlockRegionc {
      * @throws IllegalArgumentException if the given coordinates for min and max are {@link #isValid()
      *         invalid}.
      */
-    public BlockRegion set(BlockRegion source) {
+    public BlockRegion set(BlockRegionc source) {
         return this.set(source.minX(), source.minY(), source.minZ(), source.maxX(), source.maxY(), source.maxZ());
     }
 
@@ -418,21 +418,21 @@ public class BlockRegion implements BlockRegionc {
         return union(pos.x(), pos.y(), pos.z(), this);
     }
 
-    public BlockRegion union(BlockRegion other) {
+    public BlockRegion union(BlockRegionc other) {
         return this.union(other, this);
     }
 
     // ---------------------------------------------------------------------------------------------------------------//
 
     @Override
-    public Optional<BlockRegion> intersect(BlockRegion other, BlockRegion dest) {
-        dest.minX = Math.max(minX, other.minX);
-        dest.minY = Math.max(minY, other.minY);
-        dest.minZ = Math.max(minZ, other.minZ);
+    public Optional<BlockRegion> intersect(BlockRegionc other, BlockRegion dest) {
+        dest.minX = Math.max(minX, other.minX());
+        dest.minY = Math.max(minY, other.minY());
+        dest.minZ = Math.max(minZ, other.minZ());
 
-        dest.maxX = Math.min(maxX, other.maxX);
-        dest.maxY = Math.min(maxY, other.maxY);
-        dest.maxZ = Math.min(maxZ, other.maxZ);
+        dest.maxX = Math.min(maxX, other.maxX());
+        dest.maxY = Math.min(maxY, other.maxY());
+        dest.maxZ = Math.min(maxZ, other.maxZ());
 
         if (dest.isValid()) {
             return Optional.of(dest);
@@ -441,7 +441,7 @@ public class BlockRegion implements BlockRegionc {
         }
     }
 
-    public Optional<BlockRegion> intersect(BlockRegion other) {
+    public Optional<BlockRegion> intersect(BlockRegionc other) {
         return this.intersect(other, this);
     }
 

@@ -389,7 +389,7 @@ public interface BlockRegionc extends Iterable<Vector3ic> {
      * @param dest destination; will hold the result
      * @return @code dest} (after modification)
      */
-    default BlockRegion union(BlockRegion other, BlockRegion dest) {
+    default BlockRegion union(BlockRegionc other, BlockRegion dest) {
         return this.union(other.minX(), other.minY(), other.minZ(), dest)
                 .union(other.maxX(), other.maxY(), other.maxZ(), dest);
     }
@@ -405,7 +405,7 @@ public interface BlockRegionc extends Iterable<Vector3ic> {
      * @param dest destination; will hold the result
      * @return {@code dest} (after modification) or {@link Optional#empty()} if the regions don't intersect
      */
-    Optional<BlockRegion> intersect(BlockRegion other, BlockRegion dest);
+    Optional<BlockRegion> intersect(BlockRegionc other, BlockRegion dest);
 
     // ---------------------------------------------------------------------------------------------------------------//
 
@@ -576,7 +576,7 @@ public interface BlockRegionc extends Iterable<Vector3ic> {
      * @param other the other region
      * @return {@code true} iff the given region is fully enclosed by this region; {@code false} otherwise
      */
-    default boolean contains(BlockRegion other) {
+    default boolean contains(BlockRegionc other) {
         return this.contains(other.minX(), other.minY(), other.minZ())
                 && this.contains(other.maxX(), other.maxY(), other.maxZ());
     }
@@ -604,7 +604,7 @@ public interface BlockRegionc extends Iterable<Vector3ic> {
      * @param other the other BlockRegion
      * @return {@code true} iff both regions intersect; {@code false} otherwise
      */
-    default boolean intersectsBlockRegion(BlockRegion other) {
+    default boolean intersectsBlockRegion(BlockRegionc other) {
         return this.maxX() >= other.minX() && this.maxY() >= other.minY() && this.maxZ() >= other.minZ()
                 && this.minX() <= other.maxX() && this.minY() <= other.maxY() && this.minZ() <= other.maxZ();
     }
