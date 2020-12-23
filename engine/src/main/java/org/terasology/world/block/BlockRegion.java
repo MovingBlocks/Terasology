@@ -492,14 +492,6 @@ public class BlockRegion implements BlockRegionc {
         return expand(extents.x(), extents.y(), extents.z());
     }
 
-    public BlockRegion expand(float dx, float dy, float dz) {
-        return this.expand(dx, dy, dz, this);
-    }
-
-    public BlockRegion expand(Vector3f extents) {
-        return expand(extents.x(), extents.y(), extents.z());
-    }
-
     // -- transform --------------------------------------------------------------------------------------------------//
 
     @Override

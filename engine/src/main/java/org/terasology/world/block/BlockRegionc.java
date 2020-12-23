@@ -5,11 +5,9 @@ package org.terasology.world.block;
 import org.joml.AABBf;
 import org.joml.Intersectionf;
 import org.joml.LineSegmentf;
-import org.joml.Math;
 import org.joml.Matrix4fc;
 import org.joml.Planef;
 import org.joml.Rayf;
-import org.joml.RoundingMode;
 import org.joml.Spheref;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
@@ -454,41 +452,6 @@ public interface BlockRegionc extends Iterable<Vector3ic> {
      * @throws IllegalArgumentException if extending this region would result in any non-positive dimension
      */
     default BlockRegion expand(Vector3ic vec, BlockRegion dest) {
-        return this.expand(vec.x(), vec.y(), vec.z(), dest);
-    }
-
-    /**
-     * Extend this region by adding the given {@code extents} for each face of a region.
-     * <p>
-     * The extents will be floored for each dimension.
-     *
-     * @param dx the amount of blocks to extend this region by along the x axis in both directions
-     * @param dy the amount of blocks to extend this region by along the y axis in both directions
-     * @param dz the amount of blocks to extend this region by along the z axis in both directions
-     * @param dest destination; will hold the result
-     * @return {@code dest} (after modification)
-     * @throws IllegalArgumentException if extending this region would result in any non-positive dimension
-     */
-    //TODO: why do we offer float variants here?
-    default BlockRegion expand(float dx, float dy, float dz, BlockRegion dest) {
-        return this.expand(
-                Math.roundUsing(dx, RoundingMode.FLOOR),
-                Math.roundUsing(dy, RoundingMode.FLOOR),
-                Math.roundUsing(dz, RoundingMode.FLOOR),
-                dest);
-    }
-
-    /**
-     * Extend this region by adding the given {@code extents} for each face of a region.
-     * <p>
-     * The extents will be floored for each dimension.
-     *
-     * @param vec the amount of blocks to extend this region by
-     * @param dest destination; will hold the result
-     * @return {@code dest} (after modification)
-     * @throws IllegalArgumentException if extending this region would result in any non-positive dimension
-     */
-    default BlockRegion expand(Vector3fc vec, BlockRegion dest) {
         return this.expand(vec.x(), vec.y(), vec.z(), dest);
     }
 
