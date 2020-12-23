@@ -290,12 +290,12 @@ public class BlockRegion implements BlockRegionc {
         return this.setMin(min, this);
     }
 
-    public BlockRegion addMin(int dx, int dy, int dz) {
-        return this.addMin(dx, dy, dz, this);
+    public BlockRegion addToMin(int dx, int dy, int dz) {
+        return this.addToMin(dx, dy, dz, this);
     }
 
-    public BlockRegion addMin(Vector3ic dmin) {
-        return this.addMin(dmin, this);
+    public BlockRegion addToMin(Vector3ic dmin) {
+        return this.addToMin(dmin, this);
     }
 
 
@@ -368,12 +368,12 @@ public class BlockRegion implements BlockRegionc {
         return this.setMax(max, this);
     }
 
-    public BlockRegion addMax(int dx, int dy, int dz) {
-        return this.addMax(dx, dy, dz, this);
+    public BlockRegion addToMax(int dx, int dy, int dz) {
+        return this.addToMax(dx, dy, dz, this);
     }
 
-    public BlockRegion addMax(Vector3ic dmax) {
-        return this.addMax(dmax, this);
+    public BlockRegion addToMax(Vector3ic dmax) {
+        return this.addToMax(dmax, this);
     }
 
     // -- size -------------------------------------------------------------------------------------------------------//
