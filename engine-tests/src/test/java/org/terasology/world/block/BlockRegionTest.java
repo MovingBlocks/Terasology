@@ -255,7 +255,7 @@ public class BlockRegionTest {
 
     @Test
     public void testEncompasses() {
-        BlockRegion region = new BlockRegion().union(new Vector3i()).setSize(new Vector3i(1, 1, 1));
+        BlockRegion region = new BlockRegion(new Vector3i()).setSize(new Vector3i(0, 0, 0));
         assertTrue(region.contains(0, 0, 0));
 
         assertFalse(region.contains(1, 0, 0));
@@ -492,28 +492,7 @@ public class BlockRegionTest {
         assertEquals(new Vector3i(2, 3, 4), copy.getMax(new Vector3i()));
     }
 
-    // -- extend -----------------------------------------------------------------------------------------------------//
-
-    static Stream<Arguments> extendFloatArgs() {
-        return Stream.of(
-                Arguments.of(.1f, .1f, .1f, new BlockRegion(new Vector3i(), new Vector3i(3, 3, 3))),
-                Arguments.of(-.1f, -.1f, -.1f, new BlockRegion(new Vector3i(1, 1, 1), new Vector3i(2
-                        , 2, 2))),
-                Arguments.of(1f, 1f, 1f, new BlockRegion(new Vector3i(-1, -1, -1), new Vector3i(4, 4
-                        , 4))),
-                Arguments.of(-1f, -1f, -1f, new BlockRegion(new Vector3i(1, 1, 1), new Vector3i(2, 2
-                        , 2))),
-                Arguments.of(1.9f, 1.9f, 1.9f, new BlockRegion(new Vector3i(-1, -1, -1),
-                        new Vector3i(4, 4, 4)))
-        );
-    }
-
-    @ParameterizedTest
-    @MethodSource("extendFloatArgs")
-    void extendFloat(float x, float y, float z, BlockRegion expected) {
-        final BlockRegion region = new BlockRegion(new Vector3i(), new Vector3i(3, 3, 3));
-        assertEquals(expected, new BlockRegion(region).expand(x, y, z));
-    }
+    // -- expand -----------------------------------------------------------------------------------------------------//
 
     static Stream<Arguments> extendInvalidArgs() {
         return Stream.of(
