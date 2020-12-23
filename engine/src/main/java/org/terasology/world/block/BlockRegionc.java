@@ -17,12 +17,30 @@ import org.joml.Vector3fc;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
 
+import java.util.Iterator;
 import java.util.Optional;
 
 /**
  * An immutable, bounded, axis-aligned volume in space denoting a collection of blocks contained within.
  */
 public interface BlockRegionc extends Iterable<Vector3ic> {
+
+    // -- ITERABLE ---------------------------------------------------------------------------------------------------//
+
+    /**
+     * Iterate over the blocks in the block region, where the same {@link Vector3ic} is reused for low memory
+     * footprint.
+     * <p>
+     * Do not store the elements directly or use them outside the context of the iterator as they will change when the
+     * iterator is advanced. You may create new vectors from the elements if necessary, e.g.:
+     * <pre>
+     *     for (Vector3ic p : region) {
+     *         Vector3i pos = new Vector3i(p);
+     *         // use 'pos' instead of 'p'
+     *     }
+     * </pre>
+     */
+    Iterator<Vector3ic> iterator();
 
     // -- min -------------------------------------------------------------------------------------------------------//
 
