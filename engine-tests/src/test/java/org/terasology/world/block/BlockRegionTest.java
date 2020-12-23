@@ -526,7 +526,7 @@ public class BlockRegionTest {
     @MethodSource("extendFloatArgs")
     void extendFloat(float x, float y, float z, BlockRegion expected) {
         final BlockRegion region = BlockRegions.fromMinAndMax(new Vector3i(), new Vector3i(3, 3, 3));
-        assertEquals(expected, region.copy().extend(x, y, z));
+        assertEquals(expected, region.copy().expand(x, y, z));
     }
 
     void extend(int x, int y, int z) {
@@ -547,8 +547,8 @@ public class BlockRegionTest {
     void extendInvalid(Vector3i extents) {
         BlockRegion region = new BlockRegion(0, 0, 0, 1, 1, 1);
 
-        assertThrows(IllegalArgumentException.class, () -> region.extend(extents));
-        assertThrows(IllegalArgumentException.class, () -> region.extend(extents.x(), extents.y(), extents.z()));
+        assertThrows(IllegalArgumentException.class, () -> region.expand(extents));
+        assertThrows(IllegalArgumentException.class, () -> region.expand(extents.x(), extents.y(), extents.z()));
     }
 
     // -- union ------------------------------------------------------------------------------------------------------//

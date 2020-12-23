@@ -31,7 +31,7 @@ import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.block.BeforeDeactivateBlocks;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
-import org.terasology.world.block.BlockRegions;
+import org.terasology.world.block.BlockRegion;
 import org.terasology.world.block.OnActivatedBlocks;
 import org.terasology.world.block.OnAddedBlocks;
 import org.terasology.world.chunks.Chunk;
@@ -449,10 +449,7 @@ public class LocalChunkProvider implements ChunkProvider {
                             Chunk[] localchunks = chunks.toArray(new Chunk[0]);
                             return new LightMerger().merge(localchunks);
                         },
-                        pos -> StreamSupport.stream(BlockRegions.iterableInPlace(BlockRegions.fromMinAndMax(
-                                pos.x() - 1, pos.y() - 1, pos.z() - 1,
-                                pos.x() + 1, pos.y() + 1, pos.z() + 1
-                        )).spliterator(), false)
+                        pos -> StreamSupport.stream(new BlockRegion(pos).expand(1,1,1).spliterator(), false)
                                 .map(org.joml.Vector3i::new)
                                 .collect(Collectors.toSet())
                 ))
@@ -490,10 +487,7 @@ public class LocalChunkProvider implements ChunkProvider {
                             Chunk[] localchunks = chunks.toArray(new Chunk[0]);
                             return new LightMerger().merge(localchunks);
                         },
-                        pos -> StreamSupport.stream(BlockRegions.iterableInPlace(BlockRegions.fromMinAndMax(
-                                pos.x() - 1, pos.y() - 1, pos.z() - 1,
-                                pos.x() + 1, pos.y() + 1, pos.z() + 1
-                        )).spliterator(), false)
+                        pos -> StreamSupport.stream(new BlockRegion(pos).expand(1,1,1).spliterator(), false)
                                 .map(org.joml.Vector3i::new)
                                 .collect(Collectors.toCollection(Sets::newLinkedHashSet))
                 ))
