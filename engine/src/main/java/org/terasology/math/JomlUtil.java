@@ -44,6 +44,7 @@ import org.terasology.math.geom.Rect2i;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockRegion;
+import org.terasology.world.block.BlockRegions;
 
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -194,7 +195,7 @@ public final class JomlUtil {
         if (aabb == null) {
             return null;
         }
-        return new BlockRegion(aabb.minX(), aabb.minY(), aabb.minZ(), aabb.maxX(), aabb.maxY(), aabb.maxZ());
+        return BlockRegions.createFromMinAndMax(aabb.minX(), aabb.minY(), aabb.minZ(), aabb.maxX(), aabb.maxY(), aabb.maxZ());
     }
 
 
