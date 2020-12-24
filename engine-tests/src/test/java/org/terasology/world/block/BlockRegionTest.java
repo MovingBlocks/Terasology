@@ -124,7 +124,7 @@ public class BlockRegionTest {
     @ParameterizedTest
     @MethodSource("fromMinAndSizeArgs")
     public void fromMinAndSize(Vector3i min, Vector3i size, Vector3i expectedMax) {
-        BlockRegion region = new BlockRegion().setMin(min).setSize(size);
+        BlockRegion region = new BlockRegion(min).setSize(size);
 
         assertEquals(min, region.getMin(new Vector3i()));
         assertEquals(size, region.getSize(new Vector3i()));
@@ -255,7 +255,7 @@ public class BlockRegionTest {
 
     @Test
     public void testEncompasses() {
-        BlockRegion region = new BlockRegion(new Vector3i()).setSize(new Vector3i(0, 0, 0));
+        BlockRegion region = new BlockRegion(0, 0, 0);
         assertTrue(region.contains(0, 0, 0));
 
         assertFalse(region.contains(1, 0, 0));

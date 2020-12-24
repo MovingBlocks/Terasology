@@ -255,8 +255,8 @@ public class BlockRegion implements BlockRegionc {
     }
 
     @Override
-    public BlockRegion setMin(int minX, int minY, int minZ, BlockRegion dest) {
-        return dest.set(minX, minY, minZ, this.maxX, this.maxY, this.maxZ);
+    public BlockRegion setMin(int x, int y, int z, BlockRegion dest) {
+        return dest.set(x, y, z, this.maxX, this.maxY, this.maxZ);
     }
 
     public BlockRegion setMin(int x, int y, int z) {
@@ -322,7 +322,7 @@ public class BlockRegion implements BlockRegionc {
 
     @Override
     public BlockRegion setMax(int x, int y, int z, BlockRegion dest) {
-        return dest.set(this.minX, this.minY, this.minZ, maxX, maxY, maxZ);
+        return dest.set(this.minX, this.minY, this.minZ, x, y, z);
     }
 
     public BlockRegion setMax(int x, int y, int z) {
