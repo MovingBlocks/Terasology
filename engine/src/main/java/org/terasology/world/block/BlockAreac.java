@@ -57,71 +57,6 @@ public interface BlockAreac extends Iterable<Vector2ic> {
         return dest.set(minX(), minY());
     }
 
-    /**
-     * Set the minimum x-coordinate of the area.
-     *
-     * @param dest destination; will hold the result
-     * @return {@code dest} (after modification)
-     * @throws IllegalArgumentException if {@code x} is greater than the maximum x coordinate
-     */
-    BlockArea minX(int x, BlockArea dest);
-
-    /**
-     * Set the minimum y-coordinate of the area.
-     *
-     * @param dest destination; will hold the result
-     * @return {@code dest} (after modification)
-     * @throws IllegalArgumentException if {@code y} is greater than the maximum y coordinate
-     */
-    BlockArea minY(int y, BlockArea dest);
-
-    /**
-     * Set the coordinates of the minimum corner for this area.
-     *
-     * @param dest destination; will hold the result
-     * @return {@code dest} (after modification)
-     * @throws IllegalArgumentException if any dimension is greater than the respective component of the maximum
-     *         corner
-     */
-    BlockArea setMin(int x, int y, BlockArea dest);
-
-    /**
-     * Set the coordinates of the minimum corner for this area.
-     *
-     * @param dest destination; will hold the result
-     * @return {@code dest} (after modification)
-     * @throws IllegalArgumentException if any dimension is greater than the respective component of the maximum
-     *         corner
-     */
-    default BlockArea setMin(Vector2ic min, BlockArea dest) {
-        return this.setMin(min.x(), min.y(), dest);
-    }
-
-    /**
-     * Translate the minimum corner of the area by adding given {@code (dx, dy)}.
-     *
-     * @param dx the number of blocks to add to the minimum corner on the x axis
-     * @param dy the number of blocks to add to the minimum corner on the y axis
-     * @param dest destination; will hold the result
-     * @return {@code dest} (after modification)
-     * @throws IllegalArgumentException if the resulting area would be {@link #isValid() invalid}.
-     */
-    default BlockArea addToMin(int dx, int dy, BlockArea dest) {
-        return this.setMin(minX() + dx, minY() + dy, dest);
-    }
-
-    /**
-     * Translate the minimum corner of the area by adding given {@code (dx, dy)}.
-     *
-     * @param dmin the translation vector for the minimum corner
-     * @param dest destination; will hold the result
-     * @return {@code dest} (after modification)
-     * @throws IllegalArgumentException if the resulting area would be {@link #isValid() invalid}.
-     */
-    default BlockArea addToMin(Vector2ic dmin, BlockArea dest) {
-        return this.addToMin(dmin.x(), dmin.y(), dest);
-    }
-
     // -- max -------------------------------------------------------------------------------------------------------//
 
     /**
@@ -142,70 +77,6 @@ public interface BlockAreac extends Iterable<Vector2ic> {
      */
     default Vector2i getMax(Vector2i dest) {
         return dest.set(maxX(), maxY());
-    }
-
-    /**
-     * Set the maximum x-coordinate of the area.
-     *
-     * @param dest destination; will hold the result
-     * @return {@code dest} (after modification)
-     * @throws IllegalArgumentException if {@code x} is smaller than the minimum x-coordinate
-     */
-    BlockArea maxX(int x, BlockArea dest);
-
-    /**
-     * Set the maximum y-coordinate of the area.
-     *
-     * @param dest destination; will hold the result
-     * @return {@code dest} (after modification)
-     * @throws IllegalArgumentException if {@code x} is smaller than the minimum x-coordinate
-     */
-    BlockArea maxY(int y, BlockArea dest);
-
-    /**
-     * Set the coordinates of the maximum corner for this area.
-     *
-     * @param dest destination; will hold the result
-     * @return {@code dest} (after modification)
-     * @throws IllegalArgumentException if any dimension is smaller than the respective component of the minimum
-     *         corner
-     */
-    BlockArea setMax(int x, int y, BlockArea dest);
-
-    /**
-     * Set the coordinates of the maximum corner for this area.
-     *
-     * @param dest destination; will hold the result
-     * @return {@code dest} (after modification)
-     * @throws IllegalArgumentException if any dimension is smaller than the respective component of the minimum
-     *         corner
-     */
-    default BlockArea setMax(Vector2ic max, BlockArea dest) {
-        return this.setMax(max.x(), max.y(), dest);
-    }
-
-    /**
-     * Translate the maximum corner of the area by adding given {@code (dx, dy)}.
-     *
-     * @param dx the number of blocks to add to the maximum corner on the x axis
-     * @param dy the number of blocks to add to the maximum corner on the y axis
-     * @param dest destination; will hold the result
-     * @return {@code dest} (after modification)
-     * @throws IllegalArgumentException if the resulting area would be {@link #isValid() invalid}.
-     */
-    default BlockArea addToMax(int dx, int dy, BlockArea dest) {
-        return this.setMax(maxX() + dx, maxY() + dy, dest);
-    }
-
-    /**
-     * Translate the maximum corner of the area by adding given {@code (dx, dy)}.
-     *
-     * @param dmax the translation vector for the maximum corner
-     * @return {@code dest} (after modification)
-     * @throws IllegalArgumentException if the resulting area would be {@link #isValid() invalid}.
-     */
-    default BlockArea addToMax(Vector2ic dmax, BlockArea dest) {
-        return this.addToMax(dmax.x(), dmax.y(), dest);
     }
 
     // -- size ------------------------------------------------------------------------------------------------------//
@@ -235,30 +106,7 @@ public interface BlockAreac extends Iterable<Vector2ic> {
     }
 
     /**
-     * Set the size of the block area from the minimum corner.
-     *
-     * @param x the x coordinate to set the size; must be > 0
-     * @param y the y coordinate to set the size; must be > 0
-     * @param dest destination; will hold the result
-     * @return {@code dest} (after modification)
-     * @throws IllegalArgumentException if the size is smaller than or equal to 0 in any dimension
-     */
-    BlockArea setSize(int x, int y, BlockArea dest);
-
-    /**
-     * Set the size of the block area from the minimum corner.
-     *
-     * @param size the size to set; all dimensions must be > 0
-     * @param dest destination; will hold the result
-     * @return {@code dest} (after modification)
-     * @throws IllegalArgumentException if the size is smaller than or equal to 0 in any dimension
-     */
-    default BlockArea setSize(Vector2ic size, BlockArea dest) {
-        return this.setSize(size.x(), size.y(), dest);
-    }
-
-    /**
-     * The are of this area in blocks, i.e., the number of blocks contained in this area.
+     * The area of this area in blocks, i.e., the number of blocks contained in this area.
      * <p>
      * The area is computed by
      * <pre>
@@ -309,102 +157,6 @@ public interface BlockAreac extends Iterable<Vector2ic> {
     }
 
     // -- IN-PLACE MUTATION -----------------------------------------------------------------------------------------//
-    // -- union -----------------------------------------------------------------------------------------------------//
-
-    /**
-     * Compute the union of this area and the given block coordinate.
-     *
-     * @param x the x coordinate of the block
-     * @param y the y coordinate of the block
-     * @param dest destination; will hold the result
-     * @return {@code dest} (after modification)
-     */
-    BlockArea union(int x, int y, BlockArea dest);
-
-    /**
-     * Compute the union of this area and the given block coordinate.
-     *
-     * @param pos the position of the block
-     * @param dest destination; will hold the result
-     * @return {@code dest} (after modification)
-     */
-    default BlockArea union(Vector2ic pos, BlockArea dest) {
-        return this.union(pos.x(), pos.y(), dest);
-    }
-
-    /**
-     * Compute the union of this area and the other area.
-     *
-     * @param other {@link BlockArea}
-     * @param dest destination; will hold the result
-     * @return @code dest} (after modification)
-     */
-    default BlockArea union(BlockAreac other, BlockArea dest) {
-        return this.union(other.minX(), other.minY(), dest)
-                .union(other.maxX(), other.maxY(), dest);
-    }
-
-    // -- intersect -------------------------------------------------------------------------------------------------//
-
-    /**
-     * Compute the intersection of this area with the {@code other} area.
-     * <p>
-     * NOTE: If the areas don't intersect the destination area will become invalid!
-     *
-     * @param other the other area
-     * @param dest destination; will hold the result
-     * @return {@code dest} (after modification) or {@link Optional#empty()} if the areas don't intersect
-     */
-    Optional<BlockArea> intersect(BlockAreac other, BlockArea dest);
-
-    // ---------------------------------------------------------------------------------------------------------------//
-
-    /**
-     * Translate this area by the given vector {@code (x, y, z))}.
-     *
-     * @param dx the x coordinate to translate by
-     * @param dy the y coordinate to translate by
-     * @param dest destination; will hold the result
-     * @return {@code dest} (after modification)
-     */
-    BlockArea translate(int dx, int dy, BlockArea dest);
-
-    /**
-     * Translate this area by the given vector {@code vec}.
-     *
-     * @param vec the vector to translate by
-     * @param dest destination; will hold the result
-     * @return {@code dest} (after modification)
-     */
-    default BlockArea translate(Vector2ic vec, BlockArea dest) {
-        return this.translate(vec.x(), vec.y(), dest);
-    }
-
-    // -- expand -----------------------------------------------------------------------------------------------------//
-
-    /**
-     * Expand this area by adding the given {@code extents} for each face of the area.
-     *
-     * @param dx the amount of blocks to extend this area by along the x axis in both directions
-     * @param dy the amount of blocks to extend this area by along the y axis in both directions
-     * @param dest destination; will hold the result
-     * @return {@code dest} (after modification)
-     * @throws IllegalArgumentException if extending this area would result in any non-positive dimension
-     */
-    BlockArea expand(int dx, int dy, BlockArea dest);
-
-    /**
-     * Expand this area by adding the given {@code extents} for each face of a area.
-     *
-     * @param vec the amount of blocks to expand this area by
-     * @param dest destination; will hold the result
-     * @return {@code dest} (after modification)
-     * @throws IllegalArgumentException if extending this area would result in any non-positive dimension
-     */
-    default BlockArea expand(Vector2ic vec, BlockArea dest) {
-        return this.expand(vec.x(), vec.y(), dest);
-    }
-
     // -- transform --------------------------------------------------------------------------------------------------//
 
     //TODO: does this make sense for a BlockArea?    

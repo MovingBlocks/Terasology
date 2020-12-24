@@ -138,43 +138,69 @@ public class BlockArea implements BlockAreac {
         return minY;
     }
 
-    @Override
-    public BlockArea minX(int x, BlockArea dest) {
-        return dest.set(x, minY, maxX, maxY);
-    }
-
+    /**
+     * Set the minimum x-coordinate of the area.
+     *
+     * @return {@code this} (after modification)
+     * @throws IllegalArgumentException if {@code x} is greater than the maximum x coordinate
+     */
     public BlockArea minX(int x) {
-        return minX(x, this);
+        return this.set(x, minY, maxX, maxY);
     }
 
-    @Override
-    public BlockArea minY(int y, BlockArea dest) {
-        return dest.set(minX, y, maxX, maxY);
-    }
-
+    /**
+     * Set the minimum y-coordinate of the area.
+     *
+     * @return {@code this} (after modification)
+     * @throws IllegalArgumentException if {@code y} is greater than the maximum y coordinate
+     */
     public BlockArea minY(int y) {
-        return minY(y, this);
+        return this.set(minX, y, maxX, maxY);
     }
 
-    @Override
-    public BlockArea setMin(int x, int y, BlockArea dest) {
-        return dest.set(x, y, maxX, maxY);
-    }
-
+    /**
+     * Set the coordinates of the minimum corner for this area.
+     *
+     * @return {@code this} (after modification)
+     * @throws IllegalArgumentException if any dimension is greater than the respective component of the maximum
+     *         corner
+     */
     public BlockArea setMin(int x, int y) {
-        return this.setMin(x, y, this);
+        return this.set(x, y, maxX, maxY);
     }
 
+    /**
+     * Set the coordinates of the minimum corner for this area.
+     *
+     * @return {@code this} (after modification)
+     * @throws IllegalArgumentException if any dimension is greater than the respective component of the maximum
+     *         corner
+     */
     public BlockArea setMin(Vector2ic min) {
-        return this.setMin(min.x(), min.y(), this);
+        return this.setMin(min.x(), min.y());
     }
 
-    public BlockArea addToMin(int x, int y) {
-        return this.addToMin(x, y, this);
+    /**
+     * Translate the minimum corner of the area by adding given {@code (dx, dy)}.
+     *
+     * @param dx the number of blocks to add to the minimum corner on the x axis
+     * @param dy the number of blocks to add to the minimum corner on the y axis
+     * @return {@code this} (after modification)
+     * @throws IllegalArgumentException if the resulting area would be {@link #isValid() invalid}.
+     */
+    public BlockArea addToMin(int dx, int dy) {
+        return this.setMin(minX() + dx, minY() + dy);
     }
 
-    public BlockArea addToMin(Vector2ic min) {
-        return this.addToMin(min.x(), min.y(), this);
+    /**
+     * Translate the minimum corner of the area by adding given {@code (dx, dy)}.
+     *
+     * @param dmin the translation vector for the minimum corner
+     * @return {@code this} (after modification)
+     * @throws IllegalArgumentException if the resulting area would be {@link #isValid() invalid}.
+     */
+    public BlockArea addToMin(Vector2ic dmin) {
+        return this.addToMin(dmin.x(), dmin.y());
     }
 
 
@@ -190,134 +216,226 @@ public class BlockArea implements BlockAreac {
         return maxY;
     }
 
-    @Override
-    public BlockArea maxX(int x, BlockArea dest) {
-        return dest.set(minX, minY, x, maxY);
-    }
-
+    /**
+     * Set the maximum x-coordinate of the area.
+     *
+     * @return {@code this} (after modification)
+     * @throws IllegalArgumentException if {@code x} is smaller than the minimum x-coordinate
+     */
     public BlockArea maxX(int x) {
-        return maxX(x, this);
+        return this.set(minX, minY, x, maxY);
     }
 
-    @Override
-    public BlockArea maxY(int y, BlockArea dest) {
-        return dest.set(minX, minY, maxX, y);
-    }
-
+    /**
+     * Set the maximum y-coordinate of the area.
+     *
+     * @return {@code this} (after modification)
+     * @throws IllegalArgumentException if {@code x} is smaller than the minimum x-coordinate
+     */
     public BlockArea maxY(int y) {
-        return maxY(y, this);
+        return this.set(minX, minY, maxX, y);
     }
 
-    @Override
-    public BlockArea setMax(int x, int y, BlockArea dest) {
-        return dest.set(minX, minY, x, y);
-    }
-
+    /**
+     * Set the coordinates of the maximum corner for this area.
+     *
+     * @return {@code this} (after modification)
+     * @throws IllegalArgumentException if any dimension is smaller than the respective component of the minimum
+     *         corner
+     */
     public BlockArea setMax(int x, int y) {
-        return this.setMax(x, y, this);
+        return this.set(minX, minY, x, y);
     }
 
+    /**
+     * Set the coordinates of the maximum corner for this area.
+     *
+     * @return {@code this} (after modification)
+     * @throws IllegalArgumentException if any dimension is smaller than the respective component of the minimum
+     *         corner
+     */
     public BlockArea setMax(Vector2ic max) {
-        return this.setMax(max.x(), max.y(), this);
+        return this.setMax(max.x(), max.y());
     }
 
-    public BlockArea addToMax(int x, int y) {
-        return this.addToMax(x, y, this);
+    /**
+     * Translate the maximum corner of the area by adding given {@code (dx, dy)}.
+     *
+     * @param dx the number of blocks to add to the maximum corner on the x axis
+     * @param dy the number of blocks to add to the maximum corner on the y axis
+     * @return {@code this} (after modification)
+     * @throws IllegalArgumentException if the resulting area would be {@link #isValid() invalid}.
+     */
+    public BlockArea addToMax(int dx, int dy) {
+        return this.setMax(maxX() + dx, maxY() + dy);
     }
 
-    public BlockArea addToMax(Vector2ic max) {
-        return this.addToMax(max.x(), max.y(), this);
+    /**
+     * Translate the maximum corner of the area by adding given {@code (dx, dy)}.
+     *
+     * @param dmax the translation vector for the maximum corner
+     * @return {@code this} (after modification)
+     * @throws IllegalArgumentException if the resulting area would be {@link #isValid() invalid}.
+     */
+    public BlockArea addToMax(Vector2ic dmax) {
+        return this.addToMax(dmax.x(), dmax.y());
     }
 
     // ---------------------------------------------------------------------------------------------------------------//
 
-    @Override
-    public BlockArea setSize(int sizeX, int sizeY, BlockArea dest) {
-        return dest.set(minX, minY, minX + sizeX, minY + sizeY);
-    }
-
+    /**
+     * Set the size of the block area from the minimum corner.
+     *
+     * @param sizeX the x coordinate to set the size; must be > 0
+     * @param sizeY the y coordinate to set the size; must be > 0
+     * @return {@code this} (after modification)
+     * @throws IllegalArgumentException if the size is smaller than or equal to 0 in any dimension
+     */
     public BlockArea setSize(int sizeX, int sizeY) {
-        return this.setSize(sizeX, sizeY, this);
+        return this.set(minX, minY, minX + sizeX, minY + sizeY);
     }
 
+    /**
+     * Set the size of the block area from the minimum corner.
+     *
+     * @param size the size to set; all dimensions must be > 0
+     * @return {@code this} (after modification)
+     * @throws IllegalArgumentException if the size is smaller than or equal to 0 in any dimension
+     */
     public BlockArea setSize(Vector2ic size) {
-        return this.setSize(size.x(), size.y(), this);
+        return this.setSize(size.x(), size.y());
     }
 
     // ---------------------------------------------------------------------------------------------------------------//
 
-    @Override
-    public BlockArea union(int x, int y, BlockArea dest) {
-        return dest.set(
+    /**
+     * Compute the union of this area and the given block coordinate.
+     *
+     * @param x the x coordinate of the block
+     * @param y the y coordinate of the block
+     * @return {@code this} (after modification)
+     */
+    public BlockArea union(int x, int y) {
+        return this.set(
                 Math.min(this.minX, x), Math.min(this.minY, y),
                 Math.max(this.maxX, x), Math.max(this.maxY, y));
     }
 
-    public BlockArea union(int x, int y) {
-        return union(x, y, this);
+    /**
+     * Compute the union of this area and the given block coordinate.
+     *
+     * @param pos the position of the block
+     * @return {@code this} (after modification)
+     */
+    public BlockArea union(Vector2ic pos) {
+        return union(pos.x(), pos.y());
     }
 
-    public BlockArea union(Vector2ic p) {
-        return union(p.x(), p.y(), this);
-    }
-
+    /**
+     * Compute the union of this area and the other area.
+     *
+     * @param other {@link BlockArea}
+     * @return @code this} (after modification)
+     */
     public BlockArea union(BlockArea other) {
-        return union(other, this);
+        return this.union(other.minX(), other.minY())
+                .union(other.maxX(), other.maxY());
     }
 
     // ---------------------------------------------------------------------------------------------------------------//
 
-    @Override
-    public Optional<BlockArea> intersect(BlockAreac other, BlockArea dest) {
-        dest.minX = Math.max(minX, other.minX());
-        dest.minY = Math.max(minY, other.minY());
+    /**
+     * Compute the intersection of this area with the {@code other} area.
+     * <p>
+     * NOTE: If the areas don't intersect the destination area will become invalid!
+     *
+     * @param other the other area
+     * @return {@code this} (after modification) or {@link Optional#empty()} if the areas don't intersect
+     */
+    public Optional<BlockArea> intersect(BlockAreac other) {
+        this.minX = Math.max(minX, other.minX());
+        this.minY = Math.max(minY, other.minY());
 
-        dest.maxX = Math.min(maxX, other.maxX());
-        dest.maxY = Math.min(maxY, other.maxY());
+        this.maxX = Math.min(maxX, other.maxX());
+        this.maxY = Math.min(maxY, other.maxY());
 
-        if (dest.isValid()) {
-            return Optional.of(dest);
+        if (this.isValid()) {
+            return Optional.of(this);
         } else {
             return Optional.empty();
         }
     }
 
-    public Optional<BlockArea> intersect(BlockAreac other) {
-        return this.intersect(other, this);
-    }
-
     // ---------------------------------------------------------------------------------------------------------------//
 
-    @Override
-    public BlockArea translate(int dx, int dy, BlockArea dest) {
-        dest.minX = minX + dx;
-        dest.minY = minY + dy;
-        dest.maxX = maxX + dx;
-        dest.maxY = maxY + dy;
-        return dest;
-    }
-
+    /**
+     * Translate this area by the given vector {@code (x, y))}.
+     *
+     * @param dx the x coordinate to translate by
+     * @param dy the y coordinate to translate by
+     * @return {@code this} (after modification)
+     */
     public BlockArea translate(int dx, int dy) {
-        return translate(dx, dy, this);
+        this.minX = minX + dx;
+        this.minY = minY + dy;
+        this.maxX = maxX + dx;
+        this.maxY = maxY + dy;
+        return this;
     }
 
+    /**
+     * Translate this area by the given vector {@code vec}.
+     *
+     * @param dv the vector to translate by
+     * @return {@code this} (after modification)
+     */
     public BlockArea translate(Vector2ic dv) {
-        return translate(dv.x(), dv.y(), this);
+        return translate(dv.x(), dv.y());
     }
 
+    /**
+     * Move this area to the given vector {@code (x, y))}.
+     *
+     * @param x the x coordinate to move to
+     * @param y the y coordinate to move to
+     * @return {@code this} (after modification)
+     */
+    public BlockArea setPosition(int x, int y) {
+        return translate(x - this.minX, y - this.minY);
+    }
+
+    /**
+     * Move this area to the given vector {@code vec}.
+     *
+     * @param dv the vector to move to
+     * @return {@code this} (after modification)
+     */
+    public BlockArea setPosition(Vector2ic dv) {
+        return setPosition(dv.x(), dv.y());
+    }
     // ---------------------------------------------------------------------------------------------------------------//
 
-    @Override
-    public BlockArea expand(int dx, int dy, BlockArea dest) {
-        return dest.set(minX - dx, minY - dy, maxX + dx, maxY + dy);
-    }
-
+    /**
+     * Expand this area by adding the given {@code extents} for each face of the area.
+     *
+     * @param dx the amount of blocks to extend this area by along the x axis in both directions
+     * @param dy the amount of blocks to extend this area by along the y axis in both directions
+     * @return {@code this} (after modification)
+     * @throws IllegalArgumentException if extending this area would result in any non-positive dimension
+     */
     public BlockArea expand(int dx, int dy) {
-        return expand(dx, dy, this);
+        return this.set(minX - dx, minY - dy, maxX + dx, maxY + dy);
     }
 
+    /**
+     * Expand this area by adding the given {@code extents} for each face of a area.
+     *
+     * @param dv the amount of blocks to expand this area by
+     * @return {@code this} (after modification)
+     * @throws IllegalArgumentException if extending this area would result in any non-positive dimension
+     */
     public BlockArea expand(Vector2ic dv) {
-        return expand(dv.x(), dv.y(), this);
+        return expand(dv.x(), dv.y());
     }
 
     // ---------------------------------------------------------------------------------------------------------------//
