@@ -346,7 +346,7 @@ public class BlockRegion implements BlockRegionc {
 
     @Override
     public BlockRegion setSize(int x, int y, int z, BlockRegion dest) {
-        return dest.set(this.minX, this.minY, this.minZ, this.minX + x, this.minY + y, this.minZ + z);
+        return dest.set(this.minX, this.minY, this.minZ, this.minX + x - 1, this.minY + y - 1, this.minZ + z - 1);
     }
 
     public BlockRegion setSize(int x, int y, int z) {
