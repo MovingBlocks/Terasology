@@ -5,7 +5,6 @@ package org.terasology.world.block;
 import org.joml.AABBf;
 import org.joml.Intersectionf;
 import org.joml.LineSegmentf;
-import org.joml.Matrix4fc;
 import org.joml.Planef;
 import org.joml.Rayf;
 import org.joml.Spheref;
@@ -16,7 +15,6 @@ import org.joml.Vector3i;
 import org.joml.Vector3ic;
 
 import java.util.Iterator;
-import java.util.Optional;
 
 /**
  * An immutable, bounded, axis-aligned volume in space denoting a collection of blocks contained within.
@@ -67,81 +65,6 @@ public interface BlockRegionc extends Iterable<Vector3ic> {
         return dest.set(minX(), minY(), minZ());
     }
 
-    /**
-     * Set the minimum x-coordinate of the region.
-     *
-     * @param dest destination; will hold the result
-     * @return {@code dest} (after modification)
-     * @throws IllegalArgumentException if {@code x} is greater than the maximum x coordinate
-     */
-    BlockRegion minX(int x, BlockRegion dest);
-
-    /**
-     * Set the minimum y-coordinate of the region.
-     *
-     * @param dest destination; will hold the result
-     * @return {@code dest} (after modification)
-     * @throws IllegalArgumentException if {@code y} is greater than the maximum y coordinate
-     */
-    BlockRegion minY(int y, BlockRegion dest);
-
-    /**
-     * Set the minimum z-coordinate of the region.
-     *
-     * @param dest destination; will hold the result
-     * @return {@code dest} (after modification)
-     * @throws IllegalArgumentException if {@code z} is greater than the maximum z coordinate
-     */
-    BlockRegion minZ(int z, BlockRegion dest);
-
-    /**
-     * Set the coordinates of the minimum corner for this region.
-     *
-     * @param dest destination; will hold the result
-     * @return {@code dest} (after modification)
-     * @throws IllegalArgumentException if any dimension is greater than the respective component of the maximum
-     *         corner
-     */
-    BlockRegion setMin(int x, int y, int z, BlockRegion dest);
-
-    /**
-     * Set the coordinates of the minimum corner for this region.
-     *
-     * @param dest destination; will hold the result
-     * @return {@code dest} (after modification)
-     * @throws IllegalArgumentException if any dimension is greater than the respective component of the maximum
-     *         corner
-     */
-    default BlockRegion setMin(Vector3ic min, BlockRegion dest) {
-        return this.setMin(min.x(), min.y(), min.z(), dest);
-    }
-
-    /**
-     * Translate the minimum corner of the region by adding given {@code (dx, dy, dz)}.
-     *
-     * @param dx the number of blocks to add to the minimum corner on the x axis
-     * @param dy the number of blocks to add to the minimum corner on the y axis
-     * @param dz the number of blocks to add to the minimum corner on the z axis
-     * @param dest destination; will hold the result
-     * @return {@code dest} (after modification)
-     * @throws IllegalArgumentException if the resulting region would be {@link #isValid() invalid}.
-     */
-    default BlockRegion addToMin(int dx, int dy, int dz, BlockRegion dest) {
-        return this.setMin(minX() + dx, minY() + dy, minZ() + dz, dest);
-    }
-
-    /**
-     * Translate the minimum corner of the region by adding given {@code (dx, dy, dz)}.
-     *
-     * @param dmin the translation vector for the minimum corner
-     * @param dest destination; will hold the result
-     * @return {@code dest} (after modification)
-     * @throws IllegalArgumentException if the resulting region would be {@link #isValid() invalid}.
-     */
-    default BlockRegion addToMin(Vector3ic dmin, BlockRegion dest) {
-        return this.addToMin(dmin.x(), dmin.y(), dmin.z(), dest);
-    }
-
     // -- max -------------------------------------------------------------------------------------------------------//
 
     /**
@@ -167,80 +90,6 @@ public interface BlockRegionc extends Iterable<Vector3ic> {
      */
     default Vector3i getMax(Vector3i dest) {
         return dest.set(maxX(), maxY(), maxZ());
-    }
-
-    /**
-     * Set the maximum x-coordinate of the region.
-     *
-     * @param dest destination; will hold the result
-     * @return {@code dest} (after modification)
-     * @throws IllegalArgumentException if {@code x} is smaller than the minimum x-coordinate
-     */
-    BlockRegion maxX(int x, BlockRegion dest);
-
-    /**
-     * Set the maximum y-coordinate of the region.
-     *
-     * @param dest destination; will hold the result
-     * @return {@code dest} (after modification)
-     * @throws IllegalArgumentException if {@code x} is smaller than the minimum x-coordinate
-     */
-    BlockRegion maxY(int y, BlockRegion dest);
-
-    /**
-     * Set the maximum z-coordinate of the region.
-     *
-     * @param dest destination; will hold the result
-     * @return {@code dest} (after modification)
-     * @throws IllegalArgumentException if {@code x} is smaller than the minimum x-coordinate
-     */
-    BlockRegion maxZ(int z, BlockRegion dest);
-
-    /**
-     * Set the coordinates of the maximum corner for this region.
-     *
-     * @param dest destination; will hold the result
-     * @return {@code dest} (after modification)
-     * @throws IllegalArgumentException if any dimension is smaller than the respective component of the minimum
-     *         corner
-     */
-    BlockRegion setMax(int x, int y, int z, BlockRegion dest);
-
-    /**
-     * Set the coordinates of the maximum corner for this region.
-     *
-     * @param dest destination; will hold the result
-     * @return {@code dest} (after modification)
-     * @throws IllegalArgumentException if any dimension is smaller than the respective component of the minimum
-     *         corner
-     */
-    default BlockRegion setMax(Vector3ic max, BlockRegion dest) {
-        return this.setMax(max.x(), max.y(), max.z(), dest);
-    }
-
-    /**
-     * Translate the maximum corner of the region by adding given {@code (dx, dy, dz)}.
-     *
-     * @param dx the number of blocks to add to the maximum corner on the x axis
-     * @param dy the number of blocks to add to the maximum corner on the y axis
-     * @param dz the number of blocks to add to the maximum corner on the z axis
-     * @param dest destination; will hold the result
-     * @return {@code dest} (after modification)
-     * @throws IllegalArgumentException if the resulting region would be {@link #isValid() invalid}.
-     */
-    default BlockRegion addToMax(int dx, int dy, int dz, BlockRegion dest) {
-        return this.setMax(maxX() + dx, maxY() + dy, maxZ() + dz, dest);
-    }
-
-    /**
-     * Translate the maximum corner of the region by adding given {@code (dx, dy, dz)}.
-     *
-     * @param dmax the translation vector for the maximum corner
-     * @return {@code dest} (after modification)
-     * @throws IllegalArgumentException if the resulting region would be {@link #isValid() invalid}.
-     */
-    default BlockRegion addToMax(Vector3ic dmax, BlockRegion dest) {
-        return this.addToMax(dmax.x(), dmax.y(), dmax.z(), dest);
     }
 
     // -- size ------------------------------------------------------------------------------------------------------//
@@ -274,30 +123,6 @@ public interface BlockRegionc extends Iterable<Vector3ic> {
      */
     default Vector3i getSize(Vector3i dest) {
         return dest.set(getSizeX(), getSizeY(), getSizeZ());
-    }
-
-    /**
-     * Set the size of the block region from the minimum corner.
-     *
-     * @param x the x coordinate to set the size; must be > 0
-     * @param y the y coordinate to set the size; must be > 0
-     * @param z the z coordinate to set the size; must be >
-     * @param dest destination; will hold the result
-     * @return {@code dest} (after modification)
-     * @throws IllegalArgumentException if the size is smaller than or equal to 0 in any dimension
-     */
-    BlockRegion setSize(int x, int y, int z, BlockRegion dest);
-
-    /**
-     * Set the size of the block region from the minimum corner.
-     *
-     * @param size the size to set; all dimensions must be > 0
-     * @param dest destination; will hold the result
-     * @return {@code dest} (after modification)
-     * @throws IllegalArgumentException if the size is smaller than or equal to 0 in any dimension
-     */
-    default BlockRegion setSize(Vector3ic size, BlockRegion dest) {
-        return this.setSize(size.x(), size.y(), size.z(), dest);
     }
 
     /**
@@ -355,127 +180,13 @@ public interface BlockRegionc extends Iterable<Vector3ic> {
         );
     }
 
-    // -- IN-PLACE MUTATION -----------------------------------------------------------------------------------------//
-    // -- union -----------------------------------------------------------------------------------------------------//
-
-    /**
-     * Compute the union of this region and the given block coordinate.
-     *
-     * @param x the x coordinate of the block
-     * @param y the y coordinate of the block
-     * @param z the z coordinate of the block
-     * @param dest destination; will hold the result
-     * @return {@code dest} (after modification)
-     */
-    BlockRegion union(int x, int y, int z, BlockRegion dest);
-
-    /**
-     * Compute the union of this region and the given block coordinate.
-     *
-     * @param pos the position of the block
-     * @param dest destination; will hold the result
-     * @return {@code dest} (after modification)
-     */
-    default BlockRegion union(Vector3ic pos, BlockRegion dest) {
-        return this.union(pos.x(), pos.y(), pos.z(), dest);
-    }
-
-    /**
-     * Compute the union of this region and the other region.
-     *
-     * @param other {@link BlockRegion}
-     * @param dest destination; will hold the result
-     * @return @code dest} (after modification)
-     */
-    default BlockRegion union(BlockRegionc other, BlockRegion dest) {
-        return this.union(other.minX(), other.minY(), other.minZ(), dest)
-                .union(other.maxX(), other.maxY(), other.maxZ(), dest);
-    }
-
-    // -- intersect -------------------------------------------------------------------------------------------------//
-
-    /**
-     * Compute the intersection of this region with the {@code other} region.
-     * <p>
-     * NOTE: If the regions don't intersect the destination region will become invalid!
-     *
-     * @param other the other region
-     * @param dest destination; will hold the result
-     * @return {@code dest} (after modification) or {@link Optional#empty()} if the regions don't intersect
-     */
-    Optional<BlockRegion> intersect(BlockRegionc other, BlockRegion dest);
-
-    // ---------------------------------------------------------------------------------------------------------------//
-
-    /**
-     * Translate this region by the given vector {@code (x, y, z))}.
-     *
-     * @param dx the x coordinate to translate by
-     * @param dy the y coordinate to translate by
-     * @param dz the z coordinate to translate by
-     * @param dest destination; will hold the result
-     * @return {@code dest} (after modification)
-     */
-    BlockRegion translate(int dx, int dy, int dz, BlockRegion dest);
-
-    /**
-     * Translate this region by the given vector {@code vec}.
-     *
-     * @param vec the vector to translate by
-     * @param dest destination; will hold the result
-     * @return {@code dest} (after modification)
-     */
-    default BlockRegion translate(Vector3ic vec, BlockRegion dest) {
-        return this.translate(vec.x(), vec.y(), vec.z(), dest);
-    }
-
-    // -- expand -----------------------------------------------------------------------------------------------------//
-
-    /**
-     * Expand this region by adding the given {@code extents} for each face of the region.
-     *
-     * @param dx the amount of blocks to extend this region by along the x axis in both directions
-     * @param dy the amount of blocks to extend this region by along the y axis in both directions
-     * @param dz the amount of blocks to extend this region by along the z axis in both directions
-     * @param dest destination; will hold the result
-     * @return {@code dest} (after modification)
-     * @throws IllegalArgumentException if extending this region would result in any non-positive dimension
-     */
-    BlockRegion expand(int dx, int dy, int dz, BlockRegion dest);
-
-    /**
-     * Expand this region by adding the given {@code extents} for each face of a region.
-     *
-     * @param vec the amount of blocks to expand this region by
-     * @param dest destination; will hold the result
-     * @return {@code dest} (after modification)
-     * @throws IllegalArgumentException if extending this region would result in any non-positive dimension
-     */
-    default BlockRegion expand(Vector3ic vec, BlockRegion dest) {
-        return this.expand(vec.x(), vec.y(), vec.z(), dest);
-    }
-
-    // -- transform --------------------------------------------------------------------------------------------------//
-
-    /**
-     * Apply the given {@link Matrix4fc#isAffine() affine} transformation to this {@link BlockRegion}.
-     * <p>
-     * The matrix in {@code m} <i>must</i> be {@link Matrix4fc#isAffine() affine}.
-     *
-     * @param m the affine transformation matrix
-     * @param dest will hold the result
-     * @param dest destination; will hold the result
-     * @return {@code dest} (after modification)
-     * @throws IllegalArgumentException if the matrix {@code m} is not {@link Matrix4fc#isAffine() affine}
-     */
-    BlockRegion transform(Matrix4fc m, BlockRegion dest);
-
     // -- CHECKS -----------------------------------------------------------------------------------------------------//
 
     /**
-     * Check whether this region BlockRegion represents a valid BlockRegion.
+     * Check whether this region is valid. A region is valid if the minimum corner is componen-wise smaller or equal to
+     * the maximum corner.
      *
-     * @return {@code true} iff this BlockRegion is valid; {@code false} otherwise
+     * @return {@code true} iff this region is valid; {@code false} otherwise
      */
     default boolean isValid() {
         return minX() <= maxX() && minY() <= maxY() && minZ() <= maxZ();
@@ -754,9 +465,9 @@ public interface BlockRegionc extends Iterable<Vector3ic> {
     }
 
     // ---------------------------------------------------------------------------------------------------------------//
-    public boolean equals(Object obj);
+    boolean equals(Object obj);
 
-    public int hashCode();
+    int hashCode();
 
-    public String toString();
+    String toString();
 }

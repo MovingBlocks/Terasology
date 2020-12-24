@@ -6,7 +6,6 @@ import com.google.common.base.Preconditions;
 import org.joml.Math;
 import org.joml.Matrix4fc;
 import org.joml.RoundingMode;
-import org.joml.Vector3f;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
 
@@ -228,54 +227,72 @@ public class BlockRegion implements BlockRegionc {
         return this.minZ;
     }
 
-    @Override
-    public BlockRegion minX(int x, BlockRegion dest) {
-        return dest.set(x, this.minY, this.minZ, this.maxX, this.maxY, this.maxZ);
-    }
-
+    /**
+     * Set the minimum x-coordinate of the region.
+     *
+     * @return {@code this} (after modification)
+     * @throws IllegalArgumentException if the resulting region would become {@link #isValid() invalid}.
+     */
     public BlockRegion minX(int x) {
-        return this.minX(x, this);
+        Preconditions.checkArgument(x <= maxX);
+        this.minX = x;
+        return this;
     }
 
-    @Override
-    public BlockRegion minY(int y, BlockRegion dest) {
-        return dest.set(this.minX, y, this.minZ, this.maxX, this.maxY, this.maxZ);
-    }
-
+    /**
+     * Set the minimum y-coordinate of the region.
+     *
+     * @return {@code this} (after modification)
+     * @throws IllegalArgumentException if the resulting region would become {@link #isValid() invalid}.
+     */
     public BlockRegion minY(int y) {
-        return this.minY(y, this);
+        Preconditions.checkArgument(y <= maxY);
+        this.minY = y;
+        return this;
     }
 
-    @Override
-    public BlockRegion minZ(int z, BlockRegion dest) {
-        return dest.set(this.minX, this.minY, z, this.maxX, this.maxY, this.maxZ);
-    }
-
+    /**
+     * Set the minimum z-coordinate of the region.
+     *
+     * @return {@code this} (after modification)
+     * @throws IllegalArgumentException if the resulting region would become {@link #isValid() invalid}.
+     */
     public BlockRegion minZ(int z) {
-        return this.minZ(z, this);
+        Preconditions.checkArgument(z <= maxZ);
+        this.minZ = z;
+        return this;
     }
 
-    @Override
-    public BlockRegion setMin(int minX, int minY, int minZ, BlockRegion dest) {
-        return dest.set(minX, minY, minZ, this.maxX, this.maxY, this.maxZ);
-    }
-
-    public BlockRegion setMin(int x, int y, int z) {
-        return this.setMin(x, y, z, this);
+    /**
+     * Set the coordinates of the minimum corner for this region.
+     *
+     * @return {@code this} (after modification)
+     * @throws IllegalArgumentException if the resulting region would become {@link #isValid() invalid}.
+     */
+    public BlockRegion setMin(int minX, int minY, int minZ) {
+        return this.set(minX, minY, minZ, this.maxX, this.maxY, this.maxZ);
     }
 
     public BlockRegion setMin(Vector3ic min) {
-        return this.setMin(min, this);
+        return this.setMin(min.x(), min.y(), min.z());
     }
 
+    /**
+     * Translate the minimum corner of the region by adding given {@code (dx, dy, dz)}.
+     *
+     * @param dx the number of blocks to add to the minimum corner on the x axis
+     * @param dy the number of blocks to add to the minimum corner on the y axis
+     * @param dz the number of blocks to add to the minimum corner on the z axis
+     * @return {@code this} (after modification)
+     * @throws IllegalArgumentException if the resulting region would become {@link #isValid() invalid}.
+     */
     public BlockRegion addToMin(int dx, int dy, int dz) {
-        return this.addToMin(dx, dy, dz, this);
+        return this.setMin(minX() + dx, minY() + dy, minZ() + dz);
     }
 
     public BlockRegion addToMin(Vector3ic dmin) {
-        return this.addToMin(dmin, this);
+        return this.addToMin(dmin.x(), dmin.y(), dmin.z());
     }
-
 
     // -- max --------------------------------------------------------------------------------------------------------//
 
@@ -294,63 +311,86 @@ public class BlockRegion implements BlockRegionc {
         return this.maxZ;
     }
 
-    @Override
-    public BlockRegion maxX(int x, BlockRegion dest) {
-        return dest.set(this.minX, this.minY, this.minZ, x, this.maxY, this.maxZ);
-    }
-
+    /**
+     * Set the maximum x-coordinate of the region.
+     *
+     * @return {@code this} (after modification)
+     * @throws IllegalArgumentException if the resulting region would become {@link #isValid() invalid}.
+     */
     public BlockRegion maxX(int x) {
-        return this.maxX(x, this);
+        Preconditions.checkArgument(x >= minX);
+        this.maxX = x;
+        return this;
     }
 
-    @Override
-    public BlockRegion maxY(int y, BlockRegion dest) {
-        return dest.set(this.minX, this.minY, this.minZ, this.maxX, y, this.maxZ);
-    }
-
+    /**
+     * Set the maximum y-coordinate of the region.
+     *
+     * @return {@code this} (after modification)
+     * @throws IllegalArgumentException if the resulting region would become {@link #isValid() invalid}.
+     */
     public BlockRegion maxY(int y) {
-        return this.maxY(y, this);
+        Preconditions.checkArgument(y >= minY);
+        this.maxY = y;
+        return this;
     }
 
-    @Override
-    public BlockRegion maxZ(int z, BlockRegion dest) {
-        return dest.set(this.minX, this.minY, this.minZ, this.maxX, this.maxY, z);
-    }
-
+    /**
+     * Set the maximum z-coordinate of the region.
+     *
+     * @return {@code this} (after modification)
+     * @throws IllegalArgumentException if the resulting region would become {@link #isValid() invalid}.
+     */
     public BlockRegion maxZ(int z) {
-        return this.maxZ(z, this);
+        Preconditions.checkArgument(z >= minZ);
+        this.maxZ = z;
+        return this;
     }
 
-    @Override
-    public BlockRegion setMax(int x, int y, int z, BlockRegion dest) {
-        return dest.set(this.minX, this.minY, this.minZ, maxX, maxY, maxZ);
-    }
-
+    /**
+     * Set the coordinates of the maximum corner for this region.
+     *
+     * @return {@code this} (after modification)
+     * @throws IllegalArgumentException if the resulting region would become {@link #isValid() invalid}.
+     */
     public BlockRegion setMax(int x, int y, int z) {
-        return this.setMax(x, y, z, this);
+        return this.set(this.minX, this.minY, this.minZ, x, y, z);
     }
 
     public BlockRegion setMax(Vector3ic max) {
-        return this.setMax(max, this);
+        return this.setMax(max.x(), max.y(), max.z());
     }
 
+    /**
+     * Translate the maximum corner of the region by adding given {@code (dx, dy, dz)}.
+     *
+     * @param dx the number of blocks to add to the maximum corner on the x axis
+     * @param dy the number of blocks to add to the maximum corner on the y axis
+     * @param dz the number of blocks to add to the maximum corner on the z axis
+     * @return {@code this} (after modification)
+     * @throws IllegalArgumentException if the resulting region would become {@link #isValid() invalid}.
+     */
     public BlockRegion addToMax(int dx, int dy, int dz) {
-        return this.addToMax(dx, dy, dz, this);
+        return this.setMax(this.maxX + dx, this.maxY + dy, this.maxZ + dz);
     }
 
     public BlockRegion addToMax(Vector3ic dmax) {
-        return this.addToMax(dmax, this);
+        return this.addToMax(dmax.x(), dmax.y(), dmax.z());
     }
 
     // -- size -------------------------------------------------------------------------------------------------------//
 
-    @Override
-    public BlockRegion setSize(int x, int y, int z, BlockRegion dest) {
-        return dest.set(this.minX, this.minY, this.minZ, this.minX + x, this.minY + y, this.minZ + z);
-    }
-
+    /**
+     * Set the size of the block region from the minimum corner.
+     *
+     * @param x the x coordinate to set the size; must be > 0
+     * @param y the y coordinate to set the size; must be > 0
+     * @param z the z coordinate to set the size; must be > 0
+     * @return {@code this} (after modification)
+     * @throws IllegalArgumentException if the size is smaller than or equal to 0 in any dimension
+     */
     public BlockRegion setSize(int x, int y, int z) {
-        return this.setSize(x, y, z, this);
+        return this.setMax(this.minX + x, this.minY + y, this.minZ);
     }
 
     public BlockRegion setSize(Vector3ic size) {
@@ -358,68 +398,84 @@ public class BlockRegion implements BlockRegionc {
     }
 
     // -- IN-PLACE MUTATION ------------------------------------------------------------------------------------------//
-    @Override
-    public BlockRegion union(int x, int y, int z, BlockRegion dest) {
-        dest.minX = Math.min(this.minX, x);
-        dest.minY = Math.min(this.minY, y);
-        dest.minZ = Math.min(this.minZ, z);
 
-        dest.maxX = Math.max(this.maxX, x);
-        dest.maxY = Math.max(this.maxY, y);
-        dest.maxZ = Math.max(this.maxZ, z);
-        return dest;
-    }
-
+    /**
+     * Compute the union of this region and the given block coordinate.
+     *
+     * @param x the x coordinate of the block
+     * @param y the y coordinate of the block
+     * @param z the z coordinate of the block
+     * @return {@code this} (after modification)
+     */
     public BlockRegion union(int x, int y, int z) {
-        return this.union(x, y, z, this);
+        this.minX = Math.min(this.minX, x);
+        this.minY = Math.min(this.minY, y);
+        this.minZ = Math.min(this.minZ, z);
+
+        this.maxX = Math.max(this.maxX, x);
+        this.maxY = Math.max(this.maxY, y);
+        this.maxZ = Math.max(this.maxZ, z);
+        return this;
     }
 
     public BlockRegion union(Vector3ic pos) {
-        return union(pos.x(), pos.y(), pos.z(), this);
+        return union(pos.x(), pos.y(), pos.z());
     }
 
+    /**
+     * Compute the union of this region and the other region.
+     *
+     * @param other {@link BlockRegion}
+     * @return @code this} (after modification)
+     */
     public BlockRegion union(BlockRegionc other) {
-        return this.union(other, this);
+        return this.union(other.minX(), other.minY(), other.minZ()).union(other.maxX(), other.maxY(), other.maxZ());
     }
 
     // ---------------------------------------------------------------------------------------------------------------//
 
-    @Override
-    public Optional<BlockRegion> intersect(BlockRegionc other, BlockRegion dest) {
-        dest.minX = Math.max(minX, other.minX());
-        dest.minY = Math.max(minY, other.minY());
-        dest.minZ = Math.max(minZ, other.minZ());
+    /**
+     * Compute the intersection of this region with the {@code other} region.
+     * <p>
+     * NOTE: If the regions don't intersect this region will become invalid!
+     *
+     * @param other the other region
+     * @return {@code this} (after modification) or {@link Optional#empty()} if the regions don't intersect
+     */
+    public Optional<BlockRegion> intersect(BlockRegionc other) {
+        this.minX = Math.max(minX, other.minX());
+        this.minY = Math.max(minY, other.minY());
+        this.minZ = Math.max(minZ, other.minZ());
 
-        dest.maxX = Math.min(maxX, other.maxX());
-        dest.maxY = Math.min(maxY, other.maxY());
-        dest.maxZ = Math.min(maxZ, other.maxZ());
+        this.maxX = Math.min(maxX, other.maxX());
+        this.maxY = Math.min(maxY, other.maxY());
+        this.maxZ = Math.min(maxZ, other.maxZ());
 
-        if (dest.isValid()) {
-            return Optional.of(dest);
+        if (this.isValid()) {
+            return Optional.of(this);
         } else {
             return Optional.empty();
         }
     }
 
-    public Optional<BlockRegion> intersect(BlockRegionc other) {
-        return this.intersect(other, this);
-    }
-
     // ---------------------------------------------------------------------------------------------------------------//
 
-    @Override
-    public BlockRegion translate(int x, int y, int z, BlockRegion dest) {
-        dest.minX = this.minX + x;
-        dest.minY = this.minY + y;
-        dest.minZ = this.minZ + z;
-        dest.maxX = this.maxX + x;
-        dest.maxY = this.maxY + y;
-        dest.maxZ = this.maxZ + z;
-        return dest;
-    }
-
-    public BlockRegion translate(int x, int y, int z) {
-        return this.translate(x, y, z, this);
+    /**
+     * Translate this region by the given vector {@code (dx, dy, dz))}.
+     *
+     * @param dx the x coordinate to translate by
+     * @param dy the y coordinate to translate by
+     * @param dz the z coordinate to translate by
+     * @return {@code this} (after modification)
+     */
+    public BlockRegion translate(int dx, int dy, int dz) {
+        this.minX = this.minX + dx;
+        this.minY = this.minY + dy;
+        this.minZ = this.minZ + dz;
+        this.maxX = this.maxX + dx;
+        this.maxY = this.maxY + dy;
+        this.maxZ = this.maxZ + dz;
+        return this;
     }
 
     public BlockRegion translate(Vector3ic vec) {
@@ -428,14 +484,20 @@ public class BlockRegion implements BlockRegionc {
 
     // -- extend -----------------------------------------------------------------------------------------------------//
 
-    @Override
-    public BlockRegion expand(int dx, int dy, int dz, BlockRegion dest) {
-        return dest.set(this.minX - dx, this.minY - dy, this.minZ - dz,
-                this.maxX + dx, this.maxY + dy, this.maxZ + dz);
-    }
+    // -- expand -----------------------------------------------------------------------------------------------------//
 
+    /**
+     * Expand this region by adding the given {@code extents} for each face of the region.
+     *
+     * @param dx the amount of blocks to extend this region by along the x axis in both directions
+     * @param dy the amount of blocks to extend this region by along the y axis in both directions
+     * @param dz the amount of blocks to extend this region by along the z axis in both directions
+     * @return {@code this} (after modification)
+     * @throws IllegalArgumentException if the resulting region would become {@link #isValid() invalid}.
+     */
     public BlockRegion expand(int dx, int dy, int dz) {
-        return this.expand(dx, dy, dz, this);
+        return this.set(this.minX - dx, this.minY - dy, this.minZ - dz,
+                this.maxX + dx, this.maxY + dy, this.maxZ + dz);
     }
 
     public BlockRegion expand(Vector3ic extents) {
@@ -444,8 +506,16 @@ public class BlockRegion implements BlockRegionc {
 
     // -- transform --------------------------------------------------------------------------------------------------//
 
-    @Override
-    public BlockRegion transform(Matrix4fc m, BlockRegion dest) {
+    /**
+     * Apply the given {@link Matrix4fc#isAffine() affine} transformation to this {@link BlockRegion}.
+     * <p>
+     * The matrix in {@code m} <i>must</i> be {@link Matrix4fc#isAffine() affine}.
+     *
+     * @param m the affine transformation matrix
+     * @return {@code this} (after modification)
+     * @throws IllegalArgumentException if the matrix {@code m} is not {@link Matrix4fc#isAffine() affine}
+     */
+    public BlockRegion transform(Matrix4fc m) {
         Preconditions.checkArgument(m.isAffine());
         float dx = maxX - minX;
         float dy = maxY - minY;
@@ -470,18 +540,14 @@ public class BlockRegion implements BlockRegionc {
             maxy = Math.max(ty, maxy);
             maxz = Math.max(tz, maxz);
         }
-        dest.minX = Math.roundUsing(minx, RoundingMode.FLOOR);
-        dest.minY = Math.roundUsing(miny, RoundingMode.FLOOR);
-        dest.minZ = Math.roundUsing(minz, RoundingMode.FLOOR);
-        dest.maxX = Math.roundUsing(maxx, RoundingMode.CEILING);
-        dest.maxY = Math.roundUsing(maxy, RoundingMode.CEILING);
-        dest.maxZ = Math.roundUsing(maxz, RoundingMode.CEILING);
+        this.minX = Math.roundUsing(minx, RoundingMode.FLOOR);
+        this.minY = Math.roundUsing(miny, RoundingMode.FLOOR);
+        this.minZ = Math.roundUsing(minz, RoundingMode.FLOOR);
+        this.maxX = Math.roundUsing(maxx, RoundingMode.CEILING);
+        this.maxY = Math.roundUsing(maxy, RoundingMode.CEILING);
+        this.maxZ = Math.roundUsing(maxz, RoundingMode.CEILING);
 
-        return dest;
-    }
-
-    public BlockRegion transform(Matrix4fc m) {
-        return transform(m, this);
+        return this;
     }
 
     // ---------------------------------------------------------------------------------------------------------------//
