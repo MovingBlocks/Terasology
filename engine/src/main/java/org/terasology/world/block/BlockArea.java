@@ -233,7 +233,7 @@ public class BlockArea implements BlockAreac {
 
     @Override
     public BlockArea setSize(int sizeX, int sizeY, BlockArea dest) {
-        return dest.set(minX, minY, minX + sizeX, minY + sizeY);
+        return dest.set(minX, minY, minX + sizeX - 1, minY + sizeY - 1);
     }
 
     public BlockArea setSize(int sizeX, int sizeY) {
