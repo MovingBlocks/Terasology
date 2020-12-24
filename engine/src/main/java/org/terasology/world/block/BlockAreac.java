@@ -3,9 +3,7 @@
 
 package org.terasology.world.block;
 
-import org.joml.Math;
 import org.joml.Rectanglef;
-import org.joml.RoundingMode;
 import org.joml.Vector2f;
 import org.joml.Vector2fc;
 import org.joml.Vector2i;
@@ -378,6 +376,29 @@ public interface BlockAreac extends Iterable<Vector2ic> {
      */
     default BlockArea translate(Vector2ic vec, BlockArea dest) {
         return this.translate(vec.x(), vec.y(), dest);
+    }
+
+    /**
+     * Move this area to the given position {@code (x, y)). The position is defined by the minimum corner.
+     *
+     * @param x the new x coordinate of the minimum corner
+     * @param y the new y coordinate of the minimum corner
+     * @param dest destination; will hold the result
+     * @return {@code dest} (after modification)
+     */
+    default BlockArea setPosition(int x, int y, BlockArea dest) {
+        return this.translate(x - minX(), y - minY(), dest);
+    }
+
+    /**
+     * Move this area to the given position {@code (x, y)). The position is defined by the minimum corner.
+     *
+     * @param pos the new coordinates of the minimum corner
+     * @param dest destination; will hold the result
+     * @return {@code dest} (after modification)
+     */
+    default BlockArea setPosition(Vector2ic pos, BlockArea dest) {
+        return this.setPosition(pos.x(), pos.y(), dest);
     }
 
     // -- expand -----------------------------------------------------------------------------------------------------//

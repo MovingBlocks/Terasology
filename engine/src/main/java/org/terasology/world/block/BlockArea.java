@@ -305,6 +305,14 @@ public class BlockArea implements BlockAreac {
         return translate(dv.x(), dv.y(), this);
     }
 
+    public BlockArea setPosition(int x, int y) {
+        return setPosition(x, y, this);
+    }
+
+    public BlockArea setPosition(Vector2i pos) {
+        return setPosition(pos.x(), pos.y(), this);
+    }
+
     // ---------------------------------------------------------------------------------------------------------------//
 
     @Override
