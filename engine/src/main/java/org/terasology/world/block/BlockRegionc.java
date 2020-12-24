@@ -429,6 +429,30 @@ public interface BlockRegionc extends Iterable<Vector3ic> {
         return this.translate(vec.x(), vec.y(), vec.z(), dest);
     }
 
+    /**
+     * Move this region to the given position {@code (x, y, z)). The position is defined by the minimum corner.
+     *
+     * @param x the new x coordinate of the minimum corner
+     * @param y the new y coordinate of the minimum corner
+     * @param z the new z coordinate of the minimum corner
+     * @param dest destination; will hold the result
+     * @return {@code dest} (after modification)
+     */
+    default BlockRegion setPosition(int x, int y, int z, BlockRegion dest) {
+        return dest.translate(x - this.minX(), y - this.minY(), z - this.minZ());
+    }
+
+    /**
+     * Move this region to the given position {@code (x, y, z)). The position is defined by the minimum corner.
+     *
+     * @param pos the new coordinates of the minimum corner
+     * @param dest destination; will hold the result
+     * @return {@code dest} (after modification)
+     */
+    default BlockRegion setPosition(Vector3ic pos, BlockRegion dest) {
+        return setPosition(pos.x(), pos.y(), pos.z(), dest);
+    }
+
     // -- expand -----------------------------------------------------------------------------------------------------//
 
     /**
