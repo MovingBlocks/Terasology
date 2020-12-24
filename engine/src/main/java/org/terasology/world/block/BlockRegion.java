@@ -482,7 +482,21 @@ public class BlockRegion implements BlockRegionc {
         return translate(vec.x(), vec.y(), vec.z());
     }
 
-    // -- extend -----------------------------------------------------------------------------------------------------//
+    /**
+     * Move this region to the given position {@code (x, y, z)). The position is defined by the minimum corner.
+     *
+     * @param x the new x coordinate of the minimum corner
+     * @param y the new y coordinate of the minimum corner
+     * @param z the new z coordinate of the minimum corner
+     * @return {@code this} (after modification)
+     */
+    public BlockRegion setPosition(int x, int y, int z) {
+        return this.translate(x - this.minX, y - this.minY, z - this.minZ);
+    }
+
+    public BlockRegion setPosition(Vector3ic pos) {
+        return this.setPosition(pos.x(), pos.y(), pos.z());
+    }
 
     // -- expand -----------------------------------------------------------------------------------------------------//
 
