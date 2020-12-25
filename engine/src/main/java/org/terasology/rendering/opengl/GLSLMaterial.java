@@ -79,7 +79,7 @@ public class GLSLMaterial extends BaseMaterial {
     public GLSLMaterial(ResourceUrn urn, AssetType<?, MaterialData> assetType, MaterialData data, LwjglGraphicsProcessing graphicsProcessing) {
         super(urn, assetType);
         this.graphicsProcessing = graphicsProcessing;
-        disposalAction = new DisposalAction(urn);
+        disposalAction = new DisposalAction(urn, graphicsProcessing);
         getDisposalHook().setDisposeAction(disposalAction);
         this.materialData = data;
         shaderManager = CoreRegistry.get(ShaderManager.class);
@@ -684,12 +684,14 @@ public class GLSLMaterial extends BaseMaterial {
     private static class DisposalAction implements Runnable {
 
         private final ResourceUrn urn;
+        private final LwjglGraphicsProcessing graphicsProcessing;
 
         private TIntIntMap shaderPrograms = new TIntIntHashMap();
 
         // made package-private after Jenkins' suggestion
-        DisposalAction(ResourceUrn urn) {
+        DisposalAction(ResourceUrn urn, LwjglGraphicsProcessing graphicsProcessing) {
             this.urn = urn;
+            this.graphicsProcessing = graphicsProcessing;
         }
 
         @Override
@@ -697,20 +699,14 @@ public class GLSLMaterial extends BaseMaterial {
             try {
                 GameThread.synch(() -> {
                     logger.debug("Disposing material {}.", urn);
-                    TIntIntIterator it = shaderPrograms.iterator();
-                    while (it.hasNext()) {
-                        it.advance();
-                        GL20.glDeleteProgram(it.value());
-                    }
-
-//                    final TIntIntMap deletedPrograms = new TIntIntHashMap(shaderPrograms);
-//                    graphicsProcessing.asynchToDisplayThread(() -> {
-//                        TIntIntIterator it = deletedPrograms.iterator();
-//                        while (it.hasNext()) {
-//                            it.advance();
-//                            GL20.glDeleteProgram(it.value());
-//                        }
-//                    });
+                    final TIntIntMap deletedPrograms = new TIntIntHashMap(shaderPrograms);
+                    graphicsProcessing.asynchToDisplayThread(() -> {
+                        TIntIntIterator it = deletedPrograms.iterator();
+                        while (it.hasNext()) {
+                            it.advance();
+                            GL20.glDeleteProgram(it.value());
+                        }
+                    });
                     shaderPrograms.clear();
                 });
             } catch (InterruptedException e) {
