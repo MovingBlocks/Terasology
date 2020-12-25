@@ -34,7 +34,7 @@ import java.util.Map.Entry;
 public abstract class SparseFieldFacet3D extends SparseFacet3D implements FieldFacet3D {
 
     // msteiger: it could be advantageous to use a Joda Collections map instead
-    private final Map<Vector3i, Number> relData = Maps.newLinkedHashMap();
+    private final Map<Vector3ic, Number> relData = Maps.newLinkedHashMap();
 
     private final float defValue;
 
@@ -74,8 +74,8 @@ public abstract class SparseFieldFacet3D extends SparseFacet3D implements FieldF
         set(new Vector3i(x, y, z), value);
     }
 
-    public void set(Vector3i pos, Number value) {
-        checkRelativeCoords(pos.x, pos.y, pos.z);
+    public void set(Vector3ic pos, Number value) {
+        checkRelativeCoords(pos.x(), pos.y(), pos.z());
 
         if (value.floatValue() != defValue) {
             relData.put(pos, value);
@@ -106,8 +106,8 @@ public abstract class SparseFieldFacet3D extends SparseFacet3D implements FieldF
         setWorld(x, y, z, Float.valueOf(value));
     }
 
-    public void setWorld(Vector3i pos, Number value) {
-        setWorld(pos.x, pos.y, pos.z, value);
+    public void setWorld(Vector3ic pos, Number value) {
+        setWorld(pos.x(), pos.y(), pos.z(), value);
     }
 
     public void setWorld(int x, int y, int z, Number value) {
@@ -122,7 +122,7 @@ public abstract class SparseFieldFacet3D extends SparseFacet3D implements FieldF
     /**
      * @return an unmodifiable view on the relative entries
      */
-    public Map<Vector3i, Number> getRelativeEntries() {
+    public Map<Vector3ic, Number> getRelativeEntries() {
         return Collections.unmodifiableMap(relData);
     }
 
@@ -133,9 +133,9 @@ public abstract class SparseFieldFacet3D extends SparseFacet3D implements FieldF
 
         Map<Vector3i, Number> result = Maps.newLinkedHashMap();
 
-        for (Entry<Vector3i, Number> entry : relData.entrySet()) {
-            Vector3i relPos = entry.getKey();
-            Vector3i worldPos = relativeToWorld(relPos.x, relPos.y, relPos.z);
+        for (Entry<Vector3ic, Number> entry : relData.entrySet()) {
+            Vector3ic relPos = entry.getKey();
+            Vector3i worldPos = relativeToWorld(relPos.x(), relPos.y(), relPos.z());
 
             result.put(worldPos, entry.getValue());
         }
