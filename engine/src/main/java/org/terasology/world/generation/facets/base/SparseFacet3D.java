@@ -31,7 +31,7 @@ public abstract class SparseFacet3D implements WorldFacet3D {
 
     public SparseFacet3D(BlockRegion targetRegion, Border3D border) {
         worldRegion = border.expandTo3D(targetRegion);
-        relativeRegion = border.expandTo3D(targetRegion.getSize(new org.joml.Vector3i()));
+        relativeRegion = border.expandTo3D(targetRegion.getSize(new Vector3i()));
     }
 
     @Override
