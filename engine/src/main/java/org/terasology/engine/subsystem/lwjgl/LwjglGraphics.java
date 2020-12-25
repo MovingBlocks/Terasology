@@ -81,6 +81,7 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
         initWindow();
         initOpenGL();
 
+        context.put(ShaderManager.class, new ShaderManagerLwjgl());
         context.put(CanvasRenderer.class, new LwjglCanvasRenderer(context));
     }
 
@@ -185,7 +186,7 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
 
     private void initOpenGL() {
         logger.info("Initializing OpenGL");
-        checkOpenGL();
+        LwjglGraphicsUtil.checkOpenGL();
         GLFW.glfwSetFramebufferSizeCallback(GLFW.glfwGetCurrentContext(), new GLFWFramebufferSizeCallback() {
             @Override
             public void invoke(long window, int width, int height) {
@@ -200,60 +201,5 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
                 logger.warn("Unable to specify DebugCallback to receive debugging messages from the GL.");
             }
         }
-        context.put(ShaderManager.class, new ShaderManagerLwjgl());
-    }
-
-    private void checkOpenGL() {
-        GLCapabilities capabilities = GL.createCapabilities();
-        boolean[] requiredCapabilities = {
-                capabilities.OpenGL12,
-                capabilities.OpenGL14,
-                capabilities.OpenGL15,
-                capabilities.OpenGL20,
-                capabilities.OpenGL21,   // needed as we use GLSL 1.20
-
-                capabilities.GL_ARB_framebuffer_object,  // Extensions eventually included in
-                capabilities.GL_ARB_texture_float,       // OpenGl 3.0 according to
-                capabilities.GL_ARB_half_float_pixel};   // http://en.wikipedia.org/wiki/OpenGL#OpenGL_3.0
-
-        String[] capabilityNames = {"OpenGL12",
-                "OpenGL14",
-                "OpenGL15",
-                "OpenGL20",
-                "OpenGL21",
-                "GL_ARB_framebuffer_object",
-                "GL_ARB_texture_float",
-                "GL_ARB_half_float_pixel"};
-
-        boolean canRunTheGame = true;
-        StringBuilder missingCapabilitiesMessage = new StringBuilder();
-
-        for (int index = 0; index < requiredCapabilities.length; index++) {
-            if (!requiredCapabilities[index]) {
-                missingCapabilitiesMessage.append("    - ").append(capabilityNames[index]).append("\n");
-                canRunTheGame = false;
-            }
-        }
-
-        if (!canRunTheGame) {
-            String completeErrorMessage = completeErrorMessage(missingCapabilitiesMessage.toString());
-            throw new IllegalStateException(completeErrorMessage);
-        }
-    }
-
-    private String completeErrorMessage(String errorMessage) {
-        return "\n" +
-                "\nThe following OpenGL versions/extensions are required but are not supported by your GPU driver:\n" +
-                "\n" +
-                errorMessage +
-                "\n" +
-                "GPU Information:\n" +
-                "\n" +
-                "    Vendor:  " + GL11.glGetString(GL11.GL_VENDOR) + "\n" +
-                "    Model:   " + GL11.glGetString(GL11.GL_RENDERER) + "\n" +
-                "    Driver:  " + GL11.glGetString(GL11.GL_VERSION) + "\n" +
-                "\n" +
-                "Try updating the driver to the latest version available.\n" +
-                "If that fails you might need to use a different GPU (graphics card). Sorry!\n";
     }
 }

@@ -35,6 +35,7 @@ import org.slf4j.LoggerFactory;
 import org.terasology.assets.AssetType;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.engine.GameThread;
+import org.terasology.engine.subsystem.lwjgl.LwjglGraphicsProcessing;
 import org.terasology.math.MatrixUtils;
 import org.terasology.math.geom.Matrix3f;
 import org.terasology.math.geom.Matrix4f;
@@ -56,6 +57,7 @@ import java.util.Set;
 public class GLSLMaterial extends BaseMaterial {
 
     private static final Logger logger = LoggerFactory.getLogger(GLSLMaterial.class);
+    private final LwjglGraphicsProcessing graphicsProcessing;
 
     private int textureIndex;
 
@@ -74,19 +76,16 @@ public class GLSLMaterial extends BaseMaterial {
     private DisposalAction disposalAction;
     private MaterialData materialData;
 
-    public GLSLMaterial(ResourceUrn urn, AssetType<?, MaterialData> assetType, MaterialData data) {
+    public GLSLMaterial(ResourceUrn urn, AssetType<?, MaterialData> assetType, MaterialData data, LwjglGraphicsProcessing graphicsProcessing) {
         super(urn, assetType);
+        this.graphicsProcessing = graphicsProcessing;
         disposalAction = new DisposalAction(urn);
         getDisposalHook().setDisposeAction(disposalAction);
         this.materialData = data;
         shaderManager = CoreRegistry.get(ShaderManager.class);
-    }
-
-    public void glInitialize() {
-        if (shaderManager == null) {
-            shaderManager = CoreRegistry.get(ShaderManager.class);
-        }
-        reload(materialData);
+        graphicsProcessing.asynchToDisplayThread(() -> {
+            reload(data);
+        });
     }
 
     @Override
@@ -149,7 +148,6 @@ public class GLSLMaterial extends BaseMaterial {
         //Some of the uniforms are not updated constantly between frames
         //this function will rebind any uniforms that are not bound
         rebindVariables(materialData);
-
     }
 
     @Override
@@ -162,7 +160,6 @@ public class GLSLMaterial extends BaseMaterial {
                 shader = (GLSLShader) data.getShader();
                 recompile();
                 rebindVariables(data);
-
             });
         } catch (InterruptedException e) {
             logger.error("Failed to reload {}", getUrn(), e);
@@ -705,6 +702,15 @@ public class GLSLMaterial extends BaseMaterial {
                         it.advance();
                         GL20.glDeleteProgram(it.value());
                     }
+
+//                    final TIntIntMap deletedPrograms = new TIntIntHashMap(shaderPrograms);
+//                    graphicsProcessing.asynchToDisplayThread(() -> {
+//                        TIntIntIterator it = deletedPrograms.iterator();
+//                        while (it.hasNext()) {
+//                            it.advance();
+//                            GL20.glDeleteProgram(it.value());
+//                        }
+//                    });
                     shaderPrograms.clear();
                 });
             } catch (InterruptedException e) {

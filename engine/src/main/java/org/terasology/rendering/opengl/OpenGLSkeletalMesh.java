@@ -25,9 +25,9 @@ import org.terasology.assets.AssetType;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.engine.GameThread;
 import org.terasology.engine.subsystem.lwjgl.GLBufferPool;
+import org.terasology.engine.subsystem.lwjgl.LwjglGraphicsProcessing;
 import org.terasology.math.AABB;
 import org.terasology.math.geom.Matrix4f;
-import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector2f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.rendering.VertexBufferObjectUtil;
@@ -69,15 +69,14 @@ public class OpenGLSkeletalMesh extends SkeletalMesh {
 
     private DisposalAction disposalAction;
 
-    public OpenGLSkeletalMesh(ResourceUrn urn, AssetType<?, SkeletalMeshData> assetType, GLBufferPool bufferPool, SkeletalMeshData data) {
+    public OpenGLSkeletalMesh(ResourceUrn urn, AssetType<?, SkeletalMeshData> assetType, GLBufferPool bufferPool,
+                              SkeletalMeshData data, LwjglGraphicsProcessing graphicsProcessing) {
         super(urn, assetType);
         disposalAction = new DisposalAction(urn, bufferPool);
         getDisposalHook().setDisposeAction(disposalAction);
-        this.data = data;
-    }
-
-    public void glInitialize() {
-        reload(data);
+        graphicsProcessing.asynchToDisplayThread(() -> {
+            reload(data);
+        });
     }
 
     public void setScaleTranslate(org.joml.Vector3f newScale, org.joml.Vector3f newTranslate) {

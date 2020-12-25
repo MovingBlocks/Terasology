@@ -156,4 +156,9 @@ public class AwtMouseDevice implements MouseDevice, PropertyChangeListener {
             this.uiScale = this.renderingConfig.getUiScale() / 100f;
         }
     }
+
+    public void resetDelta() {
+        xPosDelta = 0;
+        yPosDelta = 0;
+    }
 }

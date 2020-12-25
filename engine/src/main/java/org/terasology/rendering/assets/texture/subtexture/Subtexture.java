@@ -36,16 +36,11 @@ public class Subtexture extends TextureRegionAsset<SubtextureData> {
     private Texture texture;
     private Rect2f subregion;
     private Runnable disposalAction;
-    private SubtextureData initData;
 
-    public Subtexture(ResourceUrn urn, AssetType<?, SubtextureData> assetType, SubtextureData initData) {
+    public Subtexture(ResourceUrn urn, AssetType<?, SubtextureData> assetType, SubtextureData data) {
         super(urn, assetType);
         disposalAction = this::dispose;
-        this.initData = initData;
-    }
-
-    public void glInitialize() {
-        reload(initData);
+        reload(data);
     }
 
     @Override

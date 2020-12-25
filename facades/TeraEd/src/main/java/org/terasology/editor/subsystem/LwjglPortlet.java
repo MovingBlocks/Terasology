@@ -24,6 +24,7 @@ import org.terasology.engine.modes.GameState;
 import org.terasology.engine.subsystem.DisplayDevice;
 import org.terasology.engine.subsystem.lwjgl.BaseLwjglSubsystem;
 import org.terasology.engine.subsystem.lwjgl.DebugCallback;
+import org.terasology.engine.subsystem.lwjgl.GLFWErrorCallback;
 import org.terasology.engine.subsystem.lwjgl.LwjglGraphicsManager;
 import org.terasology.engine.subsystem.lwjgl.LwjglGraphicsUtil;
 import org.terasology.entitySystem.event.internal.EventSystem;
@@ -33,6 +34,7 @@ import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.ShaderManager;
 import org.terasology.rendering.ShaderManagerLwjgl;
 import org.terasology.rendering.nui.internal.LwjglCanvasRenderer;
+import org.terasology.rendering.world.WorldRenderer;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -53,6 +55,7 @@ public class LwjglPortlet extends BaseLwjglSubsystem {
     private GameEngine engine;
     private AWTGLCanvas canvas;
     private LwjglPortletDisplayDevice display;
+    private AwtMouseDevice mouseDevice;
 
     private final LwjglGraphicsManager graphics = new LwjglGraphicsManager();
 
@@ -85,6 +88,7 @@ public class LwjglPortlet extends BaseLwjglSubsystem {
 
         initBuffer();
 
+        context.put(ShaderManager.class, new ShaderManagerLwjgl());
         context.put(CanvasRenderer.class, new LwjglCanvasRenderer(context));
     }
 
@@ -107,6 +111,7 @@ public class LwjglPortlet extends BaseLwjglSubsystem {
     public void setupThreads() {
         GameThread.reset();
         GameThread.setToCurrentThread();
+        graphics.setThreadMode(LwjglGraphicsManager.ThreadMode.GAME_THREAD);
 
         EventSystem eventSystem = CoreRegistry.get(EventSystem.class);
         if (eventSystem != null) {
@@ -120,16 +125,16 @@ public class LwjglPortlet extends BaseLwjglSubsystem {
         canvas = new AWTGLCanvas() {
             @Override
             public void initGL() {
-                initOpenGL(LwjglPortlet.this.context);
+                initGLFW();
+                initOpenGL();
                 glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
                 glLoadIdentity();
-                LwjglPortlet.this.context.put(CanvasRenderer.class, new LwjglCanvasRenderer(LwjglPortlet.this.context));
             }
 
             @Override
             public void paintGL() {
-                if (!((TerasologyEngine) engine).tick()) {
-                    // ignore?
+                if (((TerasologyEngine) engine).tick()) {
+                    mouseDevice.resetDelta();
                 }
             }
         };
@@ -137,6 +142,24 @@ public class LwjglPortlet extends BaseLwjglSubsystem {
 
     public AWTGLCanvas getCanvas() {
         return this.canvas;
+    }
+
+    private void initGLFW() {
+        if (!GLFW.glfwInit()) {
+            throw new RuntimeException("Failed to initialize GLFW");
+        }
+
+        GLFW.glfwDefaultWindowHints();
+        GLFW.glfwWindowHint(GLFW.GLFW_VISIBLE, GLFW.GLFW_FALSE);
+        GLFW.glfwWindowHint(GLFW.GLFW_COCOA_GRAPHICS_SWITCHING, GLFW.GLFW_TRUE);
+        GLFW.glfwWindowHint(GLFW.GLFW_COCOA_RETINA_FRAMEBUFFER, GLFW.GLFW_FALSE);
+        GLFW.glfwWindowHint(GLFW.GLFW_DEPTH_BITS, config.getPixelFormat());
+
+        if (config.getDebug().isEnabled()) {
+            GLFW.glfwWindowHint(GLFW.GLFW_OPENGL_DEBUG_CONTEXT, GLFW.GLFW_TRUE);
+        }
+
+        GLFW.glfwSetErrorCallback(new GLFWErrorCallback());
     }
 
     private void initBuffer() {
@@ -168,7 +191,7 @@ public class LwjglPortlet extends BaseLwjglSubsystem {
         display.setDisplayModeSetting(config.getDisplayModeSetting());
     }
 
-    private void initOpenGL(Context currentContext) {
+    private void initOpenGL() {
         logger.info("Initializing OpenGL");
         LwjglGraphicsUtil.checkOpenGL();
         LwjglGraphicsUtil.initOpenGLParams();
@@ -179,13 +202,13 @@ public class LwjglPortlet extends BaseLwjglSubsystem {
                 logger.warn("Unable to specify DebugCallback to receive debugging messages from the GL.");
             }
         }
-        currentContext.put(ShaderManager.class, new ShaderManagerLwjgl());
     }
 
     public void initInputs() {
         final InputSystem inputSystem = context.get(InputSystem.class);
         Preconditions.checkNotNull(inputSystem);
-        ((AwtMouseDevice) inputSystem.getMouseDevice()).registerToAwtGlCanvas(canvas);
+        mouseDevice = ((AwtMouseDevice) inputSystem.getMouseDevice());
+        mouseDevice.registerToAwtGlCanvas(canvas);
         ((AwtKeyboardDevice) inputSystem.getKeyboard()).registerToAwtGlCanvas(canvas);
     }
 

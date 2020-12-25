@@ -3,7 +3,6 @@
 
 package org.terasology.editor.subsystem;
 
-import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.awt.AWTGLCanvas;
 import org.terasology.engine.subsystem.DisplayDevice;

@@ -66,7 +66,7 @@ import static org.lwjgl.opengl.GL11.glDeleteTextures;
 import static org.lwjgl.opengl.GL11.glGenTextures;
 import static org.lwjgl.opengl.GL11.glTexParameterf;
 
-public class LwjglGraphicsManager {
+public class LwjglGraphicsManager implements LwjglGraphicsProcessing {
 
     private final GLBufferPool bufferPool = new GLBufferPool(false);
 
@@ -102,48 +102,29 @@ public class LwjglGraphicsManager {
                     }
                 }));
         assetTypeManager.registerCoreAssetType(Shader.class,
-                (AssetFactory<Shader, ShaderData>) (urn, assetType, data) -> {
-                    GLSLShader slShader = new GLSLShader(urn, assetType, data);
-                    asynchToDisplayThread(slShader::glInitialize);
-                    return slShader;
-                }, "shaders");
+                (AssetFactory<Shader, ShaderData>) (urn, assetType, data) ->
+                        new GLSLShader(urn, assetType, data, this),
+                "shaders");
         assetTypeManager.registerCoreAssetType(Material.class,
-                (AssetFactory<Material, MaterialData>) (urn, assetType, data) -> {
-                    final GLSLMaterial material = new GLSLMaterial(urn, assetType, data);
-                    asynchToDisplayThread(material::glInitialize);
-                    return material;
-                }, "materials");
+                (AssetFactory<Material, MaterialData>) (urn, assetType, data) ->
+                        new GLSLMaterial(urn, assetType, data, this),
+                "materials");
         assetTypeManager.registerCoreAssetType(Mesh.class, (AssetFactory<Mesh, MeshData>)
-                (urn, assetType, data) -> {
-                    final OpenGLMesh mesh = new OpenGLMesh(urn, assetType, bufferPool, data);
-                    asynchToDisplayThread(mesh::glInitialize);
-                    return mesh;
-                }, "mesh");
+                        (urn, assetType, data) ->
+                                new OpenGLMesh(urn, assetType, bufferPool, data, this),
+                "mesh");
         assetTypeManager.registerCoreAssetType(SkeletalMesh.class, (AssetFactory<SkeletalMesh, SkeletalMeshData>)
-                (urn, assetType, data) -> {
-                    OpenGLSkeletalMesh skeletalMesh = new OpenGLSkeletalMesh(urn, assetType, bufferPool, data);
-                    asynchToDisplayThread(skeletalMesh::glInitialize);
-                    return skeletalMesh;
-                }, "skeletalMesh");
-        assetTypeManager.registerCoreAssetType(MeshAnimation.class,
-                (urn, assetType, data) -> {
-                    MeshAnimationImpl meshAnimation = new MeshAnimationImpl(urn, assetType, data);
-                    asynchToDisplayThread(meshAnimation::glInitialize);
-                    return meshAnimation;
-                }, "animations", "skeletalMesh");
+                        (urn, assetType, data) ->
+                                new OpenGLSkeletalMesh(urn, assetType, bufferPool, data, this),
+                "skeletalMesh");
+        assetTypeManager.registerCoreAssetType(MeshAnimation.class, MeshAnimationImpl::new,
+                "animations", "skeletalMesh");
         assetTypeManager.registerCoreAssetType(Atlas.class, Atlas::new, "atlas");
         assetTypeManager.registerCoreAssetType(MeshAnimationBundle.class,
-                (AssetFactory<MeshAnimationBundle, MeshAnimationBundleData>) (urn, assetType, data) -> {
-                    MeshAnimationBundle meshAnimationBundle = new MeshAnimationBundle(urn, assetType, data);
-                    asynchToDisplayThread(meshAnimationBundle::glInitialize);
-                    return meshAnimationBundle;
-                }, "skeletalMesh", "animations");
+                (AssetFactory<MeshAnimationBundle, MeshAnimationBundleData>) MeshAnimationBundle::new,
+                "skeletalMesh", "animations");
         assetTypeManager.registerCoreAssetType(Subtexture.class,
-                (AssetFactory<Subtexture, SubtextureData>) (urn, assetType, data) -> {
-                    Subtexture subtexture = new Subtexture(urn, assetType, data);
-                    asynchToDisplayThread(subtexture::glInitialize);
-                    return subtexture;
-                });
+                (AssetFactory<Subtexture, SubtextureData>) Subtexture::new);
     }
 
     public void registerRenderingSubsystem(Context context) {

@@ -240,16 +240,11 @@ public class HeadlessEnvironment extends Environment {
                 HeadlessMesh::new, "mesh");
         assetTypeManager.registerCoreAssetType(SkeletalMesh.class,
                 HeadlessSkeletalMesh::new, "skeletalMesh");
-        assetTypeManager.registerCoreAssetType(MeshAnimation.class, (urn, assetType, data) -> {
-                    MeshAnimationImpl meshAnimationImpl = new MeshAnimationImpl(urn, assetType, data);
-                    meshAnimationImpl.glInitialize();
-                    return meshAnimationImpl;
-                }, "animations");
+        assetTypeManager.registerCoreAssetType(MeshAnimation.class, MeshAnimationImpl::new, "animations");
 
         assetTypeManager.registerCoreAssetType(Atlas.class,
                 Atlas::new, "atlas");
-        assetTypeManager.registerCoreAssetType(Subtexture.class,
-                Subtexture::new);
+        assetTypeManager.registerCoreAssetType(Subtexture.class, Subtexture::new);
 
         assetTypeManager.switchEnvironment(context.get(ModuleManager.class).getEnvironment());
 
