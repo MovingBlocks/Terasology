@@ -75,6 +75,7 @@ public class Border3D {
      * @param size The size used.
      * @return The 2D representation with the additional space added to it with the additional space added to it in the 3 dimensions.
      */
+    //TODO: offer a variant that takes three integers to potentially avoid allocation of superfluous vectors
     public Rect2i expandTo2D(Vector3i size) {
         return Rect2i.createFromMinAndMax(-getSides(), -getSides(), size.x + getSides() - 1, size.z + getSides() - 1);
     }
@@ -94,6 +95,7 @@ public class Border3D {
      * @param size The size to be used.
      * @return The 3D world representation with the additional space added to it in the 3 dimensions.
      */
+    //TODO: offer a variant that takes three integers to potentially avoid allocation of superfluous vectors
     public BlockRegion expandTo3D(Vector3i size) {
         return new BlockRegion(-sides, -bottom, -sides,
                 size.x + sides - 1, size.y + top - 1, size.z + sides - 1);

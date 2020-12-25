@@ -29,8 +29,7 @@ public abstract class BaseFieldFacet3D extends BaseFacet3D implements FieldFacet
 
     public BaseFieldFacet3D(BlockRegion targetRegion, Border3D border) {
         super(targetRegion, border);
-        Vector3i size = getRelativeRegion().getSize(new Vector3i());
-        this.data = new float[size.x * size.y * size.z];
+        this.data = new float[getRelativeRegion().volume()];
     }
 
     @Override

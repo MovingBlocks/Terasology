@@ -33,8 +33,7 @@ public abstract class BaseObjectFacet3D<T> extends BaseFacet3D implements Object
 
     public BaseObjectFacet3D(BlockRegion targetRegion, Border3D border, Class<T> objectType) {
         super(targetRegion, border);
-        Vector3i size = getRelativeRegion().getSize(new Vector3i());
-        this.data = (T[]) Array.newInstance(objectType, size.x * size.y * size.z);
+        this.data = (T[]) Array.newInstance(objectType, getRelativeRegion().volume());
     }
 
     @Override
