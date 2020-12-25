@@ -26,7 +26,6 @@ import org.terasology.module.ModuleEnvironment;
 import org.terasology.rendering.assets.texture.TextureData;
 import org.terasology.rendering.nui.layers.mainMenu.ProgressListener;
 import org.terasology.world.block.BlockRegion;
-import org.terasology.world.block.BlockRegions;
 import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.generation.Region;
 import org.terasology.world.generation.World;
@@ -179,7 +178,7 @@ public class FacetLayerPreview implements PreviewGenerator {
         int minX = chunkPos.getX() * TILE_SIZE_X;
         int minZ = chunkPos.getY() * TILE_SIZE_Y;
         int height = vertChunks * ChunkConstants.SIZE_Y;
-        BlockRegion area3d = BlockRegions.createFromMinAndSize(new Vector3i(minX, 0, minZ), new Vector3i(TILE_SIZE_X, height, TILE_SIZE_Y));
+        BlockRegion area3d = new BlockRegion(minX, 0, minZ).setSize(TILE_SIZE_X, height, TILE_SIZE_Y);
         World world = worldGenerator.getWorld();
         Region region = world.getWorldData(area3d);
         return region;

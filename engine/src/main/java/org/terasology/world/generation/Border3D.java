@@ -16,10 +16,9 @@
 package org.terasology.world.generation;
 
 import com.google.common.base.Preconditions;
-import org.terasology.math.geom.Rect2i;
 import org.joml.Vector3i;
+import org.terasology.math.geom.Rect2i;
 import org.terasology.world.block.BlockRegion;
-import org.terasology.world.block.BlockRegions;
 
 import java.util.Objects;
 
@@ -67,8 +66,8 @@ public class Border3D {
      * @return The 2D representation with the additional space added to it.
      */
     public Rect2i expandTo2D(BlockRegion region) {
-        return Rect2i.createFromMinAndMax(region.getMinX() - getSides(), region.getMinZ() - getSides(),
-                region.getMaxX() + getSides(), region.getMaxZ() + getSides());
+        return Rect2i.createFromMinAndMax(region.minX() - getSides(), region.minZ() - getSides(),
+                region.maxX() + getSides(), region.maxZ() + getSides());
     }
 
     /**
@@ -86,8 +85,8 @@ public class Border3D {
      * @return The 3D world representation with the additional space added to it in the 3 dimensions.
      */
     public BlockRegion expandTo3D(BlockRegion region) {
-        return BlockRegions.createFromMinAndMax(new Vector3i(region.getMinX() - sides, region.getMinY() - bottom, region.getMinZ() - sides),
-                new Vector3i(region.getMaxX() + sides, region.getMaxY() + top, region.getMaxZ() + sides));
+        return new BlockRegion(region.minX() - sides, region.minY() - bottom, region.minZ() - sides,
+                region.maxX() + sides, region.maxY() + top, region.maxZ() + sides);
     }
 
     /**
@@ -96,8 +95,8 @@ public class Border3D {
      * @return The 3D world representation with the additional space added to it in the 3 dimensions.
      */
     public BlockRegion expandTo3D(Vector3i size) {
-        return BlockRegions.createFromMinAndMax(new Vector3i(-sides, -bottom, -sides),
-                new Vector3i(size.x + sides - 1, size.y + top - 1, size.z + sides - 1));
+        return new BlockRegion(-sides, -bottom, -sides,
+                size.x + sides - 1, size.y + top - 1, size.z + sides - 1);
     }
 
     /**

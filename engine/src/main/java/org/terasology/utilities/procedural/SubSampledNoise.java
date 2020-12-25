@@ -16,15 +16,13 @@
 package org.terasology.utilities.procedural;
 
 import com.google.common.math.IntMath;
-
-import org.terasology.math.geom.Rect2i;
-import org.terasology.math.TeraMath;
 import org.joml.Vector2f;
 import org.joml.Vector2i;
 import org.joml.Vector3f;
 import org.joml.Vector3i;
+import org.terasology.math.TeraMath;
+import org.terasology.math.geom.Rect2i;
 import org.terasology.world.block.BlockRegion;
-import org.terasology.world.block.BlockRegions;
 
 /**
  */
@@ -166,7 +164,7 @@ public class SubSampledNoise extends AbstractNoise {
     private float[] getSubset(float[] fullData, BlockRegion fullRegion, BlockRegion subRegion) {
         if (subRegion.getSizeX() != fullRegion.getSizeX() || subRegion.getSizeY() != fullRegion.getSizeY() || subRegion.getSizeZ() != fullRegion.getSizeZ()) {
             float[] result = new float[subRegion.getSizeX() * subRegion.getSizeY() * subRegion.getSizeZ()];
-            Vector3i offset = new Vector3i(subRegion.getMinX() - fullRegion.getMinX(), subRegion.getMinY() - fullRegion.getMinY(), subRegion.getMinZ() - fullRegion.getMinZ());
+            Vector3i offset = new Vector3i(subRegion.minX() - fullRegion.minX(), subRegion.minY() - fullRegion.minY(), subRegion.minZ() - fullRegion.minZ());
             for (int z = 0; z < subRegion.getSizeZ(); ++z) {
                 for (int y = 0; y < subRegion.getSizeY(); ++y) {
                     System.arraycopy(fullData, offset.x + fullRegion.getSizeX() * (y + offset.y + fullRegion.getSizeY() * (z + offset.z)),
@@ -218,9 +216,9 @@ public class SubSampledNoise extends AbstractNoise {
         for (int z = 0; z < zDim; z++) {
             for (int y = 0; y < yDim; y++) {
                 for (int x = 0; x < xDim; x++) {
-                    int actualX = x * sampleRate + fullRegion.getMinX();
-                    int actualY = y * sampleRate + fullRegion.getMinY();
-                    int actualZ = z * sampleRate + fullRegion.getMinZ();
+                    int actualX = x * sampleRate + fullRegion.minX();
+                    int actualY = y * sampleRate + fullRegion.minY();
+                    int actualZ = z * sampleRate + fullRegion.minZ();
                     fullData[x + xDim * (y + yDim * z)] = source.noise(zoom.x * actualX, zoom.y * actualY, zoom.z * actualZ);
                 }
             }
@@ -229,12 +227,12 @@ public class SubSampledNoise extends AbstractNoise {
     }
 
     private BlockRegion determineRequiredRegion(BlockRegion region) {
-        int newMinX = region.getMinX() - IntMath.mod(region.getMinX(), sampleRate);
-        int newMinY = region.getMinY() - IntMath.mod(region.getMinY(), sampleRate);
-        int newMinZ = region.getMinZ() - IntMath.mod(region.getMinZ(), sampleRate);
-        int newMaxX = region.getMaxX() + 4 - IntMath.mod(region.getMaxX(), sampleRate) - 1;
-        int newMaxY = region.getMaxY() + 4 - IntMath.mod(region.getMaxY(), sampleRate) - 1;
-        int newMaxZ = region.getMaxZ() + 4 - IntMath.mod(region.getMaxZ(), sampleRate) - 1;
-        return BlockRegions.createFromMinAndMax(new Vector3i(newMinX, newMinY, newMinZ), new Vector3i(newMaxX, newMaxY, newMaxZ));
+        int newMinX = region.minX() - IntMath.mod(region.minX(), sampleRate);
+        int newMinY = region.minY() - IntMath.mod(region.minY(), sampleRate);
+        int newMinZ = region.minZ() - IntMath.mod(region.minZ(), sampleRate);
+        int newMaxX = region.maxX() + 4 - IntMath.mod(region.maxX(), sampleRate) - 1;
+        int newMaxY = region.maxY() + 4 - IntMath.mod(region.maxY(), sampleRate) - 1;
+        int newMaxZ = region.maxZ() + 4 - IntMath.mod(region.maxZ(), sampleRate) - 1;
+        return new BlockRegion(newMinX, newMinY, newMinZ, newMaxX, newMaxY, newMaxZ);
     }
 }

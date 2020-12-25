@@ -47,7 +47,7 @@ public class VerticallySparseBooleanFacet3D implements WorldFacet3D {
 
     public boolean get(Vector3ic pos) {
         Set<Integer> column = data[getRelativeIndex(pos)];
-        return column.contains(pos.y() + worldRegion.getMinY() - relativeRegion.getMinY());
+        return column.contains(pos.y() + worldRegion.minY() - relativeRegion.minY());
     }
 
     public void set(int x, int y, int z, boolean value) {
@@ -56,7 +56,7 @@ public class VerticallySparseBooleanFacet3D implements WorldFacet3D {
 
     public void set(Vector3ic pos, boolean value) {
         Set<Integer> column = data[getRelativeIndex(pos)];
-        int y = pos.y() + worldRegion.getMinY() - relativeRegion.getMinY();
+        int y = pos.y() + worldRegion.minY() - relativeRegion.minY();
         if (value) {
             column.add(y);
         } else {
@@ -87,20 +87,20 @@ public class VerticallySparseBooleanFacet3D implements WorldFacet3D {
     }
 
     public Set<Integer> getWorldColumn(int x, int z) {
-        return data[getWorldIndex(new Vector3i(x, worldRegion.getMinY(), z))];
+        return data[getWorldIndex(new Vector3i(x, worldRegion.minY(), z))];
     }
 
     protected final int getRelativeIndex(Vector3ic pos) {
-        if (!relativeRegion.containsBlock(pos)) {
+        if (!relativeRegion.contains(pos)) {
             throw new IllegalArgumentException(String.format("Out of bounds: %s for region %s", pos.toString(), relativeRegion.toString()));
         }
-        return pos.x() - relativeRegion.getMinX() + relativeRegion.getSizeX() * (pos.z() - relativeRegion.getMinZ());
+        return pos.x() - relativeRegion.minX() + relativeRegion.getSizeX() * (pos.z() - relativeRegion.minZ());
     }
 
     protected final int getWorldIndex(Vector3ic pos) {
-        if (!worldRegion.containsBlock(pos)) {
+        if (!worldRegion.contains(pos)) {
             throw new IllegalArgumentException(String.format("Out of bounds: %s for region %s", pos.toString(), worldRegion.toString()));
         }
-        return pos.x() - worldRegion.getMinX() + worldRegion.getSizeX() * (pos.z() - worldRegion.getMinZ());
+        return pos.x() - worldRegion.minX() + worldRegion.getSizeX() * (pos.z() - worldRegion.minZ());
     }
 }
