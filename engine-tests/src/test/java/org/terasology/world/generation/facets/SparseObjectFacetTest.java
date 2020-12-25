@@ -17,9 +17,8 @@
 package org.terasology.world.generation.facets;
 
 import com.google.common.collect.ImmutableMap;
+import org.joml.Vector3i;
 import org.junit.jupiter.api.Test;
-import org.terasology.math.Region3i;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.world.block.BlockRegion;
 import org.terasology.world.generation.Border3D;
 import org.terasology.world.generation.facets.base.ObjectFacet3D;
