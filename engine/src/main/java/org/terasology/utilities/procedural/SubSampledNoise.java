@@ -178,7 +178,7 @@ public class SubSampledNoise extends AbstractNoise {
     }
 
     private float[] mapExpand(float[] keyData, BlockRegion fullRegion) {
-        float[] fullData = new float[fullRegion.getSizeX() * fullRegion.getSizeY() * fullRegion.getSizeZ()];
+        float[] fullData = new float[fullRegion.volume()];
         int samplesX = fullRegion.getSizeX() / sampleRate + 1;
         int samplesY = fullRegion.getSizeY() / sampleRate + 1;
         int samplesZ = fullRegion.getSizeZ() / sampleRate + 1;
