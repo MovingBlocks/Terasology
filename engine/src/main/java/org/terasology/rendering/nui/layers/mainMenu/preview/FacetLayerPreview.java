@@ -200,10 +200,8 @@ public class FacetLayerPreview implements PreviewGenerator {
      * @return an image of that region
      */
     private BufferedImage rasterize(Region region) {
-
-        Vector3i extent = region.getRegion().getSize(new Vector3i());
-        int width = extent.x;
-        int height = extent.z;
+        int width =  region.getRegion().getSizeX();
+        int height =  region.getRegion().getSizeZ();
 
         WritableRaster raster = colorModel.createCompatibleWritableRaster(width, height);
         BufferedImage image = new BufferedImage(colorModel, raster, false, null);
