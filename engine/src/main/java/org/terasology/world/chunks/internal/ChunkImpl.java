@@ -21,7 +21,6 @@ import org.joml.Vector3ic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.math.AABB;
-import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.BaseVector3i;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
@@ -102,8 +101,11 @@ public class ChunkImpl implements Chunk {
         lightData = new TeraDenseArray8Bit(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
         dirty = true;
         this.blockManager = blockManager;
-        region = new BlockRegion(chunkPos.x * ChunkConstants.SIZE_X, chunkPos.y * ChunkConstants.SIZE_Y,
-                chunkPos.z * ChunkConstants.SIZE_Z).setSize(JomlUtil.from(ChunkConstants.CHUNK_SIZE));
+        region = new BlockRegion(
+                chunkPos.x * ChunkConstants.SIZE_X,
+                chunkPos.y * ChunkConstants.SIZE_Y,
+                chunkPos.z * ChunkConstants.SIZE_Z)
+                .setSize(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z);
         ChunkMonitor.fireChunkCreated(this);
     }
 
