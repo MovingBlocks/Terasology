@@ -18,10 +18,7 @@ package org.terasology.world.generation;
 import org.junit.jupiter.api.Test;
 import org.terasology.context.Context;
 import org.terasology.context.internal.ContextImpl;
-import org.terasology.math.Region3i;
-import org.joml.Vector3i;
 import org.terasology.world.block.BlockRegion;
-import org.terasology.world.block.BlockRegions;
 import org.terasology.world.generation.facets.base.BaseFacet3D;
 import org.terasology.world.generator.plugin.WorldGeneratorPluginLibrary;
 
@@ -41,14 +38,14 @@ public class WorldBuilderTest {
         worldBuilder.addProvider(new Facet2Provider());
 
         World world = worldBuilder.build();
-        BlockRegion regionToGenerate = BlockRegions.createFromCenterAndExtents(new Vector3i(), new Vector3i(1, 1, 1));
+        BlockRegion regionToGenerate = new BlockRegion(0,0,0).expand(1, 1, 1);
         Region regionData = world.getWorldData(regionToGenerate);
 
         Facet1 facet1 = regionData.getFacet(Facet1.class);
         assertEquals(regionToGenerate, facet1.getWorldRegion());
 
         Facet2 facet2 = regionData.getFacet(Facet2.class);
-        assertEquals(BlockRegions.createFromMinAndSize(new Vector3i(-3, -1, -3), new Vector3i(7, 3, 7)), facet2.getWorldRegion());
+        assertEquals(new BlockRegion(-3, -1, -3).setSize(7, 3, 7), facet2.getWorldRegion());
     }
 
     @Test
@@ -60,17 +57,17 @@ public class WorldBuilderTest {
         worldBuilder.addProvider(new Facet3Provider());
 
         World world = worldBuilder.build();
-        BlockRegion regionToGenerate = BlockRegions.createFromCenterAndExtents(new Vector3i(), new Vector3i(1, 1, 1));
+        BlockRegion regionToGenerate = new BlockRegion(0,0,0).expand(1, 1, 1);
         Region regionData = world.getWorldData(regionToGenerate);
 
         Facet3 facet3 = regionData.getFacet(Facet3.class);
         assertEquals(regionToGenerate, facet3.getWorldRegion());
 
         Facet1 facet1 = regionData.getFacet(Facet1.class);
-        assertEquals(BlockRegions.createFromMinAndSize(new Vector3i(-2, -1, -2), new Vector3i(5, 3, 5)), facet1.getWorldRegion());
+        assertEquals(new BlockRegion(-2, -1, -2).setSize(5, 3, 5), facet1.getWorldRegion());
 
         Facet2 facet2 = regionData.getFacet(Facet2.class);
-        assertEquals(BlockRegions.createFromMinAndSize(new Vector3i(-4, -1, -4), new Vector3i(9, 3, 9)), facet2.getWorldRegion());
+        assertEquals(new BlockRegion(-4, -1, -4).setSize(9, 3, 9), facet2.getWorldRegion());
     }
 
     @Test
@@ -82,7 +79,7 @@ public class WorldBuilderTest {
         worldBuilder.addProvider(new Facet4Provider());
 
         World world = worldBuilder.build();
-        BlockRegion regionToGenerate = BlockRegions.createFromCenterAndExtents(new Vector3i(), new Vector3i(1, 1, 1));
+        BlockRegion regionToGenerate = new BlockRegion(0,0,0).expand(1, 1, 1);
         Region regionData = world.getWorldData(regionToGenerate);
 
         Facet1 facet1 = regionData.getFacet(Facet1.class);
@@ -92,7 +89,7 @@ public class WorldBuilderTest {
         assertEquals(regionToGenerate, facet4.getWorldRegion());
 
         Facet2 facet2 = regionData.getFacet(Facet2.class);
-        assertEquals(BlockRegions.createFromMinAndSize(new Vector3i(-4, -1, -4), new Vector3i(9, 3, 9)), facet2.getWorldRegion());
+        assertEquals(new BlockRegion(-4, -1, -4).setSize(9, 3, 9), facet2.getWorldRegion());
     }
 
 
@@ -106,7 +103,7 @@ public class WorldBuilderTest {
         worldBuilder.addProvider(new Facet4Provider());
         worldBuilder.addProvider(new FacetUpdater());
 
-        BlockRegion regionToGenerate = BlockRegions.createFromCenterAndExtents(new Vector3i(), new Vector3i(1, 1, 1));
+        BlockRegion regionToGenerate = new BlockRegion(0,0,0).expand(1, 1, 1);
 
         World world;
         Region regionData;

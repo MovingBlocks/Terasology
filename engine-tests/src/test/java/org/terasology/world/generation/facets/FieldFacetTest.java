@@ -21,7 +21,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.terasology.world.block.BlockRegion;
-import org.terasology.world.block.BlockRegions;
 import org.terasology.world.generation.Border3D;
 import org.terasology.world.generation.facets.base.FieldFacet3D;
 
@@ -40,7 +39,7 @@ public abstract class FieldFacetTest {
         Border3D border = new Border3D(0, 0, 0).extendBy(0, 15, 10);
         Vector3i min = new Vector3i(10, 20, 30);
         Vector3i size = new Vector3i(40, 50, 60);
-        BlockRegion region = BlockRegions.createFromMinAndSize(min, size);
+        BlockRegion region = new BlockRegion(min).setSize(size);
         facet = createFacet(region, border);
         // facet = [worldMin=(0, 5, 20), relativeMin=(-10, -15, -10), size=(60, 65, 80)]
     }
