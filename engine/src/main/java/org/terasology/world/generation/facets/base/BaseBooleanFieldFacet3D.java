@@ -29,7 +29,7 @@ public abstract class BaseBooleanFieldFacet3D extends BaseFacet3D implements Boo
 
     public BaseBooleanFieldFacet3D(BlockRegion targetRegion, Border3D border) {
         super(targetRegion, border);
-        Vector3i size = getRelativeRegion().getSize(new org.joml.Vector3i());
+        Vector3i size = getRelativeRegion().getSize(new Vector3i());
         data = new boolean[size.x * size.y * size.z];
     }
 
