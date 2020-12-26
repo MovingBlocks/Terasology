@@ -56,7 +56,8 @@ We encourage contributions from anybody and try to keep a warm and friendly comm
             with OpenGL 2.1*
         </td>
         <td  style="vertical-align:top">
-            ??? <br/>
+            GeForce 8xxx series (or higher) or<br/>
+            Radeon HD 2000 series (or higher)<br/>
             with OpenGL 3.x
         </td>
     </tr>
