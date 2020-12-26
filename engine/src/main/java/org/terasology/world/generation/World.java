@@ -16,6 +16,7 @@
 package org.terasology.world.generation;
 
 import org.terasology.math.Region3i;
+import org.terasology.world.block.BlockRegion;
 import org.terasology.world.chunks.CoreChunk;
 
 import java.util.Set;
@@ -24,7 +25,7 @@ import java.util.Set;
  */
 public interface World {
 
-    Region getWorldData(Region3i region);
+    Region getWorldData(BlockRegion region);
 
     /**
      * @return the sea level, measured in blocks. May be used for setting
