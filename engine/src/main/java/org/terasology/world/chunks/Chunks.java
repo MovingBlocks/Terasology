@@ -10,7 +10,6 @@ import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.terasology.module.sandbox.API;
 import org.terasology.world.block.BlockRegion;
-import org.terasology.world.block.BlockRegions;
 
 @API
 public final class Chunks {
@@ -34,7 +33,7 @@ public final class Chunks {
     public static final Vector3ic CHUNK_POWER = new Vector3i(POWER_X, POWER_Y, POWER_Z);
     public static final Vector3ic CHUNK_SIZE = new Vector3i(SIZE_X, SIZE_Y, SIZE_Z);
     public static final Vector3ic INNER_CHUNK_POS_FILTER = new org.joml.Vector3i(INNER_CHUNK_POS_FILTER_X, INNER_CHUNK_POS_FILTER_Y, INNER_CHUNK_POS_FILTER_Z);
-    public static final BlockRegion CHUNK_REGION = BlockRegions.createFromMinAndSize(new Vector3i(), CHUNK_SIZE);
+    public static final BlockRegion CHUNK_REGION = new BlockRegion(new Vector3i()).setSize(CHUNK_SIZE);
 
     public static final Vector3ic LOCAL_REGION_EXTENTS = new Vector3i(1, 1, 1);
 
@@ -188,8 +187,8 @@ public final class Chunks {
      */
     public static BlockRegion toChunkRegion(BlockRegion region, int chunkX, int chunkY, int chunkZ, BlockRegion dest) {
         return dest.
-            setMin(toChunkPos(region.getMinX(), chunkX), toChunkPos(region.getMinY(), chunkY), toChunkPos(region.getMinZ(), chunkZ)).
-            setMax(toChunkPos(region.getMaxX(), chunkX), toChunkPos(region.getMaxY(), chunkY), toChunkPos(region.getMaxZ(), chunkZ));
+            set(toChunkPos(region.minX(), chunkX), toChunkPos(region.minY(), chunkY), toChunkPos(region.minZ(), chunkZ),
+                toChunkPos(region.maxX(), chunkX), toChunkPos(region.maxY(), chunkY), toChunkPos(region.maxZ(), chunkZ));
     }
 
     /**

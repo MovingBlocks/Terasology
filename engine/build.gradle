@@ -71,11 +71,6 @@ configurations {
     }
 }
 
-// TODO: Remove when we don't need to rely on snapshots. Wonder why modules respected this set in root project, engine not so much
-configurations.all {
-    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
-}
-
 // Primary dependencies definition
 dependencies {
     // Storage and networking
@@ -214,11 +209,6 @@ def moduleConfig = slurper.parseText(moduleFile.text)
 
 // Gradle uses the magic version variable when creating the jar name (unless explicitly set differently)
 version = moduleConfig.version
-
-// The only case in which we make non-snapshots is when BRANCH_NAME exists and contains "master" - otherwise snapshots
-if (env.BRANCH_NAME == null || !env.BRANCH_NAME.equals("master")) {
-    version += "-SNAPSHOT"
-}
 
 // Jenkins-Artifactory integration catches on to this as part of the Maven-type descriptor
 group = 'org.terasology.engine'

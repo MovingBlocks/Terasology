@@ -23,7 +23,6 @@ import org.terasology.context.internal.ContextImpl;
 import org.terasology.context.internal.MockContext;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.world.block.BlockRegion;
-import org.terasology.world.block.BlockRegions;
 import org.terasology.world.chunks.Chunks;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -34,12 +33,12 @@ public class ChunkMathTest {
         CoreRegistry.setContext(new ContextImpl());
         CoreRegistry.put(Config.class, new Config(new MockContext()));
 
-        assertEquals(BlockRegions.createFromMinAndMax(0, 0, 0, 0, 0, 0), Chunks.toChunkRegion(BlockRegions.createFromMinAndMax(new Vector3i(0, 0, 0), new Vector3i(0, 0, 0)), new BlockRegion()));
-        assertEquals(BlockRegions.createFromMinAndMax(0, 0, 0, 0, 0, 0), Chunks.toChunkRegion(BlockRegions.createFromMinAndMax(new Vector3i(0, 0, 0), new Vector3i(31, 63, 31)), new BlockRegion()));
-        assertEquals(BlockRegions.createFromMinAndMax(0, 0, 0, 1, 0, 0), Chunks.toChunkRegion(BlockRegions.createFromMinAndMax(new Vector3i(0, 0, 0), new Vector3i(32, 63, 31)), new BlockRegion()));
-        assertEquals(BlockRegions.createFromMinAndMax(0, 0, 0, 1, 0, 1), Chunks.toChunkRegion(BlockRegions.createFromMinAndMax(new Vector3i(0, 0, 0), new Vector3i(32, 63, 32)), new BlockRegion()));
-        assertEquals(BlockRegions.createFromMinAndMax(0, 0, 0, 1, 1, 1), Chunks.toChunkRegion(BlockRegions.createFromMinAndMax(new Vector3i(0, 0, 0), new Vector3i(32, 64, 32)), new BlockRegion()));
-        assertEquals(BlockRegions.createFromMinAndMax(-1, 0, 0, 1, 1, 1), Chunks.toChunkRegion(BlockRegions.createFromMinAndMax(new Vector3i(-1, 0, 0), new Vector3i(32, 64, 32)), new BlockRegion()));
+        assertEquals(new BlockRegion(0, 0, 0, 0, 0, 0), Chunks.toChunkRegion(new BlockRegion(new Vector3i(0, 0, 0), new Vector3i(0, 0, 0)), new BlockRegion(BlockRegion.INVALID)));
+        assertEquals(new BlockRegion(0, 0, 0, 0, 0, 0), Chunks.toChunkRegion(new BlockRegion(new Vector3i(0, 0, 0), new Vector3i(31, 63, 31)), new BlockRegion(BlockRegion.INVALID)));
+        assertEquals(new BlockRegion(0, 0, 0, 1, 0, 0), Chunks.toChunkRegion(new BlockRegion(new Vector3i(0, 0, 0), new Vector3i(32, 63, 31)), new BlockRegion(BlockRegion.INVALID)));
+        assertEquals(new BlockRegion(0, 0, 0, 1, 0, 1), Chunks.toChunkRegion(new BlockRegion(new Vector3i(0, 0, 0), new Vector3i(32, 63, 32)), new BlockRegion(BlockRegion.INVALID)));
+        assertEquals(new BlockRegion(0, 0, 0, 1, 1, 1), Chunks.toChunkRegion(new BlockRegion(new Vector3i(0, 0, 0), new Vector3i(32, 64, 32)), new BlockRegion(BlockRegion.INVALID)));
+        assertEquals(new BlockRegion(-1, 0, 0, 1, 1, 1), Chunks.toChunkRegion(new BlockRegion(new Vector3i(-1, 0, 0), new Vector3i(32, 64, 32)), new BlockRegion(BlockRegion.INVALID)));
     }
 
     @Test
