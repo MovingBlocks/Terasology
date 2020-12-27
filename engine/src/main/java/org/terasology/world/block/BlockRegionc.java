@@ -14,6 +14,7 @@ import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
+import org.terasology.math.Side;
 
 import java.util.Iterator;
 import java.util.Optional;
@@ -493,6 +494,33 @@ public interface BlockRegionc extends Iterable<Vector3ic> {
      * @throws IllegalArgumentException if the matrix {@code m} is not {@link Matrix4fc#isAffine() affine}
      */
     BlockRegion transform(Matrix4fc m, BlockRegion dest);
+
+    /**
+     * calculates a 1 width region that borders the provided {@link Side} of a region
+     *
+     * @param side the side of the region
+     * @param dest will hold the result
+     * @return dest
+     */
+    default BlockRegion blockFace(Side side, BlockRegion dest) {
+        switch (side) {
+            case TOP:
+                return dest.set(this.minX(), this.maxY(), this.minZ(), this.maxX(), this.maxY(), this.maxZ());
+            case BOTTOM:
+                return dest.set(this.minX(), this.minY(), this.minZ(), this.maxX(), this.minY(), this.maxZ());
+            case LEFT:
+                return dest.set(this.minX(), this.minY(), this.minZ(), this.minX(), this.maxY(), this.maxZ());
+            case RIGHT:
+                return dest.set(this.maxX(), this.minY(), this.minZ(), this.maxX(), this.maxY(), this.maxZ());
+            case FRONT:
+                return dest.set(this.minX(), this.minY(), this.minZ(), this.maxX(), this.maxY(), this.minZ());
+            case BACK:
+                return dest.set(this.minX(), this.minY(), this.maxZ(), this.maxX(), this.maxY(), this.maxZ());
+            default:
+                return dest.set(this);
+        }
+    }
+
 
     // -- CHECKS -----------------------------------------------------------------------------------------------------//
 

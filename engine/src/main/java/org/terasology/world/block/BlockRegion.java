@@ -490,30 +490,8 @@ public class BlockRegion implements BlockRegionc {
         return transform(m, this);
     }
 
-    /**
-     * calculates a 1 width region that borders the provided {@link Side} of a region
-     *
-     * @param side the side of the region
-     * @param dest will hold the result
-     * @return dest
-     */
-    public BlockRegion blockFace(Side side, BlockRegion dest) {
-        switch (side) {
-            case TOP:
-                return dest.set(this.minX(), this.maxY(), this.minZ(), this.maxX(), this.maxY(), this.maxZ());
-            case BOTTOM:
-                return dest.set(this.minX(), this.minY(), this.minZ(), this.maxX(), this.minY(), this.maxZ());
-            case LEFT:
-                return dest.set(this.minX(), this.minY(), this.minZ(), this.minX(), this.maxY(), this.maxZ());
-            case RIGHT:
-                return dest.set(this.maxX(), this.minY(), this.minZ(), this.maxX(), this.maxY(), this.maxZ());
-            case FRONT:
-                return dest.set(this.minX(), this.minY(), this.minZ(), this.maxX(), this.maxY(), this.minZ());
-            case BACK:
-                return dest.set(this.minX(), this.minY(), this.maxZ(), this.maxX(), this.maxY(), this.maxZ());
-            default:
-                return dest.set(this);
-        }
+    public BlockRegion blockFace(Side side) {
+        return blockFace(side, this);
     }
 
     // ---------------------------------------------------------------------------------------------------------------//
