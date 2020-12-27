@@ -18,6 +18,7 @@ package org.terasology.rendering.nui.animation;
 
 import java.util.function.Supplier;
 
+import org.joml.Rectanglei;
 import org.terasology.math.geom.Rect2i;
 
 /**
@@ -72,7 +73,7 @@ public class DeferredMenuAnimationSystem implements MenuAnimationSystem {
     }
 
     @Override
-    public Rect2i animateRegion(Rect2i rc) {
+    public Rectanglei animateRegion(Rectanglei rc) {
         return getSystem().animateRegion(rc);
     }
 
