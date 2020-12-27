@@ -17,6 +17,7 @@ package org.terasology.world.generation.facets.base;
 
 import org.joml.Vector3i;
 import org.terasology.world.block.BlockRegion;
+import org.terasology.world.block.BlockRegionc;
 import org.terasology.world.generation.Border3D;
 import org.terasology.world.generation.WorldFacet3D;
 
@@ -27,7 +28,7 @@ public class BaseFacet3D implements WorldFacet3D {
     private BlockRegion worldRegion;
     private BlockRegion relativeRegion;
 
-    public BaseFacet3D(BlockRegion targetRegion, Border3D border) {
+    public BaseFacet3D(BlockRegionc targetRegion, Border3D border) {
         worldRegion = border.expandTo3D(targetRegion);
         relativeRegion = border.expandTo3D(targetRegion.getSize(new Vector3i()));
     }

@@ -19,6 +19,7 @@ import com.google.common.base.Preconditions;
 import org.joml.Vector3i;
 import org.terasology.math.geom.Rect2i;
 import org.terasology.world.block.BlockRegion;
+import org.terasology.world.block.BlockRegionc;
 
 import java.util.Objects;
 
@@ -85,13 +86,13 @@ public class Border3D {
      * @param region The region to be expanded with the borders.
      * @return The 3D world representation with the additional space added to it in the 3 dimensions.
      */
-    public BlockRegion expandTo3D(BlockRegion region) {
+    public BlockRegion expandTo3D(BlockRegionc region) {
         return new BlockRegion(region.minX() - sides, region.minY() - bottom, region.minZ() - sides,
                 region.maxX() + sides, region.maxY() + top, region.maxZ() + sides);
     }
 
     /**
-     * Same as {@code {@link #expandTo3D(BlockRegion)}}} but with a Vector3i instead of a Region3i.
+     * Same as {@code {@link #expandTo3D(BlockRegionc)}}} but with a Vector3i instead of a Region3i.
      * @param size The size to be used.
      * @return The 3D world representation with the additional space added to it in the 3 dimensions.
      */
