@@ -15,6 +15,9 @@
  */
 package org.terasology.logic.selection;
 
+import org.joml.RoundingMode;
+import org.joml.Vector3f;
+import org.joml.Vector3i;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
@@ -25,10 +28,8 @@ import org.terasology.input.events.LeftMouseDownButtonEvent;
 import org.terasology.logic.common.ActivateEvent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.LocalPlayer;
-import org.terasology.math.Region3i;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.registry.In;
+import org.terasology.world.block.BlockRegion;
 import org.terasology.world.selection.BlockSelectionComponent;
 import org.terasology.world.selection.event.SetBlockSelectionEndingPointEvent;
 import org.terasology.world.selection.event.SetBlockSelectionStartingPointEvent;
@@ -93,13 +94,14 @@ public class LocalPlayerBlockSelectionByItemSystem extends BaseComponentSystem {
             return;
         }
 
-        Vector3f targetLocation = locationComponent.getWorldPosition();
+        Vector3f targetLocation = locationComponent.getWorldPosition(new Vector3f());
 
         if (blockSelectionComponent.isMovable) {
-            Region3i region = blockSelectionComponent.currentSelection;
 
-            blockSelectionComponent.currentSelection = Region3i.createFromCenterExtents(new Vector3i(targetLocation.x, targetLocation.y, targetLocation.z),
-                    new Vector3i(region.sizeX()/2, 0, region.sizeZ()/2));
+            Vector3i pos = new Vector3i(targetLocation, RoundingMode.FLOOR);
+            Vector3i size = blockSelectionComponent.currentSelection.getSize(new Vector3i());
+            blockSelectionComponent.currentSelection.set(
+                pos, pos).expand(size.x() / 2, 0, size.z() / 2);
             blockSelectionComponentEntity.saveComponent(blockSelectionComponent);
 
             return;
