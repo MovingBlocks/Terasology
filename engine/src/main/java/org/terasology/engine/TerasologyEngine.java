@@ -50,6 +50,7 @@ import org.terasology.nui.asset.UIElement;
 import org.terasology.nui.skin.UISkin;
 import org.terasology.nui.skin.UISkinData;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
+import org.terasology.persistence.typeHandling.TypeHandlerLibraryImpl;
 import org.terasology.recording.CharacterStateEventPositionMap;
 import org.terasology.recording.DirectionAndOriginPosRecorderList;
 import org.terasology.recording.RecordAndReplayCurrentStatus;
@@ -326,7 +327,7 @@ public class TerasologyEngine implements GameEngine {
         CopyStrategyLibrary copyStrategyLibrary = new CopyStrategyLibrary(reflectFactory);
         rootContext.put(CopyStrategyLibrary.class, copyStrategyLibrary);
 
-        rootContext.put(TypeHandlerLibrary.class, TypeHandlerLibrary.forModuleEnvironment(moduleManager, typeRegistry));
+        rootContext.put(TypeHandlerLibrary.class, TypeHandlerLibraryImpl.forModuleEnvironment(moduleManager, typeRegistry));
 
         changeStatus(TerasologyEngineStatus.INITIALIZING_ASSET_TYPES);
         assetTypeManager = new ModuleAwareAssetTypeManager();

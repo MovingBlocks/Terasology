@@ -136,6 +136,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
 
     // Client only
     private ServerImpl server;
+    private EventLoopGroup clientGroup;
 
     public NetworkSystemImpl(Time time, Context context) {
         this.time = time;
@@ -219,11 +220,11 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
             }
             ChannelFuture connectCheck = null;
 
-            EventLoopGroup group = new NioEventLoopGroup();
+            clientGroup = new NioEventLoopGroup();
             try {
                 Bootstrap clientBootstrap = new Bootstrap();
 
-                clientBootstrap.group(group);
+                clientBootstrap.group(clientGroup);
                 clientBootstrap.channel(NioSocketChannel.class);
                 clientBootstrap.option(ChannelOption.SO_KEEPALIVE, true);
                 clientBootstrap.option(ChannelOption.TCP_NODELAY, true);
@@ -247,13 +248,17 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
                     } else {
                         logger.warn("Failed to connect to server", connectCheck.cause());
                         connectCheck.channel().closeFuture().awaitUninterruptibly();
+                        clientGroup.shutdownGracefully().syncUninterruptibly();
                         return new JoinStatusImpl("Failed to connect to server - " + connectCheck.cause().getMessage());
                     }
                 }
                 connectCheck.channel().closeFuture().sync();
-            } catch (InterruptedException e) {
-                connectCheck.cancel(true);
-                connectCheck.channel().closeFuture().awaitUninterruptibly();
+            } catch (Exception e) {
+                shutdown();
+                if (connectCheck != null) {
+                    connectCheck.cancel(true);
+                    connectCheck.channel().closeFuture().awaitUninterruptibly();
+                }
                 throw e;
             }
         }
@@ -265,11 +270,10 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
         allChannels.close().awaitUninterruptibly();
         if (serverChannelFuture != null) {
             serverChannelFuture.channel().closeFuture();
-            bossGroup.shutdownGracefully();
-            workerGroup.shutdownGracefully();
-
             // Wait until all threads are terminated.
             try {
+                bossGroup.shutdownGracefully().sync();
+                workerGroup.shutdownGracefully().sync();
                 bossGroup.terminationFuture().sync();
                 workerGroup.terminationFuture().sync();
             } catch (InterruptedException e) {
@@ -277,6 +281,9 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
                 throw new RuntimeException(e);
             }
 
+        }
+        if (clientGroup != null) {
+            clientGroup.shutdownGracefully().syncUninterruptibly();
         }
         // Shut down all event loops to terminate all threads.
 
@@ -567,7 +574,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
 
         context.get(ComponentSystemManager.class).register(new NetworkEntitySystem(this), "engine:networkEntitySystem");
 
-        TypeHandlerLibrary typeHandlerLibrary = new TypeHandlerLibrary(entityManager.getTypeSerializerLibrary());
+        TypeHandlerLibrary typeHandlerLibrary = entityManager.getTypeSerializerLibrary().copy();
         typeHandlerLibrary.addTypeHandler(EntityRef.class, new NetEntityRefTypeHandler(this, blockEntityRegistry));
         // TODO: Add network override types here (that use id lookup tables)
 
