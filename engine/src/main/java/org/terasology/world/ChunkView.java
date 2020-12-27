@@ -15,9 +15,10 @@
  */
 package org.terasology.world;
 
-import org.terasology.math.Region3i;
-import org.terasology.math.geom.Vector3i;
+import org.joml.Vector3i;
+import org.joml.Vector3ic;
 import org.terasology.world.block.Block;
+import org.terasology.world.block.BlockRegionc;
 
 /**
  * A chunk view is a way of accessing multiple chunks for modification in a performant manner.
@@ -40,7 +41,7 @@ public interface ChunkView {
      * @param pos
      * @return The block at the given position. If this is outside of the view then the air block is returned
      */
-    Block getBlock(Vector3i pos);
+    Block getBlock(Vector3ic pos);
 
     /**
      * @param x
@@ -100,7 +101,7 @@ public interface ChunkView {
      * @param pos
      * @param type
      */
-    void setBlock(Vector3i pos, Block type);
+    void setBlock(Vector3ic pos, Block type);
 
     /**
      * Sets the block at the given coordinates, if it is within the view.
@@ -122,7 +123,7 @@ public interface ChunkView {
      * @return The (index)th extra-data value at the given position
      */
     int getExtraData(int index, int x, int y, int z);
-    
+
     /**
      * Gets one of the per-block custom data values at the given position. Returns 0 outside the view.
      *
@@ -130,8 +131,8 @@ public interface ChunkView {
      * @param pos
      * @return The (index)th extra-data value at the given position
      */
-    int getExtraData(int index, Vector3i pos);
-    
+    int getExtraData(int index, Vector3ic pos);
+
     /**
      * Sets one of the per-block custom data values at the given position, if it is within the view.
      *
@@ -142,7 +143,7 @@ public interface ChunkView {
      * @param value
      */
     void setExtraData(int index, int x, int y, int z, int value);
-    
+
     /**
      * Sets one of the per-block custom data values at the given position, if it is within the view.
      *
@@ -150,7 +151,7 @@ public interface ChunkView {
      * @param pos
      * @param value
      */
-    void setExtraData(int index, Vector3i pos, int value);
+    void setExtraData(int index, Vector3ic pos, int value);
 
     /**
      * Converts a coordinate from view-space to world space.
@@ -158,17 +159,17 @@ public interface ChunkView {
      * @param localPos
      * @return The equivalent world-space coordinate for the given view coord.
      */
-    Vector3i toWorldPos(Vector3i localPos);
+    Vector3i toWorldPos(Vector3ic localPos);
 
     /**
      * @return The region of the world which this view is over
      */
-    Region3i getWorldRegion();
+    BlockRegionc getWorldRegion();
 
     /**
      * @return A Region3i denoting the chunks covered by this view
      */
-    Region3i getChunkRegion();
+    BlockRegionc getChunkRegion();
 
     /**
      * Sets the chunks containing or adjacent to blockPos, which are contained in the chunk view, to dirty. This causes
@@ -176,7 +177,7 @@ public interface ChunkView {
      *
      * @param blockPos
      */
-    void setDirtyAround(Vector3i blockPos);
+    void setDirtyAround(Vector3ic blockPos);
 
     /**
      * Sets ths chunks contained or adjacent to blockRegion, which are contained in the chunk view, to dirty. This causes
@@ -184,7 +185,7 @@ public interface ChunkView {
      *
      * @param blockRegion
      */
-    void setDirtyAround(Region3i blockRegion);
+    void setDirtyAround(BlockRegionc blockRegion);
 
 
     /**

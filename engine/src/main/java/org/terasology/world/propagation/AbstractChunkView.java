@@ -15,6 +15,7 @@
  */
 package org.terasology.world.propagation;
 
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.world.block.Block;
 import org.terasology.world.internal.ChunkViewCore;
@@ -68,7 +69,7 @@ public abstract class AbstractChunkView implements PropagatorWorldView {
     @Override
     public Block getBlockAt(Vector3i pos) {
         if (isInBounds(pos)) {
-            return chunkView.getBlock(pos);
+            return chunkView.getBlock(JomlUtil.from(pos));
         }
         return null;
     }
@@ -79,6 +80,6 @@ public abstract class AbstractChunkView implements PropagatorWorldView {
      * @param pos The position to check, in world coordinates
      */
     public boolean isInBounds(Vector3i pos) {
-        return chunkView.getWorldRegion().encompasses(pos);
+        return chunkView.getWorldRegion().contains(JomlUtil.from(pos));
     }
 }

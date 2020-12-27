@@ -220,7 +220,7 @@ public class RemoteChunkProvider implements ChunkProvider {
             int index = TeraMath.calculate3DArrayIndex(chunkPos, region.size());
             chunks[index] = chunk;
         }
-        return new ChunkViewCoreImpl(chunks, region, offset, blockManager.getBlock(BlockManager.AIR_ID));
+        return new ChunkViewCoreImpl(chunks, JomlUtil.from(region), JomlUtil.from(offset), blockManager.getBlock(BlockManager.AIR_ID));
     }
 
     @Override
