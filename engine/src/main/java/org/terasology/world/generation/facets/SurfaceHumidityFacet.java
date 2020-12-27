@@ -15,7 +15,7 @@
  */
 package org.terasology.world.generation.facets;
 
-import org.terasology.math.Region3i;
+import org.terasology.world.block.BlockRegion;
 import org.terasology.world.generation.Border3D;
 import org.terasology.world.generation.FacetName;
 import org.terasology.world.generation.facets.base.BaseFieldFacet2D;
@@ -27,7 +27,7 @@ import org.terasology.world.generation.facets.base.BaseFieldFacet2D;
 public class SurfaceHumidityFacet extends BaseFieldFacet2D {
     static int maxSamplesPerRegion = 5;
 
-    public SurfaceHumidityFacet(Region3i targetRegion, Border3D border) {
+    public SurfaceHumidityFacet(BlockRegion targetRegion, Border3D border) {
         super(targetRegion, border);
     }
 }
