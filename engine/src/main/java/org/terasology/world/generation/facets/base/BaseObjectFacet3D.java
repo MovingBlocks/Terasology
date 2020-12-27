@@ -15,14 +15,13 @@
  */
 package org.terasology.world.generation.facets.base;
 
-import java.lang.reflect.Array;
-
-import org.terasology.math.Region3i;
-import org.terasology.math.geom.BaseVector3i;
-import org.terasology.math.geom.Vector3i;
+import com.google.common.base.Preconditions;
+import org.joml.Vector3i;
+import org.joml.Vector3ic;
+import org.terasology.world.block.BlockRegion;
 import org.terasology.world.generation.Border3D;
 
-import com.google.common.base.Preconditions;
+import java.lang.reflect.Array;
 
 /**
  * Base class for storing objects of the specified type in a 3D grid for a facet.
@@ -32,10 +31,9 @@ import com.google.common.base.Preconditions;
 public abstract class BaseObjectFacet3D<T> extends BaseFacet3D implements ObjectFacet3D<T> {
     private T[] data;
 
-    public BaseObjectFacet3D(Region3i targetRegion, Border3D border, Class<T> objectType) {
+    public BaseObjectFacet3D(BlockRegion targetRegion, Border3D border, Class<T> objectType) {
         super(targetRegion, border);
-        Vector3i size = getRelativeRegion().size();
-        this.data = (T[]) Array.newInstance(objectType, size.x * size.y * size.z);
+        this.data = (T[]) Array.newInstance(objectType, getRelativeRegion().volume());
     }
 
     @Override
@@ -44,7 +42,7 @@ public abstract class BaseObjectFacet3D<T> extends BaseFacet3D implements Object
     }
 
     @Override
-    public T get(BaseVector3i pos) {
+    public T get(Vector3ic pos) {
         return get(pos.x(), pos.y(), pos.z());
     }
 
@@ -54,7 +52,7 @@ public abstract class BaseObjectFacet3D<T> extends BaseFacet3D implements Object
     }
 
     @Override
-    public T getWorld(BaseVector3i pos) {
+    public T getWorld(Vector3ic pos) {
         return getWorld(pos.x(), pos.y(), pos.z());
     }
 
@@ -68,7 +66,7 @@ public abstract class BaseObjectFacet3D<T> extends BaseFacet3D implements Object
     }
 
     @Override
-    public void set(BaseVector3i pos, T value) {
+    public void set(Vector3ic pos, T value) {
         set(pos.x(), pos.y(), pos.z(), value);
     }
 
@@ -78,7 +76,7 @@ public abstract class BaseObjectFacet3D<T> extends BaseFacet3D implements Object
     }
 
     @Override
-    public void setWorld(BaseVector3i pos, T value) {
+    public void setWorld(Vector3ic pos, T value) {
         setWorld(pos.x(), pos.y(), pos.z(), value);
     }
 

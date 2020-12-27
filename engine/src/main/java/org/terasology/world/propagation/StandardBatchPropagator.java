@@ -24,7 +24,6 @@ import org.terasology.math.Side;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockRegion;
-import org.terasology.world.block.BlockRegions;
 import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.LitChunk;
 
@@ -304,11 +303,11 @@ public class StandardBatchPropagator implements BatchPropagator {
     public void propagateBetween(LitChunk chunk, LitChunk adjChunk, Side side, boolean propagateExternal) {
         IndexProvider indexProvider = createIndexProvider(side);
 
-        BlockRegion edgeRegion = BlockRegions.createFromMinAndSize(new org.joml.Vector3i(0, 0, 0), JomlUtil.from(ChunkConstants.CHUNK_SIZE));
+        BlockRegion edgeRegion = new BlockRegion(0, 0, 0)
+                .setSize(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z);
         ChunkMath.getEdgeRegion(edgeRegion, side, edgeRegion);
 
-        int edgeSize = edgeRegion.sizeX() * edgeRegion.sizeY() * edgeRegion.sizeZ();
-        int[] depth = new int[edgeSize];
+        int[] depth = new int[edgeRegion.volume()];
 
         propagateSide(chunk, adjChunk, side, indexProvider, edgeRegion, depth);
         propagateDepth(adjChunk, side, propagateExternal, indexProvider, edgeRegion, depth);
@@ -334,7 +333,7 @@ public class StandardBatchPropagator implements BatchPropagator {
             }
         }
 
-        for (Vector3ic pos : BlockRegions.iterableInPlace(edgeRegion)) {
+        for (Vector3ic pos : edgeRegion) {
             int depthIndex = indexProvider.getIndexFor(JomlUtil.from(pos));
             int adjacentDepth = adjDepth[depthIndex];
             for (int i = adjacentDepth; i < depths[depthIndex]; ++i) {
@@ -353,9 +352,9 @@ public class StandardBatchPropagator implements BatchPropagator {
     private void propagateSide(LitChunk chunk, LitChunk adjChunk, Side side, IndexProvider indexProvider,
                                BlockRegion edgeRegion, int[] depths) {
         Vector3i adjPos = new Vector3i();
-        for (int x = edgeRegion.getMinX(); x <= edgeRegion.getMaxX(); ++x) {
-            for (int y = edgeRegion.getMinY(); y <= edgeRegion.getMaxY(); ++y) {
-                for (int z = edgeRegion.getMinZ(); z <= edgeRegion.getMaxZ(); ++z) {
+        for (int x = edgeRegion.minX(); x <= edgeRegion.maxX(); ++x) {
+            for (int y = edgeRegion.minY(); y <= edgeRegion.maxY(); ++y) {
+                for (int z = edgeRegion.minZ(); z <= edgeRegion.maxZ(); ++z) {
 
                     byte expectedValue = (byte) (rules.getValue(chunk, x, y, z) - 1);
                     if (expectedValue < 1) {

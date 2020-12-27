@@ -17,9 +17,9 @@
 package org.terasology.world.generation.facets;
 
 import com.google.common.collect.ImmutableMap;
+import org.joml.Vector3i;
 import org.junit.jupiter.api.Test;
-import org.terasology.math.Region3i;
-import org.terasology.math.geom.Vector3i;
+import org.terasology.world.block.BlockRegion;
 import org.terasology.world.generation.Border3D;
 import org.terasology.world.generation.facets.base.BooleanFieldFacet3D;
 import org.terasology.world.generation.facets.base.SparseBooleanFieldFacet3D;
@@ -37,7 +37,7 @@ public class SparseBooleanFacetTest extends BooleanFacetTest {
     private SparseBooleanFieldFacet3D facet;
 
     @Override
-    protected BooleanFieldFacet3D createFacet(Region3i region, Border3D border) {
+    protected BooleanFieldFacet3D createFacet(BlockRegion region, Border3D border) {
         facet = new SparseBooleanFieldFacet3D(region, border) {
             // this class is abstract, but we don't want specific implementations
         };

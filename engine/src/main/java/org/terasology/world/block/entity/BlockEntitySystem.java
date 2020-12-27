@@ -41,7 +41,6 @@ import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockComponent;
 import org.terasology.world.block.BlockManager;
-import org.terasology.world.block.BlockRegions;
 import org.terasology.world.block.entity.damage.BlockDamageModifierComponent;
 import org.terasology.world.block.items.BlockItemFactory;
 import org.terasology.world.block.items.OnBlockToItem;
@@ -105,7 +104,7 @@ public class BlockEntitySystem extends BaseComponentSystem {
                 BlockRegionComponent blockRegion = entity.getComponent(BlockRegionComponent.class);
                 if (blockComponent.dropBlocksInRegion) {
                     // loop through all the blocks in this region and drop them
-                    for (Vector3ic location : BlockRegions.iterableInPlace(blockRegion.region)) {
+                    for (Vector3ic location : blockRegion.region) {
                         Block blockInWorld = worldProvider.getBlock(location);
                         commonDefaultDropsHandling(event, entity, JomlUtil.from(location), blockInWorld.getBlockFamily().getArchetypeBlock());
                     }

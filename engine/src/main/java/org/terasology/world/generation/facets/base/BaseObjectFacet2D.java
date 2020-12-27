@@ -20,6 +20,7 @@ import com.google.common.base.Preconditions;
 import org.terasology.math.Region3i;
 import org.terasology.math.geom.BaseVector2i;
 import org.terasology.math.geom.Vector2i;
+import org.terasology.world.block.BlockRegion;
 import org.terasology.world.generation.Border3D;
 
 import java.lang.reflect.Array;
@@ -30,7 +31,7 @@ public abstract class BaseObjectFacet2D<T> extends BaseFacet2D implements Object
 
     private T[] data;
 
-    public BaseObjectFacet2D(Region3i targetRegion, Border3D border, Class<T> objectType) {
+    public BaseObjectFacet2D(BlockRegion targetRegion, Border3D border, Class<T> objectType) {
         super(targetRegion, border);
         Vector2i size = getRelativeRegion().size();
         this.data = (T[]) Array.newInstance(objectType, size.x * size.y);

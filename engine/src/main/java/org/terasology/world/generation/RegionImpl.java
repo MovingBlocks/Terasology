@@ -19,6 +19,7 @@ import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Sets;
 import org.terasology.math.Region3i;
 import org.terasology.utilities.collection.TypeMap;
+import org.terasology.world.block.BlockRegion;
 
 import java.util.Map;
 import java.util.Set;
@@ -27,7 +28,7 @@ import java.util.Set;
  */
 public class RegionImpl implements Region, GeneratingRegion {
 
-    private final Region3i region;
+    private final BlockRegion region;
     private final ListMultimap<Class<? extends WorldFacet>, FacetProvider> facetProviderChains;
     private final Map<Class<? extends WorldFacet>, Border3D> borders;
 
@@ -35,7 +36,7 @@ public class RegionImpl implements Region, GeneratingRegion {
     private final Set<FacetProvider> processedProviders = Sets.newHashSet();
     private final TypeMap<WorldFacet> generatedFacets = TypeMap.create();
 
-    public RegionImpl(Region3i region, ListMultimap<Class<? extends WorldFacet>, FacetProvider> facetProviderChains, Map<Class<? extends WorldFacet>, Border3D> borders) {
+    public RegionImpl(BlockRegion region, ListMultimap<Class<? extends WorldFacet>, FacetProvider> facetProviderChains, Map<Class<? extends WorldFacet>, Border3D> borders) {
         this.region = region;
         this.facetProviderChains = facetProviderChains;
         this.borders = borders;
@@ -56,7 +57,7 @@ public class RegionImpl implements Region, GeneratingRegion {
     }
 
     @Override
-    public Region3i getRegion() {
+    public BlockRegion getRegion() {
         return region;
     }
 

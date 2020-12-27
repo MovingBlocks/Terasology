@@ -21,7 +21,6 @@ import org.joml.Vector3ic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.math.AABB;
-import org.terasology.math.Region3i;
 import org.terasology.math.geom.BaseVector3i;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
@@ -30,6 +29,7 @@ import org.terasology.protobuf.EntityData;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
+import org.terasology.world.block.BlockRegion;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkBlockIterator;
 import org.terasology.world.chunks.ChunkConstants;
@@ -43,12 +43,11 @@ import org.terasology.world.chunks.deflate.TeraStandardDeflator;
 import java.text.DecimalFormat;
 
 /**
- * Chunks are the basic components of the world. Each chunk contains a fixed amount of blocks
- * determined by its dimensions. They are used to manage the world efficiently and
- * to reduce the batch count within the render loop.
+ * Chunks are the basic components of the world. Each chunk contains a fixed amount of blocks determined by its
+ * dimensions. They are used to manage the world efficiently and to reduce the batch count within the render loop.
  * <br><br>
- * Chunks are tessellated on creation and saved to vertex arrays. From those VBOs are generated
- * which are then used for the actual rendering process.
+ * Chunks are tessellated on creation and saved to vertex arrays. From those VBOs are generated which are then used for
+ * the actual rendering process.
  */
 public class ChunkImpl implements Chunk {
 
@@ -71,7 +70,7 @@ public class ChunkImpl implements Chunk {
     private volatile TeraArray[] extraDataSnapshots;
 
     private AABB aabb;
-    private Region3i region;
+    private BlockRegion region;
 
     private boolean disposed;
     private boolean ready;
@@ -102,8 +101,11 @@ public class ChunkImpl implements Chunk {
         lightData = new TeraDenseArray8Bit(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
         dirty = true;
         this.blockManager = blockManager;
-        region = Region3i.createFromMinAndSize(new Vector3i(chunkPos.x * ChunkConstants.SIZE_X, chunkPos.y * ChunkConstants.SIZE_Y, chunkPos.z * ChunkConstants.SIZE_Z),
-                ChunkConstants.CHUNK_SIZE);
+        region = new BlockRegion(
+                chunkPos.x * ChunkConstants.SIZE_X,
+                chunkPos.y * ChunkConstants.SIZE_Y,
+                chunkPos.z * ChunkConstants.SIZE_Z)
+                .setSize(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z);
         ChunkMonitor.fireChunkCreated(this);
     }
 
@@ -114,7 +116,7 @@ public class ChunkImpl implements Chunk {
 
     @Override
     public org.joml.Vector3i getPosition(org.joml.Vector3i dest) {
-        return dest.set(chunkPos.x,chunkPos.y,chunkPos.z);
+        return dest.set(chunkPos.x, chunkPos.y, chunkPos.z);
     }
 
     @Override
@@ -177,7 +179,7 @@ public class ChunkImpl implements Chunk {
 
     @Override
     public Block setBlock(Vector3ic pos, Block block) {
-        return setBlock(pos.x(),pos.y(),pos.z(),block);
+        return setBlock(pos.x(), pos.y(), pos.z(), block);
     }
 
     @Override
@@ -517,7 +519,8 @@ public class ChunkImpl implements Chunk {
         if (disposed) {
             disposed = false;
             sunlightData = new TeraDenseArray8Bit(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z);
-            sunlightRegenData = new TeraDenseArray8Bit(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z);
+            sunlightRegenData = new TeraDenseArray8Bit(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y,
+                    ChunkConstants.SIZE_Z);
             lightData = new TeraDenseArray8Bit(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z);
         }
     }
@@ -552,7 +555,7 @@ public class ChunkImpl implements Chunk {
     }
 
     @Override
-    public Region3i getRegion() {
+    public BlockRegion getRegion() {
         return region;
     }
 
@@ -582,8 +585,8 @@ public class ChunkImpl implements Chunk {
     }
 
     /**
-     * Calling this method results in a (cheap) snapshot to be taken of the current state of the chunk.
-     * This snapshot can then be obtained and rleased by calling {@link #encodeAndReleaseSnapshot()}.
+     * Calling this method results in a (cheap) snapshot to be taken of the current state of the chunk. This snapshot
+     * can then be obtained and rleased by calling {@link #encodeAndReleaseSnapshot()}.
      */
     public void createSnapshot() {
         this.blockDataSnapshot = this.blockData;
@@ -592,10 +595,9 @@ public class ChunkImpl implements Chunk {
     }
 
     /**
-     * This method can only be
-     * called once after {@link #createSnapshot()} has been called. It can be called from a different thread than
-     * {@link #createSnapshot()}, but it must be made sure that neither method is still running when the other gets
-     * called.
+     * This method can only be called once after {@link #createSnapshot()} has been called. It can be called from a
+     * different thread than {@link #createSnapshot()}, but it must be made sure that neither method is still running
+     * when the other gets called.
      *
      * @return an encoded version of the snapshot taken with {@link #createSnapshot()}.
      */
