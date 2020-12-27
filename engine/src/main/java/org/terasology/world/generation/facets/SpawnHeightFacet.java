@@ -15,7 +15,7 @@
  */
 package org.terasology.world.generation.facets;
 
-import org.terasology.math.Region3i;
+import org.terasology.world.block.BlockRegion;
 import org.terasology.world.generation.Border3D;
 import org.terasology.world.generation.facets.base.BaseStrictlySparseFieldFacet2D;
 
@@ -23,7 +23,7 @@ import org.terasology.world.generation.facets.base.BaseStrictlySparseFieldFacet2
  * Stores the height at which the player may be spawned, if it exists for a given coordinate
  */
 public class SpawnHeightFacet extends BaseStrictlySparseFieldFacet2D {
-    public SpawnHeightFacet(Region3i targetRegion, Border3D border) {
+    public SpawnHeightFacet(BlockRegion targetRegion, Border3D border) {
         super(targetRegion, border);
     }
 }
