@@ -20,6 +20,7 @@ import com.google.common.base.Preconditions;
 import org.terasology.math.Region3i;
 import org.terasology.math.geom.BaseVector2i;
 import org.terasology.math.geom.Vector2i;
+import org.terasology.world.block.BlockRegion;
 import org.terasology.world.generation.Border3D;
 
 /**
@@ -28,7 +29,7 @@ public abstract class BaseFieldFacet2D extends BaseFacet2D implements FieldFacet
 
     private float[] data;
 
-    public BaseFieldFacet2D(Region3i targetRegion, Border3D border) {
+    public BaseFieldFacet2D(BlockRegion targetRegion, Border3D border) {
         super(targetRegion, border);
         Vector2i size = getRelativeRegion().size();
         this.data = new float[size.x * size.y];

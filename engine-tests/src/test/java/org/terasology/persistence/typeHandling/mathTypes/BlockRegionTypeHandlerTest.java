@@ -23,11 +23,9 @@ public class BlockRegionTypeHandlerTest extends MathTypeAssert {
 
     private final Reflections reflections = new Reflections(getClass().getClassLoader());
     private final TypeHandlerLibrary typeHandlerLibrary = TypeHandlerLibraryImpl.withReflections(reflections);
-    private AABBiTypeHandler handler = new AABBiTypeHandler();
 
     private final Gson gson =
-        GsonBuilderFactory.createGsonBuilderWithTypeSerializationLibrary(typeHandlerLibrary)
-            .create();
+            GsonBuilderFactory.createGsonBuilderWithTypeSerializationLibrary(typeHandlerLibrary).create();
 
     @Test
     public void testSerializeBlockRegion() {
