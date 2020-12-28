@@ -216,24 +216,22 @@ group = 'org.terasology.engine'
 println "Version for $project.name loaded as $version for group $group"
 
 // This version info file actually goes inside the built jar and can be used at runtime
-task createVersionInfoFile {
+def createVersionInfoFile = tasks.register("createVersionInfoFile", WriteProperties) {
     inputs.property('dateTime', startDateTimeString)
-    onlyIf { env.BUILD_URL != null }
-    doLast {
-        versionInfoFileDir.mkdirs()
-        ant.propertyfile(file: versionInfoFile) {
-            ant.entry(key: 'buildNumber', value: env.BUILD_NUMBER)
-            ant.entry(key: 'buildId', value: env.BUILD_ID)
-            ant.entry(key: 'buildTag', value: env.BUILD_TAG)
-            ant.entry(key: 'buildUrl', value: env.BUILD_URL)
-            ant.entry(key: 'jobName', value: env.JOB_NAME)
-            ant.entry(key: 'gitBranch', value: convertGitBranch(env.GIT_BRANCH))
-            ant.entry(key: 'gitCommit', value: env.GIT_COMMIT)
-            ant.entry(key: 'dateTime', value: startDateTimeString)
-            ant.entry(key: 'displayVersion', value: displayVersion)
-            ant.entry(key: 'engineVersion', value: version)
-        }
-    }
+    //noinspection GroovyAssignabilityCheck
+    properties([
+            buildNumber: env.BUILD_NUMBER,
+            buildId: env.BUILD_ID,
+            buildTag: env.BUILD_TAG,
+            buildUrl: env.BUILD_URL,
+            jobName: env.JOB_NAME,
+            gitBranch: convertGitBranch(env.GIT_BRANCH),
+            gitCommit: env.GIT_COMMIT,
+            dateTime: startDateTimeString,
+            displayVersion: displayVersion,
+            engineVersion: version
+    ].findAll { it.value != null })
+    outputFile = versionInfoFile
 }
 
 
