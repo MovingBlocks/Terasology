@@ -5,7 +5,6 @@
 
 import org.apache.tools.ant.filters.FixCrLfFilter
 import org.apache.tools.ant.taskdefs.condition.Os
-import org.gradle.plugins.ide.idea.model.IdeaModel
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -70,12 +69,6 @@ val displayVersion = versionBase
 
 application {
     mainClass.set(extra.get("mainClassName") as String)
-}
-
-// Adjust as the Gradle 6 upgrade changed this path a bit
-sourceSets {
-    main { java.outputDir = File("$buildDir/classes") }
-    test { java.outputDir = File("$buildDir/testClasses") }
 }
 
 // Base the engine tests on the same version number as the engine
@@ -281,16 +274,6 @@ tasks.register<Sync>("distForLauncher") {
         from("$rootDir/engine/build/classes/org/terasology/version") {
             include("versionInfo.properties")
         }
-    }
-}
-
-// Prep an IntelliJ module for the facade
-configure<IdeaModel> {
-    module {
-        // Change around the output a bit
-        inheritOutputDirs = false
-        outputDir = file("build/classes")
-        testOutputDir = file("build/testClasses")
     }
 }
 
