@@ -97,8 +97,7 @@ public class Bone {
 
     public Quaternionf getLocalRotation() {
         Quaternionf result = new Quaternionf();
-        relativeTransform.getNormalizedRotation(result);
-        return result;
+        return relativeTransform.getNormalizedRotation(new Quaternionf());
     }
 
     public Vector3f getLocalScale() {

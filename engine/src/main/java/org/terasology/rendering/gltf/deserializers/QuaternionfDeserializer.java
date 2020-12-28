@@ -28,7 +28,7 @@ import java.lang.reflect.Type;
 /**
  * Json deserializer for an Quat4f.
  */
-public class Quat4fDeserializer implements JsonDeserializer<Quaternionf> {
+public class QuaternionfDeserializer implements JsonDeserializer<Quaternionf> {
     @Override
     public Quaternionf deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
         TFloatList result = new TFloatArrayList();

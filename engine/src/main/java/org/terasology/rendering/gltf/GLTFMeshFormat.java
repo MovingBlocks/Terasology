@@ -120,7 +120,7 @@ public class GLTFMeshFormat extends GLTFCommonFormat<MeshData> {
             if (node.getMatrix() == null) {
                 Vector3f position = new Vector3f();
                 Quaternionf rotation = new Quaternionf();
-                Vector3f scale = new Vector3f(1,1,1);
+                Vector3f scale = new Vector3f(1, 1, 1);
 
                 if (node.getTranslation() != null) {
                     position.set(node.getTranslation());
@@ -131,19 +131,7 @@ public class GLTFMeshFormat extends GLTFCommonFormat<MeshData> {
                 if (node.getScale() != null) {
                     scale.set(node.getScale());
                 }
-                transform.set(new Matrix4f().translationRotateScale(position,rotation, scale));
-
-//                transform.set(0, 0, scale.getX() * transform.get(0, 0));
-//                transform.set(0, 1, scale.getX() * transform.get(0, 1));
-//                transform.set(0, 2, scale.getX() * transform.get(0, 2));
-//
-//                transform.set(1, 0, scale.getY() * transform.get(1, 0));
-//                transform.set(1, 1, scale.getY() * transform.get(1, 1));
-//                transform.set(1, 2, scale.getY() * transform.get(1, 2));
-//
-//                transform.set(2, 0, scale.getZ() * transform.get(2, 0));
-//                transform.set(2, 1, scale.getZ() * transform.get(2, 1));
-//                transform.set(2, 2, scale.getZ() * transform.get(2, 2));
+                transform.translationRotateScale(position, rotation, scale);
             } else {
                 transform.set(node.getMatrix());
             }

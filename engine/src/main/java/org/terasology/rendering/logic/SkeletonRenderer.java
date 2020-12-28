@@ -297,7 +297,7 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
                 }
             }
             ((OpenGLSkeletalMesh) skeletalMesh.mesh).setScaleTranslate(skeletalMesh.scale, skeletalMesh.translate);
-            ((OpenGLSkeletalMesh) skeletalMesh.mesh).render(Arrays.stream(boneTransforms).collect(Collectors.toList()));
+            ((OpenGLSkeletalMesh) skeletalMesh.mesh).render(Arrays.asList(boneTransforms));
         }
     }
 

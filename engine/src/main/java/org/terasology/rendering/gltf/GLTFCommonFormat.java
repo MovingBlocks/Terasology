@@ -47,7 +47,7 @@ import org.terasology.rendering.gltf.deserializers.GLTFModeDeserializer;
 import org.terasology.rendering.gltf.deserializers.GLTFTargetBufferDeserializer;
 import org.terasology.rendering.gltf.deserializers.GLTFVersionDeserializer;
 import org.terasology.rendering.gltf.deserializers.Matrix4fDeserializer;
-import org.terasology.rendering.gltf.deserializers.Quat4fDeserializer;
+import org.terasology.rendering.gltf.deserializers.QuaternionfDeserializer;
 import org.terasology.rendering.gltf.deserializers.TFloatListDeserializer;
 import org.terasology.rendering.gltf.deserializers.TIntListDeserializer;
 import org.terasology.rendering.gltf.deserializers.Vector3fDeserializer;
@@ -88,7 +88,7 @@ public abstract class GLTFCommonFormat<T extends AssetData> extends AbstractAsse
             .registerTypeAdapter(TIntList.class, new TIntListDeserializer())
             .registerTypeAdapter(TFloatList.class, new TFloatListDeserializer())
             .registerTypeAdapter(Matrix4f.class, new Matrix4fDeserializer())
-            .registerTypeAdapter(Quaternionf.class, new Quat4fDeserializer())
+            .registerTypeAdapter(Quaternionf.class, new QuaternionfDeserializer())
             .registerTypeAdapter(Vector3f.class, new Vector3fDeserializer())
             .registerTypeAdapter(GLTFComponentType.class, new GLTFComponentTypeDeserializer())
             .registerTypeAdapter(GLTFMode.class, new GLTFModeDeserializer())
