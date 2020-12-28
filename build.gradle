@@ -184,20 +184,6 @@ task extractConfig(type: Copy) {
     into "$rootDir/$dirConfigMetrics"
 }
 
-// Helper that returns a list of all local Terasology module projects
-def terasologyModules() {
-    subprojects.findAll { it.parent.name == 'modules' }
-}
-
-// Helpers that do magic things after having dependencies attached below
-task moduleJars
-
-// This magically makes everything work - without this the desired module projects returned have no tasks :-(
-gradle.projectsEvaluated {
-    // This makes it work for a full jar task
-    moduleJars.dependsOn(terasologyModules().jar)
-}
-
 // Include deletion of extracted natives in the global clean task. Without the doLast it runs on *every* execution ...
 clean.doLast {
     new File(dirNatives).deleteDir()

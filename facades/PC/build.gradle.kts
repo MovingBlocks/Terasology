@@ -264,26 +264,9 @@ tasks.register<Sync>("distApp") {
     }
 }
 
-// Distribute modules - only grabs Core in Jenkins but locally will grab any present. "Distros" now handle Jenkins packs
-tasks.register<Sync>("distModules") {
-    description = "Prepares local modules for distribution"
-    dependsOn("distApp")
-    dependsOn(":moduleJars")
-
-    // So this is probably a hack, but it works ;-) It does not work if it is in distApp, default "into" quirk ?
-    into("${distsDirectory.get().asFile}/app/modules")
-    // FIXME: duplicating code from /build.gradle:terasologyModules
-    val terasologyModules = rootProject.subprojects.filter { it.parent?.name == "modules" }
-    terasologyModules.forEach {
-        from("$rootDir/modules/${it.name}/build/libs")
-        include("*.jar")
-    }
-}
-
 tasks.register<Zip>("distPCZip") {
     group = "terasology dist"
     dependsOn("distApp")
-    dependsOn("distModules")
     from("${distsDirectory.get().asFile}/app")
     archiveFileName.set("Terasology.zip")
 }
