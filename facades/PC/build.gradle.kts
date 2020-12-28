@@ -92,6 +92,8 @@ dependencies {
 
     // TODO: Consider whether we can move the CR dependency back here from the engine, where it is referenced from the main menu
     implementation(group = "org.terasology.crashreporter", name = "cr-terasology", version = "4.1.0")
+
+    runtimeOnly(platform(project(":modules")))
 }
 
 // Instructions for packaging a jar file for the PC facade
@@ -117,7 +119,6 @@ fun JavaExec.commonConfigure() {
     group = "terasology run"
 
     dependsOn(":extractNatives")
-    dependsOn(":moduleClasses")
     dependsOn("classes")
 
     // Run arguments
