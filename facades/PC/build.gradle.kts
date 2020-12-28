@@ -192,11 +192,11 @@ tasks.register<JavaExec>("server") {
 }
 
 // Preps a version file to bundle with PC dists. This eventually goes into the root of a zip file
-tasks.register<Copy>("createVersionFile") {
+val createVersionFile = tasks.register<Copy>("createVersionFile") {
     inputs.property("dateTime", startDateTimeString)
     onlyIf { env["BUILD_URL"] != null }
     from(templatesDir)
-    into("$buildDir")
+    into("$buildDir/versionfile")
     include(versionFileName)
     expand(mapOf(
         "buildNumber" to env["BUILD_NUMBER"],
@@ -209,7 +209,7 @@ tasks.register<Copy>("createVersionFile") {
 }
 
 // TODO: This could probably be done more Gradley (engine project resource dir instead of direct path?) and with some variables
-tasks.register<Copy>("copyCreditsFile") {
+val copyCreditsFile = tasks.register<Copy>("copyCreditsFile") {
     description = "Copies the credits file into the engine's resource dir where it'll be read at runtime"
     from("$rootDir/docs")
     into("$rootDir/engine/src/main/resources")
@@ -274,6 +274,22 @@ tasks.register<Sync>("distForLauncher") {
     into("../resources/main/org/terasology/version") {
         from("$rootDir/engine/build/classes/org/terasology/version") {
             include("versionInfo.properties")
+        }
+    }
+}
+
+// TODO: add versionInfo.properties as resource
+// TODO: add Credits.md as resource
+
+distributions {
+    main {
+        contents {
+            from(rootDir) {
+                include("README.markdown", "LICENSE", "NOTICE")
+                rename("README.markdown", "README")
+                filter(FixCrLfFilter::class, "eol" to FixCrLfFilter.CrLf.newInstance("crlf"))
+            }
+            from(createVersionFile)
         }
     }
 }
