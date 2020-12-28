@@ -68,6 +68,7 @@ val displayVersion = versionBase
 
 
 application {
+    applicationName = "Terasology"
     mainClass.set(extra.get("mainClassName") as String)
 }
 
