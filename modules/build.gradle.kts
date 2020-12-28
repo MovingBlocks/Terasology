@@ -15,3 +15,11 @@ dependencies {
         runtime(this)
     }
 }
+
+// Allows using :modules:clean as a shortcut for running clean in each module.
+tasks.named("clean").configure {
+    val cleanPlatform = this
+    subprojects {
+        cleanPlatform.dependsOn(this.tasks.named("clean"))
+    }
+}
