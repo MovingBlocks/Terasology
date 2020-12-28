@@ -82,7 +82,7 @@ public class SubSampledNoise extends AbstractNoise {
         return getSubset(fullData, fullRegion, region);
     }
 
-    public float[] noise(BlockArea region) {
+    public float[] noise(BlockAreac area) {
         BlockArea fullRegion = determineRequiredRegion(region);
         float[] keyData = getKeyValues(fullRegion);
         float[] fullData = mapExpand(keyData, fullRegion);
