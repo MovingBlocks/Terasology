@@ -113,7 +113,7 @@ configurations {
 }
 
 // Used for all game configs.
-val commonConfigure : JavaExec.()-> Unit = {
+fun JavaExec.commonConfigure() {
     group = "terasology run"
 
     dependsOn(":extractNatives")
