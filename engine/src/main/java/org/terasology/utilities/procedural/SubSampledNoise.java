@@ -72,7 +72,7 @@ public class SubSampledNoise extends AbstractNoise {
      * @param region
      * @return
      * @deprecated This is scheduled for removal in an upcoming version method will be replaced with JOML implementation
-     *     {@link #noise(BlockArea)}.
+     *     {@link #noise(BlockAreac)}.
      */
     @Deprecated
     public float[] noise(Rect2i region) {
@@ -83,10 +83,10 @@ public class SubSampledNoise extends AbstractNoise {
     }
 
     public float[] noise(BlockAreac area) {
-        BlockArea fullRegion = determineRequiredRegion(region);
+        BlockArea fullRegion = determineRequiredRegion(area);
         float[] keyData = getKeyValues(fullRegion);
         float[] fullData = mapExpand(keyData, fullRegion);
-        return getSubset(fullData, fullRegion, region);
+        return getSubset(fullData, fullRegion, area);
     }
 
     private float[] getSubset(float[] fullData, BlockAreac fullRegion, BlockAreac subRegion) {
@@ -197,7 +197,7 @@ public class SubSampledNoise extends AbstractNoise {
         return Rect2i.createFromMinAndMax(newMinX, newMinY, newMaxX, newMaxY);
     }
 
-    private BlockArea determineRequiredRegion(BlockArea region) {
+    private BlockArea determineRequiredRegion(BlockAreac region) {
         int newMinX = region.minX() - IntMath.mod(region.minX(), sampleRate);
         int newMinY = region.minY() - IntMath.mod(region.minY(), sampleRate);
         int newMaxX = region.maxX() + 4 - IntMath.mod(region.maxX(), sampleRate) - 1;
