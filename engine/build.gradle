@@ -29,8 +29,6 @@ ext {
 
     // Stuff for our automatic version file setup
     startDateTimeString = dateTimeFormat.format(new Date())
-    versionInfoFileDir = new File(buildDir, 'classes/org/terasology/version')
-    versionInfoFile = new File(versionInfoFileDir, 'versionInfo.properties')
     versionFileName = 'VERSION'
     versionBase = new File(templatesDir, "version.txt").text.trim()
     displayVersion = versionBase
@@ -217,7 +215,6 @@ println "Version for $project.name loaded as $version for group $group"
 
 // This version info file actually goes inside the built jar and can be used at runtime
 def createVersionInfoFile = tasks.register("createVersionInfoFile", WriteProperties) {
-    inputs.property('dateTime', startDateTimeString)
     //noinspection GroovyAssignabilityCheck
     properties([
             buildNumber: env.BUILD_NUMBER,
@@ -231,9 +228,14 @@ def createVersionInfoFile = tasks.register("createVersionInfoFile", WritePropert
             displayVersion: displayVersion,
             engineVersion: version
     ].findAll { it.value != null })
-    outputFile = versionInfoFile
+    outputFile = "$buildDir/createVersionInfoFile/versionInfo.properties"
 }
 
+tasks.named("processResources", Copy) {
+    from(createVersionInfoFile) {
+        into("org/terasology/version/")
+    }
+}
 
 //TODO: Remove it  when gestalt will can to handle ProtectionDomain without classes (Resources)
 task copyResourcesToClasses(type: Copy) {
@@ -245,7 +247,6 @@ task copyResourcesToClasses(type: Copy) {
     classes.dependsOn copyResourcesToClasses
 }
 
-jar.dependsOn createVersionInfoFile
 jar.dependsOn cacheReflections
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

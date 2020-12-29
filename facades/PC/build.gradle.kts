@@ -278,7 +278,6 @@ tasks.register<Sync>("distForLauncher") {
     }
 }
 
-// TODO: add versionInfo.properties as resource
 // TODO: add Credits.md as resource
 
 distributions {
