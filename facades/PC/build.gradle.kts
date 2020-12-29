@@ -108,6 +108,10 @@ configurations {
     }
 }
 
+/****************************************
+ * Run Targets
+ */
+
 // Used for all game configs.
 fun JavaExec.commonConfigure() {
     group = "terasology run"
@@ -160,6 +164,10 @@ tasks.register<JavaExec>("permissiveNatives") {
     systemProperty("java.library.path", rootProject.file(dirNatives + "/" + nativeSubdirectoryName()))
 }
 
+/******************************************
+ * Headless server
+ */
+
 apply(from="server.build.gradle")
 
 // TODO: Seems to always be up to date so no modules get copied
@@ -190,6 +198,13 @@ tasks.register<JavaExec>("server") {
     dependsOn("setupServerModules")
     args("-headless", "-homedir=$localServerDataPath")
 }
+
+
+/*********************************
+ * Distribution
+ *
+ * See also publish.gradle, included near the top.
+ */
 
 // Preps a version file to bundle with PC dists. This eventually goes into the root of a zip file
 val createVersionFile = tasks.register<Copy>("createVersionFile") {
@@ -281,6 +296,11 @@ distributions {
         }
     }
 }
+
+
+/********************************
+ * Eclipse Integration
+ */
 
 tasks.register<Copy>("copyEclipseLauncher") {
     from("$rootDir/config/eclipse")
