@@ -208,21 +208,12 @@ val createVersionFile = tasks.register<Copy>("createVersionFile") {
     filter(FixCrLfFilter::class, "eol" to FixCrLfFilter.CrLf.newInstance("crlf"))
 }
 
-// TODO: This could probably be done more Gradley (engine project resource dir instead of direct path?) and with some variables
-val copyCreditsFile = tasks.register<Copy>("copyCreditsFile") {
-    description = "Copies the credits file into the engine's resource dir where it'll be read at runtime"
-    from("$rootDir/docs")
-    into("$rootDir/engine/src/main/resources")
-    include("Credits.md")
-}
-
 // Main application dist target. Does NOT include any modules.
 tasks.register<Sync>("distApp") {
     description = "Creates an application package for distribution"
     group = "terasology dist"
 
     dependsOn("createVersionFile")
-    dependsOn("copyCreditsFile")
     dependsOn(":extractNatives")
     dependsOn("jar")
 
@@ -277,8 +268,6 @@ tasks.register<Sync>("distForLauncher") {
         }
     }
 }
-
-// TODO: add Credits.md as resource
 
 distributions {
     main {

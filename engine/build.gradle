@@ -235,6 +235,9 @@ tasks.named("processResources", Copy) {
     from(createVersionInfoFile) {
         into("org/terasology/version/")
     }
+    from("$rootDir/docs") {
+        include("Credits.md")
+    }
 }
 
 //TODO: Remove it  when gestalt will can to handle ProtectionDomain without classes (Resources)
