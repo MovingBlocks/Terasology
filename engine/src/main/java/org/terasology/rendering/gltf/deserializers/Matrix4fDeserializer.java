@@ -21,7 +21,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
 import gnu.trove.list.TFloatList;
 import gnu.trove.list.array.TFloatArrayList;
-import org.terasology.math.geom.Matrix4f;
+import org.joml.Matrix4f;
 
 import java.lang.reflect.Type;
 

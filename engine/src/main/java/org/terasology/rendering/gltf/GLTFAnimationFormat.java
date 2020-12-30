@@ -23,13 +23,13 @@ import gnu.trove.list.array.TFloatArrayList;
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.map.TIntIntMap;
 import gnu.trove.map.hash.TIntIntHashMap;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.format.AssetDataFile;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.assets.module.annotations.RegisterAssetFileFormat;
 import org.terasology.math.AABB;
-import org.terasology.math.geom.Quat4f;
-import org.terasology.math.geom.Vector3f;
 import org.terasology.rendering.assets.animation.MeshAnimationBundleData;
 import org.terasology.rendering.assets.animation.MeshAnimationData;
 import org.terasology.rendering.assets.animation.MeshAnimationFrame;
@@ -97,14 +97,17 @@ public class GLTFAnimationFormat extends GLTFCommonFormat<MeshAnimationBundleDat
                     name = "anim_" + index;
                 }
 
-                animations.put(new ResourceUrn(urn, name), loadAnimation(gltf, gltfAnimation, loadedBuffers, nodeToJoint, boneNames, boneParents, bones));
+                animations.put(new ResourceUrn(urn, name), loadAnimation(gltf, gltfAnimation, loadedBuffers,
+                    nodeToJoint, boneNames, boneParents, bones));
             }
 
             return new MeshAnimationBundleData(animations);
         }
     }
 
-    private MeshAnimationData loadAnimation(GLTF gltf, GLTFAnimation animation, List<byte[]> loadedBuffers, TIntIntMap boneIndexMapping, List<String> boneNames, TIntList boneParents, List<Bone> bones) throws IOException {
+    private MeshAnimationData loadAnimation(GLTF gltf, GLTFAnimation animation, List<byte[]> loadedBuffers,
+                                            TIntIntMap boneIndexMapping, List<String> boneNames, TIntList boneParents
+        , List<Bone> bones) throws IOException {
         List<ChannelReader> channelReaders = new ArrayList<>();
 
         for (GLTFChannel channel : animation.getChannels()) {
@@ -116,17 +119,20 @@ public class GLTFAnimationFormat extends GLTFCommonFormat<MeshAnimationBundleDat
                 case TRANSLATION: {
                     List<Vector3f> data = getVector3fs(gltf, loadedBuffers, sampler.getOutput());
 
-                    channelReaders.add(new BufferChannelReader<>(times, data, sampler.getInterpolation()::interpolate, x -> x.getPosition(bone)));
+                    channelReaders.add(new BufferChannelReader<>(times, data, sampler.getInterpolation()::interpolate
+                        , x -> x.getPosition(bone)));
                     break;
                 }
                 case ROTATION: {
-                    List<Quat4f> data = getQuat4fs(gltf, loadedBuffers, sampler.getOutput());
-                    channelReaders.add(new BufferChannelReader<>(times, data, sampler.getInterpolation()::interpolate, x -> x.getRotation(bone)));
+                    List<Quaternionf> data = getQuat4fs(gltf, loadedBuffers, sampler.getOutput());
+                    channelReaders.add(new BufferChannelReader<>(times, data, sampler.getInterpolation()::interpolate
+                        , x -> x.getRotation(bone)));
                     break;
                 }
                 case SCALE: {
                     List<Vector3f> data = getVector3fs(gltf, loadedBuffers, sampler.getOutput());
-                    channelReaders.add(new BufferChannelReader<>(times, data, sampler.getInterpolation()::interpolate, x -> x.getBoneScale(bone)));
+                    channelReaders.add(new BufferChannelReader<>(times, data, sampler.getInterpolation()::interpolate
+                        , x -> x.getBoneScale(bone)));
                     break;
                 }
                 default:
@@ -134,17 +140,18 @@ public class GLTFAnimationFormat extends GLTFCommonFormat<MeshAnimationBundleDat
             }
 
         }
-        int frameCount = (int) (channelReaders.stream().map(ChannelReader::endTime).reduce(Float::max).orElse(0f) / TIME_PER_FRAME) + 1;
+        int frameCount =
+            (int) (channelReaders.stream().map(ChannelReader::endTime).reduce(Float::max).orElse(0f) / TIME_PER_FRAME) + 1;
         List<MeshAnimationFrame> frames = new ArrayList<>(frameCount);
 
         for (int i = 0; i < frameCount; i++) {
             float time = i * TIME_PER_FRAME;
             List<Vector3f> boneLocations = new ArrayList<>();
-            List<Quat4f> boneRotations = new ArrayList<>();
+            List<Quaternionf> boneRotations = new ArrayList<>();
             List<Vector3f> boneScales = new ArrayList<>();
             for (Bone bone : bones) {
                 boneLocations.add(new Vector3f(bone.getLocalPosition()));
-                boneRotations.add(new Quat4f(bone.getLocalRotation()));
+                boneRotations.add(new Quaternionf(bone.getLocalRotation()));
                 boneScales.add(new Vector3f(bone.getLocalScale()));
             }
             MeshAnimationFrame frame = new MeshAnimationFrame(boneLocations, boneRotations, boneScales);
@@ -172,11 +179,11 @@ public class GLTFAnimationFormat extends GLTFCommonFormat<MeshAnimationBundleDat
         return vectors;
     }
 
-    private List<Quat4f> getQuat4fs(GLTF gltf, List<byte[]> loadedBuffers, int accessorIndex) throws IOException {
+    private List<Quaternionf> getQuat4fs(GLTF gltf, List<byte[]> loadedBuffers, int accessorIndex) throws IOException {
         TFloatList floats = getFloats(gltf, loadedBuffers, accessorIndex);
-        List<Quat4f> quats = Lists.newArrayListWithCapacity(floats.size() / 4);
+        List<Quaternionf> quats = Lists.newArrayListWithCapacity(floats.size() / 4);
         for (int i = 0; i < floats.size(); i += 4) {
-            quats.add(new Quat4f(floats.get(i), floats.get(i + 1), floats.get(i + 2), floats.get(i + 3)));
+            quats.add(new Quaternionf(floats.get(i), floats.get(i + 1), floats.get(i + 2), floats.get(i + 3)));
         }
         return quats;
     }
@@ -202,7 +209,8 @@ public class GLTFAnimationFormat extends GLTFCommonFormat<MeshAnimationBundleDat
         private Interpolator<T> interpolator;
         private TargetRetriever<T> targetRetriever;
 
-        BufferChannelReader(TFloatList times, List<T> data, Interpolator<T> interpolator, TargetRetriever<T> targetRetriever) {
+        BufferChannelReader(TFloatList times, List<T> data, Interpolator<T> interpolator,
+                            TargetRetriever<T> targetRetriever) {
             this.times = times;
             this.data = data;
             this.interpolator = interpolator;
@@ -228,5 +236,4 @@ public class GLTFAnimationFormat extends GLTFCommonFormat<MeshAnimationBundleDat
             return times.get(times.size() - 1);
         }
     }
-
 }
