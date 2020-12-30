@@ -15,30 +15,26 @@
  */
 package org.terasology.rendering.gltf.model;
 
-import org.terasology.math.geom.BaseQuat4f;
-import org.terasology.math.geom.Quat4f;
-import org.terasology.math.geom.Vector3f;
+
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 
 /**
  * Animation Interpolation algorithms
  */
 public enum GLTFInterpolation {
     /**
-     * For initial value 'a' and next value 'b' and delta time 't'
-     * a + (b - a ) * t
+     * For initial value 'a' and next value 'b' and delta time 't' a + (b - a ) * t
      */
     LINEAR {
         @Override
         public void interpolate(Vector3f a, Vector3f b, float t, Vector3f out) {
-            out.x = a.x + t * (b.x - a.x);
-            out.y = a.y + t * (b.y - a.y);
-            out.z = a.z + t * (b.z - a.z);
-
+            a.lerp(b, t, out);
         }
 
         @Override
-        public void interpolate(Quat4f a, Quat4f b, float t, Quat4f out) {
-            out.set(BaseQuat4f.interpolate(a, b, t));
+        public void interpolate(Quaternionf a, Quaternionf b, float t, Quaternionf out) {
+            a.slerp(b, t, out);
         }
     },
     /**
@@ -51,7 +47,7 @@ public enum GLTFInterpolation {
         }
 
         @Override
-        public void interpolate(Quat4f a, Quat4f b, float t, Quat4f out) {
+        public void interpolate(Quaternionf a, Quaternionf b, float t, Quaternionf out) {
             out.set(a);
         }
     },
@@ -65,7 +61,7 @@ public enum GLTFInterpolation {
         }
 
         @Override
-        public void interpolate(Quat4f a, Quat4f b, float t, Quat4f out) {
+        public void interpolate(Quaternionf a, Quaternionf b, float t, Quaternionf out) {
             out.set(a);
         }
     };
@@ -73,5 +69,5 @@ public enum GLTFInterpolation {
 
     public abstract void interpolate(Vector3f a, Vector3f b, float t, Vector3f out);
 
-    public abstract void interpolate(Quat4f a, Quat4f b, float t, Quat4f out);
+    public abstract void interpolate(Quaternionf a, Quaternionf b, float t, Quaternionf out);
 }

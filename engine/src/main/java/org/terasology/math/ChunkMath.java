@@ -22,15 +22,17 @@ import org.joml.Vector3ic;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.world.block.BlockRegion;
-import org.terasology.world.block.BlockRegions;
+import org.terasology.world.block.BlockRegionc;
 import org.terasology.world.chunks.ChunkConstants;
 
 import java.math.RoundingMode;
 
 /**
  * Collection of math functions.
- *
+ * @deprecated This class is scheduled for removal in an upcoming version.
+ *             Use the JOML implementation instead: {@link org.terasology.world.chunks.Chunks}.
  */
+@Deprecated
 public final class ChunkMath {
 
     private ChunkMath() {
@@ -270,8 +272,8 @@ public final class ChunkMath {
      */
     public static BlockRegion calcChunkRegion(BlockRegion region, int chunkX, int chunkY, int chunkZ, BlockRegion dest) {
         return dest.
-            setMin(calcChunkPos(region.getMinX(), chunkX), calcChunkPos(region.getMinY(), chunkY), calcChunkPos(region.getMinZ(), chunkZ)).
-            setMax(calcChunkPos(region.getMaxX(), chunkX), calcChunkPos(region.getMaxY(), chunkY), calcChunkPos(region.getMaxZ(), chunkZ));
+            setMin(calcChunkPos(region.minX(), chunkX), calcChunkPos(region.minY(), chunkY), calcChunkPos(region.minZ(), chunkZ)).
+            setMax(calcChunkPos(region.maxX(), chunkX), calcChunkPos(region.maxY(), chunkY), calcChunkPos(region.maxZ(), chunkZ));
     }
 
     /**
@@ -487,12 +489,16 @@ public final class ChunkMath {
      * @param pos the world position
      * @param extent the extent
      * @return chunk region
+     * @deprecated This is scheduled for removal in an upcoming version
+     *             method will be replaced with JOML implementation {@link org.terasology.world.chunks.Chunks#toChunkRegion(BlockRegion, BlockRegion)}.
+     *
      */
+    @Deprecated
     public static BlockRegion getChunkRegionAroundWorldPos(Vector3ic pos, int extent) {
         org.joml.Vector3i temp = new org.joml.Vector3i();
         org.joml.Vector3i minChunk = calcChunkPos(temp.set(pos).add(-extent, -extent, -extent), new org.joml.Vector3i());
         org.joml.Vector3i maxChunk = calcChunkPos(temp.set(pos).add(extent, extent, extent), new org.joml.Vector3i());
-        return BlockRegions.createFromMinAndMax(minChunk, maxChunk);
+        return new BlockRegion(minChunk, maxChunk);
     }
 
 
@@ -532,7 +538,7 @@ public final class ChunkMath {
      * @param side
      * @return
      * @deprecated This is scheduled for removal in an upcoming version
-     *             method will be replaced with JOML implementation {@link #getEdgeRegion(BlockRegion, Side, BlockRegion)}.
+     *             method will be replaced with JOML implementation {@link #getEdgeRegion(BlockRegionc, Side, BlockRegion)}.
      */
     @Deprecated
     public static Region3i getEdgeRegion(Region3i region, Side side) {
@@ -570,74 +576,68 @@ public final class ChunkMath {
      * @param side the side to border
      * @param dest will hold the result
      * @return dest
+     * @deprecated use {@link BlockRegion#face(Side, BlockRegion)}
      */
-    public static BlockRegion getEdgeRegion(BlockRegion region, Side side, BlockRegion dest) {
+    @Deprecated
+    public static BlockRegion getEdgeRegion(BlockRegionc region, Side side, BlockRegion dest) {
         switch (side) {
             case TOP:
-                return dest.setMin(
-                    region.getMinX(),
-                    region.getMaxY(),
-                    region.getMinZ()
-                ).setMax(
-                    region.getMaxX(),
-                    region.getMaxY(),
-                    region.getMaxZ());
+                return dest.set(
+                    region.minX(),
+                    region.maxY(),
+                    region.minZ(),
+                    region.maxX(),
+                    region.maxY(),
+                    region.maxZ());
             case BOTTOM:
-                return dest.setMin(
-                    region.getMinX(),
-                    region.getMinY(),
-                    region.getMinZ()
-                ).setMax(
-                    region.getMaxX(),
-                    region.getMinY(),
-                    region.getMaxZ());
+                return dest.set(
+                    region.minX(),
+                    region.minY(),
+                    region.minZ(),
+                    region.maxX(),
+                    region.minY(),
+                    region.maxZ());
             case LEFT:
-                return dest.setMin(
-                    region.getMinX(),
-                    region.getMinY(),
-                    region.getMinZ()
-                ).setMax(
-                    region.getMinX(),
-                    region.getMaxY(),
-                    region.getMaxZ());
+                return dest.set(
+                    region.minX(),
+                    region.minY(),
+                    region.minZ(),
+                    region.minX(),
+                    region.maxY(),
+                    region.maxZ());
             case RIGHT:
-                return dest.setMin(
-                    region.getMaxX(),
-                    region.getMinY(),
-                    region.getMinZ()
-                ).setMax(
-                    region.getMaxX(),
-                    region.getMaxY(),
-                    region.getMaxZ());
+                return dest.set(
+                    region.maxX(),
+                    region.minY(),
+                    region.minZ(),
+                    region.maxX(),
+                    region.maxY(),
+                    region.maxZ());
             case FRONT:
-                return dest.setMin(
-                    region.getMinX(),
-                    region.getMinY(),
-                    region.getMinZ()
-                ).setMax(
-                    region.getMaxX(),
-                    region.getMaxY(),
-                    region.getMinZ());
+                return dest.set(
+                    region.minX(),
+                    region.minY(),
+                    region.minZ(),
+                    region.maxX(),
+                    region.maxY(),
+                    region.minZ());
             case BACK:
-                return dest.setMin(
-                    region.getMinX(),
-                    region.getMinY(),
-                    region.getMaxZ()
-                ).setMax(
-                    region.getMaxX(),
-                    region.getMaxY(),
-                    region.getMaxZ());
+                return dest.set(
+                    region.minX(),
+                    region.minY(),
+                    region.maxZ(),
+                    region.maxX(),
+                    region.maxY(),
+                    region.maxZ());
             default:
-                return dest.setMin(
-                    region.getMinX(),
-                    region.getMinY(),
-                    region.getMinZ()
-                ).setMax(
-                    region.getMaxX(),
-                    region.getMaxY(),
-                    region.getMaxZ()
+                return dest.set(
+                    region.minX(),
+                    region.minY(),
+                    region.minZ(),
+                    region.maxX(),
+                    region.maxY(),
+                    region.maxZ()
                 );
-
         }
     }
 

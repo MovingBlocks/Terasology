@@ -31,7 +31,7 @@ import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.block.BeforeDeactivateBlocks;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
-import org.terasology.world.block.BlockRegions;
+import org.terasology.world.block.BlockRegion;
 import org.terasology.world.block.OnActivatedBlocks;
 import org.terasology.world.block.OnAddedBlocks;
 import org.terasology.world.chunks.Chunk;
@@ -197,6 +197,7 @@ public class LocalChunkProvider implements ChunkProvider {
             return; // TODO move it in pipeline;
         }
         chunkCache.put(chunk.getPosition(), chunk);
+        chunk.markReady();
         //TODO, it is not clear if the activate/addedBlocks event logic is correct.
         //See https://github.com/MovingBlocks/Terasology/issues/3244
         ChunkStore store = this.storageManager.loadChunkStore(chunk.getPosition());
@@ -244,7 +245,6 @@ public class LocalChunkProvider implements ChunkProvider {
             worldEntity.send(new OnChunkGenerated(chunk.getPosition()));
         }
         worldEntity.send(new OnChunkLoaded(chunk.getPosition()));
-        chunk.markReady();
     }
 
     private void generateQueuedEntities(EntityStore store) {
@@ -449,10 +449,7 @@ public class LocalChunkProvider implements ChunkProvider {
                             Chunk[] localchunks = chunks.toArray(new Chunk[0]);
                             return new LightMerger().merge(localchunks);
                         },
-                        pos -> StreamSupport.stream(BlockRegions.iterableInPlace(BlockRegions.createFromMinAndMax(
-                                pos.x() - 1, pos.y() - 1, pos.z() - 1,
-                                pos.x() + 1, pos.y() + 1, pos.z() + 1
-                        )).spliterator(), false)
+                        pos -> StreamSupport.stream(new BlockRegion(pos).expand(1,1,1).spliterator(), false)
                                 .map(org.joml.Vector3i::new)
                                 .collect(Collectors.toSet())
                 ))
@@ -490,10 +487,7 @@ public class LocalChunkProvider implements ChunkProvider {
                             Chunk[] localchunks = chunks.toArray(new Chunk[0]);
                             return new LightMerger().merge(localchunks);
                         },
-                        pos -> StreamSupport.stream(BlockRegions.iterableInPlace(BlockRegions.createFromMinAndMax(
-                                pos.x() - 1, pos.y() - 1, pos.z() - 1,
-                                pos.x() + 1, pos.y() + 1, pos.z() + 1
-                        )).spliterator(), false)
+                        pos -> StreamSupport.stream(new BlockRegion(pos).expand(1,1,1).spliterator(), false)
                                 .map(org.joml.Vector3i::new)
                                 .collect(Collectors.toCollection(Sets::newLinkedHashSet))
                 ))

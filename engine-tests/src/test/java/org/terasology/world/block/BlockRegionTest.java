@@ -14,16 +14,18 @@ import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.entity.internal.PojoEntityManager;
+import org.terasology.math.Side;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
@@ -34,34 +36,47 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/**
- *
- */
 public class BlockRegionTest {
+
+    @Test
+    public void testGetEdgeRegion() {
+        BlockRegion region = new BlockRegion(new Vector3i(16, 0, 16)).setSize(16, 128, 16);
+        assertEquals(new BlockRegion(16, 0, 16, 16, 127, 31), region.face(Side.LEFT,
+            new BlockRegion(BlockRegion.INVALID)));
+        assertEquals(new BlockRegion(31, 0, 16, 31, 127, 31), region.face(Side.RIGHT,
+            new BlockRegion(BlockRegion.INVALID)));
+        assertEquals(new BlockRegion(16, 0, 16, 31, 127, 16), region.face(Side.FRONT,
+            new BlockRegion(BlockRegion.INVALID)));
+        assertEquals(new BlockRegion(16, 0, 31, 31, 127, 31), region.face(Side.BACK,
+            new BlockRegion(BlockRegion.INVALID)));
+        assertEquals(new BlockRegion(16, 127, 16, 31, 127, 31), region.face(Side.TOP,
+            new BlockRegion(BlockRegion.INVALID)));
+        assertEquals(new BlockRegion(16, 0, 16, 31, 0, 31), region.face(Side.BOTTOM,
+            new BlockRegion(BlockRegion.INVALID)));
+    }
 
     @Test
     void getMinMax() {
         final Vector3i min = new Vector3i(1, 2, 3);
         final Vector3i max = new Vector3i(7, 8, 9);
-        final BlockRegion region =
-                BlockRegions.createFromMinAndMax(min, max);
+        final BlockRegion region = new BlockRegion(min, max);
 
         assertEquals(min, region.getMin(new Vector3i()));
         assertEquals(max, region.getMax(new Vector3i()));
 
-        assertEquals(min.x, region.getMinX());
-        assertEquals(region.getMinX(), region.minX());
-        assertEquals(min.y, region.getMinY());
-        assertEquals(region.getMinY(), region.minY());
-        assertEquals(min.z, region.getMinZ());
-        assertEquals(region.getMinZ(), region.minZ());
+        assertEquals(min.x, region.minX());
+        assertEquals(region.minX(), region.minX());
+        assertEquals(min.y, region.minY());
+        assertEquals(region.minY(), region.minY());
+        assertEquals(min.z, region.minZ());
+        assertEquals(region.minZ(), region.minZ());
 
-        assertEquals(max.x, region.getMaxX());
-        assertEquals(region.getMaxX(), region.maxX());
-        assertEquals(max.y, region.getMaxY());
-        assertEquals(region.getMaxY(), region.maxY());
-        assertEquals(max.z, region.getMaxZ());
-        assertEquals(region.getMaxZ(), region.maxZ());
+        assertEquals(max.x, region.maxX());
+        assertEquals(region.maxX(), region.maxX());
+        assertEquals(max.y, region.maxY());
+        assertEquals(region.maxY(), region.maxY());
+        assertEquals(max.z, region.maxZ());
+        assertEquals(region.maxZ(), region.maxZ());
     }
 
     @Test
@@ -89,11 +104,28 @@ public class BlockRegionTest {
         assertThrows(IllegalArgumentException.class, () -> region.maxZ(-1));
     }
 
+    static Stream<Arguments> sizeArgs() {
+        return Stream.of(
+                Arguments.of(new BlockRegion(-10, -10, -10, -5, -5, -5), new Vector3i(6)),
+                Arguments.of(new BlockRegion(0, 0, 0, 0, 0, 0), new Vector3i(1)),
+                Arguments.of(new BlockRegion(0, 0, 0, 1, 2, 3), new Vector3i(2, 3, 4)),
+                Arguments.of(new BlockRegion(new Vector3i(-1), new Vector3i(1)), new Vector3i(3))
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("sizeArgs")
+    void size(BlockRegion region, Vector3i expected) {
+        assertEquals(expected, region.getSize(new Vector3i()));
+    }
+
+    // -- creation  --------------------------------------------------------------------------------------------------//
+
     @Test
     void createEmpty() {
-        BlockRegion empty = new BlockRegion();
+        BlockRegionc empty = BlockRegion.INVALID;
 
-        final ArrayList<Vector3i> blockPositions = Lists.newArrayList(BlockRegions.iterable(empty));
+        final ArrayList<Vector3ic> blockPositions = Lists.newArrayList(empty);
 
         assertFalse(empty.isValid(), "empty region should be invalid");
         assertEquals(Collections.emptyList(), blockPositions, "empty region should contain no block positions");
@@ -109,27 +141,25 @@ public class BlockRegionTest {
 
     @ParameterizedTest
     @MethodSource("fromMinAndSizeArgs")
-    public void createFromMinAndSize(Vector3i min, Vector3i size, Vector3i expectedMax) {
-        BlockRegion region = BlockRegions.createFromMinAndSize(min, size);
-        BlockRegion expected = new BlockRegion().setMin(min).setSize(size);
+    public void fromMinAndSize(Vector3i min, Vector3i size, Vector3i expectedMax) {
+        BlockRegion region = new BlockRegion(min).setSize(size);
 
         assertEquals(min, region.getMin(new Vector3i()));
         assertEquals(size, region.getSize(new Vector3i()));
         assertEquals(expectedMax, region.getMax(new Vector3i()));
-        assertEquals(expected, region);
     }
 
     @Test
-    public void createFromMinAndSizeInvalid() {
-        assertThrows(IllegalArgumentException.class, () -> BlockRegions.createFromMinAndSize(new Vector3i(),
-                new Vector3i(-1, 1, 1)));
-        assertThrows(IllegalArgumentException.class, () -> BlockRegions.createFromMinAndSize(new Vector3i(),
-                new Vector3i(1, -1, 1)));
-        assertThrows(IllegalArgumentException.class, () -> BlockRegions.createFromMinAndSize(new Vector3i(),
-                new Vector3i(1, 1, -1)));
+    public void fromMinAndSizeInvalid() {
+        assertThrows(IllegalArgumentException.class,
+                () -> new BlockRegion(new Vector3i()).setSize(new Vector3i(-1, 1, 1)));
+        assertThrows(IllegalArgumentException.class,
+                () -> new BlockRegion(new Vector3i()).setSize(new Vector3i(1, -1, 1)));
+        assertThrows(IllegalArgumentException.class,
+                () -> new BlockRegion(new Vector3i()).setSize(new Vector3i(1, 1, -1)));
     }
 
-    private static Stream<Arguments> createFromMinAndMaxArgs() {
+    private static Stream<Arguments> fromMinAndMaxArgs() {
         return Stream.of(
                 Arguments.of(new Vector3i(), new Vector3i(1, 1, 1), new Vector3i()),
                 Arguments.of(new Vector3i(1, 1, 1), new Vector3i(3, 3, 3), new Vector3i(3, 3, 3)),
@@ -138,9 +168,9 @@ public class BlockRegionTest {
     }
 
     @ParameterizedTest
-    @MethodSource("createFromMinAndMaxArgs")
-    public void createFromMinAndMax(Vector3i min, Vector3i expectedSize, Vector3i max) {
-        BlockRegion region = BlockRegions.createFromMinAndMax(min, max);
+    @MethodSource("fromMinAndMaxArgs")
+    public void fromMinAndMax(Vector3i min, Vector3i expectedSize, Vector3i max) {
+        BlockRegion region = new BlockRegion(min, max);
         assertEquals(min, region.getMin(new Vector3i()), "min");
         assertEquals(max, region.getMax(new Vector3i()), "max");
         assertEquals(expectedSize, region.getSize(new Vector3i()), "size");
@@ -149,14 +179,29 @@ public class BlockRegionTest {
     private static Stream<Arguments> createFromMinAndMaxInvalidArgs() {
         return Stream.of(
                 Arguments.of(new Vector3i(1, 1, 1), new Vector3i(0, 0, 0)),
-                Arguments.of(new Vector3i(0, 1, 0), new Vector3i(1, 0, 1))
+                Arguments.of(new Vector3i(0, 1, 0), new Vector3i(1, 0, 1)),
+                Arguments.of(new Vector3i(0, 0, 0), new Vector3i(-1, 0, 0))
         );
     }
 
     @ParameterizedTest
     @MethodSource("createFromMinAndMaxInvalidArgs")
-    public void createFromMinAndMaxInvalid(Vector3i min, Vector3i max) {
-        assertThrows(IllegalArgumentException.class, () -> BlockRegions.createFromMinAndMax(min, max));
+    public void fromMinAndMaxInvalid(Vector3i min, Vector3i max) {
+        assertThrows(IllegalArgumentException.class, () -> new BlockRegion(min, max));
+    }
+
+    static Stream<Arguments> fromCenterAndExtentsInvalidArgs() {
+        return Stream.of(
+                Arguments.of(new Vector3i(-1, 1, 1)),
+                Arguments.of(new Vector3i(1, -1, 1)),
+                Arguments.of(new Vector3i(1, 1, -1))
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("fromCenterAndExtentsInvalidArgs")
+    public void fromCenterAndExtentsInvalid(Vector3i extents) {
+        assertThrows(IllegalArgumentException.class, () -> new BlockRegion(new Vector3i()).expand(extents));
     }
 
     private static Stream<Arguments> createEncompassingArgs() {
@@ -180,23 +225,20 @@ public class BlockRegionTest {
         Vector3i min = positions.stream().reduce(new Vector3i(Integer.MAX_VALUE), Vector3i::min);
         Vector3i max = positions.stream().reduce(new Vector3i(Integer.MIN_VALUE), Vector3i::max);
 
-        BlockRegion region = BlockRegions.encompassing(positions);
+        BlockRegion region = positions.stream().reduce(new BlockRegion(BlockRegion.INVALID), BlockRegion::union,
+                BlockRegion::union);
         assertEquals(min, region.getMin(new Vector3i()), "min of " + region);
         assertEquals(max, region.getMax(new Vector3i()), "max of " + region);
         assertEquals(expectedSize, region.getSize(new Vector3i()), "size of " + region);
     }
 
-    @Test
-    public void testRegionInvalidIfMaxLessThanMin() {
-        assertThrows(IllegalArgumentException.class,
-                () -> BlockRegions.createFromMinAndMax(new Vector3i(0, 0, 0), new Vector3i(-1, 0, 0)));
-    }
+    // -- iterable  --------------------------------------------------------------------------------------------------//
 
     @Test
     public void testIterateRegion() {
         Vector3i min = new Vector3i(2, 5, 7);
         Vector3i max = new Vector3i(10, 11, 12);
-        BlockRegion region = BlockRegions.createFromMinAndMax(min, max);
+        BlockRegion region = new BlockRegion(min, max);
 
         Set<Vector3ic> expected = Sets.newHashSet();
         for (int x = min.x; x <= max.x; ++x) {
@@ -207,7 +249,7 @@ public class BlockRegionTest {
             }
         }
 
-        for (Vector3ic pos : BlockRegions.iterableInPlace(region)) {
+        for (Vector3ic pos : region) {
             assertTrue(expected.contains(pos), "unexpected position: " + pos);
             expected.remove(pos);
         }
@@ -217,88 +259,76 @@ public class BlockRegionTest {
 
     @Test
     public void testSimpleIntersect() {
-        BlockRegion region1 = BlockRegions.createFromMinAndMax(new Vector3i(), new Vector3i(32, 32, 32));
-        BlockRegion region2 = BlockRegions.createFromMinAndMax(new Vector3i(1, 1, 1), new Vector3i(17, 17, 17));
+        BlockRegion region1 = new BlockRegion(new Vector3i(), new Vector3i(32, 32, 32));
+        BlockRegion region2 = new BlockRegion(new Vector3i(1, 1, 1), new Vector3i(17, 17, 17));
         assertEquals(region2, new BlockRegion(region1).intersect(region2).get());
     }
 
     @Test
     public void testNonTouchingIntersect() {
-        BlockRegion region1 = BlockRegions.createFromMinAndMax(new Vector3i(), new Vector3i(32, 32, 32));
-        BlockRegion region2 = BlockRegions.createFromMinAndMax(new Vector3i(103, 103, 103), new Vector3i(170, 170,
-                170));
+        BlockRegion region1 = new BlockRegion(new Vector3i(), new Vector3i(32, 32, 32));
+        BlockRegion region2 = new BlockRegion(new Vector3i(103, 103, 103), new Vector3i(170, 170, 170));
         assertEquals(Optional.empty(), new BlockRegion(region1).intersect(region2));
     }
 
     @Test
     public void testEncompasses() {
-        BlockRegion region = new BlockRegion().union(new Vector3i()).setSize(new Vector3i(1, 1, 1));
-        assertTrue(region.containsBlock(0, 0, 0));
+        BlockRegion region = new BlockRegion(0, 0, 0);
+        assertTrue(region.contains(0, 0, 0));
 
-        assertFalse(region.containsBlock(1, 0, 0));
-        assertFalse(region.containsBlock(1, 0, 1));
-        assertFalse(region.containsBlock(0, 0, 1));
-        assertFalse(region.containsBlock(-1, 0, -1));
-        assertFalse(region.containsBlock(-1, 0, 0));
-        assertFalse(region.containsBlock(-1, 0, -1));
-        assertFalse(region.containsBlock(0, 0, -1));
+        assertFalse(region.contains(1, 0, 0));
+        assertFalse(region.contains(1, 0, 1));
+        assertFalse(region.contains(0, 0, 1));
+        assertFalse(region.contains(-1, 0, -1));
+        assertFalse(region.contains(-1, 0, 0));
+        assertFalse(region.contains(-1, 0, -1));
+        assertFalse(region.contains(0, 0, -1));
 
-        assertFalse(region.containsBlock(1, 1, 0));
-        assertFalse(region.containsBlock(1, 1, 1));
-        assertFalse(region.containsBlock(0, 1, 1));
-        assertFalse(region.containsBlock(-1, 1, -1));
-        assertFalse(region.containsBlock(-1, 1, 0));
-        assertFalse(region.containsBlock(-1, 1, -1));
-        assertFalse(region.containsBlock(0, 1, -1));
+        assertFalse(region.contains(1, 1, 0));
+        assertFalse(region.contains(1, 1, 1));
+        assertFalse(region.contains(0, 1, 1));
+        assertFalse(region.contains(-1, 1, -1));
+        assertFalse(region.contains(-1, 1, 0));
+        assertFalse(region.contains(-1, 1, -1));
+        assertFalse(region.contains(0, 1, -1));
 
-        assertFalse(region.containsBlock(1, -1, 0));
-        assertFalse(region.containsBlock(1, -1, 1));
-        assertFalse(region.containsBlock(0, -1, 1));
-        assertFalse(region.containsBlock(-1, -1, -1));
-        assertFalse(region.containsBlock(-1, -1, 0));
-        assertFalse(region.containsBlock(-1, -1, -1));
-        assertFalse(region.containsBlock(0, -1, -1));
+        assertFalse(region.contains(1, -1, 0));
+        assertFalse(region.contains(1, -1, 1));
+        assertFalse(region.contains(0, -1, 1));
+        assertFalse(region.contains(-1, -1, -1));
+        assertFalse(region.contains(-1, -1, 0));
+        assertFalse(region.contains(-1, -1, -1));
+        assertFalse(region.contains(0, -1, -1));
     }
 
     private static Stream<Arguments> testCenterArgs() {
         return Stream.of(
                 Arguments.of(
-                        new BlockRegion(),
+                        BlockRegion.INVALID,
                         new Vector3f(Float.NaN)
                 ),
                 // creating from min and max
                 Arguments.of(
-                        BlockRegions.createFromMinAndMax(new Vector3i(0, 0, 0), new Vector3i(0, 0, 0)),
+                        new BlockRegion(new Vector3i(0, 0, 0), new Vector3i(0, 0, 0)),
                         new Vector3f(0f, 0f, 0f)
                 ),
                 Arguments.of(
-                        BlockRegions.createFromMinAndMax(new Vector3i(0, 0, 0), new Vector3i(1, 1, 1)),
+                        new BlockRegion(new Vector3i(0, 0, 0), new Vector3i(1, 1, 1)),
                         new Vector3f(.5f, .5f, .5f)
                 ),
                 Arguments.of(
-                        BlockRegions.createFromMinAndMax(new Vector3i(-1, -1, -1), new Vector3i(1, 1, 1)),
+                        new BlockRegion(new Vector3i(-1, -1, -1), new Vector3i(1, 1, 1)),
                         new Vector3f(0f, 0f, 0f)
                 ),
                 Arguments.of(
-                        BlockRegions.createFromMinAndMax(new Vector3i(0, 0, 0), new Vector3i(2, 2, 2)),
+                        new BlockRegion(new Vector3i(0, 0, 0), new Vector3i(2, 2, 2)),
                         new Vector3f(1f, 1f, 1f)
                 ),
                 // creating from center and extents
                 Arguments.of(
-                        BlockRegions.createFromCenterAndExtents(new Vector3f(0, 0, 0), new Vector3f(0, 0, 0)),
-                        new Vector3f(0f, 0f, 0f)
-                ),
-                Arguments.of(
-                        BlockRegions.createFromCenterAndExtents(new Vector3f(0.5f, 0.5f, 0.5f), new Vector3f(0.5f,
-                                0.5f, 0.5f)),
-                        new Vector3f(.5f, .5f, .5f)
-                ),
-                Arguments.of(
-                        BlockRegions.createFromCenterAndExtents(new Vector3f(0.49f, 0.49f, 0.49f), new Vector3f(0.5f,
-                                0.5f, 0.5f)),
+                        new BlockRegion(new Vector3i(0, 0, 0)).expand(new Vector3i(0, 0, 0)),
                         new Vector3f(0f, 0f, 0f)
                 )
-
         );
     }
 
@@ -344,12 +374,12 @@ public class BlockRegionTest {
     @ParameterizedTest
     @MethodSource("containsPointArgs")
     public void containsPointPositive(Vector3f point, boolean shouldBeContained) {
-        BlockRegion region = BlockRegions.createFromMinAndMax(0, 0, 0, 1, 1, 1);
+        BlockRegion region = new BlockRegion(0, 0, 0, 1, 1, 1);
 
         if (shouldBeContained) {
-            assertTrue(region.containsPoint(point), "point should be within region");
+            assertTrue(region.contains(point), "point should be within region");
         } else {
-            assertFalse(region.containsPoint(point), "point should not be within region");
+            assertFalse(region.contains(point), "point should not be within region");
         }
     }
 
@@ -357,16 +387,16 @@ public class BlockRegionTest {
 
     @Test
     public void testIntersectionPlane() {
-        BlockRegion a = BlockRegions.createFromMinAndMax(0, 0, 0, 1, 1, 1);
+        BlockRegion a = new BlockRegion(0, 0, 0, 1, 1, 1);
         assertTrue(a.intersectsPlane(1, 1, 1, 1));
         assertFalse(a.intersectsPlane(1, 1, 1, 2));
     }
 
     @Test
     public void testIntersectionBlockRegion() {
-        BlockRegion a = BlockRegions.createFromMinAndMax(0, 0, 0, 1, 1, 1);
-        BlockRegion b = BlockRegions.createFromMinAndMax(1, 1, 1, 4, 4, 4);
-        BlockRegion c = BlockRegions.createFromMinAndMax(3, 3, 3, 4, 4, 4);
+        BlockRegion a = new BlockRegion(0, 0, 0, 1, 1, 1);
+        BlockRegion b = new BlockRegion(1, 1, 1, 4, 4, 4);
+        BlockRegion c = new BlockRegion(3, 3, 3, 4, 4, 4);
 
         assertTrue(a.intersectsBlockRegion(b));
         assertFalse(a.intersectsBlockRegion(c));
@@ -386,13 +416,13 @@ public class BlockRegionTest {
     @ParameterizedTest
     @MethodSource
     public void testIntersectionAABB(AABBf aabb, boolean intersects) {
-        BlockRegion region = BlockRegions.createFromMinAndMax(0, 0, 0, 1, 1, 1);
+        BlockRegion region = new BlockRegion(0, 0, 0, 1, 1, 1);
         assertEquals(intersects, region.intersectsAABB(aabb));
     }
 
     @Test
     public void testIntersectionSphere() {
-        BlockRegion a = BlockRegions.createFromMinAndMax(0, 0, 0, 1, 1, 1);
+        BlockRegion a = new BlockRegion(0, 0, 0, 1, 1, 1);
         Spheref s1 = new Spheref(0, 0, 1, 2);
         Spheref s2 = new Spheref(3, 3, 3, 1);
 
@@ -404,7 +434,7 @@ public class BlockRegionTest {
 
     @Test
     public void testIntersectionRay() {
-        BlockRegion a = BlockRegions.createFromMinAndMax(0, 0, 0, 1, 1, 1);
+        BlockRegion a = new BlockRegion(0, 0, 0, 1, 1, 1);
         Rayf r1 = new Rayf(0, 0, 3, 1, 1, -2);
         Rayf r2 = new Rayf(0, 2, 2, 1, 0, 0);
 
@@ -416,7 +446,7 @@ public class BlockRegionTest {
 
     @Test
     void testIntersectionLineSegment() {
-        BlockRegion a = BlockRegions.createFromMinAndMax(0, 0, 0, 1, 1, 1);
+        BlockRegion a = new BlockRegion(0, 0, 0, 1, 1, 1);
 
         //no intersection
         assertEquals(a.intersectLineSegment(3f, 3f, 3f, 2f, 3f, 3f, new Vector2f()), -1);
@@ -442,11 +472,11 @@ public class BlockRegionTest {
     static Stream<Arguments> getBoundsArgs() {
         return Stream.of(
                 Arguments.of(
-                        BlockRegions.createFromMinAndMax(new Vector3i(1, 1, 1), new Vector3i(2, 3, 4)),
+                        new BlockRegion(new Vector3i(1, 1, 1), new Vector3i(2, 3, 4)),
                         new AABBf(.5f, .5f, .5f, 2.5f, 3.5f, 4.5f)
                 ),
                 Arguments.of(
-                        BlockRegions.createFromMinAndMax(-1, -1, -1, 1, 1, 1),
+                        new BlockRegion(-1, -1, -1, 1, 1, 1),
                         new AABBf(-1.5f, -1.5f, -1.5f, 1.5f, 1.5f, 1.5f)
                 )
         );
@@ -461,7 +491,6 @@ public class BlockRegionTest {
     static Stream<Arguments> copyRegionArgs() {
         return Stream.of(
                 Arguments.of((Function<BlockRegion, BlockRegion>) region -> new BlockRegion(region)),
-                Arguments.of((Function<BlockRegion, BlockRegion>) region -> region.copy()),
                 Arguments.of((Function<BlockRegion, BlockRegion>) region -> new BlockRegion(0, 0, 0).set(region))
         );
     }
@@ -469,9 +498,9 @@ public class BlockRegionTest {
     @ParameterizedTest
     @MethodSource("copyRegionArgs")
     void copyRegion(Function<BlockRegion, BlockRegion> copyFn) {
-        BlockRegion original = BlockRegions.encompassing(new Vector3i(1, 1, 1), new Vector3i(2, 2, 2));
+        BlockRegion original = new BlockRegion(new Vector3i(1, 1, 1), new Vector3i(2, 2, 2));
 
-        BlockRegion source = BlockRegions.encompassing(new Vector3i(1, 1, 1), new Vector3i(2, 2, 2));
+        BlockRegion source = new BlockRegion(new Vector3i(1, 1, 1), new Vector3i(2, 2, 2));
         BlockRegion copy = copyFn.apply(source);
 
         assertEquals(original, copy);
@@ -481,32 +510,7 @@ public class BlockRegionTest {
         assertEquals(new Vector3i(2, 3, 4), copy.getMax(new Vector3i()));
     }
 
-    // -- extend -----------------------------------------------------------------------------------------------------//
-
-    static Stream<Arguments> extendFloatArgs() {
-        return Stream.of(
-                Arguments.of(.1f, .1f, .1f, BlockRegions.createFromMinAndMax(new Vector3i(), new Vector3i(3, 3, 3))),
-                Arguments.of(-.1f, -.1f, -.1f, BlockRegions.createFromMinAndMax(new Vector3i(1, 1, 1), new Vector3i(2
-                        , 2, 2))),
-                Arguments.of(1f, 1f, 1f, BlockRegions.createFromMinAndMax(new Vector3i(-1, -1, -1), new Vector3i(4, 4
-                        , 4))),
-                Arguments.of(-1f, -1f, -1f, BlockRegions.createFromMinAndMax(new Vector3i(1, 1, 1), new Vector3i(2, 2
-                        , 2))),
-                Arguments.of(1.9f, 1.9f, 1.9f, BlockRegions.createFromMinAndMax(new Vector3i(-1, -1, -1),
-                        new Vector3i(4, 4, 4)))
-        );
-    }
-
-    @ParameterizedTest
-    @MethodSource("extendFloatArgs")
-    void extendFloat(float x, float y, float z, BlockRegion expected) {
-        final BlockRegion region = BlockRegions.createFromMinAndMax(new Vector3i(), new Vector3i(3, 3, 3));
-        assertEquals(expected, region.copy().extend(x, y, z));
-    }
-
-    void extend(int x, int y, int z) {
-        BlockRegion region = new BlockRegion(0, 0, 0, 1, 1, 1);
-    }
+    // -- expand -----------------------------------------------------------------------------------------------------//
 
     static Stream<Arguments> extendInvalidArgs() {
         return Stream.of(
@@ -522,8 +526,8 @@ public class BlockRegionTest {
     void extendInvalid(Vector3i extents) {
         BlockRegion region = new BlockRegion(0, 0, 0, 1, 1, 1);
 
-        assertThrows(IllegalArgumentException.class, () -> region.extend(extents));
-        assertThrows(IllegalArgumentException.class, () -> region.extend(extents.x(), extents.y(), extents.z()));
+        assertThrows(IllegalArgumentException.class, () -> region.expand(extents));
+        assertThrows(IllegalArgumentException.class, () -> region.expand(extents.x(), extents.y(), extents.z()));
     }
 
     // -- union ------------------------------------------------------------------------------------------------------//
@@ -545,7 +549,7 @@ public class BlockRegionTest {
     @MethodSource("unionArgs")
     public void union(Vector3i vec1, Vector3i vec2) {
         BlockRegion expected =
-                BlockRegions.createFromMinAndMax(new Vector3i(-2, 4, -16), new Vector3i(4, 107, 0));
+                new BlockRegion(new Vector3i(-2, 4, -16), new Vector3i(4, 107, 0));
 
         assertEquals(expected, new BlockRegion(vec1).union(vec2));
         assertEquals(expected, new BlockRegion(vec2).union(vec1));
@@ -569,25 +573,8 @@ public class BlockRegionTest {
     @ParameterizedTest
     @MethodSource("unionWithRegionArgs")
     public void unionWithRegion(BlockRegion a, BlockRegion b, BlockRegion expected) {
-        assertEquals(expected, a.copy().union(b));
-        assertEquals(expected, b.copy().union(a));
-    }
-
-    @Test
-    public void unionWithBlockEntity() {
-        Vector3i pos = new Vector3i(1, 2, 3);
-        final EntityRef entity = new PojoEntityManager().create(new BlockComponent(new Block(), pos));
-
-        BlockRegion region = new BlockRegion().union(entity);
-        assertTrue(region.containsBlock(pos));
-        assertEquals(Collections.singletonList(pos), Lists.newArrayList(BlockRegions.iterable(region)));
-    }
-
-    @Test
-    public void unionWithNonBlockEntity() {
-        final EntityRef entity = new PojoEntityManager().create();
-        BlockRegion region = new BlockRegion().union(entity);
-        assertFalse(region.isValid());
+        assertEquals(expected, new BlockRegion(a).union(b));
+        assertEquals(expected, new BlockRegion(b).union(a));
     }
 
     // -- translate --------------------------------------------------------------------------------------------------//
@@ -597,7 +584,73 @@ public class BlockRegionTest {
         BlockRegion region = new BlockRegion(0, 0, 0, 1, 1, 1);
         Vector3i translation = new Vector3i(1, 2, 3);
 
-        assertEquals(new BlockRegion(1, 2, 3, 2, 3, 4), region.copy().translate(translation));
-        assertEquals(region, region.copy().translate(translation).translate(translation.negate(new Vector3i())));
+        assertEquals(new BlockRegion(1, 2, 3, 2, 3, 4), new BlockRegion(region).translate(translation));
+        assertEquals(region,
+                new BlockRegion(region).translate(translation).translate(translation.negate(new Vector3i())));
+    }
+
+    // -- ITERABLE ---------------------------------------------------------------------------------------------------//
+
+    @Test
+    public void testSingleBlockRegion() {
+        BlockRegion region = new BlockRegion(new Vector3i(0, 0, 0), new Vector3i(0, 0, 0));
+
+        List<Vector3ic> actual = new ArrayList<>();
+        for (Vector3ic vector3ic : region) {
+            actual.add(new Vector3i(vector3ic));
+        }
+
+        Assertions.assertEquals(1, actual.size());
+        Assertions.assertEquals(new HashSet<>(expectedPositions(region)), new HashSet<>(actual));
+    }
+
+    @Test
+    public void testLineOfBlocksRegion() {
+        BlockRegion region = new BlockRegion(new Vector3i(0, 0, 0), new Vector3i(0, 1, 0));
+
+        List<Vector3ic> actual = new ArrayList<>();
+        for (Vector3ic vector3ic : region) {
+            actual.add(new Vector3i(vector3ic));
+        }
+
+        Assertions.assertEquals(2, actual.size());
+        Assertions.assertEquals(new HashSet<>(expectedPositions(region)), new HashSet<>(actual));
+    }
+
+    @Test
+    public void testPlaneOfBlocksRegion() {
+        BlockRegion region = new BlockRegion(new Vector3i(0, 0, 0), new Vector3i(0, 1, 1));
+
+        List<Vector3ic> actual = new ArrayList<>();
+        for (Vector3ic vector3ic : region) {
+            actual.add(new Vector3i(vector3ic));
+        }
+
+        Assertions.assertEquals(4, actual.size());
+        Assertions.assertEquals(new HashSet<>(expectedPositions(region)), new HashSet<>(actual));
+    }
+
+    @Test
+    public void testBoxOfBlocksRegion() {
+        BlockRegion region = new BlockRegion(new Vector3i(0, 0, 0), new Vector3i(1, 1, 1));
+        List<Vector3ic> actual = new ArrayList<>();
+        for (Vector3ic vector3ic : region) {
+            actual.add(new Vector3i(vector3ic));
+        }
+
+        Assertions.assertEquals(8, actual.size());
+        Assertions.assertEquals(new HashSet<>(expectedPositions(region)), new HashSet<>(actual));
+    }
+
+    private List<Vector3ic> expectedPositions(BlockRegion region) {
+        List<Vector3ic> result = new ArrayList<>(region.volume());
+        for (int x = region.minX(); x <= region.maxX(); x++) {
+            for (int y = region.minY(); y <= region.maxY(); y++) {
+                for (int z = region.minZ(); z <= region.maxZ(); z++) {
+                    result.add(new Vector3i(x, y, z));
+                }
+            }
+        }
+        return result;
     }
 }

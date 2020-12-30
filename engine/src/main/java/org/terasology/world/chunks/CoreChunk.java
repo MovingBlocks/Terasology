@@ -24,6 +24,7 @@ import org.terasology.math.geom.BaseVector3i;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.module.sandbox.API;
 import org.terasology.world.block.Block;
+import org.terasology.world.block.BlockRegion;
 
 /**
  * This interface describes the core of a chunk:
@@ -316,7 +317,7 @@ public interface CoreChunk {
     /**
      * @return Chunk's Region
      */
-    Region3i getRegion();
+    BlockRegion getRegion();
 
     int getEstimatedMemoryConsumptionInBytes();
 
