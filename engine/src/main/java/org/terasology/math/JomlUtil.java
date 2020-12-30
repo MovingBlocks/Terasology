@@ -52,14 +52,15 @@ public final class JomlUtil {
     private JomlUtil() {
 
     }
+
     public static org.terasology.math.geom.Matrix4f from(Matrix4fc mat) {
         if (mat == null) {
             return null;
         }
         return new org.terasology.math.geom.Matrix4f(mat.m00(), mat.m01(), mat.m02(), mat.m03(),
-            mat.m10(), mat.m11(), mat.m12(), mat.m13(),
-            mat.m20(), mat.m21(), mat.m22(), mat.m23(),
-            mat.m30(), mat.m31(), mat.m32(), mat.m33());
+                mat.m10(), mat.m11(), mat.m12(), mat.m13(),
+                mat.m20(), mat.m21(), mat.m22(), mat.m23(),
+                mat.m30(), mat.m31(), mat.m32(), mat.m33());
     }
 
     public static org.terasology.math.geom.Matrix3f from(Matrix3fc mat) {
@@ -67,8 +68,8 @@ public final class JomlUtil {
             return null;
         }
         return new org.terasology.math.geom.Matrix3f(mat.m00(), mat.m01(), mat.m02(),
-            mat.m10(), mat.m11(), mat.m12(),
-            mat.m20(), mat.m21(), mat.m22());
+                mat.m10(), mat.m11(), mat.m12(),
+                mat.m20(), mat.m21(), mat.m22());
     }
 
     public static org.joml.Matrix4f from(BaseMatrix4f mat) {
@@ -76,9 +77,9 @@ public final class JomlUtil {
             return null;
         }
         return new org.joml.Matrix4f(mat.getM00(), mat.getM01(), mat.getM02(), mat.getM03(),
-            mat.getM10(), mat.getM11(), mat.getM12(), mat.getM13(),
-            mat.getM20(), mat.getM21(), mat.getM22(), mat.getM23(),
-            mat.getM30(), mat.getM31(), mat.getM32(), mat.getM33());
+                mat.getM10(), mat.getM11(), mat.getM12(), mat.getM13(),
+                mat.getM20(), mat.getM21(), mat.getM22(), mat.getM23(),
+                mat.getM30(), mat.getM31(), mat.getM32(), mat.getM33());
     }
 
 
@@ -87,8 +88,8 @@ public final class JomlUtil {
             return null;
         }
         return new Matrix3f(mat.getM00(), mat.getM01(), mat.getM02(),
-            mat.getM10(), mat.getM11(), mat.getM12(),
-            mat.getM20(), mat.getM21(), mat.getM22());
+                mat.getM10(), mat.getM11(), mat.getM12(),
+                mat.getM20(), mat.getM21(), mat.getM22());
     }
 
     public static org.terasology.math.geom.Vector4f from(Vector4fc vec) {
@@ -179,7 +180,8 @@ public final class JomlUtil {
         if (aabb == null) {
             return null;
         }
-        return AABB.createMinMax(new Vector3f(aabb.minX, aabb.minY, aabb.minZ), new Vector3f(aabb.maxX, aabb.maxY, aabb.maxZ));
+        return AABB.createMinMax(new Vector3f(aabb.minX, aabb.minY, aabb.minZ), new Vector3f(aabb.maxX, aabb.maxY,
+                aabb.maxZ));
     }
 
     public static AABBf from(AABB aabb) {
@@ -203,15 +205,8 @@ public final class JomlUtil {
         if (aabb == null) {
             return null;
         }
-        return Region3i.createFromMinMax(JomlUtil.from(aabb.getMin(new Vector3i())), JomlUtil.from(aabb.getMax(new Vector3i())));
-    }
-
-    public static Region3i from(BlockRegion aabb) {
-        if (aabb == null) {
-            return null;
-        }
-        return Region3i.createBounded(new Vector3i(aabb.getMinX(), aabb.getMinY(), aabb.getMinZ()), new Vector3i(aabb.getMaxX(), aabb.getMaxY(),
-            aabb.getMaxZ()));
+        return Region3i.createFromMinMax(JomlUtil.from(aabb.getMin(new Vector3i())),
+                JomlUtil.from(aabb.getMax(new Vector3i())));
     }
 
     public static Rectanglei from(Rect2i rect) {
