@@ -15,15 +15,16 @@
  */
 package org.terasology.world.selection;
 
+import org.joml.RoundingMode;
+import org.joml.Vector3f;
+import org.joml.Vector3i;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.location.LocationComponent;
-import org.terasology.math.Region3i;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector3i;
+import org.terasology.world.block.BlockRegion;
 import org.terasology.world.selection.event.SetBlockSelectionEndingPointEvent;
 import org.terasology.world.selection.event.SetBlockSelectionStartingPointEvent;
 
@@ -34,10 +35,8 @@ import org.terasology.world.selection.event.SetBlockSelectionStartingPointEvent;
 @RegisterSystem(RegisterMode.AUTHORITY)
 public class BlockSelectionSystem extends BaseComponentSystem {
 
-    @ReceiveEvent(components = {LocationComponent.class})
-    public void onStartSelectionAtEntity(SetBlockSelectionStartingPointEvent event, EntityRef entity) {
-
-        LocationComponent locationComponent = entity.getComponent(LocationComponent.class);
+    @ReceiveEvent
+    public void onStartSelectionAtEntity(SetBlockSelectionStartingPointEvent event, EntityRef entity, LocationComponent locationComponent) {
         if (null == locationComponent) {
             // entity isn't LocationComponent, which shouldn't ever be the case
             return;
@@ -49,18 +48,13 @@ public class BlockSelectionSystem extends BaseComponentSystem {
             return;
         }
 
-        Vector3f worldPosition = locationComponent.getWorldPosition();
-
-        Vector3i startPosition = new Vector3i(worldPosition.x, worldPosition.y, worldPosition.z);
+        Vector3i startPosition = new Vector3i(locationComponent.getWorldPosition(new Vector3f()), RoundingMode.FLOOR);
         blockSelectionComponent.startPosition = startPosition;
-        Vector3i endPosition = startPosition;
-        blockSelectionComponent.currentSelection = Region3i.createBounded(startPosition, endPosition);
+        blockSelectionComponent.currentSelection = new BlockRegion(startPosition);
     }
 
-    @ReceiveEvent(components = {LocationComponent.class})
-    public void onEndSelectionAtEntity(SetBlockSelectionEndingPointEvent event, EntityRef entity) {
-
-        LocationComponent locationComponent = entity.getComponent(LocationComponent.class);
+    @ReceiveEvent
+    public void onEndSelectionAtEntity(SetBlockSelectionEndingPointEvent event, EntityRef entity, LocationComponent locationComponent) {
         if (null == locationComponent) {
             // entity isn't LocationComponent, which shouldn't ever be the case
             return;
@@ -72,13 +66,12 @@ public class BlockSelectionSystem extends BaseComponentSystem {
             return;
         }
 
-        Vector3f worldPosition = locationComponent.getWorldPosition();
-
-        Vector3i endPosition = new Vector3i(worldPosition.x, worldPosition.y, worldPosition.z);
+        Vector3i endPosition = new Vector3i(locationComponent.getWorldPosition(new Vector3f()), RoundingMode.FLOOR);
         Vector3i startPosition = blockSelectionComponent.startPosition;
         if (null == startPosition) {
             startPosition = endPosition;
         }
-        blockSelectionComponent.currentSelection = Region3i.createBounded(startPosition, endPosition);
+        blockSelectionComponent.currentSelection =
+            new BlockRegion(startPosition).union(endPosition);
     }
 }
