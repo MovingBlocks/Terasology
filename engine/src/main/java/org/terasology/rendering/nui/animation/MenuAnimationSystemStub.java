@@ -16,7 +16,7 @@
 
 package org.terasology.rendering.nui.animation;
 
-import org.terasology.math.geom.Rect2i;
+import org.joml.Rectanglei;
 
 /**
  * Does not do anything. The {@link #onEnd(Runnable)} method is triggered instantly.
@@ -66,7 +66,7 @@ public class MenuAnimationSystemStub implements MenuAnimationSystem {
     }
 
     @Override
-    public Rect2i animateRegion(Rect2i rc) {
+    public Rectanglei animateRegion(Rectanglei rc) {
         return rc;
     }
 }
