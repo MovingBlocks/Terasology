@@ -98,12 +98,11 @@ public class LocalPlayerBlockSelectionByItemSystem extends BaseComponentSystem {
 
         if (blockSelectionComponent.isMovable) {
             BlockRegion region = blockSelectionComponent.currentSelection;
-            blockSelectionComponent.currentSelection = new BlockRegion()
-                .union(
+            blockSelectionComponent.currentSelection = new BlockRegion(
                     Math.roundUsing(targetLocation.x, RoundingMode.FLOOR),
                     Math.roundUsing(targetLocation.y, RoundingMode.FLOOR),
                     Math.roundUsing(targetLocation.z, RoundingMode.FLOOR))
-                .addExtents(region.getSizeX() / 2, 0, region.getSizeZ() / 2);
+                .expand(region.getSizeX() / 2, 0, region.getSizeZ() / 2);
             blockSelectionComponentEntity.saveComponent(blockSelectionComponent);
 
             return;
