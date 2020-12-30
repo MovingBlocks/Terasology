@@ -576,7 +576,7 @@ public final class ChunkMath {
      * @param side the side to border
      * @param dest will hold the result
      * @return dest
-     * @deprecated use {@link BlockRegion#blockFace(Side, BlockRegion)}
+     * @deprecated use {@link BlockRegion#face(Side, BlockRegion)}
      */
     @Deprecated
     public static BlockRegion getEdgeRegion(BlockRegionc region, Side side, BlockRegion dest) {

@@ -490,8 +490,17 @@ public class BlockRegion implements BlockRegionc {
         return transform(m, this);
     }
 
-    public BlockRegion blockFace(Side side) {
-        return blockFace(side, this);
+    /**
+     * Restrict this region to a 1-width region that borders the provided {@link Side} of a region.
+     * <p>
+     * The resulting region is a subset of this region, i.e., the intersection of the face region with the source region
+     * is exactly the face region.
+     *
+     * @param side the side of the region
+     * @return this region (after modification)
+     */
+    public BlockRegion face(Side side) {
+        return face(side, this);
     }
 
     // ---------------------------------------------------------------------------------------------------------------//

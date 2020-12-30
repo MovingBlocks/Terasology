@@ -41,17 +41,17 @@ public class BlockRegionTest {
     @Test
     public void testGetEdgeRegion() {
         BlockRegion region = new BlockRegion(new Vector3i(16, 0, 16)).setSize(16, 128, 16);
-        assertEquals(new BlockRegion(16, 0, 16, 16, 127, 31), region.blockFace(Side.LEFT,
+        assertEquals(new BlockRegion(16, 0, 16, 16, 127, 31), region.face(Side.LEFT,
             new BlockRegion(BlockRegion.INVALID)));
-        assertEquals(new BlockRegion(31, 0, 16, 31, 127, 31), region.blockFace(Side.RIGHT,
+        assertEquals(new BlockRegion(31, 0, 16, 31, 127, 31), region.face(Side.RIGHT,
             new BlockRegion(BlockRegion.INVALID)));
-        assertEquals(new BlockRegion(16, 0, 16, 31, 127, 16), region.blockFace(Side.FRONT,
+        assertEquals(new BlockRegion(16, 0, 16, 31, 127, 16), region.face(Side.FRONT,
             new BlockRegion(BlockRegion.INVALID)));
-        assertEquals(new BlockRegion(16, 0, 31, 31, 127, 31), region.blockFace(Side.BACK,
+        assertEquals(new BlockRegion(16, 0, 31, 31, 127, 31), region.face(Side.BACK,
             new BlockRegion(BlockRegion.INVALID)));
-        assertEquals(new BlockRegion(16, 127, 16, 31, 127, 31), region.blockFace(Side.TOP,
+        assertEquals(new BlockRegion(16, 127, 16, 31, 127, 31), region.face(Side.TOP,
             new BlockRegion(BlockRegion.INVALID)));
-        assertEquals(new BlockRegion(16, 0, 16, 31, 0, 31), region.blockFace(Side.BOTTOM,
+        assertEquals(new BlockRegion(16, 0, 16, 31, 0, 31), region.face(Side.BOTTOM,
             new BlockRegion(BlockRegion.INVALID)));
     }
 

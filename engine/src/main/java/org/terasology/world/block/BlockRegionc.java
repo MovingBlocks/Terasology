@@ -495,14 +495,19 @@ public interface BlockRegionc extends Iterable<Vector3ic> {
      */
     BlockRegion transform(Matrix4fc m, BlockRegion dest);
 
+    // -- face -------------------------------------------------------------------------------------------------------//
+
     /**
-     * calculates a 1 width region that borders the provided {@link Side} of a region
+     * Calculates a 1 width region that borders the provided {@link Side} of a region.
+     * <p>
+     * The resulting region is a subset of this region, i.e., the intersection of the face region with the source region
+     * is exactly the face region.
      *
      * @param side the side of the region
      * @param dest will hold the result
      * @return dest
      */
-    default BlockRegion blockFace(Side side, BlockRegion dest) {
+    default BlockRegion face(Side side, BlockRegion dest) {
         switch (side) {
             case TOP:
                 return dest.set(this.minX(), this.maxY(), this.minZ(), this.maxX(), this.maxY(), this.maxZ());
@@ -520,7 +525,6 @@ public interface BlockRegionc extends Iterable<Vector3ic> {
                 return dest.set(this);
         }
     }
-
 
     // -- CHECKS -----------------------------------------------------------------------------------------------------//
 
