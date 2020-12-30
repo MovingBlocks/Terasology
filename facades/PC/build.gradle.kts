@@ -126,7 +126,7 @@ val commonConfigure : JavaExec.()-> Unit = {
 
     classpath(sourceSets["main"].runtimeClasspath)
 
-    args("-homeDir")
+    args("-homedir")
     jvmArgs("-Xmx1536m")
 
     if (isMacOS()) {
