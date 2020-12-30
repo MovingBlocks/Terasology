@@ -197,6 +197,7 @@ public class LocalChunkProvider implements ChunkProvider {
             return; // TODO move it in pipeline;
         }
         chunkCache.put(chunk.getPosition(), chunk);
+        chunk.markReady();
         //TODO, it is not clear if the activate/addedBlocks event logic is correct.
         //See https://github.com/MovingBlocks/Terasology/issues/3244
         ChunkStore store = this.storageManager.loadChunkStore(chunk.getPosition());
@@ -244,7 +245,6 @@ public class LocalChunkProvider implements ChunkProvider {
             worldEntity.send(new OnChunkGenerated(chunk.getPosition()));
         }
         worldEntity.send(new OnChunkLoaded(chunk.getPosition()));
-        chunk.markReady();
     }
 
     private void generateQueuedEntities(EntityStore store) {
