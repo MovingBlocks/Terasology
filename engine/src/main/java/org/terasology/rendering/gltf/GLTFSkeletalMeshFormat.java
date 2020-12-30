@@ -15,28 +15,27 @@
  */
 package org.terasology.rendering.gltf;
 
-import com.google.common.collect.Lists;
-import gnu.trove.iterator.TIntObjectIterator;
 import gnu.trove.list.TFloatList;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TFloatArrayList;
 import gnu.trove.list.array.TIntArrayList;
-import gnu.trove.map.TIntIntMap;
-import gnu.trove.map.TIntObjectMap;
-import gnu.trove.map.hash.TIntIntHashMap;
-import org.joml.Vector4i;
+import org.joml.Vector3f;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.format.AssetDataFile;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.assets.module.annotations.RegisterAssetFileFormat;
-import org.terasology.math.geom.*;
-import org.terasology.rendering.gltf.model.*;
 import org.terasology.rendering.assets.skeletalmesh.Bone;
 import org.terasology.rendering.assets.skeletalmesh.BoneWeight;
 import org.terasology.rendering.assets.skeletalmesh.SkeletalMeshData;
 import org.terasology.rendering.assets.skeletalmesh.SkeletalMeshDataBuilder;
+import org.terasology.rendering.gltf.model.GLTF;
+import org.terasology.rendering.gltf.model.GLTFAccessor;
+import org.terasology.rendering.gltf.model.GLTFBufferView;
+import org.terasology.rendering.gltf.model.GLTFMesh;
+import org.terasology.rendering.gltf.model.GLTFPrimitive;
+import org.terasology.rendering.gltf.model.GLTFSkin;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
