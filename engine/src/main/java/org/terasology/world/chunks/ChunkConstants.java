@@ -22,9 +22,13 @@ import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.module.sandbox.API;
 
+
 /**
+ * @deprecated This method is scheduled for removal in an upcoming version.
+ *             Use the JOML implementation instead: {@link org.terasology.world.chunks.Chunks}.
  */
 @API
+@Deprecated
 public final class ChunkConstants {
     public static final int SIZE_X = 32;
     public static final int SIZE_Y = 64;
