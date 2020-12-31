@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ *
  */
 public class SkeletalMeshDataBuilder {
 
@@ -38,7 +39,6 @@ public class SkeletalMeshDataBuilder {
     private List<Vector3f> vertices = new ArrayList<>();
     private List<Vector3f> normals = new ArrayList<>();
     private TIntList indices = new TIntArrayList();
-    private MeshBuilder.TextureMapper textureMapper;
 
     public SkeletalMeshDataBuilder() {
 
@@ -70,13 +70,6 @@ public class SkeletalMeshDataBuilder {
         return addMesh(bone, builder.getMeshData());
     }
 
-    public SkeletalMeshDataBuilder addBox(Bone bone, Vector3f offset, Vector3f size, float u, float v) {
-        MeshBuilder meshBuilder = new MeshBuilder();
-        meshBuilder.setTextureMapper(textureMapper);
-        meshBuilder.addBox(JomlUtil.from(offset), JomlUtil.from(size), u, v);
-        return addMesh(bone, meshBuilder);
-    }
-
     public SkeletalMeshDataBuilder addMesh(Bone bone, MeshData data) {
         TFloatList meshVertices = data.getVertices();
         TIntList meshIndices = data.getIndices();
@@ -99,10 +92,6 @@ public class SkeletalMeshDataBuilder {
             indices.add(meshIndices.get(i) + weightsStart);
         }
         return this;
-    }
-
-    public void setTextureMapper(MeshBuilder.TextureMapper textureMapper) {
-        this.textureMapper = textureMapper;
     }
 
     public void setUvs(List<Vector2f> uvs) {

@@ -209,7 +209,7 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
     @Test
     public void testPlayerRelevanceLocationSurvivesStorage() {
         Vector3f loc = new Vector3f(1, 2, 3);
-        character.addComponent(new LocationComponent(JomlUtil.from(loc)));
+        character.addComponent(new LocationComponent(loc));
 
         esm.waitForCompletionOfPreviousSaveAndStartSaving();
         esm.finishSavingAndShutdown();
