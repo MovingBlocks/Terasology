@@ -80,13 +80,13 @@ public class RemoteChunkProvider implements ChunkProvider {
                                 .collect(Collectors.toSet())
                 ))
                 .addStage(ChunkTaskProvider.create("", chunk -> {
-                    listener.onChunkReady(chunk.getPosition());
-                    worldEntity.send(new OnChunkLoaded(chunk.getPosition()));
                     Chunk oldChunk = chunkCache.put(chunk.getPosition(), chunk);
                     if (oldChunk != null) {
                         oldChunk.dispose();
                     }
                     chunk.markReady();
+                    listener.onChunkReady(chunk.getPosition());
+                    worldEntity.send(new OnChunkLoaded(chunk.getPosition()));
                 }));
 
         ChunkMonitor.fireChunkProviderInitialized(this);
