@@ -29,8 +29,10 @@ import java.math.RoundingMode;
 
 /**
  * Collection of math functions.
- *
+ * @deprecated This class is scheduled for removal in an upcoming version.
+ *             Use the JOML implementation instead: {@link org.terasology.world.chunks.Chunks}.
  */
+@Deprecated
 public final class ChunkMath {
 
     private ChunkMath() {
@@ -487,7 +489,11 @@ public final class ChunkMath {
      * @param pos the world position
      * @param extent the extent
      * @return chunk region
+     * @deprecated This is scheduled for removal in an upcoming version
+     *             method will be replaced with JOML implementation {@link org.terasology.world.chunks.Chunks#toChunkRegion(BlockRegion, BlockRegion)}.
+     *
      */
+    @Deprecated
     public static BlockRegion getChunkRegionAroundWorldPos(Vector3ic pos, int extent) {
         org.joml.Vector3i temp = new org.joml.Vector3i();
         org.joml.Vector3i minChunk = calcChunkPos(temp.set(pos).add(-extent, -extent, -extent), new org.joml.Vector3i());
@@ -570,7 +576,9 @@ public final class ChunkMath {
      * @param side the side to border
      * @param dest will hold the result
      * @return dest
+     * @deprecated use {@link BlockRegion#face(Side, BlockRegion)}
      */
+    @Deprecated
     public static BlockRegion getEdgeRegion(BlockRegionc region, Side side, BlockRegion dest) {
         switch (side) {
             case TOP:

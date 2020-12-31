@@ -15,11 +15,11 @@
  */
 package org.terasology.world.selection;
 
+import org.joml.Vector3i;
 import org.terasology.entitySystem.Component;
-import org.terasology.math.Region3i;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.module.sandbox.API;
 import org.terasology.rendering.assets.texture.Texture;
+import org.terasology.world.block.BlockRegion;
 
 /**
  *         <br><br>
@@ -43,7 +43,7 @@ public class BlockSelectionComponent implements Component {
      * when the starting point is set, then represents the region between the starting
      * and ending points after the ending point is set.
      */
-    public Region3i currentSelection;
+    public BlockRegion currentSelection;
 
     /**
      * If true, block selection will be drawn

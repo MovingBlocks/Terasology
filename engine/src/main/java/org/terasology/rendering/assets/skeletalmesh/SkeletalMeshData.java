@@ -20,12 +20,11 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
+import org.joml.Matrix4f;
+import org.joml.Vector2f;
+import org.joml.Vector3f;
 import org.terasology.assets.AssetData;
 import org.terasology.math.AABB;
-import org.terasology.math.geom.Matrix4f;
-import org.terasology.math.geom.Quat4f;
-import org.terasology.math.geom.Vector2f;
-import org.terasology.math.geom.Vector3f;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -47,7 +46,8 @@ public class SkeletalMeshData implements AssetData {
     private TIntList indices = new TIntArrayList();
     private AABB staticAABB;
 
-    public SkeletalMeshData(List<Bone> bones, List<Vector3f> vertices, List<Vector3f> normals, List<BoneWeight> weights, List<Vector2f> uvs, TIntList indices, AABB staticAABB) {
+    public SkeletalMeshData(List<Bone> bones, List<Vector3f> vertices, List<Vector3f> normals,
+                            List<BoneWeight> weights, List<Vector2f> uvs, TIntList indices, AABB staticAABB) {
         for (Bone bone : bones) {
             boneLookup.put(bone.getName(), bone);
             if (bone.getParent() == null) {
@@ -102,7 +102,9 @@ public class SkeletalMeshData implements AssetData {
     }
 
     /**
-     * Provides the positions of all vertices of the mesh, transformed based on the transformation matrices of all bones
+     * Provides the positions of all vertices of the mesh, transformed based on the transformation matrices of all
+     * bones
+     *
      * @param boneTransforms A transformation matrix for each bone in the skeletal mesh
      * @return The positions of each vertex
      */
@@ -110,14 +112,14 @@ public class SkeletalMeshData implements AssetData {
         List<Vector3f> results = Lists.newArrayListWithCapacity(getVertexCount());
         for (int i = 0; i < vertices.size(); i++) {
             Vector3f pos = new Vector3f(vertices.get(i));
-            Matrix4f skinMat = new Matrix4f();
+            Matrix4f skinMat = new Matrix4f().m00(0).m11(0).m22(0).m33(0);
             BoneWeight weight = weights.get(i);
             for (int w = 0; w < weight.jointCount(); w++) {
                 Matrix4f jointMat = new Matrix4f(boneTransforms.get(weight.getJoint(w)));
-                jointMat.mul(weight.getBias(w));
+                jointMat.scale(weight.getBias(w));
                 skinMat.add(jointMat);
             }
-            skinMat.transformPoint(pos);
+            pos.mulTransposePosition(skinMat);
             results.add(pos);
         }
         return results;
@@ -125,6 +127,7 @@ public class SkeletalMeshData implements AssetData {
 
     /**
      * Provides the normals of all vertices of the mesh, transformed based on the transformation matrices of all bones
+     *
      * @param boneTransforms A transformation matrix for each bone in the skeletal mesh
      * @return The normals of each vertex
      */
@@ -132,14 +135,14 @@ public class SkeletalMeshData implements AssetData {
         List<Vector3f> results = Lists.newArrayListWithCapacity(getVertexCount());
         for (int i = 0; i < normals.size(); i++) {
             Vector3f norm = new Vector3f(normals.get(i));
-            Matrix4f skinMat = new Matrix4f();
+            Matrix4f skinMat = new Matrix4f().m00(0).m11(0).m22(0).m33(0);
             BoneWeight weight = weights.get(i);
             for (int w = 0; w < weight.jointCount(); w++) {
                 Matrix4f jointMat = new Matrix4f(boneTransforms.get(weight.getJoint(w)));
-                jointMat.mul(weight.getBias(w));
+                jointMat.scale(weight.getBias(w));
                 skinMat.add(jointMat);
             }
-            skinMat.transformVector(norm);
+            norm.mulTransposePosition(skinMat);
             results.add(norm);
         }
         return results;
@@ -193,11 +196,11 @@ public class SkeletalMeshData implements AssetData {
         Vector3f norm = new Vector3f();
         for (int i = 0; i < indices.size() / 3; ++i) {
             Vector3f baseVert = vertices.get(indices.get(i * 3));
-            v1.sub(vertices.get(indices.get(i * 3 + 1)), baseVert);
-            v2.sub(vertices.get(indices.get(i * 3 + 2)), baseVert);
+            vertices.get(indices.get(i * 3 + 1)).sub(baseVert, v1);
+            vertices.get(indices.get(i * 3 + 2)).sub(baseVert, v2);
             v1.normalize();
             v2.normalize();
-            norm.cross(v1, v2);
+            v2.cross(v1, norm);
             normals.get(indices.get(i * 3)).add(norm);
             normals.get(indices.get(i * 3 + 1)).add(norm);
             normals.get(indices.get(i * 3 + 2)).add(norm);
