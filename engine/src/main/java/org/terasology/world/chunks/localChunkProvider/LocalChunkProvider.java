@@ -10,6 +10,7 @@ import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.map.TShortObjectMap;
 import gnu.trove.map.hash.TShortObjectHashMap;
+import org.joml.Vector3ic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.Component;
@@ -468,6 +469,11 @@ public class LocalChunkProvider implements ChunkProvider {
     @Override
     public boolean isChunkReady(Vector3i pos) {
         return isChunkReady(chunkCache.get(pos));
+    }
+
+    @Override
+    public boolean isChunkReady(Vector3ic pos) {
+        return isChunkReady(chunkCache.get(JomlUtil.from(pos)));
     }
 
     private boolean isChunkReady(Chunk chunk) {

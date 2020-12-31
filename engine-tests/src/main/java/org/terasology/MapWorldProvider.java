@@ -26,6 +26,7 @@ import org.terasology.world.WorldChangeListener;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.BlockRegion;
+import org.terasology.world.block.BlockRegionc;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.blockdata.ExtraBlockDataManager;
 import org.terasology.world.chunks.internal.ChunkImpl;
@@ -84,6 +85,11 @@ public class MapWorldProvider implements WorldProviderCore {
 
     @Override
     public boolean isRegionRelevant(Region3i region) {
+        return false;
+    }
+
+    @Override
+    public boolean isRegionRelevant(BlockRegionc region) {
         return false;
     }
 
