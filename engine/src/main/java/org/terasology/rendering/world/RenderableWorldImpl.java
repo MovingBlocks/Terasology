@@ -199,12 +199,12 @@ class RenderableWorldImpl implements RenderableWorld {
     public boolean updateChunksInProximity(BlockRegion newRenderableRegion) {
         if (!newRenderableRegion.equals(renderableRegion)) {
             RenderableChunk chunk;
-            for (Vector3ic toRemove : renderableRegion) {
-                if (!newRenderableRegion.contains(toRemove)) {
+            for (Vector3ic chunkPositionToRemove : renderableRegion) {
+                if (!newRenderableRegion.contains(chunkPositionToRemove)) {
                     Iterator<RenderableChunk> nearbyChunks = chunksInProximityOfCamera.iterator();
                     for (Iterator<RenderableChunk> it = nearbyChunks; it.hasNext(); ) {
                         chunk = it.next();
-                        if (chunk.getPosition(new org.joml.Vector3i()).equals(toRemove)) {
+                        if (chunk.getPosition(new org.joml.Vector3i()).equals(chunkPositionToRemove)) {
                             chunk.disposeMesh();
                             nearbyChunks.remove();
                             break;
@@ -214,9 +214,9 @@ class RenderableWorldImpl implements RenderableWorld {
                 }
             }
             boolean chunksHaveBeenAdded = false;
-            for (Vector3ic toAdd : newRenderableRegion) {
-                if (!renderableRegion.contains(toAdd)) {
-                    chunk = chunkProvider.getChunk(JomlUtil.from(toAdd));
+            for (Vector3ic chunkPositionToAdd : newRenderableRegion) {
+                if (!renderableRegion.contains(chunkPositionToAdd)) {
+                    chunk = chunkProvider.getChunk(JomlUtil.from(chunkPositionToAdd));
                     if (chunk != null) {
                         chunksInProximityOfCamera.add(chunk);
                         chunksHaveBeenAdded = true;
