@@ -194,6 +194,7 @@ public final class JomlUtil {
         if (aabb == null) {
             return null;
         }
+        //TODO: is this conversion correct, or is it off by one (max incl. vs max excl.)
         return new BlockRegion(aabb.minX(), aabb.minY(), aabb.minZ(), aabb.maxX(), aabb.maxY(), aabb.maxZ());
     }
 

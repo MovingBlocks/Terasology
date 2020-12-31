@@ -202,7 +202,7 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
 
     @Override
     public void onDraw(Canvas canvas) {
-        Rectanglei region = JomlUtil.from(animationSystem.animateRegion(JomlUtil.from(canvas.getRegion())));
+        Rectanglei region = animationSystem.animateRegion(canvas.getRegion());
         if (isModal()) {
             canvas.addInteractionRegion(getScreenListener(), region);
         }

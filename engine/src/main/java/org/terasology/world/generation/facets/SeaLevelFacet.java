@@ -15,7 +15,7 @@
  */
 package org.terasology.world.generation.facets;
 
-import org.terasology.math.Region3i;
+import org.terasology.world.block.BlockRegion;
 import org.terasology.world.generation.Border3D;
 import org.terasology.world.generation.facets.base.BaseFacet2D;
 
@@ -26,7 +26,7 @@ public class SeaLevelFacet extends BaseFacet2D {
 
     int seaLevel;
 
-    public SeaLevelFacet(Region3i targetRegion, Border3D border) {
+    public SeaLevelFacet(BlockRegion targetRegion, Border3D border) {
         super(targetRegion, border);
     }
 
