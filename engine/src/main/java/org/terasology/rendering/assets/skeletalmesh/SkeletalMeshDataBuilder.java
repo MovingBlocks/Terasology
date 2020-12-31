@@ -21,8 +21,7 @@ import gnu.trove.list.array.TIntArrayList;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.terasology.math.AABB;
-import org.terasology.math.geom.Vector2f;
-import org.terasology.math.geom.Vector3f;
+import org.terasology.math.JomlUtil;
 import org.terasology.rendering.assets.mesh.MeshBuilder;
 import org.terasology.rendering.assets.mesh.MeshData;
 
@@ -30,6 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ *
  */
 public class SkeletalMeshDataBuilder {
 
