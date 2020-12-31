@@ -18,6 +18,8 @@ package org.terasology.rendering.assets.skeletalmesh;
 import gnu.trove.list.TFloatList;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
+import org.joml.Vector2f;
+import org.joml.Vector3f;
 import org.terasology.math.AABB;
 import org.terasology.math.geom.Vector2f;
 import org.terasology.math.geom.Vector3f;
@@ -122,7 +124,7 @@ public class SkeletalMeshDataBuilder {
         } else if (rootBones > 1) {
             throw new IllegalStateException("Cannot create a skeleton with multiple root bones");
         }
-        AABB staticAabb = AABB.createMinMax(minOfAABB, maxOfAABB);
+        AABB staticAabb = AABB.createMinMax(JomlUtil.from(minOfAABB), JomlUtil.from(maxOfAABB));
         return new SkeletalMeshData(bones, vertices, normals, weights, uvs, indices, staticAabb);
     }
 
