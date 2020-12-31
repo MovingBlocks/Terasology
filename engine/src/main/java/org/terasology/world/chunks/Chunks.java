@@ -118,6 +118,21 @@ public final class Chunks {
 
     /**
      * The position of the chunk given the coordinate and size of chunk in powers of 2.
+     * This uses the default power ({@link #POWER_X}, {@link #POWER_Y}, {@link #POWER_Z})
+     *
+     * <p>default chunk size ({@link #SIZE_X}, {@link #SIZE_Y}, {@link #SIZE_Z}) </p>
+     *
+     * @param pos absolute coordinate of the block
+     * @param dest will hold the result
+     * @return dest
+     */
+    public static Vector3i toChunkPos(Vector3ic pos, Vector3i dest) {
+        return toChunkPos(pos.x(), pos.y(), pos.z(), POWER_X, POWER_Y, POWER_Z, dest);
+    }
+
+
+    /**
+     * The position of the chunk given the coordinate and size of chunk in powers of 2.
      *
      * <p>Chunk size is in powers of 2 (2, 4, 8, 16, ...)</p>
      *
