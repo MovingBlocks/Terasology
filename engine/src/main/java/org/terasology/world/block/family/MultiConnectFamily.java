@@ -191,7 +191,7 @@ public abstract class MultiConnectFamily extends AbstractBlockFamily implements 
      */
     @Override
     public Block getBlockForPlacement(Vector3i location, Side attachmentSide, Side direction) {
-        BlockPlacementData data = new BlockPlacementData(JomlUtil.from(location), null, new Vector3f());
+        BlockPlacementData data = new BlockPlacementData(JomlUtil.from(location), attachmentSide, new Vector3f());
         return getBlockForPlacement(data);
     }
 

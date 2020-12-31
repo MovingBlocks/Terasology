@@ -19,6 +19,7 @@ import com.google.common.base.Preconditions;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.terasology.world.block.BlockRegion;
+import org.terasology.world.block.BlockRegionc;
 import org.terasology.world.generation.Border3D;
 
 /**
@@ -27,7 +28,7 @@ public abstract class BaseFieldFacet3D extends BaseFacet3D implements FieldFacet
 
     private float[] data;
 
-    public BaseFieldFacet3D(BlockRegion targetRegion, Border3D border) {
+    public BaseFieldFacet3D(BlockRegionc targetRegion, Border3D border) {
         super(targetRegion, border);
         this.data = new float[getRelativeRegion().volume()];
     }
