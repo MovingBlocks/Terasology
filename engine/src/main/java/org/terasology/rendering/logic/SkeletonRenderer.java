@@ -199,12 +199,12 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
             }
             LocationComponent boneLoc = boneEntity.getComponent(LocationComponent.class);
             if (boneLoc != null) {
-                Vector3f newPos = JomlUtil.from(frameA.getPosition(i)).lerp(JomlUtil.from(frameB.getPosition(i)), interpolationVal, new Vector3f());
+                Vector3f newPos = frameA.getPosition(i).lerp(frameB.getPosition(i), interpolationVal, new Vector3f());
                 boneLoc.setLocalPosition(newPos);
-                Quaternionf newRot = JomlUtil.from(frameA.getRotation(i)).slerp(JomlUtil.from(frameB.getRotation(i)), interpolationVal, new Quaternionf());
+                Quaternionf newRot = frameA.getRotation(i).slerp(frameB.getRotation(i), interpolationVal, new Quaternionf());
                 newRot.normalize();
                 boneLoc.setLocalRotation(newRot);
-                boneLoc.setLocalScale(JomlUtil.from(frameA.getBoneScale(i)).lerp(JomlUtil.from(frameB.getBoneScale(i)), interpolationVal, new Vector3f()).x);
+                boneLoc.setLocalScale(frameA.getBoneScale(i).lerp(frameB.getBoneScale(i), interpolationVal, new Vector3f()).x);
                 boneEntity.saveComponent(boneLoc);
             }
         }
@@ -272,7 +272,7 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
             modelViewMatrix.get(tempMatrixBuffer44);
             skeletalMesh.material.setMatrix4("worldViewMatrix", tempMatrixBuffer44, true);
 
-            modelViewMatrix.get3x3(new Matrix3f()).invert().get(tempMatrixBuffer33);
+            modelViewMatrix.normal(new Matrix3f()).get(tempMatrixBuffer33);
             skeletalMesh.material.setMatrix3("normalMatrix", tempMatrixBuffer33, true);
 
             skeletalMesh.material.setFloat("sunlight", worldRenderer.getMainLightIntensityAt(JomlUtil.from(worldPos)), true);
@@ -288,8 +288,8 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
                 if (boneLocation != null) {
                     Matrix4f boneTransform = new Matrix4f();
                     boneLocation.getRelativeTransform(boneTransform, entity);
-                    boneTransform.mul(JomlUtil.from(bone.getInverseBindMatrix()).transpose());
-                    boneTransforms[bone.getIndex()] = boneTransform;
+                    boneTransform.mul(bone.getInverseBindMatrix());
+                    boneTransforms[bone.getIndex()] = boneTransform.transpose();
                 } else {
                     logger.warn("Unable to resolve bone \"{}\"", bone.getName());
                     boneTransforms[bone.getIndex()] = new Matrix4f();
@@ -297,11 +297,7 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
                 }
             }
             ((OpenGLSkeletalMesh) skeletalMesh.mesh).setScaleTranslate(skeletalMesh.scale, skeletalMesh.translate);
-            ((OpenGLSkeletalMesh) skeletalMesh.mesh).render(Arrays.stream(boneTransforms).map(k -> {
-                org.terasology.math.geom.Matrix4f t = JomlUtil.from(k);
-                t.transpose();
-                return t;
-            }).collect(Collectors.toList()));
+            ((OpenGLSkeletalMesh) skeletalMesh.mesh).render(Arrays.asList(boneTransforms));
         }
     }
 

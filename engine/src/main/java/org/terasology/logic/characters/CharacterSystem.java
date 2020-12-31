@@ -17,6 +17,7 @@
 package org.terasology.logic.characters;
 
 import com.google.common.collect.Sets;
+import org.joml.Vector3f;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.Time;
@@ -48,8 +49,6 @@ import org.terasology.logic.health.EngineDamageTypes;
 import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.PlayerCharacterComponent;
-import org.terasology.math.JomlUtil;
-import org.terasology.math.geom.Vector3f;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkSystem;
 import org.terasology.physics.CollisionGroup;
@@ -434,9 +433,8 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
 
     private boolean isDistanceToLarge(LocationComponent characterLocation, LocationComponent targetLocation, float maxInteractionRange) {
         float maxInteractionRangeSquared = maxInteractionRange * maxInteractionRange;
-        Vector3f positionDelta = new Vector3f();
-        positionDelta.add(characterLocation.getWorldPosition());
-        positionDelta.sub(targetLocation.getWorldPosition());
+        Vector3f positionDelta = characterLocation.getWorldPosition(new Vector3f());
+        positionDelta.sub(targetLocation.getWorldPosition(new Vector3f()));
         float interactionRangeSquared = positionDelta.lengthSquared();
         // add a small epsilon to have rounding mistakes be in favor of the player:
         float epsilon = 0.00001f;
