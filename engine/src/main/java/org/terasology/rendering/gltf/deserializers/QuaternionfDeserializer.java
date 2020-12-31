@@ -21,21 +21,21 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
 import gnu.trove.list.TFloatList;
 import gnu.trove.list.array.TFloatArrayList;
-import org.terasology.math.geom.Quat4f;
+import org.joml.Quaternionf;
 
 import java.lang.reflect.Type;
 
 /**
  * Json deserializer for an Quat4f.
  */
-public class Quat4fDeserializer implements JsonDeserializer<Quat4f> {
+public class QuaternionfDeserializer implements JsonDeserializer<Quaternionf> {
     @Override
-    public Quat4f deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+    public Quaternionf deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
         TFloatList result = new TFloatArrayList();
         json.getAsJsonArray().forEach(x -> result.add(x.getAsFloat()));
         if (result.size() != 4) {
             throw new JsonParseException("Incorrect number of values for ImmutableQuat4f - expected 4");
         }
-        return new Quat4f(result.get(0), result.get(1), result.get(2), result.get(3));
+        return new Quaternionf(result.get(0), result.get(1), result.get(2), result.get(3));
     }
 }
