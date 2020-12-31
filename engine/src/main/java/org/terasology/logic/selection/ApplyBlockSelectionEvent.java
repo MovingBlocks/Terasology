@@ -19,6 +19,7 @@ import org.terasology.module.sandbox.API;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.Event;
 import org.terasology.math.Region3i;
+import org.terasology.world.block.BlockRegion;
 
 /**
  * This event is fired once a player finished a selection using an item with a BlockSelectionComponent. The item used
@@ -27,15 +28,15 @@ import org.terasology.math.Region3i;
  */
 @API
 public class ApplyBlockSelectionEvent implements Event {
-    private final Region3i selection;
+    private final BlockRegion selection;
     private final EntityRef selectedItemEntity;
 
-    public ApplyBlockSelectionEvent(EntityRef selectedItemEntity, Region3i selection) {
+    public ApplyBlockSelectionEvent(EntityRef selectedItemEntity, BlockRegion selection) {
         this.selectedItemEntity = selectedItemEntity;
         this.selection = selection;
     }
 
-    public Region3i getSelection() {
+    public BlockRegion getSelection() {
         return selection;
     }
 
