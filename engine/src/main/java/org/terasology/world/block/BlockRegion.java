@@ -8,6 +8,7 @@ import org.joml.Matrix4fc;
 import org.joml.RoundingMode;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
+import org.terasology.math.Side;
 
 import java.util.Iterator;
 import java.util.Optional;
@@ -487,6 +488,19 @@ public class BlockRegion implements BlockRegionc {
 
     public BlockRegion transform(Matrix4fc m) {
         return transform(m, this);
+    }
+
+    /**
+     * Restrict this region to a 1-width region that borders the provided {@link Side} of a region.
+     * <p>
+     * The resulting region is a subset of this region, i.e., the intersection of the face region with the source region
+     * is exactly the face region.
+     *
+     * @param side the side of the region
+     * @return this region (after modification)
+     */
+    public BlockRegion face(Side side) {
+        return face(side, this);
     }
 
     // ---------------------------------------------------------------------------------------------------------------//

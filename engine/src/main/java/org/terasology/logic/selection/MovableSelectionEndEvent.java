@@ -18,6 +18,7 @@ package org.terasology.logic.selection;
 import org.terasology.module.sandbox.API;
 import org.terasology.entitySystem.event.Event;
 import org.terasology.math.Region3i;
+import org.terasology.world.block.BlockRegion;
 
 /**
  * This event is sent when the player finalizes the position of a moving selection by clicking the left mouse button.
@@ -29,13 +30,13 @@ public class MovableSelectionEndEvent implements Event {
     /**
      * The final position of the selected region
      */
-    private Region3i finalRegion;
+    private BlockRegion finalRegion;
 
-    public MovableSelectionEndEvent(Region3i selectedRegion) {
+    public MovableSelectionEndEvent(BlockRegion selectedRegion) {
         this.finalRegion = selectedRegion;
     }
 
-    public Region3i getFinalRegion() {
+    public BlockRegion getFinalRegion() {
         return this.finalRegion;
     }
 }
