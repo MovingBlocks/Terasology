@@ -31,8 +31,7 @@ public abstract class BaseBooleanFieldFacet2D extends BaseFacet2D implements Boo
 
     public BaseBooleanFieldFacet2D(BlockRegion targetRegion, Border3D border) {
         super(targetRegion, border);
-        Vector2i size = getRelativeRegion().size();
-        data = new boolean[size.x * size.y];
+        data = new boolean[getRelativeRegion().getSizeX() * getRelativeRegion().getSizeY()];
     }
 
     @Override

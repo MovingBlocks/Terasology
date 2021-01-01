@@ -18,7 +18,8 @@ package org.terasology.world.generation.facets.base;
 import org.joml.Vector2i;
 import org.joml.Vector2ic;
 import org.joml.Vector3i;
-import org.terasology.math.geom.Rect2i;
+import org.terasology.world.block.BlockArea;
+import org.terasology.world.block.BlockAreac;
 import org.terasology.world.block.BlockRegion;
 import org.terasology.world.generation.Border3D;
 import org.terasology.world.generation.WorldFacet2D;
@@ -27,8 +28,8 @@ import org.terasology.world.generation.WorldFacet2D;
  * A base class for sparse (map-based) 2D facets.
  */
 public abstract class BaseSparseFacet2D implements WorldFacet2D {
-    private Rect2i worldRegion;
-    private Rect2i relativeRegion;
+    private BlockAreac worldRegion;
+    private BlockAreac relativeRegion;
 
     public BaseSparseFacet2D(BlockRegion targetRegion, Border3D border) {
         worldRegion = border.expandTo2D(targetRegion);
@@ -36,12 +37,12 @@ public abstract class BaseSparseFacet2D implements WorldFacet2D {
     }
 
     @Override
-    public Rect2i getWorldRegion() {
+    public BlockAreac getWorldRegion() {
         return worldRegion;
     }
 
     @Override
-    public Rect2i getRelativeRegion() {
+    public BlockAreac getRelativeRegion() {
         return relativeRegion;
     }
 
@@ -50,10 +51,10 @@ public abstract class BaseSparseFacet2D implements WorldFacet2D {
                 y - getWorldRegion().minY() + getRelativeRegion().minY());
     }
 
-    protected void validateCoord(int x, int y, Rect2i region) {
-        if(!region.contains(x, y)) {
+    protected void validateCoord(int x, int y, BlockAreac area) {
+        if(!area.contains(x, y)) {
             String text = "Out of bounds: (%d, %d) for region %s";
-            String msg = String.format(text, x, y, region.toString());
+            String msg = String.format(text, x, y, area.toString());
             throw new IllegalArgumentException(msg);
         }
     }

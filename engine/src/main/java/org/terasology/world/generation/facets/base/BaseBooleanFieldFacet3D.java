@@ -29,8 +29,8 @@ public abstract class BaseBooleanFieldFacet3D extends BaseFacet3D implements Boo
 
     public BaseBooleanFieldFacet3D(BlockRegion targetRegion, Border3D border) {
         super(targetRegion, border);
-        Vector3i size = getRelativeRegion().getSize(new Vector3i());
-        data = new boolean[size.x * size.y * size.z];
+        data =
+            new boolean[getRelativeRegion().getSizeX() * getRelativeRegion().getSizeY() * getRelativeRegion().getSizeZ()];
     }
 
     @Override
@@ -81,5 +81,4 @@ public abstract class BaseBooleanFieldFacet3D extends BaseFacet3D implements Boo
         Preconditions.checkArgument(newData.length == data.length);
         System.arraycopy(newData, 0, data, 0, newData.length);
     }
-
 }
