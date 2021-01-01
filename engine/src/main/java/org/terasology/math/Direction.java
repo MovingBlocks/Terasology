@@ -3,6 +3,7 @@
 package org.terasology.math;
 
 import com.google.common.collect.Maps;
+import org.joml.Math;
 import org.joml.Vector3fc;
 import org.joml.Vector3ic;
 import org.terasology.math.geom.Vector3f;
@@ -51,11 +52,11 @@ public enum Direction {
     }
 
     public static Direction inDirection(int x, int y, int z) {
-        if (TeraMath.fastAbs(x) > TeraMath.fastAbs(y)) {
-            if (TeraMath.fastAbs(x) > TeraMath.fastAbs(z)) {
+        if (Math.abs(x) > Math.abs(y)) {
+            if (Math.abs(x) > Math.abs(z)) {
                 return (x > 0) ? LEFT : RIGHT;
             }
-        } else if (TeraMath.fastAbs(y) > TeraMath.fastAbs(z)) {
+        } else if (Math.abs(y) > Math.abs(z)) {
             return (y > 0) ? UP : DOWN;
         }
         return (z > 0) ? FORWARD : BACKWARD;
@@ -89,11 +90,11 @@ public enum Direction {
      * @return Side enum with the appropriate direction
      */
     public static Direction inDirection(float x, float y, float z) {
-        if (TeraMath.fastAbs(x) > TeraMath.fastAbs(y)) {
-            if (TeraMath.fastAbs(x) > TeraMath.fastAbs(z)) {
+        if (Math.abs(x) > Math.abs(y)) {
+            if (Math.abs(x) > Math.abs(z)) {
                 return (x > 0) ? LEFT : RIGHT;
             }
-        } else if (TeraMath.fastAbs(y) > TeraMath.fastAbs(z)) {
+        } else if (Math.abs(y) > Math.abs(z)) {
             return (y > 0) ? UP : DOWN;
         }
         return (z > 0) ? FORWARD : BACKWARD;
@@ -107,7 +108,7 @@ public enum Direction {
      * @return Side enum with the appropriate direction
      */
     public static Direction inHorizontalDirection(float x, float z) {
-        if (TeraMath.fastAbs(x) > TeraMath.fastAbs(z)) {
+        if (Math.abs(x) > Math.abs(z)) {
             return (x > 0) ? LEFT : RIGHT;
         }
         return (z > 0) ? FORWARD : BACKWARD;
