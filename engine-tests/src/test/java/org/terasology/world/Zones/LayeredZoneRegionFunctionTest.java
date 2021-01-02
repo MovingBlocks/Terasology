@@ -67,7 +67,7 @@ public class LayeredZoneRegionFunctionTest {
                     ElevationFacet facet = new ElevationFacet(generatingRegion.getRegion(),
                             generatingRegion.getBorderForFacet(ElevationFacet.class));
 
-                    for (Vector2ic pos : facet.getRelativeRegion()) {
+                    for (Vector2ic pos : facet.getRelativeArea()) {
                         facet.set(pos, 100);
                     }
 

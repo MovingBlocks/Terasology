@@ -38,12 +38,12 @@ public class BaseFacet2D implements WorldFacet2D {
     }
 
     @Override
-    public final BlockAreac getWorldRegion() {
+    public final BlockAreac getWorldArea() {
         return worldRegion;
     }
 
     @Override
-    public final BlockAreac getRelativeRegion() {
+    public final BlockAreac getRelativeArea() {
         return relativeRegion;
     }
 

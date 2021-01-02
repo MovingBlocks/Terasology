@@ -30,7 +30,7 @@ public abstract class BaseObjectFacet2D<T> extends BaseFacet2D implements Object
 
     public BaseObjectFacet2D(BlockRegion targetRegion, Border3D border, Class<T> objectType) {
         super(targetRegion, border);
-        this.data = (T[]) Array.newInstance(objectType, getRelativeRegion().getSizeX() * getRelativeRegion().getSizeY());
+        this.data = (T[]) Array.newInstance(objectType, getRelativeArea().area());
     }
 
     @Override

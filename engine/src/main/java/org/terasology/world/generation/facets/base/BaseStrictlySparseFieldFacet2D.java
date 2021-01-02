@@ -38,13 +38,13 @@ public abstract class BaseStrictlySparseFieldFacet2D extends BaseSparseFacet2D {
     }
 
     public Optional<Float> get(Vector2ic pos) {
-        validateCoord(pos.x(), pos.y(), getRelativeRegion());
+        validateCoord(pos.x(), pos.y(), getRelativeArea());
 
         return Optional.ofNullable(data.getOrDefault(pos, null));
     }
 
     public Optional<Float> getWorld(int x, int y) {
-        validateCoord(x, y, getWorldRegion());
+        validateCoord(x, y, getWorldArea());
 
         return Optional.ofNullable(data.getOrDefault(worldToRelative(x, y), null));
     }
@@ -58,13 +58,13 @@ public abstract class BaseStrictlySparseFieldFacet2D extends BaseSparseFacet2D {
     }
 
     public void set(Vector2ic pos, float value) {
-        validateCoord(pos.x(), pos.y(), getRelativeRegion());
+        validateCoord(pos.x(), pos.y(), getRelativeArea());
 
         data.put(pos, value);
     }
 
     public void setWorld(int x, int y, float value) {
-        validateCoord(x, y, getWorldRegion());
+        validateCoord(x, y, getWorldArea());
 
         data.put(worldToRelative(x, y), value);
     }
@@ -78,13 +78,13 @@ public abstract class BaseStrictlySparseFieldFacet2D extends BaseSparseFacet2D {
     }
 
     public void unset(Vector2ic pos) {
-        validateCoord(pos.x(), pos.y(), getRelativeRegion());
+        validateCoord(pos.x(), pos.y(), getRelativeArea());
 
         data.remove(pos);
     }
 
     public void unsetWorld(int x, int y) {
-        validateCoord(x, y, getWorldRegion());
+        validateCoord(x, y, getWorldArea());
 
         data.remove(worldToRelative(x, y));
     }

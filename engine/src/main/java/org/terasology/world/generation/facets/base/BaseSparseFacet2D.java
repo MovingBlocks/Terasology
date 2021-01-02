@@ -37,18 +37,18 @@ public abstract class BaseSparseFacet2D implements WorldFacet2D {
     }
 
     @Override
-    public BlockAreac getWorldRegion() {
+    public BlockAreac getWorldArea() {
         return worldRegion;
     }
 
     @Override
-    public BlockAreac getRelativeRegion() {
+    public BlockAreac getRelativeArea() {
         return relativeRegion;
     }
 
     protected Vector2ic worldToRelative(int x, int y) {
-        return new Vector2i(x - getWorldRegion().minX() + getRelativeRegion().minX(),
-                y - getWorldRegion().minY() + getRelativeRegion().minY());
+        return new Vector2i(x - getWorldArea().minX() + getRelativeArea().minX(),
+                y - getWorldArea().minY() + getRelativeArea().minY());
     }
 
     protected void validateCoord(int x, int y, BlockAreac area) {
