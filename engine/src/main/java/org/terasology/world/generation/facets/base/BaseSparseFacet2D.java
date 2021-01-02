@@ -18,7 +18,6 @@ package org.terasology.world.generation.facets.base;
 import org.joml.Vector2i;
 import org.joml.Vector2ic;
 import org.joml.Vector3i;
-import org.terasology.world.block.BlockArea;
 import org.terasology.world.block.BlockAreac;
 import org.terasology.world.block.BlockRegion;
 import org.terasology.world.generation.Border3D;
@@ -28,22 +27,22 @@ import org.terasology.world.generation.WorldFacet2D;
  * A base class for sparse (map-based) 2D facets.
  */
 public abstract class BaseSparseFacet2D implements WorldFacet2D {
-    private BlockAreac worldRegion;
-    private BlockAreac relativeRegion;
+    private BlockAreac worldArea;
+    private BlockAreac relativeArea;
 
     public BaseSparseFacet2D(BlockRegion targetRegion, Border3D border) {
-        worldRegion = border.expandTo2D(targetRegion);
-        relativeRegion = border.expandTo2D(targetRegion.getSize(new Vector3i()));
+        worldArea = border.expandTo2D(targetRegion);
+        relativeArea = border.expandTo2D(targetRegion.getSize(new Vector3i()));
     }
 
     @Override
     public BlockAreac getWorldArea() {
-        return worldRegion;
+        return worldArea;
     }
 
     @Override
     public BlockAreac getRelativeArea() {
-        return relativeRegion;
+        return relativeArea;
     }
 
     protected Vector2ic worldToRelative(int x, int y) {
