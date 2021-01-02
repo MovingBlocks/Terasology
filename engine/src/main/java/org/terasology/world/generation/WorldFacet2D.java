@@ -24,7 +24,7 @@ public interface WorldFacet2D extends WorldFacet {
     /**
      * @return The region of the world covered by this facet
      */
-    BlockAreac getWorldRegion();
+    BlockAreac getWorldArea();
 
     /**
      * @return The region covered by this facet, relative to the target region
