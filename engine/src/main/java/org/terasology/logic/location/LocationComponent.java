@@ -66,7 +66,16 @@ public final class LocationComponent implements Component, ReplicationCheck {
     public LocationComponent() {
     }
 
+    /**
+     * @deprecated This is scheduled for removal in an upcoming version method will be replaced with JOML implementation
+     *     {@link #LocationComponent(Vector3fc)}.
+     */
+    @Deprecated
     public LocationComponent(Vector3f position) {
+        setLocalPosition(position);
+    }
+
+    public LocationComponent(Vector3fc position) {
         setLocalPosition(position);
     }
 

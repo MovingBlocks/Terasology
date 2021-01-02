@@ -128,7 +128,7 @@ fun JavaExec.commonConfigure() {
     classpath(sourceSets["main"].runtimeClasspath)
 
     args("-homedir")
-    jvmArgs("-Xmx1536m")
+    jvmArgs("-Xmx3072m")
 
     if (isMacOS()) {
         args("-noSplash")
