@@ -6,6 +6,7 @@ package org.terasology.world.chunks.remoteChunkProvider;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
+import org.joml.Vector3ic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -80,13 +81,13 @@ public class RemoteChunkProvider implements ChunkProvider {
                                 .collect(Collectors.toSet())
                 ))
                 .addStage(ChunkTaskProvider.create("", chunk -> {
-                    listener.onChunkReady(chunk.getPosition());
-                    worldEntity.send(new OnChunkLoaded(chunk.getPosition()));
                     Chunk oldChunk = chunkCache.put(chunk.getPosition(), chunk);
                     if (oldChunk != null) {
                         oldChunk.dispose();
                     }
                     chunk.markReady();
+                    listener.onChunkReady(chunk.getPosition());
+                    worldEntity.send(new OnChunkLoaded(chunk.getPosition()));
                 }));
 
         ChunkMonitor.fireChunkProviderInitialized(this);
@@ -146,6 +147,12 @@ public class RemoteChunkProvider implements ChunkProvider {
     @Override
     public boolean isChunkReady(Vector3i pos) {
         Chunk chunk = chunkCache.get(pos);
+        return chunk != null && chunk.isReady();
+    }
+
+    @Override
+    public boolean isChunkReady(Vector3ic pos) {
+        Chunk chunk = chunkCache.get(JomlUtil.from(pos));
         return chunk != null && chunk.isReady();
     }
 

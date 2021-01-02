@@ -16,6 +16,7 @@
 package org.terasology.world.propagation;
 
 import com.google.common.collect.Maps;
+import org.joml.Vector3ic;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.terasology.TerasologyTestingEnvironment;
@@ -250,6 +251,11 @@ public class BetweenChunkPropagationTest extends TerasologyTestingEnvironment {
 
         @Override
         public boolean isChunkReady(Vector3i pos) {
+            return false;
+        }
+
+        @Override
+        public boolean isChunkReady(Vector3ic pos) {
             return false;
         }
 
