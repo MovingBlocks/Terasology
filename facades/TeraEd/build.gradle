@@ -26,8 +26,6 @@ sourceSets {
 dependencies {
     implementation project(':engine')
     implementation group: 'org.reflections', name: 'reflections', version: '0.9.10'
-
-    runtimeOnly(platform(project(":modules")))
 }
 
 application {

@@ -190,10 +190,14 @@ def terasologyModules() {
 }
 
 // Helpers that do magic things after having dependencies attached below
+task moduleClasses
 task moduleJars
 
 // This magically makes everything work - without this the desired module projects returned have no tasks :-(
 gradle.projectsEvaluated {
+    // Note how "classes" may indirectly trigger "jar" for module dependencies of modules (module compile dependency)
+    moduleClasses.dependsOn(terasologyModules().classes)
+
     // This makes it work for a full jar task
     moduleJars.dependsOn(terasologyModules().jar)
 }
