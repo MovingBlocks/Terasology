@@ -102,6 +102,12 @@ public class BehaviorSystem extends BaseComponentSystem implements UpdateSubscri
         Iterable<EntityRef> entities = entityManager.getEntitiesWith(BehaviorComponent.class);
         for (EntityRef entity : entities) {
             BehaviorComponent behaviorComponent = entity.getComponent(BehaviorComponent.class);
+            // NPE observed in the past, suspected to be about loss of behavior state. Hopefully one skip is OK then resume next tick?
+            // TODO: Highlight this log entry to the telemetry system to gather better data over time
+            if (behaviorComponent.interpreter == null) {
+                logger.warn("Found a null interpreter during tick updates, skipping for entity {}", entity);
+                continue;
+            }
             behaviorComponent.interpreter.tick(delta);
         }
     }
