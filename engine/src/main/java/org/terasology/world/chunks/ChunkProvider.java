@@ -44,14 +44,9 @@ public interface ChunkProvider {
     void setWorldEntity(EntityRef entity);
 
     /**
-     * Finish adding any pending chunks
-     */
-    void completeUpdate();
-
-    /**
      * Updates the near cache based on the movement of the caching entities
      */
-    void beginUpdate();
+    void update();
 
     /**
      * @param pos the chunk coordinates

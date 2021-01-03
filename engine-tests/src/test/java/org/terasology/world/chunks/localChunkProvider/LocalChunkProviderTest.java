@@ -256,7 +256,7 @@ class LocalChunkProviderTest {
                             .filter((e) -> e instanceof BeforeDeactivateBlocks)
                             .map((e) -> (BeforeDeactivateBlocks) e)
                             .findFirst().isPresent()) {
-                        chunkProvider.beginUpdate();
+                        chunkProvider.update();
                         blockEventCaptor = ArgumentCaptor.forClass(Event.class);
                         verify(blockAtBlockManager.getEntity(), atLeast(1)).send(blockEventCaptor.capture());
 
