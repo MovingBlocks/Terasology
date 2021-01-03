@@ -186,7 +186,7 @@ public final class Chunks {
      * @param dest will hold the result
      * @return dest
      */
-    public static BlockRegion toChunkRegion(BlockRegion region, int chunkX, int chunkY, int chunkZ, BlockRegion dest) {
+    public static BlockRegion toChunkRegion(BlockRegionc region, int chunkX, int chunkY, int chunkZ, BlockRegion dest) {
         return dest.
             set(toChunkPos(region.minX(), chunkX), toChunkPos(region.minY(), chunkY), toChunkPos(region.minZ(), chunkZ),
                 toChunkPos(region.maxX(), chunkX), toChunkPos(region.maxY(), chunkY), toChunkPos(region.maxZ(), chunkZ));
@@ -213,7 +213,7 @@ public final class Chunks {
      * @param dest will hold the result
      * @return dest
      */
-    public static BlockRegion toChunkRegion(BlockRegion region, BlockRegion dest) {
+    public static BlockRegion toChunkRegion(BlockRegionc region, BlockRegion dest) {
         return toChunkRegion(region, Chunks.POWER_X, Chunks.POWER_Y, Chunks.POWER_Z, dest);
     }
 
