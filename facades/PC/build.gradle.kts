@@ -1,4 +1,4 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
 // The PC facade is responsible for the primary distribution - a plain Java application runnable on PCs
@@ -87,6 +87,9 @@ dependencies {
     // TODO: Consider whether we can move the CR dependency back here from the engine, where it is referenced from the main menu
     implementation(group = "org.terasology.crashreporter", name = "cr-terasology", version = "4.1.0")
 
+    // Make sure any local module builds are up-to-date and have their dependencies by declaring
+    // a runtime dependency on whatever the `:modules` subproject declares.
+    // This won't add anything if there are no modules checked out.
     runtimeOnly(platform(project(":modules")))
 }
 
@@ -126,7 +129,7 @@ fun JavaExec.commonConfigure() {
     classpath(sourceSets["main"].runtimeClasspath)
 
     args("-homedir")
-    jvmArgs("-Xmx1536m")
+    jvmArgs("-Xmx3072m")
 
     if (isMacOS()) {
         args("-noSplash")
