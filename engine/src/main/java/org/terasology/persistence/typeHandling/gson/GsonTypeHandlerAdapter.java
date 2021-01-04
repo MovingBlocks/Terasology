@@ -20,18 +20,13 @@
 package org.terasology.persistence.typeHandling.gson;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonSerializationContext;
-import com.google.gson.JsonSerializer;
 import com.google.gson.TypeAdapter;
 import com.google.gson.internal.Streams;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import org.terasology.persistence.typeHandling.TypeHandler;
-import org.terasology.utilities.ReflectionUtil;
 
 import java.io.IOException;
 
@@ -48,24 +43,10 @@ import java.io.IOException;
 public final class GsonTypeHandlerAdapter<T> extends TypeAdapter<T> {
 
     private final TypeHandler<T> typeHandler;
-    private final JsonSerializer<T> serializer;
-    private final JsonDeserializer<T> deserializer;
-    private final Gson gson;
-    private final TypeToken<T> typeToken;
 
     GsonTypeHandlerAdapter(TypeHandler<T> typeHandler,
                            Gson gson, TypeToken<T> typeToken) {
         this.typeHandler = typeHandler;
-
-        this.serializer = (src, typeOfSrc, context) ->
-                ((GsonPersistedData) typeHandler.serialize(src, new GsonPersistedDataSerializer()))
-                .getElement();
-
-        this.deserializer = (json, typeOfT, context) ->
-                typeHandler.deserializeOrNull(new GsonPersistedData(json));
-
-        this.gson = gson;
-        this.typeToken = typeToken;
     }
 
     @Override
@@ -74,8 +55,7 @@ public final class GsonTypeHandlerAdapter<T> extends TypeAdapter<T> {
         if (value.isJsonNull()) {
             return null;
         }
-
-        return deserializer.deserialize(value, typeToken.getType(), (JsonDeserializationContext) ReflectionUtil.readField(gson, "deserializationContext"));
+        return this.typeHandler.deserializeOrNull(new GsonPersistedData(value));
     }
 
     @Override
@@ -84,7 +64,7 @@ public final class GsonTypeHandlerAdapter<T> extends TypeAdapter<T> {
             out.nullValue();
             return;
         }
-        JsonElement tree = serializer.serialize(value, typeToken.getType(), (JsonSerializationContext) ReflectionUtil.readField(gson, "serializationContext"));
+        JsonElement tree = ((GsonPersistedData) typeHandler.serialize(value, new GsonPersistedDataSerializer())).getElement();
         Streams.write(tree, out);
     }
 }

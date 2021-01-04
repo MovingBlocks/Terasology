@@ -15,6 +15,8 @@
  */
 package org.terasology.logic.characters;
 
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.engine.modes.loadProcesses.AwaitedLocalCharacterSpawnEvent;
 import org.terasology.entitySystem.entity.EntityBuilder;
@@ -32,8 +34,6 @@ import org.terasology.logic.characters.events.CreateVisualCharacterEvent;
 import org.terasology.logic.location.Location;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.LocalPlayer;
-import org.terasology.math.geom.Quat4f;
-import org.terasology.math.geom.Vector3f;
 import org.terasology.registry.In;
 
 /**
@@ -85,7 +85,7 @@ public class VisualCharacterSystem extends BaseComponentSystem {
         characterEntity.send(event);
         EntityBuilder entityBuilder = event.getVisualCharacterBuilder();
         EntityRef visualCharacterEntity = createAndAttachVisualEntityStrategy.createAndAttachVisualEntity(entityBuilder,
-                characterEntity);
+            characterEntity);
 
         visualCharacterComponent.visualCharacter = visualCharacterEntity;
         characterEntity.saveComponent(visualCharacterComponent);
@@ -97,7 +97,7 @@ public class VisualCharacterSystem extends BaseComponentSystem {
         entityBuilder.addOrSaveComponent(new LocationComponent());
         EntityRef visualCharacterEntity = entityBuilder.build();
 
-        Location.attachChild(characterEntity, visualCharacterEntity, new Vector3f(), new Quat4f(0, 0, 0, 1));
+        Location.attachChild(characterEntity, visualCharacterEntity, new Vector3f(), new Quaternionf());
         return visualCharacterEntity;
     }
 
@@ -106,15 +106,15 @@ public class VisualCharacterSystem extends BaseComponentSystem {
     }
 
     /**
-     * Handles the local character spawn  event by doing the work that had to be delayed till then:
-     * The CreateVisualCharacterEvent events that could not be sent previously will be sent.
-     * (They could not be sent earlier as we need to know if the character belongs to the local player or not
-     * which can't be determined if the created/loaded character has not been linked to the player yet)
+     * Handles the local character spawn  event by doing the work that had to be delayed till then: The
+     * CreateVisualCharacterEvent events that could not be sent previously will be sent. (They could not be sent earlier
+     * as we need to know if the character belongs to the local player or not which can't be determined if the
+     * created/loaded character has not been linked to the player yet)
      */
     @ReceiveEvent
     public void onAwaitedLocalCharacterSpawnEvent(AwaitedLocalCharacterSpawnEvent event, EntityRef entity) {
         awaitedLocalCharacterSpawn = true;
-        for (EntityRef character: entityManager.getEntitiesWith(VisualCharacterComponent.class)) {
+        for (EntityRef character : entityManager.getEntitiesWith(VisualCharacterComponent.class)) {
             createVisualCharacterIfNotOwnCharacter(character, character.getComponent(VisualCharacterComponent.class));
         }
     }
