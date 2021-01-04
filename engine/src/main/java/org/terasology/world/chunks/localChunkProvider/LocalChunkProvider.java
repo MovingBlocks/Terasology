@@ -92,6 +92,7 @@ public class LocalChunkProvider implements ChunkProvider {
     private static final Logger logger = LoggerFactory.getLogger(LocalChunkProvider.class);
     private static final int UNLOAD_PER_FRAME = 64;
     private final EntityManager entityManager;
+    private final BlockingQueue<Chunk> readyChunks = Queues.newLinkedBlockingQueue();
     private final BlockingQueue<TShortObjectMap<TIntList>> deactivateBlocksQueue = Queues.newLinkedBlockingQueue();
     private final Map<Vector3i, Chunk> chunkCache;
 
@@ -188,11 +189,6 @@ public class LocalChunkProvider implements ChunkProvider {
     }
 
 
-    @Override
-    public void completeUpdate() {
-        //TODO remove this.
-    }
-
     private void processReadyChunk(final Chunk chunk) {
         if (chunkCache.get(chunk.getPosition()) != null) {
             return; // TODO move it in pipeline;
@@ -262,9 +258,13 @@ public class LocalChunkProvider implements ChunkProvider {
     }
 
     @Override
-    public void beginUpdate() {
+    public void update() {
         deactivateBlocks();
         checkForUnload();
+        Chunk chunk;
+        while ((chunk = readyChunks.poll()) != null) {
+            processReadyChunk(chunk);
+        }
     }
 
     private void deactivateBlocks() {
@@ -454,7 +454,7 @@ public class LocalChunkProvider implements ChunkProvider {
                                 .map(org.joml.Vector3i::new)
                                 .collect(Collectors.toSet())
                 ))
-                .addStage(ChunkTaskProvider.create("Chunk ready", this::processReadyChunk));
+                .addStage(ChunkTaskProvider.create("Chunk ready", readyChunks::add));
         unloadRequestTaskMaster = TaskMaster.createFIFOTaskMaster("Chunk-Unloader", 8);
         ChunkMonitor.fireChunkProviderInitialized(this);
 
@@ -497,6 +497,6 @@ public class LocalChunkProvider implements ChunkProvider {
                                 .map(org.joml.Vector3i::new)
                                 .collect(Collectors.toCollection(Sets::newLinkedHashSet))
                 ))
-                .addStage(ChunkTaskProvider.create("Chunk ready", this::processReadyChunk));
+                .addStage(ChunkTaskProvider.create("Chunk ready", readyChunks::add));
     }
 }
