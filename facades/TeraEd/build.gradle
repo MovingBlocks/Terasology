@@ -26,6 +26,8 @@ sourceSets {
 dependencies {
     implementation project(':engine')
     implementation group: 'org.reflections', name: 'reflections', version: '0.9.10'
+
+    runtimeOnly(platform(project(":modules")))
 }
 
 application {
@@ -46,7 +48,6 @@ task editor(type:JavaExec) {
 
     // Dependencies: natives + all modules & the PC facade itself (which will trigger the engine)
     dependsOn rootProject.extractNatives
-    dependsOn rootProject.moduleClasses
     dependsOn classes
 
     // Run arguments
