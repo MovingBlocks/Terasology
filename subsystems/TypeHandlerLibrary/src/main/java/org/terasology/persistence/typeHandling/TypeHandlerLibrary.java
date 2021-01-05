@@ -23,7 +23,7 @@ import org.terasology.persistence.typeHandling.coreTypes.factories.ArrayTypeHand
 import org.terasology.persistence.typeHandling.coreTypes.factories.CollectionTypeHandlerFactory;
 import org.terasology.persistence.typeHandling.coreTypes.factories.EnumTypeHandlerFactory;
 import org.terasology.persistence.typeHandling.coreTypes.factories.ObjectFieldMapTypeHandlerFactory;
-import org.terasology.persistence.typeHandling.coreTypes.factories.StringMapTypeHandlerFactory;
+import org.terasology.persistence.typeHandling.coreTypes.factories.MapTypeHandlerFactory;
 import org.terasology.persistence.typeHandling.reflection.ReflectionsSandbox;
 import org.terasology.persistence.typeHandling.reflection.SerializationSandbox;
 import org.terasology.reflection.TypeInfo;
@@ -105,7 +105,7 @@ public class TypeHandlerLibrary {
         typeHandlerLibrary.addTypeHandler(byte[].class, new ByteArrayTypeHandler());
 
         typeHandlerLibrary.addTypeHandlerFactory(new EnumTypeHandlerFactory());
-        typeHandlerLibrary.addTypeHandlerFactory(new StringMapTypeHandlerFactory());
+        typeHandlerLibrary.addTypeHandlerFactory(new MapTypeHandlerFactory());
     }
 
     /**
