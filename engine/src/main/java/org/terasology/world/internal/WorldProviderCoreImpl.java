@@ -20,8 +20,11 @@ import org.terasology.math.geom.Vector3i;
 import org.terasology.world.WorldChangeListener;
 import org.terasology.world.WorldComponent;
 import org.terasology.world.block.Block;
+import org.terasology.world.block.BlockRegion;
+import org.terasology.world.block.BlockRegionc;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkProvider;
+import org.terasology.world.chunks.Chunks;
 import org.terasology.world.chunks.CoreChunk;
 import org.terasology.world.chunks.LitChunk;
 import org.terasology.world.chunks.ManagedChunk;
@@ -162,6 +165,16 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
     @Override
     public boolean isRegionRelevant(Region3i region) {
         for (Vector3i chunkPos : ChunkMath.calcChunkPos(region)) {
+            if (!chunkProvider.isChunkReady(chunkPos)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public boolean isRegionRelevant(BlockRegionc region) {
+        for (Vector3ic chunkPos : Chunks.toChunkRegion(region, new BlockRegion(BlockRegion.INVALID))) {
             if (!chunkProvider.isChunkReady(chunkPos)) {
                 return false;
             }
@@ -350,9 +363,9 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
     }
 
     @Override
-    public Collection<Region3i> getRelevantRegions() {
+    public Collection<BlockRegion> getRelevantRegions() {
         Collection<Chunk> chunks = chunkProvider.getAllChunks();
-        Function<Chunk, Region3i> mapping = CoreChunk::getRegion;
+        Function<Chunk, BlockRegion> mapping = CoreChunk::getRegion;
 
         Predicate<Chunk> isReady = ManagedChunk::isReady;
 
