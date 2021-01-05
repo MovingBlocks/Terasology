@@ -251,12 +251,12 @@ public final class WorldRendererImpl implements WorldRenderer {
 
     @Override
     public void onChunkLoaded(Vector3i pos) {
-        renderableWorld.onChunkLoaded(pos);
+        renderableWorld.onChunkLoaded(JomlUtil.from(pos));
     }
 
     @Override
     public void onChunkUnloaded(Vector3i pos) {
-        renderableWorld.onChunkUnloaded(pos);
+        renderableWorld.onChunkUnloaded(JomlUtil.from(pos));
     }
 
     @Override

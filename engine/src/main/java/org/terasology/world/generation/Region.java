@@ -15,7 +15,7 @@
  */
 package org.terasology.world.generation;
 
-import org.terasology.math.Region3i;
+import org.terasology.world.block.BlockRegion;
 
 /**
  */
@@ -23,5 +23,5 @@ public interface Region {
 
     <T extends WorldFacet> T getFacet(Class<T> dataType);
 
-    Region3i getRegion();
+    BlockRegion getRegion();
 }

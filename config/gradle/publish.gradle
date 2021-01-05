@@ -1,18 +1,5 @@
-/*
- * Copyright 2020 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 
 // This include file applies maven-publish related settings to places that need them (root project + modules)
 // It is a superset of the the stuff common to Java sub projects so we include the common.gradle here
@@ -21,6 +8,53 @@ apply from: "$rootDir/config/gradle/common.gradle"
 apply plugin: 'maven-publish'
 
 publishing {
+    repositories {
+        maven {
+            name = 'TerasologyOrg'
+
+            if (rootProject.hasProperty("publishRepo")) {
+                // This first option is good for local testing, you can set a full explicit target repo in gradle.properties
+                url = "http://artifactory.terasology.org/artifactory/$publishRepo"
+                allowInsecureProtocol true // 😱
+                logger.info("Changing PUBLISH repoKey set via Gradle property to {}", publishRepo)
+            } else {
+                // Support override from the environment to use a different target publish org
+                String deducedPublishRepo = System.getenv()["PUBLISH_ORG"]
+                if (deducedPublishRepo == null || deducedPublishRepo == "") {
+                    // If not then default
+                    deducedPublishRepo = "terasology"
+                }
+
+                afterEvaluate {
+                    // depends on project.version, so must be delayed until project is configured
+                    if (!project.version || project.version == "unspecified") {
+                        throw new GradleException("Project ${project} does not have a version set yet: ${project.version}")
+                    }
+
+                    if (project.version.toString().endsWith("-SNAPSHOT")) {
+                        deducedPublishRepo += "-snapshot-local"
+                    } else {
+                        deducedPublishRepo += "-release-local"
+                    }
+
+                    logger.info("The final deduced publish repo is {}", deducedPublishRepo)
+                    url = "http://artifactory.terasology.org/artifactory/$deducedPublishRepo"
+                    allowInsecureProtocol true
+                }
+            }
+
+            if (rootProject.hasProperty("mavenUser") && rootProject.hasProperty("mavenPass")) {
+                credentials {
+                    username = "$mavenUser"
+                    password = "$mavenPass"
+                }
+                authentication {
+                    basic(BasicAuthentication)
+                }
+            }
+        }
+    }
+
     publications {
         "$project.name"(MavenPublication) {
             // Without this we get a .pom with no dependencies
@@ -28,57 +62,6 @@ publishing {
 
             artifact source: sourceJar, classifier: 'sources'
             artifact source: javadocJar, classifier: 'javadoc'
-
-            repositories {
-                maven {
-                    name = 'TerasologyOrg'
-
-                    if (rootProject.hasProperty("publishRepo")) {
-                        // This first option is good for local testing, you can set a full explicit target repo in gradle.properties
-                        url = "http://artifactory.terasology.org/artifactory/$publishRepo"
-                        allowInsecureProtocol true // 😱
-                        logger.info("Changing PUBLISH repoKey set via Gradle property to {}", publishRepo)
-                    } else {
-                        // Support override from the environment to use a different target publish org
-                        String deducedPublishRepo = System.getenv()["PUBLISH_ORG"]
-                        if (deducedPublishRepo == null || deducedPublishRepo == "") {
-                            // If not then default
-                            deducedPublishRepo = "terasology"
-                        }
-
-                        // Check the active Git branch and some module logic to see whether we're doing a release or snapshot
-                        String gitBranch = System.getenv()["BRANCH_NAME"]
-                        if (isMaster(gitBranch) && !shouldBypassModuleRelease()) {
-                            deducedPublishRepo += "-release-local"
-                        } else {
-                            deducedPublishRepo += "-snapshot-local"
-                        }
-
-                        logger.info("The final deduced publish repo is {}", deducedPublishRepo)
-                        url = "http://artifactory.terasology.org/artifactory/$deducedPublishRepo"
-                        allowInsecureProtocol true
-                    }
-
-                    if (rootProject.hasProperty("mavenUser") && rootProject.hasProperty("mavenPass")) {
-                        credentials {
-                            username = "$mavenUser"
-                            password = "$mavenPass"
-                        }
-                        authentication {
-                            basic(BasicAuthentication)
-                        }
-                    }
-                }
-            }
         }
     }
-}
-
-static def isMaster(gitBranch) {
-    return gitBranch != null && gitBranch.equals("master");
-}
-
-// Mildly awkward: Modules aren't ready globally to accept master branch == release, so make it opt-in by checking a prop that defaults to bypass
-def shouldBypassModuleRelease() {
-    return project.hasProperty("bypassModuleReleaseManagement") && bypassModuleReleaseManagement == "true";
 }

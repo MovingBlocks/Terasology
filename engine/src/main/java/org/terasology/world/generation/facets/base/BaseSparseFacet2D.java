@@ -15,10 +15,11 @@
  */
 package org.terasology.world.generation.facets.base;
 
-import org.terasology.math.Region3i;
-import org.terasology.math.geom.BaseVector2i;
+import org.joml.Vector2i;
+import org.joml.Vector2ic;
+import org.joml.Vector3i;
 import org.terasology.math.geom.Rect2i;
-import org.terasology.math.geom.Vector2i;
+import org.terasology.world.block.BlockRegion;
 import org.terasology.world.generation.Border3D;
 import org.terasology.world.generation.WorldFacet2D;
 
@@ -29,9 +30,9 @@ public abstract class BaseSparseFacet2D implements WorldFacet2D {
     private Rect2i worldRegion;
     private Rect2i relativeRegion;
 
-    public BaseSparseFacet2D(Region3i targetRegion, Border3D border) {
+    public BaseSparseFacet2D(BlockRegion targetRegion, Border3D border) {
         worldRegion = border.expandTo2D(targetRegion);
-        relativeRegion = border.expandTo2D(targetRegion.size());
+        relativeRegion = border.expandTo2D(targetRegion.getSize(new Vector3i()));
     }
 
     @Override
@@ -44,7 +45,7 @@ public abstract class BaseSparseFacet2D implements WorldFacet2D {
         return relativeRegion;
     }
 
-    protected BaseVector2i worldToRelative(int x, int y) {
+    protected Vector2ic worldToRelative(int x, int y) {
         return new Vector2i(x - getWorldRegion().minX() + getRelativeRegion().minX(),
                 y - getWorldRegion().minY() + getRelativeRegion().minY());
     }
