@@ -15,6 +15,9 @@ import java.util.stream.Collectors;
 
 public class GenericMapTypeHandler<K, V> extends TypeHandler<Map<K, V>> {
 
+    private static final String KEY = "key";
+    private static final String VALUE = "value";
+
     private final TypeHandler<K> keyHandler;
     private final TypeHandler<V> valueHandler;
 
@@ -35,12 +38,12 @@ public class GenericMapTypeHandler<K, V> extends TypeHandler<Map<K, V>> {
         PersistedData key = keyHandler.serialize(entry.getKey(), serializer);
         PersistedData value = valueHandler.serialize(entry.getValue(), serializer);
 
-        Map<String, PersistedData> jsonEntry = Maps.newLinkedHashMap();
+        Map<String, PersistedData> result = Maps.newLinkedHashMap();
         if (!key.isNull()) {
-            jsonEntry.put("_key", key);
-            jsonEntry.put("_value", value);
+            result.put(KEY, key);
+            result.put(VALUE, value);
         }
-        return serializer.serialize(jsonEntry);
+        return serializer.serialize(result);
     }
 
     @Override
@@ -52,8 +55,8 @@ public class GenericMapTypeHandler<K, V> extends TypeHandler<Map<K, V>> {
         Map<K, V> result = Maps.newLinkedHashMap();
 
         for (PersistedData entry : data.getAsArray()) {
-            final Optional<K> key = keyHandler.deserialize(entry.getAsValueMap().get("_key"));
-            final Optional<V> value = valueHandler.deserialize(entry.getAsValueMap().get("_value"));
+            final Optional<K> key = keyHandler.deserialize(entry.getAsValueMap().get(KEY));
+            final Optional<V> value = valueHandler.deserialize(entry.getAsValueMap().get(VALUE));
 
             key.ifPresent(k -> result.put(k, value.orElse(null)));
         }
