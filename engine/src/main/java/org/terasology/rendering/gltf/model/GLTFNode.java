@@ -17,7 +17,9 @@ package org.terasology.rendering.gltf.model;
 
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
-import org.terasology.math.geom.*;
+import org.joml.Matrix4f;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 
 import javax.annotation.Nullable;
 
@@ -33,7 +35,7 @@ public class GLTFNode {
     private Integer skin;
     private Matrix4f matrix;
     private Integer mesh;
-    private Quat4f rotation;
+    private Quaternionf rotation;
     private Vector3f scale;
     private Vector3f translation;
     private TIntList weights = new TIntArrayList();
@@ -70,7 +72,7 @@ public class GLTFNode {
     /**
      * @return The rotation of this node
      */
-    public Quat4f getRotation() {
+    public Quaternionf getRotation() {
         return rotation;
     }
 

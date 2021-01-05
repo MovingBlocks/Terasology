@@ -37,7 +37,7 @@ public class RectangleiTypeHandler extends TypeHandler<Rectanglei> {
             PersistedDataMap map = data.getAsValueMap();
 
             PersistedDataArray minDataArr = map.get(MIN_FIELD).getAsArray();
-            PersistedDataArray maxDataArr = map.get(MIN_FIELD).getAsArray();
+            PersistedDataArray maxDataArr = map.get(MAX_FIELD).getAsArray();
 
             TIntList minArr = minDataArr.getAsIntegerArray();
             TIntList maxArr = maxDataArr.getAsIntegerArray();

@@ -16,6 +16,7 @@
 package org.terasology.world.propagation;
 
 import com.google.common.collect.Maps;
+import org.joml.Vector3ic;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.terasology.TerasologyTestingEnvironment;
@@ -38,7 +39,6 @@ import org.terasology.world.block.tiles.NullWorldAtlas;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.ChunkProvider;
-import org.terasology.world.chunks.ChunkRegionListener;
 import org.terasology.world.chunks.blockdata.ExtraBlockDataManager;
 import org.terasology.world.chunks.internal.ChunkImpl;
 import org.terasology.world.internal.ChunkViewCore;
@@ -239,17 +239,17 @@ public class BetweenChunkPropagationTest extends TerasologyTestingEnvironment {
         }
 
         @Override
-        public void completeUpdate() {
-            // do nothing
-        }
-
-        @Override
-        public void beginUpdate() {
+        public void update() {
             // do nothing
         }
 
         @Override
         public boolean isChunkReady(Vector3i pos) {
+            return false;
+        }
+
+        @Override
+        public boolean isChunkReady(Vector3ic pos) {
             return false;
         }
 

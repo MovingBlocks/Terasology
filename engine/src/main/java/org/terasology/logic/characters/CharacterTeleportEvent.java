@@ -16,6 +16,7 @@
 package org.terasology.logic.characters;
 
 import org.joml.Vector3f;
+import org.joml.Vector3fc;
 import org.terasology.entitySystem.event.Event;
 
 /**
@@ -23,13 +24,13 @@ import org.terasology.entitySystem.event.Event;
  * movement prediction.
  */
 public class CharacterTeleportEvent implements Event {
-    private Vector3f targetPosition;
+    private Vector3fc targetPosition;
 
-    public CharacterTeleportEvent(Vector3f targetPosition) {
+    public CharacterTeleportEvent(Vector3fc targetPosition) {
         this.targetPosition = targetPosition;
     }
 
-    public Vector3f getTargetPosition() {
+    public Vector3fc getTargetPosition() {
         return targetPosition;
     }
 }

@@ -13,7 +13,6 @@ import org.terasology.logic.health.DoDestroyEvent;
 import org.terasology.registry.In;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.BlockManager;
-import org.terasology.world.block.BlockRegions;
 
 /**
  */
@@ -29,7 +28,7 @@ public class BlockRegionSystem extends BaseComponentSystem {
     // trivial priority so that all other logic can happen to the region before erasing the blocks in the region
     @ReceiveEvent(priority = EventPriority.PRIORITY_TRIVIAL)
     public void onDestroyed(DoDestroyEvent event, EntityRef entity, BlockRegionComponent blockRegion) {
-        for (Vector3ic blockPosition : BlockRegions.iterableInPlace(blockRegion.region)) {
+        for (Vector3ic blockPosition : blockRegion.region) {
             worldProvider.setBlock(blockPosition, blockManager.getBlock(BlockManager.AIR_ID));
         }
     }

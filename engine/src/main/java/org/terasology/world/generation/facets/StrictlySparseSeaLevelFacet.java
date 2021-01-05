@@ -15,8 +15,8 @@
  */
 package org.terasology.world.generation.facets;
 
-import org.terasology.math.Region3i;
 import org.terasology.math.TeraMath;
+import org.terasology.world.block.BlockRegion;
 import org.terasology.world.generation.Border3D;
 import org.terasology.world.generation.facets.base.BaseStrictlySparseFieldFacet2D;
 
@@ -26,7 +26,7 @@ import java.util.Optional;
  * Stores the sea level, if it varies or is not defined for certain coordinates.
  */
 public class StrictlySparseSeaLevelFacet extends BaseStrictlySparseFieldFacet2D {
-    public StrictlySparseSeaLevelFacet(Region3i targetRegion, Border3D border) {
+    public StrictlySparseSeaLevelFacet(BlockRegion targetRegion, Border3D border) {
         super(targetRegion, border);
     }
 

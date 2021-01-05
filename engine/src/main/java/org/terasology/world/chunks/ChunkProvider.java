@@ -3,6 +3,7 @@
 
 package org.terasology.world.chunks;
 
+import org.joml.Vector3ic;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.world.internal.ChunkViewCore;
@@ -43,14 +44,9 @@ public interface ChunkProvider {
     void setWorldEntity(EntityRef entity);
 
     /**
-     * Finish adding any pending chunks
-     */
-    void completeUpdate();
-
-    /**
      * Updates the near cache based on the movement of the caching entities
      */
-    void beginUpdate();
+    void update();
 
     /**
      * @param pos the chunk coordinates
@@ -68,6 +64,12 @@ public interface ChunkProvider {
      * @return Whether this chunk is available and ready for use
      */
     boolean isChunkReady(Vector3i pos);
+
+    /**
+     * @param pos
+     * @return Whether this chunk is available and ready for use
+     */
+    boolean isChunkReady(Vector3ic pos);
 
     /**
      * Returns the chunk at the given position if possible.

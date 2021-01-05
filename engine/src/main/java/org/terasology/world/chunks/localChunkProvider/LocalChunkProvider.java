@@ -10,6 +10,7 @@ import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.map.TShortObjectMap;
 import gnu.trove.map.hash.TShortObjectHashMap;
+import org.joml.Vector3ic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.Component;
@@ -31,7 +32,7 @@ import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.block.BeforeDeactivateBlocks;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
-import org.terasology.world.block.BlockRegions;
+import org.terasology.world.block.BlockRegion;
 import org.terasology.world.block.OnActivatedBlocks;
 import org.terasology.world.block.OnAddedBlocks;
 import org.terasology.world.chunks.Chunk;
@@ -91,6 +92,7 @@ public class LocalChunkProvider implements ChunkProvider {
     private static final Logger logger = LoggerFactory.getLogger(LocalChunkProvider.class);
     private static final int UNLOAD_PER_FRAME = 64;
     private final EntityManager entityManager;
+    private final BlockingQueue<Chunk> readyChunks = Queues.newLinkedBlockingQueue();
     private final BlockingQueue<TShortObjectMap<TIntList>> deactivateBlocksQueue = Queues.newLinkedBlockingQueue();
     private final Map<Vector3i, Chunk> chunkCache;
 
@@ -187,16 +189,12 @@ public class LocalChunkProvider implements ChunkProvider {
     }
 
 
-    @Override
-    public void completeUpdate() {
-        //TODO remove this.
-    }
-
     private void processReadyChunk(final Chunk chunk) {
         if (chunkCache.get(chunk.getPosition()) != null) {
             return; // TODO move it in pipeline;
         }
         chunkCache.put(chunk.getPosition(), chunk);
+        chunk.markReady();
         //TODO, it is not clear if the activate/addedBlocks event logic is correct.
         //See https://github.com/MovingBlocks/Terasology/issues/3244
         ChunkStore store = this.storageManager.loadChunkStore(chunk.getPosition());
@@ -244,7 +242,6 @@ public class LocalChunkProvider implements ChunkProvider {
             worldEntity.send(new OnChunkGenerated(chunk.getPosition()));
         }
         worldEntity.send(new OnChunkLoaded(chunk.getPosition()));
-        chunk.markReady();
     }
 
     private void generateQueuedEntities(EntityStore store) {
@@ -261,9 +258,13 @@ public class LocalChunkProvider implements ChunkProvider {
     }
 
     @Override
-    public void beginUpdate() {
+    public void update() {
         deactivateBlocks();
         checkForUnload();
+        Chunk chunk;
+        while ((chunk = readyChunks.poll()) != null) {
+            processReadyChunk(chunk);
+        }
     }
 
     private void deactivateBlocks() {
@@ -449,14 +450,11 @@ public class LocalChunkProvider implements ChunkProvider {
                             Chunk[] localchunks = chunks.toArray(new Chunk[0]);
                             return new LightMerger().merge(localchunks);
                         },
-                        pos -> StreamSupport.stream(BlockRegions.iterableInPlace(BlockRegions.createFromMinAndMax(
-                                pos.x() - 1, pos.y() - 1, pos.z() - 1,
-                                pos.x() + 1, pos.y() + 1, pos.z() + 1
-                        )).spliterator(), false)
+                        pos -> StreamSupport.stream(new BlockRegion(pos).expand(1,1,1).spliterator(), false)
                                 .map(org.joml.Vector3i::new)
                                 .collect(Collectors.toSet())
                 ))
-                .addStage(ChunkTaskProvider.create("Chunk ready", this::processReadyChunk));
+                .addStage(ChunkTaskProvider.create("Chunk ready", readyChunks::add));
         unloadRequestTaskMaster = TaskMaster.createFIFOTaskMaster("Chunk-Unloader", 8);
         ChunkMonitor.fireChunkProviderInitialized(this);
 
@@ -471,6 +469,11 @@ public class LocalChunkProvider implements ChunkProvider {
     @Override
     public boolean isChunkReady(Vector3i pos) {
         return isChunkReady(chunkCache.get(pos));
+    }
+
+    @Override
+    public boolean isChunkReady(Vector3ic pos) {
+        return isChunkReady(chunkCache.get(JomlUtil.from(pos)));
     }
 
     private boolean isChunkReady(Chunk chunk) {
@@ -490,13 +493,10 @@ public class LocalChunkProvider implements ChunkProvider {
                             Chunk[] localchunks = chunks.toArray(new Chunk[0]);
                             return new LightMerger().merge(localchunks);
                         },
-                        pos -> StreamSupport.stream(BlockRegions.iterableInPlace(BlockRegions.createFromMinAndMax(
-                                pos.x() - 1, pos.y() - 1, pos.z() - 1,
-                                pos.x() + 1, pos.y() + 1, pos.z() + 1
-                        )).spliterator(), false)
+                        pos -> StreamSupport.stream(new BlockRegion(pos).expand(1,1,1).spliterator(), false)
                                 .map(org.joml.Vector3i::new)
                                 .collect(Collectors.toCollection(Sets::newLinkedHashSet))
                 ))
-                .addStage(ChunkTaskProvider.create("Chunk ready", this::processReadyChunk));
+                .addStage(ChunkTaskProvider.create("Chunk ready", readyChunks::add));
     }
 }

@@ -21,9 +21,9 @@ import org.joml.Vector2ic;
 import org.joml.Vector3f;
 import org.joml.Vector3i;
 import org.terasology.math.JomlUtil;
-import org.terasology.math.Region3i;
 import org.terasology.math.SpiralIterable;
 import org.terasology.math.TeraMath;
+import org.terasology.world.block.BlockRegion;
 import org.terasology.world.generation.Region;
 import org.terasology.world.generation.World;
 import org.terasology.world.generation.facets.ElevationFacet;
@@ -51,7 +51,7 @@ public abstract class AbstractSpawner implements Spawner {
         Vector3i desiredPos = new Vector3i(pos.x(), getStartHeight(world, pos), pos.y());
 
         // try and find somewhere in this region a spot to land
-        Region3i spawnArea = Region3i.createFromCenterExtents(JomlUtil.from(desiredPos), JomlUtil.from(ext));
+        BlockRegion spawnArea = new BlockRegion(desiredPos).expand(ext);
         Region worldRegion = world.getWorldData(spawnArea);
 
         Function<Vector2ic, Optional<Float>> getWorld;
@@ -115,7 +115,7 @@ public abstract class AbstractSpawner implements Spawner {
      * Get the elevation at a single point, to use as the base point for searching.
      */
     private int getStartHeight(World world, Vector2i pos) {
-        Region3i spawnArea = Region3i.createFromCenterExtents(JomlUtil.from(new Vector3i(pos.x(), 0, pos.y())), JomlUtil.from(new Vector3i()));
+        BlockRegion spawnArea = new BlockRegion(pos.x(), 0, pos.y());
         Region worldRegion = world.getWorldData(spawnArea);
 
         ElevationFacet elevationFacet = worldRegion.getFacet(ElevationFacet.class);
