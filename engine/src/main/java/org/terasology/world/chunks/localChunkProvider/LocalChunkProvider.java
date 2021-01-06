@@ -241,7 +241,7 @@ public class LocalChunkProvider implements ChunkProvider {
 
             worldEntity.send(new OnChunkGenerated(chunk.getPosition()));
         }
-        worldEntity.send(new OnChunkLoaded(chunk.getPosition()));
+        worldEntity.send(new OnChunkLoaded(chunk.getPosition(new org.joml.Vector3i())));
     }
 
     private void generateQueuedEntities(EntityStore store) {
@@ -315,7 +315,7 @@ public class LocalChunkProvider implements ChunkProvider {
             return false;
         }
 
-        worldEntity.send(new BeforeChunkUnload(pos));
+        worldEntity.send(new BeforeChunkUnload(JomlUtil.from(pos)));
         storageManager.deactivateChunk(chunk);
         chunk.dispose();
 
@@ -432,7 +432,7 @@ public class LocalChunkProvider implements ChunkProvider {
         loadingPipeline.shutdown();
         unloadRequestTaskMaster.shutdown(new ChunkUnloadRequest(), true);
         getAllChunks().stream().filter(ManagedChunk::isReady).forEach(chunk -> {
-            worldEntity.send(new BeforeChunkUnload(chunk.getPosition()));
+            worldEntity.send(new BeforeChunkUnload(chunk.getPosition(new org.joml.Vector3i())));
             storageManager.deactivateChunk(chunk);
             chunk.dispose();
         });

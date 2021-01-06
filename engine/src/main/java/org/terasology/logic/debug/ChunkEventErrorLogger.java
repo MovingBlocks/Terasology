@@ -22,6 +22,7 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.world.WorldComponent;
 import org.terasology.world.chunks.event.BeforeChunkUnload;
@@ -39,7 +40,7 @@ public class ChunkEventErrorLogger extends BaseComponentSystem {
 
     @ReceiveEvent(components = {WorldComponent.class})
     public void onNewChunk(OnChunkLoaded chunkAvailable, EntityRef worldEntity) {
-        if (!loadedChunks.add(chunkAvailable.getChunkPos())) {
+        if (!loadedChunks.add(JomlUtil.from(chunkAvailable.getChunkPos()))) {
             logger.error("Multiple loads of chunk {}", chunkAvailable.getChunkPos());
         }
     }
