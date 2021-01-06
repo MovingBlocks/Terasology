@@ -33,7 +33,7 @@ public class RectanglefTypeHandler extends TypeHandler<Rectanglef> {
             PersistedDataMap map = data.getAsValueMap();
 
             PersistedDataArray minDataArr = map.get(MIN_FIELD).getAsArray();
-            PersistedDataArray maxDataArr = map.get(MIN_FIELD).getAsArray();
+            PersistedDataArray maxDataArr = map.get(MAX_FIELD).getAsArray();
 
             TFloatList minArr = minDataArr.getAsFloatArray();
             TFloatList maxArr = maxDataArr.getAsFloatArray();

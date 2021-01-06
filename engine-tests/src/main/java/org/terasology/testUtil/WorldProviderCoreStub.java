@@ -25,6 +25,7 @@ import org.terasology.math.geom.Vector3i;
 import org.terasology.world.WorldChangeListener;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockRegion;
+import org.terasology.world.block.BlockRegionc;
 import org.terasology.world.internal.ChunkViewCore;
 import org.terasology.world.internal.WorldInfo;
 import org.terasology.world.internal.WorldProviderCore;
@@ -101,6 +102,11 @@ public class WorldProviderCoreStub implements WorldProviderCore {
     @Override
     public boolean isRegionRelevant(Region3i region) {
         return true;
+    }
+
+    @Override
+    public boolean isRegionRelevant(BlockRegionc region) {
+        return false;
     }
 
     @Override

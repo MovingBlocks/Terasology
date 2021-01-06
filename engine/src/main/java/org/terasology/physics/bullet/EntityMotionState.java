@@ -24,7 +24,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.location.LocationComponent;
-import org.terasology.math.JomlUtil;
 
 /**
  * This motion state is used to connect rigid body entities to their rigid body in the bullet physics engine.
@@ -52,8 +51,8 @@ public class EntityMotionState extends btMotionState {
     @Override
     public void getWorldTransform(Matrix4f transform) {
         LocationComponent loc = entity.getComponent(LocationComponent.class);
-        transform.translationRotateScale(JomlUtil.from(loc.getWorldPosition()),
-            JomlUtil.from(loc.getWorldRotation()), loc.getWorldScale());
+        transform.translationRotateScale(loc.getWorldPosition(position),
+            loc.getWorldRotation(rot), loc.getWorldScale());
     }
 
     @Override
@@ -63,9 +62,9 @@ public class EntityMotionState extends btMotionState {
             rot.setFromNormalized(transform);
             rot.normalize();
             transform.getTranslation(position);
-            loc.setWorldRotation(JomlUtil.from(rot));
-            loc.setWorldPosition(JomlUtil.from(position));
+
+            loc.setWorldRotation(rot);
+            loc.setWorldPosition(position);
         }
     }
-
 }

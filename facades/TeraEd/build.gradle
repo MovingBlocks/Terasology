@@ -27,6 +27,7 @@ dependencies {
     implementation project(':engine')
     implementation group: 'org.reflections', name: 'reflections', version: '0.9.10'
 
+    runtimeOnly(platform(project(":modules")))
     // For the "natives" configuration make it depend on the native files from LWJGL
     implementation platform("org.lwjgl:lwjgl-bom:$LwjglVersion")
     ["natives-linux", "natives-windows", "natives-macos"].forEach {
@@ -67,7 +68,6 @@ task editor(type: JavaExec) {
 
     // Dependencies: natives + all modules & the PC facade itself (which will trigger the engine)
     dependsOn rootProject.extractNatives
-    dependsOn rootProject.moduleClasses
     dependsOn classes
 
     // Run arguments

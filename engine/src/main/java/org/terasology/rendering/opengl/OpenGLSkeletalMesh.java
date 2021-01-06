@@ -15,6 +15,9 @@
  */
 package org.terasology.rendering.opengl;
 
+import org.joml.Matrix4f;
+import org.joml.Vector2f;
+import org.joml.Vector3f;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
@@ -27,9 +30,6 @@ import org.terasology.engine.GameThread;
 import org.terasology.engine.subsystem.lwjgl.GLBufferPool;
 import org.terasology.engine.subsystem.lwjgl.LwjglGraphicsProcessing;
 import org.terasology.math.AABB;
-import org.terasology.math.geom.Matrix4f;
-import org.terasology.math.geom.Vector2f;
-import org.terasology.math.geom.Vector3f;
 import org.terasology.rendering.VertexBufferObjectUtil;
 import org.terasology.rendering.assets.skeletalmesh.Bone;
 import org.terasology.rendering.assets.skeletalmesh.SkeletalMesh;
@@ -64,8 +64,8 @@ public class OpenGLSkeletalMesh extends SkeletalMesh {
 
     private SkeletalMeshData data;
 
-    private org.joml.Vector3f scale;
-    private org.joml.Vector3f translate;
+    private Vector3f scale;
+    private Vector3f translate;
 
     private DisposalAction disposalAction;
 
