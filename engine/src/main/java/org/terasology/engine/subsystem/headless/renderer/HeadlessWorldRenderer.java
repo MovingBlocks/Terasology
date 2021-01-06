@@ -101,8 +101,7 @@ public class HeadlessWorldRenderer implements WorldRenderer {
 
         // Free unused space
         PerformanceMonitor.startActivity("Update Chunk Cache");
-        chunkProvider.completeUpdate();
-        chunkProvider.beginUpdate();
+        chunkProvider.update();
         PerformanceMonitor.endActivity();
 
         PerformanceMonitor.startActivity("Update Close Chunks");

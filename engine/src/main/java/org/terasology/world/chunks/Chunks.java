@@ -286,7 +286,6 @@ public final class Chunks {
 
     /**
      * the relative position in the nearest chunk from the (0,0,0) corner.
-     * Default chunk size of ({@link #SIZE_X}, {@link #SIZE_Y}, {@link #SIZE_Z}).
      *
      * @param x the x world position
      * @param y the y world position
@@ -299,7 +298,20 @@ public final class Chunks {
         return dest.set(toRelative(x, chunkFilterSize.x()), toRelative(y, chunkFilterSize.y()), toRelative(z, chunkFilterSize.z()));
     }
 
-
+    /**
+     * the relative position in the nearest chunk from the (0,0,0) corner.
+     * Default chunk size of ({@link #SIZE_X}, {@link #SIZE_Y}, {@link #SIZE_Z}).
+     *
+     * @param x the x world position
+     * @param y the y world position
+     * @param z the z world position
+     * @param dest will hold the result
+     * @return dest
+     */
+    public static Vector3i toRelative(int x, int y, int z, Vector3i dest) {
+        return dest.set(toRelative(x, INNER_CHUNK_POS_FILTER.x()), toRelative(y, INNER_CHUNK_POS_FILTER.y()), toRelative(z, INNER_CHUNK_POS_FILTER.z()));
+    }
+    
     /**
      * Works out whether the given block resides inside the given chunk.
      * <p>
