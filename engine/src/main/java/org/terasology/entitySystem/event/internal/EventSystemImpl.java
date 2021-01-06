@@ -406,6 +406,11 @@ public class EventSystemImpl implements EventSystem {
         return result;
     }
 
+    @Override
+    public void setToCurrentThread() {
+        mainThread = Thread.currentThread();
+    }
+
     private static class EventHandlerPriorityComparator implements Comparator<EventHandlerInfo> {
 
         @Override

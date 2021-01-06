@@ -16,10 +16,10 @@
 package org.terasology.telemetry.metrics;
 
 import com.snowplowanalytics.snowplow.tracker.events.Unstructured;
-import org.lwjgl.opengl.GL11;
 import org.terasology.config.Config;
 import org.terasology.context.Context;
 import org.terasology.engine.subsystem.DisplayDevice;
+import org.terasology.engine.subsystem.DisplayDeviceInfo;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.telemetry.TelemetryCategory;
 import org.terasology.telemetry.TelemetryField;
@@ -88,15 +88,10 @@ public final class SystemContextMetric extends Metric {
         jvmVersion = System.getProperty("java.vm.version");
         contextInCoreRegistry = CoreRegistry.get(Context.class);
         DisplayDevice display = contextInCoreRegistry.get(DisplayDevice.class);
-        if (!display.isHeadless()) {
-            openGLVendor = GL11.glGetString(GL11.GL_VENDOR);
-            openGLVersion = GL11.glGetString(GL11.GL_VERSION);
-            openGLRenderer = GL11.glGetString(GL11.GL_RENDERER);
-        } else {
-            openGLVendor = "headless";
-            openGLVersion = "headless";
-            openGLRenderer = "headless";
-        }
+        DisplayDeviceInfo displayDeviceInfo = display.getInfo();
+        openGLVendor = displayDeviceInfo.getOpenGlVendor();
+        openGLVersion = displayDeviceInfo.getOpenGLVersion();
+        openGLRenderer = displayDeviceInfo.getOpenGLRenderer();
         processorNumbers = Runtime.getRuntime().availableProcessors();
         memoryMaxByte = Runtime.getRuntime().maxMemory();
     }
