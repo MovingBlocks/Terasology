@@ -20,6 +20,7 @@ import com.google.common.collect.Maps;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.terasology.world.block.BlockRegion;
+import org.terasology.world.block.BlockRegionc;
 import org.terasology.world.generation.Border3D;
 
 import java.util.Collections;
@@ -39,7 +40,7 @@ public abstract class SparseObjectFacet3D<T> extends SparseFacet3D implements Ob
      * @param targetRegion
      * @param border
      */
-    public SparseObjectFacet3D(BlockRegion targetRegion, Border3D border) {
+    public SparseObjectFacet3D(BlockRegionc targetRegion, Border3D border) {
         super(targetRegion, border);
     }
 
