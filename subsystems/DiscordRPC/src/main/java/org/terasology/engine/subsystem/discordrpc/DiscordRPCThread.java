@@ -251,12 +251,25 @@ public final class DiscordRPCThread implements IPCListener, Runnable {
     }
 
     private RichPresence build() {
-        return new RichPresence.Builder()
-                .setLargeImage(DISCORD_APP_DEFAULT_IMAGE)
-                .setDetails(buffer.getDetails())
-                .setState(buffer.getState())
-                .setStartTimestamp(buffer.getStartTimestamp())
-                .build();
+        RichPresence.Builder builder = new RichPresence.Builder()
+                .setLargeImage(DISCORD_APP_DEFAULT_IMAGE);
+
+        if (buffer.getDetails() != null)
+            builder.setDetails(buffer.getDetails());
+
+        if (buffer.getState() != null)
+            builder.setState(buffer.getState());
+
+        if (buffer.getStartTimestamp() != null)
+            builder.setStartTimestamp(buffer.getStartTimestamp());
+
+        int partySize = buffer.getPartySize();
+        int partyMax = buffer.getPartyMax();
+        if (partySize > 0 && partyMax > 0) {
+            builder.setParty("null", partySize, partyMax);
+        }
+
+        return builder.build();
     }
 
     private void reset(boolean resetConnection) {

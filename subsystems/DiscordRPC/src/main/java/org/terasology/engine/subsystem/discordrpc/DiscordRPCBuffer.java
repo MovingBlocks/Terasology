@@ -14,7 +14,13 @@ public final class DiscordRPCBuffer {
     private String details;
     private String state;
     private OffsetDateTime startTimestamp;
+    private int partySize;
+    private int partyMax;
     private boolean changed;
+
+    public DiscordRPCBuffer() {
+        reset();
+    }
 
     /**
      * Resets the buffer data
@@ -24,6 +30,8 @@ public final class DiscordRPCBuffer {
         this.state = null;
         this.startTimestamp = null;
         this.changed = true;
+        this.partySize = -1;
+        this.partyMax = -1;
     }
 
     /**
@@ -80,6 +88,44 @@ public final class DiscordRPCBuffer {
      */
     public synchronized OffsetDateTime getStartTimestamp() {
         return startTimestamp;
+    }
+
+    /**
+     * Sets the current party size
+     *
+     * @param partySize The current party size
+     */
+    public synchronized void setPartySize(int partySize) {
+        this.partySize = partySize;
+        this.changed = true;
+    }
+
+    /**
+     * Returns the current party size
+     *
+     * @return The party size
+     */
+    public synchronized int getPartySize() {
+        return partySize;
+    }
+
+    /**
+     * Sets the maximum number of the players in the party
+     *
+     * @param partyMax The number of the players
+     */
+    public synchronized void setPartyMax(int partyMax) {
+        this.partyMax = partyMax;
+        this.changed = true;
+    }
+
+    /**
+     * Returns the maximum number of players in the party
+     *
+     * @return The maximum number of players in the party
+     */
+    public synchronized int getPartyMax() {
+        return partyMax;
     }
 
     /**

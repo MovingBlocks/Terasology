@@ -141,6 +141,25 @@ public final class DiscordRPCSubSystem implements EngineSubsystem, PropertyChang
         getInstance().thread.getBuffer().setStartTimestamp(timestamp);
     }
 
+    /**
+     * Sets the party information on the buffer
+     *
+     * @param size The number of the players in the party
+     * @param max The maximum number of the players in the party
+     */
+    public static void setPartyInfo(int size, int max) {
+        DiscordRPCBuffer buffer = getInstance().thread.getBuffer();
+        buffer.setPartySize(size);
+        buffer.setPartyMax(max);
+    }
+
+    /**
+     * Resets the party information on the buffer
+     */
+    public static void resetPartyInfo() {
+        setPartyInfo(-1, -1);
+    }
+
     private static DiscordRPCSubSystem getInstance() {
         return instance;
     }
