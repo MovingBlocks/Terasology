@@ -23,6 +23,7 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
+import org.terasology.math.JomlUtil;
 import org.terasology.world.WorldComponent;
 import org.terasology.world.chunks.event.BeforeChunkUnload;
 import org.terasology.world.chunks.event.OnChunkLoaded;
@@ -46,7 +47,7 @@ public class ChunkEventErrorLogger extends BaseComponentSystem {
 
     @ReceiveEvent(components = {WorldComponent.class})
     public void onRemoveChunk(BeforeChunkUnload chunkUnload, EntityRef worldEntity) {
-        if (!loadedChunks.remove(chunkUnload.getChunkPos())) {
+        if (!loadedChunks.remove(JomlUtil.from(chunkUnload.getChunkPos()))) {
             logger.error("Unload event for not loaded chunk {}", chunkUnload.getChunkPos());
         }
     }

@@ -28,6 +28,7 @@ import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.delay.DelayManager;
 import org.terasology.logic.delay.PeriodicActionTriggeredEvent;
+import org.terasology.math.JomlUtil;
 import org.terasology.registry.In;
 import org.terasology.world.WorldComponent;
 import org.terasology.world.chunks.ChunkProvider;
@@ -199,7 +200,7 @@ public class SectorSimulationSystem extends BaseComponentSystem {
     @ReceiveEvent(components = WorldComponent.class)
     public void chunkUnload(BeforeChunkUnload event, EntityRef worldEntity) {
         for (EntityRef entity : entityManager.getEntitiesWith(SectorSimulationComponent.class)) {
-            if (SectorUtil.getWatchedChunks(entity).contains(event.getChunkPos())) {
+            if (SectorUtil.getWatchedChunks(entity).contains(JomlUtil.from(event.getChunkPos()))) {
                 entity.send(new BeforeChunkUnload(event.getChunkPos()));
                 if (SectorUtil.onlyWatchedChunk(entity, event.getChunkPos(), chunkProvider)) {
                     entity.send(new SectorEntityUnload());

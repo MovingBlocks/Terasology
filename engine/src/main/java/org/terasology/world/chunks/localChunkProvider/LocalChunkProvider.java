@@ -289,8 +289,8 @@ public class LocalChunkProvider implements ChunkProvider {
                 loadingPipeline.getProcessingPosition().iterator());
         while (iterator.hasNext()) {
             org.joml.Vector3ic pos = iterator.next();
-            boolean keep = relevanceSystem.isChunkInRegions(JomlUtil.from(pos)); // TODO: move it to relevance system.
-            if (!keep && unloadChunkInternal(JomlUtil.from(pos))) {
+            boolean keep = relevanceSystem.isChunkInRegions(pos); // TODO: move it to relevance system.
+            if (!keep && unloadChunkInternal(pos)) {
                 iterator.remove();
                 if (++unloaded >= UNLOAD_PER_FRAME) {
                     break;
@@ -304,10 +304,10 @@ public class LocalChunkProvider implements ChunkProvider {
         PerformanceMonitor.endActivity();
     }
 
-    private boolean unloadChunkInternal(Vector3i pos) {
-        if (loadingPipeline.isPositionProcessing(JomlUtil.from(pos))) {
+    private boolean unloadChunkInternal(Vector3ic pos) {
+        if (loadingPipeline.isPositionProcessing(pos)) {
             // Chunk hasn't been finished or changed, so just drop it.
-            loadingPipeline.stopProcessingAt(JomlUtil.from(pos));
+            loadingPipeline.stopProcessingAt(pos);
             return false;
         }
         Chunk chunk = chunkCache.get(pos);
@@ -315,7 +315,7 @@ public class LocalChunkProvider implements ChunkProvider {
             return false;
         }
 
-        worldEntity.send(new BeforeChunkUnload(JomlUtil.from(pos)));
+        worldEntity.send(new BeforeChunkUnload(pos));
         storageManager.deactivateChunk(chunk);
         chunk.dispose();
 
@@ -400,7 +400,7 @@ public class LocalChunkProvider implements ChunkProvider {
         shutdown();
 
         for (Chunk chunk : getAllChunks()) {
-            unloadChunkInternal(chunk.getPosition());
+            unloadChunkInternal(chunk.getPosition(new org.joml.Vector3i()));
             chunk.dispose();
         }
         chunkCache.clear();
@@ -417,7 +417,7 @@ public class LocalChunkProvider implements ChunkProvider {
             return false;
         }
 
-        if (unloadChunkInternal(coords)) {
+        if (unloadChunkInternal(JomlUtil.from(coords))) {
             chunkCache.remove(coords);
             createOrLoadChunk(coords);
             return true;
@@ -459,8 +459,8 @@ public class LocalChunkProvider implements ChunkProvider {
         ChunkMonitor.fireChunkProviderInitialized(this);
 
         for (ChunkRelevanceRegion chunkRelevanceRegion : relevanceSystem.getRegions()) {
-            for (Vector3i pos : chunkRelevanceRegion.getCurrentRegion()) {
-                createOrLoadChunk(pos);
+            for (Vector3ic pos : chunkRelevanceRegion.getCurrentRegion()) {
+                createOrLoadChunk(JomlUtil.from(pos));
             }
             chunkRelevanceRegion.setUpToDate();
         }

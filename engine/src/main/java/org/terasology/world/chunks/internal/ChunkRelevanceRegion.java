@@ -18,15 +18,18 @@ package org.terasology.world.chunks.internal;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.Sets;
+import org.joml.Vector3f;
+import org.joml.Vector3fc;
+import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.ChunkMath;
-import org.terasology.math.JomlUtil;
-import org.terasology.math.Region3i;
-import org.terasology.math.geom.Vector3i;
+import org.terasology.world.block.BlockRegion;
+import org.terasology.world.block.BlockRegionc;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkRegionListener;
+import org.terasology.world.chunks.Chunks;
 
 import java.util.Iterator;
 import java.util.Set;
@@ -38,48 +41,51 @@ public class ChunkRelevanceRegion {
     private Vector3i relevanceDistance = new Vector3i();
     private boolean dirty;
     private Vector3i center = new Vector3i();
-    private Region3i currentRegion = Region3i.empty();
-    private Region3i previousRegion = Region3i.empty();
+    private BlockRegion currentRegion = new BlockRegion(BlockRegion.INVALID);
+    private BlockRegion previousRegion = new BlockRegion(BlockRegion.INVALID);
     private ChunkRegionListener listener;
 
     private Set<Vector3i> relevantChunks = Sets.newLinkedHashSet();
 
-    public ChunkRelevanceRegion(EntityRef entity, Vector3i relevanceDistance) {
+    public ChunkRelevanceRegion(EntityRef entity, Vector3ic relevanceDistance) {
         this.entity = entity;
         this.relevanceDistance.set(relevanceDistance);
 
         LocationComponent loc = entity.getComponent(LocationComponent.class);
-
-        if (loc == null||Float.isNaN(loc.getWorldPosition().x)) {
+        if(loc == null) {
             dirty = false;
-        } else {
-            center.set(ChunkMath.calcChunkPos(loc.getWorldPosition()));
-            currentRegion = calculateRegion();
-            dirty = true;
+            return;
         }
+        Vector3f position = loc.getWorldPosition(new Vector3f());
+        if (!position.isFinite()) {
+            dirty = false;
+            return;
+        }
+        center.set(Chunks.toChunkPos(position, new Vector3i()));
+        updateCurrentRegion();
+        dirty = true;
     }
 
     public Vector3i getCenter() {
         return center;
     }
 
-    public void setRelevanceDistance(Vector3i distance) {
+    public void setRelevanceDistance(Vector3ic distance) {
         if (!distance.equals(this.relevanceDistance)) {
             reviewRelevantChunks(distance);
             this.relevanceDistance.set(distance);
-            this.currentRegion = calculateRegion();
+            updateCurrentRegion();
             dirty = true;
         }
     }
 
-    private void reviewRelevantChunks(Vector3i distance) {
-        Vector3i extents = new Vector3i(distance.x / 2, distance.y / 2, distance.z / 2);
-        Region3i retainRegion = Region3i.createFromCenterExtents(center, extents);
+    private void reviewRelevantChunks(Vector3ic distance) {
+        BlockRegion retainRegion = new BlockRegion(center).expand(distance.x() / 2, distance.y() / 2, distance.z() / 2);
         Iterator<Vector3i> iter = relevantChunks.iterator();
         while (iter.hasNext()) {
             Vector3i pos = iter.next();
-            if (!retainRegion.encompasses(pos)) {
-                sendChunkIrrelevant(JomlUtil.from(pos));
+            if (!retainRegion.contains(pos)) {
+                sendChunkIrrelevant(pos);
                 iter.remove();
             }
         }
@@ -98,11 +104,11 @@ public class ChunkRelevanceRegion {
         previousRegion = currentRegion;
     }
 
-    public Region3i getCurrentRegion() {
+    public BlockRegionc getCurrentRegion() {
         return currentRegion;
     }
 
-    public Region3i getPreviousRegion() {
+    public BlockRegionc getPreviousRegion() {
         return previousRegion;
     }
 
@@ -114,25 +120,32 @@ public class ChunkRelevanceRegion {
             if (!newCenter.equals(center)) {
                 dirty = true;
                 center.set(newCenter);
-                currentRegion = calculateRegion();
+                updateCurrentRegion();
                 reviewRelevantChunks(relevanceDistance);
             }
         }
     }
 
-    private Region3i calculateRegion() {
+    private void updateCurrentRegion() {
         LocationComponent loc = entity.getComponent(LocationComponent.class);
-        if (loc != null&& !Float.isNaN(loc.getWorldPosition().x)) {
-            Vector3i extents = new Vector3i(relevanceDistance.x / 2, relevanceDistance.y / 2, relevanceDistance.z / 2);
-            return Region3i.createFromCenterExtents(ChunkMath.calcChunkPos(loc.getWorldPosition()), extents);
+        if (loc != null) {
+            Vector3fc position = loc.getWorldPosition(new Vector3f());
+            if (position.isFinite()) {
+                Vector3ic chunkPosition = Chunks.toChunkPos(position, new Vector3i());
+                currentRegion.set(chunkPosition, chunkPosition).expand(relevanceDistance.x / 2, relevanceDistance.y / 2, relevanceDistance.z / 2);
+            }
         }
-        return Region3i.empty();
+        currentRegion.set(BlockRegion.INVALID);
     }
 
     private Vector3i calculateCenter() {
         LocationComponent loc = entity.getComponent(LocationComponent.class);
         if (loc != null && !Float.isNaN(loc.getWorldPosition().x)) {
-            return ChunkMath.calcChunkPos(loc.getWorldPosition());
+            Vector3fc position = loc.getWorldPosition(new Vector3f());
+            if (position.isFinite()) {
+                Vector3i chunkPosition = Chunks.toChunkPos(position, new Vector3i());
+                return chunkPosition;
+            }
         }
         return new Vector3i();
     }
@@ -181,56 +194,74 @@ public class ChunkRelevanceRegion {
      * chunks as relevant even when no light calculation has been performed yet.
      */
     public void checkIfChunkIsRelevant(Chunk chunk) {
-        if (currentRegion.encompasses(chunk.getPosition()) && !relevantChunks.contains(chunk.getPosition())) {
-            relevantChunks.add(chunk.getPosition());
+        if (currentRegion.contains(chunk.getPosition(new Vector3i())) && !relevantChunks.contains(chunk.getPosition(new Vector3i()))) {
+            relevantChunks.add(chunk.getPosition(new Vector3i()));
             sendChunkRelevant(chunk);
         }
     }
 
-    public Iterable<Vector3i> getNeededChunks() {
+    public Iterable<Vector3ic> getNeededChunks() {
         return NeededChunksIterator::new;
     }
 
-    public void chunkUnloaded(Vector3i pos) {
+    public void chunkUnloaded(Vector3ic pos) {
         if (relevantChunks.contains(pos)) {
             relevantChunks.remove(pos);
-            sendChunkIrrelevant(JomlUtil.from(pos));
+            sendChunkIrrelevant(pos);
         }
     }
 
-    private class NeededChunksIterator implements Iterator<Vector3i> {
-        Vector3i nextChunkPos;
-        Iterator<Vector3i> regionPositions = currentRegion.iterator();
+    private class NeededChunksIterator implements Iterator<Vector3ic> {
+        Vector3i current = null;
+        Vector3i next = new Vector3i();
+        Iterator<Vector3ic> regionPositions = currentRegion.iterator();
 
         NeededChunksIterator() {
-            calculateNext();
+            next.set(findNext());
         }
 
         @Override
         public boolean hasNext() {
-            return nextChunkPos != null;
+            if (current == null) {
+                return true;
+            }
+            if (current.equals(next)) {
+                Vector3ic nn = findNext();
+                if (nn != null) {
+                    next.set(nn);
+                    return true;
+                }
+                return false;
+            }
+            return !relevantChunks.contains(next);
         }
 
         @Override
-        public Vector3i next() {
-            Vector3i result = nextChunkPos;
-            calculateNext();
-            return result;
+        public Vector3ic next() {
+            if (current == null) {
+                current = new Vector3i(next);
+                return next;
+            }
+            if (current.equals(next)) {
+                Vector3ic nn = findNext();
+                if (nn != null) {
+                    next.set(nn);
+                    return next;
+                }
+                return null;
+            }
+            current.set(next);
+            return next;
         }
 
-        @Override
-        public void remove() {
-            throw new UnsupportedOperationException();
-        }
-
-        private void calculateNext() {
-            nextChunkPos = null;
-            while (regionPositions.hasNext() && nextChunkPos == null) {
-                Vector3i candidate = regionPositions.next();
+        private Vector3ic findNext() {
+            while (regionPositions.hasNext()) {
+                Vector3ic candidate = regionPositions.next();
                 if (!relevantChunks.contains(candidate)) {
-                    nextChunkPos = candidate;
+                    return candidate;
                 }
             }
+            return null;
         }
     }
 }
