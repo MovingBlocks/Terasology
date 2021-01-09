@@ -64,7 +64,7 @@ public class SunlightRegenPropagationRules extends CommonLightPropagationRules {
 
     @Override
     public byte getValue(LitChunk chunk, Vector3ic pos) {
-        return getValue(chunk, pos);
+        return getValue(chunk, pos.x(), pos.y(), pos.z());
     }
 
     @Override
