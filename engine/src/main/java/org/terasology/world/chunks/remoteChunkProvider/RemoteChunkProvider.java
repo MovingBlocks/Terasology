@@ -114,7 +114,7 @@ public class RemoteChunkProvider implements ChunkProvider {
             if (listener != null) {
                 listener.onChunkReady(chunk.getPosition());
             }
-            worldEntity.send(new OnChunkLoaded(chunk.getPosition()));
+            worldEntity.send(new OnChunkLoaded(chunk.getPosition(new org.joml.Vector3i())));
         }
     }
 
@@ -124,7 +124,7 @@ public class RemoteChunkProvider implements ChunkProvider {
         for (Vector3i pos : positions) {
             Chunk removed = chunkCache.remove(pos);
             if (removed != null && !removed.isReady()) {
-                worldEntity.send(new BeforeChunkUnload(pos));
+                worldEntity.send(new BeforeChunkUnload(JomlUtil.from(pos)));
                 removed.dispose();
             }
         }

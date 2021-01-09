@@ -81,7 +81,7 @@ public class RelevanceSystem implements UpdateSubscriberSystem {
     @ReceiveEvent(components = WorldComponent.class)
     public void onRemoveChunk(BeforeChunkUnload chunkUnloadEvent, EntityRef worldEntity) {
         for (ChunkRelevanceRegion region : regions.values()) {
-            region.chunkUnloaded(chunkUnloadEvent.getChunkPos());
+            region.chunkUnloaded(JomlUtil.from(chunkUnloadEvent.getChunkPos()));
         }
     }
 
