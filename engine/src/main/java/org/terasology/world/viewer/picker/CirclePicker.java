@@ -3,10 +3,9 @@
 
 package org.terasology.world.viewer.picker;
 
-import java.util.Set;
-
 import org.joml.Vector2fc;
-import org.terasology.math.geom.BaseVector2f;
+
+import java.util.Set;
 
 /**
  * Retrieves a set of circular objects in the proximity of a given anchor point.
@@ -15,12 +14,6 @@ import org.terasology.math.geom.BaseVector2f;
 public interface CirclePicker<T> {
 
     void offer(float locX, float locY, T object);
-
-    /** @deprecated use {@link #offer(Vector2fc, Object)} instead. */
-    @Deprecated
-    default void offer(BaseVector2f location, T object) {
-        offer(location.getX(), location.getY(), object);
-    }
     
     default void offer(Vector2fc location, T object) {
         offer(location.x(), location.y(), object);

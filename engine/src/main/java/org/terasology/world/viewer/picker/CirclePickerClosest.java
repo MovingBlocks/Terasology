@@ -3,14 +3,11 @@
 
 package org.terasology.world.viewer.picker;
 
+import org.joml.Vector2fc;
+
 import java.util.Collections;
 import java.util.Set;
 import java.util.function.Function;
-
-import org.joml.Vector2fc;
-import org.terasology.math.JomlUtil;
-import org.terasology.math.geom.BaseVector2f;
-import org.terasology.math.geom.ImmutableVector2f;
 
 /**
  * Retrieves the closest (circular) object from a collection of tested elements.
@@ -28,20 +25,8 @@ public class CirclePickerClosest<T> implements CirclePicker<T> {
      * No minimum distance to the target is required
      * @param target the target location
      */
-    public CirclePickerClosest(BaseVector2f target) {
+    public CirclePickerClosest(Vector2fc target) {
         this(target, ignored -> Double.POSITIVE_INFINITY);
-    }
-
-    /**
-     * Matches all elements that lie within a given radius
-     * @param target the target location
-     * @param radiusFunc the radius function for each of the tested elements
-     *
-     * @deprecated use {@link CirclePickerClosest#CirclePickerClosest(Vector2fc, Function)} instead
-     */
-    @Deprecated
-    public CirclePickerClosest(BaseVector2f target, Function<? super T, ? extends Number> radiusFunc) {
-        this(JomlUtil.from(target), radiusFunc);
     }
 
     /**
