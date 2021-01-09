@@ -28,6 +28,7 @@ import org.terasology.logic.characters.CharacterMovementComponent;
 import org.terasology.logic.characters.events.HorizontalCollisionEvent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.LocalPlayer;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.registry.In;
 import org.terasology.utilities.random.FastRandom;
@@ -210,7 +211,7 @@ public class HierarchicalAISystem extends BaseComponentSystem implements
         drive.set(targetDirection);
 
         float yaw = (float) Math.atan2(targetDirection.x, targetDirection.z);
-        entity.send(new CharacterMoveInputEvent(0, 0, yaw, drive, false, false, time.getGameDeltaInMs()));
+        entity.send(new CharacterMoveInputEvent(0, 0, yaw, JomlUtil.from(drive), false, false, time.getGameDeltaInMs()));
         entity.saveComponent(location);
         // System.out.print("\Destination set: " + targetDirection.x + ":" +targetDirection.z + "\n");
         // System.out.print("\nI am: " + worldPos.x + ":" + worldPos.z + "\n");
