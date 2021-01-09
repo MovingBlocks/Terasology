@@ -94,7 +94,7 @@ public class BulkSunlightPropagationTest extends TerasologyTestingEnvironment {
             lightWorldView.setValueAt(pos, Chunks.MAX_SUNLIGHT);
         }
         for (Vector3ic pos : new BlockRegion(0, 15, 0).union(Chunks.SIZE_X - 1, 15, Chunks.SIZE_Z - 1)) {
-            regenWorldView.setBlockAt(pos, solid);
+            regenWorldView.setBlockAt(new Vector3i(pos), solid);
         }
         for (Vector3ic pos : new BlockRegion(0, 0, 0).union(Chunks.SIZE_X - 1, 14, Chunks.SIZE_Z - 1)) {
             regenWorldView.setValueAt(pos, (byte) (14 - pos.y()));
@@ -120,7 +120,7 @@ public class BulkSunlightPropagationTest extends TerasologyTestingEnvironment {
             lightWorldView.setValueAt(pos, Chunks.MAX_SUNLIGHT);
         }
         for (Vector3ic pos : new BlockRegion(0, 15, 0).union(Chunks.SIZE_X - 1, 15, Chunks.SIZE_Z - 1)) {
-            regenWorldView.setBlockAt(pos, solid);
+            regenWorldView.setBlockAt(new Vector3i(pos), solid);
         }
         for (Vector3ic pos : new BlockRegion(0, 0, 0).union(Chunks.SIZE_X - 1, 14, Chunks.SIZE_Z - 1)) {
             regenWorldView.setValueAt(pos, (byte) (14 - pos.y()));
