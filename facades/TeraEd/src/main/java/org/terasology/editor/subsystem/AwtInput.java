@@ -1,21 +1,20 @@
 // Copyright 2020 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.engine.subsystem.lwjgl;
+package org.terasology.editor.subsystem;
 
-import org.lwjgl.glfw.GLFW;
 import org.terasology.assets.module.ModuleAwareAssetTypeManager;
 import org.terasology.config.Config;
 import org.terasology.config.ControllerConfig;
-import org.terasology.config.RenderingConfig;
 import org.terasology.context.Context;
+import org.terasology.editor.input.AwtKeyboardDevice;
+import org.terasology.editor.input.AwtMouseDevice;
 import org.terasology.engine.modes.GameState;
 import org.terasology.engine.subsystem.config.BindsManager;
+import org.terasology.engine.subsystem.lwjgl.BaseLwjglSubsystem;
 import org.terasology.input.InputSystem;
 import org.terasology.input.lwjgl.LwjglControllerDevice;
-import org.terasology.input.lwjgl.LwjglKeyboardDevice;
-import org.terasology.input.lwjgl.LwjglMouseDevice;
 
-public class LwjglInput extends BaseLwjglSubsystem {
+public class AwtInput extends BaseLwjglSubsystem {
 
     private Context context;
 
@@ -45,16 +44,12 @@ public class LwjglInput extends BaseLwjglSubsystem {
 
         InputSystem inputSystem = new InputSystem();
         context.put(InputSystem.class, inputSystem);
-        inputSystem.setMouseDevice(new LwjglMouseDevice(config.getRendering()));
-        inputSystem.setKeyboardDevice(new LwjglKeyboardDevice());
+        inputSystem.setMouseDevice(new AwtMouseDevice(config.getRendering()));
+        inputSystem.setKeyboardDevice(new AwtKeyboardDevice());
 
         ControllerConfig controllerConfig = config.getInput().getControllers();
         LwjglControllerDevice controllerDevice = new LwjglControllerDevice(controllerConfig);
         inputSystem.setControllerDevice(controllerDevice);
-
-        long window = GLFW.glfwGetCurrentContext();
-        ((LwjglKeyboardDevice) inputSystem.getKeyboard()).registerToLwjglWindow(window);
-        ((LwjglMouseDevice) inputSystem.getMouseDevice()).registerToLwjglWindow(window);
     }
 
     private void updateInputConfig() {

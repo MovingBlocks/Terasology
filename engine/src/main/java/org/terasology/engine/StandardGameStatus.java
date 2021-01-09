@@ -21,6 +21,7 @@ public enum StandardGameStatus implements EngineStatus {
     UNSTARTED("Unstarted"),
     LOADING("Loading"),
     RUNNING("Running"),
+    INITIALIZING("Initializing"),
     SHUTTING_DOWN("Shutting down..."),
     DISPOSED("Shut down");
 

@@ -19,7 +19,7 @@ package org.terasology.world.generation.facets.base;
 import com.google.common.collect.Maps;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
-import org.terasology.world.block.BlockRegion;
+import org.terasology.world.block.BlockRegionc;
 import org.terasology.world.generation.Border3D;
 
 import java.util.Collections;
@@ -35,11 +35,11 @@ public abstract class SparseBooleanFieldFacet3D extends SparseFacet3D implements
 
     private final boolean defValue;
 
-    public SparseBooleanFieldFacet3D(BlockRegion targetRegion, Border3D border) {
+    public SparseBooleanFieldFacet3D(BlockRegionc targetRegion, Border3D border) {
         this(targetRegion, border, false);
     }
 
-    public SparseBooleanFieldFacet3D(BlockRegion targetRegion, Border3D border, boolean defValue) {
+    public SparseBooleanFieldFacet3D(BlockRegionc targetRegion, Border3D border, boolean defValue) {
         super(targetRegion, border);
         this.defValue = defValue;
     }
