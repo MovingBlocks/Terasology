@@ -15,8 +15,7 @@
  */
 package org.terasology.world.generation;
 
-import org.terasology.math.Region3i;
-import org.terasology.world.block.BlockRegion;
+import org.terasology.world.block.BlockRegionc;
 
 /**
  */
@@ -25,10 +24,10 @@ public interface WorldFacet3D extends WorldFacet {
     /**
      * @return The region of the world covered by this facet
      */
-    BlockRegion getWorldRegion();
+    BlockRegionc getWorldRegion();
 
     /**
      * @return The region covered by this facet, relative to the target region
      */
-    BlockRegion getRelativeRegion();
+    BlockRegionc getRelativeRegion();
 }

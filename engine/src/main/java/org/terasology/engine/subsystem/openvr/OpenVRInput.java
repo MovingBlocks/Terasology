@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 package org.terasology.engine.subsystem.openvr;
+import org.lwjgl.glfw.GLFW;
 import org.terasology.assets.module.ModuleAwareAssetTypeManager;
 import org.terasology.config.Config;
 import org.terasology.context.Context;
@@ -76,9 +77,13 @@ public class OpenVRInput implements EngineSubsystem {
         InputSystem inputSystem = context.get(InputSystem.class);
         if (inputSystem == null) {
             inputSystem = new InputSystem();
-            inputSystem.setMouseDevice(new LwjglMouseDevice(context));
+            inputSystem.setMouseDevice(new LwjglMouseDevice(config.getRendering()));
             inputSystem.setKeyboardDevice(new LwjglKeyboardDevice());
             context.put(InputSystem.class, inputSystem);
+
+            long window = GLFW.glfwGetCurrentContext();
+            ((LwjglKeyboardDevice) inputSystem.getKeyboard()).registerToLwjglWindow(window);
+            ((LwjglMouseDevice) inputSystem.getMouseDevice()).registerToLwjglWindow(window);
         }
 
         controllerDevice = new OpenVRControllers();

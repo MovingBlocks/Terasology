@@ -31,6 +31,7 @@ import org.terasology.assets.AssetType;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.engine.GameThread;
 import org.terasology.engine.subsystem.lwjgl.GLBufferPool;
+import org.terasology.engine.subsystem.lwjgl.LwjglGraphicsProcessing;
 import org.terasology.math.AABB;
 import org.terasology.rendering.VertexBufferObjectUtil;
 import org.terasology.rendering.assets.mesh.Mesh;
@@ -77,10 +78,12 @@ public class OpenGLMesh extends Mesh {
 
     private DisposalAction disposalAction;
 
-    public OpenGLMesh(ResourceUrn urn, AssetType<?, MeshData> assetType, GLBufferPool bufferPool, MeshData data) {
+    public OpenGLMesh(ResourceUrn urn, AssetType<?, MeshData> assetType, GLBufferPool bufferPool, MeshData data, LwjglGraphicsProcessing graphicsProcessing) {
         super(urn, assetType);
         this.disposalAction = new DisposalAction(urn, bufferPool);
-        reload(data);
+        graphicsProcessing.asynchToDisplayThread(() -> {
+            reload(data);
+        });
     }
 
     @Override
@@ -291,6 +294,4 @@ public class OpenGLMesh extends Mesh {
             }
         }
     }
-
-
 }

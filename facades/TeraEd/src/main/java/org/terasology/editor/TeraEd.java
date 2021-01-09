@@ -1,39 +1,30 @@
-/*
- * Copyright 2013 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
+
 package org.terasology.editor;
 
-import javax.swing.JPopupMenu;
-import javax.swing.JWindow;
-import javax.swing.UIManager;
-
+import org.lwjgl.glfw.GLFW;
+import org.lwjgl.opengl.awt.AWTGLCanvas;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.editor.properties.SceneProperties;
+import org.terasology.editor.subsystem.AwtInput;
+import org.terasology.editor.subsystem.LwjglPortlet;
 import org.terasology.editor.ui.MainWindow;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.TerasologyEngine;
 import org.terasology.engine.TerasologyEngineBuilder;
 import org.terasology.engine.modes.StateMainMenu;
 import org.terasology.engine.paths.PathManager;
+import org.terasology.engine.subsystem.config.BindsSubsystem;
 import org.terasology.engine.subsystem.lwjgl.LwjglAudio;
-import org.terasology.engine.subsystem.lwjgl.LwjglGraphics;
-import org.terasology.engine.subsystem.lwjgl.LwjglInput;
-import org.terasology.engine.subsystem.lwjgl.LwjglPortlet;
 import org.terasology.engine.subsystem.lwjgl.LwjglTimer;
+import org.terasology.monitoring.PerformanceMonitor;
 
+import javax.swing.JPopupMenu;
+import javax.swing.JWindow;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 
 /**
  * TeraEd main class.
@@ -65,24 +56,49 @@ public final class TeraEd extends JWindow {
             // If Nimbus is not available, you can set the GUI to another look and feel.
             logger.warn("Failed to set look and feel to Nimbus", e);
         }
+
         try {
-            LwjglPortlet lwjglPortlet = new LwjglPortlet();
+            LwjglPortlet portlet = new LwjglPortlet();
 
             PathManager.getInstance().useDefaultHomePath();
 
             engine = new TerasologyEngineBuilder()
-                    .add(new LwjglGraphics())
                     .add(new LwjglTimer())
                     .add(new LwjglAudio())
-                    .add(new LwjglInput())
-                    .add(lwjglPortlet).build();
+                    .add(new AwtInput())
+                    .add(new BindsSubsystem())
+                    .add(portlet).build();
+
+            if (!GLFW.glfwInit()) {
+                throw new RuntimeException("Failed to initialize GLFW");
+            }
             sceneProperties = new SceneProperties(engine);
+
             mainWindow = new MainWindow(this, engine);
-            lwjglPortlet.setCustomViewport(mainWindow.getViewport());
+            portlet.createCanvas();
+            AWTGLCanvas canvas = portlet.getCanvas();
 
             engine.subscribeToStateChange(mainWindow);
+            engine.initializeRun(new StateMainMenu());
 
-            engine.run(new StateMainMenu());
+            mainWindow.getViewport().setTerasology(canvas);
+
+            portlet.initInputs();
+
+            Runnable renderLoop = new Runnable() {
+                public void run() {
+                    if (canvas.isValid()) {
+                        canvas.render();
+                    }
+                    SwingUtilities.invokeLater(this);
+                }
+            };
+
+            // Setup swing thread as game thread
+            PerformanceMonitor.startActivity("Other");
+            SwingUtilities.invokeAndWait(portlet::setupThreads);
+            SwingUtilities.invokeLater(renderLoop);
+            PerformanceMonitor.endActivity();
         } catch (Throwable t) {
             logger.error("Uncaught Exception", t);
         }

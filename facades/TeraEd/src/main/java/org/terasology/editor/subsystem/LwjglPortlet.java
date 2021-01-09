@@ -1,27 +1,13 @@
-/*
- * Copyright 2017 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-package org.terasology.engine.subsystem.lwjgl;
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
+package org.terasology.editor.subsystem;
 
+import com.google.common.base.Preconditions;
 import org.lwjgl.glfw.GLFW;
-import org.lwjgl.glfw.GLFWFramebufferSizeCallback;
 import org.lwjgl.glfw.GLFWImage;
-import org.lwjgl.opengl.GL;
-import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL43;
-import org.lwjgl.opengl.GLCapabilities;
+import org.lwjgl.opengl.awt.AWTGLCanvas;
+import org.lwjgl.opengl.awt.GLData;
 import org.lwjgl.system.MemoryUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,32 +15,53 @@ import org.terasology.assets.module.ModuleAwareAssetTypeManager;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.context.Context;
+import org.terasology.editor.input.AwtKeyboardDevice;
+import org.terasology.editor.input.AwtMouseDevice;
 import org.terasology.engine.GameEngine;
+import org.terasology.engine.GameThread;
+import org.terasology.engine.TerasologyEngine;
 import org.terasology.engine.modes.GameState;
 import org.terasology.engine.subsystem.DisplayDevice;
+import org.terasology.engine.subsystem.lwjgl.BaseLwjglSubsystem;
+import org.terasology.engine.subsystem.lwjgl.DebugCallback;
+import org.terasology.engine.subsystem.lwjgl.GLFWErrorCallback;
+import org.terasology.engine.subsystem.lwjgl.LwjglGraphicsManager;
+import org.terasology.engine.subsystem.lwjgl.LwjglGraphicsUtil;
+import org.terasology.entitySystem.event.internal.EventSystem;
+import org.terasology.input.InputSystem;
 import org.terasology.nui.canvas.CanvasRenderer;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.ShaderManager;
 import org.terasology.rendering.ShaderManagerLwjgl;
 import org.terasology.rendering.nui.internal.LwjglCanvasRenderer;
+import org.terasology.rendering.world.WorldRenderer;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
-public class LwjglGraphics extends BaseLwjglSubsystem {
-    private static final Logger logger = LoggerFactory.getLogger(LwjglGraphics.class);
+import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
+import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
+import static org.lwjgl.opengl.GL11.glClear;
+import static org.lwjgl.opengl.GL11.glLoadIdentity;
+
+public class LwjglPortlet extends BaseLwjglSubsystem {
+
+    private static final Logger logger = LoggerFactory.getLogger(LwjglPortlet.class);
 
     private Context context;
     private RenderingConfig config;
 
     private GameEngine engine;
-    private LwjglDisplayDevice lwjglDisplay;
+    private AWTGLCanvas canvas;
+    private LwjglPortletDisplayDevice display;
+    private AwtMouseDevice mouseDevice;
 
-    private LwjglGraphicsManager graphics = new LwjglGraphicsManager();
+    private final LwjglGraphicsManager graphics = new LwjglGraphicsManager();
 
     @Override
     public String getName() {
-        return "Graphics";
+        return "Portlet";
     }
 
     @Override
@@ -63,8 +70,10 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
         this.engine = gameEngine;
         this.context = rootContext;
         this.config = context.get(Config.class).getRendering();
-        lwjglDisplay = new LwjglDisplayDevice(context);
-        context.put(DisplayDevice.class, lwjglDisplay);
+
+        graphics.setThreadMode(LwjglGraphicsManager.ThreadMode.DISPLAY_THREAD);
+        display = new LwjglPortletDisplayDevice(canvas, graphics);
+        context.put(DisplayDevice.class, display);
         logger.info("Initial initialization complete");
     }
 
@@ -77,9 +86,7 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
     public void postInitialise(Context rootContext) {
         graphics.registerRenderingSubsystem(context);
 
-        initGLFW();
-        initWindow();
-        initOpenGL();
+        initBuffer();
 
         context.put(ShaderManager.class, new ShaderManagerLwjgl());
         context.put(CanvasRenderer.class, new LwjglCanvasRenderer(context));
@@ -91,41 +98,50 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
 
         currentState.render();
 
-        lwjglDisplay.update();
+        display.update();
         int frameLimit = context.get(Config.class).getRendering().getFrameLimit();
         if (frameLimit > 0) {
-            Lwjgl2Sync.sync(frameLimit);
+//            Lwjgl2Sync.sync(frameLimit);
         }
-        if (lwjglDisplay.isCloseRequested()) {
+        if (display.isCloseRequested()) {
             engine.shutdown();
         }
     }
 
-    @Override
-    public void preShutdown() {
-        long window = GLFW.glfwGetCurrentContext();
-        if (window != MemoryUtil.NULL) {
-            boolean isVisible = GLFW.glfwGetWindowAttrib(window, GLFW.GLFW_VISIBLE) == GLFW.GLFW_TRUE;
-            boolean isFullScreen = lwjglDisplay.isFullscreen();
-            if (!isFullScreen && isVisible) {
-                int[] xBuffer = new int[1];
-                int[] yBuffer = new int[1];
-                GLFW.glfwGetWindowPos(window, xBuffer, yBuffer);
-                config.setWindowPosX(xBuffer[0]);
-                config.setWindowPosY(yBuffer[0]);
+    public void setupThreads() {
+        GameThread.reset();
+        GameThread.setToCurrentThread();
+        graphics.setThreadMode(LwjglGraphicsManager.ThreadMode.GAME_THREAD);
 
-                int[] widthBuffer = new int[1];
-                int[] heightBuffer = new int[1];
-                GLFW.glfwGetWindowSize(window, widthBuffer, heightBuffer);
-                config.setWindowWidth(widthBuffer[0]);
-                config.setWindowHeight(heightBuffer[0]);
-            }
+        EventSystem eventSystem = CoreRegistry.get(EventSystem.class);
+        if (eventSystem != null) {
+            eventSystem.setToCurrentThread();
         }
     }
 
-    @Override
-    public void shutdown() {
-        GLFW.glfwTerminate();
+    public void createCanvas() {
+        GLData data = new GLData();
+        data.samples = 4;
+        canvas = new AWTGLCanvas() {
+            @Override
+            public void initGL() {
+                initGLFW();
+                initOpenGL();
+                glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+                glLoadIdentity();
+            }
+
+            @Override
+            public void paintGL() {
+                if (((TerasologyEngine) engine).tick()) {
+                    mouseDevice.resetDelta();
+                }
+            }
+        };
+    }
+
+    public AWTGLCanvas getCanvas() {
+        return this.canvas;
     }
 
     private void initGLFW() {
@@ -146,15 +162,9 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
         GLFW.glfwSetErrorCallback(new GLFWErrorCallback());
     }
 
-    private void initWindow() {
+    private void initBuffer() {
         logger.info("Initializing display (if last line in log then likely the game crashed from an issue with your " +
                 "video card)");
-        long window = GLFW.glfwCreateWindow(
-                config.getWindowWidth(), config.getWindowHeight(), "Terasology Alpha", 0, 0);
-        if (window == 0) {
-            throw new RuntimeException("Failed to create window");
-        }
-        GLFW.glfwMakeContextCurrent(window);
 
         if (!config.isVSync()) {
             GLFW.glfwSwapInterval(0);
@@ -173,26 +183,17 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
             buffer.put(1, LwjglGraphicsUtil.convertToGLFWFormat(icon32));
             buffer.put(2, LwjglGraphicsUtil.convertToGLFWFormat(icon64));
             buffer.put(3, LwjglGraphicsUtil.convertToGLFWFormat(icon128));
-            GLFW.glfwSetWindowIcon(window, buffer);
 
         } catch (IOException | IllegalArgumentException e) {
             logger.warn("Could not set icon", e);
         }
 
-        lwjglDisplay.setDisplayModeSetting(config.getDisplayModeSetting(), false);
-
-        GLFW.glfwShowWindow(window);
+        display.setDisplayModeSetting(config.getDisplayModeSetting());
     }
 
     private void initOpenGL() {
         logger.info("Initializing OpenGL");
         LwjglGraphicsUtil.checkOpenGL();
-        GLFW.glfwSetFramebufferSizeCallback(GLFW.glfwGetCurrentContext(), new GLFWFramebufferSizeCallback() {
-            @Override
-            public void invoke(long window, int width, int height) {
-                lwjglDisplay.updateViewport(width, height);
-            }
-        });
         LwjglGraphicsUtil.initOpenGLParams();
         if (config.getDebug().isEnabled()) {
             try {
@@ -201,5 +202,18 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
                 logger.warn("Unable to specify DebugCallback to receive debugging messages from the GL.");
             }
         }
+    }
+
+    public void initInputs() {
+        final InputSystem inputSystem = context.get(InputSystem.class);
+        Preconditions.checkNotNull(inputSystem);
+        mouseDevice = ((AwtMouseDevice) inputSystem.getMouseDevice());
+        mouseDevice.registerToAwtGlCanvas(canvas);
+        ((AwtKeyboardDevice) inputSystem.getKeyboard()).registerToAwtGlCanvas(canvas);
+    }
+
+    @Override
+    public void shutdown() {
+        GLFW.glfwTerminate();
     }
 }

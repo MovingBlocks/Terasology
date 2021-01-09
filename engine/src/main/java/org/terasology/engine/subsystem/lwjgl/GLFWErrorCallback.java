@@ -12,6 +12,6 @@ public class GLFWErrorCallback implements GLFWErrorCallbackI {
 
     @Override
     public void invoke(int error, long description) {
-        logger.error("Recieved error. Code: {}, Description: {}", error, MemoryUtil.memASCII(description));
+        logger.error("Received error. Code: {}, Description: {}", error, MemoryUtil.memASCII(description));
     }
 }

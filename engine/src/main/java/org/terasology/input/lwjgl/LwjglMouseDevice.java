@@ -10,9 +10,7 @@ import org.joml.Vector2d;
 import org.joml.Vector2i;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.glfw.GLFW;
-import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
-import org.terasology.context.Context;
 import org.terasology.input.ButtonState;
 import org.terasology.input.InputType;
 import org.terasology.input.MouseInput;
@@ -25,8 +23,8 @@ import java.nio.DoubleBuffer;
 import java.util.Queue;
 
 /**
- * Lwjgl 3's (GLFW) mouse device represenation.
- * Handles mouse input via GLFW's callbacks
+ * Lwjgl 3's (GLFW) mouse device representation.
+ * Handles mouse input via GLFW's callbacks.
  * Handles mouse state.
  */
 public class LwjglMouseDevice implements MouseDevice, PropertyChangeListener {
@@ -43,24 +41,26 @@ public class LwjglMouseDevice implements MouseDevice, PropertyChangeListener {
     private double xposDelta;
     private double yposDelta;
 
-    public LwjglMouseDevice(Context context) {
-        this.renderingConfig = context.get(Config.class).getRendering();
-        this.uiScale = this.renderingConfig.getUiScale() / 100f;
-        this.renderingConfig.subscribe(RenderingConfig.UI_SCALE, this);
-
-        // GLFW callback
-        long window = GLFW.glfwGetCurrentContext();
-        GLFW.glfwSetMouseButtonCallback(window, this::mouseButtonCallback);
-        GLFW.glfwSetScrollCallback(window, this::scrollCallback);
-
+    public LwjglMouseDevice(RenderingConfig renderingConfig) {
+        this.renderingConfig = renderingConfig;
+        this.uiScale = renderingConfig.getUiScale() / 100f;
+        renderingConfig.subscribe(RenderingConfig.UI_SCALE, this);
     }
 
+    public void registerToLwjglWindow(long window) {
+        GLFW.glfwSetMouseButtonCallback(window, this::mouseButtonCallback);
+        GLFW.glfwSetScrollCallback(window, this::scrollCallback);
+    }
 
     @Override
-    public void  update() {
+    public void update() {
         long window = GLFW.glfwGetCurrentContext();
         DoubleBuffer mouseX = BufferUtils.createDoubleBuffer(1);
         DoubleBuffer mouseY = BufferUtils.createDoubleBuffer(1);
+
+        GLFW.glfwGetCursorPos(window, mouseX, mouseY);
+        mouseX.rewind();
+        mouseY.rewind();
 
         GLFW.glfwGetCursorPos(window, mouseX, mouseY);
         mouseX.rewind();
@@ -77,7 +77,7 @@ public class LwjglMouseDevice implements MouseDevice, PropertyChangeListener {
 
     @Override
     public Vector2i getPosition() {
-        return new Vector2i((int) (xpos / this.uiScale), (int)  (ypos / this.uiScale));
+        return new Vector2i((int) (xpos / this.uiScale), (int) (ypos / this.uiScale));
     }
 
     @Override
