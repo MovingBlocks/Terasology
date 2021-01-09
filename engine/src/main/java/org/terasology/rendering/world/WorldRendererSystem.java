@@ -20,6 +20,7 @@ import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
+import org.terasology.math.JomlUtil;
 import org.terasology.registry.In;
 import org.terasology.world.WorldComponent;
 import org.terasology.world.chunks.event.BeforeChunkUnload;
@@ -35,12 +36,12 @@ public class WorldRendererSystem extends BaseComponentSystem {
 
     @ReceiveEvent(components = WorldComponent.class)
     public void onChunkLoaded(OnChunkLoaded chunkLoaded, EntityRef entity) {
-        worldRenderer.onChunkLoaded(chunkLoaded.getChunkPos());
+        worldRenderer.onChunkLoaded(JomlUtil.from(chunkLoaded.getChunkPos()));
     }
 
     @ReceiveEvent(components = WorldComponent.class)
     public void onChunkUnloaded(BeforeChunkUnload chunkUnloaded, EntityRef entity) {
-        worldRenderer.onChunkUnloaded(chunkUnloaded.getChunkPos());
+        worldRenderer.onChunkUnloaded(JomlUtil.from(chunkUnloaded.getChunkPos()));
     }
 
 

@@ -16,9 +16,7 @@
 package org.terasology.world.generation;
 
 import com.google.common.base.Preconditions;
-import org.joml.Vector3i;
 import org.joml.Vector3ic;
-import org.terasology.math.geom.Rect2i;
 import org.terasology.world.block.BlockArea;
 import org.terasology.world.block.BlockRegion;
 import org.terasology.world.block.BlockRegionc;
