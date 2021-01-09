@@ -153,7 +153,7 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
                 clientsPreparingToSpawn.add(new SpawningClientInfo(entity, storedLocation, playerStore));
             }
         } else {
-            Vector3f spawnPosition = JomlUtil.from(worldGenerator.getSpawnPosition(entity));
+            Vector3fc spawnPosition = worldGenerator.getSpawnPosition(entity);
             loc.setWorldPosition(spawnPosition);
             entity.saveComponent(loc);
 
@@ -222,11 +222,11 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
         EntityRef character = clientComponent.character;
         EntityRef clientInfo = clientComponent.clientInfo;
 
-        Vector3f spawnPosition;
+        Vector3fc spawnPosition;
         if (clientInfo.hasComponent(StaticSpawnLocationComponent.class)) {
             spawnPosition = clientInfo.getComponent(StaticSpawnLocationComponent.class).position;
         } else {
-            spawnPosition = JomlUtil.from(worldGenerator.getSpawnPosition(entity));
+            spawnPosition = worldGenerator.getSpawnPosition(entity);
         }
         LocationComponent loc = character.getComponent(LocationComponent.class);
         loc.setWorldPosition(spawnPosition);

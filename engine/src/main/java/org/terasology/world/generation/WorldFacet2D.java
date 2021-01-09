@@ -15,7 +15,7 @@
  */
 package org.terasology.world.generation;
 
-import org.terasology.math.geom.Rect2i;
+import org.terasology.world.block.BlockAreac;
 
 /**
  */
@@ -24,10 +24,10 @@ public interface WorldFacet2D extends WorldFacet {
     /**
      * @return The region of the world covered by this facet
      */
-    Rect2i getWorldRegion();
+    BlockAreac getWorldArea();
 
     /**
      * @return The region covered by this facet, relative to the target region
      */
-    Rect2i getRelativeRegion();
+    BlockAreac getRelativeArea();
 }
