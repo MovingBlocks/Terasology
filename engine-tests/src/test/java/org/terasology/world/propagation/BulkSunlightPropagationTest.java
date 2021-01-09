@@ -16,17 +16,17 @@
 package org.terasology.world.propagation;
 
 import com.google.common.collect.Maps;
+import org.joml.Vector3i;
+import org.joml.Vector3ic;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.terasology.TerasologyTestingEnvironment;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
-import org.terasology.math.JomlUtil;
-import org.terasology.math.Region3i;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
+import org.terasology.world.block.BlockRegion;
 import org.terasology.world.block.BlockUri;
 import org.terasology.world.block.family.SymmetricFamily;
 import org.terasology.world.block.internal.BlockManagerImpl;
@@ -34,7 +34,7 @@ import org.terasology.world.block.loader.BlockFamilyDefinition;
 import org.terasology.world.block.loader.BlockFamilyDefinitionData;
 import org.terasology.world.block.shapes.BlockShape;
 import org.terasology.world.block.tiles.NullWorldAtlas;
-import org.terasology.world.chunks.ChunkConstants;
+import org.terasology.world.chunks.Chunks;
 import org.terasology.world.propagation.light.SunlightPropagationRules;
 import org.terasology.world.propagation.light.SunlightRegenPropagationRules;
 
@@ -76,9 +76,9 @@ public class BulkSunlightPropagationTest extends TerasologyTestingEnvironment {
 
         air = blockManager.getBlock(BlockManager.AIR_ID);
 
-        Map<Vector3i, Block> blockData = Maps.newHashMap();
-        regenWorldView = new StubPropagatorWorldView(ChunkConstants.CHUNK_REGION, air, blockData);
-        lightWorldView = new StubPropagatorWorldView(ChunkConstants.CHUNK_REGION, air, blockData);
+        Map<Vector3ic, Block> blockData = Maps.newHashMap();
+        regenWorldView = new StubPropagatorWorldView(Chunks.CHUNK_REGION, air, blockData);
+        lightWorldView = new StubPropagatorWorldView(Chunks.CHUNK_REGION, air, blockData);
 
         lightRules = new SunlightPropagationRules(regenWorldView);
         sunlightPropagator = new StandardBatchPropagator(lightRules, lightWorldView);
@@ -89,53 +89,53 @@ public class BulkSunlightPropagationTest extends TerasologyTestingEnvironment {
 
     @Test
     public void testAllowSunlightVertical() {
-        for (Vector3i pos : Region3i.createBounded(new Vector3i(0, 16, 0), new Vector3i(ChunkConstants.SIZE_X - 1, ChunkConstants.SIZE_Y - 1, ChunkConstants.SIZE_Z - 1))) {
-            regenWorldView.setValueAt(pos, ChunkConstants.MAX_SUNLIGHT_REGEN);
-            lightWorldView.setValueAt(pos, ChunkConstants.MAX_SUNLIGHT);
+        for (Vector3ic pos : new BlockRegion(0, 16, 0).union(Chunks.SIZE_X - 1, Chunks.SIZE_Y - 1, Chunks.SIZE_Z - 1)) {
+            regenWorldView.setValueAt(pos, Chunks.MAX_SUNLIGHT_REGEN);
+            lightWorldView.setValueAt(pos, Chunks.MAX_SUNLIGHT);
         }
-        for (Vector3i pos : Region3i.createBounded(new Vector3i(0, 15, 0), new Vector3i(ChunkConstants.SIZE_X - 1, 15, ChunkConstants.SIZE_Z - 1))) {
+        for (Vector3ic pos : new BlockRegion(0, 15, 0).union(Chunks.SIZE_X - 1, 15, Chunks.SIZE_Z - 1)) {
             regenWorldView.setBlockAt(pos, solid);
         }
-        for (Vector3i pos : Region3i.createBounded(new Vector3i(0, 0, 0), new Vector3i(ChunkConstants.SIZE_X - 1, 14, ChunkConstants.SIZE_Z - 1))) {
-            regenWorldView.setValueAt(pos, (byte) (14 - pos.y));
+        for (Vector3ic pos : new BlockRegion(0, 0, 0).union(Chunks.SIZE_X - 1, 14, Chunks.SIZE_Z - 1)) {
+            regenWorldView.setValueAt(pos, (byte) (14 - pos.y()));
         }
 
         regenWorldView.setBlockAt(new Vector3i(16, 15, 16), air);
-        propagator.process(new BlockChange(JomlUtil.from(new Vector3i(16, 15, 16)), solid, air));
-        sunlightPropagator.process(new BlockChange(JomlUtil.from(new Vector3i(16, 15, 16)), solid, air));
+        propagator.process(new BlockChange(new Vector3i(16, 15, 16), solid, air));
+        sunlightPropagator.process(new BlockChange(new Vector3i(16, 15, 16), solid, air));
 
         for (int y = 0; y < 16; y++) {
-            assertEquals(ChunkConstants.MAX_SUNLIGHT_REGEN, regenWorldView.getValueAt(new Vector3i(16, y, 16)), "Incorrect value at " + y);
-            assertEquals(ChunkConstants.MAX_SUNLIGHT, lightWorldView.getValueAt(new Vector3i(16, y, 16)));
+            assertEquals(Chunks.MAX_SUNLIGHT_REGEN, regenWorldView.getValueAt(new Vector3i(16, y, 16)), "Incorrect value at " + y);
+            assertEquals(Chunks.MAX_SUNLIGHT, lightWorldView.getValueAt(new Vector3i(16, y, 16)));
         }
         for (int y = 0; y < 15; y++) {
-            assertEquals(ChunkConstants.MAX_SUNLIGHT - 1, lightWorldView.getValueAt(new Vector3i(15, y, 16)));
+            assertEquals(Chunks.MAX_SUNLIGHT - 1, lightWorldView.getValueAt(new Vector3i(15, y, 16)));
         }
     }
 
     @Test
     public void testStopSunlightVertical() {
-        for (Vector3i pos : Region3i.createBounded(new Vector3i(0, 16, 0), new Vector3i(ChunkConstants.SIZE_X - 1, ChunkConstants.SIZE_Y - 1, ChunkConstants.SIZE_Z - 1))) {
-            regenWorldView.setValueAt(pos, ChunkConstants.MAX_SUNLIGHT_REGEN);
-            lightWorldView.setValueAt(pos, ChunkConstants.MAX_SUNLIGHT);
+        for (Vector3ic pos : new BlockRegion(0, 16, 0).union(Chunks.SIZE_X - 1, Chunks.SIZE_Y - 1, Chunks.SIZE_Z - 1)) {
+            regenWorldView.setValueAt(pos, Chunks.MAX_SUNLIGHT_REGEN);
+            lightWorldView.setValueAt(pos, Chunks.MAX_SUNLIGHT);
         }
-        for (Vector3i pos : Region3i.createBounded(new Vector3i(0, 15, 0), new Vector3i(ChunkConstants.SIZE_X - 1, 15, ChunkConstants.SIZE_Z - 1))) {
+        for (Vector3ic pos : new BlockRegion(0, 15, 0).union(Chunks.SIZE_X - 1, 15, Chunks.SIZE_Z - 1)) {
             regenWorldView.setBlockAt(pos, solid);
         }
-        for (Vector3i pos : Region3i.createBounded(new Vector3i(0, 0, 0), new Vector3i(ChunkConstants.SIZE_X - 1, 14, ChunkConstants.SIZE_Z - 1))) {
-            regenWorldView.setValueAt(pos, (byte) (14 - pos.y));
+        for (Vector3ic pos : new BlockRegion(0, 0, 0).union(Chunks.SIZE_X - 1, 14, Chunks.SIZE_Z - 1)) {
+            regenWorldView.setValueAt(pos, (byte) (14 - pos.y()));
         }
 
         regenWorldView.setBlockAt(new Vector3i(16, 15, 16), air);
-        propagator.process(new BlockChange(JomlUtil.from(new Vector3i(16, 15, 16)), solid, air));
-        sunlightPropagator.process(new BlockChange(JomlUtil.from(new Vector3i(16, 15, 16)), solid, air));
+        propagator.process(new BlockChange(new Vector3i(16, 15, 16), solid, air));
+        sunlightPropagator.process(new BlockChange(new Vector3i(16, 15, 16), solid, air));
 
         regenWorldView.setBlockAt(new Vector3i(16, 15, 16), solid);
-        propagator.process(new BlockChange(JomlUtil.from(new Vector3i(16, 15, 16)), air, solid));
-        sunlightPropagator.process(new BlockChange(JomlUtil.from(new Vector3i(16, 15, 16)), air, solid));
+        propagator.process(new BlockChange(new Vector3i(16, 15, 16), air, solid));
+        sunlightPropagator.process(new BlockChange(new Vector3i(16, 15, 16), air, solid));
 
-        for (Vector3i pos : Region3i.createBounded(new Vector3i(0, 0, 0), new Vector3i(ChunkConstants.SIZE_X - 1, 15, ChunkConstants.SIZE_Z - 1))) {
-            assertEquals(Math.max(0, 14 - pos.y), regenWorldView.getValueAt(pos), "Incorrect value at " + pos);
+        for (Vector3ic pos : new BlockRegion(0, 0, 0).union(Chunks.SIZE_X - 1, 15, Chunks.SIZE_Z - 1)) {
+            assertEquals(Math.max(0, 14 - pos.y()), regenWorldView.getValueAt(pos), "Incorrect value at " + pos);
             assertEquals(0, lightWorldView.getValueAt(pos), "Incorrect value at " + pos);
         }
     }
