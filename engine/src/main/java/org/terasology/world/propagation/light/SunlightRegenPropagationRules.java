@@ -15,10 +15,11 @@
  */
 package org.terasology.world.propagation.light;
 
+import org.joml.Vector3ic;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.Side;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.world.block.Block;
-import org.terasology.world.chunks.ChunkConstants;
+import org.terasology.world.chunks.Chunks;
 import org.terasology.world.chunks.LitChunk;
 import org.terasology.world.propagation.PropagationComparison;
 
@@ -33,37 +34,37 @@ public class SunlightRegenPropagationRules extends CommonLightPropagationRules {
      * {@inheritDoc}
      */
     @Override
-    public byte getFixedValue(Block block, Vector3i pos) {
+    public byte getFixedValue(Block block, Vector3ic pos) {
         return 0;
     }
 
     /**
      * Sunlight goes to zero unless leaving via the bottom face.
-     * In that case it increases up until the maximum value in {@link ChunkConstants#MAX_SUNLIGHT_REGEN}
+     * In that case it increases up until the maximum value in {@link Chunks#MAX_SUNLIGHT_REGEN}
      * <p>
      * {@inheritDoc}
      */
     @Override
     public byte propagateValue(byte existingValue, Side side, Block from) {
         if (side == Side.BOTTOM) {
-            return (existingValue == ChunkConstants.MAX_SUNLIGHT_REGEN) ? ChunkConstants.MAX_SUNLIGHT_REGEN  : (byte) (existingValue + 1);
+            return (existingValue == Chunks.MAX_SUNLIGHT_REGEN) ? Chunks.MAX_SUNLIGHT_REGEN  : (byte) (existingValue + 1);
         }
         return 0;
     }
 
     /**
-     * The maximum value of sunlight is given by {@link ChunkConstants#MAX_SUNLIGHT_REGEN}
+     * The maximum value of sunlight is given by {@link Chunks#MAX_SUNLIGHT_REGEN}
      * <p>
      * {@inheritDoc}
      */
     @Override
     public byte getMaxValue() {
-        return ChunkConstants.MAX_SUNLIGHT_REGEN;
+        return Chunks.MAX_SUNLIGHT_REGEN;
     }
 
     @Override
-    public byte getValue(LitChunk chunk, Vector3i pos) {
-        return getValue(chunk, pos.x, pos.y, pos.z);
+    public byte getValue(LitChunk chunk, Vector3ic pos) {
+        return getValue(chunk, pos);
     }
 
     @Override
@@ -72,8 +73,8 @@ public class SunlightRegenPropagationRules extends CommonLightPropagationRules {
     }
 
     @Override
-    public void setValue(LitChunk chunk, Vector3i pos, byte value) {
-        chunk.setSunlightRegen(pos, value);
+    public void setValue(LitChunk chunk, Vector3ic pos, byte value) {
+        chunk.setSunlightRegen(JomlUtil.from(pos), value);
     }
 
     /**

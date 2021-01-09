@@ -15,10 +15,11 @@
  */
 package org.terasology.world.propagation.light;
 
+import org.joml.Vector3ic;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.Side;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.world.block.Block;
-import org.terasology.world.chunks.ChunkConstants;
+import org.terasology.world.chunks.Chunks;
 import org.terasology.world.chunks.LitChunk;
 import org.terasology.world.propagation.PropagatorWorldView;
 import org.terasology.world.propagation.SingleChunkView;
@@ -44,8 +45,8 @@ public class SunlightPropagationRules extends CommonLightPropagationRules {
      * {@inheritDoc}
      */
     @Override
-    public byte getFixedValue(Block block, Vector3i pos) {
-        byte lightVal = (byte) (regenWorldView.getValueAt(pos) - ChunkConstants.SUNLIGHT_REGEN_THRESHOLD);
+    public byte getFixedValue(Block block, Vector3ic pos) {
+        byte lightVal = (byte) (regenWorldView.getValueAt(pos) - Chunks.SUNLIGHT_REGEN_THRESHOLD);
         return (lightVal > 0) ? lightVal : 0;
     }
 
@@ -60,18 +61,18 @@ public class SunlightPropagationRules extends CommonLightPropagationRules {
     }
 
     /**
-     * The maximum sunlight is given by {@link ChunkConstants#MAX_SUNLIGHT}
+     * The maximum sunlight is given by {@link Chunks#MAX_SUNLIGHT}
      * <p>
      * {@inheritDoc}
      */
     @Override
     public byte getMaxValue() {
-        return ChunkConstants.MAX_SUNLIGHT;
+        return Chunks.MAX_SUNLIGHT;
     }
 
     @Override
-    public byte getValue(LitChunk chunk, Vector3i pos) {
-        return getValue(chunk, pos.x, pos.y, pos.z);
+    public byte getValue(LitChunk chunk, Vector3ic pos) {
+        return getValue(chunk, pos);
     }
 
     @Override
@@ -80,8 +81,8 @@ public class SunlightPropagationRules extends CommonLightPropagationRules {
     }
 
     @Override
-    public void setValue(LitChunk chunk, Vector3i pos, byte value) {
-        chunk.setSunlight(pos, value);
+    public void setValue(LitChunk chunk, Vector3ic pos, byte value) {
+        chunk.setSunlight(JomlUtil.from(pos), value);
     }
 
 }
