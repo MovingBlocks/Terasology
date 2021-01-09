@@ -15,13 +15,15 @@
  */
 package org.terasology.entitySystem.sectors;
 
+import org.joml.Vector3f;
+import org.joml.Vector3i;
+import org.joml.Vector3ic;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.location.LocationComponent;
-import org.terasology.math.ChunkMath;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.module.sandbox.API;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkProvider;
+import org.terasology.world.chunks.Chunks;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -57,7 +59,7 @@ public final class SectorUtil {
      */
     public static void addChunksToRegionComponent(SectorRegionComponent regionComponent, Collection<Chunk> chunks) {
         regionComponent.chunks.addAll(chunks.stream()
-                .map(Chunk::getPosition)
+                .map(k -> k.getPosition(new Vector3i()))
                 .collect(Collectors.toSet()));
     }
 
@@ -90,12 +92,13 @@ public final class SectorUtil {
     public static Set<Vector3i> getWatchedChunks(EntityRef entity) {
         Set<Vector3i> chunks = new HashSet<>();
         LocationComponent loc = entity.getComponent(LocationComponent.class);
-        if (loc != null&& !Float.isNaN(loc.getWorldPosition().x)) {
-            chunks.add(ChunkMath.calcChunkPos(loc.getWorldPosition()));
+        Vector3f position = loc.getWorldPosition(new Vector3f());
+        if (position.isFinite()) {
+            chunks.add(Chunks.toChunkPos(position, new Vector3i()));
         }
         SectorRegionComponent regionComponent = entity.getComponent(SectorRegionComponent.class);
         if (regionComponent != null) {
-            chunks.addAll(regionComponent.chunks);
+            chunks.addAll(regionComponent.chunks); // potential leaky abstraction. component exposes its internal vectors
         }
         return chunks;
     }
@@ -108,7 +111,7 @@ public final class SectorUtil {
      * @param chunkProvider the chunkProvider, so that it can check which chunks are loaded
      * @return whether the entity is watching no loaded chunks, or only the given chunk is loaded
      */
-    public static boolean onlyWatchedChunk(EntityRef entity, Vector3i chunkPos, ChunkProvider chunkProvider) {
+    public static boolean onlyWatchedChunk(EntityRef entity, Vector3ic chunkPos, ChunkProvider chunkProvider) {
         Set<Vector3i> readyChunks = getWatchedChunks(entity).stream()
                 .filter(chunkProvider::isChunkReady)
                 .collect(Collectors.toSet());
