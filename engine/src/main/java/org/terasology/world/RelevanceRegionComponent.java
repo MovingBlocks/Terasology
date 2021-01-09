@@ -15,13 +15,13 @@
  */
 package org.terasology.world;
 
+import org.joml.Vector3i;
 import org.terasology.entitySystem.Component;
-import org.terasology.math.geom.Vector3i;
 
 /**
  */
 public class RelevanceRegionComponent implements Component {
 
-    public Vector3i distance = Vector3i.one();
+    public Vector3i distance = new Vector3i(1, 1, 1);
 
 }
