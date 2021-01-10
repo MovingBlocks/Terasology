@@ -5,6 +5,8 @@ package org.terasology.persistence.typeHandling.coreTypes;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.PersistedDataSerializer;
 import org.terasology.persistence.typeHandling.TypeHandler;
@@ -22,6 +24,8 @@ import java.util.stream.Collectors;
  * @param <V> the type of mapped values; requires a {@code TypeHandler<V>}
  */
 public class GenericMapTypeHandler<K, V> extends TypeHandler<Map<K, V>> {
+
+    private static final Logger logger = LoggerFactory.getLogger(GenericMapTypeHandler.class);
 
     private static final String KEY = "key";
     private static final String VALUE = "value";
@@ -66,7 +70,15 @@ public class GenericMapTypeHandler<K, V> extends TypeHandler<Map<K, V>> {
             final Optional<K> key = keyHandler.deserialize(entry.getAsValueMap().get(KEY));
             final Optional<V> value = valueHandler.deserialize(entry.getAsValueMap().get(VALUE));
 
-            key.ifPresent(k -> result.put(k, value.orElse(null)));
+            if (key.isPresent()) {
+                if (value.isPresent()) {
+                    result.put(key.get(), value.get());
+                } else {
+                    logger.warn("Missing field '{}' for entry '{}'", VALUE, data.getAsString());
+                }
+            } else {
+                logger.warn("Missing field '{}' for entry '{}'", KEY, data.getAsString());
+            }
         }
 
         return Optional.of(result);
