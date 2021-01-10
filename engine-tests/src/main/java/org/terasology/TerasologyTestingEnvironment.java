@@ -134,6 +134,7 @@ public abstract class TerasologyTestingEnvironment {
         env.close();
     }
 
+
     public EngineEntityManager getEntityManager() {
         return engineEntityManager;
     }
