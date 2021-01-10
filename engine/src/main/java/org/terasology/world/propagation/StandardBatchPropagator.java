@@ -119,6 +119,7 @@ public class StandardBatchPropagator implements BatchPropagator {
         }
 
         /* Process propagation out to other blocks */
+        Vector3i adjPos = new Vector3i();
         for (Side side : Side.getAllSides()) {
             PropagationComparison comparison = rules.comparePropagation(blockChange.getTo(), blockChange.getFrom(),
                     side);
@@ -126,7 +127,7 @@ public class StandardBatchPropagator implements BatchPropagator {
             if (comparison.isRestricting() && existingValue > 0) {
                 /* If the propagation of the new value is going to be lower/reduced */
                 reduce(blockChangePosition, existingValue);
-                Vector3i adjPos = side.getAdjacentPos(blockChangePosition, new Vector3i());
+                side.getAdjacentPos(blockChangePosition, adjPos);
                 byte adjValue = world.getValueAt(adjPos);
                 if (adjValue == rules.propagateValue(existingValue, side, blockChange.getFrom())) {
                     reduce(adjPos, adjValue);
@@ -139,7 +140,7 @@ public class StandardBatchPropagator implements BatchPropagator {
                     queueSpreadValue(blockChangePosition, existingValue);
                 }
                 /* Spread it out to the block on the side */
-                Vector3i adjPos = side.getAdjacentPos(blockChangePosition, new Vector3i());
+                side.getAdjacentPos(blockChangePosition, adjPos);
                 byte adjValue = world.getValueAt(adjPos);
                 if (adjValue != PropagatorWorldView.UNAVAILABLE) {
                     queueSpreadValue(adjPos, adjValue);
@@ -147,7 +148,6 @@ public class StandardBatchPropagator implements BatchPropagator {
             }
         }
     }
-
 
     /**
      * Reset a position to only it's fixed values
@@ -167,12 +167,12 @@ public class StandardBatchPropagator implements BatchPropagator {
             world.setValueAt(pos, NO_VALUE);
         }
 
-
+        Vector3i adjPos = new Vector3i();
         for (Side side : Side.getAllSides()) {
             /* Handle this value being reset to the default by updating sides as needed */
             byte expectedValue = rules.propagateValue(oldValue, side, block);
-            Vector3i adjPos = side.getAdjacentPos(pos, new Vector3i());
             if (rules.canSpreadOutOf(block, side)) {
+                side.getAdjacentPos(pos, adjPos);
                 byte adjValue = world.getValueAt(adjPos);
                 if (adjValue == expectedValue) {
                     Block adjBlock = world.getBlockAt(adjPos);
@@ -236,11 +236,12 @@ public class StandardBatchPropagator implements BatchPropagator {
      */
     private void push(Vector3ic pos, byte value) {
         Block block = world.getBlockAt(pos);
+        Vector3i adjPos = new Vector3i();
         for (Side side : Side.getAllSides()) {
             byte propagatedValue = rules.propagateValue(value, side, block);
 
             if (rules.canSpreadOutOf(block, side)) {
-                Vector3i adjPos = side.getAdjacentPos(pos, new Vector3i());
+                side.getAdjacentPos(pos, adjPos);
                 byte adjValue = world.getValueAt(adjPos);
 
                 if (adjValue < propagatedValue && adjValue != PropagatorWorldView.UNAVAILABLE) {
@@ -314,7 +315,8 @@ public class StandardBatchPropagator implements BatchPropagator {
         propagateDepth(adjChunk, side, propagateExternal, indexProvider, edgeRegion, depth);
     }
 
-    private void propagateDepth(LitChunk adjChunk, Side side, boolean propagateExternal, Function<Vector3ic, Integer> indexProvider,
+    private void propagateDepth(LitChunk adjChunk, Side side, boolean propagateExternal,
+                                Function<Vector3ic, Integer> indexProvider,
                                 BlockRegion edgeRegion, int[] depths) {
         Vector3i adjPos = new Vector3i();
 
