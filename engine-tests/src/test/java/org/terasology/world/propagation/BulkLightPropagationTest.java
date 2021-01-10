@@ -121,7 +121,7 @@ public class BulkLightPropagationTest extends TerasologyTestingEnvironment {
         assertEquals(fullLight.getLuminance() - 1, worldView.getValueAt(new Vector3i(0, 1, 0)));
         assertEquals(fullLight.getLuminance() - 14, worldView.getValueAt(new Vector3i(0, 14, 0)));
         for (int i = 1; i < fullLight.getLuminance(); ++i) {
-            for (Vector3ic pos : Diamond3iIterable.shell(new Vector3i(0,0,0), i).build()) {
+            for (Vector3ic pos : Diamond3iIterable.shell(new Vector3i(0, 0, 0), i).build()) {
                 assertEquals(fullLight.getLuminance() - i, worldView.getValueAt(pos));
             }
         }
