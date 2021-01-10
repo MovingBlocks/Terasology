@@ -204,7 +204,6 @@ public class SunlightRegenBatchPropagator implements BatchPropagator {
     }
 
     private void markForPropagation(LitChunk toChunk, int[] depth, int[] startingRegen, int[] adjDepths, int[] adjStartingRegen) {
-        Vector3i pos = new Vector3i();
         for (int z = 0; z < Chunks.SIZE_Z; ++z) {
             for (int x = 0; x < Chunks.SIZE_X; ++x) {
                 int depthIndex = x + Chunks.SIZE_X * z;
@@ -231,7 +230,6 @@ public class SunlightRegenBatchPropagator implements BatchPropagator {
                         if (strength < Chunks.MAX_SUNLIGHT) {
                             strength++;
                         }
-                        pos.y--;
                     }
                 }
 
