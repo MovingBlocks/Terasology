@@ -310,7 +310,7 @@ public class LocalChunkProvider implements ChunkProvider {
             loadingPipeline.stopProcessingAt(pos);
             return false;
         }
-        Chunk chunk = chunkCache.get(pos);
+        Chunk chunk = chunkCache.get(JomlUtil.from(pos));
         if (chunk == null) {
             return false;
         }

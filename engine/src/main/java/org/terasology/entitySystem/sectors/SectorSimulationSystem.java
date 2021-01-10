@@ -15,6 +15,7 @@
  */
 package org.terasology.entitySystem.sectors;
 
+import org.joml.Vector3i;
 import org.terasology.engine.Time;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -200,7 +201,7 @@ public class SectorSimulationSystem extends BaseComponentSystem {
     @ReceiveEvent(components = WorldComponent.class)
     public void chunkUnload(BeforeChunkUnload event, EntityRef worldEntity) {
         for (EntityRef entity : entityManager.getEntitiesWith(SectorSimulationComponent.class)) {
-            if (SectorUtil.getWatchedChunks(entity).contains(JomlUtil.from(event.getChunkPos()))) {
+            if (SectorUtil.getWatchedChunks(entity).contains(event.getChunkPos())) {
                 entity.send(new BeforeChunkUnload(event.getChunkPos()));
                 if (SectorUtil.onlyWatchedChunk(entity, event.getChunkPos(), chunkProvider)) {
                     entity.send(new SectorEntityUnload());
