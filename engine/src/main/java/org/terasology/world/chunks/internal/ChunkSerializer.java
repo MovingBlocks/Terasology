@@ -1,18 +1,5 @@
-/*
- * Copyright 2014 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.world.chunks.internal;
 
 import com.google.common.base.Preconditions;
@@ -41,12 +28,11 @@ public final class ChunkSerializer {
 
     public static EntityData.ChunkStore.Builder encode(Vector3ic pos, TeraArray blockData, TeraArray[] extraData) {
         final EntityData.ChunkStore.Builder b = EntityData.ChunkStore.newBuilder()
-                .setX(pos.x()).setY(pos.y()).setZ(pos.z());
+            .setX(pos.x()).setY(pos.y()).setZ(pos.z());
         b.setBlockData(runLengthEncode16(blockData));
-        for (int i = 0; i < extraData.length; i++) {
-            b.addExtraData(runLengthEncode16(extraData[i]));
+        for (TeraArray extraDatum : extraData) {
+            b.addExtraData(runLengthEncode16(extraDatum));
         }
-
         return b;
     }
 
