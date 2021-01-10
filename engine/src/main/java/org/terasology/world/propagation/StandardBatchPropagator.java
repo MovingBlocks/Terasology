@@ -23,12 +23,14 @@ import org.terasology.math.ChunkMath;
 import org.terasology.math.Side;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockRegion;
+import org.terasology.world.block.BlockRegionc;
 import org.terasology.world.chunks.Chunks;
 import org.terasology.world.chunks.LitChunk;
 
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 
 /**
  * Batch propagator that works on a set of changed blocks Works for a single given propagation ruleset
@@ -300,7 +302,7 @@ public class StandardBatchPropagator implements BatchPropagator {
 
     @Override
     public void propagateBetween(LitChunk chunk, LitChunk adjChunk, Side side, boolean propagateExternal) {
-        IndexProvider indexProvider = createIndexProvider(side);
+        Function<Vector3ic, Integer> indexProvider = createIndexProvider(side);
 
         BlockRegion edgeRegion = new BlockRegion(0, 0, 0)
                 .setSize(Chunks.SIZE_X, Chunks.SIZE_Y, Chunks.SIZE_Z);
@@ -312,7 +314,7 @@ public class StandardBatchPropagator implements BatchPropagator {
         propagateDepth(adjChunk, side, propagateExternal, indexProvider, edgeRegion, depth);
     }
 
-    private void propagateDepth(LitChunk adjChunk, Side side, boolean propagateExternal, IndexProvider indexProvider,
+    private void propagateDepth(LitChunk adjChunk, Side side, boolean propagateExternal, Function<Vector3ic, Integer> indexProvider,
                                 BlockRegion edgeRegion, int[] depths) {
         Vector3i adjPos = new Vector3i();
 
@@ -333,7 +335,7 @@ public class StandardBatchPropagator implements BatchPropagator {
         }
 
         for (Vector3ic pos : edgeRegion) {
-            int depthIndex = indexProvider.getIndexFor(pos);
+            int depthIndex = indexProvider.apply(pos);
             int adjacentDepth = adjDepth[depthIndex];
             for (int i = adjacentDepth; i < depths[depthIndex]; ++i) {
                 adjPos.set(side.direction());
@@ -348,41 +350,34 @@ public class StandardBatchPropagator implements BatchPropagator {
         }
     }
 
-    private void propagateSide(LitChunk chunk, LitChunk adjChunk, Side side, IndexProvider indexProvider,
-                               BlockRegion edgeRegion, int[] depths) {
+    private void propagateSide(LitChunk chunk, LitChunk adjChunk, Side side, Function<Vector3ic, Integer> indexProvider,
+                               BlockRegionc edgeRegion, int[] depths) {
         Vector3i adjPos = new Vector3i();
-        for (int x = edgeRegion.minX(); x <= edgeRegion.maxX(); ++x) {
-            for (int y = edgeRegion.minY(); y <= edgeRegion.maxY(); ++y) {
-                for (int z = edgeRegion.minZ(); z <= edgeRegion.maxZ(); ++z) {
+        for (Vector3ic pos : edgeRegion) {
+            byte expectedValue = (byte) (rules.getValue(chunk, pos) - 1);
+            if (expectedValue < 1) {
+                continue;
+            }
 
-                    byte expectedValue = (byte) (rules.getValue(chunk, x, y, z) - 1);
-                    if (expectedValue < 1) {
-                        continue;
-                    }
+            pos.add(chunkEdgeDeltas.get(side), adjPos);
 
-                    int depthIndex = indexProvider.getIndexFor(x, y, z);
-                    adjPos.set(x, y, z);
-                    adjPos.add(chunkEdgeDeltas.get(side));
-
-
-                    int depth = 0;
-                    Block lastBlock = chunk.getBlock(x, y, z);
-                    byte adjValue = rules.getValue(adjChunk, adjPos);
-                    while (expectedValue > adjValue && adjValue != PropagatorWorldView.UNAVAILABLE && rules.canSpreadOutOf(lastBlock, side)) {
-                        lastBlock = adjChunk.getBlock(adjPos);
-                        if (rules.canSpreadInto(lastBlock, side.reverse())) {
-                            rules.setValue(adjChunk, adjPos, expectedValue);
-                            adjPos.add(side.direction());
-                            depth++;
-                            expectedValue--;
-                            adjValue = rules.getValue(adjChunk, adjPos);
-                        } else {
-                            break;
-                        }
-                    }
-                    depths[depthIndex] = depth;
+            int depthIndex = indexProvider.apply(pos);
+            int depth = 0;
+            Block lastBlock = chunk.getBlock(pos);
+            byte adjValue = rules.getValue(adjChunk, adjPos);
+            while (expectedValue > adjValue && adjValue != PropagatorWorldView.UNAVAILABLE && rules.canSpreadOutOf(lastBlock, side)) {
+                lastBlock = adjChunk.getBlock(adjPos);
+                if (rules.canSpreadInto(lastBlock, side.reverse())) {
+                    rules.setValue(adjChunk, adjPos, expectedValue);
+                    adjPos.add(side.direction());
+                    depth++;
+                    expectedValue--;
+                    adjValue = rules.getValue(adjChunk, adjPos);
+                } else {
+                    break;
                 }
             }
+            depths[depthIndex] = depth;
         }
     }
 
@@ -392,16 +387,16 @@ public class StandardBatchPropagator implements BatchPropagator {
      * @param side The side to get the provider for
      * @return The provider for that side
      */
-    private IndexProvider createIndexProvider(Side side) {
+    private Function<Vector3ic, Integer> createIndexProvider(Side side) {
         switch (side) {
             case TOP:
             case BOTTOM:
-                return (x, y, z) -> x + Chunks.SIZE_X * z;
+                return pos -> pos.x() + Chunks.SIZE_X * pos.z();
             case LEFT:
             case RIGHT:
-                return (x, y, z) -> y + Chunks.SIZE_Y * z;
+                return pos -> pos.y() + Chunks.SIZE_Y * pos.z();
             default:
-                return (x, y, z) -> x + Chunks.SIZE_X * y;
+                return pos -> pos.x() + Chunks.SIZE_X * pos.y();
         }
     }
 
@@ -418,13 +413,5 @@ public class StandardBatchPropagator implements BatchPropagator {
     @Override
     public void regenerate(Vector3ic pos, byte value) {
         reduce(pos, value);
-    }
-
-    private interface IndexProvider {
-        default int getIndexFor(Vector3ic pos) {
-            return getIndexFor(pos.x(), pos.y(), pos.z());
-        }
-
-        int getIndexFor(int x, int y, int z);
     }
 }
