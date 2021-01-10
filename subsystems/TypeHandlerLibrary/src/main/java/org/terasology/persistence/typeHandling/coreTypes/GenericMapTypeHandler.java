@@ -13,6 +13,13 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+/**
+ * A type handler for generic maps delegating (de-)serialization to the respective type handler for the key type {@code
+ * K} and the value type {@code V}.
+ *
+ * @param <K> the type of keys; requires a {@code TypeHandler<K>}
+ * @param <V> the type of mapped values; requires a {@code TypeHandler<V>}
+ */
 public class GenericMapTypeHandler<K, V> extends TypeHandler<Map<K, V>> {
 
     private static final String KEY = "key";
