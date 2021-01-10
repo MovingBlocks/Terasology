@@ -204,6 +204,7 @@ public class SunlightRegenBatchPropagator implements BatchPropagator {
     }
 
     private void markForPropagation(LitChunk toChunk, int[] depth, int[] startingRegen, int[] adjDepths, int[] adjStartingRegen) {
+        Vector3i pos = new Vector3i();
         for (int z = 0; z < Chunks.SIZE_Z; ++z) {
             for (int x = 0; x < Chunks.SIZE_X; ++x) {
                 int depthIndex = x + Chunks.SIZE_X * z;
@@ -211,13 +212,9 @@ public class SunlightRegenBatchPropagator implements BatchPropagator {
                 int adjStart = adjStartingRegen[depthIndex];
                 if (start - adjStart > 1) {
                     int initialDepth = Math.max(Chunks.SUNLIGHT_REGEN_THRESHOLD - start, 0);
-                    int finalDepth = depth[depthIndex];
-
-                    int strength = Math.min(start + initialDepth - Chunks.SUNLIGHT_REGEN_THRESHOLD + 1, Chunks.MAX_SUNLIGHT);
-
-                    for (int i = initialDepth; i <= finalDepth; ++i) {
-                        sunlightPropagator.propagateFrom(toChunk.chunkToWorldPosition(x, Chunks.SIZE_Y - i - 1, z),
-                                (byte) (strength));
+                    byte strength = (byte) Math.min(Chunks.MAX_SUNLIGHT, start + initialDepth - Chunks.SUNLIGHT_REGEN_THRESHOLD + 1);
+                    for (int i = initialDepth; i <= depth[depthIndex]; ++i) {
+                        sunlightPropagator.propagateFrom(toChunk.chunkToWorldPosition(x, Chunks.SIZE_Y - i - 1, z, pos), strength);
                         if (strength < Chunks.MAX_SUNLIGHT) {
                             strength++;
                         }
@@ -226,7 +223,7 @@ public class SunlightRegenBatchPropagator implements BatchPropagator {
                     int initialDepth = Math.max(adjDepths[depthIndex], Chunks.SUNLIGHT_REGEN_THRESHOLD - start);
                     byte strength = (byte) Math.min(Chunks.MAX_SUNLIGHT, start + initialDepth - Chunks.SUNLIGHT_REGEN_THRESHOLD + 1);
                     for (int i = initialDepth; i <= depth[depthIndex]; ++i) {
-                        sunlightPropagator.propagateFrom(toChunk.chunkToWorldPosition(x, Chunks.SIZE_Y - i - 1, z), strength);
+                        sunlightPropagator.propagateFrom(toChunk.chunkToWorldPosition(x, Chunks.SIZE_Y - i - 1, z, pos), strength);
                         if (strength < Chunks.MAX_SUNLIGHT) {
                             strength++;
                         }
