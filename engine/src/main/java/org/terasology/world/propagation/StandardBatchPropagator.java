@@ -23,7 +23,7 @@ import org.terasology.math.ChunkMath;
 import org.terasology.math.Side;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockRegion;
-import org.terasology.world.chunks.ChunkConstants;
+import org.terasology.world.chunks.Chunks;
 import org.terasology.world.chunks.LitChunk;
 
 import java.util.Arrays;
@@ -53,19 +53,19 @@ public class StandardBatchPropagator implements BatchPropagator {
         for (Side side : Side.getAllSides()) {
             Vector3i delta = new Vector3i(side.direction());
             if (delta.x < 0) {
-                delta.x += ChunkConstants.SIZE_X;
+                delta.x += Chunks.SIZE_X;
             } else if (delta.x > 0) {
-                delta.x -= ChunkConstants.SIZE_X;
+                delta.x -= Chunks.SIZE_X;
             }
             if (delta.y < 0) {
-                delta.y += ChunkConstants.SIZE_Y;
+                delta.y += Chunks.SIZE_Y;
             } else if (delta.y > 0) {
-                delta.y -= ChunkConstants.SIZE_Y;
+                delta.y -= Chunks.SIZE_Y;
             }
             if (delta.z < 0) {
-                delta.z += ChunkConstants.SIZE_Z;
+                delta.z += Chunks.SIZE_Z;
             } else if (delta.z > 0) {
-                delta.z -= ChunkConstants.SIZE_Z;
+                delta.z -= Chunks.SIZE_Z;
             }
             chunkEdgeDeltas.put(side, delta);
         }
@@ -303,7 +303,7 @@ public class StandardBatchPropagator implements BatchPropagator {
         IndexProvider indexProvider = createIndexProvider(side);
 
         BlockRegion edgeRegion = new BlockRegion(0, 0, 0)
-                .setSize(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z);
+                .setSize(Chunks.SIZE_X, Chunks.SIZE_Y, Chunks.SIZE_Z);
         ChunkMath.getEdgeRegion(edgeRegion, side, edgeRegion);
 
         int[] depth = new int[edgeRegion.volume()];
@@ -317,8 +317,8 @@ public class StandardBatchPropagator implements BatchPropagator {
         Vector3i adjPos = new Vector3i();
 
         int[] adjDepth = new int[depths.length];
-        int dimA = (side == Side.LEFT || side == Side.RIGHT) ? ChunkConstants.SIZE_Y : ChunkConstants.SIZE_X;
-        int dimB = (side == Side.FRONT || side == Side.BACK) ? ChunkConstants.SIZE_Y : ChunkConstants.SIZE_Z;
+        int dimA = (side == Side.LEFT || side == Side.RIGHT) ? Chunks.SIZE_Y : Chunks.SIZE_X;
+        int dimB = (side == Side.FRONT || side == Side.BACK) ? Chunks.SIZE_Y : Chunks.SIZE_Z;
         ChunkMath.populateMinAdjacent2D(depths, adjDepth, dimA, dimB, !propagateExternal);
 
         if (propagateExternal) {
@@ -396,12 +396,12 @@ public class StandardBatchPropagator implements BatchPropagator {
         switch (side) {
             case TOP:
             case BOTTOM:
-                return (x, y, z) -> x + ChunkConstants.SIZE_X * z;
+                return (x, y, z) -> x + Chunks.SIZE_X * z;
             case LEFT:
             case RIGHT:
-                return (x, y, z) -> y + ChunkConstants.SIZE_Y * z;
+                return (x, y, z) -> y + Chunks.SIZE_Y * z;
             default:
-                return (x, y, z) -> x + ChunkConstants.SIZE_X * y;
+                return (x, y, z) -> x + Chunks.SIZE_X * y;
         }
     }
 
