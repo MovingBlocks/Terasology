@@ -64,7 +64,6 @@ import org.terasology.logic.players.event.LocalPlayerInitializedEvent;
 import org.terasology.logic.players.event.OnPlayerSpawnedEvent;
 import org.terasology.math.AABB;
 import org.terasology.math.JomlUtil;
-import org.terasology.math.TeraMath;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
@@ -189,7 +188,7 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
         }
         // For some reason, Quat4f.rotate is returning NaN for valid inputs. This prevents those NaNs from causing trouble down the line.
         if (relMove.isFinite()) {
-            entity.send(new CharacterMoveInputEvent(inputSequenceNumber++, lookPitch, lookYaw, JomlUtil.from(relMove), run, crouch, jump, time.getGameDeltaInMs()));
+            entity.send(new CharacterMoveInputEvent(inputSequenceNumber++, lookPitch, lookYaw, relMove, run, crouch, jump, time.getGameDeltaInMs()));
         }
         jump = false;
     }
@@ -413,7 +412,7 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
 
     private void updateCamera(CharacterMovementComponent charMovementComp, Vector3f position, Quaternionf rotation) {
         playerCamera.getPosition().set(position);
-        playerCamera.setOrientation(JomlUtil.from(rotation));
+        playerCamera.setOrientation(rotation);
 
         float stepDelta = charMovementComp.footstepDelta - lastStepDelta;
         if (stepDelta < 0) {

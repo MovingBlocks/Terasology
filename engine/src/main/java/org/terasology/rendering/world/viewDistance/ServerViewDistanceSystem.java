@@ -44,7 +44,7 @@ public class ServerViewDistanceSystem extends BaseComponentSystem {
         Client client = networkSystem.getOwner(entity);
         if (client != null) {
             client.setViewDistanceMode(request.getNewViewRange());
-            relevanceSystem.updateRelevanceEntityDistance(entity, JomlUtil.from(client.getViewDistance().getChunkDistance()));
+            relevanceSystem.updateRelevanceEntityDistance(entity, client.getViewDistance().getChunkDistance());
         }
     }
 

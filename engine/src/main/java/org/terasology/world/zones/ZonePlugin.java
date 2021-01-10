@@ -15,7 +15,7 @@
  */
 package org.terasology.world.zones;
 
-import org.terasology.math.geom.BaseVector3i;
+import org.joml.Vector3ic;
 import org.terasology.module.sandbox.API;
 import org.terasology.world.generation.Region;
 import org.terasology.world.generator.plugin.WorldGeneratorPlugin;
@@ -31,11 +31,11 @@ public abstract class ZonePlugin extends Zone implements WorldGeneratorPlugin {
         super(name, regionFunction);
     }
 
-    public ZonePlugin(String name, Predicate<BaseVector3i> regionFunction) {
+    public ZonePlugin(String name, Predicate<Vector3ic> regionFunction) {
         super(name, regionFunction);
     }
 
-    public ZonePlugin(String name, BiPredicate<BaseVector3i, Region> regionFunction) {
+    public ZonePlugin(String name, BiPredicate<Vector3ic, Region> regionFunction) {
         super(name, regionFunction);
     }
 

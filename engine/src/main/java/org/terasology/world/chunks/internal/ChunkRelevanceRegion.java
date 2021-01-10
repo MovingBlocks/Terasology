@@ -18,15 +18,18 @@ package org.terasology.world.chunks.internal;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.Sets;
+import org.joml.Vector3f;
+import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.ChunkMath;
 import org.terasology.math.JomlUtil;
 import org.terasology.math.Region3i;
-import org.terasology.math.geom.Vector3i;
+import org.terasology.world.block.BlockRegion;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkRegionListener;
+import org.terasology.world.chunks.Chunks;
 
 import java.util.Iterator;
 import java.util.Set;
@@ -38,22 +41,22 @@ public class ChunkRelevanceRegion {
     private Vector3i relevanceDistance = new Vector3i();
     private boolean dirty;
     private Vector3i center = new Vector3i();
-    private Region3i currentRegion = Region3i.empty();
-    private Region3i previousRegion = Region3i.empty();
+    private BlockRegion currentRegion = new BlockRegion(BlockRegion.INVALID);
+    private BlockRegion previousRegion = new BlockRegion(BlockRegion.INVALID);
     private ChunkRegionListener listener;
 
-    private Set<Vector3i> relevantChunks = Sets.newLinkedHashSet();
+    private Set<Vector3ic> relevantChunks = Sets.newLinkedHashSet();
 
-    public ChunkRelevanceRegion(EntityRef entity, Vector3i relevanceDistance) {
+    public ChunkRelevanceRegion(EntityRef entity, Vector3ic relevanceDistance) {
         this.entity = entity;
         this.relevanceDistance.set(relevanceDistance);
 
         LocationComponent loc = entity.getComponent(LocationComponent.class);
 
-        if (loc == null||Float.isNaN(loc.getWorldPosition().x)) {
+        if (loc == null||Float.isNaN(loc.getWorldPosition(new Vector3f()).x)) {
             dirty = false;
         } else {
-            center.set(ChunkMath.calcChunkPos(loc.getWorldPosition()));
+            center.set(Chunks.toChunkPos(loc.getWorldPosition(new Vector3f()), new Vector3i()));
             currentRegion = calculateRegion();
             dirty = true;
         }
@@ -63,7 +66,7 @@ public class ChunkRelevanceRegion {
         return center;
     }
 
-    public void setRelevanceDistance(Vector3i distance) {
+    public void setRelevanceDistance(Vector3ic distance) {
         if (!distance.equals(this.relevanceDistance)) {
             reviewRelevantChunks(distance);
             this.relevanceDistance.set(distance);
@@ -72,14 +75,14 @@ public class ChunkRelevanceRegion {
         }
     }
 
-    private void reviewRelevantChunks(Vector3i distance) {
-        Vector3i extents = new Vector3i(distance.x / 2, distance.y / 2, distance.z / 2);
-        Region3i retainRegion = Region3i.createFromCenterExtents(center, extents);
-        Iterator<Vector3i> iter = relevantChunks.iterator();
+    private void reviewRelevantChunks(Vector3ic distance) {
+        Vector3i extents = new Vector3i(distance.x() / 2, distance.y() / 2, distance.z() / 2);
+        BlockRegion retainRegion = new BlockRegion(center).expand(extents);
+        Iterator<Vector3ic> iter = relevantChunks.iterator();
         while (iter.hasNext()) {
-            Vector3i pos = iter.next();
-            if (!retainRegion.encompasses(pos)) {
-                sendChunkIrrelevant(JomlUtil.from(pos));
+            Vector3ic pos = iter.next();
+            if (!retainRegion.contains(pos)) {
+                sendChunkIrrelevant(pos);
                 iter.remove();
             }
         }
@@ -98,11 +101,11 @@ public class ChunkRelevanceRegion {
         previousRegion = currentRegion;
     }
 
-    public Region3i getCurrentRegion() {
+    public BlockRegion getCurrentRegion() {
         return currentRegion;
     }
 
-    public Region3i getPreviousRegion() {
+    public BlockRegion getPreviousRegion() {
         return previousRegion;
     }
 
@@ -120,19 +123,19 @@ public class ChunkRelevanceRegion {
         }
     }
 
-    private Region3i calculateRegion() {
+    private BlockRegion calculateRegion() {
         LocationComponent loc = entity.getComponent(LocationComponent.class);
-        if (loc != null&& !Float.isNaN(loc.getWorldPosition().x)) {
+        if (loc != null&& !Float.isNaN(loc.getWorldPosition(new Vector3f()).x)) {
             Vector3i extents = new Vector3i(relevanceDistance.x / 2, relevanceDistance.y / 2, relevanceDistance.z / 2);
-            return Region3i.createFromCenterExtents(ChunkMath.calcChunkPos(loc.getWorldPosition()), extents);
+            return new BlockRegion(Chunks.toChunkPos(loc.getWorldPosition(new Vector3f()), new Vector3i())).expand(extents);
         }
-        return Region3i.empty();
+        return new BlockRegion(BlockRegion.INVALID);
     }
 
     private Vector3i calculateCenter() {
         LocationComponent loc = entity.getComponent(LocationComponent.class);
-        if (loc != null && !Float.isNaN(loc.getWorldPosition().x)) {
-            return ChunkMath.calcChunkPos(loc.getWorldPosition());
+        if (loc != null && !Float.isNaN(loc.getWorldPosition(new Vector3f()).x)) {
+            return Chunks.toChunkPos(loc.getWorldPosition(new Vector3f()), new Vector3i());
         }
         return new Vector3i();
     }
@@ -181,8 +184,8 @@ public class ChunkRelevanceRegion {
      * chunks as relevant even when no light calculation has been performed yet.
      */
     public void checkIfChunkIsRelevant(Chunk chunk) {
-        if (currentRegion.encompasses(chunk.getPosition()) && !relevantChunks.contains(chunk.getPosition())) {
-            relevantChunks.add(chunk.getPosition());
+        if (currentRegion.contains(chunk.getPosition(new Vector3i())) && !relevantChunks.contains(chunk.getPosition(new Vector3i()))) {
+            relevantChunks.add(chunk.getPosition(new Vector3i()));
             sendChunkRelevant(chunk);
         }
     }
@@ -191,16 +194,15 @@ public class ChunkRelevanceRegion {
         return NeededChunksIterator::new;
     }
 
-    public void chunkUnloaded(Vector3i pos) {
+    public void chunkUnloaded(Vector3ic pos) {
         if (relevantChunks.contains(pos)) {
             relevantChunks.remove(pos);
-            sendChunkIrrelevant(JomlUtil.from(pos));
+            sendChunkIrrelevant(pos);
         }
     }
 
     private class NeededChunksIterator implements Iterator<Vector3i> {
         Vector3i nextChunkPos;
-        Iterator<Vector3i> regionPositions = currentRegion.iterator();
 
         NeededChunksIterator() {
             calculateNext();
@@ -225,10 +227,10 @@ public class ChunkRelevanceRegion {
 
         private void calculateNext() {
             nextChunkPos = null;
-            while (regionPositions.hasNext() && nextChunkPos == null) {
-                Vector3i candidate = regionPositions.next();
-                if (!relevantChunks.contains(candidate)) {
-                    nextChunkPos = candidate;
+            for (Vector3ic regionPosition : currentRegion) {
+                if (!relevantChunks.contains(regionPosition)) {
+                    nextChunkPos = new Vector3i(regionPosition);
+                    return;
                 }
             }
         }

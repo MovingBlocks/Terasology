@@ -586,7 +586,7 @@ public class KinematicCharacterMover implements CharacterMover {
 
     private void walk(final CharacterMovementComponent movementComp, final CharacterStateEvent state,
                       CharacterMoveInputEvent input, EntityRef entity) {
-        Vector3f desiredVelocity = new Vector3f(JomlUtil.from(input.getMovementDirection()));
+        Vector3f desiredVelocity = new Vector3f(input.getMovementDirection());
 
         float lengthSquared = desiredVelocity.lengthSquared();
 
