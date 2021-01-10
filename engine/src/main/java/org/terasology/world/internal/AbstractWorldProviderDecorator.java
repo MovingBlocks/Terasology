@@ -75,7 +75,7 @@ public class AbstractWorldProviderDecorator implements WorldProviderCore {
     }
 
     @Override
-    public ChunkViewCore getLocalView(Vector3i chunkPos) {
+    public ChunkViewCore getLocalView(Vector3ic chunkPos) {
         return base.getLocalView(chunkPos);
     }
 
