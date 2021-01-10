@@ -5,7 +5,6 @@ package org.terasology.world.propagation;
 import com.google.common.collect.Sets;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
-import org.terasology.math.ChunkMath;
 import org.terasology.math.JomlUtil;
 import org.terasology.math.Side;
 import org.terasology.world.block.Block;
@@ -184,7 +183,7 @@ public class SunlightRegenBatchPropagator implements BatchPropagator {
             propagateSweep(chunk, adjChunk, depth, startingRegen);
 
             int[] adjDepths = new int[depth.length];
-            ChunkMath.populateMinAdjacent2D(depth, adjDepths, Chunks.SIZE_X, Chunks.SIZE_Z, !propagateExternal);
+            populateMinAdjacent2D(depth, adjDepths, Chunks.SIZE_X, Chunks.SIZE_Z, !propagateExternal);
             if (propagateExternal) {
                 for (int z = 0; z < Chunks.SIZE_Z; ++z) {
                     adjDepths[z * Chunks.SIZE_X] = 0;
@@ -197,7 +196,7 @@ public class SunlightRegenBatchPropagator implements BatchPropagator {
             }
 
             int[] adjStartingRegen = new int[depth.length];
-            ChunkMath.populateMinAdjacent2D(startingRegen, adjStartingRegen, Chunks.SIZE_X, Chunks.SIZE_Z, true);
+            populateMinAdjacent2D(startingRegen, adjStartingRegen, Chunks.SIZE_X, Chunks.SIZE_Z, true);
 
             markForPropagation(adjChunk, depth, startingRegen, adjDepths, adjStartingRegen);
         }
