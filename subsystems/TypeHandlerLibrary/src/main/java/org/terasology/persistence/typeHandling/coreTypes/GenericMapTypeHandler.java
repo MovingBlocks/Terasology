@@ -3,6 +3,7 @@
 
 package org.terasology.persistence.typeHandling.coreTypes;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.PersistedDataSerializer;
@@ -29,8 +30,8 @@ public class GenericMapTypeHandler<K, V> extends TypeHandler<Map<K, V>> {
     private final TypeHandler<V> valueHandler;
 
     public GenericMapTypeHandler(TypeHandler<K> keyHandler, TypeHandler<V> valueHandler) {
-        this.keyHandler = keyHandler;
-        this.valueHandler = valueHandler;
+        this.keyHandler = Preconditions.checkNotNull(keyHandler);
+        this.valueHandler = Preconditions.checkNotNull(valueHandler);
     }
 
     @Override
