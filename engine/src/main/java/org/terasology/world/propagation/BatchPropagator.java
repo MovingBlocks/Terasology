@@ -4,9 +4,7 @@ package org.terasology.world.propagation;
 
 import org.joml.Math;
 import org.joml.Vector3ic;
-import org.terasology.math.JomlUtil;
 import org.terasology.math.Side;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.world.block.Block;
 import org.terasology.world.chunks.LitChunk;
 
@@ -47,11 +45,6 @@ public interface BatchPropagator {
      */
     void propagateFrom(Vector3ic pos, Block block);
 
-    @Deprecated
-    default void propagateFrom(Vector3i pos, Block block) {
-        propagateFrom(JomlUtil.from(pos), block);
-    };
-
     /**
      * Propagates a specific value out from a location
      *
@@ -60,11 +53,6 @@ public interface BatchPropagator {
      */
     void propagateFrom(Vector3ic pos, byte value);
 
-    @Deprecated
-    default void propagateFrom(Vector3i pos, byte value) {
-        propagateFrom(JomlUtil.from(pos), value);
-    }
-
     /**
      * TODO: Document
      *
@@ -72,11 +60,6 @@ public interface BatchPropagator {
      * @param value The original value at this position
      */
     void regenerate(Vector3ic pos, byte value);
-
-    @Deprecated
-    default void regenerate(Vector3i pos, byte value) {
-        regenerate(JomlUtil.from(pos), value);
-    }
 
     /**
      * Populates a target array with the minimum value adjacent to each location, including the location itself.
