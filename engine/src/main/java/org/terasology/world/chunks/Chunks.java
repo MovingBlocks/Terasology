@@ -85,7 +85,6 @@ public final class Chunks {
         return toChunkPos(z, CHUNK_POWER.z());
     }
 
-
     /**
      * The position of the chunk given the coordinate and size of chunk in powers of 2.
      *
@@ -130,7 +129,6 @@ public final class Chunks {
         return toChunkPos(pos.x(), pos.y(), pos.z(), POWER_X, POWER_Y, POWER_Z, dest);
     }
 
-
     /**
      * The position of the chunk given the coordinate and size of chunk in powers of 2.
      *
@@ -170,7 +168,6 @@ public final class Chunks {
             Math.roundUsing(z, RoundingMode.FLOOR), POWER_X, POWER_Y, POWER_Z, dest);
     }
 
-
     /**
      * The position of the chunk given the coordinate and size of chunk in powers of 2.
      *
@@ -191,6 +188,9 @@ public final class Chunks {
             toChunkPos(y, chunkY),
             toChunkPos(z, chunkZ));
     }
+
+    // -- chunk region -------------------------------------------------------------------------------------------------
+
     /**
      * Maps a {@link BlockRegion} to the chunks that intersect the {@link BlockRegion}.
      *
@@ -207,6 +207,10 @@ public final class Chunks {
                 toChunkPos(region.maxX(), chunkX), toChunkPos(region.maxY(), chunkY), toChunkPos(region.maxZ(), chunkZ));
     }
 
+    public static BlockRegion toChunkRegion(BlockRegion region, int chunkX, int chunkY, int chunkZ) {
+        return toChunkRegion(region, chunkX, chunkY, chunkZ, region);
+    }
+
     /**
      * Maps a {@link BlockRegion} to the relative chunks that intersect the {@link BlockRegion}.
      *
@@ -219,6 +223,9 @@ public final class Chunks {
         return toChunkRegion(region, chunkPower.x(), chunkPower.y(), chunkPower.z(), dest);
     }
 
+    public static BlockRegion toChunkRegion(BlockRegion region, Vector3ic chunkPower) {
+        return toChunkRegion(region, chunkPower, region);
+    }
 
     /**
      * Maps a {@link BlockRegion} to the chunks that intersect the {@link BlockRegion}.
@@ -231,6 +238,17 @@ public final class Chunks {
     public static BlockRegion toChunkRegion(BlockRegionc region, BlockRegion dest) {
         return toChunkRegion(region, Chunks.POWER_X, Chunks.POWER_Y, Chunks.POWER_Z, dest);
     }
+
+    /**
+     * 
+     * @param region
+     * @return
+     */
+    public static BlockRegion toChunkRegion(BlockRegion region) {
+        return toChunkRegion(region ,region);
+    }
+
+    // -- relative position --------------------------------------------------------------------------------------------
 
     /**
      * Returns the internal position of a block within a chunk.
@@ -311,6 +329,8 @@ public final class Chunks {
     public static Vector3i toRelative(int x, int y, int z, Vector3i dest) {
         return dest.set(toRelative(x, INNER_CHUNK_POS_FILTER.x()), toRelative(y, INNER_CHUNK_POS_FILTER.y()), toRelative(z, INNER_CHUNK_POS_FILTER.z()));
     }
+
+    // -----------------------------------------------------------------------------------------------------------------
     
     /**
      * Works out whether the given block resides inside the given chunk.
