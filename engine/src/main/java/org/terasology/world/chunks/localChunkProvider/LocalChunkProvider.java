@@ -289,7 +289,7 @@ public class LocalChunkProvider implements ChunkProvider {
                 loadingPipeline.getProcessingPosition().iterator());
         while (iterator.hasNext()) {
             org.joml.Vector3ic pos = iterator.next();
-            boolean keep = relevanceSystem.isChunkInRegions(JomlUtil.from(pos)); // TODO: move it to relevance system.
+            boolean keep = relevanceSystem.isChunkInRegions(pos); // TODO: move it to relevance system.
             if (!keep && unloadChunkInternal(JomlUtil.from(pos))) {
                 iterator.remove();
                 if (++unloaded >= UNLOAD_PER_FRAME) {
@@ -459,8 +459,8 @@ public class LocalChunkProvider implements ChunkProvider {
         ChunkMonitor.fireChunkProviderInitialized(this);
 
         for (ChunkRelevanceRegion chunkRelevanceRegion : relevanceSystem.getRegions()) {
-            for (Vector3i pos : chunkRelevanceRegion.getCurrentRegion()) {
-                createOrLoadChunk(pos);
+            for (Vector3ic pos : chunkRelevanceRegion.getCurrentRegion()) {
+                createOrLoadChunk(JomlUtil.from(pos));
             }
             chunkRelevanceRegion.setUpToDate();
         }
