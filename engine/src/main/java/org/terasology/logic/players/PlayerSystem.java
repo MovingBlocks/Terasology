@@ -195,7 +195,7 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
         //RelevanceRegionComponent relevanceRegion = new RelevanceRegionComponent();
         //relevanceRegion.distance = chunkDistance;
         //entity.saveComponent(relevanceRegion);
-        relevanceSystem.updateRelevanceEntityDistance(entity, JomlUtil.from(chunkDistance));
+        relevanceSystem.updateRelevanceEntityDistance(entity, chunkDistance);
     }
 
     private void removeRelevanceEntity(EntityRef entity) {
@@ -208,7 +208,7 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
         //RelevanceRegionComponent relevanceRegion = new RelevanceRegionComponent();
         //relevanceRegion.distance = chunkDistance;
         //entity.addComponent(relevanceRegion);
-        relevanceSystem.addRelevanceEntity(entity, JomlUtil.from(chunkDistance), owner);
+        relevanceSystem.addRelevanceEntity(entity, chunkDistance, owner);
     }
 
     @ReceiveEvent(components = ClientComponent.class)
