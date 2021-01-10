@@ -15,11 +15,14 @@
  */
 package org.terasology.world.propagation;
 
-import org.terasology.math.ChunkMath;
-import org.terasology.math.geom.Vector3i;
+import org.joml.Vector3i;
+import org.joml.Vector3ic;
+import org.terasology.math.JomlUtil;
 import org.terasology.world.block.Block;
+import org.terasology.world.block.BlockRegion;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkProvider;
+import org.terasology.world.chunks.Chunks;
 import org.terasology.world.chunks.CoreChunk;
 import org.terasology.world.chunks.LitChunk;
 
@@ -40,16 +43,15 @@ public abstract class AbstractFullWorldView implements PropagatorWorldView {
      * @param pos The position in the world
      * @return The chunk for that position
      */
-    private Chunk getChunk(Vector3i pos) {
-
-        return chunkProvider.getChunk(ChunkMath.calcChunkPos(pos));
+    private Chunk getChunk(Vector3ic pos) {
+        return chunkProvider.getChunk(JomlUtil.from(Chunks.toChunkPos(pos, new Vector3i())));
     }
 
     @Override
-    public byte getValueAt(Vector3i pos) {
+    public byte getValueAt(Vector3ic pos) {
         LitChunk chunk = getChunk(pos);
         if (chunk != null) {
-            return getValueAt(chunk, ChunkMath.calcRelativeBlockPos(pos.x, pos.y, pos.z));
+            return getValueAt(chunk, Chunks.toRelative(pos, new Vector3i()));
         }
         return UNAVAILABLE;
     }
@@ -61,13 +63,14 @@ public abstract class AbstractFullWorldView implements PropagatorWorldView {
      * @param pos   The internal position of the chunk to get the value from
      * @return The relevant value for this view
      */
-    protected abstract byte getValueAt(LitChunk chunk, Vector3i pos);
+    protected abstract byte getValueAt(LitChunk chunk, Vector3ic pos);
 
     @Override
-    public void setValueAt(Vector3i pos, byte value) {
-        setValueAt(getChunk(pos), ChunkMath.calcRelativeBlockPos(pos.x, pos.y, pos.z), value);
-        for (Vector3i affectedChunkPos : ChunkMath.getChunkRegionAroundWorldPos(pos, 1)) {
-            Chunk dirtiedChunk = chunkProvider.getChunk(affectedChunkPos);
+    public void setValueAt(Vector3ic pos, byte value) {
+        setValueAt(getChunk(pos), Chunks.toRelative(pos, new Vector3i()), value);
+        BlockRegion chunkRegion = new BlockRegion(pos).expand(1, 1, 1);
+        for (Vector3ic affectedChunkPos : Chunks.toChunkRegion(chunkRegion, chunkRegion)) {
+            Chunk dirtiedChunk = chunkProvider.getChunk(JomlUtil.from(affectedChunkPos));
             if (dirtiedChunk != null) {
                 dirtiedChunk.setDirty(true);
             }
@@ -81,13 +84,13 @@ public abstract class AbstractFullWorldView implements PropagatorWorldView {
      * @param pos   The internal position of the chunk to set the value of
      * @param value The new value
      */
-    protected abstract void setValueAt(LitChunk chunk, Vector3i pos, byte value);
+    protected abstract void setValueAt(LitChunk chunk, Vector3ic pos, byte value);
 
     @Override
-    public Block getBlockAt(Vector3i pos) {
-        CoreChunk chunk = chunkProvider.getChunk(ChunkMath.calcChunkPos(pos));
+    public Block getBlockAt(Vector3ic pos) {
+        CoreChunk chunk = chunkProvider.getChunk(JomlUtil.from(Chunks.toChunkPos(pos, new Vector3i())));
         if (chunk != null) {
-            return chunk.getBlock(ChunkMath.calcRelativeBlockPos(pos));
+            return chunk.getBlock(Chunks.toRelative(pos, new Vector3i()));
         }
         return null;
     }

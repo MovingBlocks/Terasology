@@ -15,10 +15,11 @@
  */
 package org.terasology.world.propagation.light;
 
+import org.joml.Vector3ic;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.Side;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.world.block.Block;
-import org.terasology.world.chunks.ChunkConstants;
+import org.terasology.world.chunks.Chunks;
 import org.terasology.world.chunks.LitChunk;
 
 /**
@@ -33,7 +34,7 @@ public class LightPropagationRules extends CommonLightPropagationRules {
      * {@inheritDoc}
      */
     @Override
-    public byte getFixedValue(Block block, Vector3i pos) {
+    public byte getFixedValue(Block block, Vector3ic pos) {
         return block.getLuminance();
     }
 
@@ -54,12 +55,12 @@ public class LightPropagationRules extends CommonLightPropagationRules {
      */
     @Override
     public byte getMaxValue() {
-        return ChunkConstants.MAX_LIGHT; // 15
+        return Chunks.MAX_LIGHT; // 15
     }
 
     @Override
-    public byte getValue(LitChunk chunk, Vector3i pos) {
-        return getValue(chunk, pos.x, pos.y, pos.z);
+    public byte getValue(LitChunk chunk, Vector3ic pos) {
+        return getValue(chunk, pos.x(), pos.y(), pos.z());
     }
 
     @Override
@@ -68,8 +69,8 @@ public class LightPropagationRules extends CommonLightPropagationRules {
     }
 
     @Override
-    public void setValue(LitChunk chunk, Vector3i pos, byte value) {
-        chunk.setLight(pos, value);
+    public void setValue(LitChunk chunk, Vector3ic pos, byte value) {
+        chunk.setLight(JomlUtil.from(pos), value);
     }
 
 

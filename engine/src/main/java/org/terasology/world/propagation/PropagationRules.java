@@ -15,10 +15,14 @@
  */
 package org.terasology.world.propagation;
 
+import org.joml.Vector3ic;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.Side;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.world.block.Block;
 import org.terasology.world.chunks.LitChunk;
+
+import javax.swing.JOptionPane;
 
 /**
  * Rules to drive value propagation.
@@ -31,7 +35,15 @@ public interface PropagationRules {
      * @param pos The position of the block being checked
      * @return The constant value of this block
      */
-    byte getFixedValue(Block block, Vector3i pos);
+    byte getFixedValue(Block block, Vector3ic pos);
+
+    /**
+     * @deprecated use {@link #getFixedValue(Block, Vector3ic)} instead
+     */
+    @Deprecated
+    default byte getFixedValue(Block block, Vector3i pos) {
+        return getFixedValue(block, JomlUtil.from(pos));
+    }
 
     /**
      * Compare the how the propagation changes if you replace the block with a different one, on a given side
@@ -84,7 +96,14 @@ public interface PropagationRules {
      * @param pos   The position to get from
      * @return The value of the given position of a chunk
      */
-    byte getValue(LitChunk chunk, Vector3i pos);
+    byte getValue(LitChunk chunk, Vector3ic pos);
+
+    /**
+     * @deprecated use {@link #getValue(LitChunk, Vector3ic)} instead
+     */
+    default byte getValue(LitChunk chunk, Vector3i pos) {
+        return getValue(chunk, JomlUtil.from(pos));
+    }
 
     /**
      * See {@link #getValue(LitChunk, Vector3i)}
@@ -104,5 +123,12 @@ public interface PropagationRules {
      * @param pos   The position to set at
      * @param value The value to set to
      */
-    void setValue(LitChunk chunk, Vector3i pos, byte value);
+    void setValue(LitChunk chunk, Vector3ic pos, byte value);
+
+    /**
+     * @deprecated use {@link #setValue(LitChunk, Vector3ic, byte)} instead
+     */
+    default void setValue(LitChunk chunk, Vector3i pos, byte value){
+        setValue(chunk, JomlUtil.from(pos), value);
+    }
 }
