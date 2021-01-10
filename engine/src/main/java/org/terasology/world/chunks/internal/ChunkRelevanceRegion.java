@@ -203,8 +203,10 @@ public class ChunkRelevanceRegion {
 
     private class NeededChunksIterator implements Iterator<Vector3i> {
         Vector3i nextChunkPos;
+        Iterator<Vector3ic> allPositions;
 
         NeededChunksIterator() {
+            allPositions = currentRegion.iterator();
             calculateNext();
         }
 
@@ -227,7 +229,8 @@ public class ChunkRelevanceRegion {
 
         private void calculateNext() {
             nextChunkPos = null;
-            for (Vector3ic regionPosition : currentRegion) {
+            while (allPositions.hasNext()) {
+                Vector3ic regionPosition = allPositions.next();
                 if (!relevantChunks.contains(regionPosition)) {
                     nextChunkPos = new Vector3i(regionPosition);
                     return;
