@@ -183,7 +183,7 @@ public class SunlightRegenBatchPropagator implements BatchPropagator {
             propagateSweep(chunk, adjChunk, depth, startingRegen);
 
             int[] adjDepths = new int[depth.length];
-            populateMinAdjacent2D(depth, adjDepths, Chunks.SIZE_X, Chunks.SIZE_Z, !propagateExternal);
+            BatchPropagator.populateMinAdjacent2D(depth, adjDepths, Chunks.SIZE_X, Chunks.SIZE_Z, !propagateExternal);
             if (propagateExternal) {
                 for (int z = 0; z < Chunks.SIZE_Z; ++z) {
                     adjDepths[z * Chunks.SIZE_X] = 0;
@@ -196,7 +196,7 @@ public class SunlightRegenBatchPropagator implements BatchPropagator {
             }
 
             int[] adjStartingRegen = new int[depth.length];
-            populateMinAdjacent2D(startingRegen, adjStartingRegen, Chunks.SIZE_X, Chunks.SIZE_Z, true);
+            BatchPropagator.populateMinAdjacent2D(startingRegen, adjStartingRegen, Chunks.SIZE_X, Chunks.SIZE_Z, true);
 
             markForPropagation(adjChunk, depth, startingRegen, adjDepths, adjStartingRegen);
         }

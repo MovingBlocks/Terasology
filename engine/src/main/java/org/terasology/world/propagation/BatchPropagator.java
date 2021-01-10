@@ -85,7 +85,7 @@ public interface BatchPropagator {
      * @param target
      * @param populateMargins Whether to populate the edges of the target array
      */
-    default void populateMinAdjacent2D(int[] source, int[] target, int dimX, int dimY, boolean populateMargins) {
+    static void populateMinAdjacent2D(int[] source, int[] target, int dimX, int dimY, boolean populateMargins) {
         System.arraycopy(source, 0, target, 0, target.length);
 
         // 0 < x < dimX - 1; 0 < y < dimY - 1
