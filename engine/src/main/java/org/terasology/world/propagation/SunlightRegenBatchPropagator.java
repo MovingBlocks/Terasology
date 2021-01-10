@@ -16,10 +16,11 @@
 package org.terasology.world.propagation;
 
 import com.google.common.collect.Sets;
+import org.joml.Vector3i;
+import org.joml.Vector3ic;
 import org.terasology.math.ChunkMath;
 import org.terasology.math.JomlUtil;
 import org.terasology.math.Side;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.world.block.Block;
 import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.LitChunk;
@@ -38,8 +39,8 @@ public class SunlightRegenBatchPropagator implements BatchPropagator {
     private PropagatorWorldView sunlightWorld;
     private BatchPropagator sunlightPropagator;
 
-    private Set<Vector3i>[] reduceQueues;
-    private Set<Vector3i>[] increaseQueues;
+    private Set<Vector3ic>[] reduceQueues;
+    private Set<Vector3ic>[] increaseQueues;
 
     public SunlightRegenBatchPropagator(PropagationRules regenRules, PropagatorWorldView regenWorld, BatchPropagator sunlightPropagator, PropagatorWorldView sunlightWorld) {
         this.regenRules = regenRules;
@@ -78,12 +79,12 @@ public class SunlightRegenBatchPropagator implements BatchPropagator {
 
     private void reviewChangeToBottom(BlockChange blockChange) {
         PropagationComparison comparison = regenRules.comparePropagation(blockChange.getTo(), blockChange.getFrom(), Side.BOTTOM);
-        Vector3i blockChangePosition = JomlUtil.from(blockChange.getPosition());
+        Vector3ic blockChangePosition = blockChange.getPosition();
         if (comparison.isPermitting()) {
             byte existingValue = regenWorld.getValueAt(blockChangePosition);
             queueSpreadRegen(blockChangePosition, existingValue);
         } else if (comparison.isRestricting()) {
-            Vector3i adjPos = Side.BOTTOM.getAdjacentPos(blockChangePosition);
+            Vector3i adjPos = Side.BOTTOM.getAdjacentPos(blockChangePosition, new Vector3i());
             byte existingValue = regenWorld.getValueAt(adjPos);
             reduce(adjPos, existingValue);
         }
@@ -91,9 +92,9 @@ public class SunlightRegenBatchPropagator implements BatchPropagator {
 
     private void reviewChangeToTop(BlockChange blockChange) {
         PropagationComparison comparison = regenRules.comparePropagation(blockChange.getTo(), blockChange.getFrom(), Side.TOP);
-        Vector3i blockChangePosition = JomlUtil.from(blockChange.getPosition());
+        Vector3ic blockChangePosition = blockChange.getPosition();
         if (comparison.isPermitting()) {
-            Vector3i adjPos = Side.TOP.getAdjacentPos(blockChangePosition);
+            Vector3i adjPos = Side.TOP.getAdjacentPos(blockChangePosition, new Vector3i());
             byte adjValue = regenWorld.getValueAt(adjPos);
             if (adjValue != PropagatorWorldView.UNAVAILABLE) {
                 queueSpreadRegen(adjPos, adjValue);
@@ -104,20 +105,20 @@ public class SunlightRegenBatchPropagator implements BatchPropagator {
         }
     }
 
-    private void queueSpreadRegen(Vector3i position, byte value) {
+    private void queueSpreadRegen(Vector3ic position, byte value) {
         increaseQueues[value].add(position);
     }
 
     private void processRegenReduction() {
         for (byte depth = 0; depth <= regenRules.getMaxValue(); depth++) {
-            Set<Vector3i> toProcess = reduceQueues[depth];
+            Set<Vector3ic> toProcess = reduceQueues[depth];
 
             toProcess.forEach(this::purge);
             toProcess.clear();
         }
     }
 
-    private void purge(Vector3i pos) {
+    private void purge(Vector3ic pos) {
         int expectedValue = regenWorld.getValueAt(pos);
         if (expectedValue != 0) {
             Vector3i position = new Vector3i(pos);
@@ -140,16 +141,16 @@ public class SunlightRegenBatchPropagator implements BatchPropagator {
 
     private void processRegenIncrease() {
         for (byte depth = regenRules.getMaxValue(); depth >= 0; depth--) {
-            Set<Vector3i> toProcess = increaseQueues[depth];
+            Set<Vector3ic> toProcess = increaseQueues[depth];
 
-            for (Vector3i pos : toProcess) {
+            for (Vector3ic pos : toProcess) {
                 push(pos, depth);
             }
             toProcess.clear();
         }
     }
 
-    private void push(Vector3i pos, byte value) {
+    private void push(Vector3ic pos, byte value) {
         byte regenValue = value;
         Block block = regenWorld.getBlockAt(pos);
         Vector3i position = new Vector3i(pos);
@@ -182,7 +183,7 @@ public class SunlightRegenBatchPropagator implements BatchPropagator {
     private void cleanUp() {
     }
 
-    private void reduce(Vector3i position, byte oldValue) {
+    private void reduce(Vector3ic position, byte oldValue) {
         if (oldValue > 0) {
             reduceQueues[oldValue].add(position);
         }
@@ -271,8 +272,8 @@ public class SunlightRegenBatchPropagator implements BatchPropagator {
                     regenRules.setValue(toChunk, pos, expectedValue);
                     depth[depthIndex]++;
                     byte sunlight = (byte) (expectedValue - ChunkConstants.SUNLIGHT_REGEN_THRESHOLD);
-                    if (sunlight > 0 && sunlight > toChunk.getSunlight(pos)) {
-                        toChunk.setSunlight(pos, sunlight);
+                    if (sunlight > 0 && sunlight > toChunk.getSunlight(JomlUtil.from(pos))) {
+                        toChunk.setSunlight(JomlUtil.from(pos), sunlight);
                     }
                     if (expectedValue < ChunkConstants.MAX_SUNLIGHT_REGEN) {
                         expectedValue++;
@@ -286,17 +287,17 @@ public class SunlightRegenBatchPropagator implements BatchPropagator {
     }
 
     @Override
-    public void propagateFrom(Vector3i pos, Block block) {
+    public void propagateFrom(Vector3ic pos, Block block) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public void propagateFrom(Vector3i pos, byte value) {
+    public void propagateFrom(Vector3ic pos, byte value) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public void regenerate(Vector3i pos, byte value) {
+    public void regenerate(Vector3ic pos, byte value) {
         throw new UnsupportedOperationException();
     }
 

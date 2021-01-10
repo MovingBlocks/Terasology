@@ -15,6 +15,8 @@
  */
 package org.terasology.world.propagation;
 
+import org.joml.Vector3ic;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.Side;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.world.block.Block;
@@ -55,7 +57,12 @@ public interface BatchPropagator {
      * @param pos   The position of the block
      * @param block The block type
      */
-    void propagateFrom(Vector3i pos, Block block);
+    void propagateFrom(Vector3ic pos, Block block);
+
+    @Deprecated
+    default void propagateFrom(Vector3i pos, Block block) {
+        propagateFrom(JomlUtil.from(pos), block);
+    };
 
     /**
      * Propagates a specific value out from a location
@@ -63,7 +70,12 @@ public interface BatchPropagator {
      * @param pos   The position to propagate out of
      * @param value The value to propagate out
      */
-    void propagateFrom(Vector3i pos, byte value);
+    void propagateFrom(Vector3ic pos, byte value);
+
+    @Deprecated
+    default void propagateFrom(Vector3i pos, byte value) {
+        propagateFrom(JomlUtil.from(pos), value);
+    }
 
     /**
      * TODO: Document
@@ -71,5 +83,10 @@ public interface BatchPropagator {
      * @param pos   The position to regenerate at
      * @param value The original value at this position
      */
-    void regenerate(Vector3i pos, byte value);
+    void regenerate(Vector3ic pos, byte value);
+
+    @Deprecated
+    default void regenerate(Vector3i pos, byte value) {
+        regenerate(JomlUtil.from(pos), value);
+    }
 }
