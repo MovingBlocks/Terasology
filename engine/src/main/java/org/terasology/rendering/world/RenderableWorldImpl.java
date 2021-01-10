@@ -147,7 +147,7 @@ class RenderableWorldImpl implements RenderableWorld {
             if (chunk == null) {
                 pregenerationIsComplete = false;
             } else if (chunk.isDirty()) {
-                localView = worldProvider.getLocalView(JomlUtil.from(chunkCoordinates));
+                localView = worldProvider.getLocalView(chunkCoordinates);
                 if (localView == null) {
                     continue;
                 }
