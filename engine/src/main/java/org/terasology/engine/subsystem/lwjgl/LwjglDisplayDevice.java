@@ -23,6 +23,7 @@ import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.context.Context;
 import org.terasology.engine.subsystem.DisplayDevice;
+import org.terasology.engine.subsystem.DisplayDeviceInfo;
 import org.terasology.engine.subsystem.Resolution;
 import org.terasology.rendering.nui.layers.mainMenu.videoSettings.DisplayModeSetting;
 import org.terasology.utilities.subscribables.AbstractSubscribable;
@@ -47,6 +48,7 @@ public class LwjglDisplayDevice extends AbstractSubscribable implements DisplayD
     private final Supplier<List<GLFWVidMode>> availableResolutions = createAvailableResolutionSupplier();
 
     private RenderingConfig config;
+    private DisplayDeviceInfo displayDeviceInfo = new DisplayDeviceInfo("unknown");
 
     public LwjglDisplayDevice(Context context) {
         this.config = context.get(Config.class).getRendering();
@@ -179,6 +181,12 @@ public class LwjglDisplayDevice extends AbstractSubscribable implements DisplayD
     public void prepareToRender() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glLoadIdentity();
+    }
+
+    @Override
+    public DisplayDeviceInfo getInfo() {
+        LwjglGraphicsUtil.updateDisplayDeviceInfo(displayDeviceInfo);
+        return displayDeviceInfo;
     }
 
     public void update() {

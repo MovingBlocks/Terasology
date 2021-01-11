@@ -218,7 +218,7 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
         unloadedAndSavingChunkMap.clear();
         /*
          * New entries might be added concurrently. By using putAll + clear to transfer entries we might loose new
-         * ones added in between putAll and clear. Bz iterating we can make sure that all entires removed
+         * ones added in between putAll and clear. By iterating we can make sure that all entries removed
          * from unloadedAndUnsavedChunkMap get added to unloadedAndSavingChunkMap.
          */
         Iterator<Map.Entry<Vector3i, CompressedChunkBuilder>> unsavedEntryIterator = unloadedAndUnsavedChunkMap.entrySet().iterator();

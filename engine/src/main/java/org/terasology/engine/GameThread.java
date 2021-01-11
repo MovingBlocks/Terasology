@@ -90,7 +90,7 @@ public final class GameThread {
     }
 
     /**
-     * Removes all pending processess without running them
+     * Removes all pending processes without running them
      */
     public static void clearWaitingProcesses() {
         if (gameThread == Thread.currentThread()) {

@@ -35,6 +35,7 @@ import org.slf4j.LoggerFactory;
 import org.terasology.assets.AssetType;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.engine.GameThread;
+import org.terasology.engine.subsystem.lwjgl.LwjglGraphicsProcessing;
 import org.terasology.math.MatrixUtils;
 import org.terasology.math.geom.Matrix3f;
 import org.terasology.math.geom.Matrix4f;
@@ -56,6 +57,7 @@ import java.util.Set;
 public class GLSLMaterial extends BaseMaterial {
 
     private static final Logger logger = LoggerFactory.getLogger(GLSLMaterial.class);
+    private final LwjglGraphicsProcessing graphicsProcessing;
 
     private int textureIndex;
 
@@ -69,18 +71,21 @@ public class GLSLMaterial extends BaseMaterial {
     private EnumSet<ShaderProgramFeature> activeFeatures = Sets.newEnumSet(Collections.emptyList(), ShaderProgramFeature.class);
     private int activeFeaturesMask;
 
-    private final ShaderManager shaderManager;
+    private ShaderManager shaderManager;
 
     private DisposalAction disposalAction;
     private MaterialData materialData;
 
-    public GLSLMaterial(ResourceUrn urn, AssetType<?, MaterialData> assetType, MaterialData data) {
+    public GLSLMaterial(ResourceUrn urn, AssetType<?, MaterialData> assetType, MaterialData data, LwjglGraphicsProcessing graphicsProcessing) {
         super(urn, assetType);
-        disposalAction = new DisposalAction(urn);
+        this.graphicsProcessing = graphicsProcessing;
+        disposalAction = new DisposalAction(urn, graphicsProcessing);
         getDisposalHook().setDisposeAction(disposalAction);
         this.materialData = data;
         shaderManager = CoreRegistry.get(ShaderManager.class);
-        reload(data);
+        graphicsProcessing.asynchToDisplayThread(() -> {
+            reload(data);
+        });
     }
 
     @Override
@@ -143,7 +148,6 @@ public class GLSLMaterial extends BaseMaterial {
         //Some of the uniforms are not updated constantly between frames
         //this function will rebind any uniforms that are not bound
         rebindVariables(materialData);
-
     }
 
     @Override
@@ -156,7 +160,6 @@ public class GLSLMaterial extends BaseMaterial {
                 shader = (GLSLShader) data.getShader();
                 recompile();
                 rebindVariables(data);
-
             });
         } catch (InterruptedException e) {
             logger.error("Failed to reload {}", getUrn(), e);
@@ -681,12 +684,14 @@ public class GLSLMaterial extends BaseMaterial {
     private static class DisposalAction implements Runnable {
 
         private final ResourceUrn urn;
+        private final LwjglGraphicsProcessing graphicsProcessing;
 
         private TIntIntMap shaderPrograms = new TIntIntHashMap();
 
         // made package-private after Jenkins' suggestion
-        DisposalAction(ResourceUrn urn) {
+        DisposalAction(ResourceUrn urn, LwjglGraphicsProcessing graphicsProcessing) {
             this.urn = urn;
+            this.graphicsProcessing = graphicsProcessing;
         }
 
         @Override
@@ -694,11 +699,14 @@ public class GLSLMaterial extends BaseMaterial {
             try {
                 GameThread.synch(() -> {
                     logger.debug("Disposing material {}.", urn);
-                    TIntIntIterator it = shaderPrograms.iterator();
-                    while (it.hasNext()) {
-                        it.advance();
-                        GL20.glDeleteProgram(it.value());
-                    }
+                    final TIntIntMap deletedPrograms = new TIntIntHashMap(shaderPrograms);
+                    graphicsProcessing.asynchToDisplayThread(() -> {
+                        TIntIntIterator it = deletedPrograms.iterator();
+                        while (it.hasNext()) {
+                            it.advance();
+                            GL20.glDeleteProgram(it.value());
+                        }
+                    });
                     shaderPrograms.clear();
                 });
             } catch (InterruptedException e) {

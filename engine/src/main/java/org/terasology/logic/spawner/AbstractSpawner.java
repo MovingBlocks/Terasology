@@ -20,7 +20,6 @@ import org.joml.Vector2i;
 import org.joml.Vector2ic;
 import org.joml.Vector3f;
 import org.joml.Vector3i;
-import org.terasology.math.JomlUtil;
 import org.terasology.math.SpiralIterable;
 import org.terasology.math.TeraMath;
 import org.terasology.world.block.BlockRegion;
@@ -121,7 +120,7 @@ public abstract class AbstractSpawner implements Spawner {
         ElevationFacet elevationFacet = worldRegion.getFacet(ElevationFacet.class);
 
         if (elevationFacet != null) {
-            return (int) elevationFacet.getWorld(JomlUtil.from(pos));
+            return (int) elevationFacet.getWorld(pos);
         } else {
             // We'll have to rely on the SurfaceHeightFacet or SpawnHeightFacet anyway, and those are purely 2D so the height doesn't matter.
             return 0;

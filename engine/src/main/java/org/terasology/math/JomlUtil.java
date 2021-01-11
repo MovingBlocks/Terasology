@@ -246,4 +246,8 @@ public final class JomlUtil {
     public static Map<org.terasology.math.geom.Vector3i, Block> blockMap(Map<Vector3i, Block> maps) {
         return maps.entrySet().stream().collect(Collectors.toMap(k -> JomlUtil.from(k.getKey()), Map.Entry::getValue));
     }
+
+    public static Map<Vector3ic, Block> toBlockMap(Map<org.terasology.math.geom.Vector3i, Block> maps) {
+        return maps.entrySet().stream().collect(Collectors.toMap(k -> JomlUtil.from(k.getKey()), Map.Entry::getValue));
+    }
 }

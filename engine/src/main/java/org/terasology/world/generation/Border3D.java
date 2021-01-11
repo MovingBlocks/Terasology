@@ -16,8 +16,8 @@
 package org.terasology.world.generation;
 
 import com.google.common.base.Preconditions;
-import org.joml.Vector3i;
-import org.terasology.math.geom.Rect2i;
+import org.joml.Vector3ic;
+import org.terasology.world.block.BlockArea;
 import org.terasology.world.block.BlockRegion;
 import org.terasology.world.block.BlockRegionc;
 
@@ -70,19 +70,19 @@ public class Border3D {
      * @param region The original region to be used.
      * @return The 2D representation with the additional space added to it.
      */
-    public Rect2i expandTo2D(BlockRegion region) {
-        return Rect2i.createFromMinAndMax(region.minX() - getSides(), region.minZ() - getSides(),
+    public BlockArea expandTo2D(BlockRegionc region) {
+        return new BlockArea(region.minX() - getSides(), region.minZ() - getSides(),
                 region.maxX() + getSides(), region.maxZ() + getSides());
     }
 
     /**
-     * Same as {@code {@link #expandTo2D(BlockRegion)}} but with a Vector3i instead of a Region3i.
+     * Same as {@code {@link #expandTo2D(BlockRegionc)}} but with a Vector3i instead of a Region3i.
      * @param size The size used.
      * @return The 2D representation with the additional space added to it with the additional space added to it in the 3 dimensions.
      */
     //TODO: offer a variant that takes three integers to potentially avoid allocation of superfluous vectors
-    public Rect2i expandTo2D(Vector3i size) {
-        return Rect2i.createFromMinAndMax(-getSides(), -getSides(), size.x + getSides() - 1, size.z + getSides() - 1);
+    public BlockArea expandTo2D(Vector3ic size) {
+        return new BlockArea(-getSides(), -getSides(), size.x() + getSides() - 1, size.z() + getSides() - 1);
     }
 
     /**
@@ -101,9 +101,9 @@ public class Border3D {
      * @return The 3D world representation with the additional space added to it in the 3 dimensions.
      */
     //TODO: offer a variant that takes three integers to potentially avoid allocation of superfluous vectors
-    public BlockRegion expandTo3D(Vector3i size) {
+    public BlockRegion expandTo3D(Vector3ic size) {
         return new BlockRegion(-sides, -bottom, -sides,
-                size.x + sides - 1, size.y + top - 1, size.z + sides - 1);
+                size.x() + sides - 1, size.y() + top - 1, size.z() + sides - 1);
     }
 
     /**
