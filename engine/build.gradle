@@ -1,11 +1,10 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
 // The engine build is the primary Java project and has the primary list of dependencies
 
 plugins {
     id "java-library"
-    id "me.champeau.gradle.jmh" version "0.5.2"
 }
 
 // Grab all the common stuff like plugins to use, artifact repositories, code analysis config, etc
@@ -185,8 +184,25 @@ task cleanReflections(type: Delete) {
     delete cacheReflections.outputs.files
 }
 
-jmh {
-    duplicateClassesStrategy = 'warn'
+// JMH related tasks
+
+sourceSets {
+    jmh {
+        java.srcDirs = ['src/jmh/java']
+        resources.srcDirs = ['src/jmh/resources']
+        compileClasspath += sourceSets.main.runtimeClasspath
+    }
+}
+
+task jmh(type: JavaExec, dependsOn: jmhClasses) {
+    main = 'org.openjdk.jmh.Main'
+    classpath = sourceSets.jmh.compileClasspath + sourceSets.jmh.runtimeClasspath
+}
+
+dependencies {
+    jmhAnnotationProcessor group: 'org.openjdk.jmh', name: 'jmh-generator-annprocess', version: '1.27'
+    jmhImplementation 'org.openjdk.jmh:jmh-core:1.27'
+    jmhImplementation 'org.openjdk.jmh:jmh-generator-annprocess:1.27'
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -10,7 +10,6 @@ import org.openjdk.jmh.annotations.Measurement;
 import org.openjdk.jmh.annotations.Mode;
 import org.openjdk.jmh.annotations.OutputTimeUnit;
 import org.openjdk.jmh.annotations.Scope;
-import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.annotations.Warmup;
 import org.terasology.entitySystem.Component;
@@ -24,35 +23,52 @@ import org.terasology.world.block.BlockComponent;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+/**
+ *
+ */
 @BenchmarkMode(Mode.All)
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
 @Warmup(iterations = 1, time = 1)
 @Measurement(iterations = 1, time = 1)
-public class EntityCreateBenchmark {
+public class IterateComponentsBenchmark {
 
-    @Benchmark
-    public EntityRef createEntity(StateObject state) {
-        return state.entityManager.create(state.entityData);
-    }
-
-    @State(Scope.Thread)
+    @State(Scope.Benchmark)
     public static class StateObject {
-
-        private final List<Component> entityData = Lists.newArrayList();
         private final PojoEntityManager entityManager = new PojoEntityManager();
 
-        @Setup
         public void setup() {
             FastRandom rand = new FastRandom(0L);
-            if (rand.nextFloat() < 0.75f) {
-                entityData.add(new LocationComponent());
-            }
-            if (rand.nextFloat() < 0.5f) {
-                entityData.add(new MeshComponent());
-            }
-            if (rand.nextFloat() < 0.25f) {
-                entityData.add(new BlockComponent());
+            for (int i = 0; i < 1000; ++i) {
+                List<Component> entityData = Lists.newArrayList();
+                if (rand.nextFloat() < 0.75f) {
+                    entityData.add(new LocationComponent());
+                }
+                if (rand.nextFloat() < 0.5f) {
+                    entityData.add(new MeshComponent());
+                }
+                if (rand.nextFloat() < 0.25f) {
+                    entityData.add(new BlockComponent());
+                }
+                entityManager.create(entityData);
             }
         }
     }
+    
+    @Benchmark
+    public void iterateMultipleComponent(StateObject state) {
+        for (EntityRef entity : state.entityManager.getEntitiesWith(MeshComponent.class, LocationComponent.class)) {
+            LocationComponent loc = entity.getComponent(LocationComponent.class);
+            MeshComponent meshComp = entity.getComponent(MeshComponent.class);
+            loc.getLocalPosition();
+        }
+    }
+
+    @Benchmark
+    public void iterateSingleComponent(StateObject state) {
+        for (EntityRef entity : state.entityManager.getEntitiesWith(LocationComponent.class)) {
+            LocationComponent loc = entity.getComponent(LocationComponent.class);
+            loc.getLocalPosition();
+        }
+    }
+
 }
