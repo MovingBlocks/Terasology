@@ -88,7 +88,7 @@ public class LwjglCanvasRenderer implements TerasologyCanvasRenderer, PropertyCh
     private Map<TextCacheKey, Map<Material, Mesh>> cachedText = Maps.newLinkedHashMap();
     private Set<TextCacheKey> usedText = Sets.newHashSet();
 
-    // Texutre mesh caching
+    // Texture mesh caching
     private Map<TextureCacheKey, Mesh> cachedTextures = Maps.newLinkedHashMap();
     private Set<TextureCacheKey> usedTextures = Sets.newHashSet();
 

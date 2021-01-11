@@ -76,7 +76,7 @@ public interface WorldProviderCore {
      * @param chunkPos
      * @return A world view centered on the desired chunk, with the surrounding chunks present.
      */
-    ChunkViewCore getLocalView(Vector3i chunkPos);
+    ChunkViewCore getLocalView(Vector3ic chunkPos);
 
     /**
      * @param chunk

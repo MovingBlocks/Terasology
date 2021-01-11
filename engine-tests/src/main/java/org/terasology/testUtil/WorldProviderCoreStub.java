@@ -85,7 +85,7 @@ public class WorldProviderCoreStub implements WorldProviderCore {
     }
 
     @Override
-    public ChunkViewCore getLocalView(Vector3i chunkPos) {
+    public ChunkViewCore getLocalView(Vector3ic chunkPos) {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 

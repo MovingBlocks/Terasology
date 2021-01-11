@@ -78,4 +78,5 @@ public interface DisplayDevice extends Subscribable {
 
     void update();
 
+    DisplayDeviceInfo getInfo();
 }
