@@ -15,6 +15,7 @@
  */
 package org.terasology.utilities.procedural;
 
+import org.joml.Math;
 import org.terasology.math.TeraMath;
 import org.terasology.utilities.random.FastRandom;
 
@@ -45,12 +46,12 @@ public class SimplexNoise extends AbstractNoise implements Noise2D, Noise3D {
      */
     public static final float TILEABLE1DMAGICNUMBER = 0.5773502691896258f;
 
-    private static Grad[] grad3 = {
+    private static final Grad[] GRAD_3 = {
             new Grad(1, 1, 0), new Grad(-1, 1, 0), new Grad(1, -1, 0), new Grad(-1, -1, 0),
             new Grad(1, 0, 1), new Grad(-1, 0, 1), new Grad(1, 0, -1), new Grad(-1, 0, -1),
             new Grad(0, 1, 1), new Grad(0, -1, 1), new Grad(0, 1, -1), new Grad(0, -1, -1)};
 
-    private static Grad[] grad4 = {
+    private static final Grad[] GRAD_4 = {
             new Grad(0, 1, 1, 1), new Grad(0, 1, 1, -1), new Grad(0, 1, -1, 1), new Grad(0, 1, -1, -1),
             new Grad(0, -1, 1, 1), new Grad(0, -1, 1, -1), new Grad(0, -1, -1, 1), new Grad(0, -1, -1, -1),
             new Grad(1, 0, 1, 1), new Grad(1, 0, 1, -1), new Grad(1, 0, -1, 1), new Grad(1, 0, -1, -1),
@@ -118,15 +119,15 @@ public class SimplexNoise extends AbstractNoise implements Noise2D, Noise3D {
     }
 
     private static float dot(Grad g, float x, float y) {
-        return g.x * x + g.y * y;
+        return Math.fma(g.x, x, g.y * y);
     }
 
     private static float dot(Grad g, float x, float y, float z) {
-        return g.x * x + g.y * y + g.z * z;
+        return Math.fma(g.x, x, Math.fma(g.y, y, g.z * z));
     }
 
     private static float dot(Grad g, float x, float y, float z, float w) {
-        return g.x * x + g.y * y + g.z * z + g.w * w;
+        return Math.fma(g.x, x, Math.fma(g.y, y, Math.fma(g.z, z, g.w * w)));
     }
 
     /**
@@ -173,33 +174,33 @@ public class SimplexNoise extends AbstractNoise implements Noise2D, Noise3D {
         float y2 = y0 - 1.0f + 2.0f * G2;
 
         // Work out the hashed gradient indices of the three simplex corners
-        int ii = Math.floorMod(i, permCount);
-        int jj = Math.floorMod(j, permCount);
+        int ii = java.lang.Math.floorMod(i, permCount);
+        int jj = java.lang.Math.floorMod(j, permCount);
         int gi0 = permMod12[ii + perm[jj]];
         int gi1 = permMod12[ii + i1 + perm[jj + j1]];
         int gi2 = permMod12[ii + 1 + perm[jj + 1]];
 
         // Calculate the contribution from the three corners
-        float t0 = 0.5f - x0 * x0 - y0 * y0;
+        float t0 = 0.5f - Math.fma(x0, x0, y0 * y0);
         if (t0 < 0) {
             n0 = 0.0f;
         } else {
             t0 *= t0;
-            n0 = t0 * t0 * dot(grad3[gi0], x0, y0); // (x,y) of grad3 used for 2D gradient
+            n0 = t0 * t0 * dot(GRAD_3[gi0], x0, y0); // (x,y) of grad3 used for 2D gradient
         }
-        float t1 = 0.5f - x1 * x1 - y1 * y1;
+        float t1 = 0.5f - Math.fma(x1, x1, y1 * y1);
         if (t1 < 0) {
             n1 = 0.0f;
         } else {
             t1 *= t1;
-            n1 = t1 * t1 * dot(grad3[gi1], x1, y1);
+            n1 = t1 * t1 * dot(GRAD_3[gi1], x1, y1);
         }
-        float t2 = 0.5f - x2 * x2 - y2 * y2;
+        float t2 = 0.5f - Math.fma(x2, x2, y2 * y2);
         if (t2 < 0) {
             n2 = 0.0f;
         } else {
             t2 *= t2;
-            n2 = t2 * t2 * dot(grad3[gi2], x2, y2);
+            n2 = t2 * t2 * dot(GRAD_3[gi2], x2, y2);
         }
 
         // Add contributions from each corner to get the final noise value.
@@ -307,42 +308,42 @@ public class SimplexNoise extends AbstractNoise implements Noise2D, Noise3D {
         float z3 = z0 - 1.0f + 3.0f * G3;
 
         // Work out the hashed gradient indices of the four simplex corners
-        int ii = Math.floorMod(i, permCount);
-        int jj = Math.floorMod(j, permCount);
-        int kk = Math.floorMod(k, permCount);
+        int ii = java.lang.Math.floorMod(i, permCount);
+        int jj = java.lang.Math.floorMod(j, permCount);
+        int kk = java.lang.Math.floorMod(k, permCount);
         int gi0 = permMod12[ii + perm[jj + perm[kk]]];
         int gi1 = permMod12[ii + i1 + perm[jj + j1 + perm[kk + k1]]];
         int gi2 = permMod12[ii + i2 + perm[jj + j2 + perm[kk + k2]]];
         int gi3 = permMod12[ii + 1 + perm[jj + 1 + perm[kk + 1]]];
 
         // Calculate the contribution from the four corners
-        float t0 = 0.6f - x0 * x0 - y0 * y0 - z0 * z0;
+        float t0 = 0.6f - Math.fma(x0, x0, Math.fma(y0, y0, z0 * z0));
         if (t0 < 0) {
             n0 = 0.0f;
         } else {
             t0 *= t0;
-            n0 = t0 * t0 * dot(grad3[gi0], x0, y0, z0);
+            n0 = t0 * t0 * dot(GRAD_3[gi0], x0, y0, z0);
         }
-        float t1 = 0.6f - x1 * x1 - y1 * y1 - z1 * z1;
+        float t1 = 0.6f - Math.fma(x1, x1, Math.fma(y1, y1, z1 * z1));
         if (t1 < 0) {
             n1 = 0.0f;
         } else {
             t1 *= t1;
-            n1 = t1 * t1 * dot(grad3[gi1], x1, y1, z1);
+            n1 = t1 * t1 * dot(GRAD_3[gi1], x1, y1, z1);
         }
-        float t2 = 0.6f - x2 * x2 - y2 * y2 - z2 * z2;
+        float t2 = 0.6f - Math.fma(x2, x2, Math.fma(y2, y2, z2 * z2));
         if (t2 < 0) {
             n2 = 0.0f;
         } else {
             t2 *= t2;
-            n2 = t2 * t2 * dot(grad3[gi2], x2, y2, z2);
+            n2 = t2 * t2 * dot(GRAD_3[gi2], x2, y2, z2);
         }
-        float t3 = 0.6f - x3 * x3 - y3 * y3 - z3 * z3;
+        float t3 = 0.6f - Math.fma(x3, x3, Math.fma(y3, y3, z3 * z3));
         if (t3 < 0) {
             n3 = 0.0f;
         } else {
             t3 *= t3;
-            n3 = t3 * t3 * dot(grad3[gi3], x3, y3, z3);
+            n3 = t3 * t3 * dot(GRAD_3[gi3], x3, y3, z3);
         }
 
         // Add contributions from each corner to get the final noise value.
@@ -477,10 +478,10 @@ public class SimplexNoise extends AbstractNoise implements Noise2D, Noise3D {
         float w4 = w0 - 1.0f + 4.0f * G4;
 
         // Work out the hashed gradient indices of the five simplex corners
-        int ii = Math.floorMod(i, permCount);
-        int jj = Math.floorMod(j, permCount);
-        int kk = Math.floorMod(k, permCount);
-        int ll = Math.floorMod(l, permCount);
+        int ii = java.lang.Math.floorMod(i, permCount);
+        int jj = java.lang.Math.floorMod(j, permCount);
+        int kk = java.lang.Math.floorMod(k, permCount);
+        int ll = java.lang.Math.floorMod(l, permCount);
         int gi0 = perm[ii + perm[jj + perm[kk + perm[ll]]]] % 32;
         int gi1 = perm[ii + i1 + perm[jj + j1 + perm[kk + k1 + perm[ll + l1]]]] % 32;
         int gi2 = perm[ii + i2 + perm[jj + j2 + perm[kk + k2 + perm[ll + l2]]]] % 32;
@@ -488,40 +489,44 @@ public class SimplexNoise extends AbstractNoise implements Noise2D, Noise3D {
         int gi4 = perm[ii + 1 + perm[jj + 1 + perm[kk + 1 + perm[ll + 1]]]] % 32;
 
         // Calculate the contribution from the five corners
-        float t0 = 0.6f - x0 * x0 - y0 * y0 - z0 * z0 - w0 * w0;
+        float t0 = 0.6f - Math.fma(x0, x0, Math.fma(y0, y0, Math.fma(z0, z0, w0 * w0)));
         if (t0 < 0) {
             n0 = 0.0f;
         } else {
             t0 *= t0;
-            n0 = t0 * t0 * dot(grad4[gi0], x0, y0, z0, w0);
+            n0 = t0 * t0 * dot(GRAD_4[gi0], x0, y0, z0, w0);
         }
-        float t1 = 0.6f - x1 * x1 - y1 * y1 - z1 * z1 - w1 * w1;
+
+        float t1 = 0.6f - Math.fma(x1, x1, Math.fma(y1, y1, Math.fma(z1, z1, w1 * w1)));
         if (t1 < 0) {
             n1 = 0.0f;
         } else {
             t1 *= t1;
-            n1 = t1 * t1 * dot(grad4[gi1], x1, y1, z1, w1);
+            n1 = t1 * t1 * dot(GRAD_4[gi1], x1, y1, z1, w1);
         }
-        float t2 = 0.6f - x2 * x2 - y2 * y2 - z2 * z2 - w2 * w2;
+
+        float t2 = 0.6f - Math.fma(x2, x2, Math.fma(y2, y2, Math.fma(z2, z2, w2 * w2)));
         if (t2 < 0) {
             n2 = 0.f;
         } else {
             t2 *= t2;
-            n2 = t2 * t2 * dot(grad4[gi2], x2, y2, z2, w2);
+            n2 = t2 * t2 * dot(GRAD_4[gi2], x2, y2, z2, w2);
         }
-        float t3 = 0.6f - x3 * x3 - y3 * y3 - z3 * z3 - w3 * w3;
+
+        float t3 = 0.6f - Math.fma(x3, x3, Math.fma(y3, y3, Math.fma(z3, z3, w3 * w3)));
         if (t3 < 0) {
             n3 = 0.0f;
         } else {
             t3 *= t3;
-            n3 = t3 * t3 * dot(grad4[gi3], x3, y3, z3, w3);
+            n3 = t3 * t3 * dot(GRAD_4[gi3], x3, y3, z3, w3);
         }
-        float t4 = 0.6f - x4 * x4 - y4 * y4 - z4 * z4 - w4 * w4;
+
+        float t4 = 0.6f - Math.fma(x4, x4, Math.fma(y4, y4, Math.fma(z4, z4, w4 * w4)));
         if (t4 < 0) {
             n4 = 0.0f;
         } else {
             t4 *= t4;
-            n4 = t4 * t4 * dot(grad4[gi4], x4, y4, z4, w4);
+            n4 = t4 * t4 * dot(GRAD_4[gi4], x4, y4, z4, w4);
         }
         // Sum up and scale the result to cover the range [-1,1]
         return 27.0f * (n0 + n1 + n2 + n3 + n4);
