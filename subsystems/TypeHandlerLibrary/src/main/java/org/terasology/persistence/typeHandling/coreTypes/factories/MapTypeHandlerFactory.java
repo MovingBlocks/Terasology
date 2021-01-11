@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.terasology.persistence.typeHandling.TypeHandler;
 import org.terasology.persistence.typeHandling.TypeHandlerContext;
 import org.terasology.persistence.typeHandling.TypeHandlerFactory;
+import org.terasology.persistence.typeHandling.coreTypes.GenericMapTypeHandler;
 import org.terasology.persistence.typeHandling.coreTypes.RuntimeDelegatingTypeHandler;
 import org.terasology.persistence.typeHandling.coreTypes.StringMapTypeHandler;
 import org.terasology.reflection.ReflectionUtil;
@@ -16,7 +17,7 @@ import java.lang.reflect.Type;
 import java.util.Map;
 import java.util.Optional;
 
-public class StringMapTypeHandlerFactory implements TypeHandlerFactory {
+public class MapTypeHandlerFactory implements TypeHandlerFactory {
     private static final Logger LOGGER = LoggerFactory.getLogger(StringMapTypeHandler.class);
 
     @SuppressWarnings("unchecked")
@@ -29,9 +30,6 @@ public class StringMapTypeHandlerFactory implements TypeHandlerFactory {
         Type keyType = ReflectionUtil.getTypeParameterForSuper(typeInfo.getType(), Map.class, 0);
         Type valueType = ReflectionUtil.getTypeParameterForSuper(typeInfo.getType(), Map.class, 1);
 
-        if (!String.class.equals(keyType)) {
-            return Optional.empty();
-        }
 
         if (valueType == null) {
             LOGGER.error("Map is not parameterized and cannot be serialized");
@@ -50,6 +48,19 @@ public class StringMapTypeHandlerFactory implements TypeHandlerFactory {
                 context
         );
 
-        return Optional.of((TypeHandler<T>) new StringMapTypeHandler<>(valueTypeHandler));
+        if (String.class.equals(keyType)) {
+            return Optional.of((TypeHandler<T>) new StringMapTypeHandler<>(valueTypeHandler));
+        } else {
+            Optional<TypeHandler<?>> declaredKeyTypeHandler =
+                    context.getTypeHandlerLibrary().getTypeHandler(keyType);
+            TypeInfo<?> keyTypeInfo = TypeInfo.of(keyType);
+            @SuppressWarnings({"unchecked"})
+            TypeHandler<?> keyTypeHandler = new RuntimeDelegatingTypeHandler(
+                    declaredKeyTypeHandler.orElse(null),
+                    keyTypeInfo,
+                    context
+            );
+            return Optional.of((TypeHandler<T>) new GenericMapTypeHandler<>(keyTypeHandler, valueTypeHandler));
+        }
     }
 }
