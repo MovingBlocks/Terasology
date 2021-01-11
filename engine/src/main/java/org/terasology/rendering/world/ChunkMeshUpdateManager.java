@@ -162,7 +162,7 @@ public final class ChunkMeshUpdateManager {
         @Override
         public void run() {
             ChunkMesh newMesh;
-            ChunkView chunkView = worldProvider.getLocalView(c.getPosition());
+            ChunkView chunkView = worldProvider.getLocalView(c.getPosition(new org.joml.Vector3i()));
             if (chunkView != null) {
                 /*
                  * Important set dirty flag first, so that a concurrent modification of the chunk in the mean time we

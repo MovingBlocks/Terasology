@@ -15,6 +15,7 @@
  */
 package org.terasology.logic.ai;
 
+import org.joml.Vector3f;
 import org.terasology.engine.Time;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -28,7 +29,6 @@ import org.terasology.logic.characters.CharacterMovementComponent;
 import org.terasology.logic.characters.events.HorizontalCollisionEvent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.LocalPlayer;
-import org.terasology.math.geom.Vector3f;
 import org.terasology.registry.In;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.utilities.random.Random;
@@ -53,7 +53,7 @@ public class SimpleAISystem extends BaseComponentSystem implements UpdateSubscri
     public void update(float delta) {
         for (EntityRef entity : entityManager.getEntitiesWith(SimpleAIComponent.class, CharacterMovementComponent.class, LocationComponent.class)) {
             LocationComponent location = entity.getComponent(LocationComponent.class);
-            Vector3f worldPos = location.getWorldPosition();
+            Vector3f worldPos = location.getWorldPosition(new Vector3f());
 
             // Skip this AI if not in a loaded chunk
             if (!worldProvider.isBlockRelevant(worldPos)) {
@@ -64,13 +64,12 @@ public class SimpleAISystem extends BaseComponentSystem implements UpdateSubscri
             Vector3f drive = new Vector3f();
             // TODO: shouldn't use local player, need some way to find nearest player
             if (localPlayer != null) {
-                Vector3f dist = new Vector3f(worldPos);
-                dist.sub(localPlayer.getPosition());
-                double distanceToPlayer = dist.lengthSquared();
+                final Vector3f playerPosition = localPlayer.getPosition(new Vector3f());
+                double distanceToPlayer = worldPos.distanceSquared(playerPosition);
 
                 if (distanceToPlayer > 6 && distanceToPlayer < 16) {
                     // Head to player
-                    ai.movementTarget.set(localPlayer.getPosition());
+                    ai.movementTarget.set(playerPosition);
                     ai.followingPlayer = true;
                     entity.saveComponent(ai);
                 } else {
@@ -89,10 +88,10 @@ public class SimpleAISystem extends BaseComponentSystem implements UpdateSubscri
                 drive.set(targetDirection);
 
                 float yaw = (float) Math.atan2(targetDirection.x, targetDirection.z);
-                location.getLocalRotation().set(new Vector3f(0, 1, 0), yaw);
+                location.getLocalRotation().set(0, 1, 0, yaw);
                 entity.saveComponent(location);
             }
-            entity.send(new CharacterMoveInputEvent(0, 0, 0, drive, false, false, time.getGameDeltaInMs()));
+            entity.send(new CharacterMoveInputEvent(0, 0, 0, drive, false, false, false, time.getGameDeltaInMs()));
         }
     }
 
