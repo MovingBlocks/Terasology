@@ -5,6 +5,7 @@
 
 plugins {
     id "java-library"
+    id "me.champeau.gradle.jmh" version "0.5.2"
 }
 
 // Grab all the common stuff like plugins to use, artifact repositories, code analysis config, etc
@@ -50,13 +51,6 @@ def convertGitBranch = { gitBranch ->
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 sourceSets {
-    main.java {
-        // dev/ holds things that are neither unit tests nor application code.
-        // For notes about whether it should be its own source set, see
-        // see https://github.com/MovingBlocks/Terasology/pull/4021
-        srcDir("src/dev/java")
-    }
-
     // Adjust output path (changed with the Gradle 6 upgrade, this puts it back)
     main.java.outputDir = new File("$buildDir/classes")
 }
@@ -189,6 +183,10 @@ jar {
 task cleanReflections(type: Delete) {
     description = 'Cleans the reflection cache. Useful in cases where it has gone stale and needs regeneration.'
     delete cacheReflections.outputs.files
+}
+
+jmh {
+    duplicateClassesStrategy = 'warn'
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
