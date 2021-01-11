@@ -1,4 +1,4 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.engine.bootstrap.eventSystem;
@@ -70,5 +70,11 @@ public abstract class AbstractEventSystemDecorator implements EventSystem {
     @Override
     public void send(EntityRef entity, Event event, Component component) {
         eventSystem.send(entity, event, component);
+    }
+
+    @Override
+    public void setToCurrentThread() {
+        eventSystem.setToCurrentThread();
+        mainThread = Thread.currentThread();
     }
 }
