@@ -534,16 +534,17 @@ public class SimplexNoise extends AbstractNoise implements Noise2D, Noise3D {
 
     // Inner class to speed up gradient computations
     // (array access is a lot slower than member access)
-    private static class Grad {
-        float x;
-        float y;
-        float z;
-        float w;
+    private static final class Grad {
+        final float x;
+        final float y;
+        final float z;
+        final float w;
 
         Grad(float x, float y, float z) {
             this.x = x;
             this.y = y;
             this.z = z;
+            this.w = 0;
         }
 
         Grad(float x, float y, float z, float w) {
