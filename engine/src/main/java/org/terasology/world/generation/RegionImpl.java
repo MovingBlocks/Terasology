@@ -40,7 +40,7 @@ public class RegionImpl implements Region, GeneratingRegion {
     private final Set<FacetProvider> processedProviders = Sets.newHashSet();
     private final TypeMap<WorldFacet> generatedFacets = TypeMap.create();
 
-    public RegionImpl(Region3i region,
+    public RegionImpl(BlockRegion region,
                       ListMultimap<Class<? extends WorldFacet>, FacetProvider> facetProviderChains,
                       Map<Class<? extends WorldFacet>, Border3D> borders) {
         this.region = region;
@@ -49,7 +49,7 @@ public class RegionImpl implements Region, GeneratingRegion {
         this.listenerMap = Maps.newLinkedHashMap();
     }
 
-    public RegionImpl(Region3i region,
+    public RegionImpl(BlockRegion region,
                       ListMultimap<Class<? extends WorldFacet>, FacetProvider> facetProviderChains,
                       Map<Class<? extends WorldFacet>, Border3D> borders,
                       Map<Class<?>, List<FacetProviderListener>> listenerMap) {

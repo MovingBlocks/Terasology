@@ -130,7 +130,7 @@ public class WorldBuilder extends ProviderStore {
                 providerChains,
                 orderedRasterizers,
                 entityProviders,
-                determineBorders(providerChains),
+                determineBorders(providerChains, orderedRasterizers),
                 listenerMap,
                 seaLevel);
     }
