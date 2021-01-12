@@ -21,13 +21,14 @@ import org.jboss.shrinkwrap.api.nio.file.ShrinkWrapFileSystems;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.joml.Vector3f;
 import org.joml.Vector3i;
+import org.joml.Vector3ic;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
-import org.mockito.Matchers;
+import org.mockito.ArgumentMatchers;
 import org.terasology.TerasologyTestingEnvironment;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
@@ -87,7 +88,7 @@ import static org.mockito.Mockito.when;
 public class StorageManagerTest extends TerasologyTestingEnvironment {
 
     public static final String PLAYER_ID = "someId";
-    public static final Vector3i CHUNK_POS = new Vector3i(1, 2, 3);
+    public static final Vector3ic CHUNK_POS = new Vector3i(1, 2, 3);
 
     private static File temporaryFolder;
 
@@ -303,7 +304,7 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
         chunk.markReady();
         ChunkProvider chunkProvider = mock(ChunkProvider.class);
         when(chunkProvider.getAllChunks()).thenReturn(Arrays.asList(chunk));
-        when(chunkProvider.getChunk(Matchers.any(org.terasology.math.geom.Vector3i.class))).thenReturn(chunk);
+        when(chunkProvider.getChunk(ArgumentMatchers.any(Vector3ic.class))).thenReturn(chunk);
         CoreRegistry.put(ChunkProvider.class, chunkProvider);
         boolean storeChunkInZips = true;
 

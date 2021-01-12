@@ -23,6 +23,7 @@ import org.terasology.TerasologyTestingEnvironment;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.Region3i;
 import org.terasology.math.Side;
 import org.terasology.math.geom.Vector3i;
@@ -261,6 +262,11 @@ public class BetweenChunkPropagationTest extends TerasologyTestingEnvironment {
         @Override
         public Chunk getChunk(Vector3i chunkPos) {
             return chunks.get(chunkPos);
+        }
+
+        @Override
+        public Chunk getChunk(Vector3ic chunkPos) {
+            return chunks.get(JomlUtil.from(chunkPos));
         }
 
         @Override

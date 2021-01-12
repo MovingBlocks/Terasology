@@ -145,6 +145,11 @@ public class RemoteChunkProvider implements ChunkProvider {
     }
 
     @Override
+    public Chunk getChunk(org.joml.Vector3ic pos) {
+        return getChunk(JomlUtil.from(pos));
+    }
+
+    @Override
     public boolean isChunkReady(Vector3i pos) {
         Chunk chunk = chunkCache.get(pos);
         return chunk != null && chunk.isReady();
@@ -160,11 +165,6 @@ public class RemoteChunkProvider implements ChunkProvider {
     public void dispose() {
         ChunkMonitor.fireChunkProviderDisposed(this);
         loadingPipeline.shutdown();
-    }
-
-
-    public Chunk getChunk(org.joml.Vector3ic pos) {
-        return getChunk(JomlUtil.from(pos));
     }
 
     @Override
