@@ -135,7 +135,7 @@ public class ChunkViewCoreImpl implements ChunkViewCore {
     public void setBlock(int blockX, int blockY, int blockZ, Block type) {
         if (blockRegion.contains(blockX, blockY, blockZ)) {
             int chunkIndex = relChunkIndex(blockX, blockY, blockZ);
-            chunks[chunkIndex].setBlock(Chunks.toRelative(blockX, blockY, blockZ, chunkFilterSize), type);
+            chunks[chunkIndex].setBlock(Chunks.toRelative(blockX, blockY, blockZ, chunkFilterSize, new Vector3i()), type);
         } else {
             logger.warn("Attempt to modify block outside of the view");
         }
@@ -183,7 +183,7 @@ public class ChunkViewCoreImpl implements ChunkViewCore {
         }
 
         int chunkIndex = relChunkIndex(blockX, blockY, blockZ);
-        return chunks[chunkIndex].getExtraData(index, Chunks.toRelative(blockX, blockY, blockZ, chunkFilterSize));
+        return chunks[chunkIndex].getExtraData(index, Chunks.toRelative(blockX, blockY, blockZ, chunkFilterSize, new Vector3i()));
     }
 
     @Override
@@ -195,7 +195,7 @@ public class ChunkViewCoreImpl implements ChunkViewCore {
     public void setExtraData(int index, int blockX, int blockY, int blockZ, int value) {
         if (blockRegion.contains(blockX, blockY, blockZ)) {
             int chunkIndex = relChunkIndex(blockX, blockY, blockZ);
-            chunks[chunkIndex].setExtraData(index, Chunks.toRelative(blockX, blockY, blockZ, chunkFilterSize), value);
+            chunks[chunkIndex].setExtraData(index, Chunks.toRelative(blockX, blockY, blockZ, chunkFilterSize, new Vector3i()), value);
         } else {
             throw new IllegalStateException("Attempted to modify extra data though an unlocked view");
         }
