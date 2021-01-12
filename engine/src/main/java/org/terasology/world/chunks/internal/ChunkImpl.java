@@ -21,6 +21,7 @@ import org.joml.Vector3ic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.math.AABB;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.BaseVector3i;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
@@ -33,6 +34,7 @@ import org.terasology.world.block.BlockRegion;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkBlockIterator;
 import org.terasology.world.chunks.ChunkConstants;
+import org.terasology.world.chunks.Chunks;
 import org.terasology.world.chunks.blockdata.ExtraBlockDataManager;
 import org.terasology.world.chunks.blockdata.TeraArray;
 import org.terasology.world.chunks.blockdata.TeraDenseArray16Bit;
@@ -518,10 +520,10 @@ public class ChunkImpl implements Chunk {
     public void prepareForReactivation() {
         if (disposed) {
             disposed = false;
-            sunlightData = new TeraDenseArray8Bit(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z);
-            sunlightRegenData = new TeraDenseArray8Bit(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y,
-                    ChunkConstants.SIZE_Z);
-            lightData = new TeraDenseArray8Bit(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z);
+            sunlightData = new TeraDenseArray8Bit(Chunks.SIZE_X, Chunks.SIZE_Y, Chunks.SIZE_Z);
+            sunlightRegenData = new TeraDenseArray8Bit(Chunks.SIZE_X, Chunks.SIZE_Y,
+                Chunks.SIZE_Z);
+            lightData = new TeraDenseArray8Bit(Chunks.SIZE_X, Chunks.SIZE_Y, Chunks.SIZE_Z);
         }
     }
 
@@ -561,17 +563,17 @@ public class ChunkImpl implements Chunk {
 
     @Override
     public int getChunkSizeX() {
-        return ChunkConstants.SIZE_X;
+        return Chunks.SIZE_X;
     }
 
     @Override
     public int getChunkSizeY() {
-        return ChunkConstants.SIZE_Y;
+        return Chunks.SIZE_Y;
     }
 
     @Override
     public int getChunkSizeZ() {
-        return ChunkConstants.SIZE_Z;
+        return Chunks.SIZE_Z;
     }
 
     @Override
@@ -581,7 +583,7 @@ public class ChunkImpl implements Chunk {
 
     @Override
     public EntityData.ChunkStore.Builder encode() {
-        return ChunkSerializer.encode(chunkPos, blockData, extraData);
+        return ChunkSerializer.encode(JomlUtil.from(chunkPos), blockData, extraData);
     }
 
     /**
@@ -602,7 +604,7 @@ public class ChunkImpl implements Chunk {
      * @return an encoded version of the snapshot taken with {@link #createSnapshot()}.
      */
     public EntityData.ChunkStore.Builder encodeAndReleaseSnapshot() {
-        EntityData.ChunkStore.Builder result = ChunkSerializer.encode(chunkPos, blockDataSnapshot, extraDataSnapshots);
+        EntityData.ChunkStore.Builder result = ChunkSerializer.encode(JomlUtil.from(chunkPos), blockDataSnapshot, extraDataSnapshots);
         this.blockDataSnapshot = null;
         this.extraDataSnapshots = null;
         return result;
