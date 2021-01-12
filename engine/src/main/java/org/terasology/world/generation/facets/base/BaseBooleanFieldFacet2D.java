@@ -16,9 +16,9 @@
 package org.terasology.world.generation.facets.base;
 
 import com.google.common.base.Preconditions;
-
-import org.terasology.math.Region3i;
+import org.joml.Vector2ic;
 import org.terasology.math.geom.Vector2i;
+import org.terasology.world.block.BlockRegion;
 import org.terasology.world.generation.Border3D;
 
 /**
@@ -30,10 +30,9 @@ public abstract class BaseBooleanFieldFacet2D extends BaseFacet2D implements Boo
 
     private final boolean[] data;
 
-    public BaseBooleanFieldFacet2D(Region3i targetRegion, Border3D border) {
+    public BaseBooleanFieldFacet2D(BlockRegion targetRegion, Border3D border) {
         super(targetRegion, border);
-        Vector2i size = getRelativeRegion().size();
-        data = new boolean[size.x * size.y];
+        data = new boolean[getRelativeArea().area()];
     }
 
     @Override
@@ -42,8 +41,8 @@ public abstract class BaseBooleanFieldFacet2D extends BaseFacet2D implements Boo
     }
 
     @Override
-    public boolean get(Vector2i pos) {
-        return get(pos.x, pos.y);
+    public boolean get(Vector2ic pos) {
+        return get(pos.x(), pos.y());
     }
 
     @Override
@@ -52,8 +51,8 @@ public abstract class BaseBooleanFieldFacet2D extends BaseFacet2D implements Boo
     }
 
     @Override
-    public boolean getWorld(Vector2i pos) {
-        return getWorld(pos.x, pos.y);
+    public boolean getWorld(Vector2ic pos) {
+        return getWorld(pos.x(), pos.y());
     }
 
     /**
@@ -71,8 +70,8 @@ public abstract class BaseBooleanFieldFacet2D extends BaseFacet2D implements Boo
     }
 
     @Override
-    public void set(Vector2i pos, boolean value) {
-        set(pos.x, pos.y, value);
+    public void set(Vector2ic pos, boolean value) {
+        set(pos.x(), pos.y(), value);
     }
 
     @Override
@@ -81,8 +80,8 @@ public abstract class BaseBooleanFieldFacet2D extends BaseFacet2D implements Boo
     }
 
     @Override
-    public void setWorld(Vector2i pos, boolean value) {
-        setWorld(pos.x, pos.y, value);
+    public void setWorld(Vector2ic pos, boolean value) {
+        setWorld(pos.x(), pos.y(), value);
     }
 
     /**

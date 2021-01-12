@@ -17,6 +17,8 @@ package org.terasology.rendering.world;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
+import org.joml.Vector3f;
+import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,10 +26,7 @@ import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.engine.subsystem.lwjgl.GLBufferPool;
 import org.terasology.math.JomlUtil;
-import org.terasology.math.Region3i;
 import org.terasology.math.TeraMath;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.cameras.Camera;
@@ -36,6 +35,7 @@ import org.terasology.rendering.primitives.ChunkTessellator;
 import org.terasology.rendering.world.viewDistance.ViewDistance;
 import org.terasology.world.ChunkView;
 import org.terasology.world.WorldProvider;
+import org.terasology.world.block.BlockRegion;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.ChunkProvider;
@@ -67,7 +67,7 @@ class RenderableWorldImpl implements RenderableWorld {
     private ChunkTessellator chunkTessellator;
     private final ChunkMeshUpdateManager chunkMeshUpdateManager;
     private final List<RenderableChunk> chunksInProximityOfCamera = Lists.newArrayListWithCapacity(MAX_LOADABLE_CHUNKS);
-    private Region3i renderableRegion = Region3i.empty();
+    private BlockRegion renderableRegion = new BlockRegion(BlockRegion.INVALID);
     private ViewDistance currentViewDistance;
     private RenderQueuesHelper renderQueues;
 
@@ -102,9 +102,9 @@ class RenderableWorldImpl implements RenderableWorld {
     }
 
     @Override
-    public void onChunkLoaded(Vector3i chunkCoordinates) {
-        if (renderableRegion.encompasses(chunkCoordinates)) {
-            Chunk chunk = chunkProvider.getChunk(chunkCoordinates);
+    public void onChunkLoaded(Vector3ic chunkCoordinates) {
+        if (renderableRegion.contains(chunkCoordinates)) {
+            Chunk chunk = chunkProvider.getChunk(JomlUtil.from(chunkCoordinates));
             if (chunk != null) {
                 chunksInProximityOfCamera.add(chunk);
                 Collections.sort(chunksInProximityOfCamera, new ChunkFrontToBackComparator());
@@ -115,13 +115,13 @@ class RenderableWorldImpl implements RenderableWorld {
     }
 
     @Override
-    public void onChunkUnloaded(Vector3i chunkCoordinates) {
-        if (renderableRegion.encompasses(chunkCoordinates)) {
+    public void onChunkUnloaded(Vector3ic chunkCoordinates) {
+        if (renderableRegion.contains(chunkCoordinates)) {
             RenderableChunk chunk;
             Iterator<RenderableChunk> iterator = chunksInProximityOfCamera.iterator();
             while (iterator.hasNext()) {
                 chunk = iterator.next();
-                if (chunk.getPosition().equals(chunkCoordinates)) {
+                if (chunk.getPosition(new org.joml.Vector3i()).equals(chunkCoordinates)) {
                     chunk.disposeMesh();
                     iterator.remove();
                     break;
@@ -137,14 +137,13 @@ class RenderableWorldImpl implements RenderableWorld {
     public boolean pregenerateChunks() {
         boolean pregenerationIsComplete = true;
 
-        chunkProvider.completeUpdate();
-        chunkProvider.beginUpdate();
+        chunkProvider.update();
 
         RenderableChunk chunk;
         ChunkMesh newMesh;
         ChunkView localView;
-        for (Vector3i chunkCoordinates : calculateRenderableRegion(renderingConfig.getViewDistance())) {
-            chunk = chunkProvider.getChunk(chunkCoordinates);
+        for (Vector3ic chunkCoordinates : calculateRenderableRegion(renderingConfig.getViewDistance())) {
+            chunk = chunkProvider.getChunk(JomlUtil.from(chunkCoordinates));
             if (chunk == null) {
                 pregenerationIsComplete = false;
             } else if (chunk.isDirty()) {
@@ -172,16 +171,12 @@ class RenderableWorldImpl implements RenderableWorld {
     @Override
     public void update() {
 
-        PerformanceMonitor.startActivity("Complete chunk update");
-        chunkProvider.completeUpdate();
-        PerformanceMonitor.endActivity();
-
         PerformanceMonitor.startActivity("Update Lighting");
         worldProvider.processPropagation();
         PerformanceMonitor.endActivity();
 
-        PerformanceMonitor.startActivity("Begin chunk update");
-        chunkProvider.beginUpdate();
+        PerformanceMonitor.startActivity("Chunk update");
+        chunkProvider.update();
         PerformanceMonitor.endActivity();
 
         PerformanceMonitor.startActivity("Update Close Chunks");
@@ -196,33 +191,31 @@ class RenderableWorldImpl implements RenderableWorld {
      * @return True if the list was changed
      */
     @Override
-    public boolean updateChunksInProximity(Region3i newRenderableRegion) {
+    public boolean updateChunksInProximity(BlockRegion newRenderableRegion) {
         if (!newRenderableRegion.equals(renderableRegion)) {
-            Vector3i chunkPosition;
             RenderableChunk chunk;
+            for (Vector3ic chunkPositionToRemove : renderableRegion) {
+                if (!newRenderableRegion.contains(chunkPositionToRemove)) {
+                    Iterator<RenderableChunk> nearbyChunks = chunksInProximityOfCamera.iterator();
+                    for (Iterator<RenderableChunk> it = nearbyChunks; it.hasNext(); ) {
+                        chunk = it.next();
+                        if (chunk.getPosition(new org.joml.Vector3i()).equals(chunkPositionToRemove)) {
+                            chunk.disposeMesh();
+                            nearbyChunks.remove();
+                            break;
+                        }
 
-            Iterator<Vector3i> chunksToRemove = renderableRegion.subtract(newRenderableRegion);
-            while (chunksToRemove.hasNext()) {
-                chunkPosition = chunksToRemove.next();
-                Iterator<RenderableChunk> nearbyChunks = chunksInProximityOfCamera.iterator();
-                while (nearbyChunks.hasNext()) {
-                    chunk = nearbyChunks.next();
-                    if (chunk.getPosition().equals(chunkPosition)) {
-                        chunk.disposeMesh();
-                        nearbyChunks.remove();
-                        break;
                     }
                 }
             }
-
             boolean chunksHaveBeenAdded = false;
-            Iterator<Vector3i> chunksToAdd = newRenderableRegion.subtract(renderableRegion);
-            while (chunksToAdd.hasNext()) {
-                chunkPosition = chunksToAdd.next();
-                chunk = chunkProvider.getChunk(chunkPosition);
-                if (chunk != null) {
-                    chunksInProximityOfCamera.add(chunk);
-                    chunksHaveBeenAdded = true;
+            for (Vector3ic chunkPositionToAdd : newRenderableRegion) {
+                if (!renderableRegion.contains(chunkPositionToAdd)) {
+                    chunk = chunkProvider.getChunk(JomlUtil.from(chunkPositionToAdd));
+                    if (chunk != null) {
+                        chunksInProximityOfCamera.add(chunk);
+                        chunksHaveBeenAdded = true;
+                    }
                 }
             }
 
@@ -247,11 +240,11 @@ class RenderableWorldImpl implements RenderableWorld {
         }
     }
 
-    private Region3i calculateRenderableRegion(ViewDistance newViewDistance) {
+    private BlockRegion calculateRenderableRegion(ViewDistance newViewDistance) {
         Vector3i cameraCoordinates = calcCameraCoordinatesInChunkUnits();
         Vector3ic renderableRegionSize = newViewDistance.getChunkDistance();
         Vector3i renderableRegionExtents = new Vector3i(renderableRegionSize.x() / 2, renderableRegionSize.y() / 2, renderableRegionSize.z() / 2);
-        return Region3i.createFromCenterExtents(cameraCoordinates, renderableRegionExtents);
+        return new BlockRegion(cameraCoordinates).expand(renderableRegionExtents);
     }
 
     /**
@@ -435,7 +428,7 @@ class RenderableWorldImpl implements RenderableWorld {
     private static float squaredDistanceToCamera(RenderableChunk chunk, Vector3f cameraPosition) {
         // For performance reasons, to avoid instantiating too many vectors in a frequently called method,
         // comments are in use instead of appropriately named vectors.
-        Vector3f result = chunk.getPosition().toVector3f(); // chunk position in chunk coordinates
+        Vector3f result = new Vector3f(chunk.getPosition(new Vector3i())); // chunk position in chunk coordinates
         result.add(CHUNK_CENTER_OFFSET);                    // chunk center in chunk coordinates
 
         result.x *= ChunkConstants.SIZE_X;    // chunk center in world coordinates
@@ -456,7 +449,7 @@ class RenderableWorldImpl implements RenderableWorld {
         public int compare(RenderableChunk chunk1, RenderableChunk chunk2) {
             Preconditions.checkNotNull(chunk1);
             Preconditions.checkNotNull(chunk2);
-            Vector3f cameraPosition = JomlUtil.from(CoreRegistry.get(WorldRenderer.class).getActiveCamera().getPosition());
+            Vector3f cameraPosition = CoreRegistry.get(WorldRenderer.class).getActiveCamera().getPosition();
             double distance1 = squaredDistanceToCamera(chunk1, cameraPosition);
             double distance2 = squaredDistanceToCamera(chunk2, cameraPosition);
 
@@ -473,7 +466,7 @@ class RenderableWorldImpl implements RenderableWorld {
         public int compare(RenderableChunk chunk1, RenderableChunk chunk2) {
             Preconditions.checkNotNull(chunk1);
             Preconditions.checkNotNull(chunk2);
-            Vector3f cameraPosition = JomlUtil.from(CoreRegistry.get(WorldRenderer.class).getActiveCamera().getPosition());
+            Vector3f cameraPosition = CoreRegistry.get(WorldRenderer.class).getActiveCamera().getPosition();
             double distance1 = squaredDistanceToCamera(chunk1, cameraPosition);
             double distance2 = squaredDistanceToCamera(chunk2, cameraPosition);
 

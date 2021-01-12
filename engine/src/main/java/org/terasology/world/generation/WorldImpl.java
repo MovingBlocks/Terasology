@@ -19,6 +19,7 @@ import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.terasology.math.Region3i;
+import org.terasology.world.block.BlockRegion;
 import org.terasology.world.chunks.CoreChunk;
 
 import java.util.Collection;
@@ -65,7 +66,7 @@ public class WorldImpl implements World {
     }
 
     @Override
-    public Region getWorldData(Region3i region) {
+    public Region getWorldData(BlockRegion region) {
         return new RegionImpl(region, facetProviderChains, borders, listenerMap);
     }
 

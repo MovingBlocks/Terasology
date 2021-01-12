@@ -17,10 +17,10 @@
 package org.terasology.world.generation.facets.base;
 
 import com.google.common.collect.Maps;
-
-import org.terasology.math.Region3i;
-import org.terasology.math.geom.BaseVector3i;
-import org.terasology.math.geom.Vector3i;
+import org.joml.Vector3i;
+import org.joml.Vector3ic;
+import org.terasology.world.block.BlockRegion;
+import org.terasology.world.block.BlockRegionc;
 import org.terasology.world.generation.Border3D;
 
 import java.util.Collections;
@@ -34,13 +34,13 @@ import java.util.Map.Entry;
  */
 public abstract class SparseObjectFacet3D<T> extends SparseFacet3D implements ObjectFacet3D<T> {
 
-    private final Map<BaseVector3i, T> relData = Maps.newLinkedHashMap();
+    private final Map<Vector3ic, T> relData = Maps.newLinkedHashMap();
 
     /**
      * @param targetRegion
      * @param border
      */
-    public SparseObjectFacet3D(Region3i targetRegion, Border3D border) {
+    public SparseObjectFacet3D(BlockRegionc targetRegion, Border3D border) {
         super(targetRegion, border);
     }
 
@@ -50,7 +50,7 @@ public abstract class SparseObjectFacet3D<T> extends SparseFacet3D implements Ob
     }
 
     @Override
-    public T get(BaseVector3i pos) {
+    public T get(Vector3ic pos) {
         checkRelativeCoords(pos.x(), pos.y(), pos.z());
 
         return relData.get(pos);
@@ -62,14 +62,14 @@ public abstract class SparseObjectFacet3D<T> extends SparseFacet3D implements Ob
     }
 
     @Override
-    public void set(BaseVector3i pos, T value) {
+    public void set(Vector3ic pos, T value) {
         checkRelativeCoords(pos.x(), pos.y(), pos.z());
 
         relData.put(pos, value); // TODO: consider using an immutable vector here
     }
 
     @Override
-    public T getWorld(BaseVector3i pos) {
+    public T getWorld(Vector3ic pos) {
         return getWorld(pos.x(), pos.y(), pos.z());
     }
 
@@ -82,7 +82,7 @@ public abstract class SparseObjectFacet3D<T> extends SparseFacet3D implements Ob
     }
 
     @Override
-    public void setWorld(BaseVector3i pos, T value) {
+    public void setWorld(Vector3ic pos, T value) {
         setWorld(pos.x(), pos.y(), pos.z(), value);
     }
 
@@ -97,20 +97,20 @@ public abstract class SparseObjectFacet3D<T> extends SparseFacet3D implements Ob
     /**
      * @return an unmodifiable view on the relative entries
      */
-    public Map<BaseVector3i, T> getRelativeEntries() {
+    public Map<Vector3ic, T> getRelativeEntries() {
         return Collections.unmodifiableMap(relData);
     }
 
     /**
      * @return a <b>new</b> map with world-based position entries
      */
-    public Map<BaseVector3i, T> getWorldEntries() {
+    public Map<Vector3ic, T> getWorldEntries() {
 
-        Map<BaseVector3i, T> result = Maps.newLinkedHashMap();
+        Map<Vector3ic, T> result = Maps.newLinkedHashMap();
 
-        for (Entry<BaseVector3i, T> entry : relData.entrySet()) {
-            BaseVector3i relPos = entry.getKey();
-            BaseVector3i worldPos = relativeToWorld(relPos.x(), relPos.y(), relPos.z());
+        for (Entry<Vector3ic, T> entry : relData.entrySet()) {
+            Vector3ic relPos = entry.getKey();
+            Vector3ic worldPos = relativeToWorld(relPos.x(), relPos.y(), relPos.z());
 
             result.put(worldPos, entry.getValue());
         }

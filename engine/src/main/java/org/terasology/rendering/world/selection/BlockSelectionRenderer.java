@@ -15,12 +15,12 @@
  */
 package org.terasology.rendering.world.selection;
 
+import org.joml.Vector3ic;
 import org.lwjgl.opengl.GL11;
 import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Rect2f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
-import org.terasology.math.geom.Vector4f;
 import org.terasology.module.sandbox.API;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.assets.material.Material;
@@ -110,11 +110,32 @@ public class BlockSelectionRenderer {
         defaultTextured.deactivateFeature(ShaderProgramFeature.FEATURE_ALPHA_REJECT);
     }
 
+    /**
+     *
+     * @param blockPos
+     * @deprecated This method is scheduled for removal in an upcoming version.
+     *             Use the JOML implementation instead: {@link #renderMark(Vector3ic)}.
+     */
+    @Deprecated
     public void renderMark(Vector3i blockPos) {
         Vector3f cameraPos = getCameraPosition();
 
         glPushMatrix();
         glTranslated(blockPos.x - cameraPos.x, blockPos.y - cameraPos.y, blockPos.z - cameraPos.z);
+
+        glMatrixMode(GL_MODELVIEW);
+
+        overlayMesh.render();
+
+        glPopMatrix();
+    }
+
+
+    public void renderMark(Vector3ic blockPos) {
+        Vector3f cameraPos = getCameraPosition();
+
+        glPushMatrix();
+        glTranslated(blockPos.x() - cameraPos.x, blockPos.y() - cameraPos.y, blockPos.z() - cameraPos.z);
 
         glMatrixMode(GL_MODELVIEW);
 

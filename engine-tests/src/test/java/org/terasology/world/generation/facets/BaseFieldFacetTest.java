@@ -16,7 +16,7 @@
 
 package org.terasology.world.generation.facets;
 
-import org.terasology.math.Region3i;
+import org.terasology.world.block.BlockRegion;
 import org.terasology.world.generation.Border3D;
 import org.terasology.world.generation.facets.base.BaseFieldFacet3D;
 import org.terasology.world.generation.facets.base.FieldFacet3D;
@@ -27,7 +27,7 @@ import org.terasology.world.generation.facets.base.FieldFacet3D;
 public class BaseFieldFacetTest extends FieldFacetTest {
 
     @Override
-    protected FieldFacet3D createFacet(Region3i region, Border3D border) {
+    protected FieldFacet3D createFacet(BlockRegion region, Border3D border) {
         return new BaseFieldFacet3D(region, border) {
             // this class is abstract, but we don't want specific implementations
         };

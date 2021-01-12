@@ -15,8 +15,13 @@
  */
 package org.terasology.world.generation.facets.base;
 
+import org.joml.Vector3i;
 import org.terasology.math.geom.Rect2i;
 import org.terasology.math.Region3i;
+import org.terasology.world.block.BlockArea;
+import org.terasology.world.block.BlockAreac;
+import org.terasology.world.block.BlockRegion;
+import org.terasology.world.block.BlockRegionc;
 import org.terasology.world.generation.Border3D;
 import org.terasology.world.generation.WorldFacet2D;
 
@@ -24,21 +29,21 @@ import org.terasology.world.generation.WorldFacet2D;
  */
 public class BaseFacet2D implements WorldFacet2D {
 
-    private Rect2i worldRegion;
-    private Rect2i relativeRegion;
+    private BlockArea worldRegion;
+    private BlockArea relativeRegion;
 
-    public BaseFacet2D(Region3i targetRegion, Border3D border) {
+    public BaseFacet2D(BlockRegionc targetRegion, Border3D border) {
         worldRegion = border.expandTo2D(targetRegion);
-        relativeRegion = border.expandTo2D(targetRegion.size());
+        relativeRegion = border.expandTo2D(targetRegion.getSize(new Vector3i()));
     }
 
     @Override
-    public final Rect2i getWorldRegion() {
+    public final BlockAreac getWorldArea() {
         return worldRegion;
     }
 
     @Override
-    public final Rect2i getRelativeRegion() {
+    public final BlockAreac getRelativeArea() {
         return relativeRegion;
     }
 
@@ -46,13 +51,13 @@ public class BaseFacet2D implements WorldFacet2D {
         if (!relativeRegion.contains(x, z)) {
             throw new IllegalArgumentException(String.format("Out of bounds: (%d, %d) for region %s", x, z, relativeRegion.toString()));
         }
-        return x - relativeRegion.minX() + relativeRegion.sizeX() * (z - relativeRegion.minY());
+        return x - relativeRegion.minX() + relativeRegion.getSizeX() * (z - relativeRegion.minY());
     }
 
     protected final int getWorldIndex(int x, int z) {
         if (!worldRegion.contains(x, z)) {
             throw new IllegalArgumentException(String.format("Out of bounds: (%d, %d) for region %s", x, z, worldRegion.toString()));
         }
-        return x - worldRegion.minX() + worldRegion.sizeX() * (z - worldRegion.minY());
+        return x - worldRegion.minX() + worldRegion.getSizeX() * (z - worldRegion.minY());
     }
 }

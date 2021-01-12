@@ -22,6 +22,8 @@ import org.terasology.math.Region3i;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.world.WorldChangeListener;
 import org.terasology.world.block.Block;
+import org.terasology.world.block.BlockRegion;
+import org.terasology.world.block.BlockRegionc;
 import org.terasology.world.time.WorldTime;
 
 import java.util.Collection;
@@ -73,7 +75,7 @@ public class AbstractWorldProviderDecorator implements WorldProviderCore {
     }
 
     @Override
-    public ChunkViewCore getLocalView(Vector3i chunkPos) {
+    public ChunkViewCore getLocalView(Vector3ic chunkPos) {
         return base.getLocalView(chunkPos);
     }
 
@@ -89,6 +91,11 @@ public class AbstractWorldProviderDecorator implements WorldProviderCore {
 
     @Override
     public boolean isRegionRelevant(Region3i region) {
+        return base.isRegionRelevant(region);
+    }
+
+    @Override
+    public boolean isRegionRelevant(BlockRegionc region) {
         return base.isRegionRelevant(region);
     }
 
@@ -148,7 +155,7 @@ public class AbstractWorldProviderDecorator implements WorldProviderCore {
     }
 
     @Override
-    public Collection<Region3i> getRelevantRegions() {
+    public Collection<BlockRegion> getRelevantRegions() {
         return base.getRelevantRegions();
     }
 
