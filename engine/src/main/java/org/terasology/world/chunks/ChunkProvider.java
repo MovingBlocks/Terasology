@@ -86,8 +86,19 @@ public interface ChunkProvider {
      *
      * @param chunkPos The position of the chunk to obtain
      * @return The chunk, or null if the chunk is not ready
+     * @deprecated use {@link #getChunk(org.joml.Vector3ic)} instead. TODO replace with joml.
      */
+    @Deprecated
     Chunk getChunk(Vector3i chunkPos);
+
+    /**
+     * Returns the chunk at the given position if possible.
+     *
+     * @param chunkPos The position of the chunk to obtain
+     * @return The chunk, or null if the chunk is not ready
+     */
+    Chunk getChunk(Vector3ic chunkPos);
+
 
     /**
      * Disposes the chunk provider, cleaning up all chunks and other assets it is using
