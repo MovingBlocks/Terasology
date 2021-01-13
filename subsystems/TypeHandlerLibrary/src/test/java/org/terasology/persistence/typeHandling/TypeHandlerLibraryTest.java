@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.reflections.Reflections;
 import org.terasology.persistence.typeHandling.coreTypes.CollectionTypeHandler;
 import org.terasology.persistence.typeHandling.coreTypes.EnumTypeHandler;
+import org.terasology.persistence.typeHandling.coreTypes.GenericMapTypeHandler;
 import org.terasology.persistence.typeHandling.coreTypes.ObjectFieldMapTypeHandler;
 import org.terasology.persistence.typeHandling.coreTypes.RuntimeDelegatingTypeHandler;
 import org.terasology.persistence.typeHandling.coreTypes.StringMapTypeHandler;
@@ -78,12 +79,12 @@ class TypeHandlerLibraryTest {
     }
 
     @Test
-    void testInvalidTypeHandler() {
-        Optional<TypeHandler<Map<Integer, Integer>>> handler =
+    void testGenericMapHandler() {
+        TypeHandler<Map<Integer, Integer>> handler =
                 typeHandlerLibrary.getTypeHandler(new TypeInfo<Map<Integer, Integer>>() {
-                });
+                }).get();
 
-        assertFalse(handler.isPresent());
+        assertTrue(handler instanceof GenericMapTypeHandler);
     }
 
     @Test

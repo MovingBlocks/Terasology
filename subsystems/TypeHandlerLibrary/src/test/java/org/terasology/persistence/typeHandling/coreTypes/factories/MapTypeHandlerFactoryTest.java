@@ -7,6 +7,7 @@ import org.mockito.ArgumentMatchers;
 import org.terasology.persistence.typeHandling.TypeHandler;
 import org.terasology.persistence.typeHandling.TypeHandlerContext;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
+import org.terasology.persistence.typeHandling.coreTypes.GenericMapTypeHandler;
 import org.terasology.persistence.typeHandling.coreTypes.StringMapTypeHandler;
 import org.terasology.persistence.typeHandling.reflection.SerializationSandbox;
 import org.terasology.reflection.TypeInfo;
@@ -21,9 +22,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-class StringMapTypeHandlerFactoryTest {
+class MapTypeHandlerFactoryTest {
     private final TypeHandlerLibrary typeHandlerLibrary = mock(TypeHandlerLibrary.class);
-    private final StringMapTypeHandlerFactory typeHandlerFactory = new StringMapTypeHandlerFactory();
+    private final MapTypeHandlerFactory typeHandlerFactory = new MapTypeHandlerFactory();
 
     private final TypeHandlerContext context =
             new TypeHandlerContext(typeHandlerLibrary, mock(SerializationSandbox.class));
@@ -64,5 +65,17 @@ class StringMapTypeHandlerFactoryTest {
 
         // Verify that the Integer TypeHandler was loaded from the TypeHandlerLibrary
         verify(typeHandlerLibrary).getTypeHandler(ArgumentMatchers.eq(TypeInfo.of(Integer.class).getType()));
+    }
+
+
+    @Test
+    void testGenericMap() {
+        TypeInfo<Map<Integer, Integer>> listTypeInfo = new TypeInfo<Map<Integer, Integer>>() {};
+
+        Optional<TypeHandler<Map<Integer, Integer>>> typeHandler =
+                typeHandlerFactory.create(listTypeInfo, context);
+
+        assertTrue(typeHandler.isPresent());
+        assertTrue(typeHandler.get() instanceof GenericMapTypeHandler);
     }
 }
