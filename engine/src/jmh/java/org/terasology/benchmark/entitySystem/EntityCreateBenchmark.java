@@ -6,6 +6,7 @@ package org.terasology.benchmark.entitySystem;
 import com.google.common.collect.Lists;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
+import org.openjdk.jmh.annotations.Level;
 import org.openjdk.jmh.annotations.Measurement;
 import org.openjdk.jmh.annotations.Mode;
 import org.openjdk.jmh.annotations.OutputTimeUnit;
@@ -24,10 +25,10 @@ import org.terasology.world.block.BlockComponent;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-@BenchmarkMode(Mode.All)
-@OutputTimeUnit(TimeUnit.MILLISECONDS)
-@Warmup(iterations = 1, time = 1)
-@Measurement(iterations = 1, time = 1)
+@BenchmarkMode(Mode.AverageTime)
+@OutputTimeUnit(TimeUnit.NANOSECONDS)
+@Warmup(iterations = 1)
+@Measurement(iterations = 1)
 public class EntityCreateBenchmark {
 
     @Benchmark
@@ -38,11 +39,13 @@ public class EntityCreateBenchmark {
     @State(Scope.Thread)
     public static class StateObject {
 
-        private final List<Component> entityData = Lists.newArrayList();
-        private final PojoEntityManager entityManager = new PojoEntityManager();
+        private List<Component> entityData;
+        private PojoEntityManager entityManager;
 
-        @Setup
+        @Setup(Level.Invocation)
         public void setup() {
+            entityData = Lists.newArrayList();
+            entityManager = new PojoEntityManager();
             FastRandom rand = new FastRandom(0L);
             if (rand.nextFloat() < 0.75f) {
                 entityData.add(new LocationComponent());

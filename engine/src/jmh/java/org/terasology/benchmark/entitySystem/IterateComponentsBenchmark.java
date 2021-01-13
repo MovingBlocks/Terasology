@@ -23,13 +23,10 @@ import org.terasology.world.block.BlockComponent;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-/**
- *
- */
-@BenchmarkMode(Mode.All)
-@OutputTimeUnit(TimeUnit.MILLISECONDS)
-@Warmup(iterations = 1, time = 1)
-@Measurement(iterations = 1, time = 1)
+@BenchmarkMode(Mode.AverageTime)
+@OutputTimeUnit(TimeUnit.NANOSECONDS)
+@Warmup(iterations = 1)
+@Measurement(iterations = 1)
 public class IterateComponentsBenchmark {
 
     @State(Scope.Benchmark)
