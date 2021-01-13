@@ -83,6 +83,32 @@ public class ReflectionFactoryBenchmark {
         state.getterSetterAccessor.setValue(getterSetterComponentState.component, getterSetterComponentState.value);
     }
 
+
+    @Benchmark
+    public void directGetterSetterSet(GetterSetterComponentState getterSetterComponentState) {
+        getterSetterComponentState.component.setValue(getterSetterComponentState.value);
+    }
+
+    @Benchmark
+    public Object directGetterSetterGet(GetterSetterComponentState getterSetterComponentState) {
+        return getterSetterComponentState.component.getValue();
+    }
+
+    @Benchmark
+    public void directFieldSet(FieldComponentState state) {
+        state.component.name = state.value;
+    }
+
+    @Benchmark
+    public Object directFieldGet(FieldComponentState state) {
+        return state.component.name;
+    }
+
+    @Benchmark
+    public Object directConstructor() {
+        return new LocationComponent();
+    }
+
     @State(Scope.Thread)
     public static class GetterSetterComponentState {
         private GetterSetterComponent component;
