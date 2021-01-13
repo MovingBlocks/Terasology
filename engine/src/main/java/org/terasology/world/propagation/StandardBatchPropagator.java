@@ -310,7 +310,7 @@ public class StandardBatchPropagator implements BatchPropagator {
         int[] adjDepth = new int[depths.length];
         int dimA = (side == Side.LEFT || side == Side.RIGHT) ? Chunks.SIZE_Y : Chunks.SIZE_X;
         int dimB = (side == Side.FRONT || side == Side.BACK) ? Chunks.SIZE_Y : Chunks.SIZE_Z;
-        ChunkMath.populateMinAdjacent2D(depths, adjDepth, dimA, dimB, !propagateExternal);
+        BatchPropagator.populateMinAdjacent2D(depths, adjDepth, dimA, dimB, !propagateExternal);
 
         if (propagateExternal) {
             for (int y = 0; y < dimB; ++y) {

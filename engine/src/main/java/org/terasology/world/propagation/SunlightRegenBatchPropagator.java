@@ -5,7 +5,6 @@ package org.terasology.world.propagation;
 import com.google.common.collect.Sets;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
-import org.terasology.math.ChunkMath;
 import org.terasology.math.JomlUtil;
 import org.terasology.math.Side;
 import org.terasology.world.block.Block;
@@ -184,7 +183,7 @@ public class SunlightRegenBatchPropagator implements BatchPropagator {
             propagateSweep(chunk, adjChunk, depth, startingRegen);
 
             int[] adjDepths = new int[depth.length];
-            ChunkMath.populateMinAdjacent2D(depth, adjDepths, Chunks.SIZE_X, Chunks.SIZE_Z, !propagateExternal);
+            BatchPropagator.populateMinAdjacent2D(depth, adjDepths, Chunks.SIZE_X, Chunks.SIZE_Z, !propagateExternal);
             if (propagateExternal) {
                 for (int z = 0; z < Chunks.SIZE_Z; ++z) {
                     adjDepths[z * Chunks.SIZE_X] = 0;
@@ -197,7 +196,7 @@ public class SunlightRegenBatchPropagator implements BatchPropagator {
             }
 
             int[] adjStartingRegen = new int[depth.length];
-            ChunkMath.populateMinAdjacent2D(startingRegen, adjStartingRegen, Chunks.SIZE_X, Chunks.SIZE_Z, true);
+            BatchPropagator.populateMinAdjacent2D(startingRegen, adjStartingRegen, Chunks.SIZE_X, Chunks.SIZE_Z, true);
 
             markForPropagation(adjChunk, depth, startingRegen, adjDepths, adjStartingRegen);
         }
@@ -210,31 +209,19 @@ public class SunlightRegenBatchPropagator implements BatchPropagator {
                 int depthIndex = x + Chunks.SIZE_X * z;
                 int start = startingRegen[depthIndex];
                 int adjStart = adjStartingRegen[depthIndex];
+                int initialDepth;
                 if (start - adjStart > 1) {
-                    int initialDepth = Math.max(Chunks.SUNLIGHT_REGEN_THRESHOLD - start, 0);
-                    int finalDepth = depth[depthIndex];
-
-                    int strength = Math.min(start + initialDepth - Chunks.SUNLIGHT_REGEN_THRESHOLD + 1, Chunks.MAX_SUNLIGHT);
-
-                    for (int i = initialDepth; i <= finalDepth; ++i) {
-                        sunlightPropagator.propagateFrom(toChunk.chunkToWorldPosition(x, Chunks.SIZE_Y - i - 1, z),
-                                (byte) (strength));
-                        if (strength < Chunks.MAX_SUNLIGHT) {
-                            strength++;
-                        }
-                    }
+                    initialDepth = Math.max(Chunks.SUNLIGHT_REGEN_THRESHOLD - start, 0);
                 } else {
-                    int initialDepth = Math.max(adjDepths[depthIndex], Chunks.SUNLIGHT_REGEN_THRESHOLD - start);
-                    byte strength = (byte) Math.min(Chunks.MAX_SUNLIGHT, start + initialDepth - Chunks.SUNLIGHT_REGEN_THRESHOLD + 1);
-                    for (int i = initialDepth; i <= depth[depthIndex]; ++i) {
-                        sunlightPropagator.propagateFrom(toChunk.chunkToWorldPosition(x, Chunks.SIZE_Y - i - 1, z), strength);
-                        if (strength < Chunks.MAX_SUNLIGHT) {
-                            strength++;
-                        }
-                        pos.y--;
+                    initialDepth = Math.max(Chunks.SUNLIGHT_REGEN_THRESHOLD - start, adjDepths[depthIndex]);
+                }
+                byte strength = (byte) Math.min(Chunks.MAX_SUNLIGHT, start + initialDepth - Chunks.SUNLIGHT_REGEN_THRESHOLD + 1);
+                for (int i = initialDepth; i <= depth[depthIndex]; ++i) {
+                    sunlightPropagator.propagateFrom(toChunk.chunkToWorldPosition(x, Chunks.SIZE_Y - i - 1, z, pos), strength);
+                    if (strength < Chunks.MAX_SUNLIGHT) {
+                        strength++;
                     }
                 }
-
             }
         }
     }
