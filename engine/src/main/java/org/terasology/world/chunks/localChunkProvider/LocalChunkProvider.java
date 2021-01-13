@@ -373,6 +373,7 @@ public class LocalChunkProvider implements ChunkProvider {
         return null;
     }
 
+    @Override
     public Chunk getChunk(org.joml.Vector3ic pos) {
         return getChunk(JomlUtil.from(pos));
     }
