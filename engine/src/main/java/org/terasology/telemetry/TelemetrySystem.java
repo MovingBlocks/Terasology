@@ -16,6 +16,7 @@
 package org.terasology.telemetry;
 
 import com.snowplowanalytics.snowplow.tracker.emitter.Emitter;
+import org.joml.Vector3f;
 import org.terasology.config.Config;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -23,7 +24,6 @@ import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.logic.players.LocalPlayer;
-import org.terasology.math.geom.Vector3f;
 import org.terasology.registry.In;
 import org.terasology.telemetry.metrics.BlockDestroyedMetric;
 import org.terasology.telemetry.metrics.BlockPlacedMetric;
@@ -78,7 +78,7 @@ public class TelemetrySystem extends BaseComponentSystem implements UpdateSubscr
             // the first frame when the local player is valid
             if (previousPos == null) {
                 setGamePlayStatsComponent();
-                previousPos = localPlayer.getPosition();
+                previousPos = localPlayer.getPosition(new Vector3f());
             } else {
                 recordDistanceTraveled();
                 recordPlayTime();
@@ -132,10 +132,10 @@ public class TelemetrySystem extends BaseComponentSystem implements UpdateSubscr
     }
 
     private void recordDistanceTraveled() {
-        Vector3f position = localPlayer.getPosition();
+        Vector3f position = localPlayer.getPosition(new Vector3f());
         float distanceMoved = position.distance(previousPos);
         gamePlayStatsComponent.distanceTraveled += distanceMoved;
-        previousPos = position;
+        previousPos.set(position);
         localPlayer.getCharacterEntity().addOrSaveComponent(gamePlayStatsComponent);
     }
 
