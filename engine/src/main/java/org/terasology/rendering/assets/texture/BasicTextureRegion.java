@@ -17,11 +17,11 @@ package org.terasology.rendering.assets.texture;
 
 import org.joml.Rectanglef;
 import org.joml.Rectanglei;
+import org.joml.Vector2fc;
 import org.joml.Vector2i;
 import org.terasology.math.JomlUtil;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Rect2f;
-import org.terasology.math.geom.Vector2f;
 
 /**
  */
@@ -34,8 +34,8 @@ public class BasicTextureRegion implements TextureRegion {
         this.region = JomlUtil.from(region);
     }
 
-    public BasicTextureRegion(Texture texture, Vector2f offset, Vector2f size) {
-        this(texture, Rect2f.createFromMinAndSize(offset, size));
+    public BasicTextureRegion(Texture texture, Vector2fc offset, Vector2fc size) {
+        this(texture, Rect2f.createFromMinAndSize(JomlUtil.from(offset), JomlUtil.from(size)));
     }
 
     @Override
