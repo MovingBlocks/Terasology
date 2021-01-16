@@ -18,9 +18,8 @@ package org.terasology.world.internal;
 
 import org.joml.RoundingMode;
 import org.joml.Vector3fc;
+import org.joml.Vector3i;
 import org.joml.Vector3ic;
-import org.terasology.math.JomlUtil;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.world.WorldChangeListener;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
@@ -48,12 +47,7 @@ public class WorldProviderWrapper extends AbstractWorldProviderDecorator impleme
 
     @Override
     public boolean isBlockRelevant(Vector3fc pos) {
-        return isBlockRelevant(new org.joml.Vector3i(pos, RoundingMode.HALF_UP));
-    }
-
-    @Override
-    public Block setBlock(Vector3i pos, Block type) {
-        return core.setBlock(pos, type);
+        return isBlockRelevant(new Vector3i(pos, RoundingMode.HALF_UP));
     }
 
     @Override
@@ -63,12 +57,7 @@ public class WorldProviderWrapper extends AbstractWorldProviderDecorator impleme
 
     @Override
     public Block getBlock(Vector3fc pos) {
-        return getBlock(new org.joml.Vector3i(pos, RoundingMode.HALF_UP));
-    }
-
-    @Override
-    public Block getBlock(Vector3ic pos) {
-        return core.getBlock(pos.x(), pos.y(), pos.z());
+        return getBlock(new Vector3i(pos, RoundingMode.HALF_UP));
     }
 
     @Override
@@ -78,17 +67,17 @@ public class WorldProviderWrapper extends AbstractWorldProviderDecorator impleme
 
     @Override
     public byte getLight(Vector3fc pos) {
-        return getLight(new org.joml.Vector3i(pos, RoundingMode.FLOOR));
+        return getLight(new Vector3i(pos, RoundingMode.FLOOR));
     }
 
     @Override
     public byte getSunlight(Vector3fc pos) {
-        return getSunlight(new org.joml.Vector3i(pos, RoundingMode.HALF_UP));
+        return getSunlight(new Vector3i(pos, RoundingMode.HALF_UP));
     }
 
     @Override
     public byte getTotalLight(Vector3fc pos) {
-        return getTotalLight(new org.joml.Vector3i(pos, RoundingMode.HALF_UP));
+        return getTotalLight(new Vector3i(pos, RoundingMode.HALF_UP));
     }
 
     @Override
@@ -114,7 +103,7 @@ public class WorldProviderWrapper extends AbstractWorldProviderDecorator impleme
     }
 
     public int setExtraData(String fieldName, Vector3ic pos, int value) {
-        return core.setExtraData(extraDataManager.getSlotNumber(fieldName), JomlUtil.from(pos), value);
+        return core.setExtraData(extraDataManager.getSlotNumber(fieldName), pos, value);
     }
 
     @Override

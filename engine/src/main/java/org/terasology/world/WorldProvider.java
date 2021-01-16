@@ -110,7 +110,9 @@ public interface WorldProvider extends WorldProviderCore {
      * @param pos The position
      * @return The block value at the given position
      */
-    Block getBlock(Vector3ic pos);
+    default Block getBlock(Vector3ic pos) {
+        return getBlock(pos.x(), pos.y(), pos.z());
+    }
 
     /**
      * Returns the light value at the given position.
