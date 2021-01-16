@@ -16,7 +16,6 @@
 package org.terasology.world.block;
 
 import gnu.trove.list.TIntList;
-import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.terasology.entitySystem.event.Event;
@@ -36,7 +35,6 @@ public abstract class BlockLifecycleEvent implements Event, Iterable<Vector3ic> 
         this.positions = positions;
     }
 
-    @NotNull
     @Override
     public Iterator<Vector3ic> iterator() {
         if (positions.size() < 3) {
