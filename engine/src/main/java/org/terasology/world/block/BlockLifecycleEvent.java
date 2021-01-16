@@ -16,14 +16,18 @@
 package org.terasology.world.block;
 
 import gnu.trove.list.TIntList;
+import org.jetbrains.annotations.NotNull;
+import org.joml.Vector3i;
+import org.joml.Vector3ic;
 import org.terasology.entitySystem.event.Event;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.world.BlockEntityRegistry;
-import org.terasology.world.block.internal.BlockPositionIterator;
+
+import java.util.Collections;
+import java.util.Iterator;
 
 /**
  */
-public abstract class BlockLifecycleEvent implements Event {
+public abstract class BlockLifecycleEvent implements Event, Iterable<Vector3ic> {
     private TIntList positions;
     private BlockEntityRegistry registry;
 
@@ -32,11 +36,46 @@ public abstract class BlockLifecycleEvent implements Event {
         this.positions = positions;
     }
 
-    public Iterable<Vector3i> getBlockPositions() {
-        return () -> new BlockPositionIterator(positions, registry);
+    @NotNull
+    @Override
+    public Iterator<Vector3ic> iterator() {
+        if (positions.size() < 3) {
+            return Collections.emptyIterator();
+        }
+        return new Iterator<Vector3ic>() {
+            private Vector3i next = new Vector3i(
+                positions.get(0),
+                positions.get(1),
+                positions.get(2));
+            private final Vector3i current = new Vector3i();
+            private int index = 3;
+            @Override
+            public boolean hasNext() {
+                return next != null;
+            }
+
+            @Override
+            public Vector3ic next() {
+                current.set(next);
+                fetchNext();
+                return current;
+            }
+
+            private void fetchNext() {
+                while (index < positions.size() - 2) {
+                    next.x = positions.get(index++);
+                    next.y = positions.get(index++);
+                    next.z = positions.get(index++);
+                    if (!registry.hasPermanentBlockEntity(next)) {
+                        return;
+                    }
+                }
+                next = null;
+            }
+        };
     }
 
     public int blockCount() {
-        return positions.size();
+        return positions.size() / 3;
     }
 }
