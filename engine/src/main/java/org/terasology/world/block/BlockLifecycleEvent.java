@@ -23,6 +23,7 @@ import org.terasology.world.BlockEntityRegistry;
 
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 /**
  */
@@ -54,6 +55,9 @@ public abstract class BlockLifecycleEvent implements Event, Iterable<Vector3ic> 
 
             @Override
             public Vector3ic next() {
+                if (next == null) {
+                    throw new NoSuchElementException();
+                }
                 current.set(next);
                 fetchNext();
                 return current;
