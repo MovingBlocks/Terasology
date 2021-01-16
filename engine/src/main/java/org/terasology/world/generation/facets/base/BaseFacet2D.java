@@ -16,11 +16,8 @@
 package org.terasology.world.generation.facets.base;
 
 import org.joml.Vector3i;
-import org.terasology.math.geom.Rect2i;
-import org.terasology.math.Region3i;
 import org.terasology.world.block.BlockArea;
 import org.terasology.world.block.BlockAreac;
-import org.terasology.world.block.BlockRegion;
 import org.terasology.world.block.BlockRegionc;
 import org.terasology.world.generation.Border3D;
 import org.terasology.world.generation.WorldFacet2D;
