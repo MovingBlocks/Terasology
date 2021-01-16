@@ -9,6 +9,9 @@
 !.gitignore
 !.github
 
+# Ignore generated code
+/engine/src/jmh/generated
+
 # Ignore subdirs with their own Git roots. PC Facade and Core module are bundled with the main repo.
 extensions
 /facades/*
