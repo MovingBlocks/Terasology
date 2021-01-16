@@ -27,6 +27,20 @@ import java.util.NoSuchElementException;
 
 /**
  */
+//FIXME: There is a mismatch between `blockCount` and iterated blocks.
+//       I don't get what this event is about, and how it should behave. The `TIntList positions` is a flattened list
+//       of positions. So if this event affects
+//          [(0,0,0), (1,2,3), (4,5,6)]
+//       then `positions` would be:
+//          [0,0,0, 1,2,3, 4,5,6]
+//       But whether a block listed in positions is actually returned depends on whether there's a permanent block
+//       entity registered or not? Doesn't this lead to a mismatch between the size as returned by blockCount and 
+//       the actual amount of positions returned by the iterator? So, it could be that 
+//          event.blockCount() == n 
+//       but 
+//          for (Vector3ic pos: event) { ... }
+//       only iterates over m < n blocks? Maybe we should not inline the iterator here, but rather make it explicit
+//       that it will only iterator over `blockPositionsWithNonPermanentEntities`.
 public abstract class BlockLifecycleEvent implements Event, Iterable<Vector3ic> {
     private TIntList positions;
     private BlockEntityRegistry registry;
