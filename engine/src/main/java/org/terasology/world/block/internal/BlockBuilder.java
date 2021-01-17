@@ -17,11 +17,12 @@ package org.terasology.world.block.internal;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
+import org.joml.Quaternionf;
+import org.joml.Vector2f;
 import org.terasology.math.JomlUtil;
-import org.terasology.utilities.Assets;
 import org.terasology.math.Rotation;
 import org.terasology.math.Side;
-import org.terasology.math.geom.Vector2f;
+import org.terasology.utilities.Assets;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockAppearance;
 import org.terasology.world.block.BlockBuilderHelper;
@@ -188,15 +189,16 @@ public class BlockBuilder implements BlockBuilderHelper {
                 atlasPos = new Vector2f();
                 frameCount = 1;
             } else {
-                atlasPos = worldAtlas.getTexCoords(tile, shape.getMeshPart(part) != null);
+                atlasPos = JomlUtil.from(worldAtlas.getTexCoords(tile, shape.getMeshPart(part) != null));
                 frameCount = tile.getLength();
             }
             BlockPart targetPart = part.rotate(rot);
             textureAtlasPositions.put(targetPart, atlasPos);
             if (shape.getMeshPart(part) != null) {
                 meshParts.put(targetPart,
-                    shape.getMeshPart(part).rotate(JomlUtil.from(rot.getQuat4f())).mapTexCoords(JomlUtil.from(atlasPos),
-                    worldAtlas.getRelativeTileSize(), frameCount));
+                    shape.getMeshPart(part)
+                            .rotate(rot.orientation().get(new Quaternionf()))
+                            .mapTexCoords(atlasPos, worldAtlas.getRelativeTileSize(), frameCount));
             }
         }
         return new BlockAppearance(meshParts, textureAtlasPositions);

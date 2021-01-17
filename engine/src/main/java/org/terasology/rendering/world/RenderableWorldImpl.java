@@ -137,8 +137,7 @@ class RenderableWorldImpl implements RenderableWorld {
     public boolean pregenerateChunks() {
         boolean pregenerationIsComplete = true;
 
-        chunkProvider.completeUpdate();
-        chunkProvider.beginUpdate();
+        chunkProvider.update();
 
         RenderableChunk chunk;
         ChunkMesh newMesh;
@@ -148,7 +147,7 @@ class RenderableWorldImpl implements RenderableWorld {
             if (chunk == null) {
                 pregenerationIsComplete = false;
             } else if (chunk.isDirty()) {
-                localView = worldProvider.getLocalView(JomlUtil.from(chunkCoordinates));
+                localView = worldProvider.getLocalView(chunkCoordinates);
                 if (localView == null) {
                     continue;
                 }
@@ -172,16 +171,12 @@ class RenderableWorldImpl implements RenderableWorld {
     @Override
     public void update() {
 
-        PerformanceMonitor.startActivity("Complete chunk update");
-        chunkProvider.completeUpdate();
-        PerformanceMonitor.endActivity();
-
         PerformanceMonitor.startActivity("Update Lighting");
         worldProvider.processPropagation();
         PerformanceMonitor.endActivity();
 
-        PerformanceMonitor.startActivity("Begin chunk update");
-        chunkProvider.beginUpdate();
+        PerformanceMonitor.startActivity("Chunk update");
+        chunkProvider.update();
         PerformanceMonitor.endActivity();
 
         PerformanceMonitor.startActivity("Update Close Chunks");

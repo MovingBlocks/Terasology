@@ -55,6 +55,7 @@ import java.util.stream.StreamSupport;
 public class RemoteChunkProvider implements ChunkProvider {
 
     private static final Logger logger = LoggerFactory.getLogger(RemoteChunkProvider.class);
+    private final BlockingQueue<Chunk> readyChunks = Queues.newLinkedBlockingQueue();
     private final BlockingQueue<Vector3i> invalidateChunks = Queues.newLinkedBlockingQueue();
     private final Map<Vector3i, Chunk> chunkCache = Maps.newHashMap();
     private final BlockManager blockManager;
@@ -80,15 +81,7 @@ public class RemoteChunkProvider implements ChunkProvider {
                                 .map(org.joml.Vector3i::new)
                                 .collect(Collectors.toSet())
                 ))
-                .addStage(ChunkTaskProvider.create("", chunk -> {
-                    Chunk oldChunk = chunkCache.put(chunk.getPosition(), chunk);
-                    if (oldChunk != null) {
-                        oldChunk.dispose();
-                    }
-                    chunk.markReady();
-                    listener.onChunkReady(chunk.getPosition());
-                    worldEntity.send(new OnChunkLoaded(chunk.getPosition()));
-                }));
+                .addStage(ChunkTaskProvider.create("", readyChunks::add));
 
         ChunkMonitor.fireChunkProviderInitialized(this);
     }
@@ -107,14 +100,21 @@ public class RemoteChunkProvider implements ChunkProvider {
     }
 
     @Override
-    public void completeUpdate() {
-        //TODO remove this
-    }
-
-    @Override
-    public void beginUpdate() {
+    public void update() {
         if (listener != null) {
             checkForUnload();
+        }
+        Chunk chunk;
+        while ((chunk = readyChunks.poll()) != null) {
+            Chunk oldChunk = chunkCache.put(chunk.getPosition(), chunk);
+            if (oldChunk != null) {
+                oldChunk.dispose();
+            }
+            chunk.markReady();
+            if (listener != null) {
+                listener.onChunkReady(chunk.getPosition());
+            }
+            worldEntity.send(new OnChunkLoaded(chunk.getPosition(new org.joml.Vector3i())));
         }
     }
 
@@ -124,7 +124,7 @@ public class RemoteChunkProvider implements ChunkProvider {
         for (Vector3i pos : positions) {
             Chunk removed = chunkCache.remove(pos);
             if (removed != null && !removed.isReady()) {
-                worldEntity.send(new BeforeChunkUnload(pos));
+                worldEntity.send(new BeforeChunkUnload(JomlUtil.from(pos)));
                 removed.dispose();
             }
         }
@@ -145,6 +145,11 @@ public class RemoteChunkProvider implements ChunkProvider {
     }
 
     @Override
+    public Chunk getChunk(org.joml.Vector3ic pos) {
+        return getChunk(JomlUtil.from(pos));
+    }
+
+    @Override
     public boolean isChunkReady(Vector3i pos) {
         Chunk chunk = chunkCache.get(pos);
         return chunk != null && chunk.isReady();
@@ -160,11 +165,6 @@ public class RemoteChunkProvider implements ChunkProvider {
     public void dispose() {
         ChunkMonitor.fireChunkProviderDisposed(this);
         loadingPipeline.shutdown();
-    }
-
-
-    public Chunk getChunk(org.joml.Vector3ic pos) {
-        return getChunk(JomlUtil.from(pos));
     }
 
     @Override
@@ -227,7 +227,7 @@ public class RemoteChunkProvider implements ChunkProvider {
             int index = TeraMath.calculate3DArrayIndex(chunkPos, region.size());
             chunks[index] = chunk;
         }
-        return new ChunkViewCoreImpl(chunks, region, offset, blockManager.getBlock(BlockManager.AIR_ID));
+        return new ChunkViewCoreImpl(chunks, JomlUtil.from(region), JomlUtil.from(offset), blockManager.getBlock(BlockManager.AIR_ID));
     }
 
     @Override

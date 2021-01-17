@@ -1,4 +1,4 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
 // The engine build is the primary Java project and has the primary list of dependencies
@@ -48,13 +48,6 @@ def convertGitBranch = { gitBranch ->
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 sourceSets {
-    main.java {
-        // dev/ holds things that are neither unit tests nor application code.
-        // For notes about whether it should be its own source set, see
-        // see https://github.com/MovingBlocks/Terasology/pull/4021
-        srcDir("src/dev/java")
-    }
-
     // Adjust output path (changed with the Gradle 6 upgrade, this puts it back)
     main.java.outputDir = new File("$buildDir/classes")
 }
@@ -88,7 +81,7 @@ dependencies {
     // Java magic
     implementation group: 'net.java.dev.jna', name: 'jna-platform', version: '5.6.0'
     implementation group: 'org.reflections', name: 'reflections', version: '0.9.10'
-    implementation group: 'org.javassist', name: 'javassist', version: '3.20.0-GA'
+    implementation group: 'org.javassist', name: 'javassist', version: '3.27.0-GA'
     implementation group: 'com.esotericsoftware', name: 'reflectasm', version: '1.11.1'
 
     // Graphics, 3D, UI, etc
@@ -187,6 +180,27 @@ jar {
 task cleanReflections(type: Delete) {
     description = 'Cleans the reflection cache. Useful in cases where it has gone stale and needs regeneration.'
     delete cacheReflections.outputs.files
+}
+
+// JMH related tasks
+
+sourceSets {
+    jmh {
+        java.srcDirs = ['src/jmh/java']
+        resources.srcDirs = ['src/jmh/resources']
+        compileClasspath += sourceSets.main.runtimeClasspath
+    }
+}
+
+task jmh(type: JavaExec, dependsOn: jmhClasses) {
+    main = 'org.openjdk.jmh.Main'
+    classpath = sourceSets.jmh.compileClasspath + sourceSets.jmh.runtimeClasspath
+}
+
+dependencies {
+    jmhAnnotationProcessor group: 'org.openjdk.jmh', name: 'jmh-generator-annprocess', version: '1.27'
+    jmhImplementation 'org.openjdk.jmh:jmh-core:1.27'
+    jmhImplementation 'org.openjdk.jmh:jmh-generator-annprocess:1.27'
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -55,8 +55,7 @@ public class AwaitCharacterSpawn extends VariableStepLoadProcess {
             client.character.send(new AwaitedLocalCharacterSpawnEvent());
             return true;
         } else {
-            chunkProvider.completeUpdate();
-            chunkProvider.beginUpdate();
+            chunkProvider.update();
         }
         return false;
     }

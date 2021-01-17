@@ -148,8 +148,8 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
     }
 
     @Override
-    public ChunkViewCore getLocalView(Vector3i chunkPos) {
-        return chunkProvider.getLocalView(chunkPos);
+    public ChunkViewCore getLocalView(Vector3ic chunkPos) {
+        return chunkProvider.getLocalView(JomlUtil.from(chunkPos));
     }
 
     @Override

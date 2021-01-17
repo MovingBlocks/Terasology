@@ -118,6 +118,21 @@ public final class Chunks {
 
     /**
      * The position of the chunk given the coordinate and size of chunk in powers of 2.
+     * This uses the default power ({@link #POWER_X}, {@link #POWER_Y}, {@link #POWER_Z})
+     *
+     * <p>default chunk size ({@link #SIZE_X}, {@link #SIZE_Y}, {@link #SIZE_Z}) </p>
+     *
+     * @param pos absolute coordinate of the block
+     * @param dest will hold the result
+     * @return dest
+     */
+    public static Vector3i toChunkPos(Vector3ic pos, Vector3i dest) {
+        return toChunkPos(pos.x(), pos.y(), pos.z(), POWER_X, POWER_Y, POWER_Z, dest);
+    }
+
+
+    /**
+     * The position of the chunk given the coordinate and size of chunk in powers of 2.
      *
      * <p>Chunk size is in powers of 2 (2, 4, 8, 16, ...)</p>
      *
@@ -271,7 +286,6 @@ public final class Chunks {
 
     /**
      * the relative position in the nearest chunk from the (0,0,0) corner.
-     * Default chunk size of ({@link #SIZE_X}, {@link #SIZE_Y}, {@link #SIZE_Z}).
      *
      * @param x the x world position
      * @param y the y world position
@@ -284,7 +298,20 @@ public final class Chunks {
         return dest.set(toRelative(x, chunkFilterSize.x()), toRelative(y, chunkFilterSize.y()), toRelative(z, chunkFilterSize.z()));
     }
 
-
+    /**
+     * the relative position in the nearest chunk from the (0,0,0) corner.
+     * Default chunk size of ({@link #SIZE_X}, {@link #SIZE_Y}, {@link #SIZE_Z}).
+     *
+     * @param x the x world position
+     * @param y the y world position
+     * @param z the z world position
+     * @param dest will hold the result
+     * @return dest
+     */
+    public static Vector3i toRelative(int x, int y, int z, Vector3i dest) {
+        return dest.set(toRelative(x, INNER_CHUNK_POS_FILTER.x()), toRelative(y, INNER_CHUNK_POS_FILTER.y()), toRelative(z, INNER_CHUNK_POS_FILTER.z()));
+    }
+    
     /**
      * Works out whether the given block resides inside the given chunk.
      * <p>

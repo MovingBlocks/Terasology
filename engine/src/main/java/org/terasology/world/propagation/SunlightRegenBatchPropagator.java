@@ -1,27 +1,14 @@
-/*
- * Copyright 2014 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.world.propagation;
 
 import com.google.common.collect.Sets;
-import org.terasology.math.ChunkMath;
+import org.joml.Vector3i;
+import org.joml.Vector3ic;
 import org.terasology.math.JomlUtil;
 import org.terasology.math.Side;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.world.block.Block;
-import org.terasology.world.chunks.ChunkConstants;
+import org.terasology.world.chunks.Chunks;
 import org.terasology.world.chunks.LitChunk;
 
 import java.util.Arrays;
@@ -38,8 +25,8 @@ public class SunlightRegenBatchPropagator implements BatchPropagator {
     private PropagatorWorldView sunlightWorld;
     private BatchPropagator sunlightPropagator;
 
-    private Set<Vector3i>[] reduceQueues;
-    private Set<Vector3i>[] increaseQueues;
+    private Set<Vector3ic>[] reduceQueues;
+    private Set<Vector3ic>[] increaseQueues;
 
     public SunlightRegenBatchPropagator(PropagationRules regenRules, PropagatorWorldView regenWorld, BatchPropagator sunlightPropagator, PropagatorWorldView sunlightWorld) {
         this.regenRules = regenRules;
@@ -78,12 +65,12 @@ public class SunlightRegenBatchPropagator implements BatchPropagator {
 
     private void reviewChangeToBottom(BlockChange blockChange) {
         PropagationComparison comparison = regenRules.comparePropagation(blockChange.getTo(), blockChange.getFrom(), Side.BOTTOM);
-        Vector3i blockChangePosition = JomlUtil.from(blockChange.getPosition());
+        Vector3ic blockChangePosition = blockChange.getPosition();
         if (comparison.isPermitting()) {
             byte existingValue = regenWorld.getValueAt(blockChangePosition);
             queueSpreadRegen(blockChangePosition, existingValue);
         } else if (comparison.isRestricting()) {
-            Vector3i adjPos = Side.BOTTOM.getAdjacentPos(blockChangePosition);
+            Vector3i adjPos = Side.BOTTOM.getAdjacentPos(blockChangePosition, new Vector3i());
             byte existingValue = regenWorld.getValueAt(adjPos);
             reduce(adjPos, existingValue);
         }
@@ -91,9 +78,9 @@ public class SunlightRegenBatchPropagator implements BatchPropagator {
 
     private void reviewChangeToTop(BlockChange blockChange) {
         PropagationComparison comparison = regenRules.comparePropagation(blockChange.getTo(), blockChange.getFrom(), Side.TOP);
-        Vector3i blockChangePosition = JomlUtil.from(blockChange.getPosition());
+        Vector3ic blockChangePosition = blockChange.getPosition();
         if (comparison.isPermitting()) {
-            Vector3i adjPos = Side.TOP.getAdjacentPos(blockChangePosition);
+            Vector3i adjPos = Side.TOP.getAdjacentPos(blockChangePosition, new Vector3i());
             byte adjValue = regenWorld.getValueAt(adjPos);
             if (adjValue != PropagatorWorldView.UNAVAILABLE) {
                 queueSpreadRegen(adjPos, adjValue);
@@ -104,34 +91,34 @@ public class SunlightRegenBatchPropagator implements BatchPropagator {
         }
     }
 
-    private void queueSpreadRegen(Vector3i position, byte value) {
+    private void queueSpreadRegen(Vector3ic position, byte value) {
         increaseQueues[value].add(position);
     }
 
     private void processRegenReduction() {
         for (byte depth = 0; depth <= regenRules.getMaxValue(); depth++) {
-            Set<Vector3i> toProcess = reduceQueues[depth];
+            Set<Vector3ic> toProcess = reduceQueues[depth];
 
             toProcess.forEach(this::purge);
             toProcess.clear();
         }
     }
 
-    private void purge(Vector3i pos) {
+    private void purge(Vector3ic pos) {
         int expectedValue = regenWorld.getValueAt(pos);
         if (expectedValue != 0) {
             Vector3i position = new Vector3i(pos);
-            for (byte i = 0; i <= ChunkConstants.MAX_SUNLIGHT_REGEN; ++i) {
+            for (byte i = 0; i <= Chunks.MAX_SUNLIGHT_REGEN; ++i) {
                 if (regenWorld.getValueAt(position) == expectedValue) {
                     regenWorld.setValueAt(position, i);
-                    if (expectedValue - ChunkConstants.SUNLIGHT_REGEN_THRESHOLD > 0) {
-                        sunlightPropagator.regenerate(new Vector3i(position), (byte) (expectedValue - ChunkConstants.SUNLIGHT_REGEN_THRESHOLD));
+                    if (expectedValue - Chunks.SUNLIGHT_REGEN_THRESHOLD > 0) {
+                        sunlightPropagator.regenerate(new Vector3i(position), (byte) (expectedValue - Chunks.SUNLIGHT_REGEN_THRESHOLD));
                     }
                 } else {
                     break;
                 }
                 position.y--;
-                if (expectedValue < ChunkConstants.MAX_SUNLIGHT_REGEN) {
+                if (expectedValue < Chunks.MAX_SUNLIGHT_REGEN) {
                     expectedValue++;
                 }
             }
@@ -140,16 +127,16 @@ public class SunlightRegenBatchPropagator implements BatchPropagator {
 
     private void processRegenIncrease() {
         for (byte depth = regenRules.getMaxValue(); depth >= 0; depth--) {
-            Set<Vector3i> toProcess = increaseQueues[depth];
+            Set<Vector3ic> toProcess = increaseQueues[depth];
 
-            for (Vector3i pos : toProcess) {
+            for (Vector3ic pos : toProcess) {
                 push(pos, depth);
             }
             toProcess.clear();
         }
     }
 
-    private void push(Vector3i pos, byte value) {
+    private void push(Vector3ic pos, byte value) {
         byte regenValue = value;
         Block block = regenWorld.getBlockAt(pos);
         Vector3i position = new Vector3i(pos);
@@ -162,7 +149,7 @@ public class SunlightRegenBatchPropagator implements BatchPropagator {
                 if (regenRules.canSpreadInto(block, Side.TOP)) {
                     regenWorld.setValueAt(position, regenValue);
                     reduceQueues[adjValue].remove(position);
-                    byte sunlightValue = (byte) (regenValue - ChunkConstants.SUNLIGHT_REGEN_THRESHOLD);
+                    byte sunlightValue = (byte) (regenValue - Chunks.SUNLIGHT_REGEN_THRESHOLD);
                     if (sunlightValue > 0) {
                         byte prevValue = sunlightWorld.getValueAt(position);
                         if (prevValue < sunlightValue) {
@@ -182,7 +169,7 @@ public class SunlightRegenBatchPropagator implements BatchPropagator {
     private void cleanUp() {
     }
 
-    private void reduce(Vector3i position, byte oldValue) {
+    private void reduce(Vector3ic position, byte oldValue) {
         if (oldValue > 0) {
             reduceQueues[oldValue].add(position);
         }
@@ -191,25 +178,25 @@ public class SunlightRegenBatchPropagator implements BatchPropagator {
     @Override
     public void propagateBetween(LitChunk chunk, LitChunk adjChunk, Side side, boolean propagateExternal) {
         if (side == Side.BOTTOM) {
-            int[] depth = new int[ChunkConstants.SIZE_X * ChunkConstants.SIZE_Z];
+            int[] depth = new int[Chunks.SIZE_X * Chunks.SIZE_Z];
             int[] startingRegen = new int[depth.length];
             propagateSweep(chunk, adjChunk, depth, startingRegen);
 
             int[] adjDepths = new int[depth.length];
-            ChunkMath.populateMinAdjacent2D(depth, adjDepths, ChunkConstants.SIZE_X, ChunkConstants.SIZE_Z, !propagateExternal);
+            BatchPropagator.populateMinAdjacent2D(depth, adjDepths, Chunks.SIZE_X, Chunks.SIZE_Z, !propagateExternal);
             if (propagateExternal) {
-                for (int z = 0; z < ChunkConstants.SIZE_Z; ++z) {
-                    adjDepths[z * ChunkConstants.SIZE_X] = 0;
-                    adjDepths[ChunkConstants.SIZE_X - 1 + z * ChunkConstants.SIZE_X] = 0;
+                for (int z = 0; z < Chunks.SIZE_Z; ++z) {
+                    adjDepths[z * Chunks.SIZE_X] = 0;
+                    adjDepths[Chunks.SIZE_X - 1 + z * Chunks.SIZE_X] = 0;
                 }
-                for (int x = 0; x < ChunkConstants.SIZE_X; ++x) {
+                for (int x = 0; x < Chunks.SIZE_X; ++x) {
                     adjDepths[x] = 0;
-                    adjDepths[x + ChunkConstants.SIZE_X * (ChunkConstants.SIZE_Z - 1)] = 0;
+                    adjDepths[x + Chunks.SIZE_X * (Chunks.SIZE_Z - 1)] = 0;
                 }
             }
 
             int[] adjStartingRegen = new int[depth.length];
-            ChunkMath.populateMinAdjacent2D(startingRegen, adjStartingRegen, ChunkConstants.SIZE_X, ChunkConstants.SIZE_Z, true);
+            BatchPropagator.populateMinAdjacent2D(startingRegen, adjStartingRegen, Chunks.SIZE_X, Chunks.SIZE_Z, true);
 
             markForPropagation(adjChunk, depth, startingRegen, adjDepths, adjStartingRegen);
         }
@@ -217,64 +204,52 @@ public class SunlightRegenBatchPropagator implements BatchPropagator {
 
     private void markForPropagation(LitChunk toChunk, int[] depth, int[] startingRegen, int[] adjDepths, int[] adjStartingRegen) {
         Vector3i pos = new Vector3i();
-        for (int z = 0; z < ChunkConstants.SIZE_Z; ++z) {
-            for (int x = 0; x < ChunkConstants.SIZE_X; ++x) {
-                int depthIndex = x + ChunkConstants.SIZE_X * z;
+        for (int z = 0; z < Chunks.SIZE_Z; ++z) {
+            for (int x = 0; x < Chunks.SIZE_X; ++x) {
+                int depthIndex = x + Chunks.SIZE_X * z;
                 int start = startingRegen[depthIndex];
                 int adjStart = adjStartingRegen[depthIndex];
+                int initialDepth;
                 if (start - adjStart > 1) {
-                    int initialDepth = Math.max(ChunkConstants.SUNLIGHT_REGEN_THRESHOLD - start, 0);
-                    int finalDepth = depth[depthIndex];
-
-                    int strength = Math.min(start + initialDepth - ChunkConstants.SUNLIGHT_REGEN_THRESHOLD + 1, ChunkConstants.MAX_SUNLIGHT);
-
-                    for (int i = initialDepth; i <= finalDepth; ++i) {
-                        sunlightPropagator.propagateFrom(toChunk.chunkToWorldPosition(x, ChunkConstants.SIZE_Y - i - 1, z),
-                                (byte) (strength));
-                        if (strength < ChunkConstants.MAX_SUNLIGHT) {
-                            strength++;
-                        }
-                    }
+                    initialDepth = Math.max(Chunks.SUNLIGHT_REGEN_THRESHOLD - start, 0);
                 } else {
-                    int initialDepth = Math.max(adjDepths[depthIndex], ChunkConstants.SUNLIGHT_REGEN_THRESHOLD - start);
-                    byte strength = (byte) Math.min(ChunkConstants.MAX_SUNLIGHT, start + initialDepth - ChunkConstants.SUNLIGHT_REGEN_THRESHOLD + 1);
-                    for (int i = initialDepth; i <= depth[depthIndex]; ++i) {
-                        sunlightPropagator.propagateFrom(toChunk.chunkToWorldPosition(x, ChunkConstants.SIZE_Y - i - 1, z), strength);
-                        if (strength < ChunkConstants.MAX_SUNLIGHT) {
-                            strength++;
-                        }
-                        pos.y--;
+                    initialDepth = Math.max(Chunks.SUNLIGHT_REGEN_THRESHOLD - start, adjDepths[depthIndex]);
+                }
+                byte strength = (byte) Math.min(Chunks.MAX_SUNLIGHT, start + initialDepth - Chunks.SUNLIGHT_REGEN_THRESHOLD + 1);
+                for (int i = initialDepth; i <= depth[depthIndex]; ++i) {
+                    sunlightPropagator.propagateFrom(toChunk.chunkToWorldPosition(x, Chunks.SIZE_Y - i - 1, z, pos), strength);
+                    if (strength < Chunks.MAX_SUNLIGHT) {
+                        strength++;
                     }
                 }
-
             }
         }
     }
 
     private void propagateSweep(LitChunk fromChunk, LitChunk toChunk, int[] depth, int[] startingRegen) {
         Vector3i pos = new Vector3i();
-        for (int z = 0; z < ChunkConstants.SIZE_Z; ++z) {
-            for (int x = 0; x < ChunkConstants.SIZE_X; ++x) {
-                int depthIndex = x + ChunkConstants.SIZE_X * z;
+        for (int z = 0; z < Chunks.SIZE_Z; ++z) {
+            for (int x = 0; x < Chunks.SIZE_X; ++x) {
+                int depthIndex = x + Chunks.SIZE_X * z;
                 startingRegen[depthIndex] = regenRules.getValue(fromChunk, new Vector3i(x, 0, z));
-                byte expectedValue = (byte) Math.min(startingRegen[depthIndex] + 1, ChunkConstants.MAX_SUNLIGHT_REGEN);
+                byte expectedValue = (byte) Math.min(startingRegen[depthIndex] + 1, Chunks.MAX_SUNLIGHT_REGEN);
                 Block fromBlock = fromChunk.getBlock(x, 0, z);
-                Block toBlock = toChunk.getBlock(x, ChunkConstants.SIZE_Y - 1, z);
+                Block toBlock = toChunk.getBlock(x, Chunks.SIZE_Y - 1, z);
                 if (!(regenRules.canSpreadOutOf(fromBlock, Side.BOTTOM) && regenRules.canSpreadInto(toBlock, Side.TOP))) {
                     continue;
                 }
                 byte predictedValue = 0;
-                pos.set(x, ChunkConstants.SIZE_Y - 1, z);
+                pos.set(x, Chunks.SIZE_Y - 1, z);
 
                 int currentValue = regenRules.getValue(toChunk, pos);
                 while (currentValue == predictedValue && expectedValue > currentValue) {
                     regenRules.setValue(toChunk, pos, expectedValue);
                     depth[depthIndex]++;
-                    byte sunlight = (byte) (expectedValue - ChunkConstants.SUNLIGHT_REGEN_THRESHOLD);
-                    if (sunlight > 0 && sunlight > toChunk.getSunlight(pos)) {
-                        toChunk.setSunlight(pos, sunlight);
+                    byte sunlight = (byte) (expectedValue - Chunks.SUNLIGHT_REGEN_THRESHOLD);
+                    if (sunlight > 0 && sunlight > toChunk.getSunlight(JomlUtil.from(pos))) {
+                        toChunk.setSunlight(JomlUtil.from(pos), sunlight);
                     }
-                    if (expectedValue < ChunkConstants.MAX_SUNLIGHT_REGEN) {
+                    if (expectedValue < Chunks.MAX_SUNLIGHT_REGEN) {
                         expectedValue++;
                     }
                     predictedValue++;
@@ -286,17 +261,17 @@ public class SunlightRegenBatchPropagator implements BatchPropagator {
     }
 
     @Override
-    public void propagateFrom(Vector3i pos, Block block) {
+    public void propagateFrom(Vector3ic pos, Block block) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public void propagateFrom(Vector3i pos, byte value) {
+    public void propagateFrom(Vector3ic pos, byte value) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public void regenerate(Vector3i pos, byte value) {
+    public void regenerate(Vector3ic pos, byte value) {
         throw new UnsupportedOperationException();
     }
 
