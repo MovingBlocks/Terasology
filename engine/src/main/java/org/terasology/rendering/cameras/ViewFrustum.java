@@ -15,7 +15,7 @@
  */
 package org.terasology.rendering.cameras;
 
-import org.joml.AABBf;
+import org.terasology.joml.geom.AABBf;
 import org.joml.Vector3fc;
 import org.lwjgl.BufferUtils;
 import org.terasology.logic.players.LocalPlayer;

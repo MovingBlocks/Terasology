@@ -15,7 +15,7 @@
  */
 package org.terasology.rendering.nui.widgets.browser.data.html.basic.list;
 
-import org.joml.Rectanglei;
+import org.terasology.joml.geom.Rectanglei;
 import org.joml.Vector2i;
 import org.terasology.nui.Canvas;
 import org.terasology.nui.HorizontalAlign;

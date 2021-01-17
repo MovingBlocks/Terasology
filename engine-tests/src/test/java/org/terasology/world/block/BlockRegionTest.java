@@ -5,10 +5,10 @@ package org.terasology.world.block;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import org.joml.AABBf;
-import org.joml.LineSegmentf;
-import org.joml.Rayf;
-import org.joml.Spheref;
+import org.terasology.joml.geom.AABBf;
+import org.terasology.joml.geom.LineSegmentf;
+import org.terasology.joml.geom.Rayf;
+import org.terasology.joml.geom.Spheref;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;

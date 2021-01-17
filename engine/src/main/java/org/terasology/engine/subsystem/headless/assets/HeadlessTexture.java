@@ -16,8 +16,8 @@
 package org.terasology.engine.subsystem.headless.assets;
 
 import com.google.common.collect.Lists;
-import org.joml.Rectanglef;
-import org.joml.Rectanglei;
+import org.terasology.joml.geom.Rectanglef;
+import org.terasology.joml.geom.Rectanglei;
 import org.joml.Vector2i;
 import org.terasology.assets.AssetType;
 import org.terasology.assets.ResourceUrn;

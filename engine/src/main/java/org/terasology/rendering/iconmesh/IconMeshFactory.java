@@ -15,7 +15,7 @@
  */
 package org.terasology.rendering.iconmesh;
 
-import org.joml.Rectanglei;
+import org.terasology.joml.geom.Rectanglei;
 import org.joml.Vector4f;
 import org.terasology.math.JomlUtil;
 import org.terasology.utilities.Assets;
