@@ -79,6 +79,13 @@ logger.info("PC VERSION: {}", version)
 // Jenkins-Artifactory integration catches on to this as part of the Maven-type descriptor
 group = "org.terasology.facades"
 
+configurations {
+    register("modules") {
+        description = "for fetching modules for running a server"
+        isTransitive = false
+    }
+}
+
 dependencies {
     implementation(project(":engine"))
     implementation(group = "org.reflections", name = "reflections", version = "0.9.10")
@@ -91,13 +98,6 @@ dependencies {
     // a runtime dependency on whatever the `:modules` subproject declares.
     // This won't add anything if there are no modules checked out.
     runtimeOnly(platform(project(":modules")))
-}
-
-configurations {
-    register("modules") {
-        description = "for fetching modules for running a server"
-        isTransitive = false
-    }
 }
 
 /****************************************
