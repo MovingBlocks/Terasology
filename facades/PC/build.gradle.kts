@@ -84,6 +84,9 @@ configurations {
         description = "for fetching modules for running a server"
         isTransitive = false
     }
+    register("natives") {
+        description = "native libraries (.dll and .so)"
+    }
 }
 
 dependencies {
@@ -93,6 +96,8 @@ dependencies {
 
     // TODO: Consider whether we can move the CR dependency back here from the engine, where it is referenced from the main menu
     implementation(group = "org.terasology.crashreporter", name = "cr-terasology", version = "4.1.0")
+
+    "natives"(files(rootProject.file(dirNatives)).builtBy(":extractNatives"))
 
     // Make sure any local module builds are up-to-date and have their dependencies by declaring
     // a runtime dependency on whatever the `:modules` subproject declares.
@@ -305,6 +310,9 @@ distributions {
                 filter(FixCrLfFilter::class, "eol" to FixCrLfFilter.CrLf.newInstance("crlf"))
             }
             from(createVersionFile)
+            from(configurations.named("natives")) {
+                into(dirNatives)
+            }
         }
     }
 }
