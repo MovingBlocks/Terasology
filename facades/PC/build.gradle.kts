@@ -219,7 +219,6 @@ val createVersionFile = tasks.register<Copy>("createVersionFile") {
     this.description = "Create a human-readable file with version and build information."
 
     inputs.property("dateTime", startDateTimeString)
-    onlyIf { env["BUILD_URL"] != null }
     from(templatesDir)
     into("$buildDir/versionfile")
     include(versionFileName)
