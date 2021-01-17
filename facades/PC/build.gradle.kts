@@ -199,6 +199,9 @@ tasks.register<JavaExec>("server") {
  */
 
 tasks.named<Jar>("jar") {
+    // Launcher expects the main class to be in the file with this name.
+    archiveFileName.set("Terasology.jar")
+
     manifest {
         //TODO: Maybe later add the engine's version number into here?
         attributes["Main-Class"] = mainClassName
