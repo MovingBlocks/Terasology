@@ -49,7 +49,6 @@ val localServerDataPath by extra("terasology-server")
 
 // General props
 val mainClassName by extra("org.terasology.engine.Terasology")
-val subDirLibs = "libs"
 val templatesDir = File(rootDir, "templates")
 val rootDirDist = File(rootDir, "build/distributions")
 
