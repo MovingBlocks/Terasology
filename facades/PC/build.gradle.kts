@@ -93,17 +93,6 @@ dependencies {
     runtimeOnly(platform(project(":modules")))
 }
 
-// Instructions for packaging a jar file for the PC facade
-tasks.named<Jar>("jar") {
-    manifest {
-        //TODO: Maybe later add the engine's version number into here?
-        attributes["Main-Class"] = mainClassName
-        attributes["Class-Path"] = configurations["runtimeClasspath"].map { it.name }.joinToString(" ")
-        attributes["Implementation-Title"] = "Terasology-" + project.name
-        attributes["Implementation-Version"] = """${env["BUILD_NUMBER"]}, ${env["GIT_BRANCH"]}, ${env["BUILD_ID"]}"""
-    }
-}
-
 configurations {
     register("modules") {
         description = "for fetching modules for running a server"
@@ -208,6 +197,16 @@ tasks.register<JavaExec>("server") {
  *
  * See also publish.gradle, included near the top.
  */
+
+tasks.named<Jar>("jar") {
+    manifest {
+        //TODO: Maybe later add the engine's version number into here?
+        attributes["Main-Class"] = mainClassName
+        attributes["Class-Path"] = configurations["runtimeClasspath"].map { it.name }.joinToString(" ")
+        attributes["Implementation-Title"] = "Terasology-" + project.name
+        attributes["Implementation-Version"] = """${env["BUILD_NUMBER"]}, ${env["GIT_BRANCH"]}, ${env["BUILD_ID"]}"""
+    }
+}
 
 /**
  * Create a human-readable file with version and build information.
