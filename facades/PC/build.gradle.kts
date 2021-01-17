@@ -209,8 +209,16 @@ tasks.register<JavaExec>("server") {
  * See also publish.gradle, included near the top.
  */
 
-// Preps a version file to bundle with PC dists. This eventually goes into the root of a zip file
+/**
+ * Create a human-readable file with version and build information.
+ *
+ * This goes in to the root of the distribution where it can easily be found and read by humans.
+ * For build details in a easily parsed format, see the `versionInfo.properties` resource added
+ * in engine's build.
+ */
 val createVersionFile = tasks.register<Copy>("createVersionFile") {
+    this.description = "Create a human-readable file with version and build information."
+
     inputs.property("dateTime", startDateTimeString)
     onlyIf { env["BUILD_URL"] != null }
     from(templatesDir)
