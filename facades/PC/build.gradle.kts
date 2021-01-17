@@ -247,7 +247,44 @@ tasks.register<Zip>("distForLauncher") {
     archiveFileName.set("Terasology.zip")
 
     // Launcher expects `libs/Terasology.jar`, no containing folder
-    this.with(distributions.getByName("main").contents)
+    // TODO: fix launcher so it can take either structure. It should be able to do without ambiguity.
+    val defaultLibraryDirectory = "lib"
+    val launcherLibraryDirectory = "libs"
+
+    this.with(distributions.getByName("main").contents {
+        eachFile {
+            val pathSegments = relativePath.segments
+
+            when (pathSegments[0]) {
+                defaultLibraryDirectory -> {
+                    // Redirect things from lib/ to libs/
+                    val tail = pathSegments.sliceArray(1 until pathSegments.size)
+                    relativePath = RelativePath(true, launcherLibraryDirectory, *tail)
+                }
+
+                application.executableDir -> {
+                    // I don't know how the "lib/" makes its way in to the classpath used by CreateStartScripts,
+                    // so we're adjusting it after-the-fact.
+                    filter(ScriptClasspathRewriter(this, defaultLibraryDirectory, launcherLibraryDirectory))
+                }
+            }
+        }
+    })
+}
+
+class ScriptClasspathRewriter(file: FileCopyDetails, val oldDirectory: String, val newDirectory: String) : Transformer<String, String> {
+    private val isBatchFile = file.name.endsWith(".bat")
+    private val assignment = if (isBatchFile) "set CLASSPATH=" else "CLASSPATH="
+
+    override fun transform(line: String): String = if (line.startsWith(assignment)) {
+        if (isBatchFile) {
+            line.replace("\\$oldDirectory\\", "\\$newDirectory\\")
+        } else {
+            line.replace("/$oldDirectory/", "/$newDirectory/")
+        }
+    } else {
+        line
+    }
 }
 
 // NOTE: If you build a distribution while you have modules, all the test dependencies are in here.
