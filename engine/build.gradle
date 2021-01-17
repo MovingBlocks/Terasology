@@ -95,8 +95,9 @@ dependencies {
     api "org.lwjgl:lwjgl-opengl"
     implementation "org.lwjgl:lwjgl-stb"
 
-    api group: 'java3d', name: 'vecmath', version: '1.3.1'
-    api group: 'org.joml', name: 'joml', version: '1.9.25'
+    api group: 'org.joml', name: 'joml', version: '1.10.0'
+    api group: 'org.terasology.joml-ext', name: 'joml-geometry', version: '1.0.0-SNAPSHOT'
+
     implementation group: 'org.abego.treelayout', name: 'org.abego.treelayout.core', version: '1.0.3'
     api group: 'com.miglayout', name: 'miglayout-core', version: '5.0'
     implementation group: 'de.matthiasmann.twl', name: 'PNGDecoder', version: '1111'
@@ -139,7 +140,7 @@ dependencies {
 
     // TODO: Consider moving this back to the PC Facade instead of having the engine rely on it?
     implementation group: 'org.terasology.crashreporter', name: 'cr-terasology', version: '4.1.0'
-    
+
    api(project(":subsystems:TypeHandlerLibrary"))
 }
 

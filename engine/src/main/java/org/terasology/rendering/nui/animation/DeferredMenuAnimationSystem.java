@@ -18,7 +18,7 @@ package org.terasology.rendering.nui.animation;
 
 import java.util.function.Supplier;
 
-import org.joml.Rectanglei;
+import org.terasology.joml.geom.Rectanglei;
 import org.terasology.math.geom.Rect2i;
 
 /**

@@ -3,7 +3,7 @@
 
 package org.terasology.world.block;
 
-import org.joml.Rectanglef;
+import org.terasology.joml.geom.Rectanglef;
 import org.joml.Vector2f;
 import org.joml.Vector2fc;
 import org.joml.Vector2i;
@@ -428,7 +428,7 @@ public interface BlockAreac extends Iterable<Vector2ic> {
 
     // -- transform --------------------------------------------------------------------------------------------------//
 
-    //TODO: does this make sense for a BlockArea?    
+    //TODO: does this make sense for a BlockArea?
     // BlockArea transform(Matrix4fc m, BlockArea dest);
 
     // -- CHECKS -----------------------------------------------------------------------------------------------------//

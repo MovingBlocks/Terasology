@@ -15,8 +15,8 @@
  */
 package org.terasology.rendering.assets.texture;
 
-import org.joml.Rectanglef;
-import org.joml.Rectanglei;
+import org.terasology.joml.geom.Rectanglef;
+import org.terasology.joml.geom.Rectanglei;
 import org.joml.Vector2fc;
 import org.joml.Vector2i;
 import org.terasology.math.JomlUtil;
