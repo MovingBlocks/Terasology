@@ -240,66 +240,19 @@ val createVersionFile = tasks.register<Copy>("createVersionFile") {
     filter(FixCrLfFilter::class, "eol" to FixCrLfFilter.CrLf.newInstance("crlf"))
 }
 
-// Main application dist target. Does NOT include any modules.
-tasks.register<Sync>("distApp") {
-    description = "Creates an application package for distribution"
+tasks.register<Zip>("distForLauncher") {
     group = "terasology dist"
+    description = "Bundles the project to a Launcher-compatible layout."
 
-    dependsOn("createVersionFile")
-    dependsOn(":extractNatives")
-    dependsOn("jar")
-
-    into("${distsDirectory.get().asFile}/app")
-    from ("$rootDir/README.markdown") {
-        filter(FixCrLfFilter::class, "eol" to FixCrLfFilter.CrLf.newInstance("crlf"))
-        rename("README.markdown", "README")
-    }
-    from ("$rootDir/LICENSE") {
-        filter(FixCrLfFilter::class, "eol" to FixCrLfFilter.CrLf.newInstance("crlf"))
-    }
-    from ("$rootDir/NOTICE") {
-        filter(FixCrLfFilter::class, "eol" to FixCrLfFilter.CrLf.newInstance("crlf"))
-    }
-    from("launchScripts") {
-        exclude("TeraEd.exe")
-    }
-
-    from("$buildDir/$versionFileName") {}
-
-    into(subDirLibs) {
-        from(configurations.runtimeClasspath)
-        from(tasks.getByPath(":engine:jar"))
-        from("$buildDir/libs") {
-            include("*.jar")
-            rename {
-                "Terasology.jar"
-            }
-        }
-    }
-    into(dirNatives) {
-        from("$rootDir/$dirNatives")
-    }
-}
-
-tasks.register<Zip>("distPCZip") {
-    group = "terasology dist"
-    dependsOn("distApp")
-    from("${distsDirectory.get().asFile}/app")
     archiveFileName.set("Terasology.zip")
+
+    // Launcher expects `libs/Terasology.jar`, no containing folder
+    this.with(distributions.getByName("main").contents)
 }
 
-tasks.register<Sync>("distForLauncher") {
-    group = "terasology dist"
-
-    into(rootDirDist)
-    from(tasks.getByName("distPCZip"))
-
-    into("../resources/main/org/terasology/version") {
-        from("$rootDir/engine/build/classes/org/terasology/version") {
-            include("versionInfo.properties")
-        }
-    }
-}
+// NOTE: If you build a distribution while you have modules, all the test dependencies are in here.
+//     They're "optional" in module.txt and gradle doesn't know how to tell which are runtime and which are
+//     test-only.
 
 distributions {
     main {
