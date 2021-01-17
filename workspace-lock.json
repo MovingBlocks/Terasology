@@ -1,0 +1,779 @@
+{
+  "name": "Terasology",
+  "version": "4.2.0-SNAPSHOT",
+  "ref": "refs/heads/joml/migrate-setBlocks",
+  "lockfileVersion": 1,
+  "modules": {
+    "modules/AdditionalFruits": {
+      "name": "AdditionalFruits",
+      "version": "1.1.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/AdditionalItemPipes": {
+      "name": "AdditionalItemPipes",
+      "version": "1.1.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/AdditionalRails": {
+      "name": "AdditionalRails",
+      "version": "1.1.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/AdditionalVegetables": {
+      "name": "AdditionalVegetables",
+      "version": "1.1.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/AdvancedRails": {
+      "name": "AdvancedRails",
+      "version": "1.1.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/Alchemy": {
+      "name": "Alchemy",
+      "version": "1.1.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/AlchemyPlantGenerator": {
+      "name": "AlchemyPlantGenerator",
+      "version": "1.0.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/AlterationEffects": {
+      "name": "AlterationEffects",
+      "version": "1.2.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/Anatomy": {
+      "name": "Anatomy",
+      "version": "1.1.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/AnotherWorld": {
+      "name": "AnotherWorld",
+      "version": "1.0.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/AnotherWorldPlants": {
+      "name": "AnotherWorldPlants",
+      "version": "1.1.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/Apiculture": {
+      "name": "Apiculture",
+      "version": "1.1.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/BasicCrafting": {
+      "name": "BasicCrafting",
+      "version": "1.1.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/Behaviors": {
+      "name": "Behaviors",
+      "version": "1.1.1-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/BiomesAPI": {
+      "name": "BiomesAPI",
+      "version": "4.1.1-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/BlockDetector": {
+      "name": "BlockDetector",
+      "version": "1.4.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/BlockNetwork": {
+      "name": "BlockNetwork",
+      "version": "1.1.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/BlockPicker": {
+      "name": "BlockPicker",
+      "version": "1.2.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/Books": {
+      "name": "Books",
+      "version": "1.2.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/Breathing": {
+      "name": "Breathing",
+      "version": "1.1.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/CakeLie": {
+      "name": "CakeLie",
+      "version": "1.1.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/Caves": {
+      "name": "Caves",
+      "version": "1.1.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/ChangingBlocks": {
+      "name": "ChangingBlocks",
+      "version": "1.1.1-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/CheatsForAll": {
+      "name": "CheatsForAll",
+      "version": "1.1.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/ChiselBlocks": {
+      "name": "ChiselBlocks",
+      "version": "1.1.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/ChrisVolume1OST": {
+      "name": "ChrisVolume1OST",
+      "version": "1.1.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/ChrisVolume2OST": {
+      "name": "ChrisVolume2OST",
+      "version": "1.1.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/Cities": {
+      "name": "Cities",
+      "version": "1.1.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/ClimateConditions": {
+      "name": "ClimateConditions",
+      "version": "1.0.1-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/Climbables": {
+      "name": "Climbables",
+      "version": "1.1.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/CombatSystem": {
+      "name": "CombatSystem",
+      "version": "1.0.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/CommonWorld": {
+      "name": "CommonWorld",
+      "version": "1.1.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/Compass": {
+      "name": "Compass",
+      "version": "1.1.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/ComputerMonitors": {
+      "name": "ComputerMonitors",
+      "version": "1.1.1-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/Cooking": {
+      "name": "Cooking",
+      "version": "1.2.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/CopperAndBronze": {
+      "name": "CopperAndBronze",
+      "version": "1.2.1-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/CoreAdvancedAssets": {
+      "name": "CoreAdvancedAssets",
+      "version": "1.3.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/CoreAssets": {
+      "name": "CoreAssets",
+      "version": "2.3.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/CoreRendering": {
+      "name": "CoreRendering",
+      "version": "1.1.2-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/CoreSampleGameplay": {
+      "name": "CoreSampleGameplay",
+      "version": "4.1.1-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/CoreWorlds": {
+      "name": "CoreWorlds",
+      "version": "2.0.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/CustomOreGen": {
+      "name": "CustomOreGen",
+      "version": "1.0.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/DamagingBlocks": {
+      "name": "DamagingBlocks",
+      "version": "1.1.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/Dialogs": {
+      "name": "Dialogs",
+      "version": "1.1.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/Drops": {
+      "name": "Drops",
+      "version": "1.2.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/Durability": {
+      "name": "Durability",
+      "version": "1.2.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/DynamicCities": {
+      "name": "DynamicCities",
+      "version": "1.0.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/Economy": {
+      "name": "Economy",
+      "version": "1.1.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/EdibleFlora": {
+      "name": "EdibleFlora",
+      "version": "1.0.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/EdibleSubstance": {
+      "name": "EdibleSubstance",
+      "version": "1.1.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/Equipment": {
+      "name": "Equipment",
+      "version": "1.3.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/EquipmentSmithing": {
+      "name": "EquipmentSmithing",
+      "version": "1.2.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/EventualSkills": {
+      "name": "EventualSkills",
+      "version": "1.0.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/Exoplanet": {
+      "name": "Exoplanet",
+      "version": "1.0.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/Explosives": {
+      "name": "Explosives",
+      "version": "1.1.1-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/FallingBlocks": {
+      "name": "FallingBlocks",
+      "version": "1.2.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/Fences": {
+      "name": "Fences",
+      "version": "1.1.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/FlexiblePathfinding": {
+      "name": "FlexiblePathfinding",
+      "version": "1.0.0-SNAPSHOT",
+      "ref": "refs/heads/joml/migrate-worldprovider"
+    },
+    "modules/FlowingLiquids": {
+      "name": "FlowingLiquids",
+      "version": "1.3.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/Fluid": {
+      "name": "Fluid",
+      "version": "2.1.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/FluidComputerIntegration": {
+      "name": "FluidComputerIntegration",
+      "version": "1.1.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/FunnyBlocks": {
+      "name": "FunnyBlocks",
+      "version": "1.1.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/Furnishings": {
+      "name": "Furnishings",
+      "version": "1.1.1-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/GenericRocks": {
+      "name": "GenericRocks",
+      "version": "1.1.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/Genome": {
+      "name": "Genome",
+      "version": "1.0.1-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/GooKeeper": {
+      "name": "GooKeeper",
+      "version": "1.1.1-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/Gooey": {
+      "name": "Gooey",
+      "version": "1.1.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/GooeyDefence": {
+      "name": "GooeyDefence",
+      "version": "1.1.1-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/GooeysQuests": {
+      "name": "GooeysQuests",
+      "version": "1.1.2-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/GrowingFlora": {
+      "name": "GrowingFlora",
+      "version": "1.0.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/Health": {
+      "name": "Health",
+      "version": "1.2.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/HjerlHede": {
+      "name": "HjerlHede",
+      "version": "1.2.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/HumanoidCharacters": {
+      "name": "HumanoidCharacters",
+      "version": "1.1.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/Hunger": {
+      "name": "Hunger",
+      "version": "1.2.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/IRLCorp": {
+      "name": "IRLCorp",
+      "version": "1.1.3-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/InGameHelp": {
+      "name": "InGameHelp",
+      "version": "1.1.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/InGameHelpAPI": {
+      "name": "InGameHelpAPI",
+      "version": "1.1.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/Inferno": {
+      "name": "Inferno",
+      "version": "1.0.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/Inventory": {
+      "name": "Inventory",
+      "version": "1.5.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/ItemPipes": {
+      "name": "ItemPipes",
+      "version": "1.1.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/ItemRendering": {
+      "name": "ItemRendering",
+      "version": "1.2.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/JoshariasSurvival": {
+      "name": "JoshariasSurvival",
+      "version": "1.1.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/Journal": {
+      "name": "Journal",
+      "version": "1.1.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/KComputers": {
+      "name": "KComputers",
+      "version": "1.1.1-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/Kallisti": {
+      "name": "Kallisti",
+      "version": "1.1.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/Lakes": {
+      "name": "Lakes",
+      "version": "2.0.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/LegacyMusic": {
+      "name": "LegacyMusic",
+      "version": "1.1.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/LightAndShadow": {
+      "name": "LightAndShadow",
+      "version": "1.1.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/LightAndShadowResources": {
+      "name": "LightAndShadowResources",
+      "version": "1.1.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/Lost": {
+      "name": "Lost",
+      "version": "1.1.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/Machines": {
+      "name": "Machines",
+      "version": "1.3.1-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/ManualLabor": {
+      "name": "ManualLabor",
+      "version": "1.4.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/ManualLaborEventualSkills": {
+      "name": "ManualLaborEventualSkills",
+      "version": "1.1.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/MarkovChains": {
+      "name": "MarkovChains",
+      "version": "1.6.1-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/MasterOfOreon": {
+      "name": "MasterOfOreon",
+      "version": "1.1.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/Maze": {
+      "name": "Maze",
+      "version": "1.1.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/MedievalCities": {
+      "name": "MedievalCities",
+      "version": "1.1.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/MetalRenegades": {
+      "name": "MetalRenegades",
+      "version": "1.1.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/Minerals": {
+      "name": "Minerals",
+      "version": "1.0.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/Minesweeper": {
+      "name": "MineSweeper",
+      "version": "1.0.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/Minimap": {
+      "name": "Minimap",
+      "version": "1.1.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/MobileBlocks": {
+      "name": "MobileBlocks",
+      "version": "1.1.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/ModularComputers": {
+      "name": "ModularComputers",
+      "version": "1.1.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/ModuleTestingEnvironment": {
+      "name": "ModuleTestingEnvironment",
+      "version": "0.2.3-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/MoreLights": {
+      "name": "MoreLights",
+      "version": "1.1.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/MultiBlock": {
+      "name": "MultiBlock",
+      "version": "1.1.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/MusicDirector": {
+      "name": "MusicDirector",
+      "version": "1.1.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/NameGenerator": {
+      "name": "NameGenerator",
+      "version": "1.1.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/Notifications": {
+      "name": "Notifications",
+      "version": "0.2.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/OreGeneration": {
+      "name": "OreGeneration",
+      "version": "2.0.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/Oreons": {
+      "name": "Oreons",
+      "version": "1.1.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/ParadIce": {
+      "name": "ParadIce",
+      "version": "0.1.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/Pathfinding": {
+      "name": "Pathfinding",
+      "version": "1.0.1-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/PhysicalStats": {
+      "name": "PhysicalStats",
+      "version": "1.1.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/PlantPack": {
+      "name": "PlantPack",
+      "version": "1.2.2-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/PolyWorld": {
+      "name": "PolyWorld",
+      "version": "1.0.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/Portals": {
+      "name": "Portals",
+      "version": "1.1.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/PotentialEnergyDevices": {
+      "name": "PotentialEnergyDevices",
+      "version": "1.2.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/Potions": {
+      "name": "Potions",
+      "version": "1.4.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/Projectile": {
+      "name": "Projectile",
+      "version": "1.2.1-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/Rails": {
+      "name": "Rails",
+      "version": "1.0.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/Sample": {
+      "name": "Sample",
+      "version": "1.1.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/Scenario": {
+      "name": "Scenario",
+      "version": "1.1.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/Seasons": {
+      "name": "Seasons",
+      "version": "1.1.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/SegmentedPaths": {
+      "name": "SegmentedPaths",
+      "version": "1.1.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/Sensors": {
+      "name": "Sensors",
+      "version": "1.1.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/ShatteredPlanes": {
+      "name": "ShatteredPlanes",
+      "version": "1.0.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/Signalling": {
+      "name": "Signalling",
+      "version": "1.1.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/SimpleFarming": {
+      "name": "SimpleFarming",
+      "version": "2.2.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/Smithing": {
+      "name": "Smithing",
+      "version": "1.1.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/Soils": {
+      "name": "Soils",
+      "version": "1.1.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/SoundyGenetics": {
+      "name": "SoundyGenetics",
+      "version": "1.1.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/Spawning": {
+      "name": "Spawning",
+      "version": "1.1.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/StaticCities": {
+      "name": "StaticCities",
+      "version": "1.0.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/StoneCrafting": {
+      "name": "StoneCrafting",
+      "version": "1.1.2-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/StructuralResources": {
+      "name": "StructuralResources",
+      "version": "2.3.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/StructureTemplates": {
+      "name": "StructureTemplates",
+      "version": "1.0.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/SubstanceMatters": {
+      "name": "SubstanceMatters",
+      "version": "2.1.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/SurfaceFacets": {
+      "name": "SurfaceFacets",
+      "version": "1.0.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/Tasks": {
+      "name": "Tasks",
+      "version": "1.1.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/Thirst": {
+      "name": "Thirst",
+      "version": "1.1.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/Valentines": {
+      "name": "Valentines",
+      "version": "1.1.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/WeatherManager": {
+      "name": "WeatherManager",
+      "version": "1.0.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/WildAnimals": {
+      "name": "WildAnimals",
+      "version": "1.1.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/WildAnimalsGenome": {
+      "name": "WildAnimalsGenome",
+      "version": "1.1.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/WoodAndStone": {
+      "name": "WoodAndStone",
+      "version": "1.0.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/WoodAndStoneCraftingJournal": {
+      "name": "WoodAndStoneCraftingJournal",
+      "version": "1.1.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/WoodCrafting": {
+      "name": "WoodCrafting",
+      "version": "1.1.3-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/Workstation": {
+      "name": "Workstation",
+      "version": "1.2.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/WorkstationCrafting": {
+      "name": "WorkstationCrafting",
+      "version": "2.0.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/WorkstationInGameHelp": {
+      "name": "WorkstationInGameHelp",
+      "version": "1.1.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/WorldlyTooltip": {
+      "name": "WorldlyTooltip",
+      "version": "1.3.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/WorldlyTooltipAPI": {
+      "name": "WorldlyTooltipAPI",
+      "version": "1.1.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    },
+    "modules/Xmas": {
+      "name": "Xmas",
+      "version": "0.1.0-SNAPSHOT",
+      "ref": "refs/heads/develop"
+    }
+  },
+  "libs": {}
+}

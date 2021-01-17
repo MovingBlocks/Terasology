@@ -17,6 +17,7 @@
 package org.terasology.world;
 
 import org.joml.Vector3i;
+import org.joml.Vector3ic;
 import org.terasology.entitySystem.event.Event;
 import org.terasology.world.block.Block;
 
@@ -29,13 +30,13 @@ public class OnChangedBlock implements Event {
     private Block newType;
     private Vector3i blockPosition;
 
-    public OnChangedBlock(Vector3i pos, Block newType, Block oldType) {
+    public OnChangedBlock(Vector3ic pos, Block newType, Block oldType) {
         this.blockPosition = new Vector3i(pos);
         this.oldType = oldType;
         this.newType = newType;
     }
 
-    public Vector3i getBlockPosition() {
+    public Vector3ic getBlockPosition() {
         return blockPosition;
     }
 

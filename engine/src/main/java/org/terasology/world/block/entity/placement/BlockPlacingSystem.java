@@ -35,6 +35,6 @@ public class BlockPlacingSystem extends BaseComponentSystem {
 
     @ReceiveEvent(components = {WorldComponent.class}, priority = EventPriority.PRIORITY_TRIVIAL)
     public void placeBlockInWorld(PlaceBlocks event, EntityRef world) {
-        worldProvider.setBlocks(JomlUtil.blockMap(event.getBlocks()));
+        worldProvider.setBlocks(event.getBlocks());
     }
 }

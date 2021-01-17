@@ -15,7 +15,7 @@
  */
 package org.terasology.world.block.structure;
 
-import org.joml.Vector3i;
+import org.joml.Vector3ic;
 import org.terasology.math.Side;
 import org.terasology.world.block.Block;
 
@@ -37,7 +37,7 @@ public interface BlockStructuralSupport {
      * @param sideChanged Side that has triggered this check.
      * @return If the block should be immediately removed.
      */
-    boolean shouldBeRemovedDueToChange(Vector3i location, Side sideChanged);
+    boolean shouldBeRemovedDueToChange(Vector3ic location, Side sideChanged);
 
     /**
      * Checks if the block at location is sufficiently supported.
@@ -46,5 +46,5 @@ public interface BlockStructuralSupport {
      * @param blockOverrides
      * @return
      */
-    boolean isSufficientlySupported(Vector3i location, Map<Vector3i, Block> blockOverrides);
+    boolean isSufficientlySupported(Vector3ic location, Map<? extends Vector3ic, Block> blockOverrides);
 }

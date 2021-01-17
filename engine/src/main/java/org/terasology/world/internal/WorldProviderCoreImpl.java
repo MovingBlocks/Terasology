@@ -67,7 +67,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
 
     private final List<WorldChangeListener> listeners = Lists.newArrayList();
 
-    private final Map<org.terasology.math.geom.Vector3i, BlockChange> blockChanges = Maps.newHashMap();
+    private final Map<Vector3ic, BlockChange> blockChanges = Maps.newHashMap();
     private List<BatchPropagator> propagators = Lists.newArrayList();
 
     private Block unloadedBlock;
@@ -177,8 +177,8 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
     @Override
     public Block setBlock(Vector3ic worldPos, Block type) {
         /*
-         * Hint: This method has a benchmark available in the BenchmarkScreen, The screen can be opened ingame via the
-         * command "showSCreen BenchmarkScreen".
+         * Hint: This method has a benchmark available in the BenchmarkScreen, The screen can be opened in-game via the
+         * command "showScreen BenchmarkScreen".
          */
         Vector3i chunkPos = Chunks.toChunkPos(worldPos, new Vector3i());
         CoreChunk chunk = chunkProvider.getChunk(chunkPos);
@@ -186,9 +186,9 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
             Vector3i blockPos = Chunks.toRelative(worldPos, new Vector3i());
             Block oldBlockType = chunk.setBlock(blockPos, type);
             if (oldBlockType != type) {
-                BlockChange oldChange = blockChanges.get(JomlUtil.from(worldPos));
+                BlockChange oldChange = blockChanges.get(worldPos);
                 if (oldChange == null) {
-                    blockChanges.put(JomlUtil.from(worldPos), new BlockChange(worldPos, oldBlockType, type));
+                    blockChanges.put(worldPos, new BlockChange(worldPos, oldBlockType, type));
                 } else {
                     oldChange.setTo(type);
                 }
@@ -202,32 +202,32 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
     }
 
     @Override
-    public Map<org.terasology.math.geom.Vector3i, Block> setBlocks(Map<org.terasology.math.geom.Vector3i, Block> blocks) {
+    public Map<Vector3ic, Block> setBlocks(Map<? extends Vector3ic, Block> blocks) {
         /*
          * Hint: This method has a benchmark available in the BenchmarkScreen, The screen can be opened ingame via the
          * command "showSCreen BenchmarkScreen".
          */
         Set<BlockChange> changedBlocks = new HashSet<>();
-        Map<org.terasology.math.geom.Vector3i, Block> result = new HashMap<>(blocks.size());
+        Map<Vector3ic, Block> result = new HashMap<>(blocks.size());
 
-        for (Map.Entry<org.terasology.math.geom.Vector3i, Block> entry : blocks.entrySet()) {
-            org.terasology.math.geom.Vector3i worldPos = entry.getKey();
-            org.terasology.math.geom.Vector3i chunkPos = ChunkMath.calcChunkPos(worldPos);
+        for (Map.Entry<? extends Vector3ic, Block> entry : blocks.entrySet()) {
+            Vector3ic worldPos = entry.getKey();
+            Vector3i chunkPos = Chunks.toChunkPos(worldPos, new Vector3i());
             CoreChunk chunk = chunkProvider.getChunk(chunkPos);
 
             if (chunk != null) {
                 Block type = entry.getValue();
-                org.terasology.math.geom.Vector3i blockPos = ChunkMath.calcRelativeBlockPos(worldPos);
+                Vector3i blockPos = Chunks.toRelative(worldPos, new Vector3i());
                 Block oldBlockType = chunk.setBlock(blockPos, type);
                 if (oldBlockType != type) {
                     BlockChange oldChange = blockChanges.get(worldPos);
                     if (oldChange == null) {
-                        blockChanges.put(worldPos, new BlockChange(JomlUtil.from(worldPos), oldBlockType, type));
+                        blockChanges.put(worldPos, new BlockChange(worldPos, oldBlockType, type));
                     } else {
                         oldChange.setTo(type);
                     }
-                    setDirtyChunksNear(JomlUtil.from(worldPos));
-                    changedBlocks.add(new BlockChange(JomlUtil.from(worldPos), oldBlockType, type));
+                    setDirtyChunksNear(worldPos);
+                    changedBlocks.add(new BlockChange(worldPos, oldBlockType, type));
                 }
                 result.put(worldPos, oldBlockType);
             } else {
