@@ -19,7 +19,6 @@ package org.terasology.world.generation.facets.base;
 import com.google.common.collect.Maps;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
-import org.terasology.world.block.BlockRegion;
 import org.terasology.world.block.BlockRegionc;
 import org.terasology.world.generation.Border3D;
 
