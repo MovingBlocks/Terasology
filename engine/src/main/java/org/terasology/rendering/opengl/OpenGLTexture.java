@@ -16,8 +16,8 @@
 package org.terasology.rendering.opengl;
 
 import com.google.common.collect.Lists;
-import org.joml.Rectanglef;
-import org.joml.Rectanglei;
+import org.terasology.joml.geom.Rectanglef;
+import org.terasology.joml.geom.Rectanglei;
 import org.joml.Vector2i;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

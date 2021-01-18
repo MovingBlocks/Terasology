@@ -34,7 +34,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import gnu.trove.iterator.TFloatIterator;
-import org.joml.AABBf;
+import org.terasology.joml.geom.AABBf;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;

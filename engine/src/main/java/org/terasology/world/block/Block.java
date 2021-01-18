@@ -16,7 +16,7 @@
 package org.terasology.world.block;
 
 import com.google.common.collect.Maps;
-import org.joml.AABBf;
+import org.terasology.joml.geom.AABBf;
 import org.joml.Quaternionf;
 import org.joml.RoundingMode;
 import org.joml.Vector3f;
