@@ -18,7 +18,10 @@
 
 ##############################################################################
 ##
-##  ${applicationName} start up script for UN*X
+##  %{-- Copyright 2021 The Terasology Foundation --}%
+%{-- SPDX-License-Identifier: Apache-2.0 --}%
+
+${applicationName} start up script for UN*X
 ##
 ##############################################################################
 

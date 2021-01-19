@@ -17,7 +17,10 @@
 @if "%DEBUG%" == "" @echo off
 @rem ##########################################################################
 @rem
-@rem  ${applicationName} startup script for Windows
+@rem  %{-- Copyright 2021 The Terasology Foundation --}%
+%{-- SPDX-License-Identifier: Apache-2.0 --}%
+
+${applicationName} startup script for Windows
 @rem
 @rem ##########################################################################
 
