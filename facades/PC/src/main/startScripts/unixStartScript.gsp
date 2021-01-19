@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 # Derived from
-# https://github.com/gradle/gradle/blob/f38a522/subprojects/plugins/src/main/resources/org/gradle/api/internal/plugins/windowsStartScript.txt
+# https://github.com/gradle/gradle/blob/f38a522/subprojects/plugins/src/main/resources/org/gradle/api/internal/plugins/unixStartScript.txt
 #
 # Alternatively use our Launcher from: https://github.com/MovingBlocks/TerasologyLauncher/releases
 
