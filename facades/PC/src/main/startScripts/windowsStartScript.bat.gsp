@@ -13,6 +13,7 @@
 @rem See the License for the specific language governing permissions and
 @rem limitations under the License.
 @rem
+@rem https://github.com/gradle/gradle/blob/124712713a77a6813e112ae1b68f248deca6a816/subprojects/plugins/src/main/resources/org/gradle/api/internal/plugins/windowsStartScript.txt
 
 @if "%DEBUG%" == "" @echo off
 @rem ##########################################################################
@@ -71,11 +72,10 @@ goto fail
 :execute
 @rem Setup the command line
 
-set CLASSPATH=$classpath
 <% if ( mainClassName.startsWith('--module ') ) { %>set MODULE_PATH=$modulePath<% } %>
 
 @rem Execute ${applicationName}
-"%JAVA_EXE%" %DEFAULT_JVM_OPTS% %JAVA_OPTS% %${optsEnvironmentVar}% <% if ( appNameSystemProperty ) { %>"-D${appNameSystemProperty}=%APP_BASE_NAME%"<% } %> -classpath "%CLASSPATH%" <% if ( mainClassName.startsWith('--module ') ) { %>--module-path "%MODULE_PATH%" <% } %>${mainClassName} %*
+"%JAVA_EXE%" %DEFAULT_JVM_OPTS% %JAVA_OPTS% %${optsEnvironmentVar}% <% if ( appNameSystemProperty ) { %>"-D${appNameSystemProperty}=%APP_BASE_NAME%"<% } %> <% if ( mainClassName.startsWith('--module ') ) { %>--module-path "%MODULE_PATH%" <% } %>-jar lib\\Terasology.jar %*
 
 :end
 @rem End local scope for the variables with windows NT shell
