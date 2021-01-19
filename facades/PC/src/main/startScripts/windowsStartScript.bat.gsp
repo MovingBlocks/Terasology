@@ -1,27 +1,15 @@
+@rem Copyright 2021 The Terasology Foundation, 2015 the original author or authors.
+@rem SPDX-License-Identifier: Apache-2.0
 @rem
-@rem Copyright 2015 the original author or authors.
+@rem Derived from
+@rem https://github.com/gradle/gradle/blob/f38a522/subprojects/plugins/src/main/resources/org/gradle/api/internal/plugins/windowsStartScript.txt
 @rem
-@rem Licensed under the Apache License, Version 2.0 (the "License");
-@rem you may not use this file except in compliance with the License.
-@rem You may obtain a copy of the License at
-@rem
-@rem      https://www.apache.org/licenses/LICENSE-2.0
-@rem
-@rem Unless required by applicable law or agreed to in writing, software
-@rem distributed under the License is distributed on an "AS IS" BASIS,
-@rem WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-@rem See the License for the specific language governing permissions and
-@rem limitations under the License.
-@rem
-@rem https://github.com/gradle/gradle/blob/124712713a77a6813e112ae1b68f248deca6a816/subprojects/plugins/src/main/resources/org/gradle/api/internal/plugins/windowsStartScript.txt
+@rem Alternatively use our Launcher from: https://github.com/MovingBlocks/TerasologyLauncher/releases
 
 @if "%DEBUG%" == "" @echo off
 @rem ##########################################################################
 @rem
-@rem  %{-- Copyright 2021 The Terasology Foundation --}%
-%{-- SPDX-License-Identifier: Apache-2.0 --}%
-
-${applicationName} startup script for Windows
+@rem ${applicationName} startup script for Windows
 @rem
 @rem ##########################################################################
 

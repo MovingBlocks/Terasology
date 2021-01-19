@@ -1,27 +1,15 @@
 #!/usr/bin/env sh
-
+# Copyright 2021 The Terasology Foundation, 2015 the original author or authors.
+# SPDX-License-Identifier: Apache-2.0
 #
-# Copyright 2015 the original author or authors.
+# Derived from
+# https://github.com/gradle/gradle/blob/f38a522/subprojects/plugins/src/main/resources/org/gradle/api/internal/plugins/windowsStartScript.txt
 #
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#      https://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-#
+# Alternatively use our Launcher from: https://github.com/MovingBlocks/TerasologyLauncher/releases
 
 ##############################################################################
 ##
-##  %{-- Copyright 2021 The Terasology Foundation --}%
-%{-- SPDX-License-Identifier: Apache-2.0 --}%
-
-${applicationName} start up script for UN*X
+## ${applicationName} start up script for UN*X
 ##
 ##############################################################################
 
