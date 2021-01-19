@@ -16,7 +16,7 @@
 package org.terasology.rendering.nui.layers.hud;
 
 import com.google.common.collect.Maps;
-import org.joml.Rectanglei;
+import org.terasology.joml.geom.Rectanglei;
 import org.joml.Vector2i;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;

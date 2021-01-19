@@ -16,7 +16,7 @@
 package org.terasology.rendering.nui.internal;
 
 import org.joml.Quaternionfc;
-import org.joml.Rectanglei;
+import org.terasology.joml.geom.Rectanglei;
 import org.joml.Vector2ic;
 import org.joml.Vector3fc;
 import org.terasology.assets.ResourceUrn;
