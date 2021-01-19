@@ -68,6 +68,7 @@ val displayVersion = versionBase
 
 application {
     applicationName = "Terasology"
+    executableDir = "/"
     mainClass.set(extra.get("mainClassName") as String)
 }
 
@@ -209,7 +210,9 @@ tasks.named<Jar>("jar") {
     manifest {
         //TODO: Maybe later add the engine's version number into here?
         attributes["Main-Class"] = mainClassName
-        attributes["Class-Path"] = configurations["runtimeClasspath"].map { it.name }.joinToString(" ")
+        // A classpath in the manifest avoids the problem of having to put a classpath on the command line and
+        // "line is too long" errors: https://github.com/gradle/gradle/issues/1989
+        attributes["Class-Path"] = configurations["runtimeClasspath"].joinToString(" ") { it.name }
         attributes["Implementation-Title"] = "Terasology-" + project.name
         attributes["Implementation-Version"] = """${env["BUILD_NUMBER"]}, ${env["GIT_BRANCH"]}, ${env["BUILD_ID"]}"""
     }
@@ -260,12 +263,12 @@ tasks.register<Zip>("distForLauncher") {
                     val tail = pathSegments.sliceArray(1 until pathSegments.size)
                     relativePath = RelativePath(true, launcherLibraryDirectory, *tail)
                 }
+            }
 
-                application.executableDir -> {
-                    // I don't know how the "lib/" makes its way in to the classpath used by CreateStartScripts,
-                    // so we're adjusting it after-the-fact.
-                    filter(ScriptClasspathRewriter(this, defaultLibraryDirectory, launcherLibraryDirectory))
-                }
+            if (this.sourcePath == "Terasology" || this.sourcePath == "Terasology.bat") {
+                // I don't know how the "lib/" makes its way in to the classpath used by CreateStartScripts,
+                // so we're adjusting it after-the-fact.
+                filter(ScriptClasspathRewriter(this, defaultLibraryDirectory, launcherLibraryDirectory))
             }
         }
     })
@@ -273,16 +276,23 @@ tasks.register<Zip>("distForLauncher") {
 
 class ScriptClasspathRewriter(file: FileCopyDetails, val oldDirectory: String, val newDirectory: String) : Transformer<String, String> {
     private val isBatchFile = file.name.endsWith(".bat")
-    private val assignment = if (isBatchFile) "set CLASSPATH=" else "CLASSPATH="
 
-    override fun transform(line: String): String = if (line.startsWith(assignment)) {
-        if (isBatchFile) {
-            line.replace("\\$oldDirectory\\", "\\$newDirectory\\")
+    override fun transform(line: String): String = if (isBatchFile) {
+            line.replace("$oldDirectory\\", "$newDirectory\\")
         } else {
-            line.replace("/$oldDirectory/", "/$newDirectory/")
+            line.replace("$oldDirectory/", "$newDirectory/")
         }
-    } else {
-        line
+}
+
+tasks.named<CreateStartScripts>("startScripts") {
+    // Use start scripts that invoke java with `-jar` with the classpath in the jar manifest,
+    // instead of including classpath on the command line. Avoids "line is too long" errors.
+    // See https://github.com/gradle/gradle/issues/1989
+    (unixStartScriptGenerator as TemplateBasedScriptGenerator).apply {
+        template = resources.text.fromFile("src/main/startScripts/unixStartScript.gsp")
+    }
+    (windowsStartScriptGenerator as TemplateBasedScriptGenerator).apply {
+        template = resources.text.fromFile("src/main/startScripts/windowsStartScript.bat.gsp")
     }
 }
 
