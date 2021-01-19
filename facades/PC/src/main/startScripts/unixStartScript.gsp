@@ -71,7 +71,6 @@ case "`uname`" in
     ;;
 esac
 
-CLASSPATH=$classpath
 <% if ( mainClassName.startsWith('--module ') ) { %>MODULE_PATH=$modulePath<% } %>
 
 # Determine the Java command to use to start the JVM.
@@ -171,6 +170,6 @@ save () {
 APP_ARGS=`save "\$@"`
 
 # Collect all arguments for the java command, following the shell quoting and substitution rules
-eval set -- \$DEFAULT_JVM_OPTS \$JAVA_OPTS \$${optsEnvironmentVar} <% if ( appNameSystemProperty ) { %>"\"-D${appNameSystemProperty}=\$APP_BASE_NAME\"" <% } %>-classpath "\"\$CLASSPATH\"" <% if ( mainClassName.startsWith('--module ') ) { %>--module-path "\"\$MODULE_PATH\"" <% } %>${mainClassName} "\$APP_ARGS"
+eval set -- \$DEFAULT_JVM_OPTS \$JAVA_OPTS \$${optsEnvironmentVar} <% if ( appNameSystemProperty ) { %>"\"-D${appNameSystemProperty}=\$APP_BASE_NAME\"" <% } %> <% if ( mainClassName.startsWith('--module ') ) { %>--module-path "\"\$MODULE_PATH\"" <% } %>-jar lib/Terasology.jar "\$APP_ARGS"
 
 exec "\$JAVACMD" "\$@"
