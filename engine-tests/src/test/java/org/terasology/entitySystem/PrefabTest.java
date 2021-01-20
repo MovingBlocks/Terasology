@@ -1,4 +1,4 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.entitySystem;
 
@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.MockedPathManager;
 import org.terasology.assets.AssetFactory;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.assets.module.ModuleAwareAssetTypeManager;
@@ -45,7 +46,7 @@ import static org.mockito.Mockito.when;
 
 /**
  */
-public class PrefabTest {
+public class PrefabTest implements MockedPathManager {
 
     private static final Logger logger = LoggerFactory.getLogger(PrefabTest.class);
 

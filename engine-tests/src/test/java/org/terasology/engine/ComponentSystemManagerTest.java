@@ -1,4 +1,7 @@
 
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
+
 package org.terasology.engine;
 
 import ch.qos.logback.classic.Level;
@@ -29,6 +32,7 @@ import java.util.List;
 import static java.util.stream.Collectors.toList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -123,7 +127,7 @@ public class ComponentSystemManagerTest {
         systemUnderTest.initialise();
 
         ArgumentCaptor<LoggingEvent> loggingEventArgumentCaptor = ArgumentCaptor.forClass(LoggingEvent.class);
-        verify(appender).doAppend(loggingEventArgumentCaptor.capture());
+        verify(appender, atLeastOnce()).doAppend(loggingEventArgumentCaptor.capture());
         List<String> allErrorLogMessages = loggingEventArgumentCaptor.getAllValues().stream()
                 .filter(e -> e.getLevel().isGreaterOrEqual(Level.ERROR))
                 .map(LoggingEvent::getFormattedMessage)

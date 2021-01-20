@@ -1,30 +1,16 @@
-/*
- * Copyright 2018 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.rendering.nui.layers.mainMenu.savedGames;
 
 import com.google.common.base.Charsets;
 import org.codehaus.plexus.util.FileUtils;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.junit.platform.commons.logging.Logger;
-import org.junit.platform.commons.logging.LoggerFactory;
+import org.terasology.MockedPathManager;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.game.GameManifest;
 
@@ -37,6 +23,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -46,44 +33,16 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 
-public class GameProviderTest {
+public class GameProviderTest implements MockedPathManager {
     private static final int TIMESTAMP_DELAY = 1000;
     private static final String DEFAULT_GAME_NAME = "Game";
-    private static final Path TMP_SAVES_FOLDER_PATH =
-            Paths.get("out", "test", "engine-tests", "tmp", "saves").toAbsolutePath();
-    private static final Path TMP_RECORDS_FOLDER_PATH =
-            Paths.get("out", "test", "engine-tests", "tmp", "records").toAbsolutePath();
-    private static final Path TMP_SAVE_GAME_PATH = TMP_SAVES_FOLDER_PATH.resolve(DEFAULT_GAME_NAME);
-    private static final Path TMP_RECORD_GAME_PATH = TMP_RECORDS_FOLDER_PATH.resolve(DEFAULT_GAME_NAME);
     private static final String GAME_MANIFEST_JSON = "gameManifest.json";
-    private static String MANIFEST_EXAMPLE;
+    private static String manifestExample;
 
-    private static final Logger logger = LoggerFactory.getLogger(GameProviderTest.class);
-
-    @BeforeAll
-    public static void init()
-            throws NoSuchFieldException, IllegalAccessException, IOException {
-        PathManager pathManager = PathManager.getInstance();
-
-        Field savesPathField = pathManager.getClass().getDeclaredField("savesPath");
-        savesPathField.setAccessible(true);
-        savesPathField.set(pathManager, TMP_SAVES_FOLDER_PATH);
-
-        Field recordsPathField = pathManager.getClass().getDeclaredField("recordingsPath");
-        recordsPathField.setAccessible(true);
-        recordsPathField.set(pathManager, TMP_RECORDS_FOLDER_PATH);
-
-        Files.createDirectories(TMP_SAVES_FOLDER_PATH);
-        Files.createDirectories(TMP_RECORDS_FOLDER_PATH);
-
-        final File file = new File(GameProviderTest.class.getClassLoader().getResource(GAME_MANIFEST_JSON).getFile());
-        try {
-            //noinspection UnstableApiUsage
-            MANIFEST_EXAMPLE = com.google.common.io.Files.asCharSource(file, Charsets.UTF_8).read();
-        } catch (IOException e) {
-            fail("Could not load input file");
-        }
-    }
+    private Path tmpSavesFolderPath;
+    private Path tmpRecordsFolderPath;
+    private Path tmpSaveGamePath;
+    private Path tmpRecordGamePath;
 
     private static Stream<Arguments> nextGameNamesProvider() {
         return Stream.of(
@@ -95,18 +54,48 @@ public class GameProviderTest {
         );
     }
 
+    @BeforeEach
+    public void init()
+            throws NoSuchFieldException, IllegalAccessException, IOException {
+        String gamefolder = UUID.randomUUID().toString();
+        tmpSavesFolderPath = Paths.get("out", "test", "engine-tests", gamefolder, "saves").toAbsolutePath();
+        tmpRecordsFolderPath = Paths.get("out", "test", "engine-tests", gamefolder, "records").toAbsolutePath();
+        tmpSaveGamePath = tmpSavesFolderPath.resolve(DEFAULT_GAME_NAME);
+        tmpRecordGamePath = tmpRecordsFolderPath.resolve(DEFAULT_GAME_NAME);
+        PathManager pathManager = PathManager.getInstance();
+
+        Field savesPathField = pathManager.getClass().getDeclaredField("savesPath");
+        savesPathField.setAccessible(true);
+        savesPathField.set(pathManager, tmpSavesFolderPath);
+
+        Field recordsPathField = pathManager.getClass().getDeclaredField("recordingsPath");
+        recordsPathField.setAccessible(true);
+        recordsPathField.set(pathManager, tmpRecordsFolderPath);
+
+        Files.createDirectories(tmpSavesFolderPath);
+        Files.createDirectories(tmpRecordsFolderPath);
+
+        final File file = new File(GameProviderTest.class.getClassLoader().getResource(GAME_MANIFEST_JSON).getFile());
+        try {
+            //noinspection UnstableApiUsage
+            manifestExample = com.google.common.io.Files.asCharSource(file, Charsets.UTF_8).read();
+        } catch (IOException e) {
+            fail("Could not load input file");
+        }
+    }
+
     @AfterEach
     public void cleanUp()
             throws IOException {
-        FileUtils.cleanDirectory(new File(TMP_SAVES_FOLDER_PATH.toUri()));
-        FileUtils.cleanDirectory(new File(TMP_RECORDS_FOLDER_PATH.toUri()));
+        FileUtils.cleanDirectory(new File(tmpSavesFolderPath.toUri()));
+        FileUtils.cleanDirectory(new File(tmpRecordsFolderPath.toUri()));
     }
 
     @Test
     public void emptySavedGameManifestTest()
             throws IOException {
-        Files.createDirectory(TMP_SAVE_GAME_PATH);
-        Files.createFile(TMP_SAVE_GAME_PATH.resolve(GameManifest.DEFAULT_FILE_NAME));
+        Files.createDirectory(tmpSaveGamePath);
+        Files.createFile(tmpSaveGamePath.resolve(GameManifest.DEFAULT_FILE_NAME));
 
         final List<GameInfo> result = GameProvider.getSavedGames();
 
@@ -133,8 +122,8 @@ public class GameProviderTest {
     @Test
     public void emptyRecordingGameManifestTest()
             throws IOException {
-        Files.createDirectory(TMP_RECORD_GAME_PATH);
-        Files.createFile(TMP_RECORD_GAME_PATH.resolve(GameManifest.DEFAULT_FILE_NAME));
+        Files.createDirectory(tmpRecordGamePath);
+        Files.createFile(tmpRecordGamePath.resolve(GameManifest.DEFAULT_FILE_NAME));
 
         final List<GameInfo> result = GameProvider.getSavedRecordings();
 
@@ -145,10 +134,10 @@ public class GameProviderTest {
     @Test
     public void successTest()
             throws IOException {
-        Files.createDirectories(TMP_SAVE_GAME_PATH);
-        Path manifestFilePath = TMP_SAVE_GAME_PATH.resolve(GameManifest.DEFAULT_FILE_NAME);
+        Files.createDirectories(tmpSaveGamePath);
+        Path manifestFilePath = tmpSaveGamePath.resolve(GameManifest.DEFAULT_FILE_NAME);
 
-        writeToFile(manifestFilePath, MANIFEST_EXAMPLE);
+        writeToFile(manifestFilePath, manifestExample);
 
         final List<GameInfo> result = GameProvider.getSavedGames();
         assertNotNull(result);
@@ -159,7 +148,7 @@ public class GameProviderTest {
         assertNotNull(gameInfo.getTimestamp());
         assertNotNull(gameInfo.getSavePath());
         assertEquals(DEFAULT_GAME_NAME, gameInfo.getManifest().getTitle());
-        assertEquals(TMP_SAVE_GAME_PATH, gameInfo.getSavePath());
+        assertEquals(tmpSaveGamePath, gameInfo.getSavePath());
     }
 
     @Test
@@ -170,8 +159,8 @@ public class GameProviderTest {
 
     @Test
     public void notEmptySavesGameFolderTest() throws IOException {
-        Files.createDirectories(TMP_SAVE_GAME_PATH);
-        Files.createFile(TMP_SAVE_GAME_PATH.resolve(GameManifest.DEFAULT_FILE_NAME));
+        Files.createDirectories(tmpSaveGamePath);
+        Files.createFile(tmpSaveGamePath.resolve(GameManifest.DEFAULT_FILE_NAME));
         final boolean res = GameProvider.isSavesFolderEmpty();
 
         assertFalse(res);
@@ -196,9 +185,9 @@ public class GameProviderTest {
 
     @Test
     public void getNextGameNameNumberTest() throws IOException {
-        Files.createDirectories(TMP_SAVE_GAME_PATH);
-        Path manifestFilePath = TMP_SAVE_GAME_PATH.resolve(GameManifest.DEFAULT_FILE_NAME);
-        writeToFile(manifestFilePath, MANIFEST_EXAMPLE);
+        Files.createDirectories(tmpSaveGamePath);
+        Path manifestFilePath = tmpSaveGamePath.resolve(GameManifest.DEFAULT_FILE_NAME);
+        writeToFile(manifestFilePath, manifestExample);
 
         final String name = GameProvider.getNextGameName();
 
@@ -218,9 +207,9 @@ public class GameProviderTest {
 
     @Test
     public void getNextGameNameDefaultExceptionTest() throws IOException {
-        Files.createDirectories(TMP_SAVE_GAME_PATH);
-        Path manifestFilePath = TMP_SAVE_GAME_PATH.resolve(GameManifest.DEFAULT_FILE_NAME);
-        writeToFile(manifestFilePath, MANIFEST_EXAMPLE.replace(DEFAULT_GAME_NAME, "bad"));
+        Files.createDirectories(tmpSaveGamePath);
+        Path manifestFilePath = tmpSaveGamePath.resolve(GameManifest.DEFAULT_FILE_NAME);
+        writeToFile(manifestFilePath, manifestExample.replace(DEFAULT_GAME_NAME, "bad"));
 
         final String name = GameProvider.getNextGameName();
 
@@ -256,10 +245,10 @@ public class GameProviderTest {
      * Creates an empty folder with given name {@code gameName} to mimic a save game.
      */
     private void mimicGameName(String gameName) throws IOException {
-        Path customSaveFolder = TMP_SAVES_FOLDER_PATH.resolve(gameName);
+        Path customSaveFolder = tmpSavesFolderPath.resolve(gameName);
         Files.createDirectories(customSaveFolder);
         Path manifestFilePath = customSaveFolder.resolve(GameManifest.DEFAULT_FILE_NAME);
-        writeToFile(manifestFilePath, MANIFEST_EXAMPLE.replace(DEFAULT_GAME_NAME, gameName));
+        writeToFile(manifestFilePath, manifestExample.replace(DEFAULT_GAME_NAME, gameName));
     }
 
 }

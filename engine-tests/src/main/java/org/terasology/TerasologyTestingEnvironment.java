@@ -45,7 +45,7 @@ import static org.mockito.Mockito.mock;
  * A base class for unit test classes to inherit to run in a Terasology environment - with LWJGL set up and so forth
  *
  */
-public abstract class TerasologyTestingEnvironment {
+public abstract class TerasologyTestingEnvironment implements MockedPathManager {
     protected  Context context;
 
     private  ModuleManager moduleManager;

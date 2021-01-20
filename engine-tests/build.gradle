@@ -55,7 +55,10 @@ dependencies {
     implementation group: 'com.google.protobuf', name: 'protobuf-java', version: '2.6.1'
     implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
     runtimeOnly group: 'org.slf4j', name: 'jul-to-slf4j', version: '1.7.21'
-    implementation group: 'org.reflections', name: 'reflections', version: '0.9.10'
+    implementation('org.reflections:reflections:0.9.10') {
+        exclude group: "org.javassist", module: "javassist" // exclude 3.18.2-GA - unsupport Java 11 and reflections unmaintained
+    }
+    implementation("org.javassist:javassist:3.27.0-GA") // supports java 11
 
     // Test lib dependencies
     implementation("org.junit.jupiter:junit-jupiter-api:5.5.2")
