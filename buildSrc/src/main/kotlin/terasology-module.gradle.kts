@@ -1,4 +1,4 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
 // Simple build file for modules - the one under the Core module is the template, will be copied as needed to modules
@@ -125,7 +125,10 @@ dependencies {
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.6.2")
     testImplementation("org.junit.jupiter:junit-jupiter-params:5.6.2")
-    testImplementation("org.mockito:mockito-junit-jupiter:3.2.0")
+    testImplementation("org.mockito:mockito-junit-jupiter:3.7.7") {
+        exclude(group = "org.mockito", module = "mockito-core")
+    }
+    testImplementation("org.mockito:mockito-inline:3.7.7")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.6.2")
 
     //backwards compatibility with modules tests
@@ -138,7 +141,10 @@ if (project.name == "ModuleTestingEnvironment") {
     dependencies {
         // MTE is a special snowflake, it gets these things as non-test dependencies
         implementation("org.junit.jupiter:junit-jupiter-api:5.6.2")
-        implementation("org.mockito:mockito-junit-jupiter:3.2.0")
+        implementation("org.mockito:mockito-junit-jupiter:3.7.7") {
+            exclude(group = "org.mockito", module = "mockito-core")
+        }
+        implementation("org.mockito:mockito-inline:3.7.7")
         implementation("junit:junit:4.12")
         //TODO: Remove shrinkwrap from code, you have FileSystem in java 8
         implementation("org.jboss.shrinkwrap:shrinkwrap-depchain-java7:1.2.1")
