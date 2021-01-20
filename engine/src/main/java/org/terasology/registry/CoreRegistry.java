@@ -1,18 +1,5 @@
-/*
- * Copyright 2013 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.registry;
 
 import org.terasology.context.Context;
@@ -22,7 +9,7 @@ import org.terasology.context.Context;
  *
  */
 public final class CoreRegistry {
-    private static Context context;
+    private static final ThreadLocal<Context> CONTEXT_THREAD_LOCAL = new InheritableThreadLocal<>();
 
     private CoreRegistry() {
     }
@@ -35,10 +22,10 @@ public final class CoreRegistry {
      * @param <T>
      */
     public static <T, U extends T> U put(Class<T> type, U object) {
-        if (context == null) {
+        if (CONTEXT_THREAD_LOCAL.get() == null) {
             return null;
         }
-        context.put(type, object);
+        CONTEXT_THREAD_LOCAL.get().put(type, object);
         return object;
     }
 
@@ -50,7 +37,7 @@ public final class CoreRegistry {
         if (System.getSecurityManager() != null) {
             System.getSecurityManager().checkPermission(new RuntimePermission("permRegister"));
         }
-        CoreRegistry.context = context;
+        CoreRegistry.CONTEXT_THREAD_LOCAL.set(context);
     }
 
     /**
@@ -60,13 +47,13 @@ public final class CoreRegistry {
      * @return The system fulfilling the given interface
      */
     public static <T> T get(Class<T> type) {
-        if (context == null) {
+        if (CONTEXT_THREAD_LOCAL.get() == null) {
             return null;
         }
         if (type == Context.class) {
-            return type.cast(context);
+            return type.cast(CONTEXT_THREAD_LOCAL.get());
         }
-        return context.get(type);
+        return CONTEXT_THREAD_LOCAL.get().get(type);
     }
 
 }

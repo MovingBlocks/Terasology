@@ -1,4 +1,4 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.world.chunks.pipeline;
@@ -42,10 +42,16 @@ import java.util.stream.Stream;
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
 class ChunkProcessingPipelineTest extends TerasologyTestingEnvironment {
 
-    private final BlockManager blockManager = new BlockManagerImpl(new NullWorldAtlas(),
-            CoreRegistry.get(AssetManager.class));
-    private final ExtraBlockDataManager extraDataManager = new ExtraBlockDataManager();
+    private BlockManager blockManager;
+    private ExtraBlockDataManager extraDataManager;
     private ChunkProcessingPipeline pipeline;
+
+    @BeforeEach
+    public void setup() {
+        blockManager = new BlockManagerImpl(new NullWorldAtlas(),
+                CoreRegistry.get(AssetManager.class));
+        extraDataManager = new ExtraBlockDataManager();
+    }
 
     @Test
     void simpleProcessingSuccess() throws ExecutionException, InterruptedException, TimeoutException {
