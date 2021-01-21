@@ -7,6 +7,7 @@ import com.google.common.collect.Lists;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.ResourceLock;
 import org.terasology.TerasologyTestingEnvironment;
 import org.terasology.config.Config;
 import org.terasology.engine.EngineTime;
@@ -43,6 +44,7 @@ public class TestNetwork extends TerasologyTestingEnvironment {
     }
 
     @Test
+    @ResourceLock("Net_7777")
     public void testNetwork() throws Exception {
         EngineEntityManager entityManager = getEntityManager();
         EngineTime time = mock(EngineTime.class);
@@ -67,6 +69,7 @@ public class TestNetwork extends TerasologyTestingEnvironment {
 
 
     @Test
+    @ResourceLock("Net_7777")
     public void testEntityNetworkIdChangedOnServerStart() throws HostingFailedException {
         EngineEntityManager entityManager = getEntityManager();
         NetworkComponent netComp = new NetworkComponent();

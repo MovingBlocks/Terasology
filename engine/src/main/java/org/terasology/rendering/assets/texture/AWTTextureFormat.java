@@ -1,36 +1,25 @@
-/*
- * Copyright 2016 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.rendering.assets.texture;
 
-import org.terasology.assets.module.annotations.RegisterAssetFileFormat;
-import org.terasology.assets.module.ModuleAssetDataProducer;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.format.AbstractAssetFileFormat;
 import org.terasology.assets.format.AssetDataFile;
+import org.terasology.assets.module.ModuleAssetDataProducer;
+import org.terasology.assets.module.annotations.RegisterAssetFileFormat;
+
+import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.DataBufferByte;
 import java.awt.image.WritableRaster;
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.file.PathMatcher;
 import java.util.List;
-import javax.imageio.ImageIO;
 
 /**
  */
@@ -122,7 +111,7 @@ public class AWTTextureFormat extends AbstractAssetFileFormat<TextureData> {
         } else {
             throw new IOException("Unsupported AWT format: " + image.getType());
         }
-        buf.flip();
+        ((Buffer) buf).flip(); // Explicitly casting for Java11/Java8 compability. problem at bytecode level
 
         return new TextureData(image.getWidth(), image.getHeight(), new ByteBuffer[]{buf}, Texture.WrapMode.CLAMP, filterMode);
     }

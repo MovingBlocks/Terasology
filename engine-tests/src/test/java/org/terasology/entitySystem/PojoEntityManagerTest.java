@@ -1,22 +1,8 @@
-/*
- * Copyright 2013 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.entitySystem;
 
 import com.google.common.collect.Lists;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.terasology.assets.AssetFactory;
@@ -67,12 +53,12 @@ import static org.terasology.entitySystem.entity.internal.EntityScope.CHUNK;
  */
 public class PojoEntityManagerTest {
 
-    private static Context context;
+    private Context context;
     private PojoEntityManager entityManager;
     private Prefab prefab;
 
-    @BeforeAll
-    public static void setupClass() throws Exception {
+    @BeforeEach
+    public void setup() throws Exception {
         context = new ContextImpl();
         ModuleManager moduleManager = ModuleManagerFactory.create();
         context.put(ModuleManager.class, moduleManager);
@@ -83,10 +69,7 @@ public class PojoEntityManagerTest {
         context.put(AssetManager.class, assetTypeManager.getAssetManager());
         context.put(RecordAndReplayCurrentStatus.class, new RecordAndReplayCurrentStatus());
         CoreRegistry.setContext(context);
-    }
 
-    @BeforeEach
-    public void setup() {
         context.put(NetworkSystem.class, mock(NetworkSystem.class));
         EntitySystemSetupUtil.addReflectionBasedLibraries(context);
         EntitySystemSetupUtil.addEntityManagementRelatedClasses(context);
