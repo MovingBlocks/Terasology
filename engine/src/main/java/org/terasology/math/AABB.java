@@ -30,7 +30,7 @@ import java.util.List;
 /**
  * An axis-aligned bounding box. Provides basic support for inclusion and intersection tests.
  * @deprecated this class is schedules for removal in an upcoming version
- *             Use the JOML implementation instead: {@link org.joml.AABBf}
+ *             Use the JOML implementation instead: {@link org.terasology.joml.geom.AABBf}
  **/
 @Deprecated
 public final class AABB {

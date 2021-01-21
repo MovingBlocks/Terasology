@@ -27,11 +27,13 @@ import com.badlogic.gdx.physics.bullet.linearmath.btDefaultMotionState;
 import gnu.trove.set.hash.TShortHashSet;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
+import org.joml.Vector3ic;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.physics.StandardCollisionGroup;
 import org.terasology.physics.bullet.BulletPhysics;
@@ -130,8 +132,8 @@ public class VoxelLiquidWorldSystem extends BaseComponentSystem {
      */
     @ReceiveEvent(components = WorldComponent.class)
     public void onChunkUloaded(BeforeChunkUnload beforeChunkUnload, EntityRef worldEntity) {
-        Vector3i chunkPos = beforeChunkUnload.getChunkPos();
-        wrapper.freeRegion(chunkPos.x, chunkPos.y, chunkPos.z);
+        Vector3ic chunkPos = beforeChunkUnload.getChunkPos();
+        wrapper.freeRegion(chunkPos.x(), chunkPos.y(), chunkPos.z());
     }
 
     /**
@@ -141,8 +143,8 @@ public class VoxelLiquidWorldSystem extends BaseComponentSystem {
      */
     @ReceiveEvent(components = WorldComponent.class)
     public void onNewChunk(OnChunkLoaded chunkAvailable, EntityRef worldEntity) {
-        Vector3i chunkPos = chunkAvailable.getChunkPos();
-        Chunk chunk = chunkProvider.getChunk(chunkPos);
+        Vector3ic chunkPos = chunkAvailable.getChunkPos();
+        Chunk chunk = chunkProvider.getChunk(JomlUtil.from(chunkPos));
         ByteBuffer buffer =
             ByteBuffer.allocateDirect(2 * (ChunkConstants.SIZE_X * ChunkConstants.SIZE_Y * ChunkConstants.SIZE_Z));
         buffer.order(ByteOrder.nativeOrder());
@@ -156,6 +158,6 @@ public class VoxelLiquidWorldSystem extends BaseComponentSystem {
             }
         }
         buffer.rewind();
-        wrapper.setRegion(chunkPos.x, chunkPos.y, chunkPos.z, buffer.asShortBuffer());
+        wrapper.setRegion(chunkPos.x(), chunkPos.y(), chunkPos.z(), buffer.asShortBuffer());
     }
 }

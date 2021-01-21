@@ -128,8 +128,8 @@ class LocalChunkProviderTest {
                     Event mustBeOnLoadedEvent = eventArgumentCaptor.getAllValues().get(1);
                     Assertions.assertTrue(mustBeOnLoadedEvent instanceof OnChunkLoaded,
                             "Second world event must be OnChunkLoaded");
-                    Assertions.assertEquals(((OnChunkLoaded) mustBeOnLoadedEvent).getChunkPos(),
-                            chunkPosition,
+                    Assertions.assertEquals(JomlUtil.from(chunkPosition),
+                            ((OnChunkLoaded) mustBeOnLoadedEvent).getChunkPos(),
                             "Chunk position at event not expected");
                 });
     }
@@ -157,8 +157,8 @@ class LocalChunkProviderTest {
                     Event mustBeOnLoadedEvent = worldEventCaptor.getAllValues().get(1);
                     Assertions.assertTrue(mustBeOnLoadedEvent instanceof OnChunkLoaded,
                             "Second world event must be OnChunkLoaded");
-                    Assertions.assertEquals(((OnChunkLoaded) mustBeOnLoadedEvent).getChunkPos(),
-                            chunkPosition,
+                    Assertions.assertEquals(JomlUtil.from(chunkPosition),
+                            ((OnChunkLoaded) mustBeOnLoadedEvent).getChunkPos(),
                             "Chunk position at event not expected");
                 });
 
@@ -192,8 +192,8 @@ class LocalChunkProviderTest {
         Event mustBeOnLoadedEvent = eventArgumentCaptor.getAllValues().get(0);
         Assertions.assertTrue(mustBeOnLoadedEvent instanceof OnChunkLoaded,
                 "Second world event must be OnChunkLoaded");
-        Assertions.assertEquals(((OnChunkLoaded) mustBeOnLoadedEvent).getChunkPos(),
-                chunkPosition,
+        Assertions.assertEquals(JomlUtil.from(chunkPosition),
+                ((OnChunkLoaded) mustBeOnLoadedEvent).getChunkPos(),
                 "Chunk position at event not expected");
     }
 
@@ -218,8 +218,8 @@ class LocalChunkProviderTest {
         Event mustBeOnLoadedEvent = eventArgumentCaptor.getAllValues().get(0);
         Assertions.assertTrue(mustBeOnLoadedEvent instanceof OnChunkLoaded,
                 "Second world event must be OnChunkLoaded");
-        Assertions.assertEquals(((OnChunkLoaded) mustBeOnLoadedEvent).getChunkPos(),
-                chunkPosition,
+        Assertions.assertEquals(JomlUtil.from(chunkPosition),
+                ((OnChunkLoaded) mustBeOnLoadedEvent).getChunkPos(),
                 "Chunk position at event not expected");
 
         //TODO, it is not clear if the activate/addedBlocks event logic is correct.
@@ -278,8 +278,8 @@ class LocalChunkProviderTest {
 
         Assertions.assertTrue(beforeChunkUnload.isPresent(),
                 "World events must have BeforeChunkUnload event when chunk was unload");
-        Assertions.assertEquals(beforeChunkUnload.get().getChunkPos(),
-                chunkPosition,
+        Assertions.assertEquals(JomlUtil.from(chunkPosition),
+                beforeChunkUnload.get().getChunkPos(),
                 "Chunk position at event not expected");
 
         //TODO, it is not clear if the activate/addedBlocks event logic is correct.

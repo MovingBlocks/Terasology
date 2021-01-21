@@ -17,7 +17,7 @@ package org.terasology.rendering.logic;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.SetMultimap;
-import org.joml.AABBf;
+import org.terasology.joml.geom.AABBf;
 import org.joml.Matrix3f;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;

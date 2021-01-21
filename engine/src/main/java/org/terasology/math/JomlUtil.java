@@ -15,14 +15,14 @@
  */
 package org.terasology.math;
 
-import org.joml.AABBf;
+import org.terasology.joml.geom.AABBf;
 import org.joml.Matrix3f;
 import org.joml.Matrix3fc;
 import org.joml.Matrix4fc;
 import org.joml.Quaternionf;
 import org.joml.Quaternionfc;
-import org.joml.Rectanglef;
-import org.joml.Rectanglei;
+import org.terasology.joml.geom.Rectanglef;
+import org.terasology.joml.geom.Rectanglei;
 import org.joml.Vector2fc;
 import org.joml.Vector2ic;
 import org.joml.Vector3fc;
@@ -244,6 +244,10 @@ public final class JomlUtil {
     }
 
     public static Map<org.terasology.math.geom.Vector3i, Block> blockMap(Map<Vector3i, Block> maps) {
+        return maps.entrySet().stream().collect(Collectors.toMap(k -> JomlUtil.from(k.getKey()), Map.Entry::getValue));
+    }
+
+    public static Map<Vector3ic, Block> toBlockMap(Map<org.terasology.math.geom.Vector3i, Block> maps) {
         return maps.entrySet().stream().collect(Collectors.toMap(k -> JomlUtil.from(k.getKey()), Map.Entry::getValue));
     }
 }

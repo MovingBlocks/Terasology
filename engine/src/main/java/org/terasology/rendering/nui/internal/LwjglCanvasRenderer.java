@@ -8,8 +8,8 @@ import com.google.common.collect.Sets;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Quaternionfc;
-import org.joml.Rectanglef;
-import org.joml.Rectanglei;
+import org.terasology.joml.geom.Rectanglef;
+import org.terasology.joml.geom.Rectanglei;
 import org.joml.Vector2f;
 import org.joml.Vector2ic;
 import org.joml.Vector3f;
@@ -88,7 +88,7 @@ public class LwjglCanvasRenderer implements TerasologyCanvasRenderer, PropertyCh
     private Map<TextCacheKey, Map<Material, Mesh>> cachedText = Maps.newLinkedHashMap();
     private Set<TextCacheKey> usedText = Sets.newHashSet();
 
-    // Texutre mesh caching
+    // Texture mesh caching
     private Map<TextureCacheKey, Mesh> cachedTextures = Maps.newLinkedHashMap();
     private Set<TextureCacheKey> usedTextures = Sets.newHashSet();
 

@@ -16,7 +16,7 @@
 
 package org.terasology.rendering.nui.animation;
 
-import org.joml.Rectanglei;
+import org.terasology.joml.geom.Rectanglei;
 
 /**
  * Controls animations to and from different screens

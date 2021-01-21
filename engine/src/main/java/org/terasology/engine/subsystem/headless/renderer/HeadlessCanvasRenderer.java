@@ -4,7 +4,7 @@
 package org.terasology.engine.subsystem.headless.renderer;
 
 import org.joml.Quaternionfc;
-import org.joml.Rectanglei;
+import org.terasology.joml.geom.Rectanglei;
 import org.joml.Vector2i;
 import org.joml.Vector2ic;
 import org.joml.Vector3fc;

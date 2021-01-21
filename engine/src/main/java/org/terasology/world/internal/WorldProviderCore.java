@@ -18,6 +18,7 @@ package org.terasology.world.internal;
 import com.google.common.collect.Maps;
 import org.joml.Vector3ic;
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.Region3i;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.world.WorldChangeListener;
@@ -76,14 +77,18 @@ public interface WorldProviderCore {
      * @param chunkPos
      * @return A world view centered on the desired chunk, with the surrounding chunks present.
      */
-    ChunkViewCore getLocalView(Vector3i chunkPos);
+    ChunkViewCore getLocalView(Vector3ic chunkPos);
 
     /**
      * @param chunk
      * @return A world view of the chunks around the desired chunk, uncentered.
      */
-    ChunkViewCore getWorldViewAround(Vector3i chunk);
+    ChunkViewCore getWorldViewAround(Vector3ic chunk);
 
+    @Deprecated
+    default ChunkViewCore getWorldViewAround(Vector3i chunk) {
+        return getWorldViewAround(JomlUtil.from(chunk));
+    }
 
     /**
      * An active block is in a chunk that is available and fully generated.
@@ -95,7 +100,10 @@ public interface WorldProviderCore {
      */
     boolean isBlockRelevant(int x, int y, int z);
 
-    boolean isRegionRelevant(Region3i region);
+    @Deprecated
+    default boolean isRegionRelevant(Region3i region) {
+        return isRegionRelevant(JomlUtil.from(region));
+    }
 
     boolean isRegionRelevant(BlockRegionc region);
 
@@ -109,8 +117,9 @@ public interface WorldProviderCore {
      *             method will be replaced with JOML implementation {@link #setBlock(Vector3ic, Block)}.
      */
     @Deprecated
-    Block setBlock(Vector3i pos, Block type);
-
+    default Block setBlock(Vector3i pos, Block type) {
+        return setBlock(JomlUtil.from(pos), type);
+    }
 
     /**
      * Places a block of a specific type at a given position
@@ -191,7 +200,12 @@ public interface WorldProviderCore {
      * @param value
      * @return The replaced value
      */
-    int setExtraData(int index, Vector3i pos, int value);
+    int setExtraData(int index, Vector3ic pos, int value);
+
+    @Deprecated
+    default int setExtraData(int index, Vector3i pos, int value) {
+        return setExtraData(index, JomlUtil.from(pos), value);
+    }
 
     /**
      * Disposes this world provider.

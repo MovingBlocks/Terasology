@@ -15,7 +15,7 @@
  */
 package org.terasology.rendering.nui.widgets.browser.data.basic.flow;
 
-import org.joml.Rectanglei;
+import org.terasology.joml.geom.Rectanglei;
 import org.terasology.nui.Canvas;
 import org.terasology.nui.UITextureRegion;
 import org.terasology.rendering.nui.widgets.browser.ui.style.TextRenderStyle;

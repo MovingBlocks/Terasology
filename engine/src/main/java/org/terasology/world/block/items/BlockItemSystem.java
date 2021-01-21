@@ -15,7 +15,7 @@
  */
 package org.terasology.world.block.items;
 
-import org.joml.AABBf;
+import org.terasology.joml.geom.AABBf;
 import org.joml.Vector2f;
 import org.joml.Vector3fc;
 import org.joml.Vector3i;

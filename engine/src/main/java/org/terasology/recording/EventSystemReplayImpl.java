@@ -370,6 +370,11 @@ public class EventSystemReplayImpl implements EventSystem {
         }
     }
 
+    @Override
+    public void setToCurrentThread() {
+        mainThread = Thread.currentThread();
+    }
+
     private void addEventHandler(Class<? extends Event> type, EventSystemReplayImpl.EventHandlerInfo handler, Collection<Class<? extends Component>> components) {
         if (components.isEmpty()) {
             generalHandlers.put(type, handler);
