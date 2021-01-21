@@ -62,18 +62,8 @@
                     },
                     {
                         "type": "UIButton",
-                        "id": "test",
+                        "id": "auto",
                         "text": "autoconfig"
-                    },
-                    {
-                        "type": "UIButton",
-                        "id": "test2",
-                        "text": "math"
-                    },
-                    {
-                        "type": "UIButton",
-                        "id": "test3",
-                        "text": "buildin"
                     },
                     {
                         "type": "UISpace",

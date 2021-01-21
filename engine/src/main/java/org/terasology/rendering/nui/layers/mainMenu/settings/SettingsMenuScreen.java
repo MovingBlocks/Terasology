@@ -1,4 +1,4 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.rendering.nui.layers.mainMenu.settings;
 
@@ -28,9 +28,7 @@ public class SettingsMenuScreen extends CoreScreenLayer {
         WidgetUtil.trySubscribe(this, "video", button -> triggerForwardAnimation(VideoSettingsScreen.ASSET_URI));
         WidgetUtil.trySubscribe(this, "audio", button -> triggerForwardAnimation(AudioSettingsScreen.ASSET_URI));
         WidgetUtil.trySubscribe(this, "input", button -> triggerForwardAnimation(InputSettingsScreen.ASSET_URI));
-        WidgetUtil.trySubscribe(this, "test", button -> triggerForwardAnimation(new ResourceUrn("engine:autoConfigTestScreen")));
-        WidgetUtil.trySubscribe(this, "test2", button -> triggerForwardAnimation(new ResourceUrn("engine:mathTypeWidgetTestScreen")));
-        WidgetUtil.trySubscribe(this, "test3", button -> triggerForwardAnimation(new ResourceUrn("engine:builtinTypeWidgetTestScreen")));
+        WidgetUtil.trySubscribe(this, "auto", button -> triggerForwardAnimation(new ResourceUrn("engine:autoConfigTestScreen")));
         WidgetUtil.trySubscribe(this, "close", button -> {
             config.save();
             triggerBackAnimation();
