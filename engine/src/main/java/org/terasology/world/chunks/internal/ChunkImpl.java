@@ -346,7 +346,7 @@ public class ChunkImpl implements Chunk {
     public AABBfc getAABB() {
         if (!aabb.isValid()) {
             org.joml.Vector3f min = JomlUtil.from(getChunkWorldOffset().toVector3f());
-            org.joml.Vector3f max = min.add(new org.joml.Vector3f(Chunks.CHUNK_SIZE));
+            org.joml.Vector3f max = new org.joml.Vector3f(Chunks.CHUNK_SIZE).add(min);
             aabb = new AABBf(min, max);
         }
         return aabb;
