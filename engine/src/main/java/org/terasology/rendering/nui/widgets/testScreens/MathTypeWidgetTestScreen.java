@@ -1,15 +1,15 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.rendering.nui.widgets.testScreens;
 
 import org.joml.Quaternionf;
-import org.joml.Rectanglef;
-import org.joml.Rectanglei;
 import org.joml.Vector2f;
 import org.joml.Vector2i;
 import org.joml.Vector3f;
 import org.joml.Vector3i;
 import org.joml.Vector4f;
+import org.terasology.joml.geom.Rectanglef;
+import org.terasology.joml.geom.Rectanglei;
 
 public class MathTypeWidgetTestScreen extends TypeWidgetTestScreen {
     @Override
