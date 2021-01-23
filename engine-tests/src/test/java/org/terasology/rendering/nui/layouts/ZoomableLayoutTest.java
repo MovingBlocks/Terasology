@@ -15,7 +15,7 @@
  */
 package org.terasology.rendering.nui.layouts;
 
-import org.joml.Rectanglei;
+import org.terasology.joml.geom.Rectanglei;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.joml.Vector2f;
@@ -61,7 +61,7 @@ public class ZoomableLayoutTest {
 
         canvas = mock(Canvas.class);
 
-        //    
+        //
         //   +------+
         //   |  1   |
         //   +------+

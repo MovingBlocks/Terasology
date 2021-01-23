@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.rendering.cameras;
 
-import org.joml.AABBf;
+import org.terasology.joml.geom.AABBf;
 import org.joml.AxisAngle4f;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
@@ -11,6 +11,7 @@ import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.lwjgl.BufferUtils;
 import org.terasology.config.Config;
+import org.terasology.joml.geom.AABBfc;
 import org.terasology.math.AABB;
 import org.terasology.math.Direction;
 import org.terasology.math.JomlUtil;
@@ -259,7 +260,7 @@ public abstract class Camera {
         return viewFrustum.intersects(aabb);
     }
 
-    public boolean hasInSight(AABBf aabb) {
+    public boolean hasInSight(AABBfc aabb) {
         return viewFrustum.intersects(aabb);
     }
 }

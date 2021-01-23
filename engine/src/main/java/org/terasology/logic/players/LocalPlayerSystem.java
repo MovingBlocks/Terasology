@@ -16,6 +16,7 @@
 package org.terasology.logic.players;
 
 import org.joml.Math;
+import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.terasology.assets.ResourceUrn;
@@ -50,6 +51,8 @@ import org.terasology.input.binds.movement.VerticalMovementAxis;
 import org.terasology.input.binds.movement.VerticalRealMovementAxis;
 import org.terasology.input.events.MouseAxisEvent;
 import org.terasology.input.events.MouseAxisEvent.MouseAxis;
+import org.terasology.joml.geom.AABBf;
+import org.terasology.joml.geom.AABBfc;
 import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.characters.CharacterHeldItemComponent;
 import org.terasology.logic.characters.CharacterMoveInputEvent;
@@ -128,11 +131,11 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
     @In
     private Time time;
 
-    private BlockOverlayRenderer aabbRenderer = new AABBRenderer(AABB.createEmpty());
+    private BlockOverlayRenderer aabbRenderer = new AABBRenderer(new AABBf());
 
     private int inputSequenceNumber = 1;
 
-    private AABB aabb;
+    private AABBf aabb = new AABBf();
 
     public void setPlayerCamera(Camera camera) {
         playerCamera = camera;
@@ -371,23 +374,21 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
         EntityRef target = event.getNewTarget();
         if (target.exists()) {
             LocationComponent location = target.getComponent(LocationComponent.class);
-            if (location != null && !Float.isNaN(location.getWorldPosition().x)) {
+            if (location != null) {
                 BlockComponent blockComp = target.getComponent(BlockComponent.class);
                 BlockRegionComponent blockRegion = target.getComponent(BlockRegionComponent.class);
                 if (blockComp != null || blockRegion != null) {
                     Vector3f blockPos = location.getWorldPosition(new Vector3f());
                     Block block = worldProvider.getBlock(blockPos);
-                    aabb = JomlUtil.from(block.getBounds(blockPos));
+                    aabb.set(block.getBounds(blockPos));
                 } else {
                     MeshComponent mesh = target.getComponent(MeshComponent.class);
                     if (mesh != null && mesh.mesh != null) {
-                        aabb = mesh.mesh.getAABB();
-                        aabb = aabb.transform(location.getWorldRotation(), location.getWorldPosition(), location.getWorldScale());
+                        aabb.set(mesh.mesh.getAABB());
+                        aabb.transform(new Matrix4f().translationRotateScale(location.getWorldPosition(new Vector3f()), location.getWorldRotation(new Quaternionf()), location.getWorldScale()));
                     }
                 }
             }
-        } else {
-            aabb = null;
         }
     }
 

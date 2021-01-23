@@ -275,7 +275,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
     public Block getBlock(int x, int y, int z) {
         CoreChunk chunk = chunkProvider.getChunk(Chunks.toChunkPos(x, y, z, new Vector3i()));
         if (chunk != null) {
-            return chunk.getBlock(Chunks.toRelativeX(x), Chunks.toRelativeX(y), Chunks.toRelativeX(z));
+            return chunk.getBlock(Chunks.toRelativeX(x), Chunks.toRelativeY(y), Chunks.toRelativeZ(z));
         }
         return unloadedBlock;
     }

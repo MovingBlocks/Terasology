@@ -16,7 +16,7 @@
 
 package org.terasology.rendering.nui.animation;
 
-import org.joml.Rectanglei;
+import org.terasology.joml.geom.Rectanglei;
 
 /**
  * Does not do anything. The {@link #onEnd(Runnable)} method is triggered instantly.

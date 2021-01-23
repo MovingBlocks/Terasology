@@ -17,11 +17,14 @@
 package org.terasology.persistence.internal;
 
 import com.google.common.collect.Lists;
+import org.joml.Vector3f;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.entitySystem.entity.internal.OwnershipHelper;
+import org.terasology.joml.geom.AABBf;
+import org.terasology.joml.geom.AABBfc;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.AABB;
 import org.terasology.math.JomlUtil;
@@ -184,12 +187,12 @@ public abstract class AbstractStorageManager implements StorageManager {
     protected Collection<EntityRef> getEntitiesOfChunk(Chunk chunk) {
         List<EntityRef> entitiesToStore = Lists.newArrayList();
 
-        AABB aabb = chunk.getAABB();
+        AABBfc aabb = chunk.getAABB();
         for (EntityRef entity : getEntityManager().getEntitiesWith(LocationComponent.class)) {
             if (!entity.getOwner().exists() && !entity.isAlwaysRelevant() && !entity.hasComponent(ClientComponent.class)) {
                 LocationComponent loc = entity.getComponent(LocationComponent.class);
                 if (loc != null&& !Float.isNaN(loc.getWorldPosition().x)) {
-                    if (aabb.contains(loc.getWorldPosition())) {
+                    if (aabb.containsPoint(loc.getWorldPosition(new Vector3f()))) {
                         entitiesToStore.add(entity);
                     }
                 }

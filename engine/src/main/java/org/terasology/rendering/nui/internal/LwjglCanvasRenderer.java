@@ -8,8 +8,9 @@ import com.google.common.collect.Sets;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Quaternionfc;
-import org.joml.Rectanglef;
-import org.joml.Rectanglei;
+import org.terasology.joml.geom.AABBfc;
+import org.terasology.joml.geom.Rectanglef;
+import org.terasology.joml.geom.Rectanglei;
 import org.joml.Vector2f;
 import org.joml.Vector2ic;
 import org.joml.Vector3f;
@@ -181,10 +182,10 @@ public class LwjglCanvasRenderer implements TerasologyCanvasRenderer, PropertyCh
             return;
         }
 
-        AABB meshAABB = mesh.getAABB();
-        Vector3f meshExtents = JomlUtil.from(meshAABB.getExtents());
+        AABBfc meshAABB = mesh.getAABB();
+        Vector3f meshExtents = meshAABB.extent(new Vector3f());
         float fitScale = 0.35f * Math.min(drawRegion.lengthX(), drawRegion.lengthY()) / Math.max(meshExtents.x, Math.max(meshExtents.y, meshExtents.z));
-        Vector3f centerOffset = JomlUtil.from(meshAABB.getCenter());
+        Vector3f centerOffset = meshAABB.center(new Vector3f());
         centerOffset.mul(-1.0f);
 
         Matrix4f centerTransform = new Matrix4f().translationRotateScale(centerOffset,new Quaternionf(),1);
