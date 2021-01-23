@@ -131,7 +131,7 @@ public class RelevanceSystem implements UpdateSubscriberSystem {
                         if (chunk != null) {
                             chunkRelevanceRegion.checkIfChunkIsRelevant(chunk);
                         } else {
-                            chunkProvider.createOrLoadChunk(JomlUtil.from(pos));
+                            chunkProvider.createOrLoadChunk(pos);
                         }
                     }
                     chunkRelevanceRegion.setUpToDate();
@@ -181,7 +181,7 @@ public class RelevanceSystem implements UpdateSubscriberSystem {
                             if (chunk != null) {
                                 region.checkIfChunkIsRelevant(chunk);
                             } else {
-                                chunkProvider.createOrLoadChunk(JomlUtil.from(pos));
+                                chunkProvider.createOrLoadChunk(pos);
                             }
                         }
                 );

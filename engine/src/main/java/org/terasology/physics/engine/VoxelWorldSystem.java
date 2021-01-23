@@ -33,8 +33,6 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
-import org.terasology.math.JomlUtil;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.physics.StandardCollisionGroup;
 import org.terasology.physics.bullet.BulletPhysics;
 import org.terasology.physics.bullet.shapes.BulletCollisionShape;
@@ -47,6 +45,7 @@ import org.terasology.world.block.BlockComponent;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.ChunkProvider;
+import org.terasology.world.chunks.Chunks;
 import org.terasology.world.chunks.event.BeforeChunkUnload;
 import org.terasology.world.chunks.event.OnChunkLoaded;
 
@@ -143,13 +142,13 @@ public class VoxelWorldSystem extends BaseComponentSystem {
     @ReceiveEvent(components = WorldComponent.class)
     public void onNewChunk(OnChunkLoaded chunkAvailable, EntityRef worldEntity) {
         Vector3ic chunkPos = chunkAvailable.getChunkPos();
-        Chunk chunk = chunkProvider.getChunk(JomlUtil.from(chunkPos));
+        Chunk chunk = chunkProvider.getChunk(chunkPos);
         ByteBuffer buffer =
-            ByteBuffer.allocateDirect(2 * (ChunkConstants.SIZE_X * ChunkConstants.SIZE_Y * ChunkConstants.SIZE_Z));
+            ByteBuffer.allocateDirect(2 * (Chunks.SIZE_X * Chunks.SIZE_Y * Chunks.SIZE_Z));
         buffer.order(ByteOrder.nativeOrder());
-        for (int z = 0; z < ChunkConstants.SIZE_Z; z++) {
-            for (int x = 0; x < ChunkConstants.SIZE_X; x++) {
-                for (int y = 0; y < ChunkConstants.SIZE_Y; y++) {
+        for (int z = 0; z < Chunks.SIZE_Z; z++) {
+            for (int x = 0; x < Chunks.SIZE_X; x++) {
+                for (int y = 0; y < Chunks.SIZE_Y; y++) {
                     Block block = chunk.getBlock(x, y, z);
                     tryRegister(block);
                     buffer.putShort(block.getId());

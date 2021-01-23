@@ -3,6 +3,7 @@
 package org.terasology.world.chunks.localChunkProvider;
 
 import com.google.common.collect.Maps;
+import org.joml.Vector3ic;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -54,7 +55,7 @@ class LocalChunkProviderTest {
     private ExtraBlockDataManager extraDataManager;
     private BlockEntityRegistry blockEntityRegistry;
     private EntityRef worldEntity;
-    private Map<Vector3i, Chunk> chunkCache;
+    private Map<Vector3ic, Chunk> chunkCache;
     private Block blockAtBlockManager;
     private TestStorageManager storageManager;
     private TestWorldGenerator generator;
@@ -90,14 +91,14 @@ class LocalChunkProviderTest {
     }
 
     private Future<Chunk> requestCreatingOrLoadingArea(Vector3i chunkPosition, int radius) {
-        Future<Chunk> chunkFuture = chunkProvider.createOrLoadChunk(chunkPosition);
+        Future<Chunk> chunkFuture = chunkProvider.createOrLoadChunk(JomlUtil.from(chunkPosition));
         BlockRegion extentsRegion = new BlockRegion(
                 chunkPosition.x - radius, chunkPosition.y - radius, chunkPosition.z - radius,
                 chunkPosition.x + radius, chunkPosition.y + radius, chunkPosition.z + radius);
 
         extentsRegion.iterator().forEachRemaining(pos -> {
             if (!pos.equals(JomlUtil.from(chunkPosition))) { // remove center. we takes future for it already.
-                chunkProvider.createOrLoadChunk(JomlUtil.from(pos));
+                chunkProvider.createOrLoadChunk(pos);
             }
         });
         return chunkFuture;
@@ -184,7 +185,7 @@ class LocalChunkProviderTest {
         requestCreatingOrLoadingArea(chunkPosition).get(WAIT_CHUNK_IS_READY_IN_SECONDS, TimeUnit.SECONDS);
         chunkProvider.update();
 
-        Assertions.assertTrue(((TestChunkStore) storageManager.loadChunkStore(chunkPosition)).isEntityRestored(),
+        Assertions.assertTrue(((TestChunkStore) storageManager.loadChunkStore(JomlUtil.from(chunkPosition))).isEntityRestored(),
                 "Entities must be restored by loading");
 
         final ArgumentCaptor<Event> eventArgumentCaptor = ArgumentCaptor.forClass(Event.class);
@@ -209,7 +210,7 @@ class LocalChunkProviderTest {
         requestCreatingOrLoadingArea(chunkPosition).get(WAIT_CHUNK_IS_READY_IN_SECONDS, TimeUnit.SECONDS);
         chunkProvider.update();
 
-        Assertions.assertTrue(((TestChunkStore) storageManager.loadChunkStore(chunkPosition)).isEntityRestored(),
+        Assertions.assertTrue(((TestChunkStore) storageManager.loadChunkStore(JomlUtil.from(chunkPosition))).isEntityRestored(),
                 "Entities must be restored by loading");
 
 

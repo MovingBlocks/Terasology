@@ -10,6 +10,7 @@ import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.map.TShortObjectMap;
 import gnu.trove.map.hash.TShortObjectHashMap;
+import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,11 +19,7 @@ import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.EntityStore;
 import org.terasology.entitySystem.prefab.Prefab;
-import org.terasology.math.ChunkMath;
 import org.terasology.math.JomlUtil;
-import org.terasology.math.Region3i;
-import org.terasology.math.TeraMath;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.monitoring.chunk.ChunkMonitor;
 import org.terasology.persistence.ChunkStore;
@@ -33,12 +30,13 @@ import org.terasology.world.block.BeforeDeactivateBlocks;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.BlockRegion;
+import org.terasology.world.block.BlockRegionc;
 import org.terasology.world.block.OnActivatedBlocks;
 import org.terasology.world.block.OnAddedBlocks;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkBlockIterator;
-import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.ChunkProvider;
+import org.terasology.world.chunks.Chunks;
 import org.terasology.world.chunks.ManagedChunk;
 import org.terasology.world.chunks.blockdata.ExtraBlockDataManager;
 import org.terasology.world.chunks.event.BeforeChunkUnload;
@@ -94,9 +92,9 @@ public class LocalChunkProvider implements ChunkProvider {
     private final EntityManager entityManager;
     private final BlockingQueue<Chunk> readyChunks = Queues.newLinkedBlockingQueue();
     private final BlockingQueue<TShortObjectMap<TIntList>> deactivateBlocksQueue = Queues.newLinkedBlockingQueue();
-    private final Map<Vector3i, Chunk> chunkCache;
+    private final Map<Vector3ic, Chunk> chunkCache;
 
-    private final Map<org.joml.Vector3i, List<EntityStore>> generateQueuedEntities = new ConcurrentHashMap<>();
+    private final Map<Vector3ic, List<EntityStore>> generateQueuedEntities = new ConcurrentHashMap<>();
 
     private final StorageManager storageManager;
     private final WorldGenerator generator;
@@ -111,7 +109,7 @@ public class LocalChunkProvider implements ChunkProvider {
 
     public LocalChunkProvider(StorageManager storageManager, EntityManager entityManager, WorldGenerator generator,
                               BlockManager blockManager, ExtraBlockDataManager extraDataManager,
-                              Map<Vector3i, Chunk> chunkCache) {
+                              Map<Vector3ic, Chunk> chunkCache) {
         this.storageManager = storageManager;
         this.entityManager = entityManager;
         this.generator = generator;
@@ -123,22 +121,20 @@ public class LocalChunkProvider implements ChunkProvider {
     }
 
 
-    protected Future<Chunk> createOrLoadChunk(Vector3i chunkPos) {
-        return loadingPipeline.invokeGeneratorTask(
-                JomlUtil.from(chunkPos),
-                () -> {
-                    ChunkStore chunkStore = storageManager.loadChunkStore(chunkPos);
-                    Chunk chunk;
-                    EntityBufferImpl buffer = new EntityBufferImpl();
-                    if (chunkStore == null) {
-                        chunk = new ChunkImpl(chunkPos, blockManager, extraDataManager);
-                        generator.createChunk(chunk, buffer);
-                        generateQueuedEntities.put(chunk.getPosition(new org.joml.Vector3i()), buffer.getAll());
-                    } else {
-                        chunk = chunkStore.getChunk();
-                    }
-                    return chunk;
-                });
+    protected Future<Chunk> createOrLoadChunk(Vector3ic chunkPos) {
+        return loadingPipeline.invokeGeneratorTask(new Vector3i(chunkPos), () -> {
+            ChunkStore chunkStore = storageManager.loadChunkStore(chunkPos);
+            Chunk chunk;
+            EntityBufferImpl buffer = new EntityBufferImpl();
+            if (chunkStore == null) {
+                chunk = new ChunkImpl(JomlUtil.from(chunkPos), blockManager, extraDataManager);
+                generator.createChunk(chunk, buffer);
+                generateQueuedEntities.put(chunk.getPosition(new org.joml.Vector3i()), buffer.getAll());
+            } else {
+                chunk = chunkStore.getChunk();
+            }
+            return chunk;
+        });
     }
 
     public void setBlockEntityRegistry(BlockEntityRegistry value) {
@@ -146,41 +142,42 @@ public class LocalChunkProvider implements ChunkProvider {
     }
 
     @Override
-    public ChunkViewCore getLocalView(Vector3i centerChunkPos) {
-        Region3i region = Region3i.createFromCenterExtents(centerChunkPos, ChunkConstants.LOCAL_REGION_EXTENTS);
+    public ChunkViewCore getLocalView(Vector3ic centerChunkPos) {
+        BlockRegion region = new BlockRegion(centerChunkPos).expand(Chunks.LOCAL_REGION_EXTENTS);
         if (getChunk(centerChunkPos) != null) {
-            return createWorldView(region, Vector3i.one());
+            return createWorldView(region, new Vector3i(1, 1, 1));
         }
         return null;
     }
 
     @Override
-    public ChunkViewCore getSubviewAroundBlock(Vector3i blockPos, int extent) {
-        Region3i region = ChunkMath.getChunkRegionAroundWorldPos(blockPos, extent);
-        return createWorldView(region, new Vector3i(-region.min().x, -region.min().y, -region.min().z));
+    public ChunkViewCore getSubviewAroundBlock(Vector3ic blockPos, int extent) {
+        BlockRegion region = new BlockRegion(blockPos).expand(extent, extent, extent);
+        Chunks.toChunkRegion(region, region);
+        return createWorldView(region, new Vector3i(-region.minX(), -region.minY(), -region.minZ()));
     }
 
     @Override
-    public ChunkViewCore getSubviewAroundChunk(Vector3i chunkPos) {
-        Region3i region = Region3i.createFromCenterExtents(chunkPos, ChunkConstants.LOCAL_REGION_EXTENTS);
+    public ChunkViewCore getSubviewAroundChunk(Vector3ic chunkPos) {
+        BlockRegion region = new BlockRegion(chunkPos).expand(Chunks.LOCAL_REGION_EXTENTS);
         if (getChunk(chunkPos) != null) {
-            return createWorldView(region, new Vector3i(-region.min().x, -region.min().y, -region.min().z));
+            return createWorldView(region, new Vector3i(-region.minX(), -region.minY(), -region.minZ()));
         }
         return null;
     }
 
-    private ChunkViewCore createWorldView(Region3i region, Vector3i offset) {
-        Chunk[] chunks = new Chunk[region.sizeX() * region.sizeY() * region.sizeZ()];
-        for (Vector3i chunkPos : region) {
+    private ChunkViewCore createWorldView(BlockRegionc region, Vector3ic offset) {
+        Chunk[] chunks = new Chunk[region.volume()];
+        for (Vector3ic chunkPos : region) {
             Chunk chunk = chunkCache.get(chunkPos);
             if (chunk == null) {
                 return null;
             }
-            chunkPos.sub(region.minX(), region.minY(), region.minZ());
-            int index = TeraMath.calculate3DArrayIndex(chunkPos, region.size());
+
+            int index = (chunkPos.x() - region.minX()) + region.getSizeX() * ((chunkPos.z() - region.minZ()) + region.getSizeZ() * (chunkPos.y() - region.minY()));
             chunks[index] = chunk;
         }
-        return new ChunkViewCoreImpl(chunks, JomlUtil.from(region), JomlUtil.from(offset), blockManager.getBlock(BlockManager.AIR_ID));
+        return new ChunkViewCoreImpl(chunks, region, offset, blockManager.getBlock(BlockManager.AIR_ID));
     }
 
     @Override
@@ -190,14 +187,14 @@ public class LocalChunkProvider implements ChunkProvider {
 
 
     private void processReadyChunk(final Chunk chunk) {
-        if (chunkCache.get(chunk.getPosition()) != null) {
+        if (chunkCache.get(chunk.getPosition(new Vector3i())) != null) {
             return; // TODO move it in pipeline;
         }
-        chunkCache.put(chunk.getPosition(), chunk);
+        chunkCache.put(chunk.getPosition(new Vector3i()), chunk);
         chunk.markReady();
         //TODO, it is not clear if the activate/addedBlocks event logic is correct.
         //See https://github.com/MovingBlocks/Terasology/issues/3244
-        ChunkStore store = this.storageManager.loadChunkStore(chunk.getPosition());
+        ChunkStore store = this.storageManager.loadChunkStore(chunk.getPosition(new Vector3i()));
         TShortObjectMap<TIntList> mappings = createBatchBlockEventMappings(chunk);
         if (store != null) {
             store.restoreEntities();
@@ -269,7 +266,7 @@ public class LocalChunkProvider implements ChunkProvider {
 
     private void deactivateBlocks() {
         List<TShortObjectMap<TIntList>> deactivatedBlockSets =
-                Lists.newArrayListWithExpectedSize(deactivateBlocksQueue.size());
+            Lists.newArrayListWithExpectedSize(deactivateBlocksQueue.size());
         deactivateBlocksQueue.drainTo(deactivatedBlockSets);
         for (TShortObjectMap<TIntList> deactivatedBlockSet : deactivatedBlockSets) {
             deactivatedBlockSet.forEachEntry((id, positions) -> {
@@ -285,12 +282,12 @@ public class LocalChunkProvider implements ChunkProvider {
         PerformanceMonitor.startActivity("Unloading irrelevant chunks");
         int unloaded = 0;
         Iterator<org.joml.Vector3ic> iterator = Iterators.concat(
-                Iterators.transform(chunkCache.keySet().iterator(), v -> new org.joml.Vector3i(v.x, v.y, v.z)),
-                loadingPipeline.getProcessingPosition().iterator());
+            Iterators.transform(chunkCache.keySet().iterator(), v -> new Vector3i(v.x(), v.y(), v.z())),
+            loadingPipeline.getProcessingPosition().iterator());
         while (iterator.hasNext()) {
             org.joml.Vector3ic pos = iterator.next();
             boolean keep = relevanceSystem.isChunkInRegions(pos); // TODO: move it to relevance system.
-            if (!keep && unloadChunkInternal(JomlUtil.from(pos))) {
+            if (!keep && unloadChunkInternal(pos)) {
                 iterator.remove();
                 if (++unloaded >= UNLOAD_PER_FRAME) {
                     break;
@@ -304,10 +301,10 @@ public class LocalChunkProvider implements ChunkProvider {
         PerformanceMonitor.endActivity();
     }
 
-    private boolean unloadChunkInternal(Vector3i pos) {
-        if (loadingPipeline.isPositionProcessing(JomlUtil.from(pos))) {
+    private boolean unloadChunkInternal(Vector3ic pos) {
+        if (loadingPipeline.isPositionProcessing(pos)) {
             // Chunk hasn't been finished or changed, so just drop it.
-            loadingPipeline.stopProcessingAt(JomlUtil.from(pos));
+            loadingPipeline.stopProcessingAt(pos);
             return false;
         }
         Chunk chunk = chunkCache.get(pos);
@@ -315,7 +312,7 @@ public class LocalChunkProvider implements ChunkProvider {
             return false;
         }
 
-        worldEntity.send(new BeforeChunkUnload(JomlUtil.from(pos)));
+        worldEntity.send(new BeforeChunkUnload(pos));
         storageManager.deactivateChunk(chunk);
         chunk.dispose();
 
@@ -339,7 +336,7 @@ public class LocalChunkProvider implements ChunkProvider {
     private TShortObjectMap<TIntList> createBatchBlockEventMappings(Chunk chunk) {
         TShortObjectMap<TIntList> batchBlockMap = new TShortObjectHashMap<>();
         blockManager.listRegisteredBlocks().stream().filter(Block::isLifecycleEventsRequired).forEach(block ->
-                batchBlockMap.put(block.getId(), new TIntArrayList()));
+            batchBlockMap.put(block.getId(), new TIntArrayList()));
 
         ChunkBlockIterator i = chunk.getBlockIterator();
         while (i.next()) {
@@ -358,24 +355,13 @@ public class LocalChunkProvider implements ChunkProvider {
         return getChunk(new Vector3i(x, y, z));
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @deprecated use {@link #getChunk(org.joml.Vector3ic)} instead. TODO replace with joml.
-     */
     @Override
-    @Deprecated
-    public Chunk getChunk(Vector3i pos) {
+    public Chunk getChunk(Vector3ic pos) {
         Chunk chunk = chunkCache.get(pos);
         if (isChunkReady(chunk)) {
             return chunk;
         }
         return null;
-    }
-
-    @Override
-    public Chunk getChunk(org.joml.Vector3ic pos) {
-        return getChunk(JomlUtil.from(pos));
     }
 
     @Override
@@ -401,7 +387,7 @@ public class LocalChunkProvider implements ChunkProvider {
         shutdown();
 
         for (Chunk chunk : getAllChunks()) {
-            unloadChunkInternal(chunk.getPosition());
+            unloadChunkInternal(chunk.getPosition(new Vector3i()));
             chunk.dispose();
         }
         chunkCache.clear();
@@ -413,7 +399,7 @@ public class LocalChunkProvider implements ChunkProvider {
     }
 
     @Override
-    public boolean reloadChunk(Vector3i coords) {
+    public boolean reloadChunk(Vector3ic coords) {
         if (!chunkCache.containsKey(coords)) {
             return false;
         }
@@ -443,38 +429,33 @@ public class LocalChunkProvider implements ChunkProvider {
 
         loadingPipeline = new ChunkProcessingPipeline(this::getChunk, relevanceSystem.createChunkTaskComporator());
         loadingPipeline.addStage(
-                ChunkTaskProvider.create("Chunk generate internal lightning",
-                        InternalLightProcessor::generateInternalLighting))
-                .addStage(ChunkTaskProvider.create("Chunk deflate", Chunk::deflate))
-                .addStage(ChunkTaskProvider.createMulti("Light merging",
-                        chunks -> {
-                            Chunk[] localchunks = chunks.toArray(new Chunk[0]);
-                            return new LightMerger().merge(localchunks);
-                        },
-                        pos -> StreamSupport.stream(new BlockRegion(pos).expand(1,1,1).spliterator(), false)
-                                .map(org.joml.Vector3i::new)
-                                .collect(Collectors.toSet())
-                ))
-                .addStage(ChunkTaskProvider.create("Chunk ready", readyChunks::add));
+            ChunkTaskProvider.create("Chunk generate internal lightning",
+                InternalLightProcessor::generateInternalLighting))
+            .addStage(ChunkTaskProvider.create("Chunk deflate", Chunk::deflate))
+            .addStage(ChunkTaskProvider.createMulti("Light merging",
+                chunks -> {
+                    Chunk[] localchunks = chunks.toArray(new Chunk[0]);
+                    return new LightMerger().merge(localchunks);
+                },
+                pos -> StreamSupport.stream(new BlockRegion(pos).expand(1, 1, 1).spliterator(), false)
+                    .map(org.joml.Vector3i::new)
+                    .collect(Collectors.toSet())
+            ))
+            .addStage(ChunkTaskProvider.create("Chunk ready", readyChunks::add));
         unloadRequestTaskMaster = TaskMaster.createFIFOTaskMaster("Chunk-Unloader", 8);
         ChunkMonitor.fireChunkProviderInitialized(this);
 
         for (ChunkRelevanceRegion chunkRelevanceRegion : relevanceSystem.getRegions()) {
             for (Vector3ic pos : chunkRelevanceRegion.getCurrentRegion()) {
-                createOrLoadChunk(JomlUtil.from(pos));
+                createOrLoadChunk(pos);
             }
             chunkRelevanceRegion.setUpToDate();
         }
     }
 
     @Override
-    public boolean isChunkReady(Vector3i pos) {
-        return isChunkReady(chunkCache.get(pos));
-    }
-
-    @Override
     public boolean isChunkReady(Vector3ic pos) {
-        return isChunkReady(chunkCache.get(JomlUtil.from(pos)));
+        return isChunkReady(chunkCache.get(pos));
     }
 
     private boolean isChunkReady(Chunk chunk) {
@@ -486,18 +467,18 @@ public class LocalChunkProvider implements ChunkProvider {
         this.relevanceSystem = relevanceSystem;
         loadingPipeline = new ChunkProcessingPipeline(this::getChunk, relevanceSystem.createChunkTaskComporator());
         loadingPipeline.addStage(
-                ChunkTaskProvider.create("Chunk generate internal lightning",
-                        InternalLightProcessor::generateInternalLighting))
-                .addStage(ChunkTaskProvider.create("Chunk deflate", Chunk::deflate))
-                .addStage(ChunkTaskProvider.createMulti("Light merging",
-                        chunks -> {
-                            Chunk[] localchunks = chunks.toArray(new Chunk[0]);
-                            return new LightMerger().merge(localchunks);
-                        },
-                        pos -> StreamSupport.stream(new BlockRegion(pos).expand(1,1,1).spliterator(), false)
-                                .map(org.joml.Vector3i::new)
-                                .collect(Collectors.toCollection(Sets::newLinkedHashSet))
-                ))
-                .addStage(ChunkTaskProvider.create("Chunk ready", readyChunks::add));
+            ChunkTaskProvider.create("Chunk generate internal lightning",
+                InternalLightProcessor::generateInternalLighting))
+            .addStage(ChunkTaskProvider.create("Chunk deflate", Chunk::deflate))
+            .addStage(ChunkTaskProvider.createMulti("Light merging",
+                chunks -> {
+                    Chunk[] localchunks = chunks.toArray(new Chunk[0]);
+                    return new LightMerger().merge(localchunks);
+                },
+                pos -> StreamSupport.stream(new BlockRegion(pos).expand(1, 1, 1).spliterator(), false)
+                    .map(org.joml.Vector3i::new)
+                    .collect(Collectors.toCollection(Sets::newLinkedHashSet))
+            ))
+            .addStage(ChunkTaskProvider.create("Chunk ready", readyChunks::add));
     }
 }

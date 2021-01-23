@@ -23,6 +23,7 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.entitySystem.event.Event;
 import org.terasology.math.ChunkMath;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.network.NetMetricSource;
 import org.terasology.network.NetworkComponent;
@@ -278,7 +279,7 @@ public class ServerImpl implements Server {
             }
         }
     }
-    
+
     /**
      * Apply the block changes from the message to the local world.
      */
@@ -315,7 +316,7 @@ public class ServerImpl implements Server {
     private void processInvalidatedChunks(NetData.NetMessage message) {
         for (NetData.InvalidateChunkMessage chunk : message.getInvalidateChunkList()) {
             Vector3i chunkPos = NetMessageUtil.convert(chunk.getPos());
-            remoteWorldProvider.invalidateChunks(chunkPos);
+            remoteWorldProvider.invalidateChunks(JomlUtil.from(chunkPos));
             awaitingChunkReadyBlockUpdates.removeAll(chunkPos);
             awaitingChunkReadyExtraDataUpdates.removeAll(chunkPos);
         }

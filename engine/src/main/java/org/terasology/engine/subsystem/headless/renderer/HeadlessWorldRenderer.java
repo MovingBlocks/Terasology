@@ -20,6 +20,7 @@ import org.joml.Vector3ic;
 import org.terasology.config.Config;
 import org.terasology.context.Context;
 import org.terasology.logic.players.LocalPlayerSystem;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.Region3i;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
@@ -211,7 +212,7 @@ public class HeadlessWorldRenderer implements WorldRenderer {
                 // just add all visible chunks
                 chunksInProximity.clear();
                 for (Vector3i chunkPosition : viewRegion) {
-                    RenderableChunk c = chunkProvider.getChunk(chunkPosition);
+                    RenderableChunk c = chunkProvider.getChunk(JomlUtil.from(chunkPosition));
                     if (c != null && worldProvider.getLocalView(c.getPosition(new org.joml.Vector3i())) != null) {
                         chunksInProximity.add(c);
                     } else {
@@ -225,7 +226,7 @@ public class HeadlessWorldRenderer implements WorldRenderer {
                 // remove
                 while (chunksForRemove.hasNext()) {
                     Vector3i r = chunksForRemove.next();
-                    RenderableChunk c = chunkProvider.getChunk(r);
+                    RenderableChunk c = chunkProvider.getChunk(JomlUtil.from(r));
                     if (c != null) {
                         chunksInProximity.remove(c);
                         c.disposeMesh();
@@ -234,7 +235,7 @@ public class HeadlessWorldRenderer implements WorldRenderer {
 
                 // add
                 for (Vector3i chunkPosition : viewRegion) {
-                    RenderableChunk c = chunkProvider.getChunk(chunkPosition);
+                    RenderableChunk c = chunkProvider.getChunk(JomlUtil.from(chunkPosition));
                     if (c != null && worldProvider.getLocalView(c.getPosition(new org.joml.Vector3i())) != null) {
                         chunksInProximity.add(c);
                     } else {

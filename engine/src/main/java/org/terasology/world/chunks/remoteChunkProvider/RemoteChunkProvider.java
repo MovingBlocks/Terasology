@@ -6,22 +6,20 @@ package org.terasology.world.chunks.remoteChunkProvider;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
+import org.joml.Vector3f;
+import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.players.LocalPlayer;
-import org.terasology.math.ChunkMath;
-import org.terasology.math.JomlUtil;
-import org.terasology.math.Region3i;
-import org.terasology.math.TeraMath;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.monitoring.chunk.ChunkMonitor;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.BlockRegion;
+import org.terasology.world.block.BlockRegionc;
 import org.terasology.world.chunks.Chunk;
-import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.ChunkProvider;
+import org.terasology.world.chunks.Chunks;
 import org.terasology.world.chunks.event.BeforeChunkUnload;
 import org.terasology.world.chunks.event.OnChunkLoaded;
 import org.terasology.world.chunks.pipeline.ChunkProcessingPipeline;
@@ -56,8 +54,8 @@ public class RemoteChunkProvider implements ChunkProvider {
 
     private static final Logger logger = LoggerFactory.getLogger(RemoteChunkProvider.class);
     private final BlockingQueue<Chunk> readyChunks = Queues.newLinkedBlockingQueue();
-    private final BlockingQueue<Vector3i> invalidateChunks = Queues.newLinkedBlockingQueue();
-    private final Map<Vector3i, Chunk> chunkCache = Maps.newHashMap();
+    private final BlockingQueue<Vector3ic> invalidateChunks = Queues.newLinkedBlockingQueue();
+    private final Map<Vector3ic, Chunk> chunkCache = Maps.newHashMap();
     private final BlockManager blockManager;
     private final ChunkProcessingPipeline loadingPipeline;
     private EntityRef worldEntity = EntityRef.NULL;
@@ -95,8 +93,8 @@ public class RemoteChunkProvider implements ChunkProvider {
         loadingPipeline.invokePipeline(chunk);
     }
 
-    public void invalidateChunks(Vector3i pos) {
-        invalidateChunks.offer(pos);
+    public void invalidateChunks(Vector3ic pos) {
+        invalidateChunks.offer(new Vector3i(pos));
     }
 
     @Override
@@ -106,7 +104,7 @@ public class RemoteChunkProvider implements ChunkProvider {
         }
         Chunk chunk;
         while ((chunk = readyChunks.poll()) != null) {
-            Chunk oldChunk = chunkCache.put(chunk.getPosition(), chunk);
+            Chunk oldChunk = chunkCache.put(chunk.getPosition(new Vector3i()), chunk);
             if (oldChunk != null) {
                 oldChunk.dispose();
             }
@@ -119,12 +117,12 @@ public class RemoteChunkProvider implements ChunkProvider {
     }
 
     private void checkForUnload() {
-        List<Vector3i> positions = Lists.newArrayListWithCapacity(invalidateChunks.size());
+        List<Vector3ic> positions = Lists.newArrayListWithCapacity(invalidateChunks.size());
         invalidateChunks.drainTo(positions);
-        for (Vector3i pos : positions) {
+        for (Vector3ic pos : positions) {
             Chunk removed = chunkCache.remove(pos);
             if (removed != null && !removed.isReady()) {
-                worldEntity.send(new BeforeChunkUnload(JomlUtil.from(pos)));
+                worldEntity.send(new BeforeChunkUnload(pos));
                 removed.dispose();
             }
         }
@@ -136,7 +134,7 @@ public class RemoteChunkProvider implements ChunkProvider {
     }
 
     @Override
-    public Chunk getChunk(Vector3i chunkPos) {
+    public Chunk getChunk(Vector3ic chunkPos) {
         Chunk chunk = chunkCache.get(chunkPos);
         if (chunk != null && chunk.isReady()) {
             return chunk;
@@ -144,20 +142,10 @@ public class RemoteChunkProvider implements ChunkProvider {
         return null;
     }
 
-    @Override
-    public Chunk getChunk(org.joml.Vector3ic pos) {
-        return getChunk(JomlUtil.from(pos));
-    }
-
-    @Override
-    public boolean isChunkReady(Vector3i pos) {
-        Chunk chunk = chunkCache.get(pos);
-        return chunk != null && chunk.isReady();
-    }
 
     @Override
     public boolean isChunkReady(Vector3ic pos) {
-        Chunk chunk = chunkCache.get(JomlUtil.from(pos));
+        Chunk chunk = chunkCache.get(pos);
         return chunk != null && chunk.isReady();
     }
 
@@ -168,7 +156,7 @@ public class RemoteChunkProvider implements ChunkProvider {
     }
 
     @Override
-    public boolean reloadChunk(Vector3i pos) {
+    public boolean reloadChunk(Vector3ic pos) {
         return false;
     }
 
@@ -193,41 +181,41 @@ public class RemoteChunkProvider implements ChunkProvider {
     }
 
     @Override
-    public ChunkViewCore getLocalView(Vector3i centerChunkPos) {
-        Region3i region = Region3i.createFromCenterExtents(centerChunkPos, ChunkConstants.LOCAL_REGION_EXTENTS);
+    public ChunkViewCore getLocalView(Vector3ic centerChunkPos) {
+        BlockRegion region = new BlockRegion(centerChunkPos).expand(Chunks.LOCAL_REGION_EXTENTS);
         if (getChunk(centerChunkPos) != null) {
-            return createWorldView(region, Vector3i.one());
+            return createWorldView(region, new Vector3i(1,1,1));
         }
         return null;
     }
 
     @Override
-    public ChunkViewCore getSubviewAroundBlock(Vector3i blockPos, int extent) {
-        Region3i region = ChunkMath.getChunkRegionAroundWorldPos(blockPos, extent);
-        return createWorldView(region, new Vector3i(-region.min().x, -region.min().y, -region.min().z));
+    public ChunkViewCore getSubviewAroundBlock(Vector3ic blockPos, int extent) {
+        BlockRegion region = new BlockRegion(blockPos).expand(extent,extent,extent);
+        Chunks.toChunkRegion(region,region);
+        return createWorldView(region, new Vector3i(-region.minX(), -region.minY(), -region.minZ()));
     }
 
     @Override
-    public ChunkViewCore getSubviewAroundChunk(Vector3i chunkPos) {
-        Region3i region = Region3i.createFromCenterExtents(chunkPos, ChunkConstants.LOCAL_REGION_EXTENTS);
+    public ChunkViewCore getSubviewAroundChunk(Vector3ic chunkPos) {
+        BlockRegion region = new BlockRegion(chunkPos).expand(Chunks.LOCAL_REGION_EXTENTS);
         if (getChunk(chunkPos) != null) {
-            return createWorldView(region, new Vector3i(-region.min().x, -region.min().y, -region.min().z));
+            return createWorldView(region, new Vector3i(-region.minX(), -region.minY(), -region.minZ()));
         }
         return null;
     }
 
-    private ChunkViewCore createWorldView(Region3i region, Vector3i offset) {
-        Chunk[] chunks = new Chunk[region.sizeX() * region.sizeY() * region.sizeZ()];
-        for (Vector3i chunkPos : region) {
+    private ChunkViewCore createWorldView(BlockRegionc region, Vector3ic offset) {
+        Chunk[] chunks = new Chunk[region.volume()];
+        for (Vector3ic chunkPos : region) {
             Chunk chunk = chunkCache.get(chunkPos);
             if (chunk == null) {
                 return null;
             }
-            chunkPos.sub(region.minX(), region.minY(), region.minZ());
-            int index = TeraMath.calculate3DArrayIndex(chunkPos, region.size());
+            int index = (chunkPos.x() - region.minX()) + region.getSizeX() * ((chunkPos.z() - region.minZ()) + region.getSizeZ() * (chunkPos.y() - region.minY()));
             chunks[index] = chunk;
         }
-        return new ChunkViewCoreImpl(chunks, JomlUtil.from(region), JomlUtil.from(offset), blockManager.getBlock(BlockManager.AIR_ID));
+        return new ChunkViewCoreImpl(chunks, region, offset, blockManager.getBlock(BlockManager.AIR_ID));
     }
 
     @Override
@@ -248,7 +236,7 @@ public class RemoteChunkProvider implements ChunkProvider {
         }
 
         private int score(PositionFuture<?> task) {
-            return (int) ChunkMath.calcChunkPos(JomlUtil.from(localPlayer.getPosition()), new org.joml.Vector3i()).distance(task.getPosition());
+            return (int) Chunks.toChunkPos(localPlayer.getPosition(new Vector3f()), new org.joml.Vector3i()).distance(task.getPosition());
         }
     }
 }

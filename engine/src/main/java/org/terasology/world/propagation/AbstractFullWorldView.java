@@ -44,7 +44,7 @@ public abstract class AbstractFullWorldView implements PropagatorWorldView {
      * @return The chunk for that position
      */
     private Chunk getChunk(Vector3ic pos) {
-        return chunkProvider.getChunk(JomlUtil.from(Chunks.toChunkPos(pos, new Vector3i())));
+        return chunkProvider.getChunk(Chunks.toChunkPos(pos, new Vector3i()));
     }
 
     @Override
@@ -70,7 +70,7 @@ public abstract class AbstractFullWorldView implements PropagatorWorldView {
         setValueAt(getChunk(pos), Chunks.toRelative(pos, new Vector3i()), value);
         BlockRegion chunkRegion = new BlockRegion(pos).expand(1, 1, 1);
         for (Vector3ic affectedChunkPos : Chunks.toChunkRegion(chunkRegion, chunkRegion)) {
-            Chunk dirtiedChunk = chunkProvider.getChunk(JomlUtil.from(affectedChunkPos));
+            Chunk dirtiedChunk = chunkProvider.getChunk(affectedChunkPos);
             if (dirtiedChunk != null) {
                 dirtiedChunk.setDirty(true);
             }
@@ -88,7 +88,7 @@ public abstract class AbstractFullWorldView implements PropagatorWorldView {
 
     @Override
     public Block getBlockAt(Vector3ic pos) {
-        CoreChunk chunk = chunkProvider.getChunk(JomlUtil.from(Chunks.toChunkPos(pos, new Vector3i())));
+        CoreChunk chunk = chunkProvider.getChunk(Chunks.toChunkPos(pos, new Vector3i()));
         if (chunk != null) {
             return chunk.getBlock(Chunks.toRelative(pos, new Vector3i()));
         }

@@ -3,6 +3,7 @@
 
 package org.terasology.fixtures;
 
+import org.joml.Vector3ic;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.network.Client;
 import org.terasology.persistence.ChunkStore;
@@ -56,7 +57,7 @@ public class TestStorageManager implements StorageManager {
     }
 
     @Override
-    public ChunkStore loadChunkStore(Vector3i chunkPos) {
+    public ChunkStore loadChunkStore(Vector3ic chunkPos) {
         return chunkStores.get(chunkPos);
     }
 

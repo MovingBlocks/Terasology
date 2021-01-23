@@ -151,17 +151,17 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
 
     @Override
     public ChunkViewCore getLocalView(Vector3ic chunkPos) {
-        return chunkProvider.getLocalView(JomlUtil.from(chunkPos));
+        return chunkProvider.getLocalView(chunkPos);
     }
 
     @Override
     public ChunkViewCore getWorldViewAround(Vector3ic chunk) {
-        return chunkProvider.getSubviewAroundChunk(JomlUtil.from(chunk));
+        return chunkProvider.getSubviewAroundChunk(chunk);
     }
 
     @Override
     public boolean isBlockRelevant(int x, int y, int z) {
-        return chunkProvider.isChunkReady(ChunkMath.calcChunkPos(x, y, z));
+        return chunkProvider.isChunkReady(Chunks.toChunkPos(x, y, z, new Vector3i()));
     }
 
     @Override
@@ -213,7 +213,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
         for (Map.Entry<org.terasology.math.geom.Vector3i, Block> entry : blocks.entrySet()) {
             org.terasology.math.geom.Vector3i worldPos = entry.getKey();
             org.terasology.math.geom.Vector3i chunkPos = ChunkMath.calcChunkPos(worldPos);
-            CoreChunk chunk = chunkProvider.getChunk(chunkPos);
+            CoreChunk chunk = chunkProvider.getChunk(JomlUtil.from(chunkPos));
 
             if (chunk != null) {
                 Block type = entry.getValue();

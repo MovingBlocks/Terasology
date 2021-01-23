@@ -17,6 +17,8 @@ package org.terasology.persistence.internal;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.joml.Vector3i;
+import org.joml.Vector3ic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
@@ -37,7 +39,6 @@ import org.terasology.game.Game;
 import org.terasology.game.GameManifest;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.module.Module;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.monitoring.PerformanceMonitor;
@@ -103,8 +104,8 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
      */
     private Long nextAutoSave;
     private boolean saveRequested;
-    private ConcurrentMap<Vector3i, CompressedChunkBuilder> unloadedAndUnsavedChunkMap = Maps.newConcurrentMap();
-    private ConcurrentMap<Vector3i, CompressedChunkBuilder> unloadedAndSavingChunkMap = Maps.newConcurrentMap();
+    private ConcurrentMap<Vector3ic, CompressedChunkBuilder> unloadedAndUnsavedChunkMap = Maps.newConcurrentMap();
+    private ConcurrentMap<Vector3ic, CompressedChunkBuilder> unloadedAndSavingChunkMap = Maps.newConcurrentMap();
     private ConcurrentMap<String, EntityData.PlayerStore> unloadedAndUnsavedPlayerMap = Maps.newConcurrentMap();
     private ConcurrentMap<String, EntityData.PlayerStore> unloadedAndSavingPlayerMap = Maps.newConcurrentMap();
 
@@ -221,21 +222,21 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
          * ones added in between putAll and clear. By iterating we can make sure that all entries removed
          * from unloadedAndUnsavedChunkMap get added to unloadedAndSavingChunkMap.
          */
-        Iterator<Map.Entry<Vector3i, CompressedChunkBuilder>> unsavedEntryIterator = unloadedAndUnsavedChunkMap.entrySet().iterator();
+        Iterator<Map.Entry<Vector3ic, CompressedChunkBuilder>> unsavedEntryIterator = unloadedAndUnsavedChunkMap.entrySet().iterator();
         while (unsavedEntryIterator.hasNext()) {
-            Map.Entry<Vector3i, CompressedChunkBuilder> entry = unsavedEntryIterator.next();
+            Map.Entry<Vector3ic, CompressedChunkBuilder> entry = unsavedEntryIterator.next();
             unloadedAndSavingChunkMap.put(entry.getKey(), entry.getValue());
             unsavedEntryIterator.remove();
         }
 
         chunkProvider.getAllChunks().stream().filter(ManagedChunk::isReady).forEach(chunk -> {
             // If there is a newer undisposed version of the chunk,we don't need to save the disposed version:
-            unloadedAndSavingChunkMap.remove(chunk.getPosition());
+            unloadedAndSavingChunkMap.remove(chunk.getPosition(new Vector3i()));
             ChunkImpl chunkImpl = (ChunkImpl) chunk;  // this storage manager can only work with ChunkImpls
-            saveTransactionBuilder.addLoadedChunk(chunk.getPosition(), chunkImpl);
+            saveTransactionBuilder.addLoadedChunk(chunk.getPosition(new Vector3i()), chunkImpl);
         });
 
-        for (Map.Entry<Vector3i, CompressedChunkBuilder> entry : unloadedAndSavingChunkMap.entrySet()) {
+        for (Map.Entry<Vector3ic, CompressedChunkBuilder> entry : unloadedAndSavingChunkMap.entrySet()) {
             saveTransactionBuilder.addUnloadedChunk(entry.getKey(), entry.getValue());
         }
     }
@@ -327,14 +328,14 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
     public void deactivateChunk(Chunk chunk) {
         Collection<EntityRef> entitiesOfChunk = getEntitiesOfChunk(chunk);
         ChunkImpl chunkImpl = (ChunkImpl) chunk; // storage manager only works with ChunkImpl
-        unloadedAndUnsavedChunkMap.put(chunk.getPosition(), new CompressedChunkBuilder(getEntityManager(), chunkImpl,
+        unloadedAndUnsavedChunkMap.put(chunk.getPosition(new Vector3i()), new CompressedChunkBuilder(getEntityManager(), chunkImpl,
                 entitiesOfChunk, true));
 
         entitiesOfChunk.forEach(this::deactivateOrDestroyEntityRecursive);
     }
 
     @Override
-    protected byte[] loadCompressedChunk(Vector3i chunkPos) {
+    protected byte[] loadCompressedChunk(Vector3ic chunkPos) {
         CompressedChunkBuilder disposedUnsavedChunk = unloadedAndUnsavedChunkMap.get(chunkPos);
         if (disposedUnsavedChunk != null) {
             return disposedUnsavedChunk.buildEncodedChunk();

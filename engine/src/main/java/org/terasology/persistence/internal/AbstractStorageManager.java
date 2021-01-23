@@ -18,17 +18,15 @@ package org.terasology.persistence.internal;
 
 import com.google.common.collect.Lists;
 import org.joml.Vector3f;
+import org.joml.Vector3i;
+import org.joml.Vector3ic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.entitySystem.entity.internal.OwnershipHelper;
-import org.terasology.joml.geom.AABBf;
 import org.terasology.joml.geom.AABBfc;
 import org.terasology.logic.location.LocationComponent;
-import org.terasology.math.AABB;
-import org.terasology.math.JomlUtil;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.network.ClientComponent;
 import org.terasology.persistence.ChunkStore;
@@ -107,7 +105,7 @@ public abstract class AbstractStorageManager implements StorageManager {
     }
 
     @Override
-    public ChunkStore loadChunkStore(Vector3i chunkPos) {
+    public ChunkStore loadChunkStore(Vector3ic chunkPos) {
         byte[] chunkData = loadCompressedChunk(chunkPos);
         ChunkStore store = null;
         if (chunkData != null) {
@@ -122,13 +120,13 @@ public abstract class AbstractStorageManager implements StorageManager {
         return store;
     }
 
-    protected byte[] loadChunkZip(Vector3i chunkPos) {
+    protected byte[] loadChunkZip(Vector3ic chunkPos) {
         byte[] chunkData = null;
-        Vector3i chunkZipPos = JomlUtil.from(storagePathProvider.getChunkZipPosition(JomlUtil.from(chunkPos)));
-        Path chunkPath = storagePathProvider.getChunkZipPath(JomlUtil.from(chunkZipPos));
+        Vector3i chunkZipPos = storagePathProvider.getChunkZipPosition(chunkPos);
+        Path chunkPath = storagePathProvider.getChunkZipPath(chunkZipPos);
         if (Files.isRegularFile(chunkPath)) {
             try (FileSystem chunkZip = FileSystems.newFileSystem(chunkPath, null)) {
-                Path targetChunk = chunkZip.getPath(storagePathProvider.getChunkFilename(JomlUtil.from(chunkPos)));
+                Path targetChunk = chunkZip.getPath(storagePathProvider.getChunkFilename(chunkPos));
                 if (Files.isRegularFile(targetChunk)) {
                     chunkData = Files.readAllBytes(targetChunk);
                 }
@@ -154,11 +152,11 @@ public abstract class AbstractStorageManager implements StorageManager {
         this.storeChunksInZips = storeChunksInZips;
     }
 
-    protected byte[] loadCompressedChunk(Vector3i chunkPos) {
+    protected byte[] loadCompressedChunk(Vector3ic chunkPos) {
         if (isStoreChunksInZips()) {
             return loadChunkZip(chunkPos);
         } else {
-            Path chunkPath = storagePathProvider.getChunkPath(JomlUtil.from(chunkPos));
+            Path chunkPath = storagePathProvider.getChunkPath(chunkPos);
             if (Files.isRegularFile(chunkPath)) {
                 try {
                     return Files.readAllBytes(chunkPath);

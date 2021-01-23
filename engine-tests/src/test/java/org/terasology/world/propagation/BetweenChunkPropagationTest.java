@@ -210,22 +210,22 @@ public class BetweenChunkPropagationTest extends TerasologyTestingEnvironment {
         }
 
         @Override
-        public ChunkViewCore getLocalView(Vector3i centerChunkPos) {
+        public ChunkViewCore getLocalView(Vector3ic centerChunkPos) {
             return null;
         }
 
         @Override
-        public ChunkViewCore getSubviewAroundBlock(Vector3i blockPos, int extent) {
+        public ChunkViewCore getSubviewAroundBlock(Vector3ic blockPos, int extent) {
             return null;
         }
 
         @Override
-        public ChunkViewCore getSubviewAroundChunk(Vector3i chunkPos) {
+        public ChunkViewCore getSubviewAroundChunk(Vector3ic chunkPos) {
             return null;
         }
 
         @Override
-        public boolean reloadChunk(Vector3i pos) {
+        public boolean reloadChunk(Vector3ic pos) {
             return false;
         }
 
@@ -245,28 +245,19 @@ public class BetweenChunkPropagationTest extends TerasologyTestingEnvironment {
         }
 
         @Override
-        public boolean isChunkReady(Vector3i pos) {
-            return false;
-        }
-
-        @Override
         public boolean isChunkReady(Vector3ic pos) {
             return false;
         }
 
-        @Override
-        public Chunk getChunk(int x, int y, int z) {
-            return getChunk(new Vector3i(x, y, z));
-        }
 
         @Override
-        public Chunk getChunk(Vector3i chunkPos) {
-            return chunks.get(chunkPos);
+        public Chunk getChunk(int x, int y, int z) {
+            return getChunk(JomlUtil.from(new Vector3i(x, y, z)));
         }
 
         @Override
         public Chunk getChunk(Vector3ic chunkPos) {
-            return chunks.get(JomlUtil.from(chunkPos));
+            return chunks.get(chunkPos);
         }
 
         @Override
