@@ -41,6 +41,8 @@ public final class Chunks {
     private Chunks() {
     }
 
+    //-- chunk position ----------------------------------------------------------------------------------------------//
+
     /**
      * Returns the chunk coordinate given the position and the chunk power.
      *
@@ -85,7 +87,6 @@ public final class Chunks {
         return toChunkPos(z, CHUNK_POWER.z());
     }
 
-
     /**
      * The position of the chunk given the coordinate and size of chunk in powers of 2.
      *
@@ -125,11 +126,26 @@ public final class Chunks {
      * @param pos absolute coordinate of the block
      * @param dest will hold the result
      * @return dest
+     *
+     * @see #toChunkPos(Vector3i)
      */
     public static Vector3i toChunkPos(Vector3ic pos, Vector3i dest) {
         return toChunkPos(pos.x(), pos.y(), pos.z(), POWER_X, POWER_Y, POWER_Z, dest);
     }
 
+    /**
+     * Compute (in-place) the position of the chunk given the world coordinate {@code pos}.
+     *
+     * This uses the default power ({@link #POWER_X}, {@link #POWER_Y}, {@link #POWER_Z})
+     *
+     * <p>default chunk size ({@link #SIZE_X}, {@link #SIZE_Y}, {@link #SIZE_Z}) </p>
+     *
+     * @param pos absolute coordinate of the block
+     * @return the input vector {@code pos} modified to hold the result
+     */
+    public static Vector3i toChunkPos(Vector3i pos) {
+        return toChunkPos(pos, pos);
+    }
 
     /**
      * The position of the chunk given the coordinate and size of chunk in powers of 2.
@@ -170,7 +186,6 @@ public final class Chunks {
             Math.roundUsing(z, RoundingMode.FLOOR), POWER_X, POWER_Y, POWER_Z, dest);
     }
 
-
     /**
      * The position of the chunk given the coordinate and size of chunk in powers of 2.
      *
@@ -191,6 +206,9 @@ public final class Chunks {
             toChunkPos(y, chunkY),
             toChunkPos(z, chunkZ));
     }
+
+    //-- chunk region ------------------------------------------------------------------------------------------------//
+
     /**
      * Maps a {@link BlockRegion} to the chunks that intersect the {@link BlockRegion}.
      *
@@ -219,7 +237,6 @@ public final class Chunks {
         return toChunkRegion(region, chunkPower.x(), chunkPower.y(), chunkPower.z(), dest);
     }
 
-
     /**
      * Maps a {@link BlockRegion} to the chunks that intersect the {@link BlockRegion}.
      * This uses the default power ({@link Chunks#POWER_X}, {@link Chunks#POWER_Y}, {@link Chunks#POWER_Z})
@@ -227,10 +244,25 @@ public final class Chunks {
      * @param region a bounding box that is contained
      * @param dest will hold the result
      * @return dest
+     * @see #toChunkRegion(BlockRegion)
      */
     public static BlockRegion toChunkRegion(BlockRegionc region, BlockRegion dest) {
         return toChunkRegion(region, Chunks.POWER_X, Chunks.POWER_Y, Chunks.POWER_Z, dest);
     }
+
+    /**
+     * Maps the {@link BlockRegion} in-place to the region of chunks it intersects.
+     *
+     * This uses the default power ({@link Chunks#POWER_X}, {@link Chunks#POWER_Y}, {@link Chunks#POWER_Z})
+     *
+     * @param region a bounding box that is contained
+     * @return the in-place modified {@code region}
+     */
+    public static BlockRegion toChunkRegion(BlockRegion region) {
+        return toChunkRegion(region, region);
+    }
+
+    //-- chunk-relative position -------------------------------------------------------------------------------------//
 
     /**
      * Returns the internal position of a block within a chunk.
@@ -242,7 +274,6 @@ public final class Chunks {
     public static int toRelative(int worldPos, int filter) {
         return worldPos & filter;
     }
-
 
     /**
      * the relative position from the x axis from the (0,0,0) corner.
@@ -272,6 +303,7 @@ public final class Chunks {
     public static int toRelativeZ(int blockZ) {
         return toRelative(blockZ, Chunks.INNER_CHUNK_POS_FILTER.z());
     }
+
     /**
      * the relative position in the nearest chunk from the (0,0,0) corner.
      * Default chunk size of ({@link #SIZE_X}, {@link #SIZE_Y}, {@link #SIZE_Z}).
@@ -279,9 +311,22 @@ public final class Chunks {
      * @param worldPos world position
      * @param dest will hold the result
      * @return dest
+     * @see #toRelative(Vector3i)
      */
     public static Vector3i toRelative(Vector3ic worldPos, Vector3i dest) {
         return toRelative(worldPos.x(), worldPos.y(), worldPos.z(), INNER_CHUNK_POS_FILTER, dest);
+    }
+
+    /**
+     * Compute (in-place) the relative position in the nearest chunk from the (0,0,0) corner.
+     *
+     * Default chunk size of ({@link #SIZE_X}, {@link #SIZE_Y}, {@link #SIZE_Z}).
+     *
+     * @param worldPos world position
+     * @return the modified {@code worldPos} vector
+     */
+    public static Vector3i toRelative(Vector3i worldPos) {
+        return toRelative(worldPos, worldPos);
     }
 
     /**
@@ -311,6 +356,8 @@ public final class Chunks {
     public static Vector3i toRelative(int x, int y, int z, Vector3i dest) {
         return dest.set(toRelative(x, INNER_CHUNK_POS_FILTER.x()), toRelative(y, INNER_CHUNK_POS_FILTER.y()), toRelative(z, INNER_CHUNK_POS_FILTER.z()));
     }
+
+    //-- checks ------------------------------------------------------------------------------------------------------//
     
     /**
      * Works out whether the given block resides inside the given chunk.
