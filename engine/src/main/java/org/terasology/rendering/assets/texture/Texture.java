@@ -18,13 +18,13 @@ package org.terasology.rendering.assets.texture;
 
 import org.terasology.assets.AssetType;
 import org.terasology.assets.ResourceUrn;
-import org.terasology.math.geom.Rect2f;
+import org.terasology.joml.geom.Rectanglef;
 
 /**
  */
 public abstract class Texture extends TextureRegionAsset<TextureData> {
 
-    public static final Rect2f FULL_TEXTURE_REGION = Rect2f.createFromMinAndSize(0, 0, 1, 1);
+    public static final Rectanglef FULL_TEXTURE_REGION = new Rectanglef(0,0,1,1);
 
     protected Texture(ResourceUrn urn, AssetType<?, TextureData> assetType) {
         super(urn, assetType);
