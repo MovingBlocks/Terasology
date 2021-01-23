@@ -189,7 +189,7 @@ public class BlockBuilder implements BlockBuilderHelper {
                 atlasPos = new Vector2f();
                 frameCount = 1;
             } else {
-                atlasPos = JomlUtil.from(worldAtlas.getTexCoords(tile, shape.getMeshPart(part) != null));
+                atlasPos = worldAtlas.getTexCoords(tile, shape.getMeshPart(part) != null);
                 frameCount = tile.getLength();
             }
             BlockPart targetPart = part.rotate(rot);
@@ -218,11 +218,11 @@ public class BlockBuilder implements BlockBuilderHelper {
             if (blockTile != null) {
                 BlockMeshPart lowMeshPart = lowShape
                         .getMeshPart(part)
-                        .mapTexCoords(JomlUtil.from(worldAtlas.getTexCoords(blockTile, true)), worldAtlas.getRelativeTileSize(), blockTile.getLength());
+                        .mapTexCoords(worldAtlas.getTexCoords(blockTile, true), worldAtlas.getRelativeTileSize(), blockTile.getLength());
                 block.setLowLiquidMesh(part.getSide(), lowMeshPart);
                 BlockMeshPart topMeshPart = topShape
                         .getMeshPart(part)
-                        .mapTexCoords(JomlUtil.from(worldAtlas.getTexCoords(blockTile, true)), worldAtlas.getRelativeTileSize(), blockTile.getLength());
+                        .mapTexCoords(worldAtlas.getTexCoords(blockTile, true), worldAtlas.getRelativeTileSize(), blockTile.getLength());
                 block.setTopLiquidMesh(part.getSide(), topMeshPart);
             }
         }
