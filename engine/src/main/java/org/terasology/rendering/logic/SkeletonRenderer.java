@@ -23,9 +23,9 @@ import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.RenderSystem;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
+import org.terasology.joml.geom.AABBf;
 import org.terasology.logic.location.Location;
 import org.terasology.logic.location.LocationComponent;
-import org.terasology.math.AABB;
 import org.terasology.math.JomlUtil;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.animation.MeshAnimation;
@@ -40,7 +40,6 @@ import java.nio.FloatBuffer;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
-import java.util.stream.Collectors;
 
 import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
 import static org.lwjgl.opengl.GL11.glBegin;
@@ -227,7 +226,7 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
             if (skeletalMesh.mesh == null || skeletalMesh.material == null || skeletalMesh.boneEntities == null || !skeletalMesh.material.isRenderable()) {
                 continue;
             }
-            AABB aabb;
+            AABBf aabb;
             MeshAnimation animation = skeletalMesh.animation;
             if (animation != null) {
                 aabb = animation.getAabb();
@@ -240,15 +239,15 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
             location.getWorldPosition(worldPos);
             float worldScale = location.getWorldScale();
 
-            aabb = aabb.transform(JomlUtil.from(worldRot), JomlUtil.from(worldPos), worldScale);
 
+            aabb = aabb.transform(new Matrix4f().translationRotateScale(worldPos, worldRot, worldScale), new AABBf());
 
             //Scale bounding box for skeletalMesh.
             Vector3f scale = skeletalMesh.scale;
 
-            Vector3f aabbCenter = JomlUtil.from(aabb.getCenter());
-            Vector3f scaledExtents = JomlUtil.from(aabb.getExtents().mul(scale.x(), scale.y(), scale.z()));
-            aabb = AABB.createCenterExtent(JomlUtil.from(aabbCenter), JomlUtil.from(scaledExtents));
+            Vector3f aabbCenter = aabb.center(new Vector3f());
+            Vector3f scaledExtents = aabb.extent(new Vector3f()).mul(scale.x(), scale.y(), scale.z());
+            aabb = new AABBf(aabbCenter, aabbCenter).expand(scaledExtents);
 
             if (!worldRenderer.getActiveCamera().hasInSight(aabb)) {
                 continue;

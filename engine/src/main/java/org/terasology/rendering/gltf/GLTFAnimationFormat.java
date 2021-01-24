@@ -29,6 +29,7 @@ import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.format.AssetDataFile;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.assets.module.annotations.RegisterAssetFileFormat;
+import org.terasology.joml.geom.AABBf;
 import org.terasology.math.AABB;
 import org.terasology.rendering.assets.animation.MeshAnimationBundleData;
 import org.terasology.rendering.assets.animation.MeshAnimationData;
@@ -159,7 +160,7 @@ public class GLTFAnimationFormat extends GLTFCommonFormat<MeshAnimationBundleDat
             frames.add(frame);
         }
 
-        return new MeshAnimationData(boneNames, boneParents, frames, TIME_PER_FRAME, AABB.createEmpty());
+        return new MeshAnimationData(boneNames, boneParents, frames, TIME_PER_FRAME, new AABBf());
     }
 
     private TFloatList getFloats(GLTF gltf, List<byte[]> loadedBuffers, int accessorIndex) throws IOException {
