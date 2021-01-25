@@ -9,7 +9,7 @@ import org.terasology.context.Context;
  *
  */
 public final class CoreRegistry {
-    private static final ThreadLocal<Context> CONTEXT_THREAD_LOCAL = new InheritableThreadLocal<>();
+    private static Context context;
 
     private CoreRegistry() {
     }
@@ -22,10 +22,10 @@ public final class CoreRegistry {
      * @param <T>
      */
     public static <T, U extends T> U put(Class<T> type, U object) {
-        if (CONTEXT_THREAD_LOCAL.get() == null) {
+        if (context == null) {
             return null;
         }
-        CONTEXT_THREAD_LOCAL.get().put(type, object);
+        context.put(type, object);
         return object;
     }
 
@@ -37,7 +37,7 @@ public final class CoreRegistry {
         if (System.getSecurityManager() != null) {
             System.getSecurityManager().checkPermission(new RuntimePermission("permRegister"));
         }
-        CoreRegistry.CONTEXT_THREAD_LOCAL.set(context);
+        CoreRegistry.context = context;
     }
 
     /**
@@ -47,13 +47,13 @@ public final class CoreRegistry {
      * @return The system fulfilling the given interface
      */
     public static <T> T get(Class<T> type) {
-        if (CONTEXT_THREAD_LOCAL.get() == null) {
+        if (context == null) {
             return null;
         }
         if (type == Context.class) {
-            return type.cast(CONTEXT_THREAD_LOCAL.get());
+            return type.cast(context);
         }
-        return CONTEXT_THREAD_LOCAL.get().get(type);
+        return context.get(type);
     }
 
 }
