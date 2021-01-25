@@ -5,6 +5,8 @@ package org.terasology.persistence;
 import com.google.common.collect.Lists;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.ResourceLock;
+import org.terasology.TestResourceLocks;
 import org.terasology.assets.AssetFactory;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
@@ -42,6 +44,7 @@ import static org.terasology.entitySystem.entity.internal.EntityScope.GLOBAL;
 
 /**
  */
+@ResourceLock(TestResourceLocks.CORE_REGISTRY)
 public class EntitySerializerTest {
 
     private Context context;

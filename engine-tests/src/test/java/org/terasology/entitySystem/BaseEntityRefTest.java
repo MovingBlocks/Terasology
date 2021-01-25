@@ -5,7 +5,9 @@ package org.terasology.entitySystem;
 import com.google.common.collect.Lists;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.ResourceLock;
 import org.terasology.MockedPathManager;
+import org.terasology.TestResourceLocks;
 import org.terasology.assets.AssetFactory;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.assets.module.ModuleAwareAssetTypeManager;
@@ -36,6 +38,7 @@ import static org.terasology.entitySystem.entity.internal.EntityScope.CHUNK;
 import static org.terasology.entitySystem.entity.internal.EntityScope.GLOBAL;
 import static org.terasology.entitySystem.entity.internal.EntityScope.SECTOR;
 
+@ResourceLock(TestResourceLocks.CORE_REGISTRY)
 public class BaseEntityRefTest implements MockedPathManager {
 
     private Context context;

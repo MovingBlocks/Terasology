@@ -1,4 +1,4 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.persistence;
 
@@ -6,7 +6,9 @@ import com.google.common.collect.ImmutableMap;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.ResourceLock;
 import org.reflections.Reflections;
+import org.terasology.TestResourceLocks;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.context.Context;
 import org.terasology.context.internal.ContextImpl;
@@ -38,6 +40,7 @@ import static org.mockito.Mockito.mock;
 
 /**
  */
+@ResourceLock(TestResourceLocks.CORE_REGISTRY)
 public class ComponentSerializerTest {
     private static ModuleManager moduleManager;
     private ComponentSerializer componentSerializer;

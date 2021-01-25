@@ -1,4 +1,4 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.persistence.typeHandling.event;
@@ -11,6 +11,8 @@ import org.joml.Vector4f;
 import org.joml.Vector4fc;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.ResourceLock;
+import org.terasology.TestResourceLocks;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.context.internal.ContextImpl;
 import org.terasology.engine.module.ModuleManager;
@@ -35,6 +37,7 @@ import java.util.HashMap;
 
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
+@ResourceLock(TestResourceLocks.CORE_REGISTRY)
 public class VectorEventSerializer {
 
     private EntitySystemLibrary entitySystemLibrary;
