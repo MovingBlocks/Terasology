@@ -214,7 +214,7 @@ public class MeshRenderer extends BaseComponentSystem implements RenderSystem {
                     matrixCameraSpace.translationRotateScale(offsetFromCamera, worldRot, worldScale);
 
 
-                    AABBf aabb = JomlUtil.from(meshComp.mesh.getAABB()).transform(new Matrix4f().translationRotateScale(worldPos, worldRot, worldScale));
+                    AABBf aabb = meshComp.mesh.getAABB().transform(new Matrix4f().translationRotateScale(worldPos, worldRot, worldScale), new AABBf());
                     if (worldRenderer.getActiveCamera().hasInSight(aabb)) {
                         if (meshComp.mesh != lastMesh) {
                             if (lastMesh != null) {

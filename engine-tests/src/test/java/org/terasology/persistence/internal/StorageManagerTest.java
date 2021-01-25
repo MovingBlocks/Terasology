@@ -26,6 +26,7 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.entitySystem.stubs.EntityRefComponent;
 import org.terasology.entitySystem.stubs.StringComponent;
+import org.terasology.joml.geom.AABBfc;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.JomlUtil;
 import org.terasology.module.ModuleEnvironment;
@@ -325,7 +326,8 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
         EntityRef entity = entityManager.create();
         long id = entity.getId();
         LocationComponent locationComponent = new LocationComponent();
-        Vector3f positionInChunk = new Vector3f(JomlUtil.from(chunk.getAABB().getMin()));
+        AABBfc aabb = chunk.getAABB();
+        Vector3f positionInChunk = new Vector3f(aabb.minX(), aabb.minY(), aabb.minZ());
         positionInChunk.x += 1;
         positionInChunk.y += 1;
         positionInChunk.z += 1;
