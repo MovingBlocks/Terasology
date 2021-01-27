@@ -236,7 +236,7 @@ public class LocalChunkProvider implements ChunkProvider {
             PerformanceMonitor.endActivity();
 
 
-            worldEntity.send(new OnChunkGenerated(chunk.getPosition()));
+            worldEntity.send(new OnChunkGenerated(chunk.getPosition(new org.joml.Vector3i())));
         }
         worldEntity.send(new OnChunkLoaded(chunk.getPosition(new org.joml.Vector3i())));
     }
