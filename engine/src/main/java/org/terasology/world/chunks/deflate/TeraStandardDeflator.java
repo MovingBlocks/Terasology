@@ -229,7 +229,9 @@ public class TeraStandardDeflator extends TeraVisitingDeflator {
                     newInflated[y] = xyvalues;
                 }
             } else {
-                packed[y] = deflated[y];
+                if (deflated != null) {
+                    packed[y] = deflated[y];
+                }
             }
         }
         return new TeraSparseArray16Bit(sizeX, sizeY, sizeZ, newInflated, packed);
@@ -271,7 +273,9 @@ public class TeraStandardDeflator extends TeraVisitingDeflator {
                     newInflated[y] = xyvalues;
                 }
             } else {
-                packed[y] = deflated[y];
+                if (deflated != null) {
+                    packed[y] = deflated[y];
+                }
             }
         }
         return new TeraSparseArray8Bit(sizeX, sizeY, sizeZ, newInflated, packed);
