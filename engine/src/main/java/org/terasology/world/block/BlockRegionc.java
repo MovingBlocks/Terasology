@@ -2,13 +2,13 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.world.block;
 
-import org.joml.AABBf;
-import org.joml.Intersectionf;
-import org.joml.LineSegmentf;
+import org.terasology.joml.geom.AABBf;
+import org.terasology.joml.geom.Intersectionf;
+import org.terasology.joml.geom.LineSegmentf;
 import org.joml.Matrix4fc;
-import org.joml.Planef;
-import org.joml.Rayf;
-import org.joml.Spheref;
+import org.terasology.joml.geom.Planef;
+import org.terasology.joml.geom.Rayf;
+import org.terasology.joml.geom.Spheref;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;

@@ -15,7 +15,7 @@
  */
 package org.terasology.physics;
 
-import org.joml.AABBf;
+import org.terasology.joml.geom.AABBf;
 import org.joml.Vector3f;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.math.AABB;

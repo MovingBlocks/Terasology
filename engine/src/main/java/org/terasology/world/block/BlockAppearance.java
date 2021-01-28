@@ -17,8 +17,8 @@ package org.terasology.world.block;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
-
-import org.terasology.math.geom.Vector2f;
+import org.joml.Vector2f;
+import org.joml.Vector2fc;
 import org.terasology.world.block.shapes.BlockMeshPart;
 
 import java.util.EnumMap;
@@ -31,7 +31,7 @@ import java.util.Map;
 public class BlockAppearance {
 
     private Map<BlockPart, BlockMeshPart> blockParts;
-    private Map<BlockPart, Vector2f> textureAtlasPos = new EnumMap<>(BlockPart.class);
+    private Map<BlockPart, Vector2fc> textureAtlasPos = new EnumMap<>(BlockPart.class);
 
     public BlockAppearance() {
         blockParts = Maps.newEnumMap(BlockPart.class);
@@ -41,7 +41,7 @@ public class BlockAppearance {
         }
     }
 
-    public BlockAppearance(Map<BlockPart, BlockMeshPart> blockParts, Map<BlockPart, Vector2f> textureAtlasPos) {
+    public BlockAppearance(Map<BlockPart, BlockMeshPart> blockParts, Map<BlockPart, ? extends Vector2fc> textureAtlasPos) {
         Preconditions.checkNotNull(blockParts);
         Preconditions.checkNotNull(textureAtlasPos);
         this.blockParts = blockParts;
@@ -55,8 +55,7 @@ public class BlockAppearance {
         return blockParts.get(part);
     }
 
-    public Vector2f getTextureAtlasPos(BlockPart part) {
+    public Vector2fc getTextureAtlasPos(BlockPart part) {
         return new Vector2f(textureAtlasPos.get(part));
     }
-
 }

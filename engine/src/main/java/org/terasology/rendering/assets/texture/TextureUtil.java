@@ -17,7 +17,7 @@
 package org.terasology.rendering.assets.texture;
 
 import com.google.common.primitives.UnsignedBytes;
-import org.joml.Rectanglei;
+import org.terasology.joml.geom.Rectanglei;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.naming.Name;

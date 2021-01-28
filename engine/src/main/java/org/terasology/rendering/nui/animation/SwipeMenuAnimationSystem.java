@@ -15,7 +15,7 @@
  */
 package org.terasology.rendering.nui.animation;
 
-import org.joml.Rectanglei;
+import org.terasology.joml.geom.Rectanglei;
 import org.terasology.math.geom.Rect2i;
 import org.terasology.rendering.animation.Animation;
 import org.terasology.rendering.animation.AnimationListener;
