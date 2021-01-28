@@ -15,7 +15,7 @@
  */
 package org.terasology.rendering.assets.atlas;
 
-import org.terasology.math.geom.Vector2i;
+import org.joml.Vector2i;
 
 import java.util.List;
 
