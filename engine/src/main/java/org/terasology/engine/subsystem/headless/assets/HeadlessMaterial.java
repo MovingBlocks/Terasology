@@ -108,22 +108,12 @@ public class HeadlessMaterial extends BaseMaterial {
     }
 
     @Override
-    public void setMatrix3(String name, Matrix3f matrix, boolean currentOnly) {
-        // Do nothing
-    }
-
-    @Override
     public void setMatrix3(String name, Matrix3fc matrix, boolean currentOnly) {
 
     }
 
     @Override
     public void setMatrix3(String name, FloatBuffer buffer, boolean currentOnly) {
-        // Do nothing
-    }
-
-    @Override
-    public void setMatrix4(String name, Matrix4f matrix, boolean currentOnly) {
         // Do nothing
     }
 
