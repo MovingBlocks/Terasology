@@ -24,13 +24,13 @@ import org.terasology.registry.CoreRegistry;
  */
 public abstract class Camera {
 
-    protected static final Vector3fc FORWARD = JomlUtil.from(Direction.FORWARD.getVector3f());
+    protected static final Vector3fc FORWARD = Direction.FORWARD.asVector3f();
 
     /* CAMERA PARAMETERS */
     protected final Vector3f position = new Vector3f(0, 0, 0);
-    protected final Vector3f up = JomlUtil.from(Direction.UP.getVector3f());
+    protected final Vector3f up = new Vector3f(Direction.UP.asVector3f());
     protected final Vector3f viewingDirection = new Vector3f(FORWARD);
-    protected final Vector3f viewingAxis = JomlUtil.from(Direction.LEFT.getVector3f());
+    protected final Vector3f viewingAxis = new Vector3f(Direction.LEFT.asVector3f());
     protected float viewingAngle;
 
     protected float zNear = 0.1f;
