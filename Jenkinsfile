@@ -34,6 +34,17 @@ node ("heavy-java") {
         } else {
             println "Running on a branch other than 'master' or 'develop' bypassing publishing"
         }
+
+        // Trigger the Omega dist job to repackage a game zip with modules
+        if (env.JOB_NAME.equals("Terasology/engine/develop")) {
+            build job: 'Terasology/Omega/develop', wait: false
+        } else if (env.JOB_NAME.equals("Terasology/engine/master")) {
+            build job: 'Terasology/Omega/master', wait: false
+        } else if (env.JOB_NAME.equals("Nanoware/Terasology/develop")) {
+            build job: 'Nanoware/Omega/develop', wait: false
+        } else if (env.JOB_NAME.equals("Nanoware/Terasology/master")) {
+            build job: 'Nanoware/Omega/master', wait: false
+        }
     }
     stage('Analytics') {
         sh "./gradlew --console=plain check spotbugsmain javadoc"

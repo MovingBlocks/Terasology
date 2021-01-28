@@ -16,6 +16,7 @@
 package org.terasology.world.block.structure;
 
 import org.joml.Vector3i;
+import org.joml.Vector3ic;
 import org.terasology.math.Side;
 import org.terasology.world.block.Block;
 
@@ -46,5 +47,5 @@ public interface BlockStructuralSupport {
      * @param blockOverrides
      * @return
      */
-    boolean isSufficientlySupported(Vector3i location, Map<Vector3i, Block> blockOverrides);
+    boolean isSufficientlySupported(Vector3ic location, Map<? extends Vector3ic, Block> blockOverrides);
 }
