@@ -112,7 +112,7 @@ public class RemoteChunkProvider implements ChunkProvider {
             }
             chunk.markReady();
             if (listener != null) {
-                listener.onChunkReady(chunk.getPosition());
+                listener.onChunkReady(chunk.getPosition(new org.joml.Vector3i()));
             }
             worldEntity.send(new OnChunkLoaded(chunk.getPosition(new org.joml.Vector3i())));
         }
