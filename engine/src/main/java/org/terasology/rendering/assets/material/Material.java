@@ -24,11 +24,6 @@ import org.joml.Vector4fc;
 import org.terasology.assets.Asset;
 import org.terasology.assets.AssetType;
 import org.terasology.assets.ResourceUrn;
-import org.terasology.math.geom.Matrix3f;
-import org.terasology.math.geom.Matrix4f;
-import org.terasology.math.geom.Vector2f;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector4f;
 import org.terasology.rendering.assets.shader.ShaderProgramFeature;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.cameras.Camera;
@@ -110,16 +105,6 @@ public abstract class Material extends Asset<MaterialData> {
      */
     public abstract void setFloat2(String name, float f1, float f2, boolean currentOnly);
 
-    /**
-     * Sets a float2 uniform parameter (for all feature permutations)
-     *
-     * @param name  name of uniform for (float2)
-     * @param value  the {@link Vector2f} to write into uniform
-     * @deprecated This method is scheduled for removal in an upcoming version.
-     *             Use the JOML implementation instead: {@link #setFloat2(String, Vector2fc)}.
-     */
-    @Deprecated
-    public abstract void setFloat2(String name, Vector2f value);
 
     /**
      * Sets a float2 uniform parameter (for all feature permutations)
@@ -128,18 +113,6 @@ public abstract class Material extends Asset<MaterialData> {
      * @param value the {@link Vector2fc} to write into uniform
      */
     public abstract void setFloat2(String name, Vector2fc value);
-
-    /**
-     * Sets a float2 uniform parameter
-     *
-     * @param name name of uniform for (float2)
-     * @param value  the {@link Vector2f} to write into uniform
-     * @param currentOnly determines if written to all permutations
-     * @deprecated This method is scheduled for removal in an upcoming version.
-     *             Use the JOML implementation instead: {@link #setFloat2(String, Vector2fc, boolean)}.
-     */
-    @Deprecated
-    public abstract void setFloat2(String name, Vector2f value, boolean currentOnly);
 
     /**
      * Sets a float2 uniform parameter (for all feature permutations)
@@ -189,16 +162,6 @@ public abstract class Material extends Asset<MaterialData> {
      */
     public abstract void setFloat3(String name, float f1, float f2, float f3, boolean currentOnly);
 
-    /**
-     * Sets a float3 uniform parameter (for all feature permutations)
-     *
-     * @param name name of uniform for (float3)
-     * @param value the {@link Vector3fc} to write into uniform
-     * @deprecated This method is scheduled for removal in an upcoming version.
-     *             Use the JOML implementation instead: {@link #setFloat3(String, Vector3fc)}.
-     */
-    @Deprecated
-    public abstract void setFloat3(String name, Vector3f value);
 
     /**
      * Sets a float3 uniform parameter (for all feature permutations)
@@ -208,16 +171,6 @@ public abstract class Material extends Asset<MaterialData> {
      */
     public abstract void setFloat3(String name, Vector3fc value);
 
-    /**
-     * Sets a float3 uniform parameter
-     *
-     * @param name name of uniform for (float3)
-     * @param value  the {@link Vector3f} to write into uniform
-     * @param currentOnly determines if written to all permutations
-     * @deprecated This method is scheduled for removal in an upcoming version.
-     *             Use the JOML implementation instead: {@link #setFloat3(String, Vector3fc, boolean)}.
-     */
-    public abstract void setFloat3(String name, Vector3f value, boolean currentOnly);
 
     /**
      * Sets a float3 uniform parameter
@@ -270,35 +223,12 @@ public abstract class Material extends Asset<MaterialData> {
     public abstract void setFloat4(String name, float f1, float f2, float f3, float f4, boolean currentOnly);
 
     /**
-     * Sets a float4 uniform parameter (for all feature permutations)
-     *
-     * @param name name of uniform for (float4)
-     * @param value  the {@link Vector4f} to write into uniform
-     * @deprecated This method is scheduled for removal in an upcoming version.
-     *             Use the JOML implementation instead: {@link #setFloat4(String, Vector4fc)}.
-     */
-    @Deprecated
-    public abstract void setFloat4(String name, Vector4f value);
-
-    /**
      * Sets a float4 uniform parameter
      *
      * @param name name of uniform for (float4)
      * @param value the {@link Vector4fc} to write into uniform
      */
     public abstract void setFloat4(String name, Vector4fc value);
-
-    /**
-     * Sets a float4 uniform parameter
-     *
-     * @param name name of uniform for (float4)
-     * @param value the {@link Vector4f} to write into uniform
-     * @param currentOnly determines if written to all permutations
-     * @deprecated This method is scheduled for removal in an upcoming version.
-     *             Use the JOML implementation instead: {@link #setFloat4(String, Vector4fc, boolean)}.
-     */
-    @Deprecated
-    public abstract void setFloat4(String name, Vector4f value, boolean currentOnly);
 
     /**
      * Sets a float4 uniform parameter
@@ -362,31 +292,10 @@ public abstract class Material extends Asset<MaterialData> {
      * Sets a matrix3 uniform parameter (for all feature permutations)
      *
      * @param name uniform parameter (mat3)
-     * @param matrix the {@link Matrix3f} to write into uniform
-     * @deprecated This is scheduled for removal in an upcoming version
-     *              method will be replaced with JOML implementation {@link #setMatrix3(String, Matrix3fc)}.
-     */
-    @Deprecated
-    public abstract void setMatrix3(String name, Matrix3f matrix);
-
-    /**
-     * Sets a matrix3 uniform parameter (for all feature permutations)
-     *
-     * @param name uniform parameter (mat3)
      * @param matrix the {@link Matrix3fc} to write into uniform
      */
     public abstract void setMatrix3(String name, Matrix3fc matrix);
 
-    /**
-     * Sets a matrix3 uniform parameter (for all feature permutations)
-     * @param name uniform parameter (mat3)
-     * @param matrix write 9 entries from {@link FloatBuffer} into uniform
-     * @param currentOnly determines if written to all permutations
-     * @deprecated This is scheduled for removal in an upcoming version
-     *             method will be replaced with JOML implementation {@link #setMatrix3(String, Matrix3fc, boolean)}.
-     */
-    @Deprecated
-    public abstract void setMatrix3(String name, Matrix3f matrix, boolean currentOnly);
 
     /**
      * Sets a matrix3 uniform parameter (for all feature permutations)
@@ -417,32 +326,9 @@ public abstract class Material extends Asset<MaterialData> {
      * Sets a matrix4 uniform parameter (for all feature permutations)
      *
      * @param name uniform parameter (mat4)
-     * @param matrix the {@link Matrix4f} to write into uniform
-     * @deprecated This is scheduled for removal in an upcoming version
-     *             method will be replaced with JOML implementation {@link #setMatrix4(String, Matrix4fc)}.
-     */
-    @Deprecated
-    public abstract void setMatrix4(String name, Matrix4f matrix);
-
-    /**
-     * Sets a matrix4 uniform parameter (for all feature permutations)
-     *
-     * @param name uniform parameter (mat4)
      * @param matrix  write 16 entries from {@link FloatBuffer} into uniform
      */
     public abstract void setMatrix4(String name, Matrix4fc matrix);
-
-    /**
-     *
-     * @param name uniform parameter (mat4)
-     * @param matrix  the {@link Matrix4f} to write into uniform
-     * @param currentOnly determines if written to all permutations
-     * @deprecated This is scheduled for removal in an upcoming version
-     *             method will be replaced with JOML implementation {@link #setMatrix4(String, Matrix4fc, boolean)}.
-     */
-    @Deprecated
-    public abstract void setMatrix4(String name, Matrix4f matrix, boolean currentOnly);
-
 
     /**
      * Sets a matrix4 uniform parameter (for all feature permutations)
