@@ -121,7 +121,7 @@ class LocalChunkProviderTest {
                     Assertions.assertTrue(mustBeOnGeneratedEvent instanceof OnChunkGenerated,
                             "First world event must be OnChunkGenerated");
                     Assertions.assertEquals(((OnChunkGenerated) mustBeOnGeneratedEvent).getChunkPos(),
-                            chunkPosition,
+                            JomlUtil.from(chunkPosition),
                             "Chunk position at event not expected");
                 },
                 () -> {
@@ -150,7 +150,7 @@ class LocalChunkProviderTest {
                     Assertions.assertTrue(mustBeOnGeneratedEvent instanceof OnChunkGenerated,
                             "First world event must be OnChunkGenerated");
                     Assertions.assertEquals(((OnChunkGenerated) mustBeOnGeneratedEvent).getChunkPos(),
-                            chunkPosition,
+                            JomlUtil.from(chunkPosition),
                             "Chunk position at event not expected");
                 },
                 () -> {

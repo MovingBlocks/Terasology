@@ -112,7 +112,7 @@ public class RemoteChunkProvider implements ChunkProvider {
             }
             chunk.markReady();
             if (listener != null) {
-                listener.onChunkReady(chunk.getPosition());
+                listener.onChunkReady(chunk.getPosition(new org.joml.Vector3i()));
             }
             worldEntity.send(new OnChunkLoaded(chunk.getPosition(new org.joml.Vector3i())));
         }
@@ -220,9 +220,6 @@ public class RemoteChunkProvider implements ChunkProvider {
         Chunk[] chunks = new Chunk[region.sizeX() * region.sizeY() * region.sizeZ()];
         for (Vector3i chunkPos : region) {
             Chunk chunk = chunkCache.get(chunkPos);
-            if (chunk == null) {
-                return null;
-            }
             chunkPos.sub(region.minX(), region.minY(), region.minZ());
             int index = TeraMath.calculate3DArrayIndex(chunkPos, region.size());
             chunks[index] = chunk;

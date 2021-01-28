@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.engine.subsystem.lwjgl.GLBufferPool;
+import org.terasology.joml.geom.AABBi;
 import org.terasology.math.JomlUtil;
 import org.terasology.math.TeraMath;
 import org.terasology.monitoring.PerformanceMonitor;
@@ -110,6 +111,12 @@ class RenderableWorldImpl implements RenderableWorld {
                 Collections.sort(chunksInProximityOfCamera, new ChunkFrontToBackComparator());
             } else {
                 logger.warn("Warning: onChunkLoaded called for a null chunk!");
+            }
+        }
+        for (Vector3ic pos : new BlockRegion(chunkCoordinates).expand(1, 1, 1)) {
+            Chunk chunk = chunkProvider.getChunk(pos);
+            if (chunk != null) {
+                chunk.setDirty(true);
             }
         }
     }
