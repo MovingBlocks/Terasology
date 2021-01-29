@@ -139,9 +139,9 @@ public interface WorldProviderCore {
      * @return A mapping from world position to previous block type.
      * The value of a map entry is Null if the change failed (because the necessary chunk was not loaded)
      */
-    default Map<Vector3i, Block> setBlocks(Map<Vector3i, Block> blocks) {
-        Map<Vector3i, Block> resultMap = Maps.newHashMap();
-        for (Map.Entry<Vector3i, Block> entry: blocks.entrySet()) {
+    default Map<Vector3ic, Block> setBlocks(Map<? extends Vector3ic, Block> blocks) {
+        Map<Vector3ic, Block> resultMap = Maps.newHashMap();
+        for (Map.Entry<? extends Vector3ic, Block> entry : blocks.entrySet()) {
             Block oldBlock = setBlock(entry.getKey(), entry.getValue());
             resultMap.put(entry.getKey(), oldBlock);
         }

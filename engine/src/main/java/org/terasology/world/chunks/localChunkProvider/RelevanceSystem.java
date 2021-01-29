@@ -1,4 +1,4 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.world.chunks.localChunkProvider;
 
@@ -17,6 +17,7 @@ import org.terasology.monitoring.Activity;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.world.RelevanceRegionComponent;
 import org.terasology.world.WorldComponent;
+import org.terasology.world.block.BlockRegion;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkRegionListener;
 import org.terasology.world.chunks.event.BeforeChunkUnload;
@@ -195,7 +196,7 @@ public class RelevanceSystem implements UpdateSubscriberSystem {
      */
     public boolean isChunkInRegions(Vector3ic pos) {
         for (ChunkRelevanceRegion region : regions.values()) {
-            if (region.getCurrentRegion().expand(UNLOAD_LEEWAY).contains(pos)) {
+            if (new BlockRegion(region.getCurrentRegion()).expand(UNLOAD_LEEWAY).contains(pos)) {
                 return true;
             }
         }

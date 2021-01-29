@@ -275,7 +275,7 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
 
     @Test
     public void testGetUnstoredChunkReturnsNothing() {
-        esm.loadChunkStore(JomlUtil.from(CHUNK_POS));
+        esm.loadChunkStore(CHUNK_POS);
     }
 
     @Test
@@ -290,7 +290,7 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
         esm.waitForCompletionOfPreviousSaveAndStartSaving();
         esm.finishSavingAndShutdown();
 
-        ChunkStore restored = esm.loadChunkStore(JomlUtil.from(CHUNK_POS));
+        ChunkStore restored = esm.loadChunkStore(CHUNK_POS);
         assertNotNull(restored);
         assertEquals(CHUNK_POS, restored.getChunkPosition());
         assertNotNull(restored.getChunk());
@@ -321,7 +321,7 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
                 recordAndReplayCurrentStatus);
         newSM.loadGlobalStore();
 
-        ChunkStore restored = newSM.loadChunkStore(JomlUtil.from(CHUNK_POS));
+        ChunkStore restored = newSM.loadChunkStore(CHUNK_POS);
         assertNotNull(restored);
         assertEquals(CHUNK_POS, restored.getChunkPosition());
         assertNotNull(restored.getChunk());
@@ -357,7 +357,7 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
                 extraDataManager, false, recordAndReplaySerializer, recordAndReplayUtils, recordAndReplayCurrentStatus);
         newSM.loadGlobalStore();
 
-        ChunkStore restored = newSM.loadChunkStore(JomlUtil.from(CHUNK_POS));
+        ChunkStore restored = newSM.loadChunkStore(CHUNK_POS);
         restored.restoreEntities();
         EntityRef ref = newEntityManager.getEntity(id);
         assertTrue(ref.exists());
