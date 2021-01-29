@@ -160,7 +160,7 @@ public class GLTFAnimationFormat extends GLTFCommonFormat<MeshAnimationBundleDat
             frames.add(frame);
         }
 
-        return new MeshAnimationData(boneNames, boneParents, frames, TIME_PER_FRAME, new AABBf());
+        return new MeshAnimationData(boneNames, boneParents, frames, TIME_PER_FRAME, new AABBf(0, 0, 0));
     }
 
     private TFloatList getFloats(GLTF gltf, List<byte[]> loadedBuffers, int accessorIndex) throws IOException {
