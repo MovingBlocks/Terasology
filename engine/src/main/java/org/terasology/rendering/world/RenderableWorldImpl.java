@@ -24,6 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
+import org.terasology.context.Context;
 import org.terasology.engine.subsystem.lwjgl.GLBufferPool;
 import org.terasology.joml.geom.AABBi;
 import org.terasology.math.JomlUtil;
@@ -36,12 +37,16 @@ import org.terasology.rendering.primitives.ChunkTessellator;
 import org.terasology.rendering.world.viewDistance.ViewDistance;
 import org.terasology.world.ChunkView;
 import org.terasology.world.WorldProvider;
+import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.BlockRegion;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.ChunkProvider;
+import org.terasology.world.chunks.LodChunk;
+import org.terasology.world.chunks.LodChunkProvider;
 import org.terasology.world.chunks.RenderableChunk;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -64,6 +69,7 @@ class RenderableWorldImpl implements RenderableWorld {
 
     private final WorldProvider worldProvider;
     private ChunkProvider chunkProvider;
+    private LodChunkProvider lodChunkProvider;
 
     private ChunkTessellator chunkTessellator;
     private final ChunkMeshUpdateManager chunkMeshUpdateManager;
@@ -83,17 +89,15 @@ class RenderableWorldImpl implements RenderableWorld {
     private int statIgnoredPhases;
 
 
-    RenderableWorldImpl(WorldProvider worldProvider,
-                               ChunkProvider chunkProvider,
-                               GLBufferPool bufferPool,
-                               Camera playerCamera) {
+    RenderableWorldImpl(Context context, GLBufferPool bufferPool, Camera playerCamera) {
 
-        this.worldProvider = worldProvider;
-        this.chunkProvider = chunkProvider;
+        worldProvider = context.get(WorldProvider.class);
+        chunkProvider = context.get(ChunkProvider.class);
         chunkTessellator = new ChunkTessellator(bufferPool);
         chunkMeshUpdateManager = new ChunkMeshUpdateManager(chunkTessellator, worldProvider);
 
         this.playerCamera = playerCamera;
+        lodChunkProvider = new LodChunkProvider(context, chunkTessellator, renderingConfig.getViewDistance(), (int) renderingConfig.getChunkLods(), calcCameraCoordinatesInChunkUnits());
 
         renderQueues = new RenderQueuesHelper(new PriorityQueue<>(MAX_LOADABLE_CHUNKS, new ChunkFrontToBackComparator()),
                 new PriorityQueue<>(MAX_LOADABLE_CHUNKS, new ChunkFrontToBackComparator()),
@@ -119,6 +123,7 @@ class RenderableWorldImpl implements RenderableWorld {
                 chunk.setDirty(true);
             }
         }
+        lodChunkProvider.onRealChunkLoaded(chunkCoordinates);
     }
 
     @Override
@@ -135,6 +140,7 @@ class RenderableWorldImpl implements RenderableWorld {
                 }
             }
         }
+        lodChunkProvider.onRealChunkUnloaded(chunkCoordinates);
     }
 
     /**
@@ -190,6 +196,9 @@ class RenderableWorldImpl implements RenderableWorld {
         updateChunksInProximity(calculateRenderableRegion(renderingConfig.getViewDistance()));
         PerformanceMonitor.endActivity();
 
+        PerformanceMonitor.startActivity("Update LOD Chunks");
+        lodChunkProvider.update(calcCameraCoordinatesInChunkUnits());
+        PerformanceMonitor.endActivity();
     }
 
     /**
@@ -237,10 +246,11 @@ class RenderableWorldImpl implements RenderableWorld {
     }
 
     @Override
-    public boolean updateChunksInProximity(ViewDistance newViewDistance) {
+    public boolean updateChunksInProximity(ViewDistance newViewDistance, int chunkLods) {
         if (newViewDistance != currentViewDistance) {
             logger.info("New Viewing Distance: {}", newViewDistance);
             currentViewDistance = newViewDistance;
+            lodChunkProvider.updateRenderableRegion(newViewDistance, chunkLods, calcCameraCoordinatesInChunkUnits());
             return updateChunksInProximity(calculateRenderableRegion(newViewDistance));
         } else {
             return false;
@@ -304,10 +314,16 @@ class RenderableWorldImpl implements RenderableWorld {
 
         int processedChunks = 0;
         int chunkCounter = 0;
+
+        renderQueues.clear();
+
         ChunkMesh mesh;
         boolean isDynamicShadows = renderingConfig.isDynamicShadows();
 
-        for (RenderableChunk chunk : chunksInProximityOfCamera) {
+        List<RenderableChunk> allChunks = new ArrayList<>(chunksInProximityOfCamera);
+        allChunks.addAll(lodChunkProvider.getChunks());
+
+        for (RenderableChunk chunk : allChunks) {
             if (isChunkValidForRender(chunk)) {
                 mesh = chunk.getMesh();
 
@@ -376,6 +392,7 @@ class RenderableWorldImpl implements RenderableWorld {
     @Override
     public void dispose() {
         chunkMeshUpdateManager.shutdown();
+        lodChunkProvider.shutdown();
     }
 
     private boolean isChunkValidForRender(RenderableChunk chunk) {

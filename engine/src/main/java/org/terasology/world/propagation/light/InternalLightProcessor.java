@@ -79,7 +79,7 @@ public final class InternalLightProcessor {
         for (int x = 0; x < Chunks.SIZE_X; x++) {
             for (int z = 0; z < Chunks.SIZE_Z; z++) {
                 /* Start at the bottom of the chunk and then move up until the max sunlight level */
-                for (int y = 0; y < Chunks.MAX_SUNLIGHT; y++) {
+                for (int y = 0; y < Chunks.SIZE_Y; y++) {
                     pos.set(x, y, z);
                     Block block = chunk.getBlock(x, y, z);
                     byte light = sunlightRules.getFixedValue(block, pos);
@@ -103,7 +103,7 @@ public final class InternalLightProcessor {
         /* Scan through each column in the chunk & propagate light from the top down */
         for (int x = 0; x < Chunks.SIZE_X; x++) {
             for (int z = 0; z < Chunks.SIZE_Z; z++) {
-                byte regen = 0;
+                byte regen = chunk.getSunlightRegen(x, top, z);
                 Block lastBlock = chunk.getBlock(x, top, z);
                 for (int y = top - 1; y >= 0; y--) {
                     Block block = chunk.getBlock(x, y, z);

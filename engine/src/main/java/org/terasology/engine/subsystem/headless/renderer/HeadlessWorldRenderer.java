@@ -142,7 +142,7 @@ public class HeadlessWorldRenderer implements WorldRenderer {
     }
 
     @Override
-    public void setViewDistance(ViewDistance viewDistance) {
+    public void setViewDistance(ViewDistance viewDistance, int chunkLods) {
         // TODO Auto-generated method stub
 
     }
