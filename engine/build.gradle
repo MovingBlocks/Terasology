@@ -29,8 +29,6 @@ ext {
 
     // Stuff for our automatic version file setup
     startDateTimeString = dateTimeFormat.format(new Date())
-    versionInfoFileDir = new File(buildDir, 'classes/org/terasology/version')
-    versionInfoFile = new File(versionInfoFileDir, 'versionInfo.properties')
     versionBase = new File(templatesDir, "version.txt").text.trim()
     displayVersion = versionBase
 }
