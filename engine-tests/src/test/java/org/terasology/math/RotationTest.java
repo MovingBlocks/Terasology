@@ -20,9 +20,9 @@ import org.joml.Quaternionf;
 import org.junit.jupiter.api.Test;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
-import org.terasology.testUtil.TeraAssert;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.terasology.joml.test.QuaternionAssert.assertEquals;
 
 /**
  */
@@ -46,14 +46,14 @@ public class RotationTest {
 
     @Test
     public void testOrientation() {
-        TeraAssert.assertEquals(new Quaternionf().rotationYXZ(90.0f * TeraMath.DEG_TO_RAD,0,0), Rotation.rotate(Yaw.CLOCKWISE_90).orientation(),0.001f);
-        TeraAssert.assertEquals(new Quaternionf().rotationYXZ(180.0f * TeraMath.DEG_TO_RAD,0,0), Rotation.rotate(Yaw.CLOCKWISE_180).orientation(),0.001f);
+        assertEquals(new Quaternionf().rotationYXZ(90.0f * TeraMath.DEG_TO_RAD,0,0), Rotation.rotate(Yaw.CLOCKWISE_90).orientation(),0.001f);
+        assertEquals(new Quaternionf().rotationYXZ(180.0f * TeraMath.DEG_TO_RAD,0,0), Rotation.rotate(Yaw.CLOCKWISE_180).orientation(),0.001f);
 
-        TeraAssert.assertEquals(new Quaternionf().rotationYXZ(0,90.0f * TeraMath.DEG_TO_RAD,0), Rotation.rotate(Pitch.CLOCKWISE_90).orientation(),0.001f);
-        TeraAssert.assertEquals(new Quaternionf().rotationYXZ(0,180.0f * TeraMath.DEG_TO_RAD,0), Rotation.rotate(Pitch.CLOCKWISE_180).orientation(),0.001f);
+        assertEquals(new Quaternionf().rotationYXZ(0,90.0f * TeraMath.DEG_TO_RAD,0), Rotation.rotate(Pitch.CLOCKWISE_90).orientation(),0.001f);
+        assertEquals(new Quaternionf().rotationYXZ(0,180.0f * TeraMath.DEG_TO_RAD,0), Rotation.rotate(Pitch.CLOCKWISE_180).orientation(),0.001f);
 
-        TeraAssert.assertEquals(new Quaternionf().rotationYXZ(0,0,90.0f * TeraMath.DEG_TO_RAD), Rotation.rotate(Roll.CLOCKWISE_90).orientation(),0.001f);
-        TeraAssert.assertEquals(new Quaternionf().rotationYXZ(0,0,180.0f * TeraMath.DEG_TO_RAD), Rotation.rotate(Roll.CLOCKWISE_180).orientation(),0.001f);
+        assertEquals(new Quaternionf().rotationYXZ(0,0,90.0f * TeraMath.DEG_TO_RAD), Rotation.rotate(Roll.CLOCKWISE_90).orientation(),0.001f);
+        assertEquals(new Quaternionf().rotationYXZ(0,0,180.0f * TeraMath.DEG_TO_RAD), Rotation.rotate(Roll.CLOCKWISE_180).orientation(),0.001f);
     }
 
     @Test
