@@ -15,6 +15,7 @@
  */
 package org.terasology.persistence;
 
+import org.joml.Vector3ic;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.network.Client;
 import org.terasology.world.chunks.Chunk;
@@ -50,7 +51,7 @@ public interface StorageManager {
      *
      * @param chunkPos
      */
-    ChunkStore loadChunkStore(Vector3i chunkPos);
+    ChunkStore loadChunkStore(Vector3ic chunkPos);
 
     void finishSavingAndShutdown();
 

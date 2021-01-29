@@ -24,11 +24,13 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.lifecycleEvents.BeforeRemoveComponent;
 import org.terasology.math.JomlUtil;
 import org.terasology.math.TeraMath;
-import org.terasology.testUtil.TeraAssert;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.terasology.joml.test.VectorAssert.assertEquals;
+import static org.terasology.joml.test.QuaternionAssert.assertEquals;
+
 
 /**
  */
@@ -71,7 +73,7 @@ public class LocationComponentTest extends TerasologyTestingEnvironment {
     @Test
     public void testSetLocalRotation() {
         loc.setLocalRotation(yawRotation);
-        TeraAssert.assertEquals(yawRotation, JomlUtil.from(loc.getLocalRotation()), 0.0001f);
+        assertEquals(yawRotation, JomlUtil.from(loc.getLocalRotation()), 0.0001f);
     }
 
     @Test
@@ -93,7 +95,7 @@ public class LocationComponentTest extends TerasologyTestingEnvironment {
         LocationComponent parent = giveParent();
         loc.setLocalPosition(pos1);
         parent.setLocalRotation(yawRotation);
-        TeraAssert.assertEquals(new Vector3f(pos1.z, pos1.y, -pos1.x), loc.getWorldPosition(new Vector3f()), 0.00001f);
+        assertEquals(new Vector3f(pos1.z, pos1.y, -pos1.x), loc.getWorldPosition(new Vector3f()), 0.00001f);
     }
 
     @Test
@@ -113,7 +115,7 @@ public class LocationComponentTest extends TerasologyTestingEnvironment {
         parent.setLocalPosition(pos2);
         parent.setLocalRotation(yawRotation);
 
-        TeraAssert.assertEquals(new Vector3f(8, 7, 2), loc.getWorldPosition(new Vector3f()), 0.00001f);
+        assertEquals(new Vector3f(8, 7, 2), loc.getWorldPosition(new Vector3f()), 0.00001f);
     }
 
     @Test
@@ -127,7 +129,7 @@ public class LocationComponentTest extends TerasologyTestingEnvironment {
         LocationComponent parent = giveParent();
         loc.setLocalRotation(pitchRotation);
         parent.setLocalRotation(yawRotation);
-        TeraAssert.assertEquals(yawPitch, loc.getWorldRotation(new Quaternionf()), 0.0001f);
+        assertEquals(yawPitch, loc.getWorldRotation(new Quaternionf()), 0.0001f);
     }
 
     @Test
@@ -147,7 +149,7 @@ public class LocationComponentTest extends TerasologyTestingEnvironment {
     @Test
     public void testSetWorldPositionWorksWithNoParent() {
         loc.setWorldPosition(pos1);
-        TeraAssert.assertEquals(pos1, loc.getWorldPosition(new Vector3f()), 0.0001f);
+        assertEquals(pos1, loc.getWorldPosition(new Vector3f()), 0.0001f);
     }
 
     @Test
@@ -155,7 +157,7 @@ public class LocationComponentTest extends TerasologyTestingEnvironment {
         LocationComponent parent = giveParent();
         parent.setLocalPosition(pos1);
         loc.setWorldPosition(pos1plus2);
-        TeraAssert.assertEquals(pos2, JomlUtil.from(loc.getLocalPosition()), 0.0001f);
+        assertEquals(pos2, JomlUtil.from(loc.getLocalPosition()), 0.0001f);
         assertEquals(pos1plus2, loc.getWorldPosition(new Vector3f()));
     }
 
@@ -164,7 +166,7 @@ public class LocationComponentTest extends TerasologyTestingEnvironment {
         LocationComponent parent = giveParent();
         parent.setLocalScale(2.0f);
         loc.setWorldPosition(pos1);
-        TeraAssert.assertEquals(pos1, loc.getWorldPosition(new Vector3f()), 0.0001f);
+        assertEquals(pos1, loc.getWorldPosition(new Vector3f()), 0.0001f);
     }
 
     @Test
@@ -172,7 +174,7 @@ public class LocationComponentTest extends TerasologyTestingEnvironment {
         LocationComponent parent = giveParent();
         parent.setLocalRotation(yawRotation);
         loc.setWorldPosition(pos1);
-        TeraAssert.assertEquals(pos1, loc.getWorldPosition(new Vector3f()), 0.000001f);
+        assertEquals(pos1, loc.getWorldPosition(new Vector3f()), 0.000001f);
     }
 
     @Test
@@ -189,13 +191,13 @@ public class LocationComponentTest extends TerasologyTestingEnvironment {
         Location.attachChild(firstEntity, secondEntity);
         second.setLocalPosition(new Vector3f(1, 0, 0));
         first.setLocalRotation(yawRotation);
-        TeraAssert.assertEquals(new Vector3f(0, 0, -1), second.getWorldPosition(new Vector3f()), 0.000001f);
+        assertEquals(new Vector3f(0, 0, -1), second.getWorldPosition(new Vector3f()), 0.000001f);
         Location.attachChild(secondEntity, thirdEntity);
         second.setLocalRotation(pitchRotation);
         third.setLocalPosition(new Vector3f(0, 0, 0));
-        TeraAssert.assertEquals(new Vector3f(0, 0, -1), third.getWorldPosition(new Vector3f()), 0.000001f);
+        assertEquals(new Vector3f(0, 0, -1), third.getWorldPosition(new Vector3f()), 0.000001f);
         third.setLocalPosition(new Vector3f(0, 0, 1));
-        TeraAssert.assertEquals(new Vector3f(0.5f * (float) Math.sqrt(2), -0.5f * (float) Math.sqrt(2), -1), third.getWorldPosition(new Vector3f()), 0.000001f);
+        assertEquals(new Vector3f(0.5f * (float) Math.sqrt(2), -0.5f * (float) Math.sqrt(2), -1), third.getWorldPosition(new Vector3f()), 0.000001f);
 
     }
 
@@ -206,7 +208,7 @@ public class LocationComponentTest extends TerasologyTestingEnvironment {
         parent.setLocalScale(2.0f);
         parent.setLocalPosition(pos2);
         loc.setWorldPosition(pos1);
-        TeraAssert.assertEquals(pos1, loc.getWorldPosition(new Vector3f()), 0.000001f);
+        assertEquals(pos1, loc.getWorldPosition(new Vector3f()), 0.000001f);
     }
 
     @Test
@@ -227,8 +229,8 @@ public class LocationComponentTest extends TerasologyTestingEnvironment {
     @Test
     public void testSetWorldRotationWorksWithNoParent() {
         loc.setWorldRotation(yawRotation);
-        TeraAssert.assertEquals(yawRotation, loc.getWorldRotation(new Quaternionf()), 0.0001f);
-        TeraAssert.assertEquals(yawRotation, JomlUtil.from(loc.getLocalRotation()), 0.0001f);
+        assertEquals(yawRotation, loc.getWorldRotation(new Quaternionf()), 0.0001f);
+        assertEquals(yawRotation, JomlUtil.from(loc.getLocalRotation()), 0.0001f);
     }
 
     @Test
@@ -236,7 +238,7 @@ public class LocationComponentTest extends TerasologyTestingEnvironment {
         LocationComponent parent = giveParent();
         parent.setLocalRotation(yawRotation);
         loc.setWorldRotation(yawPitch);
-        TeraAssert.assertEquals(yawPitch, loc.getWorldRotation(new Quaternionf()), 0.0001f);
+        assertEquals(yawPitch, loc.getWorldRotation(new Quaternionf()), 0.0001f);
     }
 
     @Test
@@ -248,7 +250,7 @@ public class LocationComponentTest extends TerasologyTestingEnvironment {
         loc.setWorldPosition(new Vector3f(2, 0, 0));
         Location.attachChild(parentEntity, entity);
 
-        TeraAssert.assertEquals(new Vector3f(2, 0, 0), loc.getWorldPosition(new Vector3f()), 0.000001f);
+        assertEquals(new Vector3f(2, 0, 0), loc.getWorldPosition(new Vector3f()), 0.000001f);
     }
 
     @Test
@@ -261,7 +263,7 @@ public class LocationComponentTest extends TerasologyTestingEnvironment {
         Location.attachChild(parentEntity, entity);
         Location.removeChild(parentEntity, entity);
 
-        TeraAssert.assertEquals(new Vector3f(2, 0, 0), loc.getWorldPosition(new Vector3f()), 0.000001f);
+        assertEquals(new Vector3f(2, 0, 0), loc.getWorldPosition(new Vector3f()), 0.000001f);
     }
 
     @Test
@@ -277,7 +279,7 @@ public class LocationComponentTest extends TerasologyTestingEnvironment {
         when(parentEntity.getComponent(LocationComponent.class)).thenReturn(null);
         when(parentEntity.exists()).thenReturn(false);
 
-        TeraAssert.assertEquals(new Vector3f(2, 0, 0), loc.getWorldPosition(new Vector3f()), 0.000001f);
+        assertEquals(new Vector3f(2, 0, 0), loc.getWorldPosition(new Vector3f()), 0.000001f);
     }
 
 

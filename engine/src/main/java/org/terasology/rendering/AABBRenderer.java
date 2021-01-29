@@ -16,11 +16,12 @@
 
 package org.terasology.rendering;
 
+import org.joml.Vector3f;
+import org.joml.Vector4f;
 import org.lwjgl.opengl.GL11;
+import org.terasology.joml.geom.AABBf;
+import org.terasology.joml.geom.AABBfc;
 import org.terasology.logic.players.LocalPlayer;
-import org.terasology.math.AABB;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector4f;
 import org.terasology.module.sandbox.API;
 import org.terasology.registry.CoreRegistry;
 
@@ -52,16 +53,16 @@ public class AABBRenderer implements BlockOverlayRenderer {
     private int displayListSolid = -1;
     private Vector4f solidColor = new Vector4f(1f, 1f, 1f, 1f);
 
-    private AABB aabb;
+    private AABBf aabb = new AABBf();
 
-    public AABBRenderer(AABB aabb) {
-        this.aabb = aabb;
+    public AABBRenderer(AABBfc aabb) {
+        this.aabb.set(aabb);
     }
 
     @Override
-    public void setAABB(AABB from) {
+    public void setAABB(AABBfc from) {
         if (from != null && !from.equals(this.aabb)) {
-            this.aabb = from;
+            this.aabb.set(from);
             dispose();
         }
     }
@@ -90,8 +91,9 @@ public class AABBRenderer implements BlockOverlayRenderer {
         CoreRegistry.get(ShaderManager.class).enableDefault();
 
         glPushMatrix();
-        Vector3f cameraPosition = CoreRegistry.get(LocalPlayer.class).getViewPosition();
-        glTranslated(aabb.getCenter().x - cameraPosition.x, -cameraPosition.y, aabb.getCenter().z - cameraPosition.z);
+        Vector3f cameraPosition = CoreRegistry.get(LocalPlayer.class).getViewPosition(new Vector3f());
+        Vector3f center = aabb.center(new Vector3f());
+        glTranslated(center.x - cameraPosition.x, -cameraPosition.y, center.z - cameraPosition.z);
 
         renderLocally();
 
@@ -102,8 +104,9 @@ public class AABBRenderer implements BlockOverlayRenderer {
         CoreRegistry.get(ShaderManager.class).enableDefault();
 
         glPushMatrix();
-        Vector3f cameraPosition = CoreRegistry.get(LocalPlayer.class).getViewPosition();
-        glTranslated(aabb.getCenter().x - cameraPosition.x, -cameraPosition.y, aabb.getCenter().z - cameraPosition.z);
+        Vector3f cameraPosition = CoreRegistry.get(LocalPlayer.class).getViewPosition(new Vector3f());
+        Vector3f center = aabb.center(new Vector3f());
+        glTranslated(center.x - cameraPosition.x, -cameraPosition.y, center.z - cameraPosition.z);
 
         renderSolidLocally();
 
@@ -123,9 +126,9 @@ public class AABBRenderer implements BlockOverlayRenderer {
         if (displayListWire == -1) {
             generateDisplayListWire();
         }
-
+        Vector3f center = aabb.center(new Vector3f());
         glPushMatrix();
-        glTranslated(0f, aabb.getCenter().y, 0f);
+        glTranslated(0f, center.y, 0f);
 
         glCallList(displayListWire);
 
@@ -141,7 +144,8 @@ public class AABBRenderer implements BlockOverlayRenderer {
         glEnable(GL_BLEND);
         glPushMatrix();
 
-        glTranslated(0f, aabb.getCenter().y, 0f);
+        Vector3f center = aabb.center(new Vector3f());
+        glTranslated(0f, center.y, 0f);
         glScalef(1.5f, 1.5f, 1.5f);
 
         glCallList(displayListSolid);
@@ -157,7 +161,7 @@ public class AABBRenderer implements BlockOverlayRenderer {
         glBegin(GL_QUADS);
         glColor4f(solidColor.x, solidColor.y, solidColor.z, solidColor.w);
 
-        Vector3f dimensions = aabb.getExtents();
+        Vector3f dimensions = aabb.extent(new Vector3f());
 
         GL11.glVertex3f(-dimensions.x, dimensions.y, dimensions.z);
         GL11.glVertex3f(dimensions.x, dimensions.y, dimensions.z);
@@ -201,7 +205,7 @@ public class AABBRenderer implements BlockOverlayRenderer {
         glNewList(displayListWire, GL11.GL_COMPILE);
         glColor4f(0.0f, 0.0f, 0.0f, 1.0f);
 
-        Vector3f dimensions = aabb.getExtents();
+        Vector3f dimensions = aabb.extent(new Vector3f());
 
         // FRONT
         glBegin(GL_LINE_LOOP);
@@ -253,7 +257,7 @@ public class AABBRenderer implements BlockOverlayRenderer {
         glEndList();
     }
 
-    public AABB getAABB() {
+    public AABBfc getAABB() {
         return aabb;
     }
 }

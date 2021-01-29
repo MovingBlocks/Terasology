@@ -29,18 +29,10 @@ ext {
 
     // Stuff for our automatic version file setup
     startDateTimeString = dateTimeFormat.format(new Date())
-    versionFileName = 'VERSION'
+    versionInfoFileDir = new File(buildDir, 'classes/org/terasology/version')
+    versionInfoFile = new File(versionInfoFileDir, 'versionInfo.properties')
     versionBase = new File(templatesDir, "version.txt").text.trim()
     displayVersion = versionBase
-}
-
-def convertGitBranch = { gitBranch ->
-    if (gitBranch != null) {
-        // Remove "origin/" from "origin/develop"
-        gitBranch.substring(gitBranch.lastIndexOf("/") + 1)
-    } else {
-        ""
-    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -173,7 +165,7 @@ jar {
             def manifestClasspath = "$subDirLibs/" + configurations."${sourceSets.main.runtimeClasspathConfigurationName}".collect {
                 it.getName()
             }.join(" $subDirLibs/")
-            attributes("Class-Path": manifestClasspath, "Implementation-Title": "Terasology-" + project.name, "Implementation-Version": env.BUILD_NUMBER + ", " + convertGitBranch(env.GIT_BRANCH) + ", " + env.BUILD_ID + ", " + displayVersion)
+            attributes("Class-Path": manifestClasspath, "Implementation-Title": "Terasology", "Implementation-Version": displayVersion + ", engine v" + version + " , build number " + env.BUILD_NUMBER)
         }
     }
 }
@@ -263,7 +255,7 @@ tasks.named("processResources", Copy) {
     }
 }
 
-//TODO: Remove it  when gestalt will can to handle ProtectionDomain without classes (Resources)
+//TODO: Remove this when gestalt can handle ProtectionDomain without classes (Resources)
 task copyResourcesToClasses(type: Copy) {
     from sourceSets.main.output.resourcesDir
     into sourceSets.main.output.classesDirs.first()

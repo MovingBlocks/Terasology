@@ -138,10 +138,10 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
     //However, this means that even if only one block is placed, this is the method being called.
     //It must be overridden here to allow an OnChangedBlock event to be properly sent for placed blocks.
     @Override
-    public Map<Vector3i, Block> setBlocks(Map<Vector3i, Block> blocks) {
+    public Map<Vector3ic, Block> setBlocks(Map<? extends Vector3ic, Block> blocks) {
         if (GameThread.isCurrentThread()) {
-            Map<Vector3i, Block> oldBlocks = super.setBlocks(blocks);
-            for (Vector3i vec : oldBlocks.keySet()) {
+            Map<Vector3ic, Block> oldBlocks = super.setBlocks(blocks);
+            for (Vector3ic vec : oldBlocks.keySet()) {
                 if (oldBlocks.get(vec) != null) {
                     EntityRef blockEntity = getBlockEntityAt(vec);
 
@@ -150,7 +150,7 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
                             Optional.ofNullable(blockEntity.getComponent(RetainComponentsComponent.class))
                                     .map(retainComponentsComponent -> retainComponentsComponent.components)
                                     .orElse(Collections.emptySet());
-                    updateBlockEntity(blockEntity, vec, oldBlocks.get(vec), blocks.get(vec), false, retainComponents);
+                    updateBlockEntity(blockEntity, JomlUtil.from(vec), oldBlocks.get(vec), blocks.get(vec), false, retainComponents);
                 }
             }
             return oldBlocks;

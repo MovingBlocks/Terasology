@@ -3,7 +3,8 @@
 
 package org.terasology.fixtures;
 
-import org.terasology.math.geom.Vector3i;
+import org.joml.Vector3i;
+import org.joml.Vector3ic;
 import org.terasology.network.Client;
 import org.terasology.persistence.ChunkStore;
 import org.terasology.persistence.PlayerStore;
@@ -17,7 +18,7 @@ import java.util.Map;
 
 public class TestStorageManager implements StorageManager {
 
-    private final Map<Vector3i, ChunkStore> chunkStores = new HashMap<>();
+    private final Map<Vector3ic, ChunkStore> chunkStores = new HashMap<>();
 
     public TestStorageManager() {
     }
@@ -27,12 +28,12 @@ public class TestStorageManager implements StorageManager {
         chunkList.forEach(this::add);
     }
 
-    public TestStorageManager(Map<Vector3i, ChunkStore> chunkStores) {
+    public TestStorageManager(Map<Vector3ic, ChunkStore> chunkStores) {
         this.chunkStores.putAll(chunkStores);
     }
 
     public void add(Chunk chunk) {
-        chunkStores.put(chunk.getPosition(), new TestChunkStore(chunk));
+        chunkStores.put(chunk.getPosition(new Vector3i()), new TestChunkStore(chunk));
     }
 
     @Override
@@ -56,7 +57,7 @@ public class TestStorageManager implements StorageManager {
     }
 
     @Override
-    public ChunkStore loadChunkStore(Vector3i chunkPos) {
+    public ChunkStore loadChunkStore(Vector3ic chunkPos) {
         return chunkStores.get(chunkPos);
     }
 

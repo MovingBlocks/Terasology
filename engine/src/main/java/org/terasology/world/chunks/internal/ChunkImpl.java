@@ -20,6 +20,8 @@ import com.google.common.base.Preconditions;
 import org.joml.Vector3ic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.joml.geom.AABBf;
+import org.terasology.joml.geom.AABBfc;
 import org.terasology.math.AABB;
 import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.BaseVector3i;
@@ -71,7 +73,7 @@ public class ChunkImpl implements Chunk {
     private TeraArray[] extraData;
     private volatile TeraArray[] extraDataSnapshots;
 
-    private AABB aabb;
+    private AABBf aabb = new AABBf();
     private BlockRegion region;
 
     private boolean disposed;
@@ -341,14 +343,12 @@ public class ChunkImpl implements Chunk {
     }
 
     @Override
-    public AABB getAABB() {
-        if (aabb == null) {
-            Vector3f min = getChunkWorldOffset().toVector3f();
-            Vector3f max = ChunkConstants.CHUNK_SIZE.toVector3f();
-            max.add(min);
-            aabb = AABB.createMinMax(min, max);
+    public AABBfc getAABB() {
+        if (!aabb.isValid()) {
+            org.joml.Vector3f min = JomlUtil.from(getChunkWorldOffset().toVector3f());
+            org.joml.Vector3f max = new org.joml.Vector3f(Chunks.CHUNK_SIZE).add(min);
+            aabb = new AABBf(min, max);
         }
-
         return aabb;
     }
 

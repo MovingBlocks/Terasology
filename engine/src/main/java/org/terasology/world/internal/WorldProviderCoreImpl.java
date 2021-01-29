@@ -202,32 +202,34 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
     }
 
     @Override
-    public Map<org.terasology.math.geom.Vector3i, Block> setBlocks(Map<org.terasology.math.geom.Vector3i, Block> blocks) {
+    public Map<Vector3ic, Block> setBlocks(Map<? extends Vector3ic, Block> blocks) {
         /*
          * Hint: This method has a benchmark available in the BenchmarkScreen, The screen can be opened ingame via the
          * command "showSCreen BenchmarkScreen".
          */
         Set<BlockChange> changedBlocks = new HashSet<>();
-        Map<org.terasology.math.geom.Vector3i, Block> result = new HashMap<>(blocks.size());
+        Map<Vector3ic, Block> result = new HashMap<>(blocks.size());
 
-        for (Map.Entry<org.terasology.math.geom.Vector3i, Block> entry : blocks.entrySet()) {
-            org.terasology.math.geom.Vector3i worldPos = entry.getKey();
-            org.terasology.math.geom.Vector3i chunkPos = ChunkMath.calcChunkPos(worldPos);
+        Vector3i chunkPos = new Vector3i();
+        Vector3i relativePos = new Vector3i();
+        for (Map.Entry<? extends Vector3ic, Block> entry : blocks.entrySet()) {
+            Vector3ic worldPos = entry.getKey();
+            Chunks.toChunkPos(worldPos, chunkPos);
             CoreChunk chunk = chunkProvider.getChunk(chunkPos);
 
             if (chunk != null) {
                 Block type = entry.getValue();
-                org.terasology.math.geom.Vector3i blockPos = ChunkMath.calcRelativeBlockPos(worldPos);
-                Block oldBlockType = chunk.setBlock(blockPos, type);
+               Chunks.toRelative(worldPos, relativePos);
+                Block oldBlockType = chunk.setBlock(relativePos, type);
                 if (oldBlockType != type) {
-                    BlockChange oldChange = blockChanges.get(worldPos);
+                    BlockChange oldChange = blockChanges.get(JomlUtil.from(worldPos));
                     if (oldChange == null) {
-                        blockChanges.put(worldPos, new BlockChange(JomlUtil.from(worldPos), oldBlockType, type));
+                        blockChanges.put(JomlUtil.from(worldPos), new BlockChange(worldPos, oldBlockType, type));
                     } else {
                         oldChange.setTo(type);
                     }
-                    setDirtyChunksNear(JomlUtil.from(worldPos));
-                    changedBlocks.add(new BlockChange(JomlUtil.from(worldPos), oldBlockType, type));
+                    setDirtyChunksNear(worldPos);
+                    changedBlocks.add(new BlockChange(worldPos, oldBlockType, type));
                 }
                 result.put(worldPos, oldBlockType);
             } else {
@@ -275,7 +277,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
     public Block getBlock(int x, int y, int z) {
         CoreChunk chunk = chunkProvider.getChunk(Chunks.toChunkPos(x, y, z, new Vector3i()));
         if (chunk != null) {
-            return chunk.getBlock(Chunks.toRelativeX(x), Chunks.toRelativeX(y), Chunks.toRelativeX(z));
+            return chunk.getBlock(Chunks.toRelativeX(x), Chunks.toRelativeY(y), Chunks.toRelativeZ(z));
         }
         return unloadedBlock;
     }

@@ -19,7 +19,8 @@ import gnu.trove.list.TFloatList;
 import org.terasology.assets.Asset;
 import org.terasology.assets.AssetType;
 import org.terasology.assets.ResourceUrn;
-import org.terasology.math.AABB;
+import org.terasology.joml.geom.AABBf;
+import org.terasology.joml.geom.AABBfc;
 
 public abstract class Mesh extends Asset<MeshData> {
 
@@ -33,7 +34,37 @@ public abstract class Mesh extends Asset<MeshData> {
         super(urn, assetType);
     }
 
-    public abstract AABB getAABB();
+    public abstract AABBfc getAABB();
+
+    protected AABBf getBound(MeshData data, AABBf dest) {
+        TFloatList vertices = data.getVertices();
+        int vertexCount = vertices.size() / 3;
+        if (vertexCount == 0) {
+            dest.set(Float.POSITIVE_INFINITY,
+                Float.POSITIVE_INFINITY,
+                Float.POSITIVE_INFINITY,
+                Float.NEGATIVE_INFINITY,
+                Float.NEGATIVE_INFINITY,
+                Float.NEGATIVE_INFINITY);
+        }
+
+        dest.minX = vertices.get(0);
+        dest.minY = vertices.get(1);
+        dest.minZ = vertices.get(2);
+        dest.maxX = vertices.get(0);
+        dest.maxY = vertices.get(1);
+        dest.maxZ = vertices.get(2);
+
+        for (int index = 1; index < vertexCount; ++index) {
+            dest.minX = Math.min(dest.minX, vertices.get(3 * index));
+            dest.minY = Math.max(dest.minY, vertices.get(3 * index));
+            dest.minZ = Math.min(dest.minZ, vertices.get(3 * index + 1));
+            dest.maxX = Math.max(dest.maxX, vertices.get(3 * index + 1));
+            dest.maxY = Math.min(dest.maxY, vertices.get(3 * index + 2));
+            dest.maxZ = Math.max(dest.maxZ, vertices.get(3 * index + 2));
+        }
+        return dest;
+    }
 
     public abstract TFloatList getVertices();
 

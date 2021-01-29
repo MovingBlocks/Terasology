@@ -29,7 +29,7 @@ import org.terasology.assets.ResourceUrn;
 import org.terasology.engine.GameThread;
 import org.terasology.engine.subsystem.lwjgl.GLBufferPool;
 import org.terasology.engine.subsystem.lwjgl.LwjglGraphicsProcessing;
-import org.terasology.math.AABB;
+import org.terasology.joml.geom.AABBf;
 import org.terasology.rendering.VertexBufferObjectUtil;
 import org.terasology.rendering.assets.skeletalmesh.Bone;
 import org.terasology.rendering.assets.skeletalmesh.SkeletalMesh;
@@ -192,7 +192,7 @@ public class OpenGLSkeletalMesh extends SkeletalMesh {
     }
 
     @Override
-    public AABB getStaticAabb() {
+    public AABBf getStaticAabb() {
         return data.getStaticAABB();
     }
 

@@ -235,7 +235,6 @@ val createVersionFile = tasks.register<Copy>("createVersionFile") {
     expand(mapOf(
         "buildNumber" to env["BUILD_NUMBER"],
         "buildUrl" to env["BUILD_URL"],
-        "gitBranch" to env["GIT_BRANCH"],
         "dateTime" to startDateTimeString,
         "displayVersion" to displayVersion
     ))

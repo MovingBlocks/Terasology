@@ -18,7 +18,7 @@ package org.terasology.engine.subsystem.headless.assets;
 import org.terasology.assets.Asset;
 import org.terasology.assets.AssetType;
 import org.terasology.assets.ResourceUrn;
-import org.terasology.math.AABB;
+import org.terasology.joml.geom.AABBf;
 import org.terasology.rendering.assets.skeletalmesh.Bone;
 import org.terasology.rendering.assets.skeletalmesh.SkeletalMesh;
 import org.terasology.rendering.assets.skeletalmesh.SkeletalMeshData;
@@ -61,7 +61,7 @@ public class HeadlessSkeletalMesh extends SkeletalMesh {
     }
 
     @Override
-    public AABB getStaticAabb() {
+    public AABBf getStaticAabb() {
         return data.getStaticAABB();
     }
 }
