@@ -127,7 +127,7 @@ public class LocalChunkProvider implements ChunkProvider {
         return loadingPipeline.invokeGeneratorTask(
                 JomlUtil.from(chunkPos),
                 () -> {
-                    ChunkStore chunkStore = storageManager.loadChunkStore(chunkPos);
+                    ChunkStore chunkStore = storageManager.loadChunkStore(JomlUtil.from(chunkPos));
                     Chunk chunk;
                     EntityBufferImpl buffer = new EntityBufferImpl();
                     if (chunkStore == null) {
@@ -194,7 +194,7 @@ public class LocalChunkProvider implements ChunkProvider {
         chunk.markReady();
         //TODO, it is not clear if the activate/addedBlocks event logic is correct.
         //See https://github.com/MovingBlocks/Terasology/issues/3244
-        ChunkStore store = this.storageManager.loadChunkStore(chunk.getPosition());
+        ChunkStore store = this.storageManager.loadChunkStore(chunk.getPosition(new org.joml.Vector3i()));
         TShortObjectMap<TIntList> mappings = createBatchBlockEventMappings(chunk);
         if (store != null) {
             store.restoreEntities();
