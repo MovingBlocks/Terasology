@@ -1,18 +1,5 @@
-/*
- * Copyright 2020 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.logic.players;
 
 import org.joml.Math;
@@ -52,7 +39,6 @@ import org.terasology.input.binds.movement.VerticalRealMovementAxis;
 import org.terasology.input.events.MouseAxisEvent;
 import org.terasology.input.events.MouseAxisEvent.MouseAxis;
 import org.terasology.joml.geom.AABBf;
-import org.terasology.joml.geom.AABBfc;
 import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.characters.CharacterHeldItemComponent;
 import org.terasology.logic.characters.CharacterMoveInputEvent;
@@ -65,8 +51,6 @@ import org.terasology.logic.delay.DelayManager;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.event.LocalPlayerInitializedEvent;
 import org.terasology.logic.players.event.OnPlayerSpawnedEvent;
-import org.terasology.math.AABB;
-import org.terasology.math.JomlUtil;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
