@@ -95,7 +95,7 @@ public class LocalPlayer {
      * @param dest will hold the result
      * @return dest
      */
-    public Vector3f getPosition(org.joml.Vector3f dest) {
+    public Vector3f getPosition(Vector3f dest) {
         LocationComponent location = getCharacterEntity().getComponent(LocationComponent.class);
         if (location != null) {
             Vector3f result = location.getWorldPosition(new Vector3f());
