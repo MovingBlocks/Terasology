@@ -17,6 +17,7 @@
 package org.terasology.logic.location;
 
 import org.joml.Quaternionfc;
+import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.lifecycleEvents.BeforeRemoveComponent;
@@ -24,8 +25,6 @@ import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
-import org.terasology.math.JomlUtil;
-import org.terasology.math.geom.Vector3f;
 
 import java.util.Iterator;
 
@@ -87,7 +86,7 @@ public class Location extends BaseComponentSystem {
         LocationComponent childLoc = child.getComponent(LocationComponent.class);
         LocationComponent parentLoc = parent.getComponent(LocationComponent.class);
         if (childLoc != null && parentLoc != null && !childLoc.getParent().equals(parent)) {
-            Vector3f oldWorldPos = childLoc.getWorldPosition();
+            Vector3f oldWorldPos = childLoc.getWorldPosition(new Vector3f());
             LocationComponent oldParentLoc = childLoc.getParent().getComponent(LocationComponent.class);
             if (oldParentLoc != null) {
                 oldParentLoc.children.remove(child);
@@ -105,7 +104,7 @@ public class Location extends BaseComponentSystem {
         LocationComponent childLoc = child.getComponent(LocationComponent.class);
         LocationComponent parentLoc = parent.getComponent(LocationComponent.class);
         if (childLoc != null && parentLoc != null && childLoc.getParent().equals(parent)) {
-            Vector3f oldWorldPos = childLoc.getWorldPosition();
+            Vector3f oldWorldPos = childLoc.getWorldPosition(new Vector3f());
             parentLoc.children.remove(child);
             childLoc.parent = EntityRef.NULL;
             childLoc.setWorldPosition(oldWorldPos);
@@ -124,7 +123,7 @@ public class Location extends BaseComponentSystem {
             EntityRef child = childIterator.next();
             LocationComponent childLoc = child.getComponent(LocationComponent.class);
             if (childLoc != null) {
-                Vector3f oldWorldPos = childLoc.getWorldPosition();
+                Vector3f oldWorldPos = childLoc.getWorldPosition(new Vector3f());
                 childLoc.parent = EntityRef.NULL;
                 childLoc.setWorldPosition(oldWorldPos);
                 child.saveComponent(childLoc);
@@ -135,8 +134,8 @@ public class Location extends BaseComponentSystem {
 
     @ReceiveEvent(netFilter = RegisterMode.REMOTE_CLIENT)
     public void onResyncLocation(LocationResynchEvent event, EntityRef entityRef, LocationComponent locationComponent) {
-        locationComponent.setWorldPosition(JomlUtil.from(event.getPosition()));
-        locationComponent.setWorldRotation(JomlUtil.from(event.getRotation()));
+        locationComponent.setWorldPosition(event.getPosition());
+        locationComponent.setWorldRotation(event.getRotation());
         entityRef.saveComponent(locationComponent);
     }
 }

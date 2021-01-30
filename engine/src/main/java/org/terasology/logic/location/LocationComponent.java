@@ -96,17 +96,6 @@ public final class LocationComponent implements Component, ReplicationCheck {
     }
 
     /**
-     * @param pos
-     * @deprecated This is scheduled for removal in an upcoming version method will be replaced with JOML implementation
-     *     {@link #setLocalPosition(Vector3fc)}.
-     */
-    @Deprecated
-    public void setLocalPosition(Vector3f pos) {
-        lastPosition.set(position);
-        position.set(pos);
-    }
-
-    /**
      * the local position of this location component
      *
      * @param pos position to set
