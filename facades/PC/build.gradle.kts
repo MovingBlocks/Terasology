@@ -70,7 +70,7 @@ val displayVersion = versionBase
 
 application {
     applicationName = "Terasology"
-    executableDir = "/"
+    executableDir = ""
     mainClass.set(extra.get("mainClassName") as String)
 }
 
@@ -296,6 +296,7 @@ tasks.register<ValidateZipDistribution>("testDistZip") {
 
     doLast {
         assertContainsPath("*/lib/Terasology.jar")
+        assertContainsPath("*/Terasology.bat")
 
         val rootFiles = tree.matching {
             include("/*")
