@@ -221,7 +221,7 @@ public class RemoteChunkProvider implements ChunkProvider {
     private ChunkViewCore createWorldView(BlockRegion region, Vector3i offset) {
         Chunk[] chunks = new Chunk[region.getSizeX() * region.getSizeY() * region.getSizeZ()];
         for (Vector3ic chunkPos : region) {
-            Chunk chunk = chunkCache.get(chunkPos);
+            Chunk chunk = chunkCache.get(JomlUtil.from(chunkPos));
             chunkPos.sub(region.minX(), region.minY(), region.minZ(), new org.joml.Vector3i());
             int index = TeraMath.calculate3DArrayIndex(JomlUtil.from(chunkPos), JomlUtil.from(region.getSize(new org.joml.Vector3i())));
             chunks[index] = chunk;
