@@ -8,7 +8,6 @@ import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.terasology.joml.geom.AABBf;
 import org.terasology.joml.geom.AABBfc;
-import org.terasology.joml.geom.AABBi;
 import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.BaseVector3i;
 import org.terasology.rendering.primitives.ChunkMesh;
@@ -20,12 +19,14 @@ import org.terasology.world.block.BlockRegion;
  */
 public class LodChunk implements RenderableChunk {
     private static final String UNSUPPORTED_MESSAGE = "LOD chunks can only be used for certain rendering-related operations.";
+    public final int scale;
     private Vector3ic position;
     private ChunkMesh mesh;
 
-    public LodChunk(Vector3ic pos, ChunkMesh mesh) {
+    public LodChunk(Vector3ic pos, ChunkMesh mesh, int scale) {
         position = pos;
         this.mesh = mesh;
+        this.scale = scale;
     }
 
     @Override
@@ -51,7 +52,7 @@ public class LodChunk implements RenderableChunk {
     @Override
     public AABBfc getAABB() {
         Vector3f min = new Vector3f(getChunkWorldOffset(new Vector3i()));
-        return new AABBf(min, new Vector3f(Chunks.CHUNK_SIZE).add(min));
+        return new AABBf(min, new Vector3f(Chunks.CHUNK_SIZE).mul(1 << scale).add(min));
     }
 
     @Override

@@ -93,7 +93,7 @@ public class AABBRenderer implements BlockOverlayRenderer {
         glPushMatrix();
         Vector3f cameraPosition = CoreRegistry.get(LocalPlayer.class).getViewPosition(new Vector3f());
         Vector3f center = aabb.center(new Vector3f());
-        glTranslated(center.x - cameraPosition.x, -cameraPosition.y, center.z - cameraPosition.z);
+        glTranslated(center.x - cameraPosition.x, center.y - cameraPosition.y, center.z - cameraPosition.z);
 
         renderLocally();
 
@@ -128,7 +128,7 @@ public class AABBRenderer implements BlockOverlayRenderer {
         }
         Vector3f center = aabb.center(new Vector3f());
         glPushMatrix();
-        glTranslated(0f, center.y, 0f);
+        //glTranslated(0f, center.y, 0f);
 
         glCallList(displayListWire);
 

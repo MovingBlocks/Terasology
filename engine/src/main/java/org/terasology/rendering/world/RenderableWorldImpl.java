@@ -247,7 +247,7 @@ class RenderableWorldImpl implements RenderableWorld {
 
     @Override
     public boolean updateChunksInProximity(ViewDistance newViewDistance, int chunkLods) {
-        if (newViewDistance != currentViewDistance) {
+        if (newViewDistance != currentViewDistance || chunkLods != lodChunkProvider.getChunkLods()) {
             logger.info("New Viewing Distance: {}", newViewDistance);
             currentViewDistance = newViewDistance;
             lodChunkProvider.updateRenderableRegion(newViewDistance, chunkLods, calcCameraCoordinatesInChunkUnits());

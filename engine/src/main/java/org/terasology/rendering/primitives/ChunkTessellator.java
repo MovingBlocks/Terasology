@@ -17,6 +17,7 @@ package org.terasology.rendering.primitives;
 
 import com.google.common.base.Stopwatch;
 import gnu.trove.iterator.TIntIterator;
+import gnu.trove.list.TFloatList;
 import org.lwjgl.BufferUtils;
 import org.terasology.engine.subsystem.lwjgl.GLBufferPool;
 import org.terasology.math.Direction;
@@ -45,6 +46,10 @@ public final class ChunkTessellator {
     }
 
     public ChunkMesh generateMesh(ChunkView chunkView, int meshHeight, int verticalOffset) {
+        return generateMesh(chunkView, meshHeight, verticalOffset, 1);
+    }
+
+    public ChunkMesh generateMesh(ChunkView chunkView, int meshHeight, int verticalOffset, float scale) {
         PerformanceMonitor.startActivity("GenerateMesh");
         ChunkMesh mesh = new ChunkMesh(bufferPool);
 
@@ -65,7 +70,7 @@ public final class ChunkTessellator {
         mesh.setTimeToGenerateBlockVertices((int) watch.elapsed(TimeUnit.MILLISECONDS));
 
         watch.reset().start();
-        generateOptimizedBuffers(chunkView, mesh);
+        generateOptimizedBuffers(chunkView, mesh, scale);
         watch.stop();
         mesh.setTimeToGenerateOptimizedBuffers((int) watch.elapsed(TimeUnit.MILLISECONDS));
         statVertexArrayUpdateCount++;
@@ -74,7 +79,7 @@ public final class ChunkTessellator {
         return mesh;
     }
 
-    private void generateOptimizedBuffers(ChunkView chunkView, ChunkMesh mesh) {
+    private void generateOptimizedBuffers(ChunkView chunkView, ChunkMesh mesh, float scale) {
         PerformanceMonitor.startActivity("OptimizeBuffers");
 
         for (ChunkMesh.RenderType type : ChunkMesh.RenderType.values()) {
@@ -97,9 +102,9 @@ public final class ChunkTessellator {
                         elements.vertices.get(i * 3 + 2));
 
                 /* POSITION */
-                elements.finalVertices.put(Float.floatToIntBits(vertexPos.x));
-                elements.finalVertices.put(Float.floatToIntBits(vertexPos.y));
-                elements.finalVertices.put(Float.floatToIntBits(vertexPos.z));
+                elements.finalVertices.put(Float.floatToIntBits(vertexPos.x * scale));
+                elements.finalVertices.put(Float.floatToIntBits(vertexPos.y * scale));
+                elements.finalVertices.put(Float.floatToIntBits(vertexPos.z * scale));
 
                 /* UV0 - TEX DATA 0.xy */
                 elements.finalVertices.put(Float.floatToIntBits(elements.tex.get(i * 2)));

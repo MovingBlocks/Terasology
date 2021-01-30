@@ -4,7 +4,6 @@
 package org.terasology.world.chunks;
 
 import com.google.common.collect.Queues;
-import gnu.trove.list.TFloatList;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.slf4j.Logger;
@@ -30,11 +29,11 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.PriorityBlockingQueue;
 
 public class LodChunkProvider {
@@ -50,8 +49,8 @@ public class LodChunkProvider {
     private ViewDistance viewDistanceSetting;
     private int chunkLods;
     private BlockRegion loadedRegion = new BlockRegion(BlockRegion.INVALID); // The chunks that may be actually loaded, which therefore don't need LOD chunks.
-    private BlockRegion lodRegion = new BlockRegion(BlockRegion.INVALID);
-    private Set<Vector3ic> requiredChunks; // All of the LOD chunks that are meant to exist.
+    private BlockRegion[] lodRegions = new BlockRegion[0];
+    private Map<Vector3ic, Integer> requiredChunks; // The sizes of all of the LOD chunks that are meant to exist.
     private Map<Vector3i, LodChunk> chunks;
     private ClosenessComparator nearby;
 
@@ -69,7 +68,7 @@ public class LodChunkProvider {
         viewDistanceSetting = viewDistance;
         this.chunkLods = chunkLods;
         this.center = center;
-        requiredChunks = new HashSet<>();
+        requiredChunks = new ConcurrentHashMap<>();
         chunks = new HashMap<>();
         nearby = new ClosenessComparator(center);
         neededChunks = new PriorityBlockingQueue<>(11, nearby);
@@ -83,15 +82,20 @@ public class LodChunkProvider {
     private void createChunks() {
         Block unloaded = blockManager.getBlock(BlockManager.UNLOADED_ID);
         try {
-            while (true) { // TODO: add exit condition.
+            while (true) {
                 Vector3ic pos = neededChunks.take();
-                Chunk chunk = new ChunkImpl(JomlUtil.from(pos), blockManager, extraDataManager);
+                Integer scale = requiredChunks.get(pos); // Actually the log scale
+                if (scale == null) {
+                    // This chunk is being removed in the main thread.
+                    continue;
+                }
+                Chunk chunk = new ChunkImpl(JomlUtil.from(pos).div(1 << scale), blockManager, extraDataManager);
                 generator.createChunk(chunk, new EntityBufferImpl());
                 InternalLightProcessor.generateInternalLighting(chunk);
                 tintChunk(chunk);
                 ChunkView view = new ChunkViewCoreImpl(new Chunk[]{chunk}, new BlockRegion(chunk.getPosition(new Vector3i())), new Vector3i(), unloaded);
-                ChunkMesh mesh = tessellator.generateMesh(view, Chunks.SIZE_Y, 0);
-                readyChunks.add(new LodChunk(pos, mesh));
+                ChunkMesh mesh = tessellator.generateMesh(view, Chunks.SIZE_Y, 0, 1 << scale);
+                readyChunks.add(new LodChunk(pos, mesh, scale));
             }
         } catch (InterruptedException ignored) { }
     }
@@ -100,7 +104,8 @@ public class LodChunkProvider {
         while (!readyChunks.isEmpty()) {
             LodChunk chunk = readyChunks.remove();
             Vector3i pos = chunk.getPosition(new Vector3i());
-            if (requiredChunks.contains(pos)) { // The relevant region may have been updated since this chunk was requested.
+            Integer requiredScale = requiredChunks.get(pos);
+            if (requiredScale != null && requiredScale == chunk.scale) { // The relevant region may have been updated since this chunk was requested.
                 chunk.getMesh().generateVBOs();
                 chunks.put(pos, chunk);
             }
@@ -118,52 +123,77 @@ public class LodChunkProvider {
         chunkLods = newChunkLods;
         nearby.pos = center;
         Vector3i viewDistance = new Vector3i(newViewDistance.getChunkDistance()).div(2);
-        Vector3i lodViewDistance = new Vector3i(viewDistance).mul(chunkLods == 0 ? 0 : 1 << chunkLods);
-        BlockRegion newLoadedRegion = new BlockRegion(center).expand(viewDistance.sub(1, 1, 1));
-        BlockRegion newLodRegion = new BlockRegion(center).expand(lodViewDistance);
-        if (!newLoadedRegion.equals(loadedRegion) || !newLodRegion.equals(lodRegion)) {
+        BlockRegion newLoadedRegion = new BlockRegion(center).expand(viewDistance).expand(-1, -1, -1);
+        BlockRegion[] newLodRegions = new BlockRegion[newChunkLods];
+        boolean lodRegionChange = newLodRegions.length != lodRegions.length;
+        for (int i = 0; i < newLodRegions.length; i++) {
+            if (i == 0) {
+                newLodRegions[i] = new BlockRegion(newLoadedRegion);
+            } else {
+                newLodRegions[i] = new BlockRegion(center.div(1 << i, new Vector3i())).expand(viewDistance);
+            }
+            Vector3i min = newLodRegions[i].getMin(new Vector3i());
+            Vector3i max = newLodRegions[i].getMax(new Vector3i());
+            newLodRegions[i].addToMin(-Math.abs(min.x % 2), -Math.abs(min.y % 2), -Math.abs(min.z % 2));
+            newLodRegions[i].addToMax( Math.abs(max.x % 2),  Math.abs(max.y % 2),  Math.abs(max.z % 2));
+            if (!lodRegionChange && !newLodRegions[i].equals(lodRegions[i])) {
+                lodRegionChange = true;
+            }
+        }
+        if (lodRegionChange || !newLoadedRegion.equals(loadedRegion)) {
             // Remove previously present chunks.
-            Iterator<Vector3ic> requiredChunkIt = requiredChunks.iterator();
-            while (requiredChunkIt.hasNext()) {
-                Vector3ic pos = requiredChunkIt.next();
-                if (!newLodRegion.contains(pos)) {
-                    // Although removeChunk also includes requiredChunks.remove(pos), it is necessary to actually remove it via the iterator first, to avoid a concurrent modification exception.
-                    requiredChunkIt.remove();
+            Set<Vector3ic> previouslyRequiredChunks = new HashSet<>(requiredChunks.keySet());
+            for (Vector3ic pos : previouslyRequiredChunks) {
+                int scale = requiredChunks.get(pos);
+                if (scale >= newLodRegions.length || !newLodRegions[scale].contains(pos.div(1 << scale, new Vector3i()))) {
                     removeChunk(pos);
                 }
             }
 
             // Add new chunks.
-            for (Vector3ic pos : newLodRegion) {
-                if (!newLoadedRegion.contains(pos) && !requiredChunks.contains(pos) && chunkProvider.getChunk(pos) == null) {
-                    addChunk(new Vector3i(pos));
+            for (int scale = 0; scale < newLodRegions.length; scale++) {
+                for (Vector3ic pos : newLodRegions[scale]) {
+                    if (scale == 0 && newLoadedRegion.contains(pos)) {
+                        continue;
+                    }
+                    Vector3i globalPos = pos.mul(1 << scale, new Vector3i());
+                    if (requiredChunks.get(globalPos) == null && chunkProvider.getChunk(globalPos) == null) {
+                        addChunk(globalPos, scale);
+                    }
                 }
             }
         }
-        lodRegion = newLodRegion;
+        lodRegions = newLodRegions;
         loadedRegion = newLoadedRegion;
     }
 
     public void onRealChunkUnloaded(Vector3ic pos) {
-        if (lodRegion.contains(pos) && !loadedRegion.contains(pos)) {
-            addChunk(pos);
+        if (chunkLods > 0 && !loadedRegion.contains(pos)) {
+            Vector3i scaledPos = new Vector3i(pos);
+            for (int scale = 0; scale < chunkLods; scale++) {
+                if (lodRegions[scale].contains(scaledPos)) {
+                    addChunk(pos, scale);
+                    return;
+                }
+                scaledPos.div(2);
+            }
         }
     }
 
-    private void addChunk(Vector3ic pos) {
-        requiredChunks.add(pos);
+    private void addChunk(Vector3ic pos, int scale) {
+        requiredChunks.put(pos, scale);
         neededChunks.add(pos);
     }
 
     public void onRealChunkLoaded(Vector3ic pos) {
-        if (requiredChunks.contains(pos)) {
+        if (requiredChunks.get(pos) != null) {
             removeChunk(pos);
         }
     }
 
     private void removeChunk(Vector3ic pos) {
-        requiredChunks.remove(pos);
         neededChunks.remove(pos);
+        requiredChunks.remove(pos);
         LodChunk chunk = chunks.remove(pos);
         if (chunk != null) {
             chunk.disposeMesh();
@@ -187,6 +217,10 @@ public class LodChunkProvider {
         for (Vector3ic pos : Chunks.CHUNK_REGION) {
             chunk.setSunlight(JomlUtil.from(pos), (byte) (0.75f * chunk.getSunlight(JomlUtil.from(pos))));
         }
+    }
+
+    public int getChunkLods() {
+        return chunkLods;
     }
 
     private static class ClosenessComparator implements Comparator<Vector3ic> {
