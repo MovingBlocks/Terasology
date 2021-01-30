@@ -13,6 +13,7 @@ import org.terasology.logic.characters.events.ActivationPredicted;
 import org.terasology.logic.characters.events.ActivationRequest;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.Direction;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.network.ClientComponent;
 import org.terasology.physics.HitResult;
@@ -113,11 +114,7 @@ public class LocalPlayer {
      */
     @Deprecated
     public Quat4f getRotation() {
-        LocationComponent location = getCharacterEntity().getComponent(LocationComponent.class);
-        if (location == null || Float.isNaN(location.getWorldPosition(new Vector3f()).x)) {
-            return new Quat4f(Quat4f.IDENTITY);
-        }
-        return location.getWorldRotation();
+        return JomlUtil.from(getRotation(new Quaternionf()));
     }
 
     /**
@@ -166,16 +163,7 @@ public class LocalPlayer {
      */
     @Deprecated
     public Quat4f getViewRotation() {
-        ClientComponent clientComponent = getClientEntity().getComponent(ClientComponent.class);
-        if (clientComponent == null) {
-            return new Quat4f(Quat4f.IDENTITY);
-        }
-        LocationComponent location = clientComponent.camera.getComponent(LocationComponent.class);
-        if (location == null || Float.isNaN(location.getWorldPosition(new Vector3f()).x)) {
-            return getRotation();
-        }
-
-        return location.getWorldRotation();
+        return JomlUtil.from(getViewRotation(new Quaternionf()));
     }
 
     /**

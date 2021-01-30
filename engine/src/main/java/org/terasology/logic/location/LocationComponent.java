@@ -121,16 +121,6 @@ public final class LocationComponent implements Component, ReplicationCheck {
     }
 
     /**
-     * @return A new vector containing the world location.
-     * @deprecated This is scheduled for removal in an upcoming version method will be replaced with JOML implementation
-     *     {@link #getWorldPosition(org.joml.Vector3f)}.
-     */
-    @Deprecated
-    public Vector3f getWorldPosition() {
-        return JomlUtil.from(getWorldPosition(new org.joml.Vector3f()));
-    }
-
-    /**
      * get the world position
      *
      * @param dest will hold the result
@@ -164,38 +154,8 @@ public final class LocationComponent implements Component, ReplicationCheck {
         out.mul(new Matrix4f().translationRotateScale(JomlUtil.from(position), JomlUtil.from(rotation), scale));
     }
 
-    /**
-     * @deprecated This is scheduled for removal in an upcoming version method will be replaced with JOML implementation
-     *     {@link #getWorldDirection(org.joml.Vector3f)}.
-     */
-    @Deprecated
-    public Vector3f getWorldDirection() {
-        Vector3f result = Direction.FORWARD.getVector3f();
-        getWorldRotation().rotate(result, result);
-        return result;
-    }
-
     public org.joml.Vector3f getWorldDirection(org.joml.Vector3f dest) {
-        return dest.set(Direction.FORWARD.asVector3f()).rotate(JomlUtil.from(getWorldRotation()));
-    }
-
-    /**
-     * @deprecated This is scheduled for removal in an upcoming version method will be replaced with JOML implementation
-     *     {@link #getWorldRotation(Quaternionf)}.
-     */
-    @Deprecated
-    public Quat4f getWorldRotation() {
-        return getWorldRotation(new Quat4f(0, 0, 0, 1));
-    }
-
-    /**
-     * @deprecated This is scheduled for removal in an upcoming version method will be replaced with JOML implementation
-     *     {@link #getWorldRotation(Quaternionf)}.
-     */
-    @Deprecated
-    public Quat4f getWorldRotation(Quat4f output) {
-        output.set(JomlUtil.from(getWorldRotation(new Quaternionf())));
-        return output;
+        return dest.set(Direction.FORWARD.asVector3f()).rotate(getWorldRotation(new Quaternionf()));
     }
 
     /**
@@ -233,10 +193,10 @@ public final class LocationComponent implements Component, ReplicationCheck {
         setLocalPosition(pos);
         LocationComponent parentLoc = parent.getComponent(LocationComponent.class);
         if (parentLoc != null) {
-            this.position.sub(parentLoc.getWorldPosition());
+            this.position.sub(JomlUtil.from(parentLoc.getWorldPosition(new org.joml.Vector3f())));
             this.position.scale(1f / parentLoc.getWorldScale());
             Quat4f rot = new Quat4f(0, 0, 0, 1);
-            rot.inverse(parentLoc.getWorldRotation());
+            rot.inverse(JomlUtil.from(parentLoc.getWorldRotation(new Quaternionf())));
             rot.rotate(this.position, this.position);
         }
     }
@@ -250,7 +210,7 @@ public final class LocationComponent implements Component, ReplicationCheck {
         setLocalRotation(value);
         LocationComponent parentLoc = parent.getComponent(LocationComponent.class);
         if (parentLoc != null) {
-            Quat4f worldRot = parentLoc.getWorldRotation();
+            Quat4f worldRot = JomlUtil.from(parentLoc.getWorldRotation(new Quaternionf()));
             worldRot.inverse();
             this.rotation.mul(worldRot, this.rotation);
         }
