@@ -196,25 +196,6 @@ public abstract class MultiConnectFamily extends AbstractBlockFamily implements 
         return getBlockForPlacement(data);
     }
 
-    /**
-     * Update the block then a neighbor changes
-     *
-     * @param location The location of the block
-     * @param oldBlock What the block was before the neighbor updated
-     *
-     * @return The block from the family to be placed
-     */
-    @Override
-    public Block getBlockForNeighborUpdate(Vector3i location, Block oldBlock) {
-        byte connections = 0;
-        for (Side connectSide : SideBitFlag.getSides(getConnectionSides())) {
-            if (this.connectionCondition(location, connectSide)) {
-                connections += SideBitFlag.getSide(connectSide);
-            }
-        }
-        return blocks.get(connections);
-    }
-
     @Override
     public Block getBlockForNeighborUpdate(Vector3ic location, Block oldBlock) {
         byte connections = 0;
