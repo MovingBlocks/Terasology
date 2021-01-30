@@ -32,8 +32,8 @@ public final class NetMessageUtil {
     private NetMessageUtil() {
     }
 
-    public static Vector3i convert(NetData.Vector3iData data) {
-        return new Vector3i(data.getX(), data.getY(), data.getZ());
+    public static org.joml.Vector3i convert(NetData.Vector3iData data) {
+        return new org.joml.Vector3i(data.getX(), data.getY(), data.getZ());
     }
 
     public static NetData.Vector3iData convert(Vector3i data) {

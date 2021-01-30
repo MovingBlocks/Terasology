@@ -22,14 +22,17 @@ import org.joml.Vector3ic;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.world.block.BlockRegion;
+import org.terasology.world.block.BlockRegionc;
 import org.terasology.world.chunks.ChunkConstants;
 
 import java.math.RoundingMode;
 
 /**
  * Collection of math functions.
- *
+ * @deprecated This class is scheduled for removal in an upcoming version.
+ *             Use the JOML implementation instead: {@link org.terasology.world.chunks.Chunks}.
  */
+@Deprecated
 public final class ChunkMath {
 
     private ChunkMath() {
@@ -269,8 +272,8 @@ public final class ChunkMath {
      */
     public static BlockRegion calcChunkRegion(BlockRegion region, int chunkX, int chunkY, int chunkZ, BlockRegion dest) {
         return dest.
-            setMin(calcChunkPos(region.getMinX(), chunkX), calcChunkPos(region.getMinY(), chunkY), calcChunkPos(region.getMinZ(), chunkZ)).
-            setMax(calcChunkPos(region.getMaxX(), chunkX), calcChunkPos(region.getMaxY(), chunkY), calcChunkPos(region.getMaxZ(), chunkZ));
+            setMin(calcChunkPos(region.minX(), chunkX), calcChunkPos(region.minY(), chunkY), calcChunkPos(region.minZ(), chunkZ)).
+            setMax(calcChunkPos(region.maxX(), chunkX), calcChunkPos(region.maxY(), chunkY), calcChunkPos(region.maxZ(), chunkZ));
     }
 
     /**
@@ -486,7 +489,11 @@ public final class ChunkMath {
      * @param pos the world position
      * @param extent the extent
      * @return chunk region
+     * @deprecated This is scheduled for removal in an upcoming version
+     *             method will be replaced with JOML implementation {@link org.terasology.world.chunks.Chunks#toChunkRegion(BlockRegionc, BlockRegion)}.
+     *
      */
+    @Deprecated
     public static BlockRegion getChunkRegionAroundWorldPos(Vector3ic pos, int extent) {
         org.joml.Vector3i temp = new org.joml.Vector3i();
         org.joml.Vector3i minChunk = calcChunkPos(temp.set(pos).add(-extent, -extent, -extent), new org.joml.Vector3i());
@@ -531,7 +538,7 @@ public final class ChunkMath {
      * @param side
      * @return
      * @deprecated This is scheduled for removal in an upcoming version
-     *             method will be replaced with JOML implementation {@link #getEdgeRegion(BlockRegion, Side, BlockRegion)}.
+     *             method will be replaced with JOML implementation {@link #getEdgeRegion(BlockRegionc, Side, BlockRegion)}.
      */
     @Deprecated
     public static Region3i getEdgeRegion(Region3i region, Side side) {
@@ -569,125 +576,68 @@ public final class ChunkMath {
      * @param side the side to border
      * @param dest will hold the result
      * @return dest
+     * @deprecated use {@link BlockRegion#face(Side, BlockRegion)}
      */
-    public static BlockRegion getEdgeRegion(BlockRegion region, Side side, BlockRegion dest) {
+    @Deprecated
+    public static BlockRegion getEdgeRegion(BlockRegionc region, Side side, BlockRegion dest) {
         switch (side) {
             case TOP:
-                return dest.setMin(
-                    region.getMinX(),
-                    region.getMaxY(),
-                    region.getMinZ()
-                ).setMax(
-                    region.getMaxX(),
-                    region.getMaxY(),
-                    region.getMaxZ());
+                return dest.set(
+                    region.minX(),
+                    region.maxY(),
+                    region.minZ(),
+                    region.maxX(),
+                    region.maxY(),
+                    region.maxZ());
             case BOTTOM:
-                return dest.setMin(
-                    region.getMinX(),
-                    region.getMinY(),
-                    region.getMinZ()
-                ).setMax(
-                    region.getMaxX(),
-                    region.getMinY(),
-                    region.getMaxZ());
+                return dest.set(
+                    region.minX(),
+                    region.minY(),
+                    region.minZ(),
+                    region.maxX(),
+                    region.minY(),
+                    region.maxZ());
             case LEFT:
-                return dest.setMin(
-                    region.getMinX(),
-                    region.getMinY(),
-                    region.getMinZ()
-                ).setMax(
-                    region.getMinX(),
-                    region.getMaxY(),
-                    region.getMaxZ());
+                return dest.set(
+                    region.minX(),
+                    region.minY(),
+                    region.minZ(),
+                    region.minX(),
+                    region.maxY(),
+                    region.maxZ());
             case RIGHT:
-                return dest.setMin(
-                    region.getMaxX(),
-                    region.getMinY(),
-                    region.getMinZ()
-                ).setMax(
-                    region.getMaxX(),
-                    region.getMaxY(),
-                    region.getMaxZ());
+                return dest.set(
+                    region.maxX(),
+                    region.minY(),
+                    region.minZ(),
+                    region.maxX(),
+                    region.maxY(),
+                    region.maxZ());
             case FRONT:
-                return dest.setMin(
-                    region.getMinX(),
-                    region.getMinY(),
-                    region.getMinZ()
-                ).setMax(
-                    region.getMaxX(),
-                    region.getMaxY(),
-                    region.getMinZ());
+                return dest.set(
+                    region.minX(),
+                    region.minY(),
+                    region.minZ(),
+                    region.maxX(),
+                    region.maxY(),
+                    region.minZ());
             case BACK:
-                return dest.setMin(
-                    region.getMinX(),
-                    region.getMinY(),
-                    region.getMaxZ()
-                ).setMax(
-                    region.getMaxX(),
-                    region.getMaxY(),
-                    region.getMaxZ());
+                return dest.set(
+                    region.minX(),
+                    region.minY(),
+                    region.maxZ(),
+                    region.maxX(),
+                    region.maxY(),
+                    region.maxZ());
             default:
-                return dest.setMin(
-                    region.getMinX(),
-                    region.getMinY(),
-                    region.getMinZ()
-                ).setMax(
-                    region.getMaxX(),
-                    region.getMaxY(),
-                    region.getMaxZ()
+                return dest.set(
+                    region.minX(),
+                    region.minY(),
+                    region.minZ(),
+                    region.maxX(),
+                    region.maxY(),
+                    region.maxZ()
                 );
-
-        }
-    }
-
-    /**
-     * Populates a target array with the minimum value adjacent to each location, including the location itself. TODO:
-     * this is too specific for a general class like this. Move to a new class AbstractBatchPropagator
-     *
-     * @param source
-     * @param target
-     * @param populateMargins Whether to populate the edges of the target array
-     */
-    public static void populateMinAdjacent2D(int[] source, int[] target, int dimX, int dimY, boolean populateMargins) {
-        System.arraycopy(source, 0, target, 0, target.length);
-
-        // 0 < x < dimX - 1; 0 < y < dimY - 1
-        for (int y = 1; y < dimY - 1; ++y) {
-            for (int x = 1; x < dimX - 1; ++x) {
-                target[x + y * dimX] = Math.min(Math.min(source[x + (y - 1) * dimX], source[x + (y + 1) * dimX]),
-                    Math.min(source[x + 1 + y * dimX], source[x - 1 + y * dimX]));
-            }
-        }
-
-        if (populateMargins) {
-            // x == 0, y == 0
-            target[0] = Math.min(source[1], source[dimX]);
-
-            // 0 < x < dimX - 1, y == 0
-            for (int x = 1; x < dimX - 1; ++x) {
-                target[x] = Math.min(source[x - 1], Math.min(source[x + 1], source[x + dimX]));
-            }
-
-            // x == dimX - 1, y == 0
-            target[dimX - 1] = Math.min(source[2 * dimX - 1], source[dimX - 2]);
-
-            // 0 < y < dimY - 1
-            for (int y = 1; y < dimY - 1; ++y) {
-                // x == 0
-                target[y * dimX] = Math.min(source[dimX * (y - 1)], Math.min(source[dimX * (y + 1)], source[1 + dimX * y]));
-                // x == dimX - 1
-                target[dimX - 1 + y * dimX] = Math.min(source[dimX - 1 + dimX * (y - 1)], Math.min(source[dimX - 1 + dimX * (y + 1)], source[dimX - 2 + dimX * y]));
-            }
-            // x == 0, y == dimY - 1
-            target[dimX * (dimY - 1)] = Math.min(source[1 + dimX * (dimY - 1)], source[dimX * (dimY - 2)]);
-
-            // 0 < x < dimX - 1; y == dimY - 1
-            for (int x = 1; x < dimX - 1; ++x) {
-                target[x + dimX * (dimY - 1)] = Math.min(source[x - 1 + dimX * (dimY - 1)], Math.min(source[x + 1 + dimX * (dimY - 1)], source[x + dimX * (dimY - 2)]));
-            }
-
-            // x == dimX - 1; y == dimY - 1
-            target[dimX - 1 + dimX * (dimY - 1)] = Math.min(source[dimX - 2 + dimX * (dimY - 1)], source[dimX - 1 + dimX * (dimY - 2)]);
         }
     }
 

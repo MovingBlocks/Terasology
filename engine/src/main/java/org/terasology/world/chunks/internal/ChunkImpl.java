@@ -20,8 +20,10 @@ import com.google.common.base.Preconditions;
 import org.joml.Vector3ic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.joml.geom.AABBf;
+import org.terasology.joml.geom.AABBfc;
 import org.terasology.math.AABB;
-import org.terasology.math.Region3i;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.BaseVector3i;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
@@ -30,9 +32,11 @@ import org.terasology.protobuf.EntityData;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
+import org.terasology.world.block.BlockRegion;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkBlockIterator;
 import org.terasology.world.chunks.ChunkConstants;
+import org.terasology.world.chunks.Chunks;
 import org.terasology.world.chunks.blockdata.ExtraBlockDataManager;
 import org.terasology.world.chunks.blockdata.TeraArray;
 import org.terasology.world.chunks.blockdata.TeraDenseArray16Bit;
@@ -43,12 +47,11 @@ import org.terasology.world.chunks.deflate.TeraStandardDeflator;
 import java.text.DecimalFormat;
 
 /**
- * Chunks are the basic components of the world. Each chunk contains a fixed amount of blocks
- * determined by its dimensions. They are used to manage the world efficiently and
- * to reduce the batch count within the render loop.
+ * Chunks are the basic components of the world. Each chunk contains a fixed amount of blocks determined by its
+ * dimensions. They are used to manage the world efficiently and to reduce the batch count within the render loop.
  * <br><br>
- * Chunks are tessellated on creation and saved to vertex arrays. From those VBOs are generated
- * which are then used for the actual rendering process.
+ * Chunks are tessellated on creation and saved to vertex arrays. From those VBOs are generated which are then used for
+ * the actual rendering process.
  */
 public class ChunkImpl implements Chunk {
 
@@ -70,8 +73,8 @@ public class ChunkImpl implements Chunk {
     private TeraArray[] extraData;
     private volatile TeraArray[] extraDataSnapshots;
 
-    private AABB aabb;
-    private Region3i region;
+    private AABBf aabb = new AABBf();
+    private BlockRegion region;
 
     private boolean disposed;
     private boolean ready;
@@ -102,8 +105,11 @@ public class ChunkImpl implements Chunk {
         lightData = new TeraDenseArray8Bit(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
         dirty = true;
         this.blockManager = blockManager;
-        region = Region3i.createFromMinAndSize(new Vector3i(chunkPos.x * ChunkConstants.SIZE_X, chunkPos.y * ChunkConstants.SIZE_Y, chunkPos.z * ChunkConstants.SIZE_Z),
-                ChunkConstants.CHUNK_SIZE);
+        region = new BlockRegion(
+                chunkPos.x * ChunkConstants.SIZE_X,
+                chunkPos.y * ChunkConstants.SIZE_Y,
+                chunkPos.z * ChunkConstants.SIZE_Z)
+                .setSize(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z);
         ChunkMonitor.fireChunkCreated(this);
     }
 
@@ -114,7 +120,7 @@ public class ChunkImpl implements Chunk {
 
     @Override
     public org.joml.Vector3i getPosition(org.joml.Vector3i dest) {
-        return dest.set(chunkPos.x,chunkPos.y,chunkPos.z);
+        return dest.set(chunkPos.x, chunkPos.y, chunkPos.z);
     }
 
     @Override
@@ -177,7 +183,7 @@ public class ChunkImpl implements Chunk {
 
     @Override
     public Block setBlock(Vector3ic pos, Block block) {
-        return setBlock(pos.x(),pos.y(),pos.z(),block);
+        return setBlock(pos.x(), pos.y(), pos.z(), block);
     }
 
     @Override
@@ -337,14 +343,12 @@ public class ChunkImpl implements Chunk {
     }
 
     @Override
-    public AABB getAABB() {
-        if (aabb == null) {
-            Vector3f min = getChunkWorldOffset().toVector3f();
-            Vector3f max = ChunkConstants.CHUNK_SIZE.toVector3f();
-            max.add(min);
-            aabb = AABB.createMinMax(min, max);
+    public AABBfc getAABB() {
+        if (!aabb.isValid()) {
+            org.joml.Vector3f min = JomlUtil.from(getChunkWorldOffset().toVector3f());
+            org.joml.Vector3f max = new org.joml.Vector3f(Chunks.CHUNK_SIZE).add(min);
+            aabb = new AABBf(min, max);
         }
-
         return aabb;
     }
 
@@ -516,9 +520,10 @@ public class ChunkImpl implements Chunk {
     public void prepareForReactivation() {
         if (disposed) {
             disposed = false;
-            sunlightData = new TeraDenseArray8Bit(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z);
-            sunlightRegenData = new TeraDenseArray8Bit(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z);
-            lightData = new TeraDenseArray8Bit(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z);
+            sunlightData = new TeraDenseArray8Bit(Chunks.SIZE_X, Chunks.SIZE_Y, Chunks.SIZE_Z);
+            sunlightRegenData = new TeraDenseArray8Bit(Chunks.SIZE_X, Chunks.SIZE_Y,
+                Chunks.SIZE_Z);
+            lightData = new TeraDenseArray8Bit(Chunks.SIZE_X, Chunks.SIZE_Y, Chunks.SIZE_Z);
         }
     }
 
@@ -552,23 +557,23 @@ public class ChunkImpl implements Chunk {
     }
 
     @Override
-    public Region3i getRegion() {
+    public BlockRegion getRegion() {
         return region;
     }
 
     @Override
     public int getChunkSizeX() {
-        return ChunkConstants.SIZE_X;
+        return Chunks.SIZE_X;
     }
 
     @Override
     public int getChunkSizeY() {
-        return ChunkConstants.SIZE_Y;
+        return Chunks.SIZE_Y;
     }
 
     @Override
     public int getChunkSizeZ() {
-        return ChunkConstants.SIZE_Z;
+        return Chunks.SIZE_Z;
     }
 
     @Override
@@ -578,12 +583,12 @@ public class ChunkImpl implements Chunk {
 
     @Override
     public EntityData.ChunkStore.Builder encode() {
-        return ChunkSerializer.encode(chunkPos, blockData, extraData);
+        return ChunkSerializer.encode(JomlUtil.from(chunkPos), blockData, extraData);
     }
 
     /**
-     * Calling this method results in a (cheap) snapshot to be taken of the current state of the chunk.
-     * This snapshot can then be obtained and rleased by calling {@link #encodeAndReleaseSnapshot()}.
+     * Calling this method results in a (cheap) snapshot to be taken of the current state of the chunk. This snapshot
+     * can then be obtained and rleased by calling {@link #encodeAndReleaseSnapshot()}.
      */
     public void createSnapshot() {
         this.blockDataSnapshot = this.blockData;
@@ -592,15 +597,14 @@ public class ChunkImpl implements Chunk {
     }
 
     /**
-     * This method can only be
-     * called once after {@link #createSnapshot()} has been called. It can be called from a different thread than
-     * {@link #createSnapshot()}, but it must be made sure that neither method is still running when the other gets
-     * called.
+     * This method can only be called once after {@link #createSnapshot()} has been called. It can be called from a
+     * different thread than {@link #createSnapshot()}, but it must be made sure that neither method is still running
+     * when the other gets called.
      *
      * @return an encoded version of the snapshot taken with {@link #createSnapshot()}.
      */
     public EntityData.ChunkStore.Builder encodeAndReleaseSnapshot() {
-        EntityData.ChunkStore.Builder result = ChunkSerializer.encode(chunkPos, blockDataSnapshot, extraDataSnapshots);
+        EntityData.ChunkStore.Builder result = ChunkSerializer.encode(JomlUtil.from(chunkPos), blockDataSnapshot, extraDataSnapshots);
         this.blockDataSnapshot = null;
         this.extraDataSnapshots = null;
         return result;

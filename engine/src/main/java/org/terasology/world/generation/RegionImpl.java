@@ -1,24 +1,11 @@
-/*
- * Copyright 2014 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.world.generation;
 
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Sets;
-import org.terasology.math.Region3i;
 import org.terasology.utilities.collection.TypeMap;
+import org.terasology.world.block.BlockRegion;
 
 import java.util.Map;
 import java.util.Set;
@@ -27,7 +14,7 @@ import java.util.Set;
  */
 public class RegionImpl implements Region, GeneratingRegion {
 
-    private final Region3i region;
+    private final BlockRegion region;
     private final ListMultimap<Class<? extends WorldFacet>, FacetProvider> facetProviderChains;
     private final Map<Class<? extends WorldFacet>, Border3D> borders;
 
@@ -35,7 +22,7 @@ public class RegionImpl implements Region, GeneratingRegion {
     private final Set<FacetProvider> processedProviders = Sets.newHashSet();
     private final TypeMap<WorldFacet> generatedFacets = TypeMap.create();
 
-    public RegionImpl(Region3i region, ListMultimap<Class<? extends WorldFacet>, FacetProvider> facetProviderChains, Map<Class<? extends WorldFacet>, Border3D> borders) {
+    public RegionImpl(BlockRegion region, ListMultimap<Class<? extends WorldFacet>, FacetProvider> facetProviderChains, Map<Class<? extends WorldFacet>, Border3D> borders) {
         this.region = region;
         this.facetProviderChains = facetProviderChains;
         this.borders = borders;
@@ -56,7 +43,7 @@ public class RegionImpl implements Region, GeneratingRegion {
     }
 
     @Override
-    public Region3i getRegion() {
+    public BlockRegion getRegion() {
         return region;
     }
 

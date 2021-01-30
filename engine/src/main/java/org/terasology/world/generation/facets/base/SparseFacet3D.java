@@ -16,33 +16,32 @@
 
 package org.terasology.world.generation.facets.base;
 
-import org.terasology.math.Region3i;
-import org.terasology.math.geom.Vector3i;
+import org.joml.Vector3i;
+import org.terasology.world.block.BlockRegion;
+import org.terasology.world.block.BlockRegionc;
 import org.terasology.world.generation.Border3D;
 import org.terasology.world.generation.WorldFacet3D;
 
 /**
- * A base class for sparse (map-based)
- * implementations of {@link WorldFacet3D}.
- *
+ * A base class for sparse (map-based) implementations of {@link WorldFacet3D}.
  */
 public abstract class SparseFacet3D implements WorldFacet3D {
 
-    private Region3i worldRegion;
-    private Region3i relativeRegion;
+    private BlockRegion worldRegion;
+    private BlockRegion relativeRegion;
 
-    public SparseFacet3D(Region3i targetRegion, Border3D border) {
+    public SparseFacet3D(BlockRegionc targetRegion, Border3D border) {
         worldRegion = border.expandTo3D(targetRegion);
-        relativeRegion = border.expandTo3D(targetRegion.size());
+        relativeRegion = border.expandTo3D(targetRegion.getSize(new Vector3i()));
     }
 
     @Override
-    public final Region3i getWorldRegion() {
+    public final BlockRegion getWorldRegion() {
         return worldRegion;
     }
 
     @Override
-    public final Region3i getRelativeRegion() {
+    public final BlockRegion getRelativeRegion() {
         return relativeRegion;
     }
 
@@ -50,7 +49,7 @@ public abstract class SparseFacet3D implements WorldFacet3D {
      * @throws IllegalArgumentException if not within bounds
      */
     protected void checkWorldCoords(int x, int y, int z) {
-        if (!worldRegion.encompasses(x, y, z)) {
+        if (!worldRegion.contains(x, y, z)) {
             String text = "Out of bounds: (%d, %d, %d) for region %s";
             String msg = String.format(text, x, y, z, worldRegion.toString());
             throw new IllegalArgumentException(msg);
@@ -61,7 +60,7 @@ public abstract class SparseFacet3D implements WorldFacet3D {
      * @throws IllegalArgumentException if not within bounds
      */
     protected void checkRelativeCoords(int x, int y, int z) {
-        if (!relativeRegion.encompasses(x, y, z)) {
+        if (!relativeRegion.contains(x, y, z)) {
             String text = "Out of bounds: (%d, %d, %d) for region %s";
             String msg = String.format(text, x, y, z, relativeRegion.toString());
             throw new IllegalArgumentException(msg);
@@ -86,9 +85,9 @@ public abstract class SparseFacet3D implements WorldFacet3D {
 
     @Override
     public String toString() {
-        Vector3i worldMin = getWorldRegion().min();
-        Vector3i relMin = getRelativeRegion().min();
-        Vector3i size = getRelativeRegion().size();
+        Vector3i worldMin = getWorldRegion().getMin(new Vector3i());
+        Vector3i relMin = getRelativeRegion().getMin(new Vector3i());
+        Vector3i size = getRelativeRegion().getSize(new Vector3i());
         return String.format("SparseFacet3D [worldMin=%s, relativeMin=%s, size=%s]", worldMin, relMin, size);
     }
 }

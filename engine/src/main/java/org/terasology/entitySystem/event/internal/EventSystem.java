@@ -90,4 +90,9 @@ public interface EventSystem {
      * @param component
      */
     void send(EntityRef entity, Event event, Component component);
+
+    /**
+     * Change main thread to current thread.
+     */
+    void setToCurrentThread();
 }

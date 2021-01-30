@@ -15,7 +15,7 @@
  */
 package org.terasology.world.block.items;
 
-import org.joml.AABBf;
+import org.terasology.joml.geom.AABBf;
 import org.joml.Vector2f;
 import org.joml.Vector3fc;
 import org.joml.Vector3i;
@@ -29,7 +29,6 @@ import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.characters.KinematicCharacterMover;
 import org.terasology.logic.common.ActivateEvent;
 import org.terasology.logic.inventory.ItemComponent;
-import org.terasology.math.JomlUtil;
 import org.terasology.math.Side;
 import org.terasology.network.NetworkSystem;
 import org.terasology.physics.Physics;
@@ -102,7 +101,7 @@ public class BlockItemSystem extends BaseComponentSystem {
                 PlaceBlocks placeBlocks = new PlaceBlocks(placementPos, block, event.getInstigator());
                 worldProvider.getWorldEntity().send(placeBlocks);
                 if (!placeBlocks.isConsumed()) {
-                    item.send(new OnBlockItemPlaced(JomlUtil.from(placementPos), blockEntityRegistry.getBlockEntityAt(placementPos), event.getInstigator()));
+                    item.send(new OnBlockItemPlaced(placementPos, blockEntityRegistry.getBlockEntityAt(placementPos), event.getInstigator()));
                 } else {
                     event.consume();
                 }

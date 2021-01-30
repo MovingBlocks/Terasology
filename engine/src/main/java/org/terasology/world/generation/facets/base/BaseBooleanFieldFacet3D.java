@@ -16,8 +16,9 @@
 package org.terasology.world.generation.facets.base;
 
 import com.google.common.base.Preconditions;
-import org.terasology.math.Region3i;
-import org.terasology.math.geom.Vector3i;
+import org.joml.Vector3i;
+import org.joml.Vector3ic;
+import org.terasology.world.block.BlockRegion;
 import org.terasology.world.generation.Border3D;
 
 /**
@@ -26,10 +27,10 @@ public abstract class BaseBooleanFieldFacet3D extends BaseFacet3D implements Boo
 
     private boolean[] data;
 
-    public BaseBooleanFieldFacet3D(Region3i targetRegion, Border3D border) {
+    public BaseBooleanFieldFacet3D(BlockRegion targetRegion, Border3D border) {
         super(targetRegion, border);
-        Vector3i size = getRelativeRegion().size();
-        data = new boolean[size.x * size.y * size.z];
+        data =
+            new boolean[getRelativeRegion().volume()];
     }
 
     @Override
@@ -38,8 +39,8 @@ public abstract class BaseBooleanFieldFacet3D extends BaseFacet3D implements Boo
     }
 
     @Override
-    public boolean get(Vector3i pos) {
-        return get(pos.x, pos.y, pos.z);
+    public boolean get(Vector3ic pos) {
+        return get(pos.x(), pos.y(), pos.z());
     }
 
     @Override
@@ -48,8 +49,8 @@ public abstract class BaseBooleanFieldFacet3D extends BaseFacet3D implements Boo
     }
 
     @Override
-    public boolean getWorld(Vector3i pos) {
-        return getWorld(pos.x, pos.y, pos.z);
+    public boolean getWorld(Vector3ic pos) {
+        return getWorld(pos.x(), pos.y(), pos.z());
     }
 
     public boolean[] getInternal() {
@@ -62,8 +63,8 @@ public abstract class BaseBooleanFieldFacet3D extends BaseFacet3D implements Boo
     }
 
     @Override
-    public void set(Vector3i pos, boolean value) {
-        set(pos.x, pos.y, pos.z, value);
+    public void set(Vector3ic pos, boolean value) {
+        set(pos.x(), pos.y(), pos.z(), value);
     }
 
     @Override
@@ -72,13 +73,12 @@ public abstract class BaseBooleanFieldFacet3D extends BaseFacet3D implements Boo
     }
 
     @Override
-    public void setWorld(Vector3i pos, boolean value) {
-        setWorld(pos.x, pos.y, pos.z, value);
+    public void setWorld(Vector3ic pos, boolean value) {
+        setWorld(pos.x(), pos.y(), pos.z(), value);
     }
 
     public void set(boolean[] newData) {
         Preconditions.checkArgument(newData.length == data.length);
         System.arraycopy(newData, 0, data, 0, newData.length);
     }
-
 }

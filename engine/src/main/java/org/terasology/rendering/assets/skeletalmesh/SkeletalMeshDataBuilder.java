@@ -15,14 +15,12 @@
  */
 package org.terasology.rendering.assets.skeletalmesh;
 
-import com.google.common.collect.Lists;
 import gnu.trove.list.TFloatList;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
-import org.terasology.math.AABB;
-import org.terasology.math.geom.Matrix4f;
-import org.terasology.math.geom.Vector2f;
-import org.terasology.math.geom.Vector3f;
+import org.joml.Vector2f;
+import org.joml.Vector3f;
+import org.terasology.joml.geom.AABBf;
 import org.terasology.rendering.assets.mesh.MeshBuilder;
 import org.terasology.rendering.assets.mesh.MeshData;
 
@@ -30,6 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ *
  */
 public class SkeletalMeshDataBuilder {
 
@@ -39,7 +38,6 @@ public class SkeletalMeshDataBuilder {
     private List<Vector3f> vertices = new ArrayList<>();
     private List<Vector3f> normals = new ArrayList<>();
     private TIntList indices = new TIntArrayList();
-    private MeshBuilder.TextureMapper textureMapper;
 
     public SkeletalMeshDataBuilder() {
 
@@ -71,13 +69,6 @@ public class SkeletalMeshDataBuilder {
         return addMesh(bone, builder.getMeshData());
     }
 
-    public SkeletalMeshDataBuilder addBox(Bone bone, Vector3f offset, Vector3f size, float u, float v) {
-        MeshBuilder meshBuilder = new MeshBuilder();
-        meshBuilder.setTextureMapper(textureMapper);
-        meshBuilder.addBox(offset, size, u, v);
-        return addMesh(bone, meshBuilder);
-    }
-
     public SkeletalMeshDataBuilder addMesh(Bone bone, MeshData data) {
         TFloatList meshVertices = data.getVertices();
         TIntList meshIndices = data.getIndices();
@@ -100,10 +91,6 @@ public class SkeletalMeshDataBuilder {
             indices.add(meshIndices.get(i) + weightsStart);
         }
         return this;
-    }
-
-    public void setTextureMapper(MeshBuilder.TextureMapper textureMapper) {
-        this.textureMapper = textureMapper;
     }
 
     public void setUvs(List<Vector2f> uvs) {
@@ -136,7 +123,7 @@ public class SkeletalMeshDataBuilder {
         } else if (rootBones > 1) {
             throw new IllegalStateException("Cannot create a skeleton with multiple root bones");
         }
-        AABB staticAabb = AABB.createMinMax(minOfAABB, maxOfAABB);
+        AABBf staticAabb = new AABBf(minOfAABB, maxOfAABB);
         return new SkeletalMeshData(bones, vertices, normals, weights, uvs, indices, staticAabb);
     }
 

@@ -16,10 +16,10 @@
 
 package org.terasology.world.propagation.light;
 
+import org.joml.Vector3i;
 import org.terasology.math.Side;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.world.block.Block;
-import org.terasology.world.chunks.ChunkConstants;
+import org.terasology.world.chunks.Chunks;
 import org.terasology.world.chunks.LitChunk;
 import org.terasology.world.propagation.BatchPropagator;
 import org.terasology.world.propagation.PropagationRules;
@@ -51,13 +51,14 @@ public final class InternalLightProcessor {
      */
     private static void populateLight(LitChunk chunk) {
         BatchPropagator lightPropagator = new StandardBatchPropagator(LIGHT_RULES, new SingleChunkView(LIGHT_RULES, chunk));
-        for (int x = 0; x < ChunkConstants.SIZE_X; x++) {
-            for (int z = 0; z < ChunkConstants.SIZE_Z; z++) {
-                for (int y = 0; y < ChunkConstants.SIZE_Y; y++) {
+        Vector3i pos = new Vector3i();
+        for (int x = 0; x < Chunks.SIZE_X; x++) {
+            for (int z = 0; z < Chunks.SIZE_Z; z++) {
+                for (int y = 0; y < Chunks.SIZE_Y; y++) {
                     Block block = chunk.getBlock(x, y, z);
                     if (block.getLuminance() > 0) {
                         chunk.setLight(x, y, z, block.getLuminance());
-                        lightPropagator.propagateFrom(new Vector3i(x, y, z), block.getLuminance());
+                        lightPropagator.propagateFrom(pos.set(x,y,z), block.getLuminance());
                     }
                 }
             }
@@ -74,11 +75,12 @@ public final class InternalLightProcessor {
         PropagationRules sunlightRules = new SunlightPropagationRules(chunk);
         BatchPropagator lightPropagator = new StandardBatchPropagator(sunlightRules, new SingleChunkView(sunlightRules, chunk));
 
-        for (int x = 0; x < ChunkConstants.SIZE_X; x++) {
-            for (int z = 0; z < ChunkConstants.SIZE_Z; z++) {
+        Vector3i pos = new Vector3i();
+        for (int x = 0; x < Chunks.SIZE_X; x++) {
+            for (int z = 0; z < Chunks.SIZE_Z; z++) {
                 /* Start at the bottom of the chunk and then move up until the max sunlight level */
-                for (int y = 0; y < ChunkConstants.MAX_SUNLIGHT; y++) {
-                    Vector3i pos = new Vector3i(x, y, z);
+                for (int y = 0; y < Chunks.MAX_SUNLIGHT; y++) {
+                    pos.set(x, y, z);
                     Block block = chunk.getBlock(x, y, z);
                     byte light = sunlightRules.getFixedValue(block, pos);
                     if (light > 0) {
@@ -97,10 +99,10 @@ public final class InternalLightProcessor {
      * @param chunk The chunk to populate the regeneration values through
      */
     private static void populateSunlightRegen(LitChunk chunk) {
-        int top = ChunkConstants.SIZE_Y - 1;
+        int top = Chunks.SIZE_Y - 1;
         /* Scan through each column in the chunk & propagate light from the top down */
-        for (int x = 0; x < ChunkConstants.SIZE_X; x++) {
-            for (int z = 0; z < ChunkConstants.SIZE_Z; z++) {
+        for (int x = 0; x < Chunks.SIZE_X; x++) {
+            for (int z = 0; z < Chunks.SIZE_Z; z++) {
                 byte regen = 0;
                 Block lastBlock = chunk.getBlock(x, top, z);
                 for (int y = top - 1; y >= 0; y--) {

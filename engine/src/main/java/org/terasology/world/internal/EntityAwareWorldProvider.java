@@ -56,7 +56,6 @@ import org.terasology.world.OnChangedBlock;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockComponent;
 import org.terasology.world.block.BlockRegion;
-import org.terasology.world.block.BlockRegions;
 import org.terasology.world.block.regions.BlockRegionComponent;
 
 import java.math.RoundingMode;
@@ -117,11 +116,6 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
     }
 
     @Override
-    public Block setBlock(Vector3i pos, Block type) {
-        return this.setBlock(JomlUtil.from(pos), type);
-    }
-
-    @Override
     public Block setBlock(Vector3ic pos, Block type) {
         if (GameThread.isCurrentThread()) {
             EntityRef blockEntity = getBlockEntityAt(JomlUtil.from(pos));
@@ -144,10 +138,10 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
     //However, this means that even if only one block is placed, this is the method being called.
     //It must be overridden here to allow an OnChangedBlock event to be properly sent for placed blocks.
     @Override
-    public Map<Vector3i, Block> setBlocks(Map<Vector3i, Block> blocks) {
+    public Map<Vector3ic, Block> setBlocks(Map<? extends Vector3ic, Block> blocks) {
         if (GameThread.isCurrentThread()) {
-            Map<Vector3i, Block> oldBlocks = super.setBlocks(blocks);
-            for (Vector3i vec : oldBlocks.keySet()) {
+            Map<Vector3ic, Block> oldBlocks = super.setBlocks(blocks);
+            for (Vector3ic vec : oldBlocks.keySet()) {
                 if (oldBlocks.get(vec) != null) {
                     EntityRef blockEntity = getBlockEntityAt(vec);
 
@@ -156,7 +150,7 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
                             Optional.ofNullable(blockEntity.getComponent(RetainComponentsComponent.class))
                                     .map(retainComponentsComponent -> retainComponentsComponent.components)
                                     .orElse(Collections.emptySet());
-                    updateBlockEntity(blockEntity, vec, oldBlocks.get(vec), blocks.get(vec), false, retainComponents);
+                    updateBlockEntity(blockEntity, JomlUtil.from(vec), oldBlocks.get(vec), blocks.get(vec), false, retainComponents);
                 }
             }
             return oldBlocks;
@@ -475,28 +469,28 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
     public void onBlockRegionActivated(OnActivatedComponent event, EntityRef entity) {
         BlockRegionComponent regionComp = entity.getComponent(BlockRegionComponent.class);
         blockRegions.put(entity, regionComp.region);
-        for (org.joml.Vector3i pos : BlockRegions.iterable(regionComp.region)) {
-            blockRegionLookup.put(pos, entity);
+        for (org.joml.Vector3ic pos : regionComp.region) {
+            blockRegionLookup.put(new org.joml.Vector3i(pos), entity);
         }
     }
 
     @ReceiveEvent(components = {BlockRegionComponent.class})
     public void onBlockRegionChanged(OnChangedComponent event, EntityRef entity) {
         BlockRegion oldRegion = blockRegions.get(entity);
-        for (org.joml.Vector3ic pos : BlockRegions.iterableInPlace(oldRegion)) {
+        for (org.joml.Vector3ic pos : oldRegion) {
             blockRegionLookup.remove(pos);
         }
         BlockRegionComponent regionComp = entity.getComponent(BlockRegionComponent.class);
         blockRegions.put(entity, regionComp.region);
-        for (org.joml.Vector3i pos : BlockRegions.iterable(regionComp.region)) {
-            blockRegionLookup.put(pos, entity);
+        for (org.joml.Vector3ic pos : regionComp.region) {
+            blockRegionLookup.put(new org.joml.Vector3i(pos), entity);
         }
     }
 
     @ReceiveEvent(components = {BlockRegionComponent.class})
     public void onBlockRegionDeactivated(BeforeDeactivateComponent event, EntityRef entity) {
         BlockRegion oldRegion = blockRegions.get(entity);
-        for (org.joml.Vector3ic pos : BlockRegions.iterableInPlace(oldRegion)) {
+        for (org.joml.Vector3ic pos : oldRegion) {
             blockRegionLookup.remove(pos);
         }
         blockRegions.remove(entity);

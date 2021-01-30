@@ -46,8 +46,23 @@ public interface GameEngine {
     /**
      * Runs the engine, which will block the thread.
      * Invalid for a disposed engine
+     *
+     * Same as initializeRun + runMain
      */
     void run(GameState initialState);
+
+    /**
+     * Performs engine initialization only and
+     * Invalid for a disposed engine
+     *
+     * @param initialState initial game state
+     */
+    void initializeRun(GameState initialState);
+
+    /**
+     * Runs the main loop of the engine.
+     */
+    void runMain();
 
     /**
      * Request the engine to stop running

@@ -16,16 +16,17 @@
 package org.terasology;
 
 import com.google.common.collect.Maps;
+import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.math.ChunkMath;
 import org.terasology.math.JomlUtil;
-import org.terasology.math.Region3i;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.world.WorldChangeListener;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
+import org.terasology.world.block.BlockRegion;
+import org.terasology.world.block.BlockRegionc;
 import org.terasology.world.chunks.Chunk;
+import org.terasology.world.chunks.Chunks;
 import org.terasology.world.chunks.blockdata.ExtraBlockDataManager;
 import org.terasology.world.chunks.internal.ChunkImpl;
 import org.terasology.world.generation.impl.EntityBufferImpl;
@@ -45,8 +46,8 @@ import java.util.Map;
  */
 public class MapWorldProvider implements WorldProviderCore {
 
-    private Map<Vector3i, Block> blocks = Maps.newHashMap();
-    private Map<Vector3i, Chunk> chunks = Maps.newHashMap();
+    private Map<Vector3ic, Block> blocks = Maps.newHashMap();
+    private Map<Vector3ic, Chunk> chunks = Maps.newHashMap();
     private WorldGenerator worldGenerator;
     private BlockManager blockManager;
     private ExtraBlockDataManager extraDataManager;
@@ -82,20 +83,14 @@ public class MapWorldProvider implements WorldProviderCore {
     }
 
     @Override
-    public boolean isRegionRelevant(Region3i region) {
+    public boolean isRegionRelevant(BlockRegionc region) {
         return false;
     }
 
     @Override
-    public Block setBlock(Vector3i pos, Block type) {
-        return blocks.put(pos, type);
-    }
-
-    @Override
     public Block setBlock(Vector3ic pos, Block type) {
-        return blocks.put(JomlUtil.from(pos), type);
+        return blocks.put(new Vector3i(pos), type);
     }
-
 
     @Override
     public Block getBlock(int x, int y, int z) {
@@ -106,15 +101,15 @@ public class MapWorldProvider implements WorldProviderCore {
         }
 
         // TODO block manager
-        Vector3i chunkPos = ChunkMath.calcChunkPos(pos);
+        Vector3i chunkPos = Chunks.toChunkPos(pos, new Vector3i());
         Chunk chunk = chunks.get(chunkPos);
         if (chunk == null && worldGenerator != null) {
-            chunk = new ChunkImpl(chunkPos, blockManager, extraDataManager);
+            chunk = new ChunkImpl(JomlUtil.from(chunkPos), blockManager, extraDataManager);
             worldGenerator.createChunk(chunk, entityBuffer);
             chunks.put(chunkPos, chunk);
         }
         if (chunk != null) {
-            return chunk.getBlock(ChunkMath.calcRelativeBlockPos(pos.x, pos.y, pos.z));
+            return chunk.getBlock(Chunks.toRelative(pos, pos));
         }
         return null;
     }
@@ -132,16 +127,15 @@ public class MapWorldProvider implements WorldProviderCore {
     @Override
     public WorldInfo getWorldInfo() {
         return null;
-
     }
 
     @Override
-    public ChunkViewCore getLocalView(Vector3i chunkPos) {
+    public ChunkViewCore getLocalView(Vector3ic chunkPos) {
         return null;
     }
 
     @Override
-    public ChunkViewCore getWorldViewAround(Vector3i chunk) {
+    public ChunkViewCore getWorldViewAround(Vector3ic chunk) {
         return null;
     }
 
@@ -161,7 +155,7 @@ public class MapWorldProvider implements WorldProviderCore {
     }
 
     @Override
-    public int setExtraData(int index, Vector3i pos, int value) {
+    public int setExtraData(int index, Vector3ic pos, int value) {
         return 0;
     }
 
@@ -180,7 +174,7 @@ public class MapWorldProvider implements WorldProviderCore {
     }
 
     @Override
-    public Collection<Region3i> getRelevantRegions() {
+    public Collection<BlockRegion> getRelevantRegions() {
         return Collections.emptySet();
     }
 }

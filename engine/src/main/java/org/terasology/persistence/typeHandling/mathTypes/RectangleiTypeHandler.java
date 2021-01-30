@@ -5,7 +5,7 @@ package org.terasology.persistence.typeHandling.mathTypes;
 
 import com.google.common.collect.Maps;
 import gnu.trove.list.TIntList;
-import org.joml.Rectanglei;
+import org.terasology.joml.geom.Rectanglei;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.PersistedDataArray;
 import org.terasology.persistence.typeHandling.PersistedDataMap;
@@ -37,7 +37,7 @@ public class RectangleiTypeHandler extends TypeHandler<Rectanglei> {
             PersistedDataMap map = data.getAsValueMap();
 
             PersistedDataArray minDataArr = map.get(MIN_FIELD).getAsArray();
-            PersistedDataArray maxDataArr = map.get(MIN_FIELD).getAsArray();
+            PersistedDataArray maxDataArr = map.get(MAX_FIELD).getAsArray();
 
             TIntList minArr = minDataArr.getAsIntegerArray();
             TIntList maxArr = maxDataArr.getAsIntegerArray();

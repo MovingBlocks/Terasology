@@ -15,10 +15,11 @@
  */
 package org.terasology.world.generation.facets.base;
 
-import org.terasology.math.Region3i;
-import org.terasology.math.geom.BaseVector2i;
-import org.terasology.math.geom.Rect2i;
-import org.terasology.math.geom.Vector2i;
+import org.joml.Vector2i;
+import org.joml.Vector2ic;
+import org.joml.Vector3i;
+import org.terasology.world.block.BlockAreac;
+import org.terasology.world.block.BlockRegion;
 import org.terasology.world.generation.Border3D;
 import org.terasology.world.generation.WorldFacet2D;
 
@@ -26,33 +27,33 @@ import org.terasology.world.generation.WorldFacet2D;
  * A base class for sparse (map-based) 2D facets.
  */
 public abstract class BaseSparseFacet2D implements WorldFacet2D {
-    private Rect2i worldRegion;
-    private Rect2i relativeRegion;
+    private BlockAreac worldArea;
+    private BlockAreac relativeArea;
 
-    public BaseSparseFacet2D(Region3i targetRegion, Border3D border) {
-        worldRegion = border.expandTo2D(targetRegion);
-        relativeRegion = border.expandTo2D(targetRegion.size());
+    public BaseSparseFacet2D(BlockRegion targetRegion, Border3D border) {
+        worldArea = border.expandTo2D(targetRegion);
+        relativeArea = border.expandTo2D(targetRegion.getSize(new Vector3i()));
     }
 
     @Override
-    public Rect2i getWorldRegion() {
-        return worldRegion;
+    public BlockAreac getWorldArea() {
+        return worldArea;
     }
 
     @Override
-    public Rect2i getRelativeRegion() {
-        return relativeRegion;
+    public BlockAreac getRelativeArea() {
+        return relativeArea;
     }
 
-    protected BaseVector2i worldToRelative(int x, int y) {
-        return new Vector2i(x - getWorldRegion().minX() + getRelativeRegion().minX(),
-                y - getWorldRegion().minY() + getRelativeRegion().minY());
+    protected Vector2ic worldToRelative(int x, int y) {
+        return new Vector2i(x - getWorldArea().minX() + getRelativeArea().minX(),
+                y - getWorldArea().minY() + getRelativeArea().minY());
     }
 
-    protected void validateCoord(int x, int y, Rect2i region) {
-        if(!region.contains(x, y)) {
+    protected void validateCoord(int x, int y, BlockAreac area) {
+        if(!area.contains(x, y)) {
             String text = "Out of bounds: (%d, %d) for region %s";
-            String msg = String.format(text, x, y, region.toString());
+            String msg = String.format(text, x, y, area.toString());
             throw new IllegalArgumentException(msg);
         }
     }

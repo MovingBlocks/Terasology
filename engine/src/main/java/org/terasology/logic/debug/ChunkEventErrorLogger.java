@@ -16,13 +16,13 @@
 package org.terasology.logic.debug;
 
 import com.google.common.collect.Sets;
+import org.joml.Vector3ic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.world.WorldComponent;
 import org.terasology.world.chunks.event.BeforeChunkUnload;
 import org.terasology.world.chunks.event.OnChunkLoaded;
@@ -35,7 +35,7 @@ import java.util.Set;
 public class ChunkEventErrorLogger extends BaseComponentSystem {
     private static final Logger logger = LoggerFactory.getLogger(ChunkEventErrorLogger.class);
 
-    private Set<Vector3i> loadedChunks = Sets.newHashSet();
+    private Set<Vector3ic> loadedChunks = Sets.newHashSet();
 
     @ReceiveEvent(components = {WorldComponent.class})
     public void onNewChunk(OnChunkLoaded chunkAvailable, EntityRef worldEntity) {

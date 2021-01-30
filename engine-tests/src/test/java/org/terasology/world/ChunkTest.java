@@ -20,6 +20,7 @@ import org.junit.jupiter.api.Test;
 import org.terasology.TerasologyTestingEnvironment;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
+import org.terasology.joml.geom.AABBfc;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.registry.CoreRegistry;
@@ -73,8 +74,9 @@ public class ChunkTest extends TerasologyTestingEnvironment {
 
     @Test
     public void testGetAabb() {
-        assertEquals(new Vector3f(0, 0, 0), chunk.getAABB().getMin());
-        assertEquals(new Vector3f(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z), chunk.getAABB().getMax());
+        AABBfc aabb = chunk.getAABB();
+        assertEquals(new Vector3f(0, 0, 0), new Vector3f(aabb.minX(), aabb.minY(), aabb.minZ()));
+        assertEquals(new Vector3f(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z), new Vector3f(aabb.maxX(), aabb.maxY(), aabb.maxZ()));
     }
 
 }

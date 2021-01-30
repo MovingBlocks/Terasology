@@ -6,7 +6,7 @@ package org.terasology.persistence.typeHandling.mathTypes;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import org.joml.AABBi;
+import org.terasology.joml.geom.AABBi;
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 import org.reflections.Reflections;
@@ -23,11 +23,9 @@ public class BlockRegionTypeHandlerTest extends MathTypeAssert {
 
     private final Reflections reflections = new Reflections(getClass().getClassLoader());
     private final TypeHandlerLibrary typeHandlerLibrary = TypeHandlerLibraryImpl.withReflections(reflections);
-    private AABBiTypeHandler handler = new AABBiTypeHandler();
 
     private final Gson gson =
-        GsonBuilderFactory.createGsonBuilderWithTypeSerializationLibrary(typeHandlerLibrary)
-            .create();
+            GsonBuilderFactory.createGsonBuilderWithTypeSerializationLibrary(typeHandlerLibrary).create();
 
     @Test
     public void testSerializeBlockRegion() {

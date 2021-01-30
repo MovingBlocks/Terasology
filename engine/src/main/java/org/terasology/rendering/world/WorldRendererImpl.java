@@ -26,7 +26,7 @@ import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.module.rendering.RenderingModuleRegistry;
 import org.terasology.engine.subsystem.DisplayDevice;
 import org.terasology.engine.subsystem.lwjgl.GLBufferPool;
-import org.terasology.engine.subsystem.lwjgl.LwjglGraphics;
+import org.terasology.engine.subsystem.lwjgl.LwjglGraphicsUtil;
 import org.terasology.logic.console.Console;
 import org.terasology.logic.console.commandSystem.MethodCommand;
 import org.terasology.logic.console.commandSystem.annotations.Command;
@@ -251,12 +251,12 @@ public final class WorldRendererImpl implements WorldRenderer {
 
     @Override
     public void onChunkLoaded(Vector3i pos) {
-        renderableWorld.onChunkLoaded(pos);
+        renderableWorld.onChunkLoaded(JomlUtil.from(pos));
     }
 
     @Override
     public void onChunkUnloaded(Vector3i pos) {
-        renderableWorld.onChunkUnloaded(pos);
+        renderableWorld.onChunkUnloaded(JomlUtil.from(pos));
     }
 
     @Override
@@ -365,7 +365,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         renderPipelineTaskList.forEach(RenderPipelineTask::process);
 
         // this line re-establish Terasology defaults, so that the rest of the application can rely on them.
-        LwjglGraphics.initOpenGLParams();
+        LwjglGraphicsUtil.initOpenGLParams();
 
         playerCamera.updatePrevViewProjectionMatrix();
     }
