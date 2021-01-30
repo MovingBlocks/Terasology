@@ -67,17 +67,6 @@ public final class LocationComponent implements Component, ReplicationCheck {
     }
 
     /**
-     * @param newQuat
-     * @deprecated This is scheduled for removal in an upcoming version method will be replaced with JOML implementation
-     *     {@link #setLocalRotation(Quaternionfc)}.
-     */
-    @Deprecated
-    public void setLocalRotation(Quat4f newQuat) {
-        lastRotation.set(rotation);
-        rotation.set(newQuat);
-    }
-
-    /**
      * set the current local rotation of the component
      *
      * @param rot local rotation
@@ -236,16 +225,6 @@ public final class LocationComponent implements Component, ReplicationCheck {
     }
 
     /**
-     * @param value
-     * @deprecated This is scheduled for removal in an upcoming version method will be replaced with JOML implementation
-     *     {@link #setWorldPosition(Vector3fc)}.
-     */
-    @Deprecated
-    public void setWorldPosition(Vector3f value) {
-        this.setWorldPosition(JomlUtil.from(value));
-    }
-
-    /**
      * set the world position of the {@link LocationComponent}
      *
      * @param pos position to set
@@ -260,18 +239,6 @@ public final class LocationComponent implements Component, ReplicationCheck {
             rot.inverse(parentLoc.getWorldRotation());
             rot.rotate(this.position, this.position);
         }
-    }
-
-    /**
-     * set the world rotation of the {@link LocationComponent}
-     *
-     * @param value
-     * @deprecated This is scheduled for removal in an upcoming version method will be replaced with JOML implementation
-     *     {@link #setWorldRotation(Quaternionfc)}.
-     */
-    @Deprecated
-    public void setWorldRotation(Quat4f value) {
-        this.setWorldRotation(JomlUtil.from(value));
     }
 
     /**
