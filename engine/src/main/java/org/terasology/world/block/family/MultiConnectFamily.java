@@ -91,7 +91,9 @@ public abstract class MultiConnectFamily extends AbstractBlockFamily implements 
      *             Use the JOML implementation instead: {@link #connectionCondition(Vector3ic, Side)}.
      */
     @Deprecated
-    protected abstract boolean connectionCondition(Vector3i blockLocation, Side connectSide);
+    protected boolean connectionCondition(Vector3i blockLocation, Side connectSide) {
+        return connectionCondition(JomlUtil.from(blockLocation), connectSide);
+    }
 
     /**
      * A condition to return true if the block should have a connection on the given side
@@ -102,7 +104,6 @@ public abstract class MultiConnectFamily extends AbstractBlockFamily implements 
      * @return A boolean indicating if the block should connect on the given side
      */
     protected abstract boolean connectionCondition(Vector3ic blockLocation, Side connectSide);
-
 
     /**
      * The sides of the block that can be connected to.
