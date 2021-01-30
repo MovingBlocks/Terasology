@@ -227,7 +227,6 @@ def createVersionInfoFile = tasks.register("createVersionInfoFile", WritePropert
             buildTag: env.BUILD_TAG,
             buildUrl: env.BUILD_URL,
             jobName: env.JOB_NAME,
-            gitBranch: convertGitBranch(env.GIT_BRANCH),
             gitCommit: env.GIT_COMMIT,
             displayVersion: displayVersion,
             engineVersion: version
