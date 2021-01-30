@@ -3,6 +3,7 @@
 
 // The PC facade is responsible for the primary distribution - a plain Java application runnable on PCs
 
+import Terasology_dist_gradle.ValidateZipDistribution
 import org.apache.tools.ant.filters.FixCrLfFilter
 import org.apache.tools.ant.taskdefs.condition.Os
 import java.text.SimpleDateFormat
@@ -10,6 +11,7 @@ import java.util.*
 
 plugins {
     application
+    `terasology-dist`
 }
 
 // Grab all the common stuff like plugins to use, artifact repositories, code analysis config
@@ -241,7 +243,7 @@ val createVersionFile = tasks.register<Copy>("createVersionFile") {
     filter(FixCrLfFilter::class, "eol" to FixCrLfFilter.CrLf.newInstance("crlf"))
 }
 
-tasks.register<Zip>("distForLauncher") {
+val distForLauncher = tasks.register<Zip>("distForLauncher") {
     group = "terasology dist"
     description = "Bundles the project to a Launcher-compatible layout."
 
@@ -271,6 +273,42 @@ tasks.register<Zip>("distForLauncher") {
             }
         }
     })
+}
+
+tasks.register<ValidateZipDistribution>("testDistForLauncher") {
+    description = "Validates locations in distForLauncher."
+
+    fromTask(distForLauncher)
+
+    doLast {
+        val theFile = zipFile.get().asFile
+        assertEquals("Terasology.zip", theFile.name)
+
+        assertContainsPath("libs/Terasology.jar")
+        assertContainsPath("/Terasology.bat")
+    }
+}
+
+tasks.register<ValidateZipDistribution>("testDistZip") {
+    description = "Validates locations in distZip."
+
+    fromTask(tasks.named<Zip>("distZip"))
+
+    doLast {
+        assertContainsPath("*/lib/Terasology.jar")
+
+        val rootFiles = tree.matching {
+            include("/*")
+        }
+        if (!rootFiles.isEmpty) {
+            fail("Expected a single root directory, but root contains files ${rootFiles.files.map { it.name }}")
+        }
+    }
+}
+
+tasks.register<Task>("testDist") {
+    group = "verification"
+    dependsOn("testDistForLauncher", "testDistZip")
 }
 
 class ScriptClasspathRewriter(file: FileCopyDetails, val oldDirectory: String, val newDirectory: String) : Transformer<String, String> {
