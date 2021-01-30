@@ -163,7 +163,7 @@ jar {
             def manifestClasspath = "$subDirLibs/" + configurations."${sourceSets.main.runtimeClasspathConfigurationName}".collect {
                 it.getName()
             }.join(" $subDirLibs/")
-            attributes("Class-Path": manifestClasspath, "Implementation-Title": "Terasology", "Implementation-Version": displayVersion + ", engine v" + version + " , build number " + env.BUILD_NUMBER)
+            attributes("Class-Path": manifestClasspath, "Implementation-Title": "Terasology", "Implementation-Version": displayVersion + ", engine v" + project.version + " , build number " + env.BUILD_NUMBER)
         }
     }
 }
