@@ -90,12 +90,6 @@ dependencies {
     api group: 'com.miglayout', name: 'miglayout-core', version: '5.0'
     implementation group: 'de.matthiasmann.twl', name: 'PNGDecoder', version: '1111'
 
-    // Assembly & Bytecode
-    implementation group: 'org.ow2.asm', name: 'asm', version: '5.0.3'
-    implementation group: 'org.ow2.asm', name: 'asm-tree', version: '5.0.4'
-    implementation group: 'org.ow2.asm', name: 'asm-util', version: '5.0.4'
-    implementation group: 'org.ow2.asm', name: 'asm-commons', version: '5.0.4'
-
     // Logging and audio
     implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.21'
     implementation group: 'com.projectdarkstar.ext.jorbis', name: 'jorbis', version: '0.0.17'
