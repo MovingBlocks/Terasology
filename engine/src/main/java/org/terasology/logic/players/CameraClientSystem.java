@@ -21,6 +21,7 @@ import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.permission.PermissionManager;
 import org.terasology.logic.players.event.OnPlayerSpawnedEvent;
 import org.terasology.logic.players.event.ResetCameraEvent;
+import org.terasology.math.JomlUtil;
 import org.terasology.network.ClientComponent;
 import org.terasology.registry.In;
 
@@ -116,7 +117,8 @@ public class CameraClientSystem extends BaseComponentSystem {
         LocationComponent cameraLocation = clientComponent.camera.getComponent(LocationComponent.class);
         // if the camera already has a location,  use that as the relative position of the camera
         if (cameraLocation != null) {
-            Location.attachChild(targetEntityForCamera, clientComponent.camera, cameraLocation.getLocalPosition(new Vector3f()), new Quaternionf());
+
+            Location.attachChild(targetEntityForCamera, clientComponent.camera, JomlUtil.from(cameraLocation.getLocalPosition()), new Quaternionf());
         } else {
             Location.attachChild(targetEntityForCamera, clientComponent.camera, new Vector3f(0, 0, 0), new Quaternionf());
         }

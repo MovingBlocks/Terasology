@@ -107,16 +107,6 @@ public final class LocationComponent implements Component, ReplicationCheck {
     }
 
     /**
-     * gets the local position of the given entity in
-     *
-     * @param dest will hold the result
-     * @return dest
-     */
-    public org.joml.Vector3f getLocalPosition(org.joml.Vector3f dest) {
-        return dest.set(JomlUtil.from(position));
-    }
-
-    /**
      * @param pos
      * @deprecated This is scheduled for removal in an upcoming version method will be replaced with JOML implementation
      *     {@link #setLocalPosition(Vector3fc)}.
