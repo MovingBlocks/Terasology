@@ -22,10 +22,7 @@ open class ValidateZipDistribution @Inject constructor(objects: ObjectFactory) :
     }
 
     fun fromTask(taskProvider: Provider<Zip>) {
-        // FIXME: is it right to use .get here?
-        //   https://discuss.gradle.org/t/un-nesting-provider-provider/38904
-        val fileProvider = taskProvider.map { it.archiveFile }.get()
-        zipFile.set(fileProvider)
+        zipFile.set(taskProvider.flatMap { it.archiveFile })
     }
 
     fun assertEquals(expected: Any, actual: Any, message: String? = null) =
