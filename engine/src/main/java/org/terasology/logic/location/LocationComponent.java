@@ -53,15 +53,6 @@ public final class LocationComponent implements Component, ReplicationCheck {
     public LocationComponent() {
     }
 
-    /**
-     * @deprecated This is scheduled for removal in an upcoming version method will be replaced with JOML implementation
-     *     {@link #LocationComponent(Vector3fc)}.
-     */
-    @Deprecated
-    public LocationComponent(Vector3f position) {
-        setLocalPosition(position);
-    }
-
     public LocationComponent(Vector3fc position) {
         setLocalPosition(position);
     }
@@ -74,7 +65,6 @@ public final class LocationComponent implements Component, ReplicationCheck {
     public Quat4f getLocalRotation() {
         return rotation;
     }
-
 
     /**
      * @param newQuat
@@ -97,7 +87,6 @@ public final class LocationComponent implements Component, ReplicationCheck {
         rotation.set(JomlUtil.from(rot));
     }
 
-
     /**
      * @return The position of this component relative to any parent. Can be directly modified to update the component
      *     TODO: make this readonly Vector3fc -- Michael Pollind
@@ -117,7 +106,6 @@ public final class LocationComponent implements Component, ReplicationCheck {
         position.set(pos);
     }
 
-
     /**
      * the local position of this location component
      *
@@ -129,18 +117,6 @@ public final class LocationComponent implements Component, ReplicationCheck {
     }
 
     /**
-     * @return
-     * @deprecated This is scheduled for removal in an upcoming version method will be replaced with JOML implementation
-     *     {@link #getLocalDirection(org.joml.Vector3f)}.
-     */
-    @Deprecated
-    public Vector3f getLocalDirection() {
-        Vector3f result = Direction.FORWARD.getVector3f();
-        getLocalRotation().rotate(result, result);
-        return result;
-    }
-
-    /**
      * gets the local direction of the given entity in
      *
      * @param dest will hold the result
@@ -149,7 +125,6 @@ public final class LocationComponent implements Component, ReplicationCheck {
     public org.joml.Vector3f getLocalDirection(org.joml.Vector3f dest) {
         return dest.set(Direction.FORWARD.asVector3i()).rotate(JomlUtil.from(getLocalRotation()));
     }
-
 
     /**
      * set the local scale
@@ -174,19 +149,7 @@ public final class LocationComponent implements Component, ReplicationCheck {
      */
     @Deprecated
     public Vector3f getWorldPosition() {
-        return getWorldPosition(new Vector3f());
-    }
-
-    /**
-     * @param output
-     * @return
-     * @deprecated This is scheduled for removal in an upcoming version method will be replaced with JOML implementation
-     *     {@link #getWorldPosition(org.joml.Vector3f)}.
-     */
-    @Deprecated
-    public Vector3f getWorldPosition(Vector3f output) {
-        output.set(JomlUtil.from(getWorldPosition(new org.joml.Vector3f())));
-        return output;
+        return JomlUtil.from(getWorldPosition(new org.joml.Vector3f()));
     }
 
     /**
@@ -233,7 +196,6 @@ public final class LocationComponent implements Component, ReplicationCheck {
         getWorldRotation().rotate(result, result);
         return result;
     }
-
 
     public org.joml.Vector3f getWorldDirection(org.joml.Vector3f dest) {
         return dest.set(Direction.FORWARD.asVector3f()).rotate(JomlUtil.from(getWorldRotation()));
