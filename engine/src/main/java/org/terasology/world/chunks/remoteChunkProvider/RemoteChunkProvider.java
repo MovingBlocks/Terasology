@@ -1,4 +1,4 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.world.chunks.remoteChunkProvider;
@@ -6,6 +6,7 @@ package org.terasology.world.chunks.remoteChunkProvider;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
+import org.joml.Vector3f;
 import org.joml.Vector3ic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +23,7 @@ import org.terasology.world.block.BlockRegion;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.ChunkProvider;
+import org.terasology.world.chunks.Chunks;
 import org.terasology.world.chunks.event.BeforeChunkUnload;
 import org.terasology.world.chunks.event.OnChunkLoaded;
 import org.terasology.world.chunks.pipeline.ChunkProcessingPipeline;
@@ -106,7 +108,7 @@ public class RemoteChunkProvider implements ChunkProvider {
         }
         Chunk chunk;
         while ((chunk = readyChunks.poll()) != null) {
-            Chunk oldChunk = chunkCache.put(chunk.getPosition(), chunk);
+            Chunk oldChunk = chunkCache.put(JomlUtil.from(chunk.getPosition(new org.joml.Vector3i())), chunk);
             if (oldChunk != null) {
                 oldChunk.dispose();
             }
@@ -194,7 +196,7 @@ public class RemoteChunkProvider implements ChunkProvider {
 
     @Override
     public ChunkViewCore getLocalView(Vector3i centerChunkPos) {
-        Region3i region = Region3i.createFromCenterExtents(centerChunkPos, ChunkConstants.LOCAL_REGION_EXTENTS);
+        BlockRegion region = new BlockRegion(JomlUtil.from(centerChunkPos)).expand(Chunks.LOCAL_REGION_EXTENTS);
         if (getChunk(centerChunkPos) != null) {
             return createWorldView(region, Vector3i.one());
         }
@@ -203,28 +205,28 @@ public class RemoteChunkProvider implements ChunkProvider {
 
     @Override
     public ChunkViewCore getSubviewAroundBlock(Vector3i blockPos, int extent) {
-        Region3i region = ChunkMath.getChunkRegionAroundWorldPos(blockPos, extent);
-        return createWorldView(region, new Vector3i(-region.min().x, -region.min().y, -region.min().z));
+        BlockRegion region = ChunkMath.getChunkRegionAroundWorldPos(JomlUtil.from(blockPos), extent);
+        return createWorldView(region, new Vector3i(-region.minX(), -region.minY(), -region.minZ()));
     }
 
     @Override
     public ChunkViewCore getSubviewAroundChunk(Vector3i chunkPos) {
-        Region3i region = Region3i.createFromCenterExtents(chunkPos, ChunkConstants.LOCAL_REGION_EXTENTS);
+        BlockRegion region = new BlockRegion(JomlUtil.from(chunkPos)).expand(Chunks.LOCAL_REGION_EXTENTS);
         if (getChunk(chunkPos) != null) {
-            return createWorldView(region, new Vector3i(-region.min().x, -region.min().y, -region.min().z));
+            return createWorldView(region, new Vector3i(-region.minX(), -region.minY(), -region.minZ()));
         }
         return null;
     }
 
-    private ChunkViewCore createWorldView(Region3i region, Vector3i offset) {
-        Chunk[] chunks = new Chunk[region.sizeX() * region.sizeY() * region.sizeZ()];
-        for (Vector3i chunkPos : region) {
-            Chunk chunk = chunkCache.get(chunkPos);
-            chunkPos.sub(region.minX(), region.minY(), region.minZ());
-            int index = TeraMath.calculate3DArrayIndex(chunkPos, region.size());
+    private ChunkViewCore createWorldView(BlockRegion region, Vector3i offset) {
+        Chunk[] chunks = new Chunk[region.getSizeX() * region.getSizeY() * region.getSizeZ()];
+        for (Vector3ic chunkPos : region) {
+            Chunk chunk = chunkCache.get(JomlUtil.from(chunkPos));
+            chunkPos.sub(region.minX(), region.minY(), region.minZ(), new org.joml.Vector3i());
+            int index = TeraMath.calculate3DArrayIndex(JomlUtil.from(chunkPos), JomlUtil.from(region.getSize(new org.joml.Vector3i())));
             chunks[index] = chunk;
         }
-        return new ChunkViewCoreImpl(chunks, JomlUtil.from(region), JomlUtil.from(offset), blockManager.getBlock(BlockManager.AIR_ID));
+        return new ChunkViewCoreImpl(chunks, region, JomlUtil.from(offset), blockManager.getBlock(BlockManager.AIR_ID));
     }
 
     @Override
@@ -245,7 +247,7 @@ public class RemoteChunkProvider implements ChunkProvider {
         }
 
         private int score(PositionFuture<?> task) {
-            return (int) ChunkMath.calcChunkPos(JomlUtil.from(localPlayer.getPosition()), new org.joml.Vector3i()).distance(task.getPosition());
+            return (int) Chunks.toChunkPos(localPlayer.getPosition(new Vector3f()), new org.joml.Vector3i()).distance(task.getPosition());
         }
     }
 }
