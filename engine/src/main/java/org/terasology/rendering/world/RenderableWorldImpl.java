@@ -42,9 +42,12 @@ import org.terasology.world.block.BlockRegion;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.ChunkProvider;
+import org.terasology.world.chunks.Chunks;
 import org.terasology.world.chunks.LodChunk;
 import org.terasology.world.chunks.LodChunkProvider;
 import org.terasology.world.chunks.RenderableChunk;
+import org.terasology.world.generator.ScalableWorldGenerator;
+import org.terasology.world.generator.WorldGenerator;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -97,7 +100,12 @@ class RenderableWorldImpl implements RenderableWorld {
         chunkMeshUpdateManager = new ChunkMeshUpdateManager(chunkTessellator, worldProvider);
 
         this.playerCamera = playerCamera;
-        lodChunkProvider = new LodChunkProvider(context, chunkTessellator, renderingConfig.getViewDistance(), (int) renderingConfig.getChunkLods(), calcCameraCoordinatesInChunkUnits());
+        WorldGenerator worldGenerator = context.get(WorldGenerator.class);
+        if (worldGenerator instanceof ScalableWorldGenerator) {
+            lodChunkProvider = new LodChunkProvider(context, (ScalableWorldGenerator) worldGenerator, chunkTessellator, renderingConfig.getViewDistance(), (int) renderingConfig.getChunkLods(), calcCameraCoordinatesInChunkUnits());
+        } else {
+            lodChunkProvider = null;
+        }
 
         renderQueues = new RenderQueuesHelper(new PriorityQueue<>(MAX_LOADABLE_CHUNKS, new ChunkFrontToBackComparator()),
                 new PriorityQueue<>(MAX_LOADABLE_CHUNKS, new ChunkFrontToBackComparator()),
@@ -123,7 +131,9 @@ class RenderableWorldImpl implements RenderableWorld {
                 chunk.setDirty(true);
             }
         }
-        lodChunkProvider.onRealChunkLoaded(chunkCoordinates);
+        if (lodChunkProvider != null) {
+            lodChunkProvider.onRealChunkLoaded(chunkCoordinates);
+        }
     }
 
     @Override
@@ -140,7 +150,9 @@ class RenderableWorldImpl implements RenderableWorld {
                 }
             }
         }
-        lodChunkProvider.onRealChunkUnloaded(chunkCoordinates);
+        if (lodChunkProvider != null) {
+            lodChunkProvider.onRealChunkUnloaded(chunkCoordinates);
+        }
     }
 
     /**
@@ -166,7 +178,7 @@ class RenderableWorldImpl implements RenderableWorld {
                 }
                 chunk.setDirty(false);
 
-                newMesh = chunkTessellator.generateMesh(localView, ChunkConstants.SIZE_Y, 0);
+                newMesh = chunkTessellator.generateMesh(localView);
                 newMesh.generateVBOs();
 
                 if (chunk.hasMesh()) {
@@ -196,9 +208,11 @@ class RenderableWorldImpl implements RenderableWorld {
         updateChunksInProximity(calculateRenderableRegion(renderingConfig.getViewDistance()));
         PerformanceMonitor.endActivity();
 
-        PerformanceMonitor.startActivity("Update LOD Chunks");
-        lodChunkProvider.update(calcCameraCoordinatesInChunkUnits());
-        PerformanceMonitor.endActivity();
+        if (lodChunkProvider != null) {
+            PerformanceMonitor.startActivity("Update LOD Chunks");
+            lodChunkProvider.update(calcCameraCoordinatesInChunkUnits());
+            PerformanceMonitor.endActivity();
+        }
     }
 
     /**
@@ -247,10 +261,12 @@ class RenderableWorldImpl implements RenderableWorld {
 
     @Override
     public boolean updateChunksInProximity(ViewDistance newViewDistance, int chunkLods) {
-        if (newViewDistance != currentViewDistance || chunkLods != lodChunkProvider.getChunkLods()) {
+        if (newViewDistance != currentViewDistance || (lodChunkProvider != null && chunkLods != lodChunkProvider.getChunkLods())) {
             logger.info("New Viewing Distance: {}", newViewDistance);
             currentViewDistance = newViewDistance;
-            lodChunkProvider.updateRenderableRegion(newViewDistance, chunkLods, calcCameraCoordinatesInChunkUnits());
+            if (lodChunkProvider != null) {
+                lodChunkProvider.updateRenderableRegion(newViewDistance, chunkLods, calcCameraCoordinatesInChunkUnits());
+            }
             return updateChunksInProximity(calculateRenderableRegion(newViewDistance));
         } else {
             return false;
@@ -320,8 +336,13 @@ class RenderableWorldImpl implements RenderableWorld {
         ChunkMesh mesh;
         boolean isDynamicShadows = renderingConfig.isDynamicShadows();
 
-        List<RenderableChunk> allChunks = new ArrayList<>(chunksInProximityOfCamera);
-        allChunks.addAll(lodChunkProvider.getChunks());
+        List<RenderableChunk> allChunks;
+        if (lodChunkProvider != null) {
+            allChunks = new ArrayList<>(chunksInProximityOfCamera);
+            allChunks.addAll(lodChunkProvider.getChunks());
+        } else {
+            allChunks = chunksInProximityOfCamera;
+        }
 
         for (RenderableChunk chunk : allChunks) {
             if (isChunkValidForRender(chunk)) {
@@ -392,7 +413,9 @@ class RenderableWorldImpl implements RenderableWorld {
     @Override
     public void dispose() {
         chunkMeshUpdateManager.shutdown();
-        lodChunkProvider.shutdown();
+        if (lodChunkProvider != null) {
+            lodChunkProvider.shutdown();
+        }
     }
 
     private boolean isChunkValidForRender(RenderableChunk chunk) {

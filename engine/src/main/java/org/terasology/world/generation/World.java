@@ -25,7 +25,11 @@ import java.util.Set;
  */
 public interface World {
 
-    Region getWorldData(BlockRegion region);
+    Region getWorldData(BlockRegion region, float scale);
+
+    default Region getWorldData(BlockRegion region) {
+        return getWorldData(region, 1);
+    }
 
     /**
      * @return the sea level, measured in blocks. May be used for setting
@@ -34,6 +38,8 @@ public interface World {
     int getSeaLevel();
 
     void rasterizeChunk(CoreChunk chunk, EntityBuffer buffer);
+
+    void rasterizeChunk(CoreChunk chunk, EntityBuffer buffer, float scale);
 
     /**
      * @return a <b>new</b> set containing all facet classes

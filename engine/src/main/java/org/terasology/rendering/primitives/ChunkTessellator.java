@@ -28,6 +28,7 @@ import org.terasology.rendering.RenderMath;
 import org.terasology.world.ChunkView;
 import org.terasology.world.block.Block;
 import org.terasology.world.chunks.ChunkConstants;
+import org.terasology.world.chunks.Chunks;
 
 import java.util.concurrent.TimeUnit;
 
@@ -45,19 +46,20 @@ public final class ChunkTessellator {
         this.bufferPool = bufferPool;
     }
 
-    public ChunkMesh generateMesh(ChunkView chunkView, int meshHeight, int verticalOffset) {
-        return generateMesh(chunkView, meshHeight, verticalOffset, 1);
+    public ChunkMesh generateMesh(ChunkView chunkView) {
+        return generateMesh(chunkView, 1, 0);
     }
 
-    public ChunkMesh generateMesh(ChunkView chunkView, int meshHeight, int verticalOffset, float scale) {
+    public ChunkMesh generateMesh(ChunkView chunkView, float scale, int border) {
         PerformanceMonitor.startActivity("GenerateMesh");
         ChunkMesh mesh = new ChunkMesh(bufferPool);
 
         final Stopwatch watch = Stopwatch.createStarted();
 
-        for (int x = 0; x < ChunkConstants.SIZE_X; x++) {
-            for (int z = 0; z < ChunkConstants.SIZE_Z; z++) {
-                for (int y = verticalOffset; y < verticalOffset + meshHeight; y++) {
+        // The mesh extends into the borders in the horizontal directions, but not vertically, in order to cover gaps between LOD chunks of different scales, but also avoid multiple overlapping ocean surfaces.
+        for (int x = 0; x < Chunks.SIZE_X; x++) {
+            for (int z = 0; z < Chunks.SIZE_Z; z++) {
+                for (int y = border * 2; y < Chunks.SIZE_Y - border * 2; y++) {
                     Block block = chunkView.getBlock(x, y, z);
                     if (block != null && block.getMeshGenerator() != null) {
                         block.getMeshGenerator().generateChunkMesh(chunkView, mesh, x, y, z);
@@ -70,7 +72,7 @@ public final class ChunkTessellator {
         mesh.setTimeToGenerateBlockVertices((int) watch.elapsed(TimeUnit.MILLISECONDS));
 
         watch.reset().start();
-        generateOptimizedBuffers(chunkView, mesh, scale);
+        generateOptimizedBuffers(chunkView, mesh, scale, border);
         watch.stop();
         mesh.setTimeToGenerateOptimizedBuffers((int) watch.elapsed(TimeUnit.MILLISECONDS));
         statVertexArrayUpdateCount++;
@@ -79,7 +81,7 @@ public final class ChunkTessellator {
         return mesh;
     }
 
-    private void generateOptimizedBuffers(ChunkView chunkView, ChunkMesh mesh, float scale) {
+    private void generateOptimizedBuffers(ChunkView chunkView, ChunkMesh mesh, float scale, float border) {
         PerformanceMonitor.startActivity("OptimizeBuffers");
 
         for (ChunkMesh.RenderType type : ChunkMesh.RenderType.values()) {
@@ -102,9 +104,10 @@ public final class ChunkTessellator {
                         elements.vertices.get(i * 3 + 2));
 
                 /* POSITION */
-                elements.finalVertices.put(Float.floatToIntBits(vertexPos.x * scale));
-                elements.finalVertices.put(Float.floatToIntBits(vertexPos.y * scale));
-                elements.finalVertices.put(Float.floatToIntBits(vertexPos.z * scale));
+                float totalScale = scale * Chunks.SIZE_X / (Chunks.SIZE_X - 2 * border);
+                elements.finalVertices.put(Float.floatToIntBits((vertexPos.x - border) * totalScale));
+                elements.finalVertices.put(Float.floatToIntBits((vertexPos.y - 2 * border) * totalScale));
+                elements.finalVertices.put(Float.floatToIntBits((vertexPos.z - border) * totalScale));
 
                 /* UV0 - TEX DATA 0.xy */
                 elements.finalVertices.put(Float.floatToIntBits(elements.tex.get(i * 2)));

@@ -209,23 +209,23 @@ public interface CoreChunk {
 
 
     /**
-     * Returns X offset of this chunk to the world center (0:0:0), with one unit being one chunk.
+     * Returns X offset of this chunk to the world center (0:0:0), with one unit being one block.
      *
-     * @return X offset of this chunk from world center in chunks
+     * @return X offset of this chunk from world center in blocks
      */
     int getChunkWorldOffsetX();
 
     /**
-     * Returns Y offset of this chunk to the world center (0:0:0), with one unit being one chunk.
+     * Returns Y offset of this chunk to the world center (0:0:0), with one unit being one block.
      *
-     * @return Y offset of this chunk from world center in chunks
+     * @return Y offset of this chunk from world center in blocks
      */
     int getChunkWorldOffsetY();
 
     /**
-     * Returns Z offset of this chunk to the world center (0:0:0), with one unit being one chunk.
+     * Returns Z offset of this chunk to the world center (0:0:0), with one unit being one block.
      *
-     * @return Z offset of this chunk from world center in chunks
+     * @return Z offset of this chunk from world center in blocks
      */
     int getChunkWorldOffsetZ();
 

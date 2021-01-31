@@ -38,6 +38,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Future;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -70,7 +71,7 @@ public class RemoteChunkProvider implements ChunkProvider {
 
         loadingPipeline.addStage(
                 ChunkTaskProvider.create("Chunk generate internal lightning",
-                        InternalLightProcessor::generateInternalLighting))
+                        (Consumer<Chunk>) InternalLightProcessor::generateInternalLighting))
                 .addStage(ChunkTaskProvider.create("Chunk deflate", Chunk::deflate))
                 .addStage(ChunkTaskProvider.createMulti("Light merging",
                         chunks -> {

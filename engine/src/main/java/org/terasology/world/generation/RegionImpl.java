@@ -31,15 +31,17 @@ public class RegionImpl implements Region, GeneratingRegion {
     private final BlockRegion region;
     private final ListMultimap<Class<? extends WorldFacet>, FacetProvider> facetProviderChains;
     private final Map<Class<? extends WorldFacet>, Border3D> borders;
+    private final float scale;
 
     private final TypeMap<WorldFacet> generatingFacets = TypeMap.create();
     private final Set<FacetProvider> processedProviders = Sets.newHashSet();
     private final TypeMap<WorldFacet> generatedFacets = TypeMap.create();
 
-    public RegionImpl(BlockRegion region, ListMultimap<Class<? extends WorldFacet>, FacetProvider> facetProviderChains, Map<Class<? extends WorldFacet>, Border3D> borders) {
+    public RegionImpl(BlockRegion region, ListMultimap<Class<? extends WorldFacet>, FacetProvider> facetProviderChains, Map<Class<? extends WorldFacet>, Border3D> borders, float scale) {
         this.region = region;
         this.facetProviderChains = facetProviderChains;
         this.borders = borders;
+        this.scale = scale;
     }
 
     @Override
@@ -47,7 +49,11 @@ public class RegionImpl implements Region, GeneratingRegion {
         T facet = generatedFacets.get(dataType);
         if (facet == null) {
             facetProviderChains.get(dataType).stream().filter(provider -> !processedProviders.contains(provider)).forEach(provider -> {
-                provider.process(this);
+                if (scale == 1) {
+                    provider.process(this);
+                } else {
+                    ((ScalableFacetProvider) provider).process(this, scale);
+                }
                 processedProviders.add(provider);
             });
             facet = generatingFacets.get(dataType);

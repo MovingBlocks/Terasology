@@ -18,9 +18,9 @@ import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.BlockRegion;
 import org.terasology.world.chunks.blockdata.ExtraBlockDataManager;
-import org.terasology.world.chunks.internal.ChunkImpl;
+import org.terasology.world.chunks.internal.PreLodChunk;
 import org.terasology.world.generation.impl.EntityBufferImpl;
-import org.terasology.world.generator.WorldGenerator;
+import org.terasology.world.generator.ScalableWorldGenerator;
 import org.terasology.world.internal.ChunkViewCoreImpl;
 import org.terasology.world.propagation.light.InternalLightProcessor;
 
@@ -43,7 +43,7 @@ public class LodChunkProvider {
     private BlockManager blockManager;
     private ExtraBlockDataManager extraDataManager;
     private ChunkTessellator tessellator;
-    private WorldGenerator generator;
+    private ScalableWorldGenerator generator;
 
     private Vector3i center;
     private ViewDistance viewDistanceSetting;
@@ -59,11 +59,11 @@ public class LodChunkProvider {
     private BlockingQueue<LodChunk> readyChunks = Queues.newLinkedBlockingQueue();
     private List<Thread> generationThreads = new ArrayList<>();
 
-    public LodChunkProvider(Context context, ChunkTessellator tessellator, ViewDistance viewDistance, int chunkLods, Vector3i center) {
+    public LodChunkProvider(Context context, ScalableWorldGenerator generator, ChunkTessellator tessellator, ViewDistance viewDistance, int chunkLods, Vector3i center) {
         chunkProvider = context.get(ChunkProvider.class);
         blockManager = context.get(BlockManager.class);
         extraDataManager = context.get(ExtraBlockDataManager.class);
-        generator = context.get(WorldGenerator.class);
+        this.generator = generator;
         this.tessellator = tessellator;
         viewDistanceSetting = viewDistance;
         this.chunkLods = chunkLods;
@@ -89,12 +89,12 @@ public class LodChunkProvider {
                     // This chunk is being removed in the main thread.
                     continue;
                 }
-                Chunk chunk = new ChunkImpl(JomlUtil.from(pos).div(1 << scale), blockManager, extraDataManager);
-                generator.createChunk(chunk, new EntityBufferImpl());
-                InternalLightProcessor.generateInternalLighting(chunk);
-                tintChunk(chunk);
+                Chunk chunk = new PreLodChunk(pos.div(1 << scale, new Vector3i()), blockManager, extraDataManager);
+                generator.createChunk(chunk, new EntityBufferImpl(), (1 << scale) * (2f / (Chunks.SIZE_X - 2) + 1));
+                InternalLightProcessor.generateInternalLighting(chunk, 1 << scale);
+                //tintChunk(chunk);
                 ChunkView view = new ChunkViewCoreImpl(new Chunk[]{chunk}, new BlockRegion(chunk.getPosition(new Vector3i())), new Vector3i(), unloaded);
-                ChunkMesh mesh = tessellator.generateMesh(view, Chunks.SIZE_Y, 0, 1 << scale);
+                ChunkMesh mesh = tessellator.generateMesh(view, 1 << scale, 1);
                 readyChunks.add(new LodChunk(pos, mesh, scale));
             }
         } catch (InterruptedException ignored) { }
@@ -124,7 +124,7 @@ public class LodChunkProvider {
         nearby.pos = center;
         Vector3i viewDistance = new Vector3i(newViewDistance.getChunkDistance()).div(2);
         BlockRegion newLoadedRegion = new BlockRegion(center).expand(viewDistance).expand(-1, -1, -1);
-        BlockRegion[] newLodRegions = new BlockRegion[newChunkLods];
+        BlockRegion[] newLodRegions = new BlockRegion[newChunkLods == 0 ? 0 : 1 + newChunkLods];
         boolean lodRegionChange = newLodRegions.length != lodRegions.length;
         for (int i = 0; i < newLodRegions.length; i++) {
             if (i == 0) {
@@ -135,7 +135,7 @@ public class LodChunkProvider {
             Vector3i min = newLodRegions[i].getMin(new Vector3i());
             Vector3i max = newLodRegions[i].getMax(new Vector3i());
             newLodRegions[i].addToMin(-Math.abs(min.x % 2), -Math.abs(min.y % 2), -Math.abs(min.z % 2));
-            newLodRegions[i].addToMax( Math.abs(max.x % 2),  Math.abs(max.y % 2),  Math.abs(max.z % 2));
+            newLodRegions[i].addToMax(1 - Math.abs(max.x % 2), 1 - Math.abs(max.y % 2), 1 - Math.abs(max.z % 2));
             if (!lodRegionChange && !newLodRegions[i].equals(lodRegions[i])) {
                 lodRegionChange = true;
             }
@@ -170,7 +170,7 @@ public class LodChunkProvider {
     public void onRealChunkUnloaded(Vector3ic pos) {
         if (chunkLods > 0 && !loadedRegion.contains(pos)) {
             Vector3i scaledPos = new Vector3i(pos);
-            for (int scale = 0; scale < chunkLods; scale++) {
+            for (int scale = 0; scale < lodRegions.length; scale++) {
                 if (lodRegions[scale].contains(scaledPos)) {
                     addChunk(pos, scale);
                     return;
