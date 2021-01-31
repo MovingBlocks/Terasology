@@ -88,7 +88,7 @@ public class SimpleAISystem extends BaseComponentSystem implements UpdateSubscri
                 drive.set(targetDirection);
 
                 float yaw = (float) Math.atan2(targetDirection.x, targetDirection.z);
-                location.getLocalRotation().set(0, 1, 0, yaw);
+                location.setLocalRotation(0, 1, 0, yaw);
                 entity.saveComponent(location);
             }
             entity.send(new CharacterMoveInputEvent(0, 0, 0, drive, false, false, false, time.getGameDeltaInMs()));

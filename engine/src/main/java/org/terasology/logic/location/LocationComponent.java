@@ -6,13 +6,11 @@ import com.google.common.collect.Lists;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Quaternionfc;
+import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.math.Direction;
-import org.terasology.math.JomlUtil;
-import org.terasology.math.geom.Quat4f;
-import org.terasology.math.geom.Vector3f;
 import org.terasology.network.Replicate;
 import org.terasology.network.ReplicationCheck;
 import org.terasology.nui.properties.TextField;
@@ -24,7 +22,6 @@ import java.util.Objects;
 
 /**
  * Component represent the location and facing of an entity in the world
- *
  */
 public final class LocationComponent implements Component, ReplicationCheck {
 
@@ -42,13 +39,13 @@ public final class LocationComponent implements Component, ReplicationCheck {
     @TextField
     Vector3f position = new Vector3f();
     @Replicate
-    Quat4f rotation = new Quat4f(0, 0, 0, 1);
+    Quaternionf rotation = new Quaternionf();
     @Replicate
     float scale = 1.0f;
     @Replicate
     Vector3f lastPosition = new Vector3f();
     @Replicate
-    Quat4f lastRotation = new Quat4f(0, 0, 0, 1);
+    Quaternionf lastRotation = new Quaternionf();
 
     public LocationComponent() {
     }
@@ -59,10 +56,10 @@ public final class LocationComponent implements Component, ReplicationCheck {
 
     /**
      * @return local rotation of location component
-     *
-     * TODO: make this readonly Quaternionfc -- Michael Pollind
+     *         <p>
+     *         TODO: make this readonly Quaternionfc -- Michael Pollind
      */
-    public Quat4f getLocalRotation() {
+    public Quaternionfc getLocalRotation() {
         return rotation;
     }
 
@@ -72,15 +69,19 @@ public final class LocationComponent implements Component, ReplicationCheck {
      * @param rot local rotation
      */
     public void setLocalRotation(Quaternionfc rot) {
+        this.setLocalRotation(rot.x(), rot.y(), rot.z(), rot.w());
+    }
+
+    public void setLocalRotation(float x, float y, float z, float w) {
         lastRotation.set(rotation);
-        rotation.set(JomlUtil.from(rot));
+        rotation.set(x, y, z, w);
     }
 
     /**
      * @return The position of this component relative to any parent. Can be directly modified to update the component
-     *     TODO: make this readonly Vector3fc -- Michael Pollind
+     *         TODO: make this readonly Vector3fc -- Michael Pollind
      */
-    public Vector3f getLocalPosition() {
+    public Vector3fc getLocalPosition() {
         return position;
     }
 
@@ -90,8 +91,12 @@ public final class LocationComponent implements Component, ReplicationCheck {
      * @param pos position to set
      */
     public void setLocalPosition(Vector3fc pos) {
+        setLocalPosition(pos.x(), pos.y(), pos.z());
+    }
+
+    public void setLocalPosition(float x, float y, float z) {
         lastPosition.set(position);
-        position.set(JomlUtil.from(pos));
+        position.set(x, y, z);
     }
 
     /**
@@ -100,12 +105,13 @@ public final class LocationComponent implements Component, ReplicationCheck {
      * @param dest will hold the result
      * @return dest
      */
-    public org.joml.Vector3f getLocalDirection(org.joml.Vector3f dest) {
-        return dest.set(Direction.FORWARD.asVector3i()).rotate(JomlUtil.from(getLocalRotation()));
+    public Vector3f getLocalDirection(Vector3f dest) {
+        return dest.set(Direction.FORWARD.asVector3i()).rotate(getLocalRotation());
     }
 
     /**
      * set the local scale
+     *
      * @param value the scale
      */
     public void setLocalScale(float value) {
@@ -114,6 +120,7 @@ public final class LocationComponent implements Component, ReplicationCheck {
 
     /**
      * local scale
+     *
      * @return the scale
      */
     public float getLocalScale() {
@@ -126,21 +133,22 @@ public final class LocationComponent implements Component, ReplicationCheck {
      * @param dest will hold the result
      * @return dest
      */
-    public org.joml.Vector3f getWorldPosition(org.joml.Vector3f dest) {
-        dest.set(JomlUtil.from(position));
+    public Vector3f getWorldPosition(Vector3f dest) {
+        dest.set(position);
         LocationComponent parentLoc = parent.getComponent(LocationComponent.class);
         while (parentLoc != null) {
-            dest.mul(parentLoc.scale);
-            dest.rotate(JomlUtil.from(parentLoc.getLocalRotation()));
-            dest.add(JomlUtil.from(parentLoc.position));
+            dest.mul(parentLoc.scale)
+                    .rotate(parentLoc.getLocalRotation())
+                    .add(parentLoc.position);
             parentLoc = parentLoc.parent.getComponent(LocationComponent.class);
         }
         return dest;
     }
 
     /**
-     * Populates out with the transform of this entity relative to the given entity, or the world transform if entity
-     * is not in this entity's parent hierarchy
+     * Populates out with the transform of this entity relative to the given entity, or the world transform if entity is
+     * not in this entity's parent hierarchy
+     *
      * @param out
      * @param entity
      */
@@ -151,10 +159,10 @@ public final class LocationComponent implements Component, ReplicationCheck {
                 loc.getRelativeTransform(out, entity);
             }
         }
-        out.mul(new Matrix4f().translationRotateScale(JomlUtil.from(position), JomlUtil.from(rotation), scale));
+        out.mul(new Matrix4f().translationRotateScale(position, rotation, scale));
     }
 
-    public org.joml.Vector3f getWorldDirection(org.joml.Vector3f dest) {
+    public Vector3f getWorldDirection(Vector3f dest) {
         return dest.set(Direction.FORWARD.asVector3f()).rotate(getWorldRotation(new Quaternionf()));
     }
 
@@ -165,10 +173,10 @@ public final class LocationComponent implements Component, ReplicationCheck {
      * @return dest
      */
     public Quaternionf getWorldRotation(Quaternionf dest) {
-        dest.set(JomlUtil.from(rotation));
+        dest.set(rotation);
         LocationComponent parentLoc = parent.getComponent(LocationComponent.class);
         while (parentLoc != null) {
-            dest.premul(JomlUtil.from(parentLoc.rotation));
+            dest.premul(parentLoc.rotation);
             parentLoc = parentLoc.parent.getComponent(LocationComponent.class);
         }
         return dest;
@@ -193,11 +201,9 @@ public final class LocationComponent implements Component, ReplicationCheck {
         setLocalPosition(pos);
         LocationComponent parentLoc = parent.getComponent(LocationComponent.class);
         if (parentLoc != null) {
-            this.position.sub(JomlUtil.from(parentLoc.getWorldPosition(new org.joml.Vector3f())));
-            this.position.scale(1f / parentLoc.getWorldScale());
-            Quat4f rot = new Quat4f(0, 0, 0, 1);
-            rot.inverse(JomlUtil.from(parentLoc.getWorldRotation(new Quaternionf())));
-            rot.rotate(this.position, this.position);
+            this.position.sub(parentLoc.getWorldPosition(new Vector3f()));
+            this.position.div(parentLoc.getWorldScale());
+            this.position.rotate(parentLoc.getWorldRotation(new Quaternionf()).invert());
         }
     }
 
@@ -210,9 +216,8 @@ public final class LocationComponent implements Component, ReplicationCheck {
         setLocalRotation(value);
         LocationComponent parentLoc = parent.getComponent(LocationComponent.class);
         if (parentLoc != null) {
-            Quat4f worldRot = JomlUtil.from(parentLoc.getWorldRotation(new Quaternionf()));
-            worldRot.inverse();
-            this.rotation.mul(worldRot, this.rotation);
+            Quaternionf worldRot = parentLoc.getWorldRotation(new Quaternionf()).invert();
+            this.rotation.mul(worldRot);
         }
     }
 
@@ -239,7 +244,8 @@ public final class LocationComponent implements Component, ReplicationCheck {
         }
         if (o instanceof LocationComponent) {
             LocationComponent other = (LocationComponent) o;
-            return other.scale == scale && Objects.equals(parent, other.parent) && Objects.equals(position, other.position) && Objects.equals(rotation, other.rotation);
+            return other.scale == scale && Objects.equals(parent, other.parent) && Objects.equals(position,
+                    other.position) && Objects.equals(rotation, other.rotation);
         }
         return false;
     }
