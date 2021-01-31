@@ -15,6 +15,7 @@
  */
 package org.terasology.logic.ai;
 
+import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.terasology.engine.Time;
 import org.terasology.entitySystem.entity.EntityManager;
@@ -88,7 +89,7 @@ public class SimpleAISystem extends BaseComponentSystem implements UpdateSubscri
                 drive.set(targetDirection);
 
                 float yaw = (float) Math.atan2(targetDirection.x, targetDirection.z);
-                location.setLocalRotation(0, 1, 0, yaw);
+                location.setLocalRotation(new Quaternionf().setAngleAxis(yaw, 0, 1, 0));
                 entity.saveComponent(location);
             }
             entity.send(new CharacterMoveInputEvent(0, 0, 0, drive, false, false, false, time.getGameDeltaInMs()));
