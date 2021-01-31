@@ -16,24 +16,12 @@
 package org.terasology.world.block.family;
 
 import org.joml.Vector3ic;
-import org.terasology.math.JomlUtil;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.world.block.Block;
 
 /**
  * Interface for Block family that gets updated by a change in a neighbor block.
  */
 public interface UpdatesWithNeighboursFamily extends BlockFamily {
-    /**
-     * Update called when a neighbor block changes
-     * @deprecated This method is scheduled for removal in an upcoming version.
-     *             Use the JOML implementation instead: {@link #getBlockForNeighborUpdate(Vector3ic, Block)}.
-     **/
-    @Deprecated
-    default Block getBlockForNeighborUpdate(Vector3i location, Block oldBlock) {
-        return getBlockForNeighborUpdate(JomlUtil.from(location), oldBlock);
-    }
-
     /**
      * Update the block when a neighbor changes
      *
