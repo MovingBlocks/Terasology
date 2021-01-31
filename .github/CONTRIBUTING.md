@@ -44,7 +44,7 @@ The footer should contain a [closing reference to an issue](https://help.github.
 Samples: (even more [samples](https://github.com/angular/angular/commits/master))
 
 ```
-docs(changelog): update changelog to beta.5
+doc(changelog): update changelog to beta.5
 ```
 ```
 fix(release): need to depend on latest rxjs and zone.js
@@ -60,7 +60,7 @@ Must be one of the following:
 
 * **build**: Changes that affect the build system or external dependencies (example scopes: gradle, git, idea)
 * **ci**: Changes to our CI configuration files and scripts (example scopes: Jenkins)
-* **docs**: Documentation only changes
+* **doc**: Documentation only changes
 * **feat**: A new feature
 * **fix**: A bug fix for the game
 * **perf**: A code change that improves performance of the game
@@ -69,17 +69,19 @@ Must be one of the following:
 * **test**: Adding missing tests or correcting existing tests
 
 ### Scope
-The scope should be the name of the package(s) affected (as perceived by the person reading the changelog generated from commit messages).
+The scope  is optional.
+It should describe the area of the code base this change affects.
+For instance, it may be the name of the package(s) affected (as perceived by the person reading the changelog generated from commit messages).
 The package prefix `org.terasology` should be ommitted.
 
 Samples:
 ```
 feat(world): add JOML API to WorldProvider
+
+fix(block/family): fix off-by-one error in block placement
+
+build(gradle): migrate all scripts to Kotlin
 ```
-
-There are currently a few exceptions to the "use package name" rule:
-
-> :construction: What are our exceptions? Non-code changes (build, ci, ...)?
 
 ### Subject
 The subject contains a succinct description of the change:
