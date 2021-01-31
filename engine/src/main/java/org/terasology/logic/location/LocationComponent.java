@@ -56,8 +56,6 @@ public final class LocationComponent implements Component, ReplicationCheck {
 
     /**
      * @return local rotation of location component
-     *         <p>
-     *         TODO: make this readonly Quaternionfc -- Michael Pollind
      */
     public Quaternionfc getLocalRotation() {
         return rotation;
@@ -79,7 +77,6 @@ public final class LocationComponent implements Component, ReplicationCheck {
 
     /**
      * @return The position of this component relative to any parent. Can be directly modified to update the component
-     *         TODO: make this readonly Vector3fc -- Michael Pollind
      */
     public Vector3fc getLocalPosition() {
         return position;
