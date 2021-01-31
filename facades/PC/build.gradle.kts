@@ -82,7 +82,7 @@ logger.info("PC VERSION: {}", version)
 group = "org.terasology.facades"
 
 configurations {
-    register("modules") {
+    register("serverModules") {
         description = "for fetching modules for running a server"
         isTransitive = false
     }
@@ -180,12 +180,12 @@ tasks.register<Sync>("setupServerModules") {
         it.splitToSequence(",").forEach {
             logger.info("Extra module: {}", it)
             dependencies {
-                "modules"(group = "org.terasology.modules", name = it, version = "+")
+                "serverModules"(group = "org.terasology.modules", name = it, version = "+")
             }
         }
     }
 
-    from(configurations.named("modules"))
+    from(configurations.named("serverModules"))
     into(File(rootProject.file(localServerDataPath), "modules"))
 }
 
