@@ -200,7 +200,7 @@ public final class LocationComponent implements Component, ReplicationCheck {
         if (parentLoc != null) {
             this.position.sub(parentLoc.getWorldPosition(new Vector3f()));
             this.position.div(parentLoc.getWorldScale());
-            this.position.rotate(parentLoc.getWorldRotation(new Quaternionf()).invert());
+            this.position.rotate(parentLoc.getWorldRotation(new Quaternionf()).conjugate());
         }
     }
 
@@ -213,7 +213,7 @@ public final class LocationComponent implements Component, ReplicationCheck {
         setLocalRotation(value);
         LocationComponent parentLoc = parent.getComponent(LocationComponent.class);
         if (parentLoc != null) {
-            Quaternionf worldRot = parentLoc.getWorldRotation(new Quaternionf()).invert();
+            Quaternionf worldRot = parentLoc.getWorldRotation(new Quaternionf()).conjugate();
             this.rotation.mul(worldRot);
         }
     }
