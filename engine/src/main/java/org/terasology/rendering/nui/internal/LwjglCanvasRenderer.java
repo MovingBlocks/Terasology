@@ -8,9 +8,6 @@ import com.google.common.collect.Sets;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Quaternionfc;
-import org.terasology.joml.geom.AABBfc;
-import org.terasology.joml.geom.Rectanglef;
-import org.terasology.joml.geom.Rectanglei;
 import org.joml.Vector2f;
 import org.joml.Vector2ic;
 import org.joml.Vector3f;
@@ -23,7 +20,9 @@ import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.context.Context;
 import org.terasology.engine.subsystem.DisplayDevice;
-import org.terasology.math.AABB;
+import org.terasology.joml.geom.AABBfc;
+import org.terasology.joml.geom.Rectanglef;
+import org.terasology.joml.geom.Rectanglei;
 import org.terasology.math.JomlUtil;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Vector2i;
@@ -501,7 +500,7 @@ public class LwjglCanvasRenderer implements TerasologyCanvasRenderer, PropertyCh
     }
 
     private void addRectPoly(MeshBuilder builder, float minX, float minY, float maxX, float maxY, float texMinX, float texMinY, float texMaxX, float texMaxY) {
-        builder.addPoly(JomlUtil.from(new Vector3f(minX, minY, 0)), JomlUtil.from(new Vector3f(maxX, minY, 0)), JomlUtil.from(new Vector3f(maxX, maxY, 0)), JomlUtil.from(new Vector3f(minX, maxY, 0)));
+        builder.addPoly(new Vector3f(minX, minY, 0), new Vector3f(maxX, minY, 0), new Vector3f(maxX, maxY, 0), new Vector3f(minX, maxY, 0));
         builder.addTexCoord(texMinX, texMinY);
         builder.addTexCoord(texMaxX, texMinY);
         builder.addTexCoord(texMaxX, texMaxY);
