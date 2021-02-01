@@ -124,7 +124,7 @@ public class LodChunkProvider {
         chunkLods = newChunkLods;
         nearby.pos = center;
         Vector3i viewDistance = new Vector3i(newViewDistance.getChunkDistance()).div(2);
-        Vector3i centerOffset = new Vector3i(1 - Math.abs(viewDistance.x % 2), 1 - Math.abs(viewDistance.y % 2), 1 - Math.abs(viewDistance.z % 2));
+        Vector3i altViewDistance = viewDistance.add(1 - Math.abs(viewDistance.x % 2), 1 - Math.abs(viewDistance.y % 2), 1 - Math.abs(viewDistance.z % 2), new Vector3i());
         BlockRegion newPossiblyLoadedRegion = new BlockRegion(newCenter).expand(viewDistance);
         BlockRegion newProbablyLoadedRegion =  new BlockRegion(newPossiblyLoadedRegion).expand(-1, -1, -1);
         BlockRegion[] newLodRegions = new BlockRegion[newChunkLods == 0 ? 0 : 1 + newChunkLods];
@@ -133,8 +133,8 @@ public class LodChunkProvider {
             if (i == 0) {
                 newLodRegions[i] = new BlockRegion(newPossiblyLoadedRegion);
             } else {
-                // By adding centerOffset, we ensure that every time a chunk boundary is crossed, at most a single lodRegion changes (except possibly for lodRegions[0], which is more closely tied to the renderable region).
-                newLodRegions[i] = new BlockRegion(scaleDown(center, i)).translate(centerOffset).expand(viewDistance);
+                // By making viewDistance odd, we ensure that every time a chunk boundary is crossed, at most a single lodRegion changes (except possibly for lodRegions[0], which is more closely tied to the renderable region).
+                newLodRegions[i] = new BlockRegion(scaleDown(center, i)).expand(altViewDistance);
             }
             Vector3i min = newLodRegions[i].getMin(new Vector3i());
             Vector3i max = newLodRegions[i].getMax(new Vector3i());
