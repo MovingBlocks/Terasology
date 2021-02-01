@@ -5,7 +5,8 @@
 
 import Terasology_dist_gradle.ValidateZipDistribution
 import org.apache.tools.ant.filters.FixCrLfFilter
-import org.apache.tools.ant.taskdefs.condition.Os
+import org.terasology.gradology.commonConfigure
+import org.terasology.gradology.nativeSubdirectoryName
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -19,32 +20,6 @@ apply(from = "$rootDir/config/gradle/publish.gradle")
 
 val dateTimeFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX")
 dateTimeFormat.timeZone = TimeZone.getTimeZone("UTC")
-
-
-/**
- * The subdirectory for this development environment.
- *
- * Only use this to run local processes. When building releases, you will be targeting other
- * operating systems in addition to your own.
- *
- * @return
- */
-fun nativeSubdirectoryName(): String {
-    return when {
-        Os.isFamily(Os.FAMILY_WINDOWS) -> "windows"
-        Os.isFamily(Os.FAMILY_MAC) -> "macosx"
-        Os.isFamily(Os.FAMILY_UNIX) -> "linux"
-        else -> {
-            logger.warn("What kind of libraries do you use on this? {}", System.getProperty("os.name"))
-            "UNKNOWN"
-        }
-    }
-}
-
-fun isMacOS() : Boolean {
-    return Os.isFamily(Os.FAMILY_MAC)
-}
-
 
 // Default path to store server data if running headless via Gradle
 val localServerDataPath by extra("terasology-server")
@@ -110,28 +85,6 @@ dependencies {
 /****************************************
  * Run Targets
  */
-
-// Used for all game configs.
-fun JavaExec.commonConfigure() {
-    group = "terasology run"
-
-    dependsOn(":extractNatives")
-    dependsOn("classes")
-
-    // Run arguments
-    main = mainClassName
-    workingDir = rootDir
-
-    classpath(sourceSets["main"].runtimeClasspath)
-
-    args("-homedir")
-    jvmArgs("-Xmx3072m")
-
-    if (isMacOS()) {
-        args("-noSplash")
-        jvmArgs("-XstartOnFirstThread", "-Djava.awt.headless=true")
-    }
-}
 
 tasks.register<JavaExec>("game") {
     commonConfigure()
