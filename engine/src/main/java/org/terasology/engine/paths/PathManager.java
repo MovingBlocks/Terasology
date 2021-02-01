@@ -1,4 +1,4 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.engine.paths;
@@ -33,6 +33,7 @@ public final class PathManager {
     private static final String LOG_DIR = "logs";
     private static final String SHADER_LOG_DIR = "shaders";
     private static final String MOD_DIR = "modules";
+    private static final String MOD_CACHE_DIR = "moduleCache";
     private static final String SCREENSHOT_DIR = "screenshots";
     private static final String NATIVES_DIR = "natives";
     private static final String CONFIGS_DIR = "configs";
@@ -303,12 +304,14 @@ public final class PathManager {
         Files.createDirectories(shaderLogPath);
         Path homeModPath = homePath.resolve(MOD_DIR);
         Files.createDirectories(homeModPath);
-        Path installModPath = installPath.resolve(MOD_DIR);
-        Files.createDirectories(installModPath);
-        if (Files.isSameFile(homeModPath, installModPath)) {
-            modPaths = ImmutableList.of(homeModPath);
+        Path modCachePath = homePath.resolve(MOD_CACHE_DIR);
+        Files.createDirectories(modCachePath);
+        if (Files.isSameFile(homePath, installPath)) {
+            modPaths = ImmutableList.of(modCachePath, homeModPath);
         } else {
-            modPaths = ImmutableList.of(installModPath, homeModPath);
+            Path installModPath = installPath.resolve(MOD_DIR);
+            Files.createDirectories(installModPath);
+            modPaths = ImmutableList.of(installModPath, modCachePath, homeModPath);
         }
         screenshotPath = homePath.resolve(SCREENSHOT_DIR);
         Files.createDirectories(screenshotPath);

@@ -54,6 +54,7 @@ open class RunTerasology : JavaExec() {
     private fun initConfig() {
         dependsOn(project.configurations["natives"])
         classpath(project.the<SourceSetContainer>()["main"].runtimeClasspath)
+        dependsOn("provideModuleDependencies")
 
         args("-homedir")
         jvmArgs("-Xmx3072m")
