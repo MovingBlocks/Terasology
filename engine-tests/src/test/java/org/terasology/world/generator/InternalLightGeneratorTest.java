@@ -199,7 +199,7 @@ public class InternalLightGeneratorTest extends TerasologyTestingEnvironment {
         assertEquals(fullLight.getLuminance(), chunk.getLight(16, 32, 16));
         assertEquals(fullLight.getLuminance() - 1, chunk.getLight(16, 33, 16));
         for (int i = 1; i < fullLight.getLuminance(); ++i) {
-            for (Vector3ic pos : Diamond3iIterable.region(new Vector3i(16, 32, 16), i).build()) {
+            for (Vector3ic pos : Diamond3iIterable.shell(new Vector3i(16, 32, 16), i).build()) {
                 assertEquals(fullLight.getLuminance() - i, chunk.getLight(pos));
             }
         }
