@@ -52,9 +52,7 @@ open class RunTerasology : JavaExec() {
     }
 
     private fun initConfig() {
-        dependsOn(":extractNatives")
-        dependsOn("classes")
-
+        dependsOn(project.configurations["natives"])
         classpath(project.the<SourceSetContainer>()["main"].runtimeClasspath)
 
         args("-homedir")
