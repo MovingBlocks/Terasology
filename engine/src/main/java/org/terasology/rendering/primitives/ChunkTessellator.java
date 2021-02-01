@@ -17,16 +17,15 @@ package org.terasology.rendering.primitives;
 
 import com.google.common.base.Stopwatch;
 import gnu.trove.iterator.TIntIterator;
+import org.joml.Vector3f;
 import org.lwjgl.BufferUtils;
 import org.terasology.engine.subsystem.lwjgl.GLBufferPool;
 import org.terasology.math.Direction;
-import org.terasology.math.TeraMath;
-import org.terasology.math.geom.Vector3f;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.rendering.RenderMath;
 import org.terasology.world.ChunkView;
 import org.terasology.world.block.Block;
-import org.terasology.world.chunks.ChunkConstants;
+import org.terasology.world.chunks.Chunks;
 
 import java.util.concurrent.TimeUnit;
 
@@ -50,8 +49,8 @@ public final class ChunkTessellator {
 
         final Stopwatch watch = Stopwatch.createStarted();
 
-        for (int x = 0; x < ChunkConstants.SIZE_X; x++) {
-            for (int z = 0; z < ChunkConstants.SIZE_Z; z++) {
+        for (int x = 0; x < Chunks.SIZE_X; x++) {
+            for (int z = 0; z < Chunks.SIZE_Z; z++) {
                 for (int y = verticalOffset; y < verticalOffset + meshHeight; y++) {
                     Block block = chunkView.getBlock(x, y, z);
                     if (block != null && block.getMeshGenerator() != null) {
@@ -107,7 +106,7 @@ public final class ChunkTessellator {
 
                 /* FLAGS - TEX DATA 0.z */
                 elements.finalVertices.put(Float.floatToIntBits(elements.flags.get(i)));
-                
+
                 /* ANIMATION FRAME COUNT - TEX DATA 0.w*/
                 elements.finalVertices.put(Float.floatToIntBits(elements.frames.get(i)));
 
@@ -225,7 +224,7 @@ public final class ChunkTessellator {
             }
         }
 
-        double resultAmbientOcclusion = (TeraMath.pow(0.40, occCounter) + TeraMath.pow(0.80, occCounterBillboard)) / 2.0;
+        double resultAmbientOcclusion = (Math.pow(0.40, occCounter) + Math.pow(0.80, occCounterBillboard)) / 2.0;
 
         if (counterLight == 0) {
             output[0] = 0;
