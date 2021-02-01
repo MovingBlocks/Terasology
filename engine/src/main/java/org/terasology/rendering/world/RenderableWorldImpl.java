@@ -121,6 +121,9 @@ class RenderableWorldImpl implements RenderableWorld {
             if (chunk != null) {
                 chunksInProximityOfCamera.add(chunk);
                 Collections.sort(chunksInProximityOfCamera, new ChunkFrontToBackComparator());
+                if (lodChunkProvider != null) {
+                    lodChunkProvider.onRealChunkLoaded(chunkCoordinates);
+                }
             } else {
                 logger.warn("Warning: onChunkLoaded called for a null chunk!");
             }
@@ -130,9 +133,6 @@ class RenderableWorldImpl implements RenderableWorld {
             if (chunk != null) {
                 chunk.setDirty(true);
             }
-        }
-        if (lodChunkProvider != null) {
-            lodChunkProvider.onRealChunkLoaded(chunkCoordinates);
         }
     }
 
@@ -287,9 +287,7 @@ class RenderableWorldImpl implements RenderableWorld {
      */
     private Vector3i calcCameraCoordinatesInChunkUnits() {
         org.joml.Vector3f cameraCoordinates = playerCamera.getPosition();
-        return new Vector3i((int) (cameraCoordinates.x() / ChunkConstants.SIZE_X),
-                (int) (cameraCoordinates.y() / ChunkConstants.SIZE_Y),
-                (int) (cameraCoordinates.z() / ChunkConstants.SIZE_Z));
+        return Chunks.toChunkPos(cameraCoordinates, new Vector3i());
     }
 
     @Override

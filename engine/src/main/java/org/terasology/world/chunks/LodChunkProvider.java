@@ -48,7 +48,8 @@ public class LodChunkProvider {
     private Vector3i center;
     private ViewDistance viewDistanceSetting;
     private int chunkLods;
-    private BlockRegion loadedRegion = new BlockRegion(BlockRegion.INVALID); // The chunks that may be actually loaded, which therefore don't need LOD chunks.
+    private BlockRegion possiblyLoadedRegion = new BlockRegion(BlockRegion.INVALID); // The chunks that may be actually loaded.
+    private BlockRegion probablyLoadedRegion = new BlockRegion(BlockRegion.INVALID); // The chunks that should be visible, and therefore shouldn't have LOD chunks even if the chunk there hasn't loaded yet.
     private BlockRegion[] lodRegions = new BlockRegion[0];
     private Map<Vector3ic, Integer> requiredChunks; // The sizes of all of the LOD chunks that are meant to exist.
     private Map<Vector3i, LodChunk> chunks;
@@ -89,7 +90,7 @@ public class LodChunkProvider {
                     // This chunk is being removed in the main thread.
                     continue;
                 }
-                Chunk chunk = new PreLodChunk(pos.div(1 << scale, new Vector3i()), blockManager, extraDataManager);
+                Chunk chunk = new PreLodChunk(scaleDown(pos, scale), blockManager, extraDataManager);
                 generator.createChunk(chunk, new EntityBufferImpl(), (1 << scale) * (2f / (Chunks.SIZE_X - 2) + 1));
                 InternalLightProcessor.generateInternalLighting(chunk, 1 << scale);
                 //tintChunk(chunk);
@@ -119,18 +120,21 @@ public class LodChunkProvider {
 
     public void updateRenderableRegion(ViewDistance newViewDistance, int newChunkLods, Vector3i newCenter) {
         viewDistanceSetting = newViewDistance;
-        center = newCenter;
+        center = new Vector3i(delay(center.x, newCenter.x), delay(center.y, newCenter.y), delay(center.z, newCenter.z));
         chunkLods = newChunkLods;
         nearby.pos = center;
         Vector3i viewDistance = new Vector3i(newViewDistance.getChunkDistance()).div(2);
-        BlockRegion newLoadedRegion = new BlockRegion(center).expand(viewDistance).expand(-1, -1, -1);
+        Vector3i centerOffset = new Vector3i(1 - Math.abs(viewDistance.x % 2), 1 - Math.abs(viewDistance.y % 2), 1 - Math.abs(viewDistance.z % 2));
+        BlockRegion newPossiblyLoadedRegion = new BlockRegion(newCenter).expand(viewDistance);
+        BlockRegion newProbablyLoadedRegion =  new BlockRegion(newPossiblyLoadedRegion).expand(-1, -1, -1);
         BlockRegion[] newLodRegions = new BlockRegion[newChunkLods == 0 ? 0 : 1 + newChunkLods];
         boolean lodRegionChange = newLodRegions.length != lodRegions.length;
         for (int i = 0; i < newLodRegions.length; i++) {
             if (i == 0) {
-                newLodRegions[i] = new BlockRegion(newLoadedRegion);
+                newLodRegions[i] = new BlockRegion(newPossiblyLoadedRegion);
             } else {
-                newLodRegions[i] = new BlockRegion(center.div(1 << i, new Vector3i())).expand(viewDistance);
+                // By adding centerOffset, we ensure that every time a chunk boundary is crossed, at most a single lodRegion changes (except possibly for lodRegions[0], which is more closely tied to the renderable region).
+                newLodRegions[i] = new BlockRegion(scaleDown(center, i)).translate(centerOffset).expand(viewDistance);
             }
             Vector3i min = newLodRegions[i].getMin(new Vector3i());
             Vector3i max = newLodRegions[i].getMax(new Vector3i());
@@ -140,12 +144,17 @@ public class LodChunkProvider {
                 lodRegionChange = true;
             }
         }
-        if (lodRegionChange || !newLoadedRegion.equals(loadedRegion)) {
+        if (lodRegionChange || !newProbablyLoadedRegion.equals(probablyLoadedRegion) || !newPossiblyLoadedRegion.equals(possiblyLoadedRegion)) {
             // Remove previously present chunks.
             Set<Vector3ic> previouslyRequiredChunks = new HashSet<>(requiredChunks.keySet());
             for (Vector3ic pos : previouslyRequiredChunks) {
                 int scale = requiredChunks.get(pos);
-                if (scale >= newLodRegions.length || !newLodRegions[scale].contains(pos.div(1 << scale, new Vector3i()))) {
+                if (
+                    scale >= newLodRegions.length
+                    || !newLodRegions[scale].contains(scaleDown(pos, scale))
+                    || scale == 0 && newProbablyLoadedRegion.contains(pos)
+                    || scale > 0 && newLodRegions[scale - 1].contains(scaleDown(pos, scale - 1))
+                ) {
                     removeChunk(pos);
                 }
             }
@@ -153,40 +162,41 @@ public class LodChunkProvider {
             // Add new chunks.
             for (int scale = 0; scale < newLodRegions.length; scale++) {
                 for (Vector3ic pos : newLodRegions[scale]) {
-                    if (scale == 0 && newLoadedRegion.contains(pos)) {
+                    if (
+                        scale == 0 && newProbablyLoadedRegion.contains(pos)
+                        || scale == 0 && newPossiblyLoadedRegion.contains(pos) && chunkProvider.isChunkReady(pos)
+                        || scale > 0 && newLodRegions[scale - 1].contains(pos.mul(2, new Vector3i()))
+                    ) {
                         continue;
                     }
                     Vector3i globalPos = pos.mul(1 << scale, new Vector3i());
-                    if (requiredChunks.get(globalPos) == null && chunkProvider.getChunk(globalPos) == null) {
+                    if (!requiredChunks.containsKey(globalPos)) {
                         addChunk(globalPos, scale);
                     }
                 }
             }
         }
         lodRegions = newLodRegions;
-        loadedRegion = newLoadedRegion;
+        probablyLoadedRegion = newProbablyLoadedRegion;
+        possiblyLoadedRegion = newPossiblyLoadedRegion;
     }
 
     public void onRealChunkUnloaded(Vector3ic pos) {
-        if (chunkLods > 0 && !loadedRegion.contains(pos)) {
-            Vector3i scaledPos = new Vector3i(pos);
-            for (int scale = 0; scale < lodRegions.length; scale++) {
-                if (lodRegions[scale].contains(scaledPos)) {
-                    addChunk(pos, scale);
-                    return;
-                }
-                scaledPos.div(2);
-            }
+        if (chunkLods > 0 && !probablyLoadedRegion.contains(pos) && lodRegions[0].contains(pos) && !requiredChunks.containsKey(pos)) {
+            addChunk(pos, 0);
         }
     }
 
     private void addChunk(Vector3ic pos, int scale) {
+        if (requiredChunks.containsKey(pos)) {
+            logger.warn("Duplicate LOD chunk load.");
+        }
         requiredChunks.put(pos, scale);
         neededChunks.add(pos);
     }
 
     public void onRealChunkLoaded(Vector3ic pos) {
-        if (requiredChunks.get(pos) != null) {
+        if (requiredChunks.get(pos) != null && possiblyLoadedRegion.contains(pos) && chunkProvider.isChunkReady(pos)) {
             removeChunk(pos);
         }
     }
@@ -221,6 +231,20 @@ public class LodChunkProvider {
 
     public int getChunkLods() {
         return chunkLods;
+    }
+
+    private Vector3i scaleDown(Vector3ic v, int scale) {
+        return new Vector3i(v.x() >> scale, v.y() >> scale, v.z() >> scale);
+    }
+
+    private int delay(int previous, int target) {
+        if (previous < target) {
+            return target - 1;
+        } else if (previous == target) {
+            return target;
+        } else {
+            return target + 1;
+        }
     }
 
     private static class ClosenessComparator implements Comparator<Vector3ic> {
