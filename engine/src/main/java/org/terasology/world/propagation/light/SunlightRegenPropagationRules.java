@@ -74,7 +74,7 @@ public class SunlightRegenPropagationRules extends CommonLightPropagationRules {
 
     @Override
     public void setValue(LitChunk chunk, Vector3ic pos, byte value) {
-        chunk.setSunlightRegen(JomlUtil.from(pos), value);
+        chunk.setSunlightRegen(pos, value);
     }
 
     /**
