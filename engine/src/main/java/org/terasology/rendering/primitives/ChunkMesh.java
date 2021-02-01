@@ -20,16 +20,16 @@ import gnu.trove.list.TFloatList;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TFloatArrayList;
 import gnu.trove.list.array.TIntArrayList;
+import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL15;
 import org.terasology.engine.subsystem.lwjgl.GLBufferPool;
-import org.terasology.math.geom.Vector3f;
 import org.terasology.module.sandbox.API;
 import org.terasology.rendering.VertexBufferObjectUtil;
 import org.terasology.rendering.assets.material.Material;
-import org.terasology.world.chunks.ChunkConstants;
+import org.terasology.world.chunks.Chunks;
 
 import java.nio.IntBuffer;
 import java.util.Map;
@@ -235,9 +235,9 @@ public class ChunkMesh {
      */
     public void updateMaterial(Material chunkMaterial, Vector3fc chunkPosition, boolean chunkIsAnimated) {
         chunkMaterial.setFloat3("chunkPositionWorld",
-                chunkPosition.x() * ChunkConstants.SIZE_X,
-                chunkPosition.y() * ChunkConstants.SIZE_Y,
-                chunkPosition.z() * ChunkConstants.SIZE_Z,
+                chunkPosition.x() * Chunks.SIZE_X,
+                chunkPosition.y() * Chunks.SIZE_Y,
+                chunkPosition.z() * Chunks.SIZE_Z,
                 true);
         chunkMaterial.setFloat("animated", chunkIsAnimated ? 1.0f : 0.0f, true);
     }
@@ -256,9 +256,9 @@ public class ChunkMesh {
 
         // chunkPositionRelativeToCamera = chunkCoordinates * chunkDimensions - cameraCoordinate
         final Vector3f chunkPositionRelativeToCamera =
-                new Vector3f(chunkPosition.x() * ChunkConstants.SIZE_X - cameraPosition.x(),
-                        chunkPosition.y() * ChunkConstants.SIZE_Y - cameraPosition.y(),
-                        chunkPosition.z() * ChunkConstants.SIZE_Z - cameraPosition.z());
+                new Vector3f(chunkPosition.x() * Chunks.SIZE_X - cameraPosition.x(),
+                        chunkPosition.y() * Chunks.SIZE_Y - cameraPosition.y(),
+                        chunkPosition.z() * Chunks.SIZE_Z - cameraPosition.z());
         GL11.glTranslatef(chunkPositionRelativeToCamera.x, chunkPositionRelativeToCamera.y, chunkPositionRelativeToCamera.z);
 
         render(phase);  // this is where the chunk is actually rendered
