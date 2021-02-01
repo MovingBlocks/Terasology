@@ -5,7 +5,7 @@
 
 import Terasology_dist_gradle.ValidateZipDistribution
 import org.apache.tools.ant.filters.FixCrLfFilter
-import org.terasology.gradology.commonConfigure
+import org.terasology.gradology.RunTerasology
 import org.terasology.gradology.nativeSubdirectoryName
 import java.text.SimpleDateFormat
 import java.util.*
@@ -86,8 +86,7 @@ dependencies {
  * Run Targets
  */
 
-tasks.register<JavaExec>("game") {
-    commonConfigure()
+tasks.register<RunTerasology>("game") {
     description = "Run 'Terasology' to play the game as a standard PC application"
 
     // If there are no actual source modules let the user know, just in case ..
@@ -96,20 +95,17 @@ tasks.register<JavaExec>("game") {
     }
 }
 
-tasks.register<JavaExec>("profile") {
-    commonConfigure()
+tasks.register<RunTerasology>("profile") {
     description = "Run 'Terasology' to play the game as a standard PC application (with Java FlightRecorder profiling)"
     jvmArgs( "-XX:+UnlockCommercialFeatures", "-XX:+FlightRecorder", "-XX:+UnlockDiagnosticVMOptions", "-XX:+DebugNonSafepoints", "-XX:StartFlightRecording=filename=terasology.jfr,dumponexit=true")
 }
 
-tasks.register<JavaExec>("debug") {
-    commonConfigure()
+tasks.register<RunTerasology>("debug") {
     description = "Run 'Terasology' to play the game as a standard PC application (in debug mode)"
     jvmArgs( "-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=1044")
 }
 
-tasks.register<JavaExec>("permissiveNatives") {
-    commonConfigure()
+tasks.register<RunTerasology>("permissiveNatives") {
     description = "Run 'Terasology' with security set to permissive and natives loading a second way (for KComputers)"
 
     args("-permissiveSecurity")
@@ -143,8 +139,7 @@ tasks.register<Sync>("setupServerModules") {
 }
 
 // TODO: Make a task to reset server / game data
-tasks.register<JavaExec>("server") {
-    commonConfigure()
+tasks.register<RunTerasology>("server") {
     description = "Starts a headless multiplayer server with data stored in [project-root]/$localServerDataPath"
     dependsOn("setupServerConfig")
     dependsOn("setupServerModules")

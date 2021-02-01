@@ -40,23 +40,29 @@ fun isMacOS() : Boolean {
 }
 
 
-// Used for all game configs.
-fun JavaExec.commonConfigure() {
-    group = "terasology run"
+open class RunTerasology : JavaExec() {
 
-    dependsOn(":extractNatives")
-    dependsOn("classes")
+    init {
+        group = "terasology run"
 
-    mainClass.set(project.the<JavaApplication>().mainClass)
-    workingDir = project.rootDir
+        mainClass.set(project.the<JavaApplication>().mainClass)
+        workingDir = project.rootDir
 
-    classpath(project.the<SourceSetContainer>()["main"].runtimeClasspath)
+        initConfig()
+    }
 
-    args("-homedir")
-    jvmArgs("-Xmx3072m")
+    private fun initConfig() {
+        dependsOn(":extractNatives")
+        dependsOn("classes")
 
-    if (isMacOS()) {
-        args("-noSplash")
-        jvmArgs("-XstartOnFirstThread", "-Djava.awt.headless=true")
+        classpath(project.the<SourceSetContainer>()["main"].runtimeClasspath)
+
+        args("-homedir")
+        jvmArgs("-Xmx3072m")
+
+        if (isMacOS()) {
+            args("-noSplash")
+            jvmArgs("-XstartOnFirstThread", "-Djava.awt.headless=true")
+        }
     }
 }
