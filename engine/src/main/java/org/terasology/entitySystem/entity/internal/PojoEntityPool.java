@@ -138,10 +138,10 @@ public class PojoEntityPool implements EngineEntityPool {
         }
 
         if (position != null) {
-            loc.setWorldPosition(position);
+            loc.setWorldPosition(JomlUtil.from(position));
         }
         if (rotation != null) {
-            loc.setWorldRotation(rotation);
+            loc.setWorldRotation(JomlUtil.from(rotation));
         }
 
         return builder.build();

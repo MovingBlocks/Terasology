@@ -33,7 +33,7 @@ public final class BlockComponent implements Component {
     }
     /**
      * @deprecated This is scheduled for removal in an upcoming version method will be replaced with JOML implementation
-     *     {@link #BlockComponent(Block, org.joml.Vector3i)}.
+     *     {@link #BlockComponent(Block, org.joml.Vector3ic)}.
      */
     @Deprecated
     public BlockComponent(Block block, Vector3i pos) {
@@ -41,7 +41,7 @@ public final class BlockComponent implements Component {
         this.position.set(pos);
     }
 
-    public BlockComponent(Block block, org.joml.Vector3i pos) {
+    public BlockComponent(Block block, org.joml.Vector3ic pos) {
         this.block = block;
         this.position.set(JomlUtil.from(pos));
     }
