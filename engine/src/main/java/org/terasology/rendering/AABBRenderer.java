@@ -126,13 +126,8 @@ public class AABBRenderer implements BlockOverlayRenderer {
         if (displayListWire == -1) {
             generateDisplayListWire();
         }
-        Vector3f center = aabb.center(new Vector3f());
-        glPushMatrix();
-        //glTranslated(0f, center.y, 0f);
 
         glCallList(displayListWire);
-
-        glPopMatrix();
     }
 
     public void renderSolidLocally() {

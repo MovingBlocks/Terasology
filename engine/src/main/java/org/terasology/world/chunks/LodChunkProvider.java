@@ -218,6 +218,9 @@ public class LodChunkProvider {
         for (Thread thread : generationThreads) {
             thread.interrupt();
         }
+        for (LodChunk chunk : chunks.values()) {
+            chunk.disposeMesh();
+        }
     }
 
     /**
