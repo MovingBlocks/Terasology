@@ -111,9 +111,6 @@ public class BlockRegion implements BlockRegionc {
 
     // -- ITERABLE ---------------------------------------------------------------------------------------------------//
 
-    /**
-     * All of the integer points inside this region. It returns the same vector every time, modifying its fields.
-     */
     @Override
     public Iterator<Vector3ic> iterator() {
         if (!isValid()) {
