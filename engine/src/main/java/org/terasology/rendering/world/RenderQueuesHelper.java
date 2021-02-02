@@ -38,4 +38,15 @@ public class RenderQueuesHelper {
         this.chunksAlphaReject = chunksAlphaReject;
         this.chunksAlphaBlend = chunksAlphaBlend;
     }
+
+    /**
+     * Remove any remaining data from all queues, to avoid a memory leak in the case that the nodes using that data aren't present.
+     */
+    public void clear() {
+        chunksOpaque.clear();
+        chunksOpaqueShadow.clear();
+        chunksOpaqueReflection.clear();
+        chunksAlphaReject.clear();
+        chunksAlphaBlend.clear();
+    }
 }

@@ -24,7 +24,7 @@ public abstract class SubmersibleCamera extends Camera {
 
     /* Used for Underwater Checks */
     private WorldProvider worldProvider;
-    private RenderingConfig renderingConfig;
+    RenderingConfig renderingConfig;
 
     public SubmersibleCamera(WorldProvider worldProvider, RenderingConfig renderingConfig) {
         this.worldProvider = worldProvider;
