@@ -246,8 +246,8 @@ public class SunlightRegenBatchPropagator implements BatchPropagator {
                     regenRules.setValue(toChunk, pos, expectedValue);
                     depth[depthIndex]++;
                     byte sunlight = (byte) (expectedValue - Chunks.SUNLIGHT_REGEN_THRESHOLD);
-                    if (sunlight > 0 && sunlight > toChunk.getSunlight(JomlUtil.from(pos))) {
-                        toChunk.setSunlight(JomlUtil.from(pos), sunlight);
+                    if (sunlight > 0 && sunlight > toChunk.getSunlight(pos)) {
+                        toChunk.setSunlight(pos, sunlight);
                     }
                     if (expectedValue < Chunks.MAX_SUNLIGHT_REGEN) {
                         expectedValue++;

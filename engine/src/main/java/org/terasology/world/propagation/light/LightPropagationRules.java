@@ -16,7 +16,6 @@
 package org.terasology.world.propagation.light;
 
 import org.joml.Vector3ic;
-import org.terasology.math.JomlUtil;
 import org.terasology.math.Side;
 import org.terasology.world.block.Block;
 import org.terasology.world.chunks.Chunks;
@@ -70,7 +69,7 @@ public class LightPropagationRules extends CommonLightPropagationRules {
 
     @Override
     public void setValue(LitChunk chunk, Vector3ic pos, byte value) {
-        chunk.setLight(JomlUtil.from(pos), value);
+        chunk.setLight(pos, value);
     }
 
 

@@ -34,11 +34,11 @@ public class SunlightRegenWorldView extends AbstractFullWorldView {
 
     @Override
     protected byte getValueAt(LitChunk chunk, Vector3ic pos) {
-        return chunk.getSunlightRegen(JomlUtil.from(pos));
+        return chunk.getSunlightRegen(pos);
     }
 
     @Override
     protected void setValueAt(LitChunk chunk, Vector3ic pos, byte value) {
-        chunk.setSunlightRegen(JomlUtil.from(pos), value);
+        chunk.setSunlightRegen(pos, value);
     }
 }
