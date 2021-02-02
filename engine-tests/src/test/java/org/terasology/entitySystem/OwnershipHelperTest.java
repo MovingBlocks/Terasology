@@ -31,8 +31,15 @@ import org.terasology.recording.RecordAndReplayCurrentStatus;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.testUtil.ModuleManagerFactory;
 
+import java.util.Collection;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
-import static org.terasology.testUtil.TeraAssert.assertEqualsContent;
+
 
 /**
  */
@@ -67,6 +74,21 @@ public class OwnershipHelperTest {
         EntityRef ownerEntity = entityManager.create(ownerComp);
 
         OwnershipHelper helper = new OwnershipHelper(entityManager.getComponentLibrary());
-        assertEqualsContent(Lists.newArrayList(ownedEntity), helper.listOwnedEntities(ownerEntity));
+        assertEqualsContent(helper.listOwnedEntities(ownerEntity), Lists.newArrayList(ownedEntity));
     }
+
+    //TODO: needs to be replaced with alternative
+    public static <T> void assertEqualsContent(Collection<? extends T> expected, Collection<? extends T> actual) {
+        if (expected == null) {
+            assertNull(actual);
+        } else {
+            assertNotNull(actual);
+            List<? extends T> copyActual = Lists.newArrayList(actual);
+            for (Object obj : expected) {
+                assertTrue(copyActual.remove(obj), () -> "Missing element: " + obj);
+            }
+            assertTrue(copyActual.isEmpty(), () -> "Unexpected additional elements: " + copyActual.toString());
+        }
+    }
+
 }
