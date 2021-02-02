@@ -228,7 +228,7 @@ public class LodChunkProvider {
      */
     private void tintChunk(Chunk chunk) {
         for (Vector3ic pos : Chunks.CHUNK_REGION) {
-            chunk.setSunlight(JomlUtil.from(pos), (byte) (0.75f * chunk.getSunlight(JomlUtil.from(pos))));
+            chunk.setSunlight(pos, (byte) (0.75f * chunk.getSunlight(pos)));
         }
     }
 
