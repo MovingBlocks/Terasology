@@ -17,26 +17,32 @@ import java.util.Set;
  */
 public class WorldImpl implements World {
     private final ListMultimap<Class<? extends WorldFacet>, FacetProvider> facetProviderChains;
+    private final ListMultimap<Class<? extends WorldFacet>, FacetProvider> scalableFacetProviderChains;
     private final List<WorldRasterizer> worldRasterizers;
+    private final List<WorldRasterizer> scalableWorldRasterizers;
     private final List<EntityProvider> entityProviders;
     private final Map<Class<? extends WorldFacet>, Border3D> borders;
     private final int seaLevel;
 
     public WorldImpl(ListMultimap<Class<? extends WorldFacet>, FacetProvider> facetProviderChains,
+                     ListMultimap<Class<? extends WorldFacet>, FacetProvider> scalableFacetProviderChains,
                      List<WorldRasterizer> worldRasterizers,
+                     List<WorldRasterizer> scalableWorldRasterizers,
                      List<EntityProvider> entityProviders,
                      Map<Class<? extends WorldFacet>, Border3D> borders,
                      int seaLevel) {
         this.facetProviderChains = facetProviderChains;
+        this.scalableFacetProviderChains = scalableFacetProviderChains;
         this.worldRasterizers = worldRasterizers;
+        this.scalableWorldRasterizers = scalableWorldRasterizers;
         this.entityProviders = entityProviders;
         this.borders = borders;
         this.seaLevel = seaLevel;
     }
 
     @Override
-    public Region getWorldData(BlockRegion region) {
-        return new RegionImpl(region, facetProviderChains, borders);
+    public Region getWorldData(BlockRegion region, float scale) {
+        return new RegionImpl(region, scale == 1 ? facetProviderChains : scalableFacetProviderChains, borders, scale);
     }
 
     @Override
@@ -46,9 +52,20 @@ public class WorldImpl implements World {
 
     @Override
     public void rasterizeChunk(CoreChunk chunk, EntityBuffer buffer) {
-        Region chunkRegion = getWorldData(chunk.getRegion());
+        Region chunkRegion = getWorldData(chunk.getRegion(), 1);
         for (WorldRasterizer rasterizer : worldRasterizers) {
             rasterizer.generateChunk(chunk, chunkRegion);
+        }
+        for (EntityProvider entityProvider : entityProviders) {
+            entityProvider.process(chunkRegion, buffer);
+        }
+    }
+
+    @Override
+    public void rasterizeChunk(CoreChunk chunk, EntityBuffer buffer, float scale) {
+        Region chunkRegion = getWorldData(chunk.getRegion(), scale);
+        for (WorldRasterizer rasterizer : scalableWorldRasterizers) {
+            ((ScalableWorldRasterizer) rasterizer).generateChunk(chunk, chunkRegion, scale);
         }
         for (EntityProvider entityProvider : entityProviders) {
             entityProvider.process(chunkRegion, buffer);
