@@ -72,6 +72,7 @@ Thumbs.db
 /configs/
 /screenshots/
 /logs/
+/moduleCache/
 /terasology-server/
 /terasology-2ndclient/
 /terasology-3rdclient/
