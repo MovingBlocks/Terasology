@@ -24,7 +24,7 @@ import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.terasology.assets.AssetData;
-import org.terasology.math.AABB;
+import org.terasology.joml.geom.AABBf;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -44,10 +44,10 @@ public class SkeletalMeshData implements AssetData {
     private List<Vector3f> normals;
     private List<BoneWeight> weights = Lists.newArrayList();
     private TIntList indices = new TIntArrayList();
-    private AABB staticAABB;
+    private AABBf staticAABB;
 
     public SkeletalMeshData(List<Bone> bones, List<Vector3f> vertices, List<Vector3f> normals,
-                            List<BoneWeight> weights, List<Vector2f> uvs, TIntList indices, AABB staticAABB) {
+                            List<BoneWeight> weights, List<Vector2f> uvs, TIntList indices, AABBf staticAABB) {
         for (Bone bone : bones) {
             boneLookup.put(bone.getName(), bone);
             if (bone.getParent() == null) {
@@ -180,7 +180,7 @@ public class SkeletalMeshData implements AssetData {
     /**
      * @return A axis-aligned bounding box that surrounds the skeletal mesh given its default pose.
      */
-    public AABB getStaticAABB() {
+    public AABBf getStaticAABB() {
         return staticAABB;
     }
 

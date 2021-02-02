@@ -19,7 +19,7 @@ package org.terasology.rendering.assets.animation;
 import org.terasology.assets.Asset;
 import org.terasology.assets.AssetType;
 import org.terasology.assets.ResourceUrn;
-import org.terasology.math.AABB;
+import org.terasology.joml.geom.AABBf;
 import org.terasology.rendering.assets.skeletalmesh.SkeletalMesh;
 
 /**
@@ -42,5 +42,5 @@ public abstract class MeshAnimation extends Asset<MeshAnimationData> {
 
     public abstract float getTimePerFrame();
 
-    public abstract AABB getAabb();
+    public abstract AABBf getAabb();
 }

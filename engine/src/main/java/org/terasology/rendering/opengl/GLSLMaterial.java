@@ -36,9 +36,6 @@ import org.terasology.assets.AssetType;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.engine.GameThread;
 import org.terasology.engine.subsystem.lwjgl.LwjglGraphicsProcessing;
-import org.terasology.math.MatrixUtils;
-import org.terasology.math.geom.Matrix3f;
-import org.terasology.math.geom.Matrix4f;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.ShaderManager;
 import org.terasology.rendering.assets.material.BaseMaterial;
@@ -487,29 +484,6 @@ public class GLSLMaterial extends BaseMaterial {
     }
 
     @Override
-    public void setMatrix3(String desc, Matrix3f value, boolean currentOnly) {
-        if (isDisposed()) {
-            return;
-        }
-        if (currentOnly) {
-            enable();
-            int id = getUniformLocation(getActiveShaderProgramId(), desc);
-            GL20.glUniformMatrix3fv(id, false, MatrixUtils.matrixToFloatBuffer(value));
-        } else {
-            TIntIntIterator it = disposalAction.shaderPrograms.iterator();
-            while (it.hasNext()) {
-                it.advance();
-
-                GL20.glUseProgram(it.value());
-                int id = getUniformLocation(it.value(), desc);
-                GL20.glUniformMatrix3fv(id, false, MatrixUtils.matrixToFloatBuffer(value));
-            }
-
-            restoreStateAfterUniformsSet();
-        }
-    }
-
-    @Override
     public void setMatrix3(String desc, Matrix3fc value, boolean currentOnly) {
         if (isDisposed()) {
             return;
@@ -551,29 +525,6 @@ public class GLSLMaterial extends BaseMaterial {
                 GL20.glUseProgram(it.value());
                 int id = getUniformLocation(it.value(), desc);
                 GL20.glUniformMatrix3fv(id, false, value);
-            }
-
-            restoreStateAfterUniformsSet();
-        }
-    }
-
-    @Override
-    public void setMatrix4(String desc, Matrix4f value, boolean currentOnly) {
-        if (isDisposed()) {
-            return;
-        }
-        if (currentOnly) {
-            enable();
-            int id = getUniformLocation(getActiveShaderProgramId(), desc);
-            GL20.glUniformMatrix4fv(id, false, MatrixUtils.matrixToFloatBuffer(value));
-        } else {
-            TIntIntIterator it = disposalAction.shaderPrograms.iterator();
-            while (it.hasNext()) {
-                it.advance();
-
-                GL20.glUseProgram(it.value());
-                int id = getUniformLocation(it.value(), desc);
-                GL20.glUniformMatrix4fv(id, false, MatrixUtils.matrixToFloatBuffer(value));
             }
 
             restoreStateAfterUniformsSet();

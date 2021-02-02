@@ -17,6 +17,9 @@ import org.terasology.persistence.typeHandling.TypeHandlerLibraryImpl;
 import org.terasology.reflection.TypeInfo;
 import org.terasology.testUtil.TeraAssert;
 
+import static org.terasology.joml.test.VectorAssert.assertEquals;
+
+
 import java.io.IOException;
 
 public class VectorTypeSerializerTest extends ModuleEnvironmentTest {
@@ -66,9 +69,9 @@ public class VectorTypeSerializerTest extends ModuleEnvironmentTest {
 
         TestObject2 o = gsonSerializer.fromJson(data, new TypeInfo<TestObject2>() {
         });
-        TeraAssert.assertEquals(o.v1, new org.joml.Vector3f(1.0f, 2.0f, 3.0f), .00001f);
-        TeraAssert.assertEquals(o.v2, new org.joml.Vector4f(1.0f, 2.0f, 3.0f, 5.0f), .00001f);
-        TeraAssert.assertEquals(o.v3, new org.joml.Vector2f(1.0f, 2.0f), .00001f);
+        assertEquals(o.v1, new org.joml.Vector3f(1.0f, 2.0f, 3.0f), .00001f);
+        assertEquals(o.v2, new org.joml.Vector4f(1.0f, 2.0f, 3.0f, 5.0f), .00001f);
+        assertEquals(o.v3, new org.joml.Vector2f(1.0f, 2.0f), .00001f);
     }
 
     @Test
@@ -87,9 +90,9 @@ public class VectorTypeSerializerTest extends ModuleEnvironmentTest {
         TestObject1 o = gsonSerializer.fromJson(data, new TypeInfo<TestObject1>() {
         });
 
-        TeraAssert.assertEquals(o.v1, new org.joml.Vector3f(11.5f, 13.15f, 3), .00001f);
-        TeraAssert.assertEquals(o.v2, new org.joml.Vector2f(12f, 13f), .00001f);
-        TeraAssert.assertEquals(o.v3, new org.joml.Vector4f(12, 12.2f, 3f, 15.5f), .00001f);
+        assertEquals(o.v1, new org.joml.Vector3f(11.5f, 13.15f, 3), .00001f);
+        assertEquals(o.v2, new org.joml.Vector2f(12f, 13f), .00001f);
+        assertEquals(o.v3, new org.joml.Vector4f(12, 12.2f, 3f, 15.5f), .00001f);
 
     }
 
@@ -109,9 +112,9 @@ public class VectorTypeSerializerTest extends ModuleEnvironmentTest {
         TestObject1 o = protobufSerializer.fromBytes(data, new TypeInfo<TestObject1>() {
         });
 
-        TeraAssert.assertEquals(o.v1, new org.joml.Vector3f(11.5f, 13.15f, 3), .00001f);
-        TeraAssert.assertEquals(o.v2, new org.joml.Vector2f(12f, 13f), .00001f);
-        TeraAssert.assertEquals(o.v3, new org.joml.Vector4f(12, 12.2f, 3f, 15.5f), .00001f);
+        assertEquals(o.v1, new org.joml.Vector3f(11.5f, 13.15f, 3), .00001f);
+        assertEquals(o.v2, new org.joml.Vector2f(12f, 13f), .00001f);
+        assertEquals(o.v3, new org.joml.Vector4f(12, 12.2f, 3f, 15.5f), .00001f);
 
     }
 
@@ -135,9 +138,9 @@ public class VectorTypeSerializerTest extends ModuleEnvironmentTest {
         TeraAssert.assertEquals(o.v2, new Vector2f(12f, 13f), .00001f);
         TeraAssert.assertEquals(o.v3, new Vector4f(12, 12.2f, 3f, 15.5f), .00001f);
 
-        TeraAssert.assertEquals(o.v11, new org.joml.Vector3f(11.5f, 13.15f, 3), .00001f);
-        TeraAssert.assertEquals(o.v22, new org.joml.Vector2f(12f, 13f), .00001f);
-        TeraAssert.assertEquals(o.v33, new org.joml.Vector4f(12, 12.2f, 3f, 15.5f), .00001f);
+        assertEquals(o.v11, new org.joml.Vector3f(11.5f, 13.15f, 3), .00001f);
+        assertEquals(o.v22, new org.joml.Vector2f(12f, 13f), .00001f);
+        assertEquals(o.v33, new org.joml.Vector4f(12, 12.2f, 3f, 15.5f), .00001f);
     }
 
     @Test
@@ -160,9 +163,9 @@ public class VectorTypeSerializerTest extends ModuleEnvironmentTest {
         TeraAssert.assertEquals(o.v2, new Vector2f(12f, 13f), .00001f);
         TeraAssert.assertEquals(o.v3, new Vector4f(12, 12.2f, 3f, 15.5f), .00001f);
 
-        TeraAssert.assertEquals(o.v11, new org.joml.Vector3f(11.5f, 13.15f, 3), .00001f);
-        TeraAssert.assertEquals(o.v22, new org.joml.Vector2f(12f, 13f), .00001f);
-        TeraAssert.assertEquals(o.v33, new org.joml.Vector4f(12, 12.2f, 3f, 15.5f), .00001f);
+        assertEquals(o.v11, new org.joml.Vector3f(11.5f, 13.15f, 3), .00001f);
+        assertEquals(o.v22, new org.joml.Vector2f(12f, 13f), .00001f);
+        assertEquals(o.v33, new org.joml.Vector4f(12, 12.2f, 3f, 15.5f), .00001f);
     }
 
 }

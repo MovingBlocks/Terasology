@@ -34,7 +34,7 @@ import java.util.Optional;
 public class Subtexture extends TextureRegionAsset<SubtextureData> {
 
     private Texture texture;
-    private Rect2f subregion;
+    private Rectanglef subregion;
     private Runnable disposalAction;
 
     public Subtexture(ResourceUrn urn, AssetType<?, SubtextureData> assetType, SubtextureData data) {
@@ -65,7 +65,7 @@ public class Subtexture extends TextureRegionAsset<SubtextureData> {
 
     @Override
     public Rectanglef getRegion() {
-        return JomlUtil.from(subregion);
+        return subregion;
     }
 
     @Override
@@ -77,12 +77,12 @@ public class Subtexture extends TextureRegionAsset<SubtextureData> {
 
     @Override
     public int getWidth() {
-        return TeraMath.ceilToInt(texture.getWidth() * subregion.width());
+        return TeraMath.ceilToInt(texture.getWidth() * subregion.getSizeX());
     }
 
     @Override
     public int getHeight() {
-        return TeraMath.ceilToInt(texture.getHeight() * subregion.height());
+        return TeraMath.ceilToInt(texture.getHeight() * subregion.getSizeY());
     }
 
     @Override

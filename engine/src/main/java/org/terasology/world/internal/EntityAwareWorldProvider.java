@@ -138,10 +138,10 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
     //However, this means that even if only one block is placed, this is the method being called.
     //It must be overridden here to allow an OnChangedBlock event to be properly sent for placed blocks.
     @Override
-    public Map<Vector3i, Block> setBlocks(Map<Vector3i, Block> blocks) {
+    public Map<Vector3ic, Block> setBlocks(Map<? extends Vector3ic, Block> blocks) {
         if (GameThread.isCurrentThread()) {
-            Map<Vector3i, Block> oldBlocks = super.setBlocks(blocks);
-            for (Vector3i vec : oldBlocks.keySet()) {
+            Map<Vector3ic, Block> oldBlocks = super.setBlocks(blocks);
+            for (Vector3ic vec : oldBlocks.keySet()) {
                 if (oldBlocks.get(vec) != null) {
                     EntityRef blockEntity = getBlockEntityAt(vec);
 
@@ -150,7 +150,7 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
                             Optional.ofNullable(blockEntity.getComponent(RetainComponentsComponent.class))
                                     .map(retainComponentsComponent -> retainComponentsComponent.components)
                                     .orElse(Collections.emptySet());
-                    updateBlockEntity(blockEntity, vec, oldBlocks.get(vec), blocks.get(vec), false, retainComponents);
+                    updateBlockEntity(blockEntity, JomlUtil.from(vec), oldBlocks.get(vec), blocks.get(vec), false, retainComponents);
                 }
             }
             return oldBlocks;
@@ -265,7 +265,7 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
             EntityRef blockEntity = getExistingBlockEntityAt(blockPosition);
             if ((!blockEntity.exists() || !blockEntity.hasComponent(NetworkComponent.class)) && isBlockRelevant(blockPosition.x(), blockPosition.y(), blockPosition.z())) {
                 Block block = getBlock(blockPosition.x(), blockPosition.y(), blockPosition.z());
-                blockEntity = createBlockEntity(JomlUtil.from(blockPosition), block);
+                blockEntity = createBlockEntity(blockPosition, block);
             }
             return blockEntity;
         }
@@ -375,9 +375,9 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
         }
     }
 
-    private EntityRef createBlockEntity(Vector3i blockPosition, Block block) {
+    private EntityRef createBlockEntity(Vector3ic blockPosition, Block block) {
         EntityBuilder builder = entityManager.newBuilder(block.getPrefab().orElse(null));
-        builder.addComponent(new LocationComponent(blockPosition.toVector3f()));
+        builder.addComponent(new LocationComponent(new org.joml.Vector3f(blockPosition)));
         builder.addComponent(new BlockComponent(block, blockPosition));
         boolean isTemporary = isTemporaryBlock(builder, block);
         if (!isTemporary && !builder.hasComponent(NetworkComponent.class)) {
@@ -392,7 +392,7 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
             blockEntity = builder.build();
         }
 
-        blockEntityLookup.put(new Vector3i(blockPosition), blockEntity);
+        blockEntityLookup.put(JomlUtil.from(blockPosition), blockEntity);
         return blockEntity;
     }
 

@@ -1,23 +1,11 @@
-/*
- * Copyright 2013 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.rendering.cameras;
 
 import org.terasology.joml.geom.AABBf;
 import org.joml.Vector3fc;
 import org.lwjgl.BufferUtils;
+import org.terasology.joml.geom.AABBfc;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.AABB;
 import org.terasology.math.JomlUtil;
@@ -147,7 +135,7 @@ public class ViewFrustum {
      * Returns true if this view frustum intersects the given AABB.
      *
      * @deprecated This is scheduled for removal in an upcoming version method will be replaced with JOML implementation
-     *     {@link #intersects(AABBf)}.
+     *     {@link #intersects(AABBfc)}.
      */
     public boolean intersects(AABB aabb) {
         return intersects(JomlUtil.from(aabb));
@@ -156,40 +144,40 @@ public class ViewFrustum {
     /**
      * Returns true if this view frustum intersects the given AABB.
      */
-    public boolean intersects(AABBf aabb) {
+    public boolean intersects(AABBfc aabb) {
 
-        Vector3f cp = CoreRegistry.get(LocalPlayer.class).getViewPosition();
+        Vector3f cp = JomlUtil.from(CoreRegistry.get(LocalPlayer.class).getViewPosition(new org.joml.Vector3f()));
         for (int i = 0; i < 6; i++) {
-            if (planes[i].getA() * (aabb.minX - cp.x) + planes[i].getB() * (aabb.minY - cp.y)
-                + planes[i].getC() * (aabb.maxZ - cp.z) + planes[i].getD() > 0) {
+            if (planes[i].getA() * (aabb.minX() - cp.x) + planes[i].getB() * (aabb.minY() - cp.y)
+                + planes[i].getC() * (aabb.maxZ() - cp.z) + planes[i].getD() > 0) {
                 continue;
             }
-            if (planes[i].getA() * (aabb.maxX - cp.x) + planes[i].getB() * (aabb.minY - cp.y)
-                + planes[i].getC() * (aabb.maxZ - cp.z) + planes[i].getD() > 0) {
+            if (planes[i].getA() * (aabb.maxX() - cp.x) + planes[i].getB() * (aabb.minY() - cp.y)
+                + planes[i].getC() * (aabb.maxZ() - cp.z) + planes[i].getD() > 0) {
                 continue;
             }
-            if (planes[i].getA() * (aabb.maxX - cp.x) + planes[i].getB() * (aabb.maxY - cp.y)
-                + planes[i].getC() * (aabb.maxZ - cp.z) + planes[i].getD() > 0) {
+            if (planes[i].getA() * (aabb.maxX() - cp.x) + planes[i].getB() * (aabb.maxY() - cp.y)
+                + planes[i].getC() * (aabb.maxZ() - cp.z) + planes[i].getD() > 0) {
                 continue;
             }
-            if (planes[i].getA() * (aabb.minX - cp.x) + planes[i].getB() * (aabb.maxY - cp.y)
-                + planes[i].getC() * (aabb.maxZ - cp.z) + planes[i].getD() > 0) {
+            if (planes[i].getA() * (aabb.minX() - cp.x) + planes[i].getB() * (aabb.maxY() - cp.y)
+                + planes[i].getC() * (aabb.maxZ() - cp.z) + planes[i].getD() > 0) {
                 continue;
             }
-            if (planes[i].getA() * (aabb.minX - cp.x) + planes[i].getB() * (aabb.minY - cp.y)
-                + planes[i].getC() * (aabb.minZ - cp.z) + planes[i].getD() > 0) {
+            if (planes[i].getA() * (aabb.minX() - cp.x) + planes[i].getB() * (aabb.minY() - cp.y)
+                + planes[i].getC() * (aabb.minZ() - cp.z) + planes[i].getD() > 0) {
                 continue;
             }
-            if (planes[i].getA() * (aabb.maxX - cp.x) + planes[i].getB() * (aabb.minY - cp.y)
-                + planes[i].getC() * (aabb.minZ - cp.z) + planes[i].getD() > 0) {
+            if (planes[i].getA() * (aabb.maxX() - cp.x) + planes[i].getB() * (aabb.minY() - cp.y)
+                + planes[i].getC() * (aabb.minZ() - cp.z) + planes[i].getD() > 0) {
                 continue;
             }
-            if (planes[i].getA() * (aabb.maxX - cp.x) + planes[i].getB() * (aabb.maxY - cp.y)
-                + planes[i].getC() * (aabb.minZ - cp.z) + planes[i].getD() > 0) {
+            if (planes[i].getA() * (aabb.maxX() - cp.x) + planes[i].getB() * (aabb.maxY() - cp.y)
+                + planes[i].getC() * (aabb.minZ() - cp.z) + planes[i].getD() > 0) {
                 continue;
             }
-            if (planes[i].getA() * (aabb.minX - cp.x) + planes[i].getB() * (aabb.maxY - cp.y)
-                + planes[i].getC() * (aabb.minZ - cp.z) + planes[i].getD() > 0) {
+            if (planes[i].getA() * (aabb.minX() - cp.x) + planes[i].getB() * (aabb.maxY() - cp.y)
+                + planes[i].getC() * (aabb.minZ() - cp.z) + planes[i].getD() > 0) {
                 continue;
             }
             return false;

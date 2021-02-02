@@ -63,6 +63,7 @@ import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -127,7 +128,7 @@ public class LocalChunkProvider implements ChunkProvider {
         return loadingPipeline.invokeGeneratorTask(
                 JomlUtil.from(chunkPos),
                 () -> {
-                    ChunkStore chunkStore = storageManager.loadChunkStore(chunkPos);
+                    ChunkStore chunkStore = storageManager.loadChunkStore(JomlUtil.from(chunkPos));
                     Chunk chunk;
                     EntityBufferImpl buffer = new EntityBufferImpl();
                     if (chunkStore == null) {
@@ -173,9 +174,6 @@ public class LocalChunkProvider implements ChunkProvider {
         Chunk[] chunks = new Chunk[region.sizeX() * region.sizeY() * region.sizeZ()];
         for (Vector3i chunkPos : region) {
             Chunk chunk = chunkCache.get(chunkPos);
-            if (chunk == null) {
-                return null;
-            }
             chunkPos.sub(region.minX(), region.minY(), region.minZ());
             int index = TeraMath.calculate3DArrayIndex(chunkPos, region.size());
             chunks[index] = chunk;
@@ -197,7 +195,7 @@ public class LocalChunkProvider implements ChunkProvider {
         chunk.markReady();
         //TODO, it is not clear if the activate/addedBlocks event logic is correct.
         //See https://github.com/MovingBlocks/Terasology/issues/3244
-        ChunkStore store = this.storageManager.loadChunkStore(chunk.getPosition());
+        ChunkStore store = this.storageManager.loadChunkStore(chunk.getPosition(new org.joml.Vector3i()));
         TShortObjectMap<TIntList> mappings = createBatchBlockEventMappings(chunk);
         if (store != null) {
             store.restoreEntities();
@@ -239,7 +237,7 @@ public class LocalChunkProvider implements ChunkProvider {
             PerformanceMonitor.endActivity();
 
 
-            worldEntity.send(new OnChunkGenerated(chunk.getPosition()));
+            worldEntity.send(new OnChunkGenerated(chunk.getPosition(new org.joml.Vector3i())));
         }
         worldEntity.send(new OnChunkLoaded(chunk.getPosition(new org.joml.Vector3i())));
     }
@@ -444,7 +442,7 @@ public class LocalChunkProvider implements ChunkProvider {
         loadingPipeline = new ChunkProcessingPipeline(this::getChunk, relevanceSystem.createChunkTaskComporator());
         loadingPipeline.addStage(
                 ChunkTaskProvider.create("Chunk generate internal lightning",
-                        InternalLightProcessor::generateInternalLighting))
+                        (Consumer<Chunk>) InternalLightProcessor::generateInternalLighting))
                 .addStage(ChunkTaskProvider.create("Chunk deflate", Chunk::deflate))
                 .addStage(ChunkTaskProvider.createMulti("Light merging",
                         chunks -> {
@@ -487,7 +485,7 @@ public class LocalChunkProvider implements ChunkProvider {
         loadingPipeline = new ChunkProcessingPipeline(this::getChunk, relevanceSystem.createChunkTaskComporator());
         loadingPipeline.addStage(
                 ChunkTaskProvider.create("Chunk generate internal lightning",
-                        InternalLightProcessor::generateInternalLighting))
+                        (Consumer<Chunk>) InternalLightProcessor::generateInternalLighting))
                 .addStage(ChunkTaskProvider.create("Chunk deflate", Chunk::deflate))
                 .addStage(ChunkTaskProvider.createMulti("Light merging",
                         chunks -> {

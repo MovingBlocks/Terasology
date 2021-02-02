@@ -31,18 +31,8 @@ ext {
     startDateTimeString = dateTimeFormat.format(new Date())
     versionInfoFileDir = new File(buildDir, 'classes/org/terasology/version')
     versionInfoFile = new File(versionInfoFileDir, 'versionInfo.properties')
-    versionFileName = 'VERSION'
     versionBase = new File(templatesDir, "version.txt").text.trim()
     displayVersion = versionBase
-}
-
-def convertGitBranch = { gitBranch ->
-    if (gitBranch != null) {
-        // Remove "origin/" from "origin/develop"
-        gitBranch.substring(gitBranch.lastIndexOf("/") + 1)
-    } else {
-        ""
-    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -101,12 +91,6 @@ dependencies {
     implementation group: 'org.abego.treelayout', name: 'org.abego.treelayout.core', version: '1.0.3'
     api group: 'com.miglayout', name: 'miglayout-core', version: '5.0'
     implementation group: 'de.matthiasmann.twl', name: 'PNGDecoder', version: '1111'
-
-    // Assembly & Bytecode
-    implementation group: 'org.ow2.asm', name: 'asm', version: '5.0.3'
-    implementation group: 'org.ow2.asm', name: 'asm-tree', version: '5.0.4'
-    implementation group: 'org.ow2.asm', name: 'asm-util', version: '5.0.4'
-    implementation group: 'org.ow2.asm', name: 'asm-commons', version: '5.0.4'
 
     // Logging and audio
     implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.21'
@@ -175,7 +159,7 @@ jar {
             def manifestClasspath = "$subDirLibs/" + configurations."${sourceSets.main.runtimeClasspathConfigurationName}".collect {
                 it.getName()
             }.join(" $subDirLibs/")
-            attributes("Class-Path": manifestClasspath, "Implementation-Title": "Terasology-" + project.name, "Implementation-Version": env.BUILD_NUMBER + ", " + convertGitBranch(env.GIT_BRANCH) + ", " + env.BUILD_ID + ", " + displayVersion)
+            attributes("Class-Path": manifestClasspath, "Implementation-Title": "Terasology", "Implementation-Version": displayVersion + ", engine v" + version + " , build number " + env.BUILD_NUMBER)
         }
     }
 }
@@ -230,10 +214,10 @@ group = 'org.terasology.engine'
 
 println "Version for $project.name loaded as $version for group $group"
 
-// This version info file actually goes inside the built jar and can be used at runtime
+// This version info file actually goes inside the built jar and can be used at runtime - *if* building in Jenkins (JOB_NAME set)
 task createVersionInfoFile {
     inputs.property('dateTime', startDateTimeString)
-    onlyIf { env.BUILD_URL != null }
+    onlyIf { env.JOB_NAME != null }
     doLast {
         versionInfoFileDir.mkdirs()
         ant.propertyfile(file: versionInfoFile) {
@@ -242,8 +226,6 @@ task createVersionInfoFile {
             ant.entry(key: 'buildTag', value: env.BUILD_TAG)
             ant.entry(key: 'buildUrl', value: env.BUILD_URL)
             ant.entry(key: 'jobName', value: env.JOB_NAME)
-            ant.entry(key: 'gitBranch', value: convertGitBranch(env.GIT_BRANCH))
-            ant.entry(key: 'gitCommit', value: env.GIT_COMMIT)
             ant.entry(key: 'dateTime', value: startDateTimeString)
             ant.entry(key: 'displayVersion', value: displayVersion)
             ant.entry(key: 'engineVersion', value: version)
@@ -251,8 +233,7 @@ task createVersionInfoFile {
     }
 }
 
-
-//TODO: Remove it  when gestalt will can to handle ProtectionDomain without classes (Resources)
+//TODO: Remove this when gestalt can handle ProtectionDomain without classes (Resources)
 task copyResourcesToClasses(type: Copy) {
     from sourceSets.main.output.resourcesDir
     into sourceSets.main.output.classesDirs.first()
