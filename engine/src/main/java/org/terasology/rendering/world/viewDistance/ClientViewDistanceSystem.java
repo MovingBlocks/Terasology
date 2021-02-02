@@ -56,27 +56,35 @@ public class ClientViewDistanceSystem extends BaseComponentSystem {
     @In
     private LocalPlayer localPlayer;
 
-    private PropertyChangeListener propertyChangeListener;
+    private PropertyChangeListener viewDistanceListener;
+    private PropertyChangeListener chunkLodsListener;
 
     private TranslationSystem translationSystem;
 
     @Override
     public void initialise() {
-        propertyChangeListener = evt -> {
+        viewDistanceListener = evt -> {
             if (evt.getPropertyName().equals(RenderingConfig.VIEW_DISTANCE)) {
                 onChangeViewDistanceChange();
             }
         };
-        config.getRendering().subscribe(propertyChangeListener);
+        config.getRendering().subscribe(viewDistanceListener);
+        chunkLodsListener = evt -> {
+            if (evt.getPropertyName().equals(RenderingConfig.CHUNK_LODS)) {
+                onChangeViewDistanceChange();
+            }
+        };
+        config.getRendering().subscribe(chunkLodsListener);
 
         translationSystem = new TranslationSystemImpl(context);
     }
 
     public void onChangeViewDistanceChange() {
         ViewDistance viewDistance = config.getRendering().getViewDistance();
+        int chunkLods = (int) config.getRendering().getChunkLods();
 
         if (worldRenderer != null) {
-            worldRenderer.setViewDistance(viewDistance);
+            worldRenderer.setViewDistance(viewDistance, chunkLods);
         }
 
         EntityRef clientEntity = localPlayer.getClientEntity();
@@ -85,7 +93,7 @@ public class ClientViewDistanceSystem extends BaseComponentSystem {
 
     @Override
     public void shutdown() {
-        config.getRendering().unsubscribe(propertyChangeListener);
+        config.getRendering().unsubscribe(viewDistanceListener);
     }
 
     /**

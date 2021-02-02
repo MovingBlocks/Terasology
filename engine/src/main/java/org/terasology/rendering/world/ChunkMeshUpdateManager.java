@@ -170,7 +170,7 @@ public final class ChunkMeshUpdateManager {
                  */
                 c.setDirty(false);
                 if (chunkView.isValidView()) {
-                    newMesh = tessellator.generateMesh(chunkView, ChunkConstants.SIZE_Y, 0);
+                    newMesh = tessellator.generateMesh(chunkView);
 
                     c.setPendingMesh(newMesh);
                     ChunkMonitor.fireChunkTessellated(c.getPosition(new org.joml.Vector3i()), newMesh);
