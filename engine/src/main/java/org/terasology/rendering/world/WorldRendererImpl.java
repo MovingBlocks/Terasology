@@ -56,7 +56,6 @@ import org.terasology.rendering.openvrprovider.OpenVRProvider;
 import org.terasology.rendering.world.viewDistance.ViewDistance;
 import org.terasology.utilities.Assets;
 import org.terasology.world.WorldProvider;
-import org.terasology.world.chunks.ChunkProvider;
 
 import java.util.List;
 
@@ -168,7 +167,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         LocalPlayerSystem localPlayerSystem = context.get(LocalPlayerSystem.class);
         localPlayerSystem.setPlayerCamera(playerCamera);
 
-        renderableWorld = new RenderableWorldImpl(worldProvider, context.get(ChunkProvider.class), bufferPool, playerCamera);
+        renderableWorld = new RenderableWorldImpl(context, bufferPool, playerCamera);
         renderQueues = renderableWorld.getRenderQueues();
 
         initRenderingSupport();
@@ -393,8 +392,8 @@ public final class WorldRendererImpl implements WorldRenderer {
     }
 
     @Override
-    public void setViewDistance(ViewDistance viewDistance) {
-        renderableWorld.updateChunksInProximity(viewDistance);
+    public void setViewDistance(ViewDistance viewDistance, int chunkLods) {
+        renderableWorld.updateChunksInProximity(viewDistance, chunkLods);
     }
 
     @Override
