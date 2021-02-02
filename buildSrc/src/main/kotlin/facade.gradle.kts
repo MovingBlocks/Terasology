@@ -1,6 +1,8 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
+import org.terasology.gradology.moduleDependencyArtifacts
+
 plugins {
     application
 }
@@ -11,17 +13,19 @@ configurations {
     register("natives") {
         description = "native libraries (.dll and .so)"
     }
-    register("modules") {
+    val modulesConfig = register("modules") {
         description = "locally built modules and their dependencies"
 
         resolutionStrategy {
             preferProjectModules()
         }
-
-        @Suppress("UnstableApiUsage")
-        shouldResolveConsistentlyWith(configurations["runtimeClasspath"])
+    }
+    named("compileOnly") {
+        // Include modules in compileOnly so IntelliJ thinks to compile them.
+        extendsFrom(modulesConfig.get())
     }
 }
+
 
 dependencies {
     "natives"(files(rootProject.file(dirNatives)).builtBy(":extractNatives"))
@@ -33,16 +37,9 @@ dependencies {
 }
 
 tasks.register<Sync>("provideModuleDependencies") {
-    dependsOn(configurations["modules"])
-
     destinationDir = rootProject.file("moduleCache")
 
-    from(configurations["modules"].resolvedConfiguration.resolvedArtifacts.mapNotNull {
-        if (
-            (it.moduleVersion.id.group == "org.terasology.modules") and
-            // FIXME: There must be a better way to filter out things from local projects than
-            //    doing string comparisons on the display name.
-            (!it.id.componentIdentifier.toString().startsWith("project "))
-        ) it.file else null
-    })
+    val modulesConfig = configurations.named("modules")
+    val artifactsProvider = moduleDependencyArtifacts(modulesConfig)
+    from(artifactsProvider.map { artifacts -> artifacts.map(ResolvedArtifactResult::getFile) })
 }
