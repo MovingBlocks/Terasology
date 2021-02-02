@@ -12,7 +12,7 @@ import org.gradle.api.tasks.SourceSetContainer
 import org.gradle.kotlin.dsl.get
 import org.gradle.kotlin.dsl.the
 
-val logger: Logger = Logging.getLogger("org.tersology.gradology")
+private val logger: Logger = Logging.getLogger("org.tersology.gradology.exec")
 
 /**
  * The subdirectory for this development environment.
