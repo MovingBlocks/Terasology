@@ -224,6 +224,14 @@
                                 },
                                 {
                                     "type": "UILabel",
+                                    "text": "${engine:menu#chunk-lods}: "
+                                },
+                                {
+                                    "type": "UISlider",
+                                    "id": "chunkLods"
+                                },
+                                {
+                                    "type": "UILabel",
                                     "text": "${engine:menu#framerate-limit}: "
                                 },
                                 {

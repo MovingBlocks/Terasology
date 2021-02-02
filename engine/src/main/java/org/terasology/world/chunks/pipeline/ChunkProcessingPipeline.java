@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletionService;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorCompletionService;
@@ -141,6 +142,7 @@ public class ChunkProcessingPipeline {
                             chunkProcessingInfo.getPosition(), stageName),
                     e);
             chunkProcessingInfo.getExternalFuture().setException(e);
+        } catch (CancellationException ignored) {
         }
     }
 
@@ -258,6 +260,10 @@ public class ChunkProcessingPipeline {
      */
     public void stopProcessingAt(Vector3ic pos) {
         ChunkProcessingInfo removed = chunkProcessingInfoMap.remove(pos);
+        if (removed == null) {
+            return;
+        }
+
         removed.getExternalFuture().cancel(true);
 
         Future<Chunk> currentFuture = removed.getCurrentFuture();

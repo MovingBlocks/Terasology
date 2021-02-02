@@ -17,6 +17,7 @@ package org.terasology.world.generation;
 
 import org.terasology.engine.SimpleUri;
 import org.terasology.world.chunks.CoreChunk;
+import org.terasology.world.generator.ScalableWorldGenerator;
 import org.terasology.world.generator.WorldConfigurator;
 import org.terasology.world.generator.WorldGenerator;
 import org.terasology.world.zones.Zone;
@@ -26,7 +27,7 @@ import java.util.List;
 /**
  * The most commonly used implementation of {@link WorldGenerator} based on the idea of Facets
  */
-public abstract class BaseFacetedWorldGenerator implements WorldGenerator {
+public abstract class BaseFacetedWorldGenerator implements ScalableWorldGenerator {
 
     protected WorldBuilder worldBuilder;
 
@@ -73,6 +74,11 @@ public abstract class BaseFacetedWorldGenerator implements WorldGenerator {
     @Override
     public void createChunk(CoreChunk chunk, EntityBuffer buffer) {
         world.rasterizeChunk(chunk, buffer);
+    }
+
+    @Override
+    public void createChunk(CoreChunk chunk, EntityBuffer buffer, float scale) {
+        world.rasterizeChunk(chunk, buffer, scale);
     }
 
     @Override

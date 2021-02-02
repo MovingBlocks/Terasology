@@ -61,9 +61,10 @@ public interface PropagationRules {
      * @param existingValue The value to propagate
      * @param side          The side the value is leaving by
      * @param from          The block the value is leaving
+     * @param scale         The scale of the chunk
      * @return The new value to set at the block position
      */
-    byte propagateValue(byte existingValue, Side side, Block from);
+    byte propagateValue(byte existingValue, Side side, Block from, int scale);
 
     /**
      * @return The maximum value possible for this data
