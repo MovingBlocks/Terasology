@@ -55,8 +55,8 @@ public class SunlightPropagationRules extends CommonLightPropagationRules {
      * {@inheritDoc}
      */
     @Override
-    public byte propagateValue(byte existingValue, Side side, Block from) {
-        return (byte) Math.max(existingValue - 1, 0);
+    public byte propagateValue(byte existingValue, Side side, Block from, int scale) {
+        return (byte) Math.max(existingValue - scale, 0);
     }
 
     /**

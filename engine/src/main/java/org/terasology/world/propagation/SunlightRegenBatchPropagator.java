@@ -141,7 +141,7 @@ public class SunlightRegenBatchPropagator implements BatchPropagator {
         Block block = regenWorld.getBlockAt(pos);
         Vector3i position = new Vector3i(pos);
         while (regenRules.canSpreadOutOf(block, Side.BOTTOM)) {
-            regenValue = regenRules.propagateValue(regenValue, Side.BOTTOM, block);
+            regenValue = regenRules.propagateValue(regenValue, Side.BOTTOM, block, 1);
             position.y -= 1;
             byte adjValue = regenWorld.getValueAt(position);
             if (adjValue < regenValue && adjValue != PropagatorWorldView.UNAVAILABLE) {

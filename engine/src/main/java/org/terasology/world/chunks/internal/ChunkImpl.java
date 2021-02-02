@@ -60,7 +60,8 @@ public class ChunkImpl implements Chunk {
     private static final DecimalFormat PERCENT_FORMAT = new DecimalFormat("0.##");
     private static final DecimalFormat SIZE_FORMAT = new DecimalFormat("#,###");
 
-    private final Vector3i chunkPos = new Vector3i();
+    protected final Vector3i chunkPos = new Vector3i();
+    protected BlockRegion region;
 
     private BlockManager blockManager;
 
@@ -74,7 +75,6 @@ public class ChunkImpl implements Chunk {
     private volatile TeraArray[] extraDataSnapshots;
 
     private AABBf aabb = new AABBf();
-    private BlockRegion region;
 
     private boolean disposed;
     private boolean ready;

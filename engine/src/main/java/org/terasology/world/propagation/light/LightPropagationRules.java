@@ -43,8 +43,8 @@ public class LightPropagationRules extends CommonLightPropagationRules {
      * {@inheritDoc}
      */
     @Override
-    public byte propagateValue(byte existingValue, Side side, Block from) {
-        return (byte) (existingValue - 1);
+    public byte propagateValue(byte existingValue, Side side, Block from, int scale) {
+        return (byte) Math.max(existingValue - scale, 0);
     }
 
     /**
