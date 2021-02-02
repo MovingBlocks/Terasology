@@ -154,6 +154,15 @@ public class VideoSettingsScreen extends CoreScreenLayer {
             fovSlider.bindValue(BindHelper.bindBeanProperty("fieldOfView", config.getRendering(), Float.TYPE));
         }
 
+        final UISlider chunkLodSlider = find("chunkLods", UISlider.class);
+        if (chunkLodSlider != null) {
+            chunkLodSlider.setIncrement(1);
+            chunkLodSlider.setPrecision(0);
+            chunkLodSlider.setMinimum(0);
+            chunkLodSlider.setRange(10);
+            chunkLodSlider.bindValue(BindHelper.bindBeanProperty("chunkLods", config.getRendering(), Float.TYPE));
+        }
+
         final UISlider frameLimitSlider = find("frameLimit", UISlider.class);
         if (frameLimitSlider != null) {
             frameLimitSlider.setIncrement(5.0f);
