@@ -80,8 +80,12 @@ public class SubSampledNoise extends AbstractNoise {
     }
 
     public float[] noise(BlockAreac area) {
+        return noise(area, 1);
+    }
+
+    public float[] noise(BlockAreac area, float scale) {
         BlockArea fullRegion = determineRequiredRegion(area);
-        float[] keyData = getKeyValues(fullRegion);
+        float[] keyData = getKeyValues(fullRegion, scale);
         float[] fullData = mapExpand(keyData, fullRegion);
         return getSubset(fullData, fullRegion, area);
     }
@@ -120,7 +124,7 @@ public class SubSampledNoise extends AbstractNoise {
         return fullData;
     }
 
-    private float[] getKeyValues(BlockAreac fullRegion) {
+    private float[] getKeyValues(BlockAreac fullRegion, float scale) {
         int xDim = fullRegion.getSizeX() / sampleRate + 1;
         int yDim = fullRegion.getSizeY() / sampleRate + 1;
         float[] fullData = new float[xDim * yDim];
@@ -128,7 +132,7 @@ public class SubSampledNoise extends AbstractNoise {
             for (int x = 0; x < xDim; x++) {
                 int actualX = x * sampleRate + fullRegion.minX();
                 int actualY = y * sampleRate + fullRegion.minY();
-                fullData[x + y * xDim] = source.noise(zoom.x * actualX, zoom.y * actualY);
+                fullData[x + y * xDim] = source.noise(zoom.x * scale * actualX, zoom.y * scale * actualY);
             }
         }
 
@@ -168,8 +172,12 @@ public class SubSampledNoise extends AbstractNoise {
     }
 
     public float[] noise(BlockRegion region) {
+        return noise(region, 1);
+    }
+
+    public float[] noise(BlockRegion region, float scale) {
         BlockRegion fullRegion = determineRequiredRegion(region);
-        float[] keyData = getKeyValues(fullRegion);
+        float[] keyData = getKeyValues(fullRegion, scale);
         float[] fullData = mapExpand(keyData, fullRegion);
         return getSubset(fullData, fullRegion, region);
     }
@@ -222,7 +230,7 @@ public class SubSampledNoise extends AbstractNoise {
         return fullData;
     }
 
-    private float[] getKeyValues(BlockRegion fullRegion) {
+    private float[] getKeyValues(BlockRegion fullRegion, float scale) {
         int xDim = fullRegion.getSizeX() / sampleRate + 1;
         int yDim = fullRegion.getSizeY() / sampleRate + 1;
         int zDim = fullRegion.getSizeZ() / sampleRate + 1;
@@ -233,7 +241,7 @@ public class SubSampledNoise extends AbstractNoise {
                     int actualX = x * sampleRate + fullRegion.minX();
                     int actualY = y * sampleRate + fullRegion.minY();
                     int actualZ = z * sampleRate + fullRegion.minZ();
-                    fullData[x + xDim * (y + yDim * z)] = source.noise(zoom.x * actualX, zoom.y * actualY, zoom.z * actualZ);
+                    fullData[x + xDim * (y + yDim * z)] = source.noise(zoom.x * scale * actualX, zoom.y * scale * actualY, zoom.z * scale * actualZ);
                 }
             }
         }

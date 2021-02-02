@@ -118,7 +118,7 @@ public class CameraClientSystem extends BaseComponentSystem {
         // if the camera already has a location,  use that as the relative position of the camera
         if (cameraLocation != null) {
 
-            Location.attachChild(targetEntityForCamera, clientComponent.camera, JomlUtil.from(cameraLocation.getLocalPosition()), new Quaternionf());
+            Location.attachChild(targetEntityForCamera, clientComponent.camera, cameraLocation.getLocalPosition(), new Quaternionf());
         } else {
             Location.attachChild(targetEntityForCamera, clientComponent.camera, new Vector3f(0, 0, 0), new Quaternionf());
         }
