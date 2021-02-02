@@ -9,6 +9,8 @@ import org.terasology.gradology.RunTerasology
 import org.terasology.gradology.nativeSubdirectoryName
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.test.assertEquals
+import kotlin.test.fail
 
 plugins {
     application

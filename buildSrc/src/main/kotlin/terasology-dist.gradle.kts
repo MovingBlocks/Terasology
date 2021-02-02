@@ -1,6 +1,8 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
+import kotlin.test.assertEquals
+
 /**
  * Make assertions about the content of a zip file.
  *
@@ -47,19 +49,6 @@ open class ValidateZipDistribution @Inject constructor(objects: ObjectFactory) :
     }
 
     /**
-     * Assert two objects are equal.
-     *
-     * @see kotlin.test.assertEquals
-     */
-    fun assertEquals(expected: Any, actual: Any, message: String? = null) =
-        kotlin.test.assertEquals(expected, actual, message)
-
-    /**
-     * Fail this test with the given message.
-     */
-    fun fail(message: String): Nothing = kotlin.test.fail(message)
-
-    /**
      * Assert the zip contains exactly one match for the given pattern.
      *
      * @param pattern: match pattern in glob-style [pattern format](https://docs.gradle.org/current/javadoc/org/gradle/api/tasks/util/PatternFilterable.html).
@@ -70,5 +59,3 @@ open class ValidateZipDistribution @Inject constructor(objects: ObjectFactory) :
         }.count(), "Matches for $pattern")
     }
 }
-
-

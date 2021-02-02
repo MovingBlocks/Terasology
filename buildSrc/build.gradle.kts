@@ -26,5 +26,5 @@ dependencies {
     // for inspecting modules
     implementation("org.terasology:gestalt-module:5.1.5")
 
-    implementation(kotlin("test"))
+    api(kotlin("test"))
 }
