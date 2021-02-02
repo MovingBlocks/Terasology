@@ -71,7 +71,7 @@ public class CharacterSoundSystem extends BaseComponentSystem {
         List<StaticSound> footstepSounds = characterSounds.footstepSounds;
 
         // Check if the block the character is standing on has footstep sounds
-        Vector3i blockPos = new Vector3i(JomlUtil.from(locationComponent.getLocalPosition()), RoundingMode.FLOOR);
+        Vector3i blockPos = new Vector3i(locationComponent.getLocalPosition(), RoundingMode.FLOOR);
         blockPos.y--; // The block *below* the character's feet is interesting to us
         Block block = worldProvider.getBlock(blockPos);
         if (block != null) {
