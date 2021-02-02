@@ -8,6 +8,8 @@ import org.apache.tools.ant.filters.FixCrLfFilter
 import org.apache.tools.ant.taskdefs.condition.Os
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.test.assertEquals
+import kotlin.test.fail
 
 plugins {
     application
