@@ -157,7 +157,8 @@ tasks.named<Jar>("jar") {
         // "line is too long" errors: https://github.com/gradle/gradle/issues/1989
         attributes["Class-Path"] = configurations["runtimeClasspath"].joinToString(" ") { it.name }
         attributes["Implementation-Title"] = "Terasology-" + project.name
-        attributes["Implementation-Version"] = """${env["BUILD_NUMBER"]}, ${env["GIT_BRANCH"]}, ${env["BUILD_ID"]}"""
+        attributes["Implementation-Version"] =
+            "$displayVersion, facade v${project.version}, build number ${env["BUILD_NUMBER"]}"
     }
 }
 
