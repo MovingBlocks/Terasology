@@ -31,6 +31,7 @@ import org.terasology.recording.RecordAndReplayCurrentStatus;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.testUtil.ModuleManagerFactory;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -74,21 +75,8 @@ public class OwnershipHelperTest {
         EntityRef ownerEntity = entityManager.create(ownerComp);
 
         OwnershipHelper helper = new OwnershipHelper(entityManager.getComponentLibrary());
-        assertEqualsContent(helper.listOwnedEntities(ownerEntity), Lists.newArrayList(ownedEntity));
+        ArrayList<EntityRef> target = Lists.newArrayList(helper.listOwnedEntities(ownerEntity));
+        assertEquals(target.size(), 1);
+        assertEquals(target.get(0), ownedEntity);
     }
-
-    //TODO: needs to be replaced with alternative
-    public static <T> void assertEqualsContent(Collection<? extends T> expected, Collection<? extends T> actual) {
-        if (expected == null) {
-            assertNull(actual);
-        } else {
-            assertNotNull(actual);
-            List<? extends T> copyActual = Lists.newArrayList(actual);
-            for (Object obj : expected) {
-                assertTrue(copyActual.remove(obj), () -> "Missing element: " + obj);
-            }
-            assertTrue(copyActual.isEmpty(), () -> "Unexpected additional elements: " + copyActual.toString());
-        }
-    }
-
 }
