@@ -67,9 +67,6 @@ public class WorldImpl implements World {
         for (WorldRasterizer rasterizer : scalableWorldRasterizers) {
             ((ScalableWorldRasterizer) rasterizer).generateChunk(chunk, chunkRegion, scale);
         }
-        for (EntityProvider entityProvider : entityProviders) {
-            entityProvider.process(chunkRegion, buffer);
-        }
     }
 
     @Override
