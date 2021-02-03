@@ -52,9 +52,9 @@ open class RunTerasology : JavaExec() {
     }
 
     private fun initConfig() {
-        dependsOn(project.configurations["natives"])
+        dependsOn(project.configurations.named("natives"))
         classpath(project.the<SourceSetContainer>()["main"].runtimeClasspath)
-        dependsOn("provideModuleDependencies")
+        dependsOn(project.configurations.named("modules"))
 
         args("-homedir")
         jvmArgs("-Xmx3072m")
