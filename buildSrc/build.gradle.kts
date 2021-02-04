@@ -1,4 +1,4 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
 import java.net.URI
@@ -25,4 +25,6 @@ dependencies {
 
     // for inspecting modules
     implementation("org.terasology:gestalt-module:5.1.5")
+
+    api(kotlin("test"))
 }

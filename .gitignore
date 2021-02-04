@@ -65,9 +65,6 @@ Icon
 ehthumbs.db
 Thumbs.db
 
-# Ignore Terasology build output
-/engine/src/main/resources/Credits.md
-
 # Ignore Terasology output
 *.log
 /saves/

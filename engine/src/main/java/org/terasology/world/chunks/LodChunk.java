@@ -238,7 +238,7 @@ public class LodChunk implements RenderableChunk {
     }
 
     @Override
-    public byte getSunlight(BaseVector3i pos) {
+    public byte getSunlight(Vector3ic pos) {
         throw new UnsupportedOperationException(UNSUPPORTED_MESSAGE);
     }
 
@@ -248,7 +248,7 @@ public class LodChunk implements RenderableChunk {
     }
 
     @Override
-    public boolean setSunlight(BaseVector3i pos, byte amount) {
+    public boolean setSunlight(Vector3ic pos, byte amount) {
         throw new UnsupportedOperationException(UNSUPPORTED_MESSAGE);
     }
 
@@ -258,7 +258,7 @@ public class LodChunk implements RenderableChunk {
     }
 
     @Override
-    public byte getSunlightRegen(BaseVector3i pos) {
+    public byte getSunlightRegen(Vector3ic pos) {
         throw new UnsupportedOperationException(UNSUPPORTED_MESSAGE);
     }
 
@@ -268,7 +268,7 @@ public class LodChunk implements RenderableChunk {
     }
 
     @Override
-    public boolean setSunlightRegen(BaseVector3i pos, byte amount) {
+    public boolean setSunlightRegen(Vector3ic pos, byte amount) {
         throw new UnsupportedOperationException(UNSUPPORTED_MESSAGE);
     }
 
@@ -278,7 +278,7 @@ public class LodChunk implements RenderableChunk {
     }
 
     @Override
-    public byte getLight(BaseVector3i pos) {
+    public byte getLight(Vector3ic pos) {
         throw new UnsupportedOperationException(UNSUPPORTED_MESSAGE);
     }
 
@@ -288,7 +288,7 @@ public class LodChunk implements RenderableChunk {
     }
 
     @Override
-    public boolean setLight(BaseVector3i pos, byte amount) {
+    public boolean setLight(Vector3ic pos, byte amount) {
         throw new UnsupportedOperationException(UNSUPPORTED_MESSAGE);
     }
 
