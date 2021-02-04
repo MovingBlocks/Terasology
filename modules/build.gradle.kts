@@ -11,7 +11,7 @@ plugins {
 }
 
 @Suppress("PropertyName")
-val CACHE_MODULES_DIR = rootProject.file("cacheModules")
+val CACHE_MODULES_DIR = rootProject.file("cachedModules")
 
 javaPlatform {
     allowDependencies()

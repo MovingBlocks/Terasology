@@ -33,7 +33,7 @@ public final class PathManager {
     private static final String LOG_DIR = "logs";
     private static final String SHADER_LOG_DIR = "shaders";
     private static final String MODULE_DIR = "modules";
-    private static final String MODULE_CACHE_DIR = "cacheModules";
+    private static final String MODULE_CACHE_DIR = "cachedModules";
     private static final String SCREENSHOT_DIR = "screenshots";
     private static final String NATIVES_DIR = "natives";
     private static final String CONFIGS_DIR = "configs";
