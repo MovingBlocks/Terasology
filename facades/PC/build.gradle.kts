@@ -5,7 +5,8 @@
 
 import Terasology_dist_gradle.ValidateZipDistribution
 import org.apache.tools.ant.filters.FixCrLfFilter
-import org.apache.tools.ant.taskdefs.condition.Os
+import org.terasology.gradology.RunTerasology
+import org.terasology.gradology.nativeSubdirectoryName
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.test.assertEquals
@@ -14,6 +15,7 @@ import kotlin.test.fail
 plugins {
     application
     `terasology-dist`
+    facade
 }
 
 // Grab all the common stuff like plugins to use, artifact repositories, code analysis config
@@ -21,32 +23,6 @@ apply(from = "$rootDir/config/gradle/publish.gradle")
 
 val dateTimeFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX")
 dateTimeFormat.timeZone = TimeZone.getTimeZone("UTC")
-
-
-/**
- * The subdirectory for this development environment.
- *
- * Only use this to run local processes. When building releases, you will be targeting other
- * operating systems in addition to your own.
- *
- * @return
- */
-fun nativeSubdirectoryName(): String {
-    return when {
-        Os.isFamily(Os.FAMILY_WINDOWS) -> "windows"
-        Os.isFamily(Os.FAMILY_MAC) -> "macosx"
-        Os.isFamily(Os.FAMILY_UNIX) -> "linux"
-        else -> {
-            logger.warn("What kind of libraries do you use on this? {}", System.getProperty("os.name"))
-            "UNKNOWN"
-        }
-    }
-}
-
-fun isMacOS() : Boolean {
-    return Os.isFamily(Os.FAMILY_MAC)
-}
-
 
 // Default path to store server data if running headless via Gradle
 val localServerDataPath by extra("terasology-server")
@@ -84,12 +60,9 @@ logger.info("PC VERSION: {}", version)
 group = "org.terasology.facades"
 
 configurations {
-    register("modules") {
+    register("serverModules") {
         description = "for fetching modules for running a server"
         isTransitive = false
-    }
-    register("natives") {
-        description = "native libraries (.dll and .so)"
     }
 }
 
@@ -100,43 +73,13 @@ dependencies {
 
     // TODO: Consider whether we can move the CR dependency back here from the engine, where it is referenced from the main menu
     implementation(group = "org.terasology.crashreporter", name = "cr-terasology", version = "4.1.0")
-
-    "natives"(files(rootProject.file(dirNatives)).builtBy(":extractNatives"))
-
-    // Make sure any local module builds are up-to-date and have their dependencies by declaring
-    // a runtime dependency on whatever the `:modules` subproject declares.
-    // This won't add anything if there are no modules checked out.
-    runtimeOnly(platform(project(":modules")))
 }
 
 /****************************************
  * Run Targets
  */
 
-// Used for all game configs.
-fun JavaExec.commonConfigure() {
-    group = "terasology run"
-
-    dependsOn(":extractNatives")
-    dependsOn("classes")
-
-    // Run arguments
-    main = mainClassName
-    workingDir = rootDir
-
-    classpath(sourceSets["main"].runtimeClasspath)
-
-    args("-homedir")
-    jvmArgs("-Xmx3072m")
-
-    if (isMacOS()) {
-        args("-noSplash")
-        jvmArgs("-XstartOnFirstThread", "-Djava.awt.headless=true")
-    }
-}
-
-tasks.register<JavaExec>("game") {
-    commonConfigure()
+tasks.register<RunTerasology>("game") {
     description = "Run 'Terasology' to play the game as a standard PC application"
 
     // If there are no actual source modules let the user know, just in case ..
@@ -145,20 +88,17 @@ tasks.register<JavaExec>("game") {
     }
 }
 
-tasks.register<JavaExec>("profile") {
-    commonConfigure()
+tasks.register<RunTerasology>("profile") {
     description = "Run 'Terasology' to play the game as a standard PC application (with Java FlightRecorder profiling)"
     jvmArgs( "-XX:+UnlockCommercialFeatures", "-XX:+FlightRecorder", "-XX:+UnlockDiagnosticVMOptions", "-XX:+DebugNonSafepoints", "-XX:StartFlightRecording=filename=terasology.jfr,dumponexit=true")
 }
 
-tasks.register<JavaExec>("debug") {
-    commonConfigure()
+tasks.register<RunTerasology>("debug") {
     description = "Run 'Terasology' to play the game as a standard PC application (in debug mode)"
     jvmArgs( "-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=1044")
 }
 
-tasks.register<JavaExec>("permissiveNatives") {
-    commonConfigure()
+tasks.register<RunTerasology>("permissiveNatives") {
     description = "Run 'Terasology' with security set to permissive and natives loading a second way (for KComputers)"
 
     args("-permissiveSecurity")
@@ -182,18 +122,17 @@ tasks.register<Sync>("setupServerModules") {
         it.splitToSequence(",").forEach {
             logger.info("Extra module: {}", it)
             dependencies {
-                "modules"(group = "org.terasology.modules", name = it, version = "+")
+                "serverModules"(group = "org.terasology.modules", name = it, version = "+")
             }
         }
     }
 
-    from(configurations.named("modules"))
+    from(configurations.named("serverModules"))
     into(File(rootProject.file(localServerDataPath), "modules"))
 }
 
 // TODO: Make a task to reset server / game data
-tasks.register<JavaExec>("server") {
-    commonConfigure()
+tasks.register<RunTerasology>("server") {
     description = "Starts a headless multiplayer server with data stored in [project-root]/$localServerDataPath"
     dependsOn("setupServerConfig")
     dependsOn("setupServerModules")
