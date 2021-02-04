@@ -32,8 +32,8 @@ public final class PathManager {
     private static final String RECORDINGS_LIBRARY_DIR = "recordings";
     private static final String LOG_DIR = "logs";
     private static final String SHADER_LOG_DIR = "shaders";
-    private static final String MOD_DIR = "modules";
-    private static final String MOD_CACHE_DIR = "cacheModules";
+    private static final String MODULE_DIR = "modules";
+    private static final String MODULE_CACHE_DIR = "cacheModules";
     private static final String SCREENSHOT_DIR = "screenshots";
     private static final String NATIVES_DIR = "natives";
     private static final String CONFIGS_DIR = "configs";
@@ -302,14 +302,14 @@ public final class PathManager {
         Files.createDirectories(logPath);
         shaderLogPath = logPath.resolve(SHADER_LOG_DIR);
         Files.createDirectories(shaderLogPath);
-        Path homeModPath = homePath.resolve(MOD_DIR);
+        Path homeModPath = homePath.resolve(MODULE_DIR);
         Files.createDirectories(homeModPath);
-        Path modCachePath = homePath.resolve(MOD_CACHE_DIR);
+        Path modCachePath = homePath.resolve(MODULE_CACHE_DIR);
         Files.createDirectories(modCachePath);
         if (Files.isSameFile(homePath, installPath)) {
             modPaths = ImmutableList.of(modCachePath, homeModPath);
         } else {
-            Path installModPath = installPath.resolve(MOD_DIR);
+            Path installModPath = installPath.resolve(MODULE_DIR);
             Files.createDirectories(installModPath);
             modPaths = ImmutableList.of(installModPath, modCachePath, homeModPath);
         }
