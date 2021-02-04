@@ -20,7 +20,7 @@ javaPlatform {
 dependencies {
     // This platform depends on each of its subprojects.
     subprojects {
-        runtime(this)
+        api(this)
     }
 }
 
@@ -36,25 +36,34 @@ val jarCollection: Configuration by configurations.creating {
     }
 }
 
-val provideModuleDependencies by tasks.registering(Sync::class) {
+val fetchModuleDependencies by tasks.registering(Sync::class) {
+    group = "build"
+
     destinationDir = CACHE_MODULES_DIR
 
     val artifactsProvider = moduleDependencyArtifacts(configurations.named("classpath"))
     from(artifactsProvider.map { artifacts -> artifacts.map(ResolvedArtifactResult::getFile) })
 }
 
+val cleanFetchModuleDependencies by tasks.registering(Delete::class) {
+    delete(CACHE_MODULES_DIR)
+}
+
+
 artifacts {
     // The output of our jarCollection configuration comes from this task.
-    add(jarCollection.name, provideModuleDependencies) {
+    add(jarCollection.name, fetchModuleDependencies) {
         type = "jar-collection"
     }
 }
 
 
-// Allows using :modules:clean as a shortcut for running clean in each module.
 tasks.named("clean").configure {
-    val cleanPlatform = this
+    dependsOn(cleanFetchModuleDependencies)
+
+    // Allows using :modules:clean as a shortcut for running clean in each module.
+    val cleanModules = this
     subprojects {
-        cleanPlatform.dependsOn(this.tasks.named("clean"))
+        cleanModules.dependsOn(this.tasks.named("clean"))
     }
 }
