@@ -30,6 +30,7 @@ import org.terasology.math.geom.Vector3i;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
+import org.terasology.world.block.BlockRegion;
 import org.terasology.world.block.BlockUri;
 import org.terasology.world.block.family.SymmetricFamily;
 import org.terasology.world.block.internal.BlockManagerImpl;
@@ -40,6 +41,7 @@ import org.terasology.world.block.tiles.NullWorldAtlas;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.ChunkProvider;
+import org.terasology.world.chunks.Chunks;
 import org.terasology.world.chunks.blockdata.ExtraBlockDataManager;
 import org.terasology.world.chunks.internal.ChunkImpl;
 import org.terasology.world.internal.ChunkViewCore;
@@ -105,17 +107,17 @@ public class BetweenChunkPropagationTest extends TerasologyTestingEnvironment {
         provider.addChunk(topChunk);
         provider.addChunk(bottomChunk);
 
-        for (Vector3i pos : Region3i.createFromMinAndSize(new Vector3i(0, 0, 0), new Vector3i(ChunkConstants.SIZE_X, 1, ChunkConstants.SIZE_Z))) {
-            topChunk.setSunlight(pos, ChunkConstants.MAX_SUNLIGHT);
-            topChunk.setSunlightRegen(pos, ChunkConstants.MAX_SUNLIGHT_REGEN);
+        for (Vector3ic pos : new BlockRegion(0, 0, 0).setSize(Chunks.SIZE_X, 1, Chunks.SIZE_Z)) {
+            topChunk.setSunlight(pos, Chunks.MAX_SUNLIGHT);
+            topChunk.setSunlightRegen(pos, Chunks.MAX_SUNLIGHT_REGEN);
         }
         InternalLightProcessor.generateInternalLighting(bottomChunk);
         propagator.propagateBetween(topChunk, bottomChunk, Side.BOTTOM, true);
         propagator.process();
         sunlightPropagator.process();
-        for (Vector3i pos : ChunkConstants.CHUNK_REGION) {
-            assertEquals(ChunkConstants.MAX_SUNLIGHT, bottomChunk.getSunlight(pos), () -> "Incorrect at position " + pos);
-            assertEquals(ChunkConstants.MAX_SUNLIGHT_REGEN, bottomChunk.getSunlightRegen(pos), () -> "Incorrect at position " + pos);
+        for (Vector3ic pos : Chunks.CHUNK_REGION) {
+            assertEquals(Chunks.MAX_SUNLIGHT, bottomChunk.getSunlight(pos), () -> "Incorrect at position " + pos);
+            assertEquals(Chunks.MAX_SUNLIGHT_REGEN, bottomChunk.getSunlightRegen(pos), () -> "Incorrect at position " + pos);
         }
     }
 
@@ -127,15 +129,15 @@ public class BetweenChunkPropagationTest extends TerasologyTestingEnvironment {
         provider.addChunk(topChunk);
         provider.addChunk(bottomChunk);
 
-        for (Vector3i pos : Region3i.createFromMinAndSize(new Vector3i(0, 0, 0), new Vector3i(ChunkConstants.SIZE_X, 1, ChunkConstants.SIZE_Z))) {
-            topChunk.setSunlight(pos, ChunkConstants.MAX_SUNLIGHT);
-            topChunk.setSunlightRegen(pos, ChunkConstants.MAX_SUNLIGHT_REGEN);
+        for (Vector3ic pos : new BlockRegion(0, 0, 0).setSize(Chunks.SIZE_X, 1, Chunks.SIZE_Z)) {
+            topChunk.setSunlight(pos, Chunks.MAX_SUNLIGHT);
+            topChunk.setSunlightRegen(pos, Chunks.MAX_SUNLIGHT_REGEN);
         }
         InternalLightProcessor.generateInternalLighting(bottomChunk);
         propagator.propagateBetween(topChunk, bottomChunk, Side.BOTTOM, true);
         propagator.process();
-        for (Vector3i pos : ChunkConstants.CHUNK_REGION) {
-            assertEquals(ChunkConstants.MAX_SUNLIGHT_REGEN, bottomChunk.getSunlightRegen(pos), () -> "Incorrect at position " + pos);
+        for (Vector3ic pos : Chunks.CHUNK_REGION) {
+            assertEquals(Chunks.MAX_SUNLIGHT_REGEN, bottomChunk.getSunlightRegen(pos), () -> "Incorrect at position " + pos);
         }
     }
 
@@ -147,11 +149,11 @@ public class BetweenChunkPropagationTest extends TerasologyTestingEnvironment {
         provider.addChunk(topChunk);
         provider.addChunk(bottomChunk);
 
-        for (Vector3i pos : Region3i.createFromMinAndSize(new Vector3i(0, 0, 0), new Vector3i(ChunkConstants.SIZE_X, 1, ChunkConstants.SIZE_Z))) {
-            topChunk.setSunlight(pos, ChunkConstants.MAX_SUNLIGHT);
-            topChunk.setSunlightRegen(pos, ChunkConstants.MAX_SUNLIGHT_REGEN);
+        for (Vector3ic pos : new BlockRegion(0, 0, 0).setSize(Chunks.SIZE_X, 1, Chunks.SIZE_Z)) {
+            topChunk.setSunlight(pos, Chunks.MAX_SUNLIGHT);
+            topChunk.setSunlightRegen(pos, Chunks.MAX_SUNLIGHT_REGEN);
         }
-        for (Vector3i pos : Region3i.createFromMinMax(new Vector3i(16, 48, 0), new Vector3i(31, 48, 31))) {
+        for (Vector3ic pos : new BlockRegion(16, 48, 0, 31, 48, 31)) {
             bottomChunk.setBlock(pos, solid);
         }
         InternalLightProcessor.generateInternalLighting(bottomChunk);
@@ -175,11 +177,11 @@ public class BetweenChunkPropagationTest extends TerasologyTestingEnvironment {
         provider.addChunk(topChunk);
         provider.addChunk(bottomChunk);
 
-        for (Vector3i pos : Region3i.createFromMinAndSize(new Vector3i(0, 0, 0), new Vector3i(ChunkConstants.SIZE_X, 1, ChunkConstants.SIZE_Z))) {
+        for (Vector3ic pos : new BlockRegion(0, 0, 0).setSize(Chunks.SIZE_X, 1, Chunks.SIZE_Z)) {
             topChunk.setSunlight(pos, (byte) 0);
             topChunk.setSunlightRegen(pos, (byte) 0);
         }
-        for (Vector3i pos : Region3i.createFromMinAndSize(new Vector3i(8, 0, 8), new Vector3i(ChunkConstants.SIZE_X - 16, 1, ChunkConstants.SIZE_Z - 16))) {
+        for (Vector3ic pos : new BlockRegion(8, 0, 8).setSize(Chunks.SIZE_X- 16, 1, Chunks.SIZE_Z- 16)) {
             topChunk.setSunlight(pos, (byte) 0);
             topChunk.setSunlightRegen(pos, (byte) 32);
         }
