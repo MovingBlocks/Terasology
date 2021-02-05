@@ -59,13 +59,6 @@ logger.info("PC VERSION: {}", version)
 // Jenkins-Artifactory integration catches on to this as part of the Maven-type descriptor
 group = "org.terasology.facades"
 
-configurations {
-    register("serverModules") {
-        description = "for fetching modules for running a server"
-        isTransitive = false
-    }
-}
-
 dependencies {
     implementation(project(":engine"))
     implementation(group = "org.reflections", name = "reflections", version = "0.9.10")
@@ -105,37 +98,9 @@ tasks.register<RunTerasology>("permissiveNatives") {
     systemProperty("java.library.path", rootProject.file(dirNatives + "/" + nativeSubdirectoryName()))
 }
 
-/******************************************
- * Headless server
- */
-
-apply(from="server.build.gradle")
-
-// TODO: Seems to always be up to date so no modules get copied
-tasks.register<Sync>("setupServerModules") {
-    description =
-        """Parses "extraModules" - a comma-separated list of modules and puts them into $localServerDataPath"""
-
-    val extraModules: String? by project
-    extraModules?.let {
-        // Grab modules from Artifactory - cheats by declaring them as dependencies
-        it.splitToSequence(",").forEach {
-            logger.info("Extra module: {}", it)
-            dependencies {
-                "serverModules"(group = "org.terasology.modules", name = it, version = "+")
-            }
-        }
-    }
-
-    from(configurations.named("serverModules"))
-    into(File(rootProject.file(localServerDataPath), "modules"))
-}
-
 // TODO: Make a task to reset server / game data
 tasks.register<RunTerasology>("server") {
     description = "Starts a headless multiplayer server with data stored in [project-root]/$localServerDataPath"
-    dependsOn("setupServerConfig")
-    dependsOn("setupServerModules")
     args("-headless", "-homedir=$localServerDataPath")
 }
 
