@@ -3,7 +3,8 @@
 
 package org.terasology.engine.module;
 
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.terasology.module.ModuleLoader;
 
 import java.io.IOException;
@@ -14,27 +15,18 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
 import static org.terasology.engine.TerasologyConstants.MODULE_INFO_FILENAME;
 
 public class ModuleManagerTest {
-    @Test
-    void testLoadModuleFromURL() throws IOException {
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "testdummy-1.0.0-SNAPSHOT.jar",
+            "messy-name-directory & $t#f/testmessy-1.0.0-SNAPSHOT.jar"
+    })
+    void testLoadModuleFromURL(String jarLocation) throws IOException {
         ModuleManagerImpl mm = new ThisModuleManager("");
         ModuleLoader loader = new ModuleLoader();
         loader.setModuleInfoPath(MODULE_INFO_FILENAME);
 
-        URL url = getClass().getResource("/org/terasology/engine/module/testdummy-1.0.0-SNAPSHOT.jar");
-        assumeTrue(url != null, "test resource not found.");
-        URL jarUrl = new URL("jar", null, url.toString() + "!/" + MODULE_INFO_FILENAME);
-
-        assertNotNull(mm.load(loader, jarUrl));
-    }
-
-    @Test
-    void testLoadModuleFromUrlWithSpaces() throws IOException {
-        ModuleManagerImpl mm = new ThisModuleManager("");
-        ModuleLoader loader = new ModuleLoader();
-        loader.setModuleInfoPath(MODULE_INFO_FILENAME);
-
-        URL url = getClass().getResource("/org/terasology/engine/module/messy-name-directory & $t#f/testmessy-1.0.0-SNAPSHOT.jar");
-        assumeTrue(url != null, "test resource not found.");
+        URL url = getClass().getResource("/org/terasology/engine/module/" + jarLocation);
+        assumeTrue(url != null, "test resource not found:" + jarLocation);
         URL jarUrl = new URL("jar", null, url.toString() + "!/" + MODULE_INFO_FILENAME);
 
         assertNotNull(mm.load(loader, jarUrl));
