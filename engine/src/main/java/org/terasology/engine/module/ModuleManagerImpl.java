@@ -38,6 +38,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.lang.reflect.ReflectPermission;
+import java.net.JarURLConnection;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Path;
@@ -171,23 +172,18 @@ public class ModuleManagerImpl implements ModuleManager {
                 return null;
             }
 
-            logger.info("Loading module {} from class path at {}", displayName, url.getFile());
-
-            // the url contains a protocol, and points to the module.txt
-            // we need to trim both of those away to get the module's path
-            String targetFile = url.getFile()
-                    .replace("file:", "")
-                    .replace("!/" + TerasologyConstants.MODULE_INFO_FILENAME, "")
-                    .replace("/" + TerasologyConstants.MODULE_INFO_FILENAME, "");
-
-            // Windows specific check - Path doesn't like /C:/... style Strings indicating files
-            if (targetFile.matches("/[a-zA-Z]:.*")) {
-                targetFile = targetFile.substring(1);
+            Path jarPath;
+            try {
+                JarURLConnection connection = (JarURLConnection) url.openConnection();
+                jarPath = Paths.get(connection.getJarFileURL().toURI());
+            } catch (URISyntaxException e) {
+                logger.warn("Failed to resolve jar path for {}: {}", displayName, url, e);
+                return null;
             }
 
-            Path path = Paths.get(targetFile);
+            logger.info("Loading module {} from class path at {}", displayName, url.getFile());
 
-            return loader.load(path);
+            return loader.load(jarPath);
         }
     }
 

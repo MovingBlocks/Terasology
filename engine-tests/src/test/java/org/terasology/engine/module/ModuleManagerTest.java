@@ -3,7 +3,6 @@
 
 package org.terasology.engine.module;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.terasology.module.ModuleLoader;
 
@@ -28,7 +27,6 @@ public class ModuleManagerTest {
         assertNotNull(mm.load(loader, jarUrl));
     }
 
-    @Disabled("https://github.com/MovingBlocks/Terasology/issues/4407")
     @Test
     void testLoadModuleFromUrlWithSpaces() throws IOException {
         ModuleManagerImpl mm = new ThisModuleManager("");
