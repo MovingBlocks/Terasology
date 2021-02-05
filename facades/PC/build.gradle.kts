@@ -276,10 +276,6 @@ tasks.named<CreateStartScripts>("startScripts") {
     }
 }
 
-// NOTE: If you build a distribution while you have modules, all the test dependencies are in here.
-//     They're "optional" in module.txt and gradle doesn't know how to tell which are runtime and which are
-//     test-only.
-
 distributions {
     main {
         contents {
