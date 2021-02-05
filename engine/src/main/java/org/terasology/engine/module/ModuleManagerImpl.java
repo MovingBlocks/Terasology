@@ -25,7 +25,6 @@ import org.terasology.module.ModulePathScanner;
 import org.terasology.module.ModuleRegistry;
 import org.terasology.module.TableModuleRegistry;
 import org.terasology.module.sandbox.APIScanner;
-import org.terasology.module.sandbox.BytecodeInjector;
 import org.terasology.module.sandbox.ModuleSecurityManager;
 import org.terasology.module.sandbox.ModuleSecurityPolicy;
 import org.terasology.module.sandbox.PermissionProviderFactory;
@@ -53,13 +52,13 @@ import java.util.stream.Collectors;
 
 public class ModuleManagerImpl implements ModuleManager {
     private static final Logger logger = LoggerFactory.getLogger(ModuleManagerImpl.class);
-    private StandardPermissionProviderFactory permissionProviderFactory = new StandardPermissionProviderFactory();
-    private PermissionProviderFactory wrappingPermissionProviderFactory = new WarnOnlyProviderFactory(permissionProviderFactory);
+    private final StandardPermissionProviderFactory permissionProviderFactory = new StandardPermissionProviderFactory();
+    private final PermissionProviderFactory wrappingPermissionProviderFactory = new WarnOnlyProviderFactory(permissionProviderFactory);
 
-    private ModuleRegistry registry;
+    private final ModuleRegistry registry;
     private ModuleEnvironment environment;
-    private ModuleMetadataJsonAdapter metadataReader;
-    private ModuleInstallManager installManager;
+    private final ModuleMetadataJsonAdapter metadataReader;
+    private final ModuleInstallManager installManager;
 
     public ModuleManagerImpl(String masterServerAddress) {
         this(masterServerAddress, Collections.emptyList());
@@ -136,7 +135,7 @@ public class ModuleManagerImpl implements ModuleManager {
         try {
             moduleInfosInClassPath = classLoader.getResources(TerasologyConstants.MODULE_INFO_FILENAME.toString());
         } catch (IOException e) {
-            logger.warn("Failed to search for classpath modules: {}", e);
+            logger.warn("Failed to search for classpath modules:", e);
             return;
         }
 
@@ -219,9 +218,9 @@ public class ModuleManagerImpl implements ModuleManager {
         ModuleEnvironment newEnvironment;
         boolean permissiveSecurityEnabled = Boolean.parseBoolean(System.getProperty(SystemConfig.PERMISSIVE_SECURITY_ENABLED_PROPERTY));
         if (permissiveSecurityEnabled) {
-            newEnvironment = new ModuleEnvironment(finalModules, wrappingPermissionProviderFactory, Collections.<BytecodeInjector>emptyList());
+            newEnvironment = new ModuleEnvironment(finalModules, wrappingPermissionProviderFactory, Collections.emptyList());
         } else {
-            newEnvironment = new ModuleEnvironment(finalModules, permissionProviderFactory, Collections.<BytecodeInjector>emptyList());
+            newEnvironment = new ModuleEnvironment(finalModules, permissionProviderFactory, Collections.emptyList());
         }
         if (asPrimary) {
             environment = newEnvironment;
