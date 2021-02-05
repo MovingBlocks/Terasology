@@ -30,7 +30,6 @@ import org.terasology.module.sandbox.ModuleSecurityPolicy;
 import org.terasology.module.sandbox.PermissionProviderFactory;
 import org.terasology.module.sandbox.StandardPermissionProviderFactory;
 import org.terasology.module.sandbox.WarnOnlyProviderFactory;
-import org.terasology.naming.Name;
 import org.terasology.nui.UIWidget;
 import org.terasology.reflection.TypeRegistry;
 
@@ -150,41 +149,30 @@ public class ModuleManagerImpl implements ModuleManager {
             }
             if (module != null) {
                 registry.add(module);
+                logger.info("Loaded module {} from class path at {}", module, url.getFile());
             }
         }
     }
 
     Module load(ModuleLoader loader, URL url) throws IOException {
-        if (!url.getProtocol().equalsIgnoreCase("jar")) {
-            logger.warn("Not a JAR {}", url);
+        Path jarPath;
+        try {
+            JarURLConnection connection = (JarURLConnection) url.openConnection();
+            jarPath = Paths.get(connection.getJarFileURL().toURI());
+        } catch (ClassCastException | URISyntaxException e) {
+            logger.warn("Failed to resolve jar path {}", url, e);
             return null;
         }
 
-        try (Reader reader = new InputStreamReader(url.openStream(), TerasologyConstants.CHARSET)) {
-            ModuleMetadata metaData = metadataReader.read(reader);
-            String displayName = metaData.getDisplayName().toString();
-            Name id = metaData.getId();
+        Module module = loader.load(jarPath);
 
-            // if the display name is empty or the id is null, this probably isn't a Terasology module
-            if (null == id || displayName.equalsIgnoreCase("")) {
-                logger.warn("Found a module-like JAR on the class path with no id or display name. Skipping");
-                logger.warn("{}", url);
-                return null;
-            }
-
-            Path jarPath;
-            try {
-                JarURLConnection connection = (JarURLConnection) url.openConnection();
-                jarPath = Paths.get(connection.getJarFileURL().toURI());
-            } catch (URISyntaxException e) {
-                logger.warn("Failed to resolve jar path for {}: {}", displayName, url, e);
-                return null;
-            }
-
-            logger.info("Loading module {} from class path at {}", displayName, url.getFile());
-
-            return loader.load(jarPath);
+        // if the display name is empty or the id is null, this probably isn't a Terasology module
+        if (null == module.getId() || module.getMetadata().getDisplayName().toString().isEmpty()) {
+            logger.warn("Found a module-like JAR on the class path with no id or display name. Skipping {}", url);
+            return null;
         }
+
+        return module;
     }
 
     private void setupSandbox() {
