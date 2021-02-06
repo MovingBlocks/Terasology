@@ -1,4 +1,4 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
 // Simple build file for modules - the one under the Core module is the template, will be copied as needed to modules
@@ -13,7 +13,7 @@ import org.reflections.util.FilterBuilder
 import org.terasology.module.ModuleMetadataJsonAdapter
 
 plugins {
-    id("java")
+    `java-library`
     id("idea")
     id("eclipse")
 }

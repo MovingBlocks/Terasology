@@ -16,7 +16,7 @@
 package org.terasology.rendering.assets.font;
 
 import com.google.common.collect.Maps;
-import org.terasology.math.geom.Vector3f;
+import org.joml.Vector3f;
 import org.terasology.nui.Colorc;
 import org.terasology.nui.HorizontalAlign;
 import org.terasology.nui.FontColor;

@@ -265,7 +265,7 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
             EntityRef blockEntity = getExistingBlockEntityAt(blockPosition);
             if ((!blockEntity.exists() || !blockEntity.hasComponent(NetworkComponent.class)) && isBlockRelevant(blockPosition.x(), blockPosition.y(), blockPosition.z())) {
                 Block block = getBlock(blockPosition.x(), blockPosition.y(), blockPosition.z());
-                blockEntity = createBlockEntity(JomlUtil.from(blockPosition), block);
+                blockEntity = createBlockEntity(blockPosition, block);
             }
             return blockEntity;
         }
@@ -375,9 +375,9 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
         }
     }
 
-    private EntityRef createBlockEntity(Vector3i blockPosition, Block block) {
+    private EntityRef createBlockEntity(Vector3ic blockPosition, Block block) {
         EntityBuilder builder = entityManager.newBuilder(block.getPrefab().orElse(null));
-        builder.addComponent(new LocationComponent(blockPosition.toVector3f()));
+        builder.addComponent(new LocationComponent(new org.joml.Vector3f(blockPosition)));
         builder.addComponent(new BlockComponent(block, blockPosition));
         boolean isTemporary = isTemporaryBlock(builder, block);
         if (!isTemporary && !builder.hasComponent(NetworkComponent.class)) {
@@ -392,7 +392,7 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
             blockEntity = builder.build();
         }
 
-        blockEntityLookup.put(new Vector3i(blockPosition), blockEntity);
+        blockEntityLookup.put(JomlUtil.from(blockPosition), blockEntity);
         return blockEntity;
     }
 

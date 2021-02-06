@@ -141,7 +141,7 @@ public class SunlightRegenBatchPropagator implements BatchPropagator {
         Block block = regenWorld.getBlockAt(pos);
         Vector3i position = new Vector3i(pos);
         while (regenRules.canSpreadOutOf(block, Side.BOTTOM)) {
-            regenValue = regenRules.propagateValue(regenValue, Side.BOTTOM, block);
+            regenValue = regenRules.propagateValue(regenValue, Side.BOTTOM, block, 1);
             position.y -= 1;
             byte adjValue = regenWorld.getValueAt(position);
             if (adjValue < regenValue && adjValue != PropagatorWorldView.UNAVAILABLE) {
@@ -246,8 +246,8 @@ public class SunlightRegenBatchPropagator implements BatchPropagator {
                     regenRules.setValue(toChunk, pos, expectedValue);
                     depth[depthIndex]++;
                     byte sunlight = (byte) (expectedValue - Chunks.SUNLIGHT_REGEN_THRESHOLD);
-                    if (sunlight > 0 && sunlight > toChunk.getSunlight(JomlUtil.from(pos))) {
-                        toChunk.setSunlight(JomlUtil.from(pos), sunlight);
+                    if (sunlight > 0 && sunlight > toChunk.getSunlight(pos)) {
+                        toChunk.setSunlight(pos, sunlight);
                     }
                     if (expectedValue < Chunks.MAX_SUNLIGHT_REGEN) {
                         expectedValue++;
