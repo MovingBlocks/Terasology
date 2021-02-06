@@ -301,49 +301,6 @@ public final class ChunkMath {
     }
 
     /**
-     *
-     * @param region
-     * @return
-     * @deprecated This is scheduled for removal in an upcoming version
-     *             method will be replaced with JOML implementation {@link #calcChunkRegion(BlockRegion, BlockRegion)}.
-     */
-    public static Vector3i[] calcChunkPos(Region3i region) {
-        return calcChunkPos(region, ChunkConstants.CHUNK_POWER);
-    }
-
-
-    /**
-     *
-     * @param region
-     * @param chunkPower
-     * @return
-     * @deprecated This is scheduled for removal in an upcoming version
-     *             method will be replaced with JOML implementation {@link #calcChunkRegion(BlockRegion,Vector3ic, BlockRegion)}.
-     */
-    public static Vector3i[] calcChunkPos(Region3i region, Vector3i chunkPower) {
-        int minX = calcChunkPos(region.minX(), chunkPower.x);
-        int minY = calcChunkPos(region.minY(), chunkPower.y);
-        int minZ = calcChunkPos(region.minZ(), chunkPower.z);
-
-        int maxX = calcChunkPos(region.maxX(), chunkPower.x);
-        int maxY = calcChunkPos(region.maxY(), chunkPower.y);
-        int maxZ = calcChunkPos(region.maxZ(), chunkPower.z);
-
-        int size = (maxX - minX + 1) * (maxY - minY + 1) * (maxZ - minZ + 1);
-
-        Vector3i[] result = new Vector3i[size];
-        int index = 0;
-        for (int x = minX; x <= maxX; x++) {
-            for (int y = minY; y <= maxY; y++) {
-                for (int z = minZ; z <= maxZ; z++) {
-                    result[index++] = new Vector3i(x, y, z);
-                }
-            }
-        }
-        return result;
-    }
-
-    /**
      * Returns the internal position of a block within a chunk.
      *
      * @param pos the world position of the chunk
@@ -468,27 +425,6 @@ public final class ChunkMath {
      * @param pos the world position
      * @param extent the extent
      * @return chunk region
-     * @deprecated This method is scheduled for removal in an upcoming version. Use the JOML implementation instead:
-     *     {@link #getChunkRegionAroundWorldPos(Vector3ic, int)}.
-     */
-    @Deprecated
-    public static Region3i getChunkRegionAroundWorldPos(Vector3i pos, int extent) {
-        Vector3i minPos = new Vector3i(-extent, -extent, -extent);
-        minPos.add(pos);
-        Vector3i maxPos = new Vector3i(extent, extent, extent);
-        maxPos.add(pos);
-
-        Vector3i minChunk = calcChunkPos(minPos);
-        Vector3i maxChunk = calcChunkPos(maxPos);
-
-        return Region3i.createFromMinMax(minChunk, maxChunk);
-    }
-
-    /**
-     * get chunks contained within a center point and extent
-     * @param pos the world position
-     * @param extent the extent
-     * @return chunk region
      * @deprecated This is scheduled for removal in an upcoming version
      *             method will be replaced with JOML implementation {@link org.terasology.world.chunks.Chunks#toChunkRegion(BlockRegionc, BlockRegion)}.
      *
@@ -529,44 +465,6 @@ public final class ChunkMath {
         float dot = rawDirection.dot(attachDir);
         rawDirection.sub(dot * attachDir.x, dot * attachDir.y, dot * attachDir.z);
         return Side.inDirection(rawDirection.x, rawDirection.y, rawDirection.z).reverse();
-    }
-
-    /**
-     * Produces a region containing the region touching the side of the given region, both in and outside the region.
-     *
-     * @param region
-     * @param side
-     * @return
-     * @deprecated This is scheduled for removal in an upcoming version
-     *             method will be replaced with JOML implementation {@link #getEdgeRegion(BlockRegionc, Side, BlockRegion)}.
-     */
-    @Deprecated
-    public static Region3i getEdgeRegion(Region3i region, Side side) {
-        Vector3ic sideDir = side.direction();
-        Vector3i min = region.min();
-        Vector3i max = region.max();
-        Vector3i edgeMin = new Vector3i(min);
-        Vector3i edgeMax = new Vector3i(max);
-        if (sideDir.x() < 0) {
-            edgeMin.x = min.x;
-            edgeMax.x = min.x;
-        } else if (sideDir.x() > 0) {
-            edgeMin.x = max.x;
-            edgeMax.x = max.x;
-        } else if (sideDir.y() < 0) {
-            edgeMin.y = min.y;
-            edgeMax.y = min.y;
-        } else if (sideDir.y() > 0) {
-            edgeMin.y = max.y;
-            edgeMax.y = max.y;
-        } else if (sideDir.z() < 0) {
-            edgeMin.z = min.z;
-            edgeMax.z = min.z;
-        } else if (sideDir.z() > 0) {
-            edgeMin.z = max.z;
-            edgeMax.z = max.z;
-        }
-        return Region3i.createFromMinMax(edgeMin, edgeMax);
     }
 
     /**
