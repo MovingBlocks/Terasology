@@ -60,7 +60,8 @@ public class ChunkImpl implements Chunk {
     private static final DecimalFormat PERCENT_FORMAT = new DecimalFormat("0.##");
     private static final DecimalFormat SIZE_FORMAT = new DecimalFormat("#,###");
 
-    private final Vector3i chunkPos = new Vector3i();
+    protected final Vector3i chunkPos = new Vector3i();
+    protected BlockRegion region;
 
     private BlockManager blockManager;
 
@@ -74,7 +75,6 @@ public class ChunkImpl implements Chunk {
     private volatile TeraArray[] extraDataSnapshots;
 
     private AABBf aabb = new AABBf();
-    private BlockRegion region;
 
     private boolean disposed;
     private boolean ready;
@@ -187,7 +187,7 @@ public class ChunkImpl implements Chunk {
     }
 
     @Override
-    public byte getSunlight(BaseVector3i pos) {
+    public byte getSunlight(Vector3ic pos) {
         return getSunlight(pos.x(), pos.y(), pos.z());
     }
 
@@ -197,7 +197,7 @@ public class ChunkImpl implements Chunk {
     }
 
     @Override
-    public boolean setSunlight(BaseVector3i pos, byte amount) {
+    public boolean setSunlight(Vector3ic pos, byte amount) {
         return setSunlight(pos.x(), pos.y(), pos.z(), amount);
     }
 
@@ -208,7 +208,7 @@ public class ChunkImpl implements Chunk {
     }
 
     @Override
-    public byte getSunlightRegen(BaseVector3i pos) {
+    public byte getSunlightRegen(Vector3ic pos) {
         return getSunlightRegen(pos.x(), pos.y(), pos.z());
     }
 
@@ -218,7 +218,7 @@ public class ChunkImpl implements Chunk {
     }
 
     @Override
-    public boolean setSunlightRegen(BaseVector3i pos, byte amount) {
+    public boolean setSunlightRegen(Vector3ic pos, byte amount) {
         return setSunlightRegen(pos.x(), pos.y(), pos.z(), amount);
     }
 
@@ -229,7 +229,7 @@ public class ChunkImpl implements Chunk {
     }
 
     @Override
-    public byte getLight(BaseVector3i pos) {
+    public byte getLight(Vector3ic pos) {
         return getLight(pos.x(), pos.y(), pos.z());
     }
 
@@ -239,7 +239,7 @@ public class ChunkImpl implements Chunk {
     }
 
     @Override
-    public boolean setLight(BaseVector3i pos, byte amount) {
+    public boolean setLight(Vector3ic pos, byte amount) {
         return setLight(pos.x(), pos.y(), pos.z(), amount);
     }
 

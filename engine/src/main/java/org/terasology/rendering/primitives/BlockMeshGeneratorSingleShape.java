@@ -145,8 +145,12 @@ public class BlockMeshGeneratorSingleShape implements BlockMeshGenerator {
         //TODO: This only fixes the "water under block" issue of the top side not being rendered. (see bug #3889)
         //Note: originally tried .isLiquid() instead of isWater for both checks, but IntelliJ was warning that
         //      !blockToCheck.isWater() is always true, may need further investigation
-        if (currentBlock.isWater() && (side == Side.TOP) && !blockToCheck.isWater()){
+        if (currentBlock.isWater() && (side == Side.TOP) && !blockToCheck.isWater()) {
             return true;
+        }
+
+        if (blockToCheck.getURI().toString().equals("engine:unloaded")) {
+            return false;
         }
 
         return currentBlock.isWaving() != blockToCheck.isWaving() || blockToCheck.getMeshGenerator() == null

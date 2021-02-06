@@ -63,6 +63,7 @@ import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -441,7 +442,7 @@ public class LocalChunkProvider implements ChunkProvider {
         loadingPipeline = new ChunkProcessingPipeline(this::getChunk, relevanceSystem.createChunkTaskComporator());
         loadingPipeline.addStage(
                 ChunkTaskProvider.create("Chunk generate internal lightning",
-                        InternalLightProcessor::generateInternalLighting))
+                        (Consumer<Chunk>) InternalLightProcessor::generateInternalLighting))
                 .addStage(ChunkTaskProvider.create("Chunk deflate", Chunk::deflate))
                 .addStage(ChunkTaskProvider.createMulti("Light merging",
                         chunks -> {
@@ -484,7 +485,7 @@ public class LocalChunkProvider implements ChunkProvider {
         loadingPipeline = new ChunkProcessingPipeline(this::getChunk, relevanceSystem.createChunkTaskComporator());
         loadingPipeline.addStage(
                 ChunkTaskProvider.create("Chunk generate internal lightning",
-                        InternalLightProcessor::generateInternalLighting))
+                        (Consumer<Chunk>) InternalLightProcessor::generateInternalLighting))
                 .addStage(ChunkTaskProvider.create("Chunk deflate", Chunk::deflate))
                 .addStage(ChunkTaskProvider.createMulti("Light merging",
                         chunks -> {
