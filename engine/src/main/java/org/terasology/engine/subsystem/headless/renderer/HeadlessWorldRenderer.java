@@ -34,6 +34,7 @@ import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.ChunkProvider;
+import org.terasology.world.chunks.Chunks;
 import org.terasology.world.chunks.RenderableChunk;
 
 import java.util.Collections;
@@ -261,13 +262,13 @@ public class HeadlessWorldRenderer implements WorldRenderer {
      * @return The player offset on the x-axis
      */
     private Vector3i calcCamChunkOffset() {
-        return new Vector3i((int) (getActiveCamera().getPosition().x / ChunkConstants.SIZE_X),
-                (int) (getActiveCamera().getPosition().y / ChunkConstants.SIZE_Y),
-                (int) (getActiveCamera().getPosition().z / ChunkConstants.SIZE_Z));
+        return new Vector3i((int) (getActiveCamera().getPosition().x / Chunks.SIZE_X),
+                (int) (getActiveCamera().getPosition().y / Chunks.SIZE_Y),
+                (int) (getActiveCamera().getPosition().z / Chunks.SIZE_Z));
     }
 
     private float distanceToCamera(RenderableChunk chunk) {
-        Vector3f result = new Vector3f((chunk.getPosition().x + 0.5f) * ChunkConstants.SIZE_X, 0, (chunk.getPosition().z + 0.5f) * ChunkConstants.SIZE_Z);
+        Vector3f result = new Vector3f((chunk.getPosition().x() + 0.5f) * Chunks.SIZE_X, 0, (chunk.getPosition().z() + 0.5f) * Chunks.SIZE_Z);
 
         org.joml.Vector3f cameraPos = getActiveCamera().getPosition();
         result.x -= cameraPos.x;

@@ -52,7 +52,7 @@ public class WorldImpl implements World {
 
     @Override
     public void rasterizeChunk(CoreChunk chunk, EntityBuffer buffer) {
-        Region chunkRegion = getWorldData(chunk.getRegion(), 1);
+        Region chunkRegion = getWorldData(new BlockRegion(chunk.getRegion()), 1);
         for (WorldRasterizer rasterizer : worldRasterizers) {
             rasterizer.generateChunk(chunk, chunkRegion);
         }
@@ -63,7 +63,7 @@ public class WorldImpl implements World {
 
     @Override
     public void rasterizeChunk(CoreChunk chunk, EntityBuffer buffer, float scale) {
-        Region chunkRegion = getWorldData(chunk.getRegion(), scale);
+        Region chunkRegion = getWorldData(new BlockRegion(chunk.getRegion()), scale);
         for (WorldRasterizer rasterizer : scalableWorldRasterizers) {
             ((ScalableWorldRasterizer) rasterizer).generateChunk(chunk, chunkRegion, scale);
         }

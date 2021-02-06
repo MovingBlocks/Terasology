@@ -16,6 +16,7 @@
 
 package org.terasology.world.internal;
 
+import com.google.common.collect.ImmutableList;
 import org.joml.RoundingMode;
 import org.joml.Vector3fc;
 import org.joml.Vector3i;
@@ -23,7 +24,7 @@ import org.joml.Vector3ic;
 import org.terasology.world.WorldChangeListener;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
-import org.terasology.world.block.BlockRegion;
+import org.terasology.world.block.BlockRegionc;
 import org.terasology.world.chunks.blockdata.ExtraBlockDataManager;
 
 import java.util.Collection;
@@ -122,7 +123,7 @@ public class WorldProviderWrapper extends AbstractWorldProviderDecorator impleme
     }
 
     @Override
-    public Collection<BlockRegion> getRelevantRegions() {
+    public Collection<BlockRegionc> getRelevantRegions() {
         return core.getRelevantRegions();
     }
 }

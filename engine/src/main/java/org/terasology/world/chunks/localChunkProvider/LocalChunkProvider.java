@@ -134,7 +134,7 @@ public class LocalChunkProvider implements ChunkProvider {
                 Chunk chunk;
                 EntityBufferImpl buffer = new EntityBufferImpl();
                 if (chunkStore == null) {
-                    chunk = new ChunkImpl(JomlUtil.from(pos), blockManager, extraDataManager);
+                    chunk = new ChunkImpl(pos, blockManager, extraDataManager);
                     generator.createChunk(chunk, buffer);
                     generateQueuedEntities.put(chunk.getPosition(new Vector3i()), buffer.getAll());
                 } else {
@@ -344,9 +344,9 @@ public class LocalChunkProvider implements ChunkProvider {
         while (i.next()) {
             if (i.getBlock().isLifecycleEventsRequired()) {
                 TIntList positionList = batchBlockMap.get(i.getBlock().getId());
-                positionList.add(i.getBlockPos().x);
-                positionList.add(i.getBlockPos().y);
-                positionList.add(i.getBlockPos().z);
+                positionList.add(i.getBlockPos().x());
+                positionList.add(i.getBlockPos().y());
+                positionList.add(i.getBlockPos().z());
             }
         }
         return batchBlockMap;

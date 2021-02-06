@@ -15,6 +15,7 @@
  */
 package org.terasology.world.internal;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 import org.joml.Vector3ic;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -23,7 +24,6 @@ import org.terasology.math.Region3i;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.world.WorldChangeListener;
 import org.terasology.world.block.Block;
-import org.terasology.world.block.BlockRegion;
 import org.terasology.world.block.BlockRegionc;
 import org.terasology.world.time.WorldTime;
 
@@ -217,6 +217,6 @@ public interface WorldProviderCore {
     /**
      * @return an unmodifiable view on the generated relevant regions
      */
-    Collection<BlockRegion> getRelevantRegions();
+    Collection<BlockRegionc> getRelevantRegions();
 
 }

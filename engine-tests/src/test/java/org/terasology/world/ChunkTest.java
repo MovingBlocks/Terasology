@@ -15,14 +15,14 @@
  */
 package org.terasology.world;
 
+import org.joml.Vector3f;
+import org.joml.Vector3i;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.terasology.TerasologyTestingEnvironment;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.joml.geom.AABBfc;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
@@ -34,7 +34,7 @@ import org.terasology.world.block.loader.BlockFamilyDefinitionData;
 import org.terasology.world.block.shapes.BlockShape;
 import org.terasology.world.block.tiles.NullWorldAtlas;
 import org.terasology.world.chunks.Chunk;
-import org.terasology.world.chunks.ChunkConstants;
+import org.terasology.world.chunks.Chunks;
 import org.terasology.world.chunks.blockdata.ExtraBlockDataManager;
 import org.terasology.world.chunks.internal.ChunkImpl;
 
@@ -76,7 +76,7 @@ public class ChunkTest extends TerasologyTestingEnvironment {
     public void testGetAabb() {
         AABBfc aabb = chunk.getAABB();
         assertEquals(new Vector3f(0, 0, 0), new Vector3f(aabb.minX(), aabb.minY(), aabb.minZ()));
-        assertEquals(new Vector3f(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z), new Vector3f(aabb.maxX(), aabb.maxY(), aabb.maxZ()));
+        assertEquals(new Vector3f(Chunks.SIZE_X, Chunks.SIZE_Y, Chunks.SIZE_Z), new Vector3f(aabb.maxX(), aabb.maxY(), aabb.maxZ()));
     }
 
 }

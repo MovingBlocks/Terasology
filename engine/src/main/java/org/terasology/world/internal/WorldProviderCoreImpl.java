@@ -6,6 +6,7 @@ package org.terasology.world.internal;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.FluentIterable;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.joml.Vector3i;
@@ -355,12 +356,10 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
     }
 
     @Override
-    public Collection<BlockRegion> getRelevantRegions() {
+    public Collection<BlockRegionc> getRelevantRegions() {
         Collection<Chunk> chunks = chunkProvider.getAllChunks();
-        Function<Chunk, BlockRegion> mapping = CoreChunk::getRegion;
-
         Predicate<Chunk> isReady = ManagedChunk::isReady;
 
-        return FluentIterable.from(chunks).filter(isReady).transform(mapping).toList();
+        return FluentIterable.from(chunks).filter(isReady).transform(CoreChunk::getRegion).toList();
     }
 }
