@@ -16,6 +16,7 @@
 package org.terasology.world.propagation;
 
 import com.google.common.collect.Maps;
+import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,9 +25,7 @@ import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.math.JomlUtil;
-import org.terasology.math.Region3i;
 import org.terasology.math.Side;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
@@ -101,8 +100,8 @@ public class BetweenChunkPropagationTest extends TerasologyTestingEnvironment {
 
     @Test
     public void testBetweenChunksSimple() {
-        Chunk topChunk = new ChunkImpl(new Vector3i(0, 1, 0), blockManager, extraDataManager);
-        Chunk bottomChunk = new ChunkImpl(new Vector3i(0, 0, 0), blockManager, extraDataManager);
+        Chunk topChunk = new ChunkImpl(JomlUtil.from(new Vector3i(0, 1, 0)), blockManager, extraDataManager);
+        Chunk bottomChunk = new ChunkImpl(JomlUtil.from(new Vector3i(0, 0, 0)), blockManager, extraDataManager);
 
         provider.addChunk(topChunk);
         provider.addChunk(bottomChunk);
@@ -123,8 +122,8 @@ public class BetweenChunkPropagationTest extends TerasologyTestingEnvironment {
 
     @Test
     public void testBetweenChunksSimpleSunlightRegenOnly() {
-        Chunk topChunk = new ChunkImpl(new Vector3i(0, 1, 0), blockManager, extraDataManager);
-        Chunk bottomChunk = new ChunkImpl(new Vector3i(0, 0, 0), blockManager, extraDataManager);
+        Chunk topChunk = new ChunkImpl(JomlUtil.from(new Vector3i(0, 1, 0)), blockManager, extraDataManager);
+        Chunk bottomChunk = new ChunkImpl(JomlUtil.from(new Vector3i(0, 0, 0)), blockManager, extraDataManager);
 
         provider.addChunk(topChunk);
         provider.addChunk(bottomChunk);
@@ -143,8 +142,8 @@ public class BetweenChunkPropagationTest extends TerasologyTestingEnvironment {
 
     @Test
     public void testBetweenChunksWithOverhang() {
-        Chunk topChunk = new ChunkImpl(new Vector3i(0, 1, 0), blockManager, extraDataManager);
-        Chunk bottomChunk = new ChunkImpl(new Vector3i(0, 0, 0), blockManager, extraDataManager);
+        Chunk topChunk = new ChunkImpl(JomlUtil.from(new Vector3i(0, 1, 0)), blockManager, extraDataManager);
+        Chunk bottomChunk = new ChunkImpl(JomlUtil.from(new Vector3i(0, 0, 0)), blockManager, extraDataManager);
 
         provider.addChunk(topChunk);
         provider.addChunk(bottomChunk);
@@ -171,8 +170,8 @@ public class BetweenChunkPropagationTest extends TerasologyTestingEnvironment {
 
     @Test
     public void testPropagateSunlightAppearingMidChunk() {
-        Chunk topChunk = new ChunkImpl(new Vector3i(0, 1, 0), blockManager, extraDataManager);
-        Chunk bottomChunk = new ChunkImpl(new Vector3i(0, 0, 0), blockManager, extraDataManager);
+        Chunk topChunk = new ChunkImpl(JomlUtil.from(new Vector3i(0, 1, 0)), blockManager, extraDataManager);
+        Chunk bottomChunk = new ChunkImpl(JomlUtil.from(new Vector3i(0, 0, 0)), blockManager, extraDataManager);
 
         provider.addChunk(topChunk);
         provider.addChunk(bottomChunk);
@@ -199,35 +198,35 @@ public class BetweenChunkPropagationTest extends TerasologyTestingEnvironment {
     }
 
     private static class SelectChunkProvider implements ChunkProvider {
-        private Map<Vector3i, Chunk> chunks = Maps.newHashMap();
+        private Map<Vector3ic, Chunk> chunks = Maps.newHashMap();
 
         SelectChunkProvider(Chunk... chunks) {
             for (Chunk chunk : chunks) {
-                this.chunks.put(chunk.getPosition(), chunk);
+                this.chunks.put(chunk.getPosition(new Vector3i()), chunk);
             }
         }
 
         public void addChunk(Chunk chunk) {
-            chunks.put(chunk.getPosition(), chunk);
+            chunks.put(chunk.getPosition(new Vector3i()), chunk);
         }
 
         @Override
-        public ChunkViewCore getLocalView(Vector3i centerChunkPos) {
+        public ChunkViewCore getLocalView(Vector3ic centerChunkPos) {
             return null;
         }
 
         @Override
-        public ChunkViewCore getSubviewAroundBlock(Vector3i blockPos, int extent) {
+        public ChunkViewCore getSubviewAroundBlock(Vector3ic blockPos, int extent) {
             return null;
         }
 
         @Override
-        public ChunkViewCore getSubviewAroundChunk(Vector3i chunkPos) {
+        public ChunkViewCore getSubviewAroundChunk(Vector3ic chunkPos) {
             return null;
         }
 
         @Override
-        public boolean reloadChunk(Vector3i pos) {
+        public boolean reloadChunk(Vector3ic pos) {
             return false;
         }
 
@@ -247,11 +246,6 @@ public class BetweenChunkPropagationTest extends TerasologyTestingEnvironment {
         }
 
         @Override
-        public boolean isChunkReady(Vector3i pos) {
-            return false;
-        }
-
-        @Override
         public boolean isChunkReady(Vector3ic pos) {
             return false;
         }
@@ -261,14 +255,10 @@ public class BetweenChunkPropagationTest extends TerasologyTestingEnvironment {
             return getChunk(new Vector3i(x, y, z));
         }
 
-        @Override
-        public Chunk getChunk(Vector3i chunkPos) {
-            return chunks.get(chunkPos);
-        }
 
         @Override
         public Chunk getChunk(Vector3ic chunkPos) {
-            return chunks.get(JomlUtil.from(chunkPos));
+            return chunks.get(chunkPos);
         }
 
         @Override

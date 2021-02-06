@@ -151,17 +151,17 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
 
     @Override
     public ChunkViewCore getLocalView(Vector3ic chunkPos) {
-        return chunkProvider.getLocalView(JomlUtil.from(chunkPos));
+        return chunkProvider.getLocalView(chunkPos);
     }
 
     @Override
     public ChunkViewCore getWorldViewAround(Vector3ic chunk) {
-        return chunkProvider.getSubviewAroundChunk(JomlUtil.from(chunk));
+        return chunkProvider.getSubviewAroundChunk(chunk);
     }
 
     @Override
     public boolean isBlockRelevant(int x, int y, int z) {
-        return chunkProvider.isChunkReady(ChunkMath.calcChunkPos(x, y, z));
+        return chunkProvider.isChunkReady(Chunks.toChunkPos(x, y, z, new Vector3i()));
     }
 
     @Override
