@@ -34,10 +34,10 @@ public interface BlockEntityRegistry {
      * This has implications for blocks being placed onto that position and destroyed at that position.
      *
      * @param blockPosition The position to set the new entity in
-     * @param bockEntity    The new entity to set
+     * @param blockEntity    The new entity to set
      * @return The previous entity at the location, or a null entity if one didn't exist yet.
      */
-    EntityRef setPermanentBlockEntity(Vector3ic blockPosition, EntityRef bockEntity);
+    EntityRef setPermanentBlockEntity(Vector3ic blockPosition, EntityRef blockEntity);
 
     /**
      * This method returns the block entity at the given location, but will not produce a temporary entity if
