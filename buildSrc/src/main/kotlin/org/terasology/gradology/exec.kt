@@ -9,8 +9,11 @@ import org.gradle.api.logging.Logging
 import org.gradle.api.plugins.JavaApplication
 import org.gradle.api.tasks.JavaExec
 import org.gradle.api.tasks.SourceSetContainer
+import org.gradle.api.tasks.options.Option
 import org.gradle.kotlin.dsl.get
 import org.gradle.kotlin.dsl.the
+
+const val DEFAULT_MAX_HEAP_SIZE = "3G"
 
 private val logger: Logger = Logging.getLogger("org.tersology.gradology.exec")
 
@@ -42,6 +45,11 @@ fun isMacOS() : Boolean {
 
 open class RunTerasology : JavaExec() {
 
+    @Option(option="max-heap", description="Set maximum heap size (-Xmx)")
+    override fun setMaxHeapSize(heapSize: String?) {
+        super.setMaxHeapSize(heapSize)
+    }
+
     init {
         group = "terasology run"
 
@@ -57,7 +65,7 @@ open class RunTerasology : JavaExec() {
         dependsOn(project.configurations.named("modules"))
 
         args("-homedir")
-        jvmArgs("-Xmx3072m")
+        maxHeapSize = DEFAULT_MAX_HEAP_SIZE
 
         if (isMacOS()) {
             args("-noSplash")
