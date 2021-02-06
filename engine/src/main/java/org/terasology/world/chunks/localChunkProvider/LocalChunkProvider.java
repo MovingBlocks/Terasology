@@ -126,14 +126,15 @@ public class LocalChunkProvider implements ChunkProvider {
 
 
     protected Future<Chunk> createOrLoadChunk(Vector3ic chunkPos) {
+        Vector3i pos = new Vector3i(chunkPos);
         return loadingPipeline.invokeGeneratorTask(
-            new Vector3i(chunkPos),
+            pos,
             () -> {
-                ChunkStore chunkStore = storageManager.loadChunkStore(chunkPos);
+                ChunkStore chunkStore = storageManager.loadChunkStore(pos);
                 Chunk chunk;
                 EntityBufferImpl buffer = new EntityBufferImpl();
                 if (chunkStore == null) {
-                    chunk = new ChunkImpl(JomlUtil.from(chunkPos), blockManager, extraDataManager);
+                    chunk = new ChunkImpl(JomlUtil.from(pos), blockManager, extraDataManager);
                     generator.createChunk(chunk, buffer);
                     generateQueuedEntities.put(chunk.getPosition(new Vector3i()), buffer.getAll());
                 } else {
