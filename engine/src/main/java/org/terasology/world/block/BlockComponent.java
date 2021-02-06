@@ -1,24 +1,10 @@
-/*
- * Copyright 2013 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.world.block;
 
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.terasology.entitySystem.Component;
-import org.terasology.math.JomlUtil;
 import org.terasology.network.Replicate;
 
 /**
@@ -31,14 +17,6 @@ public final class BlockComponent implements Component {
     public Block block;
 
     public BlockComponent() {
-    }
-    /**
-     * @deprecated This is scheduled for removal in an upcoming version method will be replaced with JOML implementation
-     *     {@link #BlockComponent(Block, Vector3ic)}.
-     */
-    @Deprecated
-    public BlockComponent(Block block, org.terasology.math.geom.Vector3i pos) {
-        this(block, JomlUtil.from(pos));
     }
 
     public BlockComponent(Block block, Vector3ic pos) {
@@ -69,14 +47,5 @@ public final class BlockComponent implements Component {
 
     public void setPosition(Vector3ic pos) {
         position.set(pos);
-    }
-
-    /**
-     * set the position of the {@link BlockComponent}
-     *
-     * @param pos position to set
-     */
-    public void setPosition(org.terasology.math.geom.Vector3i pos) {
-        position.set(JomlUtil.from(pos));
     }
 }
