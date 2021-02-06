@@ -212,7 +212,7 @@ public class BlockCommands extends BaseComponentSystem {
             if (def.isPresent()) {
                 BlockFamily blockFamily = blockManager.getBlockFamily(uri);
                 Block block = blockManager.getBlock(blockFamily.getURI());
-                world.setBlock(targetLocation.position, block);
+                world.setBlock(targetLocation.getPosition(), block);
             } else if (matchingUris.size() > 1) {
                 StringBuilder builder = new StringBuilder();
                 builder.append("Non-unique shape name, possible matches: ");
