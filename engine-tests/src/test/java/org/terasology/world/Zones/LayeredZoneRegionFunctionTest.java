@@ -78,7 +78,7 @@ public class LayeredZoneRegionFunctionTest {
         borders.put(ElevationFacet.class, new Border3D(0, 0, 0));
 
         region = new RegionImpl(new BlockRegion(0, 0, 0).expand(4, 4, 4),
-                facetProviderChains, borders);
+                facetProviderChains, borders, 1);
     }
 
     @Test
