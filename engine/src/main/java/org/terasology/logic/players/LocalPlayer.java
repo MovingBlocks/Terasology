@@ -108,16 +108,6 @@ public class LocalPlayer {
     }
 
     /**
-     * @return
-     * @deprecated This is scheduled for removal in an upcoming version method will be replaced with JOML implementation
-     *         {@link #getRotation(Quaternionf)}.
-     */
-    @Deprecated
-    public Quat4f getRotation() {
-        return JomlUtil.from(getRotation(new Quaternionf()));
-    }
-
-    /**
      * the rotation of the local player
      *
      * @param dest will hold the result
