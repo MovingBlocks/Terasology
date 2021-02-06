@@ -28,7 +28,8 @@ import org.terasology.reflection.reflect.ReflectFactory;
 import org.terasology.reflection.reflect.ReflectionReflectFactory;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.testUtil.ModuleManagerFactory;
-import org.terasology.testUtil.TeraAssert;
+
+import static org.terasology.joml.test.VectorAssert.assertEquals;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -105,12 +106,12 @@ public class VectorEventSerializer {
         EntityData.Event ev = serializer.serialize(a);
         Event dev = serializer.deserialize(ev);
         assumeTrue(dev instanceof Vector3fTestEvent);
-        TeraAssert.assertEquals(((Vector3fTestEvent) dev).v1, new Vector3f(1.0f, 2.0f, 3.0f), .00001f);
-        TeraAssert.assertEquals(((Vector3fTestEvent) dev).v2, new Vector4f(1.0f, 2.0f, 3.0f, 5.0f), .00001f);
-        TeraAssert.assertEquals(((Vector3fTestEvent) dev).v3, new Vector2f(1.0f, 2.0f), .00001f);
+        assertEquals(((Vector3fTestEvent) dev).v1, new Vector3f(1.0f, 2.0f, 3.0f), .00001f);
+        assertEquals(((Vector3fTestEvent) dev).v2, new Vector4f(1.0f, 2.0f, 3.0f, 5.0f), .00001f);
+        assertEquals(((Vector3fTestEvent) dev).v3, new Vector2f(1.0f, 2.0f), .00001f);
 
-        TeraAssert.assertEquals(((Vector3fTestEvent) dev).v1c, new Vector3f(1.0f, 1.0f, 1.0f), .00001f);
-        TeraAssert.assertEquals(((Vector3fTestEvent) dev).v2c, new Vector4f(1.0f, 1.0f, 2.0f, 2.0f), .00001f);
-        TeraAssert.assertEquals(((Vector3fTestEvent) dev).v3c, new Vector2f(1.0f, 1.0f), .00001f);
+        assertEquals(((Vector3fTestEvent) dev).v1c, new Vector3f(1.0f, 1.0f, 1.0f), .00001f);
+        assertEquals(((Vector3fTestEvent) dev).v2c, new Vector4f(1.0f, 1.0f, 2.0f, 2.0f), .00001f);
+        assertEquals(((Vector3fTestEvent) dev).v3c, new Vector2f(1.0f, 1.0f), .00001f);
     }
 }

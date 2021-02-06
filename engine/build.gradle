@@ -29,20 +29,8 @@ ext {
 
     // Stuff for our automatic version file setup
     startDateTimeString = dateTimeFormat.format(new Date())
-    versionInfoFileDir = new File(buildDir, 'classes/org/terasology/version')
-    versionInfoFile = new File(versionInfoFileDir, 'versionInfo.properties')
-    versionFileName = 'VERSION'
     versionBase = new File(templatesDir, "version.txt").text.trim()
     displayVersion = versionBase
-}
-
-def convertGitBranch = { gitBranch ->
-    if (gitBranch != null) {
-        // Remove "origin/" from "origin/develop"
-        gitBranch.substring(gitBranch.lastIndexOf("/") + 1)
-    } else {
-        ""
-    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -95,17 +83,12 @@ dependencies {
     api "org.lwjgl:lwjgl-opengl"
     implementation "org.lwjgl:lwjgl-stb"
 
-    api group: 'java3d', name: 'vecmath', version: '1.3.1'
-    api group: 'org.joml', name: 'joml', version: '1.9.25'
+    api group: 'org.joml', name: 'joml', version: '1.10.0'
+    api group: 'org.terasology.joml-ext', name: 'joml-geometry', version: '1.0.0-SNAPSHOT'
+
     implementation group: 'org.abego.treelayout', name: 'org.abego.treelayout.core', version: '1.0.3'
     api group: 'com.miglayout', name: 'miglayout-core', version: '5.0'
     implementation group: 'de.matthiasmann.twl', name: 'PNGDecoder', version: '1111'
-
-    // Assembly & Bytecode
-    implementation group: 'org.ow2.asm', name: 'asm', version: '5.0.3'
-    implementation group: 'org.ow2.asm', name: 'asm-tree', version: '5.0.4'
-    implementation group: 'org.ow2.asm', name: 'asm-util', version: '5.0.4'
-    implementation group: 'org.ow2.asm', name: 'asm-commons', version: '5.0.4'
 
     // Logging and audio
     implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.21'
@@ -128,8 +111,8 @@ dependencies {
     api group: 'org.terasology', name: 'splash-screen', version: '1.1.1'
     api group: 'org.terasology.jnlua', name: 'JNLua', version: '0.1.0-SNAPSHOT'
     api group: 'org.terasology.jnbullet', name: 'JNBullet', version: '1.0.2'
-    api group: 'org.terasology.nui', name: 'nui', version: '1.3.1'
-    api group: 'org.terasology.nui', name: 'nui-reflect', version: '1.3.1'
+    api group: 'org.terasology.nui', name: 'nui', version: '1.4.0-SNAPSHOT'
+    api group: 'org.terasology.nui', name: 'nui-reflect', version: '1.4.0-SNAPSHOT'
 
     // Wildcard dependency to catch any libs provided with the project (remote repo preferred instead)
     api fileTree(dir: 'libs', include: '*.jar')
@@ -139,7 +122,7 @@ dependencies {
 
     // TODO: Consider moving this back to the PC Facade instead of having the engine rely on it?
     implementation group: 'org.terasology.crashreporter', name: 'cr-terasology', version: '4.1.0'
-    
+
    api(project(":subsystems:TypeHandlerLibrary"))
 }
 
@@ -174,7 +157,7 @@ jar {
             def manifestClasspath = "$subDirLibs/" + configurations."${sourceSets.main.runtimeClasspathConfigurationName}".collect {
                 it.getName()
             }.join(" $subDirLibs/")
-            attributes("Class-Path": manifestClasspath, "Implementation-Title": "Terasology-" + project.name, "Implementation-Version": env.BUILD_NUMBER + ", " + convertGitBranch(env.GIT_BRANCH) + ", " + env.BUILD_ID + ", " + displayVersion)
+            attributes("Class-Path": manifestClasspath, "Implementation-Title": "Terasology", "Implementation-Version": displayVersion + ", engine v" + project.version + " , build number " + env.BUILD_NUMBER)
         }
     }
 }
@@ -230,28 +213,40 @@ group = 'org.terasology.engine'
 println "Version for $project.name loaded as $version for group $group"
 
 // This version info file actually goes inside the built jar and can be used at runtime
-task createVersionInfoFile {
-    inputs.property('dateTime', startDateTimeString)
-    onlyIf { env.BUILD_URL != null }
-    doLast {
-        versionInfoFileDir.mkdirs()
-        ant.propertyfile(file: versionInfoFile) {
-            ant.entry(key: 'buildNumber', value: env.BUILD_NUMBER)
-            ant.entry(key: 'buildId', value: env.BUILD_ID)
-            ant.entry(key: 'buildTag', value: env.BUILD_TAG)
-            ant.entry(key: 'buildUrl', value: env.BUILD_URL)
-            ant.entry(key: 'jobName', value: env.JOB_NAME)
-            ant.entry(key: 'gitBranch', value: convertGitBranch(env.GIT_BRANCH))
-            ant.entry(key: 'gitCommit', value: env.GIT_COMMIT)
-            ant.entry(key: 'dateTime', value: startDateTimeString)
-            ant.entry(key: 'displayVersion', value: displayVersion)
-            ant.entry(key: 'engineVersion', value: version)
-        }
+def createVersionInfoFile = tasks.register("createVersionInfoFile", WriteProperties) {
+    //noinspection GroovyAssignabilityCheck
+    properties([
+            buildNumber: env.BUILD_NUMBER,
+            buildId: env.BUILD_ID,
+            buildTag: env.BUILD_TAG,
+            buildUrl: env.BUILD_URL,
+            jobName: env.JOB_NAME,
+            gitCommit: env.GIT_COMMIT,
+            displayVersion: displayVersion,
+            engineVersion: version
+    ].findAll { it.value != null })
+    if (env.JOB_NAME != null) {
+        // Only set the dateTime property when there is a Jenkins JOB_NAME.
+        // It is a value we can always get (on Jenkins or otherwise) but we don't want local builds
+        // to invalidate their cache whenever the time changes.
+        // TODO: after upgrading to Gradle 6.8, see if we can have it ignore this property specifically:
+        //     https://docs.gradle.org/current/userguide/more_about_tasks.html#sec:property_file_normalization
+        property("dateTime", startDateTimeString)
+    }
+
+    outputFile = "$buildDir/createVersionInfoFile/versionInfo.properties"
+}
+
+tasks.named("processResources", Copy) {
+    from(createVersionInfoFile) {
+        into("org/terasology/version/")
+    }
+    from("$rootDir/docs") {
+        include("Credits.md")
     }
 }
 
-
-//TODO: Remove it  when gestalt will can to handle ProtectionDomain without classes (Resources)
+//TODO: Remove this when gestalt can handle ProtectionDomain without classes (Resources)
 task copyResourcesToClasses(type: Copy) {
     from sourceSets.main.output.resourcesDir
     into sourceSets.main.output.classesDirs.first()
@@ -261,7 +256,6 @@ task copyResourcesToClasses(type: Copy) {
     classes.dependsOn copyResourcesToClasses
 }
 
-jar.dependsOn createVersionInfoFile
 jar.dependsOn cacheReflections
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

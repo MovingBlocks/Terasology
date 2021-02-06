@@ -36,7 +36,7 @@ public interface RenderableWorld {
 
     boolean updateChunksInProximity(BlockRegion renderableRegion);
 
-    boolean updateChunksInProximity(ViewDistance viewDistance);
+    boolean updateChunksInProximity(ViewDistance viewDistance, int chunkLods);
 
     void generateVBOs();
 

@@ -15,8 +15,9 @@
  */
 package org.terasology.world.chunks.event;
 
+import org.joml.Vector3i;
+import org.joml.Vector3ic;
 import org.terasology.entitySystem.event.Event;
-import org.terasology.math.geom.Vector3i;
 
 /**
  */
@@ -24,11 +25,14 @@ public class OnChunkGenerated implements Event {
 
     private Vector3i chunkPos = new Vector3i();
 
-    public OnChunkGenerated(Vector3i chunkPos) {
+    public OnChunkGenerated() {
+    }
+
+    public OnChunkGenerated(Vector3ic chunkPos) {
         this.chunkPos.set(chunkPos);
     }
 
-    public Vector3i getChunkPos() {
+    public Vector3ic getChunkPos() {
         return chunkPos;
     }
 }

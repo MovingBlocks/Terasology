@@ -121,7 +121,7 @@ class LocalChunkProviderTest {
                     Assertions.assertTrue(mustBeOnGeneratedEvent instanceof OnChunkGenerated,
                             "First world event must be OnChunkGenerated");
                     Assertions.assertEquals(((OnChunkGenerated) mustBeOnGeneratedEvent).getChunkPos(),
-                            chunkPosition,
+                            JomlUtil.from(chunkPosition),
                             "Chunk position at event not expected");
                 },
                 () -> {
@@ -150,7 +150,7 @@ class LocalChunkProviderTest {
                     Assertions.assertTrue(mustBeOnGeneratedEvent instanceof OnChunkGenerated,
                             "First world event must be OnChunkGenerated");
                     Assertions.assertEquals(((OnChunkGenerated) mustBeOnGeneratedEvent).getChunkPos(),
-                            chunkPosition,
+                            JomlUtil.from(chunkPosition),
                             "Chunk position at event not expected");
                 },
                 () -> {
@@ -184,7 +184,7 @@ class LocalChunkProviderTest {
         requestCreatingOrLoadingArea(chunkPosition).get(WAIT_CHUNK_IS_READY_IN_SECONDS, TimeUnit.SECONDS);
         chunkProvider.update();
 
-        Assertions.assertTrue(((TestChunkStore) storageManager.loadChunkStore(chunkPosition)).isEntityRestored(),
+        Assertions.assertTrue(((TestChunkStore) storageManager.loadChunkStore(JomlUtil.from(chunkPosition))).isEntityRestored(),
                 "Entities must be restored by loading");
 
         final ArgumentCaptor<Event> eventArgumentCaptor = ArgumentCaptor.forClass(Event.class);
@@ -209,7 +209,7 @@ class LocalChunkProviderTest {
         requestCreatingOrLoadingArea(chunkPosition).get(WAIT_CHUNK_IS_READY_IN_SECONDS, TimeUnit.SECONDS);
         chunkProvider.update();
 
-        Assertions.assertTrue(((TestChunkStore) storageManager.loadChunkStore(chunkPosition)).isEntityRestored(),
+        Assertions.assertTrue(((TestChunkStore) storageManager.loadChunkStore(JomlUtil.from(chunkPosition))).isEntityRestored(),
                 "Entities must be restored by loading");
 
 

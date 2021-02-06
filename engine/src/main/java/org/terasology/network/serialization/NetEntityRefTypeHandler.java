@@ -17,7 +17,9 @@
 package org.terasology.network.serialization;
 
 import gnu.trove.list.TIntList;
+import org.joml.Vector3ic;
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.network.NetworkComponent;
 import org.terasology.network.internal.NetworkSystemImpl;
@@ -48,8 +50,8 @@ public class NetEntityRefTypeHandler extends TypeHandler<EntityRef> {
     public PersistedData serializeNonNull(EntityRef value, PersistedDataSerializer serializer) {
         BlockComponent blockComponent = value.getComponent(BlockComponent.class);
         if (blockComponent != null) {
-            Vector3i pos = blockComponent.position;
-            return serializer.serialize(pos.x, pos.y, pos.z);
+            Vector3ic pos = blockComponent.getPosition();
+            return serializer.serialize(pos.x(), pos.y(), pos.z());
         }
         NetworkComponent netComponent = value.getComponent(NetworkComponent.class);
         if (netComponent != null) {
@@ -65,7 +67,7 @@ public class NetEntityRefTypeHandler extends TypeHandler<EntityRef> {
             if (array.isNumberArray() && array.size() == 3) {
                 TIntList items = data.getAsArray().getAsIntegerArray();
                 Vector3i pos = new Vector3i(items.get(0), items.get(1), items.get(2));
-                return Optional.ofNullable(blockEntityRegistry.getBlockEntityAt(pos));
+                return Optional.ofNullable(blockEntityRegistry.getBlockEntityAt(JomlUtil.from(pos)));
             }
         }
         if (data.isNumber()) {

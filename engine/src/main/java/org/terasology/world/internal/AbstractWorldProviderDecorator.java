@@ -18,7 +18,6 @@ package org.terasology.world.internal;
 
 import org.joml.Vector3ic;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.math.Region3i;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.world.WorldChangeListener;
 import org.terasology.world.block.Block;
@@ -80,7 +79,7 @@ public class AbstractWorldProviderDecorator implements WorldProviderCore {
     }
 
     @Override
-    public ChunkViewCore getWorldViewAround(Vector3i chunk) {
+    public ChunkViewCore getWorldViewAround(Vector3ic chunk) {
         return base.getWorldViewAround(chunk);
     }
 
@@ -90,18 +89,8 @@ public class AbstractWorldProviderDecorator implements WorldProviderCore {
     }
 
     @Override
-    public boolean isRegionRelevant(Region3i region) {
-        return base.isRegionRelevant(region);
-    }
-
-    @Override
     public boolean isRegionRelevant(BlockRegionc region) {
         return base.isRegionRelevant(region);
-    }
-
-    @Override
-    public Block setBlock(Vector3i pos, Block type) {
-        return base.setBlock(pos, type);
     }
 
     @Override
@@ -110,7 +99,7 @@ public class AbstractWorldProviderDecorator implements WorldProviderCore {
     }
 
     @Override
-    public Map<Vector3i, Block> setBlocks(Map<Vector3i, Block> blocks) {
+    public Map<Vector3ic, Block> setBlocks(Map<? extends Vector3ic, Block> blocks) {
         return base.setBlocks(blocks);
     }
 
@@ -140,7 +129,7 @@ public class AbstractWorldProviderDecorator implements WorldProviderCore {
     }
 
     @Override
-    public int setExtraData(int index, Vector3i pos, int value) {
+    public int setExtraData(int index, Vector3ic pos, int value) {
         return base.setExtraData(index, pos, value);
     }
 

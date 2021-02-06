@@ -17,6 +17,7 @@ package org.terasology.world.block.structure;
 
 import com.google.common.collect.Sets;
 import org.joml.Vector3i;
+import org.joml.Vector3ic;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
@@ -91,10 +92,10 @@ public class BlockStructuralSupportSystem extends BaseComponentSystem implements
 
     @ReceiveEvent
     public void preventInvalidPlacement(PlaceBlocks placeBlocks, EntityRef world) {
-        final Map<Vector3i, Block> blocksMap = placeBlocks.getBlocks();
+        final Map<Vector3ic, Block> blocksMap = placeBlocks.getBlocks();
         for (BlockStructuralSupport support : supports) {
-            for (Map.Entry<Vector3i, Block> blockEntry : blocksMap.entrySet()) {
-                final Vector3i position = blockEntry.getKey();
+            for (Map.Entry<Vector3ic, Block> blockEntry : blocksMap.entrySet()) {
+                final Vector3ic position = blockEntry.getKey();
                 if (!support.isSufficientlySupported(position, Collections.unmodifiableMap(blocksMap))) {
                     placeBlocks.consume();
                     return;

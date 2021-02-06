@@ -17,7 +17,7 @@ package org.terasology.physics.bullet.shapes;
 
 
 import com.badlogic.gdx.physics.bullet.collision.btCollisionShape;
-import org.joml.AABBf;
+import org.terasology.joml.geom.AABBf;
 import org.joml.Matrix4f;
 import org.joml.Quaternionfc;
 import org.joml.Vector3f;

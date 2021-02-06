@@ -15,6 +15,7 @@
  */
 package org.terasology.world.chunks;
 
+import org.terasology.joml.geom.AABBfc;
 import org.terasology.math.AABB;
 import org.terasology.module.sandbox.API;
 import org.terasology.rendering.primitives.ChunkMesh;
@@ -28,7 +29,7 @@ public interface RenderableChunk extends LitChunk {
 
     void setDirty(boolean dirty);
 
-    AABB getAABB();
+    AABBfc getAABB();
 
     void setMesh(ChunkMesh newMesh);
 
