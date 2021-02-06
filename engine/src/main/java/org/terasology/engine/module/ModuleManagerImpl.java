@@ -143,7 +143,7 @@ public class ModuleManagerImpl implements ModuleManager {
             Module module;
             try {
                 module = load(loader, url);
-            } catch (IOException e) {
+            } catch (ClassCastException | IOException | URISyntaxException e) {
                 logger.warn("Failed to load classpath module {}", url, e);
                 continue;
             }
@@ -154,15 +154,9 @@ public class ModuleManagerImpl implements ModuleManager {
         }
     }
 
-    Module load(ModuleLoader loader, URL url) throws IOException {
-        Path jarPath;
-        try {
-            JarURLConnection connection = (JarURLConnection) url.openConnection();
-            jarPath = Paths.get(connection.getJarFileURL().toURI());
-        } catch (ClassCastException | URISyntaxException e) {
-            logger.warn("Failed to resolve jar path {}", url, e);
-            return null;
-        }
+    Module load(ModuleLoader loader, URL url) throws IOException, URISyntaxException {
+        JarURLConnection connection = (JarURLConnection) url.openConnection();
+        Path jarPath = Paths.get(connection.getJarFileURL().toURI());
 
         Module module = loader.load(jarPath);
 

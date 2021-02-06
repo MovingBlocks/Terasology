@@ -8,6 +8,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.terasology.module.ModuleLoader;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -20,7 +21,7 @@ public class ModuleManagerTest {
             "testdummy-1.0.0-SNAPSHOT.jar",
             "messy-name-directory & $t#f/testmessy-1.0.0-SNAPSHOT.jar"
     })
-    void testLoadModuleFromURL(String jarLocation) throws IOException {
+    void testLoadModuleFromURL(String jarLocation) throws IOException, URISyntaxException {
         ModuleManagerImpl mm = new ThisModuleManager("");
         ModuleLoader loader = new ModuleLoader();
         loader.setModuleInfoPath(MODULE_INFO_FILENAME);
