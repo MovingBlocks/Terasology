@@ -164,7 +164,7 @@ public class LocalChunkProvider implements ChunkProvider {
 
     @Override
     public ChunkViewCore getSubviewAroundChunk(Vector3ic chunkPos) {
-        BlockRegion region = Chunks.toChunkRegion(new BlockRegion(chunkPos).expand(Chunks.LOCAL_REGION_EXTENTS));
+        BlockRegion region = new BlockRegion(chunkPos).expand(Chunks.LOCAL_REGION_EXTENTS);
         if (getChunk(chunkPos) != null) {
             return createWorldView(region, new Vector3i(-region.minX(), -region.minY(), -region.minZ()));
         }
