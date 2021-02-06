@@ -13,8 +13,6 @@ import org.terasology.logic.characters.events.ActivationPredicted;
 import org.terasology.logic.characters.events.ActivationRequest;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.Direction;
-import org.terasology.math.JomlUtil;
-import org.terasology.math.geom.Quat4f;
 import org.terasology.network.ClientComponent;
 import org.terasology.physics.HitResult;
 import org.terasology.physics.Physics;
@@ -144,16 +142,6 @@ public class LocalPlayer {
             }
         }
         return getPosition(dest);
-    }
-
-    /**
-     * @return
-     * @deprecated This is scheduled for removal in an upcoming version method will be replaced with JOML implementation
-     *         {@link #getViewRotation(Quaternionf)}.
-     */
-    @Deprecated
-    public Quat4f getViewRotation() {
-        return JomlUtil.from(getViewRotation(new Quaternionf()));
     }
 
     /**
