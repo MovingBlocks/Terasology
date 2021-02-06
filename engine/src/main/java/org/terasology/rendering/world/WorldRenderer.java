@@ -167,8 +167,9 @@ public interface WorldRenderer {
      * Sets how far from the camera chunks are kept in memory and displayed.
      *
      * @param viewDistance a viewDistance value.
+     * @param chunkLods the number of LOD levels to display beyond the loaded chunks.
      */
-    void setViewDistance(ViewDistance viewDistance);
+    void setViewDistance(ViewDistance viewDistance, int chunkLods);
 
     /**
      * Returns the intensity of the light at a given location due to the combination of main light (sun or moon)

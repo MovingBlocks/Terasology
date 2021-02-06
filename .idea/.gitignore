@@ -22,6 +22,9 @@ workspace.xml
 /gradle.xml
 /libraries
 
+# see https://youtrack.jetbrains.com/issue/IDEA-251986
+/compiler.xml
+
 # too much churn with teresology-modules each having their own repo
 /vcs.xml
 

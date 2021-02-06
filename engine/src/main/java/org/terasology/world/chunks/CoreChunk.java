@@ -1,25 +1,8 @@
-/*
- * Copyright 2013 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *  http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.world.chunks;
 
-import org.joml.Vector3fc;
 import org.joml.Vector3ic;
-import org.terasology.audio.AudioEndListener;
-import org.terasology.audio.StaticSound;
-import org.terasology.math.Region3i;
 import org.terasology.math.geom.BaseVector3i;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.module.sandbox.API;
@@ -42,7 +25,7 @@ import org.terasology.world.block.BlockRegion;
 public interface CoreChunk {
 
     /**
-     * @return Position of the chunk in world, where units of distance from origin are blocks
+     * @return Position of the chunk in world, where units of distance from origin are chunks
      * @deprecated This method is scheduled for removal in an upcoming version.
      *             Use the JOML implementation instead: {@link #getPosition(org.joml.Vector3i)}.
      */
@@ -50,7 +33,7 @@ public interface CoreChunk {
     Vector3i getPosition();
 
     /**
-     * Position of the chunk in world, where units of distance from origin are blocks
+     * Position of the chunk in world, where units of distance from origin are chunks
      *
      * @param dest will hold the result
      * @return dest
@@ -191,9 +174,9 @@ public interface CoreChunk {
     int getExtraData(int index, Vector3ic pos);
 
     /**
-     * Returns offset of this chunk to the world center (0:0:0), with one unit being one chunk.
+     * Returns offset of this chunk to the world center (0:0:0), with one unit being one block.
      *
-     * @return Offset of this chunk from world center in chunks
+     * @return Offset of this chunk from world center in blocks
      * @deprecated This method is scheduled for removal in an upcoming version.
      *             Use the JOML implementation instead: {@link #getChunkWorldOffset(org.joml.Vector3i)}.
      */
@@ -201,31 +184,31 @@ public interface CoreChunk {
     Vector3i getChunkWorldOffset();
 
     /**
-     * Returns offset of this chunk to the world center (0:0:0), with one unit being one chunk.
+     * Returns offset of this chunk to the world center (0:0:0), with one unit being one block.
      *
-     * @return Offset of this chunk from world center in chunks
+     * @return Offset of this chunk from world center in blocks
      */
     org.joml.Vector3i getChunkWorldOffset(org.joml.Vector3i pos);
 
 
     /**
-     * Returns X offset of this chunk to the world center (0:0:0), with one unit being one chunk.
+     * Returns X offset of this chunk to the world center (0:0:0), with one unit being one block.
      *
-     * @return X offset of this chunk from world center in chunks
+     * @return X offset of this chunk from world center in blocks
      */
     int getChunkWorldOffsetX();
 
     /**
-     * Returns Y offset of this chunk to the world center (0:0:0), with one unit being one chunk.
+     * Returns Y offset of this chunk to the world center (0:0:0), with one unit being one block.
      *
-     * @return Y offset of this chunk from world center in chunks
+     * @return Y offset of this chunk from world center in blocks
      */
     int getChunkWorldOffsetY();
 
     /**
-     * Returns Z offset of this chunk to the world center (0:0:0), with one unit being one chunk.
+     * Returns Z offset of this chunk to the world center (0:0:0), with one unit being one block.
      *
-     * @return Z offset of this chunk from world center in chunks
+     * @return Z offset of this chunk from world center in blocks
      */
     int getChunkWorldOffsetZ();
 

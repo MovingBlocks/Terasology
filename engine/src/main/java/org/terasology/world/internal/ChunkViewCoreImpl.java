@@ -112,7 +112,7 @@ public class ChunkViewCoreImpl implements ChunkViewCore {
         if (blockRegion.contains(blockX, blockY, blockZ)) {
             Chunk chunk = chunks[relChunkIndex(blockX, blockY, blockZ)];
             if (chunk != null) {
-                return chunk.getSunlight(JomlUtil.from(Chunks.toRelative(blockX, blockY, blockZ, chunkFilterSize, new Vector3i())));
+                return chunk.getSunlight(Chunks.toRelative(blockX, blockY, blockZ, chunkFilterSize, new Vector3i()));
             }
         }
         return 0;
@@ -123,7 +123,7 @@ public class ChunkViewCoreImpl implements ChunkViewCore {
         if (blockRegion.contains(blockX, blockY, blockZ)) {
             Chunk chunk = chunks[relChunkIndex(blockX, blockY, blockZ)];
             if (chunk != null) {
-                return chunk.getLight(JomlUtil.from(Chunks.toRelative(blockX, blockY, blockZ, chunkFilterSize, new Vector3i())));
+                return chunk.getLight(Chunks.toRelative(blockX, blockY, blockZ, chunkFilterSize, new Vector3i()));
             }
         }
         return 0;
@@ -156,7 +156,7 @@ public class ChunkViewCoreImpl implements ChunkViewCore {
         if (blockRegion.contains(blockX, blockY, blockZ)) {
             Chunk chunk = chunks[relChunkIndex(blockX, blockY, blockZ)];
             if (chunk != null) {
-                chunk.setLight(JomlUtil.from(Chunks.toRelative(blockX, blockY, blockZ, chunkFilterSize, new Vector3i())), light);
+                chunk.setLight(Chunks.toRelative(blockX, blockY, blockZ, chunkFilterSize, new Vector3i()), light);
                 return;
             }
         }
@@ -173,7 +173,7 @@ public class ChunkViewCoreImpl implements ChunkViewCore {
         if (blockRegion.contains(blockX, blockY, blockZ)) {
             Chunk chunk = chunks[relChunkIndex(blockX, blockY, blockZ)];
             if (chunk != null) {
-                chunk.setSunlight(JomlUtil.from(Chunks.toRelative(blockX, blockY, blockZ, chunkFilterSize, new Vector3i())), light);
+                chunk.setSunlight(Chunks.toRelative(blockX, blockY, blockZ, chunkFilterSize, new Vector3i()), light);
                 return;
             }
         }

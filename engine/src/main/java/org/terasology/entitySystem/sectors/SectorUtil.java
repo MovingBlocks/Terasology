@@ -82,7 +82,7 @@ public final class SectorUtil {
     /**
      * Watched chunks are defined as the union of:
      * <ul>
-     *     <li>The chunk in which the {@link LocationComponent#getWorldPosition()} resides, if any</li>
+     *     <li>The chunk in which the {@link LocationComponent#getWorldPosition(Vector3f)} resides, if any</li>
      *     <li>The set of chunks in {@link SectorRegionComponent#chunks}, if any</li>
      * </ul>
      *
