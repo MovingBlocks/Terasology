@@ -97,7 +97,7 @@ class ChunkProcessingPipelineTest extends TerasologyTestingEnvironment {
         Map<Vector3ic, Chunk> chunkCache =
                 getNearChunkPositions(positionToGenerate)
                         .stream()
-                        .filter((p) -> !p.equals(JomlUtil.from(positionToGenerate))) //remove central chunk.
+                        .filter((p) -> !p.equals(positionToGenerate)) //remove central chunk.
                         .map(this::createChunkAt)
                         .collect(Collectors.toMap(
                                 (chunk) -> chunk.getPosition(new Vector3i()),
@@ -131,7 +131,7 @@ class ChunkProcessingPipelineTest extends TerasologyTestingEnvironment {
         Map<Vector3i, Chunk> chunkToGenerate =
                 getNearChunkPositions(positionToGenerate)
                         .stream()
-                        .filter((p) -> !p.equals(JomlUtil.from(positionToGenerate))) //remove central chunk.
+                        .filter((p) -> !p.equals(positionToGenerate)) //remove central chunk.
                         .map(this::createChunkAt)
                         .collect(Collectors.toMap(
                                 (chunk) -> chunk.getPosition(new Vector3i()),
@@ -142,7 +142,7 @@ class ChunkProcessingPipelineTest extends TerasologyTestingEnvironment {
         pipeline.addStage(ChunkTaskProvider.createMulti(
                 "flat merging task",
                 (chunks) -> chunks.stream()
-                        .filter((c) -> c.getPosition().equals(positionToGenerate)).findFirst() // return central chunk.
+                        .filter((c) -> c.getPosition(new Vector3i()).equals(positionToGenerate)).findFirst() // return central chunk.
                         .get(),
                 this::getNearChunkPositions));
 
