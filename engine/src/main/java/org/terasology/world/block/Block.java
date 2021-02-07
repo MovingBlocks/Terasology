@@ -27,7 +27,7 @@ import org.terasology.utilities.collection.EnumBooleanMap;
 import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.shapes.BlockMeshPart;
 import org.terasology.world.block.sounds.BlockSounds;
-import org.terasology.world.chunks.ChunkConstants;
+import org.terasology.world.chunks.Chunks;
 
 import java.util.Map;
 import java.util.Optional;
@@ -460,7 +460,7 @@ public final class Block {
      * @param luminance the light level produced by this block
      */
     public void setLuminance(byte luminance) {
-        this.luminance = (byte) TeraMath.clamp(luminance, 0, ChunkConstants.MAX_LIGHT);
+        this.luminance = (byte) TeraMath.clamp(luminance, 0, Chunks.MAX_LIGHT);
     }
 
     public Vector3f getTint() {
