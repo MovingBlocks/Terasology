@@ -3,7 +3,7 @@
 package org.terasology.rendering.world;
 
 import org.joml.Vector3f;
-import org.joml.Vector3i;
+import org.joml.Vector3ic;
 import org.terasology.module.sandbox.API;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.cameras.SubmersibleCamera;
@@ -55,14 +55,14 @@ public interface WorldRenderer {
      *
      * @param chunkPos a Vector3i providing the coordinates of the chunk that has just been loaded.
      */
-    void onChunkLoaded(Vector3i chunkPos);
+    void onChunkLoaded(Vector3ic chunkPos);
 
     /**
      * This method is triggered when a chunk has been unloaded.
      *
      * @param chunkPos a Vector3i providing the coordinates of the chunk that has just been unloaded.
      */
-    void onChunkUnloaded(Vector3i chunkPos);
+    void onChunkUnloaded(Vector3ic chunkPos);
 
     /**
      * Lists the stages the rendering engine may go through on a given frame.

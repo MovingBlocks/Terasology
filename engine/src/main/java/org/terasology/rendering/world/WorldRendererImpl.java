@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.rendering.world;
 
+import org.joml.Vector3f;
+import org.joml.Vector3ic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
@@ -20,10 +22,7 @@ import org.terasology.logic.console.commandSystem.annotations.Command;
 import org.terasology.logic.console.commandSystem.annotations.CommandParam;
 import org.terasology.logic.permission.PermissionManager;
 import org.terasology.logic.players.LocalPlayerSystem;
-import org.terasology.math.JomlUtil;
 import org.terasology.math.TeraMath;
-import org.joml.Vector3f;
-import org.joml.Vector3i;
 import org.terasology.rendering.ShaderManager;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.backdrop.BackdropProvider;
@@ -236,12 +235,12 @@ public final class WorldRendererImpl implements WorldRenderer {
     }
 
     @Override
-    public void onChunkLoaded(Vector3i pos) {
+    public void onChunkLoaded(Vector3ic pos) {
         renderableWorld.onChunkLoaded(pos);
     }
 
     @Override
-    public void onChunkUnloaded(Vector3i pos) {
+    public void onChunkUnloaded(Vector3ic pos) {
         renderableWorld.onChunkUnloaded(pos);
     }
 

@@ -66,12 +66,12 @@ public class HeadlessWorldRenderer implements WorldRenderer {
     }
 
     @Override
-    public void onChunkLoaded(Vector3i pos) {
+    public void onChunkLoaded(Vector3ic pos) {
 
     }
 
     @Override
-    public void onChunkUnloaded(Vector3i pos) {
+    public void onChunkUnloaded(Vector3ic pos) {
 
     }
 

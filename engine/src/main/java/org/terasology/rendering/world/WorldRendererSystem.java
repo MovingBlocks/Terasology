@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.rendering.world;
 
-import org.joml.Vector3i;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
@@ -23,12 +22,12 @@ public class WorldRendererSystem extends BaseComponentSystem {
 
     @ReceiveEvent(components = WorldComponent.class)
     public void onChunkLoaded(OnChunkLoaded chunkLoaded, EntityRef entity) {
-        worldRenderer.onChunkLoaded(new Vector3i(chunkLoaded.getChunkPos()));
+        worldRenderer.onChunkLoaded(chunkLoaded.getChunkPos());
     }
 
     @ReceiveEvent(components = WorldComponent.class)
     public void onChunkUnloaded(BeforeChunkUnload chunkUnloaded, EntityRef entity) {
-        worldRenderer.onChunkUnloaded(new Vector3i(chunkUnloaded.getChunkPos()));
+        worldRenderer.onChunkUnloaded(chunkUnloaded.getChunkPos());
     }
 
 
