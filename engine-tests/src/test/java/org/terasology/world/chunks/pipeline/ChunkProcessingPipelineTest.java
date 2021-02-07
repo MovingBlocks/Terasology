@@ -51,7 +51,7 @@ class ChunkProcessingPipelineTest extends TerasologyTestingEnvironment {
     void simpleProcessingSuccess() throws ExecutionException, InterruptedException, TimeoutException {
         pipeline = new ChunkProcessingPipeline((p) -> null, (o1, o2) -> 0);
 
-        org.terasology.math.geom.Vector3i chunkPos = new org.terasology.math.geom.Vector3i(0, 0, 0);
+        Vector3i chunkPos = new Vector3i(0, 0, 0);
         Chunk chunk = createChunkAt(chunkPos);
 
         pipeline.addStage(ChunkTaskProvider.create("dummy task", (c) -> c));
@@ -93,11 +93,11 @@ class ChunkProcessingPipelineTest extends TerasologyTestingEnvironment {
      */
     @Test
     void multiRequirementsChunksExistsSuccess() throws ExecutionException, InterruptedException, TimeoutException {
-        org.terasology.math.geom.Vector3i positionToGenerate = new org.terasology.math.geom.Vector3i(0, 0, 0);
+        Vector3i positionToGenerate = new Vector3i(0, 0, 0);
         Map<Vector3ic, Chunk> chunkCache =
-                getNearChunkPositions(JomlUtil.from(positionToGenerate))
+                getNearChunkPositions(positionToGenerate)
                         .stream()
-                        .filter((p) -> !p.equals(JomlUtil.from(positionToGenerate))) //remove central chunk.
+                        .filter((p) -> !p.equals(positionToGenerate)) //remove central chunk.
                         .map(this::createChunkAt)
                         .collect(Collectors.toMap(
                                 (chunk) -> chunk.getPosition(new Vector3i()),
@@ -108,7 +108,7 @@ class ChunkProcessingPipelineTest extends TerasologyTestingEnvironment {
         pipeline.addStage(ChunkTaskProvider.createMulti(
                 "flat merging task",
                 (chunks) -> chunks.stream()
-                        .filter((c) -> c.getPosition().equals(positionToGenerate))
+                        .filter((c) -> c.getPosition(new Vector3i()).equals(positionToGenerate))
                         .findFirst() // return central chunk.
                         .get(),
                 this::getNearChunkPositions));
@@ -127,11 +127,11 @@ class ChunkProcessingPipelineTest extends TerasologyTestingEnvironment {
     @Test
     void multiRequirementsChunksWillGeneratedSuccess() throws ExecutionException, InterruptedException,
             TimeoutException {
-        org.terasology.math.geom.Vector3i positionToGenerate = new org.terasology.math.geom.Vector3i(0, 0, 0);
+        Vector3i positionToGenerate = new Vector3i(0, 0, 0);
         Map<Vector3i, Chunk> chunkToGenerate =
-                getNearChunkPositions(JomlUtil.from(positionToGenerate))
+                getNearChunkPositions(positionToGenerate)
                         .stream()
-                        .filter((p) -> !p.equals(JomlUtil.from(positionToGenerate))) //remove central chunk.
+                        .filter((p) -> !p.equals(positionToGenerate)) //remove central chunk.
                         .map(this::createChunkAt)
                         .collect(Collectors.toMap(
                                 (chunk) -> chunk.getPosition(new Vector3i()),
@@ -142,7 +142,7 @@ class ChunkProcessingPipelineTest extends TerasologyTestingEnvironment {
         pipeline.addStage(ChunkTaskProvider.createMulti(
                 "flat merging task",
                 (chunks) -> chunks.stream()
-                        .filter((c) -> c.getPosition().equals(positionToGenerate)).findFirst() // return central chunk.
+                        .filter((c) -> c.getPosition(new Vector3i()).equals(positionToGenerate)).findFirst() // return central chunk.
                         .get(),
                 this::getNearChunkPositions));
 
@@ -255,11 +255,8 @@ class ChunkProcessingPipelineTest extends TerasologyTestingEnvironment {
     }
 
     private ChunkImpl createChunkAt(Vector3ic pos) {
-        return createChunkAt(JomlUtil.from(pos));
+        return new ChunkImpl(JomlUtil.from(pos), blockManager, extraDataManager);
     }
 
-    private ChunkImpl createChunkAt(org.terasology.math.geom.Vector3i chunkPos) {
-        return new ChunkImpl(chunkPos, blockManager, extraDataManager);
-    }
 
 }
