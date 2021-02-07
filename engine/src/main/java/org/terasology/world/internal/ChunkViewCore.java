@@ -9,7 +9,7 @@ import org.terasology.world.ChunkView;
 public interface ChunkViewCore extends ChunkView {
 
     /**
-     * Sets the light level at the given position. the value is usually bounded by {@link org.terasology.world.chunks.ChunkConstants#MAX_LIGHT}
+     * Sets the light level at the given position. the value is usually bounded by {@link org.terasology.world.chunks.Chunks#MAX_LIGHT}
      *
      * @param pos   The position relative to the corner of the chunk
      * @param light set the light value of a block.
@@ -17,7 +17,7 @@ public interface ChunkViewCore extends ChunkView {
     void setLight(Vector3ic pos, byte light);
 
     /**
-     * Sets the light level at the given coordinates. the value is usually bounded by {@link org.terasology.world.chunks.ChunkConstants#MAX_LIGHT}
+     * Sets the light level at the given coordinates. the value is usually bounded by {@link org.terasology.world.chunks.Chunks#MAX_LIGHT}
      *
      * @param blockX X offset from the corner of the chunk
      * @param blockY Y offset from the corner of the chunk
@@ -28,7 +28,7 @@ public interface ChunkViewCore extends ChunkView {
 
 
     /**
-     * Sets the sunlight level at the given position. the value is usually bounded by {@link org.terasology.world.chunks.ChunkConstants#MAX_SUNLIGHT}
+     * Sets the sunlight level at the given position. the value is usually bounded by {@link org.terasology.world.chunks.Chunks#MAX_SUNLIGHT}
      *
      * @param pos   The position relative to the corner of the chunk
      * @param light set the sunlight light value of a block.
@@ -37,7 +37,7 @@ public interface ChunkViewCore extends ChunkView {
 
 
     /**
-     * Sets the sunlight level at the given coordinates. the value is usually bounded by {@link org.terasology.world.chunks.ChunkConstants#MAX_SUNLIGHT}
+     * Sets the sunlight level at the given coordinates. the value is usually bounded by {@link org.terasology.world.chunks.Chunks#MAX_SUNLIGHT}
      *
      * @param blockX X offset from the corner of the chunk
      * @param blockY Y offset from the corner of the chunk
