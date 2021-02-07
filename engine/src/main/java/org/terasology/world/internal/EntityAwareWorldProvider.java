@@ -286,7 +286,7 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
 
         Optional<Prefab> oldPrefab = oldType.getPrefab();
         EntityBuilder oldEntityBuilder = entityManager.newBuilder(oldPrefab.orElse(null));
-        oldEntityBuilder.addComponent(new BlockComponent(oldType, blockComponent.position));
+        oldEntityBuilder.addComponent(new BlockComponent(oldType, blockComponent.getPosition()));
         BeforeEntityCreated oldEntityEvent = new BeforeEntityCreated(oldPrefab.orElse(null), oldEntityBuilder.iterateComponents());
         blockEntity.send(oldEntityEvent);
         for (Component comp : oldEntityEvent.getResultComponents()) {
@@ -295,7 +295,7 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
 
         Optional<Prefab> newPrefab = type.getPrefab();
         EntityBuilder newEntityBuilder = entityManager.newBuilder(newPrefab.orElse(null));
-        newEntityBuilder.addComponent(new BlockComponent(type, blockComponent.position));
+        newEntityBuilder.addComponent(new BlockComponent(type, blockComponent.getPosition()));
         BeforeEntityCreated newEntityEvent = new BeforeEntityCreated(newPrefab.orElse(null), newEntityBuilder.iterateComponents());
         blockEntity.send(newEntityEvent);
         for (Component comp : newEntityEvent.getResultComponents()) {
@@ -417,8 +417,8 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
     @ReceiveEvent(components = {BlockComponent.class})
     public void onDeactivateBlock(BeforeDeactivateComponent event, EntityRef entity) {
         BlockComponent block = entity.getComponent(BlockComponent.class);
-        if (blockEntityLookup.get(block.getPosition(new Vector3i())) == entity) {
-            blockEntityLookup.remove(block.getPosition(new Vector3i()));
+        if (blockEntityLookup.get(block.getPosition()) == entity) {
+            blockEntityLookup.remove(block.getPosition());
         }
     }
 
@@ -517,7 +517,8 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
         if (entityManager.getComponentLibrary().getMetadata(component).isForceBlockActive()) {
             BlockComponent blockComp = entity.getComponent(BlockComponent.class);
             if (blockComp != null) {
-                Block block = getBlock(blockComp.position.x, blockComp.position.y, blockComp.position.z);
+                Vector3ic blockPosition = blockComp.getPosition();
+                Block block = getBlock(blockPosition.x(), blockPosition.y(), blockPosition.z());
                 if (isTemporaryBlock(entity, block, component)) {
                     temporaryBlockEntities.add(entity);
                 }

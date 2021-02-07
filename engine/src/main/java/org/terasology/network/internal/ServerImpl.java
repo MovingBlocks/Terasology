@@ -318,7 +318,7 @@ public class ServerImpl implements Server {
     private void processInvalidatedChunks(NetData.NetMessage message) {
         for (NetData.InvalidateChunkMessage chunk : message.getInvalidateChunkList()) {
             Vector3i chunkPos = NetMessageUtil.convert(chunk.getPos());
-            remoteWorldProvider.invalidateChunks(JomlUtil.from(chunkPos));
+            remoteWorldProvider.invalidateChunks(chunkPos);
             awaitingChunkReadyBlockUpdates.removeAll(chunkPos);
             awaitingChunkReadyExtraDataUpdates.removeAll(chunkPos);
         }
@@ -367,7 +367,7 @@ public class ServerImpl implements Server {
             entitySerializer.deserializeOnto(currentEntity, updateEntity.getEntity());
             BlockComponent blockComponent = currentEntity.getComponent(BlockComponent.class);
             if (blockComponent != null && !blockEntityBefore) {
-                if (!blockEntityRegistry.getExistingBlockEntityAt(blockComponent.getPosition(new Vector3i())).equals(currentEntity)) {
+                if (!blockEntityRegistry.getExistingBlockEntityAt(blockComponent.getPosition()).equals(currentEntity)) {
                     logger.error("Failed to associated new block entity");
                 }
             }

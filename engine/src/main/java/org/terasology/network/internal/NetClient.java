@@ -55,6 +55,7 @@ import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockComponent;
 import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.chunks.Chunk;
+import org.terasology.world.chunks.Chunks;
 
 import java.util.Arrays;
 import java.util.Iterator;
@@ -335,9 +336,9 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
         try {
             BlockComponent blockComp = target.getComponent(BlockComponent.class);
             if (blockComp != null) {
-                if (relevantChunks.contains(ChunkMath.calcChunkPos(JomlUtil.from(blockComp.position), new Vector3i()))) {
+                if (relevantChunks.contains(Chunks.toChunkPos(blockComp.getPosition(), new Vector3i()))) {
                     queuedOutgoingEvents.add(NetData.EventMessage.newBuilder()
-                        .setTargetBlockPos(NetMessageUtil.convert(blockComp.position))
+                        .setTargetBlockPos(NetMessageUtil.convert(blockComp.getPosition()))
                         .setEvent(eventSerializer.serialize(event)).build());
                 }
             } else {
@@ -493,7 +494,7 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
             NetData.CreateEntityMessage.Builder createMessage = NetData.CreateEntityMessage.newBuilder().setEntity(entityData);
             BlockComponent blockComponent = entity.getComponent(BlockComponent.class);
             if (blockComponent != null) {
-                createMessage.setBlockPos(NetMessageUtil.convert(blockComponent.position));
+                createMessage.setBlockPos(NetMessageUtil.convert(blockComponent.getPosition()));
             }
             message.addCreateEntity(createMessage);
         }
