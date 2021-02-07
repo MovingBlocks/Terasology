@@ -16,6 +16,8 @@ import org.joml.Vector4ic;
 import org.reflections.Reflections;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.entitySystem.prefab.Prefab;
+import org.terasology.joml.geom.Rectanglef;
+import org.terasology.joml.geom.Rectanglei;
 import org.terasology.math.IntegerRange;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector2f;
@@ -44,6 +46,8 @@ import org.terasology.persistence.typeHandling.mathTypes.BlockRegionTypeHandler;
 import org.terasology.persistence.typeHandling.mathTypes.IntegerRangeHandler;
 import org.terasology.persistence.typeHandling.mathTypes.QuaternionfTypeHandler;
 import org.terasology.persistence.typeHandling.mathTypes.QuaternionfcTypeHandler;
+import org.terasology.persistence.typeHandling.mathTypes.RectanglefTypeHandler;
+import org.terasology.persistence.typeHandling.mathTypes.RectangleiTypeHandler;
 import org.terasology.persistence.typeHandling.mathTypes.Vector2fTypeHandler;
 import org.terasology.persistence.typeHandling.mathTypes.Vector2fcTypeHandler;
 import org.terasology.persistence.typeHandling.mathTypes.Vector2iTypeHandler;
@@ -149,6 +153,9 @@ public class TypeHandlerLibraryImpl extends TypeHandlerLibrary {
 
         serializationLibrary.addTypeHandler(org.joml.Vector4i.class, new Vector4iTypeHandler());
         serializationLibrary.addTypeHandler(Vector4ic.class, new Vector4icTypeHandler());
+
+        serializationLibrary.addTypeHandler(Rectanglei.class, new RectangleiTypeHandler());
+        serializationLibrary.addTypeHandler(Rectanglef.class, new RectanglefTypeHandler());
 
         serializationLibrary.addTypeHandler(AABBi.class, new AABBiTypeHandler());
         serializationLibrary.addTypeHandler(AABBf.class, new AABBfTypeHandler());

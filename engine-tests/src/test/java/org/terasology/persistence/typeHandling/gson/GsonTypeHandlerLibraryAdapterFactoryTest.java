@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Test;
 import org.reflections.Reflections;
 import org.terasology.joml.geom.Rectanglei;
 import org.terasology.nui.Color;
-import org.terasology.nui.util.RectUtility;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.persistence.typeHandling.TypeHandlerLibraryImpl;
 
@@ -23,17 +22,17 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class GsonTypeHandlerLibraryAdapterFactoryTest {
     private static final TestClass OBJECT = new TestClass(
             new Color(0xDEADBEEF),
-            ImmutableSet.of(new Vector4f(), new Vector4f(1,1,1,1)),
+            ImmutableSet.of(new Vector4f(0,0,0,0), new Vector4f(1,1,1,1)),
             ImmutableMap.of(
                     "someRect",
-                    RectUtility.createFromMinAndSize(-3, -3, 10, 10)
+                    new Rectanglei(-3, -3).setSize(10, 10)
             ),
             ImmutableMap.of(0, 1, 1, 0),
             -0xDECAF
     );
 
     private static final String OBJECT_JSON = "{\"color\":[222,173,190,239],\"vector4fs\":[[0.0,0.0,0.0,0.0]," +
-            "[1.0,1.0,1.0,1.0]],\"rect2iMap\":{\"someRect\":{\"min\":[-3,-3],\"size\":[10,10]}},\"i\":-912559}";
+            "[1.0,1.0,1.0,1.0]],\"rect2iMap\":{\"someRect\":{\"min\":[-3,-3],\"max\":[7,7]}},\"i\":-912559}";
 
     private final Reflections reflections = new Reflections(getClass().getClassLoader());
 
