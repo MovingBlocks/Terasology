@@ -1,4 +1,4 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
 // Dependencies needed for what our Gradle scripts themselves use. It cannot be included via an external Gradle file :-(
@@ -36,6 +36,8 @@ plugins {
     id "idea"
     // For the "Build and run using: Intellij IDEA | Gradle" switch
     id "org.jetbrains.gradle.plugin.idea-ext" version "0.8.1"
+
+    id("io.qameta.allure") version "2.8.1"
 }
 
 
@@ -229,6 +231,19 @@ project(":modules").subprojects.forEach { proj ->
 tasks.named('wrapper') {
     // ALL distributionType because IntelliJ prefers having its sources for analysis and reference.
     distributionType = Wrapper.DistributionType.ALL
+}
+
+
+////////////////
+// Reporting
+//////////////
+
+allure {
+    version = "2.9.0"
+}
+
+tasks.register("allureMultiServe", io.qameta.allure.gradle.task.AllureServe) {
+    resultsDirs = rootProject.getSubprojects().collect {it.allure.resultsDir }
 }
 
 

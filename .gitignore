@@ -102,3 +102,6 @@ blacklist.json
 terasology.jfr
 local.properties
 *.hprof
+
+# Allure error dumps
+ajcore.*.txt
