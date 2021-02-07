@@ -76,7 +76,7 @@ public class Border3D {
     }
 
     /**
-     * Same as {@code {@link #expandTo2D(BlockRegionc)}} but with a Vector3i instead of a Region3i.
+     * Same as {@code {@link #expandTo2D(BlockRegionc)}} but with a Vector3i instead of a BlockRegionc.
      * @param size The size used.
      * @return The 2D representation with the additional space added to it with the additional space added to it in the 3 dimensions.
      */
@@ -96,7 +96,7 @@ public class Border3D {
     }
 
     /**
-     * Same as {@code {@link #expandTo3D(BlockRegionc)}}} but with a Vector3i instead of a Region3i.
+     * Same as {@code {@link #expandTo3D(BlockRegionc)}}} but with a Vector3i instead of a BlockRegionc.
      * @param size The size to be used.
      * @return The 3D world representation with the additional space added to it in the 3 dimensions.
      */

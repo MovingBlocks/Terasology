@@ -19,7 +19,6 @@ import com.google.common.collect.Maps;
 import org.joml.Vector3ic;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.math.JomlUtil;
-import org.terasology.math.Region3i;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.world.WorldChangeListener;
 import org.terasology.world.block.Block;
@@ -100,26 +99,7 @@ public interface WorldProviderCore {
      */
     boolean isBlockRelevant(int x, int y, int z);
 
-    @Deprecated
-    default boolean isRegionRelevant(Region3i region) {
-        return isRegionRelevant(JomlUtil.from(region));
-    }
-
     boolean isRegionRelevant(BlockRegionc region);
-
-    /**
-     * Places a block of a specific type at a given position
-     *
-     * @param pos  The world position to change
-     * @param type The type of the block to set
-     * @return The previous block type. Null if the change failed (because the necessary chunk was not loaded)
-     * @deprecated This is scheduled for removal in an upcoming version
-     *             method will be replaced with JOML implementation {@link #setBlock(Vector3ic, Block)}.
-     */
-    @Deprecated
-    default Block setBlock(Vector3i pos, Block type) {
-        return setBlock(JomlUtil.from(pos), type);
-    }
 
     /**
      * Places a block of a specific type at a given position
