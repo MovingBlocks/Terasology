@@ -17,16 +17,12 @@ package org.terasology.world.chunks.internal;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
+import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.joml.geom.AABBf;
 import org.terasology.joml.geom.AABBfc;
-import org.terasology.math.AABB;
-import org.terasology.math.JomlUtil;
-import org.terasology.math.geom.BaseVector3i;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.monitoring.chunk.ChunkMonitor;
 import org.terasology.protobuf.EntityData;
 import org.terasology.rendering.primitives.ChunkMesh;
@@ -89,14 +85,14 @@ public class ChunkImpl implements Chunk {
         this(new Vector3i(x, y, z), blockManager, extraDataManager);
     }
 
-    public ChunkImpl(Vector3i chunkPos, BlockManager blockManager, ExtraBlockDataManager extraDataManager) {
+    public ChunkImpl(Vector3ic chunkPos, BlockManager blockManager, ExtraBlockDataManager extraDataManager) {
         this(chunkPos,
-                new TeraDenseArray16Bit(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z),
-                extraDataManager.makeDataArrays(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z),
-                blockManager);
+            new TeraDenseArray16Bit(Chunks.SIZE_X, Chunks.SIZE_Y, Chunks.SIZE_Z),
+            extraDataManager.makeDataArrays(Chunks.SIZE_X, Chunks.SIZE_Y, Chunks.SIZE_Z),
+            blockManager);
     }
 
-    public ChunkImpl(Vector3i chunkPos, TeraArray blocks, TeraArray[] extra, BlockManager blockManager) {
+    public ChunkImpl(Vector3ic chunkPos, TeraArray blocks, TeraArray[] extra, BlockManager blockManager) {
         this.chunkPos.set(Preconditions.checkNotNull(chunkPos));
         this.blockData = Preconditions.checkNotNull(blocks);
         this.extraData = Preconditions.checkNotNull(extra);
@@ -106,16 +102,16 @@ public class ChunkImpl implements Chunk {
         dirty = true;
         this.blockManager = blockManager;
         region = new BlockRegion(
-                chunkPos.x * ChunkConstants.SIZE_X,
-                chunkPos.y * ChunkConstants.SIZE_Y,
-                chunkPos.z * ChunkConstants.SIZE_Z)
-                .setSize(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z);
+            chunkPos.x() * Chunks.SIZE_X,
+            chunkPos.y() * Chunks.SIZE_Y,
+            chunkPos.z() * Chunks.SIZE_Z)
+            .setSize(Chunks.SIZE_X, Chunks.SIZE_Y, Chunks.SIZE_Z);
         ChunkMonitor.fireChunkCreated(this);
     }
 
     @Override
-    public Vector3i getPosition() {
-        return new Vector3i(chunkPos);
+    public Vector3ic getPosition() {
+        return chunkPos;
     }
 
     @Override
@@ -140,17 +136,12 @@ public class ChunkImpl implements Chunk {
             extraDataSize += extraDatum.getEstimatedMemoryConsumptionInBytes();
         }
         return blockData.getEstimatedMemoryConsumptionInBytes()
-                + sunlightData.getEstimatedMemoryConsumptionInBytes()
-                + sunlightRegenData.getEstimatedMemoryConsumptionInBytes()
-                + lightData.getEstimatedMemoryConsumptionInBytes()
-                + extraDataSize;
+            + sunlightData.getEstimatedMemoryConsumptionInBytes()
+            + sunlightRegenData.getEstimatedMemoryConsumptionInBytes()
+            + lightData.getEstimatedMemoryConsumptionInBytes()
+            + extraDataSize;
     }
 
-    @Override
-    public final Block getBlock(BaseVector3i pos) {
-        short id = (short) blockData.get(pos.x(), pos.y(), pos.z());
-        return blockManager.getBlock(id);
-    }
 
     @Override
     public Block getBlock(Vector3ic pos) {
@@ -177,11 +168,6 @@ public class ChunkImpl implements Chunk {
     }
 
     @Override
-    public Block setBlock(BaseVector3i pos, Block block) {
-        return setBlock(pos.x(), pos.y(), pos.z(), block);
-    }
-
-    @Override
     public Block setBlock(Vector3ic pos, Block block) {
         return setBlock(pos.x(), pos.y(), pos.z(), block);
     }
@@ -203,7 +189,7 @@ public class ChunkImpl implements Chunk {
 
     @Override
     public boolean setSunlight(int x, int y, int z, byte amount) {
-        Preconditions.checkArgument(amount >= 0 && amount <= ChunkConstants.MAX_SUNLIGHT);
+        Preconditions.checkArgument(amount >= 0 && amount <= Chunks.MAX_SUNLIGHT);
         return sunlightData.set(x, y, z, amount) != amount;
     }
 
@@ -224,7 +210,7 @@ public class ChunkImpl implements Chunk {
 
     @Override
     public boolean setSunlightRegen(int x, int y, int z, byte amount) {
-        Preconditions.checkArgument(amount >= 0 && amount <= ChunkConstants.MAX_SUNLIGHT_REGEN);
+        Preconditions.checkArgument(amount >= 0 && amount <= Chunks.MAX_SUNLIGHT_REGEN);
         return sunlightRegenData.set(x, y, z, amount) != amount;
     }
 
@@ -245,18 +231,13 @@ public class ChunkImpl implements Chunk {
 
     @Override
     public boolean setLight(int x, int y, int z, byte amount) {
-        Preconditions.checkArgument(amount >= 0 && amount <= ChunkConstants.MAX_LIGHT);
+        Preconditions.checkArgument(amount >= 0 && amount <= Chunks.MAX_LIGHT);
         return lightData.set(x, y, z, amount) != amount;
     }
 
     @Override
     public int getExtraData(int index, int x, int y, int z) {
         return extraData[index].get(x, y, z);
-    }
-
-    @Override
-    public int getExtraData(int index, BaseVector3i pos) {
-        return getExtraData(index, pos.x(), pos.y(), pos.z());
     }
 
     @Override
@@ -278,17 +259,7 @@ public class ChunkImpl implements Chunk {
     }
 
     @Override
-    public void setExtraData(int index, BaseVector3i pos, int value) {
-        setExtraData(index, pos.x(), pos.y(), pos.z(), value);
-    }
-
-    @Override
-    public Vector3i getChunkWorldOffset() {
-        return new Vector3i(getChunkWorldOffsetX(), getChunkWorldOffsetY(), getChunkWorldOffsetZ());
-    }
-
-    @Override
-    public org.joml.Vector3i getChunkWorldOffset(org.joml.Vector3i dest) {
+    public Vector3i getChunkWorldOffset(Vector3i dest) {
         return dest.set(getChunkWorldOffsetX(), getChunkWorldOffsetY(), getChunkWorldOffsetZ());
     }
 
@@ -308,22 +279,12 @@ public class ChunkImpl implements Chunk {
     }
 
     @Override
-    public Vector3i chunkToWorldPosition(BaseVector3i blockPos) {
-        return chunkToWorldPosition(blockPos.x(), blockPos.y(), blockPos.z());
-    }
-
-    @Override
-    public org.joml.Vector3i chunkToWorldPosition(Vector3ic blockPos, org.joml.Vector3i dest) {
+    public Vector3i chunkToWorldPosition(Vector3ic blockPos, Vector3i dest) {
         return chunkToWorldPosition(blockPos.x(), blockPos.y(), blockPos.z(), dest);
     }
 
     @Override
-    public Vector3i chunkToWorldPosition(int x, int y, int z) {
-        return new Vector3i(chunkToWorldPositionX(x), chunkToWorldPositionY(y), chunkToWorldPositionZ(z));
-    }
-
-    @Override
-    public org.joml.Vector3i chunkToWorldPosition(int x, int y, int z, org.joml.Vector3i dest) {
+    public Vector3i chunkToWorldPosition(int x, int y, int z, Vector3i dest) {
         return dest.set(chunkToWorldPositionX(x), chunkToWorldPositionY(y), chunkToWorldPositionZ(z));
     }
 
@@ -345,9 +306,7 @@ public class ChunkImpl implements Chunk {
     @Override
     public AABBfc getAABB() {
         if (!aabb.isValid()) {
-            org.joml.Vector3f min = JomlUtil.from(getChunkWorldOffset().toVector3f());
-            org.joml.Vector3f max = new org.joml.Vector3f(Chunks.CHUNK_SIZE).add(min);
-            aabb = new AABBf(min, max);
+            region.getBounds(aabb);
         }
         return aabb;
     }
@@ -386,19 +345,19 @@ public class ChunkImpl implements Chunk {
             double totalPercent = 100d - (100d / totalSize * totalReduced);
 
             logger.debug("chunk {}: " +
-                            "size-before: {} " +
-                            "bytes, size-after: {} " +
-                            "bytes, total-deflated-by: {}%, " +
-                            "blocks-deflated-by={}%, " +
-                            "light-deflated-by={}%, " +
-                            "extra-data-deflated-by={}%",
-                    chunkPos,
-                    SIZE_FORMAT.format(totalSize),
-                    SIZE_FORMAT.format(totalReduced),
-                    PERCENT_FORMAT.format(totalPercent),
-                    PERCENT_FORMAT.format(blocksPercent),
-                    PERCENT_FORMAT.format(lightPercent),
-                    PERCENT_FORMAT.format(extraPercent));
+                    "size-before: {} " +
+                    "bytes, size-after: {} " +
+                    "bytes, total-deflated-by: {}%, " +
+                    "blocks-deflated-by={}%, " +
+                    "light-deflated-by={}%, " +
+                    "extra-data-deflated-by={}%",
+                chunkPos,
+                SIZE_FORMAT.format(totalSize),
+                SIZE_FORMAT.format(totalReduced),
+                PERCENT_FORMAT.format(totalPercent),
+                PERCENT_FORMAT.format(blocksPercent),
+                PERCENT_FORMAT.format(lightPercent),
+                PERCENT_FORMAT.format(extraPercent));
             ChunkMonitor.fireChunkDeflated(this, totalSize, totalReduced);
         } else {
             final int oldSize = getEstimatedMemoryConsumptionInBytes();
@@ -433,17 +392,17 @@ public class ChunkImpl implements Chunk {
             double totalPercent = 100d - (100d / totalSize * totalReduced);
 
             logger.debug("chunk {}: " +
-                            "size-before: {} " +
-                            "bytes, size-after: {} " +
-                            "bytes, total-deflated-by: {}%, " +
-                            "sunlight-deflated-by={}%, " +
-                            "sunlight-regen-deflated-by={}%",
-                    chunkPos,
-                    SIZE_FORMAT.format(totalSize),
-                    SIZE_FORMAT.format(totalReduced),
-                    PERCENT_FORMAT.format(totalPercent),
-                    PERCENT_FORMAT.format(sunlightPercent),
-                    PERCENT_FORMAT.format(sunlightRegenPercent));
+                    "size-before: {} " +
+                    "bytes, size-after: {} " +
+                    "bytes, total-deflated-by: {}%, " +
+                    "sunlight-deflated-by={}%, " +
+                    "sunlight-regen-deflated-by={}%",
+                chunkPos,
+                SIZE_FORMAT.format(totalSize),
+                SIZE_FORMAT.format(totalReduced),
+                PERCENT_FORMAT.format(totalPercent),
+                PERCENT_FORMAT.format(sunlightPercent),
+                PERCENT_FORMAT.format(sunlightRegenPercent));
             ChunkMonitor.fireChunkDeflated(this, totalSize, totalReduced);
         } else {
             final int oldSize = getEstimatedMemoryConsumptionInBytes();
@@ -578,12 +537,12 @@ public class ChunkImpl implements Chunk {
 
     @Override
     public ChunkBlockIterator getBlockIterator() {
-        return new ChunkBlockIteratorImpl(blockManager, getChunkWorldOffset(), blockData);
+        return new ChunkBlockIteratorImpl(blockManager, getChunkWorldOffset(new Vector3i()), blockData);
     }
 
     @Override
     public EntityData.ChunkStore.Builder encode() {
-        return ChunkSerializer.encode(JomlUtil.from(chunkPos), blockData, extraData);
+        return ChunkSerializer.encode(chunkPos, blockData, extraData);
     }
 
     /**
@@ -604,10 +563,9 @@ public class ChunkImpl implements Chunk {
      * @return an encoded version of the snapshot taken with {@link #createSnapshot()}.
      */
     public EntityData.ChunkStore.Builder encodeAndReleaseSnapshot() {
-        EntityData.ChunkStore.Builder result = ChunkSerializer.encode(JomlUtil.from(chunkPos), blockDataSnapshot, extraDataSnapshots);
+        EntityData.ChunkStore.Builder result = ChunkSerializer.encode(chunkPos, blockDataSnapshot, extraDataSnapshots);
         this.blockDataSnapshot = null;
         this.extraDataSnapshots = null;
         return result;
     }
-
 }

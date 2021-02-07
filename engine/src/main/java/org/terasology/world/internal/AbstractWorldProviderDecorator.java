@@ -16,12 +16,11 @@
 
 package org.terasology.world.internal;
 
+import com.google.common.collect.ImmutableList;
 import org.joml.Vector3ic;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.world.WorldChangeListener;
 import org.terasology.world.block.Block;
-import org.terasology.world.block.BlockRegion;
 import org.terasology.world.block.BlockRegionc;
 import org.terasology.world.time.WorldTime;
 
@@ -144,7 +143,7 @@ public class AbstractWorldProviderDecorator implements WorldProviderCore {
     }
 
     @Override
-    public Collection<BlockRegion> getRelevantRegions() {
+    public Collection<BlockRegionc> getRelevantRegions() {
         return base.getRelevantRegions();
     }
 

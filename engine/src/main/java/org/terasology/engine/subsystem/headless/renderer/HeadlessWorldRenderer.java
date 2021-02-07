@@ -266,7 +266,7 @@ public class HeadlessWorldRenderer implements WorldRenderer {
     }
 
     private float distanceToCamera(RenderableChunk chunk) {
-        Vector3f result = new Vector3f((chunk.getPosition().x + 0.5f) * Chunks.SIZE_X, 0, (chunk.getPosition().z + 0.5f) * Chunks.SIZE_Z);
+        Vector3f result = new Vector3f((chunk.getPosition().x() + 0.5f) * Chunks.SIZE_X, 0, (chunk.getPosition().z() + 0.5f) * Chunks.SIZE_Z);
 
         org.joml.Vector3f cameraPos = getActiveCamera().getPosition();
         result.x -= cameraPos.x;
