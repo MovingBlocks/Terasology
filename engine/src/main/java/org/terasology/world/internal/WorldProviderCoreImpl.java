@@ -1,12 +1,10 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.world.internal;
 
-import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.FluentIterable;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.joml.Vector3i;
@@ -15,8 +13,6 @@ import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.math.ChunkMath;
-import org.terasology.math.JomlUtil;
 import org.terasology.world.WorldChangeListener;
 import org.terasology.world.WorldComponent;
 import org.terasology.world.block.Block;
@@ -68,7 +64,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
 
     private final List<WorldChangeListener> listeners = Lists.newArrayList();
 
-    private final Map<org.terasology.math.geom.Vector3i, BlockChange> blockChanges = Maps.newHashMap();
+    private final Map<Vector3i, BlockChange> blockChanges = Maps.newHashMap();
     private List<BatchPropagator> propagators = Lists.newArrayList();
 
     private Block unloadedBlock;
@@ -187,9 +183,9 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
             Vector3i blockPos = Chunks.toRelative(worldPos, new Vector3i());
             Block oldBlockType = chunk.setBlock(blockPos, type);
             if (oldBlockType != type) {
-                BlockChange oldChange = blockChanges.get(JomlUtil.from(worldPos));
+                BlockChange oldChange = blockChanges.get(worldPos);
                 if (oldChange == null) {
-                    blockChanges.put(JomlUtil.from(worldPos), new BlockChange(worldPos, oldBlockType, type));
+                    blockChanges.put(new Vector3i(worldPos), new BlockChange(worldPos, oldBlockType, type));
                 } else {
                     oldChange.setTo(type);
                 }
@@ -223,9 +219,9 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
                Chunks.toRelative(worldPos, relativePos);
                 Block oldBlockType = chunk.setBlock(relativePos, type);
                 if (oldBlockType != type) {
-                    BlockChange oldChange = blockChanges.get(JomlUtil.from(worldPos));
+                    BlockChange oldChange = blockChanges.get(worldPos);
                     if (oldChange == null) {
-                        blockChanges.put(JomlUtil.from(worldPos), new BlockChange(worldPos, oldBlockType, type));
+                        blockChanges.put(new Vector3i(worldPos), new BlockChange(worldPos, oldBlockType, type));
                     } else {
                         oldChange.setTo(type);
                     }
@@ -318,21 +314,19 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
 
     @Override
     public int getExtraData(int index, int x, int y, int z) {
-        CoreChunk chunk = chunkProvider.getChunk(ChunkMath.calcChunkPosX(x), ChunkMath.calcChunkPosY(y),
-                ChunkMath.calcChunkPosZ(z));
+        CoreChunk chunk = chunkProvider.getChunk(Chunks.toChunkPos(x, y, z, new Vector3i()));
         if (chunk != null) {
-            return chunk.getExtraData(index, ChunkMath.calcBlockPosX(x), ChunkMath.calcBlockPosY(y),
-                    ChunkMath.calcBlockPosZ(z));
+            return chunk.getExtraData(index, Chunks.toRelative(x, y, z, new Vector3i()));
         }
         return 0;
     }
 
     @Override
     public int setExtraData(int index, Vector3ic worldPos, int value) {
-        org.joml.Vector3i chunkPos = Chunks.toChunkPos(worldPos, new org.joml.Vector3i());
+        Vector3i chunkPos = Chunks.toChunkPos(worldPos, new Vector3i());
         CoreChunk chunk = chunkProvider.getChunk(chunkPos);
         if (chunk != null) {
-            org.joml.Vector3i blockPos = Chunks.toRelative(worldPos, new org.joml.Vector3i());
+            Vector3i blockPos = Chunks.toRelative(worldPos, new Vector3i());
             int oldValue = chunk.getExtraData(index, blockPos.x, blockPos.y, blockPos.z);
             chunk.setExtraData(index, blockPos.x, blockPos.y, blockPos.z, value);
             if (oldValue != value) {

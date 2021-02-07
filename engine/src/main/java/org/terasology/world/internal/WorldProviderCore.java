@@ -1,26 +1,10 @@
-/*
- * Copyright 2013 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.world.internal;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 import org.joml.Vector3ic;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.math.JomlUtil;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.world.WorldChangeListener;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockRegionc;
@@ -83,11 +67,6 @@ public interface WorldProviderCore {
      * @return A world view of the chunks around the desired chunk, uncentered.
      */
     ChunkViewCore getWorldViewAround(Vector3ic chunk);
-
-    @Deprecated
-    default ChunkViewCore getWorldViewAround(Vector3i chunk) {
-        return getWorldViewAround(JomlUtil.from(chunk));
-    }
 
     /**
      * An active block is in a chunk that is available and fully generated.
@@ -181,11 +160,6 @@ public interface WorldProviderCore {
      * @return The replaced value
      */
     int setExtraData(int index, Vector3ic pos, int value);
-
-    @Deprecated
-    default int setExtraData(int index, Vector3i pos, int value) {
-        return setExtraData(index, JomlUtil.from(pos), value);
-    }
 
     /**
      * Disposes this world provider.
