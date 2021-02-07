@@ -1,4 +1,4 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.world.chunks.internal;
 
@@ -8,7 +8,6 @@ import gnu.trove.list.TByteList;
 import gnu.trove.list.array.TByteArrayList;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
-import org.terasology.math.JomlUtil;
 import org.terasology.protobuf.EntityData;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.chunks.Chunk;
@@ -51,7 +50,7 @@ public final class ChunkSerializer {
         for (int i = 0; i < extraData.length; i++) {
             runLengthDecode(message.getExtraData(i), extraData[i]);
         }
-        return new ChunkImpl(JomlUtil.from(pos), blockData, extraData, blockManager);
+        return new ChunkImpl(pos, blockData, extraData, blockManager);
     }
 
     private static EntityData.RunLengthEncoding16 runLengthEncode16(TeraArray array) {

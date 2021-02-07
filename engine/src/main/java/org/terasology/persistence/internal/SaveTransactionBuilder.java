@@ -17,6 +17,7 @@ package org.terasology.persistence.internal;
 
 import com.google.common.collect.Maps;
 import org.joml.Vector3i;
+import org.joml.Vector3ic;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.game.GameManifest;
 import org.terasology.math.JomlUtil;
@@ -81,8 +82,8 @@ class SaveTransactionBuilder {
     }
 
 
-    void addLoadedChunk(final org.terasology.math.geom.Vector3i chunkPosition, final ChunkImpl chunk) {
-        loadedChunks.put(JomlUtil.from(chunkPosition), chunk);
+    void addLoadedChunk(final Vector3ic chunkPosition, final ChunkImpl chunk) {
+        loadedChunks.put(new Vector3i(chunkPosition), chunk);
     }
 
     public SaveTransaction build() {

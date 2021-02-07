@@ -21,7 +21,6 @@ import org.junit.jupiter.api.Test;
 import org.terasology.TerasologyTestingEnvironment;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
-import org.terasology.math.JomlUtil;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
@@ -35,6 +34,7 @@ import org.terasology.world.block.shapes.BlockShape;
 import org.terasology.world.block.tiles.NullWorldAtlas;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkConstants;
+import org.terasology.world.chunks.Chunks;
 import org.terasology.world.chunks.blockdata.ExtraBlockDataManager;
 import org.terasology.world.chunks.internal.ChunkImpl;
 import org.terasology.world.internal.ChunkViewCore;
@@ -145,10 +145,10 @@ public class ChunkViewTest extends TerasologyTestingEnvironment {
 
         ChunkViewCoreImpl chunkView = new ChunkViewCoreImpl(chunks,
             new BlockRegion(1, 0, 1).expand(1, 0, 1), new Vector3i(1, 1, 1), airBlock);
-        assertEquals(new Vector3i(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z), chunkView.toWorldPos(new Vector3i()));
+        assertEquals(new Vector3i(Chunks.SIZE_X, Chunks.SIZE_Y, Chunks.SIZE_Z), chunkView.toWorldPos(new Vector3i()));
     }
 
     private Chunk createChunk(int x, int y, int z) {
-        return new ChunkImpl(JomlUtil.from(new Vector3i(x, y, z)), blockManager, extraDataManager);
+        return new ChunkImpl(new Vector3i(x, y, z), blockManager, extraDataManager);
     }
 }
