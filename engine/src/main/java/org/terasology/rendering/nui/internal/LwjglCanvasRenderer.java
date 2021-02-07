@@ -1,4 +1,4 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.rendering.nui.internal;
@@ -9,6 +9,7 @@ import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Quaternionfc;
 import org.joml.Vector2f;
+import org.joml.Vector2i;
 import org.joml.Vector2ic;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
@@ -23,9 +24,7 @@ import org.terasology.engine.subsystem.DisplayDevice;
 import org.terasology.joml.geom.AABBfc;
 import org.terasology.joml.geom.Rectanglef;
 import org.terasology.joml.geom.Rectanglei;
-import org.terasology.math.JomlUtil;
 import org.terasology.math.TeraMath;
-import org.terasology.math.geom.Vector2i;
 import org.terasology.nui.Border;
 import org.terasology.nui.Colorc;
 import org.terasology.nui.HorizontalAlign;
@@ -265,7 +264,7 @@ public class LwjglCanvasRenderer implements TerasologyCanvasRenderer, PropertyCh
             if (frameBufferObject != null) {
                 frameBufferObject.dispose();
             }
-            frameBufferObject = new LwjglFrameBufferObject(displayDevice, urn, JomlUtil.from(size));
+            frameBufferObject = new LwjglFrameBufferObject(displayDevice, urn, size);
             fboMap.put(urn, frameBufferObject);
         }
         return frameBufferObject;
@@ -292,7 +291,7 @@ public class LwjglCanvasRenderer implements TerasologyCanvasRenderer, PropertyCh
         Mesh mesh = billboard;
         switch (mode) {
             case TILED: {
-                Vector2i textureSize = JomlUtil.from(texture.size());
+                Vector2i textureSize = texture.size();
                 TextureCacheKey key = new TextureCacheKey(textureSize, new Vector2i(absoluteRegion.lengthX(),absoluteRegion.lengthY()));
                 usedTextures.add(key);
                 mesh = cachedTextures.get(key);
