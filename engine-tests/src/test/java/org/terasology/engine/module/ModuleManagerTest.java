@@ -13,7 +13,6 @@ import java.net.URL;
 import java.nio.file.Paths;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assumptions.assumeTrue;
 import static org.terasology.engine.TerasologyConstants.MODULE_INFO_FILENAME;
 
 public class ModuleManagerTest {
@@ -28,7 +27,7 @@ public class ModuleManagerTest {
         loader.setModuleInfoPath(MODULE_INFO_FILENAME);
 
         URL url = getClass().getResource(jarLocation);
-        assumeTrue(url != null, "test resource not found:" + jarLocation);
+        assertNotNull(url, "test resource not found:" + jarLocation);
         URL jarUrl = new URL("jar", null, url.toString() + "!/" + MODULE_INFO_FILENAME);
 
         assertNotNull(mm.load(loader, jarUrl));
@@ -42,7 +41,7 @@ public class ModuleManagerTest {
         loader.setModuleInfoPath(MODULE_INFO_FILENAME);
 
         URL url = getClass().getResource(Paths.get(sourceLocation).resolve(MODULE_INFO_FILENAME).toString());
-        assumeTrue(url != null, "test resource not found:" + sourceLocation);
+        assertNotNull(url, "test resource not found:" + sourceLocation);
 
         assertNotNull(mm.load(loader, url));
     }
