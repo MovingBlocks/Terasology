@@ -10,6 +10,7 @@ import org.terasology.module.ModuleLoader;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Paths;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
@@ -21,7 +22,7 @@ public class ModuleManagerTest {
             "testdummy-1.0.0-SNAPSHOT.jar",
             "messy-name-directory & $t#f/testmessy-1.0.0-SNAPSHOT.jar"
     })
-    void testLoadModuleFromURL(String jarLocation) throws IOException, URISyntaxException {
+    void testLoadModuleFromJarURL(String jarLocation) throws IOException, URISyntaxException {
         ModuleManagerImpl mm = new ThisModuleManager("");
         ModuleLoader loader = new ModuleLoader();
         loader.setModuleInfoPath(MODULE_INFO_FILENAME);
@@ -31,6 +32,20 @@ public class ModuleManagerTest {
         URL jarUrl = new URL("jar", null, url.toString() + "!/" + MODULE_INFO_FILENAME);
 
         assertNotNull(mm.load(loader, jarUrl));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = "Spacey Parent/SourceModuleFixture/")
+    void testLoadModuleFromFileURL(String sourceLocation) throws IOException, URISyntaxException {
+        ModuleManagerImpl mm = new ThisModuleManager("");
+        ModuleLoader loader = new ModuleLoader();
+        loader.setModuleInfoPath(MODULE_INFO_FILENAME);
+
+        URL url = getClass().getResource("/org/terasology/engine/module/" +
+                Paths.get(sourceLocation).resolve(MODULE_INFO_FILENAME));
+        assumeTrue(url != null, "test resource not found:" + sourceLocation);
+
+        assertNotNull(mm.load(loader, url));
     }
 
     private static class ThisModuleManager extends ModuleManagerImpl {

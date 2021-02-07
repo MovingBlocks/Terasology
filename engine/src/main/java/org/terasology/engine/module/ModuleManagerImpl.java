@@ -40,6 +40,7 @@ import java.lang.reflect.ReflectPermission;
 import java.net.JarURLConnection;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.Policy;
@@ -143,7 +144,7 @@ public class ModuleManagerImpl implements ModuleManager {
             Module module;
             try {
                 module = load(loader, url);
-            } catch (ClassCastException | IOException | URISyntaxException e) {
+            } catch (IOException | URISyntaxException e) {
                 logger.warn("Failed to load classpath module {}", url, e);
                 continue;
             }
@@ -155,10 +156,16 @@ public class ModuleManagerImpl implements ModuleManager {
     }
 
     Module load(ModuleLoader loader, URL url) throws IOException, URISyntaxException {
-        JarURLConnection connection = (JarURLConnection) url.openConnection();
-        Path jarPath = Paths.get(connection.getJarFileURL().toURI());
+        Path modulePath;
+        URLConnection connection = url.openConnection();
 
-        Module module = loader.load(jarPath);
+        if (connection instanceof JarURLConnection) {
+            modulePath = Paths.get(((JarURLConnection) connection).getJarFileURL().toURI());
+        } else {
+            modulePath = Paths.get(url.toURI()).getParent();
+        }
+
+        Module module = loader.load(modulePath);
 
         // if the display name is empty or the id is null, this probably isn't a Terasology module
         if (null == module.getId() || module.getMetadata().getDisplayName().toString().isEmpty()) {
