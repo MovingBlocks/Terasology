@@ -2,14 +2,13 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.rendering.cameras;
 
-import org.terasology.joml.geom.AABBf;
+import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.lwjgl.BufferUtils;
 import org.terasology.joml.geom.AABBfc;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.AABB;
 import org.terasology.math.JomlUtil;
-import org.terasology.math.geom.Vector3f;
 import org.terasology.registry.CoreRegistry;
 
 import java.nio.FloatBuffer;
@@ -146,7 +145,7 @@ public class ViewFrustum {
      */
     public boolean intersects(AABBfc aabb) {
 
-        Vector3f cp = JomlUtil.from(CoreRegistry.get(LocalPlayer.class).getViewPosition(new org.joml.Vector3f()));
+        Vector3f cp = CoreRegistry.get(LocalPlayer.class).getViewPosition(new org.joml.Vector3f());
         for (int i = 0; i < 6; i++) {
             if (planes[i].getA() * (aabb.minX() - cp.x) + planes[i].getB() * (aabb.minY() - cp.y)
                 + planes[i].getC() * (aabb.maxZ() - cp.z) + planes[i].getD() > 0) {
@@ -193,7 +192,7 @@ public class ViewFrustum {
      *     {@link #intersects(Vector3fc, float)}.
      */
     public boolean intersects(Vector3f position, float radius) {
-        return intersects(JomlUtil.from(position), radius);
+        return intersects(position, radius);
     }
 
     /**
