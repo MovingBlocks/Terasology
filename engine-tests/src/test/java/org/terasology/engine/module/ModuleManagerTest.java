@@ -27,7 +27,7 @@ public class ModuleManagerTest {
         ModuleLoader loader = new ModuleLoader();
         loader.setModuleInfoPath(MODULE_INFO_FILENAME);
 
-        URL url = getClass().getResource("/org/terasology/engine/module/" + jarLocation);
+        URL url = getClass().getResource(jarLocation);
         assumeTrue(url != null, "test resource not found:" + jarLocation);
         URL jarUrl = new URL("jar", null, url.toString() + "!/" + MODULE_INFO_FILENAME);
 
@@ -41,8 +41,7 @@ public class ModuleManagerTest {
         ModuleLoader loader = new ModuleLoader();
         loader.setModuleInfoPath(MODULE_INFO_FILENAME);
 
-        URL url = getClass().getResource("/org/terasology/engine/module/" +
-                Paths.get(sourceLocation).resolve(MODULE_INFO_FILENAME));
+        URL url = getClass().getResource(Paths.get(sourceLocation).resolve(MODULE_INFO_FILENAME).toString());
         assumeTrue(url != null, "test resource not found:" + sourceLocation);
 
         assertNotNull(mm.load(loader, url));
