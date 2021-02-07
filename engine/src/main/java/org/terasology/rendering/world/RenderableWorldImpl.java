@@ -117,7 +117,7 @@ class RenderableWorldImpl implements RenderableWorld {
     @Override
     public void onChunkLoaded(Vector3ic chunkCoordinates) {
         if (renderableRegion.contains(chunkCoordinates)) {
-            Chunk chunk = chunkProvider.getChunk(JomlUtil.from(chunkCoordinates));
+            Chunk chunk = chunkProvider.getChunk(chunkCoordinates);
             if (chunk != null) {
                 chunksInProximityOfCamera.add(chunk);
                 Collections.sort(chunksInProximityOfCamera, new ChunkFrontToBackComparator());
@@ -168,7 +168,7 @@ class RenderableWorldImpl implements RenderableWorld {
         ChunkMesh newMesh;
         ChunkView localView;
         for (Vector3ic chunkCoordinates : calculateRenderableRegion(renderingConfig.getViewDistance())) {
-            chunk = chunkProvider.getChunk(JomlUtil.from(chunkCoordinates));
+            chunk = chunkProvider.getChunk(chunkCoordinates);
             if (chunk == null) {
                 pregenerationIsComplete = false;
             } else if (chunk.isDirty()) {
@@ -241,7 +241,7 @@ class RenderableWorldImpl implements RenderableWorld {
             boolean chunksHaveBeenAdded = false;
             for (Vector3ic chunkPositionToAdd : newRenderableRegion) {
                 if (!renderableRegion.contains(chunkPositionToAdd)) {
-                    chunk = chunkProvider.getChunk(JomlUtil.from(chunkPositionToAdd));
+                    chunk = chunkProvider.getChunk(chunkPositionToAdd);
                     if (chunk != null) {
                         chunksInProximityOfCamera.add(chunk);
                         chunksHaveBeenAdded = true;
