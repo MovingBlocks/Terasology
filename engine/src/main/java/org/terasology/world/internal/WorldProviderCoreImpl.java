@@ -316,7 +316,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
     public int getExtraData(int index, int x, int y, int z) {
         CoreChunk chunk = chunkProvider.getChunk(Chunks.toChunkPos(x, y, z, new Vector3i()));
         if (chunk != null) {
-            return chunk.getExtraData(index, Chunks.toChunkPos(x, y, z, new Vector3i()));
+            return chunk.getExtraData(index, Chunks.toRelative(x, y, z, new Vector3i()));
         }
         return 0;
     }
