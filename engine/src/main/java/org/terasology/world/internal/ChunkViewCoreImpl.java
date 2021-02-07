@@ -20,7 +20,6 @@ import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.math.JomlUtil;
 import org.terasology.math.TeraMath;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockRegion;
@@ -221,7 +220,10 @@ public class ChunkViewCoreImpl implements ChunkViewCore {
     public void setDirtyAround(BlockRegionc region) {
         BlockRegion tmp = new BlockRegion(region).expand(1, 1, 1);
         for (Vector3ic pos : Chunks.toChunkRegion(tmp, tmp)) {
-            Chunk chunk = chunks[TeraMath.calculate3DArrayIndex(pos.x() + offset.x, pos.y() + offset.y, pos.z() + offset.z, JomlUtil.from(chunkRegion.getSize(new Vector3i())))];
+            int px = pos.x() + offset.x;
+            int py = pos.y() + offset.y;
+            int pz = pos.z() + offset.z;
+            Chunk chunk = chunks[px + chunkRegion.getSizeX() * (pz + chunkRegion.getSizeZ() * py)];
             if (chunk != null) {
                 chunk.setDirty(true);
             }
@@ -239,9 +241,10 @@ public class ChunkViewCoreImpl implements ChunkViewCore {
     }
 
     protected int relChunkIndex(int x, int y, int z) {
-        return TeraMath.calculate3DArrayIndex(Chunks.toChunkPos(x, chunkPower.x) + offset.x,
-                Chunks.toChunkPos(y, chunkPower.y) + offset.y,
-                Chunks.toChunkPos(z, chunkPower.z) + offset.z, JomlUtil.from(chunkRegion.getSize(new Vector3i())));
+        int px = (Chunks.toChunkPos(x, chunkPower.x) + offset.x);
+        int py = Chunks.toChunkPos(y, chunkPower.y) + offset.y;
+        int pz = Chunks.toChunkPos(z, chunkPower.z) + offset.z;
+        return  px + chunkRegion.getSizeX() * (pz + chunkRegion.getSizeZ() * py);
     }
 
     public void setChunkSize(Vector3i chunkSize) {
