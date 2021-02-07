@@ -20,7 +20,6 @@ import com.google.common.collect.ListMultimap;
 import org.joml.Vector2ic;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.terasology.math.geom.BaseVector2i;
 import org.terasology.world.block.BlockRegion;
 import org.terasology.world.generation.Border3D;
 import org.terasology.world.generation.FacetProvider;

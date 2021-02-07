@@ -1,4 +1,4 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.world.chunks.localChunkProvider;
 
@@ -19,9 +19,6 @@ import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.EntityStore;
 import org.terasology.entitySystem.prefab.Prefab;
-import org.terasology.math.ChunkMath;
-import org.terasology.math.JomlUtil;
-import org.terasology.math.TeraMath;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.monitoring.chunk.ChunkMonitor;
 import org.terasology.persistence.ChunkStore;
@@ -37,7 +34,6 @@ import org.terasology.world.block.OnActivatedBlocks;
 import org.terasology.world.block.OnAddedBlocks;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkBlockIterator;
-import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.ChunkProvider;
 import org.terasology.world.chunks.Chunks;
 import org.terasology.world.chunks.ManagedChunk;
@@ -134,7 +130,7 @@ public class LocalChunkProvider implements ChunkProvider {
                 Chunk chunk;
                 EntityBufferImpl buffer = new EntityBufferImpl();
                 if (chunkStore == null) {
-                    chunk = new ChunkImpl(JomlUtil.from(pos), blockManager, extraDataManager);
+                    chunk = new ChunkImpl(pos, blockManager, extraDataManager);
                     generator.createChunk(chunk, buffer);
                     generateQueuedEntities.put(chunk.getPosition(new Vector3i()), buffer.getAll());
                 } else {
@@ -344,9 +340,9 @@ public class LocalChunkProvider implements ChunkProvider {
         while (i.next()) {
             if (i.getBlock().isLifecycleEventsRequired()) {
                 TIntList positionList = batchBlockMap.get(i.getBlock().getId());
-                positionList.add(i.getBlockPos().x);
-                positionList.add(i.getBlockPos().y);
-                positionList.add(i.getBlockPos().z);
+                positionList.add(i.getBlockPos().x());
+                positionList.add(i.getBlockPos().y());
+                positionList.add(i.getBlockPos().z());
             }
         }
         return batchBlockMap;

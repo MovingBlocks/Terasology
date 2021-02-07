@@ -17,7 +17,6 @@ import org.terasology.fixtures.TestBlockManager;
 import org.terasology.fixtures.TestChunkStore;
 import org.terasology.fixtures.TestStorageManager;
 import org.terasology.fixtures.TestWorldGenerator;
-import org.terasology.math.JomlUtil;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.block.BeforeDeactivateBlocks;
 import org.terasology.world.block.Block;
@@ -178,7 +177,7 @@ class LocalChunkProviderTest {
     @Test
     void testLoadSingleChunk() throws InterruptedException, ExecutionException, TimeoutException {
         Vector3i chunkPosition = new Vector3i(0, 0, 0);
-        Chunk chunk = new ChunkImpl(JomlUtil.from(chunkPosition), blockManager, extraDataManager);
+        Chunk chunk = new ChunkImpl(chunkPosition, blockManager, extraDataManager);
         generator.createChunk(chunk, null);
         storageManager.add(chunk);
 
@@ -201,7 +200,7 @@ class LocalChunkProviderTest {
     @Test
     void testLoadSingleChunkWithBlockLifecycle() throws InterruptedException, ExecutionException, TimeoutException {
         Vector3i chunkPosition = new Vector3i(0, 0, 0);
-        Chunk chunk = new ChunkImpl(JomlUtil.from(chunkPosition), blockManager, extraDataManager);
+        Chunk chunk = new ChunkImpl(chunkPosition, blockManager, extraDataManager);
         generator.createChunk(chunk, null);
         storageManager.add(chunk);
         blockAtBlockManager.setLifecycleEventsRequired(true);

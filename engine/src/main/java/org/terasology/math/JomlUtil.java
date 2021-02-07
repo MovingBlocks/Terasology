@@ -189,24 +189,6 @@ public final class JomlUtil {
         return new AABBf(aabb.minX(), aabb.minY(), aabb.minZ(), aabb.maxX(), aabb.maxY(), aabb.maxZ());
     }
 
-
-    public static BlockRegion from(Region3i aabb) {
-        if (aabb == null) {
-            return null;
-        }
-        //TODO: is this conversion correct, or is it off by one (max incl. vs max excl.)
-        return new BlockRegion(aabb.minX(), aabb.minY(), aabb.minZ(), aabb.maxX(), aabb.maxY(), aabb.maxZ());
-    }
-
-
-    public static Region3i from(BlockRegion aabb) {
-        if (aabb == null) {
-            return null;
-        }
-        return Region3i.createFromMinMax(JomlUtil.from(aabb.getMin(new Vector3i())), JomlUtil.from(aabb.getMax(new Vector3i())));
-    }
-
-
     public static Rectanglei from(Rect2i rect) {
         if (rect == null) {
             return null;

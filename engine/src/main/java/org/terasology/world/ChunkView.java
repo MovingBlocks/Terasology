@@ -167,7 +167,7 @@ public interface ChunkView {
     BlockRegionc getWorldRegion();
 
     /**
-     * @return A Region3i denoting the chunks covered by this view
+     * @return A BlockRegionc denoting the chunks covered by this view
      */
     BlockRegionc getChunkRegion();
 

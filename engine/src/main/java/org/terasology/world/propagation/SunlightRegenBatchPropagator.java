@@ -5,7 +5,6 @@ package org.terasology.world.propagation;
 import com.google.common.collect.Sets;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
-import org.terasology.math.JomlUtil;
 import org.terasology.math.Side;
 import org.terasology.world.block.Block;
 import org.terasology.world.chunks.Chunks;
