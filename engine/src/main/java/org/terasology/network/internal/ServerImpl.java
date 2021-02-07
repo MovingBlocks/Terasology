@@ -1,4 +1,4 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.network.internal;
@@ -24,8 +24,6 @@ import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.entitySystem.event.Event;
-import org.terasology.math.ChunkMath;
-import org.terasology.math.JomlUtil;
 import org.terasology.network.NetMetricSource;
 import org.terasology.network.NetworkComponent;
 import org.terasology.network.Server;

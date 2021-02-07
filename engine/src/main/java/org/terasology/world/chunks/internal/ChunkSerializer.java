@@ -11,7 +11,6 @@ import org.joml.Vector3ic;
 import org.terasology.protobuf.EntityData;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.chunks.Chunk;
-import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.Chunks;
 import org.terasology.world.chunks.blockdata.ExtraBlockDataManager;
 import org.terasology.world.chunks.blockdata.TeraArray;
@@ -46,7 +45,7 @@ public final class ChunkSerializer {
         }
 
         final TeraArray blockData = runLengthDecode(message.getBlockData());
-        final TeraArray[] extraData = extraDataManager.makeDataArrays(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z);
+        final TeraArray[] extraData = extraDataManager.makeDataArrays(Chunks.SIZE_X, Chunks.SIZE_Y, Chunks.SIZE_Z);
         for (int i = 0; i < extraData.length; i++) {
             runLengthDecode(message.getExtraData(i), extraData[i]);
         }
