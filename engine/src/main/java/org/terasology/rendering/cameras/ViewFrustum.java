@@ -145,7 +145,7 @@ public class ViewFrustum {
      */
     public boolean intersects(AABBfc aabb) {
 
-        Vector3f cp = CoreRegistry.get(LocalPlayer.class).getViewPosition(new org.joml.Vector3f());
+        Vector3f cp = CoreRegistry.get(LocalPlayer.class).getViewPosition(new Vector3f());
         for (int i = 0; i < 6; i++) {
             if (planes[i].getA() * (aabb.minX() - cp.x) + planes[i].getB() * (aabb.minY() - cp.y)
                 + planes[i].getC() * (aabb.maxZ() - cp.z) + planes[i].getD() > 0) {
