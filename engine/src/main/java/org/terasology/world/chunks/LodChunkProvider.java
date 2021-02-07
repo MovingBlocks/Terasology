@@ -9,7 +9,6 @@ import org.joml.Vector3ic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.context.Context;
-import org.terasology.math.JomlUtil;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.primitives.ChunkTessellator;
 import org.terasology.rendering.world.viewDistance.ViewDistance;

@@ -1,4 +1,4 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.rendering.logic;
@@ -274,8 +274,8 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
             modelViewMatrix.normal(new Matrix3f()).get(tempMatrixBuffer33);
             skeletalMesh.material.setMatrix3("normalMatrix", tempMatrixBuffer33, true);
 
-            skeletalMesh.material.setFloat("sunlight", worldRenderer.getMainLightIntensityAt(JomlUtil.from(worldPos)), true);
-            skeletalMesh.material.setFloat("blockLight", worldRenderer.getBlockLightIntensityAt(JomlUtil.from(worldPos)), true);
+            skeletalMesh.material.setFloat("sunlight", worldRenderer.getMainLightIntensityAt(worldPos), true);
+            skeletalMesh.material.setFloat("blockLight", worldRenderer.getBlockLightIntensityAt(worldPos), true);
 
             Matrix4f[] boneTransforms = new Matrix4f[skeletalMesh.mesh.getBones().size()];
             for (Bone bone : skeletalMesh.mesh.getBones()) {

@@ -6,7 +6,6 @@ import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.terasology.module.sandbox.API;
 import org.terasology.world.block.Block;
-import org.terasology.world.block.BlockRegion;
 import org.terasology.world.block.BlockRegionc;
 
 /**
