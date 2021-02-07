@@ -129,6 +129,8 @@ dependencies {
         }
     }
 
+    testRuntimeOnly("org.slf4j:jul-to-slf4j:1.7.21")
+
     add("testImplementation", platform("org.junit:junit-bom:5.7.1"))
     testImplementation("org.junit.jupiter:junit-jupiter-api")
     testImplementation("org.junit.jupiter:junit-jupiter-params")
@@ -146,9 +148,14 @@ dependencies {
 if (project.name == "ModuleTestingEnvironment") {
     dependencies {
         // MTE is a special snowflake, it gets these things as non-test dependencies
-        implementation("org.junit.jupiter:junit-jupiter-api:5.6.2")
-        implementation("org.mockito:mockito-junit-jupiter:3.2.0")
-        implementation("junit:junit:4.12")
+        implementation("ch.qos.logback:logback-classic:1.2.3")
+        runtimeOnly("org.codehaus.janino:janino:3.1.3") {
+            because("logback filters")
+        }
+        add("implementation", platform("org.junit:junit-bom:5.7.1"))
+        implementation("org.junit.jupiter:junit-jupiter-api")
+        implementation("org.mockito:mockito-junit-jupiter:3.7.7")
+        implementation("junit:junit:4.13.1")
         //TODO: Remove shrinkwrap from code, you have FileSystem in java 8
         implementation("org.jboss.shrinkwrap:shrinkwrap-depchain-java7:1.2.1")
     }
