@@ -1,25 +1,13 @@
-/*
- * Copyright 2014 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *  http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.rendering.nui.layers.hud;
 
 import com.google.common.collect.Maps;
-import org.terasology.joml.geom.Rectanglei;
 import org.joml.Vector2i;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
+import org.terasology.joml.geom.Rectanglef;
+import org.terasology.joml.geom.Rectanglei;
 import org.terasology.math.JomlUtil;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Rect2f;
@@ -51,6 +39,11 @@ public class HUDScreenLayer extends CoreScreenLayer {
         return addHUDElement(uri, ControlWidget.class, Rect2f.createFromMinAndSize(0, 0, 1, 1));
     }
 
+    public <T extends ControlWidget> T addHUDElement(String urn, Class<T> type, Rectanglef region) {
+        return addHUDElement(urn, type, JomlUtil.from(region));
+    }
+
+    @Deprecated
     public <T extends ControlWidget> T addHUDElement(String urn, Class<T> type, Rect2f region) {
         Optional<? extends UIElement> data = assetManager.getAsset(urn, UIElement.class);
         if (data.isPresent() && type.isInstance(data.get().getRootWidget())) {
@@ -59,6 +52,11 @@ public class HUDScreenLayer extends CoreScreenLayer {
         return null;
     }
 
+    public <T extends ControlWidget> T addHUDElement(ResourceUrn urn, Class<T> type, Rectanglef region) {
+        return addHUDElement(urn, type, JomlUtil.from(region));
+    }
+
+    @Deprecated
     public <T extends ControlWidget> T addHUDElement(ResourceUrn urn, Class<T> type, Rect2f region) {
         Optional<? extends UIElement> data = assetManager.getAsset(urn, UIElement.class);
         if (data.isPresent() && type.isInstance(data.get().getRootWidget())) {
@@ -67,6 +65,11 @@ public class HUDScreenLayer extends CoreScreenLayer {
         return null;
     }
 
+    public <T extends ControlWidget> T addHUDElement(ResourceUrn urn, T widget, Rectanglef region) {
+        return addHUDElement(urn, widget, JomlUtil.from(region));
+    }
+
+    @Deprecated
     public <T extends ControlWidget> T addHUDElement(ResourceUrn urn, T widget, Rect2f region) {
         InjectionHelper.inject(widget);
         widget.onOpened();
