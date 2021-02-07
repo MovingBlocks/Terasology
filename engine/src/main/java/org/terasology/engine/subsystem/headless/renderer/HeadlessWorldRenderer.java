@@ -21,7 +21,6 @@ import org.terasology.config.Config;
 import org.terasology.context.Context;
 import org.terasology.logic.players.LocalPlayerSystem;
 import org.terasology.math.JomlUtil;
-import org.terasology.math.Region3i;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.monitoring.PerformanceMonitor;
@@ -29,17 +28,16 @@ import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.cameras.SubmersibleCamera;
 import org.terasology.rendering.dag.RenderGraph;
-import org.terasology.rendering.world.viewDistance.ViewDistance;
 import org.terasology.rendering.world.WorldRenderer;
+import org.terasology.rendering.world.viewDistance.ViewDistance;
 import org.terasology.world.WorldProvider;
-import org.terasology.world.chunks.ChunkConstants;
+import org.terasology.world.block.BlockRegion;
 import org.terasology.world.chunks.ChunkProvider;
 import org.terasology.world.chunks.Chunks;
 import org.terasology.world.chunks.RenderableChunk;
 
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.List;
 
 public class HeadlessWorldRenderer implements WorldRenderer {
@@ -208,12 +206,12 @@ public class HeadlessWorldRenderer implements WorldRenderer {
         boolean chunksCurrentlyPending = false;
         if (!newChunkPos.equals(chunkPos) || force || pendingChunks) {
             Vector3ic viewingDistance = config.getRendering().getViewDistance().getChunkDistance();
-            Region3i viewRegion = Region3i.createFromCenterExtents(newChunkPos, new Vector3i(viewingDistance.x() / 2, viewingDistance.y() / 2, viewingDistance.z() / 2));
+            BlockRegion viewRegion = new BlockRegion(JomlUtil.from(newChunkPos)).expand(new org.joml.Vector3i(viewingDistance.x() / 2, viewingDistance.y() / 2, viewingDistance.z() / 2));
             if (chunksInProximity.size() == 0 || force || pendingChunks) {
                 // just add all visible chunks
                 chunksInProximity.clear();
-                for (Vector3i chunkPosition : viewRegion) {
-                    RenderableChunk c = chunkProvider.getChunk(JomlUtil.from(chunkPosition));
+                for (Vector3ic chunkPosition : viewRegion) {
+                    RenderableChunk c = chunkProvider.getChunk(chunkPosition);
                     if (c != null && worldProvider.getLocalView(c.getPosition(new org.joml.Vector3i())) != null) {
                         chunksInProximity.add(c);
                     } else {
@@ -221,22 +219,22 @@ public class HeadlessWorldRenderer implements WorldRenderer {
                     }
                 }
             } else {
-                Region3i oldRegion = Region3i.createFromCenterExtents(chunkPos, new Vector3i(viewingDistance.x() / 2, viewingDistance.y() / 2, viewingDistance.z() / 2));
+                BlockRegion oldRegion = new BlockRegion(JomlUtil.from(chunkPos)).expand(new org.joml.Vector3i(viewingDistance.x() / 2, viewingDistance.y() / 2, viewingDistance.z() / 2));
 
-                Iterator<Vector3i> chunksForRemove = oldRegion.subtract(viewRegion);
                 // remove
-                while (chunksForRemove.hasNext()) {
-                    Vector3i r = chunksForRemove.next();
-                    RenderableChunk c = chunkProvider.getChunk(JomlUtil.from(r));
-                    if (c != null) {
-                        chunksInProximity.remove(c);
-                        c.disposeMesh();
+                for (Vector3ic candidateForRemove : viewRegion) {
+                    if (!oldRegion.contains(candidateForRemove)) {
+                        RenderableChunk c = chunkProvider.getChunk(candidateForRemove);
+                        if (c != null) {
+                            chunksInProximity.remove(c);
+                            c.disposeMesh();
+                        }
                     }
                 }
 
                 // add
-                for (Vector3i chunkPosition : viewRegion) {
-                    RenderableChunk c = chunkProvider.getChunk(JomlUtil.from(chunkPosition));
+                for (Vector3ic chunkPosition : viewRegion) {
+                    RenderableChunk c = chunkProvider.getChunk(chunkPosition);
                     if (c != null && worldProvider.getLocalView(c.getPosition(new org.joml.Vector3i())) != null) {
                         chunksInProximity.add(c);
                     } else {

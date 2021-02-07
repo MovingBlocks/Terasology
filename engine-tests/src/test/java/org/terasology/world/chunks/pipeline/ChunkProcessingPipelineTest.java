@@ -131,7 +131,7 @@ class ChunkProcessingPipelineTest extends TerasologyTestingEnvironment {
         Map<Vector3i, Chunk> chunkToGenerate =
                 getNearChunkPositions(positionToGenerate)
                         .stream()
-                        .filter((p) -> !p.equals(JomlUtil.from(positionToGenerate))) //remove central chunk.
+                        .filter((p) -> !p.equals(positionToGenerate)) //remove central chunk.
                         .map(this::createChunkAt)
                         .collect(Collectors.toMap(
                                 (chunk) -> chunk.getPosition(new Vector3i()),

@@ -5,10 +5,10 @@ package org.terasology.persistence.typeHandling.gson;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.gson.Gson;
+import org.joml.Vector4f;
 import org.junit.jupiter.api.Test;
 import org.reflections.Reflections;
-import org.terasology.math.geom.Rect2i;
-import org.terasology.math.geom.Vector4f;
+import org.terasology.joml.geom.Rectanglei;
 import org.terasology.nui.Color;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.persistence.typeHandling.TypeHandlerLibraryImpl;
@@ -22,17 +22,17 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class GsonTypeHandlerLibraryAdapterFactoryTest {
     private static final TestClass OBJECT = new TestClass(
             new Color(0xDEADBEEF),
-            ImmutableSet.of(Vector4f.zero(), Vector4f.one()),
+            ImmutableSet.of(new Vector4f(0,0,0,0), new Vector4f(1,1,1,1)),
             ImmutableMap.of(
                     "someRect",
-                    Rect2i.createFromMinAndSize(-3, -3, 10, 10)
+                    new Rectanglei(-3, -3).setSize(10, 10)
             ),
             ImmutableMap.of(0, 1, 1, 0),
             -0xDECAF
     );
 
     private static final String OBJECT_JSON = "{\"color\":[222,173,190,239],\"vector4fs\":[[0.0,0.0,0.0,0.0]," +
-            "[1.0,1.0,1.0,1.0]],\"rect2iMap\":{\"someRect\":{\"min\":[-3,-3],\"size\":[10,10]}},\"i\":-912559}";
+            "[1.0,1.0,1.0,1.0]],\"rect2iMap\":{\"someRect\":{\"min\":[-3,-3],\"max\":[7,7]}},\"i\":-912559}";
 
     private final Reflections reflections = new Reflections(getClass().getClassLoader());
 
@@ -60,14 +60,14 @@ public class GsonTypeHandlerLibraryAdapterFactoryTest {
     private static class TestClass {
         private final Color color;
         private final Set<Vector4f> vector4fs;
-        private final Map<String, Rect2i> rect2iMap;
+        private final Map<String, Rectanglei> rect2iMap;
 
         // Will not be serialized
         private final Map<Integer, Integer> intMap;
 
         private final int i;
 
-        private TestClass(Color color, Set<Vector4f> vector4fs, Map<String, Rect2i> rect2iMap,
+        private TestClass(Color color, Set<Vector4f> vector4fs, Map<String, Rectanglei> rect2iMap,
                           Map<Integer, Integer> intMap, int i) {
             this.color = color;
             this.vector4fs = vector4fs;
