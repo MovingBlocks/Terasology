@@ -32,6 +32,14 @@ public abstract class BaseFieldFacet2D extends BaseFacet2D implements FieldFacet
     }
 
     @Override
+    public void update(BlockRegionc targetRegion, Border3D border) {
+        super.update(targetRegion, border);
+        if (getRelativeArea().area() > data.length) {
+            data = new float[getRelativeArea().area()];
+        }
+    }
+
+    @Override
     public float get(int x, int y) {
         return data[getRelativeIndex(x, y)];
     }

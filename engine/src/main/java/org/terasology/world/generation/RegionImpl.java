@@ -9,6 +9,8 @@ import org.terasology.world.block.BlockRegion;
 
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.function.Supplier;
 
 /**
  */
@@ -19,15 +21,18 @@ public class RegionImpl implements Region, GeneratingRegion {
     private final Map<Class<? extends WorldFacet>, Border3D> borders;
     private final float scale;
 
-    private final TypeMap<WorldFacet> generatingFacets = TypeMap.create();
     private final Set<FacetProvider> processedProviders = Sets.newHashSet();
     private final TypeMap<WorldFacet> generatedFacets = TypeMap.create();
+    private final TypeMap<WorldFacet> generatingFacets = TypeMap.create();
+    private final TypeMap<WorldFacet> cachedFacets;
 
-    public RegionImpl(BlockRegion region, ListMultimap<Class<? extends WorldFacet>, FacetProvider> facetProviderChains, Map<Class<? extends WorldFacet>, Border3D> borders, float scale) {
+
+    public RegionImpl(TypeMap<WorldFacet> cached, BlockRegion region, ListMultimap<Class<? extends WorldFacet>, FacetProvider> facetProviderChains, Map<Class<? extends WorldFacet>, Border3D> borders, float scale) {
         this.region = region;
         this.facetProviderChains = facetProviderChains;
         this.borders = borders;
         this.scale = scale;
+        this.cachedFacets = cached;
     }
 
     @Override
@@ -63,6 +68,21 @@ public class RegionImpl implements Region, GeneratingRegion {
         generatingFacets.put(type, facet);
     }
 
+    /**
+     * retrieves a thread local facet else create a new instance and store it in the cache for later retrieval
+     * @param type the type of facet
+     * @param supplier the supplier to provide the facet
+     * @param <T> the type of facet
+     * @return the instanced facet
+     */
+    public <T extends WorldFacet> T cachedFacet(Class<T> type, Supplier<T> supplier) {
+        if (this.cachedFacets.containsKey(type)) {
+            return this.cachedFacets.get(type);
+        }
+        T facet = supplier.get();
+        this.cachedFacets.put(type, facet);
+        return facet;
+    }
 
     @Override
     public Border3D getBorderForFacet(Class<? extends WorldFacet> type) {

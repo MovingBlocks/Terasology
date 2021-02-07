@@ -34,6 +34,11 @@ public class BaseFacet2D implements WorldFacet2D {
         relativeRegion = border.expandTo2D(targetRegion.getSize(new Vector3i()));
     }
 
+    public void update(BlockRegionc targetRegion, Border3D border) {
+        worldRegion = border.expandTo2D(targetRegion);
+        relativeRegion = border.expandTo2D(targetRegion.getSize(new Vector3i()));
+    }
+
     @Override
     public final BlockAreac getWorldArea() {
         return worldRegion;

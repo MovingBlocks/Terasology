@@ -4,6 +4,7 @@ package org.terasology.world.generation;
 
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Sets;
+import org.terasology.utilities.collection.TypeMap;
 import org.terasology.world.block.BlockRegion;
 import org.terasology.world.chunks.CoreChunk;
 
@@ -16,6 +17,8 @@ import java.util.Set;
 /**
  */
 public class WorldImpl implements World {
+    private static final ThreadLocal<TypeMap<WorldFacet>> FACET_CACHE = new ThreadLocal<>();
+
     private final ListMultimap<Class<? extends WorldFacet>, FacetProvider> facetProviderChains;
     private final ListMultimap<Class<? extends WorldFacet>, FacetProvider> scalableFacetProviderChains;
     private final List<WorldRasterizer> worldRasterizers;
@@ -42,7 +45,10 @@ public class WorldImpl implements World {
 
     @Override
     public Region getWorldData(BlockRegion region, float scale) {
-        return new RegionImpl(region, scale == 1 ? facetProviderChains : scalableFacetProviderChains, borders, scale);
+        if (FACET_CACHE.get() == null) {
+            FACET_CACHE.set(TypeMap.create());
+        }
+        return new RegionImpl(FACET_CACHE.get(), region, scale == 1 ? facetProviderChains : scalableFacetProviderChains, borders, scale);
     }
 
     @Override

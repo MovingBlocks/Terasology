@@ -21,6 +21,7 @@ import org.joml.Vector2ic;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.terasology.math.geom.BaseVector2i;
+import org.terasology.utilities.collection.TypeMap;
 import org.terasology.world.block.BlockRegion;
 import org.terasology.world.generation.Border3D;
 import org.terasology.world.generation.FacetProvider;
@@ -77,7 +78,7 @@ public class LayeredZoneRegionFunctionTest {
         Map<Class<? extends WorldFacet>, Border3D> borders = new HashMap<>();
         borders.put(ElevationFacet.class, new Border3D(0, 0, 0));
 
-        region = new RegionImpl(new BlockRegion(0, 0, 0).expand(4, 4, 4),
+        region = new RegionImpl(TypeMap.create(), new BlockRegion(0, 0, 0).expand(4, 4, 4),
                 facetProviderChains, borders, 1);
     }
 

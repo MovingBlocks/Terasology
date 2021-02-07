@@ -17,6 +17,8 @@ package org.terasology.world.generation;
 
 import org.terasology.world.block.BlockRegion;
 
+import java.util.function.Supplier;
+
 /**
  */
 public interface GeneratingRegion {
@@ -28,4 +30,6 @@ public interface GeneratingRegion {
     <T extends WorldFacet> void setRegionFacet(Class<T> type, T facet);
 
     Border3D getBorderForFacet(Class<? extends WorldFacet> type);
+
+    <T extends WorldFacet> T cachedFacet(Class<T> type, Supplier<T> supplier);
 }
