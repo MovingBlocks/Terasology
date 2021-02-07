@@ -187,16 +187,6 @@ public class ViewFrustum {
 
     /**
      * Returns true if the given sphere intersects the given AABB.
-     *
-     * @deprecated This is scheduled for removal in an upcoming version method will be replaced with JOML implementation
-     *     {@link #intersects(Vector3fc, float)}.
-     */
-    public boolean intersects(Vector3f position, float radius) {
-        return intersects(position, radius);
-    }
-
-    /**
-     * Returns true if the given sphere intersects the given AABB.
      */
     public boolean intersects(Vector3fc position, float radius) {
         for (int i = 0; i < 6; i++) {
