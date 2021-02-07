@@ -1,8 +1,7 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.rendering.cameras;
 
-import org.terasology.joml.geom.AABBf;
 import org.joml.AxisAngle4f;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
@@ -12,10 +11,7 @@ import org.joml.Vector3fc;
 import org.lwjgl.BufferUtils;
 import org.terasology.config.Config;
 import org.terasology.joml.geom.AABBfc;
-import org.terasology.math.AABB;
 import org.terasology.math.Direction;
-import org.terasology.math.JomlUtil;
-import org.terasology.math.geom.Quat4f;
 import org.terasology.registry.CoreRegistry;
 
 /**
@@ -193,24 +189,8 @@ public abstract class Camera {
         return viewingDirection;
     }
 
-    /**
-     * Get the orientation of the camera.
-     * @return the orientation
-     */
-    public Quat4f getOrientation() {
-        return new Quat4f(JomlUtil.from(viewingAxis), viewingAngle);
-    }
-
     public Quaternionf getOrientation(Quaternionf orientation) {
         return orientation.set(new AxisAngle4f(viewingAngle, viewingAxis));
-    }
-
-    public void setOrientation(Quat4f orientation) {
-        Quaternionf newOrientation = JomlUtil.from(orientation);
-        newOrientation.transform(FORWARD, viewingDirection);
-        AxisAngle4f axisAngle = new AxisAngle4f(newOrientation);
-        viewingAxis.set(axisAngle.x, axisAngle.y, axisAngle.z);
-        viewingAngle = axisAngle.angle;
     }
 
     public void setOrientation(Quaternionfc orientation) {
@@ -246,18 +226,6 @@ public abstract class Camera {
 
     public boolean isReflected() {
         return reflected;
-    }
-
-    /**
-     *
-     * @param aabb
-     * @return
-     * @deprecated This method is scheduled for removal in an upcoming version. Use the JOML implementation instead:
-     *       {@link #hasInSight(AABBf)}.
-     */
-    @Deprecated
-    public boolean hasInSight(AABB aabb) {
-        return viewFrustum.intersects(aabb);
     }
 
     public boolean hasInSight(AABBfc aabb) {
