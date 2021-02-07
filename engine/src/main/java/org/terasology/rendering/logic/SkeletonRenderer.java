@@ -26,7 +26,6 @@ import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.joml.geom.AABBf;
 import org.terasology.logic.location.Location;
 import org.terasology.logic.location.LocationComponent;
-import org.terasology.math.JomlUtil;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.animation.MeshAnimation;
 import org.terasology.rendering.assets.animation.MeshAnimationFrame;
