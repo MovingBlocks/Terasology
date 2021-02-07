@@ -32,6 +32,7 @@ import org.terasology.module.sandbox.StandardPermissionProviderFactory;
 import org.terasology.module.sandbox.WarnOnlyProviderFactory;
 import org.terasology.nui.UIWidget;
 import org.terasology.reflection.TypeRegistry;
+import org.terasology.utilities.Jvm;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -66,6 +67,8 @@ public class ModuleManagerImpl implements ModuleManager {
     }
 
     public ModuleManagerImpl(String masterServerAddress, List<Class<?>> classesOnClasspathsToAddToEngine) {
+        PathManager pathManager = PathManager.getInstance();  // get early so if it needs to initialize, it does it now
+
         metadataReader = new ModuleMetadataJsonAdapter();
         for (ModuleExtension ext : StandardModuleExtension.values()) {
             metadataReader.registerExtension(ext.getKey(), ext.getValueType());
@@ -101,7 +104,7 @@ public class ModuleManagerImpl implements ModuleManager {
 
         ModulePathScanner scanner = new ModulePathScanner(new ModuleLoader(metadataReader));
         scanner.getModuleLoader().setModuleInfoPath(TerasologyConstants.MODULE_INFO_FILENAME);
-        scanner.scan(registry, PathManager.getInstance().getModulePaths());
+        scanner.scan(registry, pathManager.getModulePaths());
 
         DependencyInfo engineDep = new DependencyInfo();
         engineDep.setId(engineModule.getId());
@@ -139,6 +142,9 @@ public class ModuleManagerImpl implements ModuleManager {
             logger.warn("Failed to search for classpath modules:", e);
             return;
         }
+
+        logger.debug("loadModulesFromClassPath with classpath:");
+        Jvm.logClasspath(logger);
 
         for (URL url : Collections.list(moduleInfosInClassPath)) {
             Module module;
