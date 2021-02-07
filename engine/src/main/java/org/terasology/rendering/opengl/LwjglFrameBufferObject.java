@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.rendering.opengl;
 
+import org.joml.Vector2i;
 import org.joml.Vector2ic;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
@@ -33,7 +34,7 @@ public class LwjglFrameBufferObject implements FrameBufferObject {
 
     public LwjglFrameBufferObject(DisplayDevice displayDevice, ResourceUrn urn, Vector2ic size) {
         this.displayDevice = displayDevice;
-        this.size = size;
+        this.size = new Vector2i(size);
 
         IntBuffer fboId = BufferUtils.createIntBuffer(1);
         GL30.glGenFramebuffers(fboId);
