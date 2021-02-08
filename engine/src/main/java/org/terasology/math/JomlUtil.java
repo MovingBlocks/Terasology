@@ -1,28 +1,12 @@
-/*
- * Copyright 2017 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.math;
 
-import org.terasology.joml.geom.AABBf;
 import org.joml.Matrix3f;
 import org.joml.Matrix3fc;
 import org.joml.Matrix4fc;
 import org.joml.Quaternionf;
 import org.joml.Quaternionfc;
-import org.terasology.joml.geom.Rectanglef;
-import org.terasology.joml.geom.Rectanglei;
 import org.joml.Vector2fc;
 import org.joml.Vector2ic;
 import org.joml.Vector3fc;
@@ -30,6 +14,8 @@ import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.joml.Vector4f;
 import org.joml.Vector4fc;
+import org.terasology.joml.geom.Rectanglef;
+import org.terasology.joml.geom.Rectanglei;
 import org.terasology.math.geom.BaseMatrix3f;
 import org.terasology.math.geom.BaseMatrix4f;
 import org.terasology.math.geom.BaseQuat4f;
@@ -39,11 +25,7 @@ import org.terasology.math.geom.BaseVector3f;
 import org.terasology.math.geom.BaseVector3i;
 import org.terasology.math.geom.BaseVector4f;
 import org.terasology.math.geom.Quat4f;
-import org.terasology.math.geom.Rect2f;
-import org.terasology.math.geom.Rect2i;
-import org.terasology.math.geom.Vector3f;
 import org.terasology.world.block.Block;
-import org.terasology.world.block.BlockRegion;
 
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -173,34 +155,6 @@ public final class JomlUtil {
             return null;
         }
         return new Quaternionf(quat.getX(), quat.getY(), quat.getZ(), quat.getW());
-    }
-
-    public static Rectanglei from(Rect2i rect) {
-        if (rect == null) {
-            return null;
-        }
-        return new Rectanglei(rect.minX(), rect.minY(), rect.maxX(), rect.maxY());
-    }
-
-    public static Rect2i from(Rectanglei rect) {
-        if (rect == null) {
-            return null;
-        }
-        return Rect2i.createFromMinAndMax(rect.minX, rect.minY, rect.maxX, rect.maxY);
-    }
-
-    public static Rectanglef from(Rect2f rect) {
-        if (rect == null) {
-            return null;
-        }
-        return new Rectanglef(rect.minX(), rect.minY(), rect.maxX(), rect.maxY());
-    }
-
-    public static Rect2f from(Rectanglef rect) {
-        if (rect == null) {
-            return null;
-        }
-        return Rect2f.createFromMinAndMax(rect.minX, rect.minY, rect.maxX, rect.maxY);
     }
 
     public static Rectanglei rectangleiFromMinAndSize(int minX, int minY, int width, int height) {
