@@ -3,71 +3,100 @@
 
 package org.terasology.engine.module;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.module.ClasspathModule;
 import org.terasology.module.Module;
 import org.terasology.module.ModuleLoader;
 import org.terasology.module.ModuleMetadata;
 import org.terasology.module.ModuleMetadataJsonAdapter;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.CodeSource;
 import java.security.cert.Certificate;
 
+
 public class ClasspathSupportingModuleLoader extends ModuleLoader {
+    private static final Logger logger = LoggerFactory.getLogger(ClasspathSupportingModuleLoader.class);
+
     boolean makeClasspathModules;
+    boolean lenient;
     private final ModuleMetadataJsonAdapter metadataReader;
 
-    public ClasspathSupportingModuleLoader(ModuleMetadataJsonAdapter metadataReader) {
-        super(metadataReader);
-        this.metadataReader = metadataReader;
+    public ClasspathSupportingModuleLoader(boolean makeClasspathModules, boolean lenient) {
+        this(new ModuleMetadataJsonAdapter(), makeClasspathModules, lenient);
     }
 
-    public ClasspathSupportingModuleLoader(ModuleMetadataJsonAdapter metadataReader, boolean makeClasspathModules) {
+    public ClasspathSupportingModuleLoader(
+            ModuleMetadataJsonAdapter metadataReader,
+            boolean makeClasspathModules,
+            boolean lenient) {
         super(metadataReader);
         this.metadataReader = metadataReader;
         this.makeClasspathModules = makeClasspathModules;
+        this.lenient = lenient;
     }
 
     @Override
     public Module load(Path modulePath) throws IOException {
-        Module module;
         if (makeClasspathModules) {
-            URL url = urlFromPath(modulePath);
-            ModuleMetadata metadata = readMetadata(url);
-            // TODO: basic metadata checks
-            CodeSource codeSource = new CodeSource(url, (Certificate[]) null);
-            try {
-                module = ClasspathModule.create(metadata, false, codeSource);
-            } catch (URISyntaxException e) {
-                throw new RuntimeException("URI syntax problems for: " + modulePath.toString(), e);
-            }
+            return loadFromClasspath(modulePath);
         } else {
-            module = super.load(modulePath);
+            return super.load(modulePath);
+        }
+    }
+
+    private Module loadFromClasspath(Path modulePath) throws IOException {
+        Module module;
+        URL url = modulePath.toUri().toURL();
+        ModuleMetadata metadata = readMetadata(url);
+        if (metadata == null) {
+            return null;  // no metadata file at all, ModuleLoader skips without comment
+        } else if (null == metadata.getId() || metadata.getDisplayName().toString().isEmpty()) {
+            logger.warn("Found an archive with {} but missing id or display name. Skipping {}",
+                    getModuleInfoPath(), url);
+            return null;
+        }
+
+        CodeSource codeSource = new CodeSource(url, (Certificate[]) null);
+        try {
+            logger.debug("Creating module for {}", codeSource);
+            module = ClasspathModule.create(metadata, false, codeSource);
+        } catch (URISyntaxException e) {
+            throw new RuntimeException("URI syntax problems for: " + modulePath.toString(), e);
         }
         return module;
     }
 
-    static URL urlFromPath(Path path) throws MalformedURLException {
-        File baseFile = path.toFile();
-        URL url;
-        if (baseFile.isDirectory()) {
-            url = path.toUri().toURL();
-        } else {
-            url = new URL("jar", null, path.toString());
-        }
-        return url;
-    }
-    
     ModuleMetadata readMetadata(URL moduleUrl) throws IOException {
-        URL metadataUrl = new URL(moduleUrl, getModuleInfoPath().toString());
-        try (InputStreamReader readme = new InputStreamReader(metadataUrl.openStream())) {
-            return metadataReader.read(readme);
+        URL metadataUrl;
+        ModuleMetadata metadata = null;
+        try {
+            if (Paths.get(moduleUrl.toURI()).toFile().isDirectory()) {
+                metadataUrl = new URL(moduleUrl, getModuleInfoPath().toString());
+            } else {
+                metadataUrl = new URL("jar", null, moduleUrl + "!/" + getModuleInfoPath());
+            }
+        } catch (MalformedURLException | URISyntaxException e) {
+            throw new RuntimeException("Error making metadata URL for " + moduleUrl.toString(), e);
         }
+
+        try (InputStreamReader readme = new InputStreamReader(metadataUrl.openStream())) {
+            metadata = metadataReader.read(readme);
+        } catch (java.io.FileNotFoundException e) {
+            if (!lenient) {
+                throw e;
+            }
+        }
+        if (metadata == null && !lenient) {
+            throw new RuntimeException("Empty metadata from " + moduleUrl.toString());
+        }
+        return metadata;
     }
 }

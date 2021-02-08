@@ -46,6 +46,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.Policy;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
@@ -133,33 +134,38 @@ public class ModuleManagerImpl implements ModuleManager {
         logger.debug("loadModulesFromClassPath with classpath:");
         Jvm.logClasspath(logger);
 
-        ClassLoader classLoader = ClassLoader.getSystemClassLoader();
-        ModuleLoader loader = new ClasspathSupportingModuleLoader(metadataReader, true);
+        ModuleLoader loader = new ClasspathSupportingModuleLoader(metadataReader, true, true);
         loader.setModuleInfoPath(TerasologyConstants.MODULE_INFO_FILENAME);
 
-        // We're looking for jars on the classpath with a module.txt
-        Enumeration<URL> moduleInfosInClassPath;
-        try {
-            moduleInfosInClassPath = classLoader.getResources(TerasologyConstants.MODULE_INFO_FILENAME.toString());
-        } catch (IOException e) {
-            logger.warn("Failed to search for classpath modules:", e);
-            return;
-        }
+        List<Path> classPaths = Arrays.stream(
+                System.getProperty("java.class.path").split(System.getProperty("path.separator", ":"))
+        ).map(Paths::get).collect(Collectors.toList());
 
-        logger.debug("loadModulesFromClassPath with classpath:");
-        Jvm.logClasspath(logger);
+        for (Path path : classPaths) {
+            // I thought I'd make the ClasspathSupporting stuff in the shape of a ModuleLoader
+            // so I could use it with the existing ModulePathScanner, but no. The inputs to that
+            // are the _parent directories_ of what we have.
+            //
+            // The conditions here mirror those of org.terasology.module.ModulePathScanner.loadModule
 
-        for (URL url : Collections.list(moduleInfosInClassPath)) {
             Module module;
             try {
-                module = loadFromClasspath(loader, url);
-            } catch (IOException | URISyntaxException e) {
-                logger.warn("Failed to load classpath module {}", url, e);
+                module = loader.load(path);
+            } catch (IOException e) {
+                logger.error("Failed to load classpath module {}", path, e);
                 continue;
             }
-            if (module != null) {
-                registry.add(module);
-                logger.info("Loaded module {} from class path at {}", module, url.getFile());
+
+            if (module == null) {
+                continue;
+            }
+
+            boolean isNew = registry.add(module);
+            if (isNew) {
+                logger.info("Discovered module: {}", module);
+            } else {
+                logger.warn("Discovered duplicate module: {}-{}, skipping {}",
+                        module.getId(), module.getVersion(), path);
             }
         }
     }
