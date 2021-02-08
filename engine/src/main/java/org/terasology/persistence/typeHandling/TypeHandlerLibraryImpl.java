@@ -19,12 +19,6 @@ import org.terasology.joml.geom.AABBi;
 import org.terasology.joml.geom.Rectanglef;
 import org.terasology.joml.geom.Rectanglei;
 import org.terasology.math.IntegerRange;
-import org.terasology.math.geom.Quat4f;
-import org.terasology.math.geom.Vector2f;
-import org.terasology.math.geom.Vector2i;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector3i;
-import org.terasology.math.geom.Vector4f;
 import org.terasology.naming.Name;
 import org.terasology.nui.Color;
 import org.terasology.nui.Colorc;
@@ -60,12 +54,6 @@ import org.terasology.persistence.typeHandling.mathTypes.Vector4fTypeHandler;
 import org.terasology.persistence.typeHandling.mathTypes.Vector4fcTypeHandler;
 import org.terasology.persistence.typeHandling.mathTypes.Vector4iTypeHandler;
 import org.terasology.persistence.typeHandling.mathTypes.Vector4icTypeHandler;
-import org.terasology.persistence.typeHandling.mathTypes.legacy.LegacyQuat4fTypeHandler;
-import org.terasology.persistence.typeHandling.mathTypes.legacy.LegacyVector2fTypeHandler;
-import org.terasology.persistence.typeHandling.mathTypes.legacy.LegacyVector2iTypeHandler;
-import org.terasology.persistence.typeHandling.mathTypes.legacy.LegacyVector3fTypeHandler;
-import org.terasology.persistence.typeHandling.mathTypes.legacy.LegacyVector3iTypeHandler;
-import org.terasology.persistence.typeHandling.mathTypes.legacy.LegacyVector4fTypeHandler;
 import org.terasology.persistence.typeHandling.reflection.ModuleEnvironmentSandbox;
 import org.terasology.persistence.typeHandling.reflection.SerializationSandbox;
 import org.terasology.reflection.TypeRegistry;
@@ -114,14 +102,6 @@ public class TypeHandlerLibraryImpl extends TypeHandlerLibrary {
     }
 
     private static void populateWithDefaultHandlers(TypeHandlerLibrary serializationLibrary) {
-        // LEGACY
-        serializationLibrary.addTypeHandler(Vector4f.class, new LegacyVector4fTypeHandler());
-        serializationLibrary.addTypeHandler(Vector3f.class, new LegacyVector3fTypeHandler());
-        serializationLibrary.addTypeHandler(Vector2f.class, new LegacyVector2fTypeHandler());
-        serializationLibrary.addTypeHandler(Vector3i.class, new LegacyVector3iTypeHandler());
-        serializationLibrary.addTypeHandler(Vector2i.class, new LegacyVector2iTypeHandler());
-        serializationLibrary.addTypeHandler(Quat4f.class, new LegacyQuat4fTypeHandler());
-
         // Current Supported
         serializationLibrary.addTypeHandlerFactory(new AssetTypeHandlerFactory());
 
