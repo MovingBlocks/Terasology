@@ -130,12 +130,15 @@ public class ModuleManagerImpl implements ModuleManager {
      * Overrides modules in modules/ with those specified via -classpath in the JVM
      */
     void loadModulesFromClassPath() {
+        logger.debug("loadModulesFromClassPath with classpath:");
+        Jvm.logClasspath(logger);
+
         ClassLoader classLoader = ClassLoader.getSystemClassLoader();
-        ModuleLoader loader = new ModuleLoader(metadataReader);
-        Enumeration<URL> moduleInfosInClassPath;
+        ModuleLoader loader = new ClasspathSupportingModuleLoader(metadataReader, true);
         loader.setModuleInfoPath(TerasologyConstants.MODULE_INFO_FILENAME);
 
         // We're looking for jars on the classpath with a module.txt
+        Enumeration<URL> moduleInfosInClassPath;
         try {
             moduleInfosInClassPath = classLoader.getResources(TerasologyConstants.MODULE_INFO_FILENAME.toString());
         } catch (IOException e) {
@@ -149,7 +152,7 @@ public class ModuleManagerImpl implements ModuleManager {
         for (URL url : Collections.list(moduleInfosInClassPath)) {
             Module module;
             try {
-                module = load(loader, url);
+                module = loadFromClasspath(loader, url);
             } catch (IOException | URISyntaxException e) {
                 logger.warn("Failed to load classpath module {}", url, e);
                 continue;
@@ -161,7 +164,7 @@ public class ModuleManagerImpl implements ModuleManager {
         }
     }
 
-    Module load(ModuleLoader loader, URL url) throws IOException, URISyntaxException {
+    Module loadFromClasspath(ModuleLoader loader, URL url) throws IOException, URISyntaxException {
         Path modulePath;
         URLConnection connection = url.openConnection();
 
