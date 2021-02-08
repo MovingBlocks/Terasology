@@ -4,11 +4,10 @@ package org.terasology.math;
 
 import com.google.common.collect.Maps;
 import org.joml.Math;
+import org.joml.Vector3f;
 import org.joml.Vector3fc;
+import org.joml.Vector3i;
 import org.joml.Vector3ic;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector3i;
-
 import java.util.EnumMap;
 
 /**
@@ -16,12 +15,12 @@ import java.util.EnumMap;
  *
  */
 public enum Direction {
-    UP(Vector3i.up(), new Vector3f(0, 1, 0)),
+    UP(new Vector3i(0, 1, 0), new Vector3f(0, 1, 0)),
     RIGHT(new Vector3i(-1, 0, 0), new Vector3f(-1, 0, 0)),
     LEFT(new Vector3i(1, 0, 0), new Vector3f(1, 0, 0)),
     BACKWARD(new Vector3i(0, 0, -1), new Vector3f(0, 0, -1)),
     FORWARD(new Vector3i(0, 0, 1), new Vector3f(0, 0, 1)),
-    DOWN(Vector3i.down(), new Vector3f(0, -1, 0));
+    DOWN(new Vector3i(0, -1, 0), new Vector3f(0, -1, 0));
 
     private static final EnumMap<Direction, Direction> REVERSE_MAP;
     private static final EnumMap<Direction, Side> CONVERSION_MAP;
@@ -60,17 +59,6 @@ public enum Direction {
             return (y > 0) ? UP : DOWN;
         }
         return (z > 0) ? FORWARD : BACKWARD;
-    }
-
-    /**
-     * @param dir
-     * @return
-     * @deprecated This is scheduled for removal in an upcoming version method will be replaced with JOML implementation
-     *     {@link #inDirection(Vector3fc)}.
-     */
-    @Deprecated
-    public static Direction inDirection(Vector3f dir) {
-        return inDirection(dir.x, dir.y, dir.z);
     }
 
     public static Direction inDirection(Vector3fc dir) {
@@ -121,9 +109,8 @@ public enum Direction {
      * @return vector pointing in the direction
      */
     public Vector3ic asVector3i() {
-        return JomlUtil.from(vector3iDir);
+        return vector3iDir;
     }
-
 
     /**
      * readonly normalized {@link Vector3fc} in the given {@link Direction}
@@ -131,27 +118,7 @@ public enum Direction {
      * @return vector pointing in the direction
      */
     public Vector3fc asVector3f() {
-        return JomlUtil.from(vector3fDir);
-    }
-
-    /**
-     * @return The vector3i in the direction of the side. Do not modify.
-     * @deprecated This is scheduled for removal in an upcoming version method will be replaced with JOML implementation
-     *     {@link #asVector3i()}.
-     */
-    @Deprecated
-    public Vector3i getVector3i() {
-        return new Vector3i(vector3iDir);
-    }
-
-    /**
-     * @return
-     * @deprecated This is scheduled for removal in an upcoming version method will be replaced with JOML implementation
-     *     {@link #asVector3f()}
-     */
-    @Deprecated
-    public Vector3f getVector3f() {
-        return new Vector3f(vector3fDir);
+        return vector3fDir;
     }
 
     /**
