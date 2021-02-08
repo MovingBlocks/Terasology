@@ -15,7 +15,8 @@
  */
 package org.terasology.world.chunks.internal;
 
-import org.terasology.math.geom.Vector3i;
+import org.joml.Vector3i;
+import org.joml.Vector3ic;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.chunks.ChunkBlockIterator;
@@ -25,7 +26,7 @@ import org.terasology.world.chunks.blockdata.TeraArray;
  */
 public class ChunkBlockIteratorImpl implements ChunkBlockIterator {
 
-    private final Vector3i worldOffset;
+    private final Vector3i worldOffset = new Vector3i();
     private final Vector3i endPos;
     private final Vector3i pos = new Vector3i(-1, 0, 0);
 
@@ -36,9 +37,9 @@ public class ChunkBlockIteratorImpl implements ChunkBlockIterator {
 
     private final BlockManager blockManager;
 
-    public ChunkBlockIteratorImpl(BlockManager blockManager, Vector3i worldOffset, TeraArray data) {
+    public ChunkBlockIteratorImpl(BlockManager blockManager, Vector3ic worldOffset, TeraArray data) {
         this.blockManager = blockManager;
-        this.worldOffset = worldOffset;
+        this.worldOffset.set(worldOffset);
         this.endPos = new Vector3i(data.getSizeX(), data.getSizeY(), data.getSizeZ());
         this.data = data;
     }
@@ -68,7 +69,7 @@ public class ChunkBlockIteratorImpl implements ChunkBlockIterator {
     }
 
     @Override
-    public Vector3i getBlockPos() {
+    public Vector3ic getBlockPos() {
         return blockPos;
     }
 }

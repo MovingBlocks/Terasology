@@ -1,18 +1,5 @@
-/*
- * Copyright 2014 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.persistence.internal;
 
 import com.google.common.collect.ImmutableMap;
@@ -28,7 +15,6 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.game.GameManifest;
 import org.terasology.logic.location.LocationComponent;
-import org.terasology.math.ChunkMath;
 import org.terasology.network.ClientComponent;
 import org.terasology.protobuf.EntityData;
 import org.terasology.recording.RecordAndReplayCurrentStatus;
@@ -36,6 +22,7 @@ import org.terasology.recording.RecordAndReplaySerializer;
 import org.terasology.recording.RecordAndReplayStatus;
 import org.terasology.recording.RecordAndReplayUtils;
 import org.terasology.utilities.concurrency.AbstractTask;
+import org.terasology.world.chunks.Chunks;
 import org.terasology.world.chunks.internal.ChunkImpl;
 
 import java.io.BufferedOutputStream;
@@ -268,7 +255,7 @@ public class SaveTransaction extends AbstractTask {
                 LocationComponent locationComponent = entity.getComponent(LocationComponent.class);
                 if (locationComponent != null) {
                     Vector3f loc = locationComponent.getWorldPosition(new Vector3f());
-                    Vector3i chunkPos = ChunkMath.calcChunkPos((int) loc.x, (int) loc.y, (int) loc.z, new Vector3i());
+                    Vector3i chunkPos = Chunks.toChunkPos((int) loc.x, (int) loc.y, (int) loc.z, new Vector3i());
                     Collection<EntityRef> collection = chunkPosToEntitiesMap.get(chunkPos);
                     if (collection == null) {
                         collection = Lists.newArrayList();

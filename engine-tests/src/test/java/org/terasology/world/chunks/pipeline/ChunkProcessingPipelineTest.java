@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.terasology.TerasologyTestingEnvironment;
 import org.terasology.assets.management.AssetManager;
-import org.terasology.math.JomlUtil;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.internal.BlockManagerImpl;
@@ -108,7 +107,7 @@ class ChunkProcessingPipelineTest extends TerasologyTestingEnvironment {
         pipeline.addStage(ChunkTaskProvider.createMulti(
                 "flat merging task",
                 (chunks) -> chunks.stream()
-                        .filter((c) -> c.getPosition(new Vector3i()).equals(positionToGenerate))
+                        .filter((c) -> c.getPosition().equals(positionToGenerate))
                         .findFirst() // return central chunk.
                         .get(),
                 this::getNearChunkPositions));
@@ -142,7 +141,7 @@ class ChunkProcessingPipelineTest extends TerasologyTestingEnvironment {
         pipeline.addStage(ChunkTaskProvider.createMulti(
                 "flat merging task",
                 (chunks) -> chunks.stream()
-                        .filter((c) -> c.getPosition(new Vector3i()).equals(positionToGenerate)).findFirst() // return central chunk.
+                        .filter((c) -> c.getPosition().equals(positionToGenerate)).findFirst() // return central chunk.
                         .get(),
                 this::getNearChunkPositions));
 
@@ -254,9 +253,8 @@ class ChunkProcessingPipelineTest extends TerasologyTestingEnvironment {
         return requirements;
     }
 
-    private ChunkImpl createChunkAt(Vector3ic pos) {
-        return new ChunkImpl(JomlUtil.from(pos), blockManager, extraDataManager);
+    private ChunkImpl createChunkAt(Vector3ic chunkPos) {
+        return new ChunkImpl(chunkPos, blockManager, extraDataManager);
     }
-
 
 }

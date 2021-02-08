@@ -1,13 +1,13 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.world.block;
 
-import org.terasology.joml.geom.Rectanglef;
 import org.joml.Vector2f;
 import org.joml.Vector2fc;
 import org.joml.Vector2i;
 import org.joml.Vector2ic;
+import org.terasology.joml.geom.Rectanglef;
 
 import java.util.Iterator;
 import java.util.Optional;

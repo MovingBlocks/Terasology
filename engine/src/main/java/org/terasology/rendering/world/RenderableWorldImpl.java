@@ -1,18 +1,5 @@
-/*
- * Copyright 2016 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.rendering.world;
 
 import com.google.common.base.Preconditions;
@@ -26,8 +13,6 @@ import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.context.Context;
 import org.terasology.engine.subsystem.lwjgl.GLBufferPool;
-import org.terasology.joml.geom.AABBi;
-import org.terasology.math.JomlUtil;
 import org.terasology.math.TeraMath;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.CoreRegistry;
@@ -37,13 +22,10 @@ import org.terasology.rendering.primitives.ChunkTessellator;
 import org.terasology.rendering.world.viewDistance.ViewDistance;
 import org.terasology.world.ChunkView;
 import org.terasology.world.WorldProvider;
-import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.BlockRegion;
 import org.terasology.world.chunks.Chunk;
-import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.ChunkProvider;
 import org.terasology.world.chunks.Chunks;
-import org.terasology.world.chunks.LodChunk;
 import org.terasology.world.chunks.LodChunkProvider;
 import org.terasology.world.chunks.RenderableChunk;
 import org.terasology.world.generator.ScalableWorldGenerator;
@@ -294,7 +276,7 @@ class RenderableWorldImpl implements RenderableWorld {
     public void generateVBOs() {
         PerformanceMonitor.startActivity("Building Mesh VBOs");
         ChunkMesh pendingMesh;
-        chunkMeshUpdateManager.setCameraPosition(JomlUtil.from(playerCamera.getPosition()));
+        chunkMeshUpdateManager.setCameraPosition(playerCamera.getPosition());
         for (RenderableChunk chunk : chunkMeshUpdateManager.availableChunksForUpdate()) {
 
             if (chunk.hasPendingMesh() && chunksInProximityOfCamera.contains(chunk)) {
@@ -476,9 +458,9 @@ class RenderableWorldImpl implements RenderableWorld {
         Vector3f result = new Vector3f(chunk.getPosition(new Vector3i())); // chunk position in chunk coordinates
         result.add(CHUNK_CENTER_OFFSET);                    // chunk center in chunk coordinates
 
-        result.x *= ChunkConstants.SIZE_X;    // chunk center in world coordinates
-        result.y *= ChunkConstants.SIZE_Y;
-        result.z *= ChunkConstants.SIZE_Z;
+        result.x *= Chunks.SIZE_X;    // chunk center in world coordinates
+        result.y *= Chunks.SIZE_Y;
+        result.z *= Chunks.SIZE_Z;
 
         result.sub(cameraPosition); // camera to chunk vector
 

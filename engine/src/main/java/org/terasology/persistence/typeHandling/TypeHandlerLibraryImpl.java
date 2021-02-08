@@ -1,10 +1,8 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.persistence.typeHandling;
 
-import org.terasology.joml.geom.AABBf;
-import org.terasology.joml.geom.AABBi;
 import org.joml.Quaternionf;
 import org.joml.Quaternionfc;
 import org.joml.Vector2fc;
@@ -16,6 +14,8 @@ import org.joml.Vector4ic;
 import org.reflections.Reflections;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.entitySystem.prefab.Prefab;
+import org.terasology.joml.geom.AABBf;
+import org.terasology.joml.geom.AABBi;
 import org.terasology.joml.geom.Rectanglef;
 import org.terasology.joml.geom.Rectanglei;
 import org.terasology.math.IntegerRange;
@@ -60,8 +60,6 @@ import org.terasology.persistence.typeHandling.mathTypes.Vector4fTypeHandler;
 import org.terasology.persistence.typeHandling.mathTypes.Vector4fcTypeHandler;
 import org.terasology.persistence.typeHandling.mathTypes.Vector4iTypeHandler;
 import org.terasology.persistence.typeHandling.mathTypes.Vector4icTypeHandler;
-import org.terasology.persistence.typeHandling.mathTypes.factories.Rect2fTypeHandlerFactory;
-import org.terasology.persistence.typeHandling.mathTypes.factories.Rect2iTypeHandlerFactory;
 import org.terasology.persistence.typeHandling.reflection.ModuleEnvironmentSandbox;
 import org.terasology.persistence.typeHandling.reflection.SerializationSandbox;
 import org.terasology.reflection.TypeRegistry;
@@ -152,8 +150,6 @@ public class TypeHandlerLibraryImpl extends TypeHandlerLibrary {
         serializationLibrary.addTypeHandler(Quaternionf.class, new QuaternionfTypeHandler());
         serializationLibrary.addTypeHandler(Quaternionfc.class, new QuaternionfcTypeHandler());
 
-        serializationLibrary.addTypeHandlerFactory(new Rect2iTypeHandlerFactory());
-        serializationLibrary.addTypeHandlerFactory(new Rect2fTypeHandlerFactory());
         serializationLibrary.addTypeHandler(Prefab.class, new PrefabTypeHandler());
         serializationLibrary.addTypeHandler(IntegerRange.class, new IntegerRangeHandler());
     }
