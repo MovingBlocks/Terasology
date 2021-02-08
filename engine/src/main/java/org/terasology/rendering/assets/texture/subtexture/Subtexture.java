@@ -8,7 +8,6 @@ import org.terasology.assets.AssetType;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.joml.geom.Rectanglef;
 import org.terasology.joml.geom.Rectanglei;
-import org.terasology.math.JomlUtil;
 import org.terasology.math.TeraMath;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.TextureRegionAsset;
@@ -56,9 +55,9 @@ public class Subtexture extends TextureRegionAsset<SubtextureData> {
 
     @Override
     public Rectanglei getPixelRegion() {
-        return JomlUtil.rectangleiFromMinAndSize(
+        return new Rectanglei(
                 TeraMath.floorToInt(subregion.minX() * texture.getWidth()),
-                TeraMath.floorToInt(subregion.minY() * texture.getHeight()), getWidth(), getHeight());
+                TeraMath.floorToInt(subregion.minY() * texture.getHeight())).setSize( getWidth(), getHeight());
     }
 
     @Override
