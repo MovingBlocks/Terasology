@@ -38,10 +38,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.lang.reflect.ReflectPermission;
-import java.net.JarURLConnection;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.net.URLConnection;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.Policy;
@@ -168,27 +166,6 @@ public class ModuleManagerImpl implements ModuleManager {
                         module.getId(), module.getVersion(), path);
             }
         }
-    }
-
-    Module loadFromClasspath(ModuleLoader loader, URL url) throws IOException, URISyntaxException {
-        Path modulePath;
-        URLConnection connection = url.openConnection();
-
-        if (connection instanceof JarURLConnection) {
-            modulePath = Paths.get(((JarURLConnection) connection).getJarFileURL().toURI());
-        } else {
-            modulePath = Paths.get(url.toURI()).getParent();
-        }
-
-        Module module = loader.load(modulePath);
-
-        // if the display name is empty or the id is null, this probably isn't a Terasology module
-        if (null == module.getId() || module.getMetadata().getDisplayName().toString().isEmpty()) {
-            logger.warn("Found a module-like JAR on the class path with no id or display name. Skipping {}", url);
-            return null;
-        }
-
-        return module;
     }
 
     private void setupSandbox() {
