@@ -175,20 +175,6 @@ public final class JomlUtil {
         return new Quaternionf(quat.getX(), quat.getY(), quat.getZ(), quat.getW());
     }
 
-    public static AABB from(AABBf aabb) {
-        if (aabb == null) {
-            return null;
-        }
-        return AABB.createMinMax(new Vector3f(aabb.minX, aabb.minY, aabb.minZ), new Vector3f(aabb.maxX, aabb.maxY, aabb.maxZ));
-    }
-
-    public static AABBf from(AABB aabb) {
-        if (aabb == null) {
-            return null;
-        }
-        return new AABBf(aabb.minX(), aabb.minY(), aabb.minZ(), aabb.maxX(), aabb.maxY(), aabb.maxZ());
-    }
-
     public static Rectanglei from(Rect2i rect) {
         if (rect == null) {
             return null;

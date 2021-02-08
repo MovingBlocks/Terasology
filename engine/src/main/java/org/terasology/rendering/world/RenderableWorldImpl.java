@@ -24,7 +24,6 @@ import org.terasology.world.ChunkView;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.BlockRegion;
 import org.terasology.world.chunks.Chunk;
-import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.ChunkProvider;
 import org.terasology.world.chunks.Chunks;
 import org.terasology.world.chunks.LodChunkProvider;
@@ -459,9 +458,9 @@ class RenderableWorldImpl implements RenderableWorld {
         Vector3f result = new Vector3f(chunk.getPosition(new Vector3i())); // chunk position in chunk coordinates
         result.add(CHUNK_CENTER_OFFSET);                    // chunk center in chunk coordinates
 
-        result.x *= ChunkConstants.SIZE_X;    // chunk center in world coordinates
-        result.y *= ChunkConstants.SIZE_Y;
-        result.z *= ChunkConstants.SIZE_Z;
+        result.x *= Chunks.SIZE_X;    // chunk center in world coordinates
+        result.y *= Chunks.SIZE_Y;
+        result.z *= Chunks.SIZE_Z;
 
         result.sub(cameraPosition); // camera to chunk vector
 

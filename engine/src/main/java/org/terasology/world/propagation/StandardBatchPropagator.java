@@ -6,7 +6,6 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
-import org.terasology.math.ChunkMath;
 import org.terasology.math.Side;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockRegion;
@@ -300,7 +299,7 @@ public class StandardBatchPropagator implements BatchPropagator {
 
         BlockRegion edgeRegion = new BlockRegion(0, 0, 0)
                 .setSize(Chunks.SIZE_X, Chunks.SIZE_Y, Chunks.SIZE_Z);
-        ChunkMath.getEdgeRegion(edgeRegion, side, edgeRegion);
+        edgeRegion.face(side, edgeRegion);
 
         int[] depth = new int[edgeRegion.volume()];
 

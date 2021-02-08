@@ -7,7 +7,6 @@ import org.joml.Vector3fc;
 import org.lwjgl.BufferUtils;
 import org.terasology.joml.geom.AABBfc;
 import org.terasology.logic.players.LocalPlayer;
-import org.terasology.math.AABB;
 import org.terasology.math.JomlUtil;
 import org.terasology.registry.CoreRegistry;
 
@@ -132,16 +131,6 @@ public class ViewFrustum {
 
     /**
      * Returns true if this view frustum intersects the given AABB.
-     *
-     * @deprecated This is scheduled for removal in an upcoming version method will be replaced with JOML implementation
-     *     {@link #intersects(AABBfc)}.
-     */
-    public boolean intersects(AABB aabb) {
-        return intersects(JomlUtil.from(aabb));
-    }
-
-    /**
-     * Returns true if this view frustum intersects the given AABB.
      */
     public boolean intersects(AABBfc aabb) {
 
@@ -183,16 +172,6 @@ public class ViewFrustum {
         }
 
         return true;
-    }
-
-    /**
-     * Returns true if the given sphere intersects the given AABB.
-     *
-     * @deprecated This is scheduled for removal in an upcoming version method will be replaced with JOML implementation
-     *     {@link #intersects(Vector3fc, float)}.
-     */
-    public boolean intersects(Vector3f position, float radius) {
-        return intersects(position, radius);
     }
 
     /**
