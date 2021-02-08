@@ -58,7 +58,7 @@ dependencies {
     implementation group: 'org.reflections', name: 'reflections', version: '0.9.10'
 
     // Test lib dependencies
-    implementation("org.junit:junit-bom:5.7.1") {
+    implementation(platform("org.junit:junit-bom:5.7.1")) {
         // junit-bom will set version numbers for the other org.junit dependencies.
     }
     implementation("org.junit.jupiter:junit-jupiter-api")

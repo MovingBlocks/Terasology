@@ -1,4 +1,4 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.persistence.typeHandling.mathTypes;
@@ -6,14 +6,15 @@ package org.terasology.persistence.typeHandling.mathTypes;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import org.terasology.joml.geom.AABBi;
-import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 import org.reflections.Reflections;
+import org.terasology.joml.geom.AABBi;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.persistence.typeHandling.TypeHandlerLibraryImpl;
 import org.terasology.persistence.typeHandling.gson.GsonBuilderFactory;
 import org.terasology.world.block.BlockRegion;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class BlockRegionTypeHandlerTest extends MathTypeAssert {
     public static class AABBBlockRegion1Test {
@@ -36,9 +37,9 @@ public class BlockRegionTypeHandlerTest extends MathTypeAssert {
         JsonElement tree = gson.toJsonTree(aabb1);
 
         JsonObject obj = tree.getAsJsonObject();
-        Assert.assertTrue(obj.has("a1"));
+        assertTrue(obj.has("a1"));
         assertBlockRegion(obj.get("a1"), 5, 5, 5, 13, 12, 14);
-        Assert.assertTrue(obj.has("a2"));
+        assertTrue(obj.has("a2"));
         assertAABBi(obj.get("a2"), 3, 5, 5, 22, 12, 14);
     }
 }
