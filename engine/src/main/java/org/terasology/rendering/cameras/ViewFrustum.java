@@ -7,7 +7,6 @@ import org.joml.Vector3fc;
 import org.lwjgl.BufferUtils;
 import org.terasology.joml.geom.AABBfc;
 import org.terasology.logic.players.LocalPlayer;
-import org.terasology.math.JomlUtil;
 import org.terasology.registry.CoreRegistry;
 
 import java.nio.FloatBuffer;

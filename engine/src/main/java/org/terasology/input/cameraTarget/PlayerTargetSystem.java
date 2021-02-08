@@ -26,7 +26,6 @@ import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.players.FirstPersonHeldItemMountPointComponent;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.logic.players.PlayerTargetChangedEvent;
-import org.terasology.math.JomlUtil;
 import org.terasology.physics.Physics;
 import org.terasology.registry.In;
 import org.terasology.registry.Share;

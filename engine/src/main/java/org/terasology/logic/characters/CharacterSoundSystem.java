@@ -37,7 +37,6 @@ import org.terasology.logic.characters.events.VerticalCollisionEvent;
 import org.terasology.logic.health.DoDestroyEvent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.event.OnPlayerRespawnedEvent;
-import org.terasology.math.JomlUtil;
 import org.terasology.registry.In;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.utilities.random.Random;

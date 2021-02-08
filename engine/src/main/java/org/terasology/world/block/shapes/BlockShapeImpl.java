@@ -16,10 +16,10 @@
 package org.terasology.world.block.shapes;
 
 import com.google.common.collect.Maps;
+import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.terasology.assets.AssetType;
 import org.terasology.assets.ResourceUrn;
-import org.terasology.math.JomlUtil;
 import org.terasology.math.Pitch;
 import org.terasology.math.Roll;
 import org.terasology.math.Rotation;
@@ -91,7 +91,7 @@ public class BlockShapeImpl extends BlockShape {
         Rotation simplifiedRot = applySymmetry(rot);
         CollisionShape result = collisionShape.get(simplifiedRot);
         if (result == null && baseCollisionShape != null) {
-            result = baseCollisionShape.rotate(JomlUtil.from(simplifiedRot.getQuat4f()));
+            result = baseCollisionShape.rotate(new Quaternionf(simplifiedRot.orientation()));
             collisionShape.put(simplifiedRot, result);
         }
         return result;
@@ -103,7 +103,7 @@ public class BlockShapeImpl extends BlockShape {
         if (simplifiedRot.equals(Rotation.none())) {
             return new Vector3f(baseCollisionOffset);
         }
-        return JomlUtil.from(simplifiedRot.getQuat4f()).transform(baseCollisionOffset, new Vector3f());
+        return simplifiedRot.orientation().transform(baseCollisionOffset, new Vector3f());
     }
 
     @Override

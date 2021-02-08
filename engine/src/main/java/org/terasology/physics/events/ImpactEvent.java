@@ -17,11 +17,10 @@
 package org.terasology.physics.events;
 
 import org.joml.Vector3f;
-import org.terasology.math.JomlUtil;
-import org.terasology.network.BroadcastEvent;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.AbstractConsumableEvent;
 import org.terasology.math.Side;
+import org.terasology.network.BroadcastEvent;
 
 /**
  * Impact event is called whenever an item has enough speed to detect
@@ -68,6 +67,6 @@ public class ImpactEvent extends AbstractConsumableEvent {
     }
 
     public Side getSide() {
-        return Side.inDirection(JomlUtil.from(impactNormal));
+        return Side.inDirection(impactNormal);
     }
 }
