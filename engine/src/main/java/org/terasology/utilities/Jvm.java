@@ -15,24 +15,33 @@ public final class Jvm {
     @SuppressWarnings("CheckStyle")
     static final Pattern gradleCache = Pattern.compile(".*\\Wgradle\\Wcaches?\\b.*?(/.+)?/(.*\\.jar)$");
 
+    @SuppressWarnings("CheckStyle")
+    static final Pattern mavenCache = Pattern.compile(".*/.m2/repo.*/(.+\\.jar)$");
+
     public static void logClasspath(Logger aLogger) {
         String interestingGroup = "org.terasology";
-        String home = PathManager.getInstance().getInstallPath().toString();
+        String projectRoot = PathManager.getInstance().getInstallPath().toString();
+        String userHome = System.getenv("HOME");
         String indent = "  ";
         int elidedCount = 0;
 
         for (String pathEntry : System.getProperty("java.class.path").split(System.getProperty("path.separator", ":"))) {
             Matcher asGradleCache = gradleCache.matcher(pathEntry);
+            Matcher asMavenCache = mavenCache.matcher(pathEntry);
             if (asGradleCache.matches()) {
                 if (asGradleCache.group(1).contains(interestingGroup)) {
                     aLogger.debug("{}gradle:{}", indent, asGradleCache.group(2));
                 } else {
                     elidedCount++;
                 }
+            } else if (asMavenCache.matches()) {
+                aLogger.debug("{}maven:{}", indent, asMavenCache.group(1));
             } else {
                 String place = pathEntry;
-                if (pathEntry.startsWith(home)) {
-                    place = pathEntry.replace(home, "⌂");
+                if (pathEntry.startsWith(projectRoot)) {
+                    place = pathEntry.replace(projectRoot, "⌂");
+                } else if (pathEntry.startsWith(userHome)) {
+                    place = pathEntry.replace(userHome, "~");
                 }
                 aLogger.debug("{}{}", indent, place);
             }
