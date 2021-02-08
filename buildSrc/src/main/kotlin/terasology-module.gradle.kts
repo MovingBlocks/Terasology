@@ -90,6 +90,12 @@ val deps = moduleConfig.dependencies.filterNotNull()
 val moduleDepends = deps.filterNot { it.id.toString() == "engine" }
 val engineVersion = deps.find { it.id.toString() == "engine" }?.versionRange()?.toString() ?: "+"
 
+configurations {
+    all {
+        resolutionStrategy.preferProjectModules()
+    }
+}
+
 // Set dependencies. Note that the dependency information from module.txt is used for other Terasology modules
 dependencies {
     implementation(group = "org.terasology.engine", name = "engine", version = engineVersion)
@@ -123,9 +129,7 @@ dependencies {
         }
     }
 
-    testImplementation("org.junit:junit-bom:5.7.1") {
-        // junit-bom will set version numbers for the other org.junit dependencies.
-    }
+    add("testImplementation", platform("org.junit:junit-bom:5.7.1"))
     testImplementation("org.junit.jupiter:junit-jupiter-api")
     testImplementation("org.junit.jupiter:junit-jupiter-params")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
