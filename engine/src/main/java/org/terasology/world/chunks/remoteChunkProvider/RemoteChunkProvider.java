@@ -60,8 +60,7 @@ public class RemoteChunkProvider implements ChunkProvider {
 
     public RemoteChunkProvider(BlockManager blockManager, LocalPlayer localPlayer) {
         this.blockManager = blockManager;
-        loadingPipeline = new ChunkProcessingPipeline(this::getChunk,
-            new LocalPlayerRelativeChunkComparator(localPlayer));
+        loadingPipeline = new ChunkProcessingPipeline(new LocalPlayerRelativeChunkComparator(localPlayer));
 
         loadingPipeline.addStage(
             ChunkTaskProvider.create("Chunk generate internal lightning",

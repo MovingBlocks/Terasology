@@ -421,7 +421,7 @@ public class LocalChunkProvider implements ChunkProvider {
         storageManager.deleteWorld();
         worldEntity.send(new PurgeWorldEvent());
 
-        loadingPipeline = new ChunkProcessingPipeline(this::getChunk, relevanceSystem.createChunkTaskComporator());
+        loadingPipeline = new ChunkProcessingPipeline( relevanceSystem.createChunkTaskComporator());
         loadingPipeline.addStage(
             ChunkTaskProvider.create("Chunk generate internal lightning",
                 (Consumer<Chunk>) InternalLightProcessor::generateInternalLighting))
@@ -450,7 +450,7 @@ public class LocalChunkProvider implements ChunkProvider {
     // TODO: move loadingPipeline initialization into constructor.
     public void setRelevanceSystem(RelevanceSystem relevanceSystem) {
         this.relevanceSystem = relevanceSystem;
-        loadingPipeline = new ChunkProcessingPipeline(this::getChunk, relevanceSystem.createChunkTaskComporator());
+        loadingPipeline = new ChunkProcessingPipeline(relevanceSystem.createChunkTaskComporator());
         loadingPipeline.addStage(
             ChunkTaskProvider.create("Chunk generate internal lightning",
                 (Consumer<Chunk>) InternalLightProcessor::generateInternalLighting))

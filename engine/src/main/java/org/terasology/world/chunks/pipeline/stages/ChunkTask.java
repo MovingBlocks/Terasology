@@ -1,4 +1,4 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.world.chunks.pipeline.stages;
@@ -6,7 +6,6 @@ package org.terasology.world.chunks.pipeline.stages;
 import org.joml.Vector3ic;
 import org.terasology.world.chunks.Chunk;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
 import java.util.function.Function;
@@ -14,7 +13,7 @@ import java.util.function.Function;
 /**
  * Function-style chunk task.
  */
-public interface ChunkTask extends Function<Collection<Chunk>, Chunk> {
+public interface ChunkTask extends Function<Chunk, Chunk> {
     /**
      * Task name. used for ThreadMonitor.
      *

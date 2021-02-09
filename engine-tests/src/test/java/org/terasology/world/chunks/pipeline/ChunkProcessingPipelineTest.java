@@ -1,4 +1,4 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.world.chunks.pipeline;
@@ -23,7 +23,6 @@ import org.terasology.world.chunks.internal.ChunkImpl;
 import org.terasology.world.chunks.pipeline.stages.ChunkTaskProvider;
 
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Random;
@@ -34,8 +33,6 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
@@ -48,7 +45,7 @@ class ChunkProcessingPipelineTest extends TerasologyTestingEnvironment {
 
     @Test
     void simpleProcessingSuccess() throws ExecutionException, InterruptedException, TimeoutException {
-        pipeline = new ChunkProcessingPipeline((p) -> null, (o1, o2) -> 0);
+        pipeline = new ChunkProcessingPipeline((o1, o2) -> 0);
 
         Vector3i chunkPos = new Vector3i(0, 0, 0);
         Chunk chunk = createChunkAt(chunkPos);
@@ -64,7 +61,7 @@ class ChunkProcessingPipelineTest extends TerasologyTestingEnvironment {
 
     @Test
     void simpleStopProcessingSuccess() {
-        pipeline = new ChunkProcessingPipeline((p) -> null, (o1, o2) -> 0);
+        pipeline = new ChunkProcessingPipeline( (o1, o2) -> 0);
 
         Vector3i position = new Vector3i(0, 0, 0);
         Chunk chunk = createChunkAt(position);
@@ -87,103 +84,18 @@ class ChunkProcessingPipelineTest extends TerasologyTestingEnvironment {
         );
     }
 
-    /**
-     * Imagine that we have task, which requires neighbors with same Z level. neighbors chunk already in chunk cache.
-     */
-    @Test
-    void multiRequirementsChunksExistsSuccess() throws ExecutionException, InterruptedException, TimeoutException {
-        Vector3i positionToGenerate = new Vector3i(0, 0, 0);
-        Map<Vector3ic, Chunk> chunkCache =
-                getNearChunkPositions(positionToGenerate)
-                        .stream()
-                        .filter((p) -> !p.equals(positionToGenerate)) //remove central chunk.
-                        .map(this::createChunkAt)
-                        .collect(Collectors.toMap(
-                                (chunk) -> chunk.getPosition(new Vector3i()),
-                                Function.identity()
-                        ));
-
-        pipeline = new ChunkProcessingPipeline(chunkCache::get, (o1, o2) -> 0);
-        pipeline.addStage(ChunkTaskProvider.createMulti(
-                "flat merging task",
-                (chunks) -> chunks.stream()
-                        .filter((c) -> c.getPosition().equals(positionToGenerate))
-                        .findFirst() // return central chunk.
-                        .get(),
-                this::getNearChunkPositions));
-
-        Chunk chunk = createChunkAt(positionToGenerate);
-        Future<Chunk> chunkFuture = pipeline.invokeGeneratorTask(new Vector3i(0, 0, 0), () -> chunk);
-        Chunk chunkAfterProcessing = chunkFuture.get(1, TimeUnit.SECONDS);
-
-        Assertions.assertEquals(chunkAfterProcessing.getPosition(new Vector3i()), chunk.getPosition(new Vector3i()),
-                "Chunk after processing must have equals position, probably pipeline lost you chunk");
-    }
-
-    /**
-     * Imagine that we have task, which requires neighbors with same Z level. neighbor will generated.
-     */
-    @Test
-    void multiRequirementsChunksWillGeneratedSuccess() throws ExecutionException, InterruptedException,
-            TimeoutException {
-        Vector3i positionToGenerate = new Vector3i(0, 0, 0);
-        Map<Vector3i, Chunk> chunkToGenerate =
-                getNearChunkPositions(positionToGenerate)
-                        .stream()
-                        .filter((p) -> !p.equals(positionToGenerate)) //remove central chunk.
-                        .map(this::createChunkAt)
-                        .collect(Collectors.toMap(
-                                (chunk) -> chunk.getPosition(new Vector3i()),
-                                Function.identity()
-                        ));
-
-        pipeline = new ChunkProcessingPipeline((p) -> null, (o1, o2) -> 0);
-        pipeline.addStage(ChunkTaskProvider.createMulti(
-                "flat merging task",
-                (chunks) -> chunks.stream()
-                        .filter((c) -> c.getPosition().equals(positionToGenerate)).findFirst() // return central chunk.
-                        .get(),
-                this::getNearChunkPositions));
-
-        Chunk chunk = createChunkAt(positionToGenerate);
-        Future<Chunk> chunkFuture = pipeline.invokeGeneratorTask(new Vector3i(0, 0, 0), () -> chunk);
-
-        Thread.sleep(1_000); // sleep 1 second. and check future.
-        Assertions.assertFalse(chunkFuture.isDone(), "Chunk must be not generated, because ChunkTask have not exists " +
-                "neighbors in requirements");
-
-        chunkToGenerate.forEach((position, neighborChunk) -> pipeline.invokeGeneratorTask(position,
-                () -> neighborChunk));
-
-        Chunk chunkAfterProcessing = chunkFuture.get(1, TimeUnit.SECONDS);
-
-        Assertions.assertEquals(chunkAfterProcessing.getPosition(new Vector3i()), chunk.getPosition(new Vector3i()),
-                "Chunk after processing must have equals position, probably pipeline lost you chunk");
-    }
-
     @Test
     void emulateEntityMoving() throws InterruptedException {
         final AtomicReference<Vector3ic> position = new AtomicReference<>();
         Map<Vector3ic, Future<Chunk>> futures = Maps.newHashMap();
         Map<Vector3ic, Chunk> chunkCache = Maps.newConcurrentMap();
-        pipeline = new ChunkProcessingPipeline(chunkCache::get, (o1, o2) -> {
+        pipeline = new ChunkProcessingPipeline((o1, o2) -> {
             if (position.get() != null) {
                 Vector3ic entityPos = position.get();
                 return (int) (entityPos.distance(((PositionFuture<?>) o1).getPosition()) - entityPos.distance(((PositionFuture<?>) o2).getPosition()));
             }
             return 0;
         });
-        pipeline.addStage(ChunkTaskProvider.createMulti(
-                "flat merging task",
-                (chunks) -> chunks.stream()
-                        .sorted((o1, o2) -> {
-                            Function<Chunk, Vector3i> pos = (c) -> c.getPosition(new Vector3i());
-                            return Comparator.comparing(pos.andThen(Vector3i::x))
-                                    .thenComparing(pos.andThen(Vector3i::y))
-                                    .thenComparing(pos.andThen(Vector3i::z))
-                                    .compare(o1, o2);
-                        }).toArray(Chunk[]::new)[5],
-                this::getNearChunkPositions));
         pipeline.addStage(ChunkTaskProvider.create("finish chunk", (c) -> {
             c.markReady();
             chunkCache.put(c.getPosition(new Vector3i()), c);

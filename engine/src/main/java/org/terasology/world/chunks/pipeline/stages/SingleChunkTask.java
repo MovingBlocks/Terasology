@@ -1,14 +1,11 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.world.chunks.pipeline.stages;
 
-import com.google.common.base.Preconditions;
 import org.joml.Vector3ic;
 import org.terasology.world.chunks.Chunk;
 
-import java.util.Collection;
-import java.util.Optional;
 import java.util.function.UnaryOperator;
 
 /**
@@ -37,10 +34,7 @@ public class SingleChunkTask implements ChunkTask {
     }
 
     @Override
-    public Chunk apply(Collection<Chunk> chunks) {
-        Preconditions.checkArgument(chunks.size() == 1, "SingleChunkTask must have only one chunk on input");
-        Optional<Chunk> chunk = chunks.stream().findFirst();
-        Preconditions.checkArgument(chunk.isPresent(), "SingleChunkTask must have chunk on input");
-        return function.apply(chunk.get());
+    public Chunk apply(Chunk chunk) {
+        return function.apply(chunk);
     }
 }
