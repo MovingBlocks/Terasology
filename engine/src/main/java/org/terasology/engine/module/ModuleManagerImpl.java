@@ -51,8 +51,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static org.terasology.engine.module.StandardModuleExtension.IS_ASSET;
-
 public class ModuleManagerImpl implements ModuleManager {
     private static final Logger logger = LoggerFactory.getLogger(ModuleManagerImpl.class);
     private final StandardPermissionProviderFactory permissionProviderFactory = new StandardPermissionProviderFactory();
@@ -176,13 +174,8 @@ public class ModuleManagerImpl implements ModuleManager {
         ExternalApiWhitelist.PACKAGES.stream().forEach(packagee ->
                 permissionProviderFactory.getBasePermissionSet().addAPIPackage(packagee));
 
-        APIScanner apiScanner = new APIScanner(permissionProviderFactory);
-        // TODO: we would just apiScanner.scan(registry), except non-code modules crash the gestalt v5 scanner
-        for (Module module : registry) {
-            if (module.isOnClasspath() && !IS_ASSET.isProvidedBy(module)) {
-                apiScanner.scan(module);
-            }
-        }
+        APIScanner apiScanner = new APIScannerTolerantOfAssetOnlyModules(permissionProviderFactory);
+        apiScanner.scan(registry);
 
         permissionProviderFactory.getBasePermissionSet().grantPermission("com.google.gson", ReflectPermission.class);
         permissionProviderFactory.getBasePermissionSet().grantPermission("com.google.gson.internal", ReflectPermission.class);
