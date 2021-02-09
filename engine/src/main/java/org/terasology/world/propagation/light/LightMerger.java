@@ -1,4 +1,4 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.world.propagation.light;
 
@@ -26,7 +26,7 @@ import java.util.Objects;
 public class LightMerger {
     private static final int CENTER_INDEX = 13;
     private static final int LOCAL_CHUNKS_SIDE_LENGTH = 3;
-    private static final int LOCAL_CHUNKS_ARRAY_LENGTH =
+    public static final int LOCAL_CHUNKS_ARRAY_LENGTH =
             LOCAL_CHUNKS_SIDE_LENGTH * LOCAL_CHUNKS_SIDE_LENGTH * LOCAL_CHUNKS_SIDE_LENGTH;
 
     private final LightPropagationRules lightRules = new LightPropagationRules();
