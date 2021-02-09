@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.terasology.TerasologyTestingEnvironment;
 import org.terasology.assets.management.AssetManager;
-import org.terasology.math.JomlUtil;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.internal.BlockManagerImpl;

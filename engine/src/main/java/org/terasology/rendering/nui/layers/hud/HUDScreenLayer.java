@@ -9,7 +9,6 @@ import org.terasology.assets.management.AssetManager;
 import org.terasology.joml.geom.Rectanglef;
 import org.terasology.joml.geom.Rectanglefc;
 import org.terasology.joml.geom.Rectanglei;
-import org.terasology.math.JomlUtil;
 import org.terasology.math.TeraMath;
 import org.terasology.nui.Canvas;
 import org.terasology.nui.ControlWidget;
@@ -148,7 +147,7 @@ public class HUDScreenLayer extends CoreScreenLayer {
             int minY = TeraMath.floorToInt(element.region.minY() * canvas.size().y);
             int sizeX = TeraMath.floorToInt(element.region.getSizeX() * canvas.size().x);
             int sizeY = TeraMath.floorToInt(element.region.getSizeY() * canvas.size().y);
-            Rectanglei region = JomlUtil.rectangleiFromMinAndSize(minX, minY, sizeX, sizeY);
+            Rectanglei region = new Rectanglei(minX, minY).setSize(sizeX, sizeY);
             canvas.drawWidget(element.widget, region);
         }
     }

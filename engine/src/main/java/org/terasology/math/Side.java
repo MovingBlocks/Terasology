@@ -17,11 +17,9 @@ package org.terasology.math;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
-import org.joml.Quaternionfc;
 import org.joml.Vector3fc;
+import org.joml.Vector3i;
 import org.joml.Vector3ic;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector3i;
 
 import java.util.EnumMap;
 import java.util.EnumSet;
@@ -34,8 +32,8 @@ import java.util.EnumSet;
  *
  */
 public enum Side {
-    TOP(Vector3i.up(), true, false, true),
-    BOTTOM(Vector3i.down(), true, false, true),
+    TOP(new Vector3i(0, 1, 0), true, false, true),
+    BOTTOM(new Vector3i(0, -1, 0), true, false, true),
     LEFT(new Vector3i(-1, 0, 0), false, true, true),
     RIGHT(new Vector3i(1, 0, 0), false, true, true),
     FRONT(new Vector3i(0, 0, -1), true, true, false),
@@ -155,17 +153,6 @@ public enum Side {
     }
 
     /**
-     * @param dir
-     * @return
-     * @deprecated This method is scheduled for removal in an upcoming version. Use the JOML implementation instead:
-     *     {@link #inDirection(Vector3fc)}.
-     */
-    @Deprecated
-    public static Side inDirection(Vector3f dir) {
-        return inDirection(dir.x, dir.y, dir.z);
-    }
-
-    /**
      * The side normal closes to dir
      * 
      * @param dir direction
@@ -221,22 +208,12 @@ public enum Side {
     }
 
     /**
-     * @return The vector3i in the direction of the side. Do not modify.
-     * @deprecated This method is scheduled for removal in an upcoming version. Use the JOML implementation instead:
-     *     {@link #direction()} .
-     */
-    @Deprecated
-    public Vector3i getVector3i() {
-        return vector3iDir;
-    }
-
-    /**
      * the normal vector in the direction of the side
      *
      * @return a normalized vector
      */
     public Vector3ic direction() {
-        return JomlUtil.from(vector3iDir);
+        return vector3iDir;
     }
 
     /**
@@ -325,19 +302,6 @@ public enum Side {
             default:
                 return this;
         }
-    }
-
-    /**
-     * @param position
-     * @return
-     * @deprecated This method is scheduled for removal in an upcoming version. Use the JOML implementation instead:
-     *     {@link #getAdjacentPos(Vector3ic, org.joml.Vector3i)} .
-     **/
-    @Deprecated
-    public Vector3i getAdjacentPos(Vector3i position) {
-        Vector3i result = new Vector3i(position);
-        result.add(vector3iDir);
-        return result;
     }
 
     /**
