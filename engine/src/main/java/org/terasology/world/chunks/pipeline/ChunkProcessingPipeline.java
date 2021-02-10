@@ -36,7 +36,7 @@ public class ChunkProcessingPipeline {
 
     private final List<ChunkTaskProvider> stages = Lists.newArrayList();
     private final ThreadPoolExecutor executor;
-    private final Map<Vector3ic, Future<Chunk>> processingPositions = Maps.newConcurrentMap();
+    private final Map<Vector3ic, CompletableFuture<Chunk>> processingPositions = Maps.newConcurrentMap();
     private int threadIndex;
 
     /**
@@ -89,11 +89,17 @@ public class ChunkProcessingPipeline {
      * @return Future of chunk processing.
      */
     public Future<Chunk> invokeGeneratorTask(Vector3i position, Supplier<Chunk> generatorTask) {
-        CompletableFuture<Chunk> complFuture = CompletableFuture.supplyAsync(generatorTask, executor);
-        for (ChunkTaskProvider stage : stages) {
-            complFuture.thenApplyAsync(stage.createChunkTask(position), executor);
+        CompletableFuture<Chunk> future = processingPositions.get(position);
+        if (future == null) {
+            future = CompletableFuture.supplyAsync(generatorTask, executor);
+            for (ChunkTaskProvider stage : stages) {
+                future = future.thenApplyAsync(stage.createChunkTask(position), executor);
+            }
+            processingPositions.put(position, future);
+            future.thenAcceptAsync(chunk -> processingPositions.remove(chunk.getPosition()), executor);
         }
-        return complFuture;
+
+        return future;
     }
 
     /**
