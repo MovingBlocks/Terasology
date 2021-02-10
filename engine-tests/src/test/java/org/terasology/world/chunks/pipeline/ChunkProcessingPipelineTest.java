@@ -45,7 +45,7 @@ class ChunkProcessingPipelineTest extends TerasologyTestingEnvironment {
 
     @Test
     void simpleProcessingSuccess() throws ExecutionException, InterruptedException, TimeoutException {
-        pipeline = new ChunkProcessingPipeline((o1, o2) -> 0);
+        pipeline = new ChunkProcessingPipeline();
 
         Vector3i chunkPos = new Vector3i(0, 0, 0);
         Chunk chunk = createChunkAt(chunkPos);
@@ -61,7 +61,7 @@ class ChunkProcessingPipelineTest extends TerasologyTestingEnvironment {
 
     @Test
     void simpleStopProcessingSuccess() {
-        pipeline = new ChunkProcessingPipeline( (o1, o2) -> 0);
+        pipeline = new ChunkProcessingPipeline();
 
         Vector3i position = new Vector3i(0, 0, 0);
         Chunk chunk = createChunkAt(position);
@@ -69,7 +69,7 @@ class ChunkProcessingPipelineTest extends TerasologyTestingEnvironment {
 
         pipeline.addStage(ChunkTaskProvider.create("dummy long executing task", (c) -> {
             try {
-                Thread.sleep(1_000);
+                Thread.sleep(5_000);
             } catch (InterruptedException e) {
             }
             return c;
@@ -89,13 +89,7 @@ class ChunkProcessingPipelineTest extends TerasologyTestingEnvironment {
         final AtomicReference<Vector3ic> position = new AtomicReference<>();
         Map<Vector3ic, Future<Chunk>> futures = Maps.newHashMap();
         Map<Vector3ic, Chunk> chunkCache = Maps.newConcurrentMap();
-        pipeline = new ChunkProcessingPipeline((o1, o2) -> {
-            if (position.get() != null) {
-                Vector3ic entityPos = position.get();
-                return (int) (entityPos.distance(((PositionFuture<?>) o1).getPosition()) - entityPos.distance(((PositionFuture<?>) o2).getPosition()));
-            }
-            return 0;
-        });
+        pipeline = new ChunkProcessingPipeline();
         pipeline.addStage(ChunkTaskProvider.create("finish chunk", (c) -> {
             c.markReady();
             chunkCache.put(c.getPosition(new Vector3i()), c);

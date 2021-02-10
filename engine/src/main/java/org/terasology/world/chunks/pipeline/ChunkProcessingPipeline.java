@@ -5,23 +5,20 @@ package org.terasology.world.chunks.pipeline;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Queues;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.utilities.ReflectionUtil;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.pipeline.stages.ChunkTaskProvider;
 
-import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.Future;
-import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.RunnableFuture;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -45,12 +42,12 @@ public class ChunkProcessingPipeline {
     /**
      * Create ChunkProcessingPipeline.
      */
-    public ChunkProcessingPipeline(Comparator<Future<Chunk>> comparable) {
+    public ChunkProcessingPipeline() {
         executor = new ThreadPoolExecutor(
                 NUM_TASK_THREADS,
                 NUM_TASK_THREADS, 0L,
                 TimeUnit.MILLISECONDS,
-                new PriorityBlockingQueue(800, unwrappingComporator(comparable)),
+                Queues.newArrayBlockingQueue(1024),
                 this::threadFactory,
                 this::rejectQueueHandler) {
             @Override
@@ -58,18 +55,6 @@ public class ChunkProcessingPipeline {
                 RunnableFuture<T> newTaskFor = super.newTaskFor(callable);
                 return new PositionFuture<>(newTaskFor, ((PositionalCallable) callable).getPosition());
             }
-        };
-    }
-
-    /**
-     * BlackMagic method: {@link ExecutorCompletionService} wraps task with QueueingFuture (private access) there takes
-     * wrapped task for comparing in {@link ThreadPoolExecutor}
-     */
-    private Comparator unwrappingComporator(Comparator<Future<Chunk>> comparable) {
-        return (o1, o2) -> {
-            Object unwrapped1 = ReflectionUtil.readField(o1, "task");
-            Object unwrapped2 = ReflectionUtil.readField(o2, "task");
-            return comparable.compare((Future<Chunk>) unwrapped1, (Future<Chunk>) unwrapped2);
         };
     }
 
