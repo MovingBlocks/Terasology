@@ -11,6 +11,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.monitoring.ThreadActivity;
 import org.terasology.monitoring.ThreadMonitor;
+import org.terasology.rendering.world.viewDistance.ViewDistance;
+import org.terasology.world.block.BlockRegion;
 import org.terasology.world.chunks.Chunk;
 
 import java.util.LinkedList;
@@ -43,11 +45,12 @@ public class ChunkProcessingPipeline {
      * Create ChunkProcessingPipeline.
      */
     public ChunkProcessingPipeline() {
+        int chunksCount = new BlockRegion(0, 0, 0).expand(ViewDistance.MEGA.getChunkDistance()).volume();
         executor = new ThreadPoolExecutor(
                 NUM_TASK_THREADS,
                 NUM_TASK_THREADS, 0L,
                 TimeUnit.MILLISECONDS,
-                Queues.newArrayBlockingQueue(1024),
+                Queues.newArrayBlockingQueue(chunksCount),
                 this::threadFactory,
                 this::rejectQueueHandler);
     }
