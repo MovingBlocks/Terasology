@@ -23,7 +23,6 @@ import org.terasology.world.chunks.event.BeforeChunkUnload;
 import org.terasology.world.chunks.event.OnChunkLoaded;
 import org.terasology.world.chunks.pipeline.ChunkProcessingPipeline;
 import org.terasology.world.chunks.pipeline.PositionFuture;
-import org.terasology.world.chunks.pipeline.stages.ChunkTaskProvider;
 import org.terasology.world.internal.ChunkViewCore;
 import org.terasology.world.internal.ChunkViewCoreImpl;
 import org.terasology.world.propagation.light.InternalLightProcessor;
@@ -62,11 +61,9 @@ public class RemoteChunkProvider implements ChunkProvider {
         this.blockManager = blockManager;
         loadingPipeline = new ChunkProcessingPipeline();
 
-        loadingPipeline.addStage(
-            ChunkTaskProvider.create("Chunk generate internal lightning",
-                (Consumer<Chunk>) InternalLightProcessor::generateInternalLighting))
-            .addStage(ChunkTaskProvider.create("Chunk deflate", Chunk::deflate))
-            .addStage(ChunkTaskProvider.create("", readyChunks::add));
+        loadingPipeline.addStage("Chunk generate internal lightning",(Consumer<Chunk>) InternalLightProcessor::generateInternalLighting)
+            .addStage("Chunk deflate", Chunk::deflate)
+            .addStage("", readyChunks::add);
 
         ChunkMonitor.fireChunkProviderInitialized(this);
     }

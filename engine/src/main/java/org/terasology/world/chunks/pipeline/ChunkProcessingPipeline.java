@@ -6,23 +6,23 @@ package org.terasology.world.chunks.pipeline;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
-import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.monitoring.ThreadActivity;
+import org.terasology.monitoring.ThreadMonitor;
 import org.terasology.world.chunks.Chunk;
-import org.terasology.world.chunks.pipeline.stages.ChunkTaskProvider;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
-import java.util.concurrent.RunnableFuture;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
+import java.util.function.UnaryOperator;
 
 /**
  * Manages execution of chunk processing.
@@ -34,7 +34,7 @@ public class ChunkProcessingPipeline {
     private static final int NUM_TASK_THREADS = 4;
     private static final Logger logger = LoggerFactory.getLogger(ChunkProcessingPipeline.class);
 
-    private final List<ChunkTaskProvider> stages = Lists.newArrayList();
+    private final List<UnaryOperator<Chunk>> stages = Lists.newArrayList();
     private final ThreadPoolExecutor executor;
     private final Map<Vector3ic, CompletableFuture<Chunk>> processingPositions = Maps.newConcurrentMap();
     private int threadIndex;
@@ -49,12 +49,21 @@ public class ChunkProcessingPipeline {
                 TimeUnit.MILLISECONDS,
                 Queues.newArrayBlockingQueue(1024),
                 this::threadFactory,
-                this::rejectQueueHandler) {
-            @Override
-            protected <T> RunnableFuture<T> newTaskFor(Callable<T> callable) {
-                RunnableFuture<T> newTaskFor = super.newTaskFor(callable);
-                return new PositionFuture<>(newTaskFor, ((PositionalCallable) callable).getPosition());
+                this::rejectQueueHandler);
+    }
+
+    private static UnaryOperator<Chunk> wrapWithLogging(String name, UnaryOperator<Chunk> stage) {
+        return chunk -> {
+            try (ThreadActivity ignored = ThreadMonitor.startThreadActivity(name)) {
+                return stage.apply(chunk);
             }
+        };
+    }
+
+    private static UnaryOperator<Chunk> convertToFunction(Consumer<Chunk> stage) {
+        return chunk -> {
+            stage.accept(chunk);
+            return chunk;
         };
     }
 
@@ -72,11 +81,24 @@ public class ChunkProcessingPipeline {
     /**
      * Add stage to pipeline.
      *
-     * @param stage function for ChunkTask generating by Chunk.
+     * @param name stage name for display in thread manager.
+     * @param stage function for processing chunk at this stage.
      * @return self for Fluent api.
      */
-    public ChunkProcessingPipeline addStage(ChunkTaskProvider stage) {
-        stages.add(stage);
+    public ChunkProcessingPipeline addStage(String name, UnaryOperator<Chunk> stage) {
+        stages.add(wrapWithLogging(name, stage));
+        return this;
+    }
+
+    /**
+     * Add stage to pipeline.
+     *
+     * @param name stage name for display in thread manager.
+     * @param peekStage function for processing chunk at this stage.
+     * @return self for Fluent api.
+     */
+    public ChunkProcessingPipeline addStage(String name, Consumer<Chunk> peekStage) {
+        stages.add(wrapWithLogging(name, convertToFunction(peekStage)));
         return this;
     }
 
@@ -88,12 +110,12 @@ public class ChunkProcessingPipeline {
      * @param generatorTask ChunkTask which provides new chunk to pipeline
      * @return Future of chunk processing.
      */
-    public Future<Chunk> invokeGeneratorTask(Vector3i position, Supplier<Chunk> generatorTask) {
+    public Future<Chunk> invokeGeneratorTask(Vector3ic position, Supplier<Chunk> generatorTask) {
         CompletableFuture<Chunk> future = processingPositions.get(position);
         if (future == null) {
             future = CompletableFuture.supplyAsync(generatorTask, executor);
-            for (ChunkTaskProvider stage : stages) {
-                future = future.thenApplyAsync(stage.createChunkTask(position), executor);
+            for (UnaryOperator<Chunk> stage : stages) {
+                future = future.thenApplyAsync(stage, executor);
             }
             processingPositions.put(position, future);
             future.thenAcceptAsync(chunk -> processingPositions.remove(chunk.getPosition()), executor);
@@ -109,7 +131,7 @@ public class ChunkProcessingPipeline {
      * @param chunk chunk to process.
      */
     public Future<Chunk> invokePipeline(Chunk chunk) {
-        return invokeGeneratorTask(chunk.getPosition(new Vector3i()), () -> chunk);
+        return invokeGeneratorTask(chunk.getPosition(), () -> chunk);
     }
 
     public void shutdown() {
@@ -152,27 +174,5 @@ public class ChunkProcessingPipeline {
      */
     public List<Vector3ic> getProcessingPosition() {
         return new LinkedList<>(processingPositions.keySet());
-    }
-
-    /**
-     * Dummy callable for passthru position for {@link java.util.concurrent.ThreadPoolExecutor}#newTaskFor
-     */
-    private static final class PositionalCallable implements Callable<Chunk> {
-        private final Callable<Chunk> callable;
-        private final Vector3ic position;
-
-        private PositionalCallable(Callable<Chunk> callable, Vector3ic position) {
-            this.callable = callable;
-            this.position = position;
-        }
-
-        public Vector3ic getPosition() {
-            return position;
-        }
-
-        @Override
-        public Chunk call() throws Exception {
-            return callable.call();
-        }
     }
 }

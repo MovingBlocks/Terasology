@@ -20,7 +20,6 @@ import org.terasology.world.block.tiles.NullWorldAtlas;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.blockdata.ExtraBlockDataManager;
 import org.terasology.world.chunks.internal.ChunkImpl;
-import org.terasology.world.chunks.pipeline.stages.ChunkTaskProvider;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -50,7 +49,7 @@ class ChunkProcessingPipelineTest extends TerasologyTestingEnvironment {
         Vector3i chunkPos = new Vector3i(0, 0, 0);
         Chunk chunk = createChunkAt(chunkPos);
 
-        pipeline.addStage(ChunkTaskProvider.create("dummy task", (c) -> c));
+        pipeline.addStage("dummy task", (c) -> c);
 
         Future<Chunk> chunkFuture = pipeline.invokeGeneratorTask(new Vector3i(0, 0, 0), () -> chunk);
         Chunk chunkAfterProcessing = chunkFuture.get(1, TimeUnit.SECONDS);
@@ -67,13 +66,13 @@ class ChunkProcessingPipelineTest extends TerasologyTestingEnvironment {
         Chunk chunk = createChunkAt(position);
 
 
-        pipeline.addStage(ChunkTaskProvider.create("dummy long executing task", (c) -> {
+        pipeline.addStage("dummy long executing task", (c) -> {
             try {
                 Thread.sleep(5_000);
             } catch (InterruptedException e) {
             }
             return c;
-        }));
+        });
 
         Future<Chunk> chunkFuture = pipeline.invokeGeneratorTask(position, () -> chunk);
         pipeline.stopProcessingAt(position);
@@ -90,10 +89,10 @@ class ChunkProcessingPipelineTest extends TerasologyTestingEnvironment {
         Map<Vector3ic, Future<Chunk>> futures = Maps.newHashMap();
         Map<Vector3ic, Chunk> chunkCache = Maps.newConcurrentMap();
         pipeline = new ChunkProcessingPipeline();
-        pipeline.addStage(ChunkTaskProvider.create("finish chunk", (c) -> {
+        pipeline.addStage("finish chunk", (c) -> {
             c.markReady();
             chunkCache.put(c.getPosition(new Vector3i()), c);
-        }));
+        });
 
 
         Set<Vector3ic> relativeRegion = Collections.emptySet();

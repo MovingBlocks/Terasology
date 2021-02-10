@@ -44,7 +44,6 @@ import org.terasology.world.chunks.event.PurgeWorldEvent;
 import org.terasology.world.chunks.internal.ChunkImpl;
 import org.terasology.world.chunks.internal.ChunkRelevanceRegion;
 import org.terasology.world.chunks.pipeline.ChunkProcessingPipeline;
-import org.terasology.world.chunks.pipeline.stages.ChunkTaskProvider;
 import org.terasology.world.generation.impl.EntityBufferImpl;
 import org.terasology.world.generator.WorldGenerator;
 import org.terasology.world.internal.ChunkViewCore;
@@ -112,6 +111,11 @@ public class LocalChunkProvider implements ChunkProvider {
         this.blockManager = blockManager;
         this.extraDataManager = extraDataManager;
         this.unloadRequestTaskMaster = TaskMaster.createFIFOTaskMaster("Chunk-Unloader", 4);
+        loadingPipeline = new ChunkProcessingPipeline();
+        loadingPipeline.addStage("Chunk generate internal lightning",
+                        (Consumer<Chunk>) InternalLightProcessor::generateInternalLighting)
+                .addStage("Chunk deflate", Chunk::deflate)
+                .addStage("Chunk ready", readyChunks::add);
         this.chunkCache = chunkCache;
         ChunkMonitor.fireChunkProviderInitialized(this);
     }
@@ -420,13 +424,7 @@ public class LocalChunkProvider implements ChunkProvider {
         chunkCache.clear();
         storageManager.deleteWorld();
         worldEntity.send(new PurgeWorldEvent());
-
         loadingPipeline = new ChunkProcessingPipeline();
-        loadingPipeline.addStage(
-            ChunkTaskProvider.create("Chunk generate internal lightning",
-                (Consumer<Chunk>) InternalLightProcessor::generateInternalLighting))
-            .addStage(ChunkTaskProvider.create("Chunk deflate", Chunk::deflate))
-            .addStage(ChunkTaskProvider.create("Chunk ready", readyChunks::add));
         unloadRequestTaskMaster = TaskMaster.createFIFOTaskMaster("Chunk-Unloader", 8);
         ChunkMonitor.fireChunkProviderInitialized(this);
 
@@ -447,14 +445,7 @@ public class LocalChunkProvider implements ChunkProvider {
         return chunk != null && chunk.isReady();
     }
 
-    // TODO: move loadingPipeline initialization into constructor.
     public void setRelevanceSystem(RelevanceSystem relevanceSystem) {
         this.relevanceSystem = relevanceSystem;
-        loadingPipeline = new ChunkProcessingPipeline();
-        loadingPipeline.addStage(
-            ChunkTaskProvider.create("Chunk generate internal lightning",
-                (Consumer<Chunk>) InternalLightProcessor::generateInternalLighting))
-            .addStage(ChunkTaskProvider.create("Chunk deflate", Chunk::deflate))
-            .addStage(ChunkTaskProvider.create("Chunk ready", readyChunks::add));
     }
 }
