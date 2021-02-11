@@ -102,6 +102,16 @@ public class LodChunk implements RenderableChunk {
     }
 
     @Override
+    public short getBlockId(Vector3ic pos) {
+        throw new UnsupportedOperationException(UNSUPPORTED_MESSAGE);
+    }
+
+    @Override
+    public short getBlockId(int x, int y, int z) {
+        throw new UnsupportedOperationException(UNSUPPORTED_MESSAGE);
+    }
+
+    @Override
     public Block setBlock(int x, int y, int z, Block block) {
         throw new UnsupportedOperationException(UNSUPPORTED_MESSAGE);
     }

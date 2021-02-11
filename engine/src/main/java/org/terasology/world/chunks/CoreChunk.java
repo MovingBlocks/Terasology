@@ -57,11 +57,29 @@ public interface CoreChunk {
     Block getBlock(int x, int y, int z);
 
     /**
+     * Returns block's id at given position relative to the chunk.
+     *
+     * @param pos Position of the block relative to corner of the chunk
+     * @return Block at given position
+     */
+    short getBlockId(Vector3ic pos);
+
+    /**
+     * Returns block's id at given position relative to the chunk.
+     *
+     * @param x X offset from the corner of the chunk
+     * @param y Y offset from the corner of the chunk
+     * @param z Z offset from the corner of the chunk
+     * @return Block at given position
+     */
+    short getBlockId(int x, int y, int z);
+
+    /**
      * Sets type of block at given position relative to the chunk.
      *
-     * @param x     X offset from the corner of the chunk
-     * @param y     Y offset from the corner of the chunk
-     * @param z     Z offset from the corner of the chunk
+     * @param x X offset from the corner of the chunk
+     * @param y Y offset from the corner of the chunk
+     * @param z Z offset from the corner of the chunk
      * @param block Block to set block at given position to
      * @return Old Block at given position
      */
@@ -70,32 +88,30 @@ public interface CoreChunk {
     /**
      * Sets type of block at given position relative to the chunk.
      *
-     * @param pos   Position of the block relative to corner of the chunk
+     * @param pos Position of the block relative to corner of the chunk
      * @param block Block to set block at given position to
      * @return Old Block at given position
      */
     Block setBlock(Vector3ic pos, Block block);
 
     /**
-     * Sets one of the per-block custom data values at a given position relative to the chunk.
-     * The given value is downcast from int to the appropriate type for the array. It is not
-     * checked for overflow.
+     * Sets one of the per-block custom data values at a given position relative to the chunk. The given value is
+     * downcast from int to the appropriate type for the array. It is not checked for overflow.
      *
      * @param index Index of the extra data array
-     * @param x     X offset from the corner of the chunk
-     * @param y     Y offset from the corner of the chunk
-     * @param z     Z offset from the corner of the chunk
+     * @param x X offset from the corner of the chunk
+     * @param y Y offset from the corner of the chunk
+     * @param z Z offset from the corner of the chunk
      * @param value New value to set the block to
      */
     void setExtraData(int index, int x, int y, int z, int value);
 
     /**
-     * Sets one of the per-block custom data values at a given position relative to the chunk.
-     * The given value is downcast from int to the appropriate type for the array. It is not
-     * checked for overflow.
+     * Sets one of the per-block custom data values at a given position relative to the chunk. The given value is
+     * downcast from int to the appropriate type for the array. It is not checked for overflow.
      *
      * @param index Index of the extra data array
-     * @param pos   Position of the block relative to the corner of the chunk
+     * @param pos Position of the block relative to the corner of the chunk
      * @param value New value to set the block to
      */
     void setExtraData(int index, Vector3ic pos, int value);
@@ -104,9 +120,9 @@ public interface CoreChunk {
      * Returns one of the per-block custom data values at a given position relative to the chunk.
      *
      * @param index Index of the extra data array
-     * @param x     X offset from the corner of the chunk
-     * @param y     Y offset from the corner of the chunk
-     * @param z     Z offset from the corner of the chunk
+     * @param x X offset from the corner of the chunk
+     * @param y Y offset from the corner of the chunk
+     * @param z Z offset from the corner of the chunk
      * @return Selected extra data value at the given location
      */
     int getExtraData(int index, int x, int y, int z);
@@ -115,7 +131,7 @@ public interface CoreChunk {
      * Returns one of the per-block custom data values at a given position relative to the chunk.
      *
      * @param index Index of the extra data array
-     * @param pos   Position of the block relative to the corner of the chunk
+     * @param pos Position of the block relative to the corner of the chunk
      * @return Selected extra data value at the given location
      */
     int getExtraData(int index, Vector3ic pos);

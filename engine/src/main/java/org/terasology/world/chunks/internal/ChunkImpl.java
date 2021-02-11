@@ -142,6 +142,16 @@ public class ChunkImpl implements Chunk {
         return blockManager.getBlock(id);
     }
 
+    @Override
+    public short getBlockId(Vector3ic pos) {
+        return getBlockId(pos.x(),pos.y(),pos.z());
+    }
+
+    @Override
+    public short getBlockId(int x, int y, int z) {
+        return (short) blockData.get(x, y, z);
+    }
+
     // This could be made to check for and clear extraData fields as appropriate,
     // but that could take an excessive amount of time,
     // so whatever sets a block to something extraData sensitive should also initialise the extra data.

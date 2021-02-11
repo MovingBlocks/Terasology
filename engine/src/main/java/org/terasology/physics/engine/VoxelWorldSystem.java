@@ -1,18 +1,5 @@
-/*
- * Copyright 2020 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.physics.engine;
 
 import com.badlogic.gdx.physics.bullet.collision.VoxelCollisionAlgorithmWrapper;
@@ -42,6 +29,7 @@ import org.terasology.world.WorldComponent;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockComponent;
+import org.terasology.world.block.BlockManager;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkProvider;
 import org.terasology.world.chunks.Chunks;
@@ -67,6 +55,8 @@ public class VoxelWorldSystem extends BaseComponentSystem {
     private WorldProvider worldProvider;
     @In
     private ChunkProvider chunkProvider;
+    @In
+    private BlockManager blockManager;
 
     private final TShortHashSet registred = new TShortHashSet();
 
@@ -99,21 +89,38 @@ public class VoxelWorldSystem extends BaseComponentSystem {
     }
 
     /**
-     * update voxel info for the wrapper for the associated block id
-     * @param block the block
+     * try to update voxel info for the wrapper for the associated block id. nothing if block already registred
+     * @param id block id
      */
-    private void tryRegister(Block block) {
-        short id = block.getId();
-        if (!registred.contains(id)) {
-            btCollisionShape shape = ((BulletCollisionShape) block.getCollisionShape()).underlyingShape;
-            btVoxelInfo info = new btVoxelInfo(shape != null && block.isTargetable(),
-                shape != null && !block.isPenetrable(), id, shape, block.getCollisionOffset(),
-                block.getFriction(), block.getRestitution(), block.getFriction());
-            wrapper.setVoxelInfo(info);
-            registred.add(id);
+    private void tryRegister(short id) {
+        if (id != 0 && !registred.contains(id)) {
+            Block block = blockManager.getBlock(id);
+            register(block);
         }
     }
 
+    /**
+     * try to update voxel info for the wrapper for the associated block. nothing if block already registred
+     * @param block the block
+     */
+    private void tryRegister(Block block) {
+        if (!registred.contains(block.getId())) {
+            register(block);
+        }
+    }
+
+    /**
+     * update voxel info for the wrapper for the associated block id
+     * @param block the block
+     */
+    private void register(Block block) {
+        btCollisionShape shape = ((BulletCollisionShape) block.getCollisionShape()).underlyingShape;
+        btVoxelInfo info = new btVoxelInfo(shape != null && block.isTargetable(),
+            shape != null && !block.isPenetrable(), block.getId(), shape, block.getCollisionOffset(),
+            block.getFriction(), block.getRestitution(), block.getFriction());
+        wrapper.setVoxelInfo(info);
+        registred.add(block.getId());
+    }
 
     @ReceiveEvent(components = BlockComponent.class)
     public void onBlockChange(OnChangedBlock event, EntityRef entity) {
@@ -148,9 +155,9 @@ public class VoxelWorldSystem extends BaseComponentSystem {
         for (int z = 0; z < Chunks.SIZE_Z; z++) {
             for (int x = 0; x < Chunks.SIZE_X; x++) {
                 for (int y = 0; y < Chunks.SIZE_Y; y++) {
-                    Block block = chunk.getBlock(x, y, z);
-                    tryRegister(block);
-                    buffer.putShort(block.getId());
+                    short blockId = chunk.getBlockId(x, y, z);
+                    tryRegister(blockId);
+                    buffer.putShort(blockId);
                 }
             }
         }
