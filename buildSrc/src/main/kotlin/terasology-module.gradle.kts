@@ -90,6 +90,12 @@ val deps = moduleConfig.dependencies.filterNotNull()
 val moduleDepends = deps.filterNot { it.id.toString() == "engine" }
 val engineVersion = deps.find { it.id.toString() == "engine" }?.versionRange()?.toString() ?: "+"
 
+configurations {
+    all {
+        resolutionStrategy.preferProjectModules()
+    }
+}
+
 // Set dependencies. Note that the dependency information from module.txt is used for other Terasology modules
 dependencies {
     implementation(group = "org.terasology.engine", name = "engine", version = engineVersion)
@@ -123,14 +129,17 @@ dependencies {
         }
     }
 
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.6.2")
-    testImplementation("org.junit.jupiter:junit-jupiter-params:5.6.2")
-    testImplementation("org.mockito:mockito-junit-jupiter:3.2.0")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.6.2")
+    add("testImplementation", platform("org.junit:junit-bom:5.7.1"))
+    testImplementation("org.junit.jupiter:junit-jupiter-api")
+    testImplementation("org.junit.jupiter:junit-jupiter-params")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
+
+    testImplementation("org.mockito:mockito-junit-jupiter:3.7.7")
 
     //backwards compatibility with modules tests
-    testImplementation("junit:junit:4.12")
-    testRuntimeOnly("org.junit.vintage:junit-vintage-engine:5.5.2")
+    testImplementation("junit:junit:4.13.1")
+    testImplementation("org.junit.jupiter:junit-jupiter-migrationsupport")
+    testRuntimeOnly("org.junit.vintage:junit-vintage-engine")
 }
 
 

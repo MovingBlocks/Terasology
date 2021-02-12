@@ -39,7 +39,6 @@ import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.game.Game;
 import org.terasology.game.GameManifest;
 import org.terasology.logic.location.LocationComponent;
-import org.terasology.math.JomlUtil;
 import org.terasology.module.Module;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.monitoring.PerformanceMonitor;
@@ -238,7 +237,7 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
         });
 
         for (Map.Entry<Vector3ic, CompressedChunkBuilder> entry : unloadedAndSavingChunkMap.entrySet()) {
-            saveTransactionBuilder.addUnloadedChunk(JomlUtil.from(entry.getKey()), entry.getValue());
+            saveTransactionBuilder.addUnloadedChunk(entry.getKey(), entry.getValue());
         }
     }
 
