@@ -62,13 +62,10 @@ public class WorldImpl implements World {
     }
 
     @Override
-    public void rasterizeChunk(CoreChunk chunk, EntityBuffer buffer, float scale) {
+    public void rasterizeChunk(CoreChunk chunk, float scale) {
         Region chunkRegion = getWorldData(new BlockRegion(chunk.getRegion()), scale);
         for (WorldRasterizer rasterizer : scalableWorldRasterizers) {
             ((ScalableWorldRasterizer) rasterizer).generateChunk(chunk, chunkRegion, scale);
-        }
-        for (EntityProvider entityProvider : entityProviders) {
-            entityProvider.process(chunkRegion, buffer);
         }
     }
 

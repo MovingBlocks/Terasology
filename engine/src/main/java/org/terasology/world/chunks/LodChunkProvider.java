@@ -90,7 +90,7 @@ public class LodChunkProvider {
                     continue;
                 }
                 Chunk chunk = new PreLodChunk(scaleDown(pos, scale), blockManager, extraDataManager);
-                generator.createChunk(chunk, new EntityBufferImpl(), (1 << scale) * (2f / (Chunks.SIZE_X - 2) + 1));
+                generator.createChunk(chunk, (1 << scale) * (2f / (Chunks.SIZE_X - 2) + 1));
                 InternalLightProcessor.generateInternalLighting(chunk, 1 << scale);
                 //tintChunk(chunk);
                 ChunkView view = new ChunkViewCoreImpl(new Chunk[]{chunk}, new BlockRegion(chunk.getPosition(new Vector3i())), new Vector3i(), unloaded);
