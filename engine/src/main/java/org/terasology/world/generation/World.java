@@ -25,7 +25,7 @@ public interface World {
 
     void rasterizeChunk(CoreChunk chunk, EntityBuffer buffer);
 
-    void rasterizeChunk(CoreChunk chunk, EntityBuffer buffer, float scale);
+    void rasterizeChunk(CoreChunk chunk, float scale);
 
     /**
      * @return a <b>new</b> set containing all facet classes
