@@ -11,7 +11,6 @@ import com.badlogic.gdx.physics.bullet.dynamics.btDiscreteDynamicsWorld;
 import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody;
 import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody.btRigidBodyConstructionInfo;
 import com.badlogic.gdx.physics.bullet.linearmath.btDefaultMotionState;
-import gnu.trove.set.hash.TShortHashSet;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector3ic;
@@ -58,7 +57,7 @@ public class VoxelWorldSystem extends BaseComponentSystem {
     @In
     private BlockManager blockManager;
 
-    private final TShortHashSet registred = new TShortHashSet();
+    private final boolean[] registered = new boolean[Short.MAX_VALUE];
 
     private btRigidBodyConstructionInfo blockConsInf;
     private btVoxelShape worldShape;
@@ -93,7 +92,7 @@ public class VoxelWorldSystem extends BaseComponentSystem {
      * @param id block id
      */
     private void tryRegister(short id) {
-        if (id != 0 && !registred.contains(id)) {
+        if (id != 0 && !registered[id]) {
             Block block = blockManager.getBlock(id);
             register(block);
         }
@@ -104,7 +103,7 @@ public class VoxelWorldSystem extends BaseComponentSystem {
      * @param block the block
      */
     private void tryRegister(Block block) {
-        if (!registred.contains(block.getId())) {
+        if (!registered[block.getId()]) {
             register(block);
         }
     }
@@ -119,7 +118,7 @@ public class VoxelWorldSystem extends BaseComponentSystem {
             shape != null && !block.isPenetrable(), block.getId(), shape, block.getCollisionOffset(),
             block.getFriction(), block.getRestitution(), block.getFriction());
         wrapper.setVoxelInfo(info);
-        registred.add(block.getId());
+        registered[block.getId()] = true;
     }
 
     @ReceiveEvent(components = BlockComponent.class)
