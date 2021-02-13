@@ -9,6 +9,7 @@ import org.terasology.logic.players.event.RespawnRequestEvent;
 import org.terasology.nui.WidgetUtil;
 import org.terasology.nui.widgets.UILabel;
 import org.terasology.registry.CoreRegistry;
+import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
 
 /**
@@ -16,6 +17,11 @@ import org.terasology.rendering.nui.CoreScreenLayer;
  */
 public class DeathScreen extends CoreScreenLayer {
     private UILabel deathDetails;
+
+    @In
+    protected LocalPlayer localPlayer;
+    @In
+    protected GameEngine gameEngine;
 
     @Override
     protected boolean isEscapeToCloseAllowed() {
@@ -26,13 +32,13 @@ public class DeathScreen extends CoreScreenLayer {
     public void initialise() {
         deathDetails = find("deathDetails", UILabel.class);
         WidgetUtil.trySubscribe(this, "respawn", widget -> {
-            CoreRegistry.get(LocalPlayer.class).getClientEntity().send(new RespawnRequestEvent());
+            localPlayer.getClientEntity().send(new RespawnRequestEvent());
             getManager().closeScreen(DeathScreen.this);
         });
         WidgetUtil.trySubscribe(this, "settings", widget -> getManager().pushScreen("settingsMenuScreen"));
         WidgetUtil.trySubscribe(this, "mainMenu", widget -> {
-            CoreRegistry.get(LocalPlayer.class).getClientEntity().send(new RespawnRequestEvent());
-            CoreRegistry.get(GameEngine.class).changeState(new StateMainMenu());
+            localPlayer.getClientEntity().send(new RespawnRequestEvent());
+            gameEngine.changeState(new StateMainMenu());
         });
         WidgetUtil.trySubscribe(this, "exitGame", widget -> CoreRegistry.get(GameEngine.class).shutdown());
     }
