@@ -3,9 +3,9 @@
 
 package org.terasology.world.block;
 
+import org.joml.Math;
 import org.joml.Vector3fc;
 import org.joml.Vector3i;
-import org.terasology.math.TeraMath;
 import org.terasology.module.sandbox.API;
 
 /**
@@ -61,9 +61,9 @@ public final class Blocks {
      * @return {@code dest} holding the integer block coordinates
      */
     static Vector3i toBlockPos(float x, float y, float z, Vector3i dest) {
-        dest.x = TeraMath.floorToInt(x + 0.5f);
-        dest.y = TeraMath.floorToInt(y + 0.5f);
-        dest.z = TeraMath.floorToInt(z + 0.5f);
+        dest.x = Math.roundHalfUp(x);
+        dest.y = Math.roundHalfUp(y);
+        dest.z = Math.roundHalfUp(z);
         return dest;
     }
 
