@@ -23,7 +23,7 @@ public final class Blocks {
      * @param worldPos the position in the world
      * @return a new vector with the integer block coordinates
      */
-    static Vector3i toBlockPos(Vector3fc worldPos) {
+    public static Vector3i toBlockPos(Vector3fc worldPos) {
         return toBlockPos(worldPos.x(), worldPos.y(), worldPos.z());
     }
 
@@ -36,7 +36,7 @@ public final class Blocks {
      * @param z the z coordinate in the world
      * @return a new vector with the integer block coordinates
      */
-    static Vector3i toBlockPos(float x, float y, float z) {
+    public static Vector3i toBlockPos(float x, float y, float z) {
         return toBlockPos(x, y, z, new Vector3i());
     }
 
@@ -47,7 +47,7 @@ public final class Blocks {
      * @param worldPos the position in the world
      * @return {@code dest} holding the integer block coordinates
      */
-    static Vector3i toBlockPos(Vector3fc worldPos, Vector3i dest) {
+    public static Vector3i toBlockPos(Vector3fc worldPos, Vector3i dest) {
         return toBlockPos(worldPos.x(), worldPos.y(), worldPos.z(), dest);
     }
 
@@ -60,7 +60,7 @@ public final class Blocks {
      * @param z the z coordinate in the world
      * @return {@code dest} holding the integer block coordinates
      */
-    static Vector3i toBlockPos(float x, float y, float z, Vector3i dest) {
+    public static Vector3i toBlockPos(float x, float y, float z, Vector3i dest) {
         // using TeraMath because it is faster than org.joml.Math#roundHalfUp
         dest.x = TeraMath.floorToInt(x + 0.5f);
         dest.y = TeraMath.floorToInt(y + 0.5f);
