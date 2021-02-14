@@ -9,7 +9,6 @@ import org.terasology.engine.Time;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.input.cameraTarget.CameraTargetSystem;
 import org.terasology.logic.players.LocalPlayer;
-import org.terasology.math.Direction;
 import org.terasology.math.Orientation;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.nui.databinding.ReadOnlyBinding;
@@ -21,10 +20,6 @@ import org.terasology.rendering.primitives.ChunkTessellator;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.chunks.Chunks;
 
-import java.lang.management.ManagementFactory;
-import java.lang.management.MemoryPoolMXBean;
-import java.lang.management.MemoryType;
-import java.lang.management.MemoryUsage;
 import java.util.Locale;
 
 /**
@@ -36,7 +31,7 @@ import java.util.Locale;
  */
 public class DebugOverlay extends CoreScreenLayer {
 
-    private static double MB_SIZE = 1048576.0;
+    public static double MB_SIZE = 1048576.0;
 
     @In
     private Config config;
@@ -78,18 +73,9 @@ public class DebugOverlay extends CoreScreenLayer {
             debugLine1.bindText(new ReadOnlyBinding<String>() {
                 @Override
                 public String get() {
-                    //Memory stats without using Runtime.getRuntime() for client side
-                    StringBuilder clientTracking = new StringBuilder();
-                    for (MemoryPoolMXBean mpBean : ManagementFactory.getMemoryPoolMXBeans()) {
-                        if (mpBean.getType() == MemoryType.HEAP) {
-                            MemoryUsage usage = mpBean.getUsage();
-                            clientTracking.append(String.format("Memory Heap: %s - Memory Usage: %.2f MB, Max Memory: %.2f MB \n", mpBean.getName(), usage.getUsed() / MB_SIZE, usage.getMax() / MB_SIZE));
-                        }
-                    }
                     double memoryUsage = ((double) Runtime.getRuntime().totalMemory() - (double) Runtime.getRuntime().freeMemory()) / MB_SIZE;
-                    return String.format("FPS: %.2f, Memory Usage: %.2f MB, Total Memory: %.2f MB, Max Memory: %.2f MB \n%s",
-                            time.getFps(), memoryUsage, Runtime.getRuntime().totalMemory() / MB_SIZE, Runtime.getRuntime().maxMemory() / MB_SIZE,
-                            clientTracking.toString());
+                    return String.format("FPS: %.2f, Memory Usage: %.2f MB, Total Memory: %.2f MB, Max Memory: %.2f MB",
+                            time.getFps(), memoryUsage, Runtime.getRuntime().totalMemory() / MB_SIZE, Runtime.getRuntime().maxMemory() / MB_SIZE);
                 }
             });
         }
