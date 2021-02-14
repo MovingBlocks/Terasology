@@ -20,6 +20,7 @@ import org.terasology.rendering.dag.dependencyConnections.FboConnection;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * TODO: Add javadocs
@@ -176,6 +177,35 @@ public class RenderGraph {
 
     // TODO: Add handler methods which the graph uses to communicate changes to a node.
 
+    public List<Node> getStartingNodes() {
+        // This implementation of Kahn's Algorithm is adapted from the algorithm described at
+        // https://www.geeksforgeeks.org/topological-sorting-indegree-based-solution/
+
+        // In-degree (or incoming-degree) is the number of incoming edges of a particular node.
+        Map<Node, Integer> inDegreeMap = Maps.newHashMap();
+        List<Node> nodesToExamine = Lists.newArrayList();
+
+        // Calculate the in-degree for each node, and mark all nodes with no incoming edges for examination.
+        for (Node node : graph.nodes()) {
+            int inDegree = graph.inDegree(node);
+            inDegreeMap.put(node, inDegree);
+
+            if (inDegree == 0) {
+                nodesToExamine.add(node);
+            }
+        }
+
+        return nodesToExamine;
+    }
+
+    public Set<Node> getOutgoingNodesForNode(Node currentNode) {
+        return graph.successors(currentNode);
+    }
+
+    // TODO: Add `boolean isFullyFunctional(Node node)`
+
+    // TODO: Add handler methods which the graph uses to communicate changes to a node.
+
     public List<Node> getNodesInTopologicalOrder() {
         // This implementation of Kahn's Algorithm is adapted from the algorithm described at
         // https://www.geeksforgeeks.org/topological-sorting-indegree-based-solution/
@@ -186,9 +216,9 @@ public class RenderGraph {
         postConnectAll();
 
         // In-degree (or incoming-degree) is the number of incoming edges of a particular node.
+        int visitedNodes = 0;
         Map<Node, Integer> inDegreeMap = Maps.newHashMap();
         List<Node> nodesToExamine = Lists.newArrayList();
-        int visitedNodes = 0;
 
         // Calculate the in-degree for each node, and mark all nodes with no incoming edges for examination.
         for (Node node : graph.nodes()) {
