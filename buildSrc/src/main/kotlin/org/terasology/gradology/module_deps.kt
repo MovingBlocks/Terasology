@@ -14,8 +14,6 @@ import org.gradle.api.logging.Logger
 import org.gradle.api.logging.Logging
 import org.gradle.api.provider.Provider
 
-const val TERASOLOGY_MODULES_GROUP = "org.terasology.modules"
-
 val ModuleIdentifier.isTerasologyModule: Boolean
     get() = group == TERASOLOGY_MODULES_GROUP
 
