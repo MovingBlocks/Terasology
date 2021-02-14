@@ -1,18 +1,5 @@
-/*
- * Copyright 2019 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.logic.behavior;
 
 import com.google.common.collect.Lists;
@@ -45,8 +32,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
-
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 /**
  * Behavior tree system
@@ -75,11 +66,11 @@ public class CollectiveBehaviorSystem extends BaseComponentSystem implements Upd
         List<ResourceUrn> uris = Lists.newArrayList();
         uris.addAll(new ArrayList<>(assetManager.getAvailableAssets(StaticSound.class)));
         for (ResourceUrn uri : assetManager.getAvailableAssets(BehaviorTree.class)) {
-            try {
-                Optional<BehaviorTree> asset = assetManager.getAsset(uri, BehaviorTree.class);
-                asset.ifPresent(behaviorTree -> trees.add(behaviorTree));
-            } catch (RuntimeException e) {
-                logger.info("Failed to load behavior tree asset {}.", uri, e);
+            Optional<BehaviorTree> asset = assetManager.getAsset(uri, BehaviorTree.class);
+            if (asset.isPresent()) {
+                trees.add(asset.get());
+            } else {
+                logger.warn("Failed to load behavior tree asset {}.", uri);
             }
         }
     }
@@ -99,6 +90,10 @@ public class CollectiveBehaviorSystem extends BaseComponentSystem implements Upd
         Iterable<EntityRef> entities = entityManager.getEntitiesWith(CollectiveBehaviorComponent.class);
         for (EntityRef entity : entities) {
             CollectiveBehaviorComponent collectiveBehaviorComponent = entity.getComponent(CollectiveBehaviorComponent.class);
+            if (collectiveBehaviorComponent.collectiveInterpreter == null) {
+                logger.warn("Found a null interpreter during tick updates, skipping for entity {}", entity);
+                continue;
+            }
             collectiveBehaviorComponent.collectiveInterpreter.tick(delta);
         }
     }
