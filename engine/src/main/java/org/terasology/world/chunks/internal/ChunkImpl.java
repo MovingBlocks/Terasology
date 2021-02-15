@@ -142,10 +142,6 @@ public class ChunkImpl implements Chunk {
         return blockManager.getBlock(id);
     }
 
-    @Override
-    public short getBlockId(Vector3ic pos) {
-        return getBlockId(pos.x(),pos.y(),pos.z());
-    }
 
     @Override
     public short getBlockId(int x, int y, int z) {
