@@ -45,7 +45,7 @@ public class ChunkLightMergingSystem extends BaseComponentSystem {
                 continue;
             }
             processCandidateChunk(candidateForLightMerging);
-            lightMergedChunks.add(candidateForLightMerging);
+            lightMergedChunks.add(new Vector3i(candidateForLightMerging));
         }
     }
 
