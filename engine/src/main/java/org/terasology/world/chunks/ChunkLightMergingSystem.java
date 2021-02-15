@@ -4,6 +4,7 @@
 package org.terasology.world.chunks;
 
 import com.google.common.collect.Sets;
+import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.terasology.engine.subsystem.common.ThreadManager;
 import org.terasology.entitySystem.entity.EntityRef;
