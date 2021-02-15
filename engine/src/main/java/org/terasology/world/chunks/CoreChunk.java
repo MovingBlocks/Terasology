@@ -62,7 +62,9 @@ public interface CoreChunk {
      * @param pos Position of the block relative to corner of the chunk
      * @return Block at given position
      */
-    short getBlockId(Vector3ic pos);
+    default short getBlockId(Vector3ic pos) {
+        return getBlockId(pos.x(), pos.y(), pos.z());
+    }
 
     /**
      * Returns block's id at given position relative to the chunk.
