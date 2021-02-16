@@ -251,6 +251,7 @@ public class ChunkMesh {
      * @param cameraPosition a Vector3f storing the world position of the point of view from which the chunk is rendered.
      * @return Returns an integer representing the number of triangles rendered.
      */
+    @Deprecated
     public int render(ChunkMesh.RenderPhase phase, Vector3fc chunkPosition, Vector3fc cameraPosition) {
         GL11.glPushMatrix();
 
@@ -268,7 +269,7 @@ public class ChunkMesh {
         return triangleCount();
     }
 
-    private void render(RenderPhase type) {
+    public int render(RenderPhase type) {
         switch (type) {
             case OPAQUE:
                 renderVbo(0);
@@ -283,6 +284,7 @@ public class ChunkMesh {
             default:
                 break;
         }
+        return triangleCount();
     }
 
     /**
