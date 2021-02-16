@@ -1,25 +1,12 @@
-/*
- * Copyright 2013 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *  http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.world.chunks;
 
-import org.terasology.math.Region3i;
-import org.terasology.math.geom.BaseVector3i;
-import org.terasology.math.geom.Vector3i;
+import org.joml.Vector3i;
+import org.joml.Vector3ic;
 import org.terasology.module.sandbox.API;
 import org.terasology.world.block.Block;
+import org.terasology.world.block.BlockRegionc;
 
 /**
  * This interface describes the core of a chunk:
@@ -35,10 +22,21 @@ import org.terasology.world.block.Block;
  */
 @API
 public interface CoreChunk {
+
     /**
-     * @return Position of the chunk in world, where units of distance from origin are blocks
+     * @return Position of the chunk in world, where units of distance from origin are chunks
      */
-    Vector3i getPosition();
+    Vector3ic getPosition();
+
+    /**
+     * Position of the chunk in world, where units of distance from origin are chunks
+     *
+     * @param dest will hold the result
+     * @return dest
+     * @deprecated use {@link #getPosition()}
+     */
+    @Deprecated
+    org.joml.Vector3i getPosition(org.joml.Vector3i dest);
 
     /**
      * Returns block at given position relative to the chunk.
@@ -46,7 +44,7 @@ public interface CoreChunk {
      * @param pos Position of the block relative to corner of the chunk
      * @return Block at given position
      */
-    Block getBlock(BaseVector3i pos);
+    Block getBlock(Vector3ic pos);
 
     /**
      * Returns block at given position relative to the chunk.
@@ -76,7 +74,7 @@ public interface CoreChunk {
      * @param block Block to set block at given position to
      * @return Old Block at given position
      */
-    Block setBlock(BaseVector3i pos, Block block);
+    Block setBlock(Vector3ic pos, Block block);
 
     /**
      * Sets one of the per-block custom data values at a given position relative to the chunk.
@@ -90,7 +88,7 @@ public interface CoreChunk {
      * @param value New value to set the block to
      */
     void setExtraData(int index, int x, int y, int z, int value);
-    
+
     /**
      * Sets one of the per-block custom data values at a given position relative to the chunk.
      * The given value is downcast from int to the appropriate type for the array. It is not
@@ -100,8 +98,8 @@ public interface CoreChunk {
      * @param pos   Position of the block relative to the corner of the chunk
      * @param value New value to set the block to
      */
-    void setExtraData(int index, BaseVector3i pos, int value);
-    
+    void setExtraData(int index, Vector3ic pos, int value);
+
     /**
      * Returns one of the per-block custom data values at a given position relative to the chunk.
      *
@@ -112,7 +110,7 @@ public interface CoreChunk {
      * @return Selected extra data value at the given location
      */
     int getExtraData(int index, int x, int y, int z);
-    
+
     /**
      * Returns one of the per-block custom data values at a given position relative to the chunk.
      *
@@ -120,43 +118,47 @@ public interface CoreChunk {
      * @param pos   Position of the block relative to the corner of the chunk
      * @return Selected extra data value at the given location
      */
-    int getExtraData(int index, BaseVector3i pos);
+    int getExtraData(int index, Vector3ic pos);
+
 
     /**
-     * Returns offset of this chunk to the world center (0:0:0), with one unit being one chunk.
+     * Returns offset of this chunk to the world center (0:0:0), with one unit being one block.
      *
-     * @return Offset of this chunk from world center in chunks
+     * @return Offset of this chunk from world center in blocks
      */
-    Vector3i getChunkWorldOffset();
+    Vector3i getChunkWorldOffset(Vector3i pos);
+
 
     /**
-     * Returns X offset of this chunk to the world center (0:0:0), with one unit being one chunk.
+     * Returns X offset of this chunk to the world center (0:0:0), with one unit being one block.
      *
-     * @return X offset of this chunk from world center in chunks
+     * @return X offset of this chunk from world center in blocks
      */
     int getChunkWorldOffsetX();
 
     /**
-     * Returns Y offset of this chunk to the world center (0:0:0), with one unit being one chunk.
+     * Returns Y offset of this chunk to the world center (0:0:0), with one unit being one block.
      *
-     * @return Y offset of this chunk from world center in chunks
+     * @return Y offset of this chunk from world center in blocks
      */
     int getChunkWorldOffsetY();
 
     /**
-     * Returns Z offset of this chunk to the world center (0:0:0), with one unit being one chunk.
+     * Returns Z offset of this chunk to the world center (0:0:0), with one unit being one block.
      *
-     * @return Z offset of this chunk from world center in chunks
+     * @return Z offset of this chunk from world center in blocks
      */
     int getChunkWorldOffsetZ();
+
 
     /**
      * Returns position in this chunk transformed to world coordinates.
      *
-     * @param blockPos Position in this chunk you want to transform
+     * @param dest Position in this chunk you want to transform
      * @return Transformed position
      */
-    Vector3i chunkToWorldPosition(BaseVector3i blockPos);
+    Vector3i chunkToWorldPosition(Vector3ic blockPos, Vector3i dest);
+
 
     /**
      * Returns position in this chunk transformed to world coordinates.
@@ -164,9 +166,11 @@ public interface CoreChunk {
      * @param x X position in this chunk you want to transform
      * @param y Y position in this chunk you want to transform
      * @param z Z position in this chunk you want to transform
-     * @return Transformed position
+     * @param dest will hold the result
+     * @return dest
      */
-    Vector3i chunkToWorldPosition(int x, int y, int z);
+    Vector3i chunkToWorldPosition(int x, int y, int z, Vector3i dest);
+
 
     /**
      * Returns X position in this chunk transformed to world coordinate.
@@ -210,7 +214,7 @@ public interface CoreChunk {
     /**
      * @return Chunk's Region
      */
-    Region3i getRegion();
+    BlockRegionc getRegion();
 
     int getEstimatedMemoryConsumptionInBytes();
 

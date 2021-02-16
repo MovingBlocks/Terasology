@@ -15,7 +15,7 @@
  */
 package org.terasology.rendering.nui.widgets.browser.data.html;
 
-import org.terasology.rendering.assets.font.Font;
+import org.terasology.nui.asset.font.Font;
 
 @FunctionalInterface
 public interface HTMLFontResolver {

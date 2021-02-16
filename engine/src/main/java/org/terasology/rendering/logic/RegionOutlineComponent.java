@@ -15,8 +15,8 @@
  */
 package org.terasology.rendering.logic;
 
-import org.terasology.math.geom.Vector3i;
-import org.terasology.rendering.nui.Color;
+import org.joml.Vector3i;
+import org.terasology.nui.Color;
 
 /**
  * Entities with this component will cause a outline be drawn about the specified region in block coordinates.
@@ -24,5 +24,5 @@ import org.terasology.rendering.nui.Color;
 public class RegionOutlineComponent implements VisualComponent {
     public Vector3i corner1;
     public Vector3i corner2;
-    public Color color = Color.WHITE;
+    public Color color = new Color(Color.white);
 }

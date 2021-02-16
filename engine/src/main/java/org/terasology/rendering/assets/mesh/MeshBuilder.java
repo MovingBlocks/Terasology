@@ -15,15 +15,14 @@
  */
 package org.terasology.rendering.assets.mesh;
 
-import org.terasology.utilities.Assets;
+import org.joml.Vector2fc;
+import org.joml.Vector3f;
+import org.joml.Vector3fc;
 import org.terasology.assets.ResourceUrn;
-import org.terasology.math.geom.Vector2f;
-import org.terasology.math.geom.Vector3f;
 import org.terasology.module.sandbox.API;
-import org.terasology.rendering.nui.Color;
+import org.terasology.nui.Colorc;
+import org.terasology.utilities.Assets;
 
-/**
- */
 public class MeshBuilder {
     private static final float[] VERTICES = {
             // Front face
@@ -76,33 +75,41 @@ public class MeshBuilder {
     private int vertexCount;
     private TextureMapper textureMapper;
 
-    public MeshBuilder addVertex(Vector3f v) {
-        meshData.getVertices().add(v.x);
-        meshData.getVertices().add(v.y);
-        meshData.getVertices().add(v.z);
+    public MeshBuilder addVertex(Vector3fc v) {
+        meshData.getVertices().add(v.x());
+        meshData.getVertices().add(v.y());
+        meshData.getVertices().add(v.z());
         vertexCount++;
         return this;
     }
 
-    public MeshBuilder addPoly(Vector3f v1, Vector3f v2, Vector3f v3, Vector3f... vn) {
+    /**
+     *
+     * @param v1
+     * @param v2
+     * @param v3
+     * @param vn
+     * @return
+     */
+    public MeshBuilder addPoly(Vector3fc v1, Vector3fc v2, Vector3fc v3, Vector3fc... vn) {
         for (int i = 0; i < vn.length + 1; i++) {
             addIndices(vertexCount, vertexCount + i + 2, vertexCount + i + 1);
         }
         addVertex(v1);
         addVertex(v2);
         addVertex(v3);
-        for (Vector3f v : vn) {
+        for (Vector3fc v : vn) {
             addVertex(v);
         }
         return this;
     }
 
-    public MeshBuilder addColor(Color c1, Color... colors) {
+    public MeshBuilder addColor(Colorc c1, Colorc... colors) {
         meshData.getColors().add(c1.rf());
         meshData.getColors().add(c1.gf());
         meshData.getColors().add(c1.bf());
         meshData.getColors().add(c1.af());
-        for (Color c : colors) {
+        for (Colorc c : colors) {
             meshData.getColors().add(c.rf());
             meshData.getColors().add(c.gf());
             meshData.getColors().add(c.bf());
@@ -117,8 +124,8 @@ public class MeshBuilder {
         return this;
     }
 
-    public MeshBuilder addTexCoord(Vector2f v) {
-        return addTexCoord(v.x, v.y);
+    public MeshBuilder addTexCoord(Vector2fc v) {
+        return addTexCoord(v.x(), v.y());
     }
 
     public MeshBuilder addIndex(int index) {
@@ -148,11 +155,11 @@ public class MeshBuilder {
      * <br><br>
      * Use the texture mapper to change how texture coordinates (u and v) are applied to each vertex.
      */
-    public MeshBuilder addBox(Vector3f offset, Vector3f size, float u, float v) {
+    public MeshBuilder addBox(Vector3fc offset, Vector3fc size, float u, float v) {
         int vertexId = vertexCount;
         textureMapper.initialize(offset, size);
         for (int i = 0; i < VERTICES.length / 3; i++) {
-            addVertex(new Vector3f(offset.x + size.x * VERTICES[i * 3], offset.y + size.y * VERTICES[i * 3 + 1], offset.z + size.z * VERTICES[i * 3 + 2]));
+            addVertex(new Vector3f(offset.x() + size.x() * VERTICES[i * 3], offset.y() + size.y() * VERTICES[i * 3 + 1], offset.z() + size.z() * VERTICES[i * 3 + 2]));
             addTexCoord(textureMapper.map(i, u, v));
         }
         for (int i : INDICES) {
@@ -167,10 +174,8 @@ public class MeshBuilder {
 
     @API
     public interface TextureMapper {
-        void initialize(Vector3f offset, Vector3f size);
+        void initialize(Vector3fc offset, Vector3fc size);
 
-        Vector2f map(int vertexIndex, float u, float v);
+        Vector2fc map(int vertexIndex, float u, float v);
     }
-
-
 }

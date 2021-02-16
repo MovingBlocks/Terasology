@@ -1,25 +1,11 @@
-/*
- * Copyright 2017 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.rendering.world;
 
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector3i;
+import org.joml.Vector3f;
+import org.joml.Vector3ic;
 import org.terasology.module.sandbox.API;
 import org.terasology.rendering.assets.material.Material;
-import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.cameras.SubmersibleCamera;
 import org.terasology.rendering.dag.RenderGraph;
 import org.terasology.rendering.world.viewDistance.ViewDistance;
@@ -69,14 +55,14 @@ public interface WorldRenderer {
      *
      * @param chunkPos a Vector3i providing the coordinates of the chunk that has just been loaded.
      */
-    void onChunkLoaded(Vector3i chunkPos);
+    void onChunkLoaded(Vector3ic chunkPos);
 
     /**
      * This method is triggered when a chunk has been unloaded.
      *
      * @param chunkPos a Vector3i providing the coordinates of the chunk that has just been unloaded.
      */
-    void onChunkUnloaded(Vector3i chunkPos);
+    void onChunkUnloaded(Vector3ic chunkPos);
 
     /**
      * Lists the stages the rendering engine may go through on a given frame.
@@ -104,14 +90,6 @@ public interface WorldRenderer {
      * @return a SubmersibleCamera object
      */
     SubmersibleCamera getActiveCamera();
-
-    /**
-     * Retrieves the camera positioned and oriented to look down on the world from the point of view
-     * of the main light source. This camera is used to produce the shadow map.
-     *
-     * @return a Camera object
-     */
-    Camera getLightCamera();
 
     /**
      * Called potentially multiple times per frame, this method allows the renderer to trigger the update
@@ -176,8 +154,9 @@ public interface WorldRenderer {
      * Sets how far from the camera chunks are kept in memory and displayed.
      *
      * @param viewDistance a viewDistance value.
+     * @param chunkLods the number of LOD levels to display beyond the loaded chunks.
      */
-    void setViewDistance(ViewDistance viewDistance);
+    void setViewDistance(ViewDistance viewDistance, int chunkLods);
 
     /**
      * Returns the intensity of the light at a given location due to the combination of main light (sun or moon)

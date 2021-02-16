@@ -1,30 +1,20 @@
-/*
- * Copyright 2014 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *  http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.logic.location;
 
 import com.google.common.collect.Lists;
+import org.joml.Matrix4f;
+import org.joml.Quaternionf;
+import org.joml.Quaternionfc;
+import org.joml.Vector3f;
+import org.joml.Vector3fc;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.math.Direction;
-import org.terasology.math.geom.Quat4f;
-import org.terasology.math.geom.Vector3f;
 import org.terasology.network.Replicate;
 import org.terasology.network.ReplicationCheck;
+import org.terasology.nui.properties.TextField;
 import org.terasology.reflection.metadata.FieldMetadata;
-import org.terasology.rendering.nui.properties.TextField;
 
 import java.util.Collection;
 import java.util.List;
@@ -32,7 +22,6 @@ import java.util.Objects;
 
 /**
  * Component represent the location and facing of an entity in the world
- *
  */
 public final class LocationComponent implements Component, ReplicationCheck {
 
@@ -50,93 +39,144 @@ public final class LocationComponent implements Component, ReplicationCheck {
     @TextField
     Vector3f position = new Vector3f();
     @Replicate
-    Quat4f rotation = new Quat4f(0, 0, 0, 1);
+    Quaternionf rotation = new Quaternionf();
     @Replicate
     float scale = 1.0f;
     @Replicate
     Vector3f lastPosition = new Vector3f();
     @Replicate
-    Quat4f lastRotation = new Quat4f(0,0,0,1);
+    Quaternionf lastRotation = new Quaternionf();
 
     public LocationComponent() {
     }
 
-    public LocationComponent(Vector3f position) {
+    public LocationComponent(Vector3fc position) {
         setLocalPosition(position);
+    }
+
+    /**
+     * @return local rotation of location component
+     */
+    public Quaternionfc getLocalRotation() {
+        return rotation;
+    }
+
+    /**
+     * set the current local rotation of the component
+     *
+     * @param rot local rotation
+     */
+    public void setLocalRotation(Quaternionfc rot) {
+        this.setLocalRotation(rot.x(), rot.y(), rot.z(), rot.w());
+    }
+
+    public void setLocalRotation(float x, float y, float z, float w) {
+        lastRotation.set(rotation);
+        rotation.set(x, y, z, w);
     }
 
     /**
      * @return The position of this component relative to any parent. Can be directly modified to update the component
      */
-    public Vector3f getLocalPosition() {
+    public Vector3fc getLocalPosition() {
         return position;
     }
 
-    public void setLocalPosition(Vector3f newPos) {
+    /**
+     * the local position of this location component
+     *
+     * @param pos position to set
+     */
+    public void setLocalPosition(Vector3fc pos) {
+        setLocalPosition(pos.x(), pos.y(), pos.z());
+    }
+
+    public void setLocalPosition(float x, float y, float z) {
         lastPosition.set(position);
-        position.set(newPos);
+        position.set(x, y, z);
     }
 
-    public Vector3f getLocalDirection() {
-        Vector3f result = Direction.FORWARD.getVector3f();
-        getLocalRotation().rotate(result, result);
-        return result;
+    /**
+     * gets the local direction of the given entity in
+     *
+     * @param dest will hold the result
+     * @return dest
+     */
+    public Vector3f getLocalDirection(Vector3f dest) {
+        return dest.set(Direction.FORWARD.asVector3i()).rotate(getLocalRotation());
     }
 
-    public Quat4f getLocalRotation() {
-        return rotation;
-    }
-
-    public void setLocalRotation(Quat4f newQuat) {
-        lastRotation.set(rotation);
-        rotation.set(newQuat);
-    }
-
+    /**
+     * set the local scale
+     *
+     * @param value the scale
+     */
     public void setLocalScale(float value) {
         this.scale = value;
     }
 
+    /**
+     * local scale
+     *
+     * @return the scale
+     */
     public float getLocalScale() {
         return scale;
     }
 
     /**
-     * @return A new vector containing the world location.
+     * get the world position
+     *
+     * @param dest will hold the result
+     * @return dest
      */
-    public Vector3f getWorldPosition() {
-        return getWorldPosition(new Vector3f());
-    }
-
-    public Vector3f getWorldPosition(Vector3f output) {
-        output.set(position);
+    public Vector3f getWorldPosition(Vector3f dest) {
+        dest.set(position);
         LocationComponent parentLoc = parent.getComponent(LocationComponent.class);
         while (parentLoc != null) {
-            output.scale(parentLoc.scale);
-            parentLoc.getLocalRotation().rotate(output, output);
-            output.add(parentLoc.position);
+            dest.mul(parentLoc.scale)
+                    .rotate(parentLoc.getLocalRotation())
+                    .add(parentLoc.position);
             parentLoc = parentLoc.parent.getComponent(LocationComponent.class);
         }
-        return output;
+        return dest;
     }
 
-    public Vector3f getWorldDirection() {
-        Vector3f result = Direction.FORWARD.getVector3f();
-        getWorldRotation().rotate(result, result);
-        return result;
+    /**
+     * Populates out with the transform of this entity relative to the given entity, or the world transform if entity is
+     * not in this entity's parent hierarchy
+     *
+     * @param out
+     * @param entity
+     */
+    public void getRelativeTransform(Matrix4f out, EntityRef entity) {
+        if (!(entity.equals(parent))) {
+            LocationComponent loc = parent.getComponent(LocationComponent.class);
+            if (loc != null) {
+                loc.getRelativeTransform(out, entity);
+            }
+        }
+        out.mul(new Matrix4f().translationRotateScale(position, rotation, scale));
     }
 
-    public Quat4f getWorldRotation() {
-        return getWorldRotation(new Quat4f(0, 0, 0, 1));
+    public Vector3f getWorldDirection(Vector3f dest) {
+        return dest.set(Direction.FORWARD.asVector3f()).rotate(getWorldRotation(new Quaternionf()));
     }
 
-    public Quat4f getWorldRotation(Quat4f output) {
-        output.set(rotation);
+    /**
+     * get the current world rotation of the location component
+     *
+     * @param dest will hold the result
+     * @return dest
+     */
+    public Quaternionf getWorldRotation(Quaternionf dest) {
+        dest.set(rotation);
         LocationComponent parentLoc = parent.getComponent(LocationComponent.class);
         while (parentLoc != null) {
-            output.mul(parentLoc.rotation, output);
+            dest.premul(parentLoc.rotation);
             parentLoc = parentLoc.parent.getComponent(LocationComponent.class);
         }
-        return output;
+        return dest;
     }
 
     public float getWorldScale() {
@@ -149,25 +189,32 @@ public final class LocationComponent implements Component, ReplicationCheck {
         return result;
     }
 
-    public void setWorldPosition(Vector3f value) {
-        setLocalPosition(value);
+    /**
+     * set the world position of the {@link LocationComponent}
+     *
+     * @param pos position to set
+     */
+    public void setWorldPosition(Vector3fc pos) {
+        setLocalPosition(pos);
         LocationComponent parentLoc = parent.getComponent(LocationComponent.class);
         if (parentLoc != null) {
-            this.position.sub(parentLoc.getWorldPosition());
-            this.position.scale(1f / parentLoc.getWorldScale());
-            Quat4f rot = new Quat4f(0, 0, 0, 1);
-            rot.inverse(parentLoc.getWorldRotation());
-            rot.rotate(this.position, this.position);
+            this.position.sub(parentLoc.getWorldPosition(new Vector3f()));
+            this.position.div(parentLoc.getWorldScale());
+            this.position.rotate(parentLoc.getWorldRotation(new Quaternionf()).conjugate());
         }
     }
 
-    public void setWorldRotation(Quat4f value) {
+    /**
+     * set the world rotation of the {@link LocationComponent}
+     *
+     * @param value position to set
+     */
+    public void setWorldRotation(Quaternionfc value) {
         setLocalRotation(value);
         LocationComponent parentLoc = parent.getComponent(LocationComponent.class);
         if (parentLoc != null) {
-            Quat4f worldRot = parentLoc.getWorldRotation();
-            worldRot.inverse();
-            this.rotation.mul(worldRot, this.rotation);
+            Quaternionf worldRot = parentLoc.getWorldRotation(new Quaternionf()).conjugate();
+            this.rotation.premul(worldRot);
         }
     }
 
@@ -194,7 +241,8 @@ public final class LocationComponent implements Component, ReplicationCheck {
         }
         if (o instanceof LocationComponent) {
             LocationComponent other = (LocationComponent) o;
-            return other.scale == scale && Objects.equals(parent, other.parent) && Objects.equals(position, other.position) && Objects.equals(rotation, other.rotation);
+            return other.scale == scale && Objects.equals(parent, other.parent) && Objects.equals(position,
+                    other.position) && Objects.equals(rotation, other.rotation);
         }
         return false;
     }

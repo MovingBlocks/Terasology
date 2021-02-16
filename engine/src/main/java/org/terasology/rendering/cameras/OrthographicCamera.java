@@ -15,9 +15,8 @@
  */
 package org.terasology.rendering.cameras;
 
-import org.joml.Matrix4f;
+import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
-import org.terasology.math.MatrixUtils;
 
 import static org.lwjgl.opengl.GL11.GL_PROJECTION;
 import static org.lwjgl.opengl.GL11.glMatrixMode;
@@ -52,20 +51,20 @@ public class OrthographicCamera extends Camera {
     @Override
     public void loadProjectionMatrix() {
         glMatrixMode(GL_PROJECTION);
-        GL11.glLoadMatrix(MatrixUtils.matrixToFloatBuffer(projectionMatrix));
+        GL11.glLoadMatrixf(getProjectionMatrix().get(BufferUtils.createFloatBuffer(16)));
         glMatrixMode(GL11.GL_MODELVIEW);
     }
 
     @Override
     public void loadModelViewMatrix() {
         glMatrixMode(GL11.GL_MODELVIEW);
-        GL11.glLoadMatrix(MatrixUtils.matrixToFloatBuffer(viewMatrix));
+        GL11.glLoadMatrixf(getViewMatrix().get(BufferUtils.createFloatBuffer(16)));
     }
 
     @Override
     public void loadNormalizedModelViewMatrix() {
         glMatrixMode(GL11.GL_MODELVIEW);
-        GL11.glLoadMatrix(MatrixUtils.matrixToFloatBuffer(normViewMatrix));
+        GL11.glLoadMatrixf(getNormViewMatrix().get(BufferUtils.createFloatBuffer(16)));
     }
 
     @Override
@@ -85,16 +84,17 @@ public class OrthographicCamera extends Camera {
 
         // Nothing to do...
         if (cachedPosition.equals(getPosition()) && cachedViewigDirection.equals(viewingDirection)
-                && cachedZFar == zFar && cachedZNear == zNear) {
+            && cachedZFar == zFar && cachedZNear == zNear) {
             return;
         }
 
-        projectionMatrix = MatrixUtils.createOrthogonalProjectionMatrix(left, right, top, bottom, zNear, zFar);
-        viewMatrix = MatrixUtils.createViewMatrix(0f, 0.0f, 0f, viewingDirection.x, viewingDirection.y, viewingDirection.z, up.x, up.y, up.z);
-        normViewMatrix = MatrixUtils.createViewMatrix(0f, 0f, 0f, viewingDirection.x, viewingDirection.y, viewingDirection.z, up.x, up.y, up.z);
+        projectionMatrix.setOrtho(left, right, bottom, top, zNear, zFar);
+        viewMatrix.setLookAt(0f, 0.0f, 0f, viewingDirection.x, viewingDirection.y, viewingDirection.z, up.x, up.y,
+            up.z);
+        normViewMatrix.setLookAt(0f, 0f, 0f, viewingDirection.x, viewingDirection.y, viewingDirection.z, up.x, up.y,
+            up.z);
 
-
-        viewProjectionMatrix  = new Matrix4f(viewMatrix).mul(projectionMatrix);
+        projectionMatrix.mul(viewMatrix, viewProjectionMatrix);
         viewProjectionMatrix.invert(inverseViewProjectionMatrix);
 
         // Used for dirty checks

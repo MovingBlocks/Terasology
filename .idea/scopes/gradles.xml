@@ -1,0 +1,3 @@
+<component name="DependencyValidationManager">
+  <scope name="gradles" pattern="file:*.gradle&amp;&amp;!file[Terasology.modules.*]:*" />
+</component>

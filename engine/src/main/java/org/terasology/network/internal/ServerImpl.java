@@ -1,18 +1,5 @@
-/*
- * Copyright 2013 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.network.internal;
 
@@ -26,7 +13,9 @@ import com.google.common.collect.SetMultimap;
 import gnu.trove.iterator.TIntIterator;
 import gnu.trove.set.TIntSet;
 import gnu.trove.set.hash.TIntHashSet;
-import org.jboss.netty.channel.Channel;
+import io.netty.channel.Channel;
+import org.joml.Vector3i;
+import org.joml.Vector3ic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.EngineTime;
@@ -35,8 +24,6 @@ import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.entitySystem.event.Event;
-import org.terasology.math.ChunkMath;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.network.NetMetricSource;
 import org.terasology.network.NetworkComponent;
 import org.terasology.network.Server;
@@ -58,6 +45,7 @@ import org.terasology.world.block.BlockUri;
 import org.terasology.world.block.BlockUriParseException;
 import org.terasology.world.block.internal.BlockManagerImpl;
 import org.terasology.world.chunks.Chunk;
+import org.terasology.world.chunks.Chunks;
 import org.terasology.world.chunks.blockdata.ExtraBlockDataManager;
 import org.terasology.world.chunks.internal.ChunkSerializer;
 import org.terasology.world.chunks.remoteChunkProvider.RemoteChunkProvider;
@@ -105,7 +93,7 @@ public class ServerImpl implements Server {
 
     public ServerImpl(NetworkSystemImpl system, Channel channel) {
         this.channel = channel;
-        metricsSource = (NetMetricSource) channel.getPipeline().get(MetricRecordingHandler.NAME);
+        metricsSource = (NetMetricSource) channel.pipeline().get(MetricRecordingHandler.NAME);
         this.networkSystem = system;
         this.time = (EngineTime) CoreRegistry.get(Time.class);
     }
@@ -135,7 +123,7 @@ public class ServerImpl implements Server {
 
     @Override
     public String getRemoteAddress() {
-        SocketAddress socketAddress = channel.getRemoteAddress();
+        SocketAddress socketAddress = channel.remoteAddress();
 
         // Cast to InetSocketAddress to retrieve remote address
         InetSocketAddress inetSocketAddress = (InetSocketAddress) socketAddress;
@@ -204,7 +192,7 @@ public class ServerImpl implements Server {
 
     private void send(NetData.NetMessage data) {
         logger.trace("Sending with size {}", data.getSerializedSize());
-        channel.write(data);
+        channel.writeAndFlush(data);
     }
 
     private void sendEntities(NetData.NetMessage.Builder message) {
@@ -291,7 +279,7 @@ public class ServerImpl implements Server {
             }
         }
     }
-    
+
     /**
      * Apply the block changes from the message to the local world.
      */
@@ -305,7 +293,7 @@ public class ServerImpl implements Server {
             if (worldProvider.isBlockRelevant(pos)) {
                 worldProvider.setBlock(pos, newBlock);
             } else {
-                awaitingChunkReadyBlockUpdates.put(ChunkMath.calcChunkPos(pos), blockChange);
+                awaitingChunkReadyBlockUpdates.put(Chunks.toChunkPos(pos), blockChange);
             }
         }
     }
@@ -320,7 +308,7 @@ public class ServerImpl implements Server {
             if (worldProvider.isBlockRelevant(pos)) {
                 worldProvider.setExtraData(extraDataChange.getIndex(), pos, extraDataChange.getNewData());
             } else {
-                awaitingChunkReadyExtraDataUpdates.put(ChunkMath.calcChunkPos(pos), extraDataChange);
+                awaitingChunkReadyExtraDataUpdates.put(Chunks.toChunkPos(pos), extraDataChange);
             }
         }
     }
@@ -377,7 +365,7 @@ public class ServerImpl implements Server {
             entitySerializer.deserializeOnto(currentEntity, updateEntity.getEntity());
             BlockComponent blockComponent = currentEntity.getComponent(BlockComponent.class);
             if (blockComponent != null && !blockEntityBefore) {
-                if (!blockEntityRegistry.getExistingBlockEntityAt(blockComponent.position).equals(currentEntity)) {
+                if (!blockEntityRegistry.getExistingBlockEntityAt(blockComponent.getPosition()).equals(currentEntity)) {
                     logger.error("Failed to associated new block entity");
                 }
             }
@@ -410,17 +398,17 @@ public class ServerImpl implements Server {
     }
 
     @Override
-    public void onChunkReady(Vector3i chunkPos) {
+    public void onChunkReady(Vector3ic chunkPos) {
         WorldProvider worldProvider = CoreRegistry.get(WorldProvider.class);
 
-        List<NetData.BlockChangeMessage> updateBlockMessages = awaitingChunkReadyBlockUpdates.removeAll(chunkPos);
+        List<NetData.BlockChangeMessage> updateBlockMessages = awaitingChunkReadyBlockUpdates.removeAll(new Vector3i(chunkPos));
         for (NetData.BlockChangeMessage message : updateBlockMessages) {
             Vector3i pos = NetMessageUtil.convert(message.getPos());
             Block newBlock = blockManager.getBlock((short) message.getNewBlock());
             worldProvider.setBlock(pos, newBlock);
         }
 
-        List<NetData.ExtraDataChangeMessage> updateExtraDataMessages = awaitingChunkReadyExtraDataUpdates.removeAll(chunkPos);
+        List<NetData.ExtraDataChangeMessage> updateExtraDataMessages = awaitingChunkReadyExtraDataUpdates.removeAll(new Vector3i(chunkPos));
         for (NetData.ExtraDataChangeMessage message : updateExtraDataMessages) {
             Vector3i pos = NetMessageUtil.convert(message.getPos());
             int newValue = message.getNewData();

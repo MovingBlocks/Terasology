@@ -28,19 +28,18 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
+import org.joml.Vector2f;
+import org.joml.Vector3f;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.format.AbstractAssetFileFormat;
 import org.terasology.assets.format.AssetDataFile;
 import org.terasology.assets.module.annotations.RegisterAssetFileFormat;
 import org.terasology.math.Rotation;
-import org.terasology.math.Transform;
-import org.terasology.math.geom.Vector2f;
-import org.terasology.math.geom.Vector3f;
 import org.terasology.physics.shapes.CollisionShape;
 import org.terasology.physics.shapes.CompoundShape;
 import org.terasology.physics.shapes.ConvexHullShape;
-import org.terasology.utilities.gson.legacy.LegacyVector2fTypeAdapter;
-import org.terasology.utilities.gson.legacy.LegacyVector3fTypeAdapter;
+import org.terasology.utilities.gson.Vector2fTypeAdapter;
+import org.terasology.utilities.gson.Vector3fTypeAdapter;
 import org.terasology.world.block.BlockPart;
 
 import java.io.IOException;
@@ -64,8 +63,8 @@ public class JsonBlockShapeLoader extends AbstractAssetFileFormat<BlockShapeData
                 .setPrettyPrinting()
                 .registerTypeAdapter(BlockShapeData.class, new BlockShapeHandler())
                 .registerTypeAdapter(BlockMeshPart.class, new BlockMeshPartHandler())
-                .registerTypeAdapter(Vector3f.class, new LegacyVector3fTypeAdapter())
-                .registerTypeAdapter(Vector2f.class, new LegacyVector2fTypeAdapter())
+                .registerTypeAdapter(Vector3f.class, new Vector3fTypeAdapter())
+                .registerTypeAdapter(Vector2f.class, new Vector2fTypeAdapter())
                 .create();
     }
 
@@ -148,7 +147,7 @@ public class JsonBlockShapeLoader extends AbstractAssetFileFormat<BlockShapeData
             if (collisionInfo.has(CONVEX_HULL) && collisionInfo.get(CONVEX_HULL).isJsonPrimitive()
                     && collisionInfo.get(CONVEX_HULL).getAsJsonPrimitive().isBoolean()) {
                 List<Vector3f> verts = buildVertList(shape);
-                ConvexHullShape convexHull = COLLISION_SHAPE_FACTORY.getNewConvexHull(verts);
+                ConvexHullShape convexHull = COLLISION_SHAPE_FACTORY.getNewConvexHull(new ArrayList<>(verts));
                 shape.setCollisionShape(convexHull);
             } else if (collisionInfo.has(COLLIDERS) && collisionInfo.get(COLLIDERS).isJsonArray()
                     && collisionInfo.get(COLLIDERS).getAsJsonArray().size() > 0) {
@@ -207,8 +206,7 @@ public class JsonBlockShapeLoader extends AbstractAssetFileFormat<BlockShapeData
             CompoundShape collisionShape = COLLISION_SHAPE_FACTORY.getNewCompoundShape();
 
             for (ColliderInfo collider : colliders) {
-                Transform transform = new Transform(collider.offset, Rotation.none().getQuat4f(), 1.0f);
-                collisionShape.addChildShape(transform, collider.collisionShape);
+                collisionShape.addChildShape(collider.offset, Rotation.none().orientation(), 1.0f, collider.collisionShape);
             }
             return new ColliderInfo(new Vector3f(), collisionShape);
         }

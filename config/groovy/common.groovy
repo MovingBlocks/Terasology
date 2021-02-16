@@ -183,11 +183,32 @@ class common {
     }
 
     /**
+     * Check if an item was updated within the provided time limit
+     * @param file the item's FETCH_HEAD file in the .git directory
+     * @param timeLimit the time limit for considering something recently updated, for example: use(groovy.time.TimeCategory){ 10.minute }
+     */
+    def isRecentlyUpdated(File file, def timeLimit){
+        Date lastUpdate = new Date(file.lastModified())
+        def recentlyUpdated = use(groovy.time.TimeCategory){
+            def timeElapsedSinceUpdate = new Date() - lastUpdate
+            if (timeElapsedSinceUpdate < timeLimit){
+                return true
+            } else {
+                return false
+            }
+        }
+    }
+
+    /**
      * Update a given item.
      * @param itemName the name of the item to update
      */
-    def updateItem(String itemName) {
+    def updateItem(String itemName, boolean skipRecentUpdates = false) {
         File targetDir = new File(targetDirectory, itemName)
+        if (!Character.isLetterOrDigit(itemName.charAt(0))){   
+            println color ("Skipping update for $itemName: starts with non-alphanumeric symbol", Ansi.YELLOW)
+            return
+        }
         if (!targetDir.exists()) {
             println color("$itemType \"$itemName\" not found", Ansi.RED)
             return
@@ -215,8 +236,42 @@ class common {
                 println color("uncommitted changes. Skipping.", Ansi.YELLOW)
             } else {
                 println color("updating $itemType $itemName", Ansi.GREEN)
+                
+                File targetDirFetchHead = new File("$targetDir/.git/FETCH_HEAD")
+                if (targetDirFetchHead.exists()){
+                    // If the FETCH_HEAD has been modified within time limit and -skip-recently-updated flag was passed, skip updating
+                    def timeLimit = use(groovy.time.TimeCategory){ 10.minute }
+                    if (skipRecentUpdates && isRecentlyUpdated(targetDirFetchHead, timeLimit)){
+                        println color("Skipping update for $itemName: updated within last $timeLimit", Ansi.YELLOW)
+                        return
+                    }
+                    // Always update modified time for FETCH_HEAD if it exists
+                    targetDirFetchHead.setLastModified(new Date().getTime())
+                }
+                
                 try {
+                    def current_sha = itemGit.log(maxCommits: 1).find().getAbbreviatedId(8)
                     itemGit.pull remote: defaultRemote
+                    def post_update_sha = itemGit.log(maxCommits: 1).find().getAbbreviatedId(8)
+                        
+                    if (current_sha != post_update_sha){
+                        // TODO this can be probably converted to do one composite diff of the full update 
+                        // once this PR is merged for grgit: https://github.com/ajoberstar/grgit/pull/318 
+                        println color("Updating $current_sha..$post_update_sha", Ansi.GREEN)
+                        def commits = itemGit.log {range(current_sha, post_update_sha)}
+                        for (commit in commits){
+                            println("----${commit.getAbbreviatedId(8)}----")
+                            def diff = itemGit.show(commit: commit.id)
+                            print("added: ${diff.added.size()}, ")
+                            print("copied: ${diff.copied.size()}, ")
+                            print("modified: ${diff.modified.size()}, ")
+                            print("removed: ${diff.removed.size()}, ")
+                            println("renamed: ${diff.renamed.size()}")
+                        }
+                        print("\n")
+                    } else {
+                        println color ("No changes found", Ansi.YELLOW)
+                    }
                 } catch (GrgitException exception) {
                     println color("Unable to update $itemName, Skipping: ${exception.getMessage()}", Ansi.RED)
                 }

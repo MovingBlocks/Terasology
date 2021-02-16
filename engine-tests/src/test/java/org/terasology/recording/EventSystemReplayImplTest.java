@@ -1,18 +1,6 @@
-/*
- * Copyright 2018 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
+
 package org.terasology.recording;
 
 import com.google.common.collect.Lists;
@@ -37,6 +25,7 @@ import org.terasology.module.ModuleEnvironment;
 import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
+import org.terasology.persistence.typeHandling.TypeHandlerLibraryImpl;
 import org.terasology.reflection.TypeRegistry;
 import org.terasology.registry.CoreRegistry;
 
@@ -54,15 +43,13 @@ public class EventSystemReplayImplTest {
     private TestEventHandler handler;
     private RecordAndReplayCurrentStatus recordAndReplayCurrentStatus;
 
-
-
     @BeforeEach
     public void setup() {
         ContextImpl context = new ContextImpl();
         CoreRegistry.setContext(context);
 
         Reflections reflections = new Reflections(getClass().getClassLoader());
-        TypeHandlerLibrary serializationLibrary = new TypeHandlerLibrary(reflections);
+        TypeHandlerLibrary serializationLibrary = new TypeHandlerLibraryImpl(reflections);
 
         EntitySystemLibrary entitySystemLibrary = new EntitySystemLibrary(context, serializationLibrary);
         PojoEntityManager entityManager = new PojoEntityManager();
@@ -96,14 +83,13 @@ public class EventSystemReplayImplTest {
 
         handler = new TestEventHandler();
         eventSystem.registerEventHandler(handler);
-
     }
 
     @Test
     public void testReplayStatus() {
         assertEquals(RecordAndReplayStatus.REPLAYING, recordAndReplayCurrentStatus.getStatus());
         long startTime = System.currentTimeMillis();
-        while ((System.currentTimeMillis() - startTime) < 30) {
+        while ((System.currentTimeMillis() - startTime) < 100) {
             eventSystem.process();
         }
         assertEquals(RecordAndReplayStatus.REPLAY_FINISHED, recordAndReplayCurrentStatus.getStatus());
@@ -113,7 +99,7 @@ public class EventSystemReplayImplTest {
     public void testProcessingRecordedEvent() {
         assertEquals(0, handler.receivedAttackButtonList.size());
         long startTime = System.currentTimeMillis();
-        while ((System.currentTimeMillis() - startTime) < 10) {
+        while ((System.currentTimeMillis() - startTime) < 100) {
             eventSystem.process();
         }
         assertEquals(3, handler.receivedAttackButtonList.size());
@@ -124,7 +110,7 @@ public class EventSystemReplayImplTest {
         assertEquals(0, handler.receivedAttackButtonList.size());
         eventSystem.send(entity, new AttackButton());
         long startTime = System.currentTimeMillis();
-        while ((System.currentTimeMillis() - startTime) < 10) {
+        while ((System.currentTimeMillis() - startTime) < 100) {
             eventSystem.process();
         }
         assertEquals(3, handler.receivedAttackButtonList.size());
@@ -134,7 +120,7 @@ public class EventSystemReplayImplTest {
     public void testSendingEventAfterReplay() {
         assertEquals(0, handler.receivedAttackButtonList.size());
         long startTime = System.currentTimeMillis();
-        while ((System.currentTimeMillis() - startTime) < 10) {
+        while ((System.currentTimeMillis() - startTime) < 100) {
             eventSystem.process();
         }
         eventSystem.send(entity, new AttackButton());
@@ -145,14 +131,12 @@ public class EventSystemReplayImplTest {
     public void testSendingAllowedEventDuringReplay() {
         eventSystem.send(entity, new TestEvent());
         long startTime = System.currentTimeMillis();
-        while ((System.currentTimeMillis() - startTime) < 10) {
+        while ((System.currentTimeMillis() - startTime) < 100) {
             eventSystem.process();
         }
         assertEquals(3, handler.receivedAttackButtonList.size());
         assertEquals(1, handler.receivedTestEventList.size());
     }
-
-
 
     @AfterEach
     public void cleanStates() {
@@ -188,8 +172,4 @@ public class EventSystemReplayImplTest {
     private static class TestEvent extends AbstractConsumableEvent {
 
     }
-
-
-
-
 }

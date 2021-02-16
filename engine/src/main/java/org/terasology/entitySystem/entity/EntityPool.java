@@ -15,11 +15,10 @@
  */
 package org.terasology.entitySystem.entity;
 
+import org.joml.Quaternionfc;
+import org.joml.Vector3fc;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.prefab.Prefab;
-import org.terasology.game.GameManifest;
-import org.terasology.math.geom.Quat4f;
-import org.terasology.math.geom.Vector3f;
 
 public interface EntityPool {
 
@@ -90,17 +89,18 @@ public interface EntityPool {
     /**
      * @return A new entity, based on the given prefab, at the desired position
      */
-    EntityRef create(String prefab, Vector3f position);
+    EntityRef create(String prefab, Vector3fc position);
+
 
     /**
      * @return A new entity, based on the given prefab, at the desired position
      */
-    EntityRef create(Prefab prefab, Vector3f position);
+    EntityRef create(Prefab prefab, Vector3fc position);
 
     /**
      * @return A new entity, based on the given prefab, at the desired position, and with the desired rotation
      */
-    EntityRef create(Prefab prefab, Vector3f position, Quat4f rotation);
+    EntityRef create(Prefab prefab, Vector3fc position, Quaternionfc rotation);
 
     /**
      * Creates an entity but doesn't send any lifecycle events.

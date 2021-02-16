@@ -30,6 +30,7 @@ import com.google.common.collect.Sets;
 import org.reflections.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.engine.SimpleUri;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -122,7 +123,7 @@ public class EventSystemImpl implements EventSystem {
             }
         }
         if (shouldAddToLibrary(eventType)) {
-            eventLibrary.register(uri, eventType);
+            eventLibrary.register(new ResourceUrn(uri.getModuleName(), uri.getObjectName()), eventType);
         }
     }
 
@@ -309,7 +310,6 @@ public class EventSystemImpl implements EventSystem {
     private void networkReplicate(EntityRef entity, Event event) {
         EventMetadata metadata = eventLibrary.getMetadata(event);
         if (metadata != null && metadata.isNetworkEvent()) {
-            logger.debug("Replicating event: {}", event);
             switch (metadata.getNetworkEventType()) {
                 case BROADCAST:
                     broadcastEvent(entity, event, metadata);
@@ -404,6 +404,11 @@ public class EventSystemImpl implements EventSystem {
             }
         }
         return result;
+    }
+
+    @Override
+    public void setToCurrentThread() {
+        mainThread = Thread.currentThread();
     }
 
     private static class EventHandlerPriorityComparator implements Comparator<EventHandlerInfo> {

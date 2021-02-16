@@ -1,24 +1,19 @@
-/*
- * Copyright 2016 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.rendering.dag;
 
 //TODO: consider removing the word "Node" from the name of all Node implementations now that they are in the dag.nodes package.
 
-import java.util.Set;
+import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
+import org.terasology.naming.Name;
+import org.terasology.rendering.dag.dependencyConnections.BufferPair;
+import org.terasology.rendering.dag.dependencyConnections.BufferPairConnection;
+import org.terasology.rendering.dag.dependencyConnections.DependencyConnection;
+import org.terasology.rendering.dag.dependencyConnections.RunOrderConnection;
+
+import java.util.Map;
+import java.util.Set;
 
 /**
  * A node is the processing unit within the Renderer.
@@ -98,4 +93,91 @@ public interface Node extends RenderPipelineTask {
      * @return a SimpleUri providing the namespace and name of the node.
      */
     SimpleUri getUri();
+
+    /**
+     *
+     * @return
+     */
+    Name getAka();
+
+    public Map<String, DependencyConnection> getInputConnections();
+
+    public Map<String, DependencyConnection> getOutputConnections();
+
+    public void setInputConnections(Map<String, DependencyConnection> inputConnections);
+
+    public void setOutputConnections(Map<String, DependencyConnection> outputConnections);
+
+    public void postInit(Context context);
+
+    /**.
+     * This method must be called AFTER node has connected all it's dependencies.
+     * @param context a context object, to obtain instances of classes such as the rendering config.
+     */
+    void setDependencies(Context context);
+
+    /**
+     * Attempt to insert an input Dependency connection. RuntimeException on unknown dependency type.
+     * @param id identificator of the connection TODO simpleuri
+     * @param connection TODO
+     * @return False on fail attempt to insert.
+     */
+    boolean addInputConnection(int id, DependencyConnection connection);
+
+    /**
+     * This method obtains node's output connection by its id.
+     * @param outputId Output connection's id.
+     * @return FboConnection if an output connection with this id exists.
+     * Otherwise an exception should be thrown.
+     */
+    DependencyConnection getOutputFboConnection(int outputId);
+
+    /**
+     * This method obtains node's input connection by its id.
+     * @param inputId Input connection's id.
+     * @return Connection if an input connection with this id exists.
+     * Otherwise an exception should be thrown.
+     */
+    DependencyConnection getInputFboConnection(int inputId);
+
+    public boolean addOutputFboConnection(int id);
+
+    public boolean addOutputBufferPairConnection(int id);
+
+    public boolean addOutputBufferPairConnection(int id, BufferPair bufferPair);
+
+    public boolean addOutputBufferPairConnection(int id, BufferPairConnection from);
+
+    public BufferPairConnection getOutputBufferPairConnection(int outputBufferPairId);
+
+    public BufferPairConnection getInputBufferPairConnection(int inputBufferPairId);
+
+    public boolean addInputRunOrderConnection(RunOrderConnection from, int inputId);
+
+    public boolean addOutputRunOrderConnection(int outputId);
+
+    public RunOrderConnection getOutputRunOrderConnection(int outputId);
+
+    public RunOrderConnection getInputRunOrderConnection(int inputId);
+
+    public void removeFboConnection(int id, DependencyConnection.Type type);
+
+    public void removeBufferPairConnection(int id, DependencyConnection.Type type);
+
+    public void removeRunOrderConnection(int id, DependencyConnection.Type type);
+
+    /**
+     * Is {@code thisNode} dependent on {@param anotherNode}?
+     * @param anotherNode
+     * @return If this node has at least one {@param anotherNode}'s connection on input - true. Otherwise false.
+     */
+    boolean isDependentOn(Node anotherNode);
+
+    /**
+     * Deletes all desired state changes for the node and add them all again.
+     * Must call after changing dependency connections.
+     */
+    void resetDesiredStateChanges();
+
+    void clearDesiredStateChanges();
 }

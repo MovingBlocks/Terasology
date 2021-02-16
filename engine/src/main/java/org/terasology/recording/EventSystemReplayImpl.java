@@ -15,6 +15,7 @@
  */
 package org.terasology.recording;
 
+import org.terasology.assets.ResourceUrn;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.entitySystem.event.internal.EventReceiver;
@@ -289,7 +290,7 @@ public class EventSystemReplayImpl implements EventSystem {
             }
         }
         if (shouldAddToLibrary(eventType)) {
-            eventLibrary.register(uri, eventType);
+            eventLibrary.register(new ResourceUrn(uri.getModuleName(), uri.getObjectName()), eventType);
         }
     }
 
@@ -367,6 +368,11 @@ public class EventSystemReplayImpl implements EventSystem {
                 eventHandlerIterator.remove();
             }
         }
+    }
+
+    @Override
+    public void setToCurrentThread() {
+        mainThread = Thread.currentThread();
     }
 
     private void addEventHandler(Class<? extends Event> type, EventSystemReplayImpl.EventHandlerInfo handler, Collection<Class<? extends Component>> components) {

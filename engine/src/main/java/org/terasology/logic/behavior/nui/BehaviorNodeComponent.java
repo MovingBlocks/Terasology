@@ -17,7 +17,7 @@ package org.terasology.logic.behavior.nui;
 
 import org.terasology.entitySystem.Component;
 import org.terasology.module.sandbox.API;
-import org.terasology.rendering.nui.Color;
+import org.terasology.nui.Color;
 
 /**
  * Defines a renderable node used to display behavior trees.

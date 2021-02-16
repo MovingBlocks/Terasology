@@ -19,6 +19,7 @@ import com.google.common.collect.Lists;
 import org.terasology.assets.Asset;
 import org.terasology.assets.AssetType;
 import org.terasology.assets.ResourceUrn;
+import org.terasology.module.sandbox.API;
 
 import java.awt.image.BufferedImage;
 import java.util.Collections;
@@ -27,6 +28,7 @@ import java.util.function.Consumer;
 
 /**
  */
+@API
 public class BlockTile extends Asset<TileData> {
     private BufferedImage[] images;
     private boolean autoBlock;

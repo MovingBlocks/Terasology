@@ -89,9 +89,9 @@ public class EntitySerializerTest {
         EntitySystemSetupUtil.addReflectionBasedLibraries(context);
         EntitySystemSetupUtil.addEntityManagementRelatedClasses(context);
         entityManager = context.get(EngineEntityManager.class);
-        entityManager.getComponentLibrary().register(new SimpleUri("test", "gettersetter"), GetterSetterComponent.class);
-        entityManager.getComponentLibrary().register(new SimpleUri("test", "string"), StringComponent.class);
-        entityManager.getComponentLibrary().register(new SimpleUri("test", "integer"), IntegerComponent.class);
+        entityManager.getComponentLibrary().register(new ResourceUrn("test", "gettersetter"), GetterSetterComponent.class);
+        entityManager.getComponentLibrary().register(new ResourceUrn("test", "string"), StringComponent.class);
+        entityManager.getComponentLibrary().register(new ResourceUrn("test", "integer"), IntegerComponent.class);
         entitySerializer = new EntitySerializer(entityManager);
         componentLibrary = entityManager.getComponentLibrary();
 
@@ -270,7 +270,7 @@ public class EntitySerializerTest {
 
     @Test
     public void testMappedTypeHandling() throws Exception {
-        componentLibrary.register(new SimpleUri("test", "mappedtype"), MappedTypeComponent.class);
+        componentLibrary.register(new ResourceUrn("test", "mappedtype"), MappedTypeComponent.class);
 
         EntityRef entity = entityManager.create();
         entity.addComponent(new MappedTypeComponent());

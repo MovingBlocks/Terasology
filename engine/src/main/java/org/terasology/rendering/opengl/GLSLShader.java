@@ -24,6 +24,7 @@ import gnu.trove.map.TIntIntMap;
 import gnu.trove.map.hash.TIntIntHashMap;
 import org.lwjgl.opengl.ARBShaderObjects;
 import org.lwjgl.opengl.GL20;
+import org.lwjgl.opengl.GL32;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.AssetType;
@@ -33,6 +34,7 @@ import org.terasology.config.RenderingConfig;
 import org.terasology.engine.GameThread;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.paths.PathManager;
+import org.terasology.engine.subsystem.lwjgl.LwjglGraphicsProcessing;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.assets.shader.Shader;
 import org.terasology.rendering.assets.shader.ShaderData;
@@ -53,9 +55,6 @@ import java.util.EnumSet;
 import java.util.Map;
 import java.util.Set;
 
-import static org.terasology.rendering.dag.nodes.AmbientOcclusionNode.SSAO_KERNEL_ELEMENTS;
-import static org.terasology.rendering.dag.nodes.AmbientOcclusionNode.SSAO_NOISE_SIZE;
-
 /**
  * GLSL Shader Program Instance class.
  * <p>
@@ -65,6 +64,11 @@ import static org.terasology.rendering.dag.nodes.AmbientOcclusionNode.SSAO_NOISE
 public class GLSLShader extends Shader {
 
     private static final Logger logger = LoggerFactory.getLogger(GLSLShader.class);
+    private final LwjglGraphicsProcessing graphicsProcessing;
+
+    // TODO this should be handled another way, we need to get ssao parameters here
+    public int ssaoKernelElements = 32;
+    public static int ssaoNoiseSize = 4;
 
     private static String includedFunctionsVertex = "";
     private static String includedFunctionsFragment = "";
@@ -96,11 +100,14 @@ public class GLSLShader extends Shader {
 
     private DisposalAction disposalAction;
 
-    public GLSLShader(ResourceUrn urn, AssetType<?, ShaderData> assetType, ShaderData data) {
+    public GLSLShader(ResourceUrn urn, AssetType<?, ShaderData> assetType, ShaderData data, LwjglGraphicsProcessing graphicsProcessing) {
         super(urn, assetType);
-        disposalAction = new DisposalAction(urn);
+        this.graphicsProcessing = graphicsProcessing;
+        disposalAction = new DisposalAction(urn, graphicsProcessing);
         getDisposalHook().setDisposeAction(disposalAction);
-        reload(data);
+        graphicsProcessing.asynchToDisplayThread(() -> {
+            reload(data);
+        });
     }
 
     private static InputStreamReader getInputStreamReaderFromResource(String resource) {
@@ -119,6 +126,9 @@ public class GLSLShader extends Shader {
 
         GL20.glAttachShader(shaderProgram, disposalAction.fragmentPrograms.get(featureHash));
         GL20.glAttachShader(shaderProgram, disposalAction.vertexPrograms.get(featureHash));
+        if (shaderProgramBase.getGeometryProgram() != null) {
+            GL20.glAttachShader(shaderProgram, disposalAction.geometryPrograms.get(featureHash));
+        }
         GL20.glLinkProgram(shaderProgram);
         GL20.glValidateProgram(shaderProgram);
         return shaderProgram;
@@ -126,6 +136,12 @@ public class GLSLShader extends Shader {
 
     @Override
     public void recompile() {
+        graphicsProcessing.asynchToDisplayThread(() -> {
+            recompileInt();
+        });
+    }
+
+    private void recompileInt() {
         registerAllShaderPermutations();
         // TODO: reload materials
     }
@@ -141,7 +157,7 @@ public class GLSLShader extends Shader {
     }
 
     private StringBuilder createShaderBuilder() {
-        String preProcessorPreamble = "#version 120\n";
+        String preProcessorPreamble = "";
 
         // TODO: Implement a system for this - this has gotten way out of hand.
         WorldAtlas worldAtlas = CoreRegistry.get(WorldAtlas.class);
@@ -156,8 +172,8 @@ public class GLSLShader extends Shader {
         preProcessorPreamble += "#define BLOCK_LIGHT_SUN_POW " + WorldRenderer.BLOCK_LIGHT_SUN_POW + "\n";
         preProcessorPreamble += "#define BLOCK_INTENSITY_FACTOR " + WorldRenderer.BLOCK_INTENSITY_FACTOR + "\n";
         preProcessorPreamble += "#define SHADOW_MAP_RESOLUTION " + (float) renderConfig.getShadowMapResolution() + "\n";
-        preProcessorPreamble += "#define SSAO_KERNEL_ELEMENTS " + SSAO_KERNEL_ELEMENTS + "\n";
-        preProcessorPreamble += "#define SSAO_NOISE_SIZE " + SSAO_NOISE_SIZE + "\n";
+        preProcessorPreamble += "#define SSAO_KERNEL_ELEMENTS " + ssaoKernelElements + "\n";
+        preProcessorPreamble += "#define SSAO_NOISE_SIZE " + ssaoNoiseSize + "\n";
         // TODO: This shouldn't be hardcoded
         preProcessorPreamble += "#define TEXTURE_OFFSET_EFFECTS " + 0.0625f + "\n";
 
@@ -257,23 +273,17 @@ public class GLSLShader extends Shader {
         Set<Set<ShaderProgramFeature>> allPermutations = Sets.powerSet(availableFeatures);
 
         for (Set<ShaderProgramFeature> permutation : allPermutations) {
+            int featureHash = ShaderProgramFeature.getBitset(permutation);
+
             int fragShaderId = compileShader(GL20.GL_FRAGMENT_SHADER, permutation);
             int vertShaderId = compileShader(GL20.GL_VERTEX_SHADER, permutation);
-
-            if (compileSuccess(fragShaderId) && compileSuccess(vertShaderId)) {
-                int featureHash = ShaderProgramFeature.getBitset(permutation);
-                disposalAction.fragmentPrograms.put(featureHash, fragShaderId);
-                disposalAction.vertexPrograms.put(featureHash, vertShaderId);
-            } else {
-                dumpCode(GL20.GL_FRAGMENT_SHADER,permutation,assembleShader(GL20.GL_FRAGMENT_SHADER,permutation));
-                dumpCode(GL20.GL_VERTEX_SHADER,permutation,assembleShader(GL20.GL_VERTEX_SHADER,permutation));
-
-                throw new RuntimeException(String.format("Shader '%s' failed to compile for features '%s'.%n%n"
-                                + "Vertex Shader Info: %n%s%n"
-                                + "Fragment Shader Info: %n%s",
-                        getUrn(), permutation,
-                        getLogInfo(vertShaderId), getLogInfo(fragShaderId)));
+            if (shaderProgramBase.getGeometryProgram() != null) {
+                int geomShaderId = compileShader(GL32.GL_GEOMETRY_SHADER, permutation);
+                disposalAction.geometryPrograms.put(featureHash, geomShaderId);
             }
+
+            disposalAction.fragmentPrograms.put(featureHash, fragShaderId);
+            disposalAction.vertexPrograms.put(featureHash, vertShaderId);
         }
 
         logger.debug("Compiled {} permutations for {}.", allPermutations.size(), getUrn());
@@ -293,10 +303,15 @@ public class GLSLShader extends Shader {
         shader.append(includedUniforms);
 
         if (type == GL20.GL_FRAGMENT_SHADER) {
+            shader.insert(0, "#version " + shaderProgramBase.getFragmentProgramVersion() + "\n");
             shader.append(includedFunctionsFragment);
             shader.append("\n");
             shader.append(shaderProgramBase.getFragmentProgram());
+        } else if (type == GL32.GL_GEOMETRY_SHADER) {
+            shader.insert(0, "#version " + shaderProgramBase.getGeometryProgramVersion() + "\n");
+            shader.append(shaderProgramBase.getGeometryProgram());
         } else {
+            shader.insert(0, "#version " + shaderProgramBase.getVertexProgramVersion() + "\n");
             shader.append(includedFunctionsVertex);
             shader.append("\n");
             shader.append(shaderProgramBase.getVertexProgram());
@@ -340,6 +355,14 @@ public class GLSLShader extends Shader {
         GL20.glShaderSource(shaderId, shader);
         GL20.glCompileShader(shaderId);
 
+        if (!compileSuccess(shaderId)) {
+            dumpCode(type, features, assembleShader(type, features));
+
+            throw new RuntimeException(String.format("Shader '%s' failed to compile for features '%s'.%n%n"
+                            + "Shader Info: %n%s%n",
+                    getUrn(), features, getLogInfo(shaderId)));
+        }
+
         return shaderId;
     }
 
@@ -381,7 +404,7 @@ public class GLSLShader extends Shader {
                 }
                 updateAvailableFeatures();
                 try {
-                    recompile();
+                    recompileInt();
                 } catch (RuntimeException e) {
                     logger.warn(e.getMessage());
                 }
@@ -394,13 +417,16 @@ public class GLSLShader extends Shader {
     private static class DisposalAction implements Runnable {
 
         private final ResourceUrn urn;
+        private final LwjglGraphicsProcessing graphicsProcessing;
 
-        private TIntIntMap fragmentPrograms = new TIntIntHashMap();
-        private TIntIntMap vertexPrograms = new TIntIntHashMap();
+        private final TIntIntMap fragmentPrograms = new TIntIntHashMap();
+        private final TIntIntMap vertexPrograms = new TIntIntHashMap();
+        private final TIntIntMap geometryPrograms = new TIntIntHashMap();
 
         // made package-private after CheckStyle's suggestion
-        DisposalAction(ResourceUrn urn) {
+        DisposalAction(ResourceUrn urn, LwjglGraphicsProcessing graphicsProcessing) {
             this.urn = urn;
+            this.graphicsProcessing = graphicsProcessing;
         }
 
         @Override
@@ -414,19 +440,21 @@ public class GLSLShader extends Shader {
         }
 
         private void disposeData() {
-            TIntIntIterator it = fragmentPrograms.iterator();
-            while (it.hasNext()) {
-                it.advance();
-                GL20.glDeleteShader(it.value());
-            }
-            fragmentPrograms.clear();
+            disposePrograms(fragmentPrograms);
+            disposePrograms(vertexPrograms);
+            disposePrograms(geometryPrograms);
+        }
 
-            it = vertexPrograms.iterator();
-            while (it.hasNext()) {
-                it.advance();
-                GL20.glDeleteShader(it.value());
-            }
-            vertexPrograms.clear();
+        private void disposePrograms(TIntIntMap programs) {
+            final TIntIntMap disposedPrograms = new TIntIntHashMap(programs);
+            graphicsProcessing.asynchToDisplayThread(() -> {
+                TIntIntIterator it = disposedPrograms.iterator();
+                while (it.hasNext()) {
+                    it.advance();
+                        GL20.glDeleteShader(it.value());
+                }
+            });
+            programs.clear();
         }
     }
 }

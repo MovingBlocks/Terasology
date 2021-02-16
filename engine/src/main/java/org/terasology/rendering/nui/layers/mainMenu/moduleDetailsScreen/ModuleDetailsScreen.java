@@ -16,6 +16,7 @@
 package org.terasology.rendering.nui.layers.mainMenu.moduleDetailsScreen;
 
 import org.codehaus.plexus.util.StringUtils;
+import org.joml.Vector2i;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
@@ -27,31 +28,30 @@ import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.module.RemoteModuleExtension;
 import org.terasology.engine.module.StandardModuleExtension;
 import org.terasology.i18n.TranslationSystem;
-import org.terasology.math.geom.Vector2i;
 import org.terasology.module.DependencyInfo;
 import org.terasology.module.DependencyResolver;
 import org.terasology.module.Module;
 import org.terasology.module.ModuleMetadata;
 import org.terasology.naming.Name;
 import org.terasology.naming.Version;
+import org.terasology.nui.Canvas;
+import org.terasology.nui.Color;
+import org.terasology.nui.databinding.Binding;
+import org.terasology.nui.databinding.ReadOnlyBinding;
+import org.terasology.nui.itemRendering.AbstractItemRenderer;
+import org.terasology.nui.itemRendering.StringTextRenderer;
+import org.terasology.nui.widgets.UIButton;
+import org.terasology.nui.widgets.UILabel;
+import org.terasology.nui.widgets.UIList;
+import org.terasology.nui.widgets.UIText;
 import org.terasology.registry.In;
-import org.terasology.rendering.nui.Canvas;
-import org.terasology.rendering.nui.Color;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.animation.MenuAnimationSystems;
-import org.terasology.rendering.nui.databinding.Binding;
-import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
-import org.terasology.rendering.nui.itemRendering.AbstractItemRenderer;
-import org.terasology.rendering.nui.itemRendering.StringTextRenderer;
 import org.terasology.rendering.nui.layers.mainMenu.ConfirmPopup;
 import org.terasology.rendering.nui.layers.mainMenu.MessagePopup;
 import org.terasology.rendering.nui.layers.mainMenu.WaitPopup;
 import org.terasology.rendering.nui.layers.mainMenu.advancedGameSetupScreen.DownloadPopupProgressListener;
-import org.terasology.rendering.nui.widgets.UIButton;
 import org.terasology.rendering.nui.widgets.UIButtonWebBrowser;
-import org.terasology.rendering.nui.widgets.UILabel;
-import org.terasology.rendering.nui.widgets.UIList;
-import org.terasology.rendering.nui.widgets.UIText;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -76,9 +76,9 @@ public class ModuleDetailsScreen extends CoreScreenLayer {
 
     private static final Logger logger = LoggerFactory.getLogger(ModuleDetailsScreen.class);
 
-    private static final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private static final String DEFAULT_GITHUB_MODULE_URL = "https://github.com/Terasology/";
-    private static final List INTERNAL_MODULES = Arrays.asList("Core", "engine", "CoreSampleGameplay", "BuilderSampleGameplay", "BiomesAPI");
+    private static final List<String> INTERNAL_MODULES = Arrays.asList("engine");
     @In
     private ModuleManager moduleManager;
     @In
@@ -166,7 +166,9 @@ public class ModuleDetailsScreen extends CoreScreenLayer {
 
         if (!isScreenValid()) {
             final MessagePopup popup = getManager().createScreen(MessagePopup.ASSET_URI, MessagePopup.class);
-            popup.setMessage(translationSystem.translate("${engine:menu#game-details-errors-message-title}"), translationSystem.translate("${engine:menu#game-details-errors-message-body}"));
+            popup.setMessage(
+                    translationSystem.translate("${engine:menu#game-details-errors-message-title}"),
+                    translationSystem.translate("${engine:menu#game-details-errors-message-body}"));
             popup.subscribeButton(e -> triggerBackAnimation());
             getManager().pushScreen(popup);
             // disable child widgets
@@ -205,7 +207,8 @@ public class ModuleDetailsScreen extends CoreScreenLayer {
             @Override
             public Vector2i getPreferredSize(Module value, Canvas canvas) {
                 String text = getString(value);
-                return new Vector2i(canvas.getCurrentStyle().getFont().getWidth(text),
+                return new Vector2i(
+                        canvas.getCurrentStyle().getFont().getWidth(text),
                         canvas.getCurrentStyle().getFont().getLineHeight());
             }
         });
@@ -313,15 +316,14 @@ public class ModuleDetailsScreen extends CoreScreenLayer {
 
             @Override
             public void draw(DependencyInfo value, Canvas canvas) {
-                if (moduleManager.getRegistry().getLatestModuleVersion(value.getId()) == null) {
+                Module module = moduleManager.getRegistry().getLatestModuleVersion(value.getId());
+
+                if (module == null || !(value.versionRange().contains(module.getVersion()))) {
                     canvas.setMode("invalid");
                 } else {
                     canvas.setMode("available");
                 }
-                Version version = moduleManager.getRegistry().getLatestModuleVersion(value.getId()).getVersion();
-                if (!(value.versionRange().contains(version))) {
-                    canvas.setMode("invalid");
-                }
+
                 canvas.drawText(getString(value), canvas.getRegion());
             }
 
@@ -488,7 +490,7 @@ public class ModuleDetailsScreen extends CoreScreenLayer {
                 .findFirst()
                 .map(Module::getMetadata)
                 .map(RemoteModuleExtension::getLastUpdated)
-                .map(dateFormat::format)
+                .map(DATE_FORMAT::format)
                 .orElse("");
     }
 

@@ -15,10 +15,10 @@
  */
 package org.terasology.rendering.world;
 
-import org.terasology.math.Region3i;
-import org.terasology.math.geom.Vector3i;
+import org.joml.Vector3ic;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.world.viewDistance.ViewDistance;
+import org.terasology.world.block.BlockRegion;
 import org.terasology.world.chunks.ChunkProvider;
 
 /**
@@ -26,17 +26,17 @@ import org.terasology.world.chunks.ChunkProvider;
  */
 public interface RenderableWorld {
 
-    void onChunkLoaded(Vector3i chunkPosition);
+    void onChunkLoaded(Vector3ic chunkPosition);
 
-    void onChunkUnloaded(Vector3i chunkPosition);
+    void onChunkUnloaded(Vector3ic chunkPosition);
 
     boolean pregenerateChunks();
 
     void update();
 
-    boolean updateChunksInProximity(Region3i renderableRegion);
+    boolean updateChunksInProximity(BlockRegion renderableRegion);
 
-    boolean updateChunksInProximity(ViewDistance viewDistance);
+    boolean updateChunksInProximity(ViewDistance viewDistance, int chunkLods);
 
     void generateVBOs();
 

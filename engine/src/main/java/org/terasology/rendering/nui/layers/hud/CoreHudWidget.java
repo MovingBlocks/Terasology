@@ -15,12 +15,12 @@
  */
 package org.terasology.rendering.nui.layers.hud;
 
-import org.terasology.math.geom.Vector2i;
-import org.terasology.rendering.nui.Canvas;
-import org.terasology.rendering.nui.ControlWidget;
-import org.terasology.rendering.nui.CoreWidget;
-import org.terasology.rendering.nui.LayoutConfig;
-import org.terasology.rendering.nui.UIWidget;
+import org.joml.Vector2i;
+import org.terasology.nui.Canvas;
+import org.terasology.nui.ControlWidget;
+import org.terasology.nui.CoreWidget;
+import org.terasology.nui.LayoutConfig;
+import org.terasology.nui.UIWidget;
 
 import java.util.Arrays;
 import java.util.Iterator;

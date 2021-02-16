@@ -16,11 +16,11 @@
 
 package org.terasology.world.generation.facets;
 
+import org.joml.Vector3i;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.terasology.math.Region3i;
-import org.terasology.math.geom.Vector3i;
+import org.terasology.world.block.BlockRegion;
 import org.terasology.world.generation.Border3D;
 import org.terasology.world.generation.facets.base.ObjectFacet3D;
 
@@ -39,12 +39,12 @@ public abstract class ObjectFacetTest {
         Border3D border = new Border3D(0, 0, 0).extendBy(0, 15, 10);
         Vector3i min = new Vector3i(10, 20, 30);
         Vector3i size = new Vector3i(40, 50, 60);
-        Region3i region = Region3i.createFromMinAndSize(min, size);
+        BlockRegion region = new BlockRegion(min).setSize(size);
         facet = createFacet(region, border);
         // facet = [worldMin=(0, 5, 20), relativeMin=(-10, -15, -10), size=(60, 65, 80)]
     }
 
-    protected abstract ObjectFacet3D<Integer> createFacet(Region3i region, Border3D extendBy);
+    protected abstract ObjectFacet3D<Integer> createFacet(BlockRegion region, Border3D extendBy);
 
     /**
      * Check unset values

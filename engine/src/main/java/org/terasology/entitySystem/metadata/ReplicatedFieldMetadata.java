@@ -15,6 +15,7 @@
  */
 package org.terasology.entitySystem.metadata;
 
+import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.metadata.ClassMetadata;
 import org.terasology.reflection.metadata.FieldMetadata;
 import org.terasology.reflection.copy.CopyStrategy;
@@ -34,9 +35,9 @@ public class ReplicatedFieldMetadata<T, U> extends FieldMetadata<T, U> {
     private boolean replicated;
     private Replicate replicationInfo;
 
-    public ReplicatedFieldMetadata(ClassMetadata<T, ?> owner, Field field, CopyStrategy<U> copyStrategy, ReflectFactory factory, boolean replicatedByDefault)
+    public ReplicatedFieldMetadata(ClassMetadata<T, ?> owner, Field field, CopyStrategyLibrary copyStrategyLibrary, ReflectFactory factory, boolean replicatedByDefault)
             throws InaccessibleFieldException {
-        super(owner, field, copyStrategy, factory);
+        super(owner, field, copyStrategyLibrary, factory);
         this.replicated = replicatedByDefault;
         if (field.getAnnotation(NoReplicate.class) != null) {
             replicated = false;

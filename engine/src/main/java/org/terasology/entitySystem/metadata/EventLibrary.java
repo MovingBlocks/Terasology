@@ -17,9 +17,11 @@ package org.terasology.entitySystem.metadata;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
 import org.terasology.entitySystem.event.Event;
+import org.terasology.module.ModuleEnvironment;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.metadata.AbstractClassLibrary;
 import org.terasology.reflection.metadata.ClassMetadata;
@@ -33,12 +35,12 @@ public class EventLibrary extends AbstractClassLibrary<Event> {
 
     private static final Logger logger = LoggerFactory.getLogger(EventLibrary.class);
 
-    public EventLibrary(Context context) {
-        super(context);
+    public EventLibrary(ModuleEnvironment environment, ReflectFactory reflectFactory, CopyStrategyLibrary copyStrategyLibrary) {
+        super(environment, reflectFactory, copyStrategyLibrary);
     }
 
     @Override
-    protected <C extends Event> ClassMetadata<C, ?> createMetadata(Class<C> type, ReflectFactory factory, CopyStrategyLibrary copyStrategies, SimpleUri uri) {
+    protected <C extends Event> ClassMetadata<C, ?> createMetadata(Class<C> type, ReflectFactory factory, CopyStrategyLibrary copyStrategies, ResourceUrn uri) {
         try {
             return new EventMetadata<>(type, copyStrategies, factory, uri);
         } catch (NoSuchMethodException e) {
@@ -62,7 +64,7 @@ public class EventLibrary extends AbstractClassLibrary<Event> {
 
     @Override
     @SuppressWarnings("unchecked")
-    public EventMetadata<? extends Event> getMetadata(SimpleUri uri) {
+    public EventMetadata<? extends Event> getMetadata(ResourceUrn uri) {
         return (EventMetadata<? extends Event>) super.getMetadata(uri);
     }
 

@@ -1,39 +1,27 @@
-/*
- * Copyright 2013 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *  http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.rendering.assets.texture;
 
-import org.terasology.math.geom.Rect2f;
-import org.terasology.math.geom.Rect2i;
+import org.joml.RoundingMode;
+import org.joml.Vector2fc;
+import org.joml.Vector2i;
+import org.terasology.joml.geom.Rectanglef;
+import org.terasology.joml.geom.Rectanglei;
 import org.terasology.math.TeraMath;
-import org.terasology.math.geom.Vector2f;
-import org.terasology.math.geom.Vector2i;
 
 /**
  */
 public class BasicTextureRegion implements TextureRegion {
     private Texture texture;
-    private Rect2f region;
+    private Rectanglef region = new Rectanglef();
 
-    public BasicTextureRegion(Texture texture, Rect2f region) {
+    public BasicTextureRegion(Texture texture, Rectanglef region) {
         this.texture = texture;
-        this.region = region;
+        this.region.set(region);
     }
 
-    public BasicTextureRegion(Texture texture, Vector2f offset, Vector2f size) {
-        this(texture, Rect2f.createFromMinAndSize(offset, size));
+    public BasicTextureRegion(Texture texture, Vector2fc offset, Vector2fc size) {
+        this(texture, new Rectanglef().setMin(offset).setSize(size));
     }
 
     @Override
@@ -42,18 +30,18 @@ public class BasicTextureRegion implements TextureRegion {
     }
 
     @Override
-    public Rect2f getRegion() {
+    public Rectanglef getRegion() {
         return region;
     }
 
     @Override
     public int getWidth() {
-        return TeraMath.ceilToInt(texture.getWidth() * region.width());
+        return TeraMath.ceilToInt(texture.getWidth() * region.lengthX());
     }
 
     @Override
     public int getHeight() {
-        return TeraMath.ceilToInt(texture.getHeight() * region.height());
+        return TeraMath.ceilToInt(texture.getHeight() * region.lengthY());
     }
 
     @Override
@@ -62,8 +50,8 @@ public class BasicTextureRegion implements TextureRegion {
     }
 
     @Override
-    public Rect2i getPixelRegion() {
-        return Rect2i.createFromMinAndSize(TeraMath.floorToInt(region.minX() * texture.getWidth()),
-                TeraMath.floorToInt(region.minY() * texture.getHeight()), getWidth(), getHeight());
+    public Rectanglei getPixelRegion() {
+        Vector2i min = new Vector2i(region.minX * texture.getWidth(), region.minY * texture.getHeight(), RoundingMode.FLOOR);
+        return new Rectanglei(min).setSize(getWidth(), getHeight());
     }
 }

@@ -15,33 +15,30 @@
  */
 package org.terasology.network.internal;
 
-import org.jboss.netty.channel.ChannelHandlerContext;
-import org.jboss.netty.channel.ExceptionEvent;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.network.ServerInfoMessage;
 import org.terasology.protobuf.NetData;
 
 /**
- * Checks if a {@link org.terasology.protobuf.NetData.ServerInfoMessage} was received
- * and disconnects.
+ * Checks if a {@link org.terasology.protobuf.NetData.ServerInfoMessage} was received and disconnects.
  */
-public class ServerInfoRequestHandler extends SimpleChannelUpstreamHandler {
+public class ServerInfoRequestHandler extends ChannelInboundHandlerAdapter {
 
     private static final Logger logger = LoggerFactory.getLogger(ServerInfoRequestHandler.class);
 
     private volatile ServerInfoMessage serverInfo;
 
     @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e) {
-        logger.warn("Could not query server info: {}", e.getCause().toString());
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        logger.warn("Could not query server info: {}", cause.toString());
     }
 
     @Override
-    public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) {
-        NetData.NetMessage message = (NetData.NetMessage) e.getMessage();
+    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+        NetData.NetMessage message = (NetData.NetMessage) msg;
         if (message.hasServerInfo()) {
             logger.info("Received server info");
             serverInfo = new ServerInfoMessageImpl(message.getServerInfo());
@@ -50,10 +47,10 @@ public class ServerInfoRequestHandler extends SimpleChannelUpstreamHandler {
         }
 
         // in any case, we're done, so close the connection
-        ctx.getChannel().close();
+        ctx.channel().close();
     }
 
-    public ServerInfoMessage getServerInfo() throws Exception {
+    public ServerInfoMessage getServerInfo() {
         return serverInfo;
     }
 }

@@ -18,6 +18,7 @@ package org.terasology.rendering.nui.widgets.treeView;
 import com.google.common.collect.Lists;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.terasology.nui.widgets.treeView.GenericTree;
 
 import java.util.Arrays;
 import java.util.Iterator;

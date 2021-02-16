@@ -18,6 +18,7 @@ package org.terasology.world.block.entity;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
+import org.joml.Vector3f;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.entitySystem.entity.EntityManager;
@@ -113,7 +114,7 @@ public class BlockCommands extends BaseComponentSystem {
     }
 
     @Command(shortDescription = "List all available blocks\nYou can filter by adding the beginning of words after the" +
-            " commands, e.g.: \"listBlocks engine: CoreBlocks:\" will list all blocks from the engine and coreblocks module",
+            " commands, e.g.: \"listBlocks engine: core\" will list all blocks from the engine and modules starting with 'core'",
             requiredPermission = PermissionManager.CHEAT_PERMISSION)
     public String listBlocks(@CommandParam(value = "startsWith", required = false) String[] startsWith) {
         StringBuilder stringBuilder = new StringBuilder();
@@ -148,7 +149,7 @@ public class BlockCommands extends BaseComponentSystem {
     }
 
     @Command(shortDescription = "Lists all available shapes\nYou can filter by adding the beginning of words after the" +
-            " commands, e.g.: \"listShapes engine: core:\" will list all shapes from the engine and core module",
+            " commands, e.g.: \"listShapes engine: core\" will list all shapes from the engine and modules starting with 'core'",
             requiredPermission = PermissionManager.CHEAT_PERMISSION)
     public String listShapes(@CommandParam(value = "startsWith", required = false) String[] startsWith) {
         StringBuilder stringBuilder = new StringBuilder();
@@ -171,7 +172,7 @@ public class BlockCommands extends BaseComponentSystem {
     @Command(shortDescription = "Lists available free shape blocks",
             helpText = "Lists all the available free shape blocks. These blocks can be created with any shape.\n" +
                     "You can filter by adding the beginning of words after the commands, e.g.: \"listFreeShapeBlocks" +
-                    "engine: core:\" will list all free shape blocks from the engine and core module",
+                    "engine: core\" will list all free shape blocks from the engine and modules starting with 'core'",
             requiredPermission = PermissionManager.CHEAT_PERMISSION)
     public String listFreeShapeBlocks(@CommandParam(value = "startsWith", required = false) String[] startsWith) {
         StringBuilder stringBuilder = new StringBuilder();
@@ -192,7 +193,8 @@ public class BlockCommands extends BaseComponentSystem {
     }
 
     @Command(shortDescription = "Replaces a block in front of user",
-            helpText = "Replaces a block in front of the user at the specified max distance", runOnServer =  true, requiredPermission = PermissionManager.CHEAT_PERMISSION)
+            helpText = "Replaces a block in front of the user at the specified max distance",
+            runOnServer = true, requiredPermission = PermissionManager.CHEAT_PERMISSION)
     public void replaceBlock(
             @Sender EntityRef sender,
             @CommandParam("blockName") String uri,
@@ -202,7 +204,7 @@ public class BlockCommands extends BaseComponentSystem {
         EntityRef gazeEntity = GazeAuthoritySystem.getGazeEntityForCharacter(playerEntity);
         LocationComponent gazeLocation = gazeEntity.getComponent(LocationComponent.class);
         Set<ResourceUrn> matchingUris = Assets.resolveAssetUri(uri, BlockFamilyDefinition.class);
-        targetSystem.updateTarget(gazeLocation.getWorldPosition(), gazeLocation.getWorldDirection(), maxDistance);
+        targetSystem.updateTarget(gazeLocation.getWorldPosition(new Vector3f()), gazeLocation.getWorldDirection(new Vector3f()), maxDistance);
         EntityRef target = targetSystem.getTarget();
         BlockComponent targetLocation = target.getComponent(BlockComponent.class);
         if (matchingUris.size() == 1) {
@@ -210,7 +212,7 @@ public class BlockCommands extends BaseComponentSystem {
             if (def.isPresent()) {
                 BlockFamily blockFamily = blockManager.getBlockFamily(uri);
                 Block block = blockManager.getBlock(blockFamily.getURI());
-                world.setBlock(targetLocation.position, block);
+                world.setBlock(targetLocation.getPosition(), block);
             } else if (matchingUris.size() > 1) {
                 StringBuilder builder = new StringBuilder();
                 builder.append("Non-unique shape name, possible matches: ");
@@ -265,6 +267,7 @@ public class BlockCommands extends BaseComponentSystem {
     /**
      * Called by 'give' command in ItemCommands.java to attempt to put a block in the player's inventory when no item is found.
      * Called by 'giveBulkBlock' command in BlockCommands.java to put a block in the player's inventory.
+     *
      * @return Null if not found, otherwise success or warning message
      */
     public String giveBlock(
@@ -370,7 +373,8 @@ public class BlockCommands extends BaseComponentSystem {
 
     /**
      * Used to check if an item/prefab/etc name starts with a string that is in {@code uri}
-     * @param uri the name to be checked
+     *
+     * @param uri             the name to be checked
      * @param startsWithArray array of possible word to match at the beginning of {@code uri}
      * @return true if {@code startsWithArray} is null, empty or {@code uri} starts with one of the elements in it
      */

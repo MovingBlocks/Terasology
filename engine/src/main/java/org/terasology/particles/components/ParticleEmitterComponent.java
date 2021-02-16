@@ -94,7 +94,7 @@ public class ParticleEmitterComponent implements Component {
     /**
      * This emitter's particle pool.
      */
-    public ParticlePool particlePool;
+    public transient ParticlePool particlePool;
 
     /**
      * Maps Generator component -> Function that processes that Generator

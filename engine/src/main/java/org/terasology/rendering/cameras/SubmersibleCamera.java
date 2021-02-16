@@ -15,9 +15,8 @@
  */
 package org.terasology.rendering.cameras;
 
+import org.joml.Vector3f;
 import org.terasology.config.RenderingConfig;
-import org.terasology.math.JomlUtil;
-import org.terasology.math.geom.Vector3f;
 import org.terasology.rendering.RenderHelper;
 import org.terasology.world.WorldProvider;
 
@@ -25,7 +24,7 @@ public abstract class SubmersibleCamera extends Camera {
 
     /* Used for Underwater Checks */
     private WorldProvider worldProvider;
-    private RenderingConfig renderingConfig;
+    RenderingConfig renderingConfig;
 
     public SubmersibleCamera(WorldProvider worldProvider, RenderingConfig renderingConfig) {
         this.worldProvider = worldProvider;
@@ -42,7 +41,7 @@ public abstract class SubmersibleCamera extends Camera {
     public boolean isUnderWater() {
         // TODO: Making this as a subscribable value especially for node "ChunksRefractiveReflectiveNode",
         // TODO: glDisable and glEnable state changes on that node will be dynamically added/removed based on this value.
-        Vector3f cameraPosition = new Vector3f(JomlUtil.from(this.getPosition()));
+        Vector3f cameraPosition = new Vector3f(this.getPosition());
 
         // Compensate for waves
         if (renderingConfig.isAnimateWater()) {

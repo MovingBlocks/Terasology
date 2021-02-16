@@ -1,18 +1,5 @@
-/*
- * Copyright 2017 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.rendering.opengl;
 
 import org.slf4j.Logger;
@@ -22,9 +9,9 @@ import org.terasology.config.RenderingConfig;
 import org.terasology.context.Context;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.engine.subsystem.common.ThreadManager;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.persistence.internal.GamePreviewImageProvider;
-import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
+import org.terasology.registry.CoreRegistry;
+import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFbo;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -37,7 +24,7 @@ import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.FINAL_BUFFER;
+import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFbo.FINAL_BUFFER;
 
 // TODO: Future work should not only "think" in terms of a DAG-like rendering pipeline
 // TODO: but actually implement one, see https://github.com/MovingBlocks/Terasology/issues/1741
@@ -51,7 +38,7 @@ public class ScreenGrabber {
     private ThreadManager threadManager;
     private float currentExposure;
     private boolean isTakingScreenshot;
-    private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
+    private DisplayResolutionDependentFbo displayResolutionDependentFBOs;
     private Path savedGamePath;
     private boolean savingGamePreview;
 
@@ -99,10 +86,10 @@ public class ScreenGrabber {
      * If no screenshot data is available an error is logged and the method returns doing nothing.
      */
     public void saveScreenshot() {
-        // Since ScreenGrabber is initialized before DisplayResolutionDependentFBOs (because the latter contains a reference to the former)
+        // Since ScreenGrabber is initialized before DisplayResolutionDependentFbo (because the latter contains a reference to the former)
         // on first call on saveScreenshot() displayResolutionDependentFBOs will be null.
         if (displayResolutionDependentFBOs == null) {
-            displayResolutionDependentFBOs = CoreRegistry.get(DisplayResolutionDependentFBOs.class);
+            displayResolutionDependentFBOs = CoreRegistry.get(DisplayResolutionDependentFbo.class);
         }
 
         FBO sceneFinalFbo = displayResolutionDependentFBOs.get(FINAL_BUFFER);

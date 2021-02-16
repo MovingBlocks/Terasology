@@ -1,31 +1,19 @@
-/*
- * Copyright 2018 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.persistence.serializers;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import org.joml.Vector3f;
 import org.junit.jupiter.api.Test;
 import org.terasology.ModuleEnvironmentTest;
-import org.terasology.math.geom.Vector3f;
 import org.terasology.naming.Name;
+import org.terasology.nui.Color;
 import org.terasology.persistence.ModuleContext;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
+import org.terasology.persistence.typeHandling.TypeHandlerLibraryImpl;
 import org.terasology.persistence.typeHandling.annotations.SerializedName;
 import org.terasology.reflection.TypeInfo;
-import org.terasology.rendering.nui.Color;
 
 import java.io.IOException;
 import java.util.List;
@@ -54,7 +42,7 @@ public class TypeSerializerTest extends ModuleEnvironmentTest {
     public void setup() {
         ModuleContext.setContext(moduleManager.getEnvironment().get(new Name("unittest")));
 
-        typeHandlerLibrary = TypeHandlerLibrary.forModuleEnvironment(moduleManager, typeRegistry);
+        typeHandlerLibrary = TypeHandlerLibraryImpl.forModuleEnvironment(moduleManager, typeRegistry);
 
         protobufSerializer = new ProtobufSerializer(typeHandlerLibrary);
         gsonSerializer = new GsonSerializer(typeHandlerLibrary);
@@ -156,7 +144,7 @@ public class TypeSerializerTest extends ModuleEnvironmentTest {
         private final Vector3f tailPosition;
         private final org.joml.Vector3f headPosition;
 
-        private Dog(T data, Vector3f tailPosition,org.joml.Vector3f headPosition) {
+        private Dog(T data, Vector3f tailPosition,Vector3f headPosition) {
             super(data);
             this.tailPosition = tailPosition;
             this.headPosition = headPosition;

@@ -16,8 +16,8 @@
 
 package org.terasology.world.block.tiles;
 
+import org.joml.Vector2f;
 import org.terasology.assets.ResourceUrn;
-import org.terasology.math.geom.Vector2f;
 
 /**
  * Dummy implementation of WorldAtlas

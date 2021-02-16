@@ -9,6 +9,9 @@
 !.gitignore
 !.github
 
+# Ignore generated code
+/engine/src/jmh/generated
+
 # Ignore subdirs with their own Git roots. PC Facade and Core module are bundled with the main repo.
 extensions
 /facades/*
@@ -16,10 +19,6 @@ extensions
 !/facades/TeraEd
 !/facades/subprojects.gradle
 /modules/*
-!/modules/BiomesAPI
-!/modules/Core
-!/modules/CoreSampleGameplay
-!/modules/BuilderSampleGameplay
 !/modules/subprojects.gradle
 /metas/*
 !/metas/subprojects.gradle
@@ -31,20 +30,13 @@ build/
 /gradle.properties
 /override.cfg
 
-# Ignore IntelliJ - could use "/**/*.iml" to catch all .iml files, but that requires a somewhat recent Git version
-/out/
-modules/Core/Core.iml
-modules/CoreSampleGameplay/CoreSampleGameplay.iml
-modules/BuilderSampleGameplay/BuilderSampleGameplay.iml
-facades/PC/PC.iml
-facades/TeraEd/TeraEd.iml
-engine/engine.iml
-engine-tests/engine-tests.iml
-/*.iml
-/*.ipr
+# Do share some IntelliJ settings (see .idea/.gitignore for specifics)
+!/.idea
+# But not build outputs, or things it will regenerate when it syncs with gradle.
+out/
 /*.iws
 /projectFilesBackup*
-/**/*.iml
+*.iml
 
 # Ignore Eclipse
 .checkstyle
@@ -73,9 +65,6 @@ Icon
 ehthumbs.db
 Thumbs.db
 
-# Ignore Terasology build output
-/engine/src/main/resources/Credits.md
-
 # Ignore Terasology output
 *.log
 /saves/
@@ -83,6 +72,7 @@ Thumbs.db
 /configs/
 /screenshots/
 /logs/
+/cachedModules/
 /terasology-server/
 /terasology-2ndclient/
 /terasology-3rdclient/

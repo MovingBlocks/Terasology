@@ -1,30 +1,17 @@
-/*
- * Copyright 2017 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.rendering.cameras;
 
-import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
+import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.terasology.config.RenderingConfig;
 import org.terasology.engine.subsystem.DisplayDevice;
-import org.terasology.math.MatrixUtils;
 import org.terasology.math.TeraMath;
 import org.terasology.rendering.nui.layers.mainMenu.videoSettings.CameraSetting;
 import org.terasology.world.WorldProvider;
+import org.terasology.world.chunks.Chunks;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -51,16 +38,20 @@ public class PerspectiveCamera extends SubmersibleCamera implements PropertyChan
     private float bobbingVerticalOffsetFactor;
     private float cachedBobbingRotationOffsetFactor;
     private float cachedBobbingVerticalOffsetFactor;
-    private DisplayDevice displayDevice;
+    private final DisplayDevice displayDevice;
 
     private Vector3f tempRightVector = new Vector3f();
 
-    public PerspectiveCamera(WorldProvider worldProvider, RenderingConfig renderingConfig, DisplayDevice displayDevice) {
+    public PerspectiveCamera(WorldProvider worldProvider, RenderingConfig renderingConfig,
+                             DisplayDevice displayDevice) {
         super(worldProvider, renderingConfig);
         this.displayDevice = displayDevice;
         this.cameraSettings = renderingConfig.getCameraSettings();
 
         displayDevice.subscribe(DISPLAY_RESOLUTION_CHANGE, this);
+        renderingConfig.subscribe(RenderingConfig.VIEW_DISTANCE, this);
+        renderingConfig.subscribe(RenderingConfig.CHUNK_LODS, this);
+        updateFarClippingDistance();
     }
 
     @Override
@@ -71,20 +62,20 @@ public class PerspectiveCamera extends SubmersibleCamera implements PropertyChan
     @Override
     public void loadProjectionMatrix() {
         glMatrixMode(GL_PROJECTION);
-        GL11.glLoadMatrix(MatrixUtils.matrixToFloatBuffer(getProjectionMatrix()));
+        GL11.glLoadMatrixf(getProjectionMatrix().get(BufferUtils.createFloatBuffer(16)));
         glMatrixMode(GL11.GL_MODELVIEW);
     }
 
     @Override
     public void loadModelViewMatrix() {
         glMatrixMode(GL11.GL_MODELVIEW);
-        GL11.glLoadMatrix(MatrixUtils.matrixToFloatBuffer(getViewMatrix()));
+        GL11.glLoadMatrixf(getViewMatrix().get(BufferUtils.createFloatBuffer(16)));
     }
 
     @Override
     public void loadNormalizedModelViewMatrix() {
         glMatrixMode(GL11.GL_MODELVIEW);
-        GL11.glLoadMatrix(MatrixUtils.matrixToFloatBuffer(getNormViewMatrix()));
+        GL11.glLoadMatrixf(getNormViewMatrix().get(BufferUtils.createFloatBuffer(16)));
     }
 
     @Override
@@ -137,37 +128,40 @@ public class PerspectiveCamera extends SubmersibleCamera implements PropertyChan
     public void updateMatrices(float fov) {
         // Nothing to do...
         if (cachedPosition.equals(getPosition()) && cachedViewigDirection.equals(viewingDirection)
-                && cachedBobbingRotationOffsetFactor == bobbingRotationOffsetFactor && cachedBobbingVerticalOffsetFactor == bobbingVerticalOffsetFactor
-                && cachedFov == fov
-                && cachedZFar == getzFar() && cachedZNear == getzNear()
-                && cachedReflectionHeight == getReflectionHeight()) {
+            && cachedBobbingRotationOffsetFactor == bobbingRotationOffsetFactor && cachedBobbingVerticalOffsetFactor == bobbingVerticalOffsetFactor
+            && cachedFov == fov
+            && cachedZFar == getzFar() && cachedZNear == getzNear()
+            && cachedReflectionHeight == getReflectionHeight()) {
             return;
         }
 
         viewingDirection.cross(up, tempRightVector);
         tempRightVector.mul(bobbingRotationOffsetFactor);
 
-        projectionMatrix = createPerspectiveProjectionMatrix(fov, getzNear(), getzFar(),this.displayDevice);
+        float aspectRatio = (float) displayDevice.getWidth() / displayDevice.getHeight();
+        float fovY = (float) (2 * Math.atan2(Math.tan(0.5 * fov * TeraMath.DEG_TO_RAD), aspectRatio));
+        projectionMatrix.setPerspective(fovY, aspectRatio, getzNear(), getzFar());
 
-        viewMatrix = MatrixUtils.createViewMatrix(0f, bobbingVerticalOffsetFactor * 2.0f, 0f, viewingDirection.x, viewingDirection.y + bobbingVerticalOffsetFactor * 2.0f,
-                viewingDirection.z, up.x + tempRightVector.x, up.y + tempRightVector.y, up.z + tempRightVector.z);
+        viewMatrix.setLookAt(0f, bobbingVerticalOffsetFactor * 2.0f, 0f, viewingDirection.x,
+            viewingDirection.y + bobbingVerticalOffsetFactor * 2.0f,
+            viewingDirection.z, up.x + tempRightVector.x, up.y + tempRightVector.y, up.z + tempRightVector.z);
 
-        normViewMatrix = MatrixUtils.createViewMatrix(0f, 0f, 0f, viewingDirection.x, viewingDirection.y, viewingDirection.z,
-                up.x + tempRightVector.x, up.y + tempRightVector.y, up.z + tempRightVector.z);
+        normViewMatrix.setLookAt(0f, bobbingVerticalOffsetFactor * 2.0f, 0f, viewingDirection.x,
+            viewingDirection.y + bobbingVerticalOffsetFactor * 2.0f,
+            viewingDirection.z, up.x + tempRightVector.x, up.y + tempRightVector.y, up.z + tempRightVector.z);
 
-        reflectionMatrix.setColumn(0, new Vector4f(1.0f, 0.0f, 0.0f, 0.0f));
-        reflectionMatrix.setColumn(1, new Vector4f(0.0f, -1.0f, 0.0f, 2f * (-position.y + getReflectionHeight())));
-        reflectionMatrix.setColumn(2, new Vector4f(0.0f, 0.0f, 1.0f, 0.0f));
-        reflectionMatrix.setColumn(3, new Vector4f(0.0f, 0.0f, 0.0f, 1.0f));
-        reflectionMatrix.mul(viewMatrix, viewMatrixReflected);
+        reflectionMatrix.setRow(0, new Vector4f(1.0f, 0.0f, 0.0f, 0.0f));
+        reflectionMatrix.setRow(1, new Vector4f(0.0f, -1.0f, 0.0f, 2f * (-position.y + getReflectionHeight())));
+        reflectionMatrix.setRow(2, new Vector4f(0.0f, 0.0f, 1.0f, 0.0f));
+        reflectionMatrix.setRow(3, new Vector4f(0.0f, 0.0f, 0.0f, 1.0f));
+        viewMatrix.mul(reflectionMatrix, viewMatrixReflected);
 
-        reflectionMatrix.setColumn(1, new Vector4f(0.0f, -1.0f, 0.0f, 0.0f));
-        reflectionMatrix.mul(normViewMatrix,normViewMatrixReflected);
+        reflectionMatrix.setRow(1, new Vector4f(0.0f, -1.0f, 0.0f, 0.0f));
+        normViewMatrix.mul(reflectionMatrix, normViewMatrixReflected);
 
-//        viewProjectionMatrix = MatrixUtils.calcViewProjectionMatrix(viewMatrix, projectionMatrix);
-        viewProjectionMatrix = new Matrix4f(viewMatrix).mul(projectionMatrix);
-
+        projectionMatrix.mul(viewMatrix, viewProjectionMatrix);
         projectionMatrix.invert(inverseProjectionMatrix);
+
         viewProjectionMatrix.invert(inverseViewProjectionMatrix);
 
         // Used for dirty checks
@@ -191,18 +185,23 @@ public class PerspectiveCamera extends SubmersibleCamera implements PropertyChan
         bobbingVerticalOffsetFactor = f;
     }
 
-    // TODO: Move the dependency on LWJGL (Display) elsewhere
-    private static Matrix4f createPerspectiveProjectionMatrix(float fov, float zNear, float zFar, DisplayDevice displayDevice) {
-        float aspectRatio = (float) displayDevice.getDisplayWidth()/ displayDevice.getDisplayHeight();
-        float fovY = (float) (2 * Math.atan2(Math.tan(0.5 * fov * TeraMath.DEG_TO_RAD), aspectRatio));
-
-        return MatrixUtils.createPerspectiveProjectionMatrix(fovY, aspectRatio, zNear, zFar);
+    private void updateFarClippingDistance() {
+        float distance = renderingConfig.getViewDistance().getChunkDistance().x() * Chunks.SIZE_X * (1 << (int) renderingConfig.getChunkLods());
+        zFar = Math.max(distance, 500) * 2;
+        // distance is an estimate of how far away the farthest chunks are, and the minimum bound is to ensure that the sky is visible.
     }
 
     public void propertyChange(PropertyChangeEvent propertyChangeEvent) {
-        if (propertyChangeEvent.getPropertyName().equals(DISPLAY_RESOLUTION_CHANGE)) {
-            cachedFov = -1; // Invalidate the cache, so that matrices get regenerated.
-            updateMatrices();
+        switch (propertyChangeEvent.getPropertyName()) {
+            case DISPLAY_RESOLUTION_CHANGE:
+                cachedFov = -1; // Invalidate the cache, so that matrices get regenerated.
+                updateMatrices();
+                return;
+            case RenderingConfig.VIEW_DISTANCE:
+            case RenderingConfig.CHUNK_LODS:
+                updateFarClippingDistance();
+                return;
+            default:
         }
     }
 }

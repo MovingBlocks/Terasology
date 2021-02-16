@@ -1,32 +1,20 @@
-/*
- * Copyright 2018 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.world.block;
 
 import com.google.common.collect.Maps;
+import org.joml.Quaternionf;
+import org.joml.RoundingMode;
+import org.joml.Vector3f;
+import org.joml.Vector3i;
+import org.joml.Vector3ic;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.prefab.Prefab;
-import org.terasology.math.AABB;
+import org.terasology.joml.geom.AABBf;
 import org.terasology.math.Rotation;
 import org.terasology.math.Side;
 import org.terasology.math.TeraMath;
-import org.terasology.math.Transform;
-import org.terasology.math.geom.Quat4f;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.physics.shapes.CollisionShape;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.mesh.Mesh;
@@ -39,9 +27,8 @@ import org.terasology.utilities.collection.EnumBooleanMap;
 import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.shapes.BlockMeshPart;
 import org.terasology.world.block.sounds.BlockSounds;
-import org.terasology.world.chunks.ChunkConstants;
+import org.terasology.world.chunks.Chunks;
 
-import java.math.RoundingMode;
 import java.util.Map;
 import java.util.Optional;
 
@@ -124,7 +111,7 @@ public final class Block {
     /* Collision */
     private CollisionShape collisionShape;
     private Vector3f collisionOffset;
-    private AABB bounds = AABB.createEmpty();
+    private AABBf bounds = new AABBf();
 
     public short getId() {
         return id;
@@ -473,7 +460,7 @@ public final class Block {
      * @param luminance the light level produced by this block
      */
     public void setLuminance(byte luminance) {
-        this.luminance = (byte) TeraMath.clamp(luminance, 0, ChunkConstants.MAX_LIGHT);
+        this.luminance = (byte) TeraMath.clamp(luminance, 0, Chunks.MAX_LIGHT);
     }
 
     public Vector3f getTint() {
@@ -581,7 +568,7 @@ public final class Block {
     public void setCollision(Vector3f offset, CollisionShape shape) {
         collisionShape = shape;
         collisionOffset = offset;
-        bounds = shape.getAABB(new Transform(offset, new Quat4f(0, 0, 0, 1), 1.0f));
+        bounds = shape.getAABB(offset, new Quaternionf(0, 0, 0, 1), 1.0f);
     }
 
     public CollisionShape getCollisionShape() {
@@ -592,11 +579,11 @@ public final class Block {
         return collisionOffset;
     }
 
-    public AABB getBounds(Vector3i pos) {
-        return bounds.move(pos.toVector3f());
+    public AABBf getBounds(Vector3ic pos) {
+        return new AABBf(bounds).translate(pos.x(), pos.y(), pos.z());
     }
 
-    public AABB getBounds(Vector3f floatPos) {
+    public AABBf getBounds(Vector3f floatPos) {
         return getBounds(new Vector3i(floatPos, RoundingMode.HALF_UP));
     }
 

@@ -24,7 +24,7 @@ import org.terasology.assets.ResourceUrn;
  * An abstract class
  * @param <T> The asset type this asset belongs to
  */
-public abstract class Sound<T extends AssetData> extends Asset<T> {
+public abstract class Sound<T extends AssetData> extends Asset<T> implements org.terasology.nui.asset.Sound {
 
     /**
      * The constructor for an asset. It is suggested that implementing classes provide a constructor taking both the urn, and an initial AssetData to load.

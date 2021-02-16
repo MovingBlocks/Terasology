@@ -15,12 +15,13 @@
  */
 package org.terasology.math;
 
-
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import gnu.trove.map.TByteObjectMap;
 import gnu.trove.map.hash.TByteObjectHashMap;
-import org.terasology.math.geom.Quat4f;
+import org.joml.Quaternionf;
+import org.joml.Quaternionfc;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -40,6 +41,7 @@ public final class Rotation {
     private final Yaw yaw;
     private final Pitch pitch;
     private final Roll roll;
+    private final Quaternionfc rotation;
 
     /**
      * The index used by .rotate(), among others. Ranges from 0 to 63 (4^3-1).
@@ -51,6 +53,7 @@ public final class Rotation {
         this.yaw = yaw;
         this.roll = roll;
         this.index = indexFor(yaw, pitch, roll);
+        this.rotation = new Quaternionf().rotationYXZ(yaw.getRadians(), pitch.getRadians(), roll.getRadians());
     }
 
     public static Rotation none() {
@@ -183,9 +186,11 @@ public final class Rotation {
         return roll;
     }
 
-    public Quat4f getQuat4f() {
-        Quat4f rotation = new Quat4f(yaw.getRadians(), pitch.getRadians(), roll.getRadians());
-        rotation.normalize();
+    /**
+     * The orientation of the current Rotation
+     * @return The orientation
+     */
+    public Quaternionfc orientation() {
         return rotation;
     }
 

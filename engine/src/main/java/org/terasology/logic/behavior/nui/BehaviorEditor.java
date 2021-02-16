@@ -22,6 +22,8 @@ import org.abego.treelayout.TreeForTreeLayout;
 import org.abego.treelayout.TreeLayout;
 import org.abego.treelayout.util.DefaultConfiguration;
 import org.abego.treelayout.util.FixedNodeExtentProvider;
+import org.joml.Vector2f;
+import org.joml.Vector2i;
 import org.terasology.context.Context;
 import org.terasology.logic.behavior.BehaviorSystem;
 import org.terasology.logic.behavior.DefaultBehaviorTreeRunner;
@@ -31,20 +33,18 @@ import org.terasology.logic.behavior.core.BehaviorNode;
 import org.terasology.logic.behavior.core.BehaviorState;
 import org.terasology.logic.behavior.core.BehaviorTreeBuilder;
 import org.terasology.logic.behavior.core.Visitor;
-import org.terasology.math.geom.Vector2f;
-import org.terasology.math.geom.Vector2i;
+import org.terasology.nui.BaseInteractionListener;
+import org.terasology.nui.Canvas;
+import org.terasology.nui.Color;
+import org.terasology.nui.InteractionListener;
+import org.terasology.nui.SubRegion;
+import org.terasology.nui.UIWidget;
+import org.terasology.nui.databinding.Binding;
+import org.terasology.nui.events.NUIMouseClickEvent;
+import org.terasology.nui.events.NUIMouseOverEvent;
+import org.terasology.nui.events.NUIMouseReleaseEvent;
+import org.terasology.nui.layouts.ZoomableLayout;
 import org.terasology.registry.CoreRegistry;
-import org.terasology.rendering.nui.BaseInteractionListener;
-import org.terasology.rendering.nui.Canvas;
-import org.terasology.rendering.nui.Color;
-import org.terasology.rendering.nui.InteractionListener;
-import org.terasology.rendering.nui.SubRegion;
-import org.terasology.rendering.nui.UIWidget;
-import org.terasology.rendering.nui.databinding.Binding;
-import org.terasology.rendering.nui.events.NUIMouseClickEvent;
-import org.terasology.rendering.nui.events.NUIMouseOverEvent;
-import org.terasology.rendering.nui.events.NUIMouseReleaseEvent;
-import org.terasology.rendering.nui.layouts.ZoomableLayout;
 
 import java.awt.geom.Rectangle2D;
 import java.io.ByteArrayOutputStream;
@@ -74,7 +74,7 @@ public class BehaviorEditor extends ZoomableLayout implements DefaultBehaviorTre
         public void onMouseOver(NUIMouseOverEvent event) {
             mouseWorldPosition = screenToWorld(event.getRelativeMousePosition());
             if (newNode != null) {
-                Vector2f diff = screenToWorld(event.getRelativeMousePosition()).sub(newNode.getPosition());
+                org.joml.Vector2f diff = screenToWorld(event.getRelativeMousePosition()).sub(newNode.getPosition());
                 newNode.move(diff);
             }
         }
@@ -165,8 +165,8 @@ public class BehaviorEditor extends ZoomableLayout implements DefaultBehaviorTre
                 drawConnection(canvas, activeConnectionStart, mouseWorldPosition, Color.WHITE);
             }
             if (selectedNode != null) {
-                Vector2f size = selectedNode.getSize();
-                Vector2f topLeft = selectedNode.getPosition();
+                Vector2f size = new Vector2f(selectedNode.getSize());
+                Vector2f topLeft = new Vector2f(selectedNode.getPosition());
                 Vector2f topRight = new Vector2f(topLeft);
                 topRight.add(new Vector2f(size.x + .1f, 0));
                 Vector2f bottomLeft = new Vector2f(topLeft);
@@ -211,7 +211,6 @@ public class BehaviorEditor extends ZoomableLayout implements DefaultBehaviorTre
         Vector2i s = worldToScreen(from);
         Vector2i e = worldToScreen(to);
         canvas.drawLine(s.x, s.y, e.x, e.y, color);
-
     }
 
     private void drawConnection(Canvas canvas, Port from, Vector2f to, Color color) {
@@ -266,7 +265,7 @@ public class BehaviorEditor extends ZoomableLayout implements DefaultBehaviorTre
         List<RenderableNode> renderables = createRenderables(nodeCopy);
         if (renderables.size() > 0) {
             newNode = renderables.get(0);
-            Vector2f oldPos = newNode.getPosition();
+            org.joml.Vector2f oldPos = new org.joml.Vector2f(newNode.getPosition());
             layout(newNode);
             oldPos.sub(newNode.getPosition());
             newNode.move(oldPos);

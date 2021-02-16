@@ -21,7 +21,6 @@ import org.terasology.logic.behavior.core.CollectiveBehaviorTreeRunner;
 import org.terasology.logic.common.DisplayNameComponent;
 import org.terasology.module.sandbox.API;
 
-import java.util.HashSet;
 import java.util.Set;
 
 /**

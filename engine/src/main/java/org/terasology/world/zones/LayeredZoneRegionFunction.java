@@ -1,25 +1,12 @@
-/*
- * Copyright 2017 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.world.zones;
 
-import org.terasology.math.geom.Vector2i;
+import org.joml.Vector2i;
 import org.terasology.module.sandbox.API;
-import org.terasology.world.chunks.ChunkConstants;
+import org.terasology.world.chunks.Chunks;
 import org.terasology.world.generation.Region;
-import org.terasology.world.generation.facets.SurfaceHeightFacet;
+import org.terasology.world.generation.facets.ElevationFacet;
 
 import java.util.Comparator;
 import java.util.List;
@@ -39,7 +26,7 @@ public class LayeredZoneRegionFunction implements ZoneRegionFunction {
     private List<LayeredZoneRegionFunction> siblings;
     private List<LayeredZoneRegionFunction> abovegroundLayers;
     private List<LayeredZoneRegionFunction> undergroundLayers;
-    private ConcurrentMap<Vector2i, LayerRange> layerRangeMap = new ConcurrentHashMap<>(ChunkConstants.SIZE_X * ChunkConstants.SIZE_Z * 100);
+    private ConcurrentMap<Vector2i, LayerRange> layerRangeMap = new ConcurrentHashMap<>(Chunks.SIZE_X * Chunks.SIZE_Z * 100);
     private LayerThickness layerThickness;
     private long seed;
     private Zone parent;
@@ -93,7 +80,7 @@ public class LayeredZoneRegionFunction implements ZoneRegionFunction {
     private LayerRange getLayerRange(int x, int z, Region region) {
         Vector2i pos = new Vector2i(x, z);
         if (!layerRangeMap.containsKey(pos)) {
-            int surfaceHeight = (int) Math.floor(region.getFacet(SurfaceHeightFacet.class).getWorld(pos));
+            int surfaceHeight = (int) Math.floor(region.getFacet(ElevationFacet.class).getWorld(pos));
 
             boolean aboveground = ordering > 0;
             int cumulativeDistanceSmall = 0;

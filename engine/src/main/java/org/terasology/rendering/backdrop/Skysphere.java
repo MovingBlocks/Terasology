@@ -1,29 +1,16 @@
-/*
- * Copyright 2016 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.rendering.backdrop;
 
+import org.joml.Vector3f;
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.util.glu.Sphere;
 import org.terasology.context.Context;
-import org.terasology.utilities.Assets;
 import org.terasology.math.TeraMath;
-import org.terasology.math.geom.Vector3f;
+import org.terasology.nui.properties.Range;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.cameras.Camera;
-import org.terasology.rendering.nui.properties.Range;
+import org.terasology.rendering.primitives.Sphere;
+import org.terasology.utilities.Assets;
 import org.terasology.world.sun.CelestialSystem;
 
 import static org.lwjgl.opengl.GL11.GL_BACK;
@@ -107,7 +94,7 @@ public class Skysphere implements BackdropProvider, BackdropRenderer {
         float daylight = 1.0f;
 
         if (angle < 24.0f) {
-            daylight = 1.0f - (24.0f - angle) / 24.0f;
+            daylight = Math.max(1.0f - (24.0f - angle) / 24.0f, 0.15f);
         }
 
         return daylight;
@@ -130,7 +117,7 @@ public class Skysphere implements BackdropProvider, BackdropRenderer {
 
         // Moonlight flip
         if (moonlightFlip && sunDirection.y < 0.0f) {
-            sunDirection.scale(-1.0f);
+            sunDirection.mul(-1.0f);
         }
 
         return sunDirection;

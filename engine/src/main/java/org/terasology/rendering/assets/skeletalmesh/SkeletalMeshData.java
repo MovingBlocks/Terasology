@@ -20,131 +20,167 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
+import org.joml.Matrix4f;
+import org.joml.Vector2f;
+import org.joml.Vector3f;
 import org.terasology.assets.AssetData;
-import org.terasology.math.AABB;
-import org.terasology.math.geom.Quat4f;
-import org.terasology.math.geom.Vector2f;
-import org.terasology.math.geom.Vector3f;
+import org.terasology.joml.geom.AABBf;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
 /**
+ *
  */
 public class SkeletalMeshData implements AssetData {
 
     private Bone rootBone;
     private Map<String, Bone> boneLookup = Maps.newHashMap();
     private List<Bone> bones = Lists.newArrayList();
-    private List<Vector2f> uvs = ImmutableList.of();
+    private List<Vector2f> uvs;
+    private List<Vector3f> vertices;
+    private List<Vector3f> normals;
     private List<BoneWeight> weights = Lists.newArrayList();
-    private TIntList vertexStartWeights = new TIntArrayList();
-    private TIntList vertexWeightCounts = new TIntArrayList();
     private TIntList indices = new TIntArrayList();
-    private AABB staticAABB;
+    private AABBf staticAABB;
 
-    public SkeletalMeshData(List<Bone> bones, List<BoneWeight> weights, List<Vector2f> uvs, TIntList vertexStartWeights,
-                            TIntList vertexWeightCounts, TIntList indices, AABB staticAABB) {
+    public SkeletalMeshData(List<Bone> bones, List<Vector3f> vertices, List<Vector3f> normals,
+                            List<BoneWeight> weights, List<Vector2f> uvs, TIntList indices, AABBf staticAABB) {
         for (Bone bone : bones) {
+            boneLookup.put(bone.getName(), bone);
             if (bone.getParent() == null) {
                 rootBone = bone;
-                break;
             }
         }
         this.bones.addAll(bones);
         this.weights.addAll(weights);
         this.uvs = ImmutableList.copyOf(uvs);
-        this.vertexStartWeights.addAll(vertexStartWeights);
-        this.vertexWeightCounts.addAll(vertexWeightCounts);
+        this.vertices = ImmutableList.copyOf(vertices);
+        this.normals = ImmutableList.copyOf(normals);
         this.indices.addAll(indices);
         this.staticAABB = staticAABB;
 
         calculateNormals();
     }
 
-
-
+    /**
+     * @return Information on all bones composing the mesh
+     */
     public Collection<Bone> getBones() {
         return bones;
     }
 
+    /**
+     * @return Information on the root bone
+     */
     public Bone getRootBone() {
         return rootBone;
     }
 
+    /**
+     * @return Provides the vertex positions for the default pose
+     */
     public List<Vector3f> getBindPoseVertexPositions() {
-        List<Vector3f> positions = Lists.newArrayListWithCapacity(bones.size());
-        List<Quat4f> rotations = Lists.newArrayListWithCapacity(getBones().size());
+        Matrix4f[] transforms = new Matrix4f[bones.size()];
         for (Bone bone : bones) {
-            positions.add(bone.getObjectPosition());
-            rotations.add(bone.getObjectRotation());
+            transforms[bone.getIndex()] = bone.getObjectTransform();
         }
-        return getVertexPositions(positions, rotations);
+        return getVertexPositions(Arrays.asList(transforms));
     }
 
+    /**
+     * @return Provides the vertex normals for the default pose
+     */
     public List<Vector3f> getBindPoseVertexNormals() {
-        List<Vector3f> positions = Lists.newArrayListWithCapacity(bones.size());
-        List<Quat4f> rotations = Lists.newArrayListWithCapacity(getBones().size());
+        Matrix4f[] transforms = new Matrix4f[bones.size()];
         for (Bone bone : bones) {
-            positions.add(bone.getObjectPosition());
-            rotations.add(bone.getObjectRotation());
+            transforms[bone.getIndex()] = bone.getObjectTransform();
         }
-        return getVertexNormals(positions, rotations);
+        return getVertexNormals(Arrays.asList(transforms));
     }
 
-    public List<Vector3f> getVertexPositions(List<Vector3f> bonePositions, List<Quat4f> boneRotations) {
+    /**
+     * Provides the positions of all vertices of the mesh, transformed based on the transformation matrices of all
+     * bones
+     *
+     * @param boneTransforms A transformation matrix for each bone in the skeletal mesh
+     * @return The positions of each vertex
+     */
+    public List<Vector3f> getVertexPositions(List<Matrix4f> boneTransforms) {
         List<Vector3f> results = Lists.newArrayListWithCapacity(getVertexCount());
-        for (int i = 0; i < vertexStartWeights.size(); ++i) {
-            Vector3f vertexPos = new Vector3f();
-            for (int weightIndexOffset = 0; weightIndexOffset < vertexWeightCounts.get(i); ++weightIndexOffset) {
-                int weightIndex = vertexStartWeights.get(i) + weightIndexOffset;
-                BoneWeight weight = weights.get(weightIndex);
-
-                Vector3f current = boneRotations.get(weight.getBoneIndex()).rotate(weight.getPosition(), new Vector3f());
-                current.add(bonePositions.get(weight.getBoneIndex()));
-                current.scale(weight.getBias());
-                vertexPos.add(current);
+        for (int i = 0; i < vertices.size(); i++) {
+            Vector3f pos = new Vector3f(vertices.get(i));
+            Matrix4f skinMat = new Matrix4f().m00(0).m11(0).m22(0).m33(0);
+            BoneWeight weight = weights.get(i);
+            for (int w = 0; w < weight.jointCount(); w++) {
+                Matrix4f jointMat = new Matrix4f(boneTransforms.get(weight.getJoint(w)));
+                jointMat.scale(weight.getBias(w));
+                skinMat.add(jointMat);
             }
-            results.add(vertexPos);
+            pos.mulTransposePosition(skinMat);
+            results.add(pos);
         }
         return results;
     }
 
-    public List<Vector3f> getVertexNormals(List<Vector3f> bonePositions, List<Quat4f> boneRotations) {
+    /**
+     * Provides the normals of all vertices of the mesh, transformed based on the transformation matrices of all bones
+     *
+     * @param boneTransforms A transformation matrix for each bone in the skeletal mesh
+     * @return The normals of each vertex
+     */
+    public List<Vector3f> getVertexNormals(List<Matrix4f> boneTransforms) {
         List<Vector3f> results = Lists.newArrayListWithCapacity(getVertexCount());
-        for (int i = 0; i < vertexStartWeights.size(); ++i) {
-            Vector3f vertexNorm = new Vector3f();
-            for (int weightIndexOffset = 0; weightIndexOffset < vertexWeightCounts.get(i); ++weightIndexOffset) {
-                int weightIndex = vertexStartWeights.get(i) + weightIndexOffset;
-                BoneWeight weight = weights.get(weightIndex);
-
-                Vector3f current = boneRotations.get(weight.getBoneIndex()).rotate(weight.getNormal(), new Vector3f());
-                current.scale(weight.getBias());
-                vertexNorm.add(current);
+        for (int i = 0; i < normals.size(); i++) {
+            Vector3f norm = new Vector3f(normals.get(i));
+            Matrix4f skinMat = new Matrix4f().m00(0).m11(0).m22(0).m33(0);
+            BoneWeight weight = weights.get(i);
+            for (int w = 0; w < weight.jointCount(); w++) {
+                Matrix4f jointMat = new Matrix4f(boneTransforms.get(weight.getJoint(w)));
+                jointMat.scale(weight.getBias(w));
+                skinMat.add(jointMat);
             }
-            results.add(vertexNorm);
+            norm.mulTransposePosition(skinMat);
+            results.add(norm);
         }
         return results;
     }
 
+    /**
+     * @return The number of vertices composing the mesh
+     */
     public int getVertexCount() {
-        return vertexStartWeights.size();
+        return vertices.size();
     }
 
+    /**
+     * @param name The name of the bone
+     * @return Provides information for the named bone
+     */
     public Bone getBone(String name) {
         return boneLookup.get(name);
     }
 
+    /**
+     * @return The indices instructing how to render the vertices as triangles
+     */
     public TIntList getIndices() {
         return indices;
     }
 
+    /**
+     * @return The texture coordinate of each vertex
+     */
     public List<Vector2f> getUVs() {
         return uvs;
     }
 
-    public AABB getStaticAABB() {
+    /**
+     * @return A axis-aligned bounding box that surrounds the skeletal mesh given its default pose.
+     */
+    public AABBf getStaticAABB() {
         return staticAABB;
     }
 
@@ -160,11 +196,11 @@ public class SkeletalMeshData implements AssetData {
         Vector3f norm = new Vector3f();
         for (int i = 0; i < indices.size() / 3; ++i) {
             Vector3f baseVert = vertices.get(indices.get(i * 3));
-            v1.sub(vertices.get(indices.get(i * 3 + 1)), baseVert);
-            v2.sub(vertices.get(indices.get(i * 3 + 2)), baseVert);
+            vertices.get(indices.get(i * 3 + 1)).sub(baseVert, v1);
+            vertices.get(indices.get(i * 3 + 2)).sub(baseVert, v2);
             v1.normalize();
             v2.normalize();
-            norm.cross(v1, v2);
+            v2.cross(v1, norm);
             normals.get(indices.get(i * 3)).add(norm);
             normals.get(indices.get(i * 3 + 1)).add(norm);
             normals.get(indices.get(i * 3 + 2)).add(norm);
@@ -172,73 +208,6 @@ public class SkeletalMeshData implements AssetData {
 
         normals.forEach(Vector3f::normalize);
 
-        Quat4f inverseRot = new Quat4f();
-        for (int vertIndex = 0; vertIndex < vertices.size(); ++vertIndex) {
-            Vector3f normal = normals.get(vertIndex);
-            for (int weightIndex = 0; weightIndex < vertexWeightCounts.get(vertIndex); ++weightIndex) {
-                BoneWeight weight = weights.get(weightIndex + vertexStartWeights.get(vertIndex));
-                inverseRot.inverse(bones.get(weight.getBoneIndex()).getObjectRotation());
-                inverseRot.rotate(normal, norm);
-                weight.setNormal(norm);
-            }
-        }
-    }
-
-    /**
-     * Outputs the skeletal mesh as md5mesh file
-     */
-    public String toMD5(String shader) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("MD5Version 10\n" +
-                "commandline \"Exported from Terasology MD5SkeletonLoader\"\n" +
-                "\n");
-        sb.append("numJoints ").append(bones.size()).append("\n");
-        sb.append("numMeshes 1\n\n");
-        sb.append("joints {\n");
-        for (Bone bone : bones) {
-
-            sb.append("\t\"").append(bone.getName()).append("\" ").append(bone.getParentIndex()).append(" ( ");
-            sb.append(bone.getObjectPosition().x).append(" ");
-            sb.append(bone.getObjectPosition().y).append(" ");
-            sb.append(bone.getObjectPosition().z).append(" ) ( ");
-            Quat4f rot = new Quat4f(bone.getObjectRotation());
-            rot.normalize();
-            if (rot.w > 0) {
-                rot.x = -rot.x;
-                rot.y = -rot.y;
-                rot.z = -rot.z;
-            }
-            sb.append(rot.x).append(" ");
-            sb.append(rot.y).append(" ");
-            sb.append(rot.z).append(" )\n");
-        }
-        sb.append("}\n\n");
-
-        sb.append("mesh {\n");
-        sb.append("\tshader \"" + shader + "\"\n");
-        sb.append("\tnumverts ").append(uvs.size()).append("\n");
-        for (int i = 0; i < uvs.size(); i++) {
-            sb.append("\tvert ").append(i).append(" (").append(uvs.get(i).x).append(" ").append(uvs.get(i).y).append(") ");
-            sb.append(vertexStartWeights.get(i)).append(" ").append(vertexWeightCounts.get(i)).append("\n");
-        }
-        sb.append("\n");
-        sb.append("\tnumtris ").append(indices.size() / 3).append("\n");
-        for (int i = 0; i < indices.size() / 3; i++) {
-            int i1 = indices.get(i * 3);
-            int i2 = indices.get(i * 3 + 1);
-            int i3 = indices.get(i * 3 + 2);
-            sb.append("\ttri ").append(i).append(" ").append(i1).append(" ").append(i2).append(" ").append(i3).append("\n");
-        }
-        sb.append("\n");
-        sb.append("\tnumweights ").append(weights.size()).append("\n");
-        int meshId = 0;
-        for (BoneWeight weight : weights) {
-            sb.append("\tweight ").append(meshId).append(" ").append(weight.getBoneIndex()).append(" ");
-            sb.append(weight.getBias()).append(" ( ");
-            sb.append(weight.getPosition().x).append(" ").append(weight.getPosition().y).append(" ").append(weight.getPosition().z).append(")\n");
-            meshId++;
-        }
-        sb.append("}\n");
-        return sb.toString();
+        this.normals = normals;
     }
 }

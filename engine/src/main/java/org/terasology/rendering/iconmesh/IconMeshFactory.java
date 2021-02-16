@@ -1,25 +1,11 @@
-/*
- * Copyright 2013 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.rendering.iconmesh;
 
-import org.terasology.utilities.Assets;
+import org.joml.Vector4f;
 import org.terasology.assets.Asset;
 import org.terasology.assets.ResourceUrn;
-import org.terasology.math.geom.Rect2i;
-import org.terasology.math.geom.Vector4f;
+import org.terasology.joml.geom.Rectanglei;
 import org.terasology.module.sandbox.API;
 import org.terasology.naming.Name;
 import org.terasology.rendering.assets.mesh.Mesh;
@@ -27,6 +13,7 @@ import org.terasology.rendering.assets.mesh.MeshData;
 import org.terasology.rendering.assets.texture.TextureRegion;
 import org.terasology.rendering.primitives.Tessellator;
 import org.terasology.rendering.primitives.TessellatorHelper;
+import org.terasology.utilities.Assets;
 
 import java.nio.ByteBuffer;
 
@@ -73,9 +60,9 @@ public final class IconMeshFactory {
     public static MeshData generateIconMeshData(TextureRegion tex, int alphaLimit, boolean withContour, Vector4f colorContour) {
         ByteBuffer buffer = tex.getTexture().getData().getBuffers()[0];
 
-        Rect2i pixelRegion = tex.getPixelRegion();
-        int posX = pixelRegion.minX();
-        int posY = pixelRegion.minY();
+        Rectanglei pixelRegion = tex.getPixelRegion();
+        int posX = pixelRegion.minX;
+        int posY = pixelRegion.minY;
 
         int stride = tex.getTexture().getWidth() * 4;
 

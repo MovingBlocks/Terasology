@@ -17,9 +17,9 @@
 package org.terasology.rendering.assets.skeletalmesh;
 
 import com.google.common.collect.Lists;
-
-import org.terasology.math.geom.Quat4f;
-import org.terasology.math.geom.Vector3f;
+import org.joml.Matrix4f;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 
 import java.util.Collection;
 import java.util.List;
@@ -29,62 +29,44 @@ import java.util.List;
 public class Bone {
     private String name;
     private int index;
-    private Vector3f objectSpacePos = new Vector3f();
-    private Quat4f rotation = new Quat4f(0, 0, 0, 1);
+    private Matrix4f relativeTransform = new Matrix4f();
+    private Matrix4f inverseBindMatrix = new Matrix4f();
 
     private Bone parent;
     private List<Bone> children = Lists.newArrayList();
 
-    public Bone(int index, String name, Vector3f position, Quat4f rotation) {
+    public Bone(int index, String name, Matrix4f transform) {
         this.index = index;
         this.name = name;
-        this.objectSpacePos.set(position);
-        this.rotation.set(rotation);
+        this.relativeTransform.set(transform);
     }
 
     public String getName() {
         return name;
     }
 
+    public Matrix4f getInverseBindMatrix() {
+        return inverseBindMatrix;
+    }
+
+    public void setInverseBindMatrix(Matrix4f mat) {
+        this.inverseBindMatrix.set(mat);
+    }
+
     public int getIndex() {
         return index;
     }
 
-    public Vector3f getObjectPosition() {
-        return objectSpacePos;
-    }
-
-    public void setObjectPos(Vector3f newObjectSpacePos) {
-        this.objectSpacePos = newObjectSpacePos;
-    }
-
-    public Vector3f getLocalPosition() {
-        Vector3f pos = new Vector3f(objectSpacePos);
+    public Matrix4f getObjectTransform() {
+        Matrix4f result = new Matrix4f(relativeTransform);
         if (parent != null) {
-            pos.sub(parent.getObjectPosition());
-            Quat4f inverseParentRot = new Quat4f();
-            inverseParentRot.inverse(parent.getObjectRotation());
-            inverseParentRot.rotate(pos, pos);
+            result.mul(parent.getObjectTransform());
         }
-        return pos;
+        return result;
     }
 
-    public Quat4f getObjectRotation() {
-        return rotation;
-    }
-
-    public void setObjectRotation(Quat4f newRotation) {
-        this.rotation = newRotation;
-    }
-
-    public Quat4f getLocalRotation() {
-        Quat4f rot = new Quat4f(rotation);
-        if (parent != null) {
-            Quat4f inverseParentRot = new Quat4f();
-            inverseParentRot.inverse(parent.getObjectRotation());
-            rot.mul(inverseParentRot, rot);
-        }
-        return rot;
+    public Matrix4f getLocalTransform() {
+        return relativeTransform;
     }
 
     public Bone getParent() {
@@ -105,5 +87,20 @@ public class Bone {
 
     public Collection<Bone> getChildren() {
         return children;
+    }
+
+    public Vector3f getLocalPosition() {
+        Vector3f result = new Vector3f();
+        relativeTransform.transformPosition(result);
+        return result;
+    }
+
+    public Quaternionf getLocalRotation() {
+        return relativeTransform.getNormalizedRotation(new Quaternionf());
+    }
+
+    public Vector3f getLocalScale() {
+        return relativeTransform.getScale(new Vector3f());
+
     }
 }

@@ -1,37 +1,22 @@
-/*
- * Copyright 2014 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *  http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.rendering.assets.font;
 
 import com.google.common.collect.Maps;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.rendering.FontColor;
-import org.terasology.rendering.FontUnderline;
+import org.joml.Vector3f;
+import org.terasology.nui.Colorc;
+import org.terasology.nui.FontColor;
+import org.terasology.nui.FontUnderline;
+import org.terasology.nui.HorizontalAlign;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.rendering.assets.mesh.MeshBuilder;
-import org.terasology.rendering.nui.Color;
-import org.terasology.rendering.nui.HorizontalAlign;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.List;
 import java.util.Map;
 
-/**
- */
 public class FontMeshBuilder {
 
     private static final float SHADOW_DEPTH = -2;
@@ -45,7 +30,7 @@ public class FontMeshBuilder {
         this.underlineMaterial = underlineMaterial;
     }
 
-    public Map<Material, Mesh> createTextMesh(Font font, List<String> lines, int width, HorizontalAlign alignment, Color baseColor, Color shadowColor, boolean underline) {
+    public Map<Material, Mesh> createTextMesh(Font font, List<String> lines, int width, HorizontalAlign alignment, Colorc baseColor, Colorc shadowColor, boolean underline) {
         return new Builder(font, lines, width, alignment, baseColor, shadowColor, underline).invoke();
     }
 
@@ -54,7 +39,7 @@ public class FontMeshBuilder {
         private List<String> lines;
         private int width;
         private HorizontalAlign alignment;
-        private Color shadowColor;
+        private Colorc shadowColor;
         private boolean baseUnderline;
 
         private Map<Material, MeshBuilder> meshBuilders = Maps.newLinkedHashMap();
@@ -64,10 +49,10 @@ public class FontMeshBuilder {
         private boolean currentUnderline;
         private int underlineStart = UNKNOWN;
         private int underlineEnd = UNKNOWN;
-        private Deque<Color> previousColors = new ArrayDeque<>();
-        private Color currentColor;
+        private Deque<Colorc> previousColors = new ArrayDeque<>();
+        private Colorc currentColor;
 
-        Builder(Font font, List<String> lines, int width, HorizontalAlign alignment, Color baseColor, Color shadowColor, boolean baseUnderline) {
+        Builder(Font font, List<String> lines, int width, HorizontalAlign alignment, Colorc baseColor, Colorc shadowColor, boolean baseUnderline) {
             this.font = font;
             this.lines = lines;
             this.width = width;
@@ -176,7 +161,7 @@ public class FontMeshBuilder {
             }
         }
 
-        private void addUnderline(MeshBuilder builder, int xStart, int xEnd, int underlineTop, int underlineThickness, Color color, float depth) {
+        private void addUnderline(MeshBuilder builder, int xStart, int xEnd, int underlineTop, int underlineThickness, Colorc color, float depth) {
             float bottom = (float) underlineTop + underlineThickness;
 
             Vector3f v1 = new Vector3f(xStart, underlineTop, depth);
@@ -191,7 +176,7 @@ public class FontMeshBuilder {
             builder.addTexCoord(0, 1);
         }
 
-        private void addCharacter(MeshBuilder builder, FontCharacter character, Color color, float xOffset, float yOffset, float depth) {
+        private void addCharacter(MeshBuilder builder, FontCharacter character, Colorc color, float xOffset, float yOffset, float depth) {
             float top = y + character.getyOffset() + yOffset;
             float bottom = top + character.getHeight() + yOffset;
             float left = x + character.getxOffset() + xOffset;

@@ -20,32 +20,70 @@ The [creators and maintainers](https://github.com/MovingBlocks/Terasology/blob/d
 
 Terasology is fully [open source](https://github.com/MovingBlocks/Terasology) and licensed [Apache 2.0](http://www.apache.org/licenses/LICENSE-2.0.html) for code and [CC BY 4.0](http://creativecommons.org/licenses/by/4.0/) for artwork (unless indicated otherwise - see [credits](docs/Credits.md) for minor exceptions.)
 
-We encourage contributions from anybody and try to keep a warm and friendly community and maintain a [code of conduct](https://github.com/MovingBlocks/Terasology/blob/develop/docs/CODE_OF_CONDUCT.md)
+We encourage contributions from anybody and try to keep a warm and friendly community and maintain a [code of conduct](https://github.com/MovingBlocks/Terasology/blob/develop/docs/CODE_OF_CONDUCT.md).
 
 ![Terasology](/docs/images/menuBackground.jpg "Terasology")
 
 
 ## Playing
 
-Terasology requires Java 8 - [download it here](https://www.java.com/en/download/). Also make sure that your graphics card driver is up to date.
+<table>
+    <tr>
+        <td></td>
+        <th>Minimum Requirements</th>
+        <th>Recommended Requirements</th>
+    </tr>
+    <tr>
+        <td>System (OS)</td>
+        <td colspan="2" align="center">Windows, MacOS, Linux (64 bit)</td>
+    </tr>
+    <tr>
+        <td>Processor (CPU)</td>
+        <td>dual-core CPU</td>
+        <td>quad-core CPU</td>
+    </tr>
+    <tr>
+        <td>Memory (RAM)</td>
+        <td>2 GB</td>
+        <td>8 GB</td>
+    </tr>
+    <tr>
+        <td>Graphics (GPU)</td>
+        <td style="vertical-align:top">
+            Intel HD Graphics (Gen 5)<br/>
+            GeForce 6xxx series or<br/>
+            Radeon HD 2000 series <br/>
+            with OpenGL 2.1*
+        </td>
+        <td  style="vertical-align:top">
+            GeForce 8xxx series (or higher) or<br/>
+            Radeon HD 2000 series (or higher)<br/>
+            with OpenGL 3.x
+        </td>
+    </tr>
+    <tr>
+        <td>Storage (HDD)</td>
+        <td colspan="2" align="center">1 GB</td>
+    </tr>
+</table>
 
-For easy setup (recommended) you can use our launcher - [download it here.](https://github.com/MovingBlocks/TerasologyLauncher/releases)
+Internet connectivity is required for downloading Terasology via the Launcher, afterwards offline play is possible.
 
-Direct download stable builds are uploaded to [our release section here on GitHub](https://github.com/MovingBlocks/Terasology/releases) while the cutting-edge develop version can be downloaded direct [here from our Jenkins](http://jenkins.terasology.org/job/DistroOmega/lastSuccessfulBuild/artifact/distros/omega/build/distributions/TerasologyOmega.zip)
+For easy game setup (recommended) you can use our launcher - [download it here.](https://github.com/MovingBlocks/TerasologyLauncher/releases)
 
 For more information about playing, like hot keys or server hosting, see the [dedicated page](docs/Playing.md) or check out the [modules.](docs/Modules.md)
 
 
+#### Alternate Install Method
+
+If you know you already have a Java Runtime Environment installed, you may use a direct download release as an alternative to using the [launcher](https://github.com/MovingBlocks/TerasologyLauncher/releases). Java versions 8 and 11 are supported.
+
+Direct download stable builds are uploaded to [our release section here on GitHub](https://github.com/MovingBlocks/Terasology/releases) while the cutting-edge develop version can be downloaded direct [here from our Jenkins](http://jenkins.terasology.org/job/DistroOmega/lastSuccessfulBuild/artifact/distros/omega/build/distributions/TerasologyOmega.zip)
+
+
 ## Developing
 
-We have gone to great lengths to make developing and modding Terasology as easy as possible. We use Gradle to automate just about everything. As long as you have a [Java 8 SDK](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html) running from source is a two step process:
-
-* Clone the code or download a zip.
-* Run `gradlew game` (on Unixes, including macOS, run `./gradlew` everywhere you see `gradlew`) in the root of the project directory. 
-
-That's really it! If you want the project set up in [IntelliJ](https://www.jetbrains.com/idea/download/) (our favored IDE) you run `gradlew idea` then load the generated project config. Then you get a bunch of run configurations and other stuff for free!
-
-For more on developing/modding see the [wiki!](https://github.com/MovingBlocks/Terasology/wiki)
+We strive to make developing and modding Terasology as easy as possible.  See our wiki for instructions on [setting up a development environment](https://github.com/MovingBlocks/Terasology/wiki/Dev-Setup) and how to [develop modules](https://github.com/MovingBlocks/Terasology/wiki/Developing-Modules).
 
 
 ## Links
@@ -59,5 +97,4 @@ For more on developing/modding see the [wiki!](https://github.com/MovingBlocks/T
 * [Reddit](http://www.reddit.com/r/Terasology)
 * [Twitter](https://twitter.com/Terasology)
 * [Facebook](http://www.facebook.com/pages/Terasology/248329655219905)
-* [G+](https://plus.google.com/b/103835217961917018533)
 * [Discord](https://discord.gg/4uKbB8J)

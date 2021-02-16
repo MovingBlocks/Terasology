@@ -1,25 +1,13 @@
-/*
- * Copyright 2015 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.rendering.nui.widgets.browser.ui;
 
-import org.terasology.math.geom.Rect2i;
-import org.terasology.math.geom.Vector2i;
-import org.terasology.rendering.assets.font.Font;
-import org.terasology.rendering.nui.Canvas;
-import org.terasology.rendering.nui.Color;
+import org.joml.Vector2i;
+import org.terasology.joml.geom.Rectanglei;
+import org.terasology.nui.Canvas;
+import org.terasology.nui.Color;
+import org.terasology.nui.asset.font.Font;
+import org.terasology.nui.util.RectUtility;
 import org.terasology.rendering.nui.widgets.browser.data.DocumentData;
 import org.terasology.rendering.nui.widgets.browser.data.ParagraphData;
 import org.terasology.rendering.nui.widgets.browser.data.basic.flow.ContainerRenderSpace;
@@ -106,11 +94,11 @@ public final class DocumentRenderer {
                         + paragraphRenderStyle.getParagraphMarginBottom().getValue(containerWidth);
 
                 if (floatStyle == ParagraphRenderStyle.FloatStyle.LEFT) {
-                    Rect2i position = containerRenderSpace.addLeftFloat(yShift, paragraphMinWidth, height);
-                    yShift = position.minY();
+                    Rectanglei position = containerRenderSpace.addLeftFloat(yShift, paragraphMinWidth, height);
+                    yShift = position.minY;
                 } else {
-                    Rect2i position = containerRenderSpace.addRightFloat(yShift, paragraphMinWidth, height);
-                    yShift = position.minY();
+                    Rectanglei position = containerRenderSpace.addRightFloat(yShift, paragraphMinWidth, height);
+                    yShift = position.minY;
                 }
             } else {
                 yShift += paragraphRenderStyle.getParagraphMarginTop().getValue(containerWidth)
@@ -201,33 +189,33 @@ public final class DocumentRenderer {
             height += paragraphRenderStyle.getParagraphPaddingBottom().getValue(containerWidth)
                     + paragraphRenderStyle.getParagraphMarginBottom().getValue(containerWidth);
 
-            Rect2i position;
+            Rectanglei position;
             if (floatStyle == ParagraphRenderStyle.FloatStyle.LEFT) {
                 position = containerRenderSpace.addLeftFloat(yShift, paragraphWidth, height);
             } else {
                 position = containerRenderSpace.addRightFloat(yShift, paragraphWidth, height);
             }
 
-            Rect2i paragraphBorderRegion =
-                    Rect2i.createFromMinAndMax(position.minX() + paragraphRenderStyle.getParagraphMarginLeft().getValue(containerWidth),
-                            position.minY() + paragraphRenderStyle.getParagraphMarginTop().getValue(containerWidth),
-                            position.maxX() - paragraphRenderStyle.getParagraphMarginRight().getValue(containerWidth) - 1,
-                            position.maxY() - paragraphRenderStyle.getParagraphMarginBottom().getValue(containerWidth) - 1);
+            Rectanglei paragraphBorderRegion = new Rectanglei(
+                    position.minX + paragraphRenderStyle.getParagraphMarginLeft().getValue(containerWidth),
+                    position.minY + paragraphRenderStyle.getParagraphMarginTop().getValue(containerWidth),
+                    position.maxX - paragraphRenderStyle.getParagraphMarginRight().getValue(containerWidth) - 1,
+                    position.maxY - paragraphRenderStyle.getParagraphMarginBottom().getValue(containerWidth) - 1);
 
             Color paragraphBackground = paragraphRenderStyle.getParagraphBackground();
             if (paragraphBackground != null) {
                 canvas.drawFilledRectangle(paragraphBorderRegion, paragraphBackground);
             }
 
-            Vector2i paragraphStart = new Vector2i(position.minX(),
-                    position.minY()
+            Vector2i paragraphStart = new Vector2i(position.minX,
+                    position.minY
                             + paragraphRenderStyle.getParagraphMarginTop().getValue(containerWidth)
                             + paragraphRenderStyle.getParagraphPaddingTop().getValue(containerWidth));
 
             paragraphContents.renderContents(canvas, paragraphStart, new ContainerFlowContainerRenderSpace(paragraphWidth),
                     leftParagraphIndent, rightParagraphIndent, paragraphRenderStyle, paragraphRenderStyle.getHorizontalAlignment(), register);
 
-            yShift = position.minY();
+            yShift = position.minY;
         } else {
             yShift += paragraphRenderStyle.getParagraphMarginTop().getValue(containerWidth);
 
@@ -252,12 +240,11 @@ public final class DocumentRenderer {
                     int backgroundAdvance = containerRenderSpace.getAdvanceForVerticalPosition(backgroundStart);
                     int maxSpace = containerRenderSpace.getNextWidthChange(backgroundStart);
 
-                    Rect2i backgroundRegion =
-                            Rect2i.createFromMinAndSize(
-                                    xShift + paragraphRenderStyle.getParagraphMarginLeft().getValue(containerWidth) + backgroundAdvance,
-                                    backgroundStart,
-                                    availableBackgroundWidth - 1,
-                                    Math.min(maxSpace, borderHeight - borderAdvance) - 1);
+                    Rectanglei backgroundRegion = RectUtility.createFromMinAndSize(
+                            xShift + paragraphRenderStyle.getParagraphMarginLeft().getValue(containerWidth) + backgroundAdvance,
+                            backgroundStart,
+                            availableBackgroundWidth - 1,
+                            Math.min(maxSpace, borderHeight - borderAdvance) - 1);
 
                     canvas.drawFilledRectangle(backgroundRegion, paragraphBackground);
 

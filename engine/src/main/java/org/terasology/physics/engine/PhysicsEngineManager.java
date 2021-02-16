@@ -15,13 +15,11 @@
  */
 package org.terasology.physics.engine;
 
-import com.bulletphysics.BulletGlobals;
 import org.terasology.context.Context;
 import org.terasology.physics.bullet.BulletPhysics;
 import org.terasology.physics.bullet.shapes.BulletCollisionShapeFactory;
 import org.terasology.physics.shapes.CollisionShape;
 import org.terasology.physics.shapes.CollisionShapeFactory;
-import org.terasology.world.WorldProvider;
 
 /**
  * Centralizes the various components of the physics engine. To change the physics engine used, this class
@@ -40,6 +38,6 @@ public final class PhysicsEngineManager {
      * @return The created {@link PhysicsEngine} instance.
      */
     public static PhysicsEngine getNewPhysicsEngine(Context context) {
-        return new BulletPhysics(context.get(WorldProvider.class));
+        return new BulletPhysics();
     }
 }

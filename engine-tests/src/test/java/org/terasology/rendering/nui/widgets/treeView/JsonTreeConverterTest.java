@@ -20,6 +20,7 @@ import com.google.common.io.Files;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import org.junit.jupiter.api.Test;
+import org.terasology.nui.widgets.treeView.JsonTreeConverter;
 
 import java.io.File;
 import java.io.IOException;

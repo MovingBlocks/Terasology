@@ -1,18 +1,5 @@
-/*
- * Copyright 2016 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.rendering.dag.stateChanges;
 
 import com.google.common.collect.ImmutableMap;
@@ -20,13 +7,9 @@ import org.terasology.rendering.dag.StateChange;
 
 import java.util.Objects;
 
-import static org.lwjgl.opengl.GL11.GL_CONSTANT_ALPHA;
-import static org.lwjgl.opengl.GL11.GL_CONSTANT_COLOR;
 import static org.lwjgl.opengl.GL11.GL_DST_ALPHA;
 import static org.lwjgl.opengl.GL11.GL_DST_COLOR;
 import static org.lwjgl.opengl.GL11.GL_ONE;
-import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_CONSTANT_ALPHA;
-import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_CONSTANT_COLOR;
 import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_DST_ALPHA;
 import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_DST_COLOR;
 import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
@@ -36,6 +19,10 @@ import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA_SATURATE;
 import static org.lwjgl.opengl.GL11.GL_SRC_COLOR;
 import static org.lwjgl.opengl.GL11.GL_ZERO;
 import static org.lwjgl.opengl.GL11.glBlendFunc;
+import static org.lwjgl.opengl.GL14.GL_CONSTANT_ALPHA;
+import static org.lwjgl.opengl.GL14.GL_CONSTANT_COLOR;
+import static org.lwjgl.opengl.GL14.GL_ONE_MINUS_CONSTANT_ALPHA;
+import static org.lwjgl.opengl.GL14.GL_ONE_MINUS_CONSTANT_COLOR;
 
 /**
  * Sets the blend function factors used by OpenGL.

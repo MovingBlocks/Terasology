@@ -1,27 +1,13 @@
-/*
- * Copyright 2013 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *  http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.rendering.world.selection;
 
+import org.joml.Vector2f;
+import org.joml.Vector3f;
+import org.joml.Vector3ic;
+import org.joml.Vector4f;
 import org.lwjgl.opengl.GL11;
-import org.terasology.math.JomlUtil;
-import org.terasology.utilities.Assets;
-import org.terasology.math.geom.Rect2f;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector3i;
-import org.terasology.math.geom.Vector4f;
+import org.terasology.joml.geom.Rectanglef;
 import org.terasology.module.sandbox.API;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.assets.material.Material;
@@ -32,6 +18,7 @@ import org.terasology.rendering.assets.texture.TextureRegionAsset;
 import org.terasology.rendering.primitives.Tessellator;
 import org.terasology.rendering.primitives.TessellatorHelper;
 import org.terasology.rendering.world.WorldRenderer;
+import org.terasology.utilities.Assets;
 
 import static org.lwjgl.opengl.GL11.GL_MODELVIEW;
 import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
@@ -57,7 +44,7 @@ public class BlockSelectionRenderer {
     private Mesh overlayMesh2;
     private Texture effectsTexture;
     private Material defaultTextured;
-    private Rect2f textureRegion = Rect2f.createFromMinAndSize(0f, 0f, 1f, 1f);
+    private Rectanglef textureRegion = new Rectanglef(0, 0, 1, 1);
 
     public BlockSelectionRenderer(Texture effectsTexture) {
         this.effectsTexture = effectsTexture;
@@ -65,18 +52,23 @@ public class BlockSelectionRenderer {
     }
 
     private void initialize() {
+        Vector2f min = new Vector2f(textureRegion.minX(), textureRegion.minY());
         Tessellator tessellator = new Tessellator();
-        TessellatorHelper.addBlockMesh(tessellator, new Vector4f(1, 1, 1, 1f), textureRegion.min(), textureRegion.size(), 1.001f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f);
+        TessellatorHelper.addBlockMesh(tessellator, new Vector4f(1, 1, 1, 1f),
+                min , textureRegion.getSize(new Vector2f()),
+                1.001f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f);
         overlayMesh = tessellator.generateMesh();
         tessellator = new Tessellator();
-        TessellatorHelper.addBlockMesh(tessellator, new Vector4f(1, 1, 1, .2f), textureRegion.min(), textureRegion.size(), 1.001f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f);
+        TessellatorHelper.addBlockMesh(tessellator, new Vector4f(1, 1, 1, .2f),
+                min, textureRegion.getSize(new Vector2f()), 1.001f, 1.0f, 1.0f, 0.0f,
+                0.0f, 0.0f);
         overlayMesh2 = tessellator.generateMesh();
         defaultTextured = Assets.getMaterial("engine:prog.defaultTextured").get();
     }
 
     public void setEffectsTexture(TextureRegionAsset textureRegionAsset) {
         setEffectsTexture(textureRegionAsset.getTexture());
-        textureRegion = textureRegionAsset.getRegion();
+        textureRegion.set(textureRegionAsset.getRegion());
         // reinitialize to recreate the mesh's UV coordinates for this textureRegion
         initialize();
     }
@@ -110,11 +102,11 @@ public class BlockSelectionRenderer {
         defaultTextured.deactivateFeature(ShaderProgramFeature.FEATURE_ALPHA_REJECT);
     }
 
-    public void renderMark(Vector3i blockPos) {
+    public void renderMark(Vector3ic blockPos) {
         Vector3f cameraPos = getCameraPosition();
 
         glPushMatrix();
-        glTranslated(blockPos.x - cameraPos.x, blockPos.y - cameraPos.y, blockPos.z - cameraPos.z);
+        glTranslated(blockPos.x() - cameraPos.x, blockPos.y() - cameraPos.y, blockPos.z() - cameraPos.z);
 
         glMatrixMode(GL_MODELVIEW);
 
@@ -123,11 +115,11 @@ public class BlockSelectionRenderer {
         glPopMatrix();
     }
 
-    public void renderMark2(Vector3i blockPos) {
+    public void renderMark2(Vector3ic blockPos) {
         Vector3f cameraPos = getCameraPosition();
 
         glPushMatrix();
-        glTranslated(blockPos.x - cameraPos.x, blockPos.y - cameraPos.y, blockPos.z - cameraPos.z);
+        glTranslated(blockPos.x() - cameraPos.x, blockPos.y() - cameraPos.y, blockPos.z() - cameraPos.z);
 
         glMatrixMode(GL_MODELVIEW);
 
@@ -137,7 +129,7 @@ public class BlockSelectionRenderer {
     }
 
     private Vector3f getCameraPosition() {
-        return JomlUtil.from(CoreRegistry.get(WorldRenderer.class).getActiveCamera().getPosition());
+        return CoreRegistry.get(WorldRenderer.class).getActiveCamera().getPosition();
     }
 
 }

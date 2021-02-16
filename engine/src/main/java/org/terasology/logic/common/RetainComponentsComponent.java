@@ -22,10 +22,11 @@ import org.terasology.network.Replicate;
 import java.util.Set;
 
 /**
- * This component is intended to list component classes that are supposed to be retained when placing a block.
- *
- * If a block entity has a component that is not part of its prefab, retaining this component results in
- * the block entity still having this component afterwards. If not retained, it is likely to be removed instead.
+ * This component is intended to list component classes that are supposed to be retained when converting between blocks
+ * and block items.
+ * <p>
+ * If a block (item) entity has a component that is not part of its prefab, retaining this component results in the block
+ * entity still having this component afterwards. If not retained, it is likely to be removed instead.
  */
 public class RetainComponentsComponent implements Component {
     @Replicate

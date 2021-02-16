@@ -15,9 +15,9 @@
  */
 package org.terasology.rendering.nui.widgets.browser.data.basic.flow;
 
-import org.terasology.math.geom.Rect2i;
-import org.terasology.rendering.assets.font.Font;
-import org.terasology.rendering.nui.Canvas;
+import org.terasology.joml.geom.Rectanglei;
+import org.terasology.nui.Canvas;
+import org.terasology.nui.asset.font.Font;
 import org.terasology.rendering.nui.widgets.browser.ui.style.FallbackTextRenderStyle;
 import org.terasology.rendering.nui.widgets.browser.ui.style.TextRenderStyle;
 
@@ -33,11 +33,12 @@ public class TextFlowRenderable implements FlowRenderable<TextFlowRenderable> {
     }
 
     @Override
-    public void render(Canvas canvas, Rect2i bounds, TextRenderStyle defaultRenderStyle) {
+    public void render(Canvas canvas, Rectanglei bounds, TextRenderStyle defaultRenderStyle) {
         TextRenderStyle safeRenderStyle = getTextRenderStyle(defaultRenderStyle);
         Font font = safeRenderStyle.getFont(hyperlink != null);
         int lineHeight = font.getLineHeight();
-        Rect2i bottomBounds = Rect2i.createFromMinAndSize(bounds.minX(), bounds.maxY() - lineHeight, bounds.sizeX(), lineHeight);
+        Rectanglei bottomBounds = new Rectanglei(
+                bounds.minX, bounds.maxY - lineHeight).setSize(bounds.getSizeX(), lineHeight);
         canvas.drawTextRaw(text, font, safeRenderStyle.getColor(hyperlink != null), bottomBounds);
     }
 

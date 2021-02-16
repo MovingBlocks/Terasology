@@ -1,27 +1,14 @@
-/*
- * Copyright 2014 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.rendering.assets.texture;
 
 import com.google.common.primitives.UnsignedBytes;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.engine.TerasologyConstants;
-import org.terasology.math.geom.Rect2i;
+import org.terasology.joml.geom.Rectanglei;
 import org.terasology.naming.Name;
-import org.terasology.rendering.nui.Color;
+import org.terasology.nui.Color;
 
 import java.awt.image.BufferedImage;
 import java.nio.ByteBuffer;
@@ -129,12 +116,12 @@ public final class TextureUtil {
         final int width = textureRegion.getWidth();
         final int height = textureRegion.getHeight();
 
-        final Rect2i pixelRegion = textureRegion.getPixelRegion();
+        final Rectanglei pixelRegion = textureRegion.getPixelRegion();
         final Texture texture = textureRegion.getTexture();
         ByteBuffer textureBytes = texture.getData().getBuffers()[0];
         int stride = texture.getWidth() * 4;
-        int posX = pixelRegion.minX();
-        int posY = pixelRegion.minY();
+        int posX = pixelRegion.minX;
+        int posY = pixelRegion.minY;
 
         BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         for (int y = 0; y < height; y++) {

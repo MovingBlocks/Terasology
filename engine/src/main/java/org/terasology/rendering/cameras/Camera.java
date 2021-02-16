@@ -1,37 +1,18 @@
-/*
- * Copyright 2013 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.rendering.cameras;
 
 import org.joml.AxisAngle4f;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
+import org.joml.Quaternionfc;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
+import org.lwjgl.BufferUtils;
 import org.terasology.config.Config;
-import org.terasology.math.AABB;
+import org.terasology.joml.geom.AABBfc;
 import org.terasology.math.Direction;
-import org.terasology.math.JomlUtil;
-import org.terasology.math.MatrixUtils;
-import org.terasology.math.geom.Quat4f;
 import org.terasology.registry.CoreRegistry;
-
-/**
- * Provides global access to fonts.
- *
- */
 
 /**
  * Camera base class.
@@ -39,13 +20,13 @@ import org.terasology.registry.CoreRegistry;
  */
 public abstract class Camera {
 
-    protected static final Vector3fc FORWARD = JomlUtil.from(Direction.FORWARD.getVector3f());
+    protected static final Vector3fc FORWARD = Direction.FORWARD.asVector3f();
 
     /* CAMERA PARAMETERS */
     protected final Vector3f position = new Vector3f(0, 0, 0);
-    protected final Vector3f up = JomlUtil.from(Direction.UP.getVector3f());
+    protected final Vector3f up = new Vector3f(Direction.UP.asVector3f());
     protected final Vector3f viewingDirection = new Vector3f(FORWARD);
-    protected final Vector3f viewingAxis = JomlUtil.from(Direction.LEFT.getVector3f());
+    protected final Vector3f viewingAxis = new Vector3f(Direction.LEFT.asVector3f());
     protected float viewingAngle;
 
     protected float zNear = 0.1f;
@@ -81,7 +62,7 @@ public abstract class Camera {
     protected float cachedReflectionHeight;
 
     /* (Water) Reflection */
-    private boolean reflected;
+    protected boolean reflected;
     private float reflectionHeight = 32;
 
     /**
@@ -105,8 +86,8 @@ public abstract class Camera {
             return;
         }
 
-        viewFrustum.updateFrustum(MatrixUtils.matrixToFloatBuffer(viewMatrix), MatrixUtils.matrixToFloatBuffer(projectionMatrix));
-        viewFrustumReflected.updateFrustum(MatrixUtils.matrixToFloatBuffer(viewMatrixReflected), MatrixUtils.matrixToFloatBuffer(projectionMatrix));
+        viewFrustum.updateFrustum(viewMatrix.get(BufferUtils.createFloatBuffer(16)), projectionMatrix.get(BufferUtils.createFloatBuffer(16)));
+        viewFrustumReflected.updateFrustum(viewMatrixReflected.get(BufferUtils.createFloatBuffer(16)), projectionMatrix.get(BufferUtils.createFloatBuffer(16)));
     }
 
     public abstract boolean isBobbingAllowed();
@@ -208,18 +189,13 @@ public abstract class Camera {
         return viewingDirection;
     }
 
-    /**
-     * Get the orientation of the camera.
-     * @return the orientation
-     */
-    public Quat4f getOrientation() {
-        return new Quat4f(JomlUtil.from(viewingAxis), viewingAngle);
+    public Quaternionf getOrientation(Quaternionf orientation) {
+        return orientation.set(new AxisAngle4f(viewingAngle, viewingAxis));
     }
 
-    public void setOrientation(Quat4f orientation) {
-        Quaternionf newOrientation = JomlUtil.from(orientation);
-        newOrientation.transform(FORWARD, viewingDirection);
-        AxisAngle4f axisAngle = new AxisAngle4f(newOrientation);
+    public void setOrientation(Quaternionfc orientation) {
+        orientation.transform(FORWARD, viewingDirection);
+        AxisAngle4f axisAngle = new AxisAngle4f(orientation);
         viewingAxis.set(axisAngle.x, axisAngle.y, axisAngle.z);
         viewingAngle = axisAngle.angle;
     }
@@ -252,7 +228,7 @@ public abstract class Camera {
         return reflected;
     }
 
-    public boolean hasInSight(AABB aabb) {
+    public boolean hasInSight(AABBfc aabb) {
         return viewFrustum.intersects(aabb);
     }
 }

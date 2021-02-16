@@ -1,27 +1,16 @@
-/*
- * Copyright 2014 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.engine.paths;
 
 import com.google.common.collect.ImmutableList;
 import com.sun.jna.platform.win32.KnownFolders;
 import com.sun.jna.platform.win32.Shell32Util;
+import org.terasology.context.Context;
+import org.terasology.engine.subsystem.DisplayDevice;
+import org.terasology.utilities.OS;
 
-import org.lwjgl.LWJGLUtil;
-
+import javax.swing.JFileChooser;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -30,10 +19,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
-
-import javax.swing.JFileChooser;
-import org.terasology.context.Context;
-import org.terasology.engine.subsystem.DisplayDevice;
 
 
 /**
@@ -47,7 +32,8 @@ public final class PathManager {
     private static final String RECORDINGS_LIBRARY_DIR = "recordings";
     private static final String LOG_DIR = "logs";
     private static final String SHADER_LOG_DIR = "shaders";
-    private static final String MOD_DIR = "modules";
+    private static final String MODULE_DIR = "modules";
+    private static final String MODULE_CACHE_DIR = "cachedModules";
     private static final String SCREENSHOT_DIR = "screenshots";
     private static final String NATIVES_DIR = "natives";
     private static final String CONFIGS_DIR = "configs";
@@ -166,14 +152,14 @@ public final class PathManager {
      * @throws IOException Thrown when required directories cannot be accessed.
      */
     public void useDefaultHomePath() throws IOException {
-        switch (LWJGLUtil.getPlatform()) {
-            case LWJGLUtil.PLATFORM_LINUX:
+        switch (OS.get()) {
+            case LINUX:
                 homePath = Paths.get(System.getProperty("user.home")).resolve(LINUX_HOME_SUBPATH);
                 break;
-            case LWJGLUtil.PLATFORM_MACOSX:
+            case MACOSX:
                 homePath = Paths.get(System.getProperty("user.home"), "Library", "Application Support", TERASOLOGY_FOLDER_NAME);
                 break;
-            case LWJGLUtil.PLATFORM_WINDOWS:
+            case WINDOWS:
                 String savedGamesPath = Shell32Util
                     .getKnownFolderPath(KnownFolders.FOLDERID_SavedGames);
                 if (savedGamesPath == null) {
@@ -316,14 +302,16 @@ public final class PathManager {
         Files.createDirectories(logPath);
         shaderLogPath = logPath.resolve(SHADER_LOG_DIR);
         Files.createDirectories(shaderLogPath);
-        Path homeModPath = homePath.resolve(MOD_DIR);
+        Path homeModPath = homePath.resolve(MODULE_DIR);
         Files.createDirectories(homeModPath);
-        Path installModPath = installPath.resolve(MOD_DIR);
-        Files.createDirectories(installModPath);
-        if (Files.isSameFile(homeModPath, installModPath)) {
-            modPaths = ImmutableList.of(homeModPath);
+        Path modCachePath = homePath.resolve(MODULE_CACHE_DIR);
+        Files.createDirectories(modCachePath);
+        if (Files.isSameFile(homePath, installPath)) {
+            modPaths = ImmutableList.of(modCachePath, homeModPath);
         } else {
-            modPaths = ImmutableList.of(installModPath, homeModPath);
+            Path installModPath = installPath.resolve(MODULE_DIR);
+            Files.createDirectories(installModPath);
+            modPaths = ImmutableList.of(installModPath, modCachePath, homeModPath);
         }
         screenshotPath = homePath.resolve(SCREENSHOT_DIR);
         Files.createDirectories(screenshotPath);
@@ -334,6 +322,28 @@ public final class PathManager {
         }
         sandboxPath = homePath.resolve(SANDBOX_DIR);
         Files.createDirectories(sandboxPath);
+
+        // --------------------------------- Setup native paths ---------------------
+        final Path path;
+        switch (OS.get()) {
+            case WINDOWS:
+                path = PathManager.getInstance().getNativesPath().resolve("windows");
+                break;
+            case MACOSX:
+                path = PathManager.getInstance().getNativesPath().resolve("macosx");
+                break;
+            case LINUX:
+                path = PathManager.getInstance().getNativesPath().resolve("linux");
+                break;
+            default:
+                throw new UnsupportedOperationException("Unsupported operating system: " + System.getProperty("os" +
+                        ".name"));
+        }
+        final String natives = path.toAbsolutePath().toString();
+        System.setProperty("org.lwjgl.librarypath", natives);
+        System.setProperty("net.java.games.input.librarypath", natives);  // libjinput
+        System.setProperty("org.terasology.librarypath", natives); // JNBullet
+
     }
 
     public Path getHomeModPath() {

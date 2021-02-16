@@ -29,17 +29,11 @@ import org.terasology.entitySystem.entity.EntityBuilder;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.characters.CharacterComponent;
+import org.terasology.logic.characters.CharacterMovementComponent;
 import org.terasology.logic.location.Location;
 import org.terasology.logic.location.LocationComponent;
-import org.terasology.math.AABB;
-import org.terasology.math.JomlUtil;
 import org.terasology.math.SpiralIterable;
 import org.terasology.math.TeraMath;
-import org.terasology.physics.components.shapes.BoxShapeComponent;
-import org.terasology.physics.components.shapes.CapsuleShapeComponent;
-import org.terasology.physics.components.shapes.CylinderShapeComponent;
-import org.terasology.physics.components.shapes.HullShapeComponent;
-import org.terasology.physics.components.shapes.SphereShapeComponent;
 import org.terasology.world.WorldProvider;
 
 import java.util.Optional;
@@ -71,12 +65,12 @@ public class PlayerFactory {
 
         LocationComponent location = controller.getComponent(LocationComponent.class);
         Vector3f spawnPosition = findSpawnPositionFromLocationComponent(location);
-        location.setWorldPosition(JomlUtil.from(spawnPosition));
+        location.setWorldPosition(spawnPosition);
         controller.saveComponent(location);
 
         logger.debug("Spawing player at: {}", spawnPosition);
 
-        builder.getComponent(LocationComponent.class).setWorldPosition(JomlUtil.from(spawnPosition));
+        builder.getComponent(LocationComponent.class).setWorldPosition(spawnPosition);
         builder.setOwner(controller);
 
         CharacterComponent playerComponent = builder.getComponent(CharacterComponent.class);
@@ -93,37 +87,18 @@ public class PlayerFactory {
         EntityBuilder builder = entityManager.newBuilder("engine:player");
         float extraSpace = 0.5f;  // spawn a little bit above the ground
         float entityHeight = getHeightOf(builder) + extraSpace;
-        return findSpawnPos(JomlUtil.from(locationComponent.getWorldPosition()), entityHeight).get(); // TODO: Handle Optional being empty
+        return findSpawnPos(locationComponent.getWorldPosition(new Vector3f()), entityHeight)
+                // TODO: Handle Optional being empty
+                .orElseThrow(() -> new RuntimeException("Failed to find an acceptable spawn location."));
     }
 
     private float getHeightOf(ComponentContainer prefab) {
-        BoxShapeComponent box = prefab.getComponent(BoxShapeComponent.class);
-        if (box != null) {
-            return box.extents.getY();
+        CharacterMovementComponent movementComponent = prefab.getComponent(CharacterMovementComponent.class);
+        if (movementComponent != null) {
+            return movementComponent.height;
         }
 
-        CylinderShapeComponent cylinder = prefab.getComponent(CylinderShapeComponent.class);
-        if (cylinder != null) {
-            return cylinder.height;
-        }
-
-        CapsuleShapeComponent capsule = prefab.getComponent(CapsuleShapeComponent.class);
-        if (capsule != null) {
-            return capsule.height;
-        }
-
-        SphereShapeComponent sphere = prefab.getComponent(SphereShapeComponent.class);
-        if (sphere != null) {
-            return sphere.radius * 2.0f;
-        }
-
-        HullShapeComponent hull = prefab.getComponent(HullShapeComponent.class);
-        if (hull != null) {
-            AABB aabb = hull.sourceMesh.getAABB();
-            return aabb.maxY() - aabb.minY();
-        }
-
-        logger.warn("entity {} does not have any known extent specification - using default", prefab);
+        logger.warn("entity {} does not have a CharacterMovementComponent - using default height", prefab);
         return 1.0f;
     }
 
@@ -155,8 +130,8 @@ public class PlayerFactory {
 
         // TODO: also start looking downwards if initial spawn pos is in the air
         for (int i = 1; i < 20; i++) {
-            if (worldProvider.isBlockRelevant(JomlUtil.from(newSpawnPos))) {
-                if (worldProvider.getBlock(JomlUtil.from(newSpawnPos)).isPenetrable()) {
+            if (worldProvider.isBlockRelevant(newSpawnPos)) {
+                if (worldProvider.getBlock(newSpawnPos).isPenetrable()) {
                     consecutiveAirBlocks++;
                 } else {
                     consecutiveAirBlocks = 0;

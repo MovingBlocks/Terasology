@@ -34,13 +34,13 @@ import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.behavior.core.BehaviorNode;
 import org.terasology.logic.behavior.core.BehaviorTreeBuilder;
+import org.terasology.nui.databinding.ReadOnlyBinding;
+import org.terasology.nui.itemRendering.StringTextRenderer;
+import org.terasology.nui.properties.OneOfProviderFactory;
 import org.terasology.reflection.metadata.FieldMetadata;
 import org.terasology.registry.In;
 import org.terasology.registry.Share;
 import org.terasology.rendering.assets.animation.MeshAnimation;
-import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
-import org.terasology.rendering.nui.itemRendering.StringTextRenderer;
-import org.terasology.rendering.nui.properties.OneOfProviderFactory;
 import org.terasology.utilities.Assets;
 import org.terasology.utilities.ReflectionUtil;
 
@@ -128,7 +128,7 @@ public class BehaviorNodeFactory extends BaseComponentSystem {
     private List<ComponentFieldUri> determineAnimationPoolUris() {
         final List<ComponentFieldUri> animationSetUris = Lists.newArrayList();
         for (ComponentMetadata<?> componentMetadata : componentLibrary.iterateComponentMetadata()) {
-            SimpleUri uri = componentMetadata.getUri();
+            SimpleUri uri = new SimpleUri(componentMetadata.getUri().toString());
 
             for (FieldMetadata<?, ?> fieldMetadata : componentMetadata.getFields()) {
                 if (fieldMetadata.getType().isAssignableFrom(List.class)) {
