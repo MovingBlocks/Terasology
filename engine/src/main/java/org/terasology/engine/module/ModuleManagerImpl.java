@@ -1,4 +1,4 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.module;
 
@@ -25,14 +25,12 @@ import org.terasology.module.ModulePathScanner;
 import org.terasology.module.ModuleRegistry;
 import org.terasology.module.TableModuleRegistry;
 import org.terasology.module.sandbox.APIScanner;
-import org.terasology.module.sandbox.BytecodeInjector;
 import org.terasology.module.sandbox.ModuleSecurityManager;
 import org.terasology.module.sandbox.ModuleSecurityPolicy;
 import org.terasology.module.sandbox.PermissionProvider;
 import org.terasology.module.sandbox.PermissionProviderFactory;
 import org.terasology.module.sandbox.StandardPermissionProviderFactory;
 import org.terasology.module.sandbox.WarnOnlyProviderFactory;
-import org.terasology.naming.Name;
 import org.terasology.nui.UIWidget;
 import org.terasology.reflection.TypeRegistry;
 
@@ -40,6 +38,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.lang.reflect.ReflectPermission;
+import java.net.JarURLConnection;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Path;
@@ -54,13 +53,13 @@ import java.util.stream.Collectors;
 
 public class ModuleManagerImpl implements ModuleManager {
     private static final Logger logger = LoggerFactory.getLogger(ModuleManagerImpl.class);
-    private StandardPermissionProviderFactory permissionProviderFactory = new StandardPermissionProviderFactory();
-    private PermissionProviderFactory wrappingPermissionProviderFactory = new WarnOnlyProviderFactory(permissionProviderFactory);
+    private final StandardPermissionProviderFactory permissionProviderFactory = new StandardPermissionProviderFactory();
+    private final PermissionProviderFactory wrappingPermissionProviderFactory = new WarnOnlyProviderFactory(permissionProviderFactory);
 
-    private ModuleRegistry registry;
+    private final ModuleRegistry registry;
     private ModuleEnvironment environment;
-    private ModuleMetadataJsonAdapter metadataReader;
-    private ModuleInstallManager installManager;
+    private final ModuleMetadataJsonAdapter metadataReader;
+    private final ModuleInstallManager installManager;
 
     public ModuleManagerImpl(String masterServerAddress) {
         this(masterServerAddress, Collections.emptyList());
@@ -127,7 +126,7 @@ public class ModuleManagerImpl implements ModuleManager {
     /**
      * Overrides modules in modules/ with those specified via -classpath in the JVM
      */
-    private void loadModulesFromClassPath() {
+    void loadModulesFromClassPath() {
         ClassLoader classLoader = ClassLoader.getSystemClassLoader();
         ModuleLoader loader = new ModuleLoader(metadataReader);
         Enumeration<URL> moduleInfosInClassPath;
@@ -137,49 +136,38 @@ public class ModuleManagerImpl implements ModuleManager {
         try {
             moduleInfosInClassPath = classLoader.getResources(TerasologyConstants.MODULE_INFO_FILENAME.toString());
         } catch (IOException e) {
-            logger.warn("Failed to search for classpath modules: {}", e);
+            logger.warn("Failed to search for classpath modules:", e);
             return;
         }
 
         for (URL url : Collections.list(moduleInfosInClassPath)) {
-            if (!url.getProtocol().equalsIgnoreCase("jar")) {
+            Module module;
+            try {
+                module = load(loader, url);
+            } catch (ClassCastException | IOException | URISyntaxException e) {
+                logger.warn("Failed to load classpath module {}", url, e);
                 continue;
             }
-
-            try (Reader reader = new InputStreamReader(url.openStream(), TerasologyConstants.CHARSET)) {
-                ModuleMetadata metaData = metadataReader.read(reader);
-                String displayName = metaData.getDisplayName().toString();
-                Name id = metaData.getId();
-
-                // if the display name is empty or the id is null, this probably isn't a Terasology module
-                if (null == id || displayName.equalsIgnoreCase("")) {
-                    logger.warn("Found a module-like JAR on the class path with no id or display name. Skipping");
-                    logger.warn("{}", url);
-                    continue;
-                }
-
-                logger.info("Loading module {} from class path at {}", displayName, url.getFile());
-
-                // the url contains a protocol, and points to the module.txt
-                // we need to trim both of those away to get the module's path
-                String targetFile = url.getFile()
-                        .replace("file:", "")
-                        .replace("!/" + TerasologyConstants.MODULE_INFO_FILENAME, "")
-                        .replace("/" + TerasologyConstants.MODULE_INFO_FILENAME, "");
-
-                // Windows specific check - Path doesn't like /C:/... style Strings indicating files
-                if (targetFile.matches("/[a-zA-Z]:.*")) {
-                    targetFile = targetFile.substring(1);
-                }
-
-                Path path = Paths.get(targetFile);
-
-                Module module = loader.load(path);
+            if (module != null) {
                 registry.add(module);
-            } catch (IOException e) {
-                logger.warn("Failed to load module.txt for classpath module {}", url);
+                logger.info("Loaded module {} from class path at {}", module, url.getFile());
             }
         }
+    }
+
+    Module load(ModuleLoader loader, URL url) throws IOException, URISyntaxException {
+        JarURLConnection connection = (JarURLConnection) url.openConnection();
+        Path jarPath = Paths.get(connection.getJarFileURL().toURI());
+
+        Module module = loader.load(jarPath);
+
+        // if the display name is empty or the id is null, this probably isn't a Terasology module
+        if (null == module.getId() || module.getMetadata().getDisplayName().toString().isEmpty()) {
+            logger.warn("Found a module-like JAR on the class path with no id or display name. Skipping {}", url);
+            return null;
+        }
+
+        return module;
     }
 
     private void setupSandbox() {
@@ -220,9 +208,9 @@ public class ModuleManagerImpl implements ModuleManager {
         ModuleEnvironment newEnvironment;
         boolean permissiveSecurityEnabled = Boolean.parseBoolean(System.getProperty(SystemConfig.PERMISSIVE_SECURITY_ENABLED_PROPERTY));
         if (permissiveSecurityEnabled) {
-            newEnvironment = new ModuleEnvironment(finalModules, wrappingPermissionProviderFactory, Collections.<BytecodeInjector>emptyList());
+            newEnvironment = new ModuleEnvironment(finalModules, wrappingPermissionProviderFactory, Collections.emptyList());
         } else {
-            newEnvironment = new ModuleEnvironment(finalModules, permissionProviderFactory, Collections.<BytecodeInjector>emptyList());
+            newEnvironment = new ModuleEnvironment(finalModules, permissionProviderFactory, Collections.emptyList());
         }
         if (asPrimary) {
             environment = newEnvironment;

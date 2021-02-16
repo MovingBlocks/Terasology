@@ -31,8 +31,16 @@ import org.terasology.recording.RecordAndReplayCurrentStatus;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.testUtil.ModuleManagerFactory;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
-import static org.terasology.testUtil.TeraAssert.assertEqualsContent;
+
 
 /**
  */
@@ -67,6 +75,8 @@ public class OwnershipHelperTest {
         EntityRef ownerEntity = entityManager.create(ownerComp);
 
         OwnershipHelper helper = new OwnershipHelper(entityManager.getComponentLibrary());
-        assertEqualsContent(Lists.newArrayList(ownedEntity), helper.listOwnedEntities(ownerEntity));
+        ArrayList<EntityRef> target = Lists.newArrayList(helper.listOwnedEntities(ownerEntity));
+        assertEquals(target.size(), 1);
+        assertEquals(target.get(0), ownedEntity);
     }
 }

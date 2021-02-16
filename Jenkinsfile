@@ -23,8 +23,8 @@ node ("heavy-java") {
     }
     stage('Build') {
         // Jenkins sometimes doesn't run Gradle automatically in plain console mode, so make it explicit
-        sh './gradlew --console=plain clean extractConfig extractNatives distForLauncher'
-        archiveArtifacts 'gradlew, gradle/wrapper/*, templates/build.gradle, config/**, facades/PC/build/distributions/Terasology.zip, build/resources/main/org/terasology/version/versionInfo.properties, natives/**, buildSrc/src/**, buildSrc/*.kts'
+        sh './gradlew --console=plain clean extractConfig extractNatives distForLauncher testDist'
+        archiveArtifacts 'gradlew, gradle/wrapper/*, templates/build.gradle, config/**, facades/PC/build/distributions/Terasology.zip, engine/build/resources/main/org/terasology/version/versionInfo.properties, natives/**, buildSrc/src/**, buildSrc/*.kts'
     }
     stage('Publish') {
         if (specialBranch) {

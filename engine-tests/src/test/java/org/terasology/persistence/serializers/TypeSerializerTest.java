@@ -1,14 +1,13 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.persistence.serializers;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import org.junit.jupiter.api.BeforeEach;
+import org.joml.Vector3f;
 import org.junit.jupiter.api.Test;
 import org.terasology.ModuleEnvironmentTest;
 import org.terasology.engine.module.ModuleContext;
-import org.terasology.math.geom.Vector3f;
 import org.terasology.naming.Name;
 import org.terasology.nui.Color;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
@@ -145,7 +144,7 @@ public class TypeSerializerTest extends ModuleEnvironmentTest {
         private final Vector3f tailPosition;
         private final org.joml.Vector3f headPosition;
 
-        private Dog(T data, Vector3f tailPosition,org.joml.Vector3f headPosition) {
+        private Dog(T data, Vector3f tailPosition,Vector3f headPosition) {
             super(data);
             this.tailPosition = tailPosition;
             this.headPosition = headPosition;

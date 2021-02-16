@@ -29,11 +29,6 @@ uniform vec2 aberrationOffset = vec2(0.0, 0.0);
 
 uniform sampler2D texScene;
 
-#ifdef VIGNETTE
-uniform sampler2D texVignette;
-uniform vec3 inLiquidTint;
-#endif
-
 #ifdef LIGHT_SHAFTS
 uniform sampler2D texLightShafts;
 #endif
@@ -58,17 +53,6 @@ void main() {
 #ifdef BLOOM
     vec4 colorBloom = texture2D(texBloom, gl_TexCoord[0].xy);
     color += colorBloom * bloomFactor;
-#endif
-
-#ifdef VIGNETTE
-    float vig = texture2D(texVignette, gl_TexCoord[0].xy).x;
-
-    if (!swimming) {
-        color.rgb *= vig;
-    } else {
-        color.rgb *= vig * vig * vig;
-        color.rgb *= inLiquidTint;
-    }
 #endif
 
     gl_FragData[0].rgba = color.rgba;

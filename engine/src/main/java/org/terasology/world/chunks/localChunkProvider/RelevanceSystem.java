@@ -12,7 +12,6 @@ import org.terasology.entitySystem.entity.lifecycleEvents.OnChangedComponent;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.logic.location.LocationComponent;
-import org.terasology.math.JomlUtil;
 import org.terasology.monitoring.Activity;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.world.RelevanceRegionComponent;
@@ -132,7 +131,7 @@ public class RelevanceSystem implements UpdateSubscriberSystem {
                         if (chunk != null) {
                             chunkRelevanceRegion.checkIfChunkIsRelevant(chunk);
                         } else {
-                            chunkProvider.createOrLoadChunk(JomlUtil.from(pos));
+                            chunkProvider.createOrLoadChunk(pos);
                         }
                     }
                     chunkRelevanceRegion.setUpToDate();
@@ -182,7 +181,7 @@ public class RelevanceSystem implements UpdateSubscriberSystem {
                             if (chunk != null) {
                                 region.checkIfChunkIsRelevant(chunk);
                             } else {
-                                chunkProvider.createOrLoadChunk(JomlUtil.from(pos));
+                                chunkProvider.createOrLoadChunk(pos);
                             }
                         }
                 );

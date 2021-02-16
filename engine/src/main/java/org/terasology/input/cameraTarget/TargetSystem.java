@@ -16,19 +16,18 @@
 
 package org.terasology.input.cameraTarget;
 
-import java.util.Arrays;
-
 import org.joml.Vector3f;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.location.LocationComponent;
-import org.terasology.math.JomlUtil;
 import org.terasology.physics.CollisionGroup;
 import org.terasology.physics.HitResult;
 import org.terasology.physics.Physics;
 import org.terasology.physics.StandardCollisionGroup;
 import org.terasology.world.BlockEntityRegistry;
+
+import java.util.Arrays;
 
 public class TargetSystem {
 

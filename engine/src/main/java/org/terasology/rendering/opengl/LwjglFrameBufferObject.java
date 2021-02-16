@@ -1,30 +1,17 @@
-/*
- * Copyright 2016 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.rendering.opengl;
 
+import org.joml.Vector2i;
+import org.joml.Vector2ic;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL30;
-import org.terasology.engine.subsystem.DisplayDevice;
-import org.terasology.utilities.Assets;
 import org.terasology.assets.ResourceUrn;
-import org.terasology.math.geom.BaseVector2i;
-import org.terasology.math.geom.ImmutableVector2i;
+import org.terasology.engine.subsystem.DisplayDevice;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.TextureData;
+import org.terasology.utilities.Assets;
 
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
@@ -42,12 +29,12 @@ import static org.lwjgl.opengl.GL11.glOrtho;
 public class LwjglFrameBufferObject implements FrameBufferObject {
     private DisplayDevice displayDevice;
     private int frame;
-    private ImmutableVector2i size;
+    private Vector2ic size;
     private IntBuffer vp;
 
-    public LwjglFrameBufferObject(DisplayDevice displayDevice, ResourceUrn urn, BaseVector2i size) {
+    public LwjglFrameBufferObject(DisplayDevice displayDevice, ResourceUrn urn, Vector2ic size) {
         this.displayDevice = displayDevice;
-        this.size = ImmutableVector2i.createOrUse(size);
+        this.size = new Vector2i(size);
 
         IntBuffer fboId = BufferUtils.createIntBuffer(1);
         GL30.glGenFramebuffers(fboId);

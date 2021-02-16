@@ -23,6 +23,7 @@ import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.world.ChunkView;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockAppearance;
+import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.BlockPart;
 import org.terasology.world.block.shapes.BlockMeshPart;
 
@@ -149,7 +150,7 @@ public class BlockMeshGeneratorSingleShape implements BlockMeshGenerator {
             return true;
         }
 
-        if (blockToCheck.getURI().toString().equals("engine:unloaded")) {
+        if (blockToCheck.getURI().equals(BlockManager.UNLOADED_ID)) {
             return false;
         }
 

@@ -19,14 +19,13 @@ import org.terasology.joml.geom.AABBf;
 import org.joml.Quaternionf;
 import org.joml.Quaternionfc;
 import org.joml.Vector3fc;
-import org.terasology.math.AABB;
 
 /**
  * The base type representing a collision shape in the physics engine.
  */
 public interface CollisionShape {
     /**
-     * Returns the axis-aligned bounding box ({@link AABB}) of the transformed shape.
+     * Returns the axis-aligned bounding box ({@link AABBfc}) of the transformed shape.
      *
      * @return The {@link AABBf} bounding the shape.
      */

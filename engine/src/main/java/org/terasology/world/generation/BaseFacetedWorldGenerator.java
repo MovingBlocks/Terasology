@@ -77,8 +77,8 @@ public abstract class BaseFacetedWorldGenerator implements ScalableWorldGenerato
     }
 
     @Override
-    public void createChunk(CoreChunk chunk, EntityBuffer buffer, float scale) {
-        world.rasterizeChunk(chunk, buffer, scale);
+    public void createChunk(CoreChunk chunk, float scale) {
+        world.rasterizeChunk(chunk, scale);
     }
 
     @Override
