@@ -717,7 +717,7 @@ public final class FBO {
          */
         public void multiplySelfBy(float multiplier) {
             width  = (int) (width * multiplier);
-            height = (int) (width * multiplier);
+            height = (int) (height * multiplier);
         }
 
         /**
