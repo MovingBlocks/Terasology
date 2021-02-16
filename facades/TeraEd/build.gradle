@@ -1,3 +1,6 @@
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
+
 // The Editor facade is responsible for the (shader) editor - a plain Java application runnable on PCs
 
 plugins {
@@ -23,10 +26,32 @@ sourceSets {
 dependencies {
     implementation project(':engine')
     implementation group: 'org.reflections', name: 'reflections', version: '0.9.10'
+
+    runtimeOnly(platform(project(":modules")))
+    // For the "natives" configuration make it depend on the native files from LWJGL
+    implementation platform("org.lwjgl:lwjgl-bom:$LwjglVersion")
+    ["natives-linux", "natives-windows", "natives-macos"].forEach {
+        implementation "org.lwjgl:lwjgl::$it"
+        implementation "org.lwjgl:lwjgl-assimp::$it"
+        implementation "org.lwjgl:lwjgl-glfw::$it"
+        implementation "org.lwjgl:lwjgl-openal::$it"
+        implementation "org.lwjgl:lwjgl-opengl::$it"
+        implementation "org.lwjgl:lwjgl-stb::$it"
+    }
+    implementation "org.lwjgl:lwjgl-jawt"
+
+    implementation(group: 'com.google.guava', name: 'guava', version: '23.0')
+
+    implementation(project(":subsystems:DiscordRPC"))
+    implementation(project(":subsystems:TypeHandlerLibrary"))
+
+    implementation(group: 'org.lwjglx', name: 'lwjgl3-awt', version: '0.1.7') {
+        exclude group: 'org.lwjgl', module: ''
+    }
 }
 
 application {
-    mainClassName "org.terasology.editor.TeraEd"
+    mainClass = "org.terasology.editor.TeraEd"
 }
 
 run {
@@ -37,13 +62,12 @@ run {
     args "-homedir"
 }
 
-task editor(type:JavaExec) {
+task editor(type: JavaExec) {
     description = "Run 'TeraEd' to configure graphics shader parameters in a standard PC application"
     group = "terasology run"
 
     // Dependencies: natives + all modules & the PC facade itself (which will trigger the engine)
     dependsOn rootProject.extractNatives
-    dependsOn rootProject.moduleClasses
     dependsOn classes
 
     // Run arguments

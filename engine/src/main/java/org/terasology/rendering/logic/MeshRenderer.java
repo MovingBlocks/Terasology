@@ -1,18 +1,5 @@
-/*
- * Copyright 2013 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.rendering.logic;
 
 import com.google.common.collect.HashMultimap;
@@ -35,11 +22,9 @@ import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.RenderSystem;
+import org.terasology.joml.geom.AABBf;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.LocalPlayer;
-import org.terasology.math.AABB;
-import org.terasology.math.JomlUtil;
-import org.terasology.math.Transform;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkSystem;
 import org.terasology.registry.In;
@@ -194,26 +179,28 @@ public class MeshRenderer extends BaseComponentSystem implements RenderSystem {
                 for (EntityRef entity : entities) {
                     MeshComponent meshComp = entity.getComponent(MeshComponent.class);
                     LocationComponent location = entity.getComponent(LocationComponent.class);
-
-                    if (isHidden(entity, meshComp) || location == null || Float.isNaN(location.getWorldPosition().x) || meshComp.mesh == null || !isRelevant(entity, JomlUtil.from(location.getWorldPosition()))) {
+                    if (isHidden(entity, meshComp) || location == null || meshComp.mesh == null) {
                         continue;
                     }
+                    Vector3f worldPosition = location.getWorldPosition(new Vector3f());
+                    if (!worldPosition.isFinite() && !isRelevant(entity, worldPosition)) {
+                        continue;
+                    }
+
                     if (meshComp.mesh.isDisposed()) {
                         logger.error("Attempted to render disposed mesh");
                         continue;
                     }
 
-                    worldRot.set(JomlUtil.from(location.getWorldRotation()));
-                    worldPos.set(JomlUtil.from(location.getWorldPosition()));
+                    worldRot.set(location.getWorldRotation(new Quaternionf()));
+                    worldPos.set(location.getWorldPosition(new Vector3f()));
                     float worldScale = location.getWorldScale();
-
-                    Transform toWorldSpace = new Transform(JomlUtil.from(worldPos), JomlUtil.from(worldRot), worldScale);
 
                     Vector3f offsetFromCamera = worldPos.sub(cameraPosition, new Vector3f());
                     matrixCameraSpace.translationRotateScale(offsetFromCamera, worldRot, worldScale);
 
 
-                    AABB aabb = meshComp.mesh.getAABB().transform(toWorldSpace);
+                    AABBf aabb = meshComp.mesh.getAABB().transform(new Matrix4f().translationRotateScale(worldPos, worldRot, worldScale), new AABBf());
                     if (worldRenderer.getActiveCamera().hasInSight(aabb)) {
                         if (meshComp.mesh != lastMesh) {
                             if (lastMesh != null) {
@@ -232,8 +219,8 @@ public class MeshRenderer extends BaseComponentSystem implements RenderSystem {
                         material.setMatrix3("normalMatrix", tempMatrixBuffer33, true);
 
                         material.setFloat3("colorOffset", meshComp.color.rf(), meshComp.color.gf(), meshComp.color.bf(), true);
-                        material.setFloat("sunlight", worldRenderer.getMainLightIntensityAt(JomlUtil.from(worldPos)), true);
-                        material.setFloat("blockLight", Math.max(worldRenderer.getBlockLightIntensityAt(JomlUtil.from(worldPos)), meshComp.selfLuminance), true);
+                        material.setFloat("sunlight", worldRenderer.getMainLightIntensityAt(worldPos), true);
+                        material.setFloat("blockLight", Math.max(worldRenderer.getBlockLightIntensityAt(worldPos), meshComp.selfLuminance), true);
 
                         lastMesh.doRender();
                     }

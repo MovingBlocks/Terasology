@@ -15,8 +15,9 @@
  */
 package org.terasology.logic.inventory.events;
 
+import org.joml.Vector3f;
+import org.joml.Vector3fc;
 import org.terasology.entitySystem.event.Event;
-import org.terasology.math.geom.Vector3f;
 import org.terasology.network.ServerEvent;
 
 /**
@@ -24,16 +25,16 @@ import org.terasology.network.ServerEvent;
  */
 @ServerEvent
 public class DropItemEvent implements Event {
-    private Vector3f position;
+    private Vector3f position = new Vector3f();
 
     public DropItemEvent() {
     }
 
-    public DropItemEvent(Vector3f position) {
-        this.position = position;
+    public DropItemEvent(Vector3fc position) {
+        this.position.set(position);
     }
 
-    public Vector3f getPosition() {
+    public Vector3fc getPosition() {
         return position;
     }
 }

@@ -43,8 +43,6 @@ import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.entitySystem.sectors.SectorSimulationComponent;
 import org.terasology.game.GameManifest;
-import org.terasology.math.geom.Quat4f;
-import org.terasology.math.geom.Vector3f;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.world.internal.WorldInfo;
 
@@ -214,23 +212,8 @@ public class PojoEntityManager implements EngineEntityManager {
     }
 
     @Override
-    public EntityRef create(Prefab prefab, Vector3f position) {
-        return getCurrentWorldPool().create(prefab, position);
-    }
-
-    @Override
-    public EntityRef create(Prefab prefab, Vector3f position, Quat4f rotation) {
-        return getCurrentWorldPool().create(prefab, position, rotation);
-    }
-
-    @Override
     public EntityRef create(Prefab prefab, Vector3fc position, Quaternionfc rotation) {
         return getCurrentWorldPool().create(prefab, position, rotation);
-    }
-
-    @Override
-    public EntityRef create(String prefab, Vector3f position) {
-        return getCurrentWorldPool().create(prefab, position);
     }
 
     @Override
@@ -552,6 +535,16 @@ public class PojoEntityManager implements EngineEntityManager {
         Preconditions.checkNotNull(component);
         Optional<Component> oldComponent = getPool(entityId).map(pool -> pool.getComponentStore().put(entityId, component));
 
+        // notify internal users first to get the unobstructed views on the entity as it is at this moment.
+        if (!oldComponent.isPresent()) {
+            notifyComponentAdded(getEntity(entityId), component.getClass());
+        } else {
+            logger.error("Adding a component ({}) over an existing component for entity {}", component.getClass(), entityId);
+            notifyComponentChanged(getEntity(entityId), component.getClass());
+        }
+
+        // Send life cycle events for arbitrary systems to react on.
+        // Note: systems are free to remove the component that was just added, which might cause some trouble here...
         if (eventSystem != null) {
             EntityRef entityRef = getEntity(entityId);
             if (!oldComponent.isPresent()) {
@@ -560,13 +553,6 @@ public class PojoEntityManager implements EngineEntityManager {
             } else {
                 eventSystem.send(entityRef, OnChangedComponent.newInstance(), component);
             }
-        }
-
-        if (!oldComponent.isPresent()) {
-            notifyComponentAdded(getEntity(entityId), component.getClass());
-        } else {
-            logger.error("Adding a component ({}) over an existing component for entity {}", component.getClass(), entityId);
-            notifyComponentChanged(getEntity(entityId), component.getClass());
         }
 
         return component;

@@ -1,20 +1,8 @@
-/*
- * Copyright 2018 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine;
 
+import com.badlogic.gdx.physics.bullet.Bullet;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.Queues;
@@ -62,6 +50,7 @@ import org.terasology.nui.asset.UIElement;
 import org.terasology.nui.skin.UISkin;
 import org.terasology.nui.skin.UISkinData;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
+import org.terasology.persistence.typeHandling.TypeHandlerLibraryImpl;
 import org.terasology.recording.CharacterStateEventPositionMap;
 import org.terasology.recording.DirectionAndOriginPosRecorderList;
 import org.terasology.recording.RecordAndReplayCurrentStatus;
@@ -71,6 +60,8 @@ import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.reflect.ReflectFactory;
 import org.terasology.reflection.reflect.ReflectionReflectFactory;
 import org.terasology.registry.CoreRegistry;
+import org.terasology.rendering.gltf.ByteBufferAsset;
+import org.terasology.rendering.gltf.ByteBufferData;
 import org.terasology.version.TerasologyVersion;
 import org.terasology.world.block.loader.BlockFamilyDefinition;
 import org.terasology.world.block.loader.BlockFamilyDefinitionData;
@@ -155,6 +146,9 @@ public class TerasologyEngine implements GameEngine {
      *                   audio and input subsystems.
      */
     public TerasologyEngine(TimeSubsystem timeSubsystem, Collection<EngineSubsystem> subsystems) {
+        // configure native paths
+        PathManager.getInstance();
+        Bullet.init(true, false);
 
         this.rootContext = new ContextImpl();
         rootContext.put(GameEngine.class, this);
@@ -191,6 +185,9 @@ public class TerasologyEngine implements GameEngine {
         this.allSubsystems.add(new I18nSubsystem());
         this.allSubsystems.add(new TelemetrySubSystem());
         this.allSubsystems.add(new ModuleRenderingSubsystem());
+
+        // add all subsystem as engine module part. (needs for ECS classes loaded from external subsystems)
+        allSubsystems.stream().map(Object::getClass).forEach(this::addToClassesOnClasspathsToAddToEngine);
     }
 
     /**
@@ -330,7 +327,7 @@ public class TerasologyEngine implements GameEngine {
         CopyStrategyLibrary copyStrategyLibrary = new CopyStrategyLibrary(reflectFactory);
         rootContext.put(CopyStrategyLibrary.class, copyStrategyLibrary);
 
-        rootContext.put(TypeHandlerLibrary.class, TypeHandlerLibrary.forModuleEnvironment(moduleManager, typeRegistry));
+        rootContext.put(TypeHandlerLibrary.class, TypeHandlerLibraryImpl.forModuleEnvironment(moduleManager, typeRegistry));
 
         changeStatus(TerasologyEngineStatus.INITIALIZING_ASSET_TYPES);
         assetTypeManager = new ModuleAwareAssetTypeManager();
@@ -360,6 +357,7 @@ public class TerasologyEngine implements GameEngine {
                 (AssetFactory<BehaviorTree, BehaviorTreeData>) BehaviorTree::new, false, "behaviors");
         assetTypeManager.registerCoreAssetType(UIElement.class,
                 (AssetFactory<UIElement, UIData>) UIElement::new, "ui");
+        assetTypeManager.registerCoreAssetType(ByteBufferAsset.class, (AssetFactory<ByteBufferAsset, ByteBufferData>) ByteBufferAsset::new, "mesh");
 
         for (EngineSubsystem subsystem : allSubsystems) {
             subsystem.registerCoreAssetTypes(assetTypeManager);
@@ -399,15 +397,41 @@ public class TerasologyEngine implements GameEngine {
      */
     @Override
     public synchronized void run(GameState initialState) {
+        initializeRun(initialState);
+        runMain();
+    }
+
+    @Override
+    public synchronized void initializeRun(GameState initialState) {
         Preconditions.checkState(!running);
         running = true;
+        changeStatus(StandardGameStatus.INITIALIZING);
         initialize();
-        changeStatus(StandardGameStatus.RUNNING);
 
         try {
             rootContext.put(GameEngine.class, this);
             changeState(initialState);
+        } catch (Throwable e) {
+            logger.error("Uncaught exception, attempting clean game shutdown", e);
 
+            try {
+                cleanup();
+            } catch (RuntimeException t) {
+                logger.error("Clean game shutdown after an uncaught exception failed", t);
+            }
+            running = false;
+            shutdownRequested = false;
+            changeStatus(StandardGameStatus.UNSTARTED);
+
+            throw e;
+        }
+    }
+
+    @Override
+    public synchronized void runMain() {
+        Preconditions.checkState(running);
+        changeStatus(StandardGameStatus.RUNNING);
+        try {
             mainLoop(); // -THE- MAIN LOOP. Most of the application time and resources are spent here.
         } catch (Throwable e) {
             logger.error("Uncaught exception, attempting clean game shutdown", e);

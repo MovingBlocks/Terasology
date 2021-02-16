@@ -1,32 +1,18 @@
-/*
- * Copyright 2016 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.particles.updating;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.ImmutableList;
+import org.joml.Vector3f;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.math.JomlUtil;
 import org.terasology.math.TeraMath;
-import org.terasology.math.geom.Vector3f;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.particles.ParticleDataMask;
 import org.terasology.particles.ParticlePool;
@@ -54,7 +40,8 @@ public class ParticleUpdaterImpl implements ParticleUpdater {
     private static final Logger logger = LoggerFactory.getLogger(ParticleUpdaterImpl.class);
 
     /**
-     * Number used in determining how many particles to skip in each collision update step, as updating all particles is costly.
+     * Number used in determining how many particles to skip in each collision update step, as updating all particles is
+     * costly.
      */
     private static final int PHYSICS_SKIP_NR = 100;
 
@@ -182,7 +169,7 @@ public class ParticleUpdaterImpl implements ParticleUpdater {
      * Maps a Generator function to the component it will be called on when new particles are emitted.
      *
      * @param generatorFunction The generator function to be used.
-     * @param componentClass    The component class this function is being mapped to.
+     * @param componentClass The component class this function is being mapped to.
      */
     private void mapGeneratorFunction(GeneratorFunction generatorFunction, Class<? extends Component> componentClass) {
         Preconditions.checkArgument(!registeredGeneratorFunctions.containsKey(componentClass),
@@ -197,7 +184,7 @@ public class ParticleUpdaterImpl implements ParticleUpdater {
      * Maps an Affector function to the component it will be called on when updating particles.
      *
      * @param affectorFunction The affector function to be used.
-     * @param componentClass   The component class this function is being mapped to.
+     * @param componentClass The component class this function is being mapped to.
      */
     private void mapAffectorFunction(AffectorFunction affectorFunction, Class<? extends Component> componentClass) {
         Preconditions.checkArgument(!registeredAffectorFunctions.containsKey(componentClass),
@@ -217,7 +204,7 @@ public class ParticleUpdaterImpl implements ParticleUpdater {
             int i3 = i * 3;
             curr.set(pool.position[i3 + 0], pool.position[i3 + 1], pool.position[i3 + 2]);
             vel.set(pool.velocity[i3 + 0], pool.velocity[i3 + 1], pool.velocity[i3 + 2]);
-            halfVelDir.scale(0).add(vel).normalize().scale(0.5f);
+            halfVelDir.set(0).add(vel).normalize().mul(0.5f);
             curr.sub(halfVelDir);
             float dist = (vel.length() + 0.5f) * movingAvgDelta * PHYSICS_SKIP_NR * 1.5f;
             vel.normalize();
@@ -274,7 +261,7 @@ public class ParticleUpdaterImpl implements ParticleUpdater {
         );
 
         particleEmitter.particlePool.temporaryParticleData.position.add(
-            JomlUtil.from(particleEmitter.locationComponent.getWorldPosition())
+            particleEmitter.locationComponent.getWorldPosition(new Vector3f())
         );
 
         particleEmitter.particlePool.storeTemporaryDataAt(index, ParticleDataMask.ALL.toInt());
@@ -306,8 +293,9 @@ public class ParticleUpdaterImpl implements ParticleUpdater {
     }
 
     /**
-     * Updates the specified particle emitter.
-     * Might cause the emitter to emit new particles or to be disabled once its lifetime runs out.
+     * Updates the specified particle emitter. Might cause the emitter to emit new particles or to be disabled once its
+     * lifetime runs out.
+     *
      * @param emitter the emitter to update
      * @param delta delta time
      */
@@ -320,10 +308,11 @@ public class ParticleUpdaterImpl implements ParticleUpdater {
     }
 
     /**
-     * Updates the particle data inside the particle pool, referenced by the specified particle emitter.
-     * During a single update cycle, each pool is only updated once.
-     * In case multiple particle emitters are referencing it, it is only updated the first time it's encountered.
-     * The update involves updating the trajectory and life time (optionally dependent on collisions)
+     * Updates the particle data inside the particle pool, referenced by the specified particle emitter. During a single
+     * update cycle, each pool is only updated once. In case multiple particle emitters are referencing it, it is only
+     * updated the first time it's encountered. The update involves updating the trajectory and life time (optionally
+     * dependent on collisions)
+     *
      * @param particleSystem the particle system referencing the pool to update
      * @param delta delta time
      */
@@ -342,9 +331,9 @@ public class ParticleUpdaterImpl implements ParticleUpdater {
     }
 
     /**
-     * Updates the particle emitters lifetime and disables or removes it potentially.
-     * In case the life time runs out, the emitter is disabled.
-     * In case no more particles in the pool are alive, the emitter is destroyed.
+     * Updates the particle emitters lifetime and disables or removes it potentially. In case the life time runs out,
+     * the emitter is disabled. In case no more particles in the pool are alive, the emitter is destroyed.
+     *
      * @param emitter emitter to update
      * @param delta delta time
      */

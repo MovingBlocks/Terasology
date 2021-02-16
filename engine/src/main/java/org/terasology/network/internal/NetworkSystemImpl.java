@@ -1,18 +1,5 @@
-/*
- * Copyright 2013 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.network.internal;
 
@@ -26,16 +13,19 @@ import com.google.common.collect.Sets;
 import com.google.protobuf.ByteString;
 import gnu.trove.map.TIntLongMap;
 import gnu.trove.map.hash.TIntLongHashMap;
-import org.jboss.netty.bootstrap.ClientBootstrap;
-import org.jboss.netty.bootstrap.ServerBootstrap;
-import org.jboss.netty.channel.Channel;
-import org.jboss.netty.channel.ChannelException;
-import org.jboss.netty.channel.ChannelFactory;
-import org.jboss.netty.channel.ChannelFuture;
-import org.jboss.netty.channel.group.ChannelGroup;
-import org.jboss.netty.channel.group.DefaultChannelGroup;
-import org.jboss.netty.channel.socket.nio.NioClientSocketChannelFactory;
-import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
+import io.netty.bootstrap.Bootstrap;
+import io.netty.bootstrap.ServerBootstrap;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelException;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelOption;
+import io.netty.channel.EventLoopGroup;
+import io.netty.channel.group.ChannelGroup;
+import io.netty.channel.group.DefaultChannelGroup;
+import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.util.concurrent.GlobalEventExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
@@ -43,7 +33,6 @@ import org.terasology.config.Config;
 import org.terasology.config.NetworkConfig;
 import org.terasology.context.Context;
 import org.terasology.engine.ComponentSystemManager;
-import org.terasology.engine.SimpleUri;
 import org.terasology.engine.Time;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.module.StandardModuleExtension;
@@ -104,18 +93,17 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.Executors;
 
 /**
  * Implementation of the Network System using Netty and TCP/IP
- *
  */
 public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem {
     private static final Logger logger = LoggerFactory.getLogger(NetworkSystemImpl.class);
     private static final int OWNER_DEPTH_LIMIT = 50;
     private static final int NET_TICK_RATE = 50;
     private static final int NULL_NET_ID = 0;
-
+    private final Set<Client> clientList = Sets.newLinkedHashSet();
+    private final Set<NetClient> netClientList = Sets.newLinkedHashSet();
     // Shared
     private Context context;
     private Optional<HibernationManager> hibernationSettings;
@@ -128,22 +116,19 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     private NetworkEntitySerializer entitySerializer;
     private BlockManager blockManager;
     private OwnershipHelper ownershipHelper;
-
-    private ChannelFactory factory;
     private TIntLongMap netIdToEntityId = new TIntLongHashMap();
-
     private Time time;
     private long nextNetworkTick;
-
     private boolean kicked;
-
     // Server only
-    private ChannelGroup allChannels = new DefaultChannelGroup("tera-channels");
+    private ChannelGroup allChannels = new DefaultChannelGroup("tera-channels", GlobalEventExecutor.INSTANCE);
+    private ChannelFuture serverChannelFuture;
+    private NioEventLoopGroup bossGroup;
+    private NioEventLoopGroup workerGroup;
+
     private BlockingQueue<NetClient> newClients = Queues.newLinkedBlockingQueue();
     private BlockingQueue<NetClient> disconnectedClients = Queues.newLinkedBlockingQueue();
     private int nextNetId = 1;
-    private final Set<Client> clientList = Sets.newLinkedHashSet();
-    private final Set<NetClient> netClientList = Sets.newLinkedHashSet();
     private Map<EntityRef, Client> clientPlayerLookup = Maps.newHashMap();
     private Map<EntityRef, EntityRef> ownerLookup = Maps.newHashMap();
     private SetMultimap<EntityRef, EntityRef> ownedLookup = HashMultimap.create();
@@ -151,6 +136,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
 
     // Client only
     private ServerImpl server;
+    private EventLoopGroup clientGroup;
 
     public NetworkSystemImpl(Time time, Context context) {
         this.time = time;
@@ -171,13 +157,20 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
                 }
                 generateSerializationTables();
 
-                factory = new NioServerSocketChannelFactory(Executors.newCachedThreadPool(), Executors.newCachedThreadPool());
-                ServerBootstrap bootstrap = new ServerBootstrap(factory);
-                bootstrap.setPipelineFactory(new TerasologyServerPipelineFactory(this));
-                bootstrap.setOption("child.tcpNoDelay", true);
-                bootstrap.setOption("child.keepAlive", true);
-                Channel listenChannel = bootstrap.bind(new InetSocketAddress(port));
-                allChannels.add(listenChannel);
+                // Configure the server.
+                bossGroup = new NioEventLoopGroup();
+                workerGroup = new NioEventLoopGroup();
+                ServerBootstrap b = new ServerBootstrap();
+                b.group(bossGroup, workerGroup)
+                        .channel(NioServerSocketChannel.class)
+                        .option(ChannelOption.SO_BACKLOG, 100)
+                        .localAddress(port)
+                        .childOption(ChannelOption.TCP_NODELAY, true)
+                        .childOption(ChannelOption.SO_KEEPALIVE, true)
+                        .childHandler(new TerasologyServerPipelineFactory(this));
+                // Start the server.
+                serverChannelFuture = b.bind();
+
                 logger.info("Started server on port {}", port);
                 if (config.getServerMOTD() != null) {
                     logger.info("Server MOTD is \"{}\"", config.getServerMOTD());
@@ -197,17 +190,24 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
                         }
                     }
                 }
-
+                if (serverChannelFuture.isSuccess()) {
+                    logger.info("Server started");
+                }
+                serverChannelFuture.sync();
                 nextNetworkTick = time.getRealTimeInMs();
             } catch (SocketException e) {
                 throw new HostingFailedException("Could not identify network interfaces", e);
             } catch (ChannelException e) {
                 if (e.getCause() instanceof BindException) {
-                    throw new HostingFailedException("Port already in use (are you already hosting a game?)", e.getCause());
+                    throw new HostingFailedException("Port already in use (are you already hosting a game?)",
+                            e.getCause());
                 } else {
                     throw new HostingFailedException("Failed to host game", e.getCause());
                 }
 
+            } catch (InterruptedException e) {
+                shutdown();
+                throw new HostingFailedException("Server has been interrupted", e.getCause());
             }
         }
     }
@@ -218,35 +218,48 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
             if (hibernationSettings.isPresent()) {
                 hibernationSettings.get().setHibernationAllowed(false);
             }
-            factory = new NioClientSocketChannelFactory(Executors.newCachedThreadPool(), Executors.newCachedThreadPool());
-            ClientBootstrap bootstrap = new ClientBootstrap(factory);
-            bootstrap.setPipelineFactory(new TerasologyClientPipelineFactory(this));
-            bootstrap.setOption("tcpNoDelay", true);
-            bootstrap.setOption("keepAlive", true);
-            ChannelFuture connectCheck = bootstrap.connect(new InetSocketAddress(address, port));
+            ChannelFuture connectCheck = null;
+
+            clientGroup = new NioEventLoopGroup();
             try {
-                connectCheck.await();
-            } catch (InterruptedException e) {
-                connectCheck.cancel();
-                connectCheck.getChannel().getCloseFuture().awaitUninterruptibly();
-                factory.releaseExternalResources();
-                throw e;
-            }
-            if (!connectCheck.isSuccess()) {
-                logger.warn("Failed to connect to server", connectCheck.getCause());
-                connectCheck.getChannel().getCloseFuture().awaitUninterruptibly();
-                factory.releaseExternalResources();
-                return new JoinStatusImpl("Failed to connect to server - " + connectCheck.getCause().getMessage());
-            } else {
-                allChannels.add(connectCheck.getChannel());
-                ClientConnectionHandler connectionHandler = connectCheck.getChannel().getPipeline().get(ClientConnectionHandler.class);
-                if (connectionHandler == null) {
-                    JoinStatusImpl status = new JoinStatusImpl();
-                    status.setComplete();
-                    return status;
-                } else {
-                    return connectionHandler.getJoinStatus();
+                Bootstrap clientBootstrap = new Bootstrap();
+
+                clientBootstrap.group(clientGroup);
+                clientBootstrap.channel(NioSocketChannel.class);
+                clientBootstrap.option(ChannelOption.SO_KEEPALIVE, true);
+                clientBootstrap.option(ChannelOption.TCP_NODELAY, true);
+                clientBootstrap.remoteAddress(new InetSocketAddress(address, port));
+                clientBootstrap.handler(new TerasologyClientPipelineFactory(this));
+
+                connectCheck = clientBootstrap.connect();
+                connectCheck.sync();
+                if (connectCheck.isDone()) {
+                    if (connectCheck.isSuccess()) {
+                        allChannels.add(connectCheck.channel());
+                        ClientConnectionHandler connectionHandler =
+                                connectCheck.channel().pipeline().get(ClientConnectionHandler.class);
+                        if (connectionHandler == null) {
+                            JoinStatusImpl status = new JoinStatusImpl();
+                            status.setComplete();
+                            return status;
+                        } else {
+                            return connectionHandler.getJoinStatus();
+                        }
+                    } else {
+                        logger.warn("Failed to connect to server", connectCheck.cause());
+                        connectCheck.channel().closeFuture().awaitUninterruptibly();
+                        clientGroup.shutdownGracefully().syncUninterruptibly();
+                        return new JoinStatusImpl("Failed to connect to server - " + connectCheck.cause().getMessage());
+                    }
                 }
+                connectCheck.channel().closeFuture().sync();
+            } catch (Exception e) {
+                shutdown();
+                if (connectCheck != null) {
+                    connectCheck.cancel(true);
+                    connectCheck.channel().closeFuture().awaitUninterruptibly();
+                }
+                throw e;
             }
         }
         return new JoinStatusImpl("Network system already active");
@@ -255,10 +268,25 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     @Override
     public void shutdown() {
         allChannels.close().awaitUninterruptibly();
-        // Factory may be null if a local game session has happened, yet be initialized if networking has been used
-        if (factory != null) {
-            factory.releaseExternalResources();
+        if (serverChannelFuture != null) {
+            serverChannelFuture.channel().closeFuture();
+            // Wait until all threads are terminated.
+            try {
+                bossGroup.shutdownGracefully().sync();
+                workerGroup.shutdownGracefully().sync();
+                bossGroup.terminationFuture().sync();
+                workerGroup.terminationFuture().sync();
+            } catch (InterruptedException e) {
+                logger.error("Cannot terminateFuture - interrupted");
+                throw new RuntimeException(e);
+            }
+
         }
+        if (clientGroup != null) {
+            clientGroup.shutdownGracefully().syncUninterruptibly();
+        }
+        // Shut down all event loops to terminate all threads.
+
         processPendingDisconnects();
         clientList.forEach(this::processRemovedClient);
         server = null;
@@ -347,6 +375,16 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     @Override
     public Server getServer() {
         return this.server;
+    }
+
+    void setServer(ServerImpl server) {
+        if (server != null) {
+            mode = NetworkMode.CLIENT;
+            nextNetworkTick = time.getRealTimeInMs();
+            logger.info("Connected to server");
+        }
+        this.server = server;
+
     }
 
     @Override
@@ -521,7 +559,8 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     }
 
     @Override
-    public void connectToEntitySystem(EngineEntityManager newEntityManager, EventLibrary newEventLibrary, BlockEntityRegistry blockEntityRegistry) {
+    public void connectToEntitySystem(EngineEntityManager newEntityManager, EventLibrary newEventLibrary,
+                                      BlockEntityRegistry blockEntityRegistry) {
         if (this.entityManager != null) {
             this.entityManager.unsubscribe(this);
         }
@@ -535,12 +574,13 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
 
         context.get(ComponentSystemManager.class).register(new NetworkEntitySystem(this), "engine:networkEntitySystem");
 
-        TypeHandlerLibrary typeHandlerLibrary = new TypeHandlerLibrary(entityManager.getTypeSerializerLibrary());
+        TypeHandlerLibrary typeHandlerLibrary = entityManager.getTypeSerializerLibrary().copy();
         typeHandlerLibrary.addTypeHandler(EntityRef.class, new NetEntityRefTypeHandler(this, blockEntityRegistry));
         // TODO: Add network override types here (that use id lookup tables)
 
         eventSerializer = new EventSerializer(eventLibrary, typeHandlerLibrary);
-        entitySerializer = new NetworkEntitySerializer(newEntityManager, entityManager.getComponentLibrary(), typeHandlerLibrary);
+        entitySerializer = new NetworkEntitySerializer(newEntityManager, entityManager.getComponentLibrary(),
+                typeHandlerLibrary);
         entitySerializer.setComponentSerializeCheck(new NetComponentSerializeCheck());
 
         if (mode == NetworkMode.CLIENT) {
@@ -561,7 +601,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
             if (mode.isServer()) {
                 if (metadata.isReplicated()) {
                     for (NetClient client : netClientList) {
-                        logger.info("Component {} added to {}", component, entity);
+                        logger.debug("Component {} added to {}", component, entity);
                         client.setComponentAdded(netComp.getNetworkId(), component);
                     }
                 }
@@ -578,7 +618,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
             if (mode.isServer()) {
                 if (metadata.isReplicated()) {
                     for (NetClient client : netClientList) {
-                        logger.info("Component {} removed from {}", component, entity);
+                        logger.debug("Component {} removed from {}", component, entity);
                         client.setComponentRemoved(netComp.getNetworkId(), component);
                     }
                 }
@@ -625,7 +665,8 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
         updatedOwnedEntities(entity, component, metadata);
     }
 
-    private void updatedOwnedEntities(EntityRef entity, Class<? extends Component> component, ComponentMetadata<? extends Component> metadata) {
+    private void updatedOwnedEntities(EntityRef entity, Class<? extends Component> component, ComponentMetadata<?
+            extends Component> metadata) {
         if (mode.isAuthority() && metadata.isReferenceOwner()) {
             for (EntityRef ownedEntity : ownershipHelper.listOwnedEntities(entity.getComponent(component))) {
                 EntityRef previousOwner = ownedEntity.getOwner();
@@ -752,6 +793,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
 
     /**
      * Sets the context within which this system should operate
+     *
      * @param context
      */
     @Override
@@ -919,16 +961,6 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
         }
     }
 
-    void setServer(ServerImpl server) {
-        if (server != null) {
-            mode = NetworkMode.CLIENT;
-            nextNetworkTick = time.getRealTimeInMs();
-            logger.info("Connected to server");
-        }
-        this.server = server;
-
-    }
-
     private void generateSerializationTables() {
         entitySerializer.setIdMapping(generateIds(componentLibrary));
         eventSerializer.setIdMapping(generateIds(eventLibrary));
@@ -943,7 +975,8 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
             int fieldId = 0;
             for (FieldMetadata<?, ?> field : metadata.getFields()) {
                 if (fieldId >= 256) {
-                    logger.error("Class {} has too many fields (>255), serialization will be incomplete", metadata.getUri());
+                    logger.error("Class {} has too many fields (>255), serialization will be incomplete",
+                            metadata.getUri());
                     break;
                 }
                 field.setId((byte) fieldId);
@@ -959,7 +992,8 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
         eventSerializer.setIdMapping(applySerializationInfo(serverInfo.getEventList(), eventLibrary));
     }
 
-    private <T> Map<Class<? extends T>, Integer> applySerializationInfo(List<NetData.SerializationInfo> infoList, ClassLibrary<T> classLibrary) {
+    private <T> Map<Class<? extends T>, Integer> applySerializationInfo(List<NetData.SerializationInfo> infoList,
+                                                                        ClassLibrary<T> classLibrary) {
         Map<Class<? extends T>, Integer> idTable = Maps.newHashMap();
         for (NetData.SerializationInfo info : infoList) {
             ClassMetadata<? extends T, ?> metadata = classLibrary.getMetadata(new ResourceUrn(info.getName()));

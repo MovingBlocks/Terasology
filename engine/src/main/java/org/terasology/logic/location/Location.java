@@ -17,6 +17,7 @@
 package org.terasology.logic.location;
 
 import org.joml.Quaternionfc;
+import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.lifecycleEvents.BeforeRemoveComponent;
@@ -24,9 +25,6 @@ import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
-import org.terasology.math.JomlUtil;
-import org.terasology.math.geom.Quat4f;
-import org.terasology.math.geom.Vector3f;
 
 import java.util.Iterator;
 
@@ -39,15 +37,26 @@ public class Location extends BaseComponentSystem {
      * Attaches an entity to another entity. Both must have location components.
      * This method sets the child's relative offset and rotation to the parent {@link LocationComponent}
      *
-     * @param parent           entity that will be the parent Location to the child
-     * @param child            entity will be attached relative to the parent
+     * @param parent           entity with a {@link LocationComponent}
+     * @param child            entity with a {@link LocationComponent} attach to the parent
      * @param offset           relative position from parent
      * @param relativeRotation relative rotation from parent
-     * @deprecated This is scheduled for removal in an upcoming version
-     * method will be replaced with JOML implementation {@link #attachChild(EntityRef, EntityRef, Vector3fc, Quaternionfc, float)}.
-     */
-    @Deprecated
-    public static void attachChild(EntityRef parent, EntityRef child, Vector3f offset, Quat4f relativeRotation, float relativeScale) {
+     **/
+    public static void attachChild(EntityRef parent, EntityRef child, Vector3fc offset, Quaternionfc relativeRotation) {
+        attachChild(parent, child, offset, relativeRotation, 1f);
+    }
+
+    /**
+     * Attaches an entity to another entity. Both must have location components.
+     * This method sets the child's relative offset and rotation to the parent {@link LocationComponent}
+     *
+     * @param parent           entity with a {@link LocationComponent}
+     * @param child            entity with a {@link LocationComponent} attach to the parent
+     * @param offset           relative position from parent
+     * @param relativeRotation relative rotation from parent
+     * @param relativeScale    relative scale from parent
+     **/
+    public static void attachChild(EntityRef parent, EntityRef child, Vector3fc offset, Quaternionfc relativeRotation, float relativeScale) {
         LocationComponent childLoc = child.getComponent(LocationComponent.class);
         LocationComponent parentLoc = parent.getComponent(LocationComponent.class);
         if (childLoc != null && parentLoc != null && !childLoc.getParent().equals(parent)) {
@@ -67,49 +76,6 @@ public class Location extends BaseComponentSystem {
     }
 
     /**
-     * Attaches an entity to another entity. Both must have location components.
-     * This method sets the child's relative offset and rotation to the parent {@link LocationComponent}
-     *
-     * @param parent           entity with a {@link LocationComponent}
-     * @param child            entity with a {@link LocationComponent} attach to the parent
-     * @param offset           relative position from parent
-     * @param relativeRotation relative rotation from parent
-     * @deprecated This is scheduled for removal in an upcoming version
-     * method will be replaced with JOML implementation {@link #attachChild(EntityRef, EntityRef, Vector3fc, Quaternionfc)}.
-     */
-    @Deprecated
-    public static void attachChild(EntityRef parent, EntityRef child, Vector3f offset, Quat4f relativeRotation) {
-        attachChild(parent, child, offset, relativeRotation, 1f);
-    }
-
-    /**
-     * Attaches an entity to another entity. Both must have location components.
-     * This method sets the child's relative offset and rotation to the parent {@link LocationComponent}
-     *
-     * @param parent           entity with a {@link LocationComponent}
-     * @param child            entity with a {@link LocationComponent} attach to the parent
-     * @param offset           relative position from parent
-     * @param relativeRotation relative rotation from parent
-     **/
-    public static void attachChild(EntityRef parent, EntityRef child, Vector3fc offset, Quaternionfc relativeRotation) {
-        attachChild(parent, child, JomlUtil.from(offset), JomlUtil.from(relativeRotation), 1f);
-    }
-
-    /**
-     * Attaches an entity to another entity. Both must have location components.
-     * This method sets the child's relative offset and rotation to the parent {@link LocationComponent}
-     *
-     * @param parent           entity with a {@link LocationComponent}
-     * @param child            entity with a {@link LocationComponent} attach to the parent
-     * @param offset           relative position from parent
-     * @param relativeRotation relative rotation from parent
-     * @param relativeScale    relative scale from parent
-     **/
-    public static void attachChild(EntityRef parent, EntityRef child, Vector3fc offset, Quaternionfc relativeRotation, float relativeScale) {
-        attachChild(parent, child, JomlUtil.from(offset), JomlUtil.from(relativeRotation), relativeScale);
-    }
-
-    /**
      * Attaches an entity to another entity. Both must have location components. The child maintains its previous position
      * and rotation but follows the parent.
      *
@@ -120,7 +86,7 @@ public class Location extends BaseComponentSystem {
         LocationComponent childLoc = child.getComponent(LocationComponent.class);
         LocationComponent parentLoc = parent.getComponent(LocationComponent.class);
         if (childLoc != null && parentLoc != null && !childLoc.getParent().equals(parent)) {
-            Vector3f oldWorldPos = childLoc.getWorldPosition();
+            Vector3f oldWorldPos = childLoc.getWorldPosition(new Vector3f());
             LocationComponent oldParentLoc = childLoc.getParent().getComponent(LocationComponent.class);
             if (oldParentLoc != null) {
                 oldParentLoc.children.remove(child);
@@ -138,7 +104,7 @@ public class Location extends BaseComponentSystem {
         LocationComponent childLoc = child.getComponent(LocationComponent.class);
         LocationComponent parentLoc = parent.getComponent(LocationComponent.class);
         if (childLoc != null && parentLoc != null && childLoc.getParent().equals(parent)) {
-            Vector3f oldWorldPos = childLoc.getWorldPosition();
+            Vector3f oldWorldPos = childLoc.getWorldPosition(new Vector3f());
             parentLoc.children.remove(child);
             childLoc.parent = EntityRef.NULL;
             childLoc.setWorldPosition(oldWorldPos);
@@ -157,7 +123,7 @@ public class Location extends BaseComponentSystem {
             EntityRef child = childIterator.next();
             LocationComponent childLoc = child.getComponent(LocationComponent.class);
             if (childLoc != null) {
-                Vector3f oldWorldPos = childLoc.getWorldPosition();
+                Vector3f oldWorldPos = childLoc.getWorldPosition(new Vector3f());
                 childLoc.parent = EntityRef.NULL;
                 childLoc.setWorldPosition(oldWorldPos);
                 child.saveComponent(childLoc);

@@ -11,6 +11,7 @@ import org.terasology.engine.subsystem.DisplayDevice;
 import org.terasology.math.TeraMath;
 import org.terasology.rendering.nui.layers.mainMenu.videoSettings.CameraSetting;
 import org.terasology.world.WorldProvider;
+import org.terasology.world.chunks.Chunks;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -48,6 +49,9 @@ public class PerspectiveCamera extends SubmersibleCamera implements PropertyChan
         this.cameraSettings = renderingConfig.getCameraSettings();
 
         displayDevice.subscribe(DISPLAY_RESOLUTION_CHANGE, this);
+        renderingConfig.subscribe(RenderingConfig.VIEW_DISTANCE, this);
+        renderingConfig.subscribe(RenderingConfig.CHUNK_LODS, this);
+        updateFarClippingDistance();
     }
 
     @Override
@@ -58,20 +62,20 @@ public class PerspectiveCamera extends SubmersibleCamera implements PropertyChan
     @Override
     public void loadProjectionMatrix() {
         glMatrixMode(GL_PROJECTION);
-        GL11.glLoadMatrix(getProjectionMatrix().get(BufferUtils.createFloatBuffer(16)));
+        GL11.glLoadMatrixf(getProjectionMatrix().get(BufferUtils.createFloatBuffer(16)));
         glMatrixMode(GL11.GL_MODELVIEW);
     }
 
     @Override
     public void loadModelViewMatrix() {
         glMatrixMode(GL11.GL_MODELVIEW);
-        GL11.glLoadMatrix(getViewMatrix().get(BufferUtils.createFloatBuffer(16)));
+        GL11.glLoadMatrixf(getViewMatrix().get(BufferUtils.createFloatBuffer(16)));
     }
 
     @Override
     public void loadNormalizedModelViewMatrix() {
         glMatrixMode(GL11.GL_MODELVIEW);
-        GL11.glLoadMatrix(getNormViewMatrix().get(BufferUtils.createFloatBuffer(16)));
+        GL11.glLoadMatrixf(getNormViewMatrix().get(BufferUtils.createFloatBuffer(16)));
     }
 
     @Override
@@ -134,7 +138,7 @@ public class PerspectiveCamera extends SubmersibleCamera implements PropertyChan
         viewingDirection.cross(up, tempRightVector);
         tempRightVector.mul(bobbingRotationOffsetFactor);
 
-        float aspectRatio = (float) displayDevice.getDisplayWidth() / displayDevice.getDisplayHeight();
+        float aspectRatio = (float) displayDevice.getWidth() / displayDevice.getHeight();
         float fovY = (float) (2 * Math.atan2(Math.tan(0.5 * fov * TeraMath.DEG_TO_RAD), aspectRatio));
         projectionMatrix.setPerspective(fovY, aspectRatio, getzNear(), getzFar());
 
@@ -181,10 +185,23 @@ public class PerspectiveCamera extends SubmersibleCamera implements PropertyChan
         bobbingVerticalOffsetFactor = f;
     }
 
+    private void updateFarClippingDistance() {
+        float distance = renderingConfig.getViewDistance().getChunkDistance().x() * Chunks.SIZE_X * (1 << (int) renderingConfig.getChunkLods());
+        zFar = Math.max(distance, 500) * 2;
+        // distance is an estimate of how far away the farthest chunks are, and the minimum bound is to ensure that the sky is visible.
+    }
+
     public void propertyChange(PropertyChangeEvent propertyChangeEvent) {
-        if (propertyChangeEvent.getPropertyName().equals(DISPLAY_RESOLUTION_CHANGE)) {
-            cachedFov = -1; // Invalidate the cache, so that matrices get regenerated.
-            updateMatrices();
+        switch (propertyChangeEvent.getPropertyName()) {
+            case DISPLAY_RESOLUTION_CHANGE:
+                cachedFov = -1; // Invalidate the cache, so that matrices get regenerated.
+                updateMatrices();
+                return;
+            case RenderingConfig.VIEW_DISTANCE:
+            case RenderingConfig.CHUNK_LODS:
+                updateFarClippingDistance();
+                return;
+            default:
         }
     }
 }

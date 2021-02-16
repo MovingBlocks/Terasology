@@ -1,21 +1,9 @@
-/*
- * Copyright 2016 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.engine.modes.loadProcesses;
 
+import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
@@ -74,8 +62,8 @@ public class InitialiseWorld extends SingleStepLoadProcess {
 
     private static final Logger logger = LoggerFactory.getLogger(InitialiseWorld.class);
 
-    private GameManifest gameManifest;
-    private Context context;
+    private final GameManifest gameManifest;
+    private final Context context;
 
     public InitialiseWorld(GameManifest gameManifest, Context context) {
         this.gameManifest = gameManifest;
@@ -137,9 +125,16 @@ public class InitialiseWorld extends SingleStepLoadProcess {
             return true; // We need to return true, otherwise the loading state will just call us again immediately
         }
         context.put(StorageManager.class, storageManager);
-        LocalChunkProvider chunkProvider = new LocalChunkProvider(storageManager, entityManager, worldGenerator,
-                blockManager, extraDataManager);
-        context.get(ComponentSystemManager.class).register(new RelevanceSystem(chunkProvider), "engine:relevanceSystem");
+        LocalChunkProvider chunkProvider = new LocalChunkProvider(storageManager,
+                entityManager,
+                worldGenerator,
+                blockManager,
+                extraDataManager,
+                Maps.newConcurrentMap());
+        RelevanceSystem relevanceSystem = new RelevanceSystem(chunkProvider);
+        context.put(RelevanceSystem.class, relevanceSystem);
+        context.get(ComponentSystemManager.class).register(relevanceSystem, "engine:relevanceSystem");
+        chunkProvider.setRelevanceSystem(relevanceSystem);
         Block unloadedBlock = blockManager.getBlock(BlockManager.UNLOADED_ID);
         WorldProviderCoreImpl worldProviderCore = new WorldProviderCoreImpl(worldInfo, chunkProvider, unloadedBlock, context);
         EntityAwareWorldProvider entityWorldProvider = new EntityAwareWorldProvider(worldProviderCore, context);

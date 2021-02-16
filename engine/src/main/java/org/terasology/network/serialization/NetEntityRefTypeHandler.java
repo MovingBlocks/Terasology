@@ -1,24 +1,12 @@
-/*
- * Copyright 2013 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.network.serialization;
 
 import gnu.trove.list.TIntList;
+import org.joml.Vector3i;
+import org.joml.Vector3ic;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.network.NetworkComponent;
 import org.terasology.network.internal.NetworkSystemImpl;
 import org.terasology.persistence.typeHandling.PersistedData;
@@ -48,8 +36,8 @@ public class NetEntityRefTypeHandler extends TypeHandler<EntityRef> {
     public PersistedData serializeNonNull(EntityRef value, PersistedDataSerializer serializer) {
         BlockComponent blockComponent = value.getComponent(BlockComponent.class);
         if (blockComponent != null) {
-            Vector3i pos = blockComponent.position;
-            return serializer.serialize(pos.x, pos.y, pos.z);
+            Vector3ic pos = blockComponent.getPosition();
+            return serializer.serialize(pos.x(), pos.y(), pos.z());
         }
         NetworkComponent netComponent = value.getComponent(NetworkComponent.class);
         if (netComponent != null) {

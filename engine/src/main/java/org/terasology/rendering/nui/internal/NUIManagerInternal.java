@@ -1,18 +1,6 @@
-/*
- * Copyright 2014 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *  http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
+
 package org.terasology.rendering.nui.internal;
 
 import com.google.common.base.Objects;
@@ -43,12 +31,12 @@ import org.terasology.input.BindButtonEvent;
 import org.terasology.input.InputSystem;
 import org.terasology.input.device.KeyboardDevice;
 import org.terasology.input.device.MouseDevice;
+import org.terasology.input.events.CharEvent;
 import org.terasology.input.events.KeyEvent;
 import org.terasology.input.events.MouseAxisEvent;
 import org.terasology.input.events.MouseButtonEvent;
 import org.terasology.input.events.MouseWheelEvent;
 import org.terasology.logic.players.LocalPlayer;
-import org.terasology.math.JomlUtil;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.network.ClientComponent;
 import org.terasology.nui.AbstractWidget;
@@ -58,6 +46,7 @@ import org.terasology.nui.UIWidget;
 import org.terasology.nui.asset.UIElement;
 import org.terasology.nui.canvas.CanvasControl;
 import org.terasology.nui.events.NUIBindButtonEvent;
+import org.terasology.nui.events.NUICharEvent;
 import org.terasology.nui.events.NUIKeyEvent;
 import org.terasology.nui.events.NUIMouseButtonEvent;
 import org.terasology.nui.events.NUIMouseWheelEvent;
@@ -550,7 +539,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
 
     @Override
     public void update(float delta) {
-        canvas.processMousePosition(JomlUtil.from(mouse.getPosition()));
+        canvas.processMousePosition(mouse.getPosition());
 
         // part of the update could be adding/removing screens
         // modifying a collection while iterating of it is typically not supported
@@ -631,7 +620,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
             return;
         }
 
-        Vector2i mousePosition = JomlUtil.from(event.getMousePosition());
+        Vector2i mousePosition = event.getMousePosition();
         if (focus != null) {
             focus.onMouseButtonEvent(new NUIMouseButtonEvent(event.getButton(), event.getState(), mousePosition));
             if (event.isConsumed()) {
@@ -659,7 +648,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
             return;
         }
 
-        Vector2i mousePosition = JomlUtil.from(event.getMousePosition());
+        Vector2i mousePosition = event.getMousePosition();
         if (focus != null) {
             NUIMouseWheelEvent nuiEvent = new NUIMouseWheelEvent(mouse, keyboard, mousePosition, event.getWheelTurns());
             focus.onMouseWheelEvent(nuiEvent);
@@ -677,10 +666,36 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
         }
     }
 
+    //text input events
+    @ReceiveEvent(components = ClientComponent.class, priority = EventPriority.PRIORITY_HIGH)
+    public void charEvent(CharEvent ev, EntityRef entity) {
+        NUICharEvent nuiEvent = new NUICharEvent(mouse, keyboard, ev.getCharacter());
+        if (focus != null) {
+            if (focus.onCharEvent(nuiEvent)) {
+                ev.consume();
+            }
+        }
+
+        // send event to screen stack if not yet consumed
+        if (!ev.isConsumed()) {
+            for (UIScreenLayer screen : screens) {
+                if (screen != focus) {    // explicit identity check
+                    if (screen.onCharEvent(nuiEvent)) {
+                        ev.consume();
+                        break;
+                    }
+                }
+                if (screen.isModal()) {
+                    break;
+                }
+            }
+        }
+    }
+
     //raw input events
     @ReceiveEvent(components = ClientComponent.class, priority = EventPriority.PRIORITY_HIGH)
     public void keyEvent(KeyEvent ev, EntityRef entity) {
-        NUIKeyEvent nuiEvent = new NUIKeyEvent(mouse, keyboard, ev.getKey(), ev.getKeyCharacter(), ev.getState());
+        NUIKeyEvent nuiEvent = new NUIKeyEvent(mouse, keyboard, ev.getKey(), ev.getState());
         if (focus != null) {
             if (focus.onKeyEvent(nuiEvent)) {
                 ev.consume();

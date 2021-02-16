@@ -17,16 +17,16 @@
 package org.terasology.rendering.nui.layers.mainMenu.preview;
 
 import com.google.common.math.IntMath;
+import org.joml.Vector2i;
+import org.joml.Vector2ic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.math.Region3i;
-import org.terasology.math.geom.ImmutableVector2i;
-import org.terasology.math.geom.Rect2i;
-import org.terasology.math.geom.Vector3i;
+import org.terasology.joml.geom.Rectanglei;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.rendering.assets.texture.TextureData;
 import org.terasology.rendering.nui.layers.mainMenu.ProgressListener;
-import org.terasology.world.chunks.ChunkConstants;
+import org.terasology.world.block.BlockRegion;
+import org.terasology.world.chunks.Chunks;
 import org.terasology.world.generation.Region;
 import org.terasology.world.generation.World;
 import org.terasology.world.generation.WorldFacet;
@@ -68,8 +68,8 @@ public class FacetLayerPreview implements PreviewGenerator {
 
     private static final Logger logger = LoggerFactory.getLogger(FacetLayerPreview.class);
 
-    private static final int TILE_SIZE_X = ChunkConstants.SIZE_X * 2;
-    private static final int TILE_SIZE_Y = ChunkConstants.SIZE_Z * 2;
+    private static final int TILE_SIZE_X = Chunks.SIZE_X * 2;
+    private static final int TILE_SIZE_Y = Chunks.SIZE_Z * 2;
 
     private final DirectColorModel colorModel = ColorModels.RGBA;
 
@@ -106,8 +106,8 @@ public class FacetLayerPreview implements PreviewGenerator {
 
         worldGenerator.getWorld(); // trigger building the World now
 
-        Rect2i worldArea = Rect2i.createFromMinAndSize(offX, offY, width * scale, height * scale);
-        Rect2i tileArea = worldToTileArea(worldArea);
+        Rectanglei worldArea = new Rectanglei(offX, offY).setSize(width * scale, height * scale);
+        Rectanglei tileArea = worldToTileArea(worldArea);
         AtomicInteger tilesComplete = new AtomicInteger(0);
         int tileCount = tileArea.area();
 
@@ -121,10 +121,10 @@ public class FacetLayerPreview implements PreviewGenerator {
         g.translate(-offX, -offY);
         g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
 
-        Map<ImmutableVector2i, Future<BufferedImage>> imageFutures = new HashMap<>(tileCount);
+        Map<Vector2ic, Future<BufferedImage>> imageFutures = new HashMap<>(tileCount);
         for (int z = tileArea.minY(); z < tileArea.maxY(); z++) {
             for (int x = tileArea.minX(); x < tileArea.maxX(); x++) {
-                ImmutableVector2i pos = new ImmutableVector2i(x, z);
+                Vector2i pos = new Vector2i(x, z);
                 imageFutures.put(pos, threadPool.submit(() -> {
                     Region createRegion = createRegion(pos);
                     BufferedImage image = rasterize(createRegion);
@@ -138,7 +138,7 @@ public class FacetLayerPreview implements PreviewGenerator {
 
         for (int z = tileArea.minY(); z < tileArea.maxY(); z++) {
             for (int x = tileArea.minX(); x < tileArea.maxX(); x++) {
-                ImmutableVector2i pos = new ImmutableVector2i(x, z);
+                Vector2i pos = new Vector2i(x, z);
                 try {
                     BufferedImage tileImage = imageFutures.get(pos).get();
                     g.drawImage(tileImage, x * TILE_SIZE_X, z * TILE_SIZE_Y, null);
@@ -171,27 +171,26 @@ public class FacetLayerPreview implements PreviewGenerator {
         threadPool.shutdown();
     }
 
-    private Region createRegion(ImmutableVector2i chunkPos) {
+    private Region createRegion(Vector2ic chunkPos) {
 
         int vertChunks = 4; // 4 chunks high (relevant for trees, etc)
 
-        int minX = chunkPos.getX() * TILE_SIZE_X;
-        int minZ = chunkPos.getY() * TILE_SIZE_Y;
-        int height = vertChunks * ChunkConstants.SIZE_Y;
-        Region3i area3d = Region3i.createFromMinAndSize(new Vector3i(minX, 0, minZ), new Vector3i(TILE_SIZE_X, height, TILE_SIZE_Y));
+        int minX = chunkPos.x() * TILE_SIZE_X;
+        int minZ = chunkPos.y() * TILE_SIZE_Y;
+        int height = vertChunks * Chunks.SIZE_Y;
+        BlockRegion area3d = new BlockRegion(minX, 0, minZ).setSize(TILE_SIZE_X, height, TILE_SIZE_Y);
         World world = worldGenerator.getWorld();
-        Region region = world.getWorldData(area3d);
-        return region;
+        return world.getWorldData(area3d);
     }
 
-    private static Rect2i worldToTileArea(Rect2i area) {
+    private static Rectanglei worldToTileArea(Rectanglei area) {
         int chunkMinX = IntMath.divide(area.minX(), TILE_SIZE_X, RoundingMode.FLOOR);
         int chunkMinZ = IntMath.divide(area.minY(), TILE_SIZE_Y, RoundingMode.FLOOR);
 
         int chunkMaxX = IntMath.divide(area.maxX(), TILE_SIZE_X, RoundingMode.CEILING);
         int chunkMaxZ = IntMath.divide(area.maxY(), TILE_SIZE_Y, RoundingMode.CEILING);
 
-        return Rect2i.createFromMinAndMax(chunkMinX, chunkMinZ, chunkMaxX, chunkMaxZ);
+        return new Rectanglei(chunkMinX, chunkMinZ, chunkMaxX, chunkMaxZ);
     }
 
     /**
@@ -200,10 +199,8 @@ public class FacetLayerPreview implements PreviewGenerator {
      * @return an image of that region
      */
     private BufferedImage rasterize(Region region) {
-
-        Vector3i extent = region.getRegion().size();
-        int width = extent.x;
-        int height = extent.z;
+        int width =  region.getRegion().getSizeX();
+        int height =  region.getRegion().getSizeZ();
 
         WritableRaster raster = colorModel.createCompatibleWritableRaster(width, height);
         BufferedImage image = new BufferedImage(colorModel, raster, false, null);

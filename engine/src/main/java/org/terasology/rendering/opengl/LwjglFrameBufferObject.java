@@ -1,30 +1,17 @@
-/*
- * Copyright 2016 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.rendering.opengl;
 
+import org.joml.Vector2i;
+import org.joml.Vector2ic;
 import org.lwjgl.BufferUtils;
-import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL30;
-import org.terasology.utilities.Assets;
 import org.terasology.assets.ResourceUrn;
-import org.terasology.math.geom.BaseVector2i;
-import org.terasology.math.geom.ImmutableVector2i;
+import org.terasology.engine.subsystem.DisplayDevice;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.TextureData;
+import org.terasology.utilities.Assets;
 
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
@@ -40,12 +27,14 @@ import static org.lwjgl.opengl.GL11.glOrtho;
  * A OpenGL framebuffer. Generates the fbo and a backing texture.
  */
 public class LwjglFrameBufferObject implements FrameBufferObject {
+    private DisplayDevice displayDevice;
     private int frame;
-    private ImmutableVector2i size;
+    private Vector2ic size;
     private IntBuffer vp;
 
-    public LwjglFrameBufferObject(ResourceUrn urn, BaseVector2i size) {
-        this.size = ImmutableVector2i.createOrUse(size);
+    public LwjglFrameBufferObject(DisplayDevice displayDevice, ResourceUrn urn, Vector2ic size) {
+        this.displayDevice = displayDevice;
+        this.size = new Vector2i(size);
 
         IntBuffer fboId = BufferUtils.createIntBuffer(1);
         GL30.glGenFramebuffers(fboId);
@@ -85,7 +74,7 @@ public class LwjglFrameBufferObject implements FrameBufferObject {
         glLoadIdentity();
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
-        glOrtho(0, Display.getWidth(), Display.getHeight(), 0, 0, 2048f);
+        glOrtho(0, displayDevice.getWidth(), displayDevice.getHeight(), 0, 0, 2048f);
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
     }
@@ -93,7 +82,7 @@ public class LwjglFrameBufferObject implements FrameBufferObject {
     @Override
     public void bindFrame() {
         vp = BufferUtils.createIntBuffer(16);
-        GL11.glGetInteger(GL11.GL_VIEWPORT, vp);
+        GL11.glGetIntegerv(GL11.GL_VIEWPORT, vp);
 
         GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, frame);
         GL11.glViewport(0, 0, size.x(), size.y());

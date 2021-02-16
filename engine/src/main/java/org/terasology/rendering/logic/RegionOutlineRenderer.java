@@ -34,10 +34,11 @@ import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.RenderSystem;
-import org.terasology.math.Region3i;
+import org.terasology.joml.geom.AABBf;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.world.WorldRenderer;
+import org.terasology.world.block.BlockRegion;
 
 import java.nio.FloatBuffer;
 import java.util.Map;
@@ -131,72 +132,70 @@ public class RegionOutlineRenderer extends BaseComponentSystem implements Render
             return;
         }
 
-        Region3i region = Region3i.createBounded(regionComponent.corner1, regionComponent.corner2);
-        Vector3f min = new Vector3f(region.minX() - 0.5f, region.minY() - 0.5f, region.minZ() - 0.5f);
-        Vector3f max = new Vector3f(region.maxX() + 0.5f, region.maxY() + 0.5f, region.maxZ() + 0.5f);
-
+        BlockRegion region = new BlockRegion(regionComponent.corner1).union(regionComponent.corner2);
+        AABBf bounds = region.getBounds(new AABBf());
         // 4 lines along x axis:
         glBegin(GL11.GL_LINES);
-        glVertex3f(min.x(), min.y(), min.z());
-        glVertex3f(max.x(), min.y(), min.z());
+        glVertex3f(bounds.minX, bounds.minY, bounds.minZ);
+        glVertex3f(bounds.maxX, bounds.minY, bounds.minZ);
         glEnd();
 
         glBegin(GL11.GL_LINES);
-        glVertex3f(min.x(), max.y(), min.z());
-        glVertex3f(max.x(), max.y(), min.z());
+        glVertex3f(bounds.minX, bounds.maxY, bounds.minZ);
+        glVertex3f(bounds.maxX, bounds.maxY, bounds.minZ);
         glEnd();
 
         glBegin(GL11.GL_LINES);
-        glVertex3f(min.x(), min.y(), max.z());
-        glVertex3f(max.x(), min.y(), max.z());
+        glVertex3f(bounds.minX, bounds.minY, bounds.maxZ);
+        glVertex3f(bounds.maxX, bounds.minY, bounds.maxZ);
         glEnd();
 
         glBegin(GL11.GL_LINES);
-        glVertex3f(min.x(), max.y(), max.z());
-        glVertex3f(max.x(), max.y(), max.z());
+        glVertex3f(bounds.minX, bounds.maxY, bounds.maxZ);
+        glVertex3f(bounds.maxX, bounds.maxY, bounds.maxZ);
         glEnd();
 
 
         // 4 lines along y axis
         glBegin(GL11.GL_LINES);
-        glVertex3f(min.x(), min.y(), min.z());
-        glVertex3f(min.x(), max.y(), min.z());
+        glVertex3f(bounds.minX, bounds.minY, bounds.minZ);
+        glVertex3f(bounds.minX, bounds.maxY, bounds.minZ);
         glEnd();
 
         glBegin(GL11.GL_LINES);
-        glVertex3f(max.x(), min.y(), min.z());
-        glVertex3f(max.x(), max.y(), min.z());
+        glVertex3f(bounds.maxX, bounds.minY, bounds.minZ);
+        glVertex3f(bounds.maxX, bounds.maxY, bounds.minZ);
         glEnd();
 
         glBegin(GL11.GL_LINES);
-        glVertex3f(min.x(), min.y(), max.z());
-        glVertex3f(min.x(), max.y(), max.z());
+        glVertex3f(bounds.minX, bounds.minY, bounds.maxZ);
+        glVertex3f(bounds.minX, bounds.maxY, bounds.maxZ);
         glEnd();
 
         glBegin(GL11.GL_LINES);
-        glVertex3f(max.x(), min.y(), max.z());
-        glVertex3f(max.x(), max.y(), max.z());
+        glVertex3f(bounds.maxX, bounds.minY, bounds.maxZ);
+        glVertex3f(bounds.maxX, bounds.maxY, bounds.maxZ);
         glEnd();
 
         // 4 lines along z axis:
         glBegin(GL11.GL_LINES);
-        glVertex3f(min.x(), min.y(), min.z());
-        glVertex3f(min.x(), min.y(), max.z());
+        glVertex3f(bounds.minX, bounds.minY, bounds.minZ);
+        glVertex3f(bounds.minX, bounds.minY, bounds.maxZ);
         glEnd();
 
         glBegin(GL11.GL_LINES);
-        glVertex3f(max.x(), min.y(), min.z());
-        glVertex3f(max.x(), min.y(), max.z());
+        glVertex3f(bounds.maxX, bounds.minY, bounds.minZ);
+        glVertex3f(bounds.maxX, bounds.minY, bounds.maxZ);
         glEnd();
 
         glBegin(GL11.GL_LINES);
-        glVertex3f(min.x(), max.y(), min.z());
-        glVertex3f(min.x(), max.y(), max.z());
+        glVertex3f(bounds.minX, bounds.maxY, bounds.minZ);
+        glVertex3f(bounds.minX, bounds.maxY, bounds.maxZ);
         glEnd();
 
         glBegin(GL11.GL_LINES);
-        glVertex3f(max.x(), max.y(), min.z());
-        glVertex3f(max.x(), max.y(), max.z());
+        glVertex3f(bounds.maxX, bounds.maxY, bounds.minZ);
+        glVertex3f(bounds.maxX, bounds.maxY, bounds.maxZ);
         glEnd();
 
     }

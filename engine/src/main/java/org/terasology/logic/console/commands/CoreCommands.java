@@ -4,6 +4,7 @@ package org.terasology.logic.console.commands;
 
 import com.google.common.collect.Ordering;
 import com.google.common.collect.Streams;
+import org.joml.Vector3f;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.config.Config;
@@ -39,8 +40,6 @@ import org.terasology.logic.inventory.events.DropItemEvent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.permission.PermissionManager;
 import org.terasology.math.Direction;
-import org.terasology.math.geom.Quat4f;
-import org.terasology.math.geom.Vector3f;
 import org.terasology.naming.Name;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.JoinStatus;
@@ -513,28 +512,27 @@ public class CoreCommands extends BaseComponentSystem {
         LocationComponent characterLocation = clientComponent.character.getComponent(LocationComponent.class);
 
 
-        Vector3f spawnPos = characterLocation.getWorldPosition();
-        Vector3f offset = new Vector3f(characterLocation.getWorldDirection());
-        offset.scale(2);
+        Vector3f spawnPos = characterLocation.getWorldPosition(new Vector3f());
+        Vector3f offset = characterLocation.getWorldDirection(new Vector3f());
+        offset.mul(2);
         spawnPos.add(offset);
-        Vector3f dir = new Vector3f(characterLocation.getWorldDirection());
+        Vector3f dir = characterLocation.getWorldDirection(new Vector3f());
         dir.y = 0;
         if (dir.lengthSquared() > 0.001f) {
             dir.normalize();
         } else {
-            dir.set(Direction.FORWARD.getVector3f());
+            dir.set(Direction.FORWARD.asVector3f());
         }
-        Quat4f rotation = Quat4f.shortestArcQuat(Direction.FORWARD.getVector3f(), dir);
 
-        Optional<Prefab> prefab = Assets.getPrefab(prefabName);
-        if (prefab.isPresent() && prefab.get().getComponent(LocationComponent.class) != null) {
-            entityManager.create(prefab.get(), spawnPos, rotation);
-            return "Done";
-        } else if (!prefab.isPresent()) {
-            return "Unknown prefab";
-        } else {
-            return "Prefab cannot be spawned (no location component)";
-        }
+        return Assets.getPrefab(prefabName).map(prefab -> {
+            LocationComponent loc = prefab.getComponent(LocationComponent.class);
+            if (loc != null) {
+                entityManager.create(prefab, spawnPos);
+                return "Done";
+            } else {
+                return "Prefab cannot be spawned (no location component)";
+            }
+        }).orElse("Unknown prefab");
     }
 
     /**
@@ -550,9 +548,9 @@ public class CoreCommands extends BaseComponentSystem {
         ClientComponent clientComponent = sender.getComponent(ClientComponent.class);
         LocationComponent characterLocation = clientComponent.character.getComponent(LocationComponent.class);
 
-        Vector3f spawnPos = characterLocation.getWorldPosition();
-        Vector3f offset = characterLocation.getWorldDirection();
-        offset.scale(3);
+        Vector3f spawnPos = characterLocation.getWorldPosition(new Vector3f());
+        Vector3f offset = characterLocation.getWorldDirection(new Vector3f());
+        offset.mul(3);
         spawnPos.add(offset);
 
         BlockFamily block = blockManager.getBlockFamily(blockName);
@@ -576,10 +574,10 @@ public class CoreCommands extends BaseComponentSystem {
         ClientComponent clientComponent = sender.getComponent(ClientComponent.class);
         LocationComponent characterLocation = clientComponent.character.getComponent(LocationComponent.class);
 
-        Vector3f spawnPos = characterLocation.getWorldPosition();
-        Vector3f offset = characterLocation.getWorldDirection();
+        Vector3f spawnPos = characterLocation.getWorldPosition(new Vector3f());
+        Vector3f offset = characterLocation.getWorldDirection(new Vector3f());
 
-        offset.scale(3);
+        offset.mul(3);
         spawnPos.add(5, 10, 0);
         BlockFamily block = blockManager.getBlockFamily(blockName);
         if (block == null) {
@@ -609,9 +607,9 @@ public class CoreCommands extends BaseComponentSystem {
         ClientComponent clientComponent = sender.getComponent(ClientComponent.class);
         LocationComponent characterLocation = clientComponent.character.getComponent(LocationComponent.class);
 
-        Vector3f spawnPos = characterLocation.getWorldPosition();
-        Vector3f offset = characterLocation.getWorldDirection();
-        offset.scale(5);
+        Vector3f spawnPos = characterLocation.getWorldPosition(new Vector3f());
+        Vector3f offset = characterLocation.getWorldDirection(new Vector3f());
+        offset.mul(5);
         spawnPos.add(offset);
         BlockFamily block = blockManager.getBlockFamily(blockName);
         if (block == null) {

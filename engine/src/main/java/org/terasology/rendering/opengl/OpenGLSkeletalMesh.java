@@ -15,6 +15,9 @@
  */
 package org.terasology.rendering.opengl;
 
+import org.joml.Matrix4f;
+import org.joml.Vector2f;
+import org.joml.Vector3f;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
@@ -25,10 +28,8 @@ import org.terasology.assets.AssetType;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.engine.GameThread;
 import org.terasology.engine.subsystem.lwjgl.GLBufferPool;
-import org.terasology.math.AABB;
-import org.terasology.math.geom.Quat4f;
-import org.terasology.math.geom.Vector2f;
-import org.terasology.math.geom.Vector3f;
+import org.terasology.engine.subsystem.lwjgl.LwjglGraphicsProcessing;
+import org.terasology.joml.geom.AABBf;
 import org.terasology.rendering.VertexBufferObjectUtil;
 import org.terasology.rendering.assets.skeletalmesh.Bone;
 import org.terasology.rendering.assets.skeletalmesh.SkeletalMesh;
@@ -68,14 +69,17 @@ public class OpenGLSkeletalMesh extends SkeletalMesh {
 
     private DisposalAction disposalAction;
 
-    public OpenGLSkeletalMesh(ResourceUrn urn, AssetType<?, SkeletalMeshData> assetType, SkeletalMeshData data, GLBufferPool bufferPool) {
+    public OpenGLSkeletalMesh(ResourceUrn urn, AssetType<?, SkeletalMeshData> assetType, GLBufferPool bufferPool,
+                              SkeletalMeshData data, LwjglGraphicsProcessing graphicsProcessing) {
         super(urn, assetType);
         disposalAction = new DisposalAction(urn, bufferPool);
         getDisposalHook().setDisposeAction(disposalAction);
-        reload(data);
+        graphicsProcessing.asynchToDisplayThread(() -> {
+            reload(data);
+        });
     }
 
-    public void setScaleTranslate(Vector3f newScale, Vector3f newTranslate) {
+    public void setScaleTranslate(org.joml.Vector3f newScale, org.joml.Vector3f newTranslate) {
         this.scale = newScale;
         this.translate = newTranslate;
     }
@@ -166,9 +170,9 @@ public class OpenGLSkeletalMesh extends SkeletalMesh {
         postRender();
     }
 
-    public void render(List<Vector3f> bonePositions, List<Quat4f> boneRotations) {
+    public void render(List<Matrix4f> boneTransforms) {
         preRender();
-        doRender(data.getVertexPositions(bonePositions, boneRotations), data.getVertexNormals(bonePositions, boneRotations));
+        doRender(data.getVertexPositions(boneTransforms), data.getVertexNormals(boneTransforms));
         postRender();
     }
 
@@ -188,7 +192,7 @@ public class OpenGLSkeletalMesh extends SkeletalMesh {
     }
 
     @Override
-    public AABB getStaticAabb() {
+    public AABBf getStaticAabb() {
         return data.getStaticAABB();
     }
 

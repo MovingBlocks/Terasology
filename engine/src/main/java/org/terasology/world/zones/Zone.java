@@ -15,12 +15,13 @@
  */
 package org.terasology.world.zones;
 
-import org.terasology.math.geom.BaseVector3i;
-import org.terasology.math.geom.ImmutableVector3i;
+import org.joml.Vector3i;
+import org.joml.Vector3ic;
 import org.terasology.module.sandbox.API;
 import org.terasology.rendering.nui.layers.mainMenu.preview.FacetLayerPreview;
 import org.terasology.rendering.nui.layers.mainMenu.preview.PreviewGenerator;
 import org.terasology.world.block.Block;
+import org.terasology.world.chunks.Chunks;
 import org.terasology.world.chunks.CoreChunk;
 import org.terasology.world.generation.EntityBuffer;
 import org.terasology.world.generation.EntityProvider;
@@ -37,10 +38,6 @@ import java.util.function.BiPredicate;
 import java.util.function.BooleanSupplier;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-
-import static org.terasology.world.chunks.ChunkConstants.SIZE_X;
-import static org.terasology.world.chunks.ChunkConstants.SIZE_Y;
-import static org.terasology.world.chunks.ChunkConstants.SIZE_Z;
 
 /**
  * A region in the world with its own rasterization and world preview properties.
@@ -76,12 +73,12 @@ public class Zone extends ProviderStore implements WorldRasterizer, EntityProvid
         this(name, (pos, region) -> regionFunction.getAsBoolean());
     }
 
-    public Zone(String name, Predicate<BaseVector3i> regionFunction) {
+    public Zone(String name, Predicate<Vector3ic> regionFunction) {
         this(name, (pos, region) -> regionFunction.test(pos));
     }
 
-    public Zone(String name, BiPredicate<BaseVector3i, Region> regionFunction) {
-        this(name, (x, y, z, region) -> regionFunction.test(new ImmutableVector3i(x, y, z), region));
+    public Zone(String name, BiPredicate<Vector3ic, Region> regionFunction) {
+        this(name, (x, y, z, region) -> regionFunction.test(new Vector3i(x, y, z), region));
     }
 
     /**
@@ -124,7 +121,7 @@ public class Zone extends ProviderStore implements WorldRasterizer, EntityProvid
      */
     @Override
     public void generateChunk(CoreChunk chunk, Region chunkRegion) {
-        Block[][][] savedBlocks = new Block[SIZE_X][SIZE_Y][SIZE_Z];
+        Block[][][] savedBlocks = new Block[Chunks.SIZE_X][Chunks.SIZE_Y][Chunks.SIZE_Z];
         boolean changeAllBlocks = true;
         boolean saveAllBlocks = true;
 
@@ -133,9 +130,9 @@ public class Zone extends ProviderStore implements WorldRasterizer, EntityProvid
         int offsetZ = chunk.getChunkWorldOffsetZ();
 
         //Save the blocks that aren't in the zone
-        for (int x = 0; x < SIZE_X; x++) {
-            for (int y = 0; y < SIZE_Y; y++) {
-                for (int z = 0; z < SIZE_Z; z++) {
+        for (int x = 0; x < Chunks.SIZE_X; x++) {
+            for (int y = 0; y <Chunks.SIZE_Y; y++) {
+                for (int z = 0; z < Chunks.SIZE_Z; z++) {
                     if (!containsBlock(x + offsetX, y + offsetY, z + offsetZ, chunkRegion)) {
                         savedBlocks[x][y][z] = chunk.getBlock(x, y, z);
                         changeAllBlocks = false;
@@ -153,9 +150,9 @@ public class Zone extends ProviderStore implements WorldRasterizer, EntityProvid
 
             //Replace any blocks that aren't in the zone
             if (!changeAllBlocks) {
-                for (int x = 0; x < SIZE_X; x++) {
-                    for (int y = 0; y < SIZE_Y; y++) {
-                        for (int z = 0; z < SIZE_Z; z++) {
+                for (int x = 0; x < Chunks.SIZE_X; x++) {
+                    for (int y = 0; y < Chunks.SIZE_Y; y++) {
+                        for (int z = 0; z < Chunks.SIZE_Z; z++) {
                             Block block = savedBlocks[x][y][z];
                             if (block != null) {
                                 chunk.setBlock(x, y, z, block);

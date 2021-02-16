@@ -23,8 +23,6 @@ import org.terasology.entitySystem.entity.EntityBuilder;
 import org.terasology.entitySystem.entity.EntityPool;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.prefab.Prefab;
-import org.terasology.math.geom.Quat4f;
-import org.terasology.math.geom.Vector3f;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -101,28 +99,13 @@ public class PojoSectorManager implements EngineSectorManager {
     }
 
     @Override
-    public EntityRef create(String prefab, Vector3f position) {
-        return getPool().create(prefab, position);
-    }
-
-    @Override
     public EntityRef create(String prefab, Vector3fc position) {
-        return getPool().create(prefab, position);
-    }
-
-    @Override
-    public EntityRef create(Prefab prefab, Vector3f position) {
         return getPool().create(prefab, position);
     }
 
     @Override
     public EntityRef create(Prefab prefab, Vector3fc position) {
         return getPool().create(prefab, position);
-    }
-
-    @Override
-    public EntityRef create(Prefab prefab, Vector3f position, Quat4f rotation) {
-        return getPool().create(prefab, position, rotation);
     }
 
     @Override

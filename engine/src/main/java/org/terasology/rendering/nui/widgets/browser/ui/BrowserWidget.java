@@ -1,9 +1,9 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.rendering.nui.widgets.browser.ui;
 
-import org.joml.Rectanglei;
 import org.joml.Vector2i;
+import org.terasology.joml.geom.Rectanglei;
 import org.terasology.nui.BaseInteractionListener;
 import org.terasology.nui.Canvas;
 import org.terasology.nui.CoreWidget;

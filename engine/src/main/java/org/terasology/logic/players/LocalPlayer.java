@@ -1,21 +1,10 @@
-/*
- * Copyright 2013 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.logic.players;
 
 import com.google.common.collect.Sets;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.characters.CharacterMovementComponent;
@@ -24,8 +13,6 @@ import org.terasology.logic.characters.events.ActivationPredicted;
 import org.terasology.logic.characters.events.ActivationRequest;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.Direction;
-import org.terasology.math.geom.Quat4f;
-import org.terasology.math.geom.Vector3f;
 import org.terasology.network.ClientComponent;
 import org.terasology.physics.HitResult;
 import org.terasology.physics.Physics;
@@ -98,85 +85,115 @@ public class LocalPlayer {
     public boolean isValid() {
         EntityRef characterEntity = getCharacterEntity();
         return characterEntity.exists() && characterEntity.hasComponent(LocationComponent.class) && characterEntity.hasComponent(CharacterComponent.class)
-               && characterEntity.hasComponent(CharacterMovementComponent.class);
+                && characterEntity.hasComponent(CharacterMovementComponent.class);
     }
 
-    public Vector3f getPosition() {
-        return getPosition(new Vector3f());
-    }
-
-    public Vector3f getPosition(Vector3f out) {
+    /**
+     * the position of the local player
+     *
+     * @param dest will hold the result
+     * @return dest
+     */
+    public Vector3f getPosition(Vector3f dest) {
         LocationComponent location = getCharacterEntity().getComponent(LocationComponent.class);
-        if (location == null || Float.isNaN(location.getWorldPosition().x)) {
-            return out;
+        if (location != null) {
+            Vector3f result = location.getWorldPosition(new Vector3f());
+            if (result.isFinite()) { //TODO: MP finite check seems to hide a larger underlying problem
+                dest.set(result);
+            }
         }
-        return location.getWorldPosition(out);
+        return dest;
     }
 
-    public Quat4f getRotation() {
+    /**
+     * the rotation of the local player
+     *
+     * @param dest will hold the result
+     * @return dest
+     */
+    public Quaternionf getRotation(Quaternionf dest) {
         LocationComponent location = getCharacterEntity().getComponent(LocationComponent.class);
-        if (location == null || Float.isNaN(location.getWorldPosition().x)) {
-            return new Quat4f(Quat4f.IDENTITY);
+        if (location != null) {
+            Quaternionf result = location.getWorldRotation(new Quaternionf());
+            if (result.isFinite()) { //TODO: MP finite check seems to hide a larger underlying problem
+                dest.set(result);
+            }
         }
-        return location.getWorldRotation();
+        return dest;
     }
 
-    public Vector3f getViewPosition() {
-        return getViewPosition(new Vector3f());
-    }
-
-    public Vector3f getViewPosition(Vector3f out) {
+    /**
+     * position of camera if one is present else use {@link #getPosition(Vector3f)}
+     *
+     * @param dest will hold the result
+     * @return dest
+     */
+    public Vector3f getViewPosition(Vector3f dest) {
         ClientComponent clientComponent = getClientEntity().getComponent(ClientComponent.class);
         if (clientComponent == null) {
-            return out;
+            return dest;
         }
         LocationComponent location = clientComponent.camera.getComponent(LocationComponent.class);
-        if (location == null || Float.isNaN(location.getWorldPosition().x)) {
-            return getPosition();
+        if (location != null) {
+            Vector3f result = location.getWorldPosition(new Vector3f());
+            if (result.isFinite()) { //TODO: MP finite check seems to hide a larger underlying problem
+                dest.set(result);
+                return dest;
+            }
         }
-
-        return location.getWorldPosition(out);
+        return getPosition(dest);
     }
 
-    public Quat4f getViewRotation() {
+    /**
+     * orientation of camera if one is present else use {@link #getPosition(Vector3f)}
+     *
+     * @param dest will hold the result
+     * @return dest
+     */
+    public Quaternionf getViewRotation(Quaternionf dest) {
         ClientComponent clientComponent = getClientEntity().getComponent(ClientComponent.class);
         if (clientComponent == null) {
-            return new Quat4f(Quat4f.IDENTITY);
+            return new Quaternionf();
         }
         LocationComponent location = clientComponent.camera.getComponent(LocationComponent.class);
-        if (location == null || Float.isNaN(location.getWorldPosition().x)) {
-            return getRotation();
+        if (location != null) {
+            Quaternionf result = location.getWorldRotation(new Quaternionf());
+            if (result.isFinite()) { //TODO: MP finite check seems to hide a larger underlying problem
+                dest.set(result);
+                return dest;
+            }
         }
-
-        return location.getWorldRotation();
+        return getRotation(dest);
     }
 
-    public Vector3f getViewDirection() {
-        Quat4f rot = getViewRotation();
-        // TODO: Put a generator for direction vectors in a util class somewhere
-        // And just put quaternion -> vector somewhere too
-        Vector3f dir = Direction.FORWARD.getVector3f();
-        return rot.rotate(dir, dir);
+    /**
+     * forward view direction of camera view
+     *
+     * @param dest will hold the result
+     * @return dest
+     */
+    public Vector3f getViewDirection(Vector3f dest) {
+        Quaternionf rot = getViewRotation(new Quaternionf());
+        return rot.transform(Direction.FORWARD.asVector3f(), dest);
     }
 
-    public Vector3f getVelocity() {
+    public Vector3f getVelocity(Vector3f dest) {
         CharacterMovementComponent movement = getCharacterEntity().getComponent(CharacterMovementComponent.class);
         if (movement != null) {
-            return new Vector3f(movement.getVelocity());
+            return dest.set(movement.getVelocity());
         }
-        return new Vector3f();
+        return dest;
     }
 
 
     /**
      * Can be used by modules to trigger the activation of a player owned entity like an item.
-     *
-     * The method has been made for the usage on the client. It triggers a {@link ActivationPredicted} event
-     * on the client and a {@link ActivationRequest} event on the server which will lead
-     * to a {@link org.terasology.logic.common.ActivateEvent} on the server.
+     * <p>
+     * The method has been made for the usage on the client. It triggers a {@link ActivationPredicted} event on the
+     * client and a {@link ActivationRequest} event on the server which will lead to a {@link
+     * org.terasology.logic.common.ActivateEvent} on the server.
      *
      * @param usedOwnedEntity an entity owned by the player like an item.
-     *
      */
     public void activateOwnedEntityAsClient(EntityRef usedOwnedEntity) {
         if (!usedOwnedEntity.exists()) {
@@ -187,7 +204,7 @@ public class LocalPlayer {
 
     /**
      * Tries to activate the target the player is pointing at.
-     *
+     * <p>
      * This method is indented to be used on the client.
      *
      * @return true if a target got activated.
@@ -197,38 +214,41 @@ public class LocalPlayer {
     }
 
     /**
-     *
      * @param usedOwnedEntity if it does not exist it is not an item usage.
      * @return true if an activation request got sent. Returns always true if usedItem exists.
      */
     private boolean activateTargetOrOwnedEntity(EntityRef usedOwnedEntity) {
         EntityRef character = getCharacterEntity();
         CharacterComponent characterComponent = character.getComponent(CharacterComponent.class);
-        Vector3f direction = getViewDirection();
-        Vector3f originPos = getViewPosition();
+        Vector3f direction = getViewDirection(new Vector3f());
+        Vector3f originPos = getViewPosition(new Vector3f());
         if (recordAndReplayCurrentStatus.getStatus() == RecordAndReplayStatus.RECORDING) {
             this.directionAndOriginPosRecorderList.getTargetOrOwnedEntityDirectionAndOriginPosRecorder().add(direction, originPos);
         } else if (recordAndReplayCurrentStatus.getStatus() == RecordAndReplayStatus.REPLAYING) {
-            Vector3f[] data = this.directionAndOriginPosRecorderList.getTargetOrOwnedEntityDirectionAndOriginPosRecorder().poll();
+            Vector3f[] data =
+                    this.directionAndOriginPosRecorderList.getTargetOrOwnedEntityDirectionAndOriginPosRecorder().poll();
             direction = data[0];
             originPos = data[1];
         }
         boolean ownedEntityUsage = usedOwnedEntity.exists();
         int activationId = nextActivationId++;
         Physics physics = CoreRegistry.get(Physics.class);
-        HitResult result = physics.rayTrace(originPos, direction, characterComponent.interactionRange, Sets.newHashSet(character), CharacterSystem.DEFAULTPHYSICSFILTER);
+        HitResult result = physics.rayTrace(originPos, direction, characterComponent.interactionRange,
+                Sets.newHashSet(character), CharacterSystem.DEFAULTPHYSICSFILTER);
         boolean eventWithTarget = result.isHit();
         if (eventWithTarget) {
             EntityRef activatedObject = usedOwnedEntity.exists() ? usedOwnedEntity : result.getEntity();
             activatedObject.send(new ActivationPredicted(character, result.getEntity(), originPos, direction,
                     result.getHitPoint(), result.getHitNormal(), activationId));
-            character.send(new ActivationRequest(character, ownedEntityUsage, usedOwnedEntity, eventWithTarget, result.getEntity(),
+            character.send(new ActivationRequest(character, ownedEntityUsage, usedOwnedEntity, eventWithTarget,
+                    result.getEntity(),
                     originPos, direction, result.getHitPoint(), result.getHitNormal(), activationId));
             return true;
         } else if (ownedEntityUsage) {
             usedOwnedEntity.send(new ActivationPredicted(character, EntityRef.NULL, originPos, direction,
                     originPos, new Vector3f(), activationId));
-            character.send(new ActivationRequest(character, ownedEntityUsage, usedOwnedEntity, eventWithTarget, EntityRef.NULL,
+            character.send(new ActivationRequest(character, ownedEntityUsage, usedOwnedEntity, eventWithTarget,
+                    EntityRef.NULL,
                     originPos, direction, originPos, new Vector3f(), activationId));
             return true;
         }
@@ -238,9 +258,9 @@ public class LocalPlayer {
 
     @Override
     public String toString() {
+        Vector3f pos = getPosition(new Vector3f());
         return String.format("player (x: %.2f, y: %.2f, z: %.2f | x: %.2f, y: %.2f, z: %.2f)",
-                getPosition().x, getPosition().y, getPosition().z, getViewDirection().x, getViewDirection().y, getViewDirection().z);
+                pos.x, pos.y, pos.z, getViewDirection(new Vector3f()).x,
+                getViewDirection(new Vector3f()).y, getViewDirection(new Vector3f()).z);
     }
-
-
 }

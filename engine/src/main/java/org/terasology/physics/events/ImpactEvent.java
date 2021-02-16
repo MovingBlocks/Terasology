@@ -16,11 +16,11 @@
 
 package org.terasology.physics.events;
 
-import org.terasology.math.geom.Vector3f;
-import org.terasology.network.BroadcastEvent;
+import org.joml.Vector3f;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.AbstractConsumableEvent;
 import org.terasology.math.Side;
+import org.terasology.network.BroadcastEvent;
 
 /**
  * Impact event is called whenever an item has enough speed to detect

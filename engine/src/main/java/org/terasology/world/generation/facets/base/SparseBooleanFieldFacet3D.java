@@ -17,8 +17,9 @@
 package org.terasology.world.generation.facets.base;
 
 import com.google.common.collect.Maps;
-import org.terasology.math.Region3i;
-import org.terasology.math.geom.Vector3i;
+import org.joml.Vector3i;
+import org.joml.Vector3ic;
+import org.terasology.world.block.BlockRegionc;
 import org.terasology.world.generation.Border3D;
 
 import java.util.Collections;
@@ -26,21 +27,19 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 /**
- * A sparse (map-based) implementation
- * of {@link ObjectFacet3D}.
- *
+ * A sparse (map-based) implementation of {@link ObjectFacet3D}.
  */
 public abstract class SparseBooleanFieldFacet3D extends SparseFacet3D implements BooleanFieldFacet3D {
 
-    private final Map<Vector3i, Boolean> relData = Maps.newLinkedHashMap();
+    private final Map<Vector3ic, Boolean> relData = Maps.newLinkedHashMap();
 
     private final boolean defValue;
 
-    public SparseBooleanFieldFacet3D(Region3i targetRegion, Border3D border) {
+    public SparseBooleanFieldFacet3D(BlockRegionc targetRegion, Border3D border) {
         this(targetRegion, border, false);
     }
 
-    public SparseBooleanFieldFacet3D(Region3i targetRegion, Border3D border, boolean defValue) {
+    public SparseBooleanFieldFacet3D(BlockRegionc targetRegion, Border3D border, boolean defValue) {
         super(targetRegion, border);
         this.defValue = defValue;
     }
@@ -51,8 +50,8 @@ public abstract class SparseBooleanFieldFacet3D extends SparseFacet3D implements
     }
 
     @Override
-    public boolean get(Vector3i pos) {
-        checkRelativeCoords(pos.x, pos.y, pos.z);
+    public boolean get(Vector3ic pos) {
+        checkRelativeCoords(pos.x(), pos.y(), pos.z());
 
         Boolean boxed = relData.get(pos);
         return (boxed != null) ? boxed : defValue;
@@ -64,8 +63,8 @@ public abstract class SparseBooleanFieldFacet3D extends SparseFacet3D implements
     }
 
     @Override
-    public void set(Vector3i pos, boolean value) {
-        checkRelativeCoords(pos.x, pos.y, pos.z);
+    public void set(Vector3ic pos, boolean value) {
+        checkRelativeCoords(pos.x(), pos.y(), pos.z());
 
         if (value != defValue) {
             relData.put(pos, value);
@@ -73,8 +72,8 @@ public abstract class SparseBooleanFieldFacet3D extends SparseFacet3D implements
     }
 
     @Override
-    public boolean getWorld(Vector3i pos) {
-        return getWorld(pos.x, pos.y, pos.z);
+    public boolean getWorld(Vector3ic pos) {
+        return getWorld(pos.x(), pos.y(), pos.z());
     }
 
     @Override
@@ -87,8 +86,8 @@ public abstract class SparseBooleanFieldFacet3D extends SparseFacet3D implements
     }
 
     @Override
-    public void setWorld(Vector3i pos, boolean value) {
-        setWorld(pos.x, pos.y, pos.z, value);
+    public void setWorld(Vector3ic pos, boolean value) {
+        setWorld(pos.x(), pos.y(), pos.z(), value);
     }
 
     @Override
@@ -104,7 +103,7 @@ public abstract class SparseBooleanFieldFacet3D extends SparseFacet3D implements
     /**
      * @return an unmodifiable view on the relative entries
      */
-    public Map<Vector3i, Boolean> getRelativeEntries() {
+    public Map<Vector3ic, Boolean> getRelativeEntries() {
         return Collections.unmodifiableMap(relData);
     }
 
@@ -115,9 +114,9 @@ public abstract class SparseBooleanFieldFacet3D extends SparseFacet3D implements
 
         Map<Vector3i, Boolean> result = Maps.newLinkedHashMap();
 
-        for (Entry<Vector3i, Boolean> entry : relData.entrySet()) {
-            Vector3i relPos = entry.getKey();
-            Vector3i worldPos = relativeToWorld(relPos.x, relPos.y, relPos.z);
+        for (Entry<Vector3ic, Boolean> entry : relData.entrySet()) {
+            Vector3ic relPos = entry.getKey();
+            Vector3i worldPos = relativeToWorld(relPos.x(), relPos.y(), relPos.z());
 
             result.put(worldPos, entry.getValue());
         }

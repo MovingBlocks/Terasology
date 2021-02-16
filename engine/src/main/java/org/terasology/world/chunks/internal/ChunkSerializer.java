@@ -1,29 +1,17 @@
-/*
- * Copyright 2014 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.world.chunks.internal;
 
 import com.google.common.base.Preconditions;
 import com.google.protobuf.ByteString;
 import gnu.trove.list.TByteList;
 import gnu.trove.list.array.TByteArrayList;
-import org.terasology.math.geom.Vector3i;
+import org.joml.Vector3i;
+import org.joml.Vector3ic;
 import org.terasology.protobuf.EntityData;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.chunks.Chunk;
-import org.terasology.world.chunks.ChunkConstants;
+import org.terasology.world.chunks.Chunks;
 import org.terasology.world.chunks.blockdata.ExtraBlockDataManager;
 import org.terasology.world.chunks.blockdata.TeraArray;
 import org.terasology.world.chunks.blockdata.TeraDenseArray16Bit;
@@ -36,14 +24,13 @@ public final class ChunkSerializer {
     private ChunkSerializer() {
     }
 
-    public static EntityData.ChunkStore.Builder encode(Vector3i pos, TeraArray blockData, TeraArray[] extraData) {
+    public static EntityData.ChunkStore.Builder encode(Vector3ic pos, TeraArray blockData, TeraArray[] extraData) {
         final EntityData.ChunkStore.Builder b = EntityData.ChunkStore.newBuilder()
-                .setX(pos.x).setY(pos.y).setZ(pos.z);
+            .setX(pos.x()).setY(pos.y()).setZ(pos.z());
         b.setBlockData(runLengthEncode16(blockData));
-        for (int i = 0; i < extraData.length; i++) {
-            b.addExtraData(runLengthEncode16(extraData[i]));
+        for (TeraArray extraDatum : extraData) {
+            b.addExtraData(runLengthEncode16(extraDatum));
         }
-
         return b;
     }
 
@@ -58,7 +45,7 @@ public final class ChunkSerializer {
         }
 
         final TeraArray blockData = runLengthDecode(message.getBlockData());
-        final TeraArray[] extraData = extraDataManager.makeDataArrays(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z);
+        final TeraArray[] extraData = extraDataManager.makeDataArrays(Chunks.SIZE_X, Chunks.SIZE_Y, Chunks.SIZE_Z);
         for (int i = 0; i < extraData.length; i++) {
             runLengthDecode(message.getExtraData(i), extraData[i]);
         }
@@ -121,7 +108,7 @@ public final class ChunkSerializer {
 
     private static TeraArray runLengthDecode(EntityData.RunLengthEncoding16 data) {
         Preconditions.checkState(data.getValuesCount() == data.getRunLengthsCount(), "Expected same number of values as runs");
-        short[] decodedData = new short[ChunkConstants.SIZE_X * ChunkConstants.SIZE_Y * ChunkConstants.SIZE_Z];
+        short[] decodedData = new short[Chunks.SIZE_X * Chunks.SIZE_Y * Chunks.SIZE_Z];
         int index = 0;
         for (int pos = 0; pos < data.getValuesCount(); ++pos) {
             int length = data.getRunLengths(pos);
@@ -130,12 +117,12 @@ public final class ChunkSerializer {
                 decodedData[index++] = value;
             }
         }
-        return new TeraDenseArray16Bit(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z, decodedData);
+        return new TeraDenseArray16Bit(Chunks.SIZE_X, Chunks.SIZE_Y, Chunks.SIZE_Z, decodedData);
     }
 
     private static TeraArray runLengthDecode(EntityData.RunLengthEncoding8 data) {
         Preconditions.checkState(data.getValues().size() == data.getRunLengthsCount(), "Expected same number of values as runs");
-        byte[] decodedData = new byte[ChunkConstants.SIZE_X * ChunkConstants.SIZE_Y * ChunkConstants.SIZE_Z];
+        byte[] decodedData = new byte[Chunks.SIZE_X * Chunks.SIZE_Y * Chunks.SIZE_Z];
         int index = 0;
         ByteString.ByteIterator valueSource = data.getValues().iterator();
         for (int pos = 0; pos < data.getRunLengthsCount(); ++pos) {
@@ -145,9 +132,9 @@ public final class ChunkSerializer {
                 decodedData[index++] = value;
             }
         }
-        return new TeraDenseArray8Bit(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z, decodedData);
+        return new TeraDenseArray8Bit(Chunks.SIZE_X, Chunks.SIZE_Y, Chunks.SIZE_Z, decodedData);
     }
-    
+
     /**
      * Decode compressed data into an existing TeraArray.
      * Generic w.r.t. TeraArray subclasses, allowing the data to be used for any type of TeraArray.

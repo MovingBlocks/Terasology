@@ -15,36 +15,28 @@
  */
 package org.terasology.physics.bullet.shapes;
 
-import com.bulletphysics.collision.shapes.BoxShape;
-import org.terasology.math.VecMath;
-import org.terasology.math.geom.Quat4f;
-import org.terasology.math.geom.Vector3f;
+import com.badlogic.gdx.physics.bullet.collision.btBoxShape;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
+import org.terasology.physics.shapes.BoxShape;
 import org.terasology.physics.shapes.CollisionShape;
 
-public class BulletBoxShape extends BulletCollisionShape implements org.terasology.physics.shapes.BoxShape {
-    private final BoxShape boxShape;
+public class BulletBoxShape extends BulletCollisionShape implements BoxShape {
+    private final btBoxShape boxShape;
 
     public BulletBoxShape(Vector3f halfExtents) {
-        this(VecMath.to(halfExtents));
-    }
-
-    private BulletBoxShape(javax.vecmath.Vector3f halfExtents) {
-        boxShape = new BoxShape(halfExtents);
+        boxShape = new btBoxShape(halfExtents);
         underlyingShape = boxShape;
     }
 
     @Override
-    public CollisionShape rotate(Quat4f rot) {
-        javax.vecmath.Vector3f halfExtentsWithMargin =
-                boxShape.getHalfExtentsWithMargin(new javax.vecmath.Vector3f());
-        com.bulletphysics.linearmath.QuaternionUtil.quatRotate(VecMath.to(rot), halfExtentsWithMargin, halfExtentsWithMargin);
-        halfExtentsWithMargin.absolute();
-        return new BulletBoxShape(halfExtentsWithMargin);
+    public CollisionShape rotate(Quaternionf rot) {
+        Vector3f halfExtentsWithMargin = new Vector3f(boxShape.getHalfExtentsWithMargin());
+        return new BulletBoxShape(halfExtentsWithMargin.rotate(rot).absolute());
     }
 
     @Override
-    public Vector3f getExtents() {
-        javax.vecmath.Vector3f out = new javax.vecmath.Vector3f();
-        return VecMath.from(boxShape.getHalfExtentsWithoutMargin(out)).scale(2);
+    public Vector3f getHalfExtentsWithoutMargin() {
+        return boxShape.getHalfExtentsWithoutMargin().mul(2);
     }
 }

@@ -31,7 +31,9 @@ import org.terasology.assets.AssetType;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.engine.GameThread;
 import org.terasology.engine.subsystem.lwjgl.GLBufferPool;
-import org.terasology.math.AABB;
+import org.terasology.engine.subsystem.lwjgl.LwjglGraphicsProcessing;
+import org.terasology.joml.geom.AABBf;
+import org.terasology.joml.geom.AABBfc;
 import org.terasology.rendering.VertexBufferObjectUtil;
 import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.rendering.assets.mesh.MeshData;
@@ -58,7 +60,7 @@ public class OpenGLMesh extends Mesh {
     private static final Logger logger = LoggerFactory.getLogger(OpenGLMesh.class);
 
     private static final int FLOAT_SIZE = 4;
-    private AABB aabb;
+    private AABBf aabb = new AABBf();
 
     private MeshData data;
 
@@ -77,10 +79,12 @@ public class OpenGLMesh extends Mesh {
 
     private DisposalAction disposalAction;
 
-    public OpenGLMesh(ResourceUrn urn, AssetType<?, MeshData> assetType, GLBufferPool bufferPool, MeshData data) {
+    public OpenGLMesh(ResourceUrn urn, AssetType<?, MeshData> assetType, GLBufferPool bufferPool, MeshData data, LwjglGraphicsProcessing graphicsProcessing) {
         super(urn, assetType);
         this.disposalAction = new DisposalAction(urn, bufferPool);
-        reload(data);
+        graphicsProcessing.asynchToDisplayThread(() -> {
+            reload(data);
+        });
     }
 
     @Override
@@ -93,7 +97,7 @@ public class OpenGLMesh extends Mesh {
     }
 
     @Override
-    public AABB getAABB() {
+    public AABBfc getAABB() {
         return aabb;
     }
 
@@ -223,8 +227,7 @@ public class OpenGLMesh extends Mesh {
 
         createVertexBuffer(parts, partSizes, vertexCount, vertexSize);
         createIndexBuffer(newData.getIndices());
-
-        aabb = AABB.createEncompasing(newData.getVertices());
+        getBound(newData, aabb);
     }
 
     private void createVertexBuffer(List<TFloatIterator> parts, TIntList partSizes, int vertexCount, int vertexSize) {
@@ -291,6 +294,4 @@ public class OpenGLMesh extends Mesh {
             }
         }
     }
-
-
 }

@@ -18,14 +18,15 @@ package org.terasology.engine.subsystem.headless.assets;
 import gnu.trove.list.TFloatList;
 import org.terasology.assets.AssetType;
 import org.terasology.assets.ResourceUrn;
-import org.terasology.math.AABB;
+import org.terasology.joml.geom.AABBf;
+import org.terasology.joml.geom.AABBfc;
 import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.rendering.assets.mesh.MeshData;
 
 public class HeadlessMesh extends Mesh {
 
     protected MeshData data;
-    protected AABB aabb;
+    protected AABBf aabb = new AABBf();
 
     public HeadlessMesh(ResourceUrn urn, AssetType<?, MeshData> assetType, MeshData meshData) {
         super(urn, assetType);
@@ -35,11 +36,11 @@ public class HeadlessMesh extends Mesh {
     @Override
     protected void doReload(MeshData meshData) {
         this.data = meshData;
-        this.aabb = AABB.createEncompasing(meshData.getVertices());
+        getBound(meshData, aabb);
     }
 
     @Override
-    public AABB getAABB() {
+    public AABBfc getAABB() {
         return aabb;
     }
 

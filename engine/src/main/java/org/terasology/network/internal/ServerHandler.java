@@ -16,11 +16,8 @@
 
 package org.terasology.network.internal;
 
-import org.jboss.netty.channel.ChannelHandlerContext;
-import org.jboss.netty.channel.ChannelStateEvent;
-import org.jboss.netty.channel.ExceptionEvent;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,9 +25,8 @@ import static org.terasology.protobuf.NetData.NetMessage;
 
 /**
  * This Netty handler is used to send and receive messages on the server end
- *
  */
-public class ServerHandler extends SimpleChannelUpstreamHandler {
+public class ServerHandler extends ChannelInboundHandlerAdapter {
     private static final Logger logger = LoggerFactory.getLogger(ServerHandler.class);
 
     private NetworkSystemImpl networkSystem;
@@ -46,26 +42,27 @@ public class ServerHandler extends SimpleChannelUpstreamHandler {
     }
 
     @Override
-    public void channelOpen(ChannelHandlerContext ctx, ChannelStateEvent e) {
-        networkSystem.registerChannel(e.getChannel());
+    public void channelActive(ChannelHandlerContext ctx) throws Exception {
+        networkSystem.registerChannel(ctx.channel());
     }
 
     @Override
-    public void channelDisconnected(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
+    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         if (client != null) {
             networkSystem.removeClient(client);
         }
     }
 
     @Override
-    public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) {
-        NetMessage message = (NetMessage) e.getMessage();
+    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+        NetMessage message = (NetMessage) msg;
         client.messageReceived(message);
     }
 
     @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e) {
-        logger.warn("Unexpected exception from client", e.getCause());
-        e.getChannel().close();
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        logger.warn("Unexpected exception from client", cause);
+        ctx.channel().close();
     }
+
 }
