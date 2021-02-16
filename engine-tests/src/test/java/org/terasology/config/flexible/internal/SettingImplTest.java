@@ -1,4 +1,4 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.config.flexible.internal;
 
@@ -91,7 +91,7 @@ public class SettingImplTest {
 
         @Test
         void testDoesNotSetValue() {
-            assertFalse(setting.set(25));
+            assertFalse(setting.set(101));
 
             assertEquals(-1, eventResult);
         }
