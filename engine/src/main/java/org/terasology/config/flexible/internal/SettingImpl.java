@@ -1,4 +1,4 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.config.flexible.internal;
 
@@ -11,8 +11,9 @@ import org.terasology.config.flexible.SettingChangeListener;
 import org.terasology.config.flexible.constraints.SettingConstraint;
 import org.terasology.reflection.TypeInfo;
 
+import java.util.Optional;
 import java.util.Set;
-import java.util.function.Function;
+import java.util.function.Supplier;
 
 /**
  * {@inheritDoc}
@@ -27,8 +28,8 @@ class SettingImpl<T> implements Setting<T> {
 
     private final String humanReadableName;
     private final String description;
-    private final String systemProperty;
-    private final Function<String, T> systemPropertyConverter;
+
+    private final Supplier<Optional<T>> override;
 
     private final SettingConstraint<T> constraint;
     private final Set<SettingChangeListener<T>> subscribers = Sets.newHashSet();
@@ -46,15 +47,13 @@ class SettingImpl<T> implements Setting<T> {
      * @param systemProperty
      */
     SettingImpl(TypeInfo<T> valueType, T defaultValue, SettingConstraint<T> constraint,
-                String humanReadableName, String description, String systemProperty,
-                Function<String, T> systemPropertyConverter) {
+                String humanReadableName, String description, Supplier<Optional<T>> override) {
         this.valueType = valueType;
         this.humanReadableName = humanReadableName;
         this.description = description;
 
         this.constraint = constraint;
-        this.systemProperty = systemProperty;
-        this.systemPropertyConverter = systemPropertyConverter;
+        this.override = override;
 
         Preconditions.checkNotNull(defaultValue, "The default value for a Setting cannot be null.");
 
@@ -79,18 +78,6 @@ class SettingImpl<T> implements Setting<T> {
         } else {
             constraint.warnUnsatisfiedBy(theValue);
             return true;
-        }
-    }
-
-    private T getSystemPropertyValue() {
-        if (systemProperty == null) {
-            return null;
-        }
-        String sysPropValue = System.getProperty(systemProperty);
-        if (sysPropValue != null) {
-            return systemPropertyConverter.apply(sysPropValue);
-        } else {
-            return null;
         }
     }
 
@@ -143,18 +130,14 @@ class SettingImpl<T> implements Setting<T> {
 
     @Override
     public T get() {
-        T systemPropertyValue = getSystemPropertyValue();
-        if (systemPropertyValue != null) {
-            return systemPropertyValue;
-        }
-        return value;
+        return override.get().orElse(value);
     }
 
     @Override
     public boolean set(T newValue) {
         Preconditions.checkNotNull(newValue, "The value of a setting cannot be null.");
 
-        if (getSystemPropertyValue() != null) {
+        if (override.get().isPresent()) {
             LOGGER.warn("An attempt was made to overwrite the value specified in the System property." +
                     " This will give nothing while the System Property value is supplied");
             return false;

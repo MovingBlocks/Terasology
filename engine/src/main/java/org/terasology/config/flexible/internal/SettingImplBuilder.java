@@ -1,4 +1,4 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.config.flexible.internal;
 
@@ -6,7 +6,8 @@ import org.terasology.config.flexible.Setting;
 import org.terasology.config.flexible.constraints.SettingConstraint;
 import org.terasology.reflection.TypeInfo;
 
-import java.util.function.Function;
+import java.util.Optional;
+import java.util.function.Supplier;
 
 public class SettingImplBuilder<T> implements SettingBuilder<T> {
     private T defaultValue;
@@ -14,9 +15,8 @@ public class SettingImplBuilder<T> implements SettingBuilder<T> {
     private String humanReadableName = "";
     private String description = "";
     private TypeInfo<T> valueType;
-    private String systemProperty;
-    private Function<String, T> converter;
-
+    private Supplier<Optional<T>> override = Optional::empty;
+    
     @Override
     public SettingBuilder<T> valueType(TypeInfo<T> valueType) {
         this.valueType = valueType;
@@ -54,15 +54,13 @@ public class SettingImplBuilder<T> implements SettingBuilder<T> {
     }
 
     @Override
-    public SettingBuilder<T> systemProperty(String systemProperty, Function<String, T> converter) {
-        this.systemProperty = systemProperty;
-        this.converter = converter;
+    public SettingBuilder<T> override(Supplier<Optional<T>> overrideProvider) {
+        this.override = overrideProvider;
         return this;
     }
 
     @Override
     public Setting<T> build() {
-        return new SettingImpl<>(valueType, defaultValue, constraint, humanReadableName, description, systemProperty,
-                converter);
+        return new SettingImpl<>(valueType, defaultValue, constraint, humanReadableName, description, override);
     }
 }

@@ -1,4 +1,4 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.config.flexible.internal;
 
@@ -6,7 +6,8 @@ import org.terasology.config.flexible.Setting;
 import org.terasology.config.flexible.constraints.SettingConstraint;
 import org.terasology.reflection.TypeInfo;
 
-import java.util.function.Function;
+import java.util.Optional;
+import java.util.function.Supplier;
 
 /**
  * A builder for creating a {@link Setting} storing values of type {@link T}.
@@ -55,13 +56,11 @@ public interface SettingBuilder<T> {
     SettingBuilder<T> description(String description);
 
     /**
-     * Specfies the system property of the {@link Setting} being created.
-     *
-     * @param systemProperty This system property which will rewrite value.
-     * @param converter converter for systemProperty: String -> T
-     * @return The builder object.
+     * Specfies the override f the {@link Setting} being created.
+     * @param overrideProvider The Supplier which provide override for settings value if exists.
+     * @return This builder object.
      */
-    SettingBuilder<T> systemProperty(String systemProperty, Function<String, T> converter);
+    SettingBuilder<T> override(Supplier<Optional<T>> overrideProvider);
 
     /**
      * Builds the {@link Setting} with the components that have already been specified and returns it.

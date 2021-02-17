@@ -1,4 +1,4 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.config.flexible;
 
@@ -6,8 +6,9 @@ import org.terasology.config.flexible.constraints.SettingConstraint;
 import org.terasology.config.flexible.internal.SettingBuilder;
 import org.terasology.reflection.TypeInfo;
 
+import java.util.Optional;
 import java.util.function.BiConsumer;
-import java.util.function.Function;
+import java.util.function.Supplier;
 
 public class SettingArgument<P, V> {
     private P argument;
@@ -43,10 +44,8 @@ public class SettingArgument<P, V> {
         return new SettingArgument<>(description, SettingBuilder::description);
     }
 
-    public static <V> SettingArgument<String, V> systemProperty(String systemProperty,
-                                                                Function<String, V> systemPropertyConverter) {
-        return new SettingArgument<>(systemProperty, (builder, string) -> builder.systemProperty(string,
-                systemPropertyConverter));
+    public static <V> SettingArgument<Supplier<Optional<V>>, V> override(Supplier<Optional<V>> overrideProvider) {
+        return new SettingArgument<>(overrideProvider, SettingBuilder::override);
     }
 
 

@@ -1,4 +1,4 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.config;
@@ -9,10 +9,11 @@ import org.terasology.config.flexible.constraints.NumberRangeConstraint;
 
 import java.util.Locale;
 import java.util.Locale.Category;
+import java.util.Optional;
 
 import static org.terasology.config.flexible.SettingArgument.constraint;
 import static org.terasology.config.flexible.SettingArgument.defaultValue;
-import static org.terasology.config.flexible.SettingArgument.systemProperty;
+import static org.terasology.config.flexible.SettingArgument.override;
 import static org.terasology.config.flexible.SettingArgument.type;
 
 public class SystemConfig extends AutoConfig {
@@ -56,7 +57,9 @@ public class SystemConfig extends AutoConfig {
     public final Setting<Boolean> writeSaveGamesEnabled = setting(
             type(Boolean.class),
             defaultValue(true),
-            systemProperty(SAVED_GAMES_ENABLED_PROPERTY, Boolean::parseBoolean)
+            override(() -> Optional.ofNullable(
+                    System.getProperty(SAVED_GAMES_ENABLED_PROPERTY))
+                    .map(Boolean::parseBoolean))
     );
 
     public final Setting<Long> chunkGenerationFailTimeoutInMs = setting(
