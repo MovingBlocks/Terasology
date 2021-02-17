@@ -250,6 +250,8 @@ public class ChunkMesh {
      * @param chunkPosition a Vector3f storing the world position of the chunk.
      * @param cameraPosition a Vector3f storing the world position of the point of view from which the chunk is rendered.
      * @return Returns an integer representing the number of triangles rendered.
+     * @deprecated This method uses legacy calls for opengl fixed function pipleine. transform will be set by the shader
+     *  use {@link #render(RenderPhase)}
      */
     @Deprecated
     public int render(ChunkMesh.RenderPhase phase, Vector3fc chunkPosition, Vector3fc cameraPosition) {
