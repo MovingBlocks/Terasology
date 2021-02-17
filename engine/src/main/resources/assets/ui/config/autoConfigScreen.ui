@@ -1,5 +1,5 @@
 {
-  "type": "AutoConfigTestScreen",
+  "type": "AutoConfigScreen",
   "skin": "engine:mainMenu",
   "contents": {
     "type": "RelativeLayout",
