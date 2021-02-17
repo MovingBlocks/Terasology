@@ -1,4 +1,4 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.config.flexible.ui;
 
@@ -12,6 +12,7 @@ import org.terasology.i18n.TranslationSystem;
 import org.terasology.nui.UIWidget;
 import org.terasology.nui.layouts.PropertyLayout;
 import org.terasology.nui.properties.Property;
+import org.terasology.nui.widgets.types.RegisterTypeWidgetFactory;
 import org.terasology.nui.widgets.types.TypeWidgetBuilder;
 import org.terasology.nui.widgets.types.TypeWidgetFactory;
 import org.terasology.nui.widgets.types.TypeWidgetLibrary;
@@ -44,6 +45,7 @@ import java.util.Optional;
  * }
  * </pre>
  */
+@RegisterTypeWidgetFactory
 public class AutoConfigWidgetFactory implements TypeWidgetFactory {
     private static final Logger logger = LoggerFactory.getLogger(AutoConfigWidgetFactory.class);
     private final SettingWidgetFactory settingWidgetFactory;

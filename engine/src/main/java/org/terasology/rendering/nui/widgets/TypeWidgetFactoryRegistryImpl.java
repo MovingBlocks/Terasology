@@ -1,12 +1,9 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.rendering.nui.widgets;
 
 import com.google.common.collect.Maps;
-import org.terasology.assets.management.AssetManager;
-import org.terasology.config.flexible.ui.AutoConfigWidgetFactory;
 import org.terasology.context.Context;
-import org.terasology.engine.module.ModuleManager;
 import org.terasology.nui.widgets.types.TypeWidgetFactory;
 import org.terasology.nui.widgets.types.TypeWidgetFactoryRegistry;
 import org.terasology.nui.widgets.types.TypeWidgetLibrary;
@@ -65,7 +62,6 @@ public class TypeWidgetFactoryRegistryImpl implements TypeWidgetFactoryRegistry 
         add(new EnumWidgetFactory());
         add(new CollectionWidgetFactory(constructorLibrary));
         add(new ArrayWidgetFactory(constructorLibrary));
-        add(new AutoConfigWidgetFactory(context.get(ModuleManager.class), context.get(AssetManager.class)));
     }
 
     @Override
