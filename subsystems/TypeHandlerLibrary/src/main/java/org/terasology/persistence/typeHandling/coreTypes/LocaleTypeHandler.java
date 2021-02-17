@@ -1,14 +1,14 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-package org.terasology.config.flexible.typehandling;
+package org.terasology.persistence.typeHandling.coreTypes;
 
 import org.terasology.persistence.typeHandling.StringRepresentationTypeHandler;
 
 import java.util.Locale;
 
 /**
- * Locale type handler for {@link org.terasology.config.SystemConfig#locale}
+ * Serializes objects of type {@link java.util.Locale}
  */
 public class LocaleTypeHandler extends StringRepresentationTypeHandler<Locale> {
     @Override
