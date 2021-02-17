@@ -10,9 +10,7 @@ import org.reflections.scanners.SubTypesScanner
 import org.reflections.scanners.TypeAnnotationsScanner
 import org.reflections.util.ConfigurationBuilder
 import org.reflections.util.FilterBuilder
-import org.terasology.gradology.ModuleInfoException
 import org.terasology.gradology.ModuleMetadataForGradle
-import org.terasology.module.ModuleMetadataJsonAdapter
 
 plugins {
     `java-library`
@@ -20,25 +18,11 @@ plugins {
     id("eclipse")
 }
 
-val moduleFile = file("module.txt")
+val moduleMetadata = ModuleMetadataForGradle.forProject(project)
 
-// The module file should always exist if the module was correctly created or cloned using Gradle
-if (!moduleFile.exists()) {
-    println("Y U NO EXIST MODULE.TXT!")
-    throw GradleException("Failed to find module.txt for " + project.name)
-}
-
-val moduleConfig = try {
-    moduleFile.reader().use {
-        ModuleMetadataJsonAdapter().read(it)!!
-    }
-} catch (e: Exception) {
-    throw ModuleInfoException(e, moduleFile, project)
-}
-
-project.version = moduleConfig.version
+project.version = moduleMetadata.version
 // Jenkins-Artifactory integration catches on to this as part of the Maven-type descriptor
-project.group = "org.terasology.modules"
+project.group = moduleMetadata.group
 
 logger.info("Version for {} loaded as {} for group {}", project.name, project.version, project.group)
 
@@ -58,9 +42,6 @@ configure<SourceSetContainer> {
 val convention = project.getConvention().getPlugin(JavaPluginConvention::class)
 val mainSourceSet = convention.getSourceSets().getByName("main")
 
-
-val frig = ModuleMetadataForGradle(moduleConfig)
-
 configurations {
     all {
         resolutionStrategy.preferProjectModules()
@@ -69,10 +50,10 @@ configurations {
 
 // Set dependencies. Note that the dependency information from module.txt is used for other Terasology modules
 dependencies {
-    implementation(group = "org.terasology.engine", name = "engine", version = frig.engineVersion())
-    implementation(group = "org.terasology.engine", name = "engine-tests", version = frig.engineVersion())
+    implementation(group = "org.terasology.engine", name = "engine", version = moduleMetadata.engineVersion())
+    implementation(group = "org.terasology.engine", name = "engine-tests", version = moduleMetadata.engineVersion())
 
-    for ((gradleDep, optional) in frig.moduleDependencies()) {
+    for ((gradleDep, optional) in moduleMetadata.moduleDependencies()) {
         if (optional) {
             // `optional` module dependencies are ones it does not require for runtime
             // (but will use opportunistically if available)
