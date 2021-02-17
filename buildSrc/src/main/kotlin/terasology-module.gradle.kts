@@ -14,8 +14,8 @@ import org.terasology.gradology.ModuleMetadataForGradle
 
 plugins {
     `java-library`
-    id("idea")
-    id("eclipse")
+    idea
+    eclipse
 }
 
 val moduleMetadata = ModuleMetadataForGradle.forProject(project)
@@ -32,15 +32,13 @@ apply(from = "$rootDir/config/gradle/publish.gradle")
 
 // Handle some logic related to where what is
 configure<SourceSetContainer> {
-    named("main") {
-        java.outputDir = File("$buildDir/classes")
+    main {
+        java.outputDir = buildDir.resolve("classes")
     }
-    named("test") {
-        java.outputDir = File("$buildDir/testClasses")
+    test {
+        java.outputDir = buildDir.resolve("testClasses")
     }
 }
-val convention = project.getConvention().getPlugin(JavaPluginConvention::class)
-val mainSourceSet = convention.getSourceSets().getByName("main")
 
 configurations {
     all {
@@ -127,6 +125,10 @@ tasks.register("createSkeleton") {
     mkdir("src/test/java")
 }
 
+
+val mainSourceSet: SourceSet = sourceSets[SourceSet.MAIN_SOURCE_SET_NAME]
+
+
 tasks.register("cacheReflections") {
     description = "Caches reflection output to make regular startup faster. May go stale and need cleanup at times."
     inputs.files(mainSourceSet.output.classesDirs)
@@ -193,8 +195,8 @@ configure<IdeaModel> {
     module {
         // Change around the output a bit
         inheritOutputDirs = false
-        outputDir = file("build/classes")
-        testOutputDir = file("build/testClasses")
+        outputDir = buildDir.resolve("classes")
+        testOutputDir = buildDir.resolve("testClasses")
         isDownloadSources = true
     }
 }
