@@ -10,6 +10,7 @@ import org.reflections.scanners.SubTypesScanner
 import org.reflections.scanners.TypeAnnotationsScanner
 import org.reflections.util.ConfigurationBuilder
 import org.reflections.util.FilterBuilder
+import org.terasology.gradology.ModuleInfoException
 import org.terasology.gradology.ModuleMetadataForGradle
 import org.terasology.module.ModuleMetadataJsonAdapter
 
@@ -25,35 +26,6 @@ val moduleFile = file("module.txt")
 if (!moduleFile.exists()) {
     println("Y U NO EXIST MODULE.TXT!")
     throw GradleException("Failed to find module.txt for " + project.name)
-}
-
-class ModuleInfoException(
-    cause: Throwable,
-    @Suppress("MemberVisibilityCanBePrivate") val file: File? = null,
-    private val project: Project? = null
-) : RuntimeException(cause) {
-    override val message: String
-        get() {
-            // trying to get the fully-qualified-class-name-mess off the front and just show
-            // the useful part.
-            val detail = cause?.cause?.localizedMessage ?: cause?.localizedMessage
-            return "Error while reading module info from ${describeFile()}:\n  ${detail}"
-        }
-
-    private fun describeFile(): String {
-        return if (project != null && file != null) {
-            project.rootProject.relativePath(file)
-        } else if (file != null) {
-            file.toString()
-        } else {
-            "[unnamed file]"
-        }
-    }
-
-    override fun toString(): String {
-        val causeType = cause?.let { it::class.simpleName }
-        return "ModuleInfoException(file=${describeFile()}, cause=${causeType})"
-    }
 }
 
 val moduleConfig = try {
