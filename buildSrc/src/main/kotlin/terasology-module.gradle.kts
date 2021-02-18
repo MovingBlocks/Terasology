@@ -10,6 +10,8 @@ import org.reflections.scanners.SubTypesScanner
 import org.reflections.scanners.TypeAnnotationsScanner
 import org.reflections.util.ConfigurationBuilder
 import org.reflections.util.FilterBuilder
+import org.terasology.gradology.ModuleInfoException
+import org.terasology.gradology.ModuleMetadataForGradle
 import org.terasology.module.ModuleMetadataJsonAdapter
 
 plugins {
@@ -24,35 +26,6 @@ val moduleFile = file("module.txt")
 if (!moduleFile.exists()) {
     println("Y U NO EXIST MODULE.TXT!")
     throw GradleException("Failed to find module.txt for " + project.name)
-}
-
-class ModuleInfoException(
-    cause: Throwable,
-    @Suppress("MemberVisibilityCanBePrivate") val file: File? = null,
-    private val project: Project? = null
-) : RuntimeException(cause) {
-    override val message: String
-        get() {
-            // trying to get the fully-qualified-class-name-mess off the front and just show
-            // the useful part.
-            val detail = cause?.cause?.localizedMessage ?: cause?.localizedMessage
-            return "Error while reading module info from ${describeFile()}:\n  ${detail}"
-        }
-
-    private fun describeFile(): String {
-        return if (project != null && file != null) {
-            project.rootProject.relativePath(file)
-        } else if (file != null) {
-            file.toString()
-        } else {
-            "[unnamed file]"
-        }
-    }
-
-    override fun toString(): String {
-        val causeType = cause?.let { it::class.simpleName }
-        return "ModuleInfoException(file=${describeFile()}, cause=${causeType})"
-    }
 }
 
 val moduleConfig = try {
@@ -86,9 +59,7 @@ val convention = project.getConvention().getPlugin(JavaPluginConvention::class)
 val mainSourceSet = convention.getSourceSets().getByName("main")
 
 
-val deps = moduleConfig.dependencies.filterNotNull()
-val moduleDepends = deps.filterNot { it.id.toString() == "engine" }
-val engineVersion = deps.find { it.id.toString() == "engine" }?.versionRange()?.toString() ?: "+"
+val frig = ModuleMetadataForGradle(moduleConfig)
 
 configurations {
     all {
@@ -98,34 +69,19 @@ configurations {
 
 // Set dependencies. Note that the dependency information from module.txt is used for other Terasology modules
 dependencies {
-    implementation(group = "org.terasology.engine", name = "engine", version = engineVersion)
-    implementation(group = "org.terasology.engine", name = "engine-tests", version = engineVersion)
+    implementation(group = "org.terasology.engine", name = "engine", version = frig.engineVersion())
+    implementation(group = "org.terasology.engine", name = "engine-tests", version = frig.engineVersion())
 
-    for (gestaltDep in moduleDepends) {
-        if (!gestaltDep.minVersion.isSnapshot) {
-            // gestalt considers snapshots to satisfy a minimum requirement:
-            // https://github.com/MovingBlocks/gestalt/blob/fe1893821127/gestalt-module/src/main/java/org/terasology/naming/VersionRange.java#L58-L59
-            gestaltDep.minVersion = gestaltDep.minVersion.snapshot
-            // (maybe there's some way to do that with a custom gradle resolver?
-            // but making a resolver that only works that way on gestalt modules specifically
-            // sounds complicated.)
-        }
-
-        val gradleDep = create(
-            group = "org.terasology.modules",
-            name = gestaltDep.id.toString(),
-            version = gestaltDep.versionRange().toString()
-        )
-
-        if (gestaltDep.isOptional) {
+    for ((gradleDep, optional) in frig.moduleDependencies()) {
+        if (optional) {
             // `optional` module dependencies are ones it does not require for runtime
             // (but will use opportunistically if available)
-            compileOnly(gradleDep)
+            compileOnly(gradleDep.asMap())
             // though modules also sometimes use "optional" to describe their test dependencies;
             // they're not required for runtime, but they *are* required for tests.
-            testImplementation(gradleDep)
+            testImplementation(gradleDep.asMap())
         } else {
-            implementation(gradleDep)
+            implementation(gradleDep.asMap())
         }
     }
 
