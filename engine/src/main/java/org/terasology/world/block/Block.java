@@ -16,13 +16,10 @@ import org.terasology.math.Rotation;
 import org.terasology.math.Side;
 import org.terasology.math.TeraMath;
 import org.terasology.physics.shapes.CollisionShape;
-import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.mesh.Mesh;
-import org.terasology.rendering.assets.shader.ShaderProgramFeature;
 import org.terasology.rendering.primitives.BlockMeshGenerator;
 import org.terasology.rendering.primitives.BlockMeshGeneratorSingleShape;
 import org.terasology.rendering.primitives.Tessellator;
-import org.terasology.utilities.Assets;
 import org.terasology.utilities.collection.EnumBooleanMap;
 import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.shapes.BlockMeshPart;
@@ -585,27 +582,6 @@ public final class Block {
 
     public AABBf getBounds(Vector3f floatPos) {
         return getBounds(new Vector3i(floatPos, RoundingMode.HALF_UP));
-    }
-
-    public void renderWithLightValue(float sunlight, float blockLight) {
-        if (meshGenerator == null) {
-            return;
-        }
-
-        Material mat = Assets.getMaterial("engine:prog.block").orElseThrow(() -> new RuntimeException("Missing engine material"));
-        mat.activateFeature(ShaderProgramFeature.FEATURE_USE_MATRIX_STACK);
-
-        mat.enable();
-        mat.setFloat("sunlight", sunlight);
-        mat.setFloat("blockLight", blockLight);
-
-
-        Mesh mesh = meshGenerator.getStandaloneMesh();
-        if (mesh != null) {
-            mesh.render();
-        }
-
-        mat.deactivateFeature(ShaderProgramFeature.FEATURE_USE_MATRIX_STACK);
     }
 
     @Override
