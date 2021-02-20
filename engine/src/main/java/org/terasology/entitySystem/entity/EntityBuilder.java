@@ -20,6 +20,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static com.google.common.base.Verify.verifyNotNull;
+
 /**
  * An entity builder provides the ability to set up an entity before creating it. This prevents events being sent
  * for components being added or modified before it is fully set up.
@@ -77,13 +79,8 @@ public class EntityBuilder implements MutableComponentContainer {
         if (prefab != null) {
             for (Component component : prefab.iterateComponents()) {
                 Component componentCopy = entityManager.getComponentLibrary().copy(component);
-                try {
-                    addComponent(componentCopy);
-                } catch (NullPointerException e) {
-                    throw new NullPointerException(
-                            String.format("Component %s not registered (in prefab %s)", component, prefab)
-                    );
-                }
+                //noinspection UnstableApiUsage
+                addComponent(verifyNotNull(componentCopy, "Component %s not registered (in prefab %s)", component, prefab));
             }
             addComponent(new EntityInfoComponent(prefab, prefab.isPersisted(), prefab.isAlwaysRelevant()));
         } else {
