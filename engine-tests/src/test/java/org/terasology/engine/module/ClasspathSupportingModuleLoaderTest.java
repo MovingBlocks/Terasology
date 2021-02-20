@@ -22,11 +22,11 @@ public class ClasspathSupportingModuleLoaderTest {
             "messy-name-directory & $t#f/testmessy-1.0.0-SNAPSHOT.jar",
             "Spacey Parent/SourceModuleFixture/"
     })
-    void testLoadModuleFromJarURL(String jarLocation) throws IOException, URISyntaxException {
+    void testLoadModuleFromPath(String moduleLocation) throws IOException, URISyntaxException {
         ModuleLoader loader = new ClasspathSupportingModuleLoader(true, false);
         loader.setModuleInfoPath(MODULE_INFO_FILENAME);
 
-        Path modulePath = Paths.get(getClass().getResource(jarLocation).toURI());
+        Path modulePath = Paths.get(getClass().getResource(moduleLocation).toURI());
 
         assertNotNull(loader.load(modulePath));
     }
