@@ -21,7 +21,7 @@ public final class Jvm {
     public static void logClasspath(Logger aLogger) {
         String interestingGroup = "org.terasology";
         String projectRoot = PathManager.getInstance().getInstallPath().toString();
-        String userHome = System.getenv("HOME");
+        String userHome = System.getProperty("user.home");
         String indent = "  ";
         int elidedCount = 0;
 
