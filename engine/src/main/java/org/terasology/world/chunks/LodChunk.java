@@ -8,8 +8,6 @@ import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.terasology.joml.geom.AABBf;
 import org.terasology.joml.geom.AABBfc;
-import org.terasology.math.JomlUtil;
-import org.terasology.math.geom.BaseVector3i;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockRegion;
@@ -30,8 +28,8 @@ public class LodChunk implements RenderableChunk {
     }
 
     @Override
-    public org.terasology.math.geom.Vector3i getPosition() {
-        return JomlUtil.from(position);
+    public Vector3ic getPosition() {
+        return position;
     }
 
     @Override
@@ -39,10 +37,6 @@ public class LodChunk implements RenderableChunk {
         return dest.set(position);
     }
 
-    @Override
-    public org.terasology.math.geom.Vector3i getChunkWorldOffset() {
-        return JomlUtil.from(position).mul(Chunks.SIZE_X, Chunks.SIZE_Y, Chunks.SIZE_Z);
-    }
 
     @Override
     public Vector3i getChunkWorldOffset(Vector3i dest) {
@@ -98,11 +92,6 @@ public class LodChunk implements RenderableChunk {
     }
 
     @Override
-    public Block getBlock(BaseVector3i pos) {
-        throw new UnsupportedOperationException(UNSUPPORTED_MESSAGE);
-    }
-
-    @Override
     public Block getBlock(Vector3ic pos) {
         throw new UnsupportedOperationException(UNSUPPORTED_MESSAGE);
     }
@@ -118,11 +107,6 @@ public class LodChunk implements RenderableChunk {
     }
 
     @Override
-    public Block setBlock(BaseVector3i pos, Block block) {
-        throw new UnsupportedOperationException(UNSUPPORTED_MESSAGE);
-    }
-
-    @Override
     public Block setBlock(Vector3ic pos, Block block) {
         throw new UnsupportedOperationException(UNSUPPORTED_MESSAGE);
     }
@@ -133,22 +117,12 @@ public class LodChunk implements RenderableChunk {
     }
 
     @Override
-    public void setExtraData(int index, BaseVector3i pos, int value) {
-        throw new UnsupportedOperationException(UNSUPPORTED_MESSAGE);
-    }
-
-    @Override
     public void setExtraData(int index, Vector3ic pos, int value) {
         throw new UnsupportedOperationException(UNSUPPORTED_MESSAGE);
     }
 
     @Override
     public int getExtraData(int index, int x, int y, int z) {
-        throw new UnsupportedOperationException(UNSUPPORTED_MESSAGE);
-    }
-
-    @Override
-    public int getExtraData(int index, BaseVector3i pos) {
         throw new UnsupportedOperationException(UNSUPPORTED_MESSAGE);
     }
 
@@ -173,17 +147,7 @@ public class LodChunk implements RenderableChunk {
     }
 
     @Override
-    public org.terasology.math.geom.Vector3i chunkToWorldPosition(BaseVector3i blockPos) {
-        throw new UnsupportedOperationException(UNSUPPORTED_MESSAGE);
-    }
-
-    @Override
     public Vector3i chunkToWorldPosition(Vector3ic blockPos, Vector3i dest) {
-        throw new UnsupportedOperationException(UNSUPPORTED_MESSAGE);
-    }
-
-    @Override
-    public org.terasology.math.geom.Vector3i chunkToWorldPosition(int x, int y, int z) {
         throw new UnsupportedOperationException(UNSUPPORTED_MESSAGE);
     }
 

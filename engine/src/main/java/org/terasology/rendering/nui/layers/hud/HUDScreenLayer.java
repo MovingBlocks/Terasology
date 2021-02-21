@@ -1,28 +1,15 @@
-/*
- * Copyright 2014 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *  http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.rendering.nui.layers.hud;
 
 import com.google.common.collect.Maps;
-import org.terasology.joml.geom.Rectanglei;
 import org.joml.Vector2i;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
-import org.terasology.math.JomlUtil;
+import org.terasology.joml.geom.Rectanglef;
+import org.terasology.joml.geom.Rectanglefc;
+import org.terasology.joml.geom.Rectanglei;
 import org.terasology.math.TeraMath;
-import org.terasology.math.geom.Rect2f;
 import org.terasology.nui.Canvas;
 import org.terasology.nui.ControlWidget;
 import org.terasology.nui.UIWidget;
@@ -48,18 +35,19 @@ public class HUDScreenLayer extends CoreScreenLayer {
     private NUIManager manager;
 
     public ControlWidget addHUDElement(String uri) {
-        return addHUDElement(uri, ControlWidget.class, Rect2f.createFromMinAndSize(0, 0, 1, 1));
+        return addHUDElement(uri, ControlWidget.class, new Rectanglef(0, 0, 1, 1));
     }
 
-    public <T extends ControlWidget> T addHUDElement(String urn, Class<T> type, Rect2f region) {
+    public <T extends ControlWidget> T addHUDElement(String urn, Class<T> type, Rectanglef region) {
         Optional<? extends UIElement> data = assetManager.getAsset(urn, UIElement.class);
         if (data.isPresent() && type.isInstance(data.get().getRootWidget())) {
             return addHUDElement(data.get().getUrn(), type.cast(data.get().getRootWidget()), region);
         }
         return null;
+
     }
 
-    public <T extends ControlWidget> T addHUDElement(ResourceUrn urn, Class<T> type, Rect2f region) {
+    public <T extends ControlWidget> T addHUDElement(ResourceUrn urn, Class<T> type, Rectanglef region) {
         Optional<? extends UIElement> data = assetManager.getAsset(urn, UIElement.class);
         if (data.isPresent() && type.isInstance(data.get().getRootWidget())) {
             return addHUDElement(urn, type.cast(data.get().getRootWidget()), region);
@@ -67,7 +55,7 @@ public class HUDScreenLayer extends CoreScreenLayer {
         return null;
     }
 
-    public <T extends ControlWidget> T addHUDElement(ResourceUrn urn, T widget, Rect2f region) {
+    public <T extends ControlWidget> T addHUDElement(ResourceUrn urn, T widget, Rectanglef region) {
         InjectionHelper.inject(widget);
         widget.onOpened();
         elementsLookup.put(urn, new HUDElement(widget, region));
@@ -157,9 +145,9 @@ public class HUDScreenLayer extends CoreScreenLayer {
         for (HUDElement element : elementsLookup.values()) {
             int minX = TeraMath.floorToInt(element.region.minX() * canvas.size().x);
             int minY = TeraMath.floorToInt(element.region.minY() * canvas.size().y);
-            int sizeX = TeraMath.floorToInt(element.region.width() * canvas.size().x);
-            int sizeY = TeraMath.floorToInt(element.region.height() * canvas.size().y);
-            Rectanglei region = JomlUtil.rectangleiFromMinAndSize(minX, minY, sizeX, sizeY);
+            int sizeX = TeraMath.floorToInt(element.region.getSizeX() * canvas.size().x);
+            int sizeY = TeraMath.floorToInt(element.region.getSizeY() * canvas.size().y);
+            Rectanglei region = new Rectanglei(minX, minY).setSize(sizeX, sizeY);
             canvas.drawWidget(element.widget, region);
         }
     }
@@ -206,11 +194,11 @@ public class HUDScreenLayer extends CoreScreenLayer {
 
     private static final class HUDElement {
         ControlWidget widget;
-        Rect2f region;
+        Rectanglef region = new Rectanglef();
 
-        private HUDElement(ControlWidget widget, Rect2f region) {
+        private HUDElement(ControlWidget widget, Rectanglefc region) {
             this.widget = widget;
-            this.region = region;
+            this.region.set(region);
         }
     }
 }

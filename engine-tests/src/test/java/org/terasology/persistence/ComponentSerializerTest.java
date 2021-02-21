@@ -3,6 +3,8 @@
 package org.terasology.persistence;
 
 import com.google.common.collect.ImmutableMap;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,14 +20,12 @@ import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.stubs.GetterSetterComponent;
 import org.terasology.entitySystem.stubs.IntegerComponent;
 import org.terasology.entitySystem.stubs.StringComponent;
-import org.terasology.math.geom.Quat4f;
-import org.terasology.math.geom.Vector3f;
 import org.terasology.network.NetworkSystem;
 import org.terasology.persistence.serializers.ComponentSerializer;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.persistence.typeHandling.TypeHandlerLibraryImpl;
-import org.terasology.persistence.typeHandling.mathTypes.legacy.LegacyQuat4fTypeHandler;
-import org.terasology.persistence.typeHandling.mathTypes.legacy.LegacyVector3fTypeHandler;
+import org.terasology.persistence.typeHandling.mathTypes.QuaternionfTypeHandler;
+import org.terasology.persistence.typeHandling.mathTypes.Vector3fTypeHandler;
 import org.terasology.protobuf.EntityData;
 import org.terasology.recording.RecordAndReplayCurrentStatus;
 import org.terasology.registry.CoreRegistry;
@@ -58,8 +58,8 @@ public class ComponentSerializerTest {
         Reflections reflections = new Reflections(getClass().getClassLoader());
         TypeHandlerLibrary serializationLibrary = new TypeHandlerLibraryImpl(reflections);
 
-        serializationLibrary.addTypeHandler(Vector3f.class, new LegacyVector3fTypeHandler());
-        serializationLibrary.addTypeHandler(Quat4f.class, new LegacyQuat4fTypeHandler());
+        serializationLibrary.addTypeHandler(Vector3f.class, new Vector3fTypeHandler());
+        serializationLibrary.addTypeHandler(Quaternionf.class, new QuaternionfTypeHandler());
 
         NetworkSystem networkSystem = mock(NetworkSystem.class);
         context.put(NetworkSystem.class, networkSystem);

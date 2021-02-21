@@ -41,7 +41,6 @@ import org.terasology.entitySystem.stubs.EntityRefComponent;
 import org.terasology.entitySystem.stubs.StringComponent;
 import org.terasology.joml.geom.AABBfc;
 import org.terasology.logic.location.LocationComponent;
-import org.terasology.math.JomlUtil;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.network.Client;
 import org.terasology.network.ClientComponent;
@@ -280,7 +279,7 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
 
     @Test
     public void testStoreAndRestoreChunkStore() {
-        Chunk chunk = new ChunkImpl(JomlUtil.from(CHUNK_POS), blockManager, extraDataManager);
+        Chunk chunk = new ChunkImpl(CHUNK_POS, blockManager, extraDataManager);
         chunk.setBlock(0, 0, 0, testBlock);
         chunk.markReady();
         ChunkProvider chunkProvider = mock(ChunkProvider.class);
@@ -299,7 +298,7 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
 
     @Test
     public void testChunkSurvivesStorageSaveAndRestore() throws Exception {
-        Chunk chunk = new ChunkImpl(JomlUtil.from(CHUNK_POS), blockManager, extraDataManager);
+        Chunk chunk = new ChunkImpl(CHUNK_POS, blockManager, extraDataManager);
         chunk.setBlock(0, 0, 0, testBlock);
         chunk.setBlock(0, 4, 2, testBlock2);
         chunk.markReady();
@@ -331,7 +330,7 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
 
     @Test
     public void testEntitySurvivesStorageInChunkStore() throws Exception {
-        Chunk chunk = new ChunkImpl(JomlUtil.from(CHUNK_POS), blockManager, extraDataManager);
+        Chunk chunk = new ChunkImpl(CHUNK_POS, blockManager, extraDataManager);
         chunk.setBlock(0, 0, 0, testBlock);
         chunk.markReady();
         ChunkProvider chunkProvider = mock(ChunkProvider.class);

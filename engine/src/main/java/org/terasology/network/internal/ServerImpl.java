@@ -1,4 +1,4 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.network.internal;
@@ -24,8 +24,6 @@ import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.entitySystem.event.Event;
-import org.terasology.math.ChunkMath;
-import org.terasology.math.JomlUtil;
 import org.terasology.network.NetMetricSource;
 import org.terasology.network.NetworkComponent;
 import org.terasology.network.Server;
@@ -318,7 +316,7 @@ public class ServerImpl implements Server {
     private void processInvalidatedChunks(NetData.NetMessage message) {
         for (NetData.InvalidateChunkMessage chunk : message.getInvalidateChunkList()) {
             Vector3i chunkPos = NetMessageUtil.convert(chunk.getPos());
-            remoteWorldProvider.invalidateChunks(JomlUtil.from(chunkPos));
+            remoteWorldProvider.invalidateChunks(chunkPos);
             awaitingChunkReadyBlockUpdates.removeAll(chunkPos);
             awaitingChunkReadyExtraDataUpdates.removeAll(chunkPos);
         }
@@ -367,7 +365,7 @@ public class ServerImpl implements Server {
             entitySerializer.deserializeOnto(currentEntity, updateEntity.getEntity());
             BlockComponent blockComponent = currentEntity.getComponent(BlockComponent.class);
             if (blockComponent != null && !blockEntityBefore) {
-                if (!blockEntityRegistry.getExistingBlockEntityAt(blockComponent.position).equals(currentEntity)) {
+                if (!blockEntityRegistry.getExistingBlockEntityAt(blockComponent.getPosition()).equals(currentEntity)) {
                     logger.error("Failed to associated new block entity");
                 }
             }

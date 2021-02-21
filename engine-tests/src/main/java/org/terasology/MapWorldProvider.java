@@ -19,11 +19,9 @@ import com.google.common.collect.Maps;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.math.JomlUtil;
 import org.terasology.world.WorldChangeListener;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
-import org.terasology.world.block.BlockRegion;
 import org.terasology.world.block.BlockRegionc;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.Chunks;
@@ -104,7 +102,7 @@ public class MapWorldProvider implements WorldProviderCore {
         Vector3i chunkPos = Chunks.toChunkPos(pos, new Vector3i());
         Chunk chunk = chunks.get(chunkPos);
         if (chunk == null && worldGenerator != null) {
-            chunk = new ChunkImpl(JomlUtil.from(chunkPos), blockManager, extraDataManager);
+            chunk = new ChunkImpl(chunkPos, blockManager, extraDataManager);
             worldGenerator.createChunk(chunk, entityBuffer);
             chunks.put(chunkPos, chunk);
         }
@@ -174,7 +172,7 @@ public class MapWorldProvider implements WorldProviderCore {
     }
 
     @Override
-    public Collection<BlockRegion> getRelevantRegions() {
+    public Collection<BlockRegionc> getRelevantRegions() {
         return Collections.emptySet();
     }
 }

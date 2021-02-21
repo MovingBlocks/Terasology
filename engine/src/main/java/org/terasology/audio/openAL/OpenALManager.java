@@ -17,6 +17,7 @@ package org.terasology.audio.openAL;
 
 import com.google.common.collect.Maps;
 import org.joml.Quaternionfc;
+import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.openal.AL;
@@ -42,7 +43,6 @@ import org.terasology.audio.openAL.streamingSound.OpenALStreamingSound;
 import org.terasology.audio.openAL.streamingSound.OpenALStreamingSoundPool;
 import org.terasology.config.AudioConfig;
 import org.terasology.math.Direction;
-import org.terasology.math.JomlUtil;
 
 import java.nio.FloatBuffer;
 import java.util.Iterator;
@@ -240,9 +240,9 @@ public class OpenALManager implements AudioManager {
 
         OpenALException.checkState("Setting listener velocity");
 
-        org.joml.Vector3f dir = JomlUtil.from(Direction.FORWARD.getVector3f())
+        Vector3f dir = new Vector3f(Direction.FORWARD.asVector3f())
                 .rotate(orientation);
-        org.joml.Vector3f up = JomlUtil.from(Direction.UP.getVector3f())
+        Vector3f up = new Vector3f(Direction.UP.asVector3f())
                 .rotate(orientation);
 
         FloatBuffer listenerOri = BufferUtils.createFloatBuffer(6)
