@@ -1,4 +1,4 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.module;
 
@@ -25,15 +25,14 @@ import org.terasology.module.ModulePathScanner;
 import org.terasology.module.ModuleRegistry;
 import org.terasology.module.TableModuleRegistry;
 import org.terasology.module.sandbox.APIScanner;
-import org.terasology.module.sandbox.BytecodeInjector;
 import org.terasology.module.sandbox.ModuleSecurityManager;
 import org.terasology.module.sandbox.ModuleSecurityPolicy;
 import org.terasology.module.sandbox.PermissionProviderFactory;
 import org.terasology.module.sandbox.StandardPermissionProviderFactory;
 import org.terasology.module.sandbox.WarnOnlyProviderFactory;
-import org.terasology.naming.Name;
 import org.terasology.nui.UIWidget;
 import org.terasology.reflection.TypeRegistry;
+import org.terasology.utilities.Jvm;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -45,6 +44,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.Policy;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
@@ -53,19 +53,21 @@ import java.util.stream.Collectors;
 
 public class ModuleManagerImpl implements ModuleManager {
     private static final Logger logger = LoggerFactory.getLogger(ModuleManagerImpl.class);
-    private StandardPermissionProviderFactory permissionProviderFactory = new StandardPermissionProviderFactory();
-    private PermissionProviderFactory wrappingPermissionProviderFactory = new WarnOnlyProviderFactory(permissionProviderFactory);
+    private final StandardPermissionProviderFactory permissionProviderFactory = new StandardPermissionProviderFactory();
+    private final PermissionProviderFactory wrappingPermissionProviderFactory = new WarnOnlyProviderFactory(permissionProviderFactory);
 
-    private ModuleRegistry registry;
+    private final ModuleRegistry registry;
     private ModuleEnvironment environment;
-    private ModuleMetadataJsonAdapter metadataReader;
-    private ModuleInstallManager installManager;
+    private final ModuleMetadataJsonAdapter metadataReader;
+    private final ModuleInstallManager installManager;
 
     public ModuleManagerImpl(String masterServerAddress) {
         this(masterServerAddress, Collections.emptyList());
     }
 
     public ModuleManagerImpl(String masterServerAddress, List<Class<?>> classesOnClasspathsToAddToEngine) {
+        PathManager pathManager = PathManager.getInstance();  // get early so if it needs to initialize, it does it now
+
         metadataReader = new ModuleMetadataJsonAdapter();
         for (ModuleExtension ext : StandardModuleExtension.values()) {
             metadataReader.registerExtension(ext.getKey(), ext.getValueType());
@@ -101,7 +103,7 @@ public class ModuleManagerImpl implements ModuleManager {
 
         ModulePathScanner scanner = new ModulePathScanner(new ModuleLoader(metadataReader));
         scanner.getModuleLoader().setModuleInfoPath(TerasologyConstants.MODULE_INFO_FILENAME);
-        scanner.scan(registry, PathManager.getInstance().getModulePaths());
+        scanner.scan(registry, pathManager.getModulePaths());
 
         DependencyInfo engineDep = new DependencyInfo();
         engineDep.setId(engineModule.getId());
@@ -126,57 +128,42 @@ public class ModuleManagerImpl implements ModuleManager {
     /**
      * Overrides modules in modules/ with those specified via -classpath in the JVM
      */
-    private void loadModulesFromClassPath() {
-        ClassLoader classLoader = ClassLoader.getSystemClassLoader();
-        ModuleLoader loader = new ModuleLoader(metadataReader);
-        Enumeration<URL> moduleInfosInClassPath;
+    void loadModulesFromClassPath() {
+        logger.debug("loadModulesFromClassPath with classpath:");
+        Jvm.logClasspath(logger);
+
+        ModuleLoader loader = new ClasspathSupportingModuleLoader(metadataReader, true, true);
         loader.setModuleInfoPath(TerasologyConstants.MODULE_INFO_FILENAME);
 
-        // We're looking for jars on the classpath with a module.txt
-        try {
-            moduleInfosInClassPath = classLoader.getResources(TerasologyConstants.MODULE_INFO_FILENAME.toString());
-        } catch (IOException e) {
-            logger.warn("Failed to search for classpath modules: {}", e);
-            return;
-        }
+        List<Path> classPaths = Arrays.stream(
+                System.getProperty("java.class.path").split(System.getProperty("path.separator", ":"))
+        ).map(Paths::get).collect(Collectors.toList());
 
-        for (URL url : Collections.list(moduleInfosInClassPath)) {
-            if (!url.getProtocol().equalsIgnoreCase("jar")) {
+        for (Path path : classPaths) {
+            // I thought I'd make the ClasspathSupporting stuff in the shape of a ModuleLoader
+            // so I could use it with the existing ModulePathScanner, but no. The inputs to that
+            // are the _parent directories_ of what we have.
+            //
+            // The conditions here mirror those of org.terasology.module.ModulePathScanner.loadModule
+
+            Module module;
+            try {
+                module = loader.load(path);
+            } catch (IOException e) {
+                logger.error("Failed to load classpath module {}", path, e);
                 continue;
             }
 
-            try (Reader reader = new InputStreamReader(url.openStream(), TerasologyConstants.CHARSET)) {
-                ModuleMetadata metaData = metadataReader.read(reader);
-                String displayName = metaData.getDisplayName().toString();
-                Name id = metaData.getId();
+            if (module == null) {
+                continue;
+            }
 
-                // if the display name is empty or the id is null, this probably isn't a Terasology module
-                if (null == id || displayName.equalsIgnoreCase("")) {
-                    logger.warn("Found a module-like JAR on the class path with no id or display name. Skipping");
-                    logger.warn("{}", url);
-                    continue;
-                }
-
-                logger.info("Loading module {} from class path at {}", displayName, url.getFile());
-
-                // the url contains a protocol, and points to the module.txt
-                // we need to trim both of those away to get the module's path
-                String targetFile = url.getFile()
-                        .replace("file:", "")
-                        .replace("!/" + TerasologyConstants.MODULE_INFO_FILENAME, "")
-                        .replace("/" + TerasologyConstants.MODULE_INFO_FILENAME, "");
-
-                // Windows specific check - Path doesn't like /C:/... style Strings indicating files
-                if (targetFile.matches("/[a-zA-Z]:.*")) {
-                    targetFile = targetFile.substring(1);
-                }
-
-                Path path = Paths.get(targetFile);
-
-                Module module = loader.load(path);
-                registry.add(module);
-            } catch (IOException e) {
-                logger.warn("Failed to load module.txt for classpath module {}", url);
+            boolean isNew = registry.add(module);
+            if (isNew) {
+                logger.info("Discovered module: {}", module);
+            } else {
+                logger.warn("Discovered duplicate module: {}-{}, skipping {}",
+                        module.getId(), module.getVersion(), path);
             }
         }
     }
@@ -187,8 +174,8 @@ public class ModuleManagerImpl implements ModuleManager {
         ExternalApiWhitelist.PACKAGES.stream().forEach(packagee ->
                 permissionProviderFactory.getBasePermissionSet().addAPIPackage(packagee));
 
-        APIScanner apiScanner = new APIScanner(permissionProviderFactory);
-        registry.stream().filter(Module::isOnClasspath).forEach(apiScanner::scan);
+        APIScanner apiScanner = new APIScannerTolerantOfAssetOnlyModules(permissionProviderFactory);
+        apiScanner.scan(registry);
 
         permissionProviderFactory.getBasePermissionSet().grantPermission("com.google.gson", ReflectPermission.class);
         permissionProviderFactory.getBasePermissionSet().grantPermission("com.google.gson.internal", ReflectPermission.class);
@@ -219,9 +206,9 @@ public class ModuleManagerImpl implements ModuleManager {
         ModuleEnvironment newEnvironment;
         boolean permissiveSecurityEnabled = Boolean.parseBoolean(System.getProperty(SystemConfig.PERMISSIVE_SECURITY_ENABLED_PROPERTY));
         if (permissiveSecurityEnabled) {
-            newEnvironment = new ModuleEnvironment(finalModules, wrappingPermissionProviderFactory, Collections.<BytecodeInjector>emptyList());
+            newEnvironment = new ModuleEnvironment(finalModules, wrappingPermissionProviderFactory, Collections.emptyList());
         } else {
-            newEnvironment = new ModuleEnvironment(finalModules, permissionProviderFactory, Collections.<BytecodeInjector>emptyList());
+            newEnvironment = new ModuleEnvironment(finalModules, permissionProviderFactory, Collections.emptyList());
         }
         if (asPrimary) {
             environment = newEnvironment;

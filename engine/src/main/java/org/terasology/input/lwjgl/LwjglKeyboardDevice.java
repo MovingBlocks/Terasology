@@ -11,6 +11,10 @@ import gnu.trove.set.hash.TIntHashSet;
 import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.context.Context;
+import org.terasology.engine.subsystem.DisplayDevice;
+import org.terasology.engine.subsystem.lwjgl.LwjglDisplayDevice;
+import org.terasology.engine.subsystem.lwjgl.LwjglGraphics;
 import org.terasology.input.ButtonState;
 import org.terasology.input.Input;
 import org.terasology.input.InputType;
@@ -22,7 +26,7 @@ import org.terasology.input.device.RawKeyboardAction;
 import java.util.Queue;
 
 /**
- * Lwjgl 3's (GLFW) keyboard device represenation.
+ * Lwjgl 3's (GLFW) keyboard device representation.
  * Handles keyboard input via GLFW's callbacks.
  */
 public class LwjglKeyboardDevice implements KeyboardDevice {
@@ -170,25 +174,26 @@ public class LwjglKeyboardDevice implements KeyboardDevice {
     private TIntSet buttonStates = new TIntHashSet();
 
     public LwjglKeyboardDevice() {
-        long window = GLFW.glfwGetCurrentContext();
+    }
 
+    public void registerToLwjglWindow(long window) {
         GLFW.glfwSetKeyCallback(window, this::glfwKeyCallback);
         GLFW.glfwSetCharCallback(window, this::glfwCharCallback);
     }
 
     /**
-     * Callback recieve char input events from windowing systems. Used for text typing. You cannot recieve key,
+     * Callback receive char input events from windowing systems. Used for text typing. You cannot receive key,
      * non-printables(mods keys, etc).
      *
      * @param window window's pointer
-     * @param chr recieved char, affected by keyboard layout and modifications.
+     * @param chr received char, affected by keyboard layout and modifications.
      */
     private void glfwCharCallback(long window, int chr) {
         charQueue.offer(new CharKeyboardAction((char) chr));
     }
 
     /**
-     * Callback recieve key input events. All keys in{@link GLFW}
+     * Callback receive key input events. All keys in {@link GLFW}
      *
      * @param window window's pointer
      * @param key one of key listed in {@link GLFW} GLFW_KEY*, also you can see {@link

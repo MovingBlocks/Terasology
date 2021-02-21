@@ -15,7 +15,7 @@
  */
 package org.terasology.world.propagation;
 
-import org.terasology.math.geom.Vector3i;
+import org.joml.Vector3ic;
 import org.terasology.world.block.Block;
 
 /**
@@ -28,16 +28,16 @@ public interface PropagatorWorldView {
     /**
      * @return The value of interest at pos, or {@link #UNAVAILABLE} if out of bounds
      */
-    byte getValueAt(Vector3i pos);
+    byte getValueAt(Vector3ic pos);
 
     /**
      * @param value A new value at pos.
      */
-    void setValueAt(Vector3i pos, byte value);
+    void setValueAt(Vector3ic pos, byte value);
 
     /**
      * @return The block at pos, or null if out of bounds
      */
-    Block getBlockAt(Vector3i pos);
+    Block getBlockAt(Vector3ic pos);
 
 }

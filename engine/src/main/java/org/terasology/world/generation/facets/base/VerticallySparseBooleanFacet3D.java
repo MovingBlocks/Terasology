@@ -5,8 +5,8 @@ package org.terasology.world.generation.facets.base;
 
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
-import org.terasology.math.JomlUtil;
-import org.terasology.math.Region3i;
+import org.terasology.world.block.BlockRegion;
+import org.terasology.world.block.BlockRegionc;
 import org.terasology.world.generation.Border3D;
 import org.terasology.world.generation.WorldFacet3D;
 
@@ -19,26 +19,26 @@ import java.util.Set;
  */
 public class VerticallySparseBooleanFacet3D implements WorldFacet3D {
 
-    private Region3i worldRegion;
-    private Region3i relativeRegion;
+    private BlockRegion worldRegion;
+    private BlockRegion relativeRegion;
     private Set<Integer>[] data;
 
-    public VerticallySparseBooleanFacet3D(Region3i targetRegion, Border3D border) {
+    public VerticallySparseBooleanFacet3D(BlockRegionc targetRegion, Border3D border) {
         worldRegion = border.expandTo3D(targetRegion);
-        relativeRegion = border.expandTo3D(targetRegion.size());
-        data = new Set[worldRegion.sizeX() * worldRegion.sizeZ()];
+        relativeRegion = border.expandTo3D(targetRegion.getSize(new Vector3i()));
+        data = new Set[worldRegion.getSizeX() * worldRegion.getSizeZ()];
         for (int i = 0; i < data.length; i++) {
             data[i] = new HashSet<Integer>();
         }
     }
 
     @Override
-    public Region3i getWorldRegion() {
+    public BlockRegion getWorldRegion() {
         return worldRegion;
     }
 
     @Override
-    public Region3i getRelativeRegion() {
+    public BlockRegion getRelativeRegion() {
         return relativeRegion;
     }
 
@@ -92,16 +92,16 @@ public class VerticallySparseBooleanFacet3D implements WorldFacet3D {
     }
 
     protected final int getRelativeIndex(Vector3ic pos) {
-        if (!relativeRegion.encompasses(JomlUtil.from(pos))) {
+        if (!relativeRegion.contains(pos)) {
             throw new IllegalArgumentException(String.format("Out of bounds: %s for region %s", pos.toString(), relativeRegion.toString()));
         }
-        return pos.x() - relativeRegion.minX() + relativeRegion.sizeX() * (pos.z() - relativeRegion.minZ());
+        return pos.x() - relativeRegion.minX() + relativeRegion.getSizeX() * (pos.z() - relativeRegion.minZ());
     }
 
     protected final int getWorldIndex(Vector3ic pos) {
-        if (!worldRegion.encompasses(JomlUtil.from(pos))) {
+        if (!worldRegion.contains(pos)) {
             throw new IllegalArgumentException(String.format("Out of bounds: %s for region %s", pos.toString(), worldRegion.toString()));
         }
-        return pos.x() - worldRegion.minX() + worldRegion.sizeX() * (pos.z() - worldRegion.minZ());
+        return pos.x() - worldRegion.minX() + worldRegion.getSizeX() * (pos.z() - worldRegion.minZ());
     }
 }

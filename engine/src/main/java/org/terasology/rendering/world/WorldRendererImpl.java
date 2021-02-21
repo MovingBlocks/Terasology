@@ -1,20 +1,9 @@
-/*
- * Copyright 2017 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.rendering.world;
 
+import org.joml.Vector3f;
+import org.joml.Vector3ic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
@@ -26,17 +15,14 @@ import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.module.rendering.RenderingModuleRegistry;
 import org.terasology.engine.subsystem.DisplayDevice;
 import org.terasology.engine.subsystem.lwjgl.GLBufferPool;
-import org.terasology.engine.subsystem.lwjgl.LwjglGraphics;
+import org.terasology.engine.subsystem.lwjgl.LwjglGraphicsUtil;
 import org.terasology.logic.console.Console;
 import org.terasology.logic.console.commandSystem.MethodCommand;
 import org.terasology.logic.console.commandSystem.annotations.Command;
 import org.terasology.logic.console.commandSystem.annotations.CommandParam;
 import org.terasology.logic.permission.PermissionManager;
 import org.terasology.logic.players.LocalPlayerSystem;
-import org.terasology.math.JomlUtil;
 import org.terasology.math.TeraMath;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.rendering.ShaderManager;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.backdrop.BackdropProvider;
@@ -56,7 +42,6 @@ import org.terasology.rendering.openvrprovider.OpenVRProvider;
 import org.terasology.rendering.world.viewDistance.ViewDistance;
 import org.terasology.utilities.Assets;
 import org.terasology.world.WorldProvider;
-import org.terasology.world.chunks.ChunkProvider;
 
 import java.util.List;
 
@@ -168,7 +153,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         LocalPlayerSystem localPlayerSystem = context.get(LocalPlayerSystem.class);
         localPlayerSystem.setPlayerCamera(playerCamera);
 
-        renderableWorld = new RenderableWorldImpl(worldProvider, context.get(ChunkProvider.class), bufferPool, playerCamera);
+        renderableWorld = new RenderableWorldImpl(context, bufferPool, playerCamera);
         renderQueues = renderableWorld.getRenderQueues();
 
         initRenderingSupport();
@@ -250,12 +235,12 @@ public final class WorldRendererImpl implements WorldRenderer {
     }
 
     @Override
-    public void onChunkLoaded(Vector3i pos) {
+    public void onChunkLoaded(Vector3ic pos) {
         renderableWorld.onChunkLoaded(pos);
     }
 
     @Override
-    public void onChunkUnloaded(Vector3i pos) {
+    public void onChunkUnloaded(Vector3ic pos) {
         renderableWorld.onChunkUnloaded(pos);
     }
 
@@ -299,7 +284,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         // this is done to execute this code block only once per frame
         // instead of once per eye in a stereo setup.
         if (isFirstRenderingStageForCurrentFrame) {
-            timeSmoothedMainLightIntensity = TeraMath.lerp(timeSmoothedMainLightIntensity, getMainLightIntensityAt(JomlUtil.from(playerCamera.getPosition())), secondsSinceLastFrame);
+            timeSmoothedMainLightIntensity = TeraMath.lerp(timeSmoothedMainLightIntensity, getMainLightIntensityAt(playerCamera.getPosition()), secondsSinceLastFrame);
 
             playerCamera.update(secondsSinceLastFrame);
 
@@ -365,7 +350,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         renderPipelineTaskList.forEach(RenderPipelineTask::process);
 
         // this line re-establish Terasology defaults, so that the rest of the application can rely on them.
-        LwjglGraphics.initOpenGLParams();
+        LwjglGraphicsUtil.initOpenGLParams();
 
         playerCamera.updatePrevViewProjectionMatrix();
     }
@@ -393,8 +378,8 @@ public final class WorldRendererImpl implements WorldRenderer {
     }
 
     @Override
-    public void setViewDistance(ViewDistance viewDistance) {
-        renderableWorld.updateChunksInProximity(viewDistance);
+    public void setViewDistance(ViewDistance viewDistance, int chunkLods) {
+        renderableWorld.updateChunksInProximity(viewDistance, chunkLods);
     }
 
     @Override

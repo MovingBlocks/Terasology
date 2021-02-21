@@ -15,6 +15,8 @@
  */
 package org.terasology.logic.ai;
 
+import org.joml.Vector3f;
+import org.joml.Vector3fc;
 import org.terasology.engine.Time;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -28,7 +30,6 @@ import org.terasology.logic.characters.CharacterMovementComponent;
 import org.terasology.logic.characters.events.HorizontalCollisionEvent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.LocalPlayer;
-import org.terasology.math.geom.Vector3f;
 import org.terasology.registry.In;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.utilities.random.Random;
@@ -39,8 +40,7 @@ import org.terasology.world.WorldProvider;
  *
  */
 @RegisterSystem(RegisterMode.AUTHORITY)
-public class HierarchicalAISystem extends BaseComponentSystem implements
-        UpdateSubscriberSystem {
+public class HierarchicalAISystem extends BaseComponentSystem implements UpdateSubscriberSystem {
 
     @In
     private WorldProvider worldProvider;
@@ -61,20 +61,19 @@ public class HierarchicalAISystem extends BaseComponentSystem implements
 
     @Override
     public void update(float delta) {
+        Vector3f tmp = new Vector3f();
         for (EntityRef entity : entityManager.getEntitiesWith(
-                HierarchicalAIComponent.class, CharacterMovementComponent.class,
-                LocationComponent.class)) {
-            LocationComponent location = entity
-                    .getComponent(LocationComponent.class);
-            Vector3f worldPos = location.getWorldPosition();
+                HierarchicalAIComponent.class, CharacterMovementComponent.class, LocationComponent.class)) {
+            LocationComponent location = entity.getComponent(LocationComponent.class);
+            location.getWorldPosition(tmp);
 
             // Skip this AI if not in a loaded chunk
-            if (!worldProvider.isBlockRelevant(worldPos)) {
+            if (!worldProvider.isBlockRelevant(tmp)) {
                 continue;
             }
 
             // goto Hierarchical system
-            loop(entity, location, worldPos);
+            loop(entity, location, tmp);
         }
     }
 
@@ -85,10 +84,8 @@ public class HierarchicalAISystem extends BaseComponentSystem implements
      * @param location
      * @param worldPos
      */
-    private void loop(EntityRef entity, LocationComponent location,
-                      Vector3f worldPos) {
-        HierarchicalAIComponent ai = entity
-                .getComponent(HierarchicalAIComponent.class);
+    private void loop(EntityRef entity, LocationComponent location, Vector3fc worldPos) {
+        HierarchicalAIComponent ai = entity.getComponent(HierarchicalAIComponent.class);
         long tempTime = time.getGameTimeInMs();
         //TODO remove next
         long lastAttack = 0;
@@ -110,11 +107,9 @@ public class HierarchicalAISystem extends BaseComponentSystem implements
 
         // find player position
         // TODO: shouldn't use local player, need some way to find nearest
-        // player
         if (localPlayer != null) {
-            Vector3f dist = new Vector3f(worldPos);
-            dist.sub(localPlayer.getPosition());
-            double distanceToPlayer = dist.lengthSquared();
+            final Vector3f playerPosition = localPlayer.getPosition(new Vector3f());
+            double distanceToPlayer = worldPos.distanceSquared(playerPosition);
 
             ai.inDanger = false;
             if (ai.dieIfPlayerFar && distanceToPlayer > ai.dieDistance) {
@@ -125,19 +120,15 @@ public class HierarchicalAISystem extends BaseComponentSystem implements
             if (tempTime - ai.lastChangeOfDangerAt > dangerChangeTime) {
                 dangerChangeTime = (long) (ai.dangerUpdateTime * random.nextDouble() * ai.hectic);
                 if (ai.hunter) {
-                    if (distanceToPlayer > ai.playerdistance
-                            && distanceToPlayer < ai.playerSense) {
+                    if (distanceToPlayer > ai.playerdistance && distanceToPlayer < ai.playerSense) {
                         // Head to player
-                        Vector3f tempTarget = localPlayer.getPosition();
                         if (ai.forgiving != 0) {
-                            ai.movementTarget.set(new Vector3f(
-                                    tempTarget.x + random.nextFloat(-ai.forgiving, ai.forgiving),
-                                    tempTarget.y + random.nextFloat(-ai.forgiving, ai.forgiving),
-                                    tempTarget.z + random.nextFloat(-ai.forgiving, ai.forgiving)
-                            ));
-                        } else {
-                            ai.movementTarget.set(tempTarget);
+                            playerPosition.add(
+                                    random.nextFloat(-ai.forgiving, ai.forgiving),
+                                    random.nextFloat(-ai.forgiving, ai.forgiving),
+                                    random.nextFloat(-ai.forgiving, ai.forgiving));
                         }
+                        ai.movementTarget.set(playerPosition);
                         ai.inDanger = true;
                         entity.saveComponent(ai);
 
@@ -204,22 +195,19 @@ public class HierarchicalAISystem extends BaseComponentSystem implements
             }
         }
 
-        Vector3f targetDirection = new Vector3f();
-        targetDirection.sub(ai.movementTarget, worldPos);
+        Vector3f targetDirection = ai.movementTarget.sub(worldPos, new Vector3f());
         targetDirection.normalize();
         drive.set(targetDirection);
 
         float yaw = (float) Math.atan2(targetDirection.x, targetDirection.z);
-        entity.send(new CharacterMoveInputEvent(0, 0, yaw, drive, false, false, time.getGameDeltaInMs()));
+        entity.send(new CharacterMoveInputEvent(0, 0, yaw, drive, false, false, false, time.getGameDeltaInMs()));
         entity.saveComponent(location);
-        // System.out.print("\Destination set: " + targetDirection.x + ":" +targetDirection.z + "\n");
-        // System.out.print("\nI am: " + worldPos.x + ":" + worldPos.z + "\n");
 
         ai.lastProgressedUpdateAt = time.getGameTimeInMs();
     }
 
     private void runAway(EntityRef entity, HierarchicalAIComponent ai) {
-        Vector3f tempTarget = localPlayer.getPosition();
+        Vector3f tempTarget = localPlayer.getPosition(new Vector3f());
         if (ai.forgiving != 0) {
             ai.movementTarget.set(new Vector3f(
                     -tempTarget.x + random.nextFloat(-ai.forgiving, ai.forgiving),
@@ -236,22 +224,22 @@ public class HierarchicalAISystem extends BaseComponentSystem implements
         ai.inDanger = true;
     }
 
-    private void randomWalk(Vector3f worldPos, HierarchicalAIComponent ai) {
+    private void randomWalk(Vector3fc worldPos, HierarchicalAIComponent ai) {
         // if ai flies
         if (ai.flying) {
             float targetY = 0;
             do {
-                targetY = worldPos.y + random.nextFloat(-100.0f, 100.0f);
+                targetY = worldPos.y() + random.nextFloat(-100.0f, 100.0f);
             } while (targetY > ai.maxAltitude);
             ai.movementTarget.set(
-                    worldPos.x + random.nextFloat(-500.0f, 500.0f),
+                    worldPos.x() + random.nextFloat(-500.0f, 500.0f),
                     targetY,
-                    worldPos.z + random.nextFloat(-500.0f, 500.0f));
+                    worldPos.z() + random.nextFloat(-500.0f, 500.0f));
         } else {
             ai.movementTarget.set(
-                    worldPos.x + random.nextFloat(-500.0f, 500.0f),
-                    worldPos.y,
-                    worldPos.z + random.nextFloat(-500.0f, 500.0f));
+                    worldPos.x() + random.nextFloat(-500.0f, 500.0f),
+                    worldPos.y(),
+                    worldPos.z() + random.nextFloat(-500.0f, 500.0f));
         }
         ai.lastChangeOfDirectionAt = time.getGameTimeInMs();
     }
@@ -263,9 +251,7 @@ public class HierarchicalAISystem extends BaseComponentSystem implements
 
     //TODO change eating thingy to use this
     @ReceiveEvent(components = {HierarchicalAIComponent.class})
-    public void onBump(HorizontalCollisionEvent event, EntityRef entity) {
-        CharacterMovementComponent moveComp = entity
-                .getComponent(CharacterMovementComponent.class);
+    public void onBump(HorizontalCollisionEvent event, EntityRef entity, CharacterMovementComponent moveComp) {
         if (moveComp != null && moveComp.grounded) {
             moveComp.jump = true;
             entity.saveComponent(moveComp);

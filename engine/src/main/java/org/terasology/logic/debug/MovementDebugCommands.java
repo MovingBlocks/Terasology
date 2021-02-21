@@ -40,7 +40,6 @@ import org.terasology.logic.console.commandSystem.annotations.Sender;
 import org.terasology.logic.location.Location;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.permission.PermissionManager;
-import org.terasology.math.JomlUtil;
 import org.terasology.network.ClientComponent;
 import org.terasology.physics.engine.PhysicsEngine;
 import org.terasology.registry.In;
@@ -102,7 +101,7 @@ public class MovementDebugCommands extends BaseComponentSystem {
     public String pushCharacterCommand(@Sender EntityRef sender,
                                        @CommandParam("x") float x, @CommandParam("y") float y, @CommandParam("z") float z) {
         ClientComponent clientComponent = sender.getComponent(ClientComponent.class);
-        clientComponent.character.send(new CharacterImpulseEvent(JomlUtil.from(new Vector3f(x, y, z))));
+        clientComponent.character.send(new CharacterImpulseEvent(new Vector3f(x, y, z)));
         return "Pushing character with " + x + " " + y + " " + z;
     }
 
@@ -139,7 +138,7 @@ public class MovementDebugCommands extends BaseComponentSystem {
             requiredPermission = PermissionManager.CHEAT_PERMISSION)
     public String showPosition(@Sender EntityRef client) {
         LocationComponent loc = client.getComponent(LocationComponent.class);
-        return "Your Position: " + loc.getWorldPosition();
+        return "Your Position: " + loc.getWorldPosition(new Vector3f());
     }
 
     @Command(shortDescription = "Show your Height",

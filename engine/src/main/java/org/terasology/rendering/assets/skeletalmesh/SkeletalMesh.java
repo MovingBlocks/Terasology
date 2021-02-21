@@ -19,7 +19,7 @@ package org.terasology.rendering.assets.skeletalmesh;
 import org.terasology.assets.Asset;
 import org.terasology.assets.AssetType;
 import org.terasology.assets.ResourceUrn;
-import org.terasology.math.AABB;
+import org.terasology.joml.geom.AABBf;
 
 import java.util.Collection;
 
@@ -41,5 +41,5 @@ public abstract class SkeletalMesh extends Asset<SkeletalMeshData> {
      *
      * @return the boundings of the mesh when it its not being animated.
      */
-    public abstract AABB getStaticAabb();
+    public abstract AABBf getStaticAabb();
 }

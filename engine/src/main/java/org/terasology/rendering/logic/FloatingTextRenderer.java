@@ -1,22 +1,12 @@
-/*
- * Copyright 2016 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.rendering.logic;
 
 import com.google.common.collect.Maps;
+import org.joml.Vector3f;
+import org.joml.Vector3fc;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -28,8 +18,6 @@ import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.RenderSystem;
 import org.terasology.logic.location.LocationComponent;
-import org.terasology.math.JomlUtil;
-import org.terasology.math.geom.Vector3f;
 import org.terasology.nui.Color;
 import org.terasology.nui.HorizontalAlign;
 import org.terasology.registry.In;
@@ -55,6 +43,7 @@ import static org.lwjgl.opengl.GL11.glTranslated;
 
 @RegisterSystem(RegisterMode.CLIENT)
 public class FloatingTextRenderer extends BaseComponentSystem implements RenderSystem {
+    private static final Logger logger = LoggerFactory.getLogger(FloatingTextRenderer.class);
 
     private static final int PIXEL_PER_METER = 250;
 
@@ -83,20 +72,21 @@ public class FloatingTextRenderer extends BaseComponentSystem implements RenderS
     }
 
     private void render(Iterable<EntityRef> floatingTextEntities) {
-        Vector3f cameraPosition = JomlUtil.from(camera.getPosition());
+        Vector3fc cameraPosition = camera.getPosition();
 
         for (EntityRef entity : floatingTextEntities) {
-            LocationComponent location = entity.getComponent(LocationComponent.class);
-            if (location == null || Float.isNaN(location.getWorldPosition().x)) {
-                continue;
-            }
-
-            Vector3f worldPos = location.getWorldPosition();
-            if (!worldProvider.isBlockRelevant(worldPos)) {
-                continue;
-            }
-
             FloatingTextComponent floatingText = entity.getComponent(FloatingTextComponent.class);
+            LocationComponent location = entity.getComponent(LocationComponent.class);
+
+            if (location == null) {
+                logger.warn("location component is not defined can't render text: {}", floatingText.text);
+                continue;
+            }
+
+            Vector3f worldPos = location.getWorldPosition(new Vector3f());
+            if (!worldProvider.isBlockRelevant(worldPos) || !worldPos.isFinite()) {
+                continue;
+            }
 
             String[] linesOfText = floatingText.text.split("\n");
             Color baseColor = floatingText.textColor;
@@ -115,8 +105,8 @@ public class FloatingTextRenderer extends BaseComponentSystem implements RenderS
             Map<Material, Mesh> meshMap = entityMeshCache.get(entity);
             if (meshMap == null) {
                 meshMap = meshBuilder
-                        .createTextMesh(font, Arrays.asList(linesOfText), textWidth, HorizontalAlign.CENTER, baseColor,
-                                shadowColor, underline);
+                    .createTextMesh(font, Arrays.asList(linesOfText), textWidth, HorizontalAlign.CENTER, baseColor,
+                        shadowColor, underline);
                 entityMeshCache.put(entity, meshMap);
             }
 
@@ -128,7 +118,7 @@ public class FloatingTextRenderer extends BaseComponentSystem implements RenderS
 
             float scale = METER_PER_PIXEL * floatingText.scale;
 
-            glTranslated(worldPos.x - cameraPosition.x, worldPos.y - cameraPosition.y, worldPos.z - cameraPosition.z);
+            glTranslated(worldPos.x - cameraPosition.x(), worldPos.y - cameraPosition.y(), worldPos.z - cameraPosition.z());
             OpenGLUtils.applyBillboardOrientation();
             glScaled(scale, -scale, scale);
             glTranslated(-textWidth / 2.0, 0.0, 0.0);
@@ -138,7 +128,7 @@ public class FloatingTextRenderer extends BaseComponentSystem implements RenderS
                 material.enable();
                 material.bindTextures();
                 material.setFloat4("croppingBoundaries", Float.MIN_VALUE, Float.MAX_VALUE,
-                        Float.MIN_VALUE, Float.MAX_VALUE);
+                    Float.MIN_VALUE, Float.MAX_VALUE);
                 material.setFloat2("offset", 0.0f, 0.0f);
                 material.setFloat("alpha", 1.0f);
                 mesh.render();

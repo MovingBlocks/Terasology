@@ -50,6 +50,7 @@ import org.terasology.nui.asset.UIElement;
 import org.terasology.nui.skin.UISkin;
 import org.terasology.nui.skin.UISkinData;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
+import org.terasology.persistence.typeHandling.TypeHandlerLibraryImpl;
 import org.terasology.recording.CharacterStateEventPositionMap;
 import org.terasology.recording.DirectionAndOriginPosRecorderList;
 import org.terasology.recording.RecordAndReplayCurrentStatus;
@@ -326,7 +327,7 @@ public class TerasologyEngine implements GameEngine {
         CopyStrategyLibrary copyStrategyLibrary = new CopyStrategyLibrary(reflectFactory);
         rootContext.put(CopyStrategyLibrary.class, copyStrategyLibrary);
 
-        rootContext.put(TypeHandlerLibrary.class, TypeHandlerLibrary.forModuleEnvironment(moduleManager, typeRegistry));
+        rootContext.put(TypeHandlerLibrary.class, TypeHandlerLibraryImpl.forModuleEnvironment(moduleManager, typeRegistry));
 
         changeStatus(TerasologyEngineStatus.INITIALIZING_ASSET_TYPES);
         assetTypeManager = new ModuleAwareAssetTypeManager();
@@ -396,15 +397,41 @@ public class TerasologyEngine implements GameEngine {
      */
     @Override
     public synchronized void run(GameState initialState) {
+        initializeRun(initialState);
+        runMain();
+    }
+
+    @Override
+    public synchronized void initializeRun(GameState initialState) {
         Preconditions.checkState(!running);
         running = true;
+        changeStatus(StandardGameStatus.INITIALIZING);
         initialize();
-        changeStatus(StandardGameStatus.RUNNING);
 
         try {
             rootContext.put(GameEngine.class, this);
             changeState(initialState);
+        } catch (Throwable e) {
+            logger.error("Uncaught exception, attempting clean game shutdown", e);
 
+            try {
+                cleanup();
+            } catch (RuntimeException t) {
+                logger.error("Clean game shutdown after an uncaught exception failed", t);
+            }
+            running = false;
+            shutdownRequested = false;
+            changeStatus(StandardGameStatus.UNSTARTED);
+
+            throw e;
+        }
+    }
+
+    @Override
+    public synchronized void runMain() {
+        Preconditions.checkState(running);
+        changeStatus(StandardGameStatus.RUNNING);
+        try {
             mainLoop(); // -THE- MAIN LOOP. Most of the application time and resources are spent here.
         } catch (Throwable e) {
             logger.error("Uncaught exception, attempting clean game shutdown", e);

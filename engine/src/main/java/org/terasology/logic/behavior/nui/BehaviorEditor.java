@@ -22,6 +22,7 @@ import org.abego.treelayout.TreeForTreeLayout;
 import org.abego.treelayout.TreeLayout;
 import org.abego.treelayout.util.DefaultConfiguration;
 import org.abego.treelayout.util.FixedNodeExtentProvider;
+import org.joml.Vector2f;
 import org.joml.Vector2i;
 import org.terasology.context.Context;
 import org.terasology.logic.behavior.BehaviorSystem;
@@ -32,8 +33,6 @@ import org.terasology.logic.behavior.core.BehaviorNode;
 import org.terasology.logic.behavior.core.BehaviorState;
 import org.terasology.logic.behavior.core.BehaviorTreeBuilder;
 import org.terasology.logic.behavior.core.Visitor;
-import org.terasology.math.JomlUtil;
-import org.terasology.math.geom.Vector2f;
 import org.terasology.nui.BaseInteractionListener;
 import org.terasology.nui.Canvas;
 import org.terasology.nui.Color;
@@ -73,7 +72,7 @@ public class BehaviorEditor extends ZoomableLayout implements DefaultBehaviorTre
     private final InteractionListener mouseInteractionListener = new BaseInteractionListener() {
         @Override
         public void onMouseOver(NUIMouseOverEvent event) {
-            mouseWorldPosition = JomlUtil.from(screenToWorld(event.getRelativeMousePosition()));
+            mouseWorldPosition = screenToWorld(event.getRelativeMousePosition());
             if (newNode != null) {
                 org.joml.Vector2f diff = screenToWorld(event.getRelativeMousePosition()).sub(newNode.getPosition());
                 newNode.move(diff);
@@ -166,8 +165,8 @@ public class BehaviorEditor extends ZoomableLayout implements DefaultBehaviorTre
                 drawConnection(canvas, activeConnectionStart, mouseWorldPosition, Color.WHITE);
             }
             if (selectedNode != null) {
-                Vector2f size = JomlUtil.from(selectedNode.getSize());
-                Vector2f topLeft = JomlUtil.from(selectedNode.getPosition());
+                Vector2f size = new Vector2f(selectedNode.getSize());
+                Vector2f topLeft = new Vector2f(selectedNode.getPosition());
                 Vector2f topRight = new Vector2f(topLeft);
                 topRight.add(new Vector2f(size.x + .1f, 0));
                 Vector2f bottomLeft = new Vector2f(topLeft);
@@ -209,21 +208,21 @@ public class BehaviorEditor extends ZoomableLayout implements DefaultBehaviorTre
     }
 
     private void drawConnection(Canvas canvas, Vector2f from, Vector2f to, Color color) {
-        Vector2i s = worldToScreen(JomlUtil.from(from));
-        Vector2i e = worldToScreen(JomlUtil.from(to));
+        Vector2i s = worldToScreen(from);
+        Vector2i e = worldToScreen(to);
         canvas.drawLine(s.x, s.y, e.x, e.y, color);
     }
 
     private void drawConnection(Canvas canvas, Port from, Vector2f to, Color color) {
-        Vector2f start = JomlUtil.from(from.node.getPosition());
+        Vector2f start = new Vector2f(from.node.getPosition());
         start.add(from.mid());
         drawConnection(canvas, start, to, color);
     }
 
     private void drawConnection(Canvas canvas, Port from, Port to, Color color) {
-        Vector2f start = JomlUtil.from(from.node.getPosition());
+        Vector2f start = new Vector2f(from.node.getPosition());
         start.add(from.mid());
-        Vector2f end = JomlUtil.from(to.node.getPosition());
+        Vector2f end = new Vector2f(to.node.getPosition());
         end.add(to.mid());
         drawConnection(canvas, start, end, color);
     }

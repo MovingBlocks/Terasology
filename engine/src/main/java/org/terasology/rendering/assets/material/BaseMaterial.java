@@ -22,11 +22,6 @@ import org.joml.Vector3fc;
 import org.joml.Vector4fc;
 import org.terasology.assets.AssetType;
 import org.terasology.assets.ResourceUrn;
-import org.terasology.math.geom.Matrix3f;
-import org.terasology.math.geom.Matrix4f;
-import org.terasology.math.geom.Vector2f;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector4f;
 import org.terasology.rendering.assets.shader.ShaderProgramFeature;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.cameras.Camera;
@@ -76,13 +71,7 @@ public abstract class BaseMaterial extends Material {
     public abstract void setBoolean(String name, boolean value, boolean currentOnly);
 
     @Override
-    public abstract void setMatrix3(String name, Matrix3f matrix, boolean currentOnly);
-
-    @Override
     public abstract void setMatrix3(String name, FloatBuffer buffer, boolean currentOnly);
-
-    @Override
-    public abstract void setMatrix4(String name, Matrix4f matrix, boolean currentOnly);
 
     @Override
     public abstract void setMatrix4(String name, FloatBuffer buffer, boolean currentOnly);
@@ -121,16 +110,6 @@ public abstract class BaseMaterial extends Material {
     }
 
     @Override
-    public void setFloat2(String name, Vector2f value) {
-        setFloat2(name, value.x, value.y);
-    }
-
-    @Override
-    public void setFloat2(String name, Vector2f value, boolean currentOnly) {
-        setFloat2(name, value.x, value.y, currentOnly);
-    }
-
-    @Override
     public void setFloat2(String name, Vector2fc value) {
         setFloat2(name, value.x(), value.y());
     }
@@ -151,16 +130,6 @@ public abstract class BaseMaterial extends Material {
     }
 
     @Override
-    public void setFloat3(String name, Vector3f value) {
-        setFloat3(name, value.x, value.y, value.z);
-    }
-
-    @Override
-    public void setFloat3(String name, Vector3f value, boolean currentOnly) {
-        setFloat3(name, value.x, value.y, value.z, currentOnly);
-    }
-
-    @Override
     public void setFloat3(String name, Vector3fc value) {
         setFloat3(name, value.x(), value.y(), value.z());
     }
@@ -178,16 +147,6 @@ public abstract class BaseMaterial extends Material {
     @Override
     public void setFloat4(String name, float f1, float f2, float f3, float f4) {
         setFloat4(name, f1, f2, f3, f4, false);
-    }
-
-    @Override
-    public void setFloat4(String name, Vector4f value) {
-        setFloat4(name, value.x, value.y, value.z, value.w);
-    }
-
-    @Override
-    public void setFloat4(String name, Vector4f value, boolean currentOnly) {
-        setFloat4(name, value.x, value.y, value.z, value.w, currentOnly);
     }
 
     @Override
@@ -216,11 +175,6 @@ public abstract class BaseMaterial extends Material {
     }
 
     @Override
-    public void setMatrix3(String name, Matrix3f matrix) {
-        setMatrix3(name, matrix, false);
-    }
-
-    @Override
     public void setMatrix3(String name, Matrix3fc matrix) {
         setMatrix3(name, matrix, false);
     }
@@ -228,11 +182,6 @@ public abstract class BaseMaterial extends Material {
     @Override
     public void setMatrix3(String name, FloatBuffer buffer) {
         setMatrix3(name, buffer, false);
-    }
-
-    @Override
-    public void setMatrix4(String name, Matrix4f matrix) {
-        setMatrix4(name, matrix, false);
     }
 
     @Override

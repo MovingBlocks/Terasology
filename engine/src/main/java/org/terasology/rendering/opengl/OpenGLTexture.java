@@ -16,15 +16,14 @@
 package org.terasology.rendering.opengl;
 
 import com.google.common.collect.Lists;
-import org.joml.Rectanglef;
-import org.joml.Rectanglei;
 import org.joml.Vector2i;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.AssetType;
 import org.terasology.assets.ResourceUrn;
-import org.terasology.engine.subsystem.lwjgl.LwjglGraphics;
-import org.terasology.math.JomlUtil;
+import org.terasology.engine.subsystem.lwjgl.LwjglGraphicsManager;
+import org.terasology.joml.geom.Rectanglef;
+import org.terasology.joml.geom.Rectanglei;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.TextureData;
 
@@ -39,7 +38,7 @@ public class OpenGLTexture extends Texture {
 
     private final TextureResources resources;
 
-    public OpenGLTexture(ResourceUrn urn, AssetType<?, TextureData> assetType, TextureData data, LwjglGraphics graphicsManager) {
+    public OpenGLTexture(ResourceUrn urn, AssetType<?, TextureData> assetType, TextureData data, LwjglGraphicsManager graphicsManager) {
         super(urn, assetType);
         this.resources = new TextureResources(graphicsManager);
         getDisposalHook().setDisposeAction(resources);
@@ -182,7 +181,7 @@ public class OpenGLTexture extends Texture {
 
     @Override
     public Rectanglef getRegion() {
-        return JomlUtil.from(FULL_TEXTURE_REGION);
+        return new Rectanglef(FULL_TEXTURE_REGION); // object is not guarded
     }
 
     @Override
@@ -249,13 +248,13 @@ public class OpenGLTexture extends Texture {
 
     private static class TextureResources implements Runnable {
 
-        private final LwjglGraphics graphicsManager;
+        private final LwjglGraphicsManager graphicsManager;
         private volatile int id;
         private volatile LoadedTextureInfo loadedTextureInfo;
 
         private final List<Runnable> disposalSubscribers = Lists.newArrayList();
 
-         TextureResources(LwjglGraphics graphicsManager) {
+         TextureResources(LwjglGraphicsManager graphicsManager) {
             this.graphicsManager = graphicsManager;
         }
 

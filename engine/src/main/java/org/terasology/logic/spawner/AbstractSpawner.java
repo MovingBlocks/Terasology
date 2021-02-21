@@ -20,18 +20,16 @@ import org.joml.Vector2i;
 import org.joml.Vector2ic;
 import org.joml.Vector3f;
 import org.joml.Vector3i;
-import org.terasology.math.JomlUtil;
-import org.terasology.math.Region3i;
 import org.terasology.math.SpiralIterable;
 import org.terasology.math.TeraMath;
+import org.terasology.world.block.BlockRegion;
 import org.terasology.world.generation.Region;
 import org.terasology.world.generation.World;
-import org.terasology.world.generation.facets.SurfacesFacet;
 import org.terasology.world.generation.facets.ElevationFacet;
 import org.terasology.world.generation.facets.SeaLevelFacet;
 import org.terasology.world.generation.facets.SpawnHeightFacet;
 import org.terasology.world.generation.facets.StrictlySparseSeaLevelFacet;
-import org.terasology.world.generation.facets.SurfaceHeightFacet;
+import org.terasology.world.generation.facets.SurfacesFacet;
 
 import java.util.Optional;
 import java.util.function.Function;
@@ -39,12 +37,12 @@ import java.util.function.Function;
 public abstract class AbstractSpawner implements Spawner {
 
     /**
-     * Tries to find a suitable spawning point based on {@link SurfaceHeightFacet} and {@link SeaLevelFacet}.
+     * Tries to find a suitable spawning point based on {@link SurfacesFacet} and {@link ElevationFacet}.
      * @param searchRadius the radius within a suitable spawning point will be searched
      * @param world the facet-based world
      * @param pos the desired 2D position in that world
      * @return a 3D position above the surface and sea level or <code>null</code> if none was found
-     * @throws IllegalStateException if no SurfaceHeightFacet can be created.
+     * @throws IllegalStateException if no required facets can be created.
      */
     protected Vector3f findSpawnPosition(World world, Vector2i pos, int searchRadius) {
 
@@ -52,7 +50,7 @@ public abstract class AbstractSpawner implements Spawner {
         Vector3i desiredPos = new Vector3i(pos.x(), getStartHeight(world, pos), pos.y());
 
         // try and find somewhere in this region a spot to land
-        Region3i spawnArea = Region3i.createFromCenterExtents(JomlUtil.from(desiredPos), JomlUtil.from(ext));
+        BlockRegion spawnArea = new BlockRegion(desiredPos).expand(ext);
         Region worldRegion = world.getWorldData(spawnArea);
 
         Function<Vector2ic, Optional<Float>> getWorld;
@@ -60,7 +58,6 @@ public abstract class AbstractSpawner implements Spawner {
         // check if generation uses sea level and surface height facets
         SurfacesFacet surfacesFacet = worldRegion.getFacet(SurfacesFacet.class);
         ElevationFacet elevationFacet = worldRegion.getFacet(ElevationFacet.class);
-        SurfaceHeightFacet surfaceHeightFacet = worldRegion.getFacet(SurfaceHeightFacet.class);
         SpawnHeightFacet spawnHeightFacet = worldRegion.getFacet(SpawnHeightFacet.class);
 
         if (spawnHeightFacet != null) {
@@ -71,10 +68,8 @@ public abstract class AbstractSpawner implements Spawner {
             } else {
                 getWorld = v -> Optional.of(elevationFacet.getWorld(v.x(), v.y()));
             }
-        } else if (surfaceHeightFacet != null) {
-            getWorld = v -> Optional.of(surfaceHeightFacet.getWorld(v.x(), v.y()));
         } else {
-            throw new IllegalStateException("No spawn height facet, elevation facet or surface height facet found. Can't place spawn point.");
+            throw new IllegalStateException("No spawn height facet or elevation facet facet found. Can't place spawn point.");
         }
 
         Function<Vector2ic, Optional<Integer>> getSeaLevel;
@@ -119,13 +114,13 @@ public abstract class AbstractSpawner implements Spawner {
      * Get the elevation at a single point, to use as the base point for searching.
      */
     private int getStartHeight(World world, Vector2i pos) {
-        Region3i spawnArea = Region3i.createFromCenterExtents(JomlUtil.from(new Vector3i(pos.x(), 0, pos.y())), JomlUtil.from(new Vector3i()));
+        BlockRegion spawnArea = new BlockRegion(pos.x(), 0, pos.y());
         Region worldRegion = world.getWorldData(spawnArea);
 
         ElevationFacet elevationFacet = worldRegion.getFacet(ElevationFacet.class);
 
         if (elevationFacet != null) {
-            return (int) elevationFacet.getWorld(JomlUtil.from(pos));
+            return (int) elevationFacet.getWorld(pos);
         } else {
             // We'll have to rely on the SurfaceHeightFacet or SpawnHeightFacet anyway, and those are purely 2D so the height doesn't matter.
             return 0;

@@ -1,9 +1,8 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
 // Simple build file for modules - the one under the Core module is the template, will be copied as needed to modules
 
-import groovy.json.JsonSlurper
 import org.gradle.plugins.ide.eclipse.model.EclipseModel
 import org.gradle.plugins.ide.idea.model.IdeaModel
 import org.reflections.Reflections
@@ -11,26 +10,16 @@ import org.reflections.scanners.SubTypesScanner
 import org.reflections.scanners.TypeAnnotationsScanner
 import org.reflections.util.ConfigurationBuilder
 import org.reflections.util.FilterBuilder
-
+import org.terasology.gradology.ModuleInfoException
+import org.terasology.gradology.ModuleMetadataForGradle
+import org.terasology.module.ModuleMetadataJsonAdapter
 
 plugins {
-    id("java")
+    `java-library`
     id("idea")
     id("eclipse")
 }
 
-// Read environment variables, including variables passed by jenkins continuous integration server
-val env by extra { System.getenv( )}
-// This is a fun one ... when versions switched to dynamic -SNAPSHOT or not based on branch existing modules using `master` would suddenly try publishing releases
-// This won't work without additionally doing constant version bumps (perhaps via Git tags) - but too much work to switch around all modules at once
-// Complicating things more the use of publish.gradle to centralize logic means modules and engine bits are treated the same, yet we need to vary modules
-// Temporary workaround: default modules to bypass release management: master branch builds will still make snapshot builds for the snapshot repo
-// If a module actually wants release management simply include `"isReleaseManaged" : true` in module.txt - this is needed for the engine repo embedded modules
-// One option would be to slowly convert modulespace to default to a `develop` + `master` setup living in harmony with associated automation/github tweaks
-// Alternatively one more round of refactoring could switch to Git tags, a single `master` branch, and possible other things to help match snaps/PR builds somehow?
-val bypassModuleReleaseManagement by extra("true")
-
-val moduleDepends = mutableListOf<String>()
 val moduleFile = file("module.txt")
 
 // The module file should always exist if the module was correctly created or cloned using Gradle
@@ -39,39 +28,19 @@ if (!moduleFile.exists()) {
     throw GradleException("Failed to find module.txt for " + project.name)
 }
 
-//println "Scanning for dependencies in module.txt for " + project.name
-val slurper = JsonSlurper()  // 😂 using groovy's json parser in kotlin
-val moduleConfig: Map<String, Any> = slurper.parseText(moduleFile.readText())!! as Map<String, Any>
-for (dependency in moduleConfig["dependencies"] as List<Map<String, String>>) {
-    if (dependency["id"] != "engine") {
-        moduleDepends.add(dependency["id"]!!)
+val moduleConfig = try {
+    moduleFile.reader().use {
+        ModuleMetadataJsonAdapter().read(it)!!
     }
+} catch (e: Exception) {
+    throw ModuleInfoException(e, moduleFile, project)
 }
 
-// Gradle uses the magic version variable when creating the jar name (unless explicitly set somewhere else I guess)
-version = moduleConfig["version"] as String
-
-// Check for an outright -SNAPSHOT in the loaded version - for ease of use we want to get rid of that everywhere, so warn about it and remove for the variable
-val undesiredSnapshotTag = version.toString().endsWith("-SNAPSHOT")
-if (undesiredSnapshotTag) {
-    println("Taking off undesired -SNAPSHOT")
-    version = version.toString().removeSuffix("-SNAPSHOT")
-    println("WARNING: Module ${project.name} is explicitly versioned as a snapshot in module.txt, please remove '-SNAPSHOT'")
-}
-
-// The only case in which we make module non-snapshots is if release management is enabled and BRANCH_NAME is "master"
-if (moduleConfig["isReleaseManaged"].toString().toBoolean() && env["BRANCH_NAME"] == "master") {
-    // This is mildly awkward since we need to bypass by default, yet if release management is on (true) then we set the bypass to false ..
-    val bypassModuleReleaseManagement by extra(false)
-} else {
-    // In the case where we actually are building a snapshot we load -SNAPSHOT into the version variable, even if it wasn't there in module.txt
-    version = "${version}-SNAPSHOT"
-}
-
+project.version = moduleConfig.version
 // Jenkins-Artifactory integration catches on to this as part of the Maven-type descriptor
-group = "org.terasology.modules"
+project.group = "org.terasology.modules"
 
-println("Version for $project.name loaded as $version for group $group")
+logger.info("Version for {} loaded as {} for group {}", project.name, project.version, project.group)
 
 // Grab all the common stuff like plugins to use, artifact repositories, code analysis config, Artifactory settings, Git magic
 // Note that this statement is down a ways because it is affected by the stuff higher in this file like setting versioning
@@ -87,40 +56,62 @@ configure<SourceSetContainer> {
     }
 }
 val convention = project.getConvention().getPlugin(JavaPluginConvention::class)
-val mainSourceSet = convention.getSourceSets().getByName("main");
+val mainSourceSet = convention.getSourceSets().getByName("main")
 
-// TODO: Remove when we don't need to rely on snapshots. Needed here for solo builds in Jenkins
-configurations.all {
-    resolutionStrategy.cacheChangingModulesFor(0, "seconds")
+
+val frig = ModuleMetadataForGradle(moduleConfig)
+
+configurations {
+    all {
+        resolutionStrategy.preferProjectModules()
+    }
 }
 
 // Set dependencies. Note that the dependency information from module.txt is used for other Terasology modules
 dependencies {
-    // Check to see if this module is not the root Gradle project - if so we are in a multi-project workspace
-    implementation(group = "org.terasology.engine", name = "engine", version = "+") { isChanging = true }
-    implementation(group = "org.terasology.engine", name = "engine-tests", version = "+") { isChanging = true }
+    implementation(group = "org.terasology.engine", name = "engine", version = frig.engineVersion())
+    implementation(group = "org.terasology.engine", name = "engine-tests", version = frig.engineVersion())
 
-    for (dependency in moduleDepends) {
-        implementation(group = "org.terasology.modules", name = dependency, version = "+") { isChanging = true }
+    for ((gradleDep, optional) in frig.moduleDependencies()) {
+        if (optional) {
+            // `optional` module dependencies are ones it does not require for runtime
+            // (but will use opportunistically if available)
+            compileOnly(gradleDep.asMap())
+            // though modules also sometimes use "optional" to describe their test dependencies;
+            // they're not required for runtime, but they *are* required for tests.
+            testImplementation(gradleDep.asMap())
+        } else {
+            implementation(gradleDep.asMap())
+        }
     }
 
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.6.2")
-    testImplementation("org.junit.jupiter:junit-jupiter-params:5.6.2")
-    testImplementation("org.mockito:mockito-junit-jupiter:3.2.0")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.6.2")
+    testRuntimeOnly("org.slf4j:jul-to-slf4j:1.7.21")
+
+    add("testImplementation", platform("org.junit:junit-bom:5.7.1"))
+    testImplementation("org.junit.jupiter:junit-jupiter-api")
+    testImplementation("org.junit.jupiter:junit-jupiter-params")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
+
+    testImplementation("org.mockito:mockito-junit-jupiter:3.7.7")
 
     //backwards compatibility with modules tests
-    testImplementation("junit:junit:4.12")
-    testRuntimeOnly("org.junit.vintage:junit-vintage-engine:5.5.2")
+    testImplementation("junit:junit:4.13.1")
+    testImplementation("org.junit.jupiter:junit-jupiter-migrationsupport")
+    testRuntimeOnly("org.junit.vintage:junit-vintage-engine")
 }
 
 
 if (project.name == "ModuleTestingEnvironment") {
     dependencies {
         // MTE is a special snowflake, it gets these things as non-test dependencies
-        implementation("org.junit.jupiter:junit-jupiter-api:5.6.2")
-        implementation("org.mockito:mockito-junit-jupiter:3.2.0")
-        implementation("junit:junit:4.12")
+        implementation("ch.qos.logback:logback-classic:1.2.3")
+        runtimeOnly("org.codehaus.janino:janino:3.1.3") {
+            because("logback filters")
+        }
+        add("implementation", platform("org.junit:junit-bom:5.7.1"))
+        implementation("org.junit.jupiter:junit-jupiter-api")
+        implementation("org.mockito:mockito-junit-jupiter:3.7.7")
+        implementation("junit:junit:4.13.1")
         //TODO: Remove shrinkwrap from code, you have FileSystem in java 8
         implementation("org.jboss.shrinkwrap:shrinkwrap-depchain-java7:1.2.1")
     }
@@ -171,7 +162,7 @@ tasks.register("cacheReflections") {
                     .setScanners(TypeAnnotationsScanner(), SubTypesScanner()))
             reflections.save(outputs.getFiles().getAsPath())
         } catch (e: java.net.MalformedURLException) {
-            getLogger().error("Cannot parse input to url", e);
+            logger.error("Cannot parse input to url", e)
         }
     }
 }

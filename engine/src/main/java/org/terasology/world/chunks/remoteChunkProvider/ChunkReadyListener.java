@@ -16,9 +16,9 @@
 
 package org.terasology.world.chunks.remoteChunkProvider;
 
-import org.terasology.math.geom.Vector3i;
+import org.joml.Vector3ic;
 
 @FunctionalInterface
 public interface ChunkReadyListener {
-    void onChunkReady(Vector3i pos);
+    void onChunkReady(Vector3ic pos);
 }

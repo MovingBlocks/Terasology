@@ -15,7 +15,7 @@
  */
 package org.terasology.rendering.logic;
 
-import org.terasology.math.geom.Vector3i;
+import org.joml.Vector3i;
 import org.terasology.nui.Color;
 
 /**
@@ -24,5 +24,5 @@ import org.terasology.nui.Color;
 public class RegionOutlineComponent implements VisualComponent {
     public Vector3i corner1;
     public Vector3i corner2;
-    public Color color = Color.WHITE;
+    public Color color = new Color(Color.white);
 }

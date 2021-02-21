@@ -15,8 +15,8 @@
  */
 package org.terasology.entitySystem.sectors;
 
+import org.joml.Vector3i;
 import org.terasology.entitySystem.Component;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.module.sandbox.API;
 import org.terasology.world.chunks.Chunk;
 
