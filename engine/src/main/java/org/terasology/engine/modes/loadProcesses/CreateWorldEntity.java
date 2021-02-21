@@ -92,13 +92,14 @@ public class CreateWorldEntity extends SingleStepLoadProcess {
             // Also set all the components to the world entity.
             WorldConfigurator worldConfigurator = worldGenerator.getConfigurator();
             Map<String, Component> params = worldConfigurator.getProperties();
+
             for (Map.Entry<String, Component> entry : params.entrySet()) {
                 Class<? extends Component> clazz = entry.getValue().getClass();
-                Component comp = config.getModuleConfig(generatorUri, entry.getKey(), clazz);
+                Component comp = gameManifest.getModuleConfig(generatorUri, entry.getKey(), clazz);
                 if (comp != null) {
                     worldEntity.addComponent(comp);
                     worldConfigurator.setProperty(entry.getKey(), comp);
-                } else {
+                }  else {
                     worldEntity.addComponent(entry.getValue());
                 }
             }

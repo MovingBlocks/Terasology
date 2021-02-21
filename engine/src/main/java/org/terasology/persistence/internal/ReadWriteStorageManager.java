@@ -64,6 +64,8 @@ import org.terasology.world.chunks.ChunkProvider;
 import org.terasology.world.chunks.ManagedChunk;
 import org.terasology.world.chunks.blockdata.ExtraBlockDataManager;
 import org.terasology.world.chunks.internal.ChunkImpl;
+import org.terasology.world.generator.WorldConfigurator;
+import org.terasology.world.generator.WorldGenerator;
 import org.terasology.world.internal.WorldInfo;
 
 import java.io.IOException;
@@ -379,6 +381,14 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
         for (WorldInfo worldInfo: worlds) {
             gameManifest.addWorld(worldInfo);
         }
+
+        WorldGenerator worldGenerator = CoreRegistry.get(WorldGenerator.class);
+        if (worldGenerator != null) {
+            WorldConfigurator worldConfigurator = worldGenerator.getConfigurator();
+            Map<String, Component> params = worldConfigurator.getProperties();
+            gameManifest.setModuleConfigs(worldGenerator.getUri(), params);
+        }
+
         saveTransactionBuilder.setGameManifest(gameManifest);
     }
 

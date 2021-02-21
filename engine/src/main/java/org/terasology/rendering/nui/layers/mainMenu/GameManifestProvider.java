@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.nui.layers.mainMenu;
 
+import com.google.common.collect.Maps;
 import org.codehaus.plexus.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,14 +23,18 @@ import org.terasology.config.Config;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.module.ModuleManager;
+import org.terasology.entitySystem.Component;
 import org.terasology.game.GameManifest;
 import org.terasology.module.DependencyResolver;
 import org.terasology.module.Module;
 import org.terasology.module.ResolutionResult;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameProvider;
+import org.terasology.rendering.world.WorldSetupWrapper;
 import org.terasology.world.internal.WorldInfo;
 import org.terasology.world.time.WorldTime;
+
+import java.util.Map;
 
 
 /**
@@ -76,9 +81,10 @@ public class GameManifestProvider {
 
         SimpleUri uri;
         String seed;
-        if (universeWrapper.getTargetWorld() != null) {
-            uri = universeWrapper.getTargetWorld().getWorldGenerator().getUri();
-            seed = universeWrapper.getTargetWorld().getWorldGenerator().getWorldSeed();
+        WorldSetupWrapper worldSetup = universeWrapper.getTargetWorld();
+        if (worldSetup != null) {
+            uri = worldSetup.getWorldGenerator().getUri();
+            seed = worldSetup.getWorldGenerator().getWorldSeed();
         } else {
             uri = config.getWorldGeneration().getDefaultGenerator();
             seed = universeWrapper.getSeed();
@@ -86,14 +92,23 @@ public class GameManifestProvider {
         gameManifest.setSeed(seed);
 
         String targetWorldName = "";
-        if (universeWrapper.getTargetWorld() != null) {
-            targetWorldName = universeWrapper.getTargetWorld().getWorldName().toString();
+        Map<String, Component> worldConfig = Maps.newHashMap();
+        if (worldSetup != null) {
+            targetWorldName = worldSetup.getWorldName().toString();
+            if (worldSetup.getWorldConfigurator() != null) {
+
+                // horrible hack to get configs into manifest.
+                // config driven by CreateWorldEntity.
+                // world config set somewhere else as well no clear drive from config --> world
+                gameManifest.setModuleConfigs(uri, worldSetup.getWorldConfigurator().getProperties());
+            }
         }
         // This is multiplied by the number of seconds in a day (86400000) to determine the exact  millisecond at which the game will start.
         WorldInfo worldInfo = new WorldInfo(TerasologyConstants.MAIN_WORLD, targetWorldName, seed,
                 (long) (WorldTime.DAY_LENGTH * WorldTime.SUNRISE_OFFSET), uri);
 
         gameManifest.addWorld(worldInfo);
+
         config.getUniverseConfig().addWorldManager(worldInfo);
         config.getUniverseConfig().setSpawnWorldTitle(worldInfo.getTitle());
         config.getUniverseConfig().setUniverseSeed(universeWrapper.getSeed());
