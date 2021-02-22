@@ -51,8 +51,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class ModuleManagerImpl {
-    private static final Logger logger = LoggerFactory.getLogger(ModuleManagerImpl.class);
+public class ModuleManager {
+    private static final Logger logger = LoggerFactory.getLogger(ModuleManager.class);
     private final StandardPermissionProviderFactory permissionProviderFactory = new StandardPermissionProviderFactory();
     private final PermissionProviderFactory wrappingPermissionProviderFactory = new WarnOnlyProviderFactory(permissionProviderFactory);
 
@@ -61,11 +61,11 @@ public class ModuleManagerImpl {
     private final ModuleMetadataJsonAdapter metadataReader;
     private final ModuleInstallManager installManager;
 
-    public ModuleManagerImpl(String masterServerAddress) {
+    public ModuleManager(String masterServerAddress) {
         this(masterServerAddress, Collections.emptyList());
     }
 
-    public ModuleManagerImpl(String masterServerAddress, List<Class<?>> classesOnClasspathsToAddToEngine) {
+    public ModuleManager(String masterServerAddress, List<Class<?>> classesOnClasspathsToAddToEngine) {
         PathManager pathManager = PathManager.getInstance();  // get early so if it needs to initialize, it does it now
 
         metadataReader = new ModuleMetadataJsonAdapter();
@@ -117,11 +117,11 @@ public class ModuleManagerImpl {
         installManager = new ModuleInstallManager(this, masterServerAddress);
     }
 
-    public ModuleManagerImpl(Config config) {
+    public ModuleManager(Config config) {
         this(config, Collections.emptyList());
     }
 
-    public ModuleManagerImpl(Config config, List<Class<?>> classesOnClasspathsToAddToEngine) {
+    public ModuleManager(Config config, List<Class<?>> classesOnClasspathsToAddToEngine) {
         this(config.getNetwork().getMasterServer(), classesOnClasspathsToAddToEngine);
     }
 
@@ -184,22 +184,18 @@ public class ModuleManagerImpl {
         System.setSecurityManager(new ModuleSecurityManager());
     }
 
-    @Override
     public ModuleRegistry getRegistry() {
         return registry;
     }
 
-    @Override
     public ModuleInstallManager getInstallManager() {
         return installManager;
     }
 
-    @Override
     public ModuleEnvironment getEnvironment() {
         return environment;
     }
 
-    @Override
     public ModuleEnvironment loadEnvironment(Set<Module> modules, boolean asPrimary) {
         Set<Module> finalModules = Sets.newLinkedHashSet(modules);
         finalModules.addAll(registry.stream().filter(Module::isOnClasspath).collect(Collectors.toList()));
@@ -216,7 +212,6 @@ public class ModuleManagerImpl {
         return newEnvironment;
     }
 
-    @Override
     public ModuleMetadataJsonAdapter getModuleMetadataReader() {
         return metadataReader;
     }
@@ -224,7 +219,7 @@ public class ModuleManagerImpl {
     private void enrichReflectionsWithSubsystems(Module engineModule) {
         Serializer serializer = new XmlSerializer();
         try {
-            Enumeration<URL> urls = ModuleManagerImpl.class.getClassLoader().getResources("reflections.cache");
+            Enumeration<URL> urls = ModuleManager.class.getClassLoader().getResources("reflections.cache");
             while (urls.hasMoreElements()) {
                 URL url = urls.nextElement();
                 if (url.getPath().contains("subsystem")) {
