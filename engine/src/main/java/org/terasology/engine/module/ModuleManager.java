@@ -70,6 +70,30 @@ public class ModuleManager {
 
         metadataReader = newMetadataReader();
 
+        Module engineModule = loadEngineModule(classesOnClasspathsToAddToEngine);
+
+        registry = new TableModuleRegistry();
+        registry.add(engineModule);
+
+        loadModulesFromClassPath();
+
+        ModulePathScanner scanner = new ModulePathScanner(new ModuleLoader(metadataReader));
+        scanner.getModuleLoader().setModuleInfoPath(TerasologyConstants.MODULE_INFO_FILENAME);
+        scanner.scan(registry, pathManager.getModulePaths());
+
+        DependencyInfo engineDep = new DependencyInfo();
+        engineDep.setId(engineModule.getId());
+        engineDep.setMinVersion(engineModule.getVersion());
+        engineDep.setMaxVersion(engineModule.getVersion().getNextPatchVersion());
+
+        registry.stream().filter(mod -> mod != engineModule).forEach(mod -> mod.getMetadata().getDependencies().add(engineDep));
+
+        setupSandbox();
+        loadEnvironment(Sets.newHashSet(engineModule), true);
+        installManager = new ModuleInstallManager(this, masterServerAddress);
+    }
+
+    private Module loadEngineModule(List<Class<?>> classesOnClasspathsToAddToEngine) {
         Module engineModule;
         try (Reader reader = new InputStreamReader(getClass().getResourceAsStream("/engine-module.txt"), TerasologyConstants.CHARSET)) {
             ModuleMetadata metadata = metadataReader.read(reader);
@@ -91,25 +115,7 @@ public class ModuleManager {
 
         enrichReflectionsWithSubsystems(engineModule);
 
-        registry = new TableModuleRegistry();
-        registry.add(engineModule);
-
-        loadModulesFromClassPath();
-
-        ModulePathScanner scanner = new ModulePathScanner(new ModuleLoader(metadataReader));
-        scanner.getModuleLoader().setModuleInfoPath(TerasologyConstants.MODULE_INFO_FILENAME);
-        scanner.scan(registry, pathManager.getModulePaths());
-
-        DependencyInfo engineDep = new DependencyInfo();
-        engineDep.setId(engineModule.getId());
-        engineDep.setMinVersion(engineModule.getVersion());
-        engineDep.setMaxVersion(engineModule.getVersion().getNextPatchVersion());
-
-        registry.stream().filter(mod -> mod != engineModule).forEach(mod -> mod.getMetadata().getDependencies().add(engineDep));
-
-        setupSandbox();
-        loadEnvironment(Sets.newHashSet(engineModule), true);
-        installManager = new ModuleInstallManager(this, masterServerAddress);
+        return engineModule;
     }
 
     public ModuleManager(Config config) {
