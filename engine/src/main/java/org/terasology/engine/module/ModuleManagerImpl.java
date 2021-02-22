@@ -51,7 +51,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class ModuleManagerImpl implements ModuleManager {
+public class ModuleManagerImpl {
     private static final Logger logger = LoggerFactory.getLogger(ModuleManagerImpl.class);
     private final StandardPermissionProviderFactory permissionProviderFactory = new StandardPermissionProviderFactory();
     private final PermissionProviderFactory wrappingPermissionProviderFactory = new WarnOnlyProviderFactory(permissionProviderFactory);
