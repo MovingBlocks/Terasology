@@ -68,13 +68,8 @@ public class ModuleManager {
     public ModuleManager(String masterServerAddress, List<Class<?>> classesOnClasspathsToAddToEngine) {
         PathManager pathManager = PathManager.getInstance();  // get early so if it needs to initialize, it does it now
 
-        metadataReader = new ModuleMetadataJsonAdapter();
-        for (ModuleExtension ext : StandardModuleExtension.values()) {
-            metadataReader.registerExtension(ext.getKey(), ext.getValueType());
-        }
-        for (ModuleExtension ext : ExtraDataModuleExtension.values()) {
-            metadataReader.registerExtension(ext.getKey(), ext.getValueType());
-        }
+        metadataReader = newMetadataReader();
+
         Module engineModule;
         try (Reader reader = new InputStreamReader(getClass().getResourceAsStream("/engine-module.txt"), TerasologyConstants.CHARSET)) {
             ModuleMetadata metadata = metadataReader.read(reader);
@@ -123,6 +118,18 @@ public class ModuleManager {
 
     public ModuleManager(Config config, List<Class<?>> classesOnClasspathsToAddToEngine) {
         this(config.getNetwork().getMasterServer(), classesOnClasspathsToAddToEngine);
+    }
+
+    private ModuleMetadataJsonAdapter newMetadataReader() {
+        final ModuleMetadataJsonAdapter metadataJsonAdapter;
+        metadataJsonAdapter = new ModuleMetadataJsonAdapter();
+        for (ModuleExtension ext : StandardModuleExtension.values()) {
+            metadataJsonAdapter.registerExtension(ext.getKey(), ext.getValueType());
+        }
+        for (ModuleExtension ext : ExtraDataModuleExtension.values()) {
+            metadataJsonAdapter.registerExtension(ext.getKey(), ext.getValueType());
+        }
+        return metadataJsonAdapter;
     }
 
     /**
