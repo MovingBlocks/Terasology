@@ -77,9 +77,7 @@ public class ModuleManager {
 
         loadModulesFromClassPath();
 
-        ModulePathScanner scanner = new ModulePathScanner(new ModuleLoader(metadataReader));
-        scanner.getModuleLoader().setModuleInfoPath(TerasologyConstants.MODULE_INFO_FILENAME);
-        scanner.scan(registry, pathManager.getModulePaths());
+        loadModulesFromApplicationPath(pathManager);
 
         DependencyInfo engineDep = new DependencyInfo();
         engineDep.setId(engineModule.getId());
@@ -91,6 +89,12 @@ public class ModuleManager {
         setupSandbox();
         loadEnvironment(Sets.newHashSet(engineModule), true);
         installManager = new ModuleInstallManager(this, masterServerAddress);
+    }
+
+    private void loadModulesFromApplicationPath(PathManager pathManager) {
+        ModulePathScanner scanner = new ModulePathScanner(new ModuleLoader(metadataReader));
+        scanner.getModuleLoader().setModuleInfoPath(TerasologyConstants.MODULE_INFO_FILENAME);
+        scanner.scan(registry, pathManager.getModulePaths());
     }
 
     private Module loadEngineModule(List<Class<?>> classesOnClasspathsToAddToEngine) {
