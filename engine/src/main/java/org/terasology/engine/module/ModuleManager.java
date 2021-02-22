@@ -79,16 +79,20 @@ public class ModuleManager {
 
         loadModulesFromApplicationPath(pathManager);
 
+        ensureModulesDependOnEngine(engineModule);
+
+        setupSandbox();
+        loadEnvironment(Sets.newHashSet(engineModule), true);
+        installManager = new ModuleInstallManager(this, masterServerAddress);
+    }
+
+    private void ensureModulesDependOnEngine(Module engineModule) {
         DependencyInfo engineDep = new DependencyInfo();
         engineDep.setId(engineModule.getId());
         engineDep.setMinVersion(engineModule.getVersion());
         engineDep.setMaxVersion(engineModule.getVersion().getNextPatchVersion());
 
         registry.stream().filter(mod -> mod != engineModule).forEach(mod -> mod.getMetadata().getDependencies().add(engineDep));
-
-        setupSandbox();
-        loadEnvironment(Sets.newHashSet(engineModule), true);
-        installManager = new ModuleInstallManager(this, masterServerAddress);
     }
 
     private void loadModulesFromApplicationPath(PathManager pathManager) {
