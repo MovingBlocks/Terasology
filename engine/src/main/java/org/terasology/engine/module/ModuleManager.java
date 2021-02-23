@@ -68,13 +68,46 @@ public class ModuleManager {
     public ModuleManager(String masterServerAddress, List<Class<?>> classesOnClasspathsToAddToEngine) {
         PathManager pathManager = PathManager.getInstance();  // get early so if it needs to initialize, it does it now
 
-        metadataReader = new ModuleMetadataJsonAdapter();
-        for (ModuleExtension ext : StandardModuleExtension.values()) {
-            metadataReader.registerExtension(ext.getKey(), ext.getValueType());
-        }
-        for (ModuleExtension ext : ExtraDataModuleExtension.values()) {
-            metadataReader.registerExtension(ext.getKey(), ext.getValueType());
-        }
+        metadataReader = newMetadataReader();
+
+        Module engineModule = loadEngineModule(classesOnClasspathsToAddToEngine);
+
+        registry = new TableModuleRegistry();
+        registry.add(engineModule);
+
+        loadModulesFromClassPath();
+
+        loadModulesFromApplicationPath(pathManager);
+
+        ensureModulesDependOnEngine(engineModule);
+
+        setupSandbox();
+        loadEnvironment(Sets.newHashSet(engineModule), true);
+        installManager = new ModuleInstallManager(this, masterServerAddress);
+    }
+
+    /**
+     * I wondered why this is important, and found MovingBlocks/Terasology#1450.
+     * It's not a worry that the engine module wouldn't be loaded without it. 
+     * It's about ordering: some things run in an order derived from the dependency 
+     * tree, and we want to make sure engine is at the root of it.
+     */   
+    private void ensureModulesDependOnEngine(Module engineModule) {
+        DependencyInfo engineDep = new DependencyInfo();
+        engineDep.setId(engineModule.getId());
+        engineDep.setMinVersion(engineModule.getVersion());
+        engineDep.setMaxVersion(engineModule.getVersion().getNextPatchVersion());
+
+        registry.stream().filter(mod -> mod != engineModule).forEach(mod -> mod.getMetadata().getDependencies().add(engineDep));
+    }
+
+    private void loadModulesFromApplicationPath(PathManager pathManager) {
+        ModulePathScanner scanner = new ModulePathScanner(new ModuleLoader(metadataReader));
+        scanner.getModuleLoader().setModuleInfoPath(TerasologyConstants.MODULE_INFO_FILENAME);
+        scanner.scan(registry, pathManager.getModulePaths());
+    }
+
+    private Module loadEngineModule(List<Class<?>> classesOnClasspathsToAddToEngine) {
         Module engineModule;
         try (Reader reader = new InputStreamReader(getClass().getResourceAsStream("/engine-module.txt"), TerasologyConstants.CHARSET)) {
             ModuleMetadata metadata = metadataReader.read(reader);
@@ -96,25 +129,7 @@ public class ModuleManager {
 
         enrichReflectionsWithSubsystems(engineModule);
 
-        registry = new TableModuleRegistry();
-        registry.add(engineModule);
-
-        loadModulesFromClassPath();
-
-        ModulePathScanner scanner = new ModulePathScanner(new ModuleLoader(metadataReader));
-        scanner.getModuleLoader().setModuleInfoPath(TerasologyConstants.MODULE_INFO_FILENAME);
-        scanner.scan(registry, pathManager.getModulePaths());
-
-        DependencyInfo engineDep = new DependencyInfo();
-        engineDep.setId(engineModule.getId());
-        engineDep.setMinVersion(engineModule.getVersion());
-        engineDep.setMaxVersion(engineModule.getVersion().getNextPatchVersion());
-
-        registry.stream().filter(mod -> mod != engineModule).forEach(mod -> mod.getMetadata().getDependencies().add(engineDep));
-
-        setupSandbox();
-        loadEnvironment(Sets.newHashSet(engineModule), true);
-        installManager = new ModuleInstallManager(this, masterServerAddress);
+        return engineModule;
     }
 
     public ModuleManager(Config config) {
@@ -123,6 +138,17 @@ public class ModuleManager {
 
     public ModuleManager(Config config, List<Class<?>> classesOnClasspathsToAddToEngine) {
         this(config.getNetwork().getMasterServer(), classesOnClasspathsToAddToEngine);
+    }
+
+    private ModuleMetadataJsonAdapter newMetadataReader() {
+        final ModuleMetadataJsonAdapter metadataJsonAdapter = new ModuleMetadataJsonAdapter();
+        for (ModuleExtension ext : StandardModuleExtension.values()) {
+            metadataJsonAdapter.registerExtension(ext.getKey(), ext.getValueType());
+        }
+        for (ModuleExtension ext : ExtraDataModuleExtension.values()) {
+            metadataJsonAdapter.registerExtension(ext.getKey(), ext.getValueType());
+        }
+        return metadataJsonAdapter;
     }
 
     /**
