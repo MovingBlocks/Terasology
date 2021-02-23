@@ -86,6 +86,12 @@ public class ModuleManager {
         installManager = new ModuleInstallManager(this, masterServerAddress);
     }
 
+    /**
+     * I wondered why this is important, and found MovingBlocks/Terasology#1450.
+     * It's not a worry that the engine module wouldn't be loaded without it. 
+     * It's about ordering: some things run in an order derived from the dependency 
+     * tree, and we want to make sure engine is at the root of it.
+     */   
     private void ensureModulesDependOnEngine(Module engineModule) {
         DependencyInfo engineDep = new DependencyInfo();
         engineDep.setId(engineModule.getId());
@@ -135,8 +141,7 @@ public class ModuleManager {
     }
 
     private ModuleMetadataJsonAdapter newMetadataReader() {
-        final ModuleMetadataJsonAdapter metadataJsonAdapter;
-        metadataJsonAdapter = new ModuleMetadataJsonAdapter();
+        final ModuleMetadataJsonAdapter metadataJsonAdapter = new ModuleMetadataJsonAdapter();
         for (ModuleExtension ext : StandardModuleExtension.values()) {
             metadataJsonAdapter.registerExtension(ext.getKey(), ext.getValueType());
         }
