@@ -33,18 +33,19 @@ import org.terasology.module.sandbox.StandardPermissionProviderFactory;
 import org.terasology.module.sandbox.WarnOnlyProviderFactory;
 import org.terasology.nui.UIWidget;
 import org.terasology.reflection.TypeRegistry;
+import org.terasology.utilities.Jvm;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.lang.reflect.ReflectPermission;
-import java.net.JarURLConnection;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.Policy;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
@@ -66,6 +67,8 @@ public class ModuleManagerImpl implements ModuleManager {
     }
 
     public ModuleManagerImpl(String masterServerAddress, List<Class<?>> classesOnClasspathsToAddToEngine) {
+        PathManager pathManager = PathManager.getInstance();  // get early so if it needs to initialize, it does it now
+
         metadataReader = new ModuleMetadataJsonAdapter();
         for (ModuleExtension ext : StandardModuleExtension.values()) {
             metadataReader.registerExtension(ext.getKey(), ext.getValueType());
@@ -101,7 +104,7 @@ public class ModuleManagerImpl implements ModuleManager {
 
         ModulePathScanner scanner = new ModulePathScanner(new ModuleLoader(metadataReader));
         scanner.getModuleLoader().setModuleInfoPath(TerasologyConstants.MODULE_INFO_FILENAME);
-        scanner.scan(registry, PathManager.getInstance().getModulePaths());
+        scanner.scan(registry, pathManager.getModulePaths());
 
         DependencyInfo engineDep = new DependencyInfo();
         engineDep.setId(engineModule.getId());
@@ -127,47 +130,43 @@ public class ModuleManagerImpl implements ModuleManager {
      * Overrides modules in modules/ with those specified via -classpath in the JVM
      */
     void loadModulesFromClassPath() {
-        ClassLoader classLoader = ClassLoader.getSystemClassLoader();
-        ModuleLoader loader = new ModuleLoader(metadataReader);
-        Enumeration<URL> moduleInfosInClassPath;
+        logger.debug("loadModulesFromClassPath with classpath:");
+        Jvm.logClasspath(logger);
+
+        ModuleLoader loader = new ClasspathSupportingModuleLoader(metadataReader, true, true);
         loader.setModuleInfoPath(TerasologyConstants.MODULE_INFO_FILENAME);
 
-        // We're looking for jars on the classpath with a module.txt
-        try {
-            moduleInfosInClassPath = classLoader.getResources(TerasologyConstants.MODULE_INFO_FILENAME.toString());
-        } catch (IOException e) {
-            logger.warn("Failed to search for classpath modules:", e);
-            return;
-        }
+        List<Path> classPaths = Arrays.stream(
+                System.getProperty("java.class.path").split(System.getProperty("path.separator", ":"))
+        ).map(Paths::get).collect(Collectors.toList());
 
-        for (URL url : Collections.list(moduleInfosInClassPath)) {
+        for (Path path : classPaths) {
+            // I thought I'd make the ClasspathSupporting stuff in the shape of a ModuleLoader
+            // so I could use it with the existing ModulePathScanner, but no. The inputs to that
+            // are the _parent directories_ of what we have.
+            //
+            // The conditions here mirror those of org.terasology.module.ModulePathScanner.loadModule
+
             Module module;
             try {
-                module = load(loader, url);
-            } catch (ClassCastException | IOException | URISyntaxException e) {
-                logger.warn("Failed to load classpath module {}", url, e);
+                module = loader.load(path);
+            } catch (IOException e) {
+                logger.error("Failed to load classpath module {}", path, e);
                 continue;
             }
-            if (module != null) {
-                registry.add(module);
-                logger.info("Loaded module {} from class path at {}", module, url.getFile());
+
+            if (module == null) {
+                continue;
+            }
+
+            boolean isNew = registry.add(module);
+            if (isNew) {
+                logger.info("Discovered module: {}", module);
+            } else {
+                logger.warn("Discovered duplicate module: {}-{}, skipping {}",
+                        module.getId(), module.getVersion(), path);
             }
         }
-    }
-
-    Module load(ModuleLoader loader, URL url) throws IOException, URISyntaxException {
-        JarURLConnection connection = (JarURLConnection) url.openConnection();
-        Path jarPath = Paths.get(connection.getJarFileURL().toURI());
-
-        Module module = loader.load(jarPath);
-
-        // if the display name is empty or the id is null, this probably isn't a Terasology module
-        if (null == module.getId() || module.getMetadata().getDisplayName().toString().isEmpty()) {
-            logger.warn("Found a module-like JAR on the class path with no id or display name. Skipping {}", url);
-            return null;
-        }
-
-        return module;
     }
 
     private void setupSandbox() {
@@ -176,8 +175,8 @@ public class ModuleManagerImpl implements ModuleManager {
         ExternalApiWhitelist.PACKAGES.stream().forEach(packagee ->
                 permissionProviderFactory.getBasePermissionSet().addAPIPackage(packagee));
 
-        APIScanner apiScanner = new APIScanner(permissionProviderFactory);
-        registry.stream().filter(Module::isOnClasspath).forEach(apiScanner::scan);
+        APIScanner apiScanner = new APIScannerTolerantOfAssetOnlyModules(permissionProviderFactory);
+        apiScanner.scan(registry);
 
         permissionProviderFactory.getBasePermissionSet().grantPermission("com.google.gson", ReflectPermission.class);
         permissionProviderFactory.getBasePermissionSet().grantPermission("com.google.gson.internal", ReflectPermission.class);
