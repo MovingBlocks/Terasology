@@ -20,7 +20,7 @@ import org.terasology.reflection.TypeInfo;
 
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ConstructorLibraryTest {
     private final ConstructorLibrary library = new ConstructorLibrary();
