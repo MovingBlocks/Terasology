@@ -4,6 +4,7 @@
 package org.terasology.world.chunks;
 
 import com.google.common.collect.Sets;
+import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.terasology.engine.subsystem.common.ThreadManager;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -40,11 +41,13 @@ public class ChunkLightMergingSystem extends BaseComponentSystem {
 
     private void processNearbyChunks(Vector3ic chunkPos) {
         for (Vector3ic candidateForLightMerging : new BlockRegion(chunkPos).expand(1, 1, 1)) {
-            if (lightMergedChunks.contains(candidateForLightMerging)) {
+            Vector3ic candidate = new Vector3i(candidateForLightMerging);
+            if (lightMergedChunks.contains(candidate)) {
                 continue;
             }
-            processCandidateChunk(candidateForLightMerging);
-            lightMergedChunks.add(candidateForLightMerging);
+            if (processCandidateChunk(candidate)) {
+                lightMergedChunks.add(candidate);
+            }
         }
     }
 
@@ -52,18 +55,20 @@ public class ChunkLightMergingSystem extends BaseComponentSystem {
      * Check nearby chunks, gather nearby chunks and starts light merging, if nearby chunks is ready.
      *
      * @param candidateChunkPosition candidate for lightmerging.
+     * @return is candidate sends to processing.
      */
-    private void processCandidateChunk(Vector3ic candidateChunkPosition) {
+    private boolean processCandidateChunk(Vector3ic candidateChunkPosition) {
         BlockRegion around = new BlockRegion(candidateChunkPosition).expand(1, 1, 1);
         Chunk[] chunks = new Chunk[LightMerger.LOCAL_CHUNKS_ARRAY_LENGTH];
         int index = 0;
         for (Vector3ic position : around) {
             if (!loadedChunkPos.contains(position)) {
-                return;
+                return false;
             }
             chunks[index++] = chunkProvider.getChunk(position);
         }
         threadManager.submitTask("Chunk Light Merging", () -> new LightMerger().merge(chunks));
+        return true;
     }
 
     @ReceiveEvent
