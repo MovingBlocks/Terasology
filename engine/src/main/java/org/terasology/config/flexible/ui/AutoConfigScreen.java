@@ -10,6 +10,7 @@ import org.terasology.config.flexible.AutoConfig;
 import org.terasology.config.flexible.AutoConfigManager;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.nui.UIWidget;
+import org.terasology.nui.WidgetUtil;
 import org.terasology.nui.databinding.Binding;
 import org.terasology.nui.databinding.DefaultBinding;
 import org.terasology.nui.layouts.ColumnLayout;
@@ -48,5 +49,6 @@ public class AutoConfigScreen extends CoreScreenLayer {
                 logger.warn("Cannot create widget for config:{}", config.getId());
             }
         }
+        WidgetUtil.trySubscribe(this, "close", button -> triggerBackAnimation());
     }
 }
