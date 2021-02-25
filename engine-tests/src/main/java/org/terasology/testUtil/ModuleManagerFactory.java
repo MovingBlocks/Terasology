@@ -3,12 +3,11 @@
 package org.terasology.testUtil;
 
 import org.terasology.engine.module.ModuleManager;
-import org.terasology.engine.module.ModuleManagerImpl;
 
 public final class ModuleManagerFactory {
     private ModuleManagerFactory() { }
 
     public static ModuleManager create() throws Exception {
-        return new ModuleManagerImpl("");
+        return new ModuleManager("");
     }
 }

@@ -1,0 +1,33 @@
+{
+  "type": "AutoConfigScreen",
+  "skin": "engine:mainMenu",
+  "contents": {
+    "type": "RelativeLayout",
+    "contents": [
+      {
+        "type": "ColumnLayout",
+        "id": "mainContainer",
+        "fillVerticalSpace": false,
+        "layoutInfo": {
+          "use-content-height": true,
+          "position-horizontal-center": {}
+        },
+        "contents": []
+      },
+      {
+        "type": "UIButton",
+        "text": "${engine:menu#back}",
+        "id": "close",
+        "layoutInfo": {
+        "height": 32,
+        "width": 200,
+        "position-horizontal-center": {},
+        "position-bottom": {
+          "target": "BOTTOM",
+          "offset": 48
+          }
+        }
+      }
+    ]
+  }
+}
