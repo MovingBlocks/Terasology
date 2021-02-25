@@ -52,6 +52,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static com.google.common.base.Verify.verifyNotNull;
+
 public class ModuleManager {
     private static final Logger logger = LoggerFactory.getLogger(ModuleManager.class);
     private final StandardPermissionProviderFactory permissionProviderFactory = new StandardPermissionProviderFactory();
@@ -61,6 +63,9 @@ public class ModuleManager {
     private ModuleEnvironment environment;
     private final ModuleMetadataJsonAdapter metadataReader;
     private final ModuleInstallManager installManager;
+
+    /** Set this environment variable to "true" to load all modules in the classpath by default. */
+    final String LOAD_CLASSPATH_MODULES_ENV = "terasology_load_classpath_modules";
 
     public ModuleManager(String masterServerAddress) {
         this(masterServerAddress, Collections.emptyList());
@@ -76,7 +81,12 @@ public class ModuleManager {
         registry = new TableModuleRegistry();
         registry.add(engineModule);
 
-        loadModulesFromClassPath();
+        if (doLoadModulesFromClasspath()) {
+            loadModulesFromClassPath();
+        } else {
+            logger.debug("Not loading classpath modules. ({} = {})",
+                    LOAD_CLASSPATH_MODULES_ENV, System.getenv(LOAD_CLASSPATH_MODULES_ENV));
+        }
 
         loadModulesFromApplicationPath(pathManager);
 
@@ -152,6 +162,11 @@ public class ModuleManager {
         return metadataJsonAdapter;
     }
 
+    boolean doLoadModulesFromClasspath() {
+        String env = System.getenv(LOAD_CLASSPATH_MODULES_ENV);
+        return Boolean.parseBoolean(env);
+    }
+
     /**
      * Overrides modules in modules/ with those specified via -classpath in the JVM
      */
@@ -166,33 +181,52 @@ public class ModuleManager {
                 System.getProperty("java.class.path").split(System.getProperty("path.separator", ":"))
         ).map(Paths::get).collect(Collectors.toList());
 
+        // I thought I'd make the ClasspathSupporting stuff in the shape of a ModuleLoader
+        // so I could use it with the existing ModulePathScanner, but no. The inputs to that
+        // are the _parent directories_ of what we have.
         for (Path path : classPaths) {
-            // I thought I'd make the ClasspathSupporting stuff in the shape of a ModuleLoader
-            // so I could use it with the existing ModulePathScanner, but no. The inputs to that
-            // are the _parent directories_ of what we have.
-            //
-            // The conditions here mirror those of org.terasology.module.ModulePathScanner.loadModule
-
-            Module module;
-            try {
-                module = loader.load(path);
-            } catch (IOException e) {
-                logger.error("Failed to load classpath module {}", path, e);
-                continue;
-            }
-
-            if (module == null) {
-                continue;
-            }
-
-            boolean isNew = registry.add(module);
-            if (isNew) {
-                logger.info("Discovered module: {}", module);
-            } else {
-                logger.warn("Discovered duplicate module: {}-{}, skipping {}",
-                        module.getId(), module.getVersion(), path);
-            }
+            attemptToLoadModule(loader, path);
         }
+    }
+
+    public void attemptToLoadModule(ModuleLoader loader, Path path) {
+        // The conditions here mirror those of org.terasology.module.ModulePathScanner.loadModule
+
+        Module module;
+        try {
+            module = loader.load(path);
+        } catch (IOException e) {
+            logger.error("Failed to load classpath module {}", path, e);
+            return;
+        }
+
+        if (module == null) {
+            return;
+        }
+
+        boolean isNew = registry.add(module);
+        if (isNew) {
+            logger.info("Discovered module: {}", module);
+        } else {
+            logger.warn("Discovered duplicate module: {}-{}, skipping {}",
+                    module.getId(), module.getVersion(), path);
+        }
+
+    }
+
+    public Module loadClasspathModule(Path path) throws IOException {
+        ModuleLoader loader = new ClasspathSupportingModuleLoader(metadataReader, true, false);
+        loader.setModuleInfoPath(TerasologyConstants.MODULE_INFO_FILENAME);
+
+        @SuppressWarnings("UnstableApiUsage") Module module = verifyNotNull(loader.load(path), "Failed to load module from %s", path);
+        boolean isNew = registry.add(module);
+        if (isNew) {
+            logger.info("Discovered module: {}", module);
+        } else {
+            logger.warn("Discovered duplicate module: {}-{}, skipping {}",
+                    module.getId(), module.getVersion(), path);
+        }
+        return module;
     }
 
     private void setupSandbox() {
