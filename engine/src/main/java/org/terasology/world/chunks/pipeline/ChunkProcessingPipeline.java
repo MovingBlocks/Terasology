@@ -18,11 +18,11 @@ import org.terasology.world.chunks.Chunk;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 
@@ -38,7 +38,7 @@ public class ChunkProcessingPipeline {
 
     private final List<UnaryOperator<Chunk>> stages = Lists.newArrayList();
     private final ThreadPoolExecutor executor;
-    private final Map<Vector3ic, CompletableFuture<Chunk>> processingPositions = Maps.newConcurrentMap();
+    private final Map<Vector3ic, Future<Chunk>> processingPositions = Maps.newConcurrentMap();
     private int threadIndex;
 
     /**
@@ -59,6 +59,14 @@ public class ChunkProcessingPipeline {
         return chunk -> {
             try (ThreadActivity ignored = ThreadMonitor.startThreadActivity(name)) {
                 return stage.apply(chunk);
+            }
+        };
+    }
+
+    private static Supplier<Chunk> wrapWithLogging(String name, Supplier<Chunk> stage) {
+        return () -> {
+            try (ThreadActivity ignored = ThreadMonitor.startThreadActivity(name)) {
+                return stage.get();
             }
         };
     }
@@ -114,14 +122,19 @@ public class ChunkProcessingPipeline {
      * @return Future of chunk processing.
      */
     public Future<Chunk> invokeGeneratorTask(Vector3ic position, Supplier<Chunk> generatorTask) {
-        CompletableFuture<Chunk> future = processingPositions.get(position);
+        Future<Chunk> future = processingPositions.get(position);
         if (future == null) {
-            future = CompletableFuture.supplyAsync(generatorTask, executor);
+            Function<Chunk, Chunk> current = Function.identity();
             for (UnaryOperator<Chunk> stage : stages) {
-                future = future.thenApplyAsync(stage, executor);
+                current = current.andThen(stage);
             }
+            current = current.andThen(chunk-> {
+                processingPositions.remove(chunk.getPosition());
+                return chunk;
+            });
+            Function<Chunk, Chunk> finalCurrent = current;
+            future = executor.submit(()-> finalCurrent.apply(wrapWithLogging("Create or Load", generatorTask).get()));
             processingPositions.put(position, future);
-            future.thenAcceptAsync(chunk -> processingPositions.remove(chunk.getPosition()), executor);
         }
 
         return future;
