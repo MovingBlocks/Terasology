@@ -18,9 +18,9 @@ package org.terasology.physics.bullet.shapes;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionShape;
 import com.badlogic.gdx.physics.bullet.collision.btCompoundShape;
 import org.joml.Matrix4f;
+import org.joml.Matrix4fc;
 import org.joml.Quaternionf;
 import org.joml.Quaternionfc;
-import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.terasology.physics.shapes.CollisionShape;
 import org.terasology.physics.shapes.CompoundShape;
@@ -57,8 +57,9 @@ public class BulletCompoundShape extends BulletCollisionShape implements Compoun
     public CollisionShape rotate(Quaternionf rot) {
         BulletCompoundShape shape = new BulletCompoundShape();
         for (BulletCompoundShapeChild child : childList) {
-            CollisionShape rotatedChild = child.childShape.rotate(rot);
-            shape.addChildShape(child.origin, new Quaternionf(), child.scale, rotatedChild);
+            Matrix4f transform = new Matrix4f().rotate(rot).mul(child.transform);
+            shape.compoundShape.addChildShape(transform, child.childShape.underlyingShape);
+            shape.childList.add(new BulletCompoundShapeChild(transform, child.childShape, compoundShape.getChildShape(compoundShape.getNumChildShapes() - 1)));
         }
         return shape;
     }
@@ -67,15 +68,16 @@ public class BulletCompoundShape extends BulletCollisionShape implements Compoun
         public BulletCollisionShape childShape;
 
         public btCollisionShape compoundShapeChild;
+        private final Matrix4f transform = new Matrix4f();
 
-        public final Vector3f origin = new Vector3f();
-        public final Quaternionf rotation = new Quaternionf();
-        public final float scale;
+        private BulletCompoundShapeChild(Matrix4fc trans, BulletCollisionShape childShape, btCollisionShape compoundShapeChild) {
+            this.transform.set(trans);
+            this.childShape = childShape;
+            this.compoundShapeChild = compoundShapeChild;
+        }
 
         private BulletCompoundShapeChild(Vector3fc origin, Quaternionfc rotation, float scale, BulletCollisionShape childShape, btCollisionShape compoundShapeChild) {
-            this.origin.set(origin);
-            this.rotation.set(rotation);
-            this.scale = scale;
+            this.transform.translationRotateScale(origin, rotation, scale);
             this.childShape = childShape;
             this.compoundShapeChild = compoundShapeChild;
         }
