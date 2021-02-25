@@ -1,4 +1,4 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.rendering.nui.widgets.types.object;
 
@@ -148,6 +148,7 @@ public class SubtypeLayoutBuilder<T> extends ExpandableLayoutBuilder<T> {
 
                 if (builder == null) {
                     LOGGER.error("Could not find widget for type {}, editing as base type {}", get(), baseType);
+                    return;
                 }
 
                 widgetContainer.addWidget(builder.build(binding));
