@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.reflection.reflect;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.terasology.reflection.TypeInfo;
 
 import java.util.List;
