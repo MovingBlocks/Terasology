@@ -1,4 +1,4 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.reflection.reflect;
 
@@ -15,7 +15,6 @@ import org.terasology.reflection.reflect.internal.UnsafeAllocator;
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayDeque;
@@ -61,7 +60,7 @@ public class ConstructorLibrary {
                     return unsafeAllocator.newInstance(typeInfo.getRawType());
                 } catch (Exception e) {
                     throw new RuntimeException("Unable to create an instance of " + typeInfo.getType() + ". " +
-                                                   "Register an InstanceCreator for this type to fix this problem.", e);
+                            "Register an InstanceCreator for this type to fix this problem.", e);
                 }
             }
         };
@@ -69,9 +68,9 @@ public class ConstructorLibrary {
 
     public static <T> ObjectConstructor<T> newNoArgConstructor(Class<? super T> rawType) {
         @SuppressWarnings("unchecked") // T is the same raw type as is requested
-            Constructor<T> constructor = (Constructor<T>) Arrays.stream(rawType.getDeclaredConstructors())
-                                                              .min(Comparator.comparingInt(c -> c.getParameterTypes().length))
-                                                              .orElse(null);
+        Constructor<T> constructor = (Constructor<T>) Arrays.stream(rawType.getDeclaredConstructors())
+                .min(Comparator.comparingInt(c -> c.getParameterTypes().length))
+                .orElse(null);
 
         if (constructor == null || constructor.getParameterTypes().length != 0) {
             return null;
@@ -95,7 +94,7 @@ public class ConstructorLibrary {
                 throw new RuntimeException("Failed to invoke " + constructor + " with no args", e);
             } catch (InvocationTargetException e) {
                 throw new RuntimeException("Failed to invoke " + constructor + " with no args",
-                    e.getTargetException());
+                        e.getTargetException());
             } catch (IllegalAccessException e) {
                 throw new AssertionError(e);
             }
@@ -103,13 +102,11 @@ public class ConstructorLibrary {
     }
 
     /**
-     * Constructors for common interface types like Map and List and their
-     * subtypes.
+     * Constructors for common interface types like Map and List and their subtypes.
      */
     @SuppressWarnings("unchecked") // use runtime checks to guarantee that 'T' is what it is
     public static <T> ObjectConstructor<T> newDefaultConstructor(TypeInfo<T> typeInfo) {
         Class<T> rawType = typeInfo.getRawType();
-        Type type = typeInfo.getType();
 
         if (rawType.isArray()) {
             return () -> (T) Array.newInstance(rawType.getComponentType(), 0);
@@ -145,7 +142,7 @@ public class ConstructorLibrary {
     }
 
     public static <E> ObjectConstructor<? extends Collection<E>>
-        getCollectionConstructor(TypeInfo<? extends Collection<E>> typeInfo) {
+    getCollectionConstructor(TypeInfo<? extends Collection<E>> typeInfo) {
         CollectionCopyConstructor<? extends Collection<E>, E> collectionCopyConstructor
                 = getCollectionCopyConstructor(typeInfo);
 
@@ -153,7 +150,7 @@ public class ConstructorLibrary {
     }
 
     public static <E> CollectionCopyConstructor<? extends Collection<E>, E>
-        getCollectionCopyConstructor(TypeInfo<? extends Collection<E>> typeInfo) {
+    getCollectionCopyConstructor(TypeInfo<? extends Collection<E>> typeInfo) {
         Class<? extends Collection<E>> rawType = typeInfo.getRawType();
         Type type = typeInfo.getType();
 
@@ -225,7 +222,7 @@ public class ConstructorLibrary {
         // Next try raw type match for instance creators
         @SuppressWarnings("unchecked") // types must agree
         final InstanceCreator<T> rawTypeCreator =
-            (InstanceCreator<T>) instanceCreators.get(rawType);
+                (InstanceCreator<T>) instanceCreators.get(rawType);
         if (rawTypeCreator != null) {
             return () -> rawTypeCreator.createInstance(type);
         }
