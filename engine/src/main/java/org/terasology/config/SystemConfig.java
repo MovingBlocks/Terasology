@@ -72,4 +72,9 @@ public class SystemConfig extends AutoConfig {
             type(Locale.class),
             defaultValue(Locale.getDefault(Category.DISPLAY))
     );
+
+    @Override
+    public String getName() {
+        return "${engine:menu#system-settings-title}";
+    }
 }

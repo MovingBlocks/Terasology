@@ -56,7 +56,7 @@ public interface SettingBuilder<T> {
     SettingBuilder<T> description(String description);
 
     /**
-     * Specfies the override f the {@link Setting} being created.
+     * Specfies the override of the {@link Setting} being created.
      * @param overrideProvider The Supplier which provide override for settings value if exists.
      * @return This builder object.
      */

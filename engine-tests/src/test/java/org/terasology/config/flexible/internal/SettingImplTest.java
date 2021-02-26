@@ -15,6 +15,7 @@ import org.terasology.utilities.random.FastRandom;
 import org.terasology.utilities.random.Random;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -34,7 +35,7 @@ public class SettingImplTest {
             setting = new SettingImpl<>(
                     TypeInfo.of(Integer.class), 50,
                     new NumberRangeConstraint<>(0, 100, false, false),
-                    "", "", null, null);
+                    "", "", Optional::empty);
 
             eventResult = -1;
 
@@ -57,10 +58,9 @@ public class SettingImplTest {
     }
 
     @Nested
-    class SystemProperty {
-        private static final String TEST_CONFIG_SYSTEM_PROPERTY = "foo.bar.config.value";
-        private static final int TEST_CONFIG_SYSTEM_PROPERTY_VALUE = 75;
-
+    class Override {
+        private static final int TEST_CONFIG_OVERRIDE_VALUE = 75;
+        private Integer override;
         private Setting<Integer> setting;
 
         private int eventResult;
@@ -70,7 +70,7 @@ public class SettingImplTest {
             setting = new SettingImpl<>(
                     TypeInfo.of(Integer.class), 50,
                     new NumberRangeConstraint<>(0, 100, false, false),
-                    "", "", TEST_CONFIG_SYSTEM_PROPERTY, Integer::valueOf);
+                    "", "", () -> Optional.ofNullable(override));
 
             eventResult = -1;
 
@@ -79,13 +79,13 @@ public class SettingImplTest {
 
         @Test
         void testSystemPropertyValue() {
-            System.setProperty(TEST_CONFIG_SYSTEM_PROPERTY, String.valueOf(TEST_CONFIG_SYSTEM_PROPERTY_VALUE));
+            override = TEST_CONFIG_OVERRIDE_VALUE;
             assertEquals(75, setting.get());
         }
 
         @Test
         void testSystemPropertyValueNotPresent() {
-            System.getProperties().remove(TEST_CONFIG_SYSTEM_PROPERTY);
+            override = null;
             assertEquals(50, setting.get());
         }
 
@@ -110,7 +110,7 @@ public class SettingImplTest {
             setting = new SettingImpl<>(
                     TypeInfo.of(Integer.class), 50,
                     new NumberRangeConstraint<>(0, 100, false, false),
-                    "", "", null, null);
+                    "", "", Optional::empty);
 
             eventCallCount = 0;
 
