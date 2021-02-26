@@ -1,4 +1,4 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
 // Engine tests are split out due to otherwise quirky project dependency issues with module tests extending engine tests
@@ -58,13 +58,16 @@ dependencies {
     implementation group: 'org.reflections', name: 'reflections', version: '0.9.10'
 
     // Test lib dependencies
-    implementation("org.junit.jupiter:junit-jupiter-api:5.5.2")
-    implementation("org.junit.jupiter:junit-jupiter-params:5.5.2")
-    implementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '3.2.0'
+    implementation(platform("org.junit:junit-bom:5.7.1")) {
+        // junit-bom will set version numbers for the other org.junit dependencies.
+    }
+    implementation("org.junit.jupiter:junit-jupiter-api")
+    implementation("org.junit.jupiter:junit-jupiter-params")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
 
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.5.2")
+    implementation("org.mockito:mockito-junit-jupiter:3.7.7")
 
-    implementation group: 'junit', name: 'junit', version: '4.12'
+    implementation("org.terasology.joml-ext:joml-test:0.1.0")
 
     //TODO: Remove shrinkwrap from code, you have FileSystem in java 8
     implementation group: 'org.jboss.shrinkwrap', name: 'shrinkwrap-depchain-java7', version: '1.2.1'

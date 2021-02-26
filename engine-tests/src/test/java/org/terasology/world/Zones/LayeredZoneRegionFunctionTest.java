@@ -20,7 +20,6 @@ import com.google.common.collect.ListMultimap;
 import org.joml.Vector2ic;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.terasology.math.geom.BaseVector2i;
 import org.terasology.world.block.BlockRegion;
 import org.terasology.world.generation.Border3D;
 import org.terasology.world.generation.FacetProvider;
@@ -78,7 +77,7 @@ public class LayeredZoneRegionFunctionTest {
         borders.put(ElevationFacet.class, new Border3D(0, 0, 0));
 
         region = new RegionImpl(new BlockRegion(0, 0, 0).expand(4, 4, 4),
-                facetProviderChains, borders);
+                facetProviderChains, borders, 1);
     }
 
     @Test

@@ -1,4 +1,4 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.network.internal;
@@ -32,8 +32,6 @@ import org.terasology.identity.PublicIdentityCertificate;
 import org.terasology.logic.characters.PredictionSystem;
 import org.terasology.logic.common.DisplayNameComponent;
 import org.terasology.logic.location.LocationComponent;
-import org.terasology.math.ChunkMath;
-import org.terasology.math.JomlUtil;
 import org.terasology.network.Client;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.ColorComponent;
@@ -55,6 +53,7 @@ import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockComponent;
 import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.chunks.Chunk;
+import org.terasology.world.chunks.Chunks;
 
 import java.util.Arrays;
 import java.util.Iterator;
@@ -245,7 +244,7 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
                     Vector3f target = loc.getWorldPosition(new Vector3f());
                     if (target.isFinite()) {
                         center.set(target, RoundingMode.HALF_UP); // use center as temporary variable
-                        ChunkMath.calcChunkPos(center, center); // update center to chunkPos
+                        Chunks.toChunkPos(center, center); // update center to chunkPos
                     }
                 }
                 Vector3i pos = null;
@@ -335,9 +334,9 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
         try {
             BlockComponent blockComp = target.getComponent(BlockComponent.class);
             if (blockComp != null) {
-                if (relevantChunks.contains(ChunkMath.calcChunkPos(JomlUtil.from(blockComp.position), new Vector3i()))) {
+                if (relevantChunks.contains(Chunks.toChunkPos(blockComp.getPosition(), new Vector3i()))) {
                     queuedOutgoingEvents.add(NetData.EventMessage.newBuilder()
-                        .setTargetBlockPos(NetMessageUtil.convert(blockComp.position))
+                        .setTargetBlockPos(NetMessageUtil.convert(blockComp.getPosition()))
                         .setEvent(eventSerializer.serialize(event)).build());
                 }
             } else {
@@ -389,7 +388,7 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
 
     @Override
     public void onBlockChanged(Vector3ic pos, Block newBlock, Block originalBlock) {
-        org.joml.Vector3i chunkPos = ChunkMath.calcChunkPos(pos, new org.joml.Vector3i());
+        org.joml.Vector3i chunkPos = Chunks.toChunkPos(pos, new org.joml.Vector3i());
         if (relevantChunks.contains(chunkPos)) {
             queuedOutgoingBlockChanges.add(NetData.BlockChangeMessage.newBuilder()
                 .setPos(NetMessageUtil.convert(pos))
@@ -400,7 +399,7 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
 
     @Override
     public void onExtraDataChanged(int i, Vector3ic pos, int newData, int oldData) {
-        org.joml.Vector3i chunkPos = ChunkMath.calcChunkPos(pos, new org.joml.Vector3i());
+        org.joml.Vector3i chunkPos = Chunks.toChunkPos(pos, new org.joml.Vector3i());
         if (relevantChunks.contains(chunkPos)) {
             queuedOutgoingExtraDataChanges.add(NetData.ExtraDataChangeMessage.newBuilder()
                 .setIndex(i)
@@ -493,7 +492,7 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
             NetData.CreateEntityMessage.Builder createMessage = NetData.CreateEntityMessage.newBuilder().setEntity(entityData);
             BlockComponent blockComponent = entity.getComponent(BlockComponent.class);
             if (blockComponent != null) {
-                createMessage.setBlockPos(NetMessageUtil.convert(blockComponent.position));
+                createMessage.setBlockPos(NetMessageUtil.convert(blockComponent.getPosition()));
             }
             message.addCreateEntity(createMessage);
         }

@@ -16,7 +16,6 @@
 package org.terasology.world.propagation.light;
 
 import org.joml.Vector3ic;
-import org.terasology.math.JomlUtil;
 import org.terasology.math.Side;
 import org.terasology.world.block.Block;
 import org.terasology.world.chunks.Chunks;
@@ -56,8 +55,8 @@ public class SunlightPropagationRules extends CommonLightPropagationRules {
      * {@inheritDoc}
      */
     @Override
-    public byte propagateValue(byte existingValue, Side side, Block from) {
-        return (byte) Math.max(existingValue - 1, 0);
+    public byte propagateValue(byte existingValue, Side side, Block from, int scale) {
+        return (byte) Math.max(existingValue - scale, 0);
     }
 
     /**
@@ -82,7 +81,7 @@ public class SunlightPropagationRules extends CommonLightPropagationRules {
 
     @Override
     public void setValue(LitChunk chunk, Vector3ic pos, byte value) {
-        chunk.setSunlight(JomlUtil.from(pos), value);
+        chunk.setSunlight(pos, value);
     }
 
 }

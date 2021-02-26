@@ -1,4 +1,4 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
 // Simple build file for modules - the one under the Core module is the template, will be copied as needed to modules
@@ -10,62 +10,19 @@ import org.reflections.scanners.SubTypesScanner
 import org.reflections.scanners.TypeAnnotationsScanner
 import org.reflections.util.ConfigurationBuilder
 import org.reflections.util.FilterBuilder
-import org.terasology.module.ModuleMetadataJsonAdapter
+import org.terasology.gradology.ModuleMetadataForGradle
 
 plugins {
-    id("java")
-    id("idea")
-    id("eclipse")
+    `java-library`
+    idea
+    eclipse
 }
 
-val moduleFile = file("module.txt")
+val moduleMetadata = ModuleMetadataForGradle.forProject(project)
 
-// The module file should always exist if the module was correctly created or cloned using Gradle
-if (!moduleFile.exists()) {
-    println("Y U NO EXIST MODULE.TXT!")
-    throw GradleException("Failed to find module.txt for " + project.name)
-}
-
-class ModuleInfoException(
-    cause: Throwable,
-    @Suppress("MemberVisibilityCanBePrivate") val file: File? = null,
-    private val project: Project? = null
-) : RuntimeException(cause) {
-    override val message: String
-        get() {
-            // trying to get the fully-qualified-class-name-mess off the front and just show
-            // the useful part.
-            val detail = cause?.cause?.localizedMessage ?: cause?.localizedMessage
-            return "Error while reading module info from ${describeFile()}:\n  ${detail}"
-        }
-
-    private fun describeFile(): String {
-        return if (project != null && file != null) {
-            project.rootProject.relativePath(file)
-        } else if (file != null) {
-            file.toString()
-        } else {
-            "[unnamed file]"
-        }
-    }
-
-    override fun toString(): String {
-        val causeType = cause?.let { it::class.simpleName }
-        return "ModuleInfoException(file=${describeFile()}, cause=${causeType})"
-    }
-}
-
-val moduleConfig = try {
-    moduleFile.reader().use {
-        ModuleMetadataJsonAdapter().read(it)!!
-    }
-} catch (e: Exception) {
-    throw ModuleInfoException(e, moduleFile, project)
-}
-
-project.version = moduleConfig.version
+project.version = moduleMetadata.version
 // Jenkins-Artifactory integration catches on to this as part of the Maven-type descriptor
-project.group = "org.terasology.modules"
+project.group = moduleMetadata.group
 
 logger.info("Version for {} loaded as {} for group {}", project.name, project.version, project.group)
 
@@ -75,71 +32,65 @@ apply(from = "$rootDir/config/gradle/publish.gradle")
 
 // Handle some logic related to where what is
 configure<SourceSetContainer> {
-    named("main") {
-        java.outputDir = File("$buildDir/classes")
+    main {
+        java.outputDir = buildDir.resolve("classes")
     }
-    named("test") {
-        java.outputDir = File("$buildDir/testClasses")
+    test {
+        java.outputDir = buildDir.resolve("testClasses")
     }
 }
-val convention = project.getConvention().getPlugin(JavaPluginConvention::class)
-val mainSourceSet = convention.getSourceSets().getByName("main")
 
-
-val deps = moduleConfig.dependencies.filterNotNull()
-val moduleDepends = deps.filterNot { it.id.toString() == "engine" }
-val engineVersion = deps.find { it.id.toString() == "engine" }?.versionRange()?.toString() ?: "+"
+configurations {
+    all {
+        resolutionStrategy.preferProjectModules()
+    }
+}
 
 // Set dependencies. Note that the dependency information from module.txt is used for other Terasology modules
 dependencies {
-    implementation(group = "org.terasology.engine", name = "engine", version = engineVersion)
-    implementation(group = "org.terasology.engine", name = "engine-tests", version = engineVersion)
+    implementation(group = "org.terasology.engine", name = "engine", version = moduleMetadata.engineVersion())
+    implementation(group = "org.terasology.engine", name = "engine-tests", version = moduleMetadata.engineVersion())
 
-    for (gestaltDep in moduleDepends) {
-        if (!gestaltDep.minVersion.isSnapshot) {
-            // gestalt considers snapshots to satisfy a minimum requirement:
-            // https://github.com/MovingBlocks/gestalt/blob/fe1893821127/gestalt-module/src/main/java/org/terasology/naming/VersionRange.java#L58-L59
-            gestaltDep.minVersion = gestaltDep.minVersion.snapshot
-            // (maybe there's some way to do that with a custom gradle resolver?
-            // but making a resolver that only works that way on gestalt modules specifically
-            // sounds complicated.)
-        }
-
-        val gradleDep = create(
-            group = "org.terasology.modules",
-            name = gestaltDep.id.toString(),
-            version = gestaltDep.versionRange().toString()
-        )
-
-        if (gestaltDep.isOptional) {
+    for ((gradleDep, optional) in moduleMetadata.moduleDependencies()) {
+        if (optional) {
             // `optional` module dependencies are ones it does not require for runtime
             // (but will use opportunistically if available)
-            compileOnly(gradleDep)
+            compileOnly(gradleDep.asMap())
             // though modules also sometimes use "optional" to describe their test dependencies;
             // they're not required for runtime, but they *are* required for tests.
-            testImplementation(gradleDep)
+            testImplementation(gradleDep.asMap())
         } else {
-            implementation(gradleDep)
+            implementation(gradleDep.asMap())
         }
     }
 
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.6.2")
-    testImplementation("org.junit.jupiter:junit-jupiter-params:5.6.2")
-    testImplementation("org.mockito:mockito-junit-jupiter:3.2.0")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.6.2")
+    testRuntimeOnly("org.slf4j:jul-to-slf4j:1.7.21")
+
+    add("testImplementation", platform("org.junit:junit-bom:5.7.1"))
+    testImplementation("org.junit.jupiter:junit-jupiter-api")
+    testImplementation("org.junit.jupiter:junit-jupiter-params")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
+
+    testImplementation("org.mockito:mockito-junit-jupiter:3.7.7")
 
     //backwards compatibility with modules tests
-    testImplementation("junit:junit:4.12")
-    testRuntimeOnly("org.junit.vintage:junit-vintage-engine:5.5.2")
+    testImplementation("junit:junit:4.13.1")
+    testImplementation("org.junit.jupiter:junit-jupiter-migrationsupport")
+    testRuntimeOnly("org.junit.vintage:junit-vintage-engine")
 }
 
 
 if (project.name == "ModuleTestingEnvironment") {
     dependencies {
         // MTE is a special snowflake, it gets these things as non-test dependencies
-        implementation("org.junit.jupiter:junit-jupiter-api:5.6.2")
-        implementation("org.mockito:mockito-junit-jupiter:3.2.0")
-        implementation("junit:junit:4.12")
+        implementation("ch.qos.logback:logback-classic:1.2.3")
+        runtimeOnly("org.codehaus.janino:janino:3.1.3") {
+            because("logback filters")
+        }
+        add("implementation", platform("org.junit:junit-bom:5.7.1"))
+        implementation("org.junit.jupiter:junit-jupiter-api")
+        implementation("org.mockito:mockito-junit-jupiter:3.7.7")
+        implementation("junit:junit:4.13.1")
         //TODO: Remove shrinkwrap from code, you have FileSystem in java 8
         implementation("org.jboss.shrinkwrap:shrinkwrap-depchain-java7:1.2.1")
     }
@@ -173,6 +124,10 @@ tasks.register("createSkeleton") {
     mkdir("src/main/java")
     mkdir("src/test/java")
 }
+
+
+val mainSourceSet: SourceSet = sourceSets[SourceSet.MAIN_SOURCE_SET_NAME]
+
 
 tasks.register("cacheReflections") {
     description = "Caches reflection output to make regular startup faster. May go stale and need cleanup at times."
@@ -240,8 +195,8 @@ configure<IdeaModel> {
     module {
         // Change around the output a bit
         inheritOutputDirs = false
-        outputDir = file("build/classes")
-        testOutputDir = file("build/testClasses")
+        outputDir = buildDir.resolve("classes")
+        testOutputDir = buildDir.resolve("testClasses")
         isDownloadSources = true
     }
 }

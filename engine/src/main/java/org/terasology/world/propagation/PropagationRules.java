@@ -1,28 +1,11 @@
-/*
- * Copyright 2013 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.world.propagation;
 
 import org.joml.Vector3ic;
-import org.terasology.math.JomlUtil;
 import org.terasology.math.Side;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.world.block.Block;
 import org.terasology.world.chunks.LitChunk;
-
-import javax.swing.JOptionPane;
 
 /**
  * Rules to drive value propagation.
@@ -36,14 +19,6 @@ public interface PropagationRules {
      * @return The constant value of this block
      */
     byte getFixedValue(Block block, Vector3ic pos);
-
-    /**
-     * @deprecated use {@link #getFixedValue(Block, Vector3ic)} instead
-     */
-    @Deprecated
-    default byte getFixedValue(Block block, Vector3i pos) {
-        return getFixedValue(block, JomlUtil.from(pos));
-    }
 
     /**
      * Compare the how the propagation changes if you replace the block with a different one, on a given side
@@ -61,9 +36,10 @@ public interface PropagationRules {
      * @param existingValue The value to propagate
      * @param side          The side the value is leaving by
      * @param from          The block the value is leaving
+     * @param scale         The scale of the chunk
      * @return The new value to set at the block position
      */
-    byte propagateValue(byte existingValue, Side side, Block from);
+    byte propagateValue(byte existingValue, Side side, Block from, int scale);
 
     /**
      * @return The maximum value possible for this data
@@ -99,14 +75,7 @@ public interface PropagationRules {
     byte getValue(LitChunk chunk, Vector3ic pos);
 
     /**
-     * @deprecated use {@link #getValue(LitChunk, Vector3ic)} instead
-     */
-    default byte getValue(LitChunk chunk, Vector3i pos) {
-        return getValue(chunk, JomlUtil.from(pos));
-    }
-
-    /**
-     * See {@link #getValue(LitChunk, Vector3i)}
+     * See {@link #getValue(LitChunk, Vector3ic)}
      *
      * @param chunk The chunk the position is in
      * @param x     The x position
@@ -124,11 +93,4 @@ public interface PropagationRules {
      * @param value The value to set to
      */
     void setValue(LitChunk chunk, Vector3ic pos, byte value);
-
-    /**
-     * @deprecated use {@link #setValue(LitChunk, Vector3ic, byte)} instead
-     */
-    default void setValue(LitChunk chunk, Vector3i pos, byte value){
-        setValue(chunk, JomlUtil.from(pos), value);
-    }
 }

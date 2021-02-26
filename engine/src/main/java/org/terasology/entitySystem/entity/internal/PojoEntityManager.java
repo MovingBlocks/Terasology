@@ -43,8 +43,6 @@ import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.entitySystem.sectors.SectorSimulationComponent;
 import org.terasology.game.GameManifest;
-import org.terasology.math.geom.Quat4f;
-import org.terasology.math.geom.Vector3f;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.world.internal.WorldInfo;
 
@@ -214,23 +212,8 @@ public class PojoEntityManager implements EngineEntityManager {
     }
 
     @Override
-    public EntityRef create(Prefab prefab, Vector3f position) {
-        return getCurrentWorldPool().create(prefab, position);
-    }
-
-    @Override
-    public EntityRef create(Prefab prefab, Vector3f position, Quat4f rotation) {
-        return getCurrentWorldPool().create(prefab, position, rotation);
-    }
-
-    @Override
     public EntityRef create(Prefab prefab, Vector3fc position, Quaternionfc rotation) {
         return getCurrentWorldPool().create(prefab, position, rotation);
-    }
-
-    @Override
-    public EntityRef create(String prefab, Vector3f position) {
-        return getCurrentWorldPool().create(prefab, position);
     }
 
     @Override

@@ -34,7 +34,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import gnu.trove.iterator.TFloatIterator;
-import org.joml.AABBf;
+import org.terasology.joml.geom.AABBf;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
@@ -47,8 +47,6 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.characters.CharacterMovementComponent;
 import org.terasology.logic.location.LocationComponent;
-import org.terasology.math.AABB;
-import org.terasology.math.JomlUtil;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.physics.CollisionGroup;
 import org.terasology.physics.HitResult;
@@ -166,18 +164,8 @@ public class BulletPhysics implements PhysicsEngine {
     }
 
     @Override
-    public List<EntityRef> scanArea(AABB area, CollisionGroup... collisionFilter) {
-        return scanArea(area, Arrays.asList(collisionFilter));
-    }
-
-    @Override
     public List<EntityRef> scanArea(AABBf area, CollisionGroup... collisionFilter) {
         return scanArea(area, Arrays.asList(collisionFilter));
-    }
-
-    @Override
-    public List<EntityRef> scanArea(AABB area, Iterable<CollisionGroup> collisionFilter) {
-        return scanArea(JomlUtil.from(area), collisionFilter);
     }
 
     @Override

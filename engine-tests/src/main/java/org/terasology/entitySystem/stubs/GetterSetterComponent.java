@@ -15,8 +15,8 @@
  */
 package org.terasology.entitySystem.stubs;
 
+import org.joml.Vector3f;
 import org.terasology.entitySystem.Component;
-import org.terasology.math.geom.Vector3f;
 
 /**
  */

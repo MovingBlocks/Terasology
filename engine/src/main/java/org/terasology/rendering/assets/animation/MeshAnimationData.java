@@ -19,7 +19,7 @@ import com.google.common.collect.ImmutableList;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
 import org.terasology.assets.AssetData;
-import org.terasology.math.AABB;
+import org.terasology.joml.geom.AABBf;
 
 import java.util.List;
 
@@ -33,7 +33,7 @@ public class MeshAnimationData implements AssetData {
     private TIntList boneParent;
     private List<MeshAnimationFrame> frames;
     private float timePerFrame;
-    private AABB aabb;
+    private AABBf aabb;
 
     /**
      * @param boneNames    The names of the bones this animation expects
@@ -43,7 +43,7 @@ public class MeshAnimationData implements AssetData {
      * @param timePerFrame
      */
     public MeshAnimationData(List<String> boneNames, TIntList boneParents, List<MeshAnimationFrame> frames,
-                             float timePerFrame, AABB aabb) {
+                             float timePerFrame, AABBf aabb) {
         if (boneNames.size() != boneParents.size()) {
             throw new IllegalArgumentException("Bone names and boneParent indices must align");
         }
@@ -70,7 +70,7 @@ public class MeshAnimationData implements AssetData {
         return timePerFrame;
     }
 
-    public AABB getAabb() {
+    public AABBf getAabb() {
         return aabb;
     }
 }

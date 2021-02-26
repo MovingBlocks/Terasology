@@ -6,7 +6,6 @@ import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.Event;
-import org.terasology.math.JomlUtil;
 
 /**
  * This event gets called whenever a block item is placed in the world
@@ -26,27 +25,6 @@ public class OnBlockItemPlaced implements Event {
      * The entity which placed the block
      */
     private EntityRef instigator = EntityRef.NULL;
-
-    /**
-     * @deprecated This is scheduled for removal in an upcoming version method will be replaced with JOML implementation
-     *     {@link #OnBlockItemPlaced(Vector3ic, EntityRef, EntityRef)}.
-     */
-    @Deprecated
-    public OnBlockItemPlaced(org.terasology.math.geom.Vector3i pos, EntityRef placedBlock) {
-        this.position = JomlUtil.from(pos);
-        this.placedBlock = placedBlock;
-    }
-
-    /**
-     * @deprecated This is scheduled for removal in an upcoming version method will be replaced with JOML implementation
-     *     {@link #OnBlockItemPlaced(Vector3ic, EntityRef, EntityRef)}.
-     */
-    @Deprecated
-    public OnBlockItemPlaced(org.terasology.math.geom.Vector3i pos, EntityRef placedBlock, EntityRef instigator) {
-        this.position = JomlUtil.from(pos);
-        this.placedBlock = placedBlock;
-        this.instigator = instigator;
-    }
 
     /**
      *

@@ -1,24 +1,12 @@
-/*
- * Copyright 2013 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.entitySystem.stubs;
 
+import com.google.common.base.MoreObjects;
+import com.google.common.base.Objects;
 import org.terasology.entitySystem.Component;
 
-/**
- */
+
 public final class StringComponent implements Component {
     public static String staticValue = "Test";
     public String value;
@@ -38,18 +26,19 @@ public final class StringComponent implements Component {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-
         StringComponent that = (StringComponent) o;
-
-        if (value != null ? !value.equals(that.value) : that.value != null) {
-            return false;
-        }
-
-        return true;
+        return Objects.equal(value, that.value);
     }
 
     @Override
     public int hashCode() {
-        return value != null ? value.hashCode() : 0;
+        return Objects.hashCode(value);
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .addValue(value)
+                .toString();
     }
 }

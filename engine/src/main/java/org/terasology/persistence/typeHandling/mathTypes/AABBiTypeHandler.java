@@ -5,7 +5,7 @@ package org.terasology.persistence.typeHandling.mathTypes;
 
 import com.google.common.collect.Maps;
 import gnu.trove.list.TIntList;
-import org.joml.AABBi;
+import org.terasology.joml.geom.AABBi;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.PersistedDataArray;
 import org.terasology.persistence.typeHandling.PersistedDataMap;

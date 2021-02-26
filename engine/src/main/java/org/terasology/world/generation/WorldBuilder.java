@@ -102,9 +102,19 @@ public class WorldBuilder extends ProviderStore {
         for (FacetProvider provider : providersList) {
             provider.setSeed(seed);
         }
-        ListMultimap<Class<? extends WorldFacet>, FacetProvider> providerChains = determineProviderChains();
-        List<WorldRasterizer> orderedRasterizers = ensureRasterizerOrdering();
-        return new WorldImpl(providerChains, orderedRasterizers, entityProviders, determineBorders(providerChains, orderedRasterizers), seaLevel);
+        ListMultimap<Class<? extends WorldFacet>, FacetProvider> providerChains = determineProviderChains(false);
+        ListMultimap<Class<? extends WorldFacet>, FacetProvider> scalableProviderChains = determineProviderChains(true);
+        List<WorldRasterizer> orderedRasterizers = ensureRasterizerOrdering(providerChains, false);
+        List<WorldRasterizer> scalableRasterizers = ensureRasterizerOrdering(scalableProviderChains, true);
+        return new WorldImpl(
+            providerChains,
+            scalableProviderChains,
+            orderedRasterizers,
+            scalableRasterizers,
+            entityProviders,
+            determineBorders(providerChains, orderedRasterizers),
+            seaLevel
+        );
     }
 
     private Map<Class<? extends WorldFacet>, Border3D> determineBorders(ListMultimap<Class<? extends WorldFacet>, FacetProvider> providerChains, List<WorldRasterizer> worldRasterizers) {
@@ -170,7 +180,7 @@ public class WorldBuilder extends ProviderStore {
         return borders;
     }
 
-    private ListMultimap<Class<? extends WorldFacet>, FacetProvider> determineProviderChains() {
+    private ListMultimap<Class<? extends WorldFacet>, FacetProvider> determineProviderChains(boolean scalable) {
         ListMultimap<Class<? extends WorldFacet>, FacetProvider> result = ArrayListMultimap.create();
         Set<Class<? extends WorldFacet>> facets = new LinkedHashSet<>();
         for (FacetProvider provider : providersList) {
@@ -186,7 +196,7 @@ public class WorldBuilder extends ProviderStore {
             }
         }
         for (Class<? extends WorldFacet> facet : facets) {
-            determineProviderChainFor(facet, result);
+            determineProviderChainFor(facet, result, scalable);
             if (logger.isDebugEnabled()) {
                 StringBuilder text = new StringBuilder(facet.getSimpleName());
                 text.append(" --> ");
@@ -204,7 +214,7 @@ public class WorldBuilder extends ProviderStore {
         return result;
     }
 
-    private void determineProviderChainFor(Class<? extends WorldFacet> facet, ListMultimap<Class<? extends WorldFacet>, FacetProvider> result) {
+    private void determineProviderChainFor(Class<? extends WorldFacet> facet, ListMultimap<Class<? extends WorldFacet>, FacetProvider> result, boolean scalable) {
         if (result.containsKey(facet)) {
             return;
         }
@@ -216,19 +226,31 @@ public class WorldBuilder extends ProviderStore {
         // first add all @Produces facet providers
         FacetProvider producer = null;
         for (FacetProvider provider : providersList) {
-            if (producesFacet(provider, facet)) {
+            if (producesFacet(provider, facet) && (!scalable || provider instanceof ScalableFacetProvider)) {
                 if (producer != null) {
                     logger.warn("Facet already produced by {} and overwritten by {}", producer, provider);
                 }
                 // add all required facets for producing provider
                 for (Facet requirement : requiredFacets(provider)) {
-                    determineProviderChainFor(requirement.value(), result);
-                    orderedProviders.addAll(result.get(requirement.value()));
+                    determineProviderChainFor(requirement.value(), result, scalable);
+                    List<FacetProvider> requirementChain = result.get(requirement.value());
+                    if (requirementChain != null) {
+                        orderedProviders.addAll(requirementChain);
+                    } else {
+                        facetCalculationInProgress.remove(facet);
+                        return;
+                    }
                 }
                 // add all updated facets for producing provider
                 for (Facet updated : updatedFacets(provider)) {
-                    determineProviderChainFor(updated.value(), result);
-                    orderedProviders.addAll(result.get(updated.value()));
+                    determineProviderChainFor(updated.value(), result, scalable);
+                    List<FacetProvider> requirementChain = result.get(updated.value());
+                    if (requirementChain != null) {
+                        orderedProviders.addAll(requirementChain);
+                    } else {
+                        facetCalculationInProgress.remove(facet);
+                        return;
+                    }
                 }
                 orderedProviders.add(provider);
                 producer = provider;
@@ -236,15 +258,25 @@ public class WorldBuilder extends ProviderStore {
         }
 
         if (producer == null) {
-            logger.warn("No facet provider found that produces {}", facet);
+            if (!scalable) {
+                logger.warn("No facet provider found that produces {}", facet);
+            }
+            facetCalculationInProgress.remove(facet);
+            return;
         }
 
         // then add all @Updates facet providers
-        providersList.stream().filter(provider -> updatesFacet(provider, facet)).forEach(provider -> {
+        providersList.stream().filter(provider -> updatesFacet(provider, facet) && (!scalable || provider instanceof ScalableFacetProvider)).forEach(provider -> {
+            Set<FacetProvider> localOrderedProviders = Sets.newLinkedHashSet();
             // add all required facets for updating provider
             for (Facet requirement : requiredFacets(provider)) {
-                determineProviderChainFor(requirement.value(), result);
-                orderedProviders.addAll(result.get(requirement.value()));
+                determineProviderChainFor(requirement.value(), result, scalable);
+                List<FacetProvider> requirementChain = result.get(requirement.value());
+                if (requirementChain != null) {
+                    localOrderedProviders.addAll(result.get(requirement.value()));
+                } else {
+                    return;
+                }
             }
             // the provider updates this and other facets
             // just add producers for the other facets
@@ -252,10 +284,15 @@ public class WorldBuilder extends ProviderStore {
                 for (FacetProvider fp : providersList) {
                     // only add @Produces providers to avoid infinite recursion
                     if (producesFacet(fp, updated.value())) {
-                        orderedProviders.add(fp);
+                        if (!scalable || fp instanceof ScalableFacetProvider) {
+                            localOrderedProviders.add(fp);
+                        } else {
+                            return;
+                        }
                     }
                 }
             }
+            orderedProviders.addAll(localOrderedProviders);
             orderedProviders.add(provider);
         });
         result.putAll(facet, orderedProviders);
@@ -301,7 +338,7 @@ public class WorldBuilder extends ProviderStore {
     // Ensure that rasterizers that must run after others are in the correct order. This ensures that blocks from
     // the dependent raterizer are not being overwritten by any antecedent rasterizer.
     // TODO: This will only handle first-order dependencies and does not check for circular dependencies
-    private List<WorldRasterizer> ensureRasterizerOrdering() {
+    private List<WorldRasterizer> ensureRasterizerOrdering(ListMultimap<Class<? extends WorldFacet>, FacetProvider> providerChains, boolean scalable) {
         List<WorldRasterizer> orderedRasterizers = Lists.newArrayList();
 
         Set<Class<? extends WorldRasterizer>> addedRasterizers = new HashSet<>();
@@ -318,19 +355,34 @@ public class WorldBuilder extends ProviderStore {
                 // Add all antecedents to the list first
                 antecedents.forEach(dependency -> {
                     if (!addedRasterizers.contains(dependency.getClass())) {
-                        orderedRasterizers.add(dependency);
+                        tryAddRasterizer(orderedRasterizers, dependency, providerChains, scalable);
                         addedRasterizers.add(dependency.getClass());
                     }
                 });
 
                 // Then add this one
-                orderedRasterizers.add(rasterizer);
+                tryAddRasterizer(orderedRasterizers, rasterizer, providerChains, scalable);
             } else if (!addedRasterizers.contains(rasterizer.getClass())) {
-                orderedRasterizers.add(rasterizer);
+                tryAddRasterizer(orderedRasterizers, rasterizer, providerChains, scalable);
                 addedRasterizers.add(rasterizer.getClass());
             }
         }
         return orderedRasterizers;
+    }
+
+    private void tryAddRasterizer(List<WorldRasterizer> orderedRasterizers, WorldRasterizer rasterizer, ListMultimap<Class<? extends WorldFacet>, FacetProvider> providerChains, boolean scalable) {
+        if (scalable && !(rasterizer instanceof ScalableWorldRasterizer)) {
+            return;
+        }
+        Requires requires = rasterizer.getClass().getAnnotation(Requires.class);
+        if (requires != null) {
+            for (Facet facet : requires.value()) {
+                if (!providerChains.containsKey(facet.value())) {
+                    return;
+                }
+            }
+        }
+        orderedRasterizers.add(rasterizer);
     }
 
 

@@ -6,7 +6,7 @@ import org.terasology.engine.SimpleUri;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.naming.Name;
-import org.terasology.persistence.ModuleContext;
+import org.terasology.engine.module.ModuleContext;
 import org.terasology.persistence.typeHandling.TypeHandler;
 import org.terasology.reflection.TypeInfo;
 import org.terasology.reflection.TypeRegistry;
