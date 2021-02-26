@@ -1,4 +1,4 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.config.flexible;
 
@@ -21,10 +21,14 @@ import java.io.OutputStream;
 import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collections;
 import java.nio.file.StandardOpenOption;
 import java.util.Optional;
 import java.util.Set;
 
+/**
+ * Loads, Saves and Stores {@link AutoConfig}s
+ */
 public class AutoConfigManager {
     private static final Logger logger = LoggerFactory.getLogger(AutoConfigManager.class);
 
@@ -128,5 +132,9 @@ public class AutoConfigManager {
         } catch (Exception e) {
             throw new RuntimeException("Cannot create directory for flexibleConfig " + filePath.getFileName() + "!");
         }
+    }
+
+    public Set<AutoConfig> getLoadedConfigs() {
+        return Collections.unmodifiableSet(loadedConfigs);
     }
 }

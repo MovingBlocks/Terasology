@@ -1,0 +1,25 @@
+{
+    "type": "BuiltinTypeWidgetTestScreen",
+    "skin": "engine:mainMenu",
+    "contents": {
+        "type": "RelativeLayout",
+        "contents": [
+            {
+                "type": "ScrollableArea",
+                "content": {
+                    "type": "UIBox",
+                    "content": {
+                        "type": "ColumnLayout",
+                        "id": "mainContainer",
+                        "fillVerticalSpace": false,
+                        "contents": []
+                    }
+                },
+                "layoutInfo": {
+                    "width": 600,
+                    "position-horizontal-center": {}
+                }
+            }
+        ]
+    }
+}

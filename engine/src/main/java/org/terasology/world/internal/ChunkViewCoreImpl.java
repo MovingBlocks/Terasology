@@ -20,7 +20,6 @@ import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.math.JomlUtil;
 import org.terasology.math.TeraMath;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockRegion;
@@ -75,15 +74,16 @@ public class ChunkViewCoreImpl implements ChunkViewCore {
     // TODO: Review
     @Override
     public Block getBlock(int blockX, int blockY, int blockZ) {
-        if (!blockRegion.contains(blockX, blockY, blockZ)) {
-            return defaultBlock;
+        if (blockRegion.contains(blockX, blockY, blockZ)) {
+            Chunk chunk = chunks[relChunkIndex(blockX, blockY, blockZ)];
+            if (chunk != null) {
+                return chunk.getBlock(
+                        Chunks.toRelative(blockX, chunkFilterSize.x),
+                        Chunks.toRelative(blockY, chunkFilterSize.y),
+                        Chunks.toRelative(blockZ, chunkFilterSize.z));
+            }
         }
-
-        int chunkIndex = relChunkIndex(blockX, blockY, blockZ);
-        return chunks[chunkIndex].getBlock(
-                Chunks.toRelative(blockX, chunkFilterSize.x),
-                Chunks.toRelative(blockY, chunkFilterSize.y),
-                Chunks.toRelative(blockZ, chunkFilterSize.z));
+        return defaultBlock;
     }
 
     @Override
@@ -108,22 +108,24 @@ public class ChunkViewCoreImpl implements ChunkViewCore {
 
     @Override
     public byte getSunlight(int blockX, int blockY, int blockZ) {
-        if (!blockRegion.contains(blockX, blockY, blockZ)) {
-            return 0;
+        if (blockRegion.contains(blockX, blockY, blockZ)) {
+            Chunk chunk = chunks[relChunkIndex(blockX, blockY, blockZ)];
+            if (chunk != null) {
+                return chunk.getSunlight(Chunks.toRelative(blockX, blockY, blockZ, chunkFilterSize, new Vector3i()));
+            }
         }
-
-        int chunkIndex = relChunkIndex(blockX, blockY, blockZ);
-        return chunks[chunkIndex].getSunlight(JomlUtil.from(Chunks.toRelative(blockX, blockY, blockZ, chunkFilterSize, new Vector3i())));
+        return 0;
     }
 
     @Override
     public byte getLight(int blockX, int blockY, int blockZ) {
-        if (!blockRegion.contains(blockX, blockY, blockZ)) {
-            return 0;
+        if (blockRegion.contains(blockX, blockY, blockZ)) {
+            Chunk chunk = chunks[relChunkIndex(blockX, blockY, blockZ)];
+            if (chunk != null) {
+                return chunk.getLight(Chunks.toRelative(blockX, blockY, blockZ, chunkFilterSize, new Vector3i()));
+            }
         }
-
-        int chunkIndex = relChunkIndex(blockX, blockY, blockZ);
-        return chunks[chunkIndex].getLight(JomlUtil.from(Chunks.toRelative(blockX, blockY, blockZ, chunkFilterSize, new Vector3i())));
+        return 0;
     }
 
     @Override
@@ -134,11 +136,13 @@ public class ChunkViewCoreImpl implements ChunkViewCore {
     @Override
     public void setBlock(int blockX, int blockY, int blockZ, Block type) {
         if (blockRegion.contains(blockX, blockY, blockZ)) {
-            int chunkIndex = relChunkIndex(blockX, blockY, blockZ);
-            chunks[chunkIndex].setBlock(Chunks.toRelative(blockX, blockY, blockZ, chunkFilterSize), type);
-        } else {
-            logger.warn("Attempt to modify block outside of the view");
+            Chunk chunk = chunks[relChunkIndex(blockX, blockY, blockZ)];
+            if (chunk != null) {
+                chunk.setBlock(Chunks.toRelative(blockX, blockY, blockZ, chunkFilterSize, new Vector3i()), type);
+                return;
+            }
         }
+        logger.warn("Attempt to modify block outside of the view");
     }
 
     @Override
@@ -149,11 +153,13 @@ public class ChunkViewCoreImpl implements ChunkViewCore {
     @Override
     public void setLight(int blockX, int blockY, int blockZ, byte light) {
         if (blockRegion.contains(blockX, blockY, blockZ)) {
-            int chunkIndex = relChunkIndex(blockX, blockY, blockZ);
-            chunks[chunkIndex].setLight(JomlUtil.from(Chunks.toRelative(blockX, blockY, blockZ, chunkFilterSize, new Vector3i())), light);
-        } else {
-            logger.warn("Attempted to set light at a position not encompassed by the view");
+            Chunk chunk = chunks[relChunkIndex(blockX, blockY, blockZ)];
+            if (chunk != null) {
+                chunk.setLight(Chunks.toRelative(blockX, blockY, blockZ, chunkFilterSize, new Vector3i()), light);
+                return;
+            }
         }
+        logger.warn("Attempted to set light at a position not encompassed by the view");
     }
 
     @Override
@@ -164,11 +170,13 @@ public class ChunkViewCoreImpl implements ChunkViewCore {
     @Override
     public void setSunlight(int blockX, int blockY, int blockZ, byte light) {
         if (blockRegion.contains(blockX, blockY, blockZ)) {
-            int chunkIndex = relChunkIndex(blockX, blockY, blockZ);
-            chunks[chunkIndex].setSunlight(JomlUtil.from(Chunks.toRelative(blockX, blockY, blockZ, chunkFilterSize, new Vector3i())), light);
-        } else {
-            throw new IllegalStateException("Attempted to modify sunlight though an unlocked view");
+            Chunk chunk = chunks[relChunkIndex(blockX, blockY, blockZ)];
+            if (chunk != null) {
+                chunk.setSunlight(Chunks.toRelative(blockX, blockY, blockZ, chunkFilterSize, new Vector3i()), light);
+                return;
+            }
         }
+        throw new IllegalStateException("Attempted to set sunlight at a position not encompassed by the view");
     }
 
     @Override
@@ -178,12 +186,13 @@ public class ChunkViewCoreImpl implements ChunkViewCore {
 
     @Override
     public int getExtraData(int index, int blockX, int blockY, int blockZ) {
-        if (!blockRegion.contains(blockX, blockY, blockZ)) {
-            return 0;
+        if (blockRegion.contains(blockX, blockY, blockZ)) {
+            Chunk chunk = chunks[relChunkIndex(blockX, blockY, blockZ)];
+            if (chunk != null) {
+                return chunk.getExtraData(index, Chunks.toRelative(blockX, blockY, blockZ, chunkFilterSize, new Vector3i()));
+            }
         }
-
-        int chunkIndex = relChunkIndex(blockX, blockY, blockZ);
-        return chunks[chunkIndex].getExtraData(index, Chunks.toRelative(blockX, blockY, blockZ, chunkFilterSize));
+        return 0;
     }
 
     @Override
@@ -194,33 +203,37 @@ public class ChunkViewCoreImpl implements ChunkViewCore {
     @Override
     public void setExtraData(int index, int blockX, int blockY, int blockZ, int value) {
         if (blockRegion.contains(blockX, blockY, blockZ)) {
-            int chunkIndex = relChunkIndex(blockX, blockY, blockZ);
-            chunks[chunkIndex].setExtraData(index, Chunks.toRelative(blockX, blockY, blockZ, chunkFilterSize), value);
-        } else {
-            throw new IllegalStateException("Attempted to modify extra data though an unlocked view");
+            Chunk chunk = chunks[relChunkIndex(blockX, blockY, blockZ)];
+            if (chunk != null) {
+                chunk.setExtraData(index, Chunks.toRelative(blockX, blockY, blockZ, chunkFilterSize, new Vector3i()), value);
+            }
         }
+        throw new IllegalStateException("Attempted to modify extra data at a position not encompassed by the view");
     }
 
     @Override
     public void setDirtyAround(Vector3ic blockPos) {
-        BlockRegion tmp = new BlockRegion(blockPos).expand(1, 1, 1);
-        for (Vector3ic pos : Chunks.toChunkRegion(tmp, tmp)) {
-            chunks[pos.x() + offset.x + chunkRegion.getSizeX() * (pos.z() + offset.z)].setDirty(true);
-        }
+        setDirtyAround(new BlockRegion(blockPos));
     }
 
     @Override
     public void setDirtyAround(BlockRegionc region) {
         BlockRegion tmp = new BlockRegion(region).expand(1, 1, 1);
-        for (Vector3ic pos : Chunks.toChunkRegion(tmp, chunkPower, tmp)) {
-            chunks[pos.x() + offset.x + chunkRegion.getSizeX() * (pos.z() + offset.z)].setDirty(true);
+        for (Vector3ic pos : Chunks.toChunkRegion(tmp, tmp)) {
+            int px = pos.x() + offset.x;
+            int py = pos.y() + offset.y;
+            int pz = pos.z() + offset.z;
+            Chunk chunk = chunks[px + chunkRegion.getSizeX() * (pz + chunkRegion.getSizeZ() * py)];
+            if (chunk != null) {
+                chunk.setDirty(true);
+            }
         }
     }
 
     @Override
     public boolean isValidView() {
         for (Chunk chunk : chunks) {
-            if (chunk.isDisposed()) {
+            if (chunk != null && chunk.isDisposed()) {
                 return false;
             }
         }
@@ -228,9 +241,10 @@ public class ChunkViewCoreImpl implements ChunkViewCore {
     }
 
     protected int relChunkIndex(int x, int y, int z) {
-        return TeraMath.calculate3DArrayIndex(Chunks.toChunkPos(x, chunkPower.x) + offset.x,
-                Chunks.toChunkPos(y, chunkPower.y) + offset.y,
-                Chunks.toChunkPos(z, chunkPower.z) + offset.z, JomlUtil.from(chunkRegion.getSize(new Vector3i())));
+        int px = (Chunks.toChunkPos(x, chunkPower.x) + offset.x);
+        int py = Chunks.toChunkPos(y, chunkPower.y) + offset.y;
+        int pz = Chunks.toChunkPos(z, chunkPower.z) + offset.z;
+        return  px + chunkRegion.getSizeX() * (pz + chunkRegion.getSizeZ() * py);
     }
 
     public void setChunkSize(Vector3i chunkSize) {

@@ -1,4 +1,4 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.logic.players;
 
@@ -17,7 +17,6 @@ import org.terasology.input.events.KeyEvent;
 import org.terasology.input.events.MouseAxisEvent;
 import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.debug.DebugProperties;
-import org.terasology.logic.time.TimeResynchEvent;
 import org.terasology.logic.players.event.WorldtimeResetEvent;
 import org.terasology.network.ClientComponent;
 import org.terasology.registry.In;

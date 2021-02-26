@@ -1,32 +1,16 @@
-/*
- * Copyright 2018 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.world.block.family;
 
 import com.google.common.collect.Sets;
 import gnu.trove.map.TByteObjectMap;
 import gnu.trove.map.hash.TByteObjectHashMap;
-import org.joml.Vector3f;
 import org.joml.Vector3ic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.math.JomlUtil;
 import org.terasology.math.Rotation;
 import org.terasology.math.Side;
 import org.terasology.math.SideBitFlag;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.naming.Name;
 import org.terasology.registry.In;
 import org.terasology.world.BlockEntityRegistry;
@@ -87,22 +71,8 @@ public abstract class MultiConnectFamily extends AbstractBlockFamily implements 
      * @param connectSide The side to determine connection for
      *
      * @return A boolean indicating if the block should connect on the given side
-     * @deprecated This method is scheduled for removal in an upcoming version.
-     *             Use the JOML implementation instead: {@link #connectionCondition(Vector3ic, Side)}.
-     */
-    @Deprecated
-    protected abstract boolean connectionCondition(Vector3i blockLocation, Side connectSide);
-
-    /**
-     * A condition to return true if the block should have a connection on the given side
-     *
-     * @param blockLocation The position of the block in question
-     * @param connectSide The side to determine connection for
-     *
-     * @return A boolean indicating if the block should connect on the given side
      */
     protected abstract boolean connectionCondition(Vector3ic blockLocation, Side connectSide);
-
 
     /**
      * The sides of the block that can be connected to.
@@ -179,35 +149,7 @@ public abstract class MultiConnectFamily extends AbstractBlockFamily implements 
     public Block getBlockForPlacement(BlockPlacementData data) {
         byte connections = 0;
         for (Side connectSide : SideBitFlag.getSides(getConnectionSides())) {
-            if (this.connectionCondition(JomlUtil.from(data.blockPosition), connectSide)) {
-                connections += SideBitFlag.getSide(connectSide);
-            }
-        }
-        return blocks.get(connections);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Block getBlockForPlacement(Vector3i location, Side attachmentSide, Side direction) {
-        BlockPlacementData data = new BlockPlacementData(JomlUtil.from(location), attachmentSide, new Vector3f());
-        return getBlockForPlacement(data);
-    }
-
-    /**
-     * Update the block then a neighbor changes
-     *
-     * @param location The location of the block
-     * @param oldBlock What the block was before the neighbor updated
-     *
-     * @return The block from the family to be placed
-     */
-    @Override
-    public Block getBlockForNeighborUpdate(Vector3i location, Block oldBlock) {
-        byte connections = 0;
-        for (Side connectSide : SideBitFlag.getSides(getConnectionSides())) {
-            if (this.connectionCondition(location, connectSide)) {
+            if (this.connectionCondition(data.blockPosition, connectSide)) {
                 connections += SideBitFlag.getSide(connectSide);
             }
         }

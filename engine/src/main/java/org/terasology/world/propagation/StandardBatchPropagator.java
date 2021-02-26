@@ -6,7 +6,6 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
-import org.terasology.math.ChunkMath;
 import org.terasology.math.Side;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockRegion;
@@ -28,6 +27,7 @@ public class StandardBatchPropagator implements BatchPropagator {
 
     private PropagationRules rules;
     private PropagatorWorldView world;
+    private int scale;
 
     /* Queues are stored in reverse order. Ie, strongest light is 0. */
     private Set<Vector3ic>[] reduceQueues;
@@ -36,8 +36,13 @@ public class StandardBatchPropagator implements BatchPropagator {
     private Map<Side, Vector3ic> chunkEdgeDeltas = Maps.newEnumMap(Side.class);
 
     public StandardBatchPropagator(PropagationRules rules, PropagatorWorldView world) {
+        this(rules, world, 1);
+    }
+
+    public StandardBatchPropagator(PropagationRules rules, PropagatorWorldView world, int scale) {
         this.world = world;
         this.rules = rules;
+        this.scale = scale;
 
         for (Side side : Side.getAllSides()) {
             Vector3i delta = new Vector3i(side.direction());
@@ -116,7 +121,7 @@ public class StandardBatchPropagator implements BatchPropagator {
                 reduce(blockChangePosition, existingValue);
                 side.getAdjacentPos(blockChangePosition, adjPos);
                 byte adjValue = world.getValueAt(adjPos);
-                if (adjValue == rules.propagateValue(existingValue, side, blockChange.getFrom())) {
+                if (adjValue == rules.propagateValue(existingValue, side, blockChange.getFrom(), scale)) {
                     reduce(adjPos, adjValue);
                 }
 
@@ -157,7 +162,7 @@ public class StandardBatchPropagator implements BatchPropagator {
         Vector3i adjPos = new Vector3i();
         for (Side side : Side.getAllSides()) {
             /* Handle this value being reset to the default by updating sides as needed */
-            byte expectedValue = rules.propagateValue(oldValue, side, block);
+            byte expectedValue = rules.propagateValue(oldValue, side, block, scale);
             if (rules.canSpreadOutOf(block, side)) {
                 side.getAdjacentPos(pos, adjPos);
                 byte adjValue = world.getValueAt(adjPos);
@@ -225,7 +230,7 @@ public class StandardBatchPropagator implements BatchPropagator {
         Block block = world.getBlockAt(pos);
         Vector3i adjPos = new Vector3i();
         for (Side side : Side.getAllSides()) {
-            byte propagatedValue = rules.propagateValue(value, side, block);
+            byte propagatedValue = rules.propagateValue(value, side, block, scale);
 
             if (rules.canSpreadOutOf(block, side)) {
                 side.getAdjacentPos(pos, adjPos);
@@ -294,7 +299,7 @@ public class StandardBatchPropagator implements BatchPropagator {
 
         BlockRegion edgeRegion = new BlockRegion(0, 0, 0)
                 .setSize(Chunks.SIZE_X, Chunks.SIZE_Y, Chunks.SIZE_Z);
-        ChunkMath.getEdgeRegion(edgeRegion, side, edgeRegion);
+        edgeRegion.face(side, edgeRegion);
 
         int[] depth = new int[edgeRegion.volume()];
 
@@ -310,7 +315,7 @@ public class StandardBatchPropagator implements BatchPropagator {
         int[] adjDepth = new int[depths.length];
         int dimA = (side == Side.LEFT || side == Side.RIGHT) ? Chunks.SIZE_Y : Chunks.SIZE_X;
         int dimB = (side == Side.FRONT || side == Side.BACK) ? Chunks.SIZE_Y : Chunks.SIZE_Z;
-        ChunkMath.populateMinAdjacent2D(depths, adjDepth, dimA, dimB, !propagateExternal);
+        BatchPropagator.populateMinAdjacent2D(depths, adjDepth, dimA, dimB, !propagateExternal);
 
         if (propagateExternal) {
             for (int y = 0; y < dimB; ++y) {

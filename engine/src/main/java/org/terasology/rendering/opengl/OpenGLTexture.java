@@ -16,15 +16,14 @@
 package org.terasology.rendering.opengl;
 
 import com.google.common.collect.Lists;
-import org.joml.Rectanglef;
-import org.joml.Rectanglei;
 import org.joml.Vector2i;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.AssetType;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.engine.subsystem.lwjgl.LwjglGraphicsManager;
-import org.terasology.math.JomlUtil;
+import org.terasology.joml.geom.Rectanglef;
+import org.terasology.joml.geom.Rectanglei;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.TextureData;
 
@@ -182,7 +181,7 @@ public class OpenGLTexture extends Texture {
 
     @Override
     public Rectanglef getRegion() {
-        return JomlUtil.from(FULL_TEXTURE_REGION);
+        return new Rectanglef(FULL_TEXTURE_REGION); // object is not guarded
     }
 
     @Override

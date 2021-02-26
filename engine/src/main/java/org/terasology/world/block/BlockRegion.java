@@ -10,6 +10,7 @@ import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.terasology.math.Side;
 
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.Optional;
 
@@ -112,39 +113,35 @@ public class BlockRegion implements BlockRegionc {
 
     @Override
     public Iterator<Vector3ic> iterator() {
+        if (!isValid()) {
+            return Collections.emptyIterator();
+        }
         return new Iterator<Vector3ic>() {
             private Vector3i current = null;
             private final Vector3i next = getMin(new Vector3i());
 
             public boolean findNext() {
-                if (current.equals(next)) {
-                    next.z++;
-                    if (next.z > maxZ) {
-                        next.z = minZ;
-                        next.y++;
-                        if (next.y > maxY) {
-                            next.y = minY;
-                            next.x++;
-                        }
+                next.z++;
+                if (next.z > maxZ) {
+                    next.z = minZ;
+                    next.y++;
+                    if (next.y > maxY) {
+                        next.y = minY;
+                        next.x++;
                     }
-                    return contains(next);
                 }
-                return true;
+                return next.x <= maxX;
             }
 
             @Override
             public boolean hasNext() {
-                if (!isValid()) {
-                    return false;
-                }
                 if (current == null) {
                     return true;
                 }
-
-                if (current.equals(next)) {
+                if (current.equals(next.x(), next.y(), next.z())) {
                     return findNext();
                 }
-                return contains(next);
+                return next.x <= maxX;
             }
 
             @Override
@@ -153,8 +150,7 @@ public class BlockRegion implements BlockRegionc {
                     current = new Vector3i(next);
                     return next;
                 }
-
-                if (current.equals(next)) {
+                if (current.equals(next.x(), next.y(), next.z())) {
                     if (findNext()) {
                         return next;
                     }

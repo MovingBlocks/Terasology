@@ -15,7 +15,7 @@
  */
 package org.terasology.rendering.nui.widgets.browser.data.basic.flow;
 
-import org.joml.Rectanglei;
+import org.terasology.joml.geom.Rectanglei;
 import org.terasology.rendering.nui.widgets.browser.ui.style.ParagraphRenderStyle;
 
 public interface ContainerRenderSpace {

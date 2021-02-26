@@ -16,16 +16,16 @@
 package org.terasology.rendering.assets.texture.subtexture;
 
 import org.terasology.assets.AssetData;
-import org.terasology.math.geom.Rect2f;
+import org.terasology.joml.geom.Rectanglef;
 import org.terasology.rendering.assets.texture.Texture;
 
 /**
  */
 public class SubtextureData implements AssetData {
     private Texture texture;
-    private Rect2f region;
+    private Rectanglef region;
 
-    public SubtextureData(Texture texture, Rect2f region) {
+    public SubtextureData(Texture texture, Rectanglef region) {
         this.texture = texture;
         this.region = region;
     }
@@ -34,7 +34,7 @@ public class SubtextureData implements AssetData {
         return texture;
     }
 
-    public Rect2f getRegion() {
+    public Rectanglef getRegion() {
         return region;
     }
 

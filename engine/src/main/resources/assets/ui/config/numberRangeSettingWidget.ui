@@ -1,0 +1,6 @@
+{
+    "type": "UISlider",
+    "id": "slider",
+    "increment": 0.01,
+    "precision": 2
+}

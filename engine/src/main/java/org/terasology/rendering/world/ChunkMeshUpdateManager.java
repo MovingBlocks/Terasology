@@ -1,29 +1,14 @@
-/*
- * Copyright 2013 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.rendering.world;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Queues;
-import org.lwjgl.system.CallbackI;
+import org.joml.RoundingMode;
+import org.joml.Vector3f;
+import org.joml.Vector3i;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.math.ChunkMath;
-import org.terasology.math.JomlUtil;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.monitoring.chunk.ChunkMonitor;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.primitives.ChunkTessellator;
@@ -31,8 +16,7 @@ import org.terasology.utilities.concurrency.TaskMaster;
 import org.terasology.world.ChunkView;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.chunks.Chunk;
-import org.terasology.world.chunks.ChunkConstants;
-import org.terasology.world.chunks.CoreChunk;
+import org.terasology.world.chunks.Chunks;
 import org.terasology.world.chunks.RenderableChunk;
 import org.terasology.world.chunks.pipeline.ChunkTask;
 import org.terasology.world.chunks.pipeline.ShutdownChunkTask;
@@ -101,7 +85,7 @@ public final class ChunkMeshUpdateManager {
      * immediately.
      */
     public void setCameraPosition(Vector3f cameraPosition) {
-        Vector3i chunkPos = ChunkMath.calcChunkPos(cameraPosition);
+        Vector3i chunkPos = Chunks.toChunkPos(new Vector3i(cameraPosition, RoundingMode.FLOOR));
         cameraChunkPosX = chunkPos.x;
         cameraChunkPosY = chunkPos.y;
         cameraChunkPosZ = chunkPos.z;
@@ -170,7 +154,7 @@ public final class ChunkMeshUpdateManager {
                  */
                 c.setDirty(false);
                 if (chunkView.isValidView()) {
-                    newMesh = tessellator.generateMesh(chunkView, ChunkConstants.SIZE_Y, 0);
+                    newMesh = tessellator.generateMesh(chunkView);
 
                     c.setPendingMesh(newMesh);
                     ChunkMonitor.fireChunkTessellated(c.getPosition(new org.joml.Vector3i()), newMesh);
@@ -200,11 +184,11 @@ public final class ChunkMeshUpdateManager {
             if (task.isTerminateSignal()) {
                 return -1;
             }
-            return distFromRegion(JomlUtil.from(task.getPosition()), new Vector3i(cameraChunkPosX, cameraChunkPosY, cameraChunkPosZ));
+            return distFromRegion(task.getPosition(), new Vector3i(cameraChunkPosX, cameraChunkPosY, cameraChunkPosZ, RoundingMode.FLOOR));
         }
 
         private int distFromRegion(Vector3i pos, Vector3i regionCenter) {
-            return pos.gridDistance(regionCenter);
+            return (int) pos.gridDistance(regionCenter);
         }
     }
 }
