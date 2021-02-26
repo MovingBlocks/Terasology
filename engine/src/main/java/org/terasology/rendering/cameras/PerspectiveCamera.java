@@ -187,7 +187,7 @@ public class PerspectiveCamera extends SubmersibleCamera implements PropertyChan
 
     private void updateFarClippingDistance() {
         float distance = renderingConfig.getViewDistance().getChunkDistance().x() * Chunks.SIZE_X * (1 << (int) renderingConfig.getChunkLods());
-        zFar = Math.max(distance, 500) * 2;
+        zFar = Math.max(distance, 600) * 2;
         // distance is an estimate of how far away the farthest chunks are, and the minimum bound is to ensure that the sky is visible.
     }
 

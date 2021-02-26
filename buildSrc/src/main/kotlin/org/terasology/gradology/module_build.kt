@@ -3,8 +3,12 @@
 
 package org.terasology.gradology
 
+import org.gradle.api.Project
 import org.terasology.module.DependencyInfo
 import org.terasology.module.ModuleMetadata
+import org.terasology.module.ModuleMetadataJsonAdapter
+import org.terasology.naming.Version
+import java.io.File
 
 
 // This might be a gradle ExternalModuleDependency or ModuleComponentSelector
@@ -17,7 +21,30 @@ data class GradleDependencyInfo(val group: String, val module: String, val versi
 }
 
 
-class ModuleMetadataForGradle(val moduleConfig: ModuleMetadata) {
+class ModuleMetadataForGradle(private val moduleConfig: ModuleMetadata) {
+
+    companion object {
+        fun fromFile(moduleFile: File, project: Project?): ModuleMetadataForGradle {
+            val moduleConfig = try {
+                moduleFile.reader().use {
+                    ModuleMetadataJsonAdapter().read(it)!!
+                }
+            } catch (e: Exception) {
+                throw ModuleInfoException(e, moduleFile, project)
+            }
+
+            return ModuleMetadataForGradle(moduleConfig)
+        }
+
+        fun forProject(project: Project): ModuleMetadataForGradle {
+            return fromFile(project.file(MODULE_INFO_FILENAME), project)
+        }
+    }
+
+    val version: Version
+        get() = moduleConfig.version
+
+    val group: String = TERASOLOGY_MODULES_GROUP
 
     fun engineVersion(): String {
         return moduleConfig.dependencies.filterNotNull()
