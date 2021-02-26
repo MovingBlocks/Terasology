@@ -44,7 +44,7 @@ class SettingImpl<T> implements Setting<T> {
      * @param constraint The constraint that the setting values must satisfy.
      * @param humanReadableName The human readable name of the setting.
      * @param description A description of the setting.
-     * @param systemProperty
+     * @param override A override provider of the setting.
      */
     SettingImpl(TypeInfo<T> valueType, T defaultValue, SettingConstraint<T> constraint,
                 String humanReadableName, String description, Supplier<Optional<T>> override) {
