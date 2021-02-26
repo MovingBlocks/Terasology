@@ -6,17 +6,19 @@ import com.google.common.collect.Lists;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.PersistedDataSerializer;
 import org.terasology.persistence.typeHandling.TypeHandler;
-import org.terasology.reflection.reflect.ObjectConstructor;
+import org.terasology.reflection.reflect.CollectionCopyConstructor;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 public class CollectionTypeHandler<E> extends TypeHandler<Collection<E>> {
     private TypeHandler<E> elementTypeHandler;
-    private ObjectConstructor<? extends Collection<E>> constructor;
+    private CollectionCopyConstructor<? extends Collection<E>, E> constructor;
 
-    public CollectionTypeHandler(TypeHandler<E> elementTypeHandler, ObjectConstructor<? extends Collection<E>> constructor) {
+    public CollectionTypeHandler(TypeHandler<E> elementTypeHandler,
+                                 CollectionCopyConstructor<? extends Collection<E>, E> constructor) {
         this.elementTypeHandler = elementTypeHandler;
         this.constructor = constructor;
     }
@@ -38,13 +40,13 @@ public class CollectionTypeHandler<E> extends TypeHandler<Collection<E>> {
             return Optional.empty();
         }
 
-        Collection<E> collection = constructor.construct();
+        Collection<E> items = Lists.newArrayList();
 
         for (PersistedData item : data.getAsArray()) {
             Optional<E> element = elementTypeHandler.deserialize(item);
-            element.ifPresent(collection::add);
+            element.ifPresent(items::add);
         }
 
-        return Optional.ofNullable(collection);
+        return Optional.of(constructor.construct(items));
     }
 }

@@ -27,6 +27,7 @@ import org.terasology.module.TableModuleRegistry;
 import org.terasology.module.sandbox.APIScanner;
 import org.terasology.module.sandbox.ModuleSecurityManager;
 import org.terasology.module.sandbox.ModuleSecurityPolicy;
+import org.terasology.module.sandbox.PermissionProvider;
 import org.terasology.module.sandbox.PermissionProviderFactory;
 import org.terasology.module.sandbox.StandardPermissionProviderFactory;
 import org.terasology.module.sandbox.WarnOnlyProviderFactory;
@@ -256,5 +257,9 @@ public class ModuleManager {
         } catch (IOException e) {
             logger.error("Cannot enrich engine's reflections with subsystems");
         }
+    }
+
+    public PermissionProvider getPermissionProvider(Module module) {
+        return permissionProviderFactory.createPermissionProviderFor(module);
     }
 }
