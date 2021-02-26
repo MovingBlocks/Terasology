@@ -1,0 +1,41 @@
+name-template: 'Draft for v$NEXT_MINOR_VERSION'
+tag-template: 'v$NEXT_MINOR_VERSION'
+change-template: '- #$NUMBER $TITLE (@$AUTHOR)'
+template: |
+  ## Changes
+
+  $CHANGES
+categories:
+  - title: ':rocket: Features'
+    labels:
+      - 'Enhancement'
+  - title: ':bug: Bug Fixes'
+    labels:
+      - 'Bug'
+  - title: ':toolbox: Maintenance'
+    labels:
+      - 'Stabilization'
+  - title: ':books: Documentation'
+    labels:
+      - 'Documentation'
+  - title: ':gear: Logistics'
+    labels:
+      - 'Logistics'
+autolabeler:
+  - label: 'Documentation'
+    title:
+      - '/doc/i'
+  - label: 'Bug'
+    title:
+      - '/fix/i'
+  - label: 'Enhancement'
+    title:
+      - '/feat/i'
+  - label: 'Logistics'
+    title:
+      - '/build/i'
+      - '/ci/i'
+  - label: 'Stabilization'
+    title:
+      - '/chore/i'
+      - '/refactor/i'
