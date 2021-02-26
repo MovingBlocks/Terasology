@@ -16,14 +16,14 @@
 
 package org.terasology.testUtil;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
+import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.math.JomlUtil;
-import org.terasology.math.Region3i;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.world.WorldChangeListener;
 import org.terasology.world.block.Block;
+import org.terasology.world.block.BlockRegionc;
 import org.terasology.world.internal.ChunkViewCore;
 import org.terasology.world.internal.WorldInfo;
 import org.terasology.world.internal.WorldProviderCore;
@@ -33,15 +33,14 @@ import org.terasology.world.time.WorldTimeImpl;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
  */
 public class WorldProviderCoreStub implements WorldProviderCore {
 
-    private Map<Vector3i, Block> blocks = Maps.newHashMap();
-    private ArrayList<Map<Vector3i, Integer>> extraData = new ArrayList<>();
+    private Map<Vector3ic, Block> blocks = Maps.newHashMap();
+    private ArrayList<Map<Vector3ic, Integer>> extraData = new ArrayList<>();
     private Block air;
 
     public WorldProviderCoreStub(Block air) {
@@ -83,12 +82,12 @@ public class WorldProviderCoreStub implements WorldProviderCore {
     }
 
     @Override
-    public ChunkViewCore getLocalView(Vector3i chunkPos) {
+    public ChunkViewCore getLocalView(Vector3ic chunkPos) {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
-    public ChunkViewCore getWorldViewAround(Vector3i chunk) {
+    public ChunkViewCore getWorldViewAround(Vector3ic chunk) {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
@@ -98,32 +97,17 @@ public class WorldProviderCoreStub implements WorldProviderCore {
     }
 
     @Override
-    public boolean isRegionRelevant(Region3i region) {
-        return true;
-    }
-
-    @Override
-    public Block setBlock(Vector3i pos, Block type) {
-        return this.setBlock(JomlUtil.from(pos), type);
+    public boolean isRegionRelevant(BlockRegionc region) {
+        return false;
     }
 
     @Override
     public Block setBlock(Vector3ic pos, Block type) {
-        Block old = blocks.put(JomlUtil.from(pos), type);
+        Block old = blocks.put(new Vector3i(pos), type);
         if (old == null) {
             return air;
         }
         return old;
-    }
-
-    @Override
-    public Map<Vector3i, Block> setBlocks(Map<Vector3i, Block> blocksToPlace) {
-        Map<Vector3i, Block> result = new HashMap<>(blocks.size());
-        for (Map.Entry<Vector3i, Block> entry : blocksToPlace.entrySet()) {
-            Block b = setBlock(entry.getKey(), entry.getValue());
-            result.put(entry.getKey(), b);
-        }
-        return result;
     }
 
     @Override
@@ -151,8 +135,8 @@ public class WorldProviderCoreStub implements WorldProviderCore {
     }
 
     @Override
-    public int setExtraData(int index, Vector3i pos, int value) {
-        Integer prevValue = getExtraDataLayer(index).put(pos, value);
+    public int setExtraData(int index, Vector3ic pos, int value) {
+        Integer prevValue = getExtraDataLayer(index).put(new Vector3i(pos), value);
         return prevValue == null ? 0 : prevValue;
     }
 
@@ -161,7 +145,7 @@ public class WorldProviderCoreStub implements WorldProviderCore {
         return getExtraDataLayer(index).getOrDefault(new Vector3i(x, y, z), 0);
     }
 
-    private Map<Vector3i, Integer> getExtraDataLayer(int index) {
+    private Map<Vector3ic, Integer> getExtraDataLayer(int index) {
         while (extraData.size() <= index) {
             extraData.add(Maps.newHashMap());
         }
@@ -179,7 +163,7 @@ public class WorldProviderCoreStub implements WorldProviderCore {
     }
 
     @Override
-    public Collection<Region3i> getRelevantRegions() {
+    public Collection<BlockRegionc> getRelevantRegions() {
         return Collections.emptySet();
     }
 

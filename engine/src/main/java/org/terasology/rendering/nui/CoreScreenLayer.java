@@ -1,14 +1,13 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.rendering.nui;
 
-import org.joml.Rectanglei;
 import org.joml.Vector2i;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.input.ButtonState;
 import org.terasology.input.Keyboard;
-import org.terasology.math.JomlUtil;
+import org.terasology.joml.geom.Rectanglei;
 import org.terasology.nui.AbstractWidget;
 import org.terasology.nui.BaseInteractionListener;
 import org.terasology.nui.Canvas;
@@ -202,7 +201,7 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
 
     @Override
     public void onDraw(Canvas canvas) {
-        Rectanglei region = JomlUtil.from(animationSystem.animateRegion(JomlUtil.from(canvas.getRegion())));
+        Rectanglei region = animationSystem.animateRegion(canvas.getRegion());
         if (isModal()) {
             canvas.addInteractionRegion(getScreenListener(), region);
         }

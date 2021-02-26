@@ -1,27 +1,13 @@
-/*
- * Copyright 2013 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.math;
 
 import com.google.common.collect.Maps;
+import org.joml.Math;
+import org.joml.Vector3f;
 import org.joml.Vector3fc;
+import org.joml.Vector3i;
 import org.joml.Vector3ic;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector3i;
-
 import java.util.EnumMap;
 
 /**
@@ -29,12 +15,12 @@ import java.util.EnumMap;
  *
  */
 public enum Direction {
-    UP(Vector3i.up(), new Vector3f(0, 1, 0)),
+    UP(new Vector3i(0, 1, 0), new Vector3f(0, 1, 0)),
     RIGHT(new Vector3i(-1, 0, 0), new Vector3f(-1, 0, 0)),
     LEFT(new Vector3i(1, 0, 0), new Vector3f(1, 0, 0)),
     BACKWARD(new Vector3i(0, 0, -1), new Vector3f(0, 0, -1)),
     FORWARD(new Vector3i(0, 0, 1), new Vector3f(0, 0, 1)),
-    DOWN(Vector3i.down(), new Vector3f(0, -1, 0));
+    DOWN(new Vector3i(0, -1, 0), new Vector3f(0, -1, 0));
 
     private static final EnumMap<Direction, Direction> REVERSE_MAP;
     private static final EnumMap<Direction, Side> CONVERSION_MAP;
@@ -65,18 +51,18 @@ public enum Direction {
     }
 
     public static Direction inDirection(int x, int y, int z) {
-        if (TeraMath.fastAbs(x) > TeraMath.fastAbs(y)) {
-            if (TeraMath.fastAbs(x) > TeraMath.fastAbs(z)) {
+        if (Math.abs(x) > Math.abs(y)) {
+            if (Math.abs(x) > Math.abs(z)) {
                 return (x > 0) ? LEFT : RIGHT;
             }
-        } else if (TeraMath.fastAbs(y) > TeraMath.fastAbs(z)) {
+        } else if (Math.abs(y) > Math.abs(z)) {
             return (y > 0) ? UP : DOWN;
         }
         return (z > 0) ? FORWARD : BACKWARD;
     }
 
-    public static Direction inDirection(Vector3f dir) {
-        return inDirection(dir.x, dir.y, dir.z);
+    public static Direction inDirection(Vector3fc dir) {
+        return inDirection(dir.x(), dir.y(), dir.z());
     }
 
     public Side toSide() {
@@ -92,11 +78,11 @@ public enum Direction {
      * @return Side enum with the appropriate direction
      */
     public static Direction inDirection(float x, float y, float z) {
-        if (TeraMath.fastAbs(x) > TeraMath.fastAbs(y)) {
-            if (TeraMath.fastAbs(x) > TeraMath.fastAbs(z)) {
+        if (Math.abs(x) > Math.abs(y)) {
+            if (Math.abs(x) > Math.abs(z)) {
                 return (x > 0) ? LEFT : RIGHT;
             }
-        } else if (TeraMath.fastAbs(y) > TeraMath.fastAbs(z)) {
+        } else if (Math.abs(y) > Math.abs(z)) {
             return (y > 0) ? UP : DOWN;
         }
         return (z > 0) ? FORWARD : BACKWARD;
@@ -110,7 +96,7 @@ public enum Direction {
      * @return Side enum with the appropriate direction
      */
     public static Direction inHorizontalDirection(float x, float z) {
-        if (TeraMath.fastAbs(x) > TeraMath.fastAbs(z)) {
+        if (Math.abs(x) > Math.abs(z)) {
             return (x > 0) ? LEFT : RIGHT;
         }
         return (z > 0) ? FORWARD : BACKWARD;
@@ -123,9 +109,8 @@ public enum Direction {
      * @return vector pointing in the direction
      */
     public Vector3ic asVector3i() {
-        return JomlUtil.from(vector3iDir);
+        return vector3iDir;
     }
-
 
     /**
      * readonly normalized {@link Vector3fc} in the given {@link Direction}
@@ -133,25 +118,7 @@ public enum Direction {
      * @return vector pointing in the direction
      */
     public Vector3fc asVector3f() {
-        return JomlUtil.from(vector3fDir);
-    }
-
-    /**
-     * @return The vector3i in the direction of the side. Do not modify.
-     * @deprecated This is scheduled for removal in an upcoming version method will be replaced with JOML implementation
-     *     {@link #asVector3i()}.
-     */
-    public Vector3i getVector3i() {
-        return new Vector3i(vector3iDir);
-    }
-
-    /**
-     * @return
-     * @deprecated This is scheduled for removal in an upcoming version method will be replaced with JOML implementation
-     *     {@link #asVector3f()}
-     */
-    public Vector3f getVector3f() {
-        return new Vector3f(vector3fDir);
+        return vector3fDir;
     }
 
     /**

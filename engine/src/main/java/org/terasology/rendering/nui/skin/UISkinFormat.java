@@ -1,4 +1,4 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.rendering.nui.skin;
 
@@ -16,6 +16,7 @@ import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.format.AbstractAssetFileFormat;
 import org.terasology.assets.format.AssetDataFile;
 import org.terasology.assets.module.annotations.RegisterAssetFileFormat;
+import org.terasology.engine.module.ModuleContext;
 import org.terasology.nui.Color;
 import org.terasology.nui.UITextureRegion;
 import org.terasology.nui.UIWidget;
@@ -24,7 +25,6 @@ import org.terasology.nui.skin.UISkin;
 import org.terasology.nui.skin.UISkinBuilder;
 import org.terasology.nui.skin.UISkinData;
 import org.terasology.nui.skin.UIStyleFragment;
-import org.terasology.persistence.ModuleContext;
 import org.terasology.persistence.typeHandling.extensionTypes.ColorTypeHandler;
 import org.terasology.persistence.typeHandling.gson.GsonTypeHandlerAdapterFactory;
 import org.terasology.reflection.metadata.ClassLibrary;

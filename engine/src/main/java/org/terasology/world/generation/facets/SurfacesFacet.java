@@ -4,7 +4,7 @@
 package org.terasology.world.generation.facets;
 
 import org.joml.Vector3ic;
-import org.terasology.math.Region3i;
+import org.terasology.world.block.BlockRegion;
 import org.terasology.world.generation.Border3D;
 import org.terasology.world.generation.facets.base.VerticallySparseBooleanFacet3D;
 
@@ -18,7 +18,7 @@ import java.util.Optional;
  */
 public class SurfacesFacet extends VerticallySparseBooleanFacet3D {
 
-    public SurfacesFacet(Region3i targetRegion, Border3D border) {
+    public SurfacesFacet(BlockRegion targetRegion, Border3D border) {
         super(targetRegion, border);
     }
 

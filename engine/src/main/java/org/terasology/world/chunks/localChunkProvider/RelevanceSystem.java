@@ -1,8 +1,10 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.world.chunks.localChunkProvider;
 
 import com.google.common.collect.Maps;
+import org.joml.Vector3i;
+import org.joml.Vector3ic;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.lifecycleEvents.BeforeDeactivateComponent;
 import org.terasology.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
@@ -10,12 +12,11 @@ import org.terasology.entitySystem.entity.lifecycleEvents.OnChangedComponent;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.logic.location.LocationComponent;
-import org.terasology.math.JomlUtil;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.monitoring.Activity;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.world.RelevanceRegionComponent;
 import org.terasology.world.WorldComponent;
+import org.terasology.world.block.BlockRegion;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkRegionListener;
 import org.terasology.world.chunks.event.BeforeChunkUnload;
@@ -43,7 +44,7 @@ import java.util.stream.StreamSupport;
  */
 public class RelevanceSystem implements UpdateSubscriberSystem {
 
-    private static final Vector3i UNLOAD_LEEWAY = Vector3i.one();
+    private static final Vector3i UNLOAD_LEEWAY = new Vector3i(1, 1, 1);
     private final ReadWriteLock regionLock = new ReentrantReadWriteLock();
     private final Map<EntityRef, ChunkRelevanceRegion> regions = Maps.newHashMap();
     private final LocalChunkProvider chunkProvider;
@@ -91,7 +92,7 @@ public class RelevanceSystem implements UpdateSubscriberSystem {
      * @param entity entity for update distance.
      * @param distance new distance for setting to entity's region.
      */
-    public void updateRelevanceEntityDistance(EntityRef entity, Vector3i distance) {
+    public void updateRelevanceEntityDistance(EntityRef entity, Vector3ic distance) {
         regionLock.readLock().lock();
         try {
             ChunkRelevanceRegion region = regions.get(entity);
@@ -147,7 +148,7 @@ public class RelevanceSystem implements UpdateSubscriberSystem {
      * @param distance region's distance.
      * @param listener chunk relevance listener.
      */
-    public void addRelevanceEntity(EntityRef entity, Vector3i distance, ChunkRegionListener listener) {
+    public void addRelevanceEntity(EntityRef entity, Vector3ic distance, ChunkRegionListener listener) {
         if (!entity.exists()) {
             return;
         }
@@ -192,9 +193,9 @@ public class RelevanceSystem implements UpdateSubscriberSystem {
      * @param pos chunk's position
      * @return {@code true} if chunk in regions, otherwise {@code false}
      */
-    public boolean isChunkInRegions(Vector3i pos) {
+    public boolean isChunkInRegions(Vector3ic pos) {
         for (ChunkRelevanceRegion region : regions.values()) {
-            if (region.getCurrentRegion().expand(UNLOAD_LEEWAY).encompasses(pos)) {
+            if (new BlockRegion(region.getCurrentRegion()).expand(UNLOAD_LEEWAY).contains(pos)) {
                 return true;
             }
         }
@@ -248,14 +249,14 @@ public class RelevanceSystem implements UpdateSubscriberSystem {
         // ignore
     }
 
-    private int regionsDistanceScore(Vector3i chunk) {
+    private int regionsDistanceScore(Vector3ic chunk) {
         int score = Integer.MAX_VALUE;
 
         regionLock.readLock().lock();
         try {
 
             for (ChunkRelevanceRegion region : regions.values()) {
-                int dist = distFromRegion(chunk, region.getCenter());
+                int dist = (int) chunk.gridDistance(region.getCenter());
                 if (dist < score) {
                     score = dist;
                 }
@@ -269,10 +270,6 @@ public class RelevanceSystem implements UpdateSubscriberSystem {
         }
     }
 
-    private int distFromRegion(Vector3i pos, Vector3i regionCenter) {
-        return pos.gridDistance(regionCenter);
-    }
-
     /**
      * Compare ChunkTasks by distance from region's centers.
      */
@@ -284,7 +281,7 @@ public class RelevanceSystem implements UpdateSubscriberSystem {
         }
 
         private int score(PositionFuture<?> task) {
-            return RelevanceSystem.this.regionsDistanceScore(JomlUtil.from(task.getPosition()));
+            return RelevanceSystem.this.regionsDistanceScore(task.getPosition());
         }
     }
 
@@ -292,14 +289,14 @@ public class RelevanceSystem implements UpdateSubscriberSystem {
     /**
      * Compare ChunkTasks by distance from region's centers.
      */
-    private class PositionRelevanceComparator implements Comparator<Vector3i> {
+    private class PositionRelevanceComparator implements Comparator<Vector3ic> {
 
         @Override
-        public int compare(Vector3i o1, Vector3i o2) {
+        public int compare(Vector3ic o1, Vector3ic o2) {
             return score(o1) - score(o2);
         }
 
-        private int score(Vector3i position) {
+        private int score(Vector3ic position) {
             return RelevanceSystem.this.regionsDistanceScore(position);
         }
     }

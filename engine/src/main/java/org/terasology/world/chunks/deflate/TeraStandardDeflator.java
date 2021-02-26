@@ -1,18 +1,5 @@
-/*
- * Copyright 2013 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.world.chunks.deflate;
 
@@ -24,8 +11,7 @@ import org.terasology.world.chunks.blockdata.TeraSparseArray8Bit;
 /**
  * TeraStandardDeflator implements a simple deflation algorithm for 4, 8 and 16-bit dense and sparse arrays.<br>
  * <b>NOTE:</b> Currently it is optimized for chunks of size 16x256x16 blocks.<br>
- * TODO: Implement deflation for sparse arrays.
- *
+ * TODO: Implement deflation for sparse array 4bit.
  */
 public class TeraStandardDeflator extends TeraVisitingDeflator {
 
@@ -67,7 +53,11 @@ public class TeraStandardDeflator extends TeraVisitingDeflator {
     }
 
     @Override
-    public TeraArray deflateDenseArray16Bit(short[] data, int rowSize, int sizeX, int sizeY, int sizeZ) {
+    public TeraArray deflateDenseArray16Bit(short[] data,
+                                            int rowSize,
+                                            int sizeX,
+                                            int sizeY,
+                                            int sizeZ) {
         final short[][] inflated = new short[sizeY][];
         final short[] deflated = new short[sizeY];
         int packed = 0;
@@ -110,7 +100,11 @@ public class TeraStandardDeflator extends TeraVisitingDeflator {
     }
 
     @Override
-    public TeraArray deflateDenseArray8Bit(final byte[] data, final int rowSize, final int sizeX, final int sizeY, final int sizeZ) {
+    public TeraArray deflateDenseArray8Bit(final byte[] data,
+                                           final int rowSize,
+                                           final int sizeX,
+                                           final int sizeY,
+                                           final int sizeZ) {
         final byte[][] inflated = new byte[sizeY][];
         final byte[] deflated = new byte[sizeY];
         int packed = 0;
@@ -153,7 +147,11 @@ public class TeraStandardDeflator extends TeraVisitingDeflator {
     }
 
     @Override
-    public TeraArray deflateDenseArray4Bit(final byte[] data, final int rowSize, final int sizeX, final int sizeY, final int sizeZ) {
+    public TeraArray deflateDenseArray4Bit(final byte[] data,
+                                           final int rowSize,
+                                           final int sizeX,
+                                           final int sizeY,
+                                           final int sizeZ) {
         final byte[][] inflated = new byte[sizeY][];
         final byte[] deflated = new byte[sizeY];
         int packed = 0;
@@ -196,19 +194,101 @@ public class TeraStandardDeflator extends TeraVisitingDeflator {
     }
 
     @Override
-    public TeraArray deflateSparseArray16Bit(short[][] inflated, short[] deflated, short fill, int rowSize, int sizeX, int sizeY, int sizeZ) {
-        return null;
+    public TeraArray deflateSparseArray16Bit(short[][] inflated,
+                                             short[] deflated,
+                                             short fill,
+                                             int rowSize,
+                                             int sizeX,
+                                             int sizeY,
+                                             int sizeZ) {
+        if (inflated == null && deflated == null) {
+            return new TeraSparseArray16Bit(sizeX, sizeY, sizeZ, fill);
+        }
+        if (inflated == null) {
+            return new TeraSparseArray16Bit(sizeX, sizeY, sizeZ, inflated, deflated);
+        }
+
+        short[] packed = new short[sizeY];
+        short[][] newInflated = new short[sizeY][];
+        for (int y = 0; y < sizeY; y++) {
+            short[] planeXY = inflated[y];
+            if (planeXY != null) {
+                short first = planeXY[0];
+                boolean packing = true;
+                for (int i = 1; i < rowSize; i++) {
+                    if (first != planeXY[i]) {
+                        packing = false;
+                        break;
+                    }
+                }
+                if (packing) {
+                    packed[y] = first;
+                } else {
+                    short[] xyvalues = new short[rowSize];
+                    System.arraycopy(inflated[y], 0, xyvalues, 0, rowSize);
+                    newInflated[y] = xyvalues;
+                }
+            } else {
+                if (deflated != null) {
+                    packed[y] = deflated[y];
+                }
+            }
+        }
+        return new TeraSparseArray16Bit(sizeX, sizeY, sizeZ, newInflated, packed);
     }
 
     @Override
-    public TeraArray deflateSparseArray8Bit(final byte[][] inflated, final byte[] deflated, final byte fill, final int rowSize,
-                                            final int sizeX, final int sizeY, final int sizeZ) {
-        return null;
+    public TeraArray deflateSparseArray8Bit(final byte[][] inflated,
+                                            final byte[] deflated,
+                                            final byte fill,
+                                            final int rowSize,
+                                            final int sizeX,
+                                            final int sizeY,
+                                            final int sizeZ) {
+        if (inflated == null && deflated == null) {
+            return new TeraSparseArray8Bit(sizeX, sizeY, sizeZ, fill);
+        }
+        if (inflated == null) {
+            return new TeraSparseArray8Bit(sizeX, sizeY, sizeZ, inflated, deflated);
+        }
+
+        byte[] packed = new byte[sizeY];
+        byte[][] newInflated = new byte[sizeY][];
+        for (int y = 0; y < sizeY; y++) {
+            byte[] planeXY = inflated[y];
+            if (planeXY != null) {
+                byte first = planeXY[0];
+                boolean packing = true;
+                for (int i = 1; i < rowSize; i++) {
+                    if (first != planeXY[i]) {
+                        packing = false;
+                        break;
+                    }
+                }
+                if (packing) {
+                    packed[y] = first;
+                } else {
+                    byte[] xyvalues = new byte[rowSize];
+                    System.arraycopy(inflated[y], 0, xyvalues, 0, rowSize);
+                    newInflated[y] = xyvalues;
+                }
+            } else {
+                if (deflated != null) {
+                    packed[y] = deflated[y];
+                }
+            }
+        }
+        return new TeraSparseArray8Bit(sizeX, sizeY, sizeZ, newInflated, packed);
     }
 
     @Override
-    public TeraArray deflateSparseArray4Bit(final byte[][] inflated, final byte[] deflated, final byte fill, final int rowSize,
-                                            final int sizeX, final int sizeY, final int sizeZ) {
+    public TeraArray deflateSparseArray4Bit(final byte[][] inflated,
+                                            final byte[] deflated,
+                                            final byte fill,
+                                            final int rowSize,
+                                            final int sizeX,
+                                            final int sizeY,
+                                            final int sizeZ) {
         return null;
     }
 

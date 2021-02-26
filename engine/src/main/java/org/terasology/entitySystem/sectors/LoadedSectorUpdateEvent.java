@@ -15,8 +15,8 @@
  */
 package org.terasology.entitySystem.sectors;
 
+import org.joml.Vector3i;
 import org.terasology.entitySystem.event.Event;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.module.sandbox.API;
 
 import java.util.Set;

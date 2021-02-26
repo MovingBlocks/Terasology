@@ -1,18 +1,5 @@
-/*
- * Copyright 2020 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 
 // Engine tests are split out due to otherwise quirky project dependency issues with module tests extending engine tests
 
@@ -46,11 +33,6 @@ def moduleConfig = slurper.parseText(moduleFile.text)
 // Gradle uses the magic version variable when creating the jar name (unless explicitly set differently)
 version = moduleConfig.version
 
-// The only case in which we make non-snapshots is when BRANCH_NAME exists and contains "master" - otherwise snapshots
-if (env.BRANCH_NAME == null || !env.BRANCH_NAME.equals("master")) {
-    version += "-SNAPSHOT"
-}
-
 // Jenkins-Artifactory integration catches on to this as part of the Maven-type descriptor
 group = 'org.terasology.engine'
 
@@ -76,13 +58,16 @@ dependencies {
     implementation group: 'org.reflections', name: 'reflections', version: '0.9.10'
 
     // Test lib dependencies
-    implementation("org.junit.jupiter:junit-jupiter-api:5.5.2")
-    implementation("org.junit.jupiter:junit-jupiter-params:5.5.2")
-    implementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '3.2.0'
+    implementation(platform("org.junit:junit-bom:5.7.1")) {
+        // junit-bom will set version numbers for the other org.junit dependencies.
+    }
+    implementation("org.junit.jupiter:junit-jupiter-api")
+    implementation("org.junit.jupiter:junit-jupiter-params")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
 
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.5.2")
+    implementation("org.mockito:mockito-junit-jupiter:3.7.7")
 
-    implementation group: 'junit', name: 'junit', version: '4.12'
+    implementation("org.terasology.joml-ext:joml-test:0.1.0")
 
     //TODO: Remove shrinkwrap from code, you have FileSystem in java 8
     implementation group: 'org.jboss.shrinkwrap', name: 'shrinkwrap-depchain-java7', version: '1.2.1'

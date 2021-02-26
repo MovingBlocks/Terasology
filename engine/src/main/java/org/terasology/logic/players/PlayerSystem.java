@@ -1,18 +1,5 @@
-/*
- * Copyright 2016 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.logic.players;
 
@@ -40,7 +27,6 @@ import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.event.OnPlayerRespawnedEvent;
 import org.terasology.logic.players.event.OnPlayerSpawnedEvent;
 import org.terasology.logic.players.event.RespawnRequestEvent;
-import org.terasology.math.JomlUtil;
 import org.terasology.network.Client;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkSystem;
@@ -153,7 +139,7 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
                 clientsPreparingToSpawn.add(new SpawningClientInfo(entity, storedLocation, playerStore));
             }
         } else {
-            Vector3f spawnPosition = JomlUtil.from(worldGenerator.getSpawnPosition(entity));
+            Vector3fc spawnPosition = worldGenerator.getSpawnPosition(entity);
             loc.setWorldPosition(spawnPosition);
             entity.saveComponent(loc);
 
@@ -195,7 +181,7 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
         //RelevanceRegionComponent relevanceRegion = new RelevanceRegionComponent();
         //relevanceRegion.distance = chunkDistance;
         //entity.saveComponent(relevanceRegion);
-        relevanceSystem.updateRelevanceEntityDistance(entity, JomlUtil.from(chunkDistance));
+        relevanceSystem.updateRelevanceEntityDistance(entity, chunkDistance);
     }
 
     private void removeRelevanceEntity(EntityRef entity) {
@@ -208,7 +194,7 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
         //RelevanceRegionComponent relevanceRegion = new RelevanceRegionComponent();
         //relevanceRegion.distance = chunkDistance;
         //entity.addComponent(relevanceRegion);
-        relevanceSystem.addRelevanceEntity(entity, JomlUtil.from(chunkDistance), owner);
+        relevanceSystem.addRelevanceEntity(entity, chunkDistance, owner);
     }
 
     @ReceiveEvent(components = ClientComponent.class)
@@ -222,11 +208,11 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
         EntityRef character = clientComponent.character;
         EntityRef clientInfo = clientComponent.clientInfo;
 
-        Vector3f spawnPosition;
+        Vector3fc spawnPosition;
         if (clientInfo.hasComponent(StaticSpawnLocationComponent.class)) {
             spawnPosition = clientInfo.getComponent(StaticSpawnLocationComponent.class).position;
         } else {
-            spawnPosition = JomlUtil.from(worldGenerator.getSpawnPosition(entity));
+            spawnPosition = worldGenerator.getSpawnPosition(entity);
         }
         LocationComponent loc = character.getComponent(LocationComponent.class);
         loc.setWorldPosition(spawnPosition);

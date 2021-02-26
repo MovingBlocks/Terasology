@@ -16,12 +16,11 @@
 package org.terasology.engine.subsystem.headless.assets;
 
 import com.google.common.collect.Lists;
-import org.joml.Rectanglef;
-import org.joml.Rectanglei;
 import org.joml.Vector2i;
 import org.terasology.assets.AssetType;
 import org.terasology.assets.ResourceUrn;
-import org.terasology.math.JomlUtil;
+import org.terasology.joml.geom.Rectanglef;
+import org.terasology.joml.geom.Rectanglei;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.TextureData;
 
@@ -85,7 +84,7 @@ public class HeadlessTexture extends Texture {
 
     @Override
     public Rectanglef getRegion() {
-        return JomlUtil.from(FULL_TEXTURE_REGION);
+        return new Rectanglef(FULL_TEXTURE_REGION); // object is not guarded
     }
 
     @Override

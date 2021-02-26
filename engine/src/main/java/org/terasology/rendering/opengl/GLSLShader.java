@@ -34,6 +34,7 @@ import org.terasology.config.RenderingConfig;
 import org.terasology.engine.GameThread;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.paths.PathManager;
+import org.terasology.engine.subsystem.lwjgl.LwjglGraphicsProcessing;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.assets.shader.Shader;
 import org.terasology.rendering.assets.shader.ShaderData;
@@ -63,6 +64,7 @@ import java.util.Set;
 public class GLSLShader extends Shader {
 
     private static final Logger logger = LoggerFactory.getLogger(GLSLShader.class);
+    private final LwjglGraphicsProcessing graphicsProcessing;
 
     // TODO this should be handled another way, we need to get ssao parameters here
     public int ssaoKernelElements = 32;
@@ -98,11 +100,14 @@ public class GLSLShader extends Shader {
 
     private DisposalAction disposalAction;
 
-    public GLSLShader(ResourceUrn urn, AssetType<?, ShaderData> assetType, ShaderData data) {
+    public GLSLShader(ResourceUrn urn, AssetType<?, ShaderData> assetType, ShaderData data, LwjglGraphicsProcessing graphicsProcessing) {
         super(urn, assetType);
-        disposalAction = new DisposalAction(urn);
+        this.graphicsProcessing = graphicsProcessing;
+        disposalAction = new DisposalAction(urn, graphicsProcessing);
         getDisposalHook().setDisposeAction(disposalAction);
-        reload(data);
+        graphicsProcessing.asynchToDisplayThread(() -> {
+            reload(data);
+        });
     }
 
     private static InputStreamReader getInputStreamReaderFromResource(String resource) {
@@ -131,6 +136,12 @@ public class GLSLShader extends Shader {
 
     @Override
     public void recompile() {
+        graphicsProcessing.asynchToDisplayThread(() -> {
+            recompileInt();
+        });
+    }
+
+    private void recompileInt() {
         registerAllShaderPermutations();
         // TODO: reload materials
     }
@@ -393,7 +404,7 @@ public class GLSLShader extends Shader {
                 }
                 updateAvailableFeatures();
                 try {
-                    recompile();
+                    recompileInt();
                 } catch (RuntimeException e) {
                     logger.warn(e.getMessage());
                 }
@@ -406,14 +417,16 @@ public class GLSLShader extends Shader {
     private static class DisposalAction implements Runnable {
 
         private final ResourceUrn urn;
+        private final LwjglGraphicsProcessing graphicsProcessing;
 
         private final TIntIntMap fragmentPrograms = new TIntIntHashMap();
         private final TIntIntMap vertexPrograms = new TIntIntHashMap();
         private final TIntIntMap geometryPrograms = new TIntIntHashMap();
 
         // made package-private after CheckStyle's suggestion
-        DisposalAction(ResourceUrn urn) {
+        DisposalAction(ResourceUrn urn, LwjglGraphicsProcessing graphicsProcessing) {
             this.urn = urn;
+            this.graphicsProcessing = graphicsProcessing;
         }
 
         @Override
@@ -433,11 +446,14 @@ public class GLSLShader extends Shader {
         }
 
         private void disposePrograms(TIntIntMap programs) {
-            TIntIntIterator it = programs.iterator();
-            while (it.hasNext()) {
-                it.advance();
-                GL20.glDeleteShader(it.value());
-            }
+            final TIntIntMap disposedPrograms = new TIntIntHashMap(programs);
+            graphicsProcessing.asynchToDisplayThread(() -> {
+                TIntIntIterator it = disposedPrograms.iterator();
+                while (it.hasNext()) {
+                    it.advance();
+                        GL20.glDeleteShader(it.value());
+                }
+            });
             programs.clear();
         }
     }

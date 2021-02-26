@@ -34,7 +34,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import gnu.trove.iterator.TFloatIterator;
-import org.joml.AABBf;
+import org.terasology.joml.geom.AABBf;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
@@ -47,8 +47,6 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.characters.CharacterMovementComponent;
 import org.terasology.logic.location.LocationComponent;
-import org.terasology.math.AABB;
-import org.terasology.math.JomlUtil;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.physics.CollisionGroup;
 import org.terasology.physics.HitResult;
@@ -166,18 +164,8 @@ public class BulletPhysics implements PhysicsEngine {
     }
 
     @Override
-    public List<EntityRef> scanArea(AABB area, CollisionGroup... collisionFilter) {
-        return scanArea(area, Arrays.asList(collisionFilter));
-    }
-
-    @Override
     public List<EntityRef> scanArea(AABBf area, CollisionGroup... collisionFilter) {
         return scanArea(area, Arrays.asList(collisionFilter));
-    }
-
-    @Override
-    public List<EntityRef> scanArea(AABB area, Iterable<CollisionGroup> collisionFilter) {
-        return scanArea(JomlUtil.from(area), collisionFilter);
     }
 
     @Override
@@ -324,7 +312,7 @@ public class BulletPhysics implements PhysicsEngine {
         RigidBodyComponent rb = entity.getComponent(RigidBodyComponent.class);
         BulletRigidBody rigidBody = entityRigidBodies.get(entity);
 
-        if (location == null || Float.isNaN(location.getWorldPosition().x)) {
+        if (location == null) {
             logger.warn("Updating rigid body of entity that has no "
                     + "LocationComponent?! Nothing is done, except log this"
                     + " warning instead. Entity: {}", entity);
@@ -387,23 +375,25 @@ public class BulletPhysics implements PhysicsEngine {
     //TODO: update if detectGroups changed
     public boolean updateTrigger(EntityRef entity) {
         LocationComponent location = entity.getComponent(LocationComponent.class);
-        btPairCachingGhostObject triggerObj = entityTriggers.get(entity);
-
-        if (location == null || Float.isNaN(location.getWorldPosition().x)) {
+        if (location == null) {
             logger.warn("Trying to update or create trigger of entity that has no LocationComponent?! Entity: {}", entity);
             return false;
         }
+        btPairCachingGhostObject triggerObj = entityTriggers.get(entity);
+
         if (triggerObj != null) {
             float scale = location.getWorldScale();
             if (Math.abs(triggerObj.getCollisionShape().getLocalScaling().x - scale) > SIMD_EPSILON) {
                 discreteDynamicsWorld.removeCollisionObject(triggerObj);
                 newTrigger(entity);
             } else {
-                Quaternionf worldRotation = JomlUtil.from(location.getWorldRotation());
-                Vector3f worldPosition = JomlUtil.from(location.getWorldPosition());
-                triggerObj.setWorldTransform(new Matrix4f().translationRotateScale(worldPosition,worldRotation,1.0f));
-
-//                triggerObj.setWorldTransform(new Matrix4f(worldRotation, worldPosition, 1.0f));//new Transform(new Matrix4f(worldRotation, worldPosition, 1.0f)));
+                Quaternionf worldRotation = location.getWorldRotation(new Quaternionf());
+                Vector3f position = location.getWorldPosition(new Vector3f());
+                if (!position.isFinite() || !worldRotation.isFinite()) {
+                    logger.warn("Can't update Trigger entity with a non-finite position/rotation?! Entity: {}", entity);
+                    return false;
+                }
+                triggerObj.setWorldTransform(new Matrix4f().translationRotateScale(position, worldRotation, 1.0f));
             }
             return true;
         } else {
@@ -493,7 +483,7 @@ public class BulletPhysics implements PhysicsEngine {
             List<CollisionGroup> detectGroups = Lists.newArrayList(trigger.detectGroups);
             CollisionGroup collisionGroup = trigger.collisionGroup;
             btPairCachingGhostObject triggerObj = createCollider(
-                    JomlUtil.from(location.getWorldPosition()),
+                    location.getWorldPosition(new Vector3f()),
                     shape,
                     collisionGroup.getFlag(),
                     combineGroups(detectGroups),
@@ -530,7 +520,7 @@ public class BulletPhysics implements PhysicsEngine {
         if (locComp == null || movementComp == null) {
             throw new IllegalArgumentException("Expected an entity with a Location component and CharacterMovementComponent.");
         }
-        Vector3f pos = new Vector3f(JomlUtil.from(locComp.getWorldPosition()));
+        Vector3f pos = locComp.getWorldPosition(new Vector3f());
         final float worldScale = locComp.getWorldScale();
         final float height = (movementComp.height - 2 * movementComp.radius) * worldScale;
         final float width = movementComp.radius * worldScale;
@@ -563,7 +553,7 @@ public class BulletPhysics implements PhysicsEngine {
             collider.rb.setFriction(rigidBody.friction);
             collider.collidesWith = combineGroups(rigidBody.collidesWith);
             collider.setVelocity(rigidBody.velocity, rigidBody.angularVelocity);
-            collider.setTransform(JomlUtil.from(location.getWorldPosition()), JomlUtil.from(location.getWorldRotation()));
+            collider.setTransform(location.getWorldPosition(new Vector3f()), location.getWorldRotation(new Quaternionf()));
             updateKinematicSettings(rigidBody, collider);
             BulletRigidBody oldBody = entityRigidBodies.put(entity, collider);
             addRigidBody(collider, Lists.newArrayList(rigidBody.collisionGroup), rigidBody.collidesWith);
@@ -1003,11 +993,11 @@ public class BulletPhysics implements PhysicsEngine {
         public SweepCallback sweep(Vector3f startPos, Vector3f endPos, float allowedPenetration, float slopeFactor) {
             Matrix4f startTransform = new Matrix4f().translationRotateScale(startPos, new Quaternionf(), 1.0f);
             Matrix4f endTransform = new Matrix4f().translationRotateScale(endPos, new Quaternionf(), 1.0f);
-            BulletSweepCallback callback = new BulletSweepCallback(collider,startPos,slopeFactor);
+            BulletSweepCallback callback = new BulletSweepCallback(collider, startPos, slopeFactor);
             callback.setCollisionFilterGroup(collider.getBroadphaseHandle().getCollisionFilterGroup());
             callback.setCollisionFilterMask(collider.getBroadphaseHandle().getCollisionFilterMask());
             callback.setCollisionFilterGroup((short)(callback.getCollisionFilterGroup() & (~StandardCollisionGroup.SENSOR.getFlag())));
-            collider.convexSweepTest((btConvexShape)(collider.getCollisionShape()),startTransform,endTransform,callback,allowedPenetration);
+            collider.convexSweepTest((btConvexShape)(collider.getCollisionShape()), startTransform, endTransform, callback, allowedPenetration);
             return callback;
         }
     }

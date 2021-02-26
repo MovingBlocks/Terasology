@@ -15,22 +15,22 @@
  */
 package org.terasology.rendering.nui.layers.ingame.metrics;
 
+import org.joml.Vector3f;
+import org.joml.Vector3i;
 import org.terasology.config.Config;
 import org.terasology.engine.Time;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.input.cameraTarget.CameraTargetSystem;
 import org.terasology.logic.players.LocalPlayer;
-import org.terasology.math.ChunkMath;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.monitoring.PerformanceMonitor;
+import org.terasology.nui.databinding.ReadOnlyBinding;
+import org.terasology.nui.widgets.UILabel;
 import org.terasology.persistence.StorageManager;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
-import org.terasology.nui.databinding.ReadOnlyBinding;
-import org.terasology.nui.widgets.UILabel;
 import org.terasology.rendering.primitives.ChunkTessellator;
 import org.terasology.world.WorldProvider;
+import org.terasology.world.chunks.Chunks;
 
 import java.util.Locale;
 
@@ -64,11 +64,10 @@ public class DebugOverlay extends CoreScreenLayer {
     @In
     private DebugMetricsSystem debugMetricsSystem;
 
-    private UILabel metricsLabel;
-
     @In
     private StorageManager storageManager;
 
+    private UILabel metricsLabel;
 
     @Override
     public void initialise() {
@@ -86,7 +85,7 @@ public class DebugOverlay extends CoreScreenLayer {
                 public String get() {
                     double memoryUsage = ((double) Runtime.getRuntime().totalMemory() - (double) Runtime.getRuntime().freeMemory()) / 1048576.0;
                     return String.format("FPS: %.2f, Memory Usage: %.2f MB, Total Memory: %.2f MB, Max Memory: %.2f MB",
-                            time.getFps(), memoryUsage, Runtime.getRuntime().totalMemory() / 1048576.0, Runtime.getRuntime().maxMemory() / 1048576.0);
+                        time.getFps(), memoryUsage, Runtime.getRuntime().totalMemory() / 1048576.0, Runtime.getRuntime().maxMemory() / 1048576.0);
                 }
             });
         }
@@ -106,14 +105,14 @@ public class DebugOverlay extends CoreScreenLayer {
             debugLine3.bindText(new ReadOnlyBinding<String>() {
                 @Override
                 public String get() {
-                    Vector3f pos = localPlayer.getPosition();
-                    Vector3i chunkPos = ChunkMath.calcChunkPos((int) pos.x, (int) pos.y, (int) pos.z);
-                    Vector3f rotation = localPlayer.getViewDirection();
-                    Vector3f cameraPos = localPlayer.getViewPosition();
+                    Vector3f pos = localPlayer.getPosition(new Vector3f());
+                    Vector3i chunkPos = Chunks.toChunkPos(pos, new Vector3i());
+                    Vector3f rotation = localPlayer.getViewDirection(new Vector3f());
+                    Vector3f cameraPos = localPlayer.getViewPosition(new Vector3f());
                     return String.format(Locale.US, "Position: (%.2f, %.2f, %.2f), Chunk (%d, %d, %d), Eye (%.2f, %.2f, %.2f), Rot (%.2f, %.2f, %.2f)", pos.x, pos.y, pos.z,
-                            chunkPos.x, chunkPos.y, chunkPos.z,
-                            cameraPos.x, cameraPos.y, cameraPos.z,
-                            rotation.x, rotation.y, rotation.z);
+                        chunkPos.x, chunkPos.y, chunkPos.z,
+                        cameraPos.x, cameraPos.y, cameraPos.z,
+                        rotation.x, rotation.y, rotation.z);
                 }
             });
         }
@@ -124,9 +123,9 @@ public class DebugOverlay extends CoreScreenLayer {
                 @Override
                 public String get() {
                     return String.format("Total VUs: %s, World Time: %.3f, Time Dilation: %.1f",
-                            ChunkTessellator.getVertexArrayUpdateCount(),
-                            worldProvider.getTime().getDays() - 0.0005f,    // use floor instead of rounding up
-                            time.getGameTimeDilation());
+                        ChunkTessellator.getVertexArrayUpdateCount(),
+                        worldProvider.getTime().getDays() - 0.0005f,    // use floor instead of rounding up
+                        time.getGameTimeDilation());
                 }
             });
         }
@@ -151,12 +150,12 @@ public class DebugOverlay extends CoreScreenLayer {
                 }
             });
             saveStatusLabel.bindVisible(
-                    new ReadOnlyBinding<Boolean>() {
-                        @Override
-                        public Boolean get() {
-                            return storageManager.isSaving();
-                        }
+                new ReadOnlyBinding<Boolean>() {
+                    @Override
+                    public Boolean get() {
+                        return storageManager.isSaving();
                     }
+                }
             );
         }
 
@@ -170,12 +169,12 @@ public class DebugOverlay extends CoreScreenLayer {
                 }
             });
             wireframeMode.bindVisible(
-                    new ReadOnlyBinding<Boolean>() {
-                        @Override
-                        public Boolean get() {
-                            return config.getRendering().getDebug().isWireframe();
-                        }
+                new ReadOnlyBinding<Boolean>() {
+                    @Override
+                    public Boolean get() {
+                        return config.getRendering().getDebug().isWireframe();
                     }
+                }
             );
         }
 
@@ -189,12 +188,12 @@ public class DebugOverlay extends CoreScreenLayer {
                 }
             });
             chunkRenderMode.bindVisible(
-                    new ReadOnlyBinding<Boolean>() {
-                        @Override
-                        public Boolean get() {
-                            return config.getRendering().getDebug().isRenderChunkBoundingBoxes();
-                        }
+                new ReadOnlyBinding<Boolean>() {
+                    @Override
+                    public Boolean get() {
+                        return config.getRendering().getDebug().isRenderChunkBoundingBoxes();
                     }
+                }
             );
         }
 
@@ -223,6 +222,4 @@ public class DebugOverlay extends CoreScreenLayer {
         MetricsMode mode = debugMetricsSystem.toggle();
         PerformanceMonitor.setEnabled(mode.isPerformanceManagerMode());
     }
-
-
 }

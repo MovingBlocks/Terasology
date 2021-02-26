@@ -44,7 +44,6 @@ import org.terasology.input.events.RightMouseUpButtonEvent;
 import org.terasology.input.internal.AbstractBindableAxis;
 import org.terasology.input.internal.BindableRealAxis;
 import org.terasology.logic.players.LocalPlayer;
-import org.terasology.math.JomlUtil;
 import org.terasology.registry.In;
 
 import java.util.List;

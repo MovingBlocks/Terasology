@@ -23,8 +23,8 @@ node ("heavy-java") {
     }
     stage('Build') {
         // Jenkins sometimes doesn't run Gradle automatically in plain console mode, so make it explicit
-        sh './gradlew --console=plain clean extractConfig extractNatives distForLauncher'
-        archiveArtifacts 'gradlew, gradle/wrapper/*, templates/build.gradle, config/**, facades/PC/build/distributions/Terasology.zip, build/resources/main/org/terasology/version/versionInfo.properties, natives/**, buildSrc/src/**, buildSrc/*.kts'
+        sh './gradlew --console=plain clean extractConfig extractNatives distForLauncher testDist'
+        archiveArtifacts 'gradlew, gradle/wrapper/*, templates/build.gradle, config/**, facades/PC/build/distributions/Terasology.zip, engine/build/resources/main/org/terasology/version/versionInfo.properties, natives/**, buildSrc/src/**, buildSrc/*.kts'
     }
     stage('Publish') {
         if (specialBranch) {
@@ -33,6 +33,17 @@ node ("heavy-java") {
             }
         } else {
             println "Running on a branch other than 'master' or 'develop' bypassing publishing"
+        }
+
+        // Trigger the Omega dist job to repackage a game zip with modules
+        if (env.JOB_NAME.equals("Terasology/engine/develop")) {
+            build job: 'Terasology/Omega/develop', wait: false
+        } else if (env.JOB_NAME.equals("Terasology/engine/master")) {
+            build job: 'Terasology/Omega/master', wait: false
+        } else if (env.JOB_NAME.equals("Nanoware/Terasology/develop")) {
+            build job: 'Nanoware/Omega/develop', wait: false
+        } else if (env.JOB_NAME.equals("Nanoware/Terasology/master")) {
+            build job: 'Nanoware/Omega/master', wait: false
         }
     }
     stage('Analytics') {

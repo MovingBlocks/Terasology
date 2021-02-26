@@ -15,7 +15,9 @@
  */
 package org.terasology.world.generation.facets.base;
 
-import org.terasology.math.Region3i;
+import org.joml.Vector3i;
+import org.terasology.world.block.BlockRegion;
+import org.terasology.world.block.BlockRegionc;
 import org.terasology.world.generation.Border3D;
 import org.terasology.world.generation.WorldFacet3D;
 
@@ -23,35 +25,35 @@ import org.terasology.world.generation.WorldFacet3D;
  */
 public class BaseFacet3D implements WorldFacet3D {
 
-    private Region3i worldRegion;
-    private Region3i relativeRegion;
+    private BlockRegion worldRegion;
+    private BlockRegion relativeRegion;
 
-    public BaseFacet3D(Region3i targetRegion, Border3D border) {
+    public BaseFacet3D(BlockRegionc targetRegion, Border3D border) {
         worldRegion = border.expandTo3D(targetRegion);
-        relativeRegion = border.expandTo3D(targetRegion.size());
+        relativeRegion = border.expandTo3D(targetRegion.getSize(new Vector3i()));
     }
 
     @Override
-    public final Region3i getWorldRegion() {
+    public final BlockRegion getWorldRegion() {
         return worldRegion;
     }
 
     @Override
-    public final Region3i getRelativeRegion() {
+    public final BlockRegion getRelativeRegion() {
         return relativeRegion;
     }
 
     protected final int getRelativeIndex(int x, int y, int z) {
-        if (!relativeRegion.encompasses(x, y, z)) {
+        if (!relativeRegion.contains(x, y, z)) {
             throw new IllegalArgumentException(String.format("Out of bounds: (%d, %d, %d) for region %s", x, y, z, relativeRegion.toString()));
         }
-        return x - relativeRegion.minX() + relativeRegion.sizeX() * (y - relativeRegion.minY() + relativeRegion.sizeY() * (z - relativeRegion.minZ()));
+        return x - relativeRegion.minX() + relativeRegion.getSizeX() * (y - relativeRegion.minY() + relativeRegion.getSizeY() * (z - relativeRegion.minZ()));
     }
 
     protected final int getWorldIndex(int x, int y, int z) {
-        if (!worldRegion.encompasses(x, y, z)) {
+        if (!worldRegion.contains(x, y, z)) {
             throw new IllegalArgumentException(String.format("Out of bounds: (%d, %d, %d) for region %s", x, y, z, worldRegion.toString()));
         }
-        return x - worldRegion.minX() + worldRegion.sizeX() * (y - worldRegion.minY() + worldRegion.sizeY() * (z - worldRegion.minZ()));
+        return x - worldRegion.minX() + worldRegion.getSizeX() * (y - worldRegion.minY() + worldRegion.getSizeY() * (z - worldRegion.minZ()));
     }
 }

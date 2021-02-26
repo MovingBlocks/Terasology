@@ -16,6 +16,7 @@
 package org.terasology.world.block.entity.placement;
 
 import org.joml.Vector3i;
+import org.joml.Vector3ic;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.AbstractConsumableEvent;
 import org.terasology.world.block.Block;
@@ -47,7 +48,7 @@ public class PlaceBlocks extends AbstractConsumableEvent {
         this.instigator = instigator;
     }
 
-    public Map<Vector3i, Block> getBlocks() {
+    public Map<Vector3ic, Block> getBlocks() {
         return Collections.unmodifiableMap(blocks);
     }
 

@@ -1,0 +1,6 @@
+[*]
+charset = utf-8
+
+[{*.ant,*.fxml,*.jhm,*.jnlp,*.jrxml,*.pom,*.rng,*.tld,*.wadl,*.wsdd,*.wsdl,*.xjb,*.xml,*.xsd,*.xsl,*.xslt,*.xul}]
+# The XML serializer doesn't write final newline, so don't add it during manual edits.
+insert_final_newline = false

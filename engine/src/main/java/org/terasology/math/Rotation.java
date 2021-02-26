@@ -21,7 +21,6 @@ import gnu.trove.map.TByteObjectMap;
 import gnu.trove.map.hash.TByteObjectHashMap;
 import org.joml.Quaternionf;
 import org.joml.Quaternionfc;
-import org.terasology.math.geom.Quat4f;
 
 import java.util.Arrays;
 import java.util.List;
@@ -185,19 +184,6 @@ public final class Rotation {
 
     public Roll getRoll() {
         return roll;
-    }
-
-    /**
-     *
-     * @return
-     * @deprecated This method is scheduled for removal in an upcoming version.
-     *             Use the JOML implementation instead: {@link #orientation()}.
-     */
-    @Deprecated
-    public Quat4f getQuat4f() {
-        Quat4f temp = new Quat4f(yaw.getRadians(), pitch.getRadians(), roll.getRadians());
-        temp.normalize();
-        return temp;
     }
 
     /**

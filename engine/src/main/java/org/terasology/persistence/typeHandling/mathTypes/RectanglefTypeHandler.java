@@ -5,12 +5,14 @@ package org.terasology.persistence.typeHandling.mathTypes;
 
 import com.google.common.collect.Maps;
 import gnu.trove.list.TFloatList;
-import org.joml.Rectanglef;
+import gnu.trove.list.TIntList;
+import org.terasology.joml.geom.Rectanglef;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.PersistedDataArray;
 import org.terasology.persistence.typeHandling.PersistedDataMap;
 import org.terasology.persistence.typeHandling.PersistedDataSerializer;
 import org.terasology.persistence.typeHandling.TypeHandler;
+import org.terasology.world.block.BlockArea;
 
 import java.util.Map;
 import java.util.Optional;
@@ -18,6 +20,7 @@ import java.util.Optional;
 public class RectanglefTypeHandler extends TypeHandler<Rectanglef> {
     private static final String MIN_FIELD = "min";
     private static final String MAX_FIELD = "max";
+    private static final String SIZE_FIELD = "size";
 
     @Override
     protected PersistedData serializeNonNull(Rectanglef value, PersistedDataSerializer serializer) {
@@ -33,11 +36,16 @@ public class RectanglefTypeHandler extends TypeHandler<Rectanglef> {
             PersistedDataMap map = data.getAsValueMap();
 
             PersistedDataArray minDataArr = map.get(MIN_FIELD).getAsArray();
-            PersistedDataArray maxDataArr = map.get(MIN_FIELD).getAsArray();
-
             TFloatList minArr = minDataArr.getAsFloatArray();
-            TFloatList maxArr = maxDataArr.getAsFloatArray();
+            if (map.has(SIZE_FIELD)) {
+                PersistedDataArray sizedataArray = map.get(SIZE_FIELD).getAsArray();
+                TIntList sizeArr = sizedataArray.getAsIntegerArray();
+                return Optional.of(new Rectanglef(minArr.get(0), minArr.get(1)).setSize(sizeArr.get(0),
+                    sizeArr.get(1)));
+            }
 
+            PersistedDataArray maxDataArr = map.get(MAX_FIELD).getAsArray();
+            TFloatList maxArr = maxDataArr.getAsFloatArray();
             return Optional.of(new Rectanglef(minArr.get(0), minArr.get(1), maxArr.get(0), maxArr.get(1)));
         }
         return Optional.empty();

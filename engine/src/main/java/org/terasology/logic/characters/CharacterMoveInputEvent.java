@@ -16,7 +16,8 @@
 
 package org.terasology.logic.characters;
 
-import org.terasology.math.geom.Vector3f;
+import org.joml.Vector3f;
+import org.joml.Vector3fc;
 import org.terasology.network.NetworkEvent;
 import org.terasology.network.ServerEvent;
 
@@ -38,11 +39,11 @@ public class CharacterMoveInputEvent extends NetworkEvent {
     }
 
     @Deprecated
-    public CharacterMoveInputEvent(int sequence, float pitch, float yaw, Vector3f movementDirection, boolean running, boolean jumpRequested, long delta) {
+    public CharacterMoveInputEvent(int sequence, float pitch, float yaw, Vector3fc movementDirection, boolean running, boolean jumpRequested, long delta) {
         this(sequence, pitch, yaw, movementDirection, running, false, jumpRequested, delta);
     }
 
-    public CharacterMoveInputEvent(int sequence, float pitch, float yaw, Vector3f movementDirection, boolean running, boolean crouching, boolean jumpRequested, long delta) {
+    public CharacterMoveInputEvent(int sequence, float pitch, float yaw, Vector3fc movementDirection, boolean running, boolean crouching, boolean jumpRequested, long delta) {
         this.delta = delta;
         this.pitch = pitch;
         this.yaw = yaw;
@@ -80,8 +81,8 @@ public class CharacterMoveInputEvent extends NetworkEvent {
         return yaw;
     }
 
-    public Vector3f getMovementDirection() {
-        return new Vector3f(movementDirection);
+    public Vector3fc getMovementDirection() {
+        return movementDirection;
     }
 
     public boolean isRunning() {

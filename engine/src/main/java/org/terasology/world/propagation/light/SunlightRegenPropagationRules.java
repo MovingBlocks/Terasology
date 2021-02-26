@@ -1,24 +1,11 @@
-/*
- * Copyright 2014 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.world.propagation.light;
 
+import org.joml.Vector3ic;
 import org.terasology.math.Side;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.world.block.Block;
-import org.terasology.world.chunks.ChunkConstants;
+import org.terasology.world.chunks.Chunks;
 import org.terasology.world.chunks.LitChunk;
 import org.terasology.world.propagation.PropagationComparison;
 
@@ -33,37 +20,37 @@ public class SunlightRegenPropagationRules extends CommonLightPropagationRules {
      * {@inheritDoc}
      */
     @Override
-    public byte getFixedValue(Block block, Vector3i pos) {
+    public byte getFixedValue(Block block, Vector3ic pos) {
         return 0;
     }
 
     /**
      * Sunlight goes to zero unless leaving via the bottom face.
-     * In that case it increases up until the maximum value in {@link ChunkConstants#MAX_SUNLIGHT_REGEN}
+     * In that case it increases up until the maximum value in {@link Chunks#MAX_SUNLIGHT_REGEN}
      * <p>
      * {@inheritDoc}
      */
     @Override
-    public byte propagateValue(byte existingValue, Side side, Block from) {
+    public byte propagateValue(byte existingValue, Side side, Block from, int scale) {
         if (side == Side.BOTTOM) {
-            return (existingValue == ChunkConstants.MAX_SUNLIGHT_REGEN) ? ChunkConstants.MAX_SUNLIGHT_REGEN  : (byte) (existingValue + 1);
+            return (byte) Math.min(Chunks.MAX_SUNLIGHT_REGEN, existingValue + scale);
         }
         return 0;
     }
 
     /**
-     * The maximum value of sunlight is given by {@link ChunkConstants#MAX_SUNLIGHT_REGEN}
+     * The maximum value of sunlight is given by {@link Chunks#MAX_SUNLIGHT_REGEN}
      * <p>
      * {@inheritDoc}
      */
     @Override
     public byte getMaxValue() {
-        return ChunkConstants.MAX_SUNLIGHT_REGEN;
+        return Chunks.MAX_SUNLIGHT_REGEN;
     }
 
     @Override
-    public byte getValue(LitChunk chunk, Vector3i pos) {
-        return getValue(chunk, pos.x, pos.y, pos.z);
+    public byte getValue(LitChunk chunk, Vector3ic pos) {
+        return getValue(chunk, pos.x(), pos.y(), pos.z());
     }
 
     @Override
@@ -72,7 +59,7 @@ public class SunlightRegenPropagationRules extends CommonLightPropagationRules {
     }
 
     @Override
-    public void setValue(LitChunk chunk, Vector3i pos, byte value) {
+    public void setValue(LitChunk chunk, Vector3ic pos, byte value) {
         chunk.setSunlightRegen(pos, value);
     }
 

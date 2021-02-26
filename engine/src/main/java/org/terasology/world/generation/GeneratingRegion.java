@@ -15,13 +15,13 @@
  */
 package org.terasology.world.generation;
 
-import org.terasology.math.Region3i;
+import org.terasology.world.block.BlockRegion;
 
 /**
  */
 public interface GeneratingRegion {
 
-    Region3i getRegion();
+    BlockRegion getRegion();
 
     <T extends WorldFacet> T getRegionFacet(Class<T> type);
 

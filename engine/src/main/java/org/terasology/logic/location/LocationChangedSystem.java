@@ -24,12 +24,11 @@ import org.terasology.entitySystem.systems.RegisterSystem;
 
 @RegisterSystem(RegisterMode.AUTHORITY)
 public class LocationChangedSystem extends BaseComponentSystem {
+
     @ReceiveEvent(components = {LocationComponent.class})
-    public void onItemUpdate(OnChangedComponent event, EntityRef entity)
-    {
+    public void onItemUpdate(OnChangedComponent event, EntityRef entity) {
         LocationComponent lc = entity.getComponent(LocationComponent.class);
-        if (!lc.lastPosition.equals(lc.position) || !lc.lastRotation.equals(lc.rotation))
-        {
+        if (!lc.lastPosition.equals(lc.position) || !lc.lastRotation.equals(lc.rotation)) {
             entity.send(new LocationChangedEvent(lc, lc.lastPosition, lc.lastRotation));
             lc.lastPosition.set(lc.position);
             lc.lastRotation.set(lc.rotation);
