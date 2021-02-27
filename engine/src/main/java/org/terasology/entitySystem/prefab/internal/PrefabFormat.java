@@ -40,7 +40,7 @@ public class PrefabFormat extends AbstractAssetFileFormat<PrefabData> {
                 if (!prefabData.hasName()) {
                     prefabData = prefabData.toBuilder().setName(resourceUrn.toString()).build();
                 }
-                logger.info("Deserializing prefab {} with inputs {}", resourceUrn, inputs);
+                logger.debug("Deserializing prefab {} with inputs {}", resourceUrn, inputs);
                 PrefabSerializer serializer = new PrefabSerializer(componentLibrary, typeHandlerLibrary);
                 return serializer.deserialize(prefabData);
             } else {
