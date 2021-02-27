@@ -1,21 +1,10 @@
-/*
- * Copyright 2013 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.engine.modes.loadProcesses;
 
+import ch.qos.logback.classic.pattern.TargetLengthBasedClassNameAbbreviator;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.context.Context;
@@ -34,6 +23,8 @@ import org.terasology.naming.NameVersion;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
 /**
@@ -44,7 +35,7 @@ public class RegisterMods extends SingleStepLoadProcess {
 
     private final Context context;
     private final GameManifest gameManifest;
-    private Thread applyModulesThread;
+    private Future<?> applyModulesThread;
     private ModuleEnvironment oldEnvironment;
 
     public RegisterMods(Context context, GameManifest gameManifest) {
@@ -64,7 +55,7 @@ public class RegisterMods extends SingleStepLoadProcess {
     @Override
     public boolean step() {
         if (applyModulesThread != null) {
-            if (!applyModulesThread.isAlive()) {
+            if (applyModulesThread.isDone()) {
                 if (oldEnvironment != null) {
                     oldEnvironment.close();
                 }
@@ -87,8 +78,12 @@ public class RegisterMods extends SingleStepLoadProcess {
                 }
 
                 EnvironmentSwitchHandler environmentSwitchHandler = context.get(EnvironmentSwitchHandler.class);
-                applyModulesThread = new Thread(() -> environmentSwitchHandler.handleSwitchToGameEnvironment(context));
-                applyModulesThread.start();
+
+                applyModulesThread = Executors.newSingleThreadExecutor(
+                        new ThreadFactoryBuilder()
+                                .setNameFormat(new TargetLengthBasedClassNameAbbreviator(36).abbreviate(getClass().getName()) + "-%d")
+                                .setDaemon(true)
+                                .build()).submit(() -> environmentSwitchHandler.handleSwitchToGameEnvironment(context));
                 return false;
             } else {
                 logger.warn("Missing at least one required module (or dependency) from the following list: {}", moduleIds);
