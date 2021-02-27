@@ -114,7 +114,6 @@ public class PrefabSerializer {
     public PrefabData deserialize(EntityData.Prefab prefabData, List<EntityData.Prefab> deltas) {
         Module context = ModuleContext.getContext();
         PrefabData result = new PrefabData();
-        List<String> unknownComponents = new ArrayList<>();
         deserializeCommonData(prefabData, result);
         for (EntityData.Prefab delta : deltas) {
             applyCommonDataDelta(delta, result);
