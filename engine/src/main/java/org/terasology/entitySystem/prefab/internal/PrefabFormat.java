@@ -37,7 +37,9 @@ public class PrefabFormat extends AbstractAssetFileFormat<PrefabData> {
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputs.get(0).openStream(), Charsets.UTF_8))) {
             EntityData.Prefab prefabData = EntityDataJSONFormat.readPrefab(reader);
             if (prefabData != null) {
-                prefabData = prefabData.toBuilder().setName(resourceUrn.toString()).build();
+                if (!prefabData.hasName()) {
+                    prefabData = prefabData.toBuilder().setName(resourceUrn.toString()).build();
+                }
                 logger.info("Deserializing prefab {} with inputs {}", resourceUrn, inputs);
                 PrefabSerializer serializer = new PrefabSerializer(componentLibrary, typeHandlerLibrary);
                 return serializer.deserialize(prefabData);
