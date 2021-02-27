@@ -67,7 +67,7 @@ dependencies {
 
     implementation("org.mockito:mockito-junit-jupiter:3.7.7")
 
-    implementation("org.terasology.joml-ext:joml-test:1.0.0-SNAPSHOT")
+    implementation("org.terasology.joml-ext:joml-test:0.1.0")
 
     //TODO: Remove shrinkwrap from code, you have FileSystem in java 8
     implementation group: 'org.jboss.shrinkwrap', name: 'shrinkwrap-depchain-java7', version: '1.2.1'
