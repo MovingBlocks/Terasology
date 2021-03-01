@@ -17,6 +17,8 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -226,18 +228,21 @@ public class ConstructorLibrary {
         if (rawTypeCreator != null) {
             return () -> rawTypeCreator.createInstance(type);
         }
+        
+        // TODO remove using `AccessController.doPrivileged`
+        return AccessController.doPrivileged((PrivilegedAction<ObjectConstructor<T>>) ()-> {
+            ObjectConstructor<T> defaultConstructor = newNoArgConstructor(rawType);
+            if (defaultConstructor != null) {
+                return defaultConstructor;
+            }
 
-        ObjectConstructor<T> defaultConstructor = newNoArgConstructor(rawType);
-        if (defaultConstructor != null) {
-            return defaultConstructor;
-        }
+            ObjectConstructor<T> defaultImplementation = newDefaultConstructor(typeInfo);
+            if (defaultImplementation != null) {
+                return defaultImplementation;
+            }
 
-        ObjectConstructor<T> defaultImplementation = newDefaultConstructor(typeInfo);
-        if (defaultImplementation != null) {
-            return defaultImplementation;
-        }
-
-        return newUnsafeAllocator(typeInfo);
+            return newUnsafeAllocator(typeInfo);
+        });
     }
 
     @Override
