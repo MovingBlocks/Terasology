@@ -308,15 +308,7 @@ public final class PathManager {
         }
         sandboxPath = homePath.resolve(SANDBOX_DIR);
 
-        Path homeModPath = homePath.resolve(MODULE_DIR);
-        Path modCachePath = homePath.resolve(MODULE_CACHE_DIR);
-
-        if (Files.isSameFile(homePath, installPath)) {
-            modPaths = ImmutableList.of(modCachePath, homeModPath);
-        } else {
-            Path installModPath = installPath.resolve(MODULE_DIR);
-            modPaths = ImmutableList.of(installModPath, modCachePath, homeModPath);
-        }
+        modPaths = defaultModPaths();
 
         for (Path path : getAllPaths()) {
             Files.createDirectories(path);
@@ -343,6 +335,18 @@ public final class PathManager {
         System.setProperty("net.java.games.input.librarypath", natives);  // libjinput
         System.setProperty("org.terasology.librarypath", natives); // JNBullet
 
+    }
+
+    protected ImmutableList<Path> defaultModPaths() throws IOException {
+        Path homeModPath = homePath.resolve(MODULE_DIR);
+        Path modCachePath = homePath.resolve(MODULE_CACHE_DIR);
+
+        if (Files.isSameFile(homePath, installPath)) {
+            return ImmutableList.of(modCachePath, homeModPath);
+        } else {
+            Path installModPath = installPath.resolve(MODULE_DIR);
+            return ImmutableList.of(installModPath, modCachePath, homeModPath);
+        }
     }
 
     public Path getHomeModPath() {
