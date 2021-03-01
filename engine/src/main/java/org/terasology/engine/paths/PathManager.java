@@ -327,13 +327,13 @@ public final class PathManager {
         final Path path;
         switch (OS.get()) {
             case WINDOWS:
-                path = PathManager.getInstance().getNativesPath().resolve("windows");
+                path = nativesPath.resolve("windows");
                 break;
             case MACOSX:
-                path = PathManager.getInstance().getNativesPath().resolve("macosx");
+                path = nativesPath.resolve("macosx");
                 break;
             case LINUX:
-                path = PathManager.getInstance().getNativesPath().resolve("linux");
+                path = nativesPath.resolve("linux");
                 break;
             default:
                 throw new UnsupportedOperationException("Unsupported operating system: " + System.getProperty("os" +
