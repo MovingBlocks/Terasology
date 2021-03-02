@@ -1,4 +1,4 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.persistence.serializers;
 
@@ -7,9 +7,9 @@ import com.google.common.collect.Sets;
 import org.joml.Vector3f;
 import org.junit.jupiter.api.Test;
 import org.terasology.ModuleEnvironmentTest;
+import org.terasology.engine.module.ModuleContext;
 import org.terasology.naming.Name;
 import org.terasology.nui.Color;
-import org.terasology.persistence.ModuleContext;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.persistence.typeHandling.TypeHandlerLibraryImpl;
 import org.terasology.persistence.typeHandling.annotations.SerializedName;

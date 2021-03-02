@@ -1,0 +1,10 @@
+{
+  "id": "SourceModuleFixture",
+  "version": "2.3.0-SNAPSHOT",
+  "isReleaseManaged": true,
+  "displayName": "a module source directory",
+  "description": "there is a space in the name of this directory's ancestors",
+  "dependencies": [],
+  "serverSideOnly": false,
+  "isAsset": true
+}

@@ -5,3 +5,5 @@ package org.terasology.gradology
 
 const val TERASOLOGY_MODULES_GROUP = "org.terasology.modules"
 const val ENGINE_MODULE_NAME = "engine"
+
+const val MODULE_INFO_FILENAME = "module.txt"
