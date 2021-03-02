@@ -6,7 +6,7 @@ import org.terasology.gradology.moduleDependencyArtifacts
 import org.terasology.gradology.namedAttribute
 
 plugins {
-    `terasology-repositories`
+    id("terasology-repositories")
     `java-platform`
 }
 
