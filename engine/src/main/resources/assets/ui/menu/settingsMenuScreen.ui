@@ -61,9 +61,15 @@
                         "text": "${engine:menu#input-settings}"
                     },
                     {
+                        "type": "UIButton",
+                        "id": "auto",
+                        "text": "autoconfig"
+                    },
+                    {
                         "type": "UISpace",
                         "size": [1, 104]
                     },
+
                     {
                         "type": "UIButton",
                         "id": "close",

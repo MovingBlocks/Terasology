@@ -14,8 +14,8 @@ import kotlin.test.fail
 
 plugins {
     application
-    `terasology-dist`
-    facade
+    id("terasology-dist")
+    id("facade")
 }
 
 // Grab all the common stuff like plugins to use, artifact repositories, code analysis config
