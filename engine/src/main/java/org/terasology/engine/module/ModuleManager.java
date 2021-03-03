@@ -65,7 +65,7 @@ public class ModuleManager {
     private final ModuleInstallManager installManager;
 
     /** Set this environment variable to "true" to load all modules in the classpath by default. */
-    final String LOAD_CLASSPATH_MODULES_ENV = "terasology_load_classpath_modules";
+    final String LOAD_CLASSPATH_MODULES_ENV = "TERASOLOGY_LOAD_CLASSPATH_MODULES";
 
     public ModuleManager(String masterServerAddress) {
         this(masterServerAddress, Collections.emptyList());
