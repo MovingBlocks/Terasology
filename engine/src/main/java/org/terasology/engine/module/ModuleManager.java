@@ -163,8 +163,8 @@ public class ModuleManager {
     }
 
     boolean doLoadModulesFromClasspath() {
-        Boolean env = Boolean.parseBoolean(System.getenv(LOAD_CLASSPATH_MODULES_ENV));
-        Boolean prop = Boolean.getBoolean(LOAD_CLASSPATH_MODULES_PROPERTY);
+        boolean env = Boolean.parseBoolean(System.getenv(LOAD_CLASSPATH_MODULES_ENV));
+        boolean prop = Boolean.getBoolean(LOAD_CLASSPATH_MODULES_PROPERTY);
         logger.debug("Load modules from classpath? {} [env: {}, property: {}]",
                 env || prop,
                 System.getenv(LOAD_CLASSPATH_MODULES_ENV),
