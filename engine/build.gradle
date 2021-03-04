@@ -55,7 +55,7 @@ configurations {
 // Primary dependencies definition
 dependencies {
     // Storage and networking
-    api group: 'com.google.guava', name: 'guava', version: '23.0'
+    api group: 'com.google.guava', name: 'guava', version: '30.1-jre'
     api group: 'com.google.code.gson', name: 'gson', version: '2.6.2'
     api group: 'net.sf.trove4j', name: 'trove4j', version: '3.0.3'
     implementation group: 'io.netty', name: 'netty-all', version: '4.1.53.Final'
