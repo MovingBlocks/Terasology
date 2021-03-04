@@ -185,18 +185,28 @@ public class ModuleManager {
         // so I could use it with the existing ModulePathScanner, but no. The inputs to that
         // are the _parent directories_ of what we have.
         for (Path path : classPaths) {
-            attemptToLoadModule(loader, path);
+            attemptToLoadAsClasspathModule(loader, path);
         }
     }
 
-    public void attemptToLoadModule(ModuleLoader loader, Path path) {
+    /**
+     * Attempt to load a module from the given path.
+     *
+     * Assumes that the path <em>may or may not</em> contain a Terasology module. Will add the module to
+     * {@link #registry} if successful.
+     *
+     * For troubleshooting failure cases, check for log messages from this package and from {@link ModuleLoader}.
+     *
+     * @param loader the module loader to use
+     * @param path the path to the jar or directory
+     */
+    public void attemptToLoadAsClasspathModule(ModuleLoader loader, Path path) {
         // The conditions here mirror those of org.terasology.module.ModulePathScanner.loadModule
-
         Module module;
         try {
             module = loader.load(path);
         } catch (IOException e) {
-            logger.error("Failed to load classpath module {}", path, e);
+            logger.warn("Failed to load module from classpath at {}", path, e);
             return;
         }
 
@@ -206,25 +216,37 @@ public class ModuleManager {
 
         boolean isNew = registry.add(module);
         if (isNew) {
-            logger.info("Discovered module: {}", module);
+            logger.info("Added new module: {} from {} on classpath", module, path.getFileName());
         } else {
-            logger.warn("Discovered duplicate module: {}-{}, skipping {}",
-                    module.getId(), module.getVersion(), path);
+            logger.warn("Skipped duplicate module: {}-{} from {} on classpath",
+                    module.getId(), module.getVersion(), path.getFileName());
         }
-
     }
 
+    /**
+     * Load a module from the given path.
+     *
+     * Assumes that the path <em>should</em> contain a Terasology module. Will add the module to
+     * {@link #registry} and return the resulting module if successful.
+     *
+     * May throw IOException or RuntimeExceptions on failure.
+     *
+     * For troubleshooting failure cases, check for log messages from this package and from {@link ModuleLoader}.
+     *
+     * @param path the path to the jar or directory
+     */
     public Module loadClasspathModule(Path path) throws IOException {
         ModuleLoader loader = new ClasspathSupportingModuleLoader(metadataReader, true, false);
         loader.setModuleInfoPath(TerasologyConstants.MODULE_INFO_FILENAME);
 
-        @SuppressWarnings("UnstableApiUsage") Module module = verifyNotNull(loader.load(path), "Failed to load module from %s", path);
+        //noinspection UnstableApiUsage
+        Module module = verifyNotNull(loader.load(path), "Failed to load module from %s", path);
         boolean isNew = registry.add(module);
         if (isNew) {
-            logger.info("Discovered module: {}", module);
+            logger.info("Added new module: {} from {} on classpath", module, path.getFileName());
         } else {
-            logger.warn("Discovered duplicate module: {}-{}, skipping {}",
-                    module.getId(), module.getVersion(), path);
+            logger.warn("Skipped duplicate module: {}-{} from {} on classpath",
+                    module.getId(), module.getVersion(), path.getFileName());
         }
         return module;
     }
