@@ -55,6 +55,10 @@ import java.util.stream.Collectors;
 import static com.google.common.base.Verify.verifyNotNull;
 
 public class ModuleManager {
+    /** Set this environment variable to "true" to load all modules in the classpath by default. */
+    public final static String LOAD_CLASSPATH_MODULES_ENV = "TERASOLOGY_LOAD_CLASSPATH_MODULES";
+    public final static String LOAD_CLASSPATH_MODULES_PROPERTY = "org.terasology.load_classpath_modules";
+
     private static final Logger logger = LoggerFactory.getLogger(ModuleManager.class);
     private final StandardPermissionProviderFactory permissionProviderFactory = new StandardPermissionProviderFactory();
     private final PermissionProviderFactory wrappingPermissionProviderFactory = new WarnOnlyProviderFactory(permissionProviderFactory);
@@ -63,9 +67,6 @@ public class ModuleManager {
     private ModuleEnvironment environment;
     private final ModuleMetadataJsonAdapter metadataReader;
     private final ModuleInstallManager installManager;
-
-    /** Set this environment variable to "true" to load all modules in the classpath by default. */
-    final String LOAD_CLASSPATH_MODULES_ENV = "TERASOLOGY_LOAD_CLASSPATH_MODULES";
 
     public ModuleManager(String masterServerAddress) {
         this(masterServerAddress, Collections.emptyList());
@@ -84,8 +85,7 @@ public class ModuleManager {
         if (doLoadModulesFromClasspath()) {
             loadModulesFromClassPath();
         } else {
-            logger.debug("Not loading classpath modules. ({} = {})",
-                    LOAD_CLASSPATH_MODULES_ENV, System.getenv(LOAD_CLASSPATH_MODULES_ENV));
+            logger.info("Not loading classpath modules.");
         }
 
         loadModulesFromApplicationPath(pathManager);
@@ -163,8 +163,13 @@ public class ModuleManager {
     }
 
     boolean doLoadModulesFromClasspath() {
-        String env = System.getenv(LOAD_CLASSPATH_MODULES_ENV);
-        return Boolean.parseBoolean(env);
+        Boolean env = Boolean.parseBoolean(System.getenv(LOAD_CLASSPATH_MODULES_ENV));
+        Boolean prop = Boolean.getBoolean(LOAD_CLASSPATH_MODULES_PROPERTY);
+        logger.debug("Load modules from classpath? {} [env: {}, property: {}]",
+                env || prop,
+                System.getenv(LOAD_CLASSPATH_MODULES_ENV),
+                System.getProperty(LOAD_CLASSPATH_MODULES_PROPERTY));
+        return env || prop;
     }
 
     /**
