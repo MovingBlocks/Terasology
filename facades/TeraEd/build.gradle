@@ -1,4 +1,4 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
 // The Editor facade is responsible for the (shader) editor - a plain Java application runnable on PCs
@@ -40,7 +40,7 @@ dependencies {
     }
     implementation "org.lwjgl:lwjgl-jawt"
 
-    implementation(group: 'com.google.guava', name: 'guava', version: '23.0')
+    implementation(group: 'com.google.guava', name: 'guava', version: '30.1-jre')
 
     implementation(project(":subsystems:DiscordRPC"))
     implementation(project(":subsystems:TypeHandlerLibrary"))
