@@ -90,7 +90,6 @@ import org.terasology.world.time.WorldTimeImpl;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.attribute.FileAttribute;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -278,7 +277,7 @@ public class HeadlessEnvironment extends Environment {
 
     @Override
     protected void setupPathManager() throws IOException {
-        Path tempHome = Files.createTempDirectory("terasology-env", (FileAttribute<?>[]) null);
+        Path tempHome = Files.createTempDirectory("terasology-env");
         tempHome.toFile().deleteOnExit();
         PathManager.getInstance().useOverrideHomePath(tempHome);
     }
