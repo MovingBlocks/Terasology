@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package org.terasology.network.internal;
+package org.terasology.engine.network.internal;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
-import org.terasology.network.NetMetricSource;
+import org.terasology.engine.network.NetMetricSource;
 
 import java.util.concurrent.atomic.AtomicInteger;
 

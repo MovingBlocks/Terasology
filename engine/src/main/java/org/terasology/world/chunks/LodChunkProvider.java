@@ -1,27 +1,26 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-package org.terasology.world.chunks;
+package org.terasology.engine.world.chunks;
 
 import com.google.common.collect.Queues;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.context.Context;
-import org.terasology.rendering.primitives.ChunkMesh;
-import org.terasology.rendering.primitives.ChunkTessellator;
-import org.terasology.rendering.world.viewDistance.ViewDistance;
-import org.terasology.world.ChunkView;
-import org.terasology.world.block.Block;
-import org.terasology.world.block.BlockManager;
-import org.terasology.world.block.BlockRegion;
-import org.terasology.world.chunks.blockdata.ExtraBlockDataManager;
-import org.terasology.world.chunks.internal.PreLodChunk;
-import org.terasology.world.generation.impl.EntityBufferImpl;
-import org.terasology.world.generator.ScalableWorldGenerator;
-import org.terasology.world.internal.ChunkViewCoreImpl;
-import org.terasology.world.propagation.light.InternalLightProcessor;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.world.chunks.blockdata.ExtraBlockDataManager;
+import org.terasology.engine.world.chunks.internal.PreLodChunk;
+import org.terasology.engine.world.generator.ScalableWorldGenerator;
+import org.terasology.engine.world.internal.ChunkViewCoreImpl;
+import org.terasology.engine.world.propagation.light.InternalLightProcessor;
+import org.terasology.engine.rendering.primitives.ChunkMesh;
+import org.terasology.engine.rendering.primitives.ChunkTessellator;
+import org.terasology.engine.rendering.world.viewDistance.ViewDistance;
+import org.terasology.engine.world.ChunkView;
+import org.terasology.engine.world.block.Block;
+import org.terasology.engine.world.block.BlockManager;
+import org.terasology.engine.world.block.BlockRegion;
 
 import java.util.ArrayList;
 import java.util.Collection;

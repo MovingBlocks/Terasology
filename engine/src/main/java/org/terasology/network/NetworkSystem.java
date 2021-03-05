@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-package org.terasology.network;
+package org.terasology.engine.network;
 
-import org.terasology.context.Context;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.entity.internal.EngineEntityManager;
-import org.terasology.entitySystem.metadata.EventLibrary;
-import org.terasology.network.exceptions.HostingFailedException;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.entitySystem.entity.internal.EngineEntityManager;
+import org.terasology.engine.entitySystem.metadata.EventLibrary;
+import org.terasology.engine.network.exceptions.HostingFailedException;
 import org.terasology.nui.Color;
-import org.terasology.world.BlockEntityRegistry;
-import org.terasology.world.block.internal.BlockRegistrationListener;
-import org.terasology.world.chunks.remoteChunkProvider.RemoteChunkProvider;
+import org.terasology.engine.world.BlockEntityRegistry;
+import org.terasology.engine.world.block.internal.BlockRegistrationListener;
+import org.terasology.engine.world.chunks.remoteChunkProvider.RemoteChunkProvider;
 
 /**
  * Interface for the network system

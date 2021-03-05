@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.network.internal;
+package org.terasology.engine.network.internal;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.network.ServerInfoMessage;
+import org.terasology.engine.network.ServerInfoMessage;
 import org.terasology.protobuf.NetData;
 
 /**

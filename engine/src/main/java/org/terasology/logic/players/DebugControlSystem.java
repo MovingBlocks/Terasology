@@ -1,28 +1,28 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.logic.players;
+package org.terasology.engine.logic.players;
 
-import org.terasology.config.Config;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.event.EventPriority;
-import org.terasology.entitySystem.event.ReceiveEvent;
-import org.terasology.entitySystem.systems.BaseComponentSystem;
-import org.terasology.entitySystem.systems.RegisterMode;
-import org.terasology.entitySystem.systems.RegisterSystem;
+import org.terasology.engine.config.Config;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.entitySystem.event.EventPriority;
+import org.terasology.engine.entitySystem.event.ReceiveEvent;
+import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
+import org.terasology.engine.entitySystem.systems.RegisterMode;
+import org.terasology.engine.entitySystem.systems.RegisterSystem;
+import org.terasology.engine.logic.characters.CharacterComponent;
+import org.terasology.engine.logic.players.event.WorldtimeResetEvent;
 import org.terasology.input.Keyboard;
-import org.terasology.input.binds.general.HideHUDButton;
+import org.terasology.engine.input.binds.general.HideHUDButton;
 import org.terasology.input.device.MouseDevice;
-import org.terasology.input.events.KeyDownEvent;
-import org.terasology.input.events.KeyEvent;
-import org.terasology.input.events.MouseAxisEvent;
-import org.terasology.logic.characters.CharacterComponent;
-import org.terasology.logic.debug.DebugProperties;
-import org.terasology.logic.players.event.WorldtimeResetEvent;
-import org.terasology.network.ClientComponent;
-import org.terasology.registry.In;
-import org.terasology.rendering.nui.NUIManager;
-import org.terasology.rendering.nui.layers.ingame.metrics.DebugOverlay;
-import org.terasology.world.WorldProvider;
+import org.terasology.engine.input.events.KeyDownEvent;
+import org.terasology.engine.input.events.KeyEvent;
+import org.terasology.engine.input.events.MouseAxisEvent;
+import org.terasology.engine.logic.debug.DebugProperties;
+import org.terasology.engine.network.ClientComponent;
+import org.terasology.engine.registry.In;
+import org.terasology.engine.rendering.nui.NUIManager;
+import org.terasology.engine.rendering.nui.layers.ingame.metrics.DebugOverlay;
+import org.terasology.engine.world.WorldProvider;
 
 
 @RegisterSystem(RegisterMode.CLIENT)

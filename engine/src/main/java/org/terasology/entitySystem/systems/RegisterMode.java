@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package org.terasology.entitySystem.systems;
+package org.terasology.engine.entitySystem.systems;
 
-import org.terasology.network.NetworkMode;
+import org.terasology.engine.network.NetworkMode;
 
 /**
  * Enumeration of registration modes for ComponentSystems.

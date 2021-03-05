@@ -13,33 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.engine.subsystem.common;
+package org.terasology.engine.core.subsystem.common;
 
 import ch.qos.logback.classic.LoggerContext;
 import com.snowplowanalytics.snowplow.tracker.emitter.Emitter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.config.Config;
-import org.terasology.config.TelemetryConfig;
-import org.terasology.config.facade.TelemetryConfiguration;
-import org.terasology.config.facade.TelemetryConfigurationImpl;
-import org.terasology.context.Context;
-import org.terasology.engine.subsystem.EngineSubsystem;
-import org.terasology.telemetry.Metrics;
-import org.terasology.telemetry.TelemetryEmitter;
-import org.terasology.telemetry.logstash.TelemetryLogstashAppender;
+import org.terasology.engine.config.Config;
+import org.terasology.engine.config.TelemetryConfig;
+import org.terasology.engine.config.facade.TelemetryConfiguration;
+import org.terasology.engine.config.facade.TelemetryConfigurationImpl;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.core.subsystem.EngineSubsystem;
+import org.terasology.engine.telemetry.Metrics;
+import org.terasology.engine.telemetry.TelemetryEmitter;
+import org.terasology.engine.telemetry.logstash.TelemetryLogstashAppender;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import static org.terasology.telemetry.TelemetryEmitter.DEFAULT_COLLECTOR_HOST;
-import static org.terasology.telemetry.TelemetryEmitter.DEFAULT_COLLECTOR_PORT;
-import static org.terasology.telemetry.TelemetryEmitter.DEFAULT_COLLECTOR_PROTOCOL;
+import static org.terasology.engine.telemetry.TelemetryEmitter.DEFAULT_COLLECTOR_HOST;
+import static org.terasology.engine.telemetry.TelemetryEmitter.DEFAULT_COLLECTOR_PORT;
+import static org.terasology.engine.telemetry.TelemetryEmitter.DEFAULT_COLLECTOR_PROTOCOL;
 
 /**
  * This is a telemetry engine sub system.
- * It will initialise all the telemetry stuff such as the {@link com.snowplowanalytics.snowplow.tracker.emitter.Emitter} and configure the {@link org.terasology.telemetry.logstash.TelemetryLogstashAppender}.
- * It will also adds the {@link org.terasology.telemetry.Metrics} and the {@link org.terasology.telemetry.TelemetryEmitter} to the context so that we can be use them later in other class for telemetry.
+ * It will initialise all the telemetry stuff such as the {@link com.snowplowanalytics.snowplow.tracker.emitter.Emitter} and configure the {@link org.terasology.engine.telemetry.logstash.TelemetryLogstashAppender}.
+ * It will also adds the {@link org.terasology.engine.telemetry.Metrics} and the {@link org.terasology.engine.telemetry.TelemetryEmitter} to the context so that we can be use them later in other class for telemetry.
  * @see <a href="https://github.com/GabrielXia/telemetry/wiki">https://github.com/GabrielXia/telemetry/wiki</a>
  */
 public class TelemetrySubSystem implements EngineSubsystem {

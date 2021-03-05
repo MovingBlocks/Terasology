@@ -1,10 +1,10 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-package org.terasology.world.generation.impl;
+package org.terasology.engine.world.generation.impl;
 
-import org.terasology.entitySystem.entity.EntityStore;
-import org.terasology.world.generation.EntityBuffer;
+import org.terasology.engine.entitySystem.entity.EntityStore;
+import org.terasology.engine.world.generation.EntityBuffer;
 
 import java.util.ArrayList;
 import java.util.Collections;

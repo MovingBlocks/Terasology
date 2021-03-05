@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.config;
+package org.terasology.engine.config;
 
 import java.util.LinkedHashMap;
 import java.util.Map;

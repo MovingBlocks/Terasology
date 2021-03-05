@@ -1,19 +1,6 @@
-/*
- * Copyright 2014 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-package org.terasology.rendering.assets.material;
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
+package org.terasology.engine.rendering.assets.material;
 
 import org.joml.Matrix3fc;
 import org.joml.Matrix4fc;
@@ -22,9 +9,9 @@ import org.joml.Vector3fc;
 import org.joml.Vector4fc;
 import org.terasology.assets.AssetType;
 import org.terasology.assets.ResourceUrn;
-import org.terasology.rendering.assets.shader.ShaderProgramFeature;
-import org.terasology.rendering.assets.texture.Texture;
-import org.terasology.rendering.cameras.Camera;
+import org.terasology.engine.rendering.assets.shader.ShaderProgramFeature;
+import org.terasology.engine.rendering.assets.texture.Texture;
+import org.terasology.engine.rendering.cameras.Camera;
 
 import java.nio.FloatBuffer;
 

@@ -1,26 +1,14 @@
-/*
- * Copyright 2017 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-package org.terasology.rendering.dag.stateChanges;
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
+package org.terasology.engine.rendering.dag.stateChanges;
 
 import org.terasology.assets.ResourceUrn;
-import org.terasology.engine.SimpleUri;
-import org.terasology.rendering.assets.material.Material;
-import org.terasology.rendering.dag.StateChange;
-import org.terasology.rendering.opengl.BaseFboManager;
-import org.terasology.rendering.opengl.FBO;
+import org.terasology.engine.core.SimpleUri;
+import org.terasology.engine.rendering.assets.material.Material;
+import org.terasology.engine.rendering.opengl.BaseFboManager;
+import org.terasology.engine.rendering.opengl.FBO;
+import org.terasology.engine.rendering.opengl.fbms.DisplayResolutionDependentFbo;
+import org.terasology.engine.rendering.dag.StateChange;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -30,8 +18,7 @@ import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
 import static org.lwjgl.opengl.GL11.glBindTexture;
 import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
 import static org.lwjgl.opengl.GL13.glActiveTexture;
-import static org.terasology.rendering.dag.AbstractNode.getMaterial;
-import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFbo.POST_FBO_REGENERATION;
+import static org.terasology.engine.rendering.dag.AbstractNode.getMaterial;
 
 // TODO: split this class into two - one for opengl's global state change and one for the specific material state change.
 
@@ -83,7 +70,7 @@ public class SetInputTextureFromFbo implements StateChange, PropertyChangeListen
         this.material = getMaterial(materialUrn);
 
         propertyChange(null); // Cheeky way to initialise textureId
-        fboManager.subscribe(POST_FBO_REGENERATION, this);
+        fboManager.subscribe(DisplayResolutionDependentFbo.POST_FBO_REGENERATION, this);
     }
 
     /**

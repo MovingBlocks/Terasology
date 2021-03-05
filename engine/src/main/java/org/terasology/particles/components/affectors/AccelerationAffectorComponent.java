@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.particles.components.affectors;
+package org.terasology.engine.particles.components.affectors;
 
 import org.joml.Vector3f;
-import org.terasology.entitySystem.Component;
+import org.terasology.engine.entitySystem.Component;
 import org.terasology.module.sandbox.API;
-import org.terasology.network.Replicate;
+import org.terasology.engine.network.Replicate;
 
 /**
  *

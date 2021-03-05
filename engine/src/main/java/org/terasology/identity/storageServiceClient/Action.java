@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.identity.storageServiceClient;
+package org.terasology.engine.identity.storageServiceClient;
 
 /**
  * Represents an interaction that can be made with the storage service server.

@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.persistence.typeHandling.gson;
+package org.terasology.engine.persistence.typeHandling.gson;
 
 import com.google.gson.ExclusionStrategy;
 import com.google.gson.FieldAttributes;
-import org.terasology.utilities.ReflectionUtil;
+import org.terasology.engine.utilities.ReflectionUtil;
 
 import java.lang.reflect.Type;
 import java.util.Map;

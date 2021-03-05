@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package org.terasology.audio.nullAudio;
+package org.terasology.engine.audio.nullAudio;
 
 import org.terasology.assets.Asset;
 import org.terasology.assets.AssetType;
 import org.terasology.assets.ResourceUrn;
-import org.terasology.audio.StreamingSound;
-import org.terasology.audio.StreamingSoundData;
+import org.terasology.engine.audio.StreamingSound;
+import org.terasology.engine.audio.StreamingSoundData;
 
 import java.util.Optional;
 

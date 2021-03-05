@@ -1,15 +1,15 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.rendering.nui.layers.mainMenu;
+package org.terasology.engine.rendering.nui.layers.mainMenu;
 
 import org.terasology.assets.ResourceUrn;
-import org.terasology.config.Config;
+import org.terasology.engine.config.Config;
 import org.terasology.nui.WidgetUtil;
 import org.terasology.nui.databinding.BindHelper;
 import org.terasology.nui.widgets.UIButton;
 import org.terasology.nui.widgets.UILabel;
-import org.terasology.registry.In;
-import org.terasology.rendering.nui.CoreScreenLayer;
+import org.terasology.engine.registry.In;
+import org.terasology.engine.rendering.nui.CoreScreenLayer;
 
 /**
  * LaunchPopup will appear when game launches.

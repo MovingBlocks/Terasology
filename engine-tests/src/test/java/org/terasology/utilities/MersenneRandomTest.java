@@ -18,8 +18,8 @@ package org.terasology.utilities;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.utilities.random.FastRandom;
-import org.terasology.utilities.random.MersenneRandom;
+import org.terasology.engine.utilities.random.FastRandom;
+import org.terasology.engine.utilities.random.MersenneRandom;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

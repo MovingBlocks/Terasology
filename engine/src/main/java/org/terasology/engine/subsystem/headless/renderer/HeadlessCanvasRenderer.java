@@ -1,7 +1,7 @@
 // Copyright 2020 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-package org.terasology.engine.subsystem.headless.renderer;
+package org.terasology.engine.core.subsystem.headless.renderer;
 
 import org.joml.Quaternionfc;
 import org.terasology.joml.geom.Rectanglei;
@@ -16,10 +16,10 @@ import org.terasology.nui.ScaleMode;
 import org.terasology.nui.UITextureRegion;
 import org.terasology.nui.VerticalAlign;
 import org.terasology.nui.asset.font.Font;
-import org.terasology.rendering.assets.material.Material;
-import org.terasology.rendering.assets.mesh.Mesh;
-import org.terasology.rendering.nui.internal.TerasologyCanvasRenderer;
-import org.terasology.rendering.opengl.FrameBufferObject;
+import org.terasology.engine.rendering.assets.material.Material;
+import org.terasology.engine.rendering.assets.mesh.Mesh;
+import org.terasology.engine.rendering.nui.internal.TerasologyCanvasRenderer;
+import org.terasology.engine.rendering.opengl.FrameBufferObject;
 
 public class HeadlessCanvasRenderer implements TerasologyCanvasRenderer {
 

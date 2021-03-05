@@ -17,12 +17,12 @@ package org.terasology.documentation;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
-import org.terasology.engine.module.ModuleManager;
-import org.terasology.input.DefaultBinding;
-import org.terasology.input.DefaultBindings;
+import org.terasology.engine.core.module.ModuleManager;
+import org.terasology.engine.input.DefaultBinding;
+import org.terasology.engine.input.DefaultBindings;
 import org.terasology.input.Input;
 import org.terasology.input.InputCategory;
-import org.terasology.input.RegisterBindButton;
+import org.terasology.engine.input.RegisterBindButton;
 import org.terasology.testUtil.ModuleManagerFactory;
 
 import java.util.HashMap;

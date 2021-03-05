@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package org.terasology.engine.bootstrap;
+package org.terasology.engine.core.bootstrap;
 
 import java.lang.annotation.Annotation;
 
-import org.terasology.context.Context;
-import org.terasology.engine.module.ModuleManager;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.naming.Name;
 
 public class ClassMetaLibraryImpl implements ClassMetaLibrary {

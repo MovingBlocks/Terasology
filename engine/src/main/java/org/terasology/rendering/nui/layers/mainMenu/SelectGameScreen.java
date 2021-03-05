@@ -1,23 +1,23 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.rendering.nui.layers.mainMenu;
+package org.terasology.engine.rendering.nui.layers.mainMenu;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
-import org.terasology.engine.GameEngine;
-import org.terasology.engine.modes.StateLoading;
-import org.terasology.engine.paths.PathManager;
-import org.terasology.game.GameManifest;
-import org.terasology.network.NetworkMode;
+import org.terasology.engine.core.GameEngine;
+import org.terasology.engine.core.modes.StateLoading;
+import org.terasology.engine.core.paths.PathManager;
+import org.terasology.engine.game.GameManifest;
+import org.terasology.engine.rendering.nui.animation.MenuAnimationSystems;
+import org.terasology.engine.rendering.nui.layers.mainMenu.gameDetailsScreen.GameDetailsScreen;
+import org.terasology.engine.rendering.nui.layers.mainMenu.savedGames.GameInfo;
+import org.terasology.engine.rendering.nui.layers.mainMenu.savedGames.GameProvider;
+import org.terasology.engine.network.NetworkMode;
 import org.terasology.nui.databinding.ReadOnlyBinding;
 import org.terasology.nui.widgets.UIButton;
 import org.terasology.nui.widgets.UILabel;
-import org.terasology.registry.CoreRegistry;
-import org.terasology.rendering.nui.animation.MenuAnimationSystems;
-import org.terasology.rendering.nui.layers.mainMenu.gameDetailsScreen.GameDetailsScreen;
-import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameInfo;
-import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameProvider;
+import org.terasology.engine.registry.CoreRegistry;
 
 import java.io.IOException;
 import java.nio.file.Files;

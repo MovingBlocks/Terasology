@@ -1,20 +1,20 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.rendering.nui.widgets;
+package org.terasology.engine.rendering.nui.widgets;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.config.Config;
-import org.terasology.config.WebBrowserConfig;
-import org.terasology.i18n.TranslationSystem;
+import org.terasology.engine.config.Config;
+import org.terasology.engine.config.WebBrowserConfig;
+import org.terasology.engine.i18n.TranslationSystem;
 import org.terasology.nui.databinding.Binding;
 import org.terasology.nui.databinding.DefaultBinding;
 import org.terasology.nui.widgets.ActivateEventListener;
 import org.terasology.nui.widgets.UIButton;
-import org.terasology.registry.CoreRegistry;
-import org.terasology.rendering.nui.NUIManager;
-import org.terasology.rendering.nui.layers.mainMenu.ConfirmUrlPopup;
-import org.terasology.rendering.nui.layers.mainMenu.MessagePopup;
+import org.terasology.engine.registry.CoreRegistry;
+import org.terasology.engine.rendering.nui.NUIManager;
+import org.terasology.engine.rendering.nui.layers.mainMenu.ConfirmUrlPopup;
+import org.terasology.engine.rendering.nui.layers.mainMenu.MessagePopup;
 
 import java.awt.Desktop;
 import java.io.IOException;

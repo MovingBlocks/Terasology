@@ -1,11 +1,11 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-package org.terasology.world.block.regions;
+package org.terasology.engine.world.block.regions;
 
-import org.terasology.entitySystem.Component;
-import org.terasology.network.Replicate;
-import org.terasology.world.block.BlockRegion;
+import org.terasology.engine.entitySystem.Component;
+import org.terasology.engine.network.Replicate;
+import org.terasology.engine.world.block.BlockRegion;
 
 /**
  *

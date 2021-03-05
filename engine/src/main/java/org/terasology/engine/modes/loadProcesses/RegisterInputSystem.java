@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package org.terasology.engine.modes.loadProcesses;
+package org.terasology.engine.core.modes.loadProcesses;
 
-import org.terasology.context.Context;
-import org.terasology.engine.ComponentSystemManager;
-import org.terasology.engine.modes.SingleStepLoadProcess;
-import org.terasology.input.InputSystem;
-import org.terasology.input.cameraTarget.CameraTargetSystem;
-import org.terasology.logic.players.LocalPlayerSystem;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.core.ComponentSystemManager;
+import org.terasology.engine.core.modes.SingleStepLoadProcess;
+import org.terasology.engine.input.InputSystem;
+import org.terasology.engine.input.cameraTarget.CameraTargetSystem;
+import org.terasology.engine.logic.players.LocalPlayerSystem;
 
 /**
  */

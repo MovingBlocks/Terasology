@@ -1,19 +1,19 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.rendering.world.selection;
+package org.terasology.engine.rendering.world.selection;
 
 import org.joml.Vector2i;
 import org.joml.Vector3ic;
-import org.terasology.entitySystem.entity.EntityManager;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.systems.BaseComponentSystem;
-import org.terasology.entitySystem.systems.RegisterMode;
-import org.terasology.entitySystem.systems.RegisterSystem;
-import org.terasology.entitySystem.systems.RenderSystem;
-import org.terasology.registry.In;
-import org.terasology.rendering.assets.texture.Texture;
-import org.terasology.utilities.Assets;
-import org.terasology.world.selection.BlockSelectionComponent;
+import org.terasology.engine.entitySystem.entity.EntityManager;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
+import org.terasology.engine.entitySystem.systems.RegisterMode;
+import org.terasology.engine.entitySystem.systems.RegisterSystem;
+import org.terasology.engine.entitySystem.systems.RenderSystem;
+import org.terasology.engine.registry.In;
+import org.terasology.engine.rendering.assets.texture.Texture;
+import org.terasology.engine.utilities.Assets;
+import org.terasology.engine.world.selection.BlockSelectionComponent;
 
 import java.util.HashMap;
 import java.util.Map;

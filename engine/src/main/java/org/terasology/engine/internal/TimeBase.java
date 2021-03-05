@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.engine.internal;
+package org.terasology.engine.core.internal;
 
 import com.google.common.util.concurrent.AtomicDouble;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.engine.EngineTime;
+import org.terasology.engine.core.EngineTime;
 
 import java.util.Iterator;
 import java.util.concurrent.atomic.AtomicLong;

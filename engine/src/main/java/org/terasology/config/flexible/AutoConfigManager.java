@@ -1,6 +1,6 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.config.flexible;
+package org.terasology.engine.config.flexible;
 
 import com.google.common.collect.Sets;
 import com.google.gson.Gson;
@@ -8,15 +8,15 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.context.Context;
-import org.terasology.engine.SimpleUri;
-import org.terasology.engine.TerasologyConstants;
-import org.terasology.engine.module.ModuleManager;
-import org.terasology.engine.paths.PathManager;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.core.SimpleUri;
+import org.terasology.engine.core.TerasologyConstants;
+import org.terasology.engine.core.module.ModuleManager;
+import org.terasology.engine.core.paths.PathManager;
+import org.terasology.engine.registry.InjectionHelper;
+import org.terasology.engine.utilities.ReflectionUtil;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
-import org.terasology.registry.InjectionHelper;
-import org.terasology.utilities.ReflectionUtil;
 
 import java.io.BufferedWriter;
 import java.io.IOException;

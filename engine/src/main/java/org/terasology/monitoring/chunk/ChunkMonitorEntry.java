@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.monitoring.chunk;
+package org.terasology.engine.monitoring.chunk;
 
 import com.google.common.base.Preconditions;
 import org.joml.Vector3i;
-import org.terasology.world.chunks.Chunk;
+import org.terasology.engine.world.chunks.Chunk;
 
 import java.lang.ref.WeakReference;
 import java.util.Deque;

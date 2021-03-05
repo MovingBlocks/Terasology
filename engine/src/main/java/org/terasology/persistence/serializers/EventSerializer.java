@@ -1,20 +1,7 @@
-/*
- * Copyright 2013 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 
-package org.terasology.persistence.serializers;
+package org.terasology.engine.persistence.serializers;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.ImmutableBiMap;
@@ -22,17 +9,17 @@ import com.google.common.collect.ImmutableMap;
 import com.google.protobuf.ByteString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.entitySystem.event.Event;
-import org.terasology.entitySystem.metadata.EventLibrary;
-import org.terasology.entitySystem.metadata.EventMetadata;
-import org.terasology.entitySystem.metadata.ReplicatedFieldMetadata;
+import org.terasology.engine.entitySystem.event.Event;
+import org.terasology.engine.entitySystem.metadata.EventLibrary;
+import org.terasology.engine.entitySystem.metadata.EventMetadata;
+import org.terasology.engine.entitySystem.metadata.ReplicatedFieldMetadata;
+import org.terasology.engine.persistence.typeHandling.protobuf.ProtobufPersistedData;
+import org.terasology.engine.persistence.typeHandling.protobuf.ProtobufPersistedDataSerializer;
 import org.terasology.persistence.typeHandling.DeserializationException;
 import org.terasology.persistence.typeHandling.PersistedDataSerializer;
 import org.terasology.persistence.typeHandling.SerializationException;
 import org.terasology.persistence.typeHandling.Serializer;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
-import org.terasology.persistence.typeHandling.protobuf.ProtobufPersistedData;
-import org.terasology.persistence.typeHandling.protobuf.ProtobufPersistedDataSerializer;
 import org.terasology.protobuf.EntityData;
 
 import java.util.Map;
@@ -78,7 +65,7 @@ public class EventSerializer {
     /**
      * @param eventData
      * @return The event described by the eventData
-     * @throws org.terasology.persistence.typeHandling.DeserializationException if an error occurs when deserializing
+     * @throws org.terasology.engine.persistence.typeHandling.DeserializationException if an error occurs when deserializing
      */
     public Event deserialize(EntityData.Event eventData) {
         Class<? extends Event> eventClass = getEventClass(eventData);
@@ -117,7 +104,7 @@ public class EventSerializer {
      *
      * @param event
      * @return The serialized event
-     * @throws org.terasology.persistence.typeHandling.SerializationException if an error occurs during serialization
+     * @throws org.terasology.engine.persistence.typeHandling.SerializationException if an error occurs during serialization
      */
     public EntityData.Event serialize(Event event) {
         EventMetadata<?> eventMetadata = eventLibrary.getMetadata(event.getClass());

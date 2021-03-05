@@ -1,6 +1,6 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.world.time;
+package org.terasology.engine.world.time;
 
 import com.google.common.base.Preconditions;
 import com.google.common.math.DoubleMath;

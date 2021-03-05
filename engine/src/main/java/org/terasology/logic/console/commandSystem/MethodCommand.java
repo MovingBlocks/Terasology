@@ -1,19 +1,6 @@
-/*
- * Copyright 2014 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-package org.terasology.logic.console.commandSystem;
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
+package org.terasology.engine.logic.console.commandSystem;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
@@ -22,14 +9,14 @@ import com.google.common.collect.Lists;
 import org.reflections.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.context.Context;
-import org.terasology.logic.console.Console;
-import org.terasology.logic.console.commandSystem.annotations.Command;
-import org.terasology.logic.console.commandSystem.annotations.CommandParam;
-import org.terasology.logic.console.commandSystem.annotations.Sender;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.logic.console.commandSystem.annotations.Command;
+import org.terasology.engine.logic.console.commandSystem.annotations.CommandParam;
+import org.terasology.engine.logic.console.commandSystem.annotations.Sender;
+import org.terasology.engine.logic.console.Console;
 import org.terasology.naming.Name;
-import org.terasology.registry.InjectionHelper;
-import org.terasology.utilities.reflection.SpecificAccessibleObject;
+import org.terasology.engine.registry.InjectionHelper;
+import org.terasology.engine.utilities.reflection.SpecificAccessibleObject;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -41,7 +28,7 @@ import java.util.Set;
  */
 public final class MethodCommand extends AbstractCommand {
     private static final Logger logger = LoggerFactory.getLogger(MethodCommand.class);
-    private static final String ENTITY_REF_NAME = "org.terasology.entitySystem.entity.EntityRef";
+    private static final String ENTITY_REF_NAME = "org.terasology.engine.entitySystem.entity.EntityRef";
 
     private MethodCommand(Name name, String requiredPermission, boolean runOnServer, String description, String helpText,
                           SpecificAccessibleObject<Method> executionMethod, Context context) {
@@ -50,7 +37,7 @@ public final class MethodCommand extends AbstractCommand {
 
     /**
      * Creates a new {@code ReferencedCommand} to a specific method
-     * annotated with {@link org.terasology.logic.console.commandSystem.annotations.Command}.
+     * annotated with {@link Command}.
      *
      * @param specificMethod The method to reference to
      * @return The command reference object created
@@ -81,7 +68,7 @@ public final class MethodCommand extends AbstractCommand {
     }
 
     /**
-     * Registers all available command methods annotated with {@link org.terasology.logic.console.commandSystem.annotations.Command}.
+     * Registers all available command methods annotated with {@link Command}.
      */
     public static void registerAvailable(Object provider, Console console, Context context) {
         Predicate<? super Method> predicate = Predicates.<Method>and(ReflectionUtils.withModifier(Modifier.PUBLIC), ReflectionUtils.withAnnotation(Command.class));

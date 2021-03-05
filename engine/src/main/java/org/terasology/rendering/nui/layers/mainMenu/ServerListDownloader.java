@@ -1,7 +1,7 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-package org.terasology.rendering.nui.layers.mainMenu;
+package org.terasology.engine.rendering.nui.layers.mainMenu;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -9,8 +9,8 @@ import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.config.NetworkConfig;
-import org.terasology.config.ServerInfo;
+import org.terasology.engine.config.NetworkConfig;
+import org.terasology.engine.config.ServerInfo;
 
 import java.io.IOException;
 import java.io.InputStreamReader;

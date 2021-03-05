@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package org.terasology.config;
+package org.terasology.engine.config;
 
-import org.terasology.engine.subsystem.Resolution;
+import org.terasology.engine.core.subsystem.Resolution;
 import org.terasology.module.sandbox.API;
-import org.terasology.rendering.cameras.PerspectiveCameraSettings;
-import org.terasology.rendering.nui.layers.mainMenu.videoSettings.DisplayModeSetting;
-import org.terasology.rendering.nui.layers.mainMenu.videoSettings.ScreenshotSize;
-import org.terasology.rendering.world.viewDistance.ViewDistance;
-import org.terasology.utilities.subscribables.AbstractSubscribable;
+import org.terasology.engine.rendering.cameras.PerspectiveCameraSettings;
+import org.terasology.engine.rendering.nui.layers.mainMenu.videoSettings.DisplayModeSetting;
+import org.terasology.engine.rendering.nui.layers.mainMenu.videoSettings.ScreenshotSize;
+import org.terasology.engine.rendering.world.viewDistance.ViewDistance;
+import org.terasology.engine.utilities.subscribables.AbstractSubscribable;
 
 import java.beans.PropertyChangeListener;
 

@@ -1,16 +1,16 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-package org.terasology.world.chunks;
+package org.terasology.engine.world.chunks;
 
 import org.joml.Vector3f;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.terasology.joml.geom.AABBf;
 import org.terasology.joml.geom.AABBfc;
-import org.terasology.rendering.primitives.ChunkMesh;
-import org.terasology.world.block.Block;
-import org.terasology.world.block.BlockRegion;
+import org.terasology.engine.rendering.primitives.ChunkMesh;
+import org.terasology.engine.world.block.Block;
+import org.terasology.engine.world.block.BlockRegion;
 
 /**
  * A static, far away chunk that has only the data needed for rendering.

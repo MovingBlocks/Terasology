@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.network;
+package org.terasology.engine.network;
 
-import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.event.Event;
+import org.terasology.engine.entitySystem.Component;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.entitySystem.event.Event;
 import org.terasology.protobuf.NetData;
-import org.terasology.world.chunks.remoteChunkProvider.ChunkReadyListener;
+import org.terasology.engine.world.chunks.remoteChunkProvider.ChunkReadyListener;
 
 /**
  */

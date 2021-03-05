@@ -13,29 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.engine.subsystem.lwjgl;
+package org.terasology.engine.core.subsystem.lwjgl;
 
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWFramebufferSizeCallback;
 import org.lwjgl.glfw.GLFWImage;
-import org.lwjgl.opengl.GL;
-import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL43;
-import org.lwjgl.opengl.GLCapabilities;
 import org.lwjgl.system.MemoryUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.module.ModuleAwareAssetTypeManager;
-import org.terasology.config.Config;
-import org.terasology.config.RenderingConfig;
-import org.terasology.context.Context;
-import org.terasology.engine.GameEngine;
-import org.terasology.engine.modes.GameState;
-import org.terasology.engine.subsystem.DisplayDevice;
+import org.terasology.engine.config.Config;
+import org.terasology.engine.config.RenderingConfig;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.core.GameEngine;
+import org.terasology.engine.core.modes.GameState;
+import org.terasology.engine.core.subsystem.DisplayDevice;
 import org.terasology.nui.canvas.CanvasRenderer;
-import org.terasology.rendering.ShaderManager;
-import org.terasology.rendering.ShaderManagerLwjgl;
-import org.terasology.rendering.nui.internal.LwjglCanvasRenderer;
+import org.terasology.engine.rendering.ShaderManager;
+import org.terasology.engine.rendering.ShaderManagerLwjgl;
+import org.terasology.engine.rendering.nui.internal.LwjglCanvasRenderer;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;

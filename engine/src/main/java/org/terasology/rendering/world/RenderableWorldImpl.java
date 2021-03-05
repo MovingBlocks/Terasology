@@ -1,6 +1,6 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.rendering.world;
+package org.terasology.engine.rendering.world;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
@@ -9,27 +9,27 @@ import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.config.Config;
-import org.terasology.config.RenderingConfig;
-import org.terasology.context.Context;
-import org.terasology.engine.subsystem.lwjgl.GLBufferPool;
+import org.terasology.engine.config.Config;
+import org.terasology.engine.config.RenderingConfig;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.core.subsystem.lwjgl.GLBufferPool;
+import org.terasology.engine.rendering.cameras.Camera;
+import org.terasology.engine.rendering.primitives.ChunkMesh;
+import org.terasology.engine.rendering.primitives.ChunkTessellator;
+import org.terasology.engine.rendering.world.viewDistance.ViewDistance;
 import org.terasology.math.TeraMath;
-import org.terasology.monitoring.PerformanceMonitor;
-import org.terasology.registry.CoreRegistry;
-import org.terasology.rendering.cameras.Camera;
-import org.terasology.rendering.primitives.ChunkMesh;
-import org.terasology.rendering.primitives.ChunkTessellator;
-import org.terasology.rendering.world.viewDistance.ViewDistance;
-import org.terasology.world.ChunkView;
-import org.terasology.world.WorldProvider;
-import org.terasology.world.block.BlockRegion;
-import org.terasology.world.chunks.Chunk;
-import org.terasology.world.chunks.ChunkProvider;
-import org.terasology.world.chunks.Chunks;
-import org.terasology.world.chunks.LodChunkProvider;
-import org.terasology.world.chunks.RenderableChunk;
-import org.terasology.world.generator.ScalableWorldGenerator;
-import org.terasology.world.generator.WorldGenerator;
+import org.terasology.engine.monitoring.PerformanceMonitor;
+import org.terasology.engine.registry.CoreRegistry;
+import org.terasology.engine.world.ChunkView;
+import org.terasology.engine.world.WorldProvider;
+import org.terasology.engine.world.block.BlockRegion;
+import org.terasology.engine.world.chunks.Chunk;
+import org.terasology.engine.world.chunks.ChunkProvider;
+import org.terasology.engine.world.chunks.Chunks;
+import org.terasology.engine.world.chunks.LodChunkProvider;
+import org.terasology.engine.world.chunks.RenderableChunk;
+import org.terasology.engine.world.generator.ScalableWorldGenerator;
+import org.terasology.engine.world.generator.WorldGenerator;
 
 import java.util.ArrayList;
 import java.util.Collections;

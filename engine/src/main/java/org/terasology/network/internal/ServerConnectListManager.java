@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.network.internal;
+package org.terasology.engine.network.internal;
 
 import com.google.gson.Gson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.context.Context;
-import org.terasology.engine.paths.PathManager;
-import org.terasology.engine.subsystem.DisplayDevice;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.core.paths.PathManager;
+import org.terasology.engine.core.subsystem.DisplayDevice;
 
 import java.io.IOException;
 import java.io.Writer;

@@ -20,10 +20,10 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.terasology.config.Config;
-import org.terasology.context.internal.ContextImpl;
-import org.terasology.context.internal.MockContext;
-import org.terasology.registry.CoreRegistry;
+import org.terasology.engine.config.Config;
+import org.terasology.engine.context.internal.ContextImpl;
+import org.terasology.engine.context.internal.MockContext;
+import org.terasology.engine.registry.CoreRegistry;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -13,16 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.entitySystem.metadata;
+package org.terasology.engine.entitySystem.metadata;
 
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.metadata.ClassMetadata;
 import org.terasology.reflection.metadata.FieldMetadata;
-import org.terasology.reflection.copy.CopyStrategy;
 import org.terasology.reflection.reflect.InaccessibleFieldException;
 import org.terasology.reflection.reflect.ReflectFactory;
-import org.terasology.network.NoReplicate;
-import org.terasology.network.Replicate;
+import org.terasology.engine.network.NoReplicate;
+import org.terasology.engine.network.Replicate;
 
 import java.lang.reflect.Field;
 

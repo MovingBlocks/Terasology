@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.network.internal.pipelineFactory;
+package org.terasology.engine.network.internal.pipelineFactory;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
@@ -25,14 +25,14 @@ import io.netty.handler.codec.protobuf.ProtobufDecoder;
 import io.netty.handler.codec.protobuf.ProtobufEncoder;
 import io.netty.handler.codec.protobuf.ProtobufVarint32FrameDecoder;
 import io.netty.handler.codec.protobuf.ProtobufVarint32LengthFieldPrepender;
-import org.terasology.network.internal.ClientHandshakeHandler;
-import org.terasology.network.internal.JoinStatusImpl;
-import org.terasology.network.internal.MetricRecordingHandler;
-import org.terasology.network.internal.ServerInfoRequestHandler;
+import org.terasology.engine.network.internal.ClientHandshakeHandler;
+import org.terasology.engine.network.internal.JoinStatusImpl;
+import org.terasology.engine.network.internal.MetricRecordingHandler;
+import org.terasology.engine.network.internal.ServerInfoRequestHandler;
 import org.terasology.protobuf.NetData;
 
 /**
- * A pipeline that requests {@link org.terasology.network.ServerInfoMessage} before it auto-disconnects. This is similar
+ * A pipeline that requests {@link org.terasology.engine.network.ServerInfoMessage} before it auto-disconnects. This is similar
  * to {@link TerasologyClientPipelineFactory}.
  */
 public class InfoRequestPipelineFactory extends ChannelInitializer {

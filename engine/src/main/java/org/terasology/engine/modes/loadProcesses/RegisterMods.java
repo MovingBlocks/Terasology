@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-package org.terasology.engine.modes.loadProcesses;
+package org.terasology.engine.core.modes.loadProcesses;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.context.Context;
-import org.terasology.engine.GameEngine;
-import org.terasology.engine.bootstrap.EnvironmentSwitchHandler;
-import org.terasology.engine.modes.SingleStepLoadProcess;
-import org.terasology.engine.modes.StateMainMenu;
-import org.terasology.engine.module.ModuleManager;
-import org.terasology.game.GameManifest;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.core.GameEngine;
+import org.terasology.engine.core.bootstrap.EnvironmentSwitchHandler;
+import org.terasology.engine.core.modes.SingleStepLoadProcess;
+import org.terasology.engine.core.modes.StateMainMenu;
+import org.terasology.engine.core.module.ModuleManager;
+import org.terasology.engine.game.GameManifest;
 import org.terasology.module.DependencyResolver;
 import org.terasology.module.Module;
 import org.terasology.module.ModuleEnvironment;

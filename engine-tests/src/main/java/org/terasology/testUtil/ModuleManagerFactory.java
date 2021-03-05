@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.testUtil;
 
-import org.terasology.engine.module.ModuleManager;
+import org.terasology.engine.core.module.ModuleManager;
 
 public final class ModuleManagerFactory {
     private ModuleManagerFactory() { }

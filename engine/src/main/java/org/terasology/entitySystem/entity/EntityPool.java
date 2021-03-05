@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.entitySystem.entity;
+package org.terasology.engine.entitySystem.entity;
 
 import org.joml.Quaternionfc;
 import org.joml.Vector3fc;
-import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.prefab.Prefab;
+import org.terasology.engine.entitySystem.Component;
+import org.terasology.engine.entitySystem.prefab.Prefab;
 
 public interface EntityPool {
 

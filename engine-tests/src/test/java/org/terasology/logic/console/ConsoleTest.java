@@ -18,6 +18,8 @@ package org.terasology.logic.console;
 
 import org.junit.jupiter.api.Test;
 import org.terasology.TerasologyTestingEnvironment;
+import org.terasology.engine.logic.console.Console;
+import org.terasology.engine.logic.console.Message;
 
 import java.util.Iterator;
 

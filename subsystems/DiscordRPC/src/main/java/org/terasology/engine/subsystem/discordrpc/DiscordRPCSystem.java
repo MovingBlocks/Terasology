@@ -2,17 +2,17 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.subsystem.discordrpc;
 
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.event.ReceiveEvent;
-import org.terasology.entitySystem.systems.BaseComponentSystem;
-import org.terasology.entitySystem.systems.RegisterMode;
-import org.terasology.entitySystem.systems.RegisterSystem;
-import org.terasology.game.Game;
-import org.terasology.logic.afk.AfkEvent;
-import org.terasology.logic.players.LocalPlayer;
-import org.terasology.network.NetworkMode;
-import org.terasology.network.NetworkSystem;
-import org.terasology.registry.In;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.entitySystem.event.ReceiveEvent;
+import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
+import org.terasology.engine.entitySystem.systems.RegisterMode;
+import org.terasology.engine.entitySystem.systems.RegisterSystem;
+import org.terasology.engine.game.Game;
+import org.terasology.engine.logic.afk.AfkEvent;
+import org.terasology.engine.logic.players.LocalPlayer;
+import org.terasology.engine.network.NetworkMode;
+import org.terasology.engine.network.NetworkSystem;
+import org.terasology.engine.registry.In;
 
 /**
  * It's a system that runs when a single player or multi player game has been started to process some stuff throw the

@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.config;
+package org.terasology.engine.config;
 
-import org.terasology.engine.SimpleUri;
+import org.terasology.engine.core.SimpleUri;
 
 public class WorldGenerationConfig {
     private String worldTitle;

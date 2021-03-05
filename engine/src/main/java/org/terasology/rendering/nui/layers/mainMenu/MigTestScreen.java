@@ -1,11 +1,11 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.rendering.nui.layers.mainMenu;
+package org.terasology.engine.rendering.nui.layers.mainMenu;
 
 import org.terasology.nui.widgets.UIDropdown;
 import org.terasology.nui.widgets.UIDropdownScrollable;
 import org.terasology.nui.widgets.UIList;
-import org.terasology.rendering.nui.CoreScreenLayer;
+import org.terasology.engine.rendering.nui.CoreScreenLayer;
 
 import java.util.Arrays;
 import java.util.List;

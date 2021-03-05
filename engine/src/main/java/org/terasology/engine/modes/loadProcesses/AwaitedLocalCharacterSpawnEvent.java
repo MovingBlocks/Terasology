@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.engine.modes.loadProcesses;
+package org.terasology.engine.core.modes.loadProcesses;
 
-import org.terasology.entitySystem.event.Event;
-import org.terasology.entitySystem.systems.BaseComponentSystem;
+import org.terasology.engine.entitySystem.event.Event;
+import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
 import org.terasology.module.sandbox.API;
 
 /**

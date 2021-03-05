@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.config.flexible;
+package org.terasology.engine.config.flexible;
 
-import org.terasology.config.flexible.constraints.SettingConstraint;
-import org.terasology.config.flexible.internal.SettingBuilder;
+import org.terasology.engine.config.flexible.constraints.SettingConstraint;
+import org.terasology.engine.config.flexible.internal.SettingBuilder;
 import org.terasology.reflection.TypeInfo;
 
 import java.util.function.BiConsumer;

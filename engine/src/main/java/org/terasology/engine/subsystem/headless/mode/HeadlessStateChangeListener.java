@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.engine.subsystem.headless.mode;
+package org.terasology.engine.core.subsystem.headless.mode;
 
-import org.terasology.engine.StateChangeSubscriber;
-import org.terasology.engine.TerasologyEngine;
-import org.terasology.engine.modes.GameState;
-import org.terasology.engine.modes.StateMainMenu;
+import org.terasology.engine.core.StateChangeSubscriber;
+import org.terasology.engine.core.TerasologyEngine;
+import org.terasology.engine.core.modes.GameState;
+import org.terasology.engine.core.modes.StateMainMenu;
 
 /**
  * This listener checks whether the engine goes back to the main menu, which for a headless server signals the server

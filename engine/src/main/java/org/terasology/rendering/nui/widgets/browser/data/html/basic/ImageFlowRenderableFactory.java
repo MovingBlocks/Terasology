@@ -1,14 +1,14 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.rendering.nui.widgets.browser.data.html.basic;
+package org.terasology.engine.rendering.nui.widgets.browser.data.html.basic;
 
+import org.terasology.engine.rendering.nui.widgets.browser.data.basic.flow.FlowRenderable;
+import org.terasology.engine.rendering.nui.widgets.browser.data.basic.flow.ImageFlowRenderable;
 import org.terasology.nui.Color;
 import org.terasology.nui.asset.font.Font;
-import org.terasology.rendering.nui.widgets.browser.data.basic.flow.FlowRenderable;
-import org.terasology.rendering.nui.widgets.browser.data.basic.flow.ImageFlowRenderable;
-import org.terasology.rendering.nui.widgets.browser.data.html.HTMLParseException;
-import org.terasology.rendering.nui.widgets.browser.data.html.HTMLUtils;
-import org.terasology.utilities.Assets;
+import org.terasology.engine.rendering.nui.widgets.browser.data.html.HTMLParseException;
+import org.terasology.engine.rendering.nui.widgets.browser.data.html.HTMLUtils;
+import org.terasology.engine.utilities.Assets;
 import org.xml.sax.Attributes;
 
 import java.util.Collection;

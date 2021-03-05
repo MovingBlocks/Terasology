@@ -1,14 +1,14 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-package org.terasology.engine.paths;
+package org.terasology.engine.core.paths;
 
 import com.google.common.collect.ImmutableList;
 import com.sun.jna.platform.win32.KnownFolders;
 import com.sun.jna.platform.win32.Shell32Util;
-import org.terasology.context.Context;
-import org.terasology.engine.subsystem.DisplayDevice;
-import org.terasology.utilities.OS;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.core.subsystem.DisplayDevice;
+import org.terasology.engine.utilities.OS;
 
 import javax.swing.JFileChooser;
 import java.io.File;

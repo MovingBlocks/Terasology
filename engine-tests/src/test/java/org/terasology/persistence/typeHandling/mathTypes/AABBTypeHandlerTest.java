@@ -1,18 +1,18 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-package org.terasology.persistence.typeHandling.mathTypes;
+package org.terasology.engine.persistence.typeHandling.mathTypes;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import org.junit.jupiter.api.Test;
 import org.reflections.Reflections;
+import org.terasology.engine.persistence.typeHandling.TypeHandlerLibraryImpl;
+import org.terasology.engine.persistence.typeHandling.gson.GsonBuilderFactory;
 import org.terasology.joml.geom.AABBf;
 import org.terasology.joml.geom.AABBi;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
-import org.terasology.persistence.typeHandling.TypeHandlerLibraryImpl;
-import org.terasology.persistence.typeHandling.gson.GsonBuilderFactory;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;

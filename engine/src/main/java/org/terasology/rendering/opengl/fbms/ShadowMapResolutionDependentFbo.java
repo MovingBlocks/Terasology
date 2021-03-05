@@ -1,14 +1,14 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.rendering.opengl.fbms;
+package org.terasology.engine.rendering.opengl.fbms;
 
-import org.terasology.config.Config;
-import org.terasology.config.RenderingConfig;
-import org.terasology.engine.SimpleUri;
-import org.terasology.registry.CoreRegistry;
-import org.terasology.rendering.opengl.AbstractFboManager;
-import org.terasology.rendering.opengl.FBO;
-import org.terasology.rendering.opengl.FboConfig;
+import org.terasology.engine.config.Config;
+import org.terasology.engine.config.RenderingConfig;
+import org.terasology.engine.core.SimpleUri;
+import org.terasology.engine.registry.CoreRegistry;
+import org.terasology.engine.rendering.opengl.AbstractFboManager;
+import org.terasology.engine.rendering.opengl.FBO;
+import org.terasology.engine.rendering.opengl.FboConfig;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;

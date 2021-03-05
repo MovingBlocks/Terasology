@@ -1,18 +1,18 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.rendering.nui.layers.mainMenu;
+package org.terasology.engine.rendering.nui.layers.mainMenu;
 
 import com.google.common.base.Strings;
 import org.terasology.assets.ResourceUrn;
-import org.terasology.config.Config;
-import org.terasology.config.PlayerConfig;
-import org.terasology.i18n.TranslationSystem;
+import org.terasology.engine.config.Config;
+import org.terasology.engine.config.PlayerConfig;
+import org.terasology.engine.i18n.TranslationSystem;
 import org.terasology.nui.WidgetUtil;
 import org.terasology.nui.databinding.ReadOnlyBinding;
 import org.terasology.nui.widgets.UIButton;
 import org.terasology.nui.widgets.UIText;
-import org.terasology.registry.In;
-import org.terasology.rendering.nui.CoreScreenLayer;
+import org.terasology.engine.registry.In;
+import org.terasology.engine.rendering.nui.CoreScreenLayer;
 
 public class EnterUsernamePopup extends CoreScreenLayer {
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:enterUsernamePopup");

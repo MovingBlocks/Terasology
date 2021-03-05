@@ -13,26 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.recording;
+package org.terasology.engine.recording;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.audio.events.PlaySoundEvent;
-import org.terasology.entitySystem.event.Event;
-import org.terasology.input.BindAxisEvent;
-import org.terasology.input.BindButtonEvent;
-import org.terasology.input.cameraTarget.CameraTargetChangedEvent;
-import org.terasology.input.events.InputEvent;
-import org.terasology.input.events.KeyUpEvent;
-import org.terasology.input.events.KeyRepeatEvent;
-import org.terasology.input.events.KeyDownEvent;
-import org.terasology.input.events.KeyEvent;
-import org.terasology.input.events.MouseAxisEvent;
-import org.terasology.input.events.MouseButtonEvent;
-import org.terasology.input.events.MouseWheelEvent;
-import org.terasology.logic.characters.CharacterMoveInputEvent;
-import org.terasology.logic.characters.GetMaxSpeedEvent;
-import org.terasology.logic.characters.events.AttackEvent;
+import org.terasology.engine.audio.events.PlaySoundEvent;
+import org.terasology.engine.entitySystem.event.Event;
+import org.terasology.engine.input.BindAxisEvent;
+import org.terasology.engine.input.BindButtonEvent;
+import org.terasology.engine.input.cameraTarget.CameraTargetChangedEvent;
+import org.terasology.engine.input.events.InputEvent;
+import org.terasology.engine.input.events.KeyUpEvent;
+import org.terasology.engine.input.events.KeyRepeatEvent;
+import org.terasology.engine.input.events.KeyDownEvent;
+import org.terasology.engine.input.events.KeyEvent;
+import org.terasology.engine.input.events.MouseAxisEvent;
+import org.terasology.engine.input.events.MouseButtonEvent;
+import org.terasology.engine.input.events.MouseWheelEvent;
+import org.terasology.engine.logic.characters.CharacterMoveInputEvent;
+import org.terasology.engine.logic.characters.GetMaxSpeedEvent;
+import org.terasology.engine.logic.characters.events.AttackEvent;
 
 import java.lang.reflect.InvocationTargetException;
 

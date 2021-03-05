@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package org.terasology.network;
+package org.terasology.engine.network;
 
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.event.Event;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.entitySystem.event.Event;
 import org.terasology.nui.Color;
-import org.terasology.rendering.world.viewDistance.ViewDistance;
-import org.terasology.world.chunks.ChunkRegionListener;
+import org.terasology.engine.rendering.world.viewDistance.ViewDistance;
+import org.terasology.engine.world.chunks.ChunkRegionListener;
 
 /**
  * A client is the connection between a player (local or remote) and the game.

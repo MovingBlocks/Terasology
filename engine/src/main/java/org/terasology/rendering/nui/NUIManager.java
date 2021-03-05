@@ -1,16 +1,16 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.rendering.nui;
+package org.terasology.engine.rendering.nui;
 
 import org.terasology.assets.ResourceUrn;
-import org.terasology.entitySystem.systems.ComponentSystem;
+import org.terasology.engine.entitySystem.systems.ComponentSystem;
+import org.terasology.engine.rendering.nui.layers.hud.HUDScreenLayer;
 import org.terasology.nui.ControlWidget;
 import org.terasology.nui.FocusManager;
 import org.terasology.nui.UIWidget;
 import org.terasology.nui.asset.UIElement;
 import org.terasology.nui.canvas.CanvasControl;
 import org.terasology.reflection.metadata.ClassLibrary;
-import org.terasology.rendering.nui.layers.hud.HUDScreenLayer;
 
 import java.util.Deque;
 

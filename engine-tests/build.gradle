@@ -3,9 +3,13 @@
 
 // Engine tests are split out due to otherwise quirky project dependency issues with module tests extending engine tests
 
+plugins {
+    id "java-library"
+    id "org.jetbrains.gradle.plugin.idea-ext"
+}
+
 // Grab all the common stuff like plugins to use, artifact repositories, code analysis config
 apply from: "$rootDir/config/gradle/publish.gradle"
-apply plugin: "java-library"
 
 import groovy.json.JsonSlurper
 
@@ -42,6 +46,8 @@ sourceSets {
     // Adjust output path (changed with the Gradle 6 upgrade, this puts it back)
     main.java.outputDir = new File("$buildDir/classes")
     test.java.outputDir = new File("$buildDir/testClasses")
+
+    test.java.srcDirs = ["src/test/java/org/terasology"]
 }
 
 // Primary dependencies definition
@@ -89,5 +95,9 @@ idea {
         outputDir = file('build/classes')
         testOutputDir = file('build/testClasses')
         downloadSources = true
+
+        settings {
+            packagePrefix["src/test/java/org/terasology"] = "org.terasology.engine";
+        }
     }
 }

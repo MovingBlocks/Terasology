@@ -1,17 +1,17 @@
 // Copyright 2020 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-package org.terasology.entitySystem.metadata;
+package org.terasology.engine.entitySystem.metadata;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.reflections.Reflections;
 import org.terasology.assets.ResourceUrn;
-import org.terasology.context.Context;
-import org.terasology.context.internal.ContextImpl;
-import org.terasology.entitySystem.stubs.OwnerComponent;
-import org.terasology.entitySystem.stubs.StringComponent;
-import org.terasology.persistence.typeHandling.TypeHandlerLibraryImpl;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.context.internal.ContextImpl;
+import org.terasology.engine.entitySystem.stubs.OwnerComponent;
+import org.terasology.engine.entitySystem.stubs.StringComponent;
+import org.terasology.engine.persistence.typeHandling.TypeHandlerLibraryImpl;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.reflect.ReflectFactory;
 import org.terasology.reflection.reflect.ReflectionReflectFactory;

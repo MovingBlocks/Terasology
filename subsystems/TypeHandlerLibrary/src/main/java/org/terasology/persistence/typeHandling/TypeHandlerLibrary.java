@@ -1,4 +1,4 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.persistence.typeHandling;
@@ -22,8 +22,8 @@ import org.terasology.persistence.typeHandling.coreTypes.StringTypeHandler;
 import org.terasology.persistence.typeHandling.coreTypes.factories.ArrayTypeHandlerFactory;
 import org.terasology.persistence.typeHandling.coreTypes.factories.CollectionTypeHandlerFactory;
 import org.terasology.persistence.typeHandling.coreTypes.factories.EnumTypeHandlerFactory;
-import org.terasology.persistence.typeHandling.coreTypes.factories.ObjectFieldMapTypeHandlerFactory;
 import org.terasology.persistence.typeHandling.coreTypes.factories.MapTypeHandlerFactory;
+import org.terasology.persistence.typeHandling.coreTypes.factories.ObjectFieldMapTypeHandlerFactory;
 import org.terasology.persistence.typeHandling.reflection.ReflectionsSandbox;
 import org.terasology.persistence.typeHandling.reflection.SerializationSandbox;
 import org.terasology.reflection.TypeInfo;
