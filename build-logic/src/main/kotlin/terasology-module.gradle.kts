@@ -10,35 +10,19 @@ import org.reflections.scanners.SubTypesScanner
 import org.reflections.scanners.TypeAnnotationsScanner
 import org.reflections.util.ConfigurationBuilder
 import org.reflections.util.FilterBuilder
-import org.terasology.gradology.ModuleInfoException
 import org.terasology.gradology.ModuleMetadataForGradle
-import org.terasology.module.ModuleMetadataJsonAdapter
 
 plugins {
     `java-library`
-    id("idea")
-    id("eclipse")
+    idea
+    eclipse
 }
 
-val moduleFile = file("module.txt")
+val moduleMetadata = ModuleMetadataForGradle.forProject(project)
 
-// The module file should always exist if the module was correctly created or cloned using Gradle
-if (!moduleFile.exists()) {
-    println("Y U NO EXIST MODULE.TXT!")
-    throw GradleException("Failed to find module.txt for " + project.name)
-}
-
-val moduleConfig = try {
-    moduleFile.reader().use {
-        ModuleMetadataJsonAdapter().read(it)!!
-    }
-} catch (e: Exception) {
-    throw ModuleInfoException(e, moduleFile, project)
-}
-
-project.version = moduleConfig.version
+project.version = moduleMetadata.version
 // Jenkins-Artifactory integration catches on to this as part of the Maven-type descriptor
-project.group = "org.terasology.modules"
+project.group = moduleMetadata.group
 
 logger.info("Version for {} loaded as {} for group {}", project.name, project.version, project.group)
 
@@ -48,18 +32,13 @@ apply(from = "$rootDir/config/gradle/publish.gradle")
 
 // Handle some logic related to where what is
 configure<SourceSetContainer> {
-    named("main") {
-        java.outputDir = File("$buildDir/classes")
+    main {
+        java.outputDir = buildDir.resolve("classes")
     }
-    named("test") {
-        java.outputDir = File("$buildDir/testClasses")
+    test {
+        java.outputDir = buildDir.resolve("testClasses")
     }
 }
-val convention = project.getConvention().getPlugin(JavaPluginConvention::class)
-val mainSourceSet = convention.getSourceSets().getByName("main")
-
-
-val frig = ModuleMetadataForGradle(moduleConfig)
 
 configurations {
     all {
@@ -69,10 +48,10 @@ configurations {
 
 // Set dependencies. Note that the dependency information from module.txt is used for other Terasology modules
 dependencies {
-    implementation(group = "org.terasology.engine", name = "engine", version = frig.engineVersion())
-    implementation(group = "org.terasology.engine", name = "engine-tests", version = frig.engineVersion())
+    implementation(group = "org.terasology.engine", name = "engine", version = moduleMetadata.engineVersion())
+    implementation(group = "org.terasology.engine", name = "engine-tests", version = moduleMetadata.engineVersion())
 
-    for ((gradleDep, optional) in frig.moduleDependencies()) {
+    for ((gradleDep, optional) in moduleMetadata.moduleDependencies()) {
         if (optional) {
             // `optional` module dependencies are ones it does not require for runtime
             // (but will use opportunistically if available)
@@ -112,8 +91,6 @@ if (project.name == "ModuleTestingEnvironment") {
         implementation("org.junit.jupiter:junit-jupiter-api")
         implementation("org.mockito:mockito-junit-jupiter:3.7.7")
         implementation("junit:junit:4.13.1")
-        //TODO: Remove shrinkwrap from code, you have FileSystem in java 8
-        implementation("org.jboss.shrinkwrap:shrinkwrap-depchain-java7:1.2.1")
     }
 }
 
@@ -145,6 +122,10 @@ tasks.register("createSkeleton") {
     mkdir("src/main/java")
     mkdir("src/test/java")
 }
+
+
+val mainSourceSet: SourceSet = sourceSets[SourceSet.MAIN_SOURCE_SET_NAME]
+
 
 tasks.register("cacheReflections") {
     description = "Caches reflection output to make regular startup faster. May go stale and need cleanup at times."
@@ -212,8 +193,8 @@ configure<IdeaModel> {
     module {
         // Change around the output a bit
         inheritOutputDirs = false
-        outputDir = file("build/classes")
-        testOutputDir = file("build/testClasses")
+        outputDir = buildDir.resolve("classes")
+        testOutputDir = buildDir.resolve("testClasses")
         isDownloadSources = true
     }
 }

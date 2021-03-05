@@ -40,13 +40,13 @@ public class TelemetryLogstashAppender extends LogstashTcpSocketAppender {
 
     public static final String TELEMETRY_APPENDER_NAME = "LOGSTASH";
 
-    public static final String DEFAULT_LOGSTASH_HOST = "utility.terasology.org";
+    public static final String DEFAULT_LOGSTASH_HOST = "telemetry.terasology.com";
 
     public static final String DEFAULT_LOGSTASH_OWNER = "Terasology Community";
 
     public static final String DEFAULT_LOGSTASH_NAME = "Logstash";
 
-    public static final int DEFAULT_LOGSTASH_PORT = 9600;
+    public static final int DEFAULT_LOGSTASH_PORT = 9000;
 
     private Context gameContext;
 

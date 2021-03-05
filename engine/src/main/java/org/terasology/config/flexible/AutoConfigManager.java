@@ -1,18 +1,5 @@
-/*
- * Copyright 2019 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.config.flexible;
 
 import com.google.common.collect.Sets;
@@ -36,9 +23,13 @@ import java.io.IOException;
 import java.io.Reader;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
 
+/**
+ * Loads, Saves and Stores {@link AutoConfig}s
+ */
 public class AutoConfigManager {
     private static final Logger logger = LoggerFactory.getLogger(AutoConfigManager.class);
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
@@ -122,9 +113,9 @@ public class AutoConfigManager {
 
     private Path getConfigPath(SimpleUri configId) {
         Path filePath = PathManager.getInstance()
-                            .getConfigsPath()
-                            .resolve(configId.getModuleName().toString())
-                            .resolve(configId.getObjectName().toString() + ".cfg");
+                .getConfigsPath()
+                .resolve(configId.getModuleName().toString())
+                .resolve(configId.getObjectName().toString() + ".cfg");
 
         // This call ensures that the entire directory structure (like configs/engine/) exists.
         ensureDirectoryExists(filePath);
@@ -137,5 +128,9 @@ public class AutoConfigManager {
         } catch (Exception e) {
             throw new RuntimeException("Cannot create directory for flexibleConfig " + filePath.getFileName() + "!");
         }
+    }
+
+    public Set<AutoConfig> getLoadedConfigs() {
+        return Collections.unmodifiableSet(loadedConfigs);
     }
 }

@@ -34,6 +34,13 @@ import static org.terasology.config.flexible.SettingArgument.type;
 
 public class AutoConfigTest {
     @Test
+    public void testGetSettings() {
+        TestAutoConfig config = new TestAutoConfig();
+
+        assertEquals(Sets.newHashSet(config.stringSetting, config.integerListSetting), config.getSettings());
+    }
+
+    @Test
     public void testGetSettingFieldsIn() {
         Set<Field> settingFields = AutoConfig.getSettingFieldsIn(TestAutoConfig.class);
 
