@@ -47,6 +47,7 @@ sourceSets {
     main.java.outputDir = new File("$buildDir/classes")
     test.java.outputDir = new File("$buildDir/testClasses")
 
+    main.java.srcDirs = ["src/main/java/org/terasology"]
     test.java.srcDirs = ["src/test/java/org/terasology"]
 }
 
@@ -97,6 +98,7 @@ idea {
         downloadSources = true
 
         settings {
+            packagePrefix["src/main/java/org/terasology"] = "org.terasology.engine";
             packagePrefix["src/test/java/org/terasology"] = "org.terasology.engine";
         }
     }
