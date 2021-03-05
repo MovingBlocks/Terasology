@@ -14,7 +14,7 @@ public final class BlockComponent implements Component {
     @Replicate
     protected Vector3i position = new Vector3i();
     @Replicate
-    protected Block block;
+    public Block block;
 
     public BlockComponent() {
     }
