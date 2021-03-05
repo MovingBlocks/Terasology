@@ -1,24 +1,8 @@
-/*
- * Copyright 2018 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.persistence.internal;
 
 import com.google.common.collect.Lists;
-import org.jboss.shrinkwrap.api.ShrinkWrap;
-import org.jboss.shrinkwrap.api.nio.file.ShrinkWrapFileSystems;
-import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.joml.Vector3f;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
@@ -28,6 +12,7 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.io.TempDir;
 import org.mockito.ArgumentMatchers;
 import org.terasology.TerasologyTestingEnvironment;
 import org.terasology.assets.ResourceUrn;
@@ -71,7 +56,6 @@ import org.terasology.engine.world.internal.WorldInfo;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.FileSystem;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
@@ -114,14 +98,12 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
     }
 
     @BeforeEach
-    public void setup() throws Exception {
+    public void setup(@TempDir Path tempHome) throws Exception {
         super.setup();
-        JavaArchive homeArchive = ShrinkWrap.create(JavaArchive.class);
-        FileSystem vfs = ShrinkWrapFileSystems.newFileSystem(homeArchive);
-        PathManager.getInstance().useOverrideHomePath(temporaryFolder.toPath());
+        PathManager.getInstance().useOverrideHomePath(tempHome);
         savePath = PathManager.getInstance().getSavePath("testSave");
 
-        assert !Files.isRegularFile(vfs.getPath("global.dat"));
+        assert !Files.isRegularFile(tempHome.resolve("global.dat"));
 
         entityManager = context.get(EngineEntityManager.class);
         moduleEnvironment = mock(ModuleEnvironment.class);

@@ -91,8 +91,6 @@ if (project.name == "ModuleTestingEnvironment") {
         implementation("org.junit.jupiter:junit-jupiter-api")
         implementation("org.mockito:mockito-junit-jupiter:3.7.7")
         implementation("junit:junit:4.13.1")
-        //TODO: Remove shrinkwrap from code, you have FileSystem in java 8
-        implementation("org.jboss.shrinkwrap:shrinkwrap-depchain-java7:1.2.1")
     }
 }
 

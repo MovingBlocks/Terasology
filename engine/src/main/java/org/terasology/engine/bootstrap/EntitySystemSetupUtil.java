@@ -163,7 +163,6 @@ public final class EntitySystemSetupUtil {
         for (Class<? extends Component> componentType : environment.getSubtypesOf(Component.class)) {
             if (componentType.getAnnotation(DoNotAutoRegister.class) == null) {
                 String componentName = MetadataUtil.getComponentClassName(componentType);
-                //noinspection UnstableApiUsage
                 Name componentModuleName = verifyNotNull(environment.getModuleProviding(componentType), "Could not find module for %s %s", componentName, componentType);
                 library.register(new ResourceUrn(componentModuleName.toString(), componentName), componentType);
             }

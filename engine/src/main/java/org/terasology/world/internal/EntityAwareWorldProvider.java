@@ -297,9 +297,8 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
             }
         }
 
-
-        blockComponent.block = type;
-        blockEntity.saveComponent(blockComponent);
+        BlockComponent newBlockComponent = new BlockComponent(type, blockComponent.getPosition());
+        blockEntity.saveComponent(newBlockComponent);
 
         for (Component comp : newEntityBuilder.iterateComponents()) {
             copyIntoPrefab(blockEntity, comp, retainComponents);

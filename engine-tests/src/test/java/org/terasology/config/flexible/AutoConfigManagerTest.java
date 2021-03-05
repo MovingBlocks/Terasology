@@ -2,11 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.config.flexible;
 
-import org.jboss.shrinkwrap.api.ShrinkWrap;
-import org.jboss.shrinkwrap.api.nio.file.ShrinkWrapFileSystems;
-import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.mockito.ArgumentCaptor;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.core.SimpleUri;
@@ -16,7 +14,7 @@ import org.terasology.module.ModuleEnvironment;
 import org.terasology.naming.Name;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 
-import java.nio.file.FileSystem;
+import java.nio.file.Path;
 import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -37,10 +35,8 @@ public class AutoConfigManagerTest {
     private final ModuleEnvironment environment = mock(ModuleEnvironment.class);
 
     @BeforeEach
-    public void setUp() throws Exception {
-        final JavaArchive homeArchive = ShrinkWrap.create(JavaArchive.class);
-        final FileSystem vfs = ShrinkWrapFileSystems.newFileSystem(homeArchive);
-        PathManager.getInstance().useOverrideHomePath(vfs.getPath(""));
+    public void setUp(@TempDir Path tempHome) throws Exception {
+        PathManager.getInstance().useOverrideHomePath(tempHome);
 
         when(environment.getModuleProviding(any())).thenReturn(PROVIDING_MODULE);
         when(environment.getSubtypesOf(eq(AutoConfig.class))).thenReturn(Collections.singleton(TestAutoConfig.class));

@@ -31,7 +31,7 @@ public class EntityDestructionAuthoritySystem extends BaseComponentSystem {
         if (instigator != null) {
             if (entityRef.hasComponent(BlockComponent.class)) {
                 BlockComponent blockComponent = entityRef.getComponent(BlockComponent.class);
-                String blockName = blockComponent.block.getDisplayName();
+                String blockName = blockComponent.getBlock().getDisplayName();
                 if (instigator.hasComponent(GamePlayStatsComponent.class)) {
                     GamePlayStatsComponent gamePlayStatsComponent = instigator.getComponent(GamePlayStatsComponent.class);
                     Map<String, Integer> blockDestroyedMap = gamePlayStatsComponent.blockDestroyedMap;

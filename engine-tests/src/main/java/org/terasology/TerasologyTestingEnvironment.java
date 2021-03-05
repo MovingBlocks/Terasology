@@ -1,28 +1,13 @@
-/*
- * Copyright 2013 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 
 package org.terasology;
 
 import com.badlogic.gdx.physics.bullet.Bullet;
-import org.jboss.shrinkwrap.api.ShrinkWrap;
-import org.jboss.shrinkwrap.api.nio.file.ShrinkWrapFileSystems;
-import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.io.TempDir;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.core.ComponentSystemManager;
 import org.terasology.engine.core.EngineTime;
@@ -50,7 +35,6 @@ import org.terasology.reflection.TypeRegistry;
 import org.terasology.engine.world.block.BlockManager;
 import org.terasology.engine.world.chunks.blockdata.ExtraBlockDataManager;
 
-import java.nio.file.FileSystem;
 import java.nio.file.Path;
 
 import static org.mockito.Mockito.mock;
@@ -70,10 +54,8 @@ public abstract class TerasologyTestingEnvironment {
     private EngineEntityManager engineEntityManager;
 
     @BeforeAll
-    public static void setupEnvironment() throws Exception {
-        final JavaArchive homeArchive = ShrinkWrap.create(JavaArchive.class);
-        final FileSystem vfs = ShrinkWrapFileSystems.newFileSystem(homeArchive);
-        PathManager.getInstance().useOverrideHomePath(vfs.getPath(""));
+    public static void setupEnvironment(@TempDir Path tempHome) throws Exception {
+        PathManager.getInstance().useOverrideHomePath(tempHome);
         Bullet.init(true,false);
 
         /*

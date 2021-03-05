@@ -2,9 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology;
 
-import org.jboss.shrinkwrap.api.ShrinkWrap;
-import org.jboss.shrinkwrap.api.nio.file.ShrinkWrapFileSystems;
-import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.management.AssetManager;
@@ -91,7 +88,7 @@ import org.terasology.reflection.TypeRegistry;
 import org.terasology.testUtil.ModuleManagerFactory;
 
 import java.io.IOException;
-import java.nio.file.FileSystem;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -278,14 +275,11 @@ public class HeadlessEnvironment extends Environment {
         EntitySystemSetupUtil.addReflectionBasedLibraries(context);
     }
 
-    /**
-     * @throws IOException ShrinkWrap errors
-     */
     @Override
     protected void setupPathManager() throws IOException {
-        final JavaArchive homeArchive = ShrinkWrap.create(JavaArchive.class);
-        final FileSystem vfs = ShrinkWrapFileSystems.newFileSystem(homeArchive);
-        PathManager.getInstance().useOverrideHomePath(vfs.getPath(""));
+        Path tempHome = Files.createTempDirectory("terasology-env");
+        tempHome.toFile().deleteOnExit();
+        PathManager.getInstance().useOverrideHomePath(tempHome);
     }
 
     @Override
