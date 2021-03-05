@@ -7,6 +7,7 @@ import com.badlogic.gdx.physics.bullet.Bullet;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.io.TempDir;
 import org.terasology.context.Context;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.EngineTime;
@@ -34,9 +35,7 @@ import org.terasology.reflection.TypeRegistry;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.chunks.blockdata.ExtraBlockDataManager;
 
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.attribute.FileAttribute;
 
 import static org.mockito.Mockito.mock;
 
@@ -55,9 +54,7 @@ public abstract class TerasologyTestingEnvironment {
     private EngineEntityManager engineEntityManager;
 
     @BeforeAll
-    public static void setupEnvironment() throws Exception {
-        Path tempHome = Files.createTempDirectory("terasology-tte", (FileAttribute<?>[]) null);
-        tempHome.toFile().deleteOnExit();
+    public static void setupEnvironment(@TempDir Path tempHome) throws Exception {
         PathManager.getInstance().useOverrideHomePath(tempHome);
         Bullet.init(true,false);
 

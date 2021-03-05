@@ -12,6 +12,7 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.io.TempDir;
 import org.mockito.ArgumentMatchers;
 import org.terasology.TerasologyTestingEnvironment;
 import org.terasology.assets.ResourceUrn;
@@ -57,7 +58,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.attribute.FileAttribute;
 import java.util.Arrays;
 import java.util.List;
 
@@ -98,10 +98,8 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
     }
 
     @BeforeEach
-    public void setup() throws Exception {
+    public void setup(@TempDir Path tempHome) throws Exception {
         super.setup();
-        Path tempHome = Files.createTempDirectory("terasology-smt", (FileAttribute<?>[]) null);
-        tempHome.toFile().deleteOnExit();
         PathManager.getInstance().useOverrideHomePath(tempHome);
         savePath = PathManager.getInstance().getSavePath("testSave");
 

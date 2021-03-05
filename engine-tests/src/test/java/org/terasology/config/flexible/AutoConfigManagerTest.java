@@ -4,6 +4,7 @@ package org.terasology.config.flexible;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.mockito.ArgumentCaptor;
 import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
@@ -13,9 +14,7 @@ import org.terasology.module.ModuleEnvironment;
 import org.terasology.naming.Name;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.attribute.FileAttribute;
 import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -36,9 +35,7 @@ public class AutoConfigManagerTest {
     private final ModuleEnvironment environment = mock(ModuleEnvironment.class);
 
     @BeforeEach
-    public void setUp() throws Exception {
-        Path tempHome = Files.createTempDirectory("terasology-env", (FileAttribute<?>[]) null);
-        tempHome.toFile().deleteOnExit();
+    public void setUp(@TempDir Path tempHome) throws Exception {
         PathManager.getInstance().useOverrideHomePath(tempHome);
 
         when(environment.getModuleProviding(any())).thenReturn(PROVIDING_MODULE);
