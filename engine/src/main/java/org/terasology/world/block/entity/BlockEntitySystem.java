@@ -86,14 +86,14 @@ public class BlockEntitySystem extends BaseComponentSystem {
 
     @ReceiveEvent(priority = EventPriority.PRIORITY_LOW)
     public void doDestroy(DoDestroyEvent event, EntityRef entity, BlockComponent blockComponent) {
-        commonDestroyed(event, entity, blockComponent.block);
+        commonDestroyed(event, entity, blockComponent.getBlock());
         worldProvider.setBlock(blockComponent.getPosition(), blockManager.getBlock(BlockManager.AIR_ID));
     }
 
     @ReceiveEvent(priority = EventPriority.PRIORITY_TRIVIAL)
     public void defaultDropsHandling(CreateBlockDropsEvent event, EntityRef entity, BlockComponent blockComponent) {
         Vector3ic location = blockComponent.getPosition();
-        commonDefaultDropsHandling(event, entity, location, blockComponent.block);
+        commonDefaultDropsHandling(event, entity, location, blockComponent.getBlock());
     }
 
     @ReceiveEvent(priority = EventPriority.PRIORITY_TRIVIAL)

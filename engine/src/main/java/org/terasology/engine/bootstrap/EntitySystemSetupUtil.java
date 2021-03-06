@@ -1,4 +1,4 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.engine.bootstrap;
@@ -27,6 +27,7 @@ import org.terasology.input.cameraTarget.CameraTargetChangedEvent;
 import org.terasology.input.events.InputEvent;
 import org.terasology.logic.characters.CharacterMoveInputEvent;
 import org.terasology.module.ModuleEnvironment;
+import org.terasology.naming.Name;
 import org.terasology.network.NetworkSystem;
 import org.terasology.nui.properties.OneOfProviderFactory;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
@@ -48,6 +49,8 @@ import org.terasology.reflection.reflect.ReflectionReflectFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.google.common.base.Verify.verifyNotNull;
 
 /**
  * Provides static methods that can be used to put entity system related objects into a {@link Context} instance.
@@ -160,7 +163,8 @@ public final class EntitySystemSetupUtil {
         for (Class<? extends Component> componentType : environment.getSubtypesOf(Component.class)) {
             if (componentType.getAnnotation(DoNotAutoRegister.class) == null) {
                 String componentName = MetadataUtil.getComponentClassName(componentType);
-                library.register(new ResourceUrn(environment.getModuleProviding(componentType).toString(), componentName), componentType);
+                Name componentModuleName = verifyNotNull(environment.getModuleProviding(componentType), "Could not find module for %s %s", componentName, componentType);
+                library.register(new ResourceUrn(componentModuleName.toString(), componentName), componentType);
             }
         }
     }
