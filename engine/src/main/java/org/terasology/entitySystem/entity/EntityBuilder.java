@@ -79,7 +79,6 @@ public class EntityBuilder implements MutableComponentContainer {
         if (prefab != null) {
             for (Component component : prefab.iterateComponents()) {
                 Component componentCopy = entityManager.getComponentLibrary().copy(component);
-                //noinspection UnstableApiUsage
                 addComponent(verifyNotNull(componentCopy, "Component %s not registered (in prefab %s)", component, prefab));
             }
             addComponent(new EntityInfoComponent(prefab, prefab.isPersisted(), prefab.isAlwaysRelevant()));

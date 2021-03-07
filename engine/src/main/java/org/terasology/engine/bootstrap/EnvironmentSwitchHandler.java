@@ -1,4 +1,4 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.bootstrap;
 
@@ -19,6 +19,7 @@ import org.terasology.entitySystem.prefab.internal.PrefabDeltaFormat;
 import org.terasology.entitySystem.prefab.internal.PrefabFormat;
 import org.terasology.entitySystem.systems.internal.DoNotAutoRegister;
 import org.terasology.module.ModuleEnvironment;
+import org.terasology.naming.Name;
 import org.terasology.persistence.typeHandling.RegisterTypeHandler;
 import org.terasology.persistence.typeHandling.RegisterTypeHandlerFactory;
 import org.terasology.persistence.typeHandling.TypeHandler;
@@ -40,6 +41,8 @@ import org.terasology.utilities.ReflectionUtil;
 
 import java.lang.reflect.Type;
 import java.util.Optional;
+
+import static com.google.common.base.Verify.verifyNotNull;
 
 /**
  * Handles an environment switch by updating the asset manager, component library, and other context objects.
@@ -177,7 +180,8 @@ public final class EnvironmentSwitchHandler {
         for (Class<? extends Component> componentType : environment.getSubtypesOf(Component.class)) {
             if (componentType.getAnnotation(DoNotAutoRegister.class) == null) {
                 String componentName = MetadataUtil.getComponentClassName(componentType);
-                library.register(new ResourceUrn(environment.getModuleProviding(componentType).toString(), componentName), componentType);
+                Name componentModuleName = verifyNotNull(environment.getModuleProviding(componentType), "Could not find module for %s %s", componentName, componentType);
+                library.register(new ResourceUrn(componentModuleName.toString(), componentName), componentType);
             }
         }
     }
