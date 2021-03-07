@@ -1,4 +1,4 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.recording;
 
@@ -18,6 +18,7 @@ import org.reflections.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
+import org.terasology.engine.SimpleUri;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -270,7 +271,7 @@ public class EventSystemReplayImpl implements EventSystem {
     public void registerEvent(ResourceUrn uri, Class<? extends Event> eventType) {
         eventIdMap.put(uri, eventType);
         logger.debug("Registering event {}", eventType.getSimpleName());
-        for (Class parent : ReflectionUtils.getAllSuperTypes(eventType, Predicates.assignableFrom(Event.class))) {
+        for (Class parent : ReflectionUtils.getAllSuperTypes(eventType, Predicates.subtypeOf(Event.class))) {
             if (!AbstractConsumableEvent.class.equals(parent) && !Event.class.equals(parent)) {
                 childEvents.put(parent, eventType);
             }

@@ -1,4 +1,4 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
 // Dependencies needed for what our Gradle scripts themselves use. It cannot be included via an external Gradle file :-(
@@ -8,6 +8,13 @@ buildscript {
         jcenter()
         mavenCentral()
         gradlePluginPortal()
+
+        maven {
+            // required to provide runtime dependencies to build-logic.
+            name = "Terasology Artifactory"
+            url = "http://artifactory.terasology.org/artifactory/virtual-repo-live"
+            allowInsecureProtocol = true  // 😱
+        }
     }
 
     dependencies {
@@ -20,9 +27,11 @@ buildscript {
 
         // SonarQube / Cloud scanning
         classpath "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.8"
+
+        // Our locally included /build-logic
+        classpath("org.terasology.gradology:build-logic")
     }
 }
-
 
 plugins {
     // Needed for extending the "clean" task to also delete custom stuff defined here like natives
@@ -39,18 +48,13 @@ plugins {
 }
 
 
+import org.gradle.internal.logging.text.StyledTextOutputFactory
 import org.jetbrains.gradle.ext.ActionDelegationConfig
 
-import java.nio.file.Files
-import java.nio.file.Path
-import java.nio.file.StandardCopyOption
+import static org.gradle.internal.logging.text.StyledTextOutput.Style
 
 // Test for right version of Java in use for running this script
 assert org.gradle.api.JavaVersion.current().isJava8Compatible()
-
-import org.gradle.internal.logging.text.StyledTextOutputFactory
-import static org.gradle.internal.logging.text.StyledTextOutput.Style
-
 // Check for Java 8
 if(!(JavaVersion.current() == JavaVersion.VERSION_1_8 || JavaVersion.current() == JavaVersion.VERSION_11)) {
     def out = services.get(StyledTextOutputFactory).create("an-ouput")

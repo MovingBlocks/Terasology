@@ -28,3 +28,5 @@ dependencies {
 
     api(kotlin("test"))
 }
+
+group = "org.terasology.gradology"

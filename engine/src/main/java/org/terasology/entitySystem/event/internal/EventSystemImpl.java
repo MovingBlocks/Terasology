@@ -1,4 +1,4 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.entitySystem.event.internal;
 
@@ -81,7 +81,7 @@ public class EventSystemImpl implements EventSystem {
     public void registerEvent(ResourceUrn uri, Class<? extends Event> eventType) {
         eventIdMap.put(uri, eventType);
         logger.debug("Registering event {}", eventType.getSimpleName());
-        for (Class parent : ReflectionUtils.getAllSuperTypes(eventType, Predicates.assignableFrom(Event.class))) {
+        for (Class parent : ReflectionUtils.getAllSuperTypes(eventType, Predicates.subtypeOf(Event.class))) {
             if (!AbstractConsumableEvent.class.equals(parent) && !Event.class.equals(parent)) {
                 childEvents.put(parent, eventType);
             }
