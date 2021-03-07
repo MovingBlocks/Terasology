@@ -12,9 +12,9 @@ import org.terasology.network.Replicate;
  */
 public final class BlockComponent implements Component {
     @Replicate
-    Vector3i position = new Vector3i();
+    protected Vector3i position = new Vector3i();
     @Replicate
-    public Block block;
+    protected Block block;
 
     public BlockComponent() {
     }
@@ -22,6 +22,14 @@ public final class BlockComponent implements Component {
     public BlockComponent(Block block, Vector3ic pos) {
         this.block = block;
         this.position.set(pos);
+    }
+
+    /**
+     * the block associated with this component
+     * @return block tied to this entity
+     */
+    public Block getBlock() {
+        return block;
     }
 
     /**
@@ -39,13 +47,11 @@ public final class BlockComponent implements Component {
      *
      * @param dest will hold the result
      * @return dest
+     * @deprecated  use {@link #getPosition()}
      */
+    @Deprecated
     public Vector3i getPosition(Vector3i dest) {
         dest.set(position);
         return dest;
-    }
-
-    public void setPosition(Vector3ic pos) {
-        position.set(pos);
     }
 }
