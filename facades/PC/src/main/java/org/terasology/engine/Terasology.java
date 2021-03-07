@@ -96,7 +96,7 @@ public final class Terasology {
 
     private static boolean isHeadless;
     private static boolean crashReportEnabled = true;
-    private static boolean soundEnabled = true;
+    private static boolean soundEnabled = false;
     private static boolean splashEnabled = true;
     private static boolean loadLastGame;
     private static boolean createLastGame;
