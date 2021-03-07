@@ -38,9 +38,9 @@ import org.terasology.engine.game.GameManifest;
 import org.terasology.engine.network.NetworkMode;
 import org.terasology.engine.rendering.nui.layers.mainMenu.savedGames.GameInfo;
 import org.terasology.engine.rendering.nui.layers.mainMenu.savedGames.GameProvider;
-import org.terasology.engine.subsystem.discordrpc.DiscordRPCSubSystem;
 import org.terasology.splash.SplashScreen;
 import org.terasology.splash.SplashScreenBuilder;
+import org.terasology.subsystem.discordrpc.DiscordRPCSubSystem;
 
 import java.awt.GraphicsEnvironment;
 import java.io.IOException;
