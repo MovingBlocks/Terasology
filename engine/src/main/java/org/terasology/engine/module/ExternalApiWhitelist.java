@@ -25,7 +25,7 @@ import java.util.Set;
 
 public final class ExternalApiWhitelist {
     public static final Set<String> PACKAGES = new ImmutableSet.Builder<String>()
-            // TODO: This one org.terasology entry is a hack and needs a proper fix
+            .add("org.terasology.math")
             .add("org.terasology.math.geom")
             .add("org.terasology.joml.geom")
             .add("java.lang")
