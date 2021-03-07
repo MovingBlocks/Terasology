@@ -1,4 +1,4 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine;
 
@@ -19,7 +19,6 @@ import org.terasology.engine.bootstrap.EnvironmentSwitchHandler;
 import org.terasology.engine.modes.GameState;
 import org.terasology.engine.module.ExternalApiWhitelist;
 import org.terasology.engine.module.ModuleManager;
-import org.terasology.engine.module.ModuleManagerImpl;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.engine.subsystem.DisplayDevice;
 import org.terasology.engine.subsystem.EngineSubsystem;
@@ -317,7 +316,7 @@ public class TerasologyEngine implements GameEngine {
         TypeRegistry.WHITELISTED_PACKAGES = ExternalApiWhitelist.PACKAGES;
         rootContext.put(TypeRegistry.class, typeRegistry);
 
-        ModuleManager moduleManager = new ModuleManagerImpl(rootContext.get(Config.class), classesOnClasspathsToAddToEngine);
+        ModuleManager moduleManager = new ModuleManager(rootContext.get(Config.class), classesOnClasspathsToAddToEngine);
         rootContext.put(ModuleManager.class, moduleManager);
 
         changeStatus(TerasologyEngineStatus.INITIALIZING_LOWLEVEL_OBJECT_MANIPULATION);
