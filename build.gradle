@@ -19,7 +19,7 @@ buildscript {
 
     dependencies {
         // Needed for caching reflected data during builds
-        classpath 'org.reflections:reflections:0.9.10'
+        classpath 'org.terasology:reflections:0.9.12-MB'
         classpath 'dom4j:dom4j:1.6.1'
 
         //Spotbugs
