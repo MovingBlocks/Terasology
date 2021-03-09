@@ -6,7 +6,7 @@ package org.terasology.engine.core.modes.loadProcesses;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.engine.config.Config;
+import org.terasology.engine.config.SystemConfig;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.core.ComponentSystemManager;
 import org.terasology.engine.core.GameEngine;
@@ -108,7 +108,7 @@ public class InitialiseWorld extends SingleStepLoadProcess {
 
         // Init. a new world
         EngineEntityManager entityManager = (EngineEntityManager) context.get(EntityManager.class);
-        boolean writeSaveGamesEnabled = context.get(Config.class).getSystem().isWriteSaveGamesEnabled();
+        boolean writeSaveGamesEnabled = context.get(SystemConfig.class).writeSaveGamesEnabled.get();
         //Gets save data from a normal save or from a recording if it is a replay
         Path saveOrRecordingPath = getSaveOrRecordingPath();
         StorageManager storageManager;

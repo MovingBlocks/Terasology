@@ -5,6 +5,7 @@ package org.terasology.engine.rendering.nui.editor.layers;
 import com.google.common.collect.Lists;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.engine.config.Config;
+import org.terasology.engine.config.SystemConfig;
 import org.terasology.engine.core.SimpleUri;
 import org.terasology.engine.i18n.TranslationProject;
 import org.terasology.engine.i18n.TranslationSystem;
@@ -31,6 +32,9 @@ public class NUIEditorSettingsScreen extends CoreScreenLayer {
     private Config config;
 
     @In
+    private SystemConfig systemConfig;
+
+    @In
     private TranslationSystem translationSystem;
 
     private UIDropdownScrollable<Locale> alternativeLocale;
@@ -55,7 +59,7 @@ public class NUIEditorSettingsScreen extends CoreScreenLayer {
             if (config.getNuiEditor().getAlternativeLocale() != null) {
                 alternativeLocale.setSelection(config.getNuiEditor().getAlternativeLocale());
             } else {
-                alternativeLocale.setSelection(config.getSystem().getLocale());
+                alternativeLocale.setSelection(systemConfig.locale.get());
             }
         }
     }

@@ -15,6 +15,7 @@ import org.terasology.persistence.typeHandling.coreTypes.CharacterTypeHandler;
 import org.terasology.persistence.typeHandling.coreTypes.DoubleTypeHandler;
 import org.terasology.persistence.typeHandling.coreTypes.FloatTypeHandler;
 import org.terasology.persistence.typeHandling.coreTypes.IntTypeHandler;
+import org.terasology.persistence.typeHandling.coreTypes.LocaleTypeHandler;
 import org.terasology.persistence.typeHandling.coreTypes.LongTypeHandler;
 import org.terasology.persistence.typeHandling.coreTypes.NumberTypeHandler;
 import org.terasology.persistence.typeHandling.coreTypes.RuntimeDelegatingTypeHandler;
@@ -34,6 +35,7 @@ import org.terasology.reflection.reflect.ConstructorLibrary;
 import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 
@@ -100,6 +102,7 @@ public class TypeHandlerLibrary {
         typeHandlerLibrary.addTypeHandler(Long.TYPE, new LongTypeHandler());
         typeHandlerLibrary.addTypeHandler(String.class, new StringTypeHandler());
         typeHandlerLibrary.addTypeHandler(Number.class, new NumberTypeHandler());
+        typeHandlerLibrary.addTypeHandler(Locale.class, new LocaleTypeHandler());
 
         typeHandlerLibrary.addTypeHandlerFactory(new ArrayTypeHandlerFactory());
         typeHandlerLibrary.addTypeHandler(byte[].class, new ByteArrayTypeHandler());

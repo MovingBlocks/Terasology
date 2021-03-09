@@ -7,7 +7,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
-import org.terasology.engine.config.Config;
 import org.terasology.engine.config.SystemConfig;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.core.SimpleUri;
@@ -36,7 +35,7 @@ public class TranslationSystemImpl implements TranslationSystem {
     private final List<Consumer<TranslationProject>> changeListeners = new CopyOnWriteArrayList<>();
     private final Map<Uri, TranslationProject> projects = new HashMap<>();
 
-    private final SystemConfig config;
+    private final SystemConfig systemConfig;
 
     private AssetManager assetManager;
 
@@ -45,7 +44,7 @@ public class TranslationSystemImpl implements TranslationSystem {
      */
     public TranslationSystemImpl(Context context) {
 
-        config = context.get(Config.class).getSystem();
+        systemConfig = context.get(SystemConfig.class);
         assetManager = context.get(AssetManager.class);
 
         refresh();
@@ -78,7 +77,7 @@ public class TranslationSystemImpl implements TranslationSystem {
 
     @Override
     public String translate(String id) {
-        return translate(id, config.getLocale());
+        return translate(id, systemConfig.locale.get());
     }
 
     @Override
