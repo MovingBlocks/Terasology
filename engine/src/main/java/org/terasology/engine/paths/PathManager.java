@@ -13,12 +13,15 @@ import org.terasology.utilities.OS;
 import javax.swing.JFileChooser;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 /**
@@ -293,47 +296,35 @@ public final class PathManager {
      * @throws IOException Thrown when required directories cannot be accessed.
      */
     private void updateDirs() throws IOException {
-        Files.createDirectories(homePath);
         savesPath = homePath.resolve(SAVED_GAMES_DIR);
-        Files.createDirectories(savesPath);
         recordingsPath = homePath.resolve(RECORDINGS_LIBRARY_DIR);
-        Files.createDirectories(recordingsPath);
         logPath = homePath.resolve(LOG_DIR);
-        Files.createDirectories(logPath);
         shaderLogPath = logPath.resolve(SHADER_LOG_DIR);
-        Files.createDirectories(shaderLogPath);
-        Path homeModPath = homePath.resolve(MODULE_DIR);
-        Files.createDirectories(homeModPath);
-        Path modCachePath = homePath.resolve(MODULE_CACHE_DIR);
-        Files.createDirectories(modCachePath);
-        if (Files.isSameFile(homePath, installPath)) {
-            modPaths = ImmutableList.of(modCachePath, homeModPath);
-        } else {
-            Path installModPath = installPath.resolve(MODULE_DIR);
-            Files.createDirectories(installModPath);
-            modPaths = ImmutableList.of(installModPath, modCachePath, homeModPath);
-        }
         screenshotPath = homePath.resolve(SCREENSHOT_DIR);
-        Files.createDirectories(screenshotPath);
         nativesPath = installPath.resolve(NATIVES_DIR);
         configsPath = homePath.resolve(CONFIGS_DIR);
         if (currentWorldPath == null) {
             currentWorldPath = homePath;
         }
         sandboxPath = homePath.resolve(SANDBOX_DIR);
-        Files.createDirectories(sandboxPath);
+
+        modPaths = defaultModPaths();
+
+        for (Path path : getAllPaths()) {
+            Files.createDirectories(path);
+        }
 
         // --------------------------------- Setup native paths ---------------------
         final Path path;
         switch (OS.get()) {
             case WINDOWS:
-                path = PathManager.getInstance().getNativesPath().resolve("windows");
+                path = nativesPath.resolve("windows");
                 break;
             case MACOSX:
-                path = PathManager.getInstance().getNativesPath().resolve("macosx");
+                path = nativesPath.resolve("macosx");
                 break;
             case LINUX:
-                path = PathManager.getInstance().getNativesPath().resolve("linux");
+                path = nativesPath.resolve("linux");
                 break;
             default:
                 throw new UnsupportedOperationException("Unsupported operating system: " + System.getProperty("os" +
@@ -344,6 +335,18 @@ public final class PathManager {
         System.setProperty("net.java.games.input.librarypath", natives);  // libjinput
         System.setProperty("org.terasology.librarypath", natives); // JNBullet
 
+    }
+
+    protected ImmutableList<Path> defaultModPaths() throws IOException {
+        Path homeModPath = homePath.resolve(MODULE_DIR);
+        Path modCachePath = homePath.resolve(MODULE_CACHE_DIR);
+
+        if (Files.isSameFile(homePath, installPath)) {
+            return ImmutableList.of(modCachePath, homeModPath);
+        } else {
+            Path installModPath = installPath.resolve(MODULE_DIR);
+            return ImmutableList.of(installModPath, modCachePath, homeModPath);
+        }
     }
 
     public Path getHomeModPath() {
@@ -360,5 +363,28 @@ public final class PathManager {
 
     public Path getSandboxPath(String title) {
         return getSandboxPath().resolve(title.replaceAll(REGEX, ""));
+    }
+
+    /**
+     * The Path value from a Field.
+     *
+     * Provided as a workaround for the fact that we can't have checked exceptions in iterator methods.
+     */
+    private Path getField(Field field) {
+        try {
+            return (Path) field.get(this);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException("Failed to get own field " + field, e);
+        }
+    }
+
+    /** All Paths known to this PathManager. */
+    private List<Path> getAllPaths() {
+        // This uses reflection to be less likely to be out of date after we add more Path fields.
+        List<Path> allPaths = Arrays.stream(PathManager.class.getDeclaredFields())
+                .filter(field -> Path.class.isAssignableFrom(field.getType()))
+                .map(this::getField).collect(Collectors.toList());
+        allPaths.addAll(modPaths);
+        return allPaths;
     }
 }

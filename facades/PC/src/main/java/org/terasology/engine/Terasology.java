@@ -18,7 +18,6 @@ import org.terasology.engine.subsystem.common.ConfigurationSubsystem;
 import org.terasology.engine.subsystem.common.ThreadManager;
 import org.terasology.engine.subsystem.common.hibernation.HibernationSubsystem;
 import org.terasology.engine.subsystem.config.BindsSubsystem;
-import org.terasology.engine.subsystem.discordrpc.DiscordRPCSubSystem;
 import org.terasology.engine.subsystem.headless.HeadlessAudio;
 import org.terasology.engine.subsystem.headless.HeadlessGraphics;
 import org.terasology.engine.subsystem.headless.HeadlessInput;
@@ -36,6 +35,7 @@ import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameInfo;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameProvider;
 import org.terasology.splash.SplashScreen;
 import org.terasology.splash.SplashScreenBuilder;
+import org.terasology.subsystem.discordrpc.DiscordRPCSubSystem;
 
 import java.awt.GraphicsEnvironment;
 import java.io.IOException;
