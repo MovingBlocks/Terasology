@@ -6,7 +6,6 @@ package org.terasology.engine.core.bootstrap;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.engine.audio.events.PlaySoundEvent;
 import org.terasology.engine.context.Context;
-import org.terasology.engine.core.SimpleUri;
 import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.entitySystem.entity.EntityManager;
@@ -26,6 +25,7 @@ import org.terasology.engine.entitySystem.systems.internal.DoNotAutoRegister;
 import org.terasology.engine.input.cameraTarget.CameraTargetChangedEvent;
 import org.terasology.engine.input.events.InputEvent;
 import org.terasology.engine.logic.characters.CharacterMoveInputEvent;
+import org.terasology.engine.network.NetworkEventSystemDecorator;
 import org.terasology.engine.network.NetworkSystem;
 import org.terasology.engine.persistence.typeHandling.TypeHandlerLibraryImpl;
 import org.terasology.engine.persistence.typeHandling.extensionTypes.EntityRefTypeHandler;
@@ -38,6 +38,7 @@ import org.terasology.engine.recording.RecordAndReplaySerializer;
 import org.terasology.engine.recording.RecordAndReplayStatus;
 import org.terasology.engine.recording.RecordAndReplayUtils;
 import org.terasology.engine.recording.RecordedEventStore;
+import org.terasology.engine.recording.RecordingEventSystemDecorator;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.naming.Name;
 import org.terasology.nui.properties.OneOfProviderFactory;
@@ -154,7 +155,9 @@ public final class EntitySystemSetupUtil {
                     recordAndReplaySerializer, recordAndReplayUtils, selectedClassesToRecord, recordAndReplayCurrentStatus);
         } else {
             EventCatcher eventCatcher = new EventCatcher(selectedClassesToRecord, recordedEventStore);
-            eventSystem = new EventSystemImpl(library.getEventLibrary(), networkSystem, eventCatcher, recordAndReplayCurrentStatus);
+            eventSystem = new EventSystemImpl(networkSystem.getMode().isAuthority());
+            eventSystem = new NetworkEventSystemDecorator(eventSystem, networkSystem, library.getEventLibrary());
+            eventSystem = new RecordingEventSystemDecorator(eventSystem, eventCatcher, recordAndReplayCurrentStatus);
         }
         return eventSystem;
     }
@@ -172,7 +175,7 @@ public final class EntitySystemSetupUtil {
     private static void registerEvents(EventSystem eventSystem, ModuleEnvironment environment) {
         for (Class<? extends Event> type : environment.getSubtypesOf(Event.class)) {
             if (type.getAnnotation(DoNotAutoRegister.class) == null) {
-                eventSystem.registerEvent(new SimpleUri(environment.getModuleProviding(type), type.getSimpleName()), type);
+                eventSystem.registerEvent(new ResourceUrn(environment.getModuleProviding(type).toString(), type.getSimpleName()), type);
             }
         }
     }

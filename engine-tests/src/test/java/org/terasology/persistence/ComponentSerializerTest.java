@@ -20,6 +20,7 @@ import org.terasology.engine.entitySystem.metadata.ComponentLibrary;
 import org.terasology.engine.entitySystem.stubs.GetterSetterComponent;
 import org.terasology.engine.entitySystem.stubs.IntegerComponent;
 import org.terasology.engine.entitySystem.stubs.StringComponent;
+import org.terasology.engine.network.NetworkMode;
 import org.terasology.engine.network.NetworkSystem;
 import org.terasology.engine.persistence.serializers.ComponentSerializer;
 import org.terasology.engine.persistence.typeHandling.TypeHandlerLibraryImpl;
@@ -35,6 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  */
@@ -62,6 +64,7 @@ public class ComponentSerializerTest {
         serializationLibrary.addTypeHandler(Quaternionf.class, new QuaternionfTypeHandler());
 
         NetworkSystem networkSystem = mock(NetworkSystem.class);
+        when(networkSystem.getMode()).thenReturn(NetworkMode.NONE);
         context.put(NetworkSystem.class, networkSystem);
         EntitySystemSetupUtil.addReflectionBasedLibraries(context);
         EntitySystemSetupUtil.addEntityManagementRelatedClasses(context);

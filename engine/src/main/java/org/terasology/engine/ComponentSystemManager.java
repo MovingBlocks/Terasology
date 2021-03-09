@@ -73,7 +73,7 @@ public class ComponentSystemManager {
             }
             Name moduleId = environment.getModuleProviding(type);
             RegisterSystem registerInfo = type.getAnnotation(RegisterSystem.class);
-            if (registerInfo.value().isValidFor(netMode, isHeadless) && areOptionalRequirementsContained(registerInfo, environment)) {
+            if (registerInfo.value().isValidFor(netMode.isAuthority(), isHeadless) && areOptionalRequirementsContained(registerInfo, environment)) {
                 systemsByModule.put(moduleId, type);
             }
         }
