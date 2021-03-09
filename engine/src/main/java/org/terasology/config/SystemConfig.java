@@ -1,114 +1,80 @@
-/*
- * Copyright 2013 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.config;
 
+import org.terasology.config.flexible.AutoConfig;
+import org.terasology.config.flexible.Setting;
+import org.terasology.config.flexible.constraints.NumberRangeConstraint;
+
 import java.util.Locale;
 import java.util.Locale.Category;
+import java.util.Optional;
 
-public class SystemConfig {
+import static org.terasology.config.flexible.SettingArgument.constraint;
+import static org.terasology.config.flexible.SettingArgument.defaultValue;
+import static org.terasology.config.flexible.SettingArgument.override;
+import static org.terasology.config.flexible.SettingArgument.type;
+
+public class SystemConfig extends AutoConfig {
     public static final String SAVED_GAMES_ENABLED_PROPERTY = "org.terasology.savedGamesEnabled";
     public static final String PERMISSIVE_SECURITY_ENABLED_PROPERTY = "org.terasology.permissiveSecurityEnabled";
 
-    private long dayNightLengthInMs;
-    private int maxThreads;
-    private int maxSecondsBetweenSaves;
-    private int maxUnloadedChunksPercentageTillSave;
-    private boolean debugEnabled;
-    private boolean monitoringEnabled;
-    private boolean writeSaveGamesEnabled;
-    private long chunkGenerationFailTimeoutInMs;
-    private String locale;
+    public final Setting<Long> dayNightLengthInMs = setting(
+            type(Long.class),
+            defaultValue(1800000L),
+            constraint(new NumberRangeConstraint<>(0L, Long.MAX_VALUE, false, false))
+    );
 
-    public long getDayNightLengthInMs() {
-        return dayNightLengthInMs;
-    }
+    public final Setting<Integer> maxThreads = setting(
+            type(Integer.class),
+            defaultValue(Runtime.getRuntime().availableProcessors() - 1),
+            constraint(new NumberRangeConstraint<>(0, Integer.MAX_VALUE, false, false))
+    );
 
-    public void setDayNightLengthInMs(long dayNightLengthInMs) {
-        this.dayNightLengthInMs = dayNightLengthInMs;
-    }
+    public final Setting<Integer> maxSecondsBetweenSaves = setting(
+            type(Integer.class),
+            defaultValue(60),
+            constraint(new NumberRangeConstraint<>(0, Integer.MAX_VALUE, false, false))
+    );
 
-    public int getMaxThreads() {
-        return maxThreads;
-    }
+    public final Setting<Integer> maxUnloadedChunksPercentageTillSave = setting(
+            type(Integer.class),
+            defaultValue(40),
+            constraint(new NumberRangeConstraint<>(0, 100, false, false))
+    );
 
-    public void setMaxThreads(int maxThreads) {
-        this.maxThreads = maxThreads;
-    }
+    public final Setting<Boolean> debugEnabled = setting(
+            type(Boolean.class),
+            defaultValue(false)
+    );
 
-    public int getMaxSecondsBetweenSaves() {
-        return maxSecondsBetweenSaves;
-    }
+    public final Setting<Boolean> monitoringEnabled = setting(
+            type(Boolean.class),
+            defaultValue(false)
+    );
 
-    public void setMaxSecondsBetweenSaves(int maxSecondsBetweenSaves) {
-        this.maxSecondsBetweenSaves = maxSecondsBetweenSaves;
-    }
+    public final Setting<Boolean> writeSaveGamesEnabled = setting(
+            type(Boolean.class),
+            defaultValue(true),
+            override(() -> Optional.ofNullable(
+                    System.getProperty(SAVED_GAMES_ENABLED_PROPERTY))
+                    .map(Boolean::parseBoolean))
+    );
 
-    public int getMaxUnloadedChunksPercentageTillSave() {
-        return maxUnloadedChunksPercentageTillSave;
-    }
+    public final Setting<Long> chunkGenerationFailTimeoutInMs = setting(
+            type(Long.class),
+            defaultValue(1800000L),
+            constraint(new NumberRangeConstraint<>(0L, Long.MAX_VALUE, false, false))
+    );
 
-    public void setMaxUnloadedChunksPercentageTillSave(int maxUnloadedChunksPercentageTillSave) {
-        this.maxUnloadedChunksPercentageTillSave = maxUnloadedChunksPercentageTillSave;
-    }
+    public final Setting<Locale> locale = setting(
+            type(Locale.class),
+            defaultValue(Locale.getDefault(Category.DISPLAY))
+    );
 
-    public boolean isDebugEnabled() {
-        return debugEnabled;
-    }
-
-    public void setDebugEnabled(boolean debugEnabled) {
-        this.debugEnabled = debugEnabled;
-    }
-
-    public boolean isMonitoringEnabled() {
-        return monitoringEnabled;
-    }
-
-    public void setMonitoringEnabled(boolean monitoringEnabled) {
-        this.monitoringEnabled = monitoringEnabled;
-    }
-
-    public boolean isWriteSaveGamesEnabled() {
-        String property = System.getProperty(SAVED_GAMES_ENABLED_PROPERTY);
-        if (property != null) {
-            return Boolean.parseBoolean(property);
-        }
-        return writeSaveGamesEnabled;
-    }
-
-    public void setWriteSaveGamesEnabled(boolean writeSaveGamesEnabled) {
-        this.writeSaveGamesEnabled = writeSaveGamesEnabled;
-    }
-
-    public long getChunkGenerationFailTimeoutInMs() {
-        return chunkGenerationFailTimeoutInMs;
-    }
-
-    public void setChunkGenerationFailTimeoutInMs(long chunkGenerationFailTimeoutInMs) {
-        this.chunkGenerationFailTimeoutInMs = chunkGenerationFailTimeoutInMs;
-    }
-
-    public Locale getLocale() {
-        if (locale == null) {
-            setLocale(Locale.getDefault(Category.DISPLAY));
-        }
-        return Locale.forLanguageTag(locale);
-    }
-
-    public void setLocale(Locale locale) {
-        this.locale = locale.toLanguageTag();
+    @Override
+    public String getName() {
+        return "${engine:menu#system-settings-title}";
     }
 }

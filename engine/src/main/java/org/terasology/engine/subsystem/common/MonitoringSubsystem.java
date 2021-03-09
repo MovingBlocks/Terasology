@@ -16,6 +16,7 @@
 package org.terasology.engine.subsystem.common;
 
 import org.terasology.config.Config;
+import org.terasology.config.SystemConfig;
 import org.terasology.context.Context;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.subsystem.EngineSubsystem;
@@ -32,7 +33,7 @@ public class MonitoringSubsystem implements EngineSubsystem {
 
     @Override
     public void initialise(GameEngine engine, Context rootContext) {
-        if (rootContext.get(Config.class).getSystem().isMonitoringEnabled()) {
+        if (rootContext.get(SystemConfig.class).monitoringEnabled.get()) {
             advancedMonitor = new AdvancedMonitor();
             advancedMonitor.setVisible(true);
         }

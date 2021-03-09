@@ -3,6 +3,7 @@
 package org.terasology.logic.players;
 
 import org.terasology.config.Config;
+import org.terasology.config.SystemConfig;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.EventPriority;
 import org.terasology.entitySystem.event.ReceiveEvent;
@@ -35,6 +36,8 @@ public class DebugControlSystem extends BaseComponentSystem {
     
     @In
     private Config config;
+    @In
+    private SystemConfig systemConfig;
 
     @In
     private NUIManager nuiManager;
@@ -73,7 +76,7 @@ public class DebugControlSystem extends BaseComponentSystem {
      */
     @ReceiveEvent(components = ClientComponent.class)
     public void onKeyEvent(KeyEvent event, EntityRef entity) {
-        boolean debugEnabled = config.getSystem().isDebugEnabled();
+        boolean debugEnabled = systemConfig.debugEnabled.get();
         // Features for debug mode only
         if (debugEnabled && event.isDown()) {
             switch (event.getKey().getId()) {
@@ -97,7 +100,7 @@ public class DebugControlSystem extends BaseComponentSystem {
     
     @ReceiveEvent(components = ClientComponent.class)
     public void onKeyDown(KeyDownEvent event, EntityRef entity) {
-        boolean debugEnabled = config.getSystem().isDebugEnabled();
+        boolean debugEnabled = systemConfig.debugEnabled.get();
         // Features for debug mode only
         if (debugEnabled) {
             switch (event.getKey().getId()) {
@@ -131,7 +134,7 @@ public class DebugControlSystem extends BaseComponentSystem {
                 event.consume();
                 break;
             case Keyboard.KeyId.F3:
-                config.getSystem().setDebugEnabled(!config.getSystem().isDebugEnabled());
+                systemConfig.debugEnabled.set(!systemConfig.debugEnabled.get());
                 event.consume();
                 break;
             case Keyboard.KeyId.F4:

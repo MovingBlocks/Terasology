@@ -18,6 +18,7 @@ package org.terasology.telemetry.metrics;
 import com.snowplowanalytics.snowplow.tracker.events.Unstructured;
 import org.terasology.config.Config;
 import org.terasology.config.PlayerConfig;
+import org.terasology.config.SystemConfig;
 import org.terasology.context.Context;
 import org.terasology.network.NetworkSystem;
 import org.terasology.registry.CoreRegistry;
@@ -93,7 +94,8 @@ public final class GameConfigurationMetric extends Metric {
 
     private void fetchConfig() {
         Config config = context.get(Config.class);
-        language = config.getSystem().getLocale().toString();
+        SystemConfig systemConfig = context.get(SystemConfig.class);
+        language = systemConfig.locale.get().toString();
 
         PlayerConfig playerConfig = config.getPlayer();
         playerHeight = playerConfig.getHeight();

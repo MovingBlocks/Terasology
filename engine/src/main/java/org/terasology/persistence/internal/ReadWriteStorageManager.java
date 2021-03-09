@@ -23,6 +23,7 @@ import org.joml.Vector3ic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
+import org.terasology.config.SystemConfig;
 import org.terasology.config.UniverseConfig;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.Time;
@@ -98,6 +99,7 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
     private final Lock worldDirectoryWriteLock = worldDirectoryLock.writeLock();
     private SaveTransaction saveTransaction;
     private Config config;
+    private SystemConfig systemConfig;
 
     /**
      * Time of the next save in the format that {@link System#currentTimeMillis()} returns.
@@ -142,6 +144,7 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
         this.saveTransactionHelper = new SaveTransactionHelper(getStoragePathProvider());
         this.saveThreadManager = TaskMaster.createFIFOTaskMaster("Saving", 1);
         this.config = CoreRegistry.get(Config.class);
+        this.systemConfig = CoreRegistry.get((SystemConfig.class));
         this.entityRefReplacingComponentLibrary = privateEntityManager.getComponentLibrary()
                 .createCopyUsingCopyStrategy(EntityRef.class, new DelayedEntityRefCopyStrategy(this));
         this.entitySetDeltaRecorder = new EntitySetDeltaRecorder(this.entityRefReplacingComponentLibrary);
@@ -456,7 +459,7 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
         int loadedChunkCount = chunkProvider.getAllChunks().size();
         double totalChunkCount = unloadedChunkCount + loadedChunkCount;
         double percentageUnloaded = 100.0 * unloadedChunkCount / totalChunkCount;
-        if (percentageUnloaded >= config.getSystem().getMaxUnloadedChunksPercentageTillSave()) {
+        if (percentageUnloaded >= systemConfig.maxUnloadedChunksPercentageTillSave.get()) {
             return true;
         }
 
@@ -469,7 +472,7 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
     }
 
     private void scheduleNextAutoSave() {
-        long msBetweenAutoSave = (long) config.getSystem().getMaxSecondsBetweenSaves() * 1000;
+        long msBetweenAutoSave = (long) systemConfig.maxSecondsBetweenSaves.get() * 1000;
         nextAutoSave = System.currentTimeMillis() + msBetweenAutoSave;
     }
 
