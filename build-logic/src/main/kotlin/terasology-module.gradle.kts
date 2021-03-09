@@ -72,11 +72,6 @@ dependencies {
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
 
     testImplementation("org.mockito:mockito-junit-jupiter:3.7.7")
-
-    //backwards compatibility with modules tests
-    testImplementation("junit:junit:4.13.1")
-    testImplementation("org.junit.jupiter:junit-jupiter-migrationsupport")
-    testRuntimeOnly("org.junit.vintage:junit-vintage-engine")
 }
 
 
@@ -90,9 +85,6 @@ if (project.name == "ModuleTestingEnvironment") {
         add("implementation", platform("org.junit:junit-bom:5.7.1"))
         implementation("org.junit.jupiter:junit-jupiter-api")
         implementation("org.mockito:mockito-junit-jupiter:3.7.7")
-        implementation("junit:junit:4.13.1")
-        //TODO: Remove shrinkwrap from code, you have FileSystem in java 8
-        implementation("org.jboss.shrinkwrap:shrinkwrap-depchain-java7:1.2.1")
     }
 }
 

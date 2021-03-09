@@ -14,8 +14,8 @@ import kotlin.test.fail
 
 plugins {
     application
-    `terasology-dist`
-    facade
+    id("terasology-dist")
+    id("facade")
 }
 
 // Grab all the common stuff like plugins to use, artifact repositories, code analysis config
@@ -61,7 +61,7 @@ group = "org.terasology.facades"
 
 dependencies {
     implementation(project(":engine"))
-    implementation(group = "org.reflections", name = "reflections", version = "0.9.10")
+    implementation("org.terasology:reflections:0.9.12-MB")
     implementation(project(":subsystems:DiscordRPC"))
 
     // TODO: Consider whether we can move the CR dependency back here from the engine, where it is referenced from the main menu

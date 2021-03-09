@@ -20,7 +20,7 @@ repositories {
 
 dependencies {
     // Needed for caching reflected data during builds
-    implementation("org.reflections:reflections:0.9.10")
+    implementation("org.terasology:reflections:0.9.12-MB")
     implementation("dom4j:dom4j:1.6.1")
 
     // for inspecting modules
@@ -28,3 +28,5 @@ dependencies {
 
     api(kotlin("test"))
 }
+
+group = "org.terasology.gradology"
