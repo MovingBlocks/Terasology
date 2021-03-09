@@ -27,6 +27,7 @@ import org.terasology.entitySystem.event.EventPriority;
 import org.terasology.entitySystem.event.PendingEvent;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.ComponentSystem;
+import org.terasology.monitoring.PerformanceMonitor;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
