@@ -37,6 +37,8 @@ import org.terasology.world.block.tiles.NullWorldAtlas;
 import org.terasology.world.chunks.Chunks;
 import org.terasology.world.propagation.light.LightPropagationRules;
 
+import java.util.Collections;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class BulkLightPropagationTest extends TerasologyTestingEnvironment {
@@ -60,8 +62,6 @@ public class BulkLightPropagationTest extends TerasologyTestingEnvironment {
         super.setup();
         lightRules = new LightPropagationRules();
         AssetManager assetManager = CoreRegistry.get(AssetManager.class);
-        blockManager = new BlockManagerImpl(new NullWorldAtlas(), assetManager, true);
-        CoreRegistry.put(BlockManager.class, blockManager);
         BlockFamilyDefinitionData fullLightData = new BlockFamilyDefinitionData();
         fullLightData.getBaseSection().setDisplayName("Torch");
         fullLightData.getBaseSection().setShape(assetManager.getAsset("engine:cube", BlockShape.class).get());
@@ -69,44 +69,43 @@ public class BulkLightPropagationTest extends TerasologyTestingEnvironment {
         fullLightData.getBaseSection().setTranslucent(true);
         fullLightData.setBlockFamily(SymmetricFamily.class);
         assetManager.loadAsset(new ResourceUrn("engine:torch"), fullLightData, BlockFamilyDefinition.class);
-        fullLight = blockManager.getBlock(new BlockUri(new ResourceUrn("engine:torch")));
 
         BlockFamilyDefinitionData weakLightData = new BlockFamilyDefinitionData();
         weakLightData.getBaseSection().setDisplayName("PartLight");
-        weakLightData.getBaseSection().setShape(assetManager.getAsset("engine:cube", BlockShape.class).get());
         weakLightData.getBaseSection().setLuminance((byte) 2);
         weakLightData.getBaseSection().setTranslucent(true);
         weakLightData.setBlockFamily(SymmetricFamily.class);
         assetManager.loadAsset(new ResourceUrn("engine:weakLight"), weakLightData, BlockFamilyDefinition.class);
-        weakLight = blockManager.getBlock(new BlockUri(new ResourceUrn("engine:weakLight")));
 
         BlockFamilyDefinitionData mediumLightData = new BlockFamilyDefinitionData();
         mediumLightData.getBaseSection().setDisplayName("MediumLight");
-        mediumLightData.getBaseSection().setShape(assetManager.getAsset("engine:cube", BlockShape.class).get());
         mediumLightData.getBaseSection().setLuminance((byte) 5);
         mediumLightData.getBaseSection().setTranslucent(true);
         mediumLightData.setBlockFamily(SymmetricFamily.class);
         assetManager.loadAsset(new ResourceUrn("engine:mediumLight"), mediumLightData, BlockFamilyDefinition.class);
-        mediumLight = blockManager.getBlock(new BlockUri(new ResourceUrn("engine:mediumLight")));
 
         BlockFamilyDefinitionData solidData = new BlockFamilyDefinitionData();
         solidData.getBaseSection().setDisplayName("Stone");
-        solidData.getBaseSection().setShape(assetManager.getAsset("engine:cube", BlockShape.class).get());
         solidData.getBaseSection().setTranslucent(false);
         solidData.setBlockFamily(SymmetricFamily.class);
         assetManager.loadAsset(new ResourceUrn("engine:stone"), solidData, BlockFamilyDefinition.class);
-        solid = blockManager.getBlock(new BlockUri(new ResourceUrn("engine:stone")));
 
         BlockFamilyDefinitionData solidMediumLightData = new BlockFamilyDefinitionData();
         solidMediumLightData.getBaseSection().setDisplayName("SolidMediumLight");
-        solidMediumLightData.getBaseSection().setShape(assetManager.getAsset("engine:cube", BlockShape.class).get());
         solidMediumLightData.getBaseSection().setTranslucent(false);
         solidMediumLightData.getBaseSection().setLuminance((byte) 5);
         solidMediumLightData.setBlockFamily(SymmetricFamily.class);
-        assetManager.loadAsset(new ResourceUrn("engine:solidMediumLight"), solidMediumLightData,
-                BlockFamilyDefinition.class);
-        solidMediumLight = blockManager.getBlock(new BlockUri(new ResourceUrn("engine:solidMediumLight")));
+        assetManager.loadAsset(new ResourceUrn("engine:solidMediumLight"), solidMediumLightData, BlockFamilyDefinition.class);
 
+        blockManager = new BlockManagerImpl(new NullWorldAtlas(), assetManager, true);
+        blockManager.initialise(Collections.EMPTY_LIST, Collections.EMPTY_MAP);
+        CoreRegistry.put(BlockManager.class, blockManager);
+
+        fullLight = blockManager.getBlock(new BlockUri(new ResourceUrn("engine:torch")));
+        weakLight = blockManager.getBlock(new BlockUri(new ResourceUrn("engine:weakLight")));
+        mediumLight = blockManager.getBlock(new BlockUri(new ResourceUrn("engine:mediumLight")));
+        solid = blockManager.getBlock(new BlockUri(new ResourceUrn("engine:stone")));
+        solidMediumLight = blockManager.getBlock(new BlockUri(new ResourceUrn("engine:solidMediumLight")));
         air = blockManager.getBlock(BlockManager.AIR_ID);
     }
 

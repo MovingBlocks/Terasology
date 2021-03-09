@@ -3,8 +3,10 @@
 package org.terasology.world.block.loader;
 
 import com.google.common.base.Charsets;
+import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
@@ -32,7 +34,6 @@ import org.terasology.utilities.gson.Vector4fTypeAdapter;
 import org.terasology.world.block.BlockPart;
 import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.family.BlockFamilyLibrary;
-import org.terasology.world.block.family.FreeformFamily;
 import org.terasology.world.block.family.HorizontalFamily;
 import org.terasology.world.block.family.MultiSection;
 import org.terasology.world.block.family.SymmetricFamily;
@@ -44,6 +45,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Locale;
@@ -82,14 +84,8 @@ public class BlockFamilyDefinitionFormat extends AbstractAssetFileFormat<BlockFa
             applyDefaults(resourceUrn, data.getBaseSection());
             data.getSections().values().stream().forEach(section -> applyDefaults(resourceUrn, section));
             if (!data.isTemplate()) {
-                if (data.getBlockFamily() == null && data.getBaseSection().getShape() != null) {
-                    if (data.getBaseSection().getShape().isCollisionYawSymmetric()) {
-                        data.setBlockFamily(SymmetricFamily.class);
-                    } else {
-                        data.setBlockFamily(HorizontalFamily.class);
-                    }
-                } else if (data.getBlockFamily() == null) {
-                    data.setBlockFamily(FreeformFamily.class);
+                if (data.getBlockFamily() == null && data.getBaseSection().getShape() == null && data.getBaseSection().getShapes() == null) {
+                    data.getBaseSection().setShapes(Lists.newArrayList(assetManager.getAsset("engine:cube", BlockShape.class).get()));
                 }
             }
 
@@ -202,6 +198,7 @@ public class BlockFamilyDefinitionFormat extends AbstractAssetFileFormat<BlockFa
             }
 
             setObject(data::setShape, jsonObject, "shape", BlockShape.class, context);
+            setArray(data::setShapes, jsonObject, "shapes", BlockShape.class, context);
             setBoolean(data::setWater, jsonObject, "water");
             setBoolean(data::setGrass, jsonObject, "grass");
             setBoolean(data::setIce, jsonObject, "ice");
@@ -287,16 +284,21 @@ public class BlockFamilyDefinitionFormat extends AbstractAssetFileFormat<BlockFa
             }
         }
 
+        private <T> void setArray(Consumer<ArrayList<T>> setter, JsonObject jsonObject, String name, Type type, JsonDeserializationContext context) {
+            JsonArray array = jsonObject.getAsJsonArray(name);
+            if (array != null) {
+                ArrayList<T> list = new ArrayList<>();
+                array.forEach(t -> list.add(context.deserialize(t, type)));
+                setter.accept(list);
+            }
+        }
+
         private BlockFamilyDefinitionData createBaseData(JsonObject jsonObject) {
             JsonPrimitive basedOn = jsonObject.getAsJsonPrimitive("basedOn");
             if (basedOn != null && !basedOn.getAsString().isEmpty()) {
                 Optional<BlockFamilyDefinition> baseDef = assetManager.getAsset(basedOn.getAsString(), BlockFamilyDefinition.class);
                 if (baseDef.isPresent()) {
-                    BlockFamilyDefinitionData data = baseDef.get().getData();
-                    if (data.getBlockFamily() == FreeformFamily.class) {
-                        data.setBlockFamily(null);
-                    }
-                    return data;
+                    return baseDef.get().getData();
                 } else {
                     throw new JsonParseException("Unable to resolve based block definition '" + basedOn.getAsString() + "'");
                 }

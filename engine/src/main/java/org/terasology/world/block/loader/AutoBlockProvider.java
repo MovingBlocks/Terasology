@@ -22,7 +22,7 @@ import org.terasology.assets.management.AssetManager;
 import org.terasology.assets.module.annotations.RegisterAssetDataProducer;
 import org.terasology.naming.Name;
 import org.terasology.world.block.BlockPart;
-import org.terasology.world.block.family.FreeformFamily;
+import org.terasology.world.block.family.SymmetricFamily;
 import org.terasology.world.block.sounds.BlockSounds;
 import org.terasology.world.block.tiles.BlockTile;
 
@@ -74,7 +74,7 @@ public class AutoBlockProvider implements AssetDataProducer<BlockFamilyDefinitio
                 data.getBaseSection().getBlockTiles().put(part, blockTile.get());
             }
             data.getBaseSection().setSounds(assetManager.getAsset("engine:default", BlockSounds.class).get());
-            data.setBlockFamily(FreeformFamily.class);
+            data.setBlockFamily(SymmetricFamily.class);
             return Optional.of(data);
         }
         return Optional.empty();

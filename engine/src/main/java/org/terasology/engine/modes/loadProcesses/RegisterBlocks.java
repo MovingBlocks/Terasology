@@ -62,12 +62,7 @@ public class RegisterBlocks extends SingleStepLoadProcess {
 
 
         BlockManagerImpl blockManager;
-        if (networkSystem.getMode().isAuthority()) {
-            blockManager = new BlockManagerImpl(atlas, context.get(AssetManager.class), true);
-            blockManager.subscribe(context.get(NetworkSystem.class));
-        } else {
-            blockManager = new BlockManagerImpl(atlas, context.get(AssetManager.class), false);
-        }
+        blockManager = new BlockManagerImpl(atlas, context.get(AssetManager.class), networkSystem.getMode().isAuthority());
         context.put(BlockManager.class, blockManager);
         context.get(TypeHandlerLibrary.class).addTypeHandler(Block.class, new BlockTypeHandler(blockManager));
         context.get(TypeHandlerLibrary.class).addTypeHandler(BlockFamily.class, new BlockFamilyTypeHandler(blockManager));

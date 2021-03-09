@@ -1021,15 +1021,4 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     void mockHost() {
         mode = NetworkMode.DEDICATED_SERVER;
     }
-
-    @Override
-    public void onBlockFamilyRegistered(BlockFamily family) {
-        if (mode.isServer()) {
-            for (NetClient client : netClientList) {
-                client.blockFamilyRegistered(family);
-            }
-        }
-    }
-
-
 }

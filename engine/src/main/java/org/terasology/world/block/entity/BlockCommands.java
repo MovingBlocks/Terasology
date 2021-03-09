@@ -46,7 +46,6 @@ import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockComponent;
-import org.terasology.world.block.BlockExplorer;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.BlockUri;
 import org.terasology.world.block.family.BlockFamily;
@@ -104,12 +103,10 @@ public class BlockCommands extends BaseComponentSystem {
     private WorldProviderCoreImpl worldImpl;
 
     private BlockItemFactory blockItemFactory;
-    private BlockExplorer blockExplorer;
 
     @Override
     public void initialise() {
         blockItemFactory = new BlockItemFactory(entityManager);
-        blockExplorer = new BlockExplorer(assetManager);
         targetSystem = new TargetSystem(blockRegistry, physics);
     }
 
@@ -132,19 +129,6 @@ public class BlockCommands extends BaseComponentSystem {
         }
         stringBuilder.append(Console.NEW_LINE);
 
-        stringBuilder.append("Available Blocks");
-        stringBuilder.append(Console.NEW_LINE);
-        stringBuilder.append("----------------");
-        stringBuilder.append(Console.NEW_LINE);
-        List<BlockUri> availableBlocks = sortItems(blockExplorer.getAvailableBlockFamilies());
-        for (BlockUri blockUri : availableBlocks) {
-            if (!uriStartsWithAnyString(blockUri.toString(), startsWith)) {
-                continue;
-            }
-            stringBuilder.append(blockUri.toString());
-            stringBuilder.append(Console.NEW_LINE);
-        }
-
         return stringBuilder.toString();
     }
 
@@ -159,29 +143,6 @@ public class BlockCommands extends BaseComponentSystem {
         stringBuilder.append(Console.NEW_LINE);
         List<ResourceUrn> sortedUris = sortItems(Assets.list(BlockShape.class));
         for (ResourceUrn uri : sortedUris) {
-            if (!uriStartsWithAnyString(uri.toString(), startsWith)) {
-                continue;
-            }
-            stringBuilder.append(uri.toString());
-            stringBuilder.append(Console.NEW_LINE);
-        }
-
-        return stringBuilder.toString();
-    }
-
-    @Command(shortDescription = "Lists available free shape blocks",
-            helpText = "Lists all the available free shape blocks. These blocks can be created with any shape.\n" +
-                    "You can filter by adding the beginning of words after the commands, e.g.: \"listFreeShapeBlocks" +
-                    "engine: core\" will list all free shape blocks from the engine and modules starting with 'core'",
-            requiredPermission = PermissionManager.CHEAT_PERMISSION)
-    public String listFreeShapeBlocks(@CommandParam(value = "startsWith", required = false) String[] startsWith) {
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("Free Shape Blocks");
-        stringBuilder.append(Console.NEW_LINE);
-        stringBuilder.append("-----------------");
-        stringBuilder.append(Console.NEW_LINE);
-        List<BlockUri> sortedUris = sortItems(blockExplorer.getFreeformBlockFamilies());
-        for (BlockUri uri : sortedUris) {
             if (!uriStartsWithAnyString(uri.toString(), startsWith)) {
                 continue;
             }
@@ -282,28 +243,24 @@ public class BlockCommands extends BaseComponentSystem {
         if (matchingUris.size() == 1) {
             Optional<BlockFamilyDefinition> def = Assets.get(matchingUris.iterator().next(), BlockFamilyDefinition.class);
             if (def.isPresent()) {
-                if (def.get().isFreeform()) {
-                    if (shapeUriParam == null) {
-                        blockFamily = blockManager.getBlockFamily(new BlockUri(def.get().getUrn(), new ResourceUrn("engine:cube")));
-                    } else {
-                        Set<ResourceUrn> resolvedShapeUris = Assets.resolveAssetUri(shapeUriParam, BlockShape.class);
-                        if (resolvedShapeUris.isEmpty()) {
-                            return "Found block. No shape found for '" + shapeUriParam + "'";
-                        } else if (resolvedShapeUris.size() > 1) {
-                            StringBuilder builder = new StringBuilder();
-                            builder.append("Found block. Non-unique shape name, possible matches: ");
-                            Iterator<ResourceUrn> shapeUris = sortItems(resolvedShapeUris).iterator();
-                            while (shapeUris.hasNext()) {
-                                builder.append(shapeUris.next().toString());
-                                if (shapeUris.hasNext()) {
-                                    builder.append(", ");
-                                }
+                if (shapeUriParam != null) {
+                    Set<ResourceUrn> resolvedShapeUris = Assets.resolveAssetUri(shapeUriParam, BlockShape.class);
+                    if (resolvedShapeUris.isEmpty()) {
+                        return "Found block. No shape found for '" + shapeUriParam + "'";
+                    } else if (resolvedShapeUris.size() > 1) {
+                        StringBuilder builder = new StringBuilder();
+                        builder.append("Found block. Non-unique shape name, possible matches: ");
+                        Iterator<ResourceUrn> shapeUris = sortItems(resolvedShapeUris).iterator();
+                        while (shapeUris.hasNext()) {
+                            builder.append(shapeUris.next().toString());
+                            if (shapeUris.hasNext()) {
+                                builder.append(", ");
                             }
-
-                            return builder.toString();
                         }
-                        blockFamily = blockManager.getBlockFamily(new BlockUri(def.get().getUrn(), resolvedShapeUris.iterator().next()));
+
+                        return builder.toString();
                     }
+                    blockFamily = blockManager.getBlockFamily(new BlockUri(def.get().getUrn(), resolvedShapeUris.iterator().next()));
                 } else {
                     blockFamily = blockManager.getBlockFamily(new BlockUri(def.get().getUrn()));
                 }

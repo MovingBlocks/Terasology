@@ -23,7 +23,6 @@ import org.terasology.entitySystem.metadata.EventLibrary;
 import org.terasology.network.exceptions.HostingFailedException;
 import org.terasology.nui.Color;
 import org.terasology.world.BlockEntityRegistry;
-import org.terasology.world.block.internal.BlockRegistrationListener;
 import org.terasology.world.chunks.remoteChunkProvider.RemoteChunkProvider;
 
 /**
@@ -31,7 +30,7 @@ import org.terasology.world.chunks.remoteChunkProvider.RemoteChunkProvider;
  *
  */
 // TODO: Refactor the core gameplay components like the list of players into a separate system.
-public interface NetworkSystem extends BlockRegistrationListener {
+public interface NetworkSystem {
 
     void host(int port, boolean dedicatedServer) throws HostingFailedException;
 

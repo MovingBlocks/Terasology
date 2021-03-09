@@ -17,10 +17,16 @@ package org.terasology.engine.modes.loadProcesses;
 
 import org.terasology.context.Context;
 import org.terasology.engine.modes.SingleStepLoadProcess;
+import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityManager;
+import org.terasology.entitySystem.metadata.ComponentMetadata;
+import org.terasology.entitySystem.prefab.Prefab;
+import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
+import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.internal.BlockManagerImpl;
-import org.terasology.world.block.internal.BlockPrefabManager;
+
+import java.util.Optional;
 
 /**
  */
@@ -40,7 +46,29 @@ public class ProcessBlockPrefabs extends SingleStepLoadProcess {
     @Override
     public boolean step() {
         BlockManagerImpl blockManager = (BlockManagerImpl) context.get(BlockManager.class);
-        blockManager.subscribe(new BlockPrefabManager(context.get(EntityManager.class), blockManager));
+        EntityManager entityManager = context.get(EntityManager.class);
+
+        for (BlockFamily blockFamily : blockManager.listRegisteredBlockFamilies()) {
+            for (Block block : blockFamily.getBlocks()) {
+                Optional<Prefab> prefab = block.getPrefab();
+                boolean keepActive = block.isKeepActive();
+                boolean requiresLifecycleEvents = false;
+                if (prefab.isPresent()) {
+                    for (Component comp : prefab.get().iterateComponents()) {
+                        ComponentMetadata<?> metadata = entityManager.getComponentLibrary().getMetadata(comp.getClass());
+                        if (metadata.isForceBlockActive()) {
+                            keepActive = true;
+                            break;
+                        }
+                        if (metadata.isBlockLifecycleEventsRequired()) {
+                            requiresLifecycleEvents = true;
+                        }
+                    }
+                }
+                block.setKeepActive(keepActive);
+                block.setLifecycleEventsRequired(requiresLifecycleEvents && !keepActive);
+            }
+        }
         return true;
     }
 

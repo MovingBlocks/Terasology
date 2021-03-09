@@ -66,8 +66,6 @@ public class BlockManagerImpl extends BlockManager {
 
     private AtomicReference<RegisteredState> registeredBlockInfo = new AtomicReference<>(new RegisteredState());
 
-    private Set<BlockRegistrationListener> listeners = Sets.newLinkedHashSet();
-
 
     private boolean generateNewIds;
     private AtomicInteger nextId = new AtomicInteger(1);
@@ -88,6 +86,11 @@ public class BlockManagerImpl extends BlockManager {
         this.blockBuilder = new BlockBuilder(atlas);
     }
 
+    /**
+     * Put all the existing families and blocks from the manifest back with the
+     * same IDs, and if this is the authority (singleplayer or server), check
+     * for any other block family definitions and register all of those as well.
+     */
     public void initialise(List<String> registeredBlockFamilies,
                            Map<String, Short> knownBlockMappings) {
 
@@ -100,27 +103,50 @@ public class BlockManagerImpl extends BlockManager {
 
         for (String rawFamilyUri : registeredBlockFamilies) {
             try {
-                BlockUri familyUri = new BlockUri(rawFamilyUri);
-                Optional<BlockFamily> family = loadFamily(familyUri);
-                if (family.isPresent()) {
-                    for (Block block : family.get().getBlocks()) {
-                        Short id = knownBlockMappings.get(block.getURI().toString());
-                        if (id != null) {
-                            block.setId(id);
-                        } else {
-                            logger.error("Missing id for block {} in provided family {}", block.getURI(), family.get().getURI());
-                            if (generateNewIds) {
-                                block.setId(getNextId());
-                            } else {
-                                block.setId(UNKNOWN_ID);
-                            }
-                        }
-                    }
-                    registerFamily(family.get());
-                }
+                addFamily(new BlockUri(rawFamilyUri), knownBlockMappings);
             } catch (BlockUriParseException e) {
                 logger.error("Failed to parse block family, skipping", e);
             }
+        }
+        if (generateNewIds) {
+            Set<ResourceUrn> availableFamilies = assetManager.getAvailableAssets(BlockFamilyDefinition.class);
+            for (ResourceUrn familyUrn : availableFamilies) {
+                BlockFamily existingFamily = getBlockFamily(new BlockUri(familyUrn));
+                if (null == existingFamily) {
+                    assetManager.getAsset(familyUrn, BlockFamilyDefinition.class).ifPresent(def -> {
+                        if (def.isFreeform()) {
+                            for (BlockShape shape : def.getData().getBaseSection().getShapes()) {
+                                addFamily(new BlockUri(familyUrn, shape.getUrn()), knownBlockMappings);
+                            }
+                        } else {
+                            addFamily(new BlockUri(familyUrn), knownBlockMappings);
+                        }
+                    });
+                }
+            }
+        }
+    }
+    
+    /**
+     * Load a family from its assets and then register it and its blocks, respecting existing block IDs.
+     */
+    private void addFamily(BlockUri familyUri, Map<String, Short> knownBlockMappings) {
+        Optional<BlockFamily> family = loadFamily(familyUri);
+        if (family.isPresent()) {
+            for (Block block : family.get().getBlocks()) {
+                Short id = knownBlockMappings.get(block.getURI().toString());
+                if (id != null) {
+                    block.setId(id);
+                } else {
+                    logger.error("Missing id for block {} in provided family {}", block.getURI(), family.get().getURI());
+                    if (generateNewIds) {
+                        block.setId(getNextId());
+                    } else {
+                        block.setId(UNKNOWN_ID);
+                    }
+                }
+            }
+            registerFamily(family.get());
         }
     }
 
@@ -149,35 +175,9 @@ public class BlockManagerImpl extends BlockManager {
         return airBlock;
     }
 
-    public void subscribe(BlockRegistrationListener listener) {
-        this.listeners.add(listener);
-    }
-
-    public void unsubscribe(BlockRegistrationListener listener) {
-        this.listeners.remove(listener);
-    }
-
-    public void receiveFamilyRegistration(BlockUri familyUri, Map<String, Integer> registration) {
-        Optional<BlockFamily> family = loadFamily(familyUri);
-        if (family.isPresent()) {
-            lock.lock();
-            try {
-                for (Block block : family.get().getBlocks()) {
-                    Integer id = registration.get(block.getURI().toString());
-                    if (id != null) {
-                        block.setId((short) id.intValue());
-                    } else {
-                        logger.error("Missing id for block {} in registered family {}", block.getURI(), familyUri);
-                        block.setId(UNKNOWN_ID);
-                    }
-                }
-                registerFamily(family.get());
-            } finally {
-                lock.unlock();
-            }
-        }
-    }
-
+    /**
+     * Add an already generated family and all its contained blocks to the lists.
+     */
     @VisibleForTesting
     protected void registerFamily(BlockFamily family) {
         Preconditions.checkNotNull(family);
@@ -193,11 +193,11 @@ public class BlockManagerImpl extends BlockManager {
         } finally {
             lock.unlock();
         }
-        for (BlockRegistrationListener listener : listeners) {
-            listener.onBlockFamilyRegistered(family);
-        }
     }
 
+    /**
+     * Add an already generated block to the lists.
+     */
     private void registerBlock(Block block, RegisteredState newState) {
         if (block.getId() != UNKNOWN_ID) {
             logger.info("Registered Block {} with id {}", block, block.getId());
@@ -220,6 +220,9 @@ public class BlockManagerImpl extends BlockManager {
         return result;
     }
 
+    /**
+     * Recall the family registered with the given name.
+     */
     @Override
     public BlockFamily getBlockFamily(String uri) {
         if (!uri.contains(":")) {
@@ -244,35 +247,20 @@ public class BlockManagerImpl extends BlockManager {
         return getBlockFamily(AIR_ID);
     }
 
+    /**
+     * Recall the family registered with the given name.
+     */
     @Override
     public BlockFamily getBlockFamily(BlockUri uri) {
         if (uri.getShapeUrn().isPresent() && uri.getShapeUrn().get().equals(CUBE_SHAPE_URN)) {
             return getBlockFamily(uri.getShapelessUri());
         }
-        BlockFamily family = registeredBlockInfo.get().registeredFamilyByUri.get(uri);
-        if (family == null && generateNewIds) {
-            Optional<BlockFamily> newFamily = loadFamily(uri);
-            if (newFamily.isPresent()) {
-                lock.lock();
-                try {
-                    for (Block block : newFamily.get().getBlocks()) {
-                        block.setId(getNextId());
-                    }
-                    registerFamily(newFamily.get());
-
-                } catch (Exception ex) {
-                    // A family can fail to register if the block is missing uri or list of categories,
-                    // but can fail to register if the family throws an error for any reason
-                    logger.error("Failed to register block family '{}'", newFamily, ex);
-                } finally {
-                    lock.unlock();
-                }
-                return newFamily.get();
-            }
-        }
-        return family;
+        return registeredBlockInfo.get().registeredFamilyByUri.get(uri);
     }
 
+    /**
+     * Create a block family by loading the relevant assets.
+     */
     private Optional<BlockFamily> loadFamily(BlockUri uri) {
         Optional<BlockFamilyDefinition> familyDef = assetManager.getAsset(uri.getBlockFamilyDefinitionUrn(), BlockFamilyDefinition.class);
         if (familyDef.isPresent() && familyDef.get().isLoadable()) {
@@ -287,7 +275,7 @@ public class BlockManagerImpl extends BlockManager {
                 if (shape.isPresent()) {
                     return Optional.of(familyDef.get().createFamily(shape.get(), blockBuilder));
                 }
-            } else if (!familyDef.get().isFreeform()) {
+            } else {
                 return Optional.of(familyDef.get().createFamily(blockBuilder));
             }
         } else {
@@ -296,6 +284,9 @@ public class BlockManagerImpl extends BlockManager {
         return Optional.empty();
     }
 
+    /**
+     * Recall the block registered with the given name.
+     */
     @Override
     public Block getBlock(String uri) {
         try {
@@ -306,6 +297,9 @@ public class BlockManagerImpl extends BlockManager {
         }
     }
 
+    /**
+     * Recall the block registered with the given name.
+     */
     @Override
     public Block getBlock(BlockUri uri) {
         if (uri.getShapeUrn().isPresent() && uri.getShapeUrn().get().equals(CUBE_SHAPE_URN)) {
@@ -313,18 +307,15 @@ public class BlockManagerImpl extends BlockManager {
         }
         Block block = registeredBlockInfo.get().blocksByUri.get(uri);
         if (block == null) {
-            // Check if partially registered by getting the block family
-            BlockFamily family = getBlockFamily(uri.getFamilyUri());
-            if (family != null) {
-                block = family.getBlockFor(uri);
-            }
-            if (block == null) {
-                return getAirBlock();
-            }
+            throw new NullPointerException("Attempt to fetch block with unknown uri '" + uri + "'");
+        } else {
+            return block;
         }
-        return block;
     }
 
+    /**
+     * Recall the block registered with the given id.
+     */
     @Override
     public Block getBlock(short id) {
         Block result = registeredBlockInfo.get().blocksById.get(id);

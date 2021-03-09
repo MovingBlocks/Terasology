@@ -21,8 +21,11 @@ import org.terasology.assets.AssetType;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.module.sandbox.API;
 import org.terasology.world.block.BlockBuilderHelper;
+import org.terasology.world.block.family.AbstractBlockFamily;
 import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.family.BlockFamilyLibrary;
+import org.terasology.world.block.family.HorizontalFamily;
+import org.terasology.world.block.family.SymmetricFamily;
 import org.terasology.world.block.shapes.BlockShape;
 
 import java.util.Collections;
@@ -48,17 +51,25 @@ public class BlockFamilyDefinition extends Asset<BlockFamilyDefinitionData> {
     }
 
     public boolean isFreeform() {
-        return BlockFamilyLibrary.isFreeformSupported(getData().getBlockFamily());
+        return data.getBaseSection().getShapes() != null;
     }
 
     public BlockFamily createFamily(BlockBuilderHelper blockBuilderHelper) {
-        Preconditions.checkState(!isFreeform());
-        return BlockFamilyLibrary.createFamily(getData().getBlockFamily(), this, blockBuilderHelper);
+        return BlockFamilyLibrary.createFamily(getFamilyForShape(data.getBaseSection().getShape()), this, blockBuilderHelper);
     }
 
     public BlockFamily createFamily(BlockShape shape, BlockBuilderHelper blockBuilderHelper) {
-        Preconditions.checkState(isFreeform());
-        return BlockFamilyLibrary.createFamily(getData().getBlockFamily(), this, shape, blockBuilderHelper);
+        return BlockFamilyLibrary.createFamily(getFamilyForShape(shape), this, shape, blockBuilderHelper);
+    }
+
+    private Class<? extends AbstractBlockFamily> getFamilyForShape(BlockShape shape) {
+        if (data.getBlockFamily() != null) {
+            return data.getBlockFamily();
+        } else if (shape.isCollisionYawSymmetric()) {
+            return SymmetricFamily.class;
+        } else {
+            return HorizontalFamily.class;
+        }
     }
 
 
@@ -67,6 +78,6 @@ public class BlockFamilyDefinition extends Asset<BlockFamilyDefinitionData> {
     }
 
     public boolean isLoadable() {
-        return getData().isValid() && !getData().isTemplate();
+        return !data.isTemplate();
     }
 }

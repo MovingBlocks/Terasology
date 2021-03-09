@@ -52,10 +52,12 @@ import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.family.HorizontalFamily;
 import org.terasology.world.block.family.SymmetricFamily;
+import org.terasology.world.block.internal.BlockManagerImpl;
 import org.terasology.world.block.loader.BlockFamilyDefinition;
 import org.terasology.world.block.loader.BlockFamilyDefinitionData;
 import org.terasology.world.internal.EntityAwareWorldProvider;
 
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -91,38 +93,45 @@ public class EntityAwareWorldProviderTest extends TerasologyTestingEnvironment {
         AssetManager assetManager = context.get(AssetManager.class);
         BlockManager blockManager = context.get(BlockManager.class);
 
-        airBlock = blockManager.getBlock(BlockManager.AIR_ID);
-
-        worldStub = new WorldProviderCoreStub(airBlock);
-        worldProvider = new EntityAwareWorldProvider(worldStub, context);
-
-        plainBlock = createBlock("test:plainblock", assetManager, blockManager);
+        createBlock("test:plainblock", assetManager);
         prefabWithString = createPrefabWithString("test:prefabWithString", "Test", assetManager);
-        blockWithString = createBlockWithPrefab("test:blockWithString", prefabWithString, false, assetManager, blockManager);
-        keepActiveBlock = createBlockWithPrefab("test:keepActiveBlock", prefabWithString, true, assetManager, blockManager);
+        createBlockWithPrefab("test:blockWithString", prefabWithString, false, assetManager);
+        createBlockWithPrefab("test:keepActiveBlock", prefabWithString, true, assetManager);
         Prefab prefabWithDifferentString = createPrefabWithString("test:prefabWithDifferentString", "Test2", assetManager);
-        blockWithDifferentString = createBlockWithPrefab("test:prefabWithDifferentString", prefabWithDifferentString, false, assetManager, blockManager);
+        createBlockWithPrefab("test:prefabWithDifferentString", prefabWithDifferentString, false, assetManager);
 
-        BlockFamily blockFamily = createBlockFamily("test:blockFamily", prefabWithString, assetManager, blockManager);
-        Iterator<Block> iterator = blockFamily.getBlocks().iterator();
-        blockInFamilyOne = iterator.next();
-        blockInFamilyTwo = iterator.next();
+        createBlockFamily("test:blockFamily", prefabWithString, assetManager);
 
         PrefabData retainedPrefabData = new PrefabData();
         retainedPrefabData.addComponent(new RetainedOnBlockChangeComponent(3));
         Prefab retainedPrefab = assetManager.loadAsset(new ResourceUrn("test:retainedPrefab"), retainedPrefabData, Prefab.class);
 
-        blockWithRetainedComponent = createBlockWithPrefab("test:blockWithRetainedComponent", retainedPrefab, false, assetManager, blockManager);
+        createBlockWithPrefab("test:blockWithRetainedComponent", retainedPrefab, false, assetManager);
+
+        ((BlockManagerImpl)blockManager).initialise(Collections.EMPTY_LIST, Collections.EMPTY_MAP);
+        airBlock = blockManager.getBlock(BlockManager.AIR_ID);
+        plainBlock = blockManager.getBlock("test:plainblock");
+        blockWithString = blockManager.getBlock("test:blockWithString");
+        keepActiveBlock = blockManager.getBlock("test:keepActiveBlock");
+        blockWithDifferentString = blockManager.getBlock("test:prefabWithDifferentString");
+        BlockFamily blockFamily =  blockManager.getBlockFamily("test:blockFamily");
+        Iterator<Block> iterator = blockFamily.getBlocks().iterator();
+        blockInFamilyOne = iterator.next();
+        blockInFamilyTwo = iterator.next();
+        blockWithRetainedComponent = blockManager.getBlock("test:blockWithRetainedComponent");
+
+        worldStub = new WorldProviderCoreStub(airBlock);
+        worldProvider = new EntityAwareWorldProvider(worldStub, context);
+
         worldProvider.initialise();
     }
 
-    private Block createBlockWithPrefab(String urn, Prefab prefab, boolean keepActive, AssetManager assetManager, BlockManager blockManager) {
+    private void createBlockWithPrefab(String urn, Prefab prefab, boolean keepActive, AssetManager assetManager) {
         BlockFamilyDefinitionData data = new BlockFamilyDefinitionData();
         data.setBlockFamily(SymmetricFamily.class);
         data.getBaseSection().getEntity().setPrefab(prefab);
         data.getBaseSection().getEntity().setKeepActive(keepActive);
         assetManager.loadAsset(new ResourceUrn(urn), data, BlockFamilyDefinition.class);
-        return blockManager.getBlock(urn);
     }
 
     private Prefab createPrefabWithString(String urn, String text, AssetManager assetManager) {
@@ -131,20 +140,18 @@ public class EntityAwareWorldProviderTest extends TerasologyTestingEnvironment {
         return assetManager.loadAsset(new ResourceUrn(urn), prefabData, Prefab.class);
     }
 
-    private Block createBlock(String urn, AssetManager assetManager, BlockManager blockManager) {
+    private void createBlock(String urn, AssetManager assetManager) {
         BlockFamilyDefinitionData data = new BlockFamilyDefinitionData();
         data.setBlockFamily(SymmetricFamily.class);
         assetManager.loadAsset(new ResourceUrn(urn), data, BlockFamilyDefinition.class);
-        return blockManager.getBlock(urn);
     }
 
-    private BlockFamily createBlockFamily(String urn, Prefab prefab, AssetManager assetManager, BlockManager blockManager) {
+    private void createBlockFamily(String urn, Prefab prefab, AssetManager assetManager) {
         BlockFamilyDefinitionData data = new BlockFamilyDefinitionData();
         data.setBlockFamily(HorizontalFamily.class);
         data.getBaseSection().getEntity().setKeepActive(true);
         data.getBaseSection().getEntity().setPrefab(prefab);
         assetManager.loadAsset(new ResourceUrn(urn), data, BlockFamilyDefinition.class);
-        return blockManager.getBlockFamily(urn);
     }
 
     @Test

@@ -250,7 +250,6 @@ public class ServerImpl implements Server {
             if (message.hasTime()) {
                 time.updateTimeFromServer(message.getTime());
             }
-            processBlockRegistrations(message);
             processReceivedChunks(message);
             processInvalidatedChunks(message);
             processBlockChanges(message);
@@ -326,27 +325,6 @@ public class ServerImpl implements Server {
         for (EntityData.ChunkStore chunkInfo : message.getChunkInfoList()) {
             Chunk chunk = ChunkSerializer.decode(chunkInfo, blockManager, extraDataManager);
             chunkQueue.offer(chunk);
-        }
-    }
-
-    private void processBlockRegistrations(NetData.NetMessage message) {
-        for (NetData.BlockFamilyRegisteredMessage blockFamily : message.getBlockFamilyRegisteredList()) {
-            if (blockFamily.getBlockIdCount() != blockFamily.getBlockUriCount()) {
-                logger.error("Received block registration with mismatched id<->uri mapping");
-            } else if (blockFamily.getBlockUriCount() == 0) {
-                logger.error("Received empty block registration");
-            } else {
-                try {
-                    BlockUri family = new BlockUri(blockFamily.getBlockUri(0)).getFamilyUri();
-                    Map<String, Integer> registrationMap = Maps.newHashMap();
-                    for (int i = 0; i < blockFamily.getBlockIdCount(); ++i) {
-                        registrationMap.put(blockFamily.getBlockUri(i), blockFamily.getBlockId(i));
-                    }
-                    blockManager.receiveFamilyRegistration(family, registrationMap);
-                } catch (BlockUriParseException e) {
-                    logger.error("Received invalid block uri {}", blockFamily.getBlockUri(0));
-                }
-            }
         }
     }
 

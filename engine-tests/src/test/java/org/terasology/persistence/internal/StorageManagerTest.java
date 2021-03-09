@@ -46,6 +46,7 @@ import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.family.SymmetricFamily;
+import org.terasology.world.block.internal.BlockManagerImpl;
 import org.terasology.world.block.loader.BlockFamilyDefinition;
 import org.terasology.world.block.loader.BlockFamilyDefinitionData;
 import org.terasology.world.chunks.Chunk;
@@ -59,6 +60,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -140,6 +142,7 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
         data.setBlockFamily(SymmetricFamily.class);
         assetManager.loadAsset(new ResourceUrn("test:testblock"), data, BlockFamilyDefinition.class);
         assetManager.loadAsset(new ResourceUrn("test:testblock2"), data, BlockFamilyDefinition.class);
+        ((BlockManagerImpl)blockManager).initialise(Collections.EMPTY_LIST, Collections.EMPTY_MAP);
         testBlock = context.get(BlockManager.class).getBlock("test:testblock");
         testBlock2 = context.get(BlockManager.class).getBlock("test:testblock2");
 

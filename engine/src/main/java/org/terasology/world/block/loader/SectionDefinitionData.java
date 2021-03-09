@@ -23,6 +23,7 @@ import org.terasology.world.block.shapes.BlockShape;
 import org.terasology.world.block.sounds.BlockSounds;
 import org.terasology.world.block.tiles.BlockTile;
 
+import java.util.ArrayList;
 import java.util.EnumMap;
 
 /**
@@ -63,6 +64,7 @@ public class SectionDefinitionData {
     private InventoryData inventory = new InventoryData();
 
     private BlockShape shape;
+    private ArrayList<BlockShape> shapes;
     private boolean water;
     private boolean grass;
     private boolean ice;
@@ -104,6 +106,7 @@ public class SectionDefinitionData {
         this.inventory = new InventoryData(other.inventory);
 
         this.shape = other.shape;
+        this.shapes = other.shapes;
 
         this.water = other.water;
         this.grass = other.grass;
@@ -310,6 +313,14 @@ public class SectionDefinitionData {
 
     public void setShape(BlockShape shape) {
         this.shape = shape;
+    }
+
+    public ArrayList<BlockShape> getShapes() {
+        return shapes;
+    }
+
+    public void setShapes(ArrayList<BlockShape> shapes) {
+        this.shapes = shapes;
     }
 
     public boolean isWater() {
