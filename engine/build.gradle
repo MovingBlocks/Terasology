@@ -70,7 +70,7 @@ dependencies {
 
     // Java magic
     implementation group: 'net.java.dev.jna', name: 'jna-platform', version: '5.6.0'
-    implementation group: 'org.reflections', name: 'reflections', version: '0.9.10'
+    implementation "org.terasology:reflections:0.9.12-MB"
     implementation group: 'org.javassist', name: 'javassist', version: '3.27.0-GA'
     implementation group: 'com.esotericsoftware', name: 'reflectasm', version: '1.11.1'
 

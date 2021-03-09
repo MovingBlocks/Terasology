@@ -25,7 +25,7 @@ sourceSets {
 
 dependencies {
     implementation project(':engine')
-    implementation group: 'org.reflections', name: 'reflections', version: '0.9.10'
+    implementation "org.terasology:reflections:0.9.12-MB"
 
     runtimeOnly(platform(project(":modules")))
     // For the "natives" configuration make it depend on the native files from LWJGL
