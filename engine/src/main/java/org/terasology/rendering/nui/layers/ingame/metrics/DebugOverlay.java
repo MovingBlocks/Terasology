@@ -1,18 +1,5 @@
-/*
- * Copyright 2017 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.rendering.nui.layers.ingame.metrics;
 
 import org.joml.Vector3f;
@@ -22,6 +9,7 @@ import org.terasology.engine.Time;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.input.cameraTarget.CameraTargetSystem;
 import org.terasology.logic.players.LocalPlayer;
+import org.terasology.math.Orientation;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.nui.databinding.ReadOnlyBinding;
 import org.terasology.nui.widgets.UILabel;
@@ -42,6 +30,8 @@ import java.util.Locale;
  * See the {@link #toggleMetricsMode()} method to iterate through the MetricsMode instances available for display.
  */
 public class DebugOverlay extends CoreScreenLayer {
+
+    public static double MB_SIZE = 1048576.0;
 
     @In
     private Config config;
@@ -83,9 +73,9 @@ public class DebugOverlay extends CoreScreenLayer {
             debugLine1.bindText(new ReadOnlyBinding<String>() {
                 @Override
                 public String get() {
-                    double memoryUsage = ((double) Runtime.getRuntime().totalMemory() - (double) Runtime.getRuntime().freeMemory()) / 1048576.0;
+                    double memoryUsage = ((double) Runtime.getRuntime().totalMemory() - (double) Runtime.getRuntime().freeMemory()) / MB_SIZE;
                     return String.format("FPS: %.2f, Memory Usage: %.2f MB, Total Memory: %.2f MB, Max Memory: %.2f MB",
-                        time.getFps(), memoryUsage, Runtime.getRuntime().totalMemory() / 1048576.0, Runtime.getRuntime().maxMemory() / 1048576.0);
+                            time.getFps(), memoryUsage, Runtime.getRuntime().totalMemory() / MB_SIZE, Runtime.getRuntime().maxMemory() / MB_SIZE);
                 }
             });
         }
@@ -109,10 +99,37 @@ public class DebugOverlay extends CoreScreenLayer {
                     Vector3i chunkPos = Chunks.toChunkPos(pos, new Vector3i());
                     Vector3f rotation = localPlayer.getViewDirection(new Vector3f());
                     Vector3f cameraPos = localPlayer.getViewPosition(new Vector3f());
-                    return String.format(Locale.US, "Position: (%.2f, %.2f, %.2f), Chunk (%d, %d, %d), Eye (%.2f, %.2f, %.2f), Rot (%.2f, %.2f, %.2f)", pos.x, pos.y, pos.z,
-                        chunkPos.x, chunkPos.y, chunkPos.z,
-                        cameraPos.x, cameraPos.y, cameraPos.z,
-                        rotation.x, rotation.y, rotation.z);
+                    String orientation = "";
+                    switch (Orientation.fromDirection(rotation.x, rotation.z)) {
+                        case NORTH:
+                            orientation = "N";
+                            break;
+                        case EAST:
+                            orientation = "E";
+                            break;
+                        case SOUTH:
+                            orientation = "S";
+                            break;
+                        case WEST:
+                            orientation = "W";
+                            break;
+                        case NORTHEAST:
+                            orientation = "NE";
+                            break;
+                        case SOUTHEAST:
+                            orientation = "SE";
+                            break;
+                        case SOUTHWEST:
+                            orientation = "SW";
+                            break;
+                        case NORTHWEST:
+                            orientation = "NW";
+                            break;
+                    }
+                    return String.format(Locale.US, "Position: (%.2f, %.2f, %.2f), Chunk (%d, %d, %d), Eye (%.2f, %.2f, %.2f), Rot (%.2f, %.2f, %.2f) %s", pos.x, pos.y, pos.z,
+                            chunkPos.x, chunkPos.y, chunkPos.z,
+                            cameraPos.x, cameraPos.y, cameraPos.z,
+                            rotation.x, rotation.y, rotation.z, orientation);
                 }
             });
         }
@@ -123,9 +140,9 @@ public class DebugOverlay extends CoreScreenLayer {
                 @Override
                 public String get() {
                     return String.format("Total VUs: %s, World Time: %.3f, Time Dilation: %.1f",
-                        ChunkTessellator.getVertexArrayUpdateCount(),
-                        worldProvider.getTime().getDays() - 0.0005f,    // use floor instead of rounding up
-                        time.getGameTimeDilation());
+                            ChunkTessellator.getVertexArrayUpdateCount(),
+                            worldProvider.getTime().getDays() - 0.0005f,    // use floor instead of rounding up
+                            time.getGameTimeDilation());
                 }
             });
         }
@@ -150,12 +167,12 @@ public class DebugOverlay extends CoreScreenLayer {
                 }
             });
             saveStatusLabel.bindVisible(
-                new ReadOnlyBinding<Boolean>() {
-                    @Override
-                    public Boolean get() {
-                        return storageManager.isSaving();
+                    new ReadOnlyBinding<Boolean>() {
+                        @Override
+                        public Boolean get() {
+                            return storageManager.isSaving();
+                        }
                     }
-                }
             );
         }
 
@@ -169,12 +186,12 @@ public class DebugOverlay extends CoreScreenLayer {
                 }
             });
             wireframeMode.bindVisible(
-                new ReadOnlyBinding<Boolean>() {
-                    @Override
-                    public Boolean get() {
-                        return config.getRendering().getDebug().isWireframe();
+                    new ReadOnlyBinding<Boolean>() {
+                        @Override
+                        public Boolean get() {
+                            return config.getRendering().getDebug().isWireframe();
+                        }
                     }
-                }
             );
         }
 
@@ -188,12 +205,12 @@ public class DebugOverlay extends CoreScreenLayer {
                 }
             });
             chunkRenderMode.bindVisible(
-                new ReadOnlyBinding<Boolean>() {
-                    @Override
-                    public Boolean get() {
-                        return config.getRendering().getDebug().isRenderChunkBoundingBoxes();
+                    new ReadOnlyBinding<Boolean>() {
+                        @Override
+                        public Boolean get() {
+                            return config.getRendering().getDebug().isRenderChunkBoundingBoxes();
+                        }
                     }
-                }
             );
         }
 
