@@ -74,7 +74,7 @@ public class EventSystemReplayImpl implements EventSystem {
     private Comparator<EventHandlerInfo> priorityComparator = new EventSystemReplayImpl.EventHandlerPriorityComparator();
 
     // Event metadata
-    private BiMap<SimpleUri, Class<? extends Event>> eventIdMap = HashBiMap.create();
+    private BiMap<ResourceUrn, Class<? extends Event>> eventIdMap = HashBiMap.create();
     private SetMultimap<Class<? extends Event>, Class<? extends Event>> childEvents = HashMultimap.create();
 
     private Thread mainThread;
@@ -268,7 +268,7 @@ public class EventSystemReplayImpl implements EventSystem {
     }
 
     @Override
-    public void registerEvent(SimpleUri uri, Class<? extends Event> eventType) {
+    public void registerEvent(ResourceUrn uri, Class<? extends Event> eventType) {
         eventIdMap.put(uri, eventType);
         logger.debug("Registering event {}", eventType.getSimpleName());
         for (Class parent : ReflectionUtils.getAllSuperTypes(eventType, Predicates.subtypeOf(Event.class))) {
@@ -277,7 +277,7 @@ public class EventSystemReplayImpl implements EventSystem {
             }
         }
         if (shouldAddToLibrary(eventType)) {
-            eventLibrary.register(new ResourceUrn(uri.getModuleName(), uri.getObjectName()), eventType);
+            eventLibrary.register(uri, eventType);
         }
     }
 
@@ -305,7 +305,7 @@ public class EventSystemReplayImpl implements EventSystem {
         for (Method method : handlerClass.getMethods()) {
             ReceiveEvent receiveEventAnnotation = method.getAnnotation(ReceiveEvent.class);
             if (receiveEventAnnotation != null) {
-                if (!receiveEventAnnotation.netFilter().isValidFor(networkSystem.getMode(), false)) {
+                if (!receiveEventAnnotation.netFilter().isValidFor(networkSystem.getMode().isAuthority(), false)) {
                     continue;
                 }
                 Set<Class<? extends Component>> requiredComponents = Sets.newLinkedHashSet();
