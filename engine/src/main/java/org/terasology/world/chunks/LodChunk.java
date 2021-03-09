@@ -18,6 +18,8 @@ import org.terasology.engine.world.block.BlockRegion;
 public class LodChunk implements RenderableChunk {
     private static final String UNSUPPORTED_MESSAGE = "LOD chunks can only be used for certain rendering-related operations.";
     public final int scale;
+    public int hiddenness; //The number of LOD chunks of the next level of fineness covering this one.
+    public Chunk realVersion; //The real chunk hiding this one.
     private Vector3ic position;
     private ChunkMesh mesh;
 
@@ -88,7 +90,7 @@ public class LodChunk implements RenderableChunk {
 
     @Override
     public boolean isReady() {
-        return mesh != null;
+        return mesh != null && hiddenness < 8 && (realVersion == null || !realVersion.isReady() || !realVersion.hasMesh());
     }
 
     @Override

@@ -319,7 +319,7 @@ class RenderableWorldImpl implements RenderableWorld {
         List<RenderableChunk> allChunks;
         if (lodChunkProvider != null) {
             allChunks = new ArrayList<>(chunksInProximityOfCamera);
-            allChunks.addAll(lodChunkProvider.getChunks());
+            lodChunkProvider.addAllChunks(allChunks);
         } else {
             allChunks = chunksInProximityOfCamera;
         }

@@ -49,8 +49,8 @@ public class LodChunkProvider {
     private BlockRegion possiblyLoadedRegion = new BlockRegion(BlockRegion.INVALID); // The chunks that may be actually loaded.
     private BlockRegion probablyLoadedRegion = new BlockRegion(BlockRegion.INVALID); // The chunks that should be visible, and therefore shouldn't have LOD chunks even if the chunk there hasn't loaded yet.
     private BlockRegion[] lodRegions = new BlockRegion[0];
-    private Map<Vector3ic, Integer> requiredChunks; // The sizes of all of the LOD chunks that are meant to exist.
-    private Map<Vector3i, LodChunk> chunks;
+    private Map<Vector3ic, Integer> requiredChunks; // The sizes of all of the LOD chunks that are meant to exist. All the chunks at the same positions with larger sizes also may exist, but don't always.
+    private ArrayList<Map<Vector3i, LodChunk>> chunks = new ArrayList<>();
     private ClosenessComparator nearby;
 
     // Communication with the generation threads.
@@ -68,10 +68,9 @@ public class LodChunkProvider {
         this.chunkLods = chunkLods;
         this.center = center;
         requiredChunks = new ConcurrentHashMap<>();
-        chunks = new HashMap<>();
         nearby = new ClosenessComparator(center);
         neededChunks = new PriorityBlockingQueue<>(11, nearby);
-        for (int i = 0; i < 2; i++) {
+        for (int i = 0; i < 4; i++) {
             Thread thread = new Thread(this::createChunks, "LOD Chunk Generation " + i);
             thread.start();
             generationThreads.add(thread);
@@ -104,9 +103,33 @@ public class LodChunkProvider {
             LodChunk chunk = readyChunks.remove();
             Vector3i pos = chunk.getPosition(new Vector3i());
             Integer requiredScale = requiredChunks.get(pos);
-            if (requiredScale != null && requiredScale == chunk.scale) { // The relevant region may have been updated since this chunk was requested.
+            int scale = chunk.scale;
+            if (requiredScale != null && requiredScale <= scale) { // The relevant region may have been updated since this chunk was requested.
                 chunk.getMesh().generateVBOs();
-                chunks.put(pos, chunk);
+                Vector3i subPos = new Vector3i();
+                if (scale > 0) {
+                    int subScale = 1 << (scale - 1);
+                    for (int dx = 0; dx <= subScale; dx += subScale) {
+                        for (int dy = 0; dy <= subScale; dy += subScale) {
+                            for (int dz = 0; dz <= subScale; dz += subScale) {
+                                pos.add(dx, dy, dz, subPos);
+                                if (chunks.get(scale - 1).containsKey(subPos) || scale == 1 && chunkProvider.isChunkReady(subPos)) {
+                                    chunk.hiddenness++;
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    chunk.realVersion = chunkProvider.getChunk(pos);
+                }
+                chunks.get(scale).put(new Vector3i(pos), chunk);
+                if (scale < chunkLods) {
+                    int mask = ~(1 << scale);
+                    LodChunk largerChunk = chunks.get(scale + 1).get(new Vector3i(pos.x & mask, pos.y & mask, pos.z & mask));
+                    if (largerChunk != null) {
+                        largerChunk.hiddenness++;
+                    }
+                }
             }
         }
     }
@@ -126,6 +149,14 @@ public class LodChunkProvider {
         BlockRegion newPossiblyLoadedRegion = new BlockRegion(newCenter).expand(viewDistance);
         BlockRegion newProbablyLoadedRegion =  new BlockRegion(newPossiblyLoadedRegion).expand(-1, -1, -1);
         BlockRegion[] newLodRegions = new BlockRegion[newChunkLods == 0 ? 0 : 1 + newChunkLods];
+        while (chunks.size() < newLodRegions.length) {
+            chunks.add(new ConcurrentHashMap<>());
+        }
+        while (chunks.size() > newLodRegions.length) {
+            for (LodChunk chunk : chunks.remove(chunks.size() - 1).values()) {
+                chunk.disposeMesh();
+            }
+        }
         boolean lodRegionChange = newLodRegions.length != lodRegions.length;
         for (int i = 0; i < newLodRegions.length; i++) {
             if (i == 0) {
@@ -147,13 +178,29 @@ public class LodChunkProvider {
             Set<Vector3ic> previouslyRequiredChunks = new HashSet<>(requiredChunks.keySet());
             for (Vector3ic pos : previouslyRequiredChunks) {
                 int scale = requiredChunks.get(pos);
-                if (
-                    scale >= newLodRegions.length
-                    || !newLodRegions[scale].contains(scaleDown(pos, scale))
-                    || scale == 0 && newProbablyLoadedRegion.contains(pos)
-                    || scale > 0 && newLodRegions[scale - 1].contains(scaleDown(pos, scale - 1))
-                ) {
-                    removeChunk(pos);
+                boolean gone = false; // Whether this entry in requiredChunks should be removed entirely (i.e. the chunk at the actually required scale is not at this position).
+                boolean increased = false;
+                while (scale < newLodRegions.length && !gone && !newLodRegions[scale].contains(scaleDown(pos, scale))) {
+                    LodChunk chunk = chunks.get(scale).get(new Vector3i(pos));
+                    if (chunk != null) {
+                        chunk.disposeMesh();
+                        chunks.get(scale).remove(new Vector3i(pos));
+                    }
+                    gone = ((pos.x() | pos.y() | pos.z()) & (1 << scale)) != 0;
+                    scale++;
+                    increased = true;
+                }
+                if (gone || scale >= newLodRegions.length) {
+                    neededChunks.remove(pos);
+                    requiredChunks.remove(pos);
+                } else if (increased) {
+                    LodChunk chunk = chunks.get(scale).get(new Vector3i(pos));
+                    if (chunk != null) {
+                        requiredChunks.put(new Vector3i(pos), scale);
+                        chunk.hiddenness = 0;
+                    } else {
+                        requiredChunks.remove(pos);
+                    }
                 }
             }
 
@@ -168,7 +215,8 @@ public class LodChunkProvider {
                         continue;
                     }
                     Vector3i globalPos = pos.mul(1 << scale, new Vector3i());
-                    if (!requiredChunks.containsKey(globalPos)) {
+                    Integer previousScale = requiredChunks.get(globalPos);
+                    if (previousScale == null || previousScale > scale) {
                         addChunk(globalPos, scale);
                     }
                 }
@@ -182,42 +230,48 @@ public class LodChunkProvider {
     public void onRealChunkUnloaded(Vector3ic pos) {
         if (chunkLods > 0 && !probablyLoadedRegion.contains(pos) && lodRegions[0].contains(pos) && !requiredChunks.containsKey(pos)) {
             addChunk(pos, 0);
+        } else if (chunkLods > 0) {
+            LodChunk unscaledChunk = chunks.get(0).get(new Vector3i(pos));
+            LodChunk scaledChunk = chunks.get(1).get(new Vector3i(pos.x() & -2, pos.y() & -2, pos.z() & -2));
+            if (unscaledChunk != null) {
+                unscaledChunk.realVersion = null;
+            } else if (scaledChunk != null) {
+                scaledChunk.hiddenness--;
+            }
         }
     }
 
     private void addChunk(Vector3ic pos, int scale) {
-        if (requiredChunks.containsKey(pos)) {
-            logger.warn("Duplicate LOD chunk load.");
-        }
-        requiredChunks.put(pos, scale);
+        requiredChunks.put(new Vector3i(pos), scale);
         neededChunks.add(pos);
     }
 
     public void onRealChunkLoaded(Vector3ic pos) {
-        if (requiredChunks.get(pos) != null && possiblyLoadedRegion.contains(pos) && chunkProvider.isChunkReady(pos)) {
-            removeChunk(pos);
+        if (possiblyLoadedRegion.contains(pos) && chunkProvider.isChunkReady(pos) && chunkLods > 0) {
+            LodChunk unscaledChunk = chunks.get(0).get(new Vector3i(pos));
+            LodChunk scaledChunk = chunks.get(1).get(new Vector3i(pos.x() & -2, pos.y() & -2, pos.z() & -2));
+            if (unscaledChunk != null) {
+                unscaledChunk.realVersion = chunkProvider.getChunk(pos);
+            } else if (scaledChunk != null) {
+                scaledChunk.hiddenness++;
+            }
         }
     }
 
-    private void removeChunk(Vector3ic pos) {
-        neededChunks.remove(pos);
-        requiredChunks.remove(pos);
-        LodChunk chunk = chunks.remove(pos);
-        if (chunk != null) {
-            chunk.disposeMesh();
+    public void addAllChunks(Collection<RenderableChunk> collection) {
+        for (Map<Vector3i, LodChunk> chunkMap : chunks) {
+            collection.addAll(chunkMap.values());
         }
-    }
-
-    public Collection<LodChunk> getChunks() {
-        return chunks.values();
     }
 
     public void shutdown() {
         for (Thread thread : generationThreads) {
             thread.interrupt();
         }
-        for (LodChunk chunk : chunks.values()) {
-            chunk.disposeMesh();
+        for (Map<Vector3i, LodChunk> chunkMap : chunks) {
+            for (LodChunk chunk : chunkMap.values()) {
+                chunk.disposeMesh();
+            }
         }
     }
 
