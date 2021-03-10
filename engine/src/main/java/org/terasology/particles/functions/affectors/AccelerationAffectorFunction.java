@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.particles.functions.affectors;
+package org.terasology.engine.particles.functions.affectors;
 
-import org.terasology.particles.ParticleData;
-import org.terasology.particles.ParticleDataMask;
-import org.terasology.particles.components.affectors.AccelerationAffectorComponent;
-import org.terasology.particles.functions.RegisterParticleSystemFunction;
-import org.terasology.utilities.random.Random;
+import org.terasology.engine.particles.ParticleData;
+import org.terasology.engine.particles.ParticleDataMask;
+import org.terasology.engine.particles.components.affectors.AccelerationAffectorComponent;
+import org.terasology.engine.particles.functions.RegisterParticleSystemFunction;
+import org.terasology.engine.utilities.random.Random;
 
 /**
  *

@@ -13,15 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.config;
+package org.terasology.engine.config;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.module.sandbox.API;
-import org.terasology.rendering.world.WorldRendererImpl;
-import org.terasology.utilities.subscribables.AbstractSubscribable;
+import org.terasology.engine.rendering.world.WorldRendererImpl;
+import org.terasology.engine.utilities.subscribables.AbstractSubscribable;
 
 /**
  */

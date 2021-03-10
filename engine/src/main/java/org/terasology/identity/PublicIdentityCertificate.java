@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.identity;
+package org.terasology.engine.identity;
 
 import com.google.common.base.Charsets;
 

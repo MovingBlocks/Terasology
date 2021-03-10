@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package org.terasology.config;
+package org.terasology.engine.config;
 
 import com.google.common.collect.Maps;
 import com.google.gson.JsonElement;
-import org.terasology.engine.SimpleUri;
+import org.terasology.engine.core.SimpleUri;
 
 import java.util.Map;
 

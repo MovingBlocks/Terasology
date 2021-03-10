@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.entitySystem.systems.internal;
+package org.terasology.engine.entitySystem.systems.internal;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

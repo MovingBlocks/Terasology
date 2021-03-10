@@ -1,9 +1,9 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.world.generation.facets.base;
+package org.terasology.engine.world.generation.facets.base;
 
 import org.joml.Vector3ic;
-import org.terasology.world.generation.WorldFacet3D;
+import org.terasology.engine.world.generation.WorldFacet3D;
 
 /**
  */

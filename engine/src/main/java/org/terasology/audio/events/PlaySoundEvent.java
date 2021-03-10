@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package org.terasology.audio.events;
+package org.terasology.engine.audio.events;
 
-import org.terasology.audio.StaticSound;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.network.BroadcastEvent;
+import org.terasology.engine.audio.StaticSound;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.network.BroadcastEvent;
 
 /**
  * This event is sent whenever a sound is to be played.

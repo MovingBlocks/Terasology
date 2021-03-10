@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package org.terasology.entitySystem.event;
+package org.terasology.engine.entitySystem.event;
 
-import org.terasology.network.NoReplicate;
+import org.terasology.engine.network.NoReplicate;
 
 /**
  */

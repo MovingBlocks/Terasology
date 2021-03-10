@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.config.facade;
+package org.terasology.engine.config.facade;
 
-import org.terasology.config.TelemetryConfig;
+import org.terasology.engine.config.TelemetryConfig;
 
 import java.util.Map;
 
 /**
- * An adapter for {@link org.terasology.config.TelemetryConfig}.
+ * An adapter for {@link org.terasology.engine.config.TelemetryConfig}.
  * It could be used in modules.
  */
 public class TelemetryConfigurationImpl implements TelemetryConfiguration {

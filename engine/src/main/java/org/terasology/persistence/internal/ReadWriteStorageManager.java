@@ -1,19 +1,6 @@
-/*
- * Copyright 2013 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-package org.terasology.persistence.internal;
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
+package org.terasology.engine.persistence.internal;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -22,50 +9,50 @@ import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.config.Config;
-import org.terasology.config.SystemConfig;
-import org.terasology.config.UniverseConfig;
-import org.terasology.engine.ComponentSystemManager;
-import org.terasology.engine.Time;
-import org.terasology.engine.module.ModuleManager;
-import org.terasology.engine.paths.PathManager;
-import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.entity.internal.EngineEntityManager;
-import org.terasology.entitySystem.entity.internal.EntityChangeSubscriber;
-import org.terasology.entitySystem.entity.internal.EntityDestroySubscriber;
-import org.terasology.entitySystem.entity.internal.PojoEntityManager;
-import org.terasology.entitySystem.metadata.ComponentLibrary;
-import org.terasology.entitySystem.systems.ComponentSystem;
-import org.terasology.game.Game;
-import org.terasology.game.GameManifest;
-import org.terasology.logic.location.LocationComponent;
+import org.terasology.engine.config.Config;
+import org.terasology.engine.config.SystemConfig;
+import org.terasology.engine.config.UniverseConfig;
+import org.terasology.engine.core.ComponentSystemManager;
+import org.terasology.engine.core.Time;
+import org.terasology.engine.core.module.ModuleManager;
+import org.terasology.engine.core.paths.PathManager;
+import org.terasology.engine.entitySystem.Component;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.entitySystem.entity.internal.EngineEntityManager;
+import org.terasology.engine.entitySystem.entity.internal.EntityChangeSubscriber;
+import org.terasology.engine.entitySystem.entity.internal.EntityDestroySubscriber;
+import org.terasology.engine.entitySystem.entity.internal.PojoEntityManager;
+import org.terasology.engine.entitySystem.metadata.ComponentLibrary;
+import org.terasology.engine.entitySystem.systems.ComponentSystem;
+import org.terasology.engine.game.Game;
+import org.terasology.engine.game.GameManifest;
+import org.terasology.engine.logic.location.LocationComponent;
+import org.terasology.engine.monitoring.PerformanceMonitor;
+import org.terasology.engine.network.Client;
+import org.terasology.engine.network.ClientComponent;
+import org.terasology.engine.network.NetworkSystem;
+import org.terasology.engine.recording.RecordAndReplayCurrentStatus;
+import org.terasology.engine.recording.RecordAndReplaySerializer;
+import org.terasology.engine.recording.RecordAndReplayStatus;
+import org.terasology.engine.recording.RecordAndReplayUtils;
+import org.terasology.engine.registry.CoreRegistry;
+import org.terasology.engine.rendering.opengl.ScreenGrabber;
+import org.terasology.engine.utilities.FilesUtil;
+import org.terasology.engine.utilities.concurrency.ShutdownTask;
+import org.terasology.engine.utilities.concurrency.Task;
+import org.terasology.engine.utilities.concurrency.TaskMaster;
+import org.terasology.engine.world.block.BlockManager;
+import org.terasology.engine.world.block.family.BlockFamily;
+import org.terasology.engine.world.chunks.Chunk;
+import org.terasology.engine.world.chunks.ChunkProvider;
+import org.terasology.engine.world.chunks.ManagedChunk;
+import org.terasology.engine.world.chunks.blockdata.ExtraBlockDataManager;
+import org.terasology.engine.world.chunks.internal.ChunkImpl;
+import org.terasology.engine.world.internal.WorldInfo;
 import org.terasology.module.Module;
 import org.terasology.module.ModuleEnvironment;
-import org.terasology.monitoring.PerformanceMonitor;
-import org.terasology.network.Client;
-import org.terasology.network.ClientComponent;
-import org.terasology.network.NetworkSystem;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.protobuf.EntityData;
-import org.terasology.recording.RecordAndReplayCurrentStatus;
-import org.terasology.recording.RecordAndReplaySerializer;
-import org.terasology.recording.RecordAndReplayStatus;
-import org.terasology.recording.RecordAndReplayUtils;
-import org.terasology.registry.CoreRegistry;
-import org.terasology.rendering.opengl.ScreenGrabber;
-import org.terasology.utilities.FilesUtil;
-import org.terasology.utilities.concurrency.ShutdownTask;
-import org.terasology.utilities.concurrency.Task;
-import org.terasology.utilities.concurrency.TaskMaster;
-import org.terasology.world.block.BlockManager;
-import org.terasology.world.block.family.BlockFamily;
-import org.terasology.world.chunks.Chunk;
-import org.terasology.world.chunks.ChunkProvider;
-import org.terasology.world.chunks.ManagedChunk;
-import org.terasology.world.chunks.blockdata.ExtraBlockDataManager;
-import org.terasology.world.chunks.internal.ChunkImpl;
-import org.terasology.world.internal.WorldInfo;
 
 import java.io.IOException;
 import java.nio.file.Files;

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.physics.bullet;
+package org.terasology.engine.physics.bullet;
 
 import com.badlogic.gdx.physics.bullet.linearmath.btMotionState;
 import org.joml.Matrix4f;
@@ -22,8 +22,8 @@ import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.logic.location.LocationComponent;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.logic.location.LocationComponent;
 
 /**
  * This motion state is used to connect rigid body entities to their rigid body in the bullet physics engine.

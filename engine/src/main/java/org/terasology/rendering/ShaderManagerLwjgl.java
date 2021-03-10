@@ -1,6 +1,6 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.rendering;
+package org.terasology.engine.rendering;
 
 import com.google.common.collect.Sets;
 import org.lwjgl.Version;
@@ -13,13 +13,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
-import org.terasology.registry.CoreRegistry;
-import org.terasology.rendering.assets.material.Material;
-import org.terasology.rendering.assets.material.MaterialData;
-import org.terasology.rendering.assets.shader.Shader;
-import org.terasology.rendering.assets.texture.Texture;
-import org.terasology.rendering.opengl.GLSLMaterial;
-import org.terasology.utilities.Assets;
+import org.terasology.engine.registry.CoreRegistry;
+import org.terasology.engine.rendering.assets.material.Material;
+import org.terasology.engine.rendering.assets.material.MaterialData;
+import org.terasology.engine.rendering.assets.shader.Shader;
+import org.terasology.engine.rendering.assets.texture.Texture;
+import org.terasology.engine.rendering.opengl.GLSLMaterial;
+import org.terasology.engine.utilities.Assets;
 
 import java.util.Optional;
 import java.util.Set;

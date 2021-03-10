@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.monitoring;
+package org.terasology.engine.monitoring;
 
 /**
  * Activity allows for the use the use of an activity in a try-with-resources block - when the block ends so too does the activity.

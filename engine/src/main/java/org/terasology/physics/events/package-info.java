@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 
-@API package org.terasology.physics.events;
+@API package org.terasology.engine.physics.events;
 
 import org.terasology.module.sandbox.API;

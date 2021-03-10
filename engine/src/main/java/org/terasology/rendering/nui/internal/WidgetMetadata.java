@@ -1,6 +1,6 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.rendering.nui.internal;
+package org.terasology.engine.rendering.nui.internal;
 
 import com.google.common.base.Predicate;
 import org.terasology.assets.ResourceUrn;

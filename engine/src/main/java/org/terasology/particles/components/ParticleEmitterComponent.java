@@ -13,15 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.particles.components;
+package org.terasology.engine.particles.components;
 
-import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.logic.location.LocationComponent;
+import org.terasology.engine.entitySystem.Component;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.logic.location.LocationComponent;
 import org.terasology.module.sandbox.API;
-import org.terasology.particles.ParticlePool;
-import org.terasology.particles.functions.affectors.AffectorFunction;
-import org.terasology.particles.functions.generators.GeneratorFunction;
+import org.terasology.engine.particles.ParticlePool;
+import org.terasology.engine.particles.functions.affectors.AffectorFunction;
+import org.terasology.engine.particles.functions.generators.GeneratorFunction;
 
 import java.util.LinkedHashMap;
 import java.util.Map;

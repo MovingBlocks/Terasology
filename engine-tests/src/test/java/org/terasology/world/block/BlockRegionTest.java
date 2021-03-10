@@ -5,6 +5,8 @@ package org.terasology.world.block;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import org.terasology.engine.world.block.BlockRegion;
+import org.terasology.engine.world.block.BlockRegionc;
 import org.terasology.joml.geom.AABBf;
 import org.terasology.joml.geom.LineSegmentf;
 import org.terasology.joml.geom.Rayf;
@@ -19,7 +21,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.terasology.math.Side;
+import org.terasology.engine.math.Side;
 
 import java.util.ArrayList;
 import java.util.Collection;

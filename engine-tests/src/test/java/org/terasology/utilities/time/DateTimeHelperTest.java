@@ -16,6 +16,7 @@
 package org.terasology.utilities.time;
 
 import org.junit.jupiter.api.Test;
+import org.terasology.engine.utilities.time.DateTimeHelper;
 
 import java.util.Arrays;
 

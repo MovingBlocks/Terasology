@@ -1,9 +1,9 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.rendering.dag.stateChanges;
+package org.terasology.engine.rendering.dag.stateChanges;
 
 import com.google.common.collect.ImmutableMap;
-import org.terasology.rendering.dag.StateChange;
+import org.terasology.engine.rendering.dag.StateChange;
 
 import java.util.Objects;
 

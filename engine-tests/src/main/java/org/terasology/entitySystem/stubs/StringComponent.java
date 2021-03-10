@@ -1,10 +1,10 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.entitySystem.stubs;
+package org.terasology.engine.entitySystem.stubs;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
-import org.terasology.entitySystem.Component;
+import org.terasology.engine.entitySystem.Component;
 
 
 public final class StringComponent implements Component {

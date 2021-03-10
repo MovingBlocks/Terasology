@@ -1,38 +1,25 @@
-/*
- * Copyright 2013 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 
-package org.terasology.input.cameraTarget;
+package org.terasology.engine.input.cameraTarget;
 
 import com.google.common.base.Objects;
 import org.joml.RoundingMode;
 import org.joml.Vector3f;
 import org.joml.Vector3i;
-import org.terasology.config.Config;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.systems.BaseComponentSystem;
-import org.terasology.logic.players.LocalPlayer;
+import org.terasology.engine.config.Config;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
+import org.terasology.engine.logic.players.LocalPlayer;
 import org.terasology.math.TeraMath;
-import org.terasology.physics.CollisionGroup;
-import org.terasology.physics.HitResult;
-import org.terasology.physics.Physics;
-import org.terasology.physics.StandardCollisionGroup;
-import org.terasology.registry.In;
-import org.terasology.rendering.world.WorldRenderer;
-import org.terasology.world.BlockEntityRegistry;
-import org.terasology.world.block.BlockComponent;
+import org.terasology.engine.physics.CollisionGroup;
+import org.terasology.engine.physics.HitResult;
+import org.terasology.engine.physics.Physics;
+import org.terasology.engine.physics.StandardCollisionGroup;
+import org.terasology.engine.registry.In;
+import org.terasology.engine.rendering.world.WorldRenderer;
+import org.terasology.engine.world.BlockEntityRegistry;
+import org.terasology.engine.world.block.BlockComponent;
 
 import java.util.Arrays;
 

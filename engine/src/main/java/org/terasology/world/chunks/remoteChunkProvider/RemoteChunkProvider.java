@@ -1,7 +1,7 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-package org.terasology.world.chunks.remoteChunkProvider;
+package org.terasology.engine.world.chunks.remoteChunkProvider;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -11,23 +11,23 @@ import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.logic.players.LocalPlayer;
-import org.terasology.monitoring.chunk.ChunkMonitor;
-import org.terasology.world.block.BlockManager;
-import org.terasology.world.block.BlockRegion;
-import org.terasology.world.chunks.Chunk;
-import org.terasology.world.chunks.ChunkProvider;
-import org.terasology.world.chunks.Chunks;
-import org.terasology.world.chunks.event.BeforeChunkUnload;
-import org.terasology.world.chunks.event.OnChunkLoaded;
-import org.terasology.world.chunks.pipeline.ChunkProcessingPipeline;
-import org.terasology.world.chunks.pipeline.PositionFuture;
-import org.terasology.world.chunks.pipeline.stages.ChunkTaskProvider;
-import org.terasology.world.internal.ChunkViewCore;
-import org.terasology.world.internal.ChunkViewCoreImpl;
-import org.terasology.world.propagation.light.InternalLightProcessor;
-import org.terasology.world.propagation.light.LightMerger;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.logic.players.LocalPlayer;
+import org.terasology.engine.monitoring.chunk.ChunkMonitor;
+import org.terasology.engine.world.internal.ChunkViewCore;
+import org.terasology.engine.world.internal.ChunkViewCoreImpl;
+import org.terasology.engine.world.propagation.light.InternalLightProcessor;
+import org.terasology.engine.world.propagation.light.LightMerger;
+import org.terasology.engine.world.block.BlockManager;
+import org.terasology.engine.world.block.BlockRegion;
+import org.terasology.engine.world.chunks.Chunk;
+import org.terasology.engine.world.chunks.ChunkProvider;
+import org.terasology.engine.world.chunks.Chunks;
+import org.terasology.engine.world.chunks.event.BeforeChunkUnload;
+import org.terasology.engine.world.chunks.event.OnChunkLoaded;
+import org.terasology.engine.world.chunks.pipeline.ChunkProcessingPipeline;
+import org.terasology.engine.world.chunks.pipeline.PositionFuture;
+import org.terasology.engine.world.chunks.pipeline.stages.ChunkTaskProvider;
 
 import java.util.Collection;
 import java.util.Comparator;
@@ -42,13 +42,13 @@ import java.util.stream.StreamSupport;
 /**
  * Provides chunks received from remote source.
  * <p>
- * Loading/Unload chunks dependent on {@link org.terasology.network.Server}
+ * Loading/Unload chunks dependent on {@link org.terasology.engine.network.Server}
  * <p/>
  * Produce events:
  * <p>
  * {@link OnChunkLoaded} when chunk received from server and processed.
  * <p>
- * {@link BeforeChunkUnload} when {@link org.terasology.network.Server} send invalidate chunk and chunk removing
+ * {@link BeforeChunkUnload} when {@link org.terasology.engine.network.Server} send invalidate chunk and chunk removing
  */
 public class RemoteChunkProvider implements ChunkProvider {
 

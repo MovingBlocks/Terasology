@@ -1,7 +1,7 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-package org.terasology.math;
+package org.terasology.engine.math;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;

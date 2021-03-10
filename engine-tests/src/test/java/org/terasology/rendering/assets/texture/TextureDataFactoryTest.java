@@ -16,9 +16,12 @@
 package org.terasology.rendering.assets.texture;
 
 import org.junit.jupiter.api.Test;
+import org.terasology.engine.rendering.assets.texture.Texture;
+import org.terasology.engine.rendering.assets.texture.TextureData;
+import org.terasology.engine.rendering.assets.texture.TextureDataFactory;
 import org.terasology.nui.Color;
-import org.terasology.rendering.assets.texture.Texture.FilterMode;
-import org.terasology.rendering.assets.texture.Texture.WrapMode;
+import org.terasology.engine.rendering.assets.texture.Texture.FilterMode;
+import org.terasology.engine.rendering.assets.texture.Texture.WrapMode;
 
 import java.nio.ByteBuffer;
 

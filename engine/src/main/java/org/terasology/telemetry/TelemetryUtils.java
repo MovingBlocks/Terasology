@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.telemetry;
+package org.terasology.engine.telemetry;
 
 import ch.qos.logback.classic.LoggerContext;
 import com.snowplowanalytics.snowplow.tracker.Subject;
@@ -22,13 +22,13 @@ import com.snowplowanalytics.snowplow.tracker.emitter.Emitter;
 import com.snowplowanalytics.snowplow.tracker.events.Unstructured;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.config.facade.TelemetryConfiguration;
-import org.terasology.context.Context;
-import org.terasology.engine.subsystem.DisplayDevice;
+import org.terasology.engine.config.facade.TelemetryConfiguration;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.core.subsystem.DisplayDevice;
 import org.terasology.module.sandbox.API;
-import org.terasology.registry.CoreRegistry;
-import org.terasology.telemetry.logstash.TelemetryLogstashAppender;
-import org.terasology.telemetry.metrics.Metric;
+import org.terasology.engine.registry.CoreRegistry;
+import org.terasology.engine.telemetry.logstash.TelemetryLogstashAppender;
+import org.terasology.engine.telemetry.metrics.Metric;
 
 import java.security.AccessController;
 import java.security.PrivilegedAction;
@@ -49,7 +49,7 @@ public final class TelemetryUtils {
     }
 
     /**
-     * Fetch metric in {@link org.terasology.context.Context} and send to the server.
+     * Fetch metric in {@link org.terasology.engine.context.Context} and send to the server.
      * This method could be used in the modules.
      * @param context The game context
      * @param metricClass The class of the metric which we want to track
@@ -75,7 +75,7 @@ public final class TelemetryUtils {
     }
 
     /**
-     * fetch metric in {@link org.terasology.telemetry.Metrics} and send to the server.
+     * fetch metric in {@link org.terasology.engine.telemetry.Metrics} and send to the server.
      * @param metrics Metrics class in the game context.
      * @param metricClass The class of metric.
      * @param emitter Emitter sending telemetry to the server.
@@ -95,7 +95,7 @@ public final class TelemetryUtils {
     }
 
     /**
-     * Fetch metric in {@link org.terasology.telemetry.Metrics} and send to the server.
+     * Fetch metric in {@link org.terasology.engine.telemetry.Metrics} and send to the server.
      * @param emitter Emitter sending telemetry to the server.
      * @param nameSpace The name the class tracking this metric.
      * @param event The new event.

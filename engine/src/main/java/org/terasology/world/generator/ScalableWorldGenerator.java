@@ -1,10 +1,9 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-package org.terasology.world.generator;
+package org.terasology.engine.world.generator;
 
-import org.terasology.world.chunks.CoreChunk;
-import org.terasology.world.generation.EntityBuffer;
+import org.terasology.engine.world.chunks.CoreChunk;
 
 public interface ScalableWorldGenerator extends WorldGenerator {
     /**

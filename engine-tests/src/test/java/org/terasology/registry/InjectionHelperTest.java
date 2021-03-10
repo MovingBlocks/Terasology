@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.registry;
+package org.terasology.engine.registry;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.terasology.context.Context;
-import org.terasology.context.internal.ContextImpl;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.context.internal.ContextImpl;
 
 import java.util.NoSuchElementException;
 

@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package org.terasology.entitySystem.event.internal;
+package org.terasology.engine.entitySystem.event.internal;
 
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.event.Event;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.entitySystem.event.Event;
 
 /**
  * Interface for a single event receiver

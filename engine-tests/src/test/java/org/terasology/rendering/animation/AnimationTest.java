@@ -18,6 +18,9 @@ package org.terasology.rendering.animation;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.terasology.engine.rendering.animation.Animation;
+import org.terasology.engine.rendering.animation.AnimationListener;
+import org.terasology.engine.rendering.animation.TimeModifiers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

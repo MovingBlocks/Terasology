@@ -1,6 +1,6 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.rendering.logic;
+package org.terasology.engine.rendering.logic;
 
 import com.google.common.collect.Maps;
 import org.joml.Vector3f;
@@ -8,26 +8,26 @@ import org.joml.Vector3fc;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.management.AssetManager;
-import org.terasology.entitySystem.entity.EntityManager;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.entity.lifecycleEvents.BeforeDeactivateComponent;
-import org.terasology.entitySystem.entity.lifecycleEvents.OnChangedComponent;
-import org.terasology.entitySystem.event.ReceiveEvent;
-import org.terasology.entitySystem.systems.BaseComponentSystem;
-import org.terasology.entitySystem.systems.RegisterMode;
-import org.terasology.entitySystem.systems.RegisterSystem;
-import org.terasology.entitySystem.systems.RenderSystem;
-import org.terasology.logic.location.LocationComponent;
+import org.terasology.engine.entitySystem.entity.EntityManager;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.entitySystem.entity.lifecycleEvents.BeforeDeactivateComponent;
+import org.terasology.engine.entitySystem.entity.lifecycleEvents.OnChangedComponent;
+import org.terasology.engine.entitySystem.event.ReceiveEvent;
+import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
+import org.terasology.engine.entitySystem.systems.RegisterMode;
+import org.terasology.engine.entitySystem.systems.RegisterSystem;
+import org.terasology.engine.entitySystem.systems.RenderSystem;
+import org.terasology.engine.logic.location.LocationComponent;
+import org.terasology.engine.rendering.assets.font.Font;
+import org.terasology.engine.rendering.assets.font.FontMeshBuilder;
+import org.terasology.engine.rendering.assets.material.Material;
+import org.terasology.engine.rendering.cameras.Camera;
+import org.terasology.engine.rendering.opengl.OpenGLUtils;
 import org.terasology.nui.Color;
 import org.terasology.nui.HorizontalAlign;
-import org.terasology.registry.In;
-import org.terasology.rendering.assets.font.Font;
-import org.terasology.rendering.assets.font.FontMeshBuilder;
-import org.terasology.rendering.assets.material.Material;
-import org.terasology.rendering.assets.mesh.Mesh;
-import org.terasology.rendering.cameras.Camera;
-import org.terasology.rendering.opengl.OpenGLUtils;
-import org.terasology.world.WorldProvider;
+import org.terasology.engine.registry.In;
+import org.terasology.engine.rendering.assets.mesh.Mesh;
+import org.terasology.engine.world.WorldProvider;
 
 import java.util.Arrays;
 import java.util.Map;

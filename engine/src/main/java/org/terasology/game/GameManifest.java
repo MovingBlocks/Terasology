@@ -13,22 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.game;
+package org.terasology.engine.game;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import org.terasology.engine.TerasologyConstants;
+import org.terasology.engine.core.TerasologyConstants;
 import org.terasology.naming.Name;
 import org.terasology.naming.NameVersion;
 import org.terasology.naming.Version;
 import org.terasology.naming.gson.NameTypeAdapter;
 import org.terasology.naming.gson.VersionTypeAdapter;
-import org.terasology.utilities.gson.CaseInsensitiveEnumTypeAdapterFactory;
-import org.terasology.utilities.gson.UriTypeAdapterFactory;
-import org.terasology.world.internal.WorldInfo;
+import org.terasology.engine.utilities.gson.CaseInsensitiveEnumTypeAdapterFactory;
+import org.terasology.engine.utilities.gson.UriTypeAdapterFactory;
+import org.terasology.engine.world.internal.WorldInfo;
 
 import java.io.BufferedReader;
 import java.io.IOException;

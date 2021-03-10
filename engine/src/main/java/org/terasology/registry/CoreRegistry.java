@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.registry;
+package org.terasology.engine.registry;
 
-import org.terasology.context.Context;
+import org.terasology.engine.context.Context;
 
 /**
  * Registry giving access to major singleton systems, via the interface they fulfill.

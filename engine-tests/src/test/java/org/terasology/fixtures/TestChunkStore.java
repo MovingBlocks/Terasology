@@ -4,8 +4,8 @@
 package org.terasology.fixtures;
 
 import org.joml.Vector3i;
-import org.terasology.persistence.ChunkStore;
-import org.terasology.world.chunks.Chunk;
+import org.terasology.engine.persistence.ChunkStore;
+import org.terasology.engine.world.chunks.Chunk;
 
 public class TestChunkStore implements ChunkStore {
 

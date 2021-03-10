@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 
-@API package org.terasology.entitySystem;
+@API package org.terasology.engine.entitySystem;
 
 import org.terasology.module.sandbox.API;

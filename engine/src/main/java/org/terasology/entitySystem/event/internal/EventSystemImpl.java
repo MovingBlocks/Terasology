@@ -1,6 +1,6 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.entitySystem.event.internal;
+package org.terasology.engine.entitySystem.event.internal;
 
 import com.esotericsoftware.reflectasm.MethodAccess;
 import com.google.common.base.Objects;
@@ -18,16 +18,30 @@ import org.reflections.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
-import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.event.AbstractConsumableEvent;
-import org.terasology.entitySystem.event.ConsumableEvent;
-import org.terasology.entitySystem.event.Event;
-import org.terasology.entitySystem.event.EventPriority;
-import org.terasology.entitySystem.event.PendingEvent;
-import org.terasology.entitySystem.event.ReceiveEvent;
-import org.terasology.entitySystem.systems.ComponentSystem;
-import org.terasology.monitoring.PerformanceMonitor;
+import org.terasology.engine.entitySystem.Component;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.entitySystem.event.AbstractConsumableEvent;
+import org.terasology.engine.entitySystem.event.ConsumableEvent;
+import org.terasology.engine.entitySystem.event.Event;
+import org.terasology.engine.entitySystem.event.EventPriority;
+import org.terasology.engine.entitySystem.event.PendingEvent;
+import org.terasology.engine.entitySystem.event.ReceiveEvent;
+import org.terasology.engine.entitySystem.metadata.EventLibrary;
+import org.terasology.engine.entitySystem.metadata.EventMetadata;
+import org.terasology.engine.entitySystem.systems.ComponentSystem;
+import org.terasology.engine.monitoring.PerformanceMonitor;
+import org.terasology.engine.network.BroadcastEvent;
+import org.terasology.engine.network.Client;
+import org.terasology.engine.network.NetworkComponent;
+import org.terasology.engine.network.NetworkEvent;
+import org.terasology.engine.network.NetworkMode;
+import org.terasology.engine.network.NetworkSystem;
+import org.terasology.engine.network.OwnerEvent;
+import org.terasology.engine.network.ServerEvent;
+import org.terasology.engine.recording.EventCatcher;
+import org.terasology.engine.recording.RecordAndReplayCurrentStatus;
+import org.terasology.engine.recording.RecordAndReplayStatus;
+import org.terasology.engine.world.block.BlockComponent;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;

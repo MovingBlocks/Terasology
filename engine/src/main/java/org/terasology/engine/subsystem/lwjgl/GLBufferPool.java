@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.engine.subsystem.lwjgl;
+package org.terasology.engine.core.subsystem.lwjgl;
 
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
@@ -21,7 +21,7 @@ import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL15;
-import org.terasology.rendering.VertexBufferObjectUtil;
+import org.terasology.engine.rendering.VertexBufferObjectUtil;
 
 import java.nio.IntBuffer;
 

@@ -1,19 +1,6 @@
-/*
- * Copyright 2017 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-package org.terasology.logic.behavior.nui;
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
+package org.terasology.engine.logic.behavior.nui;
 
 import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
@@ -24,15 +11,15 @@ import org.abego.treelayout.util.DefaultConfiguration;
 import org.abego.treelayout.util.FixedNodeExtentProvider;
 import org.joml.Vector2f;
 import org.joml.Vector2i;
-import org.terasology.context.Context;
-import org.terasology.logic.behavior.BehaviorSystem;
-import org.terasology.logic.behavior.DefaultBehaviorTreeRunner;
-import org.terasology.logic.behavior.asset.BehaviorTree;
-import org.terasology.logic.behavior.asset.BehaviorTreeFormat;
-import org.terasology.logic.behavior.core.BehaviorNode;
-import org.terasology.logic.behavior.core.BehaviorState;
-import org.terasology.logic.behavior.core.BehaviorTreeBuilder;
-import org.terasology.logic.behavior.core.Visitor;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.logic.behavior.asset.BehaviorTree;
+import org.terasology.engine.logic.behavior.asset.BehaviorTreeFormat;
+import org.terasology.engine.logic.behavior.core.BehaviorNode;
+import org.terasology.engine.logic.behavior.core.BehaviorState;
+import org.terasology.engine.logic.behavior.core.BehaviorTreeBuilder;
+import org.terasology.engine.logic.behavior.core.Visitor;
+import org.terasology.engine.logic.behavior.BehaviorSystem;
+import org.terasology.engine.logic.behavior.DefaultBehaviorTreeRunner;
 import org.terasology.nui.BaseInteractionListener;
 import org.terasology.nui.Canvas;
 import org.terasology.nui.Color;
@@ -44,7 +31,7 @@ import org.terasology.nui.events.NUIMouseClickEvent;
 import org.terasology.nui.events.NUIMouseOverEvent;
 import org.terasology.nui.events.NUIMouseReleaseEvent;
 import org.terasology.nui.layouts.ZoomableLayout;
-import org.terasology.registry.CoreRegistry;
+import org.terasology.engine.registry.CoreRegistry;
 
 import java.awt.geom.Rectangle2D;
 import java.io.ByteArrayOutputStream;

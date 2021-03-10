@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.physics;
+package org.terasology.engine.physics;
 
 import com.google.common.collect.Maps;
 

@@ -13,14 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.engine.subsystem.common;
+package org.terasology.engine.core.subsystem.common;
 
-import org.terasology.config.Config;
-import org.terasology.config.SystemConfig;
-import org.terasology.context.Context;
-import org.terasology.engine.GameEngine;
-import org.terasology.engine.subsystem.EngineSubsystem;
-import org.terasology.monitoring.gui.AdvancedMonitor;
+import org.terasology.engine.config.SystemConfig;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.core.GameEngine;
+import org.terasology.engine.core.subsystem.EngineSubsystem;
+import org.terasology.engine.monitoring.gui.AdvancedMonitor;
 
 public class MonitoringSubsystem implements EngineSubsystem {
 

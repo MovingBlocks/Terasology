@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.context.internal;
+package org.terasology.engine.context.internal;
 
-import org.terasology.context.Context;
+import org.terasology.engine.context.Context;
 
 public class MockContext implements Context {
     @Override

@@ -1,6 +1,6 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.utilities.procedural;
+package org.terasology.engine.utilities.procedural;
 
 import com.google.common.math.IntMath;
 import org.joml.Vector2f;
@@ -8,9 +8,9 @@ import org.joml.Vector2i;
 import org.joml.Vector3f;
 import org.joml.Vector3i;
 import org.terasology.math.TeraMath;
-import org.terasology.world.block.BlockArea;
-import org.terasology.world.block.BlockAreac;
-import org.terasology.world.block.BlockRegion;
+import org.terasology.engine.world.block.BlockArea;
+import org.terasology.engine.world.block.BlockAreac;
+import org.terasology.engine.world.block.BlockRegion;
 
 public class SubSampledNoise extends AbstractNoise {
 

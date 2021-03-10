@@ -1,6 +1,6 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.rendering.nui.layers.hud;
+package org.terasology.engine.rendering.nui.layers.hud;
 
 import com.google.common.collect.Maps;
 import org.joml.Vector2i;
@@ -14,10 +14,10 @@ import org.terasology.nui.Canvas;
 import org.terasology.nui.ControlWidget;
 import org.terasology.nui.UIWidget;
 import org.terasology.nui.asset.UIElement;
-import org.terasology.registry.In;
-import org.terasology.registry.InjectionHelper;
-import org.terasology.rendering.nui.CoreScreenLayer;
-import org.terasology.rendering.nui.NUIManager;
+import org.terasology.engine.registry.In;
+import org.terasology.engine.registry.InjectionHelper;
+import org.terasology.engine.rendering.nui.CoreScreenLayer;
+import org.terasology.engine.rendering.nui.NUIManager;
 
 import java.util.Iterator;
 import java.util.Map;

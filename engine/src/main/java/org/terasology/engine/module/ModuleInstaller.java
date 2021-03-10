@@ -13,17 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.engine.module;
+package org.terasology.engine.core.module;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.engine.TerasologyConstants;
-import org.terasology.engine.paths.PathManager;
+import org.terasology.engine.core.TerasologyConstants;
+import org.terasology.engine.core.paths.PathManager;
 import org.terasology.module.Module;
 import org.terasology.module.ModuleLoader;
 import org.terasology.module.ModuleMetadata;
-import org.terasology.utilities.download.MultiFileDownloader;
-import org.terasology.utilities.download.MultiFileTransferProgressListener;
+import org.terasology.engine.utilities.download.MultiFileDownloader;
+import org.terasology.engine.utilities.download.MultiFileTransferProgressListener;
 
 import java.io.IOException;
 import java.net.URI;

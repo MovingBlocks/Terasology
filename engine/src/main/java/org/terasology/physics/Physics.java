@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.physics;
+package org.terasology.engine.physics;
 
 import org.terasology.joml.geom.AABBf;
 import org.joml.Vector3f;
-import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.engine.entitySystem.entity.EntityRef;
 
 import java.util.List;
 import java.util.Set;

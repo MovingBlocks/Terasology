@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package org.terasology.network.serialization;
+package org.terasology.engine.network.serialization;
 
-import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.metadata.ComponentMetadata;
-import org.terasology.persistence.serializers.ComponentSerializeCheck;
+import org.terasology.engine.entitySystem.Component;
+import org.terasology.engine.entitySystem.metadata.ComponentMetadata;
+import org.terasology.engine.persistence.serializers.ComponentSerializeCheck;
 
 /**
  * Determines which components should be serialized over the network - only replicated components.

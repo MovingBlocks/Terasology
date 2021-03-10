@@ -1,11 +1,11 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-package org.terasology.world.generation.facets;
+package org.terasology.engine.world.generation.facets;
 
-import org.terasology.world.block.BlockRegionc;
-import org.terasology.world.generation.Border3D;
-import org.terasology.world.generation.facets.base.BaseFieldFacet2D;
+import org.terasology.engine.world.generation.facets.base.BaseFieldFacet2D;
+import org.terasology.engine.world.block.BlockRegionc;
+import org.terasology.engine.world.generation.Border3D;
 
 /**
  * This facet represents the approximate height of the conceptual surface of the ground at each position.

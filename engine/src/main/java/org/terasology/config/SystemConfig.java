@@ -1,20 +1,20 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-package org.terasology.config;
+package org.terasology.engine.config;
 
-import org.terasology.config.flexible.AutoConfig;
-import org.terasology.config.flexible.Setting;
-import org.terasology.config.flexible.constraints.NumberRangeConstraint;
+import org.terasology.engine.config.flexible.AutoConfig;
+import org.terasology.engine.config.flexible.Setting;
+import org.terasology.engine.config.flexible.constraints.NumberRangeConstraint;
 
 import java.util.Locale;
 import java.util.Locale.Category;
 import java.util.Optional;
 
-import static org.terasology.config.flexible.SettingArgument.constraint;
-import static org.terasology.config.flexible.SettingArgument.defaultValue;
-import static org.terasology.config.flexible.SettingArgument.override;
-import static org.terasology.config.flexible.SettingArgument.type;
+import static org.terasology.engine.config.flexible.SettingArgument.constraint;
+import static org.terasology.engine.config.flexible.SettingArgument.defaultValue;
+import static org.terasology.engine.config.flexible.SettingArgument.override;
+import static org.terasology.engine.config.flexible.SettingArgument.type;
 
 public class SystemConfig extends AutoConfig {
     public static final String SAVED_GAMES_ENABLED_PROPERTY = "org.terasology.savedGamesEnabled";

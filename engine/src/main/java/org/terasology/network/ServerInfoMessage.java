@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package org.terasology.network;
+package org.terasology.engine.network;
 
 import org.terasology.naming.NameVersion;
-import org.terasology.world.internal.WorldInfo;
+import org.terasology.engine.world.internal.WorldInfo;
 
 import java.util.List;
 import java.util.Map;

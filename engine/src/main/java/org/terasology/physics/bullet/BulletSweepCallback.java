@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.physics.bullet;
+package org.terasology.engine.physics.bullet;
 
 import com.badlogic.gdx.physics.bullet.collision.ClosestConvexResultCallback;
 import com.badlogic.gdx.physics.bullet.collision.ClosestRayResultCallback;
@@ -23,7 +23,7 @@ import com.badlogic.gdx.physics.bullet.collision.btCollisionObject;
 import com.badlogic.gdx.physics.bullet.dynamics.btDiscreteDynamicsWorld;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
-import org.terasology.physics.engine.SweepCallback;
+import org.terasology.engine.physics.engine.SweepCallback;
 
 /**
  * The bullet implementation of SweepCallback, that holds the results of a collision sweep. (detect what

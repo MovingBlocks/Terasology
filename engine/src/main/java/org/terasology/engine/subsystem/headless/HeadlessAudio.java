@@ -13,17 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.engine.subsystem.headless;
+package org.terasology.engine.core.subsystem.headless;
 
 import org.terasology.assets.module.ModuleAwareAssetTypeManager;
-import org.terasology.audio.AudioManager;
-import org.terasology.audio.StaticSound;
-import org.terasology.audio.StreamingSound;
-import org.terasology.audio.nullAudio.NullAudioManager;
-import org.terasology.context.Context;
-import org.terasology.engine.GameEngine;
-import org.terasology.engine.modes.GameState;
-import org.terasology.engine.subsystem.EngineSubsystem;
+import org.terasology.engine.audio.AudioManager;
+import org.terasology.engine.audio.StaticSound;
+import org.terasology.engine.audio.StreamingSound;
+import org.terasology.engine.audio.nullAudio.NullAudioManager;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.core.GameEngine;
+import org.terasology.engine.core.modes.GameState;
+import org.terasology.engine.core.subsystem.EngineSubsystem;
 
 public class HeadlessAudio implements EngineSubsystem {
 

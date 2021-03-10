@@ -20,9 +20,10 @@ import gnu.trove.map.TObjectByteMap;
 import gnu.trove.map.hash.TObjectByteHashMap;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
-import org.terasology.world.block.Block;
-import org.terasology.world.block.BlockRegion;
-import org.terasology.world.block.BlockRegionc;
+import org.terasology.engine.world.block.Block;
+import org.terasology.engine.world.block.BlockRegion;
+import org.terasology.engine.world.block.BlockRegionc;
+import org.terasology.engine.world.propagation.PropagatorWorldView;
 
 import java.util.Map;
 

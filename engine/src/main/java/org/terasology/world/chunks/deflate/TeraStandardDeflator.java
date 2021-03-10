@@ -1,12 +1,12 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-package org.terasology.world.chunks.deflate;
+package org.terasology.engine.world.chunks.deflate;
 
-import org.terasology.world.chunks.blockdata.TeraArray;
-import org.terasology.world.chunks.blockdata.TeraSparseArray16Bit;
-import org.terasology.world.chunks.blockdata.TeraSparseArray4Bit;
-import org.terasology.world.chunks.blockdata.TeraSparseArray8Bit;
+import org.terasology.engine.world.chunks.blockdata.TeraArray;
+import org.terasology.engine.world.chunks.blockdata.TeraSparseArray16Bit;
+import org.terasology.engine.world.chunks.blockdata.TeraSparseArray4Bit;
+import org.terasology.engine.world.chunks.blockdata.TeraSparseArray8Bit;
 
 /**
  * TeraStandardDeflator implements a simple deflation algorithm for 4, 8 and 16-bit dense and sparse arrays.<br>

@@ -1,6 +1,6 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.world.block.loader;
+package org.terasology.engine.world.block.loader;
 
 import com.google.common.base.Charsets;
 import com.google.gson.Gson;
@@ -24,21 +24,21 @@ import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.format.AbstractAssetFileFormat;
 import org.terasology.assets.format.AssetDataFile;
 import org.terasology.assets.management.AssetManager;
-import org.terasology.entitySystem.prefab.Prefab;
-import org.terasology.registry.CoreRegistry;
-import org.terasology.utilities.gson.CaseInsensitiveEnumTypeAdapterFactory;
-import org.terasology.utilities.gson.Vector3fTypeAdapter;
-import org.terasology.utilities.gson.Vector4fTypeAdapter;
-import org.terasology.world.block.BlockPart;
-import org.terasology.world.block.family.BlockFamily;
-import org.terasology.world.block.family.BlockFamilyLibrary;
-import org.terasology.world.block.family.FreeformFamily;
-import org.terasology.world.block.family.HorizontalFamily;
-import org.terasology.world.block.family.MultiSection;
-import org.terasology.world.block.family.SymmetricFamily;
-import org.terasology.world.block.shapes.BlockShape;
-import org.terasology.world.block.sounds.BlockSounds;
-import org.terasology.world.block.tiles.BlockTile;
+import org.terasology.engine.entitySystem.prefab.Prefab;
+import org.terasology.engine.registry.CoreRegistry;
+import org.terasology.engine.world.block.shapes.BlockShape;
+import org.terasology.engine.world.block.sounds.BlockSounds;
+import org.terasology.engine.utilities.gson.CaseInsensitiveEnumTypeAdapterFactory;
+import org.terasology.engine.utilities.gson.Vector3fTypeAdapter;
+import org.terasology.engine.utilities.gson.Vector4fTypeAdapter;
+import org.terasology.engine.world.block.BlockPart;
+import org.terasology.engine.world.block.family.BlockFamily;
+import org.terasology.engine.world.block.family.BlockFamilyLibrary;
+import org.terasology.engine.world.block.family.FreeformFamily;
+import org.terasology.engine.world.block.family.HorizontalFamily;
+import org.terasology.engine.world.block.family.MultiSection;
+import org.terasology.engine.world.block.family.SymmetricFamily;
+import org.terasology.engine.world.block.tiles.BlockTile;
 
 import java.io.BufferedReader;
 import java.io.IOException;

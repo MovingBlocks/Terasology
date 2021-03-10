@@ -1,21 +1,21 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.rendering.nui.widgets.browser.ui;
+package org.terasology.engine.rendering.nui.widgets.browser.ui;
 
 import org.joml.Vector2i;
+import org.terasology.engine.rendering.nui.widgets.browser.data.DocumentData;
+import org.terasology.engine.rendering.nui.widgets.browser.data.ParagraphData;
+import org.terasology.engine.rendering.nui.widgets.browser.data.basic.flow.ContainerRenderSpace;
+import org.terasology.engine.rendering.nui.widgets.browser.ui.style.DefaultDocumentRenderStyle;
+import org.terasology.engine.rendering.nui.widgets.browser.ui.style.DocumentRenderStyle;
+import org.terasology.engine.rendering.nui.widgets.browser.ui.style.FallbackDocumentRenderStyle;
+import org.terasology.engine.rendering.nui.widgets.browser.ui.style.FallbackParagraphRenderStyle;
+import org.terasology.engine.rendering.nui.widgets.browser.ui.style.ParagraphRenderStyle;
 import org.terasology.joml.geom.Rectanglei;
 import org.terasology.nui.Canvas;
 import org.terasology.nui.Color;
 import org.terasology.nui.asset.font.Font;
 import org.terasology.nui.util.RectUtility;
-import org.terasology.rendering.nui.widgets.browser.data.DocumentData;
-import org.terasology.rendering.nui.widgets.browser.data.ParagraphData;
-import org.terasology.rendering.nui.widgets.browser.data.basic.flow.ContainerRenderSpace;
-import org.terasology.rendering.nui.widgets.browser.ui.style.DefaultDocumentRenderStyle;
-import org.terasology.rendering.nui.widgets.browser.ui.style.DocumentRenderStyle;
-import org.terasology.rendering.nui.widgets.browser.ui.style.FallbackDocumentRenderStyle;
-import org.terasology.rendering.nui.widgets.browser.ui.style.FallbackParagraphRenderStyle;
-import org.terasology.rendering.nui.widgets.browser.ui.style.ParagraphRenderStyle;
 
 import java.util.Collection;
 

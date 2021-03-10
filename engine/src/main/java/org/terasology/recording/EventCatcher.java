@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.recording;
+package org.terasology.engine.recording;
 
-import org.terasology.entitySystem.event.Event;
-import org.terasology.entitySystem.event.PendingEvent;
+import org.terasology.engine.entitySystem.event.Event;
+import org.terasology.engine.entitySystem.event.PendingEvent;
 
 import java.util.List;
 

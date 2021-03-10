@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.network.internal.pipelineFactory;
+package org.terasology.engine.network.internal.pipelineFactory;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
@@ -25,12 +25,12 @@ import io.netty.handler.codec.protobuf.ProtobufDecoder;
 import io.netty.handler.codec.protobuf.ProtobufEncoder;
 import io.netty.handler.codec.protobuf.ProtobufVarint32FrameDecoder;
 import io.netty.handler.codec.protobuf.ProtobufVarint32LengthFieldPrepender;
-import org.terasology.network.internal.ClientConnectionHandler;
-import org.terasology.network.internal.ClientHandler;
-import org.terasology.network.internal.ClientHandshakeHandler;
-import org.terasology.network.internal.JoinStatusImpl;
-import org.terasology.network.internal.MetricRecordingHandler;
-import org.terasology.network.internal.NetworkSystemImpl;
+import org.terasology.engine.network.internal.ClientConnectionHandler;
+import org.terasology.engine.network.internal.ClientHandler;
+import org.terasology.engine.network.internal.ClientHandshakeHandler;
+import org.terasology.engine.network.internal.JoinStatusImpl;
+import org.terasology.engine.network.internal.MetricRecordingHandler;
+import org.terasology.engine.network.internal.NetworkSystemImpl;
 import org.terasology.protobuf.NetData;
 
 

@@ -1,14 +1,14 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.config.flexible.internal;
+package org.terasology.engine.config.flexible.internal;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.config.flexible.Setting;
-import org.terasology.config.flexible.SettingChangeListener;
-import org.terasology.config.flexible.constraints.SettingConstraint;
+import org.terasology.engine.config.flexible.Setting;
+import org.terasology.engine.config.flexible.SettingChangeListener;
+import org.terasology.engine.config.flexible.constraints.SettingConstraint;
 import org.terasology.reflection.TypeInfo;
 
 import java.util.Optional;

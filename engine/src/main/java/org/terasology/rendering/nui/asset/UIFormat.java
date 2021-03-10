@@ -1,6 +1,6 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.rendering.nui.asset;
+package org.terasology.engine.rendering.nui.asset;
 
 import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
@@ -20,8 +20,15 @@ import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.format.AbstractAssetFileFormat;
 import org.terasology.assets.format.AssetDataFile;
 import org.terasology.assets.module.annotations.RegisterAssetFileFormat;
-import org.terasology.engine.module.ModuleContext;
-import org.terasology.i18n.TranslationSystem;
+import org.terasology.engine.core.module.ModuleContext;
+import org.terasology.engine.i18n.TranslationSystem;
+import org.terasology.engine.persistence.typeHandling.extensionTypes.AssetTypeHandler;
+import org.terasology.engine.persistence.typeHandling.gson.GsonTypeSerializationLibraryAdapterFactory;
+import org.terasology.engine.registry.CoreRegistry;
+import org.terasology.engine.rendering.nui.CoreScreenLayer;
+import org.terasology.engine.rendering.nui.NUIManager;
+import org.terasology.engine.utilities.ReflectionUtil;
+import org.terasology.engine.utilities.gson.CaseInsensitiveEnumTypeAdapterFactory;
 import org.terasology.nui.LayoutHint;
 import org.terasology.nui.UILayout;
 import org.terasology.nui.UIWidget;
@@ -29,15 +36,8 @@ import org.terasology.nui.asset.UIData;
 import org.terasology.nui.skin.UISkin;
 import org.terasology.nui.widgets.UILabel;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
-import org.terasology.persistence.typeHandling.extensionTypes.AssetTypeHandler;
-import org.terasology.persistence.typeHandling.gson.GsonTypeSerializationLibraryAdapterFactory;
 import org.terasology.reflection.metadata.ClassMetadata;
 import org.terasology.reflection.metadata.FieldMetadata;
-import org.terasology.registry.CoreRegistry;
-import org.terasology.rendering.nui.CoreScreenLayer;
-import org.terasology.rendering.nui.NUIManager;
-import org.terasology.utilities.ReflectionUtil;
-import org.terasology.utilities.gson.CaseInsensitiveEnumTypeAdapterFactory;
 
 import java.io.IOException;
 import java.io.InputStreamReader;

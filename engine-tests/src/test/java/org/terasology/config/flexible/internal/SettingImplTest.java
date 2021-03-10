@@ -1,18 +1,18 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.config.flexible.internal;
+package org.terasology.engine.config.flexible.internal;
 
 import com.google.common.collect.Lists;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.terasology.config.flexible.Setting;
-import org.terasology.config.flexible.SettingChangeListener;
-import org.terasology.config.flexible.constraints.NumberRangeConstraint;
-import org.terasology.engine.SimpleUri;
+import org.terasology.engine.config.flexible.Setting;
+import org.terasology.engine.config.flexible.SettingChangeListener;
+import org.terasology.engine.config.flexible.constraints.NumberRangeConstraint;
+import org.terasology.engine.core.SimpleUri;
 import org.terasology.reflection.TypeInfo;
-import org.terasology.utilities.random.FastRandom;
-import org.terasology.utilities.random.Random;
+import org.terasology.engine.utilities.random.FastRandom;
+import org.terasology.engine.utilities.random.Random;
 
 import java.util.List;
 import java.util.Optional;

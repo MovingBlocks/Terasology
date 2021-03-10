@@ -1,6 +1,6 @@
 // Copyright 2020 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.persistence;
+package org.terasology.engine.persistence;
 
 import com.google.common.collect.Lists;
 import org.junit.jupiter.api.BeforeAll;
@@ -10,38 +10,38 @@ import org.terasology.assets.AssetFactory;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.assets.module.ModuleAwareAssetTypeManager;
-import org.terasology.context.Context;
-import org.terasology.context.internal.ContextImpl;
-import org.terasology.engine.bootstrap.EntitySystemSetupUtil;
-import org.terasology.engine.module.ModuleManager;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.entity.internal.EngineEntityManager;
-import org.terasology.entitySystem.entity.internal.EntityInfoComponent;
-import org.terasology.entitySystem.entity.internal.EntityScope;
-import org.terasology.entitySystem.metadata.ComponentLibrary;
-import org.terasology.entitySystem.prefab.Prefab;
-import org.terasology.entitySystem.prefab.PrefabData;
-import org.terasology.entitySystem.prefab.internal.PojoPrefab;
-import org.terasology.entitySystem.stubs.GetterSetterComponent;
-import org.terasology.entitySystem.stubs.IntegerComponent;
-import org.terasology.entitySystem.stubs.MappedTypeComponent;
-import org.terasology.entitySystem.stubs.StringComponent;
-import org.terasology.network.NetworkMode;
-import org.terasology.network.NetworkSystem;
-import org.terasology.persistence.serializers.EntitySerializer;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.context.internal.ContextImpl;
+import org.terasology.engine.core.bootstrap.EntitySystemSetupUtil;
+import org.terasology.engine.core.module.ModuleManager;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.entitySystem.entity.internal.EngineEntityManager;
+import org.terasology.engine.entitySystem.entity.internal.EntityInfoComponent;
+import org.terasology.engine.entitySystem.entity.internal.EntityScope;
+import org.terasology.engine.entitySystem.metadata.ComponentLibrary;
+import org.terasology.engine.entitySystem.prefab.Prefab;
+import org.terasology.engine.entitySystem.prefab.PrefabData;
+import org.terasology.engine.entitySystem.prefab.internal.PojoPrefab;
+import org.terasology.engine.entitySystem.stubs.GetterSetterComponent;
+import org.terasology.engine.entitySystem.stubs.IntegerComponent;
+import org.terasology.engine.entitySystem.stubs.MappedTypeComponent;
+import org.terasology.engine.entitySystem.stubs.StringComponent;
+import org.terasology.engine.network.NetworkMode;
+import org.terasology.engine.network.NetworkSystem;
+import org.terasology.engine.persistence.serializers.EntitySerializer;
 import org.terasology.protobuf.EntityData;
-import org.terasology.recording.RecordAndReplayCurrentStatus;
-import org.terasology.registry.CoreRegistry;
+import org.terasology.engine.recording.RecordAndReplayCurrentStatus;
+import org.terasology.engine.registry.CoreRegistry;
 import org.terasology.testUtil.ModuleManagerFactory;
-import org.terasology.utilities.Assets;
+import org.terasology.engine.utilities.Assets;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.terasology.entitySystem.entity.internal.EntityScope.CHUNK;
-import static org.terasology.entitySystem.entity.internal.EntityScope.GLOBAL;
+import static org.terasology.engine.entitySystem.entity.internal.EntityScope.CHUNK;
+import static org.terasology.engine.entitySystem.entity.internal.EntityScope.GLOBAL;
 
 /**
  */

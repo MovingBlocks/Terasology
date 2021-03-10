@@ -13,15 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.telemetry.metrics;
+package org.terasology.engine.telemetry.metrics;
 
 import com.snowplowanalytics.snowplow.tracker.events.Unstructured;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.logic.players.LocalPlayer;
-import org.terasology.registry.CoreRegistry;
-import org.terasology.telemetry.GamePlayStatsComponent;
-import org.terasology.telemetry.TelemetryCategory;
-import org.terasology.telemetry.TelemetryField;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.logic.players.LocalPlayer;
+import org.terasology.engine.registry.CoreRegistry;
+import org.terasology.engine.telemetry.GamePlayStatsComponent;
+import org.terasology.engine.telemetry.TelemetryCategory;
+import org.terasology.engine.telemetry.TelemetryField;
 
 import java.util.Map;
 import java.util.Optional;

@@ -1,13 +1,13 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.rendering.nui.layers.ingame.metrics;
+package org.terasology.engine.rendering.nui.layers.ingame.metrics;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryPoolMXBean;
 import java.lang.management.MemoryType;
 import java.lang.management.MemoryUsage;
 
-import static org.terasology.rendering.nui.layers.ingame.metrics.DebugOverlay.MB_SIZE;
+import static org.terasology.engine.rendering.nui.layers.ingame.metrics.DebugOverlay.MB_SIZE;
 
 public class HeapAllocationMode extends MetricsMode {
     private StringBuilder builder = new StringBuilder();

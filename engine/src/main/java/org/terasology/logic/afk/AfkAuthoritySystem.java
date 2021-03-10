@@ -1,21 +1,21 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.logic.afk;
+package org.terasology.engine.logic.afk;
 
-import org.terasology.engine.Time;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.event.ReceiveEvent;
-import org.terasology.entitySystem.systems.BaseComponentSystem;
-import org.terasology.entitySystem.systems.RegisterMode;
-import org.terasology.entitySystem.systems.RegisterSystem;
-import org.terasology.logic.delay.DelayManager;
-import org.terasology.logic.delay.PeriodicActionTriggeredEvent;
-import org.terasology.logic.players.LocalPlayer;
-import org.terasology.network.Client;
-import org.terasology.network.NetworkSystem;
-import org.terasology.network.events.ConnectedEvent;
-import org.terasology.network.events.DisconnectedEvent;
-import org.terasology.registry.In;
+import org.terasology.engine.core.Time;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.entitySystem.event.ReceiveEvent;
+import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
+import org.terasology.engine.entitySystem.systems.RegisterMode;
+import org.terasology.engine.entitySystem.systems.RegisterSystem;
+import org.terasology.engine.logic.delay.DelayManager;
+import org.terasology.engine.logic.delay.PeriodicActionTriggeredEvent;
+import org.terasology.engine.logic.players.LocalPlayer;
+import org.terasology.engine.network.Client;
+import org.terasology.engine.network.NetworkSystem;
+import org.terasology.engine.network.events.ConnectedEvent;
+import org.terasology.engine.network.events.DisconnectedEvent;
+import org.terasology.engine.registry.In;
 
 @RegisterSystem(RegisterMode.AUTHORITY)
 public class AfkAuthoritySystem extends BaseComponentSystem {

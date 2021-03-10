@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.persistence.typeHandling.mathTypes;
+package org.terasology.engine.persistence.typeHandling.mathTypes;
 
 import org.junit.jupiter.api.Test;
-import org.terasology.math.IntegerRange;
+import org.terasology.engine.math.IntegerRange;
 
 import java.util.Iterator;
 

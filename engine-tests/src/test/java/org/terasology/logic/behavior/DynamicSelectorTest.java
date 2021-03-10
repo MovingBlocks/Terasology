@@ -16,7 +16,7 @@
 package org.terasology.logic.behavior;
 
 import org.junit.jupiter.api.Test;
-import org.terasology.logic.behavior.core.BehaviorState;
+import org.terasology.engine.logic.behavior.core.BehaviorState;
 
 import java.util.Arrays;
 

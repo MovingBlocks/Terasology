@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package org.terasology.network.events;
+package org.terasology.engine.network.events;
 
-import org.terasology.entitySystem.event.Event;
+import org.terasology.engine.entitySystem.event.Event;
 
 /**
  * Event notifying of a client disconnecting.

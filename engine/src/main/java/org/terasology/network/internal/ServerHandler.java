@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.network.internal;
+package org.terasology.engine.network.internal;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;

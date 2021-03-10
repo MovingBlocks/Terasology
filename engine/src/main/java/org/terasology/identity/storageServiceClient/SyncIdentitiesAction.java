@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.identity.storageServiceClient;
+package org.terasology.engine.identity.storageServiceClient;
 
 import com.google.common.collect.MapDifference;
 import com.google.common.collect.Maps;
-import org.terasology.identity.ClientIdentity;
-import org.terasology.identity.PublicIdentityCertificate;
+import org.terasology.engine.identity.ClientIdentity;
+import org.terasology.engine.identity.PublicIdentityCertificate;
 
 import java.util.Map;
 

@@ -1,13 +1,13 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.rendering.nui.layers.mainMenu.inputSettings;
+package org.terasology.engine.rendering.nui.layers.mainMenu.inputSettings;
 
 import org.terasology.assets.ResourceUrn;
-import org.terasology.i18n.TranslationSystem;
+import org.terasology.engine.i18n.TranslationSystem;
 import org.terasology.nui.WidgetUtil;
 import org.terasology.nui.widgets.UILabel;
-import org.terasology.registry.In;
-import org.terasology.rendering.nui.CoreScreenLayer;
+import org.terasology.engine.registry.In;
+import org.terasology.engine.rendering.nui.CoreScreenLayer;
 
 public class ConfirmChangePopup extends CoreScreenLayer {
 

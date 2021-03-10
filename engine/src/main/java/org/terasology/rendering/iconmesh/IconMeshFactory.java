@@ -1,19 +1,19 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.rendering.iconmesh;
+package org.terasology.engine.rendering.iconmesh;
 
 import org.joml.Vector4f;
 import org.terasology.assets.Asset;
 import org.terasology.assets.ResourceUrn;
+import org.terasology.engine.rendering.primitives.Tessellator;
+import org.terasology.engine.rendering.primitives.TessellatorHelper;
 import org.terasology.joml.geom.Rectanglei;
 import org.terasology.module.sandbox.API;
 import org.terasology.naming.Name;
-import org.terasology.rendering.assets.mesh.Mesh;
-import org.terasology.rendering.assets.mesh.MeshData;
-import org.terasology.rendering.assets.texture.TextureRegion;
-import org.terasology.rendering.primitives.Tessellator;
-import org.terasology.rendering.primitives.TessellatorHelper;
-import org.terasology.utilities.Assets;
+import org.terasology.engine.rendering.assets.mesh.Mesh;
+import org.terasology.engine.rendering.assets.mesh.MeshData;
+import org.terasology.engine.rendering.assets.texture.TextureRegion;
+import org.terasology.engine.utilities.Assets;
 
 import java.nio.ByteBuffer;
 

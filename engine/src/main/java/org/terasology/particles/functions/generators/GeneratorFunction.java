@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.particles.functions.generators;
+package org.terasology.engine.particles.functions.generators;
 
-import org.terasology.entitySystem.Component;
+import org.terasology.engine.entitySystem.Component;
 import org.terasology.module.sandbox.API;
-import org.terasology.particles.ParticleData;
-import org.terasology.particles.ParticleDataMask;
-import org.terasology.particles.functions.ParticleSystemFunction;
-import org.terasology.utilities.random.Random;
+import org.terasology.engine.particles.ParticleData;
+import org.terasology.engine.particles.ParticleDataMask;
+import org.terasology.engine.particles.functions.ParticleSystemFunction;
+import org.terasology.engine.utilities.random.Random;
 
 /**
  * A generator function is called on a particle's data when it is created to set its fields.

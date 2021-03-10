@@ -1,11 +1,11 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.rendering.nui.animation;
+package org.terasology.engine.rendering.nui.animation;
 
+import org.terasology.engine.rendering.animation.Animation;
+import org.terasology.engine.rendering.animation.AnimationListener;
+import org.terasology.engine.rendering.animation.TimeModifiers;
 import org.terasology.joml.geom.Rectanglei;
-import org.terasology.rendering.animation.Animation;
-import org.terasology.rendering.animation.AnimationListener;
-import org.terasology.rendering.animation.TimeModifiers;
 
 /**
  * Controls animations to and from different screens.

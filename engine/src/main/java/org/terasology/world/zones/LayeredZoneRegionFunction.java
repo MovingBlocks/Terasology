@@ -1,12 +1,12 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.world.zones;
+package org.terasology.engine.world.zones;
 
 import org.joml.Vector2i;
+import org.terasology.engine.world.chunks.Chunks;
+import org.terasology.engine.world.generation.Region;
+import org.terasology.engine.world.generation.facets.ElevationFacet;
 import org.terasology.module.sandbox.API;
-import org.terasology.world.chunks.Chunks;
-import org.terasology.world.generation.Region;
-import org.terasology.world.generation.facets.ElevationFacet;
 
 import java.util.Comparator;
 import java.util.List;

@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.audio.openAL;
+package org.terasology.engine.audio.openAL;
 
 import org.joml.Vector3fc;
-import org.terasology.audio.Sound;
+import org.terasology.engine.audio.Sound;
 
 /**
  * Interface for a sound that includes the data required for relative sound positioning.

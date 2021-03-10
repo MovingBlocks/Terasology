@@ -1,24 +1,24 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.rendering.world.selection;
+package org.terasology.engine.rendering.world.selection;
 
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.joml.Vector3ic;
 import org.joml.Vector4f;
 import org.lwjgl.opengl.GL11;
+import org.terasology.engine.rendering.assets.material.Material;
+import org.terasology.engine.rendering.assets.shader.ShaderProgramFeature;
+import org.terasology.engine.rendering.assets.texture.Texture;
+import org.terasology.engine.rendering.assets.texture.TextureRegionAsset;
+import org.terasology.engine.rendering.primitives.Tessellator;
+import org.terasology.engine.rendering.primitives.TessellatorHelper;
 import org.terasology.joml.geom.Rectanglef;
 import org.terasology.module.sandbox.API;
-import org.terasology.registry.CoreRegistry;
-import org.terasology.rendering.assets.material.Material;
-import org.terasology.rendering.assets.mesh.Mesh;
-import org.terasology.rendering.assets.shader.ShaderProgramFeature;
-import org.terasology.rendering.assets.texture.Texture;
-import org.terasology.rendering.assets.texture.TextureRegionAsset;
-import org.terasology.rendering.primitives.Tessellator;
-import org.terasology.rendering.primitives.TessellatorHelper;
-import org.terasology.rendering.world.WorldRenderer;
-import org.terasology.utilities.Assets;
+import org.terasology.engine.registry.CoreRegistry;
+import org.terasology.engine.rendering.assets.mesh.Mesh;
+import org.terasology.engine.rendering.world.WorldRenderer;
+import org.terasology.engine.utilities.Assets;
 
 import static org.lwjgl.opengl.GL11.GL_MODELVIEW;
 import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;

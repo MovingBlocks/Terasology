@@ -1,7 +1,7 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-package org.terasology.world.generation;
+package org.terasology.engine.world.generation;
 
 public interface ScalableFacetProvider extends FacetProvider {
     void process(GeneratingRegion region, float scale);

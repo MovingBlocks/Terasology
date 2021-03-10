@@ -1,9 +1,9 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.rendering.animation;
+package org.terasology.engine.rendering.animation;
 
 import org.terasology.nui.Color;
-import org.terasology.rendering.nui.layers.mainMenu.settings.CieCamColors;
+import org.terasology.engine.rendering.nui.layers.mainMenu.settings.CieCamColors;
 
 import java.util.List;
 import java.util.function.Consumer;

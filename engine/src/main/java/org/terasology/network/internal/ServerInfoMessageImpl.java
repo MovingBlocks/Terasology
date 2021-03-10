@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.network.internal;
+package org.terasology.engine.network.internal;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -23,9 +23,9 @@ import org.slf4j.LoggerFactory;
 import org.terasology.naming.Name;
 import org.terasology.naming.NameVersion;
 import org.terasology.naming.Version;
-import org.terasology.network.ServerInfoMessage;
+import org.terasology.engine.network.ServerInfoMessage;
 import org.terasology.protobuf.NetData;
-import org.terasology.world.internal.WorldInfo;
+import org.terasology.engine.world.internal.WorldInfo;
 
 import java.util.Collections;
 import java.util.List;

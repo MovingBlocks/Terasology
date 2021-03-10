@@ -1,25 +1,25 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.rendering.nui.layers.ingame.metrics;
+package org.terasology.engine.rendering.nui.layers.ingame.metrics;
 
 import org.joml.Vector3f;
 import org.joml.Vector3i;
-import org.terasology.config.Config;
-import org.terasology.config.SystemConfig;
-import org.terasology.engine.Time;
-import org.terasology.entitySystem.entity.EntityManager;
-import org.terasology.input.cameraTarget.CameraTargetSystem;
-import org.terasology.logic.players.LocalPlayer;
-import org.terasology.math.Orientation;
-import org.terasology.monitoring.PerformanceMonitor;
+import org.terasology.engine.config.Config;
+import org.terasology.engine.config.SystemConfig;
+import org.terasology.engine.core.Time;
+import org.terasology.engine.entitySystem.entity.EntityManager;
+import org.terasology.engine.input.cameraTarget.CameraTargetSystem;
+import org.terasology.engine.logic.players.LocalPlayer;
+import org.terasology.engine.math.Orientation;
+import org.terasology.engine.monitoring.PerformanceMonitor;
+import org.terasology.engine.rendering.primitives.ChunkTessellator;
 import org.terasology.nui.databinding.ReadOnlyBinding;
 import org.terasology.nui.widgets.UILabel;
-import org.terasology.persistence.StorageManager;
-import org.terasology.registry.In;
-import org.terasology.rendering.nui.CoreScreenLayer;
-import org.terasology.rendering.primitives.ChunkTessellator;
-import org.terasology.world.WorldProvider;
-import org.terasology.world.chunks.Chunks;
+import org.terasology.engine.persistence.StorageManager;
+import org.terasology.engine.registry.In;
+import org.terasology.engine.rendering.nui.CoreScreenLayer;
+import org.terasology.engine.world.WorldProvider;
+import org.terasology.engine.world.chunks.Chunks;
 
 import java.util.Locale;
 

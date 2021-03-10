@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.telemetry;
+package org.terasology.engine.telemetry;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.context.Context;
-import org.terasology.engine.module.ModuleManager;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.module.DependencyResolver;
 import org.terasology.module.Module;
 import org.terasology.module.ModuleEnvironment;
@@ -26,7 +26,7 @@ import org.terasology.module.ResolutionResult;
 import org.terasology.module.predicates.FromModule;
 import org.terasology.module.sandbox.API;
 import org.terasology.naming.Name;
-import org.terasology.telemetry.metrics.Metric;
+import org.terasology.engine.telemetry.metrics.Metric;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -37,7 +37,7 @@ import java.util.Optional;
 import java.util.Set;
 
 /**
- * Metrics class is similar to {@link org.terasology.config.Config}, it stores the telemetry information.
+ * Metrics class is similar to {@link org.terasology.engine.config.Config}, it stores the telemetry information.
  * Once a new metric is used, the new metric instance should be added in this class to show the metric value in ui.
  */
 @API
@@ -109,7 +109,7 @@ public class Metrics {
     }
 
     /**
-     * Get the metric in the context {@link org.terasology.telemetry.Metrics} class.
+     * Get the metric in the context {@link org.terasology.engine.telemetry.Metrics} class.
      * @param cl the class of the metric class.
      * @return the metric in the game context.
      */
@@ -118,8 +118,8 @@ public class Metrics {
     }
 
     /**
-     * Add a metric instance to Metrics. This method will only be used when a metric constructor needs specific other than {@link org.terasology.context.Context}
-     * @param metric a new metric that constructor needs some arguments other than {@link org.terasology.context.Context}
+     * Add a metric instance to Metrics. This method will only be used when a metric constructor needs specific other than {@link org.terasology.engine.context.Context}
+     * @param metric a new metric that constructor needs some arguments other than {@link org.terasology.engine.context.Context}
      */
     public void addMetric(Metric metric) {
         classNameToMetric.put(metric.getClass().getName(), metric);

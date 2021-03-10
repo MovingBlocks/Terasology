@@ -1,23 +1,23 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.rendering.opengl.fbms;
+package org.terasology.engine.rendering.opengl.fbms;
 
-import org.terasology.config.RenderingConfig;
-import org.terasology.engine.SimpleUri;
-import org.terasology.engine.subsystem.DisplayDevice;
-import org.terasology.rendering.nui.layers.mainMenu.videoSettings.ScreenshotSize;
-import org.terasology.rendering.opengl.AbstractFboManager;
-import org.terasology.rendering.opengl.FBO;
-import org.terasology.rendering.opengl.FboConfig;
-import org.terasology.rendering.opengl.ScreenGrabber;
-import org.terasology.rendering.opengl.SwappableFBO;
+import org.terasology.engine.config.RenderingConfig;
+import org.terasology.engine.core.SimpleUri;
+import org.terasology.engine.core.subsystem.DisplayDevice;
+import org.terasology.engine.rendering.nui.layers.mainMenu.videoSettings.ScreenshotSize;
+import org.terasology.engine.rendering.opengl.AbstractFboManager;
+import org.terasology.engine.rendering.opengl.FBO;
+import org.terasology.engine.rendering.opengl.FboConfig;
+import org.terasology.engine.rendering.opengl.ScreenGrabber;
+import org.terasology.engine.rendering.opengl.SwappableFBO;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
-import static org.terasology.config.RenderingConfig.FBO_SCALE;
-import static org.terasology.engine.subsystem.lwjgl.LwjglDisplayDevice.DISPLAY_RESOLUTION_CHANGE;
-import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
+import static org.terasology.engine.config.RenderingConfig.FBO_SCALE;
+import static org.terasology.engine.core.subsystem.lwjgl.LwjglDisplayDevice.DISPLAY_RESOLUTION_CHANGE;
+import static org.terasology.engine.rendering.opengl.ScalingFactors.FULL_SCALE;
 
 /**
  * An instance of this class manages FBOs that need to be regenerated on resolution changes.

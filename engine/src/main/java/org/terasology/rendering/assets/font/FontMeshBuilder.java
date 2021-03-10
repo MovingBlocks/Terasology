@@ -1,16 +1,16 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.rendering.assets.font;
+package org.terasology.engine.rendering.assets.font;
 
 import com.google.common.collect.Maps;
 import org.joml.Vector3f;
+import org.terasology.engine.rendering.assets.material.Material;
+import org.terasology.engine.rendering.assets.mesh.MeshBuilder;
 import org.terasology.nui.Colorc;
 import org.terasology.nui.FontColor;
 import org.terasology.nui.FontUnderline;
 import org.terasology.nui.HorizontalAlign;
-import org.terasology.rendering.assets.material.Material;
-import org.terasology.rendering.assets.mesh.Mesh;
-import org.terasology.rendering.assets.mesh.MeshBuilder;
+import org.terasology.engine.rendering.assets.mesh.Mesh;
 
 import java.util.ArrayDeque;
 import java.util.Deque;

@@ -1,22 +1,22 @@
 // Copyright 2020 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.entitySystem;
+package org.terasology.engine.entitySystem;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.assets.module.ModuleAwareAssetTypeManager;
-import org.terasology.context.internal.ContextImpl;
-import org.terasology.engine.module.ModuleManager;
-import org.terasology.entitySystem.prefab.Prefab;
-import org.terasology.entitySystem.prefab.PrefabData;
-import org.terasology.entitySystem.prefab.internal.PojoPrefab;
-import org.terasology.entitySystem.prefab.internal.PojoPrefabManager;
-import org.terasology.entitySystem.stubs.StringComponent;
-import org.terasology.registry.CoreRegistry;
+import org.terasology.engine.context.internal.ContextImpl;
+import org.terasology.engine.core.module.ModuleManager;
+import org.terasology.engine.entitySystem.prefab.Prefab;
+import org.terasology.engine.entitySystem.prefab.PrefabData;
+import org.terasology.engine.entitySystem.prefab.internal.PojoPrefab;
+import org.terasology.engine.entitySystem.prefab.internal.PojoPrefabManager;
+import org.terasology.engine.entitySystem.stubs.StringComponent;
+import org.terasology.engine.registry.CoreRegistry;
 import org.terasology.testUtil.ModuleManagerFactory;
-import org.terasology.utilities.Assets;
+import org.terasology.engine.utilities.Assets;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;

@@ -1,12 +1,12 @@
 // Copyright 2020 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.config.flexible;
+package org.terasology.engine.config.flexible;
 
 import com.google.common.collect.ImmutableList;
 import org.reflections.ReflectionUtils;
-import org.terasology.config.flexible.internal.SettingBuilder;
-import org.terasology.config.flexible.internal.SettingImplBuilder;
-import org.terasology.engine.SimpleUri;
+import org.terasology.engine.config.flexible.internal.SettingBuilder;
+import org.terasology.engine.config.flexible.internal.SettingImplBuilder;
+import org.terasology.engine.core.SimpleUri;
 import org.terasology.reflection.TypeInfo;
 
 import java.lang.reflect.Field;

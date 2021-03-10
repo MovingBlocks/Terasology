@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.particles.functions;
+package org.terasology.engine.particles.functions;
 
-import org.terasology.particles.ParticleDataMask;
+import org.terasology.engine.particles.ParticleDataMask;
 
 /**
  * Base class for GeneratorFunction and AffectorFunction. A particle system function is called on a particle to update its fields.

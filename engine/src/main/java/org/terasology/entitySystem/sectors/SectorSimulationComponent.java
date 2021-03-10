@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.entitySystem.sectors;
+package org.terasology.engine.entitySystem.sectors;
 
-import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.entity.EntityManager;
-import org.terasology.entitySystem.entity.internal.BaseEntityRef;
-import org.terasology.entitySystem.entity.internal.EntityScope;
+import org.terasology.engine.entitySystem.Component;
+import org.terasology.engine.entitySystem.entity.EntityManager;
+import org.terasology.engine.entitySystem.entity.internal.BaseEntityRef;
+import org.terasology.engine.entitySystem.entity.internal.EntityScope;
 import org.terasology.module.sandbox.API;
 
 /**
