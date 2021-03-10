@@ -1,12 +1,12 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.world.generator;
+package org.terasology.engine.world.generator;
 
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.terasology.TerasologyTestingEnvironment;
+import org.terasology.engine.TerasologyTestingEnvironment;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.engine.math.Diamond3iIterable;

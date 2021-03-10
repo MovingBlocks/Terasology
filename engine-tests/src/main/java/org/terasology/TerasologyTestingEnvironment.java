@@ -1,7 +1,7 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-package org.terasology;
+package org.terasology.engine;
 
 import com.badlogic.gdx.physics.bullet.Bullet;
 import org.junit.jupiter.api.AfterAll;
@@ -59,10 +59,10 @@ public abstract class TerasologyTestingEnvironment {
         Bullet.init(true,false);
 
         /*
-         * Create at least for each class a new headless environemnt as it is fast and prevents side effects
+         * Create at least for each class a new headless environment as it is fast and prevents side effects
          * (Reusing a headless environment after other tests have modified the core registry isn't really clean)
          */
-        env = new HeadlessEnvironment(new Name("engine"));
+        env = new HeadlessEnvironment(new Name("engine"), new Name("unittest"));
         context = env.getContext();
         moduleManager = context.get(ModuleManager.class);
 

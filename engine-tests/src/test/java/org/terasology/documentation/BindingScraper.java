@@ -23,7 +23,7 @@ import org.terasology.engine.input.DefaultBindings;
 import org.terasology.input.Input;
 import org.terasology.input.InputCategory;
 import org.terasology.engine.input.RegisterBindButton;
-import org.terasology.testUtil.ModuleManagerFactory;
+import org.terasology.engine.testUtil.ModuleManagerFactory;
 
 import java.util.HashMap;
 import java.util.Map;

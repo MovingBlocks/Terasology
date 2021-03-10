@@ -52,7 +52,13 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static com.google.common.base.Verify.verifyNotNull;
+
 public class ModuleManager {
+    /** Set this environment variable to "true" to load all modules in the classpath by default. */
+    public final static String LOAD_CLASSPATH_MODULES_ENV = "TERASOLOGY_LOAD_CLASSPATH_MODULES";
+    public final static String LOAD_CLASSPATH_MODULES_PROPERTY = "org.terasology.load_classpath_modules";
+
     private static final Logger logger = LoggerFactory.getLogger(ModuleManager.class);
     private final StandardPermissionProviderFactory permissionProviderFactory = new StandardPermissionProviderFactory();
     private final PermissionProviderFactory wrappingPermissionProviderFactory = new WarnOnlyProviderFactory(permissionProviderFactory);
@@ -76,7 +82,11 @@ public class ModuleManager {
         registry = new TableModuleRegistry();
         registry.add(engineModule);
 
-        loadModulesFromClassPath();
+        if (doLoadModulesFromClasspath()) {
+            loadModulesFromClassPath();
+        } else {
+            logger.info("Not loading classpath modules.");
+        }
 
         loadModulesFromApplicationPath(pathManager);
 
@@ -152,6 +162,16 @@ public class ModuleManager {
         return metadataJsonAdapter;
     }
 
+    boolean doLoadModulesFromClasspath() {
+        boolean env = Boolean.parseBoolean(System.getenv(LOAD_CLASSPATH_MODULES_ENV));
+        boolean prop = Boolean.getBoolean(LOAD_CLASSPATH_MODULES_PROPERTY);
+        logger.debug("Load modules from classpath? {} [env: {}, property: {}]",
+                env || prop,
+                System.getenv(LOAD_CLASSPATH_MODULES_ENV),
+                System.getProperty(LOAD_CLASSPATH_MODULES_PROPERTY));
+        return env || prop;
+    }
+
     /**
      * Overrides modules in modules/ with those specified via -classpath in the JVM
      */
@@ -166,33 +186,74 @@ public class ModuleManager {
                 System.getProperty("java.class.path").split(System.getProperty("path.separator", ":"))
         ).map(Paths::get).collect(Collectors.toList());
 
+        // I thought I'd make the ClasspathSupporting stuff in the shape of a ModuleLoader
+        // so I could use it with the existing ModulePathScanner, but no. The inputs to that
+        // are the _parent directories_ of what we have.
         for (Path path : classPaths) {
-            // I thought I'd make the ClasspathSupporting stuff in the shape of a ModuleLoader
-            // so I could use it with the existing ModulePathScanner, but no. The inputs to that
-            // are the _parent directories_ of what we have.
-            //
-            // The conditions here mirror those of org.terasology.module.ModulePathScanner.loadModule
-
-            Module module;
-            try {
-                module = loader.load(path);
-            } catch (IOException e) {
-                logger.error("Failed to load classpath module {}", path, e);
-                continue;
-            }
-
-            if (module == null) {
-                continue;
-            }
-
-            boolean isNew = registry.add(module);
-            if (isNew) {
-                logger.info("Discovered module: {}", module);
-            } else {
-                logger.warn("Discovered duplicate module: {}-{}, skipping {}",
-                        module.getId(), module.getVersion(), path);
-            }
+            attemptToLoadAsClasspathModule(loader, path);
         }
+    }
+
+    /**
+     * Attempt to load a module from the given path.
+     *
+     * Assumes that the path <em>may or may not</em> contain a Terasology module. Will add the module to
+     * {@link #registry} if successful.
+     *
+     * For troubleshooting failure cases, check for log messages from this package and from {@link ModuleLoader}.
+     *
+     * @param loader the module loader to use
+     * @param path the path to the jar or directory
+     */
+    public void attemptToLoadAsClasspathModule(ModuleLoader loader, Path path) {
+        // The conditions here mirror those of org.terasology.module.ModulePathScanner.loadModule
+        Module module;
+        try {
+            module = loader.load(path);
+        } catch (IOException e) {
+            logger.warn("Failed to load module from classpath at {}", path, e);
+            return;
+        }
+
+        if (module == null) {
+            return;
+        }
+
+        boolean isNew = registry.add(module);
+        if (isNew) {
+            logger.info("Added new module: {} from {} on classpath", module, path.getFileName());
+        } else {
+            logger.warn("Skipped duplicate module: {}-{} from {} on classpath",
+                    module.getId(), module.getVersion(), path.getFileName());
+        }
+    }
+
+    /**
+     * Load a module from the given path.
+     *
+     * Assumes that the path <em>should</em> contain a Terasology module. Will add the module to
+     * {@link #registry} and return the resulting module if successful.
+     *
+     * May throw IOException or RuntimeExceptions on failure.
+     *
+     * For troubleshooting failure cases, check for log messages from this package and from {@link ModuleLoader}.
+     *
+     * @param path the path to the jar or directory
+     */
+    public Module loadClasspathModule(Path path) throws IOException {
+        ModuleLoader loader = new ClasspathSupportingModuleLoader(metadataReader, true, false);
+        loader.setModuleInfoPath(TerasologyConstants.MODULE_INFO_FILENAME);
+
+        //noinspection UnstableApiUsage
+        Module module = verifyNotNull(loader.load(path), "Failed to load module from %s", path);
+        boolean isNew = registry.add(module);
+        if (isNew) {
+            logger.info("Added new module: {} from {} on classpath", module, path.getFileName());
+        } else {
+            logger.warn("Skipped duplicate module: {}-{} from {} on classpath",
+                    module.getId(), module.getVersion(), path.getFileName());
+        }
+        return module;
     }
 
     private void setupSandbox() {
@@ -225,7 +286,6 @@ public class ModuleManager {
 
     public ModuleEnvironment loadEnvironment(Set<Module> modules, boolean asPrimary) {
         Set<Module> finalModules = Sets.newLinkedHashSet(modules);
-        finalModules.addAll(registry.stream().filter(Module::isOnClasspath).collect(Collectors.toList()));
         ModuleEnvironment newEnvironment;
         boolean permissiveSecurityEnabled = Boolean.parseBoolean(System.getProperty(SystemConfig.PERMISSIVE_SECURITY_ENABLED_PROPERTY));
         if (permissiveSecurityEnabled) {

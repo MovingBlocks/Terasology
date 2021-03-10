@@ -20,7 +20,7 @@ import com.google.common.io.Files;
 import com.google.gson.JsonParser;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.terasology.TerasologyTestingEnvironment;
+import org.terasology.engine.TerasologyTestingEnvironment;
 import org.terasology.engine.core.subsystem.headless.renderer.HeadlessCanvasRenderer;
 import org.terasology.engine.i18n.TranslationSystem;
 import org.terasology.engine.i18n.TranslationSystemImpl;

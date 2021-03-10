@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.world;
+package org.terasology.engine.world;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.Lists;
@@ -21,7 +21,7 @@ import org.joml.Vector3i;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.terasology.TerasologyTestingEnvironment;
+import org.terasology.engine.TerasologyTestingEnvironment;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.engine.core.GameThread;
@@ -45,7 +45,7 @@ import org.terasology.engine.entitySystem.stubs.RetainedOnBlockChangeComponent;
 import org.terasology.engine.entitySystem.stubs.StringComponent;
 import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
 import org.terasology.engine.network.NetworkComponent;
-import org.terasology.testUtil.WorldProviderCoreStub;
+import org.terasology.engine.testUtil.WorldProviderCoreStub;
 import org.terasology.engine.world.block.Block;
 import org.terasology.engine.world.block.BlockComponent;
 import org.terasology.engine.world.block.BlockManager;

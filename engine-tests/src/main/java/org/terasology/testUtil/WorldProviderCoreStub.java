@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.testUtil;
+package org.terasology.engine.testUtil;
 
 import com.google.common.collect.Maps;
 import org.joml.Vector3i;

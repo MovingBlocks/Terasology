@@ -4,7 +4,7 @@
 package org.terasology.engine.persistence.typeHandling.mathTypes;
 
 import org.junit.jupiter.api.Test;
-import org.terasology.ModuleEnvironmentTest;
+import org.terasology.engine.ModuleEnvironmentTest;
 import org.terasology.engine.core.module.ModuleContext;
 import org.terasology.engine.persistence.serializers.GsonSerializer;
 import org.terasology.engine.persistence.serializers.ProtobufSerializer;

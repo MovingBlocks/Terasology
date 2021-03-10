@@ -19,7 +19,7 @@ import com.badlogic.gdx.physics.bullet.collision.btConvexHullShape;
 import org.joml.Vector3f;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.terasology.TerasologyTestingEnvironment;
+import org.terasology.engine.TerasologyTestingEnvironment;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.engine.math.Rotation;
 import org.terasology.engine.math.Yaw;

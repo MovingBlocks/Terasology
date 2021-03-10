@@ -30,7 +30,7 @@ import org.terasology.engine.network.NetworkSystem;
 import org.terasology.engine.recording.RecordAndReplayCurrentStatus;
 import org.terasology.engine.registry.CoreRegistry;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
-import org.terasology.testUtil.ModuleManagerFactory;
+import org.terasology.engine.testUtil.ModuleManagerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
