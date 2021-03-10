@@ -20,7 +20,7 @@ import com.google.common.collect.Lists;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.terasology.TerasologyTestingEnvironment;
+import org.terasology.engine.TerasologyTestingEnvironment;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.core.EngineTime;
 import org.terasology.engine.entitySystem.entity.EntityRef;

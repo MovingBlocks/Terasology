@@ -9,7 +9,7 @@ import org.joml.Vector3fc;
 import org.joml.Vector4f;
 import org.joml.Vector4fc;
 import org.junit.jupiter.api.Test;
-import org.terasology.ModuleEnvironmentTest;
+import org.terasology.engine.ModuleEnvironmentTest;
 import org.terasology.engine.core.module.ModuleContext;
 import org.terasology.engine.persistence.typeHandling.TypeHandlerLibraryImpl;
 import org.terasology.naming.Name;

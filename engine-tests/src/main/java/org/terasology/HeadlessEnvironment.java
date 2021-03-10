@@ -1,6 +1,6 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology;
+package org.terasology.engine;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,6 +55,7 @@ import org.terasology.engine.rendering.assets.skeletalmesh.SkeletalMesh;
 import org.terasology.engine.rendering.assets.texture.PNGTextureFormat;
 import org.terasology.engine.rendering.assets.texture.Texture;
 import org.terasology.engine.rendering.assets.texture.subtexture.Subtexture;
+import org.terasology.engine.testUtil.ModuleManagerFactory;
 import org.terasology.engine.world.WorldProvider;
 import org.terasology.engine.world.block.Block;
 import org.terasology.engine.world.block.BlockManager;
@@ -85,7 +86,6 @@ import org.terasology.nui.asset.UIElement;
 import org.terasology.nui.skin.UISkin;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.reflection.TypeRegistry;
-import org.terasology.testUtil.ModuleManagerFactory;
 
 import java.io.IOException;
 import java.nio.file.Files;

@@ -27,7 +27,7 @@ import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.metadata.FieldMetadata;
 import org.terasology.reflection.reflect.ReflectFactory;
 import org.terasology.reflection.reflect.ReflectionReflectFactory;
-import org.terasology.testUtil.ModuleManagerFactory;
+import org.terasology.engine.testUtil.ModuleManagerFactory;
 
 import java.io.IOException;
 import java.util.HashMap;

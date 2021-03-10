@@ -15,7 +15,7 @@ import org.terasology.engine.entitySystem.prefab.internal.PojoPrefab;
 import org.terasology.engine.entitySystem.prefab.internal.PojoPrefabManager;
 import org.terasology.engine.entitySystem.stubs.StringComponent;
 import org.terasology.engine.registry.CoreRegistry;
-import org.terasology.testUtil.ModuleManagerFactory;
+import org.terasology.engine.testUtil.ModuleManagerFactory;
 import org.terasology.engine.utilities.Assets;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

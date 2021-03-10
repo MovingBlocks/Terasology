@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology;
+package org.terasology.engine;
 
 import com.google.common.collect.Sets;
 import org.slf4j.Logger;

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.world.propagation;
+package org.terasology.engine.world.propagation;
 
 import com.google.common.collect.Maps;
 import gnu.trove.map.TObjectByteMap;
@@ -23,7 +23,6 @@ import org.joml.Vector3ic;
 import org.terasology.engine.world.block.Block;
 import org.terasology.engine.world.block.BlockRegion;
 import org.terasology.engine.world.block.BlockRegionc;
-import org.terasology.engine.world.propagation.PropagatorWorldView;
 
 import java.util.Map;
 

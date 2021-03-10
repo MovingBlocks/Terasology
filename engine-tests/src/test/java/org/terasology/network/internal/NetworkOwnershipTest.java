@@ -18,7 +18,7 @@ package org.terasology.engine.network.internal;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.terasology.TerasologyTestingEnvironment;
+import org.terasology.engine.TerasologyTestingEnvironment;
 import org.terasology.engine.core.ComponentSystemManager;
 import org.terasology.engine.core.EngineTime;
 import org.terasology.engine.core.bootstrap.EntitySystemSetupUtil;
@@ -31,7 +31,7 @@ import org.terasology.engine.entitySystem.entity.internal.PojoEntityManager;
 import org.terasology.engine.entitySystem.metadata.EventLibrary;
 import org.terasology.engine.network.NetworkComponent;
 import org.terasology.engine.network.NetworkSystem;
-import org.terasology.testUtil.ModuleManagerFactory;
+import org.terasology.engine.testUtil.ModuleManagerFactory;
 import org.terasology.engine.world.BlockEntityRegistry;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
