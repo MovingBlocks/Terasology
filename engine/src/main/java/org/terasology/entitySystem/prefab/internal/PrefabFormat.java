@@ -1,6 +1,6 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.entitySystem.prefab.internal;
+package org.terasology.engine.entitySystem.prefab.internal;
 
 import com.google.common.base.Charsets;
 import org.slf4j.Logger;
@@ -8,10 +8,10 @@ import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.format.AbstractAssetFileFormat;
 import org.terasology.assets.format.AssetDataFile;
-import org.terasology.entitySystem.metadata.ComponentLibrary;
-import org.terasology.entitySystem.prefab.PrefabData;
-import org.terasology.persistence.serializers.EntityDataJSONFormat;
-import org.terasology.persistence.serializers.PrefabSerializer;
+import org.terasology.engine.entitySystem.metadata.ComponentLibrary;
+import org.terasology.engine.entitySystem.prefab.PrefabData;
+import org.terasology.engine.persistence.serializers.EntityDataJSONFormat;
+import org.terasology.engine.persistence.serializers.PrefabSerializer;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.protobuf.EntityData;
 

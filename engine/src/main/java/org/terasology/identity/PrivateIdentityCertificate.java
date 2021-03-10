@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.identity;
+package org.terasology.engine.identity;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;

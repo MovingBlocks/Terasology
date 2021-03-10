@@ -1,12 +1,12 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-package org.terasology.world.viewer.layers;
+package org.terasology.engine.world.viewer.layers;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.engine.world.generation.WorldFacet;
 import org.terasology.module.ModuleEnvironment;
-import org.terasology.world.generation.WorldFacet;
 
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;

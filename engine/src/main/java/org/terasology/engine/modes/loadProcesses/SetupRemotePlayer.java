@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package org.terasology.engine.modes.loadProcesses;
+package org.terasology.engine.core.modes.loadProcesses;
 
-import org.terasology.context.Context;
-import org.terasology.engine.modes.SingleStepLoadProcess;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.logic.players.LocalPlayer;
-import org.terasology.network.NetworkSystem;
-import org.terasology.network.internal.NetworkSystemImpl;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.core.modes.SingleStepLoadProcess;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.logic.players.LocalPlayer;
+import org.terasology.engine.network.NetworkSystem;
+import org.terasology.engine.network.internal.NetworkSystemImpl;
 
 /**
  */

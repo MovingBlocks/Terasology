@@ -1,11 +1,11 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.logic.selection;
+package org.terasology.engine.logic.selection;
 
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.event.Event;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.entitySystem.event.Event;
 import org.terasology.module.sandbox.API;
-import org.terasology.world.block.BlockRegion;
+import org.terasology.engine.world.block.BlockRegion;
 
 /**
  * This event is fired once a player finished a selection using an item with a BlockSelectionComponent. The item used

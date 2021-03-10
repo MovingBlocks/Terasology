@@ -1,20 +1,19 @@
-/*
- * Copyright 2015 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *  http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 
-package org.terasology.i18n;
+package org.terasology.engine.i18n;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.terasology.assets.ResourceUrn;
+import org.terasology.assets.management.AssetManager;
+import org.terasology.engine.config.SystemConfig;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.core.SimpleUri;
+import org.terasology.engine.core.Uri;
+import org.terasology.engine.i18n.assets.Translation;
+import org.terasology.engine.persistence.TemplateEngine;
+import org.terasology.engine.persistence.TemplateEngineImpl;
 
 import java.util.HashMap;
 import java.util.List;
@@ -24,19 +23,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.terasology.assets.ResourceUrn;
-import org.terasology.assets.management.AssetManager;
-import org.terasology.config.Config;
-import org.terasology.config.SystemConfig;
-import org.terasology.context.Context;
-import org.terasology.engine.SimpleUri;
-import org.terasology.engine.Uri;
-import org.terasology.i18n.assets.Translation;
-import org.terasology.persistence.TemplateEngine;
-import org.terasology.persistence.TemplateEngineImpl;
 
 /**
  * A translation system that uses {@link Translation} data assets to
@@ -49,7 +35,7 @@ public class TranslationSystemImpl implements TranslationSystem {
     private final List<Consumer<TranslationProject>> changeListeners = new CopyOnWriteArrayList<>();
     private final Map<Uri, TranslationProject> projects = new HashMap<>();
 
-    private final SystemConfig config;
+    private final SystemConfig systemConfig;
 
     private AssetManager assetManager;
 
@@ -58,7 +44,7 @@ public class TranslationSystemImpl implements TranslationSystem {
      */
     public TranslationSystemImpl(Context context) {
 
-        config = context.get(Config.class).getSystem();
+        systemConfig = context.get(SystemConfig.class);
         assetManager = context.get(AssetManager.class);
 
         refresh();
@@ -91,7 +77,7 @@ public class TranslationSystemImpl implements TranslationSystem {
 
     @Override
     public String translate(String id) {
-        return translate(id, config.getLocale());
+        return translate(id, systemConfig.locale.get());
     }
 
     @Override

@@ -13,16 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.engine.subsystem.headless.assets;
+package org.terasology.engine.core.subsystem.headless.assets;
 
 import org.joml.Matrix3fc;
 import org.joml.Matrix4fc;
 import org.terasology.assets.AssetType;
 import org.terasology.assets.ResourceUrn;
-import org.terasology.rendering.assets.material.BaseMaterial;
-import org.terasology.rendering.assets.material.MaterialData;
-import org.terasology.rendering.assets.shader.ShaderProgramFeature;
-import org.terasology.rendering.assets.texture.Texture;
+import org.terasology.engine.rendering.assets.material.BaseMaterial;
+import org.terasology.engine.rendering.assets.material.MaterialData;
+import org.terasology.engine.rendering.assets.shader.ShaderProgramFeature;
+import org.terasology.engine.rendering.assets.texture.Texture;
 
 import java.nio.FloatBuffer;
 

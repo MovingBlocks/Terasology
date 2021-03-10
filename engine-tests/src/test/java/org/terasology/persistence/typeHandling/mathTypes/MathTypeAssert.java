@@ -1,7 +1,7 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-package org.terasology.persistence.typeHandling.mathTypes;
+package org.terasology.engine.persistence.typeHandling.mathTypes;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;

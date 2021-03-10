@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.physics.shapes;
+package org.terasology.engine.physics.shapes;
 
 import org.terasology.joml.geom.AABBf;
 import org.joml.Quaternionf;

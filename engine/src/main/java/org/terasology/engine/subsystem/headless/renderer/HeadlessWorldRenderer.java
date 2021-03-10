@@ -1,26 +1,26 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.engine.subsystem.headless.renderer;
+package org.terasology.engine.core.subsystem.headless.renderer;
 
 import com.google.common.collect.Lists;
 import org.joml.Vector3f;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
-import org.terasology.config.Config;
-import org.terasology.context.Context;
-import org.terasology.logic.players.LocalPlayerSystem;
-import org.terasology.monitoring.PerformanceMonitor;
-import org.terasology.rendering.assets.material.Material;
-import org.terasology.rendering.cameras.Camera;
-import org.terasology.rendering.cameras.SubmersibleCamera;
-import org.terasology.rendering.dag.RenderGraph;
-import org.terasology.rendering.world.WorldRenderer;
-import org.terasology.rendering.world.viewDistance.ViewDistance;
-import org.terasology.world.WorldProvider;
-import org.terasology.world.block.BlockRegion;
-import org.terasology.world.chunks.ChunkProvider;
-import org.terasology.world.chunks.Chunks;
-import org.terasology.world.chunks.RenderableChunk;
+import org.terasology.engine.config.Config;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.logic.players.LocalPlayerSystem;
+import org.terasology.engine.monitoring.PerformanceMonitor;
+import org.terasology.engine.rendering.assets.material.Material;
+import org.terasology.engine.rendering.cameras.Camera;
+import org.terasology.engine.rendering.cameras.SubmersibleCamera;
+import org.terasology.engine.rendering.dag.RenderGraph;
+import org.terasology.engine.rendering.world.WorldRenderer;
+import org.terasology.engine.rendering.world.viewDistance.ViewDistance;
+import org.terasology.engine.world.WorldProvider;
+import org.terasology.engine.world.block.BlockRegion;
+import org.terasology.engine.world.chunks.ChunkProvider;
+import org.terasology.engine.world.chunks.Chunks;
+import org.terasology.engine.world.chunks.RenderableChunk;
 
 import java.util.Collections;
 import java.util.Comparator;

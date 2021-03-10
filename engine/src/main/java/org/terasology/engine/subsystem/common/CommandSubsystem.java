@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.engine.subsystem.common;
+package org.terasology.engine.core.subsystem.common;
 
-import org.terasology.context.Context;
-import org.terasology.engine.GameEngine;
-import org.terasology.engine.subsystem.EngineSubsystem;
-import org.terasology.logic.console.commandSystem.adapter.ParameterAdapterManager;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.core.GameEngine;
+import org.terasology.engine.core.subsystem.EngineSubsystem;
+import org.terasology.engine.logic.console.commandSystem.adapter.ParameterAdapterManager;
 
 /**
  *

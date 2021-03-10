@@ -1,22 +1,22 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.rendering.nui.layers.mainMenu.inputSettings;
+package org.terasology.engine.rendering.nui.layers.mainMenu.inputSettings;
 
 import org.terasology.assets.ResourceUrn;
-import org.terasology.config.BindsConfig;
-import org.terasology.config.Config;
-import org.terasology.context.Context;
-import org.terasology.engine.SimpleUri;
-import org.terasology.engine.module.ModuleManager;
-import org.terasology.engine.subsystem.config.BindsManager;
-import org.terasology.i18n.TranslationSystem;
+import org.terasology.engine.config.BindsConfig;
+import org.terasology.engine.config.Config;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.core.SimpleUri;
+import org.terasology.engine.core.module.ModuleManager;
+import org.terasology.engine.core.subsystem.config.BindsManager;
+import org.terasology.engine.i18n.TranslationSystem;
 import org.terasology.input.Input;
-import org.terasology.input.RegisterBindButton;
+import org.terasology.engine.input.RegisterBindButton;
 import org.terasology.nui.WidgetUtil;
 import org.terasology.nui.widgets.UIButton;
 import org.terasology.nui.widgets.UILabel;
-import org.terasology.registry.In;
-import org.terasology.rendering.nui.CoreScreenLayer;
+import org.terasology.engine.registry.In;
+import org.terasology.engine.rendering.nui.CoreScreenLayer;
 
 import java.util.List;
 

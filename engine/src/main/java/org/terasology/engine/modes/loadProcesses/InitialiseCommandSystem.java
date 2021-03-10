@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package org.terasology.engine.modes.loadProcesses;
+package org.terasology.engine.core.modes.loadProcesses;
 
-import org.terasology.context.Context;
-import org.terasology.engine.modes.SingleStepLoadProcess;
-import org.terasology.logic.console.Console;
-import org.terasology.logic.console.ConsoleImpl;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.core.modes.SingleStepLoadProcess;
+import org.terasology.engine.logic.console.Console;
+import org.terasology.engine.logic.console.ConsoleImpl;
 
 public class InitialiseCommandSystem extends SingleStepLoadProcess {
 

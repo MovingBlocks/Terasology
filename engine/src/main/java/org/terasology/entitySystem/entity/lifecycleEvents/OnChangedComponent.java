@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package org.terasology.entitySystem.entity.lifecycleEvents;
+package org.terasology.engine.entitySystem.entity.lifecycleEvents;
 
-import org.terasology.entitySystem.event.Event;
+import org.terasology.engine.entitySystem.event.Event;
 
 /**
  * This event occurs whenever a component is changed and saved.

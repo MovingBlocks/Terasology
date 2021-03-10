@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.persistence.internal;
+package org.terasology.engine.persistence.internal;
 
 import com.google.common.collect.Lists;
 import org.joml.Vector3f;
@@ -22,21 +22,21 @@ import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.entity.internal.EngineEntityManager;
-import org.terasology.entitySystem.entity.internal.OwnershipHelper;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.entitySystem.entity.internal.EngineEntityManager;
+import org.terasology.engine.entitySystem.entity.internal.OwnershipHelper;
 import org.terasology.joml.geom.AABBfc;
-import org.terasology.logic.location.LocationComponent;
+import org.terasology.engine.logic.location.LocationComponent;
 import org.terasology.module.ModuleEnvironment;
-import org.terasology.network.ClientComponent;
-import org.terasology.persistence.ChunkStore;
-import org.terasology.persistence.PlayerStore;
-import org.terasology.persistence.StorageManager;
-import org.terasology.persistence.serializers.PrefabSerializer;
+import org.terasology.engine.network.ClientComponent;
+import org.terasology.engine.persistence.ChunkStore;
+import org.terasology.engine.persistence.PlayerStore;
+import org.terasology.engine.persistence.StorageManager;
+import org.terasology.engine.persistence.serializers.PrefabSerializer;
 import org.terasology.protobuf.EntityData;
-import org.terasology.world.block.BlockManager;
-import org.terasology.world.chunks.Chunk;
-import org.terasology.world.chunks.blockdata.ExtraBlockDataManager;
+import org.terasology.engine.world.block.BlockManager;
+import org.terasology.engine.world.chunks.Chunk;
+import org.terasology.engine.world.chunks.blockdata.ExtraBlockDataManager;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.audio.formats;
+package org.terasology.engine.audio.formats;
 
 import com.google.common.io.ByteStreams;
 import org.lwjgl.BufferUtils;
@@ -22,7 +22,7 @@ import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.format.AbstractAssetFileFormat;
 import org.terasology.assets.format.AssetDataFile;
 import org.terasology.assets.module.annotations.RegisterAssetFileFormat;
-import org.terasology.audio.StaticSoundData;
+import org.terasology.engine.audio.StaticSoundData;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

@@ -1,19 +1,19 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.config.flexible;
+package org.terasology.engine.config.flexible;
 
 import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.context.Context;
-import org.terasology.engine.SimpleUri;
-import org.terasology.engine.module.ModuleManager;
-import org.terasology.engine.paths.PathManager;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.core.SimpleUri;
+import org.terasology.engine.core.module.ModuleManager;
+import org.terasology.engine.core.paths.PathManager;
+import org.terasology.engine.registry.InjectionHelper;
+import org.terasology.engine.utilities.ReflectionUtil;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.persistence.serializers.Serializer;
 import org.terasology.reflection.TypeInfo;
-import org.terasology.registry.InjectionHelper;
-import org.terasology.utilities.ReflectionUtil;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,8 +21,8 @@ import java.io.OutputStream;
 import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collections;
 import java.nio.file.StandardOpenOption;
+import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
 

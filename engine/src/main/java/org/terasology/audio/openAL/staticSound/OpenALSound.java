@@ -13,18 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.audio.openAL.staticSound;
+package org.terasology.engine.audio.openAL.staticSound;
 
 import org.lwjgl.openal.AL10;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.AssetType;
 import org.terasology.assets.ResourceUrn;
-import org.terasology.audio.StaticSound;
-import org.terasology.audio.StaticSoundData;
-import org.terasology.audio.openAL.OpenALException;
-import org.terasology.audio.openAL.OpenALManager;
-import org.terasology.engine.GameThread;
+import org.terasology.engine.audio.StaticSound;
+import org.terasology.engine.audio.StaticSoundData;
+import org.terasology.engine.audio.openAL.OpenALException;
+import org.terasology.engine.audio.openAL.OpenALManager;
+import org.terasology.engine.core.GameThread;
 
 import java.lang.ref.WeakReference;
 

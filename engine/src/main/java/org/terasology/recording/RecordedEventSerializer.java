@@ -1,22 +1,22 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.recording;
+package org.terasology.engine.recording;
 
 import com.google.gson.Gson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.engine.module.ModuleManager;
-import org.terasology.entitySystem.entity.EntityManager;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.entity.internal.EngineEntityManager;
+import org.terasology.engine.core.module.ModuleManager;
+import org.terasology.engine.entitySystem.entity.EntityManager;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.entitySystem.entity.internal.EngineEntityManager;
+import org.terasology.engine.persistence.typeHandling.TypeHandlerLibraryImpl;
+import org.terasology.engine.persistence.typeHandling.extensionTypes.EntityRefTypeHandler;
+import org.terasology.engine.persistence.typeHandling.gson.GsonPersistedDataReader;
+import org.terasology.engine.persistence.typeHandling.gson.GsonPersistedDataSerializer;
+import org.terasology.engine.persistence.typeHandling.gson.GsonPersistedDataWriter;
 import org.terasology.persistence.serializers.Serializer;
 import org.terasology.persistence.typeHandling.SerializationException;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
-import org.terasology.persistence.typeHandling.TypeHandlerLibraryImpl;
-import org.terasology.persistence.typeHandling.extensionTypes.EntityRefTypeHandler;
-import org.terasology.persistence.typeHandling.gson.GsonPersistedDataReader;
-import org.terasology.persistence.typeHandling.gson.GsonPersistedDataSerializer;
-import org.terasology.persistence.typeHandling.gson.GsonPersistedDataWriter;
 import org.terasology.reflection.TypeInfo;
 import org.terasology.reflection.TypeRegistry;
 

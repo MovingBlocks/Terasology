@@ -17,6 +17,7 @@ package org.terasology.math;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.terasology.engine.math.IntegerRange;
 
 import java.util.Iterator;
 

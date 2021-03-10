@@ -1,11 +1,11 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.world.propagation;
+package org.terasology.engine.world.propagation;
 
 import org.joml.Vector3ic;
-import org.terasology.math.Side;
-import org.terasology.world.block.Block;
-import org.terasology.world.chunks.LitChunk;
+import org.terasology.engine.math.Side;
+import org.terasology.engine.world.block.Block;
+import org.terasology.engine.world.chunks.LitChunk;
 
 /**
  * Rules to drive value propagation.

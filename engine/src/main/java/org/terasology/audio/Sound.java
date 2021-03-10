@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.audio;
+package org.terasology.engine.audio;
 
 import org.terasology.assets.Asset;
 import org.terasology.assets.AssetData;

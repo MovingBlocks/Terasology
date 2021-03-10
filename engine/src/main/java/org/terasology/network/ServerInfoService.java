@@ -1,7 +1,7 @@
 // Copyright 2020 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-package org.terasology.network;
+package org.terasology.engine.network;
 
 import com.google.common.util.concurrent.SettableFuture;
 import io.netty.bootstrap.Bootstrap;
@@ -11,8 +11,8 @@ import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import org.terasology.network.internal.ServerInfoRequestHandler;
-import org.terasology.network.internal.pipelineFactory.InfoRequestPipelineFactory;
+import org.terasology.engine.network.internal.ServerInfoRequestHandler;
+import org.terasology.engine.network.internal.pipelineFactory.InfoRequestPipelineFactory;
 
 import java.net.InetSocketAddress;
 import java.util.concurrent.Future;

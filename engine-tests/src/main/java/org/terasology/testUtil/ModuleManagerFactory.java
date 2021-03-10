@@ -1,13 +1,39 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.testUtil;
+package org.terasology.engine.testUtil;
 
-import org.terasology.engine.module.ModuleManager;
+import com.google.common.collect.Sets;
+import org.terasology.engine.core.module.ModuleManager;
+import org.terasology.module.Module;
+
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+import static com.google.common.base.Verify.verify;
+import static org.terasology.engine.core.TerasologyConstants.ENGINE_MODULE;
+import static org.terasology.engine.core.TerasologyConstants.MODULE_INFO_FILENAME;
 
 public final class ModuleManagerFactory {
+
     private ModuleManagerFactory() { }
 
     public static ModuleManager create() throws Exception {
-        return new ModuleManager("");
+        ModuleManager moduleManager = new ModuleManager("");
+        loadUnitTestModule(moduleManager);
+        return moduleManager;
+    }
+
+    public static void loadUnitTestModule(ModuleManager manager) throws IOException, URISyntaxException {
+        Path myPath = Paths.get(ModuleManagerFactory.class.getResource("/" + MODULE_INFO_FILENAME).toURI()).getParent();
+        Module testModule = manager.loadClasspathModule(myPath);
+        verify(testModule.getMetadata().getId().toString().equals("unittest"),
+                "Intended to load the unittest module but ended up with this instead: %s", testModule);
+        manager.loadEnvironment(
+                Sets.newHashSet(
+                        manager.getRegistry().getLatestModuleVersion(ENGINE_MODULE),
+                        testModule
+                ), true);
     }
 }

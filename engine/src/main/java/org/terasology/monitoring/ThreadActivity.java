@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.monitoring;
+package org.terasology.engine.monitoring;
 
 /**
  * A token that is used to express a thread working on a task.

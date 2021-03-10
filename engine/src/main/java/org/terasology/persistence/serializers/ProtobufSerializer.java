@@ -1,12 +1,12 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.persistence.serializers;
+package org.terasology.engine.persistence.serializers;
 
+import org.terasology.engine.persistence.typeHandling.protobuf.ProtobufPersistedData;
+import org.terasology.engine.persistence.typeHandling.protobuf.ProtobufPersistedDataSerializer;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.SerializationException;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
-import org.terasology.persistence.typeHandling.protobuf.ProtobufPersistedData;
-import org.terasology.persistence.typeHandling.protobuf.ProtobufPersistedDataSerializer;
 import org.terasology.protobuf.EntityData;
 import org.terasology.reflection.TypeInfo;
 

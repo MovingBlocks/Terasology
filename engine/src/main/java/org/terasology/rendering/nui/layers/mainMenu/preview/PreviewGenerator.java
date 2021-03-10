@@ -1,10 +1,10 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-package org.terasology.rendering.nui.layers.mainMenu.preview;
+package org.terasology.engine.rendering.nui.layers.mainMenu.preview;
 
-import org.terasology.rendering.assets.texture.TextureData;
-import org.terasology.rendering.nui.layers.mainMenu.ProgressListener;
+import org.terasology.engine.rendering.assets.texture.TextureData;
+import org.terasology.engine.rendering.nui.layers.mainMenu.ProgressListener;
 
 import java.nio.ByteBuffer;
 

@@ -1,22 +1,9 @@
-/*
- * Copyright 2013 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 
-package org.terasology.world.chunks.blockdata;
+package org.terasology.engine.world.chunks.blockdata;
 
-import org.terasology.world.chunks.deflate.TeraVisitingDeflator;
+import org.terasology.engine.world.chunks.deflate.TeraVisitingDeflator;
 
 import java.io.IOException;
 import java.io.ObjectInput;
@@ -147,7 +134,7 @@ public abstract class TeraArray {
      * This is the interface for tera array factories. Every tera array is required to implement a factory.
      * It should be implemented as a static subclass of the corresponding tera array class and it should be called Factory.
      *
-     * @see org.terasology.world.chunks.blockdata.TeraDenseArray16Bit.Factory
+     * @see TeraDenseArray16Bit.Factory
      */
     public interface Factory<T extends TeraArray> {
 
@@ -164,10 +151,10 @@ public abstract class TeraArray {
     /**
      * This is the interface for serialization handlers for tera arrays. Every tera array is required to implement
      * a serialization handler. It is recommended to subclass
-     * {@link org.terasology.world.chunks.blockdata.TeraArray.BasicSerializationHandler TeraArray.BasicSerializationHandler}
+     * {@link TeraArray.BasicSerializationHandler TeraArray.BasicSerializationHandler}
      * instead of using this interface directly. It should be implemented as a static subclass of the corresponding tera array class.
      *
-     * @see org.terasology.world.chunks.blockdata.TeraArray.BasicSerializationHandler
+     * @see TeraArray.BasicSerializationHandler
      */
     public interface SerializationHandler<T extends TeraArray> {
 
@@ -186,8 +173,8 @@ public abstract class TeraArray {
      * Extending this class is the recommended way to implement serialization handlers for tera arrays.
      * Tera arrays should implement their serialization handlers as a static subclass called SerializationHandler.
      *
-     * @see org.terasology.world.chunks.blockdata.TeraDenseArray16Bit.SerializationHandler
-     * @see org.terasology.world.chunks.blockdata.TeraDenseArray16Bit.Factory
+     * @see TeraDenseArray16Bit.SerializationHandler
+     * @see TeraDenseArray16Bit.Factory
      */
     protected abstract static class BasicSerializationHandler<T extends TeraArray> implements SerializationHandler<T> {
 

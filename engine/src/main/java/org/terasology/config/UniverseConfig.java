@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.config;
+package org.terasology.engine.config;
 
 import com.google.common.collect.Lists;
-import org.terasology.engine.TerasologyConstants;
-import org.terasology.world.internal.WorldInfo;
+import org.terasology.engine.core.TerasologyConstants;
+import org.terasology.engine.world.internal.WorldInfo;
 
 import java.util.List;
 

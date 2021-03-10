@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package org.terasology.physics.events;
+package org.terasology.engine.physics.events;
 
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
-import org.terasology.entitySystem.event.Event;
+import org.terasology.engine.entitySystem.event.Event;
 
 public class MovedEvent implements Event {
     private Vector3f delta = new Vector3f();

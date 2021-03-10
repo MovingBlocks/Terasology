@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package org.terasology.entitySystem.stubs;
+package org.terasology.engine.entitySystem.stubs;
 
-import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.systems.internal.DoNotAutoRegister;
+import org.terasology.engine.entitySystem.Component;
+import org.terasology.engine.entitySystem.systems.internal.DoNotAutoRegister;
 
 /**
  */

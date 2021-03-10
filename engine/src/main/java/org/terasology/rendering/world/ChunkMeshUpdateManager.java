@@ -1,6 +1,6 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.rendering.world;
+package org.terasology.engine.rendering.world;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Queues;
@@ -9,17 +9,17 @@ import org.joml.Vector3f;
 import org.joml.Vector3i;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.monitoring.chunk.ChunkMonitor;
-import org.terasology.rendering.primitives.ChunkMesh;
-import org.terasology.rendering.primitives.ChunkTessellator;
-import org.terasology.utilities.concurrency.TaskMaster;
-import org.terasology.world.ChunkView;
-import org.terasology.world.WorldProvider;
-import org.terasology.world.chunks.Chunk;
-import org.terasology.world.chunks.Chunks;
-import org.terasology.world.chunks.RenderableChunk;
-import org.terasology.world.chunks.pipeline.ChunkTask;
-import org.terasology.world.chunks.pipeline.ShutdownChunkTask;
+import org.terasology.engine.monitoring.chunk.ChunkMonitor;
+import org.terasology.engine.rendering.primitives.ChunkMesh;
+import org.terasology.engine.rendering.primitives.ChunkTessellator;
+import org.terasology.engine.utilities.concurrency.TaskMaster;
+import org.terasology.engine.world.ChunkView;
+import org.terasology.engine.world.WorldProvider;
+import org.terasology.engine.world.chunks.Chunk;
+import org.terasology.engine.world.chunks.Chunks;
+import org.terasology.engine.world.chunks.RenderableChunk;
+import org.terasology.engine.world.chunks.pipeline.ChunkTask;
+import org.terasology.engine.world.chunks.pipeline.ShutdownChunkTask;
 
 import java.util.Collections;
 import java.util.Comparator;

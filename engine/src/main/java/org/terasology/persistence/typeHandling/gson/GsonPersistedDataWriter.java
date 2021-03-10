@@ -1,7 +1,7 @@
 // Copyright 2020 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-package org.terasology.persistence.typeHandling.gson;
+package org.terasology.engine.persistence.typeHandling.gson;
 
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonWriter;

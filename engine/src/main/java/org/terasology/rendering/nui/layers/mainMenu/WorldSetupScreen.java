@@ -1,14 +1,16 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.rendering.nui.layers.mainMenu;
+package org.terasology.engine.rendering.nui.layers.mainMenu;
 
 import org.terasology.assets.ResourceUrn;
-import org.terasology.config.Config;
-import org.terasology.context.Context;
-import org.terasology.engine.SimpleUri;
-import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.metadata.ComponentLibrary;
-import org.terasology.i18n.TranslationSystem;
+import org.terasology.engine.config.Config;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.core.SimpleUri;
+import org.terasology.engine.entitySystem.Component;
+import org.terasology.engine.entitySystem.metadata.ComponentLibrary;
+import org.terasology.engine.i18n.TranslationSystem;
+import org.terasology.engine.rendering.nui.animation.MenuAnimationSystems;
+import org.terasology.engine.rendering.world.WorldSetupWrapper;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.naming.Name;
 import org.terasology.nui.WidgetUtil;
@@ -23,16 +25,14 @@ import org.terasology.nui.widgets.UILabel;
 import org.terasology.nui.widgets.UIText;
 import org.terasology.reflection.metadata.FieldMetadata;
 import org.terasology.reflection.reflect.ReflectFactory;
-import org.terasology.registry.In;
-import org.terasology.rendering.nui.CoreScreenLayer;
-import org.terasology.rendering.nui.animation.MenuAnimationSystems;
-import org.terasology.rendering.world.WorldSetupWrapper;
-import org.terasology.world.generator.UnresolvedWorldGeneratorException;
-import org.terasology.world.generator.WorldConfigurator;
-import org.terasology.world.generator.WorldGenerator;
-import org.terasology.world.generator.internal.WorldGeneratorManager;
-import org.terasology.world.generator.plugin.TempWorldGeneratorPluginLibrary;
-import org.terasology.world.generator.plugin.WorldGeneratorPluginLibrary;
+import org.terasology.engine.registry.In;
+import org.terasology.engine.rendering.nui.CoreScreenLayer;
+import org.terasology.engine.world.generator.UnresolvedWorldGeneratorException;
+import org.terasology.engine.world.generator.WorldConfigurator;
+import org.terasology.engine.world.generator.WorldGenerator;
+import org.terasology.engine.world.generator.internal.WorldGeneratorManager;
+import org.terasology.engine.world.generator.plugin.TempWorldGeneratorPluginLibrary;
+import org.terasology.engine.world.generator.plugin.WorldGeneratorPluginLibrary;
 
 import java.util.List;
 import java.util.Map;

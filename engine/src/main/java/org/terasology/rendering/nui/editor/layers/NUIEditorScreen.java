@@ -1,6 +1,6 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.rendering.nui.editor.layers;
+package org.terasology.engine.rendering.nui.editor.layers;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
@@ -15,9 +15,11 @@ import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.exceptions.InvalidUrnException;
 import org.terasology.assets.format.AssetDataFile;
 import org.terasology.assets.management.AssetManager;
-import org.terasology.config.Config;
-import org.terasology.config.NUIEditorConfig;
-import org.terasology.engine.paths.PathManager;
+import org.terasology.engine.config.Config;
+import org.terasology.engine.config.NUIEditorConfig;
+import org.terasology.engine.core.paths.PathManager;
+import org.terasology.engine.rendering.nui.editor.systems.NUIEditorSystem;
+import org.terasology.engine.rendering.nui.widgets.JsonEditorTreeView;
 import org.terasology.nui.UIWidget;
 import org.terasology.nui.WidgetUtil;
 import org.terasology.nui.asset.UIElement;
@@ -32,14 +34,12 @@ import org.terasology.nui.widgets.UITextEntry;
 import org.terasology.nui.widgets.treeView.JsonTree;
 import org.terasology.nui.widgets.treeView.JsonTreeConverter;
 import org.terasology.nui.widgets.treeView.JsonTreeValue;
-import org.terasology.registry.In;
-import org.terasology.rendering.nui.asset.UIFormat;
-import org.terasology.rendering.nui.editor.systems.NUIEditorSystem;
-import org.terasology.rendering.nui.editor.utils.NUIEditorItemRenderer;
-import org.terasology.rendering.nui.editor.utils.NUIEditorMenuTreeBuilder;
-import org.terasology.rendering.nui.editor.utils.NUIEditorNodeUtils;
-import org.terasology.rendering.nui.editor.utils.NUIEditorTextEntryBuilder;
-import org.terasology.rendering.nui.widgets.JsonEditorTreeView;
+import org.terasology.engine.registry.In;
+import org.terasology.engine.rendering.nui.asset.UIFormat;
+import org.terasology.engine.rendering.nui.editor.utils.NUIEditorItemRenderer;
+import org.terasology.engine.rendering.nui.editor.utils.NUIEditorMenuTreeBuilder;
+import org.terasology.engine.rendering.nui.editor.utils.NUIEditorNodeUtils;
+import org.terasology.engine.rendering.nui.editor.utils.NUIEditorTextEntryBuilder;
 
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;

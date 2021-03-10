@@ -1,14 +1,14 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.rendering.cameras;
+package org.terasology.engine.rendering.cameras;
 
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.lwjgl.BufferUtils;
 import org.terasology.joml.geom.AABBfc;
 import org.terasology.joml.geom.Planef;
-import org.terasology.logic.players.LocalPlayer;
-import org.terasology.registry.CoreRegistry;
+import org.terasology.engine.logic.players.LocalPlayer;
+import org.terasology.engine.registry.CoreRegistry;
 
 import java.nio.FloatBuffer;
 

@@ -1,4 +1,4 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.persistence.typeHandling;
@@ -15,6 +15,7 @@ import org.terasology.persistence.typeHandling.coreTypes.CharacterTypeHandler;
 import org.terasology.persistence.typeHandling.coreTypes.DoubleTypeHandler;
 import org.terasology.persistence.typeHandling.coreTypes.FloatTypeHandler;
 import org.terasology.persistence.typeHandling.coreTypes.IntTypeHandler;
+import org.terasology.persistence.typeHandling.coreTypes.LocaleTypeHandler;
 import org.terasology.persistence.typeHandling.coreTypes.LongTypeHandler;
 import org.terasology.persistence.typeHandling.coreTypes.NumberTypeHandler;
 import org.terasology.persistence.typeHandling.coreTypes.RuntimeDelegatingTypeHandler;
@@ -22,8 +23,8 @@ import org.terasology.persistence.typeHandling.coreTypes.StringTypeHandler;
 import org.terasology.persistence.typeHandling.coreTypes.factories.ArrayTypeHandlerFactory;
 import org.terasology.persistence.typeHandling.coreTypes.factories.CollectionTypeHandlerFactory;
 import org.terasology.persistence.typeHandling.coreTypes.factories.EnumTypeHandlerFactory;
-import org.terasology.persistence.typeHandling.coreTypes.factories.ObjectFieldMapTypeHandlerFactory;
 import org.terasology.persistence.typeHandling.coreTypes.factories.MapTypeHandlerFactory;
+import org.terasology.persistence.typeHandling.coreTypes.factories.ObjectFieldMapTypeHandlerFactory;
 import org.terasology.persistence.typeHandling.reflection.ReflectionsSandbox;
 import org.terasology.persistence.typeHandling.reflection.SerializationSandbox;
 import org.terasology.reflection.TypeInfo;
@@ -34,6 +35,7 @@ import org.terasology.reflection.reflect.ConstructorLibrary;
 import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 
@@ -100,6 +102,7 @@ public class TypeHandlerLibrary {
         typeHandlerLibrary.addTypeHandler(Long.TYPE, new LongTypeHandler());
         typeHandlerLibrary.addTypeHandler(String.class, new StringTypeHandler());
         typeHandlerLibrary.addTypeHandler(Number.class, new NumberTypeHandler());
+        typeHandlerLibrary.addTypeHandler(Locale.class, new LocaleTypeHandler());
 
         typeHandlerLibrary.addTypeHandlerFactory(new ArrayTypeHandlerFactory());
         typeHandlerLibrary.addTypeHandler(byte[].class, new ByteArrayTypeHandler());

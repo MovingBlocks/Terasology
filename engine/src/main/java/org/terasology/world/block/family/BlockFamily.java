@@ -1,10 +1,10 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.world.block.family;
+package org.terasology.engine.world.block.family;
 
 import org.terasology.assets.ResourceUrn;
-import org.terasology.world.block.Block;
-import org.terasology.world.block.BlockUri;
+import org.terasology.engine.world.block.Block;
+import org.terasology.engine.world.block.BlockUri;
 
 /**
  * A collection of related blocks that are all distinct but can collapse to a single "family" block.

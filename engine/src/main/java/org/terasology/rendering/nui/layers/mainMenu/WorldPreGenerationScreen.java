@@ -1,14 +1,20 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.rendering.nui.layers.mainMenu;
+package org.terasology.engine.rendering.nui.layers.mainMenu;
 
 import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
-import org.terasology.config.Config;
-import org.terasology.context.Context;
-import org.terasology.engine.module.ModuleManager;
+import org.terasology.engine.config.Config;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.core.module.ModuleManager;
+import org.terasology.engine.rendering.assets.texture.Texture;
+import org.terasology.engine.rendering.assets.texture.TextureData;
+import org.terasology.engine.rendering.nui.animation.MenuAnimationSystems;
+import org.terasology.engine.rendering.nui.layers.mainMenu.preview.FacetLayerPreview;
+import org.terasology.engine.rendering.nui.layers.mainMenu.preview.PreviewGenerator;
+import org.terasology.engine.rendering.world.WorldSetupWrapper;
 import org.terasology.math.TeraMath;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.naming.Name;
@@ -18,22 +24,16 @@ import org.terasology.nui.widgets.UIDropdownScrollable;
 import org.terasology.nui.widgets.UIImage;
 import org.terasology.nui.widgets.UISlider;
 import org.terasology.nui.widgets.UISliderOnChangeTriggeredListener;
-import org.terasology.registry.In;
-import org.terasology.rendering.assets.texture.Texture;
-import org.terasology.rendering.assets.texture.TextureData;
-import org.terasology.rendering.nui.CoreScreenLayer;
-import org.terasology.rendering.nui.NUIManager;
-import org.terasology.rendering.nui.animation.MenuAnimationSystems;
-import org.terasology.rendering.nui.layers.mainMenu.preview.FacetLayerPreview;
-import org.terasology.rendering.nui.layers.mainMenu.preview.PreviewGenerator;
-import org.terasology.rendering.world.WorldSetupWrapper;
-import org.terasology.utilities.Assets;
-import org.terasology.world.generator.UnresolvedWorldGeneratorException;
-import org.terasology.world.generator.WorldGenerator;
-import org.terasology.world.generator.internal.WorldGeneratorManager;
-import org.terasology.world.generator.plugin.TempWorldGeneratorPluginLibrary;
-import org.terasology.world.generator.plugin.WorldGeneratorPluginLibrary;
-import org.terasology.world.zones.Zone;
+import org.terasology.engine.registry.In;
+import org.terasology.engine.rendering.nui.CoreScreenLayer;
+import org.terasology.engine.rendering.nui.NUIManager;
+import org.terasology.engine.utilities.Assets;
+import org.terasology.engine.world.generator.UnresolvedWorldGeneratorException;
+import org.terasology.engine.world.generator.WorldGenerator;
+import org.terasology.engine.world.generator.internal.WorldGeneratorManager;
+import org.terasology.engine.world.generator.plugin.TempWorldGeneratorPluginLibrary;
+import org.terasology.engine.world.generator.plugin.WorldGeneratorPluginLibrary;
+import org.terasology.engine.world.zones.Zone;
 
 import java.nio.ByteBuffer;
 import java.util.List;

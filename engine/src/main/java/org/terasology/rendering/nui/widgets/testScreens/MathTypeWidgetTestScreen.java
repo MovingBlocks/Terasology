@@ -1,6 +1,6 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.rendering.nui.widgets.testScreens;
+package org.terasology.engine.rendering.nui.widgets.testScreens;
 
 import org.joml.Quaternionf;
 import org.joml.Vector2f;

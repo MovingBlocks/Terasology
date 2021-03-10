@@ -1,23 +1,23 @@
 // Copyright 2020 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.config.flexible;
+package org.terasology.engine.config.flexible;
 
 import com.google.gson.Gson;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.ArgumentCaptor;
-import org.terasology.context.Context;
-import org.terasology.engine.SimpleUri;
-import org.terasology.engine.module.ModuleManager;
-import org.terasology.engine.paths.PathManager;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.core.SimpleUri;
+import org.terasology.engine.core.module.ModuleManager;
+import org.terasology.engine.core.paths.PathManager;
+import org.terasology.engine.persistence.typeHandling.gson.GsonPersistedDataReader;
+import org.terasology.engine.persistence.typeHandling.gson.GsonPersistedDataSerializer;
+import org.terasology.engine.persistence.typeHandling.gson.GsonPersistedDataWriter;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.naming.Name;
 import org.terasology.persistence.serializers.Serializer;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
-import org.terasology.persistence.typeHandling.gson.GsonPersistedDataReader;
-import org.terasology.persistence.typeHandling.gson.GsonPersistedDataSerializer;
-import org.terasology.persistence.typeHandling.gson.GsonPersistedDataWriter;
 
 import java.nio.file.Path;
 import java.util.Collections;

@@ -1,32 +1,20 @@
-/*
- * Copyright 2017 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 
-package org.terasology.logic.chat;
+package org.terasology.engine.logic.chat;
 
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.logic.console.CoreMessageType;
-import org.terasology.logic.console.Message;
-import org.terasology.logic.console.MessageEvent;
-import org.terasology.logic.players.PlayerUtil;
-import org.terasology.network.OwnerEvent;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.logic.common.DisplayNameComponent;
+import org.terasology.engine.logic.console.CoreMessageType;
+import org.terasology.engine.logic.console.Message;
+import org.terasology.engine.logic.console.MessageEvent;
+import org.terasology.engine.logic.players.PlayerUtil;
+import org.terasology.engine.network.OwnerEvent;
 
 /**
  * Indicate that a message should be printed to the chat console.
  * <p>
- * Needs to be sent against a client entity, e.g., the targeted entity should have a {@link org.terasology.network.ClientComponent}.
+ * Needs to be sent against a client entity, e.g., the targeted entity should have a {@link org.terasology.engine.network.ClientComponent}.
  */
 @OwnerEvent
 public class ChatMessageEvent implements MessageEvent {
@@ -39,8 +27,8 @@ public class ChatMessageEvent implements MessageEvent {
     /**
      * A chat message is associated with the entity that sent it.
      * <p>
-     * This entity may often be a player, but it can be any entity with a {@link org.terasology.logic.common.DisplayNameComponent}.
-     * If the entity also has a {@link org.terasology.network.ColorComponent}, the sender's name will be colorized.
+     * This entity may often be a player, but it can be any entity with a {@link DisplayNameComponent}.
+     * If the entity also has a {@link org.terasology.engine.network.ColorComponent}, the sender's name will be colorized.
      * <p>
      * Note: The exact representation of sender and message is up to the processing system.
      *

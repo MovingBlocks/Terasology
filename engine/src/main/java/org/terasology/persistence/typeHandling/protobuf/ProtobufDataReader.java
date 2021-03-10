@@ -1,7 +1,7 @@
 // Copyright 2020 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-package org.terasology.persistence.typeHandling.protobuf;
+package org.terasology.engine.persistence.typeHandling.protobuf;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.terasology.persistence.serializers.PersistedDataReader;

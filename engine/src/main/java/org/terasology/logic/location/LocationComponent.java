@@ -1,6 +1,6 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.logic.location;
+package org.terasology.engine.logic.location;
 
 import com.google.common.collect.Lists;
 import org.joml.Matrix4f;
@@ -8,11 +8,11 @@ import org.joml.Quaternionf;
 import org.joml.Quaternionfc;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
-import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.math.Direction;
-import org.terasology.network.Replicate;
-import org.terasology.network.ReplicationCheck;
+import org.terasology.engine.entitySystem.Component;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.math.Direction;
+import org.terasology.engine.network.Replicate;
+import org.terasology.engine.network.ReplicationCheck;
 import org.terasology.nui.properties.TextField;
 import org.terasology.reflection.metadata.FieldMetadata;
 

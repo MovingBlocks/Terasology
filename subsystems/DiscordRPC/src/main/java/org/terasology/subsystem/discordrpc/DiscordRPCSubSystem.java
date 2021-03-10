@@ -13,15 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.engine.subsystem.discordrpc;
+package org.terasology.subsystem.discordrpc;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.config.Config;
-import org.terasology.config.PlayerConfig;
-import org.terasology.context.Context;
-import org.terasology.engine.GameEngine;
-import org.terasology.engine.subsystem.EngineSubsystem;
+import org.terasology.engine.config.Config;
+import org.terasology.engine.config.PlayerConfig;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.core.GameEngine;
+import org.terasology.engine.core.subsystem.EngineSubsystem;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;

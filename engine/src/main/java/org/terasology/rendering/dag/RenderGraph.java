@@ -1,6 +1,6 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.rendering.dag;
+package org.terasology.engine.rendering.dag;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
@@ -9,13 +9,13 @@ import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.MutableGraph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.context.Context;
-import org.terasology.engine.SimpleUri;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.core.SimpleUri;
+import org.terasology.engine.rendering.dag.dependencyConnections.BufferPairConnection;
+import org.terasology.engine.rendering.dag.dependencyConnections.DependencyConnection;
+import org.terasology.engine.rendering.dag.dependencyConnections.FboConnection;
 import org.terasology.naming.Name;
-import org.terasology.rendering.ShaderManager;
-import org.terasology.rendering.dag.dependencyConnections.BufferPairConnection;
-import org.terasology.rendering.dag.dependencyConnections.DependencyConnection;
-import org.terasology.rendering.dag.dependencyConnections.FboConnection;
+import org.terasology.engine.rendering.ShaderManager;
 
 import java.util.ArrayList;
 import java.util.List;

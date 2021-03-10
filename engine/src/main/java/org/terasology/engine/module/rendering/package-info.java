@@ -15,6 +15,6 @@
  */
 
 @API
-package org.terasology.engine.module.rendering;
+package org.terasology.engine.core.module.rendering;
 
 import org.terasology.module.sandbox.API;

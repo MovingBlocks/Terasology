@@ -1,23 +1,23 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-package org.terasology.persistence.typeHandling.mathTypes;
+package org.terasology.engine.persistence.typeHandling.mathTypes;
 
 import com.google.gson.Gson;
 import org.junit.jupiter.api.Test;
-import org.terasology.ModuleEnvironmentTest;
-import org.terasology.engine.module.ModuleContext;
+import org.terasology.engine.ModuleEnvironmentTest;
+import org.terasology.engine.core.module.ModuleContext;
+import org.terasology.engine.persistence.serializers.ProtobufSerializer;
+import org.terasology.engine.persistence.typeHandling.TypeHandlerLibraryImpl;
+import org.terasology.engine.persistence.typeHandling.gson.GsonPersistedDataReader;
+import org.terasology.engine.persistence.typeHandling.gson.GsonPersistedDataSerializer;
+import org.terasology.engine.persistence.typeHandling.gson.GsonPersistedDataWriter;
+import org.terasology.engine.world.block.BlockArea;
+import org.terasology.engine.world.block.BlockAreac;
 import org.terasology.naming.Name;
-import org.terasology.persistence.serializers.ProtobufSerializer;
 import org.terasology.persistence.serializers.Serializer;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
-import org.terasology.persistence.typeHandling.TypeHandlerLibraryImpl;
-import org.terasology.persistence.typeHandling.gson.GsonPersistedDataReader;
-import org.terasology.persistence.typeHandling.gson.GsonPersistedDataSerializer;
-import org.terasology.persistence.typeHandling.gson.GsonPersistedDataWriter;
 import org.terasology.reflection.TypeInfo;
-import org.terasology.world.block.BlockArea;
-import org.terasology.world.block.BlockAreac;
 
 import java.io.IOException;
 

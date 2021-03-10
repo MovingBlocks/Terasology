@@ -1,19 +1,19 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.rendering.nui.layers.mainMenu;
+package org.terasology.engine.rendering.nui.layers.mainMenu;
 
 import org.terasology.assets.ResourceUrn;
 import org.terasology.crashreporter.CrashReporter;
-import org.terasology.engine.GameEngine;
-import org.terasology.engine.LoggingContext;
+import org.terasology.engine.core.GameEngine;
+import org.terasology.engine.core.LoggingContext;
+import org.terasology.engine.rendering.nui.animation.MenuAnimationSystems;
 import org.terasology.nui.WidgetUtil;
-import org.terasology.recording.RecordAndReplayCurrentStatus;
-import org.terasology.recording.RecordAndReplayStatus;
-import org.terasology.recording.RecordAndReplayUtils;
-import org.terasology.registry.In;
-import org.terasology.rendering.nui.CoreScreenLayer;
-import org.terasology.rendering.nui.animation.MenuAnimationSystems;
-import org.terasology.telemetry.TelemetryScreen;
+import org.terasology.engine.recording.RecordAndReplayCurrentStatus;
+import org.terasology.engine.recording.RecordAndReplayStatus;
+import org.terasology.engine.recording.RecordAndReplayUtils;
+import org.terasology.engine.registry.In;
+import org.terasology.engine.rendering.nui.CoreScreenLayer;
+import org.terasology.engine.telemetry.TelemetryScreen;
 
 public class ExtrasMenuScreen extends CoreScreenLayer {
 

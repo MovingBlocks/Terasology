@@ -1,22 +1,22 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.config.flexible.ui;
+package org.terasology.engine.config.flexible.ui;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
-import org.terasology.config.flexible.AutoConfig;
-import org.terasology.config.flexible.AutoConfigManager;
-import org.terasology.engine.module.ModuleManager;
+import org.terasology.engine.config.flexible.AutoConfig;
+import org.terasology.engine.config.flexible.AutoConfigManager;
+import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.nui.UIWidget;
 import org.terasology.nui.WidgetUtil;
 import org.terasology.nui.databinding.Binding;
 import org.terasology.nui.databinding.DefaultBinding;
 import org.terasology.nui.layouts.ColumnLayout;
 import org.terasology.nui.widgets.types.TypeWidgetLibrary;
-import org.terasology.registry.In;
-import org.terasology.rendering.nui.CoreScreenLayer;
+import org.terasology.engine.registry.In;
+import org.terasology.engine.rendering.nui.CoreScreenLayer;
 
 import java.util.Optional;
 

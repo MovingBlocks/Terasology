@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.telemetry;
+package org.terasology.engine.telemetry;
 
 import org.terasology.module.sandbox.API;
 
@@ -24,7 +24,7 @@ import java.lang.annotation.Target;
 
 /**
  * A new metric class show has this annotation.
- * The {@link org.terasology.telemetry.TelemetryScreen} find telemetry information via this annotation.
+ * The {@link org.terasology.engine.telemetry.TelemetryScreen} find telemetry information via this annotation.
  */
 @API
 @Retention(RetentionPolicy.RUNTIME)

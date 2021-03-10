@@ -16,6 +16,7 @@
 package org.terasology.rendering.dag;
 
 import com.google.common.base.Objects;
+import org.terasology.engine.rendering.dag.StateChange;
 
 public class SetName implements StateChange {
     private static SetName defaultInstance = new SetName("bar");

@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.engine.subsystem.headless.device;
+package org.terasology.engine.core.subsystem.headless.device;
 
-import org.terasology.engine.internal.TimeBase;
+import org.terasology.engine.core.internal.TimeBase;
 
 public final class TimeSystem extends TimeBase {
 

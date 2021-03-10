@@ -1,6 +1,6 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.rendering.opengl;
+package org.terasology.engine.rendering.opengl;
 
 import org.joml.Vector2i;
 import org.joml.Vector2ic;
@@ -8,10 +8,10 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL30;
 import org.terasology.assets.ResourceUrn;
-import org.terasology.engine.subsystem.DisplayDevice;
-import org.terasology.rendering.assets.texture.Texture;
-import org.terasology.rendering.assets.texture.TextureData;
-import org.terasology.utilities.Assets;
+import org.terasology.engine.core.subsystem.DisplayDevice;
+import org.terasology.engine.rendering.assets.texture.Texture;
+import org.terasology.engine.rendering.assets.texture.TextureData;
+import org.terasology.engine.utilities.Assets;
 
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;

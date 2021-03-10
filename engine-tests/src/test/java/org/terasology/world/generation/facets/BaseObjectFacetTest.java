@@ -16,10 +16,10 @@
 
 package org.terasology.world.generation.facets;
 
-import org.terasology.world.block.BlockRegion;
-import org.terasology.world.generation.Border3D;
-import org.terasology.world.generation.facets.base.BaseObjectFacet3D;
-import org.terasology.world.generation.facets.base.ObjectFacet3D;
+import org.terasology.engine.world.block.BlockRegion;
+import org.terasology.engine.world.generation.Border3D;
+import org.terasology.engine.world.generation.facets.base.BaseObjectFacet3D;
+import org.terasology.engine.world.generation.facets.base.ObjectFacet3D;
 
 /**
  * Tests the {@link BaseObjectFacet3D} class.

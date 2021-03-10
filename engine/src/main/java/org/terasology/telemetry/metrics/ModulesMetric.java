@@ -13,15 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.telemetry.metrics;
+package org.terasology.engine.telemetry.metrics;
 
 import com.snowplowanalytics.snowplow.tracker.events.Unstructured;
-import org.terasology.context.Context;
-import org.terasology.engine.module.ModuleManager;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.module.Module;
 import org.terasology.module.ModuleEnvironment;
-import org.terasology.telemetry.TelemetryCategory;
-import org.terasology.telemetry.TelemetryField;
+import org.terasology.engine.telemetry.TelemetryCategory;
+import org.terasology.engine.telemetry.TelemetryField;
 
 import java.util.ArrayList;
 import java.util.HashMap;

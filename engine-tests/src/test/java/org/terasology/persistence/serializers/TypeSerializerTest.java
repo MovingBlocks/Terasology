@@ -1,23 +1,24 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.persistence.serializers;
+package org.terasology.engine.persistence.serializers;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.gson.Gson;
 import org.joml.Vector3f;
 import org.junit.jupiter.api.Test;
-import org.terasology.ModuleEnvironmentTest;
-import org.terasology.engine.TerasologyConstants;
-import org.terasology.engine.module.ModuleContext;
+import org.terasology.engine.ModuleEnvironmentTest;
+import org.terasology.engine.core.TerasologyConstants;
+import org.terasology.engine.core.module.ModuleContext;
+import org.terasology.engine.persistence.typeHandling.TypeHandlerLibraryImpl;
+import org.terasology.engine.persistence.typeHandling.gson.GsonPersistedDataReader;
+import org.terasology.engine.persistence.typeHandling.gson.GsonPersistedDataSerializer;
+import org.terasology.engine.persistence.typeHandling.gson.GsonPersistedDataWriter;
 import org.terasology.naming.Name;
 import org.terasology.nui.Color;
+import org.terasology.persistence.serializers.Serializer;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
-import org.terasology.persistence.typeHandling.TypeHandlerLibraryImpl;
 import org.terasology.persistence.typeHandling.annotations.SerializedName;
-import org.terasology.persistence.typeHandling.gson.GsonPersistedDataReader;
-import org.terasology.persistence.typeHandling.gson.GsonPersistedDataSerializer;
-import org.terasology.persistence.typeHandling.gson.GsonPersistedDataWriter;
 import org.terasology.reflection.TypeInfo;
 
 import java.io.IOException;
@@ -31,7 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class TypeSerializerTest extends ModuleEnvironmentTest {
     private static final SomeClass<Integer> INSTANCE = new SomeClass<>(0xdeadbeef);
-    private static final String INSTANCE_JSON = "{\"generic-t\":-559038737,\"list\":[50,51,-52,-53],\"animals\":[{\"class\":\"org.terasology.persistence.serializers.TypeSerializerTest$Dog\",\"tailPosition\":[3.15,54.51,-0.001],\"headPosition\":[10.0,30.0,-0.001],\"data\":{\"class\":\"java.lang.Integer\",\"content\":1}},{\"class\":\"org.terasology.persistence.serializers.TypeSerializerTest$Cheetah\",\"spotColor\":[255,0,255,255],\"data\":{\"class\":\"java.lang.Integer\",\"content\":2}}]}";
+    private static final String INSTANCE_JSON = "{\"generic-t\":-559038737,\"list\":[50,51,-52,-53],\"animals\":[{\"class\":\"org.terasology.engine.persistence.serializers.TypeSerializerTest$Dog\",\"tailPosition\":[3.15,54.51,-0.001],\"headPosition\":[10.0,30.0,-0.001],\"data\":{\"class\":\"java.lang.Integer\",\"content\":1}},{\"class\":\"org.terasology.engine.persistence.serializers.TypeSerializerTest$Cheetah\",\"spotColor\":[255,0,255,255],\"data\":{\"class\":\"java.lang.Integer\",\"content\":2}}]}";
 
     static {
         INSTANCE.list.addAll(Lists.newArrayList(50, 51, -52, -53));

@@ -1,6 +1,6 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.rendering.nui.widgets.types;
+package org.terasology.engine.rendering.nui.widgets.types;
 
 import org.terasology.nui.databinding.Binding;
 import org.terasology.nui.widgets.types.TypeWidgetBuilder;
@@ -10,8 +10,8 @@ import org.terasology.nui.widgets.types.builtin.util.GrowableListWidgetBuilder;
 import org.terasology.reflection.TypeInfo;
 import org.terasology.reflection.reflect.ConstructorLibrary;
 import org.terasology.reflection.reflect.ObjectConstructor;
-import org.terasology.utilities.ReflectionUtil;
-import org.terasology.utilities.collection.ImmutableCollectionUtil;
+import org.terasology.engine.utilities.ReflectionUtil;
+import org.terasology.engine.utilities.collection.ImmutableCollectionUtil;
 
 import java.util.Collection;
 import java.util.List;

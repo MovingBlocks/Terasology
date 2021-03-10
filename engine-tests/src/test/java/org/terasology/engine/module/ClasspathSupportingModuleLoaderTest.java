@@ -1,7 +1,7 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-package org.terasology.engine.module;
+package org.terasology.engine.core.module;
 
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -13,7 +13,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.terasology.engine.TerasologyConstants.MODULE_INFO_FILENAME;
+import static org.terasology.engine.core.TerasologyConstants.MODULE_INFO_FILENAME;
 
 public class ClasspathSupportingModuleLoaderTest {
     @ParameterizedTest

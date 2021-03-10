@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.entitySystem.event;
+package org.terasology.engine.entitySystem.event;
 
 /**
  */

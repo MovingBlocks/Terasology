@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.persistence.typeHandling.gson;
+package org.terasology.engine.persistence.typeHandling.gson;
 
 import com.google.gson.JsonElement;
 

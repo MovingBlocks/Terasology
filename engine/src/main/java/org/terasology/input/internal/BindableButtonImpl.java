@@ -1,30 +1,17 @@
-/*
- * Copyright 2013 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-package org.terasology.input.internal;
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
+package org.terasology.engine.input.internal;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.joml.Vector3fc;
 import org.joml.Vector3ic;
-import org.terasology.engine.SimpleUri;
-import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.engine.core.SimpleUri;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.input.BindableButton;
 import org.terasology.input.ActivateMode;
-import org.terasology.input.BindButtonEvent;
-import org.terasology.input.BindButtonSubscriber;
-import org.terasology.input.BindableButton;
+import org.terasology.engine.input.BindButtonEvent;
+import org.terasology.engine.input.BindButtonSubscriber;
 import org.terasology.input.ButtonState;
 import org.terasology.input.Input;
 
@@ -36,7 +23,7 @@ import java.util.Set;
  * mouse wheel).
  * <br><br>
  * When the BindableButton changes state it sends out events like an actual key or button does. It also allows direct
- * subscription via the {@link org.terasology.input.BindButtonSubscriber} interface.
+ * subscription via the {@link BindButtonSubscriber} interface.
  */
 public class BindableButtonImpl implements BindableButton {
 

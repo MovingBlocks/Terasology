@@ -1,6 +1,6 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.rendering.nui.widgets.testScreens;
+package org.terasology.engine.rendering.nui.widgets.testScreens;
 
 import org.terasology.nui.UIWidget;
 import org.terasology.nui.WidgetUtil;
@@ -12,9 +12,9 @@ import org.terasology.nui.widgets.UIText;
 import org.terasology.nui.widgets.types.TypeWidgetFactory;
 import org.terasology.nui.widgets.types.TypeWidgetLibrary;
 import org.terasology.reflection.TypeInfo;
-import org.terasology.registry.In;
-import org.terasology.rendering.nui.CoreScreenLayer;
-import org.terasology.utilities.ReflectionUtil;
+import org.terasology.engine.registry.In;
+import org.terasology.engine.rendering.nui.CoreScreenLayer;
+import org.terasology.engine.utilities.ReflectionUtil;
 
 import java.text.MessageFormat;
 import java.util.Arrays;

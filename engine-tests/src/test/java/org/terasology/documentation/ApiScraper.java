@@ -17,11 +17,11 @@ package org.terasology.documentation;
 
 import com.google.common.collect.Multimaps;
 import com.google.common.collect.SortedSetMultimap;
-import org.terasology.engine.module.ExternalApiWhitelist;
-import org.terasology.engine.module.ModuleManager;
+import org.terasology.engine.core.module.ExternalApiWhitelist;
+import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.module.sandbox.API;
-import org.terasology.testUtil.ModuleManagerFactory;
+import org.terasology.engine.testUtil.ModuleManagerFactory;
 
 import java.net.URL;
 import java.util.HashMap;

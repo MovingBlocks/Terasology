@@ -16,8 +16,9 @@
 package org.terasology.utilities;
 
 import org.junit.jupiter.api.Test;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.logic.location.LocationComponent;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.logic.location.LocationComponent;
+import org.terasology.engine.utilities.ReflectionUtil;
 import org.terasology.reflection.TypeInfo;
 import org.terasology.reflection.copy.CopyStrategy;
 

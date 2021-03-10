@@ -1,20 +1,20 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.rendering.dag;
+package org.terasology.engine.rendering.dag;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.context.Context;
-import org.terasology.engine.SimpleUri;
-import org.terasology.engine.module.ModuleManager;
-import org.terasology.entitySystem.systems.RegisterSystem;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.core.SimpleUri;
+import org.terasology.engine.core.module.ModuleManager;
+import org.terasology.engine.entitySystem.systems.RegisterSystem;
+import org.terasology.engine.rendering.dag.dependencyConnections.BufferPair;
+import org.terasology.engine.rendering.opengl.FBO;
+import org.terasology.engine.rendering.opengl.FboConfig;
+import org.terasology.engine.rendering.opengl.ScalingFactors;
+import org.terasology.engine.rendering.world.WorldRenderer;
 import org.terasology.naming.Name;
 import org.terasology.nui.properties.Range;
-import org.terasology.rendering.dag.dependencyConnections.BufferPair;
-import org.terasology.rendering.opengl.FBO;
-import org.terasology.rendering.opengl.FboConfig;
-import org.terasology.rendering.opengl.ScalingFactors;
-import org.terasology.rendering.world.WorldRenderer;
 
 @RegisterSystem
 public abstract class ModuleRendering {

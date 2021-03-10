@@ -1,10 +1,12 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-package org.terasology.rendering.nui;
+package org.terasology.engine.rendering.nui;
 
 import org.joml.Vector2i;
 import org.terasology.assets.ResourceUrn;
+import org.terasology.engine.rendering.nui.animation.MenuAnimationSystem;
+import org.terasology.engine.rendering.nui.animation.MenuAnimationSystemStub;
 import org.terasology.input.ButtonState;
 import org.terasology.input.Keyboard;
 import org.terasology.joml.geom.Rectanglei;
@@ -25,8 +27,6 @@ import org.terasology.nui.events.NUIMouseWheelEvent;
 import org.terasology.nui.layouts.ScrollableArea;
 import org.terasology.nui.widgets.UIRadialRing;
 import org.terasology.nui.widgets.UIRadialSection;
-import org.terasology.rendering.nui.animation.MenuAnimationSystem;
-import org.terasology.rendering.nui.animation.MenuAnimationSystemStub;
 
 import java.util.ArrayList;
 import java.util.Arrays;
