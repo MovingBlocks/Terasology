@@ -1,6 +1,6 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.engine.module;
+package org.terasology.engine.core.module;
 
 import com.google.common.collect.Sets;
 import org.reflections.Reflections;
@@ -9,10 +9,10 @@ import org.reflections.serializers.XmlSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.Asset;
-import org.terasology.config.Config;
-import org.terasology.config.SystemConfig;
-import org.terasology.engine.TerasologyConstants;
-import org.terasology.engine.paths.PathManager;
+import org.terasology.engine.config.Config;
+import org.terasology.engine.config.SystemConfig;
+import org.terasology.engine.core.TerasologyConstants;
+import org.terasology.engine.core.paths.PathManager;
 import org.terasology.input.device.KeyboardDevice;
 import org.terasology.module.ClasspathModule;
 import org.terasology.module.DependencyInfo;
@@ -33,7 +33,7 @@ import org.terasology.module.sandbox.StandardPermissionProviderFactory;
 import org.terasology.module.sandbox.WarnOnlyProviderFactory;
 import org.terasology.nui.UIWidget;
 import org.terasology.reflection.TypeRegistry;
-import org.terasology.utilities.Jvm;
+import org.terasology.engine.utilities.Jvm;
 
 import java.io.IOException;
 import java.io.InputStreamReader;

@@ -1,13 +1,13 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.rendering.assets.animation;
+package org.terasology.engine.rendering.assets.animation;
 
 import org.terasology.assets.Asset;
 import org.terasology.assets.AssetType;
 import org.terasology.assets.ResourceUrn;
+import org.terasology.engine.rendering.assets.skeletalmesh.Bone;
+import org.terasology.engine.rendering.assets.skeletalmesh.SkeletalMesh;
 import org.terasology.joml.geom.AABBf;
-import org.terasology.rendering.assets.skeletalmesh.Bone;
-import org.terasology.rendering.assets.skeletalmesh.SkeletalMesh;
 
 import java.util.Optional;
 

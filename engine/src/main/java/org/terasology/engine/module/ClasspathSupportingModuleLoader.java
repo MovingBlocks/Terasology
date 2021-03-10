@@ -1,7 +1,7 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-package org.terasology.engine.module;
+package org.terasology.engine.core.module;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

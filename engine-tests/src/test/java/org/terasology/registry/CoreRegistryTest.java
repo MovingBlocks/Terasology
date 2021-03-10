@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package org.terasology.registry;
+package org.terasology.engine.registry;
 
 import com.google.common.collect.Maps;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.terasology.context.Context;
+import org.terasology.engine.context.Context;
 
 import java.util.Map;
 

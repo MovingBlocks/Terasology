@@ -1,22 +1,22 @@
 
-package org.terasology.engine.subsystem.config;
+package org.terasology.engine.core.subsystem.config;
 
-import org.terasology.config.BindsConfig;
-import org.terasology.context.Context;
-import org.terasology.engine.SimpleUri;
-import org.terasology.input.BindAxisEvent;
-import org.terasology.input.BindButtonEvent;
-import org.terasology.input.BindableButton;
+import org.terasology.engine.config.BindsConfig;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.core.SimpleUri;
+import org.terasology.engine.input.BindAxisEvent;
+import org.terasology.engine.input.BindButtonEvent;
+import org.terasology.engine.input.BindableButton;
 import org.terasology.input.ControllerInput;
-import org.terasology.input.DefaultBinding;
+import org.terasology.engine.input.DefaultBinding;
 import org.terasology.input.Input;
 import org.terasology.input.Keyboard.KeyId;
 import org.terasology.input.MouseInput;
-import org.terasology.input.RegisterBindAxis;
-import org.terasology.input.RegisterBindButton;
-import org.terasology.input.RegisterRealBindAxis;
-import org.terasology.input.internal.AbstractBindableAxis;
-import org.terasology.input.internal.BindableRealAxis;
+import org.terasology.engine.input.RegisterBindAxis;
+import org.terasology.engine.input.RegisterBindButton;
+import org.terasology.engine.input.RegisterRealBindAxis;
+import org.terasology.engine.input.internal.AbstractBindableAxis;
+import org.terasology.engine.input.internal.BindableRealAxis;
 import org.terasology.module.ModuleEnvironment;
 
 import java.util.List;

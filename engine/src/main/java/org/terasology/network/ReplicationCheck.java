@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.network;
+package org.terasology.engine.network;
 
 import org.terasology.reflection.metadata.FieldMetadata;
 

@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.config.flexible;
+package org.terasology.engine.config.flexible;
 
-import org.terasology.config.flexible.constraints.SettingConstraint;
+import org.terasology.engine.config.flexible.constraints.SettingConstraint;
 import org.terasology.module.sandbox.API;
 import org.terasology.reflection.TypeInfo;
 

@@ -1,7 +1,7 @@
 // Copyright 2020 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-package org.terasology.engine.subsystem.lwjgl;
+package org.terasology.engine.core.subsystem.lwjgl;
 
 import org.lwjgl.glfw.GLFW;
 

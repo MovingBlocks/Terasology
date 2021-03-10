@@ -1,20 +1,20 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-package org.terasology.network.serialization;
+package org.terasology.engine.network.serialization;
 
 import gnu.trove.list.TIntList;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.network.NetworkComponent;
-import org.terasology.network.internal.NetworkSystemImpl;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.network.NetworkComponent;
+import org.terasology.engine.network.internal.NetworkSystemImpl;
+import org.terasology.engine.world.BlockEntityRegistry;
+import org.terasology.engine.world.block.BlockComponent;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.PersistedDataArray;
 import org.terasology.persistence.typeHandling.PersistedDataSerializer;
 import org.terasology.persistence.typeHandling.TypeHandler;
-import org.terasology.world.BlockEntityRegistry;
-import org.terasology.world.block.BlockComponent;
 
 import java.util.Optional;
 

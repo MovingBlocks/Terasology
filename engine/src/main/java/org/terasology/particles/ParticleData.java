@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.particles;
+package org.terasology.engine.particles;
 
 import org.joml.Vector2f;
 import org.joml.Vector3f;

@@ -14,21 +14,21 @@
  * limitations under the License.
  */
 
-package org.terasology.engine.modes.loadProcesses;
+package org.terasology.engine.core.modes.loadProcesses;
 
-import org.terasology.config.Config;
-import org.terasology.context.Context;
-import org.terasology.engine.SimpleUri;
-import org.terasology.engine.modes.SingleStepLoadProcess;
-import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.entity.EntityManager;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.game.GameManifest;
-import org.terasology.network.NetworkComponent;
-import org.terasology.world.WorldComponent;
-import org.terasology.world.chunks.ChunkProvider;
-import org.terasology.world.generator.WorldConfigurator;
-import org.terasology.world.generator.WorldGenerator;
+import org.terasology.engine.config.Config;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.core.SimpleUri;
+import org.terasology.engine.core.modes.SingleStepLoadProcess;
+import org.terasology.engine.entitySystem.Component;
+import org.terasology.engine.entitySystem.entity.EntityManager;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.game.GameManifest;
+import org.terasology.engine.network.NetworkComponent;
+import org.terasology.engine.world.WorldComponent;
+import org.terasology.engine.world.chunks.ChunkProvider;
+import org.terasology.engine.world.generator.WorldConfigurator;
+import org.terasology.engine.world.generator.WorldGenerator;
 
 import java.util.Iterator;
 import java.util.Map;

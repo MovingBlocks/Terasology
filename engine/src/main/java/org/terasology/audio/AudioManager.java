@@ -13,11 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.audio;
+package org.terasology.engine.audio;
 
-import org.joml.Quaternionf;
 import org.joml.Quaternionfc;
-import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.terasology.assets.AssetFactory;
 

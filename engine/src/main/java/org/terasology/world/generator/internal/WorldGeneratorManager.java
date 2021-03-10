@@ -1,23 +1,23 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.world.generator.internal;
+package org.terasology.engine.world.generator.internal;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.context.Context;
-import org.terasology.engine.SimpleUri;
-import org.terasology.engine.module.ModuleManager;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.core.SimpleUri;
+import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.module.DependencyResolver;
 import org.terasology.module.Module;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.module.ResolutionResult;
 import org.terasology.naming.Name;
-import org.terasology.registry.InjectionHelper;
-import org.terasology.world.generator.RegisterWorldGenerator;
-import org.terasology.world.generator.UnresolvedWorldGeneratorException;
-import org.terasology.world.generator.WorldGenerator;
+import org.terasology.engine.registry.InjectionHelper;
+import org.terasology.engine.world.generator.RegisterWorldGenerator;
+import org.terasology.engine.world.generator.UnresolvedWorldGeneratorException;
+import org.terasology.engine.world.generator.WorldGenerator;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;

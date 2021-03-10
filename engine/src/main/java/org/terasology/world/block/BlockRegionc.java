@@ -1,6 +1,6 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.world.block;
+package org.terasology.engine.world.block;
 
 import org.joml.Matrix4fc;
 import org.joml.Vector2f;
@@ -14,7 +14,7 @@ import org.terasology.joml.geom.LineSegmentf;
 import org.terasology.joml.geom.Planef;
 import org.terasology.joml.geom.Rayf;
 import org.terasology.joml.geom.Spheref;
-import org.terasology.math.Side;
+import org.terasology.engine.math.Side;
 
 import java.util.Iterator;
 import java.util.Optional;

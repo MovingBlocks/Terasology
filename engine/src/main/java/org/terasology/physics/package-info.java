@@ -42,6 +42,6 @@
  * This implementation can be found in the "bullet" sub-package.</li>
  * </ul>
  */
-@API package org.terasology.physics;
+@API package org.terasology.engine.physics;
 
 import org.terasology.module.sandbox.API;

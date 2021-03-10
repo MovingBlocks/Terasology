@@ -1,7 +1,7 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-package org.terasology.world.chunks.pipeline;
+package org.terasology.engine.world.chunks.pipeline;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
@@ -11,12 +11,12 @@ import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.monitoring.ThreadActivity;
-import org.terasology.monitoring.ThreadMonitor;
-import org.terasology.utilities.ReflectionUtil;
-import org.terasology.world.chunks.Chunk;
-import org.terasology.world.chunks.pipeline.stages.ChunkTask;
-import org.terasology.world.chunks.pipeline.stages.ChunkTaskProvider;
+import org.terasology.engine.monitoring.ThreadActivity;
+import org.terasology.engine.monitoring.ThreadMonitor;
+import org.terasology.engine.world.chunks.pipeline.stages.ChunkTask;
+import org.terasology.engine.world.chunks.pipeline.stages.ChunkTaskProvider;
+import org.terasology.engine.utilities.ReflectionUtil;
+import org.terasology.engine.world.chunks.Chunk;
 
 import java.util.Comparator;
 import java.util.LinkedList;
@@ -150,7 +150,7 @@ public class ChunkProcessingPipeline {
         chunkProcessingInfoMap.values().stream()
                 .filter(chunkProcessingInfo -> chunkProcessingInfo.getChunkTask() != null && chunkProcessingInfo.getCurrentFuture() == null)
                 .forEach(chunkProcessingInfo -> {
-                    ChunkTask chunkTask = chunkProcessingInfo.getChunkTask();
+                    org.terasology.engine.world.chunks.pipeline.stages.ChunkTask chunkTask = chunkProcessingInfo.getChunkTask();
                     Set<Chunk> providedChunks = chunkTask.getRequirements().stream()
                             .map(pos -> getChunkBy(chunkProcessingInfo.getChunkTaskProvider(), pos))
                             .filter(Objects::nonNull)

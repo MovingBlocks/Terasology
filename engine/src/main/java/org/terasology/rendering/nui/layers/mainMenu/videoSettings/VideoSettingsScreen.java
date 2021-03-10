@@ -1,19 +1,21 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.rendering.nui.layers.mainMenu.videoSettings;
+package org.terasology.engine.rendering.nui.layers.mainMenu.videoSettings;
 
 import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
-import org.terasology.config.Config;
-import org.terasology.engine.GameEngine;
-import org.terasology.engine.Time;
-import org.terasology.engine.subsystem.DisplayDevice;
-import org.terasology.engine.subsystem.Resolution;
-import org.terasology.i18n.TranslationSystem;
+import org.terasology.engine.config.Config;
+import org.terasology.engine.core.GameEngine;
+import org.terasology.engine.core.Time;
+import org.terasology.engine.core.subsystem.DisplayDevice;
+import org.terasology.engine.core.subsystem.Resolution;
+import org.terasology.engine.i18n.TranslationSystem;
+import org.terasology.engine.rendering.nui.animation.MenuAnimationSystems;
+import org.terasology.engine.rendering.world.viewDistance.ViewDistance;
 import org.terasology.input.Keyboard;
-import org.terasology.logic.players.LocalPlayer;
+import org.terasology.engine.logic.players.LocalPlayer;
 import org.terasology.nui.WidgetUtil;
 import org.terasology.nui.databinding.BindHelper;
 import org.terasology.nui.databinding.Binding;
@@ -24,13 +26,11 @@ import org.terasology.nui.itemRendering.ToStringTextRenderer;
 import org.terasology.nui.widgets.UIDropdown;
 import org.terasology.nui.widgets.UILabel;
 import org.terasology.nui.widgets.UISlider;
-import org.terasology.registry.CoreRegistry;
-import org.terasology.registry.In;
-import org.terasology.rendering.ShaderManager;
-import org.terasology.rendering.nui.CoreScreenLayer;
-import org.terasology.rendering.nui.animation.MenuAnimationSystems;
-import org.terasology.rendering.nui.layers.mainMenu.WaitPopup;
-import org.terasology.rendering.world.viewDistance.ViewDistance;
+import org.terasology.engine.registry.CoreRegistry;
+import org.terasology.engine.registry.In;
+import org.terasology.engine.rendering.ShaderManager;
+import org.terasology.engine.rendering.nui.CoreScreenLayer;
+import org.terasology.engine.rendering.nui.layers.mainMenu.WaitPopup;
 
 import javax.imageio.ImageIO;
 import java.util.Arrays;

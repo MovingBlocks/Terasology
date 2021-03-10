@@ -1,16 +1,16 @@
 // Copyright 2020 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-package org.terasology.network;
+package org.terasology.engine.network;
 
 import org.terasology.assets.ResourceUrn;
-import org.terasology.engine.bootstrap.eventSystem.AbstractEventSystemDecorator;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.event.Event;
-import org.terasology.entitySystem.event.internal.EventSystem;
-import org.terasology.entitySystem.metadata.EventLibrary;
-import org.terasology.entitySystem.metadata.EventMetadata;
-import org.terasology.world.block.BlockComponent;
+import org.terasology.engine.core.bootstrap.eventSystem.AbstractEventSystemDecorator;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.entitySystem.event.Event;
+import org.terasology.engine.entitySystem.event.internal.EventSystem;
+import org.terasology.engine.entitySystem.metadata.EventLibrary;
+import org.terasology.engine.entitySystem.metadata.EventMetadata;
+import org.terasology.engine.world.block.BlockComponent;
 
 /**
  * Decorator for replicate event to network.

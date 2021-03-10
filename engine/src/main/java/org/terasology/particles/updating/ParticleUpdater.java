@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.particles.updating;
+package org.terasology.engine.particles.updating;
 
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.particles.ParticleSystemManager;
-import org.terasology.particles.components.ParticleEmitterComponent;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.particles.ParticleSystemManager;
+import org.terasology.engine.particles.components.ParticleEmitterComponent;
 
 import java.util.Collection;
 

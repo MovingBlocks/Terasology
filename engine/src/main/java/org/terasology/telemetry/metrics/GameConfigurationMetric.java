@@ -13,17 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.telemetry.metrics;
+package org.terasology.engine.telemetry.metrics;
 
 import com.snowplowanalytics.snowplow.tracker.events.Unstructured;
-import org.terasology.config.Config;
-import org.terasology.config.PlayerConfig;
-import org.terasology.context.Context;
-import org.terasology.network.NetworkSystem;
-import org.terasology.registry.CoreRegistry;
-import org.terasology.telemetry.TelemetryCategory;
-import org.terasology.telemetry.TelemetryField;
-import org.terasology.world.generator.WorldGenerator;
+import org.terasology.engine.config.Config;
+import org.terasology.engine.config.PlayerConfig;
+import org.terasology.engine.config.SystemConfig;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.network.NetworkSystem;
+import org.terasology.engine.registry.CoreRegistry;
+import org.terasology.engine.telemetry.TelemetryCategory;
+import org.terasology.engine.telemetry.TelemetryField;
+import org.terasology.engine.world.generator.WorldGenerator;
 
 import java.util.Map;
 import java.util.Optional;
@@ -93,7 +94,8 @@ public final class GameConfigurationMetric extends Metric {
 
     private void fetchConfig() {
         Config config = context.get(Config.class);
-        language = config.getSystem().getLocale().toString();
+        SystemConfig systemConfig = context.get(SystemConfig.class);
+        language = systemConfig.locale.get().toString();
 
         PlayerConfig playerConfig = config.getPlayer();
         playerHeight = playerConfig.getHeight();

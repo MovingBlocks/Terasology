@@ -1,16 +1,16 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.rendering.nui.internal;
+package org.terasology.engine.rendering.nui.internal;
 
 import org.joml.Quaternionfc;
 import org.joml.Vector2ic;
 import org.joml.Vector3fc;
 import org.terasology.assets.ResourceUrn;
+import org.terasology.engine.rendering.assets.material.Material;
+import org.terasology.engine.rendering.opengl.FrameBufferObject;
 import org.terasology.joml.geom.Rectanglei;
 import org.terasology.nui.canvas.CanvasRenderer;
-import org.terasology.rendering.assets.material.Material;
-import org.terasology.rendering.assets.mesh.Mesh;
-import org.terasology.rendering.opengl.FrameBufferObject;
+import org.terasology.engine.rendering.assets.mesh.Mesh;
 
 /**
  */

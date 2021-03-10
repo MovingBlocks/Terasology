@@ -1,12 +1,12 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.rendering.nui.layers.mainMenu;
+package org.terasology.engine.rendering.nui.layers.mainMenu;
 
 import org.terasology.assets.ResourceUrn;
 import org.terasology.nui.WidgetUtil;
 import org.terasology.nui.widgets.UIButton;
 import org.terasology.nui.widgets.UILabel;
-import org.terasology.rendering.nui.CoreScreenLayer;
+import org.terasology.engine.rendering.nui.CoreScreenLayer;
 
 /**
  * Ask the user to confirm or cancel an action.

@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.entitySystem.prefab;
+package org.terasology.engine.entitySystem.prefab;
 
 import com.google.common.collect.Maps;
 import org.terasology.assets.AssetData;
-import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.MutableComponentContainer;
+import org.terasology.engine.entitySystem.Component;
+import org.terasology.engine.entitySystem.MutableComponentContainer;
 
 import java.util.Collections;
 import java.util.List;

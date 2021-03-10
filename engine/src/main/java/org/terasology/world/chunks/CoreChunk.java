@@ -1,12 +1,12 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.world.chunks;
+package org.terasology.engine.world.chunks;
 
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.terasology.module.sandbox.API;
-import org.terasology.world.block.Block;
-import org.terasology.world.block.BlockRegionc;
+import org.terasology.engine.world.block.Block;
+import org.terasology.engine.world.block.BlockRegionc;
 
 /**
  * This interface describes the core of a chunk:

@@ -1,7 +1,7 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-package org.terasology.engine.module;
+package org.terasology.engine.core.module;
 
 import org.reflections.ReflectionsException;
 import org.slf4j.Logger;
@@ -11,7 +11,7 @@ import org.terasology.module.ModuleRegistry;
 import org.terasology.module.sandbox.APIScanner;
 import org.terasology.module.sandbox.StandardPermissionProviderFactory;
 
-import static org.terasology.engine.module.StandardModuleExtension.IS_ASSET;
+import static org.terasology.engine.core.module.StandardModuleExtension.IS_ASSET;
 
 /**
  * APIScanner that doesn't crash on asset-only modules.

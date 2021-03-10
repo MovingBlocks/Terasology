@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.engine.module.rendering;
+package org.terasology.engine.core.module.rendering;
 
-import org.terasology.context.Context;
+import org.terasology.engine.context.Context;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.module.sandbox.API;
 import org.terasology.naming.Name;
-import org.terasology.rendering.dag.ModuleRendering;
+import org.terasology.engine.rendering.dag.ModuleRendering;
 
 import javax.annotation.Nullable;
 import java.lang.reflect.Constructor;

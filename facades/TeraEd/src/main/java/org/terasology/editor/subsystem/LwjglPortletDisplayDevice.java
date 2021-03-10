@@ -5,14 +5,14 @@ package org.terasology.editor.subsystem;
 
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.awt.AWTGLCanvas;
-import org.terasology.engine.subsystem.DisplayDevice;
-import org.terasology.engine.subsystem.DisplayDeviceInfo;
-import org.terasology.engine.subsystem.Resolution;
-import org.terasology.engine.subsystem.lwjgl.LwjglDisplayDevice;
-import org.terasology.engine.subsystem.lwjgl.LwjglGraphicsManager;
-import org.terasology.engine.subsystem.lwjgl.LwjglResolution;
-import org.terasology.rendering.nui.layers.mainMenu.videoSettings.DisplayModeSetting;
-import org.terasology.utilities.subscribables.AbstractSubscribable;
+import org.terasology.engine.core.subsystem.DisplayDevice;
+import org.terasology.engine.core.subsystem.DisplayDeviceInfo;
+import org.terasology.engine.core.subsystem.Resolution;
+import org.terasology.engine.core.subsystem.lwjgl.LwjglDisplayDevice;
+import org.terasology.engine.core.subsystem.lwjgl.LwjglGraphicsManager;
+import org.terasology.engine.core.subsystem.lwjgl.LwjglResolution;
+import org.terasology.engine.rendering.nui.layers.mainMenu.videoSettings.DisplayModeSetting;
+import org.terasology.engine.utilities.subscribables.AbstractSubscribable;
 
 import java.awt.GraphicsEnvironment;
 import java.awt.event.ComponentAdapter;

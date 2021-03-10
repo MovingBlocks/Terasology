@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.persistence.internal;
+package org.terasology.engine.persistence.internal;
 
 import org.codehaus.plexus.util.FileUtils;
 import org.junit.jupiter.api.AfterAll;

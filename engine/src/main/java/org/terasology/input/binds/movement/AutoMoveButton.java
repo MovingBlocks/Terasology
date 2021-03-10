@@ -1,25 +1,12 @@
-/*
- * Copyright 2016 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-package org.terasology.input.binds.movement;
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
+package org.terasology.engine.input.binds.movement;
 
-import org.terasology.input.BindButtonEvent;
-import org.terasology.input.DefaultBinding;
+import org.terasology.engine.input.BindButtonEvent;
+import org.terasology.engine.input.DefaultBinding;
 import org.terasology.input.InputType;
 import org.terasology.input.Keyboard;
-import org.terasology.input.RegisterBindButton;
+import org.terasology.engine.input.RegisterBindButton;
 
 @RegisterBindButton(id = "autoMoveMode", description = "${engine:menu#binding-autoMove-mode}")
 @DefaultBinding(id = Keyboard.KeyId.R, type = InputType.KEY)

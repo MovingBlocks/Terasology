@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.identity;
+package org.terasology.engine.identity;
 
-import org.terasology.config.SecurityConfig;
+import org.terasology.engine.config.SecurityConfig;
 
 import java.util.Objects;
 

@@ -1,20 +1,7 @@
-/*
- * Copyright 2016 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 
-package org.terasology.logic.characters;
+package org.terasology.engine.logic.characters;
 
 
 import com.google.common.collect.Lists;
@@ -23,28 +10,28 @@ import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.engine.Time;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.entity.lifecycleEvents.BeforeDeactivateComponent;
-import org.terasology.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
-import org.terasology.entitySystem.event.ReceiveEvent;
-import org.terasology.entitySystem.systems.BaseComponentSystem;
-import org.terasology.entitySystem.systems.RegisterMode;
-import org.terasology.entitySystem.systems.RegisterSystem;
-import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
-import org.terasology.logic.characters.events.SetMovementModeEvent;
-import org.terasology.logic.location.LocationComponent;
-import org.terasology.logic.players.LocalPlayer;
-import org.terasology.network.NetworkSystem;
-import org.terasology.physics.engine.CharacterCollider;
-import org.terasology.physics.engine.PhysicsEngine;
-import org.terasology.recording.CharacterStateEventPositionMap;
-import org.terasology.recording.RecordAndReplayCurrentStatus;
-import org.terasology.recording.RecordAndReplayStatus;
-import org.terasology.registry.In;
-import org.terasology.registry.Share;
-import org.terasology.utilities.collection.CircularBuffer;
-import org.terasology.world.WorldProvider;
+import org.terasology.engine.core.Time;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.entitySystem.entity.lifecycleEvents.BeforeDeactivateComponent;
+import org.terasology.engine.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
+import org.terasology.engine.entitySystem.event.ReceiveEvent;
+import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
+import org.terasology.engine.entitySystem.systems.RegisterMode;
+import org.terasology.engine.entitySystem.systems.RegisterSystem;
+import org.terasology.engine.entitySystem.systems.UpdateSubscriberSystem;
+import org.terasology.engine.logic.characters.events.SetMovementModeEvent;
+import org.terasology.engine.logic.location.LocationComponent;
+import org.terasology.engine.logic.players.LocalPlayer;
+import org.terasology.engine.network.NetworkSystem;
+import org.terasology.engine.physics.engine.CharacterCollider;
+import org.terasology.engine.physics.engine.PhysicsEngine;
+import org.terasology.engine.recording.CharacterStateEventPositionMap;
+import org.terasology.engine.recording.RecordAndReplayCurrentStatus;
+import org.terasology.engine.recording.RecordAndReplayStatus;
+import org.terasology.engine.registry.In;
+import org.terasology.engine.registry.Share;
+import org.terasology.engine.utilities.collection.CircularBuffer;
+import org.terasology.engine.world.WorldProvider;
 
 import java.util.List;
 import java.util.Map;

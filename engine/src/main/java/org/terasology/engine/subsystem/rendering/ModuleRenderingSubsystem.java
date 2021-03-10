@@ -13,17 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.engine.subsystem.rendering;
+package org.terasology.engine.core.subsystem.rendering;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.module.ModuleAwareAssetTypeManager;
-import org.terasology.context.Context;
-import org.terasology.engine.ComponentSystemManager;
-import org.terasology.engine.GameEngine;
-import org.terasology.engine.modes.GameState;
-import org.terasology.engine.module.rendering.RenderingModuleRegistry;
-import org.terasology.engine.subsystem.EngineSubsystem;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.core.ComponentSystemManager;
+import org.terasology.engine.core.GameEngine;
+import org.terasology.engine.core.modes.GameState;
+import org.terasology.engine.core.module.rendering.RenderingModuleRegistry;
+import org.terasology.engine.core.subsystem.EngineSubsystem;
 
 public class ModuleRenderingSubsystem implements EngineSubsystem {
     private static final Logger logger = LoggerFactory.getLogger(ModuleRenderingSubsystem.class);

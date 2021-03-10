@@ -14,28 +14,28 @@
  * limitations under the License.
  */
 
-package org.terasology.engine.modes.loadProcesses;
+package org.terasology.engine.core.modes.loadProcesses;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.context.Context;
-import org.terasology.engine.GameEngine;
-import org.terasology.engine.bootstrap.EnvironmentSwitchHandler;
-import org.terasology.engine.modes.StateMainMenu;
-import org.terasology.engine.modes.VariableStepLoadProcess;
-import org.terasology.engine.module.ModuleManager;
-import org.terasology.game.Game;
-import org.terasology.game.GameManifest;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.core.GameEngine;
+import org.terasology.engine.core.bootstrap.EnvironmentSwitchHandler;
+import org.terasology.engine.core.modes.StateMainMenu;
+import org.terasology.engine.core.modes.VariableStepLoadProcess;
+import org.terasology.engine.core.module.ModuleManager;
+import org.terasology.engine.game.Game;
+import org.terasology.engine.game.GameManifest;
 import org.terasology.module.Module;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.naming.NameVersion;
-import org.terasology.network.JoinStatus;
-import org.terasology.network.NetworkSystem;
-import org.terasology.network.Server;
-import org.terasology.network.ServerInfoMessage;
-import org.terasology.world.internal.WorldInfo;
+import org.terasology.engine.network.JoinStatus;
+import org.terasology.engine.network.NetworkSystem;
+import org.terasology.engine.network.Server;
+import org.terasology.engine.network.ServerInfoMessage;
+import org.terasology.engine.world.internal.WorldInfo;
 
 import java.util.Map;
 import java.util.Map.Entry;

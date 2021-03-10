@@ -1,6 +1,6 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.persistence;
+package org.terasology.engine.persistence;
 
 import com.google.common.collect.ImmutableMap;
 import org.joml.Quaternionf;
@@ -10,26 +10,26 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.reflections.Reflections;
 import org.terasology.assets.ResourceUrn;
-import org.terasology.context.Context;
-import org.terasology.context.internal.ContextImpl;
-import org.terasology.engine.bootstrap.EntitySystemSetupUtil;
-import org.terasology.engine.module.ModuleManager;
-import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.entity.internal.EngineEntityManager;
-import org.terasology.entitySystem.metadata.ComponentLibrary;
-import org.terasology.entitySystem.stubs.GetterSetterComponent;
-import org.terasology.entitySystem.stubs.IntegerComponent;
-import org.terasology.entitySystem.stubs.StringComponent;
-import org.terasology.network.NetworkMode;
-import org.terasology.network.NetworkSystem;
-import org.terasology.persistence.serializers.ComponentSerializer;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.context.internal.ContextImpl;
+import org.terasology.engine.core.bootstrap.EntitySystemSetupUtil;
+import org.terasology.engine.core.module.ModuleManager;
+import org.terasology.engine.entitySystem.Component;
+import org.terasology.engine.entitySystem.entity.internal.EngineEntityManager;
+import org.terasology.engine.entitySystem.metadata.ComponentLibrary;
+import org.terasology.engine.entitySystem.stubs.GetterSetterComponent;
+import org.terasology.engine.entitySystem.stubs.IntegerComponent;
+import org.terasology.engine.entitySystem.stubs.StringComponent;
+import org.terasology.engine.network.NetworkMode;
+import org.terasology.engine.network.NetworkSystem;
+import org.terasology.engine.persistence.serializers.ComponentSerializer;
+import org.terasology.engine.persistence.typeHandling.TypeHandlerLibraryImpl;
+import org.terasology.engine.persistence.typeHandling.mathTypes.QuaternionfTypeHandler;
+import org.terasology.engine.persistence.typeHandling.mathTypes.Vector3fTypeHandler;
+import org.terasology.engine.recording.RecordAndReplayCurrentStatus;
+import org.terasology.engine.registry.CoreRegistry;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
-import org.terasology.persistence.typeHandling.TypeHandlerLibraryImpl;
-import org.terasology.persistence.typeHandling.mathTypes.QuaternionfTypeHandler;
-import org.terasology.persistence.typeHandling.mathTypes.Vector3fTypeHandler;
 import org.terasology.protobuf.EntityData;
-import org.terasology.recording.RecordAndReplayCurrentStatus;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.testUtil.ModuleManagerFactory;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

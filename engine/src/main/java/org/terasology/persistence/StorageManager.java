@@ -1,10 +1,10 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.persistence;
+package org.terasology.engine.persistence;
 
 import org.joml.Vector3ic;
-import org.terasology.network.Client;
-import org.terasology.world.chunks.Chunk;
+import org.terasology.engine.network.Client;
+import org.terasology.engine.world.chunks.Chunk;
 
 import java.io.IOException;
 

@@ -1,14 +1,14 @@
 // Copyright 2020 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-package org.terasology.recording;
+package org.terasology.engine.recording;
 
-import org.terasology.engine.bootstrap.eventSystem.AbstractEventSystemDecorator;
-import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.event.Event;
-import org.terasology.entitySystem.event.PendingEvent;
-import org.terasology.entitySystem.event.internal.EventSystem;
+import org.terasology.engine.core.bootstrap.eventSystem.AbstractEventSystemDecorator;
+import org.terasology.engine.entitySystem.Component;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.entitySystem.event.Event;
+import org.terasology.engine.entitySystem.event.PendingEvent;
+import org.terasology.engine.entitySystem.event.internal.EventSystem;
 
 /**
  * Decorator for recording Events to Record&Replay subsystem.

@@ -1,16 +1,16 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.rendering.nui.layers.mainMenu.videoSettings;
+package org.terasology.engine.rendering.nui.layers.mainMenu.videoSettings;
 
 import org.joml.Vector2i;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
-import org.terasology.context.Context;
-import org.terasology.engine.GameEngine;
-import org.terasology.engine.modes.StateMainMenu;
-import org.terasology.engine.module.rendering.RenderingModuleRegistry;
-import org.terasology.i18n.TranslationSystem;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.core.GameEngine;
+import org.terasology.engine.core.modes.StateMainMenu;
+import org.terasology.engine.core.module.rendering.RenderingModuleRegistry;
+import org.terasology.engine.i18n.TranslationSystem;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.nui.Canvas;
 import org.terasology.nui.WidgetUtil;
@@ -22,10 +22,10 @@ import org.terasology.nui.widgets.UIDropdownScrollable;
 import org.terasology.nui.widgets.UISlider;
 import org.terasology.nui.widgets.UISliderOnChangeTriggeredListener;
 import org.terasology.nui.widgets.UIText;
-import org.terasology.registry.In;
-import org.terasology.rendering.dag.ModuleRendering;
-import org.terasology.rendering.nui.CoreScreenLayer;
-import org.terasology.rendering.nui.layers.mainMenu.StartPlayingScreen;
+import org.terasology.engine.registry.In;
+import org.terasology.engine.rendering.dag.ModuleRendering;
+import org.terasology.engine.rendering.nui.CoreScreenLayer;
+import org.terasology.engine.rendering.nui.layers.mainMenu.StartPlayingScreen;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package org.terasology.persistence.serializers;
+package org.terasology.engine.persistence.serializers;
 
-import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.entity.internal.EntityInfoComponent;
-import org.terasology.entitySystem.metadata.ComponentMetadata;
+import org.terasology.engine.entitySystem.Component;
+import org.terasology.engine.entitySystem.entity.internal.EntityInfoComponent;
+import org.terasology.engine.entitySystem.metadata.ComponentMetadata;
 
 /**
  * Interface for checks as whether a component should be serialized

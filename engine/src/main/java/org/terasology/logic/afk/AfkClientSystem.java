@@ -1,29 +1,28 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.logic.afk;
+package org.terasology.engine.logic.afk;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.assets.ResourceUrn;
-import org.terasology.engine.Time;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.event.EventPriority;
-import org.terasology.entitySystem.event.ReceiveEvent;
-import org.terasology.entitySystem.systems.BaseComponentSystem;
-import org.terasology.entitySystem.systems.RegisterMode;
-import org.terasology.entitySystem.systems.RegisterSystem;
-import org.terasology.game.Game;
+import org.terasology.engine.core.Time;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.entitySystem.event.EventPriority;
+import org.terasology.engine.entitySystem.event.ReceiveEvent;
+import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
+import org.terasology.engine.entitySystem.systems.RegisterMode;
+import org.terasology.engine.entitySystem.systems.RegisterSystem;
+import org.terasology.engine.game.Game;
+import org.terasology.engine.logic.console.Console;
+import org.terasology.engine.logic.console.commandSystem.annotations.Command;
+import org.terasology.engine.logic.players.LocalPlayer;
 import org.terasology.input.Keyboard;
-import org.terasology.input.events.KeyDownEvent;
-import org.terasology.logic.console.Console;
-import org.terasology.logic.console.commandSystem.annotations.Command;
-import org.terasology.logic.permission.PermissionManager;
-import org.terasology.logic.players.LocalPlayer;
-import org.terasology.network.NetworkMode;
-import org.terasology.network.NetworkSystem;
-import org.terasology.physics.events.MovedEvent;
-import org.terasology.registry.In;
-import org.terasology.rendering.nui.NUIManager;
+import org.terasology.engine.input.events.KeyDownEvent;
+import org.terasology.engine.logic.permission.PermissionManager;
+import org.terasology.engine.network.NetworkMode;
+import org.terasology.engine.network.NetworkSystem;
+import org.terasology.engine.physics.events.MovedEvent;
+import org.terasology.engine.registry.In;
+import org.terasology.engine.rendering.nui.NUIManager;
 
 @RegisterSystem(RegisterMode.CLIENT)
 public class AfkClientSystem extends BaseComponentSystem {

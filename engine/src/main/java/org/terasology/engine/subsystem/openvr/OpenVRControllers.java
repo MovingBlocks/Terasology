@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.engine.subsystem.openvr;
+package org.terasology.engine.core.subsystem.openvr;
 
 import jopenvr.VRControllerState_t;
 import org.joml.Matrix4f;
@@ -21,8 +21,8 @@ import org.terasology.input.ButtonState;
 import org.terasology.input.ControllerDevice;
 import org.terasology.input.InputType;
 import org.terasology.input.device.ControllerAction;
-import org.terasology.rendering.openvrprovider.ControllerListener;
-import org.terasology.rendering.openvrprovider.OpenVRUtil;
+import org.terasology.engine.rendering.openvrprovider.ControllerListener;
+import org.terasology.engine.rendering.openvrprovider.OpenVRUtil;
 import org.terasology.input.ControllerId;
 
 import java.util.ArrayDeque;

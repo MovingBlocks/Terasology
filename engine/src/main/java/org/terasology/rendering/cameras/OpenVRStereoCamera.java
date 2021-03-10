@@ -1,19 +1,19 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.rendering.cameras;
+package org.terasology.engine.rendering.cameras;
 
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector4f;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
-import org.terasology.config.RenderingConfig;
-import org.terasology.registry.CoreRegistry;
-import org.terasology.rendering.openvrprovider.OpenVRProvider;
-import org.terasology.rendering.openvrprovider.OpenVRUtil;
-import org.terasology.rendering.world.WorldRenderer;
-import org.terasology.rendering.world.WorldRenderer.RenderingStage;
-import org.terasology.world.WorldProvider;
+import org.terasology.engine.config.RenderingConfig;
+import org.terasology.engine.registry.CoreRegistry;
+import org.terasology.engine.rendering.openvrprovider.OpenVRProvider;
+import org.terasology.engine.rendering.openvrprovider.OpenVRUtil;
+import org.terasology.engine.rendering.world.WorldRenderer;
+import org.terasology.engine.rendering.world.WorldRenderer.RenderingStage;
+import org.terasology.engine.world.WorldProvider;
 
 import static org.lwjgl.opengl.GL11.GL_PROJECTION;
 import static org.lwjgl.opengl.GL11.glMatrixMode;

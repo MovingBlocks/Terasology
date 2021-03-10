@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package org.terasology.physics.engine;
+package org.terasology.engine.physics.engine;
 
 import org.joml.Vector3fc;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.physics.CollisionGroup;
-import org.terasology.physics.Physics;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.physics.CollisionGroup;
+import org.terasology.engine.physics.Physics;
 
 import java.util.Iterator;
 import java.util.List;

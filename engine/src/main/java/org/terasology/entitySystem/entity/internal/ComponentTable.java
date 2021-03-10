@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.entitySystem.entity.internal;
+package org.terasology.engine.entitySystem.entity.internal;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -23,7 +23,7 @@ import gnu.trove.map.TLongObjectMap;
 import gnu.trove.map.hash.TLongObjectHashMap;
 import gnu.trove.set.TLongSet;
 import gnu.trove.set.hash.TLongHashSet;
-import org.terasology.entitySystem.Component;
+import org.terasology.engine.entitySystem.Component;
 
 import java.util.List;
 import java.util.Map;

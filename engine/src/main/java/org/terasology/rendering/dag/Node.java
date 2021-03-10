@@ -1,16 +1,16 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.rendering.dag;
+package org.terasology.engine.rendering.dag;
 
 //TODO: consider removing the word "Node" from the name of all Node implementations now that they are in the dag.nodes package.
 
-import org.terasology.context.Context;
-import org.terasology.engine.SimpleUri;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.core.SimpleUri;
+import org.terasology.engine.rendering.dag.dependencyConnections.BufferPair;
+import org.terasology.engine.rendering.dag.dependencyConnections.BufferPairConnection;
+import org.terasology.engine.rendering.dag.dependencyConnections.DependencyConnection;
+import org.terasology.engine.rendering.dag.dependencyConnections.RunOrderConnection;
 import org.terasology.naming.Name;
-import org.terasology.rendering.dag.dependencyConnections.BufferPair;
-import org.terasology.rendering.dag.dependencyConnections.BufferPairConnection;
-import org.terasology.rendering.dag.dependencyConnections.DependencyConnection;
-import org.terasology.rendering.dag.dependencyConnections.RunOrderConnection;
 
 import java.util.Map;
 import java.util.Set;

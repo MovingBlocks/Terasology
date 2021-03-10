@@ -1,6 +1,6 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.world.chunks.internal;
+package org.terasology.engine.world.chunks.internal;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
@@ -8,24 +8,24 @@ import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.engine.world.chunks.blockdata.ExtraBlockDataManager;
+import org.terasology.engine.world.chunks.blockdata.TeraArray;
+import org.terasology.engine.world.chunks.blockdata.TeraDenseArray16Bit;
+import org.terasology.engine.world.chunks.blockdata.TeraDenseArray8Bit;
+import org.terasology.engine.world.chunks.blockdata.TeraSparseArray8Bit;
 import org.terasology.joml.geom.AABBf;
 import org.terasology.joml.geom.AABBfc;
-import org.terasology.monitoring.chunk.ChunkMonitor;
+import org.terasology.engine.monitoring.chunk.ChunkMonitor;
 import org.terasology.protobuf.EntityData;
-import org.terasology.rendering.primitives.ChunkMesh;
-import org.terasology.world.block.Block;
-import org.terasology.world.block.BlockManager;
-import org.terasology.world.block.BlockRegion;
-import org.terasology.world.chunks.Chunk;
-import org.terasology.world.chunks.ChunkBlockIterator;
-import org.terasology.world.chunks.Chunks;
-import org.terasology.world.chunks.blockdata.ExtraBlockDataManager;
-import org.terasology.world.chunks.blockdata.TeraArray;
-import org.terasology.world.chunks.blockdata.TeraDenseArray16Bit;
-import org.terasology.world.chunks.blockdata.TeraDenseArray8Bit;
-import org.terasology.world.chunks.blockdata.TeraSparseArray8Bit;
-import org.terasology.world.chunks.deflate.TeraDeflator;
-import org.terasology.world.chunks.deflate.TeraStandardDeflator;
+import org.terasology.engine.rendering.primitives.ChunkMesh;
+import org.terasology.engine.world.block.Block;
+import org.terasology.engine.world.block.BlockManager;
+import org.terasology.engine.world.block.BlockRegion;
+import org.terasology.engine.world.chunks.Chunk;
+import org.terasology.engine.world.chunks.ChunkBlockIterator;
+import org.terasology.engine.world.chunks.Chunks;
+import org.terasology.engine.world.chunks.deflate.TeraDeflator;
+import org.terasology.engine.world.chunks.deflate.TeraStandardDeflator;
 
 import java.text.DecimalFormat;
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.config;
+package org.terasology.engine.config;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.SetMultimap;
@@ -25,23 +25,23 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.context.Context;
-import org.terasology.engine.SimpleUri;
-import org.terasology.engine.TerasologyConstants;
-import org.terasology.engine.paths.PathManager;
-import org.terasology.engine.subsystem.Resolution;
-import org.terasology.entitySystem.Component;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.core.SimpleUri;
+import org.terasology.engine.core.TerasologyConstants;
+import org.terasology.engine.core.paths.PathManager;
+import org.terasology.engine.core.subsystem.Resolution;
+import org.terasology.engine.entitySystem.Component;
 import org.terasology.input.Input;
 import org.terasology.module.sandbox.API;
 import org.terasology.naming.Name;
 import org.terasology.naming.Version;
 import org.terasology.naming.gson.NameTypeAdapter;
 import org.terasology.naming.gson.VersionTypeAdapter;
-import org.terasology.utilities.gson.CaseInsensitiveEnumTypeAdapterFactory;
-import org.terasology.utilities.gson.InputHandler;
-import org.terasology.utilities.gson.ResolutionHandler;
-import org.terasology.utilities.gson.SetMultimapTypeAdapter;
-import org.terasology.utilities.gson.UriTypeAdapterFactory;
+import org.terasology.engine.utilities.gson.CaseInsensitiveEnumTypeAdapterFactory;
+import org.terasology.engine.utilities.gson.InputHandler;
+import org.terasology.engine.utilities.gson.ResolutionHandler;
+import org.terasology.engine.utilities.gson.SetMultimapTypeAdapter;
+import org.terasology.engine.utilities.gson.UriTypeAdapterFactory;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -62,7 +62,7 @@ import java.util.Set;
  */
 @API
 public final class Config {
-    public static final String PROPERTY_OVERRIDE_DEFAULT_CONFIG = "org.terasology.config.default.override";
+    public static final String PROPERTY_OVERRIDE_DEFAULT_CONFIG = "org.terasology.engine.config.default.override";
     private static final Logger logger = LoggerFactory.getLogger(Config.class);
 
     private RootConfig config;
@@ -95,10 +95,6 @@ public final class Config {
 
     public PlayerConfig getPlayer() {
         return config.getPlayer();
-    }
-
-    public SystemConfig getSystem() {
-        return config.getSystem();
     }
 
     public RenderingConfig getRendering() {

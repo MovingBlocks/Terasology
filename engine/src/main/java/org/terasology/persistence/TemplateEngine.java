@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.persistence;
+package org.terasology.engine.persistence;
 
 import org.terasology.module.sandbox.API;
 

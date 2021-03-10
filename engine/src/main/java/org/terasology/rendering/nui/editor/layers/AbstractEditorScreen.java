@@ -1,6 +1,6 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.rendering.nui.editor.layers;
+package org.terasology.engine.rendering.nui.editor.layers;
 
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
@@ -13,7 +13,10 @@ import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.exceptions.InvalidUrnException;
 import org.terasology.assets.format.AssetDataFile;
-import org.terasology.engine.module.ModuleManager;
+import org.terasology.engine.core.module.ModuleManager;
+import org.terasology.engine.rendering.nui.editor.systems.AbstractEditorSystem;
+import org.terasology.engine.rendering.nui.layers.mainMenu.ConfirmPopup;
+import org.terasology.engine.rendering.nui.widgets.JsonEditorTreeView;
 import org.terasology.input.Keyboard;
 import org.terasology.input.device.KeyboardDevice;
 import org.terasology.module.PathModule;
@@ -24,11 +27,8 @@ import org.terasology.nui.widgets.UITextEntry;
 import org.terasology.nui.widgets.treeView.JsonTree;
 import org.terasology.nui.widgets.treeView.JsonTreeConverter;
 import org.terasology.nui.widgets.treeView.JsonTreeValue;
-import org.terasology.registry.In;
-import org.terasology.rendering.nui.CoreScreenLayer;
-import org.terasology.rendering.nui.editor.systems.AbstractEditorSystem;
-import org.terasology.rendering.nui.layers.mainMenu.ConfirmPopup;
-import org.terasology.rendering.nui.widgets.JsonEditorTreeView;
+import org.terasology.engine.registry.In;
+import org.terasology.engine.rendering.nui.CoreScreenLayer;
 
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;

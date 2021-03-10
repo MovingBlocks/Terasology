@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.audio;
+package org.terasology.engine.audio;
 
 /**
  * Is called by AudioManager to inform about end of playing music or sound.

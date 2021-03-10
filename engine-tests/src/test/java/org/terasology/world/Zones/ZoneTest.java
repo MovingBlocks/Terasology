@@ -17,7 +17,7 @@ package org.terasology.world.Zones;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.terasology.world.zones.Zone;
+import org.terasology.engine.world.zones.Zone;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;

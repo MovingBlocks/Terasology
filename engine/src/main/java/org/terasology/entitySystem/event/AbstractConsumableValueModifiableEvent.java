@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.entitySystem.event;
+package org.terasology.engine.entitySystem.event;
 
-import org.terasology.network.NoReplicate;
+import org.terasology.engine.network.NoReplicate;
 
 public abstract class AbstractConsumableValueModifiableEvent extends AbstractValueModifiableEvent implements ConsumableEvent {
     @NoReplicate

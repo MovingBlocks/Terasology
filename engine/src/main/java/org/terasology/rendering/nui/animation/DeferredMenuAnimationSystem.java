@@ -1,7 +1,7 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-package org.terasology.rendering.nui.animation;
+package org.terasology.engine.rendering.nui.animation;
 
 import org.terasology.joml.geom.Rectanglei;
 

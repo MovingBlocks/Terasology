@@ -16,15 +16,15 @@
 package org.terasology;
 
 import org.terasology.naming.Name;
-import org.terasology.registry.CoreRegistry;
-import org.terasology.world.BlockEntityRegistry;
-import org.terasology.world.WorldProvider;
-import org.terasology.world.block.BlockManager;
-import org.terasology.world.chunks.blockdata.ExtraBlockDataManager;
-import org.terasology.world.generator.WorldGenerator;
-import org.terasology.world.internal.EntityAwareWorldProvider;
-import org.terasology.world.internal.WorldProviderCore;
-import org.terasology.world.internal.WorldProviderWrapper;
+import org.terasology.engine.registry.CoreRegistry;
+import org.terasology.engine.world.BlockEntityRegistry;
+import org.terasology.engine.world.WorldProvider;
+import org.terasology.engine.world.block.BlockManager;
+import org.terasology.engine.world.chunks.blockdata.ExtraBlockDataManager;
+import org.terasology.engine.world.generator.WorldGenerator;
+import org.terasology.engine.world.internal.EntityAwareWorldProvider;
+import org.terasology.engine.world.internal.WorldProviderCore;
+import org.terasology.engine.world.internal.WorldProviderWrapper;
 
 /**
  * Environment with a MapWorldProvider and BlockManager. Useful to get headless environment with a generated world.

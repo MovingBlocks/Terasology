@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package org.terasology.engine.module;
+package org.terasology.engine.core.module;
 
 import com.google.gson.stream.JsonReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.engine.TerasologyConstants;
+import org.terasology.engine.core.TerasologyConstants;
 import org.terasology.module.ModuleMetadata;
 import org.terasology.module.ModuleMetadataJsonAdapter;
 import org.terasology.module.ModuleRegistry;

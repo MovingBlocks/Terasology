@@ -1,6 +1,6 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.monitoring.gui;
+package org.terasology.engine.monitoring.gui;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
@@ -11,15 +11,15 @@ import org.joml.Vector3f;
 import org.joml.Vector3i;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.logic.players.LocalPlayer;
-import org.terasology.monitoring.ThreadActivity;
-import org.terasology.monitoring.ThreadMonitor;
-import org.terasology.monitoring.chunk.ChunkMonitor;
-import org.terasology.monitoring.chunk.ChunkMonitorEntry;
-import org.terasology.monitoring.chunk.ChunkMonitorEvent;
-import org.terasology.registry.CoreRegistry;
-import org.terasology.world.chunks.Chunk;
-import org.terasology.world.chunks.Chunks;
+import org.terasology.engine.logic.players.LocalPlayer;
+import org.terasology.engine.monitoring.ThreadActivity;
+import org.terasology.engine.monitoring.ThreadMonitor;
+import org.terasology.engine.monitoring.chunk.ChunkMonitor;
+import org.terasology.engine.monitoring.chunk.ChunkMonitorEntry;
+import org.terasology.engine.monitoring.chunk.ChunkMonitorEvent;
+import org.terasology.engine.registry.CoreRegistry;
+import org.terasology.engine.world.chunks.Chunk;
+import org.terasology.engine.world.chunks.Chunks;
 
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;

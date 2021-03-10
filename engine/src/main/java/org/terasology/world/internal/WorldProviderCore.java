@@ -1,14 +1,14 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.world.internal;
+package org.terasology.engine.world.internal;
 
 import com.google.common.collect.Maps;
 import org.joml.Vector3ic;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.world.WorldChangeListener;
-import org.terasology.world.block.Block;
-import org.terasology.world.block.BlockRegionc;
-import org.terasology.world.time.WorldTime;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.world.WorldChangeListener;
+import org.terasology.engine.world.block.Block;
+import org.terasology.engine.world.block.BlockRegionc;
+import org.terasology.engine.world.time.WorldTime;
 
 import java.util.Collection;
 import java.util.Map;

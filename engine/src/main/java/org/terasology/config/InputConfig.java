@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.config;
+package org.terasology.engine.config;
 
-import org.terasology.context.internal.MockContext;
+import org.terasology.engine.context.internal.MockContext;
 
 public class InputConfig {
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.config;
+package org.terasology.engine.config;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.HashMultimap;
@@ -28,12 +28,12 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
-import org.terasology.engine.SimpleUri;
+import org.terasology.engine.core.SimpleUri;
 import org.terasology.input.Input;
 import org.terasology.input.InputType;
 import org.terasology.input.Keyboard.KeyId;
-import org.terasology.input.RegisterBindButton;
-import org.terasology.input.binds.movement.ForwardsButton;
+import org.terasology.engine.input.RegisterBindButton;
+import org.terasology.engine.input.binds.movement.ForwardsButton;
 import org.terasology.naming.Name;
 
 import java.lang.reflect.Type;

@@ -1,10 +1,10 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.world.generator.plugin;
+package org.terasology.engine.world.generator.plugin;
 
 import com.google.common.collect.Lists;
 import org.terasology.assets.ResourceUrn;
-import org.terasology.context.Context;
+import org.terasology.engine.context.Context;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.metadata.ClassLibrary;

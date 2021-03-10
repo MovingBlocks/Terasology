@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.persistence.internal;
+package org.terasology.engine.persistence.internal;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import org.terasology.entitySystem.Component;
+import org.terasology.engine.entitySystem.Component;
 
 import java.util.Map;
 import java.util.Set;

@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.entitySystem.sectors;
+package org.terasology.engine.entitySystem.sectors;
 
 import org.joml.Vector3i;
-import org.terasology.entitySystem.Component;
+import org.terasology.engine.entitySystem.Component;
 import org.terasology.module.sandbox.API;
-import org.terasology.world.chunks.Chunk;
+import org.terasology.engine.world.chunks.Chunk;
 
 import java.util.HashSet;
 import java.util.Set;

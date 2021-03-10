@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.config.flexible.constraints;
+package org.terasology.engine.config.flexible.constraints;
 
-import org.terasology.config.flexible.Setting;
+import org.terasology.engine.config.flexible.Setting;
 
 /**
  * Represents constraints on values that can be stored in a {@link Setting}.

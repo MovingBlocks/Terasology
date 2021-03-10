@@ -1,10 +1,10 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-package org.terasology.utilities;
+package org.terasology.engine.utilities;
 
 import org.slf4j.Logger;
-import org.terasology.engine.paths.PathManager;
+import org.terasology.engine.core.paths.PathManager;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

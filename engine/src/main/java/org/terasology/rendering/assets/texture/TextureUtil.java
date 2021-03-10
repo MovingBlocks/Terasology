@@ -1,11 +1,11 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-package org.terasology.rendering.assets.texture;
+package org.terasology.engine.rendering.assets.texture;
 
 import com.google.common.primitives.UnsignedBytes;
 import org.terasology.assets.ResourceUrn;
-import org.terasology.engine.TerasologyConstants;
+import org.terasology.engine.core.TerasologyConstants;
 import org.terasology.joml.geom.Rectanglei;
 import org.terasology.naming.Name;
 import org.terasology.nui.Color;

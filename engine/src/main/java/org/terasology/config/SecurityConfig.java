@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.config;
+package org.terasology.engine.config;
 
 import com.google.common.collect.Maps;
 import com.google.gson.JsonArray;
@@ -24,9 +24,9 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
-import org.terasology.identity.ClientIdentity;
-import org.terasology.identity.PrivateIdentityCertificate;
-import org.terasology.identity.PublicIdentityCertificate;
+import org.terasology.engine.identity.ClientIdentity;
+import org.terasology.engine.identity.PrivateIdentityCertificate;
+import org.terasology.engine.identity.PublicIdentityCertificate;
 
 import java.lang.reflect.Type;
 import java.security.Permission;

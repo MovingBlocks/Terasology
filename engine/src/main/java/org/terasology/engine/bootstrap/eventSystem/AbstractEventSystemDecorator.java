@@ -1,15 +1,15 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-package org.terasology.engine.bootstrap.eventSystem;
+package org.terasology.engine.core.bootstrap.eventSystem;
 
 import org.terasology.assets.ResourceUrn;
-import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.event.Event;
-import org.terasology.entitySystem.event.internal.EventReceiver;
-import org.terasology.entitySystem.event.internal.EventSystem;
-import org.terasology.entitySystem.systems.ComponentSystem;
+import org.terasology.engine.entitySystem.Component;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.entitySystem.event.Event;
+import org.terasology.engine.entitySystem.event.internal.EventReceiver;
+import org.terasology.engine.entitySystem.event.internal.EventSystem;
+import org.terasology.engine.entitySystem.systems.ComponentSystem;
 
 public abstract class AbstractEventSystemDecorator implements EventSystem {
     private final EventSystem eventSystem;

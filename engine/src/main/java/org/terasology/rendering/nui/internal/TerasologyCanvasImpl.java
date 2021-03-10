@@ -1,6 +1,6 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.rendering.nui.internal;
+package org.terasology.engine.rendering.nui.internal;
 
 import org.joml.Quaternionfc;
 import org.joml.Vector2ic;
@@ -8,21 +8,21 @@ import org.joml.Vector3fc;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
-import org.terasology.config.Config;
-import org.terasology.config.RenderingConfig;
-import org.terasology.context.Context;
-import org.terasology.engine.Time;
-import org.terasology.input.InputSystem;
+import org.terasology.engine.config.Config;
+import org.terasology.engine.config.RenderingConfig;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.core.Time;
+import org.terasology.engine.input.InputSystem;
+import org.terasology.engine.rendering.assets.material.Material;
+import org.terasology.engine.rendering.assets.texture.TextureRegion;
+import org.terasology.engine.rendering.opengl.FrameBufferObject;
 import org.terasology.joml.geom.Rectanglei;
 import org.terasology.nui.SubRegion;
 import org.terasology.nui.UITextureRegion;
 import org.terasology.nui.canvas.CanvasImpl;
-import org.terasology.rendering.assets.material.Material;
-import org.terasology.rendering.assets.mesh.Mesh;
-import org.terasology.rendering.assets.texture.TextureRegion;
-import org.terasology.rendering.nui.NUIManager;
-import org.terasology.rendering.opengl.FrameBufferObject;
-import org.terasology.utilities.Assets;
+import org.terasology.engine.rendering.assets.mesh.Mesh;
+import org.terasology.engine.rendering.nui.NUIManager;
+import org.terasology.engine.utilities.Assets;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;

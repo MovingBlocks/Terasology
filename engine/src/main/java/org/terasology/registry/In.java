@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.registry;
+package org.terasology.engine.registry;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

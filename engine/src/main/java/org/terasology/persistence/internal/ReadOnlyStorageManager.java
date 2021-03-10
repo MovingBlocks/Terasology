@@ -14,23 +14,23 @@
  * limitations under the License.
  */
 
-package org.terasology.persistence.internal;
+package org.terasology.engine.persistence.internal;
 
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.entity.internal.EngineEntityManager;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.module.ModuleEnvironment;
-import org.terasology.network.Client;
-import org.terasology.network.ClientComponent;
-import org.terasology.world.block.BlockManager;
-import org.terasology.world.chunks.Chunk;
-import org.terasology.world.chunks.blockdata.ExtraBlockDataManager;
+import org.terasology.engine.network.Client;
+import org.terasology.engine.network.ClientComponent;
+import org.terasology.engine.world.block.BlockManager;
+import org.terasology.engine.world.chunks.Chunk;
+import org.terasology.engine.world.chunks.blockdata.ExtraBlockDataManager;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collection;
 
 /**
- * A {@link org.terasology.persistence.StorageManager} that performs reading only.
+ * A {@link org.terasology.engine.persistence.StorageManager} that performs reading only.
  */
 public final class ReadOnlyStorageManager extends AbstractStorageManager {
 

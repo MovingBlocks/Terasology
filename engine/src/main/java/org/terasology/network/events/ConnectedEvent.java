@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package org.terasology.network.events;
+package org.terasology.engine.network.events;
 
-import org.terasology.entitySystem.event.Event;
-import org.terasology.persistence.PlayerStore;
+import org.terasology.engine.entitySystem.event.Event;
+import org.terasology.engine.persistence.PlayerStore;
 
 /**
  * Event notifying that a new client has connected - sent against the client by the network system.

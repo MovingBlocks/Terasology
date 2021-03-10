@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.engine.subsystem.headless.renderer;
+package org.terasology.engine.core.subsystem.headless.renderer;
 
-import org.terasology.rendering.ShaderManager;
-import org.terasology.rendering.assets.material.Material;
-import org.terasology.rendering.assets.texture.Texture;
+import org.terasology.engine.rendering.ShaderManager;
+import org.terasology.engine.rendering.assets.material.Material;
+import org.terasology.engine.rendering.assets.texture.Texture;
 
 public class ShaderManagerHeadless implements ShaderManager {
 

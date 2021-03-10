@@ -1,12 +1,12 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.rendering.dag.nodes;
+package org.terasology.engine.rendering.dag.nodes;
 
-import org.terasology.context.Context;
-import org.terasology.engine.SimpleUri;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.core.SimpleUri;
 import org.terasology.naming.Name;
 import org.terasology.nui.properties.Range;
-import org.terasology.rendering.dag.AbstractNode;
+import org.terasology.engine.rendering.dag.AbstractNode;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;

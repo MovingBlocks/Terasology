@@ -1,13 +1,13 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-package org.terasology.world.chunks.internal;
+package org.terasology.engine.world.chunks.internal;
 
 import org.joml.Vector3i;
-import org.terasology.world.block.BlockManager;
-import org.terasology.world.block.BlockRegion;
-import org.terasology.world.chunks.Chunks;
-import org.terasology.world.chunks.blockdata.ExtraBlockDataManager;
+import org.terasology.engine.world.chunks.blockdata.ExtraBlockDataManager;
+import org.terasology.engine.world.block.BlockManager;
+import org.terasology.engine.world.block.BlockRegion;
+import org.terasology.engine.world.chunks.Chunks;
 
 /**
  * A chunk that has a full set of data, but will be turned into

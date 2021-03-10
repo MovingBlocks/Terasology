@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package org.terasology.engine.modes;
+package org.terasology.engine.core.modes;
 
-import org.terasology.context.Context;
-import org.terasology.engine.GameEngine;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.world.chunks.event.OnChunkLoaded;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.core.GameEngine;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.world.chunks.event.OnChunkLoaded;
 
 /**
  * @version 0.1

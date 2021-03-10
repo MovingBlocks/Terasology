@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package org.terasology.physics.events;
+package org.terasology.engine.physics.events;
 
 import org.joml.Vector3f;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.event.AbstractConsumableEvent;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.entitySystem.event.AbstractConsumableEvent;
 
 /**
  * TODO Make CollideEvent as a server event.

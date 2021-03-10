@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.recording;
+package org.terasology.engine.recording;
 
 import org.joml.Vector3f;
-import org.terasology.logic.characters.CharacterStateEvent;
+import org.terasology.engine.logic.characters.CharacterStateEvent;
 
 import java.util.HashMap;
 import java.util.Map;

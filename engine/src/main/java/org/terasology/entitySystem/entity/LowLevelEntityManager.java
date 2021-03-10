@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.entitySystem.entity;
+package org.terasology.engine.entitySystem.entity;
 
-import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.entity.internal.EngineEntityPool;
-import org.terasology.entitySystem.entity.internal.EngineSectorManager;
+import org.terasology.engine.entitySystem.Component;
+import org.terasology.engine.entitySystem.entity.internal.EngineEntityPool;
+import org.terasology.engine.entitySystem.entity.internal.EngineSectorManager;
 
 public interface LowLevelEntityManager extends EntityManager {
 

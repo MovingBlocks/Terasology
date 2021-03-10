@@ -1,6 +1,6 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.persistence.internal;
+package org.terasology.engine.persistence.internal;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
@@ -9,21 +9,21 @@ import org.joml.Vector3f;
 import org.joml.Vector3i;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.engine.paths.PathManager;
-import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.entity.internal.EngineEntityManager;
-import org.terasology.game.GameManifest;
-import org.terasology.logic.location.LocationComponent;
-import org.terasology.network.ClientComponent;
+import org.terasology.engine.core.paths.PathManager;
+import org.terasology.engine.entitySystem.Component;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.entitySystem.entity.internal.EngineEntityManager;
+import org.terasology.engine.game.GameManifest;
+import org.terasology.engine.logic.location.LocationComponent;
+import org.terasology.engine.network.ClientComponent;
 import org.terasology.protobuf.EntityData;
-import org.terasology.recording.RecordAndReplayCurrentStatus;
-import org.terasology.recording.RecordAndReplaySerializer;
-import org.terasology.recording.RecordAndReplayStatus;
-import org.terasology.recording.RecordAndReplayUtils;
-import org.terasology.utilities.concurrency.AbstractTask;
-import org.terasology.world.chunks.Chunks;
-import org.terasology.world.chunks.internal.ChunkImpl;
+import org.terasology.engine.recording.RecordAndReplayCurrentStatus;
+import org.terasology.engine.recording.RecordAndReplaySerializer;
+import org.terasology.engine.recording.RecordAndReplayStatus;
+import org.terasology.engine.recording.RecordAndReplayUtils;
+import org.terasology.engine.utilities.concurrency.AbstractTask;
+import org.terasology.engine.world.chunks.Chunks;
+import org.terasology.engine.world.chunks.internal.ChunkImpl;
 
 import java.io.BufferedOutputStream;
 import java.io.IOException;

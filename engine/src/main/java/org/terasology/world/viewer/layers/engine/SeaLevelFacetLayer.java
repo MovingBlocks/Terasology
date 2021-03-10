@@ -1,12 +1,12 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-package org.terasology.world.viewer.layers.engine;
+package org.terasology.engine.world.viewer.layers.engine;
 
-import org.terasology.world.generation.Region;
-import org.terasology.world.generation.facets.SeaLevelFacet;
-import org.terasology.world.viewer.layers.AbstractFacetLayer;
-import org.terasology.world.viewer.layers.Renders;
+import org.terasology.engine.world.generation.Region;
+import org.terasology.engine.world.generation.facets.SeaLevelFacet;
+import org.terasology.engine.world.viewer.layers.AbstractFacetLayer;
+import org.terasology.engine.world.viewer.layers.Renders;
 
 import java.awt.image.BufferedImage;
 

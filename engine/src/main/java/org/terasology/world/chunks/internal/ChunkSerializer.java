@@ -1,6 +1,6 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.world.chunks.internal;
+package org.terasology.engine.world.chunks.internal;
 
 import com.google.common.base.Preconditions;
 import com.google.protobuf.ByteString;
@@ -8,14 +8,14 @@ import gnu.trove.list.TByteList;
 import gnu.trove.list.array.TByteArrayList;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
+import org.terasology.engine.world.chunks.blockdata.ExtraBlockDataManager;
+import org.terasology.engine.world.chunks.blockdata.TeraArray;
+import org.terasology.engine.world.chunks.blockdata.TeraDenseArray16Bit;
+import org.terasology.engine.world.chunks.blockdata.TeraDenseArray8Bit;
 import org.terasology.protobuf.EntityData;
-import org.terasology.world.block.BlockManager;
-import org.terasology.world.chunks.Chunk;
-import org.terasology.world.chunks.Chunks;
-import org.terasology.world.chunks.blockdata.ExtraBlockDataManager;
-import org.terasology.world.chunks.blockdata.TeraArray;
-import org.terasology.world.chunks.blockdata.TeraDenseArray16Bit;
-import org.terasology.world.chunks.blockdata.TeraDenseArray8Bit;
+import org.terasology.engine.world.block.BlockManager;
+import org.terasology.engine.world.chunks.Chunk;
+import org.terasology.engine.world.chunks.Chunks;
 
 /**
  */

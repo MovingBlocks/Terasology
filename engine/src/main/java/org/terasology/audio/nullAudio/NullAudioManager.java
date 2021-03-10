@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-package org.terasology.audio.nullAudio;
+package org.terasology.engine.audio.nullAudio;
 
 import org.joml.Quaternionfc;
 import org.joml.Vector3fc;
 import org.terasology.assets.AssetFactory;
-import org.terasology.audio.AudioEndListener;
-import org.terasology.audio.AudioManager;
-import org.terasology.audio.StaticSound;
-import org.terasology.audio.StaticSoundData;
-import org.terasology.audio.StreamingSound;
-import org.terasology.audio.StreamingSoundData;
+import org.terasology.engine.audio.AudioEndListener;
+import org.terasology.engine.audio.AudioManager;
+import org.terasology.engine.audio.StaticSound;
+import org.terasology.engine.audio.StaticSoundData;
+import org.terasology.engine.audio.StreamingSound;
+import org.terasology.engine.audio.StreamingSoundData;
 
 /**
  * Null implementation of the AudioManager

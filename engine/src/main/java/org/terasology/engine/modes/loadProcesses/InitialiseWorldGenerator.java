@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package org.terasology.engine.modes.loadProcesses;
+package org.terasology.engine.core.modes.loadProcesses;
 
-import org.terasology.context.Context;
-import org.terasology.engine.modes.SingleStepLoadProcess;
-import org.terasology.rendering.world.WorldRenderer;
-import org.terasology.world.generator.WorldGenerator;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.core.modes.SingleStepLoadProcess;
+import org.terasology.engine.rendering.world.WorldRenderer;
+import org.terasology.engine.world.generator.WorldGenerator;
 
 /**
  * Initialize the world generator.

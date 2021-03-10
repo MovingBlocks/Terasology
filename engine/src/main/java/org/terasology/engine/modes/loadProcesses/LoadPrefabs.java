@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package org.terasology.engine.modes.loadProcesses;
+package org.terasology.engine.core.modes.loadProcesses;
 
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
-import org.terasology.context.Context;
-import org.terasology.engine.modes.StepBasedLoadProcess;
-import org.terasology.entitySystem.prefab.Prefab;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.core.modes.StepBasedLoadProcess;
+import org.terasology.engine.entitySystem.prefab.Prefab;
 
 import java.util.Iterator;
 

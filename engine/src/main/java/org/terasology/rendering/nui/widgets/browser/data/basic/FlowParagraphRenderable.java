@@ -1,18 +1,18 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.rendering.nui.widgets.browser.data.basic;
+package org.terasology.engine.rendering.nui.widgets.browser.data.basic;
 
 import org.joml.Vector2i;
+import org.terasology.engine.rendering.nui.widgets.browser.data.basic.flow.ContainerRenderSpace;
+import org.terasology.engine.rendering.nui.widgets.browser.data.basic.flow.FlowLineBuilder;
+import org.terasology.engine.rendering.nui.widgets.browser.data.basic.flow.FlowRenderable;
+import org.terasology.engine.rendering.nui.widgets.browser.data.basic.flow.LaidFlowLine;
 import org.terasology.joml.geom.Rectanglei;
 import org.terasology.nui.Canvas;
 import org.terasology.nui.HorizontalAlign;
 import org.terasology.nui.util.RectUtility;
-import org.terasology.rendering.nui.widgets.browser.data.basic.flow.ContainerRenderSpace;
-import org.terasology.rendering.nui.widgets.browser.data.basic.flow.FlowLineBuilder;
-import org.terasology.rendering.nui.widgets.browser.data.basic.flow.FlowRenderable;
-import org.terasology.rendering.nui.widgets.browser.data.basic.flow.LaidFlowLine;
-import org.terasology.rendering.nui.widgets.browser.ui.ParagraphRenderable;
-import org.terasology.rendering.nui.widgets.browser.ui.style.ParagraphRenderStyle;
+import org.terasology.engine.rendering.nui.widgets.browser.ui.ParagraphRenderable;
+import org.terasology.engine.rendering.nui.widgets.browser.ui.style.ParagraphRenderStyle;
 
 import java.util.Collection;
 
