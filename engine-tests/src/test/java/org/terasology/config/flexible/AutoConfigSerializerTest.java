@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 
 public class AutoConfigSerializerTest {
-    private static final String NON_DEFAULT_JSON = "{\"integerListSetting\":[1,2,3],\"Human Readable Name\":\"xyz\"}";
+    private static final String NON_DEFAULT_JSON = "{\"Human Readable Name\":\"xyz\",\"integerListSetting\":[1,2,3]}";
     private static final String DEFAULT_JSON = "{}";
 
     private final Gson gson = new Gson();

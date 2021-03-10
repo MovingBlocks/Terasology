@@ -17,6 +17,7 @@ import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -77,7 +78,13 @@ public class AutoConfigSerializer<C extends AutoConfig> {
             }
         }
 
-        return serializer.serialize(persistedSettings);
+        Map<String, PersistedData> sortedSettings = new LinkedHashMap<>(persistedSettings.size());
+
+        persistedSettings.entrySet().stream()
+                .sorted(Map.Entry.comparingByKey())
+                .forEachOrdered(e -> sortedSettings.put(e.getKey(), e.getValue()));
+
+        return serializer.serialize(sortedSettings);
     }
 
     public void deserializeOnto(C config, JsonElement data) {
