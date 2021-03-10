@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.engine.subsystem.headless.assets;
+package org.terasology.engine.core.subsystem.headless.assets;
 
 import org.terasology.assets.AssetType;
 import org.terasology.assets.ResourceUrn;
-import org.terasology.rendering.assets.shader.Shader;
-import org.terasology.rendering.assets.shader.ShaderData;
-import org.terasology.rendering.assets.shader.ShaderParameterMetadata;
+import org.terasology.engine.rendering.assets.shader.Shader;
+import org.terasology.engine.rendering.assets.shader.ShaderData;
+import org.terasology.engine.rendering.assets.shader.ShaderParameterMetadata;
 
 import java.util.Collections;
 

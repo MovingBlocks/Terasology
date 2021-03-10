@@ -1,14 +1,14 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.rendering.world;
+package org.terasology.engine.rendering.world;
 
 import org.joml.Vector3f;
 import org.joml.Vector3ic;
+import org.terasology.engine.rendering.assets.material.Material;
+import org.terasology.engine.rendering.cameras.SubmersibleCamera;
+import org.terasology.engine.rendering.world.viewDistance.ViewDistance;
 import org.terasology.module.sandbox.API;
-import org.terasology.rendering.assets.material.Material;
-import org.terasology.rendering.cameras.SubmersibleCamera;
-import org.terasology.rendering.dag.RenderGraph;
-import org.terasology.rendering.world.viewDistance.ViewDistance;
+import org.terasology.engine.rendering.dag.RenderGraph;
 
 /**
  * Implementations of this class are responsible for rendering the whole 3D world,

@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package org.terasology.physics.events;
+package org.terasology.engine.physics.events;
 
 import org.joml.Vector3f;
-import org.terasology.entitySystem.event.Event;
-import org.terasology.network.BroadcastEvent;
+import org.terasology.engine.entitySystem.event.Event;
+import org.terasology.engine.network.BroadcastEvent;
 
 /**
  */

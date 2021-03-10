@@ -17,13 +17,13 @@
 package org.terasology.utilities;
 
 import org.junit.jupiter.api.Test;
-import org.terasology.utilities.procedural.WhiteNoise;
-import org.terasology.utilities.random.FastRandom;
+import org.terasology.engine.utilities.procedural.WhiteNoise;
+import org.terasology.engine.utilities.random.FastRandom;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * A simple validity test for {@link org.terasology.utilities.procedural.WhiteNoise}
+ * A simple validity test for {@link WhiteNoise}
  */
 public class WhiteNoiseTest {
 

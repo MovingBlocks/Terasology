@@ -1,6 +1,6 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.world.block.family;
+package org.terasology.engine.world.block.family;
 
 import com.google.common.collect.Sets;
 import gnu.trove.map.TByteObjectMap;
@@ -8,18 +8,18 @@ import gnu.trove.map.hash.TByteObjectHashMap;
 import org.joml.Vector3ic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.math.Rotation;
-import org.terasology.math.Side;
-import org.terasology.math.SideBitFlag;
+import org.terasology.engine.math.Rotation;
+import org.terasology.engine.math.Side;
+import org.terasology.engine.math.SideBitFlag;
+import org.terasology.engine.world.block.loader.BlockFamilyDefinition;
+import org.terasology.engine.world.block.shapes.BlockShape;
 import org.terasology.naming.Name;
-import org.terasology.registry.In;
-import org.terasology.world.BlockEntityRegistry;
-import org.terasology.world.WorldProvider;
-import org.terasology.world.block.Block;
-import org.terasology.world.block.BlockBuilderHelper;
-import org.terasology.world.block.BlockUri;
-import org.terasology.world.block.loader.BlockFamilyDefinition;
-import org.terasology.world.block.shapes.BlockShape;
+import org.terasology.engine.registry.In;
+import org.terasology.engine.world.BlockEntityRegistry;
+import org.terasology.engine.world.WorldProvider;
+import org.terasology.engine.world.block.Block;
+import org.terasology.engine.world.block.BlockBuilderHelper;
+import org.terasology.engine.world.block.BlockUri;
 
 import java.util.Locale;
 import java.util.Set;

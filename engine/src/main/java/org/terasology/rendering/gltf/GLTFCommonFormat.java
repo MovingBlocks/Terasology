@@ -1,19 +1,6 @@
-/*
- * Copyright 2019 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-package org.terasology.rendering.gltf;
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
+package org.terasology.engine.rendering.gltf;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
@@ -40,31 +27,31 @@ import org.terasology.assets.AssetData;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.format.AbstractAssetFileFormat;
 import org.terasology.assets.management.AssetManager;
-import org.terasology.rendering.assets.skeletalmesh.Bone;
-import org.terasology.rendering.gltf.deserializers.GLTFChannelPathDeserializer;
-import org.terasology.rendering.gltf.deserializers.GLTFComponentTypeDeserializer;
-import org.terasology.rendering.gltf.deserializers.GLTFModeDeserializer;
-import org.terasology.rendering.gltf.deserializers.GLTFTargetBufferDeserializer;
-import org.terasology.rendering.gltf.deserializers.GLTFVersionDeserializer;
-import org.terasology.rendering.gltf.deserializers.Matrix4fDeserializer;
-import org.terasology.rendering.gltf.deserializers.QuaternionfDeserializer;
-import org.terasology.rendering.gltf.deserializers.TFloatListDeserializer;
-import org.terasology.rendering.gltf.deserializers.TIntListDeserializer;
-import org.terasology.rendering.gltf.deserializers.Vector3fDeserializer;
-import org.terasology.rendering.gltf.model.GLTF;
-import org.terasology.rendering.gltf.model.GLTFAccessor;
-import org.terasology.rendering.gltf.model.GLTFAttributeType;
-import org.terasology.rendering.gltf.model.GLTFBuffer;
-import org.terasology.rendering.gltf.model.GLTFBufferView;
-import org.terasology.rendering.gltf.model.GLTFChannelPath;
-import org.terasology.rendering.gltf.model.GLTFComponentType;
-import org.terasology.rendering.gltf.model.GLTFMesh;
-import org.terasology.rendering.gltf.model.GLTFMode;
-import org.terasology.rendering.gltf.model.GLTFNode;
-import org.terasology.rendering.gltf.model.GLTFPrimitive;
-import org.terasology.rendering.gltf.model.GLTFSkin;
-import org.terasology.rendering.gltf.model.GLTFTargetBuffer;
-import org.terasology.rendering.gltf.model.GLTFVersion;
+import org.terasology.engine.rendering.assets.skeletalmesh.Bone;
+import org.terasology.engine.rendering.gltf.deserializers.GLTFChannelPathDeserializer;
+import org.terasology.engine.rendering.gltf.deserializers.GLTFComponentTypeDeserializer;
+import org.terasology.engine.rendering.gltf.deserializers.GLTFModeDeserializer;
+import org.terasology.engine.rendering.gltf.deserializers.GLTFTargetBufferDeserializer;
+import org.terasology.engine.rendering.gltf.deserializers.GLTFVersionDeserializer;
+import org.terasology.engine.rendering.gltf.deserializers.Matrix4fDeserializer;
+import org.terasology.engine.rendering.gltf.deserializers.QuaternionfDeserializer;
+import org.terasology.engine.rendering.gltf.deserializers.TFloatListDeserializer;
+import org.terasology.engine.rendering.gltf.deserializers.TIntListDeserializer;
+import org.terasology.engine.rendering.gltf.deserializers.Vector3fDeserializer;
+import org.terasology.engine.rendering.gltf.model.GLTF;
+import org.terasology.engine.rendering.gltf.model.GLTFAccessor;
+import org.terasology.engine.rendering.gltf.model.GLTFAttributeType;
+import org.terasology.engine.rendering.gltf.model.GLTFBuffer;
+import org.terasology.engine.rendering.gltf.model.GLTFBufferView;
+import org.terasology.engine.rendering.gltf.model.GLTFChannelPath;
+import org.terasology.engine.rendering.gltf.model.GLTFComponentType;
+import org.terasology.engine.rendering.gltf.model.GLTFMesh;
+import org.terasology.engine.rendering.gltf.model.GLTFMode;
+import org.terasology.engine.rendering.gltf.model.GLTFNode;
+import org.terasology.engine.rendering.gltf.model.GLTFPrimitive;
+import org.terasology.engine.rendering.gltf.model.GLTFSkin;
+import org.terasology.engine.rendering.gltf.model.GLTFTargetBuffer;
+import org.terasology.engine.rendering.gltf.model.GLTFVersion;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;

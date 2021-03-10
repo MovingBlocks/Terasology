@@ -2,9 +2,9 @@
   <configuration default="false" name="engine-tests with JaCoCo" type="JUnit" factoryName="JUnit">
     <shortenClasspath name="MANIFEST" />
     <useClassPathOnly />
-    <extension name="coverage" runner="jacoco">
+    <extension name="coverage">
       <pattern>
-        <option name="PATTERN" value="org.terasology.engine.*" />
+        <option name="PATTERN" value="org.terasology.engine.core.*" />
         <option name="ENABLED" value="true" />
       </pattern>
     </extension>

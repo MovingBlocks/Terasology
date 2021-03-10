@@ -13,28 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.persistence.serializers;
+package org.terasology.engine.persistence.serializers;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.utilities.Assets;
+import org.terasology.engine.utilities.Assets;
 import org.terasology.assets.ResourceUrn;
-import org.terasology.engine.SimpleUri;
-import org.terasology.engine.module.ModuleManager;
-import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.entity.internal.EngineEntityManager;
-import org.terasology.entitySystem.metadata.ComponentLibrary;
-import org.terasology.entitySystem.metadata.ComponentMetadata;
-import org.terasology.entitySystem.prefab.Prefab;
-import org.terasology.entitySystem.prefab.PrefabData;
-import org.terasology.entitySystem.prefab.PrefabManager;
-import org.terasology.engine.module.ModuleContext;
+import org.terasology.engine.core.SimpleUri;
+import org.terasology.engine.core.module.ModuleManager;
+import org.terasology.engine.entitySystem.Component;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.entitySystem.entity.internal.EngineEntityManager;
+import org.terasology.engine.entitySystem.metadata.ComponentLibrary;
+import org.terasology.engine.entitySystem.metadata.ComponentMetadata;
+import org.terasology.engine.entitySystem.prefab.Prefab;
+import org.terasology.engine.entitySystem.prefab.PrefabData;
+import org.terasology.engine.entitySystem.prefab.PrefabManager;
+import org.terasology.engine.core.module.ModuleContext;
 import org.terasology.protobuf.EntityData;
-import org.terasology.registry.CoreRegistry;
+import org.terasology.engine.registry.CoreRegistry;
 
 import java.util.Collection;
 import java.util.Iterator;

@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package org.terasology.network;
+package org.terasology.engine.network;
 
-import org.terasology.entitySystem.Component;
+import org.terasology.engine.entitySystem.Component;
 
 /**
  */

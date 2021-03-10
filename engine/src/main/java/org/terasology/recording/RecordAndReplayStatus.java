@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.recording;
+package org.terasology.engine.recording;
 
 /**
  * An enum with the status of Record and Replay. There are six statuses:

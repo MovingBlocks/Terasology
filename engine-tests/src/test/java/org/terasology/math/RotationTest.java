@@ -20,6 +20,12 @@ import org.joml.Quaternionf;
 import org.joml.Quaternionfc;
 import org.joml.Vector3f;
 import org.junit.jupiter.api.Test;
+import org.terasology.engine.math.Direction;
+import org.terasology.engine.math.Pitch;
+import org.terasology.engine.math.Roll;
+import org.terasology.engine.math.Rotation;
+import org.terasology.engine.math.Side;
+import org.terasology.engine.math.Yaw;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.terasology.joml.test.QuaternionAssert.assertEquals;

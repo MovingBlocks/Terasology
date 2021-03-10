@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.unicode;
+package org.terasology.engine.unicode;
 
 /**
  * Unicode Dingbats block with renderable (all) characters from u2700 to u27BF. Unicode 4.1.0.

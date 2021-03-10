@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package org.terasology.audio.openAL.staticSound;
+package org.terasology.engine.audio.openAL.staticSound;
 
 import org.lwjgl.openal.AL10;
 import org.lwjgl.openal.AL11;
-import org.terasology.audio.openAL.BaseSoundSource;
-import org.terasology.audio.openAL.OpenALException;
-import org.terasology.audio.openAL.SoundPool;
+import org.terasology.engine.audio.openAL.BaseSoundSource;
+import org.terasology.engine.audio.openAL.OpenALException;
+import org.terasology.engine.audio.openAL.SoundPool;
 
 import static org.lwjgl.openal.AL10.AL_FALSE;
 import static org.lwjgl.openal.AL10.AL_LOOPING;

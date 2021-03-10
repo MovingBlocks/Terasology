@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.engine.subsystem.headless.renderer;
+package org.terasology.engine.core.subsystem.headless.renderer;
 
-import org.terasology.context.Context;
-import org.terasology.engine.subsystem.RenderingSubsystemFactory;
-import org.terasology.rendering.world.WorldRenderer;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.core.subsystem.RenderingSubsystemFactory;
+import org.terasology.engine.rendering.world.WorldRenderer;
 
 public class HeadlessRenderingSubsystemFactory implements RenderingSubsystemFactory {
 

@@ -13,16 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.persistence;
+package org.terasology.engine.persistence;
 
 import org.junit.jupiter.api.Test;
-import org.terasology.TerasologyTestingEnvironment;
-import org.terasology.entitySystem.entity.EntityBuilder;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.entity.internal.EngineEntityManager;
-import org.terasology.persistence.serializers.PrefabSerializer;
-import org.terasology.persistence.serializers.WorldSerializer;
-import org.terasology.persistence.serializers.WorldSerializerImpl;
+import org.terasology.engine.TerasologyTestingEnvironment;
+import org.terasology.engine.entitySystem.entity.EntityBuilder;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.entitySystem.entity.internal.EngineEntityManager;
+import org.terasology.engine.persistence.serializers.PrefabSerializer;
+import org.terasology.engine.persistence.serializers.WorldSerializer;
+import org.terasology.engine.persistence.serializers.WorldSerializerImpl;
 import org.terasology.protobuf.EntityData;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

@@ -6,6 +6,7 @@ package org.terasology.engine;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
+import org.terasology.engine.core.TerasologyEngineStatus;
 import org.terasology.splash.SplashScreen;
 import org.terasology.splash.glfw.graphics.Color;
 import org.terasology.splash.glfw.graphics.Renderer;

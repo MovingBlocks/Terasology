@@ -1,37 +1,24 @@
-/*
- * Copyright 2017 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-package org.terasology.rendering.nui.layers.mainMenu.settings;
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
+package org.terasology.engine.rendering.nui.layers.mainMenu.settings;
 
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
-import org.terasology.config.Config;
-import org.terasology.config.SecurityConfig;
-import org.terasology.context.Context;
-import org.terasology.i18n.TranslationSystem;
-import org.terasology.identity.ClientIdentity;
-import org.terasology.identity.PublicIdentityCertificate;
-import org.terasology.identity.storageServiceClient.BigIntegerBase64Serializer;
-import org.terasology.rendering.nui.NUIManager;
-import org.terasology.rendering.nui.layers.mainMenu.ConfirmPopup;
-import org.terasology.rendering.nui.layers.mainMenu.FilePickerPopup;
-import org.terasology.rendering.nui.layers.mainMenu.MessagePopup;
-import org.terasology.rendering.nui.layers.mainMenu.ThreeButtonPopup;
+import org.terasology.engine.config.Config;
+import org.terasology.engine.config.SecurityConfig;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.i18n.TranslationSystem;
+import org.terasology.engine.identity.ClientIdentity;
+import org.terasology.engine.identity.PublicIdentityCertificate;
+import org.terasology.engine.identity.storageServiceClient.BigIntegerBase64Serializer;
+import org.terasology.engine.rendering.nui.NUIManager;
+import org.terasology.engine.rendering.nui.layers.mainMenu.ConfirmPopup;
+import org.terasology.engine.rendering.nui.layers.mainMenu.FilePickerPopup;
+import org.terasology.engine.rendering.nui.layers.mainMenu.MessagePopup;
+import org.terasology.engine.rendering.nui.layers.mainMenu.ThreeButtonPopup;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;

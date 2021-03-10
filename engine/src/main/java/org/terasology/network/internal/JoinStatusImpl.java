@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.network.internal;
+package org.terasology.engine.network.internal;
 
 import com.google.common.util.concurrent.AtomicDouble;
-import org.terasology.network.JoinStatus;
+import org.terasology.engine.network.JoinStatus;
 
 /**
  */

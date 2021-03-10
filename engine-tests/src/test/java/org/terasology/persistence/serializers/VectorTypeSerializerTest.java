@@ -1,6 +1,6 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.persistence.serializers;
+package org.terasology.engine.persistence.serializers;
 
 import org.joml.Vector2f;
 import org.joml.Vector2fc;
@@ -9,11 +9,11 @@ import org.joml.Vector3fc;
 import org.joml.Vector4f;
 import org.joml.Vector4fc;
 import org.junit.jupiter.api.Test;
-import org.terasology.ModuleEnvironmentTest;
-import org.terasology.engine.module.ModuleContext;
+import org.terasology.engine.ModuleEnvironmentTest;
+import org.terasology.engine.core.module.ModuleContext;
+import org.terasology.engine.persistence.typeHandling.TypeHandlerLibraryImpl;
 import org.terasology.naming.Name;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
-import org.terasology.persistence.typeHandling.TypeHandlerLibraryImpl;
 import org.terasology.reflection.TypeInfo;
 
 import java.io.IOException;

@@ -18,6 +18,7 @@ package org.terasology.rendering.nui.widgets.browser.data.basic;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.terasology.engine.rendering.nui.widgets.browser.data.basic.HTMLLikeParser;
 
 import java.util.stream.Stream;
 

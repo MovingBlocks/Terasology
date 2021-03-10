@@ -1,17 +1,17 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-package org.terasology.world.viewer.layers;
+package org.terasology.engine.world.viewer.layers;
 
 import com.google.common.base.Preconditions;
 import com.google.common.math.DoubleMath;
+import org.terasology.engine.world.generation.Region;
+import org.terasology.engine.world.generation.facets.base.FieldFacet2D;
 import org.terasology.math.TeraMath;
 import org.terasology.nui.Color;
-import org.terasology.world.generation.Region;
-import org.terasology.world.generation.facets.base.FieldFacet2D;
-import org.terasology.world.viewer.color.ColorBlender;
-import org.terasology.world.viewer.color.ColorBlenders;
-import org.terasology.world.viewer.color.ColorModels;
+import org.terasology.engine.world.viewer.color.ColorBlender;
+import org.terasology.engine.world.viewer.color.ColorBlenders;
+import org.terasology.engine.world.viewer.color.ColorModels;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;

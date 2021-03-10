@@ -1,36 +1,36 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.world.block.items;
+package org.terasology.engine.world.block.items;
 
 import org.joml.Vector2f;
 import org.joml.Vector3fc;
 import org.joml.Vector3i;
-import org.terasology.audio.AudioManager;
-import org.terasology.audio.events.PlaySoundEvent;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.event.ReceiveEvent;
-import org.terasology.entitySystem.systems.BaseComponentSystem;
-import org.terasology.entitySystem.systems.RegisterMode;
-import org.terasology.entitySystem.systems.RegisterSystem;
+import org.terasology.engine.audio.AudioManager;
+import org.terasology.engine.audio.events.PlaySoundEvent;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.entitySystem.event.ReceiveEvent;
+import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
+import org.terasology.engine.entitySystem.systems.RegisterMode;
+import org.terasology.engine.entitySystem.systems.RegisterSystem;
+import org.terasology.engine.world.block.entity.placement.PlaceBlocks;
+import org.terasology.engine.world.block.family.BlockFamily;
+import org.terasology.engine.world.block.family.BlockPlacementData;
 import org.terasology.joml.geom.AABBf;
-import org.terasology.logic.characters.KinematicCharacterMover;
-import org.terasology.logic.common.ActivateEvent;
-import org.terasology.logic.inventory.ItemComponent;
-import org.terasology.math.Side;
-import org.terasology.network.NetworkSystem;
-import org.terasology.physics.Physics;
-import org.terasology.physics.StandardCollisionGroup;
-import org.terasology.registry.CoreRegistry;
-import org.terasology.registry.In;
-import org.terasology.telemetry.GamePlayStatsComponent;
-import org.terasology.utilities.Assets;
-import org.terasology.world.BlockEntityRegistry;
-import org.terasology.world.WorldProvider;
-import org.terasology.world.block.Block;
-import org.terasology.world.block.BlockComponent;
-import org.terasology.world.block.entity.placement.PlaceBlocks;
-import org.terasology.world.block.family.BlockFamily;
-import org.terasology.world.block.family.BlockPlacementData;
+import org.terasology.engine.logic.characters.KinematicCharacterMover;
+import org.terasology.engine.logic.common.ActivateEvent;
+import org.terasology.engine.logic.inventory.ItemComponent;
+import org.terasology.engine.math.Side;
+import org.terasology.engine.network.NetworkSystem;
+import org.terasology.engine.physics.Physics;
+import org.terasology.engine.physics.StandardCollisionGroup;
+import org.terasology.engine.registry.CoreRegistry;
+import org.terasology.engine.registry.In;
+import org.terasology.engine.telemetry.GamePlayStatsComponent;
+import org.terasology.engine.utilities.Assets;
+import org.terasology.engine.world.BlockEntityRegistry;
+import org.terasology.engine.world.WorldProvider;
+import org.terasology.engine.world.block.Block;
+import org.terasology.engine.world.block.BlockComponent;
 
 import java.util.Map;
 

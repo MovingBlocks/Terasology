@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.network.internal;
+package org.terasology.engine.network.internal;
 
 import com.google.common.primitives.Bytes;
-import org.terasology.identity.IdentityConstants;
-import org.terasology.identity.SecretGenerator;
+import org.terasology.engine.identity.IdentityConstants;
+import org.terasology.engine.identity.SecretGenerator;
 import org.terasology.protobuf.NetData;
 
 import javax.crypto.spec.SecretKeySpec;

@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.engine.module;
+package org.terasology.engine.core.module;
 
 import org.terasology.module.Module;
 import org.terasology.naming.Name;
-import org.terasology.registry.CoreRegistry;
+import org.terasology.engine.registry.CoreRegistry;
 
 /**
  */

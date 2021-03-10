@@ -1,17 +1,17 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.rendering.backdrop;
+package org.terasology.engine.rendering.backdrop;
 
 import org.joml.Vector3f;
 import org.lwjgl.opengl.GL11;
-import org.terasology.context.Context;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.rendering.primitives.Sphere;
 import org.terasology.math.TeraMath;
 import org.terasology.nui.properties.Range;
-import org.terasology.rendering.assets.material.Material;
-import org.terasology.rendering.cameras.Camera;
-import org.terasology.rendering.primitives.Sphere;
-import org.terasology.utilities.Assets;
-import org.terasology.world.sun.CelestialSystem;
+import org.terasology.engine.rendering.assets.material.Material;
+import org.terasology.engine.rendering.cameras.Camera;
+import org.terasology.engine.utilities.Assets;
+import org.terasology.engine.world.sun.CelestialSystem;
 
 import static org.lwjgl.opengl.GL11.GL_BACK;
 import static org.lwjgl.opengl.GL11.GL_FRONT;

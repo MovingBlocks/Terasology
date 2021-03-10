@@ -1,14 +1,14 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.rendering.nui.editor.utils;
+package org.terasology.engine.rendering.nui.editor.utils;
 
+import org.terasology.engine.rendering.assets.texture.Texture;
 import org.terasology.nui.itemRendering.StringTextIconRenderer;
 import org.terasology.nui.widgets.treeView.JsonTree;
 import org.terasology.nui.widgets.treeView.JsonTreeValue;
 import org.terasology.nui.widgets.treeView.Tree;
 import org.terasology.nui.widgets.treeView.TreeModel;
-import org.terasology.rendering.assets.texture.Texture;
-import org.terasology.utilities.Assets;
+import org.terasology.engine.utilities.Assets;
 
 import java.util.Optional;
 

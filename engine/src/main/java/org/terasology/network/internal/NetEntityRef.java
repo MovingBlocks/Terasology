@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package org.terasology.network.internal;
+package org.terasology.engine.network.internal;
 
-import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.entity.LowLevelEntityManager;
-import org.terasology.entitySystem.entity.internal.BaseEntityRef;
-import org.terasology.network.NetworkComponent;
+import org.terasology.engine.entitySystem.Component;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.entitySystem.entity.LowLevelEntityManager;
+import org.terasology.engine.entitySystem.entity.internal.BaseEntityRef;
+import org.terasology.engine.network.NetworkComponent;
 
 import java.util.Map;
 

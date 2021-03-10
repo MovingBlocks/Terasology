@@ -1,4 +1,4 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.persistence.typeHandling.coreTypes;
 
@@ -9,7 +9,6 @@ import org.terasology.persistence.typeHandling.TypeHandler;
 import org.terasology.reflection.reflect.CollectionCopyConstructor;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 

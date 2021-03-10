@@ -1,31 +1,31 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-package org.terasology.logic.players;
+package org.terasology.engine.logic.players;
 
-import org.terasology.audio.AudioManager;
-import org.terasology.engine.Time;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.event.ReceiveEvent;
-import org.terasology.entitySystem.systems.BaseComponentSystem;
-import org.terasology.entitySystem.systems.RegisterMode;
-import org.terasology.entitySystem.systems.RegisterSystem;
+import org.terasology.engine.audio.AudioManager;
+import org.terasology.engine.core.Time;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.entitySystem.event.ReceiveEvent;
+import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
+import org.terasology.engine.entitySystem.systems.RegisterMode;
+import org.terasology.engine.entitySystem.systems.RegisterSystem;
+import org.terasology.engine.logic.characters.CharacterComponent;
 import org.terasology.input.ButtonState;
-import org.terasology.input.binds.general.OnlinePlayersButton;
-import org.terasology.input.binds.general.PauseButton;
-import org.terasology.input.binds.general.ScreenshotButton;
-import org.terasology.logic.characters.CharacterComponent;
-import org.terasology.logic.characters.events.PlayerDeathEvent;
-import org.terasology.network.ClientComponent;
-import org.terasology.network.NetworkMode;
-import org.terasology.network.NetworkSystem;
-import org.terasology.registry.CoreRegistry;
-import org.terasology.registry.In;
-import org.terasology.rendering.nui.NUIManager;
-import org.terasology.rendering.nui.layers.ingame.DeathScreen;
-import org.terasology.rendering.nui.layers.ingame.OnlinePlayersOverlay;
-import org.terasology.rendering.opengl.ScreenGrabber;
-import org.terasology.utilities.Assets;
+import org.terasology.engine.input.binds.general.OnlinePlayersButton;
+import org.terasology.engine.input.binds.general.PauseButton;
+import org.terasology.engine.input.binds.general.ScreenshotButton;
+import org.terasology.engine.logic.characters.events.PlayerDeathEvent;
+import org.terasology.engine.network.ClientComponent;
+import org.terasology.engine.network.NetworkMode;
+import org.terasology.engine.network.NetworkSystem;
+import org.terasology.engine.registry.CoreRegistry;
+import org.terasology.engine.registry.In;
+import org.terasology.engine.rendering.nui.NUIManager;
+import org.terasology.engine.rendering.nui.layers.ingame.DeathScreen;
+import org.terasology.engine.rendering.nui.layers.ingame.OnlinePlayersOverlay;
+import org.terasology.engine.rendering.opengl.ScreenGrabber;
+import org.terasology.engine.utilities.Assets;
 
 
 /**

@@ -1,39 +1,39 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-package org.terasology;
+package org.terasology.engine;
 
 import com.badlogic.gdx.physics.bullet.Bullet;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.io.TempDir;
-import org.terasology.context.Context;
-import org.terasology.engine.ComponentSystemManager;
-import org.terasology.engine.EngineTime;
-import org.terasology.engine.Time;
-import org.terasology.engine.bootstrap.EntitySystemSetupUtil;
-import org.terasology.engine.modes.loadProcesses.LoadPrefabs;
-import org.terasology.engine.module.ModuleManager;
-import org.terasology.engine.paths.PathManager;
-import org.terasology.entitySystem.entity.internal.EngineEntityManager;
-import org.terasology.game.Game;
-import org.terasology.logic.console.Console;
-import org.terasology.logic.console.ConsoleImpl;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.core.ComponentSystemManager;
+import org.terasology.engine.core.EngineTime;
+import org.terasology.engine.core.Time;
+import org.terasology.engine.core.bootstrap.EntitySystemSetupUtil;
+import org.terasology.engine.core.modes.loadProcesses.LoadPrefabs;
+import org.terasology.engine.core.module.ModuleManager;
+import org.terasology.engine.core.paths.PathManager;
+import org.terasology.engine.entitySystem.entity.internal.EngineEntityManager;
+import org.terasology.engine.game.Game;
+import org.terasology.engine.logic.console.Console;
+import org.terasology.engine.logic.console.ConsoleImpl;
 import org.terasology.naming.Name;
-import org.terasology.network.NetworkSystem;
-import org.terasology.network.internal.NetworkSystemImpl;
-import org.terasology.persistence.StorageManager;
-import org.terasology.persistence.internal.ReadWriteStorageManager;
-import org.terasology.recording.CharacterStateEventPositionMap;
-import org.terasology.recording.DirectionAndOriginPosRecorderList;
-import org.terasology.recording.RecordAndReplayCurrentStatus;
-import org.terasology.recording.RecordAndReplaySerializer;
-import org.terasology.recording.RecordAndReplayUtils;
-import org.terasology.recording.RecordedEventStore;
+import org.terasology.engine.network.NetworkSystem;
+import org.terasology.engine.network.internal.NetworkSystemImpl;
+import org.terasology.engine.persistence.StorageManager;
+import org.terasology.engine.persistence.internal.ReadWriteStorageManager;
+import org.terasology.engine.recording.CharacterStateEventPositionMap;
+import org.terasology.engine.recording.DirectionAndOriginPosRecorderList;
+import org.terasology.engine.recording.RecordAndReplayCurrentStatus;
+import org.terasology.engine.recording.RecordAndReplaySerializer;
+import org.terasology.engine.recording.RecordAndReplayUtils;
+import org.terasology.engine.recording.RecordedEventStore;
 import org.terasology.reflection.TypeRegistry;
-import org.terasology.world.block.BlockManager;
-import org.terasology.world.chunks.blockdata.ExtraBlockDataManager;
+import org.terasology.engine.world.block.BlockManager;
+import org.terasology.engine.world.chunks.blockdata.ExtraBlockDataManager;
 
 import java.nio.file.Path;
 
@@ -59,10 +59,10 @@ public abstract class TerasologyTestingEnvironment {
         Bullet.init(true,false);
 
         /*
-         * Create at least for each class a new headless environemnt as it is fast and prevents side effects
+         * Create at least for each class a new headless environment as it is fast and prevents side effects
          * (Reusing a headless environment after other tests have modified the core registry isn't really clean)
          */
-        env = new HeadlessEnvironment(new Name("engine"));
+        env = new HeadlessEnvironment(new Name("engine"), new Name("unittest"));
         context = env.getContext();
         moduleManager = context.get(ModuleManager.class);
 

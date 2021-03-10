@@ -3,9 +3,13 @@
 
 // Engine tests are split out due to otherwise quirky project dependency issues with module tests extending engine tests
 
+plugins {
+    id "java-library"
+    id "org.jetbrains.gradle.plugin.idea-ext"
+}
+
 // Grab all the common stuff like plugins to use, artifact repositories, code analysis config
 apply from: "$rootDir/config/gradle/publish.gradle"
-apply plugin: "java-library"
 
 import groovy.json.JsonSlurper
 
@@ -42,6 +46,9 @@ sourceSets {
     // Adjust output path (changed with the Gradle 6 upgrade, this puts it back)
     main.java.outputDir = new File("$buildDir/classes")
     test.java.outputDir = new File("$buildDir/testClasses")
+
+    main.java.srcDirs = ["src/main/java/org/terasology"]
+    test.java.srcDirs = ["src/test/java/org/terasology"]
 }
 
 // Primary dependencies definition
@@ -55,7 +62,7 @@ dependencies {
     implementation group: 'com.google.protobuf', name: 'protobuf-java', version: '2.6.1'
     implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
     runtimeOnly group: 'org.slf4j', name: 'jul-to-slf4j', version: '1.7.21'
-    implementation group: 'org.reflections', name: 'reflections', version: '0.9.10'
+    implementation "org.terasology:reflections:0.9.12-MB"
 
     // Test lib dependencies
     implementation(platform("org.junit:junit-bom:5.7.1")) {
@@ -86,5 +93,10 @@ idea {
         outputDir = file('build/classes')
         testOutputDir = file('build/testClasses')
         downloadSources = true
+
+        settings {
+            packagePrefix["src/main/java/org/terasology"] = "org.terasology.engine";
+            packagePrefix["src/test/java/org/terasology"] = "org.terasology.engine";
+        }
     }
 }

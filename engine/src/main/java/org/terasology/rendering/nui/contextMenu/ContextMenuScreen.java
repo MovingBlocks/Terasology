@@ -1,6 +1,6 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.rendering.nui.contextMenu;
+package org.terasology.engine.rendering.nui.contextMenu;
 
 import com.google.common.collect.Lists;
 import org.joml.Vector2i;
@@ -12,7 +12,7 @@ import org.terasology.nui.InteractionListener;
 import org.terasology.nui.events.NUIMouseClickEvent;
 import org.terasology.nui.events.NUIMouseWheelEvent;
 import org.terasology.nui.widgets.UIList;
-import org.terasology.rendering.nui.CoreScreenLayer;
+import org.terasology.engine.rendering.nui.CoreScreenLayer;
 
 import java.util.List;
 

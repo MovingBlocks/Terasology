@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.telemetry;
+package org.terasology.engine.telemetry;
 
 import org.terasology.module.sandbox.API;
 
@@ -24,7 +24,7 @@ import java.lang.annotation.Target;
 
 /**
  * All telemetry fields should have this annotation.
- * {@link org.terasology.telemetry.metrics.Metric} finds all the telemetry fields & values via this annotation.
+ * {@link org.terasology.engine.telemetry.metrics.Metric} finds all the telemetry fields & values via this annotation.
  */
 @API
 @Target(ElementType.FIELD)

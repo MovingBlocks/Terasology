@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package org.terasology.entitySystem.entity.lifecycleEvents;
+package org.terasology.engine.entitySystem.entity.lifecycleEvents;
 
-import org.terasology.entitySystem.event.Event;
+import org.terasology.engine.entitySystem.event.Event;
 
 /**
  * When a component is about to be removed from an entity, or an entity is about to be destroyed, this event is sent.
@@ -24,7 +24,7 @@ import org.terasology.entitySystem.event.Event;
  * Note that this event will only be received by @ReceiveEvent methods where all components in its list are present and
  * at least one is involved in the action causing the event.
  *
- * @see org.terasology.entitySystem.entity.lifecycleEvents.OnAddedComponent
+ * @see org.terasology.engine.entitySystem.entity.lifecycleEvents.OnAddedComponent
  */
 public final class BeforeRemoveComponent implements Event {
     private static BeforeRemoveComponent instance = new BeforeRemoveComponent();

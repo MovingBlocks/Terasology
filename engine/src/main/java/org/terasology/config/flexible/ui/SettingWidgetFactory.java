@@ -1,16 +1,16 @@
 // Copyright 2020 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.config.flexible.ui;
+package org.terasology.engine.config.flexible.ui;
 
 import com.google.common.collect.ImmutableMap;
 import org.terasology.assets.management.AssetManager;
-import org.terasology.config.flexible.Setting;
-import org.terasology.config.flexible.constraints.SettingConstraint;
+import org.terasology.engine.config.flexible.Setting;
+import org.terasology.engine.config.flexible.constraints.SettingConstraint;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.nui.UIWidget;
-import org.terasology.registry.In;
-import org.terasology.registry.InjectionHelper;
-import org.terasology.utilities.ReflectionUtil;
+import org.terasology.engine.registry.In;
+import org.terasology.engine.registry.InjectionHelper;
+import org.terasology.engine.utilities.ReflectionUtil;
 
 import java.lang.reflect.Type;
 import java.util.Optional;

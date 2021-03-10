@@ -1,28 +1,28 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.world.chunks.localChunkProvider;
+package org.terasology.engine.world.chunks.localChunkProvider;
 
 import com.google.common.collect.Maps;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.entity.lifecycleEvents.BeforeDeactivateComponent;
-import org.terasology.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
-import org.terasology.entitySystem.entity.lifecycleEvents.OnChangedComponent;
-import org.terasology.entitySystem.event.ReceiveEvent;
-import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
-import org.terasology.logic.location.LocationComponent;
-import org.terasology.monitoring.Activity;
-import org.terasology.monitoring.PerformanceMonitor;
-import org.terasology.world.RelevanceRegionComponent;
-import org.terasology.world.WorldComponent;
-import org.terasology.world.block.BlockRegion;
-import org.terasology.world.chunks.Chunk;
-import org.terasology.world.chunks.ChunkRegionListener;
-import org.terasology.world.chunks.event.BeforeChunkUnload;
-import org.terasology.world.chunks.event.OnChunkLoaded;
-import org.terasology.world.chunks.internal.ChunkRelevanceRegion;
-import org.terasology.world.chunks.pipeline.PositionFuture;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.entitySystem.entity.lifecycleEvents.BeforeDeactivateComponent;
+import org.terasology.engine.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
+import org.terasology.engine.entitySystem.entity.lifecycleEvents.OnChangedComponent;
+import org.terasology.engine.entitySystem.event.ReceiveEvent;
+import org.terasology.engine.entitySystem.systems.UpdateSubscriberSystem;
+import org.terasology.engine.logic.location.LocationComponent;
+import org.terasology.engine.monitoring.Activity;
+import org.terasology.engine.monitoring.PerformanceMonitor;
+import org.terasology.engine.world.RelevanceRegionComponent;
+import org.terasology.engine.world.WorldComponent;
+import org.terasology.engine.world.block.BlockRegion;
+import org.terasology.engine.world.chunks.Chunk;
+import org.terasology.engine.world.chunks.ChunkRegionListener;
+import org.terasology.engine.world.chunks.event.BeforeChunkUnload;
+import org.terasology.engine.world.chunks.event.OnChunkLoaded;
+import org.terasology.engine.world.chunks.internal.ChunkRelevanceRegion;
+import org.terasology.engine.world.chunks.pipeline.PositionFuture;
 
 import java.util.Collection;
 import java.util.Comparator;

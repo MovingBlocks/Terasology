@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.monitoring.gui;
+package org.terasology.engine.monitoring.gui;
 
 import javax.swing.JTabbedPane;
 import javax.swing.JFrame;

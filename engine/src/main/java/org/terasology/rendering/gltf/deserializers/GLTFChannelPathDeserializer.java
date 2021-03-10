@@ -1,12 +1,12 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.rendering.gltf.deserializers;
+package org.terasology.engine.rendering.gltf.deserializers;
 
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
-import org.terasology.rendering.gltf.model.GLTFChannelPath;
+import org.terasology.engine.rendering.gltf.model.GLTFChannelPath;
 
 import java.lang.reflect.Type;
 

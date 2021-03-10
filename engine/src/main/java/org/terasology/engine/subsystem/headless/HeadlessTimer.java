@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.engine.subsystem.headless;
+package org.terasology.engine.core.subsystem.headless;
 
-import org.terasology.context.Context;
-import org.terasology.engine.EngineTime;
-import org.terasology.engine.Time;
-import org.terasology.engine.subsystem.common.TimeSubsystem;
-import org.terasology.engine.subsystem.headless.device.TimeSystem;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.core.EngineTime;
+import org.terasology.engine.core.Time;
+import org.terasology.engine.core.subsystem.common.TimeSubsystem;
+import org.terasology.engine.core.subsystem.headless.device.TimeSystem;
 
 public class HeadlessTimer implements TimeSubsystem {
 

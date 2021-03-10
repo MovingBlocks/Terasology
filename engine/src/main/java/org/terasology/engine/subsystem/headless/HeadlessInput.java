@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.engine.subsystem.headless;
+package org.terasology.engine.core.subsystem.headless;
 
-import org.terasology.context.Context;
-import org.terasology.engine.subsystem.EngineSubsystem;
-import org.terasology.input.InputSystem;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.core.subsystem.EngineSubsystem;
+import org.terasology.engine.input.InputSystem;
 
 public class HeadlessInput implements EngineSubsystem {
 

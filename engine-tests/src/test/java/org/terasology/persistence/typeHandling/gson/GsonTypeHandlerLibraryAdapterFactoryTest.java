@@ -1,6 +1,6 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.persistence.typeHandling.gson;
+package org.terasology.engine.persistence.typeHandling.gson;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -8,10 +8,10 @@ import com.google.gson.Gson;
 import org.joml.Vector4f;
 import org.junit.jupiter.api.Test;
 import org.reflections.Reflections;
+import org.terasology.engine.persistence.typeHandling.TypeHandlerLibraryImpl;
 import org.terasology.joml.geom.Rectanglei;
 import org.terasology.nui.Color;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
-import org.terasology.persistence.typeHandling.TypeHandlerLibraryImpl;
 
 import java.util.Map;
 import java.util.Objects;

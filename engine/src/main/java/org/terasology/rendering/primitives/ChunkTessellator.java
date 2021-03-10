@@ -1,19 +1,19 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.rendering.primitives;
+package org.terasology.engine.rendering.primitives;
 
 import com.google.common.base.Stopwatch;
 import gnu.trove.iterator.TIntIterator;
 import org.joml.Vector3f;
 import org.lwjgl.BufferUtils;
-import org.terasology.engine.subsystem.lwjgl.GLBufferPool;
-import org.terasology.math.Direction;
+import org.terasology.engine.core.subsystem.lwjgl.GLBufferPool;
+import org.terasology.engine.math.Direction;
 import org.terasology.math.TeraMath;
-import org.terasology.monitoring.PerformanceMonitor;
-import org.terasology.rendering.RenderMath;
-import org.terasology.world.ChunkView;
-import org.terasology.world.block.Block;
-import org.terasology.world.chunks.Chunks;
+import org.terasology.engine.monitoring.PerformanceMonitor;
+import org.terasology.engine.rendering.RenderMath;
+import org.terasology.engine.world.ChunkView;
+import org.terasology.engine.world.block.Block;
+import org.terasology.engine.world.chunks.Chunks;
 
 import java.util.concurrent.TimeUnit;
 

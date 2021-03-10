@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.physics.engine;
+package org.terasology.engine.physics.engine;
 
-import org.terasology.context.Context;
-import org.terasology.physics.bullet.BulletPhysics;
-import org.terasology.physics.bullet.shapes.BulletCollisionShapeFactory;
-import org.terasology.physics.shapes.CollisionShape;
-import org.terasology.physics.shapes.CollisionShapeFactory;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.physics.bullet.BulletPhysics;
+import org.terasology.engine.physics.bullet.shapes.BulletCollisionShapeFactory;
+import org.terasology.engine.physics.shapes.CollisionShape;
+import org.terasology.engine.physics.shapes.CollisionShapeFactory;
 
 /**
  * Centralizes the various components of the physics engine. To change the physics engine used, this class

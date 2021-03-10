@@ -1,13 +1,11 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-package org.terasology.persistence.typeHandling.mathTypes;
+package org.terasology.engine.persistence.typeHandling.mathTypes;
 
 import com.google.common.collect.Maps;
 import gnu.trove.list.TFloatList;
-import gnu.trove.list.TIntList;
 import org.terasology.joml.geom.AABBf;
-import org.terasology.joml.geom.AABBi;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.PersistedDataArray;
 import org.terasology.persistence.typeHandling.PersistedDataMap;

@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 
-@API package org.terasology.physics.shapes;
+@API package org.terasology.engine.physics.shapes;
 
 import org.terasology.module.sandbox.API;

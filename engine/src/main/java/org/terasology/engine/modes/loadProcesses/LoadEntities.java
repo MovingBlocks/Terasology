@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package org.terasology.engine.modes.loadProcesses;
+package org.terasology.engine.core.modes.loadProcesses;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.context.Context;
-import org.terasology.engine.modes.SingleStepLoadProcess;
-import org.terasology.entitySystem.entity.EntityManager;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.persistence.StorageManager;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.core.modes.SingleStepLoadProcess;
+import org.terasology.engine.entitySystem.entity.EntityManager;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.persistence.StorageManager;
 
 import java.io.IOException;
 

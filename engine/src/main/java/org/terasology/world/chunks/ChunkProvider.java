@@ -1,11 +1,11 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-package org.terasology.world.chunks;
+package org.terasology.engine.world.chunks;
 
 import org.joml.Vector3ic;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.world.internal.ChunkViewCore;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.world.internal.ChunkViewCore;
 
 import java.util.Collection;
 

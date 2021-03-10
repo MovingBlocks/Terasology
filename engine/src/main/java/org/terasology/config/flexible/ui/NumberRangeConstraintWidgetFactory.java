@@ -1,15 +1,15 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.config.flexible.ui;
+package org.terasology.engine.config.flexible.ui;
 
-import org.terasology.config.flexible.constraints.NumberRangeConstraint;
+import org.terasology.engine.config.flexible.constraints.NumberRangeConstraint;
 import org.terasology.nui.UIWidget;
 import org.terasology.nui.databinding.Binding;
 import org.terasology.nui.widgets.UISlider;
 
 /**
  * Creates {@link UISlider} for  {@link Number} types with constraint {@link NumberRangeConstraint}
- * @param <T> value type of {@link org.terasology.config.flexible.Setting}
+ * @param <T> value type of {@link org.terasology.engine.config.flexible.Setting}
  */
 public class NumberRangeConstraintWidgetFactory<T extends Number & Comparable<? super T>>
     extends AssetBackedConstraintWidgetFactory<T, NumberRangeConstraint<T>> {

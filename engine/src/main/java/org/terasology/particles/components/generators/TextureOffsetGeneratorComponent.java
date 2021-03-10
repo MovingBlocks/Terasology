@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.particles.components.generators;
+package org.terasology.engine.particles.components.generators;
 
 import org.joml.Vector2f;
 import org.joml.Vector2i;
-import org.terasology.entitySystem.Component;
+import org.terasology.engine.entitySystem.Component;
 import org.terasology.module.sandbox.API;
-import org.terasology.rendering.assets.texture.Texture;
+import org.terasology.engine.rendering.assets.texture.Texture;
 
 import java.util.LinkedList;
 import java.util.List;

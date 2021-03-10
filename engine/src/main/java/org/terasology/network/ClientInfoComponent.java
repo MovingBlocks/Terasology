@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package org.terasology.network;
+package org.terasology.engine.network;
 
-import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.engine.entitySystem.Component;
+import org.terasology.engine.entitySystem.entity.EntityRef;
 
 /**
  * The component that marks an entity as being a Client Info Entity.

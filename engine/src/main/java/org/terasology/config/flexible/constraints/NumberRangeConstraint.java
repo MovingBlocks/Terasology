@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.config.flexible.constraints;
+package org.terasology.engine.config.flexible.constraints;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.config.flexible.Setting;
+import org.terasology.engine.config.flexible.Setting;
 
 /**
  * Constrains a {@link Number} within the specified range in a {@link Setting}.

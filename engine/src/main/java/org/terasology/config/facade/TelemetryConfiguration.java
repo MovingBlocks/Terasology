@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.config.facade;
+package org.terasology.engine.config.facade;
 
 import org.terasology.module.sandbox.API;
 
 /**
- * TelemetryConfiguration is a wrapper for {@link org.terasology.config.TelemetryConfig}.
+ * TelemetryConfiguration is a wrapper for {@link org.terasology.engine.config.TelemetryConfig}.
  * It provides other modules with necessary telemetry configuration.
  */
 @API

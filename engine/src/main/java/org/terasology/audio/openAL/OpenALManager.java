@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.audio.openAL;
+package org.terasology.engine.audio.openAL;
 
 import com.google.common.collect.Maps;
 import org.joml.Quaternionfc;
@@ -30,19 +30,19 @@ import org.lwjgl.openal.ALCapabilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.AssetFactory;
-import org.terasology.audio.AudioEndListener;
-import org.terasology.audio.AudioManager;
-import org.terasology.audio.Sound;
-import org.terasology.audio.StaticSound;
-import org.terasology.audio.StaticSoundData;
-import org.terasology.audio.StreamingSound;
-import org.terasology.audio.StreamingSoundData;
-import org.terasology.audio.openAL.staticSound.OpenALSound;
-import org.terasology.audio.openAL.staticSound.OpenALSoundPool;
-import org.terasology.audio.openAL.streamingSound.OpenALStreamingSound;
-import org.terasology.audio.openAL.streamingSound.OpenALStreamingSoundPool;
-import org.terasology.config.AudioConfig;
-import org.terasology.math.Direction;
+import org.terasology.engine.audio.AudioEndListener;
+import org.terasology.engine.audio.AudioManager;
+import org.terasology.engine.audio.Sound;
+import org.terasology.engine.audio.StaticSound;
+import org.terasology.engine.audio.StaticSoundData;
+import org.terasology.engine.audio.StreamingSound;
+import org.terasology.engine.audio.StreamingSoundData;
+import org.terasology.engine.audio.openAL.staticSound.OpenALSound;
+import org.terasology.engine.audio.openAL.staticSound.OpenALSoundPool;
+import org.terasology.engine.audio.openAL.streamingSound.OpenALStreamingSound;
+import org.terasology.engine.audio.openAL.streamingSound.OpenALStreamingSoundPool;
+import org.terasology.engine.config.AudioConfig;
+import org.terasology.engine.math.Direction;
 
 import java.nio.FloatBuffer;
 import java.util.Iterator;

@@ -1,6 +1,6 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.world.block;
+package org.terasology.engine.world.block;
 
 import com.google.common.base.Preconditions;
 import org.joml.Math;
@@ -8,7 +8,7 @@ import org.joml.Matrix4fc;
 import org.joml.RoundingMode;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
-import org.terasology.math.Side;
+import org.terasology.engine.math.Side;
 
 import java.util.Collections;
 import java.util.Iterator;

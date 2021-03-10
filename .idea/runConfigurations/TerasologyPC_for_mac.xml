@@ -7,7 +7,7 @@
     <option name="VM_PARAMETERS" value="-Xms256m -Xmx1536m -XstartOnFirstThread -Djava.awt.headless=true" />
     <extension name="coverage">
       <pattern>
-        <option name="PATTERN" value="org.terasology.engine.*" />
+        <option name="PATTERN" value="org.terasology.engine.core.*" />
         <option name="ENABLED" value="true" />
       </pattern>
     </extension>

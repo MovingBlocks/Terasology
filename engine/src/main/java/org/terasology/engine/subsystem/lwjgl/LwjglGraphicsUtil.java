@@ -13,15 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.engine.subsystem.lwjgl;
+package org.terasology.engine.core.subsystem.lwjgl;
 
 import org.lwjgl.BufferUtils;
 import org.lwjgl.glfw.GLFWImage;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GLCapabilities;
-import org.terasology.engine.subsystem.DisplayDeviceInfo;
-import org.terasology.rendering.assets.texture.Texture;
+import org.terasology.engine.core.subsystem.DisplayDeviceInfo;
+import org.terasology.engine.rendering.assets.texture.Texture;
 
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;

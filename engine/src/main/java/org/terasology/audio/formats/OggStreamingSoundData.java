@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package org.terasology.audio.formats;
+package org.terasology.engine.audio.formats;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.format.AssetDataFile;
-import org.terasology.audio.StreamingSoundData;
+import org.terasology.engine.audio.StreamingSoundData;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;

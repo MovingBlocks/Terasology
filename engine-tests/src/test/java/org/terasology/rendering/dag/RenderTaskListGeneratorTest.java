@@ -19,15 +19,20 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
-import org.terasology.context.Context;
+import org.terasology.engine.context.Context;
 import org.junit.jupiter.api.Test;
-import org.terasology.engine.SimpleUri;
+import org.terasology.engine.core.SimpleUri;
+import org.terasology.engine.rendering.dag.Node;
+import org.terasology.engine.rendering.dag.RenderGraph;
+import org.terasology.engine.rendering.dag.RenderPipelineTask;
+import org.terasology.engine.rendering.dag.RenderTaskListGenerator;
+import org.terasology.engine.rendering.dag.StateChange;
 import org.terasology.naming.Name;
-import org.terasology.rendering.dag.dependencyConnections.BufferPairConnection;
-import org.terasology.rendering.dag.dependencyConnections.BufferPair;
-import org.terasology.rendering.dag.dependencyConnections.DependencyConnection;
-import org.terasology.rendering.dag.dependencyConnections.FboConnection;
-import org.terasology.rendering.dag.dependencyConnections.RunOrderConnection;
+import org.terasology.engine.rendering.dag.dependencyConnections.BufferPairConnection;
+import org.terasology.engine.rendering.dag.dependencyConnections.BufferPair;
+import org.terasology.engine.rendering.dag.dependencyConnections.DependencyConnection;
+import org.terasology.engine.rendering.dag.dependencyConnections.FboConnection;
+import org.terasology.engine.rendering.dag.dependencyConnections.RunOrderConnection;
 
 import java.util.List;
 import java.util.Map;

@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.engine.subsystem;
+package org.terasology.engine.core.subsystem;
 
-import org.terasology.context.Context;
-import org.terasology.rendering.world.WorldRenderer;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.rendering.world.WorldRenderer;
 
 @FunctionalInterface
 public interface RenderingSubsystemFactory {

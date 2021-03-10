@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.network.exceptions;
+package org.terasology.engine.network.exceptions;
 
 /**
  * Exception when hosting a game fails.

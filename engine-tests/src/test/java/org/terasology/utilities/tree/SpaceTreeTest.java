@@ -16,6 +16,8 @@
 package org.terasology.utilities.tree;
 
 import org.junit.jupiter.api.Test;
+import org.terasology.engine.utilities.tree.DimensionalMap;
+import org.terasology.engine.utilities.tree.SpaceTree;
 
 import java.util.Collection;
 import java.util.Iterator;

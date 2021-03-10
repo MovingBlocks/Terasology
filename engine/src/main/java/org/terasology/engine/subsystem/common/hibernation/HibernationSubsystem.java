@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.engine.subsystem.common.hibernation;
+package org.terasology.engine.core.subsystem.common.hibernation;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.context.Context;
-import org.terasology.engine.modes.GameState;
-import org.terasology.engine.subsystem.DisplayDevice;
-import org.terasology.engine.subsystem.EngineSubsystem;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.core.modes.GameState;
+import org.terasology.engine.core.subsystem.DisplayDevice;
+import org.terasology.engine.core.subsystem.EngineSubsystem;
 
 /**
  *

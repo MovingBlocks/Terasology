@@ -1,18 +1,18 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.rendering.nui.widgets.browser.data.html.basic;
+package org.terasology.engine.rendering.nui.widgets.browser.data.html.basic;
 
 import com.google.common.collect.Maps;
+import org.terasology.engine.rendering.nui.widgets.browser.data.basic.FlowParagraphData;
+import org.terasology.engine.rendering.nui.widgets.browser.data.basic.flow.TextFlowRenderable;
 import org.terasology.nui.Color;
 import org.terasology.nui.asset.font.Font;
-import org.terasology.rendering.nui.widgets.browser.data.ParagraphData;
-import org.terasology.rendering.nui.widgets.browser.data.basic.FlowParagraphData;
-import org.terasology.rendering.nui.widgets.browser.data.basic.flow.TextFlowRenderable;
-import org.terasology.rendering.nui.widgets.browser.data.html.HTMLBlockBuilder;
-import org.terasology.rendering.nui.widgets.browser.data.html.HTMLFontResolver;
-import org.terasology.rendering.nui.widgets.browser.data.html.HTMLParseException;
-import org.terasology.rendering.nui.widgets.browser.data.html.HTMLUtils;
-import org.terasology.rendering.nui.widgets.browser.ui.style.TextRenderStyle;
+import org.terasology.engine.rendering.nui.widgets.browser.data.ParagraphData;
+import org.terasology.engine.rendering.nui.widgets.browser.data.html.HTMLBlockBuilder;
+import org.terasology.engine.rendering.nui.widgets.browser.data.html.HTMLFontResolver;
+import org.terasology.engine.rendering.nui.widgets.browser.data.html.HTMLParseException;
+import org.terasology.engine.rendering.nui.widgets.browser.data.html.HTMLUtils;
+import org.terasology.engine.rendering.nui.widgets.browser.ui.style.TextRenderStyle;
 import org.xml.sax.Attributes;
 
 import java.util.Map;

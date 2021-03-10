@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.engine.modes.loadProcesses;
+package org.terasology.engine.core.modes.loadProcesses;
 
-import org.terasology.context.Context;
-import org.terasology.engine.ComponentSystemManager;
-import org.terasology.engine.modes.StepBasedLoadProcess;
-import org.terasology.entitySystem.systems.ComponentSystem;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.core.ComponentSystemManager;
+import org.terasology.engine.core.modes.StepBasedLoadProcess;
+import org.terasology.engine.entitySystem.systems.ComponentSystem;
 
 import java.util.Iterator;
 import java.util.List;

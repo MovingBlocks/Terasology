@@ -1,11 +1,11 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.world.generation;
+package org.terasology.engine.world.generation;
 
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Sets;
-import org.terasology.utilities.collection.TypeMap;
-import org.terasology.world.block.BlockRegion;
+import org.terasology.engine.utilities.collection.TypeMap;
+import org.terasology.engine.world.block.BlockRegion;
 
 import java.util.Map;
 import java.util.Set;

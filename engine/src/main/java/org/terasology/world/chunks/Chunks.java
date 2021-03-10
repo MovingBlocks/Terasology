@@ -1,7 +1,7 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-package org.terasology.world.chunks;
+package org.terasology.engine.world.chunks;
 
 import org.joml.Math;
 import org.joml.RoundingMode;
@@ -9,8 +9,8 @@ import org.joml.Vector3fc;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.terasology.module.sandbox.API;
-import org.terasology.world.block.BlockRegion;
-import org.terasology.world.block.BlockRegionc;
+import org.terasology.engine.world.block.BlockRegion;
+import org.terasology.engine.world.block.BlockRegionc;
 
 @API
 public final class Chunks {

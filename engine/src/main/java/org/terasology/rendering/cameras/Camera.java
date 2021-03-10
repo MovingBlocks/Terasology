@@ -1,6 +1,6 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.rendering.cameras;
+package org.terasology.engine.rendering.cameras;
 
 import org.joml.AxisAngle4f;
 import org.joml.Matrix4f;
@@ -9,10 +9,10 @@ import org.joml.Quaternionfc;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.lwjgl.BufferUtils;
-import org.terasology.config.Config;
+import org.terasology.engine.config.Config;
 import org.terasology.joml.geom.AABBfc;
-import org.terasology.math.Direction;
-import org.terasology.registry.CoreRegistry;
+import org.terasology.engine.math.Direction;
+import org.terasology.engine.registry.CoreRegistry;
 
 /**
  * Camera base class.

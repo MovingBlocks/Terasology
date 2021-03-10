@@ -1,9 +1,14 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.rendering.nui.widgets;
+package org.terasology.engine.rendering.nui.widgets;
 
 import com.google.common.collect.Maps;
-import org.terasology.context.Context;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.registry.InjectionHelper;
+import org.terasology.engine.rendering.nui.widgets.types.ArrayWidgetFactory;
+import org.terasology.engine.rendering.nui.widgets.types.CollectionWidgetFactory;
+import org.terasology.engine.rendering.nui.widgets.types.EnumWidgetFactory;
+import org.terasology.engine.rendering.nui.widgets.types.object.ObjectWidgetFactory;
 import org.terasology.nui.widgets.types.TypeWidgetFactory;
 import org.terasology.nui.widgets.types.TypeWidgetFactoryRegistry;
 import org.terasology.nui.widgets.types.TypeWidgetLibrary;
@@ -17,11 +22,6 @@ import org.terasology.nui.widgets.types.builtin.ShortWidgetFactory;
 import org.terasology.nui.widgets.types.builtin.StringWidgetFactory;
 import org.terasology.persistence.typeHandling.InstanceCreator;
 import org.terasology.reflection.reflect.ConstructorLibrary;
-import org.terasology.registry.InjectionHelper;
-import org.terasology.rendering.nui.widgets.types.ArrayWidgetFactory;
-import org.terasology.rendering.nui.widgets.types.CollectionWidgetFactory;
-import org.terasology.rendering.nui.widgets.types.EnumWidgetFactory;
-import org.terasology.rendering.nui.widgets.types.object.ObjectWidgetFactory;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;

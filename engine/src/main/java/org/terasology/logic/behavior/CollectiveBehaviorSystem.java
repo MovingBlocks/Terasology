@@ -1,32 +1,32 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.logic.behavior;
+package org.terasology.engine.logic.behavior;
 
 import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
-import org.terasology.audio.StaticSound;
-import org.terasology.engine.paths.PathManager;
-import org.terasology.entitySystem.entity.EntityManager;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
-import org.terasology.entitySystem.entity.lifecycleEvents.OnAddedComponent;
-import org.terasology.entitySystem.event.ReceiveEvent;
-import org.terasology.entitySystem.prefab.PrefabManager;
-import org.terasology.entitySystem.systems.BaseComponentSystem;
-import org.terasology.entitySystem.systems.RegisterMode;
-import org.terasology.entitySystem.systems.RegisterSystem;
-import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
-import org.terasology.logic.behavior.asset.BehaviorTree;
-import org.terasology.logic.behavior.asset.BehaviorTreeData;
-import org.terasology.logic.behavior.asset.BehaviorTreeFormat;
-import org.terasology.logic.behavior.core.Actor;
-import org.terasology.logic.behavior.core.BehaviorNode;
+import org.terasology.engine.audio.StaticSound;
+import org.terasology.engine.core.paths.PathManager;
+import org.terasology.engine.entitySystem.entity.EntityManager;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
+import org.terasology.engine.entitySystem.entity.lifecycleEvents.OnAddedComponent;
+import org.terasology.engine.entitySystem.event.ReceiveEvent;
+import org.terasology.engine.entitySystem.prefab.PrefabManager;
+import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
+import org.terasology.engine.entitySystem.systems.RegisterMode;
+import org.terasology.engine.entitySystem.systems.RegisterSystem;
+import org.terasology.engine.entitySystem.systems.UpdateSubscriberSystem;
+import org.terasology.engine.logic.behavior.asset.BehaviorTree;
+import org.terasology.engine.logic.behavior.asset.BehaviorTreeData;
+import org.terasology.engine.logic.behavior.asset.BehaviorTreeFormat;
+import org.terasology.engine.logic.behavior.core.Actor;
+import org.terasology.engine.logic.behavior.core.BehaviorNode;
 import org.terasology.naming.Name;
-import org.terasology.registry.In;
-import org.terasology.registry.Share;
+import org.terasology.engine.registry.In;
+import org.terasology.engine.registry.Share;
 
 import java.io.FileOutputStream;
 import java.io.IOException;

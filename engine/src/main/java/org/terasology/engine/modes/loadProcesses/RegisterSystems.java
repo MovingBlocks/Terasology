@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-package org.terasology.engine.modes.loadProcesses;
+package org.terasology.engine.core.modes.loadProcesses;
 
-import org.terasology.context.Context;
-import org.terasology.engine.ComponentSystemManager;
-import org.terasology.engine.GameEngine;
-import org.terasology.engine.TerasologyEngine;
-import org.terasology.engine.modes.SingleStepLoadProcess;
-import org.terasology.engine.module.ModuleManager;
-import org.terasology.engine.subsystem.EngineSubsystem;
-import org.terasology.network.NetworkMode;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.core.ComponentSystemManager;
+import org.terasology.engine.core.GameEngine;
+import org.terasology.engine.core.TerasologyEngine;
+import org.terasology.engine.core.modes.SingleStepLoadProcess;
+import org.terasology.engine.core.module.ModuleManager;
+import org.terasology.engine.core.subsystem.EngineSubsystem;
+import org.terasology.engine.network.NetworkMode;
 
 /**
  */

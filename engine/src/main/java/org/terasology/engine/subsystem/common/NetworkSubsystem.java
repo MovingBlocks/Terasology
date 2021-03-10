@@ -13,16 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.engine.subsystem.common;
+package org.terasology.engine.core.subsystem.common;
 
-import org.terasology.context.Context;
-import org.terasology.engine.GameEngine;
-import org.terasology.engine.Time;
-import org.terasology.engine.modes.GameState;
-import org.terasology.engine.subsystem.EngineSubsystem;
-import org.terasology.network.NetworkSystem;
-import org.terasology.network.internal.NetworkSystemImpl;
-import org.terasology.network.internal.ServerConnectListManager;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.core.GameEngine;
+import org.terasology.engine.core.Time;
+import org.terasology.engine.core.modes.GameState;
+import org.terasology.engine.core.subsystem.EngineSubsystem;
+import org.terasology.engine.network.NetworkSystem;
+import org.terasology.engine.network.internal.NetworkSystemImpl;
+import org.terasology.engine.network.internal.ServerConnectListManager;
 
 /**
  *

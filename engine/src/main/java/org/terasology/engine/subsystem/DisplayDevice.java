@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.engine.subsystem;
+package org.terasology.engine.core.subsystem;
 
 import org.terasology.module.sandbox.API;
-import org.terasology.rendering.nui.layers.mainMenu.videoSettings.DisplayModeSetting;
-import org.terasology.utilities.subscribables.Subscribable;
+import org.terasology.engine.rendering.nui.layers.mainMenu.videoSettings.DisplayModeSetting;
+import org.terasology.engine.utilities.subscribables.Subscribable;
 
 import java.util.List;
 

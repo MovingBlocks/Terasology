@@ -1,20 +1,7 @@
-/*
- * Copyright 2013 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 
-package org.terasology.world.block.shapes;
+package org.terasology.engine.world.block.shapes;
 
 import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
@@ -34,13 +21,13 @@ import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.format.AbstractAssetFileFormat;
 import org.terasology.assets.format.AssetDataFile;
 import org.terasology.assets.module.annotations.RegisterAssetFileFormat;
-import org.terasology.math.Rotation;
-import org.terasology.physics.shapes.CollisionShape;
-import org.terasology.physics.shapes.CompoundShape;
-import org.terasology.physics.shapes.ConvexHullShape;
-import org.terasology.utilities.gson.Vector2fTypeAdapter;
-import org.terasology.utilities.gson.Vector3fTypeAdapter;
-import org.terasology.world.block.BlockPart;
+import org.terasology.engine.math.Rotation;
+import org.terasology.engine.physics.shapes.CollisionShape;
+import org.terasology.engine.physics.shapes.CompoundShape;
+import org.terasology.engine.physics.shapes.ConvexHullShape;
+import org.terasology.engine.utilities.gson.Vector2fTypeAdapter;
+import org.terasology.engine.utilities.gson.Vector3fTypeAdapter;
+import org.terasology.engine.world.block.BlockPart;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -49,7 +36,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import static org.terasology.physics.engine.PhysicsEngineManager.COLLISION_SHAPE_FACTORY;
+import static org.terasology.engine.physics.engine.PhysicsEngineManager.COLLISION_SHAPE_FACTORY;
 
 /**
  */

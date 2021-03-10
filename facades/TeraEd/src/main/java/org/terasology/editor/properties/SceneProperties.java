@@ -16,12 +16,12 @@
 package org.terasology.editor.properties;
 
 import com.google.common.collect.Lists;
-import org.terasology.context.Context;
-import org.terasology.engine.TerasologyEngine;
-import org.terasology.engine.modes.GameState;
-import org.terasology.engine.modes.StateIngame;
-import org.terasology.rendering.backdrop.BackdropProvider;
-import org.terasology.rendering.backdrop.BackdropRenderer;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.core.TerasologyEngine;
+import org.terasology.engine.core.modes.GameState;
+import org.terasology.engine.core.modes.StateIngame;
+import org.terasology.engine.rendering.backdrop.BackdropProvider;
+import org.terasology.engine.rendering.backdrop.BackdropRenderer;
 
 import java.util.List;
 

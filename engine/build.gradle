@@ -5,6 +5,7 @@
 
 plugins {
     id "java-library"
+    id "org.jetbrains.gradle.plugin.idea-ext"
 }
 
 // Grab all the common stuff like plugins to use, artifact repositories, code analysis config, etc
@@ -40,6 +41,12 @@ ext {
 sourceSets {
     // Adjust output path (changed with the Gradle 6 upgrade, this puts it back)
     main.java.outputDir = new File("$buildDir/classes")
+
+    main.java.srcDirs = [
+            "src/main/java/org/terasology",
+            // and because old "engine" was renamed to "engine.core":
+            "src/main/java/org/terasology/engine"
+    ];
 }
 
 // Customizations for the main compilation configuration
@@ -70,7 +77,7 @@ dependencies {
 
     // Java magic
     implementation group: 'net.java.dev.jna', name: 'jna-platform', version: '5.6.0'
-    implementation group: 'org.reflections', name: 'reflections', version: '0.9.10'
+    implementation "org.terasology:reflections:0.9.12-MB"
     implementation group: 'org.javassist', name: 'javassist', version: '3.27.0-GA'
     implementation group: 'com.esotericsoftware', name: 'reflectasm', version: '1.11.1'
 
@@ -269,6 +276,11 @@ idea {
         outputDir = file('build/classes')
         testOutputDir = file('build/testClasses')
         downloadSources = true
+
+        settings {
+            packagePrefix["src/main/java/org/terasology"] = "org.terasology.engine";
+            packagePrefix["src/main/java/org/terasology/engine/"] = "org.terasology.engine.core";
+        }
     }
 }
 
