@@ -1,10 +1,10 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.logic.selection;
+package org.terasology.engine.logic.selection;
 
-import org.terasology.entitySystem.event.Event;
+import org.terasology.engine.entitySystem.event.Event;
 import org.terasology.module.sandbox.API;
-import org.terasology.world.block.BlockRegion;
+import org.terasology.engine.world.block.BlockRegion;
 
 /**
  * This event is sent when the player finalizes the position of a moving selection by clicking the left mouse button.

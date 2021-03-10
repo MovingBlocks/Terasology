@@ -1,24 +1,25 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.logic.nameTags;
+package org.terasology.engine.logic.nameTags;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
-import org.terasology.entitySystem.entity.lifecycleEvents.OnChangedComponent;
-import org.terasology.entitySystem.event.ReceiveEvent;
-import org.terasology.entitySystem.systems.BaseComponentSystem;
-import org.terasology.entitySystem.systems.RegisterMode;
-import org.terasology.entitySystem.systems.RegisterSystem;
-import org.terasology.logic.characters.CharacterComponent;
-import org.terasology.logic.common.DisplayNameComponent;
-import org.terasology.network.ClientComponent;
-import org.terasology.network.ClientInfoComponent;
-import org.terasology.network.ColorComponent;
-import org.terasology.network.NetworkSystem;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
+import org.terasology.engine.entitySystem.entity.lifecycleEvents.OnChangedComponent;
+import org.terasology.engine.entitySystem.event.ReceiveEvent;
+import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
+import org.terasology.engine.entitySystem.systems.RegisterMode;
+import org.terasology.engine.entitySystem.systems.RegisterSystem;
+import org.terasology.engine.logic.characters.CharacterComponent;
+import org.terasology.engine.logic.players.event.OnPlayerSpawnedEvent;
+import org.terasology.engine.logic.common.DisplayNameComponent;
+import org.terasology.engine.network.ClientComponent;
+import org.terasology.engine.network.ClientInfoComponent;
+import org.terasology.engine.network.ColorComponent;
+import org.terasology.engine.network.NetworkSystem;
 import org.terasology.nui.Color;
-import org.terasology.registry.In;
+import org.terasology.engine.registry.In;
 
 
 /**
@@ -35,7 +36,7 @@ public class PlayerNameTagSystem extends BaseComponentSystem {
     private NetworkSystem networkSystem;
 
     /**
-     * Listening for {@link org.terasology.logic.players.event.OnPlayerSpawnedEvent} does not work, as it is an
+     * Listening for {@link OnPlayerSpawnedEvent} does not work, as it is an
      * authority event that does not get processed at clients. That is why we listen for the activation.
      */
     @ReceiveEvent(components = CharacterComponent.class)

@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.persistence;
+package org.terasology.engine.persistence;
 
 import org.joml.Vector3i;
-import org.terasology.world.chunks.Chunk;
+import org.terasology.engine.world.chunks.Chunk;
 
 /**
  * A chunk store is used to save a chunk and its entity contents.

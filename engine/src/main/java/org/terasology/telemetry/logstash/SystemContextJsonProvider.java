@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.telemetry.logstash;
+package org.terasology.engine.telemetry.logstash;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import net.logstash.logback.composite.AbstractFieldJsonProvider;
@@ -21,20 +21,20 @@ import net.logstash.logback.composite.FieldNamesAware;
 import net.logstash.logback.composite.JsonWritingUtils;
 import net.logstash.logback.fieldnames.LogstashFieldNames;
 import ch.qos.logback.classic.spi.ILoggingEvent;
-import org.terasology.context.Context;
-import org.terasology.telemetry.Metrics;
-import org.terasology.telemetry.TelemetryUtils;
-import org.terasology.telemetry.metrics.Metric;
-import org.terasology.telemetry.metrics.SystemContextMetric;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.telemetry.Metrics;
+import org.terasology.engine.telemetry.TelemetryUtils;
+import org.terasology.engine.telemetry.metrics.Metric;
+import org.terasology.engine.telemetry.metrics.SystemContextMetric;
 
 import java.io.IOException;
 import java.util.Map;
 import java.util.Optional;
 
 /**
- * SystemContextJsonProvider provides system context information to {@link org.terasology.telemetry.logstash.TelemetryLogstashAppender}.
+ * SystemContextJsonProvider provides system context information to {@link org.terasology.engine.telemetry.logstash.TelemetryLogstashAppender}.
  * These information will then send to the server.
- * You can find all the fields that will be sent in {@link org.terasology.telemetry.metrics.SystemContextMetric}
+ * You can find all the fields that will be sent in {@link org.terasology.engine.telemetry.metrics.SystemContextMetric}
  * The fieldName can be reset in logback.xml.
  */
 public class SystemContextJsonProvider extends AbstractFieldJsonProvider<ILoggingEvent> implements FieldNamesAware<LogstashFieldNames> {

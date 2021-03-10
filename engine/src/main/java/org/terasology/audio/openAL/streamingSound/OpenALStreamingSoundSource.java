@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.audio.openAL.streamingSound;
+package org.terasology.engine.audio.openAL.streamingSound;
 
 import org.lwjgl.BufferUtils;
-import org.terasology.audio.openAL.BaseSoundSource;
-import org.terasology.audio.openAL.OpenALException;
-import org.terasology.audio.openAL.SoundPool;
-import org.terasology.audio.openAL.SoundSource;
+import org.terasology.engine.audio.openAL.BaseSoundSource;
+import org.terasology.engine.audio.openAL.OpenALException;
+import org.terasology.engine.audio.openAL.SoundPool;
+import org.terasology.engine.audio.openAL.SoundSource;
 
 import java.nio.IntBuffer;
 

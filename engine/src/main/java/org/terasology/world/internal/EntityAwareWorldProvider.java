@@ -1,20 +1,7 @@
-/*
- * Copyright 2016 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 
-package org.terasology.world.internal;
+package org.terasology.engine.world.internal;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableSet;
@@ -28,35 +15,35 @@ import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.context.Context;
-import org.terasology.engine.ComponentSystemManager;
-import org.terasology.engine.GameThread;
-import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.ComponentContainer;
-import org.terasology.entitySystem.entity.EntityBuilder;
-import org.terasology.entitySystem.entity.EntityManager;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.entity.internal.EngineEntityManager;
-import org.terasology.entitySystem.entity.internal.EntityChangeSubscriber;
-import org.terasology.entitySystem.entity.lifecycleEvents.BeforeDeactivateComponent;
-import org.terasology.entitySystem.entity.lifecycleEvents.BeforeEntityCreated;
-import org.terasology.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
-import org.terasology.entitySystem.entity.lifecycleEvents.OnChangedComponent;
-import org.terasology.entitySystem.event.ReceiveEvent;
-import org.terasology.entitySystem.metadata.ComponentMetadata;
-import org.terasology.entitySystem.prefab.Prefab;
-import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
-import org.terasology.logic.common.RetainComponentsComponent;
-import org.terasology.logic.location.LocationComponent;
-import org.terasology.monitoring.PerformanceMonitor;
-import org.terasology.network.NetworkComponent;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.core.ComponentSystemManager;
+import org.terasology.engine.core.GameThread;
+import org.terasology.engine.entitySystem.Component;
+import org.terasology.engine.entitySystem.ComponentContainer;
+import org.terasology.engine.entitySystem.entity.EntityBuilder;
+import org.terasology.engine.entitySystem.entity.EntityManager;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.entitySystem.entity.internal.EngineEntityManager;
+import org.terasology.engine.entitySystem.entity.internal.EntityChangeSubscriber;
+import org.terasology.engine.entitySystem.entity.lifecycleEvents.BeforeDeactivateComponent;
+import org.terasology.engine.entitySystem.entity.lifecycleEvents.BeforeEntityCreated;
+import org.terasology.engine.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
+import org.terasology.engine.entitySystem.entity.lifecycleEvents.OnChangedComponent;
+import org.terasology.engine.entitySystem.event.ReceiveEvent;
+import org.terasology.engine.entitySystem.metadata.ComponentMetadata;
+import org.terasology.engine.entitySystem.prefab.Prefab;
+import org.terasology.engine.entitySystem.systems.UpdateSubscriberSystem;
+import org.terasology.engine.logic.common.RetainComponentsComponent;
+import org.terasology.engine.logic.location.LocationComponent;
+import org.terasology.engine.monitoring.PerformanceMonitor;
+import org.terasology.engine.network.NetworkComponent;
 import org.terasology.reflection.metadata.FieldMetadata;
-import org.terasology.world.BlockEntityRegistry;
-import org.terasology.world.OnChangedBlock;
-import org.terasology.world.block.Block;
-import org.terasology.world.block.BlockComponent;
-import org.terasology.world.block.BlockRegion;
-import org.terasology.world.block.regions.BlockRegionComponent;
+import org.terasology.engine.world.BlockEntityRegistry;
+import org.terasology.engine.world.OnChangedBlock;
+import org.terasology.engine.world.block.Block;
+import org.terasology.engine.world.block.BlockComponent;
+import org.terasology.engine.world.block.BlockRegion;
+import org.terasology.engine.world.block.regions.BlockRegionComponent;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -310,9 +297,8 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
             }
         }
 
-
-        blockComponent.block = type;
-        blockEntity.saveComponent(blockComponent);
+        BlockComponent newBlockComponent = new BlockComponent(type, blockComponent.getPosition());
+        blockEntity.saveComponent(newBlockComponent);
 
         for (Component comp : newEntityBuilder.iterateComponents()) {
             copyIntoPrefab(blockEntity, comp, retainComponents);

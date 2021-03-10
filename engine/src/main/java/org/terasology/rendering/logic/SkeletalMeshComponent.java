@@ -1,19 +1,19 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-package org.terasology.rendering.logic;
+package org.terasology.engine.rendering.logic;
 
 import com.google.common.collect.Lists;
 import org.joml.Vector3f;
-import org.terasology.entitySystem.Owns;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.network.Replicate;
+import org.terasology.engine.entitySystem.Owns;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.rendering.assets.animation.MeshAnimation;
+import org.terasology.engine.rendering.assets.material.Material;
+import org.terasology.engine.rendering.assets.skeletalmesh.SkeletalMesh;
+import org.terasology.engine.network.Replicate;
 import org.terasology.nui.Color;
 import org.terasology.nui.properties.Range;
-import org.terasology.rendering.assets.animation.MeshAnimation;
-import org.terasology.rendering.assets.material.Material;
-import org.terasology.rendering.assets.skeletalmesh.SkeletalMesh;
-import org.terasology.world.block.ForceBlockActive;
+import org.terasology.engine.world.block.ForceBlockActive;
 
 import java.util.List;
 import java.util.Map;

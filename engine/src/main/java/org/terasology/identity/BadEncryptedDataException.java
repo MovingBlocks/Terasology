@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.identity;
+package org.terasology.engine.identity;
 
 /**
  * This exception indicates an issue during decryption c

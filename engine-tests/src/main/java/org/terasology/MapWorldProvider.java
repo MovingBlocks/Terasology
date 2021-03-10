@@ -13,27 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology;
+package org.terasology.engine;
 
 import com.google.common.collect.Maps;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.world.WorldChangeListener;
-import org.terasology.world.block.Block;
-import org.terasology.world.block.BlockManager;
-import org.terasology.world.block.BlockRegionc;
-import org.terasology.world.chunks.Chunk;
-import org.terasology.world.chunks.Chunks;
-import org.terasology.world.chunks.blockdata.ExtraBlockDataManager;
-import org.terasology.world.chunks.internal.ChunkImpl;
-import org.terasology.world.generation.impl.EntityBufferImpl;
-import org.terasology.world.generator.WorldGenerator;
-import org.terasology.world.internal.ChunkViewCore;
-import org.terasology.world.internal.WorldInfo;
-import org.terasology.world.internal.WorldProviderCore;
-import org.terasology.world.time.WorldTime;
-import org.terasology.world.time.WorldTimeImpl;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.world.WorldChangeListener;
+import org.terasology.engine.world.block.Block;
+import org.terasology.engine.world.block.BlockManager;
+import org.terasology.engine.world.block.BlockRegionc;
+import org.terasology.engine.world.chunks.Chunk;
+import org.terasology.engine.world.chunks.Chunks;
+import org.terasology.engine.world.chunks.blockdata.ExtraBlockDataManager;
+import org.terasology.engine.world.chunks.internal.ChunkImpl;
+import org.terasology.engine.world.generation.impl.EntityBufferImpl;
+import org.terasology.engine.world.generator.WorldGenerator;
+import org.terasology.engine.world.internal.ChunkViewCore;
+import org.terasology.engine.world.internal.WorldInfo;
+import org.terasology.engine.world.internal.WorldProviderCore;
+import org.terasology.engine.world.time.WorldTime;
+import org.terasology.engine.world.time.WorldTimeImpl;
 
 import java.util.Collection;
 import java.util.Collections;

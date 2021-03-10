@@ -1,21 +1,21 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.rendering.nui.editor.utils;
+package org.terasology.engine.rendering.nui.editor.utils;
 
 import com.google.common.collect.Queues;
 import com.google.gson.annotations.SerializedName;
 import org.reflections.ReflectionUtils;
+import org.terasology.engine.core.module.ModuleContext;
+import org.terasology.engine.rendering.nui.editor.layers.NUIEditorScreen;
+import org.terasology.engine.rendering.nui.editor.layers.NUISkinEditorScreen;
 import org.terasology.nui.UILayout;
 import org.terasology.nui.UIWidget;
 import org.terasology.nui.layouts.relative.RelativeLayout;
 import org.terasology.nui.skin.UIStyleFragment;
 import org.terasology.nui.widgets.treeView.JsonTree;
 import org.terasology.nui.widgets.treeView.JsonTreeValue;
-import org.terasology.persistence.ModuleContext;
-import org.terasology.rendering.nui.NUIManager;
-import org.terasology.rendering.nui.editor.layers.NUIEditorScreen;
-import org.terasology.rendering.nui.editor.layers.NUISkinEditorScreen;
-import org.terasology.utilities.ReflectionUtil;
+import org.terasology.engine.rendering.nui.NUIManager;
+import org.terasology.engine.utilities.ReflectionUtil;
 
 import java.lang.reflect.Field;
 import java.util.Deque;

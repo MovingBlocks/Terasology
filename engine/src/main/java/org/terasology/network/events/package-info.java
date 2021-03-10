@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 
-@API package org.terasology.network.events;
+@API package org.terasology.engine.network.events;
 
 import org.terasology.module.sandbox.API;

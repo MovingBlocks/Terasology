@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package org.terasology.engine.modes.loadProcesses;
+package org.terasology.engine.core.modes.loadProcesses;
 
-import org.terasology.config.Config;
-import org.terasology.context.Context;
-import org.terasology.engine.modes.SingleStepLoadProcess;
-import org.terasology.network.NetworkSystem;
-import org.terasology.network.exceptions.HostingFailedException;
-import org.terasology.rendering.nui.NUIManager;
-import org.terasology.rendering.nui.layers.mainMenu.MessagePopup;
+import org.terasology.engine.config.Config;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.core.modes.SingleStepLoadProcess;
+import org.terasology.engine.network.NetworkSystem;
+import org.terasology.engine.network.exceptions.HostingFailedException;
+import org.terasology.engine.rendering.nui.NUIManager;
+import org.terasology.engine.rendering.nui.layers.mainMenu.MessagePopup;
 
 /**
  */

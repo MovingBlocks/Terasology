@@ -1,19 +1,6 @@
-/*
- * Copyright 2017 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-package org.terasology.rendering.openvrprovider;
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
+package org.terasology.engine.rendering.openvrprovider;
 
 import com.sun.jna.Memory;
 import com.sun.jna.NativeLibrary;
@@ -32,12 +19,9 @@ import jopenvr.VR_IVRSettings_FnTable;
 import jopenvr.VR_IVRSystem_FnTable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.utilities.NativeHelper;
+import org.terasology.engine.utilities.NativeHelper;
 
 import java.nio.IntBuffer;
-
-import static org.terasology.rendering.openvrprovider.ControllerListener.LEFT_CONTROLLER;
-import static org.terasology.rendering.openvrprovider.ControllerListener.RIGHT_CONTROLLER;
 
 /**
  * This class is designed to make all API calls to OpenVR, thereby insulating it from the user. If you're looking to get
@@ -411,13 +395,13 @@ public final class OpenVRProvider {
     }
 
     private static void findControllerDevices() {
-        controllerDeviceIndex[RIGHT_CONTROLLER] = -1;
-        controllerDeviceIndex[LEFT_CONTROLLER] = -1;
+        controllerDeviceIndex[ControllerListener.RIGHT_CONTROLLER] = -1;
+        controllerDeviceIndex[ControllerListener.LEFT_CONTROLLER] = -1;
 
-        controllerDeviceIndex[RIGHT_CONTROLLER] =
+        controllerDeviceIndex[ControllerListener.RIGHT_CONTROLLER] =
                 vrSystem.GetTrackedDeviceIndexForControllerRole.apply(
                         JOpenVRLibrary.ETrackedControllerRole.ETrackedControllerRole_TrackedControllerRole_LeftHand);
-        controllerDeviceIndex[LEFT_CONTROLLER] =
+        controllerDeviceIndex[ControllerListener.LEFT_CONTROLLER] =
                 vrSystem.GetTrackedDeviceIndexForControllerRole.apply(
                         JOpenVRLibrary.ETrackedControllerRole.ETrackedControllerRole_TrackedControllerRole_RightHand);
     }

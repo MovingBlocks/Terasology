@@ -1,26 +1,26 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.rendering.dag;
+package org.terasology.engine.rendering.dag;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
-import org.terasology.context.Context;
-import org.terasology.engine.SimpleUri;
-import org.terasology.engine.module.ModuleManager;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.core.SimpleUri;
+import org.terasology.engine.core.module.ModuleManager;
+import org.terasology.engine.rendering.assets.material.Material;
+import org.terasology.engine.rendering.dag.dependencyConnections.BufferPair;
+import org.terasology.engine.rendering.dag.dependencyConnections.BufferPairConnection;
+import org.terasology.engine.rendering.dag.dependencyConnections.DependencyConnection;
+import org.terasology.engine.rendering.dag.dependencyConnections.FboConnection;
+import org.terasology.engine.rendering.dag.dependencyConnections.RunOrderConnection;
+import org.terasology.engine.rendering.opengl.BaseFboManager;
+import org.terasology.engine.rendering.opengl.FBO;
+import org.terasology.engine.rendering.opengl.FboConfig;
 import org.terasology.naming.Name;
-import org.terasology.rendering.assets.material.Material;
-import org.terasology.rendering.dag.dependencyConnections.BufferPair;
-import org.terasology.rendering.dag.dependencyConnections.BufferPairConnection;
-import org.terasology.rendering.dag.dependencyConnections.DependencyConnection;
-import org.terasology.rendering.dag.dependencyConnections.FboConnection;
-import org.terasology.rendering.dag.dependencyConnections.RunOrderConnection;
-import org.terasology.rendering.opengl.BaseFboManager;
-import org.terasology.rendering.opengl.FBO;
-import org.terasology.rendering.opengl.FboConfig;
-import org.terasology.utilities.Assets;
+import org.terasology.engine.utilities.Assets;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;

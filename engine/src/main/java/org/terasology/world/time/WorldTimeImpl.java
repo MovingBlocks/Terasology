@@ -1,14 +1,14 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.world.time;
+package org.terasology.engine.world.time;
 
-import org.terasology.engine.Time;
-import org.terasology.entitySystem.entity.EntityManager;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.systems.BaseComponentSystem;
-import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
-import org.terasology.registry.In;
-import org.terasology.world.WorldComponent;
+import org.terasology.engine.core.Time;
+import org.terasology.engine.entitySystem.entity.EntityManager;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
+import org.terasology.engine.entitySystem.systems.UpdateSubscriberSystem;
+import org.terasology.engine.registry.In;
+import org.terasology.engine.world.WorldComponent;
 
 import java.util.concurrent.atomic.AtomicLong;
 

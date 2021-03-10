@@ -1,6 +1,6 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.rendering.assets.mesh;
+package org.terasology.engine.rendering.assets.mesh;
 
 import gnu.trove.list.TFloatList;
 import org.terasology.assets.Asset;

@@ -1,7 +1,7 @@
 // Copyright 2020 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-package org.terasology.network;
+package org.terasology.engine.network;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;

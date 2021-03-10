@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.persistence.internal;
+package org.terasology.engine.persistence.internal;
 
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.entity.internal.EngineEntityManager;
-import org.terasology.logic.location.LocationComponent;
-import org.terasology.persistence.PlayerStore;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.entitySystem.entity.internal.EngineEntityManager;
+import org.terasology.engine.logic.location.LocationComponent;
+import org.terasology.engine.persistence.PlayerStore;
 import org.terasology.protobuf.EntityData;
 
 import java.util.Map;

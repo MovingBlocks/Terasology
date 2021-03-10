@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.network;
+package org.terasology.engine.network;
 
 /**
  * The current multiplayer mode of the game.

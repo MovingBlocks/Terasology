@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.unicode;
+package org.terasology.engine.unicode;
 
 /**
  * Unicode Enclosed Alphanumerics block with renderable characters from u2460 to u24FF. Unicode 4.1.0.

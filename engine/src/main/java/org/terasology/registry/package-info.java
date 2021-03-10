@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 
-@API package org.terasology.registry;
+@API package org.terasology.engine.registry;
 
 import org.terasology.module.sandbox.API;

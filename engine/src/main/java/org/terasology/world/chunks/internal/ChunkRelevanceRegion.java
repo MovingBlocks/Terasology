@@ -1,19 +1,19 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-package org.terasology.world.chunks.internal;
+package org.terasology.engine.world.chunks.internal;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.Sets;
 import org.joml.Vector3f;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.logic.location.LocationComponent;
-import org.terasology.world.block.BlockRegion;
-import org.terasology.world.chunks.Chunk;
-import org.terasology.world.chunks.ChunkRegionListener;
-import org.terasology.world.chunks.Chunks;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.logic.location.LocationComponent;
+import org.terasology.engine.world.block.BlockRegion;
+import org.terasology.engine.world.chunks.Chunk;
+import org.terasology.engine.world.chunks.ChunkRegionListener;
+import org.terasology.engine.world.chunks.Chunks;
 
 import java.util.Iterator;
 import java.util.Set;

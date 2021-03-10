@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.entitySystem.event;
+package org.terasology.engine.entitySystem.event;
 
 /**
  * A consumable event is an event that can be prevented from continuing through remaining event receivers. This is

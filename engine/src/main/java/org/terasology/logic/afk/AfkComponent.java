@@ -1,9 +1,9 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.logic.afk;
+package org.terasology.engine.logic.afk;
 
-import org.terasology.entitySystem.Component;
-import org.terasology.network.Replicate;
+import org.terasology.engine.entitySystem.Component;
+import org.terasology.engine.network.Replicate;
 
 public class AfkComponent implements Component {
 

@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.entitySystem.prefab;
+package org.terasology.engine.entitySystem.prefab;
 
 import org.terasology.assets.Asset;
 import org.terasology.assets.AssetType;
 import org.terasology.assets.ResourceUrn;
-import org.terasology.entitySystem.ComponentContainer;
+import org.terasology.engine.entitySystem.ComponentContainer;
 
 import java.util.List;
 

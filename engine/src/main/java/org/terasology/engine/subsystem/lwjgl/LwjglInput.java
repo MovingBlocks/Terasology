@@ -1,19 +1,18 @@
 // Copyright 2020 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.engine.subsystem.lwjgl;
+package org.terasology.engine.core.subsystem.lwjgl;
 
 import org.lwjgl.glfw.GLFW;
 import org.terasology.assets.module.ModuleAwareAssetTypeManager;
-import org.terasology.config.Config;
-import org.terasology.config.ControllerConfig;
-import org.terasology.config.RenderingConfig;
-import org.terasology.context.Context;
-import org.terasology.engine.modes.GameState;
-import org.terasology.engine.subsystem.config.BindsManager;
-import org.terasology.input.InputSystem;
-import org.terasology.input.lwjgl.LwjglControllerDevice;
-import org.terasology.input.lwjgl.LwjglKeyboardDevice;
-import org.terasology.input.lwjgl.LwjglMouseDevice;
+import org.terasology.engine.config.Config;
+import org.terasology.engine.config.ControllerConfig;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.core.modes.GameState;
+import org.terasology.engine.core.subsystem.config.BindsManager;
+import org.terasology.engine.input.InputSystem;
+import org.terasology.engine.input.lwjgl.LwjglControllerDevice;
+import org.terasology.engine.input.lwjgl.LwjglKeyboardDevice;
+import org.terasology.engine.input.lwjgl.LwjglMouseDevice;
 
 public class LwjglInput extends BaseLwjglSubsystem {
 

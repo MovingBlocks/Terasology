@@ -13,15 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.monitoring.chunk;
+package org.terasology.engine.monitoring.chunk;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import com.google.common.eventbus.EventBus;
 import org.joml.Vector3i;
-import org.terasology.rendering.primitives.ChunkMesh;
-import org.terasology.world.chunks.Chunk;
-import org.terasology.world.chunks.ChunkProvider;
+import org.terasology.engine.rendering.primitives.ChunkMesh;
+import org.terasology.engine.world.chunks.Chunk;
+import org.terasology.engine.world.chunks.ChunkProvider;
 
 import java.util.List;
 import java.util.Map;

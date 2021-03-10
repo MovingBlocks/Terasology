@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package org.terasology.engine.modes.loadProcesses;
+package org.terasology.engine.core.modes.loadProcesses;
 
-import org.terasology.context.Context;
-import org.terasology.engine.ComponentSystemManager;
-import org.terasology.engine.modes.SingleStepLoadProcess;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.core.ComponentSystemManager;
+import org.terasology.engine.core.modes.SingleStepLoadProcess;
 
 public class InitialiseComponentSystemManager extends SingleStepLoadProcess {
 

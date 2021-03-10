@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package org.terasology.audio.openAL;
+package org.terasology.engine.audio.openAL;
 
 import com.google.common.collect.Maps;
-import org.terasology.audio.AudioManager;
-import org.terasology.audio.Sound;
+import org.terasology.engine.audio.AudioManager;
+import org.terasology.engine.audio.Sound;
 
 import java.util.HashSet;
 import java.util.Map;

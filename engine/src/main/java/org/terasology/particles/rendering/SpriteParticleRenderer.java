@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.particles.rendering;
+package org.terasology.engine.particles.rendering;
 
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
@@ -21,18 +21,18 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
-import org.terasology.engine.subsystem.DisplayDevice;
-import org.terasology.engine.subsystem.lwjgl.LwjglDisplayDevice;
-import org.terasology.entitySystem.systems.RegisterMode;
-import org.terasology.entitySystem.systems.RegisterSystem;
-import org.terasology.entitySystem.systems.RenderSystem;
-import org.terasology.particles.ParticleSystemManager;
-import org.terasology.particles.components.ParticleDataSpriteComponent;
-import org.terasology.registry.In;
-import org.terasology.rendering.assets.material.Material;
-import org.terasology.rendering.cameras.PerspectiveCamera;
-import org.terasology.rendering.world.WorldRenderer;
-import org.terasology.utilities.Assets;
+import org.terasology.engine.core.subsystem.DisplayDevice;
+import org.terasology.engine.core.subsystem.lwjgl.LwjglDisplayDevice;
+import org.terasology.engine.entitySystem.systems.RegisterMode;
+import org.terasology.engine.entitySystem.systems.RegisterSystem;
+import org.terasology.engine.entitySystem.systems.RenderSystem;
+import org.terasology.engine.particles.ParticleSystemManager;
+import org.terasology.engine.particles.components.ParticleDataSpriteComponent;
+import org.terasology.engine.registry.In;
+import org.terasology.engine.rendering.assets.material.Material;
+import org.terasology.engine.rendering.cameras.PerspectiveCamera;
+import org.terasology.engine.rendering.world.WorldRenderer;
+import org.terasology.engine.utilities.Assets;
 
 import java.nio.FloatBuffer;
 

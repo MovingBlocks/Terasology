@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package org.terasology.config;
+package org.terasology.engine.config;
 
 import com.google.common.collect.Lists;
 
-import org.terasology.engine.TerasologyConstants;
+import org.terasology.engine.core.TerasologyConstants;
 
 import java.util.Collections;
 import java.util.List;

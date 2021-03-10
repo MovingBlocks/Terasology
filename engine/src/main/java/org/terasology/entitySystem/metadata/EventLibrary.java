@@ -13,14 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.entitySystem.metadata;
+package org.terasology.engine.entitySystem.metadata;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
-import org.terasology.context.Context;
-import org.terasology.engine.SimpleUri;
-import org.terasology.entitySystem.event.Event;
+import org.terasology.engine.entitySystem.event.Event;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.metadata.AbstractClassLibrary;

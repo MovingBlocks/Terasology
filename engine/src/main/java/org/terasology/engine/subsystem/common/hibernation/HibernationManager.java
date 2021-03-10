@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.engine.subsystem.common.hibernation;
+package org.terasology.engine.core.subsystem.common.hibernation;
 
 import org.terasology.module.sandbox.API;
 

@@ -1,7 +1,7 @@
 // Copyright 2020 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-package org.terasology.world.chunks.pipeline;
+package org.terasology.engine.world.chunks.pipeline;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -11,16 +11,16 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
-import org.terasology.TerasologyTestingEnvironment;
 import org.terasology.assets.management.AssetManager;
-import org.terasology.registry.CoreRegistry;
-import org.terasology.world.block.BlockManager;
-import org.terasology.world.block.internal.BlockManagerImpl;
-import org.terasology.world.block.tiles.NullWorldAtlas;
-import org.terasology.world.chunks.Chunk;
-import org.terasology.world.chunks.blockdata.ExtraBlockDataManager;
-import org.terasology.world.chunks.internal.ChunkImpl;
-import org.terasology.world.chunks.pipeline.stages.ChunkTaskProvider;
+import org.terasology.engine.TerasologyTestingEnvironment;
+import org.terasology.engine.registry.CoreRegistry;
+import org.terasology.engine.world.block.BlockManager;
+import org.terasology.engine.world.block.internal.BlockManagerImpl;
+import org.terasology.engine.world.block.tiles.NullWorldAtlas;
+import org.terasology.engine.world.chunks.Chunk;
+import org.terasology.engine.world.chunks.blockdata.ExtraBlockDataManager;
+import org.terasology.engine.world.chunks.internal.ChunkImpl;
+import org.terasology.engine.world.chunks.pipeline.stages.ChunkTaskProvider;
 
 import java.util.Collections;
 import java.util.Comparator;

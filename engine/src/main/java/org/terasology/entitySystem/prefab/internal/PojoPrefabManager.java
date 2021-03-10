@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.entitySystem.prefab.internal;
+package org.terasology.engine.entitySystem.prefab.internal;
 
 import com.google.common.base.Strings;
 import org.terasology.assets.management.AssetManager;
-import org.terasology.context.Context;
-import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.prefab.Prefab;
-import org.terasology.entitySystem.prefab.PrefabManager;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.entitySystem.Component;
+import org.terasology.engine.entitySystem.prefab.Prefab;
+import org.terasology.engine.entitySystem.prefab.PrefabManager;
 
 import java.util.Collection;
 import java.util.HashSet;

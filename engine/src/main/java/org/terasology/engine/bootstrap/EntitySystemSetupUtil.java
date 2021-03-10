@@ -1,46 +1,48 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-package org.terasology.engine.bootstrap;
+package org.terasology.engine.core.bootstrap;
 
 import org.terasology.assets.ResourceUrn;
-import org.terasology.audio.events.PlaySoundEvent;
-import org.terasology.context.Context;
-import org.terasology.engine.SimpleUri;
-import org.terasology.engine.module.ModuleManager;
-import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.entity.EntityManager;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.entity.internal.EngineEntityManager;
-import org.terasology.entitySystem.entity.internal.PojoEntityManager;
-import org.terasology.entitySystem.event.Event;
-import org.terasology.entitySystem.event.internal.EventSystem;
-import org.terasology.entitySystem.event.internal.EventSystemImpl;
-import org.terasology.entitySystem.metadata.ComponentLibrary;
-import org.terasology.entitySystem.metadata.EntitySystemLibrary;
-import org.terasology.entitySystem.metadata.EventLibrary;
-import org.terasology.entitySystem.metadata.MetadataUtil;
-import org.terasology.entitySystem.prefab.PrefabManager;
-import org.terasology.entitySystem.prefab.internal.PojoPrefabManager;
-import org.terasology.entitySystem.systems.internal.DoNotAutoRegister;
-import org.terasology.input.cameraTarget.CameraTargetChangedEvent;
-import org.terasology.input.events.InputEvent;
-import org.terasology.logic.characters.CharacterMoveInputEvent;
+import org.terasology.engine.audio.events.PlaySoundEvent;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.core.module.ModuleManager;
+import org.terasology.engine.entitySystem.Component;
+import org.terasology.engine.entitySystem.entity.EntityManager;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.entitySystem.entity.internal.EngineEntityManager;
+import org.terasology.engine.entitySystem.entity.internal.PojoEntityManager;
+import org.terasology.engine.entitySystem.event.Event;
+import org.terasology.engine.entitySystem.event.internal.EventSystem;
+import org.terasology.engine.entitySystem.event.internal.EventSystemImpl;
+import org.terasology.engine.entitySystem.metadata.ComponentLibrary;
+import org.terasology.engine.entitySystem.metadata.EntitySystemLibrary;
+import org.terasology.engine.entitySystem.metadata.EventLibrary;
+import org.terasology.engine.entitySystem.metadata.MetadataUtil;
+import org.terasology.engine.entitySystem.prefab.PrefabManager;
+import org.terasology.engine.entitySystem.prefab.internal.PojoPrefabManager;
+import org.terasology.engine.entitySystem.systems.internal.DoNotAutoRegister;
+import org.terasology.engine.input.cameraTarget.CameraTargetChangedEvent;
+import org.terasology.engine.input.events.InputEvent;
+import org.terasology.engine.logic.characters.CharacterMoveInputEvent;
+import org.terasology.engine.network.NetworkEventSystemDecorator;
+import org.terasology.engine.network.NetworkSystem;
+import org.terasology.engine.persistence.typeHandling.TypeHandlerLibraryImpl;
+import org.terasology.engine.persistence.typeHandling.extensionTypes.EntityRefTypeHandler;
+import org.terasology.engine.recording.CharacterStateEventPositionMap;
+import org.terasology.engine.recording.DirectionAndOriginPosRecorderList;
+import org.terasology.engine.recording.EventCatcher;
+import org.terasology.engine.recording.EventSystemReplayImpl;
+import org.terasology.engine.recording.RecordAndReplayCurrentStatus;
+import org.terasology.engine.recording.RecordAndReplaySerializer;
+import org.terasology.engine.recording.RecordAndReplayStatus;
+import org.terasology.engine.recording.RecordAndReplayUtils;
+import org.terasology.engine.recording.RecordedEventStore;
+import org.terasology.engine.recording.RecordingEventSystemDecorator;
 import org.terasology.module.ModuleEnvironment;
-import org.terasology.network.NetworkSystem;
+import org.terasology.naming.Name;
 import org.terasology.nui.properties.OneOfProviderFactory;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
-import org.terasology.persistence.typeHandling.TypeHandlerLibraryImpl;
-import org.terasology.persistence.typeHandling.extensionTypes.EntityRefTypeHandler;
-import org.terasology.recording.CharacterStateEventPositionMap;
-import org.terasology.recording.DirectionAndOriginPosRecorderList;
-import org.terasology.recording.EventCatcher;
-import org.terasology.recording.EventSystemReplayImpl;
-import org.terasology.recording.RecordAndReplayCurrentStatus;
-import org.terasology.recording.RecordAndReplaySerializer;
-import org.terasology.recording.RecordAndReplayStatus;
-import org.terasology.recording.RecordAndReplayUtils;
-import org.terasology.recording.RecordedEventStore;
 import org.terasology.reflection.TypeRegistry;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.reflect.ReflectFactory;
@@ -48,6 +50,8 @@ import org.terasology.reflection.reflect.ReflectionReflectFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.google.common.base.Verify.verifyNotNull;
 
 /**
  * Provides static methods that can be used to put entity system related objects into a {@link Context} instance.
@@ -151,7 +155,9 @@ public final class EntitySystemSetupUtil {
                     recordAndReplaySerializer, recordAndReplayUtils, selectedClassesToRecord, recordAndReplayCurrentStatus);
         } else {
             EventCatcher eventCatcher = new EventCatcher(selectedClassesToRecord, recordedEventStore);
-            eventSystem = new EventSystemImpl(library.getEventLibrary(), networkSystem, eventCatcher, recordAndReplayCurrentStatus);
+            eventSystem = new EventSystemImpl(networkSystem.getMode().isAuthority());
+            eventSystem = new NetworkEventSystemDecorator(eventSystem, networkSystem, library.getEventLibrary());
+            eventSystem = new RecordingEventSystemDecorator(eventSystem, eventCatcher, recordAndReplayCurrentStatus);
         }
         return eventSystem;
     }
@@ -160,7 +166,8 @@ public final class EntitySystemSetupUtil {
         for (Class<? extends Component> componentType : environment.getSubtypesOf(Component.class)) {
             if (componentType.getAnnotation(DoNotAutoRegister.class) == null) {
                 String componentName = MetadataUtil.getComponentClassName(componentType);
-                library.register(new ResourceUrn(environment.getModuleProviding(componentType).toString(), componentName), componentType);
+                Name componentModuleName = verifyNotNull(environment.getModuleProviding(componentType), "Could not find module for %s %s", componentName, componentType);
+                library.register(new ResourceUrn(componentModuleName.toString(), componentName), componentType);
             }
         }
     }
@@ -168,7 +175,7 @@ public final class EntitySystemSetupUtil {
     private static void registerEvents(EventSystem eventSystem, ModuleEnvironment environment) {
         for (Class<? extends Event> type : environment.getSubtypesOf(Event.class)) {
             if (type.getAnnotation(DoNotAutoRegister.class) == null) {
-                eventSystem.registerEvent(new SimpleUri(environment.getModuleProviding(type), type.getSimpleName()), type);
+                eventSystem.registerEvent(new ResourceUrn(environment.getModuleProviding(type).toString(), type.getSimpleName()), type);
             }
         }
     }

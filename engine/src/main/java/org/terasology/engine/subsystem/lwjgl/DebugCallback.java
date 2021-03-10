@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.engine.subsystem.lwjgl;
+package org.terasology.engine.core.subsystem.lwjgl;
 
 import org.lwjgl.system.MemoryUtil;
 import org.slf4j.Logger;

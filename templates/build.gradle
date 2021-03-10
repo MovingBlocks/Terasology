@@ -10,6 +10,12 @@ buildscript {
         maven {
             url = uri("https://plugins.gradle.org/m2/")
         }
+        maven {
+            // required to provide runtime dependencies to build-logic.
+            name = "Terasology Artifactory"
+            url = "http://artifactory.terasology.org/artifactory/virtual-repo-live"
+            allowInsecureProtocol = true  // 😱
+        }
     }
 
     dependencies {

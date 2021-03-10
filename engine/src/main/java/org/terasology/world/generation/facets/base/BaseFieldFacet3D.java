@@ -1,11 +1,11 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.world.generation.facets.base;
+package org.terasology.engine.world.generation.facets.base;
 
 import com.google.common.base.Preconditions;
 import org.joml.Vector3ic;
-import org.terasology.world.block.BlockRegionc;
-import org.terasology.world.generation.Border3D;
+import org.terasology.engine.world.block.BlockRegionc;
+import org.terasology.engine.world.generation.Border3D;
 
 /**
  */

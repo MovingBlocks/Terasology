@@ -1,6 +1,6 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.rendering.assets.texture.subtexture;
+package org.terasology.engine.rendering.assets.texture.subtexture;
 
 import org.joml.Vector2i;
 import org.terasology.assets.Asset;
@@ -9,8 +9,8 @@ import org.terasology.assets.ResourceUrn;
 import org.terasology.joml.geom.Rectanglef;
 import org.terasology.joml.geom.Rectanglei;
 import org.terasology.math.TeraMath;
-import org.terasology.rendering.assets.texture.Texture;
-import org.terasology.rendering.assets.texture.TextureRegionAsset;
+import org.terasology.engine.rendering.assets.texture.Texture;
+import org.terasology.engine.rendering.assets.texture.TextureRegionAsset;
 
 import java.util.Optional;
 

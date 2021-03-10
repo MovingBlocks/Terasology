@@ -1,23 +1,23 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.world.block.family;
+package org.terasology.engine.world.block.family;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
-import org.terasology.context.Context;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.world.block.loader.BlockFamilyDefinition;
+import org.terasology.engine.world.block.shapes.BlockShape;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.metadata.ClassLibrary;
 import org.terasology.reflection.metadata.ClassMetadata;
 import org.terasology.reflection.metadata.DefaultClassLibrary;
 import org.terasology.reflection.reflect.ReflectFactory;
-import org.terasology.registry.InjectionHelper;
+import org.terasology.engine.registry.InjectionHelper;
 import org.terasology.util.reflection.ParameterProvider;
 import org.terasology.util.reflection.SimpleClassFactory;
-import org.terasology.world.block.BlockBuilderHelper;
-import org.terasology.world.block.loader.BlockFamilyDefinition;
-import org.terasology.world.block.shapes.BlockShape;
+import org.terasology.engine.world.block.BlockBuilderHelper;
 
 import java.util.Optional;
 

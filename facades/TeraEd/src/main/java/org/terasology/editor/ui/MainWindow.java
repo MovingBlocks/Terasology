@@ -18,8 +18,8 @@ package org.terasology.editor.ui;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.editor.TeraEd;
-import org.terasology.engine.StateChangeSubscriber;
-import org.terasology.engine.TerasologyEngine;
+import org.terasology.engine.core.StateChangeSubscriber;
+import org.terasology.engine.core.TerasologyEngine;
 
 import javax.swing.JFrame;
 import javax.swing.JMenu;

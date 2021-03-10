@@ -1,19 +1,19 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.entitySystem.entity;
+package org.terasology.engine.entitySystem.entity;
 
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.MutableComponentContainer;
-import org.terasology.entitySystem.entity.internal.EngineEntityManager;
-import org.terasology.entitySystem.entity.internal.EngineEntityPool;
-import org.terasology.entitySystem.entity.internal.EntityInfoComponent;
-import org.terasology.entitySystem.entity.internal.EntityScope;
-import org.terasology.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
-import org.terasology.entitySystem.entity.lifecycleEvents.OnAddedComponent;
-import org.terasology.entitySystem.prefab.Prefab;
+import org.terasology.engine.entitySystem.Component;
+import org.terasology.engine.entitySystem.MutableComponentContainer;
+import org.terasology.engine.entitySystem.entity.internal.EngineEntityManager;
+import org.terasology.engine.entitySystem.entity.internal.EngineEntityPool;
+import org.terasology.engine.entitySystem.entity.internal.EntityInfoComponent;
+import org.terasology.engine.entitySystem.entity.internal.EntityScope;
+import org.terasology.engine.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
+import org.terasology.engine.entitySystem.entity.lifecycleEvents.OnAddedComponent;
+import org.terasology.engine.entitySystem.prefab.Prefab;
 
 import java.util.Collections;
 import java.util.List;
@@ -79,7 +79,6 @@ public class EntityBuilder implements MutableComponentContainer {
         if (prefab != null) {
             for (Component component : prefab.iterateComponents()) {
                 Component componentCopy = entityManager.getComponentLibrary().copy(component);
-                //noinspection UnstableApiUsage
                 addComponent(verifyNotNull(componentCopy, "Component %s not registered (in prefab %s)", component, prefab));
             }
             addComponent(new EntityInfoComponent(prefab, prefab.isPersisted(), prefab.isAlwaysRelevant()));

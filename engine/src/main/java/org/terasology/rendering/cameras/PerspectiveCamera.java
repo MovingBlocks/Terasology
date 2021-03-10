@@ -1,17 +1,17 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.rendering.cameras;
+package org.terasology.engine.rendering.cameras;
 
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
-import org.terasology.config.RenderingConfig;
-import org.terasology.engine.subsystem.DisplayDevice;
+import org.terasology.engine.config.RenderingConfig;
+import org.terasology.engine.core.subsystem.DisplayDevice;
 import org.terasology.math.TeraMath;
-import org.terasology.rendering.nui.layers.mainMenu.videoSettings.CameraSetting;
-import org.terasology.world.WorldProvider;
-import org.terasology.world.chunks.Chunks;
+import org.terasology.engine.rendering.nui.layers.mainMenu.videoSettings.CameraSetting;
+import org.terasology.engine.world.WorldProvider;
+import org.terasology.engine.world.chunks.Chunks;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -20,7 +20,7 @@ import java.util.LinkedList;
 
 import static org.lwjgl.opengl.GL11.GL_PROJECTION;
 import static org.lwjgl.opengl.GL11.glMatrixMode;
-import static org.terasology.engine.subsystem.lwjgl.LwjglDisplayDevice.DISPLAY_RESOLUTION_CHANGE;
+import static org.terasology.engine.core.subsystem.lwjgl.LwjglDisplayDevice.DISPLAY_RESOLUTION_CHANGE;
 
 /**
  * Simple default camera.

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.entitySystem.systems;
+package org.terasology.engine.entitySystem.systems;
 
 /**
  * Instances implementing this interface see their methods called at specific stages during the rendering process,

@@ -13,16 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.persistence.internal;
+package org.terasology.engine.persistence.internal;
 
-import org.terasology.entitySystem.entity.internal.EngineEntityManager;
+import org.terasology.engine.entitySystem.entity.internal.EngineEntityManager;
 import org.joml.Vector3i;
-import org.terasology.persistence.ChunkStore;
+import org.terasology.engine.persistence.ChunkStore;
 import org.terasology.protobuf.EntityData;
-import org.terasology.world.block.BlockManager;
-import org.terasology.world.chunks.Chunk;
-import org.terasology.world.chunks.blockdata.ExtraBlockDataManager;
-import org.terasology.world.chunks.internal.ChunkSerializer;
+import org.terasology.engine.world.block.BlockManager;
+import org.terasology.engine.world.chunks.Chunk;
+import org.terasology.engine.world.chunks.blockdata.ExtraBlockDataManager;
+import org.terasology.engine.world.chunks.internal.ChunkSerializer;
 
 /**
  */

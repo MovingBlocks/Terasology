@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package org.terasology.engine.modes.loadProcesses;
+package org.terasology.engine.core.modes.loadProcesses;
 
-import org.terasology.context.Context;
-import org.terasology.engine.EngineTime;
-import org.terasology.engine.Time;
-import org.terasology.engine.modes.VariableStepLoadProcess;
-import org.terasology.rendering.world.WorldRenderer;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.core.EngineTime;
+import org.terasology.engine.core.Time;
+import org.terasology.engine.core.modes.VariableStepLoadProcess;
+import org.terasology.engine.rendering.world.WorldRenderer;
 
 /**
  * Loops until world is pre-generated or 5 seconds elapsed.

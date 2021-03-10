@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.physics.bullet.shapes;
+package org.terasology.engine.physics.bullet.shapes;
 
 import org.joml.Vector3f;
-import org.terasology.physics.shapes.BoxShape;
-import org.terasology.physics.shapes.CollisionShapeFactory;
-import org.terasology.physics.shapes.CompoundShape;
-import org.terasology.physics.shapes.ConvexHullShape;
-import org.terasology.physics.shapes.SphereShape;
+import org.terasology.engine.physics.shapes.BoxShape;
+import org.terasology.engine.physics.shapes.CollisionShapeFactory;
+import org.terasology.engine.physics.shapes.CompoundShape;
+import org.terasology.engine.physics.shapes.ConvexHullShape;
+import org.terasology.engine.physics.shapes.SphereShape;
 
 import java.util.List;
 

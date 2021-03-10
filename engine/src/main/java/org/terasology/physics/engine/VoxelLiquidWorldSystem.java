@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.physics.engine;
+package org.terasology.engine.physics.engine;
 
 import com.badlogic.gdx.physics.bullet.collision.VoxelCollisionAlgorithmWrapper;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionObject;
@@ -28,30 +28,30 @@ import gnu.trove.set.hash.TShortHashSet;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector3ic;
-import org.terasology.entitySystem.entity.EntityManager;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.event.ReceiveEvent;
-import org.terasology.entitySystem.systems.BaseComponentSystem;
-import org.terasology.entitySystem.systems.RegisterSystem;
-import org.terasology.physics.StandardCollisionGroup;
-import org.terasology.physics.bullet.BulletPhysics;
-import org.terasology.physics.bullet.shapes.BulletCollisionShape;
-import org.terasology.registry.In;
-import org.terasology.world.OnChangedBlock;
-import org.terasology.world.WorldComponent;
-import org.terasology.world.WorldProvider;
-import org.terasology.world.block.Block;
-import org.terasology.world.block.BlockComponent;
-import org.terasology.world.chunks.Chunk;
-import org.terasology.world.chunks.ChunkProvider;
-import org.terasology.world.chunks.Chunks;
-import org.terasology.world.chunks.event.BeforeChunkUnload;
-import org.terasology.world.chunks.event.OnChunkLoaded;
+import org.terasology.engine.entitySystem.entity.EntityManager;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.entitySystem.event.ReceiveEvent;
+import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
+import org.terasology.engine.entitySystem.systems.RegisterSystem;
+import org.terasology.engine.physics.StandardCollisionGroup;
+import org.terasology.engine.physics.bullet.BulletPhysics;
+import org.terasology.engine.physics.bullet.shapes.BulletCollisionShape;
+import org.terasology.engine.registry.In;
+import org.terasology.engine.world.OnChangedBlock;
+import org.terasology.engine.world.WorldComponent;
+import org.terasology.engine.world.WorldProvider;
+import org.terasology.engine.world.block.Block;
+import org.terasology.engine.world.block.BlockComponent;
+import org.terasology.engine.world.chunks.Chunk;
+import org.terasology.engine.world.chunks.ChunkProvider;
+import org.terasology.engine.world.chunks.Chunks;
+import org.terasology.engine.world.chunks.event.BeforeChunkUnload;
+import org.terasology.engine.world.chunks.event.OnChunkLoaded;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-import static org.terasology.physics.bullet.BulletPhysics.AABB_SIZE;
+import static org.terasology.engine.physics.bullet.BulletPhysics.AABB_SIZE;
 
 /**
  * Manages voxel shape and updates collision state between Bullet and Terasology for

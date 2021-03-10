@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.entitySystem.systems;
+package org.terasology.engine.entitySystem.systems;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

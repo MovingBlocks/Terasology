@@ -1,11 +1,11 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.world.propagation.light;
+package org.terasology.engine.world.propagation.light;
 
 import org.joml.Vector3ic;
-import org.terasology.world.chunks.ChunkProvider;
-import org.terasology.world.chunks.LitChunk;
-import org.terasology.world.propagation.AbstractFullWorldView;
+import org.terasology.engine.world.chunks.ChunkProvider;
+import org.terasology.engine.world.chunks.LitChunk;
+import org.terasology.engine.world.propagation.AbstractFullWorldView;
 
 /**
  * Gets the sunlight regen values from the chunk.

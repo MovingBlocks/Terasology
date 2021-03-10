@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.audio.nullAudio;
+package org.terasology.engine.audio.nullAudio;
 
 import org.terasology.assets.Asset;
 import org.terasology.assets.AssetType;
 import org.terasology.assets.ResourceUrn;
-import org.terasology.audio.StaticSound;
-import org.terasology.audio.StaticSoundData;
+import org.terasology.engine.audio.StaticSound;
+import org.terasology.engine.audio.StaticSoundData;
 
 import java.util.Optional;
 

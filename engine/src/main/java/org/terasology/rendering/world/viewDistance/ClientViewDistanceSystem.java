@@ -1,24 +1,24 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.rendering.world.viewDistance;
+package org.terasology.engine.rendering.world.viewDistance;
 
-import org.terasology.config.Config;
-import org.terasology.config.RenderingConfig;
-import org.terasology.context.Context;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.event.ReceiveEvent;
-import org.terasology.entitySystem.systems.BaseComponentSystem;
-import org.terasology.entitySystem.systems.RegisterMode;
-import org.terasology.entitySystem.systems.RegisterSystem;
-import org.terasology.i18n.TranslationSystem;
-import org.terasology.i18n.TranslationSystemImpl;
-import org.terasology.logic.notifications.NotificationMessageEvent;
-import org.terasology.logic.players.DecreaseViewDistanceButton;
-import org.terasology.logic.players.IncreaseViewDistanceButton;
-import org.terasology.logic.players.LocalPlayer;
-import org.terasology.network.ClientComponent;
-import org.terasology.registry.In;
-import org.terasology.rendering.world.WorldRenderer;
+import org.terasology.engine.config.Config;
+import org.terasology.engine.config.RenderingConfig;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.entitySystem.event.ReceiveEvent;
+import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
+import org.terasology.engine.entitySystem.systems.RegisterMode;
+import org.terasology.engine.entitySystem.systems.RegisterSystem;
+import org.terasology.engine.i18n.TranslationSystem;
+import org.terasology.engine.i18n.TranslationSystemImpl;
+import org.terasology.engine.logic.notifications.NotificationMessageEvent;
+import org.terasology.engine.logic.players.DecreaseViewDistanceButton;
+import org.terasology.engine.logic.players.IncreaseViewDistanceButton;
+import org.terasology.engine.logic.players.LocalPlayer;
+import org.terasology.engine.network.ClientComponent;
+import org.terasology.engine.registry.In;
+import org.terasology.engine.rendering.world.WorldRenderer;
 
 import java.beans.PropertyChangeListener;
 import java.util.Arrays;

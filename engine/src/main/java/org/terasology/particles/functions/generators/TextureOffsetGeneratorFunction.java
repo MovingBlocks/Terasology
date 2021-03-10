@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.particles.functions.generators;
+package org.terasology.engine.particles.functions.generators;
 
 import org.joml.Vector2f;
-import org.terasology.particles.ParticleData;
-import org.terasology.particles.ParticleDataMask;
-import org.terasology.particles.components.generators.TextureOffsetGeneratorComponent;
-import org.terasology.particles.functions.RegisterParticleSystemFunction;
-import org.terasology.utilities.random.Random;
+import org.terasology.engine.particles.ParticleData;
+import org.terasology.engine.particles.ParticleDataMask;
+import org.terasology.engine.particles.components.generators.TextureOffsetGeneratorComponent;
+import org.terasology.engine.particles.functions.RegisterParticleSystemFunction;
+import org.terasology.engine.utilities.random.Random;
 
 /**
  * Created by Linus on 13-4-2015.

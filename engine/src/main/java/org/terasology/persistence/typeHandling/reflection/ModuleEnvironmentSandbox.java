@@ -1,13 +1,14 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.persistence.typeHandling.reflection;
+package org.terasology.engine.persistence.typeHandling.reflection;
 
-import org.terasology.engine.SimpleUri;
-import org.terasology.engine.module.ModuleManager;
+import org.terasology.engine.core.SimpleUri;
+import org.terasology.engine.core.module.ModuleContext;
+import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.naming.Name;
-import org.terasology.persistence.ModuleContext;
 import org.terasology.persistence.typeHandling.TypeHandler;
+import org.terasology.persistence.typeHandling.reflection.SerializationSandbox;
 import org.terasology.reflection.TypeInfo;
 import org.terasology.reflection.TypeRegistry;
 

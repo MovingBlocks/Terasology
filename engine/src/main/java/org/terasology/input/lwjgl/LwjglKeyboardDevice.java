@@ -1,7 +1,7 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-package org.terasology.input.lwjgl;
+package org.terasology.engine.input.lwjgl;
 
 import com.google.common.collect.Lists;
 import gnu.trove.map.TIntIntMap;
@@ -11,10 +11,6 @@ import gnu.trove.set.hash.TIntHashSet;
 import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.context.Context;
-import org.terasology.engine.subsystem.DisplayDevice;
-import org.terasology.engine.subsystem.lwjgl.LwjglDisplayDevice;
-import org.terasology.engine.subsystem.lwjgl.LwjglGraphics;
 import org.terasology.input.ButtonState;
 import org.terasology.input.Input;
 import org.terasology.input.InputType;

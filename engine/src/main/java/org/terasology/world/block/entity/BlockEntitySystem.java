@@ -1,52 +1,39 @@
-/*
- * Copyright 2013 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-package org.terasology.world.block.entity;
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
+package org.terasology.engine.world.block.entity;
 
 import org.joml.RoundingMode;
 import org.joml.Vector3f;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
-import org.terasology.audio.AudioManager;
-import org.terasology.audio.StaticSound;
-import org.terasology.audio.events.PlaySoundEvent;
-import org.terasology.entitySystem.entity.EntityBuilder;
-import org.terasology.entitySystem.entity.EntityManager;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.event.EventPriority;
-import org.terasology.entitySystem.event.ReceiveEvent;
-import org.terasology.entitySystem.systems.BaseComponentSystem;
-import org.terasology.entitySystem.systems.RegisterSystem;
-import org.terasology.logic.health.DoDestroyEvent;
-import org.terasology.logic.inventory.events.DropItemEvent;
-import org.terasology.logic.inventory.events.GiveItemEvent;
-import org.terasology.logic.location.LocationComponent;
-import org.terasology.physics.events.ImpulseEvent;
-import org.terasology.registry.In;
-import org.terasology.utilities.random.FastRandom;
-import org.terasology.utilities.random.Random;
-import org.terasology.world.WorldProvider;
-import org.terasology.world.block.Block;
-import org.terasology.world.block.BlockComponent;
-import org.terasology.world.block.BlockManager;
-import org.terasology.world.block.entity.damage.BlockDamageModifierComponent;
-import org.terasology.world.block.items.BlockItemFactory;
-import org.terasology.world.block.items.OnBlockToItem;
-import org.terasology.world.block.regions.ActAsBlockComponent;
-import org.terasology.world.block.regions.BlockRegionComponent;
-import org.terasology.world.block.sounds.BlockSounds;
+import org.terasology.engine.audio.AudioManager;
+import org.terasology.engine.audio.StaticSound;
+import org.terasology.engine.audio.events.PlaySoundEvent;
+import org.terasology.engine.entitySystem.entity.EntityBuilder;
+import org.terasology.engine.entitySystem.entity.EntityManager;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.entitySystem.event.EventPriority;
+import org.terasology.engine.entitySystem.event.ReceiveEvent;
+import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
+import org.terasology.engine.entitySystem.systems.RegisterSystem;
+import org.terasology.engine.logic.health.DoDestroyEvent;
+import org.terasology.engine.logic.inventory.events.DropItemEvent;
+import org.terasology.engine.logic.inventory.events.GiveItemEvent;
+import org.terasology.engine.logic.location.LocationComponent;
+import org.terasology.engine.world.block.entity.damage.BlockDamageModifierComponent;
+import org.terasology.engine.world.block.regions.ActAsBlockComponent;
+import org.terasology.engine.world.block.regions.BlockRegionComponent;
+import org.terasology.engine.world.block.sounds.BlockSounds;
+import org.terasology.engine.physics.events.ImpulseEvent;
+import org.terasology.engine.registry.In;
+import org.terasology.engine.utilities.random.FastRandom;
+import org.terasology.engine.utilities.random.Random;
+import org.terasology.engine.world.WorldProvider;
+import org.terasology.engine.world.block.Block;
+import org.terasology.engine.world.block.BlockComponent;
+import org.terasology.engine.world.block.BlockManager;
+import org.terasology.engine.world.block.items.BlockItemFactory;
+import org.terasology.engine.world.block.items.OnBlockToItem;
 
 
 /**
@@ -86,14 +73,14 @@ public class BlockEntitySystem extends BaseComponentSystem {
 
     @ReceiveEvent(priority = EventPriority.PRIORITY_LOW)
     public void doDestroy(DoDestroyEvent event, EntityRef entity, BlockComponent blockComponent) {
-        commonDestroyed(event, entity, blockComponent.block);
+        commonDestroyed(event, entity, blockComponent.getBlock());
         worldProvider.setBlock(blockComponent.getPosition(), blockManager.getBlock(BlockManager.AIR_ID));
     }
 
     @ReceiveEvent(priority = EventPriority.PRIORITY_TRIVIAL)
     public void defaultDropsHandling(CreateBlockDropsEvent event, EntityRef entity, BlockComponent blockComponent) {
         Vector3ic location = blockComponent.getPosition();
-        commonDefaultDropsHandling(event, entity, location, blockComponent.block);
+        commonDefaultDropsHandling(event, entity, location, blockComponent.getBlock());
     }
 
     @ReceiveEvent(priority = EventPriority.PRIORITY_TRIVIAL)

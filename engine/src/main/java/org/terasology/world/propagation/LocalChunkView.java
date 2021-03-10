@@ -1,12 +1,12 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.world.propagation;
+package org.terasology.engine.world.propagation;
 
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
-import org.terasology.world.block.Block;
-import org.terasology.world.chunks.Chunk;
-import org.terasology.world.chunks.Chunks;
+import org.terasology.engine.world.block.Block;
+import org.terasology.engine.world.chunks.Chunk;
+import org.terasology.engine.world.chunks.Chunks;
 
 /**
  * Provides a simple view over some chunks using a propagation rule.

@@ -13,18 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.persistence.internal;
+package org.terasology.engine.persistence.internal;
 
 import com.google.common.collect.Maps;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
-import org.terasology.entitySystem.entity.internal.EngineEntityManager;
-import org.terasology.game.GameManifest;
+import org.terasology.engine.entitySystem.entity.internal.EngineEntityManager;
+import org.terasology.engine.game.GameManifest;
 import org.terasology.protobuf.EntityData;
-import org.terasology.recording.RecordAndReplayCurrentStatus;
-import org.terasology.recording.RecordAndReplaySerializer;
-import org.terasology.recording.RecordAndReplayUtils;
-import org.terasology.world.chunks.internal.ChunkImpl;
+import org.terasology.engine.recording.RecordAndReplayCurrentStatus;
+import org.terasology.engine.recording.RecordAndReplaySerializer;
+import org.terasology.engine.recording.RecordAndReplayUtils;
+import org.terasology.engine.world.chunks.internal.ChunkImpl;
 
 import java.util.Map;
 import java.util.concurrent.locks.Lock;

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.entitySystem.entity.internal;
+package org.terasology.engine.entitySystem.entity.internal;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.MapMaker;
@@ -21,21 +21,21 @@ import org.joml.Quaternionfc;
 import org.joml.Vector3fc;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.entity.EntityBuilder;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.entity.lifecycleEvents.BeforeDeactivateComponent;
-import org.terasology.entitySystem.entity.lifecycleEvents.BeforeRemoveComponent;
-import org.terasology.entitySystem.event.internal.EventSystem;
-import org.terasology.entitySystem.prefab.Prefab;
-import org.terasology.logic.location.LocationComponent;
+import org.terasology.engine.entitySystem.Component;
+import org.terasology.engine.entitySystem.entity.EntityBuilder;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.entitySystem.entity.lifecycleEvents.BeforeDeactivateComponent;
+import org.terasology.engine.entitySystem.entity.lifecycleEvents.BeforeRemoveComponent;
+import org.terasology.engine.entitySystem.event.internal.EventSystem;
+import org.terasology.engine.entitySystem.prefab.Prefab;
+import org.terasology.engine.logic.location.LocationComponent;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 
-import static org.terasology.entitySystem.entity.internal.PojoEntityManager.NULL_ID;
+import static org.terasology.engine.entitySystem.entity.internal.PojoEntityManager.NULL_ID;
 
 public class PojoEntityPool implements EngineEntityPool {
 

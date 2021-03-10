@@ -1,17 +1,17 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-package org.terasology.world.internal;
+package org.terasology.engine.world.internal;
 
 import org.joml.RoundingMode;
 import org.joml.Vector3fc;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
-import org.terasology.world.WorldChangeListener;
-import org.terasology.world.WorldProvider;
-import org.terasology.world.block.Block;
-import org.terasology.world.block.BlockRegionc;
-import org.terasology.world.chunks.blockdata.ExtraBlockDataManager;
+import org.terasology.engine.world.WorldChangeListener;
+import org.terasology.engine.world.WorldProvider;
+import org.terasology.engine.world.block.Block;
+import org.terasology.engine.world.block.BlockRegionc;
+import org.terasology.engine.world.chunks.blockdata.ExtraBlockDataManager;
 
 import java.util.Collection;
 

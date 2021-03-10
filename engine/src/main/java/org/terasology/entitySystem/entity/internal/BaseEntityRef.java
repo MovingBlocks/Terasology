@@ -13,28 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.entitySystem.entity.internal;
+package org.terasology.engine.entitySystem.entity.internal;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.entity.LowLevelEntityManager;
-import org.terasology.entitySystem.event.Event;
-import org.terasology.entitySystem.prefab.Prefab;
-import org.terasology.entitySystem.sectors.SectorSimulationComponent;
-import org.terasology.network.NetworkComponent;
-import org.terasology.persistence.serializers.EntityDataJSONFormat;
-import org.terasology.persistence.serializers.EntitySerializer;
+import org.terasology.engine.entitySystem.Component;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.entitySystem.entity.LowLevelEntityManager;
+import org.terasology.engine.entitySystem.event.Event;
+import org.terasology.engine.entitySystem.prefab.Prefab;
+import org.terasology.engine.entitySystem.sectors.SectorSimulationComponent;
+import org.terasology.engine.network.NetworkComponent;
+import org.terasology.engine.persistence.serializers.EntityDataJSONFormat;
+import org.terasology.engine.persistence.serializers.EntitySerializer;
 
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Collections;
 import java.util.List;
 
-import static org.terasology.entitySystem.entity.internal.EntityScope.CHUNK;
-import static org.terasology.entitySystem.entity.internal.EntityScope.GLOBAL;
-import static org.terasology.entitySystem.entity.internal.EntityScope.SECTOR;
+import static org.terasology.engine.entitySystem.entity.internal.EntityScope.CHUNK;
+import static org.terasology.engine.entitySystem.entity.internal.EntityScope.GLOBAL;
+import static org.terasology.engine.entitySystem.entity.internal.EntityScope.SECTOR;
 
 /**
  */

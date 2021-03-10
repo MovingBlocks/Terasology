@@ -13,21 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.identity.storageServiceClient;
+package org.terasology.engine.identity.storageServiceClient;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.config.Config;
-import org.terasology.config.IdentityStorageServiceConfig;
-import org.terasology.config.SecurityConfig;
-import org.terasology.context.Context;
-import org.terasology.i18n.TranslationSystem;
-import org.terasology.identity.ClientIdentity;
-import org.terasology.identity.PublicIdentityCertificate;
-import org.terasology.logic.console.Console;
-import org.terasology.logic.console.CoreMessageType;
+import org.terasology.engine.config.Config;
+import org.terasology.engine.config.IdentityStorageServiceConfig;
+import org.terasology.engine.config.SecurityConfig;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.i18n.TranslationSystem;
+import org.terasology.engine.identity.ClientIdentity;
+import org.terasology.engine.identity.PublicIdentityCertificate;
+import org.terasology.engine.logic.console.Console;
+import org.terasology.engine.logic.console.CoreMessageType;
 
 import java.net.URL;
 import java.util.ArrayDeque;

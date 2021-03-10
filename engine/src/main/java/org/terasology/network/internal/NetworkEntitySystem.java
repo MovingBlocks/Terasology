@@ -14,21 +14,21 @@
  * limitations under the License.
  */
 
-package org.terasology.network.internal;
+package org.terasology.engine.network.internal;
 
-import org.terasology.entitySystem.entity.EntityManager;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.entity.internal.EntityInfoComponent;
-import org.terasology.entitySystem.entity.lifecycleEvents.BeforeDeactivateComponent;
-import org.terasology.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
-import org.terasology.entitySystem.entity.lifecycleEvents.OnChangedComponent;
-import org.terasology.entitySystem.event.EventPriority;
-import org.terasology.entitySystem.event.ReceiveEvent;
-import org.terasology.entitySystem.systems.BaseComponentSystem;
-import org.terasology.entitySystem.systems.RegisterMode;
-import org.terasology.network.NetworkComponent;
-import org.terasology.registry.In;
-import org.terasology.rendering.world.WorldRenderer;
+import org.terasology.engine.entitySystem.entity.EntityManager;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.entitySystem.entity.internal.EntityInfoComponent;
+import org.terasology.engine.entitySystem.entity.lifecycleEvents.BeforeDeactivateComponent;
+import org.terasology.engine.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
+import org.terasology.engine.entitySystem.entity.lifecycleEvents.OnChangedComponent;
+import org.terasology.engine.entitySystem.event.EventPriority;
+import org.terasology.engine.entitySystem.event.ReceiveEvent;
+import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
+import org.terasology.engine.entitySystem.systems.RegisterMode;
+import org.terasology.engine.network.NetworkComponent;
+import org.terasology.engine.registry.In;
+import org.terasology.engine.rendering.world.WorldRenderer;
 
 /**
  * This system handles a number of events relevant to the Network System:

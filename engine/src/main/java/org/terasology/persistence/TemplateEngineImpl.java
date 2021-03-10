@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.persistence;
+package org.terasology.engine.persistence;
 
 import java.util.function.Function;
 import java.util.regex.Matcher;

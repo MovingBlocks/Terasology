@@ -1,26 +1,26 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.world.block.internal;
+package org.terasology.engine.world.block.internal;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 import org.joml.Quaternionf;
 import org.joml.Vector2f;
-import org.terasology.math.Rotation;
-import org.terasology.math.Side;
-import org.terasology.utilities.Assets;
-import org.terasology.world.block.Block;
-import org.terasology.world.block.BlockAppearance;
-import org.terasology.world.block.BlockBuilderHelper;
-import org.terasology.world.block.BlockPart;
-import org.terasology.world.block.BlockUri;
-import org.terasology.world.block.family.BlockFamily;
-import org.terasology.world.block.loader.BlockFamilyDefinition;
-import org.terasology.world.block.loader.SectionDefinitionData;
-import org.terasology.world.block.shapes.BlockMeshPart;
-import org.terasology.world.block.shapes.BlockShape;
-import org.terasology.world.block.tiles.BlockTile;
-import org.terasology.world.block.tiles.WorldAtlas;
+import org.terasology.engine.math.Rotation;
+import org.terasology.engine.math.Side;
+import org.terasology.engine.utilities.Assets;
+import org.terasology.engine.world.block.Block;
+import org.terasology.engine.world.block.BlockAppearance;
+import org.terasology.engine.world.block.BlockBuilderHelper;
+import org.terasology.engine.world.block.BlockPart;
+import org.terasology.engine.world.block.BlockUri;
+import org.terasology.engine.world.block.family.BlockFamily;
+import org.terasology.engine.world.block.loader.BlockFamilyDefinition;
+import org.terasology.engine.world.block.loader.SectionDefinitionData;
+import org.terasology.engine.world.block.shapes.BlockMeshPart;
+import org.terasology.engine.world.block.shapes.BlockShape;
+import org.terasology.engine.world.block.tiles.BlockTile;
+import org.terasology.engine.world.block.tiles.WorldAtlas;
 
 import java.util.Map;
 

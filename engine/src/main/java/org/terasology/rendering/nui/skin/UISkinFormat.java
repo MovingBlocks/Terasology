@@ -1,6 +1,6 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.rendering.nui.skin;
+package org.terasology.engine.rendering.nui.skin;
 
 import com.google.common.base.Charsets;
 import com.google.gson.Gson;
@@ -16,6 +16,7 @@ import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.format.AbstractAssetFileFormat;
 import org.terasology.assets.format.AssetDataFile;
 import org.terasology.assets.module.annotations.RegisterAssetFileFormat;
+import org.terasology.engine.core.module.ModuleContext;
 import org.terasology.nui.Color;
 import org.terasology.nui.UITextureRegion;
 import org.terasology.nui.UIWidget;
@@ -24,16 +25,15 @@ import org.terasology.nui.skin.UISkin;
 import org.terasology.nui.skin.UISkinBuilder;
 import org.terasology.nui.skin.UISkinData;
 import org.terasology.nui.skin.UIStyleFragment;
-import org.terasology.persistence.ModuleContext;
-import org.terasology.persistence.typeHandling.extensionTypes.ColorTypeHandler;
-import org.terasology.persistence.typeHandling.gson.GsonTypeHandlerAdapterFactory;
+import org.terasology.engine.persistence.typeHandling.extensionTypes.ColorTypeHandler;
+import org.terasology.engine.persistence.typeHandling.gson.GsonTypeHandlerAdapterFactory;
 import org.terasology.reflection.metadata.ClassLibrary;
 import org.terasology.reflection.metadata.ClassMetadata;
-import org.terasology.registry.CoreRegistry;
-import org.terasology.rendering.nui.NUIManager;
-import org.terasology.utilities.Assets;
-import org.terasology.utilities.gson.AssetTypeAdapter;
-import org.terasology.utilities.gson.CaseInsensitiveEnumTypeAdapterFactory;
+import org.terasology.engine.registry.CoreRegistry;
+import org.terasology.engine.rendering.nui.NUIManager;
+import org.terasology.engine.utilities.Assets;
+import org.terasology.engine.utilities.gson.AssetTypeAdapter;
+import org.terasology.engine.utilities.gson.CaseInsensitiveEnumTypeAdapterFactory;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -54,7 +54,7 @@ public class UISkinFormat extends AbstractAssetFileFormat<UISkinData> {
         super("skin");
         gson = new GsonBuilder()
             .registerTypeAdapterFactory(new CaseInsensitiveEnumTypeAdapterFactory())
-            .registerTypeAdapter(Font.class, new AssetTypeAdapter<>(org.terasology.rendering.assets.font.Font.class))
+            .registerTypeAdapter(Font.class, new AssetTypeAdapter<>(org.terasology.engine.rendering.assets.font.Font.class))
             .registerTypeAdapter(UISkinData.class, new UISkinTypeAdapter())
             .registerTypeAdapter(UITextureRegion.class, new TextureRegionTypeAdapter())
             .registerTypeAdapterFactory(new GsonTypeHandlerAdapterFactory() {
