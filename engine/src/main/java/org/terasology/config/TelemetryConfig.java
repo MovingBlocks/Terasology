@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.config;
+package org.terasology.engine.config;
 
-import org.terasology.telemetry.TelemetryEmitter;
-import org.terasology.telemetry.logstash.TelemetryLogstashAppender;
+import org.terasology.engine.telemetry.TelemetryEmitter;
+import org.terasology.engine.telemetry.logstash.TelemetryLogstashAppender;
 
-import static org.terasology.telemetry.TelemetryEmitter.DEFAULT_COLLECTOR_HOST;
-import static org.terasology.telemetry.TelemetryEmitter.DEFAULT_COLLECTOR_PORT;
-import static org.terasology.telemetry.TelemetryEmitter.DEFAULT_COLLECTOR_PROTOCOL;
+import static org.terasology.engine.telemetry.TelemetryEmitter.DEFAULT_COLLECTOR_HOST;
+import static org.terasology.engine.telemetry.TelemetryEmitter.DEFAULT_COLLECTOR_PORT;
+import static org.terasology.engine.telemetry.TelemetryEmitter.DEFAULT_COLLECTOR_PROTOCOL;
 
 /**
  * Configuration (authorisation) for telemetry system.

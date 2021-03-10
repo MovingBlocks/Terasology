@@ -1,19 +1,6 @@
-/*
- * Copyright 2013 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-package org.terasology.world.block.tiles;
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
+package org.terasology.engine.world.block.tiles;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -22,25 +9,27 @@ import com.google.common.math.IntMath;
 import de.matthiasmann.twl.utils.PNGDecoder;
 import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
+import org.joml.Vector2f;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
-import org.terasology.engine.paths.PathManager;
+import org.terasology.engine.core.paths.PathManager;
+import org.terasology.joml.geom.Rectanglef;
 import org.terasology.math.TeraMath;
-import org.terasology.math.geom.Rect2f;
-import org.terasology.math.geom.Vector2f;
 import org.terasology.naming.Name;
-import org.terasology.rendering.assets.atlas.Atlas;
-import org.terasology.rendering.assets.atlas.AtlasData;
-import org.terasology.rendering.assets.material.Material;
-import org.terasology.rendering.assets.material.MaterialData;
-import org.terasology.rendering.assets.texture.Texture;
-import org.terasology.rendering.assets.texture.TextureData;
-import org.terasology.rendering.assets.texture.subtexture.SubtextureData;
-import org.terasology.utilities.Assets;
+import org.terasology.engine.rendering.assets.atlas.Atlas;
+import org.terasology.engine.rendering.assets.atlas.AtlasData;
+import org.terasology.engine.rendering.assets.material.Material;
+import org.terasology.engine.rendering.assets.material.MaterialData;
+import org.terasology.engine.rendering.assets.texture.Texture;
+import org.terasology.engine.rendering.assets.texture.TextureData;
+import org.terasology.engine.rendering.assets.texture.subtexture.SubtextureData;
+import org.terasology.engine.utilities.Assets;
 
 import javax.imageio.ImageIO;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
@@ -117,7 +106,7 @@ public class WorldAtlasImpl implements WorldAtlas {
     /**
      * Obtains the tex coords of a block tile. If it isn't part of the atlas it is added to the atlas.
      *
-     * @param uri         The uri of the block tile of interest.
+     * @param uri The uri of the block tile of interest.
      * @param warnOnError Whether a warning should be logged if the asset canot be found
      * @return The tex coords of the tile in the atlas.
      */
@@ -185,9 +174,9 @@ public class WorldAtlasImpl implements WorldAtlas {
     }
 
     private boolean checkTile(BlockTile tile) {
-        for (int i=0; i<tile.getLength(); i++) {
+        for (int i = 0; i < tile.getLength(); i++) {
             if (tile.getImage(i).getWidth() != tile.getImage(i).getHeight()
-               || !IntMath.isPowerOfTwo(tile.getImage(i).getWidth())) {
+                || !IntMath.isPowerOfTwo(tile.getImage(i).getWidth())) {
                 return false;
             }
         }
@@ -206,7 +195,7 @@ public class WorldAtlasImpl implements WorldAtlas {
             }
         }
         // intentionally pad this list with null so that the indexes match the main atlas
-        for (int i=0; i<length; i++) {
+        for (int i = 0; i < length; i++) {
             list.add(null);
         }
     }
@@ -242,7 +231,7 @@ public class WorldAtlasImpl implements WorldAtlas {
         final Vector2f texSize = new Vector2f(getRelativeTileSize(), getRelativeTileSize());
         tileIndexes.forEachEntry((tileUri, index) -> {
             Vector2f coords = getTexCoords(index);
-            SubtextureData subtextureData = new SubtextureData(texture, Rect2f.createFromMinAndSize(coords, texSize));
+            SubtextureData subtextureData = new SubtextureData(texture, new Rectanglef(coords, coords).setSize(texSize));
 
             Map<Name, SubtextureData> textureAtlas = textureAtlases.get(tileUri.getModuleName());
             if (textureAtlas == null) {
@@ -348,7 +337,7 @@ public class WorldAtlasImpl implements WorldAtlas {
 
         g.setColor(clearColor);
         g.fillRect(0, 0, size, size);
-        
+
         int totalIndex = 0;
         for (int tileIndex = 0; tileIndex < tileImages.size(); tileIndex++) {
             BlockTile tile = tileImages.get(tileIndex);

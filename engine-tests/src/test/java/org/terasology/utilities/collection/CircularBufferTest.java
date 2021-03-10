@@ -18,6 +18,7 @@ package org.terasology.utilities.collection;
 import com.google.common.collect.ImmutableList;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.terasology.engine.utilities.collection.CircularBuffer;
 
 import java.util.Collection;
 import java.util.Iterator;

@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package org.terasology.config;
+package org.terasology.engine.config;
 
-import org.terasology.engine.subsystem.Resolution;
+import org.terasology.engine.core.subsystem.Resolution;
 import org.terasology.module.sandbox.API;
-import org.terasology.rendering.cameras.PerspectiveCameraSettings;
-import org.terasology.rendering.nui.layers.mainMenu.videoSettings.DisplayModeSetting;
-import org.terasology.rendering.nui.layers.mainMenu.videoSettings.ScreenshotSize;
-import org.terasology.rendering.world.viewDistance.ViewDistance;
-import org.terasology.utilities.subscribables.AbstractSubscribable;
+import org.terasology.engine.rendering.cameras.PerspectiveCameraSettings;
+import org.terasology.engine.rendering.nui.layers.mainMenu.videoSettings.DisplayModeSetting;
+import org.terasology.engine.rendering.nui.layers.mainMenu.videoSettings.ScreenshotSize;
+import org.terasology.engine.rendering.world.viewDistance.ViewDistance;
+import org.terasology.engine.utilities.subscribables.AbstractSubscribable;
 
 import java.beans.PropertyChangeListener;
 
@@ -38,6 +38,7 @@ public class RenderingConfig extends AbstractSubscribable {
     public static final String RESOLUTION = "Resolution";
     public static final String ANIMATED_MENU = "AnimatedMenu";
     public static final String VIEW_DISTANCE = "viewDistance";
+    public static final String CHUNK_LODS = "chunkLods";
     public static final String FLICKERING_LIGHT = "FlickeringLight";
     public static final String ANIMATE_GRASS = "AnimateGrass";
     public static final String ANIMATE_WATER = "AnimateWater";
@@ -87,6 +88,7 @@ public class RenderingConfig extends AbstractSubscribable {
     private Resolution resolution;
     private boolean animatedMenu;
     private ViewDistance viewDistance;
+    private float chunkLods;
     private boolean flickeringLight;
     private boolean animateGrass;
     private boolean animateWater;
@@ -269,6 +271,16 @@ public class RenderingConfig extends AbstractSubscribable {
         ViewDistance oldDistance = this.viewDistance;
         this.viewDistance = viewDistance;
         propertyChangeSupport.firePropertyChange(VIEW_DISTANCE, oldDistance, viewDistance);
+    }
+
+    public float getChunkLods() {
+        return chunkLods;
+    }
+
+    public void setChunkLods(float chunkLods) {
+        float oldLods = this.chunkLods;
+        this.chunkLods = chunkLods;
+        propertyChangeSupport.firePropertyChange(CHUNK_LODS, oldLods, chunkLods);
     }
 
     public boolean isFlickeringLight() {

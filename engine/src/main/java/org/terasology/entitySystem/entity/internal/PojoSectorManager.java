@@ -13,18 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.entitySystem.entity.internal;
+package org.terasology.engine.entitySystem.entity.internal;
 
 import com.google.common.collect.Iterables;
 import org.joml.Quaternionfc;
 import org.joml.Vector3fc;
-import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.entity.EntityBuilder;
-import org.terasology.entitySystem.entity.EntityPool;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.prefab.Prefab;
-import org.terasology.math.geom.Quat4f;
-import org.terasology.math.geom.Vector3f;
+import org.terasology.engine.entitySystem.Component;
+import org.terasology.engine.entitySystem.entity.EntityBuilder;
+import org.terasology.engine.entitySystem.entity.EntityPool;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.entitySystem.prefab.Prefab;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -101,28 +99,13 @@ public class PojoSectorManager implements EngineSectorManager {
     }
 
     @Override
-    public EntityRef create(String prefab, Vector3f position) {
-        return getPool().create(prefab, position);
-    }
-
-    @Override
     public EntityRef create(String prefab, Vector3fc position) {
-        return getPool().create(prefab, position);
-    }
-
-    @Override
-    public EntityRef create(Prefab prefab, Vector3f position) {
         return getPool().create(prefab, position);
     }
 
     @Override
     public EntityRef create(Prefab prefab, Vector3fc position) {
         return getPool().create(prefab, position);
-    }
-
-    @Override
-    public EntityRef create(Prefab prefab, Vector3f position, Quat4f rotation) {
-        return getPool().create(prefab, position, rotation);
     }
 
     @Override

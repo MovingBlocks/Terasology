@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.network.internal;
+package org.terasology.engine.network.internal;
 
-import org.terasology.entitySystem.entity.LowLevelEntityManager;
-import org.terasology.entitySystem.entity.internal.BaseEntityRef;
-import org.terasology.entitySystem.entity.internal.DefaultRefStrategy;
-import org.terasology.network.NetworkComponent;
+import org.terasology.engine.entitySystem.entity.LowLevelEntityManager;
+import org.terasology.engine.entitySystem.entity.internal.BaseEntityRef;
+import org.terasology.engine.entitySystem.entity.internal.DefaultRefStrategy;
+import org.terasology.engine.network.NetworkComponent;
 
 /**
  */

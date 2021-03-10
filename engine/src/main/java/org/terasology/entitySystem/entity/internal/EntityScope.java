@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.entitySystem.entity.internal;
+package org.terasology.engine.entitySystem.entity.internal;
 
 import org.terasology.module.sandbox.API;
 

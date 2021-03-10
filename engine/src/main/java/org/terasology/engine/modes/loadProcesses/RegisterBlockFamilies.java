@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.engine.modes.loadProcesses;
+package org.terasology.engine.core.modes.loadProcesses;
 
-import org.terasology.context.Context;
-import org.terasology.engine.modes.SingleStepLoadProcess;
-import org.terasology.registry.InjectionHelper;
-import org.terasology.world.block.BlockManager;
-import org.terasology.world.block.family.BlockFamily;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.core.modes.SingleStepLoadProcess;
+import org.terasology.engine.registry.InjectionHelper;
+import org.terasology.engine.world.block.BlockManager;
+import org.terasology.engine.world.block.family.BlockFamily;
 
 public class RegisterBlockFamilies  extends SingleStepLoadProcess {
     private final Context context;

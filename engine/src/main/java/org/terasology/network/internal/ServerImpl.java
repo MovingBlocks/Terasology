@@ -1,7 +1,7 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-package org.terasology.network.internal;
+package org.terasology.engine.network.internal;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.HashMultimap;
@@ -18,39 +18,37 @@ import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.engine.EngineTime;
-import org.terasology.engine.Time;
-import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.entity.internal.EngineEntityManager;
-import org.terasology.entitySystem.event.Event;
-import org.terasology.math.ChunkMath;
-import org.terasology.math.JomlUtil;
-import org.terasology.network.NetMetricSource;
-import org.terasology.network.NetworkComponent;
-import org.terasology.network.Server;
-import org.terasology.network.ServerInfoMessage;
-import org.terasology.network.serialization.ClientComponentFieldCheck;
-import org.terasology.persistence.serializers.EventSerializer;
-import org.terasology.persistence.serializers.NetworkEntitySerializer;
+import org.terasology.engine.core.EngineTime;
+import org.terasology.engine.core.Time;
+import org.terasology.engine.entitySystem.Component;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.entitySystem.entity.internal.EngineEntityManager;
+import org.terasology.engine.entitySystem.event.Event;
+import org.terasology.engine.network.NetMetricSource;
+import org.terasology.engine.network.NetworkComponent;
+import org.terasology.engine.network.Server;
+import org.terasology.engine.network.ServerInfoMessage;
+import org.terasology.engine.network.serialization.ClientComponentFieldCheck;
+import org.terasology.engine.persistence.serializers.EventSerializer;
+import org.terasology.engine.persistence.serializers.NetworkEntitySerializer;
+import org.terasology.engine.registry.CoreRegistry;
+import org.terasology.engine.world.BlockEntityRegistry;
+import org.terasology.engine.world.WorldProvider;
+import org.terasology.engine.world.block.Block;
+import org.terasology.engine.world.block.BlockComponent;
+import org.terasology.engine.world.block.BlockManager;
+import org.terasology.engine.world.block.BlockUri;
+import org.terasology.engine.world.block.BlockUriParseException;
+import org.terasology.engine.world.block.internal.BlockManagerImpl;
+import org.terasology.engine.world.chunks.Chunk;
+import org.terasology.engine.world.chunks.Chunks;
+import org.terasology.engine.world.chunks.blockdata.ExtraBlockDataManager;
+import org.terasology.engine.world.chunks.internal.ChunkSerializer;
+import org.terasology.engine.world.chunks.remoteChunkProvider.RemoteChunkProvider;
 import org.terasology.persistence.typeHandling.DeserializationException;
 import org.terasology.persistence.typeHandling.SerializationException;
 import org.terasology.protobuf.EntityData;
 import org.terasology.protobuf.NetData;
-import org.terasology.registry.CoreRegistry;
-import org.terasology.world.BlockEntityRegistry;
-import org.terasology.world.WorldProvider;
-import org.terasology.world.block.Block;
-import org.terasology.world.block.BlockComponent;
-import org.terasology.world.block.BlockManager;
-import org.terasology.world.block.BlockUri;
-import org.terasology.world.block.BlockUriParseException;
-import org.terasology.world.block.internal.BlockManagerImpl;
-import org.terasology.world.chunks.Chunk;
-import org.terasology.world.chunks.Chunks;
-import org.terasology.world.chunks.blockdata.ExtraBlockDataManager;
-import org.terasology.world.chunks.internal.ChunkSerializer;
-import org.terasology.world.chunks.remoteChunkProvider.RemoteChunkProvider;
 
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
@@ -318,7 +316,7 @@ public class ServerImpl implements Server {
     private void processInvalidatedChunks(NetData.NetMessage message) {
         for (NetData.InvalidateChunkMessage chunk : message.getInvalidateChunkList()) {
             Vector3i chunkPos = NetMessageUtil.convert(chunk.getPos());
-            remoteWorldProvider.invalidateChunks(JomlUtil.from(chunkPos));
+            remoteWorldProvider.invalidateChunks(chunkPos);
             awaitingChunkReadyBlockUpdates.removeAll(chunkPos);
             awaitingChunkReadyExtraDataUpdates.removeAll(chunkPos);
         }
@@ -367,7 +365,7 @@ public class ServerImpl implements Server {
             entitySerializer.deserializeOnto(currentEntity, updateEntity.getEntity());
             BlockComponent blockComponent = currentEntity.getComponent(BlockComponent.class);
             if (blockComponent != null && !blockEntityBefore) {
-                if (!blockEntityRegistry.getExistingBlockEntityAt(blockComponent.position).equals(currentEntity)) {
+                if (!blockEntityRegistry.getExistingBlockEntityAt(blockComponent.getPosition()).equals(currentEntity)) {
                     logger.error("Failed to associated new block entity");
                 }
             }

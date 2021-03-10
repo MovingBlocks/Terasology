@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.entitySystem;
+package org.terasology.engine.entitySystem;
 
 /**
  * A Component is (a collection of) <b>data</b> that
  * <ul>
  *     <li> can be attached to/carried by an entity, and</li>
- *     <li> can be inspected and/or edited by one or more {@link org.terasology.entitySystem.systems.ComponentSystem}s.</li>
+ *     <li> can be inspected and/or edited by one or more {@link org.terasology.engine.entitySystem.systems.ComponentSystem}s.</li>
  * </ul>
  *
  */

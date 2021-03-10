@@ -1,43 +1,30 @@
-/*
- * Copyright 2015 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-package org.terasology.logic.behavior.nui;
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
+package org.terasology.engine.logic.behavior.nui;
 
 import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.context.Context;
-import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.logic.behavior.BehaviorComponent;
-import org.terasology.logic.behavior.BehaviorSystem;
-import org.terasology.logic.behavior.Interpreter;
-import org.terasology.logic.behavior.asset.BehaviorTree;
-import org.terasology.logic.behavior.core.ActionNode;
-import org.terasology.logic.behavior.core.BehaviorNode;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.entitySystem.Component;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.logic.behavior.asset.BehaviorTree;
+import org.terasology.engine.logic.behavior.core.ActionNode;
+import org.terasology.engine.logic.behavior.core.BehaviorNode;
+import org.terasology.engine.logic.behavior.BehaviorComponent;
+import org.terasology.engine.logic.behavior.BehaviorSystem;
+import org.terasology.engine.logic.behavior.Interpreter;
 import org.terasology.nui.WidgetUtil;
 import org.terasology.nui.widgets.UIDropdown;
 import org.terasology.nui.widgets.UIList;
 import org.terasology.reflection.reflect.ReflectFactory;
-import org.terasology.registry.In;
-import org.terasology.rendering.nui.CoreScreenLayer;
-import org.terasology.rendering.nui.NUIManager;
+import org.terasology.engine.registry.In;
+import org.terasology.engine.rendering.nui.CoreScreenLayer;
+import org.terasology.engine.rendering.nui.NUIManager;
 import org.terasology.nui.databinding.Binding;
 import org.terasology.nui.databinding.ReadOnlyBinding;
 import org.terasology.nui.itemRendering.ToStringTextRenderer;
-import org.terasology.rendering.nui.layers.mainMenu.EnterTextPopup;
+import org.terasology.engine.rendering.nui.layers.mainMenu.EnterTextPopup;
 import org.terasology.nui.layouts.PropertyLayout;
 import org.terasology.nui.properties.OneOfProviderFactory;
 import org.terasology.nui.properties.Property;

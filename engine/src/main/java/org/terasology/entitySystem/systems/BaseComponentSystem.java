@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.entitySystem.systems;
+package org.terasology.engine.entitySystem.systems;
 
 /**
- * Abstract class implementing the {@link org.terasology.entitySystem.systems.ComponentSystem} interface.
+ * Abstract class implementing the {@link org.terasology.engine.entitySystem.systems.ComponentSystem} interface.
  * All interface method implementations are empty/NO-OP.
  *
  */

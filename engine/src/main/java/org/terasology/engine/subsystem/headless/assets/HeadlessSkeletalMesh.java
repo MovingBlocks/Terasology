@@ -13,15 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.engine.subsystem.headless.assets;
+package org.terasology.engine.core.subsystem.headless.assets;
 
 import org.terasology.assets.Asset;
 import org.terasology.assets.AssetType;
 import org.terasology.assets.ResourceUrn;
-import org.terasology.math.AABB;
-import org.terasology.rendering.assets.skeletalmesh.Bone;
-import org.terasology.rendering.assets.skeletalmesh.SkeletalMesh;
-import org.terasology.rendering.assets.skeletalmesh.SkeletalMeshData;
+import org.terasology.joml.geom.AABBf;
+import org.terasology.engine.rendering.assets.skeletalmesh.Bone;
+import org.terasology.engine.rendering.assets.skeletalmesh.SkeletalMesh;
+import org.terasology.engine.rendering.assets.skeletalmesh.SkeletalMeshData;
 
 import java.util.Collection;
 import java.util.Optional;
@@ -61,7 +61,7 @@ public class HeadlessSkeletalMesh extends SkeletalMesh {
     }
 
     @Override
-    public AABB getStaticAabb() {
+    public AABBf getStaticAabb() {
         return data.getStaticAABB();
     }
 }

@@ -10,9 +10,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.terasology.MockedPathManager;
-import org.terasology.engine.paths.PathManager;
-import org.terasology.game.GameManifest;
+import org.terasology.engine.MockedPathManager;
+import org.terasology.engine.core.paths.PathManager;
+import org.terasology.engine.game.GameManifest;
+import org.terasology.engine.rendering.nui.layers.mainMenu.savedGames.GameInfo;
+import org.terasology.engine.rendering.nui.layers.mainMenu.savedGames.GameProvider;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -77,7 +79,6 @@ public class GameProviderTest implements MockedPathManager {
 
         final File file = new File(GameProviderTest.class.getClassLoader().getResource(GAME_MANIFEST_JSON).getFile());
         try {
-            //noinspection UnstableApiUsage
             manifestExample = com.google.common.io.Files.asCharSource(file, Charsets.UTF_8).read();
         } catch (IOException e) {
             fail("Could not load input file");

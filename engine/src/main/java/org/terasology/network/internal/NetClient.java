@@ -1,7 +1,7 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-package org.terasology.network.internal;
+package org.terasology.engine.network.internal;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.LinkedHashMultimap;
@@ -20,41 +20,40 @@ import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.engine.Time;
-import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.entity.EntityManager;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.event.Event;
-import org.terasology.entitySystem.metadata.EventLibrary;
-import org.terasology.entitySystem.metadata.EventMetadata;
-import org.terasology.entitySystem.metadata.NetworkEventType;
-import org.terasology.identity.PublicIdentityCertificate;
-import org.terasology.logic.characters.PredictionSystem;
-import org.terasology.logic.common.DisplayNameComponent;
-import org.terasology.logic.location.LocationComponent;
-import org.terasology.math.ChunkMath;
-import org.terasology.math.JomlUtil;
-import org.terasology.network.Client;
-import org.terasology.network.ClientComponent;
-import org.terasology.network.ColorComponent;
-import org.terasology.network.NetMetricSource;
-import org.terasology.network.NetworkComponent;
-import org.terasology.network.serialization.ServerComponentFieldCheck;
+import org.terasology.engine.core.Time;
+import org.terasology.engine.entitySystem.Component;
+import org.terasology.engine.entitySystem.entity.EntityManager;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.entitySystem.event.Event;
+import org.terasology.engine.entitySystem.metadata.EventLibrary;
+import org.terasology.engine.entitySystem.metadata.EventMetadata;
+import org.terasology.engine.entitySystem.metadata.NetworkEventType;
+import org.terasology.engine.identity.PublicIdentityCertificate;
+import org.terasology.engine.logic.characters.PredictionSystem;
+import org.terasology.engine.logic.common.DisplayNameComponent;
+import org.terasology.engine.logic.location.LocationComponent;
+import org.terasology.engine.network.Client;
+import org.terasology.engine.network.ClientComponent;
+import org.terasology.engine.network.ColorComponent;
+import org.terasology.engine.network.NetMetricSource;
+import org.terasology.engine.network.NetworkComponent;
+import org.terasology.engine.network.serialization.ServerComponentFieldCheck;
+import org.terasology.engine.persistence.serializers.EventSerializer;
+import org.terasology.engine.persistence.serializers.NetworkEntitySerializer;
+import org.terasology.engine.registry.CoreRegistry;
+import org.terasology.engine.rendering.world.viewDistance.ViewDistance;
+import org.terasology.engine.world.WorldChangeListener;
+import org.terasology.engine.world.WorldProvider;
+import org.terasology.engine.world.block.Block;
+import org.terasology.engine.world.block.BlockComponent;
+import org.terasology.engine.world.block.family.BlockFamily;
+import org.terasology.engine.world.chunks.Chunk;
+import org.terasology.engine.world.chunks.Chunks;
 import org.terasology.nui.Color;
-import org.terasology.persistence.serializers.EventSerializer;
-import org.terasology.persistence.serializers.NetworkEntitySerializer;
 import org.terasology.persistence.typeHandling.DeserializationException;
 import org.terasology.persistence.typeHandling.SerializationException;
 import org.terasology.protobuf.EntityData;
 import org.terasology.protobuf.NetData;
-import org.terasology.registry.CoreRegistry;
-import org.terasology.rendering.world.viewDistance.ViewDistance;
-import org.terasology.world.WorldChangeListener;
-import org.terasology.world.WorldProvider;
-import org.terasology.world.block.Block;
-import org.terasology.world.block.BlockComponent;
-import org.terasology.world.block.family.BlockFamily;
-import org.terasology.world.chunks.Chunk;
 
 import java.util.Arrays;
 import java.util.Iterator;
@@ -245,7 +244,7 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
                     Vector3f target = loc.getWorldPosition(new Vector3f());
                     if (target.isFinite()) {
                         center.set(target, RoundingMode.HALF_UP); // use center as temporary variable
-                        ChunkMath.calcChunkPos(center, center); // update center to chunkPos
+                        Chunks.toChunkPos(center, center); // update center to chunkPos
                     }
                 }
                 Vector3i pos = null;
@@ -335,9 +334,9 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
         try {
             BlockComponent blockComp = target.getComponent(BlockComponent.class);
             if (blockComp != null) {
-                if (relevantChunks.contains(ChunkMath.calcChunkPos(JomlUtil.from(blockComp.position), new Vector3i()))) {
+                if (relevantChunks.contains(Chunks.toChunkPos(blockComp.getPosition(), new Vector3i()))) {
                     queuedOutgoingEvents.add(NetData.EventMessage.newBuilder()
-                        .setTargetBlockPos(NetMessageUtil.convert(blockComp.position))
+                        .setTargetBlockPos(NetMessageUtil.convert(blockComp.getPosition()))
                         .setEvent(eventSerializer.serialize(event)).build());
                 }
             } else {
@@ -389,7 +388,7 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
 
     @Override
     public void onBlockChanged(Vector3ic pos, Block newBlock, Block originalBlock) {
-        org.joml.Vector3i chunkPos = ChunkMath.calcChunkPos(pos, new org.joml.Vector3i());
+        org.joml.Vector3i chunkPos = Chunks.toChunkPos(pos, new org.joml.Vector3i());
         if (relevantChunks.contains(chunkPos)) {
             queuedOutgoingBlockChanges.add(NetData.BlockChangeMessage.newBuilder()
                 .setPos(NetMessageUtil.convert(pos))
@@ -400,7 +399,7 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
 
     @Override
     public void onExtraDataChanged(int i, Vector3ic pos, int newData, int oldData) {
-        org.joml.Vector3i chunkPos = ChunkMath.calcChunkPos(pos, new org.joml.Vector3i());
+        org.joml.Vector3i chunkPos = Chunks.toChunkPos(pos, new org.joml.Vector3i());
         if (relevantChunks.contains(chunkPos)) {
             queuedOutgoingExtraDataChanges.add(NetData.ExtraDataChangeMessage.newBuilder()
                 .setIndex(i)
@@ -493,7 +492,7 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
             NetData.CreateEntityMessage.Builder createMessage = NetData.CreateEntityMessage.newBuilder().setEntity(entityData);
             BlockComponent blockComponent = entity.getComponent(BlockComponent.class);
             if (blockComponent != null) {
-                createMessage.setBlockPos(NetMessageUtil.convert(blockComponent.position));
+                createMessage.setBlockPos(NetMessageUtil.convert(blockComponent.getPosition()));
             }
             message.addCreateEntity(createMessage);
         }

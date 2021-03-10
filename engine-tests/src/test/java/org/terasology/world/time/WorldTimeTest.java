@@ -17,6 +17,8 @@
 package org.terasology.world.time;
 
 import org.junit.jupiter.api.Test;
+import org.terasology.engine.world.time.WorldTime;
+import org.terasology.engine.world.time.WorldTimeEvent;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

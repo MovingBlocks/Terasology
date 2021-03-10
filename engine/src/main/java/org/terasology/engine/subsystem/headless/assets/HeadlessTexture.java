@@ -13,17 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.engine.subsystem.headless.assets;
+package org.terasology.engine.core.subsystem.headless.assets;
 
 import com.google.common.collect.Lists;
-import org.terasology.joml.geom.Rectanglef;
-import org.terasology.joml.geom.Rectanglei;
 import org.joml.Vector2i;
 import org.terasology.assets.AssetType;
 import org.terasology.assets.ResourceUrn;
-import org.terasology.math.JomlUtil;
-import org.terasology.rendering.assets.texture.Texture;
-import org.terasology.rendering.assets.texture.TextureData;
+import org.terasology.joml.geom.Rectanglef;
+import org.terasology.joml.geom.Rectanglei;
+import org.terasology.engine.rendering.assets.texture.Texture;
+import org.terasology.engine.rendering.assets.texture.TextureData;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -85,7 +84,7 @@ public class HeadlessTexture extends Texture {
 
     @Override
     public Rectanglef getRegion() {
-        return JomlUtil.from(FULL_TEXTURE_REGION);
+        return new Rectanglef(FULL_TEXTURE_REGION); // object is not guarded
     }
 
     @Override

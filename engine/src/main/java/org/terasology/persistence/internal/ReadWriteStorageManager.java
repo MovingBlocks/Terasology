@@ -1,69 +1,58 @@
-/*
- * Copyright 2013 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-package org.terasology.persistence.internal;
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
+package org.terasology.engine.persistence.internal;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.joml.Vector3f;
+import org.joml.Vector3i;
+import org.joml.Vector3ic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.config.Config;
-import org.terasology.config.UniverseConfig;
-import org.terasology.engine.ComponentSystemManager;
-import org.terasology.engine.Time;
-import org.terasology.engine.module.ModuleManager;
-import org.terasology.engine.paths.PathManager;
-import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.entity.internal.EngineEntityManager;
-import org.terasology.entitySystem.entity.internal.EntityChangeSubscriber;
-import org.terasology.entitySystem.entity.internal.EntityDestroySubscriber;
-import org.terasology.entitySystem.entity.internal.PojoEntityManager;
-import org.terasology.entitySystem.metadata.ComponentLibrary;
-import org.terasology.entitySystem.systems.ComponentSystem;
-import org.terasology.game.Game;
-import org.terasology.game.GameManifest;
-import org.terasology.logic.location.LocationComponent;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector3i;
+import org.terasology.engine.config.Config;
+import org.terasology.engine.config.SystemConfig;
+import org.terasology.engine.config.UniverseConfig;
+import org.terasology.engine.core.ComponentSystemManager;
+import org.terasology.engine.core.Time;
+import org.terasology.engine.core.module.ModuleManager;
+import org.terasology.engine.core.paths.PathManager;
+import org.terasology.engine.entitySystem.Component;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.entitySystem.entity.internal.EngineEntityManager;
+import org.terasology.engine.entitySystem.entity.internal.EntityChangeSubscriber;
+import org.terasology.engine.entitySystem.entity.internal.EntityDestroySubscriber;
+import org.terasology.engine.entitySystem.entity.internal.PojoEntityManager;
+import org.terasology.engine.entitySystem.metadata.ComponentLibrary;
+import org.terasology.engine.entitySystem.systems.ComponentSystem;
+import org.terasology.engine.game.Game;
+import org.terasology.engine.game.GameManifest;
+import org.terasology.engine.logic.location.LocationComponent;
+import org.terasology.engine.monitoring.PerformanceMonitor;
+import org.terasology.engine.network.Client;
+import org.terasology.engine.network.ClientComponent;
+import org.terasology.engine.network.NetworkSystem;
+import org.terasology.engine.recording.RecordAndReplayCurrentStatus;
+import org.terasology.engine.recording.RecordAndReplaySerializer;
+import org.terasology.engine.recording.RecordAndReplayStatus;
+import org.terasology.engine.recording.RecordAndReplayUtils;
+import org.terasology.engine.registry.CoreRegistry;
+import org.terasology.engine.rendering.opengl.ScreenGrabber;
+import org.terasology.engine.utilities.FilesUtil;
+import org.terasology.engine.utilities.concurrency.ShutdownTask;
+import org.terasology.engine.utilities.concurrency.Task;
+import org.terasology.engine.utilities.concurrency.TaskMaster;
+import org.terasology.engine.world.block.BlockManager;
+import org.terasology.engine.world.block.family.BlockFamily;
+import org.terasology.engine.world.chunks.Chunk;
+import org.terasology.engine.world.chunks.ChunkProvider;
+import org.terasology.engine.world.chunks.ManagedChunk;
+import org.terasology.engine.world.chunks.blockdata.ExtraBlockDataManager;
+import org.terasology.engine.world.chunks.internal.ChunkImpl;
+import org.terasology.engine.world.internal.WorldInfo;
 import org.terasology.module.Module;
 import org.terasology.module.ModuleEnvironment;
-import org.terasology.monitoring.PerformanceMonitor;
-import org.terasology.network.Client;
-import org.terasology.network.ClientComponent;
-import org.terasology.network.NetworkSystem;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.protobuf.EntityData;
-import org.terasology.recording.RecordAndReplayCurrentStatus;
-import org.terasology.recording.RecordAndReplaySerializer;
-import org.terasology.recording.RecordAndReplayStatus;
-import org.terasology.recording.RecordAndReplayUtils;
-import org.terasology.registry.CoreRegistry;
-import org.terasology.rendering.opengl.ScreenGrabber;
-import org.terasology.utilities.FilesUtil;
-import org.terasology.utilities.concurrency.ShutdownTask;
-import org.terasology.utilities.concurrency.Task;
-import org.terasology.utilities.concurrency.TaskMaster;
-import org.terasology.world.block.BlockManager;
-import org.terasology.world.block.family.BlockFamily;
-import org.terasology.world.chunks.Chunk;
-import org.terasology.world.chunks.ChunkProvider;
-import org.terasology.world.chunks.ManagedChunk;
-import org.terasology.world.chunks.blockdata.ExtraBlockDataManager;
-import org.terasology.world.chunks.internal.ChunkImpl;
-import org.terasology.world.internal.WorldInfo;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -97,14 +86,15 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
     private final Lock worldDirectoryWriteLock = worldDirectoryLock.writeLock();
     private SaveTransaction saveTransaction;
     private Config config;
+    private SystemConfig systemConfig;
 
     /**
      * Time of the next save in the format that {@link System#currentTimeMillis()} returns.
      */
     private Long nextAutoSave;
     private boolean saveRequested;
-    private ConcurrentMap<Vector3i, CompressedChunkBuilder> unloadedAndUnsavedChunkMap = Maps.newConcurrentMap();
-    private ConcurrentMap<Vector3i, CompressedChunkBuilder> unloadedAndSavingChunkMap = Maps.newConcurrentMap();
+    private ConcurrentMap<Vector3ic, CompressedChunkBuilder> unloadedAndUnsavedChunkMap = Maps.newConcurrentMap();
+    private ConcurrentMap<Vector3ic, CompressedChunkBuilder> unloadedAndSavingChunkMap = Maps.newConcurrentMap();
     private ConcurrentMap<String, EntityData.PlayerStore> unloadedAndUnsavedPlayerMap = Maps.newConcurrentMap();
     private ConcurrentMap<String, EntityData.PlayerStore> unloadedAndSavingPlayerMap = Maps.newConcurrentMap();
 
@@ -141,6 +131,7 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
         this.saveTransactionHelper = new SaveTransactionHelper(getStoragePathProvider());
         this.saveThreadManager = TaskMaster.createFIFOTaskMaster("Saving", 1);
         this.config = CoreRegistry.get(Config.class);
+        this.systemConfig = CoreRegistry.get((SystemConfig.class));
         this.entityRefReplacingComponentLibrary = privateEntityManager.getComponentLibrary()
                 .createCopyUsingCopyStrategy(EntityRef.class, new DelayedEntityRefCopyStrategy(this));
         this.entitySetDeltaRecorder = new EntitySetDeltaRecorder(this.entityRefReplacingComponentLibrary);
@@ -221,21 +212,21 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
          * ones added in between putAll and clear. By iterating we can make sure that all entries removed
          * from unloadedAndUnsavedChunkMap get added to unloadedAndSavingChunkMap.
          */
-        Iterator<Map.Entry<Vector3i, CompressedChunkBuilder>> unsavedEntryIterator = unloadedAndUnsavedChunkMap.entrySet().iterator();
+        Iterator<Map.Entry<Vector3ic, CompressedChunkBuilder>> unsavedEntryIterator = unloadedAndUnsavedChunkMap.entrySet().iterator();
         while (unsavedEntryIterator.hasNext()) {
-            Map.Entry<Vector3i, CompressedChunkBuilder> entry = unsavedEntryIterator.next();
+            Map.Entry<Vector3ic, CompressedChunkBuilder> entry = unsavedEntryIterator.next();
             unloadedAndSavingChunkMap.put(entry.getKey(), entry.getValue());
             unsavedEntryIterator.remove();
         }
 
         chunkProvider.getAllChunks().stream().filter(ManagedChunk::isReady).forEach(chunk -> {
             // If there is a newer undisposed version of the chunk,we don't need to save the disposed version:
-            unloadedAndSavingChunkMap.remove(chunk.getPosition());
+            unloadedAndSavingChunkMap.remove(chunk.getPosition(new Vector3i()));
             ChunkImpl chunkImpl = (ChunkImpl) chunk;  // this storage manager can only work with ChunkImpls
             saveTransactionBuilder.addLoadedChunk(chunk.getPosition(), chunkImpl);
         });
 
-        for (Map.Entry<Vector3i, CompressedChunkBuilder> entry : unloadedAndSavingChunkMap.entrySet()) {
+        for (Map.Entry<Vector3ic, CompressedChunkBuilder> entry : unloadedAndSavingChunkMap.entrySet()) {
             saveTransactionBuilder.addUnloadedChunk(entry.getKey(), entry.getValue());
         }
     }
@@ -310,7 +301,7 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
         LocationComponent location = character.getComponent(LocationComponent.class);
         Vector3f relevanceLocation;
         if (location != null) {
-            relevanceLocation = location.getWorldPosition();
+            relevanceLocation = location.getWorldPosition(new Vector3f());
         } else {
             relevanceLocation = new Vector3f();
         }
@@ -327,14 +318,14 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
     public void deactivateChunk(Chunk chunk) {
         Collection<EntityRef> entitiesOfChunk = getEntitiesOfChunk(chunk);
         ChunkImpl chunkImpl = (ChunkImpl) chunk; // storage manager only works with ChunkImpl
-        unloadedAndUnsavedChunkMap.put(chunk.getPosition(), new CompressedChunkBuilder(getEntityManager(), chunkImpl,
+        unloadedAndUnsavedChunkMap.put(chunk.getPosition(new Vector3i()), new CompressedChunkBuilder(getEntityManager(), chunkImpl,
                 entitiesOfChunk, true));
 
         entitiesOfChunk.forEach(this::deactivateOrDestroyEntityRecursive);
     }
 
     @Override
-    protected byte[] loadCompressedChunk(Vector3i chunkPos) {
+    protected byte[] loadCompressedChunk(Vector3ic chunkPos) {
         CompressedChunkBuilder disposedUnsavedChunk = unloadedAndUnsavedChunkMap.get(chunkPos);
         if (disposedUnsavedChunk != null) {
             return disposedUnsavedChunk.buildEncodedChunk();
@@ -455,7 +446,7 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
         int loadedChunkCount = chunkProvider.getAllChunks().size();
         double totalChunkCount = unloadedChunkCount + loadedChunkCount;
         double percentageUnloaded = 100.0 * unloadedChunkCount / totalChunkCount;
-        if (percentageUnloaded >= config.getSystem().getMaxUnloadedChunksPercentageTillSave()) {
+        if (percentageUnloaded >= systemConfig.maxUnloadedChunksPercentageTillSave.get()) {
             return true;
         }
 
@@ -468,7 +459,7 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
     }
 
     private void scheduleNextAutoSave() {
-        long msBetweenAutoSave = (long) config.getSystem().getMaxSecondsBetweenSaves() * 1000;
+        long msBetweenAutoSave = (long) systemConfig.maxSecondsBetweenSaves.get() * 1000;
         nextAutoSave = System.currentTimeMillis() + msBetweenAutoSave;
     }
 

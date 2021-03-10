@@ -13,15 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.entitySystem.metadata;
+package org.terasology.engine.entitySystem.metadata;
 
 import com.google.common.collect.Iterables;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
-import org.terasology.context.Context;
-import org.terasology.engine.SimpleUri;
-import org.terasology.entitySystem.Component;
+import org.terasology.engine.entitySystem.Component;
 import org.terasology.module.Module;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.naming.Name;
@@ -116,7 +114,7 @@ public class ComponentLibrary extends AbstractClassLibrary<Component> {
 
 
     /**
-     * Should not be called during the game, as the {@link org.terasology.persistence.internal.ReadWriteStorageManager}
+     * Should not be called during the game, as the {@link org.terasology.engine.persistence.internal.ReadWriteStorageManager}
      * creates a copy of the data and uses the same instance in multiple threads.
      */
     @Override

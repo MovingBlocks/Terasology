@@ -1,30 +1,28 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.rendering.nui.internal;
+package org.terasology.engine.rendering.nui.internal;
 
-import org.terasology.joml.geom.Rectanglei;
+import org.joml.Quaternionfc;
+import org.joml.Vector2ic;
+import org.joml.Vector3fc;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
-import org.terasology.config.Config;
-import org.terasology.config.RenderingConfig;
-import org.terasology.context.Context;
-import org.terasology.engine.Time;
-import org.terasology.input.InputSystem;
-import org.terasology.math.JomlUtil;
-import org.terasology.math.geom.BaseVector2i;
-import org.terasology.math.geom.Quat4f;
-import org.terasology.math.geom.Rect2i;
-import org.terasology.math.geom.Vector3f;
+import org.terasology.engine.config.Config;
+import org.terasology.engine.config.RenderingConfig;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.core.Time;
+import org.terasology.engine.input.InputSystem;
+import org.terasology.engine.rendering.assets.material.Material;
+import org.terasology.engine.rendering.assets.texture.TextureRegion;
+import org.terasology.engine.rendering.opengl.FrameBufferObject;
+import org.terasology.joml.geom.Rectanglei;
 import org.terasology.nui.SubRegion;
 import org.terasology.nui.UITextureRegion;
 import org.terasology.nui.canvas.CanvasImpl;
-import org.terasology.rendering.assets.material.Material;
-import org.terasology.rendering.assets.mesh.Mesh;
-import org.terasology.rendering.assets.texture.TextureRegion;
-import org.terasology.rendering.nui.NUIManager;
-import org.terasology.rendering.opengl.FrameBufferObject;
-import org.terasology.utilities.Assets;
+import org.terasology.engine.rendering.assets.mesh.Mesh;
+import org.terasology.engine.rendering.nui.NUIManager;
+import org.terasology.engine.utilities.Assets;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -77,14 +75,14 @@ public class TerasologyCanvasImpl extends CanvasImpl implements PropertyChangeLi
     }
 
     //NOTE: now only accessible via CanvasUtility
-    public SubRegion subRegionFBO(ResourceUrn uri, BaseVector2i size) {
+    public SubRegion subRegionFBO(ResourceUrn uri, Vector2ic size) {
         return new SubRegionFBOImpl(uri, size);
     }
 
     // NOTE: drawMaterial and drawMesh can now only be accessed through CanvasUtility
-    public void drawMaterial(Material material, Rect2i region) {
+    public void drawMaterial(Material material, Rectanglei region) {
         if (material.isRenderable()) {
-            Rectanglei drawRegion = relativeToAbsolute(JomlUtil.from(region));
+            Rectanglei drawRegion = relativeToAbsolute(region);
             if (!state.cropRegion.intersectsRectangle(drawRegion)) {
                 return;
             }
@@ -94,7 +92,7 @@ public class TerasologyCanvasImpl extends CanvasImpl implements PropertyChangeLi
         }
     }
 
-    public void drawMesh(Mesh mesh, Material material, Rect2i region, Quat4f rotation, Vector3f offset, float scale) {
+    public void drawMesh(Mesh mesh, Material material, Rectanglei region, Quaternionfc rotation, Vector3fc offset, float scale) {
         if (material == null) {
             logger.warn("Attempted to draw with nonexistent material");
             return;
@@ -104,17 +102,17 @@ public class TerasologyCanvasImpl extends CanvasImpl implements PropertyChangeLi
             return;
         }
 
-        Rectanglei drawRegion = relativeToAbsolute(JomlUtil.from(region));
+        Rectanglei drawRegion = relativeToAbsolute(region);
         if (!state.cropRegion.intersectsRectangle(drawRegion)) {
             return;
         }
 
         ((TerasologyCanvasRenderer) renderer).drawMesh(
                 mesh, material, drawRegion, drawRegion.intersection(state.cropRegion),
-                JomlUtil.from(rotation), JomlUtil.from(offset), scale, state.getAlpha());
+                rotation, offset, scale, state.getAlpha());
     }
 
-    public void drawMesh(Mesh mesh, UITextureRegion texture, Rect2i region, Quat4f rotation, Vector3f offset, float scale) {
+    public void drawMesh(Mesh mesh, UITextureRegion texture, Rectanglei region, Quaternionfc rotation, Vector3fc offset, float scale) {
         meshMat.setTexture("texture", ((TextureRegion)texture).getTexture());
         drawMesh(mesh, meshMat, region, rotation, offset, scale);
     }
@@ -130,10 +128,10 @@ public class TerasologyCanvasImpl extends CanvasImpl implements PropertyChangeLi
         private FrameBufferObject fbo;
         private CanvasState previousState;
 
-        private SubRegionFBOImpl(ResourceUrn uri, BaseVector2i size) {
+        private SubRegionFBOImpl(ResourceUrn uri, Vector2ic size) {
             previousState = state;
 
-            fbo = ((TerasologyCanvasRenderer)renderer).getFBO(uri, JomlUtil.from(size));
+            fbo = ((TerasologyCanvasRenderer)renderer).getFBO(uri, size);
             state = new CanvasState(state, new Rectanglei(0, 0, size.x(), size.y()));
             fbo.bindFrame();
         }

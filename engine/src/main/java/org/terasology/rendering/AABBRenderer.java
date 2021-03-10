@@ -1,29 +1,16 @@
-/*
- * Copyright 2013 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 
-package org.terasology.rendering;
+package org.terasology.engine.rendering;
 
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 import org.lwjgl.opengl.GL11;
 import org.terasology.joml.geom.AABBf;
 import org.terasology.joml.geom.AABBfc;
-import org.terasology.logic.players.LocalPlayer;
+import org.terasology.engine.logic.players.LocalPlayer;
 import org.terasology.module.sandbox.API;
-import org.terasology.registry.CoreRegistry;
+import org.terasology.engine.registry.CoreRegistry;
 
 import static org.lwjgl.opengl.GL11.GL_BLEND;
 import static org.lwjgl.opengl.GL11.GL_LINE_LOOP;
@@ -93,7 +80,7 @@ public class AABBRenderer implements BlockOverlayRenderer {
         glPushMatrix();
         Vector3f cameraPosition = CoreRegistry.get(LocalPlayer.class).getViewPosition(new Vector3f());
         Vector3f center = aabb.center(new Vector3f());
-        glTranslated(center.x - cameraPosition.x, -cameraPosition.y, center.z - cameraPosition.z);
+        glTranslated(center.x - cameraPosition.x, center.y - cameraPosition.y, center.z - cameraPosition.z);
 
         renderLocally();
 
@@ -126,13 +113,8 @@ public class AABBRenderer implements BlockOverlayRenderer {
         if (displayListWire == -1) {
             generateDisplayListWire();
         }
-        Vector3f center = aabb.center(new Vector3f());
-        glPushMatrix();
-        glTranslated(0f, center.y, 0f);
 
         glCallList(displayListWire);
-
-        glPopMatrix();
     }
 
     public void renderSolidLocally() {

@@ -1,62 +1,47 @@
-/*
- * Copyright 2017 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-package org.terasology.rendering.world;
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
+package org.terasology.engine.rendering.world;
 
+import org.joml.Vector3f;
+import org.joml.Vector3ic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.config.Config;
-import org.terasology.config.RenderingConfig;
-import org.terasology.context.Context;
-import org.terasology.engine.GameEngine;
-import org.terasology.engine.modes.StateMainMenu;
-import org.terasology.engine.module.ModuleManager;
-import org.terasology.engine.module.rendering.RenderingModuleRegistry;
-import org.terasology.engine.subsystem.DisplayDevice;
-import org.terasology.engine.subsystem.lwjgl.GLBufferPool;
-import org.terasology.engine.subsystem.lwjgl.LwjglGraphicsUtil;
-import org.terasology.logic.console.Console;
-import org.terasology.logic.console.commandSystem.MethodCommand;
-import org.terasology.logic.console.commandSystem.annotations.Command;
-import org.terasology.logic.console.commandSystem.annotations.CommandParam;
-import org.terasology.logic.permission.PermissionManager;
-import org.terasology.logic.players.LocalPlayerSystem;
-import org.terasology.math.JomlUtil;
+import org.terasology.engine.config.Config;
+import org.terasology.engine.config.RenderingConfig;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.core.GameEngine;
+import org.terasology.engine.core.modes.StateMainMenu;
+import org.terasology.engine.core.module.ModuleManager;
+import org.terasology.engine.core.module.rendering.RenderingModuleRegistry;
+import org.terasology.engine.core.subsystem.DisplayDevice;
+import org.terasology.engine.core.subsystem.lwjgl.GLBufferPool;
+import org.terasology.engine.core.subsystem.lwjgl.LwjglGraphicsUtil;
+import org.terasology.engine.logic.console.Console;
+import org.terasology.engine.logic.console.commandSystem.MethodCommand;
+import org.terasology.engine.logic.console.commandSystem.annotations.Command;
+import org.terasology.engine.logic.console.commandSystem.annotations.CommandParam;
+import org.terasology.engine.logic.permission.PermissionManager;
+import org.terasology.engine.logic.players.LocalPlayerSystem;
+import org.terasology.engine.rendering.assets.material.Material;
+import org.terasology.engine.rendering.backdrop.BackdropProvider;
+import org.terasology.engine.rendering.cameras.OpenVRStereoCamera;
+import org.terasology.engine.rendering.cameras.PerspectiveCamera;
+import org.terasology.engine.rendering.cameras.SubmersibleCamera;
+import org.terasology.engine.rendering.opengl.FBO;
+import org.terasology.engine.rendering.opengl.ScreenGrabber;
+import org.terasology.engine.rendering.opengl.fbms.DisplayResolutionDependentFbo;
+import org.terasology.engine.rendering.openvrprovider.OpenVRProvider;
+import org.terasology.engine.rendering.world.viewDistance.ViewDistance;
 import org.terasology.math.TeraMath;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector3i;
-import org.terasology.rendering.ShaderManager;
-import org.terasology.rendering.assets.material.Material;
-import org.terasology.rendering.backdrop.BackdropProvider;
-import org.terasology.rendering.cameras.OpenVRStereoCamera;
-import org.terasology.rendering.cameras.PerspectiveCamera;
-import org.terasology.rendering.cameras.SubmersibleCamera;
-import org.terasology.rendering.dag.ModuleRendering;
-import org.terasology.rendering.dag.Node;
-import org.terasology.rendering.dag.RenderGraph;
-import org.terasology.rendering.dag.RenderPipelineTask;
-import org.terasology.rendering.dag.RenderTaskListGenerator;
-import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
-import org.terasology.rendering.opengl.FBO;
-import org.terasology.rendering.opengl.ScreenGrabber;
-import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFbo;
-import org.terasology.rendering.openvrprovider.OpenVRProvider;
-import org.terasology.rendering.world.viewDistance.ViewDistance;
-import org.terasology.utilities.Assets;
-import org.terasology.world.WorldProvider;
-import org.terasology.world.chunks.ChunkProvider;
+import org.terasology.engine.rendering.ShaderManager;
+import org.terasology.engine.rendering.dag.ModuleRendering;
+import org.terasology.engine.rendering.dag.Node;
+import org.terasology.engine.rendering.dag.RenderGraph;
+import org.terasology.engine.rendering.dag.RenderPipelineTask;
+import org.terasology.engine.rendering.dag.RenderTaskListGenerator;
+import org.terasology.engine.rendering.dag.stateChanges.SetViewportToSizeOf;
+import org.terasology.engine.utilities.Assets;
+import org.terasology.engine.world.WorldProvider;
 
 import java.util.List;
 
@@ -168,7 +153,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         LocalPlayerSystem localPlayerSystem = context.get(LocalPlayerSystem.class);
         localPlayerSystem.setPlayerCamera(playerCamera);
 
-        renderableWorld = new RenderableWorldImpl(worldProvider, context.get(ChunkProvider.class), bufferPool, playerCamera);
+        renderableWorld = new RenderableWorldImpl(context, bufferPool, playerCamera);
         renderQueues = renderableWorld.getRenderQueues();
 
         initRenderingSupport();
@@ -250,13 +235,13 @@ public final class WorldRendererImpl implements WorldRenderer {
     }
 
     @Override
-    public void onChunkLoaded(Vector3i pos) {
-        renderableWorld.onChunkLoaded(JomlUtil.from(pos));
+    public void onChunkLoaded(Vector3ic pos) {
+        renderableWorld.onChunkLoaded(pos);
     }
 
     @Override
-    public void onChunkUnloaded(Vector3i pos) {
-        renderableWorld.onChunkUnloaded(JomlUtil.from(pos));
+    public void onChunkUnloaded(Vector3ic pos) {
+        renderableWorld.onChunkUnloaded(pos);
     }
 
     @Override
@@ -299,7 +284,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         // this is done to execute this code block only once per frame
         // instead of once per eye in a stereo setup.
         if (isFirstRenderingStageForCurrentFrame) {
-            timeSmoothedMainLightIntensity = TeraMath.lerp(timeSmoothedMainLightIntensity, getMainLightIntensityAt(JomlUtil.from(playerCamera.getPosition())), secondsSinceLastFrame);
+            timeSmoothedMainLightIntensity = TeraMath.lerp(timeSmoothedMainLightIntensity, getMainLightIntensityAt(playerCamera.getPosition()), secondsSinceLastFrame);
 
             playerCamera.update(secondsSinceLastFrame);
 
@@ -393,8 +378,8 @@ public final class WorldRendererImpl implements WorldRenderer {
     }
 
     @Override
-    public void setViewDistance(ViewDistance viewDistance) {
-        renderableWorld.updateChunksInProximity(viewDistance);
+    public void setViewDistance(ViewDistance viewDistance, int chunkLods) {
+        renderableWorld.updateChunksInProximity(viewDistance, chunkLods);
     }
 
     @Override

@@ -1,47 +1,44 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-package org.terasology.world.internal;
+package org.terasology.engine.world.internal;
 
-import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
-import org.terasology.context.Context;
-import org.terasology.engine.SimpleUri;
-import org.terasology.entitySystem.entity.EntityManager;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.math.ChunkMath;
-import org.terasology.math.JomlUtil;
-import org.terasology.world.WorldChangeListener;
-import org.terasology.world.WorldComponent;
-import org.terasology.world.block.Block;
-import org.terasology.world.block.BlockRegion;
-import org.terasology.world.block.BlockRegionc;
-import org.terasology.world.chunks.Chunk;
-import org.terasology.world.chunks.ChunkProvider;
-import org.terasology.world.chunks.Chunks;
-import org.terasology.world.chunks.CoreChunk;
-import org.terasology.world.chunks.LitChunk;
-import org.terasology.world.chunks.ManagedChunk;
-import org.terasology.world.chunks.RenderableChunk;
-import org.terasology.world.propagation.BatchPropagator;
-import org.terasology.world.propagation.BlockChange;
-import org.terasology.world.propagation.PropagationRules;
-import org.terasology.world.propagation.PropagatorWorldView;
-import org.terasology.world.propagation.StandardBatchPropagator;
-import org.terasology.world.propagation.SunlightRegenBatchPropagator;
-import org.terasology.world.propagation.light.LightPropagationRules;
-import org.terasology.world.propagation.light.LightWorldView;
-import org.terasology.world.propagation.light.SunlightPropagationRules;
-import org.terasology.world.propagation.light.SunlightRegenPropagationRules;
-import org.terasology.world.propagation.light.SunlightRegenWorldView;
-import org.terasology.world.propagation.light.SunlightWorldView;
-import org.terasology.world.time.WorldTime;
-import org.terasology.world.time.WorldTimeImpl;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.core.SimpleUri;
+import org.terasology.engine.entitySystem.entity.EntityManager;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.world.propagation.BatchPropagator;
+import org.terasology.engine.world.propagation.BlockChange;
+import org.terasology.engine.world.propagation.PropagationRules;
+import org.terasology.engine.world.propagation.PropagatorWorldView;
+import org.terasology.engine.world.propagation.StandardBatchPropagator;
+import org.terasology.engine.world.propagation.SunlightRegenBatchPropagator;
+import org.terasology.engine.world.propagation.light.LightPropagationRules;
+import org.terasology.engine.world.propagation.light.LightWorldView;
+import org.terasology.engine.world.propagation.light.SunlightPropagationRules;
+import org.terasology.engine.world.propagation.light.SunlightRegenPropagationRules;
+import org.terasology.engine.world.propagation.light.SunlightRegenWorldView;
+import org.terasology.engine.world.propagation.light.SunlightWorldView;
+import org.terasology.engine.world.WorldChangeListener;
+import org.terasology.engine.world.WorldComponent;
+import org.terasology.engine.world.block.Block;
+import org.terasology.engine.world.block.BlockRegion;
+import org.terasology.engine.world.block.BlockRegionc;
+import org.terasology.engine.world.chunks.Chunk;
+import org.terasology.engine.world.chunks.ChunkProvider;
+import org.terasology.engine.world.chunks.Chunks;
+import org.terasology.engine.world.chunks.CoreChunk;
+import org.terasology.engine.world.chunks.LitChunk;
+import org.terasology.engine.world.chunks.ManagedChunk;
+import org.terasology.engine.world.chunks.RenderableChunk;
+import org.terasology.engine.world.time.WorldTime;
+import org.terasology.engine.world.time.WorldTimeImpl;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -67,7 +64,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
 
     private final List<WorldChangeListener> listeners = Lists.newArrayList();
 
-    private final Map<org.terasology.math.geom.Vector3i, BlockChange> blockChanges = Maps.newHashMap();
+    private final Map<Vector3i, BlockChange> blockChanges = Maps.newHashMap();
     private List<BatchPropagator> propagators = Lists.newArrayList();
 
     private Block unloadedBlock;
@@ -151,17 +148,17 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
 
     @Override
     public ChunkViewCore getLocalView(Vector3ic chunkPos) {
-        return chunkProvider.getLocalView(JomlUtil.from(chunkPos));
+        return chunkProvider.getLocalView(chunkPos);
     }
 
     @Override
     public ChunkViewCore getWorldViewAround(Vector3ic chunk) {
-        return chunkProvider.getSubviewAroundChunk(JomlUtil.from(chunk));
+        return chunkProvider.getSubviewAroundChunk(chunk);
     }
 
     @Override
     public boolean isBlockRelevant(int x, int y, int z) {
-        return chunkProvider.isChunkReady(ChunkMath.calcChunkPos(x, y, z));
+        return chunkProvider.isChunkReady(Chunks.toChunkPos(x, y, z, new Vector3i()));
     }
 
     @Override
@@ -186,9 +183,9 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
             Vector3i blockPos = Chunks.toRelative(worldPos, new Vector3i());
             Block oldBlockType = chunk.setBlock(blockPos, type);
             if (oldBlockType != type) {
-                BlockChange oldChange = blockChanges.get(JomlUtil.from(worldPos));
+                BlockChange oldChange = blockChanges.get(worldPos);
                 if (oldChange == null) {
-                    blockChanges.put(JomlUtil.from(worldPos), new BlockChange(worldPos, oldBlockType, type));
+                    blockChanges.put(new Vector3i(worldPos), new BlockChange(worldPos, oldBlockType, type));
                 } else {
                     oldChange.setTo(type);
                 }
@@ -202,32 +199,34 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
     }
 
     @Override
-    public Map<org.terasology.math.geom.Vector3i, Block> setBlocks(Map<org.terasology.math.geom.Vector3i, Block> blocks) {
+    public Map<Vector3ic, Block> setBlocks(Map<? extends Vector3ic, Block> blocks) {
         /*
          * Hint: This method has a benchmark available in the BenchmarkScreen, The screen can be opened ingame via the
          * command "showSCreen BenchmarkScreen".
          */
         Set<BlockChange> changedBlocks = new HashSet<>();
-        Map<org.terasology.math.geom.Vector3i, Block> result = new HashMap<>(blocks.size());
+        Map<Vector3ic, Block> result = new HashMap<>(blocks.size());
 
-        for (Map.Entry<org.terasology.math.geom.Vector3i, Block> entry : blocks.entrySet()) {
-            org.terasology.math.geom.Vector3i worldPos = entry.getKey();
-            org.terasology.math.geom.Vector3i chunkPos = ChunkMath.calcChunkPos(worldPos);
+        Vector3i chunkPos = new Vector3i();
+        Vector3i relativePos = new Vector3i();
+        for (Map.Entry<? extends Vector3ic, Block> entry : blocks.entrySet()) {
+            Vector3ic worldPos = entry.getKey();
+            Chunks.toChunkPos(worldPos, chunkPos);
             CoreChunk chunk = chunkProvider.getChunk(chunkPos);
 
             if (chunk != null) {
                 Block type = entry.getValue();
-                org.terasology.math.geom.Vector3i blockPos = ChunkMath.calcRelativeBlockPos(worldPos);
-                Block oldBlockType = chunk.setBlock(blockPos, type);
+               Chunks.toRelative(worldPos, relativePos);
+                Block oldBlockType = chunk.setBlock(relativePos, type);
                 if (oldBlockType != type) {
                     BlockChange oldChange = blockChanges.get(worldPos);
                     if (oldChange == null) {
-                        blockChanges.put(worldPos, new BlockChange(JomlUtil.from(worldPos), oldBlockType, type));
+                        blockChanges.put(new Vector3i(worldPos), new BlockChange(worldPos, oldBlockType, type));
                     } else {
                         oldChange.setTo(type);
                     }
-                    setDirtyChunksNear(JomlUtil.from(worldPos));
-                    changedBlocks.add(new BlockChange(JomlUtil.from(worldPos), oldBlockType, type));
+                    setDirtyChunksNear(worldPos);
+                    changedBlocks.add(new BlockChange(worldPos, oldBlockType, type));
                 }
                 result.put(worldPos, oldBlockType);
             } else {
@@ -286,7 +285,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
         LitChunk chunk = chunkProvider.getChunk(chunkPos);
         if (chunk != null) {
             Vector3i blockPos = Chunks.toRelative(x, y, z, new Vector3i());
-            return chunk.getLight(JomlUtil.from(blockPos));
+            return chunk.getLight(blockPos);
         }
         return 0;
     }
@@ -297,7 +296,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
         LitChunk chunk = chunkProvider.getChunk(chunkPos);
         if (chunk != null) {
             Vector3i blockPos = Chunks.toRelative(x, y, z, new Vector3i());
-            return chunk.getSunlight(JomlUtil.from(blockPos));
+            return chunk.getSunlight(blockPos);
         }
         return 0;
     }
@@ -308,28 +307,26 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
         LitChunk chunk = chunkProvider.getChunk(chunkPos);
         if (chunk != null) {
             Vector3i blockPos = Chunks.toRelative(x, y, z, new Vector3i());
-            return (byte) Math.max(chunk.getSunlight(JomlUtil.from(blockPos)), chunk.getLight(JomlUtil.from(blockPos)));
+            return (byte) Math.max(chunk.getSunlight(blockPos), chunk.getLight(blockPos));
         }
         return 0;
     }
 
     @Override
     public int getExtraData(int index, int x, int y, int z) {
-        CoreChunk chunk = chunkProvider.getChunk(ChunkMath.calcChunkPosX(x), ChunkMath.calcChunkPosY(y),
-                ChunkMath.calcChunkPosZ(z));
+        CoreChunk chunk = chunkProvider.getChunk(Chunks.toChunkPos(x, y, z, new Vector3i()));
         if (chunk != null) {
-            return chunk.getExtraData(index, ChunkMath.calcBlockPosX(x), ChunkMath.calcBlockPosY(y),
-                    ChunkMath.calcBlockPosZ(z));
+            return chunk.getExtraData(index, Chunks.toRelative(x, y, z, new Vector3i()));
         }
         return 0;
     }
 
     @Override
     public int setExtraData(int index, Vector3ic worldPos, int value) {
-        org.joml.Vector3i chunkPos = Chunks.toChunkPos(worldPos, new org.joml.Vector3i());
+        Vector3i chunkPos = Chunks.toChunkPos(worldPos, new Vector3i());
         CoreChunk chunk = chunkProvider.getChunk(chunkPos);
         if (chunk != null) {
-            org.joml.Vector3i blockPos = Chunks.toRelative(worldPos, new org.joml.Vector3i());
+            Vector3i blockPos = Chunks.toRelative(worldPos, new Vector3i());
             int oldValue = chunk.getExtraData(index, blockPos.x, blockPos.y, blockPos.z);
             chunk.setExtraData(index, blockPos.x, blockPos.y, blockPos.z, value);
             if (oldValue != value) {
@@ -353,12 +350,10 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
     }
 
     @Override
-    public Collection<BlockRegion> getRelevantRegions() {
+    public Collection<BlockRegionc> getRelevantRegions() {
         Collection<Chunk> chunks = chunkProvider.getAllChunks();
-        Function<Chunk, BlockRegion> mapping = CoreChunk::getRegion;
-
         Predicate<Chunk> isReady = ManagedChunk::isReady;
 
-        return FluentIterable.from(chunks).filter(isReady).transform(mapping).toList();
+        return FluentIterable.from(chunks).filter(isReady).transform(CoreChunk::getRegion).toList();
     }
 }

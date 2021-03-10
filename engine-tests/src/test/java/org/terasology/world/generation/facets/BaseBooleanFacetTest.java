@@ -16,11 +16,10 @@
 
 package org.terasology.world.generation.facets;
 
-import org.terasology.math.Region3i;
-import org.terasology.world.block.BlockRegion;
-import org.terasology.world.generation.Border3D;
-import org.terasology.world.generation.facets.base.BaseBooleanFieldFacet3D;
-import org.terasology.world.generation.facets.base.BooleanFieldFacet3D;
+import org.terasology.engine.world.block.BlockRegion;
+import org.terasology.engine.world.generation.Border3D;
+import org.terasology.engine.world.generation.facets.base.BaseBooleanFieldFacet3D;
+import org.terasology.engine.world.generation.facets.base.BooleanFieldFacet3D;
 
 /**
  * Tests the {@link BaseBooleanFieldFacet3D} class.

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.particles.rendering;
+package org.terasology.engine.particles.rendering;
 
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
@@ -21,18 +21,18 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
-import org.terasology.engine.subsystem.DisplayDevice;
-import org.terasology.engine.subsystem.lwjgl.LwjglDisplayDevice;
-import org.terasology.entitySystem.systems.RegisterMode;
-import org.terasology.entitySystem.systems.RegisterSystem;
-import org.terasology.entitySystem.systems.RenderSystem;
-import org.terasology.particles.ParticleSystemManager;
-import org.terasology.particles.components.ParticleDataSpriteComponent;
-import org.terasology.registry.In;
-import org.terasology.rendering.assets.material.Material;
-import org.terasology.rendering.cameras.PerspectiveCamera;
-import org.terasology.rendering.world.WorldRenderer;
-import org.terasology.utilities.Assets;
+import org.terasology.engine.core.subsystem.DisplayDevice;
+import org.terasology.engine.core.subsystem.lwjgl.LwjglDisplayDevice;
+import org.terasology.engine.entitySystem.systems.RegisterMode;
+import org.terasology.engine.entitySystem.systems.RegisterSystem;
+import org.terasology.engine.entitySystem.systems.RenderSystem;
+import org.terasology.engine.particles.ParticleSystemManager;
+import org.terasology.engine.particles.components.ParticleDataSpriteComponent;
+import org.terasology.engine.registry.In;
+import org.terasology.engine.rendering.assets.material.Material;
+import org.terasology.engine.rendering.cameras.PerspectiveCamera;
+import org.terasology.engine.rendering.world.WorldRenderer;
+import org.terasology.engine.utilities.Assets;
 
 import java.nio.FloatBuffer;
 
@@ -55,7 +55,7 @@ public class SpriteParticleRenderer implements RenderSystem {
     protected static final String PARTICLE_MATERIAL_URI = "engine:prog.particle";
 
     private final FloatBuffer matrixBuffer = BufferUtils.createFloatBuffer(16);
-
+    private  boolean opengl33 = false;
     /**
      * Vertices of a unit quad on the xy plane, centered on the origin.
      * Vertices are in counter-clockwise order starting from the bottom right vertex.
@@ -114,13 +114,13 @@ public class SpriteParticleRenderer implements RenderSystem {
 
     @Override
     public void renderAlphaBlend() {
-        if(!GL.createCapabilities().OpenGL33) {
+        if (!opengl33) {
             return;
         }
         PerspectiveCamera camera = (PerspectiveCamera) worldRenderer.getActiveCamera();
         Vector3f cameraPosition = camera.getPosition();
         Matrix4f viewProjection = new Matrix4f(camera.getViewProjectionMatrix())
-                .translate(-cameraPosition.x, -cameraPosition.y, -cameraPosition.z);
+            .translate(-cameraPosition.x, -cameraPosition.y, -cameraPosition.z);
 
         Material material = Assets.getMaterial(PARTICLE_MATERIAL_URI).get();
         material.enable();
@@ -128,7 +128,7 @@ public class SpriteParticleRenderer implements RenderSystem {
         material.setMatrix4("view_projection", viewProjection.get(matrixBuffer));
 
         particleSystemManager.getParticleEmittersByDataComponent(ParticleDataSpriteComponent.class)
-                .forEach(particleSystem -> drawParticles(material, particleSystem));
+            .forEach(particleSystem -> drawParticles(material, particleSystem));
     }
 
     @Override
@@ -143,6 +143,7 @@ public class SpriteParticleRenderer implements RenderSystem {
 
     @Override
     public void initialise() {
+        opengl33 = GL.createCapabilities().OpenGL33;
         // Nasty hack to only run LWJGL code with a LwjglDisplayDevice.  Should be unnecessary once "big todo" for drawParticles is resolved.
         if (!(displayDevice instanceof LwjglDisplayDevice)) {
             return;

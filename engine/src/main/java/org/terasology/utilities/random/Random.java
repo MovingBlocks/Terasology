@@ -1,11 +1,11 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-package org.terasology.utilities.random;
+package org.terasology.engine.utilities.random;
 
-import org.terasology.module.sandbox.API;
+import org.joml.Vector3f;
 import org.terasology.math.TeraMath;
-import org.terasology.math.geom.Vector3f;
+import org.terasology.module.sandbox.API;
 
 import java.util.List;
 
@@ -136,36 +136,6 @@ public abstract class Random {
     }
 
     /**
-     * Returns a Vector3f whose components range from min (inclusive) to max (inclusive)
-     *
-     * @param min
-     * @param max
-     * @return The vector
-     * @deprecated This method is scheduled for removal in an upcoming version. Use the JOML implementation instead:
-     *     {@link #nextVector3f(float, float, org.joml.Vector3f)}.
-     */
-    @Deprecated
-    public Vector3f nextVector3f(float min, float max) {
-        return new Vector3f(nextFloat(min, max), nextFloat(min, max), nextFloat(min, max));
-    }
-
-    /**
-     * Randomises a provided Vector3f so its components range from min (inclusive) to max
-     *
-     * @param min
-     * @param max
-     * @param output
-     * @return
-     * @deprecated This method is scheduled for removal in an upcoming version. Use the JOML implementation instead:
-     *     {@link #nextVector3f(float, float, org.joml.Vector3f)}.
-     */
-    @Deprecated
-    public Vector3f nextVector3f(float min, float max, Vector3f output) {
-        output.set(nextFloat(min, max), nextFloat(min, max), nextFloat(min, max));
-        return output;
-    }
-
-    /**
      * Randomises a provided Vector3f so its components range from min (inclusive) to max
      *
      * @param min the minimum value
@@ -173,34 +143,9 @@ public abstract class Random {
      * @param dest will hold the result
      * @return dest
      */
-    public org.joml.Vector3f nextVector3f(float min, float max, org.joml.Vector3f dest) {
+    public Vector3f nextVector3f(float min, float max, Vector3f dest) {
         dest.set(nextFloat(min, max), nextFloat(min, max), nextFloat(min, max));
         return dest;
-    }
-
-    /**
-     * Randomises a provided Vector3f so its components range from -1.0 (inclusive) to 1.0 (inclusive)
-     *
-     * @param output
-     * @return
-     * @deprecated This method is scheduled for removal in an upcoming version. Use the JOML implementation instead:
-     *     {@link #nextVector3f(org.joml.Vector3f)}.
-     */
-    @Deprecated
-    public Vector3f nextVector3f(Vector3f output) {
-        return nextVector3f(-1.0f, 1.0f, output);
-    }
-
-    /**
-     * Returns a Vector3f whose components range from -1.0 (inclusive) to 1.0 (inclusive)
-     *
-     * @return The vector
-     * @deprecated This method is scheduled for removal in an upcoming version. Use the JOML implementation instead:
-     *     {@link #nextVector3f(org.joml.Vector3f)}.
-     */
-    @Deprecated
-    public Vector3f nextVector3f() {
-        return nextVector3f(new Vector3f());
     }
 
     /**
@@ -209,29 +154,8 @@ public abstract class Random {
      * @param dest will hold the result
      * @return dest
      */
-    public org.joml.Vector3f nextVector3f(org.joml.Vector3f dest) {
+    public Vector3f nextVector3f(Vector3f dest) {
         return nextVector3f(-1.0f, 1.0f, dest);
-    }
-
-
-    /**
-     * Returns a Vector3f with a random distribution over a fixed length
-     *
-     * @param length the length
-     * @return The vector
-     * @deprecated This method is scheduled for removal in an upcoming version. Use the JOML implementation instead:
-     *     {@link #nextVector3f(float, org.joml.Vector3f)}.
-     */
-    @Deprecated
-    public Vector3f nextVector3f(float length) {
-        // Create a vector whose length is not zero
-        Vector3f vector = new Vector3f();
-        do {
-            nextVector3f(vector);
-        } while (vector.x == 0.0f && vector.y == 0.0f && vector.z == 0.0f);
-        float ln = vector.length();
-        vector.scale(length / ln);
-        return vector;
     }
 
     /**
@@ -240,7 +164,7 @@ public abstract class Random {
      * @param length the length
      * @return The vector
      */
-    public org.joml.Vector3f nextVector3f(float length, org.joml.Vector3f dest) {
+    public Vector3f nextVector3f(float length, Vector3f dest) {
         do {
             nextVector3f(dest);
         } while (dest.x == 0.0f && dest.y == 0.0f && dest.z == 0.0f);
@@ -248,7 +172,6 @@ public abstract class Random {
         dest.mul(length / ln);
         return dest;
     }
-
 
     /**
      * Calculates a standardized normal distributed value (using the polar method).

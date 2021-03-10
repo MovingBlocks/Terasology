@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package org.terasology.network.internal;
+package org.terasology.engine.network.internal;
 
-import org.terasology.entitySystem.entity.EntityManager;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.logic.common.DisplayNameComponent;
-import org.terasology.network.Client;
-import org.terasology.network.ClientComponent;
-import org.terasology.network.ClientInfoComponent;
-import org.terasology.network.ColorComponent;
+import org.terasology.engine.entitySystem.entity.EntityManager;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.logic.common.DisplayNameComponent;
+import org.terasology.engine.network.Client;
+import org.terasology.engine.network.ClientComponent;
+import org.terasology.engine.network.ClientInfoComponent;
+import org.terasology.engine.network.ColorComponent;
 import org.terasology.nui.Color;
 
 import java.util.HashSet;

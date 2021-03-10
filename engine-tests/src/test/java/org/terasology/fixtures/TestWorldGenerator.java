@@ -3,13 +3,13 @@
 
 package org.terasology.fixtures;
 
-import org.terasology.engine.SimpleUri;
-import org.terasology.world.block.BlockManager;
-import org.terasology.world.chunks.CoreChunk;
-import org.terasology.world.generation.EntityBuffer;
-import org.terasology.world.generation.World;
-import org.terasology.world.generator.WorldConfigurator;
-import org.terasology.world.generator.WorldGenerator;
+import org.terasology.engine.core.SimpleUri;
+import org.terasology.engine.world.block.BlockManager;
+import org.terasology.engine.world.chunks.CoreChunk;
+import org.terasology.engine.world.generation.EntityBuffer;
+import org.terasology.engine.world.generation.World;
+import org.terasology.engine.world.generator.WorldConfigurator;
+import org.terasology.engine.world.generator.WorldGenerator;
 
 public class TestWorldGenerator implements WorldGenerator {
     private final BlockManager blockManager;

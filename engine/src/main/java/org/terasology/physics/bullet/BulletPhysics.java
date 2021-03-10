@@ -1,6 +1,6 @@
 // Copyright 2020 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.physics.bullet;
+package org.terasology.engine.physics.bullet;
 
 import com.badlogic.gdx.physics.bullet.collision.ClosestRayResultCallback;
 import com.badlogic.gdx.physics.bullet.collision.Collision;
@@ -43,33 +43,31 @@ import org.joml.Vector3i;
 import org.lwjgl.BufferUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.systems.RegisterSystem;
-import org.terasology.logic.characters.CharacterMovementComponent;
-import org.terasology.logic.location.LocationComponent;
-import org.terasology.math.AABB;
-import org.terasology.math.JomlUtil;
-import org.terasology.monitoring.PerformanceMonitor;
-import org.terasology.physics.CollisionGroup;
-import org.terasology.physics.HitResult;
-import org.terasology.physics.StandardCollisionGroup;
-import org.terasology.physics.bullet.shapes.BulletBoxShape;
-import org.terasology.physics.bullet.shapes.BulletConvexHullShape;
-import org.terasology.physics.bullet.shapes.BulletSphereShape;
-import org.terasology.physics.components.RigidBodyComponent;
-import org.terasology.physics.components.TriggerComponent;
-import org.terasology.physics.components.shapes.BoxShapeComponent;
-import org.terasology.physics.components.shapes.CapsuleShapeComponent;
-import org.terasology.physics.components.shapes.CylinderShapeComponent;
-import org.terasology.physics.components.shapes.HullShapeComponent;
-import org.terasology.physics.components.shapes.SphereShapeComponent;
-import org.terasology.physics.engine.CharacterCollider;
-import org.terasology.physics.engine.PhysicsEngine;
-import org.terasology.physics.engine.PhysicsSystem;
-import org.terasology.physics.engine.RigidBody;
-import org.terasology.physics.engine.SweepCallback;
-import org.terasology.registry.CoreRegistry;
-import org.terasology.world.BlockEntityRegistry;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.entitySystem.systems.RegisterSystem;
+import org.terasology.engine.logic.characters.CharacterMovementComponent;
+import org.terasology.engine.logic.location.LocationComponent;
+import org.terasology.engine.monitoring.PerformanceMonitor;
+import org.terasology.engine.physics.CollisionGroup;
+import org.terasology.engine.physics.HitResult;
+import org.terasology.engine.physics.StandardCollisionGroup;
+import org.terasology.engine.physics.bullet.shapes.BulletBoxShape;
+import org.terasology.engine.physics.bullet.shapes.BulletConvexHullShape;
+import org.terasology.engine.physics.bullet.shapes.BulletSphereShape;
+import org.terasology.engine.physics.components.RigidBodyComponent;
+import org.terasology.engine.physics.components.TriggerComponent;
+import org.terasology.engine.physics.components.shapes.BoxShapeComponent;
+import org.terasology.engine.physics.components.shapes.CapsuleShapeComponent;
+import org.terasology.engine.physics.components.shapes.CylinderShapeComponent;
+import org.terasology.engine.physics.components.shapes.HullShapeComponent;
+import org.terasology.engine.physics.components.shapes.SphereShapeComponent;
+import org.terasology.engine.physics.engine.CharacterCollider;
+import org.terasology.engine.physics.engine.PhysicsEngine;
+import org.terasology.engine.physics.engine.PhysicsSystem;
+import org.terasology.engine.physics.engine.RigidBody;
+import org.terasology.engine.physics.engine.SweepCallback;
+import org.terasology.engine.registry.CoreRegistry;
+import org.terasology.engine.world.BlockEntityRegistry;
 
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
@@ -166,18 +164,8 @@ public class BulletPhysics implements PhysicsEngine {
     }
 
     @Override
-    public List<EntityRef> scanArea(AABB area, CollisionGroup... collisionFilter) {
-        return scanArea(area, Arrays.asList(collisionFilter));
-    }
-
-    @Override
     public List<EntityRef> scanArea(AABBf area, CollisionGroup... collisionFilter) {
         return scanArea(area, Arrays.asList(collisionFilter));
-    }
-
-    @Override
-    public List<EntityRef> scanArea(AABB area, Iterable<CollisionGroup> collisionFilter) {
-        return scanArea(JomlUtil.from(area), collisionFilter);
     }
 
     @Override

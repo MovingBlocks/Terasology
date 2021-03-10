@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.telemetry.logstash;
+package org.terasology.engine.telemetry.logstash;
 
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -21,18 +21,18 @@ import net.logstash.logback.composite.AbstractFieldJsonProvider;
 import net.logstash.logback.composite.FieldNamesAware;
 import net.logstash.logback.composite.JsonWritingUtils;
 import net.logstash.logback.fieldnames.LogstashFieldNames;
-import org.terasology.context.Context;
-import org.terasology.telemetry.Metrics;
-import org.terasology.telemetry.TelemetryUtils;
-import org.terasology.telemetry.metrics.Metric;
-import org.terasology.telemetry.metrics.ModulesMetric;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.telemetry.Metrics;
+import org.terasology.engine.telemetry.TelemetryUtils;
+import org.terasology.engine.telemetry.metrics.Metric;
+import org.terasology.engine.telemetry.metrics.ModulesMetric;
 
 import java.io.IOException;
 import java.util.Map;
 import java.util.Optional;
 
 /**
- * ModulesJsonProvider provides game module id and version to {@link org.terasology.telemetry.logstash.TelemetryLogstashAppender}.
+ * ModulesJsonProvider provides game module id and version to {@link org.terasology.engine.telemetry.logstash.TelemetryLogstashAppender}.
  * These information will then send to the server.
  * The fieldName can be reset in logback.xml.
  */

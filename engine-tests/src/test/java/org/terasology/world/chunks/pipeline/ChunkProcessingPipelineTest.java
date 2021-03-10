@@ -1,7 +1,7 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-package org.terasology.world.chunks.pipeline;
+package org.terasology.engine.world.chunks.pipeline;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -11,17 +11,16 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
-import org.terasology.TerasologyTestingEnvironment;
 import org.terasology.assets.management.AssetManager;
-import org.terasology.math.JomlUtil;
-import org.terasology.registry.CoreRegistry;
-import org.terasology.world.block.BlockManager;
-import org.terasology.world.block.internal.BlockManagerImpl;
-import org.terasology.world.block.tiles.NullWorldAtlas;
-import org.terasology.world.chunks.Chunk;
-import org.terasology.world.chunks.blockdata.ExtraBlockDataManager;
-import org.terasology.world.chunks.internal.ChunkImpl;
-import org.terasology.world.chunks.pipeline.stages.ChunkTaskProvider;
+import org.terasology.engine.TerasologyTestingEnvironment;
+import org.terasology.engine.registry.CoreRegistry;
+import org.terasology.engine.world.block.BlockManager;
+import org.terasology.engine.world.block.internal.BlockManagerImpl;
+import org.terasology.engine.world.block.tiles.NullWorldAtlas;
+import org.terasology.engine.world.chunks.Chunk;
+import org.terasology.engine.world.chunks.blockdata.ExtraBlockDataManager;
+import org.terasology.engine.world.chunks.internal.ChunkImpl;
+import org.terasology.engine.world.chunks.pipeline.stages.ChunkTaskProvider;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -57,7 +56,7 @@ class ChunkProcessingPipelineTest extends TerasologyTestingEnvironment {
     void simpleProcessingSuccess() throws ExecutionException, InterruptedException, TimeoutException {
         pipeline = new ChunkProcessingPipeline((p) -> null, (o1, o2) -> 0);
 
-        org.terasology.math.geom.Vector3i chunkPos = new org.terasology.math.geom.Vector3i(0, 0, 0);
+        Vector3i chunkPos = new Vector3i(0, 0, 0);
         Chunk chunk = createChunkAt(chunkPos);
 
         pipeline.addStage(ChunkTaskProvider.create("dummy task", (c) -> c));
@@ -99,11 +98,11 @@ class ChunkProcessingPipelineTest extends TerasologyTestingEnvironment {
      */
     @Test
     void multiRequirementsChunksExistsSuccess() throws ExecutionException, InterruptedException, TimeoutException {
-        org.terasology.math.geom.Vector3i positionToGenerate = new org.terasology.math.geom.Vector3i(0, 0, 0);
+        Vector3i positionToGenerate = new Vector3i(0, 0, 0);
         Map<Vector3ic, Chunk> chunkCache =
-                getNearChunkPositions(JomlUtil.from(positionToGenerate))
+                getNearChunkPositions(positionToGenerate)
                         .stream()
-                        .filter((p) -> !p.equals(JomlUtil.from(positionToGenerate))) //remove central chunk.
+                        .filter((p) -> !p.equals(positionToGenerate)) //remove central chunk.
                         .map(this::createChunkAt)
                         .collect(Collectors.toMap(
                                 (chunk) -> chunk.getPosition(new Vector3i()),
@@ -133,11 +132,11 @@ class ChunkProcessingPipelineTest extends TerasologyTestingEnvironment {
     @Test
     void multiRequirementsChunksWillGeneratedSuccess() throws ExecutionException, InterruptedException,
             TimeoutException {
-        org.terasology.math.geom.Vector3i positionToGenerate = new org.terasology.math.geom.Vector3i(0, 0, 0);
+        Vector3i positionToGenerate = new Vector3i(0, 0, 0);
         Map<Vector3i, Chunk> chunkToGenerate =
-                getNearChunkPositions(JomlUtil.from(positionToGenerate))
+                getNearChunkPositions(positionToGenerate)
                         .stream()
-                        .filter((p) -> !p.equals(JomlUtil.from(positionToGenerate))) //remove central chunk.
+                        .filter((p) -> !p.equals(positionToGenerate)) //remove central chunk.
                         .map(this::createChunkAt)
                         .collect(Collectors.toMap(
                                 (chunk) -> chunk.getPosition(new Vector3i()),
@@ -260,11 +259,7 @@ class ChunkProcessingPipelineTest extends TerasologyTestingEnvironment {
         return requirements;
     }
 
-    private ChunkImpl createChunkAt(Vector3ic pos) {
-        return createChunkAt(JomlUtil.from(pos));
-    }
-
-    private ChunkImpl createChunkAt(org.terasology.math.geom.Vector3i chunkPos) {
+    private ChunkImpl createChunkAt(Vector3ic chunkPos) {
         return new ChunkImpl(chunkPos, blockManager, extraDataManager);
     }
 

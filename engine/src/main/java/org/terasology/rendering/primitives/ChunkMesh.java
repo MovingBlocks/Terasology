@@ -1,35 +1,22 @@
-/*
- * Copyright 2013 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-package org.terasology.rendering.primitives;
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
+package org.terasology.engine.rendering.primitives;
 
 import com.google.common.collect.Maps;
 import gnu.trove.list.TFloatList;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TFloatArrayList;
 import gnu.trove.list.array.TIntArrayList;
+import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL15;
-import org.terasology.engine.subsystem.lwjgl.GLBufferPool;
-import org.terasology.math.geom.Vector3f;
+import org.terasology.engine.core.subsystem.lwjgl.GLBufferPool;
 import org.terasology.module.sandbox.API;
-import org.terasology.rendering.VertexBufferObjectUtil;
-import org.terasology.rendering.assets.material.Material;
-import org.terasology.world.chunks.ChunkConstants;
+import org.terasology.engine.rendering.VertexBufferObjectUtil;
+import org.terasology.engine.rendering.assets.material.Material;
+import org.terasology.engine.world.chunks.Chunks;
 
 import java.nio.IntBuffer;
 import java.util.Map;
@@ -235,9 +222,9 @@ public class ChunkMesh {
      */
     public void updateMaterial(Material chunkMaterial, Vector3fc chunkPosition, boolean chunkIsAnimated) {
         chunkMaterial.setFloat3("chunkPositionWorld",
-                chunkPosition.x() * ChunkConstants.SIZE_X,
-                chunkPosition.y() * ChunkConstants.SIZE_Y,
-                chunkPosition.z() * ChunkConstants.SIZE_Z,
+                chunkPosition.x() * Chunks.SIZE_X,
+                chunkPosition.y() * Chunks.SIZE_Y,
+                chunkPosition.z() * Chunks.SIZE_Z,
                 true);
         chunkMaterial.setFloat("animated", chunkIsAnimated ? 1.0f : 0.0f, true);
     }
@@ -250,15 +237,18 @@ public class ChunkMesh {
      * @param chunkPosition a Vector3f storing the world position of the chunk.
      * @param cameraPosition a Vector3f storing the world position of the point of view from which the chunk is rendered.
      * @return Returns an integer representing the number of triangles rendered.
+     * @deprecated This method uses legacy calls for opengl fixed function pipleine. transform will be set by the shader
+     *  use {@link #render(RenderPhase)}
      */
+    @Deprecated
     public int render(ChunkMesh.RenderPhase phase, Vector3fc chunkPosition, Vector3fc cameraPosition) {
         GL11.glPushMatrix();
 
         // chunkPositionRelativeToCamera = chunkCoordinates * chunkDimensions - cameraCoordinate
         final Vector3f chunkPositionRelativeToCamera =
-                new Vector3f(chunkPosition.x() * ChunkConstants.SIZE_X - cameraPosition.x(),
-                        chunkPosition.y() * ChunkConstants.SIZE_Y - cameraPosition.y(),
-                        chunkPosition.z() * ChunkConstants.SIZE_Z - cameraPosition.z());
+                new Vector3f(chunkPosition.x() * Chunks.SIZE_X - cameraPosition.x(),
+                        chunkPosition.y() * Chunks.SIZE_Y - cameraPosition.y(),
+                        chunkPosition.z() * Chunks.SIZE_Z - cameraPosition.z());
         GL11.glTranslatef(chunkPositionRelativeToCamera.x, chunkPositionRelativeToCamera.y, chunkPositionRelativeToCamera.z);
 
         render(phase);  // this is where the chunk is actually rendered
@@ -268,7 +258,7 @@ public class ChunkMesh {
         return triangleCount();
     }
 
-    private void render(RenderPhase type) {
+    public int render(RenderPhase type) {
         switch (type) {
             case OPAQUE:
                 renderVbo(0);
@@ -283,6 +273,7 @@ public class ChunkMesh {
             default:
                 break;
         }
+        return triangleCount();
     }
 
     /**

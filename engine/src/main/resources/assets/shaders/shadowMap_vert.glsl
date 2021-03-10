@@ -16,9 +16,12 @@
 
 varying vec4 positionProj;
 
+uniform mat4 projection;
+uniform mat4 modelView;
+
 void main()
 {
-	gl_Position = ftransform();
+	gl_Position = projection * modelView *  gl_Vertex;
 	positionProj = gl_Position;
 
     gl_FrontColor = gl_Color;

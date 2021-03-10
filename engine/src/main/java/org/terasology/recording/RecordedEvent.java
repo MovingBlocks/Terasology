@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.recording;
+package org.terasology.engine.recording;
 
-import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.event.Event;
+import org.terasology.engine.entitySystem.Component;
+import org.terasology.engine.entitySystem.event.Event;
 
 /**
  * Saves a recorded event, the id of the entity it was sent against, the component it was sent with, the timestamp in

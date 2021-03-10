@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.config.flexible.constraints;
+package org.terasology.engine.config.flexible.constraints;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;

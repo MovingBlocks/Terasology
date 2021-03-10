@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.entitySystem.entity.internal;
+package org.terasology.engine.entitySystem.entity.internal;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.MapMaker;
@@ -21,24 +21,21 @@ import org.joml.Quaternionfc;
 import org.joml.Vector3fc;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.entity.EntityBuilder;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.entity.lifecycleEvents.BeforeDeactivateComponent;
-import org.terasology.entitySystem.entity.lifecycleEvents.BeforeRemoveComponent;
-import org.terasology.entitySystem.event.internal.EventSystem;
-import org.terasology.entitySystem.prefab.Prefab;
-import org.terasology.logic.location.LocationComponent;
-import org.terasology.math.JomlUtil;
-import org.terasology.math.geom.Quat4f;
-import org.terasology.math.geom.Vector3f;
+import org.terasology.engine.entitySystem.Component;
+import org.terasology.engine.entitySystem.entity.EntityBuilder;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.entitySystem.entity.lifecycleEvents.BeforeDeactivateComponent;
+import org.terasology.engine.entitySystem.entity.lifecycleEvents.BeforeRemoveComponent;
+import org.terasology.engine.entitySystem.event.internal.EventSystem;
+import org.terasology.engine.entitySystem.prefab.Prefab;
+import org.terasology.engine.logic.location.LocationComponent;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 
-import static org.terasology.entitySystem.entity.internal.PojoEntityManager.NULL_ID;
+import static org.terasology.engine.entitySystem.entity.internal.PojoEntityManager.NULL_ID;
 
 public class PojoEntityPool implements EngineEntityPool {
 
@@ -66,7 +63,7 @@ public class PojoEntityPool implements EngineEntityPool {
 
     @Override
     public EntityRef create() {
-        return create((Prefab) null, (Vector3f) null, null);
+        return create((Prefab) null, (Vector3fc) null, null);
     }
 
     @Override
@@ -92,42 +89,28 @@ public class PojoEntityPool implements EngineEntityPool {
         return create(prefabName, null, null);
     }
 
+
     @Override
-    public EntityRef create(String prefabName, Vector3f position) {
+    public EntityRef create(String prefabName, Vector3fc position) {
         return create(prefabName, position, null);
     }
 
     @Override
-    public EntityRef create(String prefabName, Vector3fc position) {
-        return create(prefabName, JomlUtil.from(position), null);
-    }
-
-    @Override
-    public EntityRef create(Prefab prefab, Vector3f position) {
+    public EntityRef create(Prefab prefab, Vector3fc position) {
         return create(prefab, position, null);
     }
 
     @Override
-    public EntityRef create(Prefab prefab, Vector3fc position) {
-        return create(prefab, JomlUtil.from(position), null);
-    }
-
-    @Override
     public EntityRef create(Prefab prefab) {
-        return create(prefab, (Vector3f) null, null);
-    }
-
-    @Override
-    public EntityRef create(Prefab prefab, Vector3f position, Quat4f rotation) {
-        return create(prefab, position, rotation, true);
+        return create(prefab, (Vector3fc) null, null);
     }
 
     @Override
     public EntityRef create(Prefab prefab, Vector3fc position, Quaternionfc rotation) {
-        return create(prefab, JomlUtil.from(position), JomlUtil.from(rotation), true);
+        return create(prefab, position, rotation, true);
     }
 
-    private EntityRef create(Prefab prefab, Vector3f position, Quat4f rotation, boolean sendLifecycleEvents) {
+    private EntityRef create(Prefab prefab, Vector3fc position, Quaternionfc rotation, boolean sendLifecycleEvents) {
         EntityBuilder builder = newBuilder(prefab);
         builder.setSendLifecycleEvents(sendLifecycleEvents);
 
@@ -147,11 +130,11 @@ public class PojoEntityPool implements EngineEntityPool {
         return builder.build();
     }
 
-    private EntityRef create(String prefabName, Vector3f position, Quat4f rotation) {
+    private EntityRef create(String prefabName, Vector3fc position, Quaternionfc rotation) {
         return create(prefabName, position, rotation, true);
     }
 
-    private EntityRef create(String prefabName, Vector3f position, Quat4f rotation, boolean sendLifecycleEvents) {
+    private EntityRef create(String prefabName, Vector3fc position, Quaternionfc rotation, boolean sendLifecycleEvents) {
         Prefab prefab;
         if (prefabName == null || prefabName.isEmpty()) {
             prefab = null;

@@ -1,7 +1,7 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-package org.terasology.input.lwjgl;
+package org.terasology.engine.input.lwjgl;
 
 import com.google.common.collect.Lists;
 import gnu.trove.set.TIntSet;
@@ -10,7 +10,7 @@ import org.joml.Vector2d;
 import org.joml.Vector2i;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.glfw.GLFW;
-import org.terasology.config.RenderingConfig;
+import org.terasology.engine.config.RenderingConfig;
 import org.terasology.input.ButtonState;
 import org.terasology.input.InputType;
 import org.terasology.input.MouseInput;

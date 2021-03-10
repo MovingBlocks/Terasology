@@ -1,48 +1,34 @@
-/*
- * Copyright 2013 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-package org.terasology.logic.characters;
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
+package org.terasology.engine.logic.characters;
 
 import org.joml.RoundingMode;
 import org.joml.Vector3f;
 import org.joml.Vector3i;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.audio.StaticSound;
-import org.terasology.audio.events.PlaySoundEvent;
-import org.terasology.engine.Time;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.event.ReceiveEvent;
-import org.terasology.entitySystem.systems.BaseComponentSystem;
-import org.terasology.entitySystem.systems.RegisterMode;
-import org.terasology.entitySystem.systems.RegisterSystem;
-import org.terasology.logic.characters.events.FootstepEvent;
-import org.terasology.logic.characters.events.JumpEvent;
-import org.terasology.logic.characters.events.OnEnterBlockEvent;
-import org.terasology.logic.characters.events.PlayerDeathEvent;
-import org.terasology.logic.characters.events.SwimStrokeEvent;
-import org.terasology.logic.characters.events.VerticalCollisionEvent;
-import org.terasology.logic.health.DoDestroyEvent;
-import org.terasology.logic.location.LocationComponent;
-import org.terasology.logic.players.event.OnPlayerRespawnedEvent;
-import org.terasology.math.JomlUtil;
-import org.terasology.registry.In;
-import org.terasology.utilities.random.FastRandom;
-import org.terasology.utilities.random.Random;
-import org.terasology.world.WorldProvider;
-import org.terasology.world.block.Block;
+import org.terasology.engine.audio.StaticSound;
+import org.terasology.engine.audio.events.PlaySoundEvent;
+import org.terasology.engine.core.Time;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.entitySystem.event.ReceiveEvent;
+import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
+import org.terasology.engine.entitySystem.systems.RegisterMode;
+import org.terasology.engine.entitySystem.systems.RegisterSystem;
+import org.terasology.engine.logic.characters.events.FootstepEvent;
+import org.terasology.engine.logic.characters.events.JumpEvent;
+import org.terasology.engine.logic.characters.events.OnEnterBlockEvent;
+import org.terasology.engine.logic.characters.events.PlayerDeathEvent;
+import org.terasology.engine.logic.characters.events.SwimStrokeEvent;
+import org.terasology.engine.logic.characters.events.VerticalCollisionEvent;
+import org.terasology.engine.logic.health.DoDestroyEvent;
+import org.terasology.engine.logic.location.LocationComponent;
+import org.terasology.engine.logic.players.event.OnPlayerRespawnedEvent;
+import org.terasology.engine.registry.In;
+import org.terasology.engine.utilities.random.FastRandom;
+import org.terasology.engine.utilities.random.Random;
+import org.terasology.engine.world.WorldProvider;
+import org.terasology.engine.world.block.Block;
 
 import java.util.List;
 
@@ -71,7 +57,7 @@ public class CharacterSoundSystem extends BaseComponentSystem {
         List<StaticSound> footstepSounds = characterSounds.footstepSounds;
 
         // Check if the block the character is standing on has footstep sounds
-        Vector3i blockPos = new Vector3i(JomlUtil.from(locationComponent.getLocalPosition()), RoundingMode.FLOOR);
+        Vector3i blockPos = new Vector3i(locationComponent.getLocalPosition(), RoundingMode.FLOOR);
         blockPos.y--; // The block *below* the character's feet is interesting to us
         Block block = worldProvider.getBlock(blockPos);
         if (block != null) {

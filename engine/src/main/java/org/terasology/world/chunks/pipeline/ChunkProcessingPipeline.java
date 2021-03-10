@@ -1,7 +1,7 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-package org.terasology.world.chunks.pipeline;
+package org.terasology.engine.world.chunks.pipeline;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
@@ -11,12 +11,12 @@ import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.monitoring.ThreadActivity;
-import org.terasology.monitoring.ThreadMonitor;
-import org.terasology.utilities.ReflectionUtil;
-import org.terasology.world.chunks.Chunk;
-import org.terasology.world.chunks.pipeline.stages.ChunkTask;
-import org.terasology.world.chunks.pipeline.stages.ChunkTaskProvider;
+import org.terasology.engine.monitoring.ThreadActivity;
+import org.terasology.engine.monitoring.ThreadMonitor;
+import org.terasology.engine.world.chunks.pipeline.stages.ChunkTask;
+import org.terasology.engine.world.chunks.pipeline.stages.ChunkTaskProvider;
+import org.terasology.engine.utilities.ReflectionUtil;
+import org.terasology.engine.world.chunks.Chunk;
 
 import java.util.Comparator;
 import java.util.LinkedList;
@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletionService;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorCompletionService;
@@ -141,6 +142,7 @@ public class ChunkProcessingPipeline {
                             chunkProcessingInfo.getPosition(), stageName),
                     e);
             chunkProcessingInfo.getExternalFuture().setException(e);
+        } catch (CancellationException ignored) {
         }
     }
 
@@ -148,7 +150,7 @@ public class ChunkProcessingPipeline {
         chunkProcessingInfoMap.values().stream()
                 .filter(chunkProcessingInfo -> chunkProcessingInfo.getChunkTask() != null && chunkProcessingInfo.getCurrentFuture() == null)
                 .forEach(chunkProcessingInfo -> {
-                    ChunkTask chunkTask = chunkProcessingInfo.getChunkTask();
+                    org.terasology.engine.world.chunks.pipeline.stages.ChunkTask chunkTask = chunkProcessingInfo.getChunkTask();
                     Set<Chunk> providedChunks = chunkTask.getRequirements().stream()
                             .map(pos -> getChunkBy(chunkProcessingInfo.getChunkTaskProvider(), pos))
                             .filter(Objects::nonNull)
@@ -258,6 +260,10 @@ public class ChunkProcessingPipeline {
      */
     public void stopProcessingAt(Vector3ic pos) {
         ChunkProcessingInfo removed = chunkProcessingInfoMap.remove(pos);
+        if (removed == null) {
+            return;
+        }
+
         removed.getExternalFuture().cancel(true);
 
         Future<Chunk> currentFuture = removed.getCurrentFuture();

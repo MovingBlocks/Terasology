@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.network.events;
+package org.terasology.engine.network.events;
 
-import org.terasology.entitySystem.event.Event;
-import org.terasology.network.OwnerEvent;
+import org.terasology.engine.entitySystem.event.Event;
+import org.terasology.engine.network.OwnerEvent;
 
 /**
  * This event handles the ping from the server to all clients.

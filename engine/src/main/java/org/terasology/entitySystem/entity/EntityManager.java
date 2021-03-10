@@ -13,16 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.entitySystem.entity;
+package org.terasology.engine.entitySystem.entity;
 
-import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.entity.internal.EngineEntityPool;
-import org.terasology.entitySystem.event.internal.EventSystem;
-import org.terasology.entitySystem.metadata.ComponentLibrary;
-import org.terasology.entitySystem.prefab.PrefabManager;
-import org.terasology.entitySystem.sectors.SectorSimulationComponent;
-import org.terasology.game.GameManifest;
-import org.terasology.world.internal.WorldInfo;
+import org.terasology.engine.entitySystem.Component;
+import org.terasology.engine.entitySystem.entity.internal.EngineEntityPool;
+import org.terasology.engine.entitySystem.event.internal.EventSystem;
+import org.terasology.engine.entitySystem.metadata.ComponentLibrary;
+import org.terasology.engine.entitySystem.prefab.PrefabManager;
+import org.terasology.engine.entitySystem.sectors.SectorSimulationComponent;
+import org.terasology.engine.game.GameManifest;
+import org.terasology.engine.world.internal.WorldInfo;
 
 import java.util.List;
 import java.util.Map;

@@ -1,8 +1,8 @@
 
-package org.terasology.config.facade;
+package org.terasology.engine.config.facade;
 
-import org.terasology.config.Config;
-import org.terasology.config.ControllerConfig.ControllerInfo;
+import org.terasology.engine.config.Config;
+import org.terasology.engine.config.ControllerConfig.ControllerInfo;
 
 /**
  * Facade for {@link Config#getInput()}

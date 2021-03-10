@@ -1,23 +1,23 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-package org.terasology.network;
+package org.terasology.engine.network;
 
 import com.google.common.collect.Lists;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.ResourceLock;
-import org.terasology.TerasologyTestingEnvironment;
-import org.terasology.config.Config;
-import org.terasology.engine.EngineTime;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.entity.internal.EngineEntityManager;
-import org.terasology.entitySystem.metadata.EventLibrary;
-import org.terasology.identity.CertificateGenerator;
-import org.terasology.identity.CertificatePair;
-import org.terasology.network.exceptions.HostingFailedException;
-import org.terasology.network.internal.NetworkSystemImpl;
+import org.terasology.engine.TerasologyTestingEnvironment;
+import org.terasology.engine.config.Config;
+import org.terasology.engine.core.EngineTime;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.entitySystem.entity.internal.EngineEntityManager;
+import org.terasology.engine.entitySystem.metadata.EventLibrary;
+import org.terasology.engine.identity.CertificateGenerator;
+import org.terasology.engine.identity.CertificatePair;
+import org.terasology.engine.network.exceptions.HostingFailedException;
+import org.terasology.engine.network.internal.NetworkSystemImpl;
 
 import java.util.List;
 

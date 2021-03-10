@@ -1,32 +1,18 @@
-/*
- * Copyright 2013 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 
-package org.terasology.world.internal;
+package org.terasology.engine.world.internal;
 
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.math.JomlUtil;
 import org.terasology.math.TeraMath;
-import org.terasology.world.block.Block;
-import org.terasology.world.block.BlockRegion;
-import org.terasology.world.block.BlockRegionc;
-import org.terasology.world.chunks.Chunk;
-import org.terasology.world.chunks.Chunks;
+import org.terasology.engine.world.block.Block;
+import org.terasology.engine.world.block.BlockRegion;
+import org.terasology.engine.world.block.BlockRegionc;
+import org.terasology.engine.world.chunks.Chunk;
+import org.terasology.engine.world.chunks.Chunks;
 
 /**
  */
@@ -112,7 +98,7 @@ public class ChunkViewCoreImpl implements ChunkViewCore {
         if (blockRegion.contains(blockX, blockY, blockZ)) {
             Chunk chunk = chunks[relChunkIndex(blockX, blockY, blockZ)];
             if (chunk != null) {
-                return chunk.getSunlight(JomlUtil.from(Chunks.toRelative(blockX, blockY, blockZ, chunkFilterSize, new Vector3i())));
+                return chunk.getSunlight(Chunks.toRelative(blockX, blockY, blockZ, chunkFilterSize, new Vector3i()));
             }
         }
         return 0;
@@ -123,7 +109,7 @@ public class ChunkViewCoreImpl implements ChunkViewCore {
         if (blockRegion.contains(blockX, blockY, blockZ)) {
             Chunk chunk = chunks[relChunkIndex(blockX, blockY, blockZ)];
             if (chunk != null) {
-                return chunk.getLight(JomlUtil.from(Chunks.toRelative(blockX, blockY, blockZ, chunkFilterSize, new Vector3i())));
+                return chunk.getLight(Chunks.toRelative(blockX, blockY, blockZ, chunkFilterSize, new Vector3i()));
             }
         }
         return 0;
@@ -156,7 +142,7 @@ public class ChunkViewCoreImpl implements ChunkViewCore {
         if (blockRegion.contains(blockX, blockY, blockZ)) {
             Chunk chunk = chunks[relChunkIndex(blockX, blockY, blockZ)];
             if (chunk != null) {
-                chunk.setLight(JomlUtil.from(Chunks.toRelative(blockX, blockY, blockZ, chunkFilterSize, new Vector3i())), light);
+                chunk.setLight(Chunks.toRelative(blockX, blockY, blockZ, chunkFilterSize, new Vector3i()), light);
                 return;
             }
         }
@@ -173,7 +159,7 @@ public class ChunkViewCoreImpl implements ChunkViewCore {
         if (blockRegion.contains(blockX, blockY, blockZ)) {
             Chunk chunk = chunks[relChunkIndex(blockX, blockY, blockZ)];
             if (chunk != null) {
-                chunk.setSunlight(JomlUtil.from(Chunks.toRelative(blockX, blockY, blockZ, chunkFilterSize, new Vector3i())), light);
+                chunk.setSunlight(Chunks.toRelative(blockX, blockY, blockZ, chunkFilterSize, new Vector3i()), light);
                 return;
             }
         }
@@ -221,7 +207,10 @@ public class ChunkViewCoreImpl implements ChunkViewCore {
     public void setDirtyAround(BlockRegionc region) {
         BlockRegion tmp = new BlockRegion(region).expand(1, 1, 1);
         for (Vector3ic pos : Chunks.toChunkRegion(tmp, tmp)) {
-            Chunk chunk = chunks[TeraMath.calculate3DArrayIndex(pos.x() + offset.x, pos.y() + offset.y, pos.z() + offset.z, JomlUtil.from(chunkRegion.getSize(new Vector3i())))];
+            int px = pos.x() + offset.x;
+            int py = pos.y() + offset.y;
+            int pz = pos.z() + offset.z;
+            Chunk chunk = chunks[px + chunkRegion.getSizeX() * (pz + chunkRegion.getSizeZ() * py)];
             if (chunk != null) {
                 chunk.setDirty(true);
             }
@@ -239,9 +228,10 @@ public class ChunkViewCoreImpl implements ChunkViewCore {
     }
 
     protected int relChunkIndex(int x, int y, int z) {
-        return TeraMath.calculate3DArrayIndex(Chunks.toChunkPos(x, chunkPower.x) + offset.x,
-                Chunks.toChunkPos(y, chunkPower.y) + offset.y,
-                Chunks.toChunkPos(z, chunkPower.z) + offset.z, JomlUtil.from(chunkRegion.getSize(new Vector3i())));
+        int px = (Chunks.toChunkPos(x, chunkPower.x) + offset.x);
+        int py = Chunks.toChunkPos(y, chunkPower.y) + offset.y;
+        int pz = Chunks.toChunkPos(z, chunkPower.z) + offset.z;
+        return  px + chunkRegion.getSizeX() * (pz + chunkRegion.getSizeZ() * py);
     }
 
     public void setChunkSize(Vector3i chunkSize) {

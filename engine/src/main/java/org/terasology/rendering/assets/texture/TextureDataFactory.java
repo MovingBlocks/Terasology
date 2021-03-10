@@ -1,14 +1,15 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-package org.terasology.rendering.assets.texture;
-
+package org.terasology.engine.rendering.assets.texture;
 import org.terasology.math.TeraMath;
 import org.terasology.nui.Color;
-import org.terasology.rendering.assets.texture.Texture.FilterMode;
-import org.terasology.rendering.assets.texture.Texture.WrapMode;
-import org.terasology.utilities.random.FastRandom;
-import org.terasology.utilities.random.Random;
+import org.terasology.engine.rendering.assets.texture.Texture.FilterMode;
+import org.terasology.engine.rendering.assets.texture.Texture.WrapMode;
+import org.terasology.engine.utilities.random.FastRandom;
+import org.terasology.engine.utilities.random.Random;
+
+import java.nio.ByteBuffer;
 
 import java.nio.Buffer;
 import java.nio.ByteBuffer;

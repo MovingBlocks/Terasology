@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.physics.bullet.shapes;
+package org.terasology.engine.physics.bullet.shapes;
 
 
 import com.badlogic.gdx.physics.bullet.collision.btCollisionShape;
@@ -22,7 +22,7 @@ import org.joml.Matrix4f;
 import org.joml.Quaternionfc;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
-import org.terasology.physics.shapes.CollisionShape;
+import org.terasology.engine.physics.shapes.CollisionShape;
 
 public abstract class BulletCollisionShape implements CollisionShape {
     public btCollisionShape underlyingShape;

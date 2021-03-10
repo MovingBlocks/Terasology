@@ -19,10 +19,10 @@ package org.terasology.world.generation.facets;
 import com.google.common.collect.ImmutableMap;
 import org.joml.Vector3i;
 import org.junit.jupiter.api.Test;
-import org.terasology.world.block.BlockRegion;
-import org.terasology.world.generation.Border3D;
-import org.terasology.world.generation.facets.base.FieldFacet3D;
-import org.terasology.world.generation.facets.base.SparseFieldFacet3D;
+import org.terasology.engine.world.block.BlockRegion;
+import org.terasology.engine.world.generation.Border3D;
+import org.terasology.engine.world.generation.facets.base.FieldFacet3D;
+import org.terasology.engine.world.generation.facets.base.SparseFieldFacet3D;
 
 import java.util.Map;
 

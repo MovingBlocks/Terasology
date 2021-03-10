@@ -1,38 +1,33 @@
-/*
- * Copyright 2015 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-package org.terasology.engine.subsystem.common;
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
+package org.terasology.engine.core.subsystem.common;
 
 import com.google.common.collect.Iterables;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.config.Config;
-import org.terasology.config.facade.BindsConfiguration;
-import org.terasology.config.facade.BindsConfigurationImpl;
-import org.terasology.config.facade.InputDeviceConfiguration;
-import org.terasology.config.facade.InputDeviceConfigurationImpl;
-import org.terasology.config.flexible.AutoConfigManager;
-import org.terasology.context.Context;
-import org.terasology.engine.GameEngine;
-import org.terasology.engine.TerasologyConstants;
-import org.terasology.engine.subsystem.EngineSubsystem;
-import org.terasology.identity.CertificateGenerator;
-import org.terasology.identity.CertificatePair;
-import org.terasology.identity.PrivateIdentityCertificate;
-import org.terasology.identity.PublicIdentityCertificate;
-import org.terasology.identity.storageServiceClient.StorageServiceWorker;
+import org.terasology.engine.config.flexible.AutoConfigTypeHandlerFactory;
+import org.terasology.engine.config.Config;
+import org.terasology.engine.config.facade.BindsConfiguration;
+import org.terasology.engine.config.facade.BindsConfigurationImpl;
+import org.terasology.engine.config.facade.InputDeviceConfiguration;
+import org.terasology.engine.config.facade.InputDeviceConfigurationImpl;
+import org.terasology.engine.config.flexible.AutoConfigManager;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.core.GameEngine;
+import org.terasology.engine.core.TerasologyConstants;
+import org.terasology.engine.core.subsystem.EngineSubsystem;
+import org.terasology.engine.identity.CertificateGenerator;
+import org.terasology.engine.identity.CertificatePair;
+import org.terasology.engine.identity.PrivateIdentityCertificate;
+import org.terasology.engine.identity.PublicIdentityCertificate;
+import org.terasology.engine.identity.storageServiceClient.StorageServiceWorker;
+import org.terasology.engine.persistence.typeHandling.gson.GsonPersistedData;
+import org.terasology.engine.persistence.typeHandling.gson.GsonPersistedDataReader;
+import org.terasology.engine.persistence.typeHandling.gson.GsonPersistedDataSerializer;
+import org.terasology.engine.persistence.typeHandling.gson.GsonPersistedDataWriter;
+import org.terasology.persistence.serializers.Serializer;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 
 /**
@@ -83,7 +78,16 @@ public class ConfigurationSubsystem implements EngineSubsystem {
     public void initialise(GameEngine engine, Context rootContext) {
         // TODO: Put here because of TypeHandlerLibrary dependency,
         //  might need to move to preInitialise or elsewhere
-        autoConfigManager = new AutoConfigManager(rootContext.get(TypeHandlerLibrary.class));
+        TypeHandlerLibrary typeHandlerLibrary = rootContext.get(TypeHandlerLibrary.class);
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        Serializer<GsonPersistedData> serializer = new Serializer<>(
+                typeHandlerLibrary,
+                new GsonPersistedDataSerializer(),
+                new GsonPersistedDataWriter(gson),
+                new GsonPersistedDataReader(gson)
+        );
+        autoConfigManager = new AutoConfigManager(serializer);
+        typeHandlerLibrary.addTypeHandlerFactory(new AutoConfigTypeHandlerFactory(typeHandlerLibrary));
         rootContext.put(AutoConfigManager.class, autoConfigManager);
 
         autoConfigManager.loadConfigsIn(rootContext);

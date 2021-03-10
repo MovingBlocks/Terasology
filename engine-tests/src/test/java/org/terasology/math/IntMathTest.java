@@ -1,6 +1,6 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.math;
+package org.terasology.engine.math;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
@@ -8,11 +8,12 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.ResourceLock;
-import org.terasology.TestResourceLocks;
-import org.terasology.config.Config;
-import org.terasology.context.internal.ContextImpl;
-import org.terasology.context.internal.MockContext;
-import org.terasology.registry.CoreRegistry;
+import org.terasology.engine.TestResourceLocks;
+import org.terasology.engine.config.Config;
+import org.terasology.engine.context.internal.ContextImpl;
+import org.terasology.engine.context.internal.MockContext;
+import org.terasology.engine.registry.CoreRegistry;
+import org.terasology.math.TeraMath;
 
 import java.util.ArrayList;
 import java.util.List;

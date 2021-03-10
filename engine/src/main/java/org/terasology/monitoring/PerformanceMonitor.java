@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.monitoring;
+package org.terasology.engine.monitoring;
 
 import gnu.trove.map.TObjectDoubleMap;
-import org.terasology.monitoring.impl.NullPerformanceMonitor;
-import org.terasology.monitoring.impl.PerformanceMonitorImpl;
-import org.terasology.monitoring.impl.PerformanceMonitorInternal;
+import org.terasology.engine.monitoring.impl.NullPerformanceMonitor;
+import org.terasology.engine.monitoring.impl.PerformanceMonitorImpl;
+import org.terasology.engine.monitoring.impl.PerformanceMonitorInternal;
 
 /**
  * Maintains a running average of execution times and memory allocated by different activities.

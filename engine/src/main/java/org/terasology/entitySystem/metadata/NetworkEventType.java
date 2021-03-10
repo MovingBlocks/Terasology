@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.entitySystem.metadata;
+package org.terasology.engine.entitySystem.metadata;
 
 /**
  */

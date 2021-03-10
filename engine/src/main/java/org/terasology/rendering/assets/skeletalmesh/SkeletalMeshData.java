@@ -1,19 +1,6 @@
-/*
- * Copyright 2013 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-package org.terasology.rendering.assets.skeletalmesh;
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
+package org.terasology.engine.rendering.assets.skeletalmesh;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
@@ -24,7 +11,7 @@ import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.terasology.assets.AssetData;
-import org.terasology.math.AABB;
+import org.terasology.joml.geom.AABBf;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -44,10 +31,10 @@ public class SkeletalMeshData implements AssetData {
     private List<Vector3f> normals;
     private List<BoneWeight> weights = Lists.newArrayList();
     private TIntList indices = new TIntArrayList();
-    private AABB staticAABB;
+    private AABBf staticAABB;
 
     public SkeletalMeshData(List<Bone> bones, List<Vector3f> vertices, List<Vector3f> normals,
-                            List<BoneWeight> weights, List<Vector2f> uvs, TIntList indices, AABB staticAABB) {
+                            List<BoneWeight> weights, List<Vector2f> uvs, TIntList indices, AABBf staticAABB) {
         for (Bone bone : bones) {
             boneLookup.put(bone.getName(), bone);
             if (bone.getParent() == null) {
@@ -180,7 +167,7 @@ public class SkeletalMeshData implements AssetData {
     /**
      * @return A axis-aligned bounding box that surrounds the skeletal mesh given its default pose.
      */
-    public AABB getStaticAABB() {
+    public AABBf getStaticAABB() {
         return staticAABB;
     }
 

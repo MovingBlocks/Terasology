@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.persistence.internal;
+package org.terasology.engine.persistence.internal;
 
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.entity.internal.EngineEntityManager;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.protobuf.EntityData;
-import org.terasology.world.chunks.internal.ChunkImpl;
+import org.terasology.engine.world.chunks.internal.ChunkImpl;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

@@ -1,27 +1,13 @@
-/*
- * Copyright 2014 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-package org.terasology.world.propagation.light;
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
+package org.terasology.engine.world.propagation.light;
 
 import org.joml.Vector3ic;
-import org.terasology.math.JomlUtil;
-import org.terasology.math.Side;
-import org.terasology.world.block.Block;
-import org.terasology.world.chunks.Chunks;
-import org.terasology.world.chunks.LitChunk;
-import org.terasology.world.propagation.PropagationComparison;
+import org.terasology.engine.math.Side;
+import org.terasology.engine.world.block.Block;
+import org.terasology.engine.world.chunks.Chunks;
+import org.terasology.engine.world.chunks.LitChunk;
+import org.terasology.engine.world.propagation.PropagationComparison;
 
 /**
  * Defines and interfaces how sunlight values regenerate per block
@@ -45,9 +31,9 @@ public class SunlightRegenPropagationRules extends CommonLightPropagationRules {
      * {@inheritDoc}
      */
     @Override
-    public byte propagateValue(byte existingValue, Side side, Block from) {
+    public byte propagateValue(byte existingValue, Side side, Block from, int scale) {
         if (side == Side.BOTTOM) {
-            return (existingValue == Chunks.MAX_SUNLIGHT_REGEN) ? Chunks.MAX_SUNLIGHT_REGEN  : (byte) (existingValue + 1);
+            return (byte) Math.min(Chunks.MAX_SUNLIGHT_REGEN, existingValue + scale);
         }
         return 0;
     }
@@ -74,7 +60,7 @@ public class SunlightRegenPropagationRules extends CommonLightPropagationRules {
 
     @Override
     public void setValue(LitChunk chunk, Vector3ic pos, byte value) {
-        chunk.setSunlightRegen(JomlUtil.from(pos), value);
+        chunk.setSunlightRegen(pos, value);
     }
 
     /**

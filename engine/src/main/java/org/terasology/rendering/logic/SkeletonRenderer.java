@@ -1,7 +1,7 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-package org.terasology.rendering.logic;
+package org.terasology.engine.rendering.logic;
 
 import com.google.common.collect.Maps;
 import org.joml.Matrix3f;
@@ -13,34 +13,32 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.config.Config;
-import org.terasology.entitySystem.entity.EntityManager;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
-import org.terasology.entitySystem.event.ReceiveEvent;
-import org.terasology.entitySystem.systems.BaseComponentSystem;
-import org.terasology.entitySystem.systems.RegisterMode;
-import org.terasology.entitySystem.systems.RegisterSystem;
-import org.terasology.entitySystem.systems.RenderSystem;
-import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
-import org.terasology.logic.location.Location;
-import org.terasology.logic.location.LocationComponent;
-import org.terasology.math.AABB;
-import org.terasology.math.JomlUtil;
-import org.terasology.registry.In;
-import org.terasology.rendering.assets.animation.MeshAnimation;
-import org.terasology.rendering.assets.animation.MeshAnimationFrame;
-import org.terasology.rendering.assets.material.Material;
-import org.terasology.rendering.assets.skeletalmesh.Bone;
-import org.terasology.rendering.opengl.OpenGLSkeletalMesh;
-import org.terasology.rendering.world.WorldRenderer;
-import org.terasology.utilities.Assets;
+import org.terasology.engine.config.Config;
+import org.terasology.engine.entitySystem.entity.EntityManager;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
+import org.terasology.engine.entitySystem.event.ReceiveEvent;
+import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
+import org.terasology.engine.entitySystem.systems.RegisterMode;
+import org.terasology.engine.entitySystem.systems.RegisterSystem;
+import org.terasology.engine.entitySystem.systems.RenderSystem;
+import org.terasology.engine.entitySystem.systems.UpdateSubscriberSystem;
+import org.terasology.engine.rendering.assets.animation.MeshAnimation;
+import org.terasology.engine.rendering.assets.animation.MeshAnimationFrame;
+import org.terasology.engine.rendering.assets.material.Material;
+import org.terasology.engine.rendering.assets.skeletalmesh.Bone;
+import org.terasology.engine.rendering.opengl.OpenGLSkeletalMesh;
+import org.terasology.engine.rendering.world.WorldRenderer;
+import org.terasology.joml.geom.AABBf;
+import org.terasology.engine.logic.location.Location;
+import org.terasology.engine.logic.location.LocationComponent;
+import org.terasology.engine.registry.In;
+import org.terasology.engine.utilities.Assets;
 
 import java.nio.FloatBuffer;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
-import java.util.stream.Collectors;
 
 import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
 import static org.lwjgl.opengl.GL11.glBegin;
@@ -227,7 +225,7 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
             if (skeletalMesh.mesh == null || skeletalMesh.material == null || skeletalMesh.boneEntities == null || !skeletalMesh.material.isRenderable()) {
                 continue;
             }
-            AABB aabb;
+            AABBf aabb;
             MeshAnimation animation = skeletalMesh.animation;
             if (animation != null) {
                 aabb = animation.getAabb();
@@ -240,15 +238,15 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
             location.getWorldPosition(worldPos);
             float worldScale = location.getWorldScale();
 
-            aabb = aabb.transform(JomlUtil.from(worldRot), JomlUtil.from(worldPos), worldScale);
 
+            aabb = aabb.transform(new Matrix4f().translationRotateScale(worldPos, worldRot, worldScale), new AABBf());
 
             //Scale bounding box for skeletalMesh.
             Vector3f scale = skeletalMesh.scale;
 
-            Vector3f aabbCenter = JomlUtil.from(aabb.getCenter());
-            Vector3f scaledExtents = JomlUtil.from(aabb.getExtents().mul(scale.x(), scale.y(), scale.z()));
-            aabb = AABB.createCenterExtent(JomlUtil.from(aabbCenter), JomlUtil.from(scaledExtents));
+            Vector3f aabbCenter = aabb.center(new Vector3f());
+            Vector3f scaledExtents = aabb.extent(new Vector3f()).mul(scale.x(), scale.y(), scale.z());
+            aabb = new AABBf(aabbCenter, aabbCenter).expand(scaledExtents);
 
             if (!worldRenderer.getActiveCamera().hasInSight(aabb)) {
                 continue;
@@ -275,8 +273,8 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
             modelViewMatrix.normal(new Matrix3f()).get(tempMatrixBuffer33);
             skeletalMesh.material.setMatrix3("normalMatrix", tempMatrixBuffer33, true);
 
-            skeletalMesh.material.setFloat("sunlight", worldRenderer.getMainLightIntensityAt(JomlUtil.from(worldPos)), true);
-            skeletalMesh.material.setFloat("blockLight", worldRenderer.getBlockLightIntensityAt(JomlUtil.from(worldPos)), true);
+            skeletalMesh.material.setFloat("sunlight", worldRenderer.getMainLightIntensityAt(worldPos), true);
+            skeletalMesh.material.setFloat("blockLight", worldRenderer.getBlockLightIntensityAt(worldPos), true);
 
             Matrix4f[] boneTransforms = new Matrix4f[skeletalMesh.mesh.getBones().size()];
             for (Bone bone : skeletalMesh.mesh.getBones()) {

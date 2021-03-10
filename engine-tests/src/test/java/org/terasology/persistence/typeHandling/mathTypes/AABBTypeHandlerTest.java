@@ -1,19 +1,21 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-package org.terasology.persistence.typeHandling.mathTypes;
+package org.terasology.engine.persistence.typeHandling.mathTypes;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import org.terasology.joml.geom.AABBf;
-import org.terasology.joml.geom.AABBi;
-import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 import org.reflections.Reflections;
+import org.terasology.engine.persistence.typeHandling.TypeHandlerLibraryImpl;
+import org.terasology.engine.persistence.typeHandling.gson.GsonBuilderFactory;
+import org.terasology.joml.geom.AABBf;
+import org.terasology.joml.geom.AABBi;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
-import org.terasology.persistence.typeHandling.TypeHandlerLibraryImpl;
-import org.terasology.persistence.typeHandling.gson.GsonBuilderFactory;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class AABBTypeHandlerTest extends MathTypeAssert {
 
@@ -46,7 +48,7 @@ public class AABBTypeHandlerTest extends MathTypeAssert {
         JsonElement tree = gson.toJsonTree(aabb1);
 
         JsonObject obj = tree.getAsJsonObject();
-        Assert.assertTrue(obj.has("a1"));
+        assertTrue(obj.has("a1"));
         assertAABBi(obj.get("a1"), 0, 0, 0, 10, 10, 10);
     }
 
@@ -59,9 +61,9 @@ public class AABBTypeHandlerTest extends MathTypeAssert {
         JsonElement tree = gson.toJsonTree(aabb3);
 
         JsonObject obj = tree.getAsJsonObject();
-        Assert.assertTrue(obj.has("a1"));
+        assertTrue(obj.has("a1"));
         assertAABBf(obj.get("a1"), 10.0f, 5.0f, 0, 5.3f, 2.0f, 2.2f);
-        Assert.assertTrue(obj.has("a2"));
+        assertTrue(obj.has("a2"));
         assertAABBi(obj.get("a2"), 0, 0, 0, 10, 10, 10);
     }
 
@@ -74,9 +76,9 @@ public class AABBTypeHandlerTest extends MathTypeAssert {
         JsonElement tree = gson.toJsonTree(aabb3);
 
         JsonObject obj = tree.getAsJsonObject();
-        Assert.assertTrue(obj.has("a1"));
+        assertTrue(obj.has("a1"));
         assertAABBf(obj.get("a1"), 10.0f, 5.0f, 0, 5.3f, 2.0f, 2.2f);
-        Assert.assertTrue(!obj.has("a2"));
+        assertFalse(obj.has("a2"));
     }
 
 
@@ -88,7 +90,7 @@ public class AABBTypeHandlerTest extends MathTypeAssert {
         JsonElement tree = gson.toJsonTree(aabb1);
 
         JsonObject obj = tree.getAsJsonObject();
-        Assert.assertTrue(obj.has("a1"));
+        assertTrue(obj.has("a1"));
         assertAABBf(obj.get("a1"), 0, 2.0f, 1.5f, 10.0f, 5.0f, 10);
     }
 }

@@ -1,44 +1,31 @@
-/*
- * Copyright 2020 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-package org.terasology.rendering.nui.layers.mainMenu.videoSettings;
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
+package org.terasology.engine.rendering.nui.layers.mainMenu.videoSettings;
 
 import org.joml.Vector2i;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
-import org.terasology.context.Context;
-import org.terasology.engine.GameEngine;
-import org.terasology.engine.modes.StateMainMenu;
-import org.terasology.engine.module.rendering.RenderingModuleRegistry;
-import org.terasology.i18n.TranslationSystem;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.core.GameEngine;
+import org.terasology.engine.core.modes.StateMainMenu;
+import org.terasology.engine.core.module.rendering.RenderingModuleRegistry;
+import org.terasology.engine.i18n.TranslationSystem;
 import org.terasology.module.ModuleEnvironment;
-import org.terasology.registry.In;
-import org.terasology.rendering.dag.ModuleRendering;
 import org.terasology.nui.Canvas;
-import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.nui.WidgetUtil;
 import org.terasology.nui.databinding.Binding;
 import org.terasology.nui.databinding.ReadOnlyBinding;
 import org.terasology.nui.itemRendering.StringTextRenderer;
-import org.terasology.rendering.nui.layers.mainMenu.StartPlayingScreen;
 import org.terasology.nui.widgets.UIButton;
 import org.terasology.nui.widgets.UIDropdownScrollable;
 import org.terasology.nui.widgets.UISlider;
 import org.terasology.nui.widgets.UISliderOnChangeTriggeredListener;
 import org.terasology.nui.widgets.UIText;
+import org.terasology.engine.registry.In;
+import org.terasology.engine.rendering.dag.ModuleRendering;
+import org.terasology.engine.rendering.nui.CoreScreenLayer;
+import org.terasology.engine.rendering.nui.layers.mainMenu.StartPlayingScreen;
 
 import java.util.ArrayList;
 import java.util.List;

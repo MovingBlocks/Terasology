@@ -1,30 +1,17 @@
-/*
- * Copyright 2017 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-package org.terasology.rendering.cameras;
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
+package org.terasology.engine.rendering.cameras;
 
 import org.joml.Vector3f;
-import org.terasology.config.RenderingConfig;
-import org.terasology.rendering.RenderHelper;
-import org.terasology.world.WorldProvider;
+import org.terasology.engine.config.RenderingConfig;
+import org.terasology.engine.rendering.RenderHelper;
+import org.terasology.engine.world.WorldProvider;
 
 public abstract class SubmersibleCamera extends Camera {
 
     /* Used for Underwater Checks */
     private WorldProvider worldProvider;
-    private RenderingConfig renderingConfig;
+    RenderingConfig renderingConfig;
 
     public SubmersibleCamera(WorldProvider worldProvider, RenderingConfig renderingConfig) {
         this.worldProvider = worldProvider;

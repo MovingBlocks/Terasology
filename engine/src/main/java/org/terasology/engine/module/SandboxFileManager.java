@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.engine.module;
+package org.terasology.engine.core.module;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.engine.paths.PathManager;
+import org.terasology.engine.core.paths.PathManager;
 import org.terasology.module.sandbox.API;
 
 import java.io.FileInputStream;

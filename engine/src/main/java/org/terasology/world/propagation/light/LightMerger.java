@@ -1,19 +1,19 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.world.propagation.light;
+package org.terasology.engine.world.propagation.light;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import org.joml.Vector3i;
-import org.terasology.math.Side;
-import org.terasology.world.chunks.Chunk;
-import org.terasology.world.chunks.LitChunk;
-import org.terasology.world.propagation.BatchPropagator;
-import org.terasology.world.propagation.LocalChunkView;
-import org.terasology.world.propagation.PropagationRules;
-import org.terasology.world.propagation.PropagatorWorldView;
-import org.terasology.world.propagation.StandardBatchPropagator;
-import org.terasology.world.propagation.SunlightRegenBatchPropagator;
+import org.terasology.engine.math.Side;
+import org.terasology.engine.world.chunks.Chunk;
+import org.terasology.engine.world.chunks.LitChunk;
+import org.terasology.engine.world.propagation.BatchPropagator;
+import org.terasology.engine.world.propagation.LocalChunkView;
+import org.terasology.engine.world.propagation.PropagationRules;
+import org.terasology.engine.world.propagation.PropagatorWorldView;
+import org.terasology.engine.world.propagation.StandardBatchPropagator;
+import org.terasology.engine.world.propagation.SunlightRegenBatchPropagator;
 
 import java.util.Arrays;
 import java.util.Comparator;

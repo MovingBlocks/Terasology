@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.engine.module;
+package org.terasology.engine.core.module;
 
 import com.google.common.collect.ImmutableList;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.terasology.engine.TerasologyConstants;
+import org.terasology.engine.core.TerasologyConstants;
 import org.terasology.module.BaseModule;
 import org.terasology.module.DependencyResolver;
 import org.terasology.module.Module;

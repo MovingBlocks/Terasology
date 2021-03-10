@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.engine.module;
+package org.terasology.engine.core.module;
 
 public interface ModuleExtension {
 

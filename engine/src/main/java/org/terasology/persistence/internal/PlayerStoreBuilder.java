@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.persistence.internal;
+package org.terasology.engine.persistence.internal;
 
 import com.google.common.collect.Sets;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.entity.internal.EngineEntityManager;
-import org.terasology.math.geom.Vector3f;
+import org.joml.Vector3fc;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.protobuf.EntityData;
 
 import java.util.Set;
@@ -30,26 +30,26 @@ import java.util.Set;
  */
 class PlayerStoreBuilder {
     private Long characterEntityId;
-    private Vector3f relevanceLocation;
+    private Vector3fc relevanceLocation;
     private Set<EntityRef> storedEntities;
 
-     PlayerStoreBuilder(Long characterEntityId, Vector3f relevanceLocation) {
+     PlayerStoreBuilder(Long characterEntityId, Vector3fc relevanceLocation) {
         this.characterEntityId = characterEntityId;
         this.relevanceLocation = relevanceLocation;
     }
 
     public EntityData.PlayerStore build(EngineEntityManager entityManager) {
         EntityData.PlayerStore.Builder playerEntityStore = EntityData.PlayerStore.newBuilder();
-        playerEntityStore.setCharacterPosX(relevanceLocation.x);
-        playerEntityStore.setCharacterPosY(relevanceLocation.y);
-        playerEntityStore.setCharacterPosZ(relevanceLocation.z);
+        playerEntityStore.setCharacterPosX(relevanceLocation.x());
+        playerEntityStore.setCharacterPosY(relevanceLocation.y());
+        playerEntityStore.setCharacterPosZ(relevanceLocation.z());
         playerEntityStore.setHasCharacter(characterEntityId != null);
         if (characterEntityId != null) {
             EntityRef character = entityManager.getEntity(characterEntityId);
-            EntityStorer storer = new EntityStorer(entityManager);
-            storer.store(character, PlayerStoreInternal.CHARACTER);
-            storedEntities = storer.getStoredEntities();
-            playerEntityStore.setStore(storer.finaliseStore());
+            EntityStorer store = new EntityStorer(entityManager);
+            store.store(character, PlayerStoreInternal.CHARACTER);
+            storedEntities = store.getStoredEntities();
+            playerEntityStore.setStore(store.finaliseStore());
         } else {
             storedEntities = Sets.newHashSet();
         }

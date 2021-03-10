@@ -1,41 +1,42 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.entitySystem;
+package org.terasology.engine.entitySystem;
 
 import com.google.common.collect.Lists;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.ResourceLock;
-import org.terasology.TestResourceLocks;
+import org.terasology.engine.TestResourceLocks;
 import org.terasology.assets.AssetFactory;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.assets.module.ModuleAwareAssetTypeManager;
-import org.terasology.context.Context;
-import org.terasology.context.internal.ContextImpl;
-import org.terasology.engine.bootstrap.EntitySystemSetupUtil;
-import org.terasology.engine.module.ModuleManager;
-import org.terasology.entitySystem.entity.EntityManager;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.entity.internal.PojoEntityManager;
-import org.terasology.entitySystem.entity.internal.PojoEntityPool;
-import org.terasology.entitySystem.entity.lifecycleEvents.BeforeDeactivateComponent;
-import org.terasology.entitySystem.entity.lifecycleEvents.BeforeRemoveComponent;
-import org.terasology.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
-import org.terasology.entitySystem.entity.lifecycleEvents.OnAddedComponent;
-import org.terasology.entitySystem.entity.lifecycleEvents.OnChangedComponent;
-import org.terasology.entitySystem.event.internal.EventSystem;
-import org.terasology.entitySystem.prefab.Prefab;
-import org.terasology.entitySystem.prefab.PrefabData;
-import org.terasology.entitySystem.prefab.internal.PojoPrefab;
-import org.terasology.entitySystem.stubs.EntityRefComponent;
-import org.terasology.entitySystem.stubs.IntegerComponent;
-import org.terasology.entitySystem.stubs.StringComponent;
-import org.terasology.network.NetworkSystem;
-import org.terasology.recording.RecordAndReplayCurrentStatus;
-import org.terasology.registry.CoreRegistry;
-import org.terasology.testUtil.ModuleManagerFactory;
-import org.terasology.utilities.Assets;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.context.internal.ContextImpl;
+import org.terasology.engine.core.bootstrap.EntitySystemSetupUtil;
+import org.terasology.engine.core.module.ModuleManager;
+import org.terasology.engine.entitySystem.entity.EntityManager;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.entitySystem.entity.internal.PojoEntityManager;
+import org.terasology.engine.entitySystem.entity.internal.PojoEntityPool;
+import org.terasology.engine.entitySystem.entity.lifecycleEvents.BeforeDeactivateComponent;
+import org.terasology.engine.entitySystem.entity.lifecycleEvents.BeforeRemoveComponent;
+import org.terasology.engine.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
+import org.terasology.engine.entitySystem.entity.lifecycleEvents.OnAddedComponent;
+import org.terasology.engine.entitySystem.entity.lifecycleEvents.OnChangedComponent;
+import org.terasology.engine.entitySystem.event.internal.EventSystem;
+import org.terasology.engine.entitySystem.prefab.Prefab;
+import org.terasology.engine.entitySystem.prefab.PrefabData;
+import org.terasology.engine.entitySystem.prefab.internal.PojoPrefab;
+import org.terasology.engine.entitySystem.stubs.EntityRefComponent;
+import org.terasology.engine.entitySystem.stubs.IntegerComponent;
+import org.terasology.engine.entitySystem.stubs.StringComponent;
+import org.terasology.engine.network.NetworkMode;
+import org.terasology.engine.network.NetworkSystem;
+import org.terasology.engine.recording.RecordAndReplayCurrentStatus;
+import org.terasology.engine.registry.CoreRegistry;
+import org.terasology.engine.testUtil.ModuleManagerFactory;
+import org.terasology.engine.utilities.Assets;
 
 import java.util.Collections;
 import java.util.Iterator;
@@ -49,7 +50,8 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.terasology.entitySystem.entity.internal.EntityScope.CHUNK;
+import static org.mockito.Mockito.when;
+import static org.terasology.engine.entitySystem.entity.internal.EntityScope.CHUNK;
 
 
 @ResourceLock(TestResourceLocks.CORE_REGISTRY)
@@ -72,7 +74,9 @@ public class PojoEntityManagerTest {
         context.put(RecordAndReplayCurrentStatus.class, new RecordAndReplayCurrentStatus());
         CoreRegistry.setContext(context);
 
-        context.put(NetworkSystem.class, mock(NetworkSystem.class));
+        NetworkSystem networkSystem = mock(NetworkSystem.class);
+        when(networkSystem.getMode()).thenReturn(NetworkMode.NONE);
+        context.put(NetworkSystem.class, networkSystem);
         EntitySystemSetupUtil.addReflectionBasedLibraries(context);
         EntitySystemSetupUtil.addEntityManagementRelatedClasses(context);
         entityManager = (PojoEntityManager) context.get(EntityManager.class);

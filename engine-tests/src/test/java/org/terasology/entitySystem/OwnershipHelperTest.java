@@ -1,27 +1,31 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.entitySystem;
+package org.terasology.engine.entitySystem;
 
 import com.google.common.collect.Lists;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.ResourceLock;
-import org.terasology.TestResourceLocks;
-import org.terasology.context.internal.ContextImpl;
-import org.terasology.engine.bootstrap.EntitySystemSetupUtil;
-import org.terasology.engine.module.ModuleManager;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.entity.internal.EngineEntityManager;
-import org.terasology.entitySystem.entity.internal.OwnershipHelper;
-import org.terasology.entitySystem.stubs.OwnerComponent;
-import org.terasology.network.NetworkSystem;
-import org.terasology.recording.RecordAndReplayCurrentStatus;
-import org.terasology.registry.CoreRegistry;
-import org.terasology.testUtil.ModuleManagerFactory;
+import org.terasology.engine.TestResourceLocks;
+import org.terasology.engine.context.internal.ContextImpl;
+import org.terasology.engine.core.bootstrap.EntitySystemSetupUtil;
+import org.terasology.engine.core.module.ModuleManager;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.entitySystem.entity.internal.EngineEntityManager;
+import org.terasology.engine.entitySystem.entity.internal.OwnershipHelper;
+import org.terasology.engine.entitySystem.stubs.OwnerComponent;
+import org.terasology.engine.network.NetworkMode;
+import org.terasology.engine.network.NetworkSystem;
+import org.terasology.engine.recording.RecordAndReplayCurrentStatus;
+import org.terasology.engine.registry.CoreRegistry;
+import org.terasology.engine.testUtil.ModuleManagerFactory;
 
+import java.util.ArrayList;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
-import static org.terasology.testUtil.TeraAssert.assertEqualsContent;
+import static org.mockito.Mockito.when;
 
 @ResourceLock(TestResourceLocks.CORE_REGISTRY)
 public class OwnershipHelperTest {
@@ -39,7 +43,9 @@ public class OwnershipHelperTest {
     public void setup() {
         ContextImpl context = new ContextImpl();
         context.put(ModuleManager.class, moduleManager);
-        context.put(NetworkSystem.class, mock(NetworkSystem.class));
+        NetworkSystem networkSystem = mock(NetworkSystem.class);
+        when(networkSystem.getMode()).thenReturn(NetworkMode.NONE);
+        context.put(NetworkSystem.class, networkSystem);
         context.put(RecordAndReplayCurrentStatus.class, new RecordAndReplayCurrentStatus());
         CoreRegistry.setContext(context);
         EntitySystemSetupUtil.addReflectionBasedLibraries(context);
@@ -55,6 +61,8 @@ public class OwnershipHelperTest {
         EntityRef ownerEntity = entityManager.create(ownerComp);
 
         OwnershipHelper helper = new OwnershipHelper(entityManager.getComponentLibrary());
-        assertEqualsContent(Lists.newArrayList(ownedEntity), helper.listOwnedEntities(ownerEntity));
+        ArrayList<EntityRef> target = Lists.newArrayList(helper.listOwnedEntities(ownerEntity));
+        assertEquals(target.size(), 1);
+        assertEquals(target.get(0), ownedEntity);
     }
 }

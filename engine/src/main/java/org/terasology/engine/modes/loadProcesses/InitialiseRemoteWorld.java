@@ -1,34 +1,34 @@
 // Copyright 2020 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-package org.terasology.engine.modes.loadProcesses;
+package org.terasology.engine.core.modes.loadProcesses;
 
-import org.terasology.context.Context;
-import org.terasology.engine.ComponentSystemManager;
-import org.terasology.engine.TerasologyConstants;
-import org.terasology.engine.modes.SingleStepLoadProcess;
-import org.terasology.engine.subsystem.RenderingSubsystemFactory;
-import org.terasology.game.GameManifest;
-import org.terasology.logic.players.LocalPlayer;
-import org.terasology.network.NetworkSystem;
-import org.terasology.recording.DirectionAndOriginPosRecorderList;
-import org.terasology.recording.RecordAndReplayCurrentStatus;
-import org.terasology.rendering.backdrop.BackdropProvider;
-import org.terasology.rendering.backdrop.BackdropRenderer;
-import org.terasology.rendering.backdrop.Skysphere;
-import org.terasology.rendering.cameras.Camera;
-import org.terasology.rendering.world.WorldRenderer;
-import org.terasology.world.BlockEntityRegistry;
-import org.terasology.world.WorldProvider;
-import org.terasology.world.block.BlockManager;
-import org.terasology.world.chunks.blockdata.ExtraBlockDataManager;
-import org.terasology.world.chunks.remoteChunkProvider.RemoteChunkProvider;
-import org.terasology.world.internal.EntityAwareWorldProvider;
-import org.terasology.world.internal.WorldProviderCoreImpl;
-import org.terasology.world.internal.WorldProviderWrapper;
-import org.terasology.world.sun.BasicCelestialModel;
-import org.terasology.world.sun.CelestialSystem;
-import org.terasology.world.sun.DefaultCelestialSystem;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.core.ComponentSystemManager;
+import org.terasology.engine.core.TerasologyConstants;
+import org.terasology.engine.core.modes.SingleStepLoadProcess;
+import org.terasology.engine.core.subsystem.RenderingSubsystemFactory;
+import org.terasology.engine.game.GameManifest;
+import org.terasology.engine.logic.players.LocalPlayer;
+import org.terasology.engine.network.NetworkSystem;
+import org.terasology.engine.recording.DirectionAndOriginPosRecorderList;
+import org.terasology.engine.recording.RecordAndReplayCurrentStatus;
+import org.terasology.engine.rendering.backdrop.BackdropProvider;
+import org.terasology.engine.rendering.backdrop.BackdropRenderer;
+import org.terasology.engine.rendering.backdrop.Skysphere;
+import org.terasology.engine.rendering.cameras.Camera;
+import org.terasology.engine.rendering.world.WorldRenderer;
+import org.terasology.engine.world.BlockEntityRegistry;
+import org.terasology.engine.world.WorldProvider;
+import org.terasology.engine.world.block.BlockManager;
+import org.terasology.engine.world.chunks.blockdata.ExtraBlockDataManager;
+import org.terasology.engine.world.chunks.remoteChunkProvider.RemoteChunkProvider;
+import org.terasology.engine.world.internal.EntityAwareWorldProvider;
+import org.terasology.engine.world.internal.WorldProviderCoreImpl;
+import org.terasology.engine.world.internal.WorldProviderWrapper;
+import org.terasology.engine.world.sun.BasicCelestialModel;
+import org.terasology.engine.world.sun.CelestialSystem;
+import org.terasology.engine.world.sun.DefaultCelestialSystem;
 
 public class InitialiseRemoteWorld extends SingleStepLoadProcess {
     private final Context context;

@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.config.flexible;
+package org.terasology.engine.config.flexible;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
 import org.junit.jupiter.api.Test;
-import org.terasology.config.flexible.constraints.NumberRangeConstraint;
+import org.terasology.engine.config.flexible.constraints.NumberRangeConstraint;
 import org.terasology.reflection.TypeInfo;
 
 import java.lang.reflect.Field;
@@ -26,13 +26,20 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.terasology.config.flexible.SettingArgument.constraint;
-import static org.terasology.config.flexible.SettingArgument.defaultValue;
-import static org.terasology.config.flexible.SettingArgument.description;
-import static org.terasology.config.flexible.SettingArgument.name;
-import static org.terasology.config.flexible.SettingArgument.type;
+import static org.terasology.engine.config.flexible.SettingArgument.constraint;
+import static org.terasology.engine.config.flexible.SettingArgument.defaultValue;
+import static org.terasology.engine.config.flexible.SettingArgument.description;
+import static org.terasology.engine.config.flexible.SettingArgument.name;
+import static org.terasology.engine.config.flexible.SettingArgument.type;
 
 public class AutoConfigTest {
+    @Test
+    public void testGetSettings() {
+        TestAutoConfig config = new TestAutoConfig();
+
+        assertEquals(Sets.newHashSet(config.stringSetting, config.integerListSetting), config.getSettings());
+    }
+
     @Test
     public void testGetSettingFieldsIn() {
         Set<Field> settingFields = AutoConfig.getSettingFieldsIn(TestAutoConfig.class);

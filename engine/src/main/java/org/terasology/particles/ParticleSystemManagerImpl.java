@@ -13,28 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.particles;
+package org.terasology.engine.particles;
 
-import org.terasology.engine.module.ModuleManager;
-import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.entity.lifecycleEvents.BeforeDeactivateComponent;
-import org.terasology.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
-import org.terasology.entitySystem.event.ReceiveEvent;
-import org.terasology.entitySystem.systems.BaseComponentSystem;
-import org.terasology.entitySystem.systems.RegisterMode;
-import org.terasology.entitySystem.systems.RegisterSystem;
-import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
-import org.terasology.logic.location.LocationComponent;
+import org.terasology.engine.core.module.ModuleManager;
+import org.terasology.engine.entitySystem.Component;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.entitySystem.entity.lifecycleEvents.BeforeDeactivateComponent;
+import org.terasology.engine.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
+import org.terasology.engine.entitySystem.event.ReceiveEvent;
+import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
+import org.terasology.engine.entitySystem.systems.RegisterMode;
+import org.terasology.engine.entitySystem.systems.RegisterSystem;
+import org.terasology.engine.entitySystem.systems.UpdateSubscriberSystem;
+import org.terasology.engine.logic.location.LocationComponent;
 import org.terasology.module.sandbox.API;
-import org.terasology.particles.components.ParticleEmitterComponent;
-import org.terasology.particles.events.ParticleSystemUpdateEvent;
-import org.terasology.particles.rendering.ParticleRenderingData;
-import org.terasology.particles.updating.ParticleUpdater;
-import org.terasology.particles.updating.ParticleUpdaterImpl;
-import org.terasology.physics.Physics;
-import org.terasology.registry.In;
-import org.terasology.registry.Share;
+import org.terasology.engine.particles.components.ParticleEmitterComponent;
+import org.terasology.engine.particles.events.ParticleSystemUpdateEvent;
+import org.terasology.engine.particles.rendering.ParticleRenderingData;
+import org.terasology.engine.particles.updating.ParticleUpdater;
+import org.terasology.engine.particles.updating.ParticleUpdaterImpl;
+import org.terasology.engine.physics.Physics;
+import org.terasology.engine.registry.In;
+import org.terasology.engine.registry.Share;
 
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;

@@ -13,38 +13,38 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.engine.modes;
+package org.terasology.engine.core.modes;
 
-import org.terasology.audio.AudioManager;
-import org.terasology.config.Config;
-import org.terasology.context.Context;
-import org.terasology.engine.ComponentSystemManager;
-import org.terasology.engine.GameEngine;
-import org.terasology.engine.GameThread;
-import org.terasology.engine.bootstrap.EnvironmentSwitchHandler;
-import org.terasology.engine.module.ModuleManager;
-import org.terasology.engine.subsystem.DisplayDevice;
-import org.terasology.entitySystem.entity.internal.EngineEntityManager;
-import org.terasology.entitySystem.event.internal.EventSystem;
-import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
-import org.terasology.game.GameManifest;
-import org.terasology.identity.storageServiceClient.StorageServiceWorker;
-import org.terasology.input.InputSystem;
-import org.terasology.input.cameraTarget.CameraTargetSystem;
-import org.terasology.logic.console.Console;
+import org.terasology.engine.audio.AudioManager;
+import org.terasology.engine.config.Config;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.core.ComponentSystemManager;
+import org.terasology.engine.core.GameEngine;
+import org.terasology.engine.core.GameThread;
+import org.terasology.engine.core.bootstrap.EnvironmentSwitchHandler;
+import org.terasology.engine.core.module.ModuleManager;
+import org.terasology.engine.core.subsystem.DisplayDevice;
+import org.terasology.engine.entitySystem.entity.internal.EngineEntityManager;
+import org.terasology.engine.entitySystem.event.internal.EventSystem;
+import org.terasology.engine.entitySystem.systems.UpdateSubscriberSystem;
+import org.terasology.engine.game.GameManifest;
+import org.terasology.engine.identity.storageServiceClient.StorageServiceWorker;
+import org.terasology.engine.input.InputSystem;
+import org.terasology.engine.input.cameraTarget.CameraTargetSystem;
+import org.terasology.engine.logic.console.Console;
 import org.terasology.module.Module;
 import org.terasology.module.ModuleEnvironment;
-import org.terasology.monitoring.PerformanceMonitor;
-import org.terasology.network.NetworkMode;
-import org.terasology.network.NetworkSystem;
+import org.terasology.engine.monitoring.PerformanceMonitor;
+import org.terasology.engine.network.NetworkMode;
+import org.terasology.engine.network.NetworkSystem;
 import org.terasology.nui.databinding.ReadOnlyBinding;
-import org.terasology.persistence.StorageManager;
-import org.terasology.physics.engine.PhysicsEngine;
-import org.terasology.rendering.nui.NUIManager;
-import org.terasology.rendering.nui.layers.mainMenu.MessagePopup;
-import org.terasology.rendering.world.WorldRenderer;
-import org.terasology.rendering.world.WorldRenderer.RenderingStage;
-import org.terasology.world.chunks.ChunkProvider;
+import org.terasology.engine.persistence.StorageManager;
+import org.terasology.engine.physics.engine.PhysicsEngine;
+import org.terasology.engine.rendering.nui.NUIManager;
+import org.terasology.engine.rendering.nui.layers.mainMenu.MessagePopup;
+import org.terasology.engine.rendering.world.WorldRenderer;
+import org.terasology.engine.rendering.world.WorldRenderer.RenderingStage;
+import org.terasology.engine.world.chunks.ChunkProvider;
 
 import java.util.Collections;
 

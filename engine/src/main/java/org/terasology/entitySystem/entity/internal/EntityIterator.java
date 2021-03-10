@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.entitySystem.entity.internal;
+package org.terasology.engine.entitySystem.entity.internal;
 
 import gnu.trove.iterator.TLongIterator;
-import org.terasology.entitySystem.entity.EntityPool;
-import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.engine.entitySystem.entity.EntityPool;
+import org.terasology.engine.entitySystem.entity.EntityRef;
 
 import java.util.Iterator;
 

@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.engine.subsystem.common;
+package org.terasology.engine.core.subsystem.common;
 
-import org.terasology.engine.EngineTime;
-import org.terasology.engine.subsystem.EngineSubsystem;
+import org.terasology.engine.core.EngineTime;
+import org.terasology.engine.core.subsystem.EngineSubsystem;
 
 public interface TimeSubsystem extends EngineSubsystem {
 

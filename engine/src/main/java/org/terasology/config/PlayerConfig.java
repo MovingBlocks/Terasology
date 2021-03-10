@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package org.terasology.config;
+package org.terasology.engine.config;
 
 import org.terasology.nui.Color;
-import org.terasology.rendering.nui.layers.mainMenu.settings.CieCamColors;
-import org.terasology.utilities.random.FastRandom;
-import org.terasology.utilities.random.Random;
-import org.terasology.utilities.subscribables.AbstractSubscribable;
+import org.terasology.engine.rendering.nui.layers.mainMenu.settings.CieCamColors;
+import org.terasology.engine.utilities.random.FastRandom;
+import org.terasology.engine.utilities.random.Random;
+import org.terasology.engine.utilities.subscribables.AbstractSubscribable;
 
 import java.util.List;
 

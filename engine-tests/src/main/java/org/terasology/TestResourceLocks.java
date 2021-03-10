@@ -1,7 +1,7 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-package org.terasology;
+package org.terasology.engine;
 
 /**
  * Junit5's lock keys for {@link org.junit.jupiter.api.parallel.ResourceLock}.
@@ -10,7 +10,7 @@ package org.terasology;
 public final class TestResourceLocks {
     
     /**
-     * Locks test/test-class for using {@link org.terasology.registry.CoreRegistry}
+     * Locks test/test-class for using {@link org.terasology.engine.registry.CoreRegistry}
      */
     public static final String CORE_REGISTRY = "CoreRegistry";
 

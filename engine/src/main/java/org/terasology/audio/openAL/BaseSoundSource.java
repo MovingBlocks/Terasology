@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.audio.openAL;
+package org.terasology.engine.audio.openAL;
 
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.lwjgl.openal.AL10;
-import org.terasology.audio.AudioManager;
-import org.terasology.audio.Sound;
+import org.terasology.engine.audio.AudioManager;
+import org.terasology.engine.audio.Sound;
 
 import static org.lwjgl.openal.AL10.AL_FALSE;
 import static org.lwjgl.openal.AL10.AL_GAIN;

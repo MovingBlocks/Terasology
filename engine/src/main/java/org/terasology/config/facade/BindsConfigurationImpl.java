@@ -1,9 +1,9 @@
 
-package org.terasology.config.facade;
+package org.terasology.engine.config.facade;
 
-import org.terasology.config.BindsConfig;
-import org.terasology.config.Config;
-import org.terasology.engine.SimpleUri;
+import org.terasology.engine.config.BindsConfig;
+import org.terasology.engine.config.Config;
+import org.terasology.engine.core.SimpleUri;
 import org.terasology.input.Input;
 
 import java.util.Collection;

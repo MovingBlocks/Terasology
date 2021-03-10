@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.persistence.typeHandling;
+package org.terasology.engine.persistence.typeHandling;
 
 
 import org.terasology.module.sandbox.API;
@@ -28,8 +28,8 @@ import java.lang.annotation.Target;
  * {@link TypeHandlerLibrary} on environment change.
  * This can be used to (de)serialize custom components.
  * <p>
- * The {@link org.terasology.registry.In} annotation can be used to access objects
- * in the parent {@link org.terasology.context.Context}.
+ * The {@link org.terasology.engine.registry.In} annotation can be used to access objects
+ * in the parent {@link org.terasology.engine.context.Context}.
  */
 @API
 @Retention(RetentionPolicy.RUNTIME)

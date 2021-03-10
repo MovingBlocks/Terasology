@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.audio;
+package org.terasology.engine.audio;
 
 import org.terasology.assets.AssetType;
 import org.terasology.assets.ResourceUrn;

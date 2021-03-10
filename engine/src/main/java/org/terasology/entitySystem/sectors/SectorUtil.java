@@ -13,17 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.entitySystem.sectors;
+package org.terasology.engine.entitySystem.sectors;
 
 import org.joml.Vector3f;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.logic.location.LocationComponent;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.logic.location.LocationComponent;
 import org.terasology.module.sandbox.API;
-import org.terasology.world.chunks.Chunk;
-import org.terasology.world.chunks.ChunkProvider;
-import org.terasology.world.chunks.Chunks;
+import org.terasology.engine.world.chunks.Chunk;
+import org.terasology.engine.world.chunks.ChunkProvider;
+import org.terasology.engine.world.chunks.Chunks;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -82,7 +82,7 @@ public final class SectorUtil {
     /**
      * Watched chunks are defined as the union of:
      * <ul>
-     *     <li>The chunk in which the {@link LocationComponent#getWorldPosition()} resides, if any</li>
+     *     <li>The chunk in which the {@link LocationComponent#getWorldPosition(Vector3f)} resides, if any</li>
      *     <li>The set of chunks in {@link SectorRegionComponent#chunks}, if any</li>
      * </ul>
      *

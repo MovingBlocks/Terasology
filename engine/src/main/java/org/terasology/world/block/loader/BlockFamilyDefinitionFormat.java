@@ -1,19 +1,6 @@
-/*
- * Copyright 2018 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-package org.terasology.world.block.loader;
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
+package org.terasology.engine.world.block.loader;
 
 import com.google.common.base.Charsets;
 import com.google.gson.Gson;
@@ -31,27 +18,27 @@ import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
 import org.joml.Vector3f;
+import org.joml.Vector4f;
 import org.terasology.assets.Asset;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.format.AbstractAssetFileFormat;
 import org.terasology.assets.format.AssetDataFile;
 import org.terasology.assets.management.AssetManager;
-import org.terasology.entitySystem.prefab.Prefab;
-import org.terasology.math.geom.Vector4f;
-import org.terasology.registry.CoreRegistry;
-import org.terasology.utilities.gson.CaseInsensitiveEnumTypeAdapterFactory;
-import org.terasology.utilities.gson.Vector3fTypeAdapter;
-import org.terasology.utilities.gson.Vector4fTypeAdapter;
-import org.terasology.world.block.BlockPart;
-import org.terasology.world.block.family.BlockFamily;
-import org.terasology.world.block.family.BlockFamilyLibrary;
-import org.terasology.world.block.family.FreeformFamily;
-import org.terasology.world.block.family.HorizontalFamily;
-import org.terasology.world.block.family.MultiSection;
-import org.terasology.world.block.family.SymmetricFamily;
-import org.terasology.world.block.shapes.BlockShape;
-import org.terasology.world.block.sounds.BlockSounds;
-import org.terasology.world.block.tiles.BlockTile;
+import org.terasology.engine.entitySystem.prefab.Prefab;
+import org.terasology.engine.registry.CoreRegistry;
+import org.terasology.engine.world.block.shapes.BlockShape;
+import org.terasology.engine.world.block.sounds.BlockSounds;
+import org.terasology.engine.utilities.gson.CaseInsensitiveEnumTypeAdapterFactory;
+import org.terasology.engine.utilities.gson.Vector3fTypeAdapter;
+import org.terasology.engine.utilities.gson.Vector4fTypeAdapter;
+import org.terasology.engine.world.block.BlockPart;
+import org.terasology.engine.world.block.family.BlockFamily;
+import org.terasology.engine.world.block.family.BlockFamilyLibrary;
+import org.terasology.engine.world.block.family.FreeformFamily;
+import org.terasology.engine.world.block.family.HorizontalFamily;
+import org.terasology.engine.world.block.family.MultiSection;
+import org.terasology.engine.world.block.family.SymmetricFamily;
+import org.terasology.engine.world.block.tiles.BlockTile;
 
 import java.io.BufferedReader;
 import java.io.IOException;

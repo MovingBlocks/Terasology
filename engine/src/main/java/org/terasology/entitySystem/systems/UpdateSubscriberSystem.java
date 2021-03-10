@@ -13,7 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.entitySystem.systems;
+package org.terasology.engine.entitySystem.systems;
+
+import org.terasology.engine.logic.delay.DelayManager;
 
 /**
  * Interface for component systems that needs to be updated every time the engine is updated.
@@ -23,11 +25,11 @@ package org.terasology.entitySystem.systems;
  * In most cases it will be sufficient to:
  *   <ul>
  *     <li>
- *       use {@link org.terasology.entitySystem.event.ReceiveEvent}
- *       to update the system on specific events ({@link org.terasology.entitySystem.event.Event}),
+ *       use {@link org.terasology.engine.entitySystem.event.ReceiveEvent}
+ *       to update the system on specific events ({@link org.terasology.engine.entitySystem.event.Event}),
  *     </li>
  *     <li>
- *       use {@link org.terasology.logic.delay.DelayManager} to update entities or to call a
+ *       use {@link DelayManager} to update entities or to call a
  *       system update function at a specific times.
  *     </li>
  *   </ul>

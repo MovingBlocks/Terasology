@@ -1,20 +1,18 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology;
+package org.terasology.engine;
 
-import org.jboss.shrinkwrap.api.ShrinkWrap;
-import org.jboss.shrinkwrap.api.nio.file.ShrinkWrapFileSystems;
-import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.jupiter.api.BeforeEach;
-import org.terasology.engine.module.ModuleManager;
-import org.terasology.engine.paths.PathManager;
+import org.junit.jupiter.api.io.TempDir;
+import org.terasology.engine.core.module.ModuleManager;
+import org.terasology.engine.core.paths.PathManager;
 import org.terasology.module.DependencyResolver;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.module.ResolutionResult;
 import org.terasology.reflection.TypeRegistry;
-import org.terasology.testUtil.ModuleManagerFactory;
+import org.terasology.engine.testUtil.ModuleManagerFactory;
 
-import java.nio.file.FileSystem;
+import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
@@ -23,10 +21,8 @@ public abstract class ModuleEnvironmentTest implements MockedPathManager {
     protected TypeRegistry typeRegistry;
 
     @BeforeEach
-    public void before() throws Exception {
-        final JavaArchive homeArchive = ShrinkWrap.create(JavaArchive.class);
-        final FileSystem vfs = ShrinkWrapFileSystems.newFileSystem(homeArchive);
-        PathManager.getInstance().useOverrideHomePath(vfs.getPath(""));
+    public void before(@TempDir Path tempHome) throws Exception {
+        PathManager.getInstance().useOverrideHomePath(tempHome);
 
         moduleManager = ModuleManagerFactory.create();
 

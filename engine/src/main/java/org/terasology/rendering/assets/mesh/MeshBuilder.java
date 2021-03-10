@@ -1,28 +1,14 @@
-/*
- * Copyright 2013 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-package org.terasology.rendering.assets.mesh;
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
+package org.terasology.engine.rendering.assets.mesh;
 
 import org.joml.Vector2fc;
+import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.terasology.assets.ResourceUrn;
-import org.terasology.math.geom.Vector2f;
-import org.terasology.math.geom.Vector3f;
 import org.terasology.module.sandbox.API;
 import org.terasology.nui.Colorc;
-import org.terasology.utilities.Assets;
+import org.terasology.engine.utilities.Assets;
 
 public class MeshBuilder {
     private static final float[] VERTICES = {
@@ -76,49 +62,11 @@ public class MeshBuilder {
     private int vertexCount;
     private TextureMapper textureMapper;
 
-    /**
-     *
-     * @param v
-     * @return
-     * @deprecated This is scheduled for removal in an upcoming version
-     *      method will be replaced with JOML implementation {@link #addVertex(Vector3fc)}.
-     */
-    public MeshBuilder addVertex(Vector3f v) {
-        meshData.getVertices().add(v.x);
-        meshData.getVertices().add(v.y);
-        meshData.getVertices().add(v.z);
-        vertexCount++;
-        return this;
-    }
-
     public MeshBuilder addVertex(Vector3fc v) {
         meshData.getVertices().add(v.x());
         meshData.getVertices().add(v.y());
         meshData.getVertices().add(v.z());
         vertexCount++;
-        return this;
-    }
-
-    /**
-     *
-     * @param v1
-     * @param v2
-     * @param v3
-     * @param vn
-     * @return
-     * @deprecated This is scheduled for removal in an upcoming version
-     *      method will be replaced with JOML implementation {@link #addPoly(Vector3fc, Vector3fc, Vector3fc, Vector3fc...)}.
-     */
-    public MeshBuilder addPoly(Vector3f v1, Vector3f v2, Vector3f v3, Vector3f... vn) {
-        for (int i = 0; i < vn.length + 1; i++) {
-            addIndices(vertexCount, vertexCount + i + 2, vertexCount + i + 1);
-        }
-        addVertex(v1);
-        addVertex(v2);
-        addVertex(v3);
-        for (Vector3f v : vn) {
-            addVertex(v);
-        }
         return this;
     }
 
@@ -163,18 +111,6 @@ public class MeshBuilder {
         return this;
     }
 
-    /**
-     *
-     * @param v
-     * @return
-     *
-     * @deprecated This is scheduled for removal in an upcoming version
-     *      method will be replaced with JOML implementation {@link #addTexCoord(Vector2fc)}.
-     */
-    public MeshBuilder addTexCoord(Vector2f v) {
-        return addTexCoord(v.x, v.y);
-    }
-
     public MeshBuilder addTexCoord(Vector2fc v) {
         return addTexCoord(v.x(), v.y());
     }
@@ -206,11 +142,11 @@ public class MeshBuilder {
      * <br><br>
      * Use the texture mapper to change how texture coordinates (u and v) are applied to each vertex.
      */
-    public MeshBuilder addBox(org.joml.Vector3f offset, org.joml.Vector3f size, float u, float v) {
+    public MeshBuilder addBox(Vector3fc offset, Vector3fc size, float u, float v) {
         int vertexId = vertexCount;
         textureMapper.initialize(offset, size);
         for (int i = 0; i < VERTICES.length / 3; i++) {
-            addVertex(new Vector3f(offset.x + size.x * VERTICES[i * 3], offset.y + size.y * VERTICES[i * 3 + 1], offset.z + size.z * VERTICES[i * 3 + 2]));
+            addVertex(new Vector3f(offset.x() + size.x() * VERTICES[i * 3], offset.y() + size.y() * VERTICES[i * 3 + 1], offset.z() + size.z() * VERTICES[i * 3 + 2]));
             addTexCoord(textureMapper.map(i, u, v));
         }
         for (int i : INDICES) {
@@ -225,8 +161,8 @@ public class MeshBuilder {
 
     @API
     public interface TextureMapper {
-        void initialize(org.joml.Vector3f offset, org.joml.Vector3f size);
+        void initialize(Vector3fc offset, Vector3fc size);
 
-        org.joml.Vector2fc map(int vertexIndex, float u, float v);
+        Vector2fc map(int vertexIndex, float u, float v);
     }
 }

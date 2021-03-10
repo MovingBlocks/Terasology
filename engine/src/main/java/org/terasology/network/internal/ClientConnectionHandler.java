@@ -1,6 +1,6 @@
 // Copyright 2020 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.network.internal;
+package org.terasology.engine.network.internal;
 
 import com.google.common.collect.Sets;
 import io.netty.channel.Channel;
@@ -8,18 +8,18 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.config.Config;
-import org.terasology.engine.EngineTime;
-import org.terasology.engine.TerasologyConstants;
-import org.terasology.engine.Time;
-import org.terasology.engine.module.ModuleManager;
-import org.terasology.engine.paths.PathManager;
+import org.terasology.engine.config.Config;
+import org.terasology.engine.core.EngineTime;
+import org.terasology.engine.core.TerasologyConstants;
+import org.terasology.engine.core.Time;
+import org.terasology.engine.core.module.ModuleManager;
+import org.terasology.engine.core.paths.PathManager;
 import org.terasology.module.ModuleLoader;
 import org.terasology.naming.Name;
 import org.terasology.naming.Version;
-import org.terasology.network.JoinStatus;
+import org.terasology.engine.network.JoinStatus;
 import org.terasology.protobuf.NetData;
-import org.terasology.registry.CoreRegistry;
+import org.terasology.engine.registry.CoreRegistry;
 
 import java.io.BufferedOutputStream;
 import java.io.IOException;

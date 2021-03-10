@@ -1,8 +1,8 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.registry;
+package org.terasology.engine.registry;
 
-import org.terasology.context.Context;
+import org.terasology.engine.context.Context;
 
 /**
  * Registry giving access to major singleton systems, via the interface they fulfill.

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.monitoring.impl;
+package org.terasology.engine.monitoring.impl;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Queues;
@@ -23,10 +23,10 @@ import gnu.trove.map.hash.TObjectDoubleHashMap;
 import gnu.trove.map.hash.TObjectLongHashMap;
 import gnu.trove.procedure.TObjectDoubleProcedure;
 import gnu.trove.procedure.TObjectLongProcedure;
-import org.terasology.engine.EngineTime;
-import org.terasology.engine.Time;
-import org.terasology.monitoring.Activity;
-import org.terasology.registry.CoreRegistry;
+import org.terasology.engine.core.EngineTime;
+import org.terasology.engine.core.Time;
+import org.terasology.engine.monitoring.Activity;
+import org.terasology.engine.registry.CoreRegistry;
 
 import java.util.Deque;
 import java.util.List;

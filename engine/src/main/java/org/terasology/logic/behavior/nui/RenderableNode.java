@@ -1,28 +1,15 @@
-/*
- * Copyright 2017 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-package org.terasology.logic.behavior.nui;
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
+package org.terasology.engine.logic.behavior.nui;
 
 import com.google.common.collect.Lists;
 import org.joml.Vector2f;
 import org.joml.Vector2i;
+import org.terasology.engine.logic.behavior.core.BehaviorNode;
+import org.terasology.engine.logic.behavior.core.BehaviorState;
 import org.terasology.input.Keyboard;
 import org.terasology.input.MouseInput;
 import org.terasology.input.device.KeyboardDevice;
-import org.terasology.logic.behavior.core.BehaviorNode;
-import org.terasology.logic.behavior.core.BehaviorState;
 import org.terasology.nui.BaseInteractionListener;
 import org.terasology.nui.Canvas;
 import org.terasology.nui.CoreWidget;
@@ -34,7 +21,7 @@ import org.terasology.nui.events.NUIMouseOverEvent;
 import org.terasology.nui.events.NUIMouseReleaseEvent;
 import org.terasology.nui.layouts.ZoomableLayout;
 import org.terasology.nui.properties.PropertyProvider;
-import org.terasology.utilities.Assets;
+import org.terasology.engine.utilities.Assets;
 
 import java.util.List;
 

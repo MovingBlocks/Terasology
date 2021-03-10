@@ -19,11 +19,11 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.engine.module.ExternalApiWhitelist;
-import org.terasology.engine.module.ModuleManager;
+import org.terasology.engine.core.module.ExternalApiWhitelist;
+import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.module.sandbox.API;
-import org.terasology.testUtil.ModuleManagerFactory;
+import org.terasology.engine.testUtil.ModuleManagerFactory;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;

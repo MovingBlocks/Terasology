@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.monitoring.gui;
+package org.terasology.engine.monitoring.gui;
 
 import com.google.common.base.Preconditions;
 import org.joml.Vector3i;
-import org.terasology.monitoring.chunk.ChunkMonitorEntry;
+import org.terasology.engine.monitoring.chunk.ChunkMonitorEntry;
 
 public abstract class ChunkMonitorDisplayEvent {
 

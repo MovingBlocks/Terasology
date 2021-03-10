@@ -1,11 +1,8 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.persistence.internal;
+package org.terasology.engine.persistence.internal;
 
 import com.google.common.collect.Lists;
-import org.jboss.shrinkwrap.api.ShrinkWrap;
-import org.jboss.shrinkwrap.api.nio.file.ShrinkWrapFileSystems;
-import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.joml.Vector3f;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
@@ -15,51 +12,50 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.io.TempDir;
 import org.mockito.ArgumentMatchers;
-import org.terasology.TerasologyTestingEnvironment;
+import org.terasology.engine.TerasologyTestingEnvironment;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
-import org.terasology.engine.bootstrap.EntitySystemSetupUtil;
-import org.terasology.engine.module.ModuleManager;
-import org.terasology.engine.paths.PathManager;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.entity.internal.EngineEntityManager;
-import org.terasology.entitySystem.stubs.EntityRefComponent;
-import org.terasology.entitySystem.stubs.StringComponent;
+import org.terasology.engine.core.bootstrap.EntitySystemSetupUtil;
+import org.terasology.engine.core.module.ModuleManager;
+import org.terasology.engine.core.paths.PathManager;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.entitySystem.entity.internal.EngineEntityManager;
+import org.terasology.engine.entitySystem.stubs.EntityRefComponent;
+import org.terasology.engine.entitySystem.stubs.StringComponent;
 import org.terasology.joml.geom.AABBfc;
-import org.terasology.logic.location.LocationComponent;
-import org.terasology.math.JomlUtil;
+import org.terasology.engine.logic.location.LocationComponent;
 import org.terasology.module.ModuleEnvironment;
-import org.terasology.network.Client;
-import org.terasology.network.ClientComponent;
-import org.terasology.network.NetworkMode;
-import org.terasology.network.NetworkSystem;
-import org.terasology.persistence.ChunkStore;
-import org.terasology.persistence.PlayerStore;
-import org.terasology.persistence.StorageManager;
-import org.terasology.recording.CharacterStateEventPositionMap;
-import org.terasology.recording.DirectionAndOriginPosRecorderList;
-import org.terasology.recording.RecordAndReplayCurrentStatus;
-import org.terasology.recording.RecordAndReplaySerializer;
-import org.terasology.recording.RecordAndReplayUtils;
-import org.terasology.recording.RecordedEventStore;
+import org.terasology.engine.network.Client;
+import org.terasology.engine.network.ClientComponent;
+import org.terasology.engine.network.NetworkMode;
+import org.terasology.engine.network.NetworkSystem;
+import org.terasology.engine.persistence.ChunkStore;
+import org.terasology.engine.persistence.PlayerStore;
+import org.terasology.engine.persistence.StorageManager;
+import org.terasology.engine.recording.CharacterStateEventPositionMap;
+import org.terasology.engine.recording.DirectionAndOriginPosRecorderList;
+import org.terasology.engine.recording.RecordAndReplayCurrentStatus;
+import org.terasology.engine.recording.RecordAndReplaySerializer;
+import org.terasology.engine.recording.RecordAndReplayUtils;
+import org.terasology.engine.recording.RecordedEventStore;
 import org.terasology.reflection.TypeRegistry;
-import org.terasology.registry.CoreRegistry;
-import org.terasology.world.WorldProvider;
-import org.terasology.world.block.Block;
-import org.terasology.world.block.BlockManager;
-import org.terasology.world.block.family.SymmetricFamily;
-import org.terasology.world.block.loader.BlockFamilyDefinition;
-import org.terasology.world.block.loader.BlockFamilyDefinitionData;
-import org.terasology.world.chunks.Chunk;
-import org.terasology.world.chunks.ChunkProvider;
-import org.terasology.world.chunks.blockdata.ExtraBlockDataManager;
-import org.terasology.world.chunks.internal.ChunkImpl;
-import org.terasology.world.internal.WorldInfo;
+import org.terasology.engine.registry.CoreRegistry;
+import org.terasology.engine.world.WorldProvider;
+import org.terasology.engine.world.block.Block;
+import org.terasology.engine.world.block.BlockManager;
+import org.terasology.engine.world.block.family.SymmetricFamily;
+import org.terasology.engine.world.block.loader.BlockFamilyDefinition;
+import org.terasology.engine.world.block.loader.BlockFamilyDefinitionData;
+import org.terasology.engine.world.chunks.Chunk;
+import org.terasology.engine.world.chunks.ChunkProvider;
+import org.terasology.engine.world.chunks.blockdata.ExtraBlockDataManager;
+import org.terasology.engine.world.chunks.internal.ChunkImpl;
+import org.terasology.engine.world.internal.WorldInfo;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.FileSystem;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
@@ -102,13 +98,11 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
     }
 
     @BeforeEach
-    public void setup() throws Exception {
-        JavaArchive homeArchive = ShrinkWrap.create(JavaArchive.class);
-        FileSystem vfs = ShrinkWrapFileSystems.newFileSystem(homeArchive);
-        PathManager.getInstance().useOverrideHomePath(temporaryFolder.toPath());
+    public void setup(@TempDir Path tempHome) throws Exception {
+        PathManager.getInstance().useOverrideHomePath(tempHome);
         savePath = PathManager.getInstance().getSavePath("testSave");
 
-        assert !Files.isRegularFile(vfs.getPath("global.dat"));
+        assert !Files.isRegularFile(tempHome.resolve("global.dat"));
 
         entityManager = context.get(EngineEntityManager.class);
         moduleEnvironment = mock(ModuleEnvironment.class);
@@ -261,12 +255,12 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
 
     @Test
     public void testGetUnstoredChunkReturnsNothing() {
-        esm.loadChunkStore(JomlUtil.from(CHUNK_POS));
+        esm.loadChunkStore(CHUNK_POS);
     }
 
     @Test
     public void testStoreAndRestoreChunkStore() {
-        Chunk chunk = new ChunkImpl(JomlUtil.from(CHUNK_POS), blockManager, extraDataManager);
+        Chunk chunk = new ChunkImpl(CHUNK_POS, blockManager, extraDataManager);
         chunk.setBlock(0, 0, 0, testBlock);
         chunk.markReady();
         ChunkProvider chunkProvider = mock(ChunkProvider.class);
@@ -276,7 +270,7 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
         esm.waitForCompletionOfPreviousSaveAndStartSaving();
         esm.finishSavingAndShutdown();
 
-        ChunkStore restored = esm.loadChunkStore(JomlUtil.from(CHUNK_POS));
+        ChunkStore restored = esm.loadChunkStore(CHUNK_POS);
         assertNotNull(restored);
         assertEquals(CHUNK_POS, restored.getChunkPosition());
         assertNotNull(restored.getChunk());
@@ -285,7 +279,7 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
 
     @Test
     public void testChunkSurvivesStorageSaveAndRestore() throws Exception {
-        Chunk chunk = new ChunkImpl(JomlUtil.from(CHUNK_POS), blockManager, extraDataManager);
+        Chunk chunk = new ChunkImpl(CHUNK_POS, blockManager, extraDataManager);
         chunk.setBlock(0, 0, 0, testBlock);
         chunk.setBlock(0, 4, 2, testBlock2);
         chunk.markReady();
@@ -307,7 +301,7 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
                 recordAndReplayCurrentStatus);
         newSM.loadGlobalStore();
 
-        ChunkStore restored = newSM.loadChunkStore(JomlUtil.from(CHUNK_POS));
+        ChunkStore restored = newSM.loadChunkStore(CHUNK_POS);
         assertNotNull(restored);
         assertEquals(CHUNK_POS, restored.getChunkPosition());
         assertNotNull(restored.getChunk());
@@ -317,7 +311,7 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
 
     @Test
     public void testEntitySurvivesStorageInChunkStore() throws Exception {
-        Chunk chunk = new ChunkImpl(JomlUtil.from(CHUNK_POS), blockManager, extraDataManager);
+        Chunk chunk = new ChunkImpl(CHUNK_POS, blockManager, extraDataManager);
         chunk.setBlock(0, 0, 0, testBlock);
         chunk.markReady();
         ChunkProvider chunkProvider = mock(ChunkProvider.class);
@@ -343,7 +337,7 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
                 extraDataManager, false, recordAndReplaySerializer, recordAndReplayUtils, recordAndReplayCurrentStatus);
         newSM.loadGlobalStore();
 
-        ChunkStore restored = newSM.loadChunkStore(JomlUtil.from(CHUNK_POS));
+        ChunkStore restored = newSM.loadChunkStore(CHUNK_POS);
         restored.restoreEntities();
         EntityRef ref = newEntityManager.getEntity(id);
         assertTrue(ref.exists());

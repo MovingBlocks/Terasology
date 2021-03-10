@@ -1,16 +1,17 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.rendering.cameras;
+package org.terasology.engine.rendering.cameras;
 
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
-import org.terasology.config.RenderingConfig;
-import org.terasology.engine.subsystem.DisplayDevice;
+import org.terasology.engine.config.RenderingConfig;
+import org.terasology.engine.core.subsystem.DisplayDevice;
 import org.terasology.math.TeraMath;
-import org.terasology.rendering.nui.layers.mainMenu.videoSettings.CameraSetting;
-import org.terasology.world.WorldProvider;
+import org.terasology.engine.rendering.nui.layers.mainMenu.videoSettings.CameraSetting;
+import org.terasology.engine.world.WorldProvider;
+import org.terasology.engine.world.chunks.Chunks;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -19,7 +20,7 @@ import java.util.LinkedList;
 
 import static org.lwjgl.opengl.GL11.GL_PROJECTION;
 import static org.lwjgl.opengl.GL11.glMatrixMode;
-import static org.terasology.engine.subsystem.lwjgl.LwjglDisplayDevice.DISPLAY_RESOLUTION_CHANGE;
+import static org.terasology.engine.core.subsystem.lwjgl.LwjglDisplayDevice.DISPLAY_RESOLUTION_CHANGE;
 
 /**
  * Simple default camera.
@@ -48,6 +49,9 @@ public class PerspectiveCamera extends SubmersibleCamera implements PropertyChan
         this.cameraSettings = renderingConfig.getCameraSettings();
 
         displayDevice.subscribe(DISPLAY_RESOLUTION_CHANGE, this);
+        renderingConfig.subscribe(RenderingConfig.VIEW_DISTANCE, this);
+        renderingConfig.subscribe(RenderingConfig.CHUNK_LODS, this);
+        updateFarClippingDistance();
     }
 
     @Override
@@ -181,10 +185,23 @@ public class PerspectiveCamera extends SubmersibleCamera implements PropertyChan
         bobbingVerticalOffsetFactor = f;
     }
 
+    private void updateFarClippingDistance() {
+        float distance = renderingConfig.getViewDistance().getChunkDistance().x() * Chunks.SIZE_X * (1 << (int) renderingConfig.getChunkLods());
+        zFar = Math.max(distance, 600) * 2;
+        // distance is an estimate of how far away the farthest chunks are, and the minimum bound is to ensure that the sky is visible.
+    }
+
     public void propertyChange(PropertyChangeEvent propertyChangeEvent) {
-        if (propertyChangeEvent.getPropertyName().equals(DISPLAY_RESOLUTION_CHANGE)) {
-            cachedFov = -1; // Invalidate the cache, so that matrices get regenerated.
-            updateMatrices();
+        switch (propertyChangeEvent.getPropertyName()) {
+            case DISPLAY_RESOLUTION_CHANGE:
+                cachedFov = -1; // Invalidate the cache, so that matrices get regenerated.
+                updateMatrices();
+                return;
+            case RenderingConfig.VIEW_DISTANCE:
+            case RenderingConfig.CHUNK_LODS:
+                updateFarClippingDistance();
+                return;
+            default:
         }
     }
 }

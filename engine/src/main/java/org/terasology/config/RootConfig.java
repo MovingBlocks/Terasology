@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package org.terasology.config;
+package org.terasology.engine.config;
 
 import com.google.common.collect.Maps;
 import com.google.gson.JsonElement;
-import org.terasology.engine.SimpleUri;
+import org.terasology.engine.core.SimpleUri;
 
 import java.util.Map;
 
@@ -27,7 +27,6 @@ import java.util.Map;
  * and loaded in a JSON format.
  */
 public final class RootConfig {
-    private SystemConfig system = new SystemConfig();
     private PlayerConfig player = new PlayerConfig();
     private PermissionConfig permission = new PermissionConfig();
     private InputConfig input = new InputConfig();
@@ -73,10 +72,6 @@ public final class RootConfig {
 
     public PlayerConfig getPlayer() {
         return player;
-    }
-
-    public SystemConfig getSystem() {
-        return system;
     }
 
     public RenderingConfig getRendering() {

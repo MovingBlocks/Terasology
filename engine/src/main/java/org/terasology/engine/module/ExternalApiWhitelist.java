@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.engine.module;
+package org.terasology.engine.core.module;
 
 
 import com.google.common.collect.ImmutableSet;
@@ -25,8 +25,9 @@ import java.util.Set;
 
 public final class ExternalApiWhitelist {
     public static final Set<String> PACKAGES = new ImmutableSet.Builder<String>()
-            // TODO: This one org.terasology entry is a hack and needs a proper fix
+            .add("org.terasology.math")
             .add("org.terasology.math.geom")
+            .add("org.terasology.joml.geom")
             .add("java.lang")
             .add("java.beans")
             .add("java.lang.invoke")

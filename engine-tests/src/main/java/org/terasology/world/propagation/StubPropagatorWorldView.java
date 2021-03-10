@@ -13,18 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.world.propagation;
+package org.terasology.engine.world.propagation;
 
 import com.google.common.collect.Maps;
 import gnu.trove.map.TObjectByteMap;
 import gnu.trove.map.hash.TObjectByteHashMap;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
-import org.terasology.math.JomlUtil;
-import org.terasology.math.Region3i;
-import org.terasology.world.block.Block;
-import org.terasology.world.block.BlockRegion;
-import org.terasology.world.block.BlockRegionc;
+import org.terasology.engine.world.block.Block;
+import org.terasology.engine.world.block.BlockRegion;
+import org.terasology.engine.world.block.BlockRegionc;
 
 import java.util.Map;
 
@@ -36,19 +34,9 @@ public class StubPropagatorWorldView implements PropagatorWorldView {
     private BlockRegionc relevantRegion;
     private Block defaultBlock;
 
-    @Deprecated
-    public StubPropagatorWorldView(Region3i relevantRegion, Block defaultBlock) {
-        this(JomlUtil.from(relevantRegion), defaultBlock);
-    }
-
     public StubPropagatorWorldView(BlockRegionc relevantRegion, Block defaultBlock) {
         this.relevantRegion = new BlockRegion(relevantRegion);
         this.defaultBlock = defaultBlock;
-    }
-
-    @Deprecated
-    public StubPropagatorWorldView(Region3i relevantRegion, Block defaultBlock, Map<org.terasology.math.geom.Vector3i, Block> blockData) {
-        this(JomlUtil.from(relevantRegion), defaultBlock, JomlUtil.toBlockMap(blockData));
     }
 
     public StubPropagatorWorldView(BlockRegionc relevantRegion, Block defaultBlock, Map<Vector3ic, Block> blockData) {

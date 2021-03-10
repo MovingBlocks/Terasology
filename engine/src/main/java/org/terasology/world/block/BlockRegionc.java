@@ -1,20 +1,20 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.world.block;
+package org.terasology.engine.world.block;
 
-import org.terasology.joml.geom.AABBf;
-import org.terasology.joml.geom.Intersectionf;
-import org.terasology.joml.geom.LineSegmentf;
 import org.joml.Matrix4fc;
-import org.terasology.joml.geom.Planef;
-import org.terasology.joml.geom.Rayf;
-import org.terasology.joml.geom.Spheref;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
-import org.terasology.math.Side;
+import org.terasology.joml.geom.AABBf;
+import org.terasology.joml.geom.Intersectionf;
+import org.terasology.joml.geom.LineSegmentf;
+import org.terasology.joml.geom.Planef;
+import org.terasology.joml.geom.Rayf;
+import org.terasology.joml.geom.Spheref;
+import org.terasology.engine.math.Side;
 
 import java.util.Iterator;
 import java.util.Optional;

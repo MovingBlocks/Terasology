@@ -17,13 +17,14 @@ package org.terasology.logic.behavior;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.terasology.logic.behavior.actions.CounterAction;
-import org.terasology.logic.behavior.actions.Print;
-import org.terasology.logic.behavior.actions.TimeoutAction;
-import org.terasology.logic.behavior.core.Actor;
-import org.terasology.logic.behavior.core.BehaviorNode;
-import org.terasology.logic.behavior.core.BehaviorTreeBuilder;
-import org.terasology.logic.behavior.core.BehaviorTreeRunner;
+import org.terasology.engine.logic.behavior.DefaultBehaviorTreeRunner;
+import org.terasology.engine.logic.behavior.actions.CounterAction;
+import org.terasology.engine.logic.behavior.actions.Print;
+import org.terasology.engine.logic.behavior.actions.TimeoutAction;
+import org.terasology.engine.logic.behavior.core.Actor;
+import org.terasology.engine.logic.behavior.core.BehaviorNode;
+import org.terasology.engine.logic.behavior.core.BehaviorTreeBuilder;
+import org.terasology.engine.logic.behavior.core.BehaviorTreeRunner;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

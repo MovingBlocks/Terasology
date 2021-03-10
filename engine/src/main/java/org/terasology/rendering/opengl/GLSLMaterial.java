@@ -1,20 +1,7 @@
-/*
- * Copyright 2016 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 
-package org.terasology.rendering.opengl;
+package org.terasology.engine.rendering.opengl;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.Sets;
@@ -34,18 +21,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.AssetType;
 import org.terasology.assets.ResourceUrn;
-import org.terasology.engine.GameThread;
-import org.terasology.engine.subsystem.lwjgl.LwjglGraphicsProcessing;
-import org.terasology.math.MatrixUtils;
-import org.terasology.math.geom.Matrix3f;
-import org.terasology.math.geom.Matrix4f;
-import org.terasology.registry.CoreRegistry;
-import org.terasology.rendering.ShaderManager;
-import org.terasology.rendering.assets.material.BaseMaterial;
-import org.terasology.rendering.assets.material.MaterialData;
-import org.terasology.rendering.assets.shader.ShaderParameterMetadata;
-import org.terasology.rendering.assets.shader.ShaderProgramFeature;
-import org.terasology.rendering.assets.texture.Texture;
+import org.terasology.engine.core.GameThread;
+import org.terasology.engine.core.subsystem.lwjgl.LwjglGraphicsProcessing;
+import org.terasology.engine.registry.CoreRegistry;
+import org.terasology.engine.rendering.ShaderManager;
+import org.terasology.engine.rendering.assets.material.BaseMaterial;
+import org.terasology.engine.rendering.assets.material.MaterialData;
+import org.terasology.engine.rendering.assets.shader.ShaderParameterMetadata;
+import org.terasology.engine.rendering.assets.shader.ShaderProgramFeature;
+import org.terasology.engine.rendering.assets.texture.Texture;
 
 import java.nio.FloatBuffer;
 import java.util.Arrays;
@@ -487,29 +471,6 @@ public class GLSLMaterial extends BaseMaterial {
     }
 
     @Override
-    public void setMatrix3(String desc, Matrix3f value, boolean currentOnly) {
-        if (isDisposed()) {
-            return;
-        }
-        if (currentOnly) {
-            enable();
-            int id = getUniformLocation(getActiveShaderProgramId(), desc);
-            GL20.glUniformMatrix3fv(id, false, MatrixUtils.matrixToFloatBuffer(value));
-        } else {
-            TIntIntIterator it = disposalAction.shaderPrograms.iterator();
-            while (it.hasNext()) {
-                it.advance();
-
-                GL20.glUseProgram(it.value());
-                int id = getUniformLocation(it.value(), desc);
-                GL20.glUniformMatrix3fv(id, false, MatrixUtils.matrixToFloatBuffer(value));
-            }
-
-            restoreStateAfterUniformsSet();
-        }
-    }
-
-    @Override
     public void setMatrix3(String desc, Matrix3fc value, boolean currentOnly) {
         if (isDisposed()) {
             return;
@@ -551,29 +512,6 @@ public class GLSLMaterial extends BaseMaterial {
                 GL20.glUseProgram(it.value());
                 int id = getUniformLocation(it.value(), desc);
                 GL20.glUniformMatrix3fv(id, false, value);
-            }
-
-            restoreStateAfterUniformsSet();
-        }
-    }
-
-    @Override
-    public void setMatrix4(String desc, Matrix4f value, boolean currentOnly) {
-        if (isDisposed()) {
-            return;
-        }
-        if (currentOnly) {
-            enable();
-            int id = getUniformLocation(getActiveShaderProgramId(), desc);
-            GL20.glUniformMatrix4fv(id, false, MatrixUtils.matrixToFloatBuffer(value));
-        } else {
-            TIntIntIterator it = disposalAction.shaderPrograms.iterator();
-            while (it.hasNext()) {
-                it.advance();
-
-                GL20.glUseProgram(it.value());
-                int id = getUniformLocation(it.value(), desc);
-                GL20.glUniformMatrix4fv(id, false, MatrixUtils.matrixToFloatBuffer(value));
             }
 
             restoreStateAfterUniformsSet();

@@ -13,21 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.engine.subsystem.lwjgl;
+package org.terasology.engine.core.subsystem.lwjgl;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.module.ModuleAwareAssetTypeManager;
-import org.terasology.audio.AudioManager;
-import org.terasology.audio.StaticSound;
-import org.terasology.audio.StreamingSound;
-import org.terasology.audio.nullAudio.NullAudioManager;
-import org.terasology.audio.openAL.OpenALException;
-import org.terasology.audio.openAL.OpenALManager;
-import org.terasology.config.AudioConfig;
-import org.terasology.context.Context;
-import org.terasology.engine.GameEngine;
-import org.terasology.engine.modes.GameState;
+import org.terasology.engine.audio.AudioManager;
+import org.terasology.engine.audio.StaticSound;
+import org.terasology.engine.audio.StreamingSound;
+import org.terasology.engine.audio.nullAudio.NullAudioManager;
+import org.terasology.engine.audio.openAL.OpenALException;
+import org.terasology.engine.audio.openAL.OpenALManager;
+import org.terasology.engine.config.AudioConfig;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.core.GameEngine;
+import org.terasology.engine.core.modes.GameState;
 
 public class LwjglAudio extends BaseLwjglSubsystem {
 

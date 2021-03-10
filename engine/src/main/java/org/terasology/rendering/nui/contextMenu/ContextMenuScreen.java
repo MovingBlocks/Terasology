@@ -1,32 +1,18 @@
-/*
- * Copyright 2016 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-package org.terasology.rendering.nui.contextMenu;
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
+package org.terasology.engine.rendering.nui.contextMenu;
 
 import com.google.common.collect.Lists;
-import org.terasology.joml.geom.Rectanglei;
 import org.joml.Vector2i;
 import org.terasology.assets.ResourceUrn;
-import org.terasology.math.JomlUtil;
+import org.terasology.joml.geom.Rectanglei;
 import org.terasology.nui.BaseInteractionListener;
 import org.terasology.nui.Canvas;
 import org.terasology.nui.InteractionListener;
 import org.terasology.nui.events.NUIMouseClickEvent;
 import org.terasology.nui.events.NUIMouseWheelEvent;
 import org.terasology.nui.widgets.UIList;
-import org.terasology.rendering.nui.CoreScreenLayer;
+import org.terasology.engine.rendering.nui.CoreScreenLayer;
 
 import java.util.List;
 
@@ -83,15 +69,15 @@ public class ContextMenuScreen extends CoreScreenLayer {
                     currentPosition.x += currentWidth;
                 }
                 org.joml.Vector2i preferredSize = canvas.calculatePreferredSize(level);
-                Rectanglei region = JomlUtil.rectangleiFromMinAndSize(
-                        currentPosition.x, currentPosition.y, preferredSize.x, preferredSize.y);
+                Rectanglei region = new Rectanglei(
+                        currentPosition.x, currentPosition.y).setSize(preferredSize.x, preferredSize.y);
                 double percentageThreshold = 0.9;
-                int canvasHeight = canvas.getRegion().lengthY();
+                int canvasHeight = canvas.getRegion().getSizeY();
                 if (region.maxY > canvasHeight * percentageThreshold) {
-                    region = JomlUtil.rectangleiFromMinAndSize(region.minX,
+                    region = new Rectanglei(region.minX,
                         region.minY
                                 - (region.maxY - canvasHeight)
-                                - (int) (canvasHeight * (1 - percentageThreshold)),
+                                - (int) (canvasHeight * (1 - percentageThreshold))).setSize(
                         region.maxX,
                         canvasHeight);
                 }

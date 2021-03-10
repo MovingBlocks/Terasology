@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.audio.openAL.streamingSound;
+package org.terasology.engine.audio.openAL.streamingSound;
 
-import org.terasology.audio.openAL.BaseSoundPool;
+import org.terasology.engine.audio.openAL.BaseSoundPool;
 
 public class OpenALStreamingSoundPool extends BaseSoundPool<OpenALStreamingSound, OpenALStreamingSoundSource> {
 

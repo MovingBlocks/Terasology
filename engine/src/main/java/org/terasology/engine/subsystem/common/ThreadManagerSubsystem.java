@@ -13,17 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.engine.subsystem.common;
+package org.terasology.engine.core.subsystem.common;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.context.Context;
-import org.terasology.engine.subsystem.EngineSubsystem;
-import org.terasology.monitoring.ThreadActivity;
-import org.terasology.monitoring.ThreadMonitor;
-import org.terasology.utilities.concurrency.ShutdownTask;
-import org.terasology.utilities.concurrency.Task;
-import org.terasology.utilities.concurrency.TaskMaster;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.core.subsystem.EngineSubsystem;
+import org.terasology.engine.monitoring.ThreadActivity;
+import org.terasology.engine.monitoring.ThreadMonitor;
+import org.terasology.engine.utilities.concurrency.ShutdownTask;
+import org.terasology.engine.utilities.concurrency.Task;
+import org.terasology.engine.utilities.concurrency.TaskMaster;
 
 import java.util.concurrent.RejectedExecutionException;
 

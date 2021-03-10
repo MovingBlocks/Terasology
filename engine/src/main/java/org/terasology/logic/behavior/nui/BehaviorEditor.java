@@ -1,19 +1,6 @@
-/*
- * Copyright 2017 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-package org.terasology.logic.behavior.nui;
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
+package org.terasology.engine.logic.behavior.nui;
 
 import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
@@ -22,18 +9,17 @@ import org.abego.treelayout.TreeForTreeLayout;
 import org.abego.treelayout.TreeLayout;
 import org.abego.treelayout.util.DefaultConfiguration;
 import org.abego.treelayout.util.FixedNodeExtentProvider;
+import org.joml.Vector2f;
 import org.joml.Vector2i;
-import org.terasology.context.Context;
-import org.terasology.logic.behavior.BehaviorSystem;
-import org.terasology.logic.behavior.DefaultBehaviorTreeRunner;
-import org.terasology.logic.behavior.asset.BehaviorTree;
-import org.terasology.logic.behavior.asset.BehaviorTreeFormat;
-import org.terasology.logic.behavior.core.BehaviorNode;
-import org.terasology.logic.behavior.core.BehaviorState;
-import org.terasology.logic.behavior.core.BehaviorTreeBuilder;
-import org.terasology.logic.behavior.core.Visitor;
-import org.terasology.math.JomlUtil;
-import org.terasology.math.geom.Vector2f;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.logic.behavior.asset.BehaviorTree;
+import org.terasology.engine.logic.behavior.asset.BehaviorTreeFormat;
+import org.terasology.engine.logic.behavior.core.BehaviorNode;
+import org.terasology.engine.logic.behavior.core.BehaviorState;
+import org.terasology.engine.logic.behavior.core.BehaviorTreeBuilder;
+import org.terasology.engine.logic.behavior.core.Visitor;
+import org.terasology.engine.logic.behavior.BehaviorSystem;
+import org.terasology.engine.logic.behavior.DefaultBehaviorTreeRunner;
 import org.terasology.nui.BaseInteractionListener;
 import org.terasology.nui.Canvas;
 import org.terasology.nui.Color;
@@ -45,7 +31,7 @@ import org.terasology.nui.events.NUIMouseClickEvent;
 import org.terasology.nui.events.NUIMouseOverEvent;
 import org.terasology.nui.events.NUIMouseReleaseEvent;
 import org.terasology.nui.layouts.ZoomableLayout;
-import org.terasology.registry.CoreRegistry;
+import org.terasology.engine.registry.CoreRegistry;
 
 import java.awt.geom.Rectangle2D;
 import java.io.ByteArrayOutputStream;
@@ -73,7 +59,7 @@ public class BehaviorEditor extends ZoomableLayout implements DefaultBehaviorTre
     private final InteractionListener mouseInteractionListener = new BaseInteractionListener() {
         @Override
         public void onMouseOver(NUIMouseOverEvent event) {
-            mouseWorldPosition = JomlUtil.from(screenToWorld(event.getRelativeMousePosition()));
+            mouseWorldPosition = screenToWorld(event.getRelativeMousePosition());
             if (newNode != null) {
                 org.joml.Vector2f diff = screenToWorld(event.getRelativeMousePosition()).sub(newNode.getPosition());
                 newNode.move(diff);
@@ -166,8 +152,8 @@ public class BehaviorEditor extends ZoomableLayout implements DefaultBehaviorTre
                 drawConnection(canvas, activeConnectionStart, mouseWorldPosition, Color.WHITE);
             }
             if (selectedNode != null) {
-                Vector2f size = JomlUtil.from(selectedNode.getSize());
-                Vector2f topLeft = JomlUtil.from(selectedNode.getPosition());
+                Vector2f size = new Vector2f(selectedNode.getSize());
+                Vector2f topLeft = new Vector2f(selectedNode.getPosition());
                 Vector2f topRight = new Vector2f(topLeft);
                 topRight.add(new Vector2f(size.x + .1f, 0));
                 Vector2f bottomLeft = new Vector2f(topLeft);
@@ -209,21 +195,21 @@ public class BehaviorEditor extends ZoomableLayout implements DefaultBehaviorTre
     }
 
     private void drawConnection(Canvas canvas, Vector2f from, Vector2f to, Color color) {
-        Vector2i s = worldToScreen(JomlUtil.from(from));
-        Vector2i e = worldToScreen(JomlUtil.from(to));
+        Vector2i s = worldToScreen(from);
+        Vector2i e = worldToScreen(to);
         canvas.drawLine(s.x, s.y, e.x, e.y, color);
     }
 
     private void drawConnection(Canvas canvas, Port from, Vector2f to, Color color) {
-        Vector2f start = JomlUtil.from(from.node.getPosition());
+        Vector2f start = new Vector2f(from.node.getPosition());
         start.add(from.mid());
         drawConnection(canvas, start, to, color);
     }
 
     private void drawConnection(Canvas canvas, Port from, Port to, Color color) {
-        Vector2f start = JomlUtil.from(from.node.getPosition());
+        Vector2f start = new Vector2f(from.node.getPosition());
         start.add(from.mid());
-        Vector2f end = JomlUtil.from(to.node.getPosition());
+        Vector2f end = new Vector2f(to.node.getPosition());
         end.add(to.mid());
         drawConnection(canvas, start, end, color);
     }

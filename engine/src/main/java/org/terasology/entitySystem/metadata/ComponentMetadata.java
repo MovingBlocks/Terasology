@@ -13,22 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.entitySystem.metadata;
+package org.terasology.engine.entitySystem.metadata;
 
 import com.google.common.base.Predicates;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import org.terasology.assets.ResourceUrn;
-import org.terasology.engine.SimpleUri;
-import org.terasology.entitySystem.Component;
-import org.terasology.network.Replicate;
-import org.terasology.reflection.copy.CopyStrategy;
+import org.terasology.engine.entitySystem.Component;
+import org.terasology.engine.network.Replicate;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.metadata.ClassMetadata;
 import org.terasology.reflection.reflect.InaccessibleFieldException;
 import org.terasology.reflection.reflect.ReflectFactory;
-import org.terasology.world.block.ForceBlockActive;
-import org.terasology.world.block.RequiresBlockLifecycleEvents;
+import org.terasology.engine.world.block.ForceBlockActive;
+import org.terasology.engine.world.block.RequiresBlockLifecycleEvents;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;

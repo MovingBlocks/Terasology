@@ -1,29 +1,14 @@
-/*
- * Copyright 2013 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-package org.terasology.rendering.cameras;
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
+package org.terasology.engine.rendering.cameras;
 
-import org.terasology.joml.geom.AABBf;
+import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.lwjgl.BufferUtils;
 import org.terasology.joml.geom.AABBfc;
-import org.terasology.logic.players.LocalPlayer;
-import org.terasology.math.AABB;
-import org.terasology.math.JomlUtil;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.registry.CoreRegistry;
+import org.terasology.joml.geom.Planef;
+import org.terasology.engine.logic.players.LocalPlayer;
+import org.terasology.engine.registry.CoreRegistry;
 
 import java.nio.FloatBuffer;
 
@@ -33,7 +18,7 @@ import java.nio.FloatBuffer;
  */
 public class ViewFrustum {
 
-    private final FrustumPlane[] planes = new FrustumPlane[6];
+    private final Planef[] planes = new Planef[6];
     private final FloatBuffer clip = BufferUtils.createFloatBuffer(16);
 
     /**
@@ -41,7 +26,7 @@ public class ViewFrustum {
      */
     public ViewFrustum() {
         for (int i = 0; i < 6; i++) {
-            planes[i] = new FrustumPlane();
+            planes[i] = new Planef();
         }
     }
 
@@ -90,45 +75,45 @@ public class ViewFrustum {
             + modelViewMatrix.get(14) * projectionMatrix.get(11) + modelViewMatrix.get(15) * projectionMatrix.get(15));
 
         // RIGHT
-        planes[0].setA(clip.get(3) - clip.get(0));
-        planes[0].setB(clip.get(7) - clip.get(4));
-        planes[0].setC(clip.get(11) - clip.get(8));
-        planes[0].setD(clip.get(15) - clip.get(12));
+        planes[0].a = clip.get(3) - clip.get(0);
+        planes[0].b = clip.get(7) - clip.get(4);
+        planes[0].c = clip.get(11) - clip.get(8);
+        planes[0].d = clip.get(15) - clip.get(12);
         planes[0].normalize();
 
         // LEFT
-        planes[1].setA(clip.get(3) + clip.get(0));
-        planes[1].setB(clip.get(7) + clip.get(4));
-        planes[1].setC(clip.get(11) + clip.get(8));
-        planes[1].setD(clip.get(15) + clip.get(12));
+        planes[1].a = clip.get(3) + clip.get(0);
+        planes[1].b = clip.get(7) + clip.get(4);
+        planes[1].c = clip.get(11) + clip.get(8);
+        planes[1].d = clip.get(15) + clip.get(12);
         planes[1].normalize();
 
         // BOTTOM
-        planes[2].setA(clip.get(3) + clip.get(1));
-        planes[2].setB(clip.get(7) + clip.get(5));
-        planes[2].setC(clip.get(11) + clip.get(9));
-        planes[2].setD(clip.get(15) + clip.get(13));
+        planes[2].a = clip.get(3) + clip.get(1);
+        planes[2].b = clip.get(7) + clip.get(5);
+        planes[2].c = clip.get(11) + clip.get(9);
+        planes[2].d = clip.get(15) + clip.get(13);
         planes[2].normalize();
 
         // TOP
-        planes[3].setA(clip.get(3) - clip.get(1));
-        planes[3].setB(clip.get(7) - clip.get(5));
-        planes[3].setC(clip.get(11) - clip.get(9));
-        planes[3].setD(clip.get(15) - clip.get(13));
+        planes[3].a = clip.get(3) - clip.get(1);
+        planes[3].b = clip.get(7) - clip.get(5);
+        planes[3].c = clip.get(11) - clip.get(9);
+        planes[3].d = clip.get(15) - clip.get(13);
         planes[3].normalize();
 
         // FAR
-        planes[4].setA(clip.get(3) - clip.get(2));
-        planes[4].setB(clip.get(7) - clip.get(6));
-        planes[4].setC(clip.get(11) - clip.get(10));
-        planes[4].setD(clip.get(15) - clip.get(14));
+        planes[4].a = clip.get(3) - clip.get(2);
+        planes[4].b = clip.get(7) - clip.get(6);
+        planes[4].c = clip.get(11) - clip.get(10);
+        planes[4].d = clip.get(15) - clip.get(14);
         planes[4].normalize();
 
         // NEAR
-        planes[5].setA(clip.get(3) + clip.get(2));
-        planes[5].setB(clip.get(7) + clip.get(6));
-        planes[5].setC(clip.get(11) + clip.get(10));
-        planes[5].setD(clip.get(15) + clip.get(14));
+        planes[5].a = clip.get(3) + clip.get(2);
+        planes[5].b = clip.get(7) + clip.get(6);
+        planes[5].c = clip.get(11) + clip.get(10);
+        planes[5].d = clip.get(15) + clip.get(14);
         planes[5].normalize();
     }
 
@@ -137,7 +122,7 @@ public class ViewFrustum {
      */
     public boolean intersects(double x, double y, double z) {
         for (int i = 0; i < 6; i++) {
-            if (planes[i].getA() * x + planes[i].getB() * y + planes[i].getC() * z + planes[i].getD() <= 0) {
+            if (planes[i].a * x + planes[i].b * y + planes[i].c * z + planes[i].d <= 0) {
                 return false;
             }
         }
@@ -146,51 +131,41 @@ public class ViewFrustum {
 
     /**
      * Returns true if this view frustum intersects the given AABB.
-     *
-     * @deprecated This is scheduled for removal in an upcoming version method will be replaced with JOML implementation
-     *     {@link #intersects(AABBfc)}.
-     */
-    public boolean intersects(AABB aabb) {
-        return intersects(JomlUtil.from(aabb));
-    }
-
-    /**
-     * Returns true if this view frustum intersects the given AABB.
      */
     public boolean intersects(AABBfc aabb) {
 
-        Vector3f cp = CoreRegistry.get(LocalPlayer.class).getViewPosition();
+        Vector3f cp = CoreRegistry.get(LocalPlayer.class).getViewPosition(new Vector3f());
         for (int i = 0; i < 6; i++) {
-            if (planes[i].getA() * (aabb.minX() - cp.x) + planes[i].getB() * (aabb.minY() - cp.y)
-                + planes[i].getC() * (aabb.maxZ() - cp.z) + planes[i].getD() > 0) {
+            if (planes[i].a * (aabb.minX() - cp.x) + planes[i].b * (aabb.minY() - cp.y)
+                + planes[i].c * (aabb.maxZ() - cp.z) + planes[i].d > 0) {
                 continue;
             }
-            if (planes[i].getA() * (aabb.maxX() - cp.x) + planes[i].getB() * (aabb.minY() - cp.y)
-                + planes[i].getC() * (aabb.maxZ() - cp.z) + planes[i].getD() > 0) {
+            if (planes[i].a * (aabb.maxX() - cp.x) + planes[i].b * (aabb.minY() - cp.y)
+                + planes[i].c * (aabb.maxZ() - cp.z) + planes[i].d > 0) {
                 continue;
             }
-            if (planes[i].getA() * (aabb.maxX() - cp.x) + planes[i].getB() * (aabb.maxY() - cp.y)
-                + planes[i].getC() * (aabb.maxZ() - cp.z) + planes[i].getD() > 0) {
+            if (planes[i].a * (aabb.maxX() - cp.x) + planes[i].b * (aabb.maxY() - cp.y)
+                + planes[i].c * (aabb.maxZ() - cp.z) + planes[i].d > 0) {
                 continue;
             }
-            if (planes[i].getA() * (aabb.minX() - cp.x) + planes[i].getB() * (aabb.maxY() - cp.y)
-                + planes[i].getC() * (aabb.maxZ() - cp.z) + planes[i].getD() > 0) {
+            if (planes[i].a * (aabb.minX() - cp.x) + planes[i].b * (aabb.maxY() - cp.y)
+                + planes[i].c * (aabb.maxZ() - cp.z) + planes[i].d > 0) {
                 continue;
             }
-            if (planes[i].getA() * (aabb.minX() - cp.x) + planes[i].getB() * (aabb.minY() - cp.y)
-                + planes[i].getC() * (aabb.minZ() - cp.z) + planes[i].getD() > 0) {
+            if (planes[i].a * (aabb.minX() - cp.x) + planes[i].b * (aabb.minY() - cp.y)
+                + planes[i].c * (aabb.minZ() - cp.z) + planes[i].d > 0) {
                 continue;
             }
-            if (planes[i].getA() * (aabb.maxX() - cp.x) + planes[i].getB() * (aabb.minY() - cp.y)
-                + planes[i].getC() * (aabb.minZ() - cp.z) + planes[i].getD() > 0) {
+            if (planes[i].a * (aabb.maxX() - cp.x) + planes[i].b * (aabb.minY() - cp.y)
+                + planes[i].c * (aabb.minZ() - cp.z) + planes[i].d > 0) {
                 continue;
             }
-            if (planes[i].getA() * (aabb.maxX() - cp.x) + planes[i].getB() * (aabb.maxY() - cp.y)
-                + planes[i].getC() * (aabb.minZ() - cp.z) + planes[i].getD() > 0) {
+            if (planes[i].a * (aabb.maxX() - cp.x) + planes[i].b * (aabb.maxY() - cp.y)
+                + planes[i].c * (aabb.minZ() - cp.z) + planes[i].d > 0) {
                 continue;
             }
-            if (planes[i].getA() * (aabb.minX() - cp.x) + planes[i].getB() * (aabb.maxY() - cp.y)
-                + planes[i].getC() * (aabb.minZ() - cp.z) + planes[i].getD() > 0) {
+            if (planes[i].a * (aabb.minX() - cp.x) + planes[i].b * (aabb.maxY() - cp.y)
+                + planes[i].c * (aabb.minZ() - cp.z) + planes[i].d > 0) {
                 continue;
             }
             return false;
@@ -201,20 +176,10 @@ public class ViewFrustum {
 
     /**
      * Returns true if the given sphere intersects the given AABB.
-     *
-     * @deprecated This is scheduled for removal in an upcoming version method will be replaced with JOML implementation
-     *     {@link #intersects(Vector3fc, float)}.
-     */
-    public boolean intersects(Vector3f position, float radius) {
-        return intersects(JomlUtil.from(position), radius);
-    }
-
-    /**
-     * Returns true if the given sphere intersects the given AABB.
      */
     public boolean intersects(Vector3fc position, float radius) {
         for (int i = 0; i < 6; i++) {
-            if (planes[i].getA() * position.x() + planes[i].getB() * position.y() + planes[i].getC() * position.z() + planes[i].getD() <= -radius) {
+            if (planes[i].a * position.x() + planes[i].b * position.y() + planes[i].c * position.z() + planes[i].d <= -radius) {
                 return false;
             }
         }

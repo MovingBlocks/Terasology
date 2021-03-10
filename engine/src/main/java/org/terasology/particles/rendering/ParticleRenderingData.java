@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.particles.rendering;
+package org.terasology.engine.particles.rendering;
 
-import org.terasology.entitySystem.Component;
+import org.terasology.engine.entitySystem.Component;
 import org.terasology.module.sandbox.API;
-import org.terasology.particles.ParticlePool;
+import org.terasology.engine.particles.ParticlePool;
 
 /**
  *

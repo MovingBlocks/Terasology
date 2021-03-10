@@ -1,7 +1,7 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-package org.terasology.persistence.typeHandling.event;
+package org.terasology.engine.persistence.typeHandling.event;
 
 import org.joml.Vector2f;
 import org.joml.Vector2fc;
@@ -12,30 +12,30 @@ import org.joml.Vector4fc;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.ResourceLock;
-import org.terasology.TestResourceLocks;
+import org.terasology.engine.TestResourceLocks;
 import org.terasology.assets.ResourceUrn;
-import org.terasology.context.internal.ContextImpl;
-import org.terasology.engine.module.ModuleManager;
-import org.terasology.entitySystem.event.Event;
-import org.terasology.entitySystem.metadata.EntitySystemLibrary;
-import org.terasology.entitySystem.metadata.EventMetadata;
-import org.terasology.persistence.serializers.EventSerializer;
+import org.terasology.engine.context.internal.ContextImpl;
+import org.terasology.engine.core.module.ModuleManager;
+import org.terasology.engine.entitySystem.event.Event;
+import org.terasology.engine.entitySystem.metadata.EntitySystemLibrary;
+import org.terasology.engine.entitySystem.metadata.EventMetadata;
+import org.terasology.engine.persistence.serializers.EventSerializer;
+import org.terasology.engine.persistence.typeHandling.TypeHandlerLibraryImpl;
+import org.terasology.engine.registry.CoreRegistry;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
-import org.terasology.persistence.typeHandling.TypeHandlerLibraryImpl;
 import org.terasology.protobuf.EntityData;
 import org.terasology.reflection.TypeRegistry;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.metadata.FieldMetadata;
 import org.terasology.reflection.reflect.ReflectFactory;
 import org.terasology.reflection.reflect.ReflectionReflectFactory;
-import org.terasology.registry.CoreRegistry;
-import org.terasology.testUtil.ModuleManagerFactory;
-import org.terasology.testUtil.TeraAssert;
+import org.terasology.engine.testUtil.ModuleManagerFactory;
 
 import java.io.IOException;
 import java.util.HashMap;
 
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
+import static org.terasology.joml.test.VectorAssert.assertEquals;
 
 @ResourceLock(TestResourceLocks.CORE_REGISTRY)
 public class VectorEventSerializer {
@@ -108,12 +108,12 @@ public class VectorEventSerializer {
         EntityData.Event ev = serializer.serialize(a);
         Event dev = serializer.deserialize(ev);
         assumeTrue(dev instanceof Vector3fTestEvent);
-        TeraAssert.assertEquals(((Vector3fTestEvent) dev).v1, new Vector3f(1.0f, 2.0f, 3.0f), .00001f);
-        TeraAssert.assertEquals(((Vector3fTestEvent) dev).v2, new Vector4f(1.0f, 2.0f, 3.0f, 5.0f), .00001f);
-        TeraAssert.assertEquals(((Vector3fTestEvent) dev).v3, new Vector2f(1.0f, 2.0f), .00001f);
+        assertEquals(((Vector3fTestEvent) dev).v1, new Vector3f(1.0f, 2.0f, 3.0f), .00001f);
+        assertEquals(((Vector3fTestEvent) dev).v2, new Vector4f(1.0f, 2.0f, 3.0f, 5.0f), .00001f);
+        assertEquals(((Vector3fTestEvent) dev).v3, new Vector2f(1.0f, 2.0f), .00001f);
 
-        TeraAssert.assertEquals(((Vector3fTestEvent) dev).v1c, new Vector3f(1.0f, 1.0f, 1.0f), .00001f);
-        TeraAssert.assertEquals(((Vector3fTestEvent) dev).v2c, new Vector4f(1.0f, 1.0f, 2.0f, 2.0f), .00001f);
-        TeraAssert.assertEquals(((Vector3fTestEvent) dev).v3c, new Vector2f(1.0f, 1.0f), .00001f);
+        assertEquals(((Vector3fTestEvent) dev).v1c, new Vector3f(1.0f, 1.0f, 1.0f), .00001f);
+        assertEquals(((Vector3fTestEvent) dev).v2c, new Vector4f(1.0f, 1.0f, 2.0f, 2.0f), .00001f);
+        assertEquals(((Vector3fTestEvent) dev).v3c, new Vector2f(1.0f, 1.0f), .00001f);
     }
 }

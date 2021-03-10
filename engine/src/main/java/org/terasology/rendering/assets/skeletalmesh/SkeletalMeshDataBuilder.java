@@ -1,29 +1,15 @@
-/*
- * Copyright 2013 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-package org.terasology.rendering.assets.skeletalmesh;
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
+package org.terasology.engine.rendering.assets.skeletalmesh;
 
 import gnu.trove.list.TFloatList;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
-import org.terasology.math.AABB;
-import org.terasology.math.JomlUtil;
-import org.terasology.rendering.assets.mesh.MeshBuilder;
-import org.terasology.rendering.assets.mesh.MeshData;
+import org.terasology.joml.geom.AABBf;
+import org.terasology.engine.rendering.assets.mesh.MeshBuilder;
+import org.terasology.engine.rendering.assets.mesh.MeshData;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -124,7 +110,7 @@ public class SkeletalMeshDataBuilder {
         } else if (rootBones > 1) {
             throw new IllegalStateException("Cannot create a skeleton with multiple root bones");
         }
-        AABB staticAabb = AABB.createMinMax(JomlUtil.from(minOfAABB), JomlUtil.from(maxOfAABB));
+        AABBf staticAabb = new AABBf(minOfAABB, maxOfAABB);
         return new SkeletalMeshData(bones, vertices, normals, weights, uvs, indices, staticAabb);
     }
 

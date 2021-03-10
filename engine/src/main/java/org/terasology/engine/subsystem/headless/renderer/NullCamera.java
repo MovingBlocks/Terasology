@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.engine.subsystem.headless.renderer;
+package org.terasology.engine.core.subsystem.headless.renderer;
 
-import org.terasology.config.RenderingConfig;
-import org.terasology.rendering.cameras.SubmersibleCamera;
-import org.terasology.world.WorldProvider;
+import org.terasology.engine.config.RenderingConfig;
+import org.terasology.engine.rendering.cameras.SubmersibleCamera;
+import org.terasology.engine.world.WorldProvider;
 
 public final class NullCamera extends SubmersibleCamera {
     public NullCamera(WorldProvider worldProvider, RenderingConfig renderingConfig) {

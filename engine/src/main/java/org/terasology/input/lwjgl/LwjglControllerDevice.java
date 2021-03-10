@@ -1,7 +1,7 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-package org.terasology.input.lwjgl;
+package org.terasology.engine.input.lwjgl;
 
 import com.google.common.collect.Lists;
 import com.google.common.io.ByteStreams;
@@ -12,8 +12,8 @@ import org.lwjgl.glfw.GLFWGamepadState;
 import org.lwjgl.system.MemoryUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.config.ControllerConfig;
-import org.terasology.engine.TerasologyConstants;
+import org.terasology.engine.config.ControllerConfig;
+import org.terasology.engine.core.TerasologyConstants;
 import org.terasology.input.ButtonState;
 import org.terasology.input.ControllerDevice;
 import org.terasology.input.ControllerId;

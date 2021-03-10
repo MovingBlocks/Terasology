@@ -1,45 +1,48 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.engine.bootstrap;
+package org.terasology.engine.core.bootstrap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.module.ModuleAwareAssetTypeManager;
-import org.terasology.config.flexible.AutoConfigManager;
-import org.terasology.context.Context;
-import org.terasology.engine.module.ModuleManager;
-import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.metadata.ComponentLibrary;
-import org.terasology.entitySystem.metadata.EntitySystemLibrary;
-import org.terasology.entitySystem.metadata.EventLibrary;
-import org.terasology.entitySystem.metadata.MetadataUtil;
-import org.terasology.entitySystem.prefab.Prefab;
-import org.terasology.entitySystem.prefab.internal.PrefabDeltaFormat;
-import org.terasology.entitySystem.prefab.internal.PrefabFormat;
-import org.terasology.entitySystem.systems.internal.DoNotAutoRegister;
+import org.terasology.engine.config.flexible.AutoConfigManager;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.core.module.ModuleManager;
+import org.terasology.engine.entitySystem.Component;
+import org.terasology.engine.entitySystem.metadata.ComponentLibrary;
+import org.terasology.engine.entitySystem.metadata.EntitySystemLibrary;
+import org.terasology.engine.entitySystem.metadata.EventLibrary;
+import org.terasology.engine.entitySystem.metadata.MetadataUtil;
+import org.terasology.engine.entitySystem.prefab.Prefab;
+import org.terasology.engine.entitySystem.prefab.internal.PrefabDeltaFormat;
+import org.terasology.engine.entitySystem.prefab.internal.PrefabFormat;
+import org.terasology.engine.entitySystem.systems.internal.DoNotAutoRegister;
+import org.terasology.engine.persistence.typeHandling.RegisterTypeHandler;
+import org.terasology.engine.persistence.typeHandling.RegisterTypeHandlerFactory;
+import org.terasology.engine.persistence.typeHandling.TypeHandlerLibraryImpl;
+import org.terasology.engine.persistence.typeHandling.extensionTypes.CollisionGroupTypeHandler;
+import org.terasology.engine.physics.CollisionGroup;
+import org.terasology.engine.physics.CollisionGroupManager;
+import org.terasology.engine.registry.InjectionHelper;
+import org.terasology.engine.utilities.ReflectionUtil;
 import org.terasology.module.ModuleEnvironment;
-import org.terasology.persistence.typeHandling.RegisterTypeHandler;
-import org.terasology.persistence.typeHandling.RegisterTypeHandlerFactory;
+import org.terasology.naming.Name;
 import org.terasology.persistence.typeHandling.TypeHandler;
 import org.terasology.persistence.typeHandling.TypeHandlerFactory;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
-import org.terasology.persistence.typeHandling.TypeHandlerLibraryImpl;
-import org.terasology.persistence.typeHandling.extensionTypes.CollisionGroupTypeHandler;
-import org.terasology.physics.CollisionGroup;
-import org.terasology.physics.CollisionGroupManager;
 import org.terasology.reflection.TypeInfo;
 import org.terasology.reflection.TypeRegistry;
 import org.terasology.reflection.copy.CopyStrategy;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.copy.RegisterCopyStrategy;
 import org.terasology.reflection.reflect.ReflectFactory;
-import org.terasology.registry.InjectionHelper;
 import org.terasology.util.reflection.GenericsUtil;
-import org.terasology.utilities.ReflectionUtil;
 
 import java.lang.reflect.Type;
 import java.util.Optional;
+
+import static com.google.common.base.Verify.verifyNotNull;
 
 /**
  * Handles an environment switch by updating the asset manager, component library, and other context objects.
@@ -177,7 +180,8 @@ public final class EnvironmentSwitchHandler {
         for (Class<? extends Component> componentType : environment.getSubtypesOf(Component.class)) {
             if (componentType.getAnnotation(DoNotAutoRegister.class) == null) {
                 String componentName = MetadataUtil.getComponentClassName(componentType);
-                library.register(new ResourceUrn(environment.getModuleProviding(componentType).toString(), componentName), componentType);
+                Name componentModuleName = verifyNotNull(environment.getModuleProviding(componentType), "Could not find module for %s %s", componentName, componentType);
+                library.register(new ResourceUrn(componentModuleName.toString(), componentName), componentType);
             }
         }
     }

@@ -7,7 +7,7 @@
     <option name="VM_PARAMETERS" value="-Xms256m -Xmx8192m" />
     <extension name="coverage">
       <pattern>
-        <option name="PATTERN" value="org.terasology.engine.*" />
+        <option name="PATTERN" value="org.terasology.engine.core.*" />
         <option name="ENABLED" value="true" />
       </pattern>
     </extension>
@@ -21,6 +21,7 @@
     <ConfigurationWrapper RunnerId="Run" />
     <method v="2">
       <option name="Make" enabled="true" />
+      <option name="Gradle.BeforeRunTask" enabled="true" tasks="fetchModuleDependencies" externalProjectPath="$PROJECT_DIR$/modules" vmOptions="" scriptParameters="" />
     </method>
   </configuration>
 </component>

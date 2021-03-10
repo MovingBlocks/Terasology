@@ -1,4 +1,4 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
 // Dependencies needed for what our Gradle scripts themselves use. It cannot be included via an external Gradle file :-(
@@ -8,11 +8,18 @@ buildscript {
         jcenter()
         mavenCentral()
         gradlePluginPortal()
+
+        maven {
+            // required to provide runtime dependencies to build-logic.
+            name = "Terasology Artifactory"
+            url = "http://artifactory.terasology.org/artifactory/virtual-repo-live"
+            allowInsecureProtocol = true  // 😱
+        }
     }
 
     dependencies {
         // Needed for caching reflected data during builds
-        classpath 'org.reflections:reflections:0.9.10'
+        classpath 'org.terasology:reflections:0.9.12-MB'
         classpath 'dom4j:dom4j:1.6.1'
 
         //Spotbugs
@@ -20,9 +27,11 @@ buildscript {
 
         // SonarQube / Cloud scanning
         classpath "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.8"
+
+        // Our locally included /build-logic
+        classpath("org.terasology.gradology:build-logic")
     }
 }
-
 
 plugins {
     // Needed for extending the "clean" task to also delete custom stuff defined here like natives
@@ -35,22 +44,17 @@ plugins {
     //apply plugin: 'eclipse'
     id "idea"
     // For the "Build and run using: Intellij IDEA | Gradle" switch
-    id "org.jetbrains.gradle.plugin.idea-ext" version "0.8.1"
+    id "org.jetbrains.gradle.plugin.idea-ext" version "1.0"
 }
 
 
+import org.gradle.internal.logging.text.StyledTextOutputFactory
 import org.jetbrains.gradle.ext.ActionDelegationConfig
 
-import java.nio.file.Files
-import java.nio.file.Path
-import java.nio.file.StandardCopyOption
+import static org.gradle.internal.logging.text.StyledTextOutput.Style
 
 // Test for right version of Java in use for running this script
 assert org.gradle.api.JavaVersion.current().isJava8Compatible()
-
-import org.gradle.internal.logging.text.StyledTextOutputFactory
-import static org.gradle.internal.logging.text.StyledTextOutput.Style
-
 // Check for Java 8
 if(!(JavaVersion.current() == JavaVersion.VERSION_1_8 || JavaVersion.current() == JavaVersion.VERSION_11)) {
     def out = services.get(StyledTextOutputFactory).create("an-ouput")
@@ -184,20 +188,6 @@ task extractConfig(type: Copy) {
     into "$rootDir/$dirConfigMetrics"
 }
 
-// Helper that returns a list of all local Terasology module projects
-def terasologyModules() {
-    subprojects.findAll { it.parent.name == 'modules' }
-}
-
-// Helpers that do magic things after having dependencies attached below
-task moduleJars
-
-// This magically makes everything work - without this the desired module projects returned have no tasks :-(
-gradle.projectsEvaluated {
-    // This makes it work for a full jar task
-    moduleJars.dependsOn(terasologyModules().jar)
-}
-
 // Include deletion of extracted natives in the global clean task. Without the doLast it runs on *every* execution ...
 clean.doLast {
     new File(dirNatives).deleteDir()
@@ -239,71 +229,6 @@ project(":modules").subprojects.forEach { proj ->
         }
     }
 }
-
-/**
- * Gathering remote modules files from remoteRepo to 'modules' for autoloading in game-time (tasks server, game etc)
- */
-class RemoteModuleGatherer implements DependencyResolutionListener {
-
-    private final Path modulesDir
-    private final Logger logger
-
-    RemoteModuleGatherer(Path  modulesDir) {
-        this.modulesDir = modulesDir
-        this.logger = Logging.getLogger(this.class)
-    }
-
-    @Override
-    void beforeResolve(ResolvableDependencies dependencies) {
-        // nothing to do
-    }
-
-    @Override
-    void afterResolve(ResolvableDependencies dependencies) {
-        // We process only module dependencies
-        if (dependencies.path.startsWith(":modules:") &&
-                dependencies.name == "compileClasspath") {
-            def projectName = dependencies.path.split(":")[2]
-
-            if (!dependencies.artifacts.artifacts.empty) {
-                logger.debug("\nProcessing module '{}' in a multi-project workspace", projectName)
-            }
-
-            dependencies.artifacts.artifacts.each {
-                if (isRemoteTerasologyModule(it)) {
-                    println "$projectName resolved binary $it"
-                    def binaryModulePath = modulesDir.resolve(it.file.name)
-                    Files.copy(it.file.toPath(), binaryModulePath, StandardCopyOption.REPLACE_EXISTING)
-                } else if (isLocalTerasologyModule(it)) {
-                    logger.info("*** Found module dependency {} in source form, not copying a runtime jar from Gradle", it)
-                } else {
-                    //ignore non terasology module
-                }
-            }
-        }
-    }
-
-    private static boolean isRemoteTerasologyModule(ResolvedArtifactResult artifact) {
-        def componentIdentifier = artifact.id.componentIdentifier
-        if (componentIdentifier instanceof ModuleComponentIdentifier) {
-            def module = componentIdentifier as ModuleComponentIdentifier
-            return module.group == 'org.terasology.modules'
-        }
-        return false
-    }
-
-    private static boolean isLocalTerasologyModule(ResolvedArtifactResult artifact) {
-        def componentIdentifier = artifact.id.componentIdentifier
-        if (componentIdentifier instanceof ProjectComponentIdentifier) {
-            def module = componentIdentifier as ProjectComponentIdentifier
-            return !(module.projectName in ['engine', 'engine-tests'])
-        }
-        return false
-    }
-}
-
-gradle.addListener(new RemoteModuleGatherer(rootDir.toPath().resolve("modules")))
-
 
 tasks.named('wrapper') {
     // ALL distributionType because IntelliJ prefers having its sources for analysis and reference.
