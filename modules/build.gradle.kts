@@ -3,11 +3,13 @@
 
 import org.terasology.gradology.JAR_COLLECTION
 import org.terasology.gradology.moduleDependencyArtifacts
+import org.terasology.gradology.moduleDependencyOrdering
 import org.terasology.gradology.namedAttribute
 
 plugins {
     id("terasology-repositories")
     `java-platform`
+    `project-report`
 }
 
 @Suppress("PropertyName")
@@ -65,5 +67,11 @@ tasks.named("clean").configure {
     val cleanModules = this
     subprojects {
         cleanModules.dependsOn(this.tasks.named("clean"))
+    }
+}
+
+val reportModuleOrder by tasks.registering {
+    moduleDependencyOrdering(configurations.getByName("classpath")).forEach {
+        println(it)
     }
 }

@@ -23,6 +23,9 @@ dependencies {
     implementation("org.terasology:reflections:0.9.12-MB")
     implementation("dom4j:dom4j:1.6.1")
 
+    // graph analysis
+    implementation("org.jgrapht:jgrapht-core:1.5.0")
+
     // for inspecting modules
     implementation("org.terasology:gestalt-module:5.1.5")
 
