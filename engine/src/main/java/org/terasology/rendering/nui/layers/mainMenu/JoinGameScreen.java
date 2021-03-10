@@ -1,49 +1,33 @@
-/*
- * Copyright 2015 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *  http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-package org.terasology.rendering.nui.layers.mainMenu;
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
+package org.terasology.engine.rendering.nui.layers.mainMenu;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
-import org.terasology.config.Config;
-import org.terasology.config.ServerInfo;
-import org.terasology.engine.GameEngine;
-import org.terasology.engine.GameThread;
-import org.terasology.engine.modes.StateLoading;
-import org.terasology.engine.module.ModuleManager;
-import org.terasology.i18n.TranslationSystem;
-import org.terasology.identity.storageServiceClient.StorageServiceWorker;
+import org.terasology.engine.config.Config;
+import org.terasology.engine.config.ServerInfo;
+import org.terasology.engine.core.GameEngine;
+import org.terasology.engine.core.GameThread;
+import org.terasology.engine.core.modes.StateLoading;
+import org.terasology.engine.core.module.ModuleManager;
+import org.terasology.engine.i18n.TranslationSystem;
+import org.terasology.engine.identity.storageServiceClient.StorageServiceWorker;
+import org.terasology.engine.rendering.nui.animation.MenuAnimationSystems;
 import org.terasology.input.Keyboard;
 import org.terasology.module.ModuleRegistry;
 import org.terasology.naming.NameVersion;
-import org.terasology.network.JoinStatus;
-import org.terasology.network.NetworkSystem;
-import org.terasology.network.PingService;
-import org.terasology.network.ServerInfoMessage;
-import org.terasology.network.ServerInfoService;
-import org.terasology.registry.In;
-import org.terasology.nui.FontColor;
+import org.terasology.engine.network.JoinStatus;
+import org.terasology.engine.network.NetworkSystem;
+import org.terasology.engine.network.PingService;
+import org.terasology.engine.network.ServerInfoMessage;
+import org.terasology.engine.network.ServerInfoService;
 import org.terasology.nui.Color;
-import org.terasology.rendering.nui.CoreScreenLayer;
+import org.terasology.nui.FontColor;
 import org.terasology.nui.WidgetUtil;
-import org.terasology.rendering.nui.animation.MenuAnimationSystems;
 import org.terasology.nui.databinding.BindHelper;
 import org.terasology.nui.databinding.IntToStringBinding;
 import org.terasology.nui.databinding.ReadOnlyBinding;
@@ -54,8 +38,10 @@ import org.terasology.nui.widgets.ActivateEventListener;
 import org.terasology.nui.widgets.UIButton;
 import org.terasology.nui.widgets.UILabel;
 import org.terasology.nui.widgets.UIList;
-import org.terasology.world.internal.WorldInfo;
-import org.terasology.world.time.WorldTime;
+import org.terasology.engine.registry.In;
+import org.terasology.engine.rendering.nui.CoreScreenLayer;
+import org.terasology.engine.world.internal.WorldInfo;
+import org.terasology.engine.world.time.WorldTime;
 
 import java.io.IOException;
 import java.util.ArrayList;

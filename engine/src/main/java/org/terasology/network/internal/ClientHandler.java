@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-package org.terasology.network.internal;
+package org.terasology.engine.network.internal;
 
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.engine.GameEngine;
-import org.terasology.engine.modes.StateMainMenu;
-import org.terasology.registry.CoreRegistry;
+import org.terasology.engine.core.GameEngine;
+import org.terasology.engine.core.modes.StateMainMenu;
+import org.terasology.engine.registry.CoreRegistry;
 
 import static org.terasology.protobuf.NetData.NetMessage;
 

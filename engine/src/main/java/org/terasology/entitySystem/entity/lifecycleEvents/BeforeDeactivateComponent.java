@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package org.terasology.entitySystem.entity.lifecycleEvents;
+package org.terasology.engine.entitySystem.entity.lifecycleEvents;
 
-import org.terasology.entitySystem.event.Event;
+import org.terasology.engine.entitySystem.event.Event;
 
 /**
  * When a component is about to leave the active state, either due to being removed, the entity it is attached to being destroyed,

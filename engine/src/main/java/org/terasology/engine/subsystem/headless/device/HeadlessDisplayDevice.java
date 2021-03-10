@@ -13,14 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.engine.subsystem.headless.device;
+package org.terasology.engine.core.subsystem.headless.device;
 
-import org.terasology.engine.subsystem.DisplayDevice;
-import org.terasology.engine.subsystem.DisplayDeviceInfo;
-import org.terasology.engine.subsystem.Resolution;
-import org.terasology.engine.subsystem.lwjgl.LwjglGraphicsUtil;
-import org.terasology.rendering.nui.layers.mainMenu.videoSettings.DisplayModeSetting;
-import org.terasology.utilities.subscribables.AbstractSubscribable;
+import org.terasology.engine.core.subsystem.DisplayDevice;
+import org.terasology.engine.core.subsystem.DisplayDeviceInfo;
+import org.terasology.engine.core.subsystem.Resolution;
+import org.terasology.engine.rendering.nui.layers.mainMenu.videoSettings.DisplayModeSetting;
+import org.terasology.engine.utilities.subscribables.AbstractSubscribable;
 
 import java.util.Collections;
 import java.util.List;

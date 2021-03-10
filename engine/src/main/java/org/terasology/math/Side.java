@@ -1,27 +1,13 @@
-/*
- * Copyright 2013 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-package org.terasology.math;
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
+package org.terasology.engine.math;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
-import org.joml.Quaternionfc;
 import org.joml.Vector3fc;
+import org.joml.Vector3i;
 import org.joml.Vector3ic;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector3i;
+import org.terasology.math.TeraMath;
 
 import java.util.EnumMap;
 import java.util.EnumSet;
@@ -34,8 +20,8 @@ import java.util.EnumSet;
  *
  */
 public enum Side {
-    TOP(Vector3i.up(), true, false, true),
-    BOTTOM(Vector3i.down(), true, false, true),
+    TOP(new Vector3i(0, 1, 0), true, false, true),
+    BOTTOM(new Vector3i(0, -1, 0), true, false, true),
     LEFT(new Vector3i(-1, 0, 0), false, true, true),
     RIGHT(new Vector3i(1, 0, 0), false, true, true),
     FRONT(new Vector3i(0, 0, -1), true, true, false),
@@ -155,17 +141,6 @@ public enum Side {
     }
 
     /**
-     * @param dir
-     * @return
-     * @deprecated This method is scheduled for removal in an upcoming version. Use the JOML implementation instead:
-     *     {@link #inDirection(Vector3fc)}.
-     */
-    @Deprecated
-    public static Side inDirection(Vector3f dir) {
-        return inDirection(dir.x, dir.y, dir.z);
-    }
-
-    /**
      * The side normal closes to dir
      * 
      * @param dir direction
@@ -221,22 +196,12 @@ public enum Side {
     }
 
     /**
-     * @return The vector3i in the direction of the side. Do not modify.
-     * @deprecated This method is scheduled for removal in an upcoming version. Use the JOML implementation instead:
-     *     {@link #direction()} .
-     */
-    @Deprecated
-    public Vector3i getVector3i() {
-        return vector3iDir;
-    }
-
-    /**
      * the normal vector in the direction of the side
      *
      * @return a normalized vector
      */
     public Vector3ic direction() {
-        return JomlUtil.from(vector3iDir);
+        return vector3iDir;
     }
 
     /**
@@ -325,19 +290,6 @@ public enum Side {
             default:
                 return this;
         }
-    }
-
-    /**
-     * @param position
-     * @return
-     * @deprecated This method is scheduled for removal in an upcoming version. Use the JOML implementation instead:
-     *     {@link #getAdjacentPos(Vector3ic, org.joml.Vector3i)} .
-     **/
-    @Deprecated
-    public Vector3i getAdjacentPos(Vector3i position) {
-        Vector3i result = new Vector3i(position);
-        result.add(vector3iDir);
-        return result;
     }
 
     /**

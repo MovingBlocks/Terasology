@@ -14,8 +14,8 @@ import kotlin.test.fail
 
 plugins {
     application
-    `terasology-dist`
-    facade
+    id("terasology-dist")
+    id("facade")
 }
 
 // Grab all the common stuff like plugins to use, artifact repositories, code analysis config
@@ -59,19 +59,12 @@ logger.info("PC VERSION: {}", version)
 // Jenkins-Artifactory integration catches on to this as part of the Maven-type descriptor
 group = "org.terasology.facades"
 
-configurations {
-    register("serverModules") {
-        description = "for fetching modules for running a server"
-        isTransitive = false
-    }
-}
-
 dependencies {
     implementation(group = "info.picocli", name = "picocli", version = "4.5.2")
     annotationProcessor("info.picocli:picocli-codegen:4.5.2")
 
     implementation(project(":engine"))
-    implementation(group = "org.reflections", name = "reflections", version = "0.9.10")
+    implementation("org.terasology:reflections:0.9.12-MB")
     implementation(project(":subsystems:DiscordRPC"))
 
     // TODO: Consider whether we can move the CR dependency back here from the engine, where it is referenced from the main menu
@@ -113,37 +106,9 @@ tasks.register<RunTerasology>("permissiveNatives") {
     systemProperty("java.library.path", rootProject.file(dirNatives + "/" + nativeSubdirectoryName()))
 }
 
-/******************************************
- * Headless server
- */
-
-apply(from="server.build.gradle")
-
-// TODO: Seems to always be up to date so no modules get copied
-tasks.register<Sync>("setupServerModules") {
-    description =
-        """Parses "extraModules" - a comma-separated list of modules and puts them into $localServerDataPath"""
-
-    val extraModules: String? by project
-    extraModules?.let {
-        // Grab modules from Artifactory - cheats by declaring them as dependencies
-        it.splitToSequence(",").forEach {
-            logger.info("Extra module: {}", it)
-            dependencies {
-                "serverModules"(group = "org.terasology.modules", name = it, version = "+")
-            }
-        }
-    }
-
-    from(configurations.named("serverModules"))
-    into(File(rootProject.file(localServerDataPath), "modules"))
-}
-
 // TODO: Make a task to reset server / game data
 tasks.register<RunTerasology>("server") {
     description = "Starts a headless multiplayer server with data stored in [project-root]/$localServerDataPath"
-    dependsOn("setupServerConfig")
-    dependsOn("setupServerModules")
     args("--headless", "--homedir=$localServerDataPath")
 }
 
@@ -283,10 +248,6 @@ tasks.named<CreateStartScripts>("startScripts") {
         template = resources.text.fromFile("src/main/startScripts/windowsStartScript.bat.gsp")
     }
 }
-
-// NOTE: If you build a distribution while you have modules, all the test dependencies are in here.
-//     They're "optional" in module.txt and gradle doesn't know how to tell which are runtime and which are
-//     test-only.
 
 distributions {
     main {

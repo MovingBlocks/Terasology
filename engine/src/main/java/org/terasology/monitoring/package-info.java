@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 
-@API package org.terasology.monitoring;
+@API package org.terasology.engine.monitoring;
 
 import org.terasology.module.sandbox.API;

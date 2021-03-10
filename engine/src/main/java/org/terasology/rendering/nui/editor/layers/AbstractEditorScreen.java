@@ -1,19 +1,6 @@
-/*
- * Copyright 2016 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-package org.terasology.rendering.nui.editor.layers;
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
+package org.terasology.engine.rendering.nui.editor.layers;
 
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
@@ -26,22 +13,22 @@ import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.exceptions.InvalidUrnException;
 import org.terasology.assets.format.AssetDataFile;
-import org.terasology.engine.module.ModuleManager;
+import org.terasology.engine.core.module.ModuleManager;
+import org.terasology.engine.rendering.nui.editor.systems.AbstractEditorSystem;
+import org.terasology.engine.rendering.nui.layers.mainMenu.ConfirmPopup;
+import org.terasology.engine.rendering.nui.widgets.JsonEditorTreeView;
 import org.terasology.input.Keyboard;
 import org.terasology.input.device.KeyboardDevice;
 import org.terasology.module.PathModule;
 import org.terasology.naming.Name;
 import org.terasology.nui.Canvas;
-import org.terasology.registry.In;
-import org.terasology.rendering.nui.CoreScreenLayer;
-import org.terasology.rendering.nui.editor.systems.AbstractEditorSystem;
 import org.terasology.nui.events.NUIKeyEvent;
-import org.terasology.rendering.nui.layers.mainMenu.ConfirmPopup;
-import org.terasology.rendering.nui.widgets.JsonEditorTreeView;
 import org.terasology.nui.widgets.UITextEntry;
 import org.terasology.nui.widgets.treeView.JsonTree;
 import org.terasology.nui.widgets.treeView.JsonTreeConverter;
 import org.terasology.nui.widgets.treeView.JsonTreeValue;
+import org.terasology.engine.registry.In;
+import org.terasology.engine.rendering.nui.CoreScreenLayer;
 
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;

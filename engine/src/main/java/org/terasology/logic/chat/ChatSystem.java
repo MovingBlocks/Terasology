@@ -1,46 +1,33 @@
-/*
- * Copyright 2017 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 
-package org.terasology.logic.chat;
+package org.terasology.engine.logic.chat;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
-import org.terasology.entitySystem.entity.EntityManager;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.event.ReceiveEvent;
-import org.terasology.entitySystem.systems.BaseComponentSystem;
-import org.terasology.entitySystem.systems.RegisterSystem;
+import org.terasology.engine.entitySystem.entity.EntityManager;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.entitySystem.event.ReceiveEvent;
+import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
+import org.terasology.engine.entitySystem.systems.RegisterSystem;
+import org.terasology.engine.logic.common.DisplayNameComponent;
+import org.terasology.engine.logic.console.ConsoleColors;
+import org.terasology.engine.logic.console.CoreMessageType;
+import org.terasology.engine.logic.console.Message;
+import org.terasology.engine.logic.console.MessageEvent;
+import org.terasology.engine.logic.console.commandSystem.annotations.Command;
+import org.terasology.engine.logic.console.commandSystem.annotations.CommandParam;
+import org.terasology.engine.logic.console.commandSystem.annotations.Sender;
+import org.terasology.engine.logic.console.suggesters.OnlineUsernameSuggester;
+import org.terasology.engine.logic.console.ui.NotificationOverlay;
 import org.terasology.input.ButtonState;
-import org.terasology.input.binds.general.ChatButton;
-import org.terasology.logic.common.DisplayNameComponent;
-import org.terasology.logic.console.ConsoleColors;
-import org.terasology.logic.console.CoreMessageType;
-import org.terasology.logic.console.Message;
-import org.terasology.logic.console.MessageEvent;
-import org.terasology.logic.console.commandSystem.annotations.Command;
-import org.terasology.logic.console.commandSystem.annotations.CommandParam;
-import org.terasology.logic.console.commandSystem.annotations.Sender;
-import org.terasology.logic.console.suggesters.OnlineUsernameSuggester;
-import org.terasology.logic.console.ui.NotificationOverlay;
-import org.terasology.logic.permission.PermissionManager;
-import org.terasology.network.ClientComponent;
+import org.terasology.engine.input.binds.general.ChatButton;
+import org.terasology.engine.logic.permission.PermissionManager;
+import org.terasology.engine.network.ClientComponent;
 import org.terasology.nui.FontColor;
-import org.terasology.registry.In;
-import org.terasology.rendering.nui.NUIManager;
+import org.terasology.engine.registry.In;
+import org.terasology.engine.rendering.nui.NUIManager;
 
 import java.util.Arrays;
 

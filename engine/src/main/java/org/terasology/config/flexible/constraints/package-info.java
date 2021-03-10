@@ -13,6 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-@API package org.terasology.config.flexible.constraints;
+@API package org.terasology.engine.config.flexible.constraints;
 
 import org.terasology.module.sandbox.API;

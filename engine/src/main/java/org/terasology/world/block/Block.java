@@ -1,48 +1,33 @@
-/*
- * Copyright 2018 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-package org.terasology.world.block;
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
+package org.terasology.engine.world.block;
 
 import com.google.common.collect.Maps;
-import org.terasology.joml.geom.AABBf;
 import org.joml.Quaternionf;
 import org.joml.RoundingMode;
 import org.joml.Vector3f;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.terasology.assets.ResourceUrn;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.prefab.Prefab;
-import org.terasology.math.JomlUtil;
-import org.terasology.math.Rotation;
-import org.terasology.math.Side;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.entitySystem.prefab.Prefab;
+import org.terasology.engine.world.block.family.BlockFamily;
+import org.terasology.engine.world.block.shapes.BlockMeshPart;
+import org.terasology.engine.world.block.sounds.BlockSounds;
+import org.terasology.engine.world.chunks.Chunks;
+import org.terasology.joml.geom.AABBf;
+import org.terasology.engine.math.Rotation;
+import org.terasology.engine.math.Side;
 import org.terasology.math.TeraMath;
-import org.terasology.math.Transform;
-import org.terasology.physics.shapes.CollisionShape;
-import org.terasology.rendering.assets.material.Material;
-import org.terasology.rendering.assets.mesh.Mesh;
-import org.terasology.rendering.assets.shader.ShaderProgramFeature;
-import org.terasology.rendering.primitives.BlockMeshGenerator;
-import org.terasology.rendering.primitives.BlockMeshGeneratorSingleShape;
-import org.terasology.rendering.primitives.Tessellator;
-import org.terasology.utilities.Assets;
-import org.terasology.utilities.collection.EnumBooleanMap;
-import org.terasology.world.block.family.BlockFamily;
-import org.terasology.world.block.shapes.BlockMeshPart;
-import org.terasology.world.block.sounds.BlockSounds;
-import org.terasology.world.chunks.ChunkConstants;
+import org.terasology.engine.physics.shapes.CollisionShape;
+import org.terasology.engine.rendering.assets.material.Material;
+import org.terasology.engine.rendering.assets.mesh.Mesh;
+import org.terasology.engine.rendering.assets.shader.ShaderProgramFeature;
+import org.terasology.engine.rendering.primitives.BlockMeshGenerator;
+import org.terasology.engine.rendering.primitives.BlockMeshGeneratorSingleShape;
+import org.terasology.engine.rendering.primitives.Tessellator;
+import org.terasology.engine.utilities.Assets;
+import org.terasology.engine.utilities.collection.EnumBooleanMap;
 
 import java.util.Map;
 import java.util.Optional;
@@ -475,7 +460,7 @@ public final class Block {
      * @param luminance the light level produced by this block
      */
     public void setLuminance(byte luminance) {
-        this.luminance = (byte) TeraMath.clamp(luminance, 0, ChunkConstants.MAX_LIGHT);
+        this.luminance = (byte) TeraMath.clamp(luminance, 0, Chunks.MAX_LIGHT);
     }
 
     public Vector3f getTint() {

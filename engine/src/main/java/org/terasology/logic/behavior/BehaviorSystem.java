@@ -1,51 +1,36 @@
-/*
- * Copyright 2017 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-package org.terasology.logic.behavior;
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
+package org.terasology.engine.logic.behavior;
 
 import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
-import org.terasology.audio.StaticSound;
-import org.terasology.engine.paths.PathManager;
-import org.terasology.entitySystem.entity.EntityManager;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
-import org.terasology.entitySystem.entity.lifecycleEvents.OnAddedComponent;
-import org.terasology.entitySystem.event.ReceiveEvent;
-import org.terasology.entitySystem.prefab.PrefabManager;
-import org.terasology.entitySystem.systems.BaseComponentSystem;
-import org.terasology.entitySystem.systems.RegisterMode;
-import org.terasology.entitySystem.systems.RegisterSystem;
-import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
-import org.terasology.logic.behavior.asset.BehaviorTree;
-import org.terasology.logic.behavior.asset.BehaviorTreeData;
-import org.terasology.logic.behavior.asset.BehaviorTreeFormat;
-import org.terasology.logic.behavior.core.Actor;
-import org.terasology.logic.behavior.core.BehaviorNode;
+import org.terasology.engine.core.paths.PathManager;
+import org.terasology.engine.entitySystem.entity.EntityManager;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
+import org.terasology.engine.entitySystem.entity.lifecycleEvents.OnAddedComponent;
+import org.terasology.engine.entitySystem.event.ReceiveEvent;
+import org.terasology.engine.entitySystem.prefab.PrefabManager;
+import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
+import org.terasology.engine.entitySystem.systems.RegisterMode;
+import org.terasology.engine.entitySystem.systems.RegisterSystem;
+import org.terasology.engine.entitySystem.systems.UpdateSubscriberSystem;
+import org.terasology.engine.logic.behavior.asset.BehaviorTree;
+import org.terasology.engine.logic.behavior.asset.BehaviorTreeData;
+import org.terasology.engine.logic.behavior.asset.BehaviorTreeFormat;
+import org.terasology.engine.logic.behavior.core.Actor;
+import org.terasology.engine.logic.behavior.core.BehaviorNode;
 import org.terasology.naming.Name;
-import org.terasology.registry.In;
-import org.terasology.registry.Share;
+import org.terasology.engine.registry.In;
+import org.terasology.engine.registry.Share;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -53,8 +38,8 @@ import java.util.Optional;
 /**
  * Behavior tree system
  * <p/>
- * Each entity with BehaviorComponent is kept under control by this system. For each such entity a behavior tree
- * is loaded and an interpreter is started.
+ * Each entity with BehaviorComponent is kept under control by this system. For each such entity a behavior tree is
+ * loaded and an interpreter is started.
  * <p/>
  * Modifications made to a behavior tree will reflect to all entities using this tree.
  */
@@ -75,15 +60,14 @@ public class BehaviorSystem extends BaseComponentSystem implements UpdateSubscri
 
     @Override
     public void initialise() {
-        List<ResourceUrn> uris = Lists.newArrayList();
-        uris.addAll(new ArrayList<>(assetManager.getAvailableAssets(StaticSound.class)));
         for (ResourceUrn uri : assetManager.getAvailableAssets(BehaviorTree.class)) {
-            try {
-                Optional<BehaviorTree> asset = assetManager.getAsset(uri, BehaviorTree.class);
-                asset.ifPresent(behaviorTree -> trees.add(behaviorTree));
-            } catch (RuntimeException e) {
-                logger.info("Failed to load behavior tree asset {}.", uri, e);
+            Optional<BehaviorTree> asset = assetManager.getAsset(uri, BehaviorTree.class);
+            if (asset.isPresent()) {
+                trees.add(asset.get());
+            } else {
+                logger.warn("Failed to load behavior tree asset {}.", uri);
             }
+
         }
     }
 
@@ -102,9 +86,10 @@ public class BehaviorSystem extends BaseComponentSystem implements UpdateSubscri
         Iterable<EntityRef> entities = entityManager.getEntitiesWith(BehaviorComponent.class);
         for (EntityRef entity : entities) {
             BehaviorComponent behaviorComponent = entity.getComponent(BehaviorComponent.class);
-            // NPE observed in the past, suspected to be about loss of behavior state. Hopefully one skip is OK then resume next tick?
-            // TODO: Highlight this log entry to the telemetry system to gather better data over time
             if (behaviorComponent.interpreter == null) {
+                // NPE observed in the past, suspected to be about loss of behavior state. Hopefully one skip is OK then
+                // resume next tick?
+                // TODO: Highlight this log entry to the telemetry system to gather better data over time
                 logger.warn("Found a null interpreter during tick updates, skipping for entity {}", entity);
                 continue;
             }

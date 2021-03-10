@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package org.terasology.network.serialization;
+package org.terasology.engine.network.serialization;
 
 import org.terasology.reflection.metadata.ClassMetadata;
 import org.terasology.reflection.metadata.FieldMetadata;
-import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.metadata.ReplicatedFieldMetadata;
-import org.terasology.persistence.serializers.FieldSerializeCheck;
+import org.terasology.engine.entitySystem.Component;
+import org.terasology.engine.entitySystem.metadata.ReplicatedFieldMetadata;
+import org.terasology.engine.persistence.serializers.FieldSerializeCheck;
 
 /**
  * Determines which fields should be serialized and deserialized by the client.

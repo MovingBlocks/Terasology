@@ -1,19 +1,6 @@
-/*
- * Copyright 2019 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-package org.terasology.rendering.nui.layers.mainMenu;
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
+package org.terasology.engine.rendering.nui.layers.mainMenu;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -23,31 +10,27 @@ import org.terasology.assets.AssetFactory;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.assets.module.ModuleAwareAssetTypeManager;
-import org.terasology.config.Config;
-import org.terasology.context.Context;
-import org.terasology.context.internal.ContextImpl;
-import org.terasology.engine.bootstrap.EnvironmentSwitchHandler;
-import org.terasology.engine.module.ModuleManager;
-import org.terasology.entitySystem.prefab.Prefab;
-import org.terasology.entitySystem.prefab.PrefabData;
-import org.terasology.entitySystem.prefab.internal.PojoPrefab;
-import org.terasology.logic.behavior.asset.BehaviorTree;
-import org.terasology.logic.behavior.asset.BehaviorTreeData;
+import org.terasology.engine.config.Config;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.context.internal.ContextImpl;
+import org.terasology.engine.core.bootstrap.EnvironmentSwitchHandler;
+import org.terasology.engine.core.module.ModuleManager;
+import org.terasology.engine.entitySystem.prefab.Prefab;
+import org.terasology.engine.entitySystem.prefab.PrefabData;
+import org.terasology.engine.entitySystem.prefab.internal.PojoPrefab;
+import org.terasology.engine.logic.behavior.asset.BehaviorTree;
+import org.terasology.engine.logic.behavior.asset.BehaviorTreeData;
+import org.terasology.engine.rendering.nui.animation.MenuAnimationSystems;
+import org.terasology.engine.rendering.nui.layers.mainMenu.advancedGameSetupScreen.AdvancedGameSetupScreen;
+import org.terasology.engine.rendering.world.WorldSetupWrapper;
+import org.terasology.engine.world.generator.WorldGenerator;
 import org.terasology.module.DependencyInfo;
 import org.terasology.module.DependencyResolver;
 import org.terasology.module.Module;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.module.ResolutionResult;
 import org.terasology.naming.Name;
-import org.terasology.reflection.copy.CopyStrategyLibrary;
-import org.terasology.reflection.reflect.ReflectFactory;
-import org.terasology.reflection.reflect.ReflectionReflectFactory;
-import org.terasology.registry.CoreRegistry;
-import org.terasology.registry.In;
-import org.terasology.rendering.nui.CoreScreenLayer;
-import org.terasology.rendering.nui.NUIManager;
 import org.terasology.nui.WidgetUtil;
-import org.terasology.rendering.nui.animation.MenuAnimationSystems;
 import org.terasology.nui.asset.UIData;
 import org.terasology.nui.asset.UIElement;
 import org.terasology.nui.databinding.Binding;
@@ -56,30 +39,36 @@ import org.terasology.nui.itemRendering.StringTextRenderer;
 import org.terasology.nui.skin.UISkin;
 import org.terasology.nui.skin.UISkinData;
 import org.terasology.nui.widgets.UIDropdownScrollable;
-import org.terasology.rendering.world.WorldSetupWrapper;
-import org.terasology.world.block.family.BlockFamilyLibrary;
-import org.terasology.world.block.loader.BlockFamilyDefinition;
-import org.terasology.world.block.loader.BlockFamilyDefinitionData;
-import org.terasology.world.block.loader.BlockFamilyDefinitionFormat;
-import org.terasology.world.block.shapes.BlockShape;
-import org.terasology.world.block.shapes.BlockShapeData;
-import org.terasology.world.block.shapes.BlockShapeImpl;
-import org.terasology.world.block.sounds.BlockSounds;
-import org.terasology.world.block.sounds.BlockSoundsData;
-import org.terasology.world.block.tiles.BlockTile;
-import org.terasology.world.block.tiles.TileData;
-import org.terasology.world.generator.UnresolvedWorldGeneratorException;
-import org.terasology.world.generator.internal.WorldGeneratorInfo;
-import org.terasology.world.generator.internal.WorldGeneratorManager;
-import org.terasology.world.generator.plugin.TempWorldGeneratorPluginLibrary;
-import org.terasology.world.generator.plugin.WorldGeneratorPluginLibrary;
+import org.terasology.reflection.copy.CopyStrategyLibrary;
+import org.terasology.reflection.reflect.ReflectFactory;
+import org.terasology.reflection.reflect.ReflectionReflectFactory;
+import org.terasology.engine.registry.CoreRegistry;
+import org.terasology.engine.registry.In;
+import org.terasology.engine.rendering.nui.CoreScreenLayer;
+import org.terasology.engine.rendering.nui.NUIManager;
+import org.terasology.engine.world.block.family.BlockFamilyLibrary;
+import org.terasology.engine.world.block.loader.BlockFamilyDefinition;
+import org.terasology.engine.world.block.loader.BlockFamilyDefinitionData;
+import org.terasology.engine.world.block.loader.BlockFamilyDefinitionFormat;
+import org.terasology.engine.world.block.shapes.BlockShape;
+import org.terasology.engine.world.block.shapes.BlockShapeData;
+import org.terasology.engine.world.block.shapes.BlockShapeImpl;
+import org.terasology.engine.world.block.sounds.BlockSounds;
+import org.terasology.engine.world.block.sounds.BlockSoundsData;
+import org.terasology.engine.world.block.tiles.BlockTile;
+import org.terasology.engine.world.block.tiles.TileData;
+import org.terasology.engine.world.generator.UnresolvedWorldGeneratorException;
+import org.terasology.engine.world.generator.internal.WorldGeneratorInfo;
+import org.terasology.engine.world.generator.internal.WorldGeneratorManager;
+import org.terasology.engine.world.generator.plugin.TempWorldGeneratorPluginLibrary;
+import org.terasology.engine.world.generator.plugin.WorldGeneratorPluginLibrary;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 /**
- * Sets up the Universe for a user. Displays a list of {@link org.terasology.world.generator.WorldGenerator}
+ * Sets up the Universe for a user. Displays a list of {@link WorldGenerator}
  * for a particular game template.
  */
 public class UniverseSetupScreen extends CoreScreenLayer {
@@ -323,7 +312,7 @@ public class UniverseSetupScreen extends CoreScreenLayer {
      * This method switches the environment of the game to a temporary one needed for
      * creating a game. It creates a new {@link Context} and only puts the minimum classes
      * needed for successful game creation.
-     * @param wrapper takes the {@link org.terasology.rendering.nui.layers.mainMenu.advancedGameSetupScreen.AdvancedGameSetupScreen} and pushes it into the new context.
+     * @param wrapper takes the {@link AdvancedGameSetupScreen} and pushes it into the new context.
      */
     public void setEnvironment(UniverseWrapper wrapper) {
         context = new ContextImpl();

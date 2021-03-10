@@ -1,30 +1,17 @@
-/*
- * Copyright 2017 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-package org.terasology.rendering.opengl;
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
+package org.terasology.engine.rendering.opengl;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.config.Config;
-import org.terasology.config.RenderingConfig;
-import org.terasology.context.Context;
-import org.terasology.engine.paths.PathManager;
-import org.terasology.engine.subsystem.common.ThreadManager;
-import org.terasology.registry.CoreRegistry;
-import org.terasology.persistence.internal.GamePreviewImageProvider;
-import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFbo;
+import org.terasology.engine.config.Config;
+import org.terasology.engine.config.RenderingConfig;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.core.paths.PathManager;
+import org.terasology.engine.core.subsystem.common.ThreadManager;
+import org.terasology.engine.persistence.internal.GamePreviewImageProvider;
+import org.terasology.engine.registry.CoreRegistry;
+import org.terasology.engine.rendering.opengl.fbms.DisplayResolutionDependentFbo;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -36,8 +23,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
-import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFbo.FINAL_BUFFER;
 
 // TODO: Future work should not only "think" in terms of a DAG-like rendering pipeline
 // TODO: but actually implement one, see https://github.com/MovingBlocks/Terasology/issues/1741
@@ -105,7 +90,7 @@ public class ScreenGrabber {
             displayResolutionDependentFBOs = CoreRegistry.get(DisplayResolutionDependentFbo.class);
         }
 
-        FBO sceneFinalFbo = displayResolutionDependentFBOs.get(FINAL_BUFFER);
+        FBO sceneFinalFbo = displayResolutionDependentFBOs.get(DisplayResolutionDependentFbo.FINAL_BUFFER);
 
         final ByteBuffer buffer = sceneFinalFbo.getColorBufferRawData();
         if (buffer == null) {

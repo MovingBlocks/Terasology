@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package org.terasology.entitySystem.event;
+package org.terasology.engine.entitySystem.event;
 
-import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.engine.entitySystem.Component;
+import org.terasology.engine.entitySystem.entity.EntityRef;
 
 public class PendingEvent {
     private EntityRef entity;

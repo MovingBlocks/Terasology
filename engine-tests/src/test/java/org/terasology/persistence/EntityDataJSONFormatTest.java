@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.persistence;
+package org.terasology.engine.persistence;
 
 import com.google.common.collect.Lists;
 import com.google.protobuf.ByteString;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.terasology.engine.TerasologyConstants;
-import org.terasology.persistence.serializers.EntityDataJSONFormat;
+import org.terasology.engine.core.TerasologyConstants;
+import org.terasology.engine.persistence.serializers.EntityDataJSONFormat;
 import org.terasology.protobuf.EntityData;
 
 import java.io.BufferedReader;

@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.config;
+package org.terasology.engine.config;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
 
-import org.terasology.engine.module.StandardModuleExtension;
+import org.terasology.engine.core.module.StandardModuleExtension;
 
 public class SelectModulesConfig {
     private Set<StandardModuleExtension> selectedStandardModuleExtensionEnumSet = StandardModuleExtension.booleanPropertySet();

@@ -1,19 +1,6 @@
-/*
- * Copyright 2016 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *  http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-package org.terasology.rendering.nui.layers.mainMenu.settings;
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
+package org.terasology.engine.rendering.nui.layers.mainMenu.settings;
 
 import com.google.common.base.Function;
 import com.google.common.base.Functions;
@@ -21,13 +8,17 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.math.DoubleMath;
 import org.terasology.assets.ResourceUrn;
-import org.terasology.config.Config;
-import org.terasology.context.Context;
-import org.terasology.engine.SimpleUri;
-import org.terasology.i18n.TranslationProject;
-import org.terasology.i18n.TranslationSystem;
-import org.terasology.identity.storageServiceClient.StorageServiceWorker;
-import org.terasology.identity.storageServiceClient.StorageServiceWorkerStatus;
+import org.terasology.engine.config.Config;
+import org.terasology.engine.config.SystemConfig;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.core.SimpleUri;
+import org.terasology.engine.i18n.TranslationProject;
+import org.terasology.engine.i18n.TranslationSystem;
+import org.terasology.engine.identity.storageServiceClient.StorageServiceWorker;
+import org.terasology.engine.identity.storageServiceClient.StorageServiceWorkerStatus;
+import org.terasology.engine.rendering.assets.texture.Texture;
+import org.terasology.engine.rendering.assets.texture.TextureUtil;
+import org.terasology.engine.rendering.nui.animation.MenuAnimationSystems;
 import org.terasology.nui.Color;
 import org.terasology.nui.WidgetUtil;
 import org.terasology.nui.databinding.DefaultBinding;
@@ -39,14 +30,11 @@ import org.terasology.nui.widgets.UIImage;
 import org.terasology.nui.widgets.UILabel;
 import org.terasology.nui.widgets.UISlider;
 import org.terasology.nui.widgets.UIText;
-import org.terasology.registry.In;
-import org.terasology.rendering.assets.texture.Texture;
-import org.terasology.rendering.assets.texture.TextureUtil;
-import org.terasology.rendering.nui.CoreScreenLayer;
-import org.terasology.rendering.nui.animation.MenuAnimationSystems;
-import org.terasology.rendering.nui.layers.mainMenu.StorageServiceLoginPopup;
-import org.terasology.rendering.nui.layers.mainMenu.ThreeButtonPopup;
-import org.terasology.utilities.Assets;
+import org.terasology.engine.registry.In;
+import org.terasology.engine.rendering.nui.CoreScreenLayer;
+import org.terasology.engine.rendering.nui.layers.mainMenu.StorageServiceLoginPopup;
+import org.terasology.engine.rendering.nui.layers.mainMenu.ThreeButtonPopup;
+import org.terasology.engine.utilities.Assets;
 
 import java.math.RoundingMode;
 import java.util.ArrayList;
@@ -54,8 +42,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
-import static org.terasology.identity.storageServiceClient.StatusMessageTranslator.getLocalizedButtonMessage;
-import static org.terasology.identity.storageServiceClient.StatusMessageTranslator.getLocalizedStatusMessage;
+import static org.terasology.engine.identity.storageServiceClient.StatusMessageTranslator.getLocalizedButtonMessage;
+import static org.terasology.engine.identity.storageServiceClient.StatusMessageTranslator.getLocalizedStatusMessage;
 
 public class PlayerSettingsScreen extends CoreScreenLayer {
 
@@ -65,6 +53,8 @@ public class PlayerSettingsScreen extends CoreScreenLayer {
     private Context context;
     @In
     private Config config;
+    @In
+    private SystemConfig systemConfig;
     @In
     private TranslationSystem translationSystem;
     @In
@@ -114,7 +104,7 @@ public class PlayerSettingsScreen extends CoreScreenLayer {
             discordPresence.setChecked(config.getPlayer().isDiscordPresence());
         }
         if (language != null) {
-            language.setSelection(config.getSystem().getLocale());
+            language.setSelection(systemConfig.locale.get());
         }
         updateImage();
     }
@@ -326,8 +316,8 @@ public class PlayerSettingsScreen extends CoreScreenLayer {
             config.getPlayer().setName(nametext.getText().trim());
             config.getPlayer().setHasEnteredUsername(true);
         }
-        if (!config.getSystem().getLocale().equals(language.getSelection())) {
-            config.getSystem().setLocale(language.getSelection());
+        if (!systemConfig.locale.get().equals(language.getSelection())) {
+            systemConfig.locale.set(language.getSelection());
             getManager().invalidate();
         }
     }

@@ -1,7 +1,7 @@
 // Copyright 2020 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-package org.terasology.entitySystem.event;
+package org.terasology.engine.entitySystem.event;
 
 /**
  * Immutable event to notify a change in a certain value.

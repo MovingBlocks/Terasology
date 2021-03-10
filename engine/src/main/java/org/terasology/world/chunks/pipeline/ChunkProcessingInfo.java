@@ -1,13 +1,13 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-package org.terasology.world.chunks.pipeline;
+package org.terasology.engine.world.chunks.pipeline;
 
 import com.google.common.util.concurrent.SettableFuture;
 import org.joml.Vector3ic;
-import org.terasology.world.chunks.Chunk;
-import org.terasology.world.chunks.pipeline.stages.ChunkTask;
-import org.terasology.world.chunks.pipeline.stages.ChunkTaskProvider;
+import org.terasology.engine.world.chunks.pipeline.stages.ChunkTask;
+import org.terasology.engine.world.chunks.pipeline.stages.ChunkTaskProvider;
+import org.terasology.engine.world.chunks.Chunk;
 
 import java.util.List;
 import java.util.concurrent.Future;
@@ -20,7 +20,7 @@ public final class ChunkProcessingInfo {
     private ChunkTaskProvider chunkTaskProvider;
 
     private Future<Chunk> currentFuture;
-    private org.terasology.world.chunks.pipeline.stages.ChunkTask chunkTask;
+    private org.terasology.engine.world.chunks.pipeline.stages.ChunkTask chunkTask;
 
     public ChunkProcessingInfo(Vector3ic position, SettableFuture<Chunk> externalFuture) {
         this.position = position;
@@ -59,11 +59,11 @@ public final class ChunkProcessingInfo {
         this.currentFuture = currentFuture;
     }
 
-    public org.terasology.world.chunks.pipeline.stages.ChunkTask getChunkTask() {
+    public org.terasology.engine.world.chunks.pipeline.stages.ChunkTask getChunkTask() {
         return chunkTask;
     }
 
-    public void setChunkTask(org.terasology.world.chunks.pipeline.stages.ChunkTask chunkTask) {
+    public void setChunkTask(org.terasology.engine.world.chunks.pipeline.stages.ChunkTask chunkTask) {
         this.chunkTask = chunkTask;
     }
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.engine.module;
+package org.terasology.engine.core.module;
 
 import java.net.URL;
 import java.util.Date;

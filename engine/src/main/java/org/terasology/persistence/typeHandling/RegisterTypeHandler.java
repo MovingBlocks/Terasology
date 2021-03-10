@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.persistence.typeHandling;
+package org.terasology.engine.persistence.typeHandling;
 
 import org.terasology.module.sandbox.API;
 

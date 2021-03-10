@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 
-@API package org.terasology.audio;
+@API package org.terasology.engine.audio;
 
 import org.terasology.module.sandbox.API;

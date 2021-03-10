@@ -1,27 +1,26 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.logic.players;
+package org.terasology.engine.logic.players;
 
 import com.google.common.collect.Sets;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.logic.characters.CharacterComponent;
-import org.terasology.logic.characters.CharacterMovementComponent;
-import org.terasology.logic.characters.CharacterSystem;
-import org.terasology.logic.characters.events.ActivationPredicted;
-import org.terasology.logic.characters.events.ActivationRequest;
-import org.terasology.logic.location.LocationComponent;
-import org.terasology.math.Direction;
-import org.terasology.math.JomlUtil;
-import org.terasology.math.geom.Quat4f;
-import org.terasology.network.ClientComponent;
-import org.terasology.physics.HitResult;
-import org.terasology.physics.Physics;
-import org.terasology.recording.DirectionAndOriginPosRecorderList;
-import org.terasology.recording.RecordAndReplayCurrentStatus;
-import org.terasology.recording.RecordAndReplayStatus;
-import org.terasology.registry.CoreRegistry;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.logic.characters.CharacterComponent;
+import org.terasology.engine.logic.characters.CharacterMovementComponent;
+import org.terasology.engine.logic.characters.CharacterSystem;
+import org.terasology.engine.logic.common.ActivateEvent;
+import org.terasology.engine.logic.location.LocationComponent;
+import org.terasology.engine.logic.characters.events.ActivationPredicted;
+import org.terasology.engine.logic.characters.events.ActivationRequest;
+import org.terasology.engine.math.Direction;
+import org.terasology.engine.network.ClientComponent;
+import org.terasology.engine.physics.HitResult;
+import org.terasology.engine.physics.Physics;
+import org.terasology.engine.recording.DirectionAndOriginPosRecorderList;
+import org.terasology.engine.recording.RecordAndReplayCurrentStatus;
+import org.terasology.engine.recording.RecordAndReplayStatus;
+import org.terasology.engine.registry.CoreRegistry;
 
 public class LocalPlayer {
 
@@ -108,16 +107,6 @@ public class LocalPlayer {
     }
 
     /**
-     * @return
-     * @deprecated This is scheduled for removal in an upcoming version method will be replaced with JOML implementation
-     *         {@link #getRotation(Quaternionf)}.
-     */
-    @Deprecated
-    public Quat4f getRotation() {
-        return JomlUtil.from(getRotation(new Quaternionf()));
-    }
-
-    /**
      * the rotation of the local player
      *
      * @param dest will hold the result
@@ -154,16 +143,6 @@ public class LocalPlayer {
             }
         }
         return getPosition(dest);
-    }
-
-    /**
-     * @return
-     * @deprecated This is scheduled for removal in an upcoming version method will be replaced with JOML implementation
-     *         {@link #getViewRotation(Quaternionf)}.
-     */
-    @Deprecated
-    public Quat4f getViewRotation() {
-        return JomlUtil.from(getViewRotation(new Quaternionf()));
     }
 
     /**
@@ -213,7 +192,7 @@ public class LocalPlayer {
      * <p>
      * The method has been made for the usage on the client. It triggers a {@link ActivationPredicted} event on the
      * client and a {@link ActivationRequest} event on the server which will lead to a {@link
-     * org.terasology.logic.common.ActivateEvent} on the server.
+     * ActivateEvent} on the server.
      *
      * @param usedOwnedEntity an entity owned by the player like an item.
      */

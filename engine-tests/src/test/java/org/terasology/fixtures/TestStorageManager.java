@@ -5,11 +5,11 @@ package org.terasology.fixtures;
 
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
-import org.terasology.network.Client;
-import org.terasology.persistence.ChunkStore;
-import org.terasology.persistence.PlayerStore;
-import org.terasology.persistence.StorageManager;
-import org.terasology.world.chunks.Chunk;
+import org.terasology.engine.network.Client;
+import org.terasology.engine.persistence.ChunkStore;
+import org.terasology.engine.persistence.PlayerStore;
+import org.terasology.engine.persistence.StorageManager;
+import org.terasology.engine.world.chunks.Chunk;
 
 import java.io.IOException;
 import java.util.HashMap;

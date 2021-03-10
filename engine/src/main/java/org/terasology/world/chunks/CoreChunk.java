@@ -1,13 +1,12 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.world.chunks;
+package org.terasology.engine.world.chunks;
 
+import org.joml.Vector3i;
 import org.joml.Vector3ic;
-import org.terasology.math.geom.BaseVector3i;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.module.sandbox.API;
-import org.terasology.world.block.Block;
-import org.terasology.world.block.BlockRegion;
+import org.terasology.engine.world.block.Block;
+import org.terasology.engine.world.block.BlockRegionc;
 
 /**
  * This interface describes the core of a chunk:
@@ -26,30 +25,18 @@ public interface CoreChunk {
 
     /**
      * @return Position of the chunk in world, where units of distance from origin are chunks
-     * @deprecated This method is scheduled for removal in an upcoming version.
-     *             Use the JOML implementation instead: {@link #getPosition(org.joml.Vector3i)}.
      */
-    @Deprecated
-    Vector3i getPosition();
+    Vector3ic getPosition();
 
     /**
      * Position of the chunk in world, where units of distance from origin are chunks
      *
      * @param dest will hold the result
      * @return dest
-     */
-    org.joml.Vector3i getPosition(org.joml.Vector3i dest);
-
-    /**
-     * Returns block at given position relative to the chunk.
-     *
-     * @param pos Position of the block relative to corner of the chunk
-     * @return Block at given position
-     * @deprecated This method is scheduled for removal in an upcoming version.
-     *             Use the JOML implementation instead: {@link #getBlock(Vector3ic)}.
+     * @deprecated use {@link #getPosition()}
      */
     @Deprecated
-    Block getBlock(BaseVector3i pos);
+    org.joml.Vector3i getPosition(org.joml.Vector3i dest);
 
     /**
      * Returns block at given position relative to the chunk.
@@ -86,18 +73,6 @@ public interface CoreChunk {
      * @param pos   Position of the block relative to corner of the chunk
      * @param block Block to set block at given position to
      * @return Old Block at given position
-     * @deprecated This method is scheduled for removal in an upcoming version.
-     *             Use the JOML implementation instead: {@link #setBlock(Vector3ic, Block)}.
-     */
-    @Deprecated
-    Block setBlock(BaseVector3i pos, Block block);
-
-    /**
-     * Sets type of block at given position relative to the chunk.
-     *
-     * @param pos   Position of the block relative to corner of the chunk
-     * @param block Block to set block at given position to
-     * @return Old Block at given position
      */
     Block setBlock(Vector3ic pos, Block block);
 
@@ -113,21 +88,6 @@ public interface CoreChunk {
      * @param value New value to set the block to
      */
     void setExtraData(int index, int x, int y, int z, int value);
-
-    /**
-     * Sets one of the per-block custom data values at a given position relative to the chunk.
-     * The given value is downcast from int to the appropriate type for the array. It is not
-     * checked for overflow.
-     *
-     * @param index Index of the extra data array
-     * @param pos   Position of the block relative to the corner of the chunk
-     * @param value New value to set the block to
-     * @deprecated This method is scheduled for removal in an upcoming version.
-     *             Use the JOML implementation instead: {@link #setExtraData(int, Vector3ic, int)}.
-     */
-    @Deprecated
-    void setExtraData(int index, BaseVector3i pos, int value);
-
 
     /**
      * Sets one of the per-block custom data values at a given position relative to the chunk.
@@ -157,38 +117,16 @@ public interface CoreChunk {
      * @param index Index of the extra data array
      * @param pos   Position of the block relative to the corner of the chunk
      * @return Selected extra data value at the given location
-     * @deprecated This method is scheduled for removal in an upcoming version.
-     *             Use the JOML implementation instead: {@link #getExtraData(int, Vector3ic)}.
-     */
-    @Deprecated
-    int getExtraData(int index, BaseVector3i pos);
-
-
-    /**
-     * Returns one of the per-block custom data values at a given position relative to the chunk.
-     *
-     * @param index Index of the extra data array
-     * @param pos   Position of the block relative to the corner of the chunk
-     * @return Selected extra data value at the given location
      */
     int getExtraData(int index, Vector3ic pos);
 
-    /**
-     * Returns offset of this chunk to the world center (0:0:0), with one unit being one block.
-     *
-     * @return Offset of this chunk from world center in blocks
-     * @deprecated This method is scheduled for removal in an upcoming version.
-     *             Use the JOML implementation instead: {@link #getChunkWorldOffset(org.joml.Vector3i)}.
-     */
-    @Deprecated
-    Vector3i getChunkWorldOffset();
 
     /**
      * Returns offset of this chunk to the world center (0:0:0), with one unit being one block.
      *
      * @return Offset of this chunk from world center in blocks
      */
-    org.joml.Vector3i getChunkWorldOffset(org.joml.Vector3i pos);
+    Vector3i getChunkWorldOffset(Vector3i pos);
 
 
     /**
@@ -212,16 +150,6 @@ public interface CoreChunk {
      */
     int getChunkWorldOffsetZ();
 
-    /**
-     * Returns position in this chunk transformed to world coordinates.
-     *
-     * @param blockPos Position in this chunk you want to transform
-     * @return Transformed position
-     * @deprecated This method is scheduled for removal in an upcoming version.
-     *             Use the JOML implementation instead: {@link #chunkToWorldPosition(Vector3ic,org.joml.Vector3i)}.
-     */
-    @Deprecated
-    Vector3i chunkToWorldPosition(BaseVector3i blockPos);
 
     /**
      * Returns position in this chunk transformed to world coordinates.
@@ -229,21 +157,7 @@ public interface CoreChunk {
      * @param dest Position in this chunk you want to transform
      * @return Transformed position
      */
-    org.joml.Vector3i chunkToWorldPosition(Vector3ic blockPos, org.joml.Vector3i dest);
-
-
-    /**
-     * Returns position in this chunk transformed to world coordinates.
-     *
-     * @param x X position in this chunk you want to transform
-     * @param y Y position in this chunk you want to transform
-     * @param z Z position in this chunk you want to transform
-     * @return Transformed position
-     * @deprecated This method is scheduled for removal in an upcoming version.
-     *             Use the JOML implementation instead: {@link #chunkToWorldPosition(int, int, int, org.joml.Vector3i)}.
-     */
-    @Deprecated
-    Vector3i chunkToWorldPosition(int x, int y, int z);
+    Vector3i chunkToWorldPosition(Vector3ic blockPos, Vector3i dest);
 
 
     /**
@@ -255,7 +169,7 @@ public interface CoreChunk {
      * @param dest will hold the result
      * @return dest
      */
-    org.joml.Vector3i chunkToWorldPosition(int x, int y, int z, org.joml.Vector3i dest);
+    Vector3i chunkToWorldPosition(int x, int y, int z, Vector3i dest);
 
 
     /**
@@ -300,7 +214,7 @@ public interface CoreChunk {
     /**
      * @return Chunk's Region
      */
-    BlockRegion getRegion();
+    BlockRegionc getRegion();
 
     int getEstimatedMemoryConsumptionInBytes();
 

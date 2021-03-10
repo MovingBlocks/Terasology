@@ -1,43 +1,29 @@
-/*
- * Copyright 2017 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-package org.terasology.engine.subsystem.headless.renderer;
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
+package org.terasology.engine.core.subsystem.headless.renderer;
 
 import com.google.common.collect.Lists;
+import org.joml.Vector3f;
+import org.joml.Vector3i;
 import org.joml.Vector3ic;
-import org.terasology.config.Config;
-import org.terasology.context.Context;
-import org.terasology.logic.players.LocalPlayerSystem;
-import org.terasology.math.Region3i;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector3i;
-import org.terasology.monitoring.PerformanceMonitor;
-import org.terasology.rendering.assets.material.Material;
-import org.terasology.rendering.cameras.Camera;
-import org.terasology.rendering.cameras.SubmersibleCamera;
-import org.terasology.rendering.dag.RenderGraph;
-import org.terasology.rendering.world.viewDistance.ViewDistance;
-import org.terasology.rendering.world.WorldRenderer;
-import org.terasology.world.WorldProvider;
-import org.terasology.world.chunks.ChunkConstants;
-import org.terasology.world.chunks.ChunkProvider;
-import org.terasology.world.chunks.RenderableChunk;
+import org.terasology.engine.config.Config;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.logic.players.LocalPlayerSystem;
+import org.terasology.engine.monitoring.PerformanceMonitor;
+import org.terasology.engine.rendering.assets.material.Material;
+import org.terasology.engine.rendering.cameras.Camera;
+import org.terasology.engine.rendering.cameras.SubmersibleCamera;
+import org.terasology.engine.rendering.dag.RenderGraph;
+import org.terasology.engine.rendering.world.WorldRenderer;
+import org.terasology.engine.rendering.world.viewDistance.ViewDistance;
+import org.terasology.engine.world.WorldProvider;
+import org.terasology.engine.world.block.BlockRegion;
+import org.terasology.engine.world.chunks.ChunkProvider;
+import org.terasology.engine.world.chunks.Chunks;
+import org.terasology.engine.world.chunks.RenderableChunk;
 
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.List;
 
 public class HeadlessWorldRenderer implements WorldRenderer {
@@ -80,12 +66,12 @@ public class HeadlessWorldRenderer implements WorldRenderer {
     }
 
     @Override
-    public void onChunkLoaded(Vector3i pos) {
+    public void onChunkLoaded(Vector3ic pos) {
 
     }
 
     @Override
-    public void onChunkUnloaded(Vector3i pos) {
+    public void onChunkUnloaded(Vector3ic pos) {
 
     }
 
@@ -206,11 +192,11 @@ public class HeadlessWorldRenderer implements WorldRenderer {
         boolean chunksCurrentlyPending = false;
         if (!newChunkPos.equals(chunkPos) || force || pendingChunks) {
             Vector3ic viewingDistance = config.getRendering().getViewDistance().getChunkDistance();
-            Region3i viewRegion = Region3i.createFromCenterExtents(newChunkPos, new Vector3i(viewingDistance.x() / 2, viewingDistance.y() / 2, viewingDistance.z() / 2));
+            BlockRegion viewRegion = new BlockRegion(newChunkPos).expand(new org.joml.Vector3i(viewingDistance.x() / 2, viewingDistance.y() / 2, viewingDistance.z() / 2));
             if (chunksInProximity.size() == 0 || force || pendingChunks) {
                 // just add all visible chunks
                 chunksInProximity.clear();
-                for (Vector3i chunkPosition : viewRegion) {
+                for (Vector3ic chunkPosition : viewRegion) {
                     RenderableChunk c = chunkProvider.getChunk(chunkPosition);
                     if (c != null && worldProvider.getLocalView(c.getPosition(new org.joml.Vector3i())) != null) {
                         chunksInProximity.add(c);
@@ -219,21 +205,21 @@ public class HeadlessWorldRenderer implements WorldRenderer {
                     }
                 }
             } else {
-                Region3i oldRegion = Region3i.createFromCenterExtents(chunkPos, new Vector3i(viewingDistance.x() / 2, viewingDistance.y() / 2, viewingDistance.z() / 2));
+                BlockRegion oldRegion = new BlockRegion(chunkPos).expand(new org.joml.Vector3i(viewingDistance.x() / 2, viewingDistance.y() / 2, viewingDistance.z() / 2));
 
-                Iterator<Vector3i> chunksForRemove = oldRegion.subtract(viewRegion);
                 // remove
-                while (chunksForRemove.hasNext()) {
-                    Vector3i r = chunksForRemove.next();
-                    RenderableChunk c = chunkProvider.getChunk(r);
-                    if (c != null) {
-                        chunksInProximity.remove(c);
-                        c.disposeMesh();
+                for (Vector3ic candidateForRemove : viewRegion) {
+                    if (!oldRegion.contains(candidateForRemove)) {
+                        RenderableChunk c = chunkProvider.getChunk(candidateForRemove);
+                        if (c != null) {
+                            chunksInProximity.remove(c);
+                            c.disposeMesh();
+                        }
                     }
                 }
 
                 // add
-                for (Vector3i chunkPosition : viewRegion) {
+                for (Vector3ic chunkPosition : viewRegion) {
                     RenderableChunk c = chunkProvider.getChunk(chunkPosition);
                     if (c != null && worldProvider.getLocalView(c.getPosition(new org.joml.Vector3i())) != null) {
                         chunksInProximity.add(c);
@@ -260,13 +246,13 @@ public class HeadlessWorldRenderer implements WorldRenderer {
      * @return The player offset on the x-axis
      */
     private Vector3i calcCamChunkOffset() {
-        return new Vector3i((int) (getActiveCamera().getPosition().x / ChunkConstants.SIZE_X),
-                (int) (getActiveCamera().getPosition().y / ChunkConstants.SIZE_Y),
-                (int) (getActiveCamera().getPosition().z / ChunkConstants.SIZE_Z));
+        return new Vector3i((int) (getActiveCamera().getPosition().x / Chunks.SIZE_X),
+                (int) (getActiveCamera().getPosition().y / Chunks.SIZE_Y),
+                (int) (getActiveCamera().getPosition().z / Chunks.SIZE_Z));
     }
 
     private float distanceToCamera(RenderableChunk chunk) {
-        Vector3f result = new Vector3f((chunk.getPosition().x + 0.5f) * ChunkConstants.SIZE_X, 0, (chunk.getPosition().z + 0.5f) * ChunkConstants.SIZE_Z);
+        Vector3f result = new Vector3f((chunk.getPosition().x() + 0.5f) * Chunks.SIZE_X, 0, (chunk.getPosition().z() + 0.5f) * Chunks.SIZE_Z);
 
         org.joml.Vector3f cameraPos = getActiveCamera().getPosition();
         result.x -= cameraPos.x;

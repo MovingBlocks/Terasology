@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.physics.engine;
+package org.terasology.engine.physics.engine;
 
 import org.joml.Vector3f;
 

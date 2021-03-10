@@ -1,15 +1,15 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.logic.characters;
+package org.terasology.engine.logic.characters;
 
 import com.google.common.collect.Lists;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.logic.location.LocationComponent;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.logic.location.LocationComponent;
 import org.terasology.math.TeraMath;
-import org.terasology.physics.engine.CharacterCollider;
-import org.terasology.physics.engine.PhysicsEngine;
+import org.terasology.engine.physics.engine.CharacterCollider;
+import org.terasology.engine.physics.engine.PhysicsEngine;
 
 /**
  * Contains logic used by both {@link ClientCharacterPredictionSystem} and {@link ServerCharacterPredictionSystem}.

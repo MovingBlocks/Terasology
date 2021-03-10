@@ -1,19 +1,6 @@
-/*
- * Copyright 2016 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-package org.terasology.rendering.nui.editor.layers;
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
+package org.terasology.engine.rendering.nui.editor.layers;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
@@ -28,23 +15,17 @@ import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.exceptions.InvalidUrnException;
 import org.terasology.assets.format.AssetDataFile;
 import org.terasology.assets.management.AssetManager;
-import org.terasology.config.Config;
-import org.terasology.config.NUIEditorConfig;
-import org.terasology.engine.paths.PathManager;
-import org.terasology.registry.In;
+import org.terasology.engine.config.Config;
+import org.terasology.engine.config.NUIEditorConfig;
+import org.terasology.engine.core.paths.PathManager;
+import org.terasology.engine.rendering.nui.editor.systems.NUIEditorSystem;
+import org.terasology.engine.rendering.nui.widgets.JsonEditorTreeView;
 import org.terasology.nui.UIWidget;
 import org.terasology.nui.WidgetUtil;
 import org.terasology.nui.asset.UIElement;
-import org.terasology.rendering.nui.asset.UIFormat;
 import org.terasology.nui.databinding.Binding;
 import org.terasology.nui.databinding.ReadOnlyBinding;
-import org.terasology.rendering.nui.editor.systems.NUIEditorSystem;
-import org.terasology.rendering.nui.editor.utils.NUIEditorItemRenderer;
-import org.terasology.rendering.nui.editor.utils.NUIEditorMenuTreeBuilder;
-import org.terasology.rendering.nui.editor.utils.NUIEditorNodeUtils;
-import org.terasology.rendering.nui.editor.utils.NUIEditorTextEntryBuilder;
 import org.terasology.nui.itemRendering.ToStringTextRenderer;
-import org.terasology.rendering.nui.widgets.JsonEditorTreeView;
 import org.terasology.nui.widgets.UIBox;
 import org.terasology.nui.widgets.UIButton;
 import org.terasology.nui.widgets.UIDropdownScrollable;
@@ -53,6 +34,12 @@ import org.terasology.nui.widgets.UITextEntry;
 import org.terasology.nui.widgets.treeView.JsonTree;
 import org.terasology.nui.widgets.treeView.JsonTreeConverter;
 import org.terasology.nui.widgets.treeView.JsonTreeValue;
+import org.terasology.engine.registry.In;
+import org.terasology.engine.rendering.nui.asset.UIFormat;
+import org.terasology.engine.rendering.nui.editor.utils.NUIEditorItemRenderer;
+import org.terasology.engine.rendering.nui.editor.utils.NUIEditorMenuTreeBuilder;
+import org.terasology.engine.rendering.nui.editor.utils.NUIEditorNodeUtils;
+import org.terasology.engine.rendering.nui.editor.utils.NUIEditorTextEntryBuilder;
 
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;

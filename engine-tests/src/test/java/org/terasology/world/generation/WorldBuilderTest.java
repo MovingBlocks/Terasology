@@ -16,11 +16,22 @@
 package org.terasology.world.generation;
 
 import org.junit.jupiter.api.Test;
-import org.terasology.context.Context;
-import org.terasology.context.internal.ContextImpl;
-import org.terasology.world.block.BlockRegion;
-import org.terasology.world.generation.facets.base.BaseFacet3D;
-import org.terasology.world.generator.plugin.WorldGeneratorPluginLibrary;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.context.internal.ContextImpl;
+import org.terasology.engine.world.block.BlockRegion;
+import org.terasology.engine.world.generation.Border3D;
+import org.terasology.engine.world.generation.Facet;
+import org.terasology.engine.world.generation.FacetBorder;
+import org.terasology.engine.world.generation.FacetProvider;
+import org.terasology.engine.world.generation.GeneratingRegion;
+import org.terasology.engine.world.generation.Produces;
+import org.terasology.engine.world.generation.Region;
+import org.terasology.engine.world.generation.Requires;
+import org.terasology.engine.world.generation.Updates;
+import org.terasology.engine.world.generation.World;
+import org.terasology.engine.world.generation.WorldBuilder;
+import org.terasology.engine.world.generation.facets.base.BaseFacet3D;
+import org.terasology.engine.world.generator.plugin.WorldGeneratorPluginLibrary;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;

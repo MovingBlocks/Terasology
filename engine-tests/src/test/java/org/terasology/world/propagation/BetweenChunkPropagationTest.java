@@ -1,55 +1,42 @@
-/*
- * Copyright 2018 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.world.propagation;
 
 import com.google.common.collect.Maps;
+import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.terasology.TerasologyTestingEnvironment;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.math.JomlUtil;
-import org.terasology.math.Region3i;
-import org.terasology.math.Side;
-import org.terasology.math.geom.Vector3i;
-import org.terasology.registry.CoreRegistry;
-import org.terasology.world.block.Block;
-import org.terasology.world.block.BlockManager;
-import org.terasology.world.block.BlockRegion;
-import org.terasology.world.block.BlockUri;
-import org.terasology.world.block.family.SymmetricFamily;
-import org.terasology.world.block.internal.BlockManagerImpl;
-import org.terasology.world.block.loader.BlockFamilyDefinition;
-import org.terasology.world.block.loader.BlockFamilyDefinitionData;
-import org.terasology.world.block.shapes.BlockShape;
-import org.terasology.world.block.tiles.NullWorldAtlas;
-import org.terasology.world.chunks.Chunk;
-import org.terasology.world.chunks.ChunkConstants;
-import org.terasology.world.chunks.ChunkProvider;
-import org.terasology.world.chunks.Chunks;
-import org.terasology.world.chunks.blockdata.ExtraBlockDataManager;
-import org.terasology.world.chunks.internal.ChunkImpl;
-import org.terasology.world.internal.ChunkViewCore;
-import org.terasology.world.propagation.light.InternalLightProcessor;
-import org.terasology.world.propagation.light.SunlightPropagationRules;
-import org.terasology.world.propagation.light.SunlightRegenPropagationRules;
-import org.terasology.world.propagation.light.SunlightRegenWorldView;
-import org.terasology.world.propagation.light.SunlightWorldView;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.math.Side;
+import org.terasology.engine.registry.CoreRegistry;
+import org.terasology.engine.world.block.Block;
+import org.terasology.engine.world.block.BlockManager;
+import org.terasology.engine.world.block.BlockRegion;
+import org.terasology.engine.world.block.BlockUri;
+import org.terasology.engine.world.block.family.SymmetricFamily;
+import org.terasology.engine.world.block.internal.BlockManagerImpl;
+import org.terasology.engine.world.block.loader.BlockFamilyDefinition;
+import org.terasology.engine.world.block.loader.BlockFamilyDefinitionData;
+import org.terasology.engine.world.block.shapes.BlockShape;
+import org.terasology.engine.world.block.tiles.NullWorldAtlas;
+import org.terasology.engine.world.chunks.Chunk;
+import org.terasology.engine.world.chunks.ChunkProvider;
+import org.terasology.engine.world.chunks.Chunks;
+import org.terasology.engine.world.chunks.blockdata.ExtraBlockDataManager;
+import org.terasology.engine.world.chunks.internal.ChunkImpl;
+import org.terasology.engine.world.internal.ChunkViewCore;
+import org.terasology.engine.world.propagation.BatchPropagator;
+import org.terasology.engine.world.propagation.StandardBatchPropagator;
+import org.terasology.engine.world.propagation.SunlightRegenBatchPropagator;
+import org.terasology.engine.world.propagation.light.InternalLightProcessor;
+import org.terasology.engine.world.propagation.light.SunlightPropagationRules;
+import org.terasology.engine.world.propagation.light.SunlightRegenPropagationRules;
+import org.terasology.engine.world.propagation.light.SunlightRegenWorldView;
+import org.terasology.engine.world.propagation.light.SunlightWorldView;
 
 import java.util.Collection;
 import java.util.Map;
@@ -161,10 +148,10 @@ public class BetweenChunkPropagationTest extends TerasologyTestingEnvironment {
         propagator.propagateBetween(topChunk, bottomChunk, Side.BOTTOM, false);
         propagator.process();
         sunlightPropagator.process();
-        for (int z = 0; z < ChunkConstants.SIZE_Z; ++z) {
+        for (int z = 0; z < Chunks.SIZE_Z; ++z) {
             assertEquals(14, bottomChunk.getSunlight(16, 47, z));
         }
-        for (int z = 0; z < ChunkConstants.SIZE_Z; ++z) {
+        for (int z = 0; z < Chunks.SIZE_Z; ++z) {
             assertEquals(13, bottomChunk.getSunlight(17, 47, z));
         }
     }
@@ -199,35 +186,35 @@ public class BetweenChunkPropagationTest extends TerasologyTestingEnvironment {
     }
 
     private static class SelectChunkProvider implements ChunkProvider {
-        private Map<Vector3i, Chunk> chunks = Maps.newHashMap();
+        private Map<Vector3ic, Chunk> chunks = Maps.newHashMap();
 
         SelectChunkProvider(Chunk... chunks) {
             for (Chunk chunk : chunks) {
-                this.chunks.put(chunk.getPosition(), chunk);
+                this.chunks.put(chunk.getPosition(new Vector3i()), chunk);
             }
         }
 
         public void addChunk(Chunk chunk) {
-            chunks.put(chunk.getPosition(), chunk);
+            chunks.put(chunk.getPosition(new Vector3i()), chunk);
         }
 
         @Override
-        public ChunkViewCore getLocalView(Vector3i centerChunkPos) {
+        public ChunkViewCore getLocalView(Vector3ic centerChunkPos) {
             return null;
         }
 
         @Override
-        public ChunkViewCore getSubviewAroundBlock(Vector3i blockPos, int extent) {
+        public ChunkViewCore getSubviewAroundBlock(Vector3ic blockPos, int extent) {
             return null;
         }
 
         @Override
-        public ChunkViewCore getSubviewAroundChunk(Vector3i chunkPos) {
+        public ChunkViewCore getSubviewAroundChunk(Vector3ic chunkPos) {
             return null;
         }
 
         @Override
-        public boolean reloadChunk(Vector3i pos) {
+        public boolean reloadChunk(Vector3ic pos) {
             return false;
         }
 
@@ -247,11 +234,6 @@ public class BetweenChunkPropagationTest extends TerasologyTestingEnvironment {
         }
 
         @Override
-        public boolean isChunkReady(Vector3i pos) {
-            return false;
-        }
-
-        @Override
         public boolean isChunkReady(Vector3ic pos) {
             return false;
         }
@@ -261,14 +243,10 @@ public class BetweenChunkPropagationTest extends TerasologyTestingEnvironment {
             return getChunk(new Vector3i(x, y, z));
         }
 
-        @Override
-        public Chunk getChunk(Vector3i chunkPos) {
-            return chunks.get(chunkPos);
-        }
 
         @Override
         public Chunk getChunk(Vector3ic chunkPos) {
-            return chunks.get(JomlUtil.from(chunkPos));
+            return chunks.get(chunkPos);
         }
 
         @Override

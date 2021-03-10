@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.particles.functions.affectors;
+package org.terasology.engine.particles.functions.affectors;
 
-import org.terasology.entitySystem.Component;
+import org.terasology.engine.entitySystem.Component;
 import org.terasology.module.sandbox.API;
-import org.terasology.particles.ParticleData;
-import org.terasology.particles.ParticleDataMask;
-import org.terasology.particles.functions.ParticleSystemFunction;
-import org.terasology.utilities.random.Random;
+import org.terasology.engine.particles.ParticleData;
+import org.terasology.engine.particles.ParticleDataMask;
+import org.terasology.engine.particles.functions.ParticleSystemFunction;
+import org.terasology.engine.utilities.random.Random;
 
 /**
  * A affector function is called on a particle's data when it is updated to set its fields (Ex. Apply a force to a particle).

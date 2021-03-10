@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.engine.bootstrap;
+package org.terasology.engine.core.bootstrap;
 
 import java.lang.annotation.Annotation;
 

@@ -1,21 +1,27 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-package org.terasology.input;
+package org.terasology.engine.input;
 
 import com.google.common.collect.Queues;
 import org.joml.Vector2d;
 import org.joml.Vector2i;
-import org.terasology.config.ControllerConfig.ControllerInfo;
-import org.terasology.config.facade.InputDeviceConfiguration;
-import org.terasology.engine.SimpleUri;
-import org.terasology.engine.Time;
-import org.terasology.engine.subsystem.DisplayDevice;
-import org.terasology.engine.subsystem.config.BindsManager;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.systems.BaseComponentSystem;
-import org.terasology.entitySystem.systems.RegisterSystem;
-import org.terasology.input.cameraTarget.CameraTargetSystem;
+import org.terasology.engine.config.ControllerConfig.ControllerInfo;
+import org.terasology.engine.config.facade.InputDeviceConfiguration;
+import org.terasology.engine.core.SimpleUri;
+import org.terasology.engine.core.Time;
+import org.terasology.engine.core.subsystem.DisplayDevice;
+import org.terasology.engine.core.subsystem.config.BindsManager;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
+import org.terasology.engine.entitySystem.systems.RegisterSystem;
+import org.terasology.input.ButtonState;
+import org.terasology.input.ControllerDevice;
+import org.terasology.input.ControllerId;
+import org.terasology.input.Input;
+import org.terasology.input.InputType;
+import org.terasology.input.MouseInput;
+import org.terasology.engine.input.cameraTarget.CameraTargetSystem;
 import org.terasology.input.device.CharKeyboardAction;
 import org.terasology.input.device.ControllerAction;
 import org.terasology.input.device.KeyboardDevice;
@@ -25,27 +31,26 @@ import org.terasology.input.device.RawKeyboardAction;
 import org.terasology.input.device.nulldevices.NullControllerDevice;
 import org.terasology.input.device.nulldevices.NullKeyboardDevice;
 import org.terasology.input.device.nulldevices.NullMouseDevice;
-import org.terasology.input.events.CharEvent;
-import org.terasology.input.events.InputEvent;
-import org.terasology.input.events.KeyDownEvent;
-import org.terasology.input.events.KeyEvent;
-import org.terasology.input.events.KeyRepeatEvent;
-import org.terasology.input.events.KeyUpEvent;
-import org.terasology.input.events.LeftMouseDownButtonEvent;
-import org.terasology.input.events.LeftMouseUpButtonEvent;
-import org.terasology.input.events.MouseAxisEvent;
-import org.terasology.input.events.MouseAxisEvent.MouseAxis;
-import org.terasology.input.events.MouseButtonEvent;
-import org.terasology.input.events.MouseDownButtonEvent;
-import org.terasology.input.events.MouseUpButtonEvent;
-import org.terasology.input.events.MouseWheelEvent;
-import org.terasology.input.events.RightMouseDownButtonEvent;
-import org.terasology.input.events.RightMouseUpButtonEvent;
-import org.terasology.input.internal.AbstractBindableAxis;
-import org.terasology.input.internal.BindableRealAxis;
-import org.terasology.logic.players.LocalPlayer;
-import org.terasology.math.JomlUtil;
-import org.terasology.registry.In;
+import org.terasology.engine.input.events.CharEvent;
+import org.terasology.engine.input.events.InputEvent;
+import org.terasology.engine.input.events.KeyDownEvent;
+import org.terasology.engine.input.events.KeyEvent;
+import org.terasology.engine.input.events.KeyRepeatEvent;
+import org.terasology.engine.input.events.KeyUpEvent;
+import org.terasology.engine.input.events.LeftMouseDownButtonEvent;
+import org.terasology.engine.input.events.LeftMouseUpButtonEvent;
+import org.terasology.engine.input.events.MouseAxisEvent;
+import org.terasology.engine.input.events.MouseAxisEvent.MouseAxis;
+import org.terasology.engine.input.events.MouseButtonEvent;
+import org.terasology.engine.input.events.MouseDownButtonEvent;
+import org.terasology.engine.input.events.MouseUpButtonEvent;
+import org.terasology.engine.input.events.MouseWheelEvent;
+import org.terasology.engine.input.events.RightMouseDownButtonEvent;
+import org.terasology.engine.input.events.RightMouseUpButtonEvent;
+import org.terasology.engine.input.internal.AbstractBindableAxis;
+import org.terasology.engine.input.internal.BindableRealAxis;
+import org.terasology.engine.logic.players.LocalPlayer;
+import org.terasology.engine.registry.In;
 
 import java.util.List;
 import java.util.Queue;
@@ -551,7 +556,7 @@ public class InputSystem extends BaseComponentSystem {
 
     /**
      * API-exposed caller to {@link BindsManager#getBindsConfig()} and
-     * {@link org.terasology.config.BindsConfig#getBinds(SimpleUri)}.
+     * {@link org.terasology.engine.config.BindsConfig#getBinds(SimpleUri)}.
      * <p>
      * TODO: Restored for API reasons, may be duplicating code elsewhere. Should be reviewed.
      *

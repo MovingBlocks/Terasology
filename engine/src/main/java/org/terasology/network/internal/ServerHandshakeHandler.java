@@ -1,20 +1,20 @@
 // Copyright 2020 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.network.internal;
+package org.terasology.engine.network.internal;
 
 import com.google.protobuf.ByteString;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.config.Config;
-import org.terasology.identity.BadEncryptedDataException;
-import org.terasology.identity.CertificateGenerator;
-import org.terasology.identity.CertificatePair;
-import org.terasology.identity.IdentityConstants;
-import org.terasology.identity.PublicIdentityCertificate;
+import org.terasology.engine.config.Config;
+import org.terasology.engine.identity.BadEncryptedDataException;
+import org.terasology.engine.identity.CertificateGenerator;
+import org.terasology.engine.identity.CertificatePair;
+import org.terasology.engine.identity.IdentityConstants;
+import org.terasology.engine.identity.PublicIdentityCertificate;
 import org.terasology.protobuf.NetData;
-import org.terasology.registry.CoreRegistry;
+import org.terasology.engine.registry.CoreRegistry;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;

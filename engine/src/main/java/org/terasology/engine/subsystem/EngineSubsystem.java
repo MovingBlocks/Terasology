@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.engine.subsystem;
+package org.terasology.engine.core.subsystem;
 
 import org.terasology.assets.module.ModuleAwareAssetTypeManager;
-import org.terasology.context.Context;
-import org.terasology.engine.ComponentSystemManager;
-import org.terasology.engine.GameEngine;
-import org.terasology.engine.modes.GameState;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.core.ComponentSystemManager;
+import org.terasology.engine.core.GameEngine;
+import org.terasology.engine.core.modes.GameState;
 
 public interface EngineSubsystem {
 

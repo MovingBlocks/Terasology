@@ -1,16 +1,16 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-package org.terasology.persistence.typeHandling.extensionTypes;
+package org.terasology.engine.persistence.typeHandling.extensionTypes;
 
 import gnu.trove.list.TFloatList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.engine.persistence.typeHandling.RegisterTypeHandler;
+import org.terasology.engine.utilities.modifiable.ModifiableValue;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.PersistedDataArray;
 import org.terasology.persistence.typeHandling.PersistedDataSerializer;
-import org.terasology.persistence.typeHandling.RegisterTypeHandler;
-import org.terasology.utilities.modifiable.ModifiableValue;
 
 import java.util.Optional;
 

@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.physics.bullet.shapes;
+package org.terasology.engine.physics.bullet.shapes;
 
 import com.badlogic.gdx.physics.bullet.collision.btSphereShape;
 import org.joml.Quaternionf;
-import org.terasology.physics.shapes.CollisionShape;
-import org.terasology.physics.shapes.SphereShape;
+import org.terasology.engine.physics.shapes.CollisionShape;
+import org.terasology.engine.physics.shapes.SphereShape;
 
 public class BulletSphereShape extends BulletCollisionShape implements SphereShape {
     private final btSphereShape sphereShape;

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.physics.engine;
+package org.terasology.engine.physics.engine;
 
 import com.badlogic.gdx.physics.bullet.collision.VoxelCollisionAlgorithmWrapper;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionObject;
@@ -28,32 +28,30 @@ import gnu.trove.set.hash.TShortHashSet;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector3ic;
-import org.terasology.entitySystem.entity.EntityManager;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.event.ReceiveEvent;
-import org.terasology.entitySystem.systems.BaseComponentSystem;
-import org.terasology.entitySystem.systems.RegisterSystem;
-import org.terasology.math.JomlUtil;
-import org.terasology.math.geom.Vector3i;
-import org.terasology.physics.StandardCollisionGroup;
-import org.terasology.physics.bullet.BulletPhysics;
-import org.terasology.physics.bullet.shapes.BulletCollisionShape;
-import org.terasology.registry.In;
-import org.terasology.world.OnChangedBlock;
-import org.terasology.world.WorldComponent;
-import org.terasology.world.WorldProvider;
-import org.terasology.world.block.Block;
-import org.terasology.world.block.BlockComponent;
-import org.terasology.world.chunks.Chunk;
-import org.terasology.world.chunks.ChunkConstants;
-import org.terasology.world.chunks.ChunkProvider;
-import org.terasology.world.chunks.event.BeforeChunkUnload;
-import org.terasology.world.chunks.event.OnChunkLoaded;
+import org.terasology.engine.entitySystem.entity.EntityManager;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.entitySystem.event.ReceiveEvent;
+import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
+import org.terasology.engine.entitySystem.systems.RegisterSystem;
+import org.terasology.engine.physics.StandardCollisionGroup;
+import org.terasology.engine.physics.bullet.BulletPhysics;
+import org.terasology.engine.physics.bullet.shapes.BulletCollisionShape;
+import org.terasology.engine.registry.In;
+import org.terasology.engine.world.OnChangedBlock;
+import org.terasology.engine.world.WorldComponent;
+import org.terasology.engine.world.WorldProvider;
+import org.terasology.engine.world.block.Block;
+import org.terasology.engine.world.block.BlockComponent;
+import org.terasology.engine.world.chunks.Chunk;
+import org.terasology.engine.world.chunks.ChunkProvider;
+import org.terasology.engine.world.chunks.Chunks;
+import org.terasology.engine.world.chunks.event.BeforeChunkUnload;
+import org.terasology.engine.world.chunks.event.OnChunkLoaded;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-import static org.terasology.physics.bullet.BulletPhysics.AABB_SIZE;
+import static org.terasology.engine.physics.bullet.BulletPhysics.AABB_SIZE;
 
 /**
  * Manages voxel shape and updates collision state between Bullet and Terasology
@@ -82,8 +80,8 @@ public class VoxelWorldSystem extends BaseComponentSystem {
         if (physics instanceof BulletPhysics) {
             btDiscreteDynamicsWorld discreteDynamicsWorld = ((BulletPhysics) physics).getDiscreteDynamicsWorld();
 
-            wrapper = new VoxelCollisionAlgorithmWrapper(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y,
-                ChunkConstants.SIZE_Z);
+            wrapper = new VoxelCollisionAlgorithmWrapper(Chunks.SIZE_X, Chunks.SIZE_Y,
+                Chunks.SIZE_Z);
             worldShape = new btVoxelShape(wrapper, new Vector3f(-AABB_SIZE, -AABB_SIZE, -AABB_SIZE),
                 new Vector3f(AABB_SIZE, AABB_SIZE, AABB_SIZE));
 
@@ -143,13 +141,13 @@ public class VoxelWorldSystem extends BaseComponentSystem {
     @ReceiveEvent(components = WorldComponent.class)
     public void onNewChunk(OnChunkLoaded chunkAvailable, EntityRef worldEntity) {
         Vector3ic chunkPos = chunkAvailable.getChunkPos();
-        Chunk chunk = chunkProvider.getChunk(JomlUtil.from(chunkPos));
+        Chunk chunk = chunkProvider.getChunk(chunkPos);
         ByteBuffer buffer =
-            ByteBuffer.allocateDirect(2 * (ChunkConstants.SIZE_X * ChunkConstants.SIZE_Y * ChunkConstants.SIZE_Z));
+            ByteBuffer.allocateDirect(2 * (Chunks.SIZE_X * Chunks.SIZE_Y * Chunks.SIZE_Z));
         buffer.order(ByteOrder.nativeOrder());
-        for (int z = 0; z < ChunkConstants.SIZE_Z; z++) {
-            for (int x = 0; x < ChunkConstants.SIZE_X; x++) {
-                for (int y = 0; y < ChunkConstants.SIZE_Y; y++) {
+        for (int z = 0; z < Chunks.SIZE_Z; z++) {
+            for (int x = 0; x < Chunks.SIZE_X; x++) {
+                for (int y = 0; y < Chunks.SIZE_Y; y++) {
                     Block block = chunk.getBlock(x, y, z);
                     tryRegister(block);
                     buffer.putShort(block.getId());

@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package org.terasology.audio.formats;
+package org.terasology.engine.audio.formats;
 
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.format.AbstractAssetFileFormat;
 import org.terasology.assets.format.AssetDataFile;
 import org.terasology.assets.module.annotations.RegisterAssetFileFormat;
-import org.terasology.audio.StreamingSoundData;
+import org.terasology.engine.audio.StreamingSoundData;
 
 import java.io.IOException;
 import java.util.List;

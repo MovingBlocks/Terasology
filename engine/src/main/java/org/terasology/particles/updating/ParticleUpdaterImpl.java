@@ -1,6 +1,6 @@
 // Copyright 2020 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.particles.updating;
+package org.terasology.engine.particles.updating;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.BiMap;
@@ -9,23 +9,23 @@ import com.google.common.collect.ImmutableList;
 import org.joml.Vector3f;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.engine.module.ModuleManager;
-import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.engine.core.module.ModuleManager;
+import org.terasology.engine.entitySystem.Component;
+import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.math.TeraMath;
 import org.terasology.module.ModuleEnvironment;
-import org.terasology.particles.ParticleDataMask;
-import org.terasology.particles.ParticlePool;
-import org.terasology.particles.components.ParticleEmitterComponent;
-import org.terasology.particles.functions.ParticleSystemFunction;
-import org.terasology.particles.functions.RegisterParticleSystemFunction;
-import org.terasology.particles.functions.affectors.AffectorFunction;
-import org.terasology.particles.functions.generators.GeneratorFunction;
-import org.terasology.physics.HitResult;
-import org.terasology.physics.Physics;
-import org.terasology.physics.StandardCollisionGroup;
-import org.terasology.utilities.ReflectionUtil;
-import org.terasology.utilities.random.FastRandom;
+import org.terasology.engine.particles.ParticleDataMask;
+import org.terasology.engine.particles.ParticlePool;
+import org.terasology.engine.particles.components.ParticleEmitterComponent;
+import org.terasology.engine.particles.functions.ParticleSystemFunction;
+import org.terasology.engine.particles.functions.RegisterParticleSystemFunction;
+import org.terasology.engine.particles.functions.affectors.AffectorFunction;
+import org.terasology.engine.particles.functions.generators.GeneratorFunction;
+import org.terasology.engine.physics.HitResult;
+import org.terasology.engine.physics.Physics;
+import org.terasology.engine.physics.StandardCollisionGroup;
+import org.terasology.engine.utilities.ReflectionUtil;
+import org.terasology.engine.utilities.random.FastRandom;
 
 import java.lang.reflect.Type;
 import java.util.Collection;

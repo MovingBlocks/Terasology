@@ -13,15 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.monitoring.gui;
+package org.terasology.engine.monitoring.gui;
 
 import com.google.common.eventbus.Subscribe;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.monitoring.ThreadActivity;
-import org.terasology.monitoring.ThreadMonitor;
-import org.terasology.monitoring.impl.SingleThreadMonitor;
-import org.terasology.monitoring.impl.ThreadMonitorEvent;
+import org.terasology.engine.monitoring.ThreadActivity;
+import org.terasology.engine.monitoring.ThreadMonitor;
+import org.terasology.engine.monitoring.impl.SingleThreadMonitor;
+import org.terasology.engine.monitoring.impl.ThreadMonitorEvent;
 
 import javax.swing.JPanel;
 import javax.swing.JList;

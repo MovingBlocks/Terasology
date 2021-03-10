@@ -13,16 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.monitoring;
+package org.terasology.engine.monitoring;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.eventbus.EventBus;
-import org.terasology.monitoring.impl.SingleThreadMonitor;
-import org.terasology.monitoring.impl.SingleThreadMonitorImpl;
-import org.terasology.monitoring.impl.ThreadActivityInternal;
-import org.terasology.monitoring.impl.ThreadMonitorEvent;
+import org.terasology.engine.monitoring.impl.SingleThreadMonitor;
+import org.terasology.engine.monitoring.impl.SingleThreadMonitorImpl;
+import org.terasology.engine.monitoring.impl.ThreadActivityInternal;
+import org.terasology.engine.monitoring.impl.ThreadMonitorEvent;
 
 import java.util.List;
 import java.util.Map;

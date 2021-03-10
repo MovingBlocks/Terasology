@@ -1,43 +1,30 @@
-/*
- * Copyright 2018 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-package org.terasology.rendering.nui.layers.mainMenu;
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
+package org.terasology.engine.rendering.nui.layers.mainMenu;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
-import org.terasology.config.Config;
-import org.terasology.engine.TerasologyConstants;
-import org.terasology.i18n.TranslationSystem;
+import org.terasology.engine.config.Config;
+import org.terasology.engine.core.TerasologyConstants;
+import org.terasology.engine.i18n.TranslationSystem;
+import org.terasology.engine.rendering.assets.texture.AWTTextureFormat;
+import org.terasology.engine.rendering.assets.texture.Texture;
+import org.terasology.engine.rendering.assets.texture.TextureData;
+import org.terasology.engine.rendering.nui.layers.mainMenu.savedGames.GameInfo;
 import org.terasology.naming.Name;
 import org.terasology.naming.NameVersion;
-import org.terasology.persistence.internal.GamePreviewImageProvider;
-import org.terasology.registry.In;
-import org.terasology.rendering.assets.texture.AWTTextureFormat;
-import org.terasology.rendering.assets.texture.Texture;
-import org.terasology.rendering.assets.texture.TextureData;
-import org.terasology.rendering.nui.CoreScreenLayer;
-import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameInfo;
 import org.terasology.nui.widgets.UIImage;
 import org.terasology.nui.widgets.UIImageSlideshow;
 import org.terasology.nui.widgets.UILabel;
 import org.terasology.nui.widgets.UIList;
-import org.terasology.utilities.Assets;
-import org.terasology.utilities.FilesUtil;
-import org.terasology.world.generator.internal.WorldGeneratorInfo;
-import org.terasology.world.generator.internal.WorldGeneratorManager;
+import org.terasology.engine.persistence.internal.GamePreviewImageProvider;
+import org.terasology.engine.registry.In;
+import org.terasology.engine.rendering.nui.CoreScreenLayer;
+import org.terasology.engine.utilities.Assets;
+import org.terasology.engine.utilities.FilesUtil;
+import org.terasology.engine.world.generator.internal.WorldGeneratorInfo;
+import org.terasology.engine.world.generator.internal.WorldGeneratorManager;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;

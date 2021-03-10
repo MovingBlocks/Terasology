@@ -1,9 +1,9 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.world.generation;
+package org.terasology.engine.world.generation;
 
-import org.terasology.world.block.BlockRegion;
-import org.terasology.world.chunks.CoreChunk;
+import org.terasology.engine.world.block.BlockRegion;
+import org.terasology.engine.world.chunks.CoreChunk;
 
 import java.util.Set;
 
@@ -25,7 +25,7 @@ public interface World {
 
     void rasterizeChunk(CoreChunk chunk, EntityBuffer buffer);
 
-    void rasterizeChunk(CoreChunk chunk, EntityBuffer buffer, float scale);
+    void rasterizeChunk(CoreChunk chunk, float scale);
 
     /**
      * @return a <b>new</b> set containing all facet classes

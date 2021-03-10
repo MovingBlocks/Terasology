@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package org.terasology.entitySystem.entity.lifecycleEvents;
+package org.terasology.engine.entitySystem.entity.lifecycleEvents;
 
-import org.terasology.entitySystem.event.Event;
+import org.terasology.engine.entitySystem.event.Event;
 
 /**
  * This event is sent when an entity is created or a component added to an existing entity.
@@ -24,7 +24,7 @@ import org.terasology.entitySystem.event.Event;
  * Note that this event will only be received by @ReceiveEvent methods where all components in its list are present and
  * at least one is involved in the action causing the event.
  *
- * @see org.terasology.entitySystem.entity.lifecycleEvents.BeforeRemoveComponent
+ * @see org.terasology.engine.entitySystem.entity.lifecycleEvents.BeforeRemoveComponent
  */
 public final class OnAddedComponent implements Event {
 

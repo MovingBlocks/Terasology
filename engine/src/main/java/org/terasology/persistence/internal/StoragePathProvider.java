@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.persistence.internal;
+package org.terasology.engine.persistence.internal;
 
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
-import org.terasology.engine.TerasologyConstants;
-import org.terasology.game.GameManifest;
+import org.terasology.engine.core.TerasologyConstants;
+import org.terasology.engine.game.GameManifest;
 
 import java.nio.file.Path;
 

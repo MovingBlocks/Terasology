@@ -14,25 +14,25 @@
  * limitations under the License.
  */
 
-package org.terasology.network.internal;
+package org.terasology.engine.network.internal;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.terasology.TerasologyTestingEnvironment;
-import org.terasology.engine.ComponentSystemManager;
-import org.terasology.engine.EngineTime;
-import org.terasology.engine.bootstrap.EntitySystemSetupUtil;
-import org.terasology.engine.module.ModuleManager;
-import org.terasology.entitySystem.entity.EntityBuilder;
-import org.terasology.entitySystem.entity.EntityManager;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.entity.internal.EngineEntityManager;
-import org.terasology.entitySystem.entity.internal.PojoEntityManager;
-import org.terasology.entitySystem.metadata.EventLibrary;
-import org.terasology.network.NetworkComponent;
-import org.terasology.network.NetworkSystem;
+import org.terasology.engine.core.ComponentSystemManager;
+import org.terasology.engine.core.EngineTime;
+import org.terasology.engine.core.bootstrap.EntitySystemSetupUtil;
+import org.terasology.engine.core.module.ModuleManager;
+import org.terasology.engine.entitySystem.entity.EntityBuilder;
+import org.terasology.engine.entitySystem.entity.EntityManager;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.entitySystem.entity.internal.EngineEntityManager;
+import org.terasology.engine.entitySystem.entity.internal.PojoEntityManager;
+import org.terasology.engine.entitySystem.metadata.EventLibrary;
+import org.terasology.engine.network.NetworkComponent;
+import org.terasology.engine.network.NetworkSystem;
 import org.terasology.testUtil.ModuleManagerFactory;
-import org.terasology.world.BlockEntityRegistry;
+import org.terasology.engine.world.BlockEntityRegistry;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;

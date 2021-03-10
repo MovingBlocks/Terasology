@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.monitoring.impl;
+package org.terasology.engine.monitoring.impl;
 
 import gnu.trove.map.TObjectDoubleMap;
-import org.terasology.monitoring.Activity;
+import org.terasology.engine.monitoring.Activity;
 
 /**
  * Base interface for performance monitor implementations.

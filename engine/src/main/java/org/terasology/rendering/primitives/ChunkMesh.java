@@ -1,19 +1,6 @@
-/*
- * Copyright 2013 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-package org.terasology.rendering.primitives;
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
+package org.terasology.engine.rendering.primitives;
 
 import com.google.common.collect.Maps;
 import gnu.trove.list.TFloatList;
@@ -25,11 +12,11 @@ import org.joml.Vector3fc;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL15;
-import org.terasology.engine.subsystem.lwjgl.GLBufferPool;
+import org.terasology.engine.core.subsystem.lwjgl.GLBufferPool;
 import org.terasology.module.sandbox.API;
-import org.terasology.rendering.VertexBufferObjectUtil;
-import org.terasology.rendering.assets.material.Material;
-import org.terasology.world.chunks.Chunks;
+import org.terasology.engine.rendering.VertexBufferObjectUtil;
+import org.terasology.engine.rendering.assets.material.Material;
+import org.terasology.engine.world.chunks.Chunks;
 
 import java.nio.IntBuffer;
 import java.util.Map;

@@ -1,27 +1,14 @@
-/*
- * Copyright 2017 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-package org.terasology.rendering.world;
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
+package org.terasology.engine.rendering.world;
 
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector3i;
+import org.joml.Vector3f;
+import org.joml.Vector3ic;
+import org.terasology.engine.rendering.assets.material.Material;
+import org.terasology.engine.rendering.cameras.SubmersibleCamera;
+import org.terasology.engine.rendering.world.viewDistance.ViewDistance;
 import org.terasology.module.sandbox.API;
-import org.terasology.rendering.assets.material.Material;
-import org.terasology.rendering.cameras.SubmersibleCamera;
-import org.terasology.rendering.dag.RenderGraph;
-import org.terasology.rendering.world.viewDistance.ViewDistance;
+import org.terasology.engine.rendering.dag.RenderGraph;
 
 /**
  * Implementations of this class are responsible for rendering the whole 3D world,
@@ -68,14 +55,14 @@ public interface WorldRenderer {
      *
      * @param chunkPos a Vector3i providing the coordinates of the chunk that has just been loaded.
      */
-    void onChunkLoaded(Vector3i chunkPos);
+    void onChunkLoaded(Vector3ic chunkPos);
 
     /**
      * This method is triggered when a chunk has been unloaded.
      *
      * @param chunkPos a Vector3i providing the coordinates of the chunk that has just been unloaded.
      */
-    void onChunkUnloaded(Vector3i chunkPos);
+    void onChunkUnloaded(Vector3ic chunkPos);
 
     /**
      * Lists the stages the rendering engine may go through on a given frame.

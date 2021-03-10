@@ -13,16 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.particles;
+package org.terasology.engine.particles;
 
-import org.terasology.entitySystem.Component;
+import org.terasology.engine.entitySystem.Component;
 import org.terasology.module.sandbox.API;
-import org.terasology.particles.rendering.ParticleRenderingData;
+import org.terasology.engine.particles.rendering.ParticleRenderingData;
 
 import java.util.stream.Stream;
 
 /**
- * Component system responsible for keeping track of all {@link org.terasology.particles.components.ParticleEmitterComponent} components and updating them.
+ * Component system responsible for keeping track of all {@link org.terasology.engine.particles.components.ParticleEmitterComponent} components and updating them.
  * Also maintains a registry of generator and affector functions to be used when processing generators
  * and affectors during a particle system update.
  */

@@ -1,35 +1,35 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.world.chunks.localChunkProvider;
+package org.terasology.engine.world.chunks.localChunkProvider;
 
 import com.google.common.collect.Maps;
+import org.joml.Vector3i;
+import org.joml.Vector3ic;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-import org.terasology.entitySystem.entity.EntityManager;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.event.Event;
+import org.terasology.engine.entitySystem.entity.EntityManager;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.entitySystem.event.Event;
+import org.terasology.engine.world.BlockEntityRegistry;
+import org.terasology.engine.world.block.BeforeDeactivateBlocks;
+import org.terasology.engine.world.block.Block;
+import org.terasology.engine.world.block.BlockManager;
+import org.terasology.engine.world.block.BlockRegion;
+import org.terasology.engine.world.block.OnActivatedBlocks;
+import org.terasology.engine.world.block.OnAddedBlocks;
+import org.terasology.engine.world.chunks.Chunk;
+import org.terasology.engine.world.chunks.blockdata.ExtraBlockDataManager;
+import org.terasology.engine.world.chunks.event.BeforeChunkUnload;
+import org.terasology.engine.world.chunks.event.OnChunkGenerated;
+import org.terasology.engine.world.chunks.event.OnChunkLoaded;
+import org.terasology.engine.world.chunks.internal.ChunkImpl;
 import org.terasology.fixtures.TestBlockManager;
 import org.terasology.fixtures.TestChunkStore;
 import org.terasology.fixtures.TestStorageManager;
 import org.terasology.fixtures.TestWorldGenerator;
-import org.terasology.math.JomlUtil;
-import org.terasology.math.geom.Vector3i;
-import org.terasology.world.BlockEntityRegistry;
-import org.terasology.world.block.BeforeDeactivateBlocks;
-import org.terasology.world.block.Block;
-import org.terasology.world.block.BlockManager;
-import org.terasology.world.block.BlockRegion;
-import org.terasology.world.block.OnActivatedBlocks;
-import org.terasology.world.block.OnAddedBlocks;
-import org.terasology.world.chunks.Chunk;
-import org.terasology.world.chunks.blockdata.ExtraBlockDataManager;
-import org.terasology.world.chunks.event.BeforeChunkUnload;
-import org.terasology.world.chunks.event.OnChunkGenerated;
-import org.terasology.world.chunks.event.OnChunkLoaded;
-import org.terasology.world.chunks.internal.ChunkImpl;
 
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
@@ -54,7 +54,7 @@ class LocalChunkProviderTest {
     private ExtraBlockDataManager extraDataManager;
     private BlockEntityRegistry blockEntityRegistry;
     private EntityRef worldEntity;
-    private Map<Vector3i, Chunk> chunkCache;
+    private Map<Vector3ic, Chunk> chunkCache;
     private Block blockAtBlockManager;
     private TestStorageManager storageManager;
     private TestWorldGenerator generator;
@@ -89,21 +89,21 @@ class LocalChunkProviderTest {
         chunkProvider.shutdown();
     }
 
-    private Future<Chunk> requestCreatingOrLoadingArea(Vector3i chunkPosition, int radius) {
+    private Future<Chunk> requestCreatingOrLoadingArea(Vector3ic chunkPosition, int radius) {
         Future<Chunk> chunkFuture = chunkProvider.createOrLoadChunk(chunkPosition);
         BlockRegion extentsRegion = new BlockRegion(
-                chunkPosition.x - radius, chunkPosition.y - radius, chunkPosition.z - radius,
-                chunkPosition.x + radius, chunkPosition.y + radius, chunkPosition.z + radius);
+                chunkPosition.x() - radius, chunkPosition.y() - radius, chunkPosition.z() - radius,
+                chunkPosition.x() + radius, chunkPosition.y() + radius, chunkPosition.z() + radius);
 
         extentsRegion.iterator().forEachRemaining(pos -> {
-            if (!pos.equals(JomlUtil.from(chunkPosition))) { // remove center. we takes future for it already.
-                chunkProvider.createOrLoadChunk(JomlUtil.from(pos));
+            if (!pos.equals(chunkPosition)) { // remove center. we takes future for it already.
+                chunkProvider.createOrLoadChunk(pos);
             }
         });
         return chunkFuture;
     }
 
-    private Future<Chunk> requestCreatingOrLoadingArea(Vector3i chunkPosition) {
+    private Future<Chunk> requestCreatingOrLoadingArea(Vector3ic chunkPosition) {
         return requestCreatingOrLoadingArea(chunkPosition, 1);
     }
 
@@ -121,14 +121,14 @@ class LocalChunkProviderTest {
                     Assertions.assertTrue(mustBeOnGeneratedEvent instanceof OnChunkGenerated,
                             "First world event must be OnChunkGenerated");
                     Assertions.assertEquals(((OnChunkGenerated) mustBeOnGeneratedEvent).getChunkPos(),
-                            JomlUtil.from(chunkPosition),
+                            chunkPosition,
                             "Chunk position at event not expected");
                 },
                 () -> {
                     Event mustBeOnLoadedEvent = eventArgumentCaptor.getAllValues().get(1);
                     Assertions.assertTrue(mustBeOnLoadedEvent instanceof OnChunkLoaded,
                             "Second world event must be OnChunkLoaded");
-                    Assertions.assertEquals(JomlUtil.from(chunkPosition),
+                    Assertions.assertEquals(chunkPosition,
                             ((OnChunkLoaded) mustBeOnLoadedEvent).getChunkPos(),
                             "Chunk position at event not expected");
                 });
@@ -150,14 +150,14 @@ class LocalChunkProviderTest {
                     Assertions.assertTrue(mustBeOnGeneratedEvent instanceof OnChunkGenerated,
                             "First world event must be OnChunkGenerated");
                     Assertions.assertEquals(((OnChunkGenerated) mustBeOnGeneratedEvent).getChunkPos(),
-                            JomlUtil.from(chunkPosition),
+                            chunkPosition,
                             "Chunk position at event not expected");
                 },
                 () -> {
                     Event mustBeOnLoadedEvent = worldEventCaptor.getAllValues().get(1);
                     Assertions.assertTrue(mustBeOnLoadedEvent instanceof OnChunkLoaded,
                             "Second world event must be OnChunkLoaded");
-                    Assertions.assertEquals(JomlUtil.from(chunkPosition),
+                    Assertions.assertEquals(chunkPosition,
                             ((OnChunkLoaded) mustBeOnLoadedEvent).getChunkPos(),
                             "Chunk position at event not expected");
                 });
@@ -184,7 +184,7 @@ class LocalChunkProviderTest {
         requestCreatingOrLoadingArea(chunkPosition).get(WAIT_CHUNK_IS_READY_IN_SECONDS, TimeUnit.SECONDS);
         chunkProvider.update();
 
-        Assertions.assertTrue(((TestChunkStore) storageManager.loadChunkStore(JomlUtil.from(chunkPosition))).isEntityRestored(),
+        Assertions.assertTrue(((TestChunkStore) storageManager.loadChunkStore(chunkPosition)).isEntityRestored(),
                 "Entities must be restored by loading");
 
         final ArgumentCaptor<Event> eventArgumentCaptor = ArgumentCaptor.forClass(Event.class);
@@ -192,7 +192,7 @@ class LocalChunkProviderTest {
         Event mustBeOnLoadedEvent = eventArgumentCaptor.getAllValues().get(0);
         Assertions.assertTrue(mustBeOnLoadedEvent instanceof OnChunkLoaded,
                 "Second world event must be OnChunkLoaded");
-        Assertions.assertEquals(JomlUtil.from(chunkPosition),
+        Assertions.assertEquals(chunkPosition,
                 ((OnChunkLoaded) mustBeOnLoadedEvent).getChunkPos(),
                 "Chunk position at event not expected");
     }
@@ -209,7 +209,7 @@ class LocalChunkProviderTest {
         requestCreatingOrLoadingArea(chunkPosition).get(WAIT_CHUNK_IS_READY_IN_SECONDS, TimeUnit.SECONDS);
         chunkProvider.update();
 
-        Assertions.assertTrue(((TestChunkStore) storageManager.loadChunkStore(JomlUtil.from(chunkPosition))).isEntityRestored(),
+        Assertions.assertTrue(((TestChunkStore) storageManager.loadChunkStore(chunkPosition)).isEntityRestored(),
                 "Entities must be restored by loading");
 
 
@@ -218,7 +218,7 @@ class LocalChunkProviderTest {
         Event mustBeOnLoadedEvent = eventArgumentCaptor.getAllValues().get(0);
         Assertions.assertTrue(mustBeOnLoadedEvent instanceof OnChunkLoaded,
                 "Second world event must be OnChunkLoaded");
-        Assertions.assertEquals(JomlUtil.from(chunkPosition),
+        Assertions.assertEquals(chunkPosition,
                 ((OnChunkLoaded) mustBeOnLoadedEvent).getChunkPos(),
                 "Chunk position at event not expected");
 
@@ -278,7 +278,7 @@ class LocalChunkProviderTest {
 
         Assertions.assertTrue(beforeChunkUnload.isPresent(),
                 "World events must have BeforeChunkUnload event when chunk was unload");
-        Assertions.assertEquals(JomlUtil.from(chunkPosition),
+        Assertions.assertEquals(chunkPosition,
                 beforeChunkUnload.get().getChunkPos(),
                 "Chunk position at event not expected");
 

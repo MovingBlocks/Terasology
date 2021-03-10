@@ -13,15 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.monitoring.gui;
+package org.terasology.engine.monitoring.gui;
 
 import com.google.common.base.Preconditions;
 import gnu.trove.map.TObjectDoubleMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.monitoring.PerformanceMonitor;
-import org.terasology.monitoring.ThreadActivity;
-import org.terasology.monitoring.ThreadMonitor;
+import org.terasology.engine.monitoring.PerformanceMonitor;
+import org.terasology.engine.monitoring.ThreadActivity;
+import org.terasology.engine.monitoring.ThreadMonitor;
 
 import javax.swing.JPanel;
 import javax.swing.JList;

@@ -1,12 +1,12 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-package org.terasology.world.generation.facets;
+package org.terasology.engine.world.generation.facets;
 
 import org.joml.Vector3ic;
-import org.terasology.world.block.BlockRegion;
-import org.terasology.world.generation.Border3D;
-import org.terasology.world.generation.facets.base.VerticallySparseBooleanFacet3D;
+import org.terasology.engine.world.generation.facets.base.VerticallySparseBooleanFacet3D;
+import org.terasology.engine.world.block.BlockRegion;
+import org.terasology.engine.world.generation.Border3D;
 
 import java.util.Optional;
 

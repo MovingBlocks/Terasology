@@ -1,4 +1,4 @@
-package org.terasology.engine.subsystem.lwjgl;
+package org.terasology.engine.core.subsystem.lwjgl;
 
 
 import org.lwjgl.glfw.GLFWErrorCallbackI;

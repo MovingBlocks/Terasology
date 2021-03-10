@@ -27,6 +27,6 @@
  * <br><br>
  * Additionally, ReflectFactory is used to provide support for construction and field access, to allow for alternate implementations.
  */
-@API package org.terasology.audio.events;
+@API package org.terasology.engine.audio.events;
 
 import org.terasology.module.sandbox.API;

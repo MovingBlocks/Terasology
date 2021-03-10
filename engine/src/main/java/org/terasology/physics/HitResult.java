@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package org.terasology.physics;
+package org.terasology.engine.physics;
 
 import org.joml.RoundingMode;
 import org.joml.Vector3f;
 import org.joml.Vector3i;
-import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.engine.entitySystem.entity.EntityRef;
 
 /**
  * A HitResult holds the result of a ray-trace.

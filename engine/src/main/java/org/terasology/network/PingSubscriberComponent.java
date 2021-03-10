@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.network;
+package org.terasology.engine.network;
 
-import org.terasology.entitySystem.Component;
+import org.terasology.engine.entitySystem.Component;
 
 /**
  * PingSubscriberComponent, only on the server system, will be added to a client entity when this client subscribe.

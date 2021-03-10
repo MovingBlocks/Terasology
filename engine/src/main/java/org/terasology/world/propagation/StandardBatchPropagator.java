@@ -1,18 +1,17 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.world.propagation;
+package org.terasology.engine.world.propagation;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
-import org.terasology.math.ChunkMath;
-import org.terasology.math.Side;
-import org.terasology.world.block.Block;
-import org.terasology.world.block.BlockRegion;
-import org.terasology.world.block.BlockRegionc;
-import org.terasology.world.chunks.Chunks;
-import org.terasology.world.chunks.LitChunk;
+import org.terasology.engine.math.Side;
+import org.terasology.engine.world.block.Block;
+import org.terasology.engine.world.block.BlockRegion;
+import org.terasology.engine.world.block.BlockRegionc;
+import org.terasology.engine.world.chunks.Chunks;
+import org.terasology.engine.world.chunks.LitChunk;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -300,7 +299,7 @@ public class StandardBatchPropagator implements BatchPropagator {
 
         BlockRegion edgeRegion = new BlockRegion(0, 0, 0)
                 .setSize(Chunks.SIZE_X, Chunks.SIZE_Y, Chunks.SIZE_Z);
-        ChunkMath.getEdgeRegion(edgeRegion, side, edgeRegion);
+        edgeRegion.face(side, edgeRegion);
 
         int[] depth = new int[edgeRegion.volume()];
 

@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.identity.storageServiceClient;
+package org.terasology.engine.identity.storageServiceClient;
 
-import org.terasology.i18n.TranslationSystem;
+import org.terasology.engine.i18n.TranslationSystem;
 
 public final class StatusMessageTranslator {
 

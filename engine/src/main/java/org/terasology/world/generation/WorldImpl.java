@@ -1,11 +1,11 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.world.generation;
+package org.terasology.engine.world.generation;
 
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Sets;
-import org.terasology.world.block.BlockRegion;
-import org.terasology.world.chunks.CoreChunk;
+import org.terasology.engine.world.block.BlockRegion;
+import org.terasology.engine.world.chunks.CoreChunk;
 
 import java.util.Collection;
 import java.util.LinkedHashSet;
@@ -52,7 +52,7 @@ public class WorldImpl implements World {
 
     @Override
     public void rasterizeChunk(CoreChunk chunk, EntityBuffer buffer) {
-        Region chunkRegion = getWorldData(chunk.getRegion(), 1);
+        Region chunkRegion = getWorldData(new BlockRegion(chunk.getRegion()), 1);
         for (WorldRasterizer rasterizer : worldRasterizers) {
             rasterizer.generateChunk(chunk, chunkRegion);
         }
@@ -62,13 +62,10 @@ public class WorldImpl implements World {
     }
 
     @Override
-    public void rasterizeChunk(CoreChunk chunk, EntityBuffer buffer, float scale) {
-        Region chunkRegion = getWorldData(chunk.getRegion(), scale);
+    public void rasterizeChunk(CoreChunk chunk, float scale) {
+        Region chunkRegion = getWorldData(new BlockRegion(chunk.getRegion()), scale);
         for (WorldRasterizer rasterizer : scalableWorldRasterizers) {
             ((ScalableWorldRasterizer) rasterizer).generateChunk(chunk, chunkRegion, scale);
-        }
-        for (EntityProvider entityProvider : entityProviders) {
-            entityProvider.process(chunkRegion, buffer);
         }
     }
 

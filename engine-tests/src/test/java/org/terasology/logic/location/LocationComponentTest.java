@@ -1,28 +1,17 @@
-/*
- * Copyright 2013 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.logic.location;
 
+import org.joml.Math;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.terasology.TerasologyTestingEnvironment;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.entity.lifecycleEvents.BeforeRemoveComponent;
-import org.terasology.math.TeraMath;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.entitySystem.entity.lifecycleEvents.BeforeRemoveComponent;
+import org.terasology.engine.logic.location.Location;
+import org.terasology.engine.logic.location.LocationComponent;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -50,9 +39,9 @@ public class LocationComponentTest extends TerasologyTestingEnvironment {
         loc = new LocationComponent();
         entity = createFakeEntityWith(loc);
 
-        yawRotation = new Quaternionf().rotationYXZ(TeraMath.DEG_TO_RAD * 90, 0, 0);
-        pitchRotation = new Quaternionf().rotationYXZ(0, TeraMath.DEG_TO_RAD * 45, 0);
-        yawPitch = new Quaternionf().rotationYXZ(TeraMath.DEG_TO_RAD * 90, TeraMath.DEG_TO_RAD * 45, 0);
+        yawRotation = new Quaternionf().rotationYXZ(Math.toRadians(90), 0, 0);
+        pitchRotation = new Quaternionf().rotationYXZ(0, Math.toRadians(45), 0);
+        yawPitch = new Quaternionf().rotationYXZ(Math.toRadians(90), Math.toRadians(45), 0);
     }
 
     private EntityRef createFakeEntityWith(LocationComponent locationComponent) {
@@ -72,7 +61,7 @@ public class LocationComponentTest extends TerasologyTestingEnvironment {
     @Test
     public void testSetLocalRotation() {
         loc.setLocalRotation(yawRotation);
-        assertEquals(yawRotation,loc.getLocalRotation(), 0.0001f);
+        assertEquals(yawRotation, loc.getLocalRotation(), 0.0001f);
     }
 
     @Test

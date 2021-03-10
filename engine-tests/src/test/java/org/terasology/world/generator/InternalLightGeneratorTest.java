@@ -1,18 +1,5 @@
-/*
- * Copyright 2018 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.world.generator;
 
 import org.joml.Vector3i;
@@ -22,24 +9,23 @@ import org.junit.jupiter.api.Test;
 import org.terasology.TerasologyTestingEnvironment;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
-import org.terasology.math.Diamond3iIterable;
-import org.terasology.registry.CoreRegistry;
-import org.terasology.world.block.Block;
-import org.terasology.world.block.BlockManager;
-import org.terasology.world.block.BlockRegion;
-import org.terasology.world.block.BlockUri;
-import org.terasology.world.block.family.SymmetricFamily;
-import org.terasology.world.block.internal.BlockManagerImpl;
-import org.terasology.world.block.loader.BlockFamilyDefinition;
-import org.terasology.world.block.loader.BlockFamilyDefinitionData;
-import org.terasology.world.block.shapes.BlockShape;
-import org.terasology.world.block.tiles.NullWorldAtlas;
-import org.terasology.world.chunks.Chunk;
-import org.terasology.world.chunks.ChunkConstants;
-import org.terasology.world.chunks.Chunks;
-import org.terasology.world.chunks.blockdata.ExtraBlockDataManager;
-import org.terasology.world.chunks.internal.ChunkImpl;
-import org.terasology.world.propagation.light.InternalLightProcessor;
+import org.terasology.engine.math.Diamond3iIterable;
+import org.terasology.engine.registry.CoreRegistry;
+import org.terasology.engine.world.block.Block;
+import org.terasology.engine.world.block.BlockManager;
+import org.terasology.engine.world.block.BlockRegion;
+import org.terasology.engine.world.block.BlockUri;
+import org.terasology.engine.world.block.family.SymmetricFamily;
+import org.terasology.engine.world.block.internal.BlockManagerImpl;
+import org.terasology.engine.world.block.loader.BlockFamilyDefinition;
+import org.terasology.engine.world.block.loader.BlockFamilyDefinitionData;
+import org.terasology.engine.world.block.shapes.BlockShape;
+import org.terasology.engine.world.block.tiles.NullWorldAtlas;
+import org.terasology.engine.world.chunks.Chunk;
+import org.terasology.engine.world.chunks.Chunks;
+import org.terasology.engine.world.chunks.blockdata.ExtraBlockDataManager;
+import org.terasology.engine.world.chunks.internal.ChunkImpl;
+import org.terasology.engine.world.propagation.light.InternalLightProcessor;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -75,7 +61,7 @@ public class InternalLightGeneratorTest extends TerasologyTestingEnvironment {
         BlockFamilyDefinitionData fullLightData = new BlockFamilyDefinitionData();
         fullLightData.getBaseSection().setDisplayName("Torch");
         fullLightData.getBaseSection().setShape(assetManager.getAsset("engine:cube", BlockShape.class).get());
-        fullLightData.getBaseSection().setLuminance(ChunkConstants.MAX_LIGHT);
+        fullLightData.getBaseSection().setLuminance(Chunks.MAX_LIGHT);
         fullLightData.setBlockFamily(SymmetricFamily.class);
         assetManager.loadAsset(new ResourceUrn("engine:torch"), fullLightData, BlockFamilyDefinition.class);
         fullLight = blockManager.getBlock(new BlockUri(new ResourceUrn("engine:torch")));

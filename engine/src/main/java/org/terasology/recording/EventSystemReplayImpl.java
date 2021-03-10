@@ -1,25 +1,7 @@
-/*
- * Copyright 2018 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-package org.terasology.recording;
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
+package org.terasology.engine.recording;
 
-import org.terasology.assets.ResourceUrn;
-import org.terasology.engine.paths.PathManager;
-import org.terasology.entitySystem.entity.internal.EngineEntityManager;
-import org.terasology.entitySystem.event.internal.EventReceiver;
-import org.terasology.entitySystem.event.internal.EventSystem;
 import com.esotericsoftware.reflectasm.MethodAccess;
 import com.google.common.base.Objects;
 import com.google.common.base.Predicates;
@@ -35,28 +17,33 @@ import com.google.common.collect.Sets;
 import org.reflections.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.engine.SimpleUri;
-import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.event.AbstractConsumableEvent;
-import org.terasology.entitySystem.event.ConsumableEvent;
-import org.terasology.entitySystem.event.Event;
-import org.terasology.entitySystem.event.EventPriority;
-import org.terasology.entitySystem.event.ReceiveEvent;
-import org.terasology.entitySystem.event.PendingEvent;
-import org.terasology.entitySystem.metadata.EventLibrary;
-import org.terasology.entitySystem.metadata.EventMetadata;
-import org.terasology.entitySystem.systems.ComponentSystem;
-import org.terasology.monitoring.PerformanceMonitor;
-import org.terasology.network.BroadcastEvent;
-import org.terasology.network.Client;
-import org.terasology.network.NetworkComponent;
-import org.terasology.network.NetworkEvent;
-import org.terasology.network.NetworkMode;
-import org.terasology.network.NetworkSystem;
-import org.terasology.network.OwnerEvent;
-import org.terasology.network.ServerEvent;
-import org.terasology.world.block.BlockComponent;
+import org.terasology.assets.ResourceUrn;
+import org.terasology.engine.core.SimpleUri;
+import org.terasology.engine.core.paths.PathManager;
+import org.terasology.engine.entitySystem.Component;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.entitySystem.entity.internal.EngineEntityManager;
+import org.terasology.engine.entitySystem.event.AbstractConsumableEvent;
+import org.terasology.engine.entitySystem.event.ConsumableEvent;
+import org.terasology.engine.entitySystem.event.Event;
+import org.terasology.engine.entitySystem.event.EventPriority;
+import org.terasology.engine.entitySystem.event.PendingEvent;
+import org.terasology.engine.entitySystem.event.ReceiveEvent;
+import org.terasology.engine.entitySystem.event.internal.EventReceiver;
+import org.terasology.engine.entitySystem.event.internal.EventSystem;
+import org.terasology.engine.entitySystem.metadata.EventLibrary;
+import org.terasology.engine.entitySystem.metadata.EventMetadata;
+import org.terasology.engine.entitySystem.systems.ComponentSystem;
+import org.terasology.engine.monitoring.PerformanceMonitor;
+import org.terasology.engine.network.BroadcastEvent;
+import org.terasology.engine.network.Client;
+import org.terasology.engine.network.NetworkComponent;
+import org.terasology.engine.network.NetworkEvent;
+import org.terasology.engine.network.NetworkMode;
+import org.terasology.engine.network.NetworkSystem;
+import org.terasology.engine.network.OwnerEvent;
+import org.terasology.engine.network.ServerEvent;
+import org.terasology.engine.world.block.BlockComponent;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -87,7 +74,7 @@ public class EventSystemReplayImpl implements EventSystem {
     private Comparator<EventHandlerInfo> priorityComparator = new EventSystemReplayImpl.EventHandlerPriorityComparator();
 
     // Event metadata
-    private BiMap<SimpleUri, Class<? extends Event>> eventIdMap = HashBiMap.create();
+    private BiMap<ResourceUrn, Class<? extends Event>> eventIdMap = HashBiMap.create();
     private SetMultimap<Class<? extends Event>, Class<? extends Event>> childEvents = HashMultimap.create();
 
     private Thread mainThread;
@@ -281,16 +268,16 @@ public class EventSystemReplayImpl implements EventSystem {
     }
 
     @Override
-    public void registerEvent(SimpleUri uri, Class<? extends Event> eventType) {
+    public void registerEvent(ResourceUrn uri, Class<? extends Event> eventType) {
         eventIdMap.put(uri, eventType);
         logger.debug("Registering event {}", eventType.getSimpleName());
-        for (Class parent : ReflectionUtils.getAllSuperTypes(eventType, Predicates.assignableFrom(Event.class))) {
+        for (Class parent : ReflectionUtils.getAllSuperTypes(eventType, Predicates.subtypeOf(Event.class))) {
             if (!AbstractConsumableEvent.class.equals(parent) && !Event.class.equals(parent)) {
                 childEvents.put(parent, eventType);
             }
         }
         if (shouldAddToLibrary(eventType)) {
-            eventLibrary.register(new ResourceUrn(uri.getModuleName(), uri.getObjectName()), eventType);
+            eventLibrary.register(uri, eventType);
         }
     }
 
@@ -318,7 +305,7 @@ public class EventSystemReplayImpl implements EventSystem {
         for (Method method : handlerClass.getMethods()) {
             ReceiveEvent receiveEventAnnotation = method.getAnnotation(ReceiveEvent.class);
             if (receiveEventAnnotation != null) {
-                if (!receiveEventAnnotation.netFilter().isValidFor(networkSystem.getMode(), false)) {
+                if (!receiveEventAnnotation.netFilter().isValidFor(networkSystem.getMode().isAuthority(), false)) {
                     continue;
                 }
                 Set<Class<? extends Component>> requiredComponents = Sets.newLinkedHashSet();

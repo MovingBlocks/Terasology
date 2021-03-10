@@ -1,34 +1,19 @@
-/*
- * Copyright 2013 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-package org.terasology.rendering.primitives;
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
+package org.terasology.engine.rendering.primitives;
 
 import com.google.common.base.Stopwatch;
 import gnu.trove.iterator.TIntIterator;
-import gnu.trove.list.TFloatList;
+import org.joml.Vector3f;
 import org.lwjgl.BufferUtils;
-import org.terasology.engine.subsystem.lwjgl.GLBufferPool;
-import org.terasology.math.Direction;
+import org.terasology.engine.core.subsystem.lwjgl.GLBufferPool;
+import org.terasology.engine.math.Direction;
 import org.terasology.math.TeraMath;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.monitoring.PerformanceMonitor;
-import org.terasology.rendering.RenderMath;
-import org.terasology.world.ChunkView;
-import org.terasology.world.block.Block;
-import org.terasology.world.chunks.ChunkConstants;
-import org.terasology.world.chunks.Chunks;
+import org.terasology.engine.monitoring.PerformanceMonitor;
+import org.terasology.engine.rendering.RenderMath;
+import org.terasology.engine.world.ChunkView;
+import org.terasology.engine.world.block.Block;
+import org.terasology.engine.world.chunks.Chunks;
 
 import java.util.concurrent.TimeUnit;
 

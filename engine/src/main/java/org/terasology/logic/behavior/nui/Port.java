@@ -1,30 +1,18 @@
-/*
- * Copyright 2013 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *  http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-package org.terasology.logic.behavior.nui;
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
+package org.terasology.engine.logic.behavior.nui;
 
+import org.joml.Vector2f;
 import org.joml.Vector2i;
-import org.terasology.math.geom.Rect2f;
-import org.terasology.math.geom.Vector2f;
+import org.terasology.joml.geom.Rectanglef;
+import org.terasology.joml.geom.Rectanglefc;
 import org.terasology.nui.BaseInteractionListener;
 import org.terasology.nui.Canvas;
 import org.terasology.nui.CoreWidget;
 import org.terasology.nui.InteractionListener;
 import org.terasology.nui.UITextureRegion;
 import org.terasology.nui.events.NUIMouseClickEvent;
-import org.terasology.utilities.Assets;
+import org.terasology.engine.utilities.Assets;
 
 /**
  * Represents a port at a RenderableNode. There are several types of ports:
@@ -38,7 +26,7 @@ import org.terasology.utilities.Assets;
  */
 public abstract class Port extends CoreWidget {
     protected RenderableNode node;
-    protected Rect2f rect;
+    protected Rectanglef rect;
     private UITextureRegion active = Assets.getTextureRegion("engine:checkboxChecked").get();
     private UITextureRegion inactive = Assets.getTextureRegion("engine:checkbox").get();
 
@@ -74,14 +62,14 @@ public abstract class Port extends CoreWidget {
         return false;
     }
 
-    public Rect2f getRect() {
+    public Rectanglefc getRect() {
         return rect;
     }
 
     public Vector2f mid() {
-        Vector2f mid = new Vector2f(rect.size());
-        mid.scale(0.5f);
-        mid.add(rect.min());
+        Vector2f mid = rect.getSize(new Vector2f());
+        mid.mul(0.5f);
+        mid.add(rect.minX(), rect.minY());
         return mid;
 
     }
@@ -119,9 +107,9 @@ public abstract class Port extends CoreWidget {
 
         @Override
         public void updateRect() {
-            this.rect = Rect2f.createFromMinAndSize(
+            this.rect = new Rectanglef(
                     index() + 0.4f,
-                    4.05f,
+                    4.05f).setSize(
                     0.6f, 0.9f);
         }
 
@@ -153,9 +141,9 @@ public abstract class Port extends CoreWidget {
 
         @Override
         public void updateRect() {
-            this.rect = Rect2f.createFromMinAndSize(
+            this.rect = new Rectanglef(
                     index(),
-                    4.05f,
+                    4.05f).setSize(
                     0.4f, 0.9f);
         }
 
@@ -191,7 +179,7 @@ public abstract class Port extends CoreWidget {
 
         @Override
         public void updateRect() {
-            rect = Rect2f.createFromMinAndSize(4.5f, 0.05f, 1f, 1f);
+            rect = new Rectanglef(4.5f, 0.05f).setSize(1f, 1f);
         }
 
         public void setTarget(OutputPort port) {

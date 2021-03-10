@@ -1,68 +1,55 @@
-/*
- * Copyright 2013 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 
-package org.terasology.logic.characters;
+package org.terasology.engine.logic.characters;
 
 import com.google.common.collect.Sets;
 import org.joml.Vector3f;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.engine.Time;
-import org.terasology.entitySystem.entity.EntityManager;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.event.EventPriority;
-import org.terasology.entitySystem.event.ReceiveEvent;
-import org.terasology.entitySystem.prefab.Prefab;
-import org.terasology.entitySystem.systems.BaseComponentSystem;
-import org.terasology.entitySystem.systems.RegisterMode;
-import org.terasology.entitySystem.systems.RegisterSystem;
-import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
-import org.terasology.input.binds.interaction.AttackButton;
-import org.terasology.input.cameraTarget.PlayerTargetSystem;
-import org.terasology.logic.characters.events.ActivationRequest;
-import org.terasology.logic.characters.events.ActivationRequestDenied;
-import org.terasology.logic.characters.events.AttackEvent;
-import org.terasology.logic.characters.events.AttackRequest;
-import org.terasology.logic.characters.events.DeathEvent;
-import org.terasology.logic.characters.events.OnItemUseEvent;
-import org.terasology.logic.characters.events.OnScaleEvent;
-import org.terasology.logic.characters.events.PlayerDeathEvent;
-import org.terasology.logic.characters.interactions.InteractionUtil;
-import org.terasology.logic.common.ActivateEvent;
-import org.terasology.logic.common.DisplayNameComponent;
-import org.terasology.logic.health.BeforeDestroyEvent;
-import org.terasology.logic.health.DestroyEvent;
-import org.terasology.logic.health.EngineDamageTypes;
-import org.terasology.logic.inventory.ItemComponent;
-import org.terasology.logic.location.LocationComponent;
-import org.terasology.logic.players.PlayerCharacterComponent;
-import org.terasology.network.ClientComponent;
-import org.terasology.network.NetworkSystem;
-import org.terasology.physics.CollisionGroup;
-import org.terasology.physics.HitResult;
-import org.terasology.physics.Physics;
-import org.terasology.physics.StandardCollisionGroup;
-import org.terasology.physics.engine.PhysicsEngine;
-import org.terasology.recording.DirectionAndOriginPosRecorderList;
-import org.terasology.recording.RecordAndReplayCurrentStatus;
-import org.terasology.recording.RecordAndReplayStatus;
-import org.terasology.registry.In;
-import org.terasology.world.BlockEntityRegistry;
-import org.terasology.world.block.BlockComponent;
-import org.terasology.world.block.regions.ActAsBlockComponent;
+import org.terasology.engine.core.Time;
+import org.terasology.engine.entitySystem.entity.EntityManager;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.entitySystem.event.EventPriority;
+import org.terasology.engine.entitySystem.event.ReceiveEvent;
+import org.terasology.engine.entitySystem.prefab.Prefab;
+import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
+import org.terasology.engine.entitySystem.systems.RegisterMode;
+import org.terasology.engine.entitySystem.systems.RegisterSystem;
+import org.terasology.engine.entitySystem.systems.UpdateSubscriberSystem;
+import org.terasology.engine.input.binds.interaction.AttackButton;
+import org.terasology.engine.input.cameraTarget.PlayerTargetSystem;
+import org.terasology.engine.logic.characters.events.ActivationRequest;
+import org.terasology.engine.logic.characters.events.ActivationRequestDenied;
+import org.terasology.engine.logic.characters.events.AttackEvent;
+import org.terasology.engine.logic.characters.events.AttackRequest;
+import org.terasology.engine.logic.characters.events.DeathEvent;
+import org.terasology.engine.logic.characters.events.OnItemUseEvent;
+import org.terasology.engine.logic.characters.events.OnScaleEvent;
+import org.terasology.engine.logic.characters.events.PlayerDeathEvent;
+import org.terasology.engine.logic.characters.interactions.InteractionUtil;
+import org.terasology.engine.logic.common.ActivateEvent;
+import org.terasology.engine.logic.common.DisplayNameComponent;
+import org.terasology.engine.logic.health.BeforeDestroyEvent;
+import org.terasology.engine.logic.health.DestroyEvent;
+import org.terasology.engine.logic.health.EngineDamageTypes;
+import org.terasology.engine.logic.inventory.ItemComponent;
+import org.terasology.engine.logic.location.LocationComponent;
+import org.terasology.engine.logic.players.PlayerCharacterComponent;
+import org.terasology.engine.network.ClientComponent;
+import org.terasology.engine.network.NetworkSystem;
+import org.terasology.engine.physics.CollisionGroup;
+import org.terasology.engine.physics.HitResult;
+import org.terasology.engine.physics.Physics;
+import org.terasology.engine.physics.StandardCollisionGroup;
+import org.terasology.engine.physics.engine.PhysicsEngine;
+import org.terasology.engine.recording.DirectionAndOriginPosRecorderList;
+import org.terasology.engine.recording.RecordAndReplayCurrentStatus;
+import org.terasology.engine.recording.RecordAndReplayStatus;
+import org.terasology.engine.registry.In;
+import org.terasology.engine.world.BlockEntityRegistry;
+import org.terasology.engine.world.block.BlockComponent;
+import org.terasology.engine.world.block.regions.ActAsBlockComponent;
 
 import java.util.Optional;
 

@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package org.terasology.engine.modes.loadProcesses;
+package org.terasology.engine.core.modes.loadProcesses;
 
-import org.terasology.context.Context;
-import org.terasology.engine.ComponentSystemManager;
-import org.terasology.engine.modes.VariableStepLoadProcess;
-import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
-import org.terasology.logic.players.LocalPlayer;
-import org.terasology.network.ClientComponent;
-import org.terasology.world.chunks.ChunkProvider;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.core.ComponentSystemManager;
+import org.terasology.engine.core.modes.VariableStepLoadProcess;
+import org.terasology.engine.entitySystem.systems.UpdateSubscriberSystem;
+import org.terasology.engine.logic.players.LocalPlayer;
+import org.terasology.engine.network.ClientComponent;
+import org.terasology.engine.world.chunks.ChunkProvider;
 
 /**
  * Loops until player is loaded into the world.

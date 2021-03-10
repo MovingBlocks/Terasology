@@ -19,16 +19,15 @@ package org.terasology.testUtil;
 import com.google.common.collect.Maps;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.world.WorldChangeListener;
-import org.terasology.world.block.Block;
-import org.terasology.world.block.BlockRegion;
-import org.terasology.world.block.BlockRegionc;
-import org.terasology.world.internal.ChunkViewCore;
-import org.terasology.world.internal.WorldInfo;
-import org.terasology.world.internal.WorldProviderCore;
-import org.terasology.world.time.WorldTime;
-import org.terasology.world.time.WorldTimeImpl;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.world.WorldChangeListener;
+import org.terasology.engine.world.block.Block;
+import org.terasology.engine.world.block.BlockRegionc;
+import org.terasology.engine.world.internal.ChunkViewCore;
+import org.terasology.engine.world.internal.WorldInfo;
+import org.terasology.engine.world.internal.WorldProviderCore;
+import org.terasology.engine.world.time.WorldTime;
+import org.terasology.engine.world.time.WorldTimeImpl;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -163,7 +162,7 @@ public class WorldProviderCoreStub implements WorldProviderCore {
     }
 
     @Override
-    public Collection<BlockRegion> getRelevantRegions() {
+    public Collection<BlockRegionc> getRelevantRegions() {
         return Collections.emptySet();
     }
 

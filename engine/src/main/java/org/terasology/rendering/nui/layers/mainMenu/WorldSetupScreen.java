@@ -1,52 +1,38 @@
-/*
- * Copyright 2018 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-package org.terasology.rendering.nui.layers.mainMenu;
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
+package org.terasology.engine.rendering.nui.layers.mainMenu;
 
 import org.terasology.assets.ResourceUrn;
-import org.terasology.config.Config;
-import org.terasology.context.Context;
-import org.terasology.engine.SimpleUri;
-import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.metadata.ComponentLibrary;
-import org.terasology.i18n.TranslationSystem;
+import org.terasology.engine.config.Config;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.core.SimpleUri;
+import org.terasology.engine.entitySystem.Component;
+import org.terasology.engine.entitySystem.metadata.ComponentLibrary;
+import org.terasology.engine.i18n.TranslationSystem;
+import org.terasology.engine.rendering.nui.animation.MenuAnimationSystems;
+import org.terasology.engine.rendering.world.WorldSetupWrapper;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.naming.Name;
-import org.terasology.nui.properties.OneOfProviderFactory;
-import org.terasology.reflection.metadata.FieldMetadata;
-import org.terasology.reflection.reflect.ReflectFactory;
-import org.terasology.registry.In;
-import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.nui.WidgetUtil;
-import org.terasology.rendering.nui.animation.MenuAnimationSystems;
 import org.terasology.nui.databinding.Binding;
 import org.terasology.nui.layouts.PropertyLayout;
+import org.terasology.nui.properties.OneOfProviderFactory;
 import org.terasology.nui.properties.Property;
 import org.terasology.nui.properties.PropertyOrdering;
 import org.terasology.nui.properties.PropertyProvider;
 import org.terasology.nui.widgets.UIDropdownScrollable;
 import org.terasology.nui.widgets.UILabel;
 import org.terasology.nui.widgets.UIText;
-import org.terasology.nui.properties.PropertyProvider;
-import org.terasology.rendering.world.WorldSetupWrapper;
-import org.terasology.world.generator.UnresolvedWorldGeneratorException;
-import org.terasology.world.generator.WorldConfigurator;
-import org.terasology.world.generator.WorldGenerator;
-import org.terasology.world.generator.internal.WorldGeneratorManager;
-import org.terasology.world.generator.plugin.TempWorldGeneratorPluginLibrary;
-import org.terasology.world.generator.plugin.WorldGeneratorPluginLibrary;
+import org.terasology.reflection.metadata.FieldMetadata;
+import org.terasology.reflection.reflect.ReflectFactory;
+import org.terasology.engine.registry.In;
+import org.terasology.engine.rendering.nui.CoreScreenLayer;
+import org.terasology.engine.world.generator.UnresolvedWorldGeneratorException;
+import org.terasology.engine.world.generator.WorldConfigurator;
+import org.terasology.engine.world.generator.WorldGenerator;
+import org.terasology.engine.world.generator.internal.WorldGeneratorManager;
+import org.terasology.engine.world.generator.plugin.TempWorldGeneratorPluginLibrary;
+import org.terasology.engine.world.generator.plugin.WorldGeneratorPluginLibrary;
 
 import java.util.List;
 import java.util.Map;
