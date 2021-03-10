@@ -3,8 +3,11 @@
 package org.terasology.engine.core.subsystem.common;
 
 import com.google.common.collect.Iterables;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.engine.config.flexible.AutoConfigTypeHandlerFactory;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.config.facade.BindsConfiguration;
 import org.terasology.engine.config.facade.BindsConfigurationImpl;
@@ -20,6 +23,11 @@ import org.terasology.engine.identity.CertificatePair;
 import org.terasology.engine.identity.PrivateIdentityCertificate;
 import org.terasology.engine.identity.PublicIdentityCertificate;
 import org.terasology.engine.identity.storageServiceClient.StorageServiceWorker;
+import org.terasology.engine.persistence.typeHandling.gson.GsonPersistedData;
+import org.terasology.engine.persistence.typeHandling.gson.GsonPersistedDataReader;
+import org.terasology.engine.persistence.typeHandling.gson.GsonPersistedDataSerializer;
+import org.terasology.engine.persistence.typeHandling.gson.GsonPersistedDataWriter;
+import org.terasology.persistence.serializers.Serializer;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 
 /**
@@ -70,7 +78,16 @@ public class ConfigurationSubsystem implements EngineSubsystem {
     public void initialise(GameEngine engine, Context rootContext) {
         // TODO: Put here because of TypeHandlerLibrary dependency,
         //  might need to move to preInitialise or elsewhere
-        autoConfigManager = new AutoConfigManager(rootContext.get(TypeHandlerLibrary.class));
+        TypeHandlerLibrary typeHandlerLibrary = rootContext.get(TypeHandlerLibrary.class);
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        Serializer<GsonPersistedData> serializer = new Serializer<>(
+                typeHandlerLibrary,
+                new GsonPersistedDataSerializer(),
+                new GsonPersistedDataWriter(gson),
+                new GsonPersistedDataReader(gson)
+        );
+        autoConfigManager = new AutoConfigManager(serializer);
+        typeHandlerLibrary.addTypeHandlerFactory(new AutoConfigTypeHandlerFactory(typeHandlerLibrary));
         rootContext.put(AutoConfigManager.class, autoConfigManager);
 
         autoConfigManager.loadConfigsIn(rootContext);

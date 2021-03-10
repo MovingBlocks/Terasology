@@ -3,15 +3,19 @@
 
 package org.terasology.engine.persistence.typeHandling.mathTypes;
 
+import com.google.gson.Gson;
 import org.junit.jupiter.api.Test;
 import org.terasology.engine.ModuleEnvironmentTest;
 import org.terasology.engine.core.module.ModuleContext;
-import org.terasology.engine.persistence.serializers.GsonSerializer;
 import org.terasology.engine.persistence.serializers.ProtobufSerializer;
 import org.terasology.engine.persistence.typeHandling.TypeHandlerLibraryImpl;
+import org.terasology.engine.persistence.typeHandling.gson.GsonPersistedDataReader;
+import org.terasology.engine.persistence.typeHandling.gson.GsonPersistedDataSerializer;
+import org.terasology.engine.persistence.typeHandling.gson.GsonPersistedDataWriter;
 import org.terasology.engine.world.block.BlockArea;
 import org.terasology.engine.world.block.BlockAreac;
 import org.terasology.naming.Name;
+import org.terasology.persistence.serializers.Serializer;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.reflection.TypeInfo;
 
@@ -28,7 +32,8 @@ public class BlockAreaTypeHandlerTest extends ModuleEnvironmentTest {
 
     private TypeHandlerLibrary typeHandlerLibrary;
     private ProtobufSerializer protobufSerializer;
-    private GsonSerializer gsonSerializer;
+    private Serializer<?> gsonSerializer;
+    private Gson gson = new Gson();
 
     @Override
     public void setup() {
@@ -37,7 +42,11 @@ public class BlockAreaTypeHandlerTest extends ModuleEnvironmentTest {
         typeHandlerLibrary = TypeHandlerLibraryImpl.forModuleEnvironment(moduleManager, typeRegistry);
 
         protobufSerializer = new ProtobufSerializer(typeHandlerLibrary);
-        gsonSerializer = new GsonSerializer(typeHandlerLibrary);
+        gsonSerializer = new Serializer<>(typeHandlerLibrary,
+                new GsonPersistedDataSerializer(),
+                new GsonPersistedDataWriter(gson),
+                new GsonPersistedDataReader(gson)
+        );
     }
 
     @Test
@@ -46,11 +55,11 @@ public class BlockAreaTypeHandlerTest extends ModuleEnvironmentTest {
         a.b1 = new BlockArea(-1, -1, 0, 0);
         a.b2 = new BlockArea(0, 0, 1, 1);
 
-        String data = gsonSerializer.toJson(a, new TypeInfo<TestObject>() {
-        });
+        byte[] data = gsonSerializer.serialize(a, new TypeInfo<TestObject>() {
+        }).get();
 
-        TestObject o = gsonSerializer.fromJson(data, new TypeInfo<TestObject>() {
-        });
+        TestObject o = gsonSerializer.deserialize(new TypeInfo<TestObject>() {
+        },data).get();
         assertEquals(o.b1, new BlockArea(-1, -1, 0, 0));
         assertEquals(o.b2, new BlockArea(0, 0, 1, 1));
     }
