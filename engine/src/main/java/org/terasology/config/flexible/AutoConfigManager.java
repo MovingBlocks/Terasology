@@ -3,26 +3,25 @@
 package org.terasology.engine.config.flexible;
 
 import com.google.common.collect.Sets;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.core.SimpleUri;
-import org.terasology.engine.core.TerasologyConstants;
 import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.engine.core.paths.PathManager;
 import org.terasology.engine.registry.InjectionHelper;
 import org.terasology.engine.utilities.ReflectionUtil;
 import org.terasology.module.ModuleEnvironment;
-import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
+import org.terasology.persistence.serializers.Serializer;
+import org.terasology.reflection.TypeInfo;
 
-import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.Reader;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
@@ -32,13 +31,12 @@ import java.util.Set;
  */
 public class AutoConfigManager {
     private static final Logger logger = LoggerFactory.getLogger(AutoConfigManager.class);
-    private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
     private final Set<AutoConfig> loadedConfigs = Sets.newHashSet();
-    private final TypeHandlerLibrary typeHandlerLibrary;
+    private final Serializer<?> serializer;
 
-    public AutoConfigManager(TypeHandlerLibrary typeHandlerLibrary) {
-        this.typeHandlerLibrary = typeHandlerLibrary;
+    public AutoConfigManager(Serializer<?> serializer) {
+        this.serializer = serializer;
     }
 
     public void loadConfigsIn(Context context) {
@@ -73,18 +71,29 @@ public class AutoConfigManager {
     }
 
     private <T extends AutoConfig> void loadSettingsFromDisk(Class<T> configClass, T config) {
-        AutoConfigSerializer<T> serializer = new AutoConfigSerializer<>(configClass, typeHandlerLibrary);
 
         Path configPath = getConfigPath(config.getId());
 
         if (!Files.exists(configPath)) {
             return;
         }
-
-        try (Reader reader = Files.newBufferedReader(configPath, TerasologyConstants.CHARSET)) {
-            serializer.deserializeOnto(config, gson.fromJson(reader, JsonElement.class));
+        try (InputStream inputStream = Files.newInputStream(configPath, StandardOpenOption.READ)) {
+            T loadedConfig = (T) serializer.deserialize(TypeInfo.of(configClass), inputStream).get();
+            mergeConfig(configClass, loadedConfig, config);
         } catch (IOException e) {
             logger.error("Error while loading config {} from disk", config.getId(), e);
+        }
+    }
+
+    private <T extends AutoConfig> void mergeConfig(Class<T> configClass, T loadedConfig, T config) {
+        Set<Field> fields = AutoConfig.getSettingFieldsIn(configClass);
+        for (Field field : fields) {
+            try {
+                Object value = ((Setting) field.get(loadedConfig)).get();
+                ((Setting) field.get(config)).set(value);
+            } catch (IllegalAccessException e) {
+                // ignore `AutoConfig.getSettingFieldIn` returns PUBLIC fields
+            }
         }
     }
 
@@ -96,16 +105,11 @@ public class AutoConfigManager {
         }
     }
 
-    private <T extends AutoConfig> void saveConfigToDisk(T config) {
+    private void saveConfigToDisk(AutoConfig config) {
         // TODO: Save when screen for config closed
-        Class<T> configClass = (Class<T>) config.getClass();
-        AutoConfigSerializer<T> serializer = new AutoConfigSerializer<>(configClass, typeHandlerLibrary);
-
         Path configPath = getConfigPath(config.getId());
-
-        try (BufferedWriter writer = Files.newBufferedWriter(configPath, TerasologyConstants.CHARSET)) {
-            JsonElement json = serializer.serialize(config);
-            gson.toJson(json, writer);
+        try (OutputStream output = Files.newOutputStream(configPath, StandardOpenOption.CREATE)) {
+            serializer.serialize(config, TypeInfo.of(AutoConfig.class), output);
         } catch (IOException e) {
             logger.error("Error while saving config {} to disk", config.getId(), e);
         }

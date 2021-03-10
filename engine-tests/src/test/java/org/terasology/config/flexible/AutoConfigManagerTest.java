@@ -1,7 +1,8 @@
-// Copyright 2021 The Terasology Foundation
+// Copyright 2020 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.config.flexible;
 
+import com.google.gson.Gson;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -10,8 +11,12 @@ import org.terasology.engine.context.Context;
 import org.terasology.engine.core.SimpleUri;
 import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.engine.core.paths.PathManager;
+import org.terasology.engine.persistence.typeHandling.gson.GsonPersistedDataReader;
+import org.terasology.engine.persistence.typeHandling.gson.GsonPersistedDataSerializer;
+import org.terasology.engine.persistence.typeHandling.gson.GsonPersistedDataWriter;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.naming.Name;
+import org.terasology.persistence.serializers.Serializer;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 
 import java.nio.file.Path;
@@ -24,11 +29,17 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class AutoConfigManagerTest {
+class AutoConfigManagerTest {
     private static final Name PROVIDING_MODULE = new Name("unittest");
+    private final Gson gson = new Gson();
 
     private final TypeHandlerLibrary typeHandlerLibrary = mock(TypeHandlerLibrary.class);
-    private final AutoConfigManager autoConfigManager = new AutoConfigManager(typeHandlerLibrary);
+    private final AutoConfigManager autoConfigManager = new AutoConfigManager(new Serializer<>(
+            typeHandlerLibrary,
+            new GsonPersistedDataSerializer(),
+            new GsonPersistedDataWriter(gson),
+            new GsonPersistedDataReader(gson)
+    ));
 
     private final Context context = mock(Context.class);
     private final ModuleManager moduleManager = mock(ModuleManager.class);
