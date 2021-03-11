@@ -3,99 +3,99 @@
   <component name="CheckStyle-IDEA">
     <option name="configuration">
       <map>
-        <entry key="checkstyle-version" value="8.40" />
-        <entry key="copy-libs" value="true" />
-        <entry key="location-0" value="BUNDLED:(bundled):Sun Checks" />
-        <entry key="location-1" value="BUNDLED:(bundled):Google Checks" />
-        <entry key="scan-before-checkin" value="false" />
-        <entry key="scanscope" value="JavaOnly" />
-        <entry key="suppress-errors" value="false" />
+        <entry key="checkstyle-version" value="8.40"/>
+        <entry key="copy-libs" value="true"/>
+        <entry key="location-0" value="BUNDLED:(bundled):Sun Checks"/>
+        <entry key="location-1" value="BUNDLED:(bundled):Google Checks"/>
+        <entry key="scan-before-checkin" value="false"/>
+        <entry key="scanscope" value="JavaOnly"/>
+        <entry key="suppress-errors" value="false"/>
       </map>
     </option>
   </component>
   <component name="CompilerConfiguration">
     <resourceExtensions>
-      <entry name=".+\.(properties|xml|html|dtd|tld)" />
-      <entry name=".+\.(gif|png|jpeg|jpg)" />
+      <entry name=".+\.(properties|xml|html|dtd|tld)"/>
+      <entry name=".+\.(gif|png|jpeg|jpg)"/>
     </resourceExtensions>
     <wildcardResourcePatterns>
-      <entry name="!?*.class" />
-      <entry name="!?*.scala" />
-      <entry name="!?*.groovy" />
-      <entry name="!?*.java" />
+      <entry name="!?*.class"/>
+      <entry name="!?*.scala"/>
+      <entry name="!?*.groovy"/>
+      <entry name="!?*.java"/>
     </wildcardResourcePatterns>
-    <bytecodeTargetLevel target="1.8" />
+    <bytecodeTargetLevel target="1.8"/>
   </component>
   <component name="CopyrightManager" default="">
-    <module2copyright />
+    <module2copyright/>
   </component>
   <component name="DependencyValidationManager">
-    <option name="SKIP_IMPORT_STATEMENTS" value="false" />
+    <option name="SKIP_IMPORT_STATEMENTS" value="false"/>
   </component>
   <component name="GradleUISettings">
-    <setting name="root" />
+    <setting name="root"/>
   </component>
   <component name="GradleUISettings2">
-    <setting name="root" />
+    <setting name="root"/>
   </component>
-  <component name="IdProvider" IDEtalkID="11DA1DB66DD62DDA1ED602B7079FE97C" />
+  <component name="IdProvider" IDEtalkID="11DA1DB66DD62DDA1ED602B7079FE97C"/>
   <component name="InspectionProjectProfileManager">
     <profile version="1.0">
-      <option name="myName" value="Project Default" />
+      <option name="myName" value="Project Default"/>
     </profile>
-    <version value="1.0" />
+    <version value="1.0"/>
   </component>
   <component name="JavadocGenerationManager">
-    <option name="OUTPUT_DIRECTORY" />
-    <option name="OPTION_SCOPE" value="protected" />
-    <option name="OPTION_HIERARCHY" value="true" />
-    <option name="OPTION_NAVIGATOR" value="true" />
-    <option name="OPTION_INDEX" value="true" />
-    <option name="OPTION_SEPARATE_INDEX" value="true" />
-    <option name="OPTION_DOCUMENT_TAG_USE" value="false" />
-    <option name="OPTION_DOCUMENT_TAG_AUTHOR" value="false" />
-    <option name="OPTION_DOCUMENT_TAG_VERSION" value="false" />
-    <option name="OPTION_DOCUMENT_TAG_DEPRECATED" value="true" />
-    <option name="OPTION_DEPRECATED_LIST" value="true" />
-    <option name="OTHER_OPTIONS" value="" />
-    <option name="HEAP_SIZE" />
-    <option name="LOCALE" />
-    <option name="OPEN_IN_BROWSER" value="true" />
+    <option name="OUTPUT_DIRECTORY"/>
+    <option name="OPTION_SCOPE" value="protected"/>
+    <option name="OPTION_HIERARCHY" value="true"/>
+    <option name="OPTION_NAVIGATOR" value="true"/>
+    <option name="OPTION_INDEX" value="true"/>
+    <option name="OPTION_SEPARATE_INDEX" value="true"/>
+    <option name="OPTION_DOCUMENT_TAG_USE" value="false"/>
+    <option name="OPTION_DOCUMENT_TAG_AUTHOR" value="false"/>
+    <option name="OPTION_DOCUMENT_TAG_VERSION" value="false"/>
+    <option name="OPTION_DOCUMENT_TAG_DEPRECATED" value="true"/>
+    <option name="OPTION_DEPRECATED_LIST" value="true"/>
+    <option name="OTHER_OPTIONS" value=""/>
+    <option name="HEAP_SIZE"/>
+    <option name="LOCALE"/>
+    <option name="OPEN_IN_BROWSER" value="true"/>
   </component>
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/Terasology.iml" filepath="$PROJECT_DIR$/Terasology.iml" />
-      <module fileurl="file://$PROJECT_DIR$/engine/engine.iml" filepath="$PROJECT_DIR$/engine/engine.iml" />
-      <module fileurl="file://$PROJECT_DIR$/engine-tests/engine-tests.iml" filepath="$PROJECT_DIR$/engine-tests/engine-tests.iml" />
-      <module fileurl="file://$PROJECT_DIR$/facades/PC/PC.iml" filepath="$PROJECT_DIR$/facades/PC/PC.iml" />
-      <module fileurl="file://$PROJECT_DIR$/facades/TeraEd/TeraEd.iml" filepath="$PROJECT_DIR$/facades/TeraEd/TeraEd.iml" />
-      <module fileurl="file://$PROJECT_DIR$/subsystems/DiscordRPC/DiscordRPC.iml" filepath="$PROJECT_DIR$/subsystems/DiscordRPC/DiscordRPC.iml" />
-      <module fileurl="file://$PROJECT_DIR$/subsystems/TypeHandlerLibrary/TypeHandlerLibrary.iml" filepath="$PROJECT_DIR$/subsystems/TypeHandlerLibrary/TypeHandlerLibrary.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Terasology.iml" filepath="$PROJECT_DIR$/Terasology.iml"/>
+      <module fileurl="file://$PROJECT_DIR$/engine/engine.iml" filepath="$PROJECT_DIR$/engine/engine.iml"/>
+      <module fileurl="file://$PROJECT_DIR$/engine-tests/engine-tests.iml" filepath="$PROJECT_DIR$/engine-tests/engine-tests.iml"/>
+      <module fileurl="file://$PROJECT_DIR$/facades/PC/PC.iml" filepath="$PROJECT_DIR$/facades/PC/PC.iml"/>
+      <module fileurl="file://$PROJECT_DIR$/facades/TeraEd/TeraEd.iml" filepath="$PROJECT_DIR$/facades/TeraEd/TeraEd.iml"/>
+      <module fileurl="file://$PROJECT_DIR$/subsystems/DiscordRPC/DiscordRPC.iml" filepath="$PROJECT_DIR$/subsystems/DiscordRPC/DiscordRPC.iml"/>
+      <module fileurl="file://$PROJECT_DIR$/subsystems/TypeHandlerLibrary/TypeHandlerLibrary.iml" filepath="$PROJECT_DIR$/subsystems/TypeHandlerLibrary/TypeHandlerLibrary.iml"/>
     </modules>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_8" project-jdk-name="11" project-jdk-type="JavaSDK">
-    <output url="file://$PROJECT_DIR$/out" />
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_8" project-jdk-name="11" project-jdk-type="JavaSDK" assert-keyword="true" assert-jdk-15="true">
+    <output url="file://$PROJECT_DIR$/out"/>
   </component>
   <component name="SvnBranchConfigurationManager">
-    <option name="mySupportsUserInfoFilter" value="true" />
+    <option name="mySupportsUserInfoFilter" value="true"/>
   </component>
   <component name="VcsDirectoryMappings">
-    <mapping directory="$PROJECT_DIR$" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$" vcs="Git"/>
   </component>
   <component name="masterDetails">
     <states>
       <state key="ArtifactsStructureConfigurable.UI">
         <UIState>
           <splitter-proportions>
-            <SplitterProportionsDataImpl />
+            <SplitterProportionsDataImpl/>
           </splitter-proportions>
-          <settings />
+          <settings/>
         </UIState>
       </state>
       <state key="Copyright.UI">
         <UIState>
           <splitter-proportions>
-            <SplitterProportionsDataImpl />
+            <SplitterProportionsDataImpl/>
           </splitter-proportions>
         </UIState>
       </state>
@@ -105,7 +105,7 @@
             <SplitterProportionsDataImpl>
               <option name="proportions">
                 <list>
-                  <option value="0.2" />
+                  <option value="0.2"/>
                 </list>
               </option>
             </SplitterProportionsDataImpl>
@@ -116,9 +116,9 @@
       <state key="ScopeChooserConfigurable.UI">
         <UIState>
           <splitter-proportions>
-            <SplitterProportionsDataImpl />
+            <SplitterProportionsDataImpl/>
           </splitter-proportions>
-          <settings />
+          <settings/>
         </UIState>
       </state>
     </states>
