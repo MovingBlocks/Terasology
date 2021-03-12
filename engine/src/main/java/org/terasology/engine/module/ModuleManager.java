@@ -13,6 +13,7 @@ import org.terasology.engine.config.Config;
 import org.terasology.engine.config.SystemConfig;
 import org.terasology.engine.core.TerasologyConstants;
 import org.terasology.engine.core.paths.PathManager;
+import org.terasology.engine.utilities.Jvm;
 import org.terasology.input.device.KeyboardDevice;
 import org.terasology.module.ClasspathModule;
 import org.terasology.module.DependencyInfo;
@@ -33,7 +34,6 @@ import org.terasology.module.sandbox.StandardPermissionProviderFactory;
 import org.terasology.module.sandbox.WarnOnlyProviderFactory;
 import org.terasology.nui.UIWidget;
 import org.terasology.reflection.TypeRegistry;
-import org.terasology.engine.utilities.Jvm;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -229,29 +229,28 @@ public class ModuleManager {
     }
 
     /**
-     * Load a module from the given path.
+     * Load a module from the location containing a class.
      *
-     * Assumes that the path <em>should</em> contain a Terasology module. Will add the module to
+     * Assumes that the location <em>should</em> contain a Terasology module. Will add the module to
      * {@link #registry} and return the resulting module if successful.
      *
      * May throw IOException or RuntimeExceptions on failure.
      *
      * For troubleshooting failure cases, check for log messages from this package and from {@link ModuleLoader}.
      *
-     * @param path the path to the jar or directory
+     * @param clazz a class in the module, see {@link ClasspathModule#create}
      */
-    public Module loadClasspathModule(Path path) throws IOException {
-        ModuleLoader loader = new ClasspathSupportingModuleLoader(metadataReader, true, false);
+    public Module loadClasspathModule(Class<?> clazz) throws IOException {
+        ClasspathSupportingModuleLoader loader = new ClasspathSupportingModuleLoader(metadataReader, true, false);
         loader.setModuleInfoPath(TerasologyConstants.MODULE_INFO_FILENAME);
 
-        //noinspection UnstableApiUsage
-        Module module = verifyNotNull(loader.load(path), "Failed to load module from %s", path);
+        Module module = verifyNotNull(loader.load(clazz), "Failed to load module from %s", clazz);
         boolean isNew = registry.add(module);
         if (isNew) {
-            logger.info("Added new module: {} from {} on classpath", module, path.getFileName());
+            logger.info("Added new module: {} from {} on classpath", module, module.getClasspaths());
         } else {
             logger.warn("Skipped duplicate module: {}-{} from {} on classpath",
-                    module.getId(), module.getVersion(), path.getFileName());
+                    module.getId(), module.getVersion(), module.getClasspaths());
         }
         return module;
     }
