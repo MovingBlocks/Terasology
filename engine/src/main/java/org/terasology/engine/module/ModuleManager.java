@@ -73,6 +73,10 @@ public class ModuleManager {
     }
 
     public ModuleManager(String masterServerAddress, List<Class<?>> classesOnClasspathsToAddToEngine) {
+        this(masterServerAddress, classesOnClasspathsToAddToEngine, null);
+    }
+
+    public ModuleManager(String masterServerAddress, List<Class<?>> classesOnClasspathsToAddToEngine, Boolean loadModulesFromClasspath) {
         PathManager pathManager = PathManager.getInstance();  // get early so if it needs to initialize, it does it now
 
         metadataReader = newMetadataReader();
@@ -82,7 +86,7 @@ public class ModuleManager {
         registry = new TableModuleRegistry();
         registry.add(engineModule);
 
-        if (doLoadModulesFromClasspath()) {
+        if (doLoadModulesFromClasspath(loadModulesFromClasspath)) {
             loadModulesFromClassPath();
         } else {
             logger.info("Not loading classpath modules.");
@@ -162,14 +166,21 @@ public class ModuleManager {
         return metadataJsonAdapter;
     }
 
-    boolean doLoadModulesFromClasspath() {
+    boolean doLoadModulesFromClasspath(Boolean loadModulesFromClasspath) {
         boolean env = Boolean.parseBoolean(System.getenv(LOAD_CLASSPATH_MODULES_ENV));
         boolean prop = Boolean.getBoolean(LOAD_CLASSPATH_MODULES_PROPERTY);
-        logger.debug("Load modules from classpath? {} [env: {}, property: {}]",
-                env || prop,
+        boolean useClasspath;
+        if (loadModulesFromClasspath != null) {
+            useClasspath = loadModulesFromClasspath;
+        } else {
+            useClasspath = env || prop;
+        }
+        logger.debug("Load modules from classpath? {} [arg: {}, env: {}, property: {}]",
+                useClasspath,
+                loadModulesFromClasspath,
                 System.getenv(LOAD_CLASSPATH_MODULES_ENV),
                 System.getProperty(LOAD_CLASSPATH_MODULES_PROPERTY));
-        return env || prop;
+        return useClasspath;
     }
 
     /**

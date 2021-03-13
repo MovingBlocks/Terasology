@@ -9,6 +9,7 @@ import org.terasology.module.Module;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.Collections;
 
 import static com.google.common.base.Verify.verify;
 import static org.terasology.engine.core.TerasologyConstants.ENGINE_MODULE;
@@ -18,7 +19,11 @@ public final class ModuleManagerFactory {
     private ModuleManagerFactory() { }
 
     public static ModuleManager create() throws Exception {
-        ModuleManager moduleManager = new ModuleManager("");
+        return create(false);
+    }
+
+    public static ModuleManager create(boolean loadModulesFromClasspath) throws Exception {
+        ModuleManager moduleManager = new ModuleManager("", Collections.emptyList(), loadModulesFromClasspath);
         loadUnitTestModule(moduleManager);
         return moduleManager;
     }
