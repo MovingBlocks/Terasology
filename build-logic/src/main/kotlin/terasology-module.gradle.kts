@@ -182,6 +182,11 @@ tasks.named("jar") {
     finalizedBy("cleanReflections")
 }
 
+tasks.named<Test>("test") {
+    useJUnitPlatform()
+    systemProperty("junit.jupiter.execution.timeout.default", "4m")
+}
+
 // Prep an IntelliJ module for the Terasology module - yes, might want to read that twice :D
 configure<IdeaModel> {
     module {
