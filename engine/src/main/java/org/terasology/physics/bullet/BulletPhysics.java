@@ -890,11 +890,13 @@ public class BulletPhysics implements PhysicsEngine {
 
         @Override
         public void setLinearVelocity(Vector3f value) {
+            rb.activate();
             rb.setLinearVelocity(value);
         }
 
         @Override
         public void setAngularVelocity(Vector3f value) {
+            rb.activate();
             rb.setAngularVelocity(value);
         }
 
@@ -908,9 +910,6 @@ public class BulletPhysics implements PhysicsEngine {
         public void setLocation(Vector3f location) {
             Matrix4f translation = rb.getWorldTransform();
             Quaternionf quaternion = new Quaternionf().setFromUnnormalized(translation);
-
-//            Quat4f quaternion = new Quat4f();
-//            quaternion.set(translation);
 
             rb.setWorldTransform(new Matrix4f().translationRotateScale(location, quaternion, 1.0f));
 
