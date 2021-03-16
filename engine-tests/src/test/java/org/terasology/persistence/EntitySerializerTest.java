@@ -1,11 +1,12 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.persistence;
 
 import com.google.common.collect.Lists;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.ResourceLock;
+import org.terasology.engine.TestResourceLocks;
 import org.terasology.assets.AssetFactory;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
@@ -45,18 +46,19 @@ import static org.terasology.engine.entitySystem.entity.internal.EntityScope.GLO
 
 /**
  */
+@ResourceLock(TestResourceLocks.CORE_REGISTRY)
 public class EntitySerializerTest {
 
-    private static Context context;
-    private static ModuleManager moduleManager;
+    private Context context;
+    private ModuleManager moduleManager;
     private ComponentLibrary componentLibrary;
     private EngineEntityManager entityManager;
     private EntitySerializer entitySerializer;
     private Prefab prefab;
 
 
-    @BeforeAll
-    public static void setupClass() throws Exception {
+    @BeforeEach
+    public void setup() throws Exception {
         context = new ContextImpl();
         CoreRegistry.setContext(context);
         context.put(RecordAndReplayCurrentStatus.class, new RecordAndReplayCurrentStatus());
@@ -68,10 +70,6 @@ public class EntitySerializerTest {
                 (AssetFactory<Prefab, PrefabData>) PojoPrefab::new, "prefabs");
         assetTypeManager.switchEnvironment(moduleManager.getEnvironment());
         context.put(AssetManager.class, assetTypeManager.getAssetManager());
-    }
-
-    @BeforeEach
-    public void setup() {
         NetworkSystem networkSystem = mock(NetworkSystem.class);
         when(networkSystem.getMode()).thenReturn(NetworkMode.NONE);
         context.put(NetworkSystem.class, networkSystem);

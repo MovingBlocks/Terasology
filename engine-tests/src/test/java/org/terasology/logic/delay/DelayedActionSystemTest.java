@@ -28,9 +28,7 @@ public class DelayedActionSystemTest extends TerasologyTestingEnvironment {
     private Time time;
 
     @BeforeEach
-    @Override
     public void setup() throws Exception {
-        super.setup();
 
         delayedActionSystem = new DelayedActionSystem();
         nextFakeEntityId = 1;

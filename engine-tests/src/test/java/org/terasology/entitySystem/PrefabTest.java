@@ -4,8 +4,11 @@ package org.terasology.engine.entitySystem;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.ResourceLock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.engine.MockedPathManager;
+import org.terasology.engine.TestResourceLocks;
 import org.terasology.assets.AssetFactory;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.assets.module.ModuleAwareAssetTypeManager;
@@ -43,9 +46,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-/**
- */
-public class PrefabTest {
+@ResourceLock(TestResourceLocks.CORE_REGISTRY)
+public class PrefabTest implements MockedPathManager {
 
     private static final Logger logger = LoggerFactory.getLogger(PrefabTest.class);
 

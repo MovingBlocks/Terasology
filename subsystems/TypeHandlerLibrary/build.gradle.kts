@@ -1,4 +1,4 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
 plugins {
@@ -22,7 +22,10 @@ dependencies {
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.5.2")
     testImplementation("org.junit.jupiter:junit-jupiter-params:5.5.2")
-    testImplementation("org.mockito:mockito-junit-jupiter:3.2.0")
+    testImplementation("org.mockito:mockito-junit-jupiter:3.7.7") {
+        exclude(group = "org.mockito", module = "mockito-core")
+    }
+    testImplementation("org.mockito:mockito-inline:3.7.7")
 
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.5.2")
 }

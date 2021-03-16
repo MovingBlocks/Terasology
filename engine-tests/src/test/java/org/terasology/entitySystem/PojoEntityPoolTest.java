@@ -1,10 +1,12 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.entitySystem;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.ResourceLock;
+import org.terasology.engine.TestResourceLocks;
 import org.terasology.assets.AssetFactory;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.assets.module.ModuleAwareAssetTypeManager;
@@ -32,6 +34,7 @@ import static org.mockito.Mockito.when;
 
 /**
  */
+@ResourceLock(TestResourceLocks.CORE_REGISTRY)
 public class PojoEntityPoolTest {
 
     private PojoEntityPool pool;

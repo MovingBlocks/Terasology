@@ -1,18 +1,5 @@
-/*
- * Copyright 2013 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.engine.network;
 
@@ -20,6 +7,7 @@ import com.google.common.collect.Lists;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.ResourceLock;
 import org.terasology.engine.TerasologyTestingEnvironment;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.core.EngineTime;
@@ -44,7 +32,6 @@ public class TestNetwork extends TerasologyTestingEnvironment {
 
     @BeforeEach
     public void setup() throws Exception {
-        super.setup();
         CertificateGenerator generator = new CertificateGenerator();
         CertificatePair serverIdentiy = generator.generateSelfSigned();
         context.get(Config.class).getSecurity().setServerCredentials(serverIdentiy.getPublicCert(), serverIdentiy.getPrivateCert());
@@ -57,6 +44,7 @@ public class TestNetwork extends TerasologyTestingEnvironment {
     }
 
     @Test
+    @ResourceLock("Net_7777")
     public void testNetwork() throws Exception {
         EngineEntityManager entityManager = getEntityManager();
         EngineTime time = mock(EngineTime.class);
@@ -81,6 +69,7 @@ public class TestNetwork extends TerasologyTestingEnvironment {
 
 
     @Test
+    @ResourceLock("Net_7777")
     public void testEntityNetworkIdChangedOnServerStart() throws HostingFailedException {
         EngineEntityManager entityManager = getEntityManager();
         NetworkComponent netComp = new NetworkComponent();

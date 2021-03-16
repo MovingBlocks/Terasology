@@ -16,7 +16,7 @@ import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
-public abstract class ModuleEnvironmentTest {
+public abstract class ModuleEnvironmentTest implements MockedPathManager {
     protected ModuleManager moduleManager;
     protected TypeRegistry typeRegistry;
 

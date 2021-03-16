@@ -16,6 +16,7 @@ import java.awt.image.DataBufferByte;
 import java.awt.image.WritableRaster;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.file.PathMatcher;
 import java.util.List;
@@ -110,7 +111,7 @@ public class AWTTextureFormat extends AbstractAssetFileFormat<TextureData> {
         } else {
             throw new IOException("Unsupported AWT format: " + image.getType());
         }
-        buf.flip();
+        ((Buffer) buf).flip(); // Explicitly casting for Java11/Java8 compability. problem at bytecode level
 
         return new TextureData(image.getWidth(), image.getHeight(), new ByteBuffer[]{buf}, Texture.WrapMode.CLAMP, filterMode);
     }

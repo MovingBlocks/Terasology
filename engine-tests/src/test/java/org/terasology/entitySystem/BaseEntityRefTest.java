@@ -1,11 +1,13 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.entitySystem;
 
 import com.google.common.collect.Lists;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.ResourceLock;
+import org.terasology.engine.MockedPathManager;
+import org.terasology.engine.TestResourceLocks;
 import org.terasology.assets.AssetFactory;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.assets.module.ModuleAwareAssetTypeManager;
@@ -38,14 +40,15 @@ import static org.terasology.engine.entitySystem.entity.internal.EntityScope.CHU
 import static org.terasology.engine.entitySystem.entity.internal.EntityScope.GLOBAL;
 import static org.terasology.engine.entitySystem.entity.internal.EntityScope.SECTOR;
 
-public class BaseEntityRefTest {
+@ResourceLock(TestResourceLocks.CORE_REGISTRY)
+public class BaseEntityRefTest implements MockedPathManager {
 
-    private static Context context;
+    private Context context;
     private PojoEntityManager entityManager;
     private EntityRef ref;
 
-    @BeforeAll
-    public static void setupClass() throws Exception {
+    @BeforeEach
+    public void setupClass() throws Exception {
         context = new ContextImpl();
         ModuleManager moduleManager = ModuleManagerFactory.create();
         context.put(ModuleManager.class, moduleManager);

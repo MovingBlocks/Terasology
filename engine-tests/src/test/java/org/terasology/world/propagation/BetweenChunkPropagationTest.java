@@ -60,9 +60,8 @@ public class BetweenChunkPropagationTest extends TerasologyTestingEnvironment {
     private SunlightRegenBatchPropagator propagator;
 
     @BeforeEach
-    @Override
     public void setup() throws Exception {
-        super.setup();
+
         AssetManager assetManager = CoreRegistry.get(AssetManager.class);
 
         regenRules = new SunlightRegenPropagationRules();

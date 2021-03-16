@@ -4,10 +4,10 @@
 package org.terasology.engine;
 
 import com.badlogic.gdx.physics.bullet.Bullet;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.api.parallel.ResourceLock;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.core.ComponentSystemManager;
 import org.terasology.engine.core.EngineTime;
@@ -20,7 +20,6 @@ import org.terasology.engine.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.engine.game.Game;
 import org.terasology.engine.logic.console.Console;
 import org.terasology.engine.logic.console.ConsoleImpl;
-import org.terasology.naming.Name;
 import org.terasology.engine.network.NetworkSystem;
 import org.terasology.engine.network.internal.NetworkSystemImpl;
 import org.terasology.engine.persistence.StorageManager;
@@ -31,9 +30,10 @@ import org.terasology.engine.recording.RecordAndReplayCurrentStatus;
 import org.terasology.engine.recording.RecordAndReplaySerializer;
 import org.terasology.engine.recording.RecordAndReplayUtils;
 import org.terasology.engine.recording.RecordedEventStore;
-import org.terasology.reflection.TypeRegistry;
 import org.terasology.engine.world.block.BlockManager;
 import org.terasology.engine.world.chunks.blockdata.ExtraBlockDataManager;
+import org.terasology.naming.Name;
+import org.terasology.reflection.TypeRegistry;
 
 import java.nio.file.Path;
 
@@ -43,18 +43,19 @@ import static org.mockito.Mockito.mock;
  * A base class for unit test classes to inherit to run in a Terasology environment - with LWJGL set up and so forth
  *
  */
-public abstract class TerasologyTestingEnvironment {
-    protected static Context context;
+@ResourceLock(TestResourceLocks.CORE_REGISTRY)
+public abstract class TerasologyTestingEnvironment implements MockedPathManager {
+    protected  Context context;
 
-    private static ModuleManager moduleManager;
+    private  ModuleManager moduleManager;
 
-    private static HeadlessEnvironment env;
+    private HeadlessEnvironment env;
 
     protected EngineTime mockTime;
     private EngineEntityManager engineEntityManager;
 
-    @BeforeAll
-    public static void setupEnvironment(@TempDir Path tempHome) throws Exception {
+    @BeforeEach
+    public void setupEnvironment(@TempDir Path tempHome) throws Exception {
         PathManager.getInstance().useOverrideHomePath(tempHome);
         Bullet.init(true,false);
 
@@ -69,7 +70,7 @@ public abstract class TerasologyTestingEnvironment {
     }
 
     @BeforeEach
-    public void setup() throws Exception {
+    public void setupTTE() throws Exception {
 
         context.put(ModuleManager.class, moduleManager);
         RecordAndReplayCurrentStatus recordAndReplayCurrentStatus = context.get(RecordAndReplayCurrentStatus.class);
@@ -111,8 +112,8 @@ public abstract class TerasologyTestingEnvironment {
         context.put(Console.class, new ConsoleImpl(context));
     }
 
-    @AfterAll
-    public static void tearDown() throws Exception {
+    @AfterEach
+    public void tearDown() throws Exception {
         env.close();
     }
 

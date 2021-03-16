@@ -99,7 +99,6 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
 
     @BeforeEach
     public void setup(@TempDir Path tempHome) throws Exception {
-        super.setup();
         PathManager.getInstance().useOverrideHomePath(tempHome);
         savePath = PathManager.getInstance().getSavePath("testSave");
 

@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.engine.rendering.assets.texture;
-
 import org.terasology.math.TeraMath;
 import org.terasology.nui.Color;
 import org.terasology.engine.rendering.assets.texture.Texture.FilterMode;
@@ -10,6 +9,9 @@ import org.terasology.engine.rendering.assets.texture.Texture.WrapMode;
 import org.terasology.engine.utilities.random.FastRandom;
 import org.terasology.engine.utilities.random.Random;
 
+import java.nio.ByteBuffer;
+
+import java.nio.Buffer;
 import java.nio.ByteBuffer;
 
 /**
@@ -44,7 +46,7 @@ public final class TextureDataFactory {
         }
 
         // The buffer must be reset back to the initial position before passing it onward.
-        data.rewind();
+        ((Buffer) data).rewind(); // Explicitly casting for Java11/Java8 compability. problem at bytecode level
 
         return new TextureData(TEXTURE_WIDTH, TEXTURE_HEIGHT, new ByteBuffer[]{data}, WrapMode.REPEAT, FilterMode.NEAREST);
     }

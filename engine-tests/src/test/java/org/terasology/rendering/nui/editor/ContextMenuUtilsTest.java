@@ -1,24 +1,11 @@
-/*
- * Copyright 2016 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-package org.terasology.rendering.nui.editor;
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
+package org.terasology.engine.rendering.nui.editor;
 
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;
 import com.google.gson.JsonParser;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.terasology.engine.TerasologyTestingEnvironment;
 import org.terasology.engine.core.subsystem.headless.renderer.HeadlessCanvasRenderer;
@@ -51,8 +38,8 @@ import static org.junit.jupiter.api.Assertions.fail;
 public class ContextMenuUtilsTest extends TerasologyTestingEnvironment {
     private static JsonTree inputTree;
 
-    @BeforeAll
-    public static void setupInput() {
+    @BeforeEach
+    public void setupInput() {
         context.put(InputSystem.class, new InputSystem());
         context.put(TranslationSystem.class, new TranslationSystemImpl(context));
         context.put(CanvasRenderer.class, new HeadlessCanvasRenderer());

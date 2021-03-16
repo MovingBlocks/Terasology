@@ -63,6 +63,7 @@ dependencies {
     implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
     runtimeOnly group: 'org.slf4j', name: 'jul-to-slf4j', version: '1.7.21'
     implementation "org.terasology:reflections:0.9.12-MB"
+    implementation("org.javassist:javassist:3.27.0-GA") // supports java 11
 
     // Test lib dependencies
     implementation(platform("org.junit:junit-bom:5.7.1")) {
@@ -72,7 +73,10 @@ dependencies {
     implementation("org.junit.jupiter:junit-jupiter-params")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
 
-    implementation("org.mockito:mockito-junit-jupiter:3.7.7")
+    implementation("org.mockito:mockito-junit-jupiter:3.7.7") {
+        exclude(group: "org.mockito", module: "mockito-core")
+    }
+    implementation("org.mockito:mockito-inline:3.7.7")
 
     implementation("org.terasology.joml-ext:joml-test:0.1.0")
 }
@@ -80,6 +84,10 @@ dependencies {
 task copyResourcesToClasses(type:Copy) {
     from sourceSets.main.output.resourcesDir
     into sourceSets.main.output.classesDirs.first()
+}
+
+test {
+    maxHeapSize = "2G"
 }
 
 //TODO: Remove it  when gestalt will can to handle ProtectionDomain without classes (Resources)

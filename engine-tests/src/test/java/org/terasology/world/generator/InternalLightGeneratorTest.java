@@ -41,7 +41,6 @@ public class InternalLightGeneratorTest extends TerasologyTestingEnvironment {
 
     @BeforeEach
     public void setup() throws Exception {
-        super.setup();
         AssetManager assetManager = CoreRegistry.get(AssetManager.class);
         blockManager = new BlockManagerImpl(new NullWorldAtlas(), assetManager);
         CoreRegistry.put(BlockManager.class, blockManager);

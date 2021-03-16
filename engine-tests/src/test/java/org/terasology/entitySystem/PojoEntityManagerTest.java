@@ -1,11 +1,12 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.entitySystem;
 
 import com.google.common.collect.Lists;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.ResourceLock;
+import org.terasology.engine.TestResourceLocks;
 import org.terasology.assets.AssetFactory;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
@@ -52,16 +53,16 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.terasology.engine.entitySystem.entity.internal.EntityScope.CHUNK;
 
-/**
- */
+
+@ResourceLock(TestResourceLocks.CORE_REGISTRY)
 public class PojoEntityManagerTest {
 
-    private static Context context;
+    private Context context;
     private PojoEntityManager entityManager;
     private Prefab prefab;
 
-    @BeforeAll
-    public static void setupClass() throws Exception {
+    @BeforeEach
+    public void setup() throws Exception {
         context = new ContextImpl();
         ModuleManager moduleManager = ModuleManagerFactory.create();
         context.put(ModuleManager.class, moduleManager);
@@ -72,10 +73,7 @@ public class PojoEntityManagerTest {
         context.put(AssetManager.class, assetTypeManager.getAssetManager());
         context.put(RecordAndReplayCurrentStatus.class, new RecordAndReplayCurrentStatus());
         CoreRegistry.setContext(context);
-    }
 
-    @BeforeEach
-    public void setup() {
         NetworkSystem networkSystem = mock(NetworkSystem.class);
         when(networkSystem.getMode()).thenReturn(NetworkMode.NONE);
         context.put(NetworkSystem.class, networkSystem);

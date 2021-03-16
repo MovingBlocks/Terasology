@@ -11,6 +11,8 @@ import org.joml.Vector4f;
 import org.joml.Vector4fc;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.ResourceLock;
+import org.terasology.engine.TestResourceLocks;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.engine.context.internal.ContextImpl;
 import org.terasology.engine.core.module.ModuleManager;
@@ -35,6 +37,7 @@ import java.util.HashMap;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 import static org.terasology.joml.test.VectorAssert.assertEquals;
 
+@ResourceLock(TestResourceLocks.CORE_REGISTRY)
 public class VectorEventSerializer {
 
     private EntitySystemLibrary entitySystemLibrary;

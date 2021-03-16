@@ -5,7 +5,9 @@ package org.terasology.engine.entitySystem;
 import com.google.common.collect.Lists;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.ResourceLock;
 import org.reflections.Reflections;
+import org.terasology.engine.TestResourceLocks;
 import org.terasology.engine.context.internal.ContextImpl;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.engine.entitySystem.entity.EntityRef;
@@ -30,9 +32,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-
-/**
- */
+@ResourceLock(TestResourceLocks.CORE_REGISTRY)
 public class PojoEventSystemTests {
 
     ComponentLibrary compLibrary;

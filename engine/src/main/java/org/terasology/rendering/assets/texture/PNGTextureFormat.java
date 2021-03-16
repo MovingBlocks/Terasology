@@ -10,6 +10,7 @@ import org.terasology.assets.format.AssetDataFile;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.file.PathMatcher;
 import java.util.List;
@@ -34,7 +35,7 @@ public class PNGTextureFormat extends AbstractAssetFileFormat<TextureData> {
 
             ByteBuffer buf = ByteBuffer.allocateDirect(4 * decoder.getWidth() * decoder.getHeight());
             decoder.decode(buf, decoder.getWidth() * 4, PNGDecoder.Format.RGBA);
-            buf.flip();
+            ((Buffer) buf).flip(); // Explicitly casting for Java11/Java8 compability. problem at bytecode level
 
             int height = decoder.getHeight();
             int width = decoder.getWidth();
