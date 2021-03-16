@@ -87,6 +87,21 @@ public class BlockRegion implements BlockRegionc {
     }
 
     /**
+     * Creates a new region from center and extent
+     */
+    static public BlockRegion createFromCenterExtents(Vector3i center, int extents) {
+        Vector3i extentVec = new Vector3i(extents, extents, extents);
+        return new BlockRegion(center.sub(extentVec, new Vector3i()), center.add(extentVec, new Vector3i()));
+    }
+
+    /**
+     * Creates a new region from min and size
+     */
+    static public BlockRegion createFromMinAndSize(Vector3i min, Vector3ic size) {
+        return new BlockRegion(min, min.add(size, new Vector3i()));
+    }
+
+    /**
      * Creates a new region containing the single block given by the coordinates.
      */
     public BlockRegion(int x, int y, int z) {

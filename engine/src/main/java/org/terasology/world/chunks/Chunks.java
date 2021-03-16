@@ -325,8 +325,8 @@ public final class Chunks {
      * @param worldPos world position
      * @return the modified {@code worldPos} vector
      */
-    public static Vector3i toRelative(Vector3i worldPos) {
-        return toRelative(worldPos, worldPos);
+    public static Vector3i toRelative(Vector3ic worldPos) {
+        return toRelative(worldPos, new Vector3i(worldPos));
     }
 
     /**
