@@ -25,6 +25,7 @@ import org.terasology.engine.logic.location.Location;
 import org.terasology.engine.logic.location.LocationComponent;
 import org.terasology.engine.logic.players.event.OnPlayerRespawnedEvent;
 import org.terasology.engine.logic.players.event.OnPlayerSpawnedEvent;
+import org.terasology.engine.logic.players.event.OnPlayerSpawnedOrRestoredEvent;
 import org.terasology.engine.logic.players.event.RespawnRequestEvent;
 import org.terasology.engine.logic.health.BeforeDestroyEvent;
 import org.terasology.engine.network.Client;
@@ -171,6 +172,7 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
                 respawnPlayer(entity);
             }
             Location.attachChild(character, entity, new Vector3f(), new Quaternionf());
+            character.send(new OnPlayerSpawnedOrRestoredEvent());
         } else {
             character.destroy();
             spawnPlayer(entity);
@@ -264,6 +266,7 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
         updateRelevanceEntity(clientEntity, distance);
         client.character = playerCharacter;
         clientEntity.saveComponent(client);
+        playerCharacter.send(new OnPlayerSpawnedOrRestoredEvent());
         playerCharacter.send(new OnPlayerSpawnedEvent());
     }
 

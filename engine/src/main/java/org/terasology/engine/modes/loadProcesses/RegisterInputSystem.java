@@ -21,6 +21,7 @@ import org.terasology.engine.core.ComponentSystemManager;
 import org.terasology.engine.core.modes.SingleStepLoadProcess;
 import org.terasology.engine.input.InputSystem;
 import org.terasology.engine.input.cameraTarget.CameraTargetSystem;
+import org.terasology.engine.logic.players.LocalPlayerControlSystem;
 import org.terasology.engine.logic.players.LocalPlayerSystem;
 
 /**
@@ -44,6 +45,10 @@ public class RegisterInputSystem extends SingleStepLoadProcess {
         LocalPlayerSystem localPlayerSystem = new LocalPlayerSystem();
         componentSystemManager.register(localPlayerSystem, "engine:localPlayerSystem");
         context.put(LocalPlayerSystem.class, localPlayerSystem);
+
+        LocalPlayerControlSystem localPlayerControlSystem = new LocalPlayerControlSystem();
+        componentSystemManager.register(localPlayerControlSystem, "engine:localPlayerControlSystem");
+        context.put(LocalPlayerControlSystem.class, localPlayerControlSystem);
 
         CameraTargetSystem cameraTargetSystem = new CameraTargetSystem();
         context.put(CameraTargetSystem.class, cameraTargetSystem);
