@@ -56,10 +56,12 @@ public class CreateWorldEntity extends SingleStepLoadProcess {
     @Override
     public boolean step() {
         if (worldEntityExists()) {
-            EntityRef worldEntity = getExistingWorldEntityAndGiveItToTheChunkProvider();
+            EntityRef worldEntity = getExistingWorldEntity();
+            configureChunkProvider(worldEntity);
             useConfigurationOfCurrentWorld(worldEntity);
         } else {
-            EntityRef worldEntity = createWorldPoolsAndEntityAndGiveItToTheChunkProvider();
+            EntityRef worldEntity = createWorldPoolsAndEntity();
+            configureChunkProvider(worldEntity);
             WorldConfigurator worldConfigurator = useConfigurationFromConfig();
             configurateWorldEntity(worldConfigurator, worldEntity);
         }
@@ -99,18 +101,15 @@ public class CreateWorldEntity extends SingleStepLoadProcess {
         return worldConfigurator;
     }
 
-    private EntityRef getExistingWorldEntityAndGiveItToTheChunkProvider() {
+    private EntityRef getExistingWorldEntity() {
         EntityManager entityManager = context.get(EntityManager.class);
         Iterator<EntityRef> worldEntityIterator = entityManager.getEntitiesWith(WorldComponent.class).iterator();
         EntityRef worldEntity = worldEntityIterator.next();
         worldEntityIterator.forEachRemaining(w -> logger.warn("Ignored extra world {}", w));
-
-        ChunkProvider chunkProvider = context.get(ChunkProvider.class);
-        chunkProvider.setWorldEntity(worldEntity);
         return worldEntity;
     }
 
-    private EntityRef createWorldPoolsAndEntityAndGiveItToTheChunkProvider() {
+    private EntityRef createWorldPoolsAndEntity() {
         EntityManager entityManager = context.get(EntityManager.class);
 
         entityManager.createWorldPools(gameManifest);
@@ -120,10 +119,11 @@ public class CreateWorldEntity extends SingleStepLoadProcess {
         NetworkComponent networkComponent = new NetworkComponent();
         networkComponent.replicateMode = NetworkComponent.ReplicateMode.ALWAYS;
         worldEntity.addComponent(networkComponent);
-
-        ChunkProvider chunkProvider = context.get(ChunkProvider.class);
-        chunkProvider.setWorldEntity(worldEntity);
         return worldEntity;
+    }
+
+    private void configureChunkProvider(EntityRef worldEntity) {
+        context.get(ChunkProvider.class).setWorldEntity(worldEntity);
     }
 
     private void configurateWorldEntity(WorldConfigurator worldConfigurator, EntityRef worldEntity) {
