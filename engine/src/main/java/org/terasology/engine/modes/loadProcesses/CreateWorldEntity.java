@@ -52,27 +52,12 @@ public class CreateWorldEntity extends SingleStepLoadProcess {
 
     @Override
     public boolean step() {
-        EntityManager entityManager = context.get(EntityManager.class);
-        ChunkProvider chunkProvider = context.get(ChunkProvider.class);
-
-        Iterator<EntityRef> worldEntityIterator = entityManager.getEntitiesWith(WorldComponent.class).iterator();
-        if (worldEntityIterator.hasNext()) {
-            EntityRef worldEntity = worldEntityIterator.next();
-            chunkProvider.setWorldEntity(worldEntity);
-
-            // get the world generator config from the world entity
-            // replace the world generator values from the components in the world entity
-            WorldGenerator worldGenerator = context.get(WorldGenerator.class);
-            WorldConfigurator worldConfigurator = worldGenerator.getConfigurator();
-            Map<String, Component> params = worldConfigurator.getProperties();
-            for (Map.Entry<String, Component> entry : params.entrySet()) {
-                Class<? extends Component> clazz = entry.getValue().getClass();
-                Component comp = worldEntity.getComponent(clazz);
-                if (comp != null) {
-                    worldConfigurator.setProperty(entry.getKey(), comp);
-                }
-            }
+        if (worldEntityExists()) {
+            useConfigurationOfCurrentWorld();
         } else {
+            EntityManager entityManager = context.get(EntityManager.class);
+            ChunkProvider chunkProvider = context.get(ChunkProvider.class);
+
             EntityRef worldEntity;
             entityManager.createWorldPools(gameManifest);
             worldEntity = entityManager.create();
@@ -105,6 +90,34 @@ public class CreateWorldEntity extends SingleStepLoadProcess {
         }
 
         return true;
+    }
+
+    private boolean worldEntityExists() {
+        EntityManager entityManager = context.get(EntityManager.class);
+        Iterable<EntityRef> worldEntityIterator = entityManager.getEntitiesWith(WorldComponent.class);
+        return worldEntityIterator.iterator().hasNext();
+    }
+
+    private void useConfigurationOfCurrentWorld() {
+        EntityManager entityManager = context.get(EntityManager.class);
+        ChunkProvider chunkProvider = context.get(ChunkProvider.class);
+
+        Iterator<EntityRef> worldEntityIterator = entityManager.getEntitiesWith(WorldComponent.class).iterator();
+        EntityRef worldEntity = worldEntityIterator.next();
+        chunkProvider.setWorldEntity(worldEntity);
+
+        // get the world generator config from the world entity
+        // replace the world generator values from the components in the world entity
+        WorldGenerator worldGenerator = context.get(WorldGenerator.class);
+        WorldConfigurator worldConfigurator = worldGenerator.getConfigurator();
+        Map<String, Component> params = worldConfigurator.getProperties();
+        for (Map.Entry<String, Component> entry : params.entrySet()) {
+            Class<? extends Component> clazz = entry.getValue().getClass();
+            Component comp = worldEntity.getComponent(clazz);
+            if (comp != null) {
+                worldConfigurator.setProperty(entry.getKey(), comp);
+            }
+        }
     }
 
     @Override
