@@ -56,9 +56,12 @@ public class CreateWorldEntity extends SingleStepLoadProcess {
     @Override
     public boolean step() {
         if (worldEntityExists()) {
-            useConfigurationOfCurrentWorld();
+            EntityRef worldEntity = getExistingWorldEntityAndGiveItToTheChunkProvider();
+            useConfigurationOfCurrentWorld(worldEntity);
         } else {
-            createWorldFromConfig();
+            EntityRef worldEntity = createWorldPoolsAndEntityAndGiveItToTheChunkProvider();
+            WorldConfigurator worldConfigurator = useConfigurationFromConfig();
+            configurateWorldEntity(worldConfigurator, worldEntity);
         }
 
         return true;
@@ -70,9 +73,7 @@ public class CreateWorldEntity extends SingleStepLoadProcess {
         return worldEntityIterator.iterator().hasNext();
     }
 
-    private void useConfigurationOfCurrentWorld() {
-        EntityRef worldEntity = getExistingWorldEntityAndGiveItToTheChunkProvider();
-
+    private void useConfigurationOfCurrentWorld(EntityRef worldEntity) {
         // replace the world generator values from the components in the world entity
         WorldConfiguratorConfigurator configuratorConfigurator = new WorldConfiguratorConfigurator() {
             @Override
@@ -80,12 +81,22 @@ public class CreateWorldEntity extends SingleStepLoadProcess {
                 return worldEntity.getComponent(clazz);
             }
         };
-        setProperties(context.get(WorldGenerator.class).getConfigurator(), configuratorConfigurator);
+        setProperties(context.get(WorldConfigurator.class), configuratorConfigurator);
     }
 
-    private void createWorldFromConfig() {
-        EntityRef worldEntity = createWorldPoolsAndEntityAndGiveItToTheChunkProvider();
-        configureWorldEntityFromConfig(worldEntity);
+    /** transfer all world generation parameters from Config to WorldEntity */
+    private WorldConfigurator useConfigurationFromConfig() {
+        WorldConfigurator worldConfigurator = context.get(WorldConfigurator.class);
+        SimpleUri generatorUri = context.get(WorldGenerator.class).getUri();
+        Config config = context.get(Config.class);
+        setProperties(worldConfigurator, new WorldConfiguratorConfigurator() {
+                    @Override
+                    public <T extends Component> T getComponentOfWorldEntity(String key, Class<T> clazz) {
+                        return config.getModuleConfig(generatorUri, key, clazz);
+                    }
+                }
+        );
+        return worldConfigurator;
     }
 
     private EntityRef getExistingWorldEntityAndGiveItToTheChunkProvider() {
@@ -115,26 +126,12 @@ public class CreateWorldEntity extends SingleStepLoadProcess {
         return worldEntity;
     }
 
-    /** transfer all world generation parameters from Config to WorldEntity */
-    private void configureWorldEntityFromConfig(EntityRef worldEntity) {
-        // get the map of properties from the world generator.
-        WorldConfigurator worldConfigurator = context.get(WorldGenerator.class).getConfigurator();
-
-        // Replace its values with values from the config set by the UI.
-        setProperties(worldConfigurator, this::getComponentOfWorldEntityFromConfig);
-
-        // Also set all the components to the world entity.
-        worldConfigurator.getProperties().forEach((key, currentComponent) -> {
-            Component configuredComponent = getComponentOfWorldEntityFromConfig(key, currentComponent.getClass());
-            if (configuredComponent != null) {
-                worldEntity.addComponent(configuredComponent);
+    private void configurateWorldEntity(WorldConfigurator worldConfigurator, EntityRef worldEntity) {
+        worldConfigurator.getProperties().forEach((key, component) -> {
+            if (component != null) {
+                worldEntity.addComponent(component);
             }
         });
-    }
-
-    private <T extends Component> T getComponentOfWorldEntityFromConfig(String key, Class<T> clazz) {
-        SimpleUri generatorUri = context.get(WorldGenerator.class).getUri();
-        return context.get(Config.class).getModuleConfig(generatorUri, key, clazz);
     }
 
     private static void setProperties(WorldConfigurator configurator, WorldConfiguratorConfigurator provider) {
