@@ -120,6 +120,7 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
     private int inputSequenceNumber = 1;
 
     private AABBf aabb = new AABBf();
+    private boolean hasTarget = false;
 
     public void setPlayerCamera(Camera camera) {
         playerCamera = camera;
@@ -356,7 +357,8 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
     @ReceiveEvent
     public void onTargetChanged(PlayerTargetChangedEvent event, EntityRef entity) {
         EntityRef target = event.getNewTarget();
-        if (target.exists()) {
+        hasTarget = target.exists();
+        if (hasTarget) {
             LocationComponent location = target.getComponent(LocationComponent.class);
             if (location != null) {
                 BlockComponent blockComp = target.getComponent(BlockComponent.class);
@@ -379,11 +381,9 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
     @Override
     public void renderOverlay() {
         // Display the block the player is aiming at
-        if (config.getRendering().isRenderPlacingBox()) {
-            if (aabb != null) {
-                aabbRenderer.setAABB(aabb);
-                aabbRenderer.render();
-            }
+        if (config.getRendering().isRenderPlacingBox() && hasTarget) {
+            aabbRenderer.setAABB(aabb);
+            aabbRenderer.render();
         }
     }
 
