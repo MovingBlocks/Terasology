@@ -67,6 +67,7 @@ public class ModuleManager {
     private ModuleEnvironment environment;
     private final ModuleMetadataJsonAdapter metadataReader;
     private final ModuleInstallManager installManager;
+    private Module engineModule;
 
     public ModuleManager(String masterServerAddress) {
         this(masterServerAddress, Collections.emptyList());
@@ -81,7 +82,7 @@ public class ModuleManager {
 
         metadataReader = newMetadataReader();
 
-        Module engineModule = loadEngineModule(classesOnClasspathsToAddToEngine);
+        engineModule = loadEngineModule(classesOnClasspathsToAddToEngine);
 
         registry = new TableModuleRegistry();
         registry.add(engineModule);
@@ -296,6 +297,7 @@ public class ModuleManager {
 
     public ModuleEnvironment loadEnvironment(Set<Module> modules, boolean asPrimary) {
         Set<Module> finalModules = Sets.newLinkedHashSet(modules);
+        finalModules.add(engineModule);
         ModuleEnvironment newEnvironment;
         boolean permissiveSecurityEnabled = Boolean.parseBoolean(System.getProperty(SystemConfig.PERMISSIVE_SECURITY_ENABLED_PROPERTY));
         if (permissiveSecurityEnabled) {
