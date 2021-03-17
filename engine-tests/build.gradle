@@ -46,9 +46,6 @@ sourceSets {
     // Adjust output path (changed with the Gradle 6 upgrade, this puts it back)
     main.java.outputDir = new File("$buildDir/classes")
     test.java.outputDir = new File("$buildDir/testClasses")
-
-    main.java.srcDirs = ["src/main/java/org/terasology"]
-    test.java.srcDirs = ["src/test/java/org/terasology"]
 }
 
 // Primary dependencies definition
@@ -93,10 +90,5 @@ idea {
         outputDir = file('build/classes')
         testOutputDir = file('build/testClasses')
         downloadSources = true
-
-        settings {
-            packagePrefix["src/main/java/org/terasology"] = "org.terasology.engine";
-            packagePrefix["src/test/java/org/terasology"] = "org.terasology.engine";
-        }
     }
 }
