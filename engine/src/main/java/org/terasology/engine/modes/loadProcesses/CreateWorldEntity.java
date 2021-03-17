@@ -33,7 +33,6 @@ import org.terasology.engine.world.generator.WorldConfigurator;
 import org.terasology.engine.world.generator.WorldGenerator;
 
 import java.util.Iterator;
-import java.util.Map;
 
 /**
  */
@@ -72,27 +71,17 @@ public class CreateWorldEntity extends SingleStepLoadProcess {
     }
 
     private void useConfigurationOfCurrentWorld() {
-        EntityManager entityManager = context.get(EntityManager.class);
-        ChunkProvider chunkProvider = context.get(ChunkProvider.class);
-
-        Iterator<EntityRef> worldEntityIterator = entityManager.getEntitiesWith(WorldComponent.class).iterator();
-        EntityRef worldEntity = worldEntityIterator.next();
-        chunkProvider.setWorldEntity(worldEntity);
+        EntityRef worldEntity = getExistingWorldEntityAndGiveItToTheChunkProvider();
 
         // get the world generator config from the world entity
         // replace the world generator values from the components in the world entity
-        WorldGenerator worldGenerator = context.get(WorldGenerator.class);
-        WorldConfigurator worldConfigurator = worldGenerator.getConfigurator();
-        Map<String, Component> params = worldConfigurator.getProperties();
-        for (Map.Entry<String, Component> entry : params.entrySet()) {
-            Class<? extends Component> clazz = entry.getValue().getClass();
-            Component comp = worldEntity.getComponent(clazz);
+        WorldConfigurator worldConfigurator = context.get(WorldGenerator.class).getConfigurator();
+        worldConfigurator.getProperties().forEach((key, currentComponent) -> {
+            Component comp = worldEntity.getComponent(currentComponent.getClass());
             if (comp != null) {
-                worldConfigurator.setProperty(entry.getKey(), comp);
+                worldConfigurator.setProperty(key, comp);
             }
-        }
-
-        worldEntityIterator.forEachRemaining(w -> logger.warn("Ignored extra world {}", w));
+        });
     }
 
     private void createWorldFromConfig() {
@@ -100,23 +89,15 @@ public class CreateWorldEntity extends SingleStepLoadProcess {
         configureWorldEntityFromConfig(worldEntity);
     }
 
-    /** transfer all world generation parameters from Config to WorldEntity */
-    private void configureWorldEntityFromConfig(EntityRef worldEntity) {
-        // get the map of properties from the world generator.
-        WorldConfigurator worldConfigurator = context.get(WorldGenerator.class).getConfigurator();
-        Map<String, Component> configuratorProperties = worldConfigurator.getProperties();
+    private EntityRef getExistingWorldEntityAndGiveItToTheChunkProvider() {
+        EntityManager entityManager = context.get(EntityManager.class);
+        Iterator<EntityRef> worldEntityIterator = entityManager.getEntitiesWith(WorldComponent.class).iterator();
+        EntityRef worldEntity = worldEntityIterator.next();
+        worldEntityIterator.forEachRemaining(w -> logger.warn("Ignored extra world {}", w));
 
-        // Replace its values with values from the config set by the UI.
-        // Also set all the components to the world entity.
-        configuratorProperties.forEach((key, currentComponent) -> {
-            Component configuredComponent = getComponentOfWorldEntityFromConfig(key, currentComponent.getClass());
-            if (configuredComponent != null) {
-                worldEntity.addComponent(configuredComponent);
-                worldConfigurator.setProperty(key, configuredComponent);
-            } else {
-                worldEntity.addComponent(currentComponent);
-            }
-        });
+        ChunkProvider chunkProvider = context.get(ChunkProvider.class);
+        chunkProvider.setWorldEntity(worldEntity);
+        return worldEntity;
     }
 
     private EntityRef createWorldPoolsAndEntityAndGiveItToTheChunkProvider() {
@@ -133,6 +114,24 @@ public class CreateWorldEntity extends SingleStepLoadProcess {
         ChunkProvider chunkProvider = context.get(ChunkProvider.class);
         chunkProvider.setWorldEntity(worldEntity);
         return worldEntity;
+    }
+
+    /** transfer all world generation parameters from Config to WorldEntity */
+    private void configureWorldEntityFromConfig(EntityRef worldEntity) {
+        // get the map of properties from the world generator.
+        WorldConfigurator worldConfigurator = context.get(WorldGenerator.class).getConfigurator();
+
+        // Replace its values with values from the config set by the UI.
+        // Also set all the components to the world entity.
+        worldConfigurator.getProperties().forEach((key, currentComponent) -> {
+            Component configuredComponent = getComponentOfWorldEntityFromConfig(key, currentComponent.getClass());
+            if (configuredComponent != null) {
+                worldEntity.addComponent(configuredComponent);
+                worldConfigurator.setProperty(key, configuredComponent);
+            } else {
+                worldEntity.addComponent(currentComponent);
+            }
+        });
     }
 
     private <T extends Component> T getComponentOfWorldEntityFromConfig(String key, Class<T> clazz) {
