@@ -16,6 +16,8 @@
 
 package org.terasology.engine.core.modes.loadProcesses;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.core.SimpleUri;
@@ -36,6 +38,8 @@ import java.util.Map;
 /**
  */
 public class CreateWorldEntity extends SingleStepLoadProcess {
+
+    private static final Logger logger = LoggerFactory.getLogger(CreateWorldEntity.class);
 
     private final Context context;
     private final GameManifest gameManifest;
@@ -87,6 +91,8 @@ public class CreateWorldEntity extends SingleStepLoadProcess {
                 worldConfigurator.setProperty(entry.getKey(), comp);
             }
         }
+
+        worldEntityIterator.forEachRemaining(w -> logger.warn("Ignored extra world {}", w));
     }
 
     private void createWorldFromConfiguration() {
