@@ -55,38 +55,7 @@ public class CreateWorldEntity extends SingleStepLoadProcess {
         if (worldEntityExists()) {
             useConfigurationOfCurrentWorld();
         } else {
-            EntityManager entityManager = context.get(EntityManager.class);
-            ChunkProvider chunkProvider = context.get(ChunkProvider.class);
-
-            EntityRef worldEntity;
-            entityManager.createWorldPools(gameManifest);
-            worldEntity = entityManager.create();
-            worldEntity.addComponent(new WorldComponent());
-            NetworkComponent networkComponent = new NetworkComponent();
-            networkComponent.replicateMode = NetworkComponent.ReplicateMode.ALWAYS;
-            worldEntity.addComponent(networkComponent);
-            chunkProvider.setWorldEntity(worldEntity);
-
-            // transfer all world generation parameters from Config to WorldEntity
-            WorldGenerator worldGenerator = context.get(WorldGenerator.class);
-            SimpleUri generatorUri = worldGenerator.getUri();
-            Config config = context.get(Config.class);
-
-            // get the map of properties from the world generator.
-            // Replace its values with values from the config set by the UI.
-            // Also set all the components to the world entity.
-            WorldConfigurator worldConfigurator = worldGenerator.getConfigurator();
-            Map<String, Component> params = worldConfigurator.getProperties();
-            for (Map.Entry<String, Component> entry : params.entrySet()) {
-                Class<? extends Component> clazz = entry.getValue().getClass();
-                Component comp = config.getModuleConfig(generatorUri, entry.getKey(), clazz);
-                if (comp != null) {
-                    worldEntity.addComponent(comp);
-                    worldConfigurator.setProperty(entry.getKey(), comp);
-                } else {
-                    worldEntity.addComponent(entry.getValue());
-                }
-            }
+            createWorldFromConfiguration();
         }
 
         return true;
@@ -116,6 +85,40 @@ public class CreateWorldEntity extends SingleStepLoadProcess {
             Component comp = worldEntity.getComponent(clazz);
             if (comp != null) {
                 worldConfigurator.setProperty(entry.getKey(), comp);
+            }
+        }
+    }
+
+    private void createWorldFromConfiguration() {
+        EntityManager entityManager = context.get(EntityManager.class);
+        ChunkProvider chunkProvider = context.get(ChunkProvider.class);
+
+        entityManager.createWorldPools(gameManifest);
+        EntityRef worldEntity = entityManager.create();
+        worldEntity.addComponent(new WorldComponent());
+        NetworkComponent networkComponent = new NetworkComponent();
+        networkComponent.replicateMode = NetworkComponent.ReplicateMode.ALWAYS;
+        worldEntity.addComponent(networkComponent);
+        chunkProvider.setWorldEntity(worldEntity);
+
+        // transfer all world generation parameters from Config to WorldEntity
+        WorldGenerator worldGenerator = context.get(WorldGenerator.class);
+        SimpleUri generatorUri = worldGenerator.getUri();
+        Config config = context.get(Config.class);
+
+        // get the map of properties from the world generator.
+        // Replace its values with values from the config set by the UI.
+        // Also set all the components to the world entity.
+        WorldConfigurator worldConfigurator = worldGenerator.getConfigurator();
+        Map<String, Component> params = worldConfigurator.getProperties();
+        for (Map.Entry<String, Component> entry : params.entrySet()) {
+            Class<? extends Component> clazz = entry.getValue().getClass();
+            Component comp = config.getModuleConfig(generatorUri, entry.getKey(), clazz);
+            if (comp != null) {
+                worldEntity.addComponent(comp);
+                worldConfigurator.setProperty(entry.getKey(), comp);
+            } else {
+                worldEntity.addComponent(entry.getValue());
             }
         }
     }
