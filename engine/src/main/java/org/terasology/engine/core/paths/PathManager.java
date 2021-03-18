@@ -341,7 +341,7 @@ public final class PathManager {
         Path homeModPath = homePath.resolve(MODULE_DIR);
         Path modCachePath = homePath.resolve(MODULE_CACHE_DIR);
 
-        if (Files.isSameFile(homePath, installPath)) {
+        if (homePath == installPath) {
             return ImmutableList.of(modCachePath, homeModPath);
         } else {
             Path installModPath = installPath.resolve(MODULE_DIR);

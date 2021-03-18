@@ -11,6 +11,7 @@ import org.terasology.module.ModuleLoader;
 import org.terasology.module.ModuleMetadata;
 import org.terasology.module.ModuleMetadataJsonAdapter;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
@@ -78,10 +79,17 @@ public class ClasspathSupportingModuleLoader extends ModuleLoader {
         URL metadataUrl;
         ModuleMetadata metadata = null;
         try {
-            if (Paths.get(moduleUrl.toURI()).toFile().isDirectory()) {
-                metadataUrl = new URL(moduleUrl, getModuleInfoPath().toString());
+            if (moduleUrl.getProtocol().equals("jar")) {
+                metadataUrl = new URL(moduleUrl, "!/" + getModuleInfoPath());
             } else {
-                metadataUrl = new URL("jar", null, moduleUrl + "!/" + getModuleInfoPath());
+                File file = Paths.get(moduleUrl.toURI()).toFile();
+                if (lenient && !file.exists()) {
+                    return null;
+                } else if (file.isDirectory()) {
+                    metadataUrl = new URL(moduleUrl, getModuleInfoPath().toString());
+                } else {
+                    metadataUrl = new URL("jar", null, moduleUrl + "!/" + getModuleInfoPath());
+                }
             }
         } catch (MalformedURLException | URISyntaxException e) {
             throw new RuntimeException("Error making metadata URL for " + moduleUrl.toString(), e);
@@ -98,5 +106,15 @@ public class ClasspathSupportingModuleLoader extends ModuleLoader {
             throw new RuntimeException("Empty metadata from " + moduleUrl.toString());
         }
         return metadata;
+    }
+
+    public Module load(Class<?> clazz) throws IOException {
+        URL url = clazz.getProtectionDomain().getCodeSource().getLocation();
+        ModuleMetadata metadata = readMetadata(url);
+        try {
+            return ClasspathModule.create(metadata, false, clazz);
+        } catch (URISyntaxException e) {
+            throw new RuntimeException("while loading " + clazz, e);
+        }
     }
 }
