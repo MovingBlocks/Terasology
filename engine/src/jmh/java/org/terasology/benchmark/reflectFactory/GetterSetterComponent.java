@@ -15,7 +15,7 @@
  */
 package org.terasology.benchmark.reflectFactory;
 
-import org.terasology.entitySystem.Component;
+import org.terasology.engine.entitySystem.Component;
 
 /**
  */

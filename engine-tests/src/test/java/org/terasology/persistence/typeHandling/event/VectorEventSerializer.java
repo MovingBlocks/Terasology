@@ -1,7 +1,7 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-package org.terasology.persistence.typeHandling.event;
+package org.terasology.engine.persistence.typeHandling.event;
 
 import org.joml.Vector2f;
 import org.joml.Vector2fc;
@@ -12,29 +12,28 @@ import org.joml.Vector4fc;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.terasology.assets.ResourceUrn;
-import org.terasology.context.internal.ContextImpl;
-import org.terasology.engine.module.ModuleManager;
-import org.terasology.entitySystem.event.Event;
-import org.terasology.entitySystem.metadata.EntitySystemLibrary;
-import org.terasology.entitySystem.metadata.EventMetadata;
-import org.terasology.persistence.serializers.EventSerializer;
+import org.terasology.engine.context.internal.ContextImpl;
+import org.terasology.engine.core.module.ModuleManager;
+import org.terasology.engine.entitySystem.event.Event;
+import org.terasology.engine.entitySystem.metadata.EntitySystemLibrary;
+import org.terasology.engine.entitySystem.metadata.EventMetadata;
+import org.terasology.engine.persistence.serializers.EventSerializer;
+import org.terasology.engine.persistence.typeHandling.TypeHandlerLibraryImpl;
+import org.terasology.engine.registry.CoreRegistry;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
-import org.terasology.persistence.typeHandling.TypeHandlerLibraryImpl;
 import org.terasology.protobuf.EntityData;
 import org.terasology.reflection.TypeRegistry;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.metadata.FieldMetadata;
 import org.terasology.reflection.reflect.ReflectFactory;
 import org.terasology.reflection.reflect.ReflectionReflectFactory;
-import org.terasology.registry.CoreRegistry;
-import org.terasology.testUtil.ModuleManagerFactory;
-
-import static org.terasology.joml.test.VectorAssert.assertEquals;
+import org.terasology.engine.testUtil.ModuleManagerFactory;
 
 import java.io.IOException;
 import java.util.HashMap;
 
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
+import static org.terasology.joml.test.VectorAssert.assertEquals;
 
 public class VectorEventSerializer {
 

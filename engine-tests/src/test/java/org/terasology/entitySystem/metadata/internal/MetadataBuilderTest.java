@@ -13,12 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.entitySystem.metadata.internal;
+package org.terasology.engine.entitySystem.metadata.internal;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.terasology.assets.ResourceUrn;
-import org.terasology.engine.SimpleUri;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.metadata.DefaultClassMetadata;
 import org.terasology.reflection.metadata.FieldMetadata;

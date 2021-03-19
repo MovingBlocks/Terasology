@@ -1,30 +1,38 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.persistence.serializers;
+package org.terasology.engine.persistence.serializers;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import com.google.gson.Gson;
 import org.joml.Vector3f;
 import org.junit.jupiter.api.Test;
-import org.terasology.ModuleEnvironmentTest;
-import org.terasology.engine.module.ModuleContext;
+import org.terasology.engine.ModuleEnvironmentTest;
+import org.terasology.engine.core.TerasologyConstants;
+import org.terasology.engine.core.module.ModuleContext;
+import org.terasology.engine.persistence.typeHandling.TypeHandlerLibraryImpl;
+import org.terasology.engine.persistence.typeHandling.gson.GsonPersistedDataReader;
+import org.terasology.engine.persistence.typeHandling.gson.GsonPersistedDataSerializer;
+import org.terasology.engine.persistence.typeHandling.gson.GsonPersistedDataWriter;
 import org.terasology.naming.Name;
 import org.terasology.nui.Color;
+import org.terasology.persistence.serializers.Serializer;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
-import org.terasology.persistence.typeHandling.TypeHandlerLibraryImpl;
 import org.terasology.persistence.typeHandling.annotations.SerializedName;
 import org.terasology.reflection.TypeInfo;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class TypeSerializerTest extends ModuleEnvironmentTest {
+class TypeSerializerTest extends ModuleEnvironmentTest {
     private static final SomeClass<Integer> INSTANCE = new SomeClass<>(0xdeadbeef);
-    private static final String INSTANCE_JSON = "{\"generic-t\":-559038737,\"list\":[50,51,-52,-53],\"animals\":[{\"class\":\"org.terasology.persistence.serializers.TypeSerializerTest$Dog\",\"tailPosition\":[3.15,54.51,-0.001],\"headPosition\":[10.0,30.0,-0.001],\"data\":{\"class\":\"java.lang.Integer\",\"content\":1}},{\"class\":\"org.terasology.persistence.serializers.TypeSerializerTest$Cheetah\",\"spotColor\":[255,0,255,255],\"data\":{\"class\":\"java.lang.Integer\",\"content\":2}}]}";
+    private static final String INSTANCE_JSON = "{\"generic-t\":-559038737,\"list\":[50,51,-52,-53],\"animals\":[{\"class\":\"org.terasology.engine.persistence.serializers.TypeSerializerTest$Dog\",\"tailPosition\":[3.15,54.51,-0.001],\"headPosition\":[10.0,30.0,-0.001],\"data\":{\"class\":\"java.lang.Integer\",\"content\":1}},{\"class\":\"org.terasology.engine.persistence.serializers.TypeSerializerTest$Cheetah\",\"spotColor\":[255,0,255,255],\"data\":{\"class\":\"java.lang.Integer\",\"content\":2}}]}";
 
     static {
         INSTANCE.list.addAll(Lists.newArrayList(50, 51, -52, -53));
@@ -36,7 +44,7 @@ public class TypeSerializerTest extends ModuleEnvironmentTest {
 
     private TypeHandlerLibrary typeHandlerLibrary;
     private ProtobufSerializer protobufSerializer;
-    private GsonSerializer gsonSerializer;
+    private Serializer gsonSerializer;
 
     @Override
     public void setup() {
@@ -45,27 +53,39 @@ public class TypeSerializerTest extends ModuleEnvironmentTest {
         typeHandlerLibrary = TypeHandlerLibraryImpl.forModuleEnvironment(moduleManager, typeRegistry);
 
         protobufSerializer = new ProtobufSerializer(typeHandlerLibrary);
-        gsonSerializer = new GsonSerializer(typeHandlerLibrary);
+
+        Gson gson = new Gson();
+        gsonSerializer = new Serializer<>(typeHandlerLibrary,
+                new GsonPersistedDataSerializer(),
+                new GsonPersistedDataWriter(gson),
+                new GsonPersistedDataReader(gson)
+                );
     }
 
     @Test
-    public void testJsonSerialize() {
-        String serializedJson = gsonSerializer.toJson(INSTANCE, new TypeInfo<SomeClass<Integer>>() {
+    void testJsonSerialize() {
+        Optional<byte[]> serialize = gsonSerializer.serialize(INSTANCE, new TypeInfo<SomeClass<Integer>>() {
         });
+        assertTrue(serialize.isPresent());
+
+        String serializedJson = new String(serialize.get(), TerasologyConstants.CHARSET);
         assertEquals(INSTANCE_JSON, serializedJson);
     }
 
     @Test
-    public void testDeserialize() {
+    void testDeserialize() {
+        Optional<SomeClass<Integer>> deserialize = gsonSerializer.deserialize(new TypeInfo<SomeClass<Integer>>() {
+        }, INSTANCE_JSON.getBytes(TerasologyConstants.CHARSET));
+        assertTrue(deserialize.isPresent());
+
         SomeClass<Integer> deserialized =
-                gsonSerializer.fromJson(INSTANCE_JSON, new TypeInfo<SomeClass<Integer>>() {
-                });
+                deserialize.get();
 
         assertEquals(INSTANCE, deserialized);
     }
 
     @Test
-    public void testSerializeDeserialize() throws IOException {
+    void testSerializeDeserialize() throws IOException {
         byte[] bytes = protobufSerializer.toBytes(INSTANCE, new TypeInfo<SomeClass<Integer>>() {
         });
 

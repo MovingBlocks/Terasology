@@ -18,11 +18,11 @@ package org.terasology.logic.behavior;
 import com.google.common.collect.Lists;
 import com.google.gson.GsonBuilder;
 import org.junit.jupiter.api.BeforeEach;
-import org.terasology.logic.behavior.core.Actor;
-import org.terasology.logic.behavior.core.BehaviorNode;
-import org.terasology.logic.behavior.core.BehaviorState;
-import org.terasology.logic.behavior.core.BehaviorTreeBuilder;
-import org.terasology.logic.behavior.core.DelegateNode;
+import org.terasology.engine.logic.behavior.core.Actor;
+import org.terasology.engine.logic.behavior.core.BehaviorNode;
+import org.terasology.engine.logic.behavior.core.BehaviorState;
+import org.terasology.engine.logic.behavior.core.BehaviorTreeBuilder;
+import org.terasology.engine.logic.behavior.core.DelegateNode;
 
 import java.util.List;
 

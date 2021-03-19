@@ -9,7 +9,7 @@ import gnu.trove.set.hash.TIntHashSet;
 import org.joml.Vector2d;
 import org.joml.Vector2i;
 import org.lwjgl.opengl.awt.AWTGLCanvas;
-import org.terasology.config.RenderingConfig;
+import org.terasology.engine.config.RenderingConfig;
 import org.terasology.input.ButtonState;
 import org.terasology.input.InputType;
 import org.terasology.input.MouseInput;
