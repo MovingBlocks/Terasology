@@ -34,6 +34,8 @@ import org.terasology.engine.world.generator.WorldGenerator;
 
 import java.util.Iterator;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  */
 public class CreateWorldEntity extends SingleStepLoadProcess {
@@ -77,27 +79,16 @@ public class CreateWorldEntity extends SingleStepLoadProcess {
 
     private void useConfigurationOfCurrentWorld(EntityRef worldEntity) {
         // replace the world generator values from the components in the world entity
-        WorldConfiguratorConfigurator configuratorConfigurator = new WorldConfiguratorConfigurator() {
-            @Override
-            public <T extends Component> T getComponentOfWorldEntity(String key, Class<T> clazz) {
-                return worldEntity.getComponent(clazz);
-            }
-        };
-        setProperties(context.get(WorldConfigurator.class), configuratorConfigurator);
+        WorldConfigurator worldConfigurator = context.get(WorldGenerator.class).getConfigurator();
+        setProperties(worldConfigurator, (key, clazz) -> worldEntity.getComponent(clazz));
     }
 
     /** transfer all world generation parameters from Config to WorldEntity */
     private WorldConfigurator useConfigurationFromConfig() {
-        WorldConfigurator worldConfigurator = context.get(WorldConfigurator.class);
+        WorldConfigurator worldConfigurator = context.get(WorldGenerator.class).getConfigurator();
         SimpleUri generatorUri = context.get(WorldGenerator.class).getUri();
         Config config = context.get(Config.class);
-        setProperties(worldConfigurator, new WorldConfiguratorConfigurator() {
-                    @Override
-                    public <T extends Component> T getComponentOfWorldEntity(String key, Class<T> clazz) {
-                        return config.getModuleConfig(generatorUri, key, clazz);
-                    }
-                }
-        );
+        setProperties(worldConfigurator, (key, clazz) -> config.getModuleConfig(generatorUri, key, clazz));
         return worldConfigurator;
     }
 
@@ -135,7 +126,7 @@ public class CreateWorldEntity extends SingleStepLoadProcess {
     }
 
     private static void setProperties(WorldConfigurator configurator, WorldConfiguratorConfigurator provider) {
-        configurator.getProperties().forEach((key, currentComponent) -> {
+        checkNotNull(configurator).getProperties().forEach((key, currentComponent) -> {
             Component configuredComponent = provider.getComponentOfWorldEntity(key, currentComponent.getClass());
             if (configuredComponent != null) {
                 configurator.setProperty(key, configuredComponent);
@@ -145,7 +136,7 @@ public class CreateWorldEntity extends SingleStepLoadProcess {
 
     @FunctionalInterface
     private interface WorldConfiguratorConfigurator {
-        <T extends Component> T getComponentOfWorldEntity(String key, Class<T> clazz);
+        Component getComponentOfWorldEntity(String key, Class<? extends Component> clazz);
     }
 
     @Override
