@@ -63,10 +63,6 @@ public class LwjglMouseDevice implements MouseDevice, PropertyChangeListener {
         mouseX.rewind();
         mouseY.rewind();
 
-        GLFW.glfwGetCursorPos(window, mouseX, mouseY);
-        mouseX.rewind();
-        mouseY.rewind();
-
         double x = mouseX.get(0);
         double y = mouseY.get(0);
 
@@ -83,7 +79,6 @@ public class LwjglMouseDevice implements MouseDevice, PropertyChangeListener {
 
     @Override
     public Vector2d getDelta() {
-
         Vector2d result = new Vector2d(xposDelta, yposDelta);
         return result;
     }
