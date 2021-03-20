@@ -136,11 +136,8 @@ public class LwjglMouseDevice implements MouseDevice, PropertyChangeListener {
             mouseX.rewind();
             mouseY.rewind();
 
-            double x = mouseX.get(0);
-            double y = mouseY.get(0);
-    
-            this.xpos = x;
-            this.ypos = y;
+            xpos = mouseX.get(0);
+            ypos = mouseY.get(0);
         }
     }
 
