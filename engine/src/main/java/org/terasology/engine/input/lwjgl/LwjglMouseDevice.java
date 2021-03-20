@@ -60,8 +60,6 @@ public class LwjglMouseDevice implements MouseDevice, PropertyChangeListener {
         DoubleBuffer mouseY = BufferUtils.createDoubleBuffer(1);
 
         GLFW.glfwGetCursorPos(window, mouseX, mouseY);
-        mouseX.rewind();
-        mouseY.rewind();
 
         double x = mouseX.get(0);
         double y = mouseY.get(0);
@@ -128,8 +126,6 @@ public class LwjglMouseDevice implements MouseDevice, PropertyChangeListener {
             DoubleBuffer mouseY = BufferUtils.createDoubleBuffer(1);
 
             GLFW.glfwGetCursorPos(window, mouseX, mouseY);
-            mouseX.rewind();
-            mouseY.rewind();
 
             xpos = mouseX.get(0);
             ypos = mouseY.get(0);
