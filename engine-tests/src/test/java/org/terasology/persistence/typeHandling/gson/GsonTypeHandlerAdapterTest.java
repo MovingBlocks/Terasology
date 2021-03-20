@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.persistence.typeHandling.gson;
+package org.terasology.engine.persistence.typeHandling.gson;
 
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import org.junit.jupiter.api.Test;
 import org.terasology.nui.Color;
-import org.terasology.persistence.typeHandling.extensionTypes.ColorTypeHandler;
+import org.terasology.engine.persistence.typeHandling.extensionTypes.ColorTypeHandler;
 
 import java.util.Objects;
 

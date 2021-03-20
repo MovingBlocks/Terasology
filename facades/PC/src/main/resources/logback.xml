@@ -50,4 +50,5 @@
   <logger name="com.snowplowanalytics" level="${logOverrideLevel:-error}" />
   <logger name="io.netty" level="${logOverrideLevel:-warn}" />
   
+  <logger name="com.jagrosh.discordipc" level="OFF"/>
 </configuration>

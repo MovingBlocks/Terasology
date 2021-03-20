@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.persistence;
+package org.terasology.engine.persistence;
 
 import com.google.common.collect.ImmutableMap;
 import org.junit.jupiter.api.Test;

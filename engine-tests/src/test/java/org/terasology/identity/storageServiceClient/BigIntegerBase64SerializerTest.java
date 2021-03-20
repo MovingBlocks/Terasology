@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.identity.storageServiceClient;
+package org.terasology.engine.identity.storageServiceClient;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;

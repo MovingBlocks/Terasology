@@ -1,6 +1,6 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.world.chunks.localChunkProvider;
+package org.terasology.engine.world.chunks.localChunkProvider;
 
 import com.google.common.collect.Maps;
 import org.joml.Vector3i;
@@ -10,26 +10,26 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-import org.terasology.entitySystem.entity.EntityManager;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.event.Event;
+import org.terasology.engine.entitySystem.entity.EntityManager;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.entitySystem.event.Event;
+import org.terasology.engine.world.BlockEntityRegistry;
+import org.terasology.engine.world.block.BeforeDeactivateBlocks;
+import org.terasology.engine.world.block.Block;
+import org.terasology.engine.world.block.BlockManager;
+import org.terasology.engine.world.block.BlockRegion;
+import org.terasology.engine.world.block.OnActivatedBlocks;
+import org.terasology.engine.world.block.OnAddedBlocks;
+import org.terasology.engine.world.chunks.Chunk;
+import org.terasology.engine.world.chunks.blockdata.ExtraBlockDataManager;
+import org.terasology.engine.world.chunks.event.BeforeChunkUnload;
+import org.terasology.engine.world.chunks.event.OnChunkGenerated;
+import org.terasology.engine.world.chunks.event.OnChunkLoaded;
+import org.terasology.engine.world.chunks.internal.ChunkImpl;
 import org.terasology.fixtures.TestBlockManager;
 import org.terasology.fixtures.TestChunkStore;
 import org.terasology.fixtures.TestStorageManager;
 import org.terasology.fixtures.TestWorldGenerator;
-import org.terasology.world.BlockEntityRegistry;
-import org.terasology.world.block.BeforeDeactivateBlocks;
-import org.terasology.world.block.Block;
-import org.terasology.world.block.BlockManager;
-import org.terasology.world.block.BlockRegion;
-import org.terasology.world.block.OnActivatedBlocks;
-import org.terasology.world.block.OnAddedBlocks;
-import org.terasology.world.chunks.Chunk;
-import org.terasology.world.chunks.blockdata.ExtraBlockDataManager;
-import org.terasology.world.chunks.event.BeforeChunkUnload;
-import org.terasology.world.chunks.event.OnChunkGenerated;
-import org.terasology.world.chunks.event.OnChunkLoaded;
-import org.terasology.world.chunks.internal.ChunkImpl;
 
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
