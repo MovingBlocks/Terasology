@@ -50,6 +50,7 @@ public class LwjglMouseDevice implements MouseDevice, PropertyChangeListener {
     public void registerToLwjglWindow(long window) {
         GLFW.glfwSetMouseButtonCallback(window, this::mouseButtonCallback);
         GLFW.glfwSetScrollCallback(window, this::scrollCallback);
+        GLFW.glfwSetWindowFocusCallback(window, this::focusCallback);
     }
 
     @Override
@@ -120,6 +121,26 @@ public class LwjglMouseDevice implements MouseDevice, PropertyChangeListener {
     public void propertyChange(PropertyChangeEvent evt) {
         if (evt.getPropertyName().equals(RenderingConfig.UI_SCALE)) {
             this.uiScale = this.renderingConfig.getUiScale() / 100f;
+        }
+    }
+
+    private void focusCallback(long window, boolean isFocused) {
+        // When the window is unfocused and focused again, the mouse coordinates
+        // reported by GLFW change even if the mouse hasn't moved.
+        // So when the window regains focus, we set the new position as the reference without generating deltas.
+        if (isFocused) {
+            DoubleBuffer mouseX = BufferUtils.createDoubleBuffer(1);
+            DoubleBuffer mouseY = BufferUtils.createDoubleBuffer(1);
+
+            GLFW.glfwGetCursorPos(window, mouseX, mouseY);
+            mouseX.rewind();
+            mouseY.rewind();
+
+            double x = mouseX.get(0);
+            double y = mouseY.get(0);
+    
+            this.xpos = x;
+            this.ypos = y;
         }
     }
 
