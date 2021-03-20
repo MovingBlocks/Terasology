@@ -996,7 +996,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
                                                                         ClassLibrary<T> classLibrary) {
         Map<Class<? extends T>, Integer> idTable = Maps.newHashMap();
         for (NetData.SerializationInfo info : infoList) {
-            ClassMetadata<? extends T, ?> metadata = classLibrary.getMetadata(new ResourceUrn(info.getName()));
+            ClassMetadata<? extends T, ?> metadata = classLibrary.getMetadata(info.getName());
             if (metadata != null) {
                 idTable.put(metadata.getType(), info.getId());
                 for (int i = 0; i < info.getFieldIds().size(); ++i) {

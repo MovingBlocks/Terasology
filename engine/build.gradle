@@ -114,6 +114,7 @@ dependencies {
     api group: 'org.terasology.jnbullet', name: 'JNBullet', version: '1.0.2'
     api group: 'org.terasology.nui', name: 'nui', version: '1.5.0-SNAPSHOT'
     api group: 'org.terasology.nui', name: 'nui-reflect', version: '1.5.0-SNAPSHOT'
+    api group: 'org.terasology.nui', name: 'nui-gestalt5', version: '1.5.0-SNAPSHOT'
 
     // Wildcard dependency to catch any libs provided with the project (remote repo preferred instead)
     api fileTree(dir: 'libs', include: '*.jar')

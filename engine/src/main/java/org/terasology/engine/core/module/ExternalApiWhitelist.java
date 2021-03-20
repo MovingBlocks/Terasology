@@ -24,10 +24,70 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Set;
 
 public final class ExternalApiWhitelist {
+    private static final Set<String> NUI_PACKAGES = new ImmutableSet.Builder<String>()
+            .add("org.terasology.input")
+            .add("org.terasology.input.device")
+            .add("org.terasology.input.device.nulldevices")
+            .add("org.terasology.nui")
+            .add("org.terasology.nui.asset")
+            .add("org.terasology.nui.asset.font")
+            .add("org.terasology.nui.canvas")
+            .add("org.terasology.nui.databinding")
+            .add("org.terasology.nui.events")
+            .add("org.terasology.nui.itemRendering")
+            .add("org.terasology.nui.layouts")
+            .add("org.terasology.nui.layouts.miglayout")
+            .add("org.terasology.nui.layouts.relative")
+            .add("org.terasology.nui.properties")
+            .add("org.terasology.nui.reflection")
+            .add("org.terasology.nui.skin")
+            .add("org.terasology.nui.translate")
+            .add("org.terasology.nui.util")
+            .add("org.terasology.nui.widgets")
+            .add("org.terasology.nui.widgets.treeView")
+            .add("org.terasology.nui.widgets.types")
+            .add("org.terasology.nui.widgets.types.builtin")
+            .add("org.terasology.nui.widgets.types.builtin.object")
+            .add("org.terasology.nui.widgets.types.builtin.util")
+            .add("org.terasology.nui.widgets.types.math")
+            .add("org.terasology.reflection") // TODO: Is this safe?
+            .add("org.terasology.reflection.metadata") // TODO: Is this safe?
+            .add("org.terasology.reflection.reflect") // TODO: Is this safe?
+            .add("org.terasology.reflection.copy") // TODO: Is this safe?
+            .build();
+
     public static final Set<String> PACKAGES = new ImmutableSet.Builder<String>()
+            .addAll(NUI_PACKAGES)
             .add("org.terasology.math")
             .add("org.terasology.math.geom")
             .add("org.terasology.joml.geom")
+            .add("org.terasology.input")
+            .add("org.terasology.nui")
+            .add("org.terasology.nui.asset")
+            .add("org.terasology.nui.asset.font")
+            .add("org.terasology.nui.canvas")
+            .add("org.terasology.nui.databinding")
+            .add("org.terasology.nui.events")
+            .add("org.terasology.nui.itemRendering")
+            .add("org.terasology.nui.layouts")
+            .add("org.terasology.nui.layouts.miglayout")
+            .add("org.terasology.nui.layouts.relative")
+            .add("org.terasology.nui.properties")
+            .add("org.terasology.nui.reflection")
+            .add("org.terasology.nui.skin")
+            .add("org.terasology.nui.translate")
+            .add("org.terasology.nui.util")
+            .add("org.terasology.nui.widgets")
+            .add("org.terasology.nui.widgets.treeView")
+            .add("org.terasology.nui.widgets.types")
+            .add("org.terasology.nui.widgets.types.builtin")
+            .add("org.terasology.nui.widgets.types.builtin.object")
+            .add("org.terasology.nui.widgets.types.builtin.util")
+            .add("org.terasology.nui.widgets.types.math")
+            .add("org.terasology.reflection") // TODO: Is this safe?
+            .add("org.terasology.reflection.metadata") // TODO: Is this safe?
+            .add("org.terasology.reflection.reflect") // TODO: Is this safe?
+            .add("org.terasology.reflection.copy") // TODO: Is this safe?
             .add("java.lang")
             .add("java.beans")
             .add("java.lang.invoke")

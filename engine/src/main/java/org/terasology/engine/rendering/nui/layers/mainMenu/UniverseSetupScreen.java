@@ -37,6 +37,7 @@ import org.terasology.nui.databinding.Binding;
 import org.terasology.nui.databinding.ReadOnlyBinding;
 import org.terasology.nui.itemRendering.StringTextRenderer;
 import org.terasology.nui.skin.UISkin;
+import org.terasology.nui.skin.UISkinAsset;
 import org.terasology.nui.skin.UISkinData;
 import org.terasology.nui.widgets.UIDropdownScrollable;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
@@ -379,8 +380,8 @@ public class UniverseSetupScreen extends CoreScreenLayer {
                 (AssetFactory<BlockFamilyDefinition, BlockFamilyDefinitionData>) BlockFamilyDefinition::new, "blocks");
         assetTypeManager.registerCoreFormat(BlockFamilyDefinition.class,
                 new BlockFamilyDefinitionFormat(assetTypeManager.getAssetManager()));
-        assetTypeManager.registerCoreAssetType(UISkin.class,
-                (AssetFactory<UISkin, UISkinData>) UISkin::new, "skins");
+        assetTypeManager.registerCoreAssetType(UISkinAsset.class,
+                (AssetFactory<UISkinAsset, UISkinData>) UISkinAsset::new, "skins");
         assetTypeManager.registerCoreAssetType(BehaviorTree.class,
                 (AssetFactory<BehaviorTree, BehaviorTreeData>) BehaviorTree::new, false, "behaviors");
         assetTypeManager.registerCoreAssetType(UIElement.class,
