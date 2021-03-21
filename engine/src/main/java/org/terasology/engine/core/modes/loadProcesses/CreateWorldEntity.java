@@ -43,6 +43,12 @@ public class CreateWorldEntity extends SingleStepLoadProcess {
     private final Context context;
     private final GameManifest gameManifest;
 
+    protected EntityManager entityManager;
+    protected WorldGenerator worldGenerator;
+    protected WorldConfigurator worldConfigurator;
+    protected Config config;
+    protected ChunkProvider chunkProvider;
+
     public CreateWorldEntity(Context context, GameManifest gameManifest) {
         this.context = context;
         this.gameManifest = gameManifest;
@@ -55,24 +61,25 @@ public class CreateWorldEntity extends SingleStepLoadProcess {
 
     @Override
     public boolean step() {
-        if (worldEntityExists()) {
-            EntityRef worldEntity = getExistingWorldEntity();
-            configureChunkProvider(worldEntity);
+        this.entityManager = context.get(EntityManager.class);
+        this.worldGenerator = context.get(WorldGenerator.class);
+        this.config = context.get(Config.class);
+        this.chunkProvider = context.get(ChunkProvider.class);
+        this.worldConfigurator = worldGenerator.getConfigurator();
+
+        Iterator<EntityRef> worldEntityIterator = entityManager.getEntitiesWith(WorldComponent.class).iterator();
+        if (worldEntityIterator.hasNext()) {
+            EntityRef worldEntity = worldEntityIterator.next();
+            worldEntityIterator.forEachRemaining(w -> logger.warn("Ignored extra world {}", w));
+            chunkProvider.setWorldEntity(worldEntity);
             useConfigurationOfCurrentWorld(worldEntity);
         } else {
             EntityRef worldEntity = createWorldPoolsAndEntity();
-            configureChunkProvider(worldEntity);
-            WorldConfigurator worldConfigurator = useConfigurationFromConfig();
-            configurateWorldEntity(worldConfigurator, worldEntity);
+            chunkProvider.setWorldEntity(worldEntity);
+            useConfigurationFromConfig(worldEntity);
         }
 
         return true;
-    }
-
-    private boolean worldEntityExists() {
-        EntityManager entityManager = context.get(EntityManager.class);
-        Iterable<EntityRef> worldEntityIterator = entityManager.getEntitiesWith(WorldComponent.class);
-        return worldEntityIterator.iterator().hasNext();
     }
 
     private void useConfigurationOfCurrentWorld(EntityRef worldEntity) {
@@ -83,14 +90,12 @@ public class CreateWorldEntity extends SingleStepLoadProcess {
                 return worldEntity.getComponent(clazz);
             }
         };
-        setProperties(context.get(WorldConfigurator.class), configuratorConfigurator);
+        setProperties(worldConfigurator, configuratorConfigurator);
     }
 
     /** transfer all world generation parameters from Config to WorldEntity */
-    private WorldConfigurator useConfigurationFromConfig() {
-        WorldConfigurator worldConfigurator = context.get(WorldConfigurator.class);
-        SimpleUri generatorUri = context.get(WorldGenerator.class).getUri();
-        Config config = context.get(Config.class);
+    private void useConfigurationFromConfig(EntityRef worldEntity) {
+        SimpleUri generatorUri = worldGenerator.getUri();
         setProperties(worldConfigurator, new WorldConfiguratorConfigurator() {
                     @Override
                     public <T extends Component> T getComponentOfWorldEntity(String key, Class<T> clazz) {
@@ -98,35 +103,7 @@ public class CreateWorldEntity extends SingleStepLoadProcess {
                     }
                 }
         );
-        return worldConfigurator;
-    }
 
-    private EntityRef getExistingWorldEntity() {
-        EntityManager entityManager = context.get(EntityManager.class);
-        Iterator<EntityRef> worldEntityIterator = entityManager.getEntitiesWith(WorldComponent.class).iterator();
-        EntityRef worldEntity = worldEntityIterator.next();
-        worldEntityIterator.forEachRemaining(w -> logger.warn("Ignored extra world {}", w));
-        return worldEntity;
-    }
-
-    private EntityRef createWorldPoolsAndEntity() {
-        EntityManager entityManager = context.get(EntityManager.class);
-
-        entityManager.createWorldPools(gameManifest);
-
-        EntityRef worldEntity = entityManager.create();
-        worldEntity.addComponent(new WorldComponent());
-        NetworkComponent networkComponent = new NetworkComponent();
-        networkComponent.replicateMode = NetworkComponent.ReplicateMode.ALWAYS;
-        worldEntity.addComponent(networkComponent);
-        return worldEntity;
-    }
-
-    private void configureChunkProvider(EntityRef worldEntity) {
-        context.get(ChunkProvider.class).setWorldEntity(worldEntity);
-    }
-
-    private void configurateWorldEntity(WorldConfigurator worldConfigurator, EntityRef worldEntity) {
         worldConfigurator.getProperties().forEach((key, component) -> {
             if (component != null) {
                 worldEntity.addComponent(component);
@@ -141,6 +118,17 @@ public class CreateWorldEntity extends SingleStepLoadProcess {
                 configurator.setProperty(key, configuredComponent);
             }
         });
+    }
+
+    private EntityRef createWorldPoolsAndEntity() {
+        entityManager.createWorldPools(gameManifest);
+
+        EntityRef worldEntity = entityManager.create();
+        worldEntity.addComponent(new WorldComponent());
+        NetworkComponent networkComponent = new NetworkComponent();
+        networkComponent.replicateMode = NetworkComponent.ReplicateMode.ALWAYS;
+        worldEntity.addComponent(networkComponent);
+        return worldEntity;
     }
 
     @FunctionalInterface
