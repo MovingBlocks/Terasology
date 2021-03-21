@@ -16,12 +16,12 @@
 package org.terasology.engine.core.subsystem.headless.assets;
 
 import gnu.trove.list.TFloatList;
-import org.terasology.assets.AssetType;
-import org.terasology.assets.ResourceUrn;
-import org.terasology.joml.geom.AABBf;
-import org.terasology.joml.geom.AABBfc;
 import org.terasology.engine.rendering.assets.mesh.Mesh;
 import org.terasology.engine.rendering.assets.mesh.MeshData;
+import org.terasology.gestalt.assets.AssetType;
+import org.terasology.gestalt.assets.ResourceUrn;
+import org.terasology.joml.geom.AABBf;
+import org.terasology.joml.geom.AABBfc;
 
 public class HeadlessMesh extends Mesh {
 

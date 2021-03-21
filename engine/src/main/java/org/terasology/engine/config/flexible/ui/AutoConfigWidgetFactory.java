@@ -4,11 +4,12 @@ package org.terasology.engine.config.flexible.ui;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.assets.management.AssetManager;
 import org.terasology.engine.config.flexible.AutoConfig;
 import org.terasology.engine.config.flexible.Setting;
 import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.engine.i18n.TranslationSystem;
+import org.terasology.engine.registry.In;
+import org.terasology.gestalt.assets.management.AssetManager;
 import org.terasology.nui.UIWidget;
 import org.terasology.nui.layouts.PropertyLayout;
 import org.terasology.nui.properties.Property;
@@ -17,7 +18,6 @@ import org.terasology.nui.widgets.types.TypeWidgetBuilder;
 import org.terasology.nui.widgets.types.TypeWidgetFactory;
 import org.terasology.nui.widgets.types.TypeWidgetLibrary;
 import org.terasology.reflection.TypeInfo;
-import org.terasology.engine.registry.In;
 
 import java.util.ArrayList;
 import java.util.Collection;

@@ -14,7 +14,7 @@ import org.terasology.engine.persistence.typeHandling.TypeHandlerLibraryImpl;
 import org.terasology.engine.persistence.typeHandling.gson.GsonPersistedDataReader;
 import org.terasology.engine.persistence.typeHandling.gson.GsonPersistedDataSerializer;
 import org.terasology.engine.persistence.typeHandling.gson.GsonPersistedDataWriter;
-import org.terasology.naming.Name;
+import org.terasology.gestalt.naming.Name;
 import org.terasology.nui.Color;
 import org.terasology.persistence.serializers.Serializer;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;

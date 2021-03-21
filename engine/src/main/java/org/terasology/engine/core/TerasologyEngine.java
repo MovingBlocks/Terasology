@@ -9,9 +9,6 @@ import com.google.common.collect.Queues;
 import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.assets.AssetFactory;
-import org.terasology.assets.management.AssetManager;
-import org.terasology.assets.module.ModuleAwareAssetTypeManager;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.context.internal.ContextImpl;
@@ -35,12 +32,10 @@ import org.terasology.engine.core.subsystem.common.TimeSubsystem;
 import org.terasology.engine.core.subsystem.common.WorldGenerationSubsystem;
 import org.terasology.engine.core.subsystem.rendering.ModuleRenderingSubsystem;
 import org.terasology.engine.entitySystem.prefab.Prefab;
-import org.terasology.engine.entitySystem.prefab.PrefabData;
 import org.terasology.engine.entitySystem.prefab.internal.PojoPrefab;
 import org.terasology.engine.i18n.I18nSubsystem;
 import org.terasology.engine.input.InputSystem;
 import org.terasology.engine.logic.behavior.asset.BehaviorTree;
-import org.terasology.engine.logic.behavior.asset.BehaviorTreeData;
 import org.terasology.engine.monitoring.Activity;
 import org.terasology.engine.monitoring.PerformanceMonitor;
 import org.terasology.engine.network.NetworkSystem;
@@ -51,22 +46,20 @@ import org.terasology.engine.recording.RecordAndReplayCurrentStatus;
 import org.terasology.engine.recording.RecordAndReplayUtils;
 import org.terasology.engine.registry.CoreRegistry;
 import org.terasology.engine.rendering.gltf.ByteBufferAsset;
-import org.terasology.engine.rendering.gltf.ByteBufferData;
 import org.terasology.engine.version.TerasologyVersion;
 import org.terasology.engine.world.block.loader.BlockFamilyDefinition;
 import org.terasology.engine.world.block.loader.BlockFamilyDefinitionData;
 import org.terasology.engine.world.block.loader.BlockFamilyDefinitionFormat;
 import org.terasology.engine.world.block.shapes.BlockShape;
-import org.terasology.engine.world.block.shapes.BlockShapeData;
 import org.terasology.engine.world.block.shapes.BlockShapeImpl;
 import org.terasology.engine.world.block.sounds.BlockSounds;
-import org.terasology.engine.world.block.sounds.BlockSoundsData;
 import org.terasology.engine.world.block.tiles.BlockTile;
-import org.terasology.engine.world.block.tiles.TileData;
-import org.terasology.nui.asset.UIData;
+import org.terasology.gestalt.assets.AssetType;
+import org.terasology.gestalt.assets.management.AssetManager;
+import org.terasology.gestalt.assets.module.ModuleAwareAssetTypeManager;
+import org.terasology.gestalt.assets.module.autoreload.AutoReloadAssetTypeManager;
 import org.terasology.nui.asset.UIElement;
 import org.terasology.nui.skin.UISkinAsset;
-import org.terasology.nui.skin.UISkinData;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.reflection.ModuleTypeRegistry;
 import org.terasology.reflection.TypeRegistry;
@@ -312,13 +305,14 @@ public class TerasologyEngine implements GameEngine {
     private void initManagers() {
 
         changeStatus(TerasologyEngineStatus.INITIALIZING_MODULE_MANAGER);
-        ModuleTypeRegistry typeRegistry = new ModuleTypeRegistry();
         TypeRegistry.WHITELISTED_CLASSES = ExternalApiWhitelist.CLASSES.stream().map(Class::getName).collect(Collectors.toSet());
         TypeRegistry.WHITELISTED_PACKAGES = ExternalApiWhitelist.PACKAGES;
-        rootContext.put(ModuleTypeRegistry.class, typeRegistry);
-        rootContext.put(TypeRegistry.class, typeRegistry);
 
         ModuleManager moduleManager = new ModuleManager(rootContext.get(Config.class), classesOnClasspathsToAddToEngine);
+        ModuleTypeRegistry typeRegistry = new ModuleTypeRegistry(moduleManager.getEnvironment());
+
+        rootContext.put(ModuleTypeRegistry.class, typeRegistry);
+        rootContext.put(TypeRegistry.class, typeRegistry);
         rootContext.put(ModuleManager.class, moduleManager);
 
         changeStatus(TerasologyEngineStatus.INITIALIZING_LOWLEVEL_OBJECT_MANIPULATION);
@@ -331,7 +325,7 @@ public class TerasologyEngine implements GameEngine {
         rootContext.put(TypeHandlerLibrary.class, TypeHandlerLibraryImpl.forModuleEnvironment(moduleManager, typeRegistry));
 
         changeStatus(TerasologyEngineStatus.INITIALIZING_ASSET_TYPES);
-        assetTypeManager = new ModuleAwareAssetTypeManager();
+        assetTypeManager = new AutoReloadAssetTypeManager();
         rootContext.put(ModuleAwareAssetTypeManager.class, assetTypeManager);
         rootContext.put(AssetManager.class, assetTypeManager.getAssetManager());
     }
@@ -340,25 +334,21 @@ public class TerasologyEngine implements GameEngine {
 
 
         // cast lambdas explicitly to avoid inconsistent compiler behavior wrt. type inference
-        assetTypeManager.registerCoreAssetType(Prefab.class,
-                (AssetFactory<Prefab, PrefabData>) PojoPrefab::new, false, "prefabs");
-        assetTypeManager.registerCoreAssetType(BlockShape.class,
-                (AssetFactory<BlockShape, BlockShapeData>) BlockShapeImpl::new, "shapes");
-        assetTypeManager.registerCoreAssetType(BlockSounds.class,
-                (AssetFactory<BlockSounds, BlockSoundsData>) BlockSounds::new, "blockSounds");
-        assetTypeManager.registerCoreAssetType(BlockTile.class,
-                (AssetFactory<BlockTile, TileData>) BlockTile::new, "blockTiles");
-        assetTypeManager.registerCoreAssetType(BlockFamilyDefinition.class,
-                (AssetFactory<BlockFamilyDefinition, BlockFamilyDefinitionData>) BlockFamilyDefinition::new, "blocks");
-        assetTypeManager.registerCoreFormat(BlockFamilyDefinition.class,
+        assetTypeManager.createAssetType(Prefab.class, PojoPrefab::new, "prefabs");
+
+        assetTypeManager.createAssetType(BlockShape.class, BlockShapeImpl::new, "shapes");
+        assetTypeManager.createAssetType(BlockSounds.class, BlockSounds::new, "blockSounds");
+        assetTypeManager.createAssetType(BlockTile.class, BlockTile::new, "blockTiles");
+
+        AssetType<BlockFamilyDefinition, BlockFamilyDefinitionData> blockFamilyDefinitionAssetType = assetTypeManager.createAssetType(BlockFamilyDefinition.class, BlockFamilyDefinition::new, "blocks");
+
+        assetTypeManager.getAssetFileDataProducer(blockFamilyDefinitionAssetType).addAssetFormat(
                 new BlockFamilyDefinitionFormat(assetTypeManager.getAssetManager()));
-        assetTypeManager.registerCoreAssetType(UISkinAsset.class,
-                (AssetFactory<UISkinAsset, UISkinData>) UISkinAsset::new, "skins");
-        assetTypeManager.registerCoreAssetType(BehaviorTree.class,
-                (AssetFactory<BehaviorTree, BehaviorTreeData>) BehaviorTree::new, false, "behaviors");
-        assetTypeManager.registerCoreAssetType(UIElement.class,
-                (AssetFactory<UIElement, UIData>) UIElement::new, "ui");
-        assetTypeManager.registerCoreAssetType(ByteBufferAsset.class, (AssetFactory<ByteBufferAsset, ByteBufferData>) ByteBufferAsset::new, "mesh");
+        assetTypeManager.createAssetType(UISkinAsset.class, UISkinAsset::new, "skins");
+        assetTypeManager.createAssetType(BehaviorTree.class, BehaviorTree::new, "behaviors");
+        assetTypeManager.createAssetType(UIElement.class, UIElement::new, "ui");
+
+        assetTypeManager.createAssetType(ByteBufferAsset.class, ByteBufferAsset::new, "mesh");
 
         for (EngineSubsystem subsystem : allSubsystems) {
             subsystem.registerCoreAssetTypes(assetTypeManager);
@@ -472,7 +462,8 @@ public class TerasologyEngine implements GameEngine {
             return false;
         }
 
-        assetTypeManager.reloadChangedOnDisk();
+//        assetTypeManager.reloadChangedOnDisk();
+//        assetTypeManager.reloadAssets();
 
         processPendingState();
 

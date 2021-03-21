@@ -4,7 +4,7 @@ package org.terasology.engine.rendering.primitives;
 
 import com.google.common.collect.Maps;
 import org.joml.Vector3ic;
-import org.terasology.assets.ResourceUrn;
+import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.engine.math.Side;
 import org.terasology.engine.rendering.assets.mesh.Mesh;
 import org.terasology.engine.world.ChunkView;

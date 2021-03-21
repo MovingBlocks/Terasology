@@ -6,8 +6,10 @@ import com.google.common.collect.Lists;
 import org.joml.Vector2i;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.assets.AssetType;
-import org.terasology.assets.ResourceUrn;
+import org.terasology.engine.core.subsystem.lwjgl.LwjglGraphics;
+import org.terasology.gestalt.assets.AssetType;
+import org.terasology.gestalt.assets.DisposableResource;
+import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.engine.core.subsystem.lwjgl.LwjglGraphicsManager;
 import org.terasology.joml.geom.Rectanglef;
 import org.terasology.joml.geom.Rectanglei;
@@ -25,12 +27,16 @@ public class OpenGLTexture extends Texture {
 
     private final TextureResources resources;
 
-    public OpenGLTexture(ResourceUrn urn, AssetType<?, TextureData> assetType, TextureData data, LwjglGraphicsManager graphicsManager) {
-        super(urn, assetType);
-        this.resources = new TextureResources(graphicsManager);
-        getDisposalHook().setDisposeAction(resources);
+    public OpenGLTexture(ResourceUrn urn, AssetType<?, TextureData> assetType, TextureData data,  TextureResources textureResources) {
+        super(urn, assetType, textureResources);
+        this.resources = textureResources;
         reload(data);
     }
+
+    public static OpenGLTexture create(ResourceUrn urn, AssetType<?, TextureData> assetType, TextureData data, LwjglGraphicsManager graphicsManager) {
+        return new OpenGLTexture(urn, assetType, data, new TextureResources(graphicsManager));
+    }
+
 
     public void setId(int id) {
         resources.id = id;
@@ -177,12 +183,12 @@ public class OpenGLTexture extends Texture {
     }
 
     @Override
-    public synchronized void subscribeToDisposal(Runnable subscriber) {
+    public synchronized void subscribeToDisposal(DisposableResource subscriber) {
         resources.disposalSubscribers.add(subscriber);
     }
 
     @Override
-    public synchronized void unsubscribeToDisposal(Runnable subscriber) {
+    public synchronized void unsubscribeToDisposal(DisposableResource subscriber) {
         resources.disposalSubscribers.remove(subscriber);
     }
 
@@ -233,13 +239,13 @@ public class OpenGLTexture extends Texture {
         }
     }
 
-    private static class TextureResources implements Runnable {
+    private static class TextureResources implements DisposableResource {
 
         private final LwjglGraphicsManager graphicsManager;
         private volatile int id;
         private volatile LoadedTextureInfo loadedTextureInfo;
 
-        private final List<Runnable> disposalSubscribers = Lists.newArrayList();
+        private final List<DisposableResource> disposalSubscribers = Lists.newArrayList();
 
          TextureResources(LwjglGraphicsManager graphicsManager) {
             this.graphicsManager = graphicsManager;
@@ -247,9 +253,9 @@ public class OpenGLTexture extends Texture {
 
 
         @Override
-        public void run() {
+        public void close() {
             if (loadedTextureInfo != null) {
-                disposalSubscribers.forEach(java.lang.Runnable::run);
+                disposalSubscribers.forEach(DisposableResource::close);
                 graphicsManager.disposeTexture(id);
                 loadedTextureInfo = null;
                 id = 0;

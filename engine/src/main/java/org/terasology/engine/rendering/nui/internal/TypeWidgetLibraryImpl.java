@@ -7,7 +7,7 @@ import com.google.common.primitives.Primitives;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.core.module.ModuleContext;
 import org.terasology.engine.core.module.ModuleManager;
-import org.terasology.module.Module;
+import org.terasology.gestalt.module.Module;
 import org.terasology.nui.UIWidget;
 import org.terasology.nui.databinding.Binding;
 import org.terasology.nui.widgets.types.TypeWidgetBuilder;

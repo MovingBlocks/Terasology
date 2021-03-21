@@ -23,7 +23,7 @@ ext {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // Read the internal version out of the engine-tests module.txt
-def moduleFile = file('src/main/resources/module.txt')
+def moduleFile = file('src/main/resources/org/terasology/unittest/module.txt')
 
 if (!moduleFile.exists()) {
     println "Failed to find module.txt for engine-tests"
@@ -46,6 +46,34 @@ sourceSets {
     // Adjust output path (changed with the Gradle 6 upgrade, this puts it back)
     main.java.outputDir = new File("$buildDir/classes")
     test.java.outputDir = new File("$buildDir/testClasses")
+}
+
+
+// JMH related tasks
+
+sourceSets {
+    jmh {
+        java.srcDirs = ['src/jmh/java']
+        resources.srcDirs = ['src/jmh/resources']
+        compileClasspath += sourceSets.main.runtimeClasspath
+    }
+}
+
+task jmh(type: JavaExec, dependsOn: jmhClasses) {
+    main = 'org.openjdk.jmh.Main'
+    classpath = sourceSets.jmh.compileClasspath + sourceSets.jmh.runtimeClasspath
+}
+
+dependencies {
+    jmhAnnotationProcessor group: 'org.openjdk.jmh', name: 'jmh-generator-annprocess', version: '1.27'
+    jmhImplementation 'org.openjdk.jmh:jmh-core:1.27'
+    jmhImplementation 'org.openjdk.jmh:jmh-generator-annprocess:1.27'
+}
+
+
+// umm need for android dependencies
+repositories {
+    google()
 }
 
 // Primary dependencies definition

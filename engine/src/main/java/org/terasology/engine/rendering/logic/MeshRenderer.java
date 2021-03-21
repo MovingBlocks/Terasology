@@ -23,6 +23,7 @@ import org.terasology.engine.entitySystem.systems.RegisterMode;
 import org.terasology.engine.entitySystem.systems.RegisterSystem;
 import org.terasology.engine.entitySystem.systems.RenderSystem;
 import org.terasology.engine.rendering.assets.material.Material;
+import org.terasology.engine.rendering.assets.shader.ShaderProgramFeature;
 import org.terasology.engine.rendering.opengl.OpenGLMesh;
 import org.terasology.engine.rendering.world.WorldRenderer;
 import org.terasology.joml.geom.AABBf;

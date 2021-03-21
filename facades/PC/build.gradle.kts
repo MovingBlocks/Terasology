@@ -59,6 +59,12 @@ logger.info("PC VERSION: {}", version)
 // Jenkins-Artifactory integration catches on to this as part of the Maven-type descriptor
 group = "org.terasology.facades"
 
+
+// umm need for android dependencies
+repositories {
+    google()
+}
+
 dependencies {
     implementation(project(":engine"))
     implementation("org.terasology:reflections:0.9.12-MB")

@@ -11,7 +11,7 @@ import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.engine.core.paths.PathManager;
 import org.terasology.engine.registry.InjectionHelper;
 import org.terasology.engine.utilities.ReflectionUtil;
-import org.terasology.module.ModuleEnvironment;
+import org.terasology.gestalt.module.ModuleEnvironment;
 import org.terasology.persistence.serializers.Serializer;
 import org.terasology.reflection.TypeInfo;
 

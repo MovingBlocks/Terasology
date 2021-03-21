@@ -5,7 +5,6 @@ package org.terasology.engine.rendering.nui.layers.mainMenu;
 import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.assets.ResourceUrn;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.config.ModuleConfig;
 import org.terasology.engine.core.GameEngine;
@@ -15,14 +14,20 @@ import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.engine.core.module.StandardModuleExtension;
 import org.terasology.engine.game.GameManifest;
 import org.terasology.engine.i18n.TranslationSystem;
+import org.terasology.engine.network.NetworkMode;
+import org.terasology.engine.registry.In;
+import org.terasology.engine.rendering.nui.CoreScreenLayer;
 import org.terasology.engine.rendering.nui.animation.MenuAnimationSystems;
 import org.terasology.engine.rendering.nui.layers.mainMenu.advancedGameSetupScreen.AdvancedGameSetupScreen;
 import org.terasology.engine.rendering.nui.layers.mainMenu.savedGames.GameProvider;
+import org.terasology.engine.world.generator.internal.WorldGeneratorInfo;
+import org.terasology.engine.world.generator.internal.WorldGeneratorManager;
+import org.terasology.gestalt.assets.ResourceUrn;
+import org.terasology.gestalt.module.Module;
+import org.terasology.gestalt.module.dependencyresolution.DependencyResolver;
+import org.terasology.gestalt.module.resources.DirectoryFileSource;
+import org.terasology.gestalt.naming.Name;
 import org.terasology.input.Keyboard;
-import org.terasology.module.DependencyResolver;
-import org.terasology.module.Module;
-import org.terasology.naming.Name;
-import org.terasology.engine.network.NetworkMode;
 import org.terasology.nui.Canvas;
 import org.terasology.nui.Color;
 import org.terasology.nui.WidgetUtil;
@@ -34,10 +39,6 @@ import org.terasology.nui.widgets.UIDropdown;
 import org.terasology.nui.widgets.UIDropdownScrollable;
 import org.terasology.nui.widgets.UILabel;
 import org.terasology.nui.widgets.UIText;
-import org.terasology.engine.registry.In;
-import org.terasology.engine.rendering.nui.CoreScreenLayer;
-import org.terasology.engine.world.generator.internal.WorldGeneratorInfo;
-import org.terasology.engine.world.generator.internal.WorldGeneratorManager;
 
 import java.util.Comparator;
 import java.util.List;
@@ -185,7 +186,7 @@ public class NewGameScreen extends CoreScreenLayer {
         List<Module> gameplayModules = Lists.newArrayList();
         for (Name moduleId : moduleManager.getRegistry().getModuleIds()) {
             Module latestVersion = moduleManager.getRegistry().getLatestModuleVersion(moduleId);
-            if (!latestVersion.isOnClasspath()) {
+            if (!(latestVersion.getResources() instanceof DirectoryFileSource)) {
                 if (StandardModuleExtension.isGameplayModule(latestVersion)) {
                     gameplayModules.add(latestVersion);
                 }

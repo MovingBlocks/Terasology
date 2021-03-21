@@ -1,13 +1,13 @@
 {
-    "type": "engine:mainMenuScreen",
-    "skin": "engine:mainMenu",
+    "type": "engine:extraMenuScreen",
+    "skin": "engine:mainmenu",
     "contents": {
         "type": "relativeLayout",
         "contents": [
             {
                 "type": "UIImage",
-                "id": "title",
                 "image": "engine:terasology",
+                "id": "title",
                 "layoutInfo": {
                     "width": 512,
                     "height": 128,
@@ -20,8 +20,9 @@
             },
             {
                 "type": "UILabel",
-                "id": "version",
+                "text": "${engine:menu#extras-label}",
                 "family": "title",
+                "id": "subtitle",
                 "layoutInfo": {
                     "height": 48,
                     "position-horizontal-center": {},
@@ -32,7 +33,7 @@
                 }
             },
             {
-                "type": "engine:columnLayout",
+                "type": "ColumnLayout",
                 "layoutInfo": {
                     "use-content-width": true,
                     "use-content-height": true,
@@ -40,7 +41,7 @@
                     "position-top": {
                         "target": "BOTTOM",
                         "offset": 16,
-                        "widget": "version"
+                        "widget": "subtitle"
                     },
                     "position-bottom": {
                         "offset": 32
@@ -52,57 +53,31 @@
                 "contents": [
                     {
                         "type": "UIButton",
-                        "id": "singleplayer",
-                        "text": "${engine:menu#start-singleplayer-game}"
+                        "text": "${engine:menu#telemetry-button}",
+                        "id": "telemetry"
                     },
                     {
                         "type": "UIButton",
-                        "id": "multiplayer",
-                        "text": "${engine:menu#host-multiplayer-game}"
+                        "id": "devTools",
+                        "text": "${engine:menu#dev-tools-title}"
                     },
                     {
                         "type": "UIButton",
-                        "id": "join",
-                        "text": "${engine:menu#join-game-online}"
+                        "text": "${engine:menu#crash-reporter}",
+                        "id": "crashReporter"
+                    },
+                    {
+                        "type": "UISpace",
+                        "size": [1, 64]
                     },
                     {
                         "type": "UIButton",
-                        "id": "settings",
-                        "text": "${engine:menu#game-settings}"
-                    },
-                    {
-                        "type": "UIButton",
-                        "id": "extras",
-                        "text": "${engine:menu#extras-label}"
-                    },
-                    {
-                        "type" : "UISpace",
-                        "size" : [1, 64]
-                    },
-                    {
-                        "type": "UIButton",
-                        "id": "exit",
-                        "text": "${engine:menu#exit-game}"
+                        "id": "close",
+                        "text": "${engine:menu#back}"
                     }
                 ]
-            },
-            {
-                "type": "UILabel",
-                "id": "nonNativeJvmWarning",
-                "family": "warning",
-                "text": "${engine:menu#non-native-jvm-warn}",
-                "visible": false,
-                "layoutInfo": {
-                    "use-content-width": true,
-                    "use-content-height": true,
-                    "position-bottom": {
-                        "offset": 8
-                    },
-                    "position-left": {
-                        "offset": 8
-                    }
-                }
             }
         ]
     }
 }
+

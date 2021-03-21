@@ -8,6 +8,7 @@ apply plugin: 'pmd'
 repositories {
     // External libs - jcenter is Bintray and is supposed to be a superset of Maven Central, but do both just in case
     jcenter()
+    google()
     mavenCentral()
 
     // MovingBlocks Artifactory instance for libs not readily available elsewhere plus our own libs

@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.rendering.nui.layers.ingame;
 
-import org.terasology.assets.ResourceUrn;
+import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.crashreporter.CrashReporter;
 import org.terasology.engine.core.LoggingContext;
 import org.terasology.engine.core.Time;

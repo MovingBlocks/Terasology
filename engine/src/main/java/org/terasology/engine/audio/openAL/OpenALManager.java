@@ -29,7 +29,6 @@ import org.lwjgl.openal.ALCCapabilities;
 import org.lwjgl.openal.ALCapabilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.assets.AssetFactory;
 import org.terasology.engine.audio.AudioEndListener;
 import org.terasology.engine.audio.AudioManager;
 import org.terasology.engine.audio.Sound;
@@ -43,6 +42,7 @@ import org.terasology.engine.audio.openAL.streamingSound.OpenALStreamingSound;
 import org.terasology.engine.audio.openAL.streamingSound.OpenALStreamingSoundPool;
 import org.terasology.engine.config.AudioConfig;
 import org.terasology.engine.math.Direction;
+import org.terasology.gestalt.assets.AssetFactory;
 
 import java.nio.FloatBuffer;
 import java.util.Iterator;
@@ -289,12 +289,12 @@ public class OpenALManager implements AudioManager {
 
     @Override
     public AssetFactory<StaticSound, StaticSoundData> getStaticSoundFactory() {
-        return (urn, assetType, data) -> new OpenALSound(urn, assetType, data, OpenALManager.this);
+        return (urn, assetType, data) -> new OpenALSound(urn, assetType, data, OpenALManager.this, new OpenALSound.DisposalAction(urn));
     }
 
     @Override
     public AssetFactory<StreamingSound, StreamingSoundData> getStreamingSoundFactory() {
-        return (urn, assetType, data) -> new OpenALStreamingSound(urn, assetType, data, OpenALManager.this);
+        return (urn, assetType, data) -> new OpenALStreamingSound(urn, assetType, data, OpenALManager.this, new OpenALStreamingSound.DisposalAction(urn));
     }
 
     public void purgeSound(Sound<?> sound) {

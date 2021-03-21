@@ -3,7 +3,6 @@
 
 package org.terasology.engine.core.bootstrap;
 
-import org.terasology.assets.ResourceUrn;
 import org.terasology.engine.audio.events.PlaySoundEvent;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.core.module.ModuleManager;
@@ -39,8 +38,9 @@ import org.terasology.engine.recording.RecordAndReplayStatus;
 import org.terasology.engine.recording.RecordAndReplayUtils;
 import org.terasology.engine.recording.RecordedEventStore;
 import org.terasology.engine.recording.RecordingEventSystemDecorator;
-import org.terasology.module.ModuleEnvironment;
-import org.terasology.naming.Name;
+import org.terasology.gestalt.assets.ResourceUrn;
+import org.terasology.gestalt.module.ModuleEnvironment;
+import org.terasology.gestalt.naming.Name;
 import org.terasology.nui.properties.OneOfProviderFactory;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.reflection.TypeRegistry;

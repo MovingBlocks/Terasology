@@ -5,13 +5,13 @@ package org.terasology.engine.entitySystem.prefab.internal;
 import com.google.common.base.Charsets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.assets.ResourceUrn;
-import org.terasology.assets.format.AbstractAssetFileFormat;
-import org.terasology.assets.format.AssetDataFile;
+import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.engine.entitySystem.metadata.ComponentLibrary;
 import org.terasology.engine.entitySystem.prefab.PrefabData;
 import org.terasology.engine.persistence.serializers.EntityDataJSONFormat;
 import org.terasology.engine.persistence.serializers.PrefabSerializer;
+import org.terasology.gestalt.assets.format.AbstractAssetFileFormat;
+import org.terasology.gestalt.assets.format.AssetDataFile;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.protobuf.EntityData;
 

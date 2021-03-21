@@ -1,13 +1,13 @@
 {
-    "type": "engine:extraMenuScreen",
-    "skin": "engine:mainmenu",
+    "type": "engine:mainMenuScreen",
+    "skin": "engine:mainMenu",
     "contents": {
         "type": "relativeLayout",
         "contents": [
             {
                 "type": "UIImage",
-                "image": "engine:terasology",
                 "id": "title",
+                "image": "engine:terasology",
                 "layoutInfo": {
                     "width": 512,
                     "height": 128,
@@ -20,9 +20,8 @@
             },
             {
                 "type": "UILabel",
-                "text": "${engine:menu#extras-label}",
+                "id": "version",
                 "family": "title",
-                "id": "subtitle",
                 "layoutInfo": {
                     "height": 48,
                     "position-horizontal-center": {},
@@ -33,7 +32,7 @@
                 }
             },
             {
-                "type": "engine:columnLayout",
+                "type": "ColumnLayout",
                 "layoutInfo": {
                     "use-content-width": true,
                     "use-content-height": true,
@@ -41,7 +40,7 @@
                     "position-top": {
                         "target": "BOTTOM",
                         "offset": 16,
-                        "widget": "subtitle"
+                        "widget": "version"
                     },
                     "position-bottom": {
                         "offset": 32
@@ -53,31 +52,57 @@
                 "contents": [
                     {
                         "type": "UIButton",
-                        "text": "${engine:menu#telemetry-button}",
-                        "id": "telemetry"
+                        "id": "singleplayer",
+                        "text": "${engine:menu#start-singleplayer-game}"
                     },
                     {
                         "type": "UIButton",
-                        "id": "devTools",
-                        "text": "${engine:menu#dev-tools-title}"
+                        "id": "multiplayer",
+                        "text": "${engine:menu#host-multiplayer-game}"
                     },
                     {
                         "type": "UIButton",
-                        "text": "${engine:menu#crash-reporter}",
-                        "id": "crashReporter"
-                    },
-                    {
-                        "type": "UISpace",
-                        "size": [1, 64]
+                        "id": "join",
+                        "text": "${engine:menu#join-game-online}"
                     },
                     {
                         "type": "UIButton",
-                        "id": "close",
-                        "text": "${engine:menu#back}"
+                        "id": "settings",
+                        "text": "${engine:menu#game-settings}"
+                    },
+                    {
+                        "type": "UIButton",
+                        "id": "extras",
+                        "text": "${engine:menu#extras-label}"
+                    },
+                    {
+                        "type" : "UISpace",
+                        "size" : [1, 64]
+                    },
+                    {
+                        "type": "UIButton",
+                        "id": "exit",
+                        "text": "${engine:menu#exit-game}"
                     }
                 ]
+            },
+            {
+                "type": "UILabel",
+                "id": "nonNativeJvmWarning",
+                "family": "warning",
+                "text": "${engine:menu#non-native-jvm-warn}",
+                "visible": false,
+                "layoutInfo": {
+                    "use-content-width": true,
+                    "use-content-height": true,
+                    "position-bottom": {
+                        "offset": 8
+                    },
+                    "position-left": {
+                        "offset": 8
+                    }
+                }
             }
         ]
     }
 }
-

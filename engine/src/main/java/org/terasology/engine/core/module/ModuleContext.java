@@ -15,9 +15,9 @@
  */
 package org.terasology.engine.core.module;
 
-import org.terasology.module.Module;
-import org.terasology.naming.Name;
 import org.terasology.engine.registry.CoreRegistry;
+import org.terasology.gestalt.module.Module;
+import org.terasology.gestalt.naming.Name;
 
 /**
  */

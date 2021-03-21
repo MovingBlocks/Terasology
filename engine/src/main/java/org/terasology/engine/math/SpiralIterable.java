@@ -5,6 +5,7 @@ package org.terasology.engine.math;
 import com.google.common.base.Preconditions;
 import org.joml.Vector2i;
 import org.joml.Vector2ic;
+
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 

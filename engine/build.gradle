@@ -53,6 +53,11 @@ configurations {
     }
 }
 
+// umm need for android dependencies
+repositories {
+    google()
+}
+
 // Primary dependencies definition
 dependencies {
     // Storage and networking
@@ -105,16 +110,20 @@ dependencies {
     implementation group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '4.10'
 
     // Our developed libs
-    api group: 'org.terasology', name: 'gestalt-module', version: '5.1.5'
-    api group: 'org.terasology', name: 'gestalt-util', version: '5.1.5'
-    api group: 'org.terasology', name: 'gestalt-asset-core', version: '5.1.5'
+    api group: 'org.terasology.gestalt', name: 'gestalt-asset-core', version: '7.0.6-SNAPSHOT'
+    api group: 'org.terasology.gestalt', name: 'gestalt-entity-system', version: '7.0.6-SNAPSHOT'
+    api group: 'org.terasology.gestalt', name: 'gestalt-module', version: '7.0.6-SNAPSHOT'
+    api group: 'org.terasology.gestalt', name: 'gestalt-util', version: '7.0.6-SNAPSHOT'
+    api "com.github.zafarkhaja:java-semver:0.10.0"
+
     api group: 'org.terasology', name: 'TeraMath', version: '1.5.0'
     api group: 'org.terasology', name: 'splash-screen', version: '1.1.1'
     api group: 'org.terasology.jnlua', name: 'JNLua', version: '0.1.0-SNAPSHOT'
     api group: 'org.terasology.jnbullet', name: 'JNBullet', version: '1.0.2'
     api group: 'org.terasology.nui', name: 'nui', version: '3.0.0-SNAPSHOT'
     api group: 'org.terasology.nui', name: 'nui-reflect', version: '3.0.0-SNAPSHOT'
-    api group: 'org.terasology.nui', name: 'nui-gestalt5', version: '3.0.0-SNAPSHOT'
+    api group: 'org.terasology.nui', name: 'nui-gestalt7', version: '3.0.0-SNAPSHOT'
+
 
     // Wildcard dependency to catch any libs provided with the project (remote repo preferred instead)
     api fileTree(dir: 'libs', include: '*.jar')
@@ -169,33 +178,13 @@ task cleanReflections(type: Delete) {
     delete cacheReflections.outputs.files
 }
 
-// JMH related tasks
-
-sourceSets {
-    jmh {
-        java.srcDirs = ['src/jmh/java']
-        resources.srcDirs = ['src/jmh/resources']
-        compileClasspath += sourceSets.main.runtimeClasspath
-    }
-}
-
-task jmh(type: JavaExec, dependsOn: jmhClasses) {
-    main = 'org.openjdk.jmh.Main'
-    classpath = sourceSets.jmh.compileClasspath + sourceSets.jmh.runtimeClasspath
-}
-
-dependencies {
-    jmhAnnotationProcessor group: 'org.openjdk.jmh', name: 'jmh-generator-annprocess', version: '1.27'
-    jmhImplementation 'org.openjdk.jmh:jmh-core:1.27'
-    jmhImplementation 'org.openjdk.jmh:jmh-generator-annprocess:1.27'
-}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Version file stuff                                                                                                //
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // First read the internal version out of the engine's engine-module.txt
-def moduleFile = file('src/main/resources/engine-module.txt')
+def moduleFile = file('src/main/resources/org/terasology/engine/engine-module.txt')
 
 if (!moduleFile.exists()) {
     println "Failed to find engine-module.txt for engine"

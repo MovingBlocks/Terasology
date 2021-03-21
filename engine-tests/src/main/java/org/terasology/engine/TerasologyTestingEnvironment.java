@@ -20,7 +20,7 @@ import org.terasology.engine.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.engine.game.Game;
 import org.terasology.engine.logic.console.Console;
 import org.terasology.engine.logic.console.ConsoleImpl;
-import org.terasology.naming.Name;
+import org.terasology.gestalt.naming.Name;
 import org.terasology.engine.network.NetworkSystem;
 import org.terasology.engine.network.internal.NetworkSystemImpl;
 import org.terasology.engine.persistence.StorageManager;

@@ -15,21 +15,20 @@
  */
 package org.terasology.engine.core.module;
 
-import com.google.common.collect.ImmutableList;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.reflections.Reflections;
 import org.terasology.engine.core.TerasologyConstants;
-import org.terasology.module.BaseModule;
-import org.terasology.module.DependencyResolver;
-import org.terasology.module.Module;
-import org.terasology.module.ModuleMetadata;
-import org.terasology.module.ModuleRegistry;
-import org.terasology.module.ResolutionResult;
-import org.terasology.module.TableModuleRegistry;
-import org.terasology.naming.Name;
-import org.terasology.naming.Version;
+import org.terasology.gestalt.module.Module;
+import org.terasology.gestalt.module.ModuleMetadata;
+import org.terasology.gestalt.module.ModuleRegistry;
+import org.terasology.gestalt.module.TableModuleRegistry;
+import org.terasology.gestalt.module.dependencyresolution.DependencyResolver;
+import org.terasology.gestalt.module.dependencyresolution.ResolutionResult;
+import org.terasology.gestalt.module.resources.EmptyFileSource;
+import org.terasology.gestalt.naming.Name;
+import org.terasology.gestalt.naming.Version;
 
-import java.net.URL;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -100,24 +99,8 @@ public class ModuleDownloadListGeneratorTest {
         if (version != null) {
             metadata.setVersion(new Version(version));
         }
-        return new BaseModule(Collections.emptyList(), metadata) {
-            @Override
-            public ImmutableList<URL> getClasspaths() {
-                return null;
-            }
-
-            @Override
-            public boolean isOnClasspath() {
-                return false;
-            }
-
-            @Override
-            public boolean isCodeModule() {
-                return false;
-            }
-        };
+        return new Module(metadata, new EmptyFileSource(), Collections.emptyList(), new Reflections(), (c) -> false);
     }
-
     private Module buildEngineModule(String version) {
         return buildSimpleModule(TerasologyConstants.ENGINE_MODULE.toString(), version);
     }

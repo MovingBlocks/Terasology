@@ -7,7 +7,7 @@ import com.google.common.base.Functions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.math.DoubleMath;
-import org.terasology.assets.ResourceUrn;
+import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.config.SystemConfig;
 import org.terasology.engine.context.Context;

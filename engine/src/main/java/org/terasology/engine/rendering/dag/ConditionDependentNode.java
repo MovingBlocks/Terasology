@@ -5,7 +5,7 @@ package org.terasology.engine.rendering.dag;
 import com.google.common.collect.Lists;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.rendering.world.WorldRenderer;
-import org.terasology.naming.Name;
+import org.terasology.gestalt.naming.Name;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;

@@ -4,7 +4,7 @@ package org.terasology.engine.rendering.nui.editor.layers;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
-import org.terasology.assets.ResourceUrn;
+import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.nui.WidgetUtil;
 import org.terasology.nui.databinding.ReadOnlyBinding;
 import org.terasology.nui.widgets.UIButton;

@@ -16,11 +16,11 @@
 
 package org.terasology.engine.audio.formats;
 
-import org.terasology.assets.ResourceUrn;
-import org.terasology.assets.format.AbstractAssetFileFormat;
-import org.terasology.assets.format.AssetDataFile;
-import org.terasology.assets.module.annotations.RegisterAssetFileFormat;
 import org.terasology.engine.audio.StreamingSoundData;
+import org.terasology.gestalt.assets.ResourceUrn;
+import org.terasology.gestalt.assets.format.AbstractAssetFileFormat;
+import org.terasology.gestalt.assets.format.AssetDataFile;
+import org.terasology.gestalt.assets.module.annotations.RegisterAssetFileFormat;
 
 import java.io.IOException;
 import java.util.List;

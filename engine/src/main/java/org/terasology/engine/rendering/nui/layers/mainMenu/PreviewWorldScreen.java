@@ -5,14 +5,13 @@ package org.terasology.engine.rendering.nui.layers.mainMenu;
 import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.assets.ResourceUrn;
-import org.terasology.assets.module.ModuleAwareAssetTypeManager;
+import org.terasology.engine.core.module.ModuleManager;
+import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.context.internal.ContextImpl;
 import org.terasology.engine.core.SimpleUri;
 import org.terasology.engine.core.bootstrap.EnvironmentSwitchHandler;
-import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.entitySystem.metadata.ComponentLibrary;
 import org.terasology.engine.rendering.assets.texture.Texture;
@@ -20,11 +19,12 @@ import org.terasology.engine.rendering.assets.texture.TextureData;
 import org.terasology.engine.rendering.nui.animation.MenuAnimationSystems;
 import org.terasology.engine.rendering.nui.layers.mainMenu.preview.FacetLayerPreview;
 import org.terasology.engine.rendering.nui.layers.mainMenu.preview.PreviewGenerator;
+import org.terasology.gestalt.assets.module.ModuleAwareAssetTypeManager;
+import org.terasology.gestalt.module.dependencyresolution.DependencyResolver;
+import org.terasology.gestalt.module.dependencyresolution.ResolutionResult;
+import org.terasology.gestalt.module.exceptions.UnresolvedDependencyException;
 import org.terasology.math.TeraMath;
-import org.terasology.module.DependencyResolver;
-import org.terasology.module.ModuleEnvironment;
-import org.terasology.module.ResolutionResult;
-import org.terasology.module.exceptions.UnresolvedDependencyException;
+import org.terasology.gestalt.module.ModuleEnvironment;
 import org.terasology.nui.WidgetUtil;
 import org.terasology.nui.databinding.Binding;
 import org.terasology.nui.layouts.PropertyLayout;
@@ -140,7 +140,7 @@ public class PreviewWorldScreen extends CoreScreenLayer {
 
             configureProperties();
         } else {
-            throw new UnresolvedDependencyException("Unable to resolve depencencies for " + worldGenUri);
+            throw new UnresolvedDependencyException("Unable to resolve dependencies for " + worldGenUri);
         }
     }
 

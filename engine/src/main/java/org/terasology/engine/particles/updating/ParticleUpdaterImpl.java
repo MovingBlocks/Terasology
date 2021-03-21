@@ -13,7 +13,7 @@ import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.math.TeraMath;
-import org.terasology.module.ModuleEnvironment;
+import org.terasology.gestalt.module.ModuleEnvironment;
 import org.terasology.engine.particles.ParticleDataMask;
 import org.terasology.engine.particles.ParticlePool;
 import org.terasology.engine.particles.components.ParticleEmitterComponent;

@@ -14,8 +14,9 @@ import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL15;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.assets.AssetType;
-import org.terasology.assets.ResourceUrn;
+import org.terasology.gestalt.assets.AssetType;
+import org.terasology.gestalt.assets.DisposableResource;
+import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.engine.core.GameThread;
 import org.terasology.engine.core.subsystem.lwjgl.GLBufferPool;
 import org.terasology.engine.core.subsystem.lwjgl.LwjglGraphicsProcessing;
@@ -66,12 +67,18 @@ public class OpenGLMesh extends Mesh {
 
     private DisposalAction disposalAction;
 
-    public OpenGLMesh(ResourceUrn urn, AssetType<?, MeshData> assetType, GLBufferPool bufferPool, MeshData data, LwjglGraphicsProcessing graphicsProcessing) {
-        super(urn, assetType);
-        this.disposalAction = new DisposalAction(urn, bufferPool);
+    public OpenGLMesh(ResourceUrn urn, AssetType<?, MeshData> assetType, GLBufferPool bufferPool, MeshData data,
+                      DisposalAction disposalAction, LwjglGraphicsProcessing graphicsProcessing) {
+        super(urn, assetType, disposalAction);
+        this.disposalAction = disposalAction;
         graphicsProcessing.asynchToDisplayThread(() -> {
             reload(data);
         });
+    }
+
+    public static OpenGLMesh create(ResourceUrn urn, AssetType<?, MeshData> assetType, GLBufferPool bufferPool,
+                                    MeshData data, LwjglGraphicsProcessing graphicsProcessing) {
+        return new OpenGLMesh(urn, assetType, bufferPool, data, new DisposalAction(urn, bufferPool), graphicsProcessing);
     }
 
     @Override
@@ -250,7 +257,7 @@ public class OpenGLMesh extends Mesh {
         indexBuffer.flip();
     }
 
-    private static class DisposalAction implements Runnable {
+    private static class DisposalAction implements DisposableResource {
 
         private final ResourceUrn urn;
         private final GLBufferPool bufferPool;
@@ -264,7 +271,7 @@ public class OpenGLMesh extends Mesh {
         }
 
         @Override
-        public void run() {
+        public void close() {
             try {
                 GameThread.synch(() -> {
                     if (vboVertexBuffer != 0) {

@@ -3,10 +3,10 @@
 package org.terasology.engine.config.flexible.ui;
 
 import com.google.common.collect.ImmutableMap;
-import org.terasology.assets.management.AssetManager;
+import org.terasology.gestalt.assets.management.AssetManager;
 import org.terasology.engine.config.flexible.Setting;
 import org.terasology.engine.config.flexible.constraints.SettingConstraint;
-import org.terasology.module.ModuleEnvironment;
+import org.terasology.gestalt.module.ModuleEnvironment;
 import org.terasology.nui.UIWidget;
 import org.terasology.engine.registry.In;
 import org.terasology.engine.registry.InjectionHelper;

@@ -7,12 +7,16 @@ import org.reflections.scanners.TypeAnnotationsScanner
 import org.reflections.util.ConfigurationBuilder
 
 subprojects {
-    // Hack for getting sourcesSets.main.output there. 
+    // Hack for getting sourcesSets.main.output there.
     plugins.apply('java')
     plugins.apply('idea')
     def sourceSets = project.getConvention().getPlugin(JavaPluginConvention.class).sourceSets
 
-    
+    // umm need for android dependencies
+    repositories {
+        google()
+    }
+
     sourceSets.main.java.outputDir = new File("$buildDir/classes")
     idea {
         module {

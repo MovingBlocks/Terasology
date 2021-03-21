@@ -15,7 +15,7 @@
  */
 package org.terasology.engine.config.facade;
 
-import org.terasology.module.sandbox.API;
+import org.terasology.gestalt.module.sandbox.API;
 
 /**
  * TelemetryConfiguration is a wrapper for {@link org.terasology.engine.config.TelemetryConfig}.

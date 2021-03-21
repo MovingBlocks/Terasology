@@ -20,13 +20,13 @@ import com.badlogic.gdx.physics.bullet.Bullet;
 import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.assets.management.AssetManager;
+import org.terasology.gestalt.assets.management.AssetManager;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.context.internal.ContextImpl;
 import org.terasology.engine.core.paths.PathManager;
 import org.terasology.engine.recording.RecordAndReplayCurrentStatus;
 import org.terasology.engine.registry.CoreRegistry;
-import org.terasology.naming.Name;
+import org.terasology.gestalt.naming.Name;
 
 import java.io.IOException;
 import java.util.Set;
@@ -76,7 +76,7 @@ public class Environment {
         AssetManager assetManager = setupAssetManager();
 
         setupBlockManager(assetManager);
-        
+
         setupExtraDataManager(context);
 
         setupCollisionManager();
@@ -137,7 +137,7 @@ public class Environment {
     protected void setupBlockManager(AssetManager assetManager) {
         // empty
     }
-    
+
     protected void setupExtraDataManager(Context context) {
         // empty
     }

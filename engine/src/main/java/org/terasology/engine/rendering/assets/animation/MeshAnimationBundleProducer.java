@@ -2,10 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.rendering.assets.animation;
 
-import org.terasology.assets.AbstractFragmentDataProducer;
-import org.terasology.assets.ResourceUrn;
-import org.terasology.assets.management.AssetManager;
-import org.terasology.assets.module.annotations.RegisterAssetDataProducer;
+import org.terasology.gestalt.assets.AbstractFragmentDataProducer;
+import org.terasology.gestalt.assets.ResourceUrn;
+import org.terasology.gestalt.assets.management.AssetManager;
+import org.terasology.gestalt.assets.module.annotations.RegisterAssetDataProducer;
 
 import java.util.Collections;
 import java.util.Optional;

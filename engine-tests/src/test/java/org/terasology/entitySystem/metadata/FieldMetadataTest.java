@@ -16,7 +16,7 @@
 package org.terasology.engine.entitySystem.metadata;
 
 import org.junit.jupiter.api.Test;
-import org.terasology.assets.ResourceUrn;
+import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.engine.entitySystem.stubs.OwnerComponent;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.reflect.ReflectFactory;

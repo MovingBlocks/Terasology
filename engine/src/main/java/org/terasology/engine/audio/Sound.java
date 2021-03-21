@@ -15,16 +15,27 @@
  */
 package org.terasology.engine.audio;
 
-import org.terasology.assets.Asset;
-import org.terasology.assets.AssetData;
-import org.terasology.assets.AssetType;
-import org.terasology.assets.ResourceUrn;
+import org.terasology.gestalt.assets.Asset;
+import org.terasology.gestalt.assets.AssetData;
+import org.terasology.gestalt.assets.AssetType;
+import org.terasology.gestalt.assets.DisposableResource;
+import org.terasology.gestalt.assets.ResourceUrn;
 
 /**
  * An abstract class
  * @param <T> The asset type this asset belongs to
  */
 public abstract class Sound<T extends AssetData> extends Asset<T> implements org.terasology.nui.asset.Sound {
+
+    /**
+     * The constructor for an asset. It is suggested that implementing classes provide a constructor taking both the urn, and an initial AssetData to load.
+     *
+     * @param urn       The urn identifying the asset.
+     * @param assetType The asset type this asset belongs to.
+     */
+    protected Sound(ResourceUrn urn, AssetType<?, T> assetType, DisposableResource resource) {
+        super(urn, assetType,resource);
+    }
 
     /**
      * The constructor for an asset. It is suggested that implementing classes provide a constructor taking both the urn, and an initial AssetData to load.

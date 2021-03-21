@@ -19,6 +19,9 @@ package org.terasology.engine.core.module;
 import com.google.common.collect.ImmutableSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.persistence.typeHandling.SpecificTypeHandlerFactory;
+import org.terasology.persistence.typeHandling.StringRepresentationTypeHandler;
+import org.terasology.reflection.MappedContainer;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Set;
@@ -122,6 +125,9 @@ public final class ExternalApiWhitelist {
             .add("org.lwjgl")
             .add("org.terasology.jnlua")
             .add("org.joml")
+            .add("org.terasology.input")
+            .add("org.terasology.input.device")
+            .add("org.terasology")
             .build();
 
     public static final Set<Class<?>> CLASSES = new ImmutableSet.Builder<Class<?>>()
@@ -175,6 +181,20 @@ public final class ExternalApiWhitelist {
             .add(java.io.DataOutputStream.class)
             .add(java.io.FilterOutputStream.class)
             .add(java.io.PipedOutputStream.class)
+            // terasology math
+            .add(org.terasology.math.TeraMath.class)
+            // gestalt module
+            .add(org.terasology.gestalt.naming.Name.class)
+            .add(org.terasology.gestalt.assets.management.AssetManager.class)
+            .add(org.terasology.gestalt.assets.Asset.class)
+            .add(org.terasology.gestalt.assets.AssetData.class)
+            .add(org.terasology.gestalt.assets.AssetDataProducer.class)
+            .add(org.terasology.gestalt.assets.module.annotations.RegisterAssetDataProducer.class)
+            .add(MappedContainer.class)
+            .add(StringRepresentationTypeHandler.class)
+            .add(SpecificTypeHandlerFactory.class)
+            .add(org.terasology.gestalt.assets.ResourceUrn.class)
+            .add(org.terasology.reflection.metadata.FieldMetadata.class)
             .build();
 
     private ExternalApiWhitelist() {

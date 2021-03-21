@@ -4,39 +4,21 @@ package org.terasology.engine.testUtil;
 
 import com.google.common.collect.Sets;
 import org.terasology.engine.core.module.ModuleManager;
-import org.terasology.engine.entitySystem.stubs.StringComponent;
-import org.terasology.module.Module;
-
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.util.Collections;
-
-import static com.google.common.base.Verify.verify;
-import static org.terasology.engine.core.TerasologyConstants.ENGINE_MODULE;
+import org.terasology.gestalt.module.Module;
+import org.terasology.gestalt.naming.Name;
 
 public final class ModuleManagerFactory {
 
-    private ModuleManagerFactory() { }
+    private ModuleManagerFactory() {
+    }
 
     public static ModuleManager create() throws Exception {
-        return create(false);
-    }
+        ModuleManager moduleManager = new ModuleManager("");
+        Module unittestModule = moduleManager.getModuleFactory().createPackageModule("org.terasology.unittest");
+        moduleManager.getRegistry().add(unittestModule);
 
-    public static ModuleManager create(boolean loadModulesFromClasspath) throws Exception {
-        ModuleManager moduleManager = new ModuleManager("", Collections.emptyList(), loadModulesFromClasspath);
-        loadUnitTestModule(moduleManager);
+        moduleManager.loadEnvironment(Sets.newHashSet(moduleManager.getRegistry().getLatestModuleVersion(new Name(
+                "engine")), unittestModule), true);
         return moduleManager;
-    }
-
-    public static void loadUnitTestModule(ModuleManager manager) throws IOException, URISyntaxException {
-        // using the StringComponent stub class as representative example of classes in the unittest module
-        Module testModule = manager.loadClasspathModule(StringComponent.class);
-        verify(testModule.getMetadata().getId().toString().equals("unittest"),
-                "Intended to load the unittest module but ended up with this instead: %s", testModule);
-        manager.loadEnvironment(
-                Sets.newHashSet(
-                        manager.getRegistry().getLatestModuleVersion(ENGINE_MODULE),
-                        testModule
-                ), true);
     }
 }

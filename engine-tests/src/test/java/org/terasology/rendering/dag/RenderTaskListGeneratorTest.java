@@ -27,7 +27,7 @@ import org.terasology.engine.rendering.dag.RenderGraph;
 import org.terasology.engine.rendering.dag.RenderPipelineTask;
 import org.terasology.engine.rendering.dag.RenderTaskListGenerator;
 import org.terasology.engine.rendering.dag.StateChange;
-import org.terasology.naming.Name;
+import org.terasology.gestalt.naming.Name;
 import org.terasology.engine.rendering.dag.dependencyConnections.BufferPairConnection;
 import org.terasology.engine.rendering.dag.dependencyConnections.BufferPair;
 import org.terasology.engine.rendering.dag.dependencyConnections.DependencyConnection;

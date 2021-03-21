@@ -4,11 +4,11 @@
 package org.terasology.engine.rendering.assets.texture;
 
 import com.google.common.collect.ImmutableSet;
-import org.terasology.assets.AssetDataProducer;
-import org.terasology.assets.ResourceUrn;
-import org.terasology.assets.module.annotations.RegisterAssetDataProducer;
+import org.terasology.gestalt.assets.AssetDataProducer;
+import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.engine.core.TerasologyConstants;
-import org.terasology.naming.Name;
+import org.terasology.gestalt.assets.module.annotations.RegisterAssetDataProducer;
+import org.terasology.gestalt.naming.Name;
 
 import java.io.IOException;
 import java.util.Collections;

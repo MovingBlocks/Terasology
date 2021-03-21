@@ -18,7 +18,7 @@ package org.terasology.engine.particles.components.generators;
 import org.joml.Vector2f;
 import org.joml.Vector2i;
 import org.terasology.engine.entitySystem.Component;
-import org.terasology.module.sandbox.API;
+import org.terasology.gestalt.module.sandbox.API;
 import org.terasology.engine.rendering.assets.texture.Texture;
 
 import java.util.LinkedList;

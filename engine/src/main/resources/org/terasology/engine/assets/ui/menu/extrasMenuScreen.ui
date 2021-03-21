@@ -33,7 +33,7 @@
                 }
             },
             {
-                "type": "engine:columnLayout",
+                "type": "ColumnLayout",
                 "layoutInfo": {
                     "use-content-width": true,
                     "use-content-height": true,

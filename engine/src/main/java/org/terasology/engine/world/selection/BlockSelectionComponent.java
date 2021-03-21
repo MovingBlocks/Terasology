@@ -5,7 +5,7 @@ package org.terasology.engine.world.selection;
 import org.joml.Vector3i;
 import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.logic.selection.MovableSelectionStartEvent;
-import org.terasology.module.sandbox.API;
+import org.terasology.gestalt.module.sandbox.API;
 import org.terasology.engine.rendering.assets.texture.Texture;
 import org.terasology.engine.world.block.BlockRegion;
 

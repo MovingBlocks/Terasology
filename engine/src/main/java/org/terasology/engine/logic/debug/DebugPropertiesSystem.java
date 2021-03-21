@@ -5,14 +5,14 @@ package org.terasology.engine.logic.debug;
 import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
 import org.terasology.engine.entitySystem.systems.RegisterMode;
 import org.terasology.engine.entitySystem.systems.RegisterSystem;
-import org.terasology.module.sandbox.API;
-import org.terasology.nui.properties.OneOfProviderFactory;
-import org.terasology.reflection.reflect.ReflectFactory;
 import org.terasology.engine.registry.In;
 import org.terasology.engine.registry.Share;
 import org.terasology.engine.rendering.nui.NUIManager;
+import org.terasology.gestalt.module.sandbox.API;
 import org.terasology.nui.layouts.PropertyLayout;
+import org.terasology.nui.properties.OneOfProviderFactory;
 import org.terasology.nui.properties.PropertyProvider;
+import org.terasology.reflection.reflect.ReflectFactory;
 
 import java.security.AccessController;
 import java.security.PrivilegedAction;

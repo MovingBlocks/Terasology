@@ -6,11 +6,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.io.TempDir;
 import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.engine.core.paths.PathManager;
-import org.terasology.module.DependencyResolver;
-import org.terasology.module.ModuleEnvironment;
-import org.terasology.module.ResolutionResult;
-import org.terasology.reflection.ModuleTypeRegistry;
 import org.terasology.engine.testUtil.ModuleManagerFactory;
+import org.terasology.gestalt.module.ModuleEnvironment;
+import org.terasology.gestalt.module.dependencyresolution.DependencyResolver;
+import org.terasology.gestalt.module.dependencyresolution.ResolutionResult;
+import org.terasology.reflection.ModuleTypeRegistry;
 
 import java.nio.file.Path;
 

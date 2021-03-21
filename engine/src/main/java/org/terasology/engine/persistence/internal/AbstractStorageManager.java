@@ -27,7 +27,7 @@ import org.terasology.engine.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.engine.entitySystem.entity.internal.OwnershipHelper;
 import org.terasology.joml.geom.AABBfc;
 import org.terasology.engine.logic.location.LocationComponent;
-import org.terasology.module.ModuleEnvironment;
+import org.terasology.gestalt.module.ModuleEnvironment;
 import org.terasology.engine.network.ClientComponent;
 import org.terasology.engine.persistence.ChunkStore;
 import org.terasology.engine.persistence.PlayerStore;

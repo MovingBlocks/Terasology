@@ -6,12 +6,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.assets.AssetFactory;
-import org.terasology.assets.management.AssetManager;
-import org.terasology.assets.module.ModuleAwareAssetTypeManager;
+import org.terasology.engine.core.module.ModuleManager;
+import org.terasology.gestalt.assets.AssetType;
+import org.terasology.gestalt.assets.management.AssetManager;
+import org.terasology.gestalt.assets.module.ModuleAwareAssetTypeManager;
 import org.terasology.engine.context.internal.ContextImpl;
 import org.terasology.engine.core.bootstrap.EntitySystemSetupUtil;
-import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.engine.entitySystem.metadata.ComponentLibrary;
 import org.terasology.engine.entitySystem.prefab.Prefab;
 import org.terasology.engine.entitySystem.prefab.PrefabData;
@@ -29,6 +29,7 @@ import org.terasology.engine.network.NetworkMode;
 import org.terasology.engine.network.NetworkSystem;
 import org.terasology.engine.recording.RecordAndReplayCurrentStatus;
 import org.terasology.engine.registry.CoreRegistry;
+import org.terasology.gestalt.assets.module.ModuleAwareAssetTypeManagerImpl;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.engine.testUtil.ModuleManagerFactory;
 
@@ -61,13 +62,12 @@ public class PrefabTest {
 
         EntitySystemSetupUtil.addReflectionBasedLibraries(context);
 
-        ModuleAwareAssetTypeManager assetTypeManager = new ModuleAwareAssetTypeManager();
-        assetTypeManager.registerCoreAssetType(Prefab.class,
-                (AssetFactory<Prefab, PrefabData>) PojoPrefab::new, "prefabs");
+        ModuleAwareAssetTypeManager assetTypeManager = new ModuleAwareAssetTypeManagerImpl();
+        AssetType<Prefab, PrefabData> prefabDataAssetType = assetTypeManager.createAssetType(Prefab.class, PojoPrefab::new, "prefabs");
         ComponentLibrary componentLibrary = context.get(ComponentLibrary.class);
         TypeHandlerLibrary typeHandlerLibrary = context.get(TypeHandlerLibrary.class);
         PrefabFormat prefabFormat = new PrefabFormat(componentLibrary, typeHandlerLibrary);
-        assetTypeManager.registerCoreFormat(Prefab.class, prefabFormat);
+        assetTypeManager.getAssetFileDataProducer(prefabDataAssetType).addAssetFormat(prefabFormat);
         assetTypeManager.switchEnvironment(moduleManager.getEnvironment());
         context.put(AssetManager.class, assetTypeManager.getAssetManager());
 

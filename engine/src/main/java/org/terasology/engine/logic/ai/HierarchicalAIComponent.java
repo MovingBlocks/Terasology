@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.logic.ai;
 
-import org.terasology.engine.entitySystem.Component;
 import org.joml.Vector3f;
+import org.terasology.engine.entitySystem.Component;
 
 /**
  */
@@ -32,7 +32,7 @@ public final class HierarchicalAIComponent implements Component {
     public boolean dieIfPlayerFar = true;
     public int dieDistance = 2000;
 
-    //define type of AI 
+    //define type of AI
     public boolean hunter;
     public boolean aggressive;
     public boolean wild;

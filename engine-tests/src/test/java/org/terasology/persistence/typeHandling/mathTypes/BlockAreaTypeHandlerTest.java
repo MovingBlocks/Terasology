@@ -14,7 +14,7 @@ import org.terasology.engine.persistence.typeHandling.gson.GsonPersistedDataSeri
 import org.terasology.engine.persistence.typeHandling.gson.GsonPersistedDataWriter;
 import org.terasology.engine.world.block.BlockArea;
 import org.terasology.engine.world.block.BlockAreac;
-import org.terasology.naming.Name;
+import org.terasology.gestalt.naming.Name;
 import org.terasology.persistence.serializers.Serializer;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.reflection.TypeInfo;

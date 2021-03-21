@@ -3,7 +3,7 @@
 package org.terasology.engine.world.chunks;
 
 import org.joml.Vector3ic;
-import org.terasology.module.sandbox.API;
+import org.terasology.gestalt.module.sandbox.API;
 import org.terasology.engine.world.block.Block;
 
 /**

@@ -10,16 +10,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.core.EngineTime;
-import org.terasology.engine.core.TerasologyConstants;
 import org.terasology.engine.core.Time;
 import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.engine.core.paths.PathManager;
-import org.terasology.module.ModuleLoader;
-import org.terasology.naming.Name;
-import org.terasology.naming.Version;
 import org.terasology.engine.network.JoinStatus;
-import org.terasology.protobuf.NetData;
 import org.terasology.engine.registry.CoreRegistry;
+import org.terasology.gestalt.naming.Name;
+import org.terasology.gestalt.naming.Version;
+import org.terasology.protobuf.NetData;
 
 import java.io.BufferedOutputStream;
 import java.io.IOException;
@@ -216,11 +214,12 @@ public class ClientConnectionHandler extends ChannelInboundHandlerAdapter {
                     }
 
                     Files.copy(tempModuleLocation, finalPath);
-                    ModuleLoader loader = new ModuleLoader(moduleManager.getModuleMetadataReader());
-                    loader.setModuleInfoPath(TerasologyConstants.MODULE_INFO_FILENAME);
-
-                    moduleManager.getRegistry().add(loader.load(finalPath));
+                    moduleManager.getRegistry().add(moduleManager.getModuleFactory().createModule(finalPath.toFile()));
                     receivingModule = null;
+
+//                    ModuleLoader loader = new ModuleLoader(moduleManager.getModuleMetadataReader());
+//                    loader.setModuleInfoPath(TerasologyConstants.MODULE_INFO_FILENAME);
+//                    moduleManager.getRegistry().add(loader.load(finalPath));
 
                     if (missingModules.isEmpty()) {
                         sendJoin(channelHandlerContext);

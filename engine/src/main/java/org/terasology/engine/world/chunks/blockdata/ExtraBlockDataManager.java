@@ -7,8 +7,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.core.module.ModuleManager;
-import org.terasology.module.ModuleEnvironment;
-import org.terasology.module.sandbox.API;
+import org.terasology.gestalt.module.ModuleEnvironment;
+import org.terasology.gestalt.module.sandbox.API;
 import org.terasology.engine.world.block.Block;
 import org.terasology.engine.world.block.BlockManager;
 
@@ -51,10 +51,10 @@ public class ExtraBlockDataManager {
         TERA_ARRAY_FACTORIES.put(8,  new TeraSparseArray8Bit.Factory());
         TERA_ARRAY_FACTORIES.put(16, new TeraSparseArray16Bit.Factory());
     }
-    
+
     private Map<String, Integer> slots;
     private TeraArray.Factory<? extends TeraArray>[] slotFactories;
-    
+
     /**
      * Construct a trivial instance for testing purposes: don't add any data-fields.
      */
@@ -62,13 +62,13 @@ public class ExtraBlockDataManager {
         slots = new HashMap<>();
         slotFactories = new TeraArray.Factory[0];
     }
-    
+
     /**
      * Set extra-data fields based on the modules available through the context.
      */
     public ExtraBlockDataManager(Context context) {
         Map<Integer, Map<String, Set<Block>>> fieldss = getFieldsFromAnnotations(context);
-        
+
         // Work out which fields don't overlap and can be aliased together.
         slots = new HashMap<>();
         ArrayList<TeraArray.Factory<?>> tempSlotTypes = new ArrayList<>();
@@ -83,7 +83,7 @@ public class ExtraBlockDataManager {
             }
         });
         slotFactories = tempSlotTypes.toArray(new TeraArray.Factory<?>[0]);
-        
+
         String loggingOutput = "Extra data slots registered:";
         boolean first = true;
         for (Map.Entry<String, Integer> entry : slots.entrySet()) {
@@ -92,15 +92,15 @@ public class ExtraBlockDataManager {
         }
         logger.info(loggingOutput);
     }
-    
+
     // Find requests for extensions and which blocks they apply to.
     private Map<Integer, Map<String, Set<Block>>> getFieldsFromAnnotations(Context context) {
         ModuleEnvironment environment = context.get(ModuleManager.class).getEnvironment();
         Collection<Block> blocks = context.get(BlockManager.class).listRegisteredBlocks();
-        
+
         Map<Integer, Map<String, Set<Block>>> fieldss = new HashMap<>();
         TERA_ARRAY_FACTORIES.forEach((size, fac) -> fieldss.put(size, new HashMap<>()));
-        
+
         for (Class<?> type : environment.getTypesAnnotatedWith(ExtraDataSystem.class)) {
             for (Method method : type.getMethods()) {
                 RegisterExtraData registerAnnotation = method.getAnnotation(RegisterExtraData.class);
@@ -132,7 +132,7 @@ public class ExtraBlockDataManager {
         }
         return fieldss;
     }
-    
+
     private static String validRegistrationMethod(Method method, RegisterExtraData annotation) {
         Class<?>[] argumentTypes = method.getParameterTypes();
         return method.getReturnType() != boolean.class ? "incorrect return type"
@@ -142,7 +142,7 @@ public class ExtraBlockDataManager {
                : argumentTypes[0] != Block.class ? "incorrect argument type"
                : null;
     }
-    
+
     private static Graph getDisjointnessGraph(Map<String, Set<Block>> fields) {
         Graph graph = new Graph(fields.keySet().toArray(new String[0]));
         fields.forEach((name0, blockSet0) ->
@@ -154,7 +154,7 @@ public class ExtraBlockDataManager {
         );
         return graph;
     }
-    
+
     //This is exponential time, but the problem is known to be NP-hard in general and large cases are unlikely to come up.
     /**
      * Find the smallest-possible number of cliques that contain all of the vertices of the graph.
@@ -163,7 +163,7 @@ public class ExtraBlockDataManager {
     private static ArrayList<ArrayList<String>> findCliqueCover(Graph graph) {
         return findCliqueCover(graph, Integer.MAX_VALUE, "");
     }
-    
+
     private static ArrayList<ArrayList<String>> findCliqueCover(Graph graph, int bestSize, String tabs) {
         verboseLog(tabs + "findCliqueCover up to " + bestSize + ", " + graph.toString());
         for (int i = 0; i < graph.size(); i++) {
@@ -199,12 +199,12 @@ public class ExtraBlockDataManager {
         }
         return bestCover;
     }
-    
+
     // Log something, but only when this class is being tested.
     private static void verboseLog(String string) {
         //logger.info(string);
     }
-    
+
     /**
      * Get the numerical index associated with the extra data field name.
      * This numerical index is needed for most extra-data access methods.
@@ -216,7 +216,7 @@ public class ExtraBlockDataManager {
         }
         return index;
     }
-    
+
     public TeraArray[] makeDataArrays(int sizeX, int sizeY, int sizeZ) {
         TeraArray[] extraData = new TeraArray[slotFactories.length];
         for (int i = 0; i < extraData.length; i++) {
@@ -224,7 +224,7 @@ public class ExtraBlockDataManager {
         }
         return extraData;
     }
-    
+
     /**
      * Undirected graphs with string-labelled vertices.
      * Used to represent the overlaps between requested extra-data fields.
@@ -232,12 +232,12 @@ public class ExtraBlockDataManager {
     private static class Graph {
         private String[] verts;
         private Map<String, Set<String>> edges;
-        
+
         private Graph(String[] verts, Map<String, Set<String>> edges) {
             this.verts = verts;
             this.edges = edges;
         }
-        
+
         Graph(String[] verts) {
             this.verts = verts.clone();
             this.edges = new HashMap<>();
@@ -245,31 +245,31 @@ public class ExtraBlockDataManager {
                 edges.put(vert, new HashSet());
             }
         }
-        
+
         public int size() {
             return verts.length;
         }
-        
+
         public String getVert(int i) {
             return verts[i];
         }
-        
+
         public Set<String> getEdges(String v) {
             return Collections.unmodifiableSet(edges.get(v));
         }
-        
+
         public Graph addEdge(String s0, String s1) {
             edges.get(s0).add(s1);
             edges.get(s1).add(s0);
             return this;
         }
-        
+
         public Graph removeEdge(String s0, String s1) {
             edges.get(s0).remove(s1);
             edges.get(s1).remove(s0);
             return this;
         }
-        
+
         // Creates a new graph containing the complement of the contraction of the complement.
         public Graph ntract(String s0, String s1) {
             int v0 = -1;
@@ -303,7 +303,7 @@ public class ExtraBlockDataManager {
             }
             return new Graph(newVerts, newEdges);
         }
-        
+
         public String toString() {
             String result = "Graph:";
             for (int i = 0; i < verts.length; i++) {

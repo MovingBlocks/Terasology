@@ -8,6 +8,7 @@ import org.gradle.plugins.ide.idea.model.IdeaModel
 import org.reflections.Reflections
 import org.reflections.scanners.SubTypesScanner
 import org.reflections.scanners.TypeAnnotationsScanner
+import org.reflections.serializers.JsonSerializer
 import org.reflections.util.ConfigurationBuilder
 import org.reflections.util.FilterBuilder
 import org.terasology.gradology.ModuleMetadataForGradle
@@ -124,7 +125,7 @@ val mainSourceSet: SourceSet = sourceSets[SourceSet.MAIN_SOURCE_SET_NAME]
 tasks.register("cacheReflections") {
     description = "Caches reflection output to make regular startup faster. May go stale and need cleanup at times."
     inputs.files(mainSourceSet.output.classesDirs)
-    outputs.file(File(mainSourceSet.output.classesDirs.first(), "reflections.cache"))
+    outputs.file(File(mainSourceSet.output.classesDirs.first(), "manifest.json"))
     dependsOn(tasks.named("classes"))
 
     outputs.upToDateWhen { tasks.named("classes").get().state.upToDate }
@@ -135,7 +136,7 @@ tasks.register("cacheReflections") {
                     .filterInputsBy(FilterBuilder.parsePackages("+org"))
                     .addUrls(inputs.getFiles().getSingleFile().toURI().toURL())
                     .setScanners(TypeAnnotationsScanner(), SubTypesScanner()))
-            reflections.save(outputs.getFiles().getAsPath())
+            reflections.save(outputs.getFiles().getAsPath(), JsonSerializer())
         } catch (e: java.net.MalformedURLException) {
             logger.error("Cannot parse input to url", e)
         }
@@ -163,6 +164,10 @@ tasks.register<Sync>("syncDeltas") {
     into("${mainSourceSet.output.classesDirs.first()}/deltas")
 }
 
+tasks.named("compileJava") {
+    finalizedBy("cacheReflections")
+}
+
 // Instructions for packaging a jar file - is a manifest even needed for modules?
 tasks.named("jar") {
     // Make sure the assets directory is included
@@ -179,7 +184,6 @@ tasks.named("jar") {
         }
     }
 
-    finalizedBy("cleanReflections")
 }
 
 tasks.named<Test>("test") {

@@ -6,7 +6,7 @@ import com.google.common.collect.Maps;
 import org.joml.Vector3f;
 import org.terasology.engine.world.block.shapes.BlockShape;
 import org.terasology.engine.world.block.sounds.BlockSounds;
-import org.terasology.module.sandbox.API;
+import org.terasology.gestalt.module.sandbox.API;
 import org.terasology.engine.world.block.BlockPart;
 import org.terasology.engine.world.block.tiles.BlockTile;
 

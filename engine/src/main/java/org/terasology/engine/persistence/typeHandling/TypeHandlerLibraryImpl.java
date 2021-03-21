@@ -55,7 +55,7 @@ import org.terasology.joml.geom.AABBf;
 import org.terasology.joml.geom.AABBi;
 import org.terasology.joml.geom.Rectanglef;
 import org.terasology.joml.geom.Rectanglei;
-import org.terasology.naming.Name;
+import org.terasology.gestalt.naming.Name;
 import org.terasology.nui.Color;
 import org.terasology.nui.Colorc;
 import org.terasology.nui.UITextureRegion;

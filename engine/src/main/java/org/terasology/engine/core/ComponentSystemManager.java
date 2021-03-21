@@ -17,12 +17,12 @@ import org.terasology.engine.entitySystem.systems.RenderSystem;
 import org.terasology.engine.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.engine.logic.console.Console;
 import org.terasology.engine.logic.console.commandSystem.MethodCommand;
-import org.terasology.module.Module;
-import org.terasology.module.ModuleEnvironment;
-import org.terasology.module.sandbox.API;
-import org.terasology.naming.Name;
 import org.terasology.engine.network.NetworkMode;
 import org.terasology.engine.registry.InjectionHelper;
+import org.terasology.gestalt.module.Module;
+import org.terasology.gestalt.module.ModuleEnvironment;
+import org.terasology.gestalt.module.sandbox.API;
+import org.terasology.gestalt.naming.Name;
 
 import java.util.List;
 import java.util.Map;

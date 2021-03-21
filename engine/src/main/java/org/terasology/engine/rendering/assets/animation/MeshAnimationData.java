@@ -5,7 +5,7 @@ package org.terasology.engine.rendering.assets.animation;
 import com.google.common.collect.ImmutableList;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
-import org.terasology.assets.AssetData;
+import org.terasology.gestalt.assets.AssetData;
 import org.terasology.joml.geom.AABBf;
 
 import java.util.List;

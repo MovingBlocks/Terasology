@@ -6,7 +6,7 @@ package org.terasology.engine.world.viewer.layers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.world.generation.WorldFacet;
-import org.terasology.module.ModuleEnvironment;
+import org.terasology.gestalt.module.ModuleEnvironment;
 
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
