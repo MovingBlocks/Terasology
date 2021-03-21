@@ -21,14 +21,14 @@ import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.terasology.engine.core.TerasologyConstants;
+import org.terasology.engine.utilities.gson.CaseInsensitiveEnumTypeAdapterFactory;
+import org.terasology.engine.utilities.gson.UriTypeAdapterFactory;
+import org.terasology.engine.world.internal.WorldInfo;
 import org.terasology.naming.Name;
 import org.terasology.naming.NameVersion;
 import org.terasology.naming.Version;
 import org.terasology.naming.gson.NameTypeAdapter;
 import org.terasology.naming.gson.VersionTypeAdapter;
-import org.terasology.engine.utilities.gson.CaseInsensitiveEnumTypeAdapterFactory;
-import org.terasology.engine.utilities.gson.UriTypeAdapterFactory;
-import org.terasology.engine.world.internal.WorldInfo;
 
 import java.io.BufferedReader;
 import java.io.IOException;

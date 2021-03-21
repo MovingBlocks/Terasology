@@ -71,6 +71,59 @@
       <module fileurl="file://$PROJECT_DIR$/facades/TeraEd/TeraEd.iml" filepath="$PROJECT_DIR$/facades/TeraEd/TeraEd.iml"/>
       <module fileurl="file://$PROJECT_DIR$/subsystems/DiscordRPC/DiscordRPC.iml" filepath="$PROJECT_DIR$/subsystems/DiscordRPC/DiscordRPC.iml"/>
       <module fileurl="file://$PROJECT_DIR$/subsystems/TypeHandlerLibrary/TypeHandlerLibrary.iml" filepath="$PROJECT_DIR$/subsystems/TypeHandlerLibrary/TypeHandlerLibrary.iml"/>
+      <module fileurl="file://$PROJECT_DIR$/modules/AdditionalFruits/AdditionalFruits.iml" filepath="$PROJECT_DIR$/modules/AdditionalFruits/AdditionalFruits.iml"/>
+      <module fileurl="file://$PROJECT_DIR$/modules/BasicCrafting/BasicCrafting.iml" filepath="$PROJECT_DIR$/modules/BasicCrafting/BasicCrafting.iml"/>
+      <module fileurl="file://$PROJECT_DIR$/modules/Behaviors/Behaviors.iml" filepath="$PROJECT_DIR$/modules/Behaviors/Behaviors.iml"/>
+      <module fileurl="file://$PROJECT_DIR$/modules/BiomesAPI/BiomesAPI.iml" filepath="$PROJECT_DIR$/modules/BiomesAPI/BiomesAPI.iml"/>
+      <module fileurl="file://$PROJECT_DIR$/modules/Caves/Caves.iml" filepath="$PROJECT_DIR$/modules/Caves/Caves.iml"/>
+      <module fileurl="file://$PROJECT_DIR$/modules/ChrisVolume1OST/ChrisVolume1OST.iml" filepath="$PROJECT_DIR$/modules/ChrisVolume1OST/ChrisVolume1OST.iml"/>
+      <module fileurl="file://$PROJECT_DIR$/modules/ChrisVolume2OST/ChrisVolume2OST.iml" filepath="$PROJECT_DIR$/modules/ChrisVolume2OST/ChrisVolume2OST.iml"/>
+      <module fileurl="file://$PROJECT_DIR$/modules/CoreAdvancedAssets/CoreAdvancedAssets.iml" filepath="$PROJECT_DIR$/modules/CoreAdvancedAssets/CoreAdvancedAssets.iml"/>
+      <module fileurl="file://$PROJECT_DIR$/modules/CoreAssets/CoreAssets.iml" filepath="$PROJECT_DIR$/modules/CoreAssets/CoreAssets.iml"/>
+      <module fileurl="file://$PROJECT_DIR$/modules/CoreRendering/CoreRendering.iml" filepath="$PROJECT_DIR$/modules/CoreRendering/CoreRendering.iml"/>
+      <module fileurl="file://$PROJECT_DIR$/modules/CoreWorlds/CoreWorlds.iml" filepath="$PROJECT_DIR$/modules/CoreWorlds/CoreWorlds.iml"/>
+      <module fileurl="file://$PROJECT_DIR$/modules/CustomOreGen/CustomOreGen.iml" filepath="$PROJECT_DIR$/modules/CustomOreGen/CustomOreGen.iml"/>
+      <module fileurl="file://$PROJECT_DIR$/modules/Drops/Drops.iml" filepath="$PROJECT_DIR$/modules/Drops/Drops.iml"/>
+      <module fileurl="file://$PROJECT_DIR$/modules/Durability/Durability.iml" filepath="$PROJECT_DIR$/modules/Durability/Durability.iml"/>
+      <module fileurl="file://$PROJECT_DIR$/modules/EdibleFlora/EdibleFlora.iml" filepath="$PROJECT_DIR$/modules/EdibleFlora/EdibleFlora.iml"/>
+      <module fileurl="file://$PROJECT_DIR$/modules/EdibleSubstance/EdibleSubstance.iml" filepath="$PROJECT_DIR$/modules/EdibleSubstance/EdibleSubstance.iml"/>
+      <module fileurl="file://$PROJECT_DIR$/modules/EventualSkills/EventualSkills.iml" filepath="$PROJECT_DIR$/modules/EventualSkills/EventualSkills.iml"/>
+      <module fileurl="file://$PROJECT_DIR$/modules/Explosives/Explosives.iml" filepath="$PROJECT_DIR$/modules/Explosives/Explosives.iml"/>
+      <module fileurl="file://$PROJECT_DIR$/modules/FlowingLiquids/FlowingLiquids.iml" filepath="$PROJECT_DIR$/modules/FlowingLiquids/FlowingLiquids.iml"/>
+      <module fileurl="file://$PROJECT_DIR$/modules/Fluid/Fluid.iml" filepath="$PROJECT_DIR$/modules/Fluid/Fluid.iml"/>
+      <module fileurl="file://$PROJECT_DIR$/modules/Furnishings/Furnishings.iml" filepath="$PROJECT_DIR$/modules/Furnishings/Furnishings.iml"/>
+      <module fileurl="file://$PROJECT_DIR$/modules/Genome/Genome.iml" filepath="$PROJECT_DIR$/modules/Genome/Genome.iml"/>
+      <module fileurl="file://$PROJECT_DIR$/modules/Health/Health.iml" filepath="$PROJECT_DIR$/modules/Health/Health.iml"/>
+      <module fileurl="file://$PROJECT_DIR$/modules/Hunger/Hunger.iml" filepath="$PROJECT_DIR$/modules/Hunger/Hunger.iml"/>
+      <module fileurl="file://$PROJECT_DIR$/modules/InGameHelp/InGameHelp.iml" filepath="$PROJECT_DIR$/modules/InGameHelp/InGameHelp.iml"/>
+      <module fileurl="file://$PROJECT_DIR$/modules/InGameHelpAPI/InGameHelpAPI.iml" filepath="$PROJECT_DIR$/modules/InGameHelpAPI/InGameHelpAPI.iml"/>
+      <module fileurl="file://$PROJECT_DIR$/modules/Inventory/Inventory.iml" filepath="$PROJECT_DIR$/modules/Inventory/Inventory.iml"/>
+      <module fileurl="file://$PROJECT_DIR$/modules/IRLCorp/IRLCorp.iml" filepath="$PROJECT_DIR$/modules/IRLCorp/IRLCorp.iml"/>
+      <module fileurl="file://$PROJECT_DIR$/modules/ItemRendering/ItemRendering.iml" filepath="$PROJECT_DIR$/modules/ItemRendering/ItemRendering.iml"/>
+      <module fileurl="file://$PROJECT_DIR$/modules/JoshariasSurvival/JoshariasSurvival.iml" filepath="$PROJECT_DIR$/modules/JoshariasSurvival/JoshariasSurvival.iml"/>
+      <module fileurl="file://$PROJECT_DIR$/modules/Machines/Machines.iml" filepath="$PROJECT_DIR$/modules/Machines/Machines.iml"/>
+      <module fileurl="file://$PROJECT_DIR$/modules/ManualLabor/ManualLabor.iml" filepath="$PROJECT_DIR$/modules/ManualLabor/ManualLabor.iml"/>
+      <module fileurl="file://$PROJECT_DIR$/modules/ManualLaborEventualSkills/ManualLaborEventualSkills.iml" filepath="$PROJECT_DIR$/modules/ManualLaborEventualSkills/ManualLaborEventualSkills.iml"/>
+      <module fileurl="file://$PROJECT_DIR$/modules/MarkovChains/MarkovChains.iml" filepath="$PROJECT_DIR$/modules/MarkovChains/MarkovChains.iml"/>
+      <module fileurl="file://$PROJECT_DIR$/modules/ModuleTestingEnvironment/ModuleTestingEnvironment.iml" filepath="$PROJECT_DIR$/modules/ModuleTestingEnvironment/ModuleTestingEnvironment.iml"/>
+      <module fileurl="file://$PROJECT_DIR$/modules/MultiBlock/MultiBlock.iml" filepath="$PROJECT_DIR$/modules/MultiBlock/MultiBlock.iml"/>
+      <module fileurl="file://$PROJECT_DIR$/modules/MusicDirector/MusicDirector.iml" filepath="$PROJECT_DIR$/modules/MusicDirector/MusicDirector.iml"/>
+      <module fileurl="file://$PROJECT_DIR$/modules/NameGenerator/NameGenerator.iml" filepath="$PROJECT_DIR$/modules/NameGenerator/NameGenerator.iml"/>
+      <module fileurl="file://$PROJECT_DIR$/modules/Notifications/Notifications.iml" filepath="$PROJECT_DIR$/modules/Notifications/Notifications.iml"/>
+      <module fileurl="file://$PROJECT_DIR$/modules/OreGeneration/OreGeneration.iml" filepath="$PROJECT_DIR$/modules/OreGeneration/OreGeneration.iml"/>
+      <module fileurl="file://$PROJECT_DIR$/modules/Pathfinding/Pathfinding.iml" filepath="$PROJECT_DIR$/modules/Pathfinding/Pathfinding.iml"/>
+      <module fileurl="file://$PROJECT_DIR$/modules/PlantPack/PlantPack.iml" filepath="$PROJECT_DIR$/modules/PlantPack/PlantPack.iml"/>
+      <module fileurl="file://$PROJECT_DIR$/modules/PotentialEnergyDevices/PotentialEnergyDevices.iml" filepath="$PROJECT_DIR$/modules/PotentialEnergyDevices/PotentialEnergyDevices.iml"/>
+      <module fileurl="file://$PROJECT_DIR$/modules/SimpleFarming/SimpleFarming.iml" filepath="$PROJECT_DIR$/modules/SimpleFarming/SimpleFarming.iml"/>
+      <module fileurl="file://$PROJECT_DIR$/modules/StructuralResources/StructuralResources.iml" filepath="$PROJECT_DIR$/modules/StructuralResources/StructuralResources.iml"/>
+      <module fileurl="file://$PROJECT_DIR$/modules/SubstanceMatters/SubstanceMatters.iml" filepath="$PROJECT_DIR$/modules/SubstanceMatters/SubstanceMatters.iml"/>
+      <module fileurl="file://$PROJECT_DIR$/modules/Thirst/Thirst.iml" filepath="$PROJECT_DIR$/modules/Thirst/Thirst.iml"/>
+      <module fileurl="file://$PROJECT_DIR$/modules/WildAnimals/WildAnimals.iml" filepath="$PROJECT_DIR$/modules/WildAnimals/WildAnimals.iml"/>
+      <module fileurl="file://$PROJECT_DIR$/modules/Workstation/Workstation.iml" filepath="$PROJECT_DIR$/modules/Workstation/Workstation.iml"/>
+      <module fileurl="file://$PROJECT_DIR$/modules/WorkstationInGameHelp/WorkstationInGameHelp.iml" filepath="$PROJECT_DIR$/modules/WorkstationInGameHelp/WorkstationInGameHelp.iml"/>
+      <module fileurl="file://$PROJECT_DIR$/modules/WorldlyTooltip/WorldlyTooltip.iml" filepath="$PROJECT_DIR$/modules/WorldlyTooltip/WorldlyTooltip.iml"/>
+      <module fileurl="file://$PROJECT_DIR$/modules/WorldlyTooltipAPI/WorldlyTooltipAPI.iml" filepath="$PROJECT_DIR$/modules/WorldlyTooltipAPI/WorldlyTooltipAPI.iml"/>
+      <module fileurl="file://$PROJECT_DIR$/modules/CoreSampleGameplay/CoreSampleGameplay.iml" filepath="$PROJECT_DIR$/modules/CoreSampleGameplay/CoreSampleGameplay.iml"/>
     </modules>
   </component>
   <component name="ProjectRootManager" version="2" languageLevel="JDK_1_8" project-jdk-name="11" project-jdk-type="JavaSDK" assert-keyword="true" assert-jdk-15="true">
