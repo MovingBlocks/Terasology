@@ -180,7 +180,7 @@ public class WorldSerializerImpl implements WorldSerializer {
         for (ComponentMetadata<?> componentMetadata : componentLibrary.iterateComponentMetadata()) {
             int index = componentIdTable.size();
             componentIdTable.put(componentMetadata.getType(), index);
-            world.addComponentClass(componentMetadata.getUri().toString());
+            world.addComponentClass(componentMetadata.getId().toString());
         }
         entitySerializer.setComponentIdMapping(componentIdTable);
         prefabSerializer.setComponentIdMapping(componentIdTable);

@@ -175,7 +175,7 @@ public class UIFormat extends AbstractAssetFileFormat<UIData> {
             if (id != null) {
                 FieldMetadata<?, ?> fieldMetadata = elementMetadata.getField(ID_FIELD);
                 if (fieldMetadata == null) {
-                    logger.warn("UIWidget type {} lacks id field", elementMetadata.getUri());
+                    logger.warn("UIWidget type {} lacks id field", elementMetadata.getId());
                 } else {
                     fieldMetadata.setValue(element, id);
                 }

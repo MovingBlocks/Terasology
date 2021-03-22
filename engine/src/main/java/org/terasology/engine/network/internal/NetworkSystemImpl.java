@@ -28,7 +28,6 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.util.concurrent.GlobalEventExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.assets.ResourceUrn;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.config.NetworkConfig;
 import org.terasology.engine.context.Context;
@@ -934,7 +933,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
             EventMetadata<?> metadata = eventLibrary.getMetadata(eventMapping.getKey());
             NetData.SerializationInfo.Builder info = NetData.SerializationInfo.newBuilder()
                     .setId(eventMapping.getValue())
-                    .setName(metadata.getUri().toString());
+                    .setName(metadata.getId().toString());
             for (FieldMetadata<?, ?> field : metadata.getFields()) {
                 fieldIds.write(field.getId());
                 info.addFieldName(field.getName());
@@ -951,7 +950,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
             ComponentMetadata<?> metadata = componentLibrary.getMetadata(componentIdMapping.getKey());
             NetData.SerializationInfo.Builder info = NetData.SerializationInfo.newBuilder()
                     .setId(componentIdMapping.getValue())
-                    .setName(metadata.getUri().toString());
+                    .setName(metadata.getId().toString());
             for (FieldMetadata<?, ?> field : metadata.getFields()) {
                 fieldIds.write(field.getId());
                 info.addFieldName(field.getName());
@@ -976,7 +975,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
             for (FieldMetadata<?, ?> field : metadata.getFields()) {
                 if (fieldId >= 256) {
                     logger.error("Class {} has too many fields (>255), serialization will be incomplete",
-                            metadata.getUri());
+                            metadata.getId());
                     break;
                 }
                 field.setId((byte) fieldId);

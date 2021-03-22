@@ -50,10 +50,15 @@ public final class ExternalApiWhitelist {
             .add("org.terasology.nui.widgets.types.builtin.object")
             .add("org.terasology.nui.widgets.types.builtin.util")
             .add("org.terasology.nui.widgets.types.math")
-            .add("org.terasology.reflection") // TODO: Is this safe?
-            .add("org.terasology.reflection.metadata") // TODO: Is this safe?
-            .add("org.terasology.reflection.reflect") // TODO: Is this safe?
-            .add("org.terasology.reflection.copy") // TODO: Is this safe?
+            .add("org.terasology.reflection.metadata")
+            .build();
+
+    private static final Set<Class<?>> NUI_CLASSES = new ImmutableSet.Builder<Class<?>>()
+            .add(org.terasology.input.device.InputDevice.class)
+            .add(org.terasology.input.device.KeyboardDevice.class)
+            .add(org.terasology.input.device.MouseDevice.class)
+            .add(org.terasology.reflection.MappedContainer.class)
+            .add(org.terasology.reflection.TypeInfo.class)
             .build();
 
     public static final Set<String> PACKAGES = new ImmutableSet.Builder<String>()
@@ -61,33 +66,6 @@ public final class ExternalApiWhitelist {
             .add("org.terasology.math")
             .add("org.terasology.math.geom")
             .add("org.terasology.joml.geom")
-            .add("org.terasology.input")
-            .add("org.terasology.nui")
-            .add("org.terasology.nui.asset")
-            .add("org.terasology.nui.asset.font")
-            .add("org.terasology.nui.canvas")
-            .add("org.terasology.nui.databinding")
-            .add("org.terasology.nui.events")
-            .add("org.terasology.nui.itemRendering")
-            .add("org.terasology.nui.layouts")
-            .add("org.terasology.nui.layouts.miglayout")
-            .add("org.terasology.nui.layouts.relative")
-            .add("org.terasology.nui.properties")
-            .add("org.terasology.nui.reflection")
-            .add("org.terasology.nui.skin")
-            .add("org.terasology.nui.translate")
-            .add("org.terasology.nui.util")
-            .add("org.terasology.nui.widgets")
-            .add("org.terasology.nui.widgets.treeView")
-            .add("org.terasology.nui.widgets.types")
-            .add("org.terasology.nui.widgets.types.builtin")
-            .add("org.terasology.nui.widgets.types.builtin.object")
-            .add("org.terasology.nui.widgets.types.builtin.util")
-            .add("org.terasology.nui.widgets.types.math")
-            .add("org.terasology.reflection") // TODO: Is this safe?
-            .add("org.terasology.reflection.metadata") // TODO: Is this safe?
-            .add("org.terasology.reflection.reflect") // TODO: Is this safe?
-            .add("org.terasology.reflection.copy") // TODO: Is this safe?
             .add("java.lang")
             .add("java.beans")
             .add("java.lang.invoke")
@@ -147,6 +125,7 @@ public final class ExternalApiWhitelist {
             .build();
 
     public static final Set<Class<?>> CLASSES = new ImmutableSet.Builder<Class<?>>()
+            .addAll(NUI_CLASSES)
             .add(com.esotericsoftware.reflectasm.MethodAccess.class)
             .add(InvocationTargetException.class)
             .add(LoggerFactory.class)
