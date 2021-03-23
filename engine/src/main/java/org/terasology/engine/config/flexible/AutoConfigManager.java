@@ -109,7 +109,7 @@ public class AutoConfigManager {
         // TODO: Save when screen for config closed
         Path configPath = getConfigPath(config.getId());
         try (OutputStream output = Files.newOutputStream(configPath, StandardOpenOption.CREATE)) {
-            serializer.serialize(config, TypeInfo.of(AutoConfig.class), output);
+            serializer.serialize(config, TypeInfo.of((Class<AutoConfig>)config.getClass()), output);
         } catch (IOException e) {
             logger.error("Error while saving config {} to disk", config.getId(), e);
         }
