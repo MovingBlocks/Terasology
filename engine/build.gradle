@@ -112,9 +112,9 @@ dependencies {
     api group: 'org.terasology', name: 'splash-screen', version: '1.1.1'
     api group: 'org.terasology.jnlua', name: 'JNLua', version: '0.1.0-SNAPSHOT'
     api group: 'org.terasology.jnbullet', name: 'JNBullet', version: '1.0.2'
-    api group: 'org.terasology.nui', name: 'nui', version: '1.5.0-SNAPSHOT'
-    api group: 'org.terasology.nui', name: 'nui-reflect', version: '1.5.0-SNAPSHOT'
-    api group: 'org.terasology.nui', name: 'nui-gestalt5', version: '1.5.0-SNAPSHOT'
+    api group: 'org.terasology.nui', name: 'nui', version: '3.0.0-SNAPSHOT'
+    api group: 'org.terasology.nui', name: 'nui-reflect', version: '3.0.0-SNAPSHOT'
+    api group: 'org.terasology.nui', name: 'nui-gestalt5', version: '3.0.0-SNAPSHOT'
 
     // Wildcard dependency to catch any libs provided with the project (remote repo preferred instead)
     api fileTree(dir: 'libs', include: '*.jar')
