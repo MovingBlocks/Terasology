@@ -17,7 +17,6 @@
 package org.terasology.engine.persistence.serializers;
 
 import org.terasology.engine.entitySystem.Component;
-import org.terasology.engine.entitySystem.entity.internal.EntityInfoComponent;
 import org.terasology.engine.entitySystem.metadata.ComponentMetadata;
 
 /**
@@ -28,10 +27,10 @@ public interface ComponentSerializeCheck {
 
     boolean serialize(ComponentMetadata<? extends Component> metadata);
 
-     final class NullCheck implements ComponentSerializeCheck {
-        private static final NullCheck INSTANCE = new NullCheck();
+     final class DefaultCheck implements ComponentSerializeCheck {
+        private static final DefaultCheck INSTANCE = new DefaultCheck();
 
-        private NullCheck() {
+        private DefaultCheck() {
         }
 
         public static ComponentSerializeCheck create() {
@@ -40,7 +39,7 @@ public interface ComponentSerializeCheck {
 
         @Override
         public boolean serialize(ComponentMetadata<? extends Component> metadata) {
-            return metadata.getType() != EntityInfoComponent.class;
+            return metadata.isPersisted();
         }
     }
 }

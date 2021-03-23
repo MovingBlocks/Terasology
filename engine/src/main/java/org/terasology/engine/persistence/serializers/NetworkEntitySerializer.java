@@ -36,7 +36,7 @@ import java.util.Set;
 public class NetworkEntitySerializer {
     private static final Logger logger = LoggerFactory.getLogger(NetworkEntitySerializer.class);
 
-    private ComponentSerializeCheck componentSerializeCheck = ComponentSerializeCheck.NullCheck.create();
+    private ComponentSerializeCheck componentSerializeCheck = ComponentSerializeCheck.DefaultCheck.create();
     private EngineEntityManager entityManager;
     private ComponentLibrary componentLibrary;
     private TypeHandlerLibrary typeHandlerLibrary;
