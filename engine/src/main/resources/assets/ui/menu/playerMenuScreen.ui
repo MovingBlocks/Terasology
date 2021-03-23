@@ -151,20 +151,6 @@
                                     "id": "eye-height"
                                 }
                             ]
-                        },
-                        {
-                            "type": "UILabel",
-                            "text": "${engine:menu#discord-presence}:"
-                        },
-                        {
-                            "type": "RowLayout",
-                            "horizontalSpacing": 10,
-                            "contents": [
-                                {
-                                    "type": "UICheckbox",
-                                    "id": "discord-presence"
-                                }
-                            ]
                         }
                     ]
                 },

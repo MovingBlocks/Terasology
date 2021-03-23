@@ -117,6 +117,7 @@
     "disable-launch-popup": "Remember and don't show again",
     "disable-rendering-class": "Disable",
     "discord-presence": "Discord Rich Presence",
+    "discord-settings-title": "Discord Settings",
     "download-module": "Download",
     "downloading-server-list": "Downloading server list ..",
     "drop-item": "Drop Item",

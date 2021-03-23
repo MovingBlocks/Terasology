@@ -16,25 +16,24 @@ import org.terasology.engine.i18n.TranslationProject;
 import org.terasology.engine.i18n.TranslationSystem;
 import org.terasology.engine.identity.storageServiceClient.StorageServiceWorker;
 import org.terasology.engine.identity.storageServiceClient.StorageServiceWorkerStatus;
+import org.terasology.engine.registry.In;
 import org.terasology.engine.rendering.assets.texture.Texture;
 import org.terasology.engine.rendering.assets.texture.TextureUtil;
+import org.terasology.engine.rendering.nui.CoreScreenLayer;
 import org.terasology.engine.rendering.nui.animation.MenuAnimationSystems;
+import org.terasology.engine.rendering.nui.layers.mainMenu.StorageServiceLoginPopup;
+import org.terasology.engine.rendering.nui.layers.mainMenu.ThreeButtonPopup;
+import org.terasology.engine.utilities.Assets;
 import org.terasology.nui.Color;
 import org.terasology.nui.WidgetUtil;
 import org.terasology.nui.databinding.DefaultBinding;
 import org.terasology.nui.databinding.ReadOnlyBinding;
 import org.terasology.nui.widgets.UIButton;
-import org.terasology.nui.widgets.UICheckbox;
 import org.terasology.nui.widgets.UIDropdownScrollable;
 import org.terasology.nui.widgets.UIImage;
 import org.terasology.nui.widgets.UILabel;
 import org.terasology.nui.widgets.UISlider;
 import org.terasology.nui.widgets.UIText;
-import org.terasology.engine.registry.In;
-import org.terasology.engine.rendering.nui.CoreScreenLayer;
-import org.terasology.engine.rendering.nui.layers.mainMenu.StorageServiceLoginPopup;
-import org.terasology.engine.rendering.nui.layers.mainMenu.ThreeButtonPopup;
-import org.terasology.engine.utilities.Assets;
 
 import java.math.RoundingMode;
 import java.util.ArrayList;
@@ -79,7 +78,6 @@ public class PlayerSettingsScreen extends CoreScreenLayer {
     private UISlider heightSlider;
     private UISlider eyeHeightSlider;
     private UIImage img;
-    private UICheckbox discordPresence;
     private UIDropdownScrollable<Locale> language;
 
     private StorageServiceWorkerStatus storageServiceWorkerStatus;
@@ -99,9 +97,6 @@ public class PlayerSettingsScreen extends CoreScreenLayer {
         }
         if (eyeHeightSlider != null) {
             eyeHeightSlider.bindValue(new NotifyingBinding(config.getPlayer().getEyeHeight()));
-        }
-        if (discordPresence != null) {
-            discordPresence.setChecked(config.getPlayer().isDiscordPresence());
         }
         if (language != null) {
             language.setSelection(systemConfig.locale.get());
@@ -156,8 +151,6 @@ public class PlayerSettingsScreen extends CoreScreenLayer {
             eyeHeightSlider.setRange(1f);
             eyeHeightSlider.setPrecision(1);
         }
-
-        discordPresence = find("discord-presence", UICheckbox.class);
 
         language = find("language", UIDropdownScrollable.class);
         if (language != null) {
@@ -311,7 +304,6 @@ public class PlayerSettingsScreen extends CoreScreenLayer {
         config.getPlayer().setHeight(height);
         Float eyeHeight = getEyeHeight();
         config.getPlayer().setEyeHeight(eyeHeight);
-        config.getPlayer().setDiscordPresence(discordPresence.isChecked());
         if (nametext != null) {
             config.getPlayer().setName(nametext.getText().trim());
             config.getPlayer().setHasEnteredUsername(true);
