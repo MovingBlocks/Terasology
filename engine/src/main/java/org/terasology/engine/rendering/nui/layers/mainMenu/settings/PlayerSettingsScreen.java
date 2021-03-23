@@ -5,14 +5,11 @@ package org.terasology.engine.rendering.nui.layers.mainMenu.settings;
 import com.google.common.base.Function;
 import com.google.common.base.Functions;
 import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
 import com.google.common.math.DoubleMath;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.config.SystemConfig;
 import org.terasology.engine.context.Context;
-import org.terasology.engine.core.SimpleUri;
-import org.terasology.engine.i18n.TranslationProject;
 import org.terasology.engine.i18n.TranslationSystem;
 import org.terasology.engine.identity.storageServiceClient.StorageServiceWorker;
 import org.terasology.engine.identity.storageServiceClient.StorageServiceWorkerStatus;
@@ -29,17 +26,13 @@ import org.terasology.nui.WidgetUtil;
 import org.terasology.nui.databinding.DefaultBinding;
 import org.terasology.nui.databinding.ReadOnlyBinding;
 import org.terasology.nui.widgets.UIButton;
-import org.terasology.nui.widgets.UIDropdownScrollable;
 import org.terasology.nui.widgets.UIImage;
 import org.terasology.nui.widgets.UILabel;
 import org.terasology.nui.widgets.UISlider;
 import org.terasology.nui.widgets.UIText;
 
 import java.math.RoundingMode;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
 
 import static org.terasology.engine.identity.storageServiceClient.StatusMessageTranslator.getLocalizedButtonMessage;
 import static org.terasology.engine.identity.storageServiceClient.StatusMessageTranslator.getLocalizedStatusMessage;
@@ -61,16 +54,6 @@ public class PlayerSettingsScreen extends CoreScreenLayer {
 
     private final List<Color> colors = CieCamColors.L65C65;
 
-    /**
-     * Remove language x from this languagesExcluded table when it is ready for testing
-     */
-    private final Locale[] languagesExcluded =
-            {Locale.forLanguageTag("zh"), // TODO: Chinese symbols not yet available
-            Locale.forLanguageTag("hi"), // TODO: Hindi (Indian) symbols not yet available
-            Locale.forLanguageTag("ar"), // TODO: Arabic symbols not yet available, no translated entries yet
-            Locale.forLanguageTag("ko"), // TODO: Korean symbols not yet available
-            Locale.forLanguageTag("fa")}; // TODO: Farsi (Persian) symbols not yet available
-
     private UIText nametext;
     private UISlider slider;
     private UILabel storageServiceStatus;
@@ -78,7 +61,6 @@ public class PlayerSettingsScreen extends CoreScreenLayer {
     private UISlider heightSlider;
     private UISlider eyeHeightSlider;
     private UIImage img;
-    private UIDropdownScrollable<Locale> language;
 
     private StorageServiceWorkerStatus storageServiceWorkerStatus;
 
@@ -97,9 +79,6 @@ public class PlayerSettingsScreen extends CoreScreenLayer {
         }
         if (eyeHeightSlider != null) {
             eyeHeightSlider.bindValue(new NotifyingBinding(config.getPlayer().getEyeHeight()));
-        }
-        if (language != null) {
-            language.setSelection(systemConfig.locale.get());
         }
         updateImage();
     }
@@ -150,20 +129,6 @@ public class PlayerSettingsScreen extends CoreScreenLayer {
             eyeHeightSlider.setIncrement(0.1f);
             eyeHeightSlider.setRange(1f);
             eyeHeightSlider.setPrecision(1);
-        }
-
-        language = find("language", UIDropdownScrollable.class);
-        if (language != null) {
-            SimpleUri menuUri = new SimpleUri("engine:menu");
-            TranslationProject menuProject = translationSystem.getProject(menuUri);
-            List<Locale> locales = new ArrayList<>(menuProject.getAvailableLocales());
-            for (Locale languageExcluded : languagesExcluded) {
-                locales.remove(languageExcluded);
-            }
-            Collections.sort(locales, ((Object o1, Object o2) -> (o1.toString().compareTo(o2.toString()))));
-            language.setOptions(Lists.newArrayList(locales));
-            language.setVisibleOptions(5); // Set maximum number of options visible for scrolling
-            language.setOptionRenderer(new LocaleRenderer(translationSystem));
         }
 
         WidgetUtil.trySubscribe(this, "close", button -> triggerBackAnimation());
@@ -307,10 +272,6 @@ public class PlayerSettingsScreen extends CoreScreenLayer {
         if (nametext != null) {
             config.getPlayer().setName(nametext.getText().trim());
             config.getPlayer().setHasEnteredUsername(true);
-        }
-        if (!systemConfig.locale.get().equals(language.getSelection())) {
-            systemConfig.locale.set(language.getSelection());
-            getManager().invalidate();
         }
     }
 

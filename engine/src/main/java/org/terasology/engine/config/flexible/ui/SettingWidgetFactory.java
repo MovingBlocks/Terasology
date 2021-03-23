@@ -66,13 +66,13 @@ public class SettingWidgetFactory {
                         ReflectionUtil.getTypeParameterForSuper(widgetType, ConstraintWidgetFactory.class, 1);
 
                 if (constraint.getClass().equals(ReflectionUtil.getRawType(constraintType))) {
-                    try {
-                        ConstraintWidgetFactory<T, ?> factory = widgetType.newInstance();
-                        InjectionHelper.inject(factory, In.class, ImmutableMap.of(AssetManager.class, assetManager));
 
-                        return Optional.of(factory);
-                    } catch (InstantiationException | IllegalAccessException ignored) {
-                    }
+                    ConstraintWidgetFactory<T, ?> factory =
+                            InjectionHelper.createWithConstructorInjection(widgetType, context);
+                    InjectionHelper.inject(factory, In.class, ImmutableMap.of(AssetManager.class, assetManager));
+
+                    return Optional.of(factory);
+
                 }
             }
         }

@@ -5,6 +5,7 @@ package org.terasology.engine.config;
 
 import org.terasology.engine.config.flexible.AutoConfig;
 import org.terasology.engine.config.flexible.Setting;
+import org.terasology.engine.config.flexible.constraints.LocaleConstraint;
 import org.terasology.engine.config.flexible.constraints.NumberRangeConstraint;
 
 import java.util.Locale;
@@ -13,6 +14,7 @@ import java.util.Optional;
 
 import static org.terasology.engine.config.flexible.SettingArgument.constraint;
 import static org.terasology.engine.config.flexible.SettingArgument.defaultValue;
+import static org.terasology.engine.config.flexible.SettingArgument.name;
 import static org.terasology.engine.config.flexible.SettingArgument.override;
 import static org.terasology.engine.config.flexible.SettingArgument.type;
 
@@ -70,7 +72,9 @@ public class SystemConfig extends AutoConfig {
 
     public final Setting<Locale> locale = setting(
             type(Locale.class),
-            defaultValue(Locale.getDefault(Category.DISPLAY))
+            defaultValue(Locale.getDefault(Category.DISPLAY)),
+            name("${engine:menu#settings-language}"),
+            constraint(new LocaleConstraint(Locale.getAvailableLocales())) // TODO provide translate project's locales (Pirate lang don't works)
     );
 
     @Override
