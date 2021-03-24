@@ -32,7 +32,7 @@ import java.util.Set;
 public class AutoConfigManager {
     private static final Logger logger = LoggerFactory.getLogger(AutoConfigManager.class);
 
-    private final Set<AutoConfig> loadedConfigs = Sets.newHashSet();
+    private final Set<AutoConfig> loadedConfigs = Sets.newLinkedHashSet();
     private final Serializer<?> serializer;
 
     public AutoConfigManager(Serializer<?> serializer) {
