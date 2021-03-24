@@ -78,50 +78,6 @@
                                 }
                             ]
                         },
-                        {
-                            "type": "UILabel",
-                            "text": "${engine:menu#settings-language}:"
-                        },
-                        {
-                            "type": "UIDropdownScrollable",
-                            "id": "language"
-                        },
-                        {
-                            "type": "UILabel",
-                            "text": "${engine:menu#experimental}"
-                        },
-                        {
-                            "type": "UILabel",
-                            "text": ""
-                        },
-                        {
-                            "type": "UILabel",
-                            "text": "${engine:menu#player-height}:"
-                        },
-                        {
-                            "type": "RowLayout",
-                            "horizontalSpacing": 10,
-                            "contents": [
-                                {
-                                    "type": "UISlider",
-                                    "id": "height"
-                                }
-                            ]
-                        },
-                        {
-                            "type": "UILabel",
-                            "text": "${engine:menu#player-eye-height}:"
-                        },
-                        {
-                            "type": "RowLayout",
-                            "horizontalSpacing": 10,
-                            "contents": [
-                                {
-                                    "type": "UISlider",
-                                    "id": "eye-height"
-                                }
-                            ]
-                        }
                     ]
                 },
                 "layoutInfo": {
