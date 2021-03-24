@@ -2,24 +2,22 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.world.chunks;
 
+import org.joml.Vector3f;
 import org.terasology.joml.geom.AABBfc;
 import org.terasology.module.sandbox.API;
 import org.terasology.engine.rendering.primitives.ChunkMesh;
 
 /**
+ * Anything that acts like a chunk for rendering purposes
  */
 @API
-public interface RenderableChunk extends LitChunk {
+public interface RenderableChunk {
 
-    boolean isDirty();
-
-    void setDirty(boolean dirty);
+    Vector3f getRenderPosition();
 
     AABBfc getAABB();
 
     void setMesh(ChunkMesh newMesh);
-
-    void setPendingMesh(ChunkMesh newPendingMesh);
 
     void setAnimated(boolean animated);
 
@@ -27,11 +25,7 @@ public interface RenderableChunk extends LitChunk {
 
     boolean hasMesh();
 
-    boolean hasPendingMesh();
-
     ChunkMesh getMesh();
-
-    ChunkMesh getPendingMesh();
 
     void disposeMesh();
 

@@ -46,7 +46,7 @@ class RenderableWorldImpl implements RenderableWorld {
     private static final int MAX_ANIMATED_CHUNKS = 64;
     private static final int MAX_BILLBOARD_CHUNKS = 64;
     private static final int MAX_LOADABLE_CHUNKS = ViewDistance.MEGA.getChunkDistance().x() * ViewDistance.MEGA.getChunkDistance().y() * ViewDistance.MEGA.getChunkDistance().z();
-    private static final Vector3f CHUNK_CENTER_OFFSET = new Vector3f(0.5f, 0.5f, 0.5f);
+    private static final Vector3f CHUNK_CENTER_OFFSET = new Vector3f(Chunks.CHUNK_SIZE).div(2);
 
     private static final Logger logger = LoggerFactory.getLogger(RenderableWorldImpl.class);
 
@@ -58,7 +58,7 @@ class RenderableWorldImpl implements RenderableWorld {
 
     private ChunkTessellator chunkTessellator;
     private final ChunkMeshUpdateManager chunkMeshUpdateManager;
-    private final List<RenderableChunk> chunksInProximityOfCamera = Lists.newArrayListWithCapacity(MAX_LOADABLE_CHUNKS);
+    private final List<Chunk> chunksInProximityOfCamera = Lists.newArrayListWithCapacity(MAX_LOADABLE_CHUNKS);
     private BlockRegion renderableRegion = new BlockRegion(BlockRegion.INVALID);
     private ViewDistance currentViewDistance;
     private RenderQueuesHelper renderQueues;
@@ -121,8 +121,8 @@ class RenderableWorldImpl implements RenderableWorld {
     @Override
     public void onChunkUnloaded(Vector3ic chunkCoordinates) {
         if (renderableRegion.contains(chunkCoordinates)) {
-            RenderableChunk chunk;
-            Iterator<RenderableChunk> iterator = chunksInProximityOfCamera.iterator();
+            Chunk chunk;
+            Iterator<Chunk> iterator = chunksInProximityOfCamera.iterator();
             while (iterator.hasNext()) {
                 chunk = iterator.next();
                 if (chunk.getPosition(new org.joml.Vector3i()).equals(chunkCoordinates)) {
@@ -146,7 +146,7 @@ class RenderableWorldImpl implements RenderableWorld {
 
         chunkProvider.update();
 
-        RenderableChunk chunk;
+        Chunk chunk;
         ChunkMesh newMesh;
         ChunkView localView;
         for (Vector3ic chunkCoordinates : calculateRenderableRegion(renderingConfig.getViewDistance())) {
@@ -205,11 +205,11 @@ class RenderableWorldImpl implements RenderableWorld {
     @Override
     public boolean updateChunksInProximity(BlockRegion newRenderableRegion) {
         if (!newRenderableRegion.equals(renderableRegion)) {
-            RenderableChunk chunk;
+            Chunk chunk;
             for (Vector3ic chunkPositionToRemove : renderableRegion) {
                 if (!newRenderableRegion.contains(chunkPositionToRemove)) {
-                    Iterator<RenderableChunk> nearbyChunks = chunksInProximityOfCamera.iterator();
-                    for (Iterator<RenderableChunk> it = nearbyChunks; it.hasNext(); ) {
+                    Iterator<Chunk> nearbyChunks = chunksInProximityOfCamera.iterator();
+                    for (Iterator<Chunk> it = nearbyChunks; it.hasNext(); ) {
                         chunk = it.next();
                         if (chunk.getPosition(new org.joml.Vector3i()).equals(chunkPositionToRemove)) {
                             chunk.disposeMesh();
@@ -277,7 +277,7 @@ class RenderableWorldImpl implements RenderableWorld {
         PerformanceMonitor.startActivity("Building Mesh VBOs");
         ChunkMesh pendingMesh;
         chunkMeshUpdateManager.setCameraPosition(playerCamera.getPosition());
-        for (RenderableChunk chunk : chunkMeshUpdateManager.availableChunksForUpdate()) {
+        for (Chunk chunk : chunkMeshUpdateManager.availableChunksForUpdate()) {
 
             if (chunk.hasPendingMesh() && chunksInProximityOfCamera.contains(chunk)) {
                 pendingMesh = chunk.getPendingMesh();
@@ -316,12 +316,9 @@ class RenderableWorldImpl implements RenderableWorld {
         ChunkMesh mesh;
         boolean isDynamicShadows = renderingConfig.isDynamicShadows();
 
-        List<RenderableChunk> allChunks;
+        List<RenderableChunk> allChunks = new ArrayList<>(chunksInProximityOfCamera);
         if (lodChunkProvider != null) {
-            allChunks = new ArrayList<>(chunksInProximityOfCamera);
             lodChunkProvider.addAllChunks(allChunks);
-        } else {
-            allChunks = chunksInProximityOfCamera;
         }
 
         for (RenderableChunk chunk : allChunks) {
@@ -367,15 +364,18 @@ class RenderableWorldImpl implements RenderableWorld {
                 if (isChunkVisibleReflection(chunk)) {
                     renderQueues.chunksOpaqueReflection.add(chunk);
                 }
+            }
+            chunkCounter++;
+        }
 
-                // Process all chunks in the area, not only the visible ones
-                if (isFirstRenderingStageForCurrentFrame && (chunk.isDirty() || !chunk.hasMesh())) {
+        if (isFirstRenderingStageForCurrentFrame) {
+            for (Chunk chunk : chunksInProximityOfCamera) {
+                if (isChunkValidForRender(chunk) && (chunk.isDirty() || !chunk.hasMesh())) {
                     statDirtyChunks++;
                     chunkMeshUpdateManager.queueChunkUpdate(chunk);
                     processedChunks++;
                 }
             }
-            chunkCounter++;
         }
 
         PerformanceMonitor.endActivity();
@@ -455,12 +455,8 @@ class RenderableWorldImpl implements RenderableWorld {
     private static float squaredDistanceToCamera(RenderableChunk chunk, Vector3f cameraPosition) {
         // For performance reasons, to avoid instantiating too many vectors in a frequently called method,
         // comments are in use instead of appropriately named vectors.
-        Vector3f result = new Vector3f(chunk.getPosition(new Vector3i())); // chunk position in chunk coordinates
-        result.add(CHUNK_CENTER_OFFSET);                    // chunk center in chunk coordinates
-
-        result.x *= Chunks.SIZE_X;    // chunk center in world coordinates
-        result.y *= Chunks.SIZE_Y;
-        result.z *= Chunks.SIZE_Z;
+        Vector3f result = chunk.getRenderPosition();
+        result.add(CHUNK_CENTER_OFFSET);
 
         result.sub(cameraPosition); // camera to chunk vector
 

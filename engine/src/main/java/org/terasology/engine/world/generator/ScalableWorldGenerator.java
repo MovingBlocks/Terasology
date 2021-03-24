@@ -3,7 +3,7 @@
 
 package org.terasology.engine.world.generator;
 
-import org.terasology.engine.world.chunks.CoreChunk;
+import org.terasology.engine.world.chunks.Chunk;
 
 public interface ScalableWorldGenerator extends WorldGenerator {
     /**
@@ -11,5 +11,5 @@ public interface ScalableWorldGenerator extends WorldGenerator {
      * @param chunk Chunk to generate
      * @param scale The scale to generate at (larger numbers make the world's features smaller)
      */
-    void createChunk(CoreChunk chunk, float scale);
+    void createChunk(Chunk chunk, float scale);
 }
