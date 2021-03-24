@@ -25,40 +25,47 @@ public class SystemConfig extends AutoConfig {
     public final Setting<Long> dayNightLengthInMs = setting(
             type(Long.class),
             defaultValue(1800000L),
+            name("Day/Night length (ms) (not yet)"),
             constraint(new NumberRangeConstraint<>(0L, Long.MAX_VALUE, false, false))
     );
 
     public final Setting<Integer> maxThreads = setting(
             type(Integer.class),
             defaultValue(Runtime.getRuntime().availableProcessors() - 1),
+            name("Max threads(not yet)"),
             constraint(new NumberRangeConstraint<>(0, Integer.MAX_VALUE, false, false))
     );
 
     public final Setting<Integer> maxSecondsBetweenSaves = setting(
             type(Integer.class),
             defaultValue(60),
-            constraint(new NumberRangeConstraint<>(0, Integer.MAX_VALUE, false, false))
+            name("Seconds between saves"),
+            constraint(new NumberRangeConstraint<>(0, 1200, false, false))
     );
 
     public final Setting<Integer> maxUnloadedChunksPercentageTillSave = setting(
             type(Integer.class),
             defaultValue(40),
+            name("Max unloaded chunks percentage till save"),
             constraint(new NumberRangeConstraint<>(0, 100, false, false))
     );
 
     public final Setting<Boolean> debugEnabled = setting(
             type(Boolean.class),
-            defaultValue(false)
+            defaultValue(false),
+            name("Debug mode")
     );
 
     public final Setting<Boolean> monitoringEnabled = setting(
             type(Boolean.class),
-            defaultValue(false)
+            defaultValue(false),
+            name("Monitoring")
     );
 
     public final Setting<Boolean> writeSaveGamesEnabled = setting(
             type(Boolean.class),
             defaultValue(true),
+            name("Game saves writes"),
             override(() -> Optional.ofNullable(
                     System.getProperty(SAVED_GAMES_ENABLED_PROPERTY))
                     .map(Boolean::parseBoolean))
@@ -67,7 +74,8 @@ public class SystemConfig extends AutoConfig {
     public final Setting<Long> chunkGenerationFailTimeoutInMs = setting(
             type(Long.class),
             defaultValue(1800000L),
-            constraint(new NumberRangeConstraint<>(0L, Long.MAX_VALUE, false, false))
+            name("Chunk generation fail timeout (ms)"),
+            constraint(new NumberRangeConstraint<>(0L, 3600000L, false, false))
     );
 
     public final Setting<Locale> locale = setting(
