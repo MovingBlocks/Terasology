@@ -70,7 +70,7 @@ public class SimplexNoise extends AbstractNoise implements Noise2D, Noise3D {
     /**
      * Initialize permutations with a given seed and grid dimension.
      * Supports 1D tileable noise
-     * @see SimplexNoise#tileable1DMagicNumber
+     * @see SimplexNoise#TILEABLE1DMAGICNUMBER
      *
      * @param seed a seed value used for permutation shuffling
      * @param gridDim gridDim x gridDim will be the number of squares in the square grid formed after skewing the simplices belonging to once "tile"
