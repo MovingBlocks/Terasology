@@ -5,6 +5,7 @@ package org.terasology.engine.config;
 
 import org.terasology.engine.config.flexible.AutoConfig;
 import org.terasology.engine.config.flexible.Setting;
+import org.terasology.engine.config.flexible.constraints.ColorConstraint;
 import org.terasology.engine.config.flexible.constraints.NumberRangeConstraint;
 import org.terasology.engine.config.flexible.constraints.StringConstraint;
 import org.terasology.engine.rendering.nui.layers.mainMenu.settings.CieCamColors;
@@ -37,7 +38,8 @@ public class PlayerConfig extends AutoConfig {
     public final Setting<Color> color = setting(
             type(Color.class),
             defaultValue(defaultPlayerColor()),
-            name("${engine:menu#player-color}")
+            name("${engine:menu#player-color}"),
+            constraint(new ColorConstraint())
     );
     public final Setting<Float> height = setting(
             type(Float.class),

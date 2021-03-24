@@ -34,36 +34,6 @@
                     "contents": [
                         {
                             "type": "UILabel",
-                            "text": "${engine:menu#player-name}:"
-                        },
-                        {
-                            "type": "UIText",
-                            "id": "playername"
-                        },
-                        {
-                            "type": "UILabel",
-                            "text": "${engine:menu#player-color}:"
-                        },
-                        {
-                            "type": "RowLayout",
-                            "horizontalSpacing": 10,
-                            "contents": [
-                                {
-                                    "type": "UISlider",
-                                    "id": "tone",
-                                    "layoutInfo": {
-                                        "relativeWidth": 0.88
-                                    }
-                                },
-                                {
-                                    "type": "UIImage",
-                                    "skin": "framed_image",
-                                    "id": "image"
-                                }
-                            ]
-                        },
-                        {
-                            "type": "UILabel",
                             "text": "Multiplayer identities:",
                             "enabled": false
                         },

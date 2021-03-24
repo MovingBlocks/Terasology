@@ -1,0 +1,18 @@
+{
+  "type": "RowLayout",
+  "horizontalSpacing": 10,
+  "contents": [
+    {
+      "type": "UISlider",
+      "id": "tone",
+      "layoutInfo": {
+        "relativeWidth": 0.88
+      }
+    },
+    {
+      "type": "UIImage",
+      "skin": "framed_image",
+      "id": "image"
+    }
+  ]
+}
