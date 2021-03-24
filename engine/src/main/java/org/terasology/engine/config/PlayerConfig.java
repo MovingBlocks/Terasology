@@ -3,79 +3,58 @@
 
 package org.terasology.engine.config;
 
+import org.terasology.engine.config.flexible.AutoConfig;
+import org.terasology.engine.config.flexible.Setting;
+import org.terasology.engine.config.flexible.constraints.NumberRangeConstraint;
+import org.terasology.engine.config.flexible.constraints.StringConstraint;
 import org.terasology.engine.rendering.nui.layers.mainMenu.settings.CieCamColors;
 import org.terasology.engine.utilities.random.FastRandom;
 import org.terasology.engine.utilities.random.Random;
-import org.terasology.engine.utilities.subscribables.AbstractSubscribable;
 import org.terasology.nui.Color;
 
 import java.util.List;
 
-public class PlayerConfig extends AbstractSubscribable {
+import static org.terasology.engine.config.flexible.SettingArgument.constraint;
+import static org.terasology.engine.config.flexible.SettingArgument.defaultValue;
+import static org.terasology.engine.config.flexible.SettingArgument.name;
+import static org.terasology.engine.config.flexible.SettingArgument.type;
 
-    public static final String PLAYER_NAME = "PLAYER_NAME";
+public class PlayerConfig extends AutoConfig {
 
     private static final float DEFAULT_PLAYER_HEIGHT = 1.8f;
 
     private static final float DEFAULT_PLAYER_EYE_HEIGHT = 0.85f;
 
-
-    private String name = defaultPlayerName();
-
-    private Color color = defaultPlayerColor();
-
-    private Float height = DEFAULT_PLAYER_HEIGHT;
-
-    private Float eyeHeight = DEFAULT_PLAYER_EYE_HEIGHT;
-
-    private boolean hasEnteredUsername;
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        String oldName = this.name;
-        this.name = name;
-        propertyChangeSupport.firePropertyChange(PLAYER_NAME, oldName, name);
-    }
-
-    public Color getColor() {
-        return color;
-    }
-
-    public void setColor(Color color) {
-        this.color = color;
-    }
-
-    public Float getHeight() {
-        return height;
-    }
-
-    public void setHeight(Float height) {
-        this.height = height;
-    }
-
-    public Float getEyeHeight() {
-        return eyeHeight;
-    }
-
-    public void setEyeHeight(Float eyeHeight) {
-        if (eyeHeight < this.height) {
-            this.eyeHeight = eyeHeight;
-        }
-    }
-
-    public boolean hasEnteredUsername() {
-        return hasEnteredUsername;
-    }
-
-    public void setHasEnteredUsername(boolean entered) {
-        this.hasEnteredUsername = entered;
-    }
+    public final Setting<String> playerName = setting(
+            type(String.class),
+            defaultValue(defaultPlayerName()),
+            name("${engine:menu#player-name}"),
+            constraint(new StringConstraint(
+                    StringConstraint.notEmptyOrNull(),
+                    StringConstraint.maxLength(100))
+            )
+    );
+    public final Setting<Color> color = setting(
+            type(Color.class),
+            defaultValue(defaultPlayerColor()),
+            name("${engine:menu#player-color}")
+    );
+    public final Setting<Float> height = setting(
+            type(Float.class),
+            defaultValue(DEFAULT_PLAYER_HEIGHT),
+            name("${engine:menu#player-height}"),
+            constraint(new NumberRangeConstraint<>(1.5f, 2.0f, true, true))
+    );
+    public final Setting<Float> eyeHeight = setting(
+            type(Float.class),
+            defaultValue(DEFAULT_PLAYER_EYE_HEIGHT),
+            name("${engine:menu#player-eye-height}"),
+            constraint(new NumberRangeConstraint<>(0.5f, 1.5f, true, true))
+    );
 
     /**
-     * Generates the player's default name. The default name is the string "Player" followed by a random 5 digit code ranging from 10000 to 99999.
+     * Generates the player's default name. The default name is the string "Player" followed by a random 5 digit code
+     * ranging from 10000 to 99999.
      *
      * @return a String with the player's default name.
      */
@@ -92,5 +71,10 @@ public class PlayerConfig extends AbstractSubscribable {
         Random rng = new FastRandom();
         List<Color> colors = CieCamColors.L65C65;
         return colors.get(rng.nextInt(colors.size()));
+    }
+
+    @Override
+    public String getName() {
+        return "${engine:menu#player-settings-title}";
     }
 }

@@ -4,10 +4,9 @@ package org.terasology.engine.rendering.nui.layers.mainMenu.settings;
 
 import com.google.common.base.Function;
 import com.google.common.base.Functions;
-import com.google.common.base.Strings;
 import com.google.common.math.DoubleMath;
 import org.terasology.assets.ResourceUrn;
-import org.terasology.engine.config.Config;
+import org.terasology.engine.config.PlayerConfig;
 import org.terasology.engine.config.SystemConfig;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.i18n.TranslationSystem;
@@ -23,13 +22,10 @@ import org.terasology.engine.rendering.nui.layers.mainMenu.ThreeButtonPopup;
 import org.terasology.engine.utilities.Assets;
 import org.terasology.nui.Color;
 import org.terasology.nui.WidgetUtil;
-import org.terasology.nui.databinding.DefaultBinding;
-import org.terasology.nui.databinding.ReadOnlyBinding;
 import org.terasology.nui.widgets.UIButton;
 import org.terasology.nui.widgets.UIImage;
 import org.terasology.nui.widgets.UILabel;
 import org.terasology.nui.widgets.UISlider;
-import org.terasology.nui.widgets.UIText;
 
 import java.math.RoundingMode;
 import java.util.List;
@@ -44,7 +40,7 @@ public class PlayerSettingsScreen extends CoreScreenLayer {
     @In
     private Context context;
     @In
-    private Config config;
+    private PlayerConfig config;
     @In
     private SystemConfig systemConfig;
     @In
@@ -54,12 +50,9 @@ public class PlayerSettingsScreen extends CoreScreenLayer {
 
     private final List<Color> colors = CieCamColors.L65C65;
 
-    private UIText nametext;
     private UISlider slider;
     private UILabel storageServiceStatus;
     private UIButton storageServiceAction;
-    private UISlider heightSlider;
-    private UISlider eyeHeightSlider;
     private UIImage img;
 
     private StorageServiceWorkerStatus storageServiceWorkerStatus;
@@ -67,21 +60,8 @@ public class PlayerSettingsScreen extends CoreScreenLayer {
     @Override
     public void onOpened() {
         super.onOpened();
-        if (nametext != null) {
-            nametext.setText(config.getPlayer().getName());
-        }
-        if (slider != null) {
-            Color color = config.getPlayer().getColor();
-            slider.bindValue(new NotifyingBinding(findClosestIndex(color)));
-        }
-        if (heightSlider != null) {
-            heightSlider.bindValue(new NotifyingBinding(config.getPlayer().getHeight()));
-        }
-        if (eyeHeightSlider != null) {
-            eyeHeightSlider.bindValue(new NotifyingBinding(config.getPlayer().getEyeHeight()));
-        }
-        updateImage();
     }
+
 
     @Override
     public void initialise() {
@@ -91,16 +71,6 @@ public class PlayerSettingsScreen extends CoreScreenLayer {
         storageServiceAction = find("storageServiceAction", UIButton.class);
         updateStorageServiceStatus();
 
-        nametext = find("playername", UIText.class);
-        if (nametext != null) {
-            nametext.setTooltipDelay(0);
-            nametext.bindTooltipString(new ReadOnlyBinding<String>() {
-                @Override
-                public String get() {
-                    return validateScreen();
-                }
-            });
-        }
         img = find("image", UIImage.class);
         if (img != null) {
             ResourceUrn uri = TextureUtil.getTextureUriForColor(Color.WHITE);
@@ -115,21 +85,6 @@ public class PlayerSettingsScreen extends CoreScreenLayer {
             slider.setLabelFunction(constant);
         }
 
-        heightSlider = find("height", UISlider.class);
-        if (heightSlider != null) {
-            heightSlider.setMinimum(1.5f);
-            heightSlider.setIncrement(0.1f);
-            heightSlider.setRange(0.5f);
-            heightSlider.setPrecision(1);
-        }
-
-        eyeHeightSlider = find("eye-height", UISlider.class);
-        if (eyeHeightSlider != null) {
-            eyeHeightSlider.setMinimum(0.5f);
-            eyeHeightSlider.setIncrement(0.1f);
-            eyeHeightSlider.setRange(1f);
-            eyeHeightSlider.setPrecision(1);
-        }
 
         WidgetUtil.trySubscribe(this, "close", button -> triggerBackAnimation());
 
@@ -150,26 +105,6 @@ public class PlayerSettingsScreen extends CoreScreenLayer {
             }
         });
 
-        UIButton okButton = find("ok", UIButton.class);
-        if (okButton != null) {
-            okButton.subscribe(button -> {
-                savePlayerSettings();
-                triggerBackAnimation();
-            });
-            okButton.bindEnabled(new ReadOnlyBinding<Boolean>() {
-                @Override
-                public Boolean get() {
-                    return Strings.isNullOrEmpty(validateScreen());
-                }
-            });
-            okButton.setTooltipDelay(0);
-            okButton.bindTooltipString(new ReadOnlyBinding<String>() {
-                @Override
-                public String get() {
-                    return validateScreen();
-                }
-            });
-        }
     }
 
     @Override
@@ -188,17 +123,6 @@ public class PlayerSettingsScreen extends CoreScreenLayer {
         storageServiceWorkerStatus = stat;
     }
 
-    private String validateScreen() {
-        if (nametext != null) {
-            if (Strings.isNullOrEmpty(nametext.getText()) || nametext.getText().trim().length() == 0) {
-                return translationSystem.translate("${engine:menu#missing-name-message}");
-            }
-            if (nametext.getText().trim().length() > 100) {
-                return translationSystem.translate("${engine:menu#validation-username-max-length}");
-            }
-        }
-        return null;
-    }
 
     private float findClosestIndex(Color color) {
         int best = 0;
@@ -228,72 +152,9 @@ public class PlayerSettingsScreen extends CoreScreenLayer {
         return color;
     }
 
-    private void updateImage() {
-        Color color = getColor();
-        if (img != null) {
-            img.setTint(color);
-        }
-    }
-
-    private Color getColor() {
-        if (slider != null) {
-            float index = slider.getValue();
-            return findClosestColor(index);
-        } else {
-            return config.getPlayer().getColor();
-        }
-    }
-
-    private Float getHeight() {
-        if (heightSlider != null) {
-            float index = heightSlider.getValue();
-            return index;
-        } else {
-            return config.getPlayer().getHeight();
-        }
-    }
-
-    private Float getEyeHeight() {
-        if (eyeHeightSlider != null) {
-            float index = eyeHeightSlider.getValue();
-            return index;
-        } else {
-            return config.getPlayer().getEyeHeight();
-        }
-    }
-
-    private void savePlayerSettings() {
-        Color color = getColor();
-        config.getPlayer().setColor(color);
-        Float height = getHeight();
-        config.getPlayer().setHeight(height);
-        Float eyeHeight = getEyeHeight();
-        config.getPlayer().setEyeHeight(eyeHeight);
-        if (nametext != null) {
-            config.getPlayer().setName(nametext.getText().trim());
-            config.getPlayer().setHasEnteredUsername(true);
-        }
-    }
 
     @Override
     public boolean isLowerLayerVisible() {
         return false;
-    }
-
-    /**
-     * Calls update() in parent class when the slider value changes
-     */
-    private final class NotifyingBinding extends DefaultBinding<Float> {
-
-        private NotifyingBinding(Float value) {
-            super(value);
-        }
-
-        @Override
-        public void set(Float v) {
-            super.set(v);
-
-            updateImage();
-        }
     }
 }
