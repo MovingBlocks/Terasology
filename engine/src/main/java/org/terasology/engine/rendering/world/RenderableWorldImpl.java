@@ -5,6 +5,7 @@ package org.terasology.engine.rendering.world;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import org.joml.Vector3f;
+import org.joml.Vector3fc;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.slf4j.Logger;
@@ -46,7 +47,7 @@ class RenderableWorldImpl implements RenderableWorld {
     private static final int MAX_ANIMATED_CHUNKS = 64;
     private static final int MAX_BILLBOARD_CHUNKS = 64;
     private static final int MAX_LOADABLE_CHUNKS = ViewDistance.MEGA.getChunkDistance().x() * ViewDistance.MEGA.getChunkDistance().y() * ViewDistance.MEGA.getChunkDistance().z();
-    private static final Vector3f CHUNK_CENTER_OFFSET = new Vector3f(Chunks.CHUNK_SIZE).div(2);
+    private static final Vector3fc CHUNK_CENTER_OFFSET = new Vector3f(Chunks.CHUNK_SIZE).div(2);
 
     private static final Logger logger = LoggerFactory.getLogger(RenderableWorldImpl.class);
 
