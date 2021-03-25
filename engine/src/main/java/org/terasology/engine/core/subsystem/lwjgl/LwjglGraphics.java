@@ -60,6 +60,12 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
         this.engine = gameEngine;
         this.context = rootContext;
         this.config = context.get(Config.class).getRendering();
+        if (config.getWindowHeight()<=0 && config.getWindowWidth()<=0){
+            config.setWindowPosX(379);
+            config.setWindowPosY(235);
+            config.setWindowWidth(1280);
+            config.setWindowHeight(800);
+        }
         lwjglDisplay = new LwjglDisplayDevice(context);
         context.put(DisplayDevice.class, lwjglDisplay);
         logger.info("Initial initialization complete");
