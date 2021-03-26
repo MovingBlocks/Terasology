@@ -9,8 +9,6 @@ import org.terasology.engine.world.block.BlockRegion;
 import org.terasology.engine.world.chunks.Chunk;
 import org.terasology.engine.world.chunks.ChunkProvider;
 import org.terasology.engine.world.chunks.Chunks;
-import org.terasology.engine.world.chunks.CoreChunk;
-import org.terasology.engine.world.chunks.LitChunk;
 
 /**
  * A base world view implementation sitting on ChunkProvider.
@@ -35,7 +33,7 @@ public abstract class AbstractFullWorldView implements PropagatorWorldView {
 
     @Override
     public byte getValueAt(Vector3ic pos) {
-        LitChunk chunk = getChunk(pos);
+        Chunk chunk = getChunk(pos);
         if (chunk != null) {
             return getValueAt(chunk, Chunks.toRelative(pos, new Vector3i()));
         }
@@ -49,7 +47,7 @@ public abstract class AbstractFullWorldView implements PropagatorWorldView {
      * @param pos   The internal position of the chunk to get the value from
      * @return The relevant value for this view
      */
-    protected abstract byte getValueAt(LitChunk chunk, Vector3ic pos);
+    protected abstract byte getValueAt(Chunk chunk, Vector3ic pos);
 
     @Override
     public void setValueAt(Vector3ic pos, byte value) {
@@ -70,11 +68,11 @@ public abstract class AbstractFullWorldView implements PropagatorWorldView {
      * @param pos   The internal position of the chunk to set the value of
      * @param value The new value
      */
-    protected abstract void setValueAt(LitChunk chunk, Vector3ic pos, byte value);
+    protected abstract void setValueAt(Chunk chunk, Vector3ic pos, byte value);
 
     @Override
     public Block getBlockAt(Vector3ic pos) {
-        CoreChunk chunk = chunkProvider.getChunk(Chunks.toChunkPos(pos, new Vector3i()));
+       Chunk chunk = chunkProvider.getChunk(Chunks.toChunkPos(pos, new Vector3i()));
         if (chunk != null) {
             return chunk.getBlock(Chunks.toRelative(pos, new Vector3i()));
         }

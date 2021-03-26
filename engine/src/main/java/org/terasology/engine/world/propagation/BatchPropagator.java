@@ -6,7 +6,7 @@ import org.joml.Math;
 import org.joml.Vector3ic;
 import org.terasology.engine.math.Side;
 import org.terasology.engine.world.block.Block;
-import org.terasology.engine.world.chunks.LitChunk;
+import org.terasology.engine.world.chunks.Chunk;
 
 /**
  * Handles propagating values through blocks on a block by block basis.
@@ -35,7 +35,7 @@ public interface BatchPropagator {
      * @param side              The side the values are moving through
      * @param propagateExternal TODO: Document
      */
-    void propagateBetween(LitChunk chunk, LitChunk adjChunk, Side side, boolean propagateExternal);
+    void propagateBetween(Chunk chunk, Chunk adjChunk, Side side, boolean propagateExternal);
 
     /**
      * Propagates a value out of the block at the given position

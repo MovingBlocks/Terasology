@@ -7,8 +7,8 @@ import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.terasology.engine.math.Side;
 import org.terasology.engine.world.block.Block;
+import org.terasology.engine.world.chunks.Chunk;
 import org.terasology.engine.world.chunks.Chunks;
-import org.terasology.engine.world.chunks.LitChunk;
 
 import java.util.Arrays;
 import java.util.Set;
@@ -175,7 +175,7 @@ public class SunlightRegenBatchPropagator implements BatchPropagator {
     }
 
     @Override
-    public void propagateBetween(LitChunk chunk, LitChunk adjChunk, Side side, boolean propagateExternal) {
+    public void propagateBetween(Chunk chunk, Chunk adjChunk, Side side, boolean propagateExternal) {
         if (side == Side.BOTTOM) {
             int[] depth = new int[Chunks.SIZE_X * Chunks.SIZE_Z];
             int[] startingRegen = new int[depth.length];
@@ -201,7 +201,7 @@ public class SunlightRegenBatchPropagator implements BatchPropagator {
         }
     }
 
-    private void markForPropagation(LitChunk toChunk, int[] depth, int[] startingRegen, int[] adjDepths, int[] adjStartingRegen) {
+    private void markForPropagation(Chunk toChunk, int[] depth, int[] startingRegen, int[] adjDepths, int[] adjStartingRegen) {
         Vector3i pos = new Vector3i();
         for (int z = 0; z < Chunks.SIZE_Z; ++z) {
             for (int x = 0; x < Chunks.SIZE_X; ++x) {
@@ -225,7 +225,7 @@ public class SunlightRegenBatchPropagator implements BatchPropagator {
         }
     }
 
-    private void propagateSweep(LitChunk fromChunk, LitChunk toChunk, int[] depth, int[] startingRegen) {
+    private void propagateSweep(Chunk fromChunk, Chunk toChunk, int[] depth, int[] startingRegen) {
         Vector3i pos = new Vector3i();
         for (int z = 0; z < Chunks.SIZE_Z; ++z) {
             for (int x = 0; x < Chunks.SIZE_X; ++x) {

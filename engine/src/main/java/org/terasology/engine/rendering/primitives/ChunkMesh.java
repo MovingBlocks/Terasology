@@ -221,11 +221,7 @@ public class ChunkMesh {
      * @param chunkIsAnimated a boolean: true if the chunk is animated, false otherwise
      */
     public void updateMaterial(Material chunkMaterial, Vector3fc chunkPosition, boolean chunkIsAnimated) {
-        chunkMaterial.setFloat3("chunkPositionWorld",
-                chunkPosition.x() * Chunks.SIZE_X,
-                chunkPosition.y() * Chunks.SIZE_Y,
-                chunkPosition.z() * Chunks.SIZE_Z,
-                true);
+        chunkMaterial.setFloat3("chunkPositionWorld", chunkPosition, true);
         chunkMaterial.setFloat("animated", chunkIsAnimated ? 1.0f : 0.0f, true);
     }
 
@@ -245,10 +241,7 @@ public class ChunkMesh {
         GL11.glPushMatrix();
 
         // chunkPositionRelativeToCamera = chunkCoordinates * chunkDimensions - cameraCoordinate
-        final Vector3f chunkPositionRelativeToCamera =
-                new Vector3f(chunkPosition.x() * Chunks.SIZE_X - cameraPosition.x(),
-                        chunkPosition.y() * Chunks.SIZE_Y - cameraPosition.y(),
-                        chunkPosition.z() * Chunks.SIZE_Z - cameraPosition.z());
+        final Vector3f chunkPositionRelativeToCamera = chunkPosition.sub(cameraPosition, new Vector3f());
         GL11.glTranslatef(chunkPositionRelativeToCamera.x, chunkPositionRelativeToCamera.y, chunkPositionRelativeToCamera.z);
 
         render(phase);  // this is where the chunk is actually rendered

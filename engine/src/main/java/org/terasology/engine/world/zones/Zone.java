@@ -4,8 +4,8 @@ package org.terasology.engine.world.zones;
 
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
+import org.terasology.engine.world.chunks.Chunk;
 import org.terasology.engine.world.chunks.Chunks;
-import org.terasology.engine.world.chunks.CoreChunk;
 import org.terasology.engine.world.generation.EntityBuffer;
 import org.terasology.engine.world.generation.EntityProvider;
 import org.terasology.engine.world.generation.FacetProvider;
@@ -104,10 +104,10 @@ public class Zone extends ProviderStore implements WorldRasterizer, EntityProvid
      *
      * This will only change blocks for which {@link #containsBlock(int, int, int, Region)} returns true.
      *
-     * @see WorldRasterizer#generateChunk(CoreChunk, Region)
+     * @see WorldRasterizer#generateChunk(Chunk, Region)
      */
     @Override
-    public void generateChunk(CoreChunk chunk, Region chunkRegion) {
+    public void generateChunk(Chunk chunk, Region chunkRegion) {
         Block[][][] savedBlocks = new Block[Chunks.SIZE_X][Chunks.SIZE_Y][Chunks.SIZE_Z];
         boolean changeAllBlocks = true;
         boolean saveAllBlocks = true;
