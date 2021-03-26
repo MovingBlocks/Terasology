@@ -27,10 +27,10 @@ public interface ComponentSerializeCheck {
 
     boolean serialize(ComponentMetadata<? extends Component> metadata);
 
-     final class DefaultCheck implements ComponentSerializeCheck {
-        private static final DefaultCheck INSTANCE = new DefaultCheck();
+     final class NullCheck implements ComponentSerializeCheck {
+        private static final NullCheck INSTANCE = new NullCheck();
 
-        private DefaultCheck() {
+        private NullCheck() {
         }
 
         public static ComponentSerializeCheck create() {
@@ -39,7 +39,7 @@ public interface ComponentSerializeCheck {
 
         @Override
         public boolean serialize(ComponentMetadata<? extends Component> metadata) {
-            return metadata.isPersisted();
+            return true;
         }
     }
 }

@@ -21,7 +21,6 @@ import org.terasology.engine.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.engine.entitySystem.entity.internal.EntityInfoComponent;
 import org.terasology.engine.entitySystem.entity.internal.EntityScope;
 import org.terasology.engine.entitySystem.metadata.ComponentLibrary;
-import org.terasology.engine.entitySystem.metadata.ComponentMetadata;
 import org.terasology.engine.entitySystem.prefab.Prefab;
 import org.terasology.engine.entitySystem.prefab.PrefabData;
 import org.terasology.engine.entitySystem.prefab.internal.PojoPrefab;
@@ -33,6 +32,7 @@ import org.terasology.engine.network.NetworkMode;
 import org.terasology.engine.network.NetworkSystem;
 import org.terasology.engine.persistence.serializers.ComponentSerializeCheck;
 import org.terasology.engine.persistence.serializers.EntitySerializer;
+import org.terasology.engine.persistence.serializers.PersistenceComponentSerializeCheck;
 import org.terasology.protobuf.EntityData;
 import org.terasology.engine.recording.RecordAndReplayCurrentStatus;
 import org.terasology.engine.registry.CoreRegistry;
@@ -292,6 +292,7 @@ public class EntitySerializerTest {
 
         EntityRef entity = entityManager.create();
         entity.addComponent(new NonpersistedComponent());
+        entitySerializer.setComponentSerializeCheck(new PersistenceComponentSerializeCheck());
         EntityData.Entity entityData = entitySerializer.serialize(entity);
         long nextId = entityManager.getNextId();
         entityManager.clear();
@@ -313,7 +314,7 @@ public class EntitySerializerTest {
         long nextId = entityManager.getNextId();
         entityManager.clear();
         entityManager.setNextId(nextId);
-        entitySerializer.setComponentSerializeCheck(ComponentSerializeCheck.DefaultCheck.create());
+        entitySerializer.setComponentSerializeCheck(new PersistenceComponentSerializeCheck());
         EntityRef loadedEntity = entitySerializer.deserialize(entityData);
 
         assertTrue(loadedEntity.exists());

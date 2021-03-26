@@ -40,7 +40,7 @@ public class EntitySerializer {
     private ComponentLibrary componentLibrary;
     private ComponentSerializer componentSerializer;
 
-    private ComponentSerializeCheck componentSerializeCheck = ComponentSerializeCheck.DefaultCheck.create();
+    private ComponentSerializeCheck componentSerializeCheck = ComponentSerializeCheck.NullCheck.create();
     private boolean ignoringEntityId;
 
     /**
