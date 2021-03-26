@@ -1,26 +1,13 @@
-/*
- * Copyright 2019 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.reflection;
 
-import org.junit.Ignore;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.reflections.Reflections;
-import org.terasology.ModuleEnvironmentTest;
-import org.terasology.engine.module.ExternalApiWhitelist;
-import org.terasology.entitySystem.Component;
+import org.terasology.engine.ModuleEnvironmentTest;
+import org.terasology.engine.core.module.ExternalApiWhitelist;
+import org.terasology.engine.entitySystem.Component;
 import org.terasology.naming.Name;
 
 import java.util.Collection;
@@ -39,8 +26,8 @@ public class TypeRegistryTest extends ModuleEnvironmentTest {
     }
 
     // TODO: Re-enable as gradlew check seems to still stall even with the Ignore in place?
-    //@Ignore("Seems to intermittently stall, at least on Win10")
-    //@Test
+    @Disabled("Seems to intermittently stall, at least on Win10")
+    @Test
     public void testNonModuleTypes() {
         assumeTrue(typeRegistry.getSubtypesOf(Collection.class).contains(TreeSet.class));
 
@@ -48,8 +35,8 @@ public class TypeRegistryTest extends ModuleEnvironmentTest {
     }
 
     // TODO: Re-enable as gradlew check seems to still stall even with the Ignore in place?
-    //@Ignore("Seems to intermittently stall, at least on Win10")
-    //@Test
+    @Disabled("Seems to intermittently stall, at least on Win10")
+    @Test
     public void testModuleTypes() {
         Set<Name> modulesDeclaringComponents =
                 typeRegistry.getSubtypesOf(Component.class).stream()
@@ -60,8 +47,8 @@ public class TypeRegistryTest extends ModuleEnvironmentTest {
     }
 
     // TODO: Re-enable as gradlew check seems to still stall even with the Ignore in place?
-    //@Ignore("Seems to intermittently stall, at least on Win10")
-    //@Test
+    @Disabled("Seems to intermittently stall, at least on Win10")
+    @Test
     public void testWhitelistedTypes() {
         Set<Class<?>> allTypes = typeRegistry.getSubtypesOf(Object.class);
         for (Class<?> whitelisted : ExternalApiWhitelist.CLASSES) {

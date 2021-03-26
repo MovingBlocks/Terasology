@@ -1,33 +1,21 @@
-/*
- * Copyright 2019 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-package org.terasology.config.flexible.internal;
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
+package org.terasology.engine.config.flexible.internal;
 
 import com.google.common.collect.Lists;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.terasology.config.flexible.Setting;
-import org.terasology.config.flexible.SettingChangeListener;
-import org.terasology.config.flexible.constraints.NumberRangeConstraint;
-import org.terasology.engine.SimpleUri;
+import org.terasology.engine.config.flexible.Setting;
+import org.terasology.engine.config.flexible.SettingChangeListener;
+import org.terasology.engine.config.flexible.constraints.NumberRangeConstraint;
+import org.terasology.engine.core.SimpleUri;
 import org.terasology.reflection.TypeInfo;
-import org.terasology.utilities.random.FastRandom;
-import org.terasology.utilities.random.Random;
+import org.terasology.engine.utilities.random.FastRandom;
+import org.terasology.engine.utilities.random.Random;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -37,7 +25,7 @@ public class SettingImplTest {
     private static final SimpleUri SETTING_ID = new SimpleUri("engine-tests:TestSetting");
 
     @Nested
-    public class SetValue {
+    class SetValue {
         private Setting<Integer> setting;
 
         private int eventResult;
@@ -45,9 +33,9 @@ public class SettingImplTest {
         @BeforeEach
         public void setUp() {
             setting = new SettingImpl<>(
-                TypeInfo.of(Integer.class), 50,
+                    TypeInfo.of(Integer.class), 50,
                     new NumberRangeConstraint<>(0, 100, false, false),
-                    "", "");
+                    "", "", Optional::empty);
 
             eventResult = -1;
 
@@ -55,14 +43,14 @@ public class SettingImplTest {
         }
 
         @Test
-        public void testSetsValue() {
+        void testSetsValue() {
             assertTrue(setting.set(25));
 
             assertEquals(25, eventResult);
         }
 
         @Test
-        public void testDoesNotSetValue() {
+        void testDoesNotSetValue() {
             assertFalse(setting.set(101));
 
             assertEquals(-1, eventResult);
@@ -70,7 +58,47 @@ public class SettingImplTest {
     }
 
     @Nested
-    public class Subscribers {
+    class Override {
+        private static final int TEST_CONFIG_OVERRIDE_VALUE = 75;
+        private Integer override;
+        private Setting<Integer> setting;
+
+        private int eventResult;
+
+        @BeforeEach
+        public void setUp() {
+            setting = new SettingImpl<>(
+                    TypeInfo.of(Integer.class), 50,
+                    new NumberRangeConstraint<>(0, 100, false, false),
+                    "", "", () -> Optional.ofNullable(override));
+
+            eventResult = -1;
+
+            setting.subscribe((setting1, oldValue) -> eventResult = setting1.get());
+        }
+
+        @Test
+        void testSystemPropertyValue() {
+            override = TEST_CONFIG_OVERRIDE_VALUE;
+            assertEquals(75, setting.get());
+        }
+
+        @Test
+        void testSystemPropertyValueNotPresent() {
+            override = null;
+            assertEquals(50, setting.get());
+        }
+
+        @Test
+        void testDoesNotSetValue() {
+            assertFalse(setting.set(101));
+
+            assertEquals(-1, eventResult);
+        }
+    }
+
+    @Nested
+    class Subscribers {
         private Setting<Integer> setting;
 
         private SettingChangeListener<Integer> listener;
@@ -80,9 +108,9 @@ public class SettingImplTest {
         @BeforeEach
         public void setUp() {
             setting = new SettingImpl<>(
-                TypeInfo.of(Integer.class), 50,
+                    TypeInfo.of(Integer.class), 50,
                     new NumberRangeConstraint<>(0, 100, false, false),
-                    "", "");
+                    "", "", Optional::empty);
 
             eventCallCount = 0;
 
@@ -90,7 +118,7 @@ public class SettingImplTest {
         }
 
         @Test
-        public void testHasSubscribers() {
+        void testHasSubscribers() {
             setting.subscribe(listener);
 
             assertTrue(setting.hasSubscribers());
@@ -101,7 +129,7 @@ public class SettingImplTest {
         }
 
         @Test
-        public void testSetEventCall() {
+        void testSetEventCall() {
             setting.subscribe(listener);
 
             Random random = new FastRandom();
@@ -118,7 +146,7 @@ public class SettingImplTest {
         }
 
         @Test
-        public void testSubscribe() {
+        void testSubscribe() {
             final int subscriberCount = 10;
 
             for (int i = 0; i < subscriberCount; i++) {
@@ -131,7 +159,7 @@ public class SettingImplTest {
         }
 
         @Test
-        public void testUnsubscribe() {
+        void testUnsubscribe() {
             int subscriberCount = 10;
 
             List<SettingChangeListener<Integer>> listeners = Lists.newArrayListWithCapacity(subscriberCount);

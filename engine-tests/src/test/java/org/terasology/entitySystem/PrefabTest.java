@@ -1,19 +1,6 @@
-/*
- * Copyright 2013 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-package org.terasology.entitySystem;
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
+package org.terasology.engine.entitySystem;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,28 +9,28 @@ import org.slf4j.LoggerFactory;
 import org.terasology.assets.AssetFactory;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.assets.module.ModuleAwareAssetTypeManager;
-import org.terasology.context.internal.ContextImpl;
-import org.terasology.engine.bootstrap.EntitySystemSetupUtil;
-import org.terasology.engine.module.ModuleManager;
-import org.terasology.entitySystem.metadata.ComponentLibrary;
-import org.terasology.entitySystem.prefab.Prefab;
-import org.terasology.entitySystem.prefab.PrefabData;
-import org.terasology.entitySystem.prefab.PrefabManager;
-import org.terasology.entitySystem.prefab.internal.PojoPrefab;
-import org.terasology.entitySystem.prefab.internal.PojoPrefabManager;
-import org.terasology.entitySystem.prefab.internal.PrefabFormat;
-import org.terasology.entitySystem.stubs.ListOfEnumsComponent;
-import org.terasology.entitySystem.stubs.ListOfObjectComponent;
-import org.terasology.entitySystem.stubs.MappedContainerComponent;
-import org.terasology.entitySystem.stubs.OrderedMapTestComponent;
-import org.terasology.entitySystem.stubs.StringComponent;
-import org.terasology.math.Side;
-import org.terasology.network.NetworkMode;
-import org.terasology.network.NetworkSystem;
+import org.terasology.engine.context.internal.ContextImpl;
+import org.terasology.engine.core.bootstrap.EntitySystemSetupUtil;
+import org.terasology.engine.core.module.ModuleManager;
+import org.terasology.engine.entitySystem.metadata.ComponentLibrary;
+import org.terasology.engine.entitySystem.prefab.Prefab;
+import org.terasology.engine.entitySystem.prefab.PrefabData;
+import org.terasology.engine.entitySystem.prefab.PrefabManager;
+import org.terasology.engine.entitySystem.prefab.internal.PojoPrefab;
+import org.terasology.engine.entitySystem.prefab.internal.PojoPrefabManager;
+import org.terasology.engine.entitySystem.prefab.internal.PrefabFormat;
+import org.terasology.engine.entitySystem.stubs.ListOfEnumsComponent;
+import org.terasology.engine.entitySystem.stubs.ListOfObjectComponent;
+import org.terasology.engine.entitySystem.stubs.MappedContainerComponent;
+import org.terasology.engine.entitySystem.stubs.OrderedMapTestComponent;
+import org.terasology.engine.entitySystem.stubs.StringComponent;
+import org.terasology.engine.math.Side;
+import org.terasology.engine.network.NetworkMode;
+import org.terasology.engine.network.NetworkSystem;
+import org.terasology.engine.recording.RecordAndReplayCurrentStatus;
+import org.terasology.engine.registry.CoreRegistry;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
-import org.terasology.recording.RecordAndReplayCurrentStatus;
-import org.terasology.registry.CoreRegistry;
-import org.terasology.testUtil.ModuleManagerFactory;
+import org.terasology.engine.testUtil.ModuleManagerFactory;
 
 import java.util.ArrayList;
 import java.util.List;

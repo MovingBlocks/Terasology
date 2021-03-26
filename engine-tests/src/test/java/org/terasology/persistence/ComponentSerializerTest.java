@@ -1,53 +1,42 @@
-/*
- * Copyright 2013 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-package org.terasology.persistence;
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
+package org.terasology.engine.persistence;
 
 import com.google.common.collect.ImmutableMap;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.reflections.Reflections;
 import org.terasology.assets.ResourceUrn;
-import org.terasology.context.Context;
-import org.terasology.context.internal.ContextImpl;
-import org.terasology.engine.SimpleUri;
-import org.terasology.engine.bootstrap.EntitySystemSetupUtil;
-import org.terasology.engine.module.ModuleManager;
-import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.entity.internal.EngineEntityManager;
-import org.terasology.entitySystem.metadata.ComponentLibrary;
-import org.terasology.entitySystem.stubs.GetterSetterComponent;
-import org.terasology.entitySystem.stubs.IntegerComponent;
-import org.terasology.entitySystem.stubs.StringComponent;
-import org.terasology.math.geom.Quat4f;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.network.NetworkSystem;
-import org.terasology.persistence.serializers.ComponentSerializer;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.context.internal.ContextImpl;
+import org.terasology.engine.core.bootstrap.EntitySystemSetupUtil;
+import org.terasology.engine.core.module.ModuleManager;
+import org.terasology.engine.entitySystem.Component;
+import org.terasology.engine.entitySystem.entity.internal.EngineEntityManager;
+import org.terasology.engine.entitySystem.metadata.ComponentLibrary;
+import org.terasology.engine.entitySystem.stubs.GetterSetterComponent;
+import org.terasology.engine.entitySystem.stubs.IntegerComponent;
+import org.terasology.engine.entitySystem.stubs.StringComponent;
+import org.terasology.engine.network.NetworkMode;
+import org.terasology.engine.network.NetworkSystem;
+import org.terasology.engine.persistence.serializers.ComponentSerializer;
+import org.terasology.engine.persistence.typeHandling.TypeHandlerLibraryImpl;
+import org.terasology.engine.persistence.typeHandling.mathTypes.QuaternionfTypeHandler;
+import org.terasology.engine.persistence.typeHandling.mathTypes.Vector3fTypeHandler;
+import org.terasology.engine.recording.RecordAndReplayCurrentStatus;
+import org.terasology.engine.registry.CoreRegistry;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
-import org.terasology.persistence.typeHandling.mathTypes.legacy.LegacyQuat4fTypeHandler;
-import org.terasology.persistence.typeHandling.mathTypes.legacy.LegacyVector3fTypeHandler;
 import org.terasology.protobuf.EntityData;
-import org.terasology.recording.RecordAndReplayCurrentStatus;
-import org.terasology.registry.CoreRegistry;
-import org.terasology.testUtil.ModuleManagerFactory;
+import org.terasology.engine.testUtil.ModuleManagerFactory;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  */
@@ -69,12 +58,13 @@ public class ComponentSerializerTest {
         CoreRegistry.setContext(context);
 
         Reflections reflections = new Reflections(getClass().getClassLoader());
-        TypeHandlerLibrary serializationLibrary = new TypeHandlerLibrary(reflections);
+        TypeHandlerLibrary serializationLibrary = new TypeHandlerLibraryImpl(reflections);
 
-        serializationLibrary.addTypeHandler(Vector3f.class, new LegacyVector3fTypeHandler());
-        serializationLibrary.addTypeHandler(Quat4f.class, new LegacyQuat4fTypeHandler());
+        serializationLibrary.addTypeHandler(Vector3f.class, new Vector3fTypeHandler());
+        serializationLibrary.addTypeHandler(Quaternionf.class, new QuaternionfTypeHandler());
 
         NetworkSystem networkSystem = mock(NetworkSystem.class);
+        when(networkSystem.getMode()).thenReturn(NetworkMode.NONE);
         context.put(NetworkSystem.class, networkSystem);
         EntitySystemSetupUtil.addReflectionBasedLibraries(context);
         EntitySystemSetupUtil.addEntityManagementRelatedClasses(context);

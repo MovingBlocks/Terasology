@@ -13,12 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.entitySystem.metadata;
+package org.terasology.engine.entitySystem.metadata;
 
 import org.junit.jupiter.api.Test;
 import org.terasology.assets.ResourceUrn;
-import org.terasology.engine.SimpleUri;
-import org.terasology.entitySystem.stubs.OwnerComponent;
+import org.terasology.engine.entitySystem.stubs.OwnerComponent;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.reflect.ReflectFactory;
 import org.terasology.reflection.reflect.ReflectionReflectFactory;

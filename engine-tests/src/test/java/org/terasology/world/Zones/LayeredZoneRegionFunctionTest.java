@@ -17,20 +17,19 @@ package org.terasology.world.Zones;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
+import org.joml.Vector2ic;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.terasology.math.Region3i;
-import org.terasology.math.geom.BaseVector2i;
-import org.terasology.math.geom.Vector3i;
-import org.terasology.world.generation.Border3D;
-import org.terasology.world.generation.FacetProvider;
-import org.terasology.world.generation.Region;
-import org.terasology.world.generation.RegionImpl;
-import org.terasology.world.generation.WorldFacet;
-import org.terasology.world.generation.facets.SurfaceHeightFacet;
-import org.terasology.world.zones.LayeredZoneRegionFunction;
-import org.terasology.world.zones.MinMaxLayerThickness;
-import org.terasology.world.zones.Zone;
+import org.terasology.engine.world.block.BlockRegion;
+import org.terasology.engine.world.generation.Border3D;
+import org.terasology.engine.world.generation.FacetProvider;
+import org.terasology.engine.world.generation.Region;
+import org.terasology.engine.world.generation.RegionImpl;
+import org.terasology.engine.world.generation.WorldFacet;
+import org.terasology.engine.world.generation.facets.ElevationFacet;
+import org.terasology.engine.world.zones.LayeredZoneRegionFunction;
+import org.terasology.engine.world.zones.MinMaxLayerThickness;
+import org.terasology.engine.world.zones.Zone;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -38,12 +37,12 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.terasology.world.zones.LayeredZoneRegionFunction.LayeredZoneOrdering.ABOVE_GROUND;
-import static org.terasology.world.zones.LayeredZoneRegionFunction.LayeredZoneOrdering.GROUND;
-import static org.terasology.world.zones.LayeredZoneRegionFunction.LayeredZoneOrdering.LOW_SKY;
-import static org.terasology.world.zones.LayeredZoneRegionFunction.LayeredZoneOrdering.MEDIUM_SKY;
-import static org.terasology.world.zones.LayeredZoneRegionFunction.LayeredZoneOrdering.MEDIUM_UNDERGROUND;
-import static org.terasology.world.zones.LayeredZoneRegionFunction.LayeredZoneOrdering.SHALLOW_UNDERGROUND;
+import static org.terasology.engine.world.zones.LayeredZoneRegionFunction.LayeredZoneOrdering.ABOVE_GROUND;
+import static org.terasology.engine.world.zones.LayeredZoneRegionFunction.LayeredZoneOrdering.GROUND;
+import static org.terasology.engine.world.zones.LayeredZoneRegionFunction.LayeredZoneOrdering.LOW_SKY;
+import static org.terasology.engine.world.zones.LayeredZoneRegionFunction.LayeredZoneOrdering.MEDIUM_SKY;
+import static org.terasology.engine.world.zones.LayeredZoneRegionFunction.LayeredZoneOrdering.MEDIUM_UNDERGROUND;
+import static org.terasology.engine.world.zones.LayeredZoneRegionFunction.LayeredZoneOrdering.SHALLOW_UNDERGROUND;
 
 public class LayeredZoneRegionFunctionTest {
 
@@ -63,22 +62,22 @@ public class LayeredZoneRegionFunctionTest {
 
         ListMultimap<Class<? extends WorldFacet>, FacetProvider> facetProviderChains = ArrayListMultimap.create();
 
-        facetProviderChains.put(SurfaceHeightFacet.class, (generatingRegion) -> {
-                    SurfaceHeightFacet facet = new SurfaceHeightFacet(generatingRegion.getRegion(),
-                            generatingRegion.getBorderForFacet(SurfaceHeightFacet.class));
+        facetProviderChains.put(ElevationFacet.class, (generatingRegion) -> {
+                    ElevationFacet facet = new ElevationFacet(generatingRegion.getRegion(),
+                            generatingRegion.getBorderForFacet(ElevationFacet.class));
 
-                    for (BaseVector2i pos : facet.getRelativeRegion().contents()) {
+                    for (Vector2ic pos : facet.getRelativeArea()) {
                         facet.set(pos, 100);
                     }
 
-                    generatingRegion.setRegionFacet(SurfaceHeightFacet.class, facet);
+                    generatingRegion.setRegionFacet(ElevationFacet.class, facet);
                 });
 
         Map<Class<? extends WorldFacet>, Border3D> borders = new HashMap<>();
-        borders.put(SurfaceHeightFacet.class, new Border3D(0, 0, 0));
+        borders.put(ElevationFacet.class, new Border3D(0, 0, 0));
 
-        region = new RegionImpl(Region3i.createFromCenterExtents(new Vector3i(0, 0, 0), 4),
-                facetProviderChains, borders);
+        region = new RegionImpl(new BlockRegion(0, 0, 0).expand(4, 4, 4),
+                facetProviderChains, borders, 1);
     }
 
     @Test
