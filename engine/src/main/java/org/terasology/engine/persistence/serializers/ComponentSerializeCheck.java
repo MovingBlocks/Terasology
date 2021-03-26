@@ -17,6 +17,7 @@
 package org.terasology.engine.persistence.serializers;
 
 import org.terasology.engine.entitySystem.Component;
+import org.terasology.engine.entitySystem.entity.internal.EntityInfoComponent;
 import org.terasology.engine.entitySystem.metadata.ComponentMetadata;
 
 /**
@@ -39,7 +40,7 @@ public interface ComponentSerializeCheck {
 
         @Override
         public boolean serialize(ComponentMetadata<? extends Component> metadata) {
-            return true;
+            return metadata.getType() != EntityInfoComponent.class;
         }
     }
 }
