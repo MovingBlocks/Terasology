@@ -1,13 +1,10 @@
 {
-  "type": "RowLayout",
+  "type": "ColumnLayout",
   "horizontalSpacing": 10,
   "contents": [
     {
       "type": "UISlider",
-      "id": "tone",
-      "layoutInfo": {
-        "relativeWidth": 0.88
-      }
+      "id": "tone"
     },
     {
       "type": "UIImage",
