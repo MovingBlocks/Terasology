@@ -160,10 +160,12 @@ public class RuntimeDelegatingTypeHandlerTest {
     }
 
     private static class Base {
+        @SuppressWarnings("unused")
         int x;
     }
 
     private static class Sub extends Base {
+        @SuppressWarnings("unused")
         float y;
     }
 }
