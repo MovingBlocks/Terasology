@@ -15,6 +15,7 @@
  */
 package org.terasology.engine.persistence;
 
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.terasology.engine.TerasologyTestingEnvironment;
 import org.terasology.engine.entitySystem.entity.EntityBuilder;
@@ -27,6 +28,7 @@ import org.terasology.protobuf.EntityData;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@Tag("TteTest")
 public class WorldSerializerTest extends TerasologyTestingEnvironment {
 
     @Test

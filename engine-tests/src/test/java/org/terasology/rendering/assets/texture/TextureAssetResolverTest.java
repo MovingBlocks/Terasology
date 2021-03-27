@@ -16,6 +16,7 @@
 
 package org.terasology.rendering.assets.texture;
 
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.terasology.engine.TerasologyTestingEnvironment;
 import org.terasology.assets.ResourceUrn;
@@ -35,6 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * Tests texture asset resolvers.
  */
+@Tag("TteTest")
 public class TextureAssetResolverTest extends TerasologyTestingEnvironment {
 
     @Test
