@@ -3,6 +3,7 @@
 package org.terasology.engine.logic.delay;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.terasology.engine.TerasologyTestingEnvironment;
 import org.terasology.engine.core.Time;
@@ -17,6 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@Tag("TteTest")
 public class DelayedActionSystemTest extends TerasologyTestingEnvironment {
 
     long nextFakeEntityId = 1;
