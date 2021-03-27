@@ -2,12 +2,12 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.world.generation;
 
-import org.terasology.engine.world.chunks.CoreChunk;
+import org.terasology.engine.world.chunks.Chunk;
 
 /**
  */
 public interface WorldRasterizer {
     void initialize();
 
-    void generateChunk(CoreChunk chunk, Region chunkRegion);
+    void generateChunk(Chunk chunk, Region chunkRegion);
 }

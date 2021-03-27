@@ -18,6 +18,7 @@ package org.terasology.world.block.shape;
 import com.badlogic.gdx.physics.bullet.collision.btConvexHullShape;
 import org.joml.Vector3f;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.terasology.engine.TerasologyTestingEnvironment;
 import org.terasology.assets.management.AssetManager;
@@ -35,6 +36,7 @@ import org.terasology.engine.world.block.tiles.NullWorldAtlas;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@Tag("TteTest")
 public class BlockShapeTest extends TerasologyTestingEnvironment {
     private BlockManagerImpl blockManager;
     private AssetManager assetManager;

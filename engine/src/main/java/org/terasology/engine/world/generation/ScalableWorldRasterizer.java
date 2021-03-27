@@ -3,13 +3,13 @@
 
 package org.terasology.engine.world.generation;
 
-import org.terasology.engine.world.chunks.CoreChunk;
+import org.terasology.engine.world.chunks.Chunk;
 
 public interface ScalableWorldRasterizer extends WorldRasterizer {
-    void generateChunk(CoreChunk chunk, Region chunkRegion, float scale);
+    void generateChunk(Chunk chunk, Region chunkRegion, float scale);
 
     @Override
-    default void generateChunk(CoreChunk chunk, Region chunkRegion) {
+    default void generateChunk(Chunk chunk, Region chunkRegion) {
         generateChunk(chunk, chunkRegion, 1);
     }
 }

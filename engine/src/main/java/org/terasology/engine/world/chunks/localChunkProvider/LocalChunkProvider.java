@@ -23,12 +23,6 @@ import org.terasology.engine.monitoring.PerformanceMonitor;
 import org.terasology.engine.monitoring.chunk.ChunkMonitor;
 import org.terasology.engine.persistence.ChunkStore;
 import org.terasology.engine.persistence.StorageManager;
-import org.terasology.engine.world.generation.impl.EntityBufferImpl;
-import org.terasology.engine.world.generator.WorldGenerator;
-import org.terasology.engine.world.internal.ChunkViewCore;
-import org.terasology.engine.world.internal.ChunkViewCoreImpl;
-import org.terasology.engine.world.propagation.light.InternalLightProcessor;
-import org.terasology.engine.world.propagation.light.LightMerger;
 import org.terasology.engine.utilities.concurrency.TaskMaster;
 import org.terasology.engine.world.BlockEntityRegistry;
 import org.terasology.engine.world.block.BeforeDeactivateBlocks;
@@ -42,7 +36,6 @@ import org.terasology.engine.world.chunks.Chunk;
 import org.terasology.engine.world.chunks.ChunkBlockIterator;
 import org.terasology.engine.world.chunks.ChunkProvider;
 import org.terasology.engine.world.chunks.Chunks;
-import org.terasology.engine.world.chunks.ManagedChunk;
 import org.terasology.engine.world.chunks.blockdata.ExtraBlockDataManager;
 import org.terasology.engine.world.chunks.event.BeforeChunkUnload;
 import org.terasology.engine.world.chunks.event.OnChunkGenerated;
@@ -52,6 +45,12 @@ import org.terasology.engine.world.chunks.internal.ChunkImpl;
 import org.terasology.engine.world.chunks.internal.ChunkRelevanceRegion;
 import org.terasology.engine.world.chunks.pipeline.ChunkProcessingPipeline;
 import org.terasology.engine.world.chunks.pipeline.stages.ChunkTaskProvider;
+import org.terasology.engine.world.generation.impl.EntityBufferImpl;
+import org.terasology.engine.world.generator.WorldGenerator;
+import org.terasology.engine.world.internal.ChunkViewCore;
+import org.terasology.engine.world.internal.ChunkViewCoreImpl;
+import org.terasology.engine.world.propagation.light.InternalLightProcessor;
+import org.terasology.engine.world.propagation.light.LightMerger;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -416,7 +415,7 @@ public class LocalChunkProvider implements ChunkProvider {
         ChunkMonitor.fireChunkProviderDisposed(this);
         loadingPipeline.shutdown();
         unloadRequestTaskMaster.shutdown(new ChunkUnloadRequest(), true);
-        getAllChunks().stream().filter(ManagedChunk::isReady).forEach(chunk -> {
+        getAllChunks().stream().filter(Chunk::isReady).forEach(chunk -> {
             worldEntity.send(new BeforeChunkUnload(chunk.getPosition(new Vector3i())));
             storageManager.deactivateChunk(chunk);
             chunk.dispose();

@@ -5,7 +5,7 @@ package org.terasology.engine.world.propagation;
 import org.joml.Vector3ic;
 import org.terasology.engine.math.Side;
 import org.terasology.engine.world.block.Block;
-import org.terasology.engine.world.chunks.LitChunk;
+import org.terasology.engine.world.chunks.Chunk;
 
 /**
  * Rules to drive value propagation.
@@ -72,10 +72,10 @@ public interface PropagationRules {
      * @param pos   The position to get from
      * @return The value of the given position of a chunk
      */
-    byte getValue(LitChunk chunk, Vector3ic pos);
+    byte getValue(Chunk chunk, Vector3ic pos);
 
     /**
-     * See {@link #getValue(LitChunk, Vector3ic)}
+     * See {@link #getValue(Chunk, Vector3ic)}
      *
      * @param chunk The chunk the position is in
      * @param x     The x position
@@ -83,7 +83,7 @@ public interface PropagationRules {
      * @param z     THe z position
      * @return The value at the posiiton int he given chunk
      */
-    byte getValue(LitChunk chunk, int x, int y, int z);
+    byte getValue(Chunk chunk, int x, int y, int z);
 
     /**
      * Sets the value for a given chunk position
@@ -92,5 +92,5 @@ public interface PropagationRules {
      * @param pos   The position to set at
      * @param value The value to set to
      */
-    void setValue(LitChunk chunk, Vector3ic pos, byte value);
+    void setValue(Chunk chunk, Vector3ic pos, byte value);
 }
