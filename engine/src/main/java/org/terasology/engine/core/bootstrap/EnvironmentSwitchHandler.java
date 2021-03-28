@@ -2,6 +2,13 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.core.bootstrap;
 
+import org.joml.Quaternionf;
+import org.joml.Vector2f;
+import org.joml.Vector2i;
+import org.joml.Vector3f;
+import org.joml.Vector3i;
+import org.joml.Vector4f;
+import org.joml.Vector4i;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.config.flexible.AutoConfigManager;
@@ -23,7 +30,6 @@ import org.terasology.engine.persistence.typeHandling.extensionTypes.CollisionGr
 import org.terasology.engine.physics.CollisionGroup;
 import org.terasology.engine.physics.CollisionGroupManager;
 import org.terasology.engine.registry.InjectionHelper;
-import org.terasology.engine.utilities.ReflectionUtil;
 import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.gestalt.assets.module.ModuleAwareAssetTypeManager;
 import org.terasology.gestalt.module.ModuleEnvironment;
@@ -36,7 +42,13 @@ import org.terasology.reflection.ModuleTypeRegistry;
 import org.terasology.reflection.TypeInfo;
 import org.terasology.reflection.copy.CopyStrategy;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
-import org.terasology.reflection.copy.RegisterCopyStrategy;
+import org.terasology.reflection.copy.strategy.QuaternionfCopyStrategy;
+import org.terasology.reflection.copy.strategy.Vector2fCopyStrategy;
+import org.terasology.reflection.copy.strategy.Vector2iCopyStrategy;
+import org.terasology.reflection.copy.strategy.Vector3fCopyStrategy;
+import org.terasology.reflection.copy.strategy.Vector3iCopyStrategy;
+import org.terasology.reflection.copy.strategy.Vector4fCopyStrategy;
+import org.terasology.reflection.copy.strategy.Vector4iCopyStrategy;
 import org.terasology.reflection.reflect.ReflectFactory;
 
 import java.lang.reflect.Type;
@@ -66,17 +78,14 @@ public final class EnvironmentSwitchHandler {
 
         CopyStrategyLibrary copyStrategyLibrary = context.get(CopyStrategyLibrary.class);
         copyStrategyLibrary.clear();
-        for (Class<? extends CopyStrategy> copyStrategy : environment.getSubtypesOf(CopyStrategy.class)) {
-            if (copyStrategy.getAnnotation(RegisterCopyStrategy.class) == null) {
-                continue;
-            }
-            Type targetType = ReflectionUtil.getTypeParameterForSuper(copyStrategy, CopyStrategy.class, 0);
-            if (targetType instanceof Class) {
-                registerCopyStrategy(copyStrategyLibrary, (Class<?>) targetType, copyStrategy);
-            } else {
-                logger.error("Cannot register CopyStrategy '{}' - unable to determine target type", copyStrategy);
-            }
-        }
+
+        copyStrategyLibrary.register(Vector2f.class, new Vector2fCopyStrategy());
+        copyStrategyLibrary.register(Quaternionf.class, new QuaternionfCopyStrategy());
+        copyStrategyLibrary.register(Vector2i.class, new Vector2iCopyStrategy());
+        copyStrategyLibrary.register(Vector3f.class, new Vector3fCopyStrategy());
+        copyStrategyLibrary.register(Vector3i.class, new Vector3iCopyStrategy());
+        copyStrategyLibrary.register(Vector4f.class, new Vector4fCopyStrategy());
+        copyStrategyLibrary.register(Vector4i.class, new Vector4iCopyStrategy());
 
         //TODO: find a permanent fix over just creating a new typehandler
         // https://github.com/Terasology/JoshariasSurvival/issues/31
