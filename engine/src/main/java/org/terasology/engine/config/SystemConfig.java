@@ -65,7 +65,7 @@ public class SystemConfig extends AutoConfig {
     public final Setting<Boolean> writeSaveGamesEnabled = setting(
             type(Boolean.class),
             defaultValue(true),
-            name("Game saves writes"),
+            name("Game saves"),
             override(() -> Optional.ofNullable(
                     System.getProperty(SAVED_GAMES_ENABLED_PROPERTY))
                     .map(Boolean::parseBoolean))
