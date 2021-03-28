@@ -33,7 +33,7 @@ public class StringConstraint implements SettingConstraint<String> {
 
     public static Predicate<String> regex(String regex) {
         Pattern pattern = Pattern.compile(regex);
-        return new PredicateWithDescription<>("matches reges: \"" + regex + "\"", s -> pattern.matcher(s).matches());
+        return new PredicateWithDescription<>("matches regex: \"" + regex + "\"", s -> pattern.matcher(s).matches());
     }
 
     @NotNull
