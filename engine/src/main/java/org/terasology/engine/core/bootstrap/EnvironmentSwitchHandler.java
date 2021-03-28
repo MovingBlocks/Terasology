@@ -137,14 +137,6 @@ public final class EnvironmentSwitchHandler {
 
     }
 
-    private <T, U extends CopyStrategy<T>> void registerCopyStrategy(CopyStrategyLibrary copyStrategyLibrary, Class<T> type, Class<U> strategy) {
-        try {
-            copyStrategyLibrary.register(type, strategy.newInstance());
-        } catch (InstantiationException | IllegalAccessException e) {
-            logger.error("Cannot register CopyStrategy '{}' - failed to instantiate", strategy, e);
-        }
-    }
-
     /**
      * Switches the environment of the asset manager to the specified one. It does not register the prefab formats
      * as they require a proper ComponentLibrary.
