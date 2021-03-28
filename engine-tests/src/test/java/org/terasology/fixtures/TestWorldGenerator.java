@@ -5,7 +5,7 @@ package org.terasology.fixtures;
 
 import org.terasology.engine.core.SimpleUri;
 import org.terasology.engine.world.block.BlockManager;
-import org.terasology.engine.world.chunks.CoreChunk;
+import org.terasology.engine.world.chunks.Chunk;
 import org.terasology.engine.world.generation.EntityBuffer;
 import org.terasology.engine.world.generation.World;
 import org.terasology.engine.world.generator.WorldConfigurator;
@@ -34,7 +34,7 @@ public class TestWorldGenerator implements WorldGenerator {
     }
 
     @Override
-    public void createChunk(CoreChunk chunk, EntityBuffer buffer) {
+    public void createChunk(Chunk chunk, EntityBuffer buffer) {
         for (int x = 0; x < chunk.getChunkSizeX(); x++) {
             for (int y = 0; y < chunk.getChunkSizeY(); y++) {
                 for (int z = 0; z < chunk.getChunkSizeZ(); z++) {

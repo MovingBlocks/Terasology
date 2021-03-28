@@ -10,7 +10,7 @@ import org.terasology.engine.logic.spawner.FixedSpawner;
 import org.terasology.engine.world.generation.BaseFacetedWorldGenerator;
 import org.terasology.engine.world.generation.EntityBuffer;
 import org.terasology.engine.world.generation.World;
-import org.terasology.engine.world.chunks.CoreChunk;
+import org.terasology.engine.world.chunks.Chunk;
 import org.terasology.engine.world.zones.Zone;
 
 import java.util.List;
@@ -44,7 +44,7 @@ public interface WorldGenerator {
      * @param chunk Chunk to generate
      * @param buffer Buffer to queue entities to spawn to
      */
-    void createChunk(CoreChunk chunk, EntityBuffer buffer);
+    void createChunk(Chunk chunk, EntityBuffer buffer);
 
     /**
      * Performs any additional steps required for setting itself up before generating world
