@@ -41,7 +41,7 @@ public class StringConstraint implements SettingConstraint<String> {
         if (p instanceof PredicateWithDescription) {
             return ((PredicateWithDescription<String>) p).getDescription();
         } else {
-            return "Predicate without decription";
+            return "Predicate without description";
         }
     }
 
