@@ -40,8 +40,8 @@ public class FieldMetadataTest {
 
     @Test
     public void testOwnsAnnotationCollectionProcessed() throws NoSuchMethodException {
-        ComponentMetadata<OwnedCollectionComponent> classMetadata =
-                new ComponentMetadata<>(new ResourceUrn("unittest:OwnedCollectionComponent"), OwnedCollectionComponent.class, factory, copyStrategyLibrary);
+        ComponentMetadata<org.terasology.engine.entitySystem.metadata.OwnedCollectionComponent> classMetadata =
+                new ComponentMetadata<>(new ResourceUrn("unittest:OwnedCollectionComponent"), org.terasology.engine.entitySystem.metadata.OwnedCollectionComponent.class, factory, copyStrategyLibrary);
         ComponentFieldMetadata metadata = classMetadata.getField("items");
         assertTrue(metadata.isOwnedReference());
     }
