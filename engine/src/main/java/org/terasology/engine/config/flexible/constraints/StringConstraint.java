@@ -28,7 +28,7 @@ public class StringConstraint implements SettingConstraint<String> {
     }
 
     public static Predicate<String> maxLength(int length) {
-        return new PredicateWithDescription<>("length should be lesser then " + length, s -> s.length() < length);
+        return new PredicateWithDescription<>("length should be less than " + length, s -> s.length() < length);
     }
 
     public static Predicate<String> regex(String regex) {
@@ -59,4 +59,3 @@ public class StringConstraint implements SettingConstraint<String> {
                         .collect(Collectors.joining(",", "[", "]")));
     }
 }
-
