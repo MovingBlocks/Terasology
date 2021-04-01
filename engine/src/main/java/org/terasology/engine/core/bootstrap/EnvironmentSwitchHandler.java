@@ -42,15 +42,10 @@ import org.terasology.reflection.ModuleTypeRegistry;
 import org.terasology.reflection.TypeInfo;
 import org.terasology.reflection.copy.CopyStrategy;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
-import org.terasology.reflection.copy.strategy.QuaternionfCopyStrategy;
-import org.terasology.reflection.copy.strategy.Vector2fCopyStrategy;
-import org.terasology.reflection.copy.strategy.Vector2iCopyStrategy;
-import org.terasology.reflection.copy.strategy.Vector3fCopyStrategy;
-import org.terasology.reflection.copy.strategy.Vector3iCopyStrategy;
-import org.terasology.reflection.copy.strategy.Vector4fCopyStrategy;
-import org.terasology.reflection.copy.strategy.Vector4iCopyStrategy;
 import org.terasology.reflection.reflect.ReflectFactory;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Type;
 import java.util.Optional;
 
@@ -65,10 +60,19 @@ public final class EnvironmentSwitchHandler {
     private PrefabFormat registeredPrefabFormat;
     private PrefabDeltaFormat registeredPrefabDeltaFormat;
 
+    private final Class<?>[] typesWithCopyConstructors = {
+            Quaternionf.class,
+            Vector2f.class,
+            Vector2i.class,
+            Vector3f.class,
+            Vector3i.class,
+            Vector4f.class,
+            Vector4i.class,
+    };
+
     public EnvironmentSwitchHandler() {
     }
 
-    @SuppressWarnings("unchecked")
     public void handleSwitchToGameEnvironment(Context context) {
         ModuleManager moduleManager = context.get(ModuleManager.class);
         ModuleEnvironment environment = moduleManager.getEnvironment();
@@ -79,13 +83,13 @@ public final class EnvironmentSwitchHandler {
         CopyStrategyLibrary copyStrategyLibrary = context.get(CopyStrategyLibrary.class);
         copyStrategyLibrary.clear();
 
-        copyStrategyLibrary.register(Vector2f.class, new Vector2fCopyStrategy());
-        copyStrategyLibrary.register(Quaternionf.class, new QuaternionfCopyStrategy());
-        copyStrategyLibrary.register(Vector2i.class, new Vector2iCopyStrategy());
-        copyStrategyLibrary.register(Vector3f.class, new Vector3fCopyStrategy());
-        copyStrategyLibrary.register(Vector3i.class, new Vector3iCopyStrategy());
-        copyStrategyLibrary.register(Vector4f.class, new Vector4fCopyStrategy());
-        copyStrategyLibrary.register(Vector4i.class, new Vector4iCopyStrategy());
+        for (Class<?> aClass : typesWithCopyConstructors) {
+            try {
+                ConstructorCopyStrategy.register(copyStrategyLibrary, aClass);
+            } catch (NoSuchMethodException e) {
+                throw new RuntimeException("Failed to find copy strategy for {}" + aClass, e);
+            }
+        }
 
         //TODO: find a permanent fix over just creating a new typehandler
         // https://github.com/Terasology/JoshariasSurvival/issues/31
@@ -222,6 +226,58 @@ public final class EnvironmentSwitchHandler {
             TypeHandlerFactory instance = InjectionHelper.createWithConstructorInjection(clazz, context);
             InjectionHelper.inject(instance, context);
             library.addTypeHandlerFactory(instance);
+        }
+    }
+
+    /**
+     * Create copies by invoking the class's constructor with a value.
+     * <p>
+     * For classes that offer constructors which make a new instance as a copy of the old one.
+     * <p>
+     * FIXME: Move this class to a more appropriate package.
+     */
+    static class ConstructorCopyStrategy<T> implements CopyStrategy<T> {
+
+        private final Constructor<T> declaredConstructor;
+
+        static <T> void register(CopyStrategyLibrary library, Class<T> aClass) throws NoSuchMethodException {
+            library.register(aClass, new ConstructorCopyStrategy<>(aClass));
+        }
+
+        public ConstructorCopyStrategy(Class<T> aClass) throws NoSuchMethodException {
+            declaredConstructor = getConstructorMatching(aClass);
+        }
+
+        private Constructor<T> getConstructorMatching(Class<T> aClass) throws NoSuchMethodException {
+            try {
+                return aClass.getDeclaredConstructor(aClass);
+            } catch (NoSuchMethodException e) {
+                logger.debug("{} has no constructor for its own class; will check for compatible methods.", aClass);
+            }
+            for (Constructor<?> constructor : aClass.getDeclaredConstructors()) {
+                if (constructor.getParameterCount() != 1) {
+                    continue;
+                }
+                Class<?> parameter = constructor.getParameterTypes()[0];
+                if (parameter.isAssignableFrom(aClass)) {
+                    //noinspection unchecked
+                    return (Constructor<T>) constructor;
+                }
+            }
+            throw new NoSuchMethodException("No compatible constructors found for " + aClass);
+        }
+
+        @Override
+        public T copy(T value) {
+            if (value == null) {
+                return null;
+            }
+            try {
+                return declaredConstructor.newInstance(value);
+            } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+                logger.error("Failure to invoke constructor for {}", value.getClass(), e);
+                return null;
+            }
         }
     }
 }
