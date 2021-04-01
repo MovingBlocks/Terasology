@@ -111,7 +111,6 @@ dependencies {
 
     // Our developed libs
     api group: 'org.terasology.gestalt', name: 'gestalt-asset-core', version: '7.0.6-SNAPSHOT'
-    api group: 'org.terasology.gestalt', name: 'gestalt-entity-system', version: '7.0.6-SNAPSHOT'
     api group: 'org.terasology.gestalt', name: 'gestalt-module', version: '7.0.6-SNAPSHOT'
     api group: 'org.terasology.gestalt', name: 'gestalt-util', version: '7.0.6-SNAPSHOT'
     api "com.github.zafarkhaja:java-semver:0.10.0"
