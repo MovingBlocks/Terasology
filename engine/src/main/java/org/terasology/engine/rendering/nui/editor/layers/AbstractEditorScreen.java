@@ -19,6 +19,7 @@ import org.terasology.engine.rendering.nui.widgets.JsonEditorTreeView;
 import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.gestalt.assets.exceptions.InvalidUrnException;
 import org.terasology.gestalt.assets.format.AssetDataFile;
+import org.terasology.gestalt.module.Module;
 import org.terasology.gestalt.module.resources.DirectoryFileSource;
 import org.terasology.gestalt.naming.Name;
 import org.terasology.input.Keyboard;
@@ -47,6 +48,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
+
+import static com.google.common.base.Verify.verifyNotNull;
 
 /**
  * A base screen for the NUI screen/skin editors.
@@ -330,7 +333,9 @@ public abstract class AbstractEditorScreen extends CoreScreenLayer {
     protected Path getPath(AssetDataFile source) {
         List<String> path = source.getPath();
         Name moduleName = new Name(path.get(0));
-        if (moduleManager.getEnvironment().get(moduleName).getResources() instanceof DirectoryFileSource) {
+        Module module = verifyNotNull(moduleManager.getEnvironment().get(moduleName),
+                "Module \"%s\" not found in current module environment.", moduleName);
+        if (module.getResources() instanceof DirectoryFileSource) {
             path.add(source.getFilename());
             String[] pathArray = path.toArray(new String[path.size()]);
 
