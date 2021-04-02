@@ -1,4 +1,4 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.network.internal;
 
@@ -9,17 +9,18 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.config.Config;
+import org.terasology.engine.config.PlayerConfig;
 import org.terasology.engine.core.EngineTime;
 import org.terasology.engine.core.TerasologyConstants;
 import org.terasology.engine.core.Time;
 import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.engine.core.paths.PathManager;
+import org.terasology.engine.network.JoinStatus;
+import org.terasology.engine.registry.CoreRegistry;
 import org.terasology.module.ModuleLoader;
 import org.terasology.naming.Name;
 import org.terasology.naming.Version;
-import org.terasology.engine.network.JoinStatus;
 import org.terasology.protobuf.NetData;
-import org.terasology.engine.registry.CoreRegistry;
 
 import java.io.BufferedOutputStream;
 import java.io.IOException;
@@ -290,12 +291,13 @@ public class ClientConnectionHandler extends ChannelInboundHandlerAdapter {
      */
     private void sendJoin(ChannelHandlerContext channelHandlerContext) {
         Config config = CoreRegistry.get(Config.class);
+        PlayerConfig playerConfig = CoreRegistry.get(PlayerConfig.class);
         NetData.JoinMessage.Builder bldr = NetData.JoinMessage.newBuilder();
         NetData.Color.Builder clrbldr = NetData.Color.newBuilder();
 
-        bldr.setName(config.getPlayer().getName());
+        bldr.setName(playerConfig.playerName.get());
         bldr.setViewDistanceLevel(config.getRendering().getViewDistance().getIndex());
-        bldr.setColor(clrbldr.setRgba(config.getPlayer().getColor().rgba()).build());
+        bldr.setColor(clrbldr.setRgba(playerConfig.color.get().rgba()).build());
 
         channelHandlerContext.channel().writeAndFlush(NetData.NetMessage.newBuilder().setJoin(bldr).build());
     }

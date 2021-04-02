@@ -9,15 +9,15 @@ import org.terasology.engine.core.GameEngine;
 import org.terasology.engine.core.modes.StateLoading;
 import org.terasology.engine.core.paths.PathManager;
 import org.terasology.engine.game.GameManifest;
+import org.terasology.engine.network.NetworkMode;
+import org.terasology.engine.registry.CoreRegistry;
 import org.terasology.engine.rendering.nui.animation.MenuAnimationSystems;
 import org.terasology.engine.rendering.nui.layers.mainMenu.gameDetailsScreen.GameDetailsScreen;
 import org.terasology.engine.rendering.nui.layers.mainMenu.savedGames.GameInfo;
 import org.terasology.engine.rendering.nui.layers.mainMenu.savedGames.GameProvider;
-import org.terasology.engine.network.NetworkMode;
 import org.terasology.nui.databinding.ReadOnlyBinding;
 import org.terasology.nui.widgets.UIButton;
 import org.terasology.nui.widgets.UILabel;
-import org.terasology.engine.registry.CoreRegistry;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -124,7 +124,7 @@ public class SelectGameScreen extends SelectionScreen {
                 triggerForwardAnimation(newGameScreen);
             }
 
-            if (isLoadingAsServer() && !super.config.getPlayer().hasEnteredUsername()) {
+            if (isLoadingAsServer() && super.playerConfig.playerName.getDefaultValue().equals(super.playerConfig.playerName.get())) {
                 getManager().pushScreen(EnterUsernamePopup.ASSET_URI, EnterUsernamePopup.class);
             }
 
