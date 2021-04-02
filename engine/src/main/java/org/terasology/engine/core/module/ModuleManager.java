@@ -94,7 +94,7 @@ public class ModuleManager {
         DependencyInfo engineDep = new DependencyInfo();
         engineDep.setId(engineModule.getId());
         engineDep.setMinVersion(engineModule.getVersion());
-        engineDep.setMaxVersion(engineModule.getVersion().getNextPatchVersion());
+        engineDep.setMaxVersion(engineModule.getVersion().getNextMinorVersion());
 
         HashSet<Name> engineModules = Sets.newHashSet(engineModule.getId());
         engineModules.addAll(engineModule.getMetadata().getDependencies().stream().map(DependencyInfo::getId).collect(Collectors.toList()));
