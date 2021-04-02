@@ -74,12 +74,12 @@ class TypeSerializerTest extends ModuleEnvironmentTest {
 
     @Test
     void testDeserialize() {
-        Optional<SomeClass<Integer>> deserialize = gsonSerializer.deserialize(new TypeInfo<SomeClass<Integer>>() {
-        }, INSTANCE_JSON.getBytes(TerasologyConstants.CHARSET));
+        Optional<SomeClass<Integer>> deserialize = gsonSerializer.deserialize(
+                new TypeInfo<SomeClass<Integer>>() {},
+                INSTANCE_JSON.getBytes(TerasologyConstants.CHARSET));
         assertTrue(deserialize.isPresent());
 
-        SomeClass<Integer> deserialized =
-                deserialize.get();
+        SomeClass<Integer> deserialized = deserialize.get();
 
         assertEquals(INSTANCE, deserialized);
     }
@@ -150,7 +150,7 @@ class TypeSerializerTest extends ModuleEnvironmentTest {
             if (o == null || getClass() != o.getClass()) {
                 return false;
             }
-            Animal animal = (Animal) o;
+            Animal<?> animal = (Animal<?>) o;
             return Objects.equals(data, animal.data);
         }
 
@@ -181,7 +181,7 @@ class TypeSerializerTest extends ModuleEnvironmentTest {
             if (!super.equals(o)) {
                 return false;
             }
-            Dog dog = (Dog) o;
+            Dog<?> dog = (Dog<?>) o;
             return Objects.equals(tailPosition, dog.tailPosition) &&  Objects.equals(headPosition, dog.headPosition);
         }
 
@@ -219,7 +219,7 @@ class TypeSerializerTest extends ModuleEnvironmentTest {
             if (!super.equals(o)) {
                 return false;
             }
-            Cheetah cheetah = (Cheetah) o;
+            Cheetah<?> cheetah = (Cheetah<?>) o;
             return Objects.equals(spotColor, cheetah.spotColor);
         }
 
