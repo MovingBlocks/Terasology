@@ -1,4 +1,7 @@
 
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
+
 package org.terasology.engine.core.subsystem.config;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -13,21 +16,20 @@ import org.terasology.engine.core.subsystem.config.BindsSubsystem.BindsConfigAda
 import org.terasology.engine.input.BindButtonEvent;
 import org.terasology.engine.input.BindableButton;
 import org.terasology.engine.input.DefaultBinding;
+import org.terasology.engine.input.RegisterBindAxis;
+import org.terasology.engine.input.RegisterBindButton;
+import org.terasology.gestalt.module.Module;
+import org.terasology.gestalt.module.ModuleEnvironment;
 import org.terasology.gestalt.module.ModuleMetadata;
 import org.terasology.gestalt.module.ModuleRegistry;
 import org.terasology.gestalt.module.TableModuleRegistry;
-import org.terasology.gestalt.module.resources.DirectoryFileSource;
+import org.terasology.gestalt.naming.Name;
 import org.terasology.gestalt.naming.Version;
 import org.terasology.input.Input;
 import org.terasology.input.InputType;
 import org.terasology.input.Keyboard;
 import org.terasology.input.Keyboard.Key;
 import org.terasology.input.Keyboard.KeyId;
-import org.terasology.engine.input.RegisterBindAxis;
-import org.terasology.engine.input.RegisterBindButton;
-import org.terasology.gestalt.module.Module;
-import org.terasology.gestalt.module.ModuleEnvironment;
-import org.terasology.gestalt.naming.Name;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -65,7 +67,6 @@ public class BindsSubsystemTest {
         ModuleRegistry moduleRegistry = new TableModuleRegistry();
 
         Module module = mock(Module.class);
-        when(module.getResources() instanceof DirectoryFileSource).thenReturn(true);
         when(module.getId()).thenReturn(new Name(TEST_MODULE));
         when(module.getVersion()).thenReturn(new Version(0, 0, 1, true));
         when(module.getMetadata()).thenReturn(new ModuleMetadata());
