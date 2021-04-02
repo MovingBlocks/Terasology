@@ -14,7 +14,7 @@ import org.terasology.reflection.ModuleTypeRegistry;
 
 import java.nio.file.Path;
 
-import static org.junit.jupiter.api.Assumptions.assumeTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public abstract class ModuleEnvironmentTest {
     protected ModuleManager moduleManager;
@@ -29,7 +29,7 @@ public abstract class ModuleEnvironmentTest {
         DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
         ResolutionResult result = resolver.resolve(moduleManager.getRegistry().getModuleIds());
 
-        assumeTrue(result.isSuccess());
+        assertTrue(result.isSuccess());
 
         ModuleEnvironment environment = moduleManager.loadEnvironment(result.getModules(), true);
         typeRegistry = new ModuleTypeRegistry(environment);
