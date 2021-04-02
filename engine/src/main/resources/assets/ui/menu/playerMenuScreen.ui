@@ -34,36 +34,6 @@
                     "contents": [
                         {
                             "type": "UILabel",
-                            "text": "${engine:menu#player-name}:"
-                        },
-                        {
-                            "type": "UIText",
-                            "id": "playername"
-                        },
-                        {
-                            "type": "UILabel",
-                            "text": "${engine:menu#player-color}:"
-                        },
-                        {
-                            "type": "RowLayout",
-                            "horizontalSpacing": 10,
-                            "contents": [
-                                {
-                                    "type": "UISlider",
-                                    "id": "tone",
-                                    "layoutInfo": {
-                                        "relativeWidth": 0.88
-                                    }
-                                },
-                                {
-                                    "type": "UIImage",
-                                    "skin": "framed_image",
-                                    "id": "image"
-                                }
-                            ]
-                        },
-                        {
-                            "type": "UILabel",
                             "text": "Multiplayer identities:",
                             "enabled": false
                         },
@@ -108,64 +78,6 @@
                                 }
                             ]
                         },
-                        {
-                            "type": "UILabel",
-                            "text": "${engine:menu#settings-language}:"
-                        },
-                        {
-                            "type": "UIDropdownScrollable",
-                            "id": "language"
-                        },
-                        {
-                            "type": "UILabel",
-                            "text": "${engine:menu#experimental}"
-                        },
-                        {
-                            "type": "UILabel",
-                            "text": ""
-                        },
-                        {
-                            "type": "UILabel",
-                            "text": "${engine:menu#player-height}:"
-                        },
-                        {
-                            "type": "RowLayout",
-                            "horizontalSpacing": 10,
-                            "contents": [
-                                {
-                                    "type": "UISlider",
-                                    "id": "height"
-                                }
-                            ]
-                        },
-                        {
-                            "type": "UILabel",
-                            "text": "${engine:menu#player-eye-height}:"
-                        },
-                        {
-                            "type": "RowLayout",
-                            "horizontalSpacing": 10,
-                            "contents": [
-                                {
-                                    "type": "UISlider",
-                                    "id": "eye-height"
-                                }
-                            ]
-                        },
-                        {
-                            "type": "UILabel",
-                            "text": "${engine:menu#discord-presence}:"
-                        },
-                        {
-                            "type": "RowLayout",
-                            "horizontalSpacing": 10,
-                            "contents": [
-                                {
-                                    "type": "UICheckbox",
-                                    "id": "discord-presence"
-                                }
-                            ]
-                        }
                     ]
                 },
                 "layoutInfo": {
