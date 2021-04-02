@@ -19,6 +19,8 @@ import org.terasology.gestalt.module.ModulePathScanner;
 import org.terasology.gestalt.module.ModuleRegistry;
 import org.terasology.gestalt.module.TableModuleRegistry;
 import org.terasology.gestalt.module.dependencyresolution.DependencyInfo;
+import org.terasology.gestalt.module.dependencyresolution.DependencyResolver;
+import org.terasology.gestalt.module.dependencyresolution.ResolutionResult;
 import org.terasology.gestalt.module.sandbox.APIScanner;
 import org.terasology.gestalt.module.sandbox.ModuleSecurityManager;
 import org.terasology.gestalt.module.sandbox.ModuleSecurityPolicy;
@@ -32,6 +34,7 @@ import java.io.File;
 import java.lang.reflect.ReflectPermission;
 import java.nio.file.Path;
 import java.security.Policy;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -172,6 +175,12 @@ public class ModuleManager {
         System.setSecurityManager(new ModuleSecurityManager());
     }
 
+    /**
+     * the registry this ModuleManager uses internally
+     *
+     * @deprecated Use {@link #resolveAndLoadEnvironment} if you need module dependency resolution.
+     */
+    @Deprecated(/*since="4.4.0"*/)
     public ModuleRegistry getRegistry() {
         return registry;
     }
@@ -182,6 +191,30 @@ public class ModuleManager {
 
     public ModuleEnvironment getEnvironment() {
         return environment;
+    }
+
+    /** Create and register a new module for this package. */
+    public Module registerPackageModule(String packageName) {
+        Module module = moduleFactory.createPackageModule(packageName);
+        registry.add(module);
+        ensureModulesDependOnEngine();
+        return module;
+    }
+
+    public void resolveAndLoadEnvironment(Name... modules) {
+        resolveAndLoadEnvironment(Arrays.asList(modules));
+    }
+
+    public void resolveAndLoadEnvironment(Iterable<Name> modules) {
+        DependencyResolver resolver = new DependencyResolver(registry);
+        ResolutionResult result = resolver.resolve(modules);
+
+        if (!result.isSuccess()) {
+            // TODO: worth its own exception class?
+            throw new RuntimeException("Failed to resolve dependencies for " + modules);
+        }
+
+        loadEnvironment(result.getModules(), true);
     }
 
     public ModuleEnvironment loadEnvironment(Set<Module> modules, boolean asPrimary) {

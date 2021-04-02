@@ -82,9 +82,6 @@ import org.terasology.gestalt.assets.management.AssetManager;
 import org.terasology.gestalt.assets.module.ModuleAwareAssetTypeManager;
 import org.terasology.gestalt.assets.module.ModuleAwareAssetTypeManagerImpl;
 import org.terasology.gestalt.module.ModuleEnvironment;
-import org.terasology.gestalt.module.ModuleRegistry;
-import org.terasology.gestalt.module.dependencyresolution.DependencyResolver;
-import org.terasology.gestalt.module.dependencyresolution.ResolutionResult;
 import org.terasology.gestalt.naming.Name;
 import org.terasology.nui.asset.UIElement;
 import org.terasology.nui.skin.UISkinAsset;
@@ -262,25 +259,15 @@ public class HeadlessEnvironment extends Environment {
 
     @Override
     protected void setupModuleManager(Set<Name> moduleNames) throws Exception {
-         TypeRegistry.WHITELISTED_CLASSES = ExternalApiWhitelist.CLASSES.stream().map(Class::getName).collect(Collectors.toSet());
+        TypeRegistry.WHITELISTED_CLASSES = ExternalApiWhitelist.CLASSES.stream().map(Class::getName).collect(Collectors.toSet());
 
         ModuleManager moduleManager = ModuleManagerFactory.create();
         ModuleTypeRegistry typeRegistry = new ModuleTypeRegistry(moduleManager.getEnvironment());
 
         context.put(TypeRegistry.class, typeRegistry);
         context.put(ModuleTypeRegistry.class, typeRegistry);
-        ModuleRegistry registry = moduleManager.getRegistry();
 
-        DependencyResolver resolver = new DependencyResolver(registry);
-        ResolutionResult result = resolver.resolve(moduleNames);
-
-        if (result.isSuccess()) {
-            ModuleEnvironment modEnv = moduleManager.loadEnvironment(result.getModules(), true);
-            typeRegistry.reload(modEnv);
-            logger.debug("Loaded modules: " + modEnv.getModuleIdsOrderedByDependencies());
-        } else {
-            logger.error("Could not resolve module dependencies for " + moduleNames);
-        }
+        moduleManager.resolveAndLoadEnvironment(moduleNames);
 
         context.put(ModuleManager.class, moduleManager);
 
