@@ -7,6 +7,7 @@ import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.terasology.engine.config.Config;
+import org.terasology.engine.config.PlayerConfig;
 import org.terasology.engine.core.SimpleUri;
 import org.terasology.engine.core.Time;
 import org.terasology.engine.core.subsystem.config.BindsManager;
@@ -86,6 +87,8 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
 
     @In
     private Config config;
+    @In
+    private PlayerConfig playerConfig;
     @In
     private InputSystem inputSystem;
 
@@ -224,7 +227,7 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
     public void onPlayerSpawn(OnPlayerSpawnedEvent event, EntityRef character) {
         if (character.equals(localPlayer.getCharacterEntity())) {
             // update character height as given in player settings
-            ScaleToRequest scaleRequest = new ScaleToRequest(config.getPlayer().getHeight());
+            ScaleToRequest scaleRequest = new ScaleToRequest(playerConfig.height.get());
             localPlayer.getCharacterEntity().send(scaleRequest);
 
             // Trigger updating the player camera position as soon as the local player is spawned.

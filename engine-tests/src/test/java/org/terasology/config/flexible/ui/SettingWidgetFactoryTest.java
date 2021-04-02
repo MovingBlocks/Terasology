@@ -26,8 +26,8 @@ class SettingWidgetFactoryTest {
             .thenReturn(Lists.newArrayList(NumberRangeConstraintWidgetFactory.class));
 
         AssetManager assetManager = new AssetManager(mock(AssetTypeManager.class));
-
-        SettingWidgetFactory settingWidgetFactory = new SettingWidgetFactory(environment, assetManager);
+        SettingWidgetFactory settingWidgetFactory = new SettingWidgetFactory(environment, assetManager,
+                null);
 
         Setting<Integer> setting = mock(Setting.class);
 

@@ -6,25 +6,26 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.engine.config.Config;
+import org.terasology.engine.config.PlayerConfig;
 import org.terasology.engine.core.TerasologyConstants;
 import org.terasology.engine.i18n.TranslationSystem;
+import org.terasology.engine.persistence.internal.GamePreviewImageProvider;
+import org.terasology.engine.registry.In;
 import org.terasology.engine.rendering.assets.texture.AWTTextureFormat;
 import org.terasology.engine.rendering.assets.texture.Texture;
 import org.terasology.engine.rendering.assets.texture.TextureData;
+import org.terasology.engine.rendering.nui.CoreScreenLayer;
 import org.terasology.engine.rendering.nui.layers.mainMenu.savedGames.GameInfo;
+import org.terasology.engine.utilities.Assets;
+import org.terasology.engine.utilities.FilesUtil;
+import org.terasology.engine.world.generator.internal.WorldGeneratorInfo;
+import org.terasology.engine.world.generator.internal.WorldGeneratorManager;
 import org.terasology.gestalt.naming.Name;
 import org.terasology.gestalt.naming.NameVersion;
 import org.terasology.nui.widgets.UIImage;
 import org.terasology.nui.widgets.UIImageSlideshow;
 import org.terasology.nui.widgets.UILabel;
 import org.terasology.nui.widgets.UIList;
-import org.terasology.engine.persistence.internal.GamePreviewImageProvider;
-import org.terasology.engine.registry.In;
-import org.terasology.engine.rendering.nui.CoreScreenLayer;
-import org.terasology.engine.utilities.Assets;
-import org.terasology.engine.utilities.FilesUtil;
-import org.terasology.engine.world.generator.internal.WorldGeneratorInfo;
-import org.terasology.engine.world.generator.internal.WorldGeneratorManager;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -48,6 +49,9 @@ public abstract class SelectionScreen extends CoreScreenLayer {
 
     @In
     protected Config config;
+    @In
+    protected PlayerConfig playerConfig;
+
 
     @In
     protected WorldGeneratorManager worldGeneratorManager;

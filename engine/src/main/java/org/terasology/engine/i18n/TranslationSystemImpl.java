@@ -25,8 +25,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
 /**
- * A translation system that uses {@link Translation} data assets to
- * perform the lookup.
+ * A translation system that uses {@link Translation} data assets to perform the lookup.
  */
 public class TranslationSystemImpl implements TranslationSystem {
 
@@ -46,7 +45,6 @@ public class TranslationSystemImpl implements TranslationSystem {
 
         systemConfig = context.get(SystemConfig.class);
         assetManager = context.get(AssetManager.class);
-
         refresh();
     }
 

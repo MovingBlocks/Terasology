@@ -8,6 +8,7 @@ import com.google.common.collect.Collections2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.config.Config;
+import org.terasology.engine.config.PlayerConfig;
 import org.terasology.engine.config.ServerInfo;
 import org.terasology.engine.core.GameEngine;
 import org.terasology.engine.core.GameThread;
@@ -62,6 +63,8 @@ public class JoinGameScreen extends CoreScreenLayer {
 
     @In
     private Config config;
+    @In
+    private PlayerConfig playerConfig;
 
     @In
     private NetworkSystem networkSystem;
@@ -148,7 +151,7 @@ public class JoinGameScreen extends CoreScreenLayer {
 
         infoService = new ServerInfoService();
 
-        if (!config.getPlayer().hasEnteredUsername()) {
+        if (playerConfig.playerName.getDefaultValue().equals(playerConfig.playerName.get())) {
             getManager().pushScreen(EnterUsernamePopup.ASSET_URI, EnterUsernamePopup.class);
         }
 

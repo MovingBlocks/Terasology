@@ -7,6 +7,7 @@ import org.joml.Vector3ic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.config.Config;
+import org.terasology.engine.config.PlayerConfig;
 import org.terasology.engine.config.RenderingConfig;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.core.GameEngine;
@@ -139,7 +140,7 @@ public final class WorldRendererImpl implements WorldRenderer {
                  * in match.
                  */
                 vrProvider.getState().setGroundPlaneYOffset(
-                        GROUND_PLANE_HEIGHT_DISPARITY - context.get(Config.class).getPlayer().getEyeHeight());
+                        GROUND_PLANE_HEIGHT_DISPARITY - context.get(PlayerConfig.class).eyeHeight.get());
                 currentRenderingStage = RenderingStage.LEFT_EYE;
             } else {
                 playerCamera = new PerspectiveCamera(worldProvider, renderingConfig, context.get(DisplayDevice.class));
