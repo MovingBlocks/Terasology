@@ -102,5 +102,3 @@ blacklist.json
 terasology.jfr
 local.properties
 *.hprof
-
-engine-tests/src/jmh/generated/
