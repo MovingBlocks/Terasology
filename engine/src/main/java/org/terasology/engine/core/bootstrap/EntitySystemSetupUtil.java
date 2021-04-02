@@ -175,7 +175,9 @@ public final class EntitySystemSetupUtil {
     private static void registerEvents(EventSystem eventSystem, ModuleEnvironment environment) {
         for (Class<? extends Event> type : environment.getSubtypesOf(Event.class)) {
             if (type.getAnnotation(DoNotAutoRegister.class) == null) {
-                eventSystem.registerEvent(new ResourceUrn(environment.getModuleProviding(type).toString(), type.getSimpleName()), type);
+                Name module = verifyNotNull(environment.getModuleProviding(type),
+                        "Environment has no module for %s", type.getSimpleName());
+                eventSystem.registerEvent(new ResourceUrn(module.toString(), type.getSimpleName()), type);
             }
         }
     }
