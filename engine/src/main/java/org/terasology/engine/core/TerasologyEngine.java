@@ -65,9 +65,10 @@ import org.terasology.engine.world.block.tiles.BlockTile;
 import org.terasology.engine.world.block.tiles.TileData;
 import org.terasology.nui.asset.UIData;
 import org.terasology.nui.asset.UIElement;
-import org.terasology.nui.skin.UISkin;
+import org.terasology.nui.skin.UISkinAsset;
 import org.terasology.nui.skin.UISkinData;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
+import org.terasology.reflection.ModuleTypeRegistry;
 import org.terasology.reflection.TypeRegistry;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.reflect.ReflectFactory;
@@ -311,9 +312,10 @@ public class TerasologyEngine implements GameEngine {
     private void initManagers() {
 
         changeStatus(TerasologyEngineStatus.INITIALIZING_MODULE_MANAGER);
-        TypeRegistry typeRegistry = new TypeRegistry();
+        ModuleTypeRegistry typeRegistry = new ModuleTypeRegistry();
         TypeRegistry.WHITELISTED_CLASSES = ExternalApiWhitelist.CLASSES.stream().map(Class::getName).collect(Collectors.toSet());
         TypeRegistry.WHITELISTED_PACKAGES = ExternalApiWhitelist.PACKAGES;
+        rootContext.put(ModuleTypeRegistry.class, typeRegistry);
         rootContext.put(TypeRegistry.class, typeRegistry);
 
         ModuleManager moduleManager = new ModuleManager(rootContext.get(Config.class), classesOnClasspathsToAddToEngine);
@@ -350,8 +352,8 @@ public class TerasologyEngine implements GameEngine {
                 (AssetFactory<BlockFamilyDefinition, BlockFamilyDefinitionData>) BlockFamilyDefinition::new, "blocks");
         assetTypeManager.registerCoreFormat(BlockFamilyDefinition.class,
                 new BlockFamilyDefinitionFormat(assetTypeManager.getAssetManager()));
-        assetTypeManager.registerCoreAssetType(UISkin.class,
-                (AssetFactory<UISkin, UISkinData>) UISkin::new, "skins");
+        assetTypeManager.registerCoreAssetType(UISkinAsset.class,
+                (AssetFactory<UISkinAsset, UISkinData>) UISkinAsset::new, "skins");
         assetTypeManager.registerCoreAssetType(BehaviorTree.class,
                 (AssetFactory<BehaviorTree, BehaviorTreeData>) BehaviorTree::new, false, "behaviors");
         assetTypeManager.registerCoreAssetType(UIElement.class,

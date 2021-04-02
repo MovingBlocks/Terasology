@@ -236,7 +236,7 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
                 setDepthAuto();
             }
             if (activateBindEvent) {
-                onBindEvent(new NUIBindButtonEvent(null, null, new ResourceUrn("engine:tabbingUI"), ButtonState.DOWN));
+                onBindEvent(new NUIBindButtonEvent(null, null, "engine:tabbingUI", ButtonState.DOWN));
             }
         }
     }

@@ -21,15 +21,15 @@ import org.terasology.assets.ResourceUrn;
 import org.terasology.engine.entitySystem.event.Event;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
-import org.terasology.reflection.metadata.AbstractClassLibrary;
 import org.terasology.reflection.metadata.ClassMetadata;
+import org.terasology.reflection.metadata.ModuleClassLibrary;
 import org.terasology.reflection.reflect.ReflectFactory;
 
 /**
  * The library for metadata about events (and their fields).
  *
  */
-public class EventLibrary extends AbstractClassLibrary<Event> {
+public class EventLibrary extends ModuleClassLibrary<Event> {
 
     private static final Logger logger = LoggerFactory.getLogger(EventLibrary.class);
 
