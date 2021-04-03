@@ -55,6 +55,7 @@ public class ModuleManager {
     private final ModuleFactory moduleFactory;
     private final ModuleInstallManager installManager;
     private final Module engineModule;
+    private final Set<Module> subsystemModules;
 
     public ModuleManager(String masterServerAddress) {
         this(masterServerAddress, Collections.emptyList());
@@ -74,13 +75,16 @@ public class ModuleManager {
         registry = new TableModuleRegistry();
 
         engineModule = loadEngineModule(classesOnClasspathsToAddToEngine);
-
+        subsystemModules = loadSubsystems();
         loadModulesFromApplicationPath(pathManager);
 
         ensureModulesDependOnEngine();
 
         setupSandbox();
-        loadEnvironment(Sets.newHashSet(engineModule), true);
+        HashSet<Module> systems = Sets.newHashSet();
+        systems.add(engineModule);
+        systems.addAll(subsystemModules);
+        loadEnvironment(systems, true);
         installManager = new ModuleInstallManager(this, masterServerAddress);
     }
 
@@ -109,7 +113,11 @@ public class ModuleManager {
         List<File> paths = pathManager.getModulePaths().stream().map(Path::toFile).collect(Collectors.toList());
         scanner.scan(registry, paths);
     }
-
+    private Set<Module> loadSubsystems() {
+        Module discordSubsystem = moduleFactory.createPackageModule("org.terasology.subsystem.discordrpc");
+        registry.add(discordSubsystem);
+        return Sets.newHashSet(discordSubsystem);
+    }
     private Module loadEngineModule(List<Class<?>> classesOnClasspathsToAddToEngine) {
         // FIXME: is `classes…toAddToEngine` gone? Did we ever use it in the first place?
         Module engine = moduleFactory.createPackageModule("org.terasology.engine");
@@ -122,8 +130,10 @@ public class ModuleManager {
         nuiDependency.setMaxVersion(nui.getVersion().getNextPatchVersion());
         engine.getMetadata().getDependencies().add(nuiDependency);
 
+
         registry.add(nui);
         registry.add(engine);
+
 
         // FIXME: why doesn't gestalt-v7 need this?
         //  enrichReflectionsWithSubsystems(engineModule);
