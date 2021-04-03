@@ -17,7 +17,6 @@ package org.terasology.engine.entitySystem.metadata.internal;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.terasology.assets.ResourceUrn;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.metadata.DefaultClassMetadata;
 import org.terasology.reflection.metadata.FieldMetadata;
@@ -42,13 +41,13 @@ public class MetadataBuilderTest {
 
     @Test
     public void testDetectsLackOfDefaultConstructor() throws Exception {
-        DefaultClassMetadata<NoDefaultConstructor> metadata = new DefaultClassMetadata<>(new ResourceUrn("engine:empty"), NoDefaultConstructor.class, factory, copyStrategyLibrary);
+        DefaultClassMetadata<NoDefaultConstructor> metadata = new DefaultClassMetadata<>("engine:empty", NoDefaultConstructor.class, factory, copyStrategyLibrary);
         assertFalse(metadata.isConstructable());
     }
 
     @Test
     public void testTrivialMetadata() throws Exception {
-        DefaultClassMetadata<Trivial> metadata = new DefaultClassMetadata<>(new ResourceUrn("engine:empty"), Trivial.class, factory, copyStrategyLibrary);
+        DefaultClassMetadata<Trivial> metadata = new DefaultClassMetadata<>("engine:empty", Trivial.class, factory, copyStrategyLibrary);
         assertNotNull(metadata);
         assertEquals(0, metadata.getFieldCount());
         assertTrue(metadata.isConstructable());
@@ -56,7 +55,7 @@ public class MetadataBuilderTest {
 
     @Test
     public void testPrivateField() throws Exception {
-        DefaultClassMetadata<PrivateField> metadata = new DefaultClassMetadata<>(new ResourceUrn("engine:empty"), PrivateField.class, factory, copyStrategyLibrary);
+        DefaultClassMetadata<PrivateField> metadata = new DefaultClassMetadata<>("engine:empty", PrivateField.class, factory, copyStrategyLibrary);
         assertNotNull(metadata);
         assertEquals(1, metadata.getFieldCount());
         FieldMetadata fieldMetadata = metadata.getField("name");
@@ -68,7 +67,7 @@ public class MetadataBuilderTest {
 
     @Test
     public void testInheritsFields() throws Exception {
-        DefaultClassMetadata<Inheriting> metadata = new DefaultClassMetadata<>(new ResourceUrn("engine:empty"), Inheriting.class, factory, copyStrategyLibrary);
+        DefaultClassMetadata<Inheriting> metadata = new DefaultClassMetadata<>("engine:empty", Inheriting.class, factory, copyStrategyLibrary);
         assertNotNull(metadata);
         assertEquals(2, metadata.getFieldCount());
         assertNotNull(metadata.getField("name"));

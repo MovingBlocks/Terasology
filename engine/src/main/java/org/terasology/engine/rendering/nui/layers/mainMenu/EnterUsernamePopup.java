@@ -4,33 +4,30 @@ package org.terasology.engine.rendering.nui.layers.mainMenu;
 
 import com.google.common.base.Strings;
 import org.terasology.assets.ResourceUrn;
-import org.terasology.engine.config.Config;
 import org.terasology.engine.config.PlayerConfig;
 import org.terasology.engine.i18n.TranslationSystem;
+import org.terasology.engine.registry.In;
+import org.terasology.engine.rendering.nui.CoreScreenLayer;
 import org.terasology.nui.WidgetUtil;
 import org.terasology.nui.databinding.ReadOnlyBinding;
 import org.terasology.nui.widgets.UIButton;
 import org.terasology.nui.widgets.UIText;
-import org.terasology.engine.registry.In;
-import org.terasology.engine.rendering.nui.CoreScreenLayer;
 
 public class EnterUsernamePopup extends CoreScreenLayer {
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:enterUsernamePopup");
 
     @In
-    private Config config;
-    @In
     private TranslationSystem translationSystem;
+    @In
+    private PlayerConfig playerConfig;
 
     private UIText username;
-    private PlayerConfig playerConfig;
 
     @Override
     public void initialise() {
-        playerConfig = config.getPlayer();
 
         username = find("username", UIText.class);
-        username.setText(playerConfig.getName());
+        username.setText(playerConfig.playerName.get());
         username.bindTooltipString(new ReadOnlyBinding<String>() {
             @Override
             public String get() {
@@ -41,8 +38,7 @@ public class EnterUsernamePopup extends CoreScreenLayer {
         UIButton okButton = find("ok", UIButton.class);
         if (okButton != null) {
             okButton.subscribe(button -> {
-                playerConfig.setName(username.getText().trim());
-                playerConfig.setHasEnteredUsername(true);
+                playerConfig.playerName.set(username.getText().trim());
                 getManager().popScreen();
             });
             okButton.bindEnabled(new ReadOnlyBinding<Boolean>() {
@@ -61,7 +57,6 @@ public class EnterUsernamePopup extends CoreScreenLayer {
         }
 
         WidgetUtil.trySubscribe(this, "cancel", button -> {
-            playerConfig.setHasEnteredUsername(true);
             getManager().popScreen();
         });
     }
@@ -70,7 +65,7 @@ public class EnterUsernamePopup extends CoreScreenLayer {
     public void onOpened() {
         super.onOpened();
         if (username != null) {
-            username.setText(config.getPlayer().getName());
+            username.setText(playerConfig.playerName.get());
         }
     }
 

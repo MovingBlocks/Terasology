@@ -5,8 +5,8 @@ package org.terasology.engine.world.propagation.light;
 import org.joml.Vector3ic;
 import org.terasology.engine.math.Side;
 import org.terasology.engine.world.block.Block;
+import org.terasology.engine.world.chunks.Chunk;
 import org.terasology.engine.world.chunks.Chunks;
-import org.terasology.engine.world.chunks.LitChunk;
 import org.terasology.engine.world.propagation.PropagatorWorldView;
 import org.terasology.engine.world.propagation.SingleChunkView;
 
@@ -21,7 +21,7 @@ public class SunlightPropagationRules extends CommonLightPropagationRules {
         this.regenWorldView = regenWorldView;
     }
 
-    public SunlightPropagationRules(LitChunk chunk) {
+    public SunlightPropagationRules(Chunk chunk) {
         this.regenWorldView = new SingleChunkView(new SunlightRegenPropagationRules(), chunk);
     }
 
@@ -57,17 +57,17 @@ public class SunlightPropagationRules extends CommonLightPropagationRules {
     }
 
     @Override
-    public byte getValue(LitChunk chunk, Vector3ic pos) {
+    public byte getValue(Chunk chunk, Vector3ic pos) {
         return getValue(chunk, pos.x(), pos.y(), pos.z());
     }
 
     @Override
-    public byte getValue(LitChunk chunk, int x, int y, int z) {
+    public byte getValue(Chunk chunk, int x, int y, int z) {
         return chunk.getSunlight(x, y, z);
     }
 
     @Override
-    public void setValue(LitChunk chunk, Vector3ic pos, byte value) {
+    public void setValue(Chunk chunk, Vector3ic pos, byte value) {
         chunk.setSunlight(pos, value);
     }
 

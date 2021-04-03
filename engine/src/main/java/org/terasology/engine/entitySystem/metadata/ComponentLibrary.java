@@ -25,14 +25,14 @@ import org.terasology.module.ModuleEnvironment;
 import org.terasology.naming.Name;
 import org.terasology.reflection.copy.CopyStrategy;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
-import org.terasology.reflection.metadata.AbstractClassLibrary;
 import org.terasology.reflection.metadata.ClassMetadata;
+import org.terasology.reflection.metadata.ModuleClassLibrary;
 import org.terasology.reflection.reflect.ReflectFactory;
 
 /**
  * The library for metadata about components (and their fields).
  */
-public class ComponentLibrary extends AbstractClassLibrary<Component> {
+public class ComponentLibrary extends ModuleClassLibrary<Component> {
 
     private static final Logger logger = LoggerFactory.getLogger(ComponentLibrary.class);
 

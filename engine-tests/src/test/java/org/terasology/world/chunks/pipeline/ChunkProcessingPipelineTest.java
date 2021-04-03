@@ -9,6 +9,7 @@ import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.terasology.assets.management.AssetManager;
@@ -39,6 +40,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
+@Tag("TteTest")
 class ChunkProcessingPipelineTest extends TerasologyTestingEnvironment {
 
     private final BlockManager blockManager = new BlockManagerImpl(new NullWorldAtlas(),

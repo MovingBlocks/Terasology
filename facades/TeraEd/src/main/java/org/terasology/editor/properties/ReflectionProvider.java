@@ -45,7 +45,7 @@ public class ReflectionProvider<T> implements PropertyProvider<T> {
         try {
             ReflectFactory reflectFactory = context.get(ReflectFactory.class);
             CopyStrategyLibrary copyStrategies = context.get(CopyStrategyLibrary.class);
-            ClassMetadata<T, ?> classMetadata = new DefaultClassMetadata<>(new ResourceUrn("engine:empty"), (Class<T>) target.getClass(), reflectFactory, copyStrategies);
+            ClassMetadata<T, ?> classMetadata = new DefaultClassMetadata<>("engine:empty", (Class<T>) target.getClass(), reflectFactory, copyStrategies);
             for (Field field : getAllFields(target.getClass(), and(withAnnotation(Range.class), or(withType(Float.TYPE), withType(Float.class))))) {
                 Range range = field.getAnnotation(Range.class);
                 FieldMetadata<T, Float> fieldMetadata = (FieldMetadata<T, Float>) classMetadata.getField(field.getName());

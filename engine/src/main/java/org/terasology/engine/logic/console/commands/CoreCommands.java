@@ -66,6 +66,7 @@ import org.terasology.engine.world.block.BlockUri;
 import org.terasology.engine.world.block.family.BlockFamily;
 import org.terasology.engine.world.block.items.BlockItemFactory;
 import org.terasology.engine.world.block.loader.BlockFamilyDefinition;
+import org.terasology.nui.skin.UISkinAsset;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
@@ -364,7 +365,7 @@ public class CoreCommands extends BaseComponentSystem {
         if (!nuiSkinEditorSystem.isEditorActive()) {
             nuiSkinEditorSystem.toggleEditor();
         }
-        Set<ResourceUrn> urns = assetManager.resolve(uri, UISkin.class);
+        Set<ResourceUrn> urns = assetManager.resolve(uri, UISkinAsset.class);
         switch (urns.size()) {
             case 0:
                 return String.format("No asset found for screen '%s'", uri);
