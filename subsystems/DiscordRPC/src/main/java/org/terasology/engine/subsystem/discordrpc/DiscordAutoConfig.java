@@ -1,7 +1,7 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-package org.terasology.subsystem.discordrpc;
+package org.terasology.engine.subsystem.discordrpc;
 
 import org.terasology.engine.config.flexible.AutoConfig;
 import org.terasology.engine.config.flexible.Setting;

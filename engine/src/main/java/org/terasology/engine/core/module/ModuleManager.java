@@ -75,19 +75,17 @@ public class ModuleManager {
 
         engineModule = moduleFactory.createPackageModule("org.terasology.engine");
         Module nui = createSyntheticPackageModule("nui", "3.0.0", "org.terasology.nui");
-        Module discordSubsystem = moduleFactory.createPackageModule("org.terasology.subsystem.discordrpc");
 
         createDependency(engineModule, nui);
 
         registry.add(nui);
         registry.add(engineModule);
-        registry.add(discordSubsystem);
 
         loadModulesFromApplicationPath(pathManager);
         ensureModulesDependOnEngine();
 
         setupSandbox();
-        loadEnvironment(Sets.newHashSet(engineModule, nui, discordSubsystem), true);
+        loadEnvironment(Sets.newHashSet(engineModule, nui), true);
         installManager = new ModuleInstallManager(this, masterServerAddress);
     }
 
