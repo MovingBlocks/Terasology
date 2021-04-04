@@ -55,7 +55,6 @@ public class ModuleManager {
     private final ModuleFactory moduleFactory;
     private final ModuleInstallManager installManager;
     private final Module engineModule;
-    private final Set<Module> subsystemModules;
 
     public ModuleManager(String masterServerAddress) {
         this(masterServerAddress, Collections.emptyList());
@@ -74,18 +73,30 @@ public class ModuleManager {
 
         registry = new TableModuleRegistry();
 
-        engineModule = loadEngineModule(classesOnClasspathsToAddToEngine);
-        subsystemModules = loadSubsystems();
-        loadModulesFromApplicationPath(pathManager);
+        engineModule = moduleFactory.createPackageModule("org.terasology.engine");
+        Module nui = createSyntheticPackageModule("nui", "3.0.0", "org.terasology.nui");
+        Module discordSubsystem = moduleFactory.createPackageModule("org.terasology.subsystem.discordrpc");
 
+        createDependency(engineModule, nui);
+
+        registry.add(nui);
+        registry.add(engineModule);
+        registry.add(discordSubsystem);
+
+        loadModulesFromApplicationPath(pathManager);
         ensureModulesDependOnEngine();
 
         setupSandbox();
-        HashSet<Module> systems = Sets.newHashSet();
-        systems.add(engineModule);
-        systems.addAll(subsystemModules);
-        loadEnvironment(systems, true);
+        loadEnvironment(Sets.newHashSet(engineModule, nui, discordSubsystem), true);
         installManager = new ModuleInstallManager(this, masterServerAddress);
+    }
+
+    private  void createDependency(Module parent, Module child) {
+        DependencyInfo dependencyInfo = new DependencyInfo();
+        dependencyInfo.setId(child.getId());
+        dependencyInfo.setMinVersion(child.getVersion());
+        dependencyInfo.setMaxVersion(child.getVersion().getNextPatchVersion());
+        parent.getMetadata().getDependencies().add(dependencyInfo);
     }
 
     /**
@@ -112,33 +123,6 @@ public class ModuleManager {
         ModulePathScanner scanner = new ModulePathScanner(moduleFactory);
         List<File> paths = pathManager.getModulePaths().stream().map(Path::toFile).collect(Collectors.toList());
         scanner.scan(registry, paths);
-    }
-    private Set<Module> loadSubsystems() {
-        Module discordSubsystem = moduleFactory.createPackageModule("org.terasology.subsystem.discordrpc");
-        registry.add(discordSubsystem);
-        return Sets.newHashSet(discordSubsystem);
-    }
-    private Module loadEngineModule(List<Class<?>> classesOnClasspathsToAddToEngine) {
-        // FIXME: is `classes…toAddToEngine` gone? Did we ever use it in the first place?
-        Module engine = moduleFactory.createPackageModule("org.terasology.engine");
-        // TODO: document why nui is a module when other libraries are not
-        Module nui = createSyntheticPackageModule("nui", "3.0.0" /* FIXME */, "org.terasology.nui");
-
-        DependencyInfo nuiDependency = new DependencyInfo();
-        nuiDependency.setId(nui.getId());
-        nuiDependency.setMinVersion(nui.getVersion());
-        nuiDependency.setMaxVersion(nui.getVersion().getNextPatchVersion());
-        engine.getMetadata().getDependencies().add(nuiDependency);
-
-
-        registry.add(nui);
-        registry.add(engine);
-
-
-        // FIXME: why doesn't gestalt-v7 need this?
-        //  enrichReflectionsWithSubsystems(engineModule);
-
-        return engine;
     }
 
     public ModuleManager(Config config) {
@@ -252,19 +236,4 @@ public class ModuleManager {
         return moduleFactory;
     }
 
-//    private void enrichReflectionsWithSubsystems(Module engineModule) {
-//        Serializer serializer = new XmlSerializer();
-//        try {
-//            Enumeration<URL> urls = ModuleManager.class.getClassLoader().getResources("reflections.cache");
-//            while (urls.hasMoreElements()) {
-//                URL url = urls.nextElement();
-//                if (url.getPath().contains("subsystem")) {
-//                    Reflections subsystemReflections = serializer.read(url.openStream());
-//                    engineModule.getReflectionsFragment().merge(subsystemReflections);
-//                }
-//            }
-//        } catch (IOException e) {
-//            logger.error("Cannot enrich engine's reflections with subsystems");
-//        }
-//    }
 }
