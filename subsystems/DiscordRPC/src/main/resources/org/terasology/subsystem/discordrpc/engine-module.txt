@@ -1,0 +1,6 @@
+{
+    "id" : "discord",
+    "version" : "4.4.1-SNAPSHOT",
+    "displayName" : "Discord Subsystem",
+    "description" : "Discord Subsystem"
+}
