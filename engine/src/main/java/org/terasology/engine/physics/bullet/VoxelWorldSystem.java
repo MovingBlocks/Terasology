@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.physics.bullet;
 
-import com.google.api.client.util.Lists;
+import com.google.common.collect.Lists;
 import org.joml.Vector3ic;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.event.ReceiveEvent;
