@@ -83,8 +83,9 @@ import org.terasology.module.ModuleRegistry;
 import org.terasology.module.ResolutionResult;
 import org.terasology.naming.Name;
 import org.terasology.nui.asset.UIElement;
-import org.terasology.nui.skin.UISkin;
+import org.terasology.nui.skin.UISkinAsset;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
+import org.terasology.reflection.ModuleTypeRegistry;
 import org.terasology.reflection.TypeRegistry;
 
 import java.io.IOException;
@@ -201,8 +202,8 @@ public class HeadlessEnvironment extends Environment {
         assetTypeManager.registerCoreFormat(BlockFamilyDefinition.class,
                 new BlockFamilyDefinitionFormat(assetTypeManager.getAssetManager()));
 
-        assetTypeManager.registerCoreAssetType(UISkin.class,
-                UISkin::new, "skins");
+        assetTypeManager.registerCoreAssetType(UISkinAsset.class,
+                UISkinAsset::new, "skins");
         assetTypeManager.registerCoreAssetType(BehaviorTree.class,
                 BehaviorTree::new, false, "behaviors");
         assetTypeManager.registerCoreAssetType(UIElement.class,
@@ -252,9 +253,10 @@ public class HeadlessEnvironment extends Environment {
 
     @Override
     protected void setupModuleManager(Set<Name> moduleNames) throws Exception {
-        TypeRegistry typeRegistry = new TypeRegistry();
+        ModuleTypeRegistry typeRegistry = new ModuleTypeRegistry();
         TypeRegistry.WHITELISTED_CLASSES = ExternalApiWhitelist.CLASSES.stream().map(Class::getName).collect(Collectors.toSet());
         context.put(TypeRegistry.class, typeRegistry);
+        context.put(ModuleTypeRegistry.class, typeRegistry);
 
         ModuleManager moduleManager = ModuleManagerFactory.create(true);
         ModuleRegistry registry = moduleManager.getRegistry();

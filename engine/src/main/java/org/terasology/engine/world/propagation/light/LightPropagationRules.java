@@ -5,8 +5,8 @@ package org.terasology.engine.world.propagation.light;
 import org.joml.Vector3ic;
 import org.terasology.engine.math.Side;
 import org.terasology.engine.world.block.Block;
+import org.terasology.engine.world.chunks.Chunk;
 import org.terasology.engine.world.chunks.Chunks;
-import org.terasology.engine.world.chunks.LitChunk;
 
 /**
  * Rules for how standard light should propagate.
@@ -45,17 +45,17 @@ public class LightPropagationRules extends CommonLightPropagationRules {
     }
 
     @Override
-    public byte getValue(LitChunk chunk, Vector3ic pos) {
+    public byte getValue(Chunk chunk, Vector3ic pos) {
         return getValue(chunk, pos.x(), pos.y(), pos.z());
     }
 
     @Override
-    public byte getValue(LitChunk chunk, int x, int y, int z) {
+    public byte getValue(Chunk chunk, int x, int y, int z) {
         return chunk.getLight(x, y, z);
     }
 
     @Override
-    public void setValue(LitChunk chunk, Vector3ic pos, byte value) {
+    public void setValue(Chunk chunk, Vector3ic pos, byte value) {
         chunk.setLight(pos, value);
     }
 

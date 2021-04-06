@@ -115,7 +115,7 @@ public class BehaviorNodeFactory extends BaseComponentSystem {
     private List<ComponentFieldUri> determineAnimationPoolUris() {
         final List<ComponentFieldUri> animationSetUris = Lists.newArrayList();
         for (ComponentMetadata<?> componentMetadata : componentLibrary.iterateComponentMetadata()) {
-            SimpleUri uri = new SimpleUri(componentMetadata.getUri().toString());
+            SimpleUri uri = new SimpleUri(componentMetadata.getId().toString());
 
             for (FieldMetadata<?, ?> fieldMetadata : componentMetadata.getFields()) {
                 if (fieldMetadata.getType().isAssignableFrom(List.class)) {

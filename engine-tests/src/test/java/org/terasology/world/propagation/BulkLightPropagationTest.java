@@ -18,6 +18,7 @@ package org.terasology.engine.world.propagation;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
@@ -39,6 +40,7 @@ import org.terasology.engine.world.propagation.light.LightPropagationRules;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@Tag("TteTest")
 public class BulkLightPropagationTest extends TerasologyTestingEnvironment {
 
     private static final Vector3ic ZERO_VECTOR = new Vector3i();

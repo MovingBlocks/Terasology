@@ -594,7 +594,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     }
 
     @Override
-    public ClassLibrary<UIWidget> getWidgetMetadataLibrary() {
+    public WidgetLibrary getWidgetMetadataLibrary() {
         return widgetsLibrary;
     }
 
@@ -759,7 +759,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     //bind input events (will be send after raw input events, if a bind button was pressed and the raw input event hasn't consumed the event)
     @ReceiveEvent(components = ClientComponent.class, priority = EventPriority.PRIORITY_HIGH)
     public void bindEvent(BindButtonEvent event, EntityRef entity) {
-        NUIBindButtonEvent nuiEvent = new NUIBindButtonEvent(mouse, keyboard, new ResourceUrn(event.getId().getModuleName(), event.getId().getObjectName()), event.getState());
+        NUIBindButtonEvent nuiEvent = new NUIBindButtonEvent(mouse, keyboard, new ResourceUrn(event.getId().getModuleName(), event.getId().getObjectName()).toString(), event.getState());
 
         if (focus != null) {
             focus.onBindEvent(nuiEvent);

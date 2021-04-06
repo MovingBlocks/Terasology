@@ -4,8 +4,8 @@ package org.terasology.engine.world.propagation;
 
 import org.joml.Vector3ic;
 import org.terasology.engine.world.block.Block;
+import org.terasology.engine.world.chunks.Chunk;
 import org.terasology.engine.world.chunks.Chunks;
-import org.terasology.engine.world.chunks.LitChunk;
 
 /**
  * Provides a view over a single chunk using a given propagation rule.
@@ -13,9 +13,9 @@ import org.terasology.engine.world.chunks.LitChunk;
 public class SingleChunkView implements PropagatorWorldView {
 
     private final PropagationRules rules;
-    private final LitChunk chunk;
+    private final Chunk chunk;
 
-    public SingleChunkView(PropagationRules rules, LitChunk chunk) {
+    public SingleChunkView(PropagationRules rules, Chunk chunk) {
         this.rules = rules;
         this.chunk = chunk;
     }
