@@ -241,7 +241,7 @@ def createVersionInfoFile = tasks.register("createVersionInfoFile", WritePropert
 
 tasks.named("processResources", Copy) {
     from(createVersionInfoFile) {
-        into("org/terasology/version/")
+        into("org/terasology/engine/version/")
     }
     from("$rootDir/docs") {
         include("Credits.md")
