@@ -187,7 +187,27 @@ tasks.named("jar") {
 }
 
 tasks.named<Test>("test") {
-    useJUnitPlatform()
+    description = "Runs all tests (slow)"
+    useJUnitPlatform ()
+    systemProperty("junit.jupiter.execution.timeout.default", "4m")
+}
+
+tasks.register<Test>("unitTest") {
+    group =  "Verification"
+    description = "Runs unit tests (fast)"
+    useJUnitPlatform {
+        excludeTags = setOf("MteTest", "TteTest")
+    }
+    systemProperty("junit.jupiter.execution.timeout.default", "1m")
+}
+
+tasks.register<Test>("integrationTest") {
+    group = "Verification"
+    description = "Runs integration tests (slow) tagged with 'MteTest' or 'TteTest'"
+
+    useJUnitPlatform {
+        includeTags = setOf("MteTest", "TteTest")
+    }
     systemProperty("junit.jupiter.execution.timeout.default", "4m")
 }
 
