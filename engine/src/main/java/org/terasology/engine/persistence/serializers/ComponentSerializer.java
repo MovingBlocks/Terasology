@@ -178,7 +178,7 @@ public class ComponentSerializer {
             if (fieldInfo != null) {
                 dataMap.put(fieldInfo, new ProtobufPersistedData(field.getValue()));
             } else if (field.hasName()) {
-                logger.warn("Cannot deserialize unknown field '{}' onto '{}'", field.getName(), componentMetadata.getUri());
+                logger.warn("Cannot deserialize unknown field '{}' onto '{}'", field.getName(), componentMetadata.getId());
             }
         }
         serializer.deserializeOnto(targetComponent, dataMap, fieldCheck);
@@ -235,7 +235,7 @@ public class ComponentSerializer {
         if (compId != null) {
             componentMessage.setTypeIndex(compId);
         } else {
-            componentMessage.setType(componentMetadata.getUri().toString());
+            componentMessage.setType(componentMetadata.getId().toString());
         }
     }
 

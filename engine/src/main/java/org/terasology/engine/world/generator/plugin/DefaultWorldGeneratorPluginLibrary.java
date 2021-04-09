@@ -9,7 +9,7 @@ import org.terasology.module.ModuleEnvironment;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.metadata.ClassLibrary;
 import org.terasology.reflection.metadata.ClassMetadata;
-import org.terasology.reflection.metadata.DefaultClassLibrary;
+import org.terasology.reflection.metadata.DefaultModuleClassLibrary;
 import org.terasology.reflection.reflect.ReflectFactory;
 
 import java.util.List;
@@ -21,10 +21,10 @@ public class DefaultWorldGeneratorPluginLibrary implements WorldGeneratorPluginL
     private final ClassLibrary<WorldGeneratorPlugin> library;
 
     public DefaultWorldGeneratorPluginLibrary(ModuleEnvironment moduleEnvironment, Context context) {
-        library = new DefaultClassLibrary<>(moduleEnvironment, context.get(ReflectFactory.class), context.get(CopyStrategyLibrary.class));
+        library = new DefaultModuleClassLibrary<>(moduleEnvironment, context.get(ReflectFactory.class), context.get(CopyStrategyLibrary.class));
         for (Class<?> entry : moduleEnvironment.getTypesAnnotatedWith(RegisterPlugin.class)) {
             if (WorldGeneratorPlugin.class.isAssignableFrom(entry)) {
-                library.register(new ResourceUrn(moduleEnvironment.getModuleProviding(entry).toString(), entry.getSimpleName()), entry.asSubclass(WorldGeneratorPlugin.class));
+                library.register(new ResourceUrn(moduleEnvironment.getModuleProviding(entry).toString(), entry.getSimpleName()).toString(), entry.asSubclass(WorldGeneratorPlugin.class));
             }
         }
     }

@@ -14,11 +14,9 @@ import org.terasology.engine.logic.characters.CharacterComponent;
 import org.terasology.engine.logic.players.event.WorldtimeResetEvent;
 import org.terasology.input.Keyboard;
 import org.terasology.engine.input.binds.general.HideHUDButton;
-import org.terasology.input.device.MouseDevice;
 import org.terasology.engine.input.events.KeyDownEvent;
 import org.terasology.engine.input.events.KeyEvent;
 import org.terasology.engine.input.events.MouseAxisEvent;
-import org.terasology.engine.logic.debug.DebugProperties;
 import org.terasology.engine.network.ClientComponent;
 import org.terasology.engine.registry.In;
 import org.terasology.engine.rendering.nui.NUIManager;
@@ -30,23 +28,17 @@ import org.terasology.engine.world.WorldProvider;
 public class DebugControlSystem extends BaseComponentSystem {
 
     private static final String DEBUG_INFO_URN = "engine:DebugInfo";
-
     @In
     private WorldProvider world;
-    
     @In
     private Config config;
     @In
     private SystemConfig systemConfig;
-
     @In
     private NUIManager nuiManager;
 
-    @In
-    private MouseDevice mouseDevice;
-    
     private DebugOverlay overlay;
-    
+
     private boolean mouseGrabbed = true;
 
     @Override
@@ -97,7 +89,7 @@ public class DebugControlSystem extends BaseComponentSystem {
             }
         }
     }
-    
+
     @ReceiveEvent(components = ClientComponent.class)
     public void onKeyDown(KeyDownEvent event, EntityRef entity) {
         boolean debugEnabled = systemConfig.debugEnabled.get();
@@ -126,13 +118,6 @@ public class DebugControlSystem extends BaseComponentSystem {
         }
 
         switch (event.getKey().getId()) {
-            case Keyboard.KeyId.F11:
-                mouseGrabbed = !mouseGrabbed;
-                DebugProperties debugProperties = (DebugProperties) nuiManager.getHUD().getHUDElement("engine:DebugProperties");
-                debugProperties.setVisible(!mouseGrabbed);
-                mouseDevice.setGrabbed(mouseGrabbed);
-                event.consume();
-                break;
             case Keyboard.KeyId.F3:
                 systemConfig.debugEnabled.set(!systemConfig.debugEnabled.get());
                 event.consume();
@@ -153,7 +138,7 @@ public class DebugControlSystem extends BaseComponentSystem {
             event.consume();
         }
     }
-    
+
     /**
      * Ensures every player on the server has their time updated when
      * a KeyEvent is triggered in Debug mode.

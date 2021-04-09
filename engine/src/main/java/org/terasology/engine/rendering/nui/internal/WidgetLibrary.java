@@ -8,13 +8,13 @@ import org.terasology.assets.ResourceUrn;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.nui.UIWidget;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
-import org.terasology.reflection.metadata.AbstractClassLibrary;
 import org.terasology.reflection.metadata.ClassMetadata;
+import org.terasology.reflection.metadata.ModuleClassLibrary;
 import org.terasology.reflection.reflect.ReflectFactory;
 
 /**
  */
-public class WidgetLibrary extends AbstractClassLibrary<UIWidget> {
+public class WidgetLibrary extends ModuleClassLibrary<UIWidget> {
 
     private static final Logger logger = LoggerFactory.getLogger(WidgetLibrary.class);
 
