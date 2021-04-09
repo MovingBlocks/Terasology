@@ -79,8 +79,8 @@ task copyResourcesToClasses(type:Copy) {
     into sourceSets.main.output.classesDirs.first()
 }
 
-//TODO: Remove it  when gestalt will can to handle ProtectionDomain without classes (Resources)
 test {
+    //TODO: Remove it  when gestalt will can to handle ProtectionDomain without classes (Resources)
     dependsOn copyResourcesToClasses
     dependsOn rootProject.extractNatives
 
@@ -90,6 +90,7 @@ test {
 }
 
 task unitTest(type: Test) {
+    //TODO: Remove it  when gestalt will can to handle ProtectionDomain without classes (Resources)
     dependsOn copyResourcesToClasses
     dependsOn rootProject.extractNatives
 
@@ -103,6 +104,7 @@ task unitTest(type: Test) {
 }
 
 task integrationTest(type: Test) {
+    //TODO: Remove it  when gestalt will can to handle ProtectionDomain without classes (Resources)
     dependsOn copyResourcesToClasses
     dependsOn rootProject.extractNatives
 
