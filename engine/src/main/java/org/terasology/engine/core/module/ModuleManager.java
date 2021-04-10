@@ -16,7 +16,6 @@ import org.terasology.engine.core.paths.PathManager;
 import org.terasology.gestalt.module.Module;
 import org.terasology.gestalt.module.ModuleEnvironment;
 import org.terasology.gestalt.module.ModuleFactory;
-import org.terasology.gestalt.module.ModuleMetadata;
 import org.terasology.gestalt.module.ModuleMetadataJsonAdapter;
 import org.terasology.gestalt.module.ModuleMetadataLoader;
 import org.terasology.gestalt.module.ModulePathScanner;
@@ -32,7 +31,6 @@ import org.terasology.gestalt.module.sandbox.PermissionProviderFactory;
 import org.terasology.gestalt.module.sandbox.StandardPermissionProviderFactory;
 import org.terasology.gestalt.module.sandbox.WarnOnlyProviderFactory;
 import org.terasology.gestalt.naming.Name;
-import org.terasology.gestalt.naming.Version;
 
 import java.io.File;
 import java.lang.reflect.ReflectPermission;
@@ -115,22 +113,35 @@ public class ModuleManager {
     }
 
     private Module loadEngineModule(List<Class<?>> classesOnClasspathsToAddToEngine) {
-        // FIXME: is `classes…toAddToEngine` gone? Did we ever use it in the first place?
-        Module engine = moduleFactory.createPackageModule("org.terasology.engine");
-        // TODO: document why nui is a module when other libraries are not
-        Module nui = createSyntheticPackageModule("nui", "3.0.0" /* FIXME */, "org.terasology.nui");
+        Module packageModule = moduleFactory.createPackageModule("org.terasology.engine");
 
-        DependencyInfo nuiDependency = new DependencyInfo();
-        nuiDependency.setId(nui.getId());
-        nuiDependency.setMinVersion(nui.getVersion());
-        nuiDependency.setMaxVersion(nui.getVersion().getNextPatchVersion());
-        engine.getMetadata().getDependencies().add(nuiDependency);
+        // We need to add reflections from our subsystems and other classes.
+        ConfigurationBuilder config = new ConfigurationBuilder();
+        Reflections packageReflections = packageModule.getModuleManifest();
+        Set<Scanner> scanners = packageReflections.getConfiguration().getScanners();
+        config.setScanners(scanners.toArray(new Scanner[0]));
 
-        registry.add(nui);
+        for (Class<?> aClass : classesOnClasspathsToAddToEngine) {
+            config.addUrls(ClasspathHelper.forClass(aClass));
+        }
+
+        // TODO: is this using reflections.cache?
+        Reflections reflectionsWithSubsystems = new Reflections(config);
+        packageReflections.merge(reflectionsWithSubsystems);
+
+        ClassLoader engineClassLoader = this.getClass().getClassLoader();
+
+        // We need the class predicate to include classes in subsystems and whatnot. We can't change it in an
+        // existing module, so make a new one based on the one from the moduleFactory.
+        Module engine = new Module(
+                packageModule.getMetadata(),
+                packageModule.getResources(),
+                Collections.emptyList(),
+                packageReflections,
+                packageModule.getClassPredicate().or(clazz -> clazz.getClassLoader().equals(engineClassLoader))
+        );
+
         registry.add(engine);
-
-        enrichReflectionsWithSubsystems(engine, classesOnClasspathsToAddToEngine);
-
         return engine;
     }
 
@@ -151,15 +162,6 @@ public class ModuleManager {
             metadataJsonAdapter.registerExtension(ext.getKey(), ext.getValueType());
         }
         return metadataJsonAdapter;
-    }
-
-    private Module createSyntheticPackageModule(String id, String version, String packageName) {
-        ModuleMetadata metadata = new ModuleMetadata(
-                new Name(id),
-                new Version(version));
-        return moduleFactory.createPackageModule(
-                metadata,
-                packageName);
     }
 
     private void setupSandbox() {
@@ -243,35 +245,5 @@ public class ModuleManager {
 
     public ModuleFactory getModuleFactory() {
         return moduleFactory;
-    }
-
-    private void enrichReflectionsWithSubsystems(Module module, List<Class<?>> classesToAdd) {
-        Reflections reflections = module.getModuleManifest();
-
-        ConfigurationBuilder config = new ConfigurationBuilder();
-        Set<Scanner> scanners = reflections.getConfiguration().getScanners();
-        config.setScanners(scanners.toArray(new Scanner[0]));
-
-        for (Class<?> aClass : classesToAdd) {
-            config.addUrls(ClasspathHelper.forClass(aClass));
-        }
-
-        // TODO: use reflections cache instead of scanning on the fly?
-        reflections.merge(new Reflections(config));
-
-//        try {
-//            Enumeration<URL> urls = ModuleManager.class.getClassLoader().getResources(REFLECTIONS_MANIFEST_FILENAME);
-//            while (urls.hasMoreElements()) {
-//                URL url = urls.nextElement();
-//                // FIXME: testing for "subsystem" in the path probably doesn't work outside a dev workspace
-//                if (url.getPath().contains("subsystem")) {
-//                    try (InputStream inputStream = url.openStream()) {
-//                        reflections.collect(inputStream);
-//                    }
-//                }
-//            }
-//        } catch (IOException e) {
-//            logger.error("Cannot enrich engine's reflections with subsystems", e);
-//        }
     }
 }

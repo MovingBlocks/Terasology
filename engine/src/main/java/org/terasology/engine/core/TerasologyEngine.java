@@ -187,7 +187,7 @@ public class TerasologyEngine implements GameEngine {
      * Provide ability to set additional engine classpath locations.   This must be called before initialize() or run().
      * @param clazz any class that appears in the resource location to treat as an engine classpath.
      */
-    protected void addToClassesOnClasspathsToAddToEngine(Class<?> clazz) {
+    public void addToClassesOnClasspathsToAddToEngine(Class<?> clazz) {
         classesOnClasspathsToAddToEngine.add(clazz);
     }
 
