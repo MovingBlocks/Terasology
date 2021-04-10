@@ -51,6 +51,7 @@ public class BlockArea implements BlockAreac {
 
     // -- reset ------------------------------------------------------------------------------------------------------//
 
+    @SuppressWarnings("checkstyle:HiddenField")
     public BlockArea set(int minX, int minY, int maxX, int maxY) {
         Preconditions.checkArgument(minX <= maxX || (minX == INVALID.minX() && maxX == INVALID.maxX()));
         Preconditions.checkArgument(minY <= maxY || (minY == INVALID.minY() && maxY == INVALID.maxY()));
@@ -353,5 +354,36 @@ public class BlockArea implements BlockAreac {
     @Override
     public String toString() {
         return "BlockArea[(" + this.minX + ", " + this.minY + ")...(" + this.maxX + ", " + this.maxY + ")]";
+    }
+
+    private int calDis(int x, int y){
+        return (int) Math.sqrt(x * x + y * y);
+    }
+    public int distanceSquared(int px, int py){
+        if(px < minX){
+            if(py < minY) {
+                return calDis(minX - px, minY - py);
+            }
+            if(py <= maxY) {
+                return minX - px;
+            }
+            return calDis(minX - px, maxY - py);
+        }else if(px <= maxX){
+            if(py < minY) {
+                return minY - py;
+            }
+            if(py <= maxY) {
+                return 0;
+            }
+            return py - maxY;
+        }else{
+            if(py < minY) {
+                return calDis(maxX - px, minY - py);
+            }
+            if(py <= maxY) {
+                return px - maxX;
+            }
+            return calDis(maxX - px, maxY - py);
+        }
     }
 }
