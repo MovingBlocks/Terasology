@@ -50,6 +50,7 @@ import org.terasology.gestalt.assets.management.AssetManager;
 import org.terasology.gestalt.assets.module.ModuleAwareAssetTypeManager;
 import org.terasology.gestalt.module.Module;
 import org.terasology.gestalt.module.ModuleEnvironment;
+import org.terasology.gestalt.naming.Name;
 import org.terasology.input.device.KeyboardDevice;
 import org.terasology.input.device.MouseDevice;
 import org.terasology.nui.AbstractWidget;
@@ -70,7 +71,6 @@ import org.terasology.nui.widgets.types.TypeWidgetFactory;
 import org.terasology.nui.widgets.types.TypeWidgetFactoryRegistry;
 import org.terasology.nui.widgets.types.TypeWidgetLibrary;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
-import org.terasology.reflection.metadata.ClassLibrary;
 import org.terasology.reflection.reflect.ReflectFactory;
 
 import java.beans.PropertyChangeEvent;
@@ -81,6 +81,8 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+
+import static com.google.common.base.Verify.verifyNotNull;
 
 /**
  */
@@ -187,7 +189,8 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
         widgetsLibrary = new WidgetLibrary(context.get(ModuleManager.class).getEnvironment(), context.get(ReflectFactory.class), context.get(CopyStrategyLibrary.class));
         ModuleEnvironment environment = context.get(ModuleManager.class).getEnvironment();
         for (Class<? extends UIWidget> type : environment.getSubtypesOf(UIWidget.class)) {
-            widgetsLibrary.register(new ResourceUrn(environment.getModuleProviding(type).toString(), type.getSimpleName()), type);
+            Name module = verifyNotNull(environment.getModuleProviding(type), "No module provides %s", type);
+            widgetsLibrary.register(new ResourceUrn(module.toString(), type.getSimpleName()), type);
         }
     }
 
