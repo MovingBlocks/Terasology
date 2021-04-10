@@ -1,4 +1,4 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
 import org.reflections.Reflections
@@ -12,10 +12,6 @@ subprojects {
     plugins.apply('idea')
     def sourceSets = project.getConvention().getPlugin(JavaPluginConvention.class).sourceSets
 
-    // umm need for android dependencies
-    repositories {
-        google()
-    }
 
     sourceSets.main.java.outputDir = new File("$buildDir/classes")
     idea {

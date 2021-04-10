@@ -53,11 +53,6 @@ configurations {
     }
 }
 
-// umm need for android dependencies
-repositories {
-    google()
-}
-
 // Primary dependencies definition
 dependencies {
     // Storage and networking

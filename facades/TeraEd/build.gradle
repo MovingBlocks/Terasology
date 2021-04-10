@@ -23,12 +23,6 @@ sourceSets {
     test.java.outputDir = new File("$buildDir/testClasses")
 }
 
-
-// umm need for android dependencies
-repositories {
-    google()
-}
-
 dependencies {
     implementation project(':engine')
     implementation "org.terasology:reflections:0.9.12-MB"

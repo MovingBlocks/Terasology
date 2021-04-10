@@ -46,6 +46,8 @@ plugins {
     id "idea"
     // For the "Build and run using: Intellij IDEA | Gradle" switch
     id "org.jetbrains.gradle.plugin.idea-ext" version "1.0"
+
+    id("terasology-repositories")
 }
 
 
@@ -74,20 +76,6 @@ ext {
     LwjglVersion = '3.2.3'
 }
 
-// Declare remote repositories we're interested in - library files will be fetched from here
-repositories {
-    // External libs - jcenter is Bintray and is supposed to be a superset of Maven Central, but do both just in case
-    jcenter()
-    mavenCentral()
-    google()
-
-    // MovingBlocks Artifactory instance for libs not readily available elsewhere plus our own libs
-    maven {
-        name "Terasology Artifactory"
-        url "http://artifactory.terasology.org/artifactory/virtual-repo-live"
-        allowInsecureProtocol true  // 😱
-    }
-}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Natives - Handles pulling in and extracting native libraries for LWJGL                                            //

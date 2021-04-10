@@ -16,6 +16,14 @@ repositories {
         }
     }
 
+    google {
+        // gestalt uses an annotation library from Google
+        content {
+            // (This is an optimization so gradle doesn't try to find our hundreds of modules here.)
+            excludeGroupByRegex("""org\.terasology(\..+)?""")
+        }
+    }
+
     // MovingBlocks Artifactory instance for libs not readily available elsewhere plus our own libs
     maven {
         val repoViaEnv = System.getenv()["RESOLUTION_REPO"]
