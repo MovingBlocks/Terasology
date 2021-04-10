@@ -3,6 +3,10 @@
 package org.terasology.engine.core.module;
 
 import com.google.common.collect.Sets;
+import org.reflections.Reflections;
+import org.reflections.scanners.Scanner;
+import org.reflections.util.ClasspathHelper;
+import org.reflections.util.ConfigurationBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.config.Config;
@@ -125,8 +129,7 @@ public class ModuleManager {
         registry.add(nui);
         registry.add(engine);
 
-        // FIXME: why doesn't gestalt-v7 need this?
-        //  enrichReflectionsWithSubsystems(engineModule);
+        enrichReflectionsWithSubsystems(engine, classesOnClasspathsToAddToEngine);
 
         return engine;
     }
@@ -242,19 +245,33 @@ public class ModuleManager {
         return moduleFactory;
     }
 
-//    private void enrichReflectionsWithSubsystems(Module engineModule) {
-//        Serializer serializer = new XmlSerializer();
+    private void enrichReflectionsWithSubsystems(Module module, List<Class<?>> classesToAdd) {
+        Reflections reflections = module.getModuleManifest();
+
+        ConfigurationBuilder config = new ConfigurationBuilder();
+        Set<Scanner> scanners = reflections.getConfiguration().getScanners();
+        config.setScanners(scanners.toArray(new Scanner[0]));
+
+        for (Class<?> aClass : classesToAdd) {
+            config.addUrls(ClasspathHelper.forClass(aClass));
+        }
+
+        // TODO: use reflections cache instead of scanning on the fly?
+        reflections.merge(new Reflections(config));
+
 //        try {
-//            Enumeration<URL> urls = ModuleManager.class.getClassLoader().getResources("reflections.cache");
+//            Enumeration<URL> urls = ModuleManager.class.getClassLoader().getResources(REFLECTIONS_MANIFEST_FILENAME);
 //            while (urls.hasMoreElements()) {
 //                URL url = urls.nextElement();
+//                // FIXME: testing for "subsystem" in the path probably doesn't work outside a dev workspace
 //                if (url.getPath().contains("subsystem")) {
-//                    Reflections subsystemReflections = serializer.read(url.openStream());
-//                    engineModule.getReflectionsFragment().merge(subsystemReflections);
+//                    try (InputStream inputStream = url.openStream()) {
+//                        reflections.collect(inputStream);
+//                    }
 //                }
 //            }
 //        } catch (IOException e) {
-//            logger.error("Cannot enrich engine's reflections with subsystems");
+//            logger.error("Cannot enrich engine's reflections with subsystems", e);
 //        }
-//    }
+    }
 }
