@@ -14,8 +14,7 @@ import java.util.List;
 /**
  */
 public abstract class MeshData implements AssetData {
-
-    enum DrawingMode {
+    public enum DrawingMode {
         POINTS,
         LINES,
         LINE_LOOP,
@@ -31,18 +30,25 @@ public abstract class MeshData implements AssetData {
 
     private List<Layout> layouts = new ArrayList<>();
     private TIntList indices = new TIntArrayList();
+    private final DrawingMode mode;
 
-    public List<Layout> getLayouts() {
-        return this.layouts;
+    public MeshData() {
+        this(DrawingMode.TRIANGLES);
     }
 
-    public TIntList getIndices() {
-        return indices;
+    public MeshData(DrawingMode mode) {
+        this.mode = mode;
     }
 
     public MeshData addLayout(Layout layout) {
         this.getLayouts().add(layout);
         return this;
+    }
+    public List<Layout> getLayouts() {
+        return this.layouts;
+    }
+    public TIntList getIndices() {
+        return indices;
     }
 
     public abstract TFloatList getVertices();

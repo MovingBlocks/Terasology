@@ -8,7 +8,7 @@ import gnu.trove.list.TDoubleList;
 import java.nio.ByteBuffer;
 
 public class DoubleLayout extends Layout<TDoubleList> {
-    public DoubleLayout(int location, int size, TDoubleList buffer, int flags) {
+    public DoubleLayout(int location, int size, TDoubleList buffer, long flags) {
         super(location, size, buffer, flags | Layout.FLOATING_POINT);
     }
 

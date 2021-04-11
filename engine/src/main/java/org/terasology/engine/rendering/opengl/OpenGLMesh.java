@@ -148,9 +148,7 @@ public class OpenGLMesh extends Mesh {
 
         TIntList indices = newData.getIndices();
         IntBuffer bufferIndices = BufferUtils.createIntBuffer(indices.size());
-        for (int x = 0; x < indices.size(); x++) {
-            bufferIndices.put(indices.get(x));
-        }
+        bufferIndices.put(indices.toArray());
         bufferIndices.flip();
 
         GL30.glBindBuffer(GL30.GL_ELEMENT_ARRAY_BUFFER, this.disposalAction.ebo);

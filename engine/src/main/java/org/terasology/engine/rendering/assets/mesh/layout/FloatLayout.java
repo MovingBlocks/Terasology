@@ -9,7 +9,7 @@ import java.nio.ByteBuffer;
 
 public class FloatLayout extends Layout<TFloatList> {
 
-    public FloatLayout(int location, int size, TFloatList buffer, int flags) {
+    public FloatLayout(int location, int size, TFloatList buffer, long flags) {
         super(location, size, buffer, flags);
     }
 

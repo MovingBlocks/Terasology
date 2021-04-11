@@ -8,7 +8,7 @@ import gnu.trove.list.TByteList;
 import java.nio.ByteBuffer;
 
 public class ByteLayout extends Layout<TByteList> {
-    public ByteLayout(int location, int size, TByteList buffer, int flags) {
+    public ByteLayout(int location, int size, TByteList buffer, long flags) {
         super(location, size, buffer, flags);
     }
 

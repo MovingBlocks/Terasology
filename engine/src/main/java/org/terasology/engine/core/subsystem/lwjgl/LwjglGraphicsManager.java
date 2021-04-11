@@ -115,7 +115,7 @@ public class LwjglGraphicsManager implements LwjglGraphicsProcessing {
                 "mesh");
         assetTypeManager.registerCoreAssetType(SkeletalMesh.class, (AssetFactory<SkeletalMesh, SkeletalMeshData>)
                         (urn, assetType, data) ->
-                                new OpenGLSkeletalMesh(urn, assetType, bufferPool, data, this),
+                                new OpenGLSkeletalMesh(urn, assetType, data, this),
                 "skeletalMesh");
         assetTypeManager.registerCoreAssetType(MeshAnimation.class, MeshAnimationImpl::new,
                 "animations", "skeletalMesh");

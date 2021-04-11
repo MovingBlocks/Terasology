@@ -8,7 +8,7 @@ import gnu.trove.list.TIntList;
 import java.nio.ByteBuffer;
 
 public class IntLayout extends Layout<TIntList> {
-    public IntLayout(int location, int size, TIntList buffer, int flags) {
+    public IntLayout(int location, int size, TIntList buffer, long flags) {
         super(location, size, buffer, flags);
     }
 

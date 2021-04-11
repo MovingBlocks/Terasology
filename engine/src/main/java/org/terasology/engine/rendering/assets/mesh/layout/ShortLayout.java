@@ -8,7 +8,7 @@ import gnu.trove.list.TShortList;
 import java.nio.ByteBuffer;
 
 public class ShortLayout extends Layout<TShortList> {
-    public ShortLayout(int location, int size, TShortList buffer, int flags) {
+    public ShortLayout(int location, int size, TShortList buffer, long flags) {
         super(location, size, buffer, flags);
     }
 

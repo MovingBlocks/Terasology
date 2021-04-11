@@ -14,9 +14,9 @@ public abstract class Layout<T> {
     public final int location;
     public final int size;
     public final T buffer;
-    public final int flag;
+    public final long flag;
 
-    public Layout(int location, int size, T buffer, int flag) {
+    public Layout(int location, int size, T buffer, long flag) {
         this.location = location;
         this.size = size;
         this.buffer = buffer;
