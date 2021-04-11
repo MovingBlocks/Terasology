@@ -5,16 +5,11 @@
 
 import org.gradle.plugins.ide.eclipse.model.EclipseModel
 import org.gradle.plugins.ide.idea.model.IdeaModel
-import org.reflections.Reflections
-import org.reflections.scanners.SubTypesScanner
-import org.reflections.scanners.TypeAnnotationsScanner
-import org.reflections.serializers.JsonSerializer
-import org.reflections.util.ConfigurationBuilder
-import org.reflections.util.FilterBuilder
 import org.terasology.gradology.ModuleMetadataForGradle
 
 plugins {
     `java-library`
+    id("reflections-manifest")
     idea
     eclipse
 }
@@ -121,32 +116,6 @@ tasks.register("createSkeleton") {
 
 val mainSourceSet: SourceSet = sourceSets[SourceSet.MAIN_SOURCE_SET_NAME]
 
-
-tasks.register("cacheReflections") {
-    description = "Caches reflection output to make regular startup faster. May go stale and need cleanup at times."
-    inputs.files(mainSourceSet.output.classesDirs)
-    outputs.file(File(mainSourceSet.output.classesDirs.first(), "manifest.json"))
-    dependsOn(tasks.named("classes"))
-
-    outputs.upToDateWhen { tasks.named("classes").get().state.upToDate }
-
-    doFirst {
-        try {
-            val reflections = Reflections(ConfigurationBuilder()
-                    .filterInputsBy(FilterBuilder.parsePackages("+org"))
-                    .addUrls(inputs.getFiles().getSingleFile().toURI().toURL())
-                    .setScanners(TypeAnnotationsScanner(), SubTypesScanner()))
-            reflections.save(outputs.getFiles().getAsPath(), JsonSerializer())
-        } catch (e: java.net.MalformedURLException) {
-            logger.error("Cannot parse input to url", e)
-        }
-    }
-}
-
-tasks.register<Delete>("cleanReflections") {
-    description = "Cleans the reflection cache. Useful in cases where it has gone stale and needs regeneration."
-    delete(tasks.getByName("cacheReflections").outputs.files)
-}
 
 // This task syncs everything in the assets dir into the output dir, used when jarring the module
 tasks.register<Sync>("syncAssets") {

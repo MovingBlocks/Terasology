@@ -6,15 +6,14 @@
 plugins {
     id "java-library"
     id "org.jetbrains.gradle.plugin.idea-ext"
+    id("reflections-manifest")
 }
 
 // Grab all the common stuff like plugins to use, artifact repositories, code analysis config, etc
 apply from: "$rootDir/config/gradle/publish.gradle"
 
+
 import groovy.json.JsonSlurper
-import org.reflections.Reflections
-import org.reflections.scanners.SubTypesScanner
-import org.reflections.scanners.TypeAnnotationsScanner
 
 import java.text.SimpleDateFormat
 
@@ -131,31 +130,12 @@ dependencies {
    api(project(":subsystems:TypeHandlerLibrary"))
 }
 
-task cacheReflections {
-    description = 'Caches reflection output to make regular startup faster. May go stale and need cleanup at times.'
-    inputs.files sourceSets.main.output.classesDirs,
-            // getClassesDir from all sourceSets (for any jvm (seems) language)
-            configurations."${sourceSets.main.runtimeClasspathConfigurationName}"
-
-    outputs.upToDateWhen {classes.state.upToDate}
-    outputs.file("$buildDir/resources/main/reflections.cache")
-    dependsOn classes
-
-    doLast {
-        // Without the .mkdirs() we might hit a scenario where the classes dir doesn't exist yet
-        Reflections reflections = new org.reflections.Reflections(new org.reflections.util.ConfigurationBuilder()
-            .addUrls(inputs.files.collect { it.toURI().toURL() })
-            .setScanners(new TypeAnnotationsScanner(), new SubTypesScanner()))
-        reflections.save("$buildDir/classes/reflections.cache")
-    }
-}
-
 // Instructions for packaging a jar file for the engine
 jar {
     // Unlike the content modules Gradle grabs the assets as they're in a resources directory. Need to avoid dupes tho
     duplicatesStrategy = "EXCLUDE"
 
-    from(tasks.getByName("cacheReflections").outputs)
+    dependsOn(tasks.named("cacheReflections"))
 
     doFirst {
         manifest {
@@ -165,11 +145,6 @@ jar {
             attributes("Class-Path": manifestClasspath, "Implementation-Title": "Terasology", "Implementation-Version": displayVersion + ", engine v" + project.version + " , build number " + env.BUILD_NUMBER)
         }
     }
-}
-
-task cleanReflections(type: Delete) {
-    description = 'Cleans the reflection cache. Useful in cases where it has gone stale and needs regeneration.'
-    delete cacheReflections.outputs.files
 }
 
 // JMH related tasks
@@ -258,10 +233,11 @@ task copyResourcesToClasses(type: Copy) {
 
     dependsOn processResources
     mustRunAfter compileJava
-    classes.dependsOn copyResourcesToClasses
 }
 
-jar.dependsOn cacheReflections
+tasks.named("classes") {
+    dependsOn(tasks.named("copyResourcesToClasses"))
+}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // General IDE customization                                                                                         //
