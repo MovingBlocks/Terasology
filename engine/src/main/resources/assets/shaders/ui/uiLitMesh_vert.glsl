@@ -12,19 +12,17 @@ out vec2 v_relPos;
 out vec2 v_uv0;
 out vec4 v_color0;
 
-uniform mat4 modelView;
-uniform mat4 proj;
+uniform mat4 modelViewMatrix;
+uniform mat4 projectionMatrix;
+uniform mat3 normalMatrix;
+uniform mat4 posMatrix;
 
 uniform float alpha;
 
-void main()
-{
-    mat4 normalMatrix = transpose(inverse(modelView));
-
-    gl_Position = (proj * modelView) * vec4(in_vert, 1.0);
-    v_relPos = gl_Position.xy;
-
-    v_normal = (normalMatrix * vec4(in_normal,1.0)).xyz;
+void main() {
+    v_relPos = (posMatrix * vec4(in_vert,1.0)).xy;
+    gl_Position = (projectionMatrix * modelViewMatrix) * vec4(in_vert, 1.0);
+    v_normal = normalize(normalMatrix * in_normal);
     v_uv0 = in_uv0;
     v_color0 = vec4(in_color0.rgb, in_color0.a * alpha);
 }

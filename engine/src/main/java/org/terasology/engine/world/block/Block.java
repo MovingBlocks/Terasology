@@ -587,26 +587,6 @@ public final class Block {
         return getBounds(new Vector3i(floatPos, RoundingMode.HALF_UP));
     }
 
-    public void renderWithLightValue(float sunlight, float blockLight) {
-        if (meshGenerator == null) {
-            return;
-        }
-
-        Material mat = Assets.getMaterial("engine:prog.block").orElseThrow(() -> new RuntimeException("Missing engine material"));
-        mat.activateFeature(ShaderProgramFeature.FEATURE_USE_MATRIX_STACK);
-
-        mat.enable();
-        mat.setFloat("sunlight", sunlight);
-        mat.setFloat("blockLight", blockLight);
-
-
-        Mesh mesh = meshGenerator.getStandaloneMesh();
-        if (mesh != null) {
-            mesh.render();
-        }
-
-        mat.deactivateFeature(ShaderProgramFeature.FEATURE_USE_MATRIX_STACK);
-    }
 
     @Override
     public String toString() {

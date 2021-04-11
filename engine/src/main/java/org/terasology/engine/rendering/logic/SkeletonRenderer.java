@@ -268,7 +268,7 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
 
             Matrix4f modelViewMatrix = worldRenderer.getActiveCamera().getViewMatrix().mul(matrixCameraSpace, new Matrix4f());
             modelViewMatrix.get(tempMatrixBuffer44);
-            skeletalMesh.material.setMatrix4("worldViewMatrix", tempMatrixBuffer44, true);
+            skeletalMesh.material.setMatrix4("modelViewMatrix", tempMatrixBuffer44, true);
 
             modelViewMatrix.normal(new Matrix3f()).get(tempMatrixBuffer33);
             skeletalMesh.material.setMatrix3("normalMatrix", tempMatrixBuffer33, true);
@@ -331,7 +331,7 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
 
                 Matrix4f modelViewMatrix = worldRenderer.getActiveCamera().getViewMatrix().mul(matrixCameraSpace, new Matrix4f());
                 modelViewMatrix.get(tempMatrixBuffer44);
-                material.setMatrix4("worldViewMatrix", tempMatrixBuffer44, true);
+                material.setMatrix4("modelViewMatrix", tempMatrixBuffer44, true);
 
                 modelViewMatrix.get3x3(new Matrix3f()).invert().get(tempMatrixBuffer33);
                 material.setMatrix3("normalMatrix", tempMatrixBuffer33, true);

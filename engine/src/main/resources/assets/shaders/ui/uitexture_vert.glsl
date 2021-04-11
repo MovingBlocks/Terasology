@@ -14,8 +14,8 @@ uniform vec2 texOffset;
 uniform vec2 texSize;
 uniform vec4 croppingBoundaries;
 
-uniform mat4 modelView;
-uniform mat4 proj;
+uniform mat4 modelViewMatrix;
+uniform mat4 projectionMatrix;
 
 out vec2 v_relPos;
 out vec2 v_uv0;
@@ -27,7 +27,7 @@ void main()
     pos.xy *= scale;
     pos.xy += offset;
     v_relPos = pos.xy;
-	gl_Position = (proj * modelView) * vec4(pos,1.0);
+	gl_Position = (projectionMatrix * modelViewMatrix) * vec4(pos,1.0);
     v_uv0 = texOffset + in_uv0 * (texSize);
     v_color0 = color;
 }

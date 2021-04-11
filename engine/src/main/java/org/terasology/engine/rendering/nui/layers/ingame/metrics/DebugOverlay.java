@@ -13,6 +13,7 @@ import org.terasology.engine.logic.players.LocalPlayer;
 import org.terasology.engine.math.Orientation;
 import org.terasology.engine.monitoring.PerformanceMonitor;
 import org.terasology.engine.rendering.primitives.ChunkTessellator;
+import org.terasology.nui.Canvas;
 import org.terasology.nui.databinding.ReadOnlyBinding;
 import org.terasology.nui.widgets.UILabel;
 import org.terasology.engine.persistence.StorageManager;
@@ -234,6 +235,11 @@ public class DebugOverlay extends CoreScreenLayer {
     @Override
     protected boolean isEscapeToCloseAllowed() {
         return false;
+    }
+
+    @Override
+    public void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
     }
 
     /**

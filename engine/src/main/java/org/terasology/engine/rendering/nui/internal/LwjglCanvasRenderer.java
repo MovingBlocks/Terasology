@@ -5,9 +5,9 @@ package org.terasology.engine.rendering.nui.internal;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import org.joml.Matrix3f;
 import org.joml.Matrix4f;
 import org.joml.Matrix4fStack;
-import org.joml.Matrix4fc;
 import org.joml.Quaternionf;
 import org.joml.Quaternionfc;
 import org.joml.Vector2f;
@@ -61,14 +61,11 @@ import static org.lwjgl.opengl.GL11.glBlendFunc;
 import static org.lwjgl.opengl.GL11.glClear;
 import static org.lwjgl.opengl.GL11.glDisable;
 import static org.lwjgl.opengl.GL11.glEnable;
-import static org.lwjgl.opengl.GL11.glPopMatrix;
 
 public class LwjglCanvasRenderer implements TerasologyCanvasRenderer, PropertyChangeListener {
 
     private static final String CROPPING_BOUNDARIES_PARAM = "croppingBoundaries";
     private static final Rectanglef FULL_REGION = new Rectanglef(0, 0, 1, 1);
-//    private Matrix4f modelView;
-//    private FloatBuffer matrixBuffer = BufferUtils.createFloatBuffer(16);
     private Mesh billboard;
 
     private Material textureMat;
@@ -91,10 +88,8 @@ public class LwjglCanvasRenderer implements TerasologyCanvasRenderer, PropertyCh
     private DisplayDevice displayDevice;
     private float uiScale = 1f;
 
-    private Matrix4fStack modelMatrixStack = new Matrix4fStack(1000);
+    private Matrix4fStack modelMatrixStack = new Matrix4fStack(100000);
     private Matrix4f projMatrix = new Matrix4f();
-
-//    private static Matrix4f defaultTransform = new Matrix4f().setTranslation(0, 0, -1024f);
 
     public LwjglCanvasRenderer(Context context) {
         // TODO use context to get assets instead of static methods
@@ -167,15 +162,15 @@ public class LwjglCanvasRenderer implements TerasologyCanvasRenderer, PropertyCh
 
         AABBfc meshAABB = mesh.getAABB();
         Vector3f meshExtents = meshAABB.extent(new Vector3f());
-        float fitScale = 0.35f * Math.min(drawRegion.lengthX(), drawRegion.lengthY()) / Math.max(meshExtents.x, Math.max(meshExtents.y, meshExtents.z));
+        float fitScale = 0.35f * Math.min(drawRegion.getSizeX(), drawRegion.getSizeY()) / Math.max(meshExtents.x, Math.max(meshExtents.y, meshExtents.z));
         Vector3f centerOffset = meshAABB.center(new Vector3f());
         centerOffset.mul(-1.0f);
 
         Matrix4f centerTransform = new Matrix4f().translationRotateScale(centerOffset,new Quaternionf(),1);
         Matrix4f userTransform = new Matrix4f().translationRotateScale( offset,rotation, -fitScale * scale);
         Matrix4f translateTransform = new Matrix4f().translationRotateScale(
-                new Vector3f((drawRegion.minX + drawRegion.lengthX() / 2) * uiScale,
-                        (drawRegion.minY + drawRegion.lengthY() / 2) * uiScale, 0), new Quaternionf(), 1);
+                new Vector3f((drawRegion.minX + drawRegion.getSizeX() / 2) * uiScale,
+                        (drawRegion.minY + drawRegion.getSizeY() / 2) * uiScale, 0), new Quaternionf(), 1);
 
         userTransform.mul(centerTransform);
         translateTransform.mul(userTransform);
@@ -189,8 +184,6 @@ public class LwjglCanvasRenderer implements TerasologyCanvasRenderer, PropertyCh
                 cropRegion.maxX * uiScale,
                 cropRegion.minY * uiScale,
                 cropRegion.maxY * uiScale);
-        textureMat.setMatrix4("proj", projMatrix);
-        textureMat.setMatrix4("modelView", modelMatrixStack);
 
         glEnable(GL11.GL_DEPTH_TEST);
         glClear(GL11.GL_DEPTH_BUFFER_BIT);
@@ -199,25 +192,16 @@ public class LwjglCanvasRenderer implements TerasologyCanvasRenderer, PropertyCh
         modelMatrixStack.set(finalMat);
         modelMatrixStack.scale(this.uiScale, this.uiScale, this.uiScale);
 
-//        glMatrixMode(GL11.GL_MODELVIEW);
-//        glPushMatrix();
-//        glLoadMatrixf(matrixBuffer);
+        material.setMatrix4("posMatrix", translateTransform);
+        material.setMatrix4("projectionMatrix", projMatrix);
+        material.setMatrix4("modelViewMatrix", modelMatrixStack);
+        material.setMatrix3("normalMatrix", modelMatrixStack.normal(new Matrix3f()));
 
-//        glScalef(this.uiScale, this.uiScale, this.uiScale);
-//        matrixBuffer.rewind();
-
-        boolean matrixStackSupported = material.supportsFeature(ShaderProgramFeature.FEATURE_USE_MATRIX_STACK);
-        if (matrixStackSupported) {
-            material.activateFeature(ShaderProgramFeature.FEATURE_USE_MATRIX_STACK);
-        }
         material.setFloat("alpha", alpha);
         material.bindTextures();
         mesh.render();
-        if (matrixStackSupported) {
-            material.deactivateFeature(ShaderProgramFeature.FEATURE_USE_MATRIX_STACK);
-        }
 
-        glPopMatrix();
+        modelMatrixStack.popMatrix();
         glDisable(GL11.GL_DEPTH_TEST);
     }
 
@@ -231,16 +215,11 @@ public class LwjglCanvasRenderer implements TerasologyCanvasRenderer, PropertyCh
     public void drawMaterialAt(Material material, Rectanglei drawRegion) {
         modelMatrixStack.pushMatrix();
         modelMatrixStack.translate(drawRegion.minX, drawRegion.minY, 0f);
-        modelMatrixStack.scale(drawRegion.lengthX(), drawRegion.lengthY(), 1);
+        modelMatrixStack.scale(drawRegion.getSizeX(), drawRegion.getSizeY(), 1);
 
-        material.setMatrix4("proj", projMatrix);
-        material.setMatrix4("modelView", modelMatrixStack);
-
-//        glPushMatrix();
-//        glTranslatef(drawRegion.minX, drawRegion.minY, 0f);
-//        glScalef(drawRegion.lengthX(), drawRegion.lengthY(), 1);
+        material.setMatrix4("projectionMatrix", projMatrix);
+        material.setMatrix4("modelViewMatrix", modelMatrixStack);
         billboard.render();
-//        glPopMatrix();
         modelMatrixStack.popMatrix();
     }
 
@@ -337,8 +316,8 @@ public class LwjglCanvasRenderer implements TerasologyCanvasRenderer, PropertyCh
         textureMat.setTexture("texture", ((TextureRegion)texture).getTexture());
         textureMat.setFloat4("color", color.rf(), color.gf(), color.bf(), color.af() * alpha);
 
-        textureMat.setMatrix4("proj", projMatrix);
-        textureMat.setMatrix4("modelView", modelMatrixStack);
+        textureMat.setMatrix4("projectionMatrix", projMatrix);
+        textureMat.setMatrix4("modelViewMatrix", modelMatrixStack);
 
         textureMat.bindTextures();
         mesh.render();
@@ -371,6 +350,8 @@ public class LwjglCanvasRenderer implements TerasologyCanvasRenderer, PropertyCh
 
         fontMesh.entrySet().stream().filter(entry -> entry.getKey().isRenderable()).forEach(entry -> {
             entry.getKey().bindTextures();
+            entry.getKey().setMatrix4("projectionMatrix", projMatrix);
+            entry.getKey().setMatrix4("modelViewMatrix", modelMatrixStack);
             entry.getKey().setFloat4(CROPPING_BOUNDARIES_PARAM, requestedCropRegion.minX, requestedCropRegion.maxX,
                     requestedCropRegion.minY, requestedCropRegion.maxY);
             entry.getKey().setFloat2("offset", offset.x, offset.y);

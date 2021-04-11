@@ -206,7 +206,7 @@ public class MeshRenderer extends BaseComponentSystem implements RenderSystem {
                         modelViewMatrix.normal(normalMatrix).get(tempMatrixBuffer33);
 
                         material.setMatrix4("projectionMatrix", worldRenderer.getActiveCamera().getProjectionMatrix(), true);
-                        material.setMatrix4("worldViewMatrix", tempMatrixBuffer44, true);
+                        material.setMatrix4("modelViewMatrix", tempMatrixBuffer44, true);
                         material.setMatrix3("normalMatrix", tempMatrixBuffer33, true);
 
                         material.setFloat3("colorOffset", meshComp.color.rf(), meshComp.color.gf(), meshComp.color.bf(), true);
