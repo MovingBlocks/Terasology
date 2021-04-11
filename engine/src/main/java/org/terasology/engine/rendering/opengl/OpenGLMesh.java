@@ -8,6 +8,8 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
+import org.lwjgl.opengl.GL33;
+import org.lwjgl.opengl.GL41;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.AssetType;
@@ -17,8 +19,12 @@ import org.terasology.engine.core.subsystem.lwjgl.GLBufferPool;
 import org.terasology.engine.core.subsystem.lwjgl.LwjglGraphicsProcessing;
 import org.terasology.engine.rendering.assets.mesh.Mesh;
 import org.terasology.engine.rendering.assets.mesh.MeshData;
+import org.terasology.engine.rendering.assets.mesh.layout.ByteLayout;
+import org.terasology.engine.rendering.assets.mesh.layout.DoubleLayout;
 import org.terasology.engine.rendering.assets.mesh.layout.FloatLayout;
+import org.terasology.engine.rendering.assets.mesh.layout.IntLayout;
 import org.terasology.engine.rendering.assets.mesh.layout.Layout;
+import org.terasology.engine.rendering.assets.mesh.layout.ShortLayout;
 import org.terasology.joml.geom.AABBf;
 import org.terasology.joml.geom.AABBfc;
 
@@ -38,9 +44,9 @@ public class OpenGLMesh extends Mesh {
     private int indexCount;
     private DisposalAction disposalAction;
 
-    public OpenGLMesh(ResourceUrn urn, AssetType<?, MeshData> assetType, GLBufferPool bufferPool, MeshData data, LwjglGraphicsProcessing graphicsProcessing) {
+    public OpenGLMesh(ResourceUrn urn, AssetType<?, MeshData> assetType, MeshData data, LwjglGraphicsProcessing graphicsProcessing) {
         super(urn, assetType);
-        this.disposalAction = new DisposalAction(urn, bufferPool);
+        this.disposalAction = new DisposalAction(urn);
         graphicsProcessing.asynchToDisplayThread(() -> {
             reload(data);
         });
@@ -69,7 +75,7 @@ public class OpenGLMesh extends Mesh {
     public void render() {
         if (!isDisposed()) {
             GL30.glBindVertexArray(disposalAction.vao);
-            GL30.glDrawElements(GL30.GL_TRIANGLES, this.indexCount,  GL_UNSIGNED_INT, 0);
+            GL30.glDrawElements(GL30.GL_TRIANGLES, this.indexCount, GL_UNSIGNED_INT, 0);
             GL30.glBindVertexArray(0);
         } else {
             logger.error("Attempted to render disposed mesh: {}", getUrn());
@@ -111,13 +117,32 @@ public class OpenGLMesh extends Mesh {
 
         int offset = 0;
         for (Layout layout : targets) {
-            GL20.glEnableVertexAttribArray(layout.location);
-            if (layout instanceof FloatLayout) {
-                GL20.glVertexAttribPointer(layout.location, layout.size, GL11.GL_FLOAT, false, stride, offset);
+            GL30.glEnableVertexAttribArray(layout.location);
+            if ((layout.flag & Layout.FLOATING_POINT) > 0) {
+                if (layout instanceof FloatLayout) {
+                    GL30.glVertexAttribPointer(layout.location, layout.size, GL30.GL_FLOAT, (layout.flag & Layout.NORMALIZED) > 0, stride, offset);
+                } else if (layout instanceof ShortLayout) {
+                    GL30.glVertexAttribPointer(layout.location, layout.size, GL30.GL_SHORT, (layout.flag & Layout.NORMALIZED) > 0, stride, offset);
+                } else if (layout instanceof IntLayout) {
+                    GL30.glVertexAttribPointer(layout.location, layout.size, GL30.GL_INT, (layout.flag & Layout.NORMALIZED) > 0, stride, offset);
+                } else if (layout instanceof ByteLayout) {
+                    GL30.glVertexAttribPointer(layout.location, layout.size, GL30.GL_BYTE, (layout.flag & Layout.NORMALIZED) > 0, stride, offset);
+                } else if (layout instanceof DoubleLayout) {
+                    GL41.glVertexAttribLPointer(layout.location, layout.size, GL30.GL_DOUBLE, stride, offset);
+                } else {
+                    throw new RuntimeException("invalid layout for class: " + layout.getClass());
+                }
+            } else {
+                if (layout instanceof ShortLayout) {
+                    GL30.glVertexAttribIPointer(layout.location, layout.size, GL30.GL_SHORT, stride, offset);
+                } else if (layout instanceof IntLayout) {
+                    GL30.glVertexAttribIPointer(layout.location, layout.size, GL30.GL_INT, stride, offset);
+                } else if (layout instanceof ByteLayout) {
+                    GL30.glVertexAttribIPointer(layout.location, layout.size, GL30.GL_BYTE, stride, offset);
+                } else {
+                    throw new RuntimeException("invalid layout for class: " + layout.getClass());
+                }
             }
-//            else if (layout instanceof IntBuffer) {
-//                GL20.glVertexAttribPointer(layout.location, layout.size, GL11.GL_INT, false, stride, offset);
-//            }
             offset += layout.bytes();
         }
 
@@ -139,18 +164,16 @@ public class OpenGLMesh extends Mesh {
     private static class DisposalAction implements Runnable {
 
         private final ResourceUrn urn;
-        private final GLBufferPool bufferPool;
 
         private int vao = 0;
         private int vbo = 0;
         private int ebo = 0;
 
-        DisposalAction(ResourceUrn urn, GLBufferPool bufferPool) {
+        DisposalAction(ResourceUrn urn) {
             this.urn = urn;
-            this.bufferPool = bufferPool;
         }
 
-        public void  dispose() {
+        public void dispose() {
             if (vao != 0) {
                 GL30.glDeleteVertexArrays(vao);
             }

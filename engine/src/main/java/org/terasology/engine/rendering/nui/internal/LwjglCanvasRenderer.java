@@ -26,7 +26,6 @@ import org.terasology.engine.rendering.assets.font.FontMeshBuilder;
 import org.terasology.engine.rendering.assets.material.Material;
 import org.terasology.engine.rendering.assets.mesh.Mesh;
 import org.terasology.engine.rendering.assets.mesh.MeshBuilder;
-import org.terasology.engine.rendering.assets.shader.ShaderProgramFeature;
 import org.terasology.engine.rendering.assets.texture.TextureRegion;
 import org.terasology.engine.rendering.opengl.FrameBufferObject;
 import org.terasology.engine.rendering.opengl.LwjglFrameBufferObject;
@@ -43,7 +42,6 @@ import org.terasology.nui.TextLineBuilder;
 import org.terasology.nui.UITextureRegion;
 import org.terasology.nui.VerticalAlign;
 import org.terasology.nui.asset.font.Font;
-import org.terasology.nui.util.RectUtility;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -88,7 +86,7 @@ public class LwjglCanvasRenderer implements TerasologyCanvasRenderer, PropertyCh
     private DisplayDevice displayDevice;
     private float uiScale = 1f;
 
-    private Matrix4fStack modelMatrixStack = new Matrix4fStack(100000);
+    private Matrix4fStack modelMatrixStack = new Matrix4fStack(10000);
     private Matrix4f projMatrix = new Matrix4f();
 
     public LwjglCanvasRenderer(Context context) {
@@ -117,8 +115,6 @@ public class LwjglCanvasRenderer implements TerasologyCanvasRenderer, PropertyCh
         projMatrix.setOrtho(0, displayDevice.getWidth(), displayDevice.getHeight(),0,0, 2048f);
         modelMatrixStack.pushMatrix();
         modelMatrixStack.set(new Matrix4f().setTranslation(0,0,-1024));
-//        modelMatrixStack.setTranslation(0,0,-1024);
-//        defaultTransform.set(modelMatrixStack);
         modelMatrixStack.scale(uiScale, uiScale, uiScale);
 
         requestedCropRegion = new Rectanglei(0, 0,displayDevice.getWidth(), displayDevice.getHeight());
@@ -271,7 +267,7 @@ public class LwjglCanvasRenderer implements TerasologyCanvasRenderer, PropertyCh
         switch (mode) {
             case TILED: {
                 Vector2i textureSize = texture.size();
-                TextureCacheKey key = new TextureCacheKey(textureSize, new Vector2i(absoluteRegion.lengthX(),absoluteRegion.lengthY()));
+                TextureCacheKey key = new TextureCacheKey(textureSize, new Vector2i(absoluteRegion.getSizeX(),absoluteRegion.getSizeY()));
                 usedTextures.add(key);
                 mesh = cachedTextures.get(key);
                 if (mesh == null || mesh.isDisposed()) {
@@ -285,30 +281,30 @@ public class LwjglCanvasRenderer implements TerasologyCanvasRenderer, PropertyCh
                         absoluteRegion.minX,
                         absoluteRegion.minY);
 
-                textureMat.setFloat2("texOffset", textureArea.minX + ux * textureArea.lengthX(), textureArea.minY + uy * textureArea.lengthY());
-                textureMat.setFloat2("texSize", uw * textureArea.lengthX(), uh * textureArea.lengthY());
+                textureMat.setFloat2("texOffset", textureArea.minX + ux * textureArea.getSizeX(), textureArea.minY + uy * textureArea.getSizeY());
+                textureMat.setFloat2("texSize", uw * textureArea.getSizeX(), uh * textureArea.getSizeY());
                 break;
             }
             case SCALE_FILL: {
                 textureMat.setFloat2("offset", absoluteRegion.minX, absoluteRegion.minY);
-                textureMat.setFloat2("scale", absoluteRegion.lengthX(), absoluteRegion.lengthY());
+                textureMat.setFloat2("scale", absoluteRegion.getSizeX(), absoluteRegion.getSizeY());
 
-                float texBorderX = (scale.x - absoluteRegion.lengthX()) / scale.x * uw;
-                float texBorderY = (scale.y - absoluteRegion.lengthY()) / scale.y * uh;
+                float texBorderX = (scale.x - absoluteRegion.getSizeX()) / scale.x * uw;
+                float texBorderY = (scale.y - absoluteRegion.getSizeY()) / scale.y * uh;
 
-                textureMat.setFloat2("texOffset", textureArea.minX + (ux + 0.5f * texBorderX) * textureArea.lengthX(),
-                        textureArea.minY + (uy + 0.5f * texBorderY) * textureArea.lengthY());
-                textureMat.setFloat2("texSize", (uw - texBorderX) * textureArea.lengthX(), (uh - texBorderY) * textureArea.lengthY());
+                textureMat.setFloat2("texOffset", textureArea.minX + (ux + 0.5f * texBorderX) * textureArea.getSizeX(),
+                        textureArea.minY + (uy + 0.5f * texBorderY) * textureArea.getSizeY());
+                textureMat.setFloat2("texSize", (uw - texBorderX) * textureArea.getSizeX(), (uh - texBorderY) * textureArea.getSizeY());
                 break;
             }
             default: {
                 textureMat.setFloat2("scale", scale);
                 textureMat.setFloat2("offset",
-                        absoluteRegion.minX + 0.5f * (absoluteRegion.lengthX() - scale.x),
-                        absoluteRegion.minY + 0.5f * (absoluteRegion.lengthY() - scale.y));
+                        absoluteRegion.minX + 0.5f * (absoluteRegion.getSizeX() - scale.x),
+                        absoluteRegion.minY + 0.5f * (absoluteRegion.getSizeY() - scale.y));
 
-                textureMat.setFloat2("texOffset", textureArea.minX + ux * textureArea.lengthX(), textureArea.minY + uy * textureArea.lengthY());
-                textureMat.setFloat2("texSize", uw * textureArea.lengthX(), uh * textureArea.lengthY());
+                textureMat.setFloat2("texOffset", textureArea.minX + ux * textureArea.getSizeX(), textureArea.minY + uy * textureArea.getSizeY());
+                textureMat.setFloat2("texSize", uw * textureArea.getSizeX(), uh * textureArea.getSizeY());
                 break;
             }
         }
@@ -328,10 +324,10 @@ public class LwjglCanvasRenderer implements TerasologyCanvasRenderer, PropertyCh
                          Colorc color, Colorc shadowColor, float alpha, boolean underlined) {
         Rectanglei absoluteRegion = new Rectanglei(absoluteRegionRectangle);
 
-        TextCacheKey key = new TextCacheKey(text, font, absoluteRegion.lengthX(), hAlign, color, shadowColor, underlined);
+        TextCacheKey key = new TextCacheKey(text, font, absoluteRegion.getSizeX(), hAlign, color, shadowColor, underlined);
         usedText.add(key);
         Map<Material, Mesh> fontMesh = cachedText.get(key);
-        List<String> lines = TextLineBuilder.getLines(font, text, absoluteRegion.lengthX());
+        List<String> lines = TextLineBuilder.getLines(font, text, absoluteRegion.getSizeX());
         if (fontMesh != null) {
             for (Mesh mesh : fontMesh.values()) {
                 if (mesh.isDisposed()) {
@@ -341,7 +337,7 @@ public class LwjglCanvasRenderer implements TerasologyCanvasRenderer, PropertyCh
             }
         }
         if (fontMesh == null) {
-            fontMesh = fontMeshBuilder.createTextMesh((org.terasology.engine.rendering.assets.font.Font)font, lines, absoluteRegion.lengthX(), hAlign, color, shadowColor, underlined);
+            fontMesh = fontMeshBuilder.createTextMesh((org.terasology.engine.rendering.assets.font.Font)font, lines, absoluteRegion.getSizeX(), hAlign, color, shadowColor, underlined);
             cachedText.put(key, fontMesh);
         }
 
@@ -378,7 +374,7 @@ public class LwjglCanvasRenderer implements TerasologyCanvasRenderer, PropertyCh
 
         Vector2i textureSize = new Vector2i(TeraMath.ceilToInt(texture.getWidth() * uw), TeraMath.ceilToInt(texture.getHeight() * uh));
 
-        TextureCacheKey key = new TextureCacheKey(textureSize, new Vector2i(region.lengthX(), region.lengthY()), border, tile);
+        TextureCacheKey key = new TextureCacheKey(textureSize, new Vector2i(region.getSizeX(), region.getSizeY()), border, tile);
         usedTextures.add(key);
         Mesh mesh = cachedTextures.get(key);
         if (mesh == null || mesh.isDisposed()) {
@@ -389,20 +385,21 @@ public class LwjglCanvasRenderer implements TerasologyCanvasRenderer, PropertyCh
             float leftTex = (float) border.getLeft() / textureSize.x;
             float bottomTex = 1f - (float) border.getBottom() / textureSize.y;
             float rightTex = 1f - (float) border.getRight() / textureSize.x;
-            int centerHoriz = region.lengthX() - border.getTotalWidth();
-            int centerVert = region.lengthY() - border.getTotalHeight();
+            int centerHoriz = region.getSizeX() - border.getTotalWidth();
+            int centerVert = region.getSizeY() - border.getTotalHeight();
 
-            float top = (float) border.getTop() / region.lengthY();
-            float left = (float) border.getLeft() / region.lengthX();
-            float bottom = 1f - (float) border.getBottom() / region.lengthY();
-            float right = 1f - (float) border.getRight() / region.lengthX();
+            float top = (float) border.getTop() / region.getSizeY();
+            float left = (float) border.getLeft() / region.getSizeX();
+            float bottom = 1f - (float) border.getBottom() / region.getSizeY();
+            float right = 1f - (float) border.getRight() / region.getSizeX();
 
             if (border.getTop() != 0) {
                 if (border.getLeft() != 0) {
                     addRectPoly(builder, 0, 0, left, top, 0, 0, leftTex, topTex);
                 }
                 if (tile) {
-                    addTiles(builder, RectUtility.createFromMinAndSize(border.getLeft(), 0, centerHoriz, border.getTop()),
+
+                    addTiles(builder, new Rectanglei(border.getLeft(), 0).setSize(centerHoriz, border.getTop()),
                         new Rectanglef(left, 0, right, top),
                         new Vector2i(textureSize.x - border.getTotalWidth(), border.getTop()),
                         new Rectanglef(leftTex, 0, rightTex, topTex));
@@ -416,7 +413,7 @@ public class LwjglCanvasRenderer implements TerasologyCanvasRenderer, PropertyCh
 
             if (border.getLeft() != 0) {
                 if (tile) {
-                    addTiles(builder, RectUtility.createFromMinAndSize(0, border.getTop(), border.getLeft(), centerVert),
+                    addTiles(builder, new Rectanglei(0, border.getTop()).setSize(border.getLeft(), centerVert),
                         new Rectanglef(0, top, left, bottom),
                         new Vector2i(border.getLeft(), textureSize.y - border.getTotalHeight()),
                         new Rectanglef(0, topTex, leftTex, bottomTex));
@@ -426,7 +423,7 @@ public class LwjglCanvasRenderer implements TerasologyCanvasRenderer, PropertyCh
             }
 
             if (tile) {
-                addTiles(builder, RectUtility.createFromMinAndSize(border.getLeft(), border.getTop(), centerHoriz, centerVert),
+                addTiles(builder, new Rectanglei(border.getLeft(), border.getTop()).setSize(centerHoriz, centerVert),
                     new Rectanglef(left, top, right, bottom),
                     new Vector2i(textureSize.x - border.getTotalWidth(), textureSize.y - border.getTotalHeight()),
                     new Rectanglef(leftTex, topTex, rightTex, bottomTex));
@@ -436,7 +433,7 @@ public class LwjglCanvasRenderer implements TerasologyCanvasRenderer, PropertyCh
 
             if (border.getRight() != 0) {
                 if (tile) {
-                    addTiles(builder, RectUtility.createFromMinAndSize(region.lengthX() - border.getRight(), border.getTop(), border.getRight(), centerVert),
+                    addTiles(builder, new Rectanglei(region.getSizeX() - border.getRight(), border.getTop()).setSize(border.getRight(), centerVert),
                         new Rectanglef(right, top, 1, bottom),
                         new Vector2i(border.getRight(), textureSize.y - border.getTotalHeight()),
                         new Rectanglef(rightTex, topTex, 1, bottomTex));
@@ -450,7 +447,7 @@ public class LwjglCanvasRenderer implements TerasologyCanvasRenderer, PropertyCh
                     addRectPoly(builder, 0, bottom, left, 1, 0, bottomTex, leftTex, 1);
                 }
                 if (tile) {
-                    addTiles(builder, RectUtility.createFromMinAndSize(border.getLeft(), region.lengthY() - border.getBottom(), centerHoriz, border.getBottom()),
+                    addTiles(builder, new Rectanglei(border.getLeft(), region.getSizeY() - border.getBottom()).setSize(centerHoriz, border.getBottom()),
                         new Rectanglef(left, bottom, right, 1),
                         new Vector2i(textureSize.x - border.getTotalWidth(), border.getBottom()),
                         new Rectanglef(leftTex, bottomTex, rightTex, 1));
@@ -465,7 +462,7 @@ public class LwjglCanvasRenderer implements TerasologyCanvasRenderer, PropertyCh
             mesh = builder.build();
             cachedTextures.put(key, mesh);
         }
-        textureMat.setFloat2("scale", region.lengthX(), region.lengthY());
+        textureMat.setFloat2("scale", region.getSizeX(), region.getSizeY());
         textureMat.setFloat2("offset", region.minX, region.minY);
 
         Rectanglef textureArea = texture.getRegion();
@@ -494,25 +491,25 @@ public class LwjglCanvasRenderer implements TerasologyCanvasRenderer, PropertyCh
     private void addTiles(MeshBuilder builder, Rectanglei drawRegion, Rectanglef subDrawRegion, Vector2i textureSize, Rectanglef subTextureRegion) {
         int tileW = textureSize.x;
         int tileH = textureSize.y;
-        int horizTiles = TeraMath.fastAbs((drawRegion.lengthX() - 1) / tileW) + 1;
-        int vertTiles = TeraMath.fastAbs((drawRegion.lengthY() - 1) / tileH) + 1;
+        int horizTiles = TeraMath.fastAbs((drawRegion.getSizeX() - 1) / tileW) + 1;
+        int vertTiles = TeraMath.fastAbs((drawRegion.getSizeY() - 1) / tileH) + 1;
 
-        int offsetX = (drawRegion.lengthX() - horizTiles * tileW) / 2;
-        int offsetY = (drawRegion.lengthY() - vertTiles * tileH) / 2;
+        int offsetX = (drawRegion.getSizeX() - horizTiles * tileW) / 2;
+        int offsetY = (drawRegion.getSizeY() - vertTiles * tileH) / 2;
 
         for (int tileY = 0; tileY < vertTiles; tileY++) {
             for (int tileX = 0; tileX < horizTiles; tileX++) {
                 int left = offsetX + tileW * tileX;
                 int top = offsetY + tileH * tileY;
 
-                float vertLeft = subDrawRegion.minX + subDrawRegion.lengthX() * Math.max((float) left / drawRegion.lengthX(), 0);
-                float vertTop = subDrawRegion.minY + subDrawRegion.lengthY() * Math.max((float) top / drawRegion.lengthY(), 0);
-                float vertRight = subDrawRegion.minX + subDrawRegion.lengthX() * Math.min((float) (left + tileW) / drawRegion.lengthX(), 1);
-                float vertBottom = subDrawRegion.minY + subDrawRegion.lengthY() * Math.min((float) (top + tileH) / drawRegion.lengthY(), 1);
-                float texCoordLeft = subTextureRegion.minX + subTextureRegion.lengthX() * (Math.max(left, 0) - left) / tileW;
-                float texCoordTop = subTextureRegion.minY + subTextureRegion.lengthY() * (Math.max(top, 0) - top) / tileH;
-                float texCoordRight = subTextureRegion.minX + subTextureRegion.lengthX() * (Math.min(left + tileW, drawRegion.lengthX()) - left) / tileW;
-                float texCoordBottom = subTextureRegion.minY + subTextureRegion.lengthY() * (Math.min(top + tileH, drawRegion.lengthY()) - top) / tileH;
+                float vertLeft = subDrawRegion.minX + subDrawRegion.getSizeX() * Math.max((float) left / drawRegion.getSizeX(), 0);
+                float vertTop = subDrawRegion.minY + subDrawRegion.getSizeY() * Math.max((float) top / drawRegion.getSizeY(), 0);
+                float vertRight = subDrawRegion.minX + subDrawRegion.getSizeX() * Math.min((float) (left + tileW) / drawRegion.getSizeX(), 1);
+                float vertBottom = subDrawRegion.minY + subDrawRegion.getSizeY() * Math.min((float) (top + tileH) / drawRegion.getSizeY(), 1);
+                float texCoordLeft = subTextureRegion.minX + subTextureRegion.getSizeX() * (Math.max(left, 0) - left) / tileW;
+                float texCoordTop = subTextureRegion.minY + subTextureRegion.getSizeY() * (Math.max(top, 0) - top) / tileH;
+                float texCoordRight = subTextureRegion.minX + subTextureRegion.getSizeX() * (Math.min(left + tileW, drawRegion.getSizeX()) - left) / tileW;
+                float texCoordBottom = subTextureRegion.minY + subTextureRegion.getSizeY() * (Math.min(top + tileH, drawRegion.getSizeY()) - top) / tileH;
 
                 addRectPoly(builder, vertLeft, vertTop, vertRight, vertBottom, texCoordLeft, texCoordTop, texCoordRight, texCoordBottom);
             }

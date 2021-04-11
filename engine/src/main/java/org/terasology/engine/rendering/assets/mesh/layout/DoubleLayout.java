@@ -3,30 +3,29 @@
 
 package org.terasology.engine.rendering.assets.mesh.layout;
 
-import gnu.trove.list.TIntList;
+import gnu.trove.list.TDoubleList;
 
 import java.nio.ByteBuffer;
 
-public class IntLayout extends Layout<TIntList> {
-    public IntLayout(int location, int size, TIntList buffer, int flags) {
-        super(location, size, buffer, flags);
+public class DoubleLayout extends Layout<TDoubleList> {
+    public DoubleLayout(int location, int size, TDoubleList buffer, int flags) {
+        super(location, size, buffer, flags | Layout.FLOATING_POINT);
     }
 
     @Override
     public boolean hasContent() {
-        return this.buffer.size() > 0;
+        return buffer.size() > 0;
     }
 
     @Override
     public void write(int index, ByteBuffer data) {
         for (int x = 0; x < size; x++) {
-            data.putInt(buffer.get(index * size + x));
+            data.putDouble(buffer.get(index * size + x));
         }
     }
 
     @Override
     public int bytes() {
-        return this.size * Integer.BYTES;
+        return this.size * Double.BYTES;
     }
-
 }

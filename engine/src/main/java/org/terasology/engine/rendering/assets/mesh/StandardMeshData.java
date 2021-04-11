@@ -6,6 +6,7 @@ package org.terasology.engine.rendering.assets.mesh;
 import gnu.trove.list.TFloatList;
 import gnu.trove.list.array.TFloatArrayList;
 import org.terasology.engine.rendering.assets.mesh.layout.FloatLayout;
+import org.terasology.engine.rendering.assets.mesh.layout.Layout;
 
 public class StandardMeshData extends MeshData {
     public final TFloatList vertices;
@@ -23,12 +24,12 @@ public class StandardMeshData extends MeshData {
         this.color0 = new TFloatArrayList();
         this.light0 = new TFloatArrayList();
 
-        addLayout(new FloatLayout(0, 3, vertices));
-        addLayout(new FloatLayout(1, 3, normals));
-        addLayout(new FloatLayout(2, 2, uv0));
-        addLayout(new FloatLayout(3, 2, uv1));
-        addLayout(new FloatLayout(4, 4, color0));
-        addLayout(new FloatLayout(5, 3, light0));
+        addLayout(new FloatLayout(0, 3, vertices, Layout.FLOATING_POINT));
+        addLayout(new FloatLayout(1, 3, normals, Layout.FLOATING_POINT));
+        addLayout(new FloatLayout(2, 2, uv0, Layout.FLOATING_POINT));
+        addLayout(new FloatLayout(3, 2, uv1, Layout.FLOATING_POINT));
+        addLayout(new FloatLayout(4, 4, color0, Layout.FLOATING_POINT));
+        addLayout(new FloatLayout(5, 3, light0, Layout.FLOATING_POINT));
     }
 
 

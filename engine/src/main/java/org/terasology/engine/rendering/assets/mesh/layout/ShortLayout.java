@@ -3,30 +3,29 @@
 
 package org.terasology.engine.rendering.assets.mesh.layout;
 
-import gnu.trove.list.TIntList;
+import gnu.trove.list.TShortList;
 
 import java.nio.ByteBuffer;
 
-public class IntLayout extends Layout<TIntList> {
-    public IntLayout(int location, int size, TIntList buffer, int flags) {
+public class ShortLayout extends Layout<TShortList> {
+    public ShortLayout(int location, int size, TShortList buffer, int flags) {
         super(location, size, buffer, flags);
     }
 
     @Override
     public boolean hasContent() {
-        return this.buffer.size() > 0;
+        return buffer.size() > 0;
     }
 
     @Override
     public void write(int index, ByteBuffer data) {
         for (int x = 0; x < size; x++) {
-            data.putInt(buffer.get(index * size + x));
+            data.putShort(buffer.get(index * size + x));
         }
     }
 
     @Override
     public int bytes() {
-        return this.size * Integer.BYTES;
+        return this.size * Short.BYTES;
     }
-
 }
