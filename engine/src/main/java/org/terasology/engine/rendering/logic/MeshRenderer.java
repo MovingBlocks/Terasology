@@ -167,7 +167,6 @@ public class MeshRenderer extends BaseComponentSystem implements RenderSystem {
 
         for (Material material : meshByMaterial.keySet()) {
             if (material.isRenderable()) {
-                OpenGLMesh lastMesh = null;
                 material.enable();
                 material.setFloat("sunlight", 1.0f, true);
                 material.setFloat("blockLight", 1.0f, true);
@@ -202,14 +201,6 @@ public class MeshRenderer extends BaseComponentSystem implements RenderSystem {
 
                     AABBf aabb = meshComp.mesh.getAABB().transform(new Matrix4f().translationRotateScale(worldPos, worldRot, worldScale), new AABBf());
                     if (worldRenderer.getActiveCamera().hasInSight(aabb)) {
-                        if (meshComp.mesh != lastMesh) {
-                            if (lastMesh != null) {
-                                lastMesh.postRender();
-                            }
-                            lastMesh = (OpenGLMesh) meshComp.mesh;
-                            lastMesh.preRender();
-                        }
-
                         modelViewMatrix.set(worldRenderer.getActiveCamera().getViewMatrix()).mul(matrixCameraSpace);
                         modelViewMatrix.get(tempMatrixBuffer44);
                         modelViewMatrix.normal(normalMatrix).get(tempMatrixBuffer33);
@@ -222,11 +213,8 @@ public class MeshRenderer extends BaseComponentSystem implements RenderSystem {
                         material.setFloat("sunlight", worldRenderer.getMainLightIntensityAt(worldPos), true);
                         material.setFloat("blockLight", Math.max(worldRenderer.getBlockLightIntensityAt(worldPos), meshComp.selfLuminance), true);
 
-                        lastMesh.doRender();
+                        meshComp.mesh.render();
                     }
-                }
-                if (lastMesh != null) {
-                    lastMesh.postRender();
                 }
             }
         }

@@ -1,33 +1,30 @@
-/*
- * Copyright 2013 Moving Blocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+#version 330 core
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 
+layout (location = 0) in vec3 in_vert;
+layout (location = 1) in vec3 in_normal;
+layout (location = 2) in vec2 in_uv0;
+layout (location = 4) in vec4 in_color0;
+
+out vec3 v_normal;
+out vec2 v_relPos;
+out vec2 v_uv0;
+out vec4 v_color0;
+
+uniform mat4 modelView;
+uniform mat4 proj;
 
 uniform float alpha;
-uniform mat4 posMatrix;
-
-varying vec3 normal;
-varying vec2 relPos;
 
 void main()
 {
-    vec3 pos = (posMatrix * gl_Vertex).xyz;
-    relPos = pos.xy;
+    mat4 normalMatrix = transpose(inverse(modelView));
 
-    normal = normalize(gl_NormalMatrix * gl_Normal);
-    gl_Position = ftransform();
-    gl_TexCoord[0] = gl_MultiTexCoord0;
-    gl_FrontColor = vec4(gl_Color.rgb, gl_Color.a * alpha);
+    gl_Position = (proj * modelView) * vec4(in_vert, 1.0);
+    v_relPos = gl_Position.xy;
+
+    v_normal = (normalMatrix * vec4(in_normal,1.0)).xyz;
+    v_uv0 = in_uv0;
+    v_color0 = vec4(in_color0.rgb, in_color0.a * alpha);
 }
