@@ -58,7 +58,7 @@ class VectorTypeSerializerTest extends ModuleEnvironmentTest {
     }
 
     @Test
-    void testSerializationConstant() throws IOException {
+    void testSerializationConstant() {
         TestObject2 a = new TestObject2();
         a.v1 = new Vector3f(1.0f, 2.0f, 3.0f);
         a.v2 = new Vector4f(1.0f, 2.0f, 3.0f, 5.0f);
@@ -68,9 +68,9 @@ class VectorTypeSerializerTest extends ModuleEnvironmentTest {
 
         TestObject2 o = gsonSerializer.deserialize(new TypeInfo<TestObject2>() {
         },data).get();
-        assertEquals(o.v1, new Vector3f(1.0f, 2.0f, 3.0f), .00001f);
-        assertEquals(o.v2, new Vector4f(1.0f, 2.0f, 3.0f, 5.0f), .00001f);
-        assertEquals(o.v3, new Vector2f(1.0f, 2.0f), .00001f);
+        assertEquals(new Vector3f(1.0f, 2.0f, 3.0f), o.v1, .00001f);
+        assertEquals(new Vector4f(1.0f, 2.0f, 3.0f, 5.0f), o.v2, .00001f);
+        assertEquals(new Vector2f(1.0f, 2.0f), o.v3, .00001f);
     }
 
     @Test
@@ -86,9 +86,9 @@ class VectorTypeSerializerTest extends ModuleEnvironmentTest {
         TestObject o = protobufSerializer.fromBytes(data, new TypeInfo<TestObject>() {
         });
 
-        assertEquals(o.v1, new Vector3f(11.5f, 13.15f, 3), .00001f);
-        assertEquals(o.v2, new Vector2f(12f, 13f), .00001f);
-        assertEquals(o.v3, new Vector4f(12, 12.2f, 3f, 15.5f), .00001f);
+        assertEquals(new Vector3f(11.5f, 13.15f, 3), o.v1, .00001f);
+        assertEquals(new Vector2f(12f, 13f), o.v2, .00001f);
+        assertEquals(new Vector4f(12, 12.2f, 3f, 15.5f), o.v3, .00001f);
     }
 
     @Test
@@ -104,8 +104,8 @@ class VectorTypeSerializerTest extends ModuleEnvironmentTest {
         TestObject o = protobufSerializer.fromBytes(bytes, new TypeInfo<TestObject>() {
         });
 
-        assertEquals(o.v1, new Vector3f(11.5f, 13.15f, 3), .00001f);
-        assertEquals(o.v2, new Vector2f(12f, 13f), .00001f);
-        assertEquals(o.v3, new Vector4f(12, 12.2f, 3f, 15.5f), .00001f);
+        assertEquals(new Vector3f(11.5f, 13.15f, 3), o.v1, .00001f);
+        assertEquals(new Vector2f(12f, 13f), o.v2, .00001f);
+        assertEquals(new Vector4f(12, 12.2f, 3f, 15.5f), o.v3, .00001f);
     }
 }
