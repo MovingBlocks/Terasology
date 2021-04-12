@@ -113,8 +113,10 @@ public class BlockSelectionRenderer {
         final Vector3f cameraPosition = camera.getPosition();
 
         Matrix4f modelView = new Matrix4f();
-        modelView.setTranslation(blockPos.x() - cameraPosition.x, blockPos.y() - cameraPosition.y,
-                blockPos.z() - cameraPosition.z);
+        modelView.set(camera.getViewMatrix()).mul(new Matrix4f().setTranslation(
+                blockPos.x() - cameraPosition.x, blockPos.y() - cameraPosition.y,
+                blockPos.z() - cameraPosition.z
+        ));
         defaultTextured.setMatrix4("modelViewMatrix", modelView);
 
         overlayMesh.render();
@@ -125,8 +127,10 @@ public class BlockSelectionRenderer {
         final Vector3f cameraPosition = camera.getPosition();
 
         Matrix4f modelView = new Matrix4f();
-        modelView.setTranslation(blockPos.x() - cameraPosition.x, blockPos.y() - cameraPosition.y,
-                blockPos.z() - cameraPosition.z);
+        modelView.set(camera.getViewMatrix()).mul(new Matrix4f().setTranslation(
+                blockPos.x() - cameraPosition.x, blockPos.y() - cameraPosition.y,
+                blockPos.z() - cameraPosition.z
+        ));
         defaultTextured.setMatrix4("modelViewMatrix", modelView);
 
         overlayMesh2.render();

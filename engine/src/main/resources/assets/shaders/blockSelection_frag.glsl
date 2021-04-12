@@ -14,7 +14,7 @@ void main(){
     if (diffColor.a < 0.1) {
         discard;
     }
-        #endif
+    #endif
 
     gl_FragData[0].rgba = diffColor * v_color0;
     gl_FragData[1].rgba = vec4(0.5, 1.0, 0.5, 1.0);
