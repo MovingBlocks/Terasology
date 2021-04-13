@@ -27,6 +27,7 @@ import org.terasology.nui.databinding.Binding;
 import org.terasology.nui.databinding.ReadOnlyBinding;
 import org.terasology.nui.itemRendering.ToStringTextRenderer;
 import org.terasology.nui.skin.UISkin;
+import org.terasology.nui.skin.UISkinAsset;
 import org.terasology.nui.skin.UISkinData;
 import org.terasology.nui.widgets.UIBox;
 import org.terasology.nui.widgets.UIButton;
@@ -142,7 +143,7 @@ public final class NUISkinEditorScreen extends AbstractEditorScreen {
         // Populate the list of screens.
         List<String> availableAssetList = Lists.newArrayList();
         availableAssetList.add(CREATE_NEW_SKIN);
-        availableAssetList.addAll(assetManager.getAvailableAssets(UISkin.class).stream().map(Object::toString).collect(Collectors.toList()));
+        availableAssetList.addAll(assetManager.getAvailableAssets(UISkinAsset.class).stream().map(Object::toString).collect(Collectors.toList()));
 
         Collections.sort(availableAssetList);
 
@@ -300,10 +301,10 @@ public final class NUISkinEditorScreen extends AbstractEditorScreen {
      */
     @Override
     public void selectAsset(ResourceUrn urn) {
-        boolean isLoaded = assetManager.isLoaded(urn, UISkin.class);
-        Optional<UISkin> asset = assetManager.getAsset(urn, UISkin.class);
+        boolean isLoaded = assetManager.isLoaded(urn, UISkinAsset.class);
+        Optional<UISkinAsset> asset = assetManager.getAsset(urn, UISkinAsset.class);
         if (asset.isPresent()) {
-            UISkin skin = asset.get();
+            UISkinAsset skin = asset.get();
             if (!isLoaded) {
                 asset.get().dispose();
             }
@@ -374,7 +375,7 @@ public final class NUISkinEditorScreen extends AbstractEditorScreen {
                     UIWidget widget = new UIFormat().load(screenElement, alternativeLocale).getRootWidget();
 
                     // Set the screen's skin using the previously generated UISkinData.
-                    widget.setSkin(Assets.generateAsset(data, UISkin.class));
+                    widget.setSkin(Assets.generateAsset(data, UISkinAsset.class).getSkin());
                     selectedScreenBox.setContent(widget);
                 }
 
@@ -497,10 +498,10 @@ public final class NUISkinEditorScreen extends AbstractEditorScreen {
      */
     @Override
     protected void setSelectedAssetPath(ResourceUrn urn) {
-        boolean isLoaded = assetManager.isLoaded(urn, UISkin.class);
-        Optional<UISkin> asset = assetManager.getAsset(urn, UISkin.class);
+        boolean isLoaded = assetManager.isLoaded(urn, UISkinAsset.class);
+        Optional<UISkinAsset> asset = assetManager.getAsset(urn, UISkinAsset.class);
         if (asset.isPresent()) {
-            UISkin skin = asset.get();
+            UISkinAsset skin = asset.get();
             if (!isLoaded) {
                 asset.get().dispose();
             }

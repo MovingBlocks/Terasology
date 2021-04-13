@@ -183,7 +183,7 @@ public class BulletPhysics implements PhysicsEngine {
         List<EntityRef> result = Lists.newArrayList();
         for (int i = 0; i < scanObject.getNumOverlappingObjects(); ++i) {
             btCollisionObject other = scanObject.getOverlappingObject(i);
-            Object userObj = other.getUserPointer();
+            Object userObj = other.userData;
             if (userObj instanceof EntityRef) {
                 result.add((EntityRef) userObj);
             }

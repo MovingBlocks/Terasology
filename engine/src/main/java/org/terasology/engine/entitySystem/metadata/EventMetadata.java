@@ -41,7 +41,7 @@ public class EventMetadata<T extends Event> extends ClassMetadata<T, ReplicatedF
     private boolean skipInstigator;
 
     public EventMetadata(Class<T> simpleClass, CopyStrategyLibrary copyStrategies, ReflectFactory factory, ResourceUrn uri) throws NoSuchMethodException {
-        super(uri, simpleClass, factory, copyStrategies, Predicates.<Field>alwaysTrue());
+        super(uri.toString(), simpleClass, factory, copyStrategies, Predicates.<Field>alwaysTrue());
         if (simpleClass.getAnnotation(ServerEvent.class) != null) {
             networkEventType = NetworkEventType.SERVER;
             lagCompensated = simpleClass.getAnnotation(ServerEvent.class).lagCompensate();

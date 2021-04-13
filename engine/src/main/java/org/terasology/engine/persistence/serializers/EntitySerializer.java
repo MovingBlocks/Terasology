@@ -332,7 +332,7 @@ public class EntitySerializer {
             ComponentMetadata<?> metadata = componentLibrary.getMetadata(prefabComponent.getClass());
             if (!presentClasses.contains(prefabComponent.getClass()) && componentSerializeCheck.serialize(metadata)) {
                 // TODO: Use component ids here
-                entity.addRemovedComponent(metadata.getUri().toString());
+                entity.addRemovedComponent(metadata.getId().toString());
             }
         }
         return entity.build();

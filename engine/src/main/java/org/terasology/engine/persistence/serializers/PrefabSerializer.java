@@ -86,7 +86,7 @@ public class PrefabSerializer {
         if (prefab.getParent() != null) {
             for (Component parentComp : prefab.getParent().iterateComponents()) {
                 if (!prefab.hasComponent(parentComp.getClass())) {
-                    prefabData.addRemovedComponent(componentLibrary.getMetadata(parentComp).getUri().toString());
+                    prefabData.addRemovedComponent(componentLibrary.getMetadata(parentComp).getId().toString());
                 }
             }
         }

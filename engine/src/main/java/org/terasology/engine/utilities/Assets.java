@@ -24,6 +24,7 @@ import org.terasology.engine.rendering.assets.shader.Shader;
 import org.terasology.engine.rendering.assets.texture.Texture;
 import org.terasology.engine.rendering.assets.texture.TextureRegionAsset;
 import org.terasology.nui.skin.UISkin;
+import org.terasology.nui.skin.UISkinAsset;
 
 import java.util.Optional;
 import java.util.Set;
@@ -267,7 +268,12 @@ public final class Assets {
 //    }
 //
     public static Optional<UISkin> getSkin(String uri) {
-        return get(uri, UISkin.class);
+        Optional<UISkinAsset> skinAsset = get(uri, UISkinAsset.class);
+        if (skinAsset.isPresent()) {
+            return Optional.of(skinAsset.get().getSkin());
+        } else {
+            return Optional.empty();
+        }
     }
 
 

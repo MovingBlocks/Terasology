@@ -23,6 +23,7 @@ import org.terasology.assets.module.annotations.RegisterAssetFileFormat;
 import org.terasology.engine.core.module.ModuleContext;
 import org.terasology.engine.i18n.TranslationSystem;
 import org.terasology.engine.persistence.typeHandling.extensionTypes.AssetTypeHandler;
+import org.terasology.engine.persistence.typeHandling.extensionTypes.UISkinTypeHandler;
 import org.terasology.engine.persistence.typeHandling.gson.GsonTypeSerializationLibraryAdapterFactory;
 import org.terasology.engine.registry.CoreRegistry;
 import org.terasology.engine.rendering.nui.CoreScreenLayer;
@@ -34,6 +35,7 @@ import org.terasology.nui.UILayout;
 import org.terasology.nui.UIWidget;
 import org.terasology.nui.asset.UIData;
 import org.terasology.nui.skin.UISkin;
+import org.terasology.nui.skin.UISkinAsset;
 import org.terasology.nui.widgets.UILabel;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.reflection.metadata.ClassMetadata;
@@ -86,7 +88,8 @@ public class UIFormat extends AbstractAssetFileFormat<UIData> {
         NUIManager nuiManager = CoreRegistry.get(NUIManager.class);
         TranslationSystem translationSystem = CoreRegistry.get(TranslationSystem.class);
         TypeHandlerLibrary library = CoreRegistry.get(TypeHandlerLibrary.class).copy();
-        library.addTypeHandler(UISkin.class, new AssetTypeHandler<>(UISkin.class));
+        library.addTypeHandler(UISkinAsset.class, new AssetTypeHandler<>(UISkinAsset.class));
+        library.addTypeHandler(UISkin.class, new UISkinTypeHandler());
 
         // TODO: Rewrite to use TypeHandlerLibrary
 
@@ -172,7 +175,7 @@ public class UIFormat extends AbstractAssetFileFormat<UIData> {
             if (id != null) {
                 FieldMetadata<?, ?> fieldMetadata = elementMetadata.getField(ID_FIELD);
                 if (fieldMetadata == null) {
-                    logger.warn("UIWidget type {} lacks id field", elementMetadata.getUri());
+                    logger.warn("UIWidget type {} lacks id field", elementMetadata.getId());
                 } else {
                     fieldMetadata.setValue(element, id);
                 }
