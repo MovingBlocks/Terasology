@@ -94,10 +94,11 @@ public class BlockSelectionRenderer {
             return;
         }
         Camera camera = worldRenderer.getActiveCamera();
-        defaultTextured.activateFeature(ShaderProgramFeature.FEATURE_ALPHA_REJECT);
         defaultTextured.enable();
+        defaultTextured.activateFeature(ShaderProgramFeature.FEATURE_ALPHA_REJECT);
         defaultTextured.setMatrix4("projectionMatrix", camera.getProjectionMatrix());
         defaultTextured.setTexture("texture", effectsTexture);
+        defaultTextured.bindTextures();
 
         glEnable(GL11.GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -118,6 +119,7 @@ public class BlockSelectionRenderer {
                 blockPos.z() - cameraPosition.z
         ));
         defaultTextured.setMatrix4("modelViewMatrix", modelView);
+
 
         overlayMesh.render();
     }
