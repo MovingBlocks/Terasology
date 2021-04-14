@@ -33,6 +33,7 @@ import org.terasology.module.sandbox.PermissionProviderFactory;
 import org.terasology.module.sandbox.StandardPermissionProviderFactory;
 import org.terasology.module.sandbox.WarnOnlyProviderFactory;
 import org.terasology.nui.UIWidget;
+import org.terasology.reflection.ModuleTypeRegistry;
 import org.terasology.reflection.TypeRegistry;
 
 import java.io.IOException;
@@ -133,6 +134,7 @@ public class ModuleManager {
             additionalClassesList.add(UIWidget.class); // provide access to nui.jar
             additionalClassesList.add(TypeRegistry.class); // provide access to nui-reflect.jar
             additionalClassesList.add(KeyboardDevice.class); // provide access to nui-input.jar
+            additionalClassesList.add(ModuleTypeRegistry.class); // provide access to nui-gestalt7.jar
             additionalClassesList.addAll(classesOnClasspathsToAddToEngine); // provide access to any facade-provided classes
             Class<?>[] additionalClassesArray = new Class[additionalClassesList.size()];
             additionalClassesArray = additionalClassesList.toArray(additionalClassesArray);

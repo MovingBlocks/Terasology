@@ -9,7 +9,7 @@ import org.terasology.engine.core.paths.PathManager;
 import org.terasology.module.DependencyResolver;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.module.ResolutionResult;
-import org.terasology.reflection.TypeRegistry;
+import org.terasology.reflection.ModuleTypeRegistry;
 import org.terasology.engine.testUtil.ModuleManagerFactory;
 
 import java.nio.file.Path;
@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 public abstract class ModuleEnvironmentTest {
     protected ModuleManager moduleManager;
-    protected TypeRegistry typeRegistry;
+    protected ModuleTypeRegistry typeRegistry;
 
     @BeforeEach
     public void before(@TempDir Path tempHome) throws Exception {
@@ -32,7 +32,7 @@ public abstract class ModuleEnvironmentTest {
         assumeTrue(result.isSuccess());
 
         ModuleEnvironment environment = moduleManager.loadEnvironment(result.getModules(), true);
-        typeRegistry = new TypeRegistry(environment);
+        typeRegistry = new ModuleTypeRegistry(environment);
 
         setup();
     }

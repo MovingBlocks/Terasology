@@ -17,6 +17,7 @@
 package org.terasology.engine.network.internal;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.terasology.engine.TerasologyTestingEnvironment;
 import org.terasology.engine.core.ComponentSystemManager;
@@ -42,6 +43,7 @@ import static org.mockito.Mockito.when;
 
 /**
  */
+@Tag("TteTest")
 public class NetworkOwnershipTest extends TerasologyTestingEnvironment {
 
     private static EngineEntityManager entityManager;
