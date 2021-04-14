@@ -48,7 +48,7 @@ final class EntityStorer {
         Map<Class<? extends Component>, Integer> componentIds = Maps.newHashMap();
 
         for (ComponentMetadata<?> componentMetadata : entityManager.getComponentLibrary().iterateComponentMetadata()) {
-            entityStoreBuilder.addComponentClass(componentMetadata.getUri().toString());
+            entityStoreBuilder.addComponentClass(componentMetadata.getId().toString());
             componentIds.put(componentMetadata.getType(), componentIds.size());
         }
         serializer.setComponentIdMapping(componentIds);

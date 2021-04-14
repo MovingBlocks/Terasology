@@ -322,7 +322,7 @@ public class TypeHandlerLibrary {
             if (handler.isPresent()) {
                 handlerMap.put(field, handler.get());
             } else {
-                logger.error("Unsupported field: '{}.{}'", type.getUri(), field.getName());
+                logger.error("Unsupported field: '{}.{}'", type.getId(), field.getName());
             }
         }
         return handlerMap;

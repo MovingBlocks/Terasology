@@ -54,7 +54,7 @@ public class ComponentMetadata<T extends Component> extends ClassMetadata<T, Com
      * @throws NoSuchMethodException If the component has no default constructor
      */
     public ComponentMetadata(ResourceUrn uri, Class<T> type, ReflectFactory factory, CopyStrategyLibrary copyStrategies) throws NoSuchMethodException {
-        super(uri, type, factory, copyStrategies, Predicates.<Field>alwaysTrue());
+        super(uri.toString(), type, factory, copyStrategies, Predicates.<Field>alwaysTrue());
         replicated = type.getAnnotation(Replicate.class) != null;
         blockLifecycleEventsRequired = type.getAnnotation(RequiresBlockLifecycleEvents.class) != null;
         ForceBlockActive forceBlockActiveAnnotation = type.getAnnotation(ForceBlockActive.class);

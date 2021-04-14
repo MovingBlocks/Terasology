@@ -31,8 +31,8 @@ import org.terasology.naming.Name;
 import org.terasology.persistence.typeHandling.TypeHandler;
 import org.terasology.persistence.typeHandling.TypeHandlerFactory;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
+import org.terasology.reflection.ModuleTypeRegistry;
 import org.terasology.reflection.TypeInfo;
-import org.terasology.reflection.TypeRegistry;
 import org.terasology.reflection.copy.CopyStrategy;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.copy.RegisterCopyStrategy;
@@ -61,7 +61,7 @@ public final class EnvironmentSwitchHandler {
         ModuleManager moduleManager = context.get(ModuleManager.class);
         ModuleEnvironment environment = moduleManager.getEnvironment();
 
-        TypeRegistry typeRegistry = context.get(TypeRegistry.class);
+        ModuleTypeRegistry typeRegistry = context.get(ModuleTypeRegistry.class);
         typeRegistry.reload(environment);
 
         CopyStrategyLibrary copyStrategyLibrary = context.get(CopyStrategyLibrary.class);
