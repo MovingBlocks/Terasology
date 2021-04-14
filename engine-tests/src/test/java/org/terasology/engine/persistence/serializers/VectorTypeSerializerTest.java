@@ -16,6 +16,8 @@ import org.terasology.engine.persistence.typeHandling.TypeHandlerLibraryImpl;
 import org.terasology.engine.persistence.typeHandling.gson.GsonPersistedDataReader;
 import org.terasology.engine.persistence.typeHandling.gson.GsonPersistedDataSerializer;
 import org.terasology.engine.persistence.typeHandling.gson.GsonPersistedDataWriter;
+import org.terasology.engine.testUtil.Assertions;
+import org.terasology.gestalt.module.ModuleEnvironment;
 import org.terasology.gestalt.naming.Name;
 import org.terasology.persistence.serializers.Serializer;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
@@ -68,6 +70,18 @@ class VectorTypeSerializerTest extends ModuleEnvironmentTest {
 
         TestObject2 o = gsonSerializer.deserialize(new TypeInfo<TestObject2>() {
         },data).get();
+
+        Assertions.assertNotEmpty(typeHandlerLibrary.getTypeHandler(Vector3fc.class));
+        Assertions.assertNotEmpty(typeHandlerLibrary.getTypeHandler(Vector3f.class));
+
+        Assertions.assertNotEmpty(typeRegistry.load("org.joml.Vector3fc"));
+        Assertions.assertNotEmpty(typeRegistry.load("org.joml.Vector3f"));
+
+        ModuleEnvironment env = moduleManager.getEnvironment();
+        Assertions.assertNotEmpty(env.getSubtypesOf(Vector3fc.class));
+
+        Assertions.assertNotEmpty(typeRegistry.getSubtypesOf(Vector3fc.class));
+
         assertEquals(new Vector3f(1.0f, 2.0f, 3.0f), o.v1, .00001f);
         assertEquals(new Vector4f(1.0f, 2.0f, 3.0f, 5.0f), o.v2, .00001f);
         assertEquals(new Vector2f(1.0f, 2.0f), o.v3, .00001f);
