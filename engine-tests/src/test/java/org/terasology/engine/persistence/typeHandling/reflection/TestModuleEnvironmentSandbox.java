@@ -4,11 +4,11 @@
 package org.terasology.engine.persistence.typeHandling.reflection;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.testUtil.ModuleManagerFactory;
+import org.terasology.engine.unittest.ExampleInterface;
 import org.terasology.reflection.ModuleTypeRegistry;
 import org.terasology.reflection.TypeRegistry;
 
@@ -30,17 +30,16 @@ public class TestModuleEnvironmentSandbox {
 
     @Test
     public void findSubtypeOfGlobalClass() {
-        assertNotEmpty(sandbox.findSubTypeOf("Vector3f", org.joml.Vector3fc.class));
+        assertNotEmpty(sandbox.findSubTypeOf("org.joml.Vector3f", org.joml.Vector3fc.class));
     }
 
     @Test
     public void findSubtypeOfEngineClass() {
-        // assertNotEmpty(typeRegistry.getSubtypesOf(Component.class));
-        assertNotEmpty(sandbox.findSubTypeOf("BlockComponent", Component.class));
+        assertNotEmpty(sandbox.findSubTypeOf("engine:BlockComponent", Component.class));
     }
 
-    @Disabled("TODO")
+    @Test
     public void findSubtypeOfModuleClass() {
-
+        assertNotEmpty(sandbox.findSubTypeOf("unittest:ExampleClass", ExampleInterface.class));
     }
 }
