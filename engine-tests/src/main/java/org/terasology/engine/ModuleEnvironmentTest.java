@@ -4,17 +4,15 @@ package org.terasology.engine;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.io.TempDir;
+import org.terasology.engine.core.module.ExternalApiWhitelist;
 import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.engine.core.paths.PathManager;
 import org.terasology.engine.testUtil.ModuleManagerFactory;
-import org.terasology.gestalt.module.ModuleEnvironment;
-import org.terasology.gestalt.module.dependencyresolution.DependencyResolver;
-import org.terasology.gestalt.module.dependencyresolution.ResolutionResult;
 import org.terasology.reflection.ModuleTypeRegistry;
+import org.terasology.reflection.TypeRegistry;
 
 import java.nio.file.Path;
-
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import java.util.stream.Collectors;
 
 public abstract class ModuleEnvironmentTest {
     protected ModuleManager moduleManager;
@@ -25,14 +23,10 @@ public abstract class ModuleEnvironmentTest {
         PathManager.getInstance().useOverrideHomePath(tempHome);
 
         moduleManager = ModuleManagerFactory.create();
-
-        DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
-        ResolutionResult result = resolver.resolve(moduleManager.getRegistry().getModuleIds());
-
-        assertTrue(result.isSuccess());
-
-        ModuleEnvironment environment = moduleManager.loadEnvironment(result.getModules(), true);
-        typeRegistry = new ModuleTypeRegistry(environment);
+        moduleManager.resolveAndLoadEnvironment(moduleManager.getRegistry().getModuleIds());
+        TypeRegistry.WHITELISTED_CLASSES = ExternalApiWhitelist.CLASSES.stream().map(Class::getName).collect(Collectors.toSet());
+        TypeRegistry.WHITELISTED_PACKAGES = ExternalApiWhitelist.PACKAGES;
+        typeRegistry = new ModuleTypeRegistry(moduleManager.getEnvironment());
 
         setup();
     }
