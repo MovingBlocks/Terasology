@@ -19,6 +19,7 @@ import com.google.common.base.Charsets;
 import com.google.common.io.Files;
 import com.google.gson.JsonParser;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.terasology.engine.TerasologyTestingEnvironment;
 import org.terasology.engine.core.subsystem.headless.renderer.HeadlessCanvasRenderer;
@@ -48,6 +49,7 @@ import java.io.IOException;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 
+@Tag("TteTest")
 public class ContextMenuUtilsTest extends TerasologyTestingEnvironment {
     private static JsonTree inputTree;
 

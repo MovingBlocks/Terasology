@@ -19,6 +19,7 @@ package org.terasology.engine.network;
 import com.google.common.collect.Lists;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.terasology.engine.TerasologyTestingEnvironment;
 import org.terasology.engine.config.Config;
@@ -38,6 +39,7 @@ import static org.mockito.Mockito.mock;
 
 /**
  */
+@Tag("TteTest")
 public class TestNetwork extends TerasologyTestingEnvironment {
 
     private List<NetworkSystem> netSystems = Lists.newArrayList();
