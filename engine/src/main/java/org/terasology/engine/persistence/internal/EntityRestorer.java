@@ -21,6 +21,7 @@ import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.engine.entitySystem.metadata.ComponentMetadata;
 import org.terasology.engine.persistence.serializers.EntitySerializer;
+import org.terasology.engine.persistence.serializers.PersistenceComponentSerializeCheck;
 import org.terasology.protobuf.EntityData;
 
 import java.util.Map;
@@ -37,6 +38,7 @@ final class EntityRestorer {
 
     public Map<String, EntityRef> restore(EntityData.EntityStore store) {
         EntitySerializer serializer = new EntitySerializer(entityManager);
+        serializer.setComponentSerializeCheck(new PersistenceComponentSerializeCheck());
         Map<Class<? extends Component>, Integer> idMap = Maps.newHashMap();
         for (int i = 0; i < store.getComponentClassCount(); ++i) {
             ComponentMetadata<?> metadata = entityManager.getComponentLibrary().resolve(store.getComponentClass(i));

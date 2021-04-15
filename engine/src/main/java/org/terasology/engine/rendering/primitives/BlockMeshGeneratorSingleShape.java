@@ -43,7 +43,7 @@ public class BlockMeshGeneratorSingleShape implements BlockMeshGenerator {
                 final ChunkVertexFlag vertexFlag = getChunkVertexFlag(view, x, y, z, selfBlock);
 
                 if (blockAppearance.getPart(BlockPart.CENTER) != null) {
-                    blockAppearance.getPart(BlockPart.CENTER).appendTo(chunkMesh, x, y, z, renderType, vertexFlag);
+                    blockAppearance.getPart(BlockPart.CENTER).appendTo(chunkMesh, view, x, y, z, renderType, vertexFlag);
                 }
 
                 BlockMeshPart blockMeshPart = blockAppearance.getPart(BlockPart.fromSide(side));
@@ -73,7 +73,7 @@ public class BlockMeshGeneratorSingleShape implements BlockMeshGenerator {
                     if (selfBlock.isGrass() && side != Side.TOP && side != Side.BOTTOM) {
                         sideVertexFlag = ChunkVertexFlag.COLOR_MASK;
                     }
-                    blockMeshPart.appendTo(chunkMesh, x, y, z, renderType, sideVertexFlag);
+                    blockMeshPart.appendTo(chunkMesh, view, x, y, z, renderType, sideVertexFlag);
                 }
             }
         }

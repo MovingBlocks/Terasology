@@ -39,6 +39,7 @@ import org.terasology.engine.rendering.opengl.FBO;
 import org.terasology.engine.rendering.opengl.ScreenGrabber;
 import org.terasology.engine.rendering.opengl.fbms.DisplayResolutionDependentFbo;
 import org.terasology.engine.rendering.openvrprovider.OpenVRProvider;
+import org.terasology.engine.rendering.primitives.ChunkTessellator;
 import org.terasology.engine.rendering.world.viewDistance.ViewDistance;
 import org.terasology.engine.utilities.Assets;
 import org.terasology.engine.world.WorldProvider;
@@ -154,7 +155,9 @@ public final class WorldRendererImpl implements WorldRenderer {
         LocalPlayerSystem localPlayerSystem = context.get(LocalPlayerSystem.class);
         localPlayerSystem.setPlayerCamera(playerCamera);
 
-        renderableWorld = new RenderableWorldImpl(context, bufferPool, playerCamera);
+        context.put(ChunkTessellator.class, new ChunkTessellator(bufferPool));
+
+        renderableWorld = new RenderableWorldImpl(context, playerCamera);
         renderQueues = renderableWorld.getRenderQueues();
 
         initRenderingSupport();

@@ -91,6 +91,11 @@ public class WorldProviderCoreStub implements WorldProviderCore {
     }
 
     @Override
+    public ChunkViewCore getWorldViewAround(BlockRegionc chunk) {
+        return null;
+    }
+
+    @Override
     public boolean isBlockRelevant(int x, int y, int z) {
         return true;  //To change body of implemented methods use File | Settings | File Templates.
     }

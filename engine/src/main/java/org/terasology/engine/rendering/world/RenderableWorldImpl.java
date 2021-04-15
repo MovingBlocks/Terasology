@@ -15,6 +15,7 @@ import org.terasology.engine.config.RenderingConfig;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.core.subsystem.lwjgl.GLBufferPool;
 import org.terasology.engine.rendering.cameras.Camera;
+import org.terasology.engine.rendering.logic.ChunkMeshRenderer;
 import org.terasology.engine.rendering.primitives.ChunkMesh;
 import org.terasology.engine.rendering.primitives.ChunkTessellator;
 import org.terasology.engine.rendering.world.viewDistance.ViewDistance;
@@ -63,6 +64,7 @@ class RenderableWorldImpl implements RenderableWorld {
     private BlockRegion renderableRegion = new BlockRegion(BlockRegion.INVALID);
     private ViewDistance currentViewDistance;
     private RenderQueuesHelper renderQueues;
+    private ChunkMeshRenderer chunkMeshRenderer;
 
     private Camera playerCamera;
     private Camera shadowMapCamera;
@@ -75,11 +77,11 @@ class RenderableWorldImpl implements RenderableWorld {
     private int statIgnoredPhases;
 
 
-    RenderableWorldImpl(Context context, GLBufferPool bufferPool, Camera playerCamera) {
+    RenderableWorldImpl(Context context, Camera playerCamera) {
 
         worldProvider = context.get(WorldProvider.class);
         chunkProvider = context.get(ChunkProvider.class);
-        chunkTessellator = new ChunkTessellator(bufferPool);
+        chunkTessellator = context.get(ChunkTessellator.class);
         chunkMeshUpdateManager = new ChunkMeshUpdateManager(chunkTessellator, worldProvider);
 
         this.playerCamera = playerCamera;
@@ -163,6 +165,7 @@ class RenderableWorldImpl implements RenderableWorld {
 
                 newMesh = chunkTessellator.generateMesh(localView);
                 newMesh.generateVBOs();
+                newMesh.discardData();
 
                 if (chunk.hasMesh()) {
                     chunk.getMesh().dispose();
@@ -283,6 +286,7 @@ class RenderableWorldImpl implements RenderableWorld {
             if (chunk.hasPendingMesh() && chunksInProximityOfCamera.contains(chunk)) {
                 pendingMesh = chunk.getPendingMesh();
                 pendingMesh.generateVBOs();
+                pendingMesh.discardData();
                 if (chunk.hasMesh()) {
                     chunk.getMesh().dispose();
                 }
@@ -318,6 +322,7 @@ class RenderableWorldImpl implements RenderableWorld {
         boolean isDynamicShadows = renderingConfig.isDynamicShadows();
 
         List<RenderableChunk> allChunks = new ArrayList<>(chunksInProximityOfCamera);
+        allChunks.addAll(chunkMeshRenderer.getRenderableChunks());
         if (lodChunkProvider != null) {
             lodChunkProvider.addAllChunks(allChunks);
         }
@@ -436,6 +441,11 @@ class RenderableWorldImpl implements RenderableWorld {
     @Override
     public void setShadowMapCamera(Camera camera) {
         this.shadowMapCamera = camera;
+    }
+
+    @Override
+    public void setChunkMeshRenderer(ChunkMeshRenderer meshes) {
+        chunkMeshRenderer = meshes;
     }
 
     @Override

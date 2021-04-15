@@ -18,6 +18,7 @@ package org.terasology.engine.persistence.internal;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.engine.persistence.serializers.PersistenceComponentSerializeCheck;
 import org.terasology.engine.utilities.Assets;
 import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.engine.core.SimpleUri;
@@ -57,6 +58,7 @@ final class GlobalStoreLoader {
         this.environment = environment;
         this.componentLibrary = entityManager.getComponentLibrary();
         this.entitySerializer = new EntitySerializer(entityManager);
+        this.entitySerializer.setComponentSerializeCheck(new PersistenceComponentSerializeCheck());
         this.prefabSerializer = prefabSerializer;
     }
 

@@ -15,6 +15,7 @@ import org.reflections.Reflections;
 import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.engine.entitySystem.prefab.Prefab;
 import org.terasology.engine.math.IntegerRange;
+import org.terasology.engine.persistence.typeHandling.extensionTypes.ChunkMeshTypeHandler;
 import org.terasology.engine.persistence.typeHandling.extensionTypes.ColorTypeHandler;
 import org.terasology.engine.persistence.typeHandling.extensionTypes.ColorcTypeHandler;
 import org.terasology.engine.persistence.typeHandling.extensionTypes.NameTypeHandler;
@@ -48,6 +49,7 @@ import org.terasology.engine.persistence.typeHandling.mathTypes.Vector4iTypeHand
 import org.terasology.engine.persistence.typeHandling.mathTypes.Vector4icTypeHandler;
 import org.terasology.engine.persistence.typeHandling.reflection.ModuleEnvironmentSandbox;
 import org.terasology.engine.rendering.assets.texture.TextureRegion;
+import org.terasology.engine.rendering.primitives.ChunkMesh;
 import org.terasology.engine.world.block.BlockArea;
 import org.terasology.engine.world.block.BlockAreac;
 import org.terasology.engine.world.block.BlockRegion;
@@ -109,6 +111,7 @@ public class TypeHandlerLibraryImpl extends TypeHandlerLibrary {
         serializationLibrary.addTypeHandler(Name.class, new NameTypeHandler());
         serializationLibrary.addTypeHandler(TextureRegion.class, new TextureRegionTypeHandler());
         serializationLibrary.addTypeHandler(UITextureRegion.class, new UITextureRegionTypeHandler());
+        serializationLibrary.addTypeHandler(ChunkMesh.class, new ChunkMeshTypeHandler());
 
         serializationLibrary.addTypeHandlerFactory(new TextureRegionAssetTypeHandlerFactory());
 

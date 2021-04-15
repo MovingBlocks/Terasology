@@ -13,6 +13,9 @@ import org.terasology.gestalt.assets.module.ModuleAwareAssetTypeManager;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.context.internal.ContextImpl;
 import org.terasology.engine.core.bootstrap.EntitySystemSetupUtil;
+import org.terasology.engine.core.module.ModuleManager;
+import org.terasology.engine.entitySystem.Component;
+import org.terasology.engine.entitySystem.DoNotPersist;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.engine.entitySystem.entity.internal.EntityInfoComponent;
@@ -27,8 +30,10 @@ import org.terasology.engine.entitySystem.stubs.MappedTypeComponent;
 import org.terasology.engine.entitySystem.stubs.StringComponent;
 import org.terasology.engine.network.NetworkMode;
 import org.terasology.engine.network.NetworkSystem;
+import org.terasology.engine.persistence.serializers.ComponentSerializeCheck;
 import org.terasology.engine.persistence.serializers.EntitySerializer;
 import org.terasology.gestalt.assets.module.ModuleAwareAssetTypeManagerImpl;
+import org.terasology.engine.persistence.serializers.PersistenceComponentSerializeCheck;
 import org.terasology.protobuf.EntityData;
 import org.terasology.engine.recording.RecordAndReplayCurrentStatus;
 import org.terasology.engine.registry.CoreRegistry;
@@ -281,4 +286,42 @@ public class EntitySerializerTest {
         return entitySerializer.deserialize(entityData);
     }
 
+    @Test
+    public void testComponentWithDoNotPersistIsNotPersisted() {
+        componentLibrary.register(new ResourceUrn("test", "nonpersisted"), NonpersistedComponent.class);
+
+        EntityRef entity = entityManager.create();
+        entity.addComponent(new NonpersistedComponent());
+        entitySerializer.setComponentSerializeCheck(new PersistenceComponentSerializeCheck());
+        EntityData.Entity entityData = entitySerializer.serialize(entity);
+        long nextId = entityManager.getNextId();
+        entityManager.clear();
+        entityManager.setNextId(nextId);
+        EntityRef loadedEntity = entitySerializer.deserialize(entityData);
+
+        assertTrue(loadedEntity.exists());
+        assertFalse(loadedEntity.hasComponent(NonpersistedComponent.class));
+    }
+
+    @Test
+    public void testComponentWithDoNotPersistIsIgnoredUponDeserialization() {
+        componentLibrary.register(new ResourceUrn("test", "nonpersisted"), NonpersistedComponent.class);
+
+        EntityRef entity = entityManager.create();
+        entity.addComponent(new NonpersistedComponent());
+        entitySerializer.setComponentSerializeCheck(metadata -> true);
+        EntityData.Entity entityData = entitySerializer.serialize(entity);
+        long nextId = entityManager.getNextId();
+        entityManager.clear();
+        entityManager.setNextId(nextId);
+        entitySerializer.setComponentSerializeCheck(new PersistenceComponentSerializeCheck());
+        EntityRef loadedEntity = entitySerializer.deserialize(entityData);
+
+        assertTrue(loadedEntity.exists());
+        assertFalse(loadedEntity.hasComponent(NonpersistedComponent.class));
+    }
+
+    @DoNotPersist
+    public static class NonpersistedComponent implements Component {
+    }
 }
