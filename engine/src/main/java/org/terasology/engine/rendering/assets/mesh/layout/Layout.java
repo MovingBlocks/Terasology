@@ -6,10 +6,9 @@ package org.terasology.engine.rendering.assets.mesh.layout;
 import java.nio.ByteBuffer;
 
 public abstract class Layout<T> {
-    public static final int NONE = 0x1;
+    public static final int NONE = 0x0;
     public static final int FLOATING_POINT = 0x1;
     public static final int NORMALIZED = 0x2;
-    public static final int UNSIGNED = 0x4;
 
     public final int location;
     public final int size;

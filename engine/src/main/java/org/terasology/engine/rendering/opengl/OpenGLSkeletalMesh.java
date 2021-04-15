@@ -86,16 +86,7 @@ public class OpenGLSkeletalMesh extends SkeletalMesh {
                 int payloadSize = (UV_SIZE + VERTEX_SIZE + NORMAL_SIZE) * newData.getVertexCount();
                 ByteBuffer buffer = BufferUtils.createByteBuffer(payloadSize);
 
-                for (int x = 0; x < newData.getVertexCount(); x++) {
-                    // fill in with empty data
-                    buffer.putFloat(0); // vertex x
-                    buffer.putFloat(0); // vertex y
-                    buffer.putFloat(0); // vertex z
-                    buffer.putFloat(0); // normal x
-                    buffer.putFloat(0); // normal y
-                    buffer.putFloat(0); // normal z
-                }
-
+                buffer.position(newData.getVertexCount() * VERTEX_NORMAL_SIZE);
 
                 for (Vector2f uv : newData.getUVs()) {
                     buffer.putFloat(uv.x);

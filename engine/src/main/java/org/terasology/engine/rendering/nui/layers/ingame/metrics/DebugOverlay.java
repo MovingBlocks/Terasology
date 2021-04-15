@@ -237,11 +237,6 @@ public class DebugOverlay extends CoreScreenLayer {
         return false;
     }
 
-    @Override
-    public void onDraw(Canvas canvas) {
-        super.onDraw(canvas);
-    }
-
     /**
      * Moves forward through the MetricsMode instances and displays the content of the next available one.
      */

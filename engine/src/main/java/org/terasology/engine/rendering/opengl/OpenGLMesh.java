@@ -75,7 +75,7 @@ public class OpenGLMesh extends Mesh {
     public void render() {
         if (!isDisposed()) {
             GL30.glBindVertexArray(disposalAction.vao);
-            GL30.glDrawElements(GL30.GL_TRIANGLES, this.indexCount, GL_UNSIGNED_INT, 0);
+            GL30.glDrawElements(data.getMode().glCall, this.indexCount, GL_UNSIGNED_INT, 0);
             GL30.glBindVertexArray(0);
         } else {
             logger.error("Attempted to render disposed mesh: {}", getUrn());
