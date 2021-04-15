@@ -106,6 +106,7 @@ public class LodChunkProvider {
             int scale = chunk.scale;
             if (requiredScale != null && requiredScale <= scale) { // The relevant region may have been updated since this chunk was requested.
                 chunk.getMesh().generateVBOs();
+                chunk.getMesh().discardData();
                 Vector3i subPos = new Vector3i();
                 if (scale > 0) {
                     int subScale = 1 << (scale - 1);
