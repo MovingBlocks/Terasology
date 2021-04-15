@@ -5,6 +5,7 @@ package org.terasology.engine.rendering.primitives;
 import com.google.common.base.Stopwatch;
 import gnu.trove.iterator.TIntIterator;
 import org.joml.Vector3f;
+import org.joml.Vector3fc;
 import org.lwjgl.BufferUtils;
 import org.terasology.engine.core.subsystem.lwjgl.GLBufferPool;
 import org.terasology.engine.math.Direction;
@@ -29,6 +30,10 @@ public final class ChunkTessellator {
 
     public ChunkTessellator(GLBufferPool bufferPool) {
         this.bufferPool = bufferPool;
+    }
+
+    public ChunkMesh generateEmptyMesh() {
+        return new ChunkMesh(bufferPool);
     }
 
     public ChunkMesh generateMesh(ChunkView chunkView) {
@@ -66,7 +71,7 @@ public final class ChunkTessellator {
         return mesh;
     }
 
-    private void generateOptimizedBuffers(ChunkView chunkView, ChunkMesh mesh, float scale, float border) {
+    public void generateOptimizedBuffers(ChunkView chunkView, ChunkMesh mesh, float scale, float border) {
         PerformanceMonitor.startActivity("OptimizeBuffers");
 
         for (ChunkMesh.RenderType type : ChunkMesh.RenderType.values()) {
@@ -78,7 +83,7 @@ public final class ChunkTessellator {
                     elements.flags.size() + /* TEX0.z (flags) */
                     elements.frames.size() + /* TEX0.w (animation frame counts) */
                     elements.vertexCount * 3 + /* TEX1 (lighting data) */
-                    elements.color.size() + /* COLOR */
+                    elements.color.size() / 4 + /* COLOR */
                     elements.normals.size() /* NORMALS */
             );
 
@@ -104,14 +109,10 @@ public final class ChunkTessellator {
                 /* ANIMATION FRAME COUNT - TEX DATA 0.w*/
                 elements.finalVertices.put(Float.floatToIntBits(elements.frames.get(i)));
 
-                float[] result = new float[3];
-                Vector3f normal = new Vector3f(elements.normals.get(i * 3), elements.normals.get(i * 3 + 1), elements.normals.get(i * 3 + 2));
-                calcLightingValuesForVertexPos(chunkView, vertexPos, result, normal);
-
                 /* LIGHTING DATA / TEX DATA 1 */
-                elements.finalVertices.put(Float.floatToIntBits(result[0]));
-                elements.finalVertices.put(Float.floatToIntBits(result[1]));
-                elements.finalVertices.put(Float.floatToIntBits(result[2]));
+                elements.finalVertices.put(Float.floatToIntBits(elements.sunlight.get(i)));
+                elements.finalVertices.put(Float.floatToIntBits(elements.blocklight.get(i)));
+                elements.finalVertices.put(Float.floatToIntBits(elements.ambientOcclusion.get(i)));
 
                 /* PACKED COLOR */
                 final int packedColor = RenderMath.packColor(
@@ -122,9 +123,9 @@ public final class ChunkTessellator {
                 elements.finalVertices.put(packedColor);
 
                 /* NORMALS */
-                elements.finalVertices.put(Float.floatToIntBits(normal.x));
-                elements.finalVertices.put(Float.floatToIntBits(normal.y));
-                elements.finalVertices.put(Float.floatToIntBits(normal.z));
+                elements.finalVertices.put(Float.floatToIntBits(elements.normals.get(i * 3)));
+                elements.finalVertices.put(Float.floatToIntBits(elements.normals.get(i * 3 + 1)));
+                elements.finalVertices.put(Float.floatToIntBits(elements.normals.get(i * 3 + 2)));
             }
 
             elements.finalIndices = BufferUtils.createIntBuffer(elements.indices.size());
@@ -136,103 +137,6 @@ public final class ChunkTessellator {
             elements.finalVertices.flip();
             elements.finalIndices.flip();
         }
-        PerformanceMonitor.endActivity();
-    }
-
-    private void calcLightingValuesForVertexPos(ChunkView chunkView, Vector3f vertexPos, float[] output, Vector3f normal) {
-        PerformanceMonitor.startActivity("calcLighting");
-        float[] lights = new float[8];
-        float[] blockLights = new float[8];
-        Block[] blocks = new Block[4];
-
-        PerformanceMonitor.startActivity("gatherLightInfo");
-        Direction dir = Direction.inDirection(normal);
-        switch (dir) {
-            case LEFT:
-            case RIGHT:
-                blocks[0] = chunkView.getBlock((vertexPos.x + 0.8f * normal.x), (vertexPos.y + 0.1f), (vertexPos.z + 0.1f));
-                blocks[1] = chunkView.getBlock((vertexPos.x + 0.8f * normal.x), (vertexPos.y + 0.1f), (vertexPos.z - 0.1f));
-                blocks[2] = chunkView.getBlock((vertexPos.x + 0.8f * normal.x), (vertexPos.y - 0.1f), (vertexPos.z - 0.1f));
-                blocks[3] = chunkView.getBlock((vertexPos.x + 0.8f * normal.x), (vertexPos.y - 0.1f), (vertexPos.z + 0.1f));
-                break;
-            case FORWARD:
-            case BACKWARD:
-                blocks[0] = chunkView.getBlock((vertexPos.x + 0.1f), (vertexPos.y + 0.1f), (vertexPos.z + 0.8f * normal.z));
-                blocks[1] = chunkView.getBlock((vertexPos.x + 0.1f), (vertexPos.y - 0.1f), (vertexPos.z + 0.8f * normal.z));
-                blocks[2] = chunkView.getBlock((vertexPos.x - 0.1f), (vertexPos.y - 0.1f), (vertexPos.z + 0.8f * normal.z));
-                blocks[3] = chunkView.getBlock((vertexPos.x - 0.1f), (vertexPos.y + 0.1f), (vertexPos.z + 0.8f * normal.z));
-                break;
-            default:
-                blocks[0] = chunkView.getBlock((vertexPos.x + 0.1f), (vertexPos.y + 0.8f * normal.y), (vertexPos.z + 0.1f));
-                blocks[1] = chunkView.getBlock((vertexPos.x + 0.1f), (vertexPos.y + 0.8f * normal.y), (vertexPos.z - 0.1f));
-                blocks[2] = chunkView.getBlock((vertexPos.x - 0.1f), (vertexPos.y + 0.8f * normal.y), (vertexPos.z - 0.1f));
-                blocks[3] = chunkView.getBlock((vertexPos.x - 0.1f), (vertexPos.y + 0.8f * normal.y), (vertexPos.z + 0.1f));
-        }
-
-        lights[0] = chunkView.getSunlight((vertexPos.x + 0.1f), (vertexPos.y + 0.8f), (vertexPos.z + 0.1f));
-        lights[1] = chunkView.getSunlight((vertexPos.x + 0.1f), (vertexPos.y + 0.8f), (vertexPos.z - 0.1f));
-        lights[2] = chunkView.getSunlight((vertexPos.x - 0.1f), (vertexPos.y + 0.8f), (vertexPos.z - 0.1f));
-        lights[3] = chunkView.getSunlight((vertexPos.x - 0.1f), (vertexPos.y + 0.8f), (vertexPos.z + 0.1f));
-
-        lights[4] = chunkView.getSunlight((vertexPos.x + 0.1f), (vertexPos.y - 0.1f), (vertexPos.z + 0.1f));
-        lights[5] = chunkView.getSunlight((vertexPos.x + 0.1f), (vertexPos.y - 0.1f), (vertexPos.z - 0.1f));
-        lights[6] = chunkView.getSunlight((vertexPos.x - 0.1f), (vertexPos.y - 0.1f), (vertexPos.z - 0.1f));
-        lights[7] = chunkView.getSunlight((vertexPos.x - 0.1f), (vertexPos.y - 0.1f), (vertexPos.z + 0.1f));
-
-        blockLights[0] = chunkView.getLight((vertexPos.x + 0.1f), (vertexPos.y + 0.8f), (vertexPos.z + 0.1f));
-        blockLights[1] = chunkView.getLight((vertexPos.x + 0.1f), (vertexPos.y + 0.8f), (vertexPos.z - 0.1f));
-        blockLights[2] = chunkView.getLight((vertexPos.x - 0.1f), (vertexPos.y + 0.8f), (vertexPos.z - 0.1f));
-        blockLights[3] = chunkView.getLight((vertexPos.x - 0.1f), (vertexPos.y + 0.8f), (vertexPos.z + 0.1f));
-
-        blockLights[4] = chunkView.getLight((vertexPos.x + 0.1f), (vertexPos.y - 0.1f), (vertexPos.z + 0.1f));
-        blockLights[5] = chunkView.getLight((vertexPos.x + 0.1f), (vertexPos.y - 0.1f), (vertexPos.z - 0.1f));
-        blockLights[6] = chunkView.getLight((vertexPos.x - 0.1f), (vertexPos.y - 0.1f), (vertexPos.z - 0.1f));
-        blockLights[7] = chunkView.getLight((vertexPos.x - 0.1f), (vertexPos.y - 0.1f), (vertexPos.z + 0.1f));
-        PerformanceMonitor.endActivity();
-
-        float resultLight = 0;
-        float resultBlockLight = 0;
-        int counterLight = 0;
-        int counterBlockLight = 0;
-
-        int occCounter = 0;
-        int occCounterBillboard = 0;
-        for (int i = 0; i < 8; i++) {
-            if (lights[i] > 0) {
-                resultLight += lights[i];
-                counterLight++;
-            }
-            if (blockLights[i] > 0) {
-                resultBlockLight += blockLights[i];
-                counterBlockLight++;
-            }
-
-            if (i < 4) {
-                Block b = blocks[i];
-
-                if (b.isShadowCasting() && !b.isTranslucent()) {
-                    occCounter++;
-                } else if (b.isShadowCasting()) {
-                    occCounterBillboard++;
-                }
-            }
-        }
-
-        double resultAmbientOcclusion = (TeraMath.pow(0.40, occCounter) + TeraMath.pow(0.80, occCounterBillboard)) / 2.0;
-
-        if (counterLight == 0) {
-            output[0] = 0;
-        } else {
-            output[0] = resultLight / counterLight / 15f;
-        }
-
-        if (counterBlockLight == 0) {
-            output[1] = 0;
-        } else {
-            output[1] = resultBlockLight / counterBlockLight / 15f;
-        }
-
-        output[2] = (float) resultAmbientOcclusion;
         PerformanceMonitor.endActivity();
     }
 

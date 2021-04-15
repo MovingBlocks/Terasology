@@ -138,6 +138,11 @@ public class MapWorldProvider implements WorldProviderCore {
     }
 
     @Override
+    public ChunkViewCore getWorldViewAround(BlockRegionc chunk) {
+        return null;
+    }
+
+    @Override
     public byte getLight(int x, int y, int z) {
         return 0;
     }
