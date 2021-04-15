@@ -129,8 +129,6 @@ public class ModuleManager {
         Reflections reflectionsWithSubsystems = new Reflections(config);
         packageReflections.merge(reflectionsWithSubsystems);
 
-        ClassLoader engineClassLoader = this.getClass().getClassLoader();
-
         // We need the class predicate to include classes in subsystems and whatnot. We can't change it in an
         // existing module, so make a new one based on the one from the moduleFactory.
         Module engine = new Module(
@@ -138,7 +136,9 @@ public class ModuleManager {
                 packageModule.getResources(),
                 Collections.emptyList(),
                 packageReflections,
-                packageModule.getClassPredicate().or(clazz -> clazz.getClassLoader().equals(engineClassLoader))
+                packageModule.getClassPredicate().or(clazz ->
+                        reflectionsWithSubsystems.getConfiguration()
+                                .getUrls().contains(ClasspathHelper.forClass(clazz)))
         );
 
         registry.add(engine);

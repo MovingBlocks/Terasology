@@ -34,7 +34,13 @@ import static org.terasology.engine.testUtil.Assertions.assertNotEmpty;
 
 class TypeSerializerTest extends ModuleEnvironmentTest {
     private static final SomeClass<Integer> INSTANCE = new SomeClass<>(0xdeadbeef);
-    private static final String INSTANCE_JSON = "{\"generic-t\":-559038737,\"list\":[50,51,-52,-53],\"animals\":[{\"class\":\"org.terasology.engine.persistence.serializers.TypeSerializerTest$Dog\",\"tailPosition\":[3.15,54.51,-0.001],\"headPosition\":[10.0,30.0,-0.001],\"data\":{\"class\":\"java.lang.Integer\",\"content\":1}},{\"class\":\"org.terasology.engine.persistence.serializers.TypeSerializerTest$Cheetah\",\"spotColor\":[255,0,255,255],\"data\":{\"class\":\"java.lang.Integer\",\"content\":2}}]}";
+    private static final String INSTANCE_JSON = "{\"generic-t\":-559038737,\"list\":[50,51,-52,-53]," +
+            "\"animals\":[{\"class\":\"org.terasology.engine.persistence.serializers.TypeSerializerTest$Dog\"," +
+            "\"tailPosition\":[3.15,54.51,-0.001],\"headPosition\":[10.0,30.0,-0.001],\"data\":{\"class\":\"java.lang" +
+            ".Integer\",\"content\":1}},{\"class\":\"org.terasology.engine.persistence.serializers" +
+            ".TypeSerializerTest$Cheetah\",\"spotColor\":[255,0,255,255],\"data\":{\"class\":\"java.lang.Integer\"," +
+            "\"content\":2}}],\"singleAnimal\":{\"class\":\"org.terasology.engine.persistence.serializers" +
+            ".TypeSerializerTest$Dog\",\"tailPosition\":[4.0,5.0,6.0],\"headPosition\":[4.0,5.8,8.0],\"data\":2}}";
 
     static {
         INSTANCE.list.addAll(Lists.newArrayList(50, 51, -52, -53));

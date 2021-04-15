@@ -26,6 +26,8 @@ import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
 
+import static com.google.common.base.Verify.verifyNotNull;
+
 /**
  * Loads, Saves and Stores {@link AutoConfig}s
  */
@@ -48,7 +50,9 @@ public class AutoConfigManager {
                 continue;
             }
 
-            SimpleUri configId = ReflectionUtil.getFullyQualifiedSimpleUriFor(configClass, environment);
+            SimpleUri configId = verifyNotNull(ReflectionUtil.getFullyQualifiedSimpleUriFor(configClass, environment),
+                    "Could not find ID for %s", configClass.getSimpleName()
+            );
             loadConfig(configClass, configId, context);
         }
     }
