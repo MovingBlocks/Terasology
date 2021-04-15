@@ -64,6 +64,7 @@ import org.terasology.nui.events.NUICharEvent;
 import org.terasology.nui.events.NUIKeyEvent;
 import org.terasology.nui.events.NUIMouseButtonEvent;
 import org.terasology.nui.events.NUIMouseWheelEvent;
+import org.terasology.nui.reflection.WidgetLibrary;
 import org.terasology.nui.widgets.UIButton;
 import org.terasology.nui.widgets.UIText;
 import org.terasology.nui.widgets.types.RegisterTypeWidgetFactory;

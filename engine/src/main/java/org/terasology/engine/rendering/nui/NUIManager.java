@@ -2,15 +2,15 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.rendering.nui;
 
-import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.engine.entitySystem.systems.ComponentSystem;
-import org.terasology.engine.rendering.nui.internal.WidgetLibrary;
 import org.terasology.engine.rendering.nui.layers.hud.HUDScreenLayer;
+import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.nui.ControlWidget;
 import org.terasology.nui.FocusManager;
 import org.terasology.nui.UIWidget;
 import org.terasology.nui.asset.UIElement;
 import org.terasology.nui.canvas.CanvasControl;
+import org.terasology.nui.reflection.WidgetLibrary;
 
 import java.util.Deque;
 
