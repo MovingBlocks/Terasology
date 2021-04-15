@@ -155,6 +155,7 @@ public class OpenGLMesh extends Mesh {
         GL30.glBufferData(GL30.GL_ELEMENT_ARRAY_BUFFER, bufferIndices, GL30.GL_STATIC_DRAW);
         indexCount = indices.size();
 
+        GL30.glBindBuffer(GL30.GL_ARRAY_BUFFER, 0);
         GL30.glBindVertexArray(0);
         getBound(newData, aabb);
     }
