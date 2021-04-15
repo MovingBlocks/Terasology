@@ -13,7 +13,6 @@ import org.terasology.engine.config.Config;
 import org.terasology.engine.config.RenderingConfig;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.core.GameEngine;
-import org.terasology.engine.core.TerasologyEngine;
 import org.terasology.engine.core.modes.GameState;
 import org.terasology.engine.core.subsystem.DisplayDevice;
 import org.terasology.engine.rendering.ShaderManager;
@@ -56,16 +55,6 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
     @Override
     public void registerCoreAssetTypes(ModuleAwareAssetTypeManager assetTypeManager) {
         graphics.registerCoreAssetTypes(assetTypeManager);
-    }
-
-    @Override
-    public void preInitialise(Context context) {
-        super.preInitialise(context);
-        GameEngine engine = context.get(GameEngine.class);
-
-        // Make sure NUI classes are registered as part of the engine module.
-        // FIXME: kludgy use of method outside of Interface
-        ((TerasologyEngine) engine).addToClassesOnClasspathsToAddToEngine(CanvasRenderer.class);
     }
 
     @Override

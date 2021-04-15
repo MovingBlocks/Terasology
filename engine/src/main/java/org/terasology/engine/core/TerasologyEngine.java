@@ -58,6 +58,7 @@ import org.terasology.gestalt.assets.AssetType;
 import org.terasology.gestalt.assets.management.AssetManager;
 import org.terasology.gestalt.assets.module.ModuleAwareAssetTypeManager;
 import org.terasology.gestalt.assets.module.autoreload.AutoReloadAssetTypeManager;
+import org.terasology.nui.UIWidget;
 import org.terasology.nui.asset.UIElement;
 import org.terasology.nui.skin.UISkinAsset;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
@@ -181,6 +182,9 @@ public class TerasologyEngine implements GameEngine {
 
         // add all subsystem as engine module part. (needs for ECS classes loaded from external subsystems)
         allSubsystems.stream().map(Object::getClass).forEach(this::addToClassesOnClasspathsToAddToEngine);
+
+        // register NUI classes with engine module
+        addToClassesOnClasspathsToAddToEngine(UIWidget.class);
     }
 
     /**
