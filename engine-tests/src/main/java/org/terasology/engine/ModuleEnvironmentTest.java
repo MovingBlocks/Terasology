@@ -23,7 +23,6 @@ public abstract class ModuleEnvironmentTest {
         PathManager.getInstance().useOverrideHomePath(tempHome);
 
         moduleManager = ModuleManagerFactory.create();
-        moduleManager.resolveAndLoadEnvironment(moduleManager.getRegistry().getModuleIds());
         TypeRegistry.WHITELISTED_CLASSES = ExternalApiWhitelist.CLASSES.stream().map(Class::getName).collect(Collectors.toSet());
         TypeRegistry.WHITELISTED_PACKAGES = ExternalApiWhitelist.PACKAGES;
         typeRegistry = new ModuleTypeRegistry(moduleManager.getEnvironment());
