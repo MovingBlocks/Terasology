@@ -33,6 +33,7 @@ import org.terasology.engine.world.generator.WorldConfigurator;
 import org.terasology.engine.world.generator.WorldGenerator;
 
 import java.util.Iterator;
+import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -72,31 +73,40 @@ public class CreateWorldEntity extends SingleStepLoadProcess {
 
         Iterator<EntityRef> worldEntityIterator = entityManager.getEntitiesWith(WorldComponent.class).iterator();
         if (worldEntityIterator.hasNext()) {
+
             EntityRef worldEntity = worldEntityIterator.next();
             worldEntityIterator.forEachRemaining(w -> logger.warn("Ignored extra world {}", w));
             chunkProvider.setWorldEntity(worldEntity);
 
             // replace the world generator values from the components in the world entity
-            setProperties(worldConfigurator, (key, clazz) -> worldEntity.getComponent(clazz));
+            checkNotNull(worldConfigurator).getProperties().forEach((key, currentComponent) -> {
+                Component component = worldEntity.getComponent(currentComponent.getClass());
+                if (component != null) {
+                    worldConfigurator.setProperty(key, component);
+                }
+            });
+
         } else {
+            // create world entity if one does not exist.
             EntityRef worldEntity = createWorldPoolsAndEntity();
             chunkProvider.setWorldEntity(worldEntity);
 
             // transfer all world generation parameters from Config to WorldEntity
             SimpleUri generatorUri = worldGenerator.getUri();
-            setProperties(worldConfigurator, (key, clazz) -> config.getModuleConfig(generatorUri, key, clazz));
+            checkNotNull(worldConfigurator).getProperties().forEach((key, currentComponent) -> {
+                Class<? extends Component> clazz = currentComponent.getClass();
+                Component moduleComponent = config.getModuleConfig(generatorUri, key, clazz);
+                if (moduleComponent != null) {
+                    // configure entity from component
+                    worldEntity.addComponent(moduleComponent);
+                    worldConfigurator.setProperty(key, moduleComponent);
+                } else {
+                    worldEntity.addComponent(currentComponent);
+                }
+            });
         }
 
         return true;
-    }
-
-    private static void setProperties(WorldConfigurator configurator, WorldConfiguratorConfigurator provider) {
-        checkNotNull(configurator).getProperties().forEach((key, currentComponent) -> {
-            Component configuredComponent = provider.getComponentOfWorldEntity(key, currentComponent.getClass());
-            if (configuredComponent != null) {
-                configurator.setProperty(key, configuredComponent);
-            }
-        });
     }
 
     private EntityRef createWorldPoolsAndEntity() {
@@ -108,11 +118,6 @@ public class CreateWorldEntity extends SingleStepLoadProcess {
         networkComponent.replicateMode = NetworkComponent.ReplicateMode.ALWAYS;
         worldEntity.addComponent(networkComponent);
         return worldEntity;
-    }
-
-    @FunctionalInterface
-    private interface WorldConfiguratorConfigurator {
-        Component getComponentOfWorldEntity(String key, Class<? extends Component> clazz);
     }
 
     @Override
