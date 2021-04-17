@@ -81,7 +81,7 @@ class EventCopier {
             CharacterMoveInputEvent originalEvent = (CharacterMoveInputEvent) toBeCopied;
             return  new CharacterMoveInputEvent(originalEvent.getSequenceNumber(), originalEvent.getPitch(),
                     originalEvent.getYaw(), originalEvent.getMovementDirection(), originalEvent.isRunning(),
-                    originalEvent.isCrouching(), originalEvent.isJumpRequested(), originalEvent.getDeltaMs());
+                    originalEvent.isCrouching(), originalEvent.isJumping(), originalEvent.getDeltaMs());
         } else if (toBeCopied instanceof MouseButtonEvent) {
             MouseButtonEvent originalEvent = (MouseButtonEvent) toBeCopied;
             MouseButtonEvent newEvent = new MouseButtonEvent(originalEvent.getButton(), originalEvent.getState(), originalEvent.getDelta());

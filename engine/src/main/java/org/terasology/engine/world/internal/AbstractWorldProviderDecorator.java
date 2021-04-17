@@ -69,6 +69,11 @@ public class AbstractWorldProviderDecorator implements WorldProviderCore {
     }
 
     @Override
+    public ChunkViewCore getWorldViewAround(BlockRegionc region) {
+        return base.getWorldViewAround(region);
+    }
+
+    @Override
     public boolean isBlockRelevant(int x, int y, int z) {
         return base.isBlockRelevant(x, y, z);
     }
