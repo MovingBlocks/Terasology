@@ -86,7 +86,7 @@ public class LwjglCanvasRenderer implements TerasologyCanvasRenderer, PropertyCh
     private DisplayDevice displayDevice;
     private float uiScale = 1f;
 
-    private Matrix4fStack modelMatrixStack = new Matrix4fStack(10000);
+    private Matrix4fStack modelMatrixStack = new Matrix4fStack(1000);
     private Matrix4f projMatrix = new Matrix4f();
 
     public LwjglCanvasRenderer(Context context) {
