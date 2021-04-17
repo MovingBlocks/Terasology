@@ -55,23 +55,19 @@ public class ObjMeshFormat extends AbstractAssetFileFormat<MeshData> {
             if (data.getVertices() == null) {
                 throw new IOException("No vertices define");
             }
-            if (!data.normals.isEmpty() && data.normals.size() != data.getVertices().size()) {
-                throw new IOException("The number of normals does not match the number of vertices.");
-            }
-            if (!data.uv0.isEmpty() && data.uv0.size() / 2 != data.getVertices().size() / 3) {
-                throw new IOException("The number of tex coords does not match the number of vertices.");
-            }
+//            if (!data.normals.isEmpty() && data.normals.size() != data.getVertices().size()) {
+//                throw new IOException("The number of normals does not match the number of vertices.");
+//            }
+//            if (!data.uv0.isEmpty() && data.uv0.size() / 2 != data.getVertices().size() / 3) {
+//                throw new IOException("The number of tex coords does not match the number of vertices.");
+//            }
 
             return data;
         }
     }
 
     private StandardMeshData processData(List<Vector3f> rawVertices, List<Vector3f> rawNormals, List<Vector2f> rawTexCoords, List<Vector3i[]> rawIndices) throws IOException {
-        StandardMeshData result = new StandardMeshData();
-        TFloatList vertices = result.vertices;
-        TFloatList texCoord0 = result.uv0;
-        TFloatList normals = result.normals;
-        TIntList indices = result.getIndices();
+        StandardMeshData result = new StandardMeshData(rawVertices.size(), rawIndices.size());
         int vertCount = 0;
         for (Vector3i[] face : rawIndices) {
             for (Vector3i indexSet : face) {
@@ -79,17 +75,14 @@ public class ObjMeshFormat extends AbstractAssetFileFormat<MeshData> {
                     throw new IOException("Vertex index out of range: " + indexSet.x);
                 }
                 Vector3f vertex = rawVertices.get(indexSet.x - 1);
-                vertices.add(vertex.x);
-                vertices.add(vertex.y);
-                vertices.add(vertex.z);
+                result.position.put(vertex);
 
                 if (indexSet.y != -1) {
                     if (indexSet.y > rawTexCoords.size()) {
                         throw new IOException("TexCoord index out of range: " + indexSet.y);
                     }
                     Vector2f texCoord = rawTexCoords.get(indexSet.y - 1);
-                    texCoord0.add(texCoord.x);
-                    texCoord0.add(1 - texCoord.y);
+                    result.uv0.put(new Vector2f(texCoord.x, 1 - texCoord.y));
                 }
 
                 if (indexSet.z != -1) {
@@ -97,16 +90,14 @@ public class ObjMeshFormat extends AbstractAssetFileFormat<MeshData> {
                         throw new IOException("Normal index out of range: " + indexSet.z);
                     }
                     Vector3f normal = rawNormals.get(indexSet.z - 1);
-                    normals.add(normal.x);
-                    normals.add(normal.y);
-                    normals.add(normal.z);
+                    result.normal.put(normal);
                 }
             }
 
             for (int i = 0; i < face.length - 2; ++i) {
-                indices.add(vertCount);
-                indices.add(vertCount + i + 1);
-                indices.add(vertCount + i + 2);
+                result.indices.put(vertCount);
+                result.indices.put(vertCount + i + 1);
+                result.indices.put(vertCount + i + 2);
             }
             vertCount += face.length;
         }

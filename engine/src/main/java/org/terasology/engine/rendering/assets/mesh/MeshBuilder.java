@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.rendering.assets.mesh;
 
+import org.joml.Vector2f;
 import org.joml.Vector2fc;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
@@ -63,9 +64,7 @@ public class MeshBuilder {
     private TextureMapper textureMapper;
 
     public MeshBuilder addVertex(Vector3fc v) {
-        meshData.getVertices().add(v.x());
-        meshData.getVertices().add(v.y());
-        meshData.getVertices().add(v.z());
+        meshData.position.put(v);
         vertexCount++;
         return this;
     }
@@ -92,22 +91,15 @@ public class MeshBuilder {
     }
 
     public MeshBuilder addColor(Colorc c1, Colorc... colors) {
-        meshData.color0.add(c1.rf());
-        meshData.color0.add(c1.gf());
-        meshData.color0.add(c1.bf());
-        meshData.color0.add(c1.af());
+        meshData.color0.put(c1);
         for (Colorc c : colors) {
-            meshData.color0.add(c.rf());
-            meshData.color0.add(c.gf());
-            meshData.color0.add(c.bf());
-            meshData.color0.add(c.af());
+            meshData.color0.put(c);
         }
         return this;
     }
 
     public MeshBuilder addTexCoord(float x, float y) {
-        meshData.uv0.add(x);
-        meshData.uv0.add(y);
+        meshData.uv0.put(new Vector2f(x,y));
         return this;
     }
 
@@ -116,12 +108,14 @@ public class MeshBuilder {
     }
 
     public MeshBuilder addIndex(int index) {
-        meshData.getIndices().add(index);
+        meshData.indices.put(index);
         return this;
     }
 
     public MeshBuilder addIndices(int... indices) {
-        meshData.getIndices().add(indices);
+        for (int x = 0; x < indices.length; x++) {
+            meshData.indices.put(indices[x]);
+        }
         return this;
     }
 

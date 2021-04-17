@@ -3,8 +3,6 @@
 package org.terasology.engine.rendering.assets.mesh;
 
 import gnu.trove.list.TFloatList;
-import gnu.trove.list.TIntList;
-import gnu.trove.list.array.TIntArrayList;
 import org.lwjgl.opengl.GL30;
 import org.lwjgl.opengl.GL33;
 import org.lwjgl.opengl.GL44;
@@ -38,7 +36,6 @@ public abstract class MeshData implements AssetData {
     };
 
     private List<Layout> layouts = new ArrayList<>();
-    private TIntList indices = new TIntArrayList();
     private final DrawingMode mode;
 
     public MeshData() {
@@ -56,9 +53,9 @@ public abstract class MeshData implements AssetData {
     public List<Layout> getLayouts() {
         return this.layouts;
     }
-    public TIntList getIndices() {
-        return indices;
-    }
+//    public TIntList getIndices() {
+//        return indices;
+//    }
     public DrawingMode getMode() {
         return mode;
     }
