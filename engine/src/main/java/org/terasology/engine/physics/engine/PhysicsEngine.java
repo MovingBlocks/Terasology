@@ -32,6 +32,7 @@ import java.util.Set;
  *
  */
 public interface PhysicsEngine extends Physics {
+    float GRAVITY = 15f;
 
 
     /**
