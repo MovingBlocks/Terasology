@@ -45,8 +45,10 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class ModuleManager {
-    private static final Logger logger = LoggerFactory.getLogger(ModuleManager.class);
+    /** Set this property to "true" to allow modules on the classpath. */
+    public final static String LOAD_CLASSPATH_MODULES_PROPERTY = "org.terasology.load_classpath_modules";
 
+    private static final Logger logger = LoggerFactory.getLogger(ModuleManager.class);
     private final StandardPermissionProviderFactory permissionProviderFactory = new StandardPermissionProviderFactory();
     private final PermissionProviderFactory wrappingPermissionProviderFactory =
             new WarnOnlyProviderFactory(permissionProviderFactory);
@@ -67,7 +69,12 @@ public class ModuleManager {
 
         metadataReader = newMetadataReader();
 
-        moduleFactory = new ModuleFactory();
+        if (Boolean.getBoolean(LOAD_CLASSPATH_MODULES_PROPERTY)) {
+            moduleFactory = new ClasspathCompromisingModuleFactory();
+        } else {
+            moduleFactory = new ModuleFactory();
+        }
+
         Map<String, ModuleMetadataLoader> mmlm = moduleFactory.getModuleMetadataLoaderMap();
         mmlm.put(TerasologyConstants.MODULE_INFO_FILENAME.toString(), metadataReader);
         mmlm.put("engine-module.txt", metadataReader);  // FIXME: this should be *only* for engine-module.
