@@ -33,9 +33,6 @@ import org.terasology.engine.world.generator.WorldConfigurator;
 import org.terasology.engine.world.generator.WorldGenerator;
 
 import java.util.Iterator;
-import java.util.Map;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  */
@@ -79,7 +76,7 @@ public class CreateWorldEntity extends SingleStepLoadProcess {
             chunkProvider.setWorldEntity(worldEntity);
 
             // replace the world generator values from the components in the world entity
-            checkNotNull(worldConfigurator).getProperties().forEach((key, currentComponent) -> {
+            worldConfigurator.getProperties().forEach((key, currentComponent) -> {
                 Component component = worldEntity.getComponent(currentComponent.getClass());
                 if (component != null) {
                     worldConfigurator.setProperty(key, component);
@@ -93,7 +90,7 @@ public class CreateWorldEntity extends SingleStepLoadProcess {
 
             // transfer all world generation parameters from Config to WorldEntity
             SimpleUri generatorUri = worldGenerator.getUri();
-            checkNotNull(worldConfigurator).getProperties().forEach((key, currentComponent) -> {
+            worldConfigurator.getProperties().forEach((key, currentComponent) -> {
                 Class<? extends Component> clazz = currentComponent.getClass();
                 Component moduleComponent = config.getModuleConfig(generatorUri, key, clazz);
                 if (moduleComponent != null) {
