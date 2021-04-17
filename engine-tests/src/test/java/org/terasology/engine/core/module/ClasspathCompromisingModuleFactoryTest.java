@@ -48,4 +48,13 @@ public class ClasspathCompromisingModuleFactoryTest {
         assertTrue(module.getClassPredicate().test(someClassInTheModule));
         assertFalse(module.getClassPredicate().test(someClassOutsideTheModule));
     }
+
+    @Test
+    @Disabled("TODO: need a jar module alongside a classes directory")
+    public void directoryModuleContainsClassLoadedFromJar() {
+        // Example:
+        //   - m/build/classes/org/t/Foo.class
+        //   - m/build/libs/foo.jar
+        // load m as directory module while foo.jar is on classpath
+    }
 }

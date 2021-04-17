@@ -74,6 +74,7 @@ public class ModuleManager {
         } else {
             moduleFactory = new ModuleFactory();
         }
+        moduleFactory.setDefaultLibsSubpath("build/libs");
 
         Map<String, ModuleMetadataLoader> mmlm = moduleFactory.getModuleMetadataLoaderMap();
         mmlm.put(TerasologyConstants.MODULE_INFO_FILENAME.toString(), metadataReader);
