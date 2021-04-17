@@ -33,7 +33,7 @@ public class VoxelBlockFluidWorld implements VoxelWorld {
     private final btRigidBody rigidBody;
 
     public VoxelBlockFluidWorld(BulletPhysics physics) {
-        btDiscreteDynamicsWorld discreteDynamicsWorld = ((BulletPhysics) physics).getDiscreteDynamicsWorld();
+        btDiscreteDynamicsWorld discreteDynamicsWorld = physics.getDiscreteDynamicsWorld();
 
         wrapper = new VoxelCollisionAlgorithmWrapper(Chunks.SIZE_X, Chunks.SIZE_Y,
                 Chunks.SIZE_Z);
