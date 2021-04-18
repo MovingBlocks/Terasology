@@ -186,10 +186,8 @@ public class NewGameScreen extends CoreScreenLayer {
         List<Module> gameplayModules = Lists.newArrayList();
         for (Name moduleId : moduleManager.getRegistry().getModuleIds()) {
             Module latestVersion = moduleManager.getRegistry().getLatestModuleVersion(moduleId);
-            if (!(latestVersion.getResources() instanceof DirectoryFileSource)) {
-                if (StandardModuleExtension.isGameplayModule(latestVersion)) {
-                    gameplayModules.add(latestVersion);
-                }
+            if (StandardModuleExtension.isGameplayModule(latestVersion)) {
+                gameplayModules.add(latestVersion);
             }
         }
         gameplayModules.sort(Comparator.comparing(o -> o.getMetadata().getDisplayName().value()));
