@@ -1,39 +1,30 @@
-/*
- * Copyright 2015 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *  http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.i18n;
 
+import com.google.common.collect.ImmutableList;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.engine.core.SimpleUri;
 import org.terasology.engine.i18n.assets.TranslationData;
 import org.terasology.engine.i18n.assets.TranslationFormat;
+import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.gestalt.assets.exceptions.InvalidAssetFilenameException;
 import org.terasology.gestalt.assets.format.AssetDataFile;
 import org.terasology.gestalt.assets.format.FileFormat;
+import org.terasology.gestalt.module.resources.FileReference;
 import org.terasology.gestalt.naming.Name;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Paths;
 import java.util.Collections;
+import java.util.List;
 import java.util.Locale;
+import java.util.function.Predicate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -59,15 +50,16 @@ public class TranslationFormatTests {
         assertEquals(new Name("menu_pl"),  format.getAssetName("menu_pl.lang"));
     }
 
-//    @Test
-//    public void testPathMatcher() throws IOException, InvalidAssetFilenameException{
-//        assertFalse(format.getFileMatcher().matches(Paths.get("menu.json")));
-//        assertFalse(format.getFileMatcher().matches(Paths.get("menu.prefab")));
-//
-//        assertTrue(format.getFileMatcher().matches(Paths.get("menu.lang")));
-//        assertTrue(format.getFileMatcher().matches(Paths.get("menu_pl.lang")));
-//        assertTrue(format.getFileMatcher().matches(Paths.get("menu_en-US-x-lvariant-POSIX.lang")));
-//    }
+    @Test
+    public void testPathMatcher() {
+        Predicate<FileReference> matcher = format.getFileMatcher();
+        assertFalse(matcher.test(new CarefreeFileReference("menu.json")));
+        assertFalse(matcher.test(new CarefreeFileReference("menu.prefab")));
+
+        assertTrue(matcher.test(new CarefreeFileReference("menu.lang")));
+        assertTrue(matcher.test(new CarefreeFileReference("menu_pl.lang")));
+        assertTrue(matcher.test(new CarefreeFileReference("menu_en-US-x-lvariant-POSIX.lang")));
+    }
 
     @Test
     public void testEmptyDataGenRoot() throws IOException, InvalidAssetFilenameException {
@@ -140,5 +132,29 @@ public class TranslationFormatTests {
         sb.append("\"engine:mainMenuScreen#exit#text\": \"Beenden\"");
         sb.append("}");
         return sb.toString();
+    }
+
+
+    static class CarefreeFileReference implements FileReference {
+        private final String name;
+
+        CarefreeFileReference(String filename) {
+            name = filename;
+        }
+        
+        @Override
+        public String getName() {
+            return name;
+        }
+
+        @Override
+        public List<String> getPath() {
+            return ImmutableList.of(name);
+        }
+
+        @Override
+        public InputStream open() throws IOException {
+            throw new IOException("I never expected to have to open a file!");
+        }
     }
 }
