@@ -2,34 +2,20 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.rendering.opengl;
 
-import gnu.trove.list.TFloatList;
-import gnu.trove.list.TIntList;
-import org.lwjgl.BufferUtils;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
-import org.lwjgl.opengl.GL33;
-import org.lwjgl.opengl.GL41;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.AssetType;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.engine.core.GameThread;
-import org.terasology.engine.core.subsystem.lwjgl.GLBufferPool;
 import org.terasology.engine.core.subsystem.lwjgl.LwjglGraphicsProcessing;
 import org.terasology.engine.rendering.assets.mesh.Mesh;
 import org.terasology.engine.rendering.assets.mesh.MeshData;
-import org.terasology.engine.rendering.assets.mesh.layout.ByteLayout;
-import org.terasology.engine.rendering.assets.mesh.layout.DoubleLayout;
-import org.terasology.engine.rendering.assets.mesh.layout.FloatLayout;
-import org.terasology.engine.rendering.assets.mesh.layout.IntLayout;
-import org.terasology.engine.rendering.assets.mesh.layout.Layout;
-import org.terasology.engine.rendering.assets.mesh.layout.ShortLayout;
+import org.terasology.engine.rendering.assets.mesh.resouce.VertexResource;
 import org.terasology.joml.geom.AABBf;
 import org.terasology.joml.geom.AABBfc;
 
 import java.nio.ByteBuffer;
-import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -67,9 +53,15 @@ public class OpenGLMesh extends Mesh {
     }
 
     @Override
-    public TFloatList getVertices() {
+    public Float[] getVertices() {
         return data.getVertices();
     }
+
+    @Override
+    public int getVertexCount() {
+        return data.vertexCount();
+    }
+
 
     @Override
     public void render() {
@@ -91,69 +83,36 @@ public class OpenGLMesh extends Mesh {
         this.disposalAction.vbo = GL30.glGenBuffers();
         this.disposalAction.ebo = GL30.glGenBuffers();
 
-        List<Layout> layouts = newData.getLayouts();
-        List<Layout> targets = new ArrayList<>();
-
-        int stride = 0;
-        for (Layout layout : layouts) {
-            if (layout.hasContent()) {
-                stride += layout.bytes();
-                targets.add(layout);
-            }
-        }
-
-        ByteBuffer buffer = BufferUtils.createByteBuffer(stride * newData.getSize());
-        for (int x = 0; x < newData.getSize(); x++) {
-            for (Layout layout : targets) {
-                layout.write(x, buffer);
-            }
-        }
-        buffer.flip();
-
-        // bind vertex array and buffer
         GL30.glBindVertexArray(this.disposalAction.vao);
-        GL30.glBindBuffer(GL30.GL_ARRAY_BUFFER, this.disposalAction.vbo);
-        GL30.glBufferData(GL30.GL_ARRAY_BUFFER, buffer, GL30.GL_STATIC_DRAW);
 
-        int offset = 0;
-        for (Layout layout : targets) {
-            GL30.glEnableVertexAttribArray(layout.location);
-            if ((layout.flag & Layout.FLOATING_POINT) > 0) {
-                if (layout instanceof FloatLayout) {
-                    GL30.glVertexAttribPointer(layout.location, layout.size, GL30.GL_FLOAT, (layout.flag & Layout.NORMALIZED) > 0, stride, offset);
-                } else if (layout instanceof ShortLayout) {
-                    GL30.glVertexAttribPointer(layout.location, layout.size, GL30.GL_SHORT, (layout.flag & Layout.NORMALIZED) > 0, stride, offset);
-                } else if (layout instanceof IntLayout) {
-                    GL30.glVertexAttribPointer(layout.location, layout.size, GL30.GL_INT, (layout.flag & Layout.NORMALIZED) > 0, stride, offset);
-                } else if (layout instanceof ByteLayout) {
-                    GL30.glVertexAttribPointer(layout.location, layout.size, GL30.GL_BYTE, (layout.flag & Layout.NORMALIZED) > 0, stride, offset);
-                } else if (layout instanceof DoubleLayout) {
-                    GL41.glVertexAttribLPointer(layout.location, layout.size, GL30.GL_DOUBLE, stride, offset);
-                } else {
-                    throw new RuntimeException("invalid layout for class: " + layout.getClass());
-                }
-            } else {
-                if (layout instanceof ShortLayout) {
-                    GL30.glVertexAttribIPointer(layout.location, layout.size, GL30.GL_SHORT, stride, offset);
-                } else if (layout instanceof IntLayout) {
-                    GL30.glVertexAttribIPointer(layout.location, layout.size, GL30.GL_INT, stride, offset);
-                } else if (layout instanceof ByteLayout) {
-                    GL30.glVertexAttribIPointer(layout.location, layout.size, GL30.GL_BYTE, stride, offset);
-                } else {
-                    throw new RuntimeException("invalid layout for class: " + layout.getClass());
-                }
+        VertexResource[] resources = newData.getVertexResource();
+        List<VertexResource> targets = new ArrayList<>();
+        int bufferSize = 0;
+        for(int x = 0; x < resources.length; x++) {
+            if(resources[x].getVersion() >  0) {
+                targets.add(resources[x]);
+                bufferSize += resources[x].inSize;
             }
-            offset += layout.bytes();
+        }
+        GL30.glBindBuffer(GL30.GL_ARRAY_BUFFER, this.disposalAction.vbo);
+        GL30.glBufferData(this.disposalAction.vbo, bufferSize, GL30.GL_STATIC_DRAW);
+        int offset = 0;
+        for (VertexResource resource : targets) {
+            resource.buffer.rewind();
+            GL30.glBufferSubData(this.disposalAction.vbo, offset, resource.buffer);
+            for (VertexResource.VertexDefinition attribute : resource.attributes) {
+                GL30.glEnableVertexAttribArray(attribute.location);
+                GL30.glVertexAttribPointer(attribute.location, attribute.attribute.count,
+                        attribute.attribute.mapping.glType, false, resource.inStride, offset + resource.inStride);
+            }
+            offset += resource.inSize;
         }
 
-        TIntList indices = newData.getIndices();
-        IntBuffer bufferIndices = BufferUtils.createIntBuffer(indices.size());
-        bufferIndices.put(indices.toArray());
-        bufferIndices.flip();
-
+        ByteBuffer indexBuffer = newData.getIndexResource().buffer;
+        indexBuffer.rewind();
         GL30.glBindBuffer(GL30.GL_ELEMENT_ARRAY_BUFFER, this.disposalAction.ebo);
-        GL30.glBufferData(GL30.GL_ELEMENT_ARRAY_BUFFER, bufferIndices, GL30.GL_STATIC_DRAW);
-        indexCount = indices.size();
+        GL30.glBufferData(GL30.GL_ELEMENT_ARRAY_BUFFER, indexBuffer, GL30.GL_STATIC_DRAW);
+        this.indexCount = newData.getIndexResource().num;
 
         GL30.glBindBuffer(GL30.GL_ARRAY_BUFFER, 0);
         GL30.glBindVertexArray(0);

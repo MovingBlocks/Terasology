@@ -3,6 +3,10 @@
 package org.terasology.engine.rendering.primitives;
 
 import com.google.common.base.Preconditions;
+import gnu.trove.list.TFloatList;
+import gnu.trove.list.TIntList;
+import gnu.trove.list.array.TFloatArrayList;
+import gnu.trove.list.array.TIntArrayList;
 import org.joml.Vector2f;
 import org.joml.Vector2fc;
 import org.joml.Vector3f;
@@ -31,6 +35,13 @@ public class Tessellator {
     private boolean useLighting = true;
     private boolean useNormals = true;
 
+    public final TFloatList positions = new TFloatArrayList();
+    public final TFloatList uv0 = new TFloatArrayList();
+    public final TFloatList uv1 = new TFloatArrayList();
+    public final TFloatList normals = new TFloatArrayList();
+    public final TFloatList color0 = new TFloatArrayList();
+    public final TFloatList light0 = new TFloatArrayList();
+    public final TIntList indices = new TIntArrayList();
 
     public Tessellator() {
         resetParams();
@@ -51,41 +62,43 @@ public class Tessellator {
         activeNormal.set(0, 1, 0);
     }
 
+
+
     public void addPoly(Vector3f[] vertices, Vector2f[] texCoords) {
         if (vertices.length != texCoords.length || vertices.length < 3) {
             throw new IllegalArgumentException("addPoly expected vertices.length == texCoords.length > 2");
         }
         for (int i = 0; i < vertices.length; ++i) {
-            meshData.getVertices().add(vertices[i].x);
-            meshData.getVertices().add(vertices[i].y);
-            meshData.getVertices().add(vertices[i].z);
+            positions.add(vertices[i].x);
+            positions.add(vertices[i].y);
+            positions.add(vertices[i].z);
 
-            meshData.color0.add(activeColor.x);
-            meshData.color0.add(activeColor.y);
-            meshData.color0.add(activeColor.z);
-            meshData.color0.add(activeColor.w);
+            color0.add(activeColor.x);
+            color0.add(activeColor.y);
+            color0.add(activeColor.z);
+            color0.add(activeColor.w);
 
             if (useNormals) {
-                meshData.normals.add(activeNormal.x);
-                meshData.normals.add(activeNormal.y);
-                meshData.normals.add(activeNormal.z);
+                normals.add(activeNormal.x);
+                normals.add(activeNormal.y);
+                normals.add(activeNormal.z);
             }
 
-            meshData.uv0.add(texCoords[i].x);
-            meshData.uv0.add(texCoords[i].y);
+            uv0.add(texCoords[i].x);
+            uv0.add(texCoords[i].y);
 
             if (useLighting) {
-                meshData.uv1.add(lighting.x);
-                meshData.uv1.add(lighting.y);
-                meshData.uv1.add(lighting.z);
+                light0.add(lighting.x);
+                light0.add(lighting.y);
+                light0.add(lighting.z);
             }
         }
 
         // Standard fan
         for (int i = 0; i < vertices.length - 2; i++) {
-            meshData.getIndices().add(nextIndex);
-            meshData.getIndices().add(nextIndex + i + 1);
-            meshData.getIndices().add(nextIndex + i + 2);
+            indices.add(nextIndex);
+            indices.add(nextIndex + i + 1);
+            indices.add(nextIndex + i + 2);
         }
         nextIndex += vertices.length;
     }
@@ -101,40 +114,40 @@ public class Tessellator {
     private void addMeshPart(BlockMeshPart part, boolean doubleSided) {
         for (int i = 0; i < part.size(); ++i) {
             Vector3fc vertex = part.getVertex(i);
-            meshData.getVertices().add(vertex.x());
-            meshData.getVertices().add(vertex.y());
-            meshData.getVertices().add(vertex.z());
+            positions.add(vertex.x());
+            positions.add(vertex.y());
+            positions.add(vertex.z());
 
-            meshData.color0.add(activeColor.x);
-            meshData.color0.add(activeColor.y);
-            meshData.color0.add(activeColor.z);
-            meshData.color0.add(activeColor.w);
+            color0.add(activeColor.x);
+            color0.add(activeColor.y);
+            color0.add(activeColor.z);
+            color0.add(activeColor.w);
 
             Vector3fc normal = part.getNormal(i);
-            meshData.normals.add(normal.x());
-            meshData.normals.add(normal.y());
-            meshData.normals.add(normal.z());
+            normals.add(normal.x());
+            normals.add(normal.y());
+            normals.add(normal.z());
 
             Vector2fc uv = part.getTexCoord(i);
-            meshData.uv0.add(uv.x());
-            meshData.uv0.add(uv.y());
+            uv0.add(uv.x());
+            uv0.add(uv.y());
 
-            meshData.light0.add(lighting.x);
-            meshData.light0.add(lighting.y);
-            meshData.light0.add(lighting.z);
+            light0.add(lighting.x);
+            light0.add(lighting.y);
+            light0.add(lighting.z);
         }
 
         for (int i = 0; i < part.indicesSize(); ++i) {
-            meshData.getIndices().add(nextIndex + part.getIndex(i));
+            indices.add(nextIndex + part.getIndex(i));
         }
         if (doubleSided) {
             for (int i = 0; i < part.indicesSize(); i += 3) {
                 int i1 = nextIndex + part.getIndex(i);
                 int i2 = nextIndex + part.getIndex(i + 1);
                 int i3 = nextIndex + part.getIndex(i + 2);
-                meshData.getIndices().add(i1);
-                meshData.getIndices().add(i3);
-                meshData.getIndices().add(i2);
+                indices.add(i1);
+                indices.add(i3);
+                indices.add(i2);
             }
         }
 
@@ -159,7 +172,9 @@ public class Tessellator {
 
     public MeshData generateMeshData() {
         MeshData result = meshData;
-        meshData = new StandardMeshData();
+        meshData = new StandardMeshData(positions.size() / 3, indices.size());
+        float[] pp = positions.toArray();
+        meshData.position.map(0, this.positions.size(), pp, 0);
         return result;
     }
 

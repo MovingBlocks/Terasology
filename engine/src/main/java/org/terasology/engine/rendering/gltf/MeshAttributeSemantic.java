@@ -7,6 +7,7 @@ import gnu.trove.list.TFloatList;
 import gnu.trove.list.array.TFloatArrayList;
 import org.terasology.engine.rendering.assets.mesh.MeshData;
 import org.terasology.engine.rendering.assets.mesh.StandardMeshData;
+import org.terasology.engine.rendering.assets.skeletalmesh.SkeletalMeshData;
 import org.terasology.engine.rendering.gltf.model.GLTFAttributeType;
 import org.terasology.engine.rendering.gltf.model.GLTFComponentType;
 
@@ -17,7 +18,7 @@ import java.util.function.Function;
  * Enumeration of the vertex Attribute Semantics supported by Terasology.
  */
 public enum MeshAttributeSemantic {
-    Normal("NORMAL", GLTFAttributeType.VEC3, GLTFComponentType.FLOAT, k -> k.normals),
+    Normal("NORMAL", GLTFAttributeType.VEC3, GLTFComponentType.FLOAT, k -> k.),
     Position("POSITION", GLTFAttributeType.VEC3, GLTFComponentType.FLOAT, MeshData::getVertices),
     Texcoord_0("TEXCOORD_0", GLTFAttributeType.VEC2, GLTFComponentType.FLOAT, k -> k.uv0),
     Texcoord_1("TEXCOORD_1", GLTFAttributeType.VEC2, GLTFComponentType.FLOAT, k -> k.uv1),
@@ -28,13 +29,13 @@ public enum MeshAttributeSemantic {
     private final String name;
     private final Set<GLTFAttributeType> supportedAccessorTypes;
     private final Set<GLTFComponentType> supportedComponentTypes;
-    private final Function<StandardMeshData, TFloatList> targetBufferSupplier;
+    private final Function<SkeletalMeshData, TFloatList> targetBufferSupplier;
 
-    MeshAttributeSemantic(String name, GLTFAttributeType supportedAccessorType, GLTFComponentType supportedComponentType, Function<StandardMeshData, TFloatList> targetBufferSupplier) {
+    MeshAttributeSemantic(String name, GLTFAttributeType supportedAccessorType, GLTFComponentType supportedComponentType, Function<SkeletalMeshData, TFloatList> targetBufferSupplier) {
         this(name, new GLTFAttributeType[]{supportedAccessorType}, new GLTFComponentType[]{supportedComponentType}, targetBufferSupplier);
     }
 
-    MeshAttributeSemantic(String name, GLTFAttributeType[] supportedAccessorTypes, GLTFComponentType[] supportedComponentTypes, Function<StandardMeshData, TFloatList> targetBufferSupplier) {
+    MeshAttributeSemantic(String name, GLTFAttributeType[] supportedAccessorTypes, GLTFComponentType[] supportedComponentTypes, Function<SkeletalMeshData, TFloatList> targetBufferSupplier) {
         this.name = name;
         this.supportedAccessorTypes = ImmutableSet.copyOf(supportedAccessorTypes);
         this.supportedComponentTypes = ImmutableSet.copyOf(supportedComponentTypes);

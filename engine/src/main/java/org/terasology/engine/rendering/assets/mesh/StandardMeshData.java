@@ -3,16 +3,15 @@
 
 package org.terasology.engine.rendering.assets.mesh;
 
-import gnu.trove.list.TFloatList;
-import gnu.trove.list.array.TFloatArrayList;
 import org.joml.Vector2f;
 import org.joml.Vector2fc;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
-import org.joml.Vector4f;
-import org.joml.Vector4fc;
+import org.terasology.engine.rendering.assets.mesh.resouce.IndexResource;
 import org.terasology.engine.rendering.assets.mesh.resouce.VertexAttribute;
+import org.terasology.engine.rendering.assets.mesh.resouce.VertexFloatAttribute;
 import org.terasology.engine.rendering.assets.mesh.resouce.VertexResource;
+import org.terasology.nui.Color;
 import org.terasology.nui.Colorc;
 
 public class StandardMeshData extends MeshData {
@@ -22,33 +21,37 @@ public class StandardMeshData extends MeshData {
     public static final int COLOR0_INDEX = 3;
     public static final int LIGHT0_INDEX = 4;
 
-    private final int size;
+    private final int vertexCount;
 
-    private final TFloatList vertexArray = new TFloatArrayList();
+    public final VertexResource positionBuffer;
+    public final VertexFloatAttribute.VertexAttributeFloatBinding<Vector3f> position;
 
-    public final VertexResource positionNormalBuffer;
-    public final VertexResource.VertexAttributeBinding<Vector3fc, TFloatList> position;
-    public final VertexResource.VertexAttributeBinding<Vector3fc, TFloatList> normal;
+    public final VertexResource normalBuffer;
+    public final VertexFloatAttribute.VertexAttributeFloatBinding<Vector3f> normal;
+
 
     public final VertexResource uvBuffer;
-    public final VertexResource.VertexAttributeBinding<Vector2fc, TFloatList> uv0;
+    public final VertexFloatAttribute.VertexAttributeFloatBinding<Vector2f> uv0;
 
 
     public final VertexResource colorBuffer;
-    public final VertexResource.VertexAttributeBinding<Colorc, TFloatList> color0;
+    public final VertexFloatAttribute.VertexAttributeFloatBinding<Color> color0;
 
     public final VertexResource lightBuffer;
-    public final VertexResource.VertexAttributeBinding<Vector3fc, TFloatList> light0;
+    public final VertexFloatAttribute.VertexAttributeFloatBinding<Vector3f> light0;
 
     public final IndexResource indices;
 
     public StandardMeshData(int size, int indices) {
-        this.size = size;
+        this.vertexCount = size;
 
         VertexResource.VertexResourceBuilder builder = new VertexResource.VertexResourceBuilder(size);
         position = builder.add(VERTEX_INDEX, VertexAttribute.VECTOR_3_F_VERTEX_ATTRIBUTE, true);
-        normal = builder.add(NORMAL_INDEX, VertexAttribute.VECTOR_3_F_VERTEX_ATTRIBUTE, false);
-        positionNormalBuffer = builder.build();
+        positionBuffer = builder.build();
+
+        builder = new VertexResource.VertexResourceBuilder(size);
+        normal = builder.add(NORMAL_INDEX, VertexAttribute.VECTOR_3_F_VERTEX_ATTRIBUTE, true);
+        normalBuffer = builder.build();
 
         builder = new VertexResource.VertexResourceBuilder(size);
         uv0 = builder.add(UV0_INDEX, VertexAttribute.VECTOR_2_F_VERTEX_ATTRIBUTE, false);
@@ -62,26 +65,32 @@ public class StandardMeshData extends MeshData {
         light0 = builder.add(LIGHT0_INDEX, VertexAttribute.VECTOR_3_F_VERTEX_ATTRIBUTE, false);
         colorBuffer = builder.build();
 
-        this.indices = new IndexResource(indices * 3);
+        this.indices = new IndexResource(indices);
     }
 
-    public VertexResource[] getResources() {
+    @Override
+    public float[] getVertices() {
+        return position.getStore();
+    }
+
+    @Override
+    public VertexResource[] getVertexResource() {
         return new VertexResource[]{
-                positionNormalBuffer,
+                positionBuffer,
+                normalBuffer,
                 uvBuffer,
                 colorBuffer,
                 lightBuffer
         };
     }
 
-
     @Override
-    public TFloatList getVertices() {
-        return null;
+    public IndexResource getIndexResource() {
+        return indices;
     }
 
     @Override
-    public int getSize() {
-        return this.size;
+    public int vertexCount() {
+        return vertexCount;
     }
 }

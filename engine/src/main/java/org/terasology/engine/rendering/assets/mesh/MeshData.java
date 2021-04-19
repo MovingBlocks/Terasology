@@ -2,15 +2,12 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.rendering.assets.mesh;
 
-import gnu.trove.list.TFloatList;
 import org.lwjgl.opengl.GL30;
 import org.lwjgl.opengl.GL33;
 import org.lwjgl.opengl.GL44;
 import org.terasology.assets.AssetData;
-import org.terasology.engine.rendering.assets.mesh.layout.Layout;
-
-import java.util.ArrayList;
-import java.util.List;
+import org.terasology.engine.rendering.assets.mesh.resouce.IndexResource;
+import org.terasology.engine.rendering.assets.mesh.resouce.VertexResource;
 
 /**
  */
@@ -35,7 +32,6 @@ public abstract class MeshData implements AssetData {
 
     };
 
-    private List<Layout> layouts = new ArrayList<>();
     private final DrawingMode mode;
 
     public MeshData() {
@@ -46,21 +42,13 @@ public abstract class MeshData implements AssetData {
         this.mode = mode;
     }
 
-    public MeshData addLayout(Layout layout) {
-        this.getLayouts().add(layout);
-        return this;
-    }
-    public List<Layout> getLayouts() {
-        return this.layouts;
-    }
-//    public TIntList getIndices() {
-//        return indices;
-//    }
     public DrawingMode getMode() {
         return mode;
     }
 
-    public abstract TFloatList getVertices();
-    public abstract int getSize();
+    public abstract float[] getVertices();
 
+    public abstract VertexResource[] getVertexResource();
+    public abstract IndexResource getIndexResource();
+    public abstract int vertexCount();
 }

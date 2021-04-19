@@ -18,8 +18,8 @@ public abstract class Mesh extends Asset<MeshData> {
     public abstract AABBfc getAABB();
 
     protected AABBf getBound(MeshData data, AABBf dest) {
-        TFloatList vertices = data.getVertices();
-        int vertexCount = vertices.size() / 3;
+        Float[] vertices = this.getVertices();
+        int vertexCount = vertices.length / 3;
         if (vertexCount == 0) {
             dest.set(Float.POSITIVE_INFINITY,
                 Float.POSITIVE_INFINITY,
@@ -30,21 +30,22 @@ public abstract class Mesh extends Asset<MeshData> {
             return dest;
         }
 
-        dest.minX = vertices.get(0);
-        dest.minY = vertices.get(1);
-        dest.minZ = vertices.get(2);
-        dest.maxX = vertices.get(0);
-        dest.maxY = vertices.get(1);
-        dest.maxZ = vertices.get(2);
+        dest.minX = vertices[0];
+        dest.minY = vertices[1];
+        dest.minZ = vertices[2];
+        dest.maxX = vertices[0];
+        dest.maxY = vertices[1];
+        dest.maxZ = vertices[2];
 
         for (int index = 1; index < vertexCount; ++index) {
-            dest.union(vertices.get(3 * index), vertices.get(3 * index + 1), vertices.get(3 * index + 2));
+            dest.union(vertices[3 * index], vertices[3 * index + 1], vertices[3 * index + 2]);
 
         }
         return dest;
     }
 
-    public abstract TFloatList getVertices();
+    public abstract Float[] getVertices();
+    public abstract int getVertexCount();
 
     // TODO: Remove? At least review.
     public abstract void render();

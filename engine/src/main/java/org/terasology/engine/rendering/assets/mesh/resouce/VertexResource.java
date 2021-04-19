@@ -15,6 +15,7 @@ public class VertexResource {
     public final int inSize;
     public final VertexDefinition[] attributes;
     public final ByteBuffer buffer;
+    private int version = 0;
 
     protected VertexResource(int inStride, int inSize, VertexDefinition[] attribute) {
         this.inSize = inSize;
@@ -23,6 +24,16 @@ public class VertexResource {
         this.attributes = attribute;
     }
 
+    public int getVersion() {
+        return version;
+    }
+
+    /**
+     * increase version flag for change
+     */
+    public void mark() {
+        version++;
+    }
 
     public static class VertexDefinition {
         public final int location;
@@ -36,8 +47,8 @@ public class VertexResource {
 
 
     public static class VertexResourceBuilder {
-        private List<VertexAttributeBinding<?, ?>> bindings = new ArrayList<>();
         private List<VertexDefinition> definitions = new ArrayList<>();
+        private List<VertexAttributeBinding> bindings = new ArrayList<>();
         private int inStride;
         private int vertexCount;
 
@@ -46,8 +57,11 @@ public class VertexResource {
         }
 
 
-        public <TARGET, STORE> VertexAttributeBinding<TARGET, STORE> add(int location, VertexAttribute<TARGET, STORE> attribute, boolean cpuReadable) {
-            VertexAttributeBinding<TARGET, STORE> result = new VertexAttributeBinding<TARGET, STORE>(attribute, inStride, vertexCount, cpuReadable);
+        public <TARGET> VertexFloatAttribute.VertexAttributeFloatBinding<TARGET> add(int location,
+                                                                                     VertexFloatAttribute<TARGET> attribute, boolean cpuReadable) {
+            VertexFloatAttribute.VertexAttributeFloatBinding<TARGET> result =
+                    new VertexFloatAttribute.VertexAttributeFloatBinding<>(attribute, inStride, vertexCount,
+                            cpuReadable);
             inStride += attribute.mapping.size * attribute.count;
             this.bindings.add(result);
             this.definitions.add(new VertexDefinition(location, attribute));
@@ -55,71 +69,12 @@ public class VertexResource {
         }
 
         public VertexResource build() {
-            VertexResource resource = new VertexResource(inStride, inStride * vertexCount, this.definitions.toArray(new VertexDefinition[]{}));
+            VertexResource resource = new VertexResource(inStride, inStride * vertexCount,
+                    this.definitions.toArray(new VertexDefinition[]{}));
             for (VertexAttributeBinding binding : bindings) {
-                binding.resource = resource;
+                binding.setResource(resource);
             }
             return resource;
-        }
-    }
-
-    public static class VertexAttributeBinding<TARGET, STORE> {
-        private VertexAttribute<TARGET, STORE> attributes;
-        private VertexResource resource;
-        private int index = 0;
-        private int offset = 0;
-        private int vertexCount;
-        private STORE backing;
-
-        public Optional<STORE> getBacking() {
-            return Optional.ofNullable(backing);
-        }
-
-        public int vertexCount() {
-            return vertexCount;
-        }
-
-        VertexAttributeBinding(VertexAttribute<TARGET, STORE> target, int offset, int vertexCount, boolean cpuReadable) {
-            this.attributes = target;
-            this.offset = offset;
-            this.vertexCount = vertexCount;
-            if (cpuReadable) {
-                backing = target.configuration.build(vertexCount);
-            }
-        }
-
-        public void put(TARGET value) {
-            attributes.configuration.map(index, resource.inStride, offset, getBacking(), resource.buffer, value);
-            index++;
-        }
-
-        public void  rewind() {
-            index = 0;
-        }
-
-        public void map(int start, int end, STORE input) {
-            int loc = 0;
-            for (int x = start; x < end; x++) {
-                attributes.configuration.map(loc, resource.inStride, offset, getBacking(), resource.buffer, x, input);
-                loc++;
-            }
-        }
-
-        public void put(int vertexIndex, TARGET value) {
-            attributes.configuration.map(vertexIndex, resource.inStride, offset, getBacking(), resource.buffer, value);
-        }
-
-        /**
-         * map store to buffered data
-         */
-        public void refresh() {
-            getBacking().ifPresentOrElse(store -> {
-                for (int x = 0; x < vertexCount; x++) {
-                    attributes.configuration.map(x, resource.inStride, offset, Optional.empty(), resource.buffer, x, store);
-                }
-            }, () -> {
-                throw new RuntimeException("content is not readable");
-            });
         }
     }
 }
