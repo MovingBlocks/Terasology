@@ -10,8 +10,13 @@ workspace.xml
 # Shelf is where it put changes you're not ready to share. (it's like git stash)
 /shelf
 
-# Dictionaries: automatically generated per user
-/dictionaries
+# Dictionaries: do not ignore!
+#  /dictionaries
+# Yes, it makes a new file for each user, but JetBrains product manager Dmitry Jemerov explains:
+#
+# >    The dictionary is not in fact per-user; the spellchecker uses words from all users'
+# >    dictionaries for checking the spelling.
+#          — https://youtrack.jetbrains.com/issue/WI-45679#focus=streamItem-27-3457290.0-0
 
 # managed by gradle sync
 /gradle.xml
