@@ -24,6 +24,7 @@ import org.terasology.engine.entitySystem.entity.internal.OwnershipHelper;
 import org.terasology.engine.entitySystem.metadata.ComponentMetadata;
 import org.terasology.engine.persistence.serializers.EntitySerializer;
 import org.terasology.engine.persistence.serializers.FieldSerializeCheck;
+import org.terasology.engine.persistence.serializers.PersistenceComponentSerializeCheck;
 import org.terasology.protobuf.EntityData;
 
 import java.util.Map;
@@ -43,6 +44,7 @@ final class EntityStorer {
     EntityStorer(EngineEntityManager entityManager) {
         this.entityStoreBuilder = EntityData.EntityStore.newBuilder();
         this.serializer = new EntitySerializer(entityManager);
+        this.serializer.setComponentSerializeCheck(new PersistenceComponentSerializeCheck());
         this.helper = new OwnershipHelper(entityManager.getComponentLibrary());
 
         Map<Class<? extends Component>, Integer> componentIds = Maps.newHashMap();

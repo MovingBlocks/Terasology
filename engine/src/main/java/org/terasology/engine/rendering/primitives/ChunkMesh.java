@@ -13,10 +13,9 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL15;
 import org.terasology.engine.core.subsystem.lwjgl.GLBufferPool;
-import org.terasology.module.sandbox.API;
 import org.terasology.engine.rendering.VertexBufferObjectUtil;
 import org.terasology.engine.rendering.assets.material.Material;
-import org.terasology.engine.world.chunks.Chunks;
+import org.terasology.module.sandbox.API;
 
 import java.nio.IntBuffer;
 import java.util.Map;
@@ -84,9 +83,9 @@ public class ChunkMesh {
     // the STRIDE, above, is the gap between the beginnings of the data regarding two consecutive vertices
 
     /* VERTEX DATA */
-    private final int[] vertexBuffers = new int[4];
-    private final int[] idxBuffers = new int[4];
-    private final int[] vertexCount = new int[4];
+    public final int[] vertexBuffers = new int[4];
+    public final int[] idxBuffers = new int[4];
+    public final int[] vertexCount = new int[4];
 
     /* STATS */
     private int triangleCount = -1;
@@ -116,8 +115,8 @@ public class ChunkMesh {
         return vertexElements.get(renderType);
     }
 
-    public boolean isGenerated() {
-        return vertexElements == null;
+    public boolean hasVertexElements() {
+        return vertexElements != null;
     }
 
     /**
@@ -133,12 +132,14 @@ public class ChunkMesh {
                     return false;
                 }
 
+                // Make sure that if it has already been generated, the previous buffers are freed
+                dispose();
+                disposed = false;
+
                 for (RenderType type : RenderType.values()) {
                     generateVBO(type);
                 }
 
-                // Free unused space on the heap
-                vertexElements = null;
                 // Calculate the final amount of triangles
                 triangleCount = (vertexCount[0] + vertexCount[1] + vertexCount[2] + vertexCount[3]) / 3;
             } finally {
@@ -155,8 +156,8 @@ public class ChunkMesh {
         VertexElements elements = vertexElements.get(type);
         int id = type.getIndex();
         if (!disposed && elements.finalIndices.limit() > 0 && elements.finalVertices.limit() > 0) {
-            vertexBuffers[id] = bufferPool.get("chunkMesh");
-            idxBuffers[id] = bufferPool.get("chunkMesh");
+            vertexBuffers[id] = bufferPool != null ? bufferPool.get("chunkMesh") : GL15.glGenBuffers();
+            idxBuffers[id] = bufferPool != null ? bufferPool.get("chunkMesh") : GL15.glGenBuffers();
             vertexCount[id] = elements.finalIndices.limit();
 
             VertexBufferObjectUtil.bufferVboElementData(idxBuffers[id], elements.finalIndices, GL15.GL_STATIC_DRAW);
@@ -166,7 +167,15 @@ public class ChunkMesh {
             idxBuffers[id] = 0;
             vertexCount[id] = 0;
         }
+    }
 
+    /**
+     * Save space by removing the data that was used to construct the mesh, but
+     * after discardData is called, the mesh can't be serialized, so it shouldn't
+     * be used in contexts where that might be necessary.
+     */
+    public void discardData() {
+        vertexElements = null;
     }
 
     private void renderVbo(int id) {
@@ -282,19 +291,26 @@ public class ChunkMesh {
                 for (int i = 0; i < vertexBuffers.length; i++) {
                     int id = vertexBuffers[i];
                     if (id != 0) {
-                        bufferPool.dispose(id);
+                        if (bufferPool != null) {
+                            bufferPool.dispose(id);
+                        } else {
+                            GL15.glDeleteBuffers(id);
+                        }
                         vertexBuffers[i] = 0;
                     }
 
                     id = idxBuffers[i];
                     if (id != 0) {
-                        bufferPool.dispose(id);
+                        if (bufferPool != null) {
+                            bufferPool.dispose(id);
+                        } else {
+                            GL15.glDeleteBuffers(id);
+                        }
                         idxBuffers[i] = 0;
                     }
                 }
 
                 disposed = true;
-                vertexElements = null;
             }
         } finally {
             lock.unlock();
@@ -356,6 +372,9 @@ public class ChunkMesh {
         public final TIntList indices;
         public final TIntList flags;
         public final TIntList frames;
+        public final TFloatList sunlight;
+        public final TFloatList blocklight;
+        public final TFloatList ambientOcclusion;
         public int vertexCount;
 
         public IntBuffer finalVertices;
@@ -370,6 +389,9 @@ public class ChunkMesh {
             indices = new TIntArrayList();
             flags = new TIntArrayList();
             frames = new TIntArrayList();
+            sunlight = new TFloatArrayList();
+            blocklight = new TFloatArrayList();
+            ambientOcclusion = new TFloatArrayList();
         }
     }
 }

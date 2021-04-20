@@ -144,30 +144,7 @@ public class LocalChunkProvider implements ChunkProvider {
     }
 
     @Override
-    public ChunkViewCore getLocalView(Vector3ic centerChunkPos) {
-        BlockRegion region = new BlockRegion(centerChunkPos).expand(Chunks.LOCAL_REGION_EXTENTS);
-        if (getChunk(centerChunkPos) != null) {
-            return createWorldView(region, new Vector3i(1, 1, 1));
-        }
-        return null;
-    }
-
-    @Override
-    public ChunkViewCore getSubviewAroundBlock(Vector3ic blockPos, int extent) {
-        BlockRegion region = Chunks.toChunkRegion(new BlockRegion(blockPos).expand(extent, extent, extent));
-        return createWorldView(region, new Vector3i(-region.minX(), -region.minY(), -region.minZ()));
-    }
-
-    @Override
-    public ChunkViewCore getSubviewAroundChunk(Vector3ic chunkPos) {
-        BlockRegion region = new BlockRegion(chunkPos).expand(Chunks.LOCAL_REGION_EXTENTS);
-        if (getChunk(chunkPos) != null) {
-            return createWorldView(region, new Vector3i(-region.minX(), -region.minY(), -region.minZ()));
-        }
-        return null;
-    }
-
-    private ChunkViewCore createWorldView(BlockRegionc region, Vector3ic offset) {
+    public ChunkViewCore getSubview(BlockRegionc region, Vector3ic offset) {
         Chunk[] chunks = new Chunk[region.volume()];
         for (Vector3ic chunkPos : region) {
             Chunk chunk = chunkCache.get(chunkPos);

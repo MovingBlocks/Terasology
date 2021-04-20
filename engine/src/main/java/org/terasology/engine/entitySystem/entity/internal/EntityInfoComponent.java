@@ -16,6 +16,7 @@
 package org.terasology.engine.entitySystem.entity.internal;
 
 import org.terasology.engine.entitySystem.Component;
+import org.terasology.engine.entitySystem.DoNotPersist;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.prefab.Prefab;
 import org.terasology.engine.network.Replicate;
@@ -25,6 +26,7 @@ import javax.annotation.Nullable;
 /**
  * Component for storing entity system information on an entity
  */
+@DoNotPersist
 public class EntityInfoComponent implements Component {
     // TODO: Switch this to use Optional<Prefab>
     public Prefab parentPrefab;

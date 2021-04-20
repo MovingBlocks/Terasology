@@ -652,7 +652,7 @@ public class KinematicCharacterMover implements CharacterMover {
             endVelocity.y = 0;
 
             // Jumping is only possible, if the entity is standing on ground
-            if (input.isJumpRequested()) {
+            if (input.isJumping()) {
 
                 state.setGrounded(false);
 
@@ -682,7 +682,7 @@ public class KinematicCharacterMover implements CharacterMover {
             }
 
             // Jump again in mid-air only if a jump was requested and there are jumps remaining.
-            if (input.isJumpRequested() && movementComp.numberOfJumpsLeft > 0) {
+            if (input.isJumping() && movementComp.numberOfJumpsLeft > 0) {
                 state.setGrounded(false);
 
                 // Send event to allow for other systems to modify the jump force.

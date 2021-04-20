@@ -5,6 +5,7 @@ package org.terasology.engine.world.chunks;
 
 import org.joml.Vector3ic;
 import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.world.block.BlockRegionc;
 import org.terasology.engine.world.internal.ChunkViewCore;
 
 import java.util.Collection;
@@ -15,25 +16,12 @@ import java.util.Collection;
 public interface ChunkProvider {
 
     /**
-     * A local view provides a
-     *
-     * @param centerChunkPos
-     * @return A chunk view centered on the given chunk, with all of the surrounding chunks included.
+     * A view that gives access to a subset of the chunks
+     * @param region the region to include, in chunk coordinates
+     * @param offset the offset for the chunk view, in chunk coordinates
+     * @return
      */
-    ChunkViewCore getLocalView(Vector3ic centerChunkPos);
-
-    /**
-     * @param blockPos
-     * @param extent
-     * @return A chunk view of the chunks around the given blockPos.
-     */
-    ChunkViewCore getSubviewAroundBlock(Vector3ic blockPos, int extent);
-
-    /**
-     * @param chunkPos
-     * @return A chunk view including the chunks around the given chunk
-     */
-    ChunkViewCore getSubviewAroundChunk(Vector3ic chunkPos);
+    ChunkViewCore getSubview(BlockRegionc region, Vector3ic offset);
 
     /**
      * Sets the world entity, for the purpose of receiving chunk events.
