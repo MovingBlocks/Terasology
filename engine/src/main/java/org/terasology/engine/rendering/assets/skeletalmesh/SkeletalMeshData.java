@@ -29,10 +29,9 @@ public class SkeletalMeshData extends StandardMeshData {
     private Vector3f[] bindPosition;
     private Vector3f[] bindNormals;
 
-//    private List<Vector3f> normals;
-
     private List<BoneWeight> weights = Lists.newArrayList();
     private AABBf staticAABB;
+    private int indexCount;
 
     public SkeletalMeshData(List<Bone> bones, List<Vector3f> vertices, List<Vector3f> normals,
                             List<BoneWeight> weights, List<Vector2f> uvs, TIntList indices, AABBf staticAABB) {
@@ -55,6 +54,8 @@ public class SkeletalMeshData extends StandardMeshData {
         this.bindPosition = vertices.toArray(new Vector3f[]{});
         this.bindNormals =  normals.toArray(new Vector3f[]{});
         this.staticAABB = staticAABB;
+
+        applyBind();
 
 //        calculateNormals();
     }

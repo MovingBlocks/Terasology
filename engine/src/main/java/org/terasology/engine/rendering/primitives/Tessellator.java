@@ -23,8 +23,6 @@ import org.terasology.engine.world.block.shapes.BlockMeshPart;
 @API
 public class Tessellator {
 
-    private StandardMeshData meshData = new StandardMeshData();
-
     private int nextIndex;
 
     private Vector4f activeColor = new Vector4f();
@@ -37,7 +35,6 @@ public class Tessellator {
 
     public final TFloatList positions = new TFloatArrayList();
     public final TFloatList uv0 = new TFloatArrayList();
-    public final TFloatList uv1 = new TFloatArrayList();
     public final TFloatList normals = new TFloatArrayList();
     public final TFloatList color0 = new TFloatArrayList();
     public final TFloatList light0 = new TFloatArrayList();
@@ -171,23 +168,23 @@ public class Tessellator {
     }
 
     public MeshData generateMeshData() {
-        MeshData result = meshData;
-        meshData = new StandardMeshData(positions.size() / 3, indices.size());
-        float[] pp = positions.toArray();
-        meshData.position.map(0, this.positions.size(), pp, 0);
-        return result;
+        int vertexCount = positions.size() / 3;
+        StandardMeshData meshData = new StandardMeshData(vertexCount, indices.size());
+        meshData.position.map(0, vertexCount, positions.toArray(), 0);
+        meshData.uv0.map(0, vertexCount, uv0.toArray(), 0);
+        meshData.normal.map(0, vertexCount, normals.toArray(), 0);
+        meshData.color0.map(0, vertexCount, color0.toArray(), 0);
+        meshData.light0.map(0, vertexCount, light0.toArray(), 0);
+        meshData.indices.map(0, indices.size(), indices.toArray(), 0);
+        return meshData;
     }
 
     public Mesh generateMesh(ResourceUrn urn) {
         Preconditions.checkNotNull(urn);
-        Mesh result = Assets.generateAsset(urn, meshData, Mesh.class);
-        meshData = new StandardMeshData();
-        return result;
+        return Assets.generateAsset(urn, generateMeshData(), Mesh.class);
     }
 
     public Mesh generateMesh() {
-        Mesh result = Assets.generateAsset(meshData, Mesh.class);
-        meshData = new StandardMeshData();
-        return result;
+        return Assets.generateAsset(generateMeshData(), Mesh.class);
     }
 }

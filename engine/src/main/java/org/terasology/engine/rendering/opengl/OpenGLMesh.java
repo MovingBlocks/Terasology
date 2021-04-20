@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.rendering.opengl;
 
+import org.joml.Vector3f;
 import org.lwjgl.opengl.GL30;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,6 +12,7 @@ import org.terasology.engine.core.GameThread;
 import org.terasology.engine.core.subsystem.lwjgl.LwjglGraphicsProcessing;
 import org.terasology.engine.rendering.assets.mesh.Mesh;
 import org.terasology.engine.rendering.assets.mesh.MeshData;
+import org.terasology.engine.rendering.assets.mesh.resouce.IndexResource;
 import org.terasology.engine.rendering.assets.mesh.resouce.VertexResource;
 import org.terasology.joml.geom.AABBf;
 import org.terasology.joml.geom.AABBfc;
@@ -23,12 +25,15 @@ import static org.lwjgl.opengl.GL11.GL_UNSIGNED_INT;
 
 /**
  */
-public class OpenGLMesh extends Mesh {
+public class OpenGLMesh extends Mesh implements OpenGLMeshBase{
     private static final Logger logger = LoggerFactory.getLogger(OpenGLMesh.class);
     private AABBf aabb = new AABBf();
     private MeshData data;
     private int indexCount;
     private DisposalAction disposalAction;
+
+    private VBOContext state = null;
+
 
     public OpenGLMesh(ResourceUrn urn, AssetType<?, MeshData> assetType, MeshData data, LwjglGraphicsProcessing graphicsProcessing) {
         super(urn, assetType);
@@ -53,7 +58,7 @@ public class OpenGLMesh extends Mesh {
     }
 
     @Override
-    public Float[] getVertices() {
+    public Vector3f[] getVertices() {
         return data.getVertices();
     }
 
@@ -66,6 +71,7 @@ public class OpenGLMesh extends Mesh {
     @Override
     public void render() {
         if (!isDisposed()) {
+            updateState(state);
             GL30.glBindVertexArray(disposalAction.vao);
             GL30.glDrawElements(data.getMode().glCall, this.indexCount, GL_UNSIGNED_INT, 0);
             GL30.glBindVertexArray(0);
@@ -79,42 +85,31 @@ public class OpenGLMesh extends Mesh {
         this.data = newData;
 
         this.disposalAction.dispose();
+
         this.disposalAction.vao = GL30.glGenVertexArrays();
         this.disposalAction.vbo = GL30.glGenBuffers();
         this.disposalAction.ebo = GL30.glGenBuffers();
 
         GL30.glBindVertexArray(this.disposalAction.vao);
 
+
         VertexResource[] resources = newData.getVertexResource();
         List<VertexResource> targets = new ArrayList<>();
-        int bufferSize = 0;
-        for(int x = 0; x < resources.length; x++) {
-            if(resources[x].getVersion() >  0) {
-                targets.add(resources[x]);
-                bufferSize += resources[x].inSize;
+        for (VertexResource vertexResource : resources) {
+            if (vertexResource.getVersion() > 0) {
+                targets.add(vertexResource);
             }
-        }
-        GL30.glBindBuffer(GL30.GL_ARRAY_BUFFER, this.disposalAction.vbo);
-        GL30.glBufferData(this.disposalAction.vbo, bufferSize, GL30.GL_STATIC_DRAW);
-        int offset = 0;
-        for (VertexResource resource : targets) {
-            resource.buffer.rewind();
-            GL30.glBufferSubData(this.disposalAction.vbo, offset, resource.buffer);
-            for (VertexResource.VertexDefinition attribute : resource.attributes) {
-                GL30.glEnableVertexAttribArray(attribute.location);
-                GL30.glVertexAttribPointer(attribute.location, attribute.attribute.count,
-                        attribute.attribute.mapping.glType, false, resource.inStride, offset + resource.inStride);
-            }
-            offset += resource.inSize;
         }
 
-        ByteBuffer indexBuffer = newData.getIndexResource().buffer;
+        this.state = buildVBO(this.disposalAction.vbo, targets);
+
+        IndexResource indexResource = newData.getIndexResource();
+        this.indexCount = indexResource.num;
+        ByteBuffer indexBuffer = indexResource.buffer;
         indexBuffer.rewind();
         GL30.glBindBuffer(GL30.GL_ELEMENT_ARRAY_BUFFER, this.disposalAction.ebo);
         GL30.glBufferData(GL30.GL_ELEMENT_ARRAY_BUFFER, indexBuffer, GL30.GL_STATIC_DRAW);
-        this.indexCount = newData.getIndexResource().num;
 
-        GL30.glBindBuffer(GL30.GL_ARRAY_BUFFER, 0);
         GL30.glBindVertexArray(0);
         getBound(newData, aabb);
     }

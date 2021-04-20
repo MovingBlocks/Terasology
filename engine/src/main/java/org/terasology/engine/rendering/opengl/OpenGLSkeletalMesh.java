@@ -3,9 +3,7 @@
 package org.terasology.engine.rendering.opengl;
 
 import org.joml.Matrix4f;
-import org.joml.Vector2f;
 import org.joml.Vector3f;
-import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL30;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,15 +11,15 @@ import org.terasology.assets.AssetType;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.engine.core.GameThread;
 import org.terasology.engine.core.subsystem.lwjgl.LwjglGraphicsProcessing;
-import org.terasology.engine.rendering.assets.mesh.StandardMeshData;
+import org.terasology.engine.rendering.assets.mesh.resouce.IndexResource;
+import org.terasology.engine.rendering.assets.mesh.resouce.VertexResource;
 import org.terasology.engine.rendering.assets.skeletalmesh.Bone;
 import org.terasology.engine.rendering.assets.skeletalmesh.SkeletalMesh;
 import org.terasology.engine.rendering.assets.skeletalmesh.SkeletalMeshData;
 import org.terasology.joml.geom.AABBf;
 
 import java.nio.ByteBuffer;
-import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -29,7 +27,7 @@ import static org.lwjgl.opengl.GL11.GL_UNSIGNED_INT;
 
 /**
  */
-public class OpenGLSkeletalMesh extends SkeletalMesh {
+public class OpenGLSkeletalMesh extends SkeletalMesh implements OpenGLMeshBase {
     private static final int VERTEX_SIZE = 3 * Float.BYTES;
     private static final int NORMAL_SIZE = 3 * Float.BYTES;
     private static final int UV_SIZE = 2 * Float.BYTES;
@@ -38,11 +36,13 @@ public class OpenGLSkeletalMesh extends SkeletalMesh {
     private static final Logger logger = LoggerFactory.getLogger(OpenGLSkeletalMesh.class);
 
     private SkeletalMeshData data;
+    private int indexCount;
 
     private Vector3f scale;
     private Vector3f translate;
 
     private DisposalAction disposalAction;
+    private VBOContext state = null;
 
     public OpenGLSkeletalMesh(ResourceUrn urn, AssetType<?, SkeletalMeshData> assetType,
                               SkeletalMeshData data, LwjglGraphicsProcessing graphicsProcessing) {
@@ -65,39 +65,27 @@ public class OpenGLSkeletalMesh extends SkeletalMesh {
             GameThread.synch(() -> {
                 this.data = newData;
 
-                if (this.disposalAction.vao == 0) {
-                    this.disposalAction.vao = GL30.glGenVertexArrays();
-                    this.disposalAction.vbo = GL30.glGenBuffers();
-                    this.disposalAction.ebo = GL30.glGenBuffers();
-                }
-                // bind vertex array and buffer
+                this.disposalAction.dispose();
+
+                this.disposalAction.vao = GL30.glGenVertexArrays();
+                this.disposalAction.vbo = GL30.glGenBuffers();
+                this.disposalAction.ebo = GL30.glGenBuffers();
                 GL30.glBindVertexArray(this.disposalAction.vao);
-                GL30.glBindBuffer(GL30.GL_ARRAY_BUFFER, this.disposalAction.vbo);
 
-                GL30.glEnableVertexAttribArray(StandardMeshData.VERTEX_INDEX);
-                GL30.glVertexAttribPointer(StandardMeshData.VERTEX_INDEX, 3, GL30.GL_FLOAT, false,  VERTEX_NORMAL_SIZE, 0);
-
-                GL30.glEnableVertexAttribArray(StandardMeshData.NORMAL_INDEX);
-                GL30.glVertexAttribPointer(StandardMeshData.NORMAL_INDEX, 3, GL30.GL_FLOAT, false, VERTEX_NORMAL_SIZE, VERTEX_SIZE);
-
-                GL30.glEnableVertexAttribArray(StandardMeshData.UV0_INDEX);
-                GL30.glVertexAttribPointer(StandardMeshData.UV0_INDEX, 2, GL30.GL_FLOAT, false, UV_SIZE, (long) VERTEX_NORMAL_SIZE * newData.getVertexCount());
-
-                int payloadSize = (UV_SIZE + VERTEX_SIZE + NORMAL_SIZE) * newData.getVertexCount();
-                ByteBuffer buffer = BufferUtils.createByteBuffer(payloadSize);
-
-                buffer.position(newData.getVertexCount() * VERTEX_NORMAL_SIZE);
-
-                for (Vector2f uv : newData.getUVs()) {
-                    buffer.putFloat(uv.x);
-                    buffer.putFloat(uv.y);
+                VertexResource[] resources = newData.getVertexResource();
+                List<VertexResource> targets = new ArrayList<>();
+                for (VertexResource vertexResource : resources) {
+                    if (vertexResource.getVersion() > 0) {
+                        targets.add(vertexResource);
+                    }
                 }
-                buffer.flip();
-                GL30.glBufferData(GL30.GL_ARRAY_BUFFER, buffer, GL30.GL_DYNAMIC_DRAW);
+                this.state = buildVBO(this.disposalAction.vbo, targets);
 
-                IntBuffer indexBuffer = BufferUtils.createIntBuffer(newData.getIndices().size());
-                indexBuffer.put(newData.getIndices().toArray());
-                indexBuffer.flip();
+                IndexResource indexResource = newData.getIndexResource();
+                ByteBuffer indexBuffer = indexResource.buffer;
+
+                this.indexCount = indexResource.num;
+                indexBuffer.rewind();
                 GL30.glBindBuffer(GL30.GL_ELEMENT_ARRAY_BUFFER, this.disposalAction.ebo);
                 GL30.glBufferData(GL30.GL_ELEMENT_ARRAY_BUFFER, indexBuffer, GL30.GL_STATIC_DRAW);
 
@@ -109,43 +97,25 @@ public class OpenGLSkeletalMesh extends SkeletalMesh {
     }
 
 
-    public void doRender(List<Vector3f> verts, List<Vector3f> normals) {
+    public void render() {
         GL30.glBindVertexArray(disposalAction.vao);
-
-        FloatBuffer vertBuffer = BufferUtils.createFloatBuffer(verts.size() * VERTEX_NORMAL_SIZE);
-        for (int i = 0; i < verts.size(); ++i) {
-            Vector3f vert = verts.get(i);
-            vertBuffer.put(vert.x * scale.x + translate.x);
-            vertBuffer.put(vert.y * scale.y + translate.y);
-            vertBuffer.put(vert.z * scale.z + translate.z);
-            Vector3f norm = normals.get(i);
-            vertBuffer.put(norm.x);
-            vertBuffer.put(norm.y);
-            vertBuffer.put(norm.z);
-        }
-        vertBuffer.flip();
-        GL30.glBindBuffer(GL30.GL_ARRAY_BUFFER, this.disposalAction.vbo);
-        GL30.glBufferSubData(GL30.GL_ARRAY_BUFFER, 0, vertBuffer);
-
-        GL30.glDrawElements(GL30.GL_TRIANGLES, data.getIndices().size(), GL_UNSIGNED_INT, 0);
+        data.applyBind();
+        updateState(state);
+        GL30.glDrawElements(GL30.GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, 0);
         GL30.glBindVertexArray(0);
     }
 
-    public void render() {
-//        preRender();
-        doRender(data.getBindPoseVertexPositions(), data.getBindPoseVertexNormals());
-//        postRender();
-    }
-
     public void render(List<Matrix4f> boneTransforms) {
-//        preRender();
-        doRender(data.getVertexPositions(boneTransforms), data.getVertexNormals(boneTransforms));
-//        postRender();
+        GL30.glBindVertexArray(disposalAction.vao);
+        data.apply(boneTransforms);
+        updateState(state);
+        GL30.glDrawElements(GL30.GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, 0);
+        GL30.glBindVertexArray(0);
     }
 
     @Override
     public int getVertexCount() {
-        return data.getVertexCount();
+        return data.vertexCount();
     }
 
     @Override

@@ -47,7 +47,7 @@ public class HeadlessSkeletalMesh extends SkeletalMesh {
 
     @Override
     public int getVertexCount() {
-        return data.getVertexCount();
+        return data.vertexCount();
     }
 
     @Override

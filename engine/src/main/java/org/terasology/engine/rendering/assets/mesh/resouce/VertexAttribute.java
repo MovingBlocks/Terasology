@@ -3,6 +3,7 @@
 
 package org.terasology.engine.rendering.assets.mesh.resouce;
 
+import org.joml.Vector2f;
 import org.joml.Vector2fc;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
@@ -10,6 +11,7 @@ import org.joml.Vector3ic;
 import org.joml.Vector4f;
 import org.joml.Vector4fc;
 import org.lwjgl.opengl.GL30;
+import org.terasology.nui.Color;
 import org.terasology.nui.Colorc;
 
 import java.nio.ByteBuffer;
@@ -94,8 +96,9 @@ public class VertexAttribute<TARGET> {
 
     public static final VertexFloatAttribute<Vector4f> VECTOR_4_F_VERTEX_ATTRIBUTE = new VertexFloatAttribute<>(new VertexFloatAttribute.AttributeConfiguration<Vector4f>() {
 
+
         @Override
-        public void map(Vector4fc value, int vertIdx, int stride, int offset, ByteBuffer buffer) {
+        public void map(Vector4f value, int vertIdx, int stride, int offset, ByteBuffer buffer) {
             int bufferStart = vertIdx * stride + offset;
             buffer.putFloat(bufferStart, value.x());
             buffer.putFloat(bufferStart + Float.BYTES, value.y());
@@ -113,30 +116,28 @@ public class VertexAttribute<TARGET> {
         }
 
         @Override
-        public void map(Vector4fc value, int vertIdx, float[] store) {
-            store[vertIdx * 4] = value.x();
-            store[vertIdx * 4 + 1] = value.y();
-            store[vertIdx * 4 + 2] = value.z();
-            store[vertIdx * 4 + 3] = value.w();
+        public void map(Vector4f value, int vertIdx, Vector4f[] store) {
+            store[vertIdx].set(value.x(), value.y(), value.z(), value.w());
         }
 
         @Override
-        public void map(int pos, float[] value, int vertIdx, float[] store) {
-            store[vertIdx * 4] = value[pos];
-            store[vertIdx * 4 + 1] = value[pos + 1];
-            store[vertIdx * 4 + 2] = value[pos + 2];
-            store[vertIdx * 4 + 3] = value[pos + 3];
+        public void map(int pos, float[] value, int vertIdx, Vector4f[] store) {
+            store[vertIdx].set(value[pos], value[pos + 1], value[pos + 2], value[pos + 3]);
         }
 
         @Override
-        public float[] build(int size) {
-            return new float[size * 4];
+        public Vector4f[] build(int size) {
+            Vector4f[] arr =  new Vector4f[size];
+            for(int i = 0; i < arr.length; i++){
+                arr[i] = new Vector4f();
+            }
+            return arr;
         }
     }, TypeMapping.ATTR_FLOAT, 4);
 
-    public static final VertexFloatAttribute<Colorc> COLOR_4_F_VERTEX_ATTRIBUTE = new VertexFloatAttribute<>(new VertexFloatAttribute.AttributeConfiguration<Colorc>() {
+    public static final VertexFloatAttribute<Color> COLOR_4_F_VERTEX_ATTRIBUTE = new VertexFloatAttribute<>(new VertexFloatAttribute.AttributeConfiguration<Color>() {
         @Override
-        public void map(Colorc value, int vertIdx, int stride, int offset, ByteBuffer buffer) {
+        public void map(Color value, int vertIdx, int stride, int offset, ByteBuffer buffer) {
             int bufferStart = vertIdx * stride + offset;
             buffer.putFloat(bufferStart, value.rf());
             buffer.putFloat(bufferStart + Float.BYTES, value.gf());
@@ -154,30 +155,31 @@ public class VertexAttribute<TARGET> {
         }
 
         @Override
-        public void map(Colorc value, int vertIdx, float[] store) {
-            store[vertIdx * 4] = value.rf();
-            store[vertIdx * 4 + 1] = value.gf();
-            store[vertIdx * 4 + 2] = value.bf();
-            store[vertIdx * 4 + 3] = value.af();
+        public void map(Color value, int vertIdx, Color[] store) {
+            store[vertIdx].set(value.r(), value.g(), value.b(), value.a());
         }
 
         @Override
-        public void map(int pos, float[] value, int vertIdx, float[] store) {
-            store[vertIdx * 4] = value[pos];
-            store[vertIdx * 4 + 1] = value[pos + 1];
-            store[vertIdx * 4 + 2] = value[pos + 2];
-            store[vertIdx * 4 + 3] = value[pos + 3];
+        public void map(int pos, float[] value, int vertIdx, Color[] store) {
+            store[vertIdx].setRed(value[pos]);
+            store[vertIdx].setGreen(value[pos + 1]);
+            store[vertIdx].setBlue(value[pos + 2]);
+            store[vertIdx].setAlpha(value[pos + 3]);
         }
 
         @Override
-        public float[] build(int vertexCount) {
-            return new float[vertexCount * 3];
+        public Color[] build(int vertexCount) {
+            Color[] arr = new Color[vertexCount];
+            for(int i = 0; i < arr.length; i++){
+                arr[i] = new Color();
+            }
+            return arr;
         }
     }, TypeMapping.ATTR_FLOAT, 4);
 
-    public static final VertexFloatAttribute<Vector2fc> VECTOR_2_F_VERTEX_ATTRIBUTE = new VertexFloatAttribute<>(new VertexFloatAttribute.AttributeConfiguration<Vector2fc>() {
+    public static final VertexFloatAttribute<Vector2f> VECTOR_2_F_VERTEX_ATTRIBUTE = new VertexFloatAttribute<>(new VertexFloatAttribute.AttributeConfiguration<Vector2f>() {
         @Override
-        public void map(Vector2fc value, int vertIdx, int stride, int offset, ByteBuffer buffer) {
+        public void map(Vector2f value, int vertIdx, int stride, int offset, ByteBuffer buffer) {
             int bufferStart = vertIdx * stride + offset;
             buffer.putFloat(bufferStart, value.x());
             buffer.putFloat(bufferStart + Float.BYTES, value.y());
@@ -191,20 +193,22 @@ public class VertexAttribute<TARGET> {
         }
 
         @Override
-        public void map(Vector2fc value, int vertIdx, float[] store) {
-            store[vertIdx * 2] = value.x();
-            store[vertIdx * 2 + 1] = value.y();
+        public void map(Vector2f value, int vertIdx, Vector2f[] store) {
+            store[vertIdx].set(value.x(), value.y());
         }
 
         @Override
-        public void map(int pos, float[] value, int vertIdx, float[] store) {
-            store[vertIdx * 2] = value[pos];
-            store[vertIdx * 2 + 1] = value[pos + 1];
+        public void map(int pos, float[] value, int vertIdx, Vector2f[] store) {
+            store[vertIdx].set(value[pos], value[pos + 1]);
         }
 
         @Override
-        public float[] build(int size) {
-            return new float[size * 2];
+        public Vector2f[] build(int size) {
+            Vector2f[] arr =  new Vector2f[size];
+            for(int i = 0; i < arr.length; i++){
+                arr[i] = new Vector2f();
+            }
+            return arr;
         }
 
     }, TypeMapping.ATTR_FLOAT, 2);

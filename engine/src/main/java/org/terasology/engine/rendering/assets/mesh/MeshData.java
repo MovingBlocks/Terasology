@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.rendering.assets.mesh;
 
+import org.joml.Vector3f;
 import org.lwjgl.opengl.GL30;
 import org.lwjgl.opengl.GL33;
 import org.lwjgl.opengl.GL44;
@@ -46,7 +47,7 @@ public abstract class MeshData implements AssetData {
         return mode;
     }
 
-    public abstract float[] getVertices();
+    public abstract Vector3f[] getVertices();
 
     public abstract VertexResource[] getVertexResource();
     public abstract IndexResource getIndexResource();

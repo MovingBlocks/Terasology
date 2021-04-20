@@ -65,11 +65,11 @@ public class StandardMeshData extends MeshData {
         light0 = builder.add(LIGHT0_INDEX, VertexAttribute.VECTOR_3_F_VERTEX_ATTRIBUTE, false);
         colorBuffer = builder.build();
 
-        this.indices = new IndexResource(indices);
+        this.indices = new IndexResource(indices, true);
     }
 
     @Override
-    public float[] getVertices() {
+    public Vector3f[] getVertices() {
         return position.getStore();
     }
 
