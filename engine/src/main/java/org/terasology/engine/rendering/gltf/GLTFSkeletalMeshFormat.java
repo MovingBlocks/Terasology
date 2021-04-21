@@ -16,13 +16,13 @@ import org.terasology.assets.module.annotations.RegisterAssetFileFormat;
 import org.terasology.engine.rendering.assets.skeletalmesh.Bone;
 import org.terasology.engine.rendering.assets.skeletalmesh.BoneWeight;
 import org.terasology.engine.rendering.assets.skeletalmesh.SkeletalMeshData;
-import org.terasology.engine.rendering.assets.skeletalmesh.SkeletalMeshDataBuilder;
 import org.terasology.engine.rendering.gltf.model.GLTF;
 import org.terasology.engine.rendering.gltf.model.GLTFAccessor;
 import org.terasology.engine.rendering.gltf.model.GLTFBufferView;
 import org.terasology.engine.rendering.gltf.model.GLTFMesh;
 import org.terasology.engine.rendering.gltf.model.GLTFPrimitive;
 import org.terasology.engine.rendering.gltf.model.GLTFSkin;
+import org.terasology.joml.geom.AABBf;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -55,11 +55,19 @@ public class GLTFSkeletalMeshFormat extends GLTFCommonFormat<SkeletalMeshData> {
 
             List<byte[]> loadedBuffers = loadBinaryBuffers(urn, gltf);
 
-            SkeletalMeshDataBuilder builder = new SkeletalMeshDataBuilder();
+//            SkeletalMeshDataBuilder builder = new SkeletalMeshDataBuilder();
 
             List<Bone> bones = loadBones(gltf, skin, loadedBuffers);
+            int rootBones = 0;
             for (Bone bone : bones) {
-                builder.addBone(bone);
+                if(bone.getParent() == null) {
+                    rootBones++;
+                }
+            }
+            if (rootBones == 0) {
+                throw new IllegalStateException("Cannot create a skeleton with no root bones");
+            } else if (rootBones > 1) {
+                throw new IllegalStateException("Cannot create a skeleton with multiple root bones");
             }
 
             List<Vector3f> positions = loadVector3fList(MeshAttributeSemantic.Position, gltfPrimitive, gltf, loadedBuffers);
@@ -79,10 +87,13 @@ public class GLTFSkeletalMeshFormat extends GLTFCommonFormat<SkeletalMeshData> {
                 }
                 boneWeights.add(new BoneWeight(weightBiases, weightJoints));
             }
-            builder.addVertices(positions);
-            builder.addNormals(normals);
-            builder.addWeights(boneWeights);
-            builder.setUvs(loadVector2fList(MeshAttributeSemantic.Texcoord_0, gltfPrimitive, gltf, loadedBuffers));
+
+
+//
+//            builder.addVertices(positions);
+//            builder.addNormals(normals);
+//            builder.addWeights(boneWeights);
+//            builder.setUvs(loadVector2fList(MeshAttributeSemantic.Texcoord_0, gltfPrimitive, gltf, loadedBuffers));
 
             GLTFAccessor indicesAccessor = getIndicesAccessor(gltfPrimitive, gltf, urn);
             if (indicesAccessor.getBufferView() == null) {
@@ -92,13 +103,21 @@ public class GLTFSkeletalMeshFormat extends GLTFCommonFormat<SkeletalMeshData> {
             checkIndicesBuffer(indicesBuffer);
             TIntList indicies = new TIntArrayList();
             readBuffer(loadedBuffers.get(indicesBuffer.getBuffer()), indicesAccessor, indicesBuffer, indicies);
-            builder.setIndices(indicies);
+//            builder.setIndices(indicies);
+
+            AABBf bounds = new AABBf();
+            for(Vector3f pos: positions) {
+                bounds.union(pos);
+            }
+
 
             if (gltf.getSkins().isEmpty()) {
                 throw new IOException("Skeletal mesh '" + urn + "' missing skin");
             }
 
-            return builder.build();
+            return new SkeletalMeshData(bones, positions, normals, boneWeights,
+                    loadVector2fList(MeshAttributeSemantic.Texcoord_0, gltfPrimitive, gltf, loadedBuffers), indicies, bounds);
+
         }
     }
 

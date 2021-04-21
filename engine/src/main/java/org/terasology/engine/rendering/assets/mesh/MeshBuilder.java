@@ -142,9 +142,9 @@ public class MeshBuilder {
 
     public StandardMeshData buildMeshData() {
         StandardMeshData meshData = new StandardMeshData(position.size()/3, indices.size());
-        meshData.position.map(0, vertexCount, this.position.toArray(), 0);
-        meshData.color0.map(0, vertexCount, this.color0.toArray(), 0);
-        meshData.uv0.map(0, vertexCount, this.uv0.toArray(), 0);
+        meshData.position.map(0, this.position.size()/3, this.position.toArray(), 0);
+        meshData.color0.map(0, this.color0.size()/4, this.color0.toArray(), 0);
+        meshData.uv0.map(0, this.uv0.size()/2, this.uv0.toArray(), 0);
         meshData.indices.map(0, indices.size(), this.indices.toArray(), 0);
         return meshData;
     }

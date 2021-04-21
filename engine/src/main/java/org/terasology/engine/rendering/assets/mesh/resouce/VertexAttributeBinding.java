@@ -12,6 +12,10 @@ public abstract class VertexAttributeBinding<TARGET> {
         this.resource = resource;
     }
 
+    public VertexResource getResource() {
+        return resource;
+    }
+
     public abstract void rewind();
     public abstract void map(int startIndex, int endIndex, float[] arr, int offsetIndex);
     public abstract void put(int vertexIndex, TARGET value);

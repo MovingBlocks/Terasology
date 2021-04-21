@@ -13,7 +13,7 @@ public interface OpenGLMeshBase {
         private VBOSubBuffer[] entries;
         private int vbo;
 
-        protected class VBOSubBuffer {
+        public static class VBOSubBuffer {
             int version;
             int offset;
             VertexResource resource;
@@ -36,7 +36,7 @@ public interface OpenGLMeshBase {
         for (VertexResource vertexResource : resources) {
             bufferSize += vertexResource.inSize;
         }
-        GL30.glBufferData(vbo, bufferSize, GL30.GL_STATIC_DRAW);
+        GL30.glBufferData(GL30.GL_ARRAY_BUFFER, bufferSize, GL30.GL_STATIC_DRAW);
 
         VBOContext state = new VBOContext();
         state.entries = new VBOContext.VBOSubBuffer[resources.size()];
@@ -45,6 +45,7 @@ public interface OpenGLMeshBase {
         for (int i = 0; i < resources.size(); i++) {
             VertexResource resource = resources.get(i);
 
+            state.entries[i] = new VBOContext.VBOSubBuffer();
             state.entries[i].resource = resource;
             state.entries[i].version = resource.getVersion();
             state.entries[i].offset = offset;

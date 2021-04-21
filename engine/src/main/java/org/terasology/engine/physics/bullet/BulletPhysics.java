@@ -693,16 +693,14 @@ public class BulletPhysics implements PhysicsEngine {
         }
         HullShapeComponent hull = entityRef.getComponent(HullShapeComponent.class);
         if (hull != null) {
-            FloatBuffer buffer = BufferUtils.createFloatBuffer(hull.sourceMesh.getVertices().size());
-            TFloatIterator iterator = hull.sourceMesh.getVertices().iterator();
-            int numPoints = 0;
-            while (iterator.hasNext()) {
-                numPoints++;
-                buffer.put(iterator.next());
-                buffer.put(iterator.next());
-                buffer.put(iterator.next());
+            Vector3f[] positions = hull.sourceMesh.getVertices();
+            FloatBuffer buffer = BufferUtils.createFloatBuffer(positions.length * 3);
+            for(Vector3f pos: positions){
+                buffer.put(pos.x);
+                buffer.put(pos.y);
+                buffer.put(pos.z);
             }
-            return new BulletConvexHullShape(buffer, numPoints, 3 * Float.BYTES).underlyingShape;
+            return new BulletConvexHullShape(buffer, positions.length, 3 * Float.BYTES).underlyingShape;
         }
         CharacterMovementComponent characterMovementComponent =
             entityRef.getComponent(CharacterMovementComponent.class);

@@ -7,6 +7,8 @@ import java.nio.ByteBuffer;
 
 public class VertexFloatAttribute<TARGET> extends VertexAttribute<TARGET> {
 
+    public static VertexAttributeFloatBinding EMPTY_BINDING = new VertexAttributeFloatBinding(VECTOR_3_F_VERTEX_ATTRIBUTE, 0, 0, false);
+
     public interface AttributeConfiguration<TARGET> {
         void map(TARGET value, int vertIdx, int stride, int offset, ByteBuffer buffer);
 
@@ -56,6 +58,9 @@ public class VertexFloatAttribute<TARGET> extends VertexAttribute<TARGET> {
 
         @Override
         public void map(int startIndex, int endIndex, float[] arr, int offsetIndex) {
+            if(startIndex == endIndex)
+                return;
+
             int posIndex = 0;
             for (int x = startIndex; x < endIndex; x++) {
                 if (store != null) {

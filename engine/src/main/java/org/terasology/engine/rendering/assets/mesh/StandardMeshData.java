@@ -18,8 +18,9 @@ public class StandardMeshData extends MeshData {
     public static final int VERTEX_INDEX = 0;
     public static final int NORMAL_INDEX = 1;
     public static final int UV0_INDEX = 2;
-    public static final int COLOR0_INDEX = 3;
-    public static final int LIGHT0_INDEX = 4;
+    public static final int UV1_INDEX = 3;
+    public static final int COLOR0_INDEX = 4;
+    public static final int LIGHT0_INDEX = 5;
 
     private final int vertexCount;
 
@@ -29,9 +30,11 @@ public class StandardMeshData extends MeshData {
     public final VertexResource normalBuffer;
     public final VertexFloatAttribute.VertexAttributeFloatBinding<Vector3f> normal;
 
-
-    public final VertexResource uvBuffer;
+    public final VertexResource uv0Buffer;
     public final VertexFloatAttribute.VertexAttributeFloatBinding<Vector2f> uv0;
+
+    public final VertexResource uv1Buffer;
+    public final VertexFloatAttribute.VertexAttributeFloatBinding<Vector2f> uv1;
 
 
     public final VertexResource colorBuffer;
@@ -55,7 +58,11 @@ public class StandardMeshData extends MeshData {
 
         builder = new VertexResource.VertexResourceBuilder(size);
         uv0 = builder.add(UV0_INDEX, VertexAttribute.VECTOR_2_F_VERTEX_ATTRIBUTE, false);
-        uvBuffer = builder.build();
+        uv0Buffer = builder.build();
+
+        builder = new VertexResource.VertexResourceBuilder(size);
+        uv1 = builder.add(UV1_INDEX, VertexAttribute.VECTOR_2_F_VERTEX_ATTRIBUTE, false);
+        uv1Buffer = builder.build();
 
         builder = new VertexResource.VertexResourceBuilder(size);
         color0 = builder.add(COLOR0_INDEX, VertexAttribute.COLOR_4_F_VERTEX_ATTRIBUTE, false);
@@ -68,6 +75,38 @@ public class StandardMeshData extends MeshData {
         this.indices = new IndexResource(indices, true);
     }
 
+    public StandardMeshData(
+            VertexFloatAttribute.VertexAttributeFloatBinding<Vector3f> position,
+            VertexFloatAttribute.VertexAttributeFloatBinding<Vector3f> normal,
+            VertexFloatAttribute.VertexAttributeFloatBinding<Vector2f> uv0,
+            VertexFloatAttribute.VertexAttributeFloatBinding<Vector2f> uv1,
+            VertexFloatAttribute.VertexAttributeFloatBinding<Color> color0,
+            VertexFloatAttribute.VertexAttributeFloatBinding<Vector3f> light0,
+            IndexResource indexResource) {
+        this.position = position;
+        this.positionBuffer = position.getResource();
+
+        this.normal = normal;
+        this.normalBuffer = normal.getResource();
+
+        this.uv0 = uv0;
+        this.uv0Buffer = uv0.getResource();
+
+        this.uv1 = uv1;
+        this.uv1Buffer = uv1.getResource();
+
+        this.color0 = color0;
+        this.colorBuffer = color0.getResource();
+
+        this.light0 = light0;
+        this.lightBuffer = light0.getResource();
+
+        this.indices= indexResource;
+        this.vertexCount = position.vertexCount();
+
+    }
+
+
     @Override
     public Vector3f[] getVertices() {
         return position.getStore();
@@ -78,7 +117,8 @@ public class StandardMeshData extends MeshData {
         return new VertexResource[]{
                 positionBuffer,
                 normalBuffer,
-                uvBuffer,
+                uv0Buffer,
+                uv1Buffer,
                 colorBuffer,
                 lightBuffer
         };

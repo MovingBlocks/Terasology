@@ -27,6 +27,7 @@ import org.terasology.assets.AssetData;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.format.AbstractAssetFileFormat;
 import org.terasology.assets.management.AssetManager;
+import org.terasology.engine.rendering.assets.mesh.resouce.VertexFloatAttribute;
 import org.terasology.engine.rendering.assets.skeletalmesh.Bone;
 import org.terasology.engine.rendering.gltf.deserializers.GLTFChannelPathDeserializer;
 import org.terasology.engine.rendering.gltf.deserializers.GLTFComponentTypeDeserializer;
@@ -52,6 +53,7 @@ import org.terasology.engine.rendering.gltf.model.GLTFPrimitive;
 import org.terasology.engine.rendering.gltf.model.GLTFSkin;
 import org.terasology.engine.rendering.gltf.model.GLTFTargetBuffer;
 import org.terasology.engine.rendering.gltf.model.GLTFVersion;
+import org.terasology.nui.Color;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -201,6 +203,9 @@ public abstract class GLTFCommonFormat<T extends AssetData> extends AbstractAsse
             logger.warn("Multiple mesh found in gltf file for {} - only first mesh will be loaded", urn);
         }
     }
+
+
+
 
     protected void readBuffer(byte[] buffer, GLTFAccessor accessor, GLTFBufferView bufferView, TFloatList floatList) {
         if (accessor.getComponentType() != GLTFComponentType.FLOAT) {
