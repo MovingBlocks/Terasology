@@ -4,7 +4,7 @@
 
 layout (location = 0) in vec3 in_vert;
 layout (location = 2) in vec2 in_uv0;
-layout (location = 3) in vec4 in_color0;
+layout (location = 4) in vec4 in_color0;
 
 uniform mat4 modelViewMatrix;
 uniform mat4 projectionMatrix;

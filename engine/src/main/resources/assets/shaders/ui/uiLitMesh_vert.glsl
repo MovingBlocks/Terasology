@@ -5,7 +5,7 @@
 layout (location = 0) in vec3 in_vert;
 layout (location = 1) in vec3 in_normal;
 layout (location = 2) in vec2 in_uv0;
-layout (location = 3) in vec4 in_color0;
+layout (location = 4) in vec4 in_color0;
 
 out vec3 v_normal;
 out vec2 v_relPos;

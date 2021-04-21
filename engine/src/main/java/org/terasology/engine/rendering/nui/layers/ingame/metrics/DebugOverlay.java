@@ -19,8 +19,11 @@ import org.terasology.nui.widgets.UILabel;
 import org.terasology.engine.persistence.StorageManager;
 import org.terasology.engine.registry.In;
 import org.terasology.engine.rendering.nui.CoreScreenLayer;
+import org.terasology.engine.rendering.primitives.ChunkTessellator;
 import org.terasology.engine.world.WorldProvider;
 import org.terasology.engine.world.chunks.Chunks;
+import org.terasology.nui.databinding.ReadOnlyBinding;
+import org.terasology.nui.widgets.UILabel;
 
 import java.util.Locale;
 
