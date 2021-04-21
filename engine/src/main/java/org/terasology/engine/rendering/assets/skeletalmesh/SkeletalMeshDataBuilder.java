@@ -7,6 +7,7 @@ import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
+import org.terasology.engine.rendering.assets.mesh.StandardMeshData;
 import org.terasology.joml.geom.AABBf;
 import org.terasology.engine.rendering.assets.mesh.MeshBuilder;
 import org.terasology.engine.rendering.assets.mesh.MeshData;
@@ -56,10 +57,10 @@ public class SkeletalMeshDataBuilder {
         return addMesh(bone, builder.getMeshData());
     }
 
-    public SkeletalMeshDataBuilder addMesh(Bone bone, MeshData data) {
+    public SkeletalMeshDataBuilder addMesh(Bone bone, StandardMeshData data) {
         TFloatList meshVertices = data.getVertices();
         TIntList meshIndices = data.getIndices();
-        TFloatList texCoord0 = data.getTexCoord0();
+        TFloatList texCoord0 = data.uv0;
         int weightsStart = weights.size();
         addBone(bone);
         for (int i = 0; i < meshVertices.size() / 3; i++) {

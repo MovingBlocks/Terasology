@@ -103,7 +103,7 @@ public class RegionOutlineRenderer extends BaseComponentSystem implements Render
         modelViewMatrix.get(tempMatrixBuffer44);
         modelViewMatrix.normal(normalMatrix).get(tempMatrixBuffer33);
 
-        material.setMatrix4("worldViewMatrix", tempMatrixBuffer44, true);
+        material.setMatrix4("modelViewMatrix", tempMatrixBuffer44, true);
         material.setMatrix3("normalMatrix", tempMatrixBuffer33, true);
 
         for (RegionOutlineComponent regionOutline : entityToRegionOutlineMap.values()) {
