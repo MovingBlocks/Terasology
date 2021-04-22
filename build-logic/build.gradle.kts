@@ -8,7 +8,7 @@ plugins {
 }
 
 repositories {
-    jcenter()
+    mavenCentral()
     google()  // gestalt uses an annotation package by Google
 
     maven {

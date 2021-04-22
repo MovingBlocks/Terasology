@@ -99,11 +99,11 @@ public class LwjglGraphicsManager implements LwjglGraphicsProcessing {
         assetTypeManager.createAssetType(Material.class, (urn, assetType, data) ->
                         GLSLMaterial.create(urn, this, assetType, data),
                 "materials");
-        assetTypeManager.createAssetType(Mesh.class, (urn, assetType, data) -> OpenGLMesh.create(urn, assetType, bufferPool, data, this),
+        assetTypeManager.createAssetType(Mesh.class, (urn, assetType, data) -> OpenGLMesh.create(urn, assetType, data, this),
                 "mesh");
         assetTypeManager.createAssetType(SkeletalMesh.class,
                 (urn, assetType, data) ->
-                        OpenGLSkeletalMesh.create(urn, assetType, data, this, bufferPool),
+                        OpenGLSkeletalMesh.create(urn, assetType, data, this),
                 "skeletalMesh");
         assetTypeManager.createAssetType(MeshAnimation.class, MeshAnimationImpl::new,
                 "animations", "skeletalMesh");

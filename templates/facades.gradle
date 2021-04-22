@@ -6,8 +6,6 @@ apply plugin: 'pmd'
 
 // Same repository configuration as root project
 repositories {
-    // External libs - jcenter is Bintray and is supposed to be a superset of Maven Central, but do both just in case
-    jcenter()
     google()
     mavenCentral()
 
