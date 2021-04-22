@@ -33,6 +33,8 @@ workspace.xml
 /uiDesigner.xml
 /modules.xml
 /modules
+/inspectionProfiles
+/libraries-with-intellij-classes.xml
 
 # Ignore Sonar linting, if set up locally
 /sonarlint/
