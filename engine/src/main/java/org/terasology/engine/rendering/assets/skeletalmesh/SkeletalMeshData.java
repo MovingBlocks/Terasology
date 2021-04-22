@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.rendering.assets.skeletalmesh;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import gnu.trove.list.TIntList;
@@ -41,8 +40,7 @@ public class SkeletalMeshData extends StandardMeshData {
             this.uv0.put(x, uvs.get(x));
         }
         this.indices.map(0, indices.size(), indices.toArray(), 0);
-
-
+        
         for (Bone bone : bones) {
             boneLookup.put(bone.getName(), bone);
             if (bone.getParent() == null) {
@@ -57,7 +55,6 @@ public class SkeletalMeshData extends StandardMeshData {
 
         applyBind();
 
-//        calculateNormals();
     }
 
     /**

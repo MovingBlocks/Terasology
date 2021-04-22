@@ -101,7 +101,7 @@ public class OpenGLMesh extends Mesh implements OpenGLMeshBase{
             }
         }
 
-        this.state = buildVBO(this.disposalAction.vbo, targets);
+        this.state = buildVBO(this.disposalAction.vbo,GL30.GL_STATIC_DRAW, targets);
 
         IndexResource indexResource = newData.getIndexResource();
         this.indexCount = indexResource.num;

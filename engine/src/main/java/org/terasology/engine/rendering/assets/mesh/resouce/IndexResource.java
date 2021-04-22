@@ -45,12 +45,11 @@ public class IndexResource {
     }
 
     public void map(int startIndex, int endIndex, int[] arr, int index) {
-        this.buffer.position(index * Integer.BYTES);
-        int p = 0;
-        for (int x = startIndex; x < endIndex; x++, p++) {
-            this.buffer.putInt(arr[x]);
+        int i = 0;
+        for (int x = startIndex; x < endIndex; x++, i++) {
+            this.buffer.putInt((i + index) * Integer.BYTES, arr[x]);
             if (store != null) {
-                store[p] = arr[x];
+                store[i] = arr[x];
             }
         }
     }

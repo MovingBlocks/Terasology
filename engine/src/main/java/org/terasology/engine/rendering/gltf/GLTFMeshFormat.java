@@ -81,7 +81,6 @@ public class GLTFMeshFormat extends GLTFCommonFormat<MeshData> {
             VertexFloatAttribute.VertexAttributeFloatBinding<Color> color0 = VertexFloatAttribute.EMPTY_BINDING;
             VertexFloatAttribute.VertexAttributeFloatBinding<Vector3f> light0 = VertexFloatAttribute.EMPTY_BINDING;
 
-
             for (MeshAttributeSemantic semantic : MeshAttributeSemantic.values()) {
                 GLTFAccessor gltfAccessor = getAccessor(semantic, gltfPrimitive, gltf);
                 if (gltfAccessor != null && gltfAccessor.getBufferView() != null) {
@@ -134,6 +133,18 @@ public class GLTFMeshFormat extends GLTFCommonFormat<MeshData> {
 
             return new StandardMeshData(position, normal, uv0, uv1, color0, light0, indexResource);
         }
+    }
+
+    private Matrix4f getRootTransform(GLTF gltf) {
+        int nodeIndex = -1;
+        for (int i = 0; i < gltf.getNodes().size(); i++) {
+            if (gltf.getNodes().get(i).getMesh() == 0) {
+                nodeIndex = i;
+                break;
+            }
+        }
+
+        return getMatrix(gltf, nodeIndex);
     }
 
     private void applyTransformations(GLTF gltf, TFloatList vertices, TFloatList normals) {

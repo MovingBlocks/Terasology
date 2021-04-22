@@ -30,13 +30,13 @@ public interface OpenGLMeshBase {
         GL30.glBindBuffer(GL30.GL_ARRAY_BUFFER, 0);
     }
 
-    default VBOContext buildVBO(int vbo, List<VertexResource> resources) {
+    default VBOContext buildVBO(int vbo, int drawType, List<VertexResource> resources) {
         GL30.glBindBuffer(GL30.GL_ARRAY_BUFFER, vbo);
         int bufferSize = 0;
         for (VertexResource vertexResource : resources) {
             bufferSize += vertexResource.inSize;
         }
-        GL30.glBufferData(GL30.GL_ARRAY_BUFFER, bufferSize, GL30.GL_STATIC_DRAW);
+        GL30.glBufferData(GL30.GL_ARRAY_BUFFER, bufferSize, drawType);
 
         VBOContext state = new VBOContext();
         state.entries = new VBOContext.VBOSubBuffer[resources.size()];
@@ -55,7 +55,7 @@ public interface OpenGLMeshBase {
             for (VertexResource.VertexDefinition attribute : resource.attributes) {
                 GL30.glEnableVertexAttribArray(attribute.location);
                 GL30.glVertexAttribPointer(attribute.location, attribute.attribute.count,
-                        attribute.attribute.mapping.glType, false, resource.inStride, offset + resource.inStride);
+                        attribute.attribute.mapping.glType, false, resource.inStride, offset + attribute.stride);
             }
             offset += resource.inSize;
         }

@@ -79,7 +79,7 @@ public class OpenGLSkeletalMesh extends SkeletalMesh implements OpenGLMeshBase {
                         targets.add(vertexResource);
                     }
                 }
-                this.state = buildVBO(this.disposalAction.vbo, targets);
+                this.state = buildVBO(this.disposalAction.vbo, GL30.GL_DYNAMIC_DRAW, targets);
 
                 IndexResource indexResource = newData.getIndexResource();
                 ByteBuffer indexBuffer = indexResource.buffer;

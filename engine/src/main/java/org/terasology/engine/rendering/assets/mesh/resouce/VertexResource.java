@@ -38,10 +38,12 @@ public class VertexResource {
     public static class VertexDefinition {
         public final int location;
         public final VertexAttribute attribute;
+        public final int stride;
 
-        public VertexDefinition(int location, VertexAttribute attribute) {
+        public VertexDefinition(int location, int stride, VertexAttribute attribute) {
             this.location = location;
             this.attribute = attribute;
+            this.stride = stride;
         }
     }
 
@@ -56,15 +58,14 @@ public class VertexResource {
             this.vertexCount = vertexCount;
         }
 
-
         public <TARGET> VertexFloatAttribute.VertexAttributeFloatBinding<TARGET> add(int location,
                                                                                      VertexFloatAttribute<TARGET> attribute, boolean cpuReadable) {
             VertexFloatAttribute.VertexAttributeFloatBinding<TARGET> result =
                     new VertexFloatAttribute.VertexAttributeFloatBinding<>(attribute, inStride, vertexCount,
                             cpuReadable);
-            inStride += attribute.mapping.size * attribute.count;
             this.bindings.add(result);
-            this.definitions.add(new VertexDefinition(location, attribute));
+            this.definitions.add(new VertexDefinition(location, inStride, attribute));
+            inStride += attribute.mapping.size * attribute.count;
             return result;
         }
 
