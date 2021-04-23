@@ -143,11 +143,9 @@ public class AdvancedGameSetupScreen extends CoreScreenLayer {
         sortedModules = Lists.newArrayList();
         for (Name moduleId : moduleManager.getRegistry().getModuleIds()) {
             Module latestVersion = moduleManager.getRegistry().getLatestModuleVersion(moduleId);
-//            if (!latestVersion.isOnClasspath()) {
             ModuleSelectionInfo info = ModuleSelectionInfo.local(latestVersion);
             modulesLookup.put(info.getMetadata().getId(), info);
             sortedModules.add(info);
-//            }
         }
 
         sortedModules.sort(moduleInfoComparator);
