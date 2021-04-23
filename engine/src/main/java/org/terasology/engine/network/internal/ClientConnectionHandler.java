@@ -215,12 +215,9 @@ public class ClientConnectionHandler extends ChannelInboundHandlerAdapter {
                     }
 
                     Files.copy(tempModuleLocation, finalPath);
-                    moduleManager.getRegistry().add(moduleManager.getModuleFactory().createModule(finalPath.toFile()));
-                    receivingModule = null;
+                    moduleManager.registerArchiveModule(finalPath);
 
-//                    ModuleLoader loader = new ModuleLoader(moduleManager.getModuleMetadataReader());
-//                    loader.setModuleInfoPath(TerasologyConstants.MODULE_INFO_FILENAME);
-//                    moduleManager.getRegistry().add(loader.load(finalPath));
+                    receivingModule = null;
 
                     if (missingModules.isEmpty()) {
                         sendJoin(channelHandlerContext);

@@ -33,6 +33,7 @@ import org.terasology.gestalt.module.sandbox.WarnOnlyProviderFactory;
 import org.terasology.gestalt.naming.Name;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.ReflectPermission;
 import java.nio.file.Path;
 import java.security.Policy;
@@ -209,6 +210,15 @@ public class ModuleManager {
     /** Create and register a new module for this package. */
     public Module registerPackageModule(String packageName) {
         Module module = moduleFactory.createPackageModule(packageName);
+        registry.add(module);
+        ensureModulesDependOnEngine();
+        return module;
+    }
+
+    /** Load and register a new module for this file. */
+    @SuppressWarnings("UnusedReturnValue")
+    public Module registerArchiveModule(Path path) throws IOException {
+        Module module = moduleFactory.createArchiveModule(path.toFile());
         registry.add(module);
         ensureModulesDependOnEngine();
         return module;
