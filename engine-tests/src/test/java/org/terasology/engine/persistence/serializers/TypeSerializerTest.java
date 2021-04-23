@@ -14,7 +14,6 @@ import org.terasology.engine.persistence.typeHandling.TypeHandlerLibraryImpl;
 import org.terasology.engine.persistence.typeHandling.gson.GsonPersistedDataReader;
 import org.terasology.engine.persistence.typeHandling.gson.GsonPersistedDataSerializer;
 import org.terasology.engine.persistence.typeHandling.gson.GsonPersistedDataWriter;
-import org.terasology.gestalt.module.ModuleEnvironment;
 import org.terasology.gestalt.naming.Name;
 import org.terasology.nui.Color;
 import org.terasology.persistence.serializers.Serializer;
@@ -109,11 +108,6 @@ class TypeSerializerTest extends ModuleEnvironmentTest {
         assertNotEmpty(typeRegistry.load("org.terasology.engine.persistence.serializers.TypeSerializerTest$Animal"));
         assertNotEmpty(typeRegistry.load("org.terasology.engine.persistence.serializers.TypeSerializerTest$Dog"));
 
-        ModuleEnvironment env = moduleManager.getEnvironment();
-        assertNotEmpty(env.getSubtypesOf(Animal.class));
-
-//        assertNotEmpty(typeRegistry.getSubtypesOf(Animal.class));
-
         assertEquals(INSTANCE, deserializedInstance);
     }
 
@@ -133,11 +127,6 @@ class TypeSerializerTest extends ModuleEnvironmentTest {
 
         assertNotEmpty(typeRegistry.load("org.terasology.engine.persistence.serializers.TypeSerializerTest$Animal"));
         assertNotEmpty(typeRegistry.load("org.terasology.engine.persistence.serializers.TypeSerializerTest$Dog"));
-
-//        ModuleEnvironment env = moduleManager.getEnvironment();
-//        assertNotEmpty(env.getSubtypesOf(Animal.class));
-
-//        assertNotEmpty(typeRegistry.getSubtypesOf(Animal.class));
 
         assertEquals(INSTANCE, deserializedInstance);
     }
