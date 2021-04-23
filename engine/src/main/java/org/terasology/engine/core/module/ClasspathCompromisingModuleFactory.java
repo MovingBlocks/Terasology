@@ -7,6 +7,7 @@ import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableSet;
 import org.reflections.util.ClasspathHelper;
 import org.terasology.gestalt.module.Module;
+import org.terasology.gestalt.module.ModuleEnvironment;
 import org.terasology.gestalt.module.ModuleFactory;
 import org.terasology.gestalt.module.ModuleMetadata;
 
@@ -17,6 +18,21 @@ import java.net.URL;
 import java.util.Set;
 import java.util.function.Predicate;
 
+/**
+ * Creates modules that can own classes that were loaded without a ModuleClassLoader.
+ * <p>
+ * When {@link ModuleEnvironment#getModuleProviding(Class)} checks modules built using the default
+ * ModuleFactory, it will only acknowledge the class as belonging to that module if it was loaded
+ * using the module's ModuleClassLoader.
+ * <p>
+ * This factory will recognize classes as belonging to the module as long as that class's source
+ * location is within the module's directory or archive.
+ * <p>
+ * ⚠ Usually <em>checking the classloader is sufficient</em> and thus you
+ * should <em>not</em> find the need to use this in production code. It's useful in cases where
+ * the module <em>cannot</em> be loaded using a ModuleClassLoader (e.g. a test runner) and it's
+ * acceptable to run without the protections ModuleClassLoader provides.
+ */
 class ClasspathCompromisingModuleFactory extends ModuleFactory {
     @Override
     public Module createDirectoryModule(ModuleMetadata metadata, File directory) {
