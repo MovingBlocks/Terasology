@@ -26,14 +26,17 @@ public class ClasspathCompromisingModuleFactoryTest {
     public void directoryModuleContainsClass() {
         ModuleFactory factory = new ClasspathCompromisingModuleFactory();
 
+        // This test assumes that the unittest module is under the current working directory (`engine-test/`)
         File engineTestDirectory = new File(System.getProperty("user.dir", "."));
-
         ModuleMetadata metadata = new ModuleMetadata(new Name("unittest"), new Version("1.0.0"));
-
         Module module = factory.createDirectoryModule(metadata, engineTestDirectory);
 
+        // and that ExampleClass is inside that directory
         assertTrue(module.getClassPredicate().test(ExampleClass.class));
+        // and that this other class (in engine, not engine-test) is outside that directory.
         assertFalse(module.getClassPredicate().test(someClassOutsideTheModule));
+
+        // These assumptions could break if things get moved around enough.
     }
 
     @Test
