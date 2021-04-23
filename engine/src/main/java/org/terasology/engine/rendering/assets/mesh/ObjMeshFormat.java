@@ -3,8 +3,6 @@
 package org.terasology.engine.rendering.assets.mesh;
 
 import com.google.common.collect.Lists;
-import gnu.trove.list.TFloatList;
-import gnu.trove.list.TIntList;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.joml.Vector3i;
@@ -52,7 +50,7 @@ public class ObjMeshFormat extends AbstractAssetFileFormat<MeshData> {
 
             StandardMeshData data = processData(rawVertices, rawNormals, rawTexCoords, rawIndices);
 
-            if (data.getVertices() == null) {
+            if (data.verts() == null) {
                 throw new IOException("No vertices define");
             }
 //            if (!data.normals.isEmpty() && data.normals.size() != data.getVertices().size()) {

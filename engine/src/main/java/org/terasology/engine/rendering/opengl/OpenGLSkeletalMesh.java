@@ -72,7 +72,7 @@ public class OpenGLSkeletalMesh extends SkeletalMesh implements OpenGLMeshBase {
                 this.disposalAction.ebo = GL30.glGenBuffers();
                 GL30.glBindVertexArray(this.disposalAction.vao);
 
-                VertexResource[] resources = newData.getVertexResource();
+                VertexResource[] resources = newData.vertexResources();
                 List<VertexResource> targets = new ArrayList<>();
                 for (VertexResource vertexResource : resources) {
                     if (vertexResource.getVersion() > 0) {
@@ -81,7 +81,7 @@ public class OpenGLSkeletalMesh extends SkeletalMesh implements OpenGLMeshBase {
                 }
                 this.state = buildVBO(this.disposalAction.vbo, GL30.GL_DYNAMIC_DRAW, targets);
 
-                IndexResource indexResource = newData.getIndexResource();
+                IndexResource indexResource = newData.indexResource();
                 ByteBuffer indexBuffer = indexResource.buffer;
 
                 this.indexCount = indexResource.num;
@@ -112,12 +112,7 @@ public class OpenGLSkeletalMesh extends SkeletalMesh implements OpenGLMeshBase {
         GL30.glDrawElements(GL30.GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, 0);
         GL30.glBindVertexArray(0);
     }
-
-    @Override
-    public int getVertexCount() {
-        return data.vertexCount();
-    }
-
+    
     @Override
     public Collection<Bone> getBones() {
         return data.getBones();

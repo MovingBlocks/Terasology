@@ -22,7 +22,6 @@ public class StandardMeshData extends MeshData {
     public static final int COLOR0_INDEX = 4;
     public static final int LIGHT0_INDEX = 5;
 
-    private final int vertexCount;
 
     public final VertexResource positionBuffer;
     public final VertexFloatAttribute.VertexAttributeFloatBinding<Vector3f> position;
@@ -46,7 +45,6 @@ public class StandardMeshData extends MeshData {
     public final IndexResource indices;
 
     public StandardMeshData(int size, int indices) {
-        this.vertexCount = size;
 
         VertexResource.VertexResourceBuilder builder = new VertexResource.VertexResourceBuilder(size);
         position = builder.add(VERTEX_INDEX, VertexAttribute.VECTOR_3_F_VERTEX_ATTRIBUTE, true);
@@ -102,18 +100,17 @@ public class StandardMeshData extends MeshData {
         this.lightBuffer = light0.getResource();
 
         this.indices= indexResource;
-        this.vertexCount = position.vertexCount();
 
     }
 
 
     @Override
-    public Vector3f[] getVertices() {
+    public Vector3f[] verts() {
         return position.getStore();
     }
 
     @Override
-    public VertexResource[] getVertexResource() {
+    public VertexResource[] vertexResources() {
         return new VertexResource[]{
                 positionBuffer,
                 normalBuffer,
@@ -125,12 +122,7 @@ public class StandardMeshData extends MeshData {
     }
 
     @Override
-    public IndexResource getIndexResource() {
+    public IndexResource indexResource() {
         return indices;
-    }
-
-    @Override
-    public int vertexCount() {
-        return vertexCount;
     }
 }

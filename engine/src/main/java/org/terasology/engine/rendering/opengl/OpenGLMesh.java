@@ -59,12 +59,12 @@ public class OpenGLMesh extends Mesh implements OpenGLMeshBase{
 
     @Override
     public Vector3f[] getVertices() {
-        return data.getVertices();
+        return data.verts();
     }
 
     @Override
     public int getVertexCount() {
-        return data.vertexCount();
+        return data.verts().length;
     }
 
 
@@ -93,7 +93,7 @@ public class OpenGLMesh extends Mesh implements OpenGLMeshBase{
         GL30.glBindVertexArray(this.disposalAction.vao);
 
 
-        VertexResource[] resources = newData.getVertexResource();
+        VertexResource[] resources = newData.vertexResources();
         List<VertexResource> targets = new ArrayList<>();
         for (VertexResource vertexResource : resources) {
             if (vertexResource.getVersion() > 0) {
@@ -103,7 +103,7 @@ public class OpenGLMesh extends Mesh implements OpenGLMeshBase{
 
         this.state = buildVBO(this.disposalAction.vbo,GL30.GL_STATIC_DRAW, targets);
 
-        IndexResource indexResource = newData.getIndexResource();
+        IndexResource indexResource = newData.indexResource();
         this.indexCount = indexResource.num;
         ByteBuffer indexBuffer = indexResource.buffer;
         indexBuffer.rewind();

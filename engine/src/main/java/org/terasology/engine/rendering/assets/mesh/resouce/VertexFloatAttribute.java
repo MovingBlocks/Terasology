@@ -7,7 +7,7 @@ import java.nio.ByteBuffer;
 
 public class VertexFloatAttribute<TARGET> extends VertexAttribute<TARGET> {
 
-    public static VertexAttributeFloatBinding EMPTY_BINDING = new VertexAttributeFloatBinding(VECTOR_3_F_VERTEX_ATTRIBUTE, 0, 0, false);
+    public static VertexAttributeFloatBinding EMPTY_BINDING = new VertexAttributeFloatBinding(null, VECTOR_3_F_VERTEX_ATTRIBUTE, 0, 0, false);
 
     public interface AttributeConfiguration<TARGET> {
         void map(TARGET value, int vertIdx, int stride, int offset, ByteBuffer buffer);
@@ -34,21 +34,24 @@ public class VertexFloatAttribute<TARGET> extends VertexAttribute<TARGET> {
         private final int vertexCount;
         private TARGET[] store = null;
 
-        public TARGET[] getStore() {
-            return store;
-        }
-
-        public int vertexCount() {
-            return vertexCount;
-        }
-
-        protected VertexAttributeFloatBinding(VertexFloatAttribute<TARGET> target, int offset, int vertexCount, boolean cpuReadable) {
+        protected VertexAttributeFloatBinding(VertexResource resource, VertexFloatAttribute<TARGET> target, int offset, int vertexCount, boolean cpuReadable) {
+            super(resource);
             this.attribute = target;
             this.offset = offset;
             this.vertexCount = vertexCount;
             if (cpuReadable) {
                 store = target.configuration.build(vertexCount);
             }
+        }
+
+        @Override
+        public TARGET[] getStore() {
+            return store;
+        }
+
+        @Override
+        public int count() {
+            return vertexCount;
         }
 
         @Override

@@ -45,10 +45,6 @@ public class HeadlessSkeletalMesh extends SkeletalMesh {
         return Optional.of(new HeadlessSkeletalMesh(instanceUrn, parentAssetType, data));
     }
 
-    @Override
-    public int getVertexCount() {
-        return data.vertexCount();
-    }
 
     @Override
     public Collection<Bone> getBones() {

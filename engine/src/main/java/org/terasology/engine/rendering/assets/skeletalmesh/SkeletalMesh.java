@@ -18,8 +18,6 @@ public abstract class SkeletalMesh extends Asset<SkeletalMeshData> {
         super(urn, assetType);
     }
 
-    public abstract int getVertexCount();
-
     public abstract Collection<Bone> getBones();
 
     public abstract Bone getBone(String boneName);

@@ -11,10 +11,10 @@ import java.util.List;
 import java.util.Optional;
 
 public class VertexResource {
-    public final int inStride;
-    public final int inSize;
-    public final VertexDefinition[] attributes;
-    public final ByteBuffer buffer;
+    public int inStride;
+    public int inSize;
+    public VertexDefinition[] attributes;
+    public ByteBuffer buffer;
     private int version = 0;
 
     protected VertexResource(int inStride, int inSize, VertexDefinition[] attribute) {
@@ -22,6 +22,20 @@ public class VertexResource {
         this.inStride = inStride;
         this.buffer = BufferUtils.createByteBuffer(inSize);
         this.attributes = attribute;
+    }
+
+    protected VertexResource() {
+        this.inSize = 0;
+        this.inStride = 0;
+        attributes = new VertexDefinition[]{};
+        buffer = BufferUtils.createByteBuffer(0);
+    }
+
+    public void allocate(int inStride, int inSize, VertexDefinition[] attributes) {
+        this.attributes = attributes;
+        this.inStride = inStride;
+        this.inSize = inSize;
+        this.buffer = BufferUtils.createByteBuffer(this.inSize);
     }
 
     public int getVersion() {
@@ -53,6 +67,8 @@ public class VertexResource {
         private List<VertexAttributeBinding> bindings = new ArrayList<>();
         private int inStride;
         private int vertexCount;
+        private VertexResource vertexResource = new VertexResource();
+
 
         public VertexResourceBuilder(int vertexCount) {
             this.vertexCount = vertexCount;
@@ -61,7 +77,7 @@ public class VertexResource {
         public <TARGET> VertexFloatAttribute.VertexAttributeFloatBinding<TARGET> add(int location,
                                                                                      VertexFloatAttribute<TARGET> attribute, boolean cpuReadable) {
             VertexFloatAttribute.VertexAttributeFloatBinding<TARGET> result =
-                    new VertexFloatAttribute.VertexAttributeFloatBinding<>(attribute, inStride, vertexCount,
+                    new VertexFloatAttribute.VertexAttributeFloatBinding<>(vertexResource, attribute, inStride, vertexCount,
                             cpuReadable);
             this.bindings.add(result);
             this.definitions.add(new VertexDefinition(location, inStride, attribute));
@@ -70,12 +86,8 @@ public class VertexResource {
         }
 
         public VertexResource build() {
-            VertexResource resource = new VertexResource(inStride, inStride * vertexCount,
-                    this.definitions.toArray(new VertexDefinition[]{}));
-            for (VertexAttributeBinding binding : bindings) {
-                binding.setResource(resource);
-            }
-            return resource;
+            vertexResource.allocate(inStride, inStride * vertexCount, this.definitions.toArray(new VertexDefinition[]{}));
+            return vertexResource;
         }
     }
 }

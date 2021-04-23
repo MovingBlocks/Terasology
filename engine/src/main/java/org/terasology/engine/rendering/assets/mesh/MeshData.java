@@ -47,9 +47,8 @@ public abstract class MeshData implements AssetData {
         return mode;
     }
 
-    public abstract Vector3f[] getVertices();
+    public abstract Vector3f[] verts();
 
-    public abstract VertexResource[] getVertexResource();
-    public abstract IndexResource getIndexResource();
-    public abstract int vertexCount();
+    public abstract VertexResource[] vertexResources();
+    public abstract IndexResource indexResource();
 }
