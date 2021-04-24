@@ -77,12 +77,10 @@ public class VertexResource {
 
     public static class VertexResourceBuilder {
         private List<VertexDefinition> definitions = new ArrayList<>();
-        private List<VertexAttributeBinding> bindings = new ArrayList<>();
         private int inStride;
         private int elements;
         private VertexResource vertexResource = new VertexResource();
-
-
+        
         public VertexResourceBuilder(int elements) {
             this.elements = elements;
         }
@@ -92,7 +90,6 @@ public class VertexResource {
             VertexFloatAttribute.VertexAttributeFloatBinding<TARGET> result =
                     new VertexFloatAttribute.VertexAttributeFloatBinding<>(vertexResource, attribute, inStride, elements,
                             cpuReadable);
-            this.bindings.add(result);
             this.definitions.add(new VertexDefinition(location, inStride, attribute));
             inStride += attribute.mapping.size * attribute.count;
             return result;
