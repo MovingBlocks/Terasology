@@ -3,6 +3,7 @@
 
 package org.terasology.engine.rendering.assets.mesh.resouce;
 
+import java.lang.reflect.Array;
 import java.nio.ByteBuffer;
 
 public class VertexFloatAttribute<TARGET> extends VertexAttribute<TARGET> {
@@ -18,12 +19,12 @@ public class VertexFloatAttribute<TARGET> extends VertexAttribute<TARGET> {
 
         void map(int pos, float[] value, int vertIdx, TARGET[] store);
 
-        TARGET[] build(int size);
+        TARGET build();
     }
     public final VertexFloatAttribute.AttributeConfiguration<TARGET> configuration;
-    protected VertexFloatAttribute(VertexFloatAttribute.AttributeConfiguration<TARGET> configuration,
+    protected VertexFloatAttribute(Class<TARGET> type,VertexFloatAttribute.AttributeConfiguration<TARGET> configuration,
                                 VertexAttribute.TypeMapping mapping, int count) {
-        super(mapping, count);
+        super(type, mapping, count);
         this.configuration = configuration;
     }
 
@@ -31,16 +32,19 @@ public class VertexFloatAttribute<TARGET> extends VertexAttribute<TARGET> {
         private VertexFloatAttribute<TARGET> attribute;
         private int index = 0;
         private final int offset;
-        private final int vertexCount;
+        private int elements;
         private TARGET[] store = null;
 
-        protected VertexAttributeFloatBinding(VertexResource resource, VertexFloatAttribute<TARGET> target, int offset, int vertexCount, boolean cpuReadable) {
+        protected VertexAttributeFloatBinding(VertexResource resource, VertexFloatAttribute<TARGET> target, int offset, int elements, boolean cpuReadable) {
             super(resource);
             this.attribute = target;
             this.offset = offset;
-            this.vertexCount = vertexCount;
+            this.elements = elements;
             if (cpuReadable) {
-                store = target.configuration.build(vertexCount);
+                store = (TARGET[]) Array.newInstance(target.type, this.elements);
+                for (int x = 0; x < this.elements; x++) {
+                    store[x] = target.configuration.build();
+                }
             }
         }
 
@@ -51,12 +55,29 @@ public class VertexFloatAttribute<TARGET> extends VertexAttribute<TARGET> {
 
         @Override
         public int count() {
-            return vertexCount;
+            return this.elements;
         }
 
         @Override
         public void rewind() {
             index = 0;
+        }
+
+        private void update() {
+            if (this.resource.elements() != this.elements && this.store != null) {
+                TARGET newStore[] = (TARGET[]) Array.newInstance(this.attribute.type, this.elements);
+                int size = Math.min(newStore.length, this.store.length);
+                for (int x = 0; x < size; x++) {
+                    newStore[x] = store[x];
+                }
+                if (newStore.length > this.store.length) {
+                    for (int x = this.store.length; x < newStore.length; x++) {
+                        newStore[x] = attribute.configuration.build();
+                    }
+                }
+                this.store = newStore;
+                this.elements = this.resource.elements();
+            }
         }
 
         @Override
@@ -65,6 +86,7 @@ public class VertexFloatAttribute<TARGET> extends VertexAttribute<TARGET> {
                 return;
 
             int posIndex = 0;
+            update();
             for (int x = startIndex; x < endIndex; x++) {
                 if (store != null) {
                     attribute.configuration.map(x * attribute.count, arr, offsetIndex + posIndex, store);
@@ -78,15 +100,18 @@ public class VertexFloatAttribute<TARGET> extends VertexAttribute<TARGET> {
         @Override
         public void put(int vertexIndex, TARGET value) {
             attribute.configuration.map(value, vertexIndex, resource.inStride, offset, resource.buffer);
+            update();
             if (store != null) {
                 attribute.configuration.map(value, vertexIndex, store);
             }
             resource.mark();
+
         }
 
         @Override
         public void put(TARGET value) {
             attribute.configuration.map(value, index, resource.inStride, offset, resource.buffer);
+            update();
             if (store != null) {
                 attribute.configuration.map(value, index, store);
             }
@@ -97,7 +122,8 @@ public class VertexFloatAttribute<TARGET> extends VertexAttribute<TARGET> {
         @Override
         public void refresh() {
             if (store != null) {
-                for (int x = 0; x < vertexCount; x++) {
+                update();
+                for (int x = 0; x < this.elements; x++) {
                     attribute.configuration.map(store[x], x, resource.inStride, offset, resource.buffer);
                 }
                 resource.mark();

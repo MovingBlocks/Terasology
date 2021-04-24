@@ -8,35 +8,48 @@ import org.lwjgl.BufferUtils;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 public class VertexResource {
     public int inStride;
-    public int inSize;
     public VertexDefinition[] attributes;
     public ByteBuffer buffer;
     private int version = 0;
+    private int elements = 0;
 
-    protected VertexResource(int inStride, int inSize, VertexDefinition[] attribute) {
-        this.inSize = inSize;
+    protected VertexResource(int elements, int inStride, VertexDefinition[] attribute) {
         this.inStride = inStride;
-        this.buffer = BufferUtils.createByteBuffer(inSize);
+        this.elements = elements;
+        this.buffer = BufferUtils.createByteBuffer(elements * inStride);
         this.attributes = attribute;
     }
 
+    public int elements() {
+        return elements;
+    }
+    public int inSize() {
+        return elements * inStride;
+    }
+
     protected VertexResource() {
-        this.inSize = 0;
+        this.elements = 0;
         this.inStride = 0;
         attributes = new VertexDefinition[]{};
         buffer = BufferUtils.createByteBuffer(0);
     }
 
-    public void allocate(int inStride, int inSize, VertexDefinition[] attributes) {
+    public void reallocate(int elements, int inStride, VertexDefinition[] attributes) {
+        ByteBuffer newBuffer = BufferUtils.createByteBuffer(elements * inStride);
+        this.buffer.limit(Math.min(elements * inStride, this.elements * this.inStride));
+        this.buffer.position(0);
+        newBuffer.put(this.buffer);
+
+        this.buffer = newBuffer;
+        this.elements = elements;
         this.attributes = attributes;
         this.inStride = inStride;
-        this.inSize = inSize;
-        this.buffer = BufferUtils.createByteBuffer(this.inSize);
     }
+
+
 
     public int getVersion() {
         return version;
@@ -66,18 +79,18 @@ public class VertexResource {
         private List<VertexDefinition> definitions = new ArrayList<>();
         private List<VertexAttributeBinding> bindings = new ArrayList<>();
         private int inStride;
-        private int vertexCount;
+        private int elements;
         private VertexResource vertexResource = new VertexResource();
 
 
-        public VertexResourceBuilder(int vertexCount) {
-            this.vertexCount = vertexCount;
+        public VertexResourceBuilder(int elements) {
+            this.elements = elements;
         }
 
         public <TARGET> VertexFloatAttribute.VertexAttributeFloatBinding<TARGET> add(int location,
                                                                                      VertexFloatAttribute<TARGET> attribute, boolean cpuReadable) {
             VertexFloatAttribute.VertexAttributeFloatBinding<TARGET> result =
-                    new VertexFloatAttribute.VertexAttributeFloatBinding<>(vertexResource, attribute, inStride, vertexCount,
+                    new VertexFloatAttribute.VertexAttributeFloatBinding<>(vertexResource, attribute, inStride, elements,
                             cpuReadable);
             this.bindings.add(result);
             this.definitions.add(new VertexDefinition(location, inStride, attribute));
@@ -86,7 +99,7 @@ public class VertexResource {
         }
 
         public VertexResource build() {
-            vertexResource.allocate(inStride, inStride * vertexCount, this.definitions.toArray(new VertexDefinition[]{}));
+            vertexResource.reallocate(this.elements, this.inStride, this.definitions.toArray(new VertexDefinition[]{}));
             return vertexResource;
         }
     }

@@ -34,7 +34,7 @@ public interface OpenGLMeshBase {
         GL30.glBindBuffer(GL30.GL_ARRAY_BUFFER, vbo);
         int bufferSize = 0;
         for (VertexResource vertexResource : resources) {
-            bufferSize += vertexResource.inSize;
+            bufferSize += vertexResource.inSize();
         }
         GL30.glBufferData(GL30.GL_ARRAY_BUFFER, bufferSize, drawType);
 
@@ -57,7 +57,7 @@ public interface OpenGLMeshBase {
                 GL30.glVertexAttribPointer(attribute.location, attribute.attribute.count,
                         attribute.attribute.mapping.glType, false, resource.inStride, offset + attribute.stride);
             }
-            offset += resource.inSize;
+            offset += resource.inSize();
         }
         state.vbo = vbo;
 

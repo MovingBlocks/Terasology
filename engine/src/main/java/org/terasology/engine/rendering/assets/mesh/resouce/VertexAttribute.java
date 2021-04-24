@@ -51,7 +51,7 @@ public class VertexAttribute<TARGET> {
 //                    return new Integer[size * 3];
 //                }
 //            }, TypeMapping.ATTR_INT, 3);
-    public static final VertexFloatAttribute<Vector3f> VECTOR_3_F_VERTEX_ATTRIBUTE = new VertexFloatAttribute<>(new VertexFloatAttribute.AttributeConfiguration<Vector3f>() {
+    public static final VertexFloatAttribute<Vector3f> VECTOR_3_F_VERTEX_ATTRIBUTE = new VertexFloatAttribute<>(Vector3f.class, new VertexFloatAttribute.AttributeConfiguration<Vector3f>() {
 
         @Override
         public void map(Vector3f value, int vertIdx, int stride, int offset, ByteBuffer buffer) {
@@ -80,16 +80,12 @@ public class VertexAttribute<TARGET> {
         }
 
         @Override
-        public Vector3f[] build(int size) {
-            Vector3f[] arr =  new Vector3f[size];
-            for(int i = 0; i < arr.length; i++){
-                arr[i] = new Vector3f();
-            }
-            return arr;
+        public Vector3f build() {
+            return new Vector3f();
         }
     }, TypeMapping.ATTR_FLOAT, 3);
 
-    public static final VertexFloatAttribute<Vector4f> VECTOR_4_F_VERTEX_ATTRIBUTE = new VertexFloatAttribute<>(new VertexFloatAttribute.AttributeConfiguration<Vector4f>() {
+    public static final VertexFloatAttribute<Vector4f> VECTOR_4_F_VERTEX_ATTRIBUTE = new VertexFloatAttribute<>(Vector4f.class, new VertexFloatAttribute.AttributeConfiguration<Vector4f>() {
 
 
         @Override
@@ -121,16 +117,12 @@ public class VertexAttribute<TARGET> {
         }
 
         @Override
-        public Vector4f[] build(int size) {
-            Vector4f[] arr =  new Vector4f[size];
-            for(int i = 0; i < arr.length; i++){
-                arr[i] = new Vector4f();
-            }
-            return arr;
+        public Vector4f build() {
+            return new Vector4f();
         }
     }, TypeMapping.ATTR_FLOAT, 4);
 
-    public static final VertexFloatAttribute<Color> COLOR_4_F_VERTEX_ATTRIBUTE = new VertexFloatAttribute<>(new VertexFloatAttribute.AttributeConfiguration<Color>() {
+    public static final VertexFloatAttribute<Color> COLOR_4_F_VERTEX_ATTRIBUTE = new VertexFloatAttribute<>(Color.class, new VertexFloatAttribute.AttributeConfiguration<Color>() {
         @Override
         public void map(Color value, int vertIdx, int stride, int offset, ByteBuffer buffer) {
             int bufferStart = vertIdx * stride + offset;
@@ -163,16 +155,12 @@ public class VertexAttribute<TARGET> {
         }
 
         @Override
-        public Color[] build(int vertexCount) {
-            Color[] arr = new Color[vertexCount];
-            for(int i = 0; i < arr.length; i++){
-                arr[i] = new Color();
-            }
-            return arr;
+        public Color build() {
+            return new Color();
         }
     }, TypeMapping.ATTR_FLOAT, 4);
 
-    public static final VertexFloatAttribute<Vector2f> VECTOR_2_F_VERTEX_ATTRIBUTE = new VertexFloatAttribute<>(new VertexFloatAttribute.AttributeConfiguration<Vector2f>() {
+    public static final VertexFloatAttribute<Vector2f> VECTOR_2_F_VERTEX_ATTRIBUTE = new VertexFloatAttribute<>(Vector2f.class, new VertexFloatAttribute.AttributeConfiguration<Vector2f>() {
         @Override
         public void map(Vector2f value, int vertIdx, int stride, int offset, ByteBuffer buffer) {
             int bufferStart = vertIdx * stride + offset;
@@ -198,19 +186,17 @@ public class VertexAttribute<TARGET> {
         }
 
         @Override
-        public Vector2f[] build(int size) {
-            Vector2f[] arr =  new Vector2f[size];
-            for(int i = 0; i < arr.length; i++){
-                arr[i] = new Vector2f();
-            }
-            return arr;
+        public Vector2f build() {
+            return new Vector2f();
         }
 
     }, TypeMapping.ATTR_FLOAT, 2);
 
     public final TypeMapping mapping;
     public final int count;
-    protected VertexAttribute(TypeMapping mapping, int count) {
+    public final Class<TARGET> type;
+    protected VertexAttribute(Class<TARGET> type,TypeMapping mapping, int count) {
+        this.type = type;
         this.mapping = mapping;
         this.count = count;
     }

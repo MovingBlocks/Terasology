@@ -112,7 +112,7 @@ public class OpenGLSkeletalMesh extends SkeletalMesh implements OpenGLMeshBase {
         GL30.glDrawElements(GL30.GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, 0);
         GL30.glBindVertexArray(0);
     }
-    
+
     @Override
     public Collection<Bone> getBones() {
         return data.getBones();
