@@ -2,6 +2,11 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.rendering.assets.mesh;
 
+import gnu.trove.list.TFloatList;
+import gnu.trove.list.TIntList;
+import gnu.trove.list.array.TFloatArrayList;
+import gnu.trove.list.array.TIntArrayList;
+import org.joml.Vector2f;
 import org.joml.Vector2fc;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
@@ -58,14 +63,21 @@ public class MeshBuilder {
             20, 21, 22, 20, 22, 23    // left
     };
 
-    private StandardMeshData meshData = new StandardMeshData();
+//    private StandardMeshData meshData = new StandardMeshData();
+
+    private final TFloatList position = new TFloatArrayList();
+    private final TFloatList color0 = new TFloatArrayList();
+    public final TFloatList uv0 = new TFloatArrayList();
+    public final TIntList indices = new TIntArrayList();
+
+
     private int vertexCount;
     private TextureMapper textureMapper;
 
     public MeshBuilder addVertex(Vector3fc v) {
-        meshData.getVertices().add(v.x());
-        meshData.getVertices().add(v.y());
-        meshData.getVertices().add(v.z());
+        position.add(v.x());
+        position.add(v.y());
+        position.add(v.z());
         vertexCount++;
         return this;
     }
@@ -92,22 +104,23 @@ public class MeshBuilder {
     }
 
     public MeshBuilder addColor(Colorc c1, Colorc... colors) {
-        meshData.color0.add(c1.rf());
-        meshData.color0.add(c1.gf());
-        meshData.color0.add(c1.bf());
-        meshData.color0.add(c1.af());
+        color0.add(c1.rf());
+        color0.add(c1.gf());
+        color0.add(c1.bf());
+        color0.add(c1.af());
+
         for (Colorc c : colors) {
-            meshData.color0.add(c.rf());
-            meshData.color0.add(c.gf());
-            meshData.color0.add(c.bf());
-            meshData.color0.add(c.af());
+            color0.add(c.rf());
+            color0.add(c.gf());
+            color0.add(c.bf());
+            color0.add(c.af());
         }
         return this;
     }
 
     public MeshBuilder addTexCoord(float x, float y) {
-        meshData.uv0.add(x);
-        meshData.uv0.add(y);
+        uv0.add(x);
+        uv0.add(y);
         return this;
     }
 
@@ -116,25 +129,32 @@ public class MeshBuilder {
     }
 
     public MeshBuilder addIndex(int index) {
-        meshData.getIndices().add(index);
+        indices.add(index);
         return this;
     }
 
     public MeshBuilder addIndices(int... indices) {
-        meshData.getIndices().add(indices);
+        for (int x = 0; x < indices.length; x++) {
+            this.indices.add(indices[x]);
+        }
         return this;
     }
 
-    public StandardMeshData getMeshData() {
+    public StandardMeshData buildMeshData() {
+        StandardMeshData meshData = new StandardMeshData(position.size()/3, indices.size());
+        meshData.position.map(0, this.position.size()/3, this.position.toArray(), 0);
+        meshData.color0.map(0, this.color0.size()/4, this.color0.toArray(), 0);
+        meshData.uv0.map(0, this.uv0.size()/2, this.uv0.toArray(), 0);
+        meshData.indices.map(0, indices.size(), this.indices.toArray(), 0);
         return meshData;
     }
 
     public Mesh build() {
-        return Assets.generateAsset(meshData, Mesh.class);
+        return Assets.generateAsset(buildMeshData(), Mesh.class);
     }
 
     public Mesh build(ResourceUrn urn) {
-        return Assets.generateAsset(urn, meshData, Mesh.class);
+        return Assets.generateAsset(urn, buildMeshData(), Mesh.class);
     }
 
     /**

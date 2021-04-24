@@ -15,7 +15,7 @@
  */
 package org.terasology.engine.core.subsystem.headless.assets;
 
-import gnu.trove.list.TFloatList;
+import org.joml.Vector3f;
 import org.terasology.engine.rendering.assets.mesh.Mesh;
 import org.terasology.engine.rendering.assets.mesh.MeshData;
 import org.terasology.gestalt.assets.AssetType;
@@ -45,8 +45,13 @@ public class HeadlessMesh extends Mesh {
     }
 
     @Override
-    public TFloatList getVertices() {
-        return data.getVertices();
+    public Vector3f[] getVertices() {
+        return data.verts();
+    }
+
+    @Override
+    public int getVertexCount() {
+        return 0;
     }
 
     @Override

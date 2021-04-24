@@ -3,23 +3,30 @@
 package org.terasology.engine.rendering.gltf;
 
 import gnu.trove.list.TFloatList;
+import gnu.trove.list.array.TIntArrayList;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
+import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.engine.rendering.assets.mesh.MeshData;
 import org.terasology.engine.rendering.assets.mesh.StandardMeshData;
+import org.terasology.engine.rendering.assets.mesh.resouce.IndexResource;
+import org.terasology.engine.rendering.assets.mesh.resouce.VertexAttribute;
+import org.terasology.engine.rendering.assets.mesh.resouce.VertexFloatAttribute;
+import org.terasology.engine.rendering.assets.mesh.resouce.VertexResource;
 import org.terasology.engine.rendering.gltf.model.GLTF;
 import org.terasology.engine.rendering.gltf.model.GLTFAccessor;
 import org.terasology.engine.rendering.gltf.model.GLTFBufferView;
 import org.terasology.engine.rendering.gltf.model.GLTFMesh;
 import org.terasology.engine.rendering.gltf.model.GLTFNode;
 import org.terasology.engine.rendering.gltf.model.GLTFPrimitive;
+import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.gestalt.assets.format.AssetDataFile;
 import org.terasology.gestalt.assets.management.AssetManager;
 import org.terasology.gestalt.assets.module.annotations.RegisterAssetFileFormat;
+import org.terasology.nui.Color;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -63,12 +70,51 @@ public class GLTFMeshFormat extends GLTFCommonFormat<MeshData> {
 
             List<byte[]> loadedBuffers = loadBinaryBuffers(urn, gltf);
 
-            StandardMeshData mesh = new StandardMeshData();
+
+            VertexResource.VertexResourceBuilder builder;
+            VertexFloatAttribute.VertexAttributeFloatBinding<Vector3f> position = VertexFloatAttribute.EMPTY_BINDING;
+            VertexFloatAttribute.VertexAttributeFloatBinding<Vector3f> normal = VertexFloatAttribute.EMPTY_BINDING;
+            VertexFloatAttribute.VertexAttributeFloatBinding<Vector2f> uv0 = VertexFloatAttribute.EMPTY_BINDING;
+            VertexFloatAttribute.VertexAttributeFloatBinding<Vector2f> uv1 = VertexFloatAttribute.EMPTY_BINDING;
+            VertexFloatAttribute.VertexAttributeFloatBinding<Color> color0 = VertexFloatAttribute.EMPTY_BINDING;
+            VertexFloatAttribute.VertexAttributeFloatBinding<Vector3f> light0 = VertexFloatAttribute.EMPTY_BINDING;
+
             for (MeshAttributeSemantic semantic : MeshAttributeSemantic.values()) {
                 GLTFAccessor gltfAccessor = getAccessor(semantic, gltfPrimitive, gltf);
                 if (gltfAccessor != null && gltfAccessor.getBufferView() != null) {
                     GLTFBufferView bufferView = gltf.getBufferViews().get(gltfAccessor.getBufferView());
-                    readBuffer(loadedBuffers.get(bufferView.getBuffer()), gltfAccessor, bufferView, semantic.getTargetFloatBuffer(mesh));
+                    switch (semantic) {
+                        case Position:
+                            builder = new VertexResource.VertexResourceBuilder(gltfAccessor.getCount());
+                            position = builder.add(StandardMeshData.VERTEX_INDEX, VertexAttribute.VECTOR_3_F_VERTEX_ATTRIBUTE, true);
+                            builder.build();
+                            GLTFAttributeMapping.readVec3FBuffer(loadedBuffers.get(bufferView.getBuffer()), gltfAccessor, bufferView, position);
+                            break;
+                        case Normal:
+                            builder = new VertexResource.VertexResourceBuilder(gltfAccessor.getCount());
+                            VertexFloatAttribute.VertexAttributeFloatBinding<Vector3f> normals = builder.add(StandardMeshData.NORMAL_INDEX, VertexAttribute.VECTOR_3_F_VERTEX_ATTRIBUTE, false);
+                            builder.build();
+                            GLTFAttributeMapping.readVec3FBuffer(loadedBuffers.get(bufferView.getBuffer()), gltfAccessor, bufferView, normals);
+                            break;
+                        case Texcoord_0:
+                            builder = new VertexResource.VertexResourceBuilder(gltfAccessor.getCount());
+                            uv0 = builder.add(StandardMeshData.UV0_INDEX, VertexAttribute.VECTOR_2_F_VERTEX_ATTRIBUTE, false);
+                            builder.build();
+                            GLTFAttributeMapping.readVec2FBuffer(loadedBuffers.get(bufferView.getBuffer()), gltfAccessor, bufferView, uv0);
+                            break;
+                        case Texcoord_1:
+                            builder = new VertexResource.VertexResourceBuilder(gltfAccessor.getCount());
+                            uv1 = builder.add(StandardMeshData.UV1_INDEX, VertexAttribute.VECTOR_2_F_VERTEX_ATTRIBUTE, false);
+                            builder.build();
+                            GLTFAttributeMapping.readVec2FBuffer(loadedBuffers.get(bufferView.getBuffer()), gltfAccessor, bufferView, uv1);
+                            break;
+                        case Color_0:
+                            builder = new VertexResource.VertexResourceBuilder(gltfAccessor.getCount());
+                            color0 = builder.add(StandardMeshData.COLOR0_INDEX, VertexAttribute.COLOR_4_F_VERTEX_ATTRIBUTE, false);
+                            builder.build();
+                            GLTFAttributeMapping.readColor4FBuffer(loadedBuffers.get(bufferView.getBuffer()), gltfAccessor, bufferView, color0);
+                            break;
+                    }
                 }
             }
             GLTFAccessor indicesAccessor = getIndicesAccessor(gltfPrimitive, gltf, urn);
@@ -78,10 +124,25 @@ public class GLTFMeshFormat extends GLTFCommonFormat<MeshData> {
             GLTFBufferView indicesBuffer = gltf.getBufferViews().get(indicesAccessor.getBufferView());
             checkIndicesBuffer(indicesBuffer);
 
-            readBuffer(loadedBuffers.get(indicesBuffer.getBuffer()), indicesAccessor, indicesBuffer, mesh.getIndices());
-            applyTransformations(gltf, mesh.getVertices(), mesh.normals);
-            return mesh;
+            TIntArrayList indices = new TIntArrayList();
+            readBuffer(loadedBuffers.get(indicesBuffer.getBuffer()), indicesAccessor, indicesBuffer, indices);
+            IndexResource indexResource = new IndexResource(indices.size(), true);
+            indexResource.map(0, indices.size(), indices.toArray(), 0);
+
+            return new StandardMeshData(position, normal, uv0, uv1, color0, light0, indexResource);
         }
+    }
+
+    private Matrix4f getRootTransform(GLTF gltf) {
+        int nodeIndex = -1;
+        for (int i = 0; i < gltf.getNodes().size(); i++) {
+            if (gltf.getNodes().get(i).getMesh() == 0) {
+                nodeIndex = i;
+                break;
+            }
+        }
+
+        return getMatrix(gltf, nodeIndex);
     }
 
     private void applyTransformations(GLTF gltf, TFloatList vertices, TFloatList normals) {
