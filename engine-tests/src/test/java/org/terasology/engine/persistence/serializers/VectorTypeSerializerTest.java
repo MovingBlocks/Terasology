@@ -39,7 +39,6 @@ class VectorTypeSerializerTest extends ModuleEnvironmentTest {
     }
 
     private TypeHandlerLibrary typeHandlerLibrary;
-    private ProtobufSerializer protobufSerializer;
     private Serializer<?> gsonSerializer;
     private Gson gson = new Gson();
 
@@ -49,7 +48,6 @@ class VectorTypeSerializerTest extends ModuleEnvironmentTest {
 
         typeHandlerLibrary = TypeHandlerLibraryImpl.forModuleEnvironment(moduleManager, typeRegistry);
 
-        protobufSerializer = new ProtobufSerializer(typeHandlerLibrary);
         gsonSerializer = new Serializer<>(typeHandlerLibrary,
                 new GsonPersistedDataSerializer(),
                 new GsonPersistedDataWriter(gson),
@@ -71,41 +69,5 @@ class VectorTypeSerializerTest extends ModuleEnvironmentTest {
         assertEquals(o.v1, new Vector3f(1.0f, 2.0f, 3.0f), .00001f);
         assertEquals(o.v2, new Vector4f(1.0f, 2.0f, 3.0f, 5.0f), .00001f);
         assertEquals(o.v3, new Vector2f(1.0f, 2.0f), .00001f);
-    }
-
-    @Test
-    void testJsonSerialize() throws IOException {
-        TestObject a = new TestObject();
-        a.v1 = new Vector3f(11.5f, 13.15f, 3);
-        a.v2 = new Vector2f(12, 13f);
-        a.v3 = new Vector4f(12, 12.2f, 3f, 15.5f);
-
-        byte[] data = protobufSerializer.toBytes(a, new TypeInfo<TestObject>() {
-        });
-
-        TestObject o = protobufSerializer.fromBytes(data, new TypeInfo<TestObject>() {
-        });
-
-        assertEquals(o.v1, new Vector3f(11.5f, 13.15f, 3), .00001f);
-        assertEquals(o.v2, new Vector2f(12f, 13f), .00001f);
-        assertEquals(o.v3, new Vector4f(12, 12.2f, 3f, 15.5f), .00001f);
-    }
-
-    @Test
-    void testProtobufSerialize() throws IOException {
-        TestObject a = new TestObject();
-        a.v1 = new Vector3f(11.5f, 13.15f, 3);
-        a.v2 = new Vector2f(12, 13f);
-        a.v3 = new Vector4f(12, 12.2f, 3f, 15.5f);
-
-        byte[] bytes = protobufSerializer.toBytes(a, new TypeInfo<TestObject>() {
-        });
-
-        TestObject o = protobufSerializer.fromBytes(bytes, new TypeInfo<TestObject>() {
-        });
-
-        assertEquals(o.v1, new Vector3f(11.5f, 13.15f, 3), .00001f);
-        assertEquals(o.v2, new Vector2f(12f, 13f), .00001f);
-        assertEquals(o.v3, new Vector4f(12, 12.2f, 3f, 15.5f), .00001f);
     }
 }

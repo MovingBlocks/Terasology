@@ -21,7 +21,6 @@ import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.persistence.typeHandling.annotations.SerializedName;
 import org.terasology.reflection.TypeInfo;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -42,17 +41,15 @@ class TypeSerializerTest extends ModuleEnvironmentTest {
         INSTANCE.animals.add(new Cheetah<>(2, Color.MAGENTA));
     }
 
+    @SuppressWarnings("FieldCanBeLocal")
     private TypeHandlerLibrary typeHandlerLibrary;
-    private ProtobufSerializer protobufSerializer;
-    private Serializer gsonSerializer;
+    private Serializer<?> gsonSerializer;
 
     @Override
     public void setup() {
         ModuleContext.setContext(moduleManager.getEnvironment().get(new Name("unittest")));
 
         typeHandlerLibrary = TypeHandlerLibraryImpl.forModuleEnvironment(moduleManager, typeRegistry);
-
-        protobufSerializer = new ProtobufSerializer(typeHandlerLibrary);
 
         Gson gson = new Gson();
         gsonSerializer = new Serializer<>(typeHandlerLibrary,
@@ -85,15 +82,15 @@ class TypeSerializerTest extends ModuleEnvironmentTest {
     }
 
     @Test
-    void testSerializeDeserialize() throws IOException {
-        byte[] bytes = protobufSerializer.toBytes(INSTANCE, new TypeInfo<SomeClass<Integer>>() {
+    void testSerializeDeserialize() {
+        Optional<byte[]> serialize = gsonSerializer.serialize(INSTANCE, new TypeInfo<SomeClass<Integer>>() {
         });
+        assertTrue(serialize.isPresent());
 
-        SomeClass<Integer> deserializedInstance =
-                protobufSerializer.fromBytes(bytes, new TypeInfo<SomeClass<Integer>>() {
-                });
+        Optional<SomeClass<Integer>> deserialize = gsonSerializer.deserialize(new TypeInfo<SomeClass<Integer>>() {
+        }, serialize.get());
 
-        assertEquals(INSTANCE, deserializedInstance);
+        assertEquals(INSTANCE, deserialize.get());
     }
 
     private static class SomeClass<T> {
