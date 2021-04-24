@@ -8,7 +8,7 @@ plugins {
 }
 
 repositories {
-    jcenter()
+    mavenCentral()
 
     maven {
         name = "Terasology Artifactory"

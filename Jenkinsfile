@@ -15,7 +15,7 @@ properties([
 ])
 
 // Main pipeline definition
-node ("heavy-java") {
+node ("ts-engine && heavy && java8") {
     stage('Checkout') {
         echo "Going to check out the things !"
         checkout scm
