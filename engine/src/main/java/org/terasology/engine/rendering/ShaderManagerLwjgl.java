@@ -61,6 +61,7 @@ public class ShaderManagerLwjgl implements ShaderManager {
         addShaderProgram("toneMapping");
         addShaderProgram("sky");
         addShaderProgram("chunk");
+        addShaderProgram("blockSelection");
         if (GL.createCapabilities().OpenGL33) { //TODO remove this "if" when rendering will use OpenGL3 by default
             addShaderProgram("particle");
         } else {
