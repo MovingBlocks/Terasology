@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.core.bootstrap;
 
+import com.google.common.collect.ImmutableList;
 import org.joml.Quaternionf;
 import org.joml.Vector2f;
 import org.joml.Vector2i;
@@ -44,9 +45,8 @@ import org.terasology.reflection.copy.CopyStrategy;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.reflect.ReflectFactory;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Type;
+import java.util.Collection;
 import java.util.Optional;
 
 import static com.google.common.base.Verify.verifyNotNull;
@@ -60,15 +60,15 @@ public final class EnvironmentSwitchHandler {
     private PrefabFormat registeredPrefabFormat;
     private PrefabDeltaFormat registeredPrefabDeltaFormat;
 
-    private final Class<?>[] typesWithCopyConstructors = {
-            Quaternionf.class,
-            Vector2f.class,
-            Vector2i.class,
-            Vector3f.class,
-            Vector3i.class,
-            Vector4f.class,
-            Vector4i.class,
-    };
+    private final Collection<CopyStrategyEntry<?>> typesWithCopyConstructors = ImmutableList.of(
+            new CopyStrategyEntry<>(Quaternionf.class, Quaternionf::new),
+            new CopyStrategyEntry<>(Vector2f.class, Vector2f::new),
+            new CopyStrategyEntry<>(Vector2i.class, Vector2i::new),
+            new CopyStrategyEntry<>(Vector3f.class, Vector3f::new),
+            new CopyStrategyEntry<>(Vector3i.class, Vector3i::new),
+            new CopyStrategyEntry<>(Vector4f.class, Vector4f::new),
+            new CopyStrategyEntry<>(Vector4i.class, Vector4i::new)
+    );
 
     public EnvironmentSwitchHandler() {
     }
@@ -83,12 +83,8 @@ public final class EnvironmentSwitchHandler {
         CopyStrategyLibrary copyStrategyLibrary = context.get(CopyStrategyLibrary.class);
         copyStrategyLibrary.clear();
 
-        for (Class<?> aClass : typesWithCopyConstructors) {
-            try {
-                ConstructorCopyStrategy.register(copyStrategyLibrary, aClass);
-            } catch (NoSuchMethodException e) {
-                throw new RuntimeException("Failed to find copy strategy for {}" + aClass, e);
-            }
+        for (CopyStrategyEntry<?> entry : typesWithCopyConstructors) {
+            entry.registerWith(copyStrategyLibrary);
         }
 
         //TODO: find a permanent fix over just creating a new typehandler
@@ -229,55 +225,20 @@ public final class EnvironmentSwitchHandler {
         }
     }
 
-    /**
-     * Create copies by invoking the class's constructor with a value.
-     * <p>
-     * For classes that offer constructors which make a new instance as a copy of the old one.
-     * <p>
-     * FIXME: Move this class to a more appropriate package.
-     */
-    static class ConstructorCopyStrategy<T> implements CopyStrategy<T> {
+    // FIXME: Move this class to a more appropriate package.
+    static class CopyStrategyEntry<T> {
+        final Class<T> type;
+        final CopyStrategy<T> copyStrategy;
 
-        private final Constructor<T> declaredConstructor;
-
-        static <T> void register(CopyStrategyLibrary library, Class<T> aClass) throws NoSuchMethodException {
-            library.register(aClass, new ConstructorCopyStrategy<>(aClass));
+        CopyStrategyEntry(Class<T> type, CopyStrategy<T> copyStrategy) {
+            this.type = type;
+            this.copyStrategy = copyStrategy;
         }
 
-        public ConstructorCopyStrategy(Class<T> aClass) throws NoSuchMethodException {
-            declaredConstructor = getConstructorMatching(aClass);
-        }
-
-        private Constructor<T> getConstructorMatching(Class<T> aClass) throws NoSuchMethodException {
-            try {
-                return aClass.getDeclaredConstructor(aClass);
-            } catch (NoSuchMethodException e) {
-                logger.debug("{} has no constructor for its own class; will check for compatible methods.", aClass);
-            }
-            for (Constructor<?> constructor : aClass.getDeclaredConstructors()) {
-                if (constructor.getParameterCount() != 1) {
-                    continue;
-                }
-                Class<?> parameter = constructor.getParameterTypes()[0];
-                if (parameter.isAssignableFrom(aClass)) {
-                    //noinspection unchecked
-                    return (Constructor<T>) constructor;
-                }
-            }
-            throw new NoSuchMethodException("No compatible constructors found for " + aClass);
-        }
-
-        @Override
-        public T copy(T value) {
-            if (value == null) {
-                return null;
-            }
-            try {
-                return declaredConstructor.newInstance(value);
-            } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-                logger.error("Failure to invoke constructor for {}", value.getClass(), e);
-                return null;
-            }
+        void registerWith(CopyStrategyLibrary copyStrategyLibrary) {
+            // I tried to inline this at the call site, but Java didn't seem to want to believe
+            // these were compatible types unless I put this in a method of this generic class.
+            copyStrategyLibrary.register(type, copyStrategy);
         }
     }
 }
