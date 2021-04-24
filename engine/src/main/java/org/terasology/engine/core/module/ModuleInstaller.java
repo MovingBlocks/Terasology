@@ -1,18 +1,5 @@
-/*
- * Copyright 2017 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.core.module;
 
 import org.slf4j.Logger;
@@ -56,12 +43,9 @@ public class ModuleInstaller implements Callable<List<Module>> {
         List<Path> downloadedModulesPaths = downloader.call();
         logger.info("Module download completed, loading the new modules...");
         List<Module> newInstalledModules = new ArrayList<>(downloadedModulesPaths.size());
-//        ModuleLoader loader = new ModuleLoader(moduleManager.getModuleMetadataReader());
-//        loader.setModuleInfoPath(TerasologyConstants.MODULE_INFO_FILENAME);
         for (Path filePath : downloadedModulesPaths) {
             try {
-                Module module = moduleManager.getModuleFactory().createModule(filePath.toFile());
-                moduleManager.getRegistry().add(module);
+                Module module = moduleManager.registerArchiveModule(filePath);
                 newInstalledModules.add(module);
             } catch (IOException e) {
                 logger.warn("Could not load module {}", filePath.getFileName(), e);
