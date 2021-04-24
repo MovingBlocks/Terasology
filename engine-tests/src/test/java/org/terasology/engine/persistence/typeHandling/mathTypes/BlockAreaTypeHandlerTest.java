@@ -60,8 +60,8 @@ public class BlockAreaTypeHandlerTest extends ModuleEnvironmentTest {
 
         TestObject o = gsonSerializer.deserialize(new TypeInfo<TestObject>() {
         },data).get();
-        assertEquals(o.b1, new BlockArea(-1, -1, 0, 0));
-        assertEquals(o.b2, new BlockArea(0, 0, 1, 1));
+        assertEquals(new BlockArea(-1, -1, 0, 0), o.b1);
+        assertEquals(new BlockArea(0, 0, 1, 1), o.b2);
     }
 
     @Test
@@ -75,8 +75,8 @@ public class BlockAreaTypeHandlerTest extends ModuleEnvironmentTest {
 
         TestObject o = protobufSerializer.fromBytes(data, new TypeInfo<TestObject>() {
         });
-        assertEquals(o.b1, new BlockArea(-1, -1, 0, 0));
-        assertEquals(o.b2, new BlockArea(0, 0, 1, 1));
+        assertEquals(new BlockArea(-1, -1, 0, 0), o.b1);
+        assertEquals(new BlockArea(0, 0, 1, 1), o.b2);
     }
 
 }
