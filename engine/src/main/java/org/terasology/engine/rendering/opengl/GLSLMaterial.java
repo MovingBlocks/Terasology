@@ -19,9 +19,6 @@ import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.gestalt.assets.AssetType;
-import org.terasology.gestalt.assets.DisposableResource;
-import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.engine.core.GameThread;
 import org.terasology.engine.core.subsystem.lwjgl.LwjglGraphicsProcessing;
 import org.terasology.engine.registry.CoreRegistry;
@@ -31,6 +28,9 @@ import org.terasology.engine.rendering.assets.material.MaterialData;
 import org.terasology.engine.rendering.assets.shader.ShaderParameterMetadata;
 import org.terasology.engine.rendering.assets.shader.ShaderProgramFeature;
 import org.terasology.engine.rendering.assets.texture.Texture;
+import org.terasology.gestalt.assets.AssetType;
+import org.terasology.gestalt.assets.DisposableResource;
+import org.terasology.gestalt.assets.ResourceUrn;
 
 import java.nio.FloatBuffer;
 import java.util.Arrays;
@@ -624,7 +624,7 @@ public class GLSLMaterial extends BaseMaterial {
         }
     }
 
-    public static class DisposalAction implements DisposableResource {
+    private static class DisposalAction implements DisposableResource {
 
         private final ResourceUrn urn;
         private final LwjglGraphicsProcessing graphicsProcessing;
@@ -632,7 +632,7 @@ public class GLSLMaterial extends BaseMaterial {
         private TIntIntMap shaderPrograms = new TIntIntHashMap();
 
         // made package-private after Jenkins' suggestion
-        public DisposalAction(ResourceUrn urn, LwjglGraphicsProcessing graphicsProcessing) {
+        DisposalAction(ResourceUrn urn, LwjglGraphicsProcessing graphicsProcessing) {
             this.urn = urn;
             this.graphicsProcessing = graphicsProcessing;
         }
