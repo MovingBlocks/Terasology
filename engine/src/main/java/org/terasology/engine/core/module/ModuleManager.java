@@ -27,6 +27,7 @@ import org.terasology.gestalt.module.dependencyresolution.ResolutionResult;
 import org.terasology.gestalt.module.sandbox.APIScanner;
 import org.terasology.gestalt.module.sandbox.ModuleSecurityManager;
 import org.terasology.gestalt.module.sandbox.ModuleSecurityPolicy;
+import org.terasology.gestalt.module.sandbox.PermissionProvider;
 import org.terasology.gestalt.module.sandbox.PermissionProviderFactory;
 import org.terasology.gestalt.module.sandbox.StandardPermissionProviderFactory;
 import org.terasology.gestalt.module.sandbox.WarnOnlyProviderFactory;
@@ -263,5 +264,9 @@ public class ModuleManager {
 
     public ModuleFactory getModuleFactory() {
         return moduleFactory;
+    }
+
+    public PermissionProvider getPermissionProvider(Module module) {
+        return permissionProviderFactory.createPermissionProviderFor(module, module.getClassPredicate());
     }
 }

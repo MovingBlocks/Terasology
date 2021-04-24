@@ -7,8 +7,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.core.module.ModuleContext;
 import org.terasology.engine.core.module.ModuleManager;
+import org.terasology.engine.utilities.ReflectionUtil;
 import org.terasology.gestalt.module.Module;
 import org.terasology.gestalt.module.ModuleEnvironment;
+import org.terasology.gestalt.module.sandbox.PermissionProvider;
 import org.terasology.gestalt.naming.Name;
 import org.terasology.nui.databinding.Binding;
 import org.terasology.nui.databinding.NotifyingBinding;
@@ -20,7 +22,6 @@ import org.terasology.nui.widgets.types.TypeWidgetLibrary;
 import org.terasology.nui.widgets.types.builtin.util.ExpandableLayoutBuilder;
 import org.terasology.reflection.TypeInfo;
 import org.terasology.reflection.TypeRegistry;
-import org.terasology.engine.utilities.ReflectionUtil;
 
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
@@ -51,8 +52,8 @@ public class SubtypeLayoutBuilder<T> extends ExpandableLayoutBuilder<T> {
 
         Module contextModule = ModuleContext.getContext();
 
+        PermissionProvider permissionProvider = moduleManager.getPermissionProvider(contextModule);
 
-//        PermissionProvider permissionProvider = moduleManager.getPermissionProvider(contextModule);
         ModuleEnvironment environment = moduleManager.getEnvironment();
 
         Set<Name> allowedProvidingModules =
@@ -66,7 +67,7 @@ public class SubtypeLayoutBuilder<T> extends ExpandableLayoutBuilder<T> {
                         .stream()
                         // Type must come from an allowed module or be in the whitelist
                         .filter(clazz -> allowedProvidingModules.contains(getModuleProviding(clazz)) ||
-                                contextModule.getClassPredicate().test(clazz))
+                                permissionProvider.isPermitted(clazz))
                         // Filter public, instantiable types
                         .filter(clazz -> {
                             int modifiers = clazz.getModifiers();
