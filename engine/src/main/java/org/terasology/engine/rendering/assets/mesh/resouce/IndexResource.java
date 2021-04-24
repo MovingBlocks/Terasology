@@ -4,7 +4,6 @@
 package org.terasology.engine.rendering.assets.mesh.resouce;
 
 import org.lwjgl.BufferUtils;
-
 import java.nio.ByteBuffer;
 
 public class IndexResource {

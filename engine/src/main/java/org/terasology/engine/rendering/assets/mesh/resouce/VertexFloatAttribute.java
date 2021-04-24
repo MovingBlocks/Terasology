@@ -28,6 +28,11 @@ public class VertexFloatAttribute<TARGET> extends VertexAttribute<TARGET> {
         this.configuration = configuration;
     }
 
+    /**
+     * maps a floating point arrays to a target buffer.
+     *
+     * @param <TARGET> object that backs the buffer
+     */
     public static class VertexAttributeFloatBinding<TARGET> extends VertexAttributeBinding<TARGET> {
         private VertexFloatAttribute<TARGET> attribute;
         private int index = 0;
@@ -118,7 +123,7 @@ public class VertexFloatAttribute<TARGET> extends VertexAttribute<TARGET> {
         }
 
         @Override
-        public void refresh() {
+        public void commit() {
             if (store != null) {
                 update();
                 for (int x = 0; x < this.elements; x++) {

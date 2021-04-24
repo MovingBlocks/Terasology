@@ -11,46 +11,13 @@ import org.terasology.nui.Color;
 
 import java.nio.ByteBuffer;
 
+/**
+ * attribute maps a target object or a primitive data to a {@link VertexResource}
+ *
+ * @param <TARGET> the target object
+ */
 public class VertexAttribute<TARGET> {
 
-//    public static final VertexAttribute<Vector3ic, Integer> VECTOR_3_I_VERTEX_ATTRIBUTE = new VertexAttribute<>(
-//            new AttributeConfiguration<Vector3ic, Integer>() {
-//
-//                @Override
-//                public void map(Vector3ic value, int vertIdx, int stride, int offset, ByteBuffer buffer) {
-//                    int bufferStart = vertIdx * stride + offset;
-//                    buffer.putInt(bufferStart, value.x());
-//                    buffer.putInt(bufferStart + Integer.BYTES, value.y());
-//                    buffer.putInt(bufferStart + Integer.BYTES * 2, value.z());
-//                }
-//
-//                @Override
-//                public void map(int pos, Integer[] value, int vertIdx, int stride, int offset, ByteBuffer buffer) {
-//                    int bufferStart = vertIdx * stride + offset;
-//                    buffer.putInt(bufferStart, value[pos]);
-//                    buffer.putInt(bufferStart + Float.BYTES, value[pos + 1]);
-//                    buffer.putInt(bufferStart + Float.BYTES * 2, value[pos + 2]);
-//                }
-//
-//                @Override
-//                public void map(Vector3ic value, int vertIdx, Integer[] store) {
-//                    store[vertIdx * 4] = value.x();
-//                    store[vertIdx * 4 + 1] = value.y();
-//                    store[vertIdx * 4 + 2] = value.z();
-//                }
-//
-//                @Override
-//                public void map(int pos, Integer[] value, int vertIdx, Integer[] store) {
-//                    store[vertIdx * 4] = value[pos];
-//                    store[vertIdx * 4 + 1] = value[pos + 1];
-//                    store[vertIdx * 4 + 2] = value[pos + 2];
-//                }
-//
-//                @Override
-//                public Integer[] build(int size) {
-//                    return new Integer[size * 3];
-//                }
-//            }, TypeMapping.ATTR_INT, 3);
     public static final VertexFloatAttribute<Vector3f> VECTOR_3_F_VERTEX_ATTRIBUTE = new VertexFloatAttribute<>(Vector3f.class, new VertexFloatAttribute.AttributeConfiguration<Vector3f>() {
 
         @Override
@@ -195,6 +162,12 @@ public class VertexAttribute<TARGET> {
     public final TypeMapping mapping;
     public final int count;
     public final Class<TARGET> type;
+
+    /**
+     * @param type the mapping type
+     * @param mapping maps a primitive to a given supported type.
+     * @param count the number elements that is described by the target
+     */
     protected VertexAttribute(Class<TARGET> type,TypeMapping mapping, int count) {
         this.type = type;
         this.mapping = mapping;

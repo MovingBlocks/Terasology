@@ -24,8 +24,7 @@ public abstract class Mesh extends Asset<MeshData> {
 
     protected AABBf getBound(MeshData data, AABBf dest) {
         Vector3f[] vertices = this.getVertices();
-        int vertexCount = vertices.length / 3;
-        if (vertexCount == 0) {
+        if (vertices.length == 0) {
             dest.set(Float.POSITIVE_INFINITY,
                 Float.POSITIVE_INFINITY,
                 Float.POSITIVE_INFINITY,
@@ -34,17 +33,8 @@ public abstract class Mesh extends Asset<MeshData> {
                 Float.NEGATIVE_INFINITY);
             return dest;
         }
-
-        dest.minX = vertices[0].x;
-        dest.minY = vertices[0].y;
-        dest.minZ = vertices[0].z;
-        dest.maxX = vertices[0].x;
-        dest.maxY = vertices[0].y;
-        dest.maxZ = vertices[0].z;
-
-        for (int index = 1; index < vertexCount; ++index) {
-            dest.union(vertices[index]);
-//            , vertices[3 * index + 1], vertices[3 * index + 2]);
+        for (Vector3f vertex : vertices) {
+            dest.union(vertex);
         }
         return dest;
     }

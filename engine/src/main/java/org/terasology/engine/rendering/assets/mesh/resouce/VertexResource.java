@@ -49,8 +49,6 @@ public class VertexResource {
         this.inStride = inStride;
     }
 
-
-
     public int getVersion() {
         return version;
     }
@@ -62,6 +60,9 @@ public class VertexResource {
         version++;
     }
 
+    /**
+     * describes the metadata and placement into the buffer based off the stride.
+     */
     public static class VertexDefinition {
         public final int location;
         public final VertexAttribute attribute;
@@ -74,17 +75,28 @@ public class VertexResource {
         }
     }
 
-
+    /**
+     * Builder that that creates bindings for {@link VertexResource}
+     */
     public static class VertexResourceBuilder {
         private List<VertexDefinition> definitions = new ArrayList<>();
         private int inStride;
-        private int elements;
+        private final int elements;
         private VertexResource vertexResource = new VertexResource();
 
         public VertexResourceBuilder(int elements) {
             this.elements = elements;
         }
 
+        /**
+         * add an attribute and provides an {@link VertexFloatAttribute.VertexAttributeFloatBinding}
+         *
+         * @param location the index of the attribute binding
+         * @param attribute the attribute that describes the binding
+         * @param cpuReadable exposes the data to a {@link TARGET} array
+         * @param <TARGET>
+         * @return
+         */
         public <TARGET> VertexFloatAttribute.VertexAttributeFloatBinding<TARGET> add(int location,
                                                                                      VertexFloatAttribute<TARGET> attribute, boolean cpuReadable) {
             VertexFloatAttribute.VertexAttributeFloatBinding<TARGET> result =
