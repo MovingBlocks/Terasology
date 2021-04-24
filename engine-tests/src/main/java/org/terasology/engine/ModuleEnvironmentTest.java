@@ -3,6 +3,7 @@
 package org.terasology.engine;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.io.TempDir;
 import org.terasology.engine.core.module.ExternalApiWhitelist;
 import org.terasology.engine.core.module.ModuleManager;
@@ -14,6 +15,7 @@ import org.terasology.reflection.TypeRegistry;
 import java.nio.file.Path;
 import java.util.stream.Collectors;
 
+@Tag("MteTest")
 public abstract class ModuleEnvironmentTest {
     protected ModuleManager moduleManager;
     protected ModuleTypeRegistry typeRegistry;
