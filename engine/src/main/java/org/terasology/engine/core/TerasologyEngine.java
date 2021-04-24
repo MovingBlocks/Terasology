@@ -466,8 +466,9 @@ public class TerasologyEngine implements GameEngine {
             return false;
         }
 
-//        assetTypeManager.reloadChangedOnDisk();
-//        assetTypeManager.reloadAssets();
+        if (assetTypeManager instanceof AutoReloadAssetTypeManager) {
+            ((AutoReloadAssetTypeManager) assetTypeManager).reloadChangedAssets();
+        }
 
         processPendingState();
 
