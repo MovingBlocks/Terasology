@@ -36,7 +36,7 @@ public abstract class ModuleRendering {
 
     public ModuleRendering(Context context) {
         this.context = context;
-        moduleManager = context.get( ModuleManager.class);
+        moduleManager = context.get(ModuleManager.class);
         providingModule = moduleManager.getEnvironment().getModuleProviding(this.getClass());
     }
 

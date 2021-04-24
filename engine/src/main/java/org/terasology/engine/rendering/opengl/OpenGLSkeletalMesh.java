@@ -9,15 +9,15 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL30;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.gestalt.assets.AssetType;
-import org.terasology.gestalt.assets.DisposableResource;
-import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.engine.core.GameThread;
 import org.terasology.engine.core.subsystem.lwjgl.LwjglGraphicsProcessing;
 import org.terasology.engine.rendering.assets.mesh.StandardMeshData;
 import org.terasology.engine.rendering.assets.skeletalmesh.Bone;
 import org.terasology.engine.rendering.assets.skeletalmesh.SkeletalMesh;
 import org.terasology.engine.rendering.assets.skeletalmesh.SkeletalMeshData;
+import org.terasology.gestalt.assets.AssetType;
+import org.terasology.gestalt.assets.DisposableResource;
+import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.joml.geom.AABBf;
 
 import java.nio.ByteBuffer;
@@ -170,7 +170,7 @@ public class OpenGLSkeletalMesh extends SkeletalMesh {
         return data.getStaticAABB();
     }
 
-    public static class DisposalAction implements DisposableResource {
+    private static class DisposalAction implements DisposableResource {
 
         private final ResourceUrn urn;
 
@@ -178,7 +178,7 @@ public class OpenGLSkeletalMesh extends SkeletalMesh {
         private int vbo = 0;
         private int ebo = 0;
 
-        public DisposalAction(ResourceUrn urn) {
+        DisposalAction(ResourceUrn urn) {
             this.urn = urn;
         }
 
