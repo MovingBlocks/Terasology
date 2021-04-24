@@ -65,11 +65,9 @@ public class VertexFloatAttribute<TARGET> extends VertexAttribute<TARGET> {
 
         private void update() {
             if (this.resource.elements() != this.elements && this.store != null) {
-                TARGET newStore[] = (TARGET[]) Array.newInstance(this.attribute.type, this.elements);
+                TARGET[] newStore = (TARGET[]) Array.newInstance(this.attribute.type, this.elements);
                 int size = Math.min(newStore.length, this.store.length);
-                for (int x = 0; x < size; x++) {
-                    newStore[x] = store[x];
-                }
+                System.arraycopy(store, 0, newStore, 0, size);
                 if (newStore.length > this.store.length) {
                     for (int x = this.store.length; x < newStore.length; x++) {
                         newStore[x] = attribute.configuration.build();

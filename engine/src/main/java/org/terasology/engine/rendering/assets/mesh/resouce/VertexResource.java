@@ -80,7 +80,7 @@ public class VertexResource {
         private int inStride;
         private int elements;
         private VertexResource vertexResource = new VertexResource();
-        
+
         public VertexResourceBuilder(int elements) {
             this.elements = elements;
         }
