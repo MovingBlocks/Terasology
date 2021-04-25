@@ -13,7 +13,6 @@ import org.slf4j.LoggerFactory;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.config.RenderingConfig;
 import org.terasology.engine.context.Context;
-import org.terasology.engine.core.subsystem.lwjgl.GLBufferPool;
 import org.terasology.engine.rendering.cameras.Camera;
 import org.terasology.engine.rendering.logic.ChunkMeshRenderer;
 import org.terasology.engine.rendering.primitives.ChunkMesh;

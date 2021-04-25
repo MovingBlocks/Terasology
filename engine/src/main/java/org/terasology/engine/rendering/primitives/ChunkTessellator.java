@@ -5,11 +5,7 @@ package org.terasology.engine.rendering.primitives;
 import com.google.common.base.Stopwatch;
 import gnu.trove.iterator.TIntIterator;
 import org.joml.Vector3f;
-import org.joml.Vector3fc;
 import org.lwjgl.BufferUtils;
-import org.terasology.engine.core.subsystem.lwjgl.GLBufferPool;
-import org.terasology.engine.math.Direction;
-import org.terasology.math.TeraMath;
 import org.terasology.engine.monitoring.PerformanceMonitor;
 import org.terasology.engine.rendering.RenderMath;
 import org.terasology.engine.world.ChunkView;
@@ -26,14 +22,8 @@ public final class ChunkTessellator {
 
     private static int statVertexArrayUpdateCount;
 
-    private GLBufferPool bufferPool;
+    public ChunkTessellator() {
 
-    public ChunkTessellator(GLBufferPool bufferPool) {
-        this.bufferPool = bufferPool;
-    }
-
-    public ChunkMesh generateEmptyMesh() {
-        return new ChunkMesh(bufferPool);
     }
 
     public ChunkMesh generateMesh(ChunkView chunkView) {
@@ -42,7 +32,7 @@ public final class ChunkTessellator {
 
     public ChunkMesh generateMesh(ChunkView chunkView, float scale, int border) {
         PerformanceMonitor.startActivity("GenerateMesh");
-        ChunkMesh mesh = new ChunkMesh(bufferPool);
+        ChunkMesh mesh = new ChunkMesh();
 
         final Stopwatch watch = Stopwatch.createStarted();
 
@@ -105,7 +95,7 @@ public final class ChunkTessellator {
 
                 /* FLAGS - TEX DATA 0.z */
                 elements.finalVertices.put(Float.floatToIntBits(elements.flags.get(i)));
-                
+
                 /* ANIMATION FRAME COUNT - TEX DATA 0.w*/
                 elements.finalVertices.put(Float.floatToIntBits(elements.frames.get(i)));
 
