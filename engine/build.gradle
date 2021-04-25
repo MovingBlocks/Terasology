@@ -104,9 +104,9 @@ dependencies {
     implementation group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '4.10'
 
     // Our developed libs
-    api group: 'org.terasology.gestalt', name: 'gestalt-asset-core', version: '7.0.6-SNAPSHOT'
-    api group: 'org.terasology.gestalt', name: 'gestalt-module', version: '7.0.6-SNAPSHOT'
-    api group: 'org.terasology.gestalt', name: 'gestalt-util', version: '7.0.6-SNAPSHOT'
+    api group: 'org.terasology.gestalt', name: 'gestalt-asset-core', version: '7.1.0-SNAPSHOT'
+    api group: 'org.terasology.gestalt', name: 'gestalt-module', version: '7.1.0-SNAPSHOT'
+    api group: 'org.terasology.gestalt', name: 'gestalt-util', version: '7.1.0-SNAPSHOT'
     api "com.github.zafarkhaja:java-semver:0.10.0"
 
     api group: 'org.terasology', name: 'TeraMath', version: '1.5.0'
@@ -127,7 +127,7 @@ dependencies {
     // TODO: Consider moving this back to the PC Facade instead of having the engine rely on it?
     implementation group: 'org.terasology.crashreporter', name: 'cr-terasology', version: '4.1.0'
 
-   api(project(":subsystems:TypeHandlerLibrary"))
+    api(project(":subsystems:TypeHandlerLibrary"))
 }
 
 // Instructions for packaging a jar file for the engine
