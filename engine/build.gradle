@@ -6,7 +6,7 @@
 plugins {
     id "java-library"
     id "org.jetbrains.gradle.plugin.idea-ext"
-    id("reflections-manifest")
+//    id("reflections-manifest")
 }
 
 // Grab all the common stuff like plugins to use, artifact repositories, code analysis config, etc
@@ -135,7 +135,7 @@ jar {
     // Unlike the content modules Gradle grabs the assets as they're in a resources directory. Need to avoid dupes tho
     duplicatesStrategy = "EXCLUDE"
 
-    dependsOn(tasks.named("cacheReflections"))
+//    dependsOn(tasks.named("cacheReflections"))
 
     doFirst {
         manifest {

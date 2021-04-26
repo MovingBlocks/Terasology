@@ -9,7 +9,7 @@ import org.terasology.gradology.ModuleMetadataForGradle
 
 plugins {
     `java-library`
-    id("reflections-manifest")
+//    id("reflections-manifest")
     idea
     eclipse
 }
@@ -133,14 +133,14 @@ tasks.register<Sync>("syncDeltas") {
     into("${mainSourceSet.output.classesDirs.first()}/deltas")
 }
 
-tasks.named("compileJava") {
-    finalizedBy("cacheReflections")
-}
+//tasks.named("compileJava") {
+//    finalizedBy("cacheReflections")
+//}
 
 // Instructions for packaging a jar file - is a manifest even needed for modules?
 tasks.named("jar") {
     // Make sure the assets directory is included
-    dependsOn("cacheReflections")
+//    dependsOn("cacheReflections")
     dependsOn("syncAssets")
     dependsOn("syncOverrides")
     dependsOn("syncDeltas")

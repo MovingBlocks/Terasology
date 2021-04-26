@@ -1,6 +1,11 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
+import org.reflections.Reflections
+import org.reflections.scanners.SubTypesScanner
+import org.reflections.scanners.TypeAnnotationsScanner
+import org.reflections.serializers.JsonSerializer
+import org.reflections.util.ConfigurationBuilder
 import java.net.URLClassLoader
 
 tasks.register("cacheReflections") {
@@ -21,16 +26,17 @@ tasks.register("cacheReflections") {
     doLast {
         val classPaths = mainSourceSet.compileClasspath.map { it.toURI().toURL() }
         val classLoader = URLClassLoader(classPaths.toTypedArray())
-//        try {
-//            val reflections = Reflections(ConfigurationBuilder()
-//                .setSerializer(JsonSerializer())
-//                .addClassLoader(classLoader)
-//                // .filterInputsBy(FilterBuilder.parsePackages("+org"))
-//                .addUrls(inputs.files.map { it.toURI().toURL() })
-//                .setScanners(TypeAnnotationsScanner(), SubTypesScanner(false)))
-//            reflections.save(manifestFile.toString())
-//        } catch (e: java.net.MalformedURLException) {
-//            logger.error("Cannot parse input to url", e)
-//        }
+        try {
+            val reflections = Reflections(
+                ConfigurationBuilder()
+                .setSerializer(JsonSerializer())
+                .addClassLoader(classLoader)
+                // .filterInputsBy(FilterBuilder.parsePackages("+org"))
+                .addUrls(inputs.files.map { it.toURI().toURL() })
+                .setScanners(TypeAnnotationsScanner(), SubTypesScanner(false)))
+            reflections.save(manifestFile.toString())
+        } catch (e: java.net.MalformedURLException) {
+            logger.error("Cannot parse input to url", e)
+        }
     }
 }
