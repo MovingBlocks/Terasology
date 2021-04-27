@@ -1,15 +1,10 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-//plugins {
-//    id("reflections-manifest").apply(false)
-//}
-
 subprojects {
     // Hack for getting sourcesSets.main.output there.
     plugins.apply('java')
     plugins.apply('idea')
-//    plugins.apply("reflections-manifest")
 
     def sourceSets = project.getConvention().getPlugin(JavaPluginConvention.class).sourceSets
 
@@ -24,8 +19,4 @@ subprojects {
             downloadSources = true
         }
     }
-
-//    tasks.named("jar") {
-//        dependsOn('cacheReflections')
-//    }
 }
