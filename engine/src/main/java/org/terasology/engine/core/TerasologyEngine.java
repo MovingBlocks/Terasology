@@ -14,6 +14,7 @@ import org.terasology.engine.context.Context;
 import org.terasology.engine.context.internal.ContextImpl;
 import org.terasology.engine.core.bootstrap.EnvironmentSwitchHandler;
 import org.terasology.engine.core.modes.GameState;
+import org.terasology.engine.core.modes.StateLoading;
 import org.terasology.engine.core.module.ExternalApiWhitelist;
 import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.engine.core.paths.PathManager;
@@ -468,7 +469,9 @@ public class TerasologyEngine implements GameEngine {
             return false;
         }
 
-        if (assetTypeManager instanceof AutoReloadAssetTypeManager) {
+        // environment switch occurs during loading assetTypeManager can become invalid.
+        // potential race condition RegisterMods#step so make sure the current state is not loading
+        if (assetTypeManager instanceof AutoReloadAssetTypeManager && !(currentState instanceof StateLoading) ) {
             ((AutoReloadAssetTypeManager) assetTypeManager).reloadChangedAssets();
         }
 
