@@ -55,6 +55,7 @@ import org.terasology.engine.world.block.shapes.BlockShapeImpl;
 import org.terasology.engine.world.block.sounds.BlockSounds;
 import org.terasology.engine.world.block.tiles.BlockTile;
 import org.terasology.gestalt.assets.AssetType;
+import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.gestalt.assets.management.AssetManager;
 import org.terasology.gestalt.assets.module.ModuleAwareAssetTypeManager;
 import org.terasology.gestalt.assets.module.autoreload.AutoReloadAssetTypeManager;
@@ -185,6 +186,7 @@ public class TerasologyEngine implements GameEngine {
 
         // register NUI classes with engine module
         addToClassesOnClasspathsToAddToEngine(UIWidget.class);
+        addToClassesOnClasspathsToAddToEngine(ResourceUrn.class);
     }
 
     /**

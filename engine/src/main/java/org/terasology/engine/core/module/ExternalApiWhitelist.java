@@ -1,27 +1,11 @@
-/*
- * Copyright 2016 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.core.module;
 
 
 import com.google.common.collect.ImmutableSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.persistence.typeHandling.SpecificTypeHandlerFactory;
-import org.terasology.persistence.typeHandling.StringRepresentationTypeHandler;
-import org.terasology.reflection.MappedContainer;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Set;
@@ -125,9 +109,6 @@ public final class ExternalApiWhitelist {
             .add("org.lwjgl")
             .add("org.terasology.jnlua")
             .add("org.joml")
-            .add("org.terasology.input")
-            .add("org.terasology.input.device")
-            .add("org.terasology")
             .build();
 
     public static final Set<Class<?>> CLASSES = new ImmutableSet.Builder<Class<?>>()
@@ -185,15 +166,8 @@ public final class ExternalApiWhitelist {
             .add(org.terasology.math.TeraMath.class)
             // gestalt module
             .add(org.terasology.gestalt.naming.Name.class)
-            .add(org.terasology.gestalt.assets.management.AssetManager.class)
-            .add(org.terasology.gestalt.assets.Asset.class)
-            .add(org.terasology.gestalt.assets.AssetData.class)
-            .add(org.terasology.gestalt.assets.AssetDataProducer.class)
-            .add(org.terasology.gestalt.assets.module.annotations.RegisterAssetDataProducer.class)
-            .add(MappedContainer.class)
-            .add(StringRepresentationTypeHandler.class)
-            .add(SpecificTypeHandlerFactory.class)
-            .add(org.terasology.gestalt.assets.ResourceUrn.class)
+            .add(org.terasology.persistence.typeHandling.StringRepresentationTypeHandler.class)
+            .add(org.terasology.persistence.typeHandling.SpecificTypeHandlerFactory.class)
             .add(org.terasology.reflection.metadata.FieldMetadata.class)
             .build();
 
