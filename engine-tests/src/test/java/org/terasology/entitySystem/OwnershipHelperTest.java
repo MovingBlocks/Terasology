@@ -1,4 +1,4 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.entitySystem;
 
@@ -12,7 +12,7 @@ import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.engine.entitySystem.entity.internal.OwnershipHelper;
-import org.terasology.engine.entitySystem.stubs.OwnerComponent;
+import org.terasology.unittest.stubs.OwnerComponent;
 import org.terasology.engine.network.NetworkMode;
 import org.terasology.engine.network.NetworkSystem;
 import org.terasology.engine.recording.RecordAndReplayCurrentStatus;

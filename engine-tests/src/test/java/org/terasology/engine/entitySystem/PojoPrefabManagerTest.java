@@ -1,4 +1,4 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.entitySystem;
 
@@ -13,7 +13,7 @@ import org.terasology.engine.entitySystem.prefab.Prefab;
 import org.terasology.engine.entitySystem.prefab.PrefabData;
 import org.terasology.engine.entitySystem.prefab.internal.PojoPrefab;
 import org.terasology.engine.entitySystem.prefab.internal.PojoPrefabManager;
-import org.terasology.engine.entitySystem.stubs.StringComponent;
+import org.terasology.unittest.stubs.StringComponent;
 import org.terasology.engine.registry.CoreRegistry;
 import org.terasology.engine.testUtil.ModuleManagerFactory;
 import org.terasology.engine.utilities.Assets;

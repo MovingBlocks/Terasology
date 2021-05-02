@@ -1,4 +1,4 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.persistence;
 
@@ -13,7 +13,6 @@ import org.terasology.gestalt.assets.module.ModuleAwareAssetTypeManager;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.context.internal.ContextImpl;
 import org.terasology.engine.core.bootstrap.EntitySystemSetupUtil;
-import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.entitySystem.DoNotPersist;
 import org.terasology.engine.entitySystem.entity.EntityRef;
@@ -24,13 +23,12 @@ import org.terasology.engine.entitySystem.metadata.ComponentLibrary;
 import org.terasology.engine.entitySystem.prefab.Prefab;
 import org.terasology.engine.entitySystem.prefab.PrefabData;
 import org.terasology.engine.entitySystem.prefab.internal.PojoPrefab;
-import org.terasology.engine.entitySystem.stubs.GetterSetterComponent;
-import org.terasology.engine.entitySystem.stubs.IntegerComponent;
-import org.terasology.engine.entitySystem.stubs.MappedTypeComponent;
-import org.terasology.engine.entitySystem.stubs.StringComponent;
+import org.terasology.unittest.stubs.GetterSetterComponent;
+import org.terasology.unittest.stubs.IntegerComponent;
+import org.terasology.unittest.stubs.MappedTypeComponent;
+import org.terasology.unittest.stubs.StringComponent;
 import org.terasology.engine.network.NetworkMode;
 import org.terasology.engine.network.NetworkSystem;
-import org.terasology.engine.persistence.serializers.ComponentSerializeCheck;
 import org.terasology.engine.persistence.serializers.EntitySerializer;
 import org.terasology.gestalt.assets.module.ModuleAwareAssetTypeManagerImpl;
 import org.terasology.engine.persistence.serializers.PersistenceComponentSerializeCheck;
