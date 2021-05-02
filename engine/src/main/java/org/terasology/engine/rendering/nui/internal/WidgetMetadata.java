@@ -3,7 +3,7 @@
 package org.terasology.engine.rendering.nui.internal;
 
 import com.google.common.base.Predicate;
-import org.terasology.assets.ResourceUrn;
+import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.nui.LayoutConfig;
 import org.terasology.nui.UIWidget;
 import org.terasology.reflection.copy.CopyStrategyLibrary;

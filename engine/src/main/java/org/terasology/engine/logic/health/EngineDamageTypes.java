@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.logic.health;
 
-import org.terasology.engine.utilities.Assets;
 import org.terasology.engine.entitySystem.prefab.Prefab;
+import org.terasology.engine.utilities.Assets;
 
 /**
  * Helper enum for getting engine damage type prefabs.

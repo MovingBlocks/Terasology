@@ -3,8 +3,8 @@
 package org.terasology.engine.core;
 
 import java.io.BufferedReader;
-import java.io.InputStreamReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 
 public final class NonNativeJVMDetector {
 

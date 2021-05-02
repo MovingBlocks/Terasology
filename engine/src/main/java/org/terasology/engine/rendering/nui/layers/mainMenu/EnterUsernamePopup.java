@@ -3,7 +3,7 @@
 package org.terasology.engine.rendering.nui.layers.mainMenu;
 
 import com.google.common.base.Strings;
-import org.terasology.assets.ResourceUrn;
+import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.engine.config.PlayerConfig;
 import org.terasology.engine.i18n.TranslationSystem;
 import org.terasology.engine.registry.In;

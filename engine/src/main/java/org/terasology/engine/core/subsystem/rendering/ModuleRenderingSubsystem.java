@@ -17,13 +17,13 @@ package org.terasology.engine.core.subsystem.rendering;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.assets.module.ModuleAwareAssetTypeManager;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.core.ComponentSystemManager;
 import org.terasology.engine.core.GameEngine;
 import org.terasology.engine.core.modes.GameState;
 import org.terasology.engine.core.module.rendering.RenderingModuleRegistry;
 import org.terasology.engine.core.subsystem.EngineSubsystem;
+import org.terasology.gestalt.assets.module.ModuleAwareAssetTypeManager;
 
 public class ModuleRenderingSubsystem implements EngineSubsystem {
     private static final Logger logger = LoggerFactory.getLogger(ModuleRenderingSubsystem.class);

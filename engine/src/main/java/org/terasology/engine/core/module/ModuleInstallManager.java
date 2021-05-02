@@ -15,11 +15,11 @@
  */
 package org.terasology.engine.core.module;
 
-import org.terasology.module.DependencyResolver;
-import org.terasology.module.Module;
-import org.terasology.module.ModuleRegistry;
-import org.terasology.naming.Name;
 import org.terasology.engine.utilities.download.MultiFileTransferProgressListener;
+import org.terasology.gestalt.module.Module;
+import org.terasology.gestalt.module.ModuleRegistry;
+import org.terasology.gestalt.module.dependencyresolution.DependencyResolver;
+import org.terasology.gestalt.naming.Name;
 
 import java.util.Collection;
 import java.util.Collections;

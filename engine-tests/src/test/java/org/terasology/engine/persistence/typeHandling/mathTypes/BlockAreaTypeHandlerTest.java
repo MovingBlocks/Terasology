@@ -13,7 +13,7 @@ import org.terasology.engine.persistence.typeHandling.gson.GsonPersistedDataSeri
 import org.terasology.engine.persistence.typeHandling.gson.GsonPersistedDataWriter;
 import org.terasology.engine.world.block.BlockArea;
 import org.terasology.engine.world.block.BlockAreac;
-import org.terasology.naming.Name;
+import org.terasology.gestalt.naming.Name;
 import org.terasology.persistence.serializers.Serializer;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.reflection.TypeInfo;
@@ -57,7 +57,7 @@ public class BlockAreaTypeHandlerTest extends ModuleEnvironmentTest {
 
         TestObject o = gsonSerializer.deserialize(new TypeInfo<TestObject>() {
         },data).get();
-        assertEquals(o.b1, new BlockArea(-1, -1, 0, 0));
-        assertEquals(o.b2, new BlockArea(0, 0, 1, 1));
+        assertEquals(new BlockArea(-1, -1, 0, 0), o.b1);
+        assertEquals(new BlockArea(0, 0, 1, 1), o.b2);
     }
 }

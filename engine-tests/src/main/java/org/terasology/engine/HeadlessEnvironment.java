@@ -4,8 +4,6 @@ package org.terasology.engine;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.assets.management.AssetManager;
-import org.terasology.assets.module.ModuleAwareAssetTypeManager;
 import org.terasology.engine.audio.AudioManager;
 import org.terasology.engine.audio.StaticSound;
 import org.terasology.engine.audio.StreamingSound;
@@ -54,6 +52,7 @@ import org.terasology.engine.rendering.assets.shader.Shader;
 import org.terasology.engine.rendering.assets.skeletalmesh.SkeletalMesh;
 import org.terasology.engine.rendering.assets.texture.PNGTextureFormat;
 import org.terasology.engine.rendering.assets.texture.Texture;
+import org.terasology.engine.rendering.assets.texture.TextureData;
 import org.terasology.engine.rendering.assets.texture.subtexture.Subtexture;
 import org.terasology.engine.testUtil.ModuleManagerFactory;
 import org.terasology.engine.world.WorldProvider;
@@ -63,6 +62,7 @@ import org.terasology.engine.world.block.family.BlockFamily;
 import org.terasology.engine.world.block.family.BlockFamilyLibrary;
 import org.terasology.engine.world.block.internal.BlockManagerImpl;
 import org.terasology.engine.world.block.loader.BlockFamilyDefinition;
+import org.terasology.engine.world.block.loader.BlockFamilyDefinitionData;
 import org.terasology.engine.world.block.loader.BlockFamilyDefinitionFormat;
 import org.terasology.engine.world.block.shapes.BlockShape;
 import org.terasology.engine.world.block.shapes.BlockShapeImpl;
@@ -77,11 +77,12 @@ import org.terasology.engine.world.sun.CelestialSystem;
 import org.terasology.engine.world.sun.DefaultCelestialSystem;
 import org.terasology.engine.world.time.WorldTime;
 import org.terasology.engine.world.time.WorldTimeImpl;
-import org.terasology.module.DependencyResolver;
-import org.terasology.module.ModuleEnvironment;
-import org.terasology.module.ModuleRegistry;
-import org.terasology.module.ResolutionResult;
-import org.terasology.naming.Name;
+import org.terasology.gestalt.assets.AssetType;
+import org.terasology.gestalt.assets.management.AssetManager;
+import org.terasology.gestalt.assets.module.ModuleAwareAssetTypeManager;
+import org.terasology.gestalt.assets.module.ModuleAwareAssetTypeManagerImpl;
+import org.terasology.gestalt.module.ModuleEnvironment;
+import org.terasology.gestalt.naming.Name;
 import org.terasology.nui.asset.UIElement;
 import org.terasology.nui.skin.UISkinAsset;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
@@ -128,7 +129,7 @@ public class HeadlessEnvironment extends Environment {
 
         ModuleEnvironment environment = context.get(ModuleManager.class).getEnvironment();
         context.put(BlockFamilyLibrary.class, new BlockFamilyLibrary(environment,context));
-        
+
         ExtraBlockDataManager extraDataManager = context.get(ExtraBlockDataManager.class);
 
         context.put(StorageManager.class, new ReadWriteStorageManager(savePath, moduleManager.getEnvironment(),
@@ -164,7 +165,7 @@ public class HeadlessEnvironment extends Environment {
         typeHandlerLibrary.addTypeHandler(BlockFamily.class, new BlockFamilyTypeHandler(blockManager));
         typeHandlerLibrary.addTypeHandler(Block.class, new BlockTypeHandler(blockManager));
     }
-    
+
     @Override
     protected void setupExtraDataManager(Context context) {
         context.put(ExtraBlockDataManager.class, new ExtraBlockDataManager(context));
@@ -172,7 +173,7 @@ public class HeadlessEnvironment extends Environment {
 
     @Override
     protected AssetManager setupEmptyAssetManager() {
-        ModuleAwareAssetTypeManager assetTypeManager = new ModuleAwareAssetTypeManager();
+        ModuleAwareAssetTypeManager assetTypeManager = new ModuleAwareAssetTypeManagerImpl();
         assetTypeManager.switchEnvironment(context.get(ModuleManager.class).getEnvironment());
 
         context.put(ModuleAwareAssetTypeManager.class, assetTypeManager);
@@ -182,54 +183,59 @@ public class HeadlessEnvironment extends Environment {
 
     @Override
     protected AssetManager setupAssetManager() {
-        ModuleAwareAssetTypeManager assetTypeManager = new ModuleAwareAssetTypeManager();
+        ModuleAwareAssetTypeManager assetTypeManager = new ModuleAwareAssetTypeManagerImpl();
 
         // cast lambdas explicitly to avoid inconsistent compiler behavior wrt. type inference
-        assetTypeManager.registerCoreAssetType(Prefab.class,
-                PojoPrefab::new, false, "prefabs");
-        assetTypeManager.registerCoreAssetType(BlockShape.class,
+        assetTypeManager.createAssetType(Prefab.class,
+                PojoPrefab::new, "prefabs");
+        assetTypeManager.createAssetType(BlockShape.class,
                 BlockShapeImpl::new, "shapes");
-        assetTypeManager.registerCoreAssetType(BlockSounds.class,
+        assetTypeManager.createAssetType(BlockSounds.class,
                 BlockSounds::new, "blockSounds");
-        assetTypeManager.registerCoreAssetType(BlockTile.class,
+        assetTypeManager.createAssetType(BlockTile.class,
                 BlockTile::new, "blockTiles");
-        assetTypeManager.registerCoreAssetType(BlockFamilyDefinition.class,
-                BlockFamilyDefinition::new, "blocks");
+        AssetType<BlockFamilyDefinition, BlockFamilyDefinitionData> blockFamilyDefinitionDataAssetType =
+                assetTypeManager.createAssetType(BlockFamilyDefinition.class,
+                        BlockFamilyDefinition::new, "blocks");
 
-        assetTypeManager.registerCoreAssetType(StaticSound.class, NullSound::new, "sounds");
-        assetTypeManager.registerCoreAssetType(StreamingSound.class, NullStreamingSound::new, "music");
 
-        assetTypeManager.registerCoreFormat(BlockFamilyDefinition.class,
+        assetTypeManager.getAssetFileDataProducer(blockFamilyDefinitionDataAssetType).addAssetFormat(
                 new BlockFamilyDefinitionFormat(assetTypeManager.getAssetManager()));
 
-        assetTypeManager.registerCoreAssetType(UISkinAsset.class,
+        assetTypeManager.createAssetType(StaticSound.class, NullSound::new, "sounds");
+        assetTypeManager.createAssetType(StreamingSound.class, NullStreamingSound::new, "music");
+
+        assetTypeManager.createAssetType(UISkinAsset.class,
                 UISkinAsset::new, "skins");
-        assetTypeManager.registerCoreAssetType(BehaviorTree.class,
-                BehaviorTree::new, false, "behaviors");
-        assetTypeManager.registerCoreAssetType(UIElement.class,
+        assetTypeManager.createAssetType(BehaviorTree.class,
+                BehaviorTree::new, "behaviors");
+        assetTypeManager.createAssetType(UIElement.class,
                 UIElement::new, "ui");
-        assetTypeManager.registerCoreAssetType(Font.class,
+        assetTypeManager.createAssetType(Font.class,
                 FontImpl::new, "fonts");
-        assetTypeManager.registerCoreAssetType(Texture.class,
-                HeadlessTexture::new, "textures", "fonts");
-        assetTypeManager.registerCoreFormat(Texture.class,
-                new PNGTextureFormat(Texture.FilterMode.NEAREST, path -> path.getName(2).toString().equals("textures")));
-        assetTypeManager.registerCoreFormat(Texture.class,
-                new PNGTextureFormat(Texture.FilterMode.LINEAR, path -> path.getName(2).toString().equals("fonts")));
+        AssetType<Texture, TextureData> textureDataAssetType = assetTypeManager.createAssetType(Texture.class,
+                HeadlessTexture::create, "textures", "fonts");
+        assetTypeManager.getAssetFileDataProducer(textureDataAssetType).addAssetFormat(
+                new PNGTextureFormat(Texture.FilterMode.NEAREST,
+                        path -> path.getPath().get(1).equals("textures")));
+        assetTypeManager.getAssetFileDataProducer(textureDataAssetType).addAssetFormat(
+                new PNGTextureFormat(Texture.FilterMode.LINEAR, path -> path.getPath().get(1).equals("fonts")));
 
-        assetTypeManager.registerCoreAssetType(Shader.class,
+        assetTypeManager.createAssetType(Shader.class,
                 HeadlessShader::new, "shaders");
-        assetTypeManager.registerCoreAssetType(Material.class,
+        assetTypeManager.createAssetType(Material.class,
                 HeadlessMaterial::new, "materials");
-        assetTypeManager.registerCoreAssetType(Mesh.class,
+        assetTypeManager.createAssetType(Mesh.class,
                 HeadlessMesh::new, "mesh");
-        assetTypeManager.registerCoreAssetType(SkeletalMesh.class,
+        assetTypeManager.createAssetType(SkeletalMesh.class,
                 HeadlessSkeletalMesh::new, "skeletalMesh");
-        assetTypeManager.registerCoreAssetType(MeshAnimation.class, MeshAnimationImpl::new, "animations");
+        assetTypeManager.createAssetType(MeshAnimation.class,
+                MeshAnimationImpl::new, "animations");
 
-        assetTypeManager.registerCoreAssetType(Atlas.class,
+        assetTypeManager.createAssetType(Atlas.class,
                 Atlas::new, "atlas");
-        assetTypeManager.registerCoreAssetType(Subtexture.class, Subtexture::new);
+        assetTypeManager.createAssetType(Subtexture.class,
+                Subtexture::new);
 
         assetTypeManager.switchEnvironment(context.get(ModuleManager.class).getEnvironment());
 
@@ -253,24 +259,15 @@ public class HeadlessEnvironment extends Environment {
 
     @Override
     protected void setupModuleManager(Set<Name> moduleNames) throws Exception {
-        ModuleTypeRegistry typeRegistry = new ModuleTypeRegistry();
         TypeRegistry.WHITELISTED_CLASSES = ExternalApiWhitelist.CLASSES.stream().map(Class::getName).collect(Collectors.toSet());
+
+        ModuleManager moduleManager = ModuleManagerFactory.create();
+        ModuleTypeRegistry typeRegistry = new ModuleTypeRegistry(moduleManager.getEnvironment());
+
         context.put(TypeRegistry.class, typeRegistry);
         context.put(ModuleTypeRegistry.class, typeRegistry);
 
-        ModuleManager moduleManager = ModuleManagerFactory.create(true);
-        ModuleRegistry registry = moduleManager.getRegistry();
-
-        DependencyResolver resolver = new DependencyResolver(registry);
-        ResolutionResult result = resolver.resolve(moduleNames);
-
-        if (result.isSuccess()) {
-            ModuleEnvironment modEnv = moduleManager.loadEnvironment(result.getModules(), true);
-            typeRegistry.reload(modEnv);
-            logger.debug("Loaded modules: " + modEnv.getModuleIdsOrderedByDependencies());
-        } else {
-            logger.error("Could not resolve module dependencies for " + moduleNames);
-        }
+        moduleManager.resolveAndLoadEnvironment(moduleNames);
 
         context.put(ModuleManager.class, moduleManager);
 

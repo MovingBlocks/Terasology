@@ -5,7 +5,7 @@ package org.terasology.engine.rendering.primitives;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
-import org.terasology.module.sandbox.API;
+import org.terasology.gestalt.module.sandbox.API;
 
 @API
 public final class TessellatorHelper {

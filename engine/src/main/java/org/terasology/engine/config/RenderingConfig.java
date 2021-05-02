@@ -17,7 +17,7 @@
 package org.terasology.engine.config;
 
 import org.terasology.engine.core.subsystem.Resolution;
-import org.terasology.module.sandbox.API;
+import org.terasology.gestalt.module.sandbox.API;
 import org.terasology.engine.rendering.cameras.PerspectiveCameraSettings;
 import org.terasology.engine.rendering.nui.layers.mainMenu.videoSettings.DisplayModeSetting;
 import org.terasology.engine.rendering.nui.layers.mainMenu.videoSettings.ScreenshotSize;
@@ -465,7 +465,7 @@ public class RenderingConfig extends AbstractSubscribable {
         boolean oldValue = this.vrSupport;
         this.vrSupport = vrSupport;
         propertyChangeSupport.firePropertyChange(VR_SUPPORT, oldValue, this.vrSupport);
-    }    
+    }
 
     public int getMaxTextureAtlasResolution() {
         return maxTextureAtlasResolution;
@@ -505,7 +505,7 @@ public class RenderingConfig extends AbstractSubscribable {
         this.normalMapping = normalMapping;
         propertyChangeSupport.firePropertyChange(NORMAL_MAPPING, oldValue, this.normalMapping);
     }
-    
+
     public boolean isParallaxMapping() {
         return parallaxMapping;
     }
@@ -680,7 +680,7 @@ public class RenderingConfig extends AbstractSubscribable {
         this.dumpShaders = dumpShaders;
         propertyChangeSupport.firePropertyChange(DUMP_SHADERS, oldValue, this.dumpShaders);
     }
-    
+
     public boolean isVolumetricFog() {
         return volumetricFog;
     }

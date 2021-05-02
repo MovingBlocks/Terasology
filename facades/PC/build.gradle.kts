@@ -61,7 +61,6 @@ group = "org.terasology.facades"
 
 dependencies {
     implementation(project(":engine"))
-    implementation("org.terasology:reflections:0.9.12-MB")
     implementation(project(":subsystems:DiscordRPC"))
 
     // TODO: Consider whether we can move the CR dependency back here from the engine, where it is referenced from the main menu

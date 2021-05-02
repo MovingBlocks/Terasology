@@ -3,7 +3,7 @@
 package org.terasology.engine.logic.characters.interactions;
 
 import org.terasology.engine.entitySystem.Component;
-import org.terasology.module.sandbox.API;
+import org.terasology.gestalt.module.sandbox.API;
 
 /**
  * Entities with this component will show an UI during interactions.

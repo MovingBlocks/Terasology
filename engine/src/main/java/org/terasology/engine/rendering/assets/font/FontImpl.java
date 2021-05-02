@@ -3,8 +3,8 @@
 package org.terasology.engine.rendering.assets.font;
 
 import org.joml.Vector2i;
-import org.terasology.assets.AssetType;
-import org.terasology.assets.ResourceUrn;
+import org.terasology.gestalt.assets.AssetType;
+import org.terasology.gestalt.assets.ResourceUrn;
 
 import java.util.List;
 

@@ -6,13 +6,13 @@ import org.terasology.engine.core.SimpleUri;
 import org.terasology.engine.core.subsystem.config.BindsManager;
 import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
 import org.terasology.engine.entitySystem.systems.RegisterSystem;
-import org.terasology.input.Input;
-import org.terasology.input.Keyboard;
-import org.terasology.input.Keyboard.KeyId;
 import org.terasology.engine.logic.console.commandSystem.annotations.Command;
 import org.terasology.engine.logic.console.commandSystem.annotations.CommandParam;
 import org.terasology.engine.logic.permission.PermissionManager;
 import org.terasology.engine.registry.In;
+import org.terasology.input.Input;
+import org.terasology.input.Keyboard;
+import org.terasology.input.Keyboard.KeyId;
 
 import java.util.Collections;
 import java.util.HashMap;

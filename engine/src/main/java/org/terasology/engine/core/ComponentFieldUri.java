@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.core;
 
-import org.terasology.module.sandbox.API;
-import org.terasology.naming.Name;
+import org.terasology.gestalt.module.sandbox.API;
+import org.terasology.gestalt.naming.Name;
 
 import java.util.Objects;
 

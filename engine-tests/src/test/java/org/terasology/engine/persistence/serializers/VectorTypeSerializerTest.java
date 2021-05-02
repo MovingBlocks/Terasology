@@ -16,7 +16,7 @@ import org.terasology.engine.persistence.typeHandling.TypeHandlerLibraryImpl;
 import org.terasology.engine.persistence.typeHandling.gson.GsonPersistedDataReader;
 import org.terasology.engine.persistence.typeHandling.gson.GsonPersistedDataSerializer;
 import org.terasology.engine.persistence.typeHandling.gson.GsonPersistedDataWriter;
-import org.terasology.naming.Name;
+import org.terasology.gestalt.naming.Name;
 import org.terasology.persistence.serializers.Serializer;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.reflection.TypeInfo;
@@ -25,6 +25,7 @@ import java.io.IOException;
 
 import static org.terasology.joml.test.VectorAssert.assertEquals;
 
+@SuppressWarnings("FieldCanBeLocal")
 class VectorTypeSerializerTest extends ModuleEnvironmentTest {
     static class TestObject {
         public Vector3f v1;
@@ -56,7 +57,7 @@ class VectorTypeSerializerTest extends ModuleEnvironmentTest {
     }
 
     @Test
-    void testSerializationConstant() throws IOException {
+    void testSerializationConstant() {
         TestObject2 a = new TestObject2();
         a.v1 = new Vector3f(1.0f, 2.0f, 3.0f);
         a.v2 = new Vector4f(1.0f, 2.0f, 3.0f, 5.0f);
@@ -66,8 +67,9 @@ class VectorTypeSerializerTest extends ModuleEnvironmentTest {
 
         TestObject2 o = gsonSerializer.deserialize(new TypeInfo<TestObject2>() {
         },data).get();
-        assertEquals(o.v1, new Vector3f(1.0f, 2.0f, 3.0f), .00001f);
-        assertEquals(o.v2, new Vector4f(1.0f, 2.0f, 3.0f, 5.0f), .00001f);
-        assertEquals(o.v3, new Vector2f(1.0f, 2.0f), .00001f);
+
+        assertEquals(new Vector3f(1.0f, 2.0f, 3.0f), o.v1, .00001f);
+        assertEquals(new Vector4f(1.0f, 2.0f, 3.0f, 5.0f), o.v2, .00001f);
+        assertEquals(new Vector2f(1.0f, 2.0f), o.v3, .00001f);
     }
 }

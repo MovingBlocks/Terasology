@@ -15,12 +15,12 @@ import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
 import org.terasology.engine.entitySystem.systems.RegisterMode;
 import org.terasology.engine.entitySystem.systems.RegisterSystem;
 import org.terasology.engine.logic.characters.GazeAuthoritySystem;
+import org.terasology.engine.logic.console.commandSystem.annotations.Command;
 import org.terasology.engine.logic.location.Location;
 import org.terasology.engine.logic.location.LocationComponent;
+import org.terasology.engine.logic.permission.PermissionManager;
 import org.terasology.engine.logic.players.event.OnPlayerSpawnedEvent;
 import org.terasology.engine.logic.players.event.ResetCameraEvent;
-import org.terasology.engine.logic.console.commandSystem.annotations.Command;
-import org.terasology.engine.logic.permission.PermissionManager;
 import org.terasology.engine.network.ClientComponent;
 import org.terasology.engine.registry.In;
 
@@ -113,10 +113,11 @@ public class CameraClientSystem extends BaseComponentSystem {
     private void mountCamera() {
         ClientComponent clientComponent = localPlayer.getClientEntity().getComponent(ClientComponent.class);
         EntityRef targetEntityForCamera = GazeAuthoritySystem.getGazeEntityForCharacter(clientComponent.character);
-        LocationComponent cameraLocation = clientComponent.camera.getComponent(LocationComponent.class);
-        // if the camera already has a location,  use that as the relative position of the camera
-        if (cameraLocation != null) {
 
+        //TODO: why is the camera setup differently
+        LocationComponent cameraLocation = clientComponent.camera.getComponent(LocationComponent.class);
+        //if the camera already has a location,  use that as the relative position of the camera
+        if (cameraLocation != null) {
             Location.attachChild(targetEntityForCamera, clientComponent.camera, cameraLocation.getLocalPosition(), new Quaternionf());
         } else {
             Location.attachChild(targetEntityForCamera, clientComponent.camera, new Vector3f(0, 0, 0), new Quaternionf());

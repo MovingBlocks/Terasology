@@ -4,7 +4,7 @@
 package org.terasology.engine.world.block.tiles;
 
 import org.joml.Vector2f;
-import org.terasology.assets.ResourceUrn;
+import org.terasology.gestalt.assets.ResourceUrn;
 
 /**
  * Dummy implementation of WorldAtlas

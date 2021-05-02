@@ -3,13 +3,13 @@
 package org.terasology.engine.rendering.iconmesh;
 
 import org.joml.Vector4f;
-import org.terasology.assets.Asset;
-import org.terasology.assets.ResourceUrn;
+import org.terasology.gestalt.assets.Asset;
+import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.engine.rendering.primitives.Tessellator;
 import org.terasology.engine.rendering.primitives.TessellatorHelper;
 import org.terasology.joml.geom.Rectanglei;
-import org.terasology.module.sandbox.API;
-import org.terasology.naming.Name;
+import org.terasology.gestalt.module.sandbox.API;
+import org.terasology.gestalt.naming.Name;
 import org.terasology.engine.rendering.assets.mesh.Mesh;
 import org.terasology.engine.rendering.assets.mesh.MeshData;
 import org.terasology.engine.rendering.assets.texture.TextureRegion;

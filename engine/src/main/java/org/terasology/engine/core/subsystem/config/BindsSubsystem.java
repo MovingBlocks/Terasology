@@ -30,11 +30,7 @@ import org.terasology.engine.input.BindAxisEvent;
 import org.terasology.engine.input.BindButtonEvent;
 import org.terasology.engine.input.BindableAxis;
 import org.terasology.engine.input.BindableButton;
-import org.terasology.input.ControllerInput;
 import org.terasology.engine.input.DefaultBinding;
-import org.terasology.input.Input;
-import org.terasology.input.InputType;
-import org.terasology.input.MouseInput;
 import org.terasology.engine.input.RegisterBindAxis;
 import org.terasology.engine.input.RegisterBindButton;
 import org.terasology.engine.input.RegisterRealBindAxis;
@@ -44,11 +40,15 @@ import org.terasology.engine.input.internal.AbstractBindableAxis;
 import org.terasology.engine.input.internal.BindableAxisImpl;
 import org.terasology.engine.input.internal.BindableButtonImpl;
 import org.terasology.engine.input.internal.BindableRealAxis;
-import org.terasology.module.DependencyResolver;
-import org.terasology.module.ModuleEnvironment;
-import org.terasology.module.ResolutionResult;
-import org.terasology.module.predicates.FromModule;
-import org.terasology.naming.Name;
+import org.terasology.gestalt.module.ModuleEnvironment;
+import org.terasology.gestalt.module.dependencyresolution.DependencyResolver;
+import org.terasology.gestalt.module.dependencyresolution.ResolutionResult;
+import org.terasology.gestalt.module.predicates.FromModule;
+import org.terasology.gestalt.naming.Name;
+import org.terasology.input.ControllerInput;
+import org.terasology.input.Input;
+import org.terasology.input.InputType;
+import org.terasology.input.MouseInput;
 
 import java.lang.annotation.Annotation;
 import java.util.Collection;
@@ -149,16 +149,14 @@ public class BindsSubsystem implements EngineSubsystem, BindsManager {
         ModuleManager moduleManager = passedContext.get(ModuleManager.class);
         DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
         for (Name moduleId : moduleManager.getRegistry().getModuleIds()) {
-            if (moduleManager.getRegistry().getLatestModuleVersion(moduleId).isCodeModule()) {
-                ResolutionResult result = resolver.resolve(moduleId);
-                if (result.isSuccess()) {
-                    try (ModuleEnvironment environment = moduleManager.loadEnvironment(result.getModules(), false)) {
-                        FromModule filter = new FromModule(environment, moduleId);
-                        Iterable<Class<?>> buttons = environment.getTypesAnnotatedWith(RegisterBindButton.class, filter);
-                        Iterable<Class<?>> axes = environment.getTypesAnnotatedWith(RegisterRealBindAxis.class, filter);
-                        addButtonDefaultsFor(moduleId, buttons, config);
-                        addAxisDefaultsFor(moduleId, axes, config);
-                    }
+            ResolutionResult result = resolver.resolve(moduleId);
+            if (result.isSuccess()) {
+                try (ModuleEnvironment environment = moduleManager.loadEnvironment(result.getModules(), false)) {
+                    FromModule filter = new FromModule(environment, moduleId);
+                    Iterable<Class<?>> buttons = environment.getTypesAnnotatedWith(RegisterBindButton.class, filter);
+                    Iterable<Class<?>> axes = environment.getTypesAnnotatedWith(RegisterRealBindAxis.class, filter);
+                    addButtonDefaultsFor(moduleId, buttons, config);
+                    addAxisDefaultsFor(moduleId, axes, config);
                 }
             }
         }

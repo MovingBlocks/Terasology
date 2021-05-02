@@ -10,7 +10,7 @@ import org.terasology.engine.rendering.dag.dependencyConnections.BufferPair;
 import org.terasology.engine.rendering.dag.dependencyConnections.BufferPairConnection;
 import org.terasology.engine.rendering.dag.dependencyConnections.DependencyConnection;
 import org.terasology.engine.rendering.dag.dependencyConnections.RunOrderConnection;
-import org.terasology.naming.Name;
+import org.terasology.gestalt.naming.Name;
 
 import java.util.Map;
 import java.util.Set;

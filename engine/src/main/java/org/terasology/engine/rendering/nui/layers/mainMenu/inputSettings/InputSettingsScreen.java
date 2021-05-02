@@ -6,17 +6,21 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.joml.Vector2i;
-import org.terasology.assets.ResourceUrn;
+import org.terasology.engine.core.module.ModuleManager;
+import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.engine.config.BindsConfig;
 import org.terasology.engine.config.ControllerConfig.ControllerInfo;
 import org.terasology.engine.config.facade.InputDeviceConfiguration;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.core.SimpleUri;
-import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.engine.core.subsystem.config.BindsManager;
 import org.terasology.engine.i18n.TranslationSystem;
 import org.terasology.engine.input.BindButtonEvent;
 import org.terasology.engine.rendering.nui.animation.MenuAnimationSystems;
+import org.terasology.gestalt.module.dependencyresolution.DependencyResolver;
+import org.terasology.gestalt.module.dependencyresolution.ResolutionResult;
+import org.terasology.gestalt.module.predicates.FromModule;
+import org.terasology.gestalt.module.resources.DirectoryFileSource;
 import org.terasology.input.Input;
 import org.terasology.input.InputCategory;
 import org.terasology.engine.input.InputSystem;
@@ -24,12 +28,9 @@ import org.terasology.input.InputType;
 import org.terasology.input.Keyboard.KeyId;
 import org.terasology.engine.input.RegisterBindButton;
 import org.terasology.engine.input.internal.BindCommands;
-import org.terasology.module.DependencyResolver;
-import org.terasology.module.Module;
-import org.terasology.module.ModuleEnvironment;
-import org.terasology.module.ResolutionResult;
-import org.terasology.module.predicates.FromModule;
-import org.terasology.naming.Name;
+import org.terasology.gestalt.module.Module;
+import org.terasology.gestalt.module.ModuleEnvironment;
+import org.terasology.gestalt.naming.Name;
 import org.terasology.nui.TabbingManager;
 import org.terasology.nui.WidgetUtil;
 import org.terasology.nui.databinding.BindHelper;
@@ -133,7 +134,7 @@ public class InputSettingsScreen extends CoreScreenLayer {
         DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
         for (Name moduleId : moduleManager.getRegistry().getModuleIds()) {
             Module module = moduleManager.getRegistry().getLatestModuleVersion(moduleId);
-            if (module.isCodeModule()) {
+            if (module.getResources() instanceof DirectoryFileSource) {
                 ResolutionResult result = resolver.resolve(moduleId);
                 if (result.isSuccess()) {
                     try (ModuleEnvironment environment = moduleManager.loadEnvironment(result.getModules(), false)) {

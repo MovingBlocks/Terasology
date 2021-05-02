@@ -14,13 +14,14 @@ import org.terasology.engine.persistence.typeHandling.TypeHandlerLibraryImpl;
 import org.terasology.engine.persistence.typeHandling.gson.GsonPersistedDataReader;
 import org.terasology.engine.persistence.typeHandling.gson.GsonPersistedDataSerializer;
 import org.terasology.engine.persistence.typeHandling.gson.GsonPersistedDataWriter;
-import org.terasology.naming.Name;
+import org.terasology.gestalt.naming.Name;
 import org.terasology.nui.Color;
 import org.terasology.persistence.serializers.Serializer;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.persistence.typeHandling.annotations.SerializedName;
 import org.terasology.reflection.TypeInfo;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -28,10 +29,17 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.terasology.engine.testUtil.Assertions.assertNotEmpty;
 
 class TypeSerializerTest extends ModuleEnvironmentTest {
     private static final SomeClass<Integer> INSTANCE = new SomeClass<>(0xdeadbeef);
-    private static final String INSTANCE_JSON = "{\"generic-t\":-559038737,\"list\":[50,51,-52,-53],\"animals\":[{\"class\":\"org.terasology.engine.persistence.serializers.TypeSerializerTest$Dog\",\"tailPosition\":[3.15,54.51,-0.001],\"headPosition\":[10.0,30.0,-0.001],\"data\":{\"class\":\"java.lang.Integer\",\"content\":1}},{\"class\":\"org.terasology.engine.persistence.serializers.TypeSerializerTest$Cheetah\",\"spotColor\":[255,0,255,255],\"data\":{\"class\":\"java.lang.Integer\",\"content\":2}}]}";
+    private static final String INSTANCE_JSON = "{\"generic-t\":-559038737,\"list\":[50,51,-52,-53]," +
+            "\"animals\":[{\"class\":\"org.terasology.engine.persistence.serializers.TypeSerializerTest$Dog\"," +
+            "\"tailPosition\":[3.15,54.51,-0.001],\"headPosition\":[10.0,30.0,-0.001],\"data\":{\"class\":\"java.lang" +
+            ".Integer\",\"content\":1}},{\"class\":\"org.terasology.engine.persistence.serializers" +
+            ".TypeSerializerTest$Cheetah\",\"spotColor\":[255,0,255,255],\"data\":{\"class\":\"java.lang.Integer\"," +
+            "\"content\":2}}],\"singleAnimal\":{\"class\":\"org.terasology.engine.persistence.serializers" +
+            ".TypeSerializerTest$Dog\",\"tailPosition\":[4.0,5.0,6.0],\"headPosition\":[4.0,5.8,8.0],\"data\":2}}";
 
     static {
         INSTANCE.list.addAll(Lists.newArrayList(50, 51, -52, -53));
@@ -39,11 +47,12 @@ class TypeSerializerTest extends ModuleEnvironmentTest {
         INSTANCE.animals.add(new Dog<>(1, new Vector3f(3.15f, 54.51f, -0.001f), new org.joml.Vector3f(10.0f,30.0f,-0.001f)));
 
         INSTANCE.animals.add(new Cheetah<>(2, Color.MAGENTA));
+
+        INSTANCE.singleAnimal = new Dog<>(2, new Vector3f(4, 5, 6), new org.joml.Vector3f(4,5.8f,8));
     }
 
-    @SuppressWarnings("FieldCanBeLocal")
     private TypeHandlerLibrary typeHandlerLibrary;
-    private Serializer<?> gsonSerializer;
+    private Serializer gsonSerializer;
 
     @Override
     public void setup() {
@@ -56,7 +65,7 @@ class TypeSerializerTest extends ModuleEnvironmentTest {
                 new GsonPersistedDataSerializer(),
                 new GsonPersistedDataWriter(gson),
                 new GsonPersistedDataReader(gson)
-                );
+        );
     }
 
     @Test
@@ -71,26 +80,34 @@ class TypeSerializerTest extends ModuleEnvironmentTest {
 
     @Test
     void testDeserialize() {
-        Optional<SomeClass<Integer>> deserialize = gsonSerializer.deserialize(new TypeInfo<SomeClass<Integer>>() {
-        }, INSTANCE_JSON.getBytes(TerasologyConstants.CHARSET));
+        Optional<SomeClass<Integer>> deserialize = gsonSerializer.deserialize(
+                new TypeInfo<SomeClass<Integer>>() {},
+                INSTANCE_JSON.getBytes(TerasologyConstants.CHARSET));
         assertTrue(deserialize.isPresent());
 
-        SomeClass<Integer> deserialized =
-                deserialize.get();
+        SomeClass<Integer> deserialized = deserialize.get();
 
         assertEquals(INSTANCE, deserialized);
     }
 
     @Test
-    void testSerializeDeserialize() {
-        Optional<byte[]> serialize = gsonSerializer.serialize(INSTANCE, new TypeInfo<SomeClass<Integer>>() {
-        });
-        assertTrue(serialize.isPresent());
+    void testJsonSerializeDeserialize() throws IOException {
+        //noinspection unchecked,OptionalGetWithoutIsPresent,OptionalGetWithoutIsPresent
+        byte[] bytes = (byte[]) gsonSerializer.serialize(INSTANCE, new TypeInfo<SomeClass<Integer>>() {
+        }).get();
 
-        Optional<SomeClass<Integer>> deserialize = gsonSerializer.deserialize(new TypeInfo<SomeClass<Integer>>() {
-        }, serialize.get());
+        //noinspection unchecked,OptionalGetWithoutIsPresent,OptionalGetWithoutIsPresent
+        SomeClass<Integer> deserializedInstance =
+                (SomeClass<Integer>) gsonSerializer.deserialize(new TypeInfo<SomeClass<Integer>>() {}, bytes)
+                        .get();
 
-        assertEquals(INSTANCE, deserialize.get());
+        assertNotEmpty(typeHandlerLibrary.getTypeHandler(Animal.class));
+        assertNotEmpty(typeHandlerLibrary.getTypeHandler(Dog.class));
+
+        assertNotEmpty(typeRegistry.load("org.terasology.engine.persistence.serializers.TypeSerializerTest$Animal"));
+        assertNotEmpty(typeRegistry.load("org.terasology.engine.persistence.serializers.TypeSerializerTest$Dog"));
+
+        assertEquals(INSTANCE, deserializedInstance);
     }
 
     private static class SomeClass<T> {
@@ -98,6 +115,7 @@ class TypeSerializerTest extends ModuleEnvironmentTest {
         private T data;
         private List<T> list = Lists.newArrayList();
         private Set<Animal<?>> animals = Sets.newHashSet();
+        private Animal<T> singleAnimal;
 
         private SomeClass(T data) {
             this.data = data;
@@ -147,7 +165,7 @@ class TypeSerializerTest extends ModuleEnvironmentTest {
             if (o == null || getClass() != o.getClass()) {
                 return false;
             }
-            Animal animal = (Animal) o;
+            Animal<?> animal = (Animal<?>) o;
             return Objects.equals(data, animal.data);
         }
 
@@ -178,17 +196,17 @@ class TypeSerializerTest extends ModuleEnvironmentTest {
             if (!super.equals(o)) {
                 return false;
             }
-            Dog dog = (Dog) o;
+            Dog<?> dog = (Dog<?>) o;
             return Objects.equals(tailPosition, dog.tailPosition) &&  Objects.equals(headPosition, dog.headPosition);
         }
 
         @Override
         public String toString() {
             return "Dog{" +
-                "name='" + data + '\'' +
-                ", tailPosition=" + tailPosition +
-                ", headPosition=" + headPosition +
-                '}';
+                    "name='" + data + '\'' +
+                    ", tailPosition=" + tailPosition +
+                    ", headPosition=" + headPosition +
+                    '}';
         }
 
         @Override
@@ -216,7 +234,7 @@ class TypeSerializerTest extends ModuleEnvironmentTest {
             if (!super.equals(o)) {
                 return false;
             }
-            Cheetah cheetah = (Cheetah) o;
+            Cheetah<?> cheetah = (Cheetah<?>) o;
             return Objects.equals(spotColor, cheetah.spotColor);
         }
 

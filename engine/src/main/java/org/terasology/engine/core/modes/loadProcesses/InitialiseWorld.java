@@ -20,7 +20,6 @@ import org.terasology.engine.entitySystem.entity.EntityManager;
 import org.terasology.engine.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.engine.game.GameManifest;
 import org.terasology.engine.logic.players.LocalPlayer;
-import org.terasology.module.ModuleEnvironment;
 import org.terasology.engine.persistence.StorageManager;
 import org.terasology.engine.persistence.internal.ReadOnlyStorageManager;
 import org.terasology.engine.persistence.internal.ReadWriteStorageManager;
@@ -54,6 +53,7 @@ import org.terasology.engine.world.internal.WorldProviderWrapper;
 import org.terasology.engine.world.sun.BasicCelestialModel;
 import org.terasology.engine.world.sun.CelestialSystem;
 import org.terasology.engine.world.sun.DefaultCelestialSystem;
+import org.terasology.gestalt.module.ModuleEnvironment;
 
 import java.io.IOException;
 import java.nio.file.Path;

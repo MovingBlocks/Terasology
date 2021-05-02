@@ -17,7 +17,7 @@ package org.terasology.engine.particles.components;
 
 import org.joml.Vector2f;
 import org.terasology.engine.entitySystem.Component;
-import org.terasology.module.sandbox.API;
+import org.terasology.gestalt.module.sandbox.API;
 import org.terasology.engine.rendering.assets.texture.Texture;
 
 /**

@@ -5,8 +5,8 @@ package org.terasology.engine.logic.console.commandSystem.adapter;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import org.terasology.engine.entitySystem.prefab.Prefab;
-import org.terasology.module.sandbox.API;
-import org.terasology.naming.Name;
+import org.terasology.gestalt.module.sandbox.API;
+import org.terasology.gestalt.naming.Name;
 import org.terasology.engine.world.block.family.BlockFamily;
 
 import java.util.Map;

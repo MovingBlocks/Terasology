@@ -12,17 +12,17 @@ import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
 import org.terasology.engine.entitySystem.systems.RegisterMode;
 import org.terasology.engine.entitySystem.systems.RegisterSystem;
 import org.terasology.engine.game.Game;
+import org.terasology.engine.input.events.KeyDownEvent;
 import org.terasology.engine.logic.console.Console;
 import org.terasology.engine.logic.console.commandSystem.annotations.Command;
-import org.terasology.engine.logic.players.LocalPlayer;
-import org.terasology.input.Keyboard;
-import org.terasology.engine.input.events.KeyDownEvent;
 import org.terasology.engine.logic.permission.PermissionManager;
+import org.terasology.engine.logic.players.LocalPlayer;
 import org.terasology.engine.network.NetworkMode;
 import org.terasology.engine.network.NetworkSystem;
 import org.terasology.engine.physics.events.MovedEvent;
 import org.terasology.engine.registry.In;
 import org.terasology.engine.rendering.nui.NUIManager;
+import org.terasology.input.Keyboard;
 
 @RegisterSystem(RegisterMode.CLIENT)
 public class AfkClientSystem extends BaseComponentSystem {

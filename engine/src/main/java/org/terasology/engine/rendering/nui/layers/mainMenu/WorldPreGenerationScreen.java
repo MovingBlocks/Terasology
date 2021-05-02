@@ -5,10 +5,10 @@ package org.terasology.engine.rendering.nui.layers.mainMenu;
 import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.assets.ResourceUrn;
+import org.terasology.engine.core.module.ModuleManager;
+import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.context.Context;
-import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.engine.rendering.assets.texture.Texture;
 import org.terasology.engine.rendering.assets.texture.TextureData;
 import org.terasology.engine.rendering.nui.animation.MenuAnimationSystems;
@@ -16,8 +16,8 @@ import org.terasology.engine.rendering.nui.layers.mainMenu.preview.FacetLayerPre
 import org.terasology.engine.rendering.nui.layers.mainMenu.preview.PreviewGenerator;
 import org.terasology.engine.rendering.world.WorldSetupWrapper;
 import org.terasology.math.TeraMath;
-import org.terasology.module.ModuleEnvironment;
-import org.terasology.naming.Name;
+import org.terasology.gestalt.module.ModuleEnvironment;
+import org.terasology.gestalt.naming.Name;
 import org.terasology.nui.WidgetUtil;
 import org.terasology.nui.databinding.Binding;
 import org.terasology.nui.widgets.UIDropdownScrollable;
@@ -197,7 +197,7 @@ public class WorldPreGenerationScreen extends CoreScreenLayer implements UISlide
             e.printStackTrace();
         }
     }
-    
+
     /**
      * Set seletedWorld when configure from WorldPreGenerationScreen
      * @param newNameToSet
