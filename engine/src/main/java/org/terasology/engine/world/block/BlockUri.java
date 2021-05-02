@@ -162,7 +162,7 @@ public class BlockUri implements Uri, Comparable<BlockUri> {
         }
         if (obj instanceof BlockUri) {
             BlockUri other = (BlockUri) obj;
-            return this.hashCode == ((BlockUri) obj).hashCode
+            return this.hashCode == other.hashCode
                     && Objects.equal(other.blockFamilyDefinition, blockFamilyDefinition)
                     && Objects.equal(other.blockName, blockName)
                     && Objects.equal(other.shape, shape);
