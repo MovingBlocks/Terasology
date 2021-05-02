@@ -17,12 +17,12 @@ package org.terasology.engine.core.subsystem.headless.assets;
 
 import org.joml.Matrix3fc;
 import org.joml.Matrix4fc;
-import org.terasology.assets.AssetType;
-import org.terasology.assets.ResourceUrn;
 import org.terasology.engine.rendering.assets.material.BaseMaterial;
 import org.terasology.engine.rendering.assets.material.MaterialData;
 import org.terasology.engine.rendering.assets.shader.ShaderProgramFeature;
 import org.terasology.engine.rendering.assets.texture.Texture;
+import org.terasology.gestalt.assets.AssetType;
+import org.terasology.gestalt.assets.ResourceUrn;
 
 import java.nio.FloatBuffer;
 

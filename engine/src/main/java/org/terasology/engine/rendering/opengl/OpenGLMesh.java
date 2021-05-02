@@ -5,17 +5,11 @@ package org.terasology.engine.rendering.opengl;
 import gnu.trove.list.TFloatList;
 import gnu.trove.list.TIntList;
 import org.lwjgl.BufferUtils;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
-import org.lwjgl.opengl.GL33;
 import org.lwjgl.opengl.GL41;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.assets.AssetType;
-import org.terasology.assets.ResourceUrn;
 import org.terasology.engine.core.GameThread;
-import org.terasology.engine.core.subsystem.lwjgl.GLBufferPool;
 import org.terasology.engine.core.subsystem.lwjgl.LwjglGraphicsProcessing;
 import org.terasology.engine.rendering.assets.mesh.Mesh;
 import org.terasology.engine.rendering.assets.mesh.MeshData;
@@ -25,6 +19,9 @@ import org.terasology.engine.rendering.assets.mesh.layout.FloatLayout;
 import org.terasology.engine.rendering.assets.mesh.layout.IntLayout;
 import org.terasology.engine.rendering.assets.mesh.layout.Layout;
 import org.terasology.engine.rendering.assets.mesh.layout.ShortLayout;
+import org.terasology.gestalt.assets.AssetType;
+import org.terasology.gestalt.assets.DisposableResource;
+import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.joml.geom.AABBf;
 import org.terasology.joml.geom.AABBfc;
 
@@ -44,13 +41,18 @@ public class OpenGLMesh extends Mesh {
     private int indexCount;
     private DisposalAction disposalAction;
 
-    public OpenGLMesh(ResourceUrn urn, AssetType<?, MeshData> assetType, MeshData data, LwjglGraphicsProcessing graphicsProcessing) {
+    public OpenGLMesh(ResourceUrn urn, AssetType<?, MeshData> assetType, MeshData data,
+                      DisposalAction disposalAction, LwjglGraphicsProcessing graphicsProcessing) {
         super(urn, assetType);
-        this.disposalAction = new DisposalAction(urn);
-        getDisposalHook().setDisposeAction(disposalAction);
+        this.disposalAction = disposalAction;
         graphicsProcessing.asynchToDisplayThread(() -> {
             reload(data);
         });
+    }
+
+    public static OpenGLMesh create(ResourceUrn urn, AssetType<?, MeshData> assetType, MeshData data,
+                                    LwjglGraphicsProcessing graphicsProcessing) {
+        return new OpenGLMesh(urn, assetType, data, new DisposalAction(urn), graphicsProcessing);
     }
 
     @Override
@@ -161,7 +163,7 @@ public class OpenGLMesh extends Mesh {
         getBound(newData, aabb);
     }
 
-    private static class DisposalAction implements Runnable {
+    private static class DisposalAction implements DisposableResource {
 
         private final ResourceUrn urn;
 
@@ -189,7 +191,7 @@ public class OpenGLMesh extends Mesh {
         }
 
         @Override
-        public void run() {
+        public void close() {
             try {
                 GameThread.synch(() -> {
                     dispose();

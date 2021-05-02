@@ -7,7 +7,6 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.assets.ResourceUrn;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.config.PlayerConfig;
 import org.terasology.engine.config.ServerInfo;
@@ -27,9 +26,10 @@ import org.terasology.engine.rendering.nui.CoreScreenLayer;
 import org.terasology.engine.rendering.nui.animation.MenuAnimationSystems;
 import org.terasology.engine.world.internal.WorldInfo;
 import org.terasology.engine.world.time.WorldTime;
+import org.terasology.gestalt.assets.ResourceUrn;
+import org.terasology.gestalt.module.ModuleRegistry;
+import org.terasology.gestalt.naming.NameVersion;
 import org.terasology.input.Keyboard;
-import org.terasology.module.ModuleRegistry;
-import org.terasology.naming.NameVersion;
 import org.terasology.nui.Color;
 import org.terasology.nui.FontColor;
 import org.terasology.nui.WidgetUtil;
@@ -63,7 +63,7 @@ public class JoinGameScreen extends CoreScreenLayer {
 
     @In
     private Config config;
-    @In 
+    @In
     private PlayerConfig playerConfig;
 
     @In

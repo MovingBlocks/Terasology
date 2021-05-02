@@ -6,6 +6,7 @@
  * Type handlers provide the algorithms for serializing and deserializing types - this uses an implementation agnostic set of interfaces
  * so TypeHandlers can be used for different serialization techniques (Json, Protobuf, etc).
  */
-@API package org.terasology.persistence.typeHandling;
+@API
+package org.terasology.persistence.typeHandling;
 
-import org.terasology.module.sandbox.API;
+import org.terasology.gestalt.module.sandbox.API;

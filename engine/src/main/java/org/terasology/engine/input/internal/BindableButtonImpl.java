@@ -8,10 +8,10 @@ import org.joml.Vector3fc;
 import org.joml.Vector3ic;
 import org.terasology.engine.core.SimpleUri;
 import org.terasology.engine.entitySystem.entity.EntityRef;
-import org.terasology.engine.input.BindableButton;
-import org.terasology.input.ActivateMode;
 import org.terasology.engine.input.BindButtonEvent;
 import org.terasology.engine.input.BindButtonSubscriber;
+import org.terasology.engine.input.BindableButton;
+import org.terasology.input.ActivateMode;
 import org.terasology.input.ButtonState;
 import org.terasology.input.Input;
 

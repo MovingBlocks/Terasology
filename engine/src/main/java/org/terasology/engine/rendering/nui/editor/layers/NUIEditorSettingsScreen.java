@@ -3,7 +3,7 @@
 package org.terasology.engine.rendering.nui.editor.layers;
 
 import com.google.common.collect.Lists;
-import org.terasology.assets.ResourceUrn;
+import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.config.SystemConfig;
 import org.terasology.engine.core.SimpleUri;

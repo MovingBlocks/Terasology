@@ -17,7 +17,7 @@ import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.logic.console.commandSystem.ConsoleCommand;
 import org.terasology.engine.logic.console.commandSystem.exceptions.CommandExecutionException;
 import org.terasology.engine.logic.permission.PermissionManager;
-import org.terasology.naming.Name;
+import org.terasology.gestalt.naming.Name;
 import org.terasology.engine.network.ClientComponent;
 import org.terasology.engine.network.NetworkSystem;
 import org.terasology.nui.FontColor;

@@ -1,4 +1,4 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.input;
@@ -16,17 +16,13 @@ import org.terasology.engine.core.subsystem.config.BindsManager;
 import org.terasology.engine.core.subsystem.headless.device.TimeSystem;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.event.Event;
+import org.terasology.engine.entitySystem.systems.internal.DoNotAutoRegister;
 import org.terasology.engine.input.BindButtonEvent;
 import org.terasology.engine.input.BindableButton;
 import org.terasology.engine.input.DefaultBinding;
 import org.terasology.engine.input.InputSystem;
 import org.terasology.engine.input.RegisterBindButton;
-import org.terasology.input.Keyboard.Key;
-import org.terasology.input.Keyboard.KeyId;
 import org.terasology.engine.input.cameraTarget.CameraTargetSystem;
-import org.terasology.input.device.CharKeyboardAction;
-import org.terasology.input.device.KeyboardDevice;
-import org.terasology.input.device.RawKeyboardAction;
 import org.terasology.engine.input.events.KeyEvent;
 import org.terasology.engine.input.internal.BindableButtonImpl;
 import org.terasology.engine.logic.players.LocalPlayer;
@@ -34,6 +30,11 @@ import org.terasology.engine.network.ClientComponent;
 import org.terasology.engine.recording.DirectionAndOriginPosRecorderList;
 import org.terasology.engine.recording.RecordAndReplayCurrentStatus;
 import org.terasology.engine.registry.InjectionHelper;
+import org.terasology.input.Keyboard.Key;
+import org.terasology.input.Keyboard.KeyId;
+import org.terasology.input.device.CharKeyboardAction;
+import org.terasology.input.device.KeyboardDevice;
+import org.terasology.input.device.RawKeyboardAction;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -272,6 +273,7 @@ public class InputSystemTests {
 
     }
 
+    @DoNotAutoRegister
     @RegisterBindButton(id = "testEvent", description = "${engine-tests:menu#theTestEvent}", category = "tests")
     @DefaultBinding(type = InputType.KEY, id = Keyboard.KeyId.T)
     public class TestEventButton extends BindButtonEvent {

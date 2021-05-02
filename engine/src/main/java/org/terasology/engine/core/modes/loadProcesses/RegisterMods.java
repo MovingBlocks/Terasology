@@ -25,12 +25,12 @@ import org.terasology.engine.core.modes.SingleStepLoadProcess;
 import org.terasology.engine.core.modes.StateMainMenu;
 import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.engine.game.GameManifest;
-import org.terasology.module.DependencyResolver;
-import org.terasology.module.Module;
-import org.terasology.module.ModuleEnvironment;
-import org.terasology.module.ResolutionResult;
-import org.terasology.naming.Name;
-import org.terasology.naming.NameVersion;
+import org.terasology.gestalt.module.Module;
+import org.terasology.gestalt.module.ModuleEnvironment;
+import org.terasology.gestalt.module.dependencyresolution.DependencyResolver;
+import org.terasology.gestalt.module.dependencyresolution.ResolutionResult;
+import org.terasology.gestalt.naming.Name;
+import org.terasology.gestalt.naming.NameVersion;
 
 import java.util.ArrayList;
 import java.util.List;

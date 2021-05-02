@@ -6,6 +6,7 @@ apply plugin: 'pmd'
 
 // Same repository configuration as root project
 repositories {
+    google()
     mavenCentral()
 
     // MovingBlocks Artifactory instance for libs not readily available elsewhere plus our own libs

@@ -4,19 +4,19 @@ package org.terasology.engine.world.block.family;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.assets.ResourceUrn;
+import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.world.block.loader.BlockFamilyDefinition;
 import org.terasology.engine.world.block.shapes.BlockShape;
-import org.terasology.module.ModuleEnvironment;
+import org.terasology.gestalt.module.ModuleEnvironment;
+import org.terasology.gestalt.util.reflection.ParameterProvider;
+import org.terasology.gestalt.util.reflection.SimpleClassFactory;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.metadata.ClassLibrary;
 import org.terasology.reflection.metadata.ClassMetadata;
 import org.terasology.reflection.metadata.DefaultModuleClassLibrary;
 import org.terasology.reflection.reflect.ReflectFactory;
 import org.terasology.engine.registry.InjectionHelper;
-import org.terasology.util.reflection.ParameterProvider;
-import org.terasology.util.reflection.SimpleClassFactory;
 import org.terasology.engine.world.block.BlockBuilderHelper;
 
 import java.util.Optional;

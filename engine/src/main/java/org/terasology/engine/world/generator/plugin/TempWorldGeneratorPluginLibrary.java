@@ -3,7 +3,7 @@
 package org.terasology.engine.world.generator.plugin;
 
 import org.terasology.engine.context.Context;
-import org.terasology.module.ModuleEnvironment;
+import org.terasology.gestalt.module.ModuleEnvironment;
 
 /**
  * A fake environment so that plugins can be loaded for configuration.

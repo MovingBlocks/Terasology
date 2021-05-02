@@ -3,7 +3,7 @@
 package org.terasology.engine.rendering.assets.font;
 
 import com.google.common.collect.ImmutableMap;
-import org.terasology.assets.AssetData;
+import org.terasology.gestalt.assets.AssetData;
 
 import java.util.Map;
 

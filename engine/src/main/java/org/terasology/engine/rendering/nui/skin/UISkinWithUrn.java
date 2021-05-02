@@ -3,7 +3,7 @@
 
 package org.terasology.engine.rendering.nui.skin;
 
-import org.terasology.assets.ResourceUrn;
+import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.nui.skin.UISkin;
 import org.terasology.nui.skin.UIStyleFamily;
 

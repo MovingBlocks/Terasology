@@ -4,10 +4,10 @@
 package org.terasology.gradology
 
 import org.gradle.api.Project
-import org.terasology.module.DependencyInfo
-import org.terasology.module.ModuleMetadata
-import org.terasology.module.ModuleMetadataJsonAdapter
-import org.terasology.naming.Version
+import org.terasology.gestalt.module.ModuleMetadata
+import org.terasology.gestalt.module.ModuleMetadataJsonAdapter
+import org.terasology.gestalt.module.dependencyresolution.DependencyInfo
+import org.terasology.gestalt.naming.Version
 import java.io.File
 
 

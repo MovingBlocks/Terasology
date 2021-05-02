@@ -9,14 +9,15 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL30;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.assets.AssetType;
-import org.terasology.assets.ResourceUrn;
 import org.terasology.engine.core.GameThread;
 import org.terasology.engine.core.subsystem.lwjgl.LwjglGraphicsProcessing;
 import org.terasology.engine.rendering.assets.mesh.StandardMeshData;
 import org.terasology.engine.rendering.assets.skeletalmesh.Bone;
 import org.terasology.engine.rendering.assets.skeletalmesh.SkeletalMesh;
 import org.terasology.engine.rendering.assets.skeletalmesh.SkeletalMeshData;
+import org.terasology.gestalt.assets.AssetType;
+import org.terasology.gestalt.assets.DisposableResource;
+import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.joml.geom.AABBf;
 
 import java.nio.ByteBuffer;
@@ -45,14 +46,20 @@ public class OpenGLSkeletalMesh extends SkeletalMesh {
     private DisposalAction disposalAction;
 
     public OpenGLSkeletalMesh(ResourceUrn urn, AssetType<?, SkeletalMeshData> assetType,
-                              SkeletalMeshData data, LwjglGraphicsProcessing graphicsProcessing) {
-        super(urn, assetType);
-        disposalAction = new DisposalAction(urn);
-        getDisposalHook().setDisposeAction(disposalAction);
+                              SkeletalMeshData data, LwjglGraphicsProcessing graphicsProcessing,
+                              OpenGLSkeletalMesh.DisposalAction disposalAction) {
+        super(urn, assetType, disposalAction);
+        this.disposalAction = disposalAction;
         graphicsProcessing.asynchToDisplayThread(() -> {
             reload(data);
         });
     }
+
+    public static OpenGLSkeletalMesh create(ResourceUrn urn, AssetType<?, SkeletalMeshData> assetType,
+                                            SkeletalMeshData data, LwjglGraphicsProcessing graphicsProcessing) {
+        return new OpenGLSkeletalMesh(urn, assetType, data, graphicsProcessing, new DisposalAction(urn));
+    }
+
 
     public void setScaleTranslate(org.joml.Vector3f newScale, org.joml.Vector3f newTranslate) {
         this.scale = newScale;
@@ -163,7 +170,7 @@ public class OpenGLSkeletalMesh extends SkeletalMesh {
         return data.getStaticAABB();
     }
 
-    private static class DisposalAction implements Runnable {
+    private static class DisposalAction implements DisposableResource {
 
         private final ResourceUrn urn;
 
@@ -171,7 +178,7 @@ public class OpenGLSkeletalMesh extends SkeletalMesh {
         private int vbo = 0;
         private int ebo = 0;
 
-         DisposalAction(ResourceUrn urn) {
+        DisposalAction(ResourceUrn urn) {
             this.urn = urn;
         }
 
@@ -191,7 +198,7 @@ public class OpenGLSkeletalMesh extends SkeletalMesh {
         }
 
         @Override
-        public void run() {
+        public void close() {
             try {
                 GameThread.synch(() -> {
                     dispose();

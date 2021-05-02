@@ -11,12 +11,13 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
-import org.terasology.assets.ResourceUrn;
-import org.terasology.assets.exceptions.InvalidAssetFilenameException;
-import org.terasology.assets.format.AssetDataFile;
-import org.terasology.assets.format.AssetFileFormat;
-import org.terasology.assets.module.annotations.RegisterAssetFileFormat;
-import org.terasology.naming.Name;
+import org.terasology.gestalt.assets.ResourceUrn;
+import org.terasology.gestalt.assets.exceptions.InvalidAssetFilenameException;
+import org.terasology.gestalt.assets.format.AssetDataFile;
+import org.terasology.gestalt.assets.format.AssetFileFormat;
+import org.terasology.gestalt.assets.module.annotations.RegisterAssetFileFormat;
+import org.terasology.gestalt.module.resources.FileReference;
+import org.terasology.gestalt.naming.Name;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -24,6 +25,7 @@ import java.io.Reader;
 import java.lang.reflect.Type;
 import java.nio.file.PathMatcher;
 import java.util.List;
+import java.util.function.Predicate;
 
 /**
  */
@@ -42,9 +44,9 @@ public class GLSLShaderFormat implements AssetFileFormat<ShaderData> {
     }
 
     @Override
-    public PathMatcher getFileMatcher() {
+    public Predicate<FileReference> getFileMatcher() {
         return path -> {
-            String name = path.getFileName().toString();
+            String name = path.getName();
             return name.endsWith(FRAGMENT_SUFFIX)
                     || name.endsWith(VERTEX_SUFFIX)
                     || name.endsWith(GEOMETRY_SUFFIX)

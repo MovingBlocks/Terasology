@@ -11,8 +11,7 @@ import org.lwjgl.opengl.GL20;
 import org.lwjgl.system.Platform;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.assets.ResourceUrn;
-import org.terasology.assets.management.AssetManager;
+import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.engine.registry.CoreRegistry;
 import org.terasology.engine.rendering.assets.material.Material;
 import org.terasology.engine.rendering.assets.material.MaterialData;
@@ -20,6 +19,7 @@ import org.terasology.engine.rendering.assets.shader.Shader;
 import org.terasology.engine.rendering.assets.texture.Texture;
 import org.terasology.engine.rendering.opengl.GLSLMaterial;
 import org.terasology.engine.utilities.Assets;
+import org.terasology.gestalt.assets.management.AssetManager;
 
 import java.util.Optional;
 import java.util.Set;

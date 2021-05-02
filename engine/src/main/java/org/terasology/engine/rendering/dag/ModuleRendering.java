@@ -13,7 +13,7 @@ import org.terasology.engine.rendering.opengl.FBO;
 import org.terasology.engine.rendering.opengl.FboConfig;
 import org.terasology.engine.rendering.opengl.ScalingFactors;
 import org.terasology.engine.rendering.world.WorldRenderer;
-import org.terasology.naming.Name;
+import org.terasology.gestalt.naming.Name;
 import org.terasology.nui.properties.Range;
 
 @RegisterSystem

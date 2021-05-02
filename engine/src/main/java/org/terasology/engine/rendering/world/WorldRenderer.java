@@ -7,8 +7,8 @@ import org.joml.Vector3ic;
 import org.terasology.engine.rendering.assets.material.Material;
 import org.terasology.engine.rendering.cameras.SubmersibleCamera;
 import org.terasology.engine.rendering.world.viewDistance.ViewDistance;
-import org.terasology.module.sandbox.API;
 import org.terasology.engine.rendering.dag.RenderGraph;
+import org.terasology.gestalt.module.sandbox.API;
 
 /**
  * Implementations of this class are responsible for rendering the whole 3D world,

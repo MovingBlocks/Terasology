@@ -3,7 +3,7 @@
 package org.terasology.engine.logic.console.commandSystem;
 
 import org.terasology.engine.entitySystem.entity.EntityRef;
-import org.terasology.module.sandbox.API;
+import org.terasology.gestalt.module.sandbox.API;
 
 import java.util.Set;
 

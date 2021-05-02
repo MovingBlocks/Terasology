@@ -10,7 +10,7 @@ import org.terasology.engine.math.Side;
 import org.terasology.engine.math.Yaw;
 import org.terasology.engine.world.block.loader.BlockFamilyDefinition;
 import org.terasology.engine.world.block.shapes.BlockShape;
-import org.terasology.naming.Name;
+import org.terasology.gestalt.naming.Name;
 import org.terasology.engine.world.block.Block;
 import org.terasology.engine.world.block.BlockBuilderHelper;
 import org.terasology.engine.world.block.BlockUri;

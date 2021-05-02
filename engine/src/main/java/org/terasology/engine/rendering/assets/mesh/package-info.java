@@ -3,4 +3,4 @@
 
 @API package org.terasology.engine.rendering.assets.mesh;
 
-import org.terasology.module.sandbox.API;
+import org.terasology.gestalt.module.sandbox.API;

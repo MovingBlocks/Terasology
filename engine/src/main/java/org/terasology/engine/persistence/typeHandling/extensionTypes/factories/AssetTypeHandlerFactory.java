@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.persistence.typeHandling.extensionTypes.factories;
 
-import org.terasology.assets.Asset;
+import org.terasology.gestalt.assets.Asset;
 import org.terasology.engine.persistence.typeHandling.extensionTypes.AssetTypeHandler;
 import org.terasology.persistence.typeHandling.TypeHandler;
 import org.terasology.persistence.typeHandling.TypeHandlerContext;

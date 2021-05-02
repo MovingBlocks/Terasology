@@ -9,7 +9,7 @@ import org.lwjgl.opengl.GL11;
 import org.terasology.joml.geom.AABBf;
 import org.terasology.joml.geom.AABBfc;
 import org.terasology.engine.logic.players.LocalPlayer;
-import org.terasology.module.sandbox.API;
+import org.terasology.gestalt.module.sandbox.API;
 import org.terasology.engine.registry.CoreRegistry;
 
 import static org.lwjgl.opengl.GL11.GL_BLEND;
