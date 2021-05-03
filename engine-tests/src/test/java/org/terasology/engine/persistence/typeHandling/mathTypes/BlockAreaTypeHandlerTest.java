@@ -7,7 +7,6 @@ import com.google.gson.Gson;
 import org.junit.jupiter.api.Test;
 import org.terasology.engine.ModuleEnvironmentTest;
 import org.terasology.engine.core.module.ModuleContext;
-import org.terasology.engine.persistence.serializers.ProtobufSerializer;
 import org.terasology.engine.persistence.typeHandling.TypeHandlerLibraryImpl;
 import org.terasology.engine.persistence.typeHandling.gson.GsonPersistedDataReader;
 import org.terasology.engine.persistence.typeHandling.gson.GsonPersistedDataSerializer;
@@ -31,7 +30,6 @@ public class BlockAreaTypeHandlerTest extends ModuleEnvironmentTest {
     }
 
     private TypeHandlerLibrary typeHandlerLibrary;
-    private ProtobufSerializer protobufSerializer;
     private Serializer<?> gsonSerializer;
     private Gson gson = new Gson();
 
@@ -41,7 +39,6 @@ public class BlockAreaTypeHandlerTest extends ModuleEnvironmentTest {
 
         typeHandlerLibrary = TypeHandlerLibraryImpl.forModuleEnvironment(moduleManager, typeRegistry);
 
-        protobufSerializer = new ProtobufSerializer(typeHandlerLibrary);
         gsonSerializer = new Serializer<>(typeHandlerLibrary,
                 new GsonPersistedDataSerializer(),
                 new GsonPersistedDataWriter(gson),
@@ -63,20 +60,4 @@ public class BlockAreaTypeHandlerTest extends ModuleEnvironmentTest {
         assertEquals(new BlockArea(-1, -1, 0, 0), o.b1);
         assertEquals(new BlockArea(0, 0, 1, 1), o.b2);
     }
-
-    @Test
-    public void testProtobufSerialize() throws IOException {
-        TestObject a = new TestObject();
-        a.b1 = new BlockArea(-1, -1, 0, 0);
-        a.b2 = new BlockArea(0, 0, 1, 1);
-
-        byte[] data = protobufSerializer.toBytes(a, new TypeInfo<TestObject>() {
-        });
-
-        TestObject o = protobufSerializer.fromBytes(data, new TypeInfo<TestObject>() {
-        });
-        assertEquals(new BlockArea(-1, -1, 0, 0), o.b1);
-        assertEquals(new BlockArea(0, 0, 1, 1), o.b2);
-    }
-
 }
