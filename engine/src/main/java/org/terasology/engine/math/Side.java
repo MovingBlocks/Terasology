@@ -142,7 +142,7 @@ public enum Side {
 
     /**
      * The side normal closes to dir
-     * 
+     *
      * @param dir direction
      * @return side
      */
@@ -299,7 +299,7 @@ public enum Side {
      * @param dest will hold the result
      * @return dest
      */
-    public org.joml.Vector3i getAdjacentPos(Vector3ic pos, org.joml.Vector3i dest) {
+    public Vector3i getAdjacentPos(Vector3ic pos, Vector3i dest) {
         return dest.set(pos).add(direction());
     }
 
