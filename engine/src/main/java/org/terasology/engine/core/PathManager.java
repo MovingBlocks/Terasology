@@ -140,6 +140,12 @@ public final class PathManager {
         return instance;
     }
 
+    static PathManager setInstance(PathManager pathManager) {
+        PathManager oldInstance = instance;
+        instance = pathManager;
+        return oldInstance;
+    }
+
     /**
      * Uses the given path as the home instead of the default home path.
      * @param rootPath Path to use as the home path.
