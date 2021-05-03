@@ -78,7 +78,7 @@ class ModuleMetadataForGradle(private val moduleConfig: ModuleMetadata) {
         } else {
             // TODO: gradle-compatible version expressions for gestalt dependencies
             //     https://github.com/MovingBlocks/gestalt/issues/114
-            gestaltDependency.minVersion.toString();
+            "[${gestaltDependency.minVersion},)"                                                                                                                                                                   
         }
 
         val gradleDep = GradleDependencyInfo(TERASOLOGY_MODULES_GROUP, gestaltDependency.id.toString(), version)
