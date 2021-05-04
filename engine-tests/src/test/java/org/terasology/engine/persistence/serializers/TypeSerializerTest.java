@@ -52,7 +52,6 @@ class TypeSerializerTest extends ModuleEnvironmentTest {
     }
 
     private TypeHandlerLibrary typeHandlerLibrary;
-    private ProtobufSerializer protobufSerializer;
     private Serializer gsonSerializer;
 
     @Override
@@ -61,14 +60,12 @@ class TypeSerializerTest extends ModuleEnvironmentTest {
 
         typeHandlerLibrary = TypeHandlerLibraryImpl.forModuleEnvironment(moduleManager, typeRegistry);
 
-        protobufSerializer = new ProtobufSerializer(typeHandlerLibrary);
-
         Gson gson = new Gson();
         gsonSerializer = new Serializer<>(typeHandlerLibrary,
                 new GsonPersistedDataSerializer(),
                 new GsonPersistedDataWriter(gson),
                 new GsonPersistedDataReader(gson)
-                );
+        );
     }
 
     @Test
@@ -94,24 +91,6 @@ class TypeSerializerTest extends ModuleEnvironmentTest {
     }
 
     @Test
-    void testProtobufSerializeDeserialize() throws IOException {
-        byte[] bytes = protobufSerializer.toBytes(INSTANCE, new TypeInfo<SomeClass<Integer>>() {
-        });
-
-        SomeClass<Integer> deserializedInstance =
-                protobufSerializer.fromBytes(bytes, new TypeInfo<SomeClass<Integer>>() {
-                });
-
-        assertNotEmpty(typeHandlerLibrary.getTypeHandler(Animal.class));
-        assertNotEmpty(typeHandlerLibrary.getTypeHandler(Dog.class));
-
-        assertNotEmpty(typeRegistry.load("org.terasology.engine.persistence.serializers.TypeSerializerTest$Animal"));
-        assertNotEmpty(typeRegistry.load("org.terasology.engine.persistence.serializers.TypeSerializerTest$Dog"));
-
-        assertEquals(INSTANCE, deserializedInstance);
-    }
-
-    @Test
     void testJsonSerializeDeserialize() throws IOException {
         //noinspection unchecked,OptionalGetWithoutIsPresent,OptionalGetWithoutIsPresent
         byte[] bytes = (byte[]) gsonSerializer.serialize(INSTANCE, new TypeInfo<SomeClass<Integer>>() {
@@ -120,7 +99,7 @@ class TypeSerializerTest extends ModuleEnvironmentTest {
         //noinspection unchecked,OptionalGetWithoutIsPresent,OptionalGetWithoutIsPresent
         SomeClass<Integer> deserializedInstance =
                 (SomeClass<Integer>) gsonSerializer.deserialize(new TypeInfo<SomeClass<Integer>>() {}, bytes)
-                .get();
+                        .get();
 
         assertNotEmpty(typeHandlerLibrary.getTypeHandler(Animal.class));
         assertNotEmpty(typeHandlerLibrary.getTypeHandler(Dog.class));
@@ -224,10 +203,10 @@ class TypeSerializerTest extends ModuleEnvironmentTest {
         @Override
         public String toString() {
             return "Dog{" +
-                "name='" + data + '\'' +
-                ", tailPosition=" + tailPosition +
-                ", headPosition=" + headPosition +
-                '}';
+                    "name='" + data + '\'' +
+                    ", tailPosition=" + tailPosition +
+                    ", headPosition=" + headPosition +
+                    '}';
         }
 
         @Override
