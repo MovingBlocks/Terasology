@@ -24,7 +24,7 @@ public abstract class VertexAttributeBinding<TARGET> {
      * access a buffer is slow so examining an array of {@link TARGET}s is quicker.
      * @return the store that describes this attribute
      */
-    public abstract TARGET[] getStore();
+//    public abstract TARGET[] getStore();
 
     /**
      * rewind the index back to 0
@@ -35,7 +35,7 @@ public abstract class VertexAttributeBinding<TARGET> {
      * the number of {@link TARGET} elements that this binding supports.
      * @return the number of elements
      */
-    public abstract int count();
+//    public abstract int count();
 
     /**
      * maps a float array to the resource and to the {@link TARGET} store if one exist.

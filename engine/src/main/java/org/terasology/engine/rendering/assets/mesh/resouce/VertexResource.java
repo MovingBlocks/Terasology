@@ -10,43 +10,60 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class VertexResource {
-    public int inStride;
-    public VertexDefinition[] attributes;
+    private int inStride;
+    private int inSize;
     public ByteBuffer buffer;
     private int version = 0;
-    private int elements = 0;
+    public VertexDefinition[] attributes;
 
-    protected VertexResource(int elements, int inStride, VertexDefinition[] attribute) {
-        this.inStride = inStride;
-        this.elements = elements;
-        this.buffer = BufferUtils.createByteBuffer(elements * inStride);
-        this.attributes = attribute;
-    }
-
-    public int elements() {
-        return elements;
-    }
     public int inSize() {
-        return elements * inStride;
+        return inSize;
     }
 
-    protected VertexResource() {
-        this.elements = 0;
-        this.inStride = 0;
-        attributes = new VertexDefinition[]{};
-        buffer = BufferUtils.createByteBuffer(0);
+    public VertexResource() {
+
     }
 
-    public void reallocate(int elements, int inStride, VertexDefinition[] attributes) {
-        ByteBuffer newBuffer = BufferUtils.createByteBuffer(elements * inStride);
-        this.buffer.limit(Math.min(elements * inStride, this.elements * this.inStride));
-        this.buffer.position(0);
-        newBuffer.put(this.buffer);
-
-        this.buffer = newBuffer;
-        this.elements = elements;
-        this.attributes = attributes;
+    public void allocate(int inSize, int inStride) {
+        this.inSize = inSize;
         this.inStride = inStride;
+        ensureCapacity(inSize);
+    }
+
+    public void setDefinitions(VertexDefinition[] attributes) {
+        this.attributes = attributes;
+    }
+
+    public VertexResource(int inSize, int inStride, VertexDefinition[] attributes) {
+        this.inStride = inStride;
+        this.inSize = inSize;
+        this.attributes = attributes;
+        this.buffer = BufferUtils.createByteBuffer(inSize);
+    }
+
+    public void reallocate(int inStride, int inSize) {
+        this.inStride = inStride;
+        this.inSize = inSize;
+    }
+
+    public int getInSize() {
+        return inSize;
+    }
+
+    public int getInStride() {
+        return inStride;
+    }
+
+    public void ensureCapacity(int inSize) {
+        if(inSize > buffer.capacity()) {
+            int newCap = Math.max(inSize << 1, inSize);
+            ByteBuffer newBuffer = BufferUtils.createByteBuffer(newCap);
+            buffer.limit(Math.min(inSize, this.inSize));
+            buffer.position(0);
+            newBuffer.put(buffer);
+            this.buffer = newBuffer;
+            this.inSize = inSize;
+        }
     }
 
     public int getVersion() {
@@ -82,14 +99,14 @@ public class VertexResource {
         private List<VertexDefinition> definitions = new ArrayList<>();
         private int inStride;
         private final int elements;
-        private VertexResource vertexResource = new VertexResource();
+        private VertexResource resource = new VertexResource();
 
         public VertexResourceBuilder(int elements) {
             this.elements = elements;
         }
 
         /**
-         * add an attribute and provides an {@link VertexFloatAttribute.VertexAttributeFloatBinding}
+         * add an attribute and provides an {@link VertexAttributeFloatBinding}
          *
          * @param location the index of the attribute binding
          * @param attribute the attribute that describes the binding
@@ -97,19 +114,19 @@ public class VertexResource {
          * @param <TARGET>
          * @return
          */
-        public <TARGET> VertexFloatAttribute.VertexAttributeFloatBinding<TARGET> add(int location,
+        public <TARGET> VertexAttributeFloatBinding<TARGET> add(int location,
                                                                                      VertexFloatAttribute<TARGET> attribute, boolean cpuReadable) {
-            VertexFloatAttribute.VertexAttributeFloatBinding<TARGET> result =
-                    new VertexFloatAttribute.VertexAttributeFloatBinding<>(vertexResource, attribute, inStride, elements,
-                            cpuReadable);
+            VertexAttributeFloatBinding<TARGET> result =
+                    new VertexAttributeFloatBinding<>(resource,attribute, inStride);
             this.definitions.add(new VertexDefinition(location, inStride, attribute));
             inStride += attribute.mapping.size * attribute.count;
             return result;
         }
 
         public VertexResource build() {
-            vertexResource.reallocate(this.elements, this.inStride, this.definitions.toArray(new VertexDefinition[]{}));
-            return vertexResource;
+            resource.allocate(this.inStride * this.elements, this.inStride);
+            resource.setDefinitions(definitions.toArray(new VertexDefinition[]{}));
+            return resource;
         }
     }
 }

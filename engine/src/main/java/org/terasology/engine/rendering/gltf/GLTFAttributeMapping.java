@@ -6,6 +6,7 @@ package org.terasology.engine.rendering.gltf;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
+import org.terasology.engine.rendering.assets.mesh.resouce.VertexAttributeFloatBinding;
 import org.terasology.engine.rendering.assets.mesh.resouce.VertexFloatAttribute;
 import org.terasology.engine.rendering.gltf.model.GLTFAccessor;
 import org.terasology.engine.rendering.gltf.model.GLTFBufferView;
@@ -21,7 +22,7 @@ public class GLTFAttributeMapping {
     }
 
 
-    public static void readVec3FBuffer(byte[] buffer, GLTFAccessor accessor, GLTFBufferView bufferView, VertexFloatAttribute.VertexAttributeFloatBinding<Vector3f> mapping) {
+    public static void readVec3FBuffer(byte[] buffer, GLTFAccessor accessor, GLTFBufferView bufferView, VertexAttributeFloatBinding<Vector3f> mapping) {
         if (accessor.getComponentType() != GLTFComponentType.FLOAT) {
             return;
         }
@@ -50,7 +51,7 @@ public class GLTFAttributeMapping {
     }
 
 
-    public static void readVec2FBuffer(byte[] buffer, GLTFAccessor accessor, GLTFBufferView bufferView, VertexFloatAttribute.VertexAttributeFloatBinding<Vector2f> mapping) {
+    public static void readVec2FBuffer(byte[] buffer, GLTFAccessor accessor, GLTFBufferView bufferView, VertexAttributeFloatBinding<Vector2f> mapping) {
         if (accessor.getComponentType() != GLTFComponentType.FLOAT) {
             return;
         }
@@ -79,7 +80,7 @@ public class GLTFAttributeMapping {
     }
 
 
-    public static void readVec4FBuffer(byte[] buffer, GLTFAccessor accessor, GLTFBufferView bufferView, VertexFloatAttribute.VertexAttributeFloatBinding<Vector4f> mapping) {
+    public static void readVec4FBuffer(byte[] buffer, GLTFAccessor accessor, GLTFBufferView bufferView, VertexAttributeFloatBinding<Vector4f> mapping) {
         if (accessor.getComponentType() != GLTFComponentType.FLOAT) {
             return;
         }
@@ -107,7 +108,7 @@ public class GLTFAttributeMapping {
         }
     }
 
-    public static void readColor4FBuffer(byte[] buffer, GLTFAccessor accessor, GLTFBufferView bufferView, VertexFloatAttribute.VertexAttributeFloatBinding<Color> mapping) {
+    public static void readColor4FBuffer(byte[] buffer, GLTFAccessor accessor, GLTFBufferView bufferView, VertexAttributeFloatBinding<Color> mapping) {
         if (accessor.getComponentType() != GLTFComponentType.FLOAT) {
             return;
         }

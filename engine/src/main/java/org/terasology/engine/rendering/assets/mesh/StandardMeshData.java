@@ -7,7 +7,7 @@ import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.terasology.engine.rendering.assets.mesh.resouce.IndexResource;
 import org.terasology.engine.rendering.assets.mesh.resouce.VertexAttribute;
-import org.terasology.engine.rendering.assets.mesh.resouce.VertexFloatAttribute;
+import org.terasology.engine.rendering.assets.mesh.resouce.VertexAttributeFloatBinding;
 import org.terasology.engine.rendering.assets.mesh.resouce.VertexResource;
 import org.terasology.nui.Color;
 
@@ -20,22 +20,22 @@ public class StandardMeshData extends MeshData {
     public static final int LIGHT0_INDEX = 5;
 
     public final VertexResource positionBuffer;
-    public final VertexFloatAttribute.VertexAttributeFloatBinding<Vector3f> position;
+    public final VertexAttributeFloatBinding<Vector3f> position;
 
     public final VertexResource normalBuffer;
-    public final VertexFloatAttribute.VertexAttributeFloatBinding<Vector3f> normal;
+    public final VertexAttributeFloatBinding<Vector3f> normal;
 
     public final VertexResource uv0Buffer;
-    public final VertexFloatAttribute.VertexAttributeFloatBinding<Vector2f> uv0;
+    public final VertexAttributeFloatBinding<Vector2f> uv0;
 
     public final VertexResource uv1Buffer;
-    public final VertexFloatAttribute.VertexAttributeFloatBinding<Vector2f> uv1;
+    public final VertexAttributeFloatBinding<Vector2f> uv1;
 
     public final VertexResource colorBuffer;
-    public final VertexFloatAttribute.VertexAttributeFloatBinding<Color> color0;
+    public final VertexAttributeFloatBinding<Color> color0;
 
     public final VertexResource lightBuffer;
-    public final VertexFloatAttribute.VertexAttributeFloatBinding<Vector3f> light0;
+    public final VertexAttributeFloatBinding<Vector3f> light0;
 
     public final IndexResource indices;
 
@@ -69,12 +69,12 @@ public class StandardMeshData extends MeshData {
     }
 
     public StandardMeshData(
-            VertexFloatAttribute.VertexAttributeFloatBinding<Vector3f> position,
-            VertexFloatAttribute.VertexAttributeFloatBinding<Vector3f> normal,
-            VertexFloatAttribute.VertexAttributeFloatBinding<Vector2f> uv0,
-            VertexFloatAttribute.VertexAttributeFloatBinding<Vector2f> uv1,
-            VertexFloatAttribute.VertexAttributeFloatBinding<Color> color0,
-            VertexFloatAttribute.VertexAttributeFloatBinding<Vector3f> light0,
+            VertexAttributeFloatBinding<Vector3f> position,
+            VertexAttributeFloatBinding<Vector3f> normal,
+            VertexAttributeFloatBinding<Vector2f> uv0,
+            VertexAttributeFloatBinding<Vector2f> uv1,
+            VertexAttributeFloatBinding<Color> color0,
+            VertexAttributeFloatBinding<Vector3f> light0,
             IndexResource indexResource) {
         this.position = position;
         this.positionBuffer = position.getResource();
@@ -100,7 +100,7 @@ public class StandardMeshData extends MeshData {
 
 
     @Override
-    public Vector3f[] verts() {
+    public float[] verts() {
         return position.getStore();
     }
 

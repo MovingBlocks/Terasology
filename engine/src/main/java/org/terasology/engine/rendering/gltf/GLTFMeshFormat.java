@@ -70,49 +70,26 @@ public class GLTFMeshFormat extends GLTFCommonFormat<MeshData> {
 
             List<byte[]> loadedBuffers = loadBinaryBuffers(urn, gltf);
 
-
-            VertexResource.VertexResourceBuilder builder;
-            VertexFloatAttribute.VertexAttributeFloatBinding<Vector3f> position = VertexFloatAttribute.EMPTY_BINDING;
-            VertexFloatAttribute.VertexAttributeFloatBinding<Vector3f> normal = VertexFloatAttribute.EMPTY_BINDING;
-            VertexFloatAttribute.VertexAttributeFloatBinding<Vector2f> uv0 = VertexFloatAttribute.EMPTY_BINDING;
-            VertexFloatAttribute.VertexAttributeFloatBinding<Vector2f> uv1 = VertexFloatAttribute.EMPTY_BINDING;
-            VertexFloatAttribute.VertexAttributeFloatBinding<Color> color0 = VertexFloatAttribute.EMPTY_BINDING;
-            VertexFloatAttribute.VertexAttributeFloatBinding<Vector3f> light0 = VertexFloatAttribute.EMPTY_BINDING;
-
+            StandardMeshData  meshData = new StandardMeshData(0, 0);
             for (MeshAttributeSemantic semantic : MeshAttributeSemantic.values()) {
                 GLTFAccessor gltfAccessor = getAccessor(semantic, gltfPrimitive, gltf);
                 if (gltfAccessor != null && gltfAccessor.getBufferView() != null) {
                     GLTFBufferView bufferView = gltf.getBufferViews().get(gltfAccessor.getBufferView());
                     switch (semantic) {
                         case Position:
-                            builder = new VertexResource.VertexResourceBuilder(gltfAccessor.getCount());
-                            position = builder.add(StandardMeshData.VERTEX_INDEX, VertexAttribute.VECTOR_3_F_VERTEX_ATTRIBUTE, true);
-                            builder.build();
-                            GLTFAttributeMapping.readVec3FBuffer(loadedBuffers.get(bufferView.getBuffer()), gltfAccessor, bufferView, position);
+                            GLTFAttributeMapping.readVec3FBuffer(loadedBuffers.get(bufferView.getBuffer()), gltfAccessor, bufferView, meshData.position);
                             break;
                         case Normal:
-                            builder = new VertexResource.VertexResourceBuilder(gltfAccessor.getCount());
-                            VertexFloatAttribute.VertexAttributeFloatBinding<Vector3f> normals = builder.add(StandardMeshData.NORMAL_INDEX, VertexAttribute.VECTOR_3_F_VERTEX_ATTRIBUTE, false);
-                            builder.build();
-                            GLTFAttributeMapping.readVec3FBuffer(loadedBuffers.get(bufferView.getBuffer()), gltfAccessor, bufferView, normals);
+                            GLTFAttributeMapping.readVec3FBuffer(loadedBuffers.get(bufferView.getBuffer()), gltfAccessor, bufferView, meshData.normal);
                             break;
                         case Texcoord_0:
-                            builder = new VertexResource.VertexResourceBuilder(gltfAccessor.getCount());
-                            uv0 = builder.add(StandardMeshData.UV0_INDEX, VertexAttribute.VECTOR_2_F_VERTEX_ATTRIBUTE, false);
-                            builder.build();
-                            GLTFAttributeMapping.readVec2FBuffer(loadedBuffers.get(bufferView.getBuffer()), gltfAccessor, bufferView, uv0);
+                            GLTFAttributeMapping.readVec2FBuffer(loadedBuffers.get(bufferView.getBuffer()), gltfAccessor, bufferView, meshData.uv0);
                             break;
                         case Texcoord_1:
-                            builder = new VertexResource.VertexResourceBuilder(gltfAccessor.getCount());
-                            uv1 = builder.add(StandardMeshData.UV1_INDEX, VertexAttribute.VECTOR_2_F_VERTEX_ATTRIBUTE, false);
-                            builder.build();
-                            GLTFAttributeMapping.readVec2FBuffer(loadedBuffers.get(bufferView.getBuffer()), gltfAccessor, bufferView, uv1);
+                            GLTFAttributeMapping.readVec2FBuffer(loadedBuffers.get(bufferView.getBuffer()), gltfAccessor, bufferView, meshData.uv1);
                             break;
                         case Color_0:
-                            builder = new VertexResource.VertexResourceBuilder(gltfAccessor.getCount());
-                            color0 = builder.add(StandardMeshData.COLOR0_INDEX, VertexAttribute.COLOR_4_F_VERTEX_ATTRIBUTE, false);
-                            builder.build();
-                            GLTFAttributeMapping.readColor4FBuffer(loadedBuffers.get(bufferView.getBuffer()), gltfAccessor, bufferView, color0);
+                            GLTFAttributeMapping.readColor4FBuffer(loadedBuffers.get(bufferView.getBuffer()), gltfAccessor, bufferView, meshData.color0);
                             break;
                     }
                 }
@@ -126,10 +103,9 @@ public class GLTFMeshFormat extends GLTFCommonFormat<MeshData> {
 
             TIntArrayList indices = new TIntArrayList();
             readBuffer(loadedBuffers.get(indicesBuffer.getBuffer()), indicesAccessor, indicesBuffer, indices);
-            IndexResource indexResource = new IndexResource(indices.size(), true);
-            indexResource.map(0, indices.size(), indices.toArray(), 0);
-
-            return new StandardMeshData(position, normal, uv0, uv1, color0, light0, indexResource);
+//            IndexResource indexResource = new IndexResource(indices.size(), true);
+            meshData.indices.map(0, indices.size(), indices.toArray(), 0);
+            return meshData;
         }
     }
 
