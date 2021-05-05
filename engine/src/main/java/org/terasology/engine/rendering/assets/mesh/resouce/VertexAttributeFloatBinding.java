@@ -59,6 +59,7 @@ public class VertexAttributeFloatBinding<TARGET> extends VertexAttributeBinding<
         if (startIndex == endIndex)
             return;
         int posIndex = 0;
+        ensureCapacity((endIndex - startIndex) + offsetIndex);
         for (int x = startIndex; x < endIndex; x++) {
             attribute.configuration.map(x * attribute.count, arr, offsetIndex + posIndex, resource.getInStride(), offset, resource.buffer, Optional.ofNullable(this.store));
             posIndex++;
@@ -68,6 +69,7 @@ public class VertexAttributeFloatBinding<TARGET> extends VertexAttributeBinding<
 
     @Override
     public void put(int vertexIndex, TARGET value) {
+        ensureCapacity(vertexIndex + 1);
         attribute.configuration.map(value, vertexIndex, resource.getInStride(), offset, resource.buffer, Optional.ofNullable(this.store));
         resource.mark();
 
@@ -75,6 +77,7 @@ public class VertexAttributeFloatBinding<TARGET> extends VertexAttributeBinding<
 
     @Override
     public void put(TARGET value) {
+        ensureCapacity(index + 1);
         attribute.configuration.map(value, index, resource.getInStride(), offset, resource.buffer, Optional.ofNullable(this.store));
         resource.mark();
         index++;

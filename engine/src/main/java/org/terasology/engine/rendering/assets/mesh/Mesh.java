@@ -23,7 +23,7 @@ public abstract class Mesh extends Asset<MeshData> {
     public abstract AABBfc getAABB();
 
     protected AABBf getBound(MeshData data, AABBf dest) {
-        Vector3f[] vertices = this.getVertices();
+        float[] vertices = this.getVertices();
         if (vertices.length == 0) {
             dest.set(Float.POSITIVE_INFINITY,
                 Float.POSITIVE_INFINITY,
@@ -33,13 +33,13 @@ public abstract class Mesh extends Asset<MeshData> {
                 Float.NEGATIVE_INFINITY);
             return dest;
         }
-        for (Vector3f vertex : vertices) {
-            dest.union(vertex);
+        for(int x = 0; x < vertices.length; x+=3){
+            dest.union(vertices[x],vertices[x + 1],vertices[x + 2]);
         }
         return dest;
     }
 
-    public abstract Vector3f[] getVertices();
+    public abstract float[] getVertices();
     public abstract int getVertexCount();
 
     // TODO: Remove? At least review.

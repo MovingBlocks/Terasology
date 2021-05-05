@@ -693,12 +693,12 @@ public class BulletPhysics implements PhysicsEngine {
         }
         HullShapeComponent hull = entityRef.getComponent(HullShapeComponent.class);
         if (hull != null) {
-            Vector3f[] positions = hull.sourceMesh.getVertices();
+            float[] positions = hull.sourceMesh.getVertices();
             FloatBuffer buffer = BufferUtils.createFloatBuffer(positions.length * 3);
-            for(Vector3f pos: positions){
-                buffer.put(pos.x);
-                buffer.put(pos.y);
-                buffer.put(pos.z);
+            for(int i = 0; i < positions.length; i+=3) {
+                buffer.put(positions[i]);
+                buffer.put(positions[i + 1]);
+                buffer.put(positions[i + 2]);
             }
             return new BulletConvexHullShape(buffer, positions.length, 3 * Float.BYTES).underlyingShape;
         }

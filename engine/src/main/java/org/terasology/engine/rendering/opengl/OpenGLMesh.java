@@ -64,7 +64,7 @@ public class OpenGLMesh extends Mesh implements OpenGLMeshBase{
     }
 
     @Override
-    public Vector3f[] getVertices() {
+    public float[] getVertices() {
         return data.verts();
     }
 

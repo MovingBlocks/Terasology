@@ -14,6 +14,8 @@ public class VertexFloatAttribute<TARGET> extends VertexAttribute<TARGET> {
         void map(TARGET value, int vertIdx, int stride, int offset, ByteBuffer buffer, Optional<float[]> store);
 
         void map(int pos, float[] value, int vertIdx, int stride, int offset, ByteBuffer buffer, Optional<float[]> store);
+
+
     }
     public final VertexFloatAttribute.AttributeConfiguration<TARGET> configuration;
     protected VertexFloatAttribute(Class<TARGET> type,VertexFloatAttribute.AttributeConfiguration<TARGET> configuration,

@@ -45,7 +45,7 @@ public class HeadlessMesh extends Mesh {
     }
 
     @Override
-    public Vector3f[] getVertices() {
+    public float[] getVertices() {
         return data.verts();
     }
 

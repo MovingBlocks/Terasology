@@ -10,9 +10,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class VertexResource {
-    private int inStride;
-    private int inSize;
-    public ByteBuffer buffer;
+    private int inStride = 0;
+    private int inSize = 0;
+    public ByteBuffer buffer = BufferUtils.createByteBuffer(0);
     private int version = 0;
     public VertexDefinition[] attributes;
 
@@ -25,7 +25,6 @@ public class VertexResource {
     }
 
     public void allocate(int inSize, int inStride) {
-        this.inSize = inSize;
         this.inStride = inStride;
         ensureCapacity(inSize);
     }
@@ -56,7 +55,7 @@ public class VertexResource {
 
     public void ensureCapacity(int inSize) {
         if(inSize > buffer.capacity()) {
-            int newCap = Math.max(inSize << 1, inSize);
+            int newCap = Math.max(this.inSize << 1, inSize);
             ByteBuffer newBuffer = BufferUtils.createByteBuffer(newCap);
             buffer.limit(Math.min(inSize, this.inSize));
             buffer.position(0);
