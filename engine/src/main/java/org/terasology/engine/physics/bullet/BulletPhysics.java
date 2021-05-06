@@ -695,7 +695,7 @@ public class BulletPhysics implements PhysicsEngine {
         if (hull != null) {
             float[] positions = hull.sourceMesh.getVertices();
             FloatBuffer buffer = BufferUtils.createFloatBuffer(positions.length * 3);
-            for(int i = 0; i < positions.length; i+=3) {
+            for(int i = 0; i < (positions.length/3); i+=3) {
                 buffer.put(positions[i]);
                 buffer.put(positions[i + 1]);
                 buffer.put(positions[i + 2]);

@@ -33,7 +33,7 @@ public abstract class Mesh extends Asset<MeshData> {
                 Float.NEGATIVE_INFINITY);
             return dest;
         }
-        for(int x = 0; x < vertices.length; x+=3){
+        for(int x = 0; x < (vertices.length/3); x+=3){
             dest.union(vertices[x],vertices[x + 1],vertices[x + 2]);
         }
         return dest;
