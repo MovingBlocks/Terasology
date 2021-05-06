@@ -34,7 +34,6 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import gnu.trove.iterator.TFloatIterator;
-import org.terasology.joml.geom.AABBf;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
@@ -68,6 +67,7 @@ import org.terasology.engine.physics.engine.RigidBody;
 import org.terasology.engine.physics.engine.SweepCallback;
 import org.terasology.engine.registry.CoreRegistry;
 import org.terasology.engine.world.BlockEntityRegistry;
+import org.terasology.joml.geom.AABBf;
 
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
@@ -119,7 +119,7 @@ public class BulletPhysics implements PhysicsEngine {
         dispatcher = new btCollisionDispatcher(defaultCollisionConfiguration);
         sequentialImpulseConstraintSolver = new btSequentialImpulseConstraintSolver();
         discreteDynamicsWorld = new btDiscreteDynamicsWorld(dispatcher, broadphase, sequentialImpulseConstraintSolver, defaultCollisionConfiguration);
-        discreteDynamicsWorld.setGravity(new Vector3f(0f, -15f, 0f));
+        discreteDynamicsWorld.setGravity(new Vector3f(0f, -PhysicsEngine.GRAVITY, 0f));
         blockEntityRegistry = CoreRegistry.get(BlockEntityRegistry.class);
 
         discreteDynamicsWorld.getBroadphase().getOverlappingPairCache().setInternalGhostPairCallback(ghostPairCallback);
@@ -183,7 +183,7 @@ public class BulletPhysics implements PhysicsEngine {
         List<EntityRef> result = Lists.newArrayList();
         for (int i = 0; i < scanObject.getNumOverlappingObjects(); ++i) {
             btCollisionObject other = scanObject.getOverlappingObject(i);
-            Object userObj = other.getUserPointer();
+            Object userObj = other.userData;
             if (userObj instanceof EntityRef) {
                 result.add((EntityRef) userObj);
             }

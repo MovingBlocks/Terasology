@@ -7,24 +7,24 @@ import org.terasology.engine.core.SimpleUri;
 import org.terasology.engine.input.BindAxisEvent;
 import org.terasology.engine.input.BindButtonEvent;
 import org.terasology.engine.input.BindableButton;
-import org.terasology.input.ControllerInput;
 import org.terasology.engine.input.DefaultBinding;
-import org.terasology.input.Input;
-import org.terasology.input.Keyboard.KeyId;
-import org.terasology.input.MouseInput;
 import org.terasology.engine.input.RegisterBindAxis;
 import org.terasology.engine.input.RegisterBindButton;
 import org.terasology.engine.input.RegisterRealBindAxis;
 import org.terasology.engine.input.internal.AbstractBindableAxis;
 import org.terasology.engine.input.internal.BindableRealAxis;
-import org.terasology.module.ModuleEnvironment;
+import org.terasology.gestalt.module.ModuleEnvironment;
+import org.terasology.input.ControllerInput;
+import org.terasology.input.Input;
+import org.terasology.input.Keyboard.KeyId;
+import org.terasology.input.MouseInput;
 
 import java.util.List;
 import java.util.Map;
 
 /**
  * Manages all input bindings from the {@link ModuleEnvironment}.
- * The manager handles: 
+ * The manager handles:
  * <ul>
  * <li>Subclasses of {@link BindButtonEvent}, annotated with {@link RegisterBindButton}.</li>
  * <li>Subclasses of {@link BindAxisEvent}, annotated with {@link RegisterBindAxis} or {@link RegisterRealBindAxis}.</li>
@@ -33,7 +33,7 @@ import java.util.Map;
 public interface BindsManager {
 
     /**
-     * The actual binds config. This reflects the current status from {@link #updateDefaultBinds(Context)} 
+     * The actual binds config. This reflects the current status from {@link #updateDefaultBinds(Context)}
      * and all further modifications like modifications in the user input settings.
      * @return
      */
@@ -41,18 +41,18 @@ public interface BindsManager {
 
     /**
      * The default bindings. This reflects the current status from {@link #updateDefaultBinds(Context)}.
-     * @return Returns the default bindings. Changes to this config modify the actual instance 
+     * @return Returns the default bindings. Changes to this config modify the actual instance
      * but become invalid the next time {@link #updateConfigWithDefaultBinds()} is called.
      */
     BindsConfig getDefaultBindsConfig();
 
     /**
      * Updates the bindings with their defaults from the current {@link ModuleEnvironment}.
-     * After this call {@link #getDefaultBindsConfig()} contains all values for events with 
+     * After this call {@link #getDefaultBindsConfig()} contains all values for events with
      * {@link RegisterBindButton}, {@link RegisterBindAxis} and {@link RegisterRealBindAxis} which contain one ore more {@link DefaultBinding}.
-     * 
+     *
      * {@link #getBindsConfig()} will only be enhanced with missing values.
-     * 
+     *
      */
     void updateConfigWithDefaultBinds();
 

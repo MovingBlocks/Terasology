@@ -16,13 +16,13 @@
 
 package org.terasology.engine.core.module;
 
-import java.util.EnumSet;
-import java.util.Set;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.core.SimpleUri;
-import org.terasology.module.Module;
+import org.terasology.gestalt.module.Module;
+
+import java.util.EnumSet;
+import java.util.Set;
 
 /**
  * A set of standard module extensions.

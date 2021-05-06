@@ -11,10 +11,8 @@ plugins {
 // Grab all the common stuff like plugins to use, artifact repositories, code analysis config, etc
 apply from: "$rootDir/config/gradle/publish.gradle"
 
+
 import groovy.json.JsonSlurper
-import org.reflections.Reflections
-import org.reflections.scanners.SubTypesScanner
-import org.reflections.scanners.TypeAnnotationsScanner
 
 import java.text.SimpleDateFormat
 
@@ -105,15 +103,19 @@ dependencies {
     implementation group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '4.10'
 
     // Our developed libs
-    api group: 'org.terasology', name: 'gestalt-module', version: '5.1.5'
-    api group: 'org.terasology', name: 'gestalt-util', version: '5.1.5'
-    api group: 'org.terasology', name: 'gestalt-asset-core', version: '5.1.5'
+    api group: 'org.terasology.gestalt', name: 'gestalt-asset-core', version: '7.1.0-SNAPSHOT'
+    api group: 'org.terasology.gestalt', name: 'gestalt-module', version: '7.1.0-SNAPSHOT'
+    api group: 'org.terasology.gestalt', name: 'gestalt-util', version: '7.1.0-SNAPSHOT'
+    api "com.github.zafarkhaja:java-semver:0.10.0"  // ASAP: Remove after https://github.com/MovingBlocks/gestalt/pull/110
+
     api group: 'org.terasology', name: 'TeraMath', version: '1.5.0'
     api group: 'org.terasology', name: 'splash-screen', version: '1.1.1'
     api group: 'org.terasology.jnlua', name: 'JNLua', version: '0.1.0-SNAPSHOT'
     api group: 'org.terasology.jnbullet', name: 'JNBullet', version: '1.0.2'
-    api group: 'org.terasology.nui', name: 'nui', version: '1.5.0-SNAPSHOT'
-    api group: 'org.terasology.nui', name: 'nui-reflect', version: '1.5.0-SNAPSHOT'
+    api group: 'org.terasology.nui', name: 'nui', version: '3.0.0-SNAPSHOT'
+    api group: 'org.terasology.nui', name: 'nui-reflect', version: '3.0.0-SNAPSHOT'
+    api group: 'org.terasology.nui', name: 'nui-gestalt7', version: '3.0.0-SNAPSHOT'
+
 
     // Wildcard dependency to catch any libs provided with the project (remote repo preferred instead)
     api fileTree(dir: 'libs', include: '*.jar')
@@ -124,34 +126,13 @@ dependencies {
     // TODO: Consider moving this back to the PC Facade instead of having the engine rely on it?
     implementation group: 'org.terasology.crashreporter', name: 'cr-terasology', version: '4.1.0'
 
-   api(project(":subsystems:TypeHandlerLibrary"))
-}
-
-task cacheReflections {
-    description = 'Caches reflection output to make regular startup faster. May go stale and need cleanup at times.'
-    inputs.files sourceSets.main.output.classesDirs,
-            // getClassesDir from all sourceSets (for any jvm (seems) language)
-            configurations."${sourceSets.main.runtimeClasspathConfigurationName}"
-
-    outputs.upToDateWhen {classes.state.upToDate}
-    outputs.file("$buildDir/resources/main/reflections.cache")
-    dependsOn classes
-
-    doLast {
-        // Without the .mkdirs() we might hit a scenario where the classes dir doesn't exist yet
-        Reflections reflections = new org.reflections.Reflections(new org.reflections.util.ConfigurationBuilder()
-            .addUrls(inputs.files.collect { it.toURI().toURL() })
-            .setScanners(new TypeAnnotationsScanner(), new SubTypesScanner()))
-        reflections.save("$buildDir/classes/reflections.cache")
-    }
+    api(project(":subsystems:TypeHandlerLibrary"))
 }
 
 // Instructions for packaging a jar file for the engine
 jar {
     // Unlike the content modules Gradle grabs the assets as they're in a resources directory. Need to avoid dupes tho
     duplicatesStrategy = "EXCLUDE"
-
-    from(tasks.getByName("cacheReflections").outputs)
 
     doFirst {
         manifest {
@@ -161,11 +142,6 @@ jar {
             attributes("Class-Path": manifestClasspath, "Implementation-Title": "Terasology", "Implementation-Version": displayVersion + ", engine v" + project.version + " , build number " + env.BUILD_NUMBER)
         }
     }
-}
-
-task cleanReflections(type: Delete) {
-    description = 'Cleans the reflection cache. Useful in cases where it has gone stale and needs regeneration.'
-    delete cacheReflections.outputs.files
 }
 
 // JMH related tasks
@@ -194,7 +170,7 @@ dependencies {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // First read the internal version out of the engine's engine-module.txt
-def moduleFile = file('src/main/resources/engine-module.txt')
+def moduleFile = file('src/main/resources/org/terasology/engine/engine-module.txt')
 
 if (!moduleFile.exists()) {
     println "Failed to find engine-module.txt for engine"
@@ -240,7 +216,7 @@ def createVersionInfoFile = tasks.register("createVersionInfoFile", WritePropert
 
 tasks.named("processResources", Copy) {
     from(createVersionInfoFile) {
-        into("org/terasology/version/")
+        into("org/terasology/engine/version/")
     }
     from("$rootDir/docs") {
         include("Credits.md")
@@ -254,10 +230,11 @@ task copyResourcesToClasses(type: Copy) {
 
     dependsOn processResources
     mustRunAfter compileJava
-    classes.dependsOn copyResourcesToClasses
 }
 
-jar.dependsOn cacheReflections
+tasks.named("classes") {
+    dependsOn(tasks.named("copyResourcesToClasses"))
+}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // General IDE customization                                                                                         //

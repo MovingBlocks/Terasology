@@ -15,11 +15,11 @@
  */
 package org.terasology.engine.core.subsystem.headless.assets;
 
-import org.terasology.assets.AssetType;
-import org.terasology.assets.ResourceUrn;
 import org.terasology.engine.rendering.assets.shader.Shader;
 import org.terasology.engine.rendering.assets.shader.ShaderData;
 import org.terasology.engine.rendering.assets.shader.ShaderParameterMetadata;
+import org.terasology.gestalt.assets.AssetType;
+import org.terasology.gestalt.assets.ResourceUrn;
 
 import java.util.Collections;
 

@@ -17,7 +17,7 @@ package org.terasology.engine.audio;
 
 import org.joml.Quaternionfc;
 import org.joml.Vector3fc;
-import org.terasology.assets.AssetFactory;
+import org.terasology.gestalt.assets.AssetFactory;
 
 /**
  * Manages the playing of sounds and music as well as muting and updating listeners

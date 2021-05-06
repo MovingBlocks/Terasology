@@ -3,9 +3,9 @@
 package org.terasology.engine.world.block.shapes;
 
 import org.joml.Vector3f;
-import org.terasology.assets.Asset;
-import org.terasology.assets.AssetType;
-import org.terasology.assets.ResourceUrn;
+import org.terasology.gestalt.assets.Asset;
+import org.terasology.gestalt.assets.AssetType;
+import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.engine.math.Rotation;
 import org.terasology.engine.math.Side;
 import org.terasology.engine.physics.shapes.CollisionShape;

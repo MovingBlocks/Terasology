@@ -19,8 +19,6 @@ import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.assets.AssetType;
-import org.terasology.assets.ResourceUrn;
 import org.terasology.engine.core.GameThread;
 import org.terasology.engine.core.subsystem.lwjgl.LwjglGraphicsProcessing;
 import org.terasology.engine.registry.CoreRegistry;
@@ -30,6 +28,9 @@ import org.terasology.engine.rendering.assets.material.MaterialData;
 import org.terasology.engine.rendering.assets.shader.ShaderParameterMetadata;
 import org.terasology.engine.rendering.assets.shader.ShaderProgramFeature;
 import org.terasology.engine.rendering.assets.texture.Texture;
+import org.terasology.gestalt.assets.AssetType;
+import org.terasology.gestalt.assets.DisposableResource;
+import org.terasology.gestalt.assets.ResourceUrn;
 
 import java.nio.FloatBuffer;
 import java.util.Arrays;
@@ -60,17 +61,21 @@ public class GLSLMaterial extends BaseMaterial {
     private DisposalAction disposalAction;
     private MaterialData materialData;
 
-    public GLSLMaterial(ResourceUrn urn, AssetType<?, MaterialData> assetType, MaterialData data, LwjglGraphicsProcessing graphicsProcessing) {
-        super(urn, assetType);
+    public GLSLMaterial(ResourceUrn urn, AssetType<?, MaterialData> assetType, MaterialData data, LwjglGraphicsProcessing graphicsProcessing, GLSLMaterial.DisposalAction disposalAction) {
+        super(urn, assetType, disposalAction);
         this.graphicsProcessing = graphicsProcessing;
-        disposalAction = new DisposalAction(urn, graphicsProcessing);
-        getDisposalHook().setDisposeAction(disposalAction);
+        this.disposalAction = disposalAction;
         this.materialData = data;
         shaderManager = CoreRegistry.get(ShaderManager.class);
         graphicsProcessing.asynchToDisplayThread(() -> {
             reload(data);
         });
     }
+
+    public static GLSLMaterial create(ResourceUrn urn, LwjglGraphicsProcessing graphicsProcessing, AssetType<?, MaterialData> assetType, MaterialData data) {
+        return new GLSLMaterial(urn, assetType, data, graphicsProcessing, new DisposalAction(urn, graphicsProcessing));
+    }
+
 
     @Override
     public void enable() {
@@ -138,7 +143,7 @@ public class GLSLMaterial extends BaseMaterial {
     public final void doReload(MaterialData data) {
         try {
             GameThread.synch(() -> {
-                disposalAction.run();
+                disposalAction.close();
                 uniformLocationMap.clear();
 
                 shader = (GLSLShader) data.getShader();
@@ -619,7 +624,7 @@ public class GLSLMaterial extends BaseMaterial {
         }
     }
 
-    private static class DisposalAction implements Runnable {
+    private static class DisposalAction implements DisposableResource {
 
         private final ResourceUrn urn;
         private final LwjglGraphicsProcessing graphicsProcessing;
@@ -632,8 +637,9 @@ public class GLSLMaterial extends BaseMaterial {
             this.graphicsProcessing = graphicsProcessing;
         }
 
+
         @Override
-        public void run() {
+        public void close() {
             try {
                 GameThread.synch(() -> {
                     logger.debug("Disposing material {}.", urn);

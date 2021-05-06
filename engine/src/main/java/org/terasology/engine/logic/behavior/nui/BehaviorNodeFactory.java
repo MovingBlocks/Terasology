@@ -4,8 +4,8 @@ package org.terasology.engine.logic.behavior.nui;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import org.terasology.assets.ResourceUrn;
-import org.terasology.assets.management.AssetManager;
+import org.terasology.gestalt.assets.ResourceUrn;
+import org.terasology.gestalt.assets.management.AssetManager;
 import org.terasology.engine.audio.StaticSound;
 import org.terasology.engine.audio.StreamingSound;
 import org.terasology.engine.core.ComponentFieldUri;
@@ -115,7 +115,7 @@ public class BehaviorNodeFactory extends BaseComponentSystem {
     private List<ComponentFieldUri> determineAnimationPoolUris() {
         final List<ComponentFieldUri> animationSetUris = Lists.newArrayList();
         for (ComponentMetadata<?> componentMetadata : componentLibrary.iterateComponentMetadata()) {
-            SimpleUri uri = new SimpleUri(componentMetadata.getUri().toString());
+            SimpleUri uri = new SimpleUri(componentMetadata.getId().toString());
 
             for (FieldMetadata<?, ?> fieldMetadata : componentMetadata.getFields()) {
                 if (fieldMetadata.getType().isAssignableFrom(List.class)) {

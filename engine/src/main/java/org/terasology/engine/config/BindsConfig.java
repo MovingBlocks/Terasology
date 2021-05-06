@@ -34,7 +34,7 @@ import org.terasology.input.InputType;
 import org.terasology.input.Keyboard.KeyId;
 import org.terasology.engine.input.RegisterBindButton;
 import org.terasology.engine.input.binds.movement.ForwardsButton;
-import org.terasology.naming.Name;
+import org.terasology.gestalt.naming.Name;
 
 import java.lang.reflect.Type;
 import java.util.Arrays;

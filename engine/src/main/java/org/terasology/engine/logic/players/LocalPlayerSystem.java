@@ -6,8 +6,8 @@ import org.joml.Math;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
-import org.terasology.assets.ResourceUrn;
 import org.terasology.engine.config.Config;
+import org.terasology.engine.config.PlayerConfig;
 import org.terasology.engine.core.SimpleUri;
 import org.terasology.engine.core.Time;
 import org.terasology.engine.core.subsystem.config.BindsManager;
@@ -17,15 +17,6 @@ import org.terasology.engine.entitySystem.event.ReceiveEvent;
 import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
 import org.terasology.engine.entitySystem.systems.RenderSystem;
 import org.terasology.engine.entitySystem.systems.UpdateSubscriberSystem;
-import org.terasology.engine.logic.characters.CharacterComponent;
-import org.terasology.engine.logic.characters.CharacterMoveInputEvent;
-import org.terasology.engine.logic.characters.CharacterMovementComponent;
-import org.terasology.engine.logic.characters.MovementMode;
-import org.terasology.engine.logic.location.LocationComponent;
-import org.terasology.engine.logic.players.event.LocalPlayerInitializedEvent;
-import org.terasology.engine.logic.players.event.OnPlayerSpawnedEvent;
-import org.terasology.input.ButtonState;
-import org.terasology.input.Input;
 import org.terasology.engine.input.InputSystem;
 import org.terasology.engine.input.binds.interaction.FrobButton;
 import org.terasology.engine.input.binds.inventory.UseItemButton;
@@ -45,12 +36,18 @@ import org.terasology.engine.input.binds.movement.VerticalMovementAxis;
 import org.terasology.engine.input.binds.movement.VerticalRealMovementAxis;
 import org.terasology.engine.input.events.MouseAxisEvent;
 import org.terasology.engine.input.events.MouseAxisEvent.MouseAxis;
-import org.terasology.joml.geom.AABBf;
+import org.terasology.engine.logic.characters.CharacterComponent;
 import org.terasology.engine.logic.characters.CharacterHeldItemComponent;
+import org.terasology.engine.logic.characters.CharacterMoveInputEvent;
+import org.terasology.engine.logic.characters.CharacterMovementComponent;
+import org.terasology.engine.logic.characters.MovementMode;
 import org.terasology.engine.logic.characters.events.OnItemUseEvent;
 import org.terasology.engine.logic.characters.events.ScaleToRequest;
 import org.terasology.engine.logic.characters.interactions.InteractionUtil;
 import org.terasology.engine.logic.delay.DelayManager;
+import org.terasology.engine.logic.location.LocationComponent;
+import org.terasology.engine.logic.players.event.LocalPlayerInitializedEvent;
+import org.terasology.engine.logic.players.event.OnPlayerSpawnedEvent;
 import org.terasology.engine.network.ClientComponent;
 import org.terasology.engine.network.NetworkMode;
 import org.terasology.engine.network.NetworkSystem;
@@ -65,6 +62,10 @@ import org.terasology.engine.world.WorldProvider;
 import org.terasology.engine.world.block.Block;
 import org.terasology.engine.world.block.BlockComponent;
 import org.terasology.engine.world.block.regions.BlockRegionComponent;
+import org.terasology.gestalt.assets.ResourceUrn;
+import org.terasology.input.ButtonState;
+import org.terasology.input.Input;
+import org.terasology.joml.geom.AABBf;
 
 import java.util.List;
 
@@ -86,6 +87,8 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
 
     @In
     private Config config;
+    @In
+    private PlayerConfig playerConfig;
     @In
     private InputSystem inputSystem;
 
@@ -224,7 +227,7 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
     public void onPlayerSpawn(OnPlayerSpawnedEvent event, EntityRef character) {
         if (character.equals(localPlayer.getCharacterEntity())) {
             // update character height as given in player settings
-            ScaleToRequest scaleRequest = new ScaleToRequest(config.getPlayer().getHeight());
+            ScaleToRequest scaleRequest = new ScaleToRequest(playerConfig.height.get());
             localPlayer.getCharacterEntity().send(scaleRequest);
 
             // Trigger updating the player camera position as soon as the local player is spawned.
@@ -262,7 +265,7 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
 
     @ReceiveEvent(components = {CharacterComponent.class, CharacterMovementComponent.class})
     public void onJump(JumpButton event, EntityRef entity) {
-        if (event.getState() == ButtonState.DOWN) {
+        if (event.isDown()) {
             jump = true;
             event.consume();
         } else {

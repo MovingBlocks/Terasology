@@ -13,7 +13,7 @@ import org.terasology.engine.logic.console.Console;
 import org.terasology.engine.logic.console.ConsoleColors;
 import org.terasology.engine.logic.console.CoreMessageType;
 import org.terasology.engine.logic.console.Message;
-import org.terasology.naming.Name;
+import org.terasology.gestalt.naming.Name;
 import org.terasology.nui.FontColor;
 import org.terasology.engine.utilities.CamelCaseMatcher;
 

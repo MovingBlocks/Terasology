@@ -4,7 +4,7 @@
 package org.terasology.engine.persistence.typeHandling.extensionTypes;
 
 import com.google.common.base.Strings;
-import org.terasology.assets.Asset;
+import org.terasology.gestalt.assets.Asset;
 import org.terasology.engine.utilities.Assets;
 import org.terasology.persistence.typeHandling.StringRepresentationTypeHandler;
 

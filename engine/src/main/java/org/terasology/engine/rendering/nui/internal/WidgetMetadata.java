@@ -3,7 +3,7 @@
 package org.terasology.engine.rendering.nui.internal;
 
 import com.google.common.base.Predicate;
-import org.terasology.assets.ResourceUrn;
+import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.nui.LayoutConfig;
 import org.terasology.nui.UIWidget;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
@@ -28,7 +28,7 @@ public class WidgetMetadata<T extends UIWidget> extends ClassMetadata<T, FieldMe
      * @throws NoSuchMethodException If the class has no default constructor
      */
     public WidgetMetadata(ResourceUrn uri, Class<T> type, ReflectFactory factory, CopyStrategyLibrary copyStrategyLibrary) throws NoSuchMethodException {
-        super(uri, type, factory, copyStrategyLibrary, IsConfigField.INSTANCE);
+        super(uri.toString(), type, factory, copyStrategyLibrary, IsConfigField.INSTANCE);
     }
 
     @Override

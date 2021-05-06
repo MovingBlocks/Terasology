@@ -6,7 +6,7 @@ package org.terasology.engine.world.block;
 import org.joml.Vector3fc;
 import org.joml.Vector3i;
 import org.terasology.math.TeraMath;
-import org.terasology.module.sandbox.API;
+import org.terasology.gestalt.module.sandbox.API;
 
 /**
  * Utility class for common block-related operations.

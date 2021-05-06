@@ -4,98 +4,92 @@ package org.terasology.engine.core.module;
 
 import com.google.common.collect.Sets;
 import org.reflections.Reflections;
-import org.reflections.serializers.Serializer;
-import org.reflections.serializers.XmlSerializer;
+import org.reflections.scanners.Scanner;
+import org.reflections.util.ClasspathHelper;
+import org.reflections.util.ConfigurationBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.assets.Asset;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.config.SystemConfig;
 import org.terasology.engine.core.TerasologyConstants;
 import org.terasology.engine.core.paths.PathManager;
-import org.terasology.engine.utilities.Jvm;
-import org.terasology.input.device.KeyboardDevice;
-import org.terasology.module.ClasspathModule;
-import org.terasology.module.DependencyInfo;
-import org.terasology.module.Module;
-import org.terasology.module.ModuleEnvironment;
-import org.terasology.module.ModuleLoader;
-import org.terasology.module.ModuleMetadata;
-import org.terasology.module.ModuleMetadataJsonAdapter;
-import org.terasology.module.ModulePathScanner;
-import org.terasology.module.ModuleRegistry;
-import org.terasology.module.TableModuleRegistry;
-import org.terasology.module.sandbox.APIScanner;
-import org.terasology.module.sandbox.ModuleSecurityManager;
-import org.terasology.module.sandbox.ModuleSecurityPolicy;
-import org.terasology.module.sandbox.PermissionProvider;
-import org.terasology.module.sandbox.PermissionProviderFactory;
-import org.terasology.module.sandbox.StandardPermissionProviderFactory;
-import org.terasology.module.sandbox.WarnOnlyProviderFactory;
-import org.terasology.nui.UIWidget;
-import org.terasology.reflection.TypeRegistry;
+import org.terasology.gestalt.module.Module;
+import org.terasology.gestalt.module.ModuleEnvironment;
+import org.terasology.gestalt.module.ModuleFactory;
+import org.terasology.gestalt.module.ModuleMetadataJsonAdapter;
+import org.terasology.gestalt.module.ModuleMetadataLoader;
+import org.terasology.gestalt.module.ModulePathScanner;
+import org.terasology.gestalt.module.ModuleRegistry;
+import org.terasology.gestalt.module.TableModuleRegistry;
+import org.terasology.gestalt.module.dependencyresolution.DependencyInfo;
+import org.terasology.gestalt.module.dependencyresolution.DependencyResolver;
+import org.terasology.gestalt.module.dependencyresolution.ResolutionResult;
+import org.terasology.gestalt.module.sandbox.APIScanner;
+import org.terasology.gestalt.module.sandbox.ModuleSecurityManager;
+import org.terasology.gestalt.module.sandbox.ModuleSecurityPolicy;
+import org.terasology.gestalt.module.sandbox.PermissionProvider;
+import org.terasology.gestalt.module.sandbox.PermissionProviderFactory;
+import org.terasology.gestalt.module.sandbox.StandardPermissionProviderFactory;
+import org.terasology.gestalt.module.sandbox.WarnOnlyProviderFactory;
+import org.terasology.gestalt.naming.Name;
 
+import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
 import java.lang.reflect.ReflectPermission;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.security.Policy;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static com.google.common.base.Verify.verifyNotNull;
-
 public class ModuleManager {
-    /** Set this environment variable to "true" to load all modules in the classpath by default. */
-    public final static String LOAD_CLASSPATH_MODULES_ENV = "TERASOLOGY_LOAD_CLASSPATH_MODULES";
+    /** Set this property to "true" to allow modules on the classpath. */
     public final static String LOAD_CLASSPATH_MODULES_PROPERTY = "org.terasology.load_classpath_modules";
 
     private static final Logger logger = LoggerFactory.getLogger(ModuleManager.class);
     private final StandardPermissionProviderFactory permissionProviderFactory = new StandardPermissionProviderFactory();
-    private final PermissionProviderFactory wrappingPermissionProviderFactory = new WarnOnlyProviderFactory(permissionProviderFactory);
+    private final PermissionProviderFactory wrappingPermissionProviderFactory =
+            new WarnOnlyProviderFactory(permissionProviderFactory);
 
     private final ModuleRegistry registry;
     private ModuleEnvironment environment;
     private final ModuleMetadataJsonAdapter metadataReader;
+    private final ModuleFactory moduleFactory;
     private final ModuleInstallManager installManager;
-    private Module engineModule;
+    private final Module engineModule;
 
     public ModuleManager(String masterServerAddress) {
         this(masterServerAddress, Collections.emptyList());
     }
 
     public ModuleManager(String masterServerAddress, List<Class<?>> classesOnClasspathsToAddToEngine) {
-        this(masterServerAddress, classesOnClasspathsToAddToEngine, null);
-    }
-
-    public ModuleManager(String masterServerAddress, List<Class<?>> classesOnClasspathsToAddToEngine, Boolean loadModulesFromClasspath) {
         PathManager pathManager = PathManager.getInstance();  // get early so if it needs to initialize, it does it now
 
         metadataReader = newMetadataReader();
 
-        engineModule = loadEngineModule(classesOnClasspathsToAddToEngine);
+        if (Boolean.getBoolean(LOAD_CLASSPATH_MODULES_PROPERTY)) {
+            moduleFactory = new ClasspathCompromisingModuleFactory();
+        } else {
+            moduleFactory = new ModuleFactory();
+        }
+        moduleFactory.setDefaultLibsSubpath("build/libs");
+
+        Map<String, ModuleMetadataLoader> mmlm = moduleFactory.getModuleMetadataLoaderMap();
+        mmlm.put(TerasologyConstants.MODULE_INFO_FILENAME.toString(), metadataReader);
+        mmlm.put("engine-module.txt", metadataReader);  // FIXME: this should be *only* for engine-module.
+        // FIXME: …or maybe engine-module doesn't need a special filename anymore?
 
         registry = new TableModuleRegistry();
-        registry.add(engineModule);
 
-        if (doLoadModulesFromClasspath(loadModulesFromClasspath)) {
-            loadModulesFromClassPath();
-        } else {
-            logger.info("Not loading classpath modules.");
-        }
+        engineModule = loadEngineModule(classesOnClasspathsToAddToEngine);
 
         loadModulesFromApplicationPath(pathManager);
 
-        ensureModulesDependOnEngine(engineModule);
+        ensureModulesDependOnEngine();
 
         setupSandbox();
         loadEnvironment(Sets.newHashSet(engineModule), true);
@@ -104,48 +98,60 @@ public class ModuleManager {
 
     /**
      * I wondered why this is important, and found MovingBlocks/Terasology#1450.
-     * It's not a worry that the engine module wouldn't be loaded without it. 
-     * It's about ordering: some things run in an order derived from the dependency 
+     * It's not a worry that the engine module wouldn't be loaded without it.
+     * It's about ordering: some things run in an order derived from the dependency
      * tree, and we want to make sure engine is at the root of it.
-     */   
-    private void ensureModulesDependOnEngine(Module engineModule) {
+     */
+    private void ensureModulesDependOnEngine() {
         DependencyInfo engineDep = new DependencyInfo();
         engineDep.setId(engineModule.getId());
         engineDep.setMinVersion(engineModule.getVersion());
-        engineDep.setMaxVersion(engineModule.getVersion().getNextPatchVersion());
 
-        registry.stream().filter(mod -> mod != engineModule).forEach(mod -> mod.getMetadata().getDependencies().add(engineDep));
+        HashSet<Name> engineModules = Sets.newHashSet(engineModule.getId());
+        engineModules.addAll(engineModule.getMetadata().getDependencies().stream().map(DependencyInfo::getId).collect(Collectors.toList()));
+
+        registry.stream()
+                .filter(mod -> !engineModules.contains(mod.getId()))
+                .forEach(mod -> mod.getMetadata().getDependencies().add(engineDep));
     }
 
     private void loadModulesFromApplicationPath(PathManager pathManager) {
-        ModulePathScanner scanner = new ModulePathScanner(new ModuleLoader(metadataReader));
-        scanner.getModuleLoader().setModuleInfoPath(TerasologyConstants.MODULE_INFO_FILENAME);
-        scanner.scan(registry, pathManager.getModulePaths());
+        ModulePathScanner scanner = new ModulePathScanner(moduleFactory);
+        List<File> paths = pathManager.getModulePaths().stream().map(Path::toFile).collect(Collectors.toList());
+        scanner.scan(registry, paths);
     }
 
     private Module loadEngineModule(List<Class<?>> classesOnClasspathsToAddToEngine) {
-        Module engineModule;
-        try (Reader reader = new InputStreamReader(getClass().getResourceAsStream("/engine-module.txt"), TerasologyConstants.CHARSET)) {
-            ModuleMetadata metadata = metadataReader.read(reader);
-            List<Class<?>> additionalClassesList = new ArrayList<>(classesOnClasspathsToAddToEngine.size() + 2);
-            additionalClassesList.add(Module.class); // provide access to gestalt-module.jar
-            additionalClassesList.add(Asset.class); // provide access to gestalt-asset-core.jar
-            additionalClassesList.add(UIWidget.class); // provide access to nui.jar
-            additionalClassesList.add(TypeRegistry.class); // provide access to nui-reflect.jar
-            additionalClassesList.add(KeyboardDevice.class); // provide access to nui-input.jar
-            additionalClassesList.addAll(classesOnClasspathsToAddToEngine); // provide access to any facade-provided classes
-            Class<?>[] additionalClassesArray = new Class[additionalClassesList.size()];
-            additionalClassesArray = additionalClassesList.toArray(additionalClassesArray);
-            engineModule = ClasspathModule.create(metadata, getClass(), additionalClassesArray);
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to read engine metadata", e);
-        } catch (URISyntaxException e) {
-            throw new RuntimeException("Failed to convert engine library location to path", e);
+        Module packageModule = moduleFactory.createPackageModule("org.terasology.engine");
+
+        // We need to add reflections from our subsystems and other classes.
+        ConfigurationBuilder config = new ConfigurationBuilder();
+        Reflections packageReflections = packageModule.getModuleManifest();
+        Set<Scanner> scanners = packageReflections.getConfiguration().getScanners();
+        config.setScanners(scanners.toArray(new Scanner[0]));
+
+        for (Class<?> aClass : classesOnClasspathsToAddToEngine) {
+            config.addUrls(ClasspathHelper.forClass(aClass));
         }
 
-        enrichReflectionsWithSubsystems(engineModule);
+        // TODO: is this using reflections.cache?
+        Reflections reflectionsWithSubsystems = new Reflections(config);
+        packageReflections.merge(reflectionsWithSubsystems);
 
-        return engineModule;
+        // We need the class predicate to include classes in subsystems and whatnot. We can't change it in an
+        // existing module, so make a new one based on the one from the moduleFactory.
+        Module engine = new Module(
+                packageModule.getMetadata(),
+                packageModule.getResources(),
+                Collections.emptyList(),
+                packageReflections,
+                packageModule.getClassPredicate().or(clazz ->
+                        reflectionsWithSubsystems.getConfiguration()
+                                .getUrls().contains(ClasspathHelper.forClass(clazz)))
+        );
+
+        registry.add(engine);
+        return engine;
     }
 
     public ModuleManager(Config config) {
@@ -167,114 +173,14 @@ public class ModuleManager {
         return metadataJsonAdapter;
     }
 
-    boolean doLoadModulesFromClasspath(Boolean loadModulesFromClasspath) {
-        boolean env = Boolean.parseBoolean(System.getenv(LOAD_CLASSPATH_MODULES_ENV));
-        boolean prop = Boolean.getBoolean(LOAD_CLASSPATH_MODULES_PROPERTY);
-        boolean useClasspath;
-        if (loadModulesFromClasspath != null) {
-            useClasspath = loadModulesFromClasspath;
-        } else {
-            useClasspath = env || prop;
-        }
-        logger.debug("Load modules from classpath? {} [arg: {}, env: {}, property: {}]",
-                useClasspath,
-                loadModulesFromClasspath,
-                System.getenv(LOAD_CLASSPATH_MODULES_ENV),
-                System.getProperty(LOAD_CLASSPATH_MODULES_PROPERTY));
-        return useClasspath;
-    }
-
-    /**
-     * Overrides modules in modules/ with those specified via -classpath in the JVM
-     */
-    void loadModulesFromClassPath() {
-        logger.debug("loadModulesFromClassPath with classpath:");
-        Jvm.logClasspath(logger);
-
-        ModuleLoader loader = new ClasspathSupportingModuleLoader(metadataReader, true, true);
-        loader.setModuleInfoPath(TerasologyConstants.MODULE_INFO_FILENAME);
-
-        List<Path> classPaths = Arrays.stream(
-                System.getProperty("java.class.path").split(System.getProperty("path.separator", ":"))
-        ).map(Paths::get).collect(Collectors.toList());
-
-        // I thought I'd make the ClasspathSupporting stuff in the shape of a ModuleLoader
-        // so I could use it with the existing ModulePathScanner, but no. The inputs to that
-        // are the _parent directories_ of what we have.
-        for (Path path : classPaths) {
-            attemptToLoadAsClasspathModule(loader, path);
-        }
-    }
-
-    /**
-     * Attempt to load a module from the given path.
-     *
-     * Assumes that the path <em>may or may not</em> contain a Terasology module. Will add the module to
-     * {@link #registry} if successful.
-     *
-     * For troubleshooting failure cases, check for log messages from this package and from {@link ModuleLoader}.
-     *
-     * @param loader the module loader to use
-     * @param path the path to the jar or directory
-     */
-    public void attemptToLoadAsClasspathModule(ModuleLoader loader, Path path) {
-        // The conditions here mirror those of org.terasology.module.ModulePathScanner.loadModule
-        Module module;
-        try {
-            module = loader.load(path);
-        } catch (IOException e) {
-            logger.warn("Failed to load module from classpath at {}", path, e);
-            return;
-        }
-
-        if (module == null) {
-            return;
-        }
-
-        boolean isNew = registry.add(module);
-        if (isNew) {
-            logger.info("Added new module: {} from {} on classpath", module, path.getFileName());
-        } else {
-            logger.warn("Skipped duplicate module: {}-{} from {} on classpath",
-                    module.getId(), module.getVersion(), path.getFileName());
-        }
-    }
-
-    /**
-     * Load a module from the location containing a class.
-     *
-     * Assumes that the location <em>should</em> contain a Terasology module. Will add the module to
-     * {@link #registry} and return the resulting module if successful.
-     *
-     * May throw IOException or RuntimeExceptions on failure.
-     *
-     * For troubleshooting failure cases, check for log messages from this package and from {@link ModuleLoader}.
-     *
-     * @param clazz a class in the module, see {@link ClasspathModule#create}
-     */
-    public Module loadClasspathModule(Class<?> clazz) throws IOException {
-        ClasspathSupportingModuleLoader loader = new ClasspathSupportingModuleLoader(metadataReader, true, false);
-        loader.setModuleInfoPath(TerasologyConstants.MODULE_INFO_FILENAME);
-
-        Module module = verifyNotNull(loader.load(clazz), "Failed to load module from %s", clazz);
-        boolean isNew = registry.add(module);
-        if (isNew) {
-            logger.info("Added new module: {} from {} on classpath", module, module.getClasspaths());
-        } else {
-            logger.warn("Skipped duplicate module: {}-{} from {} on classpath",
-                    module.getId(), module.getVersion(), module.getClasspaths());
-        }
-        return module;
-    }
-
     private void setupSandbox() {
         ExternalApiWhitelist.CLASSES.stream().forEach(clazz ->
                 permissionProviderFactory.getBasePermissionSet().addAPIClass(clazz));
         ExternalApiWhitelist.PACKAGES.stream().forEach(packagee ->
                 permissionProviderFactory.getBasePermissionSet().addAPIPackage(packagee));
 
-        APIScanner apiScanner = new APIScannerTolerantOfAssetOnlyModules(permissionProviderFactory);
-        apiScanner.scan(registry);
+        APIScanner apiScanner = new APIScanner(permissionProviderFactory);
+        registry.stream().map(Module::getModuleManifest).forEach(apiScanner::scan);
 
         permissionProviderFactory.getBasePermissionSet().grantPermission("com.google.gson", ReflectPermission.class);
         permissionProviderFactory.getBasePermissionSet().grantPermission("com.google.gson.internal", ReflectPermission.class);
@@ -283,6 +189,12 @@ public class ModuleManager {
         System.setSecurityManager(new ModuleSecurityManager());
     }
 
+    /**
+     * the registry this ModuleManager uses internally
+     *
+     * @deprecated Use {@link #resolveAndLoadEnvironment} if you need module dependency resolution.
+     */
+    @Deprecated(/*since="4.4.0"*/)
     public ModuleRegistry getRegistry() {
         return registry;
     }
@@ -295,15 +207,48 @@ public class ModuleManager {
         return environment;
     }
 
+    /** Create and register a new module for this package. */
+    public Module registerPackageModule(String packageName) {
+        Module module = moduleFactory.createPackageModule(packageName);
+        registry.add(module);
+        ensureModulesDependOnEngine();
+        return module;
+    }
+
+    /** Load and register a new module for this file. */
+    @SuppressWarnings("UnusedReturnValue")
+    public Module registerArchiveModule(Path path) throws IOException {
+        Module module = moduleFactory.createArchiveModule(path.toFile());
+        registry.add(module);
+        ensureModulesDependOnEngine();
+        return module;
+    }
+
+    public void resolveAndLoadEnvironment(Name... modules) {
+        resolveAndLoadEnvironment(Arrays.asList(modules));
+    }
+
+    public void resolveAndLoadEnvironment(Iterable<Name> modules) {
+        DependencyResolver resolver = new DependencyResolver(registry);
+        ResolutionResult result = resolver.resolve(modules);
+
+        if (!result.isSuccess()) {
+            // TODO: worth its own exception class?
+            throw new RuntimeException("Failed to resolve dependencies for " + modules);
+        }
+
+        loadEnvironment(result.getModules(), true);
+    }
+
     public ModuleEnvironment loadEnvironment(Set<Module> modules, boolean asPrimary) {
         Set<Module> finalModules = Sets.newLinkedHashSet(modules);
         finalModules.add(engineModule);
         ModuleEnvironment newEnvironment;
         boolean permissiveSecurityEnabled = Boolean.parseBoolean(System.getProperty(SystemConfig.PERMISSIVE_SECURITY_ENABLED_PROPERTY));
         if (permissiveSecurityEnabled) {
-            newEnvironment = new ModuleEnvironment(finalModules, wrappingPermissionProviderFactory, Collections.emptyList());
+            newEnvironment = new ModuleEnvironment(finalModules, wrappingPermissionProviderFactory);
         } else {
-            newEnvironment = new ModuleEnvironment(finalModules, permissionProviderFactory, Collections.emptyList());
+            newEnvironment = new ModuleEnvironment(finalModules, permissionProviderFactory);
         }
         if (asPrimary) {
             environment = newEnvironment;
@@ -312,26 +257,15 @@ public class ModuleManager {
     }
 
     public ModuleMetadataJsonAdapter getModuleMetadataReader() {
+        // FIXME: is this used anywhere? (MTE?)
         return metadataReader;
     }
 
-    private void enrichReflectionsWithSubsystems(Module engineModule) {
-        Serializer serializer = new XmlSerializer();
-        try {
-            Enumeration<URL> urls = ModuleManager.class.getClassLoader().getResources("reflections.cache");
-            while (urls.hasMoreElements()) {
-                URL url = urls.nextElement();
-                if (url.getPath().contains("subsystem")) {
-                    Reflections subsystemReflections = serializer.read(url.openStream());
-                    engineModule.getReflectionsFragment().merge(subsystemReflections);
-                }
-            }
-        } catch (IOException e) {
-            logger.error("Cannot enrich engine's reflections with subsystems");
-        }
+    public ModuleFactory getModuleFactory() {
+        return moduleFactory;
     }
 
     public PermissionProvider getPermissionProvider(Module module) {
-        return permissionProviderFactory.createPermissionProviderFor(module);
+        return permissionProviderFactory.createPermissionProviderFor(module, module.getClassPredicate());
     }
 }

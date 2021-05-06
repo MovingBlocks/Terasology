@@ -17,13 +17,13 @@ package org.terasology.engine.core.subsystem.openvr;
 
 import jopenvr.VRControllerState_t;
 import org.joml.Matrix4f;
-import org.terasology.input.ButtonState;
-import org.terasology.input.ControllerDevice;
-import org.terasology.input.InputType;
-import org.terasology.input.device.ControllerAction;
 import org.terasology.engine.rendering.openvrprovider.ControllerListener;
 import org.terasology.engine.rendering.openvrprovider.OpenVRUtil;
+import org.terasology.input.ButtonState;
+import org.terasology.input.ControllerDevice;
 import org.terasology.input.ControllerId;
+import org.terasology.input.InputType;
+import org.terasology.input.device.ControllerAction;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;

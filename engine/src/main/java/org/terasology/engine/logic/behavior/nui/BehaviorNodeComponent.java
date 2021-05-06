@@ -3,7 +3,7 @@
 package org.terasology.engine.logic.behavior.nui;
 
 import org.terasology.engine.entitySystem.Component;
-import org.terasology.module.sandbox.API;
+import org.terasology.gestalt.module.sandbox.API;
 import org.terasology.nui.Color;
 
 /**

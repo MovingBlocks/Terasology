@@ -18,7 +18,7 @@ package org.terasology.engine.entitySystem.metadata;
 import com.google.common.base.Predicates;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.assets.ResourceUrn;
+import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.reflection.metadata.ClassMetadata;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.reflect.InaccessibleFieldException;
@@ -41,7 +41,7 @@ public class EventMetadata<T extends Event> extends ClassMetadata<T, ReplicatedF
     private boolean skipInstigator;
 
     public EventMetadata(Class<T> simpleClass, CopyStrategyLibrary copyStrategies, ReflectFactory factory, ResourceUrn uri) throws NoSuchMethodException {
-        super(uri, simpleClass, factory, copyStrategies, Predicates.<Field>alwaysTrue());
+        super(uri.toString(), simpleClass, factory, copyStrategies, Predicates.<Field>alwaysTrue());
         if (simpleClass.getAnnotation(ServerEvent.class) != null) {
             networkEventType = NetworkEventType.SERVER;
             lagCompensated = simpleClass.getAnnotation(ServerEvent.class).lagCompensate();

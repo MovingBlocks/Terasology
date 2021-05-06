@@ -20,34 +20,35 @@ import com.snowplowanalytics.snowplow.tracker.emitter.Emitter;
 import org.reflections.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.assets.ResourceUrn;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.config.ServerInfo;
 import org.terasology.engine.config.TelemetryConfig;
 import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.engine.i18n.TranslationSystem;
-import org.terasology.module.DependencyResolver;
-import org.terasology.module.Module;
-import org.terasology.module.ModuleEnvironment;
-import org.terasology.module.ResolutionResult;
-import org.terasology.module.predicates.FromModule;
-import org.terasology.naming.Name;
-import org.terasology.nui.WidgetUtil;
 import org.terasology.engine.registry.In;
 import org.terasology.engine.rendering.nui.CoreScreenLayer;
 import org.terasology.engine.rendering.nui.NUIManager;
 import org.terasology.engine.rendering.nui.animation.MenuAnimationSystems;
+import org.terasology.engine.rendering.nui.layers.mainMenu.AddServerPopup;
+import org.terasology.engine.telemetry.logstash.TelemetryLogstashAppender;
+import org.terasology.engine.telemetry.metrics.Metric;
+import org.terasology.gestalt.assets.ResourceUrn;
+import org.terasology.gestalt.module.Module;
+import org.terasology.gestalt.module.ModuleEnvironment;
+import org.terasology.gestalt.module.dependencyresolution.DependencyResolver;
+import org.terasology.gestalt.module.dependencyresolution.ResolutionResult;
+import org.terasology.gestalt.module.predicates.FromModule;
+import org.terasology.gestalt.module.resources.DirectoryFileSource;
+import org.terasology.gestalt.naming.Name;
+import org.terasology.nui.WidgetUtil;
 import org.terasology.nui.databinding.BindHelper;
 import org.terasology.nui.databinding.Binding;
-import org.terasology.engine.rendering.nui.layers.mainMenu.AddServerPopup;
 import org.terasology.nui.layouts.ColumnLayout;
 import org.terasology.nui.layouts.RowLayout;
 import org.terasology.nui.layouts.ScrollableArea;
 import org.terasology.nui.widgets.UICheckbox;
 import org.terasology.nui.widgets.UILabel;
 import org.terasology.nui.widgets.UISpace;
-import org.terasology.engine.telemetry.logstash.TelemetryLogstashAppender;
-import org.terasology.engine.telemetry.metrics.Metric;
 
 import java.lang.reflect.Field;
 import java.net.URL;
@@ -292,7 +293,7 @@ public class TelemetryScreen extends CoreScreenLayer {
         DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
         for (Name moduleId : moduleManager.getRegistry().getModuleIds()) {
             Module module = moduleManager.getRegistry().getLatestModuleVersion(moduleId);
-            if (module.isCodeModule()) {
+            if (module.getResources() instanceof DirectoryFileSource) {
                 ResolutionResult result = resolver.resolve(moduleId);
                 if (result.isSuccess()) {
                     try (ModuleEnvironment environment = moduleManager.loadEnvironment(result.getModules(), false)) {

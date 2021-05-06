@@ -6,22 +6,25 @@ import com.google.common.collect.Queues;
 import com.google.gson.annotations.SerializedName;
 import org.reflections.ReflectionUtils;
 import org.terasology.engine.core.module.ModuleContext;
+import org.terasology.engine.rendering.nui.NUIManager;
 import org.terasology.engine.rendering.nui.editor.layers.NUIEditorScreen;
 import org.terasology.engine.rendering.nui.editor.layers.NUISkinEditorScreen;
+import org.terasology.engine.utilities.ReflectionUtil;
 import org.terasology.nui.UILayout;
 import org.terasology.nui.UIWidget;
 import org.terasology.nui.layouts.relative.RelativeLayout;
 import org.terasology.nui.skin.UIStyleFragment;
 import org.terasology.nui.widgets.treeView.JsonTree;
 import org.terasology.nui.widgets.treeView.JsonTreeValue;
-import org.terasology.engine.rendering.nui.NUIManager;
-import org.terasology.engine.utilities.ReflectionUtil;
 
 import java.lang.reflect.Field;
 import java.util.Deque;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
+
+import static com.google.common.base.Verify.verifyNotNull;
 
 @SuppressWarnings("unchecked")
 public final class NUIEditorNodeUtils {
@@ -116,16 +119,18 @@ public final class NUIEditorNodeUtils {
         Deque<JsonTree> pathToRoot = getPathToRoot(node);
 
         // Start iterating from top to bottom.
-        Class currentClass = null;
-        Class activeLayoutClass = null;
+        Class<?> currentClass = null;
+        Class<?> activeLayoutClass = null;
+
+        Function<String, Class<? extends UIWidget>> resolve = (String type) ->
+                verifyNotNull(nuiManager.getWidgetMetadataLibrary().resolve(type, ModuleContext.getContext()), "Failed to resolve widget %s in %s", type, ModuleContext.getContext())
+                        .getType();
+
         for (JsonTree n : pathToRoot) {
             if (n.isRoot()) {
                 // currentClass is not set - set it to the screen type.
                 String type = (String) n.getChildWithKey("type").getValue().getValue();
-                currentClass = nuiManager
-                    .getWidgetMetadataLibrary()
-                    .resolve(type, ModuleContext.getContext())
-                    .getType();
+                currentClass = resolve.apply(type);
             } else {
                 if (List.class.isAssignableFrom(currentClass)
                     && n.getValue().getKey() == null
@@ -136,14 +141,11 @@ public final class NUIEditorNodeUtils {
                     // Retrieve the type of an unspecified UIWidget.
                     if (currentClass == UIWidget.class && n.hasSiblingWithKey("type")) {
                         String type = (String) n.getSiblingWithKey("type").getValue().getValue();
-                        currentClass = nuiManager
-                            .getWidgetMetadataLibrary()
-                            .resolve(type, ModuleContext.getContext())
-                            .getType();
+                        currentClass = resolve.apply(type);
                     }
 
                     // If the current class is a layout, remember its' value (but do not set until later on!)
-                    Class layoutClass = null;
+                    Class<?> layoutClass = null;
                     if (UILayout.class.isAssignableFrom(currentClass)) {
                         layoutClass = currentClass;
                     }
@@ -153,7 +155,7 @@ public final class NUIEditorNodeUtils {
                         currentClass = List.class;
                     } else if (UIWidget.class.isAssignableFrom(currentClass) && "layoutInfo".equals(n.getValue().getKey())) {
                         // Set currentClass to the layout hint type for the active layout.
-                        currentClass = (Class) ReflectionUtil.getTypeParameter(activeLayoutClass.getGenericSuperclass(), 0);
+                        currentClass = (Class<?>) ReflectionUtil.getTypeParameter(activeLayoutClass.getGenericSuperclass(), 0);
                     } else {
                         String value = n.getValue().toString();
                         Set<Field> fields = ReflectionUtils.getAllFields(currentClass);
@@ -183,13 +185,10 @@ public final class NUIEditorNodeUtils {
             }
         }
 
-        // If the final result is a generic UIWidget, attempt to retrieve its' type.
+        // If the final result is a generic UIWidget, attempt to retrieve its type.
         if (currentClass == UIWidget.class && node.hasChildWithKey("type")) {
             String type = (String) node.getChildWithKey("type").getValue().getValue();
-            currentClass = nuiManager
-                .getWidgetMetadataLibrary()
-                .resolve(type, ModuleContext.getContext())
-                .getType();
+            currentClass = resolve.apply(type);
         }
         return new NodeInfo(currentClass, activeLayoutClass);
     }

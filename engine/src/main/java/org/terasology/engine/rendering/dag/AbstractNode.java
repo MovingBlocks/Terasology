@@ -6,10 +6,10 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.assets.ResourceUrn;
+import org.terasology.engine.core.module.ModuleManager;
+import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.core.SimpleUri;
-import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.engine.rendering.assets.material.Material;
 import org.terasology.engine.rendering.dag.dependencyConnections.BufferPair;
 import org.terasology.engine.rendering.dag.dependencyConnections.BufferPairConnection;
@@ -19,7 +19,7 @@ import org.terasology.engine.rendering.dag.dependencyConnections.RunOrderConnect
 import org.terasology.engine.rendering.opengl.BaseFboManager;
 import org.terasology.engine.rendering.opengl.FBO;
 import org.terasology.engine.rendering.opengl.FboConfig;
-import org.terasology.naming.Name;
+import org.terasology.gestalt.naming.Name;
 import org.terasology.engine.utilities.Assets;
 
 import javax.annotation.Nullable;

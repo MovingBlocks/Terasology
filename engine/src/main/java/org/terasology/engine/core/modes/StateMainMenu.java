@@ -30,7 +30,6 @@ import org.terasology.engine.registry.CoreRegistry;
 import org.terasology.engine.rendering.nui.NUIManager;
 import org.terasology.engine.rendering.nui.editor.systems.NUIEditorSystem;
 import org.terasology.engine.rendering.nui.editor.systems.NUISkinEditorSystem;
-import org.terasology.nui.canvas.CanvasRenderer;
 import org.terasology.engine.rendering.nui.internal.NUIManagerInternal;
 import org.terasology.engine.rendering.nui.internal.TerasologyCanvasRenderer;
 import org.terasology.engine.rendering.nui.layers.mainMenu.LaunchPopup;
@@ -39,6 +38,7 @@ import org.terasology.engine.telemetry.TelemetryScreen;
 import org.terasology.engine.telemetry.TelemetryUtils;
 import org.terasology.engine.telemetry.logstash.TelemetryLogstashAppender;
 import org.terasology.engine.utilities.Assets;
+import org.terasology.nui.canvas.CanvasRenderer;
 
 /**
  * The class implements the main game menu.

@@ -4,7 +4,7 @@ package org.terasology.engine.logic.characters.interactions;
 
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.event.Event;
-import org.terasology.module.sandbox.API;
+import org.terasology.gestalt.module.sandbox.API;
 
 /**
  *

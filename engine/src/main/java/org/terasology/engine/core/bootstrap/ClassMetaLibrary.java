@@ -16,10 +16,10 @@
 
 package org.terasology.engine.core.bootstrap;
 
-import java.lang.annotation.Annotation;
+import org.terasology.gestalt.module.sandbox.API;
+import org.terasology.gestalt.naming.Name;
 
-import org.terasology.module.sandbox.API;
-import org.terasology.naming.Name;
+import java.lang.annotation.Annotation;
 
 /**
  * Provides information on available classes.

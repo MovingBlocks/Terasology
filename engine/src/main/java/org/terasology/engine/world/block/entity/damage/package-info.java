@@ -3,4 +3,4 @@
 
 @API package org.terasology.engine.world.block.entity.damage;
 
-import org.terasology.module.sandbox.API;
+import org.terasology.gestalt.module.sandbox.API;

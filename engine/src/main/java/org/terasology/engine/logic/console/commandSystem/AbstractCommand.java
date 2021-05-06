@@ -15,7 +15,7 @@ import org.terasology.engine.logic.console.commandSystem.exceptions.CommandIniti
 import org.terasology.engine.logic.console.commandSystem.exceptions.CommandParameterParseException;
 import org.terasology.engine.logic.console.commandSystem.exceptions.CommandSuggestionException;
 import org.terasology.engine.logic.permission.PermissionManager;
-import org.terasology.naming.Name;
+import org.terasology.gestalt.naming.Name;
 import org.terasology.engine.utilities.reflection.SpecificAccessibleObject;
 
 import java.lang.reflect.InvocationTargetException;

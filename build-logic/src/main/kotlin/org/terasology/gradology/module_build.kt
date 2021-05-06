@@ -4,10 +4,11 @@
 package org.terasology.gradology
 
 import org.gradle.api.Project
-import org.terasology.module.DependencyInfo
-import org.terasology.module.ModuleMetadata
-import org.terasology.module.ModuleMetadataJsonAdapter
-import org.terasology.naming.Version
+import org.terasology.gestalt.module.ModuleMetadata
+import org.terasology.gestalt.module.ModuleMetadataJsonAdapter
+import org.terasology.gestalt.module.dependencyresolution.DependencyInfo
+import org.terasology.gestalt.naming.Version
+import org.terasology.gestalt.naming.VersionRange
 import java.io.File
 
 
@@ -72,7 +73,15 @@ class ModuleMetadataForGradle(private val moduleConfig: ModuleMetadata) {
             // sounds complicated.)
         }
 
-        val gradleDep = GradleDependencyInfo(TERASOLOGY_MODULES_GROUP, gestaltDependency.id.toString(), gestaltDependency.versionRange().toString())
+        val version = if (gestaltDependency.versionPredicate() is VersionRange) {
+            gestaltDependency.versionPredicate().toString()
+        } else {
+            // TODO: gradle-compatible version expressions for gestalt dependencies
+            //     https://github.com/MovingBlocks/gestalt/issues/114
+            "[${gestaltDependency.minVersion},)"                                                                                                                                                                   
+        }
+
+        val gradleDep = GradleDependencyInfo(TERASOLOGY_MODULES_GROUP, gestaltDependency.id.toString(), version)
         return Pair(gradleDep, gestaltDependency.isOptional)
     }
 }

@@ -4,7 +4,7 @@ package org.terasology.engine.persistence.typeHandling.extensionTypes.factories;
 
 import com.google.common.collect.Lists;
 import org.junit.jupiter.api.Test;
-import org.terasology.assets.Asset;
+import org.terasology.gestalt.assets.Asset;
 import org.terasology.engine.audio.StaticSound;
 import org.terasology.engine.audio.StreamingSound;
 import org.terasology.engine.persistence.typeHandling.extensionTypes.AssetTypeHandler;

@@ -3,7 +3,7 @@
 package org.terasology.engine.rendering.dag.stateChanges;
 
 import com.google.common.base.Objects;
-import org.terasology.assets.ResourceUrn;
+import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.engine.registry.CoreRegistry;
 import org.terasology.engine.rendering.assets.material.Material;
 import org.terasology.engine.rendering.ShaderManager;

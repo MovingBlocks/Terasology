@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.rendering.nui.layers.mainMenu.settings;
 
-import org.terasology.assets.ResourceUrn;
+import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.engine.config.AudioConfig;
 import org.terasology.engine.rendering.nui.animation.MenuAnimationSystems;
 import org.terasology.nui.WidgetUtil;

@@ -4,7 +4,7 @@ package org.terasology.engine.rendering.nui.layers.mainMenu;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.assets.ResourceUrn;
+import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.engine.core.GameEngine;
 import org.terasology.engine.core.modes.StateLoading;
 import org.terasology.engine.core.paths.PathManager;

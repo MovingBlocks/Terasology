@@ -3,8 +3,8 @@
 package org.terasology.engine.rendering.assets.animation;
 
 import com.google.common.collect.ImmutableMap;
-import org.terasology.assets.AssetData;
-import org.terasology.assets.ResourceUrn;
+import org.terasology.gestalt.assets.AssetData;
+import org.terasology.gestalt.assets.ResourceUrn;
 
 import java.util.Map;
 

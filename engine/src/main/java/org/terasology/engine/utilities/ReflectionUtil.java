@@ -8,8 +8,8 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.reflections.ReflectionUtils;
 import org.terasology.engine.core.SimpleUri;
-import org.terasology.module.ModuleEnvironment;
-import org.terasology.naming.Name;
+import org.terasology.gestalt.module.ModuleEnvironment;
+import org.terasology.gestalt.naming.Name;
 import org.terasology.nui.UIWidget;
 import org.terasology.reflection.TypeInfo;
 

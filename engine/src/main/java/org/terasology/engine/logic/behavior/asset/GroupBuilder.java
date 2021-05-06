@@ -5,7 +5,7 @@ package org.terasology.engine.logic.behavior.asset;
 import com.google.gson.Gson;
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
-import org.terasology.module.sandbox.API;
+import org.terasology.gestalt.module.sandbox.API;
 import org.terasology.engine.registry.In;
 
 import java.io.InputStream;

@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.editor.subsystem;
 
-import org.terasology.assets.module.ModuleAwareAssetTypeManager;
+import org.terasology.gestalt.assets.module.ModuleAwareAssetTypeManager;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.config.ControllerConfig;
 import org.terasology.engine.context.Context;

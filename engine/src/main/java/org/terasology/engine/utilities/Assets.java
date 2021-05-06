@@ -5,16 +5,16 @@ package org.terasology.engine.utilities;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
-import org.terasology.assets.Asset;
-import org.terasology.assets.AssetData;
-import org.terasology.assets.ResourceUrn;
-import org.terasology.assets.management.AssetManager;
+import org.terasology.engine.core.module.ModuleManager;
+import org.terasology.gestalt.assets.Asset;
+import org.terasology.gestalt.assets.AssetData;
+import org.terasology.gestalt.assets.ResourceUrn;
+import org.terasology.gestalt.assets.management.AssetManager;
 import org.terasology.engine.audio.StaticSound;
 import org.terasology.engine.audio.StreamingSound;
-import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.engine.entitySystem.prefab.Prefab;
-import org.terasology.module.sandbox.API;
-import org.terasology.naming.Name;
+import org.terasology.gestalt.module.sandbox.API;
+import org.terasology.gestalt.naming.Name;
 import org.terasology.nui.asset.UIElement;
 import org.terasology.engine.registry.CoreRegistry;
 import org.terasology.engine.rendering.assets.font.Font;
@@ -24,6 +24,7 @@ import org.terasology.engine.rendering.assets.shader.Shader;
 import org.terasology.engine.rendering.assets.texture.Texture;
 import org.terasology.engine.rendering.assets.texture.TextureRegionAsset;
 import org.terasology.nui.skin.UISkin;
+import org.terasology.nui.skin.UISkinAsset;
 
 import java.util.Optional;
 import java.util.Set;
@@ -267,7 +268,12 @@ public final class Assets {
 //    }
 //
     public static Optional<UISkin> getSkin(String uri) {
-        return get(uri, UISkin.class);
+        Optional<UISkinAsset> skinAsset = get(uri, UISkinAsset.class);
+        if (skinAsset.isPresent()) {
+            return Optional.of(skinAsset.get().getSkin());
+        } else {
+            return Optional.empty();
+        }
     }
 
 

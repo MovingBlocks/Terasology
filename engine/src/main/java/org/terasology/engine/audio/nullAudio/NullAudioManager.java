@@ -18,13 +18,13 @@ package org.terasology.engine.audio.nullAudio;
 
 import org.joml.Quaternionfc;
 import org.joml.Vector3fc;
-import org.terasology.assets.AssetFactory;
 import org.terasology.engine.audio.AudioEndListener;
 import org.terasology.engine.audio.AudioManager;
 import org.terasology.engine.audio.StaticSound;
 import org.terasology.engine.audio.StaticSoundData;
 import org.terasology.engine.audio.StreamingSound;
 import org.terasology.engine.audio.StreamingSoundData;
+import org.terasology.gestalt.assets.AssetFactory;
 
 /**
  * Null implementation of the AudioManager

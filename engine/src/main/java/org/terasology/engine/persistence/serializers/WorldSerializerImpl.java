@@ -20,9 +20,8 @@ import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.engine.utilities.Assets;
-import org.terasology.assets.ResourceUrn;
 import org.terasology.engine.core.SimpleUri;
+import org.terasology.engine.core.module.ModuleContext;
 import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.entitySystem.entity.EntityRef;
@@ -32,9 +31,10 @@ import org.terasology.engine.entitySystem.metadata.ComponentMetadata;
 import org.terasology.engine.entitySystem.prefab.Prefab;
 import org.terasology.engine.entitySystem.prefab.PrefabData;
 import org.terasology.engine.entitySystem.prefab.PrefabManager;
-import org.terasology.engine.core.module.ModuleContext;
-import org.terasology.protobuf.EntityData;
 import org.terasology.engine.registry.CoreRegistry;
+import org.terasology.engine.utilities.Assets;
+import org.terasology.gestalt.assets.ResourceUrn;
+import org.terasology.protobuf.EntityData;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -180,7 +180,7 @@ public class WorldSerializerImpl implements WorldSerializer {
         for (ComponentMetadata<?> componentMetadata : componentLibrary.iterateComponentMetadata()) {
             int index = componentIdTable.size();
             componentIdTable.put(componentMetadata.getType(), index);
-            world.addComponentClass(componentMetadata.getUri().toString());
+            world.addComponentClass(componentMetadata.getId().toString());
         }
         entitySerializer.setComponentIdMapping(componentIdTable);
         prefabSerializer.setComponentIdMapping(componentIdTable);

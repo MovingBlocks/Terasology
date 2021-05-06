@@ -3,7 +3,7 @@
 package org.terasology.engine.rendering.assets.texture;
 
 import com.google.common.math.IntMath;
-import org.terasology.assets.AssetData;
+import org.terasology.gestalt.assets.AssetData;
 
 import java.nio.ByteBuffer;
 import java.util.Arrays;

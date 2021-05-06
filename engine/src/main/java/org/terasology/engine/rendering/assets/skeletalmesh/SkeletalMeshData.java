@@ -10,7 +10,7 @@ import gnu.trove.list.array.TIntArrayList;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
-import org.terasology.assets.AssetData;
+import org.terasology.gestalt.assets.AssetData;
 import org.terasology.joml.geom.AABBf;
 
 import java.util.Arrays;

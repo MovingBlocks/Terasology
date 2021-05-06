@@ -4,11 +4,11 @@ package org.terasology.engine.config.flexible.ui;
 
 import com.google.common.collect.Lists;
 import org.junit.jupiter.api.Test;
-import org.terasology.assets.management.AssetManager;
-import org.terasology.assets.management.AssetTypeManager;
+import org.terasology.gestalt.assets.management.AssetManager;
 import org.terasology.engine.config.flexible.Setting;
 import org.terasology.engine.config.flexible.constraints.NumberRangeConstraint;
-import org.terasology.module.ModuleEnvironment;
+import org.terasology.gestalt.assets.management.AssetTypeManager;
+import org.terasology.gestalt.module.ModuleEnvironment;
 
 import java.util.Optional;
 
@@ -26,8 +26,8 @@ class SettingWidgetFactoryTest {
             .thenReturn(Lists.newArrayList(NumberRangeConstraintWidgetFactory.class));
 
         AssetManager assetManager = new AssetManager(mock(AssetTypeManager.class));
-
-        SettingWidgetFactory settingWidgetFactory = new SettingWidgetFactory(environment, assetManager);
+        SettingWidgetFactory settingWidgetFactory = new SettingWidgetFactory(environment, assetManager,
+                null);
 
         Setting<Integer> setting = mock(Setting.class);
 

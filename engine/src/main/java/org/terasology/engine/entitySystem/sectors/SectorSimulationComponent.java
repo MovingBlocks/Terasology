@@ -19,7 +19,7 @@ import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.entitySystem.entity.EntityManager;
 import org.terasology.engine.entitySystem.entity.internal.BaseEntityRef;
 import org.terasology.engine.entitySystem.entity.internal.EntityScope;
-import org.terasology.module.sandbox.API;
+import org.terasology.gestalt.module.sandbox.API;
 
 /**
  * The component that allows the {@link SectorSimulationSystem} to send simulation events to a sector-scope entity.

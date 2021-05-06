@@ -48,8 +48,8 @@ import org.terasology.engine.world.chunks.ChunkProvider;
 import org.terasology.engine.world.chunks.blockdata.ExtraBlockDataManager;
 import org.terasology.engine.world.chunks.internal.ChunkImpl;
 import org.terasology.engine.world.internal.WorldInfo;
-import org.terasology.module.Module;
-import org.terasology.module.ModuleEnvironment;
+import org.terasology.gestalt.module.Module;
+import org.terasology.gestalt.module.ModuleEnvironment;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.protobuf.EntityData;
 

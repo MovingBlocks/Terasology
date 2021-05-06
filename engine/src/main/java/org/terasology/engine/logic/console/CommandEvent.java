@@ -3,7 +3,7 @@
 package org.terasology.engine.logic.console;
 
 import org.terasology.engine.entitySystem.event.Event;
-import org.terasology.naming.Name;
+import org.terasology.gestalt.naming.Name;
 import org.terasology.engine.network.ServerEvent;
 
 import java.util.List;

@@ -22,6 +22,7 @@ import org.terasology.engine.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.engine.entitySystem.metadata.ComponentMetadata;
 import org.terasology.engine.entitySystem.prefab.Prefab;
 import org.terasology.engine.persistence.serializers.EntitySerializer;
+import org.terasology.engine.persistence.serializers.PersistenceComponentSerializeCheck;
 import org.terasology.engine.persistence.serializers.PrefabSerializer;
 import org.terasology.protobuf.EntityData;
 
@@ -46,7 +47,7 @@ final class GlobalStoreBuilder {
 
         Map<Class<? extends Component>, Integer> componentIdTable = Maps.newHashMap();
         for (ComponentMetadata<?> componentMetadata : entityManager.getComponentLibrary().iterateComponentMetadata()) {
-            store.addComponentClass(componentMetadata.getUri().toString());
+            store.addComponentClass(componentMetadata.getId().toString());
             componentIdTable.put(componentMetadata.getType(), componentIdTable.size());
         }
         prefabSerializer.setComponentIdMapping(componentIdTable);
@@ -66,6 +67,7 @@ final class GlobalStoreBuilder {
         }
 
         EntitySerializer entitySerializer = new EntitySerializer(entityManager);
+        entitySerializer.setComponentSerializeCheck(new PersistenceComponentSerializeCheck());
         entitySerializer.setComponentIdMapping(componentIdTable);
         for (EntityRef entity: entities) {
             if (entity.isPersistent()) {

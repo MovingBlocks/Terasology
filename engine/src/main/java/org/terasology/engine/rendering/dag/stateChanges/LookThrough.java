@@ -17,6 +17,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * The default instance of this class resets both matrices to identity matrices, OpenGL's default.
  */
+@Deprecated
 public class LookThrough implements StateChange {
     private static StateChange defaultInstance = new LookThroughDefault();
 

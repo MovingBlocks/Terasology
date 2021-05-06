@@ -4,11 +4,15 @@
 package org.terasology.engine.core.subsystem.headless.renderer;
 
 import org.joml.Quaternionfc;
-import org.terasology.joml.geom.Rectanglei;
 import org.joml.Vector2i;
 import org.joml.Vector2ic;
 import org.joml.Vector3fc;
-import org.terasology.assets.ResourceUrn;
+import org.terasology.engine.rendering.assets.material.Material;
+import org.terasology.engine.rendering.assets.mesh.Mesh;
+import org.terasology.engine.rendering.nui.internal.TerasologyCanvasRenderer;
+import org.terasology.engine.rendering.opengl.FrameBufferObject;
+import org.terasology.gestalt.assets.ResourceUrn;
+import org.terasology.joml.geom.Rectanglei;
 import org.terasology.nui.Border;
 import org.terasology.nui.Colorc;
 import org.terasology.nui.HorizontalAlign;
@@ -16,10 +20,6 @@ import org.terasology.nui.ScaleMode;
 import org.terasology.nui.UITextureRegion;
 import org.terasology.nui.VerticalAlign;
 import org.terasology.nui.asset.font.Font;
-import org.terasology.engine.rendering.assets.material.Material;
-import org.terasology.engine.rendering.assets.mesh.Mesh;
-import org.terasology.engine.rendering.nui.internal.TerasologyCanvasRenderer;
-import org.terasology.engine.rendering.opengl.FrameBufferObject;
 
 public class HeadlessCanvasRenderer implements TerasologyCanvasRenderer {
 

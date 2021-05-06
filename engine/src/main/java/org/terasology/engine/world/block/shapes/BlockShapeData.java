@@ -4,7 +4,7 @@ package org.terasology.engine.world.block.shapes;
 
 import com.google.common.collect.Maps;
 import org.joml.Vector3f;
-import org.terasology.assets.AssetData;
+import org.terasology.gestalt.assets.AssetData;
 import org.terasology.engine.math.Side;
 import org.terasology.engine.physics.shapes.CollisionShape;
 import org.terasology.engine.utilities.collection.EnumBooleanMap;

@@ -10,10 +10,10 @@ import org.joml.Vector3f;
 import org.joml.Vector3i;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.assets.ResourceUrn;
-import org.terasology.assets.format.AbstractAssetFileFormat;
-import org.terasology.assets.format.AssetDataFile;
-import org.terasology.assets.module.annotations.RegisterAssetFileFormat;
+import org.terasology.gestalt.assets.ResourceUrn;
+import org.terasology.gestalt.assets.format.AbstractAssetFileFormat;
+import org.terasology.gestalt.assets.format.AssetDataFile;
+import org.terasology.gestalt.assets.module.annotations.RegisterAssetFileFormat;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -50,15 +50,15 @@ public class ObjMeshFormat extends AbstractAssetFileFormat<MeshData> {
                 throw new IOException("No index data");
             }
 
-            MeshData data = processData(rawVertices, rawNormals, rawTexCoords, rawIndices);
+            StandardMeshData data = processData(rawVertices, rawNormals, rawTexCoords, rawIndices);
 
             if (data.getVertices() == null) {
                 throw new IOException("No vertices define");
             }
-            if (!data.getNormals().isEmpty() && data.getNormals().size() != data.getVertices().size()) {
+            if (!data.normals.isEmpty() && data.normals.size() != data.getVertices().size()) {
                 throw new IOException("The number of normals does not match the number of vertices.");
             }
-            if (!data.getTexCoord0().isEmpty() && data.getTexCoord0().size() / 2 != data.getVertices().size() / 3) {
+            if (!data.uv0.isEmpty() && data.uv0.size() / 2 != data.getVertices().size() / 3) {
                 throw new IOException("The number of tex coords does not match the number of vertices.");
             }
 
@@ -66,11 +66,11 @@ public class ObjMeshFormat extends AbstractAssetFileFormat<MeshData> {
         }
     }
 
-    private MeshData processData(List<Vector3f> rawVertices, List<Vector3f> rawNormals, List<Vector2f> rawTexCoords, List<Vector3i[]> rawIndices) throws IOException {
-        MeshData result = new MeshData();
-        TFloatList vertices = result.getVertices();
-        TFloatList texCoord0 = result.getTexCoord0();
-        TFloatList normals = result.getNormals();
+    private StandardMeshData processData(List<Vector3f> rawVertices, List<Vector3f> rawNormals, List<Vector2f> rawTexCoords, List<Vector3i[]> rawIndices) throws IOException {
+        StandardMeshData result = new StandardMeshData();
+        TFloatList vertices = result.vertices;
+        TFloatList texCoord0 = result.uv0;
+        TFloatList normals = result.normals;
         TIntList indices = result.getIndices();
         int vertCount = 0;
         for (Vector3i[] face : rawIndices) {

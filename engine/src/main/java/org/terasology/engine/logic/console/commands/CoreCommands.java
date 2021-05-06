@@ -5,8 +5,6 @@ package org.terasology.engine.logic.console.commands;
 import com.google.common.collect.Ordering;
 import com.google.common.collect.Streams;
 import org.joml.Vector3f;
-import org.terasology.assets.ResourceUrn;
-import org.terasology.assets.management.AssetManager;
 import org.terasology.engine.config.SystemConfig;
 import org.terasology.engine.core.GameEngine;
 import org.terasology.engine.core.SimpleUri;
@@ -27,6 +25,8 @@ import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
 import org.terasology.engine.entitySystem.systems.RegisterSystem;
 import org.terasology.engine.i18n.TranslationProject;
 import org.terasology.engine.i18n.TranslationSystem;
+import org.terasology.engine.logic.console.Console;
+import org.terasology.engine.logic.console.ConsoleColors;
 import org.terasology.engine.logic.console.commandSystem.ConsoleCommand;
 import org.terasology.engine.logic.console.commandSystem.annotations.Command;
 import org.terasology.engine.logic.console.commandSystem.annotations.CommandParam;
@@ -36,20 +36,14 @@ import org.terasology.engine.logic.console.suggesters.ScreenSuggester;
 import org.terasology.engine.logic.console.suggesters.SkinSuggester;
 import org.terasology.engine.logic.inventory.events.DropItemEvent;
 import org.terasology.engine.logic.location.LocationComponent;
-import org.terasology.engine.logic.console.Console;
-import org.terasology.engine.logic.console.ConsoleColors;
 import org.terasology.engine.logic.permission.PermissionManager;
 import org.terasology.engine.math.Direction;
-import org.terasology.naming.Name;
 import org.terasology.engine.network.ClientComponent;
 import org.terasology.engine.network.JoinStatus;
 import org.terasology.engine.network.NetworkMode;
 import org.terasology.engine.network.NetworkSystem;
 import org.terasology.engine.network.PingService;
 import org.terasology.engine.network.Server;
-import org.terasology.nui.FontColor;
-import org.terasology.nui.asset.UIElement;
-import org.terasology.nui.skin.UISkin;
 import org.terasology.engine.persistence.WorldDumper;
 import org.terasology.engine.persistence.serializers.PrefabSerializer;
 import org.terasology.engine.registry.In;
@@ -66,6 +60,12 @@ import org.terasology.engine.world.block.BlockUri;
 import org.terasology.engine.world.block.family.BlockFamily;
 import org.terasology.engine.world.block.items.BlockItemFactory;
 import org.terasology.engine.world.block.loader.BlockFamilyDefinition;
+import org.terasology.gestalt.assets.ResourceUrn;
+import org.terasology.gestalt.assets.management.AssetManager;
+import org.terasology.gestalt.naming.Name;
+import org.terasology.nui.FontColor;
+import org.terasology.nui.asset.UIElement;
+import org.terasology.nui.skin.UISkinAsset;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
@@ -364,7 +364,7 @@ public class CoreCommands extends BaseComponentSystem {
         if (!nuiSkinEditorSystem.isEditorActive()) {
             nuiSkinEditorSystem.toggleEditor();
         }
-        Set<ResourceUrn> urns = assetManager.resolve(uri, UISkin.class);
+        Set<ResourceUrn> urns = assetManager.resolve(uri, UISkinAsset.class);
         switch (urns.size()) {
             case 0:
                 return String.format("No asset found for screen '%s'", uri);

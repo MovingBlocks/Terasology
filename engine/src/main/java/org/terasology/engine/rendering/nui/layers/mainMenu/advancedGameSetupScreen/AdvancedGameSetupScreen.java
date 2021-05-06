@@ -11,7 +11,6 @@ import org.codehaus.plexus.util.StringUtils;
 import org.joml.Vector2i;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.assets.ResourceUrn;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.config.ModuleConfig;
 import org.terasology.engine.config.SelectModulesConfig;
@@ -25,14 +24,26 @@ import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.engine.core.module.StandardModuleExtension;
 import org.terasology.engine.game.GameManifest;
 import org.terasology.engine.i18n.TranslationSystem;
-import org.terasology.engine.rendering.nui.animation.MenuAnimationSystems;
-import org.terasology.module.DependencyInfo;
-import org.terasology.module.DependencyResolver;
-import org.terasology.module.Module;
-import org.terasology.module.ModuleMetadata;
-import org.terasology.module.ResolutionResult;
-import org.terasology.naming.Name;
 import org.terasology.engine.network.NetworkMode;
+import org.terasology.engine.registry.In;
+import org.terasology.engine.rendering.nui.CoreScreenLayer;
+import org.terasology.engine.rendering.nui.animation.MenuAnimationSystems;
+import org.terasology.engine.rendering.nui.layers.mainMenu.ConfirmPopup;
+import org.terasology.engine.rendering.nui.layers.mainMenu.GameManifestProvider;
+import org.terasology.engine.rendering.nui.layers.mainMenu.MessagePopup;
+import org.terasology.engine.rendering.nui.layers.mainMenu.UniverseSetupScreen;
+import org.terasology.engine.rendering.nui.layers.mainMenu.UniverseWrapper;
+import org.terasology.engine.rendering.nui.layers.mainMenu.WaitPopup;
+import org.terasology.engine.rendering.nui.layers.mainMenu.moduleDetailsScreen.ModuleDetailsScreen;
+import org.terasology.engine.utilities.random.FastRandom;
+import org.terasology.engine.world.generator.internal.WorldGeneratorManager;
+import org.terasology.gestalt.assets.ResourceUrn;
+import org.terasology.gestalt.module.Module;
+import org.terasology.gestalt.module.ModuleMetadata;
+import org.terasology.gestalt.module.dependencyresolution.DependencyInfo;
+import org.terasology.gestalt.module.dependencyresolution.DependencyResolver;
+import org.terasology.gestalt.module.dependencyresolution.ResolutionResult;
+import org.terasology.gestalt.naming.Name;
 import org.terasology.nui.Canvas;
 import org.terasology.nui.WidgetUtil;
 import org.terasology.nui.databinding.Binding;
@@ -45,17 +56,6 @@ import org.terasology.nui.widgets.UICheckbox;
 import org.terasology.nui.widgets.UILabel;
 import org.terasology.nui.widgets.UIList;
 import org.terasology.nui.widgets.UIText;
-import org.terasology.engine.registry.In;
-import org.terasology.engine.rendering.nui.CoreScreenLayer;
-import org.terasology.engine.rendering.nui.layers.mainMenu.ConfirmPopup;
-import org.terasology.engine.rendering.nui.layers.mainMenu.GameManifestProvider;
-import org.terasology.engine.rendering.nui.layers.mainMenu.MessagePopup;
-import org.terasology.engine.rendering.nui.layers.mainMenu.UniverseSetupScreen;
-import org.terasology.engine.rendering.nui.layers.mainMenu.UniverseWrapper;
-import org.terasology.engine.rendering.nui.layers.mainMenu.WaitPopup;
-import org.terasology.engine.rendering.nui.layers.mainMenu.moduleDetailsScreen.ModuleDetailsScreen;
-import org.terasology.engine.utilities.random.FastRandom;
-import org.terasology.engine.world.generator.internal.WorldGeneratorManager;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -143,11 +143,9 @@ public class AdvancedGameSetupScreen extends CoreScreenLayer {
         sortedModules = Lists.newArrayList();
         for (Name moduleId : moduleManager.getRegistry().getModuleIds()) {
             Module latestVersion = moduleManager.getRegistry().getLatestModuleVersion(moduleId);
-            if (!latestVersion.isOnClasspath()) {
-                ModuleSelectionInfo info = ModuleSelectionInfo.local(latestVersion);
-                modulesLookup.put(info.getMetadata().getId(), info);
-                sortedModules.add(info);
-            }
+            ModuleSelectionInfo info = ModuleSelectionInfo.local(latestVersion);
+            modulesLookup.put(info.getMetadata().getId(), info);
+            sortedModules.add(info);
         }
 
         sortedModules.sort(moduleInfoComparator);

@@ -1,0 +1,49 @@
+{
+  "type": "AutoConfigScreen",
+  "skin": "engine:mainMenu",
+  "contents": {
+    "type": "RelativeLayout",
+    "contents": [
+      {
+        "type": "ScrollableArea",
+        "content": {
+          "type": "ColumnLayout",
+          "id": "mainContainer",
+          "fillVerticalSpace": false,
+          "layoutInfo": {
+            "use-content-height": true,
+            "position-horizontal-center": {}
+          },
+          "contents": []
+        },
+        "layoutInfo": {
+          "width": 800,
+          "position-horizontal-center": {},
+          "position-top": {
+            "target": "TOP",
+            "offset": 48
+          },
+          "position-bottom": {
+            "target": "TOP",
+            "offset": 32,
+            "widget": "close"
+          }
+        }
+      },
+      {
+        "type": "UIButton",
+        "text": "${engine:menu#back}",
+        "id": "close",
+        "layoutInfo": {
+          "height": 32,
+          "width": 200,
+          "position-horizontal-center": {},
+          "position-bottom": {
+            "target": "BOTTOM",
+            "offset": 48
+          }
+        }
+      }
+    ]
+  }
+}

@@ -5,11 +5,6 @@
 
 import org.gradle.plugins.ide.eclipse.model.EclipseModel
 import org.gradle.plugins.ide.idea.model.IdeaModel
-import org.reflections.Reflections
-import org.reflections.scanners.SubTypesScanner
-import org.reflections.scanners.TypeAnnotationsScanner
-import org.reflections.util.ConfigurationBuilder
-import org.reflections.util.FilterBuilder
 import org.terasology.gradology.ModuleMetadataForGradle
 
 plugins {
@@ -121,32 +116,6 @@ tasks.register("createSkeleton") {
 val mainSourceSet: SourceSet = sourceSets[SourceSet.MAIN_SOURCE_SET_NAME]
 
 
-tasks.register("cacheReflections") {
-    description = "Caches reflection output to make regular startup faster. May go stale and need cleanup at times."
-    inputs.files(mainSourceSet.output.classesDirs)
-    outputs.file(File(mainSourceSet.output.classesDirs.first(), "reflections.cache"))
-    dependsOn(tasks.named("classes"))
-
-    outputs.upToDateWhen { tasks.named("classes").get().state.upToDate }
-
-    doFirst {
-        try {
-            val reflections = Reflections(ConfigurationBuilder()
-                    .filterInputsBy(FilterBuilder.parsePackages("+org"))
-                    .addUrls(inputs.getFiles().getSingleFile().toURI().toURL())
-                    .setScanners(TypeAnnotationsScanner(), SubTypesScanner()))
-            reflections.save(outputs.getFiles().getAsPath())
-        } catch (e: java.net.MalformedURLException) {
-            logger.error("Cannot parse input to url", e)
-        }
-    }
-}
-
-tasks.register<Delete>("cleanReflections") {
-    description = "Cleans the reflection cache. Useful in cases where it has gone stale and needs regeneration."
-    delete(tasks.getByName("cacheReflections").outputs.files)
-}
-
 // This task syncs everything in the assets dir into the output dir, used when jarring the module
 tasks.register<Sync>("syncAssets") {
     from("assets")
@@ -166,7 +135,6 @@ tasks.register<Sync>("syncDeltas") {
 // Instructions for packaging a jar file - is a manifest even needed for modules?
 tasks.named("jar") {
     // Make sure the assets directory is included
-    dependsOn("cacheReflections")
     dependsOn("syncAssets")
     dependsOn("syncOverrides")
     dependsOn("syncDeltas")
@@ -179,11 +147,30 @@ tasks.named("jar") {
         }
     }
 
-    finalizedBy("cleanReflections")
 }
 
 tasks.named<Test>("test") {
-    useJUnitPlatform()
+    description = "Runs all tests (slow)"
+    useJUnitPlatform ()
+    systemProperty("junit.jupiter.execution.timeout.default", "4m")
+}
+
+tasks.register<Test>("unitTest") {
+    group =  "Verification"
+    description = "Runs unit tests (fast)"
+    useJUnitPlatform {
+        excludeTags = setOf("MteTest", "TteTest")
+    }
+    systemProperty("junit.jupiter.execution.timeout.default", "1m")
+}
+
+tasks.register<Test>("integrationTest") {
+    group = "Verification"
+    description = "Runs integration tests (slow) tagged with 'MteTest' or 'TteTest'"
+
+    useJUnitPlatform {
+        includeTags = setOf("MteTest", "TteTest")
+    }
     systemProperty("junit.jupiter.execution.timeout.default", "4m")
 }
 
