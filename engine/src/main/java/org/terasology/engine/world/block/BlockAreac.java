@@ -524,4 +524,8 @@ public interface BlockAreac extends Iterable<Vector2ic> {
     public int hashCode();
 
     public String toString();
+
+    public long distanceSquared(Vector2ic p);
+
+    public long distanceSquared(int px, int py);
 }

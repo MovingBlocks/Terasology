@@ -356,34 +356,23 @@ public class BlockArea implements BlockAreac {
         return "BlockArea[(" + this.minX + ", " + this.minY + ")...(" + this.maxX + ", " + this.maxY + ")]";
     }
 
-    private int calDis(int x, int y){
-        return (int) Math.sqrt(x * x + y * y);
+    @Override
+    public long distanceSquared(Vector2ic p){
+        return distanceSquared(p.x(), p.y());
     }
-    public int distanceSquared(int px, int py){
-        if(px < minX){
-            if(py < minY) {
-                return calDis(minX - px, minY - py);
-            }
-            if(py <= maxY) {
-                return minX - px;
-            }
-            return calDis(minX - px, maxY - py);
-        }else if(px <= maxX){
-            if(py < minY) {
-                return minY - py;
-            }
-            if(py <= maxY) {
-                return 0;
-            }
-            return py - maxY;
-        }else{
-            if(py < minY) {
-                return calDis(maxX - px, minY - py);
-            }
-            if(py <= maxY) {
-                return px - maxX;
-            }
-            return calDis(maxX - px, maxY - py);
-        }
+
+    @Override
+    public long distanceSquared(int px, int py){
+        //center = min + width / 2 = min + (max - min) / 2
+        // 2 * center  = 2 * min + max - min = min + max
+        int cx2 = minX() + maxX();
+        int cy2 = minY() + maxY();
+
+        //     dx = p - center - width / 2
+        // 2 * dx = 2 * px - 2 * center - width
+        //     dx = (2 * px - 2 * center - width) / 2
+        long dx = Math.max(Math.abs(2 * px - cx2) - getSizeX(), 0) / 2;
+        long dy = Math.max(Math.abs(2 * py - cy2) - getSizeY(), 0) / 2;
+        return dx * dx + dy * dy;
     }
 }
