@@ -77,15 +77,6 @@ class ModuleMetadataForGradle(private val moduleConfig: ModuleMetadata) {
     }
 
     private fun gradleModule(gestaltDependency: DependencyInfo): Pair<GradleDependencyInfo, Boolean> {
-        if (!gestaltDependency.minVersion.isSnapshot) {
-            // gestalt considers snapshots to satisfy a minimum requirement:
-            // https://github.com/MovingBlocks/gestalt/blob/fe1893821127/gestalt-module/src/main/java/org/terasology/naming/VersionRange.java#L58-L59
-            gestaltDependency.minVersion = gestaltDependency.minVersion.snapshot
-            // (maybe there's some way to do that with a custom gradle resolver?
-            // but making a resolver that only works that way on gestalt modules specifically
-            // sounds complicated.)
-        }
-
         val version = versionStringFromGestaltDependency(gestaltDependency)
 
         val gradleDep = GradleDependencyInfo(TERASOLOGY_MODULES_GROUP, gestaltDependency.id.toString(), version)
