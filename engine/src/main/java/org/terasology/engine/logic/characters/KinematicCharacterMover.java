@@ -4,6 +4,7 @@ package org.terasology.engine.logic.characters;
 
 import org.joml.Math;
 import org.joml.Quaternionf;
+import org.joml.RoundingMode;
 import org.joml.Vector3f;
 import org.joml.Vector3i;
 import org.slf4j.Logger;
@@ -91,8 +92,8 @@ public class KinematicCharacterMover implements CharacterMover {
                 //      The CharacterMovementComponent also has a 'radius' which may be used here.
                 //      Question: Is this connected with _shapes_ or bounding boxes in some way?
                 checkBlockEntry(entity,
-                        new Vector3i(initial.getPosition(), org.joml.RoundingMode.HALF_UP),
-                        new Vector3i(result.getPosition(), org.joml.RoundingMode.HALF_UP),
+                        new Vector3i(initial.getPosition(), RoundingMode.HALF_UP),
+                        new Vector3i(result.getPosition(), RoundingMode.HALF_UP),
                         characterMovementComponent.height);
             }
             if (result.getMode() != MovementMode.GHOSTING && result.getMode() != MovementMode.NONE) {
