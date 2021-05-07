@@ -48,9 +48,11 @@ class ModuleMetadataForGradle(private val moduleConfig: ModuleMetadata) {
     val group: String = TERASOLOGY_MODULES_GROUP
 
     fun engineVersion(): String {
-        return moduleConfig.dependencies.filterNotNull()
+        return moduleConfig.dependencies
+            .filterNotNull()
             .find { it.id.toString() == ENGINE_MODULE_NAME }
-            ?.versionRange()?.toString() ?: "+"
+            ?.let(this::versionStringFromGestaltDependency)
+            ?: "+"
     }
 
     /**
@@ -59,8 +61,19 @@ class ModuleMetadataForGradle(private val moduleConfig: ModuleMetadata) {
      * @return a list of modules and whether each is optional
      */
     fun moduleDependencies(): List<Pair<GradleDependencyInfo, Boolean>> {
-        val gestaltDeps = moduleConfig.dependencies.filterNotNull().filterNot { it.id.toString() == "engine" }
+        val gestaltDeps = moduleConfig.dependencies.filterNotNull().filterNot { it.id.toString() == ENGINE_MODULE_NAME }
         return gestaltDeps.map { gradleModule(it) }
+    }
+
+    private fun versionStringFromGestaltDependency(gestaltDependency: DependencyInfo): String {
+        val version = if (gestaltDependency.versionPredicate() is VersionRange) {
+            gestaltDependency.versionPredicate().toString()
+        } else {
+            // TODO: gradle-compatible version expressions for gestalt dependencies
+            //     https://github.com/MovingBlocks/gestalt/issues/114
+            "[${gestaltDependency.minVersion},)"                                       
+        }
+        return version;
     }
 
     private fun gradleModule(gestaltDependency: DependencyInfo): Pair<GradleDependencyInfo, Boolean> {
@@ -73,13 +86,7 @@ class ModuleMetadataForGradle(private val moduleConfig: ModuleMetadata) {
             // sounds complicated.)
         }
 
-        val version = if (gestaltDependency.versionPredicate() is VersionRange) {
-            gestaltDependency.versionPredicate().toString()
-        } else {
-            // TODO: gradle-compatible version expressions for gestalt dependencies
-            //     https://github.com/MovingBlocks/gestalt/issues/114
-            "[${gestaltDependency.minVersion},)"                                                                                                                                                                   
-        }
+        val version = versionStringFromGestaltDependency(gestaltDependency)
 
         val gradleDep = GradleDependencyInfo(TERASOLOGY_MODULES_GROUP, gestaltDependency.id.toString(), version)
         return Pair(gradleDep, gestaltDependency.isOptional)
