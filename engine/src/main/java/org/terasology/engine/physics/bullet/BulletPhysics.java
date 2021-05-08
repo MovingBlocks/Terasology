@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.physics.bullet;
 
+import com.badlogic.gdx.physics.bullet.collision.AllHitsRayResultCallback;
 import com.badlogic.gdx.physics.bullet.collision.ClosestRayResultCallback;
 import com.badlogic.gdx.physics.bullet.collision.Collision;
 import com.badlogic.gdx.physics.bullet.collision.btBoxShape;
@@ -13,7 +14,9 @@ import com.badlogic.gdx.physics.bullet.collision.btCapsuleShape;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionConfiguration;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionDispatcher;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionObject;
+import com.badlogic.gdx.physics.bullet.collision.btCollisionObjectConstArray;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionShape;
+import com.badlogic.gdx.physics.bullet.collision.btConvexHullShape;
 import com.badlogic.gdx.physics.bullet.collision.btConvexShape;
 import com.badlogic.gdx.physics.bullet.collision.btCylinderShape;
 import com.badlogic.gdx.physics.bullet.collision.btDbvtBroadphase;
@@ -193,18 +196,61 @@ public class BulletPhysics implements PhysicsEngine {
     }
 
     @Override
-    public HitResult rayTrace(Vector3f from1, Vector3f direction, float distance, CollisionGroup... collisionGroups) {
-        return rayTrace(from1, direction, distance, Sets.newHashSet(), collisionGroups);
+    public HitResult rayTrace(Vector3f from, Vector3f direction, float distance, CollisionGroup... collisionGroups) {
+        Vector3f to = new Vector3f(direction);
+        to.normalize();
+        to.mul(distance);
+        to.add(from);
+
+        short filter = combineGroups(collisionGroups);
+
+        ClosestRayResultCallback callback = new ClosestRayResultCallback(from, to);
+        callback.setCollisionFilterGroup(StandardCollisionGroup.ALL.getFlag());
+        callback.setCollisionFilterMask(filter);
+
+        discreteDynamicsWorld.rayTest(from, to, callback);
+        if (callback.hasHit()) {
+            btCollisionObject collisionObject = callback.getCollisionObject();
+            Vector3f hitPointWorld = new Vector3f();
+            callback.getHitPointWorld(hitPointWorld);
+
+            Vector3f hitNormalWorld = new Vector3f();
+            callback.getHitNormalWorld(hitNormalWorld);
+
+            if (callback.hasHit()) {
+                callback.dispose();
+                if (collisionObject.userData instanceof EntityRef) { //we hit an other entity
+                    return new HitResult((EntityRef) collisionObject.userData,
+                            hitPointWorld,
+                            hitNormalWorld);
+                } else if ((collisionObject.getCollisionFlags() & btCollisionObject.CollisionFlags.CF_VOXEL_OBJECT) > 0) {
+                    btVector3i pos = new btVector3i();
+                    collisionObject.getVoxelPosition(pos);
+
+                    Vector3i voxelPosition = new Vector3i(pos.getX(), pos.getY(), pos.getZ());
+                    final EntityRef entityAt = blockEntityRegistry.getEntityAt(voxelPosition);
+                    return new HitResult(entityAt,
+                            hitPointWorld,
+                            hitNormalWorld,
+                            voxelPosition);
+                } else { //we hit something we don't understand, assume its nothing and log a warning
+                    logger.warn("Unidentified object was hit in the physics engine: {}", collisionObject.userData);
+                }
+            }
+
+        } else {
+            callback.dispose();
+        }
+        return new HitResult();
     }
 
     @Override
-    public HitResult rayTrace(Vector3f from1, Vector3f direction, float distance, Set<EntityRef> excludedEntities,
+    public HitResult rayTrace(Vector3f from, Vector3f direction, float distance, Set<EntityRef> excludedEntities,
                               CollisionGroup... collisionGroups) {
-        if (excludedEntities == null) {
-            return rayTrace(from1, direction, distance, collisionGroups);
+        if (excludedEntities == null || excludedEntities.size() == 0) {
+            return rayTrace(from, direction, distance, collisionGroups);
         }
         Vector3f to = new Vector3f(direction);
-        Vector3f from = from1;
         to.normalize();
         to.mul(distance);
         to.add(from);
@@ -224,40 +270,38 @@ public class BulletPhysics implements PhysicsEngine {
                 excludedCollisionIds.add(entityTriggers.get(excludedEntity).getBroadphaseHandle().getUid());
             }
         }
-        ClosestRayResultCallback callback = new ClosestRayResultCallback(from, to);
+        AllHitsRayResultCallback callback = new AllHitsRayResultCallback(from, to);
         callback.setCollisionFilterGroup(StandardCollisionGroup.ALL.getFlag());
         callback.setCollisionFilterMask(filter);
 
         discreteDynamicsWorld.rayTest(from, to, callback);
         if (callback.hasHit()) {
-            btCollisionObject collisionObject = callback.getCollisionObject();
-            Vector3f hitPointWorld = new Vector3f();
-            callback.getHitPointWorld(hitPointWorld);
+            btCollisionObjectConstArray collisionObjects = callback.getCollisionObjects();
+            for (int x = 0; x < collisionObjects.size(); x++) {
+                btCollisionObject collisionObject = collisionObjects.atConst(x);
+                if (!excludedCollisionIds.contains(collisionObject.getBroadphaseHandle().getUid())) {
+                    Vector3f hitPointWorld = callback.getHitPointWorld().at(x);
+                    Vector3f hitNormalWorld = callback.getHitNormalWorld().at(x);
+                    callback.dispose();
+                    if (collisionObject.userData instanceof EntityRef) { //we hit an other entity
+                        return new HitResult((EntityRef) collisionObject.userData,
+                                hitPointWorld,
+                                hitNormalWorld);
+                    } else if ((collisionObject.getCollisionFlags() & btCollisionObject.CollisionFlags.CF_VOXEL_OBJECT) > 0) {
+                        btVector3i pos = new btVector3i();
+                        collisionObject.getVoxelPosition(pos);
 
-            Vector3f hitNormalWorld = new Vector3f();
-            callback.getHitNormalWorld(hitNormalWorld);
-
-            if (callback.hasHit()) {
-                callback.dispose();
-                if (collisionObject.userData instanceof EntityRef) { //we hit an other entity
-                    return new HitResult((EntityRef) collisionObject.userData,
-                        hitPointWorld,
-                        hitNormalWorld);
-                } else if ((collisionObject.getCollisionFlags() & btCollisionObject.CollisionFlags.CF_VOXEL_OBJECT) > 0) {
-                    btVector3i pos = new btVector3i();
-                    collisionObject.getVoxelPosition(pos);
-
-                    Vector3i voxelPosition = new Vector3i(pos.getX(), pos.getY(), pos.getZ());
-                    final EntityRef entityAt = blockEntityRegistry.getEntityAt(voxelPosition);
-                    return new HitResult(entityAt,
-                        hitPointWorld,
-                        hitNormalWorld,
-                        voxelPosition);
-                } else { //we hit something we don't understand, assume its nothing and log a warning
-                    logger.warn("Unidentified object was hit in the physics engine: {}", collisionObject.userData);
+                        Vector3i voxelPosition = new Vector3i(pos.getX(), pos.getY(), pos.getZ());
+                        final EntityRef entityAt = blockEntityRegistry.getEntityAt(voxelPosition);
+                        return new HitResult(entityAt,
+                                hitPointWorld,
+                                hitNormalWorld,
+                                voxelPosition);
+                    } else { //we hit something we don't understand, assume its nothing and log a warning
+                        logger.warn("Unidentified object was hit in the physics engine: {}", collisionObject.userData);
+                    }
                 }
             }
-
         } else {
             callback.dispose();
         }
