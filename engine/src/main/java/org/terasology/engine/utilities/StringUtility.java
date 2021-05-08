@@ -15,6 +15,53 @@ public final class StringUtility {
     private StringUtility() { }
 
     /**
+     * Returns the ordinal indicator of an integer.
+     * <br><br>
+     * Most readable when called with class name:
+     * OrdinalIndicator.of(22) returns "nd"
+     *
+     * @param number the integer
+     * @return The ordinal indicator ("st", "nd", "rd" or "th").
+     */
+    public static String getOrdinal(int number) {
+        int x = Math.abs(number);
+        x %= 100;
+
+        switch (x) {
+            case 11:
+            case 12:
+            case 13:
+                return "th";
+        }
+
+        x %= 10;
+
+        switch (x) {
+            case 1:
+                return "st";
+            case 2:
+                return "nd";
+            case 3:
+                return "rd";
+            default:
+                return "th";
+        }
+    }
+
+    /**
+     * Returns the integer combined with it's ordinal indicator as String.
+     * <br><br>
+     * Most readable when called with class name:
+     * OrdinalIndicator.addedTo(22) returns "22nd"
+     *
+     * @param x the integer
+     * @return The integer with it's ordinal indicator attached.
+     */
+    public static String toOrdinalString(int x) {
+        return String.format("%d%s", x, getOrdinal(x));
+    }
+
+    /**
      * reference: http://stackoverflow.com/questions/745415/regex-to-match-from-partial-or-camel-case-string
      *
      * Match a string by a wild card expression and a collection of strings to match against
