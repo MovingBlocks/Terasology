@@ -3,30 +3,24 @@
 
 package org.terasology.engine.rendering.assets.mesh.resource;
 
-import org.joml.Vector2f;
-import org.joml.Vector3f;
-import org.joml.Vector4f;
 import org.lwjgl.opengl.GL30;
-import org.terasology.nui.Color;
-
-import java.nio.ByteBuffer;
 
 /**
  * attribute maps a target object or a primitive data to a {@link VertexResource}
  *
- * @param <TARGET> the target object
+ * @param <T> the target object
  */
-public class VertexAttribute<TARGET> {
+public class VertexAttribute<T, TImpl extends T> {
 
 
     public final TypeMapping mapping;
     public final int count;
-    public final Class<TARGET> type;
-    public final AttributeConfiguration<TARGET> configuration;
+    public final Class<TImpl> type;
+    public final AttributeConfiguration<T, TImpl> configuration;
 
-    public interface AttributeConfiguration<TARGET> {
-        void write(TARGET value, int vertIdx, int offset, VertexResource resource);
-        TARGET read(int vertIdx, int offset, VertexResource resource, TARGET dest);
+    public interface AttributeConfiguration<T, TImpl> {
+        void write(T value, int vertIdx, int offset, VertexResource resource);
+        TImpl read(int vertIdx, int offset, VertexResource resource, TImpl dest);
         int size(int vertIdx, int offset, VertexResource resource);
         int numElements(int offset, VertexResource resource);
     }
@@ -36,7 +30,7 @@ public class VertexAttribute<TARGET> {
      * @param mapping maps a primitive to a given supported type.
      * @param count the number elements that is described by the target
      */
-    protected VertexAttribute(Class<TARGET> type, AttributeConfiguration<TARGET> attributeConfiguration, TypeMapping mapping, int count) {
+    protected VertexAttribute(Class<TImpl> type, AttributeConfiguration<T, TImpl> attributeConfiguration, TypeMapping mapping, int count) {
         this.type = type;
         this.mapping = mapping;
         this.count = count;

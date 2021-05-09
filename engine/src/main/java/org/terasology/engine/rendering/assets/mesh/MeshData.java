@@ -3,6 +3,7 @@
 package org.terasology.engine.rendering.assets.mesh;
 
 import org.joml.Vector3f;
+import org.joml.Vector3fc;
 import org.lwjgl.opengl.GL30;
 import org.lwjgl.opengl.GL33;
 import org.lwjgl.opengl.GL44;
@@ -48,7 +49,7 @@ public abstract class MeshData implements AssetData {
         return mode;
     }
 
-    public abstract VertexAttributeBinding<Vector3f> verts();
+    public abstract VertexAttributeBinding<Vector3fc, Vector3f> positions();
 
     public abstract VertexResource[] vertexResources();
     public abstract IndexResource indexResource();

@@ -48,26 +48,14 @@ public class ObjMeshFormat extends AbstractAssetFileFormat<MeshData> {
                 throw new IOException("No index data");
             }
 
-            StandardMeshData data = processData(rawVertices, rawNormals, rawTexCoords, rawIndices);
-
-            if (data.verts() == null) {
-                throw new IOException("No vertices define");
-            }
-//            if (!data.normals.isEmpty() && data.normals.size() != data.getVertices().size()) {
-//                throw new IOException("The number of normals does not match the number of vertices.");
-//            }
-//            if (!data.uv0.isEmpty() && data.uv0.size() / 2 != data.getVertices().size() / 3) {
-//                throw new IOException("The number of tex coords does not match the number of vertices.");
-//            }
-
-            return data;
+            return processData(rawVertices, rawNormals, rawTexCoords, rawIndices);
         }
     }
 
     private StandardMeshData processData(List<Vector3f> rawVertices, List<Vector3f> rawNormals, List<Vector2f> rawTexCoords, List<Vector3i[]> rawIndices) throws IOException {
         int numIndices = 0;
         int numVerts = 0;
-        for(int x = 0; x < rawIndices.size(); x++){
+        for (int x = 0; x < rawIndices.size(); x++) {
             numIndices += (rawIndices.get(x).length - 2) * 3;
             numVerts += rawIndices.get(x).length;
         }

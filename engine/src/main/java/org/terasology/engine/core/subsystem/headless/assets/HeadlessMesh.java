@@ -16,6 +16,7 @@
 package org.terasology.engine.core.subsystem.headless.assets;
 
 import org.joml.Vector3f;
+import org.joml.Vector3fc;
 import org.terasology.engine.rendering.assets.mesh.Mesh;
 import org.terasology.engine.rendering.assets.mesh.MeshData;
 import org.terasology.engine.rendering.assets.mesh.resource.VertexAttributeBinding;
@@ -37,7 +38,7 @@ public class HeadlessMesh extends Mesh {
     @Override
     protected void doReload(MeshData meshData) {
         this.data = meshData;
-        getBound(meshData, aabb);
+        getBound(aabb);
     }
 
     @Override
@@ -46,8 +47,8 @@ public class HeadlessMesh extends Mesh {
     }
 
     @Override
-    public VertexAttributeBinding<Vector3f>  getVertices() {
-        return data.verts();
+    public VertexAttributeBinding<Vector3fc, Vector3f>  getVertices() {
+        return data.positions();
     }
 
     @Override

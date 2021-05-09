@@ -4,9 +4,13 @@
 package org.terasology.engine.rendering.assets.mesh.resource;
 
 import org.joml.Vector2f;
+import org.joml.Vector2fc;
 import org.joml.Vector3f;
+import org.joml.Vector3fc;
 import org.joml.Vector4f;
+import org.joml.Vector4fc;
 import org.terasology.nui.Color;
+import org.terasology.nui.Colorc;
 
 import java.nio.ByteBuffer;
 
@@ -15,10 +19,10 @@ public final class GLAttributes {
 
     }
 
-    public static final VertexAttribute<Vector3f> VECTOR_3_F_VERTEX_ATTRIBUTE = new VertexAttribute<>(Vector3f.class, new VertexAttribute.AttributeConfiguration<Vector3f>() {
+    public static final VertexAttribute<Vector3fc, Vector3f> VECTOR_3_F_VERTEX_ATTRIBUTE = new VertexAttribute<Vector3fc, Vector3f>(Vector3f.class, new VertexAttribute.AttributeConfiguration<Vector3fc, Vector3f>() {
 
         @Override
-        public void write(Vector3f value, int vertIdx, int offset, VertexResource resource) {
+        public void write(Vector3fc value, int vertIdx, int offset, VertexResource resource) {
             int bufferStart = vertIdx * resource.getInStride() + offset;
             ByteBuffer buffer = resource.buffer();
             buffer.putFloat(bufferStart, value.x());
@@ -51,9 +55,9 @@ public final class GLAttributes {
         }
     }, VertexAttribute.TypeMapping.ATTR_FLOAT, 3);
 
-    public static final VertexAttribute<Vector4f> VECTOR_4_F_VERTEX_ATTRIBUTE = new VertexAttribute<>(Vector4f.class, new VertexAttribute.AttributeConfiguration<Vector4f>() {
+    public static final VertexAttribute<Vector4fc, Vector4f> VECTOR_4_F_VERTEX_ATTRIBUTE = new VertexAttribute<>(Vector4f.class, new VertexAttribute.AttributeConfiguration<Vector4fc, Vector4f>() {
         @Override
-        public void write(Vector4f value, int vertIdx, int offset, VertexResource resource) {
+        public void write(Vector4fc value, int vertIdx, int offset, VertexResource resource) {
             int bufferStart = vertIdx * resource.getInStride() + offset;
             ByteBuffer buffer = resource.buffer();
             buffer.putFloat(bufferStart, value.x());
@@ -88,9 +92,9 @@ public final class GLAttributes {
         }
     }, VertexAttribute.TypeMapping.ATTR_FLOAT, 4);
 
-    public static final VertexAttribute<Color> COLOR_4_F_VERTEX_ATTRIBUTE = new VertexAttribute<>(Color.class, new VertexAttribute.AttributeConfiguration<Color>() {
+    public static final VertexAttribute<Colorc, Color> COLOR_4_F_VERTEX_ATTRIBUTE = new VertexAttribute<>(Color.class, new VertexAttribute.AttributeConfiguration<Colorc, Color>() {
         @Override
-        public void write(Color value, int vertIdx, int offset, VertexResource resource) {
+        public void write(Colorc value, int vertIdx, int offset, VertexResource resource) {
             int bufferStart = vertIdx * resource.getInStride() + offset;
             ByteBuffer buffer = resource.buffer();
 
@@ -119,7 +123,7 @@ public final class GLAttributes {
         @Override
         public int numElements(int offset, VertexResource resource) {
             int size = (resource.getInSize() / resource.getInStride());
-            if (resource.getInSize() % resource.getInStride() >= Float.BYTES * 4) {
+            if (resource.getInSize() % resource.getInStride() >= (offset + Float.BYTES * 4)) {
                 size++;
             }
             return size;
@@ -127,9 +131,9 @@ public final class GLAttributes {
 
     }, VertexAttribute.TypeMapping.ATTR_FLOAT, 4);
 
-    public static final VertexAttribute<Vector2f> VECTOR_2_F_VERTEX_ATTRIBUTE = new VertexAttribute<>(Vector2f.class, new VertexAttribute.AttributeConfiguration<Vector2f>() {
+    public static final VertexAttribute<Vector2fc, Vector2f> VECTOR_2_F_VERTEX_ATTRIBUTE = new VertexAttribute<>(Vector2f.class, new VertexAttribute.AttributeConfiguration<Vector2fc, Vector2f>() {
         @Override
-        public void write(Vector2f value, int vertIdx, int offset, VertexResource resource) {
+        public void write(Vector2fc value, int vertIdx, int offset, VertexResource resource) {
             int bufferStart = vertIdx * resource.getInStride() + offset;
             ByteBuffer buffer = resource.buffer();
             buffer.putFloat(bufferStart, value.x());

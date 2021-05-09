@@ -694,7 +694,7 @@ public class BulletPhysics implements PhysicsEngine {
         }
         HullShapeComponent hull = entityRef.getComponent(HullShapeComponent.class);
         if (hull != null) {
-            VertexAttributeBinding<Vector3f> positions = hull.sourceMesh.getVertices();
+            VertexAttributeBinding<Vector3fc, Vector3f> positions = hull.sourceMesh.getVertices();
             FloatBuffer buffer = BufferUtils.createFloatBuffer(positions.numberOfElements() * 3);
             Vector3f pos = new Vector3f();
             for (int i = 0; i < positions.numberOfElements(); i++) {

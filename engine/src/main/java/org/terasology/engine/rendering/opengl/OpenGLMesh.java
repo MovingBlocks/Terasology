@@ -3,6 +3,7 @@
 package org.terasology.engine.rendering.opengl;
 
 import org.joml.Vector3f;
+import org.joml.Vector3fc;
 import org.lwjgl.opengl.GL30;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,13 +66,13 @@ public class OpenGLMesh extends Mesh implements OpenGLMeshBase{
     }
 
     @Override
-    public VertexAttributeBinding<Vector3f> getVertices() {
-        return data.verts();
+    public VertexAttributeBinding<Vector3fc, Vector3f> getVertices() {
+        return data.positions();
     }
 
     @Override
     public int getVertexCount() {
-        return data.verts().numberOfElements();
+        return data.positions().numberOfElements();
     }
 
 
@@ -118,7 +119,7 @@ public class OpenGLMesh extends Mesh implements OpenGLMeshBase{
         GL30.glBufferData(GL30.GL_ELEMENT_ARRAY_BUFFER, indexBuffer, GL30.GL_STATIC_DRAW);
 
         GL30.glBindVertexArray(0);
-        getBound(newData, aabb);
+        getBound(aabb);
     }
 
     private static class DisposalAction implements DisposableResource {

@@ -4,13 +4,16 @@
 package org.terasology.engine.rendering.assets.mesh;
 
 import org.joml.Vector2f;
+import org.joml.Vector2fc;
 import org.joml.Vector3f;
+import org.joml.Vector3fc;
 import org.terasology.engine.rendering.assets.mesh.resource.GLAttributes;
 import org.terasology.engine.rendering.assets.mesh.resource.IndexResource;
 import org.terasology.engine.rendering.assets.mesh.resource.VertexAttributeBinding;
 import org.terasology.engine.rendering.assets.mesh.resource.VertexResource;
 import org.terasology.engine.rendering.assets.mesh.resource.VertexResourceBuilder;
 import org.terasology.nui.Color;
+import org.terasology.nui.Colorc;
 
 public class StandardMeshData extends MeshData {
     public static final int VERTEX_INDEX = 0;
@@ -21,22 +24,22 @@ public class StandardMeshData extends MeshData {
     public static final int LIGHT0_INDEX = 5;
 
     public final VertexResource positionBuffer;
-    public final VertexAttributeBinding<Vector3f> position;
+    public final VertexAttributeBinding<Vector3fc, Vector3f> position;
 
     public final VertexResource normalBuffer;
-    public final VertexAttributeBinding<Vector3f> normal;
+    public final VertexAttributeBinding<Vector3fc, Vector3f> normal;
 
     public final VertexResource uv0Buffer;
-    public final VertexAttributeBinding<Vector2f> uv0;
+    public final VertexAttributeBinding<Vector2fc, Vector2f> uv0;
 
     public final VertexResource uv1Buffer;
-    public final VertexAttributeBinding<Vector2f> uv1;
+    public final VertexAttributeBinding<Vector2fc, Vector2f> uv1;
 
     public final VertexResource colorBuffer;
-    public final VertexAttributeBinding<Color> color0;
+    public final VertexAttributeBinding<Colorc, Color> color0;
 
     public final VertexResource lightBuffer;
-    public final VertexAttributeBinding<Vector3f> light0;
+    public final VertexAttributeBinding<Vector3fc, Vector3f> light0;
 
     public final IndexResource indices;
 
@@ -77,12 +80,22 @@ public class StandardMeshData extends MeshData {
         uv1Buffer.reserveElements(numVertices);
         lightBuffer.reserveElements(numVertices);
         colorBuffer.reserveElements(numVertices);
-        indices.ensureCapacity(numIndices);
+        indices.reserveElements(numIndices);
     }
 
+    public void  reallocate(int numVerts, int numIndices) {
+        positionBuffer.reallocateElements(numVerts);
+        normalBuffer.reallocateElements(numVerts);
+        uv0Buffer.reallocateElements(numVerts);
+        uv1Buffer.reallocateElements(numVerts);
+        lightBuffer.reallocateElements(numVerts);
+        colorBuffer.reallocateElements(numVerts);
+        indices.reallocateElements(numIndices);
+
+    }
 
     @Override
-    public VertexAttributeBinding<Vector3f> verts() {
+    public VertexAttributeBinding<Vector3fc, Vector3f> positions() {
         return position;
     }
 

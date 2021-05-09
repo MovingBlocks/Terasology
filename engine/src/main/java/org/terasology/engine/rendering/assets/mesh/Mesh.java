@@ -3,6 +3,7 @@
 package org.terasology.engine.rendering.assets.mesh;
 
 import org.joml.Vector3f;
+import org.joml.Vector3fc;
 import org.terasology.engine.rendering.assets.mesh.resource.VertexAttributeBinding;
 import org.terasology.gestalt.assets.Asset;
 import org.terasology.gestalt.assets.AssetType;
@@ -23,8 +24,8 @@ public abstract class Mesh extends Asset<MeshData> {
 
     public abstract AABBfc getAABB();
 
-    protected AABBf getBound(MeshData data, AABBf dest) {
-        VertexAttributeBinding<Vector3f> vertices = this.getVertices();
+    protected AABBf getBound(AABBf dest) {
+        VertexAttributeBinding<Vector3fc, Vector3f> vertices = this.getVertices();
         if (vertices.numberOfElements() == 0) {
             dest.set(Float.POSITIVE_INFINITY,
                     Float.POSITIVE_INFINITY,
@@ -41,7 +42,7 @@ public abstract class Mesh extends Asset<MeshData> {
         return dest;
     }
 
-    public abstract VertexAttributeBinding<Vector3f> getVertices();
+    public abstract VertexAttributeBinding<Vector3fc, Vector3f> getVertices();
     public abstract int getVertexCount();
 
     // TODO: Remove? At least review.

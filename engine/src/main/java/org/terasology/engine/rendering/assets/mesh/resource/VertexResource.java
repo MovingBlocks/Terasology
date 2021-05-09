@@ -68,6 +68,14 @@ public class VertexResource {
         ensureCapacity(size);
     }
 
+    public void  reallocateElements(int verts) {
+        int size = verts * inStride;
+        ensureCapacity(size);
+        this.inSize = size;
+        squeeze();
+
+    }
+
     public void squeeze() {
         if (this.inSize != buffer.capacity()) {
             ByteBuffer newBuffer = BufferUtils.createByteBuffer(this.inSize);

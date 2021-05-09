@@ -19,11 +19,11 @@ public class VertexResourceBuilder {
      *
      * @param location the index of the attribute binding
      * @param attribute the attribute that describes the binding
-     * @param <TARGET>
+     * @param <T>
      * @return
      */
-    public <TARGET> VertexAttributeBinding<TARGET> add(int location, VertexAttribute<TARGET> attribute) {
-        VertexAttributeBinding<TARGET> result = new VertexAttributeBinding<TARGET>(resource, inStride, attribute);
+    public <T, TImpl extends T> VertexAttributeBinding<T, TImpl> add(int location, VertexAttribute<T, TImpl> attribute) {
+        VertexAttributeBinding<T, TImpl> result = new VertexAttributeBinding<T, TImpl>(resource, inStride, attribute);
         this.definitions.add(new VertexResource.VertexDefinition(location, inStride, attribute));
         inStride += attribute.mapping.size * attribute.count;
         return result;

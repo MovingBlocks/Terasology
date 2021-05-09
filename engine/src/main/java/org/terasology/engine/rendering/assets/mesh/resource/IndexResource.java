@@ -6,12 +6,16 @@ package org.terasology.engine.rendering.assets.mesh.resource;
 import org.lwjgl.BufferUtils;
 import java.nio.ByteBuffer;
 
+/**
+ * defines the order of vertices to walk for rendering geometry
+ *
+ * refrence: https://www.khronos.org/opengl/wiki/Primitive
+ */
 public class IndexResource {
     public ByteBuffer buffer;
     private int numIndices = 0;
     private int inSize = 0;
     private int posIndex = 0;
-
 
     public int getNumberOfIndices() {
         return numIndices;
@@ -39,6 +43,10 @@ public class IndexResource {
         }
     }
 
+    public void reserveElements(int elements) {
+        ensureCapacity(elements * Integer.BYTES);
+    }
+
     public void rewind() {
         posIndex = 0;
     }
@@ -50,6 +58,25 @@ public class IndexResource {
         if (posIndex > numIndices) {
             numIndices = posIndex;
         }
+    }
+
+    public void squeeze() {
+        if (this.inSize != buffer.capacity()) {
+            ByteBuffer newBuffer = BufferUtils.createByteBuffer(this.inSize);
+            buffer.limit(this.inSize);
+            buffer.position(0);
+            newBuffer.put(buffer);
+            this.buffer = newBuffer;
+        }
+    }
+
+    public void reallocateElements(int indices) {
+        ensureCapacity((indices + 1) * Integer.BYTES);
+        numIndices = indices;
+    }
+
+    public void position(int position) {
+        posIndex = position;
     }
 
     public void put(int index, int value) {

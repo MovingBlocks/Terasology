@@ -5,18 +5,18 @@ package org.terasology.engine.rendering.assets.mesh.resource;
 
 /**
  * a binding that maps depending on the type of attribute and a resource where the data is committed to
- * @param <TARGET>
+ * @param <T>
  */
-public class VertexAttributeBinding<TARGET> {
+public class VertexAttributeBinding<T, TImpl extends T> {
     private final VertexResource resource;
-    private final VertexAttribute<TARGET> attribute;
+    private final VertexAttribute<T, TImpl> attribute;
     private final int offset;
     private int vertexIndex;
 
     private int version = -1;
     private int numberElements = 0;
 
-    public VertexAttributeBinding(VertexResource resource, int offset, VertexAttribute<TARGET> attribute) {
+    public VertexAttributeBinding(VertexResource resource, int offset, VertexAttribute<T, TImpl> attribute) {
         this.resource = resource;
         this.attribute = attribute;
         this.offset = offset;
@@ -63,19 +63,19 @@ public class VertexAttributeBinding<TARGET> {
      *
      * @param value the value to commit
      */
-    public void put(TARGET value) {
+    public void put(T value) {
         resource.ensureCapacity(attribute.configuration.size(this.vertexIndex, this.offset, resource));
         attribute.configuration.write(value, this.vertexIndex, this.offset, resource);
         this.vertexIndex++;
         this.resource.mark();
     }
 
-    public void set(int index, TARGET value) {
+    public void set(int index, T value) {
         attribute.configuration.write(value, index, this.offset, resource);
         this.resource.mark();
     }
 
-    public TARGET get(int index, TARGET dest) {
+    public TImpl get(int index, TImpl dest) {
         return attribute.configuration.read(index, this.offset, resource, dest);
     }
 }
