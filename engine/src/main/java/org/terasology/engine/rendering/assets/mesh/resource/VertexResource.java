@@ -41,6 +41,21 @@ public class VertexResource {
         this.buffer = BufferUtils.createByteBuffer(inSize);
     }
 
+    public void copy(VertexResource resource) {
+        if (resource.inSize == 0) {
+            return;
+        }
+        ensureCapacity(resource.inSize);
+        ByteBuffer copyBuffer = resource.buffer;
+        copyBuffer.limit(resource.inSize());
+        copyBuffer.rewind();
+        buffer.put(copyBuffer);
+
+        this.inSize = resource.inSize;
+        this.inStride = resource.inStride;
+        this.mark();
+    }
+
     public int getInSize() {
         return inSize;
     }

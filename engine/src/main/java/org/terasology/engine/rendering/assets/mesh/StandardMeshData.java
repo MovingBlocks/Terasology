@@ -115,4 +115,17 @@ public class StandardMeshData extends MeshData {
     public IndexResource indexResource() {
         return indices;
     }
+
+    @Override
+    public StandardMeshData clone() {
+        StandardMeshData meshData = new StandardMeshData();
+        meshData.positionBuffer.copy(this.positionBuffer);
+        meshData.normalBuffer.copy(this.normalBuffer);
+        meshData.uv0Buffer.copy(this.uv0Buffer);
+        meshData.uv1Buffer.copy(this.uv1Buffer);
+        meshData.lightBuffer.copy(this.lightBuffer);
+        meshData.colorBuffer.copy(this.colorBuffer);
+        meshData.indices.copy(this.indices);
+        return meshData;
+    }
 }

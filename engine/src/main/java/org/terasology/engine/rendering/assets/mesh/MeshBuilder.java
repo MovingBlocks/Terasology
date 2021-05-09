@@ -108,7 +108,7 @@ public class MeshBuilder {
     }
 
     public MeshBuilder addIndex(int index) {
-        meshData.indices.put(index);//.add(index);
+        meshData.indices.put(index);
         return this;
     }
 
@@ -119,16 +119,16 @@ public class MeshBuilder {
         return this;
     }
 
-    public StandardMeshData getMeshData() {
-        return meshData;
+    public StandardMeshData buildMeshData() {
+        return meshData.clone();
     }
 
     public Mesh build() {
-        return Assets.generateAsset(getMeshData(), Mesh.class);
+        return Assets.generateAsset(buildMeshData(), Mesh.class);
     }
 
     public Mesh build(ResourceUrn urn) {
-        return Assets.generateAsset(urn, getMeshData(), Mesh.class);
+        return Assets.generateAsset(urn, buildMeshData(), Mesh.class);
     }
 
     /**

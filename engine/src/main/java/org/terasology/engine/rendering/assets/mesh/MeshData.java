@@ -50,7 +50,7 @@ public abstract class MeshData implements AssetData {
     }
 
     public abstract VertexAttributeBinding<Vector3fc, Vector3f> positions();
-
     public abstract VertexResource[] vertexResources();
     public abstract IndexResource indexResource();
+    public abstract StandardMeshData clone();
 }

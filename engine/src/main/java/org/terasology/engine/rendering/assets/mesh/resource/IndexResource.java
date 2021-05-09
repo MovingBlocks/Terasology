@@ -43,6 +43,18 @@ public class IndexResource {
         }
     }
 
+    public void copy(IndexResource resource) {
+        ensureCapacity(resource.inSize);
+        ByteBuffer copyBuffer = resource.buffer;
+        copyBuffer.limit(resource.getSize());
+        copyBuffer.rewind();
+        buffer.put(copyBuffer);
+
+        this.inSize = resource.inSize;
+        this.numIndices = resource.getNumberOfIndices();
+    }
+
+
     public void reserveElements(int elements) {
         ensureCapacity(elements * Integer.BYTES);
     }

@@ -12,7 +12,6 @@ import org.lwjgl.opengl.GL30;
  */
 public class VertexAttribute<T, TImpl extends T> {
 
-
     public final TypeMapping mapping;
     public final int count;
     public final Class<TImpl> type;
@@ -20,8 +19,11 @@ public class VertexAttribute<T, TImpl extends T> {
 
     public interface AttributeConfiguration<T, TImpl> {
         void write(T value, int vertIdx, int offset, VertexResource resource);
+
         TImpl read(int vertIdx, int offset, VertexResource resource, TImpl dest);
+
         int size(int vertIdx, int offset, VertexResource resource);
+
         int numElements(int offset, VertexResource resource);
     }
 
@@ -52,7 +54,4 @@ public class VertexAttribute<T, TImpl extends T> {
             this.glType = glType;
         }
     }
-
-
-
 }
