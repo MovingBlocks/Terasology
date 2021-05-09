@@ -53,7 +53,7 @@ public class HeadlessMesh extends Mesh {
 
     @Override
     public int getVertexCount() {
-        return 0;
+        return data.positions().numberOfElements();
     }
 
     @Override
