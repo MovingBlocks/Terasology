@@ -4,7 +4,7 @@
 package org.terasology.engine.core;
 
 import com.google.common.base.Charsets;
-import org.terasology.naming.Name;
+import org.terasology.gestalt.naming.Name;
 
 import java.nio.charset.Charset;
 import java.nio.file.Path;

@@ -13,9 +13,9 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL15;
 import org.terasology.engine.core.subsystem.lwjgl.GLBufferPool;
+import org.terasology.gestalt.module.sandbox.API;
 import org.terasology.engine.rendering.VertexBufferObjectUtil;
 import org.terasology.engine.rendering.assets.material.Material;
-import org.terasology.module.sandbox.API;
 
 import java.nio.IntBuffer;
 import java.util.Map;

@@ -4,7 +4,7 @@ package org.terasology.engine.logic.console;
 
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.logic.console.commandSystem.ConsoleCommand;
-import org.terasology.naming.Name;
+import org.terasology.gestalt.naming.Name;
 
 import java.util.Collection;
 import java.util.List;

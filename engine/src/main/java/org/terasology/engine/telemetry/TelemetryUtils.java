@@ -25,7 +25,7 @@ import org.slf4j.LoggerFactory;
 import org.terasology.engine.config.facade.TelemetryConfiguration;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.core.subsystem.DisplayDevice;
-import org.terasology.module.sandbox.API;
+import org.terasology.gestalt.module.sandbox.API;
 import org.terasology.engine.registry.CoreRegistry;
 import org.terasology.engine.telemetry.logstash.TelemetryLogstashAppender;
 import org.terasology.engine.telemetry.metrics.Metric;

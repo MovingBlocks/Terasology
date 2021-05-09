@@ -18,7 +18,7 @@ package org.terasology.engine.persistence.internal;
 
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.entity.internal.EngineEntityManager;
-import org.terasology.module.ModuleEnvironment;
+import org.terasology.gestalt.module.ModuleEnvironment;
 import org.terasology.engine.network.Client;
 import org.terasology.engine.network.ClientComponent;
 import org.terasology.engine.world.block.BlockManager;

@@ -2,14 +2,13 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.logic.ai;
 
+import com.google.common.collect.Iterables;
 import org.terasology.engine.entitySystem.entity.EntityManager;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
 import org.terasology.engine.entitySystem.systems.RegisterSystem;
 import org.terasology.engine.logic.console.commandSystem.annotations.Command;
 import org.terasology.engine.registry.In;
-
-import com.google.common.collect.Iterables;
 
 /**
  * Artificial Intelligence commands for counting and destroying AIs used by entities with AI related components attached

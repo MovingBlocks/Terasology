@@ -2,15 +2,14 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.i18n.assets;
 
+import com.google.common.base.Preconditions;
+import org.terasology.engine.core.Uri;
+import org.terasology.gestalt.assets.AssetData;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-
-import org.terasology.assets.AssetData;
-import org.terasology.engine.core.Uri;
-
-import com.google.common.base.Preconditions;
 
 
 /**

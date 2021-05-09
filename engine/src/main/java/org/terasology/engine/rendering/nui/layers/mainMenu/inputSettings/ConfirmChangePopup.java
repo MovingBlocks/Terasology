@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.rendering.nui.layers.mainMenu.inputSettings;
 
-import org.terasology.assets.ResourceUrn;
+import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.engine.i18n.TranslationSystem;
 import org.terasology.nui.WidgetUtil;
 import org.terasology.nui.widgets.UILabel;

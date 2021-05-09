@@ -3,4 +3,4 @@
 
 @API package org.terasology.engine.logic.console.suggesters;
 
-import org.terasology.module.sandbox.API;
+import org.terasology.gestalt.module.sandbox.API;

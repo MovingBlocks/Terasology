@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.rendering.nui.layers.mainMenu.advancedGameSetupScreen;
 
-import org.terasology.module.Module;
-import org.terasology.module.ModuleMetadata;
+import org.terasology.gestalt.module.Module;
+import org.terasology.gestalt.module.ModuleMetadata;
 
 final class ModuleSelectionInfo {
     private Module latestVersion;

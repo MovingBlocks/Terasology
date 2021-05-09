@@ -17,7 +17,7 @@ import org.terasology.engine.rendering.cameras.Camera;
 import org.terasology.engine.rendering.primitives.Tessellator;
 import org.terasology.engine.rendering.primitives.TessellatorHelper;
 import org.terasology.joml.geom.Rectanglef;
-import org.terasology.module.sandbox.API;
+import org.terasology.gestalt.module.sandbox.API;
 import org.terasology.engine.registry.CoreRegistry;
 import org.terasology.engine.rendering.assets.mesh.Mesh;
 import org.terasology.engine.rendering.world.WorldRenderer;

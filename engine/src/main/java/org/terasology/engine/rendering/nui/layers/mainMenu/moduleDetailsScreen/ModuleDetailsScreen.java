@@ -6,7 +6,6 @@ import org.codehaus.plexus.util.StringUtils;
 import org.joml.Vector2i;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.assets.ResourceUrn;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.core.module.DependencyResolutionFailedException;
 import org.terasology.engine.core.module.ExtraDataModuleExtension;
@@ -15,15 +14,21 @@ import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.engine.core.module.RemoteModuleExtension;
 import org.terasology.engine.core.module.StandardModuleExtension;
 import org.terasology.engine.i18n.TranslationSystem;
+import org.terasology.engine.registry.In;
+import org.terasology.engine.rendering.nui.CoreScreenLayer;
 import org.terasology.engine.rendering.nui.animation.MenuAnimationSystems;
+import org.terasology.engine.rendering.nui.layers.mainMenu.ConfirmPopup;
+import org.terasology.engine.rendering.nui.layers.mainMenu.MessagePopup;
+import org.terasology.engine.rendering.nui.layers.mainMenu.WaitPopup;
 import org.terasology.engine.rendering.nui.layers.mainMenu.advancedGameSetupScreen.DownloadPopupProgressListener;
 import org.terasology.engine.rendering.nui.widgets.UIButtonWebBrowser;
-import org.terasology.module.DependencyInfo;
-import org.terasology.module.DependencyResolver;
-import org.terasology.module.Module;
-import org.terasology.module.ModuleMetadata;
-import org.terasology.naming.Name;
-import org.terasology.naming.Version;
+import org.terasology.gestalt.assets.ResourceUrn;
+import org.terasology.gestalt.module.Module;
+import org.terasology.gestalt.module.ModuleMetadata;
+import org.terasology.gestalt.module.dependencyresolution.DependencyInfo;
+import org.terasology.gestalt.module.dependencyresolution.DependencyResolver;
+import org.terasology.gestalt.naming.Name;
+import org.terasology.gestalt.naming.Version;
 import org.terasology.nui.Canvas;
 import org.terasology.nui.Color;
 import org.terasology.nui.databinding.Binding;
@@ -34,11 +39,6 @@ import org.terasology.nui.widgets.UIButton;
 import org.terasology.nui.widgets.UILabel;
 import org.terasology.nui.widgets.UIList;
 import org.terasology.nui.widgets.UIText;
-import org.terasology.engine.registry.In;
-import org.terasology.engine.rendering.nui.CoreScreenLayer;
-import org.terasology.engine.rendering.nui.layers.mainMenu.ConfirmPopup;
-import org.terasology.engine.rendering.nui.layers.mainMenu.MessagePopup;
-import org.terasology.engine.rendering.nui.layers.mainMenu.WaitPopup;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -305,7 +305,7 @@ public class ModuleDetailsScreen extends CoreScreenLayer {
             public void draw(DependencyInfo value, Canvas canvas) {
                 Module module = moduleManager.getRegistry().getLatestModuleVersion(value.getId());
 
-                if (module == null || !(value.versionRange().contains(module.getVersion()))) {
+                if (module == null || !(value.versionPredicate().test(module.getVersion()))) {
                     canvas.setMode("invalid");
                 } else {
                     canvas.setMode("available");

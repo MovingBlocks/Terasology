@@ -4,11 +4,11 @@ package org.terasology.engine.config.flexible.ui;
 
 import com.google.common.collect.Lists;
 import org.junit.jupiter.api.Test;
-import org.terasology.assets.management.AssetManager;
-import org.terasology.assets.management.AssetTypeManager;
+import org.terasology.gestalt.assets.management.AssetManager;
 import org.terasology.engine.config.flexible.Setting;
 import org.terasology.engine.config.flexible.constraints.NumberRangeConstraint;
-import org.terasology.module.ModuleEnvironment;
+import org.terasology.gestalt.assets.management.AssetTypeManager;
+import org.terasology.gestalt.module.ModuleEnvironment;
 
 import java.util.Optional;
 

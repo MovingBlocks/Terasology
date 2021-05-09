@@ -16,11 +16,11 @@
 package org.terasology.engine.entitySystem.prefab.internal;
 
 import com.google.common.base.Strings;
-import org.terasology.assets.management.AssetManager;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.entitySystem.prefab.Prefab;
 import org.terasology.engine.entitySystem.prefab.PrefabManager;
+import org.terasology.gestalt.assets.management.AssetManager;
 
 import java.util.Collection;
 import java.util.HashSet;

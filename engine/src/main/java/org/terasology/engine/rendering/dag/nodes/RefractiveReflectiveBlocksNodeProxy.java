@@ -4,7 +4,7 @@ package org.terasology.engine.rendering.dag.nodes;
 
 import org.terasology.engine.context.Context;
 import org.terasology.engine.core.SimpleUri;
-import org.terasology.naming.Name;
+import org.terasology.gestalt.naming.Name;
 import org.terasology.nui.properties.Range;
 import org.terasology.engine.rendering.dag.AbstractNode;
 

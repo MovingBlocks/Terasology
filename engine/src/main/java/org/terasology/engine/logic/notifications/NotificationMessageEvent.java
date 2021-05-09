@@ -8,7 +8,7 @@ import org.terasology.engine.logic.console.CoreMessageType;
 import org.terasology.engine.logic.console.Message;
 import org.terasology.engine.logic.console.MessageEvent;
 import org.terasology.engine.logic.players.PlayerUtil;
-import org.terasology.module.sandbox.API;
+import org.terasology.gestalt.module.sandbox.API;
 import org.terasology.engine.network.OwnerEvent;
 
 /**
@@ -28,16 +28,16 @@ public class NotificationMessageEvent implements MessageEvent {
         this.message = message;
         this.from = from;
     }
-    
+
     public static NotificationMessageEvent newJoinEvent(EntityRef client) {
         String playerName = PlayerUtil.getColoredPlayerName(client);
-        
+
         return new NotificationMessageEvent("Player \"" + playerName + "\" has joined the game", client);
     }
-    
+
     public static NotificationMessageEvent newLeaveEvent(EntityRef client) {
         String playerName = PlayerUtil.getColoredPlayerName(client);
-        
+
         return new NotificationMessageEvent("Player \"" + playerName + "\" has left the game", client);
     }
 
@@ -48,7 +48,7 @@ public class NotificationMessageEvent implements MessageEvent {
     public EntityRef getFrom() {
         return from;
     }
-    
+
     @Override
     public Message getFormattedMessage() {
         return new Message(message, CoreMessageType.NOTIFICATION);

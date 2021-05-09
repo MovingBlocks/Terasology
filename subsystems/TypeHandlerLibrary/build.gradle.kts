@@ -17,8 +17,8 @@ dependencies {
 
     implementation("org.terasology:reflections:0.9.12-MB")
     implementation("org.terasology.nui:nui-reflect:3.0.0-SNAPSHOT")
-    implementation("org.terasology:gestalt-module:5.1.5")
-    implementation("org.terasology:gestalt-asset-core:5.1.5")
+    implementation("org.terasology.gestalt:gestalt-module:7.0.6-SNAPSHOT")
+    implementation("org.terasology.gestalt:gestalt-asset-core:7.0.6-SNAPSHOT")
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.5.2")
     testImplementation("org.junit.jupiter:junit-jupiter-params:5.5.2")

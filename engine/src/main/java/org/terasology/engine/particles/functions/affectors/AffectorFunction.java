@@ -16,7 +16,7 @@
 package org.terasology.engine.particles.functions.affectors;
 
 import org.terasology.engine.entitySystem.Component;
-import org.terasology.module.sandbox.API;
+import org.terasology.gestalt.module.sandbox.API;
 import org.terasology.engine.particles.ParticleData;
 import org.terasology.engine.particles.ParticleDataMask;
 import org.terasology.engine.particles.functions.ParticleSystemFunction;

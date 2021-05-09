@@ -7,8 +7,8 @@ import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.logic.console.Console;
 import org.terasology.engine.logic.console.commandSystem.exceptions.CommandExecutionException;
 import org.terasology.engine.logic.console.commandSystem.exceptions.CommandSuggestionException;
-import org.terasology.module.sandbox.API;
-import org.terasology.naming.Name;
+import org.terasology.gestalt.module.sandbox.API;
+import org.terasology.gestalt.naming.Name;
 
 import java.util.Comparator;
 import java.util.List;

@@ -5,7 +5,7 @@ package org.terasology.engine.rendering.nui.internal;
 import org.joml.Quaternionfc;
 import org.joml.Vector2ic;
 import org.joml.Vector3fc;
-import org.terasology.assets.ResourceUrn;
+import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.engine.rendering.assets.material.Material;
 import org.terasology.engine.rendering.opengl.FrameBufferObject;
 import org.terasology.joml.geom.Rectanglei;

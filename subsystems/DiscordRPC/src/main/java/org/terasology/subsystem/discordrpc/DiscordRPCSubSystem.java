@@ -132,8 +132,10 @@ public final class DiscordRPCSubSystem implements EngineSubsystem {
 
     @Override
     public synchronized void preShutdown() {
-        thread.disable();
-        thread.stop();
+        if (thread != null) {
+            thread.disable();
+            thread.stop();
+        }
     }
 
     @Override

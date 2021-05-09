@@ -40,21 +40,21 @@ import org.terasology.engine.logic.console.ConsoleImpl;
 import org.terasology.engine.logic.console.ConsoleSystem;
 import org.terasology.engine.logic.console.commands.CoreCommands;
 import org.terasology.engine.logic.players.LocalPlayer;
-import org.terasology.module.Module;
-import org.terasology.naming.Name;
 import org.terasology.engine.network.ClientComponent;
 import org.terasology.engine.network.NetworkMode;
 import org.terasology.engine.recording.DirectionAndOriginPosRecorderList;
 import org.terasology.engine.recording.RecordAndReplayCurrentStatus;
 import org.terasology.engine.registry.CoreRegistry;
 import org.terasology.engine.rendering.nui.NUIManager;
-import org.terasology.nui.canvas.CanvasRenderer;
 import org.terasology.engine.rendering.nui.internal.NUIManagerInternal;
 import org.terasology.engine.rendering.nui.internal.TerasologyCanvasRenderer;
 import org.terasology.engine.rendering.nui.layers.mainMenu.savedGames.GameInfo;
 import org.terasology.engine.rendering.nui.layers.mainMenu.savedGames.GameProvider;
 import org.terasology.engine.world.internal.WorldInfo;
 import org.terasology.engine.world.time.WorldTime;
+import org.terasology.gestalt.module.Module;
+import org.terasology.gestalt.naming.Name;
+import org.terasology.nui.canvas.CanvasRenderer;
 
 import java.util.List;
 

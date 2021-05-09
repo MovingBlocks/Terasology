@@ -17,12 +17,11 @@ import org.terasology.engine.rendering.nui.layers.mainMenu.savedGames.GameProvid
 import org.terasology.engine.rendering.world.WorldSetupWrapper;
 import org.terasology.engine.world.internal.WorldInfo;
 import org.terasology.engine.world.time.WorldTime;
-import org.terasology.module.DependencyResolver;
-import org.terasology.module.Module;
-import org.terasology.module.ResolutionResult;
+import org.terasology.gestalt.module.Module;
+import org.terasology.gestalt.module.dependencyresolution.DependencyResolver;
+import org.terasology.gestalt.module.dependencyresolution.ResolutionResult;
 
 import java.util.Map;
-
 
 /**
  * Generates new games manifest according to input data.

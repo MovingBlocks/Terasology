@@ -9,6 +9,7 @@ plugins {
 
 repositories {
     mavenCentral()
+    google()  // gestalt uses an annotation package by Google
 
     maven {
         name = "Terasology Artifactory"
@@ -21,10 +22,11 @@ repositories {
 dependencies {
     // Needed for caching reflected data during builds
     implementation("org.terasology:reflections:0.9.12-MB")
+    implementation("org.javassist:javassist:3.27.0-GA")
     implementation("dom4j:dom4j:1.6.1")
 
     // for inspecting modules
-    implementation("org.terasology:gestalt-module:5.1.5")
+    implementation("org.terasology.gestalt:gestalt-module:7.1.0-SNAPSHOT")
 
     api(kotlin("test"))
 }

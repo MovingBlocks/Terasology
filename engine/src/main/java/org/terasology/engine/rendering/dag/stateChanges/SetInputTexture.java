@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.rendering.dag.stateChanges;
 
-import org.terasology.assets.ResourceUrn;
+import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.engine.rendering.assets.material.Material;
 import org.terasology.engine.rendering.assets.texture.Texture;
 import org.terasology.engine.rendering.dag.StateChange;

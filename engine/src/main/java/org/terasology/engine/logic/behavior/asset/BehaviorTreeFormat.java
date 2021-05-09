@@ -5,13 +5,13 @@ package org.terasology.engine.logic.behavior.asset;
 import com.google.common.base.Charsets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.assets.ResourceUrn;
-import org.terasology.assets.format.AbstractAssetFileFormat;
-import org.terasology.assets.format.AssetDataFile;
-import org.terasology.assets.module.annotations.RegisterAssetFileFormat;
+import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.engine.logic.behavior.core.BehaviorNode;
 import org.terasology.engine.logic.behavior.core.BehaviorTreeBuilder;
 import org.terasology.engine.registry.CoreRegistry;
+import org.terasology.gestalt.assets.format.AbstractAssetFileFormat;
+import org.terasology.gestalt.assets.format.AssetDataFile;
+import org.terasology.gestalt.assets.module.annotations.RegisterAssetFileFormat;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,7 +32,6 @@ public class BehaviorTreeFormat extends AbstractAssetFileFormat<BehaviorTreeData
     private static final Logger logger = LoggerFactory.getLogger(BehaviorTreeFormat.class);
 
 
-
     public BehaviorTreeFormat() {
         super("behavior");
     }
@@ -43,7 +42,6 @@ public class BehaviorTreeFormat extends AbstractAssetFileFormat<BehaviorTreeData
         writer.write(builder.toJson(data.getRoot()));
         writer.close();
     }
-
 
 
     @Override
@@ -57,9 +55,6 @@ public class BehaviorTreeFormat extends AbstractAssetFileFormat<BehaviorTreeData
             return load(stream);
         }
     }
-
-
-
 
 
     public BehaviorTreeData load(InputStream stream) {

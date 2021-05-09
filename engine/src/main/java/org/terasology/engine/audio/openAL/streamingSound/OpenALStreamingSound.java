@@ -1,31 +1,19 @@
-/*
- * Copyright 2013 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.audio.openAL.streamingSound;
 
 import org.lwjgl.openal.AL10;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.assets.Asset;
-import org.terasology.assets.AssetType;
-import org.terasology.assets.ResourceUrn;
 import org.terasology.engine.audio.StreamingSound;
 import org.terasology.engine.audio.StreamingSoundData;
 import org.terasology.engine.audio.openAL.OpenALException;
 import org.terasology.engine.audio.openAL.OpenALManager;
 import org.terasology.engine.core.GameThread;
+import org.terasology.gestalt.assets.Asset;
+import org.terasology.gestalt.assets.AssetType;
+import org.terasology.gestalt.assets.DisposableResource;
+import org.terasology.gestalt.assets.ResourceUrn;
 
 import java.lang.ref.WeakReference;
 import java.nio.ByteBuffer;
@@ -44,14 +32,14 @@ public final class OpenALStreamingSound extends StreamingSound {
     private StreamingSoundData stream;
     private ByteBuffer dataBuffer = ByteBuffer.allocateDirect(BUFFER_SIZE);
 
-    private InternalResources internalResources;
+    private OpenALStreamingSound.DisposalAction internalResources;
     private int lastUpdatedBuffer;
 
-    public OpenALStreamingSound(ResourceUrn urn, AssetType<?, StreamingSoundData> assetType, StreamingSoundData data, OpenALManager audioManager) {
-        super(urn, assetType);
-        this.internalResources = new InternalResources(urn, this);
+    public OpenALStreamingSound(ResourceUrn urn, AssetType<?, StreamingSoundData> assetType, StreamingSoundData data, OpenALManager audioManager, OpenALStreamingSound.DisposalAction disposableAction) {
+        super(urn, assetType, disposableAction);
+        this.internalResources = disposableAction;
+        this.internalResources.setAsset(this);
         this.audioManager = audioManager;
-        getDisposalHook().setDisposeAction(internalResources);
         reload(data);
     }
 
@@ -139,24 +127,30 @@ public final class OpenALStreamingSound extends StreamingSound {
     }
 
     @Override
-    protected Optional<? extends Asset<StreamingSoundData>> doCreateCopy(ResourceUrn copyUrn, AssetType<?, StreamingSoundData> parentAssetType) {
-        return Optional.of(new OpenALStreamingSound(copyUrn, parentAssetType, stream, audioManager));
+    protected Optional<? extends Asset<StreamingSoundData>> doCreateCopy(ResourceUrn copyUrn, AssetType<?,
+            StreamingSoundData> parentAssetType) {
+        return Optional.of(new OpenALStreamingSound(copyUrn, parentAssetType, stream, audioManager,
+                new DisposalAction(copyUrn)));
     }
 
-    private static class InternalResources implements Runnable {
 
-        protected int[] buffers = new int[0];
+    public static class DisposalAction implements DisposableResource {
 
         private final ResourceUrn urn;
-        private final WeakReference<OpenALStreamingSound> asset;
+        protected int[] buffers = new int[0];
+        private WeakReference<OpenALStreamingSound> asset;
 
-        InternalResources(ResourceUrn urn, OpenALStreamingSound asset) {
+        public DisposalAction(ResourceUrn urn) {
             this.urn = urn;
+        }
+
+        public void setAsset(OpenALStreamingSound asset) {
             this.asset = new WeakReference<>(asset);
         }
 
+
         @Override
-        public void run() {
+        public void close() {
             try {
                 GameThread.synch(() -> {
                     OpenALStreamingSound sound = asset.get();

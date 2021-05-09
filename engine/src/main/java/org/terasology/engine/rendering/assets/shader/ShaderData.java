@@ -3,7 +3,7 @@
 package org.terasology.engine.rendering.assets.shader;
 
 import com.google.common.collect.ImmutableList;
-import org.terasology.assets.AssetData;
+import org.terasology.gestalt.assets.AssetData;
 
 import java.util.List;
 import java.util.regex.Matcher;

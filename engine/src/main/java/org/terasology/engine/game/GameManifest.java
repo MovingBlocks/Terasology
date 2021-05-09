@@ -27,11 +27,11 @@ import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.utilities.gson.CaseInsensitiveEnumTypeAdapterFactory;
 import org.terasology.engine.utilities.gson.UriTypeAdapterFactory;
 import org.terasology.engine.world.internal.WorldInfo;
-import org.terasology.naming.Name;
-import org.terasology.naming.NameVersion;
-import org.terasology.naming.Version;
-import org.terasology.naming.gson.NameTypeAdapter;
-import org.terasology.naming.gson.VersionTypeAdapter;
+import org.terasology.gestalt.naming.Name;
+import org.terasology.gestalt.naming.NameVersion;
+import org.terasology.gestalt.naming.Version;
+import org.terasology.gestalt.naming.gson.NameTypeAdapter;
+import org.terasology.gestalt.naming.gson.VersionTypeAdapter;
 
 import java.io.BufferedReader;
 import java.io.IOException;

@@ -14,7 +14,7 @@ import org.terasology.engine.core.SimpleUri;
 import org.terasology.engine.rendering.dag.dependencyConnections.BufferPairConnection;
 import org.terasology.engine.rendering.dag.dependencyConnections.DependencyConnection;
 import org.terasology.engine.rendering.dag.dependencyConnections.FboConnection;
-import org.terasology.naming.Name;
+import org.terasology.gestalt.naming.Name;
 import org.terasology.engine.rendering.ShaderManager;
 
 import java.util.ArrayList;

@@ -5,7 +5,7 @@ package org.terasology.engine.rendering.nui.layers.mainMenu.videoSettings;
 import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.assets.ResourceUrn;
+import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.core.GameEngine;
 import org.terasology.engine.core.Time;

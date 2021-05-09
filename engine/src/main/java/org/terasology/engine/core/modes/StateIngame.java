@@ -32,12 +32,9 @@ import org.terasology.engine.identity.storageServiceClient.StorageServiceWorker;
 import org.terasology.engine.input.InputSystem;
 import org.terasology.engine.input.cameraTarget.CameraTargetSystem;
 import org.terasology.engine.logic.console.Console;
-import org.terasology.module.Module;
-import org.terasology.module.ModuleEnvironment;
 import org.terasology.engine.monitoring.PerformanceMonitor;
 import org.terasology.engine.network.NetworkMode;
 import org.terasology.engine.network.NetworkSystem;
-import org.terasology.nui.databinding.ReadOnlyBinding;
 import org.terasology.engine.persistence.StorageManager;
 import org.terasology.engine.physics.engine.PhysicsEngine;
 import org.terasology.engine.rendering.nui.NUIManager;
@@ -45,6 +42,9 @@ import org.terasology.engine.rendering.nui.layers.mainMenu.MessagePopup;
 import org.terasology.engine.rendering.world.WorldRenderer;
 import org.terasology.engine.rendering.world.WorldRenderer.RenderingStage;
 import org.terasology.engine.world.chunks.ChunkProvider;
+import org.terasology.gestalt.module.Module;
+import org.terasology.gestalt.module.ModuleEnvironment;
+import org.terasology.nui.databinding.ReadOnlyBinding;
 
 import java.util.Collections;
 

@@ -11,9 +11,6 @@ import com.google.common.collect.Queues;
 import org.joml.Vector2i;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.assets.ResourceUrn;
-import org.terasology.assets.management.AssetManager;
-import org.terasology.assets.module.ModuleAwareAssetTypeManager;
 import org.terasology.engine.audio.StaticSound;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.config.RenderingConfig;
@@ -30,18 +27,32 @@ import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
 import org.terasology.engine.i18n.TranslationSystem;
 import org.terasology.engine.input.BindButtonEvent;
 import org.terasology.engine.input.InputSystem;
-import org.terasology.engine.rendering.assets.texture.Texture;
-import org.terasology.input.device.KeyboardDevice;
-import org.terasology.input.device.MouseDevice;
 import org.terasology.engine.input.events.CharEvent;
 import org.terasology.engine.input.events.KeyEvent;
 import org.terasology.engine.input.events.MouseAxisEvent;
 import org.terasology.engine.input.events.MouseButtonEvent;
 import org.terasology.engine.input.events.MouseWheelEvent;
 import org.terasology.engine.logic.players.LocalPlayer;
-import org.terasology.module.Module;
-import org.terasology.module.ModuleEnvironment;
 import org.terasology.engine.network.ClientComponent;
+import org.terasology.engine.registry.InjectionHelper;
+import org.terasology.engine.rendering.assets.texture.Texture;
+import org.terasology.engine.rendering.nui.CoreScreenLayer;
+import org.terasology.engine.rendering.nui.NUIManager;
+import org.terasology.engine.rendering.nui.ScreenLayerClosedEvent;
+import org.terasology.engine.rendering.nui.SortOrderSystem;
+import org.terasology.engine.rendering.nui.UIScreenLayer;
+import org.terasology.engine.rendering.nui.layers.hud.HUDScreenLayer;
+import org.terasology.engine.rendering.nui.layers.ingame.OnlinePlayersOverlay;
+import org.terasology.engine.rendering.nui.widgets.TypeWidgetFactoryRegistryImpl;
+import org.terasology.engine.utilities.Assets;
+import org.terasology.gestalt.assets.ResourceUrn;
+import org.terasology.gestalt.assets.management.AssetManager;
+import org.terasology.gestalt.assets.module.ModuleAwareAssetTypeManager;
+import org.terasology.gestalt.module.Module;
+import org.terasology.gestalt.module.ModuleEnvironment;
+import org.terasology.gestalt.naming.Name;
+import org.terasology.input.device.KeyboardDevice;
+import org.terasology.input.device.MouseDevice;
 import org.terasology.nui.AbstractWidget;
 import org.terasology.nui.ControlWidget;
 import org.terasology.nui.TabbingManager;
@@ -53,6 +64,7 @@ import org.terasology.nui.events.NUICharEvent;
 import org.terasology.nui.events.NUIKeyEvent;
 import org.terasology.nui.events.NUIMouseButtonEvent;
 import org.terasology.nui.events.NUIMouseWheelEvent;
+import org.terasology.nui.reflection.WidgetLibrary;
 import org.terasology.nui.widgets.UIButton;
 import org.terasology.nui.widgets.UIText;
 import org.terasology.nui.widgets.types.RegisterTypeWidgetFactory;
@@ -60,18 +72,7 @@ import org.terasology.nui.widgets.types.TypeWidgetFactory;
 import org.terasology.nui.widgets.types.TypeWidgetFactoryRegistry;
 import org.terasology.nui.widgets.types.TypeWidgetLibrary;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
-import org.terasology.reflection.metadata.ClassLibrary;
 import org.terasology.reflection.reflect.ReflectFactory;
-import org.terasology.engine.registry.InjectionHelper;
-import org.terasology.engine.rendering.nui.CoreScreenLayer;
-import org.terasology.engine.rendering.nui.NUIManager;
-import org.terasology.engine.rendering.nui.ScreenLayerClosedEvent;
-import org.terasology.engine.rendering.nui.SortOrderSystem;
-import org.terasology.engine.rendering.nui.UIScreenLayer;
-import org.terasology.engine.rendering.nui.layers.hud.HUDScreenLayer;
-import org.terasology.engine.rendering.nui.layers.ingame.OnlinePlayersOverlay;
-import org.terasology.engine.rendering.nui.widgets.TypeWidgetFactoryRegistryImpl;
-import org.terasology.engine.utilities.Assets;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -81,6 +82,8 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+
+import static com.google.common.base.Verify.verifyNotNull;
 
 /**
  */
@@ -187,7 +190,8 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
         widgetsLibrary = new WidgetLibrary(context.get(ModuleManager.class).getEnvironment(), context.get(ReflectFactory.class), context.get(CopyStrategyLibrary.class));
         ModuleEnvironment environment = context.get(ModuleManager.class).getEnvironment();
         for (Class<? extends UIWidget> type : environment.getSubtypesOf(UIWidget.class)) {
-            widgetsLibrary.register(new ResourceUrn(environment.getModuleProviding(type).toString(), type.getSimpleName()), type);
+            Name module = verifyNotNull(environment.getModuleProviding(type), "No module provides %s", type);
+            widgetsLibrary.register(new ResourceUrn(module.toString(), type.getSimpleName()), type);
         }
     }
 
