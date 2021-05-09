@@ -26,7 +26,7 @@ dependencies {
     implementation("dom4j:dom4j:1.6.1")
 
     // for inspecting modules
-    implementation("org.terasology.gestalt:gestalt-module:7.0.6-SNAPSHOT")
+    implementation("org.terasology.gestalt:gestalt-module:7.1.0-SNAPSHOT")
 
     api(kotlin("test"))
 }
