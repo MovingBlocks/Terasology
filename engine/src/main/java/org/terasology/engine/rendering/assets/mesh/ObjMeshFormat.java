@@ -72,7 +72,8 @@ public class ObjMeshFormat extends AbstractAssetFileFormat<MeshData> {
             numVerts += rawIndices.get(x).length;
         }
 
-        StandardMeshData result = new StandardMeshData(numVerts, numIndices);
+        StandardMeshData result = new StandardMeshData();
+        result.reserve(numVerts, numIndices);
         int vertCount = 0;
         for (Vector3i[] face : rawIndices) {
             for (Vector3i indexSet : face) {

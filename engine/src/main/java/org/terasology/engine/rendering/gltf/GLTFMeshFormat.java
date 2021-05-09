@@ -6,16 +6,11 @@ import gnu.trove.list.TFloatList;
 import gnu.trove.list.array.TIntArrayList;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
-import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.rendering.assets.mesh.MeshData;
 import org.terasology.engine.rendering.assets.mesh.StandardMeshData;
-import org.terasology.engine.rendering.assets.mesh.resouce.IndexResource;
-import org.terasology.engine.rendering.assets.mesh.resouce.VertexAttribute;
-import org.terasology.engine.rendering.assets.mesh.resouce.VertexFloatAttribute;
-import org.terasology.engine.rendering.assets.mesh.resouce.VertexResource;
 import org.terasology.engine.rendering.gltf.model.GLTF;
 import org.terasology.engine.rendering.gltf.model.GLTFAccessor;
 import org.terasology.engine.rendering.gltf.model.GLTFBufferView;
@@ -26,7 +21,6 @@ import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.gestalt.assets.format.AssetDataFile;
 import org.terasology.gestalt.assets.management.AssetManager;
 import org.terasology.gestalt.assets.module.annotations.RegisterAssetFileFormat;
-import org.terasology.nui.Color;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -70,7 +64,7 @@ public class GLTFMeshFormat extends GLTFCommonFormat<MeshData> {
 
             List<byte[]> loadedBuffers = loadBinaryBuffers(urn, gltf);
 
-            StandardMeshData  meshData = new StandardMeshData(0, 0);
+            StandardMeshData meshData = new StandardMeshData();
             for (MeshAttributeSemantic semantic : MeshAttributeSemantic.values()) {
                 GLTFAccessor gltfAccessor = getAccessor(semantic, gltfPrimitive, gltf);
                 if (gltfAccessor != null && gltfAccessor.getBufferView() != null) {
@@ -103,8 +97,9 @@ public class GLTFMeshFormat extends GLTFCommonFormat<MeshData> {
 
             TIntArrayList indices = new TIntArrayList();
             readBuffer(loadedBuffers.get(indicesBuffer.getBuffer()), indicesAccessor, indicesBuffer, indices);
-//            IndexResource indexResource = new IndexResource(indices.size(), true);
-            meshData.indices.map(0, indices.size(), indices.toArray(), 0);
+            for (int x = 0; x < indices.size(); x++) {
+                meshData.indices.put(indices.get(x));
+            }
             return meshData;
         }
     }

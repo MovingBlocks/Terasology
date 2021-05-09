@@ -3,8 +3,8 @@
 
 package org.terasology.engine.rendering.assets.mesh;
 
-import org.terasology.engine.rendering.assets.mesh.resouce.VertexAttribute;
-import org.terasology.engine.rendering.assets.mesh.resouce.VertexResource;
+import org.terasology.engine.rendering.assets.mesh.resource.VertexAttribute;
+import org.terasology.engine.rendering.assets.mesh.resource.VertexResource;
 
 /**
  *

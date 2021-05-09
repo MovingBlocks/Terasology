@@ -19,6 +19,7 @@ import org.terasology.engine.rendering.assets.mesh.Mesh;
 import org.terasology.engine.rendering.assets.mesh.MeshData;
 import org.terasology.engine.utilities.Assets;
 import org.terasology.engine.world.block.shapes.BlockMeshPart;
+import org.terasology.nui.Color;
 
 @API
 public class Tessellator {
@@ -168,14 +169,34 @@ public class Tessellator {
     }
 
     public MeshData generateMeshData() {
-        int vertexCount = positions.size() / 3;
-        StandardMeshData meshData = new StandardMeshData(vertexCount, indices.size());
-        meshData.position.map(0, vertexCount, positions.toArray(), 0);
-        meshData.uv0.map(0, vertexCount, uv0.toArray(), 0);
-        meshData.normal.map(0, vertexCount, normals.toArray(), 0);
-        meshData.color0.map(0, vertexCount, color0.toArray(), 0);
-        meshData.light0.map(0, vertexCount, light0.toArray(), 0);
-        meshData.indices.map(0, indices.size(), indices.toArray(), 0);
+        StandardMeshData meshData = new StandardMeshData();
+        Vector3f pos = new Vector3f();
+        for (int x = 0; x < ((this.positions.size() / 3) * 3); x += 3) {
+            pos.set(this.positions.get(x), this.positions.get(x + 1), this.positions.get(x + 2));
+            meshData.position.put(pos);
+        }
+        Color color = new Color();
+        for (int x = 0; x < ((this.color0.size() / 4) * 4); x += 4) {
+            color.set((int) (this.color0.get(x) * 255.0f), (int) (this.color0.get(x + 1) * 255.0f),
+                    (int) (this.color0.get(x + 2) * 255.0f), (int) (this.color0.get(x + 3) * 255.0f));
+            meshData.color0.put(color);
+        }
+        for (int x = 0; x < ((this.light0.size() / 3) * 3); x += 3) {
+            pos.set(this.light0.get(x), this.light0.get(x + 1), this.light0.get(x + 2));
+            meshData.light0.put(pos);
+        }
+        for (int x = 0; x < ((this.normals.size() / 3) * 3); x += 3) {
+            pos.set(this.normals.get(x), this.normals.get(x + 1), this.normals.get(x + 2));
+            meshData.normal.put(pos);
+        }
+        Vector2f uv = new Vector2f();
+        for (int x = 0; x < ((this.uv0.size() / 2) * 2); x += 2) {
+            uv.set(this.uv0.get(x), this.uv0.get(x + 1));
+            meshData.uv0.put(uv);
+        }
+        for (int x = 0; x < indices.size(); x++) {
+            meshData.indices.put(indices.get(x));
+        }
         return meshData;
     }
 

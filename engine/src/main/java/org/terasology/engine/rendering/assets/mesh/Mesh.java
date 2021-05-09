@@ -3,6 +3,7 @@
 package org.terasology.engine.rendering.assets.mesh;
 
 import org.joml.Vector3f;
+import org.terasology.engine.rendering.assets.mesh.resource.VertexAttributeBinding;
 import org.terasology.gestalt.assets.Asset;
 import org.terasology.gestalt.assets.AssetType;
 import org.terasology.gestalt.assets.DisposableResource;
@@ -23,23 +24,24 @@ public abstract class Mesh extends Asset<MeshData> {
     public abstract AABBfc getAABB();
 
     protected AABBf getBound(MeshData data, AABBf dest) {
-        float[] vertices = this.getVertices();
-        if (vertices.length == 0) {
+        VertexAttributeBinding<Vector3f> vertices = this.getVertices();
+        if (vertices.numberOfElements() == 0) {
             dest.set(Float.POSITIVE_INFINITY,
-                Float.POSITIVE_INFINITY,
-                Float.POSITIVE_INFINITY,
-                Float.NEGATIVE_INFINITY,
-                Float.NEGATIVE_INFINITY,
-                Float.NEGATIVE_INFINITY);
+                    Float.POSITIVE_INFINITY,
+                    Float.POSITIVE_INFINITY,
+                    Float.NEGATIVE_INFINITY,
+                    Float.NEGATIVE_INFINITY,
+                    Float.NEGATIVE_INFINITY);
             return dest;
         }
-        for(int x = 0; x < (vertices.length/3); x+=3){
-            dest.union(vertices[x],vertices[x + 1],vertices[x + 2]);
+        Vector3f pos = new Vector3f();
+        for (int x = 0; x < vertices.numberOfElements(); x++) {
+            dest.union(vertices.get(x, pos));
         }
         return dest;
     }
 
-    public abstract float[] getVertices();
+    public abstract VertexAttributeBinding<Vector3f> getVertices();
     public abstract int getVertexCount();
 
     // TODO: Remove? At least review.

@@ -10,8 +10,10 @@ import org.joml.Vector2f;
 import org.joml.Vector2fc;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
+import org.joml.Vector4f;
 import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.gestalt.module.sandbox.API;
+import org.terasology.nui.Color;
 import org.terasology.nui.Colorc;
 import org.terasology.engine.utilities.Assets;
 
@@ -62,8 +64,6 @@ public class MeshBuilder {
             16, 17, 18, 16, 18, 19,   // right
             20, 21, 22, 20, 22, 23    // left
     };
-
-//    private StandardMeshData meshData = new StandardMeshData();
 
     private final TFloatList position = new TFloatArrayList();
     private final TFloatList color0 = new TFloatArrayList();
@@ -141,11 +141,26 @@ public class MeshBuilder {
     }
 
     public StandardMeshData buildMeshData() {
-        StandardMeshData meshData = new StandardMeshData(position.size()/3, indices.size());
-        meshData.position.map(0, this.position.size()/3, this.position.toArray(), 0);
-        meshData.color0.map(0, this.color0.size()/4, this.color0.toArray(), 0);
-        meshData.uv0.map(0, this.uv0.size()/2, this.uv0.toArray(), 0);
-        meshData.indices.map(0, indices.size(), this.indices.toArray(), 0);
+        StandardMeshData meshData = new StandardMeshData();
+        Vector3f pos = new Vector3f();
+        for (int x = 0; x < ((this.position.size() / 3) * 3); x += 3) {
+            pos.set(this.position.get(x), this.position.get(x + 1), this.position.get(x + 2));
+            meshData.position.put(pos);
+        }
+        Color color = new Color();
+        Vector4f c = new Vector4f();
+        for (int x = 0; x < ((this.color0.size() / 4) * 4); x += 4) {
+            color.set((int) (this.color0.get(x) * 255.0f), (int) (this.color0.get(x + 1) * 255.0f), (int) (this.color0.get(x + 2) * 255.0f), (int) (this.color0.get(x + 3) * 255.0f));
+            meshData.color0.put(color);
+        }
+        Vector2f uv = new Vector2f();
+        for (int x = 0; x < ((this.uv0.size() / 2) * 2); x += 2) {
+            uv.set(this.uv0.get(x), this.uv0.get(x + 1));
+            meshData.uv0.put(uv);
+        }
+        for (int x = 0; x < indices.size(); x++) {
+            meshData.indices.put(indices.get(x));
+        }
         return meshData;
     }
 

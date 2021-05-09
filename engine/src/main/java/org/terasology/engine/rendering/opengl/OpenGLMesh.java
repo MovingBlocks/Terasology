@@ -10,8 +10,9 @@ import org.terasology.engine.core.GameThread;
 import org.terasology.engine.core.subsystem.lwjgl.LwjglGraphicsProcessing;
 import org.terasology.engine.rendering.assets.mesh.Mesh;
 import org.terasology.engine.rendering.assets.mesh.MeshData;
-import org.terasology.engine.rendering.assets.mesh.resouce.IndexResource;
-import org.terasology.engine.rendering.assets.mesh.resouce.VertexResource;
+import org.terasology.engine.rendering.assets.mesh.resource.IndexResource;
+import org.terasology.engine.rendering.assets.mesh.resource.VertexAttributeBinding;
+import org.terasology.engine.rendering.assets.mesh.resource.VertexResource;
 import org.terasology.gestalt.assets.AssetType;
 import org.terasology.gestalt.assets.DisposableResource;
 import org.terasology.gestalt.assets.ResourceUrn;
@@ -64,13 +65,13 @@ public class OpenGLMesh extends Mesh implements OpenGLMeshBase{
     }
 
     @Override
-    public float[] getVertices() {
+    public VertexAttributeBinding<Vector3f> getVertices() {
         return data.verts();
     }
 
     @Override
     public int getVertexCount() {
-        return data.verts().length;
+        return data.verts().numberOfElements();
     }
 
 
@@ -98,7 +99,6 @@ public class OpenGLMesh extends Mesh implements OpenGLMeshBase{
 
         GL30.glBindVertexArray(this.disposalAction.vao);
 
-
         VertexResource[] resources = newData.vertexResources();
         List<VertexResource> targets = new ArrayList<>();
         for (VertexResource vertexResource : resources) {
@@ -107,12 +107,13 @@ public class OpenGLMesh extends Mesh implements OpenGLMeshBase{
             }
         }
 
-        this.state = buildVBO(this.disposalAction.vbo,GL30.GL_STATIC_DRAW, targets);
+        this.state = buildVBO(this.disposalAction.vbo, GL30.GL_STATIC_DRAW, targets);
 
         IndexResource indexResource = newData.indexResource();
-        this.indexCount = indexResource.num;
+        this.indexCount = indexResource.getNumberOfIndices();
         ByteBuffer indexBuffer = indexResource.buffer;
         indexBuffer.rewind();
+        indexBuffer.limit(indexResource.getSize());
         GL30.glBindBuffer(GL30.GL_ELEMENT_ARRAY_BUFFER, this.disposalAction.ebo);
         GL30.glBufferData(GL30.GL_ELEMENT_ARRAY_BUFFER, indexBuffer, GL30.GL_STATIC_DRAW);
 

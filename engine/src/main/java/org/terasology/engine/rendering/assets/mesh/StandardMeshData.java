@@ -5,10 +5,11 @@ package org.terasology.engine.rendering.assets.mesh;
 
 import org.joml.Vector2f;
 import org.joml.Vector3f;
-import org.terasology.engine.rendering.assets.mesh.resouce.IndexResource;
-import org.terasology.engine.rendering.assets.mesh.resouce.VertexAttribute;
-import org.terasology.engine.rendering.assets.mesh.resouce.VertexAttributeFloatBinding;
-import org.terasology.engine.rendering.assets.mesh.resouce.VertexResource;
+import org.terasology.engine.rendering.assets.mesh.resource.GLAttributes;
+import org.terasology.engine.rendering.assets.mesh.resource.IndexResource;
+import org.terasology.engine.rendering.assets.mesh.resource.VertexAttributeBinding;
+import org.terasology.engine.rendering.assets.mesh.resource.VertexResource;
+import org.terasology.engine.rendering.assets.mesh.resource.VertexResourceBuilder;
 import org.terasology.nui.Color;
 
 public class StandardMeshData extends MeshData {
@@ -20,88 +21,69 @@ public class StandardMeshData extends MeshData {
     public static final int LIGHT0_INDEX = 5;
 
     public final VertexResource positionBuffer;
-    public final VertexAttributeFloatBinding<Vector3f> position;
+    public final VertexAttributeBinding<Vector3f> position;
 
     public final VertexResource normalBuffer;
-    public final VertexAttributeFloatBinding<Vector3f> normal;
+    public final VertexAttributeBinding<Vector3f> normal;
 
     public final VertexResource uv0Buffer;
-    public final VertexAttributeFloatBinding<Vector2f> uv0;
+    public final VertexAttributeBinding<Vector2f> uv0;
 
     public final VertexResource uv1Buffer;
-    public final VertexAttributeFloatBinding<Vector2f> uv1;
+    public final VertexAttributeBinding<Vector2f> uv1;
 
     public final VertexResource colorBuffer;
-    public final VertexAttributeFloatBinding<Color> color0;
+    public final VertexAttributeBinding<Color> color0;
 
     public final VertexResource lightBuffer;
-    public final VertexAttributeFloatBinding<Vector3f> light0;
+    public final VertexAttributeBinding<Vector3f> light0;
 
     public final IndexResource indices;
 
-    public StandardMeshData(int size, int indices) {
+    public StandardMeshData() {
 
-        VertexResource.VertexResourceBuilder builder = new VertexResource.VertexResourceBuilder(size);
-        position = builder.add(VERTEX_INDEX, VertexAttribute.VECTOR_3_F_VERTEX_ATTRIBUTE, true);
+        VertexResourceBuilder builder = new VertexResourceBuilder();
+        position = builder.add(VERTEX_INDEX, GLAttributes.VECTOR_3_F_VERTEX_ATTRIBUTE);
         positionBuffer = builder.build();
 
-        builder = new VertexResource.VertexResourceBuilder(size);
-        normal = builder.add(NORMAL_INDEX, VertexAttribute.VECTOR_3_F_VERTEX_ATTRIBUTE, true);
+        builder = new VertexResourceBuilder();
+        normal = builder.add(NORMAL_INDEX, GLAttributes.VECTOR_3_F_VERTEX_ATTRIBUTE);
         normalBuffer = builder.build();
 
-        builder = new VertexResource.VertexResourceBuilder(size);
-        uv0 = builder.add(UV0_INDEX, VertexAttribute.VECTOR_2_F_VERTEX_ATTRIBUTE, false);
+        builder = new VertexResourceBuilder();
+        uv0 = builder.add(UV0_INDEX, GLAttributes.VECTOR_2_F_VERTEX_ATTRIBUTE);
         uv0Buffer = builder.build();
 
-        builder = new VertexResource.VertexResourceBuilder(size);
-        uv1 = builder.add(UV1_INDEX, VertexAttribute.VECTOR_2_F_VERTEX_ATTRIBUTE, false);
+        builder = new VertexResourceBuilder();
+        uv1 = builder.add(UV1_INDEX, GLAttributes.VECTOR_2_F_VERTEX_ATTRIBUTE);
         uv1Buffer = builder.build();
 
-        builder = new VertexResource.VertexResourceBuilder(size);
-        color0 = builder.add(COLOR0_INDEX, VertexAttribute.COLOR_4_F_VERTEX_ATTRIBUTE, false);
-        lightBuffer = builder.build();
-
-        builder = new VertexResource.VertexResourceBuilder(size);
-        light0 = builder.add(LIGHT0_INDEX, VertexAttribute.VECTOR_3_F_VERTEX_ATTRIBUTE, false);
+        builder = new VertexResourceBuilder();
+        color0 = builder.add(COLOR0_INDEX, GLAttributes.COLOR_4_F_VERTEX_ATTRIBUTE);
         colorBuffer = builder.build();
 
-        this.indices = new IndexResource(indices, true);
+
+        builder = new VertexResourceBuilder();
+        light0 = builder.add(LIGHT0_INDEX, GLAttributes.VECTOR_3_F_VERTEX_ATTRIBUTE);
+        lightBuffer = builder.build();
+
+        this.indices = new IndexResource();
     }
 
-    public StandardMeshData(
-            VertexAttributeFloatBinding<Vector3f> position,
-            VertexAttributeFloatBinding<Vector3f> normal,
-            VertexAttributeFloatBinding<Vector2f> uv0,
-            VertexAttributeFloatBinding<Vector2f> uv1,
-            VertexAttributeFloatBinding<Color> color0,
-            VertexAttributeFloatBinding<Vector3f> light0,
-            IndexResource indexResource) {
-        this.position = position;
-        this.positionBuffer = position.getResource();
-
-        this.normal = normal;
-        this.normalBuffer = normal.getResource();
-
-        this.uv0 = uv0;
-        this.uv0Buffer = uv0.getResource();
-
-        this.uv1 = uv1;
-        this.uv1Buffer = uv1.getResource();
-
-        this.color0 = color0;
-        this.colorBuffer = color0.getResource();
-
-        this.light0 = light0;
-        this.lightBuffer = light0.getResource();
-
-        this.indices= indexResource;
-
+    public void  reserve(int numVertices, int numIndices) {
+        positionBuffer.reserveElements(numVertices);
+        normalBuffer.reserveElements(numVertices);
+        uv0Buffer.reserveElements(numVertices);
+        uv1Buffer.reserveElements(numVertices);
+        lightBuffer.reserveElements(numVertices);
+        colorBuffer.reserveElements(numVertices);
+        indices.ensureCapacity(numIndices);
     }
 
 
     @Override
-    public float[] verts() {
-        return position.getStore();
+    public VertexAttributeBinding<Vector3f> verts() {
+        return position;
     }
 
     @Override

@@ -66,6 +66,7 @@ import org.terasology.engine.physics.engine.PhysicsSystem;
 import org.terasology.engine.physics.engine.RigidBody;
 import org.terasology.engine.physics.engine.SweepCallback;
 import org.terasology.engine.registry.CoreRegistry;
+import org.terasology.engine.rendering.assets.mesh.resource.VertexAttributeBinding;
 import org.terasology.engine.world.BlockEntityRegistry;
 import org.terasology.joml.geom.AABBf;
 
@@ -693,14 +694,16 @@ public class BulletPhysics implements PhysicsEngine {
         }
         HullShapeComponent hull = entityRef.getComponent(HullShapeComponent.class);
         if (hull != null) {
-            float[] positions = hull.sourceMesh.getVertices();
-            FloatBuffer buffer = BufferUtils.createFloatBuffer(positions.length * 3);
-            for(int i = 0; i < (positions.length/3); i+=3) {
-                buffer.put(positions[i]);
-                buffer.put(positions[i + 1]);
-                buffer.put(positions[i + 2]);
+            VertexAttributeBinding<Vector3f> positions = hull.sourceMesh.getVertices();
+            FloatBuffer buffer = BufferUtils.createFloatBuffer(positions.numberOfElements() * 3);
+            Vector3f pos = new Vector3f();
+            for (int i = 0; i < positions.numberOfElements(); i++) {
+                positions.get(i, pos);
+                buffer.put(pos.x);
+                buffer.put(pos.y);
+                buffer.put(pos.z);
             }
-            return new BulletConvexHullShape(buffer, positions.length, 3 * Float.BYTES).underlyingShape;
+            return new BulletConvexHullShape(buffer, positions.numberOfElements(), 3 * Float.BYTES).underlyingShape;
         }
         CharacterMovementComponent characterMovementComponent =
             entityRef.getComponent(CharacterMovementComponent.class);

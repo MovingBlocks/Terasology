@@ -2,12 +2,14 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.rendering.assets.mesh;
 
+import org.joml.Vector3f;
 import org.lwjgl.opengl.GL30;
 import org.lwjgl.opengl.GL33;
 import org.lwjgl.opengl.GL44;
+import org.terasology.engine.rendering.assets.mesh.resource.VertexAttributeBinding;
 import org.terasology.gestalt.assets.AssetData;
-import org.terasology.engine.rendering.assets.mesh.resouce.IndexResource;
-import org.terasology.engine.rendering.assets.mesh.resouce.VertexResource;
+import org.terasology.engine.rendering.assets.mesh.resource.IndexResource;
+import org.terasology.engine.rendering.assets.mesh.resource.VertexResource;
 
 /**
  */
@@ -46,7 +48,7 @@ public abstract class MeshData implements AssetData {
         return mode;
     }
 
-    public abstract float[] verts();
+    public abstract VertexAttributeBinding<Vector3f> verts();
 
     public abstract VertexResource[] vertexResources();
     public abstract IndexResource indexResource();
