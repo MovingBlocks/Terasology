@@ -5,16 +5,15 @@ package org.terasology.engine.world.block.shapes;
 import com.google.common.collect.Maps;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
-import org.terasology.gestalt.assets.AssetType;
-import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.engine.math.Pitch;
 import org.terasology.engine.math.Roll;
 import org.terasology.engine.math.Rotation;
 import org.terasology.engine.math.Side;
 import org.terasology.engine.math.Yaw;
 import org.terasology.engine.physics.shapes.CollisionShape;
-import org.terasology.engine.utilities.collection.EnumBooleanMap;
 import org.terasology.engine.world.block.BlockPart;
+import org.terasology.gestalt.assets.AssetType;
+import org.terasology.gestalt.assets.ResourceUrn;
 
 import java.util.EnumMap;
 import java.util.Map;
@@ -25,7 +24,7 @@ public class BlockShapeImpl extends BlockShape {
 
     private String displayName;
     private EnumMap<BlockPart, BlockMeshPart> meshParts = Maps.newEnumMap(BlockPart.class);
-    private EnumBooleanMap<Side> fullSide = new EnumBooleanMap<>(Side.class);
+    private boolean[] fullSide = new boolean[Side.values().length];
     private CollisionShape baseCollisionShape;
     private Vector3f baseCollisionOffset = new Vector3f();
     private boolean yawSymmetric;
@@ -51,7 +50,7 @@ public class BlockShapeImpl extends BlockShape {
 
     @Override
     public boolean isBlockingSide(Side side) {
-        return fullSide.get(side);
+        return fullSide[side.ordinal()];
     }
 
     @Override
@@ -62,7 +61,7 @@ public class BlockShapeImpl extends BlockShape {
             this.meshParts.put(part, data.getMeshPart(part));
         }
         for (Side side : Side.getAllSides()) {
-            this.fullSide.put(side, data.isBlockingSide(side));
+            this.fullSide[side.ordinal()] = data.isBlockingSide(side);
         }
         this.baseCollisionShape = data.getCollisionShape();
         this.baseCollisionOffset.set(data.getCollisionOffset());

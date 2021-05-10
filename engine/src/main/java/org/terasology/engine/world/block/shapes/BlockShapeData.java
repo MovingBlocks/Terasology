@@ -4,11 +4,10 @@ package org.terasology.engine.world.block.shapes;
 
 import com.google.common.collect.Maps;
 import org.joml.Vector3f;
-import org.terasology.gestalt.assets.AssetData;
 import org.terasology.engine.math.Side;
 import org.terasology.engine.physics.shapes.CollisionShape;
-import org.terasology.engine.utilities.collection.EnumBooleanMap;
 import org.terasology.engine.world.block.BlockPart;
+import org.terasology.gestalt.assets.AssetData;
 
 import java.util.EnumMap;
 
@@ -17,7 +16,7 @@ import java.util.EnumMap;
 public class BlockShapeData implements AssetData {
     private String displayName = "";
     private EnumMap<BlockPart, BlockMeshPart> meshParts = Maps.newEnumMap(BlockPart.class);
-    private EnumBooleanMap<Side> fullSide = new EnumBooleanMap<>(Side.class);
+    private boolean[] fullSide = new boolean[Side.values().length];
     private CollisionShape collisionShape;
     private Vector3f collisionOffset = new Vector3f();
     private boolean yawSymmetric;
@@ -50,7 +49,7 @@ public class BlockShapeData implements AssetData {
     }
 
     public boolean isBlockingSide(Side side) {
-        return fullSide.get(side);
+        return fullSide[side.ordinal()];
     }
 
     /**
@@ -60,7 +59,7 @@ public class BlockShapeData implements AssetData {
      * @param blocking
      */
     public void setBlockingSide(Side side, boolean blocking) {
-        fullSide.put(side, blocking);
+        fullSide[side.ordinal()] = blocking;
     }
 
     public Vector3f getCollisionOffset() {
