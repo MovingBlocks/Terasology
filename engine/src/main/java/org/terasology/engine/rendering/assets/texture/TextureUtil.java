@@ -9,6 +9,7 @@ import org.terasology.engine.core.TerasologyConstants;
 import org.terasology.joml.geom.Rectanglei;
 import org.terasology.gestalt.naming.Name;
 import org.terasology.nui.Color;
+import org.terasology.nui.Colorc;
 
 import java.awt.image.BufferedImage;
 import java.nio.ByteBuffer;
@@ -26,8 +27,8 @@ public final class TextureUtil {
      * @param color including alpha, of the texture to represent.
      * @return an asset Uri for the texture
      */
-    public static ResourceUrn getTextureUriForColor(Color color) {
-        return new ResourceUrn(TerasologyConstants.ENGINE_MODULE, COLOR_RESOURCE_NAME, new Name(getColorName(color)));
+    public static ResourceUrn getTextureUriForColor(Colorc color) {
+        return new ResourceUrn(TerasologyConstants.ENGINE_MODULE, COLOR_RESOURCE_NAME, new Name(color.toHex()));
     }
 
     /**
@@ -44,46 +45,6 @@ public final class TextureUtil {
         String name = String.format("%s.%d.%d.%d.%d", "white", size, seed, min, max);
 
         return new ResourceUrn(TerasologyConstants.ENGINE_MODULE, NOISE_RESOURCE_NAME, new Name(name));
-    }
-
-    private static String getColorName(Color color) {
-        StringBuilder builder = new StringBuilder();
-        appendColorName(builder, color);
-        return builder.toString();
-    }
-
-    /**
-     * Method to append the color string hex representation back to a string buffer.
-     * Package-only access as it is for internal use in ColorTextureAssetResolver,
-     * but should be here for maintenance with the color-to-color-string code.
-     *
-     * @param sb    StringBuilder into which to append name
-     * @param color represented by hexColorName
-     */
-    private static void appendColorName(StringBuilder sb, Color color) {
-        int red = color.r();
-        if (red < 16) {
-            sb.append('0');
-        }
-        sb.append(Integer.toHexString(red));
-
-        int green = color.g();
-        if (green < 16) {
-            sb.append('0');
-        }
-        sb.append(Integer.toHexString(green));
-
-        int blue = color.b();
-        if (blue < 16) {
-            sb.append('0');
-        }
-        sb.append(Integer.toHexString(blue));
-
-        int alpha = color.a();
-        if (alpha < 16) {
-            sb.append('0');
-        }
-        sb.append(Integer.toHexString(alpha));
     }
 
     /**
