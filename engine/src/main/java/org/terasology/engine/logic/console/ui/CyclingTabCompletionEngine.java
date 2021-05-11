@@ -15,7 +15,7 @@ import org.terasology.engine.logic.console.CoreMessageType;
 import org.terasology.engine.logic.console.Message;
 import org.terasology.gestalt.naming.Name;
 import org.terasology.nui.FontColor;
-import org.terasology.engine.utilities.CamelCaseMatcher;
+import org.terasology.engine.utilities.StringUtility;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -55,7 +55,7 @@ public class CyclingTabCompletionEngine implements TabCompletionEngine {
                                  ConsoleCommand command, int suggestedIndex) {
         if (suggestedIndex <= 0) {
             updateCommandNamesIfNecessary();
-            return CamelCaseMatcher.getMatches(commandName.toString(), commandNames, true);
+            return StringUtility.wildcardMatch(commandName.toString(), commandNames, true);
         } else if (command == null) {
             return null;
         }
