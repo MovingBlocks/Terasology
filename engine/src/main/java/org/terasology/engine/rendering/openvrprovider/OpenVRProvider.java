@@ -19,7 +19,7 @@ import jopenvr.VR_IVRSettings_FnTable;
 import jopenvr.VR_IVRSystem_FnTable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.engine.utilities.NativeHelper;
+import org.terasology.engine.utilities.OS;
 
 import java.nio.IntBuffer;
 
@@ -279,8 +279,25 @@ public final class OpenVRProvider {
         if (initialized) {
             return true;
         }
-        logger.info("Adding OpenVR search path: " + NativeHelper.getOpenVRLibPath());
-        NativeLibrary.addSearchPath("openvr_api", NativeHelper.getOpenVRLibPath());
+
+        String target = OS.USER_DIRECTORY +  OS.PATH_SEPARATOR + "openvr_natives" + OS.PATH_SEPARATOR;
+        switch (OS.get()) {
+            case WINDOWS:
+                // Windows
+                target += "win32-" + (OS.IS_64 ? "x86-64" : "x86");
+                break;
+            case MACOSX:
+                // osx
+                target += "darwin";
+                break;
+            case LINUX:
+                // Assume Linux
+                target += "linux-" + (OS.IS_64 ? "x86-64" : "x86");
+                break;
+        }
+
+        logger.info("Adding OpenVR search path: " + target);
+        NativeLibrary.addSearchPath("openvr_api", target);
 
         if (jopenvr.JOpenVRLibrary.VR_IsHmdPresent() != 1) {
             logger.info("VR Headset not detected.");
