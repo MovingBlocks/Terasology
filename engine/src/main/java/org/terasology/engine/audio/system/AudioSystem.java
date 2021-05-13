@@ -114,9 +114,11 @@ Vector3f position = localPlayer.getPosition(new Vector3f());
 
     @Override
     public void update(float delta) {
-        audioManager.updateListener(
-            localPlayer.getPosition(new Vector3f()),
-            localPlayer.getViewRotation(new Quaternionf()),
-            localPlayer.getVelocity(new Vector3f()));
+        if (localPlayer.isValid()) {
+            audioManager.updateListener(
+                    localPlayer.getPosition(new Vector3f()),
+                    localPlayer.getViewRotation(new Quaternionf()),
+                    localPlayer.getVelocity(new Vector3f()));
+        }
     }
 }
