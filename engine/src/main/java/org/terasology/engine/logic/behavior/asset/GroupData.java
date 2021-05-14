@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.logic.behavior.asset;
 
-import org.terasology.assets.AssetData;
+import org.terasology.gestalt.assets.AssetData;
 
 /**
  * Every Group asset is described by a GroupData class.

@@ -3,7 +3,7 @@
 package org.terasology.engine.rendering.nui.layers.mainMenu;
 
 import com.google.common.primitives.Ints;
-import org.terasology.assets.ResourceUrn;
+import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.engine.config.ServerInfo;
 import org.terasology.engine.core.TerasologyConstants;
 import org.terasology.nui.databinding.ReadOnlyBinding;

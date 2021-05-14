@@ -3,7 +3,7 @@
 
 package org.terasology.engine.utilities.modifiable;
 
-import org.terasology.module.sandbox.API;
+import org.terasology.gestalt.module.sandbox.API;
 
 /**
  * A helper type to get and modify the value of a component without changing its actual value.

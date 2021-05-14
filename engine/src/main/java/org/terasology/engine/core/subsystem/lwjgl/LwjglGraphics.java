@@ -1,18 +1,5 @@
-/*
- * Copyright 2017 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.core.subsystem.lwjgl;
 
 import org.lwjgl.glfw.GLFW;
@@ -22,17 +9,17 @@ import org.lwjgl.opengl.GL43;
 import org.lwjgl.system.MemoryUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.assets.module.ModuleAwareAssetTypeManager;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.config.RenderingConfig;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.core.GameEngine;
 import org.terasology.engine.core.modes.GameState;
 import org.terasology.engine.core.subsystem.DisplayDevice;
-import org.terasology.nui.canvas.CanvasRenderer;
 import org.terasology.engine.rendering.ShaderManager;
 import org.terasology.engine.rendering.ShaderManagerLwjgl;
 import org.terasology.engine.rendering.nui.internal.LwjglCanvasRenderer;
+import org.terasology.gestalt.assets.module.ModuleAwareAssetTypeManager;
+import org.terasology.nui.canvas.CanvasRenderer;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -160,7 +147,7 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
         }
 
         try {
-            String root = "org/terasology/icons/";
+            String root = "org/terasology/engine/icons/";
             ClassLoader classLoader = getClass().getClassLoader();
 
             BufferedImage icon16 = ImageIO.read(classLoader.getResourceAsStream(root + "gooey_sweet_16.png"));

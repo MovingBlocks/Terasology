@@ -26,7 +26,7 @@ import org.terasology.engine.entitySystem.systems.RegisterMode;
 import org.terasology.engine.entitySystem.systems.RegisterSystem;
 import org.terasology.engine.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.engine.logic.location.LocationComponent;
-import org.terasology.module.sandbox.API;
+import org.terasology.gestalt.module.sandbox.API;
 import org.terasology.engine.particles.components.ParticleEmitterComponent;
 import org.terasology.engine.particles.events.ParticleSystemUpdateEvent;
 import org.terasology.engine.particles.rendering.ParticleRenderingData;

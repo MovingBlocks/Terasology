@@ -4,7 +4,7 @@ package org.terasology.engine.logic.nameTags;
 
 import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.logic.common.DisplayNameComponent;
-import org.terasology.module.sandbox.API;
+import org.terasology.gestalt.module.sandbox.API;
 import org.terasology.engine.network.Replicate;
 import org.terasology.nui.Color;
 

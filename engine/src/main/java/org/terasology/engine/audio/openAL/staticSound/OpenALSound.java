@@ -18,13 +18,14 @@ package org.terasology.engine.audio.openAL.staticSound;
 import org.lwjgl.openal.AL10;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.assets.AssetType;
-import org.terasology.assets.ResourceUrn;
 import org.terasology.engine.audio.StaticSound;
 import org.terasology.engine.audio.StaticSoundData;
 import org.terasology.engine.audio.openAL.OpenALException;
 import org.terasology.engine.audio.openAL.OpenALManager;
 import org.terasology.engine.core.GameThread;
+import org.terasology.gestalt.assets.AssetType;
+import org.terasology.gestalt.assets.DisposableResource;
+import org.terasology.gestalt.assets.ResourceUrn;
 
 import java.lang.ref.WeakReference;
 
@@ -42,17 +43,16 @@ public final class OpenALSound extends StaticSound {
 
     protected float length;
     private final OpenALManager audioManager;
-
-    private DisposalAction disposalAction;
+    private final DisposalAction disposalAction;
 
     // TODO: Do we have proper support for unloading sounds (as mods are changed?)
     private int bufferId;
 
-    public OpenALSound(ResourceUrn urn, AssetType<?, StaticSoundData> assetType, StaticSoundData data, OpenALManager audioManager) {
-        super(urn, assetType);
+    public OpenALSound(ResourceUrn urn, AssetType<?, StaticSoundData> assetType, StaticSoundData data, OpenALManager audioManager, OpenALSound.DisposalAction disposalAction) {
+        super(urn, assetType, disposalAction);
+        disposalAction.setAsset(this);
         this.audioManager = audioManager;
-        disposalAction = new DisposalAction(urn, this);
-        getDisposalHook().setDisposeAction(disposalAction);
+        this.disposalAction = disposalAction;
         reload(data);
     }
 
@@ -119,18 +119,25 @@ public final class OpenALSound extends StaticSound {
         }
     }
 
-    private static class DisposalAction implements Runnable {
+    public static class DisposalAction implements DisposableResource {
         private final ResourceUrn urn;
         private int bufferId;
-        private final WeakReference<OpenALSound> asset;
+        private WeakReference<OpenALSound> asset;
 
-        DisposalAction(ResourceUrn urn, OpenALSound openALSound) {
+        public DisposalAction(ResourceUrn urn) {
             this.urn = urn;
-             asset = new WeakReference<>(openALSound);
+        }
+
+        public OpenALSound getAsset() {
+            return asset.get();
+        }
+
+        public void setAsset(OpenALSound asset) {
+            this.asset = new WeakReference<>(asset);
         }
 
         @Override
-        public void run() {
+        public void close() {
             try {
                 GameThread.synch(() -> {
                     OpenALSound sound = asset.get();

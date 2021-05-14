@@ -19,7 +19,7 @@ package org.terasology.rendering.assets.texture;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.terasology.engine.TerasologyTestingEnvironment;
-import org.terasology.assets.ResourceUrn;
+import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.engine.rendering.assets.texture.Texture;
 import org.terasology.engine.rendering.assets.texture.TextureUtil;
 import org.terasology.nui.Color;

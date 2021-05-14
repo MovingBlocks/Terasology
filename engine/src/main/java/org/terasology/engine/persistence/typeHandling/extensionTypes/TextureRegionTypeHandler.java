@@ -4,7 +4,7 @@ package org.terasology.engine.persistence.typeHandling.extensionTypes;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.assets.Asset;
+import org.terasology.gestalt.assets.Asset;
 import org.terasology.engine.rendering.assets.texture.TextureRegion;
 import org.terasology.engine.rendering.assets.texture.TextureRegionAsset;
 import org.terasology.engine.utilities.Assets;

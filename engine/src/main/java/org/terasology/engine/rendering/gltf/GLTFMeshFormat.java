@@ -8,17 +8,18 @@ import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.assets.ResourceUrn;
-import org.terasology.assets.format.AssetDataFile;
-import org.terasology.assets.management.AssetManager;
-import org.terasology.assets.module.annotations.RegisterAssetFileFormat;
+import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.engine.rendering.assets.mesh.MeshData;
+import org.terasology.engine.rendering.assets.mesh.StandardMeshData;
 import org.terasology.engine.rendering.gltf.model.GLTF;
 import org.terasology.engine.rendering.gltf.model.GLTFAccessor;
 import org.terasology.engine.rendering.gltf.model.GLTFBufferView;
 import org.terasology.engine.rendering.gltf.model.GLTFMesh;
 import org.terasology.engine.rendering.gltf.model.GLTFNode;
 import org.terasology.engine.rendering.gltf.model.GLTFPrimitive;
+import org.terasology.gestalt.assets.format.AssetDataFile;
+import org.terasology.gestalt.assets.management.AssetManager;
+import org.terasology.gestalt.assets.module.annotations.RegisterAssetFileFormat;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -62,7 +63,7 @@ public class GLTFMeshFormat extends GLTFCommonFormat<MeshData> {
 
             List<byte[]> loadedBuffers = loadBinaryBuffers(urn, gltf);
 
-            MeshData mesh = new MeshData();
+            StandardMeshData mesh = new StandardMeshData();
             for (MeshAttributeSemantic semantic : MeshAttributeSemantic.values()) {
                 GLTFAccessor gltfAccessor = getAccessor(semantic, gltfPrimitive, gltf);
                 if (gltfAccessor != null && gltfAccessor.getBufferView() != null) {
@@ -78,7 +79,7 @@ public class GLTFMeshFormat extends GLTFCommonFormat<MeshData> {
             checkIndicesBuffer(indicesBuffer);
 
             readBuffer(loadedBuffers.get(indicesBuffer.getBuffer()), indicesAccessor, indicesBuffer, mesh.getIndices());
-            applyTransformations(gltf, mesh.getVertices(), mesh.getNormals());
+            applyTransformations(gltf, mesh.getVertices(), mesh.normals);
             return mesh;
         }
     }

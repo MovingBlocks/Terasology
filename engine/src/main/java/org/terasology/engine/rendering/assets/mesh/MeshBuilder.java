@@ -5,8 +5,8 @@ package org.terasology.engine.rendering.assets.mesh;
 import org.joml.Vector2fc;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
-import org.terasology.assets.ResourceUrn;
-import org.terasology.module.sandbox.API;
+import org.terasology.gestalt.assets.ResourceUrn;
+import org.terasology.gestalt.module.sandbox.API;
 import org.terasology.nui.Colorc;
 import org.terasology.engine.utilities.Assets;
 
@@ -58,7 +58,7 @@ public class MeshBuilder {
             20, 21, 22, 20, 22, 23    // left
     };
 
-    private MeshData meshData = new MeshData();
+    private StandardMeshData meshData = new StandardMeshData();
     private int vertexCount;
     private TextureMapper textureMapper;
 
@@ -92,22 +92,22 @@ public class MeshBuilder {
     }
 
     public MeshBuilder addColor(Colorc c1, Colorc... colors) {
-        meshData.getColors().add(c1.rf());
-        meshData.getColors().add(c1.gf());
-        meshData.getColors().add(c1.bf());
-        meshData.getColors().add(c1.af());
+        meshData.color0.add(c1.rf());
+        meshData.color0.add(c1.gf());
+        meshData.color0.add(c1.bf());
+        meshData.color0.add(c1.af());
         for (Colorc c : colors) {
-            meshData.getColors().add(c.rf());
-            meshData.getColors().add(c.gf());
-            meshData.getColors().add(c.bf());
-            meshData.getColors().add(c.af());
+            meshData.color0.add(c.rf());
+            meshData.color0.add(c.gf());
+            meshData.color0.add(c.bf());
+            meshData.color0.add(c.af());
         }
         return this;
     }
 
     public MeshBuilder addTexCoord(float x, float y) {
-        meshData.getTexCoord0().add(x);
-        meshData.getTexCoord0().add(y);
+        meshData.uv0.add(x);
+        meshData.uv0.add(y);
         return this;
     }
 
@@ -125,7 +125,7 @@ public class MeshBuilder {
         return this;
     }
 
-    public MeshData getMeshData() {
+    public StandardMeshData getMeshData() {
         return meshData;
     }
 

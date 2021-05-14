@@ -16,7 +16,7 @@
 
 package org.terasology.engine.persistence.typeHandling;
 
-import org.terasology.module.sandbox.API;
+import org.terasology.gestalt.module.sandbox.API;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

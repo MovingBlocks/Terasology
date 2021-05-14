@@ -23,7 +23,7 @@ ext {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // Read the internal version out of the engine-tests module.txt
-def moduleFile = file('src/main/resources/module.txt')
+def moduleFile = file('src/main/resources/org/terasology/unittest/module.txt')
 
 if (!moduleFile.exists()) {
     println "Failed to find module.txt for engine-tests"
@@ -68,6 +68,7 @@ dependencies {
     implementation("org.junit.jupiter:junit-jupiter-api")
     implementation("org.junit.jupiter:junit-jupiter-params")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
+    testImplementation("org.mockito:mockito-inline:3.7.7")
 
     implementation("org.mockito:mockito-junit-jupiter:3.7.7")
 

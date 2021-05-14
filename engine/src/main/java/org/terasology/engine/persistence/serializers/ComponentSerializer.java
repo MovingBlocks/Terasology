@@ -16,7 +16,7 @@ import org.terasology.engine.entitySystem.metadata.ComponentMetadata;
 import org.terasology.engine.entitySystem.metadata.ReplicatedFieldMetadata;
 import org.terasology.engine.persistence.typeHandling.protobuf.ProtobufPersistedData;
 import org.terasology.engine.persistence.typeHandling.protobuf.ProtobufPersistedDataSerializer;
-import org.terasology.module.Module;
+import org.terasology.gestalt.module.Module;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.Serializer;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;

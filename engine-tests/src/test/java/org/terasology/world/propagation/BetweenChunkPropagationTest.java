@@ -9,14 +9,15 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.terasology.engine.TerasologyTestingEnvironment;
-import org.terasology.assets.ResourceUrn;
-import org.terasology.assets.management.AssetManager;
+import org.terasology.gestalt.assets.ResourceUrn;
+import org.terasology.gestalt.assets.management.AssetManager;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.math.Side;
 import org.terasology.engine.registry.CoreRegistry;
 import org.terasology.engine.world.block.Block;
 import org.terasology.engine.world.block.BlockManager;
 import org.terasology.engine.world.block.BlockRegion;
+import org.terasology.engine.world.block.BlockRegionc;
 import org.terasology.engine.world.block.BlockUri;
 import org.terasology.engine.world.block.family.SymmetricFamily;
 import org.terasology.engine.world.block.internal.BlockManagerImpl;
@@ -201,17 +202,7 @@ public class BetweenChunkPropagationTest extends TerasologyTestingEnvironment {
         }
 
         @Override
-        public ChunkViewCore getLocalView(Vector3ic centerChunkPos) {
-            return null;
-        }
-
-        @Override
-        public ChunkViewCore getSubviewAroundBlock(Vector3ic blockPos, int extent) {
-            return null;
-        }
-
-        @Override
-        public ChunkViewCore getSubviewAroundChunk(Vector3ic chunkPos) {
+        public ChunkViewCore getSubview(BlockRegionc region, Vector3ic offset) {
             return null;
         }
 

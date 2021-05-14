@@ -4,7 +4,7 @@ package org.terasology.engine.logic.console.ui;
 
 import com.google.common.collect.Iterables;
 import org.codehaus.plexus.util.StringUtils;
-import org.terasology.assets.ResourceUrn;
+import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.engine.logic.console.Console;
 import org.terasology.engine.logic.console.CoreMessageType;
 import org.terasology.engine.logic.console.Message;

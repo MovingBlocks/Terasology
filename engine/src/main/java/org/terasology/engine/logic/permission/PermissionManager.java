@@ -4,7 +4,7 @@ package org.terasology.engine.logic.permission;
 
 import com.google.common.base.Predicate;
 import org.terasology.engine.entitySystem.entity.EntityRef;
-import org.terasology.module.sandbox.API;
+import org.terasology.gestalt.module.sandbox.API;
 
 @API
 public interface PermissionManager {

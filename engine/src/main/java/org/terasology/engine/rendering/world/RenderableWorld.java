@@ -4,6 +4,7 @@ package org.terasology.engine.rendering.world;
 
 import org.joml.Vector3ic;
 import org.terasology.engine.rendering.cameras.Camera;
+import org.terasology.engine.rendering.logic.ChunkMeshRenderer;
 import org.terasology.engine.rendering.world.viewDistance.ViewDistance;
 import org.terasology.engine.world.block.BlockRegion;
 import org.terasology.engine.world.chunks.ChunkProvider;
@@ -38,4 +39,6 @@ public interface RenderableWorld {
     ChunkProvider getChunkProvider();
 
     void setShadowMapCamera(Camera camera);
+
+    void setChunkMeshRenderer(ChunkMeshRenderer meshes);
 }

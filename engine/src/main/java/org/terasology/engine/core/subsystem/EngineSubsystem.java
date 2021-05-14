@@ -15,11 +15,11 @@
  */
 package org.terasology.engine.core.subsystem;
 
-import org.terasology.assets.module.ModuleAwareAssetTypeManager;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.core.ComponentSystemManager;
 import org.terasology.engine.core.GameEngine;
 import org.terasology.engine.core.modes.GameState;
+import org.terasology.gestalt.assets.module.ModuleAwareAssetTypeManager;
 
 public interface EngineSubsystem {
 

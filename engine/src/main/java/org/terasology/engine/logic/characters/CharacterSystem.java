@@ -213,13 +213,13 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
         if (!onItemUseEvent.isConsumed()) {
             EntityRef gazeEntity = GazeAuthoritySystem.getGazeEntityForCharacter(character);
             LocationComponent gazeLocation = gazeEntity.getComponent(LocationComponent.class);
-            org.joml.Vector3f direction = gazeLocation.getWorldDirection(new org.joml.Vector3f());
-            org.joml.Vector3f originPos = gazeLocation.getWorldPosition(new org.joml.Vector3f());
+            Vector3f direction = gazeLocation.getWorldDirection(new Vector3f());
+            Vector3f originPos = gazeLocation.getWorldPosition(new Vector3f());
             if (recordAndReplayCurrentStatus.getStatus() == RecordAndReplayStatus.RECORDING) {
                 directionAndOriginPosRecorderList.getAttackEventDirectionAndOriginPosRecorder().add(direction,
                     originPos);
             } else if (recordAndReplayCurrentStatus.getStatus() == RecordAndReplayStatus.REPLAYING) {
-                org.joml.Vector3f[] data =
+                Vector3f[] data =
                     directionAndOriginPosRecorderList.getAttackEventDirectionAndOriginPosRecorder().poll();
                 direction = data[0];
                 originPos = data[1];
@@ -311,14 +311,14 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
         CharacterComponent characterComponent = character.getComponent(CharacterComponent.class);
         EntityRef camera = GazeAuthoritySystem.getGazeEntityForCharacter(character);
         LocationComponent location = camera.getComponent(LocationComponent.class);
-        org.joml.Vector3f direction = location.getWorldDirection(new org.joml.Vector3f());
+        Vector3f direction = location.getWorldDirection(new Vector3f());
         if (!(event.getDirection().equals(direction, 0.0001f))) {
             logger.error("Direction at client {} was different than direction at server {}", event.getDirection(), direction);
         }
         // Assume the exact same value in case there are rounding mistakes:
         direction = event.getDirection();
 
-        org.joml.Vector3f originPos = location.getWorldPosition(new org.joml.Vector3f());
+        Vector3f originPos = location.getWorldPosition(new Vector3f());
         if (!(event.getOrigin().equals(originPos, 0.0001f))) {
             String msg = "Player {} seems to have cheated: It stated that it performed an action from {} but the predicted position is {}";
             logger.info(msg, getPlayerNameFromCharacter(character), event.getOrigin(), originPos);

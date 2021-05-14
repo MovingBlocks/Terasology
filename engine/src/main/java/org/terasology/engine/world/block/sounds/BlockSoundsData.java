@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.world.block.sounds;
 
-import org.terasology.assets.AssetData;
+import org.terasology.gestalt.assets.AssetData;
 import org.terasology.engine.audio.StaticSound;
-import org.terasology.module.sandbox.API;
+import org.terasology.gestalt.module.sandbox.API;
 
 import java.util.ArrayList;
 import java.util.List;

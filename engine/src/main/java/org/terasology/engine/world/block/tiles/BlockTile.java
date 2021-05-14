@@ -3,10 +3,10 @@
 package org.terasology.engine.world.block.tiles;
 
 import com.google.common.collect.Lists;
-import org.terasology.assets.Asset;
-import org.terasology.assets.AssetType;
-import org.terasology.assets.ResourceUrn;
-import org.terasology.module.sandbox.API;
+import org.terasology.gestalt.assets.Asset;
+import org.terasology.gestalt.assets.AssetType;
+import org.terasology.gestalt.assets.ResourceUrn;
+import org.terasology.gestalt.module.sandbox.API;
 
 import java.awt.image.BufferedImage;
 import java.util.Collections;
@@ -33,7 +33,7 @@ public class BlockTile extends Asset<TileData> {
     public BufferedImage getImage(int i) {
         return images[i];
     }
-    
+
     public int getLength() {
         return images.length;
     }

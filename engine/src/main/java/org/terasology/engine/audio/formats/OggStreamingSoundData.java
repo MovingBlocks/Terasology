@@ -18,8 +18,8 @@ package org.terasology.engine.audio.formats;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.assets.format.AssetDataFile;
 import org.terasology.engine.audio.StreamingSoundData;
+import org.terasology.gestalt.assets.format.AssetDataFile;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;

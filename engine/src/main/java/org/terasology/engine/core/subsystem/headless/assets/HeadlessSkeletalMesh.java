@@ -15,13 +15,13 @@
  */
 package org.terasology.engine.core.subsystem.headless.assets;
 
-import org.terasology.assets.Asset;
-import org.terasology.assets.AssetType;
-import org.terasology.assets.ResourceUrn;
-import org.terasology.joml.geom.AABBf;
 import org.terasology.engine.rendering.assets.skeletalmesh.Bone;
 import org.terasology.engine.rendering.assets.skeletalmesh.SkeletalMesh;
 import org.terasology.engine.rendering.assets.skeletalmesh.SkeletalMeshData;
+import org.terasology.gestalt.assets.Asset;
+import org.terasology.gestalt.assets.AssetType;
+import org.terasology.gestalt.assets.ResourceUrn;
+import org.terasology.joml.geom.AABBf;
 
 import java.util.Collection;
 import java.util.Optional;

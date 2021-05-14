@@ -1,23 +1,9 @@
-/*
- * Copyright 2014 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *  http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.core.subsystem.lwjgl;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.assets.module.ModuleAwareAssetTypeManager;
 import org.terasology.engine.audio.AudioManager;
 import org.terasology.engine.audio.StaticSound;
 import org.terasology.engine.audio.StreamingSound;
@@ -28,6 +14,7 @@ import org.terasology.engine.config.AudioConfig;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.core.GameEngine;
 import org.terasology.engine.core.modes.GameState;
+import org.terasology.gestalt.assets.module.ModuleAwareAssetTypeManager;
 
 public class LwjglAudio extends BaseLwjglSubsystem {
 
@@ -53,8 +40,8 @@ public class LwjglAudio extends BaseLwjglSubsystem {
 
     @Override
     public void registerCoreAssetTypes(ModuleAwareAssetTypeManager assetTypeManager) {
-        assetTypeManager.registerCoreAssetType(StaticSound.class, audioManager.getStaticSoundFactory(), "sounds");
-        assetTypeManager.registerCoreAssetType(StreamingSound.class, audioManager.getStreamingSoundFactory(), "music");
+        assetTypeManager.createAssetType(StaticSound.class, audioManager.getStaticSoundFactory(), "sounds");
+        assetTypeManager.createAssetType(StreamingSound.class, audioManager.getStreamingSoundFactory(), "music");
     }
 
     @Override

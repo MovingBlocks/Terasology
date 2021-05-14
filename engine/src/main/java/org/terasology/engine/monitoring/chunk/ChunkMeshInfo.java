@@ -33,7 +33,7 @@ public class ChunkMeshInfo {
         int vertices = 0;
         int indices = 0;
 
-        if (!mesh.isGenerated()) {
+        if (mesh.hasVertexElements()) {
             for (ChunkMesh.RenderType type : ChunkMesh.RenderType.values()) {
                 final ChunkMesh.VertexElements element = mesh.getVertexElements(type);
                 vertices += element.finalVertices.limit();

@@ -6,7 +6,7 @@ import org.terasology.engine.logic.behavior.asset.BehaviorTree;
 import org.terasology.engine.logic.behavior.core.Actor;
 import org.terasology.engine.logic.behavior.core.CollectiveBehaviorTreeRunner;
 import org.terasology.engine.logic.common.DisplayNameComponent;
-import org.terasology.module.sandbox.API;
+import org.terasology.gestalt.module.sandbox.API;
 
 import java.util.Set;
 

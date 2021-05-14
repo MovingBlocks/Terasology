@@ -18,5 +18,5 @@
                 "engine:crouch"
         }) package org.terasology.engine.input.binds.movement;
 
-import org.terasology.module.sandbox.API;
+import org.terasology.gestalt.module.sandbox.API;
 import org.terasology.input.InputCategory;

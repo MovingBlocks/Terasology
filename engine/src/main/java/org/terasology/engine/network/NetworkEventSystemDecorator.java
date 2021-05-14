@@ -3,7 +3,7 @@
 
 package org.terasology.engine.network;
 
-import org.terasology.assets.ResourceUrn;
+import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.engine.core.bootstrap.eventSystem.AbstractEventSystemDecorator;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.event.Event;

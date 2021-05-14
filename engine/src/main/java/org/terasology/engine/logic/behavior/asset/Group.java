@@ -2,10 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.logic.behavior.asset;
 
-import org.terasology.assets.Asset;
-import org.terasology.assets.AssetType;
-import org.terasology.assets.ResourceUrn;
-import org.terasology.assets.module.annotations.RegisterAssetType;
+import org.terasology.gestalt.assets.Asset;
+import org.terasology.gestalt.assets.AssetType;
+import org.terasology.gestalt.assets.ResourceUrn;
+import org.terasology.gestalt.assets.module.annotations.RegisterAssetType;
 
 /**
  * The main Group asset class. This is the reference type

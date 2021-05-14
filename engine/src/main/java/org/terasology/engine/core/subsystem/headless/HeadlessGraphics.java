@@ -15,8 +15,6 @@
  */
 package org.terasology.engine.core.subsystem.headless;
 
-import org.terasology.assets.AssetFactory;
-import org.terasology.assets.module.ModuleAwareAssetTypeManager;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.core.subsystem.DisplayDevice;
 import org.terasology.engine.core.subsystem.EngineSubsystem;
@@ -32,28 +30,20 @@ import org.terasology.engine.core.subsystem.headless.renderer.HeadlessRenderingS
 import org.terasology.engine.core.subsystem.headless.renderer.ShaderManagerHeadless;
 import org.terasology.engine.rendering.ShaderManager;
 import org.terasology.engine.rendering.assets.animation.MeshAnimation;
-import org.terasology.engine.rendering.assets.animation.MeshAnimationBundle;
-import org.terasology.engine.rendering.assets.animation.MeshAnimationBundleData;
-import org.terasology.engine.rendering.assets.animation.MeshAnimationData;
 import org.terasology.engine.rendering.assets.animation.MeshAnimationImpl;
 import org.terasology.engine.rendering.assets.atlas.Atlas;
-import org.terasology.engine.rendering.assets.atlas.AtlasData;
 import org.terasology.engine.rendering.assets.font.Font;
-import org.terasology.engine.rendering.assets.font.FontData;
 import org.terasology.engine.rendering.assets.font.FontImpl;
 import org.terasology.engine.rendering.assets.material.Material;
-import org.terasology.engine.rendering.assets.material.MaterialData;
 import org.terasology.engine.rendering.assets.mesh.Mesh;
-import org.terasology.engine.rendering.assets.mesh.MeshData;
 import org.terasology.engine.rendering.assets.shader.Shader;
-import org.terasology.engine.rendering.assets.shader.ShaderData;
 import org.terasology.engine.rendering.assets.skeletalmesh.SkeletalMesh;
-import org.terasology.engine.rendering.assets.skeletalmesh.SkeletalMeshData;
 import org.terasology.engine.rendering.assets.texture.PNGTextureFormat;
 import org.terasology.engine.rendering.assets.texture.Texture;
 import org.terasology.engine.rendering.assets.texture.TextureData;
 import org.terasology.engine.rendering.assets.texture.subtexture.Subtexture;
-import org.terasology.engine.rendering.assets.texture.subtexture.SubtextureData;
+import org.terasology.gestalt.assets.AssetType;
+import org.terasology.gestalt.assets.module.ModuleAwareAssetTypeManager;
 import org.terasology.nui.canvas.CanvasRenderer;
 
 public class HeadlessGraphics implements EngineSubsystem {
@@ -65,18 +55,23 @@ public class HeadlessGraphics implements EngineSubsystem {
 
     @Override
     public void registerCoreAssetTypes(ModuleAwareAssetTypeManager assetTypeManager) {
-        assetTypeManager.registerCoreAssetType(Font.class, (AssetFactory<Font, FontData>) FontImpl::new, "fonts");
-        assetTypeManager.registerCoreAssetType(Texture.class, (AssetFactory<Texture, TextureData>) HeadlessTexture::new, "textures", "fonts");
-        assetTypeManager.registerCoreFormat(Texture.class, new PNGTextureFormat(Texture.FilterMode.NEAREST, path -> path.getName(2).toString().equals("textures")));
-        assetTypeManager.registerCoreFormat(Texture.class, new PNGTextureFormat(Texture.FilterMode.LINEAR, path -> path.getName(2).toString().equals("fonts")));
-        assetTypeManager.registerCoreAssetType(Shader.class, (AssetFactory<Shader, ShaderData>) HeadlessShader::new, "shaders");
-        assetTypeManager.registerCoreAssetType(Material.class, (AssetFactory<Material, MaterialData>) HeadlessMaterial::new, "materials");
-        assetTypeManager.registerCoreAssetType(Mesh.class, (AssetFactory<Mesh, MeshData>) HeadlessMesh::new, "mesh");
-        assetTypeManager.registerCoreAssetType(SkeletalMesh.class, (AssetFactory<SkeletalMesh, SkeletalMeshData>) HeadlessSkeletalMesh::new, "skeletalMesh");
-        assetTypeManager.registerCoreAssetType(MeshAnimation.class, (AssetFactory<MeshAnimation, MeshAnimationData>) MeshAnimationImpl::new, "animations", "skeletalMesh");
-        assetTypeManager.registerCoreAssetType(MeshAnimationBundle.class, (AssetFactory<MeshAnimationBundle, MeshAnimationBundleData>) MeshAnimationBundle::new, "skeletalMesh", "animations");
-        assetTypeManager.registerCoreAssetType(Atlas.class, (AssetFactory<Atlas, AtlasData>) Atlas::new, "atlas");
-        assetTypeManager.registerCoreAssetType(Subtexture.class, (AssetFactory<Subtexture, SubtextureData>) Subtexture::new);
+        assetTypeManager.createAssetType(Font.class, FontImpl::new, "fonts");
+        AssetType<Texture, TextureData> texture = assetTypeManager.createAssetType(Texture.class,
+                (urn, assetType, data) -> new HeadlessTexture(urn, assetType, data, new HeadlessTexture.DisposalAction()), "textures", "fonts");
+        assetTypeManager.getAssetFileDataProducer(texture)
+                .addAssetFormat(new PNGTextureFormat(Texture.FilterMode.NEAREST,
+                        path -> path.getPath().get(1).equals("textures")));
+        assetTypeManager.getAssetFileDataProducer(texture)
+                .addAssetFormat(new PNGTextureFormat(Texture.FilterMode.LINEAR, path -> path.getPath().get(1).equals(
+                        "fonts")));
+        assetTypeManager.createAssetType(Shader.class, HeadlessShader::new, "shaders");
+        assetTypeManager.createAssetType(Material.class, HeadlessMaterial::new, "materials");
+        assetTypeManager.createAssetType(Mesh.class, HeadlessMesh::new, "mesh");
+        assetTypeManager.createAssetType(SkeletalMesh.class, HeadlessSkeletalMesh::new, "skeletalMesh");
+        assetTypeManager.createAssetType(MeshAnimation.class, MeshAnimationImpl::new, "animations");
+        assetTypeManager.createAssetType(Atlas.class, Atlas::new, "atlas");
+        assetTypeManager.createAssetType(Subtexture.class, Subtexture::new);
+
     }
 
     @Override
