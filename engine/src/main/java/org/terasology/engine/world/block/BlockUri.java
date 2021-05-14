@@ -31,6 +31,7 @@ public class BlockUri implements Uri, Comparable<BlockUri> {
     private final ResourceUrn blockFamilyDefinition;
     private final Optional<ResourceUrn> shape;
     private final Name blockName;
+    private final int hashCode;
 
     public BlockUri(String uri) throws BlockUriParseException {
         try {
@@ -62,6 +63,8 @@ public class BlockUri implements Uri, Comparable<BlockUri> {
         } catch (InvalidUrnException e) {
             throw new BlockUriParseException("Could not parse block uri: '" + uri + "'", e);
         }
+        this.hashCode = hashCode();
+
     }
 
     public BlockUri(ResourceUrn blockFamilyDefinition) {
@@ -88,7 +91,10 @@ public class BlockUri implements Uri, Comparable<BlockUri> {
         this.blockFamilyDefinition = blockFamilyDefinition;
         this.shape = shape;
         this.blockName = blockName;
+
+        this.hashCode = hashCode();
     }
+
 
     @Override
     public Name getModuleName() {
@@ -156,7 +162,8 @@ public class BlockUri implements Uri, Comparable<BlockUri> {
         }
         if (obj instanceof BlockUri) {
             BlockUri other = (BlockUri) obj;
-            return Objects.equal(other.blockFamilyDefinition, blockFamilyDefinition)
+            return this.hashCode == other.hashCode
+                    && Objects.equal(other.blockFamilyDefinition, blockFamilyDefinition)
                     && Objects.equal(other.blockName, blockName)
                     && Objects.equal(other.shape, shape);
         }
