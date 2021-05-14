@@ -101,8 +101,8 @@ public final class Block {
     private boolean stackable = true;
 
     private BlockAppearance primaryAppearance = new BlockAppearance();
-    private Map<Side, BlockMeshPart> lowLiquidMesh = Maps.newEnumMap(Side.class);
-    private Map<Side, BlockMeshPart> topLiquidMesh = Maps.newEnumMap(Side.class);
+    private BlockMeshPart[] lowLiquidMesh = new BlockMeshPart[Side.values().length];
+    private BlockMeshPart[] topLiquidMesh = new BlockMeshPart[Side.values().length];
 
     /* Collision */
     private CollisionShape collisionShape;
@@ -528,19 +528,19 @@ public final class Block {
     }
 
     public BlockMeshPart getLowLiquidMesh(Side side) {
-        return lowLiquidMesh.get(side);
+        return lowLiquidMesh[side.ordinal()];
     }
 
     public void setLowLiquidMesh(Side side, BlockMeshPart meshPart) {
-        lowLiquidMesh.put(side, meshPart);
+        lowLiquidMesh[side.ordinal()] = meshPart;
     }
 
     public BlockMeshPart getTopLiquidMesh(Side side) {
-        return topLiquidMesh.get(side);
+        return topLiquidMesh[side.ordinal()];
     }
 
     public void setTopLiquidMesh(Side side, BlockMeshPart meshPart) {
-        topLiquidMesh.put(side, meshPart);
+        topLiquidMesh[side.ordinal()] = meshPart;
     }
 
     /**
