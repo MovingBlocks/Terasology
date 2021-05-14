@@ -3,8 +3,8 @@
 package org.terasology.engine.world.generation;
 
 import com.google.common.collect.ListMultimap;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import org.terasology.engine.utilities.collection.TypeMap;
 import org.terasology.engine.world.block.BlockRegion;
 
 import java.util.Map;
@@ -19,9 +19,9 @@ public class RegionImpl implements Region, GeneratingRegion {
     private final Map<Class<? extends WorldFacet>, Border3D> borders;
     private final float scale;
 
-    private final TypeMap<WorldFacet> generatingFacets = TypeMap.create();
+    private final Map<Class<? extends WorldFacet>, WorldFacet> generatingFacets = Maps.newHashMap();
     private final Set<FacetProvider> processedProviders = Sets.newHashSet();
-    private final TypeMap<WorldFacet> generatedFacets = TypeMap.create();
+    private final Map<Class<? extends WorldFacet>, WorldFacet> generatedFacets = Maps.newHashMap();
 
     public RegionImpl(BlockRegion region, ListMultimap<Class<? extends WorldFacet>, FacetProvider> facetProviderChains, Map<Class<? extends WorldFacet>, Border3D> borders, float scale) {
         this.region = region;
@@ -32,7 +32,7 @@ public class RegionImpl implements Region, GeneratingRegion {
 
     @Override
     public <T extends WorldFacet> T getFacet(Class<T> dataType) {
-        T facet = generatedFacets.get(dataType);
+        T facet = (T) generatedFacets.get(dataType);
         if (facet == null) {
             facetProviderChains.get(dataType).stream().filter(provider -> !processedProviders.contains(provider)).forEach(provider -> {
                 if (scale == 1) {
@@ -42,7 +42,7 @@ public class RegionImpl implements Region, GeneratingRegion {
                 }
                 processedProviders.add(provider);
             });
-            facet = generatingFacets.get(dataType);
+            facet = (T) generatingFacets.get(dataType);
             generatedFacets.put(dataType, facet);
         }
         return facet;
@@ -55,7 +55,7 @@ public class RegionImpl implements Region, GeneratingRegion {
 
     @Override
     public <T extends WorldFacet> T getRegionFacet(Class<T> type) {
-        return generatingFacets.get(type);
+        return (T) generatingFacets.get(type);
     }
 
     @Override
