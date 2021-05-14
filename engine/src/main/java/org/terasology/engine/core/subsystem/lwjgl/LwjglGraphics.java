@@ -95,14 +95,16 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
                 int[] xBuffer = new int[1];
                 int[] yBuffer = new int[1];
                 GLFW.glfwGetWindowPos(window, xBuffer, yBuffer);
-                config.setWindowPosX(xBuffer[0]);
-                config.setWindowPosY(yBuffer[0]);
-
                 int[] widthBuffer = new int[1];
                 int[] heightBuffer = new int[1];
                 GLFW.glfwGetWindowSize(window, widthBuffer, heightBuffer);
-                config.setWindowWidth(widthBuffer[0]);
-                config.setWindowHeight(heightBuffer[0]);
+
+                if (widthBuffer[0]>0 && heightBuffer[0]>0 && xBuffer[0]>0 && yBuffer[0]>0) {
+                    config.setWindowWidth(widthBuffer[0]);
+                    config.setWindowHeight(heightBuffer[0]);
+                    config.setWindowPosX(xBuffer[0]);
+                    config.setWindowPosY(yBuffer[0]);
+                }
             }
         }
     }
