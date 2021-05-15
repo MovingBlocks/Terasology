@@ -43,6 +43,28 @@ public class StandardMeshData extends MeshData {
 
     public final IndexResource indices;
 
+    /**
+     * transfer buffered data to another {@link StandardMeshData}
+     * @param data the data
+     */
+    public StandardMeshData(StandardMeshData data) {
+        this();
+        positionBuffer.copy(data.positionBuffer);
+        normalBuffer.copy(data.normalBuffer);
+        uv0Buffer.copy(data.uv0Buffer);
+        uv1Buffer.copy(data.uv1Buffer);
+        lightBuffer.copy(data.lightBuffer);
+        colorBuffer.copy(data.colorBuffer);
+        indices.copy(data.indices);
+
+        position.setPosition(data.position.getPosition());
+        normal.setPosition(data.normal.getPosition());
+        uv0.setPosition(data.uv0.getPosition());
+        uv1.setPosition(data.uv1.getPosition());
+        color0.setPosition(data.color0.getPosition());
+        light0.setPosition(data.light0.getPosition());
+    }
+
     public StandardMeshData() {
 
         VertexResourceBuilder builder = new VertexResourceBuilder();
@@ -116,16 +138,5 @@ public class StandardMeshData extends MeshData {
         return indices;
     }
 
-    @Override
-    public StandardMeshData clone() {
-        StandardMeshData meshData = new StandardMeshData();
-        meshData.positionBuffer.copy(this.positionBuffer);
-        meshData.normalBuffer.copy(this.normalBuffer);
-        meshData.uv0Buffer.copy(this.uv0Buffer);
-        meshData.uv1Buffer.copy(this.uv1Buffer);
-        meshData.lightBuffer.copy(this.lightBuffer);
-        meshData.colorBuffer.copy(this.colorBuffer);
-        meshData.indices.copy(this.indices);
-        return meshData;
-    }
+
 }

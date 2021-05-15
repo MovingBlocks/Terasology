@@ -120,7 +120,7 @@ public class MeshBuilder {
     }
 
     public StandardMeshData buildMeshData() {
-        return meshData.clone();
+        return new StandardMeshData(meshData);
     }
 
     public Mesh build() {

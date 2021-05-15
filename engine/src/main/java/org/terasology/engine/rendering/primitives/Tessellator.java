@@ -125,7 +125,7 @@ public class Tessellator {
     }
 
     public MeshData buildMeshData() {
-        return meshData.clone();
+        return new StandardMeshData(meshData);
     }
 
     public Mesh generateMesh(ResourceUrn urn) {

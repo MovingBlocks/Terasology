@@ -42,6 +42,10 @@ public class VertexAttributeBinding<T, TImpl extends T> {
         this.vertexIndex = index;
     }
 
+    public int getPosition() {
+        return this.vertexIndex;
+    }
+
     public int numberOfElements() {
         if (version != resource.getVersion()) {
             update();
