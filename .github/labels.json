@@ -2,7 +2,8 @@
   {
     "color": "FF0000",
     "description": "Issue reporting or PR addressing a critical problem that blocks other efforts",
-    "name": "Blocker"
+    "name": "Blocker",
+    "aliases": ["not possible yet"]
   },
   {
     "color": "ba0000",
@@ -13,7 +14,7 @@
     "color": "f5a342",
     "description": "Requests, Issues and Changes targeting gradle, groovy, Jenkins, etc.",
     "name": "Category: Build/CI",
-    "aliases":["logistics"]
+    "aliases": ["logistics"]
   },
   {
     "color": "ff7332",
@@ -63,13 +64,13 @@
     "color": "AAd9d2",
     "description": "Very big effort likely requiring a lot of research and work in many areas across the codebase",
     "name": "Size: L",
-    "aliases":["epic"]
+    "aliases": ["epic"]
   },
   {
     "color": "AAd9d2",
     "description": "Medium-sized effort likely requiring some research and work in multiple areas",
     "name": "Size: M",
-    "aliases":["mentor size"]
+    "aliases": ["mentor size"]
   },
   {
     "color": "AAd9d2",
@@ -113,7 +114,7 @@
     "color": "3b808e",
     "description": "Requests, Issues and Changes related to software architecture, programming patterns, etc.",
     "name": "Topic: Architecture",
-    "aliases": ["architecture", "api", "Architecture"]
+    "aliases": ["architecture", "api"]
   },
   {
     "color": "3b808e",
@@ -134,7 +135,7 @@
     "aliases": ["rendering"]
   },
   {
-    "color": "f5a342",
+    "color": "3b808e",
     "description": "Requests, Issues and Changes related to improving stablity and reducing flakyness",
     "name": "Topic: Stabilization",
     "aliases": ["stabilization"]
