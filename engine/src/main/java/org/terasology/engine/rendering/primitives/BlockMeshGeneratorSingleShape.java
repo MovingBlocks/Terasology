@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.rendering.primitives;
 
-import com.google.common.collect.Maps;
 import org.joml.Vector3ic;
 import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.engine.math.Side;
@@ -13,8 +12,6 @@ import org.terasology.engine.world.block.BlockAppearance;
 import org.terasology.engine.world.block.BlockManager;
 import org.terasology.engine.world.block.BlockPart;
 import org.terasology.engine.world.block.shapes.BlockMeshPart;
-
-import java.util.Map;
 
 public class BlockMeshGeneratorSingleShape implements BlockMeshGenerator {
 
@@ -30,14 +27,14 @@ public class BlockMeshGeneratorSingleShape implements BlockMeshGenerator {
         final Block selfBlock = view.getBlock(x, y, z);
 
         // Gather adjacent blocks
-        final Map<Side, Block> adjacentBlocks = Maps.newEnumMap(Side.class);
+        Block[] adjacentBlocks = new Block[Side.values().length];
         for (Side side : Side.getAllSides()) {
             Vector3ic offset = side.direction();
             Block blockToCheck = view.getBlock(x + offset.x(), y + offset.y(), z + offset.z());
-            adjacentBlocks.put(side, blockToCheck);
+            adjacentBlocks[side.ordinal()] = blockToCheck;
         }
         for (final Side side : Side.getAllSides()) {
-            if (isSideVisibleForBlockTypes(adjacentBlocks.get(side), selfBlock, side)) {
+            if (isSideVisibleForBlockTypes(adjacentBlocks[side.ordinal()], selfBlock, side)) {
                 final ChunkMesh.RenderType renderType = getRenderType(selfBlock);
                 final BlockAppearance blockAppearance = selfBlock.getPrimaryAppearance();
                 final ChunkVertexFlag vertexFlag = getChunkVertexFlag(view, x, y, z, selfBlock);
@@ -50,12 +47,12 @@ public class BlockMeshGeneratorSingleShape implements BlockMeshGenerator {
 
                 // If the selfBlock isn't lowered, some more faces may have to be drawn
                 if (selfBlock.isLiquid()) {
-                    final Block topBlock = adjacentBlocks.get(Side.TOP);
+                    final Block topBlock = adjacentBlocks[Side.TOP.ordinal()];
                     // Draw horizontal sides if visible from below
                     if (topBlock.isLiquid() && Side.horizontalSides().contains(side)) {
                         final Vector3ic offset = side.direction();
                         final Block adjacentAbove = view.getBlock(x + offset.x(), y + 1, z + offset.z());
-                        final Block adjacent = adjacentBlocks.get(side);
+                        final Block adjacent = adjacentBlocks[side.ordinal()];
 
                         if (adjacent.isLiquid() && !adjacentAbove.isLiquid()) {
                             blockMeshPart = selfBlock.getTopLiquidMesh(side);
