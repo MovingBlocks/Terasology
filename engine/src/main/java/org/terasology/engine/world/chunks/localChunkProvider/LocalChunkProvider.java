@@ -161,6 +161,9 @@ public class LocalChunkProvider implements ChunkProvider {
 
     private void processReadyChunk(final Chunk chunk) {
         Vector3ic chunkPos = chunk.getPosition();
+        if (chunkCache.get(chunkPos) != null) {
+            return; // TODO move it in pipeline;
+        }
         chunkCache.put(new Vector3i(chunkPos), chunk);
         chunk.markReady();
         //TODO, it is not clear if the activate/addedBlocks event logic is correct.
@@ -206,9 +209,9 @@ public class LocalChunkProvider implements ChunkProvider {
             PerformanceMonitor.endActivity();
 
 
-            worldEntity.send(new OnChunkGenerated(new Vector3i(chunkPos)));
+            worldEntity.send(new OnChunkGenerated(chunkPos));
         }
-        worldEntity.send(new OnChunkLoaded(new Vector3i(chunkPos)));
+        worldEntity.send(new OnChunkLoaded(chunkPos));
     }
 
     private void generateQueuedEntities(EntityStore store) {
