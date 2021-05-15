@@ -35,7 +35,7 @@ We encourage contributions from anybody and try to keep a warm and friendly comm
     </tr>
     <tr>
         <td>System (OS)</td>
-        <td colspan="2" align="center"> Windows, MacOS, Linux (64 bit)</td>
+        <td colspan="2" align="center">Windows, MacOS, Linux (64 bit)</td>
     </tr>
     <tr>
         <td>Processor (CPU)</td>
