@@ -92,7 +92,7 @@ public class CreateWorldEntity extends SingleStepLoadProcess {
             SimpleUri generatorUri = worldGenerator.getUri();
             worldConfigurator.getProperties().forEach((key, currentComponent) -> {
                 Class<? extends Component> clazz = currentComponent.getClass();
-                Component moduleComponent = config.getModuleConfig(generatorUri, key, clazz);
+                Component moduleComponent = gameManifest.getModuleConfig(generatorUri, key, clazz);
                 if (moduleComponent != null) {
                     // configure entity from component
                     worldEntity.addComponent(moduleComponent);
