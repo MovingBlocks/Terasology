@@ -353,9 +353,9 @@ public enum Side {
     public Side getRelativeSide(Direction direction) {
         switch (direction) {
             case UP:
-                pitchClockwise(1);
+                return pitchClockwise(1);
             case DOWN:
-                pitchClockwise(-1);
+                return pitchClockwise(-1);
             case LEFT:
                 return yawClockwise(1);
             case RIGHT:
