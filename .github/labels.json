@@ -1,0 +1,182 @@
+[
+  {
+    "color": "FF0000",
+    "description": "Issue reporting or PR addressing a critical problem that blocks other efforts",
+    "name": "Blocker",
+    "aliases": ["not possible yet"]
+  },
+  {
+    "color": "ba0000",
+    "description": "API breaking change requiring follow-up work in dependant areas",
+    "name": "Breaking Change"
+  },
+  {
+    "color": "f5a342",
+    "description": "Requests, Issues and Changes targeting gradle, groovy, Jenkins, etc.",
+    "name": "Category: Build/CI",
+    "aliases": ["logistics"]
+  },
+  {
+    "color": "ff7332",
+    "description": "Requests, Issues and Changes targeting unexpected terminations, segfaults, etc.",
+    "name": "Category: Crash"
+  },
+  {
+    "color": "f5a342",
+    "description": "Requests, Issues and Changes targeting javadoc and module documentation",
+    "name": "Category: Doc",
+    "aliases": ["documentation"]
+  },
+  {
+    "color": "f5a342",
+    "description": "Requests, Issues and Changes targeting gameplay mechanics and content",
+    "name": "Category: Gameplay Content",
+    "aliases": ["content"]
+  },
+  {
+    "color": "f5a342",
+    "description": "Requests, Issues and Changes targeting performance",
+    "name": "Category: Performance",
+    "aliases": ["performance"]
+  },
+  {
+    "color": "f5a342",
+    "description": "Requests, Issues and Changes targeting security",
+    "name": "Category: Security",
+    "aliases": ["security"]
+  },
+  {
+    "color": "f5a342",
+    "description": "Requests, Issues and Changes targeting tests and quality assurance",
+    "name": "Category: Test/QA"
+  },
+  {
+    "color": "94EC55",
+    "description": "Good for learners that are new to Terasology",
+    "name": "Good First Issue"
+  },
+  {
+    "color": "876314",
+    "description": "Affects aspects not visible in Singleplayer mode only",
+    "name": "Multiplayer"
+  },
+  {
+    "color": "AAd9d2",
+    "description": "Very big effort likely requiring a lot of research and work in many areas across the codebase",
+    "name": "Size: L",
+    "aliases": ["epic"]
+  },
+  {
+    "color": "AAd9d2",
+    "description": "Medium-sized effort likely requiring some research and work in multiple areas",
+    "name": "Size: M",
+    "aliases": ["mentor size"]
+  },
+  {
+    "color": "AAd9d2",
+    "description": "Small effort likely only affecting a single area and requiring little to no research",
+    "name": "Size: S",
+    "aliases": ["bite-size"]
+  },
+  {
+    "color": "ff7d7d",
+    "description": "Is currently blocked by missing dependencies, pre-requisites, etc.",
+    "name": "Status: Blocked"
+  },
+  {
+    "color": "E99695",
+    "description": "Requires more information by the author on the reported issue or provided changes",
+    "name": "Status: Needs Author Input"
+  },
+  {
+    "color": "E99695",
+    "description": "Requires help discussing a reported issue or provided PR",
+    "name": "Status: Needs Discussion",
+    "aliases": ["help wanted", "support"]
+  },
+  {
+    "color": "E99695",
+    "description": "Requires to be checked for feasibility, reproducability, etc.",
+    "name": "Status: Needs Investigation",
+    "aliases": ["research", "needs info"]
+  },
+  {
+    "color": "E99695",
+    "description": "Requires to be tested in-game",
+    "name": "Status: Needs Testing"
+  },
+  {
+    "color": "DDDDDD",
+    "description": "Wasn't reviewed or continued for a while",
+    "name": "Status: Stale"
+  },
+  {
+    "color": "3b808e",
+    "description": "Requests, Issues and Changes related to software architecture, programming patterns, etc.",
+    "name": "Topic: Architecture",
+    "aliases": ["architecture", "api"]
+  },
+  {
+    "color": "3b808e",
+    "description": "Requests, Issues and Changes related to bullet, collisions, gravity, etc.",
+    "name": "Topic: Physics",
+    "aliases": ["physics"]
+  },
+  {
+    "color": "3b808e",
+    "description": "Requests, Issues and Changes related to pathfinding, behaviors, etc.",
+    "name": "Topic: AI",
+    "aliases": ["ai"]
+  },
+  {
+    "color": "3b808e",
+    "description": "Requests, Issues and Changes related to lighting, meshes, camera, etc.",
+    "name": "Topic: Rendering",
+    "aliases": ["rendering"]
+  },
+  {
+    "color": "3b808e",
+    "description": "Requests, Issues and Changes related to improving stablity and reducing flakyness",
+    "name": "Topic: Stabilization",
+    "aliases": ["stabilization"]
+  },
+  {
+    "color": "3b808e",
+    "description": "Requests, Issues and Changes related to screens, artwork, sound and overall user experience",
+    "name": "Topic: UI/UX",
+    "aliases": ["art", "ui", "artwork"]
+  },
+  {
+    "color": "3b808e",
+    "description": "Requests, Issues and Changes related to facets, rasterizers, etc.",
+    "name": "Topic: WorldGen"
+  },
+  {
+    "color": "d73a4a",
+    "description": "Issues reporting and PRs fixing problems",
+    "name": "Type: Bug",
+    "aliases": ["bug"]
+  },
+  {
+    "color": "666666",
+    "description": "Request for or implementation of maintenance changes",
+    "name": "Type: Chore"
+  },
+  {
+    "color": "0E8A16",
+    "description": "Request for or addition/enhancement of a feature",
+    "name": "Type: Improvement",
+    "aliases": ["enhancement", "new feature"]
+  },
+  {
+    "color": "66CBED",
+    "description": "Issue intended to help understanding something that is unclear",
+    "name": "Type: Question",
+    "aliases": ["question"]
+  },
+  {
+    "color": "fbca04",
+    "description": "Request for or implementation of pure and automatic refactorings, e.g. renaming, to improve clarity",
+    "name": "Type: Refactoring"
+  }
+]
