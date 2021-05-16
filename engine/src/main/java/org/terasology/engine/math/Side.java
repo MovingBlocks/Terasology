@@ -201,7 +201,16 @@ public enum Side {
                 }
                 break;
             case 2:
-                return reverse();
+                switch (this) {
+                    case FRONT:
+                        return BACK;
+                    case RIGHT:
+                        return LEFT;
+                    case BACK:
+                        return FRONT;
+                    case LEFT:
+                        return RIGHT;
+                }
             case 3:
                 switch (this) {
                     case FRONT:
