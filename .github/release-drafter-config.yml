@@ -9,33 +9,42 @@ categories:
   - title: ':rocket: Features'
     labels:
       - 'Enhancement'
+      - 'Type: Improvement'
   - title: ':bug: Bug Fixes'
     labels:
       - 'Bug'
+      - 'Type: Bug'
   - title: ':toolbox: Maintenance'
     labels:
       - 'Stabilization'
+      - 'Topic: Stabilization'
+      - 'Type: Chore'
+      - 'Type: Refactoring'
   - title: ':books: Documentation'
     labels:
+      - 'Category: Doc'
       - 'Documentation'
   - title: ':gear: Logistics'
     labels:
-      - 'Logistics'
+      - 'Category: Build/CI'
+      - 'Logistics'      
 autolabeler:
-  - label: 'Documentation'
+  - label: 'Category: Doc'
     title:
       - '/doc/i'
-  - label: 'Bug'
+  - label: 'Type: Bug'
     title:
       - '/fix/i'
-  - label: 'Enhancement'
+  - label: 'Type: Improvement'
     title:
       - '/feat/i'
-  - label: 'Logistics'
+  - label: 'Category: Build/CI'
     title:
       - '/build/i'
       - '/ci/i'
-  - label: 'Stabilization'
+  - label: 'Type: Chore'
     title:
       - '/chore/i'
+  - label: 'Type: Refactoring'
+    title:
       - '/refactor/i'
