@@ -1,18 +1,8 @@
-/*
- * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+#version 330 core
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
+
+in vec2 v_uv0;
 
 uniform float weight;
 uniform float decay;
@@ -28,27 +18,24 @@ void main() {
     gl_FragData[0].rgba = vec4(0.0, 0.0, 0.0, 1.0);
 
     if (lightDirDotViewDir > 0.0) {
-        vec2 texCoord = gl_TexCoord[0].xy;
-        vec2 deltaTexCoord = (1.0 / float(LIGHT_SHAFT_SAMPLES)) * density * vec2(texCoord.xy - lightScreenPos.xy);
+        vec2 uv0 = v_uv0;
+        vec2 deltaTexCoord = (1.0 / float(LIGHT_SHAFT_SAMPLES)) * density * vec2(uv0.xy - lightScreenPos.xy);
 
         float dist = length(deltaTexCoord.xy);
 
         // TODO: This shouldn't be hardcoded
         float threshold = 0.01;
         if (dist > threshold) {
-            deltaTexCoord.xy /= dist / threshold;
+            deltaTexCoord.xy /= (dist / threshold);
         }
 
         float illuminationDecay = 1.0;
-        for(int i=0; i < LIGHT_SHAFT_SAMPLES ; i++)
-        {
-            texCoord -= deltaTexCoord;
-            vec3 sample = texture2D(texScene, texCoord).rgb;
+        for(int i=0; i < LIGHT_SHAFT_SAMPLES; i++) {
+            uv0 -= deltaTexCoord;
+            vec3 sampler = texture(texScene, uv0).rgb;
 
-            sample *= illuminationDecay * weight;
-
-            gl_FragData[0].rgb += sample;
-
+            sampler *= illuminationDecay * weight;
+            gl_FragData[0].rgb += sampler;
             illuminationDecay *= decay;
         }
 
