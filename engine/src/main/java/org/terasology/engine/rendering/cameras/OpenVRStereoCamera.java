@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.rendering.cameras;
 
+import org.joml.FrustumIntersection;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector4f;
@@ -38,10 +39,10 @@ public class OpenVRStereoCamera extends SubmersibleCamera {
     private final Matrix4f viewMatrixReflectedLeftEye = new Matrix4f();
     private final Matrix4f viewMatrixReflectedRightEye = new Matrix4f();
 
-    private final ViewFrustum viewFrustumLeftEye = new ViewFrustum();
-    private final ViewFrustum viewFrustumRightEye = new ViewFrustum();
-    private final ViewFrustum viewFrustumReflectedLeftEye = new ViewFrustum();
-    private final ViewFrustum viewFrustumReflectedRightEye = new ViewFrustum();
+    private final FrustumIntersection viewFrustumLeftEye = new FrustumIntersection();
+    private final FrustumIntersection viewFrustumRightEye = new FrustumIntersection();
+    private final FrustumIntersection viewFrustumReflectedLeftEye = new FrustumIntersection();
+    private final FrustumIntersection viewFrustumReflectedRightEye = new FrustumIntersection();
 
     private final Matrix4f viewProjectionMatrixLeftEye = new Matrix4f();
     private final Matrix4f viewProjectionMatrixRightEye = new Matrix4f();
@@ -61,14 +62,12 @@ public class OpenVRStereoCamera extends SubmersibleCamera {
     public void updateFrustum() {
         super.updateFrustum();
 
-        viewFrustumLeftEye.updateFrustum(viewMatrixLeftEye.get(BufferUtils.createFloatBuffer(16)),
-            projectionMatrixLeftEye.get(BufferUtils.createFloatBuffer(16)));
-        viewFrustumRightEye.updateFrustum(viewMatrixRightEye.get(BufferUtils.createFloatBuffer(16)),
-            projectionMatrixRightEye.get(BufferUtils.createFloatBuffer(16)));
-        viewFrustumReflectedLeftEye.updateFrustum(viewMatrixReflectedLeftEye.get(BufferUtils.createFloatBuffer(16)),
-            projectionMatrixLeftEye.get(BufferUtils.createFloatBuffer(16)));
-        viewFrustumReflectedRightEye.updateFrustum(viewMatrixReflectedRightEye.get(BufferUtils.createFloatBuffer(16))
-            , projectionMatrixRightEye.get(BufferUtils.createFloatBuffer(16)));
+        Matrix4f dest = new Matrix4f();
+
+        viewFrustumLeftEye.set(projectionMatrixLeftEye.mul(viewMatrixLeftEye, dest), true);
+        viewFrustumRightEye.set(projectionMatrixRightEye.mul(viewMatrixRightEye, dest));
+        viewFrustumReflectedLeftEye.set(projectionMatrixLeftEye.mul(viewMatrixReflectedLeftEye, dest), true);
+        viewFrustumReflectedRightEye.set(projectionMatrixRightEye.mul(viewMatrixReflectedRightEye, dest), true);
     }
 
     @Override
@@ -77,7 +76,7 @@ public class OpenVRStereoCamera extends SubmersibleCamera {
     }
 
     @Override
-    public ViewFrustum getViewFrustum() {
+    public FrustumIntersection getViewFrustum() {
         RenderingStage renderingStage = CoreRegistry.get(WorldRenderer.class).getCurrentRenderStage();
 
         if (renderingStage == RenderingStage.LEFT_EYE) {
@@ -90,7 +89,7 @@ public class OpenVRStereoCamera extends SubmersibleCamera {
     }
 
     @Override
-    public ViewFrustum getViewFrustumReflected() {
+    public FrustumIntersection getViewFrustumReflected() {
         RenderingStage renderingStage = CoreRegistry.get(WorldRenderer.class).getCurrentRenderStage();
 
         if (renderingStage == RenderingStage.LEFT_EYE) {
