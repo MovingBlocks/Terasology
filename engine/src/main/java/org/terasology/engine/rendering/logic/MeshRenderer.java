@@ -22,17 +22,14 @@ import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
 import org.terasology.engine.entitySystem.systems.RegisterMode;
 import org.terasology.engine.entitySystem.systems.RegisterSystem;
 import org.terasology.engine.entitySystem.systems.RenderSystem;
-import org.terasology.engine.rendering.assets.material.Material;
-import org.terasology.engine.rendering.assets.shader.ShaderProgramFeature;
-import org.terasology.engine.rendering.opengl.OpenGLMesh;
-import org.terasology.engine.rendering.world.WorldRenderer;
-import org.terasology.joml.geom.AABBf;
 import org.terasology.engine.logic.location.LocationComponent;
-import org.terasology.engine.logic.players.LocalPlayer;
 import org.terasology.engine.network.ClientComponent;
 import org.terasology.engine.network.NetworkSystem;
 import org.terasology.engine.registry.In;
+import org.terasology.engine.rendering.assets.material.Material;
+import org.terasology.engine.rendering.world.WorldRenderer;
 import org.terasology.engine.world.WorldProvider;
+import org.terasology.joml.geom.AABBf;
 
 import java.nio.FloatBuffer;
 import java.util.Arrays;
@@ -47,9 +44,6 @@ public class MeshRenderer extends BaseComponentSystem implements RenderSystem {
 
     @In
     private NetworkSystem network;
-
-    @In
-    private LocalPlayer localPlayer;
 
     @In
     private Config config;

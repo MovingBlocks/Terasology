@@ -18,6 +18,8 @@ package org.terasology.engine.audio.system;
 
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.engine.audio.AudioManager;
 import org.terasology.engine.audio.events.PlaySoundEvent;
 import org.terasology.engine.audio.events.PlaySoundForOwnerEvent;
@@ -34,6 +36,7 @@ import org.terasology.engine.logic.permission.PermissionManager;
 import org.terasology.engine.logic.players.LocalPlayer;
 import org.terasology.engine.network.ClientComponent;
 import org.terasology.engine.network.NetworkSystem;
+import org.terasology.engine.physics.bullet.BulletPhysics;
 import org.terasology.engine.registry.In;
 import org.terasology.engine.utilities.Assets;
 
@@ -42,6 +45,7 @@ import org.terasology.engine.utilities.Assets;
  */
 @RegisterSystem
 public class AudioSystem extends BaseComponentSystem implements UpdateSubscriberSystem {
+    private static final Logger logger = LoggerFactory.getLogger(AudioSystem.class);
 
     @In
     private NetworkSystem networkSystem;
@@ -91,6 +95,8 @@ Vector3f position = localPlayer.getPosition(new Vector3f());
             if (pos.isFinite()) {
                 audioManager.playSound(playSoundEvent.getSound(), pos, playSoundEvent.getVolume(), AudioManager.PRIORITY_NORMAL);
                 return;
+            } else {
+                logger.warn("Can't play sound with non-finite position/rotation?! Entity: {}", entity);
             }
         }
         audioManager.playSound(playSoundEvent.getSound(), playSoundEvent.getVolume());

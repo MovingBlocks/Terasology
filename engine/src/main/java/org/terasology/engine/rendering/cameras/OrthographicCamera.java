@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.rendering.cameras;
 
+import org.joml.FrustumIntersection;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 
@@ -94,7 +95,7 @@ public class OrthographicCamera extends Camera {
     }
 
     @Override
-    public ViewFrustum getViewFrustumReflected() {
+    public FrustumIntersection getViewFrustumReflected() {
         throw new RuntimeException("Not yet implemented!");
     }
 }
