@@ -1,18 +1,8 @@
-/*
- * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+#version 330 core
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
+
+in vec2 v_uv0;
 
 uniform sampler2D texScene;
 uniform sampler2D texDepth;
@@ -41,10 +31,10 @@ uniform mat4 prevViewProjMatrix;
 
 void main() {
 #if !defined (NO_BLUR)
-    vec4 colorBlur = texture2D(texBlur, gl_TexCoord[0].xy);
+    vec4 colorBlur = texture(texBlur, v_uv0.xy);
 #endif
 
-    float currentDepth = texture2D(texDepth, gl_TexCoord[0].xy).x * 2.0 - 1.0;
+    float currentDepth = texture(texDepth, v_uv0.xy).x * 2.0 - 1.0;
 //TODO: Separate the underwater shader effect from the depth of field effect - Amrit 'Who'
 /**
  * Calculate blur for depth of field effect and underwater.
@@ -68,10 +58,10 @@ void main() {
     }
 #endif
 
-    vec4 color = texture2D(texScene, gl_TexCoord[0].xy);
+    vec4 color = texture(texScene, v_uv0.xy);
 
 #if defined (MOTION_BLUR)
-    vec4 screenSpaceNorm = vec4(gl_TexCoord[0].x, gl_TexCoord[0].y, currentDepth, 1.0);
+    vec4 screenSpaceNorm = vec4(v_uv0.x, v_uv0.y, currentDepth, 1.0);
     vec4 screenSpacePos = screenSpaceNorm * vec4(2.0, 2.0, 1.0, 1.0) - vec4(1.0, 1.0, 0.0, 0.0);
 
     vec4 worldSpacePos = invViewProjMatrix * screenSpacePos;
@@ -82,13 +72,13 @@ void main() {
     vec2 velocity = (screenSpacePos.xy - prevScreenSpacePos.xy) / 128.0;
     velocity = clamp(velocity, vec2(-0.01), vec2(0.01));
 
-    vec2 blurTexCoord = gl_TexCoord[0].xy;
+    vec2 blurTexCoord = v_uv0.xy;
     blurTexCoord += velocity;
     for(int i = 1; i < MOTION_BLUR_SAMPLES; ++i, blurTexCoord += velocity)
     {
-      vec4 currentColor = texture2D(texScene, blurTexCoord);
+      vec4 currentColor = texture(texScene, blurTexCoord);
 #ifndef NO_BLUR
-      vec4 currentColorBlur = texture2D(texBlur, blurTexCoord);
+      vec4 currentColorBlur = texture(texBlur, blurTexCoord);
 #endif
 
       color += currentColor;
@@ -110,7 +100,7 @@ void main() {
 #endif
 
 #ifdef FILM_GRAIN
-    vec3 noise = texture2D(texNoise, renderTargetSize * (gl_TexCoord[0].xy + noiseOffset) / noiseSize).xyz * 2.0 - 1.0;
+    vec3 noise = texture(texNoise, renderTargetSize * (v_uv0.xy + noiseOffset) / noiseSize).xyz * 2.0 - 1.0;
     finalColor.rgb += clamp(noise.xxx * grainIntensity, 0.0, 1.0);
 #endif
 
@@ -120,7 +110,7 @@ void main() {
 
     // Color grading
     vec3 lutOffset = vec3(1.0 / 32.0);
-    finalColor.rgb = texture3D(texColorGradingLut, lutScale * finalColor.rgb + lutOffset).rgb;
+    finalColor.rgb = texture(texColorGradingLut, lutScale * finalColor.rgb + lutOffset).rgb;
 
     gl_FragData[0].rgba = finalColor;
 }
