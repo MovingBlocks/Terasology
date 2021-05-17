@@ -1,3 +1,9 @@
+#version 330 core
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
+
+in vec2 v_uv0;
+
 uniform sampler2D texScene;
 
 #ifdef VIGNETTE
@@ -7,10 +13,10 @@ uniform vec3 tint = vec3(1.0,1.0,1.0);
 #endif
 
 void main(){
-    vec4 color = texture2D(texScene, gl_TexCoord[0].xy);
+    vec4 color = texture2D(texScene, v_uv0.xy);
 
     #ifdef VIGNETTE
-        float vig = texture2D(texVignette, gl_TexCoord[0].xy).x;
+        float vig = texture2D(texVignette, v_uv0.xy).x;
         if (!swimming) {
             color.rgb *= vec3(vig)+(1-vig)*tint.rgb;
         } else {
