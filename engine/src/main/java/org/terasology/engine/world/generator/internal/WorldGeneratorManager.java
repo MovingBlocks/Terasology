@@ -9,20 +9,21 @@ import org.slf4j.LoggerFactory;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.core.SimpleUri;
 import org.terasology.engine.core.module.ModuleManager;
-import org.terasology.gestalt.module.Module;
-import org.terasology.gestalt.module.ModuleEnvironment;
-import org.terasology.gestalt.module.dependencyresolution.DependencyResolver;
-import org.terasology.gestalt.module.dependencyresolution.ResolutionResult;
-import org.terasology.gestalt.module.resources.DirectoryFileSource;
-import org.terasology.gestalt.naming.Name;
 import org.terasology.engine.registry.InjectionHelper;
 import org.terasology.engine.world.generator.RegisterWorldGenerator;
 import org.terasology.engine.world.generator.UnresolvedWorldGeneratorException;
 import org.terasology.engine.world.generator.WorldGenerator;
+import org.terasology.gestalt.module.Module;
+import org.terasology.gestalt.module.ModuleEnvironment;
+import org.terasology.gestalt.module.dependencyresolution.DependencyResolver;
+import org.terasology.gestalt.module.dependencyresolution.ResolutionResult;
+import org.terasology.gestalt.naming.Name;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
 import java.util.List;
+
+import static com.google.common.base.Verify.verifyNotNull;
 
 /**
  */
@@ -39,34 +40,32 @@ public class WorldGeneratorManager {
     }
 
     public void refresh() {
-        ModuleManager moduleManager = context.get(ModuleManager.class);
+        ModuleManager moduleManager = verifyNotNull(context.get(ModuleManager.class), "no ModuleManager");
         List<WorldGeneratorInfo> infos = Lists.newArrayList();
         for (Name moduleId : moduleManager.getRegistry().getModuleIds()) {
             Module module = moduleManager.getRegistry().getLatestModuleVersion(moduleId);
 
-            if (module.getResources() instanceof DirectoryFileSource) {
-                DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
-                ResolutionResult resolutionResult = resolver.resolve(module.getId());
-                if (resolutionResult.isSuccess()) {
-                    try (ModuleEnvironment tempEnvironment = moduleManager.loadEnvironment(resolutionResult.getModules(), false)) {
-                        for (Class<?> generatorClass : tempEnvironment.getTypesAnnotatedWith(RegisterWorldGenerator.class)) {
-                            if (tempEnvironment.getModuleProviding(generatorClass).equals(module.getId())) {
-                                RegisterWorldGenerator annotation = generatorClass.getAnnotation(RegisterWorldGenerator.class);
-                                if (isValidWorldGenerator(generatorClass)) {
-                                    SimpleUri uri = new SimpleUri(moduleId, annotation.id());
-                                    infos.add(new WorldGeneratorInfo(uri, annotation.displayName(), annotation.description()));
-                                } else {
-                                    logger.error("{} marked to be registered as a World Generator, but is not a subclass of WorldGenerator or lacks the correct constructor",
-                                            generatorClass);
-                                }
+            DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
+            ResolutionResult resolutionResult = resolver.resolve(module.getId());
+            if (resolutionResult.isSuccess()) {
+                try (ModuleEnvironment tempEnvironment = moduleManager.loadEnvironment(resolutionResult.getModules(), false)) {
+                    for (Class<?> generatorClass : tempEnvironment.getTypesAnnotatedWith(RegisterWorldGenerator.class)) {
+                        if (tempEnvironment.getModuleProviding(generatorClass).equals(module.getId())) {
+                            RegisterWorldGenerator annotation = generatorClass.getAnnotation(RegisterWorldGenerator.class);
+                            if (isValidWorldGenerator(generatorClass)) {
+                                SimpleUri uri = new SimpleUri(moduleId, annotation.id());
+                                infos.add(new WorldGeneratorInfo(uri, annotation.displayName(), annotation.description()));
+                            } else {
+                                logger.error("{} marked to be registered as a World Generator, but is not a subclass of WorldGenerator or lacks the correct constructor",
+                                        generatorClass);
                             }
                         }
-                    } catch (Exception e) {
-                        logger.error("Error loading world generator in module {}, skipping", module.getId(), e);
                     }
-                } else {
-                    logger.warn("Could not resolve dependencies for module: {}", module);
+                } catch (Exception e) {
+                    logger.error("Error loading world generator in module {}, skipping", module.getId(), e);
                 }
+            } else {
+                logger.warn("Could not resolve dependencies for module: {}", module);
             }
         }
         Collections.sort(infos);
