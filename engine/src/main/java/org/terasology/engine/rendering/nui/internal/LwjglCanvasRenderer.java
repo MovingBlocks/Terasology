@@ -59,6 +59,7 @@ import static org.lwjgl.opengl.GL11.glBlendFunc;
 import static org.lwjgl.opengl.GL11.glClear;
 import static org.lwjgl.opengl.GL11.glDisable;
 import static org.lwjgl.opengl.GL11.glEnable;
+import static org.lwjgl.opengl.GL11.glViewport;
 
 public class LwjglCanvasRenderer implements TerasologyCanvasRenderer, PropertyChangeListener {
 
@@ -112,6 +113,9 @@ public class LwjglCanvasRenderer implements TerasologyCanvasRenderer, PropertyCh
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+        // TODO: figure out previous call to viewport scaling is handled
+        // changing resolution scaling affect viewport of LWJGLCanvas causing strange scaling artifact.
+        glViewport(0, 0, displayDevice.getWidth(), displayDevice.getHeight());
         projMatrix.setOrtho(0, displayDevice.getWidth(), displayDevice.getHeight(),0,0, 2048f);
         modelMatrixStack.pushMatrix();
         modelMatrixStack.set(new Matrix4f().setTranslation(0,0,-1024));
