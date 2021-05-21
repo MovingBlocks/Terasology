@@ -54,7 +54,7 @@ public class VertexAttributeBinding<T, TImpl extends T> {
     }
 
     private void  update() {
-        if (resource.getInSize() == 0 || resource.getInStride() == 0) {
+        if (resource.inSize() == 0 || resource.inStride() == 0) {
             numberElements = 0;
         } else {
             numberElements = attribute.configuration.numElements(offset, resource);

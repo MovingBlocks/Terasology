@@ -7,11 +7,9 @@ import org.lwjgl.BufferUtils;
 
 import java.nio.ByteBuffer;
 
-public class VertexResource {
+public class VertexResource extends BufferedResource {
     private int inStride = 0;
-    private int inSize = 0;
     private int version = 0;
-    private ByteBuffer buffer = BufferUtils.createByteBuffer(0);
     private VertexDefinition[] attributes;
 
     public int inSize() {
@@ -26,56 +24,29 @@ public class VertexResource {
         return this.attributes;
     }
 
-    public ByteBuffer buffer() {
-        return this.buffer;
-    }
 
     public void setDefinitions(VertexDefinition[] attr) {
         this.attributes = attr;
     }
 
     public VertexResource(int inSize, int inStride, VertexDefinition[] attributes) {
+        ensureCapacity(inSize);
         this.inStride = inStride;
         this.inSize = inSize;
         this.attributes = attributes;
-        this.buffer = BufferUtils.createByteBuffer(inSize);
     }
 
     public void copy(VertexResource resource) {
-        if (resource.inSize == 0) {
+        if (resource.isEmpty()) {
             return;
         }
-        ensureCapacity(resource.inSize);
-        ByteBuffer copyBuffer = resource.buffer;
-        copyBuffer.limit(resource.inSize());
-        copyBuffer.rewind();
-        buffer.put(copyBuffer);
-
-        this.inSize = resource.inSize;
+        copyBuffer(resource);
         this.inStride = resource.inStride;
         this.mark();
     }
 
-    public int getInSize() {
-        return inSize;
-    }
-
-    public int getInStride() {
+    public int inStride() {
         return inStride;
-    }
-
-    public void ensureCapacity(int size) {
-        if (size > buffer.capacity()) {
-            int newCap = Math.max(this.inSize << 1, size);
-            ByteBuffer newBuffer = BufferUtils.createByteBuffer(newCap);
-            buffer.limit(Math.min(size, this.inSize));
-            buffer.position(0);
-            newBuffer.put(buffer);
-            this.buffer = newBuffer;
-        }
-        if (size > this.inSize) {
-            this.inSize = size;
-        }
     }
 
     public void reserveElements(int verts) {
@@ -83,7 +54,7 @@ public class VertexResource {
         ensureCapacity(size);
     }
 
-    public void  reallocateElements(int verts) {
+    public void reallocateElements(int verts) {
         int size = verts * inStride;
         ensureCapacity(size);
         this.inSize = size;

@@ -61,7 +61,7 @@ public interface OpenGLMeshBase {
             for (VertexResource.VertexDefinition attribute : resource.definitions()) {
                 GL30.glEnableVertexAttribArray(attribute.location);
                 GL30.glVertexAttribPointer(attribute.location, attribute.attribute.count,
-                        attribute.attribute.mapping.glType, false, resource.getInStride(), offset + attribute.offset);
+                        attribute.attribute.mapping.glType, false, resource.inStride(), offset + attribute.offset);
             }
             offset += resource.inSize();
         }

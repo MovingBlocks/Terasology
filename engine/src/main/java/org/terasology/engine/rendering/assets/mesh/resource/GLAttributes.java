@@ -23,7 +23,7 @@ public final class GLAttributes {
 
         @Override
         public void write(Vector3fc value, int vertIdx, int offset, VertexResource resource) {
-            int bufferStart = vertIdx * resource.getInStride() + offset;
+            int bufferStart = vertIdx * resource.inStride() + offset;
             ByteBuffer buffer = resource.buffer();
             buffer.putFloat(bufferStart, value.x());
             buffer.putFloat(bufferStart + Float.BYTES, value.y());
@@ -32,7 +32,7 @@ public final class GLAttributes {
 
         @Override
         public Vector3f read(int vertIdx, int offset, VertexResource resource, Vector3f dest) {
-            int bufferStart = vertIdx * resource.getInStride() + offset;
+            int bufferStart = vertIdx * resource.inStride() + offset;
             ByteBuffer buffer = resource.buffer();
             dest.x = buffer.getFloat(bufferStart);
             dest.y = buffer.getFloat(bufferStart + Float.BYTES);
@@ -42,13 +42,13 @@ public final class GLAttributes {
 
         @Override
         public int size(int vertIdx, int offset, VertexResource resource) {
-            return (vertIdx * resource.getInStride() + offset) + Float.BYTES * 3;
+            return (vertIdx * resource.inStride() + offset) + Float.BYTES * 3;
         }
 
         @Override
         public int numElements(int offset, VertexResource resource) {
-            int size = (resource.getInSize() / resource.getInStride());
-            if (resource.getInSize() % resource.getInStride() >= Float.BYTES * 3) {
+            int size = (resource.inSize() / resource.inStride());
+            if (resource.inSize() % resource.inStride() >= Float.BYTES * 3) {
                 size++;
             }
             return size;
@@ -58,7 +58,7 @@ public final class GLAttributes {
     public static final VertexAttribute<Vector4fc, Vector4f> VECTOR_4_F_VERTEX_ATTRIBUTE = new VertexAttribute<>(Vector4f.class, new VertexAttribute.AttributeConfiguration<Vector4fc, Vector4f>() {
         @Override
         public void write(Vector4fc value, int vertIdx, int offset, VertexResource resource) {
-            int bufferStart = vertIdx * resource.getInStride() + offset;
+            int bufferStart = vertIdx * resource.inStride() + offset;
             ByteBuffer buffer = resource.buffer();
             buffer.putFloat(bufferStart, value.x());
             buffer.putFloat(bufferStart + Float.BYTES, value.y());
@@ -68,7 +68,7 @@ public final class GLAttributes {
 
         @Override
         public Vector4f read(int vertIdx, int offset, VertexResource resource, Vector4f dest) {
-            int bufferStart = vertIdx * resource.getInStride() + offset;
+            int bufferStart = vertIdx * resource.inStride() + offset;
             ByteBuffer buffer = resource.buffer();
             dest.x = buffer.getFloat(bufferStart);
             dest.y = buffer.getFloat(bufferStart + Float.BYTES);
@@ -79,13 +79,13 @@ public final class GLAttributes {
 
         @Override
         public int size(int vertIdx, int offset, VertexResource resource) {
-            return (vertIdx * resource.getInStride() + offset) + Float.BYTES * 4;
+            return (vertIdx * resource.inStride() + offset) + Float.BYTES * 4;
         }
 
         @Override
         public int numElements(int offset, VertexResource resource) {
-            int size = (resource.getInSize() / resource.getInStride());
-            if (resource.getInSize() % resource.getInStride() >= Float.BYTES * 4) {
+            int size = (resource.inSize() / resource.inStride());
+            if (resource.inSize() % resource.inStride() >= Float.BYTES * 4) {
                 size++;
             }
             return size;
@@ -95,7 +95,7 @@ public final class GLAttributes {
     public static final VertexAttribute<Colorc, Color> COLOR_4_F_VERTEX_ATTRIBUTE = new VertexAttribute<>(Color.class, new VertexAttribute.AttributeConfiguration<Colorc, Color>() {
         @Override
         public void write(Colorc value, int vertIdx, int offset, VertexResource resource) {
-            int bufferStart = vertIdx * resource.getInStride() + offset;
+            int bufferStart = vertIdx * resource.inStride() + offset;
             ByteBuffer buffer = resource.buffer();
 
             buffer.putFloat(bufferStart, value.rf());
@@ -106,7 +106,7 @@ public final class GLAttributes {
 
         @Override
         public Color read(int vertIdx, int offset, VertexResource resource, Color dest) {
-            int bufferStart = vertIdx * resource.getInStride() + offset;
+            int bufferStart = vertIdx * resource.inStride() + offset;
             ByteBuffer buffer = resource.buffer();
             dest.setRed(buffer.getFloat(bufferStart));
             dest.setGreen(buffer.getFloat(bufferStart + Float.BYTES));
@@ -117,13 +117,13 @@ public final class GLAttributes {
 
         @Override
         public int size(int vertIdx, int offset, VertexResource resource) {
-            return (vertIdx * resource.getInStride() + offset) + Float.BYTES * 4;
+            return (vertIdx * resource.inStride() + offset) + Float.BYTES * 4;
         }
 
         @Override
         public int numElements(int offset, VertexResource resource) {
-            int size = (resource.getInSize() / resource.getInStride());
-            if (resource.getInSize() % resource.getInStride() >= (offset + Float.BYTES * 4)) {
+            int size = (resource.inSize() / resource.inStride());
+            if (resource.inSize() % resource.inStride() >= (offset + Float.BYTES * 4)) {
                 size++;
             }
             return size;
@@ -134,7 +134,7 @@ public final class GLAttributes {
     public static final VertexAttribute<Vector2fc, Vector2f> VECTOR_2_F_VERTEX_ATTRIBUTE = new VertexAttribute<>(Vector2f.class, new VertexAttribute.AttributeConfiguration<Vector2fc, Vector2f>() {
         @Override
         public void write(Vector2fc value, int vertIdx, int offset, VertexResource resource) {
-            int bufferStart = vertIdx * resource.getInStride() + offset;
+            int bufferStart = vertIdx * resource.inStride() + offset;
             ByteBuffer buffer = resource.buffer();
             buffer.putFloat(bufferStart, value.x());
             buffer.putFloat(bufferStart + Float.BYTES, value.y());
@@ -142,7 +142,7 @@ public final class GLAttributes {
 
         @Override
         public Vector2f read(int vertIdx, int offset, VertexResource resource, Vector2f dest) {
-            int bufferStart = vertIdx * resource.getInStride() + offset;
+            int bufferStart = vertIdx * resource.inStride() + offset;
             ByteBuffer buffer = resource.buffer();
             dest.x = buffer.getFloat(bufferStart);
             dest.y = buffer.getFloat(bufferStart + Float.BYTES);
@@ -151,13 +151,13 @@ public final class GLAttributes {
 
         @Override
         public int size(int vertIdx, int offset, VertexResource resource) {
-            return (vertIdx * resource.getInStride() + offset) + Float.BYTES * 2;
+            return (vertIdx * resource.inStride() + offset) + Float.BYTES * 2;
         }
 
         @Override
         public int numElements(int offset, VertexResource resource) {
-            int size = (resource.getInSize() / resource.getInStride());
-            if (resource.getInSize() % resource.getInStride() >= Float.BYTES * 2) {
+            int size = (resource.inSize() / resource.inStride());
+            if (resource.inSize() % resource.inStride() >= Float.BYTES * 2) {
                 size++;
             }
             return size;
