@@ -45,6 +45,7 @@ public class StandardMeshData extends MeshData {
 
     /**
      * transfer buffered data to another {@link StandardMeshData}
+     *
      * @param data the data
      */
     public StandardMeshData(StandardMeshData data) {
@@ -87,7 +88,6 @@ public class StandardMeshData extends MeshData {
         color0 = builder.add(COLOR0_INDEX, GLAttributes.COLOR_4_F_VERTEX_ATTRIBUTE);
         colorBuffer = builder.build();
 
-
         builder = new VertexResourceBuilder();
         light0 = builder.add(LIGHT0_INDEX, GLAttributes.VECTOR_3_F_VERTEX_ATTRIBUTE);
         lightBuffer = builder.build();
@@ -95,7 +95,7 @@ public class StandardMeshData extends MeshData {
         this.indices = new IndexResource();
     }
 
-    public void  reserve(int numVertices, int numIndices) {
+    public void reserve(int numVertices, int numIndices) {
         positionBuffer.reserveElements(numVertices);
         normalBuffer.reserveElements(numVertices);
         uv0Buffer.reserveElements(numVertices);
@@ -105,7 +105,7 @@ public class StandardMeshData extends MeshData {
         indices.reserveElements(numIndices);
     }
 
-    public void  reallocate(int numVerts, int numIndices) {
+    public void reallocate(int numVerts, int numIndices) {
         positionBuffer.reallocateElements(numVerts);
         normalBuffer.reallocateElements(numVerts);
         uv0Buffer.reallocateElements(numVerts);
@@ -113,7 +113,6 @@ public class StandardMeshData extends MeshData {
         lightBuffer.reallocateElements(numVerts);
         colorBuffer.reallocateElements(numVerts);
         indices.reallocateElements(numIndices);
-
     }
 
     @Override
@@ -137,6 +136,4 @@ public class StandardMeshData extends MeshData {
     public IndexResource indexResource() {
         return indices;
     }
-
-
 }
