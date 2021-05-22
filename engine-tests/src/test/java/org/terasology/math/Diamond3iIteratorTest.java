@@ -21,13 +21,13 @@ public class Diamond3iIteratorTest {
 
     @Test
     public void testZeroDistanceIteration() {
-        Iterator<Vector3ic> iter = Diamond3iIterable.region(new org.joml.Vector3i(),0).build().iterator();
+        Iterator<Vector3ic> iter = Diamond3iIterable.region(new org.joml.Vector3i(), 0).build().iterator();
         assertEquals(Lists.newArrayList(new Vector3i()), Lists.newArrayList(iter));
     }
 
     @Test
     public void testOneDistanceIteration() {
-        Iterator<Vector3ic> iter = Diamond3iIterable.region(new Vector3i(),1).build().iterator();
+        Iterator<Vector3ic> iter = Diamond3iIterable.region(new Vector3i(), 1).build().iterator();
         Set<Vector3i> expected = Sets.newHashSet(new Vector3i(), new Vector3i(1, 0, 0), new Vector3i(-1, 0, 0), new Vector3i(0, 1, 0),
             new Vector3i(0, -1, 0), new Vector3i(0, 0, 1), new Vector3i(0, 0, -1));
         while (iter.hasNext()) {
@@ -40,7 +40,7 @@ public class Diamond3iIteratorTest {
     @Test
     public void testTwoDistanceIteration() {
         int cc = 0;
-        for (Vector3ic next : Diamond3iIterable.region(new Vector3i(), 2).build()){
+        for (Vector3ic next : Diamond3iIterable.region(new Vector3i(), 2).build()) {
             assertTrue(next.gridDistance(new Vector3i()) <= 2);
             cc++;
         }

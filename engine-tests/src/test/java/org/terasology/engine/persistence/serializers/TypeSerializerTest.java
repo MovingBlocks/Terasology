@@ -44,11 +44,11 @@ class TypeSerializerTest extends ModuleEnvironmentTest {
     static {
         INSTANCE.list.addAll(Lists.newArrayList(50, 51, -52, -53));
 
-        INSTANCE.animals.add(new Dog<>(1, new Vector3f(3.15f, 54.51f, -0.001f), new org.joml.Vector3f(10.0f,30.0f,-0.001f)));
+        INSTANCE.animals.add(new Dog<>(1, new Vector3f(3.15f, 54.51f, -0.001f), new org.joml.Vector3f(10.0f, 30.0f, -0.001f)));
 
         INSTANCE.animals.add(new Cheetah<>(2, Color.MAGENTA));
 
-        INSTANCE.singleAnimal = new Dog<>(2, new Vector3f(4, 5, 6), new org.joml.Vector3f(4,5.8f,8));
+        INSTANCE.singleAnimal = new Dog<>(2, new Vector3f(4, 5, 6), new org.joml.Vector3f(4, 5.8f, 8));
     }
 
     private TypeHandlerLibrary typeHandlerLibrary;
@@ -81,7 +81,7 @@ class TypeSerializerTest extends ModuleEnvironmentTest {
     @Test
     void testDeserialize() {
         Optional<SomeClass<Integer>> deserialize = gsonSerializer.deserialize(
-                new TypeInfo<SomeClass<Integer>>() {},
+                new TypeInfo<SomeClass<Integer>>() { },
                 INSTANCE_JSON.getBytes(TerasologyConstants.CHARSET));
         assertTrue(deserialize.isPresent());
 
@@ -98,7 +98,7 @@ class TypeSerializerTest extends ModuleEnvironmentTest {
 
         //noinspection unchecked,OptionalGetWithoutIsPresent,OptionalGetWithoutIsPresent
         SomeClass<Integer> deserializedInstance =
-                (SomeClass<Integer>) gsonSerializer.deserialize(new TypeInfo<SomeClass<Integer>>() {}, bytes)
+                (SomeClass<Integer>) gsonSerializer.deserialize(new TypeInfo<SomeClass<Integer>>() { }, bytes)
                         .get();
 
         assertNotEmpty(typeHandlerLibrary.getTypeHandler(Animal.class));
@@ -130,9 +130,9 @@ class TypeSerializerTest extends ModuleEnvironmentTest {
                 return false;
             }
             SomeClass<?> someClass = (SomeClass<?>) o;
-            return Objects.equals(data, someClass.data) &&
-                    Objects.equals(list, someClass.list) &&
-                    Objects.equals(animals, someClass.animals);
+            return Objects.equals(data, someClass.data)
+                    && Objects.equals(list, someClass.list)
+                    && Objects.equals(animals, someClass.animals);
         }
 
         @Override

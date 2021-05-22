@@ -37,7 +37,7 @@ public class AutoConfigTest {
         );
 
         assertEquals(
-            Sets.newHashSet(new TypeInfo<Setting<String>>() {}, new TypeInfo<Setting<ImmutableList<Integer>>>() {}),
+            Sets.newHashSet(new TypeInfo<Setting<String>>() { }, new TypeInfo<Setting<ImmutableList<Integer>>>() { }),
             settingFields.stream().map(Field::getGenericType).map(TypeInfo::of).collect(Collectors.toSet())
         );
     }

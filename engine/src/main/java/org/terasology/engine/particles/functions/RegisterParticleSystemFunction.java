@@ -15,4 +15,4 @@ import java.lang.annotation.Target;
 @API
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-public @interface RegisterParticleSystemFunction {}
+public @interface RegisterParticleSystemFunction { }

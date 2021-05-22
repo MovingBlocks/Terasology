@@ -21,9 +21,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class ReflectionUtilTest {
     @Test
     public void testGetClassOfTypeWildcard() {
-        class C<T> {}
+        class C<T> { }
 
-        ParameterizedType cType = (ParameterizedType) new TypeInfo<C<?>>() {}.getType();
+        ParameterizedType cType = (ParameterizedType) new TypeInfo<C<?>>() { }.getType();
         Type wildcardType = cType.getActualTypeArguments()[0];
 
         assertEquals(Object.class, ReflectionUtil.getRawType(wildcardType));
@@ -41,8 +41,8 @@ public class ReflectionUtilTest {
 
     @Test
     public void testGetParameterForBuriedGenericInterface() {
-        class Base<T> {}
-        class Sub extends Base<Integer> implements MarkerA<String> {}
+        class Base<T> { }
+        class Sub extends Base<Integer> implements MarkerA<String> { }
 
         Type parameter = ReflectionUtil.getTypeParameterForSuper(Sub.class, MarkerA.class, 0);
 
@@ -51,7 +51,7 @@ public class ReflectionUtilTest {
 
     @Test
     public void testGetParameterForUnboundGenericInterface() {
-        Type parameter = ReflectionUtil.getTypeParameterForSuper(new TypeInfo<UnboundInterfaceImplementor<?>>() {}.getType(), CopyStrategy.class, 0);
+        Type parameter = ReflectionUtil.getTypeParameterForSuper(new TypeInfo<UnboundInterfaceImplementor<?>>() { }.getType(), CopyStrategy.class, 0);
 
         assertTrue(parameter instanceof WildcardType);
     }
@@ -65,13 +65,13 @@ public class ReflectionUtilTest {
             }
         }
 
-        class SubClass extends SubInterface<String> {}
+        class SubClass extends SubInterface<String> { }
 
-        Type subInterfaceType = new TypeInfo<SubInterface<Integer>>() {}.getType();
+        Type subInterfaceType = new TypeInfo<SubInterface<Integer>>() { }.getType();
 
         assertEquals(Integer.class, ReflectionUtil.getTypeParameterForSuper(subInterfaceType, CopyStrategy.class, 0));
 
-        Type subClassType = new TypeInfo<SubClass>() {}.getType();
+        Type subClassType = new TypeInfo<SubClass>() { }.getType();
 
         assertEquals(String.class, ReflectionUtil.getTypeParameterForSuper(subClassType, CopyStrategy.class, 0));
     }
@@ -107,7 +107,7 @@ public class ReflectionUtilTest {
             typeInfo.getRawType().getDeclaredFields()[0].getGenericType()
         );
 
-        assertEquals(new TypeInfo<CopyStrategy<Float>>() {}.getType(), resolvedFieldType);
+        assertEquals(new TypeInfo<CopyStrategy<Float>>() { }.getType(), resolvedFieldType);
     }
 
     @Test
@@ -125,7 +125,7 @@ public class ReflectionUtilTest {
             typeInfo.getRawType().getDeclaredFields()[0].getGenericType()
         );
 
-        assertEquals(new TypeInfo<CopyStrategy<Object>>() {}.getType(), resolvedFieldType);
+        assertEquals(new TypeInfo<CopyStrategy<Object>>() { }.getType(), resolvedFieldType);
 
         resolvedFieldType = ReflectionUtil.resolveType(
             typeInfo.getType(),
@@ -150,7 +150,7 @@ public class ReflectionUtilTest {
             typeInfo.getRawType().getDeclaredFields()[0].getGenericType()
         );
 
-        assertEquals(new TypeInfo<CopyStrategy<Integer>>() {}.getType(), resolvedFieldType);
+        assertEquals(new TypeInfo<CopyStrategy<Integer>>() { }.getType(), resolvedFieldType);
 
         resolvedFieldType = ReflectionUtil.resolveType(
             typeInfo.getType(),
@@ -208,10 +208,10 @@ public class ReflectionUtilTest {
 
     @Test
     public void testResolveThroughGenericSupertypes() {
-        class B<S, T> implements MarkerB<S>, MarkerA<T> {}
+        class B<S, T> implements MarkerB<S>, MarkerA<T> { }
 
         ParameterizedType resolvedTypeForB = (ParameterizedType) ReflectionUtil.resolveType(
-            new TypeInfo<MarkerA<String>>() {}.getType(),
+            new TypeInfo<MarkerA<String>>() { }.getType(),
             ReflectionUtil.parameterizeRawType(B.class)
         );
 
@@ -223,21 +223,21 @@ public class ReflectionUtilTest {
 
     @Test
     public void testResolveThroughInheritanceTree() {
-        class A<S, T> implements MarkerA<T>, MarkerC<S> {}
-        class B<S, T> extends A<S, T> implements MarkerB<T>, MarkerC<S> {}
-        class C<T> extends B<Integer, T> {}
+        class A<S, T> implements MarkerA<T>, MarkerC<S> { }
+        class B<S, T> extends A<S, T> implements MarkerB<T>, MarkerC<S> { }
+        class C<T> extends B<Integer, T> { }
 
         final Type typeToResolve = ReflectionUtil.parameterizeRawType(C.class);
 
         ParameterizedType resolvedThroughMarkerA = (ParameterizedType) ReflectionUtil.resolveType(
-            new TypeInfo<MarkerA<String>>() {}.getType(),
+            new TypeInfo<MarkerA<String>>() { }.getType(),
             typeToResolve
         );
 
         assertEquals(String.class, resolvedThroughMarkerA.getActualTypeArguments()[0]);
 
         ParameterizedType resolvedThroughMarkerB = (ParameterizedType) ReflectionUtil.resolveType(
-            new TypeInfo<MarkerB<String>>() {}.getType(),
+            new TypeInfo<MarkerB<String>>() { }.getType(),
             typeToResolve
         );
 
@@ -246,20 +246,20 @@ public class ReflectionUtilTest {
 
         ParameterizedType resolvedThroughAWithIncorrectFirstType =
             (ParameterizedType) ReflectionUtil.resolveType(
-                new TypeInfo<A<String, String>>() {}.getType(),
+                new TypeInfo<A<String, String>>() { }.getType(),
                 typeToResolve
             );
 
         assertEquals(String.class, resolvedThroughAWithIncorrectFirstType.getActualTypeArguments()[0]);
     }
 
-    interface MarkerA<T> {}
+    interface MarkerA<T> { }
 
-    interface MarkerB<T> {}
+    interface MarkerB<T> { }
 
-    interface MarkerC<T> {}
+    interface MarkerC<T> { }
 
-    interface GenericInterfaceSubInterface extends CopyStrategy<Integer> {}
+    interface GenericInterfaceSubInterface extends CopyStrategy<Integer> { }
 
     public static class UnboundInterfaceImplementor<T> implements CopyStrategy<T> {
 

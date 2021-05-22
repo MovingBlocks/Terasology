@@ -31,7 +31,7 @@ public class ZoneTest {
         try {
             zone.getChildZone("Invalid name");
             fail();
-        } catch (Exception e) {}
+        } catch (Exception e) { }
 
         assertEquals(child, zone.getChildZone("Child"));
     }
