@@ -100,7 +100,7 @@ void main() {
 #endif
 
 #ifdef FILM_GRAIN
-    vec3 noise = texture(texNoise, renderTargetSize * (gl_TexCoord[0].xy + noiseOffset) / noiseSize).xyz * 2.0 - 1.0;
+    vec3 noise = texture(texNoise, renderTargetSize * (v_uv0.xy + noiseOffset) / noiseSize).xyz * 2.0 - 1.0;
     finalColor.rgb += clamp(noise.xxx * grainIntensity, 0.0, 1.0);
 #endif
 

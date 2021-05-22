@@ -53,6 +53,7 @@ import org.terasology.nui.widgets.UISpace;
 import java.lang.reflect.Field;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -137,7 +138,7 @@ public class TelemetryScreen extends CoreScreenLayer {
                     entry.setValue(telemetryEnabled);
                 }
 
-                fetchTelemetryCategoriesFromEnvironment();
+                fetchTelemetryCategoriesFromEngineOnlyEnvironment();
                 for (Map.Entry<TelemetryCategory, Class> telemetryCategory : telemetryCategories.entrySet()) {
                     UICheckbox categoryBox = this.find(telemetryCategory.getKey().id(), UICheckbox.class);
                     if (categoryBox != null) {
@@ -161,7 +162,7 @@ public class TelemetryScreen extends CoreScreenLayer {
      * If this checkbox is checked, all the sub telemetry fields will be enabled/disabled.
      */
     private void addGroupEnablingListener() {
-        fetchTelemetryCategoriesFromEnvironment();
+        fetchTelemetryCategoriesFromEngineOnlyEnvironment();
         for (Map.Entry<TelemetryCategory, Class> telemetryCategory: telemetryCategories.entrySet()) {
             if (!telemetryCategory.getKey().isOneMapMetric()) {
                 UICheckbox uiCheckbox = this.find(telemetryCategory.getKey().id(), UICheckbox.class);
@@ -187,7 +188,7 @@ public class TelemetryScreen extends CoreScreenLayer {
         ColumnLayout mainLayout = new ColumnLayout();
         mainLayout.setHorizontalSpacing(8);
         mainLayout.setVerticalSpacing(8);
-        fetchTelemetryCategoriesFromEnvironment();
+        fetchTelemetryCategoriesFromEngineOnlyEnvironment();
 
         for (Map.Entry<TelemetryCategory, Class> telemetryCategory: telemetryCategories.entrySet()) {
             Class metricClass = telemetryCategory.getValue();
@@ -287,22 +288,12 @@ public class TelemetryScreen extends CoreScreenLayer {
     /**
      * refresh the telemetryCategories map.
      */
-    private void fetchTelemetryCategoriesFromEnvironment() {
+    private void fetchTelemetryCategoriesFromEngineOnlyEnvironment() {
         telemetryCategories = Maps.newHashMap();
-
-        DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
-        for (Name moduleId : moduleManager.getRegistry().getModuleIds()) {
-            Module module = moduleManager.getRegistry().getLatestModuleVersion(moduleId);
-            if (module.getResources() instanceof DirectoryFileSource) {
-                ResolutionResult result = resolver.resolve(moduleId);
-                if (result.isSuccess()) {
-                    try (ModuleEnvironment environment = moduleManager.loadEnvironment(result.getModules(), false)) {
-                        for (Class<?> holdingType : environment.getTypesAnnotatedWith(TelemetryCategory.class, new FromModule(environment, moduleId))) {
-                            TelemetryCategory telemetryCategory = holdingType.getAnnotation(TelemetryCategory.class);
-                            telemetryCategories.put(telemetryCategory, holdingType);
-                        }
-                    }
-                }
+        try (ModuleEnvironment environment = moduleManager.loadEnvironment(Collections.emptySet(), false)) {
+            for (Class<?> holdingType : environment.getTypesAnnotatedWith(TelemetryCategory.class)) {
+                TelemetryCategory telemetryCategory = holdingType.getAnnotation(TelemetryCategory.class);
+                telemetryCategories.put(telemetryCategory, holdingType);
             }
         }
     }
