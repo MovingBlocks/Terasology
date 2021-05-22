@@ -37,6 +37,7 @@ public final class OpenGLUtils {
      * Removes the rotation and scale part of the current OpenGL matrix.
      * Can be used to render billboards like particles.
      */
+    @Deprecated
     public static void applyBillboardOrientation() {
         // Fetch the current modelview matrix
         final FloatBuffer model = BufferUtils.createFloatBuffer(16);
@@ -59,6 +60,7 @@ public final class OpenGLUtils {
     /**
      * Renders a quad filling the whole currently set viewport.
      */
+    @Deprecated
     public static void renderFullscreenQuad() {
         glMatrixMode(GL_MODELVIEW);
         glPushMatrix();
@@ -86,6 +88,7 @@ public final class OpenGLUtils {
      */
     // TODO: perhaps remove this method and make sure the viewport is set explicitly.
     // TODO: find a much more suitable name for this method
+    @Deprecated
     public static void renderFullscreenQuad(int x, int y, int viewportWidth, int viewportHeight) {
         glViewport(x, y, viewportWidth, viewportHeight);
         renderFullscreenQuad();
@@ -93,6 +96,7 @@ public final class OpenGLUtils {
 
 
     // TODO: replace with a proper resident buffer with interleaved vertex and uv coordinates
+    @Deprecated
     private static void renderQuad() {
         if (displayListQuad == -1) {
             displayListQuad = glGenLists(1);
