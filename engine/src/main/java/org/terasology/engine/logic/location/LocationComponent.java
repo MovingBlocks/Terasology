@@ -58,7 +58,7 @@ public final class LocationComponent implements Component, ReplicationCheck {
     }
 
     private void dirty() {
-        if (!isDirty) {
+        if (!isDirty && parent == EntityRef.NULL) {
             lastRotation.set(rotation);
             lastPosition.set(position);
             isDirty = true;
