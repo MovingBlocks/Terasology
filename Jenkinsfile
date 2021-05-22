@@ -21,11 +21,18 @@ node ("ts-engine && heavy && java8") {
         checkout scm
         sh 'chmod +x gradlew'
     }
+
     stage('Build') {
         // Jenkins sometimes doesn't run Gradle automatically in plain console mode, so make it explicit
         sh './gradlew --console=plain clean extractConfig extractNatives distForLauncher testDist'
         archiveArtifacts 'gradlew, gradle/wrapper/*, templates/build.gradle, config/**, facades/PC/build/distributions/Terasology.zip, engine/build/resources/main/org/terasology/engine/version/versionInfo.properties, natives/**, build-logic/src/**, build-logic/*.kts'
     }
+
+    stage('Unit Tests') {
+        sh './gradlew unitTest'
+        junit testResults: '**/build/test-results/unitTest/*.xml', allowEmptyResults: true
+    }
+
     stage('Publish') {
         if (specialBranch) {
             withCredentials([usernamePassword(credentialsId: 'artifactory-gooey', usernameVariable: 'artifactoryUser', passwordVariable: 'artifactoryPass')]) {
@@ -46,16 +53,23 @@ node ("ts-engine && heavy && java8") {
             build job: 'Nanoware/Omega/master', wait: false
         }
     }
-    stage('Analytics') {
-        sh "./gradlew --console=plain check spotbugsmain javadoc"
+
+    stage('IntegrationTests') {
+        sh './gradlew integrationTest'
+        junit testResults: '**build/test-restults/integrationTest/*.xml', allowEmptyResults: true
     }
-    stage('Record') {
-        junit testResults: '**/build/test-results/test/*.xml',  allowEmptyResults: true
-        recordIssues tool: javaDoc()
-        step([$class: 'JavadocArchiver', javadocDir: 'engine/build/docs/javadoc', keepAll: false])
+
+    stage('Analytics') {
+        sh './gradlew --console=plain check -x test spotbugsmain'
         recordIssues tool: checkStyle(pattern: '**/build/reports/checkstyle/*.xml')
         recordIssues tool: spotBugs(pattern: '**/build/reports/spotbugs/main/*.xml', useRankAsPriority: true)
         recordIssues tool: pmdParser(pattern: '**/build/reports/pmd/*.xml')
         recordIssues tool: taskScanner(includePattern: '**/*.java,**/*.groovy,**/*.gradle', lowTags: 'WIBNIF', normalTags: 'TODO', highTags: 'ASAP')
+    }
+
+    stage('Documentation') {
+        sh './gradlew javadoc'
+        step([$class: 'JavadocArchiver', javadocDir: 'engine/build/docs/javadoc', keepAll: false])
+        recordIssues tool: javaDoc()
     }
 }
