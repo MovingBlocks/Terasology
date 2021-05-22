@@ -21,20 +21,34 @@ public enum MeshAttributeSemantic {
     Position("POSITION", GLTFAttributeType.VEC3, GLTFComponentType.FLOAT, MeshData::getVertices),
     Texcoord_0("TEXCOORD_0", GLTFAttributeType.VEC2, GLTFComponentType.FLOAT, k -> k.uv0),
     Texcoord_1("TEXCOORD_1", GLTFAttributeType.VEC2, GLTFComponentType.FLOAT, k -> k.uv1),
-    Color_0("COLOR_0", new GLTFAttributeType[]{GLTFAttributeType.VEC4}, new GLTFComponentType[]{GLTFComponentType.FLOAT},  k-> k.color0),
-    Joints_0("JOINTS_0", new GLTFAttributeType[]{GLTFAttributeType.VEC4}, new GLTFComponentType[]{GLTFComponentType.UNSIGNED_BYTE, GLTFComponentType.UNSIGNED_SHORT}, x -> new TFloatArrayList()),
-    Weights_0("WEIGHTS_0", new GLTFAttributeType[]{GLTFAttributeType.VEC4}, new GLTFComponentType[]{GLTFComponentType.FLOAT}, x -> new TFloatArrayList());
+    Color_0("COLOR_0",
+            new GLTFAttributeType[]{GLTFAttributeType.VEC4},
+            new GLTFComponentType[]{GLTFComponentType.FLOAT},
+            k-> k.color0),
+    Joints_0("JOINTS_0",
+            new GLTFAttributeType[]{GLTFAttributeType.VEC4},
+            new GLTFComponentType[]{GLTFComponentType.UNSIGNED_BYTE, GLTFComponentType.UNSIGNED_SHORT},
+            x -> new TFloatArrayList()),
+    Weights_0("WEIGHTS_0",
+            new GLTFAttributeType[]{GLTFAttributeType.VEC4},
+            new GLTFComponentType[]{GLTFComponentType.FLOAT},
+            x -> new TFloatArrayList());
 
     private final String name;
     private final Set<GLTFAttributeType> supportedAccessorTypes;
     private final Set<GLTFComponentType> supportedComponentTypes;
     private final Function<StandardMeshData, TFloatList> targetBufferSupplier;
 
-    MeshAttributeSemantic(String name, GLTFAttributeType supportedAccessorType, GLTFComponentType supportedComponentType, Function<StandardMeshData, TFloatList> targetBufferSupplier) {
-        this(name, new GLTFAttributeType[]{supportedAccessorType}, new GLTFComponentType[]{supportedComponentType}, targetBufferSupplier);
+    MeshAttributeSemantic(String name, GLTFAttributeType supportedAccessorType,
+                          GLTFComponentType supportedComponentType,
+                          Function<StandardMeshData, TFloatList> targetBufferSupplier) {
+        this(name, new GLTFAttributeType[]{supportedAccessorType}, new GLTFComponentType[]{supportedComponentType},
+                targetBufferSupplier);
     }
 
-    MeshAttributeSemantic(String name, GLTFAttributeType[] supportedAccessorTypes, GLTFComponentType[] supportedComponentTypes, Function<StandardMeshData, TFloatList> targetBufferSupplier) {
+    MeshAttributeSemantic(String name, GLTFAttributeType[] supportedAccessorTypes,
+                          GLTFComponentType[] supportedComponentTypes,
+                          Function<StandardMeshData, TFloatList> targetBufferSupplier) {
         this.name = name;
         this.supportedAccessorTypes = ImmutableSet.copyOf(supportedAccessorTypes);
         this.supportedComponentTypes = ImmutableSet.copyOf(supportedComponentTypes);

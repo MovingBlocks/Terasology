@@ -45,10 +45,13 @@ public class LodChunkProvider {
     private Vector3i center;
     private ViewDistance viewDistanceSetting;
     private int chunkLods;
-    private BlockRegion possiblyLoadedRegion = new BlockRegion(BlockRegion.INVALID); // The chunks that may be actually loaded.
-    private BlockRegion probablyLoadedRegion = new BlockRegion(BlockRegion.INVALID); // The chunks that should be visible, and therefore shouldn't have LOD chunks even if the chunk there hasn't loaded yet.
+    // The chunks that may be actually loaded.
+    private BlockRegion possiblyLoadedRegion = new BlockRegion(BlockRegion.INVALID);
+    // The chunks that should be visible, and therefore shouldn't have LOD chunks even if the chunk there hasn't loaded yet.
+    private BlockRegion probablyLoadedRegion = new BlockRegion(BlockRegion.INVALID);
     private BlockRegion[] lodRegions = new BlockRegion[0];
-    private Map<Vector3ic, Integer> requiredChunks; // The sizes of all of the LOD chunks that are meant to exist. All the chunks at the same positions with larger sizes also may exist, but don't always.
+    // The sizes of all of the LOD chunks that are meant to exist. All the chunks at the same positions with larger sizes also may exist, but don't always.
+    private Map<Vector3ic, Integer> requiredChunks;
     private ArrayList<Map<Vector3i, LodChunk>> chunks = new ArrayList<>();
     private ClosenessComparator nearby;
 
@@ -162,7 +165,8 @@ public class LodChunkProvider {
             if (i == 0) {
                 newLodRegions[i] = new BlockRegion(newPossiblyLoadedRegion);
             } else {
-                // By making viewDistance odd, we ensure that every time a chunk boundary is crossed, at most a single lodRegion changes (except possibly for lodRegions[0], which is more closely tied to the renderable region).
+                // By making viewDistance odd, we ensure that every time a chunk boundary is crossed, at most a single
+                // lodRegion changes (except possibly for lodRegions[0], which is more closely tied to the renderable region).
                 newLodRegions[i] = new BlockRegion(scaleDown(center, i)).expand(altViewDistance);
             }
             Vector3i min = newLodRegions[i].getMin(new Vector3i());
@@ -178,7 +182,8 @@ public class LodChunkProvider {
             Set<Vector3ic> previouslyRequiredChunks = new HashSet<>(requiredChunks.keySet());
             for (Vector3ic pos : previouslyRequiredChunks) {
                 int scale = requiredChunks.get(pos);
-                boolean gone = false; // Whether this entry in requiredChunks should be removed entirely (i.e. the chunk at the actually required scale is not at this position).
+                // Whether this entry in requiredChunks should be removed entirely (i.e. the chunk at the actually required scale is not at this position).
+                boolean gone = false;
                 boolean increased = false;
                 while (scale < newLodRegions.length && !gone && !newLodRegions[scale].contains(scaleDown(pos, scale))) {
                     LodChunk chunk = chunks.get(scale).get(new Vector3i(pos));

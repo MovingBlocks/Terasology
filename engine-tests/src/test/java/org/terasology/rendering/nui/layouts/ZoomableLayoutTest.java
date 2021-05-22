@@ -2,11 +2,11 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.rendering.nui.layouts;
 
-import org.terasology.joml.geom.Rectanglei;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.joml.Vector2f;
 import org.joml.Vector2i;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.terasology.joml.geom.Rectanglei;
 import org.terasology.nui.Canvas;
 import org.terasology.nui.layouts.ZoomableLayout;
 
@@ -101,12 +101,19 @@ public class ZoomableLayoutTest {
         //world size scaled to fit ratio of screen size - world size now 200 x 100
         assertEquals(zoomableLayout.getWindowSize(), new Vector2f(WORLD_WIDTH * 2, WORLD_HEIGHT));
         assertEquals(zoomableLayout.getScreenSize(), new Vector2i(CANVAS_WIDTH, CANVAS_HEIGHT));
-        assertEquals(zoomableLayout.getPixelSize(), new Vector2f(CANVAS_WIDTH / (WORLD_WIDTH * 2), CANVAS_HEIGHT / WORLD_HEIGHT));
+        assertEquals(zoomableLayout.getPixelSize(),
+                new Vector2f(CANVAS_WIDTH / (WORLD_WIDTH * 2), CANVAS_HEIGHT / WORLD_HEIGHT));
 
         //coordinates on widgets scaled down by half
-        verify(canvas).drawWidget(item1, new Rectanglei(new Vector2i(ceilToInt(pos1.x / 2), ceilToInt(pos1.y / 2)), new Vector2i(ceilToInt((pos1.x + size1.x) / 2), ceilToInt((pos1.y + size1.y) / 2))));
-        verify(canvas).drawWidget(item2, new Rectanglei(new Vector2i(ceilToInt(pos2.x / 2), ceilToInt(pos2.y / 2)), new Vector2i(ceilToInt((pos2.x + size2.x) / 2), ceilToInt((pos2.y + size2.y) / 2))));
-        verify(canvas).drawWidget(item3, new Rectanglei(new Vector2i(ceilToInt(pos3.x / 2), ceilToInt(pos3.y / 2)), new Vector2i(ceilToInt((pos3.x + size3.x) / 2), ceilToInt((pos3.y + size3.y) / 2))));
+        verify(canvas).drawWidget(item1, new Rectanglei(
+                new Vector2i(ceilToInt(pos1.x / 2), ceilToInt(pos1.y / 2)),
+                new Vector2i(ceilToInt((pos1.x + size1.x) / 2), ceilToInt((pos1.y + size1.y) / 2))));
+        verify(canvas).drawWidget(item2, new Rectanglei(
+                new Vector2i(ceilToInt(pos2.x / 2), ceilToInt(pos2.y / 2)),
+                new Vector2i(ceilToInt((pos2.x + size2.x) / 2), ceilToInt((pos2.y + size2.y) / 2))));
+        verify(canvas).drawWidget(item3, new Rectanglei(
+                new Vector2i(ceilToInt(pos3.x / 2), ceilToInt(pos3.y / 2)),
+                new Vector2i(ceilToInt((pos3.x + size3.x) / 2), ceilToInt((pos3.y + size3.y) / 2))));
 
     }
 
@@ -122,11 +129,18 @@ public class ZoomableLayoutTest {
         //world size doubled
         assertEquals(zoomableLayout.getWindowSize(), new Vector2f(WORLD_WIDTH * 2 * 2, WORLD_HEIGHT * 2));
         assertEquals(zoomableLayout.getScreenSize(), new Vector2i(CANVAS_WIDTH, CANVAS_HEIGHT));
-        assertEquals(zoomableLayout.getPixelSize(), new Vector2f(CANVAS_WIDTH / (WORLD_WIDTH * 2 * 2), CANVAS_HEIGHT / (WORLD_HEIGHT * 2)));
+        assertEquals(zoomableLayout.getPixelSize(),
+                new Vector2f(CANVAS_WIDTH / (WORLD_WIDTH * 2 * 2), CANVAS_HEIGHT / (WORLD_HEIGHT * 2)));
 
-        verify(canvas).drawWidget(item1, new Rectanglei(new Vector2i(ceilToInt(pos1.x / 4), ceilToInt(pos1.y / 4)), new Vector2i(ceilToInt((pos1.x + size1.x) / 4), ceilToInt((pos1.y + size1.y) / 4))));
-        verify(canvas).drawWidget(item2, new Rectanglei(new Vector2i(ceilToInt(pos2.x / 4), ceilToInt(pos2.y / 4)), new Vector2i(ceilToInt((pos2.x + size2.x) / 4), ceilToInt((pos2.y + size2.y) / 4))));
-        verify(canvas).drawWidget(item3, new Rectanglei(new Vector2i(ceilToInt(pos3.x / 4), ceilToInt(pos3.y / 4)), new Vector2i(ceilToInt((pos3.x + size3.x) / 4), ceilToInt((pos3.y + size3.y) / 4))));
+        verify(canvas).drawWidget(item1, new Rectanglei(
+                new Vector2i(ceilToInt(pos1.x / 4), ceilToInt(pos1.y / 4)),
+                new Vector2i(ceilToInt((pos1.x + size1.x) / 4), ceilToInt((pos1.y + size1.y) / 4))));
+        verify(canvas).drawWidget(item2, new Rectanglei(
+                new Vector2i(ceilToInt(pos2.x / 4), ceilToInt(pos2.y / 4)),
+                new Vector2i(ceilToInt((pos2.x + size2.x) / 4), ceilToInt((pos2.y + size2.y) / 4))));
+        verify(canvas).drawWidget(item3, new Rectanglei(
+                new Vector2i(ceilToInt(pos3.x / 4), ceilToInt(pos3.y / 4)),
+                new Vector2i(ceilToInt((pos3.x + size3.x) / 4), ceilToInt((pos3.y + size3.y) / 4))));
 
     }
 
@@ -142,20 +156,33 @@ public class ZoomableLayoutTest {
         //world size halved
         assertEquals(zoomableLayout.getWindowSize(), new Vector2f(WORLD_WIDTH, WORLD_HEIGHT / 2));
         assertEquals(zoomableLayout.getScreenSize(), new Vector2i(CANVAS_WIDTH, CANVAS_HEIGHT));
-        assertEquals(zoomableLayout.getPixelSize(), new Vector2f(CANVAS_WIDTH / WORLD_WIDTH, CANVAS_HEIGHT / (WORLD_HEIGHT / 2)));
+        assertEquals(zoomableLayout.getPixelSize(),
+                new Vector2f(CANVAS_WIDTH / WORLD_WIDTH, CANVAS_HEIGHT / (WORLD_HEIGHT / 2)));
 
-        verify(canvas).drawWidget(item1, new Rectanglei(new Vector2i(ceilToInt(pos1.x), ceilToInt(pos1.y)), new Vector2i(ceilToInt(pos1.x + size1.x), ceilToInt(pos1.y + size1.y))));
-        verify(canvas).drawWidget(item2, new Rectanglei(new Vector2i(ceilToInt(pos2.x), ceilToInt(pos2.y)), new Vector2i(ceilToInt(pos2.x + size2.x), ceilToInt(pos2.y + size2.y))));
-        verify(canvas).drawWidget(item3, new Rectanglei(new Vector2i(ceilToInt(pos3.x), ceilToInt(pos3.y)), new Vector2i(ceilToInt(pos3.x + size3.x), ceilToInt(pos3.y + size3.y))));
+        verify(canvas).drawWidget(item1, new Rectanglei(
+                new Vector2i(ceilToInt(pos1.x), ceilToInt(pos1.y)),
+                new Vector2i(ceilToInt(pos1.x + size1.x), ceilToInt(pos1.y + size1.y))));
+        verify(canvas).drawWidget(item2, new Rectanglei(
+                new Vector2i(ceilToInt(pos2.x), ceilToInt(pos2.y)),
+                new Vector2i(ceilToInt(pos2.x + size2.x), ceilToInt(pos2.y + size2.y))));
+        verify(canvas).drawWidget(item3, new Rectanglei(
+                new Vector2i(ceilToInt(pos3.x), ceilToInt(pos3.y)),
+                new Vector2i(ceilToInt(pos3.x + size3.x), ceilToInt(pos3.y + size3.y))));
 
         //simulate drag to item2
         zoomableLayout.setWindowPosition(pos2);
         zoomableLayout.onDraw(canvas);
 
         //item1 out of canvas
-        verify(canvas).drawWidget(item1, new Rectanglei(new Vector2i(ceilToInt(pos1.x - pos2.x), ceilToInt(pos1.y - pos2.y)), new Vector2i(ceilToInt(pos1.x + size1.x - pos2.x), ceilToInt(pos1.y + size1.y - pos2.y))));
-        verify(canvas).drawWidget(item2, new Rectanglei(new Vector2i(), new Vector2i(ceilToInt(size2.x), ceilToInt(size2.y))));
-        verify(canvas).drawWidget(item3, new Rectanglei(new Vector2i(ceilToInt(pos3.x - pos2.x), ceilToInt(pos3.y - pos2.y)), new Vector2i(ceilToInt(pos3.x + size3.x - pos2.x), ceilToInt(pos3.y + size3.y - pos2.y))));
+        verify(canvas).drawWidget(item1, new Rectanglei(
+                new Vector2i(ceilToInt(pos1.x - pos2.x), ceilToInt(pos1.y - pos2.y)),
+                new Vector2i(ceilToInt(pos1.x + size1.x - pos2.x), ceilToInt(pos1.y + size1.y - pos2.y))));
+        verify(canvas).drawWidget(item2, new Rectanglei(
+                new Vector2i(),
+                new Vector2i(ceilToInt(size2.x), ceilToInt(size2.y))));
+        verify(canvas).drawWidget(item3, new Rectanglei(
+                new Vector2i(ceilToInt(pos3.x - pos2.x), ceilToInt(pos3.y - pos2.y)),
+                new Vector2i(ceilToInt(pos3.x + size3.x - pos2.x), ceilToInt(pos3.y + size3.y - pos2.y))));
     }
 
 }
