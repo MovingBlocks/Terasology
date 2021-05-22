@@ -140,6 +140,12 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
         if (window == 0) {
             throw new RuntimeException("Failed to create window");
         }
+
+        // set opengl core profile to 3.3
+        GLFW.glfwWindowHint(GLFW.GLFW_CONTEXT_VERSION_MAJOR, 3);
+        GLFW.glfwWindowHint(GLFW.GLFW_CONTEXT_VERSION_MINOR, 3);
+        GLFW.glfwWindowHint(GLFW.GLFW_OPENGL_PROFILE, GLFW.GLFW_OPENGL_CORE_PROFILE);
+
         GLFW.glfwMakeContextCurrent(window);
 
         if (!config.isVSync()) {
