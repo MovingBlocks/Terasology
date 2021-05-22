@@ -36,10 +36,6 @@ import org.terasology.engine.world.block.loader.BlockFamilyDefinitionData;
 import org.terasology.engine.world.block.shapes.BlockShape;
 import org.terasology.engine.world.block.tiles.NullWorldAtlas;
 import org.terasology.engine.world.chunks.Chunks;
-import org.terasology.engine.world.propagation.BatchPropagator;
-import org.terasology.engine.world.propagation.BlockChange;
-import org.terasology.engine.world.propagation.StandardBatchPropagator;
-import org.terasology.engine.world.propagation.SunlightRegenBatchPropagator;
 import org.terasology.engine.world.propagation.light.SunlightPropagationRules;
 import org.terasology.engine.world.propagation.light.SunlightRegenPropagationRules;
 

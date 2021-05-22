@@ -19,14 +19,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.core.module.ModuleManager;
-import org.terasology.gestalt.module.Module;
 import org.terasology.gestalt.module.ModuleEnvironment;
-import org.terasology.gestalt.module.dependencyresolution.DependencyResolver;
-import org.terasology.gestalt.module.dependencyresolution.ResolutionResult;
-import org.terasology.gestalt.module.predicates.FromModule;
-import org.terasology.gestalt.module.resources.DirectoryFileSource;
 import org.terasology.gestalt.module.sandbox.API;
-import org.terasology.gestalt.naming.Name;
 import org.terasology.engine.telemetry.metrics.Metric;
 
 import java.lang.reflect.Constructor;

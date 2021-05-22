@@ -18,7 +18,6 @@ package org.terasology.editor.properties;
 import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.engine.context.Context;
 import org.terasology.nui.properties.Range;
 import org.terasology.reflection.copy.CopyStrategyLibrary;

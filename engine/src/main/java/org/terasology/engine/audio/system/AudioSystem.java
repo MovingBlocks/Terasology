@@ -36,7 +36,6 @@ import org.terasology.engine.logic.permission.PermissionManager;
 import org.terasology.engine.logic.players.LocalPlayer;
 import org.terasology.engine.network.ClientComponent;
 import org.terasology.engine.network.NetworkSystem;
-import org.terasology.engine.physics.bullet.BulletPhysics;
 import org.terasology.engine.registry.In;
 import org.terasology.engine.utilities.Assets;
 
