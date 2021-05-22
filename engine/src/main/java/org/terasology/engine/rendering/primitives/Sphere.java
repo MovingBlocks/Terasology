@@ -122,7 +122,9 @@ public class Sphere {
     }
 
     private void TXTR_COORD(float x, float y) {
-        if (textureFlag) glTexCoord2f(x, y);
+        if (textureFlag) {
+            glTexCoord2f(x, y);
+        }
     }
 
     private float sin(float r) {

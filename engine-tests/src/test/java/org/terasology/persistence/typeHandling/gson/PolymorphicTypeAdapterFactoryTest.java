@@ -28,9 +28,7 @@ public class PolymorphicTypeAdapterFactoryTest {
 
     @Test
     public void testInterfaceReference() {
-        Walker walker = CAT;
-
-        String json = interfaceGson.toJson(walker);
+        String json = interfaceGson.toJson(CAT);
 
         Walker newAnimal = interfaceGson.fromJson(json, Walker.class);
 
@@ -39,9 +37,7 @@ public class PolymorphicTypeAdapterFactoryTest {
 
     @Test
     public void testBaseClassReference() {
-        Animal animal = CHEETAH;
-
-        String json = baseClassGson.toJson(animal);
+        String json = baseClassGson.toJson(CHEETAH);
 
         Animal newAnimal = baseClassGson.fromJson(json, Animal.class);
 
@@ -85,7 +81,7 @@ public class PolymorphicTypeAdapterFactoryTest {
         assertTrue(newWalkers.get(2) instanceof Cheetah);
     }
 
-    private static class Capsule {
+    private static final class Capsule {
         private final Animal animal;
 
         private Capsule(Animal animal) {
@@ -105,14 +101,18 @@ public class PolymorphicTypeAdapterFactoryTest {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
             Animal animal = (Animal) o;
             return Objects.equals(name, animal.name);
         }
     }
 
-    private static class Dog extends Animal {
+    private static final class Dog extends Animal {
         private final float tailLength;
 
         private Dog(float tailLength) {
@@ -122,9 +122,15 @@ public class PolymorphicTypeAdapterFactoryTest {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            if (!super.equals(o)) return false;
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+            if (!super.equals(o)) {
+                return false;
+            }
             Dog dog = (Dog) o;
             return Float.compare(dog.tailLength, tailLength) == 0;
         }
@@ -140,9 +146,15 @@ public class PolymorphicTypeAdapterFactoryTest {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            if (!super.equals(o)) return false;
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+            if (!super.equals(o)) {
+                return false;
+            }
             Cheetah cheetah = (Cheetah) o;
             return spotCount == cheetah.spotCount;
         }

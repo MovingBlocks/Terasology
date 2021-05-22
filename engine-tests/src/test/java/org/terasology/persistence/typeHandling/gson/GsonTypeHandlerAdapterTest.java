@@ -53,7 +53,7 @@ public class GsonTypeHandlerAdapterTest {
         assertEquals(OBJECT_JSON_ARRAY, serializedObject);
     }
 
-    private static class TestClass {
+    private static final class TestClass {
         private final Color color;
         private final int i;
 
@@ -64,11 +64,15 @@ public class GsonTypeHandlerAdapterTest {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
             TestClass testClass = (TestClass) o;
-            return i == testClass.i &&
-                    Objects.equals(color, testClass.color);
+            return i == testClass.i
+                    && Objects.equals(color, testClass.color);
         }
     }
 }
