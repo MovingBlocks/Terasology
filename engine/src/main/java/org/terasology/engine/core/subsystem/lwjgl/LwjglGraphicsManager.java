@@ -61,8 +61,6 @@ import static org.lwjgl.opengl.GL11.glTexParameterf;
 
 public class LwjglGraphicsManager implements LwjglGraphicsProcessing {
 
-    private final GLBufferPool bufferPool = new GLBufferPool(false);
-
     private final BlockingDeque<Runnable> displayThreadActions = Queues.newLinkedBlockingDeque();
 
     private DisplayDeviceInfo displayDeviceInfo = new DisplayDeviceInfo("unknown");
@@ -114,7 +112,7 @@ public class LwjglGraphicsManager implements LwjglGraphicsProcessing {
     }
 
     public void registerRenderingSubsystem(Context context) {
-        context.put(RenderingSubsystemFactory.class, new LwjglRenderingSubsystemFactory(bufferPool));
+        context.put(RenderingSubsystemFactory.class, new LwjglRenderingSubsystemFactory());
     }
 
     public void processActions() {

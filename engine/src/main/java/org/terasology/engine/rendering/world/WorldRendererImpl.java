@@ -15,7 +15,6 @@ import org.terasology.engine.core.modes.StateMainMenu;
 import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.engine.core.module.rendering.RenderingModuleRegistry;
 import org.terasology.engine.core.subsystem.DisplayDevice;
-import org.terasology.engine.core.subsystem.lwjgl.GLBufferPool;
 import org.terasology.engine.core.subsystem.lwjgl.LwjglGraphicsUtil;
 import org.terasology.engine.logic.console.Console;
 import org.terasology.engine.logic.console.commandSystem.MethodCommand;
@@ -115,9 +114,8 @@ public final class WorldRendererImpl implements WorldRenderer {
      * it requires and is ready to render via the render(RenderingStage) method.
      *
      * @param context    a context object, to obtain instances of classes such as the rendering config.
-     * @param bufferPool a GLBufferPool, to be passed to the RenderableWorld instance used by this implementation.
      */
-    public WorldRendererImpl(Context context, GLBufferPool bufferPool) {
+    public WorldRendererImpl(Context context) {
         this.context = context;
         renderGraph = new RenderGraph(context);
 
@@ -155,7 +153,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         LocalPlayerSystem localPlayerSystem = context.get(LocalPlayerSystem.class);
         localPlayerSystem.setPlayerCamera(playerCamera);
 
-        context.put(ChunkTessellator.class, new ChunkTessellator(bufferPool));
+        context.put(ChunkTessellator.class, new ChunkTessellator());
 
         renderableWorld = new RenderableWorldImpl(context, playerCamera);
         renderQueues = renderableWorld.getRenderQueues();
