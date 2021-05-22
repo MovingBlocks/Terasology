@@ -330,11 +330,21 @@ public abstract class AbstractEditorScreen extends CoreScreenLayer {
         outputStream.write(jsonString.getBytes());
     }
 
+    /**
+     * Returns the file path to a given asset if the module providing the asset is present as source. The path will for
+     * instance be used by the editor to edit the asset. Editing files within module jars is not possible. Hence, we
+     * return `null` in case the module is not present as source.
+     *
+     * @param source asset file object to get the file path to
+     * @return path to asset or null if module not present as source
+     */
     protected Path getPath(AssetDataFile source) {
         List<String> path = source.getPath();
         Name moduleName = new Name(path.get(0));
         Module module = verifyNotNull(moduleManager.getEnvironment().get(moduleName),
                 "Module \"%s\" not found in current module environment.", moduleName);
+        // TODO: Checking whether the module is present as source should not be done in `getPath()` as this has no
+        //  knowledge about what the path will be used for (read vs write access)
         if (module.getResources() instanceof DirectoryFileSource) {
             path.add(source.getFilename());
             String[] pathArray = path.toArray(new String[path.size()]);

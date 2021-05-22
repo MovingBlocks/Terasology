@@ -41,7 +41,7 @@ public class ChunkMeshTypeHandler extends TypeHandler<ChunkMesh> {
             directBuffer.rewind();
             asBuffers.add(directBuffer);
         }
-        ChunkMesh result = new ChunkMesh(null);
+        ChunkMesh result = new ChunkMesh();
         for (ChunkMesh.RenderType renderType : ChunkMesh.RenderType.values()) {
             result.getVertexElements(renderType).finalVertices = asBuffers.remove(0);
             result.getVertexElements(renderType).finalIndices = asBuffers.remove(0);
