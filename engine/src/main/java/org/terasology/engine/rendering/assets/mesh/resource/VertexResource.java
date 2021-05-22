@@ -12,9 +12,6 @@ public class VertexResource extends BufferedResource {
     private int version = 0;
     private VertexDefinition[] attributes;
 
-    public int inSize() {
-        return inSize;
-    }
 
     public VertexResource() {
 
@@ -32,7 +29,6 @@ public class VertexResource extends BufferedResource {
     public VertexResource(int inSize, int inStride, VertexDefinition[] attributes) {
         ensureCapacity(inSize);
         this.inStride = inStride;
-        this.inSize = inSize;
         this.attributes = attributes;
     }
 
@@ -51,31 +47,18 @@ public class VertexResource extends BufferedResource {
 
     public void reserveElements(int verts) {
         int size = verts * inStride;
-        ensureCapacity(size);
+        reserve(size);
     }
 
-    public void reallocateElements(int verts) {
+    public void allocateElements(int verts) {
         int size = verts * inStride;
-        ensureCapacity(size);
-        this.inSize = size;
+        allocate(size);
         squeeze();
-
-    }
-
-    public void squeeze() {
-        if (this.inSize != buffer.capacity()) {
-            ByteBuffer newBuffer = BufferUtils.createByteBuffer(this.inSize);
-            buffer.limit(this.inSize);
-            buffer.position(0);
-            newBuffer.put(buffer);
-            this.buffer = newBuffer;
-        }
     }
 
     public void allocate(int size, int stride) {
-        this.ensureCapacity(size);
+        this.allocate(size);
         this.inStride = stride;
-        this.inSize = size;
     }
 
     public int getVersion() {
@@ -88,6 +71,12 @@ public class VertexResource extends BufferedResource {
     public void mark() {
         version++;
     }
+
+    @Override
+    public boolean isEmpty() {
+        return inSize == 0;
+    }
+
 
     /**
      * describes the metadata and placement into the buffer based off the stride.

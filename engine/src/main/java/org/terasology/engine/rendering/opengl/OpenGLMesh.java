@@ -20,7 +20,6 @@ import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.joml.geom.AABBf;
 import org.terasology.joml.geom.AABBfc;
 
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,7 +27,7 @@ import static org.lwjgl.opengl.GL11.GL_UNSIGNED_INT;
 
 /**
  */
-public class OpenGLMesh extends Mesh implements OpenGLMeshBase{
+public class OpenGLMesh extends Mesh implements OpenGLMeshBase {
     private static final Logger logger = LoggerFactory.getLogger(OpenGLMesh.class);
     private AABBf aabb = new AABBf();
     private MeshData data;
@@ -111,12 +110,9 @@ public class OpenGLMesh extends Mesh implements OpenGLMeshBase{
         this.state = buildVBO(this.disposalAction.vbo, GL30.GL_STATIC_DRAW, targets);
 
         IndexResource indexResource = newData.indexResource();
-        this.indexCount = indexResource.getNumberOfIndices();
-        ByteBuffer indexBuffer = indexResource.buffer;
-        indexBuffer.rewind();
-        indexBuffer.limit(indexResource.getSize());
+        this.indexCount = indexResource.indices();
         GL30.glBindBuffer(GL30.GL_ELEMENT_ARRAY_BUFFER, this.disposalAction.ebo);
-        GL30.glBufferData(GL30.GL_ELEMENT_ARRAY_BUFFER, indexBuffer, GL30.GL_STATIC_DRAW);
+        indexResource.writeBuffer((buffer) -> GL30.glBufferData(GL30.GL_ELEMENT_ARRAY_BUFFER, buffer, GL30.GL_STATIC_DRAW));
 
         GL30.glBindVertexArray(0);
         getBound(aabb);

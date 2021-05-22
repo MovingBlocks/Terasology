@@ -26,9 +26,14 @@ public interface OpenGLMeshBase {
         for (int x = 0; x < state.entries.length; x++) {
             if (state.entries[x].version != state.entries[x].resource.getVersion()) {
                 VertexResource resource = state.entries[x].resource;
-                ByteBuffer buffer = resource.buffer();
-                buffer.limit(resource.inSize());
-                GL30.glBufferSubData(GL30.GL_ARRAY_BUFFER, state.entries[x].offset, buffer);
+
+                int offset = state.entries[x].offset;
+                resource.writeBuffer((buffer) -> {
+                    GL30.glBufferSubData(GL30.GL_ARRAY_BUFFER, offset, buffer);
+                });
+//                ByteBuffer buffer = resource.buffer();
+//                buffer.limit(resource.inSize());
+//                GL30.glBufferSubData(GL30.GL_ARRAY_BUFFER, state.entries[x].offset, buffer);
             }
         }
         GL30.glBindBuffer(GL30.GL_ARRAY_BUFFER, 0);
@@ -54,10 +59,14 @@ public interface OpenGLMeshBase {
             state.entries[i].version = resource.getVersion();
             state.entries[i].offset = offset;
 
-            ByteBuffer vertexBuffer = resource.buffer();
-            vertexBuffer.rewind();
-            vertexBuffer.limit(resource.inSize());
-            GL30.glBufferSubData(GL30.GL_ARRAY_BUFFER, offset, vertexBuffer);
+            int currentOffset = offset;
+            resource.writeBuffer((buffer) -> {
+                GL30.glBufferSubData(GL30.GL_ARRAY_BUFFER, currentOffset, buffer);
+            });
+//            ByteBuffer vertexBuffer = resource.buffer();
+//            vertexBuffer.rewind();
+//            vertexBuffer.limit(resource.inSize());
+//            GL30.glBufferSubData(GL30.GL_ARRAY_BUFFER, offset, vertexBuffer);
             for (VertexResource.VertexDefinition attribute : resource.definitions()) {
                 GL30.glEnableVertexAttribArray(attribute.location);
                 GL30.glVertexAttribPointer(attribute.location, attribute.attribute.count,

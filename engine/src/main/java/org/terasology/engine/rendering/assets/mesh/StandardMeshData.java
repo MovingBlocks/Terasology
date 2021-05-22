@@ -106,13 +106,13 @@ public class StandardMeshData extends MeshData {
     }
 
     public void reallocate(int numVerts, int numIndices) {
-        positionBuffer.reallocateElements(numVerts);
-        normalBuffer.reallocateElements(numVerts);
-        uv0Buffer.reallocateElements(numVerts);
-        uv1Buffer.reallocateElements(numVerts);
-        lightBuffer.reallocateElements(numVerts);
-        colorBuffer.reallocateElements(numVerts);
-        indices.reallocateElements(numIndices);
+        positionBuffer.allocateElements(numVerts);
+        normalBuffer.allocateElements(numVerts);
+        uv0Buffer.allocateElements(numVerts);
+        uv1Buffer.allocateElements(numVerts);
+        lightBuffer.allocateElements(numVerts);
+        colorBuffer.allocateElements(numVerts);
+        indices.reallocate(numIndices);
     }
 
     @Override
