@@ -42,10 +42,10 @@ public final class Example {
         treeBuilder.registerDecorator("repeat", Repeat.class);
         actor = new Actor(null);
         actor.setDelta(0.1f);
-        node = treeBuilder.fromJson("{ sequence:[ " +
-                                    "{repeat :{ count:5, child:{print:{msg:x}}}}, success, { delay:{duration:1}}, { print:{msg:Hello} }, { delay:{duration:1}}, { print:{msg:World} } "
-                                    +
-                                    "] }");
+        node = treeBuilder.fromJson(
+                "{ sequence:[ "
+                        + "{repeat :{ count:5, child:{print:{msg:x}}}}, success, { delay:{duration:1}}, { print:{msg:Hello} }, { delay:{duration:1}}, { print:{msg:World} } "
+                        + "] }");
         tree = new DefaultBehaviorTreeRunner(node, actor);
         for (int i = 0; i < 100; i++) {
             tree.step();

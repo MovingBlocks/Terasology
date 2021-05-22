@@ -58,7 +58,6 @@ import static com.google.common.base.Verify.verifyNotNull;
  */
 public final class EntitySystemSetupUtil {
 
-
     private EntitySystemSetupUtil() {
         // static utility class, no instance needed
     }
@@ -129,7 +128,9 @@ public final class EntitySystemSetupUtil {
         CharacterStateEventPositionMap characterStateEventPositionMap = context.get(CharacterStateEventPositionMap.class);
         DirectionAndOriginPosRecorderList directionAndOriginPosRecorderList = context.get(DirectionAndOriginPosRecorderList.class);
         RecordedEventStore recordedEventStore = new RecordedEventStore();
-        RecordAndReplaySerializer recordAndReplaySerializer = new RecordAndReplaySerializer(entityManager, recordedEventStore, recordAndReplayUtils, characterStateEventPositionMap, directionAndOriginPosRecorderList, moduleManager, context.get(TypeRegistry.class));
+        RecordAndReplaySerializer recordAndReplaySerializer =
+                new RecordAndReplaySerializer(entityManager, recordedEventStore, recordAndReplayUtils, characterStateEventPositionMap,
+                        directionAndOriginPosRecorderList, moduleManager, context.get(TypeRegistry.class));
         context.put(RecordAndReplaySerializer.class, recordAndReplaySerializer);
 
 

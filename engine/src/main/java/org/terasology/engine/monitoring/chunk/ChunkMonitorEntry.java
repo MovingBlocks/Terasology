@@ -47,7 +47,8 @@ public class ChunkMonitorEntry {
 
     public void addChunk(Chunk value) {
         Preconditions.checkNotNull(value, "The parameter 'value' must not be null");
-        Preconditions.checkArgument(pos.equals(value.getPosition(new Vector3i())), "Expected chunk for position {} but got position {} instead", pos, value.getPosition(new Vector3i()));
+        Preconditions.checkArgument(pos.equals(value.getPosition(new Vector3i())),
+                "Expected chunk for position {} but got position {} instead", pos, value.getPosition(new Vector3i()));
         purge();
         chunks.add(new WeakReference<>(value));
     }

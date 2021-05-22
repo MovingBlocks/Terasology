@@ -22,7 +22,8 @@ public class DefaultWorldGeneratorPluginLibrary implements WorldGeneratorPluginL
         library = new DefaultModuleClassLibrary<>(moduleEnvironment, context.get(ReflectFactory.class), context.get(CopyStrategyLibrary.class));
         for (Class<?> entry : moduleEnvironment.getTypesAnnotatedWith(RegisterPlugin.class)) {
             if (WorldGeneratorPlugin.class.isAssignableFrom(entry)) {
-                library.register(new ResourceUrn(moduleEnvironment.getModuleProviding(entry).toString(), entry.getSimpleName()).toString(), entry.asSubclass(WorldGeneratorPlugin.class));
+                ResourceUrn resourceUrn = new ResourceUrn(moduleEnvironment.getModuleProviding(entry).toString(), entry.getSimpleName());
+                library.register(resourceUrn.toString(), entry.asSubclass(WorldGeneratorPlugin.class));
             }
         }
     }

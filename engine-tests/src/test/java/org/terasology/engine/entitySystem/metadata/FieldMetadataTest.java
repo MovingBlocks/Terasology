@@ -4,10 +4,10 @@ package org.terasology.engine.entitySystem.metadata;
 
 import org.junit.jupiter.api.Test;
 import org.terasology.gestalt.assets.ResourceUrn;
-import org.terasology.unittest.stubs.OwnerComponent;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.reflect.ReflectFactory;
 import org.terasology.reflection.reflect.ReflectionReflectFactory;
+import org.terasology.unittest.stubs.OwnerComponent;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -26,7 +26,8 @@ public class FieldMetadataTest {
     @Test
     public void testOwnsAnnotationCollectionProcessed() throws NoSuchMethodException {
         ComponentMetadata<org.terasology.engine.entitySystem.metadata.OwnedCollectionComponent> classMetadata =
-                new ComponentMetadata<>(new ResourceUrn("unittest:OwnedCollectionComponent"), org.terasology.engine.entitySystem.metadata.OwnedCollectionComponent.class, factory, copyStrategyLibrary);
+                new ComponentMetadata<>(new ResourceUrn("unittest:OwnedCollectionComponent"),
+                        org.terasology.engine.entitySystem.metadata.OwnedCollectionComponent.class, factory, copyStrategyLibrary);
         ComponentFieldMetadata metadata = classMetadata.getField("items");
         assertTrue(metadata.isOwnedReference());
     }

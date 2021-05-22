@@ -118,7 +118,8 @@ public class BulletSweepCallback extends ClosestConvexResultCallback implements 
         Matrix4f transformFrom = new Matrix4f().setTranslation(fromWorld);
         Matrix4f transformTo = new Matrix4f().setTranslation(toWorld);
         Matrix4f targetTransform = this.getHitCollisionObject().getWorldTransform();
-        btDiscreteDynamicsWorld.rayTestSingle(transformFrom, transformTo, this.getHitCollisionObject(), this.getHitCollisionObject().getCollisionShape(), targetTransform, rayResult);
+        btDiscreteDynamicsWorld.rayTestSingle(transformFrom, transformTo, this.getHitCollisionObject(),
+                this.getHitCollisionObject().getCollisionShape(), targetTransform, rayResult);
         if (rayResult.hasHit()) {
             hitStep = true;
             Vector3f hitNormal = new Vector3f();
@@ -131,7 +132,8 @@ public class BulletSweepCallback extends ClosestConvexResultCallback implements 
         transformFrom = new Matrix4f().setTranslation(fromWorld);
         transformTo = new Matrix4f().setTranslation(toWorld);
         targetTransform = this.getHitCollisionObject().getWorldTransform();
-        btDiscreteDynamicsWorld.rayTestSingle(transformFrom, transformTo, this.getHitCollisionObject(), this.getHitCollisionObject().getCollisionShape(), targetTransform, rayResult);
+        btDiscreteDynamicsWorld.rayTestSingle(transformFrom, transformTo, this.getHitCollisionObject(),
+                this.getHitCollisionObject().getCollisionShape(), targetTransform, rayResult);
         if (rayResult.hasHit()) {
             hitStep = true;
             Vector3f hitNormal = new Vector3f();

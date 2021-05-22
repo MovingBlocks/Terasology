@@ -99,14 +99,16 @@ public class ColumnLayoutTest {
         // Gets one-fifth of entire area
         verify(canvas).drawWidget(itemAt2x1, RectUtility.createFromMinAndSize(CANVAS_WIDTH / 2, ((CANVAS_HEIGHT - 20) / 2), CANVAS_WIDTH * 2 / 10, 10));
         // Gets three-tens of entire area
-        verify(canvas).drawWidget(itemAt3x1, RectUtility.createFromMinAndSize(CANVAS_WIDTH / 2 + CANVAS_WIDTH * 2 / 10, ((CANVAS_HEIGHT - 20) / 2), CANVAS_WIDTH * 3 / 10, 10));
+        verify(canvas).drawWidget(itemAt3x1, RectUtility.createFromMinAndSize(CANVAS_WIDTH / 2 + CANVAS_WIDTH * 2 / 10,
+                ((CANVAS_HEIGHT - 20) / 2), CANVAS_WIDTH * 3 / 10, 10));
 
         // Gets half of entire area
         verify(canvas).drawWidget(itemAt1x2, RectUtility.createFromMinAndSize(0, ((CANVAS_HEIGHT - 20) / 2) + 10, CANVAS_WIDTH / 2, 10));
         // Gets one-fifth of entire area
         verify(canvas).drawWidget(itemAt2x2, RectUtility.createFromMinAndSize(CANVAS_WIDTH / 2, ((CANVAS_HEIGHT - 20) / 2) + 10, CANVAS_WIDTH * 2 / 10, 10));
         // Gets three-tens of entire area
-        verify(canvas).drawWidget(itemAt3x2, RectUtility.createFromMinAndSize(CANVAS_WIDTH / 2 + CANVAS_WIDTH * 2 / 10, ((CANVAS_HEIGHT - 20) / 2) + 10, CANVAS_WIDTH * 3 / 10, 10));
+        verify(canvas).drawWidget(itemAt3x2, RectUtility.createFromMinAndSize(CANVAS_WIDTH / 2 + CANVAS_WIDTH * 2 / 10,
+                ((CANVAS_HEIGHT - 20) / 2) + 10, CANVAS_WIDTH * 3 / 10, 10));
     }
 
     @Test
