@@ -4,9 +4,7 @@ package org.terasology.engine.core.subsystem.common.hibernation;
 
 import org.terasology.gestalt.module.sandbox.API;
 
-/**
- *
- */
+
 @API
 public class HibernationManager {
     private boolean hibernationAllowed = true;

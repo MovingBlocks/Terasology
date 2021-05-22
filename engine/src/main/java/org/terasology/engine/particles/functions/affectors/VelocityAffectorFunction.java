@@ -8,9 +8,7 @@ import org.terasology.engine.particles.components.affectors.VelocityAffectorComp
 import org.terasology.engine.particles.functions.RegisterParticleSystemFunction;
 import org.terasology.engine.utilities.random.Random;
 
-/**
- *
- */
+
 @RegisterParticleSystemFunction()
 public final class VelocityAffectorFunction extends AffectorFunction<VelocityAffectorComponent> {
     public VelocityAffectorFunction() {

@@ -21,9 +21,7 @@ import java.security.SecurityPermission;
 import java.util.Collections;
 import java.util.Map;
 
-/**
- *
- */
+
 public class SecurityConfig {
     public static final SecurityPermission PRIVATE_CERTIFICATE_ACCESS_PERMISSION = new SecurityPermission("PRIVATE_CERTIFICATE_ACCESS_PERMISSION");
     public static final SecurityPermission CERTIFICATE_WRITE_PERMISSION = new SecurityPermission("CERTIFICATE_WRITE_PERMISSION");

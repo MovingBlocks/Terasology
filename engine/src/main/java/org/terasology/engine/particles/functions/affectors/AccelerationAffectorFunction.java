@@ -8,9 +8,7 @@ import org.terasology.engine.particles.components.affectors.AccelerationAffector
 import org.terasology.engine.particles.functions.RegisterParticleSystemFunction;
 import org.terasology.engine.utilities.random.Random;
 
-/**
- *
- */
+
 @RegisterParticleSystemFunction()
 public final class AccelerationAffectorFunction extends AffectorFunction<AccelerationAffectorComponent> {
     public AccelerationAffectorFunction() {

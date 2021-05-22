@@ -12,9 +12,7 @@ import org.terasology.engine.core.subsystem.EngineSubsystem;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 
-/**
- *
- */
+
 public abstract class BaseLwjglSubsystem implements EngineSubsystem {
 
     private static final Logger logger = LoggerFactory.getLogger(BaseLwjglSubsystem.class);

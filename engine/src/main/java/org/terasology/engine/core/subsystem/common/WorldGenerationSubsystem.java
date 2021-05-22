@@ -7,9 +7,7 @@ import org.terasology.engine.core.GameEngine;
 import org.terasology.engine.core.subsystem.EngineSubsystem;
 import org.terasology.engine.world.generator.internal.WorldGeneratorManager;
 
-/**
- *
- */
+
 public class WorldGenerationSubsystem implements EngineSubsystem {
     @Override
     public String getName() {

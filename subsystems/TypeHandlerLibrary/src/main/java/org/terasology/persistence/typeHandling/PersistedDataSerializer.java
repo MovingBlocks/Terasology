@@ -10,9 +10,7 @@ import gnu.trove.iterator.TLongIterator;
 import java.nio.ByteBuffer;
 import java.util.Map;
 
-/**
- *
- */
+
 public interface PersistedDataSerializer {
 
     /**

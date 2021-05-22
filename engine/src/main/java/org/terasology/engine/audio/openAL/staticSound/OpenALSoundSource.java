@@ -15,9 +15,7 @@ import static org.lwjgl.openal.AL10.AL_TRUE;
 import static org.lwjgl.openal.AL10.alGetSourcei;
 import static org.lwjgl.openal.AL10.alSourcei;
 
-/**
- *
- */
+
 public class OpenALSoundSource extends BaseSoundSource<OpenALSound> {
 
     private OpenALSound audio;

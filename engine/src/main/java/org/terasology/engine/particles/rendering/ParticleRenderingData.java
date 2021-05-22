@@ -6,9 +6,7 @@ import org.terasology.engine.entitySystem.Component;
 import org.terasology.gestalt.module.sandbox.API;
 import org.terasology.engine.particles.ParticlePool;
 
-/**
- *
- */
+
 @API
 public final class ParticleRenderingData<E extends Component> {
     public final E particleData;

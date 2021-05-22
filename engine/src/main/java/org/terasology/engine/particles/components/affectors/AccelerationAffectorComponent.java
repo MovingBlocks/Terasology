@@ -7,9 +7,7 @@ import org.terasology.engine.entitySystem.Component;
 import org.terasology.gestalt.module.sandbox.API;
 import org.terasology.engine.network.Replicate;
 
-/**
- *
- */
+
 @API
 public class AccelerationAffectorComponent implements Component {
 

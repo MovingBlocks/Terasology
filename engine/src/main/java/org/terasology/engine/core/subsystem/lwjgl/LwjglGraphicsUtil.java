@@ -27,9 +27,7 @@ import static org.lwjgl.opengl.GL11.GL_REPEAT;
 import static org.lwjgl.opengl.GL11.glDepthFunc;
 import static org.lwjgl.opengl.GL11.glEnable;
 
-/**
- *
- */
+
 public final class LwjglGraphicsUtil {
     private LwjglGraphicsUtil() {
     }

@@ -7,9 +7,7 @@ import org.terasology.engine.entitySystem.Component;
 import org.terasology.gestalt.module.sandbox.API;
 import org.terasology.engine.rendering.assets.texture.Texture;
 
-/**
- *
- */
+
 @API
 public class ParticleDataSpriteComponent implements Component {
     /**

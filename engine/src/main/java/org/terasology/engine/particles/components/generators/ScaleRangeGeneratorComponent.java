@@ -6,9 +6,7 @@ import org.joml.Vector3f;
 import org.terasology.engine.entitySystem.Component;
 import org.terasology.gestalt.module.sandbox.API;
 
-/**
- *
- */
+
 @API
 public class ScaleRangeGeneratorComponent implements Component {
     public Vector3f minScale;

@@ -14,9 +14,7 @@ import java.security.AccessController;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
 
-/**
- *
- */
+
 public class OggStreamingSoundData implements StreamingSoundData {
 
     private static final Logger logger = LoggerFactory.getLogger(OggStreamingSoundData.class);

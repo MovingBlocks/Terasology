@@ -7,9 +7,7 @@ import org.terasology.engine.core.GameEngine;
 import org.terasology.engine.core.subsystem.EngineSubsystem;
 import org.terasology.engine.game.Game;
 
-/**
- *
- */
+
 // TODO: Get rid of this subsystem, it is kind of silly (remove Game class, convert to entity?)
 public class GameSubsystem implements EngineSubsystem {
     @Override

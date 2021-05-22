@@ -22,9 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
-/**
- *
- */
+
 public class ServerConnectionHandler extends ChannelInboundHandlerAdapter {
 
     private static final Logger logger = LoggerFactory.getLogger(ServerConnectionHandler.class);

@@ -7,9 +7,7 @@ import org.terasology.engine.core.GameEngine;
 import org.terasology.engine.core.subsystem.EngineSubsystem;
 import org.terasology.engine.physics.CollisionGroupManager;
 
-/**
- *
- */
+
 public class PhysicsSubsystem implements EngineSubsystem {
     @Override
     public String getName() {

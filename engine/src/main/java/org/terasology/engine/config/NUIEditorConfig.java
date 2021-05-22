@@ -4,9 +4,7 @@ package org.terasology.engine.config;
 
 import java.util.Locale;
 
-/**
- *
- */
+
 public class NUIEditorConfig {
     private boolean disableIcons;
     private boolean disableAutosave;

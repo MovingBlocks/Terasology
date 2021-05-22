@@ -7,9 +7,7 @@ import org.terasology.engine.core.GameEngine;
 import org.terasology.engine.core.subsystem.EngineSubsystem;
 import org.terasology.engine.logic.console.commandSystem.adapter.ParameterAdapterManager;
 
-/**
- *
- */
+
 public class CommandSubsystem implements EngineSubsystem {
     @Override
     public String getName() {

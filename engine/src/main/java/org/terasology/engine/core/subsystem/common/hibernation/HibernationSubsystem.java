@@ -9,9 +9,7 @@ import org.terasology.engine.core.modes.GameState;
 import org.terasology.engine.core.subsystem.DisplayDevice;
 import org.terasology.engine.core.subsystem.EngineSubsystem;
 
-/**
- *
- */
+
 public class HibernationSubsystem implements EngineSubsystem {
     private static final Logger logger = LoggerFactory.getLogger(HibernationSubsystem.class);
     private HibernationManager hibernationManager;

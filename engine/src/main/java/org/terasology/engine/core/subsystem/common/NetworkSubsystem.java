@@ -11,9 +11,7 @@ import org.terasology.engine.network.NetworkSystem;
 import org.terasology.engine.network.internal.NetworkSystemImpl;
 import org.terasology.engine.network.internal.ServerConnectListManager;
 
-/**
- *
- */
+
 public class NetworkSubsystem implements EngineSubsystem {
 
     private NetworkSystem networkSystem;

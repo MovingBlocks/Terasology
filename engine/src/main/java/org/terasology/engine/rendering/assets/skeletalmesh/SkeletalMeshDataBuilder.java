@@ -14,9 +14,7 @@ import org.terasology.engine.rendering.assets.mesh.MeshBuilder;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- *
- */
+
 public class SkeletalMeshDataBuilder {
 
     private List<Bone> bones = new ArrayList<>();
