@@ -10,13 +10,13 @@ import org.reflections.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.context.Context;
+import org.terasology.engine.logic.console.Console;
 import org.terasology.engine.logic.console.commandSystem.annotations.Command;
 import org.terasology.engine.logic.console.commandSystem.annotations.CommandParam;
 import org.terasology.engine.logic.console.commandSystem.annotations.Sender;
-import org.terasology.engine.logic.console.Console;
-import org.terasology.gestalt.naming.Name;
 import org.terasology.engine.registry.InjectionHelper;
 import org.terasology.engine.utilities.reflection.SpecificAccessibleObject;
+import org.terasology.gestalt.naming.Name;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -28,14 +28,14 @@ public final class MethodCommand extends AbstractCommand {
     private static final Logger logger = LoggerFactory.getLogger(MethodCommand.class);
     private static final String ENTITY_REF_NAME = "org.terasology.engine.entitySystem.entity.EntityRef";
 
-    private MethodCommand(Name name, String requiredPermission, boolean runOnServer, String description, String helpText,
+    private MethodCommand(Name name, String requiredPermission, boolean runOnServer, String description,
+                          String helpText,
                           SpecificAccessibleObject<Method> executionMethod, Context context) {
         super(name, requiredPermission, runOnServer, description, helpText, executionMethod, context);
     }
 
     /**
-     * Creates a new {@code ReferencedCommand} to a specific method
-     * annotated with {@link Command}.
+     * Creates a new {@code ReferencedCommand} to a specific method annotated with {@link Command}.
      *
      * @param specificMethod The method to reference to
      * @return The command reference object created
@@ -69,20 +69,25 @@ public final class MethodCommand extends AbstractCommand {
      * Registers all available command methods annotated with {@link Command}.
      */
     public static void registerAvailable(Object provider, Console console, Context context) {
-        Predicate<? super Method> predicate = Predicates.<Method>and(ReflectionUtils.withModifier(Modifier.PUBLIC), ReflectionUtils.withAnnotation(Command.class));
+        Predicate<? super Method> predicate = Predicates.<Method>and(ReflectionUtils.withModifier(Modifier.PUBLIC),
+                ReflectionUtils.withAnnotation(Command.class));
         Set<Method> commandMethods = ReflectionUtils.getAllMethods(provider.getClass(), predicate);
         for (Method method : commandMethods) {
             if (!hasSenderAnnotation(method)) {
-                logger.error("Command {} provided by {} contains a EntityRef without @Sender annotation, may cause a NullPointerException", method.getName(), provider.getClass().getSimpleName());
+                logger.error("Command {} provided by {} contains a EntityRef without @Sender annotation, may cause a " +
+                        "NullPointerException", method.getName(), provider.getClass().getSimpleName());
             }
-            logger.debug("Registering command method {} in class {}", method.getName(), method.getDeclaringClass().getCanonicalName());
+            logger.debug("Registering command method {} in class {}", method.getName(),
+                    method.getDeclaringClass().getCanonicalName());
             try {
                 SpecificAccessibleObject<Method> specificMethod = new SpecificAccessibleObject<>(method, provider);
                 MethodCommand command = referringTo(specificMethod, context);
                 console.registerCommand(command);
-                logger.debug("Registered command method {} in class {}", method.getName(), method.getDeclaringClass().getCanonicalName());
+                logger.debug("Registered command method {} in class {}", method.getName(),
+                        method.getDeclaringClass().getCanonicalName());
             } catch (RuntimeException t) {
-                logger.error("Failed to load command method {} in class {}", method.getName(), method.getDeclaringClass().getCanonicalName(), t);
+                logger.error("Failed to load command method {} in class {}", method.getName(),
+                        method.getDeclaringClass().getCanonicalName(), t);
             }
         }
     }
@@ -95,7 +100,7 @@ public final class MethodCommand extends AbstractCommand {
                 if (paramAnnotations[i].length == 0) {
                     return false;
                 } else {
-                    for (Annotation annotation: paramAnnotations[i]) {
+                    for (Annotation annotation : paramAnnotations[i]) {
                         if (annotation instanceof Sender) {
                             return true;
                         }
@@ -131,7 +136,7 @@ public final class MethodCommand extends AbstractCommand {
                 String name = parameterAnnotation.value();
                 Class<? extends CommandParameterSuggester> suggesterClass = parameterAnnotation.suggester();
                 boolean required = parameterAnnotation.required();
-                CommandParameterSuggester  suggester = InjectionHelper.createWithConstructorInjection(suggesterClass,
+                CommandParameterSuggester suggester = InjectionHelper.createWithConstructorInjection(suggesterClass,
                         context);
 
                 if (type.isArray()) {

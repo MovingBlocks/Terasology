@@ -24,7 +24,7 @@ public enum MeshAttributeSemantic {
     Color_0("COLOR_0",
             new GLTFAttributeType[]{GLTFAttributeType.VEC4},
             new GLTFComponentType[]{GLTFComponentType.FLOAT},
-            k-> k.color0),
+            k -> k.color0),
     Joints_0("JOINTS_0",
             new GLTFAttributeType[]{GLTFAttributeType.VEC4},
             new GLTFComponentType[]{GLTFComponentType.UNSIGNED_BYTE, GLTFComponentType.UNSIGNED_SHORT},

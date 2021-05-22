@@ -24,9 +24,12 @@ import static org.terasology.engine.telemetry.TelemetryEmitter.DEFAULT_COLLECTOR
 import static org.terasology.engine.telemetry.TelemetryEmitter.DEFAULT_COLLECTOR_PROTOCOL;
 
 /**
- * This is a telemetry engine sub system.
- * It will initialise all the telemetry stuff such as the {@link com.snowplowanalytics.snowplow.tracker.emitter.Emitter} and configure the {@link org.terasology.engine.telemetry.logstash.TelemetryLogstashAppender}.
- * It will also adds the {@link org.terasology.engine.telemetry.Metrics} and the {@link org.terasology.engine.telemetry.TelemetryEmitter} to the context so that we can be use them later in other class for telemetry.
+ * This is a telemetry engine sub system. It will initialise all the telemetry stuff such as the {@link
+ * com.snowplowanalytics.snowplow.tracker.emitter.Emitter} and configure the {@link
+ * org.terasology.engine.telemetry.logstash.TelemetryLogstashAppender}. It will also adds the {@link
+ * org.terasology.engine.telemetry.Metrics} and the {@link org.terasology.engine.telemetry.TelemetryEmitter} to the
+ * context so that we can be use them later in other class for telemetry.
+ *
  * @see <a href="https://github.com/GabrielXia/telemetry/wiki">https://github.com/GabrielXia/telemetry/wiki</a>
  */
 public class TelemetrySubSystem implements EngineSubsystem {
@@ -78,7 +81,8 @@ public class TelemetrySubSystem implements EngineSubsystem {
         TelemetryConfig telemetryConfig = config.getTelemetryConfig();
         String errorReportingDestination = telemetryConfig.getErrorReportingDestination();
         if (errorReportingDestination == null) {
-            errorReportingDestination = TelemetryLogstashAppender.DEFAULT_LOGSTASH_HOST + ":" + TelemetryLogstashAppender.DEFAULT_LOGSTASH_PORT;
+            errorReportingDestination =
+                    TelemetryLogstashAppender.DEFAULT_LOGSTASH_HOST + ":" + TelemetryLogstashAppender.DEFAULT_LOGSTASH_PORT;
             telemetryConfig.setErrorReportingDestination(errorReportingDestination);
         }
         if (telemetryConfig.isErrorReportingEnabled()) {
@@ -104,7 +108,7 @@ public class TelemetrySubSystem implements EngineSubsystem {
                     DEFAULT_COLLECTOR_PROTOCOL, DEFAULT_COLLECTOR_HOST, DEFAULT_COLLECTOR_PORT).toString());
         }
     }
-    
+
     @Override
     public void shutdown() {
 
