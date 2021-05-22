@@ -16,15 +16,15 @@ import java.util.Set;
  *
  */
 public final class SideBitFlag {
-    private static final TObjectByteMap<Side> sideBits = new TObjectByteHashMap<>();
+    private static final TObjectByteMap<Side> SIDE_BITS = new TObjectByteHashMap<>();
 
     static {
-        sideBits.put(Side.TOP, (byte) 0b000001);
-        sideBits.put(Side.LEFT, (byte) 0b000010);
-        sideBits.put(Side.FRONT, (byte) 0b000100);
-        sideBits.put(Side.BOTTOM, (byte) 0b001000);
-        sideBits.put(Side.RIGHT, (byte) 0b010000);
-        sideBits.put(Side.BACK, (byte) 0b100000);
+        SIDE_BITS.put(Side.TOP, (byte) 0b000001);
+        SIDE_BITS.put(Side.LEFT, (byte) 0b000010);
+        SIDE_BITS.put(Side.FRONT, (byte) 0b000100);
+        SIDE_BITS.put(Side.BOTTOM, (byte) 0b001000);
+        SIDE_BITS.put(Side.RIGHT, (byte) 0b010000);
+        SIDE_BITS.put(Side.BACK, (byte) 0b100000);
     }
 
     private SideBitFlag() {
@@ -37,7 +37,7 @@ public final class SideBitFlag {
     public static byte getSides(Set<Side> sides) {
         byte result = 0;
         for (Side side : sides) {
-            result += sideBits.get(side);
+            result += SIDE_BITS.get(side);
         }
         return result;
     }
@@ -45,7 +45,7 @@ public final class SideBitFlag {
     public static byte getSides(Side... sides) {
         byte result = 0;
         for (Side side : sides) {
-            final byte sideBit = sideBits.get(side);
+            final byte sideBit = SIDE_BITS.get(side);
             if ((result & sideBit) > 0) {
                 throw new IllegalArgumentException("Cannot have multiples of the same side");
             }
@@ -55,12 +55,12 @@ public final class SideBitFlag {
     }
 
     public static byte getSide(Side side) {
-        return sideBits.get(side);
+        return SIDE_BITS.get(side);
     }
 
     public static EnumSet<Side> getSides(final byte sidesBit) {
         final List<Side> result = Lists.newArrayList();
-        sideBits.forEachEntry(
+        SIDE_BITS.forEachEntry(
                 (a, b) -> {
                     if ((b & sidesBit) > 0) {
                         result.add(a);
@@ -72,13 +72,13 @@ public final class SideBitFlag {
     }
 
     public static boolean hasSide(byte sideBit, Side side) {
-        return (sideBit & sideBits.get(side)) > 0;
+        return (sideBit & SIDE_BITS.get(side)) > 0;
     }
 
     public static byte addSide(byte sideBit, Side... sides) {
         byte result = sideBit;
         for (Side side : sides) {
-            result |= sideBits.get(side);
+            result |= SIDE_BITS.get(side);
         }
 
         return result;
