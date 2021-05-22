@@ -3,8 +3,6 @@
 
 package org.terasology.engine.utilities;
 
-import java.nio.file.FileSystems;
-
 /**
  * Utility for determinate OperationSystem(aka Platform)
  * Used instead {@link org.lwjgl.system.Platform}, because it invoke static of {@link org.lwjgl.system.Configuration} and load configs to static.
@@ -18,7 +16,6 @@ public enum OS {
     public static final String OS_NAME = System.getProperty("os.name").toLowerCase();
     public static final String ARCHITECTURE = System.getProperty("os.arch");
     public static final String USER_DIRECTORY = System.getProperty("user.dir");
-    public static final String PATH_SEPARATOR = FileSystems.getDefault().getSeparator();
 
     public static final boolean IS_WINDOWS = OS_NAME.toLowerCase().contains("win");
     public static final boolean IS_MACOSX =  OS_NAME.toLowerCase().contains("mac");

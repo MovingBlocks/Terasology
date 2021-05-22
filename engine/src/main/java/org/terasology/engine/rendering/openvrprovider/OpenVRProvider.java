@@ -22,6 +22,8 @@ import org.slf4j.LoggerFactory;
 import org.terasology.engine.utilities.OS;
 
 import java.nio.IntBuffer;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 /**
  * This class is designed to make all API calls to OpenVR, thereby insulating it from the user. If you're looking to get
@@ -280,24 +282,24 @@ public final class OpenVRProvider {
             return true;
         }
 
-        String target = OS.USER_DIRECTORY +  OS.PATH_SEPARATOR + "openvr_natives" + OS.PATH_SEPARATOR;
+        String target = "";
         switch (OS.get()) {
             case WINDOWS:
                 // Windows
-                target += "win32-" + (OS.IS_64 ? "x86-64" : "x86");
+                target = "win32-" + (OS.IS_64 ? "x86-64" : "x86");
                 break;
             case MACOSX:
                 // osx
-                target += "darwin";
+                target = "darwin";
                 break;
             case LINUX:
                 // Assume Linux
-                target += "linux-" + (OS.IS_64 ? "x86-64" : "x86");
+                target = "linux-" + (OS.IS_64 ? "x86-64" : "x86");
                 break;
         }
-
-        logger.info("Adding OpenVR search path: " + target);
-        NativeLibrary.addSearchPath("openvr_api", target);
+        String path = Paths.get(OS.USER_DIRECTORY, "openvr_natives", target).toString();
+        logger.info("Adding OpenVR search path: " +  path);
+        NativeLibrary.addSearchPath("openvr_api", path);
 
         if (jopenvr.JOpenVRLibrary.VR_IsHmdPresent() != 1) {
             logger.info("VR Headset not detected.");
