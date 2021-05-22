@@ -627,7 +627,7 @@ public class BulletPhysics implements PhysicsEngine {
 
         for (Map.Entry<EntityRef, BulletRigidBody> entree : entityRigidBodies.entrySet()) {
             BulletRigidBody body = entree.getValue();
-            if(body.pendingImpulse.lengthSquared() > .01f || body.pendingForce.lengthSquared() > .01f ) {
+            if (body.pendingImpulse.lengthSquared() > .01f || body.pendingForce.lengthSquared() > .01f) {
                 body.rb.applyCentralImpulse(body.pendingImpulse);
                 body.rb.applyCentralForce(body.pendingForce);
             }
@@ -642,8 +642,7 @@ public class BulletPhysics implements PhysicsEngine {
     }
 
     private void addRigidBody(BulletRigidBody body) {
-
-        short filter = (short) (btBroadphaseProxy.CollisionFilterGroups.DefaultFilter | btBroadphaseProxy.CollisionFilterGroups.StaticFilter| btBroadphaseProxy.CollisionFilterGroups.SensorTrigger);
+        short filter = (short) (btBroadphaseProxy.CollisionFilterGroups.DefaultFilter | btBroadphaseProxy.CollisionFilterGroups.StaticFilter | btBroadphaseProxy.CollisionFilterGroups.SensorTrigger);
         insertionQueue.add(new RigidBodyRequest(body, (short) btBroadphaseProxy.CollisionFilterGroups.DefaultFilter, filter));
     }
 

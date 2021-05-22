@@ -40,8 +40,7 @@ public class Message {
         return type;
     }
 
-    public boolean hasNewLine()
-    {
+    public boolean hasNewLine() {
         return newLine;
     }
 

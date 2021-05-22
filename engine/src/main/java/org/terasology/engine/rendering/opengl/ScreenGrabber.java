@@ -182,8 +182,7 @@ public class ScreenGrabber {
      *
      * @param saveDirPath to save folder
      */
-    public void takeGamePreview(final Path saveDirPath)
-    {
+    public void takeGamePreview(final Path saveDirPath) {
         this.savingGamePreview = true;
         this.savedGamePath = GamePreviewImageProvider.getNextGamePreviewImagePath(saveDirPath);
         this.saveScreenshot();

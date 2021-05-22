@@ -166,8 +166,8 @@ public class LwjglCanvasRenderer implements TerasologyCanvasRenderer, PropertyCh
         Vector3f centerOffset = meshAABB.center(new Vector3f());
         centerOffset.mul(-1.0f);
 
-        Matrix4f centerTransform = new Matrix4f().translationRotateScale(centerOffset,new Quaternionf(),1);
-        Matrix4f userTransform = new Matrix4f().translationRotateScale( offset,rotation, -fitScale * scale);
+        Matrix4f centerTransform = new Matrix4f().translationRotateScale(centerOffset, new Quaternionf(), 1);
+        Matrix4f userTransform = new Matrix4f().translationRotateScale(offset,rotation, -fitScale * scale);
         Matrix4f translateTransform = new Matrix4f().translationRotateScale(
                 new Vector3f((drawRegion.minX + drawRegion.getSizeX() / 2) * uiScale,
                         (drawRegion.minY + drawRegion.getSizeY() / 2) * uiScale, 0), new Quaternionf(), 1);
@@ -252,7 +252,7 @@ public class LwjglCanvasRenderer implements TerasologyCanvasRenderer, PropertyCh
     @Override
     public void drawTexture(UITextureRegion texture, Colorc color, ScaleMode mode, Rectanglei absoluteRegionRectangle,
                             float ux, float uy, float uw, float uh, float alpha) {
-        if (!((TextureRegion)texture).getTexture().isLoaded()) {
+        if (!((TextureRegion) texture).getTexture().isLoaded()) {
             return;
         }
 
@@ -271,7 +271,7 @@ public class LwjglCanvasRenderer implements TerasologyCanvasRenderer, PropertyCh
         switch (mode) {
             case TILED: {
                 Vector2i textureSize = texture.size();
-                TextureCacheKey key = new TextureCacheKey(textureSize, new Vector2i(absoluteRegion.getSizeX(),absoluteRegion.getSizeY()));
+                TextureCacheKey key = new TextureCacheKey(textureSize, new Vector2i(absoluteRegion.getSizeX(), absoluteRegion.getSizeY()));
                 usedTextures.add(key);
                 mesh = cachedTextures.get(key);
                 if (mesh == null || mesh.isDisposed()) {
@@ -313,7 +313,7 @@ public class LwjglCanvasRenderer implements TerasologyCanvasRenderer, PropertyCh
             }
         }
 
-        textureMat.setTexture("texture", ((TextureRegion)texture).getTexture());
+        textureMat.setTexture("texture", ((TextureRegion) texture).getTexture());
         textureMat.setFloat4("color", color.rf(), color.gf(), color.bf(), color.af() * alpha);
 
         textureMat.setMatrix4("projectionMatrix", projMatrix);
@@ -341,7 +341,7 @@ public class LwjglCanvasRenderer implements TerasologyCanvasRenderer, PropertyCh
             }
         }
         if (fontMesh == null) {
-            fontMesh = fontMeshBuilder.createTextMesh((org.terasology.engine.rendering.assets.font.Font)font, lines, absoluteRegion.getSizeX(), hAlign, color, shadowColor, underlined);
+            fontMesh = fontMeshBuilder.createTextMesh((org.terasology.engine.rendering.assets.font.Font) font, lines, absoluteRegion.getSizeX(), hAlign, color, shadowColor, underlined);
             cachedText.put(key, fontMesh);
         }
 

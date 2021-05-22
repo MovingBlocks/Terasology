@@ -39,7 +39,7 @@ public class OwnershipHelperTest {
     @BeforeEach
     public void setup() {
         ContextImpl context = new ContextImpl();
-        context.put( ModuleManager.class, moduleManager);
+        context.put(ModuleManager.class, moduleManager);
         NetworkSystem networkSystem = mock(NetworkSystem.class);
         when(networkSystem.getMode()).thenReturn(NetworkMode.NONE);
         context.put(NetworkSystem.class, networkSystem);
