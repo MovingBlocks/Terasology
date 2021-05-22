@@ -6,8 +6,6 @@ import org.terasology.engine.registry.CoreRegistry;
 import org.terasology.gestalt.module.Module;
 import org.terasology.gestalt.naming.Name;
 
-/**
- */
 public final class ModuleContext {
 
     private static ThreadLocal<Module> context = new ThreadLocal<>();

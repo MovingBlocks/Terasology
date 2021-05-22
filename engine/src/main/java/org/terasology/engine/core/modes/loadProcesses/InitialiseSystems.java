@@ -12,8 +12,6 @@ import org.terasology.engine.entitySystem.metadata.EventLibrary;
 import org.terasology.engine.network.NetworkSystem;
 import org.terasology.engine.world.BlockEntityRegistry;
 
-/**
- */
 public class InitialiseSystems extends SingleStepLoadProcess {
 
     private final Context context;

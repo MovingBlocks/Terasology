@@ -3,8 +3,6 @@
 
 package org.terasology.engine.physics;
 
-/**
- */
 public interface CollisionGroup {
     short getFlag();
 

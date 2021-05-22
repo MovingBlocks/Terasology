@@ -4,8 +4,6 @@ package org.terasology.engine.world.time;
 
 import org.terasology.engine.entitySystem.systems.ComponentSystem;
 
-/**
- */
 public interface WorldTime extends ComponentSystem {
 
     /**

@@ -8,8 +8,6 @@ import org.terasology.engine.math.Side;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-/**
- */
 public class SideTest {
 
     @Test

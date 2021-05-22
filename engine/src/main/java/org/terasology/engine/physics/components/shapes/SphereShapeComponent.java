@@ -5,8 +5,6 @@ package org.terasology.engine.physics.components.shapes;
 
 import org.terasology.engine.entitySystem.Component;
 
-/**
- */
 public class SphereShapeComponent implements Component {
     public float radius = 0.5f;
 }

@@ -5,8 +5,6 @@ package org.terasology.engine.network;
 
 import org.terasology.engine.entitySystem.Component;
 
-/**
- */
 public class NetworkComponent implements Component {
     public ReplicateMode replicateMode = ReplicateMode.RELEVANT;
 

@@ -5,8 +5,6 @@ package org.terasology.engine.network.internal;
 import com.google.common.util.concurrent.AtomicDouble;
 import org.terasology.engine.network.JoinStatus;
 
-/**
- */
 public class JoinStatusImpl implements JoinStatus {
     private Status status = Status.IN_PROGRESS;
     private String currentActivity = "";

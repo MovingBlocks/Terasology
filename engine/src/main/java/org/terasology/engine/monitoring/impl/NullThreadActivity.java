@@ -4,8 +4,6 @@ package org.terasology.engine.monitoring.impl;
 
 import org.terasology.engine.monitoring.ThreadActivity;
 
-/**
- */
 public class NullThreadActivity implements ThreadActivity {
     @Override
     public void close() {

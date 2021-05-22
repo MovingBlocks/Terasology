@@ -7,8 +7,6 @@ import org.terasology.engine.entitySystem.entity.LowLevelEntityManager;
 import org.terasology.engine.entitySystem.prefab.Prefab;
 import org.terasology.engine.network.NetworkComponent;
 
-/**
- */
 public class PojoEntityRef extends BaseEntityRef {
     private long id;
     private boolean exists = true;

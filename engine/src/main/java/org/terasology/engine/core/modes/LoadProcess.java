@@ -3,8 +3,6 @@
 
 package org.terasology.engine.core.modes;
 
-/**
- */
 public interface LoadProcess {
 
     /**

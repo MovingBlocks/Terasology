@@ -15,8 +15,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-/**
- */
 public class PojoPrefab extends Prefab {
 
     private Prefab parent;

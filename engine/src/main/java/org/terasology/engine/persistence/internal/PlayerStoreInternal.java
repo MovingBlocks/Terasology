@@ -12,8 +12,6 @@ import org.terasology.protobuf.EntityData;
 
 import java.util.Map;
 
-/**
- */
 final class PlayerStoreInternal implements PlayerStore {
     static final String CHARACTER = "character";
 

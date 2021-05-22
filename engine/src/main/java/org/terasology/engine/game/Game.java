@@ -2,8 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.game;
 
-/**
- */
 public class Game {
 
     private String name = "";

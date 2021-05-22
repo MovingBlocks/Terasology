@@ -12,8 +12,6 @@ import org.terasology.gestalt.assets.module.annotations.RegisterAssetFileFormat;
 import java.io.IOException;
 import java.util.List;
 
-/**
- */
 @RegisterAssetFileFormat
 public class OggStreamingSoundFormat extends AbstractAssetFileFormat<StreamingSoundData> {
 

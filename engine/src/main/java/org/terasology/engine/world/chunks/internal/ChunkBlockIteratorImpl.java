@@ -9,8 +9,6 @@ import org.terasology.engine.world.block.Block;
 import org.terasology.engine.world.block.BlockManager;
 import org.terasology.engine.world.chunks.ChunkBlockIterator;
 
-/**
- */
 public class ChunkBlockIteratorImpl implements ChunkBlockIterator {
 
     private final Vector3i worldOffset = new Vector3i();

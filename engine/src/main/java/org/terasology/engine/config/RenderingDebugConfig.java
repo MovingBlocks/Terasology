@@ -10,8 +10,6 @@ import org.terasology.gestalt.module.sandbox.API;
 import org.terasology.engine.rendering.world.WorldRendererImpl;
 import org.terasology.engine.utilities.subscribables.AbstractSubscribable;
 
-/**
- */
 @API
 public class RenderingDebugConfig extends AbstractSubscribable implements PropertyChangeListener {
     public static final String WIREFRAME = "wireframe";

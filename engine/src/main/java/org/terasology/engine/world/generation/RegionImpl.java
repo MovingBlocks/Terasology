@@ -11,8 +11,6 @@ import org.terasology.engine.world.block.BlockRegion;
 import java.util.Map;
 import java.util.Set;
 
-/**
- */
 public class RegionImpl implements Region, GeneratingRegion {
 
     private final BlockRegion region;

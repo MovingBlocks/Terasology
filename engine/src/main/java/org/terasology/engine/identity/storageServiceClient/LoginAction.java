@@ -4,8 +4,6 @@ package org.terasology.engine.identity.storageServiceClient;
 
 import java.net.URL;
 
-/**
- */
 final class LoginAction implements Action {
 
     private final URL serviceURL;

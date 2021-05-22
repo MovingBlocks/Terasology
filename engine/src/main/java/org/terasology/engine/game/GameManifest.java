@@ -28,8 +28,6 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
-/**
- */
 public class GameManifest {
     public static final String DEFAULT_FILE_NAME = "manifest.json";
 

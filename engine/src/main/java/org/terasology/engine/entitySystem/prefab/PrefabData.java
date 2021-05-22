@@ -11,8 +11,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-/**
- */
 public class PrefabData implements MutableComponentContainer, AssetData {
 
     private Map<Class<? extends Component>, Component> components = Maps.newHashMap();

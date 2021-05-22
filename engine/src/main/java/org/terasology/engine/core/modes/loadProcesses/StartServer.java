@@ -11,8 +11,6 @@ import org.terasology.engine.network.exceptions.HostingFailedException;
 import org.terasology.engine.rendering.nui.NUIManager;
 import org.terasology.engine.rendering.nui.layers.mainMenu.MessagePopup;
 
-/**
- */
 public class StartServer extends SingleStepLoadProcess {
 
     private final Context context;

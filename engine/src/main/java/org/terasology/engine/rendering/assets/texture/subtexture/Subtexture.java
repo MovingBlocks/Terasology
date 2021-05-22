@@ -15,8 +15,6 @@ import org.terasology.engine.rendering.assets.texture.TextureRegionAsset;
 
 import java.util.Optional;
 
-/**
- */
 public class Subtexture extends TextureRegionAsset<SubtextureData> {
 
     private Texture texture;

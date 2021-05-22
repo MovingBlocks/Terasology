@@ -4,8 +4,6 @@ package org.terasology.engine.entitySystem;
 
 import java.util.List;
 
-/**
- */
 public interface ComponentContainer {
 
     /**

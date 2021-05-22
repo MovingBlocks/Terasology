@@ -8,8 +8,6 @@ import org.terasology.gestalt.naming.Name;
 
 import java.util.List;
 
-/**
- */
 public class ModuleConfig {
     private List<Name> modules = Lists.newArrayList();
     private String defaultGameplayModuleName = "";

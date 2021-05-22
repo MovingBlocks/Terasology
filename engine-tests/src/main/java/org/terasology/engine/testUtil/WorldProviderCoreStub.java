@@ -21,8 +21,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 
-/**
- */
 public class WorldProviderCoreStub implements WorldProviderCore {
 
     private Map<Vector3ic, Block> blocks = Maps.newHashMap();

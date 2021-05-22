@@ -7,8 +7,6 @@ import org.joml.Vector3f;
 import org.terasology.engine.entitySystem.event.Event;
 import org.terasology.engine.network.BroadcastEvent;
 
-/**
- */
 @BroadcastEvent
 public class ImpulseEvent implements Event {
     private Vector3f impulse;

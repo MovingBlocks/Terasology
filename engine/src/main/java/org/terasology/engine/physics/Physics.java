@@ -9,8 +9,6 @@ import org.terasology.engine.entitySystem.entity.EntityRef;
 import java.util.List;
 import java.util.Set;
 
-/**
- */
 public interface Physics {
     /**
      * Executes a rayTrace on the physics engine.

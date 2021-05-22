@@ -5,8 +5,6 @@ package org.terasology.engine.entitySystem.event;
 
 import org.terasology.engine.network.NoReplicate;
 
-/**
- */
 public abstract class AbstractConsumableEvent implements ConsumableEvent {
     @NoReplicate
     protected boolean consumed;

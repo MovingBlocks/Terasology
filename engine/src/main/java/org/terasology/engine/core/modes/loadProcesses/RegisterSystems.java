@@ -12,8 +12,6 @@ import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.engine.core.subsystem.EngineSubsystem;
 import org.terasology.engine.network.NetworkMode;
 
-/**
- */
 public class RegisterSystems extends SingleStepLoadProcess {
     private final Context context;
     private final NetworkMode netMode;

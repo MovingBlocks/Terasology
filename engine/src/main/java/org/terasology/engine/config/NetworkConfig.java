@@ -10,8 +10,6 @@ import org.terasology.engine.core.TerasologyConstants;
 import java.util.Collections;
 import java.util.List;
 
-/**
- */
 public class NetworkConfig {
 
     private List<ServerInfo> servers = Lists.newArrayList(new ServerInfo("localhost", "localhost", TerasologyConstants.DEFAULT_PORT));

@@ -3,8 +3,6 @@
 
 package org.terasology.engine.entitySystem.event;
 
-/**
- */
 public final class EventPriority {
     public static final int PRIORITY_CRITICAL = 200;
     public static final int PRIORITY_HIGH = 150;

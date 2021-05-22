@@ -2,8 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.world.block;
 
-/**
- */
 public class BlockUriParseException extends RuntimeException {
 
     private static final long serialVersionUID = 5571599578432666018L;

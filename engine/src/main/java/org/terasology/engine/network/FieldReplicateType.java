@@ -3,8 +3,6 @@
 
 package org.terasology.engine.network;
 
-/**
- */
 public enum FieldReplicateType {
     SERVER_TO_CLIENT(false),
     SERVER_TO_OWNER(false),

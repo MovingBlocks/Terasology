@@ -10,8 +10,6 @@ import java.util.Collections;
 import java.util.Locale;
 import java.util.Map;
 
-/**
- */
 public class CollisionGroupManager {
 
     private Map<String, CollisionGroup> collisionGroupMap = Maps.newHashMap();

@@ -7,8 +7,6 @@ import org.terasology.engine.identity.PublicIdentityCertificate;
 
 import java.util.Map;
 
-/**
- */
 final class PutIdentityAction implements Action {
 
     private final Map<PublicIdentityCertificate, ClientIdentity> identities;

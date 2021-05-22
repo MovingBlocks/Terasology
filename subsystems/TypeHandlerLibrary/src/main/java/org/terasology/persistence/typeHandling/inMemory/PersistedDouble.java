@@ -2,8 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.persistence.typeHandling.inMemory;
 
-/**
- */
 public class PersistedDouble extends PersistedNumber {
     private double data;
 

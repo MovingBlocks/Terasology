@@ -24,8 +24,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-/**
- */
 public class WorldBuilder extends ProviderStore {
 
     private static final Logger logger = LoggerFactory.getLogger(WorldBuilder.class);

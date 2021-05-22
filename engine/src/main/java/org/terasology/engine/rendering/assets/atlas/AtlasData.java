@@ -8,8 +8,6 @@ import org.terasology.gestalt.naming.Name;
 
 import java.util.Map;
 
-/**
- */
 public class AtlasData implements AssetData {
 
     private Map<Name, SubtextureData> subtextures;

@@ -8,8 +8,6 @@ import org.terasology.engine.core.modes.SingleStepLoadProcess;
 import org.terasology.engine.rendering.nui.NUIManager;
 import org.terasology.engine.rendering.nui.internal.NUIManagerInternal;
 
-/**
- */
 public class InitialiseGraphics extends SingleStepLoadProcess {
 
     private final Context context;

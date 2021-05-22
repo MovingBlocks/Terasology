@@ -7,8 +7,6 @@ import org.terasology.engine.entitySystem.entity.internal.BaseEntityRef;
 import org.terasology.engine.entitySystem.entity.internal.DefaultRefStrategy;
 import org.terasology.engine.network.NetworkComponent;
 
-/**
- */
 public class NetworkClientRefStrategy extends DefaultRefStrategy {
 
     private NetworkSystemImpl system;

@@ -21,8 +21,6 @@ import org.terasology.engine.world.generator.WorldGenerator;
 
 import java.util.Iterator;
 
-/**
- */
 public class CreateWorldEntity extends SingleStepLoadProcess {
 
     private static final Logger logger = LoggerFactory.getLogger(CreateWorldEntity.class);

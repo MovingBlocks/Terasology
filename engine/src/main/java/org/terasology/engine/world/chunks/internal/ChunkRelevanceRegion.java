@@ -18,8 +18,6 @@ import org.terasology.engine.world.chunks.Chunks;
 import java.util.Iterator;
 import java.util.Set;
 
-/**
- */
 public class ChunkRelevanceRegion {
     private EntityRef entity;
     private Vector3i relevanceDistance = new Vector3i();

@@ -18,8 +18,6 @@ import org.terasology.engine.rendering.assets.texture.TextureData;
 import java.nio.ByteBuffer;
 import java.util.List;
 
-/**
- */
 public class OpenGLTexture extends Texture {
 
     private static final Logger logger = LoggerFactory.getLogger(OpenGLTexture.class);

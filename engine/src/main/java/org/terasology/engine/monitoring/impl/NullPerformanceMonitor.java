@@ -6,8 +6,6 @@ import gnu.trove.map.TObjectDoubleMap;
 import gnu.trove.map.hash.TObjectDoubleHashMap;
 import org.terasology.engine.monitoring.Activity;
 
-/**
- */
 public class NullPerformanceMonitor implements PerformanceMonitorInternal {
     private static final NullActivity NULL_ACTIVITY = new NullActivity();
     private TObjectDoubleMap<String> metrics = new TObjectDoubleHashMap<>();

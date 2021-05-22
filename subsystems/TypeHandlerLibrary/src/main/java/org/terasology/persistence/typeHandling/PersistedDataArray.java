@@ -9,8 +9,6 @@ import gnu.trove.list.TLongList;
 
 import java.util.List;
 
-/**
- */
 public interface PersistedDataArray extends PersistedData, Iterable<PersistedData> {
 
     int size();

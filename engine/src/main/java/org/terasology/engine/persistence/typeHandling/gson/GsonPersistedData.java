@@ -4,8 +4,6 @@ package org.terasology.engine.persistence.typeHandling.gson;
 
 import com.google.gson.JsonElement;
 
-/**
- */
 public class GsonPersistedData extends AbstractGsonPersistedData {
 
     private final JsonElement element;

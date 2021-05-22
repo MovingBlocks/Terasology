@@ -23,8 +23,6 @@ import static org.terasology.engine.entitySystem.entity.internal.EntityScope.CHU
 import static org.terasology.engine.entitySystem.entity.internal.EntityScope.GLOBAL;
 import static org.terasology.engine.entitySystem.entity.internal.EntityScope.SECTOR;
 
-/**
- */
 public abstract class BaseEntityRef extends EntityRef {
 
     private static final Logger logger = LoggerFactory.getLogger(BaseEntityRef.class);

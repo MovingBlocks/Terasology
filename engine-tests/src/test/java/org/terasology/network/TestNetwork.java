@@ -24,8 +24,6 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.Mockito.mock;
 
-/**
- */
 @Tag("TteTest")
 public class TestNetwork extends TerasologyTestingEnvironment {
 

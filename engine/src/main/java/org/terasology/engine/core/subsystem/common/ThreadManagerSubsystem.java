@@ -14,8 +14,6 @@ import org.terasology.engine.utilities.concurrency.TaskMaster;
 
 import java.util.concurrent.RejectedExecutionException;
 
-/**
- */
 public class ThreadManagerSubsystem implements EngineSubsystem, ThreadManager {
 
     private static final int MAX_NUMBER_THREADS = 16;

@@ -26,8 +26,6 @@ import org.terasology.protobuf.EntityData;
 import java.util.Map;
 import java.util.Optional;
 
-/**
- */
 final class GlobalStoreLoader {
 
     private static final Logger logger = LoggerFactory.getLogger(GlobalStoreLoader.class);

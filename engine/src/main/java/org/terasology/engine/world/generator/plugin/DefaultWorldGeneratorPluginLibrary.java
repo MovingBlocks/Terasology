@@ -14,8 +14,6 @@ import org.terasology.reflection.reflect.ReflectFactory;
 
 import java.util.List;
 
-/**
- */
 public class DefaultWorldGeneratorPluginLibrary implements WorldGeneratorPluginLibrary {
 
     private final ClassLibrary<WorldGeneratorPlugin> library;

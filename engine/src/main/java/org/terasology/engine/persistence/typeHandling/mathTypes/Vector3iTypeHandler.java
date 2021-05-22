@@ -11,8 +11,6 @@ import org.terasology.persistence.typeHandling.TypeHandler;
 
 import java.util.Optional;
 
-/**
- */
 public class Vector3iTypeHandler extends TypeHandler<Vector3i> {
 
     @Override

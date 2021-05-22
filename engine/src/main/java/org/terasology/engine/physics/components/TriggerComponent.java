@@ -12,8 +12,6 @@ import org.terasology.engine.world.block.ForceBlockActive;
 
 import java.util.List;
 
-/**
- */
 @ForceBlockActive
 public class TriggerComponent implements Component {
     @Replicate

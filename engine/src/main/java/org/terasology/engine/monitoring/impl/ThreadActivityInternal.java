@@ -4,8 +4,6 @@ package org.terasology.engine.monitoring.impl;
 
 import org.terasology.engine.monitoring.ThreadActivity;
 
-/**
- */
 public class ThreadActivityInternal implements ThreadActivity {
 
     private SingleThreadMonitor monitor;

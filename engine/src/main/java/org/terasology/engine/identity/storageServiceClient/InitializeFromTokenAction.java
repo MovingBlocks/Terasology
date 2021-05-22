@@ -2,8 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.identity.storageServiceClient;
 
-/**
- */
 final class InitializeFromTokenAction implements Action {
 
     @Override

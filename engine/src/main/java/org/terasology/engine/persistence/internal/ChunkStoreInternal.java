@@ -11,8 +11,6 @@ import org.terasology.engine.world.chunks.Chunk;
 import org.terasology.engine.world.chunks.blockdata.ExtraBlockDataManager;
 import org.terasology.engine.world.chunks.internal.ChunkSerializer;
 
-/**
- */
 final class ChunkStoreInternal implements ChunkStore {
 
     private Vector3i chunkPosition;

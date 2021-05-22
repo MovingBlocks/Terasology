@@ -23,8 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- */
 public class RegisterMods extends SingleStepLoadProcess {
 
     private static final Logger logger = LoggerFactory.getLogger(RegisterMods.class);

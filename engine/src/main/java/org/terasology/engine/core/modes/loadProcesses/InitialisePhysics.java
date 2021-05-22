@@ -8,8 +8,6 @@ import org.terasology.engine.physics.Physics;
 import org.terasology.engine.physics.engine.PhysicsEngine;
 import org.terasology.engine.physics.engine.PhysicsEngineManager;
 
-/**
- */
 public class InitialisePhysics extends SingleStepLoadProcess {
     private final Context context;
 

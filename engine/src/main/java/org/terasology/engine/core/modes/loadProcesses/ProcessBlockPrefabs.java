@@ -9,8 +9,6 @@ import org.terasology.engine.world.block.BlockManager;
 import org.terasology.engine.world.block.internal.BlockManagerImpl;
 import org.terasology.engine.world.block.internal.BlockPrefabManager;
 
-/**
- */
 public class ProcessBlockPrefabs extends SingleStepLoadProcess {
 
     private final Context context;

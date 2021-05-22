@@ -9,8 +9,6 @@ import org.terasology.engine.identity.PublicIdentityCertificate;
 
 import java.util.Map;
 
-/**
- */
 final class SyncIdentitiesAction implements Action {
 
     @Override

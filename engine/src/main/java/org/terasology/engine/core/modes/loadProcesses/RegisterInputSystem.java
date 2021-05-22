@@ -10,8 +10,6 @@ import org.terasology.engine.input.InputSystem;
 import org.terasology.engine.input.cameraTarget.CameraTargetSystem;
 import org.terasology.engine.logic.players.LocalPlayerSystem;
 
-/**
- */
 public class RegisterInputSystem extends SingleStepLoadProcess {
 
     private final Context context;

@@ -30,8 +30,6 @@ import java.util.Deque;
 import java.util.Iterator;
 import java.util.Map;
 
-/**
- */
 @RegisterSystem(RegisterMode.REMOTE_CLIENT)
 public class ClientCharacterPredictionSystem extends BaseComponentSystem implements UpdateSubscriberSystem {
     private static final Logger logger = LoggerFactory.getLogger(ClientCharacterPredictionSystem.class);

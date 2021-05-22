@@ -17,8 +17,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-/**
- */
 final class GlobalStoreBuilder {
 
     private final long nextEntityId;

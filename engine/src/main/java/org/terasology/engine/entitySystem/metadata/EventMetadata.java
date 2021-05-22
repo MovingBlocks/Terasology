@@ -18,8 +18,6 @@ import org.terasology.engine.network.ServerEvent;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 
-/**
- */
 public class EventMetadata<T extends Event> extends ClassMetadata<T, ReplicatedFieldMetadata<T, ?>> {
     private static final Logger logger = LoggerFactory.getLogger(EventMetadata.class);
 

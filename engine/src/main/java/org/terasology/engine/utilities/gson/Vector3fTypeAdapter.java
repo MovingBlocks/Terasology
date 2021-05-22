@@ -12,8 +12,6 @@ import org.joml.Vector3f;
 
 import java.lang.reflect.Type;
 
-/**
- */
 public class Vector3fTypeAdapter implements JsonDeserializer<Vector3f> {
     @Override
     public Vector3f deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {

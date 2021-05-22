@@ -21,8 +21,6 @@ import java.io.OutputStreamWriter;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-/**
- */
 public class EntityDataJSONFormatTest {
 
     public static final String VALUE_NAME = "Name";

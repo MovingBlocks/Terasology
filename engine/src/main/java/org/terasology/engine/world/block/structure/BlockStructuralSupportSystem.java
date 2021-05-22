@@ -28,8 +28,6 @@ import java.util.Comparator;
 import java.util.Map;
 import java.util.Set;
 
-/**
- */
 @RegisterSystem
 @Share(BlockStructuralSupportRegistry.class)
 public class BlockStructuralSupportSystem extends BaseComponentSystem implements BlockStructuralSupportRegistry {

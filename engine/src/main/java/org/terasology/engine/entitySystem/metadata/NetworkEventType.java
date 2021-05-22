@@ -3,8 +3,6 @@
 
 package org.terasology.engine.entitySystem.metadata;
 
-/**
- */
 public enum NetworkEventType {
 
     /**

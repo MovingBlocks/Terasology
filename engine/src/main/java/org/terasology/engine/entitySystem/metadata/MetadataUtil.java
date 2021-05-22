@@ -6,8 +6,6 @@ import org.terasology.engine.entitySystem.Component;
 
 import java.util.Locale;
 
-/**
- */
 public final class MetadataUtil {
 
     private MetadataUtil() {

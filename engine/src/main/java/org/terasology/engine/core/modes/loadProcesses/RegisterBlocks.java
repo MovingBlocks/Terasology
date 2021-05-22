@@ -22,8 +22,6 @@ import org.terasology.gestalt.assets.management.AssetManager;
 import org.terasology.gestalt.module.ModuleEnvironment;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 
-/**
- */
 public class RegisterBlocks extends SingleStepLoadProcess {
     private final Context context;
     private final GameManifest gameManifest;

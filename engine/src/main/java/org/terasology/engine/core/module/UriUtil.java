@@ -4,8 +4,6 @@ package org.terasology.engine.core.module;
 
 import java.util.Locale;
 
-/**
- */
 public final class UriUtil {
 
     private UriUtil() {

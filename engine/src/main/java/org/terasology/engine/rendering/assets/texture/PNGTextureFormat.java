@@ -15,8 +15,6 @@ import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.function.Predicate;
 
-/**
- */
 public class PNGTextureFormat extends AbstractAssetFileFormat<TextureData> {
 
     private Texture.FilterMode defaultFilterMode;

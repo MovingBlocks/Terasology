@@ -24,8 +24,6 @@ import java.lang.reflect.Modifier;
 import java.util.List;
 import java.util.Set;
 
-/**
- */
 public final class MethodCommand extends AbstractCommand {
     private static final Logger logger = LoggerFactory.getLogger(MethodCommand.class);
     private static final String ENTITY_REF_NAME = "org.terasology.engine.entitySystem.entity.EntityRef";

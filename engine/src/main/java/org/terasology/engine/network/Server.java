@@ -8,8 +8,6 @@ import org.terasology.engine.entitySystem.event.Event;
 import org.terasology.protobuf.NetData;
 import org.terasology.engine.world.chunks.remoteChunkProvider.ChunkReadyListener;
 
-/**
- */
 public interface Server extends ChunkReadyListener {
 
     EntityRef getClientEntity();

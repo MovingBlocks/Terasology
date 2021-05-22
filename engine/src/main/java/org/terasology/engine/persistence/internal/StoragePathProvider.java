@@ -9,8 +9,6 @@ import org.terasology.engine.game.GameManifest;
 
 import java.nio.file.Path;
 
-/**
- */
 public class StoragePathProvider {
     private static final String PLAYERS_PATH = "players";
     private static final String WORLDS_PATH = "worlds";

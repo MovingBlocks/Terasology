@@ -5,8 +5,6 @@ package org.terasology.persistence.typeHandling;
 
 import java.nio.ByteBuffer;
 
-/**
- */
 public interface PersistedData {
 
     /**

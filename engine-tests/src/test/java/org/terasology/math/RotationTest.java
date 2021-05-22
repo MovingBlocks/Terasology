@@ -17,8 +17,6 @@ import org.terasology.engine.math.Yaw;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.terasology.joml.test.QuaternionAssert.assertEquals;
 
-/**
- */
 public class RotationTest {
 
     @Test

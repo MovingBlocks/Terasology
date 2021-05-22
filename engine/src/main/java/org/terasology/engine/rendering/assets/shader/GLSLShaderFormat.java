@@ -26,8 +26,6 @@ import java.lang.reflect.Type;
 import java.util.List;
 import java.util.function.Predicate;
 
-/**
- */
 @RegisterAssetFileFormat
 public class GLSLShaderFormat implements AssetFileFormat<ShaderData> {
     public static final String FRAGMENT_SUFFIX = "_frag.glsl";

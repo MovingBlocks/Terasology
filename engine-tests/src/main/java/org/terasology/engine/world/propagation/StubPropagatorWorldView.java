@@ -13,8 +13,6 @@ import org.terasology.engine.world.block.BlockRegionc;
 
 import java.util.Map;
 
-/**
- */
 public class StubPropagatorWorldView implements PropagatorWorldView {
     private TObjectByteMap<Vector3ic> lightData = new TObjectByteHashMap<>();
     private Map<Vector3ic, Block> blockData = Maps.newHashMap();

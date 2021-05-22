@@ -11,8 +11,6 @@ import org.terasology.reflection.reflect.ReflectionReflectFactory;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/**
- */
 public class FieldMetadataTest {
 
     private ReflectFactory factory = new ReflectionReflectFactory();

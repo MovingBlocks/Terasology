@@ -19,8 +19,6 @@ import org.terasology.engine.registry.In;
 import org.terasology.engine.rendering.nui.NUIManager;
 import org.terasology.engine.rendering.nui.ScreenLayerClosedEvent;
 
-/**
- */
 @RegisterSystem(RegisterMode.ALWAYS)
 public class InteractionSystem extends BaseComponentSystem {
     private static final Logger logger = LoggerFactory.getLogger(InteractionSystem.class);

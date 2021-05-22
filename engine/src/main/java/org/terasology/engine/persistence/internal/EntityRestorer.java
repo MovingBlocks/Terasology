@@ -13,8 +13,6 @@ import org.terasology.protobuf.EntityData;
 
 import java.util.Map;
 
-/**
- */
 final class EntityRestorer {
 
     private EngineEntityManager entityManager;

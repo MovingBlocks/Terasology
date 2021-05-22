@@ -4,8 +4,6 @@ package org.terasology.engine.entitySystem.entity.internal;
 
 import org.terasology.engine.entitySystem.entity.LowLevelEntityManager;
 
-/**
- */
 public class DefaultRefStrategy implements RefStrategy {
     @Override
     public BaseEntityRef createRefFor(long id, LowLevelEntityManager entityManager) {

@@ -5,8 +5,6 @@ package org.terasology.engine.persistence;
 import org.joml.Vector3fc;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 
-/**
- */
 public interface PlayerStore {
 
     /**

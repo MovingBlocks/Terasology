@@ -16,8 +16,6 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.List;
 
-/**
- */
 @RegisterAssetFileFormat
 public class OggSoundFormat extends AbstractAssetFileFormat<StaticSoundData> {
 

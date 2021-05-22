@@ -7,8 +7,6 @@ import org.terasology.engine.context.Context;
 import org.terasology.engine.core.bootstrap.EntitySystemSetupUtil;
 import org.terasology.engine.core.modes.SingleStepLoadProcess;
 
-/**
- */
 public class InitialiseEntitySystem extends SingleStepLoadProcess {
 
     private final Context context;

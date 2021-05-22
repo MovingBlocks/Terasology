@@ -5,8 +5,6 @@ package org.terasology.engine.physics;
 
 import java.util.Locale;
 
-/**
- */
 public enum StandardCollisionGroup implements CollisionGroup {
     NONE((short) 0b00000000),
     DEFAULT((short) 0b00000001),

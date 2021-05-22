@@ -85,8 +85,6 @@ import java.util.Set;
 
 import static com.google.common.base.Verify.verifyNotNull;
 
-/**
- */
 public class NUIManagerInternal extends BaseComponentSystem implements NUIManager, PropertyChangeListener {
     private final ModuleEnvironment moduleEnvironment;
     private final TypeWidgetFactoryRegistry typeWidgetFactoryRegistry;

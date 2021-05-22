@@ -13,8 +13,6 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
-/**
- */
 public final class OwnershipHelper {
     private ComponentLibrary componentLibrary;
 
