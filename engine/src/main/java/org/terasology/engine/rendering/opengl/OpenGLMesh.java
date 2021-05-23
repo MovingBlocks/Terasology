@@ -43,7 +43,7 @@ public class OpenGLMesh extends Mesh {
 
     public OpenGLMesh(ResourceUrn urn, AssetType<?, MeshData> assetType, MeshData data,
                       DisposalAction disposalAction, LwjglGraphicsProcessing graphicsProcessing) {
-        super(urn, assetType);
+        super(urn, assetType, disposalAction);
         this.disposalAction = disposalAction;
         graphicsProcessing.asynchToDisplayThread(() -> {
             reload(data);
