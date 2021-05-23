@@ -151,7 +151,7 @@ public class VisualCharacterSystemTest {
         EntityRef entityRef = Mockito.mock(EntityRef.class);
         // Proper getId and exists method are needed to make equals work properly.
         Mockito.when(entityRef.getId()).thenReturn(nextEntityId++);
-        Mockito.when(entityRef.exists()).thenReturn(false);
+        Mockito.when(entityRef.exists()).thenReturn(true);
         return entityRef;
     }
 
