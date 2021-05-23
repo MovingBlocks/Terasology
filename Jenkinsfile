@@ -29,8 +29,14 @@ node ("ts-engine && heavy && java8") {
     }
 
     stage('Unit Tests') {
-        sh './gradlew unitTest'
-        junit testResults: '**/build/test-results/unitTest/*.xml', allowEmptyResults: true
+        steps {
+            sh './gradlew unitTest'
+        }
+        post {
+            always {
+                junit testResults: '**/build/test-results/unitTest/*.xml'
+            }
+        }
     }
 
     stage('Publish') {
@@ -55,8 +61,14 @@ node ("ts-engine && heavy && java8") {
     }
 
     stage('IntegrationTests') {
-        sh './gradlew integrationTest'
-        junit testResults: '**build/test-restults/integrationTest/*.xml', allowEmptyResults: true
+        steps {
+            sh './gradlew integrationTest'
+        }
+        post {
+            always {
+                junit testResults: '**build/test-restults/integrationTest/*.xml', allowEmptyResults: true
+            }
+        }
     }
 
     stage('Analytics') {
