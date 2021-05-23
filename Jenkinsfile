@@ -31,9 +31,6 @@ node ("ts-engine && heavy && java8") {
     stage('Unit Tests') {
         try {
             sh './gradlew --console=plain unitTest'
-        } catch (e) {
-            echo 'Unit Tests failed'
-            throw e
         } finally {
             junit testResults: '**/build/test-results/unitTest/*.xml'
         }
@@ -63,9 +60,6 @@ node ("ts-engine && heavy && java8") {
     stage('Integration Tests') {
         try {
             sh './gradlew --console=plain integrationTest'
-        } catch (e) {
-            echo 'Integration Tests failed'
-            throw e
         } finally {
             junit testResults: '**build/test-restults/integrationTest/*.xml', allowEmptyResults: true
         }
