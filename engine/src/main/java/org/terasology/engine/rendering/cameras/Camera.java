@@ -3,16 +3,16 @@
 package org.terasology.engine.rendering.cameras;
 
 import org.joml.AxisAngle4f;
+import org.joml.FrustumIntersection;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Quaternionfc;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
-import org.lwjgl.BufferUtils;
 import org.terasology.engine.config.Config;
-import org.terasology.joml.geom.AABBfc;
 import org.terasology.engine.math.Direction;
 import org.terasology.engine.registry.CoreRegistry;
+import org.terasology.joml.geom.AABBfc;
 
 /**
  * Camera base class.
@@ -37,8 +37,8 @@ public abstract class Camera {
     protected float activeFov = targetFov / 4f;
 
     /* VIEW FRUSTUM */
-    protected final ViewFrustum viewFrustum = new ViewFrustum();
-    protected final ViewFrustum viewFrustumReflected = new ViewFrustum();
+    protected final FrustumIntersection viewFrustum = new FrustumIntersection();
+    protected final FrustumIntersection viewFrustumReflected = new FrustumIntersection();
 
     /* MATRICES */
     protected Matrix4f projectionMatrix = new Matrix4f();
@@ -85,9 +85,8 @@ public abstract class Camera {
         if (getViewMatrix() == null || getProjectionMatrix() == null) {
             return;
         }
-
-        viewFrustum.updateFrustum(viewMatrix.get(BufferUtils.createFloatBuffer(16)), projectionMatrix.get(BufferUtils.createFloatBuffer(16)));
-        viewFrustumReflected.updateFrustum(viewMatrixReflected.get(BufferUtils.createFloatBuffer(16)), projectionMatrix.get(BufferUtils.createFloatBuffer(16)));
+        viewFrustumReflected.set(projectionMatrix.mul(viewMatrixReflected, new Matrix4f()));
+        viewFrustum.set(viewProjectionMatrix, true);
     }
 
     public abstract boolean isBobbingAllowed();
@@ -200,11 +199,11 @@ public abstract class Camera {
         viewingAngle = axisAngle.angle;
     }
 
-    public ViewFrustum getViewFrustum() {
+    public FrustumIntersection getViewFrustum() {
         return viewFrustum;
     }
 
-    public ViewFrustum getViewFrustumReflected() {
+    public FrustumIntersection getViewFrustumReflected() {
         return viewFrustumReflected;
     }
 
@@ -229,6 +228,6 @@ public abstract class Camera {
     }
 
     public boolean hasInSight(AABBfc aabb) {
-        return viewFrustum.intersects(aabb);
+        return viewFrustum.testAab(aabb.minX() - position.x, aabb.minY() - position.y, aabb.minZ() - position.z, aabb.maxX() - position.x, aabb.maxY() - position.y, aabb.maxZ() - position.z);
     }
 }

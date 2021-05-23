@@ -12,7 +12,6 @@ import org.joml.Vector3fc;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL15;
-import org.terasology.engine.core.subsystem.lwjgl.GLBufferPool;
 import org.terasology.gestalt.module.sandbox.API;
 import org.terasology.engine.rendering.VertexBufferObjectUtil;
 import org.terasology.engine.rendering.assets.material.Material;
@@ -102,10 +101,7 @@ public class ChunkMesh {
     private int timeToGenerateBlockVertices;
     private int timeToGenerateOptimizedBuffers;
 
-    private GLBufferPool bufferPool;
-
-    public ChunkMesh(GLBufferPool bufferPool) {
-        this.bufferPool = bufferPool;
+    public ChunkMesh() {
         for (RenderType type : RenderType.values()) {
             vertexElements.put(type, new VertexElements());
         }
@@ -156,8 +152,8 @@ public class ChunkMesh {
         VertexElements elements = vertexElements.get(type);
         int id = type.getIndex();
         if (!disposed && elements.finalIndices.limit() > 0 && elements.finalVertices.limit() > 0) {
-            vertexBuffers[id] = bufferPool != null ? bufferPool.get("chunkMesh") : GL15.glGenBuffers();
-            idxBuffers[id] = bufferPool != null ? bufferPool.get("chunkMesh") : GL15.glGenBuffers();
+            vertexBuffers[id] = GL15.glGenBuffers();
+            idxBuffers[id] = GL15.glGenBuffers();
             vertexCount[id] = elements.finalIndices.limit();
 
             VertexBufferObjectUtil.bufferVboElementData(idxBuffers[id], elements.finalIndices, GL15.GL_STATIC_DRAW);
@@ -291,21 +287,13 @@ public class ChunkMesh {
                 for (int i = 0; i < vertexBuffers.length; i++) {
                     int id = vertexBuffers[i];
                     if (id != 0) {
-                        if (bufferPool != null) {
-                            bufferPool.dispose(id);
-                        } else {
-                            GL15.glDeleteBuffers(id);
-                        }
+                        GL15.glDeleteBuffers(id);
                         vertexBuffers[i] = 0;
                     }
 
                     id = idxBuffers[i];
                     if (id != 0) {
-                        if (bufferPool != null) {
-                            bufferPool.dispose(id);
-                        } else {
-                            GL15.glDeleteBuffers(id);
-                        }
+                        GL15.glDeleteBuffers(id);
                         idxBuffers[i] = 0;
                     }
                 }

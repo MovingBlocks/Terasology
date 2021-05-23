@@ -22,14 +22,13 @@ import org.terasology.engine.rendering.world.WorldRendererImpl;
 
 public class LwjglRenderingSubsystemFactory implements RenderingSubsystemFactory {
 
-    private GLBufferPool bufferPool;
 
-    public LwjglRenderingSubsystemFactory(GLBufferPool bufferPool) {
-        this.bufferPool = bufferPool;
+    public LwjglRenderingSubsystemFactory() {
+
     }
 
     @Override
     public WorldRenderer createWorldRenderer(Context context) {
-        return new WorldRendererImpl(context, bufferPool);
+        return new WorldRendererImpl(context);
     }
 }

@@ -20,7 +20,10 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import org.terasology.engine.core.SimpleUri;
 import org.terasology.engine.core.TerasologyConstants;
+import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.utilities.gson.CaseInsensitiveEnumTypeAdapterFactory;
 import org.terasology.engine.utilities.gson.UriTypeAdapterFactory;
 import org.terasology.engine.world.internal.WorldInfo;
@@ -50,6 +53,7 @@ public class GameManifest {
     private Map<String, Short> blockIdMap = Maps.newHashMap();
     private Map<String, WorldInfo> worlds = Maps.newHashMap();
     private List<NameVersion> modules = Lists.newArrayList();
+    private Map<SimpleUri, Map<String, JsonElement>> moduleConfigs = Maps.newHashMap();
 
     public GameManifest() {
     }
@@ -62,6 +66,10 @@ public class GameManifest {
             this.seed = seed;
         }
         this.time = time;
+    }
+
+    public Map<SimpleUri, Map<String, JsonElement>> getModuleConfigs() {
+        return moduleConfigs;
     }
 
     public String getTitle() {
@@ -124,6 +132,37 @@ public class GameManifest {
         try (Writer writer = Files.newBufferedWriter(toFile, TerasologyConstants.CHARSET)) {
             createGson().toJson(gameManifest, writer);
         }
+    }
+
+    /**
+     * @param generatorUri the generator Uri
+     * @param configs      the new config params for the world generator
+     */
+    public void setModuleConfigs(SimpleUri generatorUri, Map<String, Component> configs) {
+        Gson gson = createGson();
+        Map<String, JsonElement> map = Maps.newHashMap();
+        for (Map.Entry<String, Component> entry : configs.entrySet()) {
+            JsonElement json = gson.toJsonTree(entry.getValue());
+            map.put(entry.getKey(), json);
+        }
+        getModuleConfigs().put(generatorUri, map);
+    }
+
+    /**
+     * @param uri   the uri to look up
+     * @param key   the look-up key
+     * @param clazz the class to convert the data to
+     * @return a config component for the given uri and class or <code>null</code>
+     */
+    public <T extends Component> T getModuleConfig(SimpleUri uri, String key, Class<T> clazz) {
+        Map<String, JsonElement> map = getModuleConfigs().get(uri);
+        if (map == null) {
+            return null;
+        }
+
+        JsonElement element = map.get(key);
+        Gson gson = createGson();
+        return gson.fromJson(element, clazz);
     }
 
     public static GameManifest load(Path filePath) throws IOException {

@@ -61,6 +61,7 @@ import org.terasology.gestalt.assets.module.autoreload.AutoReloadAssetTypeManage
 import org.terasology.nui.UIWidget;
 import org.terasology.nui.asset.UIElement;
 import org.terasology.nui.skin.UISkinAsset;
+import org.terasology.persistence.typeHandling.TypeHandler;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.reflection.ModuleTypeRegistry;
 import org.terasology.reflection.TypeRegistry;
@@ -136,8 +137,8 @@ public class TerasologyEngine implements GameEngine {
      * subsystems and managers. It also verifies that some required systems
      * are up and running after they have been initialized.
      *
-     * @param subsystems Typical subsystems lists contain graphics, timer,
-     *                   audio and input subsystems.
+     * @param timeSubsystem the timer subsystem
+     * @param subsystems other typical subsystems, e.g., graphics, audio and input subsystems.
      */
     public TerasologyEngine(TimeSubsystem timeSubsystem, Collection<EngineSubsystem> subsystems) {
         // configure native paths
@@ -183,8 +184,13 @@ public class TerasologyEngine implements GameEngine {
         // add all subsystem as engine module part. (needs for ECS classes loaded from external subsystems)
         allSubsystems.stream().map(Object::getClass).forEach(this::addToClassesOnClasspathsToAddToEngine);
 
+        // the TypeHandlerLibrary is technically not a subsystem (although it lives in the subsystem space)
+        // therefore, we have to manually register the type handler classes with the engine module
+        addToClassesOnClasspathsToAddToEngine(TypeHandler.class);
+
         // register NUI classes with engine module
         addToClassesOnClasspathsToAddToEngine(UIWidget.class);
+        // register gestalt asset classes with engine module
         addToClassesOnClasspathsToAddToEngine(ResourceUrn.class);
     }
 
