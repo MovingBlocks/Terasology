@@ -45,8 +45,8 @@ public class IndexResource extends BufferedResource {
         posIndex++;
     }
 
-    public void reallocate(int indices) {
-        ensureCapacity(indices * Integer.BYTES);
+    public void allocateElements(int indices) {
+        allocate(indices * Integer.BYTES);
         inIndices = indices;
     }
 

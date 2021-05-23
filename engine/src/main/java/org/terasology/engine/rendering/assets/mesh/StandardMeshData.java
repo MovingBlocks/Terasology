@@ -112,7 +112,7 @@ public class StandardMeshData extends MeshData {
         uv1Buffer.allocateElements(numVerts);
         lightBuffer.allocateElements(numVerts);
         colorBuffer.allocateElements(numVerts);
-        indices.reallocate(numIndices);
+        indices.allocateElements(numIndices);
     }
 
     @Override
