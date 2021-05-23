@@ -140,6 +140,14 @@ public final class PathManager {
         return instance;
     }
 
+    /**
+     * INTERNAL: use only for testing!
+     *
+     * Inject a path manager instance to be used as the "singleton" instance.
+     *
+     * @param pathManager the new "singleton" instance, will be returned by subsequent calls to {@link #getInstance()}
+     * @return the old path manager instance
+     */
     static PathManager setInstance(PathManager pathManager) {
         PathManager oldInstance = instance;
         instance = pathManager;

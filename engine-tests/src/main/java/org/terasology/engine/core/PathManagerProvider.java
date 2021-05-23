@@ -10,9 +10,28 @@ import org.junit.jupiter.api.extension.ParameterResolver;
 
 import static org.mockito.Mockito.mock;
 
+/**
+ * Provide a mock PathManager to unit tests.
+ * <p>
+ * This is a mock PathManager instance created by Mockito. It does not forward or have
+ * any other behavior unless you use {@code mockito.when} to specify it.
+ * <p>
+ * Use by including this class in {@code ExtendWith}. For example:
+ *
+ * <pre>
+ * &#64;ExtendWith({MockitoExtension.class, PathManagerProvider.class})
+ * public class FooTest {
+ *
+ *     &#64;Test
+ *     public void testThisDoesThisAndNotThat(PathManager pathManager) {
+ *         when(pathManager.getModulePaths()).thenReturn(Collections.emptyList());
+ *         manager = new ModuleManager("");
+ * </pre>
+ */
 public class PathManagerProvider implements ParameterResolver {
     private PathManagerProvider() {};
 
+    /** Set a new global PathManager, returning the old one. */
     static PathManager setPathManager(PathManager pathManager) {
         return PathManager.setInstance(pathManager);
     }
@@ -34,6 +53,7 @@ public class PathManagerProvider implements ParameterResolver {
         return newPathManager;
     }
 
+    /** Make sure the PathManager is reset to its original value at the end of the test. */
     static class Cleaner implements ExtensionContext.Store.CloseableResource {
         final PathManager originalPathManager;
         final PathManager tempPathManager;
