@@ -31,6 +31,7 @@ import org.terasology.engine.telemetry.metrics.Metric;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -50,28 +51,19 @@ public class Metrics {
 
     public void initialise(Context context) {
 
-        Set<Class> metricsClassSet = fetchMetricsClassFromEnvironemnt(context);
+        Set<Class> metricsClassSet = fetchMetricsClassFromEngineOnlyEnvironment(context);
         initializeMetrics(metricsClassSet, context);
     }
 
-    private Set<Class> fetchMetricsClassFromEnvironemnt(Context context) {
-
+    private Set<Class> fetchMetricsClassFromEngineOnlyEnvironment(Context context) {
         ModuleManager moduleManager = context.get(ModuleManager.class);
         Set<Class> metricsClassSet = new HashSet<>();
-        DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
-        for (Name moduleId : moduleManager.getRegistry().getModuleIds()) {
-            Module module = moduleManager.getRegistry().getLatestModuleVersion(moduleId);
-            if (module.getResources() instanceof DirectoryFileSource) {
-                ResolutionResult result = resolver.resolve(moduleId);
-                if (result.isSuccess()) {
-                    try (ModuleEnvironment environment = moduleManager.loadEnvironment(result.getModules(), false)) {
-                        for (Class<?> holdingType : environment.getTypesAnnotatedWith(TelemetryCategory.class, new FromModule(environment, moduleId))) {
-                            metricsClassSet.add(holdingType);
-                        }
-                    }
-                }
+        try (ModuleEnvironment environment = moduleManager.loadEnvironment(Collections.emptySet(), false)) {
+            for (Class<?> holdingType : environment.getTypesAnnotatedWith(TelemetryCategory.class)) {
+                metricsClassSet.add(holdingType);
             }
         }
+
         return metricsClassSet;
     }
 

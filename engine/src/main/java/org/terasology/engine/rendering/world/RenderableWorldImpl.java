@@ -13,12 +13,12 @@ import org.slf4j.LoggerFactory;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.config.RenderingConfig;
 import org.terasology.engine.context.Context;
-import org.terasology.engine.core.subsystem.lwjgl.GLBufferPool;
 import org.terasology.engine.rendering.cameras.Camera;
 import org.terasology.engine.rendering.logic.ChunkMeshRenderer;
 import org.terasology.engine.rendering.primitives.ChunkMesh;
 import org.terasology.engine.rendering.primitives.ChunkTessellator;
 import org.terasology.engine.rendering.world.viewDistance.ViewDistance;
+import org.terasology.joml.geom.AABBfc;
 import org.terasology.math.TeraMath;
 import org.terasology.engine.monitoring.PerformanceMonitor;
 import org.terasology.engine.registry.CoreRegistry;
@@ -425,7 +425,9 @@ class RenderableWorldImpl implements RenderableWorld {
     }
 
     private boolean isChunkVisibleReflection(RenderableChunk chunk) {
-        return playerCamera.getViewFrustumReflected().intersects(chunk.getAABB());
+        AABBfc bounds = chunk.getAABB();
+        return playerCamera.getViewFrustumReflected().testAab(bounds.minX(), bounds.minY(), bounds.minZ(),
+                bounds.maxX(), bounds.maxY(), bounds.maxZ());
     }
 
     @Override
