@@ -30,7 +30,7 @@ node ("ts-engine && heavy && java8") {
 
     stage('Unit Tests') {
         try {
-            sh './gradlew unitTest'
+            sh './gradlew --console=plain unitTest'
         } catch (e) {
             echo 'Unit Tests failed'
             throw e
@@ -62,7 +62,7 @@ node ("ts-engine && heavy && java8") {
 
     stage('Integration Tests') {
         try {
-            sh './gradlew integrationTest'
+            sh './gradlew --console=plain integrationTest'
         } catch (e) {
             echo 'Integration Tests failed'
             throw e
@@ -80,7 +80,7 @@ node ("ts-engine && heavy && java8") {
     }
 
     stage('Documentation') {
-        sh './gradlew javadoc'
+        sh './gradlew --console=plain javadoc'
         step([$class: 'JavadocArchiver', javadocDir: 'engine/build/docs/javadoc', keepAll: false])
         recordIssues tool: javaDoc()
     }
