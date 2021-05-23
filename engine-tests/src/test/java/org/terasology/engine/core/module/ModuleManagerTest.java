@@ -8,6 +8,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.reflections.Reflections;
+import org.terasology.engine.config.flexible.AutoConfig;
+import org.terasology.engine.core.paths.PathManager;
 import org.terasology.engine.core.subsystem.EngineSubsystem;
 import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.logic.permission.PermissionSetComponent;
@@ -33,6 +35,7 @@ public class ModuleManagerTest {
     ModuleEnvironment environment;
     Module engineModule;
 
+    /** Configure a ModuleManager with only the <i>engine module.</i> */
     @BeforeEach
     public void provideEngineModule() {
         manager = new ModuleManager("");
@@ -44,6 +47,7 @@ public class ModuleManagerTest {
         assertThat(environment.getModuleIdsOrderedByDependencies()).containsExactly(ENGINE_MODULE);
     }
 
+    /** A bare minimum Module not associated with any real code or assets. */
     private Module getEmptyTestModule() {
         return new Module(
                 new ModuleMetadata(new Name("EmptyTestModule"), new Version("0.0.1")),
@@ -54,25 +58,63 @@ public class ModuleManagerTest {
         );
     }
 
-    @Test
-    public void nonApiClassesAreNotPermitted() {
-        Class<?> disallowedClass = PermissionSetComponent.class;
+    /**
+     * Non-API classes are not permitted.
+     * <p>
+     * Tests against the {@link PermissionProvider} that ModuleManager gives a module.
+     * <p>
+     * A test failure here may indicate that modules have unrestricted access to engine classes they
+     * should not.
+     * <p>
+     * ⚠ This test <em>passing</em> should <strong>not</strong> be taken to mean the protections
+     * of the sandbox are intact. The PermissionProvider provides only one piece of the logic and
+     * is not always the deciding factor.
+     *
+     * @param disallowedClass A class in {@code org.terasology.engine} not annotated with @API
+     *     nor in any package annotated with @API.
+     */
+    @ParameterizedTest
+    @ValueSource(classes = {
+            PathManager.class,
+            PermissionSetComponent.class
+    })
+    public void nonApiClassesAreNotPermitted(Class<?> disallowedClass) {
         PermissionProvider permissionProvider = manager.getPermissionProvider(getEmptyTestModule());
         assertFalse(permissionProvider.isPermitted(disallowedClass));
     }
 
+    /**
+     * Non-API classes have a module which provides them.
+     * <p>
+     * There are some classes that are not marked as being part of a public API, but we still expect the
+     * {@link ModuleEnvironment} to recognize which module provides them.
+     * <p>
+     * Test failures of this type can show up in the application as a failure to get a URI for a class,
+     * or find a class from a URI, or get a subtype of a class. These are often NullPointerExceptions.
+     *
+     * @param engineClass A class in {@code org.terasology.engine} not annotated with @API
+     *      nor in any package annotated with @API.
+     */
     @ParameterizedTest
     @ValueSource(classes = {
             Component.class,
             AttachSupportRequiredComponent.class,
             PermissionSetComponent.class
     })
-    public void nonApiClassesHaveAModuleWhichProvidesThem(Class<?> clazz) {
-        // These classes should be recognized as belonging to the engine module, even if access
-        // to them is not permitted from other modules.
-        assertThat(environment.getModuleProviding(clazz)).isEqualTo(ENGINE_MODULE);
+    public void nonApiClassesHaveAModuleWhichProvidesThem(Class<?> engineClass) {
+        assertThat(environment.getModuleProviding(engineClass)).isEqualTo(ENGINE_MODULE);
     }
 
+    /**
+     * Classes from subsystems are contained in the <i>engine module.</i>
+     * <p>
+     * Test failures of this type appear as failures to find classes from the subsystem, such as
+     * its {@link AutoConfig} class.
+     * <p>
+     * (This policy may change in the future to better reflect the fact that the set of subsystems
+     * is not always the same, and it would be useful to know which classes are provided by which
+     * subsystem.)
+     * */
     @Test
     public void engineModuleContainsSubsystems() {
         Class<StubSubsystem> subsystem = StubSubsystem.class;
