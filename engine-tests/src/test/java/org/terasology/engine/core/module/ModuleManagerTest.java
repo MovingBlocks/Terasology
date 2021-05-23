@@ -9,7 +9,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.reflections.Reflections;
 import org.terasology.engine.config.flexible.AutoConfig;
-import org.terasology.engine.core.paths.PathManager;
+import org.terasology.engine.core.PathManager;
 import org.terasology.engine.core.subsystem.EngineSubsystem;
 import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.logic.permission.PermissionSetComponent;
