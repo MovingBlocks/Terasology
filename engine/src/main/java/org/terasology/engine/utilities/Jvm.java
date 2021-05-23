@@ -13,10 +13,10 @@ public final class Jvm {
     private Jvm() { }
 
     @SuppressWarnings("CheckStyle")
-    static final Pattern GRADLE_CACHE = Pattern.compile(".*\\Wgradle\\Wcaches?\\b.*?(/.+)?/(.*\\.jar)$");
+    static final Pattern gradleCache = Pattern.compile(".*\\Wgradle\\Wcaches?\\b.*?(/.+)?/(.*\\.jar)$");
 
     @SuppressWarnings("CheckStyle")
-    static final Pattern MAVEN_CACHE = Pattern.compile(".*/.m2/repo.*/(.+\\.jar)$");
+    static final Pattern mavenCache = Pattern.compile(".*/.m2/repo.*/(.+\\.jar)$");
 
     public static void logClasspath(Logger aLogger) {
         String interestingGroup = "org.terasology";
@@ -26,8 +26,8 @@ public final class Jvm {
         int elidedCount = 0;
 
         for (String pathEntry : System.getProperty("java.class.path").split(System.getProperty("path.separator", ":"))) {
-            Matcher asGradleCache = GRADLE_CACHE.matcher(pathEntry);
-            Matcher asMavenCache = MAVEN_CACHE.matcher(pathEntry);
+            Matcher asGradleCache = gradleCache.matcher(pathEntry);
+            Matcher asMavenCache = mavenCache.matcher(pathEntry);
             if (asGradleCache.matches()) {
                 if (asGradleCache.group(1).contains(interestingGroup)) {
                     aLogger.debug("{}gradle:{}", indent, asGradleCache.group(2));

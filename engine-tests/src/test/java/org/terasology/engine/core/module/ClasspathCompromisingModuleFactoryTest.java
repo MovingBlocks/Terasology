@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ClasspathCompromisingModuleFactoryTest {
-    static final Class<?> SOME_CLASS_OUTSIDE_THE_MODULE = ClasspathCompromisingModuleFactory.class;
+    final static Class<?> someClassOutsideTheModule = ClasspathCompromisingModuleFactory.class;
 
     @Test
     public void directoryModuleContainsClass() {
@@ -34,7 +34,7 @@ public class ClasspathCompromisingModuleFactoryTest {
         // and that ExampleClass is inside that directory
         assertTrue(module.getClassPredicate().test(ExampleClass.class));
         // and that this other class (in engine, not engine-test) is outside that directory.
-        assertFalse(module.getClassPredicate().test(SOME_CLASS_OUTSIDE_THE_MODULE));
+        assertFalse(module.getClassPredicate().test(someClassOutsideTheModule));
 
         // These assumptions could break if things get moved around enough.
     }
@@ -49,7 +49,7 @@ public class ClasspathCompromisingModuleFactoryTest {
         Class<?> someClassInTheModule = module.getModuleManifest().getTypesAnnotatedWith(API.class).iterator().next();
 
         assertTrue(module.getClassPredicate().test(someClassInTheModule));
-        assertFalse(module.getClassPredicate().test(SOME_CLASS_OUTSIDE_THE_MODULE));
+        assertFalse(module.getClassPredicate().test(someClassOutsideTheModule));
     }
 
     @Test

@@ -17,13 +17,13 @@ public enum GLTFMode {
     TRIANGLE_STRIP(5),
     TRIANGLE_FAN(6);
 
-    private static final TIntObjectMap<GLTFMode> CODE_TO_MODE;
+    private static final TIntObjectMap<GLTFMode> codeToMode;
     private final int code;
 
     static {
-        CODE_TO_MODE = new TIntObjectHashMap<>();
+        codeToMode = new TIntObjectHashMap<>();
         for (GLTFMode mode : GLTFMode.values()) {
-            CODE_TO_MODE.put(mode.code, mode);
+            codeToMode.put(mode.code, mode);
         }
     }
 
@@ -37,7 +37,7 @@ public enum GLTFMode {
      * @return The GLTFMode for the given code
      */
     public static GLTFMode fromCode(int code) {
-        return CODE_TO_MODE.get(code);
+        return codeToMode.get(code);
     }
 
 
