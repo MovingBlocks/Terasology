@@ -53,7 +53,7 @@ public final class GLAttributes {
             }
             return size;
         }
-    }, VertexAttribute.TypeMapping.ATTR_FLOAT, 3);
+    }, TypeMapping.ATTR_FLOAT, 3);
 
     public static final VertexAttribute<Vector4fc, Vector4f> VECTOR_4_F_VERTEX_ATTRIBUTE = new VertexAttribute<>(Vector4f.class, new VertexAttribute.AttributeConfiguration<Vector4fc, Vector4f>() {
         @Override
@@ -90,7 +90,7 @@ public final class GLAttributes {
             }
             return size;
         }
-    }, VertexAttribute.TypeMapping.ATTR_FLOAT, 4);
+    }, TypeMapping.ATTR_FLOAT, 4);
 
     public static final VertexAttribute<Colorc, Color> COLOR_4_F_VERTEX_ATTRIBUTE = new VertexAttribute<>(Color.class, new VertexAttribute.AttributeConfiguration<Colorc, Color>() {
         @Override
@@ -129,7 +129,7 @@ public final class GLAttributes {
             return size;
         }
 
-    }, VertexAttribute.TypeMapping.ATTR_FLOAT, 4);
+    }, TypeMapping.ATTR_FLOAT, 4);
 
     public static final VertexAttribute<Vector2fc, Vector2f> VECTOR_2_F_VERTEX_ATTRIBUTE = new VertexAttribute<>(Vector2f.class, new VertexAttribute.AttributeConfiguration<Vector2fc, Vector2f>() {
         @Override
@@ -162,5 +162,5 @@ public final class GLAttributes {
             }
             return size;
         }
-    }, VertexAttribute.TypeMapping.ATTR_FLOAT, 2);
+    }, TypeMapping.ATTR_FLOAT, 2);
 }
