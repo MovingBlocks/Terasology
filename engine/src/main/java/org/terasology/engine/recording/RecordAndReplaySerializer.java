@@ -11,8 +11,8 @@ import com.google.gson.stream.JsonWriter;
 import org.joml.Vector3f;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.engine.core.PathManager;
 import org.terasology.engine.core.module.ModuleManager;
-import org.terasology.engine.core.paths.PathManager;
 import org.terasology.engine.entitySystem.entity.EntityManager;
 import org.terasology.reflection.TypeRegistry;
 
