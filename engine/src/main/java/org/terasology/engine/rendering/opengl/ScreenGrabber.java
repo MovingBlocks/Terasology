@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.config.RenderingConfig;
 import org.terasology.engine.context.Context;
-import org.terasology.engine.core.paths.PathManager;
+import org.terasology.engine.core.PathManager;
 import org.terasology.engine.core.subsystem.common.ThreadManager;
 import org.terasology.engine.persistence.internal.GamePreviewImageProvider;
 import org.terasology.engine.registry.CoreRegistry;

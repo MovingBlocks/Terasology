@@ -4,21 +4,21 @@ package org.terasology.engine.rendering.nui.layers.mainMenu;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.engine.core.GameEngine;
+import org.terasology.engine.core.PathManager;
 import org.terasology.engine.core.modes.StateLoading;
-import org.terasology.engine.core.paths.PathManager;
 import org.terasology.engine.game.GameManifest;
-import org.terasology.engine.rendering.nui.animation.MenuAnimationSystems;
-import org.terasology.engine.rendering.nui.layers.mainMenu.savedGames.GameInfo;
-import org.terasology.engine.rendering.nui.layers.mainMenu.savedGames.GameProvider;
 import org.terasology.engine.network.NetworkMode;
-import org.terasology.nui.widgets.UIButton;
 import org.terasology.engine.recording.RecordAndReplayCurrentStatus;
 import org.terasology.engine.recording.RecordAndReplayStatus;
 import org.terasology.engine.recording.RecordAndReplayUtils;
 import org.terasology.engine.registry.CoreRegistry;
 import org.terasology.engine.registry.In;
+import org.terasology.engine.rendering.nui.animation.MenuAnimationSystems;
+import org.terasology.engine.rendering.nui.layers.mainMenu.savedGames.GameInfo;
+import org.terasology.engine.rendering.nui.layers.mainMenu.savedGames.GameProvider;
+import org.terasology.gestalt.assets.ResourceUrn;
+import org.terasology.nui.widgets.UIButton;
 
 import java.nio.file.Path;
 import java.util.Objects;
