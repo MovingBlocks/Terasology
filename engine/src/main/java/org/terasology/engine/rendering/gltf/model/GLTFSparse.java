@@ -3,7 +3,9 @@
 package org.terasology.engine.rendering.gltf.model;
 
 /**
- * GLTFSparse provides sparse storage of overrides for attributes. See https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#reference-sparse for details
+ * GLTFSparse provides sparse storage of overrides for attributes.
+ * <p>
+ * See <a href="https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#reference-sparse">glTF Specification - sparse</a> for details.
  */
 public class GLTFSparse {
 

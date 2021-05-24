@@ -33,15 +33,17 @@ public interface BlockBuilderHelper {
     Block constructSimpleBlock(BlockFamilyDefinition definition, String section, BlockUri uri, BlockFamily blockFamily);
 
     /**
-     * Constructs a basic block from the data provided. This block is assumed to have no rotations, and to use reasonable defaults
-     * The block is registered into the engine as to be directly usable
+     * Constructs a basic block from the data provided. This block is assumed to have no rotations, and to use
+     * reasonable defaults The block is registered into the engine as to be directly usable
      * <p>
-     * For blocks that contain rotations or that use custom values see {@link #constructTransformedBlock(BlockFamilyDefinition, Rotation, BlockUri, BlockFamily)} and {@link #constructCustomBlock(String, BlockShape, Rotation, SectionDefinitionData, BlockUri, BlockFamily)}
+     * For blocks that contain rotations or that use custom values see
+     * {@link #constructTransformedBlock(BlockFamilyDefinition, Rotation, BlockUri, BlockFamily)} and
+     * {@link #constructCustomBlock(String, BlockShape, Rotation, SectionDefinitionData, BlockUri, BlockFamily)}
      *
-     * @param definition  The definition for the block family this block should belong to
-     * @param shape       The shape this block should be displayed with
-     * @param section     The block family subsection this block will represent
-     * @param uri         The URI to use for the block
+     * @param definition The definition for the block family this block should belong to
+     * @param shape The shape this block should be displayed with
+     * @param section The block family subsection this block will represent
+     * @param uri The URI to use for the block
      * @param blockFamily The block family instance this block will belong to
      * @return The constructed and registered block
      */

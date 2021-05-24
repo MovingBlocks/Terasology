@@ -27,8 +27,6 @@ import org.terasology.engine.utilities.Assets;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
-/**
- */
 public class TerasologyCanvasImpl extends CanvasImpl implements PropertyChangeListener {
 
     private static final Logger logger = LoggerFactory.getLogger(TerasologyCanvasImpl.class);

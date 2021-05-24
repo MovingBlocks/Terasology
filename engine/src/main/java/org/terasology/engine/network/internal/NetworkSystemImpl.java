@@ -71,7 +71,6 @@ import org.terasology.engine.world.block.BlockManager;
 import org.terasology.engine.world.block.family.BlockFamily;
 import org.terasology.engine.world.chunks.remoteChunkProvider.RemoteChunkProvider;
 import org.terasology.engine.world.generator.WorldGenerator;
-import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.gestalt.module.Module;
 import org.terasology.nui.Color;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;

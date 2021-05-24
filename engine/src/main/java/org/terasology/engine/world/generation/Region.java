@@ -4,8 +4,6 @@ package org.terasology.engine.world.generation;
 
 import org.terasology.engine.world.block.BlockRegion;
 
-/**
- */
 public interface Region {
 
     <T extends WorldFacet> T getFacet(Class<T> dataType);

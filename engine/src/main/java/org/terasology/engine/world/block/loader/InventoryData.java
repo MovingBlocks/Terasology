@@ -4,8 +4,6 @@ package org.terasology.engine.world.block.loader;
 
 import org.terasology.gestalt.module.sandbox.API;
 
-/**
- */
 @API
 public class InventoryData {
     private boolean directPickup;

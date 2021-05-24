@@ -68,7 +68,7 @@ public class PersistedValueArray extends AbstractPersistedArray {
             if (persistedData.isNumber()) {
                 return persistedData.getAsInteger();
             } else {
-                throw new ClassCastException("Data is not a Integer" );
+                throw new ClassCastException("Data is not a Integer");
             }
         } else {
             throw new IllegalStateException("Data is an array of size != 1");

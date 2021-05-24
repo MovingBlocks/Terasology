@@ -9,8 +9,6 @@ import org.terasology.engine.input.RegisterBindButton;
 import org.terasology.input.InputType;
 import org.terasology.input.Keyboard;
 
-/**
- */
 @RegisterBindButton(id = "forwards", description = "${engine:menu#binding-forwards}")
 @DefaultBinding(type = InputType.KEY, id = Keyboard.KeyId.W)
 public class ForwardsButton extends BindButtonEvent {

@@ -11,8 +11,6 @@ import org.terasology.input.ActivateMode;
 import org.terasology.input.ButtonState;
 import org.terasology.input.Input;
 
-/**
- */
 public interface BindableButton {
 
     /**

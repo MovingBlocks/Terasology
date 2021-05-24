@@ -50,9 +50,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
-/**
- *
- */
+
 public class InputSettingsScreen extends CoreScreenLayer {
 
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:inputSettingsScreen");

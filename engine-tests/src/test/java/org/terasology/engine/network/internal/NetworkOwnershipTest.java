@@ -28,8 +28,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-/**
- */
 @Tag("TteTest")
 public class NetworkOwnershipTest extends TerasologyTestingEnvironment {
 

@@ -12,8 +12,6 @@ import org.terasology.engine.registry.In;
 import org.terasology.engine.world.WorldComponent;
 import org.terasology.engine.world.WorldProvider;
 
-/**
- */
 @RegisterSystem(RegisterMode.AUTHORITY)
 public class BlockPlacingSystem extends BaseComponentSystem {
     @In

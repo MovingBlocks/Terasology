@@ -10,8 +10,6 @@ import org.terasology.persistence.typeHandling.TypeHandler;
 import java.util.Map;
 import java.util.Optional;
 
-/**
- */
 public class StringMapTypeHandler<T> extends TypeHandler<Map<String, T>> {
 
     private TypeHandler<T> contentsHandler;

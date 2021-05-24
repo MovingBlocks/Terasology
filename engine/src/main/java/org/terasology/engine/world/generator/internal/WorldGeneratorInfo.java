@@ -6,8 +6,6 @@ import org.terasology.engine.core.SimpleUri;
 
 import java.util.Objects;
 
-/**
- */
 public class WorldGeneratorInfo implements Comparable<WorldGeneratorInfo> {
 
     private SimpleUri uri;

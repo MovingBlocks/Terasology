@@ -17,8 +17,6 @@ package org.terasology.benchmark.reflectFactory;
 
 import org.terasology.engine.entitySystem.Component;
 
-/**
- */
 public class GetterSetterComponent implements Component {
     private int value;
 
