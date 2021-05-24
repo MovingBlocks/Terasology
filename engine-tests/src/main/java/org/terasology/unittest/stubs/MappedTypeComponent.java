@@ -6,8 +6,6 @@ package org.terasology.unittest.stubs;
 import org.terasology.engine.entitySystem.Component;
 import org.terasology.reflection.MappedContainer;
 
-/**
- */
 public class MappedTypeComponent implements Component {
 
     public InnerType val = new InnerType();

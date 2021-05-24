@@ -1,7 +1,7 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-package org.terasology.engine.core.paths;
+package org.terasology.engine.core;
 
 import com.google.common.collect.ImmutableList;
 import com.sun.jna.platform.win32.KnownFolders;
@@ -138,6 +138,20 @@ public final class PathManager {
             instance = new PathManager();
         }
         return instance;
+    }
+
+    /**
+     * INTERNAL: use only for testing!
+     *
+     * Inject a path manager instance to be used as the "singleton" instance.
+     *
+     * @param pathManager the new "singleton" instance, will be returned by subsequent calls to {@link #getInstance()}
+     * @return the old path manager instance
+     */
+    static PathManager setInstance(PathManager pathManager) {
+        PathManager oldInstance = instance;
+        instance = pathManager;
+        return oldInstance;
     }
 
     /**

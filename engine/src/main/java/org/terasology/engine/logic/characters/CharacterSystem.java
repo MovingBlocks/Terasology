@@ -53,9 +53,7 @@ import org.terasology.engine.world.block.regions.ActAsBlockComponent;
 
 import java.util.Optional;
 
-/**
- *
- */
+
 @RegisterSystem
 public class CharacterSystem extends BaseComponentSystem implements UpdateSubscriberSystem {
     public static final CollisionGroup[] DEFAULTPHYSICSFILTER = {StandardCollisionGroup.DEFAULT, StandardCollisionGroup.WORLD, StandardCollisionGroup.CHARACTER};

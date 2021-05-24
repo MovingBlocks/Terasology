@@ -245,10 +245,14 @@ public class GameDetailsScreen extends CoreScreenLayer {
         } else {
             gameTitle = worldInfo.getCustomTitle();
         }
-        return translationSystem.translate("${engine:menu#game-details-game-title} ") + gameTitle + '\n' + '\n' +
-                translationSystem.translate("${engine:menu#game-details-game-seed} ") + worldInfo.getSeed() + '\n' + '\n' +
-                translationSystem.translate("${engine:menu#game-details-world-generator}: ") + worldGeneratorManager.getWorldGeneratorInfo(worldInfo.getWorldGenerator()).getDisplayName() + '\n' + '\n' +
-                translationSystem.translate("${engine:menu#game-details-game-duration} ")
+        return translationSystem.translate("${engine:menu#game-details-game-title} ") + gameTitle
+                + '\n' + '\n'
+                + translationSystem.translate("${engine:menu#game-details-game-seed} ") + worldInfo.getSeed()
+                + '\n' + '\n'
+                + translationSystem.translate("${engine:menu#game-details-world-generator}: ")
+                + worldGeneratorManager.getWorldGeneratorInfo(worldInfo.getWorldGenerator()).getDisplayName()
+                + '\n' + '\n'
+                + translationSystem.translate("${engine:menu#game-details-game-duration} ")
                 + DateTimeHelper.getDeltaBetweenTimestamps(new Date(0).getTime(), worldInfo.getTime());
     }
 

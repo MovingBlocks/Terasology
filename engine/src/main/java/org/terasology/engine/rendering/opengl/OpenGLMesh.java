@@ -32,8 +32,6 @@ import java.util.List;
 
 import static org.lwjgl.opengl.GL11.GL_UNSIGNED_INT;
 
-/**
- */
 public class OpenGLMesh extends Mesh {
     private static final Logger logger = LoggerFactory.getLogger(OpenGLMesh.class);
     private AABBf aabb = new AABBf();

@@ -483,7 +483,7 @@ public final class FBO {
     }
 
     @Override
-    public String toString(){
+    public String toString() {
         return "FBO: " + this.fboName;
     }
 

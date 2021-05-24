@@ -1,18 +1,5 @@
-/*
- * Copyright 2017 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.persistence.typeHandling.gson;
 
 import com.google.common.collect.Lists;
@@ -41,9 +28,7 @@ public class PolymorphicTypeAdapterFactoryTest {
 
     @Test
     public void testInterfaceReference() {
-        Walker walker = CAT;
-
-        String json = interfaceGson.toJson(walker);
+        String json = interfaceGson.toJson(CAT);
 
         Walker newAnimal = interfaceGson.fromJson(json, Walker.class);
 
@@ -52,9 +37,7 @@ public class PolymorphicTypeAdapterFactoryTest {
 
     @Test
     public void testBaseClassReference() {
-        Animal animal = CHEETAH;
-
-        String json = baseClassGson.toJson(animal);
+        String json = baseClassGson.toJson(CHEETAH);
 
         Animal newAnimal = baseClassGson.fromJson(json, Animal.class);
 
@@ -98,7 +81,7 @@ public class PolymorphicTypeAdapterFactoryTest {
         assertTrue(newWalkers.get(2) instanceof Cheetah);
     }
 
-    private static class Capsule {
+    private static final class Capsule {
         private final Animal animal;
 
         private Capsule(Animal animal) {
@@ -118,14 +101,18 @@ public class PolymorphicTypeAdapterFactoryTest {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
             Animal animal = (Animal) o;
             return Objects.equals(name, animal.name);
         }
     }
 
-    private static class Dog extends Animal {
+    private static final class Dog extends Animal {
         private final float tailLength;
 
         private Dog(float tailLength) {
@@ -135,9 +122,15 @@ public class PolymorphicTypeAdapterFactoryTest {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            if (!super.equals(o)) return false;
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+            if (!super.equals(o)) {
+                return false;
+            }
             Dog dog = (Dog) o;
             return Float.compare(dog.tailLength, tailLength) == 0;
         }
@@ -153,9 +146,15 @@ public class PolymorphicTypeAdapterFactoryTest {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            if (!super.equals(o)) return false;
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+            if (!super.equals(o)) {
+                return false;
+            }
             Cheetah cheetah = (Cheetah) o;
             return spotCount == cheetah.spotCount;
         }

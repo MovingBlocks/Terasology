@@ -9,8 +9,6 @@ import org.terasology.persistence.typeHandling.PersistedDataMap;
 
 import java.nio.ByteBuffer;
 
-/**
- */
 public abstract class AbstractPersistedData implements PersistedData {
 
     @Override

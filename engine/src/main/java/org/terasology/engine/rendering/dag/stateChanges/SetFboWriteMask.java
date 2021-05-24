@@ -3,18 +3,18 @@
 package org.terasology.engine.rendering.dag.stateChanges;
 
 import com.google.common.base.Objects;
-import org.terasology.engine.rendering.opengl.FBO;
 import org.terasology.engine.rendering.dag.StateChange;
+import org.terasology.engine.rendering.opengl.FBO;
 
 /**
  * Sets an FBO's write mask.
- *
+ * <p>
  * A write mask is useful to render to an FBO leaving some of its attachments untouched.
- *
+ * <p>
  * This particular state change independently enables/disables writing to the color, depth and light accumulation
- * attachments of an FBO. At this stage this functionality makes sense only in the context of the gBuffers,
- * as only those buffers have all the attachments mentioned.
- *
+ * attachments of an FBO. At this stage this functionality makes sense only in the context of the gBuffers, as only
+ * those buffers have all the attachments mentioned.
+ * <p>
  * The behaviour of this state change in relation to FBOs that do not have all the relevant attachments has not been
  * investigated.
  */
@@ -29,16 +29,19 @@ public final class SetFboWriteMask implements StateChange {
 
     /**
      * Creates an instance of this StateChange, that can be added to a Node's list of desired StateChanges.
-     *
-     * Sample use:
-     *      addDesiredStateChange(new SetFboWriteMask(fbo, true, false, false));
+     * <p>
+     * Sample use: addDesiredStateChange(new SetFboWriteMask(fbo, true, false, false));
      *
      * @param fbo The FBO whose render masks have to be modified - usually only the lastUpdatedGBuffer.
-     * @param renderToColorBuffer A boolean indicating whether the Color buffer of the given FBO should be written to.
-     * @param renderToDepthBuffer A boolean indicating whether the DepthStencil buffer of the given FBO should be written to.
-     * @param renderToLightBuffer A boolean indicating whether the Light Accumulation buffer of the given FBO should be written to.
+     * @param renderToColorBuffer A boolean indicating whether the Color buffer of the given FBO should be
+     *         written to.
+     * @param renderToDepthBuffer A boolean indicating whether the DepthStencil buffer of the given FBO should
+     *         be written to.
+     * @param renderToLightBuffer A boolean indicating whether the Light Accumulation buffer of the given FBO
+     *         should be written to.
      */
-    public SetFboWriteMask(FBO fbo, boolean renderToColorBuffer, boolean renderToDepthBuffer, boolean renderToLightBuffer) {
+    public SetFboWriteMask(FBO fbo, boolean renderToColorBuffer, boolean renderToDepthBuffer,
+                           boolean renderToLightBuffer) {
         this.fbo = fbo;
         this.renderToColorBuffer = renderToColorBuffer;
         this.renderToDepthBuffer = renderToDepthBuffer;
@@ -83,7 +86,8 @@ public final class SetFboWriteMask implements StateChange {
 
     @Override
     public String toString() {
-        return String.format("%30s: %s (fboId: %s), %b, %b, %b", this.getClass().getSimpleName(), fbo.getName(), fbo.getId(), renderToColorBuffer, renderToDepthBuffer, renderToLightBuffer);
+        return String.format("%30s: %s (fboId: %s), %b, %b, %b", this.getClass().getSimpleName(), fbo.getName(),
+                fbo.getId(), renderToColorBuffer, renderToDepthBuffer, renderToLightBuffer);
     }
 
     @Override

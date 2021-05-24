@@ -10,8 +10,6 @@ import org.terasology.persistence.typeHandling.StringRepresentationTypeHandler;
 
 import java.util.Optional;
 
-/**
- */
 public class AssetTypeHandler<T extends Asset> extends StringRepresentationTypeHandler<T> {
     private Class<T> assetClass;
 

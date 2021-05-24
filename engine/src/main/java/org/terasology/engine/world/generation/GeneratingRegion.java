@@ -4,8 +4,6 @@ package org.terasology.engine.world.generation;
 
 import org.terasology.engine.world.block.BlockRegion;
 
-/**
- */
 public interface GeneratingRegion {
 
     BlockRegion getRegion();
