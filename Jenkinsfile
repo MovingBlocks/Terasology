@@ -61,7 +61,7 @@ node ("ts-engine && heavy && java8") {
         try {
             sh './gradlew --console=plain integrationTest'
         } finally {
-            junit testResults: '**build/test-restults/integrationTest/*.xml', allowEmptyResults: true
+            junit testResults: '**/build/test-restults/integrationTest/*.xml', allowEmptyResults: true
         }
     }
 
