@@ -11,7 +11,7 @@ import org.terasology.gestalt.module.sandbox.API;
  *
  */
 @API
-public class CollectiveBehaviorComponent implements Component{
+public class CollectiveBehaviorComponent implements Component {
     public BehaviorTree tree;
     public transient CollectiveInterpreter collectiveInterpreter;
 }

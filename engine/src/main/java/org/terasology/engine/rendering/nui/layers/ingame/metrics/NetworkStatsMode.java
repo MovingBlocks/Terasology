@@ -8,8 +8,6 @@ import org.terasology.engine.network.NetworkMode;
 import org.terasology.engine.network.NetworkSystem;
 import org.terasology.engine.registry.CoreRegistry;
 
-/**
- */
 final class NetworkStatsMode extends MetricsMode {
     private long lastTime;
     private Time time;

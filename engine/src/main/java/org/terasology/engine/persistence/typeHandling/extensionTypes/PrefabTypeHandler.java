@@ -7,8 +7,6 @@ import org.terasology.engine.entitySystem.prefab.Prefab;
 import org.terasology.engine.utilities.Assets;
 import org.terasology.persistence.typeHandling.StringRepresentationTypeHandler;
 
-/**
- */
 public class PrefabTypeHandler extends StringRepresentationTypeHandler<Prefab> {
 
     public PrefabTypeHandler() {

@@ -6,8 +6,6 @@ package org.terasology.engine.input.events;
 
 import org.joml.Vector2i;
 
-/**
- */
 public class MouseWheelEvent extends InputEvent {
 
     private int wheelTurns;

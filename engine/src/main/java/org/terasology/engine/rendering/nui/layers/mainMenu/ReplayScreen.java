@@ -69,11 +69,15 @@ public class ReplayScreen extends SelectionScreen {
             });
 
             delete.subscribe(button -> {
-                TwoButtonPopup confirmationPopup = getManager().pushScreen(TwoButtonPopup.ASSET_URI, TwoButtonPopup.class);
-                confirmationPopup.setMessage(translationSystem.translate("${engine:menu#remove-confirmation-popup-title}"),
+                TwoButtonPopup confirmationPopup = getManager().pushScreen(TwoButtonPopup.ASSET_URI,
+                        TwoButtonPopup.class);
+                confirmationPopup.setMessage(translationSystem.translate("${engine:menu#remove-confirmation-popup" +
+                                "-title}"),
                         translationSystem.translate("${engine:menu#remove-confirmation-popup-message}"));
-                confirmationPopup.setLeftButton(translationSystem.translate("${engine:menu#dialog-yes}"), this::removeSelectedReplay);
-                confirmationPopup.setRightButton(translationSystem.translate("${engine:menu#dialog-no}"), () -> { });
+                confirmationPopup.setLeftButton(translationSystem.translate("${engine:menu#dialog-yes}"),
+                        this::removeSelectedReplay);
+                confirmationPopup.setRightButton(translationSystem.translate("${engine:menu#dialog-no}"), () -> {
+                });
             });
 
             close.subscribe(button -> {
@@ -91,7 +95,8 @@ public class ReplayScreen extends SelectionScreen {
             refreshGameInfoList(GameProvider.getSavedRecordings());
         } else {
             final MessagePopup popup = getManager().createScreen(MessagePopup.ASSET_URI, MessagePopup.class);
-            popup.setMessage(translationSystem.translate("${engine:menu#game-details-errors-message-title}"), translationSystem.translate("${engine:menu#game-details-errors-message-body}"));
+            popup.setMessage(translationSystem.translate("${engine:menu#game-details-errors-message-title}"),
+                    translationSystem.translate("${engine:menu#game-details-errors-message-body}"));
             popup.subscribeButton(e -> triggerBackAnimation());
             getManager().pushScreen(popup);
             // disable child widgets
@@ -108,7 +113,8 @@ public class ReplayScreen extends SelectionScreen {
     }
 
     private void removeSelectedReplay() {
-        final Path world = PathManager.getInstance().getRecordingPath(getGameInfos().getSelection().getManifest().getTitle());
+        final Path world =
+                PathManager.getInstance().getRecordingPath(getGameInfos().getSelection().getManifest().getTitle());
         remove(getGameInfos(), world, REMOVE_STRING);
     }
 
@@ -121,7 +127,8 @@ public class ReplayScreen extends SelectionScreen {
             CoreRegistry.get(GameEngine.class).changeState(new StateLoading(manifest, NetworkMode.NONE));
         } catch (Exception e) {
             logger.error("Failed to load saved game", e);
-            getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Error Loading Game", e.getMessage());
+            getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Error Loading Game",
+                    e.getMessage());
         }
     }
 

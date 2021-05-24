@@ -11,8 +11,6 @@ import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-/**
- */
 public class MaterialData implements AssetData {
     private Shader shader;
     private Map<String, Texture> textures = Maps.newHashMap();

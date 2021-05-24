@@ -138,23 +138,25 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
 
         if (localPlayerInitialized) {
             EntityRef entity = localPlayer.getCharacterEntity();
-            CharacterMovementComponent characterMovementComponent = entity.getComponent(CharacterMovementComponent.class);
+            CharacterMovementComponent characterMovementComponent =
+                    entity.getComponent(CharacterMovementComponent.class);
 
             processInput(entity, characterMovementComponent);
-            updateCamera(characterMovementComponent, localPlayer.getViewPosition(new Vector3f()), localPlayer.getViewRotation(new Quaternionf()));
+            updateCamera(characterMovementComponent, localPlayer.getViewPosition(new Vector3f()),
+                    localPlayer.getViewRotation(new Quaternionf()));
         }
     }
 
     private void processInput(EntityRef entity, CharacterMovementComponent characterMovementComponent) {
         lookYaw = (float) ((lookYaw - lookYawDelta) % 360);
         lookYawDelta = 0f;
-        lookPitch = (float) Math.clamp(-89, 89,lookPitch + lookPitchDelta);
+        lookPitch = (float) Math.clamp(-89, 89, lookPitch + lookPitchDelta);
         lookPitchDelta = 0f;
 
         Vector3f relMove = new Vector3f(relativeMovement);
         relMove.y = 0;
 
-        Quaternionf viewRotation =  new Quaternionf();
+        Quaternionf viewRotation = new Quaternionf();
         switch (characterMovementComponent.mode) {
             case CROUCHING:
             case WALKING:
@@ -177,9 +179,11 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
                 relMove.y += relativeMovement.y;
                 break;
         }
-        // For some reason, Quat4f.rotate is returning NaN for valid inputs. This prevents those NaNs from causing trouble down the line.
+        // For some reason, Quat4f.rotate is returning NaN for valid inputs. This prevents those NaNs from causing
+        // trouble down the line.
         if (relMove.isFinite()) {
-            entity.send(new CharacterMoveInputEvent(inputSequenceNumber++, lookPitch, lookYaw, relMove, run, crouch, jump, time.getGameDeltaInMs()));
+            entity.send(new CharacterMoveInputEvent(inputSequenceNumber++, lookPitch, lookYaw, relMove, run, crouch,
+                    jump, time.getGameDeltaInMs()));
         }
         jump = false;
     }
@@ -195,8 +199,8 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
     }
 
     /**
-     * Auto move is disabled when the associated key is pressed again.
-     * This cancels the simulated repeated key stroke for the forward input button.
+     * Auto move is disabled when the associated key is pressed again. This cancels the simulated repeated key stroke
+     * for the forward input button.
      */
     private void stopAutoMove() {
         List<Input> inputs = bindsManager.getBindsConfig().getBinds(new SimpleUri("engine:forwards"));
@@ -209,8 +213,8 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
     }
 
     /**
-     * Append the input for moving forward to the keyboard command queue to simulate pressing of the forward key.
-     * For an input that repeats, the key must be in Down state before Repeat state can be applied to it.
+     * Append the input for moving forward to the keyboard command queue to simulate pressing of the forward key. For an
+     * input that repeats, the key must be in Down state before Repeat state can be applied to it.
      */
     private void startAutoMove() {
         isAutoMove = false;
@@ -284,7 +288,7 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
 
     @ReceiveEvent(components = {ClientComponent.class})
     public void updateStrafeMovement(StrafeMovementAxis event, EntityRef entity) {
-        relativeMovement.x =  (float)event.getValue();
+        relativeMovement.x = (float) event.getValue();
         event.consume();
     }
 
@@ -296,7 +300,7 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
 
     @ReceiveEvent(components = {ClientComponent.class})
     public void updateForwardsMovement(ForwardsRealMovementAxis event, EntityRef entity) {
-        relativeMovement.z =  (float)event.getValue();
+        relativeMovement.z = (float) event.getValue();
         event.consume();
     }
 
@@ -308,7 +312,7 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
 
     @ReceiveEvent(components = {ClientComponent.class})
     public void updateVerticalMovement(VerticalRealMovementAxis event, EntityRef entity) {
-        relativeMovement.y =  (float)event.getValue();
+        relativeMovement.y = (float) event.getValue();
         event.consume();
     }
 
@@ -444,7 +448,8 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
     }
 
     @ReceiveEvent(components = {CharacterComponent.class})
-    public void onUseItemButton(UseItemButton event, EntityRef entity, CharacterHeldItemComponent characterHeldItemComponent) {
+    public void onUseItemButton(UseItemButton event, EntityRef entity,
+                                CharacterHeldItemComponent characterHeldItemComponent) {
         if (!event.isDown()) {
             return;
         }
@@ -490,8 +495,8 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
     }
 
     /**
-     * Special getter that fetches the client entity via the NetworkSystem instead of the LocalPlayer.
-     * This can be needed in special cases where the local player isn't fully available (TODO: May be a bug?)
+     * Special getter that fetches the client entity via the NetworkSystem instead of the LocalPlayer. This can be
+     * needed in special cases where the local player isn't fully available (TODO: May be a bug?)
      *
      * @return the EntityRef that the networking system says is the client associated with this player
      */

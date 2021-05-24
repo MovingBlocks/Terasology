@@ -8,8 +8,6 @@ import org.terasology.persistence.typeHandling.TypeHandler;
 
 import java.util.Optional;
 
-/**
- */
 public class BooleanTypeHandler extends TypeHandler<Boolean> {
 
     @Override

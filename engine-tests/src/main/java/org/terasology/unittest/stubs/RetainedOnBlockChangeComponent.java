@@ -5,8 +5,6 @@ package org.terasology.unittest.stubs;
 import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.world.block.ForceBlockActive;
 
-/**
- */
 @ForceBlockActive(retainUnalteredOnBlockChange = true)
 public class RetainedOnBlockChangeComponent implements Component {
     public int value;

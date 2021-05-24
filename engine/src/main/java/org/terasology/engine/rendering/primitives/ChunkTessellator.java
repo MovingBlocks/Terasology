@@ -36,7 +36,8 @@ public final class ChunkTessellator {
 
         final Stopwatch watch = Stopwatch.createStarted();
 
-        // The mesh extends into the borders in the horizontal directions, but not vertically upwards, in order to cover gaps between LOD chunks of different scales, but also avoid multiple overlapping ocean surfaces.
+        // The mesh extends into the borders in the horizontal directions, but not vertically upwards, in order to cover
+        // gaps between LOD chunks of different scales, but also avoid multiple overlapping ocean surfaces.
         for (int x = 0; x < Chunks.SIZE_X; x++) {
             for (int z = 0; z < Chunks.SIZE_Z; z++) {
                 for (int y = 0; y < Chunks.SIZE_Y - border * 2; y++) {

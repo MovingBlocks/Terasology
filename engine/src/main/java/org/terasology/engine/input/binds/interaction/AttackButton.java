@@ -9,8 +9,6 @@ import org.terasology.engine.input.RegisterBindButton;
 import org.terasology.input.ControllerId;
 import org.terasology.input.InputType;
 
-/**
- */
 @RegisterBindButton(id = "attack", description = "${engine:menu#binding-attack}", repeating = true)
 @DefaultBinding(type = InputType.MOUSE_BUTTON, id = 0)
 @DefaultBinding(type = InputType.CONTROLLER_BUTTON, id = ControllerId.ZERO)

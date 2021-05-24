@@ -25,8 +25,6 @@ import java.util.List;
 
 import static com.google.common.base.Verify.verifyNotNull;
 
-/**
- */
 public class WorldGeneratorManager {
     private static final Logger logger = LoggerFactory.getLogger(WorldGeneratorManager.class);
 

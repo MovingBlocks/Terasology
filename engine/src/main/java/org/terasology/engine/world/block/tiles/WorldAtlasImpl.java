@@ -44,8 +44,6 @@ import java.util.Optional;
 import java.util.concurrent.BlockingQueue;
 import java.util.function.Consumer;
 
-/**
- */
 public class WorldAtlasImpl implements WorldAtlas {
     private static final Logger logger = LoggerFactory.getLogger(WorldAtlasImpl.class);
 

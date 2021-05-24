@@ -10,8 +10,6 @@ import org.terasology.nui.Color;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-/**
- */
 public class TextureUtilTest {
 
     @Test

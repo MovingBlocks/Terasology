@@ -12,8 +12,6 @@ import org.terasology.engine.world.WorldComponent;
 import org.terasology.engine.world.chunks.event.BeforeChunkUnload;
 import org.terasology.engine.world.chunks.event.OnChunkLoaded;
 
-/**
- */
 @RegisterSystem(RegisterMode.CLIENT)
 public class WorldRendererSystem extends BaseComponentSystem {
 

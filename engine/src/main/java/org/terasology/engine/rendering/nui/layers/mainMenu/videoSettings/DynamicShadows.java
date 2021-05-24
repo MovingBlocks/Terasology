@@ -4,8 +4,6 @@ package org.terasology.engine.rendering.nui.layers.mainMenu.videoSettings;
 
 import org.terasology.engine.config.RenderingConfig;
 
-/**
- */
 public enum DynamicShadows {
     OFF("${engine:menu#shadows-off}", false, false),
     ON("${engine:menu#shadows-on}", true, false),

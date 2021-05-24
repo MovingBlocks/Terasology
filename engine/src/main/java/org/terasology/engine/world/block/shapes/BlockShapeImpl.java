@@ -18,8 +18,6 @@ import org.terasology.gestalt.assets.ResourceUrn;
 import java.util.EnumMap;
 import java.util.Map;
 
-/**
- */
 public class BlockShapeImpl extends BlockShape {
 
     private String displayName;

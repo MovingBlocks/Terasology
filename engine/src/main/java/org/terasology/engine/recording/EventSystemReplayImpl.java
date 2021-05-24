@@ -328,8 +328,9 @@ public class EventSystemReplayImpl implements EventSystem {
                     componentParams.add((Class<? extends Component>) types[i]);
                 }
 
-                EventSystemReplayImpl.ByteCodeEventHandlerInfo handlerInfo = new EventSystemReplayImpl.ByteCodeEventHandlerInfo(handler, method, receiveEventAnnotation.priority(),
-                        receiveEventAnnotation.activity(), requiredComponents, componentParams);
+                EventSystemReplayImpl.ByteCodeEventHandlerInfo handlerInfo =
+                        new EventSystemReplayImpl.ByteCodeEventHandlerInfo(handler, method, receiveEventAnnotation.priority(),
+                                receiveEventAnnotation.activity(), requiredComponents, componentParams);
                 addEventHandler((Class<? extends Event>) types[0], handlerInfo, requiredComponents);
             }
         }
