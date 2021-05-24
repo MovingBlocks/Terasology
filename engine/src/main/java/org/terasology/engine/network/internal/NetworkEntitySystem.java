@@ -53,7 +53,7 @@ public class NetworkEntitySystem extends BaseComponentSystem {
         }
     }
 
-    @ReceiveEvent(components = {EntityInfoComponent.class})
+    @ReceiveEvent(components = EntityInfoComponent.class)
     public void onOwnershipChanged(OnChangedComponent event, EntityRef entity) {
         networkSystem.updateOwnership(entity);
     }

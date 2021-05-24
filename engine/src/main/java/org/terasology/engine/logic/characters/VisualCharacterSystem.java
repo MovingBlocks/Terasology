@@ -57,7 +57,7 @@ public class VisualCharacterSystem extends BaseComponentSystem {
     }
 
 
-    @ReceiveEvent(components = {VisualCharacterComponent.class})
+    @ReceiveEvent(components = VisualCharacterComponent.class)
     public void onBeforeDeactivatedVisualCharacter(BeforeDeactivateComponent event, EntityRef entity,
                                                    VisualCharacterComponent visualCharacterComponent) {
         visualCharacterComponent.visualCharacter.destroy();

@@ -90,17 +90,17 @@ public class PhysicsSystem extends BaseComponentSystem implements UpdateSubscrib
         physics.updateTrigger(entity);
     }
 
-    @ReceiveEvent(components = {RigidBodyComponent.class})
+    @ReceiveEvent(components = RigidBodyComponent.class)
     public void onImpulse(ImpulseEvent event, EntityRef entity) {
         physics.getRigidBody(entity).applyImpulse(event.getImpulse());
     }
 
-    @ReceiveEvent(components = {RigidBodyComponent.class})
+    @ReceiveEvent(components = RigidBodyComponent.class)
     public void onForce(ForceEvent event, EntityRef entity) {
         physics.getRigidBody(entity).applyForce(event.getForce());
     }
 
-    @ReceiveEvent(components = {RigidBodyComponent.class})
+    @ReceiveEvent(components = RigidBodyComponent.class)
     public void onChangeVelocity(ChangeVelocityEvent event, EntityRef entity) {
         if (event.getAngularVelocity() != null) {
             physics.getRigidBody(entity).setAngularVelocity(event.getAngularVelocity());
@@ -130,7 +130,7 @@ public class PhysicsSystem extends BaseComponentSystem implements UpdateSubscrib
         physics.updateRigidBody(entity);
     }
 
-    @ReceiveEvent(components = {BlockComponent.class})
+    @ReceiveEvent(components = BlockComponent.class)
     public void onBlockAltered(OnChangedBlock event, EntityRef entity) {
         physics.awakenArea(new Vector3f(event.getBlockPosition()), 0.6f);
     }

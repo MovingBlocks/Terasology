@@ -174,7 +174,7 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
         }
     }
 
-    @ReceiveEvent(components = {CharacterComponent.class}, netFilter = RegisterMode.CLIENT)
+    @ReceiveEvent(components = CharacterComponent.class, netFilter = RegisterMode.CLIENT)
     public void onAttackRequest(AttackButton event, EntityRef entity, CharacterHeldItemComponent characterHeldItemComponent) {
         if (!event.isDown()) {
             return;
@@ -232,7 +232,7 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
         }
     }
 
-    @ReceiveEvent(components = {CharacterComponent.class})
+    @ReceiveEvent(components = CharacterComponent.class)
     public void onItemUse(OnItemUseEvent event, EntityRef entity, CharacterHeldItemComponent characterHeldItemComponent) {
         long currentTime = time.getGameTimeInMs();
         if (characterHeldItemComponent.nextItemUseTime > currentTime) {

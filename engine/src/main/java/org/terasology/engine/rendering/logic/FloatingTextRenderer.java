@@ -171,13 +171,13 @@ public class FloatingTextRenderer extends BaseComponentSystem implements RenderS
     public void renderShadows() {
     }
 
-    @ReceiveEvent(components = {FloatingTextComponent.class})
+    @ReceiveEvent(components = FloatingTextComponent.class)
     public void onDisplayNameChange(OnChangedComponent event, EntityRef entity) {
         disposeCachedMeshOfEntity(entity);
     }
 
 
-    @ReceiveEvent(components = {FloatingTextComponent.class})
+    @ReceiveEvent(components = FloatingTextComponent.class)
     public void onNameTagOwnerRemoved(BeforeDeactivateComponent event, EntityRef entity) {
         disposeCachedMeshOfEntity(entity);
     }
