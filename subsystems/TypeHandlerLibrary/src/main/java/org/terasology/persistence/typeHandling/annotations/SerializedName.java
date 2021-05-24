@@ -12,7 +12,7 @@ import java.lang.annotation.Target;
  * the provided name value as its field name.
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.FIELD})
+@Target(ElementType.FIELD)
 public @interface SerializedName {
     /**
      * @return the desired name of the field when it is serialized or deserialized.
