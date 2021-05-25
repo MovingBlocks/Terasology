@@ -16,8 +16,6 @@ import org.terasology.engine.world.chunks.event.OnChunkLoaded;
 
 import java.util.Set;
 
-/**
- */
 @RegisterSystem
 public class ChunkEventErrorLogger extends BaseComponentSystem {
     private static final Logger logger = LoggerFactory.getLogger(ChunkEventErrorLogger.class);

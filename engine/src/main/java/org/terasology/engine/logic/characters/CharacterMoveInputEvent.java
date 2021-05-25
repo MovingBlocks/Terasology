@@ -8,8 +8,6 @@ import org.joml.Vector3fc;
 import org.terasology.engine.network.NetworkEvent;
 import org.terasology.engine.network.ServerEvent;
 
-/**
- */
 @ServerEvent
 public class CharacterMoveInputEvent extends NetworkEvent {
     private long delta;

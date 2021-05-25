@@ -18,8 +18,6 @@ import org.terasology.engine.world.block.ForceBlockActive;
 import java.util.List;
 import java.util.Map;
 
-/**
- */
 @ForceBlockActive
 public class SkeletalMeshComponent implements VisualComponent {
     public SkeletalMesh mesh;

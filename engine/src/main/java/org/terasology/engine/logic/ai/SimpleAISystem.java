@@ -22,8 +22,6 @@ import org.terasology.engine.utilities.random.FastRandom;
 import org.terasology.engine.utilities.random.Random;
 import org.terasology.engine.world.WorldProvider;
 
-/**
- */
 @RegisterSystem(RegisterMode.AUTHORITY)
 public class SimpleAISystem extends BaseComponentSystem implements UpdateSubscriberSystem {
 

@@ -2,8 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.logic.console;
 
-/**
- */
 public class Message {
 
     private final MessageType type;
@@ -42,8 +40,7 @@ public class Message {
         return type;
     }
 
-    public boolean hasNewLine()
-    {
+    public boolean hasNewLine() {
         return newLine;
     }
 

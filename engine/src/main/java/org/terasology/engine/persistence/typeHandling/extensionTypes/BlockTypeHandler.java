@@ -6,8 +6,6 @@ import org.terasology.engine.world.block.Block;
 import org.terasology.engine.world.block.BlockManager;
 import org.terasology.persistence.typeHandling.StringRepresentationTypeHandler;
 
-/**
- */
 public class BlockTypeHandler extends StringRepresentationTypeHandler<Block> {
 
     private BlockManager blockManager;

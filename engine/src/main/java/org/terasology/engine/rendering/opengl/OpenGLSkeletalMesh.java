@@ -28,8 +28,6 @@ import java.util.List;
 
 import static org.lwjgl.opengl.GL11.GL_UNSIGNED_INT;
 
-/**
- */
 public class OpenGLSkeletalMesh extends SkeletalMesh {
     private static final int VERTEX_SIZE = 3 * Float.BYTES;
     private static final int NORMAL_SIZE = 3 * Float.BYTES;

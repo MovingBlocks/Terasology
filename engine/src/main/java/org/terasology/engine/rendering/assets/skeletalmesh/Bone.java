@@ -11,8 +11,6 @@ import org.joml.Vector3f;
 import java.util.Collection;
 import java.util.List;
 
-/**
- */
 public class Bone {
     private String name;
     private int index;

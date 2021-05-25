@@ -1,23 +1,12 @@
-/*
- * Copyright 2013 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.engine.audio.system;
 
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.engine.audio.AudioManager;
 import org.terasology.engine.audio.events.PlaySoundEvent;
 import org.terasology.engine.audio.events.PlaySoundForOwnerEvent;
@@ -42,6 +31,7 @@ import org.terasology.engine.utilities.Assets;
  */
 @RegisterSystem
 public class AudioSystem extends BaseComponentSystem implements UpdateSubscriberSystem {
+    private static final Logger logger = LoggerFactory.getLogger(AudioSystem.class);
 
     @In
     private NetworkSystem networkSystem;
@@ -91,6 +81,8 @@ Vector3f position = localPlayer.getPosition(new Vector3f());
             if (pos.isFinite()) {
                 audioManager.playSound(playSoundEvent.getSound(), pos, playSoundEvent.getVolume(), AudioManager.PRIORITY_NORMAL);
                 return;
+            } else {
+                logger.warn("Can't play sound with non-finite position/rotation?! Entity: {}", entity);
             }
         }
         audioManager.playSound(playSoundEvent.getSound(), playSoundEvent.getVolume());

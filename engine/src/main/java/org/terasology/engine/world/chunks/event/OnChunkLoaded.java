@@ -7,8 +7,6 @@ import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.terasology.engine.entitySystem.event.Event;
 
-/**
- */
 public class OnChunkLoaded implements Event {
     private Vector3i chunkPos = new Vector3i();
 

@@ -12,8 +12,6 @@ import org.terasology.nui.UIWidget;
 import java.util.Arrays;
 import java.util.Iterator;
 
-/**
- */
 public abstract class CoreHudWidget extends CoreWidget implements ControlWidget {
 
     @LayoutConfig

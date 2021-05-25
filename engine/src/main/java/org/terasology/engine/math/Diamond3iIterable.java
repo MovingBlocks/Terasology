@@ -80,7 +80,7 @@ public final class Diamond3iIterable implements Iterable<Vector3ic> {
     public Iterator<Vector3ic> iterator() {
         Vector3i pos = new Vector3i();
         final int[] level = {this.startDistance};
-        final Vector3i offset = new Vector3i(-this.startDistance,0,0);
+        final Vector3i offset = new Vector3i(-this.startDistance, 0, 0);
 
         return new Iterator<Vector3ic>() {
             @Override
@@ -126,7 +126,7 @@ public final class Diamond3iIterable implements Iterable<Vector3ic> {
          * @param origin center region for iterator
          * @param endDistance maximums radius
          */
-        private Builder(Vector3ic origin, int endDistance){
+        private Builder(Vector3ic origin, int endDistance) {
             this.origin = origin;
             this.endDistance = endDistance + 1;
         }
@@ -141,7 +141,7 @@ public final class Diamond3iIterable implements Iterable<Vector3ic> {
         }
 
         public Diamond3iIterable build() {
-            return new Diamond3iIterable(origin,startDistance,endDistance);
+            return new Diamond3iIterable(origin, startDistance, endDistance);
         }
 
     }

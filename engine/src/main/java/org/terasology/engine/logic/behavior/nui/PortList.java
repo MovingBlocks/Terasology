@@ -10,8 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- */
 public class PortList implements TreeAccessor<RenderableNode> {
     private List<Port> ports = Lists.newLinkedList();
     private Port.InputPort inputPort;

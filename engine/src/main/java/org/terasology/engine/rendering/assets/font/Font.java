@@ -10,8 +10,6 @@ import org.terasology.gestalt.assets.ResourceUrn;
 
 import java.util.List;
 
-/**
- */
 public abstract class Font extends Asset<FontData> implements org.terasology.nui.asset.font.Font {
 
     protected Font(ResourceUrn urn, AssetType<?, FontData> assetType) {

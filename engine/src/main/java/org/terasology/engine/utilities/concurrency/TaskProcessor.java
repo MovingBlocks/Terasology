@@ -11,8 +11,6 @@ import org.terasology.engine.monitoring.ThreadMonitor;
 
 import java.util.concurrent.BlockingQueue;
 
-/**
- */
 final class TaskProcessor<T extends Task> implements Runnable {
 
     private static final Logger logger = LoggerFactory.getLogger(TaskProcessor.class);
