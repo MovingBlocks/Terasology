@@ -67,7 +67,10 @@ public abstract class Camera {
 
     /**
      * Applies the projection and modelview matrix.
+     * this method is scheduled for removal with core profile change to 3.3
+     * use {@link #getProjectionMatrix()} and {@link #getViewMatrix}
      */
+    @Deprecated
     public void lookThrough() {
         loadProjectionMatrix();
         loadModelViewMatrix();
@@ -75,7 +78,10 @@ public abstract class Camera {
 
     /**
      * Applies the projection and the normalized modelview matrix (positioned at the origin without any offset like bobbing) .
+     * this method is scheduled for removal with core profile change to 3.3
+     * use {@link #getProjectionMatrix()} and {@link #getNormViewMatrix()}
      */
+    @Deprecated
     public void lookThroughNormalized() {
         loadProjectionMatrix();
         loadNormalizedModelViewMatrix();
@@ -91,10 +97,26 @@ public abstract class Camera {
 
     public abstract boolean isBobbingAllowed();
 
+    /**
+     * this method is scheduled for removal with core profile change to 3.3
+     * use {@link #getProjectionMatrix()}
+     */
+    @Deprecated
     public abstract void loadProjectionMatrix();
 
+
+    /**
+     * this method is scheduled for removal with core profile change to 3.3
+     * use {@link #getViewMatrix()}
+     */
+    @Deprecated
     public abstract void loadModelViewMatrix();
 
+    /**
+     * this method is scheduled for removal with core profile change to 3.3
+     * use {@link #getNormViewMatrix()}
+     */
+    @Deprecated
     public abstract void loadNormalizedModelViewMatrix();
 
     public abstract void updateMatrices();
