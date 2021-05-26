@@ -50,7 +50,7 @@ public class ArrayTypeHandler<E> extends TypeHandler<Object> {
             return Optional.empty();
         }
 
-        @SuppressWarnings({"unchecked"})
+        @SuppressWarnings("unchecked")
         List<E> items = data.getAsArray().getAsValueArray().stream()
                 .map(itemData -> elementTypeHandler.deserialize(itemData))
                 .filter(Optional::isPresent)

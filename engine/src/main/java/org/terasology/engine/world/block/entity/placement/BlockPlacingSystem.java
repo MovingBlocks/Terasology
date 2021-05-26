@@ -17,7 +17,7 @@ public class BlockPlacingSystem extends BaseComponentSystem {
     @In
     private WorldProvider worldProvider;
 
-    @ReceiveEvent(components = {WorldComponent.class}, priority = EventPriority.PRIORITY_TRIVIAL)
+    @ReceiveEvent(components = WorldComponent.class, priority = EventPriority.PRIORITY_TRIVIAL)
     public void placeBlockInWorld(PlaceBlocks event, EntityRef world) {
         worldProvider.setBlocks(event.getBlocks());
     }

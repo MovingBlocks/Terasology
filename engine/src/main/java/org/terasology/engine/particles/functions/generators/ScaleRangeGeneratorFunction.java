@@ -11,7 +11,7 @@ import org.terasology.engine.utilities.random.Random;
 /**
  * Created by Linus on 11-3-2015.
  */
-@RegisterParticleSystemFunction()
+@RegisterParticleSystemFunction
 public final class ScaleRangeGeneratorFunction extends GeneratorFunction<ScaleRangeGeneratorComponent> {
     public ScaleRangeGeneratorFunction() {
         super(ParticleDataMask.SCALE);

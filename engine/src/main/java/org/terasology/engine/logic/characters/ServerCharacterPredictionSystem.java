@@ -102,7 +102,7 @@ public class ServerCharacterPredictionSystem extends BaseComponentSystem impleme
         lastInputEvent.remove(entity);
     }
 
-    @ReceiveEvent(components = {AliveCharacterComponent.class})
+    @ReceiveEvent(components = AliveCharacterComponent.class)
     public void onSetMovementModeEvent(SetMovementModeEvent event, EntityRef character,
                                        CharacterMovementComponent movementComponent) {
         CircularBuffer<CharacterStateEvent> stateBuffer = characterStates.get(character);
