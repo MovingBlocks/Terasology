@@ -31,9 +31,6 @@ public interface OpenGLMeshBase {
                 resource.writeBuffer((buffer) -> {
                     GL30.glBufferSubData(GL30.GL_ARRAY_BUFFER, offset, buffer);
                 });
-//                ByteBuffer buffer = resource.buffer();
-//                buffer.limit(resource.inSize());
-//                GL30.glBufferSubData(GL30.GL_ARRAY_BUFFER, state.entries[x].offset, buffer);
             }
         }
         GL30.glBindBuffer(GL30.GL_ARRAY_BUFFER, 0);
