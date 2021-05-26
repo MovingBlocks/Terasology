@@ -19,7 +19,7 @@ public class ChunkMeshComponent implements VisualComponent {
     @Replicate
     public boolean animated = true;
 
-    public ChunkMeshComponent() {}
+    public ChunkMeshComponent() { }
 
     public ChunkMeshComponent(ChunkMesh mesh, AABBf aabb) {
         this.mesh = mesh;

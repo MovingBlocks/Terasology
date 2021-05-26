@@ -33,8 +33,6 @@ import java.util.Arrays;
 
 import static java.util.stream.Collectors.joining;
 
-/**
- */
 @RegisterSystem
 public class ChatSystem extends BaseComponentSystem {
     private static final Logger logger = LoggerFactory.getLogger(ChatSystem.class);

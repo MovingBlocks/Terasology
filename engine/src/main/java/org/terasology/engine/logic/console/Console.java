@@ -9,8 +9,6 @@ import org.terasology.gestalt.naming.Name;
 import java.util.Collection;
 import java.util.List;
 
-/**
- */
 public interface Console {
 
     String NEW_LINE = "\n";

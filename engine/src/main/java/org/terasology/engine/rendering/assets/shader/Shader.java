@@ -8,8 +8,6 @@ import org.terasology.gestalt.assets.AssetType;
 import org.terasology.gestalt.assets.DisposableResource;
 import org.terasology.gestalt.assets.ResourceUrn;
 
-/**
- */
 public abstract class Shader extends Asset<ShaderData> {
 
     protected Shader(ResourceUrn urn, AssetType<?, ShaderData> assetType, DisposableResource resource) {

@@ -4,7 +4,6 @@ package org.terasology.engine.logic.characters;
 
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
-import org.terasology.gestalt.assets.management.AssetManager;
 import org.terasology.engine.core.modes.loadProcesses.AwaitedLocalCharacterSpawnEvent;
 import org.terasology.engine.entitySystem.entity.EntityBuilder;
 import org.terasology.engine.entitySystem.entity.EntityManager;
@@ -22,6 +21,7 @@ import org.terasology.engine.logic.location.Location;
 import org.terasology.engine.logic.location.LocationComponent;
 import org.terasology.engine.logic.players.LocalPlayer;
 import org.terasology.engine.registry.In;
+import org.terasology.gestalt.assets.management.AssetManager;
 
 /**
  * This system is responsible for sending a {@link CreateVisualCharacterEvent} according to how it is specified in
@@ -57,13 +57,14 @@ public class VisualCharacterSystem extends BaseComponentSystem {
     }
 
 
-    @ReceiveEvent(components = {VisualCharacterComponent.class})
+    @ReceiveEvent(components = VisualCharacterComponent.class)
     public void onBeforeDeactivatedVisualCharacter(BeforeDeactivateComponent event, EntityRef entity,
                                                    VisualCharacterComponent visualCharacterComponent) {
         visualCharacterComponent.visualCharacter.destroy();
     }
 
-    void createVisualCharacterIfNotOwnCharacter(EntityRef characterEntity, VisualCharacterComponent visualCharacterComponent) {
+    void createVisualCharacterIfNotOwnCharacter(EntityRef characterEntity,
+                                                VisualCharacterComponent visualCharacterComponent) {
         boolean isCharacterOfLocalPlayer = characterEntity.getOwner().equals(localPlayer.getClientEntity());
         if (isCharacterOfLocalPlayer) {
             return;
@@ -72,7 +73,7 @@ public class VisualCharacterSystem extends BaseComponentSystem {
         characterEntity.send(event);
         EntityBuilder entityBuilder = event.getVisualCharacterBuilder();
         EntityRef visualCharacterEntity = createAndAttachVisualEntityStrategy.createAndAttachVisualEntity(entityBuilder,
-            characterEntity);
+                characterEntity);
 
         visualCharacterComponent.visualCharacter = visualCharacterEntity;
         characterEntity.saveComponent(visualCharacterComponent);

@@ -7,8 +7,6 @@ import org.terasology.engine.physics.CollisionGroup;
 import org.terasology.engine.physics.CollisionGroupManager;
 import org.terasology.persistence.typeHandling.StringRepresentationTypeHandler;
 
-/**
- */
 public class CollisionGroupTypeHandler extends StringRepresentationTypeHandler<CollisionGroup> {
 
     private CollisionGroupManager groupManager;

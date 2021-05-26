@@ -15,7 +15,6 @@ import org.terasology.engine.core.modes.StateMainMenu;
 import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.engine.core.module.rendering.RenderingModuleRegistry;
 import org.terasology.engine.core.subsystem.DisplayDevice;
-import org.terasology.engine.core.subsystem.lwjgl.GLBufferPool;
 import org.terasology.engine.core.subsystem.lwjgl.LwjglGraphicsUtil;
 import org.terasology.engine.logic.console.Console;
 import org.terasology.engine.logic.console.commandSystem.MethodCommand;
@@ -53,14 +52,15 @@ import static org.lwjgl.opengl.GL11.glViewport;
 
 
 /**
- * Renders the 3D world, including background, overlays and first person/in hand objects. 2D UI elements are dealt with elsewhere.
+ * Renders the 3D world, including background, overlays and first person/in hand objects. 2D UI elements are dealt with
+ * elsewhere.
  * <p>
  * This implementation includes support for OpenVR, through which HTC Vive and Oculus Rift is supported.
  * <p>
  * This implementation works closely with a number of support objects, in particular:
  * <p>
- * TODO: update this section to include new, relevant objects
- * - a RenderableWorld instance, providing acceleration structures caching blocks requiring different rendering treatments<br/>
+ * TODO: update this section to include new, relevant objects - a RenderableWorld instance, providing acceleration
+ * structures caching blocks requiring different rendering treatments<br/>
  */
 public final class WorldRendererImpl implements WorldRenderer {
     /*
@@ -104,20 +104,19 @@ public final class WorldRendererImpl implements WorldRenderer {
     /**
      * Instantiates a WorldRenderer implementation.
      * <p>
-     * This particular implementation works as deferred shader. The scene is rendered multiple times per frame
-     * in a number of separate passes (each stored in GPU buffers) and the passes are combined throughout the
-     * rendering pipeline to calculate per-pixel lighting and other effects.
+     * This particular implementation works as deferred shader. The scene is rendered multiple times per frame in a
+     * number of separate passes (each stored in GPU buffers) and the passes are combined throughout the rendering
+     * pipeline to calculate per-pixel lighting and other effects.
      * <p>
-     * Transparencies are handled through alpha rejection (i.e. ground plants) and alpha-based blending.
-     * An exception to this is water, which is handled separately to allow for reflections and refractions, if enabled.
+     * Transparencies are handled through alpha rejection (i.e. ground plants) and alpha-based blending. An exception to
+     * this is water, which is handled separately to allow for reflections and refractions, if enabled.
      * <p>
-     * By the time it is fully instantiated this implementation is already connected to all the support objects
-     * it requires and is ready to render via the render(RenderingStage) method.
+     * By the time it is fully instantiated this implementation is already connected to all the support objects it
+     * requires and is ready to render via the render(RenderingStage) method.
      *
-     * @param context    a context object, to obtain instances of classes such as the rendering config.
-     * @param bufferPool a GLBufferPool, to be passed to the RenderableWorld instance used by this implementation.
+     * @param context a context object, to obtain instances of classes such as the rendering config.
      */
-    public WorldRendererImpl(Context context, GLBufferPool bufferPool) {
+    public WorldRendererImpl(Context context) {
         this.context = context;
         renderGraph = new RenderGraph(context);
 
@@ -155,7 +154,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         LocalPlayerSystem localPlayerSystem = context.get(LocalPlayerSystem.class);
         localPlayerSystem.setPlayerCamera(playerCamera);
 
-        context.put(ChunkTessellator.class, new ChunkTessellator(bufferPool));
+        context.put(ChunkTessellator.class, new ChunkTessellator());
 
         renderableWorld = new RenderableWorldImpl(context, playerCamera);
         renderQueues = renderableWorld.getRenderQueues();
@@ -174,7 +173,8 @@ public final class WorldRendererImpl implements WorldRenderer {
         ScreenGrabber screenGrabber = new ScreenGrabber(context);
         context.put(ScreenGrabber.class, screenGrabber);
 
-        displayResolutionDependentFbo = new DisplayResolutionDependentFbo(context.get(Config.class).getRendering(), screenGrabber, context.get(DisplayDevice.class));
+        displayResolutionDependentFbo = new DisplayResolutionDependentFbo(
+                context.get(Config.class).getRendering(), screenGrabber, context.get(DisplayDevice.class));
         context.put(DisplayResolutionDependentFbo.class, displayResolutionDependentFbo);
 
         shaderManager.initShaders();
@@ -200,7 +200,8 @@ public final class WorldRendererImpl implements WorldRenderer {
                     context.get(ModuleManager.class).getEnvironment(), context);
             if (renderingModules.isEmpty()) {
                 GameEngine gameEngine = context.get(GameEngine.class);
-                gameEngine.changeState(new StateMainMenu("No rendering module loaded, unable to render. Try enabling CoreRendering."));
+                gameEngine.changeState(new StateMainMenu("No rendering module loaded, unable to render. Try enabling " +
+                        "CoreRendering."));
             }
         } else { // registry populated by new ModuleRendering instances in UI
             // Switch module's context from gamecreation subcontext to gamerunning context
@@ -217,8 +218,8 @@ public final class WorldRendererImpl implements WorldRenderer {
         for (ModuleRendering moduleRenderingInstance : renderingModuleRegistry.getOrderedRenderingModules()) {
             if (moduleRenderingInstance.isEnabled()) {
                 logger.info(String.format("\nInitialising rendering class %s from %s module.\n",
-                                            moduleRenderingInstance.getClass().getSimpleName(),
-                                            moduleRenderingInstance.getProvidingModule()));
+                        moduleRenderingInstance.getClass().getSimpleName(),
+                        moduleRenderingInstance.getProvidingModule()));
                 moduleRenderingInstance.initialise();
             }
         }
@@ -288,7 +289,8 @@ public final class WorldRendererImpl implements WorldRenderer {
         // this is done to execute this code block only once per frame
         // instead of once per eye in a stereo setup.
         if (isFirstRenderingStageForCurrentFrame) {
-            timeSmoothedMainLightIntensity = TeraMath.lerp(timeSmoothedMainLightIntensity, getMainLightIntensityAt(playerCamera.getPosition()), secondsSinceLastFrame);
+            timeSmoothedMainLightIntensity = TeraMath.lerp(timeSmoothedMainLightIntensity,
+                    getMainLightIntensityAt(playerCamera.getPosition()), secondsSinceLastFrame);
 
             playerCamera.update(secondsSinceLastFrame);
 
@@ -298,7 +300,8 @@ public final class WorldRendererImpl implements WorldRenderer {
 
             displayResolutionDependentFbo.update();
 
-            millisecondsSinceRenderingStart += secondsSinceLastFrame * 1000;  // updates the variable animations are based on.
+            millisecondsSinceRenderingStart += secondsSinceLastFrame * 1000;  // updates the variable animations are
+            // based on.
         }
 
         if (currentRenderingStage != RenderingStage.MONO) {
@@ -316,18 +319,18 @@ public final class WorldRendererImpl implements WorldRenderer {
     }
 
     /**
-     * TODO: update javadocs
-     * This method triggers the execution of the rendering pipeline and, eventually, sends the output to the display
-     * or to a file, when grabbing a screenshot.
+     * TODO: update javadocs This method triggers the execution of the rendering pipeline and, eventually, sends the
+     * output to the display or to a file, when grabbing a screenshot.
      * <p>
      * In this particular implementation this method can be called once per frame, when rendering to a standard display,
      * or twice, each time with a different rendering stage, when rendering to the head mounted display.
      * <p>
-     * PerformanceMonitor.startActivity/endActivity statements are used in this method and in those it executes,
-     * to provide statistics regarding the ongoing rendering and its individual steps (i.e. rendering shadows,
-     * reflections, 2D filters...).
+     * PerformanceMonitor.startActivity/endActivity statements are used in this method and in those it executes, to
+     * provide statistics regarding the ongoing rendering and its individual steps (i.e. rendering shadows, reflections,
+     * 2D filters...).
      *
-     * @param renderingStage "MONO" for standard rendering and "LEFT_EYE" or "RIGHT_EYE" for stereoscopic displays.
+     * @param renderingStage "MONO" for standard rendering and "LEFT_EYE" or "RIGHT_EYE" for stereoscopic
+     *         displays.
      */
     @Override
     public void render(RenderingStage renderingStage) {
@@ -396,13 +399,15 @@ public final class WorldRendererImpl implements WorldRenderer {
         float rawLightValueSun = worldProvider.getSunlight(pos) / 15.0f;
         float rawLightValueBlock = worldProvider.getLight(pos) / 15.0f;
 
-        float lightValueSun = (float) Math.pow(BLOCK_LIGHT_SUN_POW, (1.0f - rawLightValueSun) * 16.0) * rawLightValueSun;
+        float lightValueSun =
+                (float) Math.pow(BLOCK_LIGHT_SUN_POW, (1.0f - rawLightValueSun) * 16.0) * rawLightValueSun;
         lightValueSun *= backdropProvider.getDaylight();
         // TODO: Hardcoded factor and value to compensate for daylight tint and night brightness
         lightValueSun *= 0.9f;
         lightValueSun += 0.05f;
 
-        float lightValueBlock = (float) Math.pow(BLOCK_LIGHT_POW, (1.0f - (double) rawLightValueBlock) * 16.0f) * rawLightValueBlock * BLOCK_INTENSITY_FACTOR;
+        float lightValueBlock =
+                (float) Math.pow(BLOCK_LIGHT_POW, (1.0f - (double) rawLightValueBlock) * 16.0f) * rawLightValueBlock * BLOCK_INTENSITY_FACTOR;
 
         return Math.max(lightValueBlock, lightValueSun);
     }
@@ -454,12 +459,13 @@ public final class WorldRendererImpl implements WorldRenderer {
     }
 
     /**
-     * Forces a recompilation of all shaders. This command, backed by Gestalt's monitoring feature,
-     * allows developers to hot-swap shaders for easy development.
-     *
+     * Forces a recompilation of all shaders. This command, backed by Gestalt's monitoring feature, allows developers to
+     * hot-swap shaders for easy development.
+     * <p>
      * To run the command simply type "recompileShaders" and then press Enter in the console.
      */
-    @Command(shortDescription = "Forces a recompilation of shaders.", requiredPermission = PermissionManager.NO_PERMISSION)
+    @Command(shortDescription = "Forces a recompilation of shaders.", requiredPermission =
+            PermissionManager.NO_PERMISSION)
     public void recompileShaders() {
         console.addMessage("Recompiling shaders... ", false);
         shaderManager.recompileAllShaders();
@@ -469,15 +475,14 @@ public final class WorldRendererImpl implements WorldRenderer {
     /**
      * Acts as an interface between the console and the Nodes. All parameters passed to command are redirected to the
      * concerned Nodes, which in turn take care of executing them.
-     *
-     * Usage:
-     *      dagNodeCommand <nodeUri> <command> <parameters>
-     *
-     * Example:
-     *      dagNodeCommand engine:outputToScreenNode setFbo engine:fbo.ssao
+     * <p>
+     * Usage: dagNodeCommand <nodeUri> <command> <parameters>
+     * <p>
+     * Example: dagNodeCommand engine:outputToScreenNode setFbo engine:fbo.ssao
      */
     @Command(shortDescription = "Debugging command for DAG.", requiredPermission = PermissionManager.NO_PERMISSION)
-    public void dagNodeCommand(@CommandParam("nodeUri") final String nodeUri, @CommandParam("command") final String command,
+    public void dagNodeCommand(@CommandParam("nodeUri") final String nodeUri,
+                               @CommandParam("command") final String command,
                                @CommandParam(value = "arguments") final String... arguments) {
         Node node = renderGraph.findNode(nodeUri);
         if (node == null) {
@@ -491,24 +496,25 @@ public final class WorldRendererImpl implements WorldRenderer {
 
     /**
      * Redirect output FBO from one node to another's input
-     *
-     * Usage:
-     *      dagRedirect <connectionTypeString> <fromNodeUri> <outputFboId> <toNodeUri> <inputFboId>
-     *
-     * Example:
-     *      dagRedirect fbo blurredAmbientOcclusion 1 BasicRendering:outputToScreenNode 1
-     *      dagRedirect bufferpair backdrop 1 AdvancedRendering:intermediateHazeNode 1
+     * <p>
+     * Usage: dagRedirect <connectionTypeString> <fromNodeUri> <outputFboId> <toNodeUri> <inputFboId>
+     * <p>
+     * Example: dagRedirect fbo blurredAmbientOcclusion 1 BasicRendering:outputToScreenNode 1 dagRedirect bufferpair
+     * backdrop 1 AdvancedRendering:intermediateHazeNode 1
      */
     @Command(shortDescription = "Debugging command for DAG.", requiredPermission = PermissionManager.NO_PERMISSION)
-    public void dagRedirect(@CommandParam("fromNodeUri") final String connectionTypeString, @CommandParam("fromNodeUri") final String fromNodeUri, @CommandParam("outputFboId") final int outputFboId,
-                            @CommandParam("toNodeUri") final String toNodeUri, @CommandParam(value = "inputFboId") final int inputFboId) {
+    public void dagRedirect(@CommandParam("fromNodeUri") final String connectionTypeString, @CommandParam(
+            "fromNodeUri") final String fromNodeUri, @CommandParam("outputFboId") final int outputFboId,
+                            @CommandParam("toNodeUri") final String toNodeUri,
+                            @CommandParam(value = "inputFboId") final int inputFboId) {
         RenderGraph.ConnectionType connectionType;
-        if(connectionTypeString.equalsIgnoreCase("fbo")) {
+        if (connectionTypeString.equalsIgnoreCase("fbo")) {
             connectionType = RenderGraph.ConnectionType.FBO;
         } else if (connectionTypeString.equalsIgnoreCase("bufferpair")) {
             connectionType = RenderGraph.ConnectionType.BUFFER_PAIR;
         } else {
-            throw new RuntimeException(("Unsupported connection type: '" + connectionTypeString + "'. Expected 'fbo' or 'bufferpair'.\n"));
+            throw new RuntimeException(("Unsupported connection type: '" + connectionTypeString + "'. Expected 'fbo' " +
+                    "or 'bufferpair'.\n"));
         }
 
         Node toNode = renderGraph.findNode(toNodeUri);
@@ -526,9 +532,9 @@ public final class WorldRendererImpl implements WorldRenderer {
                 throw new RuntimeException(("No node is associated with URI '" + fromNodeUri + "'"));
             }
         }
-    renderGraph.reconnectInputToOutput(fromNode, outputFboId, toNode, inputFboId, connectionType, true);
-    toNode.clearDesiredStateChanges();
-    requestTaskListRefresh();
+        renderGraph.reconnectInputToOutput(fromNode, outputFboId, toNode, inputFboId, connectionType, true);
+        toNode.clearDesiredStateChanges();
+        requestTaskListRefresh();
 
     }
 }

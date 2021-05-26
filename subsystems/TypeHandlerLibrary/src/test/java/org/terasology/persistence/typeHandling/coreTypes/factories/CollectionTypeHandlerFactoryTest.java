@@ -32,7 +32,7 @@ public class CollectionTypeHandlerFactoryTest {
 
     @Test
     public void testList() {
-        TypeInfo<List<Integer>> listTypeInfo = new TypeInfo<List<Integer>>() {};
+        TypeInfo<List<Integer>> listTypeInfo = new TypeInfo<List<Integer>>() { };
 
         Optional<TypeHandler<List<Integer>>> typeHandler =
                 typeHandlerFactory.create(listTypeInfo, context);
@@ -46,7 +46,7 @@ public class CollectionTypeHandlerFactoryTest {
 
     @Test
     public void testSet() {
-        TypeInfo<Set<Integer>> listTypeInfo = new TypeInfo<Set<Integer>>() {};
+        TypeInfo<Set<Integer>> listTypeInfo = new TypeInfo<Set<Integer>>() { };
 
         Optional<TypeHandler<Set<Integer>>> typeHandler =
                 typeHandlerFactory.create(listTypeInfo, context);
@@ -60,7 +60,7 @@ public class CollectionTypeHandlerFactoryTest {
 
     @Test
     public void testQueue() {
-        TypeInfo<Queue<Integer>> listTypeInfo = new TypeInfo<Queue<Integer>>() {};
+        TypeInfo<Queue<Integer>> listTypeInfo = new TypeInfo<Queue<Integer>>() { };
 
         Optional<TypeHandler<Queue<Integer>>> typeHandler =
                 typeHandlerFactory.create(listTypeInfo, context);
@@ -74,7 +74,7 @@ public class CollectionTypeHandlerFactoryTest {
 
     @Test
     public void testNonGenericCollection() {
-        class IntList extends ArrayList<Integer> {}
+        class IntList extends ArrayList<Integer> { }
 
         Optional<TypeHandler<IntList>> typeHandler =
                 typeHandlerFactory.create(TypeInfo.of(IntList.class), context);

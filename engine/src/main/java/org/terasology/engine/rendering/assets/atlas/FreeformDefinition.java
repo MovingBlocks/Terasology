@@ -5,8 +5,6 @@ package org.terasology.engine.rendering.assets.atlas;
 
 import org.joml.Vector2i;
 
-/**
- */
 public class FreeformDefinition {
 
     private String name;

@@ -14,8 +14,6 @@ import org.terasology.nui.reflection.WidgetLibrary;
 
 import java.util.Deque;
 
-/**
- */
 public interface NUIManager extends ComponentSystem, FocusManager {
 
     HUDScreenLayer getHUD();
