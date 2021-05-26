@@ -6,8 +6,6 @@ import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.network.Replicate;
 import org.terasology.engine.world.block.Block;
 
-/**
- */
 public class BlockTypeComponent implements Component {
     @Replicate
     public Block block;

@@ -13,8 +13,6 @@ import org.terasology.gestalt.assets.module.annotations.RegisterAssetSupplementa
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-/**
- */
 @RegisterAssetSupplementalFileFormat
 public class TextureInfoFormat extends AbstractAssetAlterationFileFormat<TextureData> {
 

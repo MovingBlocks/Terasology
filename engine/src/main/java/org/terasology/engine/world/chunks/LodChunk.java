@@ -9,8 +9,6 @@ import org.joml.Vector3ic;
 import org.terasology.joml.geom.AABBf;
 import org.terasology.joml.geom.AABBfc;
 import org.terasology.engine.rendering.primitives.ChunkMesh;
-import org.terasology.engine.world.block.Block;
-import org.terasology.engine.world.block.BlockRegion;
 
 /**
  * A static, far away chunk that has only the data needed for rendering.

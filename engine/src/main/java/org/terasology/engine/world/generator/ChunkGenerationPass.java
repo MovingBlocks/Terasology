@@ -7,8 +7,6 @@ import org.terasology.engine.world.chunks.Chunk;
 
 import java.util.Map;
 
-/**
- */
 public interface ChunkGenerationPass {
 
     void setWorldSeed(String seed);

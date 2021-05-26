@@ -9,8 +9,6 @@ import org.terasology.engine.entitySystem.Component;
 
 import java.util.List;
 
-/**
- */
 public final class CharacterSoundComponent implements Component {
 
     public List<StaticSound> footstepSounds = Lists.newArrayList();

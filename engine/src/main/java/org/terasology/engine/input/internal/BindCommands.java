@@ -18,8 +18,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- */
 @RegisterSystem
 public class BindCommands extends BaseComponentSystem {
 

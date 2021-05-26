@@ -15,8 +15,6 @@ import org.terasology.engine.entitySystem.systems.RegisterSystem;
 
 import java.util.Iterator;
 
-/**
- */
 @RegisterSystem
 public class Location extends BaseComponentSystem {
 

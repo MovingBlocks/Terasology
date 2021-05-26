@@ -42,8 +42,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-/**
- */
 @RegisterAssetFileFormat
 public class UISkinFormat extends AbstractAssetFileFormat<UISkinData> {
 

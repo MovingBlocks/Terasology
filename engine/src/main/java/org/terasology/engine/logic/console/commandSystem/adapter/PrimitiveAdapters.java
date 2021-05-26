@@ -5,8 +5,6 @@ package org.terasology.engine.logic.console.commandSystem.adapter;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 
-/**
- */
 public final class PrimitiveAdapters {
 
     public static final ParameterAdapter<Long> LONG = new ParameterAdapter<Long>() {

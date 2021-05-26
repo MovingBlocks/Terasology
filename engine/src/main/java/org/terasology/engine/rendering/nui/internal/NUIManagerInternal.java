@@ -85,8 +85,6 @@ import java.util.Set;
 
 import static com.google.common.base.Verify.verifyNotNull;
 
-/**
- */
 public class NUIManagerInternal extends BaseComponentSystem implements NUIManager, PropertyChangeListener {
     private final ModuleEnvironment moduleEnvironment;
     private final TypeWidgetFactoryRegistry typeWidgetFactoryRegistry;
@@ -152,9 +150,12 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
                 && bindsManager.getBindsConfig().hasBinds(new SimpleUri("engine:tabbingUI"))
                 && bindsManager.getBindsConfig().hasBinds(new SimpleUri("engine:tabbingModifier"))
                 && bindsManager.getBindsConfig().hasBinds(new SimpleUri("engine:activate"))) {
-            TabbingManager.tabForwardInput = bindsManager.getBindsConfig().getBinds(new SimpleUri("engine:tabbingUI")).get(0);
-            TabbingManager.tabBackInputModifier = bindsManager.getBindsConfig().getBinds(new SimpleUri("engine:tabbingModifier")).get(0);
-            TabbingManager.activateInput = bindsManager.getBindsConfig().getBinds(new SimpleUri("engine:activate")).get(0);
+            TabbingManager.tabForwardInput =
+                    bindsManager.getBindsConfig().getBinds(new SimpleUri("engine:tabbingUI")).get(0);
+            TabbingManager.tabBackInputModifier = bindsManager.getBindsConfig().getBinds(new SimpleUri("engine" +
+                    ":tabbingModifier")).get(0);
+            TabbingManager.activateInput =
+                    bindsManager.getBindsConfig().getBinds(new SimpleUri("engine:activate")).get(0);
         }
 
         moduleEnvironment = context.get(ModuleManager.class).getEnvironment();
@@ -187,7 +188,8 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     }
 
     public void refreshWidgetsLibrary() {
-        widgetsLibrary = new WidgetLibrary(context.get(ModuleManager.class).getEnvironment(), context.get(ReflectFactory.class), context.get(CopyStrategyLibrary.class));
+        widgetsLibrary = new WidgetLibrary(context.get(ModuleManager.class).getEnvironment(),
+                context.get(ReflectFactory.class), context.get(CopyStrategyLibrary.class));
         ModuleEnvironment environment = context.get(ModuleManager.class).getEnvironment();
         for (Class<? extends UIWidget> type : environment.getSubtypesOf(UIWidget.class)) {
             Name module = verifyNotNull(environment.getModuleProviding(type), "No module provides %s", type);
@@ -269,9 +271,10 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
 
     @Override
     public ResourceUrn getUri(UIScreenLayer screen) {
-        BiMap<ResourceUrn, UIScreenLayer> lookup =  HashBiMap.create(screenLookup);
+        BiMap<ResourceUrn, UIScreenLayer> lookup = HashBiMap.create(screenLookup);
         return lookup.inverse().remove(screen);
     }
+
     @Override
     public void closeScreen(UIScreenLayer screen) {
         if (screens.remove(screen)) {
@@ -760,10 +763,13 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
         }
     }
 
-    //bind input events (will be send after raw input events, if a bind button was pressed and the raw input event hasn't consumed the event)
+    //bind input events (will be send after raw input events, if a bind button was pressed and the raw input event
+    // hasn't consumed the event)
     @ReceiveEvent(components = ClientComponent.class, priority = EventPriority.PRIORITY_HIGH)
     public void bindEvent(BindButtonEvent event, EntityRef entity) {
-        NUIBindButtonEvent nuiEvent = new NUIBindButtonEvent(mouse, keyboard, new ResourceUrn(event.getId().getModuleName(), event.getId().getObjectName()).toString(), event.getState());
+        NUIBindButtonEvent nuiEvent = new NUIBindButtonEvent(mouse, keyboard,
+                new ResourceUrn(event.getId().getModuleName(), event.getId().getObjectName()).toString(),
+                event.getState());
 
         if (focus != null) {
             focus.onBindEvent(nuiEvent);
@@ -816,6 +822,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
             setHUDVisible(true);
         }
     }
+
     @Override
     public CanvasControl getCanvas() {
         return canvas;

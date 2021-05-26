@@ -6,8 +6,6 @@ package org.terasology.engine.logic.players.event;
 import org.terasology.engine.entitySystem.event.Event;
 import org.terasology.engine.network.ServerEvent;
 
-/**
- */
 @ServerEvent
 public class RespawnRequestEvent implements Event {
 }

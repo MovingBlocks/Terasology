@@ -12,8 +12,6 @@ import org.terasology.joml.geom.Rectanglei;
 import org.terasology.nui.canvas.CanvasRenderer;
 import org.terasology.engine.rendering.assets.mesh.Mesh;
 
-/**
- */
 public interface TerasologyCanvasRenderer extends CanvasRenderer {
     FrameBufferObject getFBO(ResourceUrn urn, Vector2ic size);
 

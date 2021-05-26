@@ -25,7 +25,6 @@ import org.terasology.engine.world.generator.internal.WorldGeneratorManager;
 import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.gestalt.module.Module;
 import org.terasology.gestalt.module.dependencyresolution.DependencyResolver;
-import org.terasology.gestalt.module.resources.DirectoryFileSource;
 import org.terasology.gestalt.naming.Name;
 import org.terasology.input.Keyboard;
 import org.terasology.nui.Canvas;

@@ -10,8 +10,6 @@ import org.terasology.nui.widgets.UIText;
 import org.terasology.engine.registry.CoreRegistry;
 import org.terasology.engine.rendering.nui.BaseInteractionScreen;
 
-/**
- */
 public class InspectionScreen extends BaseInteractionScreen {
     private UIText fullDescriptionLabel;
     private UIText entityIdField;

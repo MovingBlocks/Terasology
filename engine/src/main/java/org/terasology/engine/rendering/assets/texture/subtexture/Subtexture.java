@@ -15,8 +15,6 @@ import org.terasology.engine.rendering.assets.texture.TextureRegionAsset;
 
 import java.util.Optional;
 
-/**
- */
 public class Subtexture extends TextureRegionAsset<SubtextureData> {
 
     private Texture texture;
@@ -58,7 +56,7 @@ public class Subtexture extends TextureRegionAsset<SubtextureData> {
     public Rectanglei getPixelRegion() {
         return new Rectanglei(
                 TeraMath.floorToInt(subregion.minX() * texture.getWidth()),
-                TeraMath.floorToInt(subregion.minY() * texture.getHeight())).setSize( getWidth(), getHeight());
+                TeraMath.floorToInt(subregion.minY() * texture.getHeight())).setSize(getWidth(), getHeight());
     }
 
     @Override

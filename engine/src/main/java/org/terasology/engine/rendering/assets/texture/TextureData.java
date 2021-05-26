@@ -8,8 +8,6 @@ import org.terasology.gestalt.assets.AssetData;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 
-/**
- */
 public class TextureData implements AssetData {
     private static final int BYTES_PER_PIXEL = 4;
 
