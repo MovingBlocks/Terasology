@@ -10,14 +10,11 @@ import org.joml.Vector3f;
 import org.terasology.engine.rendering.assets.mesh.StandardMeshData;
 import org.terasology.joml.geom.AABBf;
 import org.terasology.engine.rendering.assets.mesh.MeshBuilder;
-import org.terasology.engine.rendering.assets.mesh.MeshData;
 
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- *
- */
+
 public class SkeletalMeshDataBuilder {
 
     private List<Bone> bones = new ArrayList<>();

@@ -46,7 +46,7 @@ public class RuntimeDelegatingTypeHandler<T> extends TypeHandler<T> {
         this.sandbox = context.getSandbox();
     }
 
-    @SuppressWarnings({"unchecked"})
+    @SuppressWarnings("unchecked")
     @Override
     public PersistedData serializeNonNull(T value, PersistedDataSerializer serializer) {
         // If primitive, don't go looking for the runtime type, serialize as is
@@ -157,7 +157,7 @@ public class RuntimeDelegatingTypeHandler<T> extends TypeHandler<T> {
         return ReflectionUtil.parameterizeandResolveRawType(typeInfo.getType(), value.getClass());
     }
 
-    @SuppressWarnings({"unchecked"})
+    @SuppressWarnings("unchecked")
     @Override
     public Optional<T> deserialize(PersistedData data) {
         if (!data.isValueMap()) {

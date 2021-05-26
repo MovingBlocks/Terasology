@@ -8,8 +8,6 @@ import org.terasology.nui.Color;
 import org.terasology.engine.rendering.assets.mesh.Mesh;
 import org.terasology.engine.world.block.ForceBlockActive;
 
-/**
- */
 @ForceBlockActive
 public final class MeshComponent implements VisualComponent {
 

@@ -6,8 +6,6 @@ package org.terasology.engine.input.cameraTarget;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.event.Event;
 
-/**
- */
 public class CameraTargetChangedEvent implements Event {
     private EntityRef oldTarget;
     private EntityRef newTarget;

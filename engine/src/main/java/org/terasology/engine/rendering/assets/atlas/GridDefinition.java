@@ -7,8 +7,6 @@ import org.joml.Vector2i;
 
 import java.util.List;
 
-/**
- */
 public class GridDefinition {
 
     private Vector2i tileSize;

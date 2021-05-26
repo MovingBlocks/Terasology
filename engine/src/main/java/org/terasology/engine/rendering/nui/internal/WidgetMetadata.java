@@ -14,8 +14,6 @@ import org.terasology.reflection.reflect.ReflectFactory;
 
 import java.lang.reflect.Field;
 
-/**
- */
 public class WidgetMetadata<T extends UIWidget> extends ClassMetadata<T, FieldMetadata<T, ?>> {
 
     /**

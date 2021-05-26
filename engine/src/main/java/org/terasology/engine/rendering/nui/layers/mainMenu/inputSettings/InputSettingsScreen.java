@@ -6,31 +6,32 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.joml.Vector2i;
-import org.terasology.engine.core.module.ModuleManager;
-import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.engine.config.BindsConfig;
 import org.terasology.engine.config.ControllerConfig.ControllerInfo;
 import org.terasology.engine.config.facade.InputDeviceConfiguration;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.core.SimpleUri;
+import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.engine.core.subsystem.config.BindsManager;
 import org.terasology.engine.i18n.TranslationSystem;
 import org.terasology.engine.input.BindButtonEvent;
+import org.terasology.engine.input.InputSystem;
+import org.terasology.engine.input.RegisterBindButton;
+import org.terasology.engine.input.internal.BindCommands;
+import org.terasology.engine.registry.In;
+import org.terasology.engine.rendering.nui.CoreScreenLayer;
 import org.terasology.engine.rendering.nui.animation.MenuAnimationSystems;
+import org.terasology.gestalt.assets.ResourceUrn;
+import org.terasology.gestalt.module.Module;
+import org.terasology.gestalt.module.ModuleEnvironment;
 import org.terasology.gestalt.module.dependencyresolution.DependencyResolver;
 import org.terasology.gestalt.module.dependencyresolution.ResolutionResult;
 import org.terasology.gestalt.module.predicates.FromModule;
-import org.terasology.gestalt.module.resources.DirectoryFileSource;
+import org.terasology.gestalt.naming.Name;
 import org.terasology.input.Input;
 import org.terasology.input.InputCategory;
-import org.terasology.engine.input.InputSystem;
 import org.terasology.input.InputType;
 import org.terasology.input.Keyboard.KeyId;
-import org.terasology.engine.input.RegisterBindButton;
-import org.terasology.engine.input.internal.BindCommands;
-import org.terasology.gestalt.module.Module;
-import org.terasology.gestalt.module.ModuleEnvironment;
-import org.terasology.gestalt.naming.Name;
 import org.terasology.nui.TabbingManager;
 import org.terasology.nui.WidgetUtil;
 import org.terasology.nui.databinding.BindHelper;
@@ -42,8 +43,6 @@ import org.terasology.nui.widgets.UICheckbox;
 import org.terasology.nui.widgets.UILabel;
 import org.terasology.nui.widgets.UISlider;
 import org.terasology.nui.widgets.UISpace;
-import org.terasology.engine.registry.In;
-import org.terasology.engine.rendering.nui.CoreScreenLayer;
 
 import java.util.Collections;
 import java.util.List;
@@ -51,9 +50,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
-/**
- *
- */
+
 public class InputSettingsScreen extends CoreScreenLayer {
 
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:inputSettingsScreen");
@@ -134,25 +131,22 @@ public class InputSettingsScreen extends CoreScreenLayer {
         DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
         for (Name moduleId : moduleManager.getRegistry().getModuleIds()) {
             Module module = moduleManager.getRegistry().getLatestModuleVersion(moduleId);
-            if (module.getResources() instanceof DirectoryFileSource) {
-                ResolutionResult result = resolver.resolve(moduleId);
-                if (result.isSuccess()) {
-                    try (ModuleEnvironment environment = moduleManager.loadEnvironment(result.getModules(), false)) {
-                        for (Class<?> holdingType : environment.getTypesAnnotatedWith(InputCategory.class,
-                                new FromModule(environment, moduleId))) {
-                            InputCategory inputCategory = holdingType.getAnnotation(InputCategory.class);
-                            inputCategories.put(module.getId() + ":" + inputCategory.id(), inputCategory);
-                        }
-                        for (Class<?> bindEvent : environment.getTypesAnnotatedWith(RegisterBindButton.class,
-                                new FromModule(environment, moduleId))) {
-                            if (BindButtonEvent.class.isAssignableFrom(bindEvent)) {
-                                RegisterBindButton bindRegister = bindEvent.getAnnotation(RegisterBindButton.class);
-                                inputsById.put(new SimpleUri(module.getId(), bindRegister.id()), bindRegister);
-                            }
+            ResolutionResult result = resolver.resolve(moduleId);
+            if (result.isSuccess()) {
+                try (ModuleEnvironment environment = moduleManager.loadEnvironment(result.getModules(), false)) {
+                    for (Class<?> holdingType : environment.getTypesAnnotatedWith(InputCategory.class,
+                            new FromModule(environment, moduleId))) {
+                        InputCategory inputCategory = holdingType.getAnnotation(InputCategory.class);
+                        inputCategories.put(module.getId() + ":" + inputCategory.id(), inputCategory);
+                    }
+                    for (Class<?> bindEvent : environment.getTypesAnnotatedWith(RegisterBindButton.class,
+                            new FromModule(environment, moduleId))) {
+                        if (BindButtonEvent.class.isAssignableFrom(bindEvent)) {
+                            RegisterBindButton bindRegister = bindEvent.getAnnotation(RegisterBindButton.class);
+                            inputsById.put(new SimpleUri(module.getId(), bindRegister.id()), bindRegister);
                         }
                     }
                 }
-
             }
         }
 

@@ -6,8 +6,6 @@ package org.terasology.engine.rendering.assets.font;
 import org.terasology.engine.rendering.assets.material.Material;
 import org.terasology.engine.rendering.assets.texture.Texture;
 
-/**
- */
 public class FontCharacter {
     private float x;
     private float y;

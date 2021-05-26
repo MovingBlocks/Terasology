@@ -19,8 +19,6 @@ import org.terasology.engine.registry.In;
 import org.terasology.engine.rendering.nui.NUIManager;
 import org.terasology.engine.rendering.nui.ScreenLayerClosedEvent;
 
-/**
- */
 @RegisterSystem(RegisterMode.ALWAYS)
 public class InteractionSystem extends BaseComponentSystem {
     private static final Logger logger = LoggerFactory.getLogger(InteractionSystem.class);
@@ -28,7 +26,7 @@ public class InteractionSystem extends BaseComponentSystem {
     @In
     private NUIManager nuiManager;
 
-    @ReceiveEvent(components = {InteractionTargetComponent.class}, netFilter = RegisterMode.AUTHORITY)
+    @ReceiveEvent(components = InteractionTargetComponent.class, netFilter = RegisterMode.AUTHORITY)
     public void onActivate(ActivateEvent event, EntityRef target) {
         EntityRef instigator = event.getInstigator();
 
@@ -48,7 +46,7 @@ public class InteractionSystem extends BaseComponentSystem {
 
     }
 
-    @ReceiveEvent(components = {InteractionTargetComponent.class})
+    @ReceiveEvent(components = InteractionTargetComponent.class)
     public void onActivationPredicted(ActivationPredicted event, EntityRef target) {
         EntityRef character = event.getInstigator();
         CharacterComponent characterComponent = character.getComponent(CharacterComponent.class);
@@ -66,17 +64,17 @@ public class InteractionSystem extends BaseComponentSystem {
         }
     }
 
-    @ReceiveEvent(components = {CharacterComponent.class}, netFilter = RegisterMode.AUTHORITY)
+    @ReceiveEvent(components = CharacterComponent.class, netFilter = RegisterMode.AUTHORITY)
     public void onActivationRequestDenied(ActivationRequestDenied event, EntityRef character) {
         character.send(new InteractionEndEvent(event.getActivationId()));
     }
 
-    @ReceiveEvent(components = {}, netFilter = RegisterMode.AUTHORITY)
+    @ReceiveEvent(netFilter = RegisterMode.AUTHORITY)
     public void onInteractionEndRequest(InteractionEndRequest request, EntityRef instigator) {
         InteractionUtil.cancelInteractionAsServer(instigator);
     }
 
-    @ReceiveEvent(components = {CharacterComponent.class})
+    @ReceiveEvent(components = CharacterComponent.class)
     public void onInteractionEnd(InteractionEndEvent event, EntityRef character, CharacterComponent characterComponent) {
         if (event.getInteractionId() == characterComponent.predictedInteractionId) {
             InteractionUtil.cancelInteractionAsClient(character, false);
@@ -90,7 +88,7 @@ public class InteractionSystem extends BaseComponentSystem {
     }
 
 
-    @ReceiveEvent(components = {InteractionScreenComponent.class})
+    @ReceiveEvent(components = InteractionScreenComponent.class)
     public void onInteractionStartPredicted(InteractionStartPredicted event, EntityRef container,
                                             InteractionScreenComponent interactionScreenComponent) {
         EntityRef investigator = event.getInstigator();
@@ -111,7 +109,7 @@ public class InteractionSystem extends BaseComponentSystem {
      * <p>
      * When it happens then it cancels the interaction.
      */
-    @ReceiveEvent(components = {ClientComponent.class})
+    @ReceiveEvent(components = ClientComponent.class)
     public void onScreenLayerClosed(ScreenLayerClosedEvent event, EntityRef container, ClientComponent clientComponent) {
         EntityRef character = clientComponent.character;
         ResourceUrn activeInteractionScreenUri = InteractionUtil.getActiveInteractionScreenUri(character);

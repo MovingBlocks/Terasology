@@ -1,4 +1,4 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.network.internal;
 
@@ -22,9 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
-/**
- *
- */
+
 public class ServerConnectionHandler extends ChannelInboundHandlerAdapter {
 
     private static final Logger logger = LoggerFactory.getLogger(ServerConnectionHandler.class);

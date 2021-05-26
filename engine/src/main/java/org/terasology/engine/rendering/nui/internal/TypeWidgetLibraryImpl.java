@@ -40,7 +40,7 @@ public class TypeWidgetLibraryImpl implements TypeWidgetLibrary {
 
     @Override
     public <T> Optional<TypeWidgetBuilder<T>> getBuilder(TypeInfo<T> type) {
-        try(ModuleContext.ContextSpan ignored = ModuleContext.setContext(contextModule)) {
+        try (ModuleContext.ContextSpan ignored = ModuleContext.setContext(contextModule)) {
 
             // Iterate in reverse order so that later added factories take priority
             for (TypeWidgetFactory factory : Lists.reverse(widgetFactories.getFactories())) {
@@ -62,7 +62,7 @@ public class TypeWidgetLibraryImpl implements TypeWidgetLibrary {
 
     @Override
     public <T> Optional<UIWidget> getBaseTypeWidget(Binding<T> binding, TypeInfo<T> baseType) {
-        try(ModuleContext.ContextSpan ignored = ModuleContext.setContext(contextModule)) {
+        try (ModuleContext.ContextSpan ignored = ModuleContext.setContext(contextModule)) {
             if (Primitives.isWrapperType(baseType.getRawType()) || baseType.getRawType().isPrimitive()) {
                 return getWidget(binding, baseType);
             }
