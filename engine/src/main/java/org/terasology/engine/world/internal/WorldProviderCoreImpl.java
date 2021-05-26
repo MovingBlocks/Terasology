@@ -44,9 +44,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-/**
- *
- */
+
 public class WorldProviderCoreImpl implements WorldProviderCore {
 
     private String title;

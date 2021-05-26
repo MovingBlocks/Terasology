@@ -3,7 +3,9 @@
 package org.terasology.engine.rendering.gltf.model;
 
 /**
- * GLTF Channel Target is the details of what to animate with a GLTF Channel. See https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#target for details
+ * GLTF Channel Target is the details of what to animate with a GLTF Channel.
+ * <p>
+ * See <a href="https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#target">glTF Specification - target</a> for details.
  */
 public class GLTFChannelTarget {
     private Integer node;

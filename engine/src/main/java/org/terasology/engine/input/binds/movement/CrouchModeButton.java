@@ -8,8 +8,6 @@ import org.terasology.engine.input.RegisterBindButton;
 import org.terasology.input.InputType;
 import org.terasology.input.Keyboard;
 
-/**
- */
 @RegisterBindButton(id = "crouchMode", description = "${engine:menu#binding-crouch-mode}")
 @DefaultBinding(type = InputType.KEY, id = Keyboard.KeyId.X)
 public class CrouchModeButton extends BindButtonEvent {

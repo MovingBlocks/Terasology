@@ -92,7 +92,7 @@ public class TranslationFormatTests {
     }
 
     @Test
-    public void testMultiLine() throws IOException, InvalidAssetFilenameException{
+    public void testMultiLine() throws IOException, InvalidAssetFilenameException {
         byte[] resource = createSimpleMultiLineTranslationFile().getBytes(StandardCharsets.UTF_8);
         AssetDataFile assetDataFile = mockAssetDataFile("game.lang", resource);
         ResourceUrn urn = createUrnFromFile(format, assetDataFile);
@@ -115,7 +115,7 @@ public class TranslationFormatTests {
         return new ResourceUrn("engine:" + assetName.toString());
     }
 
-    private static String createSimpleMultiLineTranslationFile(){
+    private static String createSimpleMultiLineTranslationFile() {
         StringBuilder sb = new StringBuilder();
         sb.append("{");
         sb.append("\"multi-line\": [\"line 1 \n \",\"line 2 \n \",\"line 3\"],");

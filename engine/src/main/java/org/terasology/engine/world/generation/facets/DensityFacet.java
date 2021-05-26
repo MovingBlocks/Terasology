@@ -6,8 +6,6 @@ import org.terasology.engine.world.generation.facets.base.BaseFieldFacet3D;
 import org.terasology.engine.world.block.BlockRegionc;
 import org.terasology.engine.world.generation.Border3D;
 
-/**
- */
 public class DensityFacet extends BaseFieldFacet3D {
 
     public DensityFacet(BlockRegionc targetRegion, Border3D border) {

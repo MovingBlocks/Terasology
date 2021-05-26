@@ -13,8 +13,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 
-/**
- */
 public class EnumTypeHandler<T extends Enum> extends TypeHandler<T> {
 
     private static final Logger logger = LoggerFactory.getLogger(EnumTypeHandler.class);

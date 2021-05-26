@@ -1,4 +1,7 @@
 
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
+
 package org.terasology.engine.config.facade;
 
 import org.terasology.engine.config.BindsConfig;

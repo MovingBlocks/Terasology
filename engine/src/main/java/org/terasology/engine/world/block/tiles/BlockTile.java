@@ -13,8 +13,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 
-/**
- */
 @API
 public class BlockTile extends Asset<TileData> {
     private BufferedImage[] images;

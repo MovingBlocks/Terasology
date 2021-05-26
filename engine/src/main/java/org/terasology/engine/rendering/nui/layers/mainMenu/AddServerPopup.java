@@ -15,8 +15,6 @@ import org.terasology.engine.rendering.nui.CoreScreenLayer;
 
 import java.util.function.Consumer;
 
-/**
- */
 public class AddServerPopup extends CoreScreenLayer {
 
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:addServerPopup!instance");

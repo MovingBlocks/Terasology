@@ -29,8 +29,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-/**
- */
 @RegisterAssetFileFormat
 public class AtlasFormat extends AbstractAssetFileFormat<AtlasData> {
     public static final float BORDER_SIZE = 0.0001f;

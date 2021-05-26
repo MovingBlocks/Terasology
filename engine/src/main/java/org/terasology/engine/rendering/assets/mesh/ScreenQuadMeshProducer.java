@@ -29,7 +29,7 @@ public class ScreenQuadMeshProducer implements AssetDataProducer<MeshData> {
 
     @Override
     public Set<Name> getModulesProviding(Name resourceName) {
-        if (TextureUtil.NOISE_RESOURCE_NAME.equals(resourceName)) {
+        if (SCREEN_QUAD_RESOURCE_NAME.equals(resourceName)) {
             return ImmutableSet.of(TerasologyConstants.ENGINE_MODULE);
         }
         return Collections.emptySet();

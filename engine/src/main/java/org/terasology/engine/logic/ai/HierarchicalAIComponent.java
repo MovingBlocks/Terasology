@@ -5,8 +5,6 @@ package org.terasology.engine.logic.ai;
 import org.joml.Vector3f;
 import org.terasology.engine.entitySystem.Component;
 
-/**
- */
 public final class HierarchicalAIComponent implements Component {
 
     //how often updates are progressed, handle whit care

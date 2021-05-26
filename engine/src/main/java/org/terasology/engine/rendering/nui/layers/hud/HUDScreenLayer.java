@@ -23,8 +23,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Optional;
 
-/**
- */
 public class HUDScreenLayer extends CoreScreenLayer {
 
     private Map<ResourceUrn, HUDElement> elementsLookup = Maps.newLinkedHashMap();

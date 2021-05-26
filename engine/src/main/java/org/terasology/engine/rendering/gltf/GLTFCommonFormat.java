@@ -23,8 +23,6 @@ import org.joml.Vector4f;
 import org.joml.Vector4i;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.gestalt.assets.AssetData;
-import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.engine.rendering.assets.skeletalmesh.Bone;
 import org.terasology.engine.rendering.gltf.deserializers.GLTFChannelPathDeserializer;
 import org.terasology.engine.rendering.gltf.deserializers.GLTFComponentTypeDeserializer;
@@ -50,6 +48,8 @@ import org.terasology.engine.rendering.gltf.model.GLTFPrimitive;
 import org.terasology.engine.rendering.gltf.model.GLTFSkin;
 import org.terasology.engine.rendering.gltf.model.GLTFTargetBuffer;
 import org.terasology.engine.rendering.gltf.model.GLTFVersion;
+import org.terasology.gestalt.assets.AssetData;
+import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.gestalt.assets.format.AbstractAssetFileFormat;
 import org.terasology.gestalt.assets.management.AssetManager;
 
@@ -89,7 +89,8 @@ public abstract class GLTFCommonFormat<T extends AssetData> extends AbstractAsse
     }
 
     protected void readBuffer(byte[] bytes, GLTFAccessor accessor, GLTFBufferView bufferView, TIntList target) {
-        ByteBuffer byteBuffer = ByteBuffer.wrap(bytes, bufferView.getByteOffset(), accessor.getCount() * accessor.getType().getDimension() * accessor.getComponentType().getByteLength());
+        ByteBuffer byteBuffer =
+                ByteBuffer.wrap(bytes, bufferView.getByteOffset(), accessor.getCount() * accessor.getType().getDimension() * accessor.getComponentType().getByteLength());
         byteBuffer.order(ByteOrder.LITTLE_ENDIAN);
         switch (accessor.getComponentType()) {
             case UNSIGNED_BYTE:
@@ -174,9 +175,12 @@ public abstract class GLTFCommonFormat<T extends AssetData> extends AbstractAsse
                 if (uri.endsWith(".bin")) {
                     uri = uri.substring(0, uri.length() - 4);
                 }
-                ByteBufferAsset bufferAsset = assetManager.getAsset(uri, ByteBufferAsset.class, urn.getModuleName()).orElseThrow(() -> new IOException("Failed to resolve binary uri " + buffer.getUri() + " for " + urn));
+                ByteBufferAsset bufferAsset =
+                        assetManager.getAsset(uri, ByteBufferAsset.class, urn.getModuleName())
+                            .orElseThrow(() -> new IOException("Failed to resolve binary uri " + buffer.getUri() + " for " + urn));
                 if (bufferAsset.getBytes().length != buffer.getByteLength()) {
-                    throw new IOException("Byte buffer " + uri + " has incorrect length. Expected (" + buffer.getByteLength() + "), actual (" + bufferAsset.getBytes().length + ")");
+                    throw new IOException("Byte buffer " + uri + " has incorrect length. "
+                            + "Expected (" + buffer.getByteLength() + "), actual (" + bufferAsset.getBytes().length + ")");
                 }
                 loadedBuffers.add(bufferAsset.getBytes());
             }
@@ -229,8 +233,9 @@ public abstract class GLTFCommonFormat<T extends AssetData> extends AbstractAsse
     }
 
     protected void checkVersionSupported(ResourceUrn urn, GLTF gltf) throws IOException {
-        if (gltf.getAsset().getMinVersion() != null && (gltf.getAsset().getMinVersion().getMajor() != SUPPORTED_VERSION.getMajor() || gltf.getAsset().getMinVersion().getMinor() > SUPPORTED_VERSION.getMinor())) {
-            throw new IOException("Cannot read gltf for " + urn + " as gltf version " + gltf.getAsset().getMinVersion() + " is not supported");
+        GLTFVersion minVersion = gltf.getAsset().getMinVersion();
+        if (minVersion != null && (minVersion.getMajor() != SUPPORTED_VERSION.getMajor() || minVersion.getMinor() > SUPPORTED_VERSION.getMinor())) {
+            throw new IOException("Cannot read gltf for " + urn + " as gltf version " + minVersion + " is not supported");
         } else if (gltf.getAsset().getVersion().getMajor() != SUPPORTED_VERSION.getMajor()) {
             throw new IOException("Cannot read gltf for " + urn + " as gltf version " + gltf.getAsset().getVersion() + " is not supported");
         }
@@ -245,7 +250,7 @@ public abstract class GLTFCommonFormat<T extends AssetData> extends AbstractAsse
             GLTFNode node = gltf.getNodes().get(nodeIndex);
             Vector3f position = new Vector3f();
             Quaternionf rotation = new Quaternionf();
-            Vector3f scale = new Vector3f(1,1,1);
+            Vector3f scale = new Vector3f(1, 1, 1);
             if (node.getTranslation() != null) {
                 position.set(node.getTranslation());
             }

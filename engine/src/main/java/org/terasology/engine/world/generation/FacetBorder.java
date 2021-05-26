@@ -5,8 +5,6 @@ package org.terasology.engine.world.generation;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
-/**
- */
 @Retention(RetentionPolicy.RUNTIME)
 public @interface FacetBorder {
     int top() default 0;

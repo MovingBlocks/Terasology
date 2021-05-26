@@ -9,9 +9,7 @@ import org.terasology.nui.Colorc;
 
 import java.nio.FloatBuffer;
 
-/**
- *
- */
+
 public final class LineRenderer {
 
     private LineRenderer() {

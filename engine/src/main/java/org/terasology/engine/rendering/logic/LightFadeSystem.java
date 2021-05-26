@@ -12,8 +12,6 @@ import org.terasology.engine.entitySystem.systems.RegisterSystem;
 import org.terasology.engine.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.engine.registry.In;
 
-/**
- */
 @RegisterSystem
 public class LightFadeSystem extends BaseComponentSystem implements UpdateSubscriberSystem {
 

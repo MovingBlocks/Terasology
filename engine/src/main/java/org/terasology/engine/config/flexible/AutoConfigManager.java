@@ -6,9 +6,9 @@ import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.context.Context;
+import org.terasology.engine.core.PathManager;
 import org.terasology.engine.core.SimpleUri;
 import org.terasology.engine.core.module.ModuleManager;
-import org.terasology.engine.core.paths.PathManager;
 import org.terasology.engine.registry.InjectionHelper;
 import org.terasology.engine.utilities.ReflectionUtil;
 import org.terasology.gestalt.module.ModuleEnvironment;
@@ -84,7 +84,7 @@ public class AutoConfigManager {
         try (InputStream inputStream = Files.newInputStream(configPath, StandardOpenOption.READ)) {
             T loadedConfig = (T) serializer.deserialize(TypeInfo.of(configClass), inputStream).get();
             mergeConfig(configClass, loadedConfig, config);
-        } catch (IOException e) {
+        } catch (Exception e) {
             logger.error("Error while loading config {} from disk", config.getId(), e);
         }
     }
@@ -112,8 +112,9 @@ public class AutoConfigManager {
     private void saveConfigToDisk(AutoConfig config) {
         // TODO: Save when screen for config closed
         Path configPath = getConfigPath(config.getId());
-        try (OutputStream output = Files.newOutputStream(configPath, StandardOpenOption.CREATE)) {
-            serializer.serialize(config, TypeInfo.of((Class<AutoConfig>)config.getClass()), output);
+        try (OutputStream output = Files.newOutputStream(configPath, StandardOpenOption.TRUNCATE_EXISTING,
+                StandardOpenOption.CREATE)) {
+            serializer.serialize(config, TypeInfo.of((Class<AutoConfig>) config.getClass()), output);
         } catch (IOException e) {
             logger.error("Error while saving config {} to disk", config.getId(), e);
         }
