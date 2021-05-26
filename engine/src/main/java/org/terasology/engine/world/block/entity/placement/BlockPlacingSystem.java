@@ -12,14 +12,12 @@ import org.terasology.engine.registry.In;
 import org.terasology.engine.world.WorldComponent;
 import org.terasology.engine.world.WorldProvider;
 
-/**
- */
 @RegisterSystem(RegisterMode.AUTHORITY)
 public class BlockPlacingSystem extends BaseComponentSystem {
     @In
     private WorldProvider worldProvider;
 
-    @ReceiveEvent(components = {WorldComponent.class}, priority = EventPriority.PRIORITY_TRIVIAL)
+    @ReceiveEvent(components = WorldComponent.class, priority = EventPriority.PRIORITY_TRIVIAL)
     public void placeBlockInWorld(PlaceBlocks event, EntityRef world) {
         worldProvider.setBlocks(event.getBlocks());
     }

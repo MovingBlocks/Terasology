@@ -2,8 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.core;
 
-/**
- */
 public enum StandardGameStatus implements EngineStatus {
     UNSTARTED("Unstarted"),
     LOADING("Loading"),

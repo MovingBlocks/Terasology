@@ -9,8 +9,6 @@ import org.terasology.engine.input.RegisterBindButton;
 import org.terasology.input.InputType;
 import org.terasology.input.Keyboard;
 
-/**
- */
 @RegisterBindButton(id = "backwards", description = "${engine:menu#binding-backwards}")
 @DefaultBinding(type = InputType.KEY, id = Keyboard.KeyId.S)
 public class BackwardsButton extends BindButtonEvent {

@@ -5,8 +5,6 @@ package org.terasology.engine.input.events;
 
 import org.terasology.input.ButtonState;
 
-/**
- */
 public abstract class ButtonEvent extends InputEvent {
 
     public ButtonEvent(float delta) {

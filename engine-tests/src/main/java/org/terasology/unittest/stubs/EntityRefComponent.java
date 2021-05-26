@@ -5,8 +5,6 @@ package org.terasology.unittest.stubs;
 import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 
-/**
- */
 public class EntityRefComponent implements Component {
 
     public EntityRef entityRef = EntityRef.NULL;

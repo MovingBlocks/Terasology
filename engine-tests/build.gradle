@@ -73,6 +73,9 @@ dependencies {
     implementation("org.mockito:mockito-junit-jupiter:3.7.7")
 
     implementation("org.terasology.joml-ext:joml-test:0.1.0")
+
+    testImplementation("com.google.truth:truth:1.1.2")
+    testImplementation("com.google.truth.extensions:truth-java8-extension:1.1.2")
 }
 
 task copyResourcesToClasses(type:Copy) {

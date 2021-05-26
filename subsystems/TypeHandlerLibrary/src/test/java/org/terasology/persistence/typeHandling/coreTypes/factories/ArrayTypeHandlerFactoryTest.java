@@ -41,7 +41,7 @@ class ArrayTypeHandlerFactoryTest {
 
     @Test
     void testGenericArray() {
-        TypeInfo<List<Integer>[]> arrayTypeInfo = new TypeInfo<List<Integer>[]>() {};
+        TypeInfo<List<Integer>[]> arrayTypeInfo = new TypeInfo<List<Integer>[]>() { };
 
         Optional<TypeHandler<List<Integer>[]>> typeHandler =
                 typeHandlerFactory.create(arrayTypeInfo, context);
@@ -50,12 +50,12 @@ class ArrayTypeHandlerFactoryTest {
         assertTrue(typeHandler.get() instanceof ArrayTypeHandler);
 
         // Verify that the List<Integer> TypeHandler was loaded from the TypeHandlerLibrary
-        verify(typeHandlerLibrary).getTypeHandler(eq(new TypeInfo<List<Integer>>() {}.getType()));
+        verify(typeHandlerLibrary).getTypeHandler(eq(new TypeInfo<List<Integer>>() { }.getType()));
     }
 
     @Test
     void testNonArray() {
-        TypeInfo<List<Integer>> arrayTypeInfo = new TypeInfo<List<Integer>>() {};
+        TypeInfo<List<Integer>> arrayTypeInfo = new TypeInfo<List<Integer>>() { };
 
         Optional<TypeHandler<List<Integer>>> typeHandler =
                 typeHandlerFactory.create(arrayTypeInfo, context);

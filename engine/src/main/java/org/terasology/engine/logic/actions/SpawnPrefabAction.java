@@ -13,8 +13,6 @@ import org.terasology.engine.entitySystem.systems.RegisterSystem;
 import org.terasology.engine.logic.common.ActivateEvent;
 import org.terasology.engine.registry.In;
 
-/**
- */
 @RegisterSystem(RegisterMode.AUTHORITY)
 public class SpawnPrefabAction extends BaseComponentSystem {
 

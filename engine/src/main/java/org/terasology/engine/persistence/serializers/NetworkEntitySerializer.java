@@ -31,8 +31,6 @@ import org.terasology.protobuf.EntityData;
 import java.util.Map;
 import java.util.Set;
 
-/**
- */
 public class NetworkEntitySerializer {
     private static final Logger logger = LoggerFactory.getLogger(NetworkEntitySerializer.class);
 

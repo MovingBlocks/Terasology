@@ -4,7 +4,7 @@
 package org.terasology.engine.utilities;
 
 import org.slf4j.Logger;
-import org.terasology.engine.core.paths.PathManager;
+import org.terasology.engine.core.PathManager;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

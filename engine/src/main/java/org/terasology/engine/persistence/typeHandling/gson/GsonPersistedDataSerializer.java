@@ -18,8 +18,6 @@ import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.Map;
 
-/**
- */
 public class GsonPersistedDataSerializer implements PersistedDataSerializer {
 
     private static final PersistedData NULL_INSTANCE = new GsonPersistedData(JsonNull.INSTANCE);

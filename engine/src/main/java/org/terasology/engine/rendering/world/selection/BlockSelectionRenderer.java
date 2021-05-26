@@ -5,35 +5,28 @@ package org.terasology.engine.rendering.world.selection;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
-import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.joml.Vector4f;
 import org.lwjgl.opengl.GL11;
+import org.terasology.engine.registry.CoreRegistry;
 import org.terasology.engine.rendering.assets.material.Material;
+import org.terasology.engine.rendering.assets.mesh.Mesh;
 import org.terasology.engine.rendering.assets.shader.ShaderProgramFeature;
 import org.terasology.engine.rendering.assets.texture.Texture;
 import org.terasology.engine.rendering.assets.texture.TextureRegionAsset;
 import org.terasology.engine.rendering.cameras.Camera;
 import org.terasology.engine.rendering.primitives.Tessellator;
 import org.terasology.engine.rendering.primitives.TessellatorHelper;
-import org.terasology.joml.geom.Rectanglef;
-import org.terasology.gestalt.module.sandbox.API;
-import org.terasology.engine.registry.CoreRegistry;
-import org.terasology.engine.rendering.assets.mesh.Mesh;
 import org.terasology.engine.rendering.world.WorldRenderer;
 import org.terasology.engine.utilities.Assets;
+import org.terasology.gestalt.module.sandbox.API;
+import org.terasology.joml.geom.Rectanglef;
 
-import static org.lwjgl.opengl.GL11.GL_MODELVIEW;
 import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
 import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
-import static org.lwjgl.opengl.GL11.glBindTexture;
 import static org.lwjgl.opengl.GL11.glBlendFunc;
 import static org.lwjgl.opengl.GL11.glDisable;
 import static org.lwjgl.opengl.GL11.glEnable;
-import static org.lwjgl.opengl.GL11.glMatrixMode;
-import static org.lwjgl.opengl.GL11.glPopMatrix;
-import static org.lwjgl.opengl.GL11.glPushMatrix;
-import static org.lwjgl.opengl.GL11.glTranslated;
 
 /**
  * Renders a selection. Is used by the BlockSelectionSystem.

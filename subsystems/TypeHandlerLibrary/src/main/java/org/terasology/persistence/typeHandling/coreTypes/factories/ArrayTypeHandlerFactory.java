@@ -35,14 +35,14 @@ public class ArrayTypeHandlerFactory implements TypeHandlerFactory {
         Optional<TypeHandler<?>> declaredElementTypeHandler =
                 context.getTypeHandlerLibrary().getTypeHandler(elementType);
 
-        @SuppressWarnings({"unchecked"})
+        @SuppressWarnings("unchecked")
         TypeHandler<?> elementTypeHandler = new RuntimeDelegatingTypeHandler(
                 declaredElementTypeHandler.orElse(null),
                 elementTypeInfo,
                 context
         );
 
-        @SuppressWarnings({"unchecked"})
+        @SuppressWarnings("unchecked")
         TypeHandler<T> typeHandler = new ArrayTypeHandler(elementTypeHandler, elementTypeInfo);
 
         return Optional.of(typeHandler);

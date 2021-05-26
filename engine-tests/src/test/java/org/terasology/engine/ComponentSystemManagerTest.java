@@ -1,4 +1,7 @@
 
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
+
 package org.terasology.engine;
 
 import ch.qos.logback.classic.Level;
@@ -141,14 +144,14 @@ public class ComponentSystemManagerTest {
     }
 
     private static class SystemWithValidCommand extends BaseComponentSystem {
-        @Command()
+        @Command
         public String validCommandName(@CommandParam(value = "parameter") String value, @Sender EntityRef sender) {
             return value;
         }
     }
 
     private static class SystemWithCommandMissingSenderAnnotation extends BaseComponentSystem {
-        @Command()
+        @Command
         public String commandWithoutSenderAnnotation(@CommandParam(value = "parameter") String value, EntityRef sender) {
             return value;
         }

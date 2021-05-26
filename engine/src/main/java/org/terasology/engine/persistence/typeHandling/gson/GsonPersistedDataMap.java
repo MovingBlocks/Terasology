@@ -13,8 +13,6 @@ import java.util.AbstractMap;
 import java.util.Map;
 import java.util.Set;
 
-/**
- */
 public class GsonPersistedDataMap extends AbstractGsonPersistedData implements PersistedDataMap {
 
     private JsonObject map;

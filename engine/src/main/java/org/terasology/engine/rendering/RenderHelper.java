@@ -6,8 +6,6 @@ import org.joml.Vector2f;
 import org.joml.Vector3fc;
 import org.terasology.engine.rendering.dag.nodes.RefractiveReflectiveBlocksNodeProxy;
 
-/**
- */
 public final class RenderHelper {
 
     // Parameters which are also defined on shader side

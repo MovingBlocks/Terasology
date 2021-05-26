@@ -5,8 +5,6 @@ package org.terasology.unittest.stubs;
 import org.joml.Vector3f;
 import org.terasology.engine.entitySystem.Component;
 
-/**
- */
 public class GetterSetterComponent implements Component {
     public transient boolean getterUsed;
     public transient boolean setterUsed;
