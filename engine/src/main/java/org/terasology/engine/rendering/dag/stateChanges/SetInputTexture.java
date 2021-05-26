@@ -2,11 +2,11 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.rendering.dag.stateChanges;
 
-import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.engine.rendering.assets.material.Material;
 import org.terasology.engine.rendering.assets.texture.Texture;
 import org.terasology.engine.rendering.dag.StateChange;
 import org.terasology.engine.utilities.Assets;
+import org.terasology.gestalt.assets.ResourceUrn;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -16,21 +16,23 @@ import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
 import static org.lwjgl.opengl.GL13.glActiveTexture;
 import static org.terasology.engine.rendering.dag.AbstractNode.getMaterial;
 
-// TODO: split this class into two - one for opengl's global state change and one for the specific material state change.
+// TODO: split this class into two - one for opengl's global state change and one for the specific material state
+//  change.
 
 /**
  * Sets a texture asset as the input for a material.
- *
- * Input textures are assigned to a texture unit and this is then communicated to the shader.
- * This StateChange and the underlying task only handles textures of type GL_TEXTURE_2D.
- *
- * Instances of this class bind a texture to a texture unit. The integer identifying the texture unit is then
- * passed to a shader program using the material/parameter pair provided on construction. This allow for a
- * texture asset to be used by a shader program as an input.
- *
+ * <p>
+ * Input textures are assigned to a texture unit and this is then communicated to the shader. This StateChange and the
+ * underlying task only handles textures of type GL_TEXTURE_2D.
+ * <p>
+ * Instances of this class bind a texture to a texture unit. The integer identifying the texture unit is then passed to
+ * a shader program using the material/parameter pair provided on construction. This allow for a texture asset to be
+ * used by a shader program as an input.
+ * <p>
  * See the source of the process() method for the nitty gritty details.
- *
- * It is recommended to use one of the children classes (SetInputTexture2D / SetInputTexture3D) to make the code clearer.
+ * <p>
+ * It is recommended to use one of the children classes (SetInputTexture2D / SetInputTexture3D) to make the code
+ * clearer.
  */
 public class SetInputTexture implements StateChange {
     private final int textureType;
@@ -44,17 +46,22 @@ public class SetInputTexture implements StateChange {
 
     /**
      * The constructor, to be used in the initialise method of a node.
+     * <p>
+     * Sample use: addDesiredStateChange(new SetInputTexture(GL_TEXTURE_2D, 0, water.getId(), "engine:prog.chunk",
+     * "textureWater"));
      *
-     * Sample use:
-     *      addDesiredStateChange(new SetInputTexture(GL_TEXTURE_2D, 0, water.getId(), "engine:prog.chunk", "textureWater"));
-     *
-     * @param textureType an opengl constant, can be GL_TEXTURE_2D, GL_TEXTURE_3D and any other texture type listed in https://www.khronos.org/opengl/wiki/Texture#Theory     * @param textureSlot a 0-based integer. Notice that textureUnit = GL_TEXTURE0 + textureSlot. See OpenGL spects for maximum allowed values.
-     * @param textureSlot a 0-based integer. Notice that textureUnit = GL_TEXTURE0 + textureSlot. See OpenGL spects for maximum allowed values.
-     * @param textureId an integer representing the opengl name of a texture. This is usually the return value of glGenTexture().
+     * @param textureType an opengl constant, can be GL_TEXTURE_2D, GL_TEXTURE_3D and any other texture type
+     *         listed in https://www.khronos.org/opengl/wiki/Texture#Theory     * @param textureSlot a 0-based integer.
+     *         Notice that textureUnit = GL_TEXTURE0 + textureSlot. See OpenGL spects for maximum allowed values.
+     * @param textureSlot a 0-based integer. Notice that textureUnit = GL_TEXTURE0 + textureSlot. See OpenGL
+     *         spects for maximum allowed values.
+     * @param textureId an integer representing the opengl name of a texture. This is usually the return value
+     *         of glGenTexture().
      * @param materialUrn a ResourceURN object uniquely identifying a Material asset.
      * @param materialParameter a String representing the variable within the shader holding the texture.
      */
-    protected SetInputTexture(int textureType, int textureSlot, int textureId, ResourceUrn materialUrn, String materialParameter) {
+    protected SetInputTexture(int textureType, int textureSlot, int textureId, ResourceUrn materialUrn,
+                              String materialParameter) {
         this.textureType = textureType;
         this.textureSlot = textureSlot;
         this.textureId = textureId;
@@ -68,16 +75,19 @@ public class SetInputTexture implements StateChange {
 
     /**
      * The constructor, to be used in the initialise method of a node.
+     * <p>
+     * Sample use: addDesiredStateChange(new SetInputTexture(GL_TEXTURE_2D, 0, "engine:water", "engine:prog.chunk",
+     * "textureWater"));
      *
-     * Sample use:
-     *      addDesiredStateChange(new SetInputTexture(GL_TEXTURE_2D, 0, "engine:water", "engine:prog.chunk", "textureWater"));
-     *
-     * @param textureType an opengl constant, can be GL_TEXTURE_2D, GL_TEXTURE_3D and any other texture type listed in https://www.khronos.org/opengl/wiki/Texture#Theory     * @param textureSlot a 0-based integer. Notice that textureUnit = GL_TEXTURE0 + textureSlot. See OpenGL spects for maximum allowed values.
+     * @param textureType an opengl constant, can be GL_TEXTURE_2D, GL_TEXTURE_3D and any other texture type
+     *         listed in https://www.khronos.org/opengl/wiki/Texture#Theory     * @param textureSlot a 0-based integer.
+     *         Notice that textureUnit = GL_TEXTURE0 + textureSlot. See OpenGL spects for maximum allowed values.
      * @param textureUrn a String identifying a loaded texture, whose id will then be used by this StateChange.
      * @param materialUrn a ResourceURN object uniquely identifying a Material asset.
      * @param materialParameter a String representing the variable within the shader holding the texture.
      */
-    protected SetInputTexture(int textureType, int textureSlot, String textureUrn, ResourceUrn materialUrn, String materialParameter) {
+    protected SetInputTexture(int textureType, int textureSlot, String textureUrn, ResourceUrn materialUrn,
+                              String materialParameter) {
         this.textureType = textureType;
         this.textureSlot = textureSlot;
         this.materialUrn = materialUrn;
@@ -123,11 +133,11 @@ public class SetInputTexture implements StateChange {
     }
 
     /**
-     * Returns a StateChange instance useful to disconnect the given texture from its assigned texture slot.
-     * Also disconnects the texture from the shader program.
+     * Returns a StateChange instance useful to disconnect the given texture from its assigned texture slot. Also
+     * disconnects the texture from the shader program.
      *
-     * @return the default instance for the particular slot/material/parameter combination held by this
-     * SetInputTexture object, cast as a StateChange instance.
+     * @return the default instance for the particular slot/material/parameter combination held by this SetInputTexture
+     *         object, cast as a StateChange instance.
      */
     @Override
     public StateChange getDefaultInstance() {

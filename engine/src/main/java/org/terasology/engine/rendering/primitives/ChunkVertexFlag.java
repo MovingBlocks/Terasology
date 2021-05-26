@@ -4,8 +4,6 @@ package org.terasology.engine.rendering.primitives;
 
 import org.terasology.gestalt.module.sandbox.API;
 
-/**
- */
 @API
 public enum ChunkVertexFlag {
     NORMAL(0, "BLOCK_HINT_NORMAL"),

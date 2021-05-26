@@ -10,8 +10,6 @@ import org.terasology.engine.math.Side;
 import java.util.EnumMap;
 import java.util.List;
 
-/**
- */
 public enum BlockPart {
     TOP(Side.TOP),
     LEFT(Side.LEFT),

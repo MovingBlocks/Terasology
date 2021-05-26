@@ -12,7 +12,7 @@ import org.terasology.reflection.TypeInfo;
 public class ComponentClassTypeHandlerFactory extends SpecificTypeHandlerFactory<Class<? extends Component>> {
 
     public ComponentClassTypeHandlerFactory() {
-        super(new TypeInfo<Class<? extends Component>>() {});
+        super(new TypeInfo<Class<? extends Component>>() { });
     }
 
     @Override

@@ -11,8 +11,6 @@ import org.terasology.nui.widgets.UIText;
 
 import java.util.List;
 
-/**
- */
 public class UICommandEntry extends UIText {
 
     private Binding<List<String>> commandHistory = new DefaultBinding<>(Lists.<String>newArrayList());

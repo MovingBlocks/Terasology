@@ -19,8 +19,6 @@ import static org.terasology.joml.test.QuaternionAssert.assertEquals;
 import static org.terasology.joml.test.VectorAssert.assertEquals;
 
 
-/**
- */
 @Tag("TteTest")
 public class LocationComponentTest extends TerasologyTestingEnvironment {
 

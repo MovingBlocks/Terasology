@@ -54,8 +54,6 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
-/**
- */
 public class JoinGameScreen extends CoreScreenLayer {
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:joinGameScreen");
 
@@ -479,8 +477,9 @@ public class JoinGameScreen extends CoreScreenLayer {
             } catch (IOException e) {
                 String text = translationSystem.translate("${engine:menu#connection-failed}");
                 // Check if selection name is same as earlier when response is received before updating ping field
-                if (name.equals(visibleList.getSelection().getName()))
-                GameThread.asynch(() -> ping.setText(FontColor.getColored(text, Color.RED)));
+                if (name.equals(visibleList.getSelection().getName())) {
+                    GameThread.asynch(() -> ping.setText(FontColor.getColored(text, Color.RED)));
+                }
             }
         });
 

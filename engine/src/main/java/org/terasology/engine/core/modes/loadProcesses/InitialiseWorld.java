@@ -117,8 +117,10 @@ public class InitialiseWorld extends SingleStepLoadProcess {
         RecordAndReplayCurrentStatus recordAndReplayCurrentStatus = context.get(RecordAndReplayCurrentStatus.class);
         try {
             storageManager = writeSaveGamesEnabled
-                    ? new ReadWriteStorageManager(saveOrRecordingPath, environment, entityManager, blockManager, extraDataManager, recordAndReplaySerializer, recordAndReplayUtils, recordAndReplayCurrentStatus)
-                    : new ReadOnlyStorageManager(saveOrRecordingPath, environment, entityManager, blockManager, extraDataManager);
+                    ? new ReadWriteStorageManager(saveOrRecordingPath, environment, entityManager, blockManager,
+                    extraDataManager, recordAndReplaySerializer, recordAndReplayUtils, recordAndReplayCurrentStatus)
+                    : new ReadOnlyStorageManager(saveOrRecordingPath, environment, entityManager, blockManager,
+                    extraDataManager);
         } catch (IOException e) {
             logger.error("Unable to create storage manager!", e);
             context.get(GameEngine.class).changeState(new StateMainMenu("Unable to create storage manager!"));
@@ -136,7 +138,8 @@ public class InitialiseWorld extends SingleStepLoadProcess {
         context.get(ComponentSystemManager.class).register(relevanceSystem, "engine:relevanceSystem");
         chunkProvider.setRelevanceSystem(relevanceSystem);
         Block unloadedBlock = blockManager.getBlock(BlockManager.UNLOADED_ID);
-        WorldProviderCoreImpl worldProviderCore = new WorldProviderCoreImpl(worldInfo, chunkProvider, unloadedBlock, context);
+        WorldProviderCoreImpl worldProviderCore = new WorldProviderCoreImpl(worldInfo, chunkProvider, unloadedBlock,
+                context);
         EntityAwareWorldProvider entityWorldProvider = new EntityAwareWorldProvider(worldProviderCore, context);
         WorldProvider worldProvider = new WorldProviderWrapper(entityWorldProvider, extraDataManager);
         context.put(WorldProvider.class, worldProvider);
@@ -160,7 +163,8 @@ public class InitialiseWorld extends SingleStepLoadProcess {
 
         // TODO: These shouldn't be done here, nor so strongly tied to the world renderer
         LocalPlayer localPlayer = new LocalPlayer();
-        localPlayer.setRecordAndReplayClasses(context.get(DirectionAndOriginPosRecorderList.class), context.get(RecordAndReplayCurrentStatus.class));
+        localPlayer.setRecordAndReplayClasses(context.get(DirectionAndOriginPosRecorderList.class),
+                context.get(RecordAndReplayCurrentStatus.class));
         context.put(LocalPlayer.class, localPlayer);
         context.put(Camera.class, worldRenderer.getActiveCamera());
 

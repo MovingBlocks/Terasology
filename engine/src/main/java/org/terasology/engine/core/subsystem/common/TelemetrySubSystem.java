@@ -1,18 +1,5 @@
-/*
- * Copyright 2017 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.core.subsystem.common;
 
 import ch.qos.logback.classic.LoggerContext;
@@ -37,9 +24,12 @@ import static org.terasology.engine.telemetry.TelemetryEmitter.DEFAULT_COLLECTOR
 import static org.terasology.engine.telemetry.TelemetryEmitter.DEFAULT_COLLECTOR_PROTOCOL;
 
 /**
- * This is a telemetry engine sub system.
- * It will initialise all the telemetry stuff such as the {@link com.snowplowanalytics.snowplow.tracker.emitter.Emitter} and configure the {@link org.terasology.engine.telemetry.logstash.TelemetryLogstashAppender}.
- * It will also adds the {@link org.terasology.engine.telemetry.Metrics} and the {@link org.terasology.engine.telemetry.TelemetryEmitter} to the context so that we can be use them later in other class for telemetry.
+ * This is a telemetry engine sub system. It will initialise all the telemetry stuff such as the {@link
+ * com.snowplowanalytics.snowplow.tracker.emitter.Emitter} and configure the {@link
+ * org.terasology.engine.telemetry.logstash.TelemetryLogstashAppender}. It will also adds the {@link
+ * org.terasology.engine.telemetry.Metrics} and the {@link org.terasology.engine.telemetry.TelemetryEmitter} to the
+ * context so that we can be use them later in other class for telemetry.
+ *
  * @see <a href="https://github.com/GabrielXia/telemetry/wiki">https://github.com/GabrielXia/telemetry/wiki</a>
  */
 public class TelemetrySubSystem implements EngineSubsystem {
@@ -91,7 +81,8 @@ public class TelemetrySubSystem implements EngineSubsystem {
         TelemetryConfig telemetryConfig = config.getTelemetryConfig();
         String errorReportingDestination = telemetryConfig.getErrorReportingDestination();
         if (errorReportingDestination == null) {
-            errorReportingDestination = TelemetryLogstashAppender.DEFAULT_LOGSTASH_HOST + ":" + TelemetryLogstashAppender.DEFAULT_LOGSTASH_PORT;
+            errorReportingDestination =
+                    TelemetryLogstashAppender.DEFAULT_LOGSTASH_HOST + ":" + TelemetryLogstashAppender.DEFAULT_LOGSTASH_PORT;
             telemetryConfig.setErrorReportingDestination(errorReportingDestination);
         }
         if (telemetryConfig.isErrorReportingEnabled()) {
@@ -117,7 +108,7 @@ public class TelemetrySubSystem implements EngineSubsystem {
                     DEFAULT_COLLECTOR_PROTOCOL, DEFAULT_COLLECTOR_HOST, DEFAULT_COLLECTOR_PORT).toString());
         }
     }
-    
+
     @Override
     public void shutdown() {
 

@@ -8,8 +8,6 @@ import org.terasology.engine.world.block.BlockRegionc;
 import org.terasology.engine.world.generation.Border3D;
 import org.terasology.engine.world.generation.WorldFacet3D;
 
-/**
- */
 public class BaseFacet3D implements WorldFacet3D {
 
     private BlockRegion worldRegion;

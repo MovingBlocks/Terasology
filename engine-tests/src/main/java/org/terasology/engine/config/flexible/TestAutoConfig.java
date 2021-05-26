@@ -17,7 +17,7 @@ public class TestAutoConfig extends AutoConfig {
     );
 
     public final Setting<ImmutableList<Integer>> integerListSetting = setting(
-        type(new TypeInfo<ImmutableList<Integer>>() {}),
+        type(new TypeInfo<ImmutableList<Integer>>() { }),
         defaultValue(ImmutableList.of())
     );
 

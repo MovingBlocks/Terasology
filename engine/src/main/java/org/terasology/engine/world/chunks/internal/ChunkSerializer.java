@@ -17,8 +17,6 @@ import org.terasology.engine.world.block.BlockManager;
 import org.terasology.engine.world.chunks.Chunk;
 import org.terasology.engine.world.chunks.Chunks;
 
-/**
- */
 public final class ChunkSerializer {
 
     private ChunkSerializer() {

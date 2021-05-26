@@ -12,8 +12,6 @@ import org.terasology.gestalt.naming.Name;
 import java.util.Collection;
 import java.util.Set;
 
-/**
- */
 public final class CommandNameSuggester implements CommandParameterSuggester<Name> {
     private final Console console;
 

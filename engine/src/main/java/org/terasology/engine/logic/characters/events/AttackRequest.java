@@ -7,8 +7,6 @@ import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.network.NetworkEvent;
 import org.terasology.engine.network.ServerEvent;
 
-/**
- */
 @ServerEvent(lagCompensate = true)
 public class AttackRequest extends NetworkEvent {
 

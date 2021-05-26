@@ -10,8 +10,6 @@ import org.terasology.engine.rendering.assets.mesh.resource.VertexAttributeBindi
 import org.terasology.engine.rendering.assets.mesh.resource.VertexResource;
 import org.terasology.gestalt.assets.AssetData;
 
-/**
- */
 public abstract class MeshData implements AssetData {
     private final DrawingMode mode;
 

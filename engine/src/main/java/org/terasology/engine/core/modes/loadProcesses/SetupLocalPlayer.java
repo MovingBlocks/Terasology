@@ -10,8 +10,6 @@ import org.terasology.engine.logic.players.LocalPlayer;
 import org.terasology.engine.network.Client;
 import org.terasology.engine.network.NetworkSystem;
 
-/**
- */
 public class SetupLocalPlayer extends SingleStepLoadProcess {
 
     private final Context context;

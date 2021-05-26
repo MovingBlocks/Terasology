@@ -11,8 +11,6 @@ import org.terasology.gestalt.assets.Asset;
 
 import java.lang.reflect.Type;
 
-/**
- */
 public class AssetTypeAdapter<V extends Asset> implements JsonDeserializer<V> {
 
     private Class<V> type;

@@ -3,16 +3,10 @@
 package org.terasology.engine.rendering.gltf;
 
 import com.google.common.collect.ImmutableSet;
-import gnu.trove.list.TFloatList;
-import gnu.trove.list.array.TFloatArrayList;
-import org.terasology.engine.rendering.assets.mesh.MeshData;
-import org.terasology.engine.rendering.assets.mesh.StandardMeshData;
-import org.terasology.engine.rendering.assets.skeletalmesh.SkeletalMeshData;
 import org.terasology.engine.rendering.gltf.model.GLTFAttributeType;
 import org.terasology.engine.rendering.gltf.model.GLTFComponentType;
 
 import java.util.Set;
-import java.util.function.Function;
 
 /**
  * Enumeration of the vertex Attribute Semantics supported by Terasology.

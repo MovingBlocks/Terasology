@@ -2,8 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.logic.console.commandSystem.exceptions;
 
-/**
- */
 public class CommandExecutionException extends Exception {
     private static final long serialVersionUID = 5104187084941740072L;
 

@@ -23,8 +23,6 @@ import org.terasology.math.TeraMath;
 
 import java.util.Arrays;
 
-/**
- */
 public class CameraTargetSystem extends BaseComponentSystem {
 
     @In
