@@ -1,7 +1,7 @@
-#version 330 core
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
+#version 330 core
 
 #define UNCHARTED_2_TONEMAP
 // #define REINHARD_TONEMAP
