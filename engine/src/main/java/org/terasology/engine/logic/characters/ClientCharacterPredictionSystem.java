@@ -30,8 +30,6 @@ import java.util.Deque;
 import java.util.Iterator;
 import java.util.Map;
 
-/**
- */
 @RegisterSystem(RegisterMode.REMOTE_CLIENT)
 public class ClientCharacterPredictionSystem extends BaseComponentSystem implements UpdateSubscriberSystem {
     private static final Logger logger = LoggerFactory.getLogger(ClientCharacterPredictionSystem.class);
@@ -127,7 +125,9 @@ public class ClientCharacterPredictionSystem extends BaseComponentSystem impleme
 
     private CharacterStateEvent createInitialState(EntityRef entity) {
         LocationComponent location = entity.getComponent(LocationComponent.class);
-        return new CharacterStateEvent(time.getGameTimeInMs(), 0, location.getWorldPosition(new org.joml.Vector3f()), location.getWorldRotation(new Quaternionf()), new Vector3f(), 0, 0, MovementMode.WALKING, false);
+        return new CharacterStateEvent(time.getGameTimeInMs(), 0,
+                location.getWorldPosition(new Vector3f()), location.getWorldRotation(new Quaternionf()),
+                new Vector3f(), 0, 0, MovementMode.WALKING, false);
     }
 
     private CharacterStateEvent stepState(CharacterMoveInputEvent input, CharacterStateEvent lastState, EntityRef entity) {

@@ -23,8 +23,6 @@ import org.terasology.nui.events.NUIMouseWheelEvent;
 
 import java.util.List;
 
-/**
- */
 public class UIInputBind extends CoreWidget {
 
     private boolean capturingInput;

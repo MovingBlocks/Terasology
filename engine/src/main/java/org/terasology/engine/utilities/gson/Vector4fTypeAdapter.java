@@ -12,8 +12,6 @@ import org.joml.Vector4f;
 
 import java.lang.reflect.Type;
 
-/**
- */
 public class Vector4fTypeAdapter implements JsonDeserializer<Vector4f> {
 
     @Override

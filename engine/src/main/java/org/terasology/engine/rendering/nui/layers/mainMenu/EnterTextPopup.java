@@ -7,8 +7,6 @@ import org.terasology.nui.databinding.Binding;
 import org.terasology.nui.widgets.UIText;
 import org.terasology.engine.rendering.nui.CoreScreenLayer;
 
-/**
- */
 public class EnterTextPopup extends CoreScreenLayer {
     private Binding<String> inputBinding;
 

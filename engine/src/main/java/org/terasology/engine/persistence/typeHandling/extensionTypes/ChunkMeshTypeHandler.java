@@ -4,9 +4,7 @@
 package org.terasology.engine.persistence.typeHandling.extensionTypes;
 
 import org.lwjgl.BufferUtils;
-import org.terasology.engine.registry.CoreRegistry;
 import org.terasology.engine.rendering.primitives.ChunkMesh;
-import org.terasology.engine.rendering.primitives.ChunkTessellator;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.PersistedDataSerializer;
 import org.terasology.persistence.typeHandling.TypeHandler;
@@ -41,7 +39,7 @@ public class ChunkMeshTypeHandler extends TypeHandler<ChunkMesh> {
             directBuffer.rewind();
             asBuffers.add(directBuffer);
         }
-        ChunkMesh result = new ChunkMesh(null);
+        ChunkMesh result = new ChunkMesh();
         for (ChunkMesh.RenderType renderType : ChunkMesh.RenderType.values()) {
             result.getVertexElements(renderType).finalVertices = asBuffers.remove(0);
             result.getVertexElements(renderType).finalIndices = asBuffers.remove(0);

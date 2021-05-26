@@ -4,8 +4,6 @@ package org.terasology.engine.logic.console.commandSystem.adapter;
 
 import org.terasology.gestalt.naming.Name;
 
-/**
- */
 public class NameAdapter implements ParameterAdapter<Name> {
     @Override
     public Name parse(String raw) {

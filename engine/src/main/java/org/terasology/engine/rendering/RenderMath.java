@@ -4,8 +4,6 @@ package org.terasology.engine.rendering;
 
 import org.terasology.math.TeraMath;
 
-/**
- */
 public final class RenderMath {
     private RenderMath() {
     }

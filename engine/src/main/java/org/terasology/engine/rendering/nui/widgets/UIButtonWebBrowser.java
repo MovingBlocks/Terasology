@@ -119,7 +119,7 @@ public class UIButtonWebBrowser extends UIButton {
                 translationSystem.translate("${engine:menu#button-web-browser-confirmation-message}")
                         + NEW_LINE + this.url);
         confirmUrlPopup.setLeftButton(translationSystem.translate("${engine:menu#dialog-yes}"), this::openBrowser);
-        confirmUrlPopup.setRightButton(translationSystem.translate("${engine:menu#dialog-no}"), () -> {});
+        confirmUrlPopup.setRightButton(translationSystem.translate("${engine:menu#dialog-no}"), () -> { });
         try {
             if (webBrowserConfig != null) {
                 confirmUrlPopup.setCheckbox(webBrowserConfig, this.url);

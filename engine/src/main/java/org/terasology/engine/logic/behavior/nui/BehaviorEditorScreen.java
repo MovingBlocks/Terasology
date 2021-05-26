@@ -35,8 +35,6 @@ import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.util.List;
 
-/**
- */
 public class BehaviorEditorScreen extends CoreScreenLayer {
     public static final Logger logger = LoggerFactory.getLogger(BehaviorEditorScreen.class);
     public static final String PALETTE_ITEM_OPEN = "--";

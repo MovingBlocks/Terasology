@@ -4,8 +4,6 @@ package org.terasology.engine.world.generation;
 
 import org.terasology.engine.world.block.BlockRegionc;
 
-/**
- */
 public interface WorldFacet3D extends WorldFacet {
 
     /**

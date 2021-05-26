@@ -11,8 +11,6 @@ import org.terasology.joml.geom.AABBf;
 
 import java.util.Collection;
 
-/**
- */
 public abstract class SkeletalMesh extends Asset<SkeletalMeshData> {
 
     protected SkeletalMesh(ResourceUrn urn, AssetType<?, SkeletalMeshData> assetType, DisposableResource disposableResource) {

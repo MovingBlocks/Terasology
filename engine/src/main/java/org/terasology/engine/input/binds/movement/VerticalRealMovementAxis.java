@@ -10,8 +10,6 @@ import org.terasology.engine.input.SendEventMode;
 import org.terasology.input.ControllerId;
 import org.terasology.input.InputType;
 
-/**
- */
 @RegisterRealBindAxis(id = "verticalRealMovement", eventMode = SendEventMode.WHEN_CHANGED)
 @DefaultBinding(type = InputType.CONTROLLER_AXIS, id = ControllerId.Z_AXIS)
 public class VerticalRealMovementAxis extends BindAxisEvent {

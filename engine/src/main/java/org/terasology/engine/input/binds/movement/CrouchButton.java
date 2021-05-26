@@ -9,8 +9,6 @@ import org.terasology.engine.input.RegisterBindButton;
 import org.terasology.input.InputType;
 import org.terasology.input.Keyboard;
 
-/**
- */
 @RegisterBindButton(id = "crouch", description = "${engine:menu#binding-crouch}")
 @DefaultBinding(type = InputType.KEY, id = Keyboard.KeyId.LEFT_CTRL)
 public class CrouchButton extends BindButtonEvent {

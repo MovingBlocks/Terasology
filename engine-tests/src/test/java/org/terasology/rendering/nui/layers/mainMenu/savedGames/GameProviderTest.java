@@ -12,7 +12,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.platform.commons.logging.Logger;
 import org.junit.platform.commons.logging.LoggerFactory;
-import org.terasology.engine.core.paths.PathManager;
+import org.terasology.engine.core.PathManager;
 import org.terasology.engine.game.GameManifest;
 import org.terasology.engine.rendering.nui.layers.mainMenu.savedGames.GameInfo;
 import org.terasology.engine.rendering.nui.layers.mainMenu.savedGames.GameProvider;
