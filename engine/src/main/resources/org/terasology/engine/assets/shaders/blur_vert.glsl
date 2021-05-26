@@ -1,21 +1,14 @@
-/*
- * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+#version 330 core
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
+layout (location = 0) in vec3 in_vert;
+layout (location = 1) in vec3 in_normal;
+layout (location = 2) in vec2 in_uv0;
+layout (location = 4) in vec4 in_color0;
+
+out vec2 v_uv0;
 
 void main() {
-	gl_Position = ftransform();
-    gl_TexCoord[0] = gl_MultiTexCoord0;
-    gl_FrontColor = gl_Color;
+    gl_Position = vec4(in_vert, 1.0);
+    v_uv0 = in_uv0;
 }

@@ -6,8 +6,6 @@ import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.event.AbstractConsumableEvent;
 import org.terasology.engine.entitySystem.prefab.Prefab;
 
-/**
- */
 public class BeforeDestroyEvent extends AbstractConsumableEvent {
     private EntityRef instigator;
     private EntityRef directCause;

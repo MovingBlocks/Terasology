@@ -73,7 +73,7 @@ public class MenuControlSystem extends BaseComponentSystem {
         }
     }
 
-    @ReceiveEvent(components = {CharacterComponent.class})
+    @ReceiveEvent(components = CharacterComponent.class)
     public void onPlayerDeath(PlayerDeathEvent event, EntityRef character) {
         EntityRef client = character.getComponent(CharacterComponent.class).controller;
         if (client.getComponent(ClientComponent.class).local) {

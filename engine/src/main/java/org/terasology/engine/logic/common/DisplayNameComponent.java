@@ -7,8 +7,6 @@ import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.network.Replicate;
 import org.terasology.engine.world.block.items.AddToBlockBasedItem;
 
-/**
- */
 @AddToBlockBasedItem
 public class DisplayNameComponent implements Component {
     @Replicate

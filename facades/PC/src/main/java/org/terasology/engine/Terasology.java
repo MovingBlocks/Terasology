@@ -1,4 +1,4 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.engine;
@@ -11,13 +11,13 @@ import org.terasology.crashreporter.CrashReporter;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.config.SystemConfig;
 import org.terasology.engine.core.LoggingContext;
+import org.terasology.engine.core.PathManager;
 import org.terasology.engine.core.StandardGameStatus;
 import org.terasology.engine.core.TerasologyConstants;
 import org.terasology.engine.core.TerasologyEngine;
 import org.terasology.engine.core.TerasologyEngineBuilder;
 import org.terasology.engine.core.modes.StateLoading;
 import org.terasology.engine.core.modes.StateMainMenu;
-import org.terasology.engine.core.paths.PathManager;
 import org.terasology.engine.core.subsystem.EngineSubsystem;
 import org.terasology.engine.core.subsystem.common.ConfigurationSubsystem;
 import org.terasology.engine.core.subsystem.common.ThreadManager;

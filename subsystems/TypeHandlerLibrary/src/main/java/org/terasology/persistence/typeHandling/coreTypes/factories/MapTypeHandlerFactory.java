@@ -41,7 +41,7 @@ public class MapTypeHandlerFactory implements TypeHandlerFactory {
 
         TypeInfo<?> valueTypeInfo = TypeInfo.of(valueType);
 
-        @SuppressWarnings({"unchecked"})
+        @SuppressWarnings("unchecked")
         TypeHandler<?> valueTypeHandler = new RuntimeDelegatingTypeHandler(
                 declaredValueTypeHandler.orElse(null),
                 valueTypeInfo,
@@ -54,7 +54,7 @@ public class MapTypeHandlerFactory implements TypeHandlerFactory {
             Optional<TypeHandler<?>> declaredKeyTypeHandler =
                     context.getTypeHandlerLibrary().getTypeHandler(keyType);
             TypeInfo<?> keyTypeInfo = TypeInfo.of(keyType);
-            @SuppressWarnings({"unchecked"})
+            @SuppressWarnings("unchecked")
             TypeHandler<?> keyTypeHandler = new RuntimeDelegatingTypeHandler(
                     declaredKeyTypeHandler.orElse(null),
                     keyTypeInfo,

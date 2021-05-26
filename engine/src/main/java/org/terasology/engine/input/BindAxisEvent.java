@@ -5,8 +5,6 @@ package org.terasology.engine.input;
 
 import org.terasology.engine.input.events.AxisEvent;
 
-/**
- */
 public class BindAxisEvent extends AxisEvent {
 
     private String id;

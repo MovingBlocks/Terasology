@@ -52,8 +52,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.terasology.engine.entitySystem.entity.internal.EntityScope.CHUNK;
 
-/**
- */
 public class PojoEntityManagerTest {
 
     private static Context context;

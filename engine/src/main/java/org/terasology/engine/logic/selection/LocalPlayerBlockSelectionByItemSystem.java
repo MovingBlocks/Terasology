@@ -33,7 +33,7 @@ public class LocalPlayerBlockSelectionByItemSystem extends BaseComponentSystem {
 
     private EntityRef blockSelectionComponentEntity;
 
-    @ReceiveEvent(components = {OnItemActivateSelectionComponent.class})
+    @ReceiveEvent(components = OnItemActivateSelectionComponent.class)
     public void onPlaced(ActivateEvent event, EntityRef itemEntity) {
         if (event.getTargetLocation() == null) {
             return;
@@ -60,7 +60,7 @@ public class LocalPlayerBlockSelectionByItemSystem extends BaseComponentSystem {
         }
     }
 
-    @ReceiveEvent(components = {LocationComponent.class})
+    @ReceiveEvent(components = LocationComponent.class)
     public void onCamTargetChanged(CameraTargetChangedEvent event, EntityRef entity) {
         // This method will update the block selection to whatever block is targeted in the players view
         if (null == blockSelectionComponentEntity) {
@@ -106,7 +106,7 @@ public class LocalPlayerBlockSelectionByItemSystem extends BaseComponentSystem {
      * @param event The event sent
      * @param blockSelectionComponentEntity The entity sending the event. This entity must have the {@link BlockSelectionComponent}
      */
-    @ReceiveEvent(components = {BlockSelectionComponent.class})
+    @ReceiveEvent(components = BlockSelectionComponent.class)
     public void onMovableBlockSelectionStart(MovableSelectionStartEvent event, EntityRef blockSelectionComponentEntity) {
         this.blockSelectionComponentEntity = blockSelectionComponentEntity;
     }

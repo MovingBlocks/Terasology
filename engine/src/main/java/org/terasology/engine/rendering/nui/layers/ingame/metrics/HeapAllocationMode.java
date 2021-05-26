@@ -28,7 +28,8 @@ public class HeapAllocationMode extends MetricsMode {
         for (MemoryPoolMXBean mpBean : ManagementFactory.getMemoryPoolMXBeans()) {
             if (mpBean.getType() == MemoryType.HEAP) {
                 MemoryUsage usage = mpBean.getUsage();
-                builder.append(String.format("Memory Heap: %s - Memory Usage: %.2f MB, Max Memory: %.2f MB \n", mpBean.getName(), usage.getUsed() / MB_SIZE, usage.getMax() / MB_SIZE));
+                builder.append(String.format("Memory Heap: %s - Memory Usage: %.2f MB, Max Memory: %.2f MB \n",
+                        mpBean.getName(), usage.getUsed() / MB_SIZE, usage.getMax() / MB_SIZE));
             }
         }
         return builder.toString();

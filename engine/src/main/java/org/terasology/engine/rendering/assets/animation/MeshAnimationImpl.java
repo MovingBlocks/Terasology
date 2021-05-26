@@ -11,8 +11,6 @@ import org.terasology.joml.geom.AABBf;
 
 import java.util.Optional;
 
-/**
- */
 public class MeshAnimationImpl extends MeshAnimation {
 
     private MeshAnimationData data;

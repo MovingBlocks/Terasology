@@ -11,8 +11,6 @@ import org.terasology.persistence.typeHandling.PersistedDataMap;
 
 import java.nio.ByteBuffer;
 
-/**
- */
 public abstract class AbstractGsonPersistedData implements PersistedData {
 
     private byte[] cachedDecodedBytes;
