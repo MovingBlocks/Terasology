@@ -12,7 +12,7 @@ import org.terasology.engine.utilities.random.Random;
 /**
  * Created by Linus on 13-4-2015.
  */
-@RegisterParticleSystemFunction()
+@RegisterParticleSystemFunction
 public class TextureOffsetGeneratorFunction extends GeneratorFunction<TextureOffsetGeneratorComponent> {
 
     public TextureOffsetGeneratorFunction() {

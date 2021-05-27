@@ -390,7 +390,7 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
         return false;
     }
 
-    @ReceiveEvent(components = {BlockComponent.class})
+    @ReceiveEvent(components = BlockComponent.class)
     public void onActivateBlock(OnActivatedComponent event, EntityRef entity) {
         BlockComponent block = entity.getComponent(BlockComponent.class);
         EntityRef oldEntity = blockEntityLookup.put(block.getPosition(new Vector3i()), entity);
@@ -400,7 +400,7 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
         }
     }
 
-    @ReceiveEvent(components = {BlockComponent.class})
+    @ReceiveEvent(components = BlockComponent.class)
     public void onDeactivateBlock(BeforeDeactivateComponent event, EntityRef entity) {
         BlockComponent block = entity.getComponent(BlockComponent.class);
         if (blockEntityLookup.get(block.getPosition()) == entity) {
@@ -408,7 +408,7 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
         }
     }
 
-    @ReceiveEvent(components = {BlockRegionComponent.class})
+    @ReceiveEvent(components = BlockRegionComponent.class)
     public void onBlockRegionActivated(OnActivatedComponent event, EntityRef entity) {
         BlockRegionComponent regionComp = entity.getComponent(BlockRegionComponent.class);
         blockRegions.put(entity, regionComp.region);
@@ -417,7 +417,7 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
         }
     }
 
-    @ReceiveEvent(components = {BlockRegionComponent.class})
+    @ReceiveEvent(components = BlockRegionComponent.class)
     public void onBlockRegionChanged(OnChangedComponent event, EntityRef entity) {
         BlockRegion oldRegion = blockRegions.get(entity);
         for (Vector3ic pos : oldRegion) {
@@ -430,7 +430,7 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
         }
     }
 
-    @ReceiveEvent(components = {BlockRegionComponent.class})
+    @ReceiveEvent(components = BlockRegionComponent.class)
     public void onBlockRegionDeactivated(BeforeDeactivateComponent event, EntityRef entity) {
         BlockRegion oldRegion = blockRegions.get(entity);
         for (Vector3ic pos : oldRegion) {

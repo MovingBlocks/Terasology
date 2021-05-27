@@ -29,7 +29,7 @@ public class LoadingChunkEventSystem extends BaseComponentSystem {
      * @param chunkAvailable an event which includes the position of the new chunk
      * @param worldEntity the world entity that this event was sent to
      */
-    @ReceiveEvent(components = {WorldComponent.class})
+    @ReceiveEvent(components = WorldComponent.class)
     public void onNewChunk(OnChunkLoaded chunkAvailable, EntityRef worldEntity) {
         GameEngine gameEngine = context.get(GameEngine.class);
 

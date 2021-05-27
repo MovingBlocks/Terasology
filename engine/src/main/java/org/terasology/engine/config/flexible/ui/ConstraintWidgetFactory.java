@@ -27,7 +27,7 @@ public abstract class ConstraintWidgetFactory<T, C extends SettingConstraint<T>>
         return setting;
     }
 
-    @SuppressWarnings({"unchecked"})
+    @SuppressWarnings("unchecked")
     protected C getConstraint() {
         return (C) setting.getConstraint();
     }
