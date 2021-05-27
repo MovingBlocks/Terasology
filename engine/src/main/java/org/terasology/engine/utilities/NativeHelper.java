@@ -6,8 +6,6 @@ package org.terasology.engine.utilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- */
 public final class NativeHelper {
 
     private static final Logger logger = LoggerFactory.getLogger(NativeHelper.class);

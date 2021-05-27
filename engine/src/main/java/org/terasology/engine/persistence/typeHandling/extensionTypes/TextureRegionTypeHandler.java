@@ -12,8 +12,6 @@ import org.terasology.persistence.typeHandling.StringRepresentationTypeHandler;
 
 import java.util.Optional;
 
-/**
- */
 public class TextureRegionTypeHandler extends StringRepresentationTypeHandler<TextureRegion> {
     private static final Logger logger = LoggerFactory.getLogger(TextureRegionTypeHandler.class);
 

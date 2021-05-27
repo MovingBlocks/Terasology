@@ -16,8 +16,6 @@ import org.terasology.engine.world.block.internal.BlockRegistrationListener;
 
 import java.util.Optional;
 
-/**
- */
 public class BlockTypeEntityGenerator implements BlockRegistrationListener {
 
     private EntityManager entityManager;

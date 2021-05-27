@@ -5,8 +5,6 @@ package org.terasology.engine.logic.console;
 
 import org.terasology.nui.Color;
 
-/**
- */
 public enum CoreMessageType implements MessageType {
     CONSOLE(ConsoleColors.DEFAULT),
     CHAT(ConsoleColors.CHAT),

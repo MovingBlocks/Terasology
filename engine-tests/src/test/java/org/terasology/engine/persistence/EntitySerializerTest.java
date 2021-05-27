@@ -46,8 +46,6 @@ import static org.mockito.Mockito.when;
 import static org.terasology.engine.entitySystem.entity.internal.EntityScope.CHUNK;
 import static org.terasology.engine.entitySystem.entity.internal.EntityScope.GLOBAL;
 
-/**
- */
 public class EntitySerializerTest {
 
     private static Context context;

@@ -171,7 +171,7 @@ public class BetweenChunkPropagationTest extends TerasologyTestingEnvironment {
             topChunk.setSunlight(pos, (byte) 0);
             topChunk.setSunlightRegen(pos, (byte) 0);
         }
-        for (Vector3ic pos : new BlockRegion(8, 0, 8).setSize(Chunks.SIZE_X- 16, 1, Chunks.SIZE_Z- 16)) {
+        for (Vector3ic pos : new BlockRegion(8, 0, 8).setSize(Chunks.SIZE_X - 16, 1, Chunks.SIZE_Z - 16)) {
             topChunk.setSunlight(pos, (byte) 0);
             topChunk.setSunlightRegen(pos, (byte) 32);
         }

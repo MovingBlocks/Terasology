@@ -6,8 +6,6 @@ import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.entitySystem.Owns;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 
-/**
- */
 public class OwnerComponent implements Component {
     @Owns
     public EntityRef child = EntityRef.NULL;

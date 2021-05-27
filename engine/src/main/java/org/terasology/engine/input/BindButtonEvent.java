@@ -7,8 +7,6 @@ import org.terasology.engine.core.SimpleUri;
 import org.terasology.engine.input.events.ButtonEvent;
 import org.terasology.input.ButtonState;
 
-/**
- */
 public class BindButtonEvent extends ButtonEvent {
 
     private SimpleUri id;

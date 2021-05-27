@@ -32,7 +32,8 @@ public class SideBlockSupportRequired implements BlockStructuralSupport {
     public boolean shouldBeRemovedDueToChange(Vector3i location, Side sideChanged) {
         final SideBlockSupportRequiredComponent component = getComponent(location, Collections.emptyMap());
         if (component != null) {
-            final boolean sufficientlySupported = isSufficientlySupported(location, sideChanged, Collections.emptyMap(), component);
+            final boolean sufficientlySupported = isSufficientlySupported(location, sideChanged,
+                    Collections.emptyMap(), component);
             if (!sufficientlySupported) {
                 if (component.dropDelay <= 0) {
                     return true;
@@ -49,11 +50,13 @@ public class SideBlockSupportRequired implements BlockStructuralSupport {
     }
 
     @ReceiveEvent
-    public void checkForSupport(DelayedActionTriggeredEvent event, EntityRef entity, BlockComponent block, SideBlockSupportRequiredComponent supportRequired) {
+    public void checkForSupport(DelayedActionTriggeredEvent event, EntityRef entity, BlockComponent block,
+                                SideBlockSupportRequiredComponent supportRequired) {
         if (event.getActionId().equals(SUPPORT_CHECK_ACTION_ID)) {
             if (!isSufficientlySupported(block.getPosition(), null, Collections.emptyMap(), supportRequired)) {
                 PrefabManager prefabManager = CoreRegistry.get(PrefabManager.class);
-                entity.send(new DestroyEvent(entity, EntityRef.NULL, prefabManager.getPrefab("engine:supportRemovedDamage")));
+                entity.send(new DestroyEvent(entity, EntityRef.NULL, prefabManager.getPrefab("engine" +
+                        ":supportRemovedDamage")));
             }
         }
     }
@@ -80,11 +83,14 @@ public class SideBlockSupportRequired implements BlockStructuralSupport {
         }
     }
 
-    private SideBlockSupportRequiredComponent getComponent(Vector3ic location, Map<? extends Vector3ic, Block> blockOverrides) {
+    private SideBlockSupportRequiredComponent getComponent(Vector3ic location,
+                                                           Map<? extends Vector3ic, Block> blockOverrides) {
         return getEntity(location, blockOverrides).getComponent(SideBlockSupportRequiredComponent.class);
     }
 
-    private boolean isSufficientlySupported(Vector3ic location, Side sideChanged, Map<? extends Vector3ic, Block> blockOverrides, SideBlockSupportRequiredComponent supportComponent) {
+    private boolean isSufficientlySupported(Vector3ic location, Side sideChanged,
+                                            Map<? extends Vector3ic, Block> blockOverrides,
+                                            SideBlockSupportRequiredComponent supportComponent) {
         if (supportComponent != null) {
             if ((sideChanged == null || sideChanged.isHorizontal()) && supportComponent.sideAllowed
                     && !hasSupport(location, supportComponent, blockOverrides)) {
@@ -97,7 +103,8 @@ public class SideBlockSupportRequired implements BlockStructuralSupport {
         return true;
     }
 
-    private boolean hasSupport(Vector3ic blockPosition, SideBlockSupportRequiredComponent supportComponent, Map<? extends Vector3ic, Block> blockOverrides) {
+    private boolean hasSupport(Vector3ic blockPosition, SideBlockSupportRequiredComponent supportComponent, Map<?
+            extends Vector3ic, Block> blockOverrides) {
         if (supportComponent.bottomAllowed && hasSupportFromBlockOnSide(blockPosition, Side.BOTTOM, blockOverrides)) {
             return true;
         }
@@ -113,7 +120,8 @@ public class SideBlockSupportRequired implements BlockStructuralSupport {
         return false;
     }
 
-    private boolean hasSupportFromBlockOnSide(Vector3ic blockPosition, Side side, Map<? extends Vector3ic, Block> blockOverrides) {
+    private boolean hasSupportFromBlockOnSide(Vector3ic blockPosition, Side side,
+                                              Map<? extends Vector3ic, Block> blockOverrides) {
         final Vector3i sideBlockPosition = side.getAdjacentPos(blockPosition, new Vector3i());
         if (!getWorldProvider().isBlockRelevant(sideBlockPosition)) {
             return true;

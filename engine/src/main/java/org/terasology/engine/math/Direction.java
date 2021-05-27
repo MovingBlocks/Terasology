@@ -2,15 +2,11 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.math;
 
-import com.google.common.collect.Maps;
-import net.logstash.logback.encoder.org.apache.commons.lang.UnhandledException;
 import org.joml.Math;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
-
-import java.util.EnumMap;
 
 /**
  * An enumeration of the axis of the world from the player perspective. There is also

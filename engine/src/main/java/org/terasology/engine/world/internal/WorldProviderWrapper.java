@@ -15,8 +15,6 @@ import org.terasology.engine.world.chunks.blockdata.ExtraBlockDataManager;
 
 import java.util.Collection;
 
-/**
- */
 public class WorldProviderWrapper extends AbstractWorldProviderDecorator implements WorldProvider {
     private WorldProviderCore core;
     private ExtraBlockDataManager extraDataManager;

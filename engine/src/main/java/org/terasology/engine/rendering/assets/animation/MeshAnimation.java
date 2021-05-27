@@ -9,8 +9,6 @@ import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.engine.rendering.assets.skeletalmesh.SkeletalMesh;
 import org.terasology.joml.geom.AABBf;
 
-/**
- */
 public abstract class MeshAnimation extends Asset<MeshAnimationData> {
 
     protected MeshAnimation(ResourceUrn urn, AssetType<?, MeshAnimationData> assetType) {

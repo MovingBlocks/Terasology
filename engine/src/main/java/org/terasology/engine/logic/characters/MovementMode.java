@@ -3,8 +3,6 @@
 
 package org.terasology.engine.logic.characters;
 
-/**
- */
 public enum MovementMode {
     WALKING(1f, 8f, true, true, true, 3f, false),
     CROUCHING(1f, 8f, true, true, true, 1.5f, false),

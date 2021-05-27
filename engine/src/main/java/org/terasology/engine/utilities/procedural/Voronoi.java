@@ -8,8 +8,6 @@ import org.joml.Vector2f;
 
 import java.util.Random;
 
-/**
- */
 public class Voronoi {
 
     private static final float DENSITY_ADJUSTMENT = 0.39815f;
