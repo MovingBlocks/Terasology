@@ -48,7 +48,7 @@ public class ParticleSystemManagerImpl extends BaseComponentSystem implements Up
     private ParticleUpdater particleUpdater;
 
 
-    @ReceiveEvent(components = {ParticleEmitterComponent.class})
+    @ReceiveEvent(components = ParticleEmitterComponent.class)
     public void onEmitterActivated(OnActivatedComponent event, EntityRef entity, ParticleEmitterComponent particleEmitterComponent) {
         particleEmitterComponent.ownerEntity = entity;
         particleEmitterComponent.locationComponent = entity.getComponent(LocationComponent.class);
@@ -60,12 +60,12 @@ public class ParticleSystemManagerImpl extends BaseComponentSystem implements Up
         particleUpdater.configureEmitter(particleEmitterComponent);
     }
 
-    @ReceiveEvent(components = {ParticleEmitterComponent.class})
+    @ReceiveEvent(components = ParticleEmitterComponent.class)
     public void onEmitterChanged(ParticleSystemUpdateEvent event, EntityRef entity, ParticleEmitterComponent emitter) {
         particleUpdater.configureEmitter(emitter);
     }
 
-    @ReceiveEvent(components = {ParticleEmitterComponent.class})
+    @ReceiveEvent(components = ParticleEmitterComponent.class)
     public void onEmitterDeactivated(BeforeDeactivateComponent event, EntityRef entity, ParticleEmitterComponent particleEmitterComponent) {
         particleUpdater.removeEmitter(entity);
     }
