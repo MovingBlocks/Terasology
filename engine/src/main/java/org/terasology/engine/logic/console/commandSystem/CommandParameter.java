@@ -17,8 +17,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-/**
- */
 public final class CommandParameter<T> implements Parameter {
     private final String name;
     private final Class<T> type;

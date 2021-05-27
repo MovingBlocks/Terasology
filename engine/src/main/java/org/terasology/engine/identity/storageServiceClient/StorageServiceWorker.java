@@ -1,18 +1,5 @@
-/*
- * Copyright 2017 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.identity.storageServiceClient;
 
 import com.google.common.collect.ImmutableMap;
@@ -36,9 +23,9 @@ import java.util.Map;
 import java.util.concurrent.LinkedBlockingDeque;
 
 /**
- * The public interface to this package. Manages a communication session with the storage service server,
- * can answer for status information queries and can perform asynchronous operations on the storage service.
- * This class can be in two states, with the default being "logged out".
+ * The public interface to this package. Manages a communication session with the storage service server, can answer for
+ * status information queries and can perform asynchronous operations on the storage service. This class can be in two
+ * states, with the default being "logged out".
  */
 public final class StorageServiceWorker {
 
@@ -94,7 +81,8 @@ public final class StorageServiceWorker {
     public void flushNotificationsToConsole(Console target) {
         while (!notificationBuffer.isEmpty()) {
             ConsoleNotification notification = notificationBuffer.pop();
-            String message = translationSystem.translate("${engine:menu#storage-service}") + ": " + String.format(translationSystem.translate(notification.messageId), notification.args);
+            String message =
+                    translationSystem.translate("${engine:menu#storage-service}") + ": " + String.format(translationSystem.translate(notification.messageId), notification.args);
             target.addMessage(message, CoreMessageType.NOTIFICATION);
         }
     }
@@ -108,16 +96,16 @@ public final class StorageServiceWorker {
     }
 
     /**
-     * Tries to initialize the session using the parameters (host URL and session token) read from configuration.
-     * The session token is verified against the server; if it's valid, the status is switched to logged in.
+     * Tries to initialize the session using the parameters (host URL and session token) read from configuration. The
+     * session token is verified against the server; if it's valid, the status is switched to logged in.
      */
     public void initializeFromConfig() {
         performAction(new InitializeFromTokenAction(), StorageServiceWorkerStatus.LOGGED_OUT);
     }
 
     /**
-     * Tries to login with the specified credentials; on success, the status is switched to logged in
-     * and the parameters are stored in configuration.
+     * Tries to login with the specified credentials; on success, the status is switched to logged in and the parameters
+     * are stored in configuration.
      */
     public void login(URL serviceURL, String login, String password) {
         performAction(new LoginAction(serviceURL, login, password), StorageServiceWorkerStatus.LOGGED_OUT);
@@ -125,6 +113,7 @@ public final class StorageServiceWorker {
 
     /**
      * Destroys the current session and switches to the logged out status.
+     *
      * @param deleteLocalIdentities whether the locally stored identities should be deleted or not.
      */
     public void logout(boolean deleteLocalIdentities) {
@@ -161,19 +150,21 @@ public final class StorageServiceWorker {
      */
     public IdentityConflict getNextConflict() {
         IdentityBundle entry = conflictingRemoteIdentities.peekFirst();
-        return new IdentityConflict(entry.getServer(), securityConfig.getIdentity(entry.getServer()), entry.getClient());
+        return new IdentityConflict(entry.getServer(), securityConfig.getIdentity(entry.getServer()),
+                entry.getClient());
     }
 
     /**
-     * @param solution the strategy to resolve the conflict returned by the latest call to {@link #getNextConflict()}.
-     * If there are no more conflicts and some of the solved conflicts must keep the local version, the uploads are performed asynchronously.
+     * @param solution the strategy to resolve the conflict returned by the latest call to {@link
+     *         #getNextConflict()}. If there are no more conflicts and some of the solved conflicts must keep the local
+     *         version, the uploads are performed asynchronously.
      */
     public void solveNextConflict(IdentityConflictSolution solution) {
         IdentityBundle entry = conflictingRemoteIdentities.removeFirst();
         PublicIdentityCertificate server = entry.getServer();
         ClientIdentity remote = entry.getClient();
         ClientIdentity local = securityConfig.getIdentity(server);
-        switch(solution) {
+        switch (solution) {
             case KEEP_LOCAL: //save for upload (remote will be overwritten)
                 conflictSolutionsToUpload.put(server, local);
                 break;
@@ -193,6 +184,7 @@ public final class StorageServiceWorker {
     private static final class ConsoleNotification {
         private String messageId;
         private Object[] args;
+
         private ConsoleNotification(String messageId, Object[] args) {
             this.messageId = messageId;
             this.args = args;

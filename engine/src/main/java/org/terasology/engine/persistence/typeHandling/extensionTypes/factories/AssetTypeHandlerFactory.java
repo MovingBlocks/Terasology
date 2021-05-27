@@ -24,7 +24,7 @@ public class AssetTypeHandlerFactory implements TypeHandlerFactory {
             return Optional.empty();
         }
 
-        @SuppressWarnings({"unchecked"})
+        @SuppressWarnings("unchecked")
         TypeHandler<T> typeHandler = new AssetTypeHandler(rawType);
 
         return Optional.of(typeHandler);

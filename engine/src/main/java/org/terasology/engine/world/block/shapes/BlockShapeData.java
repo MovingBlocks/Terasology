@@ -11,8 +11,6 @@ import org.terasology.gestalt.assets.AssetData;
 
 import java.util.EnumMap;
 
-/**
- */
 public class BlockShapeData implements AssetData {
     private String displayName = "";
     private EnumMap<BlockPart, BlockMeshPart> meshParts = Maps.newEnumMap(BlockPart.class);

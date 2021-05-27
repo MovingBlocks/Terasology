@@ -7,8 +7,6 @@ import org.terasology.engine.registry.CoreRegistry;
 import org.terasology.engine.world.block.BlockManager;
 import org.terasology.engine.world.block.family.BlockFamily;
 
-/**
- */
 public class BlockFamilyAdapter implements ParameterAdapter<BlockFamily> {
     @Override
     public BlockFamily parse(String raw) {

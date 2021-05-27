@@ -38,8 +38,6 @@ import java.util.Locale;
 
 import static org.terasology.engine.physics.engine.PhysicsEngineManager.COLLISION_SHAPE_FACTORY;
 
-/**
- */
 @RegisterAssetFileFormat
 public class JsonBlockShapeLoader extends AbstractAssetFileFormat<BlockShapeData> {
     private Gson gson;

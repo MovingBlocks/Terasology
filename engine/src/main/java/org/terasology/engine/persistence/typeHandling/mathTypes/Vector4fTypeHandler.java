@@ -11,8 +11,6 @@ import org.terasology.persistence.typeHandling.TypeHandler;
 
 import java.util.Optional;
 
-/**
- */
 public class Vector4fTypeHandler extends TypeHandler<Vector4f> {
 
     @Override

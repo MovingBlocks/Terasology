@@ -35,7 +35,8 @@ public final class OpenALStreamingSound extends StreamingSound {
     private OpenALStreamingSound.DisposalAction internalResources;
     private int lastUpdatedBuffer;
 
-    public OpenALStreamingSound(ResourceUrn urn, AssetType<?, StreamingSoundData> assetType, StreamingSoundData data, OpenALManager audioManager, OpenALStreamingSound.DisposalAction disposableAction) {
+    public OpenALStreamingSound(ResourceUrn urn, AssetType<?, StreamingSoundData> assetType, StreamingSoundData data,
+                                OpenALManager audioManager, OpenALStreamingSound.DisposalAction disposableAction) {
         super(urn, assetType, disposableAction);
         this.internalResources = disposableAction;
         this.internalResources.setAsset(this);

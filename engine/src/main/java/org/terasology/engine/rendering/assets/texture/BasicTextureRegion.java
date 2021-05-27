@@ -9,8 +9,6 @@ import org.terasology.joml.geom.Rectanglef;
 import org.terasology.joml.geom.Rectanglei;
 import org.terasology.math.TeraMath;
 
-/**
- */
 public class BasicTextureRegion implements TextureRegion {
     private Texture texture;
     private Rectanglef region = new Rectanglef();

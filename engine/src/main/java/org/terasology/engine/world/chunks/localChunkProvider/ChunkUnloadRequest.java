@@ -5,8 +5,6 @@ package org.terasology.engine.world.chunks.localChunkProvider;
 import org.terasology.engine.utilities.concurrency.Task;
 import org.terasology.engine.world.chunks.Chunk;
 
-/**
- */
 public class ChunkUnloadRequest implements Task {
 
     private Chunk chunk;

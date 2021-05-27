@@ -4,8 +4,6 @@ package org.terasology.engine.rendering.nui;
 
 import org.terasology.nui.ControlWidget;
 
-/**
- */
 public interface UIScreenLayer extends ControlWidget {
 
     boolean isLowerLayerVisible();

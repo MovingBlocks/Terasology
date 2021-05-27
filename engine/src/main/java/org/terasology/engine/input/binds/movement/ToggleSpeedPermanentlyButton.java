@@ -9,8 +9,6 @@ import org.terasology.engine.input.RegisterBindButton;
 import org.terasology.input.InputType;
 import org.terasology.input.Keyboard;
 
-/**
- */
 @RegisterBindButton(id = "toggleSpeedPermanently", description = "${engine:menu#binding-toggle-speed-permanently}")
 @DefaultBinding(type = InputType.KEY, id = Keyboard.KeyId.CAPS_LOCK)
 public class ToggleSpeedPermanentlyButton extends BindButtonEvent {

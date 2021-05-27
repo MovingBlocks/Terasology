@@ -16,7 +16,6 @@ import org.terasology.engine.core.bootstrap.EnvironmentSwitchHandler;
 import org.terasology.engine.core.modes.GameState;
 import org.terasology.engine.core.module.ExternalApiWhitelist;
 import org.terasology.engine.core.module.ModuleManager;
-import org.terasology.engine.core.paths.PathManager;
 import org.terasology.engine.core.subsystem.DisplayDevice;
 import org.terasology.engine.core.subsystem.EngineSubsystem;
 import org.terasology.engine.core.subsystem.RenderingSubsystemFactory;
@@ -62,6 +61,7 @@ import org.terasology.gestalt.assets.module.autoreload.AutoReloadAssetTypeManage
 import org.terasology.nui.UIWidget;
 import org.terasology.nui.asset.UIElement;
 import org.terasology.nui.skin.UISkinAsset;
+import org.terasology.persistence.typeHandling.TypeHandler;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.reflection.ModuleTypeRegistry;
 import org.terasology.reflection.TypeRegistry;
@@ -84,24 +84,21 @@ import java.util.stream.Collectors;
  * This GameEngine implementation is the heart of Terasology.
  * </p>
  * <p>
- * It first takes care of making a number of application-wide initializations (see init()
- * method). It then provides a main game loop (see run() method) characterized by a number
- * of mutually exclusive {@link GameState}s. The current GameState is updated each
- * frame, and a change of state (see changeState() method) can be requested at any time - the
- * switch will occur cleanly between frames. Interested parties can be notified of GameState
- * changes by using the subscribeToStateChange() method.
+ * It first takes care of making a number of application-wide initializations (see init() method). It then provides a
+ * main game loop (see run() method) characterized by a number of mutually exclusive {@link GameState}s. The current
+ * GameState is updated each frame, and a change of state (see changeState() method) can be requested at any time - the
+ * switch will occur cleanly between frames. Interested parties can be notified of GameState changes by using the
+ * subscribeToStateChange() method.
  * </p>
  * <p>
- * At this stage the engine also provides a number of utility methods (see submitTask() and
- * hasMouseFocus() to name a few) but they might be moved elsewhere.
+ * At this stage the engine also provides a number of utility methods (see submitTask() and hasMouseFocus() to name a
+ * few) but they might be moved elsewhere.
  * </p>
  * <p>
- * Special mention must be made in regard to EngineSubsystems. An {@link EngineSubsystem}
- * is a pluggable low-level component of the engine, that is processed every frame - like
- * rendering or audio. A list of EngineSubsystems is provided in input to the engine's
- * constructor. Different sets of Subsystems can significantly change the behaviour of
- * the engine, i.e. providing a "no-frills" server in one case or a full-graphics client
- * in another.
+ * Special mention must be made in regard to EngineSubsystems. An {@link EngineSubsystem} is a pluggable low-level
+ * component of the engine, that is processed every frame - like rendering or audio. A list of EngineSubsystems is
+ * provided in input to the engine's constructor. Different sets of Subsystems can significantly change the behaviour of
+ * the engine, i.e. providing a "no-frills" server in one case or a full-graphics client in another.
  * </p>
  */
 public class TerasologyEngine implements GameEngine {
@@ -133,12 +130,11 @@ public class TerasologyEngine implements GameEngine {
     private Context rootContext;
 
     /**
-     * This constructor initializes the engine by initializing its systems,
-     * subsystems and managers. It also verifies that some required systems
-     * are up and running after they have been initialized.
+     * This constructor initializes the engine by initializing its systems, subsystems and managers. It also verifies
+     * that some required systems are up and running after they have been initialized.
      *
-     * @param subsystems Typical subsystems lists contain graphics, timer,
-     *                   audio and input subsystems.
+     * @param timeSubsystem the timer subsystem
+     * @param subsystems other typical subsystems, e.g., graphics, audio and input subsystems.
      */
     public TerasologyEngine(TimeSubsystem timeSubsystem, Collection<EngineSubsystem> subsystems) {
         // configure native paths
@@ -184,13 +180,20 @@ public class TerasologyEngine implements GameEngine {
         // add all subsystem as engine module part. (needs for ECS classes loaded from external subsystems)
         allSubsystems.stream().map(Object::getClass).forEach(this::addToClassesOnClasspathsToAddToEngine);
 
+        // the TypeHandlerLibrary is technically not a subsystem (although it lives in the subsystem space)
+        // therefore, we have to manually register the type handler classes with the engine module
+        addToClassesOnClasspathsToAddToEngine(TypeHandler.class);
+
         // register NUI classes with engine module
         addToClassesOnClasspathsToAddToEngine(UIWidget.class);
+        // register gestalt asset classes with engine module
         addToClassesOnClasspathsToAddToEngine(ResourceUrn.class);
     }
 
     /**
-     * Provide ability to set additional engine classpath locations.   This must be called before initialize() or run().
+     * Provide ability to set additional engine classpath locations.   This must be called before initialize() or
+     * run().
+     *
      * @param clazz any class that appears in the resource location to treat as an engine classpath.
      */
     protected void addToClassesOnClasspathsToAddToEngine(Class<?> clazz) {
@@ -205,7 +208,8 @@ public class TerasologyEngine implements GameEngine {
                 logger.info("Initializing Terasology...");
                 logEnvironmentInfo();
 
-                // TODO: Need to get everything thread safe and get rid of the concept of "GameThread" as much as possible.
+                // TODO: Need to get everything thread safe and get rid of the concept of "GameThread" as much as
+                //  possible.
                 GameThread.setToCurrentThread();
 
                 preInitSubsystems();
@@ -258,8 +262,10 @@ public class TerasologyEngine implements GameEngine {
         logger.info("Home path: {}", PathManager.getInstance().getHomePath());
         logger.info("Install path: {}", PathManager.getInstance().getInstallPath());
         logger.info("Java: {} in {}", System.getProperty("java.version"), System.getProperty("java.home"));
-        logger.info("Java VM: {}, version: {}", System.getProperty("java.vm.name"), System.getProperty("java.vm.version"));
-        logger.info("OS: {}, arch: {}, version: {}", System.getProperty("os.name"), System.getProperty("os.arch"), System.getProperty("os.version"));
+        logger.info("Java VM: {}, version: {}", System.getProperty("java.vm.name"), System.getProperty("java.vm" +
+                ".version"));
+        logger.info("OS: {}, arch: {}, version: {}", System.getProperty("os.name"), System.getProperty("os.arch"),
+                System.getProperty("os.version"));
         logger.info("Max. Memory: {} MiB", Runtime.getRuntime().maxMemory() / ONE_MEBIBYTE);
         logger.info("Processors: {}", Runtime.getRuntime().availableProcessors());
         if (NonNativeJVMDetector.JVM_ARCH_IS_NONNATIVE) {
@@ -311,10 +317,12 @@ public class TerasologyEngine implements GameEngine {
     private void initManagers() {
 
         changeStatus(TerasologyEngineStatus.INITIALIZING_MODULE_MANAGER);
-        TypeRegistry.WHITELISTED_CLASSES = ExternalApiWhitelist.CLASSES.stream().map(Class::getName).collect(Collectors.toSet());
+        TypeRegistry.WHITELISTED_CLASSES =
+                ExternalApiWhitelist.CLASSES.stream().map(Class::getName).collect(Collectors.toSet());
         TypeRegistry.WHITELISTED_PACKAGES = ExternalApiWhitelist.PACKAGES;
 
-        ModuleManager moduleManager = new ModuleManager(rootContext.get(Config.class), classesOnClasspathsToAddToEngine);
+        ModuleManager moduleManager = new ModuleManager(rootContext.get(Config.class),
+                classesOnClasspathsToAddToEngine);
         ModuleTypeRegistry typeRegistry = new ModuleTypeRegistry(moduleManager.getEnvironment());
 
         rootContext.put(ModuleTypeRegistry.class, typeRegistry);
@@ -328,7 +336,8 @@ public class TerasologyEngine implements GameEngine {
         CopyStrategyLibrary copyStrategyLibrary = new CopyStrategyLibrary(reflectFactory);
         rootContext.put(CopyStrategyLibrary.class, copyStrategyLibrary);
 
-        rootContext.put(TypeHandlerLibrary.class, TypeHandlerLibraryImpl.forModuleEnvironment(moduleManager, typeRegistry));
+        rootContext.put(TypeHandlerLibrary.class, TypeHandlerLibraryImpl.forModuleEnvironment(moduleManager,
+                typeRegistry));
 
         changeStatus(TerasologyEngineStatus.INITIALIZING_ASSET_TYPES);
         assetTypeManager = new AutoReloadAssetTypeManager();
@@ -346,7 +355,8 @@ public class TerasologyEngine implements GameEngine {
         assetTypeManager.createAssetType(BlockSounds.class, BlockSounds::new, "blockSounds");
         assetTypeManager.createAssetType(BlockTile.class, BlockTile::new, "blockTiles");
 
-        AssetType<BlockFamilyDefinition, BlockFamilyDefinitionData> blockFamilyDefinitionAssetType = assetTypeManager.createAssetType(BlockFamilyDefinition.class, BlockFamilyDefinition::new, "blocks");
+        AssetType<BlockFamilyDefinition, BlockFamilyDefinitionData> blockFamilyDefinitionAssetType =
+                assetTypeManager.createAssetType(BlockFamilyDefinition.class, BlockFamilyDefinition::new, "blocks");
 
         assetTypeManager.getAssetFileDataProducer(blockFamilyDefinitionAssetType).addAssetFormat(
                 new BlockFamilyDefinitionFormat(assetTypeManager.getAssetManager()));
@@ -384,13 +394,11 @@ public class TerasologyEngine implements GameEngine {
     }
 
     /**
-     * Runs the engine, including its main loop. This method is called only once per
-     * application startup, which is the reason the GameState provided is the -initial-
-     * state rather than a generic game state.
+     * Runs the engine, including its main loop. This method is called only once per application startup, which is the
+     * reason the GameState provided is the -initial- state rather than a generic game state.
      *
-     * @param initialState In at least one context (the PC facade) the GameState
-     *                     implementation provided as input may vary, depending if
-     *                     the application has or hasn't been started headless.
+     * @param initialState In at least one context (the PC facade) the GameState implementation provided as
+     *         input may vary, depending if the application has or hasn't been started headless.
      */
     @Override
     public synchronized void run(GameState initialState) {
@@ -446,9 +454,8 @@ public class TerasologyEngine implements GameEngine {
     }
 
     /**
-     * The main loop runs until the EngineState is set back to INITIALIZED by shutdown()
-     * or until the OS requests the application's window to be closed. Engine cleanup
-     * and disposal occur afterwards.
+     * The main loop runs until the EngineState is set back to INITIALIZED by shutdown() or until the OS requests the
+     * application's window to be closed. Engine cleanup and disposal occur afterwards.
      */
     private void mainLoop() {
         PerformanceMonitor.startActivity("Other");
@@ -461,6 +468,7 @@ public class TerasologyEngine implements GameEngine {
 
     /**
      * Runs a single "tick" of the engine
+     *
      * @return true if the loop requesting a tick should continue running
      */
     public boolean tick() {
@@ -542,8 +550,8 @@ public class TerasologyEngine implements GameEngine {
     }
 
     /**
-     * Causes the main loop to stop at the end of the current frame, cleanly ending
-     * the current GameState, all running task threads and disposing subsystems.
+     * Causes the main loop to stop at the end of the current frame, cleanly ending the current GameState, all running
+     * task threads and disposing subsystems.
      */
     @Override
     public void shutdown() {
@@ -551,12 +559,11 @@ public class TerasologyEngine implements GameEngine {
     }
 
     /**
-     * Changes the game state, i.e. to switch from the MainMenu to Ingame via Loading screen
-     * (each is a GameState). The change can be immediate, if there is no current game
-     * state set, or scheduled, when a current state exists and the new state is stored as
-     * pending. That been said, scheduled changes occurs in the main loop through the call
-     * processStateChanges(). As such, from a user perspective in normal circumstances,
-     * scheduled changes are likely to be perceived as immediate.
+     * Changes the game state, i.e. to switch from the MainMenu to Ingame via Loading screen (each is a GameState). The
+     * change can be immediate, if there is no current game state set, or scheduled, when a current state exists and the
+     * new state is stored as pending. That been said, scheduled changes occurs in the main loop through the call
+     * processStateChanges(). As such, from a user perspective in normal circumstances, scheduled changes are likely to
+     * be perceived as immediate.
      */
     @Override
     public void changeState(GameState newState) {
@@ -621,10 +628,10 @@ public class TerasologyEngine implements GameEngine {
     }
 
     /**
-     * Allows it to obtain objects directly from the context of the game engine. It exists only for situations in
-     * which no child context exists yet. If there is a child context then it automatically contains the objects of
-     * the engine context. Thus normal code should just work with the (child) context that is available to it
-     * instead of using this method.
+     * Allows it to obtain objects directly from the context of the game engine. It exists only for situations in which
+     * no child context exists yet. If there is a child context then it automatically contains the objects of the engine
+     * context. Thus normal code should just work with the (child) context that is available to it instead of using this
+     * method.
      *
      * @return a object directly from the context of the game engine
      */

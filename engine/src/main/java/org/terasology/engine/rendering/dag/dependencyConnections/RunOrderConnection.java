@@ -6,9 +6,7 @@ import org.terasology.engine.core.SimpleUri;
 
 // TODO examine if we really need this connection type
 
-/**
- *
- */
+
 public class RunOrderConnection extends DependencyConnection {
 
     public RunOrderConnection(String name, Type type, SimpleUri parentNode) {

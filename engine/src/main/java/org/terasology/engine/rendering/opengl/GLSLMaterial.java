@@ -61,7 +61,8 @@ public class GLSLMaterial extends BaseMaterial {
     private DisposalAction disposalAction;
     private MaterialData materialData;
 
-    public GLSLMaterial(ResourceUrn urn, AssetType<?, MaterialData> assetType, MaterialData data, LwjglGraphicsProcessing graphicsProcessing, GLSLMaterial.DisposalAction disposalAction) {
+    public GLSLMaterial(ResourceUrn urn, AssetType<?, MaterialData> assetType, MaterialData data,
+                        LwjglGraphicsProcessing graphicsProcessing, GLSLMaterial.DisposalAction disposalAction) {
         super(urn, assetType, disposalAction);
         this.graphicsProcessing = graphicsProcessing;
         this.disposalAction = disposalAction;

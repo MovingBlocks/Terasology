@@ -38,7 +38,7 @@ public class NameTagClientSystem extends BaseComponentSystem {
         createOrUpdateNameTagFor(entity, nameTagComponent);
     }
 
-    @ReceiveEvent(components = {NameTagComponent.class })
+    @ReceiveEvent(components = NameTagComponent.class)
     public void onDisplayNameChange(OnChangedComponent event, EntityRef entity,
                                     NameTagComponent nameTagComponent) {
         createOrUpdateNameTagFor(entity, nameTagComponent);
@@ -84,7 +84,7 @@ public class NameTagClientSystem extends BaseComponentSystem {
     }
 
 
-    @ReceiveEvent(components = {NameTagComponent.class })
+    @ReceiveEvent(components = NameTagComponent.class)
     public void onNameTagOwnerRemoved(BeforeDeactivateComponent event, EntityRef entity) {
         destroyNameTagOf(entity);
     }

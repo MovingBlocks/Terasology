@@ -7,8 +7,6 @@ import org.terasology.engine.entitySystem.Component;
 
 import java.util.Map;
 
-/**
- */
 public class BlockDamageModifierComponent implements Component {
 
     public Map<String, Integer> materialDamageMultiplier = Maps.newHashMap();

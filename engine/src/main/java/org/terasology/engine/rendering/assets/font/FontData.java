@@ -7,8 +7,6 @@ import org.terasology.gestalt.assets.AssetData;
 
 import java.util.Map;
 
-/**
- */
 public class FontData implements AssetData {
     private int lineHeight;
     private int baseHeight;

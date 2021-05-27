@@ -6,8 +6,6 @@ package org.terasology.unittest.stubs;
 import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.entitySystem.systems.internal.DoNotAutoRegister;
 
-/**
- */
 @DoNotAutoRegister
 public class UnsupportedTypeComponent implements Component {
     public UnsupportedType value;
