@@ -300,9 +300,7 @@ public final class ReflectionUtil {
         }
 
         for (Type genericInterface : targetClass.getGenericInterfaces()) {
-            genericInterface = resolveType(target, genericInterface);
-
-            Type typeParameter = getTypeParameterForSuperInterface(genericInterface, superClass, index);
+            Type typeParameter = getTypeParameterForSuperInterface(resolveType(target, genericInterface), superClass, index);
 
             if (typeParameter != null) {
                 return typeParameter;
