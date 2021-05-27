@@ -26,7 +26,7 @@ public abstract class Mesh extends Asset<MeshData> {
 
     protected AABBf getBound(AABBf dest) {
         VertexAttributeBinding<Vector3fc, Vector3f> vertices = this.getVertices();
-        if (vertices.numberOfElements() == 0) {
+        if (vertices.getResource().elements() == 0) {
             dest.set(Float.POSITIVE_INFINITY,
                     Float.POSITIVE_INFINITY,
                     Float.POSITIVE_INFINITY,
@@ -36,7 +36,7 @@ public abstract class Mesh extends Asset<MeshData> {
             return dest;
         }
         Vector3f pos = new Vector3f();
-        for (int x = 0; x < vertices.numberOfElements(); x++) {
+        for (int x = 0; x < vertices.getResource().elements(); x++) {
             dest.union(vertices.get(x, pos));
         }
         return dest;

@@ -18,6 +18,23 @@ public final class GLAttributes {
     private GLAttributes() {
 
     }
+    public static final VertexIntegerAttribute INT_1_VERTEX_ATTRIBUTE = new VertexIntegerAttribute(new VertexIntegerAttribute.AttributeConfiguration() {
+
+        @Override
+        public void write(int value, int vertIdx, int offset, VertexResource resource) {
+            int bufferStart = vertIdx * resource.inStride() + offset;
+            ByteBuffer buffer = resource.buffer();
+            buffer.putInt(bufferStart, value);
+        }
+
+        @Override
+        public int read(int vertIdx, int offset, VertexResource resource) {
+            int bufferStart = vertIdx * resource.inStride() + offset;
+            ByteBuffer buffer = resource.buffer();
+            return buffer.getInt(bufferStart);
+        }
+    }, TypeMapping.ATTR_INT, 1);
+
 
     public static final VertexAttribute<Vector3fc, Vector3f> VECTOR_3_F_VERTEX_ATTRIBUTE = new VertexAttribute<Vector3fc, Vector3f>(Vector3f.class, new VertexAttribute.AttributeConfiguration<Vector3fc, Vector3f>() {
 
@@ -40,19 +57,6 @@ public final class GLAttributes {
             return dest;
         }
 
-        @Override
-        public int size(int vertIdx, int offset, VertexResource resource) {
-            return (vertIdx * resource.inStride() + offset) + Float.BYTES * 3;
-        }
-
-        @Override
-        public int numElements(int offset, VertexResource resource) {
-            int size = (resource.inSize() / resource.inStride());
-            if (resource.inSize() % resource.inStride() >= Float.BYTES * 3) {
-                size++;
-            }
-            return size;
-        }
     }, TypeMapping.ATTR_FLOAT, 3);
 
     public static final VertexAttribute<Vector4fc, Vector4f> VECTOR_4_F_VERTEX_ATTRIBUTE = new VertexAttribute<>(Vector4f.class, new VertexAttribute.AttributeConfiguration<Vector4fc, Vector4f>() {
@@ -77,20 +81,32 @@ public final class GLAttributes {
             return dest;
         }
 
+    }, TypeMapping.ATTR_FLOAT, 4);
+
+    public static final VertexAttribute<Colorc, Color> COLOR_4_PACKED_VERTEX_ATTRIBUTE = new VertexAttribute<>(Color.class, new VertexAttribute.AttributeConfiguration<Colorc, Color>() {
         @Override
-        public int size(int vertIdx, int offset, VertexResource resource) {
-            return (vertIdx * resource.inStride() + offset) + Float.BYTES * 4;
+        public void write(Colorc value, int vertIdx, int offset, VertexResource resource) {
+            int bufferStart = vertIdx * resource.inStride() + offset;
+            ByteBuffer buffer = resource.buffer();
+
+            buffer.put(bufferStart, (byte) value.r());
+            buffer.put(bufferStart + Byte.BYTES, (byte) value.g());
+            buffer.put(bufferStart + Byte.BYTES * 2, (byte) value.b());
+            buffer.put(bufferStart + Byte.BYTES * 3, (byte) value.a());
         }
 
         @Override
-        public int numElements(int offset, VertexResource resource) {
-            int size = (resource.inSize() / resource.inStride());
-            if (resource.inSize() % resource.inStride() >= Float.BYTES * 4) {
-                size++;
-            }
-            return size;
+        public Color read(int vertIdx, int offset, VertexResource resource, Color dest) {
+            int bufferStart = vertIdx * resource.inStride() + offset;
+            ByteBuffer buffer = resource.buffer();
+            dest.setRed(buffer.get(bufferStart));
+            dest.setGreen(buffer.get(bufferStart + Byte.BYTES));
+            dest.setBlue(buffer.get(bufferStart + Byte.BYTES * 2));
+            dest.setAlpha(buffer.get(bufferStart + Byte.BYTES * 3));
+            return dest;
         }
-    }, TypeMapping.ATTR_FLOAT, 4);
+
+    }, TypeMapping.ATTR_BYTE, 4);
 
     public static final VertexAttribute<Colorc, Color> COLOR_4_F_VERTEX_ATTRIBUTE = new VertexAttribute<>(Color.class, new VertexAttribute.AttributeConfiguration<Colorc, Color>() {
         @Override
@@ -115,20 +131,6 @@ public final class GLAttributes {
             return dest;
         }
 
-        @Override
-        public int size(int vertIdx, int offset, VertexResource resource) {
-            return (vertIdx * resource.inStride() + offset) + Float.BYTES * 4;
-        }
-
-        @Override
-        public int numElements(int offset, VertexResource resource) {
-            int size = (resource.inSize() / resource.inStride());
-            if (resource.inSize() % resource.inStride() >= (offset + Float.BYTES * 4)) {
-                size++;
-            }
-            return size;
-        }
-
     }, TypeMapping.ATTR_FLOAT, 4);
 
     public static final VertexAttribute<Vector2fc, Vector2f> VECTOR_2_F_VERTEX_ATTRIBUTE = new VertexAttribute<>(Vector2f.class, new VertexAttribute.AttributeConfiguration<Vector2fc, Vector2f>() {
@@ -149,18 +151,5 @@ public final class GLAttributes {
             return dest;
         }
 
-        @Override
-        public int size(int vertIdx, int offset, VertexResource resource) {
-            return (vertIdx * resource.inStride() + offset) + Float.BYTES * 2;
-        }
-
-        @Override
-        public int numElements(int offset, VertexResource resource) {
-            int size = (resource.inSize() / resource.inStride());
-            if (resource.inSize() % resource.inStride() >= Float.BYTES * 2) {
-                size++;
-            }
-            return size;
-        }
     }, TypeMapping.ATTR_FLOAT, 2);
 }

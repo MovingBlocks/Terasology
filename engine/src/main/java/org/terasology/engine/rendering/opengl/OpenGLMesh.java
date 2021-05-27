@@ -69,7 +69,7 @@ public class OpenGLMesh extends Mesh implements OpenGLMeshBase {
 
     @Override
     public int getVertexCount() {
-        return data.positions().numberOfElements();
+        return data.positions().getResource().elements();
     }
 
 

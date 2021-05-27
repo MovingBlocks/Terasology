@@ -3,18 +3,17 @@
 
 package org.terasology.engine.rendering.assets.mesh.resource;
 
-import org.lwjgl.BufferUtils;
-
-import java.nio.ByteBuffer;
-
 public class VertexResource extends BufferedResource {
     private int inStride = 0;
     private int version = 0;
     private VertexDefinition[] attributes;
 
-
     public VertexResource() {
 
+    }
+
+    public int elements() {
+        return inSize / inStride;
     }
 
     public VertexDefinition[] definitions() {
@@ -53,7 +52,11 @@ public class VertexResource extends BufferedResource {
     public void allocateElements(int verts) {
         int size = verts * inStride;
         allocate(size);
-        squeeze();
+    }
+
+    public void ensureElements(int verts) {
+        int size = verts * inStride;
+        ensureCapacity(size);
     }
 
     public void allocate(int size, int stride) {
@@ -77,16 +80,15 @@ public class VertexResource extends BufferedResource {
         return inSize == 0;
     }
 
-
     /**
      * describes the metadata and placement into the buffer based off the stride.
      */
     public static class VertexDefinition {
         public final int location;
-        public final VertexAttribute attribute;
+        public final BaseVertexAttribute attribute;
         public final int offset;
 
-        public VertexDefinition(int location, int offset, VertexAttribute attribute) {
+        public VertexDefinition(int location, int offset, BaseVertexAttribute attribute) {
             this.location = location;
             this.attribute = attribute;
             this.offset = offset;
