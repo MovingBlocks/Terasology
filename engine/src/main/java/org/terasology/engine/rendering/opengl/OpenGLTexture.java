@@ -6,7 +6,6 @@ import com.google.common.collect.Lists;
 import org.joml.Vector2i;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.engine.core.subsystem.lwjgl.LwjglGraphics;
 import org.terasology.gestalt.assets.AssetType;
 import org.terasology.gestalt.assets.DisposableResource;
 import org.terasology.gestalt.assets.ResourceUrn;
@@ -19,8 +18,6 @@ import org.terasology.engine.rendering.assets.texture.TextureData;
 import java.nio.ByteBuffer;
 import java.util.List;
 
-/**
- */
 public class OpenGLTexture extends Texture {
 
     private static final Logger logger = LoggerFactory.getLogger(OpenGLTexture.class);

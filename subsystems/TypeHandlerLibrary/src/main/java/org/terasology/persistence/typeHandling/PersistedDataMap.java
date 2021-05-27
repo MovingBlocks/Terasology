@@ -7,8 +7,6 @@ import org.terasology.persistence.typeHandling.inMemory.PersistedMap;
 import java.util.Map;
 import java.util.Set;
 
-/**
- */
 public interface PersistedDataMap extends PersistedData {
 
     boolean has(String name);

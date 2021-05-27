@@ -4,8 +4,6 @@ package org.terasology.engine.rendering.logic;
 
 import org.terasology.engine.network.Replicate;
 
-/**
- */
 public final class LightFadeComponent implements VisualComponent {
 
     @Replicate

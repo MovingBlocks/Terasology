@@ -12,8 +12,6 @@ import org.terasology.engine.world.WorldComponent;
 
 import java.util.concurrent.atomic.AtomicLong;
 
-/**
- */
 public class WorldTimeImpl extends BaseComponentSystem implements WorldTime, UpdateSubscriberSystem {
 
     private static final float WORLD_TIME_MULTIPLIER = 48f;

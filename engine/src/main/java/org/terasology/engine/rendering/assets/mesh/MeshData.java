@@ -14,8 +14,6 @@ import org.terasology.engine.rendering.assets.mesh.layout.Layout;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- */
 public abstract class MeshData implements AssetData {
     public enum DrawingMode {
         POINTS(GL30.GL_POINT),

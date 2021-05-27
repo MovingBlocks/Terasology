@@ -3,7 +3,9 @@
 package org.terasology.engine.rendering.gltf.model;
 
 /**
- * GLTF Animation Sampler maps accessors with an algorithm to produce animation data. See https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#animation-sampler for details
+ * GLTF Animation Sampler maps accessors with an algorithm to produce animation data.
+ * <p>
+ * See <a href="https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#animation-sampler">glTF Specification - sampler</a> for details.
  */
 public class GLTFAnimationSampler {
     private int input;

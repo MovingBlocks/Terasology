@@ -5,8 +5,6 @@ package org.terasology.engine.world.chunks;
 
 import org.joml.Vector3ic;
 
-/**
- */
 public interface ChunkRegionListener {
 
     /**

@@ -14,7 +14,7 @@ public class ConstructorLibraryTest {
 
     @Test
     public void testArray() {
-        ObjectConstructor<List<String>[]> constructor = library.get(new TypeInfo<List<String>[]>() {});
+        ObjectConstructor<List<String>[]> constructor = library.get(new TypeInfo<List<String>[]>() { });
 
         List<String>[] constructed = constructor.construct();
 
@@ -23,7 +23,7 @@ public class ConstructorLibraryTest {
 
     @Test
     public void testMultidimensionalArray() {
-        ObjectConstructor<String[][]> constructor = library.get(new TypeInfo<String[][]>() {});
+        ObjectConstructor<String[][]> constructor = library.get(new TypeInfo<String[][]>() { });
 
         String[][] constructed = constructor.construct();
 

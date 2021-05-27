@@ -33,9 +33,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-/**
- *
- */
+
 public final class ReflectionUtil {
     private ReflectionUtil() {
     }
@@ -239,7 +237,7 @@ public final class ReflectionUtil {
      * @param type The {@link TypeInfo} describing the type of the array.
      * @param <C>  The component type of the array.
      */
-    @SuppressWarnings({"unchecked"})
+    @SuppressWarnings("unchecked")
     public static <C> TypeInfo<C> getComponentType(TypeInfo<C[]> type) {
         if (type.getType() instanceof GenericArrayType) {
             GenericArrayType arrayType = (GenericArrayType) type.getType();
@@ -260,7 +258,7 @@ public final class ReflectionUtil {
      * @param type The {@link TypeInfo} describing the type of the {@link Collection}.
      * @param <E>  The element type of the {@link Collection}.
      */
-    @SuppressWarnings({"unchecked"})
+    @SuppressWarnings("unchecked")
     public static <E> TypeInfo<E> getElementType(TypeInfo<? extends Collection<E>> type) {
         Type elementType = getTypeParameterForSuper(type.getType(), Collection.class, 0);
 

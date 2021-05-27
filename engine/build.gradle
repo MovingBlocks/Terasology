@@ -71,7 +71,7 @@ dependencies {
     implementation group: 'net.java.dev.jna', name: 'jna-platform', version: '5.6.0'
     implementation "org.terasology:reflections:0.9.12-MB"
     implementation group: 'org.javassist', name: 'javassist', version: '3.27.0-GA'
-    implementation group: 'com.esotericsoftware', name: 'reflectasm', version: '1.11.1'
+    implementation group: 'com.esotericsoftware', name: 'reflectasm', version: '1.11.9'
 
     // Graphics, 3D, UI, etc
     api platform("org.lwjgl:lwjgl-bom:$LwjglVersion")

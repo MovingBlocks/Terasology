@@ -12,8 +12,6 @@ import org.joml.Quaternionf;
 
 import java.lang.reflect.Type;
 
-/**
- */
 public class QuaternionfTypeAdapter implements JsonDeserializer<Quaternionf> {
 
     @Override

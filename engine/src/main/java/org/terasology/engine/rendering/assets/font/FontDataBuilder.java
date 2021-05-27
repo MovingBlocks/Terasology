@@ -10,8 +10,6 @@ import org.terasology.engine.rendering.assets.texture.Texture;
 
 import java.util.Map;
 
-/**
- */
 public class FontDataBuilder {
 
     private int lineHeight;

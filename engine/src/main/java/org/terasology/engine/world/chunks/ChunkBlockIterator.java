@@ -6,8 +6,6 @@ import org.joml.Vector3ic;
 import org.terasology.gestalt.module.sandbox.API;
 import org.terasology.engine.world.block.Block;
 
-/**
- */
 @API
 public interface ChunkBlockIterator {
 

@@ -21,8 +21,6 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/**
- */
 @RegisterAssetFileFormat
 public class FontFormat extends AbstractAssetFileFormat<FontData> {
 

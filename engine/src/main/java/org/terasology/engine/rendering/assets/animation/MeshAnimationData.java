@@ -10,8 +10,6 @@ import org.terasology.joml.geom.AABBf;
 
 import java.util.List;
 
-/**
- */
 public class MeshAnimationData implements AssetData {
 
     public static final int NO_PARENT = -1;

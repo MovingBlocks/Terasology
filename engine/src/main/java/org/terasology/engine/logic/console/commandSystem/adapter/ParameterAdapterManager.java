@@ -11,8 +11,6 @@ import org.terasology.engine.world.block.family.BlockFamily;
 
 import java.util.Map;
 
-/**
- */
 @API
 public class ParameterAdapterManager {
     private final Map<Class<?>, ParameterAdapter> adapters = Maps.newHashMap();

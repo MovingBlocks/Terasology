@@ -9,8 +9,6 @@ import org.joml.Vector3f;
 
 import java.util.List;
 
-/**
- */
 public class MeshAnimationFrame {
     private List<Vector3f> bonePositions;
     private List<Quaternionf> boneRotations;

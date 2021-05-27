@@ -32,8 +32,6 @@ import org.terasology.engine.world.block.Block;
 
 import java.util.List;
 
-/**
- */
 @RegisterSystem(RegisterMode.ALWAYS)
 public class CharacterSoundSystem extends BaseComponentSystem {
 
