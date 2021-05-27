@@ -83,10 +83,10 @@ public class VertexResource extends BufferedResource {
      */
     public static class VertexDefinition {
         public final int location;
-        public final VertexAttribute attribute;
+        public final BaseVertexAttribute attribute;
         public final int offset;
 
-        public VertexDefinition(int location, int offset, VertexAttribute attribute) {
+        public VertexDefinition(int location, int offset, BaseVertexAttribute attribute) {
             this.location = location;
             this.attribute = attribute;
             this.offset = offset;

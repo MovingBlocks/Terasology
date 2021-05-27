@@ -3,27 +3,21 @@
 
 package org.terasology.engine.rendering.assets.mesh.resource;
 
-/**
- * a binding that maps depending on the type of attribute and a resource where the data is committed to
- * @param <T>
- */
-public class VertexAttributeBinding<T, TImpl extends T> extends VertexBinding {
-    private final VertexAttribute<T, TImpl> attribute;
+public class VertexIntegerAttributeBinding extends VertexBinding {
+    private final VertexIntegerAttribute attribute;
 
-    public VertexAttributeBinding(VertexResource resource, int offset, VertexAttribute<T, TImpl> attribute) {
+    public VertexIntegerAttributeBinding(VertexResource resource, int offset, VertexIntegerAttribute attribute) {
         super(resource, offset);
         this.attribute = attribute;
     }
-
+    @Override
+    public void allocate(int elements) {
+        this.resource.reserveElements(elements);
+    }
 
     @Override
     public void reserve(int vertCount) {
         resource.ensureCapacity(attribute.configuration.size(vertCount, this.offset, resource));
-    }
-
-    @Override
-    public void allocate(int elements) {
-        this.resource.reserveElements(elements);
     }
 
     @Override
@@ -33,12 +27,7 @@ public class VertexAttributeBinding<T, TImpl extends T> extends VertexBinding {
         resource.mark();
     }
 
-    /**
-     * write a value by the index.
-     *
-     * @param value the value to commit
-     */
-    public void put(T value) {
+    public void put(int value) {
         if (vertexIndex >= inVerts) {
             inVerts = vertexIndex + 1;
             resource.ensureCapacity(attribute.configuration.size(this.inVerts, this.offset, resource));
@@ -49,12 +38,13 @@ public class VertexAttributeBinding<T, TImpl extends T> extends VertexBinding {
         this.resource.mark();
     }
 
-    public void set(int index, T value) {
+    public void set(int index, int value) {
         attribute.configuration.write(value, index, this.offset, resource);
         this.resource.mark();
     }
 
-    public TImpl get(int index, TImpl dest) {
-        return attribute.configuration.read(index, this.offset, resource, dest);
+    public int get(int index) {
+        return attribute.configuration.read(index, this.offset, resource);
     }
+
 }

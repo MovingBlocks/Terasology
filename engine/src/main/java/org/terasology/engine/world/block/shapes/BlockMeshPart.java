@@ -12,6 +12,7 @@ import org.terasology.engine.rendering.primitives.ChunkVertexFlag;
 import org.terasology.engine.world.ChunkView;
 import org.terasology.engine.world.block.Block;
 import org.terasology.math.TeraMath;
+import org.terasology.nui.Color;
 
 import java.util.Arrays;
 
@@ -82,33 +83,42 @@ public class BlockMeshPart {
     public void appendTo(ChunkMesh chunk, ChunkView chunkView, int offsetX, int offsetY, int offsetZ, ChunkMesh.RenderType renderType, ChunkVertexFlag flags) {
         ChunkMesh.VertexElements elements = chunk.getVertexElements(renderType);
         for (Vector2f texCoord : texCoords) {
-            elements.tex.add(texCoord.x);
-            elements.tex.add(texCoord.y);
+            elements.uv0.put(texCoord);
+//            elements.tex.add(texCoord.x);
+//            elements.tex.add(texCoord.y);
         }
 
-        int nextIndex = elements.vertexCount;
+
+        int nextIndex = elements.position.numberOfElements();
+        Vector3f temp = new Vector3f();
         for (int vIdx = 0; vIdx < vertices.length; ++vIdx) {
-            elements.color.add(1);
-            elements.color.add(1);
-            elements.color.add(1);
-            elements.color.add(1);
-            elements.vertices.add(vertices[vIdx].x + offsetX);
-            elements.vertices.add(vertices[vIdx].y + offsetY);
-            elements.vertices.add(vertices[vIdx].z + offsetZ);
-            elements.normals.add(normals[vIdx].x);
-            elements.normals.add(normals[vIdx].y);
-            elements.normals.add(normals[vIdx].z);
-            elements.flags.add(flags.getValue());
-            elements.frames.add(texFrames);
-            float[] lightingData = calcLightingValuesForVertexPos(chunkView, vertices[vIdx].add(offsetX, offsetY, offsetZ, new Vector3f()), normals[vIdx]);
+            elements.color.put(Color.white);
+//            elements.color.add(1);
+//            elements.color.add(1);
+//            elements.color.add(1);
+//            elements.color.add(1);
+            elements.position.put(temp.set(vertices[vIdx]).add(offsetX, offsetY, offsetZ));
+//            elements.vertices.add(vertices[vIdx].x + offsetX);
+//            elements.vertices.add(vertices[vIdx].y + offsetY);
+//            elements.vertices.add(vertices[vIdx].z + offsetZ);
+            elements.normals.put(normals[vIdx]);
+//            elements.normals.add(normals[vIdx].x);
+//            elements.normals.add(normals[vIdx].y);
+//            elements.normals.add(normals[vIdx].z);
+//            elements.flags.add(flags.getValue());
+//            elements.frames.add(texFrames);
+            elements.flags.put(flags.getValue());
+            elements.frames.put(texFrames);
+            float[] lightingData = calcLightingValuesForVertexPos(chunkView, vertices[vIdx].add(offsetX, offsetY,
+                    offsetZ, new Vector3f()), normals[vIdx]);
             elements.sunlight.add(lightingData[0]);
             elements.blocklight.add(lightingData[1]);
             elements.ambientOcclusion.add(lightingData[2]);
         }
-        elements.vertexCount += vertices.length;
+//        elements.vertexCount += vertices.length;
 
         for (int index : indices) {
-            elements.indices.add(index + nextIndex);
+            elements.indexResource.put(index + nextIndex);
         }
     }
 

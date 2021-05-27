@@ -7,14 +7,26 @@ import gnu.trove.list.TFloatList;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TFloatArrayList;
 import gnu.trove.list.array.TIntArrayList;
+import org.joml.Vector2f;
+import org.joml.Vector2fc;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL15;
+import org.terasology.engine.registry.In;
+import org.terasology.engine.rendering.assets.mesh.resource.GLAttributes;
+import org.terasology.engine.rendering.assets.mesh.resource.IndexResource;
+import org.terasology.engine.rendering.assets.mesh.resource.VertexAttributeBinding;
+import org.terasology.engine.rendering.assets.mesh.resource.VertexIntegerAttribute;
+import org.terasology.engine.rendering.assets.mesh.resource.VertexIntegerAttributeBinding;
+import org.terasology.engine.rendering.assets.mesh.resource.VertexResource;
+import org.terasology.engine.rendering.assets.mesh.resource.VertexResourceBuilder;
 import org.terasology.gestalt.module.sandbox.API;
 import org.terasology.engine.rendering.VertexBufferObjectUtil;
 import org.terasology.engine.rendering.assets.material.Material;
+import org.terasology.nui.Color;
+import org.terasology.nui.Colorc;
 
 import java.nio.IntBuffer;
 import java.util.Map;
@@ -353,27 +365,51 @@ public class ChunkMesh {
      */
     public static class VertexElements {
 
-        public final TFloatList normals;
-        public final TFloatList vertices;
-        public final TFloatList tex;
-        public final TFloatList color;
-        public final TIntList indices;
-        public final TIntList flags;
-        public final TIntList frames;
-        public final TFloatList sunlight;
-        public final TFloatList blocklight;
-        public final TFloatList ambientOcclusion;
-        public int vertexCount;
+        public final VertexResource vertexResource;
+        public final IndexResource indexResource = new IndexResource();
+
+        public final VertexAttributeBinding<Vector3fc, Vector3f> position;
+        public final VertexAttributeBinding<Vector3fc, Vector3f> normals;
+        public final VertexAttributeBinding<Vector2fc, Vector2f> uv0;
+        public final VertexAttributeBinding<Colorc, Color> color;
+
+        public final VertexIntegerAttributeBinding flags;
+        public final VertexIntegerAttributeBinding frames;
+
+        public final VertexAttributeBinding<Float, Float> sunlight;
+        public final VertexAttributeBinding<Float, Float> blockLight;
+        public final VertexAttributeBinding<Float, Float> ambientOcclusion;
+
+//        public final VertexAttributeBinding<Vector3fc, Vector3f> normals;
+
+//        public final TFloatList normals;
+//        public final TFloatList vertices;
+//        public final TFloatList tex;
+//        public final TFloatList color;
+//        public final TIntList indices;
+//        public final TIntList flags;
+//        public final TIntList frames;
+//        public final TFloatList sunlight;
+//        public final TFloatList blocklight;
+//        public final TFloatList ambientOcclusion;
+//        public int vertexCount;
 
         public IntBuffer finalVertices;
         public IntBuffer finalIndices;
 
         VertexElements() {
+            VertexResourceBuilder builder = new VertexResourceBuilder();
+            position = builder.add(0, GLAttributes.VECTOR_3_F_VERTEX_ATTRIBUTE);
+            normals = builder.add(0, GLAttributes.VECTOR_3_F_VERTEX_ATTRIBUTE);
+            color = builder.add(0, GLAttributes.COLOR_4_PACKED_VERTEX_ATTRIBUTE);
+            uv0 = builder.add(0, GLAttributes.VECTOR_2_F_VERTEX_ATTRIBUTE);
+            vertexResource = builder.build();
+
             vertexCount = 0;
-            normals = new TFloatArrayList();
-            vertices = new TFloatArrayList();
-            tex = new TFloatArrayList();
-            color = new TFloatArrayList();
+//            normals = new TFloatArrayList();
+//            vertices = new TFloatArrayList();
+//            tex = new TFloatArrayList();
+//            color = new TFloatArrayList();
             indices = new TIntArrayList();
             flags = new TIntArrayList();
             frames = new TIntArrayList();
