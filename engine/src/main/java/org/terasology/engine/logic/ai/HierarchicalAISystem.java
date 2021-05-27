@@ -237,7 +237,7 @@ public class HierarchicalAISystem extends BaseComponentSystem implements UpdateS
     }
 
     //TODO change eating thingy to use this
-    @ReceiveEvent(components = {HierarchicalAIComponent.class})
+    @ReceiveEvent(components = HierarchicalAIComponent.class)
     public void onBump(HorizontalCollisionEvent event, EntityRef entity, CharacterMovementComponent moveComp) {
         if (moveComp != null && moveComp.grounded) {
             moveComp.jump = true;
