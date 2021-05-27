@@ -115,7 +115,7 @@ public class ModuleManager {
         engineDep.setId(engineModule.getId());
         engineDep.setMinVersion(engineModule.getVersion());
 
-        HashSet<Name> engineModules = Sets.newHashSet(engineModule.getId());
+        Set<Name> engineModules = Sets.newHashSet(engineModule.getId());
         engineModules.addAll(engineModule.getMetadata().getDependencies().stream().map(DependencyInfo::getId).collect(Collectors.toList()));
 
         registry.stream()
