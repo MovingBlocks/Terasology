@@ -67,8 +67,10 @@ public abstract class Camera {
 
     /**
      * Applies the projection and modelview matrix.
-     * this method is scheduled for removal with core profile change to 3.3
-     * use {@link #getProjectionMatrix()} and {@link #getViewMatrix}
+     *
+     * @deprecated This method is scheduled for removal with core profile change to 3.3
+     *         <p>
+     *         Use {@link         #getProjectionMatrix()} and {@link #getViewMatrix}
      */
     @Deprecated
     public void lookThrough() {
