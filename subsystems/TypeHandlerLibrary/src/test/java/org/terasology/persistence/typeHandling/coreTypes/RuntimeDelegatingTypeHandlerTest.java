@@ -54,7 +54,7 @@ class RuntimeDelegatingTypeHandlerTest {
         subType = Sub.class;
         baseType = TypeInfo.of(Base.class).getType();
 
-        abstract class SubHandler extends TypeHandler<Sub> {}
+        abstract class SubHandler extends TypeHandler<Sub> { }
 
         baseTypeHandler = mockTypeHandler();
         subTypeHandler = mockTypeHandler(SubHandler.class);
@@ -129,8 +129,8 @@ class RuntimeDelegatingTypeHandlerTest {
             argThat((ArgumentMatcher<Map<String, PersistedData>>) argument -> {
                 return argument.get(RuntimeDelegatingTypeHandler.TYPE_FIELD)
                            .getAsString()
-                           .equals(subType.getName()) &&
-                           argument.containsKey(RuntimeDelegatingTypeHandler.VALUE_FIELD);
+                           .equals(subType.getName())
+                        && argument.containsKey(RuntimeDelegatingTypeHandler.VALUE_FIELD);
             })
         );
     }

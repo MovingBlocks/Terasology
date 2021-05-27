@@ -10,8 +10,6 @@ import gnu.trove.map.TObjectDoubleMap;
 import java.text.NumberFormat;
 import java.util.List;
 
-/**
- */
 public abstract class TimeMetricsMode extends MetricsMode {
 
     private int limit;

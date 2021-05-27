@@ -15,8 +15,6 @@ import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.Map;
 
-/**
- */
 public class ProtobufPersistedDataSerializer implements PersistedDataSerializer {
 
     @Override

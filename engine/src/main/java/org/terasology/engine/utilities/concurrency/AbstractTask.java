@@ -3,8 +3,6 @@
 
 package org.terasology.engine.utilities.concurrency;
 
-/**
- */
 public abstract class AbstractTask implements Task {
 
     @Override

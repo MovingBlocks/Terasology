@@ -5,8 +5,6 @@ package org.terasology.engine.rendering.nui.layers.mainMenu.videoSettings;
 import org.terasology.engine.config.RenderingConfig;
 import org.terasology.nui.databinding.Binding;
 
-/**
- */
 public class PresetBinding implements Binding<Preset> {
     private RenderingConfig config;
 

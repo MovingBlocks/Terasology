@@ -71,7 +71,7 @@ class RecordedEventSerializer {
 
         try (FileInputStream fileInputStream = new FileInputStream(filePath)) {
             List<RecordedEvent> recordedEvents =
-                    serializer.deserialize(new TypeInfo<List<RecordedEvent>>() {}, fileInputStream).get();
+                    serializer.deserialize(new TypeInfo<List<RecordedEvent>>() { }, fileInputStream).get();
             events.addAll(recordedEvents);
         } catch (SerializationException | IOException e) {
             logger.error("Error while serializing recorded events", e);

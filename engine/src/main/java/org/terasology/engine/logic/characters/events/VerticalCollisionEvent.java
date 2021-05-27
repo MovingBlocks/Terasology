@@ -4,8 +4,6 @@ package org.terasology.engine.logic.characters.events;
 
 import org.joml.Vector3f;
 
-/**
- */
 public class VerticalCollisionEvent extends CollisionEvent {
 
     public VerticalCollisionEvent(Vector3f location, Vector3f velocity) {

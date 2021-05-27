@@ -6,8 +6,6 @@ import org.terasology.gestalt.assets.AssetData;
 
 import java.awt.image.BufferedImage;
 
-/**
- */
 public class TileData implements AssetData {
     private BufferedImage[] images;
     private boolean autoBlock;

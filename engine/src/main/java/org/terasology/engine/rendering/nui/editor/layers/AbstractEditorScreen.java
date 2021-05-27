@@ -354,7 +354,7 @@ public abstract class AbstractEditorScreen extends CoreScreenLayer {
             String[] more = Arrays.copyOfRange(pathArray, 1, pathArray.length);
             return Paths.get("", moduleManager.getEnvironment().getResources()
                     .getFile(first, more)
-                    .orElseThrow(()-> new RuntimeException("Cannot get path for "+source.getFilename())).getPath().stream().toArray(String[]::new));
+                    .orElseThrow(()-> new RuntimeException("Cannot get path for " + source.getFilename())).getPath().stream().toArray(String[]::new));
         }
         return null;
     }

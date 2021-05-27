@@ -4,8 +4,6 @@ package org.terasology.engine.rendering.nui.layers.mainMenu.videoSettings;
 
 import org.terasology.engine.config.RenderingConfig;
 
-/**
- */
 public enum Preset {
     MINIMAL("${engine:menu#video-preset-minimal}") {
         @Override

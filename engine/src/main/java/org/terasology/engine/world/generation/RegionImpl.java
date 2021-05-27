@@ -11,8 +11,6 @@ import org.terasology.engine.world.block.BlockRegion;
 import java.util.Map;
 import java.util.Set;
 
-/**
- */
 public class RegionImpl implements Region, GeneratingRegion {
 
     private final BlockRegion region;
@@ -24,7 +22,9 @@ public class RegionImpl implements Region, GeneratingRegion {
     private final Set<FacetProvider> processedProviders = Sets.newHashSet();
     private final ClassToInstanceMap<WorldFacet> generatedFacets = MutableClassToInstanceMap.create();
 
-    public RegionImpl(BlockRegion region, ListMultimap<Class<? extends WorldFacet>, FacetProvider> facetProviderChains, Map<Class<? extends WorldFacet>, Border3D> borders, float scale) {
+    public RegionImpl(BlockRegion region,
+                      ListMultimap<Class<? extends WorldFacet>, FacetProvider> facetProviderChains, Map<Class<?
+            extends WorldFacet>, Border3D> borders, float scale) {
         this.region = region;
         this.facetProviderChains = facetProviderChains;
         this.borders = borders;

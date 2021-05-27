@@ -10,8 +10,6 @@ import org.terasology.gestalt.module.sandbox.API;
 import org.terasology.input.ControllerId;
 import org.terasology.input.InputType;
 
-/**
- */
 @RegisterBindButton(id = "useItem", description = "${engine:menu#binding-use-item}", repeating = true, category = "interaction")
 @DefaultBinding(type = InputType.MOUSE_BUTTON, id = 1)
 @DefaultBinding(type = InputType.CONTROLLER_BUTTON, id = ControllerId.THREE)

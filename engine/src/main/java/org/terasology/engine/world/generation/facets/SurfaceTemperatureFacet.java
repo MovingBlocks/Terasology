@@ -7,8 +7,6 @@ import org.terasology.engine.world.block.BlockRegion;
 import org.terasology.engine.world.generation.Border3D;
 import org.terasology.engine.world.generation.FacetName;
 
-/**
- */
 @FacetName("Temperature")
 public class SurfaceTemperatureFacet extends BaseFieldFacet2D {
     static int maxSamplesPerRegion = 5;
