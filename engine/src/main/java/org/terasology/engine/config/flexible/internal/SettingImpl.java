@@ -21,6 +21,8 @@ import java.util.function.Supplier;
  * @param <T> The type of the value this {@link SettingImpl} contains.
  */
 class SettingImpl<T> implements Setting<T> {
+    protected T value;
+
     private static final Logger LOGGER = LoggerFactory.getLogger(SettingImpl.class);
 
     private final T defaultValue;
@@ -33,8 +35,6 @@ class SettingImpl<T> implements Setting<T> {
 
     private final SettingConstraint<T> constraint;
     private final Set<SettingChangeListener<T>> subscribers = Sets.newHashSet();
-
-    protected T value;
 
     /**
      * Creates a new {@link SettingImpl} with the given id, default value and constraint.

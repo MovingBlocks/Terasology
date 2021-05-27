@@ -10,8 +10,8 @@ import org.terasology.gestalt.module.sandbox.API;
  */
 @API
 public abstract class BaseAction implements Action {
-    private transient int id;
     protected transient boolean constructed;
+    private transient int id;
 
     @Override
     public void setup() {

@@ -54,13 +54,7 @@ public class GLSLShader extends Shader {
     private static final Logger logger = LoggerFactory.getLogger(GLSLShader.class);
 
     // TODO this should be handled another way, we need to get ssao parameters here
-    public int ssaoKernelElements = 32;
     public static int ssaoNoiseSize = 4;
-
-    private static String includedFunctionsVertex = "";
-    private static String includedFunctionsFragment = "";
-    private static String includedDefines = "";
-    private static String includedUniforms = "";
 
     static {
         try (
@@ -77,6 +71,14 @@ public class GLSLShader extends Shader {
             logger.error("Failed to load Include shader resources");
         }
     }
+
+    private static String includedFunctionsVertex = "";
+    private static String includedFunctionsFragment = "";
+    private static String includedDefines = "";
+    private static String includedUniforms = "";
+
+    // TODO this should be handled another way, we need to get ssao parameters here
+    public int ssaoKernelElements = 32;
 
     private EnumSet<ShaderProgramFeature> availableFeatures = Sets.newEnumSet(Collections.emptyList(), ShaderProgramFeature.class);
     private ShaderData shaderProgramBase;
