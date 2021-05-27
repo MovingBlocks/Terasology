@@ -85,7 +85,7 @@ public class NeighbourBlockFamilyUpdateSystem extends BaseComponentSystem implem
         largeBlockUpdateCount--;
     }
 
-    @ReceiveEvent(components = {BlockComponent.class})
+    @ReceiveEvent(components = BlockComponent.class)
     public void blockUpdate(OnChangedBlock event, EntityRef blockEntity) {
         if (largeBlockUpdateCount > 0) {
             blocksUpdatedInLargeBlockUpdate.add(event.getBlockPosition());

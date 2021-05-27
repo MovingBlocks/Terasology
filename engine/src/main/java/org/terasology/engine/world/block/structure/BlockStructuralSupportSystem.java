@@ -63,7 +63,7 @@ public class BlockStructuralSupportSystem extends BaseComponentSystem implements
         supports.add(blockStructuralSupport);
     }
 
-    @ReceiveEvent(components = {BlockComponent.class})
+    @ReceiveEvent(components = BlockComponent.class)
     public void checkForSupportRemoved(OnChangedBlock event, EntityRef entity) {
         PerformanceMonitor.startActivity("StructuralCheck");
         try {
