@@ -21,8 +21,6 @@ import org.terasology.persistence.serializers.Serializer;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.reflection.TypeInfo;
 
-import java.io.IOException;
-
 import static org.terasology.joml.test.VectorAssert.assertEquals;
 
 @SuppressWarnings("FieldCanBeLocal")

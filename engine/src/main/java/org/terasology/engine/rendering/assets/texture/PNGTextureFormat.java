@@ -12,12 +12,9 @@ import org.terasology.gestalt.module.resources.FileReference;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
-import java.nio.file.PathMatcher;
 import java.util.List;
 import java.util.function.Predicate;
 
-/**
- */
 public class PNGTextureFormat extends AbstractAssetFileFormat<TextureData> {
 
     private Texture.FilterMode defaultFilterMode;

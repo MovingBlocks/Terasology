@@ -12,8 +12,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-/**
- */
 //FIXME: There is a mismatch between `blockCount` and iterated blocks.
 //       I don't get what this event is about, and how it should behave. The `TIntList positions` is a flattened list
 //       of positions. So if this event affects

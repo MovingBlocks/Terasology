@@ -8,26 +8,22 @@ import org.joml.RoundingMode;
 import org.joml.Vector3f;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
-import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.prefab.Prefab;
+import org.terasology.engine.math.Rotation;
+import org.terasology.engine.math.Side;
+import org.terasology.engine.physics.shapes.CollisionShape;
+import org.terasology.engine.rendering.assets.mesh.Mesh;
+import org.terasology.engine.rendering.primitives.BlockMeshGenerator;
+import org.terasology.engine.rendering.primitives.BlockMeshGeneratorSingleShape;
+import org.terasology.engine.rendering.primitives.Tessellator;
 import org.terasology.engine.world.block.family.BlockFamily;
 import org.terasology.engine.world.block.shapes.BlockMeshPart;
 import org.terasology.engine.world.block.sounds.BlockSounds;
 import org.terasology.engine.world.chunks.Chunks;
+import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.joml.geom.AABBf;
-import org.terasology.engine.math.Rotation;
-import org.terasology.engine.math.Side;
 import org.terasology.math.TeraMath;
-import org.terasology.engine.physics.shapes.CollisionShape;
-import org.terasology.engine.rendering.assets.material.Material;
-import org.terasology.engine.rendering.assets.mesh.Mesh;
-import org.terasology.engine.rendering.assets.shader.ShaderProgramFeature;
-import org.terasology.engine.rendering.primitives.BlockMeshGenerator;
-import org.terasology.engine.rendering.primitives.BlockMeshGeneratorSingleShape;
-import org.terasology.engine.rendering.primitives.Tessellator;
-import org.terasology.engine.utilities.Assets;
-import org.terasology.engine.utilities.collection.EnumBooleanMap;
 
 import java.util.Map;
 import java.util.Optional;
@@ -66,7 +62,7 @@ public final class Block {
     private boolean replacementAllowed;
     private int hardness = 3;
     private boolean supportRequired;
-    private EnumBooleanMap<Side> fullSide = new EnumBooleanMap<>(Side.class);
+    private boolean[] fullSide = new boolean[Side.values().length];
     private BlockSounds sounds;
 
     // Special rendering flags (TODO: clean this up)
@@ -105,8 +101,8 @@ public final class Block {
     private boolean stackable = true;
 
     private BlockAppearance primaryAppearance = new BlockAppearance();
-    private Map<Side, BlockMeshPart> lowLiquidMesh = Maps.newEnumMap(Side.class);
-    private Map<Side, BlockMeshPart> topLiquidMesh = Maps.newEnumMap(Side.class);
+    private BlockMeshPart[] lowLiquidMesh = new BlockMeshPart[Side.values().length];
+    private BlockMeshPart[] topLiquidMesh = new BlockMeshPart[Side.values().length];
 
     /* Collision */
     private CollisionShape collisionShape;
@@ -358,7 +354,7 @@ public final class Block {
      * @return False if this block is not allowed attachment or the side of this block is not full side
      */
     public boolean canAttachTo(Side side) {
-        return attachmentAllowed && fullSide.get(side);
+        return attachmentAllowed && fullSide[side.ordinal()];
     }
 
     /**
@@ -532,19 +528,19 @@ public final class Block {
     }
 
     public BlockMeshPart getLowLiquidMesh(Side side) {
-        return lowLiquidMesh.get(side);
+        return lowLiquidMesh[side.ordinal()];
     }
 
     public void setLowLiquidMesh(Side side, BlockMeshPart meshPart) {
-        lowLiquidMesh.put(side, meshPart);
+        lowLiquidMesh[side.ordinal()] = meshPart;
     }
 
     public BlockMeshPart getTopLiquidMesh(Side side) {
-        return topLiquidMesh.get(side);
+        return topLiquidMesh[side.ordinal()];
     }
 
     public void setTopLiquidMesh(Side side, BlockMeshPart meshPart) {
-        topLiquidMesh.put(side, meshPart);
+        topLiquidMesh[side.ordinal()] = meshPart;
     }
 
     /**
@@ -552,11 +548,11 @@ public final class Block {
      * @return Is the given side of the block "full" (a full square filling the side)
      */
     public boolean isFullSide(Side side) {
-        return fullSide.get(side);
+        return fullSide[side.ordinal()];
     }
 
     public void setFullSide(Side side, boolean full) {
-        fullSide.put(side, full);
+        fullSide[side.ordinal()] = full;
     }
 
     /**

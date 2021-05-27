@@ -7,8 +7,6 @@ import org.joml.Vector2f;
 import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.gestalt.module.sandbox.API;
 
-/**
- */
 @API
 public interface WorldAtlas {
 

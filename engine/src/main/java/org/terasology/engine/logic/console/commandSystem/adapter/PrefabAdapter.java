@@ -5,8 +5,6 @@ package org.terasology.engine.logic.console.commandSystem.adapter;
 import org.terasology.engine.utilities.Assets;
 import org.terasology.engine.entitySystem.prefab.Prefab;
 
-/**
- */
 public class PrefabAdapter implements ParameterAdapter<Prefab> {
     @Override
     public Prefab parse(String raw) {

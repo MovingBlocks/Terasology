@@ -19,7 +19,7 @@ public class Sphere {
     private boolean textureFlag = false;
 
     /**
-     * draws a sphere of the given	radius centered	around the origin. The sphere is subdivided around the z axis into
+     * draws a sphere of the given radius centered around the origin. The sphere is subdivided around the z axis into
      * slices and along the z axis into stacks (similar to lines of longitude and latitude).
      * <p>
      * If the orientation is set to GLU.OUTSIDE (with glu.quadricOrientation), then any normals generated point away
@@ -30,10 +30,25 @@ public class Sphere {
      * +y axis, to 0.25 at the +x axis, to 0.5 at the -y axis, to 0.75 at the -x axis, and back to 1.0 at the +y axis.
      */
     public void draw(float radius, int slices, int stacks) {
-        float rho, drho, theta, dtheta;
-        float x, y, z;
-        float s, t, ds, dt;
-        int i, j, imin, imax;
+        float rho;
+        float drho;
+        float theta;
+        float dtheta;
+
+        float x;
+        float y;
+        float z;
+
+        float s;
+        float t;
+        float ds;
+        float dt;
+
+        int i;
+        int j;
+        int imin;
+        int imax;
+
         float nsign;
 
         nsign = 1.0f;
@@ -121,8 +136,11 @@ public class Sphere {
         this.textureFlag = textureFlag;
     }
 
+    @SuppressWarnings("checkstyle:MethodName")
     private void TXTR_COORD(float x, float y) {
-        if (textureFlag) glTexCoord2f(x, y);
+        if (textureFlag) {
+            glTexCoord2f(x, y);
+        }
     }
 
     private float sin(float r) {

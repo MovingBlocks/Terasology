@@ -15,8 +15,6 @@ import org.terasology.engine.registry.In;
 
 import java.util.Set;
 
-/**
- */
 @RegisterSystem
 public class AutoCreateSystem extends BaseComponentSystem {
 

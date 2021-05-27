@@ -4,8 +4,6 @@ package org.terasology.engine.world.generation;
 
 import org.terasology.engine.world.chunks.Chunk;
 
-/**
- */
 public interface WorldRasterizer {
     void initialize();
 

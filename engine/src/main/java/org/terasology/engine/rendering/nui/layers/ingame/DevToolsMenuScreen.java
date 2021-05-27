@@ -10,9 +10,7 @@ import org.terasology.engine.rendering.nui.CoreScreenLayer;
 import org.terasology.engine.rendering.nui.editor.systems.NUIEditorSystem;
 import org.terasology.engine.rendering.nui.editor.systems.NUISkinEditorSystem;
 
-/**
- *
- */
+
 public class DevToolsMenuScreen extends CoreScreenLayer {
 
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:devToolsMenuScreen");

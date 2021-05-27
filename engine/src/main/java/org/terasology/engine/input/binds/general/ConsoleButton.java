@@ -9,8 +9,6 @@ import org.terasology.engine.input.RegisterBindButton;
 import org.terasology.input.InputType;
 import org.terasology.input.Keyboard;
 
-/**
- */
 @RegisterBindButton(id = "console", description = "${engine:menu#binding-console}", category = "general")
 @DefaultBinding(type = InputType.KEY, id = Keyboard.KeyId.GRAVE)
 @DefaultBinding(type = InputType.KEY, id = Keyboard.KeyId.F1)

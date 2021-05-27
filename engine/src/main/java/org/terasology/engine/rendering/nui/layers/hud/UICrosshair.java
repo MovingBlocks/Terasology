@@ -14,8 +14,6 @@ import org.terasology.nui.databinding.DefaultBinding;
 
 import java.util.List;
 
-/**
- */
 public class UICrosshair extends CoreWidget {
 
     @LayoutConfig

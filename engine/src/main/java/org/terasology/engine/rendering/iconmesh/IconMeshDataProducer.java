@@ -19,8 +19,6 @@ import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
 
-/**
- */
 @RegisterAssetDataProducer
 public class IconMeshDataProducer implements AssetDataProducer<MeshData> {
 
