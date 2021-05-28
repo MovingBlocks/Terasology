@@ -83,10 +83,10 @@ public final class DiscordRPCSystem extends BaseComponentSystem {
     }
 
     @ReceiveEvent
-    public void onPlayerInitialized(LocalPlayerInitializedEvent event, EntityRef player) {
+    public void onPlayerInitialized(LocalPlayerInitializedEvent event, EntityRef localPlayer) {
         /* Adds the periodic action when the player is hosting or playing online to update party size */
         if (networkSystem.getMode() != NetworkMode.NONE) {
-            delayManager.addPeriodicAction(player, UPDATE_PARTY_SIZE_ID, 0, UPDATE_PARTY_SIZE_PERIOD);
+            delayManager.addPeriodicAction(localPlayer, UPDATE_PARTY_SIZE_ID, 0, UPDATE_PARTY_SIZE_PERIOD);
         }
     }
 
