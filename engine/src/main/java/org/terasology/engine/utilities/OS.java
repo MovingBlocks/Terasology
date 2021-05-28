@@ -18,7 +18,8 @@ public enum OS {
         String osName = System.getProperty("os.name");
         if (osName.startsWith("Windows")) {
             return WINDOWS;
-        } else if (osName.startsWith("Linux") || osName.startsWith("FreeBSD") || osName.startsWith("SunOS") || osName.startsWith("Unix")) {
+        } else if (osName.startsWith("Linux") || osName.startsWith("FreeBSD")
+                || osName.startsWith("SunOS") || osName.startsWith("Unix")) {
             return LINUX;
         } else if (osName.startsWith("Mac OS X") || osName.startsWith("Darwin")) {
             return MACOSX;
