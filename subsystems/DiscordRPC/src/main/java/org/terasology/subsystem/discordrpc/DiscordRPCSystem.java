@@ -71,10 +71,12 @@ public final class DiscordRPCSystem extends BaseComponentSystem {
 
     @Override
     public void shutdown() {
-        if (delayManager.hasPeriodicAction(player.getClientEntity(), UPDATE_PARTY_SIZE_ID)) {
-            delayManager.cancelPeriodicAction(player.getClientEntity(), UPDATE_PARTY_SIZE_ID);
+        if (player != null) {
+            EntityRef client = player.getClientEntity();
+            if (delayManager != null && delayManager.hasPeriodicAction(client, UPDATE_PARTY_SIZE_ID)) {
+                delayManager.cancelPeriodicAction(client, UPDATE_PARTY_SIZE_ID);
+            }
         }
-
         DiscordRPCSubSystem.reset();
         DiscordRPCSubSystem.setState("In Main Menu");
         DiscordRPCSubSystem.setStartTimestamp(null);
