@@ -125,7 +125,9 @@ public class ModuleManager {
 
     private void loadModulesFromApplicationPath(PathManager pathManager) {
         ModulePathScanner scanner = new ModulePathScanner(moduleFactory);
-        List<File> paths = pathManager.getModulePaths().stream().map(Path::toFile).collect(Collectors.toList());
+        List<File> paths = pathManager.getModulePaths().stream()
+                .map(Path::toFile)
+                .collect(Collectors.toList());
         scanner.scan(registry, paths);
     }
 
