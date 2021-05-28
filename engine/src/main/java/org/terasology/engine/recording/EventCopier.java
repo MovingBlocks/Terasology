@@ -32,7 +32,7 @@ class EventCopier {
     private static final Logger logger = LoggerFactory.getLogger(EventCopier.class);
 
 
-    public EventCopier() {
+    EventCopier() {
 
     }
 

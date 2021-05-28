@@ -703,7 +703,7 @@ public final class ReflectionUtil {
         private final Type[] upperBounds;
         private final Type[] lowerBounds;
 
-        public WildcardTypeImpl(Type[] upperBounds, Type[] lowerBounds) {
+        WildcardTypeImpl(Type[] upperBounds, Type[] lowerBounds) {
             this.upperBounds = upperBounds;
             this.lowerBounds = lowerBounds;
         }
