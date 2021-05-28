@@ -18,6 +18,12 @@ import java.nio.FloatBuffer;
  */
 public final class ParticlePool {
 
+    // Static constants
+    private static final int X_OFFSET = 0;
+    private static final int Y_OFFSET = 1;
+    private static final int Z_OFFSET = 2;
+    private static final int W_OFFSET = 3;
+
     public final ParticleData temporaryParticleData = new ParticleData();
 
     //== package private attributes =====================
@@ -36,12 +42,6 @@ public final class ParticlePool {
     private final FloatBuffer scaleBuffer;
     private final FloatBuffer colorBuffer;
     private final FloatBuffer textureOffsetBuffer;
-
-    // Static constants
-    private static final int X_OFFSET = 0;
-    private static final int Y_OFFSET = 1;
-    private static final int Z_OFFSET = 2;
-    private static final int W_OFFSET = 3;
 
     //== private attributes =============================
 

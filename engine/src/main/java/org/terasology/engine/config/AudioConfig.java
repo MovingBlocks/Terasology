@@ -13,8 +13,6 @@ import static org.terasology.engine.config.flexible.SettingArgument.type;
 
 public class AudioConfig extends AutoConfig {
 
-    // TODO: Convert into Setting -- no uses yet
-    private boolean disableSound;
 
     public final Setting<Float> soundVolume =
             setting(
@@ -31,6 +29,9 @@ public class AudioConfig extends AutoConfig {
                     name("${engine:menu#music-volume}"),
                     constraint(new NumberRangeConstraint<>(0.0f, 1.0f, true, true))
             );
+
+    // TODO: Convert into Setting -- no uses yet
+    private boolean disableSound;
 
     @Override
     public String getName() {

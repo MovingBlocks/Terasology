@@ -21,9 +21,9 @@ import java.util.function.Supplier;
  * @param <T> The type of the value this {@link SettingImpl} contains.
  */
 class SettingImpl<T> implements Setting<T> {
-    protected T value;
-
     private static final Logger LOGGER = LoggerFactory.getLogger(SettingImpl.class);
+
+    protected T value;
 
     private final T defaultValue;
     private final TypeInfo<T> valueType;

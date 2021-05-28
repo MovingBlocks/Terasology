@@ -22,14 +22,14 @@ import org.terasology.engine.world.generator.WorldGenerator;
 import java.util.Iterator;
 
 public class CreateWorldEntity extends SingleStepLoadProcess {
+    private static final Logger logger = LoggerFactory.getLogger(CreateWorldEntity.class);
+
     //TODO: figure out dependencies at some point ....
     protected EntityManager entityManager;
     protected WorldGenerator worldGenerator;
     protected WorldConfigurator worldConfigurator;
     protected Config config;
     protected ChunkProvider chunkProvider;
-
-    private static final Logger logger = LoggerFactory.getLogger(CreateWorldEntity.class);
 
     private final Context context;
     private final GameManifest gameManifest;

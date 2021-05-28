@@ -50,11 +50,10 @@ import java.util.Set;
  * </p>
  */
 public class GLSLShader extends Shader {
-
-    private static final Logger logger = LoggerFactory.getLogger(GLSLShader.class);
-
     // TODO this should be handled another way, we need to get ssao parameters here
     public static int ssaoNoiseSize = 4;
+
+    private static final Logger logger = LoggerFactory.getLogger(GLSLShader.class);
 
     static {
         try (
