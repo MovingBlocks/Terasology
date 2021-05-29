@@ -4,13 +4,15 @@
 package org.terasology.engine.rendering.assets.mesh;
 
 import org.joml.Math;
+import org.joml.Matrix4f;
 import org.joml.Vector3f;
+import org.joml.Vector4f;
 
 public class SphereBuilder {
     private boolean textured = false;
     private float radius = 1;
-    private int slices = 6;
-    private int stacks = 6;
+    private int horizontalCuts = 6;
+    private int verticalCuts = 6;
     private boolean normals = false;
     public SphereBuilder() {
 
@@ -25,13 +27,13 @@ public class SphereBuilder {
         return this;
     }
 
-    public SphereBuilder setStacks(int value) {
-        this.stacks = value;
+    public SphereBuilder setVerticalCuts(int value) {
+        this.verticalCuts = value;
         return this;
     }
 
-    public SphereBuilder setSlices(int value) {
-        this.slices = value;
+    public SphereBuilder setHorizontalCuts(int value) {
+        this.horizontalCuts = value;
         return this;
     }
 
@@ -42,81 +44,54 @@ public class SphereBuilder {
 
     // refrence: https://github.com/caosdoar/spheres/blob/master/src/spheres.cpp
     public StandardMeshData build() {
-//        MeshBuilder builder = new MeshBuilder();
         StandardMeshData meshData = new StandardMeshData();
 
-        Vector3f pos = new Vector3f();
-        int count = 0;
-
-        float s = 0;
+        Matrix4f mat = new Matrix4f().setRotationXYZ(0, 0, (float) (Math.PI / 2.0f));
+        Vector4f pos = new Vector4f();
+        float s = 0.0f;
         float t = 1.0f;
 
+        float ds = 1.0f / verticalCuts;
+        float dt = 1.0f / horizontalCuts ;
 
-        float ds = 1.0f / slices;
-        float dt = 1.0f / stacks;
-
-        meshData.vertices.add(new float[]{0.0f, radius, 0.0f});
-        if (this.normals) {
-            meshData.normals.add(new float[]{0.0f, radius, 0.0f});
-        }
-        if (this.textured) {
-            meshData.uv0.add(new float[]{s, t});
-        }
-        count++;
-        for (int j = 0; j < slices - 1; ++j) {
-            double polar = (Math.PI * (j + 1)) / slices;
-            double sp = Math.sin(polar);
-            double cp = Math.sin(polar);
+        for (int j = 0; j <= horizontalCuts; ++j) {
+            double polar = (Math.PI * j) / horizontalCuts;
+            double sp = Math.sin(polar );
+            double cp = Math.cos(polar);
             s = 0.0f;
-            for (int i = 0; i < stacks; ++i) {
-                double azimuth = (2.0 * Math.PI * i) / stacks;
+            for (int i = 0; i <= verticalCuts; ++i) {
+                double azimuth = (2.0 * Math.PI * i) / verticalCuts;
                 double sa = Math.sin(azimuth);
                 double ca = Math.cos(azimuth);
                 if (this.normals) {
                     meshData.normals.add(new float[]{(float) (sp * ca), (float) cp, (float) (sp * sa)});
                 }
                 if (this.textured) {
-                    s += ds;
                     meshData.uv0.add(new float[]{s, t});
                 }
-                meshData.vertices.add(new float[]{(float) ((sp * ca) * radius), (float) (cp * radius), (float) ((sp * sa) * radius)});
-                count++;
+                s += ds;
+
+                pos.set((float) ((sp * ca) * radius), (float) (cp * radius), (float) ((sp * sa) * radius), 1.0f);
+                mat.transform(pos);
+                meshData.vertices.add(new float[]{pos.x, pos.y, pos.z});
             }
             t -= dt;
         }
-        if (this.textured) {
-            meshData.uv0.add(new float[]{s, t});
-        }
-        if (this.normals) {
-            meshData.normals.add(new float[]{0.0f, -radius, 0.0f});
-        }
-        meshData.vertices.add(new float[]{0.0f, -radius, 0.0f});
-        count++;
 
-        for (int i = 0; i < stacks; i++) {
-            int a = i + 1;
-            int b = (i + 1) % stacks + 1;
-            meshData.getIndices().add(new int[]{0, a, b});
-        }
 
-        for (int j = 0; j < slices - 2; ++j) {
-            int aStart = j * stacks + 1;
-            int bStart = (j + 1) * stacks + 1;
-            for (int i = 0; i < stacks; ++i) {
+        for (int j = 0; j <= horizontalCuts; ++j) {
+            int aStart = (j * (verticalCuts + 1)) + 1;
+            int bStart = (j + 1) * (verticalCuts + 1) + 1;
+            for (int i = 0; i <= verticalCuts; ++i) {
                 int a = aStart + i;
-                int a1 = aStart + (i + 1) % stacks;
+                int a1 = aStart + ((i + 1) % (verticalCuts + 1));
                 int b = bStart + i;
-                int b1 = bStart + (i + 1) % stacks;
-                meshData.getIndices().add(new int[]{a, a1, b1});
-                meshData.getIndices().add(new int[]{b1, a1, b});
+                int b1 = bStart + ((i + 1) % (verticalCuts + 1));
+                meshData.getIndices().add(new int[]{a, b1, b});
+                meshData.getIndices().add(new int[]{a1, b1, a});
             }
         }
 
-        for (int i = 0; i < stacks; i++) {
-            int a = i + stacks * (slices - 2) + 1;
-            int b = (i + 1) % stacks + stacks * (slices - 2) + 1;
-            meshData.getIndices().add(new int[]{count - 1, a, b});
-        }
         return meshData;
     }
 }
