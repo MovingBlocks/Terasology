@@ -45,7 +45,7 @@ public class ArrayWidgetFactory implements TypeWidgetFactory {
     }
 
     private static class GrowableListArrayWidgetBuilder<E> extends GrowableListWidgetBuilder<E[], E> {
-        public GrowableListArrayWidgetBuilder(
+        GrowableListArrayWidgetBuilder(
             TypeInfo<E[]> type,
             TypeWidgetLibrary library,
             ObjectConstructor<E[]> constructor

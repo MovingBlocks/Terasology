@@ -5,7 +5,6 @@ package org.terasology.engine.rendering.assets.mesh;
 
 import com.google.common.collect.ImmutableSet;
 import org.terasology.engine.core.TerasologyConstants;
-import org.terasology.engine.rendering.assets.texture.TextureUtil;
 import org.terasology.gestalt.assets.AssetDataProducer;
 import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.gestalt.assets.module.annotations.RegisterAssetDataProducer;

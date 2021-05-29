@@ -519,9 +519,9 @@ public interface BlockAreac extends Iterable<Vector2ic> {
     }
 
     // ---------------------------------------------------------------------------------------------------------------//
-    public boolean equals(Object obj);
+    boolean equals(Object obj);
 
-    public int hashCode();
+    int hashCode();
 
-    public String toString();
+    String toString();
 }

@@ -155,7 +155,10 @@ public class VisualCharacterSystemTest {
         return entityRef;
     }
 
-    private void simulateProperLinkingOfLocalPlayerAndCharacterEntities(EntityRef clientEntity, EntityRef otherClientEntity, EntityRef ownCharacterEntity, EntityRef otherCharacterEntity) {
+    private void simulateProperLinkingOfLocalPlayerAndCharacterEntities(EntityRef clientEntity,
+                                                                        EntityRef otherClientEntity,
+                                                                        EntityRef ownCharacterEntity,
+                                                                        EntityRef otherCharacterEntity) {
         // Simulate linking of character with client
         clientEntityReturnedByLocalPlayer = clientEntity;
         Mockito.when(ownCharacterEntity.getOwner()).thenReturn(clientEntity);
@@ -172,7 +175,7 @@ public class VisualCharacterSystemTest {
 
     private List<Class<?>> typesOf(List<?> objects) {
         List<Class<?>> typeList = new ArrayList<>();
-        for (Object object: objects) {
+        for (Object object : objects) {
             typeList.add(object.getClass());
         }
         return typeList;
