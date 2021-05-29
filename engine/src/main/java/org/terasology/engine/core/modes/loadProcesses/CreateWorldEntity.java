@@ -22,11 +22,7 @@ import org.terasology.engine.world.generator.WorldGenerator;
 import java.util.Iterator;
 
 public class CreateWorldEntity extends SingleStepLoadProcess {
-
     private static final Logger logger = LoggerFactory.getLogger(CreateWorldEntity.class);
-
-    private final Context context;
-    private final GameManifest gameManifest;
 
     //TODO: figure out dependencies at some point ....
     protected EntityManager entityManager;
@@ -34,6 +30,9 @@ public class CreateWorldEntity extends SingleStepLoadProcess {
     protected WorldConfigurator worldConfigurator;
     protected Config config;
     protected ChunkProvider chunkProvider;
+
+    private final Context context;
+    private final GameManifest gameManifest;
 
     public CreateWorldEntity(Context context, GameManifest gameManifest) {
         this.context = context;

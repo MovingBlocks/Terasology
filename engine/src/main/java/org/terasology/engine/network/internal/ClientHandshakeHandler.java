@@ -212,7 +212,8 @@ public class ClientHandshakeHandler extends ChannelInboundHandlerAdapter {
     }
 
     /**
-     * Generates a client hello from clientRandom file, time, and the public client certificate. Sends the clients hello and certificate back to the server via network channel.
+     * Generates a client hello from clientRandom file, time, and the public client certificate.
+     * Sends the clients hello and certificate back to the server via network channel.
      * @param helloMessage Message from server to client.
      * @param ctx Channel Handler Context.
      */

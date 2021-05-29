@@ -82,7 +82,8 @@ public final class StorageServiceWorker {
         while (!notificationBuffer.isEmpty()) {
             ConsoleNotification notification = notificationBuffer.pop();
             String message =
-                    translationSystem.translate("${engine:menu#storage-service}") + ": " + String.format(translationSystem.translate(notification.messageId), notification.args);
+                    translationSystem.translate("${engine:menu#storage-service}") + ": "
+                            + String.format(translationSystem.translate(notification.messageId), notification.args);
             target.addMessage(message, CoreMessageType.NOTIFICATION);
         }
     }
