@@ -1,28 +1,25 @@
-/*
- * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+#version 330 core
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 
-varying	vec4 	position;
-varying	vec3 	colorYxy;
-varying vec3    skyVec;
+layout (location = 0) in vec3 in_vert;
+layout (location = 1) in vec3 in_normal;
+layout (location = 2) in vec2 in_uv0;
+layout (location = 4) in vec4 in_color0;
+
+out	vec4 v_position;
+out vec2 v_uv0;
+out	vec3 v_colorYxy;
+out vec3 v_skyVec;
 
 uniform float	sunAngle;
 uniform	float	turbidity;
 uniform vec3    zenith;
 
 const vec4 eyePos = vec4(0.0, 0.0, 0.0, 1.0);
+
+uniform mat4 modelViewMatrix;
+uniform mat4 projectionMatrix;
 
 vec3 allWeather(float t, float cosTheta, float cosGamma)
 {
@@ -65,12 +62,12 @@ void main(void)
     float	ca  = cos (sunAngle);
     mat3	r   = mat3 (1.0, 0.0, 0.0, 0.0, ca, -sa, 0.0, sa, ca);
 
-    vec3 v          = normalize ((gl_Vertex-eyePos).xyz);
+    vec3 v          = normalize ((vec4(in_vert, 1.0) - eyePos).xyz);
     vec3 l          = sunVec;
     float lv        = dot(l, v);
-    skyVec          = v.xyz;
-    colorYxy        = allWeatherSky(turbidity, max(v.y, 0.0) + 0.05, lv, l.y);
-    position        = gl_Vertex;
-    gl_Position     = ftransform();
-    gl_TexCoord[0]  = gl_MultiTexCoord0;
+	v_skyVec        = v.xyz;
+	v_colorYxy      = allWeatherSky(turbidity, max(v.y, 0.0) + 0.05, lv, l.y);
+	v_position      = vec4(in_vert, 1.0);
+	v_uv0           = in_uv0;
+	gl_Position     = (projectionMatrix * modelViewMatrix) * v_position;
 }
