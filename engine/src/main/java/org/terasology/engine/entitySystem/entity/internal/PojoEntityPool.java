@@ -26,9 +26,9 @@ import static org.terasology.engine.entitySystem.entity.internal.PojoEntityManag
 
 public class PojoEntityPool implements EngineEntityPool {
 
-    private PojoEntityManager entityManager;
-
     private static final Logger logger = LoggerFactory.getLogger(PojoEntityPool.class);
+
+    private PojoEntityManager entityManager;
 
     private Map<Long, BaseEntityRef> entityStore = new MapMaker().weakValues().concurrencyLevel(4).initialCapacity(1000).makeMap();
     private ComponentTable componentStore = new ComponentTable();

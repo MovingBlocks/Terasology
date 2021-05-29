@@ -49,7 +49,8 @@ public final class Lwjgl2Sync {
             for (long t0 = getTime(), t1; (nextFrame - t0) > SLEEP_DURATIONS.avg(); t0 = t1) {
                 //noinspection BusyWait
                 Thread.sleep(1);
-                SLEEP_DURATIONS.add((t1 = getTime()) - t0); // update average sleep time
+                t1 = getTime();
+                SLEEP_DURATIONS.add(t1 - t0); // update average sleep time
             }
 
             // slowly dampen sleep average if too high to avoid yielding too much
@@ -58,7 +59,8 @@ public final class Lwjgl2Sync {
             // yield until the average yield time is greater than the time remaining till nextFrame
             for (long t0 = getTime(), t1; (nextFrame - t0) > YIELD_DURATIONS.avg(); t0 = t1) {
                 Thread.yield();
-                YIELD_DURATIONS.add((t1 = getTime()) - t0); // update average yield time
+                t1 = getTime();
+                YIELD_DURATIONS.add(t1 - t0); // update average yield time
             }
         } catch (InterruptedException ignored) {
         }

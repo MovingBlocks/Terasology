@@ -31,13 +31,14 @@ public class SpriteParticleRenderer implements RenderSystem {
 
     protected static final String PARTICLE_MATERIAL_URI = "engine:prog.particle";
 
-    private final FloatBuffer matrixBuffer = BufferUtils.createFloatBuffer(16);
-    private  boolean opengl33 = false;
     @In
     WorldRenderer worldRenderer;
 
     @In
     ParticleSystemManager particleSystemManager;
+
+    private final FloatBuffer matrixBuffer = BufferUtils.createFloatBuffer(16);
+    private  boolean opengl33 = false;
 
     public void drawParticles(Material material, ParticleRenderingData<ParticleDataSpriteComponent> particleSystem) {
         ParticleDataSpriteComponent particleData = particleSystem.particleData;
