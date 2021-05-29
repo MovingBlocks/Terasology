@@ -31,6 +31,7 @@ import org.terasology.engine.testUtil.ModuleManagerFactory;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 import static org.terasology.joml.test.VectorAssert.assertEquals;
@@ -42,7 +43,7 @@ public class VectorEventSerializer {
 
     private ReflectFactory reflectFactory = new ReflectionReflectFactory();
     private CopyStrategyLibrary copyStrategies = new CopyStrategyLibrary(reflectFactory);
-    HashMap<Class<? extends Event>, Integer> eventMap = new HashMap<>();
+    Map<Class<? extends Event>, Integer> eventMap = new HashMap<>();
     int indexCount = 0;
 
     public static class Vector3fTestEvent implements Event {
