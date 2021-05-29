@@ -80,7 +80,6 @@ public class ModuleManager {
 
         Map<String, ModuleMetadataLoader> mmlm = moduleFactory.getModuleMetadataLoaderMap();
         mmlm.put(TerasologyConstants.MODULE_INFO_FILENAME.toString(), metadataReader);
-        mmlm.put("module.txt", metadataReader);  // FIXME: this should be *only* for engine-module.
 
         registry = new TableModuleRegistry();
 
