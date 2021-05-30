@@ -27,7 +27,7 @@ import java.util.Objects;
 public final class LocationComponent implements Component, ReplicationCheck {
 
     public boolean replicateChanges = true;
-    boolean isDirty = false;
+    private boolean isDirty = false;
 
     // Relative to
     @Replicate
@@ -63,6 +63,14 @@ public final class LocationComponent implements Component, ReplicationCheck {
             lastPosition.set(position);
             isDirty = true;
         }
+    }
+
+    boolean isDirty() {
+        return this.isDirty;
+    }
+
+    void clearDirtyFlag() {
+        isDirty = false;
     }
 
     /**

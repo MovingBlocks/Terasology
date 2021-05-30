@@ -15,7 +15,7 @@ public class LocationChangedEvent implements Event {
     protected Vector3f currentPosition = new Vector3f();
     protected Quaternionf currentRotation = new Quaternionf();
 
-    public LocationChangedEvent() {
+    protected LocationChangedEvent() {
     }
 
     public LocationChangedEvent(Vector3fc lastPosition, Quaternionfc lastRotation, Vector3fc currentPosition, Quaternionfc currentRotation) {
@@ -44,14 +44,5 @@ public class LocationChangedEvent implements Event {
 
     public Quaternionfc currentRotation() {
         return currentRotation;
-    }
-
-
-    public Vector3f vectorMoved(Vector3f dest) {
-        return currentPosition.sub(lastPosition, dest);
-    }
-
-    public float distanceMoved() {
-        return currentPosition.distance(lastPosition);
     }
 }

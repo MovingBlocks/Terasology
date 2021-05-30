@@ -16,22 +16,19 @@ import java.util.Set;
 
 @RegisterSystem(RegisterMode.AUTHORITY)
 public class LocationChangedSystem extends BaseComponentSystem implements UpdateSubscriberSystem {
-
     private Set<EntityRef> process = Sets.newHashSet();
 
     @ReceiveEvent(components = {LocationComponent.class})
-    public void locationChanged(OnAddedComponent event, EntityRef entity) {
-        LocationComponent lc = entity.getComponent(LocationComponent.class);
-        lc.isDirty = false;
+    public void locationChanged(OnAddedComponent event, EntityRef entity, LocationComponent lc) {
+        lc.clearDirtyFlag();
     }
 
     @ReceiveEvent(components = {LocationComponent.class})
-    public void locationChanged(OnChangedComponent event, EntityRef entity) {
-        LocationComponent lc = entity.getComponent(LocationComponent.class);
-        if (lc.isDirty && (!lc.position.equals(lc.lastPosition) || !lc.rotation.equals(lc.lastRotation))) {
+    public void locationChanged(OnChangedComponent event, EntityRef entity, LocationComponent lc) {
+        if (lc.isDirty() && (!lc.position.equals(lc.lastPosition) || !lc.rotation.equals(lc.lastRotation))) {
             process.add(entity);
         } else {
-            lc.isDirty = false;
+            lc.clearDirtyFlag();
         }
     }
 
@@ -41,7 +38,7 @@ public class LocationChangedSystem extends BaseComponentSystem implements Update
             LocationComponent lc = entity.getComponent(LocationComponent.class);
             if (lc != null) {
                 entity.send(new LocationChangedEvent(lc.lastPosition, lc.lastRotation, lc.position, lc.rotation));
-                lc.isDirty = false;
+                lc.clearDirtyFlag();
             }
         }
         process.clear();
