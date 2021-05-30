@@ -81,7 +81,7 @@ public class SimpleAISystem extends BaseComponentSystem implements UpdateSubscri
         }
     }
 
-    @ReceiveEvent(components = {SimpleAIComponent.class})
+    @ReceiveEvent(components = SimpleAIComponent.class)
     public void onBump(HorizontalCollisionEvent event, EntityRef entity) {
         CharacterMovementComponent moveComp = entity.getComponent(CharacterMovementComponent.class);
         if (moveComp != null && moveComp.grounded) {

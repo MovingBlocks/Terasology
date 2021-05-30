@@ -18,33 +18,32 @@ import java.nio.FloatBuffer;
  */
 public final class ParticlePool {
 
-    //== package private attributes =====================
-
     // Static constants
     private static final int X_OFFSET = 0;
     private static final int Y_OFFSET = 1;
     private static final int Z_OFFSET = 2;
     private static final int W_OFFSET = 3;
 
+    public final ParticleData temporaryParticleData = new ParticleData();
+
+    //== package private attributes =====================
+
     // Per particle scalars
     public final float[] energy;
 
     // Per particle 3d vectors
-    public final float[] position;
-    private final FloatBuffer positionBuffer;
-    public final float[] scale;
-    private final FloatBuffer scaleBuffer;
-    public final float[] color;
-    private final FloatBuffer colorBuffer;
-    public final float[] textureOffset;
-    private final FloatBuffer textureOffsetBuffer;
-
     public final float[] previousPosition;
     public final float[] velocity;
+    public final float[] position;
+    public final float[] scale;
+    public final float[] color;
+    public final float[] textureOffset;
+    private final FloatBuffer positionBuffer;
+    private final FloatBuffer scaleBuffer;
+    private final FloatBuffer colorBuffer;
+    private final FloatBuffer textureOffsetBuffer;
 
     //== private attributes =============================
-
-    public final ParticleData temporaryParticleData = new ParticleData();
 
     private int firstDeadParticleIndex;
     private final int rawSize;

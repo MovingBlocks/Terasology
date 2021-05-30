@@ -61,7 +61,7 @@ public class ParticleUpdaterImpl implements ParticleUpdater {
      * Set of all particle emitters
      */
     private final Set<ParticleEmitterComponent> registeredParticleSystems = new HashSet<>();
-    private final HashSet<ParticlePool> updatedParticlePools = new HashSet<>();
+    private final Set<ParticlePool> updatedParticlePools = new HashSet<>();
 
     private final FastRandom random = new FastRandom();
     private final Physics physics;

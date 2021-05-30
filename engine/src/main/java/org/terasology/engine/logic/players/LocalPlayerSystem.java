@@ -12,7 +12,6 @@ import org.terasology.engine.core.SimpleUri;
 import org.terasology.engine.core.Time;
 import org.terasology.engine.core.subsystem.config.BindsManager;
 import org.terasology.engine.entitySystem.entity.EntityRef;
-import org.terasology.engine.entitySystem.event.EventPriority;
 import org.terasology.engine.entitySystem.event.ReceiveEvent;
 import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
 import org.terasology.engine.entitySystem.systems.RenderSystem;
@@ -255,13 +254,13 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
         event.consume();
     }
 
-    @ReceiveEvent(components = {CharacterComponent.class})
+    @ReceiveEvent(components = CharacterComponent.class)
     public void updateRotationYaw(RotationYawAxis event, EntityRef entity) {
         lookYawDelta = event.getValue();
         event.consume();
     }
 
-    @ReceiveEvent(components = {CharacterComponent.class})
+    @ReceiveEvent(components = CharacterComponent.class)
     public void updateRotationPitch(RotationPitchAxis event, EntityRef entity) {
         lookPitchDelta = event.getValue();
         event.consume();
@@ -277,7 +276,7 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
         }
     }
 
-    @ReceiveEvent(components = {ClientComponent.class})
+    @ReceiveEvent(components = ClientComponent.class)
     public void updateForwardsMovement(ForwardsMovementAxis event, EntityRef entity) {
         relativeMovement.z = (float) event.getValue();
         if (relativeMovement.z == 0f && isAutoMove) {
@@ -286,37 +285,37 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
         event.consume();
     }
 
-    @ReceiveEvent(components = {ClientComponent.class})
+    @ReceiveEvent(components = ClientComponent.class)
     public void updateStrafeMovement(StrafeMovementAxis event, EntityRef entity) {
         relativeMovement.x = (float) event.getValue();
         event.consume();
     }
 
-    @ReceiveEvent(components = {ClientComponent.class})
+    @ReceiveEvent(components = ClientComponent.class)
     public void updateVerticalMovement(VerticalMovementAxis event, EntityRef entity) {
         relativeMovement.y = (float) event.getValue();
         event.consume();
     }
 
-    @ReceiveEvent(components = {ClientComponent.class})
+    @ReceiveEvent(components = ClientComponent.class)
     public void updateForwardsMovement(ForwardsRealMovementAxis event, EntityRef entity) {
         relativeMovement.z = (float) event.getValue();
         event.consume();
     }
 
-    @ReceiveEvent(components = {ClientComponent.class})
+    @ReceiveEvent(components = ClientComponent.class)
     public void updateStrafeMovement(StrafeRealMovementAxis event, EntityRef entity) {
         relativeMovement.x = (float) event.getValue();
         event.consume();
     }
 
-    @ReceiveEvent(components = {ClientComponent.class})
+    @ReceiveEvent(components = ClientComponent.class)
     public void updateVerticalMovement(VerticalRealMovementAxis event, EntityRef entity) {
         relativeMovement.y = (float) event.getValue();
         event.consume();
     }
 
-    @ReceiveEvent(components = {ClientComponent.class}, priority = EventPriority.PRIORITY_NORMAL)
+    @ReceiveEvent(components = ClientComponent.class)
     public void onToggleSpeedTemporarily(ToggleSpeedTemporarilyButton event, EntityRef entity) {
         boolean toggle = event.isDown();
         run = runPerDefault ^ toggle;
@@ -324,14 +323,14 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
     }
 
     // Crouches if button is pressed. Stands if button is released.
-    @ReceiveEvent(components = {ClientComponent.class}, priority = EventPriority.PRIORITY_NORMAL)
+    @ReceiveEvent(components = ClientComponent.class)
     public void onCrouchTemporarily(CrouchButton event, EntityRef entity) {
         boolean toggle = event.isDown();
         crouch = crouchPerDefault ^ toggle;
         event.consume();
     }
 
-    @ReceiveEvent(components = {ClientComponent.class}, priority = EventPriority.PRIORITY_NORMAL)
+    @ReceiveEvent(components = ClientComponent.class)
     public void onCrouchMode(CrouchModeButton event, EntityRef entity) {
         if (event.isDown()) {
             crouchPerDefault = !crouchPerDefault;
@@ -340,7 +339,7 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
         event.consume();
     }
 
-    @ReceiveEvent(components = {ClientComponent.class}, priority = EventPriority.PRIORITY_NORMAL)
+    @ReceiveEvent(components = ClientComponent.class)
     public void onAutoMoveMode(AutoMoveButton event, EntityRef entity) {
         if (event.isDown()) {
             if (!isAutoMove) {
@@ -352,7 +351,7 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
         event.consume();
     }
 
-    @ReceiveEvent(components = {ClientComponent.class}, priority = EventPriority.PRIORITY_NORMAL)
+    @ReceiveEvent(components = ClientComponent.class)
     public void onToggleSpeedPermanently(ToggleSpeedPermanentlyButton event, EntityRef entity) {
         if (event.isDown()) {
             runPerDefault = !runPerDefault;
@@ -378,7 +377,10 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
                     MeshComponent mesh = target.getComponent(MeshComponent.class);
                     if (mesh != null && mesh.mesh != null) {
                         aabb.set(mesh.mesh.getAABB());
-                        aabb.transform(new Matrix4f().translationRotateScale(location.getWorldPosition(new Vector3f()), location.getWorldRotation(new Quaternionf()), location.getWorldScale()));
+                        aabb.transform(new Matrix4f().translationRotateScale(
+                                location.getWorldPosition(new Vector3f()),
+                                location.getWorldRotation(new Quaternionf()),
+                                location.getWorldScale()));
                     }
                 }
             }
@@ -430,7 +432,7 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
         }
     }
 
-    @ReceiveEvent(components = {CharacterComponent.class})
+    @ReceiveEvent(components = CharacterComponent.class)
     public void onFrobButton(FrobButton event, EntityRef character) {
         if (event.getState() != ButtonState.DOWN) {
             return;
@@ -447,7 +449,7 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
         }
     }
 
-    @ReceiveEvent(components = {CharacterComponent.class})
+    @ReceiveEvent(components = CharacterComponent.class)
     public void onUseItemButton(UseItemButton event, EntityRef entity,
                                 CharacterHeldItemComponent characterHeldItemComponent) {
         if (!event.isDown()) {

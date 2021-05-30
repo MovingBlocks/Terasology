@@ -7,7 +7,6 @@ import com.google.common.collect.ImmutableSet;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.terasology.engine.core.TerasologyConstants;
-import org.terasology.engine.rendering.assets.texture.TextureUtil;
 import org.terasology.gestalt.assets.AssetDataProducer;
 import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.gestalt.assets.module.annotations.RegisterAssetDataProducer;

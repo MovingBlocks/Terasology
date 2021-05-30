@@ -27,12 +27,12 @@ import org.terasology.input.Keyboard;
 @RegisterSystem(RegisterMode.CLIENT)
 public class AfkClientSystem extends BaseComponentSystem {
 
-    private static final Logger logger = LoggerFactory.getLogger(AfkClientSystem.class);
-
     /**
      * Duration in milliseconds (ms).
      */
     public static final long AFK_FREEDOM = 5 * 1000;
+
+    private static final Logger logger = LoggerFactory.getLogger(AfkClientSystem.class);
 
     /**
      * Duration in milliseconds (ms).
