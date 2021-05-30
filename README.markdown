@@ -83,7 +83,7 @@ Direct download stable builds are uploaded to [our release section here on GitHu
 
 ## Developing
 
-We strive to make developing and modding Terasology as easy as possible.  See our wiki for instructions on [setting up a development environment](https://github.com/MovingBlocks/Terasology/wiki/Dev-Setup) and how to [develop modules](https://github.com/MovingBlocks/Terasology/wiki/Developing-Modules).
+We strive to make developing and modding Terasology as easy as possible.  See our wiki for instructions on [setting up a development environment](https://github.com/MovingBlocks/Terasology/wiki/Contributor-Quick-Start) and how to [develop modules](https://github.com/MovingBlocks/Terasology/wiki/Developing-Modules).
 
 
 ## Links

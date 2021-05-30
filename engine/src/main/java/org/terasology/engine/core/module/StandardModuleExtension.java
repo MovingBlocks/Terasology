@@ -25,9 +25,9 @@ public enum StandardModuleExtension implements ModuleExtension {
     IS_AUGMENTATION("isAugmentation", Boolean.class),
     DEFAULT_WORLD_GENERATOR("defaultWorldGenerator", String.class);
 
+    private static final Logger logger = LoggerFactory.getLogger(StandardModuleExtension.class);
     private final String key;
     private final Class<?> valueType;
-    private static final Logger logger = LoggerFactory.getLogger(StandardModuleExtension.class);
 
     StandardModuleExtension(String key, Class<?> valueType) {
         this.key = key;
