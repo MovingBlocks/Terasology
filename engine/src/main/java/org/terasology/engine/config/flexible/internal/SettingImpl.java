@@ -23,6 +23,8 @@ import java.util.function.Supplier;
 class SettingImpl<T> implements Setting<T> {
     private static final Logger LOGGER = LoggerFactory.getLogger(SettingImpl.class);
 
+    protected T value;
+
     private final T defaultValue;
     private final TypeInfo<T> valueType;
 
@@ -33,8 +35,6 @@ class SettingImpl<T> implements Setting<T> {
 
     private final SettingConstraint<T> constraint;
     private final Set<SettingChangeListener<T>> subscribers = Sets.newHashSet();
-
-    protected T value;
 
     /**
      * Creates a new {@link SettingImpl} with the given id, default value and constraint.

@@ -44,9 +44,9 @@ import java.util.List;
 
 public class NewGameScreen extends CoreScreenLayer {
 
-    private static final Logger logger = LoggerFactory.getLogger(NewGameScreen.class);
-
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:newGameScreen");
+
+    private static final Logger logger = LoggerFactory.getLogger(NewGameScreen.class);
     private static final String DEFAULT_GAME_TEMPLATE_NAME = "JoshariasSurvival";
 
     @In

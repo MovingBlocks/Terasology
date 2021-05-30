@@ -100,15 +100,15 @@ public interface Node extends RenderPipelineTask {
      */
     Name getAka();
 
-    public Map<String, DependencyConnection> getInputConnections();
+    Map<String, DependencyConnection> getInputConnections();
 
-    public Map<String, DependencyConnection> getOutputConnections();
+    Map<String, DependencyConnection> getOutputConnections();
 
-    public void setInputConnections(Map<String, DependencyConnection> inputConnections);
+    void setInputConnections(Map<String, DependencyConnection> inputConnections);
 
-    public void setOutputConnections(Map<String, DependencyConnection> outputConnections);
+    void setOutputConnections(Map<String, DependencyConnection> outputConnections);
 
-    public void postInit(Context context);
+    void postInit(Context context);
 
     /**.
      * This method must be called AFTER node has connected all it's dependencies.
@@ -140,31 +140,31 @@ public interface Node extends RenderPipelineTask {
      */
     DependencyConnection getInputFboConnection(int inputId);
 
-    public boolean addOutputFboConnection(int id);
+    boolean addOutputFboConnection(int id);
 
-    public boolean addOutputBufferPairConnection(int id);
+    boolean addOutputBufferPairConnection(int id);
 
-    public boolean addOutputBufferPairConnection(int id, BufferPair bufferPair);
+    boolean addOutputBufferPairConnection(int id, BufferPair bufferPair);
 
-    public boolean addOutputBufferPairConnection(int id, BufferPairConnection from);
+    boolean addOutputBufferPairConnection(int id, BufferPairConnection from);
 
-    public BufferPairConnection getOutputBufferPairConnection(int outputBufferPairId);
+    BufferPairConnection getOutputBufferPairConnection(int outputBufferPairId);
 
-    public BufferPairConnection getInputBufferPairConnection(int inputBufferPairId);
+    BufferPairConnection getInputBufferPairConnection(int inputBufferPairId);
 
-    public boolean addInputRunOrderConnection(RunOrderConnection from, int inputId);
+    boolean addInputRunOrderConnection(RunOrderConnection from, int inputId);
 
-    public boolean addOutputRunOrderConnection(int outputId);
+    boolean addOutputRunOrderConnection(int outputId);
 
-    public RunOrderConnection getOutputRunOrderConnection(int outputId);
+    RunOrderConnection getOutputRunOrderConnection(int outputId);
 
-    public RunOrderConnection getInputRunOrderConnection(int inputId);
+    RunOrderConnection getInputRunOrderConnection(int inputId);
 
-    public void removeFboConnection(int id, DependencyConnection.Type type);
+    void removeFboConnection(int id, DependencyConnection.Type type);
 
-    public void removeBufferPairConnection(int id, DependencyConnection.Type type);
+    void removeBufferPairConnection(int id, DependencyConnection.Type type);
 
-    public void removeRunOrderConnection(int id, DependencyConnection.Type type);
+    void removeRunOrderConnection(int id, DependencyConnection.Type type);
 
     /**
      * Is {@code thisNode} dependent on {@param anotherNode}?
