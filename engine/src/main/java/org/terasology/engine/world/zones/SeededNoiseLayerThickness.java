@@ -15,8 +15,8 @@ import java.util.function.LongFunction;
 @API
 public abstract class SeededNoiseLayerThickness implements LayerThickness {
 
-    private final LongFunction<Noise> seededNoiseFunction;
     protected Noise noise;
+    private final LongFunction<Noise> seededNoiseFunction;
 
     public SeededNoiseLayerThickness(LongFunction<Noise> seededNoiseFunction) {
         this.seededNoiseFunction = seededNoiseFunction;

@@ -137,8 +137,8 @@ public final class OpenALStreamingSound extends StreamingSound {
 
     public static class DisposalAction implements DisposableResource {
 
-        private final ResourceUrn urn;
         protected int[] buffers = new int[0];
+        private final ResourceUrn urn;
         private WeakReference<OpenALStreamingSound> asset;
 
         public DisposalAction(ResourceUrn urn) {
