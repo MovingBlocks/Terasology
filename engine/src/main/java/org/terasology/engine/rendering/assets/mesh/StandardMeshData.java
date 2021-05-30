@@ -24,7 +24,8 @@ public class StandardMeshData extends MeshData {
     public final TFloatList color0;
     public final TFloatList light0;
 
-    public StandardMeshData() {
+    public StandardMeshData(DrawingMode mode) {
+       super(mode);
         this.vertices = new TFloatArrayList();
         this.uv0 = new TFloatArrayList();
         this.uv1 = new TFloatArrayList();
@@ -38,6 +39,11 @@ public class StandardMeshData extends MeshData {
         addLayout(new FloatLayout(UV1_INDEX, 2, uv1, Layout.FLOATING_POINT));
         addLayout(new FloatLayout(COLOR0_INDEX, 4, color0, Layout.FLOATING_POINT));
         addLayout(new FloatLayout(LIGHT0_INDEX, 3, light0, Layout.FLOATING_POINT));
+
+    }
+    public StandardMeshData() {
+        this(DrawingMode.TRIANGLES);
+
     }
 
 
