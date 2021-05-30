@@ -16,8 +16,24 @@ import java.nio.ByteBuffer;
 
 public final class GLAttributes {
     private GLAttributes() {
-
     }
+
+    public static final VertexFloatAttribute FLOAT_1_VERTEX_ATTRIBUTE = new VertexFloatAttribute(new VertexFloatAttribute.AttributeConfiguration() {
+        @Override
+        public void write(float value, int vertIdx, int offset, VertexResource resource) {
+            int bufferStart = vertIdx * resource.inStride() + offset;
+            ByteBuffer buffer = resource.buffer();
+            buffer.putFloat(bufferStart, value);
+        }
+
+        @Override
+        public float read(int vertIdx, int offset, VertexResource resource) {
+            int bufferStart = vertIdx * resource.inStride() + offset;
+            ByteBuffer buffer = resource.buffer();
+            return buffer.getFloat(bufferStart);
+        }
+    }, TypeMapping.ATTR_FLOAT, 1);
+
     public static final VertexIntegerAttribute INT_1_VERTEX_ATTRIBUTE = new VertexIntegerAttribute(new VertexIntegerAttribute.AttributeConfiguration() {
 
         @Override
@@ -34,6 +50,23 @@ public final class GLAttributes {
             return buffer.getInt(bufferStart);
         }
     }, TypeMapping.ATTR_INT, 1);
+
+    public static final VertexIntegerAttribute BYTE_1_VERTEX_ATTRIBUTE = new VertexIntegerAttribute(new VertexIntegerAttribute.AttributeConfiguration() {
+
+        @Override
+        public void write(int value, int vertIdx, int offset, VertexResource resource) {
+            int bufferStart = vertIdx * resource.inStride() + offset;
+            ByteBuffer buffer = resource.buffer();
+            buffer.put(bufferStart, (byte) value);
+        }
+
+        @Override
+        public int read(int vertIdx, int offset, VertexResource resource) {
+            int bufferStart = vertIdx * resource.inStride() + offset;
+            ByteBuffer buffer = resource.buffer();
+            return buffer.get(bufferStart);
+        }
+    }, TypeMapping.ATTR_BYTE, 1);
 
 
     public static final VertexAttribute<Vector3fc, Vector3f> VECTOR_3_F_VERTEX_ATTRIBUTE = new VertexAttribute<Vector3fc, Vector3f>(Vector3f.class, new VertexAttribute.AttributeConfiguration<Vector3fc, Vector3f>() {

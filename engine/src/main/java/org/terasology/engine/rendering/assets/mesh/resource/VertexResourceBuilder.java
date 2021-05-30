@@ -36,6 +36,14 @@ public class VertexResourceBuilder {
         return result;
     }
 
+    public VertexFloatAttributeBinding add(int location, VertexFloatAttribute attribute) {
+        VertexFloatAttributeBinding result = new VertexFloatAttributeBinding(resource, inStride, attribute);
+        this.definitions.add(new VertexResource.VertexDefinition(location, inStride, attribute));
+        inStride += attribute.mapping.size * attribute.count;
+        return result;
+    }
+
+
     public VertexResource build() {
         resource.setDefinitions(definitions.toArray(new VertexResource.VertexDefinition[]{}));
         resource.allocate(0, inStride);

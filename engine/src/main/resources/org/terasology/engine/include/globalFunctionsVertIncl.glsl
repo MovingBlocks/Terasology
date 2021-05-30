@@ -30,6 +30,6 @@ float smoothTriangleWave(float x) {
   return smoothCurve(triangleWave(x)) * 2.0 - 1.0;
 }
 
-bool checkFlag(int flag, float val) {
-    return flag == int(val);
-}
+//bool checkFlag(uint flag, uint val) {
+//    return flag == val;
+//}

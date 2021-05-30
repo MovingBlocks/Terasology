@@ -87,9 +87,9 @@ float fresnel(float nDotL, float fresnelBias, float fresnelPow) {
   return clamp(fresnelBias + (1.0 - fresnelBias) * pow(facing, fresnelPow), 0.0, 1.0);
 }
 
-bool checkFlag(int flag, float val) {
-    return val > float(flag) - 0.5 && val < float(flag) + 0.5;
-}
+//bool checkFlag(int flag, float val) {
+//    return val > float(flag) - 0.5 && val < float(flag) + 0.5;
+//}
 
 vec3 convertColorYxy(vec3 color, float colorExp) {
     if (color.x < 0.0 || color.y < 0.0 || color.z < 0.0) {
@@ -148,7 +148,7 @@ float calcVolumetricFog(vec3 fogWorldPosition, float volumetricHeightDensityAtVi
     vec3 cameraToFogWorldPosition = -fogWorldPosition;
 
     float totalFogToSample = length(cameraToFogWorldPosition) * globalDensity * volumetricHeightDensityAtViewer;
-    
+
     const float slopeThreshold = 0.01;
     float heightDensityFactor = heightFalloff * cameraToFogWorldPosition.y;
     if (abs(heightDensityFactor) > slopeThreshold) {

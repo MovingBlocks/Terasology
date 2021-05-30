@@ -3,20 +3,19 @@
 
 package org.terasology.engine.rendering.assets.mesh.resource;
 
-public class VertexIntegerAttribute extends BaseVertexAttribute {
-    public final VertexIntegerAttribute.AttributeConfiguration configuration;
+public class VertexFloatAttribute extends BaseVertexAttribute {
+    public final VertexFloatAttribute.AttributeConfiguration configuration;
 
     public interface AttributeConfiguration {
-        void write(int value, int vertIdx, int offset, VertexResource resource);
+        void write(float value, int vertIdx, int offset, VertexResource resource);
 
-        int read(int vertIdx, int offset, VertexResource resource);
+        float read(int vertIdx, int offset, VertexResource resource);
     }
-
     /**
      * @param mapping maps a primitive to a given supported type.
      * @param count the number elements that is described by the target
      */
-    protected VertexIntegerAttribute(VertexIntegerAttribute.AttributeConfiguration attributeConfiguration,
+    protected VertexFloatAttribute(VertexFloatAttribute.AttributeConfiguration attributeConfiguration,
                                      TypeMapping mapping, int count) {
         super(mapping, count);
         this.configuration = attributeConfiguration;
