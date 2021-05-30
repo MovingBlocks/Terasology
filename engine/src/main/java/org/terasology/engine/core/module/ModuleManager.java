@@ -79,8 +79,6 @@ public class ModuleManager {
 
         Map<String, ModuleMetadataLoader> mmlm = moduleFactory.getModuleMetadataLoaderMap();
         mmlm.put(TerasologyConstants.MODULE_INFO_FILENAME.toString(), metadataReader);
-        mmlm.put("engine-module.txt", metadataReader);  // FIXME: this should be *only* for engine-module.
-        // FIXME: …or maybe engine-module doesn't need a special filename anymore?
 
         registry = new TableModuleRegistry();
 
