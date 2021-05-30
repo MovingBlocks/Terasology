@@ -7,22 +7,38 @@ import gnu.trove.list.TFloatList;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TFloatArrayList;
 import gnu.trove.list.array.TIntArrayList;
+import org.joml.Vector2f;
+import org.joml.Vector2fc;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL15;
+import org.lwjgl.opengl.GL30;
+import org.terasology.engine.rendering.assets.mesh.resource.GLAttributes;
+import org.terasology.engine.rendering.assets.mesh.resource.IndexResource;
+import org.terasology.engine.rendering.assets.mesh.resource.VertexAttributeBinding;
+import org.terasology.engine.rendering.assets.mesh.resource.VertexFloatAttributeBinding;
+import org.terasology.engine.rendering.assets.mesh.resource.VertexIntegerAttribute;
+import org.terasology.engine.rendering.assets.mesh.resource.VertexIntegerAttributeBinding;
+import org.terasology.engine.rendering.assets.mesh.resource.VertexResource;
+import org.terasology.engine.rendering.assets.mesh.resource.VertexResourceBuilder;
 import org.terasology.gestalt.module.sandbox.API;
 import org.terasology.engine.rendering.VertexBufferObjectUtil;
 import org.terasology.engine.rendering.assets.material.Material;
+import org.terasology.nui.Color;
+import org.terasology.nui.Colorc;
 
+import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Consumer;
 
 import static org.lwjgl.opengl.GL11.GL_COLOR_ARRAY;
 import static org.lwjgl.opengl.GL11.GL_NORMAL_ARRAY;
 import static org.lwjgl.opengl.GL11.GL_TEXTURE_COORD_ARRAY;
+import static org.lwjgl.opengl.GL11.GL_UNSIGNED_INT;
 import static org.lwjgl.opengl.GL11.GL_VERTEX_ARRAY;
 import static org.lwjgl.opengl.GL11.glColorPointer;
 import static org.lwjgl.opengl.GL11.glDisableClientState;
@@ -81,10 +97,12 @@ public class ChunkMesh {
     private static final int STRIDE = OFFSET_NORMAL + SIZE_NORMAL * 4;
     // the STRIDE, above, is the gap between the beginnings of the data regarding two consecutive vertices
 
+
     /* VERTEX DATA */
     public final int[] vertexBuffers = new int[4];
     public final int[] idxBuffers = new int[4];
     public final int[] vertexCount = new int[4];
+    public final int[] vaoCount = new int[4];
 
     /* STATS */
     private int triangleCount = -1;
@@ -151,13 +169,32 @@ public class ChunkMesh {
     private void generateVBO(RenderType type) {
         VertexElements elements = vertexElements.get(type);
         int id = type.getIndex();
-        if (!disposed && elements.finalIndices.limit() > 0 && elements.finalVertices.limit() > 0) {
+        if (!disposed && elements.buffer.elements() > 0) {
             vertexBuffers[id] = GL15.glGenBuffers();
             idxBuffers[id] = GL15.glGenBuffers();
-            vertexCount[id] = elements.finalIndices.limit();
+            vaoCount[id] = GL30.glGenVertexArrays();
 
-            VertexBufferObjectUtil.bufferVboElementData(idxBuffers[id], elements.finalIndices, GL15.GL_STATIC_DRAW);
-            VertexBufferObjectUtil.bufferVboData(vertexBuffers[id], elements.finalVertices, GL15.GL_STATIC_DRAW);
+            GL30.glBindVertexArray(vaoCount[id]);
+
+            GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vertexBuffers[id]);
+            elements.buffer.writeBuffer(buffer -> {
+                GL15.glBufferData(GL15.GL_ARRAY_BUFFER, buffer, GL30.GL_STATIC_DRAW);
+            });
+
+            for (VertexResource.VertexDefinition definition : elements.buffer.definitions()) {
+                GL30.glEnableVertexAttribArray(definition.location);
+                GL30.glVertexAttribPointer(definition.location, definition.attribute.count,
+                        definition.attribute.mapping.glType, false, elements.buffer.inStride(), definition.offset);
+            }
+
+            GL30.glBindBuffer(GL30.GL_ELEMENT_ARRAY_BUFFER, idxBuffers[id]);
+            elements.indices.writeBuffer((buffer) -> GL30.glBufferData(GL30.GL_ELEMENT_ARRAY_BUFFER, buffer, GL30.GL_STATIC_DRAW));
+            vertexCount[id] = elements.indices.indices();
+
+            GL30.glBindVertexArray(0);
+
+//            VertexBufferObjectUtil.bufferVboElementData(idxBuffers[id], elements.finalIndices, GL15.GL_STATIC_DRAW);
+//            VertexBufferObjectUtil.bufferVboData(vertexBuffers[id], elements.finalVertices, GL15.GL_STATIC_DRAW);
         } else {
             vertexBuffers[id] = 0;
             idxBuffers[id] = 0;
@@ -181,36 +218,40 @@ public class ChunkMesh {
                     return;
                 }
 
-                glEnableClientState(GL_VERTEX_ARRAY);
-                glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-                glEnableClientState(GL_COLOR_ARRAY);
-                glEnableClientState(GL_NORMAL_ARRAY);
+                GL30.glBindVertexArray(vaoCount[id]);
+                GL30.glDrawElements(GL30.GL_TRIANGLES, vertexCount[id], GL30.GL_UNSIGNED_INT, 0);
+                GL30.glBindVertexArray(0);
 
-                GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, idxBuffers[id]);
-                GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vertexBuffers[id]);
-
-                glVertexPointer(SIZE_VERTEX, GL11.GL_FLOAT, STRIDE, OFFSET_VERTEX);
-
-                GL13.glClientActiveTexture(GL13.GL_TEXTURE0);
-                glTexCoordPointer(SIZE_TEX0, GL11.GL_FLOAT, STRIDE, OFFSET_TEX_0);
-
-                GL13.glClientActiveTexture(GL13.GL_TEXTURE1);
-                glTexCoordPointer(SIZE_TEX1, GL11.GL_FLOAT, STRIDE, OFFSET_TEX_1);
-
-                glColorPointer(SIZE_COLOR * 4, GL11.GL_UNSIGNED_BYTE, STRIDE, OFFSET_COLOR);
-
-                glNormalPointer(GL11.GL_FLOAT, STRIDE, OFFSET_NORMAL);
-
-                GL11.glDrawElements(GL11.GL_TRIANGLES, vertexCount[id], GL11.GL_UNSIGNED_INT, 0);
-
-
-                GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
-                GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, 0);
-
-                glDisableClientState(GL_NORMAL_ARRAY);
-                glDisableClientState(GL_COLOR_ARRAY);
-                glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-                glDisableClientState(GL_VERTEX_ARRAY);
+//                glEnableClientState(GL_VERTEX_ARRAY);
+//                glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+//                glEnableClientState(GL_COLOR_ARRAY);
+//                glEnableClientState(GL_NORMAL_ARRAY);
+//
+//                GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, idxBuffers[id]);
+//                GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vertexBuffers[id]);
+//
+//                glVertexPointer(SIZE_VERTEX, GL11.GL_FLOAT, STRIDE, OFFSET_VERTEX);
+//
+//                GL13.glClientActiveTexture(GL13.GL_TEXTURE0);
+//                glTexCoordPointer(SIZE_TEX0, GL11.GL_FLOAT, STRIDE, OFFSET_TEX_0);
+//
+//                GL13.glClientActiveTexture(GL13.GL_TEXTURE1);
+//                glTexCoordPointer(SIZE_TEX1, GL11.GL_FLOAT, STRIDE, OFFSET_TEX_1);
+//
+//                glColorPointer(SIZE_COLOR * 4, GL11.GL_UNSIGNED_BYTE, STRIDE, OFFSET_COLOR);
+//
+//                glNormalPointer(GL11.GL_FLOAT, STRIDE, OFFSET_NORMAL);
+//
+//                GL11.glDrawElements(GL11.GL_TRIANGLES, vertexCount[id], GL11.GL_UNSIGNED_INT, 0);
+//
+//
+//                GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
+//                GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, 0);
+//
+//                glDisableClientState(GL_NORMAL_ARRAY);
+//                glDisableClientState(GL_COLOR_ARRAY);
+//                glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+//                glDisableClientState(GL_VERTEX_ARRAY);
 
             } finally {
                 lock.unlock();
@@ -296,6 +337,12 @@ public class ChunkMesh {
                         GL15.glDeleteBuffers(id);
                         idxBuffers[i] = 0;
                     }
+
+                    id = vaoCount[i];
+                    if (id != 0) {
+                        GL30.glDeleteVertexArrays(id);
+                        vaoCount[i] = 0;
+                    }
                 }
 
                 disposed = true;
@@ -353,33 +400,77 @@ public class ChunkMesh {
      */
     public static class VertexElements {
 
-        public final TFloatList normals;
-        public final TFloatList vertices;
-        public final TFloatList tex;
-        public final TFloatList color;
-        public final TIntList indices;
-        public final TIntList flags;
-        public final TIntList frames;
-        public final TFloatList sunlight;
-        public final TFloatList blocklight;
-        public final TFloatList ambientOcclusion;
-        public int vertexCount;
+        public static final int VERTEX_INDEX = 0; // vec3
+        public static final int NORMAL_INDEX = 1;  // vec3
+        public static final int UV0_INDEX = 2;  // vec3
 
-        public IntBuffer finalVertices;
-        public IntBuffer finalIndices;
+        public static final int FLAGS_INDEX = 3;  // uint
+        public static final int FRAME_INDEX = 4; // uint
+
+        public static final int SUNLIGHT_INDEX = 5; // float
+        public static final int BLOCK_INDEX = 6; // float
+        public static final int AMBIENT_OCCLUSION_INDEX = 7; // float
+
+        public final VertexResource buffer;
+        public final IndexResource indices = new IndexResource();
+
+        public final VertexAttributeBinding<Vector3fc, Vector3f> position;
+        public final VertexAttributeBinding<Vector3fc, Vector3f> normals;
+        public final VertexAttributeBinding<Vector2fc, Vector2f> uv0;
+//        public final VertexAttributeBinding<Colorc, Color> color; // color data is unused
+
+        public final VertexIntegerAttributeBinding flags;
+        public final VertexIntegerAttributeBinding frames;
+
+        public final VertexFloatAttributeBinding sunlight;
+        public final VertexFloatAttributeBinding blockLight;
+        public final VertexFloatAttributeBinding ambientOcclusion;
+        public  int vertexCount;
+
+
+        //        public final TFloatList normals;
+//        public final TFloatList vertices;
+//        public final TFloatList tex;
+//        public final TFloatList color;
+//        public final TIntList indices;
+//        public final TIntList flags;
+//        public final TIntList frames;
+//        public final TFloatList sunlight;
+//        public final TFloatList blocklight;
+//        public final TFloatList ambientOcclusion;
+//        public int vertexCount;
+
+//        public IntBuffer finalVertices;
+//        public IntBuffer finalIndices;
 
         VertexElements() {
-            vertexCount = 0;
-            normals = new TFloatArrayList();
-            vertices = new TFloatArrayList();
-            tex = new TFloatArrayList();
-            color = new TFloatArrayList();
-            indices = new TIntArrayList();
-            flags = new TIntArrayList();
-            frames = new TIntArrayList();
-            sunlight = new TFloatArrayList();
-            blocklight = new TFloatArrayList();
-            ambientOcclusion = new TFloatArrayList();
+            VertexResourceBuilder builder = new VertexResourceBuilder();
+            position = builder.add(VERTEX_INDEX, GLAttributes.VECTOR_3_F_VERTEX_ATTRIBUTE);
+            normals = builder.add(NORMAL_INDEX, GLAttributes.VECTOR_3_F_VERTEX_ATTRIBUTE);
+            uv0 = builder.add(UV0_INDEX, GLAttributes.VECTOR_2_F_VERTEX_ATTRIBUTE);
+//            color = builder.add(1, GLAttributes.COLOR_4_F_VERTEX_ATTRIBUTE);
+
+            flags = builder.add(FLAGS_INDEX, GLAttributes.BYTE_1_VERTEX_ATTRIBUTE);
+            frames = builder.add(FRAME_INDEX, GLAttributes.BYTE_1_VERTEX_ATTRIBUTE);
+
+            sunlight = builder.add(SUNLIGHT_INDEX, GLAttributes.FLOAT_1_VERTEX_ATTRIBUTE);
+            blockLight = builder.add(BLOCK_INDEX, GLAttributes.FLOAT_1_VERTEX_ATTRIBUTE);
+            ambientOcclusion = builder.add(AMBIENT_OCCLUSION_INDEX, GLAttributes.FLOAT_1_VERTEX_ATTRIBUTE);
+
+            buffer = builder.build();
+
+//
+//            vertexCount = 0;
+//            normals = new TFloatArrayList();
+//            vertices = new TFloatArrayList();
+//            tex = new TFloatArrayList();
+//            color = new TFloatArrayList();
+//            indices = new TIntArrayList();
+//            flags = new TIntArrayList();
+//            frames = new TIntArrayList();
+//            sunlight = new TFloatArrayList();
+//            blocklight = new TFloatArrayList();
+//            ambientOcclusion = new TFloatArrayList();
         }
     }
 }

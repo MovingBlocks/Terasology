@@ -82,33 +82,48 @@ public class BlockMeshPart {
     public void appendTo(ChunkMesh chunk, ChunkView chunkView, int offsetX, int offsetY, int offsetZ, ChunkMesh.RenderType renderType, ChunkVertexFlag flags) {
         ChunkMesh.VertexElements elements = chunk.getVertexElements(renderType);
         for (Vector2f texCoord : texCoords) {
-            elements.tex.add(texCoord.x);
-            elements.tex.add(texCoord.y);
+//            elements.tex.add(texCoord.x);
+//            elements.tex.add(texCoord.y);
+
+            elements.uv0.put(texCoord);
         }
 
         int nextIndex = elements.vertexCount;
+        Vector3f pos = new Vector3f();
         for (int vIdx = 0; vIdx < vertices.length; ++vIdx) {
-            elements.color.add(1);
-            elements.color.add(1);
-            elements.color.add(1);
-            elements.color.add(1);
-            elements.vertices.add(vertices[vIdx].x + offsetX);
-            elements.vertices.add(vertices[vIdx].y + offsetY);
-            elements.vertices.add(vertices[vIdx].z + offsetZ);
-            elements.normals.add(normals[vIdx].x);
-            elements.normals.add(normals[vIdx].y);
-            elements.normals.add(normals[vIdx].z);
-            elements.flags.add(flags.getValue());
-            elements.frames.add(texFrames);
+//            elements.color.put(1);
+
+//            elements.color.add(1);
+//            elements.color.add(1);
+//            elements.color.add(1);
+//            elements.color.add(1);
+            elements.position.put(pos.set(vertices[vIdx]).add(offsetX, offsetY, offsetZ));
+            elements.normals.put(normals[vIdx]);
+            elements.flags.put(flags.getValue());
+            elements.frames.put(texFrames);
+
             float[] lightingData = calcLightingValuesForVertexPos(chunkView, vertices[vIdx].add(offsetX, offsetY, offsetZ, new Vector3f()), normals[vIdx]);
-            elements.sunlight.add(lightingData[0]);
-            elements.blocklight.add(lightingData[1]);
-            elements.ambientOcclusion.add(lightingData[2]);
+            elements.sunlight.put(lightingData[0]);
+            elements.blockLight.put(lightingData[1]);
+            elements.ambientOcclusion.put(lightingData[2]);
+
+//            elements.vertices.add(vertices[vIdx].x + offsetX);
+//            elements.vertices.add(vertices[vIdx].y + offsetY);
+//            elements.vertices.add(vertices[vIdx].z + offsetZ);
+//            elements.normals.add(normals[vIdx].x);
+//            elements.normals.add(normals[vIdx].y);
+//            elements.normals.add(normals[vIdx].z);
+//            elements.flags.add(flags.getValue());
+//            elements.frames.add(texFrames);
+//            elements.sunlight.add(lightingData[0]);
+//            elements.blocklight.add(lightingData[1]);
+//            elements.ambientOcclusion.add(lightingData[2]);
         }
         elements.vertexCount += vertices.length;
 
         for (int index : indices) {
-            elements.indices.add(index + nextIndex);
+            elements.indices.put(index + nextIndex);
+//            elements.indices.add(index + nextIndex);
         }
     }
 

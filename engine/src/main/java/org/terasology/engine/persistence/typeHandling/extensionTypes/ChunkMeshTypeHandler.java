@@ -14,6 +14,7 @@ import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 public class ChunkMeshTypeHandler extends TypeHandler<ChunkMesh> {
     @Override
@@ -23,8 +24,17 @@ public class ChunkMeshTypeHandler extends TypeHandler<ChunkMesh> {
         }
         List<PersistedData> data = new ArrayList<>();
         for (ChunkMesh.RenderType renderType : ChunkMesh.RenderType.values()) {
-            data.add(serializer.serialize(asByteBuffer(value.getVertexElements(renderType).finalVertices)));
-            data.add(serializer.serialize(asByteBuffer(value.getVertexElements(renderType).finalIndices)));
+
+            value.getVertexElements(renderType).buffer.writeBuffer(buffer -> {
+                data.add(serializer.serialize(buffer));
+            });
+            value.getVertexElements(renderType).indices.writeBuffer(buffer -> {
+                data.add(serializer.serialize(buffer));
+//                data.add(serializer.serialize(buffer));
+            });
+
+//            data.add(serializer.serialize(asByteBuffer(value.getVertexElements(renderType).finalVertices)));
+//            data.add(serializer.serialize(asByteBuffer(value.getVertexElements(renderType).finalIndices)));
         }
         return serializer.serialize(data);
     }
@@ -41,8 +51,8 @@ public class ChunkMeshTypeHandler extends TypeHandler<ChunkMesh> {
         }
         ChunkMesh result = new ChunkMesh();
         for (ChunkMesh.RenderType renderType : ChunkMesh.RenderType.values()) {
-            result.getVertexElements(renderType).finalVertices = asBuffers.remove(0);
-            result.getVertexElements(renderType).finalIndices = asBuffers.remove(0);
+//            result.getVertexElements(renderType).finalVertices = asBuffers.remove(0);
+//            result.getVertexElements(renderType).finalIndices = asBuffers.remove(0);
         }
         result.generateVBOs();
         return Optional.of(result);

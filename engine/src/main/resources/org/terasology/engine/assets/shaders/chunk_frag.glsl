@@ -1,18 +1,6 @@
-/*
- * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
-*/
+#version 330 core
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 
 #define WATER_COLOR_SWIMMING 0.8, 1.0, 1.0, 0.975
 #define WATER_TINT 0.1, 0.41, 0.627, 1.0
@@ -37,12 +25,12 @@ uniform sampler2D texSceneOpaque;
 uniform sampler2D textureWaterNormal;
 uniform sampler2D textureWaterNormalAlt;
 
-varying vec3 waterNormalViewSpace;
+in vec3 waterNormalViewSpace;
 #endif
 
 #if defined (NORMAL_MAPPING)
-varying vec3 worldSpaceNormal;
-varying mat3 normalMatrix;
+in vec3 worldSpaceNormal;
+//in mat3 normalMatrix;
 
 uniform sampler2D textureAtlasNormal;
 #endif
@@ -57,23 +45,29 @@ uniform sampler2D textureAtlasHeight;
 
 
 #if defined (FLICKERING_LIGHT)
-varying float flickeringLightOffset;
+in float flickeringLightOffset;
 #endif
 
-varying vec3 vertexWorldPos;
-varying vec4 vertexViewPos;
-varying vec4 vertexProjPos;
-varying vec3 sunVecView;
+in vec3 vertexWorldPos;
+in vec4 vertexViewPos;
+in vec4 vertexProjPos;
+in vec3 sunVecView;
 
-varying vec3 normal;
+in vec3 normal;
 
-varying float blockHint;
-varying float isUpside;
+in float blockHint;
+in float isUpside;
+
+in vec2 v_uv0;
 
 uniform sampler2D textureAtlas;
 uniform sampler2D textureEffects;
 
 uniform float clip;
+
+in float v_sunlight;
+in float v_blocklight;
+in float v_ambientLight;
 
 //inverse is not available in GLSL 1.20, so calculate it manually
 mat2 inverse2(mat2 m) {
@@ -90,7 +84,7 @@ void main() {
     }
 #endif
 
-    vec2 texCoord = gl_TexCoord[0].xy;
+    vec2 texCoord = v_uv0.xy;
 
     vec3 normalizedViewPos = -normalize(vertexViewPos.xyz);
     vec2 projectedPos = projectVertexToTexCoord(vertexProjPos);
@@ -100,11 +94,11 @@ void main() {
 #if defined (NORMAL_MAPPING) || defined (PARALLAX_MAPPING)
     // TODO: Calculates the tangent frame on the fly - this is absurdly costly... But storing
     // the tangent for each vertex in the chunk VBO might be not the best idea either.
-    // The only reason dFdx and dFdy are used here is that it happens to be possible to relate 
-    // both view and UV coordinates to screen-space coordinated. The specific relationship between 
+    // The only reason dFdx and dFdy are used here is that it happens to be possible to relate
+    // both view and UV coordinates to screen-space coordinated. The specific relationship between
     // screen coordinates and view coordinates is irrelevant.
     mat2x3 screenToView = mat2x3(dFdx(vertexViewPos.xyz), dFdy(vertexViewPos.xyz));
-    mat2   screenToUv   = mat2  (dFdx(gl_TexCoord[0].xy), dFdy(gl_TexCoord[0].xy)) / TEXTURE_OFFSET;
+    mat2   screenToUv   = mat2  (dFdx(v_uv0.xy), dFdy(v_uv0.xy)) / TEXTURE_OFFSET;
     mat2 uvToScreen = inverse2(screenToUv);
     mat2x3 uvToView = screenToView * uvToScreen;
 
@@ -112,20 +106,20 @@ void main() {
     vec2 viewDirectionUvProjection = -normalizedViewPos * uvToView;
 
     float height = parallaxScale * texture2D(textureAtlasHeight, texCoord).r - parallaxBias;
-    // Ideally this should be divided by dot(normal, normalizedViewPos), as the offset for texCoord 
-    // is the component parallel to the surface of a vector along the view's forward axis, 
-    // the other component being a vector perpendicular to the surface and having magnitude "height". 
-    // In practice the current way looks better at low angles, as the height-map can't make the triangle 
+    // Ideally this should be divided by dot(normal, normalizedViewPos), as the offset for texCoord
+    // is the component parallel to the surface of a vector along the view's forward axis,
+    // the other component being a vector perpendicular to the surface and having magnitude "height".
+    // In practice the current way looks better at low angles, as the height-map can't make the triangle
     // protrude beyond its boundaries like displacement mapping would.
     texCoord += height * viewDirectionUvProjection * TEXTURE_OFFSET;
-	
+
     //Crudely prevent the parallax from extending to other textures in the same atlas.
-    vec2 texCorner = floor(gl_TexCoord[0].xy/TEXTURE_OFFSET)*TEXTURE_OFFSET;
+    vec2 texCorner = floor(v_uv0.xy/TEXTURE_OFFSET)*TEXTURE_OFFSET;
     vec2 texSize = vec2(1,1)*TEXTURE_OFFSET*0.9999; //Remain strictly this side of the edge of the texture.
     texCoord = clamp(texCoord, texCorner, texCorner + texSize);
 #endif
 #if defined (NORMAL_MAPPING)
-    // Normalised but not orthonormalised. It should be orthogonal anyway (except for some non-rectangular 
+    // Normalised but not orthonormalised. It should be orthogonal anyway (except for some non-rectangular
     // block shapes like torches), but it's not obvious what's the best thing to do when it isn't.
     mat3 uvnSpaceToViewSpace = mat3(normalize(uvToView[0]), normalize(uvToView[1]), normal);
     normalOpaque = normalize(texture2D(textureAtlasNormal, texCoord).xyz * 2.0 - 1.0);
@@ -182,14 +176,14 @@ void main() {
 
 #endif
 
-    // Calculate daylight lighting value
-    float daylightValue = gl_TexCoord[1].x;
-    // Calculate blocklight lighting value
-    float blocklightValue = gl_TexCoord[1].y;
-    // ...and finally the occlusion value
-    float occlusionValue = expOccValue(gl_TexCoord[1].z);
+//    // Calculate daylight lighting value
+//    float daylightValue = gl_TexCoord[1].x;
+//    // Calculate blocklight lighting value
+//    float blocklightValue = gl_TexCoord[1].y;
+//    // ...and finally the occlusion value
+//    float occlusionValue = expOccValue(gl_TexCoord[1].z);
 
-    float blocklightColorBrightness = calcBlocklightColorBrightness(blocklightValue
+    float blocklightColorBrightness = calcBlocklightColorBrightness(v_blocklight
 #if defined (FLICKERING_LIGHT)
         , flickeringLightOffset
 #endif
@@ -200,25 +194,25 @@ void main() {
     vec3 daylightColorValue;
 
     if (isOceanWater) {
-        daylightColorValue = calcSunlightColorWater(daylightValue, normalWater, sunVecViewAdjusted);
+        daylightColorValue = calcSunlightColorWater(v_sunlight, normalWater, sunVecViewAdjusted);
     } else {
-        daylightColorValue = calcSunlightColorOpaque(daylightValue, normal, sunVecViewAdjusted);
+        daylightColorValue = calcSunlightColorOpaque(v_sunlight, normal, sunVecViewAdjusted);
     }
 
     vec3 combinedLightValue = max(daylightColorValue, blocklightColorValue);
 #elif defined (FEATURE_USE_FORWARD_LIGHTING)
-    vec3 daylightColorValue = calcSunlightColorOpaque(daylightValue, normal, sunVecViewAdjusted);
+    vec3 daylightColorValue = calcSunlightColorOpaque(v_sunlight, normal, sunVecViewAdjusted);
     vec3 combinedLightValue = max(daylightColorValue, blocklightColorValue);
 #endif
 
 #if defined (FEATURE_REFRACTIVE_PASS)
     // Apply the final lighting mix
-    color.xyz *= combinedLightValue * occlusionValue;
+    color.xyz *= combinedLightValue * (v_ambientLight * v_ambientLight);
 
     // Apply reflection and refraction AFTER the lighting has been applied (otherwise bright areas below water become dark)
     // The water tint has still to be adjusted adjusted though...
     if (isWater && isOceanWater) {
-        float specularHighlight = WATER_SPEC * calcDayAndNightLightingFactor(daylightValue, daylight) * calcSpecLightNormalized(normalWater, sunVecViewAdjusted, normalizedViewPos, waterSpecExp);
+        float specularHighlight = WATER_SPEC * calcDayAndNightLightingFactor(v_sunlight, daylight) * calcSpecLightNormalized(normalWater, sunVecViewAdjusted, normalizedViewPos, waterSpecExp);
         color.xyz += vec3(specularHighlight, specularHighlight, specularHighlight);
 
         vec4 reflectionColor = vec4(texture2D(textureWaterReflection, projectedPos + normalWaterOffset.xy * waterRefraction).xyz, 1.0);
@@ -259,9 +253,9 @@ void main() {
     }
 #elif defined (FEATURE_USE_FORWARD_LIGHTING)
     // Apply the final lighting mix
-    color.xyz *= combinedLightValue * occlusionValue;
+    color.xyz *= combinedLightValue * (v_ambientLight * v_ambientLight);
 #else
-    gl_FragData[2].rgba = vec4(blocklightColorBrightness, daylightValue, 0.0, 0.0);
+    gl_FragData[2].rgba = vec4(blocklightColorBrightness, v_sunlight, 0.0, 0.0);
 #endif
 
 #if defined (FEATURE_REFRACTIVE_PASS) || defined (FEATURE_USE_FORWARD_LIGHTING)
@@ -273,7 +267,7 @@ void main() {
 #else
     gl_FragData[0].rgb = color.rgb;
     // Encode occlusion value into the alpha channel
-    gl_FragData[0].a = occlusionValue;
+    gl_FragData[0].a = (v_ambientLight * v_ambientLight);
     // Encode shininess value into the normal alpha channel
     gl_FragData[1].a = shininess;
 #endif
