@@ -7,9 +7,7 @@ import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.network.Replicate;
 import org.terasology.engine.world.block.BlockRegion;
 
-/**
- *
- */
+
 public class BlockRegionComponent implements Component {
     /**
      * May be null.

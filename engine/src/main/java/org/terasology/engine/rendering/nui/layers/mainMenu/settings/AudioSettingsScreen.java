@@ -11,8 +11,6 @@ import org.terasology.nui.widgets.UISlider;
 import org.terasology.engine.registry.In;
 import org.terasology.engine.rendering.nui.CoreScreenLayer;
 
-/**
- */
 public class AudioSettingsScreen extends CoreScreenLayer {
 
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:AudioMenuScreen");

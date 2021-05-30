@@ -11,8 +11,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.config.SystemConfig;
+import org.terasology.engine.core.PathManager;
 import org.terasology.engine.core.TerasologyConstants;
-import org.terasology.engine.core.paths.PathManager;
 import org.terasology.gestalt.module.Module;
 import org.terasology.gestalt.module.ModuleEnvironment;
 import org.terasology.gestalt.module.ModuleFactory;
@@ -40,7 +40,6 @@ import java.nio.file.Path;
 import java.security.Policy;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -48,7 +47,7 @@ import java.util.stream.Collectors;
 
 public class ModuleManager {
     /** Set this property to "true" to allow modules on the classpath. */
-    public final static String LOAD_CLASSPATH_MODULES_PROPERTY = "org.terasology.load_classpath_modules";
+    public static final String LOAD_CLASSPATH_MODULES_PROPERTY = "org.terasology.load_classpath_modules";
 
     private static final Logger logger = LoggerFactory.getLogger(ModuleManager.class);
     private final StandardPermissionProviderFactory permissionProviderFactory = new StandardPermissionProviderFactory();
@@ -96,6 +95,14 @@ public class ModuleManager {
         installManager = new ModuleInstallManager(this, masterServerAddress);
     }
 
+    public ModuleManager(Config config) {
+        this(config, Collections.emptyList());
+    }
+
+    public ModuleManager(Config config, List<Class<?>> classesOnClasspathsToAddToEngine) {
+        this(config.getNetwork().getMasterServer(), classesOnClasspathsToAddToEngine);
+    }
+
     /**
      * I wondered why this is important, and found MovingBlocks/Terasology#1450.
      * It's not a worry that the engine module wouldn't be loaded without it.
@@ -107,7 +114,7 @@ public class ModuleManager {
         engineDep.setId(engineModule.getId());
         engineDep.setMinVersion(engineModule.getVersion());
 
-        HashSet<Name> engineModules = Sets.newHashSet(engineModule.getId());
+        Set<Name> engineModules = Sets.newHashSet(engineModule.getId());
         engineModules.addAll(engineModule.getMetadata().getDependencies().stream().map(DependencyInfo::getId).collect(Collectors.toList()));
 
         registry.stream()
@@ -117,7 +124,9 @@ public class ModuleManager {
 
     private void loadModulesFromApplicationPath(PathManager pathManager) {
         ModulePathScanner scanner = new ModulePathScanner(moduleFactory);
-        List<File> paths = pathManager.getModulePaths().stream().map(Path::toFile).collect(Collectors.toList());
+        List<File> paths = pathManager.getModulePaths().stream()
+                .map(Path::toFile)
+                .collect(Collectors.toList());
         scanner.scan(registry, paths);
     }
 
@@ -154,14 +163,6 @@ public class ModuleManager {
         return engine;
     }
 
-    public ModuleManager(Config config) {
-        this(config, Collections.emptyList());
-    }
-
-    public ModuleManager(Config config, List<Class<?>> classesOnClasspathsToAddToEngine) {
-        this(config.getNetwork().getMasterServer(), classesOnClasspathsToAddToEngine);
-    }
-
     private ModuleMetadataJsonAdapter newMetadataReader() {
         final ModuleMetadataJsonAdapter metadataJsonAdapter = new ModuleMetadataJsonAdapter();
         for (ModuleExtension ext : StandardModuleExtension.values()) {
@@ -194,7 +195,7 @@ public class ModuleManager {
      *
      * @deprecated Use {@link #resolveAndLoadEnvironment} if you need module dependency resolution.
      */
-    @Deprecated(/*since="4.4.0"*/)
+    @Deprecated/*(since="4.4.0")*/
     public ModuleRegistry getRegistry() {
         return registry;
     }

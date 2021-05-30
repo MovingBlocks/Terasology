@@ -24,8 +24,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
-/**
- */
 public class ByteCodeReflectFactory implements ReflectFactory {
     private static final Logger logger = LoggerFactory.getLogger(ByteCodeReflectFactory.class);
 

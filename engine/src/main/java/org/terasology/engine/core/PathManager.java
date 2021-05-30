@@ -1,7 +1,7 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-package org.terasology.engine.core.paths;
+package org.terasology.engine.core;
 
 import com.google.common.collect.ImmutableList;
 import com.sun.jna.platform.win32.KnownFolders;
@@ -141,12 +141,26 @@ public final class PathManager {
     }
 
     /**
+     * INTERNAL: use only for testing!
+     *
+     * Inject a path manager instance to be used as the "singleton" instance.
+     *
+     * @param pathManager the new "singleton" instance, will be returned by subsequent calls to {@link #getInstance()}
+     * @return the old path manager instance
+     */
+    static PathManager setInstance(PathManager pathManager) {
+        PathManager oldInstance = instance;
+        instance = pathManager;
+        return oldInstance;
+    }
+
+    /**
      * Uses the given path as the home instead of the default home path.
      * @param rootPath Path to use as the home path.
      * @throws IOException Thrown when required directories cannot be accessed.
      */
     public void useOverrideHomePath(Path rootPath) throws IOException {
-        this.homePath = rootPath;
+        this.homePath = rootPath.toAbsolutePath();
         updateDirs();
     }
 
@@ -341,7 +355,7 @@ public final class PathManager {
         Path homeModPath = homePath.resolve(MODULE_DIR);
         Path modCachePath = homePath.resolve(MODULE_CACHE_DIR);
 
-        if (homePath == installPath) {
+        if (homePath.equals(installPath)) {
             return ImmutableList.of(modCachePath, homeModPath);
         } else {
             Path installModPath = installPath.resolve(MODULE_DIR);

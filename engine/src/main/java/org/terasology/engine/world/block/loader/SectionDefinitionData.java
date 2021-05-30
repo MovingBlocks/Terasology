@@ -12,8 +12,6 @@ import org.terasology.engine.world.block.tiles.BlockTile;
 
 import java.util.EnumMap;
 
-/**
- */
 @API
 public class SectionDefinitionData {
     private String displayName = "";

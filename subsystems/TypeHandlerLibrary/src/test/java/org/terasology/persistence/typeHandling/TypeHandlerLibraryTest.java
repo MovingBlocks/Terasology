@@ -33,7 +33,7 @@ class TypeHandlerLibraryTest {
     }
 
     @MappedContainer
-    private static class AMappedContainer {}
+    private static class AMappedContainer { }
 
     @Test
     public void testMappedContainerHandler() {
@@ -45,17 +45,17 @@ class TypeHandlerLibraryTest {
     @Test
     public void testCollectionHandler() {
         TypeHandler<Set<Integer>> setHandler =
-                typeHandlerLibrary.getTypeHandler(new TypeInfo<Set<Integer>>() {}).get();
+                typeHandlerLibrary.getTypeHandler(new TypeInfo<Set<Integer>>() { }).get();
 
         assertTrue(setHandler instanceof CollectionTypeHandler);
 
         TypeHandler<List<Integer>> listHandler =
-                typeHandlerLibrary.getTypeHandler(new TypeInfo<List<Integer>>() {}).get();
+                typeHandlerLibrary.getTypeHandler(new TypeInfo<List<Integer>>() { }).get();
 
         assertTrue(listHandler instanceof CollectionTypeHandler);
 
         TypeHandler<Queue<Integer>> queueHandler =
-                typeHandlerLibrary.getTypeHandler(new TypeInfo<Queue<Integer>>() {}).get();
+                typeHandlerLibrary.getTypeHandler(new TypeInfo<Queue<Integer>>() { }).get();
 
         assertTrue(queueHandler instanceof CollectionTypeHandler);
     }
@@ -92,5 +92,5 @@ class TypeHandlerLibraryTest {
         assertTrue(handler instanceof RuntimeDelegatingTypeHandler);
     }
 
-    private enum AnEnum {}
+    private enum AnEnum { }
 }

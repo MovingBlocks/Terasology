@@ -14,23 +14,23 @@ import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL32;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.gestalt.assets.AssetType;
-import org.terasology.gestalt.assets.DisposableResource;
-import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.config.RenderingConfig;
 import org.terasology.engine.core.GameThread;
+import org.terasology.engine.core.PathManager;
 import org.terasology.engine.core.TerasologyConstants;
-import org.terasology.engine.core.paths.PathManager;
 import org.terasology.engine.core.subsystem.lwjgl.LwjglGraphicsProcessing;
 import org.terasology.engine.registry.CoreRegistry;
-import org.terasology.engine.rendering.primitives.ChunkVertexFlag;
 import org.terasology.engine.rendering.assets.shader.Shader;
 import org.terasology.engine.rendering.assets.shader.ShaderData;
 import org.terasology.engine.rendering.assets.shader.ShaderParameterMetadata;
 import org.terasology.engine.rendering.assets.shader.ShaderProgramFeature;
+import org.terasology.engine.rendering.primitives.ChunkVertexFlag;
 import org.terasology.engine.rendering.world.WorldRenderer;
 import org.terasology.engine.world.block.tiles.WorldAtlas;
+import org.terasology.gestalt.assets.AssetType;
+import org.terasology.gestalt.assets.DisposableResource;
+import org.terasology.gestalt.assets.ResourceUrn;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -50,17 +50,10 @@ import java.util.Set;
  * </p>
  */
 public class GLSLShader extends Shader {
-
-    private static final Logger logger = LoggerFactory.getLogger(GLSLShader.class);
-
     // TODO this should be handled another way, we need to get ssao parameters here
-    public int ssaoKernelElements = 32;
     public static int ssaoNoiseSize = 4;
 
-    private static String includedFunctionsVertex = "";
-    private static String includedFunctionsFragment = "";
-    private static String includedDefines = "";
-    private static String includedUniforms = "";
+    private static final Logger logger = LoggerFactory.getLogger(GLSLShader.class);
 
     static {
         try (
@@ -77,6 +70,14 @@ public class GLSLShader extends Shader {
             logger.error("Failed to load Include shader resources");
         }
     }
+
+    private static String includedFunctionsVertex = "";
+    private static String includedFunctionsFragment = "";
+    private static String includedDefines = "";
+    private static String includedUniforms = "";
+
+    // TODO this should be handled another way, we need to get ssao parameters here
+    public int ssaoKernelElements = 32;
 
     private EnumSet<ShaderProgramFeature> availableFeatures = Sets.newEnumSet(Collections.emptyList(), ShaderProgramFeature.class);
     private ShaderData shaderProgramBase;

@@ -13,8 +13,6 @@ import org.terasology.persistence.typeHandling.TypeHandler;
 import java.util.List;
 import java.util.Optional;
 
-/**
- */
 public class EntityRefTypeHandler extends TypeHandler<EntityRef> {
 
     private EngineEntityManager entityManager;

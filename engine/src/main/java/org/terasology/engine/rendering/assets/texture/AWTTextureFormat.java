@@ -22,8 +22,6 @@ import java.util.function.Predicate;
 
 import static org.terasology.gestalt.assets.module.ModuleAssetScanner.OVERRIDE_FOLDER;
 
-/**
- */
 @RegisterAssetFileFormat
 public class AWTTextureFormat extends AbstractAssetFileFormat<TextureData> {
 

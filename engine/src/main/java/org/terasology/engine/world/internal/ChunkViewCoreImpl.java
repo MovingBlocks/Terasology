@@ -14,8 +14,6 @@ import org.terasology.engine.world.block.BlockRegionc;
 import org.terasology.engine.world.chunks.Chunk;
 import org.terasology.engine.world.chunks.Chunks;
 
-/**
- */
 public class ChunkViewCoreImpl implements ChunkViewCore {
 
     private static final Logger logger = LoggerFactory.getLogger(ChunkViewCoreImpl.class);
