@@ -359,27 +359,28 @@ public class EventSystemImpl implements EventSystem {
 
         @Override
         public void invoke(EntityRef entity, Event event) {
+            // 2021-05-28 We used to catch all kinds of exceptions here that occurred during event invokation. As most
+            // module logic depends on event handling, this basically covered ALL exceptions thrown in any system.
+            //
+            // There might be specific events that can be safely handled here. In that case, we should add the try-catch
+            // back in for the most specific exception type as possible.
+            Object[] params = new Object[2 + componentParams.size()];
+            params[0] = event;
+            params[1] = entity;
+            for (int i = 0; i < componentParams.size(); ++i) {
+                params[i + 2] = entity.getComponent(componentParams.get(i));
+            }
+
+
+            if (!activity.isEmpty()) {
+                PerformanceMonitor.startActivity(activity);
+            }
             try {
-                Object[] params = new Object[2 + componentParams.size()];
-                params[0] = event;
-                params[1] = entity;
-                for (int i = 0; i < componentParams.size(); ++i) {
-                    params[i + 2] = entity.getComponent(componentParams.get(i));
-                }
-
-
+                methodAccess.invoke(handler, methodIndex, params);
+            } finally {
                 if (!activity.isEmpty()) {
-                    PerformanceMonitor.startActivity(activity);
+                    PerformanceMonitor.endActivity();
                 }
-                try {
-                    methodAccess.invoke(handler, methodIndex, params);
-                } finally {
-                    if (!activity.isEmpty()) {
-                        PerformanceMonitor.endActivity();
-                    }
-                }
-            } catch (Exception ex) {
-                logger.error("Failed to invoke event", ex);
             }
         }
 
