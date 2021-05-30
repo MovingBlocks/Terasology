@@ -45,4 +45,12 @@ public class LocationChangedEvent implements Event {
     public Quaternionfc currentRotation() {
         return currentRotation;
     }
+
+    public Vector3f positionDelta(Vector3f dest) {
+        return currentPosition.sub(lastPosition, dest);
+    }
+
+    public Quaternionf rotationDelta(Quaternionf dest) {
+        return lastRotation.difference(currentRotation, dest);
+    }
 }
