@@ -1,49 +1,48 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-
 package org.terasology.engine.rendering;
 
+import org.joml.Matrix4f;
+import org.joml.Vector2f;
+import org.joml.Vector2fc;
 import org.joml.Vector3f;
+import org.joml.Vector3fc;
 import org.joml.Vector4f;
-import org.lwjgl.opengl.GL11;
+import org.terasology.engine.logic.players.LocalPlayer;
+import org.terasology.engine.registry.CoreRegistry;
+import org.terasology.engine.rendering.assets.material.Material;
+import org.terasology.engine.rendering.assets.mesh.Mesh;
+import org.terasology.engine.rendering.assets.mesh.MeshBuilder;
+import org.terasology.engine.rendering.assets.mesh.StandardMeshData;
+import org.terasology.engine.rendering.assets.mesh.resource.DrawingMode;
+import org.terasology.engine.rendering.cameras.Camera;
+import org.terasology.engine.rendering.world.WorldRenderer;
+import org.terasology.engine.utilities.Assets;
+import org.terasology.gestalt.module.sandbox.API;
 import org.terasology.joml.geom.AABBf;
 import org.terasology.joml.geom.AABBfc;
-import org.terasology.engine.logic.players.LocalPlayer;
-import org.terasology.gestalt.module.sandbox.API;
-import org.terasology.engine.registry.CoreRegistry;
-
-import static org.lwjgl.opengl.GL11.GL_BLEND;
-import static org.lwjgl.opengl.GL11.GL_LINE_LOOP;
-import static org.lwjgl.opengl.GL11.GL_QUADS;
-import static org.lwjgl.opengl.GL11.glBegin;
-import static org.lwjgl.opengl.GL11.glCallList;
-import static org.lwjgl.opengl.GL11.glColor4f;
-import static org.lwjgl.opengl.GL11.glDeleteLists;
-import static org.lwjgl.opengl.GL11.glDisable;
-import static org.lwjgl.opengl.GL11.glEnable;
-import static org.lwjgl.opengl.GL11.glEnd;
-import static org.lwjgl.opengl.GL11.glEndList;
-import static org.lwjgl.opengl.GL11.glGenLists;
-import static org.lwjgl.opengl.GL11.glNewList;
-import static org.lwjgl.opengl.GL11.glPopMatrix;
-import static org.lwjgl.opengl.GL11.glPushMatrix;
-import static org.lwjgl.opengl.GL11.glScalef;
-import static org.lwjgl.opengl.GL11.glTranslated;
-import static org.lwjgl.opengl.GL11.glVertex3f;
+import org.terasology.nui.Color;
 
 /**
  * Renderer for an AABB.
  */
 @API
-public class AABBRenderer implements BlockOverlayRenderer {
-    private int displayListWire = -1;
-    private int displayListSolid = -1;
+public class AABBRenderer implements BlockOverlayRenderer, AutoCloseable {
     private Vector4f solidColor = new Vector4f(1f, 1f, 1f, 1f);
 
+    protected static final String DEFAULT_MATERIAL_URI = "engine:prog.default";
+
+    private Mesh solidMesh;
+    private Mesh wireMesh;
     private AABBf aabb = new AABBf();
+    private WorldRenderer worldRenderer;
+    private Material defaultMaterial;
 
     public AABBRenderer(AABBfc aabb) {
         this.aabb.set(aabb);
+        worldRenderer = CoreRegistry.get(WorldRenderer.class);
+        defaultMaterial = Assets.getMaterial(DEFAULT_MATERIAL_URI).get();
+
     }
 
     @Override
@@ -55,18 +54,36 @@ public class AABBRenderer implements BlockOverlayRenderer {
     }
 
     public void dispose() {
-        if (displayListWire != -1) {
-            glDeleteLists(displayListWire, 1);
-            displayListWire = -1;
+        if (solidMesh != null) {
+            solidMesh.dispose();
+            solidMesh = null;
         }
-        if (displayListSolid != -1) {
-            glDeleteLists(displayListSolid, 1);
-            displayListSolid = -1;
+        if (wireMesh != null) {
+            wireMesh.dispose();
+            wireMesh = null;
         }
     }
 
     public void setSolidColor(Vector4f color) {
         solidColor = color;
+    }
+
+    private void prepare() {
+        defaultMaterial.enable();
+
+        Matrix4f modelView = new Matrix4f();
+        Camera camera = worldRenderer.getActiveCamera();
+
+        Vector3f center = aabb.center(new Vector3f());
+        Vector3f cameraPosition = CoreRegistry.get(LocalPlayer.class).getViewPosition(new Vector3f());
+        modelView.set(camera.getViewMatrix()).mul(new Matrix4f().setTranslation(
+                center.x() - cameraPosition.x, center.y() - cameraPosition.y,
+                center.z() - cameraPosition.z
+        ));
+
+        defaultMaterial.setMatrix4("modelViewMatrix", modelView);
+        defaultMaterial.setMatrix4("projectionMatrix", camera.getProjectionMatrix());
+
     }
 
     /**
@@ -75,29 +92,13 @@ public class AABBRenderer implements BlockOverlayRenderer {
      */
     @Override
     public void render() {
-        CoreRegistry.get(ShaderManager.class).enableDefault();
-
-        glPushMatrix();
-        Vector3f cameraPosition = CoreRegistry.get(LocalPlayer.class).getViewPosition(new Vector3f());
-        Vector3f center = aabb.center(new Vector3f());
-        glTranslated(center.x - cameraPosition.x, center.y - cameraPosition.y, center.z - cameraPosition.z);
-
+        prepare();
         renderLocally();
-
-        glPopMatrix();
     }
 
     public void renderSolid() {
-        CoreRegistry.get(ShaderManager.class).enableDefault();
-
-        glPushMatrix();
-        Vector3f cameraPosition = CoreRegistry.get(LocalPlayer.class).getViewPosition(new Vector3f());
-        Vector3f center = aabb.center(new Vector3f());
-        glTranslated(center.x - cameraPosition.x, -cameraPosition.y, center.z - cameraPosition.z);
-
+        prepare();
         renderSolidLocally();
-
-        glPopMatrix();
     }
 
     /**
@@ -108,138 +109,123 @@ public class AABBRenderer implements BlockOverlayRenderer {
     }
 
     public void renderLocally() {
-        CoreRegistry.get(ShaderManager.class).enableDefault();
-
-        if (displayListWire == -1) {
+        if (wireMesh == null) {
             generateDisplayListWire();
         }
-
-        glCallList(displayListWire);
+        wireMesh.render();
     }
 
     public void renderSolidLocally() {
-        CoreRegistry.get(ShaderManager.class).enableDefault();
-
-        if (displayListSolid == -1) {
+        if (solidMesh == null) {
             generateDisplayListSolid();
         }
-        glEnable(GL_BLEND);
-        glPushMatrix();
-
-        Vector3f center = aabb.center(new Vector3f());
-        glTranslated(0f, center.y, 0f);
-        glScalef(1.5f, 1.5f, 1.5f);
-
-        glCallList(displayListSolid);
-
-        glPopMatrix();
-        glDisable(GL_BLEND);
+        solidMesh.render();
     }
 
     private void generateDisplayListSolid() {
-        displayListSolid = glGenLists(1);
+        MeshBuilder builder = new MeshBuilder();
+        builder.addBox(aabb.extent(new Vector3f()).mul(-1.0f), aabb.extent(new Vector3f()).mul(2.0f), 0.0f, 0.0f)
+                .setTextureMapper(new MeshBuilder.TextureMapper() {
+                    @Override
+                    public void initialize(Vector3fc offset, Vector3fc size) {
 
-        glNewList(displayListSolid, GL11.GL_COMPILE);
-        glBegin(GL_QUADS);
-        glColor4f(solidColor.x, solidColor.y, solidColor.z, solidColor.w);
+                    }
 
-        Vector3f dimensions = aabb.extent(new Vector3f());
+                    @Override
+                    public Vector2fc map(int vertexIndex, float u, float v) {
+                        switch (vertexIndex) {
+                            // Front face
+                            case  0 : return new Vector2f(0f, 1f);
+                            case  1 : return new Vector2f(1f, 1f);
+                            case  2 : return new Vector2f(1f, 1);
+                            case  3 : return new Vector2f(0f, 1);
+                            // Back face
+                            case  4 : return new Vector2f(1f, 1f);
+                            case  5 : return new Vector2f(1f, 1);
+                            case  6 : return new Vector2f(0f, 1);
+                            case  7 : return new Vector2f(0f, 1f);
+                            // Top face
+                            case  8 : return new Vector2f(1f, 0f);
+                            case  9 : return new Vector2f(1f, 1f);
+                            case 10 : return new Vector2f(0f, 1f);
+                            case 11 : return new Vector2f(0f, 0f);
+                            // Bottom face
+                            case 12 : return new Vector2f(1f, 0f);
+                            case 13 : return new Vector2f(0f, 0f);
+                            case 14 : return new Vector2f(0f, 1f);
+                            case 15 : return new Vector2f(1f, 1f);
+                            // Right face
+                            case 16 : return new Vector2f(1f, 1f);
+                            case 17 : return new Vector2f(1f, 1);
+                            case 18 : return new Vector2f(0f, 1);
+                            case 19 : return new Vector2f(0f, 1f);
+                            // Left face
+                            case 20 : return new Vector2f(0f, 0f);
+                            case 21 : return new Vector2f(1f, 0f);
+                            case 22 : return new Vector2f(1f, 1.0f);
+                            case 23 : return new Vector2f(0f, 1.0f);
 
-        GL11.glVertex3f(-dimensions.x, dimensions.y, dimensions.z);
-        GL11.glVertex3f(dimensions.x, dimensions.y, dimensions.z);
-        GL11.glVertex3f(dimensions.x, dimensions.y, -dimensions.z);
-        GL11.glVertex3f(-dimensions.x, dimensions.y, -dimensions.z);
-
-        GL11.glVertex3f(-dimensions.x, -dimensions.y, -dimensions.z);
-        GL11.glVertex3f(-dimensions.x, -dimensions.y, dimensions.z);
-        GL11.glVertex3f(-dimensions.x, dimensions.y, dimensions.z);
-        GL11.glVertex3f(-dimensions.x, dimensions.y, -dimensions.z);
-
-        GL11.glVertex3f(-dimensions.x, -dimensions.y, dimensions.z);
-        GL11.glVertex3f(dimensions.x, -dimensions.y, dimensions.z);
-        GL11.glVertex3f(dimensions.x, dimensions.y, dimensions.z);
-        GL11.glVertex3f(-dimensions.x, dimensions.y, dimensions.z);
-
-        GL11.glVertex3f(dimensions.x, dimensions.y, -dimensions.z);
-        GL11.glVertex3f(dimensions.x, dimensions.y, dimensions.z);
-        GL11.glVertex3f(dimensions.x, -dimensions.y, dimensions.z);
-        GL11.glVertex3f(dimensions.x, -dimensions.y, -dimensions.z);
-
-        GL11.glVertex3f(-dimensions.x, dimensions.y, -dimensions.z);
-        GL11.glVertex3f(dimensions.x, dimensions.y, -dimensions.z);
-        GL11.glVertex3f(dimensions.x, -dimensions.y, -dimensions.z);
-        GL11.glVertex3f(-dimensions.x, -dimensions.y, -dimensions.z);
-
-        GL11.glVertex3f(-dimensions.x, -dimensions.y, -dimensions.z);
-        GL11.glVertex3f(dimensions.x, -dimensions.y, -dimensions.z);
-        GL11.glVertex3f(dimensions.x, -dimensions.y, dimensions.z);
-        GL11.glVertex3f(-dimensions.x, -dimensions.y, dimensions.z);
-        glEnd();
-        glEndList();
-
+                            default : throw new RuntimeException("Unreachable state.");
+                        }
+                    }
+                });
+        for (int  x = 0; x < 24; x++) {
+            builder.addColor(new Color(solidColor.x, solidColor.y, solidColor.z, solidColor.w));
+        }
+        solidMesh = builder.build();
     }
 
     private void generateDisplayListWire() {
         float offset = 0.001f;
 
-        displayListWire = glGenLists(1);
+        StandardMeshData meshData = new StandardMeshData(DrawingMode.LINES);
 
-        glNewList(displayListWire, GL11.GL_COMPILE);
-        glColor4f(0.0f, 0.0f, 0.0f, 1.0f);
 
         Vector3f dimensions = aabb.extent(new Vector3f());
+        Vector3f pos = new Vector3f();
+        meshData.position.put(pos.set(-dimensions.x - offset, -dimensions.y - offset, -dimensions.z - offset)); // 0
+        meshData.position.put(pos.set(+dimensions.x + offset, -dimensions.y - offset, -dimensions.z - offset)); // 1
+        meshData.position.put(pos.set(+dimensions.x + offset, -dimensions.y - offset, +dimensions.z + offset)); // 2
+        meshData.position.put(pos.set(-dimensions.x - offset, -dimensions.y - offset, +dimensions.z + offset)); // 3
 
-        // FRONT
-        glBegin(GL_LINE_LOOP);
-        glVertex3f(-dimensions.x - offset, -dimensions.y - offset, -dimensions.z - offset);
-        glVertex3f(+dimensions.x + offset, -dimensions.y - offset, -dimensions.z - offset);
-        glVertex3f(+dimensions.x + offset, +dimensions.y + offset, -dimensions.z - offset);
-        glVertex3f(-dimensions.x - offset, +dimensions.y + offset, -dimensions.z - offset);
-        glEnd();
+        meshData.position.put(pos.set(-dimensions.x - offset, +dimensions.y + offset, -dimensions.z - offset)); // 4
+        meshData.position.put(pos.set(+dimensions.x + offset, +dimensions.y + offset, -dimensions.z - offset)); // 5
+        meshData.position.put(pos.set(+dimensions.x + offset, +dimensions.y + offset, +dimensions.z + offset)); // 6
+        meshData.position.put(pos.set(-dimensions.x - offset, +dimensions.y + offset, +dimensions.z + offset)); // 7
 
-        // BACK
-        glBegin(GL_LINE_LOOP);
-        glVertex3f(-dimensions.x - offset, -dimensions.y - offset, +dimensions.z + offset);
-        glVertex3f(+dimensions.x + offset, -dimensions.y - offset, +dimensions.z + offset);
-        glVertex3f(+dimensions.x + offset, +dimensions.y + offset, +dimensions.z + offset);
-        glVertex3f(-dimensions.x - offset, +dimensions.y + offset, +dimensions.z + offset);
-        glEnd();
+        meshData.indices.putAll(new int[]{
+                // top loop
+                0, 1,
+                1, 2,
+                2, 3,
+                3, 0,
 
-        // TOP
-        glBegin(GL_LINE_LOOP);
-        glVertex3f(-dimensions.x - offset, -dimensions.y - offset, -dimensions.z - offset);
-        glVertex3f(+dimensions.x + offset, -dimensions.y - offset, -dimensions.z - offset);
-        glVertex3f(+dimensions.x + offset, -dimensions.y - offset, +dimensions.z + offset);
-        glVertex3f(-dimensions.x - offset, -dimensions.y - offset, +dimensions.z + offset);
-        glEnd();
+                // connecting edges between top and bottom
+                0, 4,
+                1, 5,
+                2, 6,
+                3, 7,
 
-        // BOTTOM
-        glBegin(GL_LINE_LOOP);
-        glVertex3f(-dimensions.x - offset, +dimensions.y + offset, -dimensions.z - offset);
-        glVertex3f(+dimensions.x + offset, +dimensions.y + offset, -dimensions.z - offset);
-        glVertex3f(+dimensions.x + offset, +dimensions.y + offset, +dimensions.z + offset);
-        glVertex3f(-dimensions.x - offset, +dimensions.y + offset, +dimensions.z + offset);
-        glEnd();
+                // bottom loop
+                4, 5,
+                5, 6,
+                6, 7,
+                7, 4,
+        });
 
-        // LEFT
-        glBegin(GL_LINE_LOOP);
-        glVertex3f(-dimensions.x - offset, -dimensions.y - offset, -dimensions.z - offset);
-        glVertex3f(-dimensions.x - offset, -dimensions.y - offset, +dimensions.z + offset);
-        glVertex3f(-dimensions.x - offset, +dimensions.y + offset, +dimensions.z + offset);
-        glVertex3f(-dimensions.x - offset, +dimensions.y + offset, -dimensions.z - offset);
-        glEnd();
-
-        // RIGHT
-        glBegin(GL_LINE_LOOP);
-        glVertex3f(+dimensions.x + offset, -dimensions.y - offset, -dimensions.z - offset);
-        glVertex3f(+dimensions.x + offset, -dimensions.y - offset, +dimensions.z + offset);
-        glVertex3f(+dimensions.x + offset, +dimensions.y + offset, +dimensions.z + offset);
-        glVertex3f(+dimensions.x + offset, +dimensions.y + offset, -dimensions.z - offset);
-        glEnd();
-        glEndList();
+        Color color = new Color(Color.black);
+        for (int i = 0; i < 8; i++) {
+            meshData.color0.put(color);
+        }
+        wireMesh = Assets.generateAsset(meshData, Mesh.class);
     }
 
     public AABBfc getAABB() {
         return aabb;
+    }
+
+    @Override
+    public void close() {
+        dispose();
     }
 }

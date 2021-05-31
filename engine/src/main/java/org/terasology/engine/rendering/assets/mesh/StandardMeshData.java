@@ -7,6 +7,7 @@ import org.joml.Vector2f;
 import org.joml.Vector2fc;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
+import org.terasology.engine.rendering.assets.mesh.resource.DrawingMode;
 import org.terasology.engine.rendering.assets.mesh.resource.GLAttributes;
 import org.terasology.engine.rendering.assets.mesh.resource.IndexResource;
 import org.terasology.engine.rendering.assets.mesh.resource.VertexAttributeBinding;
@@ -43,6 +44,7 @@ public class StandardMeshData extends MeshData {
 
     public final IndexResource indices;
 
+
     /**
      * transfer buffered data to another {@link StandardMeshData}
      *
@@ -67,6 +69,11 @@ public class StandardMeshData extends MeshData {
     }
 
     public StandardMeshData() {
+        this(DrawingMode.TRIANGLES);
+    }
+
+    public StandardMeshData(DrawingMode mode) {
+        super(mode);
 
         VertexResourceBuilder builder = new VertexResourceBuilder();
         position = builder.add(VERTEX_INDEX, GLAttributes.VECTOR_3_F_VERTEX_ATTRIBUTE);

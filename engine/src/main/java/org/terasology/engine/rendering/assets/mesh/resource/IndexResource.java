@@ -45,6 +45,20 @@ public class IndexResource extends BufferedResource {
         posIndex++;
     }
 
+    public void putAll(int value, int ... values) {
+        put(value);
+        for (int x = 0; x < values.length; x++) {
+            put(values[x]);
+        }
+    }
+
+
+    public void putAll(int[] values) {
+        for (int x = 0; x < values.length; x++) {
+            put(values[x]);
+        }
+    }
+
     public void allocateElements(int indices) {
         allocate(indices * Integer.BYTES);
         inIndices = indices;
