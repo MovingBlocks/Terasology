@@ -8,6 +8,7 @@ import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
+import org.lwjgl.opengl.GL30;
 import org.lwjgl.system.Platform;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -81,7 +82,8 @@ public class ShaderManagerLwjgl implements ShaderManager {
         logger.info("GL_VERSION: {}", GL11.glGetString(GL11.GL_VERSION));
         logger.info("SHADING_LANGUAGE VERSION: {}", GL11.glGetString(GL20.GL_SHADING_LANGUAGE_VERSION));
 
-        String extStr = GL11.glGetString(GL11.GL_EXTENSIONS);
+        int[] extension = new int[1];
+        GL30.glGetIntegerv(GL30.GL_NUM_EXTENSIONS, extension);
 
         // log shader extensions in smaller packages,
         // because the full string can be extremely long
@@ -89,20 +91,19 @@ public class ShaderManagerLwjgl implements ShaderManager {
 
         // starting with OpenGL 3.0, extensions can also listed using
         // GL_NUM_EXTENSIONS and glGetStringi(GL_EXTENSIONS, idx)
-        String[] exts = extStr.split(" ");
-        if (exts.length > 0) {
-            StringBuilder bldr = new StringBuilder(exts[0]);
-            for (int i = 1; i < exts.length; i++) {
+        if (extension[0] > 0) {
+            StringBuilder bldr = new StringBuilder();
+            for (int i = 1; i < extension[0]; i++) {
                 if (i % extsPerLine == 0) {
-                    logger.info("EXTENSIONS: {}", bldr.toString());
+                    logger.info("EXTENSIONS: {}", bldr);
                     bldr.setLength(0);
                 } else {
                     bldr.append(" ");
                 }
-                bldr.append(exts[i]);
+                bldr.append(GL30.glGetStringi(GL30.GL_EXTENSIONS, i));
             }
             if (bldr.length() > 0) {
-                logger.info("EXTENSIONS: {}", bldr.toString());
+                logger.info("EXTENSIONS: {}", bldr);
             }
         }
     }
