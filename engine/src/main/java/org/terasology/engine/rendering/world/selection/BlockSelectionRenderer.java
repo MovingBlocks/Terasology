@@ -39,7 +39,7 @@ public class BlockSelectionRenderer {
     private Mesh overlayMesh;
     private Mesh overlayMesh2;
     private Texture effectsTexture;
-    private Material defaultTextured;
+    private Material blockSelectionMat;
     private Rectanglef textureRegion = new Rectanglef(0, 0, 1, 1);
     private WorldRenderer worldRenderer;
 
@@ -62,7 +62,7 @@ public class BlockSelectionRenderer {
                 min, textureRegion.getSize(new Vector2f()), 1.001f, 1.0f, 1.0f, 0.0f,
                 0.0f, 0.0f);
         overlayMesh2 = tessellator.generateMesh();
-        defaultTextured = Assets.getMaterial("engine:prog.blockSelection").get();
+        blockSelectionMat = Assets.getMaterial("engine:prog.blockSelection").get();
     }
 
     public void setEffectsTexture(TextureRegionAsset textureRegionAsset) {
@@ -87,11 +87,11 @@ public class BlockSelectionRenderer {
             return;
         }
         Camera camera = worldRenderer.getActiveCamera();
-        defaultTextured.enable();
-        defaultTextured.activateFeature(ShaderProgramFeature.FEATURE_ALPHA_REJECT);
-        defaultTextured.setMatrix4("projectionMatrix", camera.getProjectionMatrix());
-        defaultTextured.setTexture("texture", effectsTexture);
-        defaultTextured.bindTextures();
+        blockSelectionMat.enable();
+        blockSelectionMat.activateFeature(ShaderProgramFeature.FEATURE_ALPHA_REJECT);
+        blockSelectionMat.setMatrix4("projectionMatrix", camera.getProjectionMatrix());
+        blockSelectionMat.setTexture("texture", effectsTexture);
+        blockSelectionMat.bindTextures();
 
         glEnable(GL11.GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -99,7 +99,7 @@ public class BlockSelectionRenderer {
 
     public void endRenderOverlay() {
         glDisable(GL11.GL_BLEND);
-        defaultTextured.deactivateFeature(ShaderProgramFeature.FEATURE_ALPHA_REJECT);
+        blockSelectionMat.deactivateFeature(ShaderProgramFeature.FEATURE_ALPHA_REJECT);
     }
 
     public void renderMark(Vector3ic blockPos) {
@@ -111,7 +111,7 @@ public class BlockSelectionRenderer {
                 blockPos.x() - cameraPosition.x, blockPos.y() - cameraPosition.y,
                 blockPos.z() - cameraPosition.z
         ));
-        defaultTextured.setMatrix4("modelViewMatrix", modelView);
+        blockSelectionMat.setMatrix4("modelViewMatrix", modelView);
 
 
         overlayMesh.render();
@@ -126,7 +126,7 @@ public class BlockSelectionRenderer {
                 blockPos.x() - cameraPosition.x, blockPos.y() - cameraPosition.y,
                 blockPos.z() - cameraPosition.z
         ));
-        defaultTextured.setMatrix4("modelViewMatrix", modelView);
+        blockSelectionMat.setMatrix4("modelViewMatrix", modelView);
 
         overlayMesh2.render();
     }
