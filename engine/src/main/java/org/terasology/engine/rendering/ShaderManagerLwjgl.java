@@ -35,7 +35,6 @@ public class ShaderManagerLwjgl implements ShaderManager {
 
     private GLSLMaterial activeMaterial;
     private GLSLMaterial defaultShaderProgram;
-    private GLSLMaterial defaultTexturedShaderProgram;
 
     private Set<GLSLMaterial> progamaticShaders = Sets.newHashSet();
 
@@ -46,7 +45,6 @@ public class ShaderManagerLwjgl implements ShaderManager {
     public void initShaders() {
         logCapabilities();
         defaultShaderProgram = addShaderProgram("default");
-        defaultTexturedShaderProgram = addShaderProgram("defaultTextured");
 
         // TODO: Find a better way to do this
         addShaderProgram("post");
@@ -72,6 +70,7 @@ public class ShaderManagerLwjgl implements ShaderManager {
         addShaderProgram("lightBufferPass");
         addShaderProgram("lightGeometryPass");
         addShaderProgram("ssaoBlur");
+        addShaderProgram("outputPass");
     }
 
     private void logCapabilities() {
@@ -169,13 +168,6 @@ public class ShaderManagerLwjgl implements ShaderManager {
         defaultShaderProgram.enable();
     }
 
-    /**
-     * Enables the default shader program.
-     */
-    @Override
-    public void enableDefaultTextured() {
-        defaultTexturedShaderProgram.enable();
-    }
 
     @Override
     public void disableShader() {
