@@ -160,7 +160,7 @@ public final class PathManager {
      * @throws IOException Thrown when required directories cannot be accessed.
      */
     public void useOverrideHomePath(Path rootPath) throws IOException {
-        this.homePath = rootPath;
+        this.homePath = rootPath.toAbsolutePath();
         updateDirs();
     }
 
@@ -355,7 +355,7 @@ public final class PathManager {
         Path homeModPath = homePath.resolve(MODULE_DIR);
         Path modCachePath = homePath.resolve(MODULE_CACHE_DIR);
 
-        if (homePath == installPath) {
+        if (homePath.equals(installPath)) {
             return ImmutableList.of(modCachePath, homeModPath);
         } else {
             Path installModPath = installPath.resolve(MODULE_DIR);
