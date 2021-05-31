@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ClasspathCompromisingModuleFactoryTest {
-    final static Class<?> someClassOutsideTheModule = ClasspathCompromisingModuleFactory.class;
+    static final Class<?> someClassOutsideTheModule = ClasspathCompromisingModuleFactory.class;
 
     @Test
     public void directoryModuleContainsClass() {

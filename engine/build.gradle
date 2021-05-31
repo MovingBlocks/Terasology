@@ -169,15 +169,15 @@ dependencies {
 // Version file stuff                                                                                                //
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// First read the internal version out of the engine's engine-module.txt
-def moduleFile = file('src/main/resources/org/terasology/engine/engine-module.txt')
+// First read the internal version out of the engine's module.txt
+def moduleFile = file('src/main/resources/org/terasology/engine/module.txt')
 
 if (!moduleFile.exists()) {
-    println "Failed to find engine-module.txt for engine"
-    throw new GradleException("Failed to find engine-module.txt for engine")
+    println "Failed to find module.txt for engine"
+    throw new GradleException("Failed to find module.txt for engine")
 }
 
-println "Scanning for version in engine-module.txt for engine"
+println "Scanning for version in module.txt for engine"
 def slurper = new JsonSlurper()
 def moduleConfig = slurper.parseText(moduleFile.text)
 
