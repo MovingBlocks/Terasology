@@ -142,7 +142,7 @@ public class ChunkMesh {
 
             for (VertexResource.VertexDefinition definition : elements.buffer.definitions()) {
                 GL30.glEnableVertexAttribArray(definition.location);
-                if (definition.location == VertexElements.FLAGS_INDEX || definition.location == VertexElements.BLOCK_INDEX) {
+                if (definition.location == VertexElements.FLAGS_INDEX) {
                     GL30.glVertexAttribIPointer(definition.location, definition.attribute.count,
                             definition.attribute.mapping.glType, elements.buffer.inStride(), definition.offset);
                 } else {

@@ -182,7 +182,7 @@ void main() {
     // ...and finally the occlusion value
     float occlusionValue = expOccValue(v_ambientLight);
 
-    float blocklightColorBrightness = calcBlocklightColorBrightness(v_blocklight
+    float blocklightColorBrightness = calcBlocklightColorBrightness(blocklightValue
 #if defined (FLICKERING_LIGHT)
         , flickeringLightOffset
 #endif
