@@ -13,8 +13,8 @@ import org.terasology.engine.registry.CoreRegistry;
 import org.terasology.engine.rendering.assets.material.Material;
 import org.terasology.engine.rendering.assets.mesh.Mesh;
 import org.terasology.engine.rendering.assets.mesh.MeshBuilder;
-import org.terasology.engine.rendering.assets.mesh.MeshData;
 import org.terasology.engine.rendering.assets.mesh.StandardMeshData;
+import org.terasology.engine.rendering.assets.mesh.resource.DrawingMode;
 import org.terasology.engine.rendering.cameras.Camera;
 import org.terasology.engine.rendering.world.WorldRenderer;
 import org.terasology.engine.utilities.Assets;
@@ -178,25 +178,22 @@ public class AABBRenderer implements BlockOverlayRenderer, AutoCloseable {
     private void generateDisplayListWire() {
         float offset = 0.001f;
 
-        StandardMeshData meshData = new StandardMeshData(MeshData.DrawingMode.LINES);
+        StandardMeshData meshData = new StandardMeshData(DrawingMode.LINES);
 
 
         Vector3f dimensions = aabb.extent(new Vector3f());
-        meshData.vertices.addAll(new float[]{
-                // TOP
-                -dimensions.x - offset, -dimensions.y - offset, -dimensions.z - offset, // 0
-                +dimensions.x + offset, -dimensions.y - offset, -dimensions.z - offset, // 1
-                +dimensions.x + offset, -dimensions.y - offset, +dimensions.z + offset, // 2
-                -dimensions.x - offset, -dimensions.y - offset, +dimensions.z + offset, // 3
+        Vector3f pos = new Vector3f();
+        meshData.position.put(pos.set(-dimensions.x - offset, -dimensions.y - offset, -dimensions.z - offset)); // 0
+        meshData.position.put(pos.set(+dimensions.x + offset, -dimensions.y - offset, -dimensions.z - offset)); // 1
+        meshData.position.put(pos.set(+dimensions.x + offset, -dimensions.y - offset, +dimensions.z + offset)); // 2
+        meshData.position.put(pos.set(-dimensions.x - offset, -dimensions.y - offset, +dimensions.z + offset)); // 3
 
-                // BOTTOM
-                -dimensions.x - offset, +dimensions.y + offset, -dimensions.z - offset, // 4
-                +dimensions.x + offset, +dimensions.y + offset, -dimensions.z - offset, // 5
-                +dimensions.x + offset, +dimensions.y + offset, +dimensions.z + offset, // 6
-                -dimensions.x - offset, +dimensions.y + offset, +dimensions.z + offset  // 7
-        });
+        meshData.position.put(pos.set(-dimensions.x - offset, +dimensions.y + offset, -dimensions.z - offset)); // 4
+        meshData.position.put(pos.set(+dimensions.x + offset, +dimensions.y + offset, -dimensions.z - offset)); // 5
+        meshData.position.put(pos.set(+dimensions.x + offset, +dimensions.y + offset, +dimensions.z + offset)); // 6
+        meshData.position.put(pos.set(-dimensions.x - offset, +dimensions.y + offset, +dimensions.z + offset)); // 7
 
-        meshData.getIndices().addAll(new int[]{
+        meshData.indices.putAll(new int[]{
                 // top loop
                 0, 1,
                 1, 2,
@@ -215,8 +212,10 @@ public class AABBRenderer implements BlockOverlayRenderer, AutoCloseable {
                 6, 7,
                 7, 4,
         });
+
+        Color color = new Color(Color.black);
         for (int i = 0; i < 8; i++) {
-            meshData.color0.addAll(new float[]{0.0f, 0.0f, 0.0f, 1.0f});
+            meshData.color0.put(color);
         }
         wireMesh = Assets.generateAsset(meshData, Mesh.class);
     }
