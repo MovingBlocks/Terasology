@@ -30,8 +30,6 @@ in vec3 waterNormalViewSpace;
 
 #if defined (NORMAL_MAPPING)
 in vec3 worldSpaceNormal;
-//in mat3 normalMatrix;
-
 uniform sampler2D textureAtlasNormal;
 #endif
 
@@ -101,31 +99,31 @@ void main() {
     mat2 uvToScreen = inverse2(screenToUv);
     mat2x3 uvToView = screenToView * uvToScreen;
 
-#if defined (PARALLAX_MAPPING)
-    vec2 viewDirectionUvProjection = -normalizedViewPos * uvToView;
+    #if defined (PARALLAX_MAPPING)
+        vec2 viewDirectionUvProjection = -normalizedViewPos * uvToView;
 
-    float height = parallaxScale * texture2D(textureAtlasHeight, texCoord).r - parallaxBias;
-    // Ideally this should be divided by dot(normal, normalizedViewPos), as the offset for texCoord
-    // is the component parallel to the surface of a vector along the view's forward axis,
-    // the other component being a vector perpendicular to the surface and having magnitude "height".
-    // In practice the current way looks better at low angles, as the height-map can't make the triangle
-    // protrude beyond its boundaries like displacement mapping would.
-    texCoord += height * viewDirectionUvProjection * TEXTURE_OFFSET;
+        float height = parallaxScale * texture2D(textureAtlasHeight, texCoord).r - parallaxBias;
+        // Ideally this should be divided by dot(normal, normalizedViewPos), as the offset for texCoord
+        // is the component parallel to the surface of a vector along the view's forward axis,
+        // the other component being a vector perpendicular to the surface and having magnitude "height".
+        // In practice the current way looks better at low angles, as the height-map can't make the triangle
+        // protrude beyond its boundaries like displacement mapping would.
+        texCoord += height * viewDirectionUvProjection * TEXTURE_OFFSET;
 
-    //Crudely prevent the parallax from extending to other textures in the same atlas.
-    vec2 texCorner = floor(v_uv0.xy/TEXTURE_OFFSET)*TEXTURE_OFFSET;
-    vec2 texSize = vec2(1,1)*TEXTURE_OFFSET*0.9999; //Remain strictly this side of the edge of the texture.
-    texCoord = clamp(texCoord, texCorner, texCorner + texSize);
-#endif
-#if defined (NORMAL_MAPPING)
-    // Normalised but not orthonormalised. It should be orthogonal anyway (except for some non-rectangular
-    // block shapes like torches), but it's not obvious what's the best thing to do when it isn't.
-    mat3 uvnSpaceToViewSpace = mat3(normalize(uvToView[0]), normalize(uvToView[1]), normal);
-    normalOpaque = normalize(texture2D(textureAtlasNormal, texCoord).xyz * 2.0 - 1.0);
-    normalOpaque = normalize(uvnSpaceToViewSpace * normalOpaque);
+        //Crudely prevent the parallax from extending to other textures in the same atlas.
+        vec2 texCorner = floor(v_uv0.xy/TEXTURE_OFFSET)*TEXTURE_OFFSET;
+        vec2 texSize = vec2(1,1)*TEXTURE_OFFSET*0.9999; //Remain strictly this side of the edge of the texture.
+        texCoord = clamp(texCoord, texCorner, texCorner + texSize);
+    #endif
+    #if defined (NORMAL_MAPPING)
+        // Normalised but not orthonormalised. It should be orthogonal anyway (except for some non-rectangular
+        // block shapes like torches), but it's not obvious what's the best thing to do when it isn't.
+        mat3 uvnSpaceToViewSpace = mat3(normalize(uvToView[0]), normalize(uvToView[1]), normal);
+        normalOpaque = normalize(texture2D(textureAtlasNormal, texCoord).xyz * 2.0 - 1.0);
+        normalOpaque = normalize(uvnSpaceToViewSpace * normalOpaque);
 
-    shininess = texture2D(textureAtlasNormal, texCoord).w;
-#endif
+        shininess = texture2D(textureAtlasNormal, texCoord).w;
+    #endif
 #endif
 
 #ifdef FEATURE_REFRACTIVE_PASS
@@ -167,12 +165,11 @@ void main() {
 #if !defined (FEATURE_REFRACTIVE_PASS)
     color = texture2D(textureAtlas, texCoord.xy);
 
-#if defined FEATURE_ALPHA_REJECT
-    if (color.a < 0.1) {
-        discard;
-    }
-#endif
-
+    #if defined FEATURE_ALPHA_REJECT
+        if (color.a < 0.1) {
+            discard;
+        }
+    #endif
 #endif
 
     // Calculate daylight lighting value
@@ -183,9 +180,9 @@ void main() {
     float occlusionValue = expOccValue(v_ambientLight);
 
     float blocklightColorBrightness = calcBlocklightColorBrightness(blocklightValue
-#if defined (FLICKERING_LIGHT)
-        , flickeringLightOffset
-#endif
+    #if defined (FLICKERING_LIGHT)
+            , flickeringLightOffset
+    #endif
     );
     vec3 blocklightColorValue = calcBlocklightColor(blocklightColorBrightness);
 

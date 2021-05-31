@@ -308,8 +308,8 @@ public class ChunkMesh {
         public static final int NORMAL_INDEX = 1;  // vec3
         public static final int UV0_INDEX = 2;  // vec3
 
-        public static final int FLAGS_INDEX = 3;  // uint
-        public static final int FRAME_INDEX = 4; // uint
+        public static final int FLAGS_INDEX = 3;  // int
+        public static final int FRAME_INDEX = 4; // float
 
         public static final int SUNLIGHT_INDEX = 5; // float
         public static final int BLOCK_INDEX = 6; // float
@@ -321,14 +321,16 @@ public class ChunkMesh {
         public final VertexAttributeBinding<Vector3fc, Vector3f> position;
         public final VertexAttributeBinding<Vector3fc, Vector3f> normals;
         public final VertexAttributeBinding<Vector2fc, Vector2f> uv0;
-//        public final VertexAttributeBinding<Colorc, Color> color; // color data is unused
+
+        // color data is unused something to consider later
+        // public final VertexAttributeBinding<Colorc, Color> color;
 
         public final VertexIntegerAttributeBinding flags;
         public final VertexIntegerAttributeBinding frames;
 
-        public final VertexFloatAttributeBinding sunlight;
-        public final VertexFloatAttributeBinding blockLight;
-        public final VertexFloatAttributeBinding ambientOcclusion;
+        public final VertexFloatAttributeBinding sunlight;         // this could be changed to a single byte
+        public final VertexFloatAttributeBinding blockLight;       // this could be changed to a single byte
+        public final VertexFloatAttributeBinding ambientOcclusion; // this could be changed to a single byte
         public  int vertexCount;
 
 

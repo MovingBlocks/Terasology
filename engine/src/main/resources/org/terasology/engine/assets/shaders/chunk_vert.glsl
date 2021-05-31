@@ -76,7 +76,6 @@ out float flickeringLightOffset;
 
 #if defined (NORMAL_MAPPING)
 out vec3 worldSpaceNormal;
-//out mat3 normalMatrix;
 #endif
 
 uniform float blockScale = 1.0;
@@ -115,7 +114,6 @@ layout (location = 5) in float in_sunlight;
 layout (location = 6) in float in_blocklight;
 layout (location = 7) in float in_ambientlight;
 
-
 void main() {
 
     v_uv0 = in_uv0;
@@ -124,9 +122,9 @@ void main() {
     v_ambientLight = in_ambientlight;
     v_blockHint = in_flags;
     vertexViewPos = modelViewMatrix * vec4(in_vert, 1.0);
-	vertexWorldPos = in_vert + chunkPositionWorld.xyz;
+    vertexWorldPos = in_vert + chunkPositionWorld.xyz;
 
-	if (in_frames > 0) {
+    if (in_frames > 0) {
         float globalFrameIndex = floor(time * 6 *60*60*24/48); // 6Hz at default world time scale
         float frameIndex = mod(globalFrameIndex, in_frames);
         float frame_x = in_uv0.x + (frameIndex * TEXTURE_OFFSET);
@@ -134,22 +132,20 @@ void main() {
         v_uv0.x = mod(frame_x, 1);
     }
 
+    sunVecView = (modelViewMatrix * vec4(sunVec.x, sunVec.y, sunVec.z, 0.0)).xyz;
 
-	sunVecView = (modelViewMatrix * vec4(sunVec.x, sunVec.y, sunVec.z, 0.0)).xyz;
-
-	isUpside = in_normal.y > 0.9 ? 1 : 0;
+    isUpside = in_normal.y > 0.9 ? 1 : 0;
 
 #if defined (NORMAL_MAPPING)
-//    normalMatrix = in_normal;
     worldSpaceNormal = in_normal;
 #endif
     normal = normalMatrix * in_normal;
 
 
 #ifdef FLICKERING_LIGHT
-	flickeringLightOffset = smoothTriangleWave(timeToTick(time, 0.5)) / 16.0;
-	flickeringLightOffset += smoothTriangleWave(timeToTick(time, 0.25) + 0.3762618) / 8.0;
-	flickeringLightOffset += smoothTriangleWave(timeToTick(time, 0.1) + 0.872917) / 4.0;
+    flickeringLightOffset = smoothTriangleWave(timeToTick(time, 0.5)) / 16.0;
+    flickeringLightOffset += smoothTriangleWave(timeToTick(time, 0.25) + 0.3762618) / 8.0;
+    flickeringLightOffset += smoothTriangleWave(timeToTick(time, 0.1) + 0.872917) / 4.0;
 #endif
 
 #ifdef ANIMATED_GRASS
@@ -170,16 +166,16 @@ void main() {
 #endif
 
 #if defined (FEATURE_REFRACTIVE_PASS)
-#if defined (ANIMATED_WATER)
-    if (v_blockHint == BLOCK_HINT_WATER_SURFACE && isUpside == 1) {
-        vec4 normalAndOffset = calcWaterNormalAndOffset(vertexWorldPos.xz);
+    #if defined (ANIMATED_WATER)
+        if (v_blockHint == BLOCK_HINT_WATER_SURFACE && isUpside == 1) {
+            vec4 normalAndOffset = calcWaterNormalAndOffset(vertexWorldPos.xz);
 
-        waterNormalViewSpace = normalMatrix * normalAndOffset.xyz;
-        vertexViewPos += modelViewMatrix[1] * (normalAndOffset.w + waterOffsetY);
-    }
-#else
-    waterNormalViewSpace = normalMatrix * vec3(0.0, 1.0, 0.0);
-#endif
+            waterNormalViewSpace = normalMatrix * normalAndOffset.xyz;
+            vertexViewPos += modelViewMatrix[1] * (normalAndOffset.w + waterOffsetY);
+        }
+    #else
+        waterNormalViewSpace = normalMatrix * vec3(0.0, 1.0, 0.0);
+    #endif
 #endif
 
     vertexProjPos = projectionMatrix * vertexViewPos;
