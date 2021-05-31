@@ -24,6 +24,11 @@ public abstract class BufferedResource {
         return inSize;
     }
 
+    public void copyBuffer(ByteBuffer copyBuffer) {
+        ensureCapacity(copyBuffer.capacity());
+        buffer.put(copyBuffer);
+    }
+
     public void copyBuffer(BufferedResource resource) {
         ensureCapacity(resource.inSize);
         ByteBuffer copyBuffer = resource.buffer;
@@ -34,9 +39,15 @@ public abstract class BufferedResource {
         this.inSize = resource.inSize;
     }
 
-    protected void reserve(int inSize) {
-        ensureCapacity(inSize);
-        this.inSize = 0;
+    protected void reserve(int size) {
+        if (size > buffer.capacity()) {
+            int newCap = Math.max(buffer.capacity() << 1, size);
+            ByteBuffer newBuffer = BufferUtils.createByteBuffer(newCap);
+            buffer.limit(this.inSize);
+            buffer.position(0);
+            newBuffer.put(buffer);
+            this.buffer = newBuffer;
+        }
     }
 
     protected void allocate(int size) {
@@ -46,9 +57,9 @@ public abstract class BufferedResource {
 
     protected void ensureCapacity(int size) {
         if (size > buffer.capacity()) {
-            int newCap = Math.max(this.inSize << 1, size);
+            int newCap = Math.max(this.buffer.capacity() << 1, size);
             ByteBuffer newBuffer = BufferUtils.createByteBuffer(newCap);
-            buffer.limit(Math.min(size, this.inSize));
+            buffer.limit(this.inSize);
             buffer.position(0);
             newBuffer.put(buffer);
             this.buffer = newBuffer;
