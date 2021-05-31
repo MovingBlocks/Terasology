@@ -67,7 +67,7 @@ public class ChunkMesh {
     private int triangleCount = -1;
 
     /* TEMPORARY DATA */
-    private Map<RenderType, VertexElements> vertexElements = Maps.newEnumMap(RenderType.class);
+    private VertexElements[] vertexElements = new VertexElements[RenderType.values().length];
 
     private boolean disposed;
 
@@ -80,12 +80,12 @@ public class ChunkMesh {
 
     public ChunkMesh() {
         for (RenderType type : RenderType.values()) {
-            vertexElements.put(type, new VertexElements());
+            vertexElements[type.ordinal()] = new VertexElements();
         }
     }
 
     public VertexElements getVertexElements(RenderType renderType) {
-        return vertexElements.get(renderType);
+        return vertexElements[renderType.ordinal()];
     }
 
     public boolean hasVertexElements() {
@@ -126,7 +126,7 @@ public class ChunkMesh {
     }
 
     private void generateVBO(RenderType type) {
-        VertexElements elements = vertexElements.get(type);
+        VertexElements elements = vertexElements[type.ordinal()];
         int id = type.getIndex();
         if (!disposed && elements.buffer.elements() > 0) {
             vertexBuffers[id] = GL15.glGenBuffers();
@@ -179,6 +179,7 @@ public class ChunkMesh {
                 if (vertexBuffers[id] <= 0 || disposed) {
                     return;
                 }
+
                 GL30.glBindVertexArray(vaoCount[id]);
                 GL30.glDrawElements(GL30.GL_TRIANGLES, vertexCount[id], GL30.GL_UNSIGNED_INT, 0);
                 GL30.glBindVertexArray(0);
