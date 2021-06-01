@@ -24,11 +24,6 @@ public interface ShaderManager {
      */
     void enableDefault();
 
-    /**
-     * Enables the default shader program.
-     */
-    void enableDefaultTextured();
-
     void disableShader();
 
 }
