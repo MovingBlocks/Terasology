@@ -4,7 +4,7 @@
 package org.terasology.engine.rendering.assets.mesh.resource;
 
 /**
- * a binding that maps depending on the type of attribute and a resource where the data is committed to
+ * a binding that maps from a type to a resource where the data is committed to.
  * @param <T>
  */
 public class VertexAttributeBinding<T, TImpl extends T> extends VertexBinding {

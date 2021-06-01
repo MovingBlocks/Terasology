@@ -3,6 +3,9 @@
 
 package org.terasology.engine.rendering.assets.mesh.resource;
 
+/**
+ * A resource that represents vertex data
+ */
 public class VertexResource extends BufferedResource {
     private int inStride = 0;
     private int version = 0;
@@ -12,15 +15,26 @@ public class VertexResource extends BufferedResource {
 
     }
 
+    /**
+     * the number of elements in the vertex resource / verticies
+     * @return the number of verts
+     */
     public int elements() {
         return inSize / inStride;
     }
 
+    /**
+     * definition information that the end consumer uses to determin the layout of the vertex data
+     * @return the definition
+     */
     public VertexDefinition[] definitions() {
         return this.attributes;
     }
 
-
+    /**
+     * set definition data that describes the {@link VertexResource}
+     * @param attr
+     */
     public void setDefinitions(VertexDefinition[] attr) {
         this.attributes = attr;
     }
@@ -31,6 +45,11 @@ public class VertexResource extends BufferedResource {
         this.attributes = attributes;
     }
 
+    /**
+     * copy the contents of a vertex resource over.
+     *
+     * @param resource
+     */
     public void copy(VertexResource resource) {
         if (resource.isEmpty()) {
             return;
@@ -40,6 +59,10 @@ public class VertexResource extends BufferedResource {
         this.mark();
     }
 
+    /**
+     * the stride of the data where each jump is another vertex
+     * @return
+     */
     public int inStride() {
         return inStride;
     }
@@ -64,6 +87,11 @@ public class VertexResource extends BufferedResource {
         this.inStride = stride;
     }
 
+    /**
+     * the version of the buffer is used to determines if the contents have changed.
+     * this should notify the end user of the buffer to sync the data back to the driver
+     * @return the version flag
+     */
     public int getVersion() {
         return version;
     }

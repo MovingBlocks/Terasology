@@ -6,6 +6,9 @@ package org.terasology.engine.rendering.assets.mesh.resource;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * factory that is used to define an attribute binding to the backing {@link VertexResource}
+ */
 public class VertexResourceBuilder {
     private List<VertexResource.VertexDefinition> definitions = new ArrayList<>();
     private int inStride;

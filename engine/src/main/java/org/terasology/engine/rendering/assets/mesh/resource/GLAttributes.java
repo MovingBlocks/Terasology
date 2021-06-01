@@ -14,6 +14,9 @@ import org.terasology.nui.Colorc;
 
 import java.nio.ByteBuffer;
 
+/**
+ * attribute mappings that map to an opengl data type.
+ */
 public final class GLAttributes {
     private GLAttributes() {
     }
