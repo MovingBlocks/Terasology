@@ -34,6 +34,7 @@ public class ShaderManagerLwjgl implements ShaderManager {
     private static final Logger logger = LoggerFactory.getLogger(ShaderManagerLwjgl.class);
 
     private GLSLMaterial activeMaterial;
+
     private Set<GLSLMaterial> progamaticShaders = Sets.newHashSet();
 
     public ShaderManagerLwjgl() {
@@ -43,7 +44,6 @@ public class ShaderManagerLwjgl implements ShaderManager {
     public void initShaders() {
         logCapabilities();
         addShaderProgram("default");
-        addShaderProgram("defaultTextured");
 
         // TODO: Find a better way to do this
         addShaderProgram("post");
@@ -69,6 +69,7 @@ public class ShaderManagerLwjgl implements ShaderManager {
         addShaderProgram("lightBufferPass");
         addShaderProgram("lightGeometryPass");
         addShaderProgram("ssaoBlur");
+        addShaderProgram("outputPass");
     }
 
     private void logCapabilities() {

@@ -18,7 +18,7 @@ public interface ShaderManager {
     void recompileAllShaders();
 
     Material addShaderProgram(String title, String providingModule);
-
+  
     void disableShader();
 
 }
