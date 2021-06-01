@@ -36,7 +36,6 @@ import com.google.api.client.util.Maps;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import gnu.trove.iterator.TFloatIterator;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
@@ -744,16 +743,17 @@ public class BulletPhysics implements PhysicsEngine {
         }
         HullShapeComponent hull = entityRef.getComponent(HullShapeComponent.class);
         if (hull != null) {
-            VertexAttributeBinding<Vector3fc, Vector3f> positions = hull.sourceMesh.getVertices();
-            FloatBuffer buffer = BufferUtils.createFloatBuffer(positions.getResource().elements() * 3);
+            VertexAttributeBinding<Vector3fc, Vector3f> positions = hull.sourceMesh.vertices();
+            final int numVertices = hull.sourceMesh.elements();
+            FloatBuffer buffer = BufferUtils.createFloatBuffer(numVertices * 3);
             Vector3f pos = new Vector3f();
-            for (int i = 0; i < positions.getResource().elements(); i++) {
+            for (int i = 0; i < numVertices; i++) {
                 positions.get(i, pos);
                 buffer.put(pos.x);
                 buffer.put(pos.y);
                 buffer.put(pos.z);
             }
-            return new btConvexHullShape(buffer, positions.getResource().elements(), 3 * Float.BYTES);
+            return new btConvexHullShape(buffer, numVertices, 3 * Float.BYTES);
         }
         CharacterMovementComponent characterMovementComponent =
                 entityRef.getComponent(CharacterMovementComponent.class);

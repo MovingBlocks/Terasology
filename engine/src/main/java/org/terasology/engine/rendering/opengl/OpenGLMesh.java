@@ -63,12 +63,12 @@ public class OpenGLMesh extends Mesh implements OpenGLMeshBase {
     }
 
     @Override
-    public VertexAttributeBinding<Vector3fc, Vector3f> getVertices() {
+    public VertexAttributeBinding<Vector3fc, Vector3f> vertices() {
         return data.positions();
     }
 
     @Override
-    public int getVertexCount() {
+    public int elements() {
         return data.positions().getResource().elements();
     }
 

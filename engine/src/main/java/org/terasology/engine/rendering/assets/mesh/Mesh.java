@@ -25,8 +25,8 @@ public abstract class Mesh extends Asset<MeshData> {
     public abstract AABBfc getAABB();
 
     protected AABBf getBound(AABBf dest) {
-        VertexAttributeBinding<Vector3fc, Vector3f> vertices = this.getVertices();
-        if (vertices.getResource().elements() == 0) {
+        VertexAttributeBinding<Vector3fc, Vector3f> vertices = this.vertices();
+        if (elements() == 0) {
             dest.set(Float.POSITIVE_INFINITY,
                     Float.POSITIVE_INFINITY,
                     Float.POSITIVE_INFINITY,
@@ -36,14 +36,14 @@ public abstract class Mesh extends Asset<MeshData> {
             return dest;
         }
         Vector3f pos = new Vector3f();
-        for (int x = 0; x < vertices.getResource().elements(); x++) {
+        for (int x = 0; x < elements(); x++) {
             dest.union(vertices.get(x, pos));
         }
         return dest;
     }
 
-    public abstract VertexAttributeBinding<Vector3fc, Vector3f> getVertices();
-    public abstract int getVertexCount();
+    public abstract VertexAttributeBinding<Vector3fc, Vector3f> vertices();
+    public abstract int elements();
 
     // TODO: Remove? At least review.
     public abstract void render();
