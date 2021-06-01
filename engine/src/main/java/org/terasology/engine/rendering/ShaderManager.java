@@ -19,16 +19,6 @@ public interface ShaderManager {
 
     Material addShaderProgram(String title, String providingModule);
 
-    /**
-     * Enables the default shader program.
-     */
-    void enableDefault();
-
-    /**
-     * Enables the default shader program.
-     */
-    void enableDefaultTextured();
-
     void disableShader();
 
 }

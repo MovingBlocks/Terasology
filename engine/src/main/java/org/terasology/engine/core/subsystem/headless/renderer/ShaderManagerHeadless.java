@@ -38,17 +38,7 @@ public class ShaderManagerHeadless implements ShaderManager {
     public Material addShaderProgram(String title, String providingModule) {
         return null;
     }
-
-    @Override
-    public void enableDefault() {
-        // Do nothing
-    }
-
-    @Override
-    public void enableDefaultTextured() {
-        // Do nothing
-    }
-
+    
     @Override
     public void disableShader() {
         // Do nothing
