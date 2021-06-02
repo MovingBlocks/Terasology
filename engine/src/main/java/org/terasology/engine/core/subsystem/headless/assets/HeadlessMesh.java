@@ -39,7 +39,7 @@ public class HeadlessMesh extends Mesh {
     }
 
     @Override
-    public int elements() {
+    public int elementCount() {
         return data.positions().getResource().elements();
     }
 

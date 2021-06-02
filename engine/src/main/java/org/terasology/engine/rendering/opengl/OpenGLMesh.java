@@ -68,7 +68,7 @@ public class OpenGLMesh extends Mesh implements OpenGLMeshBase {
     }
 
     @Override
-    public int elements() {
+    public int elementCount() {
         return data.positions().getResource().elements();
     }
 
