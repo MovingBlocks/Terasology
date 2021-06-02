@@ -183,11 +183,13 @@ public class AABBRenderer implements BlockOverlayRenderer, AutoCloseable {
 
         Vector3f dimensions = aabb.extent(new Vector3f());
         Vector3f pos = new Vector3f();
+        // top verts
         meshData.position.put(pos.set(-dimensions.x - offset, -dimensions.y - offset, -dimensions.z - offset)); // 0
         meshData.position.put(pos.set(+dimensions.x + offset, -dimensions.y - offset, -dimensions.z - offset)); // 1
         meshData.position.put(pos.set(+dimensions.x + offset, -dimensions.y - offset, +dimensions.z + offset)); // 2
         meshData.position.put(pos.set(-dimensions.x - offset, -dimensions.y - offset, +dimensions.z + offset)); // 3
 
+        // bottom verts
         meshData.position.put(pos.set(-dimensions.x - offset, +dimensions.y + offset, -dimensions.z - offset)); // 4
         meshData.position.put(pos.set(+dimensions.x + offset, +dimensions.y + offset, -dimensions.z - offset)); // 5
         meshData.position.put(pos.set(+dimensions.x + offset, +dimensions.y + offset, +dimensions.z + offset)); // 6
@@ -213,9 +215,8 @@ public class AABBRenderer implements BlockOverlayRenderer, AutoCloseable {
                 7, 4,
         });
 
-        Color color = new Color(Color.black);
         for (int i = 0; i < 8; i++) {
-            meshData.color0.put(color);
+            meshData.color0.put(Color.black);
         }
         wireMesh = Assets.generateAsset(meshData, Mesh.class);
     }
