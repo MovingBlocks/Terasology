@@ -20,9 +20,13 @@ import java.util.Map;
 
 @RegisterSystem
 public class BindCommands extends BaseComponentSystem {
+    public static Map<Integer, SimpleUri> AZERTY;
+    public static Map<Integer, SimpleUri> DVORAK;
+    public static Map<Integer, SimpleUri> NEO;
 
     @In
     private BindsManager bindsManager;
+
 
     @Command(shortDescription = "Maps a key to a function", requiredPermission = PermissionManager.NO_PERMISSION)
     public String bindKey(@CommandParam("key") String key, @CommandParam("function") String bind) {
@@ -33,10 +37,6 @@ public class BindCommands extends BaseComponentSystem {
         }
         throw new IllegalArgumentException("Unknown key: " + key);
     }
-
-    public static Map<Integer, SimpleUri> AZERTY;
-    public static Map<Integer, SimpleUri> DVORAK;
-    public static Map<Integer, SimpleUri> NEO;
 
     static {
         AZERTY = new HashMap<>();

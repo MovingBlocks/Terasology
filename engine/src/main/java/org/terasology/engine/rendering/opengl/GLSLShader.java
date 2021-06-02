@@ -50,12 +50,10 @@ import java.util.Set;
  * </p>
  */
 public class GLSLShader extends Shader {
+    // TODO this should be handled another way, we need to get ssao parameters here
+    public static int ssaoNoiseSize = 4;
 
     private static final Logger logger = LoggerFactory.getLogger(GLSLShader.class);
-
-    // TODO this should be handled another way, we need to get ssao parameters here
-    public int ssaoKernelElements = 32;
-    public static int ssaoNoiseSize = 4;
 
     private static String includedFunctionsVertex = "";
     private static String includedFunctionsFragment = "";
@@ -77,6 +75,9 @@ public class GLSLShader extends Shader {
             logger.error("Failed to load Include shader resources");
         }
     }
+
+    // TODO this should be handled another way, we need to get ssao parameters here
+    public int ssaoKernelElements = 32;
 
     private EnumSet<ShaderProgramFeature> availableFeatures = Sets.newEnumSet(Collections.emptyList(), ShaderProgramFeature.class);
     private ShaderData shaderProgramBase;

@@ -10,13 +10,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public final class Jvm {
-    private Jvm() { }
-
     @SuppressWarnings("CheckStyle")
     static final Pattern gradleCache = Pattern.compile(".*\\Wgradle\\Wcaches?\\b.*?(/.+)?/(.*\\.jar)$");
 
     @SuppressWarnings("CheckStyle")
     static final Pattern mavenCache = Pattern.compile(".*/.m2/repo.*/(.+\\.jar)$");
+
+    private Jvm() { }
 
     public static void logClasspath(Logger aLogger) {
         String interestingGroup = "org.terasology";
