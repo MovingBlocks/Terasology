@@ -10,8 +10,8 @@ import org.terasology.engine.world.WorldProvider;
 public abstract class SubmersibleCamera extends Camera {
 
     /* Used for Underwater Checks */
-    private WorldProvider worldProvider;
     RenderingConfig renderingConfig;
+    private WorldProvider worldProvider;
 
     public SubmersibleCamera(WorldProvider worldProvider, RenderingConfig renderingConfig) {
         this.worldProvider = worldProvider;

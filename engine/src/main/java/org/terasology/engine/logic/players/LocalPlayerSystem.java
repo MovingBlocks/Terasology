@@ -117,8 +117,6 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
     @In
     private Time time;
 
-    private BlockOverlayRenderer aabbRenderer = new AABBRenderer(new AABBf());
-
     private int inputSequenceNumber = 1;
 
     private AABBf aabb = new AABBf();
@@ -391,17 +389,10 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
     public void renderOverlay() {
         // Display the block the player is aiming at
         if (config.getRendering().isRenderPlacingBox() && hasTarget) {
-            aabbRenderer.setAABB(aabb);
-            aabbRenderer.render();
+            try (AABBRenderer renderer = new AABBRenderer(aabb)) {
+                renderer.render();
+            }
         }
-    }
-
-    public BlockOverlayRenderer getAABBRenderer() {
-        return aabbRenderer;
-    }
-
-    public void setAABBRenderer(BlockOverlayRenderer newAABBRender) {
-        aabbRenderer = newAABBRender;
     }
 
     private void updateCamera(CharacterMovementComponent charMovementComp, Vector3f position, Quaternionf rotation) {

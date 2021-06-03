@@ -40,6 +40,11 @@ public class AudioSystem extends BaseComponentSystem implements UpdateSubscriber
     @In
     private AudioManager audioManager;
 
+    // reuse same vector and quaternion instances when updating listeners during delta update.
+    private final Vector3f playerPosition = new Vector3f();
+    private final Vector3f playerVelocity = new Vector3f();
+    private final Quaternionf playerViewRotation = new Quaternionf();
+
     /**
      * Toggles the muting of sounds.
      *
@@ -60,10 +65,11 @@ public class AudioSystem extends BaseComponentSystem implements UpdateSubscriber
      * @param zOffset The z axis offset from the player to play the sound at.
      */
     @Command(shortDescription = "Plays a test sound")
-    public void playTestSound(@Sender EntityRef sender, @CommandParam("xOffset") float xOffset, @CommandParam("zOffset") float zOffset) {
-Vector3f position = localPlayer.getPosition(new Vector3f());
-        position.x += xOffset;
-        position.z += zOffset;
+    public void playTestSound(@Sender EntityRef sender,
+                              @CommandParam("xOffset") float xOffset,
+                              @CommandParam("zOffset") float zOffset) {
+        Vector3f position = localPlayer.getPosition(new Vector3f());
+        position.add(xOffset, 0, zOffset);
         audioManager.playSound(Assets.getSound("engine:dig").get(), position);
     }
 
@@ -107,8 +113,8 @@ Vector3f position = localPlayer.getPosition(new Vector3f());
     @Override
     public void update(float delta) {
         audioManager.updateListener(
-            localPlayer.getPosition(new Vector3f()),
-            localPlayer.getViewRotation(new Quaternionf()),
-            localPlayer.getVelocity(new Vector3f()));
+            localPlayer.getPosition(playerPosition),
+            localPlayer.getViewRotation(playerViewRotation),
+            localPlayer.getVelocity(playerVelocity));
     }
 }
