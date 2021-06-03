@@ -40,7 +40,6 @@ import java.nio.file.Path;
 import java.security.Policy;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -80,8 +79,6 @@ public class ModuleManager {
 
         Map<String, ModuleMetadataLoader> mmlm = moduleFactory.getModuleMetadataLoaderMap();
         mmlm.put(TerasologyConstants.MODULE_INFO_FILENAME.toString(), metadataReader);
-        mmlm.put("engine-module.txt", metadataReader);  // FIXME: this should be *only* for engine-module.
-        // FIXME: …or maybe engine-module doesn't need a special filename anymore?
 
         registry = new TableModuleRegistry();
 
@@ -115,7 +112,7 @@ public class ModuleManager {
         engineDep.setId(engineModule.getId());
         engineDep.setMinVersion(engineModule.getVersion());
 
-        HashSet<Name> engineModules = Sets.newHashSet(engineModule.getId());
+        Set<Name> engineModules = Sets.newHashSet(engineModule.getId());
         engineModules.addAll(engineModule.getMetadata().getDependencies().stream().map(DependencyInfo::getId).collect(Collectors.toList()));
 
         registry.stream()
@@ -125,7 +122,9 @@ public class ModuleManager {
 
     private void loadModulesFromApplicationPath(PathManager pathManager) {
         ModulePathScanner scanner = new ModulePathScanner(moduleFactory);
-        List<File> paths = pathManager.getModulePaths().stream().map(Path::toFile).collect(Collectors.toList());
+        List<File> paths = pathManager.getModulePaths().stream()
+                .map(Path::toFile)
+                .collect(Collectors.toList());
         scanner.scan(registry, paths);
     }
 

@@ -8,13 +8,14 @@ import org.terasology.engine.world.block.BlockRegion;
 import org.terasology.engine.world.generation.Border3D;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 /***
  * A strictly-sparse (not necessarily defined at all points) alternative to {@link BaseFieldFacet2D}
  */
 public abstract class BaseStrictlySparseFieldFacet2D extends BaseSparseFacet2D {
-    private HashMap<Vector2ic, Float> data = new HashMap<>();
+    private Map<Vector2ic, Float> data = new HashMap<>();
 
     public BaseStrictlySparseFieldFacet2D(BlockRegion targetRegion, Border3D border) {
         super(targetRegion, border);

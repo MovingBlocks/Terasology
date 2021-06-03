@@ -45,11 +45,6 @@ public class ShaderManagerHeadless implements ShaderManager {
     }
 
     @Override
-    public void enableDefaultTextured() {
-        // Do nothing
-    }
-
-    @Override
     public void disableShader() {
         // Do nothing
     }
