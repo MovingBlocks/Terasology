@@ -29,7 +29,6 @@ import org.terasology.engine.recording.RecordAndReplaySerializer;
 import org.terasology.engine.recording.RecordAndReplayStatus;
 import org.terasology.engine.recording.RecordAndReplayUtils;
 import org.terasology.engine.rendering.backdrop.BackdropProvider;
-import org.terasology.engine.rendering.backdrop.BackdropRenderer;
 import org.terasology.engine.rendering.backdrop.Skysphere;
 import org.terasology.engine.rendering.cameras.Camera;
 import org.terasology.engine.rendering.world.WorldRenderer;
@@ -153,9 +152,7 @@ public class InitialiseWorld extends SingleStepLoadProcess {
 
         Skysphere skysphere = new Skysphere(context);
         BackdropProvider backdropProvider = skysphere;
-        BackdropRenderer backdropRenderer = skysphere;
         context.put(BackdropProvider.class, backdropProvider);
-        context.put(BackdropRenderer.class, backdropRenderer);
 
         RenderingSubsystemFactory engineSubsystemFactory = context.get(RenderingSubsystemFactory.class);
         WorldRenderer worldRenderer = engineSubsystemFactory.createWorldRenderer(context);
