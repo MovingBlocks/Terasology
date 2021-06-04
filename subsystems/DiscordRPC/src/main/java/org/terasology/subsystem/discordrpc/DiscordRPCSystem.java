@@ -85,7 +85,9 @@ public final class DiscordRPCSystem extends BaseComponentSystem {
     @ReceiveEvent
     public void onPlayerInitialized(LocalPlayerInitializedEvent event, EntityRef localPlayer) {
         /* Adds the periodic action when the player is hosting or playing online to update party size */
-        if (networkSystem.getMode() != NetworkMode.NONE) {
+        //FIXME: The 'delayManager' is only available on the authority system and is not initialized on clients.
+        //       This will fail with a NPE when a clients tries to join a game.
+        if (delayManager != null && networkSystem.getMode() != NetworkMode.NONE) {
             delayManager.addPeriodicAction(localPlayer, UPDATE_PARTY_SIZE_ID, 0, UPDATE_PARTY_SIZE_PERIOD);
         }
     }
