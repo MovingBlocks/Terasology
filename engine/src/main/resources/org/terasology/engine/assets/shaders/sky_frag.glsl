@@ -7,10 +7,6 @@ in vec2 v_uv0;
 in vec3 v_colorYxy;
 in vec3 v_skyVec;
 
-//varying	vec3 colorYxy;
-//varying vec3 skyVec;
-//varying	vec4 position;
-
 uniform sampler2D texSky180;
 uniform sampler2D texSky90;
 
