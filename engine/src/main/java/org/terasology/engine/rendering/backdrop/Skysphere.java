@@ -13,8 +13,6 @@ import org.terasology.nui.properties.Range;
  */
 public class Skysphere implements BackdropProvider {
 
-    private static int displayListSphere = -1;
-
     @Range(min = 0.01f, max = 100.0f)
     private float colorExp = 0.01f;
     @Range(min = 2.0f, max = 32.0f)
