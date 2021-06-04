@@ -60,10 +60,6 @@ public interface OpenGLMeshBase {
             resource.writeBuffer((buffer) -> {
                 GL30.glBufferSubData(GL30.GL_ARRAY_BUFFER, currentOffset, buffer);
             });
-//            ByteBuffer vertexBuffer = resource.buffer();
-//            vertexBuffer.rewind();
-//            vertexBuffer.limit(resource.inSize());
-//            GL30.glBufferSubData(GL30.GL_ARRAY_BUFFER, offset, vertexBuffer);
             for (VertexResource.VertexDefinition attribute : resource.definitions()) {
                 GL30.glEnableVertexAttribArray(attribute.location);
                 GL30.glVertexAttribPointer(attribute.location, attribute.attribute.count,
