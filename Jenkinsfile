@@ -36,13 +36,6 @@ node ("ts-engine && heavy && java8") {
         }
     }            
 
-    stage('CheckStyle'){
-        sh './gradlew --console=plain checkstyleMain checkstyleTest checkstyleJmh'
-        recordIssues skipBlames: true, 
-            tool: checkStyle(pattern: '**/build/reports/checkstyle/*.xml'), 
-            qualityGates: [[threshold: 1, type: 'TOTAL_ERROR', unstable: false], [threshold: 1, type: 'TOTAL_HIGH', unstable: true]]
-    }
-
     stage('Publish') {
         if (specialBranch) {
             withCredentials([usernamePassword(credentialsId: 'artifactory-gooey', usernameVariable: 'artifactoryUser', passwordVariable: 'artifactoryPass')]) {
@@ -66,9 +59,9 @@ node ("ts-engine && heavy && java8") {
 
     stage('Analytics') {
         sh './gradlew --console=plain check -x test'
-        recordIssues skipBlames: true, tool: checkStyle(pattern: '**/build/reports/checkstyle/*.xml')
-        recordIssues skipBlames: true, tool: spotBugs(pattern: '**/build/reports/spotbugs/main/*.xml', useRankAsPriority: true)
-        recordIssues skipBlames: true, tool: pmdParser(pattern: '**/build/reports/pmd/*.xml')
+        recordIssues skipBlames: true, tool: checkStyle(pattern: '**/build/reports/checkstyle/*.xml'), qualityGates: [[threshold: 1, type: 'NEW', unstable: false]]
+        recordIssues skipBlames: true, tool: spotBugs(pattern: '**/build/reports/spotbugs/main/*.xml', useRankAsPriority: true), qualityGates: [[threshold: 1, type: 'NEW', unstable: false]]
+        recordIssues skipBlames: true, tool: pmdParser(pattern: '**/build/reports/pmd/*.xml'), qualityGates: [[threshold: 1, type: 'NEW', unstable: false]]
         recordIssues skipBlames: true, tool: taskScanner(includePattern: '**/*.java,**/*.groovy,**/*.gradle', lowTags: 'WIBNIF', normalTags: 'TODO', highTags: 'ASAP')
     }
 
