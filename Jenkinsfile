@@ -57,25 +57,30 @@ node ("ts-engine && heavy && java8") {
         }
     }
 
+    stage('Analytics') {
+        sh './gradlew --console=plain check -x test'
+        discoverGitReferenceBuild(defaultBranch: 'develop') //TODO: does this also work for PRs with different base branch?
+        recordIssues skipBlames: true, qualityGates: [[threshold: 1, type: 'NEW', unstable: true]], 
+            tool: checkStyle(pattern: '**/build/reports/checkstyle/*.xml')
+        recordIssues skipBlames: true, qualityGates: [[threshold: 1, type: 'NEW', unstable: true]],
+            tool: spotBugs(pattern: '**/build/reports/spotbugs/main/*.xml', useRankAsPriority: true)
+        recordIssues skipBlames: true, qualityGates: [[threshold: 1, type: 'NEW', unstable: true]],
+            tool: pmdParser(pattern: '**/build/reports/pmd/*.xml')
+        recordIssues skipBlames: true, 
+            tool: taskScanner(includePattern: '**/*.java,**/*.groovy,**/*.gradle', lowTags: 'WIBNIF', normalTags: 'TODO', highTags: 'ASAP')
+    }
+
+    stage('Documentation') {
+        sh './gradlew --console=plain javadoc'
+        step([$class: 'JavadocArchiver', javadocDir: 'engine/build/docs/javadoc', keepAll: false])
+        recordIssues skipBlames: true, tool: javaDoc()
+    }
+
     stage('Integration Tests') {
         try {
             sh './gradlew --console=plain integrationTest'
         } finally {
             junit testResults: '**/build/test-results/integrationTest/*.xml', allowEmptyResults: true
         }
-    }
-
-    stage('Analytics') {
-        sh './gradlew --console=plain check -x test spotbugsmain'
-        recordIssues tool: checkStyle(pattern: '**/build/reports/checkstyle/*.xml')
-        recordIssues tool: spotBugs(pattern: '**/build/reports/spotbugs/main/*.xml', useRankAsPriority: true)
-        recordIssues tool: pmdParser(pattern: '**/build/reports/pmd/*.xml')
-        recordIssues tool: taskScanner(includePattern: '**/*.java,**/*.groovy,**/*.gradle', lowTags: 'WIBNIF', normalTags: 'TODO', highTags: 'ASAP')
-    }
-
-    stage('Documentation') {
-        sh './gradlew --console=plain javadoc'
-        step([$class: 'JavadocArchiver', javadocDir: 'engine/build/docs/javadoc', keepAll: false])
-        recordIssues tool: javaDoc()
     }
 }
