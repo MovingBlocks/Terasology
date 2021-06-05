@@ -17,9 +17,9 @@ void main() {
 #if defined (FEATURE_LIGHT_POINT)
     vertexProjPos = (viewProjMatrix * modelMatrix) * vec4(in_vert, 1.0);
 #elif defined (FEATURE_LIGHT_DIRECTIONAL)
-    vertexProjPos =  vec4(in_vert, 1.0);
+    vertexProjPos = vec4(in_vert, 1.0);
 #endif
 
-	gl_Position = vertexProjPos;
+    gl_Position = vertexProjPos;
     v_uv0 = in_uv0;
 }
