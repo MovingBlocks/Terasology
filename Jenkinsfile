@@ -38,7 +38,9 @@ node ("ts-engine && heavy && java8") {
 
     stage('CheckStyle'){
         sh './gradlew --console=plain checkstyleMain checkstyleTest checkstyleJmh'
-        recordIssues tool: checkStyle(pattern: '**/build/reports/checkstyle/*.xml'), qualityGates: [[threshold: 1, type: 'TOTAL_ERROR', unstable: false], [threshold: 1, type: 'TOTAL_HIGH', unstable: true]], skipBlames: true
+        recordIssues skipBlames: true, 
+            tool: checkStyle(pattern: '**/build/reports/checkstyle/*.xml'), 
+            qualityGates: [[threshold: 1, type: 'TOTAL_ERROR', unstable: false], [threshold: 1, type: 'TOTAL_HIGH', unstable: true]]
     }
 
     stage('Publish') {
@@ -63,28 +65,24 @@ node ("ts-engine && heavy && java8") {
     }
 
     stage('Analytics') {
-        parallel 'integration test': {
-            try {
-                sh './gradlew --console=plain integrationTest'
-            } finally {
-                junit testResults: '**/build/test-results/integrationTest/*.xml', allowEmptyResults: true
-            }
-        },
-        'spotbugs': {
-            sh './gradlew --console=plain spotbugsMain spotbugsTest spotbugsJmh'
-            recordIssues tool: spotBugs(pattern: '**/build/reports/spotbugs/main/*.xml', useRankAsPriority: true)
-        },
-        'pmd': {
-            sh './gradlew --console=plain pmdMain pmdTest pmdJmh'
-            recordIssues tool: pmdParser(pattern: '**/build/reports/pmd/*.xml')
-        },
-        'task scanner': {
-            recordIssues tool: taskScanner(includePattern: '**/*.java,**/*.groovy,**/*.gradle', lowTags: 'WIBNIF', normalTags: 'TODO', highTags: 'ASAP')
-        },        
-        'documentation': {
-            sh './gradlew --console=plain javadoc'
-            step([$class: 'JavadocArchiver', javadocDir: 'engine/build/docs/javadoc', keepAll: false])
-            recordIssues tool: javaDoc()
-        }        
+        sh './gradlew --console=plain check -x test'
+        recordIssues skipBlames: true, tool: checkStyle(pattern: '**/build/reports/checkstyle/*.xml')
+        recordIssues skipBlames: true, tool: spotBugs(pattern: '**/build/reports/spotbugs/main/*.xml', useRankAsPriority: true)
+        recordIssues skipBlames: true, tool: pmdParser(pattern: '**/build/reports/pmd/*.xml')
+        recordIssues skipBlames: true, tool: taskScanner(includePattern: '**/*.java,**/*.groovy,**/*.gradle', lowTags: 'WIBNIF', normalTags: 'TODO', highTags: 'ASAP')
+    }
+
+    stage('Documentation') {
+        sh './gradlew --console=plain javadoc'
+        step([$class: 'JavadocArchiver', javadocDir: 'engine/build/docs/javadoc', keepAll: false])
+        recordIssues skipBlames: true, tool: javaDoc()
+    }
+
+    stage('Integration Tests') {
+        try {
+            sh './gradlew --console=plain integrationTest'
+        } finally {
+            junit testResults: '**/build/test-results/integrationTest/*.xml', allowEmptyResults: true
+        }
     }
 }
