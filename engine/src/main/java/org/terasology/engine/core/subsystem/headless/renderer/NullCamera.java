@@ -20,18 +20,6 @@ public final class NullCamera extends SubmersibleCamera {
     }
 
     @Override
-    public void loadProjectionMatrix() {
-    }
-
-    @Override
-    public void loadNormalizedModelViewMatrix() {
-    }
-
-    @Override
-    public void loadModelViewMatrix() {
-    }
-
-    @Override
     public boolean isBobbingAllowed() {
         return false;
     }
