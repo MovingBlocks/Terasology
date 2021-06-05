@@ -23,8 +23,8 @@ public class ChunkMeshInfo {
         if (mesh.hasVertexElements()) {
             for (ChunkMesh.RenderType type : ChunkMesh.RenderType.values()) {
                 final ChunkMesh.VertexElements element = mesh.getVertexElements(type);
-                vertices += element.finalVertices.limit();
-                indices += element.finalIndices.limit();
+                vertices += element.buffer.elements();
+                indices += element.indices.indices();
             }
         }
 
