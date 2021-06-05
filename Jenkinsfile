@@ -28,22 +28,17 @@ node ("ts-engine && heavy && java8") {
         archiveArtifacts 'gradlew, gradle/wrapper/*, templates/build.gradle, config/**, facades/PC/build/distributions/Terasology.zip, engine/build/resources/main/org/terasology/engine/version/versionInfo.properties, natives/**, build-logic/src/**, build-logic/*.kts'
     }
 
-    stage('Validation') {
-        parallel 'unit test': {
-            stage('Unit Test') {
-                try {
-                    sh './gradlew --console=plain unitTest'
-                } finally {
-                    junit testResults: '**/build/test-results/unitTest/*.xml'
-                }
-            }            
-        },
-        'checkstyle': {
-            stage('CheckStyle'){
-                sh './gradlew --console=plain checkstyleMain checkstyleTest checkstyleJmh'
-                recordIssues tool: checkStyle(pattern: '**/build/reports/checkstyle/*.xml'), qualityGates: [[threshold: 1, type: 'TOTAL_HIGH', unstable: false]]
-            }
+    stage('Unit Test') {
+        try {
+            sh './gradlew --console=plain unitTest'
+        } finally {
+            junit testResults: '**/build/test-results/unitTest/*.xml'
         }
+    }            
+
+    stage('CheckStyle'){
+        sh './gradlew --console=plain checkstyleMain checkstyleTest checkstyleJmh'
+        recordIssues tool: checkStyle(pattern: '**/build/reports/checkstyle/*.xml'), qualityGates: [[threshold: 1, type: 'TOTAL_ERROR', unstable: false], [threshold: 1, type: 'TOTAL_HIGH', unstable: true]], skipBlames: true
     }
 
     stage('Publish') {
