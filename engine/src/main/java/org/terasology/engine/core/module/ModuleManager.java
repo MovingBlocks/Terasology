@@ -62,7 +62,7 @@ public class ModuleManager {
     private final ModuleRegistry registry = new TableModuleRegistry();
     private ModuleEnvironment environment;
     private final ModuleMetadataJsonAdapter metadataReader = newMetadataReader();
-    private final ModuleFactory moduleFactory;
+    private final ModuleFactory moduleFactory = newModuleFactory(metadataReader);
     private final ModuleInstallManager installManager;
     private final Module engineModule;
 
@@ -71,22 +71,10 @@ public class ModuleManager {
     }
 
     public ModuleManager(String masterServerAddress, List<Class<?>> classesOnClasspathsToAddToEngine) {
-        PathManager pathManager = PathManager.getInstance();  // get early so if it needs to initialize, it does it now
-
-        if (Boolean.getBoolean(LOAD_CLASSPATH_MODULES_PROPERTY)) {
-            moduleFactory = new ClasspathCompromisingModuleFactory();
-        } else {
-            moduleFactory = new ModuleFactory();
-        }
-        moduleFactory.setDefaultLibsSubpath("build/libs");
-
-        Map<String, ModuleMetadataLoader> mmlm = moduleFactory.getModuleMetadataLoaderMap();
-        mmlm.put(TerasologyConstants.MODULE_INFO_FILENAME.toString(), metadataReader);
-
         engineModule = loadAndConfigureEngineModule(moduleFactory, classesOnClasspathsToAddToEngine);
         registry.add(engineModule);
 
-        loadModulesFromApplicationPath(pathManager);
+        loadModulesFromApplicationPath(PathManager.getInstance());
 
         ensureModulesDependOnEngine();
 
@@ -103,11 +91,29 @@ public class ModuleManager {
         this(config.getNetwork().getMasterServer(), classesOnClasspathsToAddToEngine);
     }
 
+    /** Create a ModuleFactory configured for Terasology modules. */
+    private static ModuleFactory newModuleFactory(ModuleMetadataJsonAdapter metadataReader) {
+        final ModuleFactory moduleFactory;
+        if (Boolean.getBoolean(LOAD_CLASSPATH_MODULES_PROPERTY)) {
+            moduleFactory = new ClasspathCompromisingModuleFactory();
+        } else {
+            moduleFactory = new ModuleFactory();
+        }
+        moduleFactory.setDefaultLibsSubpath("build/libs");
+
+        Map<String, ModuleMetadataLoader> mmlm = moduleFactory.getModuleMetadataLoaderMap();
+        mmlm.put(TerasologyConstants.MODULE_INFO_FILENAME.toString(), metadataReader);
+        return moduleFactory;
+    }
+
     /**
-     * I wondered why this is important, and found MovingBlocks/Terasology#1450.
-     * It's not a worry that the engine module wouldn't be loaded without it.
-     * It's about ordering: some things run in an order derived from the dependency
-     * tree, and we want to make sure engine is at the root of it.
+     * Ensure all modules declare a dependency on the engine module.
+     * <p>
+     * This is to ensure that the set of modules is a graph with a single root.
+     * We need this to ensure the engine is loaded <em>before</em> other modules
+     * when things iterate over the module list in dependency order.
+     * <p>
+     * See <a href="https://github.com/MovingBlocks/Terasology/issues/1450">#1450</a>.
      */
     private void ensureModulesDependOnEngine() {
         DependencyInfo engineDep = new DependencyInfo();
