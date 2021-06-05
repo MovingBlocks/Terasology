@@ -31,11 +31,10 @@ node ("ts-engine && heavy && java8") {
     stage('Validation') {
         parallel 'unit test': {
             try {
-            sh './gradlew --console=plain unitTest'
-        } finally {
-            junit testResults: '**/build/test-results/unitTest/*.xml'
-        }
-
+                sh './gradlew --console=plain unitTest'
+            } finally {
+                junit testResults: '**/build/test-results/unitTest/*.xml'
+            }
         },
         'checkstyle': {
             sh './gradlew --console=plain checkstyleMain checkstyleTest checkstyleJmh'
@@ -71,7 +70,7 @@ node ("ts-engine && heavy && java8") {
             } finally {
                 junit testResults: '**/build/test-results/integrationTest/*.xml', allowEmptyResults: true
             }
-        }
+        },
         'spotbugs': {
             sh './gradlew --console=plain spotbugsMain spotbugsTest spotbugsJmh'
             recordIssues tool: spotBugs(pattern: '**/build/reports/spotbugs/main/*.xml', useRankAsPriority: true)
