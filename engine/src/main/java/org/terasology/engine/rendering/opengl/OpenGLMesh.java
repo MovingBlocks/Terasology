@@ -100,7 +100,7 @@ public class OpenGLMesh extends Mesh implements OpenGLMeshBase {
         VertexResource[] resources = newData.vertexResources();
         List<VertexResource> targets = new ArrayList<>();
         for (VertexResource vertexResource : resources) {
-            if (vertexResource.getVersion() > 0) {
+            if (vertexResource.inSize() > 0) {
                 targets.add(vertexResource);
             }
         }

@@ -39,7 +39,7 @@ public class IndexResource extends BufferedResource {
     public void put(int value) {
         if (posIndex >= inIndices) {
             inIndices++;
-            allocate(inIndices * Integer.BYTES);
+            allocateElements(inIndices);
         }
         buffer.putInt(posIndex * Integer.BYTES, value);
         posIndex++;
