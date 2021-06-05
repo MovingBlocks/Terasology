@@ -30,15 +30,19 @@ node ("ts-engine && heavy && java8") {
 
     stage('Validation') {
         parallel 'unit test': {
-            try {
-                sh './gradlew --console=plain unitTest'
-            } finally {
-                junit testResults: '**/build/test-results/unitTest/*.xml'
-            }
+            stage('Unit Test') {
+                try {
+                    sh './gradlew --console=plain unitTest'
+                } finally {
+                    junit testResults: '**/build/test-results/unitTest/*.xml'
+                }
+            }            
         },
         'checkstyle': {
-            sh './gradlew --console=plain checkstyleMain checkstyleTest checkstyleJmh'
-            recordIssues tool: checkStyle(pattern: '**/build/reports/checkstyle/*.xml')
+            stage('CheckStyle'){
+                sh './gradlew --console=plain checkstyleMain checkstyleTest checkstyleJmh'
+                recordIssues tool: checkStyle(pattern: '**/build/reports/checkstyle/*.xml')
+            }
         }
     }
 
