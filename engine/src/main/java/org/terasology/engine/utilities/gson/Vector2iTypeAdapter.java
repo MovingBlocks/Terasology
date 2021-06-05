@@ -12,8 +12,6 @@ import org.joml.Vector2i;
 
 import java.lang.reflect.Type;
 
-/**
- */
 public class Vector2iTypeAdapter implements JsonDeserializer<Vector2i> {
     @Override
     public Vector2i deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {

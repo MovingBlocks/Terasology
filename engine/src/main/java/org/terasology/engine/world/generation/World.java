@@ -7,8 +7,6 @@ import org.terasology.engine.world.chunks.Chunk;
 
 import java.util.Set;
 
-/**
- */
 public interface World {
 
     Region getWorldData(BlockRegion region, float scale);

@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class GsonTypeHandlerLibraryAdapterFactoryTest {
     private static final TestClass OBJECT = new TestClass(
             new Color(0xDEADBEEF),
-            ImmutableSet.of(new Vector4f(0,0,0,0), new Vector4f(1,1,1,1)),
+            ImmutableSet.of(new Vector4f(0, 0, 0, 0), new Vector4f(1, 1, 1, 1)),
             ImmutableMap.of(
                     "someRect",
                     new Rectanglei(-3, -3).setSize(10, 10)
@@ -57,13 +57,10 @@ public class GsonTypeHandlerLibraryAdapterFactoryTest {
         assertEquals(OBJECT, deserializedObject);
     }
 
-    private static class TestClass {
+    private static final class TestClass {
         private final Color color;
         private final Set<Vector4f> vector4fs;
         private final Map<String, Rectanglei> rectangleiMap;
-
-        // Will not be serialized
-        private final Map<Integer, Integer> intMap;
 
         private final int i;
 
@@ -72,19 +69,23 @@ public class GsonTypeHandlerLibraryAdapterFactoryTest {
             this.color = color;
             this.vector4fs = vector4fs;
             this.rectangleiMap = rectangleiMap;
-            this.intMap = intMap;
+            // Will not be serialized
             this.i = i;
         }
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
             TestClass testClass = (TestClass) o;
-            return i == testClass.i &&
-                    Objects.equals(color, testClass.color) &&
-                    Objects.equals(vector4fs, testClass.vector4fs) &&
-                    Objects.equals(rectangleiMap, testClass.rectangleiMap);
+            return i == testClass.i
+                    && Objects.equals(color, testClass.color)
+                    && Objects.equals(vector4fs, testClass.vector4fs)
+                    && Objects.equals(rectangleiMap, testClass.rectangleiMap);
         }
     }
 }

@@ -6,8 +6,6 @@ package org.terasology.engine.world;
 import org.joml.Vector3ic;
 import org.terasology.engine.world.block.Block;
 
-/**
- */
 public interface WorldChangeListener {
 
     void onBlockChanged(Vector3ic pos, Block newBlock, Block originalBlock);

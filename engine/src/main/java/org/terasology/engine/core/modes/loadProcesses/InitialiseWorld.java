@@ -1,4 +1,4 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.engine.core.modes.loadProcesses;
@@ -10,11 +10,11 @@ import org.terasology.engine.config.SystemConfig;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.core.ComponentSystemManager;
 import org.terasology.engine.core.GameEngine;
+import org.terasology.engine.core.PathManager;
 import org.terasology.engine.core.TerasologyConstants;
 import org.terasology.engine.core.modes.SingleStepLoadProcess;
 import org.terasology.engine.core.modes.StateMainMenu;
 import org.terasology.engine.core.module.ModuleManager;
-import org.terasology.engine.core.paths.PathManager;
 import org.terasology.engine.core.subsystem.RenderingSubsystemFactory;
 import org.terasology.engine.entitySystem.entity.EntityManager;
 import org.terasology.engine.entitySystem.entity.internal.EngineEntityManager;
@@ -29,7 +29,6 @@ import org.terasology.engine.recording.RecordAndReplaySerializer;
 import org.terasology.engine.recording.RecordAndReplayStatus;
 import org.terasology.engine.recording.RecordAndReplayUtils;
 import org.terasology.engine.rendering.backdrop.BackdropProvider;
-import org.terasology.engine.rendering.backdrop.BackdropRenderer;
 import org.terasology.engine.rendering.backdrop.Skysphere;
 import org.terasology.engine.rendering.cameras.Camera;
 import org.terasology.engine.rendering.world.WorldRenderer;
@@ -117,8 +116,10 @@ public class InitialiseWorld extends SingleStepLoadProcess {
         RecordAndReplayCurrentStatus recordAndReplayCurrentStatus = context.get(RecordAndReplayCurrentStatus.class);
         try {
             storageManager = writeSaveGamesEnabled
-                    ? new ReadWriteStorageManager(saveOrRecordingPath, environment, entityManager, blockManager, extraDataManager, recordAndReplaySerializer, recordAndReplayUtils, recordAndReplayCurrentStatus)
-                    : new ReadOnlyStorageManager(saveOrRecordingPath, environment, entityManager, blockManager, extraDataManager);
+                    ? new ReadWriteStorageManager(saveOrRecordingPath, environment, entityManager, blockManager,
+                    extraDataManager, recordAndReplaySerializer, recordAndReplayUtils, recordAndReplayCurrentStatus)
+                    : new ReadOnlyStorageManager(saveOrRecordingPath, environment, entityManager, blockManager,
+                    extraDataManager);
         } catch (IOException e) {
             logger.error("Unable to create storage manager!", e);
             context.get(GameEngine.class).changeState(new StateMainMenu("Unable to create storage manager!"));
@@ -136,7 +137,8 @@ public class InitialiseWorld extends SingleStepLoadProcess {
         context.get(ComponentSystemManager.class).register(relevanceSystem, "engine:relevanceSystem");
         chunkProvider.setRelevanceSystem(relevanceSystem);
         Block unloadedBlock = blockManager.getBlock(BlockManager.UNLOADED_ID);
-        WorldProviderCoreImpl worldProviderCore = new WorldProviderCoreImpl(worldInfo, chunkProvider, unloadedBlock, context);
+        WorldProviderCoreImpl worldProviderCore = new WorldProviderCoreImpl(worldInfo, chunkProvider, unloadedBlock,
+                context);
         EntityAwareWorldProvider entityWorldProvider = new EntityAwareWorldProvider(worldProviderCore, context);
         WorldProvider worldProvider = new WorldProviderWrapper(entityWorldProvider, extraDataManager);
         context.put(WorldProvider.class, worldProvider);
@@ -150,9 +152,7 @@ public class InitialiseWorld extends SingleStepLoadProcess {
 
         Skysphere skysphere = new Skysphere(context);
         BackdropProvider backdropProvider = skysphere;
-        BackdropRenderer backdropRenderer = skysphere;
         context.put(BackdropProvider.class, backdropProvider);
-        context.put(BackdropRenderer.class, backdropRenderer);
 
         RenderingSubsystemFactory engineSubsystemFactory = context.get(RenderingSubsystemFactory.class);
         WorldRenderer worldRenderer = engineSubsystemFactory.createWorldRenderer(context);
@@ -160,7 +160,8 @@ public class InitialiseWorld extends SingleStepLoadProcess {
 
         // TODO: These shouldn't be done here, nor so strongly tied to the world renderer
         LocalPlayer localPlayer = new LocalPlayer();
-        localPlayer.setRecordAndReplayClasses(context.get(DirectionAndOriginPosRecorderList.class), context.get(RecordAndReplayCurrentStatus.class));
+        localPlayer.setRecordAndReplayClasses(context.get(DirectionAndOriginPosRecorderList.class),
+                context.get(RecordAndReplayCurrentStatus.class));
         context.put(LocalPlayer.class, localPlayer);
         context.put(Camera.class, worldRenderer.getActiveCamera());
 

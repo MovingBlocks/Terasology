@@ -40,8 +40,8 @@ public class BlockAreacTypeHandler extends TypeHandler<BlockAreac> {
                 PersistedDataArray sizedataArray = map.get(SIZE_FIELD).getAsArray();
                 TIntList sizeArr = sizedataArray.getAsIntegerArray();
                 return Optional.of(
-                    new BlockArea(minArr.get(0), minArr.get(1))
-                    		.setSize(sizeArr.get(0), sizeArr.get(1)));
+                        new BlockArea(minArr.get(0), minArr.get(1))
+                                .setSize(sizeArr.get(0), sizeArr.get(1)));
             }
 
             PersistedDataArray maxDataArr = map.get(MAX_FIELD).getAsArray();

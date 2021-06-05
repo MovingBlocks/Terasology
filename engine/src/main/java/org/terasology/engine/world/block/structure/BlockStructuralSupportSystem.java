@@ -28,8 +28,6 @@ import java.util.Comparator;
 import java.util.Map;
 import java.util.Set;
 
-/**
- */
 @RegisterSystem
 @Share(BlockStructuralSupportRegistry.class)
 public class BlockStructuralSupportSystem extends BaseComponentSystem implements BlockStructuralSupportRegistry {
@@ -65,7 +63,7 @@ public class BlockStructuralSupportSystem extends BaseComponentSystem implements
         supports.add(blockStructuralSupport);
     }
 
-    @ReceiveEvent(components = {BlockComponent.class})
+    @ReceiveEvent(components = BlockComponent.class)
     public void checkForSupportRemoved(OnChangedBlock event, EntityRef entity) {
         PerformanceMonitor.startActivity("StructuralCheck");
         try {

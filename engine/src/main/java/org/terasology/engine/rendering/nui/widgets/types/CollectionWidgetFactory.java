@@ -53,7 +53,7 @@ public class CollectionWidgetFactory implements TypeWidgetFactory {
     private static class GrowableListCollectionWidgetBuilder<T extends Collection<E>, E>
         extends GrowableListWidgetBuilder<T, E> {
 
-        public GrowableListCollectionWidgetBuilder(
+        GrowableListCollectionWidgetBuilder(
             TypeInfo<T> type,
             TypeWidgetLibrary library,
             ObjectConstructor<T> constructor

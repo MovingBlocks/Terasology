@@ -19,8 +19,6 @@ import org.terasology.persistence.typeHandling.PersistedDataArray;
 import java.util.Iterator;
 import java.util.List;
 
-/**
- */
 public class GsonPersistedDataArray extends AbstractGsonPersistedData implements PersistedDataArray {
 
     private JsonArray array;

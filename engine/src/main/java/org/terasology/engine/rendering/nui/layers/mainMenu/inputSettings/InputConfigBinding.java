@@ -11,8 +11,6 @@ import org.terasology.nui.databinding.Binding;
 
 import java.util.List;
 
-/**
- */
 public class InputConfigBinding implements Binding<Input> {
 
     private BindsConfig config;

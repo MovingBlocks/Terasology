@@ -34,7 +34,7 @@ class RecordedEventSerializer {
     private static final Logger logger = LoggerFactory.getLogger(RecordedEventSerializer.class);
     private final Serializer<?> serializer;
 
-    public RecordedEventSerializer(EntityManager entityManager, ModuleManager moduleManager, TypeRegistry typeRegistry) {
+    RecordedEventSerializer(EntityManager entityManager, ModuleManager moduleManager, TypeRegistry typeRegistry) {
         TypeHandlerLibrary typeHandlerLibrary = TypeHandlerLibraryImpl.forModuleEnvironment(moduleManager, typeRegistry);
         typeHandlerLibrary.addTypeHandler(EntityRef.class, new EntityRefTypeHandler((EngineEntityManager) entityManager));
         Gson gson = new Gson();
@@ -71,7 +71,7 @@ class RecordedEventSerializer {
 
         try (FileInputStream fileInputStream = new FileInputStream(filePath)) {
             List<RecordedEvent> recordedEvents =
-                    serializer.deserialize(new TypeInfo<List<RecordedEvent>>() {}, fileInputStream).get();
+                    serializer.deserialize(new TypeInfo<List<RecordedEvent>>() { }, fileInputStream).get();
             events.addAll(recordedEvents);
         } catch (SerializationException | IOException e) {
             logger.error("Error while serializing recorded events", e);

@@ -34,13 +34,12 @@ public class TileFormat extends AbstractAssetFileFormat<TileData> {
             if (!IntMath.isPowerOfTwo(image.getHeight()) || image.getWidth() % image.getHeight() != 0 || image.getWidth() == 0) {
                 throw new IOException("Invalid tile - must be horizontal row of power-of-two sized squares");
             }
-            BufferedImage[] frames = new BufferedImage[image.getWidth()/image.getHeight()];
-            for (int i=0; i<frames.length; i++) {
+            BufferedImage[] frames = new BufferedImage[image.getWidth() / image.getHeight()];
+            for (int i = 0; i < frames.length; i++) {
                 frames[i] = new BufferedImage(image.getHeight(), image.getHeight(), BufferedImage.TYPE_INT_ARGB);
                 frames[i].createGraphics().drawImage(image, -image.getHeight() * i, 0, null);
             }
             return new TileData(frames, auto);
         }
     }
-
 }

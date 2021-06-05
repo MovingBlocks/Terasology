@@ -3,7 +3,6 @@
 package org.terasology.engine.rendering.logic;
 
 import com.google.common.collect.Maps;
-import org.joml.Matrix3f;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
@@ -172,13 +171,13 @@ public class FloatingTextRenderer extends BaseComponentSystem implements RenderS
     public void renderShadows() {
     }
 
-    @ReceiveEvent(components = {FloatingTextComponent.class})
+    @ReceiveEvent(components = FloatingTextComponent.class)
     public void onDisplayNameChange(OnChangedComponent event, EntityRef entity) {
         disposeCachedMeshOfEntity(entity);
     }
 
 
-    @ReceiveEvent(components = {FloatingTextComponent.class})
+    @ReceiveEvent(components = FloatingTextComponent.class)
     public void onNameTagOwnerRemoved(BeforeDeactivateComponent event, EntityRef entity) {
         disposeCachedMeshOfEntity(entity);
     }

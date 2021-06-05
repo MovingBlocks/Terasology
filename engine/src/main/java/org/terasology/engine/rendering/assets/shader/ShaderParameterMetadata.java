@@ -3,8 +3,6 @@
 
 package org.terasology.engine.rendering.assets.shader;
 
-/**
- */
 public class ShaderParameterMetadata {
     String name;
     ParamType type;

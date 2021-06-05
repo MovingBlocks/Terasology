@@ -12,8 +12,6 @@ import org.terasology.gestalt.naming.Name;
 import java.util.Map;
 import java.util.Optional;
 
-/**
- */
 public class Atlas extends Asset<AtlasData> {
     private Map<ResourceUrn, SubtextureData> subtextures = Maps.newHashMap();
 

@@ -12,8 +12,6 @@ import org.terasology.persistence.typeHandling.StringRepresentationTypeHandler;
 
 import java.util.Optional;
 
-/**
- */
 // NOTE: This is a copy of TextureRegionTypeHandler that is to be used with UITextureRegions
 public class UITextureRegionTypeHandler extends StringRepresentationTypeHandler<UITextureRegion> {
     private static final Logger logger = LoggerFactory.getLogger(UITextureRegionTypeHandler.class);
