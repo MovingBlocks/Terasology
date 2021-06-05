@@ -39,7 +39,7 @@ uniform sampler2D texSceneClouds;
 uniform sampler2D texSceneShadowMap;
 #endif
 
-uniform mat4 lightViewProjMatrix;
+uniform mat4 viewProjMatrix;
 
 uniform vec3 activeCameraToLightSpace;
 
@@ -67,7 +67,7 @@ void main() {
     vec3 worldPosition = reconstructViewPos(depth, v_uv0.xy, invViewProjMatrix);
     vec3 lightWorldPosition = worldPosition.xyz + activeCameraToLightSpace;
 
-    vec4 lightProjVertPos = lightViewProjMatrix * vec4(lightWorldPosition.x, lightWorldPosition.y, lightWorldPosition.z, 1.0);
+    vec4 lightProjVertPos = viewProjMatrix * vec4(lightWorldPosition.x, lightWorldPosition.y, lightWorldPosition.z, 1.0);
 
     lightProjVertPos.xyz /= lightProjVertPos.w;
     vec2 shadowMapTexPos = lightProjVertPos.xy * vec2(0.5) + vec2(0.5);
