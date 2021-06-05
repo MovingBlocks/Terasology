@@ -9,7 +9,7 @@ import org.terasology.engine.particles.functions.RegisterParticleSystemFunction;
 import org.terasology.engine.utilities.random.Random;
 
 
-@RegisterParticleSystemFunction()
+@RegisterParticleSystemFunction
 public final class VelocityAffectorFunction extends AffectorFunction<VelocityAffectorComponent> {
     public VelocityAffectorFunction() {
         super(ParticleDataMask.POSITION, ParticleDataMask.VELOCITY);

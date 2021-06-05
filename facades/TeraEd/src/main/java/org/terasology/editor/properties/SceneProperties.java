@@ -8,7 +8,6 @@ import org.terasology.engine.core.TerasologyEngine;
 import org.terasology.engine.core.modes.GameState;
 import org.terasology.engine.core.modes.StateIngame;
 import org.terasology.engine.rendering.backdrop.BackdropProvider;
-import org.terasology.engine.rendering.backdrop.BackdropRenderer;
 
 import java.util.List;
 
@@ -34,10 +33,6 @@ public class SceneProperties implements PropertyProvider {
         BackdropProvider backdropProvider = ingameContext.get(BackdropProvider.class);
         if (backdropProvider != null) {
             result.addAll(new ReflectionProvider(backdropProvider, ingameContext).getProperties());
-        }
-        BackdropRenderer backdropRenderer = ingameContext.get(BackdropRenderer.class);
-        if (backdropRenderer != null) {
-            result.addAll(new ReflectionProvider(backdropRenderer, ingameContext).getProperties());
         }
 
         // TODO: fix this

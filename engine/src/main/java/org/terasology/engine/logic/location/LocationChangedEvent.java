@@ -2,67 +2,95 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.logic.location;
 
+import com.google.common.base.Preconditions;
 import org.joml.Quaternionf;
 import org.joml.Quaternionfc;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.terasology.engine.entitySystem.event.Event;
 
+/**
+ * A <i>notification event</i> that the location and/or rotation of the associated entity has changed.
+ * <p>
+ * This is similar to a {@link org.terasology.engine.entitySystem.event.BeforeAfterEvent BeforeAfterEvent} but holds the
+ * last and current values for both {@code position} and {@code rotation}.
+ */
 public class LocationChangedEvent implements Event {
-    public final LocationComponent component;
-    public final Vector3fc oldPosition;
-    public final Quaternionfc oldRotation;
-    public final Vector3fc newPosition;
-    public final Quaternionfc newRotation;
+    protected Vector3f lastPosition = new Vector3f();
+    protected Quaternionf lastRotation = new Quaternionf();
+    protected Vector3f currentPosition = new Vector3f();
+    protected Quaternionf currentRotation = new Quaternionf();
 
-    public LocationChangedEvent(LocationComponent newLocation) {
-        this(newLocation, newLocation.position, newLocation.rotation, newLocation.position, newLocation.rotation);
+    /**
+     * INTERNAL: default constructor for de-/serialization.
+     */
+    protected LocationChangedEvent() {
     }
 
-    public LocationChangedEvent(LocationComponent newLocation, Vector3f oPosition) {
-        this(newLocation, oPosition, newLocation.rotation, newLocation.position, newLocation.rotation);
+    /**
+     * Create a new <i>notification event</i> about a location and/or rotation change.
+     *
+     * @param lastPosition the previous position; must not be {@code null}
+     * @param lastRotation the previous rotation; must not be {@code null}
+     * @param currentPosition the current position; must not be {@code null}
+     * @param currentRotation the current rotation; must not be {@code null}
+     */
+    public LocationChangedEvent(Vector3fc lastPosition, Quaternionfc lastRotation,
+                                Vector3fc currentPosition, Quaternionfc currentRotation) {
+        Preconditions.checkNotNull(lastPosition);
+        Preconditions.checkNotNull(lastRotation);
+        Preconditions.checkNotNull(currentPosition);
+        Preconditions.checkNotNull(currentRotation);
+
+        this.lastPosition.set(lastPosition);
+        this.lastRotation.set(lastRotation);
+        this.currentPosition.set(currentPosition);
+        this.currentRotation.set(currentRotation);
     }
 
-    public LocationChangedEvent(LocationComponent newLocation, Vector3f oPosition, Vector3f nPosition) {
-        this(newLocation, oPosition, newLocation.rotation, nPosition, newLocation.rotation);
+    public Vector3fc lastPosition() {
+        return lastPosition;
     }
 
-    public LocationChangedEvent(LocationComponent newLocation, Quaternionfc oRotation) {
-        this(newLocation, newLocation.position, oRotation, newLocation.position, newLocation.rotation);
+    public Quaternionfc lastRotation() {
+        return lastRotation;
     }
 
-    public LocationChangedEvent(LocationComponent newLocation, Quaternionfc oRotation, Quaternionfc nRotation) {
-        this(newLocation, newLocation.position, oRotation, newLocation.position, nRotation);
+    public Vector3fc currentPosition() {
+        return currentPosition;
     }
 
-    public LocationChangedEvent(LocationComponent newLocation, Vector3f oPosition, Quaternionfc oRotation) {
-        this(newLocation, oPosition, oRotation, newLocation.position, newLocation.rotation);
+    public Quaternionfc currentRotation() {
+        return currentRotation;
     }
 
-    public LocationChangedEvent(LocationComponent newLocation, Vector3f oPosition, Quaternionfc oRotation,
-                                Vector3f nPosition) {
-        this(newLocation, oPosition, oRotation, nPosition, newLocation.rotation);
+    /**
+     * Compute the vector that has to be added to get from {@link #lastPosition()} to {@link #currentPosition()} and
+     * store the result in {@code dest}.
+     * <p>
+     * If V is the computed difference between {@code last} and {@code current}, then the following equation holds:
+     * <p>
+     * <code>last + V = current</code>
+     *
+     * @param dest will hold the result
+     * @return {@code dest}
+     */
+    public Vector3f positionDelta(Vector3f dest) {
+        return currentPosition.sub(lastPosition, dest);
     }
 
-    public LocationChangedEvent(LocationComponent newLocation, Vector3f oPosition, Quaternionfc oRotation,
-                                Quaternionfc nRotation) {
-        this(newLocation, oPosition, oRotation, newLocation.position, nRotation);
-    }
-
-    public LocationChangedEvent(LocationComponent nComponent, Vector3fc oPosition, Quaternionfc oRotation,
-                                Vector3fc nPosition, Quaternionfc nRotation) {
-        oldPosition = new Vector3f(oPosition);
-        oldRotation = new Quaternionf(oRotation);
-        newPosition = new Vector3f(nPosition);
-        newRotation = new Quaternionf(nRotation);
-        component = nComponent;
-    }
-
-    public Vector3f vectorMoved(Vector3f dest) {
-        return oldPosition != null ? newPosition.sub(oldPosition, dest) : dest.set(0, 0, 0);
-    }
-
-    public float distanceMoved() {
-        return oldPosition != null ? newPosition.distance(oldPosition) : 0.0F;
+    /**
+     * Compute the rotation that has to be applied to get from {@link #lastRotation()} to {@link #currentRotation()} and
+     * store the result in {@code dest}.
+     * <p>
+     * If D is the computed difference between {@code last} and {@code current}, then the following equation holds:
+     * <p>
+     * <code>last * D = current</code>
+     *
+     * @param dest will hold the result
+     * @return {@code dest}
+     */
+    public Quaternionf rotationDelta(Quaternionf dest) {
+        return lastRotation.difference(currentRotation, dest);
     }
 }

@@ -38,7 +38,7 @@ public class PlaySoundAction extends BaseComponentSystem {
      * @param event contains the details for the predicted event, used here for location purposes
      * @param entity is source of the playsound
      */
-    @ReceiveEvent(components = {PlaySoundActionComponent.class})
+    @ReceiveEvent(components = PlaySoundActionComponent.class)
     public void onActivationPredicted(ActivationPredicted event, EntityRef entity) {
         PlaySoundActionComponent playSound = entity.getComponent(PlaySoundActionComponent.class);
         StaticSound sound = random.nextItem(playSound.sounds);
@@ -65,7 +65,7 @@ public class PlaySoundAction extends BaseComponentSystem {
      * @param event contains the details for the active event, used here for location purposes
      * @param entity is source of the playsound
      */
-    @ReceiveEvent(components = {PlaySoundActionComponent.class})
+    @ReceiveEvent(components = PlaySoundActionComponent.class)
     public void onActivate(ActivateEvent event, EntityRef entity) {
         if (event.getInstigator().equals(localPlayer.getCharacterEntity())) {
             return; // owner has heard sound from prediction

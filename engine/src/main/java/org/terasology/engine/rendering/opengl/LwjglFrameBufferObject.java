@@ -2,26 +2,22 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.rendering.opengl;
 
+import org.joml.Matrix4f;
+import org.joml.Matrix4fStack;
 import org.joml.Vector2i;
 import org.joml.Vector2ic;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL30;
-import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.engine.core.subsystem.DisplayDevice;
 import org.terasology.engine.rendering.assets.texture.Texture;
 import org.terasology.engine.rendering.assets.texture.TextureData;
+import org.terasology.engine.rendering.nui.internal.LwjglCanvasRenderer;
 import org.terasology.engine.utilities.Assets;
+import org.terasology.gestalt.assets.ResourceUrn;
 
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
-
-import static org.lwjgl.opengl.GL11.GL_MODELVIEW;
-import static org.lwjgl.opengl.GL11.GL_PROJECTION;
-import static org.lwjgl.opengl.GL11.GL_TEXTURE;
-import static org.lwjgl.opengl.GL11.glLoadIdentity;
-import static org.lwjgl.opengl.GL11.glMatrixMode;
-import static org.lwjgl.opengl.GL11.glOrtho;
 
 /**
  * A OpenGL framebuffer. Generates the fbo and a backing texture.
@@ -31,10 +27,18 @@ public class LwjglFrameBufferObject implements FrameBufferObject {
     private int frame;
     private Vector2ic size;
     private IntBuffer vp;
+    private LwjglCanvasRenderer canvasRenderer;
 
-    public LwjglFrameBufferObject(DisplayDevice displayDevice, ResourceUrn urn, Vector2ic size) {
+    private final Matrix4fStack transforms;
+    private final Matrix4f projectionMatrix;
+    private final Matrix4f lastProjectionMatrix = new Matrix4f();
+
+    public LwjglFrameBufferObject(Matrix4fStack transforms, Matrix4f projectionMatrix, DisplayDevice displayDevice, ResourceUrn urn, Vector2ic size) {
         this.displayDevice = displayDevice;
         this.size = new Vector2i(size);
+
+        this.projectionMatrix = projectionMatrix;
+        this.transforms = transforms;
 
         IntBuffer fboId = BufferUtils.createIntBuffer(1);
         GL30.glGenFramebuffers(fboId);
@@ -70,29 +74,22 @@ public class LwjglFrameBufferObject implements FrameBufferObject {
         GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, 0);
         GL11.glViewport(vp.get(0), vp.get(1), vp.get(2), vp.get(3));
 
-        glMatrixMode(GL_TEXTURE);
-        glLoadIdentity();
-        glMatrixMode(GL_PROJECTION);
-        glLoadIdentity();
-        glOrtho(0, displayDevice.getWidth(), displayDevice.getHeight(), 0, 0, 2048f);
-        glMatrixMode(GL_MODELVIEW);
-        glLoadIdentity();
+        projectionMatrix.set(lastProjectionMatrix);
+        transforms.popMatrix();
     }
 
     @Override
     public void bindFrame() {
+        lastProjectionMatrix.set(projectionMatrix);
+
         vp = BufferUtils.createIntBuffer(16);
-        GL11.glGetIntegerv(GL11.GL_VIEWPORT, vp);
+        GL30.glGetIntegerv(GL30.GL_VIEWPORT, vp);
 
         GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, frame);
-        GL11.glViewport(0, 0, size.x(), size.y());
+        GL30.glViewport(0, 0, size.x(), size.y());
 
-        glMatrixMode(GL_TEXTURE);
-        glLoadIdentity();
-        glMatrixMode(GL_PROJECTION);
-        glLoadIdentity();
-        glOrtho(0, size.x(), size.y(), 0, 0, 2048f);
-        glMatrixMode(GL_MODELVIEW);
-        glLoadIdentity();
+        projectionMatrix.setOrtho(0, size.x(), size.y(), 0,0 , 2048f);
+        transforms.pushMatrix();
+        transforms.identity();
     }
 }

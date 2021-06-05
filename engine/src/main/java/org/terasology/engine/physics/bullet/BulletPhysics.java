@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.physics.bullet;
 
+import com.badlogic.gdx.physics.bullet.collision.AllHitsRayResultCallback;
 import com.badlogic.gdx.physics.bullet.collision.ClosestRayResultCallback;
 import com.badlogic.gdx.physics.bullet.collision.Collision;
 import com.badlogic.gdx.physics.bullet.collision.btBoxShape;
@@ -13,6 +14,7 @@ import com.badlogic.gdx.physics.bullet.collision.btCapsuleShape;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionConfiguration;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionDispatcher;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionObject;
+import com.badlogic.gdx.physics.bullet.collision.btCollisionObjectConstArray;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionShape;
 import com.badlogic.gdx.physics.bullet.collision.btConvexHullShape;
 import com.badlogic.gdx.physics.bullet.collision.btConvexShape;
@@ -34,7 +36,6 @@ import com.google.api.client.util.Maps;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import gnu.trove.iterator.TFloatIterator;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
@@ -64,6 +65,7 @@ import org.terasology.engine.physics.engine.PhysicsSystem;
 import org.terasology.engine.physics.engine.RigidBody;
 import org.terasology.engine.physics.engine.SweepCallback;
 import org.terasology.engine.registry.CoreRegistry;
+import org.terasology.engine.rendering.assets.mesh.resource.VertexAttributeBinding;
 import org.terasology.engine.world.BlockEntityRegistry;
 import org.terasology.joml.geom.AABBf;
 
@@ -201,37 +203,14 @@ public class BulletPhysics implements PhysicsEngine {
     }
 
     @Override
-    public HitResult rayTrace(Vector3f from1, Vector3f direction, float distance, CollisionGroup... collisionGroups) {
-        return rayTrace(from1, direction, distance, Sets.newHashSet(), collisionGroups);
-    }
-
-    @Override
-    public HitResult rayTrace(Vector3f from1, Vector3f direction, float distance, Set<EntityRef> excludedEntities,
-                              CollisionGroup... collisionGroups) {
-        if (excludedEntities == null) {
-            return rayTrace(from1, direction, distance, collisionGroups);
-        }
+    public HitResult rayTrace(Vector3f from, Vector3f direction, float distance, CollisionGroup... collisionGroups) {
         Vector3f to = new Vector3f(direction);
-        Vector3f from = from1;
         to.normalize();
         to.mul(distance);
         to.add(from);
 
         short filter = combineGroups(collisionGroups);
 
-        // lookup all the collision item ids for these entities
-        Set<Integer> excludedCollisionIds = Sets.newHashSet();
-        for (EntityRef excludedEntity : excludedEntities) {
-            if (entityRigidBodies.containsKey(excludedEntity)) {
-                excludedCollisionIds.add(entityRigidBodies.get(excludedEntity).rb.getBroadphaseHandle().getUid());
-            }
-            if (entityColliders.containsKey(excludedEntity)) {
-                excludedCollisionIds.add(entityColliders.get(excludedEntity).collider.getBroadphaseHandle().getUid());
-            }
-            if (entityTriggers.containsKey(excludedEntity)) {
-                excludedCollisionIds.add(entityTriggers.get(excludedEntity).getBroadphaseHandle().getUid());
-            }
-        }
         ClosestRayResultCallback callback = new ClosestRayResultCallback(from, to);
         callback.setCollisionFilterGroup(StandardCollisionGroup.ALL.getFlag());
         callback.setCollisionFilterMask(filter);
@@ -266,6 +245,70 @@ public class BulletPhysics implements PhysicsEngine {
                 }
             }
 
+        } else {
+            callback.dispose();
+        }
+        return new HitResult();
+    }
+
+    @Override
+    public HitResult rayTrace(Vector3f from, Vector3f direction, float distance, Set<EntityRef> excludedEntities,
+                              CollisionGroup... collisionGroups) {
+        if (excludedEntities == null || excludedEntities.size() == 0) {
+            return rayTrace(from, direction, distance, collisionGroups);
+        }
+        Vector3f to = new Vector3f(direction);
+        to.normalize();
+        to.mul(distance);
+        to.add(from);
+
+        short filter = combineGroups(collisionGroups);
+
+        // lookup all the collision item ids for these entities
+        Set<Integer> excludedCollisionIds = Sets.newHashSet();
+        for (EntityRef excludedEntity : excludedEntities) {
+            if (entityRigidBodies.containsKey(excludedEntity)) {
+                excludedCollisionIds.add(entityRigidBodies.get(excludedEntity).rb.getBroadphaseHandle().getUid());
+            }
+            if (entityColliders.containsKey(excludedEntity)) {
+                excludedCollisionIds.add(entityColliders.get(excludedEntity).collider.getBroadphaseHandle().getUid());
+            }
+            if (entityTriggers.containsKey(excludedEntity)) {
+                excludedCollisionIds.add(entityTriggers.get(excludedEntity).getBroadphaseHandle().getUid());
+            }
+        }
+        AllHitsRayResultCallback callback = new AllHitsRayResultCallback(from, to);
+        callback.setCollisionFilterGroup(StandardCollisionGroup.ALL.getFlag());
+        callback.setCollisionFilterMask(filter);
+
+        discreteDynamicsWorld.rayTest(from, to, callback);
+        if (callback.hasHit()) {
+            btCollisionObjectConstArray collisionObjects = callback.getCollisionObjects();
+            for (int x = 0; x < collisionObjects.size(); x++) {
+                btCollisionObject collisionObject = collisionObjects.atConst(x);
+                if (!excludedCollisionIds.contains(collisionObject.getBroadphaseHandle().getUid())) {
+                    Vector3f hitPointWorld = callback.getHitPointWorld().at(x);
+                    Vector3f hitNormalWorld = callback.getHitNormalWorld().at(x);
+                    callback.dispose();
+                    if (collisionObject.userData instanceof EntityRef) { //we hit an other entity
+                        return new HitResult((EntityRef) collisionObject.userData,
+                                hitPointWorld,
+                                hitNormalWorld);
+                    } else if ((collisionObject.getCollisionFlags() & btCollisionObject.CollisionFlags.CF_VOXEL_OBJECT) > 0) {
+                        btVector3i pos = new btVector3i();
+                        collisionObject.getVoxelPosition(pos);
+
+                        Vector3i voxelPosition = new Vector3i(pos.getX(), pos.getY(), pos.getZ());
+                        final EntityRef entityAt = blockEntityRegistry.getEntityAt(voxelPosition);
+                        return new HitResult(entityAt,
+                                hitPointWorld,
+                                hitNormalWorld,
+                                voxelPosition);
+                    } else { //we hit something we don't understand, assume its nothing and log a warning
+                        logger.warn("Unidentified object was hit in the physics engine: {}", collisionObject.userData);
+                    }
+                }
+            }
         } else {
             callback.dispose();
         }
@@ -700,16 +743,17 @@ public class BulletPhysics implements PhysicsEngine {
         }
         HullShapeComponent hull = entityRef.getComponent(HullShapeComponent.class);
         if (hull != null) {
-            FloatBuffer buffer = BufferUtils.createFloatBuffer(hull.sourceMesh.getVertices().size());
-            TFloatIterator iterator = hull.sourceMesh.getVertices().iterator();
-            int numPoints = 0;
-            while (iterator.hasNext()) {
-                numPoints++;
-                buffer.put(iterator.next());
-                buffer.put(iterator.next());
-                buffer.put(iterator.next());
+            VertexAttributeBinding<Vector3fc, Vector3f> positions = hull.sourceMesh.vertices();
+            final int numVertices = hull.sourceMesh.elementCount();
+            FloatBuffer buffer = BufferUtils.createFloatBuffer(numVertices * 3);
+            Vector3f pos = new Vector3f();
+            for (int i = 0; i < numVertices; i++) {
+                positions.get(i, pos);
+                buffer.put(pos.x);
+                buffer.put(pos.y);
+                buffer.put(pos.z);
             }
-            return new btConvexHullShape(buffer, numPoints, 3 * Float.BYTES);
+            return new btConvexHullShape(buffer, numVertices, 3 * Float.BYTES);
         }
         CharacterMovementComponent characterMovementComponent =
                 entityRef.getComponent(CharacterMovementComponent.class);
