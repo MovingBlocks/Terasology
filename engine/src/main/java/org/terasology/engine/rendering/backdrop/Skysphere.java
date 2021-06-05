@@ -3,33 +3,15 @@
 package org.terasology.engine.rendering.backdrop;
 
 import org.joml.Vector3f;
-import org.lwjgl.opengl.GL11;
 import org.terasology.engine.context.Context;
-import org.terasology.engine.rendering.assets.mesh.Mesh;
-import org.terasology.engine.rendering.assets.mesh.SphereBuilder;
-import org.terasology.engine.rendering.primitives.Sphere;
+import org.terasology.engine.world.sun.CelestialSystem;
 import org.terasology.math.TeraMath;
 import org.terasology.nui.properties.Range;
-import org.terasology.engine.rendering.assets.material.Material;
-import org.terasology.engine.rendering.cameras.Camera;
-import org.terasology.engine.utilities.Assets;
-import org.terasology.engine.world.sun.CelestialSystem;
-
-import static org.lwjgl.opengl.GL11.GL_BACK;
-import static org.lwjgl.opengl.GL11.GL_FRONT;
-import static org.lwjgl.opengl.GL11.glCallList;
-import static org.lwjgl.opengl.GL11.glCullFace;
-import static org.lwjgl.opengl.GL11.glDepthMask;
-import static org.lwjgl.opengl.GL11.glEndList;
-import static org.lwjgl.opengl.GL11.glGenLists;
-import static org.lwjgl.opengl.GL11.glNewList;
 
 /**
  * Skysphere based on the Perez all weather luminance model.
  */
 public class Skysphere implements BackdropProvider {
-
-    private static int displayListSphere = -1;
 
     @Range(min = 0.01f, max = 100.0f)
     private float colorExp = 0.01f;
