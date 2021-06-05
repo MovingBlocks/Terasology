@@ -8,8 +8,11 @@ import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SphereBuilder {
+    private static final Logger logger = LoggerFactory.getLogger(SphereBuilder.class);
     private boolean textured = false;
     private float radius = 1;
     private int horizontalCuts = 6;
@@ -88,15 +91,15 @@ public class SphereBuilder {
             t -= dt;
         }
 
-
-        for (int j = 0; j <= horizontalCuts; ++j) {
-            int aStart = (j * (verticalCuts + 1)) + 1;
-            int bStart = (j + 1) * (verticalCuts + 1) + 1;
-            for (int i = 0; i <= verticalCuts; ++i) {
+        for (int j = 0; j < horizontalCuts; ++j) {
+            int aStart = (j * (verticalCuts + 1));
+            int bStart = (j + 1) * (verticalCuts + 1);
+            for (int i = 0; i < verticalCuts; ++i) {
                 int a = aStart + i;
                 int a1 = aStart + ((i + 1) % (verticalCuts + 1));
                 int b = bStart + i;
                 int b1 = bStart + ((i + 1) % (verticalCuts + 1));
+
                 meshData.indices.putAll(a, b1, b);
                 meshData.indices.putAll(a1, b1, a);
             }
