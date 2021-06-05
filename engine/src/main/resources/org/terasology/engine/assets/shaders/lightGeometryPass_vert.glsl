@@ -8,18 +8,18 @@ layout (location = 2) in vec2 in_uv0;
 layout (location = 4) in vec4 in_color0;
 
 out vec2 v_uv0;
-out vec4 vertexProjPos;
+out vec4 v_vertexProjPos;
 
 uniform mat4 modelMatrix;
 uniform mat4 viewProjMatrix;
 
 void main() {
 #if defined (FEATURE_LIGHT_POINT)
-    vertexProjPos = (viewProjMatrix * modelMatrix) * vec4(in_vert, 1.0);
+    v_vertexProjPos = (viewProjMatrix * modelMatrix) * vec4(in_vert, 1.0);
 #elif defined (FEATURE_LIGHT_DIRECTIONAL)
-    vertexProjPos = vec4(in_vert, 1.0);
+    v_vertexProjPos = vec4(in_vert, 1.0);
 #endif
 
-    gl_Position = vertexProjPos;
+    gl_Position = v_vertexProjPos;
     v_uv0 = in_uv0;
 }
