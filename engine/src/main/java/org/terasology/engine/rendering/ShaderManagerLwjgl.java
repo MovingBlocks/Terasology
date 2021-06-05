@@ -34,7 +34,6 @@ public class ShaderManagerLwjgl implements ShaderManager {
     private static final Logger logger = LoggerFactory.getLogger(ShaderManagerLwjgl.class);
 
     private GLSLMaterial activeMaterial;
-    private GLSLMaterial defaultShaderProgram;
 
     private Set<GLSLMaterial> progamaticShaders = Sets.newHashSet();
 
@@ -44,7 +43,7 @@ public class ShaderManagerLwjgl implements ShaderManager {
     @Override
     public void initShaders() {
         logCapabilities();
-        defaultShaderProgram = addShaderProgram("default");
+        addShaderProgram("default");
 
         // TODO: Find a better way to do this
         addShaderProgram("post");
@@ -153,21 +152,13 @@ public class ShaderManagerLwjgl implements ShaderManager {
         Optional<? extends Shader> shader = Assets.getShader(uri);
         checkState(shader.isPresent(), "Failed to resolve %s", uri);
         shader.get().recompile();
-        GLSLMaterial material = (GLSLMaterial) Assets.generateAsset(new ResourceUrn(providingModule + ":prog." + title), new MaterialData(shader.get()), Material.class);
+        GLSLMaterial material =
+                (GLSLMaterial) Assets.generateAsset(new ResourceUrn(providingModule + ":prog." + title),
+                        new MaterialData(shader.get()), Material.class);
         progamaticShaders.add(material);
 
         return material;
     }
-
-
-    /**
-     * Enables the default shader program.
-     */
-    @Override
-    public void enableDefault() {
-        defaultShaderProgram.enable();
-    }
-
 
     @Override
     public void disableShader() {
