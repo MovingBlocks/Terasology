@@ -1,21 +1,9 @@
-/*
- * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+#version 330 core
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 
 #ifdef FEATURE_REFRACTIVE_PASS
-varying vec3 waterNormalViewSpace;
+out vec3 waterNormalViewSpace;
 #endif
 
 #if defined (ANIMATED_WATER) && defined (FEATURE_REFRACTIVE_PASS)
@@ -83,12 +71,11 @@ vec4 calcWaterNormalAndOffset(vec2 worldPosRaw) {
 #endif
 
 #if defined (FLICKERING_LIGHT)
-varying float flickeringLightOffset;
+out float flickeringLightOffset;
 #endif
 
 #if defined (NORMAL_MAPPING)
-varying vec3 worldSpaceNormal;
-varying mat3 normalMatrix;
+out vec3 worldSpaceNormal;
 #endif
 
 uniform float blockScale = 1.0;
@@ -97,65 +84,80 @@ uniform vec3 chunkPositionWorld;
 // waving blocks
 uniform bool animated;
 
-varying vec3 normal;
+uniform mat4 modelViewMatrix;
+uniform mat4 projectionMatrix;
+uniform mat3 normalMatrix;
 
-varying vec3 vertexWorldPos;
-varying vec4 vertexViewPos;
-varying vec4 vertexProjPos;
+out vec3 normal;
 
-varying vec3 sunVecView;
+out vec3 vertexWorldPos;
+out vec4 vertexViewPos;
+out vec4 vertexProjPos;
 
-varying float isUpside;
-varying float blockHint;
+out vec3 sunVecView;
 
-void main()
-{
-	gl_TexCoord[0] = gl_MultiTexCoord0;
-	blockHint = int(gl_TexCoord[0].z);
-	/*int*/ float animationFrameCount = gl_TexCoord[0].w;
+out vec2 v_uv0;
+out float v_sunlight;
+out float v_blocklight;
+out float v_ambientLight;
+flat out int isUpside;
+flat out int v_blockHint;
 
-    gl_TexCoord[1] = gl_MultiTexCoord1;
+layout (location = 0) in vec3 in_vert;
+layout (location = 1) in vec3 in_normal;
+layout (location = 2) in vec2 in_uv0;
 
-	vertexViewPos = gl_ModelViewMatrix * gl_Vertex;
-	vertexWorldPos = gl_Vertex.xyz + chunkPositionWorld.xyz;
-	
-	if (animationFrameCount > 0) {
-	    /*int*/ float globalFrameIndex = floor(time * 6 *60*60*24/48); // 6Hz at default world time scale
-	    /*int*/ float frameIndex = mod(globalFrameIndex, animationFrameCount);
-	    gl_TexCoord[0].x += frameIndex * TEXTURE_OFFSET;
-	    gl_TexCoord[0].y += floor(gl_TexCoord[0].x) * TEXTURE_OFFSET;
-	    gl_TexCoord[0].x = mod(gl_TexCoord[0].x, 1);
+layout (location = 3) in int in_flags;
+layout (location = 4) in float in_frames;
+
+layout (location = 5) in float in_sunlight;
+layout (location = 6) in float in_blocklight;
+layout (location = 7) in float in_ambientlight;
+
+void main() {
+
+    v_uv0 = in_uv0;
+    v_sunlight = in_sunlight;
+    v_blocklight = in_blocklight;
+    v_ambientLight = in_ambientlight;
+    v_blockHint = in_flags;
+    vertexViewPos = modelViewMatrix * vec4(in_vert, 1.0);
+    vertexWorldPos = in_vert + chunkPositionWorld.xyz;
+
+    if (in_frames > 0) {
+        float globalFrameIndex = floor(time * 6 *60*60*24/48); // 6Hz at default world time scale
+        float frameIndex = mod(globalFrameIndex, in_frames);
+        float frame_x = in_uv0.x + (frameIndex * TEXTURE_OFFSET);
+        v_uv0.y = in_uv0.y + floor(frame_x) * TEXTURE_OFFSET;
+        v_uv0.x = mod(frame_x, 1);
     }
 
-	sunVecView = (gl_ModelViewMatrix * vec4(sunVec.x, sunVec.y, sunVec.z, 0.0)).xyz;
+    sunVecView = (modelViewMatrix * vec4(sunVec.x, sunVec.y, sunVec.z, 0.0)).xyz;
 
-	isUpside = (gl_Normal.y > 0.9) ? 1.0 : 0.0;
+    isUpside = in_normal.y > 0.9 ? 1 : 0;
 
 #if defined (NORMAL_MAPPING)
-    normalMatrix = gl_NormalMatrix;
-    worldSpaceNormal = gl_Normal;
+    worldSpaceNormal = in_normal;
 #endif
+    normal = normalMatrix * in_normal;
 
-    normal = gl_NormalMatrix * gl_Normal;
-
-    gl_FrontColor = gl_Color;
 
 #ifdef FLICKERING_LIGHT
-	flickeringLightOffset = smoothTriangleWave(timeToTick(time, 0.5)) / 16.0;
-	flickeringLightOffset += smoothTriangleWave(timeToTick(time, 0.25) + 0.3762618) / 8.0;
-	flickeringLightOffset += smoothTriangleWave(timeToTick(time, 0.1) + 0.872917) / 4.0;
+    flickeringLightOffset = smoothTriangleWave(timeToTick(time, 0.5)) / 16.0;
+    flickeringLightOffset += smoothTriangleWave(timeToTick(time, 0.25) + 0.3762618) / 8.0;
+    flickeringLightOffset += smoothTriangleWave(timeToTick(time, 0.1) + 0.872917) / 4.0;
 #endif
 
 #ifdef ANIMATED_GRASS
     if (animated) {
         // GRASS ANIMATION
-        if ( checkFlag(BLOCK_HINT_WAVING, blockHint) ) {
+        if (v_blockHint == BLOCK_HINT_WAVING) {
            // Only animate the upper two vertices
-           if (mod(gl_TexCoord[0].y, TEXTURE_OFFSET) < TEXTURE_OFFSET / 2.0) {
+           if (mod(v_uv0.y, TEXTURE_OFFSET) < TEXTURE_OFFSET / 2.0) {
                vertexViewPos.x += (smoothTriangleWave(timeToTick(time, 0.2) + vertexWorldPos.x * 0.1 + vertexWorldPos.z * 0.1) * 2.0 - 1.0) * 0.1 * blockScale;
                vertexViewPos.y += (smoothTriangleWave(timeToTick(time, 0.1) + vertexWorldPos.x * -0.5 + vertexWorldPos.z * -0.5) * 2.0 - 1.0) * 0.05 * blockScale;
            }
-        } else if ( checkFlag(BLOCK_HINT_WAVING_BLOCK, blockHint) ) {
+        } else if (v_blockHint == BLOCK_HINT_WAVING_BLOCK) {
             vertexViewPos.x += (smoothTriangleWave(timeToTick(time, 0.1) + vertexWorldPos.x * 0.01 + vertexWorldPos.z * 0.01) * 2.0 - 1.0) * 0.01 * blockScale;
             vertexViewPos.y += (smoothTriangleWave(timeToTick(time, 0.15) + vertexWorldPos.x * -0.01 + vertexWorldPos.z * -0.01) * 2.0 - 1.0) * 0.05 * blockScale;
             vertexViewPos.z += (smoothTriangleWave(timeToTick(time, 0.1) + vertexWorldPos.x * -0.01 + vertexWorldPos.z * -0.01) * 2.0 - 1.0) * 0.01 * blockScale;
@@ -164,19 +166,19 @@ void main()
 #endif
 
 #if defined (FEATURE_REFRACTIVE_PASS)
-#if defined (ANIMATED_WATER)
-    if (checkFlag(BLOCK_HINT_WATER_SURFACE, blockHint) && isUpside > 0.99) {
-        vec4 normalAndOffset = calcWaterNormalAndOffset(vertexWorldPos.xz);
+    #if defined (ANIMATED_WATER)
+        if (v_blockHint == BLOCK_HINT_WATER_SURFACE && isUpside == 1) {
+            vec4 normalAndOffset = calcWaterNormalAndOffset(vertexWorldPos.xz);
 
-        waterNormalViewSpace = gl_NormalMatrix * normalAndOffset.xyz;
-        vertexViewPos += gl_ModelViewMatrix[1] * (normalAndOffset.w + waterOffsetY);
-    }
-#else
-    waterNormalViewSpace = gl_NormalMatrix * vec3(0.0, 1.0, 0.0);
-#endif
+            waterNormalViewSpace = normalMatrix * normalAndOffset.xyz;
+            vertexViewPos += modelViewMatrix[1] * (normalAndOffset.w + waterOffsetY);
+        }
+    #else
+        waterNormalViewSpace = normalMatrix * vec3(0.0, 1.0, 0.0);
+    #endif
 #endif
 
-    vertexProjPos = gl_ProjectionMatrix * vertexViewPos;
+    vertexProjPos = projectionMatrix * vertexViewPos;
     gl_Position = vertexProjPos;
 
 #if defined (FEATURE_ALPHA_REJECT)
