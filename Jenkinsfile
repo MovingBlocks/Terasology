@@ -41,7 +41,7 @@ node ("ts-engine && heavy && java8") {
         'checkstyle': {
             stage('CheckStyle'){
                 sh './gradlew --console=plain checkstyleMain checkstyleTest checkstyleJmh'
-                recordIssues tool: checkStyle(pattern: '**/build/reports/checkstyle/*.xml')
+                recordIssues tool: checkStyle(pattern: '**/build/reports/checkstyle/*.xml') qualityGates: [[threshold: 1, type: 'TOTAL_HIGH', unstable: false]]
             }
         }
     }
