@@ -4,6 +4,7 @@
 package org.terasology.engine.audio.events;
 
 import org.terasology.engine.audio.StaticSound;
+import org.terasology.engine.entitySystem.entity.EntityManager;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.network.BroadcastEvent;
 
@@ -13,8 +14,7 @@ import org.terasology.engine.network.BroadcastEvent;
  */
 @BroadcastEvent(skipInstigator = true)
 public class PlaySoundEvent extends AbstractPlaySoundEvent {
-    protected PlaySoundEvent() {
-    }
+    protected PlaySoundEvent(){}
 
 
     public PlaySoundEvent(StaticSound sound, float volume) {
