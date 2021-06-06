@@ -3,45 +3,17 @@
 package org.terasology.engine.rendering.opengl;
 
 import org.lwjgl.BufferUtils;
-import org.lwjgl.opengl.ARBHalfFloatPixel;
-import org.lwjgl.opengl.ARBTextureFloat;
-import org.lwjgl.opengl.EXTPackedDepthStencil;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 import org.lwjgl.opengl.GL14;
 import org.lwjgl.opengl.GL20;
+import org.lwjgl.opengl.GL30;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.core.SimpleUri;
 
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
-
-import static org.lwjgl.opengl.EXTFramebufferObject.GL_COLOR_ATTACHMENT0_EXT;
-import static org.lwjgl.opengl.EXTFramebufferObject.GL_COLOR_ATTACHMENT1_EXT;
-import static org.lwjgl.opengl.EXTFramebufferObject.GL_COLOR_ATTACHMENT2_EXT;
-import static org.lwjgl.opengl.EXTFramebufferObject.GL_DEPTH_ATTACHMENT_EXT;
-import static org.lwjgl.opengl.EXTFramebufferObject.GL_FRAMEBUFFER_COMPLETE_EXT;
-import static org.lwjgl.opengl.EXTFramebufferObject.GL_FRAMEBUFFER_EXT;
-import static org.lwjgl.opengl.EXTFramebufferObject.GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT_EXT;
-import static org.lwjgl.opengl.EXTFramebufferObject.GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT;
-import static org.lwjgl.opengl.EXTFramebufferObject.GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER_EXT;
-import static org.lwjgl.opengl.EXTFramebufferObject.GL_FRAMEBUFFER_INCOMPLETE_FORMATS_EXT;
-import static org.lwjgl.opengl.EXTFramebufferObject.GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT_EXT;
-import static org.lwjgl.opengl.EXTFramebufferObject.GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT;
-import static org.lwjgl.opengl.EXTFramebufferObject.GL_FRAMEBUFFER_UNSUPPORTED_EXT;
-import static org.lwjgl.opengl.EXTFramebufferObject.GL_RENDERBUFFER_EXT;
-import static org.lwjgl.opengl.EXTFramebufferObject.GL_STENCIL_ATTACHMENT_EXT;
-import static org.lwjgl.opengl.EXTFramebufferObject.glBindFramebufferEXT;
-import static org.lwjgl.opengl.EXTFramebufferObject.glBindRenderbufferEXT;
-import static org.lwjgl.opengl.EXTFramebufferObject.glCheckFramebufferStatusEXT;
-import static org.lwjgl.opengl.EXTFramebufferObject.glDeleteFramebuffersEXT;
-import static org.lwjgl.opengl.EXTFramebufferObject.glDeleteRenderbuffersEXT;
-import static org.lwjgl.opengl.EXTFramebufferObject.glFramebufferRenderbufferEXT;
-import static org.lwjgl.opengl.EXTFramebufferObject.glFramebufferTexture2DEXT;
-import static org.lwjgl.opengl.EXTFramebufferObject.glGenFramebuffersEXT;
-import static org.lwjgl.opengl.EXTFramebufferObject.glGenRenderbuffersEXT;
-import static org.lwjgl.opengl.EXTFramebufferObject.glRenderbufferStorageEXT;
 import static org.lwjgl.opengl.GL11.glDeleteTextures;
 import static org.lwjgl.opengl.GL11.glGenTextures;
 
@@ -111,7 +83,7 @@ public final class FBO {
         // By my understanding current OpenGL implementations are smart enough to prevent it on their own. If
         // necessary, it'd be easy to add a class variable tracking the currently bound FrameBuffer and the
         // associated checks.
-        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fboId);
+        GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, fboId);
     }
 
     /**
@@ -140,18 +112,18 @@ public final class FBO {
         // TODO: in turn set within the class or method
         if (colorBufferTextureId != 0) {
             if (this.writeToColorBuffer) {
-                bufferIds.put(GL_COLOR_ATTACHMENT0_EXT + attachmentId);
+                bufferIds.put(GL30.GL_COLOR_ATTACHMENT0 + attachmentId);
             }
             attachmentId++;
         }
         if (normalsBufferTextureId != 0) {
             if (this.writeToNormalsBuffer) {
-                bufferIds.put(GL_COLOR_ATTACHMENT0_EXT + attachmentId);
+                bufferIds.put(GL30.GL_COLOR_ATTACHMENT0 + attachmentId);
             }
             attachmentId++;
         }
         if (lightBufferTextureId != 0 && this.writeToLightBuffer) { // compacted if block because Jenkins was complaining about it.
-            bufferIds.put(GL_COLOR_ATTACHMENT0_EXT + attachmentId);
+            bufferIds.put(GL30.GL_COLOR_ATTACHMENT0 + attachmentId);
         }
 
         bufferIds.flip();
@@ -165,7 +137,7 @@ public final class FBO {
      * therefore be sent to the display until a different FrameBuffer is bound.
      */
     public void unbind() {
-        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+        GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, 0);
     }
 
     /**
@@ -173,7 +145,7 @@ public final class FBO {
      * Once a texture is bound it can be sampled by shaders.
      */
     public void bindTexture() {
-        GL11.glBindTexture(GL11.GL_TEXTURE_2D, colorBufferTextureId);
+        GL30.glBindTexture(GL30.GL_TEXTURE_2D, colorBufferTextureId);
     }
 
     /**
@@ -181,7 +153,7 @@ public final class FBO {
      * Once a texture is bound it can be sampled by shaders.
      */
     public void bindDepthTexture() {
-        GL11.glBindTexture(GL11.GL_TEXTURE_2D, depthStencilTextureId);
+        GL30.glBindTexture(GL30.GL_TEXTURE_2D, depthStencilTextureId);
     }
 
     /**
@@ -189,7 +161,7 @@ public final class FBO {
      * Once a texture is bound it can be sampled by shaders.
      */
     public void bindNormalsTexture() {
-        GL11.glBindTexture(GL11.GL_TEXTURE_2D, normalsBufferTextureId);
+        GL30.glBindTexture(GL30.GL_TEXTURE_2D, normalsBufferTextureId);
     }
 
     /**
@@ -197,7 +169,7 @@ public final class FBO {
      * Once a texture is bound it can be sampled by shaders.
      */
     public void bindLightBufferTexture() {
-        GL11.glBindTexture(GL11.GL_TEXTURE_2D, lightBufferTextureId);
+        GL30.glBindTexture(GL30.GL_TEXTURE_2D, lightBufferTextureId);
     }
 
     /**
@@ -206,7 +178,7 @@ public final class FBO {
      * of the calling instance's FrameBuffer.
      */
     public static void unbindTexture() {
-        GL11.glBindTexture(GL11.GL_TEXTURE_2D, 0);
+        GL30.glBindTexture(GL30.GL_TEXTURE_2D, 0);
     }
 
     /**
@@ -219,8 +191,8 @@ public final class FBO {
 
         target.bind();
 
-        glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, depthStencilRboId);
-        glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL11.GL_TEXTURE_2D, depthStencilTextureId, 0);
+        GL30.glFramebufferRenderbuffer(GL30.GL_FRAMEBUFFER, GL30.GL_DEPTH_ATTACHMENT, GL30.GL_RENDERBUFFER, depthStencilRboId);
+        GL30.glFramebufferTexture2D(GL30.GL_FRAMEBUFFER, GL30.GL_DEPTH_ATTACHMENT, GL30.GL_TEXTURE_2D, depthStencilTextureId, 0 );
 
         target.unbind();
     }
@@ -231,8 +203,8 @@ public final class FBO {
     public void detachDepthBuffer() {
         bind();
 
-        glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, 0);
-        glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL11.GL_TEXTURE_2D, 0, 0);
+        GL30.glFramebufferRenderbuffer(GL30.GL_FRAMEBUFFER, GL30.GL_DEPTH_ATTACHMENT, GL30.GL_RENDERBUFFER, 0);
+        GL30.glFramebufferTexture2D(GL30.GL_FRAMEBUFFER, GL30.GL_DEPTH_ATTACHMENT, GL30.GL_TEXTURE_2D, 0, 0 );
 
         unbind();
     }
@@ -242,8 +214,8 @@ public final class FBO {
      * effectively freeing memory on the graphic adapter.
      */
     public void dispose() {
-        glDeleteFramebuffersEXT(fboId);
-        glDeleteRenderbuffersEXT(depthStencilRboId);
+        GL30.glDeleteFramebuffers(fboId);
+        GL30.glDeleteRenderbuffers(depthStencilRboId);
         GL11.glDeleteTextures(normalsBufferTextureId);
         GL11.glDeleteTextures(depthStencilTextureId);
         GL11.glDeleteTextures(colorBufferTextureId);
@@ -378,8 +350,8 @@ public final class FBO {
         FBO fbo = new FBO(fboName, dimensions.width, dimensions.height);
 
         // Create the FBO on the GPU
-        fbo.fboId = glGenFramebuffersEXT();
-        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo.fboId);
+        fbo.fboId = GL30.glGenFramebuffers();
+        GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, fbo.fboId);
 
         if (type != Type.NO_COLOR) {
             createColorBuffer(fbo, dimensions, type);
@@ -401,13 +373,13 @@ public final class FBO {
 
         IntBuffer bufferIds = BufferUtils.createIntBuffer(3);
         if (type != Type.NO_COLOR) {
-            bufferIds.put(GL_COLOR_ATTACHMENT0_EXT);
+            bufferIds.put(GL30.GL_COLOR_ATTACHMENT0);
         }
         if (useNormalBuffer) {
-            bufferIds.put(GL_COLOR_ATTACHMENT1_EXT);
+            bufferIds.put(GL30.GL_COLOR_ATTACHMENT1);
         }
         if (useLightBuffer) {
-            bufferIds.put(GL_COLOR_ATTACHMENT2_EXT);
+            bufferIds.put(GL30.GL_COLOR_ATTACHMENT2);
         }
         bufferIds.flip();
 
@@ -419,7 +391,8 @@ public final class FBO {
         }
 
         verifyCompleteness(fboName, type, fbo);
-        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+
+        GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, 0);
 
         return fbo;
     }
@@ -434,7 +407,7 @@ public final class FBO {
 
         fbo.dimensions = fboConfig.getDimensions();
 
-        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo.fboId);
+        GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, fbo.fboId);
 
         if (type != Type.NO_COLOR) {
             glDeleteTextures(fbo.colorBufferTextureId);
@@ -453,7 +426,7 @@ public final class FBO {
 
         if (useDepthBuffer) {
             glDeleteTextures(fbo.depthStencilTextureId);
-            glDeleteRenderbuffersEXT(fbo.depthStencilRboId);
+            GL30.glDeleteRenderbuffers(fbo.depthStencilRboId);
             createDepthBuffer(fbo, dimensions, useStencilBuffer);
         }
 
@@ -461,13 +434,13 @@ public final class FBO {
 
         IntBuffer bufferIds = BufferUtils.createIntBuffer(3);
         if (type != Type.NO_COLOR) {
-            bufferIds.put(GL_COLOR_ATTACHMENT0_EXT);
+            bufferIds.put(GL30.GL_COLOR_ATTACHMENT0);
         }
         if (useNormalBuffer) {
-            bufferIds.put(GL_COLOR_ATTACHMENT1_EXT);
+            bufferIds.put(GL30.GL_COLOR_ATTACHMENT1);
         }
         if (useLightBuffer) {
-            bufferIds.put(GL_COLOR_ATTACHMENT2_EXT);
+            bufferIds.put(GL30.GL_COLOR_ATTACHMENT2);
         }
         bufferIds.flip();
 
@@ -479,7 +452,7 @@ public final class FBO {
         }
 
         verifyCompleteness(fboConfig.getName(), type, fbo);
-        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+        GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, 0);
     }
 
     @Override
@@ -488,42 +461,32 @@ public final class FBO {
     }
 
     private static void verifyCompleteness(SimpleUri urn, Type type, FBO fbo) {
-        int checkFB = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
+        int checkFB = GL30.glCheckFramebufferStatus(GL30.GL_FRAMEBUFFER);
         switch (checkFB) {
-            case GL_FRAMEBUFFER_COMPLETE_EXT:
+            case GL30.GL_FRAMEBUFFER_COMPLETE:
                 fbo.setStatus(Status.COMPLETE);
                 break;
-            case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT_EXT:
+            case GL30.GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
                 logger.error("FrameBuffer: " + urn
                         + ", has caused a GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT_EXT exception");
                 fbo.setStatus(Status.INCOMPLETE);
                 break;
-            case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT_EXT:
+            case GL30.GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
                 logger.error("FrameBuffer: " + urn
                         + ", has caused a GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT_EXT exception");
                 fbo.setStatus(Status.INCOMPLETE);
                 break;
-            case GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT:
-                logger.error("FrameBuffer: " + urn
-                        + ", has caused a GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT exception");
-                fbo.setStatus(Status.INCOMPLETE);
-                break;
-            case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER_EXT:
+            case GL30.GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER:
                 logger.error("FrameBuffer: " + urn
                         + ", has caused a GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER_EXT exception");
                 fbo.setStatus(Status.INCOMPLETE);
                 break;
-            case GL_FRAMEBUFFER_INCOMPLETE_FORMATS_EXT:
-                logger.error("FrameBuffer: " + urn
-                        + ", has caused a GL_FRAMEBUFFER_INCOMPLETE_FORMATS_EXT exception");
-                fbo.setStatus(Status.INCOMPLETE);
-                break;
-            case GL_FRAMEBUFFER_UNSUPPORTED_EXT:
+            case GL30.GL_FRAMEBUFFER_UNSUPPORTED:
                 logger.error("FrameBuffer: " + urn
                         + ", has caused a GL_FRAMEBUFFER_UNSUPPORTED_EXT exception");
                 fbo.setStatus(Status.INCOMPLETE);
                 break;
-            case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT:
+            case GL30.GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER:
                 logger.error("FrameBuffer: " + urn
                         + ", has caused a GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT exception");
 
@@ -568,12 +531,12 @@ public final class FBO {
         setTextureParameters(GL11.GL_LINEAR);
 
         if (type == Type.HDR) {
-            allocateTexture(dimensions, GL11.GL_RGBA, GL11.GL_RGBA, ARBHalfFloatPixel.GL_HALF_FLOAT_ARB);
+            allocateTexture(dimensions, GL11.GL_RGBA, GL11.GL_RGBA, GL30.GL_HALF_FLOAT);
         } else {
             allocateTexture(dimensions, GL11.GL_RGBA, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE);
         }
 
-        glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL11.GL_TEXTURE_2D, fbo.colorBufferTextureId, 0);
+        GL30.glFramebufferTexture2D(GL30.GL_DRAW_FRAMEBUFFER, GL30.GL_COLOR_ATTACHMENT0, GL30.GL_TEXTURE_2D, fbo.colorBufferTextureId, 0);
     }
 
     private static void createNormalsBuffer(FBO fbo, Dimensions dimensions) {
@@ -584,7 +547,8 @@ public final class FBO {
 
         allocateTexture(dimensions, GL11.GL_RGBA, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE);
 
-        glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT1_EXT, GL11.GL_TEXTURE_2D, fbo.normalsBufferTextureId, 0);
+
+        GL30.glFramebufferTexture2D(GL30.GL_DRAW_FRAMEBUFFER, GL30.GL_COLOR_ATTACHMENT1, GL30.GL_TEXTURE_2D, fbo.normalsBufferTextureId, 0);
     }
 
     private static void createLightBuffer(FBO fbo, Dimensions dimensions, Type type) {
@@ -594,57 +558,59 @@ public final class FBO {
         setTextureParameters(GL11.GL_LINEAR);
 
         if (type == Type.HDR) {
-            allocateTexture(dimensions, ARBTextureFloat.GL_RGBA16F_ARB, GL11.GL_RGBA, ARBHalfFloatPixel.GL_HALF_FLOAT_ARB);
+            allocateTexture(dimensions, GL30.GL_RGBA16F, GL11.GL_RGBA, GL30.GL_HALF_FLOAT);
         } else {
             allocateTexture(dimensions, GL11.GL_RGBA, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE);
         }
 
-        glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT2_EXT, GL11.GL_TEXTURE_2D, fbo.lightBufferTextureId, 0);
+        GL30.glFramebufferTexture2D(GL30.GL_DRAW_FRAMEBUFFER, GL30.GL_COLOR_ATTACHMENT2, GL30.GL_TEXTURE_2D, fbo.lightBufferTextureId, 0);
     }
 
     private static void createDepthBuffer(FBO fbo, Dimensions dimensions, boolean useStencilBuffer) {
         fbo.depthStencilTextureId = glGenTextures();
-        GL11.glBindTexture(GL11.GL_TEXTURE_2D, fbo.depthStencilTextureId);
+        GL30.glBindTexture(GL30.GL_TEXTURE_2D, fbo.depthStencilTextureId);
 
-        setTextureParameters(GL11.GL_NEAREST);
+        setTextureParameters(GL30.GL_NEAREST);
 
         if (!useStencilBuffer) {
-            allocateTexture(dimensions, GL14.GL_DEPTH_COMPONENT24, GL11.GL_DEPTH_COMPONENT, GL11.GL_UNSIGNED_INT);
+            allocateTexture(dimensions, GL30.GL_DEPTH_COMPONENT32F, GL30.GL_DEPTH_COMPONENT, GL30.GL_FLOAT);
+            float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+            GL30.glTexParameterfv(GL30.GL_TEXTURE_2D, GL30.GL_TEXTURE_BORDER_COLOR, borderColor);
         } else {
             allocateTexture(dimensions,
-                    EXTPackedDepthStencil.GL_DEPTH24_STENCIL8_EXT,
-                    EXTPackedDepthStencil.GL_DEPTH_STENCIL_EXT,
-                    EXTPackedDepthStencil.GL_UNSIGNED_INT_24_8_EXT);
+                    GL30.GL_DEPTH24_STENCIL8,
+                    GL30.GL_DEPTH_STENCIL,
+                    GL30.GL_UNSIGNED_INT_24_8);
         }
 
-        fbo.depthStencilRboId = glGenRenderbuffersEXT();
-        glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, fbo.depthStencilRboId);
+        fbo.depthStencilRboId = GL30.glGenRenderbuffers();
+        GL30.glBindRenderbuffer(GL30.GL_RENDERBUFFER, fbo.depthStencilRboId);
 
         if (!useStencilBuffer) {
-            glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, GL14.GL_DEPTH_COMPONENT24, fbo.dimensions.width, fbo.dimensions.height);
+            GL30.glRenderbufferStorage(GL30.GL_RENDERBUFFER, GL14.GL_DEPTH_COMPONENT24, fbo.dimensions.width, fbo.dimensions.height);
         } else {
-            glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, EXTPackedDepthStencil.GL_DEPTH24_STENCIL8_EXT, fbo.dimensions.width, fbo.dimensions.height);
+            GL30.glRenderbufferStorage(GL30.GL_RENDERBUFFER, GL30.GL_DEPTH24_STENCIL8, fbo.dimensions.width, fbo.dimensions.height);
         }
 
-        glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, 0);
+        GL30.glBindRenderbuffer(GL30.GL_RENDERBUFFER, 0);
 
-        glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, fbo.depthStencilRboId);
-        glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL11.GL_TEXTURE_2D, fbo.depthStencilTextureId, 0);
+        GL30.glFramebufferRenderbuffer(GL30.GL_FRAMEBUFFER, GL30.GL_DEPTH_ATTACHMENT, GL30.GL_RENDERBUFFER, fbo.depthStencilRboId);
+        GL30.glFramebufferTexture2D(GL30.GL_FRAMEBUFFER, GL30.GL_DEPTH_ATTACHMENT, GL30.GL_TEXTURE_2D, fbo.depthStencilTextureId, 0);
 
         if (useStencilBuffer) {
-            glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_STENCIL_ATTACHMENT_EXT, GL11.GL_TEXTURE_2D, fbo.depthStencilTextureId, 0);
+            GL30.glFramebufferTexture2D(GL30.GL_FRAMEBUFFER, GL30.GL_STENCIL_ATTACHMENT, GL11.GL_TEXTURE_2D, fbo.depthStencilTextureId, 0);
         }
     }
 
     private static void setTextureParameters(float filterType) {
-        GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, filterType);
-        GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, filterType);
-        GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL12.GL_CLAMP_TO_EDGE);
-        GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL12.GL_CLAMP_TO_EDGE);
+        GL30.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, filterType);
+        GL30.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, filterType);
+        GL30.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL12.GL_CLAMP_TO_EDGE);
+        GL30.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL12.GL_CLAMP_TO_EDGE);
     }
 
     private static void allocateTexture(Dimensions dimensions, int internalFormat, int dataFormat, int dataType) {
-        GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, internalFormat, dimensions.width, dimensions.height, 0, dataFormat, dataType, (ByteBuffer) null);
+        GL30.glTexImage2D(GL11.GL_TEXTURE_2D, 0, internalFormat, dimensions.width, dimensions.height, 0, dataFormat, dataType, (ByteBuffer) null);
     }
 
     /**

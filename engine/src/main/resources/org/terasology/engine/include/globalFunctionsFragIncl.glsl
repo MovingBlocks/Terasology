@@ -113,6 +113,8 @@ vec2 normalizeAtlasTexCoord(vec2 atlasTexCoord) {
                 mod(atlasTexCoord.y, TEXTURE_OFFSET) * (1.0 / TEXTURE_OFFSET));
 }
 
+
+
 float calcPcfShadowTerm(sampler2D shadowMap, float lightDepth, vec2 texCoord, float shadowIntens, float bias)
 {
 	vec2 shadowMapCoord = SHADOW_MAP_RESOLUTION * texCoord;

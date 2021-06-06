@@ -5,7 +5,6 @@
 in vec2 v_uv0;
 in vec4 v_vertexProjPos;
 
-
 uniform vec3 lightViewPos;
 
 uniform sampler2D texSceneOpaqueDepth;
@@ -26,25 +25,26 @@ uniform vec4 lightExtendedProperties;
 #define lightAttenuationRange lightExtendedProperties.x
 #define lightAttenuationFalloff lightExtendedProperties.y
 
-uniform mat4 invProjMatrix;
 
 #if defined (DYNAMIC_SHADOWS)
-#if defined (CLOUD_SHADOWS)
-uniform sampler2D texSceneClouds;
+    #if defined (CLOUD_SHADOWS)
+    uniform sampler2D texSceneClouds;
+    #endif
+
+    #define SHADOW_MAP_BIAS 0.00001
+
+    #if defined (FEATURE_LIGHT_DIRECTIONAL)
+    uniform sampler2D texSceneShadowMap;
+    #endif
+
+    uniform vec3 activeCameraToLightSpace;
+
+    uniform mat4 invProjMatrix;
+    uniform mat4 lightMatrix;
+
+    uniform mat4 invViewProjMatrix;
 #endif
 
-#define SHADOW_MAP_BIAS 0.01
-
-#if defined (FEATURE_LIGHT_DIRECTIONAL)
-uniform sampler2D texSceneShadowMap;
-#endif
-
-uniform mat4 viewProjMatrix;
-
-uniform vec3 activeCameraToLightSpace;
-
-uniform mat4 invViewProjMatrix;
-#endif
 
 void main() {
 
@@ -59,32 +59,39 @@ void main() {
     vec4 normalBuffer = texture2D(texSceneOpaqueNormals, projectedPos.xy).rgba;
     vec3 normal = normalize(normalBuffer.xyz * 2.0 - 1.0);
     float shininess = normalBuffer.a;
-    vec4 depthBuffer = texture2D(texSceneOpaqueDepth, projectedPos.xy).rgba;
-    float depth = depthBuffer.r * 2.0 - 1.0;
+    float depth = texture2D(texSceneOpaqueDepth, projectedPos.xy).r * 2.0 - 1.0;
+
+    vec3 lightDir;
+    // TODO: Costly - would be nice to use Crytek's view frustum ray method at this point
+    vec3 viewSpacePos = reconstructViewPos(depth, projectedPos, invProjMatrix);
+
+#if defined (FEATURE_LIGHT_POINT)
+    lightDir = lightViewPos.xyz - viewSpacePos;
+#elif defined (FEATURE_LIGHT_DIRECTIONAL)
+    lightDir = lightViewPos.xyz;
+#endif
+
 
 #if defined (DYNAMIC_SHADOWS) && defined (FEATURE_LIGHT_DIRECTIONAL)
     // TODO: Uhhh... Doing this twice here :/ Frustum ray would be better!
     vec3 worldPosition = reconstructViewPos(depth, v_uv0.xy, invViewProjMatrix);
     vec3 lightWorldPosition = worldPosition.xyz + activeCameraToLightSpace;
 
-    vec4 lightProjVertPos = viewProjMatrix * vec4(lightWorldPosition.x, lightWorldPosition.y, lightWorldPosition.z, 1.0);
-
-    lightProjVertPos.xyz /= lightProjVertPos.w;
-    vec2 shadowMapTexPos = lightProjVertPos.xy * vec2(0.5) + vec2(0.5);
-
-    float shadowTerm = 1.0;
-
-    if (!epsilonEqualsOne(depth)) {
-#if defined (DYNAMIC_SHADOWS_PCF)
-        shadowTerm = calcPcfShadowTerm(texSceneShadowMap, lightProjVertPos.z, shadowMapTexPos, 0.0, SHADOW_MAP_BIAS);
-#else
-        float shadowMapDepth = texture2D(texSceneShadowMap, shadowMapTexPos).x;
-        if (shadowMapDepth + SHADOW_MAP_BIAS < lightProjVertPos.z) {
-            shadowTerm = 0.0;
+    vec4 shadowMapTexPos = lightMatrix * vec4(lightWorldPosition.x, lightWorldPosition.y, lightWorldPosition.z, 1.0);
+    highp float shadowTerm = 0.0;
+    highp float bias = max(0.0001 * (1.0 - dot(normal, lightDir)), SHADOW_MAP_BIAS);
+    vec2 texelSize = 1.0 / textureSize(texSceneShadowMap, 0);
+    for(int x = -1; x <= 1; ++x) {
+        for(int y = -1; y <= 1; ++y) {
+            vec2 shadowPos = shadowMapTexPos.xy + vec2(x, y) * texelSize;
+            highp float pcfDepth = texture(texSceneShadowMap, shadowPos).r;
+            shadowTerm += (shadowMapTexPos.z + bias > pcfDepth) ? 0.0 : 1.0;
         }
-#endif
+    }
+    shadowTerm /= 9.0;
 
-#if defined (CLOUD_SHADOWS) && !defined (VOLUMETRIC_LIGHTING)
+
+    #if defined (CLOUD_SHADOWS) && !defined (VOLUMETRIC_LIGHTING)
         // TODO: Add shader parameters for this...
         // Get the preconfigured value from the randomized texture, sampling a value from it to determine how much cloud shadow there will be.
         // Clamp the value so that clouds do not turn the surface black.
@@ -92,19 +99,10 @@ void main() {
 
         // Combine the cloud shadow with the dynamic shadows
         shadowTerm *= rescaleRange(cloudOcclusion,0,1,0,shadowTerm);
-#endif
-   }
+    #endif
 #endif
 
-    // TODO: Costly - would be nice to use Crytek's view frustum ray method at this point
-    vec3 viewSpacePos = reconstructViewPos(depth, projectedPos, invProjMatrix);
 
-    vec3 lightDir;
-#if defined (FEATURE_LIGHT_POINT)
-    lightDir = lightViewPos.xyz - viewSpacePos;
-#elif defined (FEATURE_LIGHT_DIRECTIONAL)
-    lightDir = lightViewPos.xyz;
-#endif
 
     vec3 eyeVec = -normalize(viewSpacePos.xyz).xyz;
 
@@ -168,4 +166,5 @@ void main() {
 #else
     gl_FragData[0].rgba = vec4(color.r, color.g, color.b, specular);
 #endif
+
 }
