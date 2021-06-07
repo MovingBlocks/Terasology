@@ -80,16 +80,21 @@ void main() {
     vec4 shadowMapTexPos = lightMatrix * vec4(lightWorldPosition.x, lightWorldPosition.y, lightWorldPosition.z, 1.0);
     highp float shadowTerm = 0.0;
     highp float bias = max(0.0001 * (1.0 - dot(normal, lightDir)), SHADOW_MAP_BIAS);
-    vec2 texelSize = 1.0 / textureSize(texSceneShadowMap, 0);
-    for(int x = -1; x <= 1; ++x) {
-        for(int y = -1; y <= 1; ++y) {
-            vec2 shadowPos = shadowMapTexPos.xy + vec2(x, y) * texelSize;
-            highp float pcfDepth = texture(texSceneShadowMap, shadowPos).r;
-            shadowTerm += (shadowMapTexPos.z + bias > pcfDepth) ? 0.0 : 1.0;
-        }
-    }
-    shadowTerm /= 9.0;
 
+    #if defined (DYNAMIC_SHADOWS_PCF)
+        vec2 texelSize = 1.0 / textureSize(texSceneShadowMap, 0);
+        for(int x = -1; x <= 1; ++x) {
+            for(int y = -1; y <= 1; ++y) {
+                vec2 shadowPos = shadowMapTexPos.xy + vec2(x, y) * texelSize;
+                highp float pcfDepth = texture(texSceneShadowMap, shadowPos).r;
+                shadowTerm += (shadowMapTexPos.z + bias > pcfDepth) ? 0.0 : 1.0;
+            }
+        }
+        shadowTerm /= 9.0;
+    #else
+        highp float pcfDepth = texture(texSceneShadowMap, shadowMapTexPos.xy).r;
+        shadowTerm = (shadowMapTexPos.z + bias > pcfDepth) ? 0.0 : 1.0;
+    #endif
 
     #if defined (CLOUD_SHADOWS) && !defined (VOLUMETRIC_LIGHTING)
         // TODO: Add shader parameters for this...

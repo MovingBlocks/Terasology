@@ -113,22 +113,6 @@ vec2 normalizeAtlasTexCoord(vec2 atlasTexCoord) {
                 mod(atlasTexCoord.y, TEXTURE_OFFSET) * (1.0 / TEXTURE_OFFSET));
 }
 
-
-
-float calcPcfShadowTerm(sampler2D shadowMap, float lightDepth, vec2 texCoord, float shadowIntens, float bias)
-{
-	vec2 shadowMapCoord = SHADOW_MAP_RESOLUTION * texCoord;
-	vec2 mixScale = fract(shadowMapCoord);
-
-	float samples[4];
-	samples[0] = (texture2D(shadowMap, texCoord).x + bias < lightDepth) ? shadowIntens : 1.0;
-	samples[1] = (texture2D(shadowMap, texCoord + vec2(1.0/SHADOW_MAP_RESOLUTION, 0)).x + bias < lightDepth) ? shadowIntens: 1.0;
-	samples[2] = (texture2D(shadowMap, texCoord + vec2(0, 1.0/SHADOW_MAP_RESOLUTION)).x + bias < lightDepth) ? shadowIntens: 1.0;
-	samples[3] = (texture2D(shadowMap, texCoord + vec2(1.0/SHADOW_MAP_RESOLUTION, 1.0/SHADOW_MAP_RESOLUTION)).x + bias < lightDepth) ? shadowIntens : 1.0;
-
-	return mix(mix(samples[0], samples[1], mixScale.x), mix(samples[2], samples[3], mixScale.x), mixScale.y);
-}
-
 float calcVolumetricFog(vec3 fogWorldPosition, float volumetricHeightDensityAtViewer, float globalDensity, float heightFalloff) {
     vec3 cameraToFogWorldPosition = -fogWorldPosition;
 
