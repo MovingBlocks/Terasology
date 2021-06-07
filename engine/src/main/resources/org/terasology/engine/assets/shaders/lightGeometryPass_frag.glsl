@@ -59,7 +59,7 @@ void main() {
     vec4 normalBuffer = texture2D(texSceneOpaqueNormals, projectedPos.xy).rgba;
     vec3 normal = normalize(normalBuffer.xyz * 2.0 - 1.0);
     float shininess = normalBuffer.a;
-    float depth = texture2D(texSceneOpaqueDepth, projectedPos.xy).r * 2.0 - 1.0;
+    highp float depth = texture2D(texSceneOpaqueDepth, projectedPos.xy).r * 2.0 - 1.0;
 
     vec3 lightDir;
     // TODO: Costly - would be nice to use Crytek's view frustum ray method at this point
