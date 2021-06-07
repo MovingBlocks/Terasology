@@ -135,6 +135,7 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
     private void initWindow() {
         logger.info("Initializing display (if last line in log then likely the game crashed from an issue with your " +
                 "video card)");
+
         // set opengl core profile to 3.3
         GLFW.glfwWindowHint(GLFW.GLFW_CONTEXT_VERSION_MAJOR, 3);
         GLFW.glfwWindowHint(GLFW.GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -145,6 +146,7 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
         if (window == 0) {
             throw new RuntimeException("Failed to create window");
         }
+
         GLFW.glfwMakeContextCurrent(window);
 
         if (!config.isVSync()) {
