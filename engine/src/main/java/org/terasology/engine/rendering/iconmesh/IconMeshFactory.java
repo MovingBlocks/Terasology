@@ -135,7 +135,7 @@ public final class IconMeshFactory {
                 }
             }
         }
-        return tessellator.generateMeshData();
+        return tessellator.buildMeshData();
     }
 
 }

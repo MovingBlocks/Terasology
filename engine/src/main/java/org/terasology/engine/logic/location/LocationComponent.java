@@ -9,6 +9,7 @@ import org.joml.Quaternionfc;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.terasology.engine.entitySystem.Component;
+import org.terasology.engine.entitySystem.DoNotPersist;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.math.Direction;
 import org.terasology.engine.network.Replicate;
@@ -26,6 +27,7 @@ import java.util.Objects;
 public final class LocationComponent implements Component, ReplicationCheck {
 
     public boolean replicateChanges = true;
+    private boolean isDirty = false;
 
     // Relative to
     @Replicate
@@ -47,11 +49,28 @@ public final class LocationComponent implements Component, ReplicationCheck {
     @Replicate
     Quaternionf lastRotation = new Quaternionf();
 
+
     public LocationComponent() {
     }
 
     public LocationComponent(Vector3fc position) {
         setLocalPosition(position);
+    }
+
+    private void dirty() {
+        if (!isDirty && parent == EntityRef.NULL) {
+            lastRotation.set(rotation);
+            lastPosition.set(position);
+            isDirty = true;
+        }
+    }
+
+    boolean isDirty() {
+        return this.isDirty;
+    }
+
+    void clearDirtyFlag() {
+        isDirty = false;
     }
 
     /**
@@ -71,7 +90,7 @@ public final class LocationComponent implements Component, ReplicationCheck {
     }
 
     public void setLocalRotation(float x, float y, float z, float w) {
-        lastRotation.set(rotation);
+        dirty();
         rotation.set(x, y, z, w);
     }
 
@@ -92,7 +111,7 @@ public final class LocationComponent implements Component, ReplicationCheck {
     }
 
     public void setLocalPosition(float x, float y, float z) {
-        lastPosition.set(position);
+        dirty();
         position.set(x, y, z);
     }
 
@@ -195,7 +214,8 @@ public final class LocationComponent implements Component, ReplicationCheck {
      * @param pos position to set
      */
     public void setWorldPosition(Vector3fc pos) {
-        setLocalPosition(pos);
+        dirty();
+        position.set(pos);
         LocationComponent parentLoc = parent.getComponent(LocationComponent.class);
         if (parentLoc != null) {
             this.position.sub(parentLoc.getWorldPosition(new Vector3f()));
@@ -210,7 +230,8 @@ public final class LocationComponent implements Component, ReplicationCheck {
      * @param value position to set
      */
     public void setWorldRotation(Quaternionfc value) {
-        setLocalRotation(value);
+        dirty();
+        rotation.set(value);
         LocationComponent parentLoc = parent.getComponent(LocationComponent.class);
         if (parentLoc != null) {
             Quaternionf worldRot = parentLoc.getWorldRotation(new Quaternionf()).conjugate();

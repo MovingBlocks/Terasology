@@ -65,33 +65,6 @@ public abstract class Camera {
     protected boolean reflected;
     private float reflectionHeight = 32;
 
-    /**
-     * Applies the projection and modelview matrix.
-     *
-     * @deprecated This method is scheduled for removal with core profile change to 3.3
-     *         <p>
-     *         Use {@link         #getProjectionMatrix()} and {@link #getViewMatrix}
-     */
-    @Deprecated
-    public void lookThrough() {
-        loadProjectionMatrix();
-        loadModelViewMatrix();
-    }
-
-    /**
-     * Applies the projection and the normalized modelview matrix (positioned at the origin without any offset like
-     * bobbing) .
-     *
-     * @deprecated This method is scheduled for removal with core profile change to 3.3.
-     *         <p>
-     *         Use {@link #getProjectionMatrix()} and {@link #getNormViewMatrix()}
-     */
-    @Deprecated
-    public void lookThroughNormalized() {
-        loadProjectionMatrix();
-        loadNormalizedModelViewMatrix();
-    }
-
     public void updateFrustum() {
         if (getViewMatrix() == null || getProjectionMatrix() == null) {
             return;
@@ -101,31 +74,6 @@ public abstract class Camera {
     }
 
     public abstract boolean isBobbingAllowed();
-
-    /**
-     * @deprecated This method is scheduled for removal with core profile change to 3.3.
-     *         <p>
-     *         Use {@link #getProjectionMatrix()}
-     */
-    @Deprecated
-    public abstract void loadProjectionMatrix();
-
-
-    /**
-     * @deprecated This method is scheduled for removal with core profile change to 3.3
-     *         <p>
-     *         Use {@link #getViewMatrix()}
-     */
-    @Deprecated
-    public abstract void loadModelViewMatrix();
-
-    /**
-     * @deprecated This method is scheduled for removal with core profile change to 3.3
-     *         <p>
-     *         Use {@link #getNormViewMatrix()}
-     */
-    @Deprecated
-    public abstract void loadNormalizedModelViewMatrix();
 
     public abstract void updateMatrices();
 
@@ -258,6 +206,8 @@ public abstract class Camera {
     }
 
     public boolean hasInSight(AABBfc aabb) {
-        return viewFrustum.testAab(aabb.minX() - position.x, aabb.minY() - position.y, aabb.minZ() - position.z, aabb.maxX() - position.x, aabb.maxY() - position.y, aabb.maxZ() - position.z);
+        return viewFrustum.testAab(
+                aabb.minX() - position.x,aabb.minY() - position.y, aabb.minZ() - position.z,
+                aabb.maxX() - position.x, aabb.maxY() - position.y, aabb.maxZ() - position.z);
     }
 }

@@ -16,12 +16,12 @@ import org.terasology.engine.rendering.nui.CoreScreenLayer;
  * This screen is displayed when the player dies.
  */
 public class DeathScreen extends CoreScreenLayer {
-    private UILabel deathDetails;
-
     @In
     protected LocalPlayer localPlayer;
     @In
     protected GameEngine gameEngine;
+
+    private UILabel deathDetails;
 
     @Override
     protected boolean isEscapeToCloseAllowed() {
