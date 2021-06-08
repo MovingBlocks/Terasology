@@ -4,8 +4,9 @@
 package org.terasology.engine.rendering.assets.mesh;
 
 import com.google.common.collect.ImmutableSet;
+import org.joml.Vector2f;
+import org.joml.Vector3f;
 import org.terasology.engine.core.TerasologyConstants;
-import org.terasology.engine.rendering.assets.texture.TextureUtil;
 import org.terasology.gestalt.assets.AssetDataProducer;
 import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.gestalt.assets.module.annotations.RegisterAssetDataProducer;
@@ -29,7 +30,7 @@ public class ScreenQuadMeshProducer implements AssetDataProducer<MeshData> {
 
     @Override
     public Set<Name> getModulesProviding(Name resourceName) {
-        if (TextureUtil.NOISE_RESOURCE_NAME.equals(resourceName)) {
+        if (SCREEN_QUAD_RESOURCE_NAME.equals(resourceName)) {
             return ImmutableSet.of(TerasologyConstants.ENGINE_MODULE);
         }
         return Collections.emptySet();
@@ -45,22 +46,26 @@ public class ScreenQuadMeshProducer implements AssetDataProducer<MeshData> {
         if (TerasologyConstants.ENGINE_MODULE.equals(urn.getModuleName())) {
             if (SCREEN_QUAD_RESOURCE_NAME.equals(urn.getResourceName())) {
                 StandardMeshData data = new StandardMeshData();
-                data.getVertices().addAll(new float[]{
-                        -1.0f, -1.0f, 0.0f,
-                        -1.0f, 1.0f, 0.0f,
-                        1.0f, 1.0f, 0.0f,
-                        1.0f, -1.0f, 0.0f,
-                });
-                data.getIndices().addAll(new int[]{
-                        0, 1, 2,
-                        0, 2, 3
-                });
-                data.uv0.addAll(new float[]{
-                        0.f, 0.f,
-                        0.f, 1.f,
-                        1.f, 1.f,
-                        1.f, 0.f
-                });
+                Vector3f posDest = new Vector3f();
+                Vector2f uvDest = new Vector2f();
+                data.position.put(posDest.set(-1.0f, -1.0f, 0.0f));
+                data.position.put(posDest.set(-1.0f, 1.0f, 0.0f));
+                data.position.put(posDest.set(1.0f, 1.0f, 0.0f));
+                data.position.put(posDest.set(1.0f, -1.0f, 0.0f));
+
+                data.indices.put(0);
+                data.indices.put(1);
+                data.indices.put(2);
+
+                data.indices.put(0);
+                data.indices.put(2);
+                data.indices.put(3);
+
+                data.uv0.put(uvDest.set(0.0f, 0.0f));
+                data.uv0.put(uvDest.set(0.0f, 1.0f));
+                data.uv0.put(uvDest.set(1.0f, 1.0f));
+                data.uv0.put(uvDest.set(1.0f, 0.0f));
+
                 return Optional.of(data);
             }
         }

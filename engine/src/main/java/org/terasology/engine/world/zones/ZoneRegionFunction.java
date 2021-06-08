@@ -36,6 +36,6 @@ public interface ZoneRegionFunction {
      *
      * @param parent the zone this function is attached to
      */
-    default void initialize(Zone parent) {}
+    default void initialize(Zone parent) { }
 
 }

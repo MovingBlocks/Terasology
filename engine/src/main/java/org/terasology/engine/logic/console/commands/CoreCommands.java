@@ -7,13 +7,13 @@ import com.google.common.collect.Streams;
 import org.joml.Vector3f;
 import org.terasology.engine.config.SystemConfig;
 import org.terasology.engine.core.GameEngine;
+import org.terasology.engine.core.PathManager;
 import org.terasology.engine.core.SimpleUri;
 import org.terasology.engine.core.TerasologyConstants;
 import org.terasology.engine.core.Time;
 import org.terasology.engine.core.modes.StateLoading;
 import org.terasology.engine.core.modes.StateMainMenu;
 import org.terasology.engine.core.module.ModuleManager;
-import org.terasology.engine.core.paths.PathManager;
 import org.terasology.engine.core.subsystem.DisplayDevice;
 import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.entitySystem.entity.EntityManager;
@@ -69,6 +69,8 @@ import org.terasology.nui.skin.UISkinAsset;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
+import java.nio.file.Path;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -468,22 +470,24 @@ public class CoreCommands extends BaseComponentSystem {
      * @return String containing information about number of entities saved
      * @throws IOException thrown when error with saving file occures
      */
-    @Command(shortDescription = "Writes out information on all entities to a text file for debugging",
-            helpText = "Writes entity information out into a file named \"entityDump.txt\"." +
+    @Command(shortDescription = "Writes out information on all entities to a JSON file for debugging",
+            helpText = "Writes entity information out into a file named \"<timestamp>-entityDump.json\"." +
                     " Supports list of component names, which will be used to only save entities that contains" +
                     " one or more of those components. Names should be separated by spaces.")
     public String dumpEntities(@CommandParam(value = "componentNames", required = false) String... componentNames) throws IOException {
         int savedEntityCount;
         EngineEntityManager engineEntityManager = (EngineEntityManager) entityManager;
-        PrefabSerializer prefabSerializer = new PrefabSerializer(engineEntityManager.getComponentLibrary(), engineEntityManager.getTypeSerializerLibrary());
+        PrefabSerializer prefabSerializer =
+                new PrefabSerializer(engineEntityManager.getComponentLibrary(), engineEntityManager.getTypeSerializerLibrary());
         WorldDumper worldDumper = new WorldDumper(engineEntityManager, prefabSerializer);
+        Path outFile = PathManager.getInstance().getHomePath().resolve(Instant.now() + "-entityDump.json");
         if (componentNames.length == 0) {
-            savedEntityCount = worldDumper .save(PathManager.getInstance().getHomePath().resolve("entityDump.txt"));
+            savedEntityCount = worldDumper.save(outFile);
         } else {
             List<Class<? extends Component>> filterComponents = Arrays.stream(componentNames)
                     .map(String::trim) //Trim off whitespace
                     .filter(o -> !o.isEmpty()) //Remove empty strings
-                    .map(o -> o.toLowerCase().endsWith("component") ? o : o + "component") //All component class names finish with "component"
+                    .map(o -> o.toLowerCase().endsWith("component") ? o : o + "component") //All component class names end with "component"
                     .map(o -> Streams.stream(moduleManager.getEnvironment().getSubtypesOf(Component.class))
                             .filter(e -> e.getSimpleName().equalsIgnoreCase(o))
                             .findFirst())
@@ -491,7 +495,7 @@ public class CoreCommands extends BaseComponentSystem {
                     .map(Optional::get)
                     .collect(Collectors.toList());
             if (!filterComponents.isEmpty()) {
-                savedEntityCount = worldDumper.save(PathManager.getInstance().getHomePath().resolve("entityDump.txt"), filterComponents);
+                savedEntityCount = worldDumper.save(outFile, filterComponents);
             } else {
                 return "Could not find components matching given names";
             }

@@ -23,5 +23,5 @@ public interface LayerThickness {
      *
      * @param parent the layer this is attached to
      */
-    default void initialize(LayeredZoneRegionFunction parent) {}
+    default void initialize(LayeredZoneRegionFunction parent) { }
 }

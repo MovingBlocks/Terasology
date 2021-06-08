@@ -38,7 +38,7 @@ public class ObjectFieldMapTypeHandlerFactoryTest {
     @Test
     public void testObject() {
         Optional<TypeHandler<SomeClass<Integer>>> typeHandler =
-                typeHandlerFactory.create(new TypeInfo<SomeClass<Integer>>() {}, context);
+                typeHandlerFactory.create(new TypeInfo<SomeClass<Integer>>() { }, context);
 
         assertTrue(typeHandler.isPresent());
         assertTrue(typeHandler.get() instanceof ObjectFieldMapTypeHandler);
@@ -46,6 +46,6 @@ public class ObjectFieldMapTypeHandlerFactoryTest {
         // Verify that the Integer and List<Integer> TypeHandlers were loaded from the TypeHandlerLibrary
         verify(typeHandlerLibrary).getTypeHandler(eq(TypeInfo.of(Integer.class).getType()));
 
-        verify(typeHandlerLibrary).getTypeHandler(eq(new TypeInfo<List<Integer>>() {}.getType()));
+        verify(typeHandlerLibrary).getTypeHandler(eq(new TypeInfo<List<Integer>>() { }.getType()));
     }
 }

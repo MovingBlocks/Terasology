@@ -4,8 +4,6 @@ package org.terasology.unittest.stubs;
 
 import org.terasology.engine.entitySystem.Component;
 
-/**
- */
 public final class IntegerComponent implements Component {
     public int value;
 

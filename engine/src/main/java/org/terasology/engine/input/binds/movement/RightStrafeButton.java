@@ -9,8 +9,6 @@ import org.terasology.engine.input.RegisterBindButton;
 import org.terasology.input.InputType;
 import org.terasology.input.Keyboard;
 
-/**
- */
 @RegisterBindButton(id = "right", description = "${engine:menu#binding-right}")
 @DefaultBinding(type = InputType.KEY, id = Keyboard.KeyId.D)
 public class RightStrafeButton extends BindButtonEvent {

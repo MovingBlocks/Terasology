@@ -14,8 +14,6 @@ import org.terasology.engine.registry.CoreRegistry;
 import org.terasology.engine.world.block.Block;
 import org.terasology.engine.world.block.BlockManager;
 
-/**
- */
 @RegisterSystem(RegisterMode.REMOTE_CLIENT)
 public class BlockTypeClientSystem extends BaseComponentSystem {
     private static final Logger logger = LoggerFactory.getLogger(BlockTypeClientSystem.class);

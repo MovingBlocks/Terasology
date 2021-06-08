@@ -4,7 +4,5 @@ package org.terasology.engine.world.block.entity.neighbourUpdate;
 
 import org.terasology.engine.entitySystem.event.Event;
 
-/**
- */
 public class LargeBlockUpdateStarting implements Event {
 }

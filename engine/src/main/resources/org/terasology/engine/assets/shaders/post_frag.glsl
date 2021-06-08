@@ -31,10 +31,10 @@ uniform mat4 prevViewProjMatrix;
 
 void main() {
 #if !defined (NO_BLUR)
-    vec4 colorBlur = texture2D(texBlur, v_uv0.xy);
+    vec4 colorBlur = texture(texBlur, v_uv0.xy);
 #endif
 
-    float currentDepth = texture2D(texDepth, v_uv0.xy).x * 2.0 - 1.0;
+    float currentDepth = texture(texDepth, v_uv0.xy).x * 2.0 - 1.0;
 //TODO: Separate the underwater shader effect from the depth of field effect - Amrit 'Who'
 /**
  * Calculate blur for depth of field effect and underwater.
@@ -58,7 +58,7 @@ void main() {
     }
 #endif
 
-    vec4 color = texture2D(texScene, v_uv0.xy);
+    vec4 color = texture(texScene, v_uv0.xy);
 
 #if defined (MOTION_BLUR)
     vec4 screenSpaceNorm = vec4(v_uv0.x, v_uv0.y, currentDepth, 1.0);
@@ -76,9 +76,9 @@ void main() {
     blurTexCoord += velocity;
     for(int i = 1; i < MOTION_BLUR_SAMPLES; ++i, blurTexCoord += velocity)
     {
-      vec4 currentColor = texture2D(texScene, blurTexCoord);
+      vec4 currentColor = texture(texScene, blurTexCoord);
 #ifndef NO_BLUR
-      vec4 currentColorBlur = texture2D(texBlur, blurTexCoord);
+      vec4 currentColorBlur = texture(texBlur, blurTexCoord);
 #endif
 
       color += currentColor;
@@ -100,7 +100,7 @@ void main() {
 #endif
 
 #ifdef FILM_GRAIN
-    vec3 noise = texture2D(texNoise, renderTargetSize * (gl_TexCoord[0].xy + noiseOffset) / noiseSize).xyz * 2.0 - 1.0;
+    vec3 noise = texture(texNoise, renderTargetSize * (v_uv0.xy + noiseOffset) / noiseSize).xyz * 2.0 - 1.0;
     finalColor.rgb += clamp(noise.xxx * grainIntensity, 0.0, 1.0);
 #endif
 
@@ -110,7 +110,7 @@ void main() {
 
     // Color grading
     vec3 lutOffset = vec3(1.0 / 32.0);
-    finalColor.rgb = texture3D(texColorGradingLut, lutScale * finalColor.rgb + lutOffset).rgb;
+    finalColor.rgb = texture(texColorGradingLut, lutScale * finalColor.rgb + lutOffset).rgb;
 
     gl_FragData[0].rgba = finalColor;
 }

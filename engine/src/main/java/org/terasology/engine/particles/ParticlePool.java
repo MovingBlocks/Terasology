@@ -1,18 +1,5 @@
-/*
- * Copyright 2016 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.particles;
 
 import com.google.common.base.Preconditions;
@@ -31,33 +18,32 @@ import java.nio.FloatBuffer;
  */
 public final class ParticlePool {
 
-    //== package private attributes =====================
-
     // Static constants
     private static final int X_OFFSET = 0;
     private static final int Y_OFFSET = 1;
     private static final int Z_OFFSET = 2;
     private static final int W_OFFSET = 3;
 
+    public final ParticleData temporaryParticleData = new ParticleData();
+
+    //== package private attributes =====================
+
     // Per particle scalars
     public final float[] energy;
 
     // Per particle 3d vectors
-    public final float[] position;
-    private final FloatBuffer positionBuffer;
-    public final float[] scale;
-    private final FloatBuffer scaleBuffer;
-    public final float[] color;
-    private final FloatBuffer colorBuffer;
-    public final float[] textureOffset;
-    private final FloatBuffer textureOffsetBuffer;
-
     public final float[] previousPosition;
     public final float[] velocity;
+    public final float[] position;
+    public final float[] scale;
+    public final float[] color;
+    public final float[] textureOffset;
+    private final FloatBuffer positionBuffer;
+    private final FloatBuffer scaleBuffer;
+    private final FloatBuffer colorBuffer;
+    private final FloatBuffer textureOffsetBuffer;
 
     //== private attributes =============================
-
-    public final ParticleData temporaryParticleData = new ParticleData();
 
     private int firstDeadParticleIndex;
     private final int rawSize;

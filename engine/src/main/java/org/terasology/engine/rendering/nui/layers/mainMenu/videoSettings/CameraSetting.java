@@ -2,8 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.rendering.nui.layers.mainMenu.videoSettings;
 
-/**
- */
 public enum CameraSetting {
     NORMAL("${engine:menu#camera-setting-normal}", 1),
     SMOOTH("${engine:menu#camera-setting-smooth}", 5),

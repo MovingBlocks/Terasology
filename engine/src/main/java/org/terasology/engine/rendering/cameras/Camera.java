@@ -4,18 +4,15 @@ package org.terasology.engine.rendering.cameras;
 
 import org.joml.AxisAngle4f;
 import org.joml.FrustumIntersection;
-import org.joml.FrustumRayBuilder;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Quaternionfc;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
-import org.lwjgl.BufferUtils;
 import org.terasology.engine.config.Config;
-import org.terasology.engine.logic.players.LocalPlayer;
-import org.terasology.joml.geom.AABBfc;
 import org.terasology.engine.math.Direction;
 import org.terasology.engine.registry.CoreRegistry;
+import org.terasology.joml.geom.AABBfc;
 
 /**
  * Camera base class.
@@ -68,22 +65,6 @@ public abstract class Camera {
     protected boolean reflected;
     private float reflectionHeight = 32;
 
-    /**
-     * Applies the projection and modelview matrix.
-     */
-    public void lookThrough() {
-        loadProjectionMatrix();
-        loadModelViewMatrix();
-    }
-
-    /**
-     * Applies the projection and the normalized modelview matrix (positioned at the origin without any offset like bobbing) .
-     */
-    public void lookThroughNormalized() {
-        loadProjectionMatrix();
-        loadNormalizedModelViewMatrix();
-    }
-
     public void updateFrustum() {
         if (getViewMatrix() == null || getProjectionMatrix() == null) {
             return;
@@ -93,12 +74,6 @@ public abstract class Camera {
     }
 
     public abstract boolean isBobbingAllowed();
-
-    public abstract void loadProjectionMatrix();
-
-    public abstract void loadModelViewMatrix();
-
-    public abstract void loadNormalizedModelViewMatrix();
 
     public abstract void updateMatrices();
 
@@ -231,8 +206,8 @@ public abstract class Camera {
     }
 
     public boolean hasInSight(AABBfc aabb) {
-        // TODO: strange offset to shift aabb by player view position
-        Vector3f playerView = CoreRegistry.get(LocalPlayer.class).getViewPosition(new Vector3f());
-        return viewFrustum.testAab(aabb.minX() - playerView.x, aabb.minY() - playerView.y, aabb.minZ() - playerView.z, aabb.maxX() - playerView.x, aabb.maxY() - playerView.y, aabb.maxZ() - playerView.z);
+        return viewFrustum.testAab(
+                aabb.minX() - position.x,aabb.minY() - position.y, aabb.minZ() - position.z,
+                aabb.maxX() - position.x, aabb.maxY() - position.y, aabb.maxZ() - position.z);
     }
 }

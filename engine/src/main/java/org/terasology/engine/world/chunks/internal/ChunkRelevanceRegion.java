@@ -18,8 +18,6 @@ import org.terasology.engine.world.chunks.Chunks;
 import java.util.Iterator;
 import java.util.Set;
 
-/**
- */
 public class ChunkRelevanceRegion {
     private EntityRef entity;
     private Vector3i relevanceDistance = new Vector3i();
@@ -37,7 +35,7 @@ public class ChunkRelevanceRegion {
 
         LocationComponent loc = entity.getComponent(LocationComponent.class);
 
-        if (loc == null||Float.isNaN(loc.getWorldPosition(new Vector3f()).x)) {
+        if (loc == null || Float.isNaN(loc.getWorldPosition(new Vector3f()).x)) {
             dirty = false;
         } else {
             center.set(Chunks.toChunkPos(loc.getWorldPosition(new Vector3f()), new Vector3i()));
@@ -109,7 +107,7 @@ public class ChunkRelevanceRegion {
 
     private BlockRegion calculateRegion() {
         LocationComponent loc = entity.getComponent(LocationComponent.class);
-        if (loc != null&& !Float.isNaN(loc.getWorldPosition(new Vector3f()).x)) {
+        if (loc != null && !Float.isNaN(loc.getWorldPosition(new Vector3f()).x)) {
             Vector3i extents = new Vector3i(relevanceDistance.x / 2, relevanceDistance.y / 2, relevanceDistance.z / 2);
             return new BlockRegion(Chunks.toChunkPos(loc.getWorldPosition(new Vector3f()), new Vector3i())).expand(extents);
         }

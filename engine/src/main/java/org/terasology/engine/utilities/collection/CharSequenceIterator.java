@@ -5,8 +5,6 @@ package org.terasology.engine.utilities.collection;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-/**
- */
 public class CharSequenceIterator implements Iterator<Character> {
 
     private final CharSequence sequence;

@@ -24,12 +24,12 @@ public class BuiltinTypeWidgetTestScreen extends TypeWidgetTestScreen {
 
         newBinding(TestEnum.class);
 
-        newBinding(new TypeInfo<Set<String>>() {});
-        newBinding(new TypeInfo<ImmutableList<Integer>>() {});
+        newBinding(new TypeInfo<Set<String>>() { });
+        newBinding(new TypeInfo<ImmutableList<Integer>>() { });
         newBinding(Boolean[].class);
 
-        newBinding(new TypeInfo<Container>() {});
-        newBinding(new TypeInfo<List<Base<Integer>>>() {});
+        newBinding(new TypeInfo<Container>() { });
+        newBinding(new TypeInfo<List<Base<Integer>>>() { });
 
         newBinding(WithFinalFields.class);
 
@@ -44,9 +44,13 @@ public class BuiltinTypeWidgetTestScreen extends TypeWidgetTestScreen {
 
         private String displayName;
 
-        TestEnum() {this(null);}
+        TestEnum() {
+            this(null);
+        }
 
-        TestEnum(String displayName) {this.displayName = displayName;}
+        TestEnum(String displayName) {
+            this.displayName = displayName;
+        }
 
 
         @Override

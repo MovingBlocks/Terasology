@@ -1,4 +1,4 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.particles.updating;
 
@@ -61,7 +61,7 @@ public class ParticleUpdaterImpl implements ParticleUpdater {
      * Set of all particle emitters
      */
     private final Set<ParticleEmitterComponent> registeredParticleSystems = new HashSet<>();
-    private final HashSet<ParticlePool> updatedParticlePools = new HashSet<>();
+    private final Set<ParticlePool> updatedParticlePools = new HashSet<>();
 
     private final FastRandom random = new FastRandom();
     private final Physics physics;

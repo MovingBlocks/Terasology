@@ -1,4 +1,4 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.subsystem.discordrpc;
 
@@ -71,20 +71,22 @@ public final class DiscordRPCSystem extends BaseComponentSystem {
 
     @Override
     public void shutdown() {
-        if (delayManager.hasPeriodicAction(player.getClientEntity(), UPDATE_PARTY_SIZE_ID)) {
-            delayManager.cancelPeriodicAction(player.getClientEntity(), UPDATE_PARTY_SIZE_ID);
+        if (player != null) {
+            EntityRef client = player.getClientEntity();
+            if (delayManager != null && delayManager.hasPeriodicAction(client, UPDATE_PARTY_SIZE_ID)) {
+                delayManager.cancelPeriodicAction(client, UPDATE_PARTY_SIZE_ID);
+            }
         }
-
         DiscordRPCSubSystem.reset();
         DiscordRPCSubSystem.setState("In Main Menu");
         DiscordRPCSubSystem.setStartTimestamp(null);
     }
 
     @ReceiveEvent
-    public void onPlayerInitialized(LocalPlayerInitializedEvent event, EntityRef player) {
+    public void onPlayerInitialized(LocalPlayerInitializedEvent event, EntityRef localPlayer) {
         /* Adds the periodic action when the player is hosting or playing online to update party size */
         if (networkSystem.getMode() != NetworkMode.NONE) {
-            delayManager.addPeriodicAction(player, UPDATE_PARTY_SIZE_ID, 0, UPDATE_PARTY_SIZE_PERIOD);
+            delayManager.addPeriodicAction(localPlayer, UPDATE_PARTY_SIZE_ID, 0, UPDATE_PARTY_SIZE_PERIOD);
         }
     }
 

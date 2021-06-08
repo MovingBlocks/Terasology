@@ -10,8 +10,6 @@ import org.terasology.input.ControllerId;
 import org.terasology.input.InputType;
 import org.terasology.input.Keyboard;
 
-/**
- */
 @RegisterBindButton(id = "jump", description = "${engine:menu#binding-jump}", repeating = true)
 @DefaultBinding(type = InputType.KEY, id = Keyboard.KeyId.SPACE)
 @DefaultBinding(type = InputType.CONTROLLER_BUTTON, id = ControllerId.TWO)

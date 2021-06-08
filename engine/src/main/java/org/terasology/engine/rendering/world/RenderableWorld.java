@@ -9,9 +9,7 @@ import org.terasology.engine.rendering.world.viewDistance.ViewDistance;
 import org.terasology.engine.world.block.BlockRegion;
 import org.terasology.engine.world.chunks.ChunkProvider;
 
-/**
- *
- */
+
 public interface RenderableWorld {
 
     void onChunkLoaded(Vector3ic chunkPosition);

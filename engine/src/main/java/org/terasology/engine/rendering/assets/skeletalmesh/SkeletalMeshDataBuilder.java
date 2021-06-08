@@ -10,14 +10,11 @@ import org.joml.Vector3f;
 import org.terasology.engine.rendering.assets.mesh.StandardMeshData;
 import org.terasology.joml.geom.AABBf;
 import org.terasology.engine.rendering.assets.mesh.MeshBuilder;
-import org.terasology.engine.rendering.assets.mesh.MeshData;
 
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- *
- */
+
 public class SkeletalMeshDataBuilder {
 
     private List<Bone> bones = new ArrayList<>();
@@ -50,34 +47,6 @@ public class SkeletalMeshDataBuilder {
 
     public SkeletalMeshDataBuilder addWeights(List<BoneWeight> weights) {
         this.weights.addAll(weights);
-        return this;
-    }
-
-    public SkeletalMeshDataBuilder addMesh(Bone bone, MeshBuilder builder) {
-        return addMesh(bone, builder.getMeshData());
-    }
-
-    public SkeletalMeshDataBuilder addMesh(Bone bone, StandardMeshData data) {
-        TFloatList meshVertices = data.getVertices();
-        TIntList meshIndices = data.getIndices();
-        TFloatList texCoord0 = data.uv0;
-        int weightsStart = weights.size();
-        addBone(bone);
-        for (int i = 0; i < meshVertices.size() / 3; i++) {
-            float x = meshVertices.get(i * 3);
-            float y = meshVertices.get(i * 3 + 1);
-            float z = meshVertices.get(i * 3 + 2);
-            Vector3f pos = new Vector3f(x, y, z);
-            BoneWeight weight = new BoneWeight(new float[]{1}, new int[]{bone.getIndex()});
-            // TODO Copy mesh normals
-            vertices.add(pos);
-            weights.add(weight);
-            uvs.add(new Vector2f(texCoord0.get(i * 2), texCoord0.get(i * 2 + 1)));
-        }
-
-        for (int i = 0; i < meshIndices.size(); i++) {
-            indices.add(meshIndices.get(i) + weightsStart);
-        }
         return this;
     }
 
