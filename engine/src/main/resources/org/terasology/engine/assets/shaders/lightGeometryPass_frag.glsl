@@ -31,7 +31,7 @@ uniform vec4 lightExtendedProperties;
     uniform sampler2D texSceneClouds;
     #endif
 
-    #define SHADOW_MAP_BIAS 0.00001
+    #define SHADOW_MAP_BIAS 0.0001
 
     #if defined (FEATURE_LIGHT_DIRECTIONAL)
     uniform sampler2D texSceneShadowMap;
@@ -79,7 +79,7 @@ void main() {
 
     vec4 shadowMapTexPos = lightMatrix * vec4(lightWorldPosition.x, lightWorldPosition.y, lightWorldPosition.z, 1.0);
     highp float shadowTerm = 0.0;
-    highp float bias = max(0.0001 * (1.0 - dot(normal, lightDir)), SHADOW_MAP_BIAS);
+    highp float bias = max(SHADOW_MAP_BIAS * (1.0 - dot(normal, lightDir)), SHADOW_MAP_BIAS);
 
     #if defined (DYNAMIC_SHADOWS_PCF)
         vec2 texelSize = 1.0 / textureSize(texSceneShadowMap, 0);
