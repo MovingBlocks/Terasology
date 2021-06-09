@@ -5,7 +5,6 @@ package org.terasology.engine.logic.players;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.terasology.engine.core.Time;
-import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.entitySystem.entity.EntityBuilder;
 import org.terasology.engine.entitySystem.entity.EntityManager;
 import org.terasology.engine.entitySystem.entity.EntityRef;
@@ -17,16 +16,17 @@ import org.terasology.engine.entitySystem.systems.RegisterMode;
 import org.terasology.engine.entitySystem.systems.RegisterSystem;
 import org.terasology.engine.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.engine.logic.characters.CharacterComponent;
-import org.terasology.engine.logic.location.Location;
-import org.terasology.engine.logic.location.LocationComponent;
 import org.terasology.engine.logic.characters.CharacterHeldItemComponent;
 import org.terasology.engine.logic.console.commandSystem.annotations.Command;
 import org.terasology.engine.logic.console.commandSystem.annotations.CommandParam;
-import org.terasology.math.TeraMath;
+import org.terasology.engine.logic.location.Location;
+import org.terasology.engine.logic.location.LocationComponent;
 import org.terasology.engine.network.ClientComponent;
 import org.terasology.engine.registry.In;
 import org.terasology.engine.rendering.logic.VisualComponent;
 import org.terasology.engine.rendering.world.WorldRenderer;
+import org.terasology.gestalt.entitysystem.component.Component;
+import org.terasology.math.TeraMath;
 
 @RegisterSystem(RegisterMode.CLIENT)
 public class FirstPersonClientSystem extends BaseComponentSystem implements UpdateSubscriberSystem {

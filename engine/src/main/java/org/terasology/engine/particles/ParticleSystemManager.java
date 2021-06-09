@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.particles;
 
-import org.terasology.engine.entitySystem.Component;
-import org.terasology.gestalt.module.sandbox.API;
 import org.terasology.engine.particles.rendering.ParticleRenderingData;
+import org.terasology.gestalt.entitysystem.component.Component;
+import org.terasology.gestalt.module.sandbox.API;
 
 import java.util.stream.Stream;
 

@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.logic.delay;
 
-import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.world.block.ForceBlockActive;
+import org.terasology.gestalt.entitysystem.component.Component;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -15,7 +15,7 @@ import java.util.Set;
  * Not for public use. Use DelayManager instead.
  */
 @ForceBlockActive
-public final class PeriodicActionComponent implements Component {
+public final class PeriodicActionComponent implements Component<PeriodicActionComponent> {
     private Map<String, Long> actionIdsWakeUp = new HashMap<>();
     private Map<String, Long> actionIdsPeriod = new HashMap<>();
     private long lowestWakeUp = Long.MAX_VALUE;
@@ -76,5 +76,12 @@ public final class PeriodicActionComponent implements Component {
 
     public boolean containsActionId(String actionId) {
         return actionIdsWakeUp.containsKey(actionId);
+    }
+
+    @Override
+    public void copy(PeriodicActionComponent other) {
+        this.actionIdsPeriod = other.actionIdsPeriod;
+        this.actionIdsWakeUp = other.actionIdsPeriod;
+        this.lowestWakeUp = other.lowestWakeUp;
     }
 }

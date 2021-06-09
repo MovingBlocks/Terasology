@@ -48,8 +48,13 @@ public final class ExternalApiWhitelist {
             .add(org.terasology.reflection.TypeInfo.class)
             .build();
 
+    private static final Set<String> GESTALT_ECS_PACKAGES = new ImmutableSet.Builder<String>()
+            .add("org.terasology.gestalt.entitysystem.component")
+            .build();
+
     public static final Set<String> PACKAGES = new ImmutableSet.Builder<String>()
             .addAll(NUI_PACKAGES)
+            .addAll(GESTALT_ECS_PACKAGES)
             .add("org.terasology.math")
             .add("org.terasology.math.geom")
             .add("org.terasology.joml.geom")

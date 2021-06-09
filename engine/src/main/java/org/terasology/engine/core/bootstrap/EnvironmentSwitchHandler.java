@@ -15,7 +15,6 @@ import org.slf4j.LoggerFactory;
 import org.terasology.engine.config.flexible.AutoConfigManager;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.core.module.ModuleManager;
-import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.entitySystem.metadata.ComponentLibrary;
 import org.terasology.engine.entitySystem.metadata.EntitySystemLibrary;
 import org.terasology.engine.entitySystem.metadata.EventLibrary;
@@ -33,6 +32,7 @@ import org.terasology.engine.physics.CollisionGroupManager;
 import org.terasology.engine.registry.InjectionHelper;
 import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.gestalt.assets.module.ModuleAwareAssetTypeManager;
+import org.terasology.gestalt.entitysystem.component.Component;
 import org.terasology.gestalt.module.ModuleEnvironment;
 import org.terasology.gestalt.naming.Name;
 import org.terasology.gestalt.util.reflection.GenericsUtil;
@@ -45,6 +45,7 @@ import org.terasology.reflection.copy.CopyStrategy;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.reflect.ReflectFactory;
 
+import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.Optional;
@@ -192,7 +193,7 @@ public final class EnvironmentSwitchHandler {
 
     private static void registerComponents(ComponentLibrary library, ModuleEnvironment environment) {
         for (Class<? extends Component> componentType : environment.getSubtypesOf(Component.class)) {
-            if (componentType.getAnnotation(DoNotAutoRegister.class) == null) {
+            if (componentType.getAnnotation(DoNotAutoRegister.class) == null && !componentType.isInterface() && !Modifier.isAbstract(componentType.getModifiers())) {
                 String componentName = MetadataUtil.getComponentClassName(componentType);
                 Name componentModuleName = verifyNotNull(environment.getModuleProviding(componentType), "Could not find module for %s %s", componentName, componentType);
                 library.register(new ResourceUrn(componentModuleName.toString(), componentName), componentType);

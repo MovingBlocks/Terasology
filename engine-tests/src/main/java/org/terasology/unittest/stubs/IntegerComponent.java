@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.unittest.stubs;
 
-import org.terasology.engine.entitySystem.Component;
+import org.terasology.gestalt.entitysystem.component.Component;
 
-public final class IntegerComponent implements Component {
+public final class IntegerComponent implements Component<IntegerComponent> {
     public int value;
 
     public IntegerComponent() {
@@ -35,5 +35,10 @@ public final class IntegerComponent implements Component {
     @Override
     public int hashCode() {
         return value;
+    }
+
+    @Override
+    public void copy(IntegerComponent other) {
+        this.value = other.value;
     }
 }

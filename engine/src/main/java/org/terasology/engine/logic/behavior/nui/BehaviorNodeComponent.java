@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.logic.behavior.nui;
 
-import org.terasology.engine.entitySystem.Component;
+import org.terasology.gestalt.entitysystem.component.Component;
 import org.terasology.gestalt.module.sandbox.API;
 import org.terasology.nui.Color;
 
@@ -11,7 +11,7 @@ import org.terasology.nui.Color;
  *
  */
 @API
-public class BehaviorNodeComponent implements Component {
+public class BehaviorNodeComponent implements Component<BehaviorNodeComponent> {
     public static final BehaviorNodeComponent DEFAULT = new BehaviorNodeComponent();
 
     public String action;                       // the node(s) to create
@@ -26,5 +26,17 @@ public class BehaviorNodeComponent implements Component {
     @Override
     public String toString() {
         return displayName;
+    }
+
+    @Override
+    public void copy(BehaviorNodeComponent other) {
+        this.action = other.action;
+        this.name = other.name;
+        this.displayName = other.displayName;
+        this.category = other.category;
+        this.shape = other.shape;
+        this.color = other.color;
+        this.textColor = other.textColor;
+        this.description = other.description;
     }
 }

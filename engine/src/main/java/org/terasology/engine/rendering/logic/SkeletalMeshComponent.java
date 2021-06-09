@@ -7,19 +7,19 @@ import com.google.common.collect.Lists;
 import org.joml.Vector3f;
 import org.terasology.engine.entitySystem.Owns;
 import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.network.Replicate;
 import org.terasology.engine.rendering.assets.animation.MeshAnimation;
 import org.terasology.engine.rendering.assets.material.Material;
 import org.terasology.engine.rendering.assets.skeletalmesh.SkeletalMesh;
-import org.terasology.engine.network.Replicate;
+import org.terasology.engine.world.block.ForceBlockActive;
 import org.terasology.nui.Color;
 import org.terasology.nui.properties.Range;
-import org.terasology.engine.world.block.ForceBlockActive;
 
 import java.util.List;
 import java.util.Map;
 
 @ForceBlockActive
-public class SkeletalMeshComponent implements VisualComponent {
+public class SkeletalMeshComponent implements VisualComponent<SkeletalMeshComponent> {
     public SkeletalMesh mesh;
     public Material material;
 
@@ -56,4 +56,21 @@ public class SkeletalMeshComponent implements VisualComponent {
 
     @Replicate
     public Color color = Color.WHITE;
+
+    @Override
+    public void copy(SkeletalMeshComponent other) {
+        this.mesh = other.mesh;
+        this.material = other.material;
+        this.animation = other.animation;
+        this.loop = other.loop;
+        this.animationPool = other.animationPool;
+        this.animationRate = other.animationRate;
+        this.heightOffset = other.heightOffset;
+        this.boneEntities = other.boneEntities;
+        this.rootBone = other.rootBone;
+        this.animationTime = other.animationTime;
+        this.scale = new Vector3f(other.scale);
+        this.translate = new Vector3f(other.translate);
+        this.color = other.color;
+    }
 }

@@ -2,13 +2,13 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.particles.components;
 
-import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.logic.location.LocationComponent;
-import org.terasology.gestalt.module.sandbox.API;
 import org.terasology.engine.particles.ParticlePool;
 import org.terasology.engine.particles.functions.affectors.AffectorFunction;
 import org.terasology.engine.particles.functions.generators.GeneratorFunction;
+import org.terasology.gestalt.entitysystem.component.Component;
+import org.terasology.gestalt.module.sandbox.API;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -25,7 +25,7 @@ import java.util.Map;
  * See ParticleDataSpriteComponent and SpriteParticleRenderer for an example.
  */
 @API
-public class ParticleEmitterComponent implements Component {
+public class ParticleEmitterComponent implements Component<ParticleEmitterComponent> {
     public static final int INFINITE_PARTICLE_SPAWNS = -1;
     public static final int INDEFINITE_EMITTER_LIFETIME = -1;
 
@@ -108,4 +108,25 @@ public class ParticleEmitterComponent implements Component {
      * Allows checking only some particles each update since it's a heavy operation.
      */
     public int collisionUpdateIteration;
+
+    @Override
+    public void copy(ParticleEmitterComponent other) {
+        this.maxParticles = other.maxParticles;
+        this.particleCollision = other.particleCollision;
+        this.spawnRateMax = other.spawnRateMax;
+        this.spawnRateMin = other.spawnRateMin;
+        this.enabled = other.enabled;
+        this.lifeTime = other.lifeTime;
+        this.particleSpawnsLeft = other.particleSpawnsLeft;
+        this.destroyEntityWhenDead = other.destroyEntityWhenDead;
+        this.ownerEntity = other.ownerEntity;
+        this.particlePool = other.particlePool;
+        this.generatorFunctionMap.clear();
+        this.generatorFunctionMap.putAll(other.generatorFunctionMap);
+        this.affectorFunctionMap.clear();
+        this.affectorFunctionMap.putAll(other.affectorFunctionMap);
+        this.locationComponent = other.locationComponent;
+        this.nextEmission = other.nextEmission;
+        this.collisionUpdateIteration = other.collisionUpdateIteration;
+    }
 }

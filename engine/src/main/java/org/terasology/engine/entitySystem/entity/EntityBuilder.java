@@ -5,7 +5,6 @@ package org.terasology.engine.entitySystem.entity;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.entitySystem.MutableComponentContainer;
 import org.terasology.engine.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.engine.entitySystem.entity.internal.EngineEntityPool;
@@ -14,6 +13,7 @@ import org.terasology.engine.entitySystem.entity.internal.EntityScope;
 import org.terasology.engine.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
 import org.terasology.engine.entitySystem.entity.lifecycleEvents.OnAddedComponent;
 import org.terasology.engine.entitySystem.prefab.Prefab;
+import org.terasology.gestalt.entitysystem.component.Component;
 
 import java.util.Collections;
 import java.util.List;

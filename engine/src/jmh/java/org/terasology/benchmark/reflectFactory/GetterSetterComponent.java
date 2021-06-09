@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.benchmark.reflectFactory;
 
-import org.terasology.engine.entitySystem.Component;
+import org.terasology.gestalt.entitysystem.component.Component;
 
-public class GetterSetterComponent implements Component {
+public class GetterSetterComponent implements Component<GetterSetterComponent> {
     private int value;
 
     public void setValue(int value) {

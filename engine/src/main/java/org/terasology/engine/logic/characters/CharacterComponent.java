@@ -2,19 +2,19 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.logic.characters;
 
-import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.entitySystem.Owns;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.logic.characters.interactions.InteractionEndPredicted;
 import org.terasology.engine.logic.characters.interactions.InteractionStartPredicted;
 import org.terasology.engine.network.FieldReplicateType;
 import org.terasology.engine.network.Replicate;
+import org.terasology.gestalt.entitysystem.component.Component;
 
 /**
  * Information common to characters (the physical body of players and creatures)
  *
  */
-public final class CharacterComponent implements Component {
+public final class CharacterComponent implements Component<CharacterComponent> {
     /**
      * Recommended height from center at which name tags should be placed if there is one.
      */
@@ -65,4 +65,16 @@ public final class CharacterComponent implements Component {
 
     @Replicate(FieldReplicateType.SERVER_TO_OWNER)
     public EntityRef controller = EntityRef.NULL;
+
+    @Override
+    public void copy(CharacterComponent other) {
+        this.nameTagOffset = other.nameTagOffset;
+        this.interactionRange = other.interactionRange;
+        this.authorizedInteractionTarget = other.authorizedInteractionTarget;
+        this.authorizedInteractionId = other.authorizedInteractionId;
+        this.predictedInteractionTarget = other.predictedInteractionTarget;
+        this.predictedInteractionId = other.predictedInteractionId;
+        this.movingItem = other.movingItem;
+        this.controller = other.controller;
+    }
 }

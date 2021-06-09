@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.logic.behavior;
 
-import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.logic.behavior.asset.BehaviorTree;
+import org.terasology.gestalt.entitysystem.component.Component;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +16,7 @@ import java.util.List;
  * easy identification/addition/removal of grouped
  * entities.
  */
-public class GroupTagComponent implements Component {
+public class GroupTagComponent implements Component<GroupTagComponent> {
 
     /**
      * Groups to which the entity belong.
@@ -39,4 +39,11 @@ public class GroupTagComponent implements Component {
     public BehaviorTree backupBT;
 
     public Interpreter backupRunningState;
+
+    @Override
+    public void copy(GroupTagComponent other) {
+        this.groups = other.groups;
+        this.backupBT = other.backupBT;
+        this.backupRunningState = other.backupRunningState;
+    }
 }

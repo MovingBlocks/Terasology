@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.logic.autoCreate;
 
+import org.terasology.gestalt.entitysystem.component.Component;
 import org.terasology.gestalt.module.sandbox.API;
-import org.terasology.engine.entitySystem.Component;
 
 /**
  * This component is used to mark prefabs that should automatically created when a game begins or is loaded, if one does not already exist.
@@ -12,6 +12,11 @@ import org.terasology.engine.entitySystem.Component;
  *
  */
 @API
-public class AutoCreateComponent implements Component {
+public class AutoCreateComponent implements Component<AutoCreateComponent> {
     public boolean createClientSide;
+
+    @Override
+    public void copy(AutoCreateComponent other) {
+        this.createClientSide = other.createClientSide;
+    }
 }

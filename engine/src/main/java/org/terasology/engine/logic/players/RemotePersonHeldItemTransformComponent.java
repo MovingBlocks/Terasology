@@ -5,8 +5,15 @@ package org.terasology.engine.logic.players;
 import org.joml.Vector3f;
 import org.terasology.engine.rendering.logic.VisualComponent;
 
-public class RemotePersonHeldItemTransformComponent implements VisualComponent {
+public class RemotePersonHeldItemTransformComponent implements VisualComponent<RemotePersonHeldItemTransformComponent> {
     public Vector3f rotateDegrees = new Vector3f();
     public Vector3f translate = new Vector3f();
     public float scale = 1f;
+
+    @Override
+    public void copy(RemotePersonHeldItemTransformComponent other) {
+        this.rotateDegrees = new Vector3f(other.rotateDegrees);
+        this.translate = new Vector3f(other.translate);
+        this.scale = other.scale;
+    }
 }

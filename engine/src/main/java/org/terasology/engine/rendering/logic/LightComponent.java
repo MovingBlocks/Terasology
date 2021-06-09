@@ -11,7 +11,7 @@ import org.terasology.reflection.metadata.FieldMetadata;
  * Add this component to an entity for it to transmit light from its location.  By default the component is configured to act similarly to a placed torch block.
  */
 // TODO: Split into multiple components? Point, Directional?
-public final class LightComponent implements VisualComponent, ReplicationCheck {
+public final class LightComponent implements VisualComponent<LightComponent>, ReplicationCheck {
 
     public enum LightType {
         POINT,
@@ -59,6 +59,19 @@ public final class LightComponent implements VisualComponent, ReplicationCheck {
 
     public boolean simulateFading;
 
+    @Override
+    public void copy(LightComponent other) {
+        this.lightColorDiffuse = new Vector3f(other.lightColorDiffuse);
+        this.lightColorAmbient = new Vector3f(other.lightColorAmbient);
+        this.lightDiffuseIntensity = other.lightDiffuseIntensity;
+        this.lightAmbientIntensity = other.lightAmbientIntensity;
+        this.lightSpecularPower = other.lightSpecularPower;
+        this.lightAttenuationRange = other.lightAttenuationRange;
+        this.lightAttenuationFalloff = other.lightAttenuationFalloff;
+        this.lightRenderingDistance = other.lightRenderingDistance;
+        this.lightType = other.lightType;
+        this.simulateFading = other.simulateFading;
+    }
 
     @Override
     public boolean shouldReplicate(FieldMetadata<?, ?> field, boolean initial, boolean toOwner) {

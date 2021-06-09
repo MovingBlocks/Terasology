@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.logic.behavior;
 
-import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.gestalt.entitysystem.component.Component;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -14,7 +14,7 @@ import java.util.Set;
  * behavior by all entities belonging to a group.
  * @see GroupTagComponent
  */
-public class GroupMindComponent implements Component {
+public class GroupMindComponent implements Component<GroupMindComponent> {
     /**
      * The unique group identifier with which the component will be associated
      */
@@ -28,4 +28,11 @@ public class GroupMindComponent implements Component {
      * The identifiers for each of the entities belonging to the group.
      */
     public Set<EntityRef> groupMembers = new HashSet<>();
+
+    @Override
+    public void copy(GroupMindComponent other) {
+        this.groupLabel = other.groupLabel;
+        this.behavior = other.behavior;
+        this.groupMembers = other.groupMembers;
+    }
 }

@@ -3,9 +3,9 @@
 package org.terasology.engine.entitySystem.metadata;
 
 import com.google.common.collect.Lists;
-import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.entitySystem.Owns;
 import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.gestalt.entitysystem.component.Component;
 
 import java.util.List;
 

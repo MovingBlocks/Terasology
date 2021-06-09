@@ -2,11 +2,11 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.logic.characters;
 
-import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.logic.characters.events.CreateVisualCharacterEvent;
 import org.terasology.engine.network.NoReplicate;
 import org.terasology.engine.network.Replicate;
+import org.terasology.gestalt.entitysystem.component.Component;
 
 /**
  * Add this component to characters to give them a visual appearance.
@@ -19,10 +19,15 @@ import org.terasology.engine.network.Replicate;
  *
  */
 @Replicate
-public class VisualCharacterComponent implements Component {
+public class VisualCharacterComponent implements Component<VisualCharacterComponent> {
     /**
      * Should not be set manually. Can however be used to forward events from character to visual character.
      */
     @NoReplicate
     public EntityRef visualCharacter = EntityRef.NULL;
+
+    @Override
+    public void copy(VisualCharacterComponent other) {
+        this.visualCharacter = other.visualCharacter;
+    }
 }

@@ -8,12 +8,11 @@ import org.joml.Quaternionf;
 import org.joml.Quaternionfc;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
-import org.terasology.engine.entitySystem.Component;
-import org.terasology.engine.entitySystem.DoNotPersist;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.math.Direction;
 import org.terasology.engine.network.Replicate;
 import org.terasology.engine.network.ReplicationCheck;
+import org.terasology.gestalt.entitysystem.component.Component;
 import org.terasology.nui.properties.TextField;
 import org.terasology.reflection.metadata.FieldMetadata;
 
@@ -24,18 +23,14 @@ import java.util.Objects;
 /**
  * Component represent the location and facing of an entity in the world
  */
-public final class LocationComponent implements Component, ReplicationCheck {
+public final class LocationComponent implements Component<LocationComponent>, ReplicationCheck {
 
     public boolean replicateChanges = true;
-    private boolean isDirty = false;
-
     // Relative to
     @Replicate
     EntityRef parent = EntityRef.NULL;
-
     @Replicate
     List<EntityRef> children = Lists.newArrayList();
-
     // Standard position/rotation
     @Replicate
     @TextField
@@ -48,6 +43,7 @@ public final class LocationComponent implements Component, ReplicationCheck {
     Vector3f lastPosition = new Vector3f();
     @Replicate
     Quaternionf lastRotation = new Quaternionf();
+    private boolean isDirty = false;
 
 
     public LocationComponent() {
@@ -126,21 +122,21 @@ public final class LocationComponent implements Component, ReplicationCheck {
     }
 
     /**
-     * set the local scale
-     *
-     * @param value the scale
-     */
-    public void setLocalScale(float value) {
-        this.scale = value;
-    }
-
-    /**
      * local scale
      *
      * @return the scale
      */
     public float getLocalScale() {
         return scale;
+    }
+
+    /**
+     * set the local scale
+     *
+     * @param value the scale
+     */
+    public void setLocalScale(float value) {
+        this.scale = value;
     }
 
     /**
@@ -208,6 +204,14 @@ public final class LocationComponent implements Component, ReplicationCheck {
         return result;
     }
 
+    public void setWorldScale(float value) {
+        this.scale = value;
+        LocationComponent parentLoc = parent.getComponent(LocationComponent.class);
+        if (parentLoc != null) {
+            this.scale /= parentLoc.getWorldScale();
+        }
+    }
+
     /**
      * set the world position of the {@link LocationComponent}
      *
@@ -236,14 +240,6 @@ public final class LocationComponent implements Component, ReplicationCheck {
         if (parentLoc != null) {
             Quaternionf worldRot = parentLoc.getWorldRotation(new Quaternionf()).conjugate();
             this.rotation.premul(worldRot);
-        }
-    }
-
-    public void setWorldScale(float value) {
-        this.scale = value;
-        LocationComponent parentLoc = parent.getComponent(LocationComponent.class);
-        if (parentLoc != null) {
-            this.scale /= parentLoc.getWorldScale();
         }
     }
 
@@ -276,5 +272,19 @@ public final class LocationComponent implements Component, ReplicationCheck {
     @Override
     public boolean shouldReplicate(FieldMetadata<?, ?> field, boolean initial, boolean toOwner) {
         return initial || replicateChanges;
+    }
+
+
+    @Override
+    public void copy(LocationComponent other) {
+        this.replicateChanges = other.replicateChanges;
+        this.isDirty = other.isDirty;
+        this.parent = other.parent;
+        this.children = other.children;
+        this.position = new Vector3f(other.position);
+        this.rotation = new Quaternionf(other.rotation);
+        this.scale = other.scale;
+        this.lastPosition = new Vector3f(other.lastPosition);
+        this.lastRotation = new Quaternionf(other.lastRotation);
     }
 }

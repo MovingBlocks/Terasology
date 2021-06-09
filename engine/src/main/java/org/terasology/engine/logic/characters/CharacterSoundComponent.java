@@ -3,13 +3,12 @@
 package org.terasology.engine.logic.characters;
 
 import com.google.common.collect.Lists;
-
 import org.terasology.engine.audio.StaticSound;
-import org.terasology.engine.entitySystem.Component;
+import org.terasology.gestalt.entitysystem.component.Component;
 
 import java.util.List;
 
-public final class CharacterSoundComponent implements Component {
+public final class CharacterSoundComponent implements Component<CharacterSoundComponent> {
 
     public List<StaticSound> footstepSounds = Lists.newArrayList();
     public List<StaticSound> damageSounds = Lists.newArrayList();
@@ -33,4 +32,25 @@ public final class CharacterSoundComponent implements Component {
 
     public long lastSoundTime;
 
+    @Override
+    public void copy(CharacterSoundComponent other) {
+        this.footstepSounds = other.footstepSounds;
+                this.damageSounds = other.damageSounds;
+        this.landingSounds = other.landingSounds;
+                this.jumpSounds = other.jumpSounds;
+        this.deathSounds = other.deathSounds;
+                this.respawnSounds = other.respawnSounds;
+        this.swimSounds = other.swimSounds;
+                this.enterWaterSounds = other.enterWaterSounds;
+        this.leaveWaterSounds = other.leaveWaterSounds;
+                this.footstepVolume = other.footstepVolume;
+        this.damageVolume = other.damageVolume;
+                this.jumpVolume = other.jumpVolume;
+        this.landingVolume = other.landingVolume;
+                this.deathVolume = other.deathVolume;
+        this.respawnVolume = other.respawnVolume;
+                this.swimmingVolume = other.swimmingVolume;
+        this.diveVolume = other.diveVolume;
+                this.lastSoundTime = other.lastSoundTime;
+    }
 }

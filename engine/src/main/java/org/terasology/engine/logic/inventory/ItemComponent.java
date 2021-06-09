@@ -3,17 +3,17 @@
 
 package org.terasology.engine.logic.inventory;
 
-import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.entitySystem.prefab.Prefab;
 import org.terasology.engine.network.FieldReplicateType;
 import org.terasology.engine.network.Replicate;
 import org.terasology.engine.rendering.assets.texture.TextureRegionAsset;
+import org.terasology.gestalt.entitysystem.component.Component;
 
 /**
  * Item data is stored using this component
  *
  */
-public final class ItemComponent implements Component {
+public final class ItemComponent implements Component<ItemComponent> {
     /**
      * Name of the icon this item should be rendered with
      */
@@ -73,4 +73,18 @@ public final class ItemComponent implements Component {
     public Prefab pickupPrefab;
 
     public int cooldownTime = 200;
+
+    @Override
+    public void copy(ItemComponent other) {
+        this.icon = other.icon;
+        this.stackId = other.stackId;
+        this.maxStackSize = other.maxStackSize;
+        this.stackCount = other.stackCount;
+        this.usage = other.usage;
+        this.consumedOnUse = other.consumedOnUse;
+        this.baseDamage = other.baseDamage;
+        this.damageType = other.damageType;
+        this.pickupPrefab = other.pickupPrefab;
+        this.cooldownTime = other.cooldownTime;
+    }
 }

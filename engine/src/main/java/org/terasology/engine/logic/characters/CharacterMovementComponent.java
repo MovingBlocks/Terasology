@@ -3,23 +3,22 @@
 package org.terasology.engine.logic.characters;
 
 import com.google.common.collect.Lists;
-
 import org.joml.Vector3f;
-import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.network.FieldReplicateType;
 import org.terasology.engine.network.Replicate;
-import org.terasology.nui.properties.Range;
 import org.terasology.engine.physics.CollisionGroup;
 import org.terasology.engine.physics.StandardCollisionGroup;
+import org.terasology.gestalt.entitysystem.component.Component;
+import org.terasology.nui.properties.Range;
 
 import java.util.List;
 
 /**
- * This component is attached to all character entities. It governs movement and stores
- * associated paramenters, and can be used instead of a CapsuleShapeComponent by the physics system to define the collision shape. <br/>
- * The {@link AliveCharacterComponent} should necessarily be attached to the character entity for the movement systems to work.
+ * This component is attached to all character entities. It governs movement and stores associated paramenters, and can
+ * be used instead of a CapsuleShapeComponent by the physics system to define the collision shape. <br/> The {@link
+ * AliveCharacterComponent} should necessarily be attached to the character entity for the movement systems to work.
  */
-public final class CharacterMovementComponent implements Component {
+public final class CharacterMovementComponent implements Component<CharacterMovementComponent> {
 
     // Collision settings
     @Range(min = 1, max = 25)
@@ -27,7 +26,8 @@ public final class CharacterMovementComponent implements Component {
     @Range(min = 0, max = 5)
     public float radius = 0.3f;
     public CollisionGroup collisionGroup = StandardCollisionGroup.CHARACTER;
-    public List<CollisionGroup> collidesWith = Lists.<CollisionGroup>newArrayList(StandardCollisionGroup.WORLD, StandardCollisionGroup.SENSOR);
+    public List<CollisionGroup> collidesWith = Lists.<CollisionGroup>newArrayList(StandardCollisionGroup.WORLD,
+            StandardCollisionGroup.SENSOR);
     @Range(min = 0, max = 5)
     public float pickupRadius = 1.5f;
 
@@ -84,4 +84,27 @@ public final class CharacterMovementComponent implements Component {
         velocity.set(newVelocity);
     }
 
+    @Override
+    public void copy(CharacterMovementComponent other) {
+        this.height = other.height;
+        this.radius = other.radius;
+        this.collisionGroup = other.collisionGroup;
+        this.collidesWith = other.collidesWith;
+        this.pickupRadius = other.pickupRadius;
+        this.speedMultiplier = other.speedMultiplier;
+        this.runFactor = other.runFactor;
+        this.jumpSpeed = other.jumpSpeed;
+        this.stepHeight = other.stepHeight;
+        this.slopeFactor = other.slopeFactor;
+        this.baseNumberOfJumpsMax = other.baseNumberOfJumpsMax;
+        this.numberOfJumpsMax = other.numberOfJumpsMax;
+        this.numberOfJumpsLeft = other.numberOfJumpsLeft;
+        this.distanceBetweenFootsteps = other.distanceBetweenFootsteps;
+        this.faceMovementDirection = other.faceMovementDirection;
+        this.mode = other.mode;
+        this.grounded = other.grounded;
+        this.jump = other.jump;
+        this.footstepDelta = other.footstepDelta;
+        this.velocity = new Vector3f(other.velocity);
+    }
 }

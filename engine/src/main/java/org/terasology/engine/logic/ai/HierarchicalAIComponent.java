@@ -3,9 +3,9 @@
 package org.terasology.engine.logic.ai;
 
 import org.joml.Vector3f;
-import org.terasology.engine.entitySystem.Component;
+import org.terasology.gestalt.entitysystem.component.Component;
 
-public final class HierarchicalAIComponent implements Component {
+public final class HierarchicalAIComponent implements Component<HierarchicalAIComponent> {
 
     //how often updates are progressed, handle whit care
     public int updateFrequency;
@@ -64,4 +64,37 @@ public final class HierarchicalAIComponent implements Component {
     //TODO remove this when fight system is ready!!!
     public int damage = 50;
     public int damageFrequency = 500;
+
+    @Override
+    public void copy(HierarchicalAIComponent other) {
+        this.updateFrequency = other.updateFrequency;
+        this.lastProgressedUpdateAt = other.lastProgressedUpdateAt;
+        this.movementTarget = new Vector3f(other.movementTarget);
+        this.lastChangeOfDirectionAt = other.lastChangeOfDirectionAt;
+        this.lastChangeOfMovementAt = other.lastChangeOfMovementAt;
+        this.lastChangeOfidlingtAt = other.lastChangeOfidlingtAt;
+        this.lastChangeOfDangerAt = other.lastChangeOfDangerAt;
+        this.moveUpdateTime = other.moveUpdateTime;
+        this.directionUpdateTime = other.directionUpdateTime;
+        this.idlingUpdateTime = other.idlingUpdateTime;
+        this.dangerUpdateTime = other.dangerUpdateTime;
+        this.dieIfPlayerFar = other.dieIfPlayerFar;
+        this.dieDistance = other.dieDistance;
+        this.hunter = other.hunter;
+        this.aggressive = other.aggressive;
+        this.wild = other.wild;
+        this.flying = other.flying;
+        this.maxAltitude = other.maxAltitude;
+        this.hectic = other.hectic;
+        this.straightLined = other.straightLined;
+        this.forgiving = other.forgiving;
+        this.playerSense = other.playerSense;
+        this.playerdistance = other.playerdistance;
+        this.attackDistance = other.attackDistance;
+        this.runDistance = other.runDistance;
+        this.panicDistance = other.panicDistance;
+        this.inDanger = other.inDanger;
+        this.damage = other.damage;
+        this.damageFrequency = other.damageFrequency;
+    }
 }

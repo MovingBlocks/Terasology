@@ -4,9 +4,9 @@ package org.terasology.engine.particles.components.generators;
 
 import org.joml.Vector2f;
 import org.joml.Vector2i;
-import org.terasology.engine.entitySystem.Component;
-import org.terasology.gestalt.module.sandbox.API;
 import org.terasology.engine.rendering.assets.texture.Texture;
+import org.terasology.gestalt.entitysystem.component.Component;
+import org.terasology.gestalt.module.sandbox.API;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -16,7 +16,7 @@ import java.util.function.Function;
  * Generator used to choose a particle's textureOffset (from a tile-map texture)
  */
 @API
-public class TextureOffsetGeneratorComponent implements Component {
+public class TextureOffsetGeneratorComponent implements Component<TextureOffsetGeneratorComponent> {
     public List<Vector2f> validOffsets;
 
     public TextureOffsetGeneratorComponent() {
@@ -59,5 +59,10 @@ public class TextureOffsetGeneratorComponent implements Component {
         for (Vector2i offset : validTextures) {
             this.validOffsets.add(absolute2Relative.apply(offset));
         }
+    }
+
+    @Override
+    public void copy(TextureOffsetGeneratorComponent other) {
+        this.validOffsets = other.validOffsets;
     }
 }

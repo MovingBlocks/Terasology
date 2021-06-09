@@ -18,7 +18,6 @@ import org.reflections.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.core.PathManager;
-import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.engine.entitySystem.event.AbstractConsumableEvent;
@@ -43,6 +42,7 @@ import org.terasology.engine.network.OwnerEvent;
 import org.terasology.engine.network.ServerEvent;
 import org.terasology.engine.world.block.BlockComponent;
 import org.terasology.gestalt.assets.ResourceUrn;
+import org.terasology.gestalt.entitysystem.component.Component;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;

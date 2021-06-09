@@ -3,14 +3,19 @@
 
 package org.terasology.engine.network;
 
-import org.terasology.engine.entitySystem.Component;
+import org.terasology.gestalt.entitysystem.component.Component;
 import org.terasology.nui.Color;
 
 /**
  * A component that provides a color to describe an entity
  */
-public class ColorComponent implements Component {
+public class ColorComponent implements Component<ColorComponent> {
 
     @Replicate
     public Color color;
+
+    @Override
+    public void copy(ColorComponent other) {
+        this.color = other.color;
+    }
 }

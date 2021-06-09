@@ -2,11 +2,11 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.entitySystem.entity.internal;
 
-import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.entitySystem.DoNotPersist;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.prefab.Prefab;
 import org.terasology.engine.network.Replicate;
+import org.terasology.gestalt.entitysystem.component.Component;
 
 import javax.annotation.Nullable;
 
@@ -14,7 +14,7 @@ import javax.annotation.Nullable;
  * Component for storing entity system information on an entity
  */
 @DoNotPersist
-public class EntityInfoComponent implements Component {
+public class EntityInfoComponent implements Component<EntityInfoComponent> {
     // TODO: Switch this to use Optional<Prefab>
     public Prefab parentPrefab;
     /**
@@ -41,5 +41,14 @@ public class EntityInfoComponent implements Component {
                                EntityScope scope) {
         this(parentPrefab, persisted, alwaysRelevant);
         this.scope = scope;
+    }
+
+    @Override
+    public void copy(EntityInfoComponent other) {
+        this.persisted = other.persisted;
+        this.parentPrefab = other.parentPrefab;
+        this.alwaysRelevant = other.alwaysRelevant;
+        this.scope = other.scope;
+        this.owner = other.owner;
     }
 }
