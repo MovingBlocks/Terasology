@@ -50,15 +50,15 @@ We encourage contributions from anybody and try to keep a warm and friendly comm
     <tr>
         <td>Graphics (GPU)</td>
         <td style="vertical-align:top">
-            Intel HD Graphics (Gen 5)<br/>
-            GeForce 6xxx series or<br/>
-            Radeon HD 2000 series <br/>
-            with OpenGL 2.1*
+            Intel HD Graphics (Gen 7)<br/>
+            GeForce 8xxx series (or higher) or<br/>
+            Radeon HD 2000 series (or higher)<br/>
+            with OpenGL 3.3
         </td>
         <td  style="vertical-align:top">
             GeForce 8xxx series (or higher) or<br/>
             Radeon HD 2000 series (or higher)<br/>
-            with OpenGL 3.x
+            with OpenGL 3.3
         </td>
     </tr>
     <tr>
