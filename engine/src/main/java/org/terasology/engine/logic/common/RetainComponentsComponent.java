@@ -21,6 +21,6 @@ public class RetainComponentsComponent implements Component<RetainComponentsComp
 
     @Override
     public void copy(RetainComponentsComponent other) {
-        this.components = other.components;
+        this.components = Sets.newHashSet(other.components); // TODO Investigate, needs to deep-copy or not!
     }
 }

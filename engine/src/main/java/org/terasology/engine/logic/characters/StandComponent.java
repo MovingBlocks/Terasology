@@ -23,6 +23,6 @@ public class StandComponent implements Component<StandComponent> {
 
     @Override
     public void copy(StandComponent other) {
-        this.animationPool = other.animationPool;
+        this.animationPool = Lists.newArrayList(other.animationPool);
     }
 }

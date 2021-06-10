@@ -60,6 +60,6 @@ public class RigidBodyComponent implements Component<RigidBodyComponent> {
         this.restitution = other.restitution;
         this.angularVelocity = new Vector3f(other.angularVelocity);
         this.collisionGroup = other.collisionGroup;
-        this.collidesWith = other.collidesWith;
+        this.collidesWith = Lists.newArrayList(other.collidesWith);
     }
 }

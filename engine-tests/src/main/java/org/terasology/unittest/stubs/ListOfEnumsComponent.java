@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.unittest.stubs;
 
+import com.google.common.collect.Lists;
 import org.terasology.engine.math.Side;
 import org.terasology.gestalt.entitysystem.component.Component;
 
@@ -13,6 +14,6 @@ public class ListOfEnumsComponent implements Component<ListOfEnumsComponent> {
 
     @Override
     public void copy(ListOfEnumsComponent other) {
-        this.elements = other.elements;
+        this.elements = Lists.newArrayList(other.elements);
     }
 }

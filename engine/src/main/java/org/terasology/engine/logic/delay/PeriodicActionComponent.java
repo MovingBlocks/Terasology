@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.logic.delay;
 
+import com.google.common.collect.Maps;
 import org.terasology.engine.world.block.ForceBlockActive;
 import org.terasology.gestalt.entitysystem.component.Component;
 
@@ -80,8 +81,8 @@ public final class PeriodicActionComponent implements Component<PeriodicActionCo
 
     @Override
     public void copy(PeriodicActionComponent other) {
-        this.actionIdsPeriod = other.actionIdsPeriod;
-        this.actionIdsWakeUp = other.actionIdsPeriod;
+        this.actionIdsPeriod = Maps.newHashMap(other.actionIdsPeriod);
+        this.actionIdsWakeUp = Maps.newHashMap(other.actionIdsPeriod);
         this.lowestWakeUp = other.lowestWakeUp;
     }
 }

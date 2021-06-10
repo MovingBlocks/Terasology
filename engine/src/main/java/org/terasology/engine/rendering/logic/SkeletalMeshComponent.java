@@ -4,6 +4,7 @@
 package org.terasology.engine.rendering.logic;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import org.joml.Vector3f;
 import org.terasology.engine.entitySystem.Owns;
 import org.terasology.engine.entitySystem.entity.EntityRef;
@@ -63,10 +64,10 @@ public class SkeletalMeshComponent implements VisualComponent<SkeletalMeshCompon
         this.material = other.material;
         this.animation = other.animation;
         this.loop = other.loop;
-        this.animationPool = other.animationPool;
+        this.animationPool = Lists.newArrayList(other.animationPool);
         this.animationRate = other.animationRate;
         this.heightOffset = other.heightOffset;
-        this.boneEntities = other.boneEntities;
+        this.boneEntities = Maps.newHashMap(other.boneEntities);
         this.rootBone = other.rootBone;
         this.animationTime = other.animationTime;
         this.scale = new Vector3f(other.scale);

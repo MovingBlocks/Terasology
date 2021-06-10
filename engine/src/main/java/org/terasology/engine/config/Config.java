@@ -239,7 +239,7 @@ public final class Config {
      * @param clazz the class to convert the data to
      * @return a config component for the given uri and class or <code>null</code>
      */
-    public <T extends Component> T getModuleConfig(SimpleUri uri, String key, Class<T> clazz) {
+    public <T extends Component<T>> T getModuleConfig(SimpleUri uri, String key, Class<T> clazz) {
         Map<String, JsonElement> map = config.getModuleConfigs().get(uri);
         if (map == null) {
             return null;

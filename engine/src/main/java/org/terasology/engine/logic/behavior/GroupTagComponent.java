@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.logic.behavior;
 
+import com.google.common.collect.Lists;
 import org.terasology.engine.logic.behavior.asset.BehaviorTree;
 import org.terasology.gestalt.entitysystem.component.Component;
 
@@ -42,7 +43,7 @@ public class GroupTagComponent implements Component<GroupTagComponent> {
 
     @Override
     public void copy(GroupTagComponent other) {
-        this.groups = other.groups;
+        this.groups = Lists.newArrayList(other.groups);
         this.backupBT = other.backupBT;
         this.backupRunningState = other.backupRunningState;
     }

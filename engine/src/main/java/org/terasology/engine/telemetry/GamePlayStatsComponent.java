@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.telemetry;
 
+import com.google.common.collect.Maps;
 import org.terasology.engine.network.Replicate;
 import org.terasology.gestalt.entitysystem.component.Component;
 
@@ -30,8 +31,8 @@ public class GamePlayStatsComponent implements Component<GamePlayStatsComponent>
 
     @Override
     public void copy(GamePlayStatsComponent other) {
-        this.blockDestroyedMap = other.blockDestroyedMap;
-        this.blockPlacedMap = other.blockPlacedMap;
+        this.blockDestroyedMap = Maps.newHashMap(other.blockDestroyedMap);
+        this.blockPlacedMap = Maps.newHashMap(other.blockPlacedMap);
         this.distanceTraveled = other.distanceTraveled;
         this.playTimeMinute = other.playTimeMinute;
         this.creatureKilled = other.creatureKilled;

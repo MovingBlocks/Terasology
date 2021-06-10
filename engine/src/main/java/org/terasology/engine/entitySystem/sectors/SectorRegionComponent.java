@@ -9,6 +9,7 @@ import org.terasology.gestalt.module.sandbox.API;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * When this component is added to a sector-scope entity, the {@link SectorSimulationComponent} will count any chunks
@@ -27,7 +28,8 @@ public class SectorRegionComponent implements Component<SectorRegionComponent> {
 
     @Override
     public void copy(SectorRegionComponent other) {
-        //TODO check that is right
-        this.chunks = other.chunks;
+        this.chunks = other.chunks.stream()
+                .map(Vector3i::new)
+                .collect(Collectors.toSet());
     }
 }

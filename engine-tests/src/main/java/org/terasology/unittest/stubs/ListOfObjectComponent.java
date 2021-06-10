@@ -8,6 +8,7 @@ import org.terasology.reflection.MappedContainer;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class ListOfObjectComponent implements Component<ListOfObjectComponent> {
     public String shortName;
@@ -16,7 +17,12 @@ public class ListOfObjectComponent implements Component<ListOfObjectComponent> {
     @Override
     public void copy(ListOfObjectComponent other) {
         this.shortName = other.shortName;
-        this.elements = other.elements;
+        this.elements = other.elements.stream().map((subElement -> {
+            SubElement newSub = new SubElement();
+            newSub.id = subElement.id;
+            newSub.type = subElement.type;
+            return newSub;
+        })).collect(Collectors.toList());
     }
 
     @MappedContainer

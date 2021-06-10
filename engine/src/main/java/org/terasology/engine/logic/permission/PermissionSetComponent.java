@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.logic.permission;
 
+import com.google.common.collect.Sets;
 import org.terasology.gestalt.entitysystem.component.Component;
 
 import java.util.Set;
@@ -11,6 +12,6 @@ public class PermissionSetComponent implements Component<PermissionSetComponent>
 
     @Override
     public void copy(PermissionSetComponent other) {
-        this.permissions = other.permissions;
+        this.permissions = Sets.newHashSet(other.permissions);
     }
 }

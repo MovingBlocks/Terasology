@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.logic.delay;
 
+import com.google.common.collect.Maps;
 import org.terasology.engine.world.block.ForceBlockActive;
 import org.terasology.gestalt.entitysystem.component.Component;
 
@@ -71,7 +72,7 @@ public final class DelayedActionComponent implements Component<DelayedActionComp
 
     @Override
     public void copy(DelayedActionComponent other) {
-        this.actionIdsWakeUp = other.actionIdsWakeUp;
+        this.actionIdsWakeUp = Maps.newHashMap(other.actionIdsWakeUp);
         this.lowestWakeUp = other.lowestWakeUp;
     }
 }

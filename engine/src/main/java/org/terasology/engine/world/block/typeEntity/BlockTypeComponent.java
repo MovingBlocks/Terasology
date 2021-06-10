@@ -12,6 +12,6 @@ public class BlockTypeComponent implements Component<BlockTypeComponent> {
 
     @Override
     public void copy(BlockTypeComponent other) {
-        this.block =other.block;
+        this.block = other.block;
     }
 }

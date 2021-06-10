@@ -23,6 +23,6 @@ public class TriggerComponent implements Component<TriggerComponent> {
     @Override
     public void copy(TriggerComponent other) {
         this.collisionGroup = other.collisionGroup;
-        this.detectGroups = other.detectGroups;
+        this.detectGroups = Lists.newArrayList(other.detectGroups);
     }
 }

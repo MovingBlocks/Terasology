@@ -23,6 +23,6 @@ public class WalkComponent implements Component<WalkComponent> {
 
     @Override
     public void copy(WalkComponent other) {
-        this.animationPool = other.animationPool;
+        this.animationPool = Lists.newArrayList(other.animationPool);
     }
 }

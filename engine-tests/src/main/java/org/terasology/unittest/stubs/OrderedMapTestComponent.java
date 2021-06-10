@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.unittest.stubs;
 
+import com.google.common.collect.Maps;
 import org.terasology.gestalt.entitysystem.component.Component;
 
 import java.util.Map;
@@ -11,6 +12,6 @@ public final class OrderedMapTestComponent implements Component<OrderedMapTestCo
 
     @Override
     public void copy(OrderedMapTestComponent other) {
-        this.orderedMap = other.orderedMap;
+        this.orderedMap = Maps.newHashMap(other.orderedMap);
     }
 }

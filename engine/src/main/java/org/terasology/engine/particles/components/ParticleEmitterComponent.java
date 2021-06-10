@@ -125,7 +125,8 @@ public class ParticleEmitterComponent implements Component<ParticleEmitterCompon
         this.generatorFunctionMap.putAll(other.generatorFunctionMap);
         this.affectorFunctionMap.clear();
         this.affectorFunctionMap.putAll(other.affectorFunctionMap);
-        this.locationComponent = other.locationComponent;
+        this.locationComponent = new LocationComponent();
+        this.locationComponent.copy(other.locationComponent); // TODO check this
         this.nextEmission = other.nextEmission;
         this.collisionUpdateIteration = other.collisionUpdateIteration;
     }

@@ -89,7 +89,7 @@ public final class CharacterMovementComponent implements Component<CharacterMove
         this.height = other.height;
         this.radius = other.radius;
         this.collisionGroup = other.collisionGroup;
-        this.collidesWith = other.collidesWith;
+        this.collidesWith = Lists.newArrayList(other.collidesWith);
         this.pickupRadius = other.pickupRadius;
         this.speedMultiplier = other.speedMultiplier;
         this.runFactor = other.runFactor;

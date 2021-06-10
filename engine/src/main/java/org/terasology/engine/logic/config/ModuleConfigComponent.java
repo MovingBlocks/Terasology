@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.logic.config;
 
+import com.google.common.collect.Maps;
 import org.terasology.gestalt.entitysystem.component.Component;
 
 import java.util.Map;
@@ -13,6 +14,6 @@ public class ModuleConfigComponent implements Component<ModuleConfigComponent> {
     @Override
     public void copy(ModuleConfigComponent other) {
         this.moduleName = other.moduleName;
-        this.properties = other.properties;
+        this.properties = Maps.newHashMap(other.properties);
     }
 }

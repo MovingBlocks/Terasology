@@ -17,7 +17,7 @@ public class BlockDamageModifierComponent implements Component<BlockDamageModifi
 
     @Override
     public void copy(BlockDamageModifierComponent other) {
-        this.materialDamageMultiplier = other.materialDamageMultiplier;
+        this.materialDamageMultiplier = Maps.newHashMap(other.materialDamageMultiplier);
         this.blockAnnihilationChance = other.blockAnnihilationChance;
         this.skipPerBlockEffects = other.skipPerBlockEffects;
         this.directPickup = other.directPickup;

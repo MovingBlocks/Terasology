@@ -28,7 +28,7 @@ public class ChunkMeshComponent implements VisualComponent<ChunkMeshComponent> {
 
     @Override
     public void copy(ChunkMeshComponent other) {
-        this.mesh = other.mesh;
+        this.mesh = other.mesh; // TODO deep or shallow copy?
         this.aabb = new AABBf(other.aabb);
         this.animated = other.animated;
     }

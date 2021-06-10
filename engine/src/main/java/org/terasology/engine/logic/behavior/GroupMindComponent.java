@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.logic.behavior;
 
+import com.google.common.collect.Sets;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.gestalt.entitysystem.component.Component;
 
@@ -33,6 +34,6 @@ public class GroupMindComponent implements Component<GroupMindComponent> {
     public void copy(GroupMindComponent other) {
         this.groupLabel = other.groupLabel;
         this.behavior = other.behavior;
-        this.groupMembers = other.groupMembers;
+        this.groupMembers = Sets.newHashSet(other.groupMembers);
     }
 }

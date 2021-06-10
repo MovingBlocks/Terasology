@@ -11,6 +11,7 @@ import org.terasology.gestalt.module.sandbox.API;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * Generator used to choose a particle's textureOffset (from a tile-map texture)
@@ -63,6 +64,8 @@ public class TextureOffsetGeneratorComponent implements Component<TextureOffsetG
 
     @Override
     public void copy(TextureOffsetGeneratorComponent other) {
-        this.validOffsets = other.validOffsets;
+        this.validOffsets = other.validOffsets.stream()
+                .map(Vector2f::new)
+                .collect(Collectors.toList());
     }
 }

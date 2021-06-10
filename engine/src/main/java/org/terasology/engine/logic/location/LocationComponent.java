@@ -280,7 +280,7 @@ public final class LocationComponent implements Component<LocationComponent>, Re
         this.replicateChanges = other.replicateChanges;
         this.isDirty = other.isDirty;
         this.parent = other.parent;
-        this.children = other.children;
+        this.children = Lists.newArrayList(other.children);
         this.position = new Vector3f(other.position);
         this.rotation = new Quaternionf(other.rotation);
         this.scale = other.scale;
