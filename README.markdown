@@ -31,21 +31,18 @@ We encourage contributions from anybody and try to keep a warm and friendly comm
     <tr>
         <td></td>
         <th>Minimum Requirements</th>
-        <th>Recommended Requirements</th>
     </tr>
     <tr>
         <td>System (OS)</td>
-        <td colspan="2" align="center">Windows, MacOS, Linux (64 bit)</td>
+        <td>Windows, MacOS, Linux (64 bit)</td>
     </tr>
     <tr>
         <td>Processor (CPU)</td>
         <td>dual-core CPU</td>
-        <td>quad-core CPU</td>
     </tr>
     <tr>
         <td>Memory (RAM)</td>
         <td>2 GB</td>
-        <td>8 GB</td>
     </tr>
     <tr>
         <td>Graphics (GPU)</td>
@@ -55,15 +52,10 @@ We encourage contributions from anybody and try to keep a warm and friendly comm
             Radeon HD 2000 series (or higher)<br/>
             with OpenGL 3.3
         </td>
-        <td  style="vertical-align:top">
-            GeForce 8xxx series (or higher) or<br/>
-            Radeon HD 2000 series (or higher)<br/>
-            with OpenGL 3.3
-        </td>
     </tr>
     <tr>
         <td>Storage (HDD)</td>
-        <td colspan="2" align="center">1 GB</td>
+        <td>1 GB</td>
     </tr>
 </table>
 
