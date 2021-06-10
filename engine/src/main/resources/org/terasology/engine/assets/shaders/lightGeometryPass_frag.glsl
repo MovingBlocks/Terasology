@@ -38,13 +38,11 @@ uniform vec4 lightExtendedProperties;
     #endif
 
     uniform vec3 activeCameraToLightSpace;
-
-    uniform mat4 invProjMatrix;
     uniform mat4 lightMatrix;
-
     uniform mat4 invViewProjMatrix;
 #endif
 
+uniform mat4 invProjMatrix;
 
 void main() {
 
