@@ -28,6 +28,18 @@ node ("ts-engine && heavy && java8") {
         archiveArtifacts 'gradlew, gradle/wrapper/*, templates/build.gradle, config/**, facades/PC/build/distributions/Terasology.zip, engine/build/resources/main/org/terasology/engine/version/versionInfo.properties, natives/**, build-logic/src/**, build-logic/*.kts'
     }
 
+
+    stage('Integration Tests') {
+        try {
+            sh 'exit -1'
+            //sh './gradlew --console=plain integrationTest'            
+        } catch (err) {
+            currentBuild.result = 'UNSTABLE'
+        } finally {
+            junit testResults: '**/build/test-results/integrationTest/*.xml', allowEmptyResults: true
+        }
+    }
+
     stage('Unit Tests') {
         try {
             sh './gradlew --console=plain unitTest'
@@ -69,7 +81,7 @@ node ("ts-engine && heavy && java8") {
             ] 
             
         recordIssues skipBlames: true, 
-            tool: taskScanner(includePattern: '**/*.java,**/*.groovy,**/*.gradle', lowTags: 'WIBNIF', normalTags: 'TODO', highTags: 'ASAP')
+            tool: taskScanner(includePattern: '**/*.java,**/*.groovy,**/*.gradle', lowTags: 'WIBNIF', normalTags: 'TODO', highTags: 'FIXME')
     }
 
     stage('Documentation') {
@@ -78,11 +90,4 @@ node ("ts-engine && heavy && java8") {
         recordIssues skipBlames: true, tool: javaDoc()
     }
 
-    stage('Integration Tests') {
-        try {
-            sh './gradlew --console=plain integrationTest'
-        } finally {
-            junit testResults: '**/build/test-results/integrationTest/*.xml', allowEmptyResults: true
-        }
-    }
 }
