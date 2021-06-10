@@ -31,7 +31,7 @@ import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.gestalt.assets.management.AssetManager;
 import org.terasology.gestalt.assets.module.ModuleAwareAssetTypeManager;
 import org.terasology.gestalt.assets.module.ModuleAwareAssetTypeManagerImpl;
-import org.terasology.gestalt.entitysystem.component.Component;
+import org.terasology.gestalt.entitysystem.component.EmptyComponent;
 import org.terasology.protobuf.EntityData;
 import org.terasology.unittest.stubs.GetterSetterComponent;
 import org.terasology.unittest.stubs.IntegerComponent;
@@ -318,6 +318,6 @@ public class EntitySerializerTest {
     }
 
     @DoNotPersist
-    public static class NonpersistedComponent implements Component {
+    public static class NonpersistedComponent extends EmptyComponent<NonpersistedComponent> {
     }
 }

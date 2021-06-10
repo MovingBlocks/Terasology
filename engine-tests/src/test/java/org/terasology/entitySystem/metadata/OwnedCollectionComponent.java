@@ -9,7 +9,13 @@ import org.terasology.gestalt.entitysystem.component.Component;
 
 import java.util.List;
 
-public class OwnedCollectionComponent implements Component {
+public class OwnedCollectionComponent implements Component<OwnedCollectionComponent> {
     @Owns
     public List<EntityRef> items = Lists.newArrayList();
+
+
+    @Override
+    public void copy(OwnedCollectionComponent other) {
+        this.items = Lists.newArrayList(other.items);
+    }
 }
