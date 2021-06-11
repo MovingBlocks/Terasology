@@ -5,12 +5,10 @@ package org.terasology.engine.rendering.logic;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
-import org.joml.Matrix3f;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
-import org.lwjgl.BufferUtils;
-import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL33;
 import org.terasology.engine.entitySystem.entity.EntityManager;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.entity.lifecycleEvents.BeforeDeactivateComponent;
@@ -20,22 +18,20 @@ import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
 import org.terasology.engine.entitySystem.systems.RegisterMode;
 import org.terasology.engine.entitySystem.systems.RegisterSystem;
 import org.terasology.engine.entitySystem.systems.RenderSystem;
+import org.terasology.engine.registry.In;
 import org.terasology.engine.rendering.assets.material.Material;
+import org.terasology.engine.rendering.assets.mesh.Mesh;
+import org.terasology.engine.rendering.assets.mesh.StandardMeshData;
+import org.terasology.engine.rendering.assets.mesh.resource.AllocationType;
+import org.terasology.engine.rendering.assets.mesh.resource.DrawingMode;
 import org.terasology.engine.rendering.world.WorldRenderer;
+import org.terasology.engine.utilities.Assets;
+import org.terasology.engine.world.block.BlockRegion;
 import org.terasology.gestalt.assets.management.AssetManager;
 import org.terasology.joml.geom.AABBf;
-import org.terasology.engine.registry.In;
-import org.terasology.engine.world.block.BlockRegion;
 
-import java.nio.FloatBuffer;
 import java.util.Map;
 
-import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
-import static org.lwjgl.opengl.GL11.glBegin;
-import static org.lwjgl.opengl.GL11.glDisable;
-import static org.lwjgl.opengl.GL11.glEnable;
-import static org.lwjgl.opengl.GL11.glEnd;
-import static org.lwjgl.opengl.GL11.glVertex3f;
 
 /**
  * Renderes region outlines for all entities with  {@link RegionOutlineComponent}s.
@@ -52,6 +48,8 @@ public class RegionOutlineRenderer extends BaseComponentSystem implements Render
     @In
     private EntityManager entityManager;
 
+    private StandardMeshData meshData = new StandardMeshData(DrawingMode.LINES, AllocationType.STREAM);
+    private Mesh mesh;
 
     private Material material;
 
@@ -61,6 +59,7 @@ public class RegionOutlineRenderer extends BaseComponentSystem implements Render
     public void initialise() {
         Preconditions.checkArgument(!Strings.isNullOrEmpty("engine:white"));
         this.material = assetManager.getAsset("engine:white", Material.class).get();
+        mesh = Assets.generateAsset(meshData, Mesh.class);
     }
 
 
@@ -82,109 +81,79 @@ public class RegionOutlineRenderer extends BaseComponentSystem implements Render
         if (entityToRegionOutlineMap.isEmpty()) {
             return; // skip everything if there is nothing to do to avoid possibly costly draw mode changes
         }
-        glDisable(GL_DEPTH_TEST);
+        GL33.glDepthFunc(GL33.GL_ALWAYS);
         Vector3f cameraPosition = worldRenderer.getActiveCamera().getPosition();
 
-        FloatBuffer tempMatrixBuffer44 = BufferUtils.createFloatBuffer(16);
-        FloatBuffer tempMatrixBuffer33 = BufferUtils.createFloatBuffer(12);
-
-        material.setFloat("sunlight", 1.0f, true);
-        material.setFloat("blockLight", 1.0f, true);
-        material.setMatrix4("projectionMatrix", worldRenderer.getActiveCamera().getProjectionMatrix());
         Vector3f worldPos = new Vector3f();
-
         Vector3f worldPositionCameraSpace = new Vector3f();
         worldPos.sub(cameraPosition, worldPositionCameraSpace);
-
         Matrix4f matrixCameraSpace = new Matrix4f().translationRotateScale(worldPositionCameraSpace, new Quaternionf(), 1.0f);
-
         Matrix4f modelViewMatrix = new Matrix4f(worldRenderer.getActiveCamera().getViewMatrix()).mul(matrixCameraSpace);
-        Matrix3f normalMatrix = new Matrix3f();
-        modelViewMatrix.get(tempMatrixBuffer44);
-        modelViewMatrix.normal(normalMatrix).get(tempMatrixBuffer33);
+        material.setMatrix4("projectionMatrix", worldRenderer.getActiveCamera().getProjectionMatrix());
+        material.setMatrix4("modelViewMatrix", modelViewMatrix, true);
 
-        material.setMatrix4("modelViewMatrix", tempMatrixBuffer44, true);
-        material.setMatrix3("normalMatrix", tempMatrixBuffer33, true);
+        meshData.reallocate(0,0);
+        meshData.indices.rewind();
+        meshData.position.rewind();
+        meshData.color0.rewind();
 
+        int index = 0;
+        Vector3f pos = new Vector3f();
         for (RegionOutlineComponent regionOutline : entityToRegionOutlineMap.values()) {
-            material.setFloat3("colorOffset", regionOutline.color.rf(), regionOutline.color.gf(), regionOutline.color.bf(), true);
-            drawRegionOutline(regionOutline);
+            if (regionOutline.corner1 == null || regionOutline.corner2 == null) {
+                continue;
+            }
+
+            BlockRegion region = new BlockRegion(regionOutline.corner1).union(regionOutline.corner2);
+            AABBf bounds = region.getBounds(new AABBf());
+
+            meshData.position.put(pos.set(bounds.minX, bounds.minY, bounds.minZ));
+            meshData.position.put(pos.set(bounds.maxX, bounds.minY, bounds.minZ));
+            meshData.position.put(pos.set(bounds.maxX, bounds.minY, bounds.maxZ));
+            meshData.position.put(pos.set(bounds.minX, bounds.minY, bounds.maxZ));
+
+            meshData.position.put(pos.set(bounds.minX, bounds.maxY, bounds.minZ));
+            meshData.position.put(pos.set(bounds.maxX, bounds.maxY, bounds.minZ));
+            meshData.position.put(pos.set(bounds.maxX, bounds.maxY, bounds.maxZ));
+            meshData.position.put(pos.set(bounds.minX, bounds.maxY, bounds.maxZ));
+
+            meshData.color0.put(regionOutline.color);
+            meshData.color0.put(regionOutline.color);
+            meshData.color0.put(regionOutline.color);
+            meshData.color0.put(regionOutline.color);
+
+            meshData.color0.put(regionOutline.color);
+            meshData.color0.put(regionOutline.color);
+            meshData.color0.put(regionOutline.color);
+            meshData.color0.put(regionOutline.color);
+
+            meshData.indices.putAll(new int[]{
+                    // top loop
+                    index, index + 1,
+                    index + 1, index + 2,
+                    index + 2, index + 3,
+                    index + 3, index,
+
+                    // connecting edges between top and bottom
+                    index, index + 4,
+                    index + 1, index + 5,
+                    index + 2, index + 6,
+                    index + 3, index + 7,
+
+                    // bottom loop
+                    index + 4, index + 5,
+                    index + 5, index + 6,
+                    index + 6, index + 7,
+                    index + 7, index + 4,
+
+            });
+
+            index += 8;
         }
-
-        glEnable(GL_DEPTH_TEST);
-    }
-
-    private void drawRegionOutline(RegionOutlineComponent regionComponent) {
-        if (regionComponent.corner1 == null || regionComponent.corner2 == null) {
-            return;
-        }
-
-        BlockRegion region = new BlockRegion(regionComponent.corner1).union(regionComponent.corner2);
-        AABBf bounds = region.getBounds(new AABBf());
-        // 4 lines along x axis:
-        glBegin(GL11.GL_LINES);
-        glVertex3f(bounds.minX, bounds.minY, bounds.minZ);
-        glVertex3f(bounds.maxX, bounds.minY, bounds.minZ);
-        glEnd();
-
-        glBegin(GL11.GL_LINES);
-        glVertex3f(bounds.minX, bounds.maxY, bounds.minZ);
-        glVertex3f(bounds.maxX, bounds.maxY, bounds.minZ);
-        glEnd();
-
-        glBegin(GL11.GL_LINES);
-        glVertex3f(bounds.minX, bounds.minY, bounds.maxZ);
-        glVertex3f(bounds.maxX, bounds.minY, bounds.maxZ);
-        glEnd();
-
-        glBegin(GL11.GL_LINES);
-        glVertex3f(bounds.minX, bounds.maxY, bounds.maxZ);
-        glVertex3f(bounds.maxX, bounds.maxY, bounds.maxZ);
-        glEnd();
-
-
-        // 4 lines along y axis
-        glBegin(GL11.GL_LINES);
-        glVertex3f(bounds.minX, bounds.minY, bounds.minZ);
-        glVertex3f(bounds.minX, bounds.maxY, bounds.minZ);
-        glEnd();
-
-        glBegin(GL11.GL_LINES);
-        glVertex3f(bounds.maxX, bounds.minY, bounds.minZ);
-        glVertex3f(bounds.maxX, bounds.maxY, bounds.minZ);
-        glEnd();
-
-        glBegin(GL11.GL_LINES);
-        glVertex3f(bounds.minX, bounds.minY, bounds.maxZ);
-        glVertex3f(bounds.minX, bounds.maxY, bounds.maxZ);
-        glEnd();
-
-        glBegin(GL11.GL_LINES);
-        glVertex3f(bounds.maxX, bounds.minY, bounds.maxZ);
-        glVertex3f(bounds.maxX, bounds.maxY, bounds.maxZ);
-        glEnd();
-
-        // 4 lines along z axis:
-        glBegin(GL11.GL_LINES);
-        glVertex3f(bounds.minX, bounds.minY, bounds.minZ);
-        glVertex3f(bounds.minX, bounds.minY, bounds.maxZ);
-        glEnd();
-
-        glBegin(GL11.GL_LINES);
-        glVertex3f(bounds.maxX, bounds.minY, bounds.minZ);
-        glVertex3f(bounds.maxX, bounds.minY, bounds.maxZ);
-        glEnd();
-
-        glBegin(GL11.GL_LINES);
-        glVertex3f(bounds.minX, bounds.maxY, bounds.minZ);
-        glVertex3f(bounds.minX, bounds.maxY, bounds.maxZ);
-        glEnd();
-
-        glBegin(GL11.GL_LINES);
-        glVertex3f(bounds.maxX, bounds.maxY, bounds.minZ);
-        glVertex3f(bounds.maxX, bounds.maxY, bounds.maxZ);
-        glEnd();
-
+        material.enable();
+        mesh.reload(meshData);
+        mesh.render();
+        GL33.glDepthFunc(GL33.GL_LEQUAL);
     }
 
     @Override

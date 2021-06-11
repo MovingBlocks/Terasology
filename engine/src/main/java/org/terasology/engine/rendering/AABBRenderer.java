@@ -14,6 +14,7 @@ import org.terasology.engine.rendering.assets.material.Material;
 import org.terasology.engine.rendering.assets.mesh.Mesh;
 import org.terasology.engine.rendering.assets.mesh.MeshBuilder;
 import org.terasology.engine.rendering.assets.mesh.StandardMeshData;
+import org.terasology.engine.rendering.assets.mesh.resource.AllocationType;
 import org.terasology.engine.rendering.assets.mesh.resource.DrawingMode;
 import org.terasology.engine.rendering.cameras.Camera;
 import org.terasology.engine.rendering.world.WorldRenderer;
@@ -178,7 +179,7 @@ public class AABBRenderer implements BlockOverlayRenderer, AutoCloseable {
     private void generateDisplayListWire() {
         float offset = 0.001f;
 
-        StandardMeshData meshData = new StandardMeshData(DrawingMode.LINES);
+        StandardMeshData meshData = new StandardMeshData(DrawingMode.LINES, AllocationType.DYNAMIC);
 
 
         Vector3f dimensions = aabb.extent(new Vector3f());
