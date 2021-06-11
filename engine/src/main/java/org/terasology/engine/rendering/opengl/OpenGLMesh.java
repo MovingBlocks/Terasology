@@ -81,7 +81,7 @@ public class OpenGLMesh extends Mesh implements OpenGLMeshBase {
     @Override
     public void render() {
         if (!isDisposed()) {
-            updateState(state, allocationType);
+            updateState(state);
             GL30.glBindVertexArray(disposalAction.vao);
             GL30.glDrawElements(drawMode.glCall, this.indexCount, GL_UNSIGNED_INT, 0);
             GL30.glBindVertexArray(0);

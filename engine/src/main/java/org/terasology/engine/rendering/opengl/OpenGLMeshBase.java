@@ -20,7 +20,7 @@ public interface OpenGLMeshBase {
         }
     }
 
-    default boolean updateState(VBOContext state, AllocationType allocationType) {
+    default boolean updateState(VBOContext state) {
         GL30.glBindBuffer(GL30.GL_ARRAY_BUFFER, state.vbo);
         for (int x = 0; x < state.entries.length; x++) {
             if (state.entries[x].version != state.entries[x].resource.getVersion()) {

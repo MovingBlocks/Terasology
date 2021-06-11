@@ -3,12 +3,17 @@
 
 package org.terasology.engine.rendering.assets.mesh.resource;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.terasology.engine.config.flexible.ui.AutoConfigScreen;
+
 /**
  * defines the order of vertices to walk for rendering geometry
  *
  * refrence: https://www.khronos.org/opengl/wiki/Primitive
  */
 public class IndexResource extends BufferedResource {
+    public static final Logger logger = LoggerFactory.getLogger(IndexResource.class);
     private int inIndices = 0;
     private int posIndex = 0;
 
@@ -27,7 +32,6 @@ public class IndexResource extends BufferedResource {
         this.inIndices = resource.indices();
     }
 
-
     public void reserveElements(int elements) {
         reserve(elements * Integer.BYTES);
     }
@@ -37,12 +41,12 @@ public class IndexResource extends BufferedResource {
     }
 
     public void put(int value) {
-        if (posIndex >= inIndices) {
-            inIndices++;
-            allocateElements(inIndices);
-        }
+        ensureCapacity((posIndex + 1) * Integer.BYTES);
         buffer.putInt(posIndex * Integer.BYTES, value);
         posIndex++;
+        if (posIndex > inIndices) {
+            inIndices = posIndex;
+        }
     }
 
     public void putAll(int value, int ... values) {
@@ -60,8 +64,8 @@ public class IndexResource extends BufferedResource {
     }
 
     public void allocateElements(int indices) {
-        allocate(indices * Integer.BYTES);
-        inIndices = indices;
+        int size = indices * Integer.BYTES;
+        allocate(size);
     }
 
     public void position(int position) {

@@ -81,7 +81,7 @@ public class RegionOutlineRenderer extends BaseComponentSystem implements Render
         if (entityToRegionOutlineMap.isEmpty()) {
             return; // skip everything if there is nothing to do to avoid possibly costly draw mode changes
         }
-        GL33.glDisable(GL33.GL_DEPTH_TEST);
+        GL33.glDepthFunc(GL33.GL_ALWAYS);
         Vector3f cameraPosition = worldRenderer.getActiveCamera().getPosition();
 
         Vector3f worldPos = new Vector3f();
@@ -92,10 +92,10 @@ public class RegionOutlineRenderer extends BaseComponentSystem implements Render
         material.setMatrix4("projectionMatrix", worldRenderer.getActiveCamera().getProjectionMatrix());
         material.setMatrix4("modelViewMatrix", modelViewMatrix, true);
 
-        meshData.indices.allocateElements(0);
-        meshData.position.allocate(0);
+        meshData.reallocate(0,0);
         meshData.indices.rewind();
         meshData.position.rewind();
+        meshData.color0.rewind();
 
         int index = 0;
         Vector3f pos = new Vector3f();
@@ -107,15 +107,15 @@ public class RegionOutlineRenderer extends BaseComponentSystem implements Render
             BlockRegion region = new BlockRegion(regionOutline.corner1).union(regionOutline.corner2);
             AABBf bounds = region.getBounds(new AABBf());
 
+            meshData.position.put(pos.set(bounds.minX, bounds.minY, bounds.minZ));
             meshData.position.put(pos.set(bounds.maxX, bounds.minY, bounds.minZ));
             meshData.position.put(pos.set(bounds.maxX, bounds.minY, bounds.maxZ));
-            meshData.position.put(pos.set(bounds.minX, bounds.minY, bounds.minZ));
             meshData.position.put(pos.set(bounds.minX, bounds.minY, bounds.maxZ));
 
             meshData.position.put(pos.set(bounds.minX, bounds.maxY, bounds.minZ));
-            meshData.position.put(pos.set(bounds.minX, bounds.maxY, bounds.minZ));
-            meshData.position.put(pos.set(bounds.minX, bounds.maxY, bounds.minZ));
-            meshData.position.put(pos.set(bounds.minX, bounds.maxY, bounds.minZ));
+            meshData.position.put(pos.set(bounds.maxX, bounds.maxY, bounds.minZ));
+            meshData.position.put(pos.set(bounds.maxX, bounds.maxY, bounds.maxZ));
+            meshData.position.put(pos.set(bounds.minX, bounds.maxY, bounds.maxZ));
 
             meshData.color0.put(regionOutline.color);
             meshData.color0.put(regionOutline.color);
@@ -150,8 +150,10 @@ public class RegionOutlineRenderer extends BaseComponentSystem implements Render
 
             index += 8;
         }
+        material.enable();
+        mesh.reload(meshData);
         mesh.render();
-        GL33.glEnable(GL33.GL_DEPTH_TEST);
+        GL33.glDepthFunc(GL33.GL_LEQUAL);
     }
 
     @Override
