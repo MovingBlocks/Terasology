@@ -14,7 +14,22 @@ properties([
     buildDiscarder(logRotator(artifactNumToKeepStr: artifactBuildsToKeep))
 ])
 
-// Main pipeline definition
+/**
+ * Main pipeline definition for building the engine.
+ *
+ * It uses the Scripted Pipeline Syntax.
+ * See https://www.jenkins.io/doc/book/pipeline/#declarative-versus-scripted-pipeline-syntax
+ *
+ * This pipeline uses Jenkins plugins to collect and report additional information about the build.
+ *
+ *   - Warnings Next Generation Plugin (https://plugins.jenkins.io/warnings-ng/)
+ *      To record issues from code scans and static analysis tools, e.g., CheckStyle or Spotbugs.
+ *   - Git Forensics Plugin (https://plugins.jenkins.io/git-forensics/)
+        To compare code scans and static analysis against a reference build from the base branch.
+ *   - JUnit Plugin (https://plugins.jenkins.io/junit/)
+ *      To record the results of our test suites from JUnit format. 
+ *
+ */
 node ("ts-engine && heavy && java8") {
     stage('Checkout') {
         echo "Going to check out the things !"
