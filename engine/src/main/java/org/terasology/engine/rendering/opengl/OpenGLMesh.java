@@ -2,42 +2,42 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.rendering.opengl;
 
-import gnu.trove.list.TFloatList;
-import gnu.trove.list.TIntList;
-import org.lwjgl.BufferUtils;
+import org.joml.Vector3f;
+import org.joml.Vector3fc;
 import org.lwjgl.opengl.GL30;
-import org.lwjgl.opengl.GL41;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.core.GameThread;
 import org.terasology.engine.core.subsystem.lwjgl.LwjglGraphicsProcessing;
 import org.terasology.engine.rendering.assets.mesh.Mesh;
 import org.terasology.engine.rendering.assets.mesh.MeshData;
-import org.terasology.engine.rendering.assets.mesh.layout.ByteLayout;
-import org.terasology.engine.rendering.assets.mesh.layout.DoubleLayout;
-import org.terasology.engine.rendering.assets.mesh.layout.FloatLayout;
-import org.terasology.engine.rendering.assets.mesh.layout.IntLayout;
-import org.terasology.engine.rendering.assets.mesh.layout.Layout;
-import org.terasology.engine.rendering.assets.mesh.layout.ShortLayout;
+import org.terasology.engine.rendering.assets.mesh.resource.AllocationType;
+import org.terasology.engine.rendering.assets.mesh.resource.DrawingMode;
+import org.terasology.engine.rendering.assets.mesh.resource.IndexResource;
+import org.terasology.engine.rendering.assets.mesh.resource.VertexAttributeBinding;
+import org.terasology.engine.rendering.assets.mesh.resource.VertexResource;
 import org.terasology.gestalt.assets.AssetType;
 import org.terasology.gestalt.assets.DisposableResource;
 import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.joml.geom.AABBf;
 import org.terasology.joml.geom.AABBfc;
 
-import java.nio.ByteBuffer;
-import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.lwjgl.opengl.GL11.GL_UNSIGNED_INT;
 
-public class OpenGLMesh extends Mesh {
+public class OpenGLMesh extends Mesh implements OpenGLMeshBase {
     private static final Logger logger = LoggerFactory.getLogger(OpenGLMesh.class);
     private AABBf aabb = new AABBf();
-    private MeshData data;
     private int indexCount;
     private DisposalAction disposalAction;
+    private DrawingMode drawMode;
+    private AllocationType allocationType;
+
+    private  VertexAttributeBinding<Vector3fc, Vector3f> positions;
+
+    private VBOContext state = null;
 
     public OpenGLMesh(ResourceUrn urn, AssetType<?, MeshData> assetType, MeshData data,
                       DisposalAction disposalAction, LwjglGraphicsProcessing graphicsProcessing) {
@@ -68,15 +68,22 @@ public class OpenGLMesh extends Mesh {
     }
 
     @Override
-    public TFloatList getVertices() {
-        return data.getVertices();
+    public VertexAttributeBinding<Vector3fc, Vector3f> vertices() {
+        return positions;
     }
+
+    @Override
+    public int elementCount() {
+        return positions.elements();
+    }
+
 
     @Override
     public void render() {
         if (!isDisposed()) {
+            updateState(state);
             GL30.glBindVertexArray(disposalAction.vao);
-            GL30.glDrawElements(data.getMode().glCall, this.indexCount, GL_UNSIGNED_INT, 0);
+            GL30.glDrawElements(drawMode.glCall, this.indexCount, GL_UNSIGNED_INT, 0);
             GL30.glBindVertexArray(0);
         } else {
             logger.error("Attempted to render disposed mesh: {}", getUrn());
@@ -85,80 +92,26 @@ public class OpenGLMesh extends Mesh {
 
 
     private void buildMesh(MeshData newData) {
-        this.data = newData;
-
-        this.disposalAction.dispose();
-        this.disposalAction.vao = GL30.glGenVertexArrays();
-        this.disposalAction.vbo = GL30.glGenBuffers();
-        this.disposalAction.ebo = GL30.glGenBuffers();
-
-        List<Layout> layouts = newData.getLayouts();
-        List<Layout> targets = new ArrayList<>();
-
-        int stride = 0;
-        for (Layout layout : layouts) {
-            if (layout.hasContent()) {
-                stride += layout.bytes();
-                targets.add(layout);
-            }
+        if (this.disposalAction.vao == 0) {
+            this.disposalAction.vao = GL30.glGenVertexArrays();
+            this.disposalAction.vbo = GL30.glGenBuffers();
+            this.disposalAction.ebo = GL30.glGenBuffers();
         }
 
-        ByteBuffer buffer = BufferUtils.createByteBuffer(stride * newData.getSize());
-        for (int x = 0; x < newData.getSize(); x++) {
-            for (Layout layout : targets) {
-                layout.write(x, buffer);
-            }
-        }
-        buffer.flip();
+        allocationType = newData.allocationType();
+        drawMode = newData.getMode();
 
-        // bind vertex array and buffer
         GL30.glBindVertexArray(this.disposalAction.vao);
-        GL30.glBindBuffer(GL30.GL_ARRAY_BUFFER, this.disposalAction.vbo);
-        GL30.glBufferData(GL30.GL_ARRAY_BUFFER, buffer, GL30.GL_STATIC_DRAW);
+        positions = newData.positions();
+        this.state = buildVBO(this.disposalAction.vbo, allocationType, newData.vertexResources());
 
-        int offset = 0;
-        for (Layout layout : targets) {
-            GL30.glEnableVertexAttribArray(layout.location);
-            if ((layout.flag & Layout.FLOATING_POINT) > 0) {
-                if (layout instanceof FloatLayout) {
-                    GL30.glVertexAttribPointer(layout.location, layout.size, GL30.GL_FLOAT, (layout.flag & Layout.NORMALIZED) > 0, stride, offset);
-                } else if (layout instanceof ShortLayout) {
-                    GL30.glVertexAttribPointer(layout.location, layout.size, GL30.GL_SHORT, (layout.flag & Layout.NORMALIZED) > 0, stride, offset);
-                } else if (layout instanceof IntLayout) {
-                    GL30.glVertexAttribPointer(layout.location, layout.size, GL30.GL_INT, (layout.flag & Layout.NORMALIZED) > 0, stride, offset);
-                } else if (layout instanceof ByteLayout) {
-                    GL30.glVertexAttribPointer(layout.location, layout.size, GL30.GL_BYTE, (layout.flag & Layout.NORMALIZED) > 0, stride, offset);
-                } else if (layout instanceof DoubleLayout) {
-                    GL41.glVertexAttribLPointer(layout.location, layout.size, GL30.GL_DOUBLE, stride, offset);
-                } else {
-                    throw new RuntimeException("invalid layout for class: " + layout.getClass());
-                }
-            } else {
-                if (layout instanceof ShortLayout) {
-                    GL30.glVertexAttribIPointer(layout.location, layout.size, GL30.GL_SHORT, stride, offset);
-                } else if (layout instanceof IntLayout) {
-                    GL30.glVertexAttribIPointer(layout.location, layout.size, GL30.GL_INT, stride, offset);
-                } else if (layout instanceof ByteLayout) {
-                    GL30.glVertexAttribIPointer(layout.location, layout.size, GL30.GL_BYTE, stride, offset);
-                } else {
-                    throw new RuntimeException("invalid layout for class: " + layout.getClass());
-                }
-            }
-            offset += layout.bytes();
-        }
-
-        TIntList indices = newData.getIndices();
-        IntBuffer bufferIndices = BufferUtils.createIntBuffer(indices.size());
-        bufferIndices.put(indices.toArray());
-        bufferIndices.flip();
-
+        IndexResource indexResource = newData.indexResource();
+        this.indexCount = indexResource.indices();
         GL30.glBindBuffer(GL30.GL_ELEMENT_ARRAY_BUFFER, this.disposalAction.ebo);
-        GL30.glBufferData(GL30.GL_ELEMENT_ARRAY_BUFFER, bufferIndices, GL30.GL_STATIC_DRAW);
-        indexCount = indices.size();
+        indexResource.writeBuffer((buffer) -> GL30.glBufferData(GL30.GL_ELEMENT_ARRAY_BUFFER, buffer, GL30.GL_STATIC_DRAW));
 
-        GL30.glBindBuffer(GL30.GL_ARRAY_BUFFER, 0);
         GL30.glBindVertexArray(0);
-        getBound(newData, aabb);
+        getBound(aabb);
     }
 
     private static class DisposalAction implements DisposableResource {
