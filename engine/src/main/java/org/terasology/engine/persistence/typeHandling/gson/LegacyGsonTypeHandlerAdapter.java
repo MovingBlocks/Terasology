@@ -14,6 +14,8 @@ import org.terasology.persistence.typeHandling.TypeHandler;
 import java.lang.reflect.Type;
 
 /**
+ * @deprecated superseded by {@link GsonTypeHandlerAdapter}
+ *
  * Adapts a {@link TypeHandler} as a legacy Gson {@link JsonSerializer} and {@link JsonDeserializer}.
  * Instances of {@link LegacyGsonTypeHandlerAdapter}, when registered as type adapters in a {@link Gson}
  * object, can be used to (de)serialize objects to JSON (via Gson) with the rules specified by
