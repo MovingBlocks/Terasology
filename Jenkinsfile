@@ -14,9 +14,24 @@ properties([
     buildDiscarder(logRotator(artifactNumToKeepStr: artifactBuildsToKeep))
 ])
 
-// Main pipeline definition
+/**
+ * Main pipeline definition for building the engine.
+ *
+ * It uses the Scripted Pipeline Syntax.
+ * See https://www.jenkins.io/doc/book/pipeline/#declarative-versus-scripted-pipeline-syntax
+ *
+ * This pipeline uses Jenkins plugins to collect and report additional information about the build.
+ *
+ *   - Warnings Next Generation Plugin (https://plugins.jenkins.io/warnings-ng/)
+ *      To record issues from code scans and static analysis tools, e.g., CheckStyle or Spotbugs.
+ *   - Git Forensics Plugin (https://plugins.jenkins.io/git-forensics/)
+ *      To compare code scans and static analysis against a reference build from the base branch.
+ *   - JUnit Plugin (https://plugins.jenkins.io/junit/)
+ *      To record the results of our test suites from JUnit format. 
+ *
+ */
 node ("ts-engine && heavy && java8") {
-    stage('Checkout') {
+    stage('Setup') {
         echo "Going to check out the things !"
         checkout scm
         sh 'chmod +x gradlew'
@@ -32,6 +47,11 @@ node ("ts-engine && heavy && java8") {
         try {
             sh './gradlew --console=plain unitTest'
         } finally {
+            // Gradle generates both a HTML report of the unit tests to `build/reports/tests/*` and XML reports
+            // to `build/test-results/*`.
+            // We need to upload the XML reports for visualization in Jenkins. 
+            //
+            // See https://docs.gradle.org/current/userguide/java_testing.html#test_reporting
             junit testResults: '**/build/test-results/unitTest/*.xml'
         }
     }
@@ -57,25 +77,37 @@ node ("ts-engine && heavy && java8") {
         }
     }
 
-    stage('Integration Tests') {
-        try {
-            sh './gradlew --console=plain integrationTest'
-        } finally {
-            junit testResults: '**/build/test-results/integrationTest/*.xml', allowEmptyResults: true
-        }
-    }
-
     stage('Analytics') {
-        sh './gradlew --console=plain check -x test spotbugsmain'
-        recordIssues tool: checkStyle(pattern: '**/build/reports/checkstyle/*.xml')
-        recordIssues tool: spotBugs(pattern: '**/build/reports/spotbugs/main/*.xml', useRankAsPriority: true)
-        recordIssues tool: pmdParser(pattern: '**/build/reports/pmd/*.xml')
-        recordIssues tool: taskScanner(includePattern: '**/*.java,**/*.groovy,**/*.gradle', lowTags: 'WIBNIF', normalTags: 'TODO', highTags: 'ASAP')
+        sh './gradlew --console=plain check -x test'
+        // the default resolution when omitting `defaultBranch` is to `master` - which is wrong in our case. 
+        discoverGitReferenceBuild(defaultBranch: 'develop') //TODO: does this also work for PRs with different base branch?
+        recordIssues skipBlames: true,
+            tools: [
+                checkStyle(pattern: '**/build/reports/checkstyle/*.xml'),
+                spotBugs(pattern: '**/build/reports/spotbugs/main/*.xml', useRankAsPriority: true),
+                pmdParser(pattern: '**/build/reports/pmd/*.xml')
+            ] 
+            
+        recordIssues skipBlames: true, 
+            tool: taskScanner(includePattern: '**/*.java,**/*.groovy,**/*.gradle', lowTags: 'WIBNIF', normalTags: 'TODO', highTags: 'ASAP')
     }
 
     stage('Documentation') {
         sh './gradlew --console=plain javadoc'
         step([$class: 'JavadocArchiver', javadocDir: 'engine/build/docs/javadoc', keepAll: false])
-        recordIssues tool: javaDoc()
+        recordIssues skipBlames: true, tool: javaDoc()
+    }
+
+    stage('Integration Tests') {
+        try {
+            sh './gradlew --console=plain integrationTest'
+        } finally {
+            // Gradle generates both a HTML report of the unit tests to `build/reports/tests/*` and XML reports
+            // to `build/test-results/*`.
+            // We need to upload the XML reports for visualization in Jenkins. 
+            //
+            // See https://docs.gradle.org/current/userguide/java_testing.html#test_reporting
+            junit testResults: '**/build/test-results/integrationTest/*.xml', allowEmptyResults: true
+        }
     }
 }
