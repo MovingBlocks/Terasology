@@ -95,6 +95,7 @@ public class InjectionHelperTest {
         assertNull(constructorAB.getServiceB());
     }
 
+    @SuppressWarnings("checkstyle:LocalVariableName")
     @Test
     public void testConstructorInjectionNotAllParametersPopulatedFallback() {
         Context context = new ContextImpl();
