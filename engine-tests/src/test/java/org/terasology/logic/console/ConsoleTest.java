@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @Tag("TteTest")
 public class ConsoleTest extends TerasologyTestingEnvironment {
 
-    private final String MESSAGE_TEXT = "Test message";
+    private static final String MESSAGE_TEXT = "Test message";
 
     @Test
     public void testClearCommand() {
