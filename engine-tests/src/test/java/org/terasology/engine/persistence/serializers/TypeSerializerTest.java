@@ -150,7 +150,8 @@ class TypeSerializerTest extends ModuleEnvironmentTest {
         }
     }
 
-    private static final class Animal<T> {
+    @SuppressWarnings("checkstyle:FinalClass")
+    private static class Animal<T> {
         protected final T data;
 
         private Animal(T data) {

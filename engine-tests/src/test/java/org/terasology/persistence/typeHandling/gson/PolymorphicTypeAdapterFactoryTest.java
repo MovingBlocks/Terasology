@@ -92,7 +92,8 @@ public class PolymorphicTypeAdapterFactoryTest {
     private interface Walker {
     }
 
-    private static final class Animal implements Walker {
+    @SuppressWarnings("checkstyle:FinalClass")
+    private static class Animal implements Walker {
         private final String name;
 
         private Animal(String name) {
