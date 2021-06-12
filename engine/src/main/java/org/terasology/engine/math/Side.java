@@ -136,7 +136,7 @@ public enum Side {
      * @return Whether this is one of the horizontal directions (LEFT, FRONT, RIGHT, BACK).
      */
     public boolean isHorizontal() {
-        switch (this){
+        switch (this) {
             case LEFT:
             case FRONT:
             case RIGHT:

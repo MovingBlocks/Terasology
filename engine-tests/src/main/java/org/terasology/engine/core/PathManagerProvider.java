@@ -29,7 +29,7 @@ import static org.mockito.Mockito.mock;
  * </pre>
  */
 public class PathManagerProvider implements ParameterResolver {
-    private PathManagerProvider() {};
+    private PathManagerProvider() { };
 
     /** Set a new global PathManager, returning the old one. */
     static PathManager setPathManager(PathManager pathManager) {
