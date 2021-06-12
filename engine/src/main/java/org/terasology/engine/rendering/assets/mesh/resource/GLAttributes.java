@@ -18,8 +18,6 @@ import java.nio.ByteBuffer;
  * attribute mappings that map to an opengl data type.
  */
 public final class GLAttributes {
-    private GLAttributes() {
-    }
 
     public static final VertexFloatAttribute FLOAT_1_VERTEX_ATTRIBUTE =
             new VertexFloatAttribute(new VertexFloatAttribute.AttributeConfiguration() {
@@ -196,4 +194,7 @@ public final class GLAttributes {
         }
 
     }, TypeMapping.ATTR_FLOAT, 2);
+    
+    private GLAttributes() {
+    }
 }

@@ -16,14 +16,13 @@ public class IndexResource extends BufferedResource {
     private int inIndices = 0;
     private int posIndex = 0;
 
-    public int indices() {
-        return inIndices;
-    }
-
     public IndexResource() {
         super();
     }
 
+    public int indices() {
+        return inIndices;
+    }
 
     public void copy(IndexResource resource) {
         copyBuffer(resource);

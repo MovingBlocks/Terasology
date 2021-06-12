@@ -26,7 +26,6 @@ import java.util.Objects;
 public final class LocationComponent implements Component, ReplicationCheck {
 
     public boolean replicateChanges = true;
-    private boolean isDirty = false;
 
     // Relative to
     @Replicate
@@ -48,6 +47,7 @@ public final class LocationComponent implements Component, ReplicationCheck {
     @Replicate
     Quaternionf lastRotation = new Quaternionf();
 
+    private boolean isDirty = false;
 
     public LocationComponent() {
     }
