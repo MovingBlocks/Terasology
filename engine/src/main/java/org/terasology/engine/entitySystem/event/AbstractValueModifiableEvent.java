@@ -71,9 +71,7 @@ public abstract class AbstractValueModifiableEvent implements Event {
      * Calculates the result value from the base value and given modifiers and multipliers.
      * <p>
      * The value is calculated based on the following formula:
-     * <pre>
-     * result = (<baseValue> + Σ <modifier>) * Π <multiplier> + Σ <postModifier>
-     * </pre>
+     * {@code result = (<baseValue> + Σ <modifier>) * Π <multiplier> + Σ <postModifier>}
      *
      * <emph>Negative result values are allowed here.</emph>
      */
