@@ -28,7 +28,7 @@ import static org.mockito.Mockito.mock;
  *         manager = new ModuleManager("");
  * </pre>
  */
-public class PathManagerProvider implements ParameterResolver {
+public final class PathManagerProvider implements ParameterResolver {
     private PathManagerProvider() { };
 
     /** Set a new global PathManager, returning the old one. */

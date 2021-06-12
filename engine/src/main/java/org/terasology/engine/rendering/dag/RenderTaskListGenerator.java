@@ -207,7 +207,7 @@ public final class RenderTaskListGenerator {
      * If the content of the task list is printed out by the logger, instances of this class
      * visually separate the tasks related to a node from those of the previous one.
      */
-    private class MarkerTask implements RenderPipelineTask {
+    private final class MarkerTask implements RenderPipelineTask {
 
         private String message;
 

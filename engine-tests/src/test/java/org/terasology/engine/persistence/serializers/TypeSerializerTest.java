@@ -110,7 +110,7 @@ class TypeSerializerTest extends ModuleEnvironmentTest {
         assertEquals(INSTANCE, deserializedInstance);
     }
 
-    private static class SomeClass<T> {
+    private static final class SomeClass<T> {
         @SerializedName("generic-t")
         private T data;
         private List<T> list = Lists.newArrayList();
@@ -150,7 +150,7 @@ class TypeSerializerTest extends ModuleEnvironmentTest {
         }
     }
 
-    private static class Animal<T> {
+    private static final class Animal<T> {
         protected final T data;
 
         private Animal(T data) {
@@ -175,7 +175,7 @@ class TypeSerializerTest extends ModuleEnvironmentTest {
         }
     }
 
-    private static class Dog<T> extends Animal<T> {
+    private static final class Dog<T> extends Animal<T> {
         private final Vector3f tailPosition;
         private final org.joml.Vector3f headPosition;
 
@@ -215,7 +215,7 @@ class TypeSerializerTest extends ModuleEnvironmentTest {
         }
     }
 
-    private static class Cheetah<T> extends Animal<T> {
+    private static final class Cheetah<T> extends Animal<T> {
         private final Color spotColor;
 
         private Cheetah(T data, Color spotColor) {

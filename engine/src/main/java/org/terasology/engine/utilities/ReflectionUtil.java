@@ -775,7 +775,7 @@ public final class ReflectionUtil {
         }
     }
 
-    private static class GenericArrayTypeImpl implements GenericArrayType {
+    private static final class GenericArrayTypeImpl implements GenericArrayType {
         private final Type genericComponentType;
 
         private GenericArrayTypeImpl(Type genericComponentType) {
@@ -814,7 +814,7 @@ public final class ReflectionUtil {
         }
     }
 
-    private static class ParameterizedTypeImpl implements ParameterizedType {
+    private static final class ParameterizedTypeImpl implements ParameterizedType {
         private final Type[] actualTypeArguments;
         private final Class<?> rawType;
         private final Type ownerType;

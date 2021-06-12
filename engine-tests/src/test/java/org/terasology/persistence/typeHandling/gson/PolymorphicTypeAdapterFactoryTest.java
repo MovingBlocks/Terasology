@@ -92,7 +92,7 @@ public class PolymorphicTypeAdapterFactoryTest {
     private interface Walker {
     }
 
-    private static class Animal implements Walker {
+    private static final class Animal implements Walker {
         private final String name;
 
         private Animal(String name) {
@@ -146,7 +146,7 @@ public class PolymorphicTypeAdapterFactoryTest {
         }
     }
 
-    private static class Cheetah extends Animal {
+    private static final class Cheetah extends Animal {
         private final int spotCount;
 
         private Cheetah(int spotCount) {

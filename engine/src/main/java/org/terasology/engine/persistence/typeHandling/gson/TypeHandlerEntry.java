@@ -9,7 +9,7 @@ import org.terasology.persistence.typeHandling.TypeHandler;
  *
  * @param <T> The type handled by the {@link TypeHandler} contained in the {@link TypeHandlerEntry}.
  */
-public class TypeHandlerEntry<T> {
+public final class TypeHandlerEntry<T> {
     public final Class<T> type;
     public final TypeHandler<T> typeHandler;
 
