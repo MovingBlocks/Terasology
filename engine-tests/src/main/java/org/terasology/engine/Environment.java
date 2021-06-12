@@ -128,7 +128,7 @@ public class Environment {
         // empty
     }
 
-    protected void setupExtraDataManager(Context context) {
+    protected void setupExtraDataManager(Context ctxt) {
         // empty
     }
 

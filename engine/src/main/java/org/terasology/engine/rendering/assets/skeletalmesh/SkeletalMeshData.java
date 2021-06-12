@@ -171,28 +171,28 @@ public class SkeletalMeshData implements AssetData {
 
     private void calculateNormals() {
         // TODO: Better algorithm (take into account triangle size and angles
-        List<Vector3f> vertices = getBindPoseVertexPositions();
-        List<Vector3f> normals = Lists.newArrayListWithCapacity(vertices.size());
-        for (int i = 0; i < vertices.size(); ++i) {
-            normals.add(new Vector3f());
+        List<Vector3f> vertexPositions = getBindPoseVertexPositions();
+        List<Vector3f> vertexNormals = Lists.newArrayListWithCapacity(vertexPositions.size());
+        for (int i = 0; i < vertexPositions.size(); ++i) {
+            vertexNormals.add(new Vector3f());
         }
         Vector3f v1 = new Vector3f();
         Vector3f v2 = new Vector3f();
         Vector3f norm = new Vector3f();
         for (int i = 0; i < indices.size() / 3; ++i) {
-            Vector3f baseVert = vertices.get(indices.get(i * 3));
-            vertices.get(indices.get(i * 3 + 1)).sub(baseVert, v1);
-            vertices.get(indices.get(i * 3 + 2)).sub(baseVert, v2);
+            Vector3f baseVert = vertexPositions.get(indices.get(i * 3));
+            vertexPositions.get(indices.get(i * 3 + 1)).sub(baseVert, v1);
+            vertexPositions.get(indices.get(i * 3 + 2)).sub(baseVert, v2);
             v1.normalize();
             v2.normalize();
             v2.cross(v1, norm);
-            normals.get(indices.get(i * 3)).add(norm);
-            normals.get(indices.get(i * 3 + 1)).add(norm);
-            normals.get(indices.get(i * 3 + 2)).add(norm);
+            vertexNormals.get(indices.get(i * 3)).add(norm);
+            vertexNormals.get(indices.get(i * 3 + 1)).add(norm);
+            vertexNormals.get(indices.get(i * 3 + 2)).add(norm);
         }
 
-        normals.forEach(Vector3f::normalize);
+        vertexNormals.forEach(Vector3f::normalize);
 
-        this.normals = normals;
+        this.normals = vertexNormals;
     }
 }

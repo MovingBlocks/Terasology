@@ -25,8 +25,8 @@ public class MeshAnimationBundle extends Asset<MeshAnimationBundleData> {
     }
 
     @Override
-    protected void doReload(MeshAnimationBundleData data) {
-        this.data = data;
+    protected void doReload(MeshAnimationBundleData bundleData) {
+        this.data = bundleData;
     }
 
 

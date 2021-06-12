@@ -357,8 +357,8 @@ public class UniverseSetupScreen extends CoreScreenLayer {
 
     private void initAssets() {
 
-        ModuleEnvironment environment = context.get(ModuleManager.class).getEnvironment();
-        BlockFamilyLibrary library =  new BlockFamilyLibrary(environment, context);
+        ModuleEnvironment env = context.get(ModuleManager.class).getEnvironment();
+        BlockFamilyLibrary library =  new BlockFamilyLibrary(env, context);
 
         // cast lambdas explicitly to avoid inconsistent compiler behavior wrt. type inference
         assetTypeManager.createAssetType(Prefab.class, PojoPrefab::new, "prefabs");
