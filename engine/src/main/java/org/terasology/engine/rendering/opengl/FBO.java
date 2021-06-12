@@ -574,7 +574,7 @@ public final class FBO {
 
         if (!useStencilBuffer) {
             allocateTexture(dimensions, GL30.GL_DEPTH_COMPONENT32F, GL30.GL_DEPTH_COMPONENT, GL30.GL_FLOAT);
-            float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+            float[] borderColor = {1.0f, 1.0f, 1.0f, 1.0f};
             GL30.glTexParameterfv(GL30.GL_TEXTURE_2D, GL30.GL_TEXTURE_BORDER_COLOR, borderColor);
         } else {
             allocateTexture(dimensions,
