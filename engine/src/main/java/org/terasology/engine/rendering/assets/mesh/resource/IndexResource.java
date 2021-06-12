@@ -5,7 +5,6 @@ package org.terasology.engine.rendering.assets.mesh.resource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.engine.config.flexible.ui.AutoConfigScreen;
 
 /**
  * defines the order of vertices to walk for rendering geometry

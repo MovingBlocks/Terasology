@@ -3,11 +3,8 @@
 package org.terasology.engine.rendering.primitives;
 
 import com.google.common.base.Stopwatch;
-import gnu.trove.iterator.TIntIterator;
 import org.joml.Vector3f;
-import org.lwjgl.BufferUtils;
 import org.terasology.engine.monitoring.PerformanceMonitor;
-import org.terasology.engine.rendering.RenderMath;
 import org.terasology.engine.world.ChunkView;
 import org.terasology.engine.world.block.Block;
 import org.terasology.engine.world.chunks.Chunks;
