@@ -11,6 +11,9 @@ import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
  * serialization rules and support Terasology TypeHandlers.
  */
 public class GsonBuilderFactory {
+
+    private GsonBuilderFactory() { }
+
     /**
      * Create a {@link GsonBuilder} with options set to comply with Terasology JSON serialization rules.
      */
