@@ -184,6 +184,7 @@ public class InjectionHelperTest {
         }
     }
 
+    @SuppressWarnings("checkstyle:TypeName")
     public static class ConstructorA_AB {
         private ServiceA serviceA;
 
