@@ -134,16 +134,14 @@ public class EventSystemImpl implements EventSystem {
 
     @Override
     public void unregisterEventHandler(ComponentSystem handler) {
-        for (SetMultimap<Class<? extends Component>, EventHandlerInfo> eventHandlers :
-                componentSpecificHandlers.values()) {
-            Iterator<EventHandlerInfo> eventHandlerIterator = eventHandlers.values().iterator();
+        componentSpecificHandlers.values().stream().map(eventHandlers -> eventHandlers.values().iterator()).forEach(eventHandlerIterator -> {
             while (eventHandlerIterator.hasNext()) {
                 EventHandlerInfo eventHandler = eventHandlerIterator.next();
                 if (eventHandler.getHandler().equals(handler)) {
                     eventHandlerIterator.remove();
                 }
             }
-        }
+        });
 
         Iterator<EventHandlerInfo> eventHandlerIterator = generalHandlers.values().iterator();
         while (eventHandlerIterator.hasNext()) {

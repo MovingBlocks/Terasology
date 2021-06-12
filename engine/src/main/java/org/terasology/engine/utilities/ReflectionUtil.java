@@ -891,9 +891,9 @@ public final class ReflectionUtil {
                 return true;
             }
 
-            return Objects.equals(this.ownerType, otherParameterizedType.getOwnerType()) &&
-                       Objects.equals(this.rawType, otherParameterizedType.getRawType()) &&
-                       Arrays.equals(this.actualTypeArguments, otherParameterizedType.getActualTypeArguments());
+            return Objects.equals(this.ownerType, otherParameterizedType.getOwnerType())
+                    && Objects.equals(this.rawType, otherParameterizedType.getRawType())
+                    && Arrays.equals(this.actualTypeArguments, otherParameterizedType.getActualTypeArguments());
         }
 
         public int hashCode() {

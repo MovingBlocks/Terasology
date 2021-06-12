@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 public class SelectGameScreen extends SelectionScreen {
@@ -169,8 +170,9 @@ public class SelectGameScreen extends SelectionScreen {
             final GameManifest manifest = item.getManifest();
             config.getWorldGeneration().setDefaultSeed(manifest.getSeed());
             config.getWorldGeneration().setWorldTitle(manifest.getTitle());
-            CoreRegistry.get(GameEngine.class).changeState(new StateLoading(manifest, (isLoadingAsServer()) ?
-                    NetworkMode.DEDICATED_SERVER : NetworkMode.NONE));
+            Optional.ofNullable(CoreRegistry.get(GameEngine.class))
+                    .orElseThrow(() -> new Exception("Failed to get game engine from CoreRegistry"))
+                    .changeState(new StateLoading(manifest, (isLoadingAsServer()) ? NetworkMode.DEDICATED_SERVER : NetworkMode.NONE));
         } catch (Exception e) {
             logger.error("Failed to load saved game", e);
             getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Error Loading Game",
@@ -200,8 +202,7 @@ public class SelectGameScreen extends SelectionScreen {
     @Override
     protected boolean isValidScreen() {
         if (Stream.of(load, delete, close, details, create, gameTypeTitle)
-                .anyMatch(Objects::isNull) ||
-                !super.isValidScreen()) {
+                .anyMatch(Objects::isNull) || !super.isValidScreen()) {
             logger.error("Can't initialize screen correctly. At least one widget was missed!");
             return false;
         }
