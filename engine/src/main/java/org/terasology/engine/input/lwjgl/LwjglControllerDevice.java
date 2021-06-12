@@ -191,12 +191,12 @@ public class LwjglControllerDevice implements ControllerDevice {
             }
 
         }
-        for (int jid : joystickIds.toArray()) {
-            //TODO handle this!
+        //TODO: handle this!
+//        for (int jid : joystickIds.toArray()) {
 //            GLFW.glfwGetJoystickAxes(jid);
 //            GLFW.glfwGetJoystickButtons(jid);
 //            GLFW.glfwGetJoystickHats(jid);
-        }
+//        }
 
         return controllerActions;
     }
