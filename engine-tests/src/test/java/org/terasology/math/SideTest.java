@@ -12,7 +12,7 @@ public class SideTest {
 
     @Test
     public void testSideInDirection() {
-        for (Side side : Side.getAllSides()) {
+        for (Side side : Side.values()) {
             assertEquals(side, Side.inDirection(side.direction().x(), side.direction().y(), side.direction().z()));
         }
     }

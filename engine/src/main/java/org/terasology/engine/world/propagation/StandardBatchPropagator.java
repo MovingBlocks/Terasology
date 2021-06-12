@@ -44,7 +44,7 @@ public class StandardBatchPropagator implements BatchPropagator {
         this.rules = rules;
         this.scale = scale;
 
-        for (Side side : Side.getAllSides()) {
+        for (Side side : Side.values()) {
             Vector3i delta = new Vector3i(side.direction());
             if (delta.x < 0) {
                 delta.x += Chunks.SIZE_X;
@@ -112,7 +112,7 @@ public class StandardBatchPropagator implements BatchPropagator {
 
         /* Process propagation out to other blocks */
         Vector3i adjPos = new Vector3i();
-        for (Side side : Side.getAllSides()) {
+        for (Side side : Side.values()) {
             PropagationComparison comparison = rules.comparePropagation(blockChange.getTo(), blockChange.getFrom(),
                     side);
 
@@ -160,7 +160,7 @@ public class StandardBatchPropagator implements BatchPropagator {
         }
 
         Vector3i adjPos = new Vector3i();
-        for (Side side : Side.getAllSides()) {
+        for (Side side : Side.values()) {
             /* Handle this value being reset to the default by updating sides as needed */
             byte expectedValue = rules.propagateValue(oldValue, side, block, scale);
             if (rules.canSpreadOutOf(block, side)) {
@@ -229,7 +229,7 @@ public class StandardBatchPropagator implements BatchPropagator {
     private void push(Vector3ic pos, byte value) {
         Block block = world.getBlockAt(pos);
         Vector3i adjPos = new Vector3i();
-        for (Side side : Side.getAllSides()) {
+        for (Side side : Side.values()) {
             byte propagatedValue = rules.propagateValue(value, side, block, scale);
 
             if (rules.canSpreadOutOf(block, side)) {
