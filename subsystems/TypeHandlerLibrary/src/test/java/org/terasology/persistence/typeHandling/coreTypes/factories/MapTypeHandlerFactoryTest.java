@@ -55,6 +55,7 @@ class MapTypeHandlerFactoryTest {
 
     @Test
     void testNonGenericMap() {
+        @SuppressWarnings("checkstyle:IllegalType")
         class IntMap extends HashMap<String, Integer> { }
 
         Optional<TypeHandler<IntMap>> typeHandler =
