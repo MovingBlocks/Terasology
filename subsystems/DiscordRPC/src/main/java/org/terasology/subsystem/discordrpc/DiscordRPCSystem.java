@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.subsystem.discordrpc;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.engine.entitySystem.entity.EntityManager;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.event.ReceiveEvent;
@@ -31,6 +33,8 @@ import java.time.OffsetDateTime;
 public final class DiscordRPCSystem extends BaseComponentSystem {
     private static final String UPDATE_PARTY_SIZE_ID = "discord-rpc:party-size";
     private static final long UPDATE_PARTY_SIZE_PERIOD = 25L * 1000L;
+
+    private static final Logger logger = LoggerFactory.getLogger(DiscordRPCSystem.class);
 
     @In
     private Game game;
@@ -82,11 +86,20 @@ public final class DiscordRPCSystem extends BaseComponentSystem {
         DiscordRPCSubSystem.setStartTimestamp(null);
     }
 
+    /**
+     *  Adds the periodic action when the player is hosting or playing online to update party size
+     */
     @ReceiveEvent
     public void onPlayerInitialized(LocalPlayerInitializedEvent event, EntityRef localPlayer) {
-        /* Adds the periodic action when the player is hosting or playing online to update party size */
-        if (networkSystem.getMode() != NetworkMode.NONE) {
-            delayManager.addPeriodicAction(localPlayer, UPDATE_PARTY_SIZE_ID, 0, UPDATE_PARTY_SIZE_PERIOD);
+        NetworkMode mode = networkSystem.getMode();
+        if (mode != NetworkMode.NONE) {
+            //FIXME: The 'delayManager' is only available on the authority system and is not initialized on clients.
+            //       This will fail with a NPE when a clients tries to join a game. See #4742.
+            if (mode.isAuthority()) {
+                delayManager.addPeriodicAction(localPlayer, UPDATE_PARTY_SIZE_ID, 0, UPDATE_PARTY_SIZE_PERIOD);
+            } else {
+                logger.warn("The 'DelayManager' is not available on non-authority system. Not scheduling '{}' periodic action. See #4742.", UPDATE_PARTY_SIZE_ID);
+            }
         }
     }
 
