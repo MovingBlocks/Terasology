@@ -9,7 +9,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.fail;
 
-public class Assertions {
+public final class Assertions {
 
     private Assertions() { }
 

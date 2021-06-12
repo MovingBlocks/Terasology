@@ -83,9 +83,9 @@ public class GsonTypeHandlerLibraryAdapterFactoryTest {
             }
             TestClass testClass = (TestClass) o;
             return i == testClass.i
-                    && java.util.Objects.equals(color, testClass.color)
-                    && java.util.Objects.equals(vector4fs, testClass.vector4fs)
-                    && java.util.Objects.equals(rectangleiMap, testClass.rectangleiMap);
+                    && Objects.equal(color, testClass.color)
+                    && Objects.equal(vector4fs, testClass.vector4fs)
+                    && Objects.equal(rectangleiMap, testClass.rectangleiMap);
         }
 
         @Override

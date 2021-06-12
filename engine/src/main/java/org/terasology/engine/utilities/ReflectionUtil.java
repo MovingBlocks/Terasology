@@ -266,6 +266,8 @@ public final class ReflectionUtil {
     }
 
     @SuppressWarnings("checkstyle:ParameterAssignment")
+    // TODO: figure out whether the reassignment is necessary and/or whether it's a desired property of this method
+    //       until then, this is accepted and, thus, suppressed
     private static <T> Type getTypeParameterForSuperClass(Type target, Class<T> superClass, int index) {
         for (Class targetClass = getRawType(target);
              !Object.class.equals(targetClass);

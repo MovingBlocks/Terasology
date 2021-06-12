@@ -171,7 +171,7 @@ public class SelectGameScreen extends SelectionScreen {
             config.getWorldGeneration().setDefaultSeed(manifest.getSeed());
             config.getWorldGeneration().setWorldTitle(manifest.getTitle());
             Optional.ofNullable(CoreRegistry.get(GameEngine.class))
-                    .orElseThrow(() -> new Exception("Failed to get game engine from CoreRegistry"))
+                    .orElseThrow(() -> new IllegalStateException("Failed to get game engine from CoreRegistry"))
                     .changeState(new StateLoading(manifest, (isLoadingAsServer()) ? NetworkMode.DEDICATED_SERVER : NetworkMode.NONE));
         } catch (Exception e) {
             logger.error("Failed to load saved game", e);

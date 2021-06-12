@@ -226,7 +226,7 @@ public final class RenderTaskListGenerator {
         /**
          * Returns a string description of the instance.
          *
-         * @return A string in the form: "----- {@code <message>}",
+         * @return A string in the form: "{@code ----- <message>}",
          *         where {@code <message>} is the string passed to the constructor.
          */
         public String toString() {

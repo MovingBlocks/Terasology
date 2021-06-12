@@ -71,8 +71,9 @@ public interface Node extends RenderPipelineTask {
      * Handles Console commands sent to a node.
      *
      * In the Console, commands have the following syntax:
-     *
-     * {@code dagCommandNode <nodeUri> <command> <arguments...>}
+     * <pre> {@code
+     *      dagCommandNode <nodeUri> <command> <arguments...>
+     * } </pre>
      *
      * A node doesn't need to register the commands it can handle: commands must be known to the user by means
      * of a node's documentation.
