@@ -62,7 +62,7 @@ public class ChunkViewTest extends TerasologyTestingEnvironment {
         Chunk chunk = createChunk(0, 0, 0);
         chunk.setBlock(new Vector3i(0, 0, 0), solidBlock);
 
-        ChunkViewCore chunkView = new ChunkViewCoreImpl(new Chunk[]{chunk}, new BlockRegion(0,0,0), new Vector3i(), airBlock);
+        ChunkViewCore chunkView = new ChunkViewCoreImpl(new Chunk[]{chunk}, new BlockRegion(0, 0, 0), new Vector3i(), airBlock);
         assertEquals(solidBlock, chunkView.getBlock(0, 0, 0));
     }
 

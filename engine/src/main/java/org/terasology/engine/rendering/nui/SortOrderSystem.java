@@ -138,7 +138,7 @@ public class SortOrderSystem extends BaseComponentSystem {
             }
             int iterator;
 
-            while(index >= layersFilled.size()) {
+            while (index >= layersFilled.size()) {
                 index -= layersFilled.size();
             }
 

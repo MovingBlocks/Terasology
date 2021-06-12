@@ -50,7 +50,7 @@ public final class ChunkTessellator {
             }
         }
 
-        if(border != 0) {
+        if (border != 0) {
             float totalScale = scale * Chunks.SIZE_X / (Chunks.SIZE_X - 2 * border);
             for (ChunkMesh.RenderType type : ChunkMesh.RenderType.values()) {
                 ChunkMesh.VertexElements elements = mesh.getVertexElements(type);

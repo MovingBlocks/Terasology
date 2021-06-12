@@ -308,10 +308,10 @@ public class KinematicCharacterMover implements CharacterMover {
         float movementLength = direction.length();
         if (movementLength > physics.getEpsilon()) {
             direction.normalize();
-            Vector3f reflectDir = direction.reflect(hitNormal,new Vector3f());
+            Vector3f reflectDir = direction.reflect(hitNormal, new Vector3f());
             reflectDir.normalize();
 
-            Vector3f perpendicularDir = hitNormal.mul(reflectDir.dot(hitNormal),new Vector3f()).mul(-1).add(reflectDir);
+            Vector3f perpendicularDir = hitNormal.mul(reflectDir.dot(hitNormal), new Vector3f()).mul(-1).add(reflectDir);
             if (normalMag != 0.0f) {
                 Vector3f perpComponent = new Vector3f(perpendicularDir);
                 perpComponent.mul(normalMag * movementLength);
@@ -444,7 +444,7 @@ public class KinematicCharacterMover implements CharacterMover {
         }
         boolean horizontalHit = false;
         Vector3f normalizedDir = horizMove.normalize();
-        if(!normalizedDir.isFinite()) {
+        if (!normalizedDir.isFinite()) {
             normalizedDir.set(0);
         }
 
@@ -774,7 +774,7 @@ public class KinematicCharacterMover implements CharacterMover {
         } else if (angleToClimbDirection < Math.PI * 3.0 / 4.0) {
             float rollAmount = state.isGrounded() ? 45f : 90f;
             tmp = new Vector3f();
-            climbDir3f.rotate(rotation,tmp);
+            climbDir3f.rotate(rotation, tmp);
             float leftOrRight = tmp.x;
             float plusOrMinus = (leftOrRight < 0f ? -1.0f : 1.0f) * (climbDir3i.x != 0 ? -1.0f : 1.0f);
             if (jumpOrCrouchActive) {

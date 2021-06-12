@@ -74,7 +74,7 @@ public class InternalLightGeneratorTest extends TerasologyTestingEnvironment {
         Chunk chunk = new ChunkImpl(0, 0, 0, blockManager, extraDataManager);
         InternalLightProcessor.generateInternalLighting(chunk);
 
-        for (Vector3ic pos : new BlockRegion(0,0,0).setSize(Chunks.SIZE_X, Chunks.SIZE_Y, Chunks.SIZE_Z)) {
+        for (Vector3ic pos : new BlockRegion(0, 0, 0).setSize(Chunks.SIZE_X, Chunks.SIZE_Y, Chunks.SIZE_Z)) {
             byte expectedRegen = (byte) Math.min(Chunks.SIZE_Y - pos.y() - 1, Chunks.MAX_SUNLIGHT_REGEN);
             assertEquals(expectedRegen, chunk.getSunlightRegen(pos));
         }
@@ -109,7 +109,7 @@ public class InternalLightGeneratorTest extends TerasologyTestingEnvironment {
         }
         InternalLightProcessor.generateInternalLighting(chunk);
 
-        for (Vector3ic pos : new BlockRegion(0,0,0).setSize(Chunks.SIZE_X, Chunks.SIZE_Y - 1, Chunks.SIZE_Z)) {
+        for (Vector3ic pos : new BlockRegion(0, 0, 0).setSize(Chunks.SIZE_X, Chunks.SIZE_Y - 1, Chunks.SIZE_Z)) {
             byte expectedRegen = (byte) Math.min(Chunks.SIZE_Y - pos.y() - 2, Chunks.MAX_SUNLIGHT_REGEN);
             assertEquals(expectedRegen, chunk.getSunlightRegen(pos));
         }
@@ -125,7 +125,7 @@ public class InternalLightGeneratorTest extends TerasologyTestingEnvironment {
             assertEquals(0, chunk.getSunlight(pos));
         }
 
-        for (Vector3ic pos : new BlockRegion(0,0,0).setSize(Chunks.SIZE_X, Chunks.SIZE_Y - Chunks.MAX_SUNLIGHT_REGEN,
+        for (Vector3ic pos : new BlockRegion(0, 0, 0).setSize(Chunks.SIZE_X, Chunks.SIZE_Y - Chunks.MAX_SUNLIGHT_REGEN,
             Chunks.SIZE_Z)) {
             byte expectedSunlight = (byte) Math.min(Chunks.SIZE_Y - Chunks.SUNLIGHT_REGEN_THRESHOLD - pos.y() - 1, Chunks.MAX_SUNLIGHT);
             assertEquals(expectedSunlight, chunk.getSunlight(pos), () -> "Incorrect lighting at " + pos);

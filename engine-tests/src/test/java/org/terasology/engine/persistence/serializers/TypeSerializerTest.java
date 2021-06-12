@@ -179,7 +179,7 @@ class TypeSerializerTest extends ModuleEnvironmentTest {
         private final Vector3f tailPosition;
         private final org.joml.Vector3f headPosition;
 
-        private Dog(T data, Vector3f tailPosition,Vector3f headPosition) {
+        private Dog(T data, Vector3f tailPosition, Vector3f headPosition) {
             super(data);
             this.tailPosition = tailPosition;
             this.headPosition = headPosition;

@@ -38,7 +38,7 @@ public abstract class BaseSparseFacet2D implements WorldFacet2D {
     }
 
     protected void validateCoord(int x, int y, BlockAreac area) {
-        if(!area.contains(x, y)) {
+        if (!area.contains(x, y)) {
             String text = "Out of bounds: (%d, %d) for region %s";
             String msg = String.format(text, x, y, area.toString());
             throw new IllegalArgumentException(msg);

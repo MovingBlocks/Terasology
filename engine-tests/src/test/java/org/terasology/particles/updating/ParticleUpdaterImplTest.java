@@ -38,7 +38,7 @@ public class ParticleUpdaterImplTest {
 
     @Test
     public void testNullEmitterRegistration() {
-        Assertions.assertThrows(IllegalArgumentException.class,() -> {
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
             particleUpdater.addEmitter(null);
         });
     }
@@ -47,7 +47,7 @@ public class ParticleUpdaterImplTest {
     public void testNonEmitterRegistration() {
         EntityRef emitterEntity = mock(EntityRef.class);
         when(emitterEntity.getComponent(ParticleEmitterComponent.class)).thenReturn(null);
-        Assertions.assertThrows(IllegalArgumentException.class,() -> {
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
             particleUpdater.addEmitter(emitterEntity);
         });
     }
