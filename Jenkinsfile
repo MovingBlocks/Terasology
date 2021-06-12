@@ -47,7 +47,12 @@ node ("ts-engine && heavy && java8") {
         try {
             sh './gradlew --console=plain unitTest'
         } finally {
-            junit testResults: '**/build/reports/tests/unitTest/*.xml'
+            // Gradle generates both a HTML report of the unit tests to `build/reports/tests/*` and XML reports
+            // to `build/test-results/*`.
+            // We need to upload the XML reports for visualization in Jenkins. 
+            //
+            // See https://docs.gradle.org/current/userguide/java_testing.html#test_reporting
+            junit testResults: '**/build/test-results/unitTest/*.xml'
         }
     }
 
@@ -97,7 +102,12 @@ node ("ts-engine && heavy && java8") {
         try {
             sh './gradlew --console=plain integrationTest'
         } finally {
-            junit testResults: '**/build/reports/tests/integrationTest/*.xml', allowEmptyResults: true
+            // Gradle generates both a HTML report of the unit tests to `build/reports/tests/*` and XML reports
+            // to `build/test-results/*`.
+            // We need to upload the XML reports for visualization in Jenkins. 
+            //
+            // See https://docs.gradle.org/current/userguide/java_testing.html#test_reporting
+            junit testResults: '**/build/test-results/integrationTest/*.xml', allowEmptyResults: true
         }
     }
 }
