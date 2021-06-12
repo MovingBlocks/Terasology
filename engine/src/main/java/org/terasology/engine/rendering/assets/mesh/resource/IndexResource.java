@@ -49,17 +49,17 @@ public class IndexResource extends BufferedResource {
         }
     }
 
-    public void putAll(int value, int ... values) {
+    public void putAll(int value, int... values) {
         put(value);
-        for (int x = 0; x < values.length; x++) {
-            put(values[x]);
+        for (int i : values) {
+            put(i);
         }
     }
 
 
     public void putAll(int[] values) {
-        for (int x = 0; x < values.length; x++) {
-            put(values[x]);
+        for (int value : values) {
+            put(value);
         }
     }
 

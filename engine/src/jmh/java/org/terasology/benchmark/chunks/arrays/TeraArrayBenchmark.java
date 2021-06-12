@@ -87,7 +87,6 @@ public class TeraArrayBenchmark {
         return state.handler.deserialize(bbState.in);
     }
 
-
     public enum TeraArrayType {
         DENCE_4BIT(() -> new TeraDenseArray4Bit(16, 256, 16), TeraDenseArray4Bit.SerializationHandler::new),
         DENCE_8BIT(() -> new TeraDenseArray8Bit(16, 256, 16), TeraDenseArray8Bit.SerializationHandler::new),
@@ -95,8 +94,7 @@ public class TeraArrayBenchmark {
         SPARCE_4BIT(() -> new TeraSparseArray4Bit(16, 256, 16, INFLATED_4_BIT, DEFLATED_4_BIT),
                 TeraSparseArray4Bit.SerializationHandler::new),
         SPARCE_8BIT(() -> new TeraSparseArray8Bit(16, 256, 16, INFLATED_8_BIT, DEFLATED_8_BIT),
-                TeraSparseArray8Bit.SerializationHandler::new),
-        ;
+                TeraSparseArray8Bit.SerializationHandler::new);
 
         private final Supplier<TeraArray> creator;
         private final Supplier<SerializationHandler> handler;

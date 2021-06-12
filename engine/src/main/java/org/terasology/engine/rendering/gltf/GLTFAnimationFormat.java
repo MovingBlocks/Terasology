@@ -93,8 +93,8 @@ public class GLTFAnimationFormat extends GLTFCommonFormat<MeshAnimationBundleDat
     }
 
     private MeshAnimationData loadAnimation(GLTF gltf, GLTFAnimation animation, List<byte[]> loadedBuffers,
-                                            TIntIntMap boneIndexMapping, List<String> boneNames, TIntList boneParents
-        , List<Bone> bones) throws IOException {
+                                            TIntIntMap boneIndexMapping, List<String> boneNames,
+                                            TIntList boneParents, List<Bone> bones) throws IOException {
         List<ChannelReader> channelReaders = new ArrayList<>();
 
         for (GLTFChannel channel : animation.getChannels()) {
@@ -106,20 +106,20 @@ public class GLTFAnimationFormat extends GLTFCommonFormat<MeshAnimationBundleDat
                 case TRANSLATION: {
                     List<Vector3f> data = getVector3fs(gltf, loadedBuffers, sampler.getOutput());
 
-                    channelReaders.add(new BufferChannelReader<>(times, data, sampler.getInterpolation()::interpolate
-                        , x -> x.getPosition(bone)));
+                    channelReaders.add(new BufferChannelReader<>(times, data, sampler.getInterpolation()::interpolate,
+                            x -> x.getPosition(bone)));
                     break;
                 }
                 case ROTATION: {
                     List<Quaternionf> data = getQuat4fs(gltf, loadedBuffers, sampler.getOutput());
-                    channelReaders.add(new BufferChannelReader<>(times, data, sampler.getInterpolation()::interpolate
-                        , x -> x.getRotation(bone)));
+                    channelReaders.add(new BufferChannelReader<>(times, data, sampler.getInterpolation()::interpolate,
+                            x -> x.getRotation(bone)));
                     break;
                 }
                 case SCALE: {
                     List<Vector3f> data = getVector3fs(gltf, loadedBuffers, sampler.getOutput());
-                    channelReaders.add(new BufferChannelReader<>(times, data, sampler.getInterpolation()::interpolate
-                        , x -> x.getBoneScale(bone)));
+                    channelReaders.add(new BufferChannelReader<>(times, data, sampler.getInterpolation()::interpolate,
+                            x -> x.getBoneScale(bone)));
                     break;
                 }
                 default:

@@ -86,7 +86,7 @@ public final class BindsConfig {
      * Sets the inputs for a given bind, replacing any previous inputs
      *
      */
-    public void setBinds(SimpleUri bindUri, Input ... inputs) {
+    public void setBinds(SimpleUri bindUri, Input... inputs) {
         setBinds(bindUri, Arrays.asList(inputs));
     }
 

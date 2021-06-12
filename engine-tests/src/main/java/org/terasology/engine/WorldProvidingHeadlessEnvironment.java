@@ -18,7 +18,7 @@ import org.terasology.engine.world.internal.WorldProviderWrapper;
  */
 public class WorldProvidingHeadlessEnvironment extends HeadlessEnvironment {
 
-    public WorldProvidingHeadlessEnvironment(Name ... modules) {
+    public WorldProvidingHeadlessEnvironment(Name... modules) {
         super(modules);
     }
 
