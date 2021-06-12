@@ -25,13 +25,13 @@ properties([
  *   - Warnings Next Generation Plugin (https://plugins.jenkins.io/warnings-ng/)
  *      To record issues from code scans and static analysis tools, e.g., CheckStyle or Spotbugs.
  *   - Git Forensics Plugin (https://plugins.jenkins.io/git-forensics/)
-        To compare code scans and static analysis against a reference build from the base branch.
+ *      To compare code scans and static analysis against a reference build from the base branch.
  *   - JUnit Plugin (https://plugins.jenkins.io/junit/)
  *      To record the results of our test suites from JUnit format. 
  *
  */
 node ("ts-engine && heavy && java8") {
-    stage('Checkout') {
+    stage('Setup') {
         echo "Going to check out the things !"
         checkout scm
         sh 'chmod +x gradlew'
@@ -47,7 +47,7 @@ node ("ts-engine && heavy && java8") {
         try {
             sh './gradlew --console=plain unitTest'
         } finally {
-            junit testResults: '**/build/test-results/unitTest/*.xml'
+            junit testResults: '**/build/reports/tests/unitTest/*.xml'
         }
     }
 
@@ -97,7 +97,7 @@ node ("ts-engine && heavy && java8") {
         try {
             sh './gradlew --console=plain integrationTest'
         } finally {
-            junit testResults: '**/build/test-results/integrationTest/*.xml', allowEmptyResults: true
+            junit testResults: '**/build/reports/tests/integrationTest/*.xml', allowEmptyResults: true
         }
     }
 }
