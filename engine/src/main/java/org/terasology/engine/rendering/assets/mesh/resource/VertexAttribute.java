@@ -14,12 +14,6 @@ public class VertexAttribute<T, I extends T> extends BaseVertexAttribute {
     public final Class<I> type;
     public final AttributeConfiguration<T, I> configuration;
 
-    public interface AttributeConfiguration<U, V> {
-        void write(U value, int vertIdx, int offset, VertexResource resource);
-
-        V read(int vertIdx, int offset, VertexResource resource, V dest);
-    }
-
     /**
      * @param type the mapping type
      * @param mapping maps a primitive to a given supported type.
@@ -29,5 +23,11 @@ public class VertexAttribute<T, I extends T> extends BaseVertexAttribute {
         super(mapping, count);
         this.type = type;
         this.configuration = attributeConfiguration;
+    }
+
+    public interface AttributeConfiguration<U, V> {
+        void write(U value, int vertIdx, int offset, VertexResource resource);
+
+        V read(int vertIdx, int offset, VertexResource resource, V dest);
     }
 }

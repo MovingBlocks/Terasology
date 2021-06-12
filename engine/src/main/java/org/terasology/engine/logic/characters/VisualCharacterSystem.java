@@ -89,10 +89,6 @@ public class VisualCharacterSystem extends BaseComponentSystem {
         return visualCharacterEntity;
     }
 
-    interface VisualEntityBuildAndAttachStrategy {
-        EntityRef createAndAttachVisualEntity(EntityBuilder entityBuilder, EntityRef characterEntity);
-    }
-
     /**
      * Handles the local character spawn  event by doing the work that had to be delayed till then: The
      * CreateVisualCharacterEvent events that could not be sent previously will be sent. (They could not be sent earlier
@@ -121,5 +117,9 @@ public class VisualCharacterSystem extends BaseComponentSystem {
      */
     void setCreateAndAttachVisualEntityStrategy(VisualEntityBuildAndAttachStrategy createAndAttachVisualEntityStrategy) {
         this.createAndAttachVisualEntityStrategy = createAndAttachVisualEntityStrategy;
+    }
+
+    interface VisualEntityBuildAndAttachStrategy {
+        EntityRef createAndAttachVisualEntity(EntityBuilder entityBuilder, EntityRef characterEntity);
     }
 }

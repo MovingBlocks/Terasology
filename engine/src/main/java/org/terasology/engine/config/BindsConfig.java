@@ -108,6 +108,10 @@ public final class BindsConfig {
         uriBoundInputs.replaceValues(bindUri, uniqueInputs);
     }
 
+    public Collection<Input> getBoundInputs() {
+        return uriBoundInputs.values();
+    }
+
     static class Handler implements JsonSerializer<BindsConfig>, JsonDeserializer<BindsConfig> {
 
         @Override
@@ -148,9 +152,4 @@ public final class BindsConfig {
             return bindingByModuleName;
         }
     }
-
-    public Collection<Input> getBoundInputs() {
-        return uriBoundInputs.values();
-    }
-
 }
