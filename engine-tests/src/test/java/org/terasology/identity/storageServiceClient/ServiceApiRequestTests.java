@@ -3,6 +3,7 @@
 package org.terasology.engine.identity.storageServiceClient;
 
 
+import com.google.common.base.Objects;
 import com.google.gson.Gson;
 import org.junit.jupiter.api.Test;
 
@@ -44,12 +45,20 @@ public class ServiceApiRequestTests {
         }
 
         @Override
-        public boolean equals(Object other) {
-            if (!(other instanceof DummySerializableObject)) {
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
                 return false;
             }
-            DummySerializableObject o = (DummySerializableObject) other;
-            return fieldA.equals(o.fieldA) && fieldB == o.fieldB;
+            DummySerializableObject that = (DummySerializableObject) o;
+            return fieldB == that.fieldB && Objects.equal(fieldA, that.fieldA);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hashCode(fieldA, fieldB);
         }
     }
 }

@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.persistence.typeHandling.gson;
 
+import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.gson.Gson;
@@ -14,7 +15,6 @@ import org.terasology.nui.Color;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -83,9 +83,14 @@ public class GsonTypeHandlerLibraryAdapterFactoryTest {
             }
             TestClass testClass = (TestClass) o;
             return i == testClass.i
-                    && Objects.equals(color, testClass.color)
-                    && Objects.equals(vector4fs, testClass.vector4fs)
-                    && Objects.equals(rectangleiMap, testClass.rectangleiMap);
+                    && java.util.Objects.equals(color, testClass.color)
+                    && java.util.Objects.equals(vector4fs, testClass.vector4fs)
+                    && java.util.Objects.equals(rectangleiMap, testClass.rectangleiMap);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hashCode(color, vector4fs, rectangleiMap, i);
         }
     }
 }
