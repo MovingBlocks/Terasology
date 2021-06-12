@@ -265,6 +265,7 @@ public final class ReflectionUtil {
         return (TypeInfo<E>) TypeInfo.of(elementType);
     }
 
+    @SuppressWarnings("checkstyle:ParameterAssignment")
     private static <T> Type getTypeParameterForSuperClass(Type target, Class<T> superClass, int index) {
         for (Class targetClass = getRawType(target);
              !Object.class.equals(targetClass);
