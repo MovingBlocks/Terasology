@@ -76,7 +76,7 @@ node ("ts-engine && heavy && java8") {
         sh './gradlew --console=plain check -x test'
         // the default resolution when omitting `defaultBranch` is to `master` - which is wrong in our case. 
         discoverGitReferenceBuild(defaultBranch: 'develop') //TODO: does this also work for PRs with different base branch?
-        recordIssues skipBlames: true, qualityGates: [[threshold: 1, type: 'NEW', unstable: true]], 
+        recordIssues skipBlames: true,
             tools: [
                 checkStyle(pattern: '**/build/reports/checkstyle/*.xml'),
                 spotBugs(pattern: '**/build/reports/spotbugs/main/*.xml', useRankAsPriority: true),
