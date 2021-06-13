@@ -118,14 +118,16 @@ public final class LwjglGraphicsUtil {
                 capabilities.OpenGL33,
         };
 
-        String[] capabilityNames = {"OpenGL12",
+        String[] capabilityNames = {
+                "OpenGL12",
                 "OpenGL14",
                 "OpenGL15",
                 "OpenGL20",
                 "OpenGL21",
                 "OpenGL30",
                 "OpenGL32",
-                "OpenGL33",};
+                "OpenGL33",
+        };
 
         boolean canRunTheGame = true;
         StringBuilder missingCapabilitiesMessage = new StringBuilder();

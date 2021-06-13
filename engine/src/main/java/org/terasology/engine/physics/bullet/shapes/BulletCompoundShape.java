@@ -51,7 +51,7 @@ public class BulletCompoundShape extends BulletCollisionShape implements Compoun
         return shape;
     }
 
-    private static class BulletCompoundShapeChild {
+    private static final class BulletCompoundShapeChild {
         public BulletCollisionShape childShape;
 
         public btCollisionShape compoundShapeChild;

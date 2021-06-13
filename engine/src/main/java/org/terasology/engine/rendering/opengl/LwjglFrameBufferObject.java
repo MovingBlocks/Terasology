@@ -88,7 +88,7 @@ public class LwjglFrameBufferObject implements FrameBufferObject {
         GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, frame);
         GL30.glViewport(0, 0, size.x(), size.y());
 
-        projectionMatrix.setOrtho(0, size.x(), size.y(), 0,0 , 2048f);
+        projectionMatrix.setOrtho(0, size.x(), size.y(), 0, 0, 2048f);
         transforms.pushMatrix();
         transforms.identity();
     }

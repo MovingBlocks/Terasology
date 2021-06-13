@@ -45,7 +45,7 @@ public class RefractiveReflectiveBlocksNodeProxy extends AbstractNode implements
     public static float waterOffsetY;
 
     public RefractiveReflectiveBlocksNodeProxy(String nodeUri, Context context) {
-        super(nodeUri,new Name("engine"), context);
+        super(nodeUri, new Name("engine"), context);
     }
 
     public static void updateWaterAttributes(float waveIntensityModule, float waveIntensityFalloffModule, float waveSizeModule,

@@ -29,10 +29,10 @@ import org.terasology.nui.Color;
  */
 @API
 public class AABBRenderer implements BlockOverlayRenderer, AutoCloseable {
-    private Vector4f solidColor = new Vector4f(1f, 1f, 1f, 1f);
 
     protected static final String DEFAULT_MATERIAL_URI = "engine:prog.default";
 
+    private Vector4f solidColor = new Vector4f(1f, 1f, 1f, 1f);
     private Mesh solidMesh;
     private Mesh wireMesh;
     private AABBf aabb = new AABBf();

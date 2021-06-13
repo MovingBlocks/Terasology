@@ -164,8 +164,8 @@ public class LwjglControllerDevice implements ControllerDevice {
                         if (GLFW.GLFW_GAMEPAD_BUTTON_DPAD_UP <= buttonIndex && buttonIndex <= GLFW.GLFW_GAMEPAD_BUTTON_DPAD_LEFT) {
                             boolean isX =
                                     (buttonIndex == GLFW.GLFW_GAMEPAD_BUTTON_DPAD_LEFT) || (buttonIndex == GLFW.GLFW_GAMEPAD_BUTTON_DPAD_RIGHT);
-                            Input input = InputType.CONTROLLER_AXIS.getInput(isX ? ControllerId.POVX_AXIS :
-                                    ControllerId.POVY_AXIS);
+                            Input input = InputType.CONTROLLER_AXIS.getInput(isX ? ControllerId.POVX_AXIS
+                                                                                 : ControllerId.POVY_AXIS);
                             float axisValue;
                             if (buttonIndex == GLFW.GLFW_GAMEPAD_BUTTON_DPAD_RIGHT || buttonIndex == GLFW.GLFW_GAMEPAD_BUTTON_DPAD_DOWN) {
                                 axisValue = -1;
@@ -191,12 +191,12 @@ public class LwjglControllerDevice implements ControllerDevice {
             }
 
         }
-        for (int jid : joystickIds.toArray()) {
-            //TODO handle this!
+        //TODO: handle this!
+//        for (int jid : joystickIds.toArray()) {
 //            GLFW.glfwGetJoystickAxes(jid);
 //            GLFW.glfwGetJoystickButtons(jid);
 //            GLFW.glfwGetJoystickHats(jid);
-        }
+//        }
 
         return controllerActions;
     }
