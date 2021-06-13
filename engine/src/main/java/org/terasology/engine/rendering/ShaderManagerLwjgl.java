@@ -60,11 +60,7 @@ public class ShaderManagerLwjgl implements ShaderManager {
         addShaderProgram("sky");
         addShaderProgram("chunk");
         addShaderProgram("blockSelection");
-        if (GL.createCapabilities().OpenGL33) { //TODO remove this "if" when rendering will use OpenGL3 by default
-            addShaderProgram("particle");
-        } else {
-            logger.warn("Your GPU or driver not supports OpenGL 3.3 , particles disabled");
-        }
+        addShaderProgram("particle");
         addShaderProgram("shadowMap");
         addShaderProgram("lightBufferPass");
         addShaderProgram("lightGeometryPass");
