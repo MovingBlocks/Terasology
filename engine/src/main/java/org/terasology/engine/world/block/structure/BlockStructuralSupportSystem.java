@@ -67,7 +67,7 @@ public class BlockStructuralSupportSystem extends BaseComponentSystem implements
     public void checkForSupportRemoved(OnChangedBlock event, EntityRef entity) {
         PerformanceMonitor.startActivity("StructuralCheck");
         try {
-            for (Side side : Side.getAllSides()) {
+            for (Side side : Side.values()) {
                 validateSupportForBlockOnSide(event.getBlockPosition(), side);
             }
         } finally {
