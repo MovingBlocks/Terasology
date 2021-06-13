@@ -8,7 +8,7 @@ public class BaseVertexAttribute {
     public final TypeMapping mapping;
     public final int count;
 
-    protected BaseVertexAttribute( TypeMapping mapping, int count) {
+    protected BaseVertexAttribute(TypeMapping mapping, int count) {
         this.mapping = mapping;
         this.count = count;
     }

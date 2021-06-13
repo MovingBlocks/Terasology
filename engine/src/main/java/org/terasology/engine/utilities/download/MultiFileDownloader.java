@@ -80,7 +80,7 @@ public class MultiFileDownloader implements Callable<List<Path>> {
 
     /**
      * @param values
-     * This method iterates through the Iterable<Long> parameter and sums the values of it.
+     * This method iterates through the {@code Iterable<Long>} parameter and sums the values of it.
      * @return long.
      */
     private long sum(Iterable<Long> values) {

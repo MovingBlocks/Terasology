@@ -207,7 +207,7 @@ public final class RenderTaskListGenerator {
      * If the content of the task list is printed out by the logger, instances of this class
      * visually separate the tasks related to a node from those of the previous one.
      */
-    private class MarkerTask implements RenderPipelineTask {
+    private final class MarkerTask implements RenderPipelineTask {
 
         private String message;
 
@@ -226,8 +226,8 @@ public final class RenderTaskListGenerator {
         /**
          * Returns a string description of the instance.
          *
-         * @return A string in the form: "----- <message>",
-         *         where <message> is the string passed to the constructor.
+         * @return A string in the form: "{@code ----- <message>}",
+         *         where {@code <message>} is the string passed to the constructor.
          */
         public String toString() {
             return String.format("----- %s", message);

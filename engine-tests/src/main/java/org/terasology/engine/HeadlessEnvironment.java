@@ -128,7 +128,7 @@ public class HeadlessEnvironment extends Environment {
         RecordAndReplayCurrentStatus recordAndReplayCurrentStatus = context.get(RecordAndReplayCurrentStatus.class);
 
         ModuleEnvironment environment = context.get(ModuleManager.class).getEnvironment();
-        context.put(BlockFamilyLibrary.class, new BlockFamilyLibrary(environment,context));
+        context.put(BlockFamilyLibrary.class, new BlockFamilyLibrary(environment, context));
 
         ExtraBlockDataManager extraDataManager = context.get(ExtraBlockDataManager.class);
 

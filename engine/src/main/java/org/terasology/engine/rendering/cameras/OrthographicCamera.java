@@ -3,11 +3,6 @@
 package org.terasology.engine.rendering.cameras;
 
 import org.joml.FrustumIntersection;
-import org.lwjgl.BufferUtils;
-import org.lwjgl.opengl.GL11;
-
-import static org.lwjgl.opengl.GL11.GL_PROJECTION;
-import static org.lwjgl.opengl.GL11.glMatrixMode;
 
 /**
  * Simple default camera.

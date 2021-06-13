@@ -109,7 +109,7 @@ public class Tessellator {
     }
 
     public void setColor(Vector4f v) {
-        activeColor.set((int)(v.x() * 255.0f), (int)(v.y() * 255.0f), (int)(v.z() * 255.0f), (int)(v.w() * 255.0f));
+        activeColor.set((int) (v.x() * 255.0f), (int) (v.y() * 255.0f), (int) (v.z() * 255.0f), (int) (v.w() * 255.0f));
     }
 
     public void setNormal(Vector3f v) {

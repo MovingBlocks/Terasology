@@ -8,17 +8,6 @@ import org.terasology.engine.rendering.assets.mesh.resource.AllocationType;
 import org.terasology.engine.rendering.assets.mesh.resource.VertexResource;
 
 public interface OpenGLMeshBase {
-    class VBOContext {
-        private VBOSubBuffer[] entries;
-        private int vbo;
-
-        public static class VBOSubBuffer {
-            int version;
-            int offset;
-            int size;
-            VertexResource resource;
-        }
-    }
 
     default boolean updateState(VBOContext state) {
         GL30.glBindBuffer(GL30.GL_ARRAY_BUFFER, state.vbo);
@@ -77,5 +66,17 @@ public interface OpenGLMeshBase {
 
         GL30.glBindBuffer(GL30.GL_ARRAY_BUFFER, 0);
         return state;
+    }
+
+    class VBOContext {
+        private VBOSubBuffer[] entries;
+        private int vbo;
+
+        public static class VBOSubBuffer {
+            int version;
+            int offset;
+            int size;
+            VertexResource resource;
+        }
     }
 }

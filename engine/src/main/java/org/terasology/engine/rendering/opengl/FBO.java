@@ -192,7 +192,7 @@ public final class FBO {
         target.bind();
 
         GL30.glFramebufferRenderbuffer(GL30.GL_FRAMEBUFFER, GL30.GL_DEPTH_ATTACHMENT, GL30.GL_RENDERBUFFER, depthStencilRboId);
-        GL30.glFramebufferTexture2D(GL30.GL_FRAMEBUFFER, GL30.GL_DEPTH_ATTACHMENT, GL30.GL_TEXTURE_2D, depthStencilTextureId, 0 );
+        GL30.glFramebufferTexture2D(GL30.GL_FRAMEBUFFER, GL30.GL_DEPTH_ATTACHMENT, GL30.GL_TEXTURE_2D, depthStencilTextureId, 0);
 
         target.unbind();
     }
@@ -204,7 +204,7 @@ public final class FBO {
         bind();
 
         GL30.glFramebufferRenderbuffer(GL30.GL_FRAMEBUFFER, GL30.GL_DEPTH_ATTACHMENT, GL30.GL_RENDERBUFFER, 0);
-        GL30.glFramebufferTexture2D(GL30.GL_FRAMEBUFFER, GL30.GL_DEPTH_ATTACHMENT, GL30.GL_TEXTURE_2D, 0, 0 );
+        GL30.glFramebufferTexture2D(GL30.GL_FRAMEBUFFER, GL30.GL_DEPTH_ATTACHMENT, GL30.GL_TEXTURE_2D, 0, 0);
 
         unbind();
     }
@@ -574,7 +574,7 @@ public final class FBO {
 
         if (!useStencilBuffer) {
             allocateTexture(dimensions, GL30.GL_DEPTH_COMPONENT32F, GL30.GL_DEPTH_COMPONENT, GL30.GL_FLOAT);
-            float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+            float[] borderColor = {1.0f, 1.0f, 1.0f, 1.0f};
             GL30.glTexParameterfv(GL30.GL_TEXTURE_2D, GL30.GL_TEXTURE_BORDER_COLOR, borderColor);
         } else {
             allocateTexture(dimensions,

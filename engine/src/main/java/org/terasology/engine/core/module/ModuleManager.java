@@ -284,7 +284,7 @@ public class ModuleManager {
         return newEnvironment;
     }
 
-    @Deprecated(/*since="4.4.0"*/)
+    @Deprecated/*(since="4.4.0")*/
     public ModuleMetadataJsonAdapter getModuleMetadataReader() {
         // FIXME: This has one use in MTE. Give MTE a better interface to use and remove
         //     the accessor for this.

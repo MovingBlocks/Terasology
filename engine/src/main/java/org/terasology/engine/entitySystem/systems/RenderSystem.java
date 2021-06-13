@@ -26,7 +26,7 @@ public interface RenderSystem extends ComponentSystem {
     void renderOverlay();
 
     /**
-     * Currently not used.
+     * @deprecated Currently not used.
      */
     @Deprecated
     void renderShadows();
