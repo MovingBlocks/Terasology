@@ -138,9 +138,7 @@ public class ReplayScreen extends SelectionScreen {
 
     @Override
     protected boolean isValidScreen() {
-        if (Stream.of(load, delete, close)
-                .anyMatch(Objects::isNull) ||
-                !super.isValidScreen()) {
+        if (Stream.of(load, delete, close).anyMatch(Objects::isNull) || !super.isValidScreen()) {
             logger.error("Can't initialize screen correctly. At least one widget was missed!");
             return false;
         }

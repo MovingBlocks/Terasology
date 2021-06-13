@@ -178,7 +178,7 @@ public class PhysicsSystem extends BaseComponentSystem implements UpdateSubscrib
             RigidBody body = physics.getRigidBody(entity);
 
             // force location component to update and sync trigger state
-            if(entity.hasComponent(TriggerComponent.class)) {
+            if (entity.hasComponent(TriggerComponent.class)) {
                 physics.updateTrigger(entity);
             }
 

@@ -326,7 +326,7 @@ public abstract class Material extends Asset<MaterialData> {
      * @param name uniform parameter (mat4)
      * @param matrix the {@link Matrix4fc} to write into uniform
      */
-    public abstract void setMatrix4(String name, Matrix4fc matrix,boolean currentOnly);
+    public abstract void setMatrix4(String name, Matrix4fc matrix, boolean currentOnly);
 
     /**
      * Sets a matrix3 uniform parameter (for all feature permutations)

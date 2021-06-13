@@ -192,6 +192,11 @@ public class WorldSetupScreen extends CoreScreenLayer {
         }
     }
 
+    @Override
+    public boolean isLowerLayerVisible() {
+        return false;
+    }
+
     /**
      * Updates a world configurator through setProperty() whenever Binding#set() is called.
      */
@@ -268,10 +273,5 @@ public class WorldSetupScreen extends CoreScreenLayer {
                 ((Binding<Float>) binding).set(value);
             }
         }
-    }
-
-    @Override
-    public boolean isLowerLayerVisible() {
-        return false;
     }
 }

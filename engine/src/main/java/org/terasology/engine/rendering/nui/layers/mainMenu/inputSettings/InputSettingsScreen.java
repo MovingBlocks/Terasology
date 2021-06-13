@@ -277,8 +277,7 @@ public class InputSettingsScreen extends CoreScreenLayer {
         UIButton primaryInputBind = makeInputBindButton(uri, bind, binds, PRIMARY_BIND_INDEX);
         UIButton secondaryInputBind = makeInputBindButton(uri, bind, binds, SECONDARY_BIND_INDEX);
 
-        layout.addWidget(new RowLayout(new UILabel(translationSystem.translate(bind.description())), primaryInputBind
-                , secondaryInputBind)
+        layout.addWidget(new RowLayout(new UILabel(translationSystem.translate(bind.description())), primaryInputBind, secondaryInputBind)
                 .setColumnRatios(0.4f)
                 .setHorizontalSpacing(horizontalSpacing));
     }

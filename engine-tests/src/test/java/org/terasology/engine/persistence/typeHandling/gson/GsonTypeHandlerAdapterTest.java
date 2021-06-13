@@ -2,14 +2,13 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.persistence.typeHandling.gson;
 
+import com.google.common.base.Objects;
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import org.junit.jupiter.api.Test;
 import org.terasology.nui.Color;
 import org.terasology.engine.persistence.typeHandling.extensionTypes.ColorTypeHandler;
-
-import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -71,8 +70,12 @@ public class GsonTypeHandlerAdapterTest {
                 return false;
             }
             TestClass testClass = (TestClass) o;
-            return i == testClass.i
-                    && Objects.equals(color, testClass.color);
+            return i == testClass.i && Objects.equal(color, testClass.color);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hashCode(color, i);
         }
     }
 }

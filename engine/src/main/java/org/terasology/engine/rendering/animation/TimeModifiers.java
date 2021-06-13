@@ -67,7 +67,7 @@ public final class TimeModifiers {
     }
 
     /**
-     * increases the speed by factor <code>times</codes> and restarts from 0.
+     * increases the speed by factor <code>times</code> and restarts from 0.
      * @param times the (positive) multiplication factor
      * @return a mapping function
      */

@@ -135,7 +135,7 @@ public class ComponentMetadata<T extends Component> extends ClassMetadata<T, Com
     public T copyWithOwnedEntities(T object) {
         T result = constructor.construct();
         if (result != null) {
-            for (ComponentFieldMetadata<T,?> field : fields.values()) {
+            for (ComponentFieldMetadata<T, ?> field : fields.values()) {
                 field.setValue(result, field.getCopyOfValueWithOwnedEntities(object));
             }
         }

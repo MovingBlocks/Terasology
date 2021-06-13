@@ -95,6 +95,7 @@ public class InjectionHelperTest {
         assertNull(constructorAB.getServiceB());
     }
 
+    @SuppressWarnings("checkstyle:LocalVariableName")
     @Test
     public void testConstructorInjectionNotAllParametersPopulatedFallback() {
         Context context = new ContextImpl();
@@ -184,6 +185,7 @@ public class InjectionHelperTest {
         }
     }
 
+    @SuppressWarnings("checkstyle:TypeName")
     public static class ConstructorA_AB {
         private ServiceA serviceA;
 

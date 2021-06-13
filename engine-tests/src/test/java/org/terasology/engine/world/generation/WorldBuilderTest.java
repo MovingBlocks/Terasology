@@ -25,7 +25,7 @@ public class WorldBuilderTest {
         worldBuilder.addProvider(new Facet2Provider());
 
         World world = worldBuilder.build();
-        BlockRegion regionToGenerate = new BlockRegion(0,0,0).expand(1, 1, 1);
+        BlockRegion regionToGenerate = new BlockRegion(0, 0, 0).expand(1, 1, 1);
         Region regionData = world.getWorldData(regionToGenerate);
 
         Facet1 facet1 = regionData.getFacet(Facet1.class);
@@ -44,7 +44,7 @@ public class WorldBuilderTest {
         worldBuilder.addProvider(new Facet3Provider());
 
         World world = worldBuilder.build();
-        BlockRegion regionToGenerate = new BlockRegion(0,0,0).expand(1, 1, 1);
+        BlockRegion regionToGenerate = new BlockRegion(0, 0, 0).expand(1, 1, 1);
         Region regionData = world.getWorldData(regionToGenerate);
 
         Facet3 facet3 = regionData.getFacet(Facet3.class);
@@ -66,7 +66,7 @@ public class WorldBuilderTest {
         worldBuilder.addProvider(new Facet4Provider());
 
         World world = worldBuilder.build();
-        BlockRegion regionToGenerate = new BlockRegion(0,0,0).expand(1, 1, 1);
+        BlockRegion regionToGenerate = new BlockRegion(0, 0, 0).expand(1, 1, 1);
         Region regionData = world.getWorldData(regionToGenerate);
 
         Facet1 facet1 = regionData.getFacet(Facet1.class);
@@ -90,7 +90,7 @@ public class WorldBuilderTest {
         worldBuilder.addProvider(new Facet4Provider());
         worldBuilder.addProvider(new FacetUpdater());
 
-        BlockRegion regionToGenerate = new BlockRegion(0,0,0).expand(1, 1, 1);
+        BlockRegion regionToGenerate = new BlockRegion(0, 0, 0).expand(1, 1, 1);
 
         World world;
         Region regionData;

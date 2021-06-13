@@ -18,12 +18,12 @@ import java.util.Set;
 public class LocationChangedSystem extends BaseComponentSystem implements UpdateSubscriberSystem {
     private Set<EntityRef> process = Sets.newHashSet();
 
-    @ReceiveEvent(components = {LocationComponent.class})
+    @ReceiveEvent(components = LocationComponent.class)
     public void locationChanged(OnAddedComponent event, EntityRef entity, LocationComponent lc) {
         lc.clearDirtyFlag();
     }
 
-    @ReceiveEvent(components = {LocationComponent.class})
+    @ReceiveEvent(components = LocationComponent.class)
     public void locationChanged(OnChangedComponent event, EntityRef entity, LocationComponent lc) {
         if (lc.isDirty() && (!lc.position.equals(lc.lastPosition) || !lc.rotation.equals(lc.lastRotation))) {
             process.add(entity);
