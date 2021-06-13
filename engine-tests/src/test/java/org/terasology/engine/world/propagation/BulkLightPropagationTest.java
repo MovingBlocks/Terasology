@@ -238,8 +238,7 @@ public class BulkLightPropagationTest extends TerasologyTestingEnvironment {
         worldView.setBlockAt(new Vector3i(1, 0, 0), mediumLight);
         worldView.setBlockAt(new Vector3i(0, 0, 0), mediumLight);
         BatchPropagator propagator = new StandardBatchPropagator(lightRules, worldView);
-        propagator.process(new BlockChange(new Vector3i(1, 0, 0), air, mediumLight), new BlockChange(ZERO_VECTOR, air
-                , mediumLight));
+        propagator.process(new BlockChange(new Vector3i(1, 0, 0), air, mediumLight), new BlockChange(ZERO_VECTOR, air, mediumLight));
 
         for (int i = 0; i < fullLight.getLuminance() + 1; ++i) {
             for (Vector3ic pos : Diamond3iIterable.shell(new Vector3i(0, 0, 0), i).build()) {
@@ -268,8 +267,7 @@ public class BulkLightPropagationTest extends TerasologyTestingEnvironment {
         worldView.setBlockAt(new Vector3i(1, 0, 0), mediumLight);
         worldView.setBlockAt(new Vector3i(0, 0, 0), mediumLight);
         BatchPropagator propagator = new StandardBatchPropagator(lightRules, worldView);
-        propagator.process(new BlockChange(new Vector3i(1, 0, 0), air, mediumLight), new BlockChange(ZERO_VECTOR, air
-                , mediumLight));
+        propagator.process(new BlockChange(new Vector3i(1, 0, 0), air, mediumLight), new BlockChange(ZERO_VECTOR, air, mediumLight));
 
         worldView.setBlockAt(new Vector3i(1, 0, 0), air);
         worldView.setBlockAt(new Vector3i(0, 0, 0), air);
@@ -331,8 +329,7 @@ public class BulkLightPropagationTest extends TerasologyTestingEnvironment {
 
         worldView.setBlockAt(new Vector3i(1, 0, 0), air);
         worldView.setBlockAt(new Vector3i(0, 0, 0), air);
-        propagator.process(new BlockChange(new Vector3i(1, 0, 0), solid, air), new BlockChange(ZERO_VECTOR, fullLight
-                , air));
+        propagator.process(new BlockChange(new Vector3i(1, 0, 0), solid, air), new BlockChange(ZERO_VECTOR, fullLight, air));
 
         for (int i = 0; i < fullLight.getLuminance() + 1; ++i) {
             byte expectedLuminance = (byte) 0;

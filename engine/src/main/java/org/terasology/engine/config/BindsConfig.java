@@ -86,7 +86,7 @@ public final class BindsConfig {
      * Sets the inputs for a given bind, replacing any previous inputs
      *
      */
-    public void setBinds(SimpleUri bindUri, Input ... inputs) {
+    public void setBinds(SimpleUri bindUri, Input... inputs) {
         setBinds(bindUri, Arrays.asList(inputs));
     }
 
@@ -106,6 +106,10 @@ public final class BindsConfig {
             }
         }
         uriBoundInputs.replaceValues(bindUri, uniqueInputs);
+    }
+
+    public Collection<Input> getBoundInputs() {
+        return uriBoundInputs.values();
     }
 
     static class Handler implements JsonSerializer<BindsConfig>, JsonDeserializer<BindsConfig> {
@@ -148,9 +152,4 @@ public final class BindsConfig {
             return bindingByModuleName;
         }
     }
-
-    public Collection<Input> getBoundInputs() {
-        return uriBoundInputs.values();
-    }
-
 }

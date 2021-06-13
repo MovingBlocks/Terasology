@@ -5,7 +5,6 @@ package org.terasology.engine.rendering.assets.mesh.resource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.engine.config.flexible.ui.AutoConfigScreen;
 
 /**
  * defines the order of vertices to walk for rendering geometry
@@ -17,14 +16,13 @@ public class IndexResource extends BufferedResource {
     private int inIndices = 0;
     private int posIndex = 0;
 
-    public int indices() {
-        return inIndices;
-    }
-
     public IndexResource() {
         super();
     }
 
+    public int indices() {
+        return inIndices;
+    }
 
     public void copy(IndexResource resource) {
         copyBuffer(resource);
@@ -49,17 +47,17 @@ public class IndexResource extends BufferedResource {
         }
     }
 
-    public void putAll(int value, int ... values) {
+    public void putAll(int value, int... values) {
         put(value);
-        for (int x = 0; x < values.length; x++) {
-            put(values[x]);
+        for (int i : values) {
+            put(i);
         }
     }
 
 
     public void putAll(int[] values) {
-        for (int x = 0; x < values.length; x++) {
-            put(values[x]);
+        for (int value : values) {
+            put(value);
         }
     }
 

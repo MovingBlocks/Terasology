@@ -24,7 +24,7 @@ import java.util.Map;
  *
  * @param <T> The base type.
  */
-public class PolymorphicTypeAdapterFactory<T> implements TypeAdapterFactory {
+public final class PolymorphicTypeAdapterFactory<T> implements TypeAdapterFactory {
     private static final String TYPE_FIELD_NAME = "@type";
 
     private final Class<T> baseClass;

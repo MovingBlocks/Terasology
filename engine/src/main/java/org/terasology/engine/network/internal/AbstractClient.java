@@ -140,7 +140,7 @@ public abstract class AbstractClient implements Client {
 
 
     /**
-     * Creates a HashSet<String> of all connected player names.
+     * Creates a {@code HashSet<String>} of all connected player names.
      * @param entityManager
      * @param player Client name to make sure it doesn't put its own name in the list.
      * @return Returns all connected player names.

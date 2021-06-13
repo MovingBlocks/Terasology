@@ -37,14 +37,14 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
 import static org.terasology.joml.test.VectorAssert.assertEquals;
 
 public class VectorEventSerializer {
+    Map<Class<? extends Event>, Integer> eventMap = new HashMap<>();
+    int indexCount = 0;
 
     private EntitySystemLibrary entitySystemLibrary;
     private EventSerializer serializer;
 
     private ReflectFactory reflectFactory = new ReflectionReflectFactory();
     private CopyStrategyLibrary copyStrategies = new CopyStrategyLibrary(reflectFactory);
-    Map<Class<? extends Event>, Integer> eventMap = new HashMap<>();
-    int indexCount = 0;
 
     public static class Vector3fTestEvent implements Event {
         public Vector3f v1;

@@ -43,7 +43,7 @@ public class GameProviderTest {
     private static final Path TMP_SAVE_GAME_PATH = TMP_SAVES_FOLDER_PATH.resolve(DEFAULT_GAME_NAME);
     private static final Path TMP_RECORD_GAME_PATH = TMP_RECORDS_FOLDER_PATH.resolve(DEFAULT_GAME_NAME);
     private static final String GAME_MANIFEST_JSON = "gameManifest.json";
-    private static String MANIFEST_EXAMPLE;
+    private static String manifestExample;
 
     private static final Logger logger = LoggerFactory.getLogger(GameProviderTest.class);
 
@@ -65,7 +65,7 @@ public class GameProviderTest {
 
         final File file = new File(GameProviderTest.class.getClassLoader().getResource(GAME_MANIFEST_JSON).getFile());
         try {
-            MANIFEST_EXAMPLE = com.google.common.io.Files.asCharSource(file, Charsets.UTF_8).read();
+            manifestExample = com.google.common.io.Files.asCharSource(file, Charsets.UTF_8).read();
         } catch (IOException e) {
             fail("Could not load input file");
         }
@@ -134,7 +134,7 @@ public class GameProviderTest {
         Files.createDirectories(TMP_SAVE_GAME_PATH);
         Path manifestFilePath = TMP_SAVE_GAME_PATH.resolve(GameManifest.DEFAULT_FILE_NAME);
 
-        writeToFile(manifestFilePath, MANIFEST_EXAMPLE);
+        writeToFile(manifestFilePath, manifestExample);
 
         final List<GameInfo> result = GameProvider.getSavedGames();
         assertNotNull(result);
@@ -184,7 +184,7 @@ public class GameProviderTest {
     public void getNextGameNameNumberTest() throws IOException {
         Files.createDirectories(TMP_SAVE_GAME_PATH);
         Path manifestFilePath = TMP_SAVE_GAME_PATH.resolve(GameManifest.DEFAULT_FILE_NAME);
-        writeToFile(manifestFilePath, MANIFEST_EXAMPLE);
+        writeToFile(manifestFilePath, manifestExample);
 
         final String name = GameProvider.getNextGameName();
 
@@ -206,7 +206,7 @@ public class GameProviderTest {
     public void getNextGameNameDefaultExceptionTest() throws IOException {
         Files.createDirectories(TMP_SAVE_GAME_PATH);
         Path manifestFilePath = TMP_SAVE_GAME_PATH.resolve(GameManifest.DEFAULT_FILE_NAME);
-        writeToFile(manifestFilePath, MANIFEST_EXAMPLE.replace(DEFAULT_GAME_NAME, "bad"));
+        writeToFile(manifestFilePath, manifestExample.replace(DEFAULT_GAME_NAME, "bad"));
 
         final String name = GameProvider.getNextGameName();
 
@@ -245,7 +245,7 @@ public class GameProviderTest {
         Path customSaveFolder = TMP_SAVES_FOLDER_PATH.resolve(gameName);
         Files.createDirectories(customSaveFolder);
         Path manifestFilePath = customSaveFolder.resolve(GameManifest.DEFAULT_FILE_NAME);
-        writeToFile(manifestFilePath, MANIFEST_EXAMPLE.replace(DEFAULT_GAME_NAME, gameName));
+        writeToFile(manifestFilePath, manifestExample.replace(DEFAULT_GAME_NAME, gameName));
     }
 
 }

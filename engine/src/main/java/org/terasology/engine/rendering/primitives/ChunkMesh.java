@@ -2,12 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.rendering.primitives;
 
-import com.google.common.collect.Maps;
 import org.joml.Vector2f;
 import org.joml.Vector2fc;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
-import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL30;
 import org.terasology.engine.rendering.assets.material.Material;
@@ -20,7 +18,6 @@ import org.terasology.engine.rendering.assets.mesh.resource.VertexResource;
 import org.terasology.engine.rendering.assets.mesh.resource.VertexResourceBuilder;
 import org.terasology.gestalt.module.sandbox.API;
 
-import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**

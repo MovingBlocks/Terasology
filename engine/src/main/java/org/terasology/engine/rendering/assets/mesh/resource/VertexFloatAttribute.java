@@ -5,12 +5,6 @@ package org.terasology.engine.rendering.assets.mesh.resource;
 
 public class VertexFloatAttribute extends BaseVertexAttribute {
     public final VertexFloatAttribute.AttributeConfiguration configuration;
-
-    public interface AttributeConfiguration {
-        void write(float value, int vertIdx, int offset, VertexResource resource);
-
-        float read(int vertIdx, int offset, VertexResource resource);
-    }
     /**
      * @param mapping maps a primitive to a given supported type.
      * @param count the number elements that is described by the target
@@ -19,5 +13,11 @@ public class VertexFloatAttribute extends BaseVertexAttribute {
                                      TypeMapping mapping, int count) {
         super(mapping, count);
         this.configuration = attributeConfiguration;
+    }
+
+    public interface AttributeConfiguration {
+        void write(float value, int vertIdx, int offset, VertexResource resource);
+
+        float read(int vertIdx, int offset, VertexResource resource);
     }
 }

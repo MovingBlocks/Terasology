@@ -13,10 +13,13 @@ import org.terasology.engine.physics.shapes.CollisionShapeFactory;
  * should ideally be the only one modified.
  */
 public final class PhysicsEngineManager {
+
     /**
      * The {@link CollisionShapeFactory} that can be used to create a {@link CollisionShape}.
      */
     public static final CollisionShapeFactory COLLISION_SHAPE_FACTORY = new BulletCollisionShapeFactory();
+
+    private PhysicsEngineManager() { }
 
     /**
      * Create a new {@link PhysicsEngine} instance.
