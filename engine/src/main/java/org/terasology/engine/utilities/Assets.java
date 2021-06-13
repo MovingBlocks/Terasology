@@ -79,7 +79,6 @@ public final class Assets {
     public static Optional<Texture> getTexture(String urn) {
         return get(urn, Texture.class);
     }
-
     /**
      * @param urn The two-part uri for asset ("module:assetName")
      * @return The requested texture, or null if it doesn't exist
@@ -88,34 +87,6 @@ public final class Assets {
         return get(urn, Texture.class);
     }
 
-    //
-//    /**
-//     * @param module
-//     * @param assetName
-//     * @return The requested texture, or null if it doesn't exist
-//     */
-//    public static Texture getTexture(String module, String assetName) {
-//        return get(new AssetUri(AssetType.TEXTURE, module, assetName), Texture.class);
-//    }
-//
-//    /**
-//     * @param module
-//     * @param assetName
-//     * @return The requested texture, or null if it doesn't exist
-//     */
-//    public static Texture getTexture(Name module, String assetName) {
-//        return get(new AssetUri(AssetType.TEXTURE, module, assetName), Texture.class);
-//    }
-//
-//    public static Subtexture getSubtexture(String simpleUri) {
-//        return get(AssetType.SUBTEXTURE, simpleUri, Subtexture.class);
-//    }
-//
-//    public static Subtexture getSubtexture(String module, String assetName) {
-//        return get(new AssetUri(AssetType.SUBTEXTURE, module, assetName), Subtexture.class);
-//    }
-//
-
     /**
      * @param simpleUri The two-part uri for asset ("module:assetName")
      * @return The requested shader, or null if it doesn't exist
@@ -123,16 +94,14 @@ public final class Assets {
     public static Optional<Shader> getShader(String simpleUri) {
         return get(simpleUri, Shader.class);
     }
-//
-//    /**
-//     * @param module
-//     * @param assetName
-//     * @return The requested shader, or null if it doesn't exist
-//     */
-//    public static Shader getShader(String module, String assetName) {
-//        return get(new AssetUri(AssetType.SHADER, module, assetName), Shader.class);
-//    }
-//
+
+    /**
+     * @param urn The two-part uri for asset ("module:assetName")
+     * @return The requested shader, or null if it doesn't exist
+     */
+    public static Optional<Shader> getShader(ResourceUrn urn) {
+        return get(urn, Shader.class);
+    }
 
     /**
      * @param simpleUri The two-part uri for asset ("module:assetName")
@@ -141,16 +110,13 @@ public final class Assets {
     public static Optional<Font> getFont(String simpleUri) {
         return get(simpleUri, Font.class);
     }
-//
-//    /**
-//     * @param module
-//     * @param assetName
-//     * @return The requested font, or null if it doesn't exist
-//     */
-//    public static Font getFont(String module, String assetName) {
-//        return get(new AssetUri(AssetType.FONT, module, assetName), Font.class);
-//    }
-//
+    /**
+     * @param urn The two-part uri for asset ("module:assetName")
+     * @return The requested font, or null if it doesn't exist
+     */
+    public static Optional<Font> getFont(ResourceUrn urn) {
+        return get(urn, Font.class);
+    }
 
     /**
      * @param simpleUri The two-part uri for asset ("module:assetName")
@@ -159,16 +125,13 @@ public final class Assets {
     public static Optional<StaticSound> getSound(String simpleUri) {
         return get(simpleUri, StaticSound.class);
     }
-//
-//    /**
-//     * @param module
-//     * @param assetName
-//     * @return The requested sound, or null if it doesn't exist
-//     */
-//    public static StaticSound getSound(String module, String assetName) {
-//        return get(new AssetUri(AssetType.SOUND, module, assetName), StaticSound.class);
-//    }
-//
+    /**
+     * @param urn The two-part uri for asset ("module:assetName")
+     * @return The requested sound, or null if it doesn't exist
+     */
+    public static Optional<StaticSound> getSound(ResourceUrn urn) {
+        return get(urn, StaticSound.class);
+    }
 
     /**
      * @param simpleUri The two-part uri for asset ("module:assetName")
@@ -177,16 +140,13 @@ public final class Assets {
     public static Optional<StreamingSound> getMusic(String simpleUri) {
         return get(simpleUri, StreamingSound.class);
     }
-//
-//    /**
-//     * @param module
-//     * @param assetName
-//     * @return The requested music, or null if it doesn't exist
-//     */
-//    public static StreamingSound getMusic(String module, String assetName) {
-//        return get(new AssetUri(AssetType.MUSIC, module, assetName), StreamingSound.class);
-//    }
-//
+    /**
+     * @param urn The two-part uri for asset ("module:assetName")
+     * @return The requested music, or null if it doesn't exist
+     */
+    public static Optional<StreamingSound> getMusic(ResourceUrn urn) {
+        return get(urn, StreamingSound.class);
+    }
 
     /**
      * @param simpleUri The two-part uri for asset ("module:assetName")
@@ -195,16 +155,13 @@ public final class Assets {
     public static Optional<Mesh> getMesh(String simpleUri) {
         return get(simpleUri, Mesh.class);
     }
-//
-//    /**
-//     * @param module
-//     * @param assetName
-//     * @return The requested mesh, or null if it doesn't exist
-//     */
-//    public static Mesh getMesh(String module, String assetName) {
-//        return get(new AssetUri(AssetType.MESH, module, assetName), Mesh.class);
-//    }
-//
+    /**
+     * @param urn The two-part uri for asset ("module:assetName")
+     * @return The requested mesh, or null if it doesn't exist
+     */
+    public static Optional<Mesh> getMesh(ResourceUrn urn) {
+        return get(urn, Mesh.class);
+    }
 
     /**
      * @param simpleUri The two-part uri for asset ("module:assetName")
@@ -213,60 +170,22 @@ public final class Assets {
     public static Optional<Material> getMaterial(String simpleUri) {
         return get(simpleUri, Material.class);
     }
+    /**
+     * @param urn The two-part uri for asset ("module:assetName")
+     * @return The requested material, or null if it doesn't exist
+     */
+    public static Optional<Material> getMaterial(ResourceUrn urn) {
+        return get(urn, Material.class);
+    }
 
-    //
-//    /**
-//     * @param module
-//     * @param assetName
-//     * @return The requested material, or null if it doesn't exist
-//     */
-//    public static Material getMaterial(String module, String assetName) {
-//        return get(new AssetUri(AssetType.MATERIAL, module, assetName), Material.class);
-//    }
-//
-//    /**
-//     * @param simpleUri The two-part uri for asset ("module:assetName")
-//     * @return The requested SkeletalMesh, or null if it doesn't exist
-//     */
-//    public static SkeletalMesh getSkeletalMesh(String simpleUri) {
-//        return get(AssetType.SKELETON_MESH, simpleUri, SkeletalMesh.class);
-//    }
-//
-//    /**
-//     * @param module
-//     * @param assetName
-//     * @return The requested SkeletalMesh, or null if it doesn't exist
-//     */
-//    public static SkeletalMesh getSkeletalMesh(String module, String assetName) {
-//        return get(new AssetUri(AssetType.SKELETON_MESH, module, assetName), SkeletalMesh.class);
-//    }
-//
-//    /**
-//     * @param simpleUri The two-part uri for asset ("module:assetName")
-//     * @return The requested MeshAnimation, or null if it doesn't exist
-//     */
-//    public static MeshAnimation getAnimation(String simpleUri) {
-//        return get(AssetType.ANIMATION, simpleUri, MeshAnimation.class);
-//    }
-//
-//    /**
-//     * @param module
-//     * @param assetName
-//     * @return The requested MeshAnimation, or null if it doesn't exist
-//     */
-//    public static MeshAnimation getAnimation(String module, String assetName) {
-//        return get(new AssetUri(AssetType.ANIMATION, module, assetName), MeshAnimation.class);
-//    }
-//
     public static Optional<Prefab> getPrefab(String simpleUri) {
         return get(simpleUri, Prefab.class);
     }
 
-    //
-//    public static BehaviorTree getBehaviorTree(String simpleUri) {
-//        return get(AssetType.BEHAVIOR, simpleUri, BehaviorTree.class);
-//    }
-//
+    public static Optional<Prefab> getPrefab(ResourceUrn urn) {
+        return get(urn, Prefab.class);
+    }
+
     public static Optional<UISkin> getSkin(String uri) {
         Optional<UISkinAsset> skinAsset = get(uri, UISkinAsset.class);
         if (skinAsset.isPresent()) {
@@ -290,11 +209,6 @@ public final class Assets {
         return CoreRegistry.get(AssetManager.class).loadAsset(urn, data, assetClass);
     }
 
-    //
-//    public static void dispose(Asset<?> asset) {
-//        CoreRegistry.get(AssetManager.class).dispose(asset);
-//    }
-//
     public static Optional<TextureRegionAsset> getTextureRegion(String simpleUri) {
         if (simpleUri.isEmpty()) {
             return Optional.empty();

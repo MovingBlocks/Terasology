@@ -44,32 +44,8 @@ public class ShaderManagerLwjgl implements ShaderManager {
     public void initShaders() {
         logCapabilities();
         addShaderProgram("default");
-
-        // TODO: Find a better way to do this
-        addShaderProgram("post");
-        addShaderProgram("ssao");
-        addShaderProgram("lightShafts");
-        addShaderProgram("sobel");
-        addShaderProgram("initialPost");
-        addShaderProgram("prePostComposite");
-        addShaderProgram("highPass");
-        addShaderProgram("blur");
-        addShaderProgram("vignette");
-        addShaderProgram("downSampler");
-        addShaderProgram("toneMapping");
-        addShaderProgram("sky");
-        addShaderProgram("chunk");
         addShaderProgram("blockSelection");
-        if (GL.createCapabilities().OpenGL33) { //TODO remove this "if" when rendering will use OpenGL3 by default
-            addShaderProgram("particle");
-        } else {
-            logger.warn("Your GPU or driver not supports OpenGL 3.3 , particles disabled");
-        }
-        addShaderProgram("shadowMap");
-        addShaderProgram("lightBufferPass");
-        addShaderProgram("lightGeometryPass");
-        addShaderProgram("ssaoBlur");
-        addShaderProgram("outputPass");
+        addShaderProgram("particle");
     }
 
     private void logCapabilities() {
