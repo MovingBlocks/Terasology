@@ -53,7 +53,6 @@ import org.terasology.engine.network.NetworkSystem;
 import org.terasology.engine.physics.engine.PhysicsEngine;
 import org.terasology.engine.registry.In;
 import org.terasology.engine.rendering.AABBRenderer;
-import org.terasology.engine.rendering.BlockOverlayRenderer;
 import org.terasology.engine.rendering.cameras.Camera;
 import org.terasology.engine.rendering.cameras.PerspectiveCamera;
 import org.terasology.engine.rendering.logic.MeshComponent;

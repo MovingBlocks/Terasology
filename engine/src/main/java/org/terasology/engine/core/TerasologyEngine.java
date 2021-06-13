@@ -457,6 +457,7 @@ public class TerasologyEngine implements GameEngine {
      * The main loop runs until the EngineState is set back to INITIALIZED by shutdown() or until the OS requests the
      * application's window to be closed. Engine cleanup and disposal occur afterwards.
      */
+    @SuppressWarnings("checkstyle:EmptyBlock")
     private void mainLoop() {
         PerformanceMonitor.startActivity("Other");
         // MAIN GAME LOOP

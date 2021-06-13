@@ -17,7 +17,7 @@ public abstract class Texture extends TextureRegionAsset<TextureData> {
     }
 
     protected Texture(ResourceUrn urn, AssetType<?, TextureData> assetType, DisposableResource disposableResource) {
-        super(urn, assetType,disposableResource);
+        super(urn, assetType, disposableResource);
     }
 
 
