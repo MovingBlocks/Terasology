@@ -94,9 +94,9 @@ public abstract class AbstractNode implements Node {
         this.outputConnections = outputConnections;
     }
 
-    public final void postInit(Context ctxt) {
+    public final void postInit(Context context) {
         tryBufferPairPass();
-        setDependencies(ctxt);
+        setDependencies(context);
     }
 
     public void tryBufferPairPass() {
@@ -112,7 +112,7 @@ public abstract class AbstractNode implements Node {
      * Each node must implement this method to be called when the node is fully connected.
      * This method should call other private node methods to use dependencies.
      */
-    public abstract void setDependencies(Context ctxt);
+    public abstract void setDependencies(Context context);
 
     /**
      *

@@ -350,8 +350,8 @@ public enum Side {
         return dest.set(pos).add(direction());
     }
 
-    public Side getRelativeSide(Direction dir) {
-        switch (dir) {
+    public Side getRelativeSide(Direction direction) {
+        switch (direction) {
             case UP:
                 return pitchClockwise(1);
             case DOWN:

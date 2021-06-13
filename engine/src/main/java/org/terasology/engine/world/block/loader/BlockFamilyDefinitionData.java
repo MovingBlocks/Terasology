@@ -74,8 +74,8 @@ public class BlockFamilyDefinitionData implements AssetData {
         return family;
     }
 
-    public void setBlockFamily(Class<? extends AbstractBlockFamily> blockFamily) {
-        this.family = blockFamily;
+    public void setBlockFamily(Class<? extends AbstractBlockFamily> family) {
+        this.family = family;
     }
 
     public List<String> getCategories() {

@@ -32,18 +32,18 @@ public class SkeletalMeshDataBuilder {
         return this;
     }
 
-    public SkeletalMeshDataBuilder addVertices(List<Vector3f> verticesToAdd) {
-        this.vertices.addAll(verticesToAdd);
+    public SkeletalMeshDataBuilder addVertices(List<Vector3f> vertices) {
+        this.vertices.addAll(vertices);
         return this;
     }
 
-    public SkeletalMeshDataBuilder addNormals(List<Vector3f> normalsToAdd) {
-        this.normals.addAll(normalsToAdd);
+    public SkeletalMeshDataBuilder addNormals(List<Vector3f> normals) {
+        this.normals.addAll(normals);
         return this;
     }
 
-    public SkeletalMeshDataBuilder addWeights(List<BoneWeight> weightsToAdd) {
-        this.weights.addAll(weightsToAdd);
+    public SkeletalMeshDataBuilder addWeights(List<BoneWeight> weights) {
+        this.weights.addAll(weights);
         return this;
     }
 

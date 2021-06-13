@@ -32,8 +32,8 @@ public abstract class ConstraintWidgetFactory<T, C extends SettingConstraint<T>>
         return (C) setting.getConstraint();
     }
 
-    public Optional<UIWidget> buildWidgetFor(Setting<T> targetSetting) {
-        this.setting = targetSetting;
+    public Optional<UIWidget> buildWidgetFor(Setting<T> setting) {
+        this.setting = setting;
 
         return buildWidget();
     }

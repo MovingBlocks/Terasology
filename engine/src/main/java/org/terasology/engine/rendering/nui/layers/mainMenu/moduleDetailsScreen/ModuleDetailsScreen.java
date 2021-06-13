@@ -286,9 +286,9 @@ public class ModuleDetailsScreen extends CoreScreenLayer {
         });
     }
 
-    private boolean validateModuleDependencies(Name module) {
+    private boolean validateModuleDependencies(Name moduleName) {
         DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
-        return resolver.resolve(module).isSuccess();
+        return resolver.resolve(moduleName).isSuccess();
     }
 
     private void setUpDependencies() {

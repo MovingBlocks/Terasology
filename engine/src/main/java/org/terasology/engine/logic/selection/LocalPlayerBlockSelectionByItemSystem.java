@@ -104,11 +104,11 @@ public class LocalPlayerBlockSelectionByItemSystem extends BaseComponentSystem {
      * This event is sent after the size of a region is finalized and the location is to yet to be decided by the player.
      * This event marks the start of the camera position binding with the region.
      * @param event The event sent
-     * @param entity The entity sending the event. This entity must have the {@link BlockSelectionComponent}
+     * @param blockSelectionComponentEntity The entity sending the event. This entity must have the {@link BlockSelectionComponent}
      */
     @ReceiveEvent(components = BlockSelectionComponent.class)
-    public void onMovableBlockSelectionStart(MovableSelectionStartEvent event, EntityRef entity) {
-        this.blockSelectionComponentEntity = entity;
+    public void onMovableBlockSelectionStart(MovableSelectionStartEvent event, EntityRef blockSelectionComponentEntity) {
+        this.blockSelectionComponentEntity = blockSelectionComponentEntity;
     }
 
     /**

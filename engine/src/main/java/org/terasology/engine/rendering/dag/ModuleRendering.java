@@ -78,8 +78,8 @@ public abstract class ModuleRendering {
     }
 
     protected void setProvidingModule(Class implementingClass) {
-        ModuleManager manager = context.get(ModuleManager.class);
-        this.providingModule = manager.getEnvironment().getModuleProviding(implementingClass);
+        ModuleManager moduleManager = context.get(ModuleManager.class);
+        this.providingModule = moduleManager.getEnvironment().getModuleProviding(implementingClass);
     }
 
     protected BufferPair createBufferPair(String primaryBufferName, String secondaryBufferName,

@@ -44,10 +44,10 @@ public class LayeredZoneRegionFunction implements ZoneRegionFunction {
     }
 
     @Override
-    public void initialize(Zone parentZone) {
-        this.parent = parentZone;
+    public void initialize(Zone parent) {
+        this.parent = parent;
 
-        siblings = Zone.getSiblingRegionFunctions(parentZone).stream()
+        siblings = Zone.getSiblingRegionFunctions(parent).stream()
                 .filter(function -> function instanceof LayeredZoneRegionFunction)
                 .map(layerFunction -> (LayeredZoneRegionFunction) layerFunction)
                 .sorted(Comparator.comparingInt(layerFunction -> Math.abs(layerFunction.getOrdering())))
@@ -61,7 +61,7 @@ public class LayeredZoneRegionFunction implements ZoneRegionFunction {
                 .filter(layer -> !layer.isUnderground())
                 .collect(Collectors.toList());
 
-        seed = parentZone.getSeed();
+        seed = parent.getSeed();
         layerThickness.initialize(this);
     }
 
