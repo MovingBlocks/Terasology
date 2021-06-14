@@ -9,6 +9,7 @@ import org.joml.Vector3ic;
 import org.terasology.math.TeraMath;
 
 import java.util.EnumSet;
+import java.util.Set;
 
 /**
  * The six sides of a block and a slew of related utility.
@@ -19,10 +20,10 @@ import java.util.EnumSet;
  */
 public enum Side {
     TOP(new Vector3i(0, 1, 0)),
-    BOTTOM(new Vector3i(0, -1, 0)),
     LEFT(new Vector3i(-1, 0, 0)),
-    RIGHT(new Vector3i(1, 0, 0)),
     FRONT(new Vector3i(0, 0, -1)),
+    BOTTOM(new Vector3i(0, -1, 0)),
+    RIGHT(new Vector3i(1, 0, 0)),
     BACK(new Vector3i(0, 0, 1));
 
     public static final ImmutableList<Side> X_TANGENT_SIDE = ImmutableList.of(TOP, BOTTOM, FRONT, BACK);
@@ -39,6 +40,44 @@ public enum Side {
 
     Side(Vector3i vector3i) {
         this.direction = vector3i;
+    }
+
+    public static byte toByte(Set<Side> sides) {
+        byte result = 0;
+        for (Side side : sides) {
+            result |= (1 << side.ordinal());
+        }
+        return result;
+    }
+
+    public static byte toByte(Side ... sides) {
+        byte result = 0;
+        for (Side side : sides) {
+            result |= (1 << side.ordinal());
+        }
+        return result;
+    }
+
+    public static EnumSet<Side> getSides(final byte data) {
+        final EnumSet<Side> result = EnumSet.noneOf(Side.class);
+        for (Side side : Side.values()) {
+            if ((data & (1 << side.ordinal())) > 0) {
+                result.add(side);
+            }
+        }
+        return result;
+    }
+
+    public static boolean hasSide(byte flags, Side side) {
+        return (flags & (1 << side.ordinal())) > 0;
+    }
+
+    public static byte addSide(byte flags, Side... sides) {
+        byte result = flags;
+        for (Side side : sides) {
+            result |= (1 << side.ordinal());
+        }
+        return result;
     }
 
     /**
