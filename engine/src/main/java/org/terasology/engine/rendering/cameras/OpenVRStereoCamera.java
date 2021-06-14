@@ -6,8 +6,6 @@ import org.joml.FrustumIntersection;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector4f;
-import org.lwjgl.BufferUtils;
-import org.lwjgl.opengl.GL11;
 import org.terasology.engine.config.RenderingConfig;
 import org.terasology.engine.registry.CoreRegistry;
 import org.terasology.engine.rendering.openvrprovider.OpenVRProvider;
@@ -15,9 +13,6 @@ import org.terasology.engine.rendering.openvrprovider.OpenVRUtil;
 import org.terasology.engine.rendering.world.WorldRenderer;
 import org.terasology.engine.rendering.world.WorldRenderer.RenderingStage;
 import org.terasology.engine.world.WorldProvider;
-
-import static org.lwjgl.opengl.GL11.GL_PROJECTION;
-import static org.lwjgl.opengl.GL11.glMatrixMode;
 
 /**
  * Camera which can be used to render stereoscopic images of the scene for VR.

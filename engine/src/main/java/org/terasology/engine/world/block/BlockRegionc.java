@@ -431,7 +431,7 @@ public interface BlockRegionc extends Iterable<Vector3ic> {
     }
 
     /**
-     * Move this region to the given position {@code (x, y, z)). The position is defined by the minimum corner.
+     * Move this region to the given position {@code (x, y, z)}. The position is defined by the minimum corner.
      *
      * @param x the new x coordinate of the minimum corner
      * @param y the new y coordinate of the minimum corner
@@ -444,7 +444,7 @@ public interface BlockRegionc extends Iterable<Vector3ic> {
     }
 
     /**
-     * Move this region to the given position {@code (x, y, z)). The position is defined by the minimum corner.
+     * Move this region to the given position {@code (x, y, z)}. The position is defined by the minimum corner.
      *
      * @param pos the new coordinates of the minimum corner
      * @param dest destination; will hold the result

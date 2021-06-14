@@ -191,14 +191,14 @@ public class BlockBuilder implements BlockBuilderHelper {
     }
 
     private void setBlockFullSides(Block block, BlockShape shape, Rotation rot) {
-        for (Side side : Side.getAllSides()) {
+        for (Side side : Side.values()) {
             BlockPart targetPart = BlockPart.fromSide(rot.rotate(side));
             block.setFullSide(targetPart.getSide(), shape.isBlockingSide(side));
         }
     }
 
     private void applyLiquidShapes(Block block, Map<BlockPart, BlockTile> tiles) {
-        for (Side side : Side.getAllSides()) {
+        for (Side side : Side.values()) {
             BlockPart part = BlockPart.fromSide(side);
             BlockTile blockTile = tiles.get(part);
             if (blockTile != null) {

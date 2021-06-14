@@ -19,7 +19,7 @@ import java.nio.FloatBuffer;
 public abstract class BaseMaterial extends Material {
 
     protected BaseMaterial(ResourceUrn urn, AssetType<?, MaterialData> assetType, DisposableResource resource) {
-        super(urn, assetType,resource);
+        super(urn, assetType, resource);
     }
 
     protected BaseMaterial(ResourceUrn urn, AssetType<?, MaterialData> assetType) {

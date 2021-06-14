@@ -2,14 +2,11 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.rendering.assets.skeletalmesh;
 
-import gnu.trove.list.TFloatList;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
-import org.terasology.engine.rendering.assets.mesh.StandardMeshData;
 import org.terasology.joml.geom.AABBf;
-import org.terasology.engine.rendering.assets.mesh.MeshBuilder;
 
 import java.util.ArrayList;
 import java.util.List;

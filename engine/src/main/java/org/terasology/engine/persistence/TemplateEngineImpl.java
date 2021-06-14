@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
 import org.terasology.gestalt.module.sandbox.API;
 
 /**
- * A simple template engine that replaces <code>${text}<code> expressions
+ * A simple template engine that replaces <code>${text}</code> expressions
  * based on a given text mapping function.
  */
 @API

@@ -38,7 +38,7 @@ public interface Setting<T> {
     T get();
 
     /**
-     * Sets the value stored in this {@link Setting<T>}. When no {@link SettingConstraint} is
+     * Sets the value stored in this {@link Setting}. When no {@link SettingConstraint} is
      * present the new value immediately replaces the stored one and any subscriber is notified
      * of the change.
      *
@@ -52,7 +52,7 @@ public interface Setting<T> {
     boolean set(T newValue);
 
     /**
-     * Resets the value stored in this {@link Setting<T>} to the default value.
+     * Resets the value stored in this {@link Setting} to the default value.
      */
     default void resetValue() {
         set(getDefaultValue());

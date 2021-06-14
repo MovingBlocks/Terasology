@@ -31,8 +31,8 @@ import static org.mockito.Mockito.when;
 
 public class PojoEntityPoolTest {
 
-    private PojoEntityPool pool;
     private static Context context;
+    private PojoEntityPool pool;
     private PojoEntityManager entityManager;
 
     @BeforeAll

@@ -55,7 +55,7 @@ public class AttachedToSurfaceFamily extends AbstractBlockFamily {
             blockMap.put(Side.BOTTOM, block);
         }
 
-        for (Side side : Side.getAllSides()) {
+        for (Side side : Side.values()) {
             Block block = blockMap.get(side);
             if (block != null) {
                 blocks.put(side, block);

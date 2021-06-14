@@ -92,7 +92,7 @@ public class RegionOutlineRenderer extends BaseComponentSystem implements Render
         material.setMatrix4("projectionMatrix", worldRenderer.getActiveCamera().getProjectionMatrix());
         material.setMatrix4("modelViewMatrix", modelViewMatrix, true);
 
-        meshData.reallocate(0,0);
+        meshData.reallocate(0, 0);
         meshData.indices.rewind();
         meshData.position.rewind();
         meshData.color0.rewind();

@@ -74,7 +74,7 @@ public class LightMerger {
 
         for (BatchPropagator propagator : propagators) {
             // Propagate Inwards
-            for (Side side : Side.getAllSides()) {
+            for (Side side : Side.values()) {
                 Chunk adjChunk = localChunks[indexOf(side)];
                 if (adjChunk != null) {
                     propagator.propagateBetween(adjChunk, chunk, side.reverse(), false);
@@ -82,7 +82,7 @@ public class LightMerger {
             }
 
             // Propagate Outwards
-            for (Side side : Side.getAllSides()) {
+            for (Side side : Side.values()) {
                 Chunk adjChunk = localChunks[indexOf(side)];
                 if (adjChunk != null) {
                     propagator.propagateBetween(chunk, adjChunk, side, true);

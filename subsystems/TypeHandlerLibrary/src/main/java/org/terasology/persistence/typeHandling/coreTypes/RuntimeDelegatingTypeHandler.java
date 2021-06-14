@@ -73,8 +73,8 @@ public class RuntimeDelegatingTypeHandler<T> extends TypeHandler<T> {
                                 return typeHandler;
                             }
 
-                            if (!(typeHandler instanceof ObjectFieldMapTypeHandler) &&
-                                    typeHandler.getClass().equals(delegateHandler.getClass())) {
+                            if (!(typeHandler instanceof ObjectFieldMapTypeHandler)
+                                    && typeHandler.getClass().equals(delegateHandler.getClass())) {
                                 // Both handlers are of same type and will do the same thing,
                                 // use delegateHandler which might have more info
                                 return delegateHandler;
@@ -133,11 +133,11 @@ public class RuntimeDelegatingTypeHandler<T> extends TypeHandler<T> {
     }
 
     private boolean isDefaultTypeHandler(TypeHandler<?> typeHandler) {
-        return typeHandler instanceof ObjectFieldMapTypeHandler ||
-                   typeHandler instanceof EnumTypeHandler ||
-                   typeHandler instanceof CollectionTypeHandler ||
-                   typeHandler instanceof StringMapTypeHandler ||
-                   typeHandler instanceof ArrayTypeHandler;
+        return typeHandler instanceof ObjectFieldMapTypeHandler
+                || typeHandler instanceof EnumTypeHandler
+                || typeHandler instanceof CollectionTypeHandler
+                || typeHandler instanceof StringMapTypeHandler
+                || typeHandler instanceof ArrayTypeHandler;
     }
 
     private PersistedData serializeViaDelegate(T value, PersistedDataSerializer serializer) {

@@ -19,7 +19,7 @@ import org.terasology.nui.Colorc;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-public class GLTFAttributeMapping {
+public final class GLTFAttributeMapping {
     private GLTFAttributeMapping() {
 
     }

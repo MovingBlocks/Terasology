@@ -207,7 +207,7 @@ public abstract class Camera {
 
     public boolean hasInSight(AABBfc aabb) {
         return viewFrustum.testAab(
-                aabb.minX() - position.x,aabb.minY() - position.y, aabb.minZ() - position.z,
+                aabb.minX() - position.x, aabb.minY() - position.y, aabb.minZ() - position.z,
                 aabb.maxX() - position.x, aabb.maxY() - position.y, aabb.maxZ() - position.z);
     }
 }

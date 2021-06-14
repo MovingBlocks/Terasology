@@ -56,7 +56,7 @@ public class BlockAreaTypeHandlerTest extends ModuleEnvironmentTest {
         }).get();
 
         TestObject o = gsonSerializer.deserialize(new TypeInfo<TestObject>() {
-        },data).get();
+        }, data).get();
         assertEquals(new BlockArea(-1, -1, 0, 0), o.b1);
         assertEquals(new BlockArea(0, 0, 1, 1), o.b2);
     }

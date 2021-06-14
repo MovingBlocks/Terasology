@@ -231,8 +231,7 @@ public class InputSystem extends BaseComponentSystem {
         int dir = action.getInput().getId();
         if (dir != 0 && action.getTurns() != 0) {
             boolean consumed = sendMouseWheelEvent(action.getMousePosition(), dir * action.getTurns(), delta);
-            BindableButton bind = (dir == 1) ? bindsManager.getMouseWheelUpBind() :
-                    bindsManager.getMouseWheelDownBind();
+            BindableButton bind = (dir == 1) ? bindsManager.getMouseWheelUpBind() : bindsManager.getMouseWheelDownBind();
             if (bind != null) {
                 for (int i = 0; i < action.getTurns(); ++i) {
                     updateBindState(bind, action.getInput(), true, delta, consumed);
@@ -482,16 +481,16 @@ public class InputSystem extends BaseComponentSystem {
             case NONE:
                 return false;
             case MOUSE_LEFT:
-                event = (buttonDown) ? LeftMouseDownButtonEvent.create(position, delta) :
-                        LeftMouseUpButtonEvent.create(position, delta);
+                event = (buttonDown) ? LeftMouseDownButtonEvent.create(position, delta)
+                                     : LeftMouseUpButtonEvent.create(position, delta);
                 break;
             case MOUSE_RIGHT:
-                event = (buttonDown) ? RightMouseDownButtonEvent.create(position, delta) :
-                        RightMouseUpButtonEvent.create(position, delta);
+                event = (buttonDown) ? RightMouseDownButtonEvent.create(position, delta)
+                                     : RightMouseUpButtonEvent.create(position, delta);
                 break;
             default:
-                event = (buttonDown) ? MouseDownButtonEvent.create(button, position, delta) :
-                        MouseUpButtonEvent.create(button, position, delta);
+                event = (buttonDown) ? MouseDownButtonEvent.create(button, position, delta)
+                                     : MouseUpButtonEvent.create(button, position, delta);
                 break;
         }
         boolean consumed = send(event);

@@ -25,8 +25,6 @@ public enum Side {
     FRONT(new Vector3i(0, 0, -1)),
     BACK(new Vector3i(0, 0, 1));
 
-    private static final EnumSet<Side> ALL_SIDES = EnumSet.allOf(Side.class);
-
     public static final ImmutableList<Side> X_TANGENT_SIDE = ImmutableList.of(TOP, BOTTOM, FRONT, BACK);
     public static final ImmutableList<Side> Y_TANGENT_SIDE = ImmutableList.of(LEFT, RIGHT, FRONT, BACK);
     public static final ImmutableList<Side> Z_TANGENT_SIDE = ImmutableList.of(TOP, BOTTOM, LEFT, RIGHT);
@@ -34,6 +32,8 @@ public enum Side {
     public static final ImmutableList<Side> X_VERTICAL_SIDE = ImmutableList.of(LEFT, RIGHT);
     public static final ImmutableList<Side> Y_VERTICAL_SIDE = ImmutableList.of(TOP, BOTTOM);
     public static final ImmutableList<Side> Z_VERTICAL_SIDE = ImmutableList.of(FRONT, BACK);
+
+    private static final EnumSet<Side> ALL_SIDES = EnumSet.allOf(Side.class);
 
     private final Vector3ic direction;
 
@@ -136,7 +136,7 @@ public enum Side {
      * @return Whether this is one of the horizontal directions (LEFT, FRONT, RIGHT, BACK).
      */
     public boolean isHorizontal() {
-        switch (this){
+        switch (this) {
             case LEFT:
             case FRONT:
             case RIGHT:

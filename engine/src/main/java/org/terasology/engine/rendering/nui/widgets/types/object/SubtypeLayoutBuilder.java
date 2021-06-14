@@ -66,8 +66,8 @@ public class SubtypeLayoutBuilder<T> extends ExpandableLayoutBuilder<T> {
                 typeRegistry.getSubtypesOf(baseType.getRawType())
                         .stream()
                         // Type must come from an allowed module or be in the whitelist
-                        .filter(clazz -> allowedProvidingModules.contains(getModuleProviding(clazz)) ||
-                                permissionProvider.isPermitted(clazz))
+                        .filter(clazz -> allowedProvidingModules.contains(getModuleProviding(clazz))
+                                || permissionProvider.isPermitted(clazz))
                         // Filter public, instantiable types
                         .filter(clazz -> {
                             int modifiers = clazz.getModifiers();

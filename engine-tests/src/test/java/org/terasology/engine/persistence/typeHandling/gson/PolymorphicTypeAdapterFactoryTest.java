@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.persistence.typeHandling.gson;
 
+import com.google.common.base.Objects;
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -9,7 +10,6 @@ import com.google.gson.reflect.TypeToken;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -92,6 +92,7 @@ public class PolymorphicTypeAdapterFactoryTest {
     private interface Walker {
     }
 
+    @SuppressWarnings("checkstyle:FinalClass")
     private static class Animal implements Walker {
         private final String name;
 
@@ -108,7 +109,12 @@ public class PolymorphicTypeAdapterFactoryTest {
                 return false;
             }
             Animal animal = (Animal) o;
-            return Objects.equals(name, animal.name);
+            return Objects.equal(name, animal.name);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hashCode(name);
         }
     }
 
@@ -134,9 +140,14 @@ public class PolymorphicTypeAdapterFactoryTest {
             Dog dog = (Dog) o;
             return Float.compare(dog.tailLength, tailLength) == 0;
         }
+
+        @Override
+        public int hashCode() {
+            return Objects.hashCode(super.hashCode(), tailLength);
+        }
     }
 
-    private static class Cheetah extends Animal {
+    private static final class Cheetah extends Animal {
         private final int spotCount;
 
         private Cheetah(int spotCount) {
@@ -157,6 +168,11 @@ public class PolymorphicTypeAdapterFactoryTest {
             }
             Cheetah cheetah = (Cheetah) o;
             return spotCount == cheetah.spotCount;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hashCode(super.hashCode(), spotCount);
         }
     }
 }
