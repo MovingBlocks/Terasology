@@ -3,13 +3,11 @@
 package org.terasology.engine.math;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Maps;
 import org.joml.Vector3fc;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.terasology.math.TeraMath;
 
-import java.util.EnumMap;
 import java.util.EnumSet;
 
 /**
@@ -20,113 +18,41 @@ import java.util.EnumSet;
  *
  */
 public enum Side {
-    TOP(new Vector3i(0, 1, 0), true, false, true),
-    BOTTOM(new Vector3i(0, -1, 0), true, false, true),
-    LEFT(new Vector3i(-1, 0, 0), false, true, true),
-    RIGHT(new Vector3i(1, 0, 0), false, true, true),
-    FRONT(new Vector3i(0, 0, -1), true, true, false),
-    BACK(new Vector3i(0, 0, 1), true, true, false);
+    TOP(new Vector3i(0, 1, 0)),
+    BOTTOM(new Vector3i(0, -1, 0)),
+    LEFT(new Vector3i(-1, 0, 0)),
+    RIGHT(new Vector3i(1, 0, 0)),
+    FRONT(new Vector3i(0, 0, -1)),
+    BACK(new Vector3i(0, 0, 1));
+
+    public static final ImmutableList<Side> X_TANGENT_SIDE = ImmutableList.of(TOP, BOTTOM, FRONT, BACK);
+    public static final ImmutableList<Side> Y_TANGENT_SIDE = ImmutableList.of(LEFT, RIGHT, FRONT, BACK);
+    public static final ImmutableList<Side> Z_TANGENT_SIDE = ImmutableList.of(TOP, BOTTOM, LEFT, RIGHT);
+
+    public static final ImmutableList<Side> X_VERTICAL_SIDE = ImmutableList.of(LEFT, RIGHT);
+    public static final ImmutableList<Side> Y_VERTICAL_SIDE = ImmutableList.of(TOP, BOTTOM);
+    public static final ImmutableList<Side> Z_VERTICAL_SIDE = ImmutableList.of(FRONT, BACK);
 
     private static final EnumSet<Side> ALL_SIDES = EnumSet.allOf(Side.class);
 
-    private static final EnumMap<Side, Side> REVERSE_MAP;
-    private static final ImmutableList<Side> HORIZONTAL_SIDES;
-    private static final ImmutableList<Side> VERTICAL_SIDES;
-    private static final EnumMap<Side, Side> CLOCKWISE_YAW_SIDE;
-    private static final EnumMap<Side, Side> ANTICLOCKWISE_YAW_SIDE;
-    private static final EnumMap<Side, Side> CLOCKWISE_PITCH_SIDE;
-    private static final EnumMap<Side, Side> ANTICLOCKWISE_PITCH_SIDE;
-    private static final EnumMap<Side, Side> CLOCKWISE_ROLL_SIDE;
-    private static final EnumMap<Side, Side> ANTICLOCKWISE_ROLL_SIDE;
-    private static final EnumMap<Side, Direction> CONVERSION_MAP;
-    private static final EnumMap<Side, ImmutableList<Side>> TANGENTS;
+    private final Vector3ic direction;
 
-    static {
-        TANGENTS = new EnumMap<>(Side.class);
-        TANGENTS.put(TOP, ImmutableList.of(LEFT, RIGHT, FRONT, BACK));
-        TANGENTS.put(BOTTOM, ImmutableList.of(LEFT, RIGHT, FRONT, BACK));
-        TANGENTS.put(LEFT, ImmutableList.of(TOP, BOTTOM, FRONT, BACK));
-        TANGENTS.put(RIGHT, ImmutableList.of(TOP, BOTTOM, FRONT, BACK));
-        TANGENTS.put(FRONT, ImmutableList.of(TOP, BOTTOM, LEFT, RIGHT));
-        TANGENTS.put(BACK, ImmutableList.of(TOP, BOTTOM, LEFT, RIGHT));
-
-        REVERSE_MAP = new EnumMap<>(Side.class);
-        REVERSE_MAP.put(TOP, BOTTOM);
-        REVERSE_MAP.put(LEFT, RIGHT);
-        REVERSE_MAP.put(RIGHT, LEFT);
-        REVERSE_MAP.put(FRONT, BACK);
-        REVERSE_MAP.put(BACK, FRONT);
-        REVERSE_MAP.put(BOTTOM, TOP);
-
-        CONVERSION_MAP = new EnumMap<>(Side.class);
-        CONVERSION_MAP.put(TOP, Direction.UP);
-        CONVERSION_MAP.put(BOTTOM, Direction.DOWN);
-        CONVERSION_MAP.put(BACK, Direction.FORWARD);
-        CONVERSION_MAP.put(FRONT, Direction.BACKWARD);
-        CONVERSION_MAP.put(RIGHT, Direction.LEFT);
-        CONVERSION_MAP.put(LEFT, Direction.RIGHT);
-
-        CLOCKWISE_YAW_SIDE = new EnumMap<>(Side.class);
-        ANTICLOCKWISE_YAW_SIDE = new EnumMap<>(Side.class);
-        CLOCKWISE_YAW_SIDE.put(Side.FRONT, Side.LEFT);
-        ANTICLOCKWISE_YAW_SIDE.put(Side.FRONT, Side.RIGHT);
-        CLOCKWISE_YAW_SIDE.put(Side.RIGHT, Side.FRONT);
-        ANTICLOCKWISE_YAW_SIDE.put(Side.RIGHT, Side.BACK);
-        CLOCKWISE_YAW_SIDE.put(Side.BACK, Side.RIGHT);
-        ANTICLOCKWISE_YAW_SIDE.put(Side.BACK, Side.LEFT);
-        CLOCKWISE_YAW_SIDE.put(Side.LEFT, Side.BACK);
-        ANTICLOCKWISE_YAW_SIDE.put(Side.LEFT, Side.FRONT);
-
-        CLOCKWISE_PITCH_SIDE = Maps.newEnumMap(Side.class);
-        ANTICLOCKWISE_PITCH_SIDE = Maps.newEnumMap(Side.class);
-        CLOCKWISE_PITCH_SIDE.put(Side.FRONT, Side.TOP);
-        ANTICLOCKWISE_PITCH_SIDE.put(Side.FRONT, Side.BOTTOM);
-        CLOCKWISE_PITCH_SIDE.put(Side.BOTTOM, Side.FRONT);
-        ANTICLOCKWISE_PITCH_SIDE.put(Side.BOTTOM, Side.BACK);
-        CLOCKWISE_PITCH_SIDE.put(Side.BACK, Side.BOTTOM);
-        ANTICLOCKWISE_PITCH_SIDE.put(Side.BACK, Side.TOP);
-        CLOCKWISE_PITCH_SIDE.put(Side.TOP, Side.BACK);
-        ANTICLOCKWISE_PITCH_SIDE.put(Side.TOP, Side.FRONT);
-
-        CLOCKWISE_ROLL_SIDE = Maps.newEnumMap(Side.class);
-        ANTICLOCKWISE_ROLL_SIDE = Maps.newEnumMap(Side.class);
-        CLOCKWISE_ROLL_SIDE.put(Side.TOP, Side.LEFT);
-        ANTICLOCKWISE_ROLL_SIDE.put(Side.TOP, Side.RIGHT);
-        CLOCKWISE_ROLL_SIDE.put(Side.LEFT, Side.BOTTOM);
-        ANTICLOCKWISE_ROLL_SIDE.put(Side.LEFT, Side.TOP);
-        CLOCKWISE_ROLL_SIDE.put(Side.BOTTOM, Side.RIGHT);
-        ANTICLOCKWISE_ROLL_SIDE.put(Side.BOTTOM, Side.LEFT);
-        CLOCKWISE_ROLL_SIDE.put(Side.RIGHT, Side.TOP);
-        ANTICLOCKWISE_ROLL_SIDE.put(Side.RIGHT, Side.BOTTOM);
-
-        HORIZONTAL_SIDES = ImmutableList.of(LEFT, RIGHT, FRONT, BACK);
-        VERTICAL_SIDES = ImmutableList.of(TOP, BOTTOM);
-    }
-
-    private final Vector3i vector3iDir;
-    private final boolean canYaw;
-    private final boolean canPitch;
-    private final boolean canRoll;
-
-    Side(Vector3i vector3i, boolean canPitch, boolean canYaw, boolean canRoll) {
-        this.vector3iDir = vector3i;
-        this.canPitch = canPitch;
-        this.canYaw = canYaw;
-        this.canRoll = canRoll;
+    Side(Vector3i vector3i) {
+        this.direction = vector3i;
     }
 
     /**
      * @return The horizontal sides, for iteration
      */
     public static ImmutableList<Side> horizontalSides() {
-        return HORIZONTAL_SIDES;
+        return Y_TANGENT_SIDE;
     }
 
     /**
      * @return The vertical sides, for iteration
      */
     public static ImmutableList<Side> verticalSides() {
-        return VERTICAL_SIDES;
+        return Y_VERTICAL_SIDE;
     }
 
     public static Side inDirection(int x, int y, int z) {
@@ -189,8 +115,10 @@ public enum Side {
      * <b>Warning:</b> Do not change the content of the returned enum set! It will be reflected on all calls to this
      * method.
      *
-     * @return All available sides
+     * @return All available sides'
+     * @deprecated use {@link Side#values()}
      */
+    @Deprecated
     public static EnumSet<Side> getAllSides() {
         return ALL_SIDES;
     }
@@ -201,34 +129,59 @@ public enum Side {
      * @return a normalized vector
      */
     public Vector3ic direction() {
-        return vector3iDir;
+        return direction;
     }
 
     /**
      * @return Whether this is one of the horizontal directions (LEFT, FRONT, RIGHT, BACK).
      */
     public boolean isHorizontal() {
-        return canYaw;
+        switch (this) {
+            case LEFT:
+            case FRONT:
+            case RIGHT:
+            case BACK:
+                return true;
+        }
+        return false;
     }
 
     /**
      * @return Whether this is one of the vertical directions (TOP, BOTTOM).
      */
     public boolean isVertical() {
-        return !canYaw;
+        switch (this) {
+            case TOP:
+            case BOTTOM:
+                return true;
+        }
+        return false;
     }
 
     /**
      * @return The opposite side to this side.
      */
     public Side reverse() {
-        return REVERSE_MAP.get(this);
+        switch (this) {
+            case TOP:
+                return BOTTOM;
+            case BOTTOM:
+                return TOP;
+            case LEFT:
+                return RIGHT;
+            case RIGHT:
+                return LEFT;
+            case FRONT:
+                return BACK;
+            case BACK:
+                return FRONT;
+            default:
+                throw new IllegalStateException("Unexpected value: " + this);
+
+        }
     }
 
     public Side yawClockwise(int turns) {
-        if (!canYaw) {
-            return this;
-        }
         int steps = turns;
         if (steps < 0) {
             steps = -steps + 2;
@@ -236,20 +189,45 @@ public enum Side {
         steps = steps % 4;
         switch (steps) {
             case 1:
-                return CLOCKWISE_YAW_SIDE.get(this);
+                switch (this) {
+                    case FRONT:
+                        return LEFT;
+                    case RIGHT:
+                        return FRONT;
+                    case BACK:
+                        return RIGHT;
+                    case LEFT:
+                        return BACK;
+                }
+                break;
             case 2:
-                return REVERSE_MAP.get(this);
+                switch (this) {
+                    case FRONT:
+                        return BACK;
+                    case RIGHT:
+                        return LEFT;
+                    case BACK:
+                        return FRONT;
+                    case LEFT:
+                        return RIGHT;
+                }
             case 3:
-                return ANTICLOCKWISE_YAW_SIDE.get(this);
-            default:
-                return this;
+                switch (this) {
+                    case FRONT:
+                        return RIGHT;
+                    case RIGHT:
+                        return BACK;
+                    case BACK:
+                        return LEFT;
+                    case LEFT:
+                        return FRONT;
+                }
+                break;
         }
+        return this;
     }
 
     public Side pitchClockwise(int turns) {
-        if (!canPitch) {
-            return this;
-        }
         int steps = turns;
         if (steps < 0) {
             steps = -steps + 2;
@@ -257,24 +235,64 @@ public enum Side {
         steps = steps % 4;
         switch (steps) {
             case 1:
-                return CLOCKWISE_PITCH_SIDE.get(this);
+                switch (this) {
+                    case FRONT:
+                        return TOP;
+                    case BOTTOM:
+                        return FRONT;
+                    case BACK:
+                        return BOTTOM;
+                    case TOP:
+                        return BACK;
+                }
+                break;
             case 2:
-                return REVERSE_MAP.get(this);
+                switch (this) {
+                    case FRONT:
+                        return BACK;
+                    case BOTTOM:
+                        return TOP;
+                    case BACK:
+                        return FRONT;
+                    case TOP:
+                        return BOTTOM;
+                }
             case 3:
-                return ANTICLOCKWISE_PITCH_SIDE.get(this);
-            default:
-                return this;
+                switch (this) {
+                    case FRONT:
+                        return BOTTOM;
+                    case BOTTOM:
+                        return BACK;
+                    case BACK:
+                        return TOP;
+                    case TOP:
+                        return FRONT;
+                }
+                break;
         }
+        return this;
     }
 
     public Direction toDirection() {
-        return CONVERSION_MAP.get(this);
+        switch (this) {
+            case TOP:
+                return Direction.UP;
+            case BOTTOM:
+                return Direction.DOWN;
+            case BACK:
+                return Direction.FORWARD;
+            case FRONT:
+                return Direction.BACKWARD;
+            case RIGHT:
+                return Direction.LEFT;
+            case LEFT:
+                return Direction.RIGHT;
+            default:
+                throw new IllegalStateException("Unexpected value: " + this);
+        }
     }
 
     public Side rollClockwise(int turns) {
-        if (!canRoll) {
-            return this;
-        }
         int steps = turns;
         if (steps < 0) {
             steps = -steps + 2;
@@ -282,14 +300,43 @@ public enum Side {
         steps = steps % 4;
         switch (steps) {
             case 1:
-                return CLOCKWISE_ROLL_SIDE.get(this);
+                switch (this) {
+                    case TOP:
+                        return LEFT;
+                    case LEFT:
+                        return BOTTOM;
+                    case BOTTOM:
+                        return RIGHT;
+                    case RIGHT:
+                        return TOP;
+                }
+                break;
             case 2:
-                return REVERSE_MAP.get(this);
+                switch (this) {
+                    case TOP:
+                        return BOTTOM;
+                    case LEFT:
+                        return RIGHT;
+                    case BOTTOM:
+                        return TOP;
+                    case RIGHT:
+                        return LEFT;
+                }
+                break;
             case 3:
-                return ANTICLOCKWISE_ROLL_SIDE.get(this);
-            default:
-                return this;
+                switch (this) {
+                    case TOP:
+                        return RIGHT;
+                    case LEFT:
+                        return TOP;
+                    case BOTTOM:
+                        return LEFT;
+                    case RIGHT:
+                        return BOTTOM;
+                }
+                break;
         }
+        return this;
     }
 
     /**
@@ -304,22 +351,34 @@ public enum Side {
     }
 
     public Side getRelativeSide(Direction direction) {
-        if (direction == Direction.UP) {
-            return pitchClockwise(1);
-        } else if (direction == Direction.DOWN) {
-            return pitchClockwise(-1);
-        } else if (direction == Direction.LEFT) {
-            return yawClockwise(1);
-        } else if (direction == Direction.RIGHT) {
-            return yawClockwise(-1);
-        } else if (direction == Direction.BACKWARD) {
-            return reverse();
-        } else {
-            return this;
+        switch (direction) {
+            case UP:
+                return pitchClockwise(1);
+            case DOWN:
+                return pitchClockwise(-1);
+            case LEFT:
+                return yawClockwise(1);
+            case RIGHT:
+                return yawClockwise(-1);
+            case BACKWARD:
+                return reverse();
         }
+        return this;
     }
 
     public Iterable<Side> tangents() {
-        return TANGENTS.get(this);
+        switch (this) {
+            case TOP:
+            case BOTTOM:
+                return Y_TANGENT_SIDE;
+            case LEFT:
+            case RIGHT:
+                return Z_TANGENT_SIDE;
+            case FRONT:
+            case BACK:
+                return Y_TANGENT_SIDE;
+            default:
+                throw new IllegalStateException("Unexpected value: " + this);
+        }
     }
 }

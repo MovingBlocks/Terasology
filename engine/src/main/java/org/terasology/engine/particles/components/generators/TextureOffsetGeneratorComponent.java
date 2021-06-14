@@ -32,7 +32,7 @@ public class TextureOffsetGeneratorComponent implements Component {
      *                     <li>(0.0, 0.0) for the leftmost image on the first row</li>
      *                     <li>(0.75, 0.5) for the rightmost image on the second row</li>
      *                     <li>(0.25, 0.0) for the second image on the first row</li>
-     *                     </ul
+     *                     </ul>
      */
     public TextureOffsetGeneratorComponent(final Vector2f[] validOffsets) {
         this.validOffsets = new LinkedList<>();

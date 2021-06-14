@@ -18,9 +18,9 @@ import java.util.Optional;
  * The ModifiableValue type is deserialized from prefabs directly from the corresponding component values.
  * <b>Only</b> the base value is to be specified in the prefabs, this will deserialize into a ModifiableValue type,
  * with set preModifier=0, multiplier=1, postModifier=0.
- * "<field_name>": <base_value>
+ * {@code "<field_name>": <base_value>}
  * It is not recommended to set the modifiers in the prefab but it can be done via an unlabeled array.
- * "<field_name>": [<base_value>, <pre_modifier>, <multiplier>, <post_modifier>]
+ * {@code "<field_name>": [<base_value>, <pre_modifier>, <multiplier>, <post_modifier>]}
  */
 @RegisterTypeHandler
 public class ModifiableValueTypeHandler extends org.terasology.persistence.typeHandling.TypeHandler<ModifiableValue> {

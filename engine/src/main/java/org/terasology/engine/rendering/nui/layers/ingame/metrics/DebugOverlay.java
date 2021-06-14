@@ -32,7 +32,7 @@ import java.util.Locale;
  */
 public class DebugOverlay extends CoreScreenLayer {
 
-    public static double MB_SIZE = 1048576.0;
+    public static final double MB_SIZE = 1048576.0;
 
     @In
     private Config config;

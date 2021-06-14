@@ -525,11 +525,9 @@ public class LwjglCanvasRenderer implements TerasologyCanvasRenderer, PropertyCh
                 int top = offsetY + tileH * tileY;
 
                 float vertLeft =
-                        subDrawRegion.minX + subDrawRegion.getSizeX() * Math.max((float) left / drawRegion.getSizeX()
-                                , 0);
+                        subDrawRegion.minX + subDrawRegion.getSizeX() * Math.max((float) left / drawRegion.getSizeX(), 0);
                 float vertTop =
-                        subDrawRegion.minY + subDrawRegion.getSizeY() * Math.max((float) top / drawRegion.getSizeY(),
-                                0);
+                        subDrawRegion.minY + subDrawRegion.getSizeY() * Math.max((float) top / drawRegion.getSizeY(), 0);
                 float vertRight =
                         subDrawRegion.minX + subDrawRegion.getSizeX() * Math.min((float) (left + tileW) / drawRegion.getSizeX(), 1);
                 float vertBottom =

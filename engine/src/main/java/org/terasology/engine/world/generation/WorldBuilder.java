@@ -350,7 +350,7 @@ public class WorldBuilder extends ProviderStore {
 
                 // Then add this one
                 tryAddRasterizer(orderedRasterizers, rasterizer, providerChains, scalable);
-            } else if (!addedRasterizers.contains(rasterizer.getClass())) {
+            } else {
                 tryAddRasterizer(orderedRasterizers, rasterizer, providerChains, scalable);
                 addedRasterizers.add(rasterizer.getClass());
             }

@@ -66,11 +66,7 @@ public class TypeHandlerLibrary {
         TypeHandlerLibrary.populateBuiltInHandlers(this);
         addTypeHandlerFactory(new CollectionTypeHandlerFactory(constructorLibrary));
     }
-
-
-    /**
-     *
-     */
+    
     public TypeHandlerLibrary(Reflections reflections) {
         this(new ReflectionsSandbox(reflections));
     }

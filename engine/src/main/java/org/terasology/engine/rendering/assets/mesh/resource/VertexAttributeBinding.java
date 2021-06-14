@@ -5,12 +5,13 @@ package org.terasology.engine.rendering.assets.mesh.resource;
 
 /**
  * a binding that maps from a type to a resource where the data is committed to.
- * @param <T>
+ * @param <T> the target object type
+ * @param <I> a class implementing the target object type
  */
-public class VertexAttributeBinding<T, TImpl extends T> extends VertexBinding {
-    private final VertexAttribute<T, TImpl> attribute;
+public class VertexAttributeBinding<T, I extends T> extends VertexBinding {
+    private final VertexAttribute<T, I> attribute;
 
-    public VertexAttributeBinding(VertexResource resource, int offset, VertexAttribute<T, TImpl> attribute) {
+    public VertexAttributeBinding(VertexResource resource, int offset, VertexAttribute<T, I> attribute) {
         super(resource, offset);
         this.attribute = attribute;
     }
@@ -48,7 +49,7 @@ public class VertexAttributeBinding<T, TImpl extends T> extends VertexBinding {
         this.resource.mark();
     }
 
-    public TImpl get(int index, TImpl dest) {
+    public I get(int index, I dest) {
         return attribute.configuration.read(index, this.offset, resource, dest);
     }
 }

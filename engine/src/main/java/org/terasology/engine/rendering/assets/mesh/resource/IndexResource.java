@@ -3,30 +3,32 @@
 
 package org.terasology.engine.rendering.assets.mesh.resource;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * defines the order of vertices to walk for rendering geometry
  *
  * refrence: https://www.khronos.org/opengl/wiki/Primitive
  */
 public class IndexResource extends BufferedResource {
+    public static final Logger logger = LoggerFactory.getLogger(IndexResource.class);
     private int inIndices = 0;
     private int posIndex = 0;
-
-    public int indices() {
-        return inIndices;
-    }
 
     public IndexResource() {
         super();
     }
 
+    public int indices() {
+        return inIndices;
+    }
 
     public void copy(IndexResource resource) {
         copyBuffer(resource);
         this.inSize = resource.inSize;
         this.inIndices = resource.indices();
     }
-
 
     public void reserveElements(int elements) {
         reserve(elements * Integer.BYTES);
@@ -37,31 +39,31 @@ public class IndexResource extends BufferedResource {
     }
 
     public void put(int value) {
-        if (posIndex >= inIndices) {
-            inIndices++;
-            allocateElements(inIndices);
-        }
+        ensureCapacity((posIndex + 1) * Integer.BYTES);
         buffer.putInt(posIndex * Integer.BYTES, value);
         posIndex++;
+        if (posIndex > inIndices) {
+            inIndices = posIndex;
+        }
     }
 
-    public void putAll(int value, int ... values) {
+    public void putAll(int value, int... values) {
         put(value);
-        for (int x = 0; x < values.length; x++) {
-            put(values[x]);
+        for (int i : values) {
+            put(i);
         }
     }
 
 
     public void putAll(int[] values) {
-        for (int x = 0; x < values.length; x++) {
-            put(values[x]);
+        for (int value : values) {
+            put(value);
         }
     }
 
     public void allocateElements(int indices) {
-        allocate(indices * Integer.BYTES);
-        inIndices = indices;
+        int size = indices * Integer.BYTES;
+        allocate(size);
     }
 
     public void position(int position) {

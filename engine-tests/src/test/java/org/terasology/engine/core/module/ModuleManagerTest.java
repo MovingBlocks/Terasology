@@ -5,11 +5,14 @@ package org.terasology.engine.core.module;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.reflections.Reflections;
 import org.terasology.engine.config.flexible.AutoConfig;
 import org.terasology.engine.core.PathManager;
+import org.terasology.engine.core.PathManagerProvider;
 import org.terasology.engine.core.subsystem.EngineSubsystem;
 import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.logic.permission.PermissionSetComponent;
@@ -27,8 +30,11 @@ import java.util.Collections;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.mockito.Mockito.when;
 import static org.terasology.engine.core.TerasologyConstants.ENGINE_MODULE;
 
+@ExtendWith(PathManagerProvider.class)
+@ExtendWith(MockitoExtension.class)
 public class ModuleManagerTest {
 
     ModuleManager manager;
@@ -37,7 +43,8 @@ public class ModuleManagerTest {
 
     /** Configure a ModuleManager with only the <i>engine module.</i> */
     @BeforeEach
-    public void provideEngineModule() {
+    public void provideEngineModule(PathManager pathManager) {
+        when(pathManager.getModulePaths()).thenReturn(Collections.emptyList());
         manager = new ModuleManager("");
         environment = manager.getEnvironment();
         engineModule = environment.get(ENGINE_MODULE);

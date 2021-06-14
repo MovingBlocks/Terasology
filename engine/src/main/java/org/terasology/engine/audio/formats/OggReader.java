@@ -447,10 +447,6 @@ public class OggReader extends FilterInputStream {
         return decodePacket();
     }
 
-    /**
-     * @return
-     * @throws IOException
-     */
     private int getNextPacket() throws IOException {
         // get next packet.
         boolean fetchedPacket = false;
