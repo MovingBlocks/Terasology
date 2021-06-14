@@ -111,7 +111,7 @@ public class TerasologyCanvasImpl extends CanvasImpl implements PropertyChangeLi
     }
 
     public void drawMesh(Mesh mesh, UITextureRegion texture, Rectanglei region, Quaternionfc rotation, Vector3fc offset, float scale) {
-        meshMat.setTexture("texture", ((TextureRegion) texture).getTexture());
+        meshMat.setTexture("tex", ((TextureRegion) texture).getTexture());
         drawMesh(mesh, meshMat, region, rotation, offset, scale);
     }
 
