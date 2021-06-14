@@ -6,19 +6,19 @@
 in vec4 color_gs;
 in vec2 uv;
 
-out vec4 out_color;
-
 uniform bool use_texture = false;
 uniform sampler2D texture_sampler;
 
+layout(location = 0) out vec4 outColor;
+
 void main() {
     if (use_texture) {
-        out_color = texture(texture_sampler, uv);
+        outColor = texture(texture_sampler, uv);
     } else {
-        out_color = color_gs;
+        outColor = color_gs;
     }
 
-    if (out_color.a < 0.01) {
+    if (outColor.a < 0.01) {
         discard;
     }
 }

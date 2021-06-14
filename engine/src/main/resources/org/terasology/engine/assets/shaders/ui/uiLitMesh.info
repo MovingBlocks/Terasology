@@ -1,7 +1,7 @@
 {
     "params": [
         {
-            "name": "texture",
+            "name": "tex",
             "type": "sampler2D"
         }
     ]
