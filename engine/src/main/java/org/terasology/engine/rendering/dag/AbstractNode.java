@@ -616,8 +616,7 @@ public abstract class AbstractNode implements Node {
      * @throws RuntimeException if the material couldn't be resolved through the asset system.
      */
     public static Material getMaterial(ResourceUrn materialUrn) {
-        String materialName = materialUrn.toString();
-        return Assets.getMaterial(materialName).orElseThrow(() ->
-                new RuntimeException("Failed to resolve required asset: '" + materialName + "'"));
+       return Assets.get(materialUrn, Material.class).orElseThrow(() ->
+               new RuntimeException("Failed to resolve required asset: '" + materialUrn.toString() + "'"));
     }
 }
