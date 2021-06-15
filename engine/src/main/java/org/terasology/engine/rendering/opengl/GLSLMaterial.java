@@ -61,6 +61,8 @@ public class GLSLMaterial extends BaseMaterial {
     private DisposalAction disposalAction;
     private MaterialData materialData;
 
+    private final FloatBuffer matrixBuffer = BufferUtils.createFloatBuffer(16);
+
     public GLSLMaterial(ResourceUrn urn, AssetType<?, MaterialData> assetType, MaterialData data,
                         LwjglGraphicsProcessing graphicsProcessing, GLSLMaterial.DisposalAction disposalAction) {
         super(urn, assetType, disposalAction);
@@ -481,12 +483,12 @@ public class GLSLMaterial extends BaseMaterial {
         if (isDisposed()) {
             return;
         }
-        FloatBuffer buffer = BufferUtils.createFloatBuffer(16);
-        value.get(buffer);
+        matrixBuffer.rewind();
+        value.get(matrixBuffer);
         if (currentOnly) {
             enable();
             int id = getUniformLocation(getActiveShaderProgramId(), desc);
-            GL20.glUniformMatrix3fv(id, false, buffer);
+            GL20.glUniformMatrix3fv(id, false, matrixBuffer);
         } else {
             TIntIntIterator it = disposalAction.shaderPrograms.iterator();
             while (it.hasNext()) {
@@ -494,7 +496,7 @@ public class GLSLMaterial extends BaseMaterial {
 
                 GL20.glUseProgram(it.value());
                 int id = getUniformLocation(it.value(), desc);
-                GL20.glUniformMatrix3fv(id, false, buffer);
+                GL20.glUniformMatrix3fv(id, false, matrixBuffer);
             }
 
             restoreStateAfterUniformsSet();
@@ -529,12 +531,12 @@ public class GLSLMaterial extends BaseMaterial {
         if (isDisposed()) {
             return;
         }
-        FloatBuffer buffer = BufferUtils.createFloatBuffer(16);
-        value.get(buffer);
+        matrixBuffer.rewind();
+        value.get(matrixBuffer);
         if (currentOnly) {
             enable();
             int id = getUniformLocation(getActiveShaderProgramId(), desc);
-            GL20.glUniformMatrix4fv(id, false, buffer);
+            GL20.glUniformMatrix4fv(id, false, matrixBuffer);
         } else {
             TIntIntIterator it = disposalAction.shaderPrograms.iterator();
             while (it.hasNext()) {
@@ -542,7 +544,7 @@ public class GLSLMaterial extends BaseMaterial {
 
                 GL20.glUseProgram(it.value());
                 int id = getUniformLocation(it.value(), desc);
-                GL20.glUniformMatrix4fv(id, false, buffer);
+                GL20.glUniformMatrix4fv(id, false, matrixBuffer);
             }
 
             restoreStateAfterUniformsSet();
