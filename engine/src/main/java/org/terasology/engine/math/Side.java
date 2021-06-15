@@ -42,18 +42,26 @@ public enum Side {
         this.direction = vector3i;
     }
 
-    public static byte toByte(Set<Side> sides) {
+    public byte getFlag() {
+        return (byte) (1 << this.ordinal());
+    }
+
+    public static byte toFlags(Set<Side> sides) {
         byte result = 0;
         for (Side side : sides) {
-            result |= (1 << side.ordinal());
+            result |= side.getFlag();
         }
         return result;
     }
 
-    public static byte toByte(Side ... sides) {
+    public static byte reversSides(byte sides) {
+        return (byte) ((sides / 8) + ((sides % 8) * 8));
+    }
+
+    public static byte toFlags(Side ... sides) {
         byte result = 0;
         for (Side side : sides) {
-            result |= (1 << side.ordinal());
+            result |= side.getFlag();
         }
         return result;
     }
@@ -61,21 +69,21 @@ public enum Side {
     public static EnumSet<Side> getSides(final byte data) {
         final EnumSet<Side> result = EnumSet.noneOf(Side.class);
         for (Side side : Side.values()) {
-            if ((data & (1 << side.ordinal())) > 0) {
+            if ((data & side.getFlag()) > 0) {
                 result.add(side);
             }
         }
         return result;
     }
 
-    public static boolean hasSide(byte flags, Side side) {
-        return (flags & (1 << side.ordinal())) > 0;
+    public static boolean hasFlag(byte flags, Side side) {
+        return (flags & side.getFlag()) > 0;
     }
 
-    public static byte addSide(byte flags, Side... sides) {
+    public static byte setFlags(byte flags, Side... sides) {
         byte result = flags;
         for (Side side : sides) {
-            result |= (1 << side.ordinal());
+            result |= side.getFlag();
         }
         return result;
     }

@@ -30,10 +30,12 @@ public final class SideBitFlag {
     private SideBitFlag() {
     }
 
+    @Deprecated
     public static byte getReverse(byte sides) {
         return (byte) ((sides / 8) + ((sides % 8) * 8));
     }
 
+    @Deprecated
     public static byte getSides(Set<Side> sides) {
         byte result = 0;
         for (Side side : sides) {
@@ -42,6 +44,7 @@ public final class SideBitFlag {
         return result;
     }
 
+    @Deprecated
     public static byte getSides(Side... sides) {
         byte result = 0;
         for (Side side : sides) {
@@ -54,10 +57,12 @@ public final class SideBitFlag {
         return result;
     }
 
+    @Deprecated
     public static byte getSide(Side side) {
         return sideBits.get(side);
     }
 
+    @Deprecated
     public static EnumSet<Side> getSides(final byte sidesBit) {
         final List<Side> result = Lists.newArrayList();
         sideBits.forEachEntry(
@@ -71,10 +76,12 @@ public final class SideBitFlag {
         return Sets.newEnumSet(result, Side.class);
     }
 
+    @Deprecated
     public static boolean hasSide(byte sideBit, Side side) {
         return (sideBit & sideBits.get(side)) > 0;
     }
 
+    @Deprecated
     public static byte addSide(byte sideBit, Side... sides) {
         byte result = sideBit;
         for (Side side : sides) {
