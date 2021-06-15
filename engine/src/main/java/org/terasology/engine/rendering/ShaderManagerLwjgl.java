@@ -44,28 +44,8 @@ public class ShaderManagerLwjgl implements ShaderManager {
     public void initShaders() {
         logCapabilities();
         addShaderProgram("default");
-
-        // TODO: Find a better way to do this
-        addShaderProgram("post");
-        addShaderProgram("ssao");
-        addShaderProgram("lightShafts");
-        addShaderProgram("sobel");
-        addShaderProgram("initialPost");
-        addShaderProgram("prePostComposite");
-        addShaderProgram("highPass");
-        addShaderProgram("blur");
-        addShaderProgram("vignette");
-        addShaderProgram("downSampler");
-        addShaderProgram("toneMapping");
-        addShaderProgram("sky");
-        addShaderProgram("chunk");
         addShaderProgram("blockSelection");
         addShaderProgram("particle");
-        addShaderProgram("shadowMap");
-        addShaderProgram("lightBufferPass");
-        addShaderProgram("lightGeometryPass");
-        addShaderProgram("ssaoBlur");
-        addShaderProgram("outputPass");
     }
 
     private void logCapabilities() {

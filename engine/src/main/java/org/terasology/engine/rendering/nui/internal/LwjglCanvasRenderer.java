@@ -320,7 +320,7 @@ public class LwjglCanvasRenderer implements TerasologyCanvasRenderer, PropertyCh
             }
         }
 
-        textureMat.setTexture("texture", ((TextureRegion) texture).getTexture());
+        textureMat.setTexture("tex", ((TextureRegion) texture).getTexture());
         textureMat.setFloat4("color", color.rf(), color.gf(), color.bf(), color.af() * alpha);
 
         textureMat.setMatrix4("projectionMatrix", projMatrix);
@@ -488,7 +488,7 @@ public class LwjglCanvasRenderer implements TerasologyCanvasRenderer, PropertyCh
                 textureArea.minY + uy * textureArea.lengthY());
         textureMat.setFloat2("texSize", uw * textureArea.lengthX(), uh * textureArea.lengthY());
 
-        textureMat.setTexture("texture", ((TextureRegion) texture).getTexture());
+        textureMat.setTexture("tex", ((TextureRegion) texture).getTexture());
         textureMat.setFloat4("color", 1, 1, 1, alpha);
         textureMat.bindTextures();
         mesh.render();

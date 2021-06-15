@@ -1,7 +1,7 @@
 {
     "shader": "engine:font",
     "params": {
-        "texture": "engine:white",
+        "tex": "engine:white",
         "offset": [0.0, 0.0]
     }
 }
