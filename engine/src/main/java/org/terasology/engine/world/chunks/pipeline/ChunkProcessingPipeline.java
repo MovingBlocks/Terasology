@@ -104,14 +104,11 @@ public class ChunkProcessingPipeline {
                     }
                     Vector3ic position = chunk.getPosition();
 
-                    SettableFuture<Chunk> exitFuture = SettableFuture.create();
-                    ChunkProcessingInfo chunkProcessingInfo = new ChunkProcessingInfo(position, exitFuture);
+                    ChunkProcessingInfo chunkProcessingInfo = new ChunkProcessingInfo(position);
                     chunkProcessingInfo.setChunk(chunk);
                     chunkProcessingInfo.nextStage(stages);
                     chunkProcessingInfo.makeChunkTask();
                     chunkProcessingInfoMap.put(position, chunkProcessingInfo);
-
-                    chunkProcessingInfo.setCurrentFuture(CompletableFuture.completedFuture(chunk));
                 }
             }
         } catch (InterruptedException e) {
@@ -145,7 +142,6 @@ public class ChunkProcessingPipeline {
                                 chunkProcessingInfo.makeChunkTask();
                                 anyChanged = true;
                             } else {
-                                chunkProcessingInfo.endProcessing();
                                 cleanup(chunkProcessingInfo);
                             }
                         } catch (Exception e) {
@@ -171,7 +167,6 @@ public class ChunkProcessingPipeline {
                             chunkProcessingInfo.makeChunkTask();
                             anyChanged = true;
                         } else {
-                            chunkProcessingInfo.endProcessing();
                             cleanup(chunkProcessingInfo);
                         }
                     } finally {
@@ -230,13 +225,6 @@ public class ChunkProcessingPipeline {
         ChunkProcessingInfo removed = chunkProcessingInfoMap.remove(pos);
         if (removed == null) {
             return;
-        }
-
-        removed.getExternalFuture().cancel(true);
-
-        Future<Chunk> currentFuture = removed.getCurrentFuture();
-        if (currentFuture != null) {
-            currentFuture.cancel(true);
         }
 
         Chunk chunk = removed.getChunk();
