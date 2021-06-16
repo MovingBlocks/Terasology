@@ -11,8 +11,10 @@ import org.terasology.engine.world.chunks.Chunk;
 
 import java.util.List;
 import java.util.concurrent.Future;
+import java.util.concurrent.locks.ReentrantLock;
 
 public final class ChunkProcessingInfo {
+    public final ReentrantLock lock = new ReentrantLock();
     private final Vector3ic position;
     private final SettableFuture<Chunk> externalFuture;
 

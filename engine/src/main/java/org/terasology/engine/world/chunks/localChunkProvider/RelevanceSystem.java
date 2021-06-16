@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.concurrent.Future;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 /**
@@ -118,6 +119,12 @@ public class RelevanceSystem implements UpdateSubscriberSystem {
         }
     }
 
+    public Stream<Vector3i> neededChunks() {
+        return regions.values()
+                .stream()
+                .flatMap(x -> StreamSupport.stream(x.getNeededChunks().spliterator(), false));
+    }
+
     /**
      * Synchronize region center to entity's position and create/load chunks in that region.
      */
@@ -130,10 +137,9 @@ public class RelevanceSystem implements UpdateSubscriberSystem {
                         Chunk chunk = chunkProvider.getChunk(pos);
                         if (chunk != null) {
                             chunkRelevanceRegion.checkIfChunkIsRelevant(chunk);
-                        } else {
-                            chunkProvider.createOrLoadChunk(pos);
                         }
                     }
+                    chunkProvider.notifyRelevanceChanged();
                     chunkRelevanceRegion.setUpToDate();
                 }
             }
@@ -174,14 +180,11 @@ public class RelevanceSystem implements UpdateSubscriberSystem {
         }
 
         StreamSupport.stream(region.getCurrentRegion().spliterator(), false)
-                .sorted(new PositionRelevanceComparator()) //<-- this is n^2 cost. not sure why this needs to be sorted like this.
                 .forEach(
                         pos -> {
                             Chunk chunk = chunkProvider.getChunk(pos);
                             if (chunk != null) {
                                 region.checkIfChunkIsRelevant(chunk);
-                            } else {
-                                chunkProvider.createOrLoadChunk(pos);
                             }
                         }
                 );
@@ -203,12 +206,12 @@ public class RelevanceSystem implements UpdateSubscriberSystem {
     }
 
     /**
-     * Create comporator for ChunkTasks, which compare by distance from region centers
+     * Create comparator for chunk positions, which compare by distance from region centers
      *
-     * @return Comporator.
+     * @return Comparator.
      */
-    public Comparator<Future<Chunk>> createChunkTaskComporator() {
-        return new ChunkTaskRelevanceComparator();
+    public Comparator<Vector3ic> createChunkPosComparator() {
+        return new PositionRelevanceComparator();
     }
 
     /**
@@ -269,22 +272,6 @@ public class RelevanceSystem implements UpdateSubscriberSystem {
             regionLock.readLock().unlock();
         }
     }
-
-    /**
-     * Compare ChunkTasks by distance from region's centers.
-     */
-    private class ChunkTaskRelevanceComparator implements Comparator<Future<Chunk>> {
-
-        @Override
-        public int compare(Future<Chunk> o1, Future<Chunk> o2) {
-            return score((PositionFuture<?>) o1) - score((PositionFuture<?>) o2);
-        }
-
-        private int score(PositionFuture<?> task) {
-            return RelevanceSystem.this.regionsDistanceScore(task.getPosition());
-        }
-    }
-
 
     /**
      * Compare ChunkTasks by distance from region's centers.
