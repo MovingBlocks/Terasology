@@ -7,7 +7,6 @@ import org.joml.Vector3ic;
 import org.terasology.engine.world.chunks.Chunk;
 
 import java.util.Set;
-import java.util.concurrent.Future;
 
 public interface InitialChunkProvider {
     boolean hasNext();

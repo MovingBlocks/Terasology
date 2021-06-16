@@ -3,33 +3,22 @@
 
 package org.terasology.engine.world.chunks.localChunkProvider;
 
-import com.google.common.collect.Streams;
-import org.joml.Vector3i;
 import org.joml.Vector3ic;
-import org.slf4j.LoggerFactory;
-import org.terasology.engine.persistence.ChunkStore;
-import org.terasology.engine.world.block.Block;
 import org.terasology.engine.world.block.BlockRegion;
 import org.terasology.engine.world.chunks.Chunk;
-import org.terasology.engine.world.chunks.internal.ChunkImpl;
 import org.terasology.engine.world.chunks.internal.ChunkRelevanceRegion;
 import org.terasology.engine.world.chunks.pipeline.InitialChunkProvider;
-import org.terasology.engine.world.generation.impl.EntityBufferImpl;
 
-import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 public class LocalChunkInitialProvider implements InitialChunkProvider {
-    private LocalChunkProvider chunkProvider;
-    private RelevanceSystem relevanceSystem;
+    private final LocalChunkProvider chunkProvider;
+    private final RelevanceSystem relevanceSystem;
 
-    private List<Vector3ic> chunksInRange;
+    private final List<Vector3ic> chunksInRange;
     private BlockRegion[] lastRegions;
 
     public LocalChunkInitialProvider(LocalChunkProvider chunkProvider, RelevanceSystem relevanceSystem) {
