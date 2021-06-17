@@ -96,14 +96,16 @@ public interface BatchPropagator {
                 // x == 0
                 target[y * dimX] = Math.min(source[dimX * (y - 1)], Math.min(source[dimX * (y + 1)], source[1 + dimX * y]));
                 // x == dimX - 1
-                target[dimX - 1 + y * dimX] = Math.min(source[dimX - 1 + dimX * (y - 1)], Math.min(source[dimX - 1 + dimX * (y + 1)], source[dimX - 2 + dimX * y]));
+                target[dimX - 1 + y * dimX] = Math.min(source[dimX - 1 + dimX * (y - 1)],
+                        Math.min(source[dimX - 1 + dimX * (y + 1)], source[dimX - 2 + dimX * y]));
             }
             // x == 0, y == dimY - 1
             target[dimX * (dimY - 1)] = Math.min(source[1 + dimX * (dimY - 1)], source[dimX * (dimY - 2)]);
 
             // 0 < x < dimX - 1; y == dimY - 1
             for (int x = 1; x < dimX - 1; ++x) {
-                target[x + dimX * (dimY - 1)] = Math.min(source[x - 1 + dimX * (dimY - 1)], Math.min(source[x + 1 + dimX * (dimY - 1)], source[x + dimX * (dimY - 2)]));
+                target[x + dimX * (dimY - 1)] = Math.min(source[x - 1 + dimX * (dimY - 1)],
+                        Math.min(source[x + 1 + dimX * (dimY - 1)], source[x + dimX * (dimY - 2)]));
             }
 
             // x == dimX - 1; y == dimY - 1
