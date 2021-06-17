@@ -17,19 +17,22 @@ in vec3 v_normal;
 in vec2 v_uv0;
 in vec4 v_color0;
 
+layout(location = 0) out vec4 outColor;
+layout(location = 1) out vec4 outNormal;
+layout(location = 2) out vec4 outLight;
 
 void main(){
     vec4 color;
 
     if (textured) {
-        color = texture2D(diffuse, v_uv0);
+        color = texture(diffuse, v_uv0);
         color.rgb *= colorOffset.rgb;
-        gl_FragData[0].rgba = color;
+        outColor.rgba = color;
     } else {
         color = vec4(colorOffset.rgb, 1.0);
-        gl_FragData[0].rgba = color;
+        outColor.rgba = color;
     }
 
-    gl_FragData[1].rgba = vec4(v_normal.x / 2.0 + 0.5, v_normal.y / 2.0 + 0.5, v_normal.z / 2.0 + 0.5, 0.0);
-    gl_FragData[2].rgba = vec4(blockLight, sunlight, 0.0, 0.0);
+    outNormal.rgba = vec4(v_normal.x / 2.0 + 0.5, v_normal.y / 2.0 + 0.5, v_normal.z / 2.0 + 0.5, 0.0);
+    outLight.rgba = vec4(blockLight, sunlight, 0.0, 0.0);
 }

@@ -22,11 +22,11 @@ public class VertexResourceBuilder {
      *
      * @param location the index of the attribute binding
      * @param attribute the attribute that describes the binding
-     * @param <T>
-     * @return
+     * @param <T> the target object type
+     * @param <I> a class implementing the target object type
      */
-    public <T, TImpl extends T> VertexAttributeBinding<T, TImpl> add(int location, VertexAttribute<T, TImpl> attribute) {
-        VertexAttributeBinding<T, TImpl> result = new VertexAttributeBinding<T, TImpl>(resource, inStride, attribute);
+    public <T, I extends T> VertexAttributeBinding<T, I> add(int location, VertexAttribute<T, I> attribute) {
+        VertexAttributeBinding<T, I> result = new VertexAttributeBinding<T, I>(resource, inStride, attribute);
         this.definitions.add(new VertexResource.VertexDefinition(location, inStride, attribute));
         inStride += attribute.mapping.size * attribute.count;
         return result;

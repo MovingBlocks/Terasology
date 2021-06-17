@@ -320,7 +320,7 @@ public class LwjglCanvasRenderer implements TerasologyCanvasRenderer, PropertyCh
             }
         }
 
-        textureMat.setTexture("texture", ((TextureRegion) texture).getTexture());
+        textureMat.setTexture("tex", ((TextureRegion) texture).getTexture());
         textureMat.setFloat4("color", color.rf(), color.gf(), color.bf(), color.af() * alpha);
 
         textureMat.setMatrix4("projectionMatrix", projMatrix);
@@ -488,7 +488,7 @@ public class LwjglCanvasRenderer implements TerasologyCanvasRenderer, PropertyCh
                 textureArea.minY + uy * textureArea.lengthY());
         textureMat.setFloat2("texSize", uw * textureArea.lengthX(), uh * textureArea.lengthY());
 
-        textureMat.setTexture("texture", ((TextureRegion) texture).getTexture());
+        textureMat.setTexture("tex", ((TextureRegion) texture).getTexture());
         textureMat.setFloat4("color", 1, 1, 1, alpha);
         textureMat.bindTextures();
         mesh.render();
@@ -525,11 +525,9 @@ public class LwjglCanvasRenderer implements TerasologyCanvasRenderer, PropertyCh
                 int top = offsetY + tileH * tileY;
 
                 float vertLeft =
-                        subDrawRegion.minX + subDrawRegion.getSizeX() * Math.max((float) left / drawRegion.getSizeX()
-                                , 0);
+                        subDrawRegion.minX + subDrawRegion.getSizeX() * Math.max((float) left / drawRegion.getSizeX(), 0);
                 float vertTop =
-                        subDrawRegion.minY + subDrawRegion.getSizeY() * Math.max((float) top / drawRegion.getSizeY(),
-                                0);
+                        subDrawRegion.minY + subDrawRegion.getSizeY() * Math.max((float) top / drawRegion.getSizeY(), 0);
                 float vertRight =
                         subDrawRegion.minX + subDrawRegion.getSizeX() * Math.min((float) (left + tileW) / drawRegion.getSizeX(), 1);
                 float vertBottom =

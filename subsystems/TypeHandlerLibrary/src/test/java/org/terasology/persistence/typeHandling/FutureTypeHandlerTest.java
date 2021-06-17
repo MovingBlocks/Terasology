@@ -27,7 +27,7 @@ public class FutureTypeHandlerTest {
     private final TypeHandlerLibrary typeHandlerLibrary =
             Mockito.spy(new TypeHandlerLibrary(reflections));
 
-    private static class RecursiveType<T> {
+    private static final class RecursiveType<T> {
         final T data;
         final List<RecursiveType<T>> children;
 

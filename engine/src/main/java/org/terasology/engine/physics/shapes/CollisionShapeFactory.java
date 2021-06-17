@@ -33,7 +33,7 @@ public interface CollisionShapeFactory {
      * @return The created unit cube box shape.
      */
     default BoxShape getNewUnitCube() {
-        return getNewBox(new Vector3f(1,1,1));
+        return getNewBox(new Vector3f(1, 1, 1));
     }
 
     /**

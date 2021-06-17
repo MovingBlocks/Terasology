@@ -476,7 +476,7 @@ public final class WorldRendererImpl implements WorldRenderer {
      * Acts as an interface between the console and the Nodes. All parameters passed to command are redirected to the
      * concerned Nodes, which in turn take care of executing them.
      * <p>
-     * Usage: dagNodeCommand <nodeUri> <command> <parameters>
+     * Usage: {@code dagNodeCommand <nodeUri> <command> <parameters>}
      * <p>
      * Example: dagNodeCommand engine:outputToScreenNode setFbo engine:fbo.ssao
      */
@@ -497,7 +497,7 @@ public final class WorldRendererImpl implements WorldRenderer {
     /**
      * Redirect output FBO from one node to another's input
      * <p>
-     * Usage: dagRedirect <connectionTypeString> <fromNodeUri> <outputFboId> <toNodeUri> <inputFboId>
+     * Usage: {@code dagRedirect <connectionTypeString> <fromNodeUri> <outputFboId> <toNodeUri> <inputFboId>}
      * <p>
      * Example: dagRedirect fbo blurredAmbientOcclusion 1 BasicRendering:outputToScreenNode 1 dagRedirect bufferpair
      * backdrop 1 AdvancedRendering:intermediateHazeNode 1

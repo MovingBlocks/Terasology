@@ -15,6 +15,12 @@ public class VertexResource extends BufferedResource {
 
     }
 
+    public VertexResource(int inSize, int inStride, VertexDefinition[] attributes) {
+        ensureCapacity(inSize);
+        this.inStride = inStride;
+        this.attributes = attributes;
+    }
+
     /**
      * the number of elements in the vertex resource / verticies
      * @return the number of verts
@@ -37,12 +43,6 @@ public class VertexResource extends BufferedResource {
      */
     public void setDefinitions(VertexDefinition[] attr) {
         this.attributes = attr;
-    }
-
-    public VertexResource(int inSize, int inStride, VertexDefinition[] attributes) {
-        ensureCapacity(inSize);
-        this.inStride = inStride;
-        this.attributes = attributes;
     }
 
     /**

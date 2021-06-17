@@ -11,26 +11,27 @@ import org.terasology.engine.core.GameThread;
 import org.terasology.engine.core.subsystem.lwjgl.LwjglGraphicsProcessing;
 import org.terasology.engine.rendering.assets.mesh.Mesh;
 import org.terasology.engine.rendering.assets.mesh.MeshData;
+import org.terasology.engine.rendering.assets.mesh.resource.AllocationType;
+import org.terasology.engine.rendering.assets.mesh.resource.DrawingMode;
 import org.terasology.engine.rendering.assets.mesh.resource.IndexResource;
 import org.terasology.engine.rendering.assets.mesh.resource.VertexAttributeBinding;
-import org.terasology.engine.rendering.assets.mesh.resource.VertexResource;
 import org.terasology.gestalt.assets.AssetType;
 import org.terasology.gestalt.assets.DisposableResource;
 import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.joml.geom.AABBf;
 import org.terasology.joml.geom.AABBfc;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import static org.lwjgl.opengl.GL11.GL_UNSIGNED_INT;
 
 public class OpenGLMesh extends Mesh implements OpenGLMeshBase {
     private static final Logger logger = LoggerFactory.getLogger(OpenGLMesh.class);
     private AABBf aabb = new AABBf();
-    private MeshData data;
     private int indexCount;
     private DisposalAction disposalAction;
+    private DrawingMode drawMode;
+    private AllocationType allocationType;
+
+    private  VertexAttributeBinding<Vector3fc, Vector3f> positions;
 
     private VBOContext state = null;
 
@@ -64,12 +65,12 @@ public class OpenGLMesh extends Mesh implements OpenGLMeshBase {
 
     @Override
     public VertexAttributeBinding<Vector3fc, Vector3f> vertices() {
-        return data.positions();
+        return positions;
     }
 
     @Override
     public int elementCount() {
-        return data.positions().getResource().elements();
+        return positions.elements();
     }
 
 
@@ -78,7 +79,7 @@ public class OpenGLMesh extends Mesh implements OpenGLMeshBase {
         if (!isDisposed()) {
             updateState(state);
             GL30.glBindVertexArray(disposalAction.vao);
-            GL30.glDrawElements(data.getMode().glCall, this.indexCount, GL_UNSIGNED_INT, 0);
+            GL30.glDrawElements(drawMode.glCall, this.indexCount, GL_UNSIGNED_INT, 0);
             GL30.glBindVertexArray(0);
         } else {
             logger.error("Attempted to render disposed mesh: {}", getUrn());
@@ -87,25 +88,18 @@ public class OpenGLMesh extends Mesh implements OpenGLMeshBase {
 
 
     private void buildMesh(MeshData newData) {
-        this.data = newData;
-
-        this.disposalAction.dispose();
-
-        this.disposalAction.vao = GL30.glGenVertexArrays();
-        this.disposalAction.vbo = GL30.glGenBuffers();
-        this.disposalAction.ebo = GL30.glGenBuffers();
-
-        GL30.glBindVertexArray(this.disposalAction.vao);
-
-        VertexResource[] resources = newData.vertexResources();
-        List<VertexResource> targets = new ArrayList<>();
-        for (VertexResource vertexResource : resources) {
-            if (vertexResource.inSize() > 0) {
-                targets.add(vertexResource);
-            }
+        if (this.disposalAction.vao == 0) {
+            this.disposalAction.vao = GL30.glGenVertexArrays();
+            this.disposalAction.vbo = GL30.glGenBuffers();
+            this.disposalAction.ebo = GL30.glGenBuffers();
         }
 
-        this.state = buildVBO(this.disposalAction.vbo, GL30.GL_STATIC_DRAW, targets);
+        allocationType = newData.allocationType();
+        drawMode = newData.getMode();
+
+        GL30.glBindVertexArray(this.disposalAction.vao);
+        positions = newData.positions();
+        this.state = buildVBO(this.disposalAction.vbo, allocationType, newData.vertexResources());
 
         IndexResource indexResource = newData.indexResource();
         this.indexCount = indexResource.indices();

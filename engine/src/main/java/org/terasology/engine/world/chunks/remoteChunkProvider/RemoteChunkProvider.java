@@ -197,7 +197,7 @@ public class RemoteChunkProvider implements ChunkProvider {
         this.worldEntity = entity;
     }
 
-    private class LocalPlayerRelativeChunkComparator implements Comparator<Future<Chunk>> {
+    private final class LocalPlayerRelativeChunkComparator implements Comparator<Future<Chunk>> {
         private final LocalPlayer localPlayer;
 
         private LocalPlayerRelativeChunkComparator(LocalPlayer localPlayer) {
