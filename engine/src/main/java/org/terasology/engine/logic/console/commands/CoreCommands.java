@@ -25,6 +25,7 @@ import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
 import org.terasology.engine.entitySystem.systems.RegisterSystem;
 import org.terasology.engine.i18n.TranslationProject;
 import org.terasology.engine.i18n.TranslationSystem;
+import org.terasology.engine.logic.console.AnimalSpawnEvent;
 import org.terasology.engine.logic.console.Console;
 import org.terasology.engine.logic.console.ConsoleColors;
 import org.terasology.engine.logic.console.commandSystem.ConsoleCommand;
@@ -531,7 +532,7 @@ public class CoreCommands extends BaseComponentSystem {
         return Assets.getPrefab(prefabName).map(prefab -> {
             LocationComponent loc = prefab.getComponent(LocationComponent.class);
             if (loc != null) {
-                entityManager.create(prefab, spawnPos);
+                entityManager.create(prefab, spawnPos).send(new AnimalSpawnEvent());
                 return "Done";
             } else {
                 return "Prefab cannot be spawned (no location component)";
