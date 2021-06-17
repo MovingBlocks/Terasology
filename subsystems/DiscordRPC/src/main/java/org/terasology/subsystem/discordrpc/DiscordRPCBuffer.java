@@ -6,8 +6,9 @@ package org.terasology.subsystem.discordrpc;
 import java.time.OffsetDateTime;
 
 /**
- * A threaded-safe shared buffer used to store information for {@link DiscordRPCThread} to be processed as {@link com.jagrosh.discordipc.entities.RichPresence}
- *
+ * A threaded-safe shared buffer used to store information for {@link DiscordRPCThread} to be processed as {@link
+ * com.jagrosh.discordipc.entities.RichPresence}
+ * <p>
  * It helps avoiding allocating unnecessary objects for the rich presence.
  */
 public final class DiscordRPCBuffer {

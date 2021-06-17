@@ -24,8 +24,8 @@ import org.terasology.engine.registry.In;
 import java.time.OffsetDateTime;
 
 /**
- * It's a system that runs when a single player or multi player game has been started to process some stuff throw the
- * {@link DiscordRPCSubSystem}.
+ * It's a system that runs when a single player or multi player game has been started to process some stuff throw the {@link
+ * DiscordRPCSubSystem}.
  *
  * @see DiscordRPCSubSystem
  */
@@ -87,7 +87,7 @@ public final class DiscordRPCSystem extends BaseComponentSystem {
     }
 
     /**
-     *  Adds the periodic action when the player is hosting or playing online to update party size
+     * Adds the periodic action when the player is hosting or playing online to update party size
      */
     @ReceiveEvent
     public void onPlayerInitialized(LocalPlayerInitializedEvent event, EntityRef localPlayer) {
@@ -98,7 +98,8 @@ public final class DiscordRPCSystem extends BaseComponentSystem {
             if (mode.isAuthority()) {
                 delayManager.addPeriodicAction(localPlayer, UPDATE_PARTY_SIZE_ID, 0, UPDATE_PARTY_SIZE_PERIOD);
             } else {
-                logger.warn("The 'DelayManager' is not available on non-authority system. Not scheduling '{}' periodic action. See #4742.", UPDATE_PARTY_SIZE_ID);
+                logger.warn("The 'DelayManager' is not available on non-authority system. Not scheduling '{}' periodic action. " +
+                        "See #4742.", UPDATE_PARTY_SIZE_ID);
             }
         }
     }
