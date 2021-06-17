@@ -13,13 +13,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.monitoring.ThreadActivity;
 import org.terasology.engine.monitoring.ThreadMonitor;
-import org.terasology.engine.world.chunks.pipeline.stages.ChunkTask;
-import org.terasology.engine.world.chunks.pipeline.stages.ChunkTaskProvider;
 import org.terasology.engine.utilities.ReflectionUtil;
 import org.terasology.engine.world.chunks.Chunk;
+import org.terasology.engine.world.chunks.pipeline.stages.ChunkTask;
+import org.terasology.engine.world.chunks.pipeline.stages.ChunkTaskProvider;
 
 import java.util.Comparator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -301,8 +300,8 @@ public class ChunkProcessingPipeline {
      *
      * @return copy of processing positions
      */
-    public List<Vector3ic> getProcessingPosition() {
-        return new LinkedList<>(chunkProcessingInfoMap.keySet());
+    public Iterable<Vector3ic> getProcessingPosition() {
+        return chunkProcessingInfoMap.keySet();
     }
 
     /**
