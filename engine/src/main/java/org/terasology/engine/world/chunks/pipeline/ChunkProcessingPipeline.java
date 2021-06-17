@@ -68,9 +68,7 @@ public class ChunkProcessingPipeline {
 
     private void stopPoolThreads() {
         shouldStop.set(true);
-        for (Thread thread : poolThreads) {
-            thread.interrupt();
-        }
+        notifyUpdate();
     }
 
     private void runPoolThread() {
@@ -85,17 +83,19 @@ public class ChunkProcessingPipeline {
 
                 // But if there aren't any chunks that can advance to the next stage right now, start some new chunks
                 for (int i = 0; i < NUM_CHUNKS_AT_ONCE; i++) {
-                    Chunk chunk;
+                    Chunk chunk = null;
                     synchronized (initialChunkProvider) {
-                        if (!initialChunkProvider.hasNext()) {
-                            synchronized (waitForNewChunks) {
-                                waitForNewChunks.wait();
-                            }
-                            continue;
+                        if (initialChunkProvider.hasNext()) {
+                            chunk = initialChunkProvider.next(chunkProcessingInfoMap.keySet());
                         }
-                        chunk = initialChunkProvider.next(chunkProcessingInfoMap.keySet());
                     }
                     if (chunk == null) {
+                        if (shouldStop.get()) {
+                            break;
+                        }
+                        synchronized (waitForNewChunks) {
+                            waitForNewChunks.wait();
+                        }
                         continue;
                     }
                     Vector3ic position = chunk.getPosition();
