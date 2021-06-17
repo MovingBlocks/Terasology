@@ -3,6 +3,7 @@
 
 package org.terasology.engine.world.chunks.pipeline;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.joml.Vector3i;
@@ -235,7 +236,7 @@ class ChunkProcessingPipelineTest extends TerasologyTestingEnvironment {
             Assertions.assertTrue(Sets.difference(Sets.newHashSet(pipeline.getProcessingPosition()), relativeRegion).isEmpty(),
                     "We must haven't chunks in processing not related to relativeRegion");
 
-            Assertions.assertTrue(relativeRegion.containsAll(pipeline.getProcessingPosition()),
+            Assertions.assertTrue(relativeRegion.containsAll(Lists.newArrayList(pipeline.getProcessingPosition())),
                     "No non-relative chunks should be processing");
 
             Thread.sleep(new Random().nextInt(500)); //think time
