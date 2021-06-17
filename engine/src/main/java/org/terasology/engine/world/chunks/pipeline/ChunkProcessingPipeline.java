@@ -60,6 +60,9 @@ public class ChunkProcessingPipeline {
         }
     }
 
+    /**
+     * Notify the pipeline that new chunks are available, so if any worker threads were suspended, they should be resumed.
+     */
     public void notifyUpdate() {
         synchronized (waitForNewChunks) {
             waitForNewChunks.notifyAll();

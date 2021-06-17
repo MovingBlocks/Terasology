@@ -8,8 +8,15 @@ import org.terasology.engine.world.chunks.Chunk;
 
 import java.util.Set;
 
+/**
+ * An InitialChunkProvider provides input chunks to the ChunkProcessingPipeline.
+ */
 public interface InitialChunkProvider {
     boolean hasNext();
 
+    /**
+     * @param currentlyGenerating the set of chunks which are currently being processed.
+     *  This lets the InitialChunkProvider discard those chunks before trying to generate them at all.
+     */
     Chunk next(Set<Vector3ic> currentlyGenerating);
 }
