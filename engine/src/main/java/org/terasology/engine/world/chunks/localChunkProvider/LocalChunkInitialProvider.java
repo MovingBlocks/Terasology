@@ -57,7 +57,7 @@ public class LocalChunkInitialProvider implements InitialChunkProvider {
     }
 
     @Override
-    public boolean hasNext() {
+    public synchronized boolean hasNext() {
         if (checkForUpdate()) {
             updateList();
         }
@@ -67,7 +67,10 @@ public class LocalChunkInitialProvider implements InitialChunkProvider {
     @Override
     public Chunk next(Set<Vector3ic> currentlyGenerating) {
         while (hasNext()) {
-            Vector3ic pos = chunksInRange.remove(chunksInRange.size() - 1);
+            Vector3ic pos;
+            synchronized (this) {
+                pos = chunksInRange.remove(chunksInRange.size() - 1);
+            }
             if (currentlyGenerating.contains(pos)) {
                 continue;
             }

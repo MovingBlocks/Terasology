@@ -10,6 +10,7 @@ import java.util.Set;
 
 /**
  * An InitialChunkProvider provides input chunks to the ChunkProcessingPipeline.
+ * All methods should be able to be called by multiple threads simultaneously, taking care of any necessary synchronization themselves.
  */
 public interface InitialChunkProvider {
     boolean hasNext();

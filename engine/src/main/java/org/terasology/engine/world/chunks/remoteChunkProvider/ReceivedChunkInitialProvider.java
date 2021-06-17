@@ -29,7 +29,7 @@ public class ReceivedChunkInitialProvider implements InitialChunkProvider {
     }
 
     @Override
-    public Chunk next(Set<Vector3ic> currentlyGenerating) {
+    public synchronized Chunk next(Set<Vector3ic> currentlyGenerating) {
         return chunkQueue.poll();
     }
 }

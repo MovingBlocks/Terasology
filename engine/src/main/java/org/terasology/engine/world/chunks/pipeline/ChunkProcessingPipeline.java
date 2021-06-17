@@ -87,10 +87,8 @@ public class ChunkProcessingPipeline {
                 // But if there aren't any chunks that can advance to the next stage right now, start some new chunks
                 for (int i = 0; i < NUM_CHUNKS_AT_ONCE; i++) {
                     Chunk chunk = null;
-                    synchronized (initialChunkProvider) {
-                        if (initialChunkProvider.hasNext()) {
-                            chunk = initialChunkProvider.next(chunkProcessingInfoMap.keySet());
-                        }
+                    if (initialChunkProvider.hasNext()) {
+                        chunk = initialChunkProvider.next(chunkProcessingInfoMap.keySet());
                     }
                     if (chunk == null) {
                         if (shouldStop.get()) {
