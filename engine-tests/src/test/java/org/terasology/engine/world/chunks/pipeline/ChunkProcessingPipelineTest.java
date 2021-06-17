@@ -171,7 +171,8 @@ class ChunkProcessingPipelineTest extends TerasologyTestingEnvironment {
         pipeline = new ChunkProcessingPipeline(chunkCache::get, (o1, o2) -> {
             if (position.get() != null) {
                 Vector3ic entityPos = position.get();
-                return (int) (entityPos.distance(((PositionFuture<?>) o1).getPosition()) - entityPos.distance(((PositionFuture<?>) o2).getPosition()));
+                return (int) (entityPos.distance(((PositionFuture<?>) o1).getPosition())
+                            - entityPos.distance(((PositionFuture<?>) o2).getPosition()));
             }
             return 0;
         });
