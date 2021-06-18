@@ -109,7 +109,7 @@ class LocalChunkProviderTest {
         Vector3i chunkPosition = new Vector3i(0, 0, 0);
         requestCreatingOrLoadingArea(chunkPosition);
         chunkProvider.notifyRelevanceChanged();
-        Thread.sleep(WAIT_CHUNK_IS_READY_IN_SECONDS * 1000);
+        chunkProvider.waitUntilGenerated(WAIT_CHUNK_IS_READY_IN_SECONDS * 1000);
         chunkProvider.update();
 
         final ArgumentCaptor<Event> eventArgumentCaptor = ArgumentCaptor.forClass(Event.class);
@@ -140,7 +140,7 @@ class LocalChunkProviderTest {
         blockAtBlockManager.setEntity(mock(EntityRef.class));
         requestCreatingOrLoadingArea(chunkPosition);
         chunkProvider.notifyRelevanceChanged();
-        Thread.sleep(WAIT_CHUNK_IS_READY_IN_SECONDS * 1000);
+        chunkProvider.waitUntilGenerated(WAIT_CHUNK_IS_READY_IN_SECONDS * 1000);
         chunkProvider.update();
 
         final ArgumentCaptor<Event> worldEventCaptor = ArgumentCaptor.forClass(Event.class);
@@ -184,7 +184,7 @@ class LocalChunkProviderTest {
 
         requestCreatingOrLoadingArea(chunkPosition);
         chunkProvider.notifyRelevanceChanged();
-        Thread.sleep(WAIT_CHUNK_IS_READY_IN_SECONDS * 1000);
+        chunkProvider.waitUntilGenerated(WAIT_CHUNK_IS_READY_IN_SECONDS * 1000);
         chunkProvider.update();
 
         Assertions.assertTrue(((TestChunkStore) storageManager.loadChunkStore(chunkPosition)).isEntityRestored(),
@@ -211,7 +211,7 @@ class LocalChunkProviderTest {
 
         requestCreatingOrLoadingArea(chunkPosition);
         chunkProvider.notifyRelevanceChanged();
-        Thread.sleep(WAIT_CHUNK_IS_READY_IN_SECONDS * 1000);
+        chunkProvider.waitUntilGenerated(WAIT_CHUNK_IS_READY_IN_SECONDS * 1000);
         chunkProvider.update();
 
         Assertions.assertTrue(((TestChunkStore) storageManager.loadChunkStore(chunkPosition)).isEntityRestored(),
@@ -256,11 +256,11 @@ class LocalChunkProviderTest {
 
         requestCreatingOrLoadingArea(chunkPosition);
         chunkProvider.notifyRelevanceChanged();
-        Thread.sleep(WAIT_CHUNK_IS_READY_IN_SECONDS * 1000);
+        chunkProvider.waitUntilGenerated(WAIT_CHUNK_IS_READY_IN_SECONDS * 1000);
         relevanceSystem.removeRelevanceEntity(playerEntity);
         chunkProvider.notifyRelevanceChanged();
 
-        //Wait BeforeDeactivateBlocks event
+        // Wait for BeforeDeactivateBlocks event
         Assertions.assertTimeoutPreemptively(Duration.of(WAIT_CHUNK_IS_READY_IN_SECONDS, ChronoUnit.SECONDS),
                 () -> {
                     ArgumentCaptor<Event> blockEventCaptor = ArgumentCaptor.forClass(Event.class);

@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 
 /**
@@ -33,8 +34,17 @@ public class ChunkProcessingPipeline {
     private static final int NUM_CHUNKS_AT_ONCE = 8;
     private static final Logger logger = LoggerFactory.getLogger(ChunkProcessingPipeline.class);
 
+    /**
+     * This object can be `wait`ed on, and will notify all waiting threads when the provider is done generating chunks.
+     * It's mostly meant for testing.
+     */
+    private final Object doneGeneratingSignal = new Object();
+    private final AtomicInteger numAliveThreads = new AtomicInteger(0);
+    /**
+     * Another signal object, used to tell worker threads when new chunks become available.
+     */
+    private final Object newChunksSignal = new Object();
     private final InitialChunkProvider initialChunkProvider;
-    private final Object waitForNewChunks = new Object();
     private final AtomicBoolean shouldStop = new AtomicBoolean(false);
 
     private final List<ChunkTaskProvider> stages = Lists.newArrayList();
@@ -62,8 +72,8 @@ public class ChunkProcessingPipeline {
      * Notify the pipeline that new chunks are available, so if any worker threads were suspended, they should be resumed.
      */
     public void notifyUpdate() {
-        synchronized (waitForNewChunks) {
-            waitForNewChunks.notifyAll();
+        synchronized (newChunksSignal) {
+            newChunksSignal.notifyAll();
         }
     }
 
@@ -72,8 +82,18 @@ public class ChunkProcessingPipeline {
         notifyUpdate();
     }
 
+    /**
+     * Wait until this pipeline is done generating and processing chunks, or timeoutMillis milliseconds, whichever is earlier.
+     */
+    public void waitUntilDone(long timeoutMillis) throws InterruptedException {
+        synchronized (doneGeneratingSignal) {
+            doneGeneratingSignal.wait(timeoutMillis);
+        }
+    }
+
     private void runPoolThread() {
         Preconditions.checkState(!stages.isEmpty(), "ChunkProcessingPipeline must have at least one stage");
+        numAliveThreads.incrementAndGet();
 
         try {
             while (!shouldStop.get()) {
@@ -86,12 +106,23 @@ public class ChunkProcessingPipeline {
                 for (int i = 0; i < NUM_CHUNKS_AT_ONCE; i++) {
                     Optional<Chunk> chunk = initialChunkProvider.next(chunkProcessingInfoMap.keySet());
                     if (chunk.isEmpty()) {
+                        // If i > 0, then this thread started some chunks earlier, so it's not done until they're processed
+                        if (i > 0) {
+                            continue;
+                        }
                         if (shouldStop.get()) {
                             break;
                         }
-                        synchronized (waitForNewChunks) {
-                            waitForNewChunks.wait();
+                        // Don't signal that generation is done until all threads are done
+                        if (numAliveThreads.decrementAndGet() == 0) {
+                            synchronized (doneGeneratingSignal) {
+                                doneGeneratingSignal.notifyAll();
+                            }
                         }
+                        synchronized (newChunksSignal) {
+                            newChunksSignal.wait();
+                        }
+                        numAliveThreads.incrementAndGet();
                         continue;
                     }
                     Vector3ic position = chunk.get().getPosition();
@@ -105,6 +136,8 @@ public class ChunkProcessingPipeline {
             }
         } catch (InterruptedException e) {
             logger.warn("Chunk processing thread interrupted");
+        } finally {
+            numAliveThreads.decrementAndGet();
         }
     }
 

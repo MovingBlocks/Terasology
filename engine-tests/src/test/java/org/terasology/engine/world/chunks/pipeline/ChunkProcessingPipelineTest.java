@@ -47,6 +47,10 @@ class ChunkProcessingPipelineTest extends TerasologyTestingEnvironment {
     private final ExtraBlockDataManager extraDataManager = new ExtraBlockDataManager();
     private ChunkProcessingPipeline pipeline;
 
+    void waitUntilDone() throws InterruptedException {
+        pipeline.waitUntilDone(5000);
+    }
+
     @Test
     void simpleProcessingSuccess() throws InterruptedException {
         ReceivedInitialChunkProvider initialProvider = new ReceivedInitialChunkProvider((o1, o2) -> 0);
@@ -62,7 +66,7 @@ class ChunkProcessingPipelineTest extends TerasologyTestingEnvironment {
         initialProvider.submit(chunk);
         pipeline.start();
 
-        Thread.sleep(1000);
+        waitUntilDone();
         Chunk chunkAfterProcessing = result.get(0);
 
         Assertions.assertEquals(chunkAfterProcessing.getPosition(), chunk.getPosition(),
@@ -124,7 +128,7 @@ class ChunkProcessingPipelineTest extends TerasologyTestingEnvironment {
         initialProvider.submit(chunk);
         pipeline.start();
 
-        Thread.sleep(1000);
+        waitUntilDone();
         Chunk chunkAfterProcessing = result.get(0);
 
         Assertions.assertEquals(chunkAfterProcessing.getPosition(), chunk.getPosition(),
@@ -162,14 +166,14 @@ class ChunkProcessingPipelineTest extends TerasologyTestingEnvironment {
         initialProvider.submit(chunk);
         pipeline.start();
 
-        Thread.sleep(1_000); // sleep 1 second, and check result.
+        waitUntilDone();
         Assertions.assertTrue(result.isEmpty(), "Chunk must be not generated, because the ChunkTask's requirements don't exist");
 
         chunkToGenerate.forEach((position, neighborChunk) -> initialProvider.submit(neighborChunk));
         pipeline.notifyUpdate();
 
-        Thread.sleep(1000);
-        Assertions.assertEquals(result.size(), 1, "Only one chunk has its requirements fulfilled");
+        waitUntilDone();
+        Assertions.assertEquals(1, result.size(), "Only one chunk has its requirements fulfilled");
         Chunk chunkAfterProcessing = result.get(0);
 
         Assertions.assertEquals(chunkAfterProcessing.getPosition(), chunk.getPosition(),
@@ -225,6 +229,7 @@ class ChunkProcessingPipelineTest extends TerasologyTestingEnvironment {
             );
 
             pipeline.notifyUpdate();
+            Thread.sleep(100);
 
             relativeRegion = newRegion;
 

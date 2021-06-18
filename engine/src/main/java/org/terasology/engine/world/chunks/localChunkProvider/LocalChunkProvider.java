@@ -117,6 +117,13 @@ public class LocalChunkProvider implements ChunkProvider {
     }
 
     /**
+     * Wait until the pipeline is done generating and processing chunks, for use in tests.
+     */
+    protected void waitUntilGenerated(long timeoutMillis) throws InterruptedException {
+        loadingPipeline.waitUntilDone(timeoutMillis);
+    }
+
+    /**
      * Load a chunk from disk or generate it, so that it's ready for processing in the chunk processing pipeline.
      * This method is called from the chunk processing worker threads.
      */
