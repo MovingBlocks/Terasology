@@ -15,13 +15,12 @@ import org.terasology.engine.world.chunks.Chunk;
 import org.terasology.engine.world.chunks.pipeline.stages.ChunkTask;
 import org.terasology.engine.world.chunks.pipeline.stages.ChunkTaskProvider;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 /**
  * Manages execution of chunk processing.
@@ -30,13 +29,12 @@ import java.util.stream.Collectors;
  */
 public class ChunkProcessingPipeline {
 
-    private static final int NUM_TASK_THREADS = 4;
+    private static final int NUM_TASK_THREADS = 2;
     private static final int NUM_CHUNKS_AT_ONCE = 8;
     private static final Logger logger = LoggerFactory.getLogger(ChunkProcessingPipeline.class);
 
     private final InitialChunkProvider initialChunkProvider;
     private final Object waitForNewChunks = new Object();
-    private final Thread[] poolThreads = new Thread[NUM_TASK_THREADS];
     private final AtomicBoolean shouldStop = new AtomicBoolean(false);
 
     private final List<ChunkTaskProvider> stages = Lists.newArrayList();
@@ -53,10 +51,10 @@ public class ChunkProcessingPipeline {
 
     public void start() {
         for (int i = 0; i < NUM_TASK_THREADS; i++) {
-            poolThreads[i] = new Thread(this::runPoolThread);
-            poolThreads[i].setDaemon(true);
-            poolThreads[i].setName("Chunk-Processing-" + i);
-            poolThreads[i].start();
+            Thread worker = new Thread(this::runPoolThread);
+            worker.setDaemon(true);
+            worker.setName("Chunk-Processing-" + i);
+            worker.start();
         }
     }
 
@@ -75,7 +73,7 @@ public class ChunkProcessingPipeline {
     }
 
     private void runPoolThread() {
-        Preconditions.checkState(!stages.isEmpty(), "ChunkProcessingPipeline must to have at least one stage");
+        Preconditions.checkState(!stages.isEmpty(), "ChunkProcessingPipeline must have at least one stage");
 
         try {
             while (!shouldStop.get()) {
@@ -86,11 +84,8 @@ public class ChunkProcessingPipeline {
 
                 // But if there aren't any chunks that can advance to the next stage right now, start some new chunks
                 for (int i = 0; i < NUM_CHUNKS_AT_ONCE; i++) {
-                    Chunk chunk = null;
-                    if (initialChunkProvider.hasNext()) {
-                        chunk = initialChunkProvider.next(chunkProcessingInfoMap.keySet());
-                    }
-                    if (chunk == null) {
+                    Optional<Chunk> chunk = initialChunkProvider.next(chunkProcessingInfoMap.keySet());
+                    if (chunk.isEmpty()) {
                         if (shouldStop.get()) {
                             break;
                         }
@@ -99,17 +94,17 @@ public class ChunkProcessingPipeline {
                         }
                         continue;
                     }
-                    Vector3ic position = chunk.getPosition();
+                    Vector3ic position = chunk.get().getPosition();
 
                     ChunkProcessingInfo chunkProcessingInfo = new ChunkProcessingInfo(position);
-                    chunkProcessingInfo.setChunk(chunk);
+                    chunkProcessingInfo.setChunk(chunk.get());
                     chunkProcessingInfo.nextStage(stages);
                     chunkProcessingInfo.makeChunkTask();
                     chunkProcessingInfoMap.put(position, chunkProcessingInfo);
                 }
             }
         } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
+            logger.warn("Chunk processing thread interrupted");
         }
     }
 
@@ -121,38 +116,45 @@ public class ChunkProcessingPipeline {
         for (ChunkProcessingInfo chunkProcessingInfo : chunkProcessingInfoMap.values()) {
             ChunkTask chunkTask = chunkProcessingInfo.getChunkTask();
             if (chunkTask != null) {
-                Set<Chunk> providedChunks = chunkTask.getRequirements().stream()
-                        .map(pos -> getChunkBy(chunkProcessingInfo.getChunkTaskProvider(), pos))
-                        .filter(Objects::nonNull)
-                        .collect(Collectors.toSet());
-                if (providedChunks.size() == chunkTask.getRequirements().size()) {
-                    // If another thread is running the task, just skip it
-                    if (chunkProcessingInfo.lock.tryLock()) {
-                        try {
-                            try (ThreadActivity ignored = ThreadMonitor.startThreadActivity(chunkTask.getName())) {
-                                chunkProcessingInfo.setChunk(chunkTask.apply(providedChunks));
-                            }
-                            chunkProcessingInfo.resetTaskState();
 
-                            if (chunkProcessingInfo.hasNextStage(stages)) {
-                                chunkProcessingInfo.nextStage(stages);
-                                chunkProcessingInfo.makeChunkTask();
-                                anyChanged = true;
-                            } else {
-                                cleanup(chunkProcessingInfo);
-                            }
-                        } catch (Exception e) {
-                            String stageName =
-                                    chunkProcessingInfo.getChunkTaskProvider() == null
-                                            ? "Generation or Loading"
-                                            : chunkProcessingInfo.getChunkTaskProvider().getName();
-                            logger.error(
-                                    String.format("ChunkTask at position %s and stage [%s] catch error: ",
-                                            chunkProcessingInfo.getPosition(), stageName),
-                                    e);
-                        } finally {
-                            chunkProcessingInfo.lock.unlock();
+                List<Chunk> providedChunks = new ArrayList<>();
+                boolean satisfied = true;
+                for (Vector3ic pos : chunkTask.getRequirements()) {
+                    Chunk chunk = getChunkBy(chunkProcessingInfo.getChunkTaskProvider(), pos);
+                    // If we don't have all the requirements generated yet, skip it
+                    if (chunk == null) {
+                        satisfied = false;
+                        break;
+                    }
+                    providedChunks.add(chunk);
+                }
+
+                // If another thread is running the task, just skip it
+                if (satisfied && chunkProcessingInfo.lock.tryLock()) {
+                    try {
+                        try (ThreadActivity ignored = ThreadMonitor.startThreadActivity(chunkTask.getName())) {
+                            chunkProcessingInfo.setChunk(chunkTask.apply(providedChunks));
                         }
+                        chunkProcessingInfo.resetTaskState();
+
+                        if (chunkProcessingInfo.hasNextStage(stages)) {
+                            chunkProcessingInfo.nextStage(stages);
+                            chunkProcessingInfo.makeChunkTask();
+                            anyChanged = true;
+                        } else {
+                            cleanup(chunkProcessingInfo);
+                        }
+                    } catch (Exception e) {
+                        String stageName =
+                                chunkProcessingInfo.getChunkTaskProvider() == null
+                                        ? "Generation or Loading"
+                                        : chunkProcessingInfo.getChunkTaskProvider().getName();
+                        logger.error(
+                                String.format("ChunkTask at position %s and stage [%s] catch error: ",
+                                        chunkProcessingInfo.getPosition(), stageName),
+                                e);
+                    } finally {
+                        chunkProcessingInfo.lock.unlock();
                     }
                 }
             } else {

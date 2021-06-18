@@ -22,7 +22,7 @@ import org.terasology.engine.world.chunks.Chunk;
 import org.terasology.engine.world.chunks.blockdata.ExtraBlockDataManager;
 import org.terasology.engine.world.chunks.internal.ChunkImpl;
 import org.terasology.engine.world.chunks.pipeline.stages.ChunkTaskProvider;
-import org.terasology.engine.world.chunks.remoteChunkProvider.ReceivedChunkInitialProvider;
+import org.terasology.engine.world.chunks.remoteChunkProvider.ReceivedInitialChunkProvider;
 import org.terasology.gestalt.assets.management.AssetManager;
 
 import java.util.ArrayList;
@@ -33,8 +33,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -50,8 +48,8 @@ class ChunkProcessingPipelineTest extends TerasologyTestingEnvironment {
     private ChunkProcessingPipeline pipeline;
 
     @Test
-    void simpleProcessingSuccess() throws ExecutionException, InterruptedException, TimeoutException {
-        ReceivedChunkInitialProvider initialProvider = new ReceivedChunkInitialProvider((o1, o2) -> 0);
+    void simpleProcessingSuccess() throws InterruptedException {
+        ReceivedInitialChunkProvider initialProvider = new ReceivedInitialChunkProvider((o1, o2) -> 0);
         pipeline = new ChunkProcessingPipeline((p) -> null, initialProvider);
 
         Vector3i chunkPos = new Vector3i(0, 0, 0);
@@ -73,7 +71,7 @@ class ChunkProcessingPipelineTest extends TerasologyTestingEnvironment {
 
     @Test
     void simpleStopProcessingSuccess() {
-        ReceivedChunkInitialProvider initialProvider = new ReceivedChunkInitialProvider((o1, o2) -> 0);
+        ReceivedInitialChunkProvider initialProvider = new ReceivedInitialChunkProvider((o1, o2) -> 0);
         pipeline = new ChunkProcessingPipeline((p) -> null, initialProvider);
 
         Vector3i position = new Vector3i(0, 0, 0);
@@ -98,7 +96,7 @@ class ChunkProcessingPipelineTest extends TerasologyTestingEnvironment {
      * Imagine that we have task, which requires neighbors with same Z level. neighbors chunk already in chunk cache.
      */
     @Test
-    void multiRequirementsChunksExistsSuccess() throws ExecutionException, InterruptedException, TimeoutException {
+    void multiRequirementsChunksExistsSuccess() throws InterruptedException {
         Vector3i positionToGenerate = new Vector3i(0, 0, 0);
         Map<Vector3ic, Chunk> chunkCache =
                 getNearChunkPositions(positionToGenerate)
@@ -110,7 +108,7 @@ class ChunkProcessingPipelineTest extends TerasologyTestingEnvironment {
                                 Function.identity()
                         ));
 
-        ReceivedChunkInitialProvider initialProvider = new ReceivedChunkInitialProvider((o1,  o2) -> 0);
+        ReceivedInitialChunkProvider initialProvider = new ReceivedInitialChunkProvider((o1,  o2) -> 0);
         pipeline = new ChunkProcessingPipeline(chunkCache::get, initialProvider);
         pipeline.addStage(ChunkTaskProvider.createMulti(
                 "flat merging task",
@@ -137,8 +135,7 @@ class ChunkProcessingPipelineTest extends TerasologyTestingEnvironment {
      * Imagine that we have task, which requires neighbors with same Z level. neighbor will generated.
      */
     @Test
-    void multiRequirementsChunksWillGeneratedSuccess() throws ExecutionException, InterruptedException,
-            TimeoutException {
+    void multiRequirementsChunksWillGeneratedSuccess() throws InterruptedException {
         Vector3i positionToGenerate = new Vector3i(0, 0, 0);
         Map<Vector3i, Chunk> chunkToGenerate =
                 getNearChunkPositions(positionToGenerate)
@@ -150,7 +147,7 @@ class ChunkProcessingPipelineTest extends TerasologyTestingEnvironment {
                                 Function.identity()
                         ));
 
-        ReceivedChunkInitialProvider initialProvider = new ReceivedChunkInitialProvider((o1,  o2) -> 0);
+        ReceivedInitialChunkProvider initialProvider = new ReceivedInitialChunkProvider((o1,  o2) -> 0);
         pipeline = new ChunkProcessingPipeline((p) -> null, initialProvider);
         pipeline.addStage(ChunkTaskProvider.createMulti(
                 "flat merging task",
@@ -183,7 +180,7 @@ class ChunkProcessingPipelineTest extends TerasologyTestingEnvironment {
     void emulateEntityMoving() throws InterruptedException {
         final AtomicReference<Vector3ic> position = new AtomicReference<>();
         Map<Vector3ic, Chunk> chunkCache = Maps.newConcurrentMap();
-        ReceivedChunkInitialProvider initialProvider = new ReceivedChunkInitialProvider((o1, o2) -> {
+        ReceivedInitialChunkProvider initialProvider = new ReceivedInitialChunkProvider((o1, o2) -> {
             if (position.get() != null) {
                 Vector3ic entityPos = position.get();
                 return (int) (entityPos.distance(o1.getPosition()) - entityPos.distance(o2.getPosition()));

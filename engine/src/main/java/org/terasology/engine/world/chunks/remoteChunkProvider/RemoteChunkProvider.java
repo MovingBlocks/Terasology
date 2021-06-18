@@ -59,11 +59,11 @@ public class RemoteChunkProvider implements ChunkProvider {
     private final ChunkProcessingPipeline loadingPipeline;
     private EntityRef worldEntity = EntityRef.NULL;
     private ChunkReadyListener listener;
-    private ReceivedChunkInitialProvider initialProvider;
+    private final ReceivedInitialChunkProvider initialProvider;
 
     public RemoteChunkProvider(BlockManager blockManager, LocalPlayer localPlayer) {
         this.blockManager = blockManager;
-        initialProvider = new ReceivedChunkInitialProvider(new LocalPlayerRelativeChunkComparator(localPlayer));
+        initialProvider = new ReceivedInitialChunkProvider(new LocalPlayerRelativeChunkComparator(localPlayer));
         loadingPipeline = new ChunkProcessingPipeline(this::getChunk, initialProvider);
 
         loadingPipeline.addStage(

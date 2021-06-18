@@ -8,14 +8,18 @@ import org.terasology.engine.world.chunks.Chunk;
 import org.terasology.engine.world.chunks.pipeline.InitialChunkProvider;
 
 import java.util.Comparator;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.PriorityBlockingQueue;
 
-public class ReceivedChunkInitialProvider implements InitialChunkProvider {
-    private BlockingQueue<Chunk> chunkQueue;
+/**
+ * Passes chunks received from the server through into the `ChunkProcessingPipeline`.
+ */
+public class ReceivedInitialChunkProvider implements InitialChunkProvider {
+    private final BlockingQueue<Chunk> chunkQueue;
 
-    public ReceivedChunkInitialProvider(Comparator<Chunk> comparator) {
+    public ReceivedInitialChunkProvider(Comparator<Chunk> comparator) {
         chunkQueue = new PriorityBlockingQueue<>(800, comparator);
     }
 
@@ -24,12 +28,8 @@ public class ReceivedChunkInitialProvider implements InitialChunkProvider {
     }
 
     @Override
-    public boolean hasNext() {
-        return !chunkQueue.isEmpty();
-    }
-
-    @Override
-    public synchronized Chunk next(Set<Vector3ic> currentlyGenerating) {
-        return chunkQueue.poll();
+    public Optional<Chunk> next(Set<Vector3ic> currentlyGenerating) {
+        // The queue handles synchronization
+        return Optional.ofNullable(chunkQueue.poll());
     }
 }

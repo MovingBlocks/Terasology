@@ -3,18 +3,19 @@
 
 package org.terasology.engine.world.chunks.pipeline;
 
-import com.google.common.util.concurrent.SettableFuture;
 import org.joml.Vector3ic;
+import org.terasology.engine.world.chunks.Chunk;
 import org.terasology.engine.world.chunks.pipeline.stages.ChunkTask;
 import org.terasology.engine.world.chunks.pipeline.stages.ChunkTaskProvider;
-import org.terasology.engine.world.chunks.Chunk;
 
 import java.util.List;
-import java.util.concurrent.Future;
 import java.util.concurrent.locks.ReentrantLock;
 
 public final class ChunkProcessingInfo {
-    public final ReentrantLock lock = new ReentrantLock();
+    /**
+     * Used by ChunkProcessingPipeline worker threads to avoid working on the same chunk at the same time.
+     */
+    protected final ReentrantLock lock = new ReentrantLock();
     private final Vector3ic position;
 
     private Chunk chunk;

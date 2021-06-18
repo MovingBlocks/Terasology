@@ -401,23 +401,7 @@ public class LocalChunkProvider implements ChunkProvider {
         chunkCache.clear();
         storageManager.deleteWorld();
         worldEntity.send(new PurgeWorldEvent());
-
-        loadingPipeline = new ChunkProcessingPipeline(this::getChunk, new LocalChunkInitialProvider(this, relevanceSystem));
-        loadingPipeline.addStage(
-            ChunkTaskProvider.create("Chunk generate internal lightning",
-                (Consumer<Chunk>) InternalLightProcessor::generateInternalLighting))
-            .addStage(ChunkTaskProvider.create("Chunk deflate", Chunk::deflate))
-            .addStage(ChunkTaskProvider.createMulti("Light merging",
-                chunks -> {
-                    Chunk[] localChunks = chunks.toArray(new Chunk[0]);
-                    return new LightMerger().merge(localChunks);
-                },
-                pos -> StreamSupport.stream(new BlockRegion(pos).expand(1, 1, 1).spliterator(), false)
-                    .map(Vector3i::new)
-                    .collect(Collectors.toSet())
-            ))
-            .addStage(ChunkTaskProvider.create("Chunk ready", readyChunks::add));
-        loadingPipeline.start();
+        setRelevanceSystem(relevanceSystem);
         unloadRequestTaskMaster = TaskMaster.createFIFOTaskMaster("Chunk-Unloader", 8);
         ChunkMonitor.fireChunkProviderInitialized(this);
     }
