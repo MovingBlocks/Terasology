@@ -105,7 +105,7 @@ public class ChunkProcessingPipeline {
                 // But if there aren't any chunks that can advance to the next stage right now, start some new chunks
                 for (int i = 0; i < NUM_CHUNKS_AT_ONCE; i++) {
                     Optional<Chunk> chunk = initialChunkProvider.next(chunkProcessingInfoMap.keySet());
-                    if (chunk.isEmpty()) {
+                    if (!chunk.isPresent()) {
                         // If i > 0, then this thread started some chunks earlier, so it's not done until they're processed
                         if (i > 0) {
                             continue;

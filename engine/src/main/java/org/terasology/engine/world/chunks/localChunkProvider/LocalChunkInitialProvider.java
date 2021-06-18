@@ -30,11 +30,9 @@ public class LocalChunkInitialProvider implements InitialChunkProvider {
     }
 
     private void updateList() {
-        relevanceSystem.neededChunks().forEach(chunkPos -> {
-            if (!chunksInRange.contains(chunkPos)) {
-                chunksInRange.add(chunkPos);
-            }
-        });
+        relevanceSystem.neededChunks()
+                .filter(pos -> !chunksInRange.contains(pos))
+                .forEach(chunksInRange::add);
         chunksInRange.removeIf(x -> !relevanceSystem.isChunkInRegions(x) || chunkProvider.isChunkReady(x));
         chunksInRange.sort(relevanceSystem.createChunkPosComparator().reversed());
     }
