@@ -283,7 +283,8 @@ public class MovementDebugCommands extends BaseComponentSystem {
 
     @Command(value = "teleport", shortDescription = "Teleports you to a location", runOnServer = true,
             requiredPermission = PermissionManager.CHEAT_PERMISSION)
-    public String teleportCommand(@Sender EntityRef sender, @CommandParam("x") float x, @CommandParam("y") float y, @CommandParam("z") float z) {
+    public String teleportCommand(@Sender EntityRef sender,
+                                  @CommandParam("x") float x, @CommandParam("y") float y, @CommandParam("z") float z) {
         ClientComponent clientComp = sender.getComponent(ClientComponent.class);
         clientComp.character.send(new CharacterTeleportEvent(new Vector3f(x, y, z)));
         return "Teleporting  to " + x + " " + y + " " + z;
@@ -443,7 +444,9 @@ public class MovementDebugCommands extends BaseComponentSystem {
                 clientComp.character.send(new CharacterTeleportEvent(vPlayerLocation));
 
                 CharacterMovementComponent characterMovementComponent = clientComp.character.getComponent(CharacterMovementComponent.class);
-                if (characterMovementComponent != null && playerMovementMode != MovementMode.NONE && playerMovementMode != characterMovementComponent.mode) {
+                if (characterMovementComponent != null
+                        && playerMovementMode != MovementMode.NONE
+                        && playerMovementMode != characterMovementComponent.mode) {
                     clientComp.character.send(new SetMovementModeEvent(playerMovementMode));
                 }
             }

@@ -59,11 +59,13 @@ public class OrderedListDecorator implements ListDecorator {
         }
 
         @Override
-        public int getPreferredContentsHeight(ParagraphRenderStyle defaultStyle, int yStart, ContainerRenderSpace containerRenderSpace, int sideIndents) {
+        public int getPreferredContentsHeight(ParagraphRenderStyle defaultStyle, int yStart,
+                                              ContainerRenderSpace containerRenderSpace, int sideIndents) {
             FallbackParagraphRenderStyle fallbackStyle = new FallbackParagraphRenderStyle(defaultStyle, paragraphData.getParagraphRenderStyle());
             Font font = fallbackStyle.getFont(false);
             int maxIndent = getMaxIndent(font);
-            return paragraphData.getParagraphContents().getPreferredContentsHeight(fallbackStyle, yStart, containerRenderSpace, sideIndents + maxIndent);
+            return paragraphData.getParagraphContents().getPreferredContentsHeight(fallbackStyle, yStart,
+                    containerRenderSpace, sideIndents + maxIndent);
         }
 
         @Override

@@ -36,7 +36,8 @@ import java.util.Arrays;
 import java.util.Set;
 
 /**
- * TODO: This should be made generic (no explicit shader or mesh) and ported directly into WorldRenderer? Later note: some GelCube functionality moved to a module
+ * TODO: This should be made generic (no explicit shader or mesh) and ported directly into WorldRenderer?
+ *  Later note: some GelCube functionality moved to a module
  */
 @RegisterSystem(RegisterMode.CLIENT)
 public class MeshRenderer extends BaseComponentSystem implements RenderSystem {
@@ -194,7 +195,8 @@ public class MeshRenderer extends BaseComponentSystem implements RenderSystem {
                     matrixCameraSpace.translationRotateScale(offsetFromCamera, worldRot, worldScale);
 
 
-                    AABBf aabb = meshComp.mesh.getAABB().transform(new Matrix4f().translationRotateScale(worldPos, worldRot, worldScale), new AABBf());
+                    AABBf aabb = meshComp.mesh.getAABB()
+                            .transform(new Matrix4f().translationRotateScale(worldPos, worldRot, worldScale), new AABBf());
                     if (worldRenderer.getActiveCamera().hasInSight(aabb)) {
                         modelViewMatrix.set(worldRenderer.getActiveCamera().getViewMatrix()).mul(matrixCameraSpace);
                         modelViewMatrix.get(tempMatrixBuffer44);
@@ -206,7 +208,8 @@ public class MeshRenderer extends BaseComponentSystem implements RenderSystem {
 
                         material.setFloat3("colorOffset", meshComp.color.rf(), meshComp.color.gf(), meshComp.color.bf(), true);
                         material.setFloat("sunlight", worldRenderer.getMainLightIntensityAt(worldPos), true);
-                        material.setFloat("blockLight", Math.max(worldRenderer.getBlockLightIntensityAt(worldPos), meshComp.selfLuminance), true);
+                        material.setFloat("blockLight",
+                                Math.max(worldRenderer.getBlockLightIntensityAt(worldPos), meshComp.selfLuminance), true);
 
                         meshComp.mesh.render();
                     }
