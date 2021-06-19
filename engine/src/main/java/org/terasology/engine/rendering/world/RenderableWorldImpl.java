@@ -338,7 +338,10 @@ class RenderableWorldImpl implements RenderableWorld {
             if (isChunkValidForRender(chunk)) {
                 mesh = chunk.getMesh();
 
-                if (isDynamicShadows && isFirstRenderingStageForCurrentFrame && chunkCounter < maxChunksForShadows && isChunkVisibleFromMainLight(chunk)) {
+                if (isDynamicShadows
+                        && isFirstRenderingStageForCurrentFrame
+                        && chunkCounter < maxChunksForShadows
+                        && isChunkVisibleFromMainLight(chunk)) {
                     if (triangleCount(mesh, ChunkMesh.RenderPhase.OPAQUE) > 0) {
                         renderQueues.chunksOpaqueShadow.add(chunk);
                     } else {
