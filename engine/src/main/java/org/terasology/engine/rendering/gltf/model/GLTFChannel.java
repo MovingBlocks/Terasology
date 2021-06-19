@@ -3,7 +3,8 @@
 package org.terasology.engine.rendering.gltf.model;
 
 /**
- * GLTF Channel maps an animation sampler to a node value to animate. See https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#channel for details
+ * GLTF Channel maps an animation sampler to a node value to animate.
+ * See https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#channel for details
  */
 public class GLTFChannel {
     private int sampler;
