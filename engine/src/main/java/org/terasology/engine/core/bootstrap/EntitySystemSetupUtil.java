@@ -146,9 +146,10 @@ public final class EntitySystemSetupUtil {
         registerEvents(entityManager.getEventSystem(), environment);
     }
 
-    private static EventSystem createEventSystem(NetworkSystem networkSystem, PojoEntityManager entityManager, EntitySystemLibrary library,
-                                                 RecordedEventStore recordedEventStore, RecordAndReplaySerializer recordAndReplaySerializer,
-                                                 RecordAndReplayUtils recordAndReplayUtils, RecordAndReplayCurrentStatus recordAndReplayCurrentStatus) {
+    private static EventSystem createEventSystem(NetworkSystem networkSystem, PojoEntityManager entityManager,
+                                                 EntitySystemLibrary library, RecordedEventStore recordedEventStore,
+                                                 RecordAndReplaySerializer recordAndReplaySerializer, RecordAndReplayUtils recordAndReplayUtils,
+                                                 RecordAndReplayCurrentStatus recordAndReplayCurrentStatus) {
         EventSystem eventSystem;
         List<Class<?>> selectedClassesToRecord = createSelectedClassesToRecordList();
         if (recordAndReplayCurrentStatus.getStatus() == RecordAndReplayStatus.PREPARING_REPLAY) {
@@ -167,7 +168,8 @@ public final class EntitySystemSetupUtil {
         for (Class<? extends Component> componentType : environment.getSubtypesOf(Component.class)) {
             if (componentType.getAnnotation(DoNotAutoRegister.class) == null) {
                 String componentName = MetadataUtil.getComponentClassName(componentType);
-                Name componentModuleName = verifyNotNull(environment.getModuleProviding(componentType), "Could not find module for %s %s", componentName, componentType);
+                Name componentModuleName = verifyNotNull(environment.getModuleProviding(componentType),
+                        "Could not find module for %s %s", componentName, componentType);
                 library.register(new ResourceUrn(componentModuleName.toString(), componentName), componentType);
             }
         }
