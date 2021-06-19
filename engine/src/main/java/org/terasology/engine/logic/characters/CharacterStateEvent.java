@@ -75,6 +75,10 @@ public class CharacterStateEvent extends NetworkEvent {
         return rotation;
     }
 
+    public void setRotation(Quaternionf rotation) {
+        this.rotation = rotation;
+    }
+
     public MovementMode getMode() {
         return mode;
     }
