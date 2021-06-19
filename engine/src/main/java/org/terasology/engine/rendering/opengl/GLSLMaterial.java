@@ -602,11 +602,13 @@ public class GLSLMaterial extends BaseMaterial {
     private static final class UniformId {
         private int shaderProgramId;
         private String name;
+        private int hashCode;
 
         // made package-private after Jenkins' suggestion
         UniformId(int shaderProgramId, String name) {
             this.shaderProgramId = shaderProgramId;
             this.name = name;
+            this.hashCode = Objects.hashCode(shaderProgramId, name);
         }
 
         @Override
@@ -623,7 +625,7 @@ public class GLSLMaterial extends BaseMaterial {
 
         @Override
         public int hashCode() {
-            return Objects.hashCode(shaderProgramId, name);
+            return this.hashCode;
         }
     }
 
