@@ -34,7 +34,8 @@ public class CertificateGenerator {
             keyFactory = KeyFactory.getInstance(IdentityConstants.CERTIFICATE_ALGORITHM);
             signer = Signature.getInstance(IdentityConstants.SIGNATURE_ALGORITHM);
         } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException("Insufficient support for '" + IdentityConstants.CERTIFICATE_ALGORITHM + "', required for identity management", e);
+            throw new RuntimeException("Insufficient support for '" + IdentityConstants.CERTIFICATE_ALGORITHM
+                    + "', required for identity management", e);
         }
     }
 
