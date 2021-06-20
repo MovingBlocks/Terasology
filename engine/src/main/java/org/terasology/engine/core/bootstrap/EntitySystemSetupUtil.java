@@ -164,7 +164,7 @@ public final class EntitySystemSetupUtil {
         return eventSystem;
     }
 
-    private static void registerComponents(ComponentLibrary library, ModuleEnvironment environment) {
+    static void registerComponents(ComponentLibrary library, ModuleEnvironment environment) {
         for (Class<? extends Component> componentType : environment.getSubtypesOf(Component.class)) {
             if (componentType.getAnnotation(DoNotAutoRegister.class) == null) {
                 String componentName = MetadataUtil.getComponentClassName(componentType);
