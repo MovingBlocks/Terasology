@@ -5,8 +5,6 @@ package org.terasology.engine.logic.players;
 import com.google.common.collect.Sets;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.logic.characters.CharacterComponent;
 import org.terasology.engine.logic.characters.CharacterMovementComponent;
