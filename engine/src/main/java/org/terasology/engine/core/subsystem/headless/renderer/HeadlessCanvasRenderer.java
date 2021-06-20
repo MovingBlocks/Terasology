@@ -34,7 +34,8 @@ public class HeadlessCanvasRenderer implements TerasologyCanvasRenderer {
     }
 
     @Override
-    public void drawMesh(Mesh mesh, Material material, Rectanglei drawRegion, Rectanglei cropRegion, Quaternionfc rotation, Vector3fc offset, float scale, float alpha) {
+    public void drawMesh(Mesh mesh, Material material, Rectanglei drawRegion, Rectanglei cropRegion,
+                         Quaternionfc rotation, Vector3fc offset, float scale, float alpha) {
         // Do nothing
     }
 
@@ -64,18 +65,20 @@ public class HeadlessCanvasRenderer implements TerasologyCanvasRenderer {
     }
 
     @Override
-    public void drawTexture(UITextureRegion texture, Colorc color, ScaleMode mode, Rectanglei absoluteRegion, float ux, float uy, float uw, float uh, float alpha) {
+    public void drawTexture(UITextureRegion texture, Colorc color, ScaleMode mode, Rectanglei absoluteRegion,
+                            float ux, float uy, float uw, float uh, float alpha) {
         // Do nothing
     }
 
     @Override
-    public void drawText(String text, Font font, HorizontalAlign hAlign, VerticalAlign vAlign, Rectanglei absoluteRegion, Colorc color, Colorc shadowColor,
-                         float alpha, boolean underlined) {
+    public void drawText(String text, Font font, HorizontalAlign hAlign, VerticalAlign vAlign, Rectanglei absoluteRegion,
+                         Colorc color, Colorc shadowColor, float alpha, boolean underlined) {
         // Do nothing
     }
 
     @Override
-    public void drawTextureBordered(UITextureRegion texture, Rectanglei absoluteRegion, Border border, boolean tile, float ux, float uy, float uw, float uh, float alpha) {
+    public void drawTextureBordered(UITextureRegion texture, Rectanglei absoluteRegion, Border border, boolean tile,
+                                    float ux, float uy, float uw, float uh, float alpha) {
         // Do nothing
     }
 

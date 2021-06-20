@@ -43,7 +43,8 @@ public class BlockFamilyLibrary {
             RegisterBlockFamily registerInfo = entry.getAnnotation(RegisterBlockFamily.class);
             String id = registerInfo.value();
             logger.debug("Registering blockFamily {}", id);
-            library.register(new ResourceUrn(moduleEnvironment.getModuleProviding(entry).toString(), registerInfo.value()).toString(), (Class<? extends BlockFamily>) entry);
+            library.register(new ResourceUrn(moduleEnvironment.getModuleProviding(entry).toString(), registerInfo.value()).toString(),
+                    (Class<? extends BlockFamily>) entry);
 
         }
     }

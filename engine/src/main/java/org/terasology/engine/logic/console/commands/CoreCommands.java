@@ -510,7 +510,8 @@ public class CoreCommands extends BaseComponentSystem {
      * @param prefabName String containing prefab name
      * @return String containing final message
      */
-    @Command(shortDescription = "Spawns an instance of a prefab in the world", runOnServer = true, requiredPermission = PermissionManager.CHEAT_PERMISSION)
+    @Command(shortDescription = "Spawns an instance of a prefab in the world", runOnServer = true,
+            requiredPermission = PermissionManager.CHEAT_PERMISSION)
     public String spawnPrefab(@Sender EntityRef sender, @CommandParam("prefabId") String prefabName) {
         ClientComponent clientComponent = sender.getComponent(ClientComponent.class);
         LocationComponent characterLocation = clientComponent.character.getComponent(LocationComponent.class);
@@ -547,7 +548,8 @@ public class CoreCommands extends BaseComponentSystem {
      * @return String containg final message
      */
     @Command(shortDescription = "Spawns a block in front of the player", helpText = "Spawns the specified block as a " +
-            "item in front of the player. You can simply pick it up.", runOnServer = true, requiredPermission = PermissionManager.CHEAT_PERMISSION)
+            "item in front of the player. You can simply pick it up.", runOnServer = true,
+            requiredPermission = PermissionManager.CHEAT_PERMISSION)
     public String spawnBlock(@Sender EntityRef sender, @CommandParam("blockName") String blockName) {
         ClientComponent clientComponent = sender.getComponent(ClientComponent.class);
         LocationComponent characterLocation = clientComponent.character.getComponent(LocationComponent.class);
@@ -706,27 +708,27 @@ public class CoreCommands extends BaseComponentSystem {
             } else {
                 StringBuilder msg = new StringBuilder();
 
-                msg.append("=====================================================================================================================");
+                msg.append("===========================================================================================================");
                 msg.append(Console.NEW_LINE);
                 msg.append(cmd.getUsage());
                 msg.append(Console.NEW_LINE);
-                msg.append("=====================================================================================================================");
+                msg.append("===========================================================================================================");
                 msg.append(Console.NEW_LINE);
                 if (!cmd.getHelpText().isEmpty()) {
                     msg.append(cmd.getHelpText());
                     msg.append(Console.NEW_LINE);
-                    msg.append("=====================================================================================================================");
+                    msg.append("===========================================================================================================");
                     msg.append(Console.NEW_LINE);
                 } else if (!cmd.getDescription().isEmpty()) {
                     msg.append(cmd.getDescription());
                     msg.append(Console.NEW_LINE);
-                    msg.append("=====================================================================================================================");
+                    msg.append("===========================================================================================================");
                     msg.append(Console.NEW_LINE);
                 }
                 if (!cmd.getRequiredPermission().isEmpty()) {
                     msg.append("Required permission level - " + cmd.getRequiredPermission());
                     msg.append(Console.NEW_LINE);
-                    msg.append("=====================================================================================================================");
+                    msg.append("===========================================================================================================");
                     msg.append(Console.NEW_LINE);
                 }
 

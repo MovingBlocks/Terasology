@@ -79,7 +79,8 @@ public class BlockMeshPart {
         return new BlockMeshPart(vertices, normals, newTexCoords, indices, frames);
     }
 
-    public void appendTo(ChunkMesh chunk, ChunkView chunkView, int offsetX, int offsetY, int offsetZ, ChunkMesh.RenderType renderType, ChunkVertexFlag flags) {
+    public void appendTo(ChunkMesh chunk, ChunkView chunkView, int offsetX, int offsetY, int offsetZ,
+                         ChunkMesh.RenderType renderType, ChunkVertexFlag flags) {
         ChunkMesh.VertexElements elements = chunk.getVertexElements(renderType);
         for (Vector2f texCoord : texCoords) {
             elements.uv0.put(texCoord);
@@ -93,7 +94,8 @@ public class BlockMeshPart {
             elements.normals.put(normals[vIdx]);
             elements.flags.put(flags.getValue());
             elements.frames.put(texFrames - 1);
-            float[] lightingData = calcLightingValuesForVertexPos(chunkView, vertices[vIdx].add(offsetX, offsetY, offsetZ, new Vector3f()), normals[vIdx]);
+            float[] lightingData = calcLightingValuesForVertexPos(chunkView, vertices[vIdx].add(offsetX, offsetY, offsetZ,
+                    new Vector3f()), normals[vIdx]);
             elements.sunlight.put(lightingData[0]);
             elements.blockLight.put(lightingData[1]);
             elements.ambientOcclusion.put(lightingData[2]);

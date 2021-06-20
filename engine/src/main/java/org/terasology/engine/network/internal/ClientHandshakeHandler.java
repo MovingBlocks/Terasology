@@ -75,7 +75,8 @@ public class ClientHandshakeHandler extends ChannelInboundHandlerAdapter {
     }
 
     /**
-     * Process the handshake verification, checking that both the server and client have attempted it. If successful marks the channel as Authenticated.
+     * Process the handshake verification, checking that both the server and client have attempted it.
+     * If successful marks the channel as Authenticated.
      * @param handshakeVerification
      * @param ctx Channel Handler Context.
      */
@@ -88,7 +89,8 @@ public class ClientHandshakeHandler extends ChannelInboundHandlerAdapter {
             return;
         }
 
-        if (!serverCertificate.verify(HandshakeCommon.getSignatureData(serverHello, clientHello), handshakeVerification.getSignature().toByteArray())) {
+        if (!serverCertificate.verify(HandshakeCommon.getSignatureData(serverHello, clientHello),
+                handshakeVerification.getSignature().toByteArray())) {
             logger.error("Server failed verification: cancelling authentication");
             joinStatus.setErrorMessage(AUTHENTICATION_FAILURE);
             ctx.channel().close();

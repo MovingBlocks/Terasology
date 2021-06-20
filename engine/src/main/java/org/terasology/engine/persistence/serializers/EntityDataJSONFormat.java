@@ -96,7 +96,8 @@ public final class EntityDataJSONFormat {
         }
 
         @Override
-        public EntityData.GlobalStore deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+        public EntityData.GlobalStore deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
+                throws JsonParseException {
             EntityData.GlobalStore.Builder world = EntityData.GlobalStore.newBuilder();
             if (json.isJsonObject()) {
                 JsonObject jsonObject = json.getAsJsonObject();
@@ -137,7 +138,8 @@ public final class EntityDataJSONFormat {
 
     private static class ComponentBuilderHandler implements JsonDeserializer<EntityData.Component.Builder> {
         @Override
-        public EntityData.Component.Builder deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+        public EntityData.Component.Builder deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
+                throws JsonParseException {
             EntityData.Component.Builder component = EntityData.Component.newBuilder();
             JsonObject jsonObject = json.getAsJsonObject();
             for (Map.Entry<String, JsonElement> entry : jsonObject.entrySet()) {
@@ -183,7 +185,8 @@ public final class EntityDataJSONFormat {
         }
 
         @Override
-        public EntityData.Entity deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+        public EntityData.Entity deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
+                throws JsonParseException {
             EntityData.Entity.Builder entity = EntityData.Entity.newBuilder();
             JsonObject jsonObject = json.getAsJsonObject();
 
@@ -252,7 +255,8 @@ public final class EntityDataJSONFormat {
         }
 
         @Override
-        public EntityData.Prefab deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+        public EntityData.Prefab deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
+                throws JsonParseException {
             EntityData.Prefab.Builder prefab = EntityData.Prefab.newBuilder();
             JsonObject jsonObject = json.getAsJsonObject();
 
@@ -339,7 +343,8 @@ public final class EntityDataJSONFormat {
         }
 
         @Override
-        public EntityData.Value deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+        public EntityData.Value deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
+                throws JsonParseException {
             EntityData.Value.Builder value = EntityData.Value.newBuilder();
             if (json.isJsonPrimitive()) {
                 extractPrimitive(value, json);

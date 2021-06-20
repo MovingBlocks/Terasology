@@ -6,7 +6,8 @@ import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
 
 /**
- * GLTFSSkin defines the joints and matrices of a skeleton. See https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#reference-skin for details
+ * GLTFSSkin defines the joints and matrices of a skeleton.
+ * See https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#reference-skin for details
  */
 public class GLTFSkin {
     private Integer inverseBindMatrices;
@@ -15,7 +16,8 @@ public class GLTFSkin {
     private String name = "";
 
     /**
-     * @return The index of an accessor containing 4x4 floating point inverseBind matrices. If null, then each matrix can be considered to be an identity matrix.
+     * @return The index of an accessor containing 4x4 floating point inverseBind matrices.
+     * If null, then each matrix can be considered to be an identity matrix.
      */
     public Integer getInverseBindMatrices() {
         return inverseBindMatrices;

@@ -13,7 +13,8 @@ import org.terasology.gestalt.assets.ResourceUrn;
 public abstract class StaticSound extends Sound<StaticSoundData> {
 
     /**
-     * The constructor for an asset. It is suggested that implementing classes provide a constructor taking both the urn, and an initial AssetData to load.
+     * The constructor for an asset.
+     * It is suggested that implementing classes provide a constructor taking both the urn, and an initial AssetData to load.
      *
      * @param urn       The urn identifying the asset.
      * @param assetType The asset type this asset belongs to.
@@ -23,7 +24,8 @@ public abstract class StaticSound extends Sound<StaticSoundData> {
     }
 
     /**
-     * The constructor for an asset. It is suggested that implementing classes provide a constructor taking both the urn, and an initial AssetData to load.
+     * The constructor for an asset.
+     * It is suggested that implementing classes provide a constructor taking both the urn, and an initial AssetData to load.
      *
      * @param urn       The urn identifying the asset.
      * @param assetType The asset type this asset belongs to.
