@@ -116,6 +116,17 @@ public class LocalChunkProvider implements ChunkProvider {
         ChunkMonitor.fireChunkProviderInitialized(this);
     }
 
+    /**
+     * Wait until the pipeline is done generating and processing chunks, for use in tests.
+     */
+    protected void waitUntilGenerated(long timeoutMillis) throws InterruptedException {
+        loadingPipeline.waitUntilDone(timeoutMillis);
+    }
+
+    /**
+     * Load a chunk from disk or generate it, so that it's ready for processing in the chunk processing pipeline.
+     * This method is called from the chunk processing worker threads.
+     */
     protected Chunk getInitialChunk(Vector3ic pos) {
         ChunkStore chunkStore = storageManager.loadChunkStore(pos);
         Chunk chunk;
@@ -123,7 +134,7 @@ public class LocalChunkProvider implements ChunkProvider {
         if (chunkStore == null) {
             chunk = new ChunkImpl(pos, blockManager, extraDataManager);
             generator.createChunk(chunk, buffer);
-            generateQueuedEntities.put(chunk.getPosition(new Vector3i()), buffer.getAll());
+            generateQueuedEntities.put(chunk.getPosition(), buffer.getAll());
         } else {
             chunk = chunkStore.getChunk();
         }
@@ -221,6 +232,9 @@ public class LocalChunkProvider implements ChunkProvider {
         }
     }
 
+    /**
+     * Notify this provider's pipeline that the relevance regions changed, so new chunks might be available.
+     */
     protected void notifyRelevanceChanged() {
         loadingPipeline.notifyUpdate();
     }
@@ -396,23 +410,7 @@ public class LocalChunkProvider implements ChunkProvider {
         chunkCache.clear();
         storageManager.deleteWorld();
         worldEntity.send(new PurgeWorldEvent());
-
-        loadingPipeline = new ChunkProcessingPipeline(this::getChunk, new LocalChunkInitialProvider(this, relevanceSystem));
-        loadingPipeline.addStage(
-            ChunkTaskProvider.create("Chunk generate internal lightning",
-                (Consumer<Chunk>) InternalLightProcessor::generateInternalLighting))
-            .addStage(ChunkTaskProvider.create("Chunk deflate", Chunk::deflate))
-            .addStage(ChunkTaskProvider.createMulti("Light merging",
-                chunks -> {
-                    Chunk[] localChunks = chunks.toArray(new Chunk[0]);
-                    return new LightMerger().merge(localChunks);
-                },
-                pos -> StreamSupport.stream(new BlockRegion(pos).expand(1, 1, 1).spliterator(), false)
-                    .map(Vector3i::new)
-                    .collect(Collectors.toSet())
-            ))
-            .addStage(ChunkTaskProvider.create("Chunk ready", readyChunks::add));
-        loadingPipeline.start();
+        setRelevanceSystem(relevanceSystem);
         unloadRequestTaskMaster = TaskMaster.createFIFOTaskMaster("Chunk-Unloader", 8);
         ChunkMonitor.fireChunkProviderInitialized(this);
     }

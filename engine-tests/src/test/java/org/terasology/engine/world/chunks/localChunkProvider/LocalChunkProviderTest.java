@@ -3,6 +3,7 @@
 package org.terasology.engine.world.chunks.localChunkProvider;
 
 import com.google.common.collect.Maps;
+import org.joml.Vector3f;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.junit.jupiter.api.AfterEach;
@@ -13,11 +14,11 @@ import org.mockito.ArgumentCaptor;
 import org.terasology.engine.entitySystem.entity.EntityManager;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.event.Event;
+import org.terasology.engine.logic.location.LocationComponent;
 import org.terasology.engine.world.BlockEntityRegistry;
 import org.terasology.engine.world.block.BeforeDeactivateBlocks;
 import org.terasology.engine.world.block.Block;
 import org.terasology.engine.world.block.BlockManager;
-import org.terasology.engine.world.block.BlockRegion;
 import org.terasology.engine.world.block.OnActivatedBlocks;
 import org.terasology.engine.world.block.OnAddedBlocks;
 import org.terasology.engine.world.chunks.Chunk;
@@ -36,17 +37,16 @@ import java.time.temporal.ChronoUnit;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 class LocalChunkProviderTest {
 
-    private static final int WAIT_CHUNK_IS_READY_IN_SECONDS = 30;
+    private static final int WAIT_CHUNK_IS_READY_IN_SECONDS = 5;
 
     private LocalChunkProvider chunkProvider;
     private EntityManager entityManager;
@@ -58,6 +58,8 @@ class LocalChunkProviderTest {
     private Block blockAtBlockManager;
     private TestStorageManager storageManager;
     private TestWorldGenerator generator;
+    private RelevanceSystem relevanceSystem;
+    private EntityRef playerEntity;
 
     @BeforeEach
     public void setUp() {
@@ -81,7 +83,8 @@ class LocalChunkProviderTest {
                 chunkCache);
         chunkProvider.setBlockEntityRegistry(blockEntityRegistry);
         chunkProvider.setWorldEntity(worldEntity);
-        chunkProvider.setRelevanceSystem(new RelevanceSystem(chunkProvider)); // workaround. initialize loading pipeline
+        relevanceSystem = new RelevanceSystem(chunkProvider);
+        chunkProvider.setRelevanceSystem(relevanceSystem); // workaround. initialize loading pipeline
     }
 
     @AfterEach
@@ -89,28 +92,24 @@ class LocalChunkProviderTest {
         chunkProvider.shutdown();
     }
 
-    private Future<Chunk> requestCreatingOrLoadingArea(Vector3ic chunkPosition, int radius) {
-        Future<Chunk> chunkFuture = chunkProvider.createOrLoadChunk(chunkPosition);
-        BlockRegion extentsRegion = new BlockRegion(
-                chunkPosition.x() - radius, chunkPosition.y() - radius, chunkPosition.z() - radius,
-                chunkPosition.x() + radius, chunkPosition.y() + radius, chunkPosition.z() + radius);
-
-        extentsRegion.iterator().forEachRemaining(pos -> {
-            if (!pos.equals(chunkPosition)) { // remove center. we takes future for it already.
-                chunkProvider.createOrLoadChunk(pos);
-            }
-        });
-        return chunkFuture;
+    private void requestCreatingOrLoadingArea(Vector3ic chunkPosition, int radius) {
+        playerEntity = mock(EntityRef.class);
+        when(playerEntity.exists()).thenReturn(true);
+        when(playerEntity.getComponent(LocationComponent.class)).thenReturn(new LocationComponent(new Vector3f(chunkPosition)));
+        Vector3i distance = new Vector3i(radius * 2, radius * 2, radius * 2);
+        relevanceSystem.addRelevanceEntity(playerEntity, distance, null);
     }
 
-    private Future<Chunk> requestCreatingOrLoadingArea(Vector3ic chunkPosition) {
-        return requestCreatingOrLoadingArea(chunkPosition, 1);
+    private void requestCreatingOrLoadingArea(Vector3ic chunkPosition) {
+        requestCreatingOrLoadingArea(chunkPosition, 1);
     }
 
     @Test
     void testGenerateSingleChunk() throws InterruptedException, ExecutionException, TimeoutException {
         Vector3i chunkPosition = new Vector3i(0, 0, 0);
-        requestCreatingOrLoadingArea(chunkPosition).get(WAIT_CHUNK_IS_READY_IN_SECONDS, TimeUnit.SECONDS);
+        requestCreatingOrLoadingArea(chunkPosition);
+        chunkProvider.notifyRelevanceChanged();
+        chunkProvider.waitUntilGenerated(WAIT_CHUNK_IS_READY_IN_SECONDS * 1000);
         chunkProvider.update();
 
         final ArgumentCaptor<Event> eventArgumentCaptor = ArgumentCaptor.forClass(Event.class);
@@ -139,7 +138,9 @@ class LocalChunkProviderTest {
         Vector3i chunkPosition = new Vector3i(0, 0, 0);
         blockAtBlockManager.setLifecycleEventsRequired(true);
         blockAtBlockManager.setEntity(mock(EntityRef.class));
-        requestCreatingOrLoadingArea(chunkPosition).get(WAIT_CHUNK_IS_READY_IN_SECONDS, TimeUnit.SECONDS);
+        requestCreatingOrLoadingArea(chunkPosition);
+        chunkProvider.notifyRelevanceChanged();
+        chunkProvider.waitUntilGenerated(WAIT_CHUNK_IS_READY_IN_SECONDS * 1000);
         chunkProvider.update();
 
         final ArgumentCaptor<Event> worldEventCaptor = ArgumentCaptor.forClass(Event.class);
@@ -181,7 +182,9 @@ class LocalChunkProviderTest {
         generator.createChunk(chunk, null);
         storageManager.add(chunk);
 
-        requestCreatingOrLoadingArea(chunkPosition).get(WAIT_CHUNK_IS_READY_IN_SECONDS, TimeUnit.SECONDS);
+        requestCreatingOrLoadingArea(chunkPosition);
+        chunkProvider.notifyRelevanceChanged();
+        chunkProvider.waitUntilGenerated(WAIT_CHUNK_IS_READY_IN_SECONDS * 1000);
         chunkProvider.update();
 
         Assertions.assertTrue(((TestChunkStore) storageManager.loadChunkStore(chunkPosition)).isEntityRestored(),
@@ -206,7 +209,9 @@ class LocalChunkProviderTest {
         blockAtBlockManager.setLifecycleEventsRequired(true);
         blockAtBlockManager.setEntity(mock(EntityRef.class));
 
-        requestCreatingOrLoadingArea(chunkPosition).get(WAIT_CHUNK_IS_READY_IN_SECONDS, TimeUnit.SECONDS);
+        requestCreatingOrLoadingArea(chunkPosition);
+        chunkProvider.notifyRelevanceChanged();
+        chunkProvider.waitUntilGenerated(WAIT_CHUNK_IS_READY_IN_SECONDS * 1000);
         chunkProvider.update();
 
         Assertions.assertTrue(((TestChunkStore) storageManager.loadChunkStore(chunkPosition)).isEntityRestored(),
@@ -249,9 +254,13 @@ class LocalChunkProviderTest {
         blockAtBlockManager.setLifecycleEventsRequired(true);
         blockAtBlockManager.setEntity(mock(EntityRef.class));
 
-        requestCreatingOrLoadingArea(chunkPosition).get(WAIT_CHUNK_IS_READY_IN_SECONDS, TimeUnit.SECONDS);
+        requestCreatingOrLoadingArea(chunkPosition);
+        chunkProvider.notifyRelevanceChanged();
+        chunkProvider.waitUntilGenerated(WAIT_CHUNK_IS_READY_IN_SECONDS * 1000);
+        relevanceSystem.removeRelevanceEntity(playerEntity);
+        chunkProvider.notifyRelevanceChanged();
 
-        //Wait BeforeDeactivateBlocks event
+        // Wait for BeforeDeactivateBlocks event
         Assertions.assertTimeoutPreemptively(Duration.of(WAIT_CHUNK_IS_READY_IN_SECONDS, ChronoUnit.SECONDS),
                 () -> {
                     ArgumentCaptor<Event> blockEventCaptor = ArgumentCaptor.forClass(Event.class);

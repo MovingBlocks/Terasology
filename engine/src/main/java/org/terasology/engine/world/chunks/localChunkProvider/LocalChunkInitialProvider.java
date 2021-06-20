@@ -12,6 +12,7 @@ import org.terasology.engine.world.chunks.pipeline.InitialChunkProvider;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 public class LocalChunkInitialProvider implements InitialChunkProvider {
@@ -29,11 +30,9 @@ public class LocalChunkInitialProvider implements InitialChunkProvider {
     }
 
     private void updateList() {
-        relevanceSystem.neededChunks().forEach(chunkPos -> {
-            if (!chunksInRange.contains(chunkPos)) {
-                chunksInRange.add(chunkPos);
-            }
-        });
+        relevanceSystem.neededChunks()
+                .filter(pos -> !chunksInRange.contains(pos))
+                .forEach(chunksInRange::add);
         chunksInRange.removeIf(x -> !relevanceSystem.isChunkInRegions(x) || chunkProvider.isChunkReady(x));
         chunksInRange.sort(relevanceSystem.createChunkPosComparator().reversed());
     }
@@ -57,23 +56,24 @@ public class LocalChunkInitialProvider implements InitialChunkProvider {
     }
 
     @Override
-    public boolean hasNext() {
-        if (checkForUpdate()) {
-            updateList();
-        }
-        return !chunksInRange.isEmpty();
-    }
-
-    @Override
-    public Chunk next(Set<Vector3ic> currentlyGenerating) {
-        while (hasNext()) {
-            Vector3ic pos = chunksInRange.remove(chunksInRange.size() - 1);
+    public Optional<Chunk> next(Set<Vector3ic> currentlyGenerating) {
+        while (true) {
+            Vector3ic pos;
+            synchronized (this) {
+                if (checkForUpdate()) {
+                    updateList();
+                }
+                if (chunksInRange.isEmpty()) {
+                    break;
+                }
+                pos = chunksInRange.remove(chunksInRange.size() - 1);
+            }
             if (currentlyGenerating.contains(pos)) {
                 continue;
             }
 
-            return chunkProvider.getInitialChunk(pos);
+            return Optional.of(chunkProvider.getInitialChunk(pos));
         }
-        return null;
+        return Optional.empty();
     }
 }
