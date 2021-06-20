@@ -102,7 +102,8 @@ public class NameRecordingScreen extends CoreScreenLayer {
     }
 
     /**
-     * Last step of the recording setup process. Copies the save files from the selected game, transplants them into the 'recordings' folder, and renames the map files
+     * Last step of the recording setup process.
+     * Copies the save files from the selected game, transplants them into the 'recordings' folder, and renames the map files
      * to match the provided recording name. Then launches the game loading state.
      *
      * @param newTitle The title of the new recording.
@@ -163,7 +164,8 @@ public class NameRecordingScreen extends CoreScreenLayer {
     private boolean isNameValid(String name) {
         Path destinationPath = PathManager.getInstance().getRecordingPath(name);
 
-        // invalid characters are filtered from paths, so if the file name is made up of entirely invalid characters, the path will have a blank file name.
+        // invalid characters are filtered from paths
+        // - if the file name is made up of entirely invalid characters, the path will have a blank file name.
         // also acts as a check for blank input.
         return !destinationPath.equals(PathManager.getInstance().getRecordingPath(""));
     }

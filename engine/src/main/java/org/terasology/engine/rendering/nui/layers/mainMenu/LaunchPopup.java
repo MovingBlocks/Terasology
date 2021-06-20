@@ -29,7 +29,8 @@ public class LaunchPopup extends CoreScreenLayer {
 
     @Override
     public void initialise() {
-        WidgetUtil.tryBindCheckbox(this, "showLaunchPopup", BindHelper.bindBeanProperty("launchPopupDisabled", config.getTelemetryConfig(), Boolean.TYPE));
+        WidgetUtil.tryBindCheckbox(this, "showLaunchPopup",
+                BindHelper.bindBeanProperty("launchPopupDisabled", config.getTelemetryConfig(), Boolean.TYPE));
 
         WidgetUtil.trySubscribe(this, "yes", (button) -> {
             yesHandler.run();

@@ -66,7 +66,8 @@ public class ServerHandshakeHandler extends ChannelInboundHandlerAdapter {
         }
     }
 
-    private void processClientHandshake(NetData.HandshakeHello clientHello, NetData.HandshakeVerification handshakeVerification, ChannelHandlerContext ctx) {
+    private void processClientHandshake(NetData.HandshakeHello clientHello, NetData.HandshakeVerification handshakeVerification,
+                                        ChannelHandlerContext ctx) {
         logger.info("Received client certificate");
         PublicIdentityCertificate clientCert = NetMessageUtil.convert(clientHello.getCertificate());
 
@@ -98,8 +99,11 @@ public class ServerHandshakeHandler extends ChannelInboundHandlerAdapter {
     private void processNewIdentityRequest(NetData.NewIdentityRequest newIdentityRequest, ChannelHandlerContext ctx) {
         logger.info("Received new identity request");
         try {
-            byte[] preMasterSecret = config.getSecurity().getServerPrivateCertificate().decrypt(newIdentityRequest.getPreMasterSecret().toByteArray());
-            byte[] masterSecret = HandshakeCommon.generateMasterSecret(preMasterSecret, newIdentityRequest.getRandom().toByteArray(), serverRandom);
+            byte[] preMasterSecret = config.getSecurity()
+                    .getServerPrivateCertificate()
+                    .decrypt(newIdentityRequest.getPreMasterSecret().toByteArray());
+            byte[] masterSecret = HandshakeCommon.generateMasterSecret(preMasterSecret,
+                    newIdentityRequest.getRandom().toByteArray(), serverRandom);
 
             // Generate a certificate pair for the client
             CertificatePair clientCertificates = new CertificateGenerator().generate(config.getSecurity().getServerPrivateCertificate());
@@ -111,11 +115,13 @@ public class ServerHandshakeHandler extends ChannelInboundHandlerAdapter {
 
             byte[] encryptedCert = null;
             try {
-                SecretKeySpec key = HandshakeCommon.generateSymmetricKey(masterSecret, newIdentityRequest.getRandom().toByteArray(), serverRandom);
+                SecretKeySpec key = HandshakeCommon.generateSymmetricKey(masterSecret,
+                        newIdentityRequest.getRandom().toByteArray(), serverRandom);
                 Cipher cipher = Cipher.getInstance(IdentityConstants.SYMMETRIC_ENCRYPTION_ALGORITHM);
                 cipher.init(Cipher.ENCRYPT_MODE, key);
                 encryptedCert = cipher.doFinal(certificateData.toByteArray());
-            } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | BadPaddingException | IllegalBlockSizeException e) {
+            } catch (NoSuchAlgorithmException | NoSuchPaddingException
+                    | InvalidKeyException | BadPaddingException | IllegalBlockSizeException e) {
                 logger.error("Unexpected error encrypting certificate for sending, ending connection attempt", e);
                 ctx.channel().close();
                 return;

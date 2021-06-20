@@ -213,7 +213,8 @@ public abstract class AbstractNode implements Node {
             success = true;
         } else {
             DependencyConnection localBufferPairConnection =
-                    new BufferPairConnection(BufferPairConnection.getConnectionName(id, this.nodeUri), DependencyConnection.Type.OUTPUT, bufferPair, this.getUri());
+                    new BufferPairConnection(BufferPairConnection.getConnectionName(id, this.nodeUri),
+                            DependencyConnection.Type.OUTPUT, bufferPair, this.getUri());
             success = addOutputConnection(localBufferPairConnection);
         }
         return success;
@@ -250,7 +251,8 @@ public abstract class AbstractNode implements Node {
             success = true;
         } else {
             DependencyConnection localBufferPairConnection =
-                    new BufferPairConnection(BufferPairConnection.getConnectionName(id, this.nodeUri), DependencyConnection.Type.OUTPUT, from.getData(), this.getUri());
+                    new BufferPairConnection(BufferPairConnection.getConnectionName(id, this.nodeUri),
+                            DependencyConnection.Type.OUTPUT, from.getData(), this.getUri());
             success = addOutputConnection(localBufferPairConnection);
         }
         return success;
@@ -258,7 +260,8 @@ public abstract class AbstractNode implements Node {
 
     public boolean addOutputBufferPairConnection(int id) {
         DependencyConnection localBufferPairConnection =
-                new BufferPairConnection(BufferPairConnection.getConnectionName(id, this.nodeUri), DependencyConnection.Type.OUTPUT, this.getUri());
+                new BufferPairConnection(BufferPairConnection.getConnectionName(id, this.nodeUri),
+                        DependencyConnection.Type.OUTPUT, this.getUri());
         return addOutputConnection(localBufferPairConnection);
     }
 
@@ -270,7 +273,8 @@ public abstract class AbstractNode implements Node {
      */
     protected boolean addInputFboConnection(int id, FboConnection from) {
         DependencyConnection fboConnection =
-                new FboConnection(FboConnection.getConnectionName(id, this.nodeUri), DependencyConnection.Type.INPUT, from.getData(), this.getUri());
+                new FboConnection(FboConnection.getConnectionName(id, this.nodeUri),
+                        DependencyConnection.Type.INPUT, from.getData(), this.getUri());
         fboConnection.setConnectedConnection(from); // must remember where I'm connected from
         return addInputConnection(fboConnection);
     }
@@ -283,7 +287,8 @@ public abstract class AbstractNode implements Node {
      */
     public boolean addInputFboConnection(int id, FBO fboData) {
         DependencyConnection fboConnection =
-                new FboConnection(FboConnection.getConnectionName(id, this.nodeUri), DependencyConnection.Type.INPUT, fboData, this.getUri());
+                new FboConnection(FboConnection.getConnectionName(id, this.nodeUri),
+                        DependencyConnection.Type.INPUT, fboData, this.getUri());
         return addInputConnection(fboConnection);
     }
 
@@ -318,7 +323,8 @@ public abstract class AbstractNode implements Node {
             success = true;
         } else {
             DependencyConnection fboConnection =
-                    new FboConnection(FboConnection.getConnectionName(id, this.nodeUri), DependencyConnection.Type.OUTPUT, fboData, this.getUri());
+                    new FboConnection(FboConnection.getConnectionName(id, this.nodeUri),
+                            DependencyConnection.Type.OUTPUT, fboData, this.getUri());
             success = addOutputConnection(fboConnection);
         }
         return success;
@@ -326,7 +332,8 @@ public abstract class AbstractNode implements Node {
 
     public boolean addOutputFboConnection(int id) {
         DependencyConnection fboConnection =
-                new FboConnection(FboConnection.getConnectionName(id, this.nodeUri), DependencyConnection.Type.OUTPUT, this.getUri());
+                new FboConnection(FboConnection.getConnectionName(id, this.nodeUri),
+                        DependencyConnection.Type.OUTPUT, this.getUri());
         return addOutputConnection(fboConnection);
     }
 

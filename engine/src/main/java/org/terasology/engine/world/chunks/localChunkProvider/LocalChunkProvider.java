@@ -139,7 +139,9 @@ public class LocalChunkProvider implements ChunkProvider {
         Chunk[] chunks = new Chunk[region.volume()];
         for (Vector3ic chunkPos : region) {
             Chunk chunk = chunkCache.get(chunkPos);
-            int index = (chunkPos.x() - region.minX()) + region.getSizeX() * ((chunkPos.z() - region.minZ()) + region.getSizeZ()  * (chunkPos.y() - region.minY()));
+            int index = (chunkPos.x() - region.minX()) + region.getSizeX()
+                    * ((chunkPos.z() - region.minZ()) + region.getSizeZ()
+                    * (chunkPos.y() - region.minY()));
             chunks[index] = chunk;
         }
         return new ChunkViewCoreImpl(chunks, region, offset, blockManager.getBlock(BlockManager.AIR_ID));

@@ -15,7 +15,8 @@ import org.terasology.engine.rendering.assets.mesh.Mesh;
 public interface TerasologyCanvasRenderer extends CanvasRenderer {
     FrameBufferObject getFBO(ResourceUrn urn, Vector2ic size);
 
-    void drawMesh(Mesh mesh, Material material, Rectanglei drawRegion, Rectanglei cropRegion, Quaternionfc rotation, Vector3fc offset, float scale, float alpha);
+    void drawMesh(Mesh mesh, Material material, Rectanglei drawRegion, Rectanglei cropRegion,
+                  Quaternionfc rotation, Vector3fc offset, float scale, float alpha);
 
     void drawMaterialAt(Material material, Rectanglei drawRegion);
 }

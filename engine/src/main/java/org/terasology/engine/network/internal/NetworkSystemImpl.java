@@ -849,7 +849,9 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
 
         client.connected(entityManager, entitySerializer, eventSerializer, eventLibrary);
         client.send(NetData.NetMessage.newBuilder().setJoinComplete(
-                NetData.JoinCompleteMessage.newBuilder().setClientId(client.getEntity().getComponent(NetworkComponent.class).getNetworkId())).build());
+                NetData.JoinCompleteMessage.newBuilder().setClientId(client.getEntity()
+                                .getComponent(NetworkComponent.class)
+                                .getNetworkId())).build());
         clientList.add(client);
         netClientList.add(client);
         clientPlayerLookup.put(client.getEntity(), client);

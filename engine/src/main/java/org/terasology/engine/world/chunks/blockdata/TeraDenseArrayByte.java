@@ -27,7 +27,8 @@ public abstract class TeraDenseArrayByte extends TeraDenseArray {
     protected TeraDenseArrayByte(int sizeX, int sizeY, int sizeZ, byte[] data) {
         super(sizeX, sizeY, sizeZ, false);
         this.data = Preconditions.checkNotNull(data);
-        Preconditions.checkArgument(data.length == dataSize(), "The length of the parameter 'data' has to be " + dataSize() + " but is " + data.length);
+        Preconditions.checkArgument(data.length == dataSize(),
+                "The length of the parameter 'data' has to be " + dataSize() + " but is " + data.length);
     }
 
     protected TeraDenseArrayByte(TeraArray in) {

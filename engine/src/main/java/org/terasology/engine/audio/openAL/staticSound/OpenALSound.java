@@ -35,7 +35,8 @@ public final class OpenALSound extends StaticSound {
     // TODO: Do we have proper support for unloading sounds (as mods are changed?)
     private int bufferId;
 
-    public OpenALSound(ResourceUrn urn, AssetType<?, StaticSoundData> assetType, StaticSoundData data, OpenALManager audioManager, OpenALSound.DisposalAction disposalAction) {
+    public OpenALSound(ResourceUrn urn, AssetType<?, StaticSoundData> assetType, StaticSoundData data,
+                       OpenALManager audioManager, OpenALSound.DisposalAction disposalAction) {
         super(urn, assetType, disposalAction);
         disposalAction.setAsset(this);
         this.audioManager = audioManager;
@@ -92,7 +93,8 @@ public final class OpenALSound extends StaticSound {
                     audioManager.purgeSound(this);
                 }
 
-                AL10.alBufferData(bufferId, newData.getChannels() == 1 ? AL10.AL_FORMAT_MONO16 : AL10.AL_FORMAT_STEREO16, newData.getData(), newData.getSampleRate());
+                AL10.alBufferData(bufferId, newData.getChannels() == 1 ? AL10.AL_FORMAT_MONO16 : AL10.AL_FORMAT_STEREO16,
+                        newData.getData(), newData.getSampleRate());
                 OpenALException.checkState("Allocating sound buffer");
 
                 int bits = newData.getBufferBits();

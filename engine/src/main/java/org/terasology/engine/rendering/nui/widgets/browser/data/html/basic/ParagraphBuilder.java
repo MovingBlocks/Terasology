@@ -63,7 +63,8 @@ public class ParagraphBuilder implements HTMLBlockBuilder {
 
         for (Map.Entry<String, FlowRenderableFactory> flowRenderableFactoryEntry : flowRenderableFactoryMap.entrySet()) {
             if (flowRenderableFactoryEntry.getKey().equalsIgnoreCase(tag)) {
-                paragraphData.append(flowRenderableFactoryEntry.getValue().create(attributes, htmlFontResolver.getFont(fontName, bold), color, hyperlink));
+                paragraphData.append(flowRenderableFactoryEntry.getValue()
+                        .create(attributes, htmlFontResolver.getFont(fontName, bold), color, hyperlink));
                 return true;
             }
         }

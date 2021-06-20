@@ -50,7 +50,8 @@ public class ClientIdentity {
         }
         if (obj instanceof ClientIdentity) {
             ClientIdentity other = (ClientIdentity) obj;
-            return Objects.equals(playerPublicCertificate, other.playerPublicCertificate) && Objects.equals(playerPrivateCertificate, other.playerPrivateCertificate);
+            return Objects.equals(playerPublicCertificate, other.playerPublicCertificate)
+                    && Objects.equals(playerPrivateCertificate, other.playerPrivateCertificate);
         }
         return false;
     }

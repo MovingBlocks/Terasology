@@ -66,7 +66,9 @@ public class FilePickerPopup extends CoreScreenLayer {
         find("currentPath", UILabel.class).bindText(new ReadOnlyBinding<String>() {
             @Override
             public String get() {
-                return currentPath == null ? translationSystem.translate("${engine:menu#file-picker-roots-title}") : pathToString(currentPath, false);
+                return currentPath == null
+                        ? translationSystem.translate("${engine:menu#file-picker-roots-title}")
+                        : pathToString(currentPath, false);
             }
         });
         find("fileName", UIText.class).bindText(new Binding<String>() {
@@ -188,6 +190,8 @@ public class FilePickerPopup extends CoreScreenLayer {
     }
 
     private void showDirectoryAccessErrorMessage(String message) {
-        getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage(translationSystem.translate("${engine:menu#file-picker-cant-change-dir}"), message);
+        getManager()
+                .pushScreen(MessagePopup.ASSET_URI, MessagePopup.class)
+                .setMessage(translationSystem.translate("${engine:menu#file-picker-cant-change-dir}"), message);
     }
 }

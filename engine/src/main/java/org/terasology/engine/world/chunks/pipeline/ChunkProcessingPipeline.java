@@ -6,7 +6,6 @@ package org.terasology.engine.world.chunks.pipeline;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.util.concurrent.SettableFuture;
 import org.joml.Vector3ic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,13 +15,10 @@ import org.terasology.engine.world.chunks.Chunk;
 import org.terasology.engine.world.chunks.pipeline.stages.ChunkTask;
 import org.terasology.engine.world.chunks.pipeline.stages.ChunkTaskProvider;
 
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -259,7 +255,7 @@ public class ChunkProcessingPipeline {
      *
      * @return copy of processing positions
      */
-    public List<Vector3ic> getProcessingPosition() {
-        return new LinkedList<>(chunkProcessingInfoMap.keySet());
+    public Iterable<Vector3ic> getProcessingPosition() {
+        return chunkProcessingInfoMap.keySet();
     }
 }

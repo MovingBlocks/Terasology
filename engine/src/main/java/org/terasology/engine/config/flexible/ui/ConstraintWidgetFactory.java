@@ -11,7 +11,8 @@ import java.util.Optional;
 /**
  * Creates {@link UIWidget}s by {@link Setting} and used {@link SettingConstraint}
  * <p>
- * You should to implement {@link ConstraintWidgetFactory} if you what use custom type in your {@link org.terasology.engine.config.flexible.AutoConfig}
+ * You should to implement {@link ConstraintWidgetFactory} if you what use custom type
+ * in your {@link org.terasology.engine.config.flexible.AutoConfig}
  * 
  * @param <T> type of setting
  * @param <C> concrete type of {@link SettingConstraint}

@@ -32,7 +32,9 @@ public class DefaultWorldGeneratorPluginLibrary implements WorldGeneratorPluginL
     public <U extends WorldGeneratorPlugin> List<U> instantiateAllOfType(Class<U> ofType) {
         List<U> result = Lists.newArrayList();
         for (ClassMetadata<?, ?> classMetadata : library) {
-            if (ofType.isAssignableFrom(classMetadata.getType()) && classMetadata.isConstructable() && classMetadata.getType().getAnnotation(RegisterPlugin.class) != null) {
+            if (ofType.isAssignableFrom(classMetadata.getType())
+                    && classMetadata.isConstructable()
+                    && classMetadata.getType().getAnnotation(RegisterPlugin.class) != null) {
                 U item = ofType.cast(classMetadata.newInstance());
                 if (item != null) {
                     result.add(item);

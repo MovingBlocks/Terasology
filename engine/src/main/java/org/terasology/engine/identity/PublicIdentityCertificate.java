@@ -108,7 +108,8 @@ public class PublicIdentityCertificate {
             cipher.init(Cipher.ENCRYPT_MODE, key);
             return cipher.doFinal(data);
         } catch (NoSuchAlgorithmException | NoSuchPaddingException e) {
-            throw new RuntimeException("Insufficient support for '" + IdentityConstants.CERTIFICATE_ALGORITHM + "', required for identity management", e);
+            throw new RuntimeException("Insufficient support for '" + IdentityConstants.CERTIFICATE_ALGORITHM
+                    + "', required for identity management", e);
         } catch (InvalidKeySpecException | InvalidKeyException | BadPaddingException | IllegalBlockSizeException e) {
             throw new RuntimeException("Unexpected error during encryption", e);
         }
@@ -141,7 +142,8 @@ public class PublicIdentityCertificate {
             signatureVerifier.update(exponent.toByteArray());
             return signatureVerifier.verify(getSignatureBytes());
         } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException("Insufficient support for '" + IdentityConstants.CERTIFICATE_ALGORITHM + "', required for identity management", e);
+            throw new RuntimeException("Insufficient support for '" + IdentityConstants.CERTIFICATE_ALGORITHM
+                    + "', required for identity management", e);
         } catch (InvalidKeySpecException e) {
             return false;
         } catch (SignatureException e) {
@@ -169,7 +171,8 @@ public class PublicIdentityCertificate {
             signatureVerifier.update(data);
             return signatureVerifier.verify(signedData);
         } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException("Insufficient support for '" + IdentityConstants.CERTIFICATE_ALGORITHM + "', required for identity management", e);
+            throw new RuntimeException("Insufficient support for '" + IdentityConstants.CERTIFICATE_ALGORITHM
+                    + "', required for identity management", e);
         } catch (InvalidKeySpecException e) {
             return false;
         } catch (SignatureException e) {

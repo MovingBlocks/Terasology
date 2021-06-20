@@ -4,7 +4,6 @@ package org.terasology.engine.rendering;
 
 import com.google.common.collect.Sets;
 import org.lwjgl.Version;
-import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
@@ -12,7 +11,6 @@ import org.lwjgl.opengl.GL30;
 import org.lwjgl.system.Platform;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.engine.registry.CoreRegistry;
 import org.terasology.engine.rendering.assets.material.Material;
 import org.terasology.engine.rendering.assets.material.MaterialData;
@@ -20,6 +18,7 @@ import org.terasology.engine.rendering.assets.shader.Shader;
 import org.terasology.engine.rendering.assets.texture.Texture;
 import org.terasology.engine.rendering.opengl.GLSLMaterial;
 import org.terasology.engine.utilities.Assets;
+import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.gestalt.assets.management.AssetManager;
 
 import java.util.Optional;
