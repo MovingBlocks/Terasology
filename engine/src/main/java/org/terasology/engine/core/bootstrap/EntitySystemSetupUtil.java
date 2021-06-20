@@ -146,9 +146,12 @@ public final class EntitySystemSetupUtil {
         registerEvents(entityManager.getEventSystem(), environment);
     }
 
-    private static EventSystem createEventSystem(NetworkSystem networkSystem, PojoEntityManager entityManager,
-                                                 EntitySystemLibrary library, RecordedEventStore recordedEventStore,
-                                                 RecordAndReplaySerializer recordAndReplaySerializer, RecordAndReplayUtils recordAndReplayUtils,
+    private static EventSystem createEventSystem(NetworkSystem networkSystem,
+                                                 PojoEntityManager entityManager,
+                                                 EntitySystemLibrary library,
+                                                 RecordedEventStore recordedEventStore,
+                                                 RecordAndReplaySerializer recordAndReplaySerializer,
+                                                 RecordAndReplayUtils recordAndReplayUtils,
                                                  RecordAndReplayCurrentStatus recordAndReplayCurrentStatus) {
         EventSystem eventSystem;
         List<Class<?>> selectedClassesToRecord = createSelectedClassesToRecordList();
