@@ -30,15 +30,19 @@ public class BaseFacet3D implements WorldFacet3D {
 
     protected final int getRelativeIndex(int x, int y, int z) {
         if (!relativeRegion.contains(x, y, z)) {
-            throw new IllegalArgumentException(String.format("Out of bounds: (%d, %d, %d) for region %s", x, y, z, relativeRegion.toString()));
+            throw new IllegalArgumentException(
+                    String.format("Out of bounds: (%d, %d, %d) for region %s", x, y, z, relativeRegion.toString()));
         }
-        return x - relativeRegion.minX() + relativeRegion.getSizeX() * (y - relativeRegion.minY() + relativeRegion.getSizeY() * (z - relativeRegion.minZ()));
+        return x - relativeRegion.minX()
+                + relativeRegion.getSizeX() * (y - relativeRegion.minY() + relativeRegion.getSizeY() * (z - relativeRegion.minZ()));
     }
 
     protected final int getWorldIndex(int x, int y, int z) {
         if (!worldRegion.contains(x, y, z)) {
-            throw new IllegalArgumentException(String.format("Out of bounds: (%d, %d, %d) for region %s", x, y, z, worldRegion.toString()));
+            throw new IllegalArgumentException(
+                    String.format("Out of bounds: (%d, %d, %d) for region %s", x, y, z, worldRegion.toString()));
         }
-        return x - worldRegion.minX() + worldRegion.getSizeX() * (y - worldRegion.minY() + worldRegion.getSizeY() * (z - worldRegion.minZ()));
+        return x - worldRegion.minX()
+                + worldRegion.getSizeX() * (y - worldRegion.minY() + worldRegion.getSizeY() * (z - worldRegion.minZ()));
     }
 }

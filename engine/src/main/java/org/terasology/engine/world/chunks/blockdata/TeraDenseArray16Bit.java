@@ -29,7 +29,8 @@ public class TeraDenseArray16Bit extends TeraDenseArray {
     public TeraDenseArray16Bit(int sizeX, int sizeY, int sizeZ, short[] data) {
         super(sizeX, sizeY, sizeZ, false);
         this.data = Preconditions.checkNotNull(data);
-        Preconditions.checkArgument(data.length == getSizeXYZ(), "The length of parameter 'data' has to be " + getSizeXYZ() + " but is " + data.length);
+        Preconditions.checkArgument(data.length == getSizeXYZ(),
+                "The length of parameter 'data' has to be " + getSizeXYZ() + " but is " + data.length);
     }
 
     public TeraDenseArray16Bit(TeraArray in) {

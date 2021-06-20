@@ -16,8 +16,9 @@ public interface EngineSubsystem {
     String getName();
 
     /**
-     * Called on each system before initialisation. This is an opportunity to add anything into the root context that will carry across the entire rune
-     * of the engine, and may be used by other systems
+     * Called on each system before initialisation.
+     * This is an opportunity to add anything into the root context that will carry across the entire rune of the engine,
+     * and may be used by other systems
      *
      * @param rootContext The root context, that will survive the entire run of the engine
      */

@@ -27,7 +27,8 @@ public class SpecificAccessibleObject<T extends AccessibleObject> {
         this.target = target;
     }
 
-    public static SpecificAccessibleObject<Method> method(Object target, String name, Class<?>... parameterTypes) throws NoSuchMethodException {
+    public static SpecificAccessibleObject<Method> method(Object target, String name, Class<?>... parameterTypes)
+            throws NoSuchMethodException {
         Class<?> targetClass = target.getClass();
         Method method = targetClass.getMethod(name, parameterTypes);
 
@@ -41,7 +42,8 @@ public class SpecificAccessibleObject<T extends AccessibleObject> {
         return new SpecificAccessibleObject<>(field, target);
     }
 
-    public static SpecificAccessibleObject<Method> declaredMethod(Object target, String name, Class<?>... parameterTypes) throws NoSuchMethodException {
+    public static SpecificAccessibleObject<Method> declaredMethod(Object target, String name, Class<?>... parameterTypes)
+            throws NoSuchMethodException {
         Class<?> targetClass = target.getClass();
         Method method = targetClass.getDeclaredMethod(name, parameterTypes);
 

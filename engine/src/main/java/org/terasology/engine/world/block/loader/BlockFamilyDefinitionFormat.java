@@ -208,7 +208,8 @@ public class BlockFamilyDefinitionFormat extends AbstractAssetFileFormat<BlockFa
         }
 
         private <T> void readBlockPartMap(JsonObject jsonObject, String singleName,
-                                          String partsName, Supplier<EnumMap<BlockPart, T>> supplier, Class<T> type, JsonDeserializationContext context) {
+                                          String partsName, Supplier<EnumMap<BlockPart, T>> supplier, Class<T> type,
+                                          JsonDeserializationContext context) {
             if (jsonObject.has(singleName)) {
                 T value = context.deserialize(jsonObject.get(singleName), type);
                 for (BlockPart blockPart : BlockPart.values()) {
@@ -312,7 +313,8 @@ public class BlockFamilyDefinitionFormat extends AbstractAssetFileFormat<BlockFa
         }
 
         @Override
-        public Class<? extends BlockFamily> deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+        public Class<? extends BlockFamily> deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
+                throws JsonParseException {
 
             BlockFamilyLibrary library = CoreRegistry.get(BlockFamilyLibrary.class);
             return library.getBlockFamily(json.getAsString());

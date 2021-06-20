@@ -40,7 +40,8 @@ public class ComponentLibrary extends ModuleClassLibrary<Component> {
     }
 
     @Override
-    protected <C extends Component> ClassMetadata<C, ?> createMetadata(Class<C> type, ReflectFactory factory, CopyStrategyLibrary copyStrategies, ResourceUrn uri) {
+    protected <C extends Component> ClassMetadata<C, ?> createMetadata(Class<C> type, ReflectFactory factory,
+                                                                       CopyStrategyLibrary copyStrategies, ResourceUrn uri) {
         ComponentMetadata<C> info;
         try {
             info = new ComponentMetadata<>(uri, type, factory, copyStrategies);

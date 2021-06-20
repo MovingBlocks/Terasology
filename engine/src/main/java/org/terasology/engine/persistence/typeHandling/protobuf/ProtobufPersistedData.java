@@ -208,7 +208,8 @@ public class ProtobufPersistedData implements PersistedData, PersistedDataArray 
 
     @Override
     public boolean isNull() {
-        return !data.hasBytes() && data.getBooleanCount() + data.getFloatCount() + data.getDoubleCount() + data.getIntegerCount() + data.getLongCount()
+        return !data.hasBytes() && data.getBooleanCount() + data.getFloatCount() + data.getDoubleCount()
+                + data.getIntegerCount() + data.getLongCount()
                 + data.getStringCount() + data.getValueCount() + data.getNameValueCount() == 0;
     }
 

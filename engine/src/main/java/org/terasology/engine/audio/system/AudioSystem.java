@@ -112,9 +112,13 @@ public class AudioSystem extends BaseComponentSystem implements UpdateSubscriber
 
     @Override
     public void update(float delta) {
+        if (!localPlayer.isValid()) {
+            // localplayer is invalid so no audio
+            return;
+        }
         audioManager.updateListener(
-            localPlayer.getPosition(playerPosition),
-            localPlayer.getViewRotation(playerViewRotation),
-            localPlayer.getVelocity(playerVelocity));
+                localPlayer.getPosition(playerPosition),
+                localPlayer.getViewRotation(playerViewRotation),
+                localPlayer.getVelocity(playerVelocity));
     }
 }

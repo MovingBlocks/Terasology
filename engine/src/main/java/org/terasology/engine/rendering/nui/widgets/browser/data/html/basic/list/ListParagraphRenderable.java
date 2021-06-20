@@ -37,6 +37,7 @@ public class ListParagraphRenderable implements ParagraphRenderable {
     @Override
     public void renderContents(Canvas canvas, Vector2i startPos, ContainerRenderSpace containerRenderSpace, int leftIndent, int rightIndent,
                                ParagraphRenderStyle defaultStyle, HorizontalAlign horizontalAlign, HyperlinkRegister hyperlinkRegister) {
-        multiBlockParagraphRenderable.renderContents(canvas, startPos, containerRenderSpace, leftIndent, rightIndent, defaultStyle, horizontalAlign, hyperlinkRegister);
+        multiBlockParagraphRenderable.renderContents(canvas, startPos, containerRenderSpace, leftIndent, rightIndent,
+                defaultStyle, horizontalAlign, hyperlinkRegister);
     }
 }

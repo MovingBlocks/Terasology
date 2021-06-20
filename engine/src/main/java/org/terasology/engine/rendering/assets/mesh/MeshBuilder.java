@@ -140,7 +140,9 @@ public class MeshBuilder {
         int vertexId = vertexCount;
         textureMapper.initialize(offset, size);
         for (int i = 0; i < VERTICES.length / 3; i++) {
-            addVertex(new Vector3f(offset.x() + size.x() * VERTICES[i * 3], offset.y() + size.y() * VERTICES[i * 3 + 1], offset.z() + size.z() * VERTICES[i * 3 + 2]));
+            addVertex(new Vector3f(offset.x() + size.x() * VERTICES[i * 3],
+                    offset.y() + size.y() * VERTICES[i * 3 + 1],
+                    offset.z() + size.z() * VERTICES[i * 3 + 2]));
             addTexCoord(textureMapper.map(i, u, v));
         }
         for (int i : INDICES) {

@@ -104,7 +104,8 @@ public final class InjectionHelper {
      * @param clazz The class to instantiate.
      * @param context The context to use for injection.
      * @return A new instance of the class to create.
-     * @throws NoSuchElementException if the injection failed, e.g. if no parameters were available on the context and a default constructor is missing.
+     * @throws NoSuchElementException if the injection failed,
+     * e.g. if no parameters were available on the context and a default constructor is missing.
      */
     public static <E> E createWithConstructorInjection(Class<? extends E> clazz, Context context) {
         return safeCreateWithConstructorInjection(clazz, context).get();

@@ -227,7 +227,9 @@ public class BindsSubsystem implements EngineSubsystem, BindsManager {
                     bindButton.setMode(info.mode());
                     bindButton.setRepeating(info.repeating());
 
-                    bindsConfiguration.getBinds(bindUri).stream().filter(input -> input != null).forEach(input -> linkBindButtonToInput(input, bindUri));
+                    bindsConfiguration.getBinds(bindUri).stream()
+                            .filter(input -> input != null)
+                            .forEach(input -> linkBindButtonToInput(input, bindUri));
 
                     logger.debug("Registered button bind: {}", bindUri);
                 } catch (InstantiationException | IllegalAccessException e) {
@@ -257,7 +259,8 @@ public class BindsSubsystem implements EngineSubsystem, BindsManager {
                     continue;
                 }
                 try {
-                    BindableAxis bindAxis = registerBindAxis(id.toString(), (BindAxisEvent) registerBindClass.newInstance(), positiveButton, negativeButton);
+                    BindableAxis bindAxis = registerBindAxis(id.toString(), (BindAxisEvent) registerBindClass.newInstance(),
+                            positiveButton, negativeButton);
                     bindAxis.setSendEventMode(info.eventMode());
                     logger.debug("Registered axis bind: {}", id);
                 } catch (InstantiationException | IllegalAccessException e) {

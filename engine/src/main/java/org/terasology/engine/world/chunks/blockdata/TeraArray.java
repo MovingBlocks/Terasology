@@ -43,8 +43,10 @@ public abstract class TeraArray {
         sizeXZHalf = sizeXZ / 2;
         sizeXYZ = sizeY * sizeXZ;
         sizeXYZHalf = sizeXYZ / 2;
-        checkArgument(getSizeXYZ() % 2 == 0, "The product of the parameters 'sizeX', 'sizeY' and 'sizeZ' has to be a multiple of 2 (" + getSizeXYZ() + ")");
-        checkArgument(getSizeXZ() % 2 == 0, "The product of the parameters 'sizeX' and 'sizeZ' has to be a multiple of 2 (" + getSizeXZ() + ")");
+        checkArgument(getSizeXYZ() % 2 == 0, "The product of the parameters 'sizeX', 'sizeY' and 'sizeZ' " +
+                "has to be a multiple of 2 (" + getSizeXYZ() + ")");
+        checkArgument(getSizeXZ() % 2 == 0, "The product of the parameters 'sizeX' and 'sizeZ' " +
+                "has to be a multiple of 2 (" + getSizeXZ() + ")");
         if (initialize) {
             initialize();
         }
