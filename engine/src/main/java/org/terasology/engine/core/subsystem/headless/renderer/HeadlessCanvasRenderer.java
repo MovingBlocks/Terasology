@@ -71,8 +71,8 @@ public class HeadlessCanvasRenderer implements TerasologyCanvasRenderer {
     }
 
     @Override
-    public void drawText(String text, Font font, HorizontalAlign hAlign, VerticalAlign vAlign, Rectanglei absoluteRegion, Colorc color, Colorc shadowColor,
-                         float alpha, boolean underlined) {
+    public void drawText(String text, Font font, HorizontalAlign hAlign, VerticalAlign vAlign, Rectanglei absoluteRegion,
+                         Colorc color, Colorc shadowColor, float alpha, boolean underlined) {
         // Do nothing
     }
 
