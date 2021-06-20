@@ -55,11 +55,14 @@ public class ConditionAction extends BaseAction {
             }
             return BehaviorState.SUCCESS;
         } catch (ClassNotFoundException e) {
-            logger.error("Class not found. Does the Component specified exist?", e);
+            logger.error("Class not found. " +
+                    "Does the Component specified exist?", e);
         } catch (NoSuchFieldException e) {
-            logger.error("Field not found. Does the field specified in 'values' (publicly) exist in the Component specified in 'componentPresent'?", e);
+            logger.error("Field not found. " +
+                    "Does the field specified in 'values' (publicly) exist in the Component specified in 'componentPresent'?", e);
         } catch (IllegalAccessException e) {
-            logger.error("Illegal access. Do we have access to the Component in question?", e);
+            logger.error("Illegal access. " +
+                    "Do we have access to the Component in question?", e);
         }
         return BehaviorState.FAILURE;
     }

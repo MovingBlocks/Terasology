@@ -114,8 +114,8 @@ public class Border3D {
     }
 
     /**
-     * Returns a new border, using the largest value of each extension for both borders. Border A(Sides=5,Bottom=4,Top=3) maxed with border B (Sides=3,Bottom=4,Top=5)
-     * would make a border C with boundries: (5,4,5).
+     * Returns a new border, using the largest value of each extension for both borders.
+     * Border A(Sides=5,Bottom=4,Top=3) maxed with border B (Sides=3,Bottom=4,Top=5) would make a border C with boundries: (5,4,5).
      * @param other The top value to compare with the instance's top value.
      * @return The resulting new Border3D.
      */
@@ -131,8 +131,8 @@ public class Border3D {
     }
 
     /**
-     * Checks if the fields of the instance are the same as the object passed in the parameters. It compares the size of the Border3D and returns true of all sizes are the
-     * same.
+     * Checks if the fields of the instance are the same as the object passed in the parameters.
+     * It compares the size of the Border3D and returns true of all sizes are the same.
      */
     @Override
     public boolean equals(Object obj) {

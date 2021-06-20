@@ -31,7 +31,8 @@ public final class Example {
         treeBuilder.registerAction("delay", Delay.class);
         Actor actor = new Actor(null);
         actor.setDelta(0.1f);
-        node = treeBuilder.fromJson("{ sequence:[ success, { delay:{duration:1}}, { print:{msg:Hello} }, { delay:{duration:1}}, { print:{msg:World} } ] }");
+        node = treeBuilder.fromJson("{ sequence:[ success, { delay:{duration:1}}, { print:{msg:Hello} }, " +
+                "{ delay:{duration:1}}, { print:{msg:World} } ] }");
         DefaultBehaviorTreeRunner tree = new DefaultBehaviorTreeRunner(node, actor);
         for (int i = 0; i < 100; i++) {
             tree.step();
@@ -42,7 +43,8 @@ public final class Example {
         actor.setDelta(0.1f);
         node = treeBuilder.fromJson(
                 "{ sequence:[ "
-                        + "{repeat :{ count:5, child:{print:{msg:x}}}}, success, { delay:{duration:1}}, { print:{msg:Hello} }, { delay:{duration:1}}, { print:{msg:World} } "
+                        + "{repeat :{ count:5, child:{print:{msg:x}}}}, success, { delay:{duration:1}}, " +
+                        "{ print:{msg:Hello} }, { delay:{duration:1}}, { print:{msg:World} } "
                         + "] }");
         tree = new DefaultBehaviorTreeRunner(node, actor);
         for (int i = 0; i < 100; i++) {

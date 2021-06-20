@@ -47,7 +47,8 @@ public final class DocumentRenderer {
         return new Vector2i(documentWidth, preferredHeight + documentVerticalMargins);
     }
 
-    public static int getParagraphsMinimumWidth(int availableWidth, ParagraphRenderStyle baseParagraphRenderStyle, Collection<ParagraphData> paragraphs) {
+    public static int getParagraphsMinimumWidth(int availableWidth, ParagraphRenderStyle baseParagraphRenderStyle,
+                                                Collection<ParagraphData> paragraphs) {
         int minParagraphsWidth = 0;
         for (ParagraphData paragraphData : paragraphs) {
             ParagraphRenderStyle paragraphRenderStyle = getParagraphRenderStyle(baseParagraphRenderStyle, paragraphData);
@@ -109,7 +110,8 @@ public final class DocumentRenderer {
                         + paragraphRenderStyle.getParagraphPaddingLeft().getValue(containerWidth)
                         + paragraphRenderStyle.getParagraphPaddingRight().getValue(containerWidth);
 
-                yShift += paragraphData.getParagraphContents().getPreferredContentsHeight(paragraphRenderStyle, yShift, containerRenderSpace, paragraphSideIndent);
+                yShift += paragraphData.getParagraphContents().getPreferredContentsHeight(paragraphRenderStyle, yShift,
+                        containerRenderSpace, paragraphSideIndent);
 
                 yShift += paragraphRenderStyle.getParagraphPaddingBottom().getValue(containerWidth)
                         + paragraphRenderStyle.getParagraphMarginBottom().getValue(containerWidth);
@@ -139,7 +141,8 @@ public final class DocumentRenderer {
 
         ContainerFlowContainerRenderSpace renderSpace = new ContainerFlowContainerRenderSpace(documentWidth);
 
-        renderParagraphs(canvas, register, documentRenderStyle, documentMarginLeft, documentMarginTop, documentMarginLeft, documentMarginRight, paragraphs, renderSpace);
+        renderParagraphs(canvas, register, documentRenderStyle, documentMarginLeft, documentMarginTop,
+                documentMarginLeft, documentMarginRight, paragraphs, renderSpace);
     }
 
     public static void renderParagraphs(Canvas canvas, ParagraphRenderable.HyperlinkRegister register, ParagraphRenderStyle baseRenderStyle,

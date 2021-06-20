@@ -34,8 +34,10 @@ public class TeraSparseArray16Bit extends TeraSparseArray {
         super(sizeX, sizeY, sizeZ, false);
         this.inflated = Preconditions.checkNotNull(inflated);
         this.deflated = Preconditions.checkNotNull(deflated);
-        Preconditions.checkArgument(inflated.length == sizeY, "The length of parameter 'inflated' has to be " + sizeY + " but is " + inflated.length);
-        Preconditions.checkArgument(deflated.length == sizeY, "The length of parameter 'deflated' has to be " + sizeY + " but is " + deflated.length);
+        Preconditions.checkArgument(inflated.length == sizeY,
+                "The length of parameter 'inflated' has to be " + sizeY + " but is " + inflated.length);
+        Preconditions.checkArgument(deflated.length == sizeY,
+                "The length of parameter 'deflated' has to be " + sizeY + " but is " + deflated.length);
     }
 
     public TeraSparseArray16Bit(int sizeX, int sizeY, int sizeZ, short fill) {
@@ -66,7 +68,8 @@ public class TeraSparseArray16Bit extends TeraSparseArray {
 
     @Override
     public TeraArray deflate(TeraVisitingDeflator deflator) {
-        return Preconditions.checkNotNull(deflator).deflateSparseArray16Bit(inflated, deflated, fill, getSizeXZ(), getSizeX(), getSizeY(), getSizeZ());
+        return Preconditions.checkNotNull(deflator)
+                .deflateSparseArray16Bit(inflated, deflated, fill, getSizeXZ(), getSizeX(), getSizeY(), getSizeZ());
     }
 
     @Override

@@ -153,7 +153,8 @@ public class ComponentSerializer {
      * @param context       The module this component is being deserialized from, or null if it isn't within a module
      * @return The target component.
      */
-    public Component deserializeOnto(Component target, EntityData.Component componentData, FieldSerializeCheck<Component> fieldCheck, Module context) {
+    public Component deserializeOnto(Component target, EntityData.Component componentData,
+                                     FieldSerializeCheck<Component> fieldCheck, Module context) {
         ComponentMetadata<? extends Component> componentMetadata = getComponentMetadata(componentData, context);
         if (componentMetadata != null) {
             return deserializeOnto(target, componentData, componentMetadata, fieldCheck);

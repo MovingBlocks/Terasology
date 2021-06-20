@@ -75,7 +75,8 @@ public class GLSLMaterial extends BaseMaterial {
         });
     }
 
-    public static GLSLMaterial create(ResourceUrn urn, LwjglGraphicsProcessing graphicsProcessing, AssetType<?, MaterialData> assetType, MaterialData data) {
+    public static GLSLMaterial create(ResourceUrn urn, LwjglGraphicsProcessing graphicsProcessing,
+                                      AssetType<?, MaterialData> assetType, MaterialData data) {
         return new GLSLMaterial(urn, assetType, data, graphicsProcessing, new DisposalAction(urn, graphicsProcessing));
     }
 

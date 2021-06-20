@@ -184,7 +184,6 @@ public final class EnvironmentSwitchHandler {
         }
     }
 
-
     @SuppressWarnings({"rawtypes", "unchecked"})
     private static void registerTypeHandlers(Context context, TypeHandlerLibrary library, ModuleEnvironment environment) {
         for (Class<? extends TypeHandler> handler : environment.getSubtypesOf(TypeHandler.class)) {

@@ -85,9 +85,11 @@ public abstract class ModuleRendering {
     protected BufferPair createBufferPair(String primaryBufferName, String secondaryBufferName,
                                           ScalingFactors sharedBufferScale, FBO.Type sharedBufferType, FBO.Dimensions scale) {
 
-        FBO buffer1 = generateWithDimensions(new FboConfig(new SimpleUri(providingModule + ":fbo." + primaryBufferName), sharedBufferScale, sharedBufferType)
+        FBO buffer1 = generateWithDimensions(new FboConfig(
+                new SimpleUri(providingModule + ":fbo." + primaryBufferName), sharedBufferScale, sharedBufferType)
                 .useDepthBuffer().useNormalBuffer().useLightBuffer().useStencilBuffer(), scale);
-        FBO buffer2 = generateWithDimensions(new FboConfig(new SimpleUri(providingModule + ":fbo." + secondaryBufferName), sharedBufferScale, sharedBufferType)
+        FBO buffer2 = generateWithDimensions(new FboConfig(
+                new SimpleUri(providingModule + ":fbo." + secondaryBufferName), sharedBufferScale, sharedBufferType)
                 .useDepthBuffer().useNormalBuffer().useLightBuffer().useStencilBuffer(), scale);
         return new BufferPair(buffer1, buffer2);
     }

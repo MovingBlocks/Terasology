@@ -83,9 +83,12 @@ public class RowLayoutTest {
         // Gets 1/10 of the entire area
         final int width3 = CANVAS_WIDTH / 10;
 
-        verify(canvas).drawWidget(itemAt1x1, RectUtility.createFromMinAndSize(0, 0, width1, CANVAS_HEIGHT));
-        verify(canvas).drawWidget(itemAt1x2, RectUtility.createFromMinAndSize(width1, 0, width2, CANVAS_HEIGHT));
-        verify(canvas).drawWidget(itemAt1x3, RectUtility.createFromMinAndSize(width1 + width2, 0, width3, CANVAS_HEIGHT));
+        verify(canvas).drawWidget(itemAt1x1,
+                RectUtility.createFromMinAndSize(0, 0, width1, CANVAS_HEIGHT));
+        verify(canvas).drawWidget(itemAt1x2,
+                RectUtility.createFromMinAndSize(width1, 0, width2, CANVAS_HEIGHT));
+        verify(canvas).drawWidget(itemAt1x3,
+                RectUtility.createFromMinAndSize(width1 + width2, 0, width3, CANVAS_HEIGHT));
     }
 
     @Test
@@ -103,9 +106,12 @@ public class RowLayoutTest {
         rowLayout.onDraw(canvas);
 
         //Width split equally among 3 widgets as they have no relative widths
-        verify(canvas).drawWidget(itemAt1x1, RectUtility.createFromMinAndSize(0, 0, CANVAS_WIDTH / 3, CANVAS_HEIGHT));
-        verify(canvas).drawWidget(itemAt1x2, RectUtility.createFromMinAndSize(CANVAS_WIDTH / 3, 0, CANVAS_WIDTH / 3, CANVAS_HEIGHT));
-        verify(canvas).drawWidget(itemAt1x3, RectUtility.createFromMinAndSize(CANVAS_WIDTH / 3 + CANVAS_WIDTH / 3, 0, CANVAS_WIDTH / 3, CANVAS_HEIGHT));
+        verify(canvas).drawWidget(itemAt1x1,
+                RectUtility.createFromMinAndSize(0, 0, CANVAS_WIDTH / 3, CANVAS_HEIGHT));
+        verify(canvas).drawWidget(itemAt1x2,
+                RectUtility.createFromMinAndSize(CANVAS_WIDTH / 3, 0, CANVAS_WIDTH / 3, CANVAS_HEIGHT));
+        verify(canvas).drawWidget(itemAt1x3,
+                RectUtility.createFromMinAndSize(CANVAS_WIDTH / 3 + CANVAS_WIDTH / 3, 0, CANVAS_WIDTH / 3, CANVAS_HEIGHT));
     }
 
     @Test
@@ -129,8 +135,11 @@ public class RowLayoutTest {
         final int width2 = (CANVAS_WIDTH - width1) / 2;
         final int width3 = (CANVAS_WIDTH - width1) / 2;
 
-        verify(canvas).drawWidget(itemAt1x1, RectUtility.createFromMinAndSize(0, 0, width1, CANVAS_HEIGHT));
-        verify(canvas).drawWidget(itemAt1x2, RectUtility.createFromMinAndSize(width1, 0, width2, CANVAS_HEIGHT));
-        verify(canvas).drawWidget(itemAt1x3, RectUtility.createFromMinAndSize(width1 + width2, 0, width3, CANVAS_HEIGHT));
+        verify(canvas).drawWidget(itemAt1x1,
+                RectUtility.createFromMinAndSize(0, 0, width1, CANVAS_HEIGHT));
+        verify(canvas).drawWidget(itemAt1x2,
+                RectUtility.createFromMinAndSize(width1, 0, width2, CANVAS_HEIGHT));
+        verify(canvas).drawWidget(itemAt1x3,
+                RectUtility.createFromMinAndSize(width1 + width2, 0, width3, CANVAS_HEIGHT));
     }
 }

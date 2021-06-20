@@ -52,7 +52,8 @@ public class ObjMeshFormat extends AbstractAssetFileFormat<MeshData> {
         }
     }
 
-    private StandardMeshData processData(List<Vector3f> rawVertices, List<Vector3f> rawNormals, List<Vector2f> rawTexCoords, List<Vector3i[]> rawIndices) throws IOException {
+    private StandardMeshData processData(List<Vector3f> rawVertices, List<Vector3f> rawNormals,
+                                         List<Vector2f> rawTexCoords, List<Vector3i[]> rawIndices) throws IOException {
         int numIndices = 0;
         int numVerts = 0;
         for (int x = 0; x < rawIndices.size(); x++) {
