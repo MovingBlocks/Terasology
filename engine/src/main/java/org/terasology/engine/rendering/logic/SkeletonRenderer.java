@@ -185,7 +185,8 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
         return animationPool.get(random.nextInt(animationPool.size()));
     }
 
-    private void updateSkeleton(SkeletalMeshComponent skeletalMeshComp, MeshAnimationFrame frameA, MeshAnimationFrame frameB, float interpolationVal) {
+    private void updateSkeleton(SkeletalMeshComponent skeletalMeshComp, MeshAnimationFrame frameA, MeshAnimationFrame frameB,
+                                float interpolationVal) {
         for (int i = 0; i < skeletalMeshComp.animation.getBoneCount(); ++i) {
             String boneName = skeletalMeshComp.animation.getBoneName(i);
             Bone bone = skeletalMeshComp.mesh.getBone(boneName);
@@ -220,7 +221,10 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
         for (EntityRef entity : entityManager.getEntitiesWith(SkeletalMeshComponent.class, LocationComponent.class)) {
 
             SkeletalMeshComponent skeletalMesh = entity.getComponent(SkeletalMeshComponent.class);
-            if (skeletalMesh.mesh == null || skeletalMesh.material == null || skeletalMesh.boneEntities == null || !skeletalMesh.material.isRenderable()) {
+            if (skeletalMesh.mesh == null
+                    || skeletalMesh.material == null
+                    || skeletalMesh.boneEntities == null
+                    || !skeletalMesh.material.isRenderable()) {
                 continue;
             }
             AABBf aabb;
@@ -253,7 +257,8 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
             skeletalMesh.material.enable();
             skeletalMesh.material.setFloat("sunlight", 1.0f, true);
             skeletalMesh.material.setFloat("blockLight", 1.0f, true);
-            skeletalMesh.material.setFloat3("colorOffset", skeletalMesh.color.rf(), skeletalMesh.color.gf(), skeletalMesh.color.bf(), true);
+            skeletalMesh.material.setFloat3("colorOffset", skeletalMesh.color.rf(),
+                    skeletalMesh.color.gf(), skeletalMesh.color.bf(), true);
 
             skeletalMesh.material.setMatrix4("projectionMatrix", worldRenderer.getActiveCamera().getProjectionMatrix());
             skeletalMesh.material.bindTextures();
@@ -325,7 +330,8 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
                 Vector3f worldPositionCameraSpace = new Vector3f();
                 worldPositionCameraSpace.sub(worldPos, cameraPosition);
 
-                Matrix4f matrixCameraSpace = new Matrix4f().translation(worldPositionCameraSpace); //anew Quat4f(0, 0, 0, 1), worldPositionCameraSpace, 1);
+                //anew Quat4f(0, 0, 0, 1), worldPositionCameraSpace, 1);
+                Matrix4f matrixCameraSpace = new Matrix4f().translation(worldPositionCameraSpace);
 
                 Matrix4f modelViewMatrix = worldRenderer.getActiveCamera().getViewMatrix().mul(matrixCameraSpace, new Matrix4f());
                 modelViewMatrix.get(tempMatrixBuffer44);

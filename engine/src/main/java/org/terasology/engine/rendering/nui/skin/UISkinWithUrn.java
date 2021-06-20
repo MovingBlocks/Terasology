@@ -12,7 +12,8 @@ import java.util.Map;
 
 /**
  * [NOTE] Sub-classing UISkin into UISkinWithUrn is a work-around in order to associate a ResourceUrn with a UISkin.
- * When a UISkin is deserialised (via UISkinTypeHandler), then it is copied into a new UISkinWithUrn instance to associate it with the urn it was deserialised with.
+ * When a UISkin is deserialised (via UISkinTypeHandler), then it is copied into a new UISkinWithUrn instance
+ * to associate it with the urn it was deserialised with.
  *
  * (2021-03-31) It is not clear whether this feature is used anywhere (in the Omega module space) right now.
  */

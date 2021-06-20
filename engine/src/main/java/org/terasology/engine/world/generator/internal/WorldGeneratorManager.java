@@ -54,8 +54,8 @@ public class WorldGeneratorManager {
                                 SimpleUri uri = new SimpleUri(moduleId, annotation.id());
                                 infos.add(new WorldGeneratorInfo(uri, annotation.displayName(), annotation.description()));
                             } else {
-                                logger.error("{} marked to be registered as a World Generator, but is not a subclass of WorldGenerator or lacks the correct constructor",
-                                        generatorClass);
+                                logger.error("{} marked to be registered as a World Generator, " +
+                                                "but is not a subclass of WorldGenerator or lacks the correct constructor", generatorClass);
                             }
                         }
                     }
@@ -96,9 +96,11 @@ public class WorldGeneratorManager {
             ResolutionResult result = resolver.resolve(uri.getModuleName());
             if (!result.isSuccess()) {
                 if (moduleManager.getRegistry().getLatestModuleVersion(uri.getModuleName()) == null) {
-                    throw new UnresolvedWorldGeneratorException("Unable to resolve world generator '" + uri + "' - not found");
+                    throw new UnresolvedWorldGeneratorException("Unable to resolve world generator '"
+                            + uri + "' - not found");
                 } else {
-                    throw new UnresolvedWorldGeneratorException("Unable to resolve world generator '" + uri + "' - unable to resolve module dependencies");
+                    throw new UnresolvedWorldGeneratorException("Unable to resolve world generator '"
+                            + uri + "' - unable to resolve module dependencies");
                 }
             }
             try (ModuleEnvironment environment = moduleManager.loadEnvironment(result.getModules(), false)) {
@@ -115,7 +117,8 @@ public class WorldGeneratorManager {
      * @param environment to be searched for the world generator class.
      * @return a new world generator with the specified uri.
      */
-    public static WorldGenerator createWorldGenerator(SimpleUri uri, Context context, ModuleEnvironment environment) throws UnresolvedWorldGeneratorException {
+    public static WorldGenerator createWorldGenerator(SimpleUri uri, Context context, ModuleEnvironment environment)
+            throws UnresolvedWorldGeneratorException {
         for (Class<?> generatorClass : environment.getTypesAnnotatedWith(RegisterWorldGenerator.class)) {
             RegisterWorldGenerator annotation = generatorClass.getAnnotation(RegisterWorldGenerator.class);
             Name moduleName = environment.getModuleProviding(generatorClass);
@@ -152,7 +155,8 @@ public class WorldGeneratorManager {
                 }
             }
             return false;
-            // Being generous in catching here, because if the module is broken due to code changes or missing classes the world generator is invalid
+            // Being generous in catching here, because if the module is broken due to code changes or missing classes
+            // the world generator is invalid
         } catch (NoSuchMethodException | RuntimeException e) {
             return false;
         }

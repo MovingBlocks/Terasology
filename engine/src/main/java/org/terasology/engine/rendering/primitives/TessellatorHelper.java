@@ -13,7 +13,8 @@ public final class TessellatorHelper {
     private TessellatorHelper() {
     }
 
-    public static void addBlockMesh(Tessellator tessellator, Vector4f color, float size, float light1, float light2, float posX, float posY, float posZ) {
+    public static void addBlockMesh(Tessellator tessellator, Vector4f color, float size,
+                                    float light1, float light2, float posX, float posY, float posZ) {
         Vector2f defaultSize = new Vector2f(1.0f, 1.0f);
         Vector2f defaultOffset = new Vector2f(0.0f, 0.0f);
         addBlockMesh(tessellator, color, defaultOffset, defaultSize, size, light1, light2, posX, posY, posZ);
