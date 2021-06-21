@@ -295,7 +295,6 @@ public final class WorldRendererImpl implements WorldRenderer {
             playerCamera.update(secondsSinceLastFrame);
 
             renderableWorld.update();
-            renderableWorld.generateVBOs();
             secondsSinceLastFrame = 0;
 
             displayResolutionDependentFbo.update();

@@ -13,7 +13,7 @@ import org.terasology.protobuf.EntityData;
 import org.terasology.gestalt.module.sandbox.API;
 
 /**
- * Chunks are a box-shaped logical grouping of Terasology's blocks, for performance reasons. 
+ * Chunks are a box-shaped logical grouping of Terasology's blocks, for performance reasons.
  *
  * For example the renderer renders a single mesh for all opaque blocks in a chunk rather
  * than rendering each block as a separate mesh.
@@ -356,10 +356,4 @@ public interface Chunk extends RenderableChunk {
     boolean isDirty();
 
     void setDirty(boolean dirty);
-
-    void setPendingMesh(ChunkMesh newPendingMesh);
-
-    boolean hasPendingMesh();
-
-    ChunkMesh getPendingMesh();
 }

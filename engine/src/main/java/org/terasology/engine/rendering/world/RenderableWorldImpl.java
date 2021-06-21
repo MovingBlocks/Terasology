@@ -4,6 +4,19 @@ package org.terasology.engine.rendering.world;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
+import io.reactivex.rxjava3.core.Flowable;
+import io.reactivex.rxjava3.core.MaybeSource;
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.core.Scheduler;
+import io.reactivex.rxjava3.disposables.Disposable;
+import io.reactivex.rxjava3.functions.Action;
+import io.reactivex.rxjava3.functions.Consumer;
+import io.reactivex.rxjava3.functions.Function;
+import io.reactivex.rxjava3.schedulers.Schedulers;
+import org.checkerframework.checker.nullness.Opt;
+import org.joml.Random;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.joml.Vector3i;
@@ -13,7 +26,9 @@ import org.slf4j.LoggerFactory;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.config.RenderingConfig;
 import org.terasology.engine.context.Context;
+import org.terasology.engine.core.GameThread;
 import org.terasology.engine.monitoring.PerformanceMonitor;
+import org.terasology.engine.monitoring.chunk.ChunkMonitor;
 import org.terasology.engine.registry.CoreRegistry;
 import org.terasology.engine.rendering.cameras.Camera;
 import org.terasology.engine.rendering.logic.ChunkMeshRenderer;
@@ -33,25 +48,31 @@ import org.terasology.engine.world.generator.WorldGenerator;
 import org.terasology.joml.geom.AABBfc;
 import org.terasology.math.TeraMath;
 
+import javax.swing.text.html.Option;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.PriorityQueue;
+import java.util.Set;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 /**
  * TODO: write javadoc unless this class gets slated for removal, which might be.
  */
 class RenderableWorldImpl implements RenderableWorld {
+    private static final Logger logger = LoggerFactory.getLogger(RenderableWorldImpl.class);
 
     private static final int MAX_ANIMATED_CHUNKS = 64;
     private static final int MAX_BILLBOARD_CHUNKS = 64;
     private static final int MAX_LOADABLE_CHUNKS =
             ViewDistance.MEGA.getChunkDistance().x() * ViewDistance.MEGA.getChunkDistance().y() * ViewDistance.MEGA.getChunkDistance().z();
     private static final Vector3fc CHUNK_CENTER_OFFSET = new Vector3f(Chunks.CHUNK_SIZE).div(2);
-
-    private static final Logger logger = LoggerFactory.getLogger(RenderableWorldImpl.class);
 
     private final int maxChunksForShadows =
             TeraMath.clamp(CoreRegistry.get(Config.class).getRendering().getMaxChunksUsedForShadowMapping(), 64, 1024);
@@ -61,7 +82,7 @@ class RenderableWorldImpl implements RenderableWorld {
     private LodChunkProvider lodChunkProvider;
 
     private ChunkTessellator chunkTessellator;
-    private final ChunkMeshUpdateManager chunkMeshUpdateManager;
+//    private final ChunkMeshUpdateManager chunkMeshUpdateManager;
     private final List<Chunk> chunksInProximityOfCamera = Lists.newArrayListWithCapacity(MAX_LOADABLE_CHUNKS);
     private BlockRegion renderableRegion = new BlockRegion(BlockRegion.INVALID);
     private ViewDistance currentViewDistance;
@@ -78,13 +99,14 @@ class RenderableWorldImpl implements RenderableWorld {
     private int statVisibleChunks;
     private int statIgnoredPhases;
 
+    private Map<Vector3ic, Disposable> chunkMeshProcessing = Maps.newHashMap();
 
     RenderableWorldImpl(Context context, Camera playerCamera) {
 
         worldProvider = context.get(WorldProvider.class);
         chunkProvider = context.get(ChunkProvider.class);
         chunkTessellator = context.get(ChunkTessellator.class);
-        chunkMeshUpdateManager = new ChunkMeshUpdateManager(chunkTessellator, worldProvider);
+//        chunkMeshUpdateManager = new ChunkMeshUpdateManager(chunkTessellator, worldProvider);
 
         this.playerCamera = playerCamera;
         WorldGenerator worldGenerator = context.get(WorldGenerator.class);
@@ -128,12 +150,17 @@ class RenderableWorldImpl implements RenderableWorld {
 
     @Override
     public void onChunkUnloaded(Vector3ic chunkCoordinates) {
+        Disposable disposable = chunkMeshProcessing.remove(chunkCoordinates);
+        if (disposable != null && !disposable.isDisposed()) {
+            disposable.dispose();
+        }
+
         if (renderableRegion.contains(chunkCoordinates)) {
             Chunk chunk;
             Iterator<Chunk> iterator = chunksInProximityOfCamera.iterator();
             while (iterator.hasNext()) {
                 chunk = iterator.next();
-                if (chunk.getPosition(new org.joml.Vector3i()).equals(chunkCoordinates)) {
+                if (chunk.getPosition().equals(chunkCoordinates)) {
                     chunk.disposeMesh();
                     iterator.remove();
                     break;
@@ -220,7 +247,7 @@ class RenderableWorldImpl implements RenderableWorld {
                     Iterator<Chunk> nearbyChunks = chunksInProximityOfCamera.iterator();
                     for (Iterator<Chunk> it = nearbyChunks; it.hasNext();) {
                         chunk = it.next();
-                        if (chunk.getPosition(new org.joml.Vector3i()).equals(chunkPositionToRemove)) {
+                        if (chunk.getPosition().equals(chunkPositionToRemove)) {
                             chunk.disposeMesh();
                             nearbyChunks.remove();
                             break;
@@ -283,32 +310,6 @@ class RenderableWorldImpl implements RenderableWorld {
         return Chunks.toChunkPos(cameraCoordinates, new Vector3i());
     }
 
-    @Override
-    public void generateVBOs() {
-        PerformanceMonitor.startActivity("Building Mesh VBOs");
-        ChunkMesh pendingMesh;
-        chunkMeshUpdateManager.setCameraPosition(playerCamera.getPosition());
-        for (Chunk chunk : chunkMeshUpdateManager.availableChunksForUpdate()) {
-
-            if (chunk.hasPendingMesh() && chunksInProximityOfCamera.contains(chunk)) {
-                pendingMesh = chunk.getPendingMesh();
-                pendingMesh.generateVBOs();
-                pendingMesh.discardData();
-                if (chunk.hasMesh()) {
-                    chunk.getMesh().dispose();
-                }
-                chunk.setMesh(pendingMesh);
-                chunk.setPendingMesh(null);
-
-            } else {
-                if (chunk.hasPendingMesh()) {
-                    chunk.getPendingMesh().dispose();
-                    chunk.setPendingMesh(null);
-                }
-            }
-        }
-        PerformanceMonitor.endActivity();
-    }
 
     /**
      * Updates the currently visible chunks (in sight of the player).
@@ -386,9 +387,44 @@ class RenderableWorldImpl implements RenderableWorld {
 
         if (isFirstRenderingStageForCurrentFrame) {
             for (Chunk chunk : chunksInProximityOfCamera) {
-                if (isChunkValidForRender(chunk) && (chunk.isDirty() || !chunk.hasMesh())) {
+                if (isChunkValidForRender(chunk) && (chunk.isDirty() || !chunk.hasMesh()) && !chunkMeshProcessing.containsKey(chunk.getPosition())) {
                     statDirtyChunks++;
-                    chunkMeshUpdateManager.queueChunkUpdate(chunk);
+                    final Chunk currentChunk = chunk;
+                    chunkMeshProcessing.put(chunk.getPosition(), Observable
+                            .just(currentChunk)
+                            .observeOn(Schedulers.io())
+                            .delay(500 * processedChunks, TimeUnit.MILLISECONDS) // delay chunks so everything is not all evaluated at once
+                            .<ChunkMesh>mapOptional(c -> {
+                                ChunkView chunkView = worldProvider.getLocalView(c.getPosition());
+                                if (chunkView != null) {
+                                    /*
+                                     * Important set dirty flag first, so that a concurrent modification of the chunk in the mean time we
+                                     * will end up with a dirty chunk.
+                                     */
+                                    c.setDirty(false);
+                                    if (chunkView.isValidView()) {
+                                        ChunkMesh newMesh = chunkTessellator.generateMesh(chunkView);
+                                        ChunkMonitor.fireChunkTessellated(new Vector3i(chunk.getPosition()), newMesh);
+                                        return Optional.of(newMesh);
+                                    }
+                                }
+                                return Optional.empty();
+                            })
+                            .observeOn(GameThread.main())
+                            .doFinally(() -> {
+                                chunkMeshProcessing.remove(currentChunk.getPosition());
+                            }).subscribe(chunkMesh -> {
+                                if (chunksInProximityOfCamera.contains(currentChunk)) {
+                                    chunkMesh.generateVBOs();
+                                    chunkMesh.discardData();
+                                    if (currentChunk.hasMesh()) {
+                                        currentChunk.getMesh().dispose();
+                                    }
+                                    currentChunk.setMesh(chunkMesh);
+                                }
+                            }, throwable -> {
+                                logger.error("Failed to build mesh {}", throwable);
+                            }));
                     processedChunks++;
                 }
             }
@@ -408,7 +444,11 @@ class RenderableWorldImpl implements RenderableWorld {
 
     @Override
     public void dispose() {
-        chunkMeshUpdateManager.shutdown();
+        for(Disposable dsp: chunkMeshProcessing.values()) {
+            if(!dsp.isDisposed()) {
+                dsp.dispose();
+            }
+        }
         if (lodChunkProvider != null) {
             lodChunkProvider.shutdown();
         }

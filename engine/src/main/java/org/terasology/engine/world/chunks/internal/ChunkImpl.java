@@ -66,7 +66,6 @@ public class ChunkImpl implements Chunk {
 
     // Rendering
     private ChunkMesh activeMesh;
-    private ChunkMesh pendingMesh;
 
     public ChunkImpl(int x, int y, int z, BlockManager blockManager, ExtraBlockDataManager extraDataManager) {
         this(new Vector3i(x, y, z), blockManager, extraDataManager);
@@ -423,11 +422,6 @@ public class ChunkImpl implements Chunk {
     }
 
     @Override
-    public void setPendingMesh(ChunkMesh mesh) {
-        this.pendingMesh = mesh;
-    }
-
-    @Override
     public void setAnimated(boolean animated) {
         this.animated = animated;
     }
@@ -442,19 +436,10 @@ public class ChunkImpl implements Chunk {
         return activeMesh != null;
     }
 
-    @Override
-    public boolean hasPendingMesh() {
-        return pendingMesh != null;
-    }
 
     @Override
     public ChunkMesh getMesh() {
         return activeMesh;
-    }
-
-    @Override
-    public ChunkMesh getPendingMesh() {
-        return pendingMesh;
     }
 
     @Override

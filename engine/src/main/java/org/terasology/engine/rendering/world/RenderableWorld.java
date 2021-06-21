@@ -24,8 +24,6 @@ public interface RenderableWorld {
 
     boolean updateChunksInProximity(ViewDistance viewDistance, int chunkLods);
 
-    void generateVBOs();
-
     int queueVisibleChunks(boolean isFirstRenderingStageForCurrentFrame);
 
     void dispose();

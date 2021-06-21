@@ -68,9 +68,6 @@ public class ChunkMesh {
 
     private boolean disposed;
 
-    /* CONCURRENCY */
-    private ReentrantLock lock = new ReentrantLock();
-
     /* MEASUREMENTS */
     private int timeToGenerateBlockVertices;
     private int timeToGenerateOptimizedBuffers;
@@ -95,46 +92,39 @@ public class ChunkMesh {
      * @return True if something was generated
      */
     public boolean generateVBOs() {
-        if (lock.tryLock()) {
-            try {
-                // IMPORTANT: A mesh can only be generated once.
-                if (vertexElements == null || disposed) {
-                    return false;
-                }
 
-                // Make sure that if it has already been generated, the previous buffers are freed
-                dispose();
-                disposed = false;
-
-                for (RenderType type : RenderType.values()) {
-                    generateVBO(type);
-                }
-
-                // Calculate the final amount of triangles
-                triangleCount = (vertexCount[0] + vertexCount[1] + vertexCount[2] + vertexCount[3]) / 3;
-            } finally {
-                lock.unlock();
-            }
-
-            return true;
+        // IMPORTANT: A mesh can only be generated once.
+        if (vertexElements == null || disposed) {
+            return false;
         }
 
-        return false;
+        // Make sure that if it has already been generated, the previous buffers are freed
+        dispose();
+        disposed = false;
+
+        for (RenderType type : RenderType.values()) {
+            generateVBO(type);
+        }
+
+        // Calculate the final amount of triangles
+        triangleCount = (vertexCount[0] + vertexCount[1] + vertexCount[2] + vertexCount[3]) / 3;
+
+        return true;
     }
 
     private void generateVBO(RenderType type) {
         VertexElements elements = vertexElements[type.ordinal()];
         int id = type.getIndex();
         if (!disposed && elements.buffer.elements() > 0) {
-            vertexBuffers[id] = GL15.glGenBuffers();
-            idxBuffers[id] = GL15.glGenBuffers();
+            vertexBuffers[id] = GL30.glGenBuffers();
+            idxBuffers[id] = GL30.glGenBuffers();
             vaoCount[id] = GL30.glGenVertexArrays();
 
             GL30.glBindVertexArray(vaoCount[id]);
 
-            GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vertexBuffers[id]);
+            GL30.glBindBuffer(GL30.GL_ARRAY_BUFFER, vertexBuffers[id]);
             elements.buffer.writeBuffer(buffer -> {
-                GL15.glBufferData(GL15.GL_ARRAY_BUFFER, buffer, GL30.GL_STATIC_DRAW);
+                GL30.glBufferData(GL30.GL_ARRAY_BUFFER, buffer, GL30.GL_STATIC_DRAW);
             });
 
             for (VertexResource.VertexDefinition definition : elements.buffer.definitions()) {
@@ -171,19 +161,13 @@ public class ChunkMesh {
     }
 
     private void renderVbo(int id) {
-        if (lock.tryLock()) {
-            try {
-                if (vertexBuffers[id] <= 0 || disposed) {
-                    return;
-                }
-
-                GL30.glBindVertexArray(vaoCount[id]);
-                GL30.glDrawElements(GL30.GL_TRIANGLES, vertexCount[id], GL30.GL_UNSIGNED_INT, 0);
-                GL30.glBindVertexArray(0);
-            } finally {
-                lock.unlock();
-            }
+        if (vertexBuffers[id] <= 0 || disposed) {
+            return;
         }
+
+        GL30.glBindVertexArray(vaoCount[id]);
+        GL30.glDrawElements(GL30.GL_TRIANGLES, vertexCount[id], GL30.GL_UNSIGNED_INT, 0);
+        GL30.glBindVertexArray(0);
     }
 
     /**
@@ -223,33 +207,28 @@ public class ChunkMesh {
      * ChunkMesh instances cannot be un-disposed.
      */
     public void dispose() {
-        lock.lock();
-        try {
-            if (!disposed) {
-                for (int i = 0; i < vertexBuffers.length; i++) {
-                    int id = vertexBuffers[i];
-                    if (id != 0) {
-                        GL15.glDeleteBuffers(id);
-                        vertexBuffers[i] = 0;
-                    }
-
-                    id = idxBuffers[i];
-                    if (id != 0) {
-                        GL15.glDeleteBuffers(id);
-                        idxBuffers[i] = 0;
-                    }
-
-                    id = vaoCount[i];
-                    if (id != 0) {
-                        GL30.glDeleteVertexArrays(id);
-                        vaoCount[i] = 0;
-                    }
+        if (!disposed) {
+            for (int i = 0; i < vertexBuffers.length; i++) {
+                int id = vertexBuffers[i];
+                if (id != 0) {
+                    GL15.glDeleteBuffers(id);
+                    vertexBuffers[i] = 0;
                 }
 
-                disposed = true;
+                id = idxBuffers[i];
+                if (id != 0) {
+                    GL15.glDeleteBuffers(id);
+                    idxBuffers[i] = 0;
+                }
+
+                id = vaoCount[i];
+                if (id != 0) {
+                    GL30.glDeleteVertexArrays(id);
+                    vaoCount[i] = 0;
+                }
             }
-        } finally {
-            lock.unlock();
+
+            disposed = true;
         }
     }
 
