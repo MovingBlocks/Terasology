@@ -377,7 +377,7 @@ class RenderableWorldImpl implements RenderableWorld {
                     final Chunk currentChunk = chunk;
                     chunkMeshProcessing.put(chunk.getPosition(), Observable
                             .just(currentChunk)
-                            .observeOn(Schedulers.io())
+                            .observeOn(Schedulers.computation())
                             .delay(500 * processedChunks, TimeUnit.MILLISECONDS) // delay chunks so everything is not all evaluated at once
                             .<ChunkMesh>mapOptional(c -> {
                                 ChunkView chunkView = worldProvider.getLocalView(c.getPosition());
