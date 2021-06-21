@@ -5,18 +5,9 @@ package org.terasology.engine.rendering.world;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-import io.reactivex.rxjava3.core.Flowable;
-import io.reactivex.rxjava3.core.MaybeSource;
 import io.reactivex.rxjava3.core.Observable;
-import io.reactivex.rxjava3.core.Scheduler;
 import io.reactivex.rxjava3.disposables.Disposable;
-import io.reactivex.rxjava3.functions.Action;
-import io.reactivex.rxjava3.functions.Consumer;
-import io.reactivex.rxjava3.functions.Function;
 import io.reactivex.rxjava3.schedulers.Schedulers;
-import org.checkerframework.checker.nullness.Opt;
-import org.joml.Random;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.joml.Vector3i;
@@ -48,18 +39,14 @@ import org.terasology.engine.world.generator.WorldGenerator;
 import org.terasology.joml.geom.AABBfc;
 import org.terasology.math.TeraMath;
 
-import javax.swing.text.html.Option;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.PriorityQueue;
-import java.util.Set;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -82,7 +69,6 @@ class RenderableWorldImpl implements RenderableWorld {
     private LodChunkProvider lodChunkProvider;
 
     private ChunkTessellator chunkTessellator;
-//    private final ChunkMeshUpdateManager chunkMeshUpdateManager;
     private final List<Chunk> chunksInProximityOfCamera = Lists.newArrayListWithCapacity(MAX_LOADABLE_CHUNKS);
     private BlockRegion renderableRegion = new BlockRegion(BlockRegion.INVALID);
     private ViewDistance currentViewDistance;
@@ -106,7 +92,6 @@ class RenderableWorldImpl implements RenderableWorld {
         worldProvider = context.get(WorldProvider.class);
         chunkProvider = context.get(ChunkProvider.class);
         chunkTessellator = context.get(ChunkTessellator.class);
-//        chunkMeshUpdateManager = new ChunkMeshUpdateManager(chunkTessellator, worldProvider);
 
         this.playerCamera = playerCamera;
         WorldGenerator worldGenerator = context.get(WorldGenerator.class);
