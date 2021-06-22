@@ -37,10 +37,10 @@ pipeline {
         label 'ts-engine && heavy && java8'
     }
     stages {
+        // declarative pipeline does `checkout scm` automatically when hitting first stage
         stage('Setup') {
             steps {
-                echo 'Going to check out the things !'
-                checkout scm
+                echo 'Automatically checked out the things!'
                 sh 'chmod +x gradlew'
             }
         }
@@ -115,8 +115,9 @@ pipeline {
         stage('Analytics') {
             steps {
                 sh './gradlew --console=plain check -x test'
-                // the default resolution when omitting `defaultBranch` is to `master` - which is wrong in our case.
-                //TODO: does this also work for PRs with different base branch?
+                // the default resolution when omitting `defaultBranch` is to `master`
+                // this is wrong in our case, so explicitly set `develop` as default
+                // TODO: does this also work for PRs with different base branch?
                 discoverGitReferenceBuild(defaultBranch: 'develop')
                 recordIssues skipBlames: true,
                     tools: [
