@@ -19,7 +19,7 @@ properties([
  * Main pipeline definition for building the engine.
  *
  * It uses the Declarative Pipeline Syntax.
- * See https://www.jenkins.io/doc/book/pipeline/#declarative-versus-scripted-pipeline-syntax
+ * See https://www.jenkins.io/doc/book/pipeline/syntax
  *
  * This pipeline uses Jenkins plugins to collect and report additional information about the build.
  *
