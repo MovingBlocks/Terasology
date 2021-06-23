@@ -33,15 +33,11 @@ public final class ChunkTessellator {
 
         final Stopwatch watch = Stopwatch.createStarted();
 
-        watch.stop();
-        mesh.setTimeToGenerateBlockVertices((int) watch.elapsed(TimeUnit.MILLISECONDS));
-        watch.reset().start();
-
         // The mesh extends into the borders in the horizontal directions, but not vertically upwards, in order to cover
         // gaps between LOD chunks of different scales, but also avoid multiple overlapping ocean surfaces.
-        for (int x = 0; x < Chunks.SIZE_X; x++) {
+        for (int y = 0; y < Chunks.SIZE_Y - border * 2; y++) {
             for (int z = 0; z < Chunks.SIZE_Z; z++) {
-                for (int y = 0; y < Chunks.SIZE_Y - border * 2; y++) {
+                for (int x = 0; x < Chunks.SIZE_X; x++) {
                     Block block = chunkView.getBlock(x, y, z);
                     if (block != null && block.getMeshGenerator() != null) {
                         block.getMeshGenerator().generateChunkMesh(chunkView, mesh, x, y, z);
@@ -63,7 +59,7 @@ public final class ChunkTessellator {
         }
 
         watch.stop();
-        mesh.setTimeToGenerateOptimizedBuffers((int) watch.elapsed(TimeUnit.MILLISECONDS));
+        mesh.setTimeToGenerateBlockVertices((int) watch.elapsed(TimeUnit.MILLISECONDS));
         statVertexArrayUpdateCount++;
 
         PerformanceMonitor.endActivity();
