@@ -462,6 +462,7 @@ public class ChunkImpl implements Chunk {
     public void dispose() {
         disposed = true;
         ready = false;
+        dirty = true;
         disposeMesh();
         /*
          * Explicitly do not clear data, so that background threads that work with the chunk can finish.

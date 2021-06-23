@@ -4,9 +4,10 @@ package org.terasology.engine.rendering.world;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import io.reactivex.rxjava3.core.Observable;
-import io.reactivex.rxjava3.disposables.Disposable;
+import com.google.common.collect.Sets;
+import io.reactivex.rxjava3.core.BackpressureStrategy;
+import io.reactivex.rxjava3.core.Flowable;
+import io.reactivex.rxjava3.core.FlowableEmitter;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
@@ -44,10 +45,9 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.PriorityQueue;
-import java.util.concurrent.TimeUnit;
+import java.util.Set;
 
 /**
  * TODO: write javadoc unless this class gets slated for removal, which might be.
@@ -85,7 +85,15 @@ class RenderableWorldImpl implements RenderableWorld {
     private int statVisibleChunks;
     private int statIgnoredPhases;
 
-    private Map<Vector3ic, Disposable> chunkMeshProcessing = Maps.newHashMap();
+
+    private final Set<Vector3ic> chunkMeshProcessing = Sets.newHashSet();
+    private FlowableEmitter<Chunk> chunkMeshPublisher;
+//    private Disposable meshDispose;
+
+    private static class ChunkMeshPayload {
+        Chunk chunk;
+        ChunkMesh mesh;
+    }
 
     RenderableWorldImpl(Context context, Camera playerCamera) {
 
@@ -109,6 +117,81 @@ class RenderableWorldImpl implements RenderableWorld {
                 new PriorityQueue<>(MAX_LOADABLE_CHUNKS, new ChunkFrontToBackComparator()),
                 new PriorityQueue<>(MAX_LOADABLE_CHUNKS, new ChunkFrontToBackComparator()),
                 new PriorityQueue<>(MAX_LOADABLE_CHUNKS, new ChunkBackToFrontComparator()));
+
+        Flowable.<Chunk>create(emitter -> chunkMeshPublisher = emitter, BackpressureStrategy.BUFFER)
+                .distinct(Chunk::getPosition, () -> chunkMeshProcessing)
+                .parallel(4).runOn(Schedulers.computation())
+                .<ChunkMeshPayload>mapOptional(c -> {
+                    ChunkView chunkView = worldProvider.getLocalView(c.getPosition());
+                    if (chunkView != null) {
+                        c.setDirty(false);
+                        if (chunkView.isValidView()) {
+                            ChunkMesh newMesh = chunkTessellator.generateMesh(chunkView);
+                            ChunkMonitor.fireChunkTessellated(new Vector3i(c.getPosition()), newMesh);
+                            ChunkMeshPayload payload = new ChunkMeshPayload();
+                            payload.chunk = c;
+                            payload.mesh = newMesh;
+                            return Optional.of(payload);
+                        }
+                    }
+                    return Optional.empty();
+                })
+                .sequential()
+                .observeOn(GameThread.main())
+                .doOnNext(k -> {
+                    chunkMeshProcessing.remove(k.chunk.getPosition());
+                })
+                .subscribe(payload -> {
+                    if (chunksInProximityOfCamera.contains(payload.chunk)) {
+                        payload.mesh.generateVBOs();
+                        payload.mesh.discardData();
+                        if (payload.chunk.hasMesh()) {
+                            payload.chunk.getMesh().dispose();
+                        }
+                        payload.chunk.setMesh(payload.mesh);
+                    }
+                }, throwable -> {
+                    logger.error("Failed to build mesh {}", throwable);
+                });
+//
+//        meshDispose = chunkMeshPublisher
+//                .distinct(Chunk::getPosition, () -> chunkMeshProcessing)
+//                .toFlowable(BackpressureStrategy.BUFFER)
+//                .parallel()
+//                .runOn(Schedulers.computation())
+//                .<ChunkMeshPayload>mapOptional(c -> {
+//                    ChunkView chunkView = worldProvider.getLocalView(c.getPosition());
+//                    if (chunkView != null) {
+//                        c.setDirty(false);
+//
+//                        if (chunkView.isValidView()) {
+//                            ChunkMesh newMesh = chunkTessellator.generateMesh(chunkView);
+//                            ChunkMonitor.fireChunkTessellated(new Vector3i(c.getPosition()), newMesh);
+//                            ChunkMeshPayload payload = new ChunkMeshPayload();
+//                            payload.chunk = c;
+//                            payload.mesh = newMesh;
+//                            return Optional.of(payload);
+//                        }
+//                    }
+//                    return Optional.empty();
+//                })
+//                .sequential()
+//                .observeOn(GameThread.main())
+//                .doOnNext(k -> {
+//                    chunkMeshProcessing.remove(k.chunk.getPosition());
+//                })
+//                .subscribe(payload -> {
+//                    if (chunksInProximityOfCamera.contains(payload.chunk)) {
+//                        payload.mesh.generateVBOs();
+//                        payload.mesh.discardData();
+//                        if (payload.chunk.hasMesh()) {
+//                            payload.chunk.getMesh().dispose();
+//                        }
+//                        payload.chunk.setMesh(payload.mesh);
+//                    }
+//                }, throwable -> {
+//                    logger.error("Failed to build mesh {}", throwable);
+//                });
     }
 
     @Override
@@ -135,11 +218,6 @@ class RenderableWorldImpl implements RenderableWorld {
 
     @Override
     public void onChunkUnloaded(Vector3ic chunkCoordinates) {
-        Disposable disposable = chunkMeshProcessing.remove(chunkCoordinates);
-        if (disposable != null && !disposable.isDisposed()) {
-            disposable.dispose();
-        }
-
         if (renderableRegion.contains(chunkCoordinates)) {
             Chunk chunk;
             Iterator<Chunk> iterator = chunksInProximityOfCamera.iterator();
@@ -372,51 +450,15 @@ class RenderableWorldImpl implements RenderableWorld {
 
         if (isFirstRenderingStageForCurrentFrame) {
             for (Chunk chunk : chunksInProximityOfCamera) {
-                if (isChunkValidForRender(chunk) && (chunk.isDirty() || !chunk.hasMesh()) && !chunkMeshProcessing.containsKey(chunk.getPosition())) {
+                if (isChunkValidForRender(chunk) && chunk.isDirty()) {
                     statDirtyChunks++;
-                    final Chunk currentChunk = chunk;
-                    chunkMeshProcessing.put(chunk.getPosition(), Observable
-                            .just(currentChunk)
-                            .observeOn(Schedulers.computation())
-                            .delay(500 * processedChunks, TimeUnit.MILLISECONDS) // delay chunks so everything is not all evaluated at once
-                            .<ChunkMesh>mapOptional(c -> {
-                                ChunkView chunkView = worldProvider.getLocalView(c.getPosition());
-                                if (chunkView != null) {
-                                    /*
-                                     * Important set dirty flag first, so that a concurrent modification of the chunk in the mean time we
-                                     * will end up with a dirty chunk.
-                                     */
-                                    c.setDirty(false);
-                                    if (chunkView.isValidView()) {
-                                        ChunkMesh newMesh = chunkTessellator.generateMesh(chunkView);
-                                        ChunkMonitor.fireChunkTessellated(new Vector3i(chunk.getPosition()), newMesh);
-                                        return Optional.of(newMesh);
-                                    }
-                                }
-                                return Optional.empty();
-                            })
-                            .observeOn(GameThread.main())
-                            .doFinally(() -> {
-                                chunkMeshProcessing.remove(currentChunk.getPosition());
-                            }).subscribe(chunkMesh -> {
-                                if (chunksInProximityOfCamera.contains(currentChunk)) {
-                                    chunkMesh.generateVBOs();
-                                    chunkMesh.discardData();
-                                    if (currentChunk.hasMesh()) {
-                                        currentChunk.getMesh().dispose();
-                                    }
-                                    currentChunk.setMesh(chunkMesh);
-                                }
-                            }, throwable -> {
-                                logger.error("Failed to build mesh {}", throwable);
-                            }));
-                    processedChunks++;
+                    chunkMeshPublisher.onNext(chunk);
                 }
             }
         }
 
         PerformanceMonitor.endActivity();
-        return processedChunks;
+        return chunkMeshProcessing.size();
     }
 
     private int triangleCount(ChunkMesh mesh, ChunkMesh.RenderPhase renderPhase) {
@@ -429,11 +471,7 @@ class RenderableWorldImpl implements RenderableWorld {
 
     @Override
     public void dispose() {
-        for(Disposable dsp: chunkMeshProcessing.values()) {
-            if(!dsp.isDisposed()) {
-                dsp.dispose();
-            }
-        }
+//        meshDispose.dispose();
         if (lodChunkProvider != null) {
             lodChunkProvider.shutdown();
         }
