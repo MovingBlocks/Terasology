@@ -89,13 +89,13 @@ pipeline {
                 withCredentials([usernamePassword(credentialsId: 'artifactory-gooey', \
                                                     usernameVariable: 'artifactoryUser', \
                                                     passwordVariable: 'artifactoryPass')]) {
-                    sh '''./gradlew
-                        --console=plain
-                        -Dorg.gradle.internal.publish.checksums.insecure=true
-                        publish
-                        -PmavenUser=${artifactoryUser}
+                    sh """./gradlew \
+                        --console=plain \
+                        -Dorg.gradle.internal.publish.checksums.insecure=true \
+                        publish \
+                        -PmavenUser=${artifactoryUser} \
                         -PmavenPass=${artifactoryPass}
-                    '''
+                    """
                 }
                 script {
                     // Trigger the Omega dist job to repackage a game zip with modules
