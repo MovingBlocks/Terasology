@@ -81,10 +81,10 @@ public class BlockArea implements BlockAreac {
 
             public boolean findNext() {
                 if (current.equals(next)) {
-                    next.y++;
-                    if (next.y > maxY) {
-                        next.y = minY;
-                        next.x++;
+                    next.x++;
+                    if (next.x > maxX) {
+                        next.x = minX;
+                        next.y++;
                     }
 
                     return contains(next);
@@ -116,6 +116,7 @@ public class BlockArea implements BlockAreac {
 
                 if (current.equals(next)) {
                     if (findNext()) {
+                        current.set(next);
                         return next;
                     }
                     return null;
