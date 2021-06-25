@@ -117,19 +117,17 @@ class RenderableWorldImpl implements RenderableWorld {
 
         chunkMeshPublisher.toFlowable(BackpressureStrategy.BUFFER)
             .distinct(Chunk::getPosition, () -> chunkMeshProcessing)
+            .doOnNext(k -> k.setDirty(false))
             .parallel(4).runOn(Schedulers.computation())
             .<ChunkMeshPayload>mapOptional(c -> {
                 ChunkView chunkView = worldProvider.getLocalView(c.getPosition());
-                if (chunkView != null) {
-                    c.setDirty(false);
-                    if (chunkView.isValidView()) {
-                        ChunkMesh newMesh = chunkTessellator.generateMesh(chunkView);
-                        ChunkMonitor.fireChunkTessellated(new Vector3i(c.getPosition()), newMesh);
-                        ChunkMeshPayload payload = new ChunkMeshPayload();
-                        payload.chunk = c;
-                        payload.mesh = newMesh;
-                        return Optional.of(payload);
-                    }
+                if (chunkView != null && chunkView.isValidView()) {
+                    ChunkMesh newMesh = chunkTessellator.generateMesh(chunkView);
+                    ChunkMonitor.fireChunkTessellated(new Vector3i(c.getPosition()), newMesh);
+                    ChunkMeshPayload payload = new ChunkMeshPayload();
+                    payload.chunk = c;
+                    payload.mesh = newMesh;
+                    return Optional.of(payload);
                 }
                 return Optional.empty();
             })
