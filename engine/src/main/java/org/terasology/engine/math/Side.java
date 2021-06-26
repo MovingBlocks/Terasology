@@ -9,6 +9,7 @@ import org.joml.Vector3ic;
 import org.terasology.math.TeraMath;
 
 import java.util.EnumSet;
+import java.util.List;
 
 /**
  * The six sides of a block and a slew of related utility.
@@ -33,8 +34,7 @@ public enum Side {
     public static final ImmutableList<Side> Y_VERTICAL_SIDE = ImmutableList.of(TOP, BOTTOM);
     public static final ImmutableList<Side> Z_VERTICAL_SIDE = ImmutableList.of(FRONT, BACK);
 
-    private static final EnumSet<Side> ALL_SIDES = EnumSet.allOf(Side.class);
-
+    private static final List<Side> ALL_SIDES = ImmutableList.of(TOP ,BOTTOM ,LEFT ,RIGHT ,FRONT ,BACK);
     private final Vector3ic direction;
 
     Side(Vector3i vector3i) {
@@ -116,10 +116,8 @@ public enum Side {
      * method.
      *
      * @return All available sides'
-     * @deprecated use {@link Side#values()}
      */
-    @Deprecated
-    public static EnumSet<Side> getAllSides() {
+    public static List<Side> getAllSides() {
         return ALL_SIDES;
     }
 

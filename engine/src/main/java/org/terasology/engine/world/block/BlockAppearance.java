@@ -14,7 +14,7 @@ import java.util.Map;
  *
  */
 public class BlockAppearance {
-    private final BlockMeshInfo[] meshInfo = new BlockMeshInfo[BlockPart.values().length];
+    private final BlockMeshInfo[] meshInfo = new BlockMeshInfo[BlockPart.getAll().size()];
     private boolean hasAppearance = false;
 
 

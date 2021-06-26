@@ -30,13 +30,13 @@ public class BlockMeshGeneratorSingleShape implements BlockMeshGenerator {
         }
 
         // Gather adjacent blocks
-        Block[] adjacentBlocks = new Block[Side.values().length];
-        for (Side side : Side.values()) {
+        Block[] adjacentBlocks = new Block[Side.getAllSides().size()];
+        for (Side side : Side.getAllSides()) {
             Vector3ic offset = side.direction();
             Block blockToCheck = view.getBlock(x + offset.x(), y + offset.y(), z + offset.z());
             adjacentBlocks[side.ordinal()] = blockToCheck;
         }
-        for (final Side side : Side.values()) {
+        for (final Side side : Side.getAllSides()) {
             if (isSideVisibleForBlockTypes(adjacentBlocks[side.ordinal()], block, side)) {
                 final ChunkMesh.RenderType renderType = getRenderType(block);
                 final ChunkVertexFlag vertexFlag = getChunkVertexFlag(view, x, y, z, block);

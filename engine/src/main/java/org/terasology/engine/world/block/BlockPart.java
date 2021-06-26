@@ -51,11 +51,11 @@ public enum BlockPart {
     /**
      * @return The horizontal sides
      */
-    public static List<BlockPart> horizontalSides() {
+    public static List<BlockPart> getHorizontal() {
         return HORIZONTAL_SIDES;
     }
 
-    public static List<BlockPart> sideValues() {
+    public static List<BlockPart> getAll() {
         return SIDES;
     }
 
