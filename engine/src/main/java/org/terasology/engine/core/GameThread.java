@@ -6,11 +6,9 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Queues;
 import io.reactivex.rxjava3.core.Scheduler;
 import io.reactivex.rxjava3.schedulers.Schedulers;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.concurrent.BlockingDeque;
-import java.util.concurrent.Executor;
 import java.util.concurrent.Semaphore;
 
 /**
@@ -30,12 +28,7 @@ public final class GameThread {
     private static final Scheduler MAIN;
 
     static {
-        MAIN = Schedulers.from(new Executor() {
-            @Override
-            public void execute(@NotNull Runnable runnable) {
-                pendingRunnables.add(runnable);
-            }
-        });
+        MAIN = Schedulers.from(runnable -> pendingRunnables.add(runnable));
     }
 
     public static Scheduler main() {
