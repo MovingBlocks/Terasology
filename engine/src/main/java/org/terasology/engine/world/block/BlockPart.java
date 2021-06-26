@@ -19,6 +19,7 @@ public enum BlockPart {
     CENTER;
 
     private static final List<BlockPart> HORIZONTAL_SIDES = ImmutableList.of(LEFT, RIGHT, FRONT, BACK);
+    private static final List<BlockPart> SIDES = ImmutableList.of(TOP, LEFT, RIGHT, FRONT, BACK, BOTTOM, CENTER);
     private Side side;
 
     BlockPart() {
@@ -47,12 +48,15 @@ public enum BlockPart {
         }
         return null;
     }
-
     /**
      * @return The horizontal sides
      */
     public static List<BlockPart> horizontalSides() {
         return HORIZONTAL_SIDES;
+    }
+
+    public static List<BlockPart> sideValues() {
+        return SIDES;
     }
 
     public boolean isSide() {
