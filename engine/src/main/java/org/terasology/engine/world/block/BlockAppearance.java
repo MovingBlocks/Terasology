@@ -15,6 +15,8 @@ import java.util.Map;
  */
 public class BlockAppearance {
     private final BlockMeshInfo[] meshInfo = new BlockMeshInfo[BlockPart.values().length];
+    private boolean hasAppearance = false;
+
 
     public BlockAppearance() {
         for (int x = 0; x < meshInfo.length; x++) {
@@ -35,8 +37,13 @@ public class BlockAppearance {
             meshInfo[part.ordinal()].textureAtlasPosition = textureAtlasPos.get(part);
             if (blockParts.containsKey(part)) {
                 meshInfo[part.ordinal()].part = blockParts.get(part);
+                hasAppearance = true;
             }
         }
+    }
+
+    public boolean hasAppearance() {
+        return hasAppearance;
     }
 
     public BlockMeshPart getPart(BlockPart part) {

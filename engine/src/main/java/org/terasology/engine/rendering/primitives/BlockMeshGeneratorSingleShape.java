@@ -24,7 +24,10 @@ public class BlockMeshGeneratorSingleShape implements BlockMeshGenerator {
 
     @Override
     public void generateChunkMesh(ChunkView view, ChunkMesh chunkMesh, int x, int y, int z) {
-        final Block selfBlock = view.getBlock(x, y, z);
+        final BlockAppearance blockAppearance = block.getPrimaryAppearance();
+        if (!blockAppearance.hasAppearance()) {
+            return;
+        }
 
         // Gather adjacent blocks
         Block[] adjacentBlocks = new Block[Side.values().length];
@@ -34,10 +37,9 @@ public class BlockMeshGeneratorSingleShape implements BlockMeshGenerator {
             adjacentBlocks[side.ordinal()] = blockToCheck;
         }
         for (final Side side : Side.values()) {
-            if (isSideVisibleForBlockTypes(adjacentBlocks[side.ordinal()], selfBlock, side)) {
-                final ChunkMesh.RenderType renderType = getRenderType(selfBlock);
-                final BlockAppearance blockAppearance = selfBlock.getPrimaryAppearance();
-                final ChunkVertexFlag vertexFlag = getChunkVertexFlag(view, x, y, z, selfBlock);
+            if (isSideVisibleForBlockTypes(adjacentBlocks[side.ordinal()], block, side)) {
+                final ChunkMesh.RenderType renderType = getRenderType(block);
+                final ChunkVertexFlag vertexFlag = getChunkVertexFlag(view, x, y, z, block);
 
                 if (blockAppearance.getPart(BlockPart.CENTER) != null) {
                     blockAppearance.getPart(BlockPart.CENTER).appendTo(chunkMesh, view, x, y, z, renderType, vertexFlag);
@@ -46,7 +48,7 @@ public class BlockMeshGeneratorSingleShape implements BlockMeshGenerator {
                 BlockMeshPart blockMeshPart = blockAppearance.getPart(BlockPart.fromSide(side));
 
                 // If the selfBlock isn't lowered, some more faces may have to be drawn
-                if (selfBlock.isLiquid()) {
+                if (block.isLiquid()) {
                     final Block topBlock = adjacentBlocks[Side.TOP.ordinal()];
                     // Draw horizontal sides if visible from below
                     if (topBlock.isLiquid() && Side.horizontalSides().contains(side)) {
@@ -55,11 +57,11 @@ public class BlockMeshGeneratorSingleShape implements BlockMeshGenerator {
                         final Block adjacent = adjacentBlocks[side.ordinal()];
 
                         if (adjacent.isLiquid() && !adjacentAbove.isLiquid()) {
-                            blockMeshPart = selfBlock.getTopLiquidMesh(side);
+                            blockMeshPart = block.getTopLiquidMesh(side);
                         }
                     } else {
                         if (blockMeshPart != null) {
-                            blockMeshPart = selfBlock.getLowLiquidMesh(side);
+                            blockMeshPart = block.getLowLiquidMesh(side);
                         }
                     }
                 }
@@ -67,7 +69,7 @@ public class BlockMeshGeneratorSingleShape implements BlockMeshGenerator {
                 if (blockMeshPart != null) {
                     // TODO: Needs review since the new per-vertex flags introduce a lot of special scenarios - probably a per-side setting?
                     ChunkVertexFlag sideVertexFlag = vertexFlag;
-                    if (selfBlock.isGrass() && side != Side.TOP && side != Side.BOTTOM) {
+                    if (block.isGrass() && side != Side.TOP && side != Side.BOTTOM) {
                         sideVertexFlag = ChunkVertexFlag.COLOR_MASK;
                     }
                     blockMeshPart.appendTo(chunkMesh, view, x, y, z, renderType, sideVertexFlag);

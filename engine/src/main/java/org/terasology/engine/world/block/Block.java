@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.world.block;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import org.joml.Quaternionf;
 import org.joml.RoundingMode;
@@ -235,6 +236,7 @@ public final class Block {
      *                      If meshGenerator is null then this block is invisible.
      */
     public void setMeshGenerator(BlockMeshGenerator meshGenerator) {
+        Preconditions.checkNotNull(meshGenerator);
         this.meshGenerator = meshGenerator;
     }
 
