@@ -276,12 +276,14 @@ public class OpenALManager implements AudioManager {
 
     @Override
     public AssetFactory<StaticSound, StaticSoundData> getStaticSoundFactory() {
-        return (urn, assetType, data) -> new OpenALSound(urn, assetType, data, OpenALManager.this, new OpenALSound.DisposalAction(urn));
+        return (urn, assetType, data) -> new OpenALSound(urn, assetType, data,
+                OpenALManager.this, new OpenALSound.DisposalAction(urn));
     }
 
     @Override
     public AssetFactory<StreamingSound, StreamingSoundData> getStreamingSoundFactory() {
-        return (urn, assetType, data) -> new OpenALStreamingSound(urn, assetType, data, OpenALManager.this, new OpenALStreamingSound.DisposalAction(urn));
+        return (urn, assetType, data) -> new OpenALStreamingSound(urn, assetType, data,
+                OpenALManager.this, new OpenALStreamingSound.DisposalAction(urn));
     }
 
     public void purgeSound(Sound<?> sound) {

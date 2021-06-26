@@ -21,7 +21,8 @@ import java.net.URLDecoder;
  */
 final class ServiceApiRequest {
 
-    private static final Gson GSON = new GsonBuilder().registerTypeHierarchyAdapter(BigInteger.class, BigIntegerBase64Serializer.getInstance()).create();
+    private static final Gson GSON =
+            new GsonBuilder().registerTypeHierarchyAdapter(BigInteger.class, BigIntegerBase64Serializer.getInstance()).create();
 
     private ServiceApiRequest() {
     }
@@ -44,7 +45,8 @@ final class ServiceApiRequest {
         }
     }
 
-    public static <REQUEST, RESPONSE> RESPONSE request(HttpURLConnection firstConn, HttpMethod method, String sessionToken, REQUEST data, Class<RESPONSE> responseClass)
+    public static <REQUEST, RESPONSE> RESPONSE request(HttpURLConnection firstConn, HttpMethod method, String sessionToken,
+                                                       REQUEST data, Class<RESPONSE> responseClass)
             throws IOException, StorageServiceException {
         HttpURLConnection conn = null;
         int followedRedirects = 0;
@@ -62,7 +64,8 @@ final class ServiceApiRequest {
 
                 //needed if the Location header specifies a relative redirect, e.g. "Location: /some/path/on/the/same/server"
                 URL baseUrl = conn.getURL();
-                //if redirectUrl is already absolute (contains authority), baseUrl will be ignored (see javadoc for the URL(URL, String) constructor for more info)
+                //if redirectUrl is already absolute (contains authority), baseUrl will be ignored
+                // (see javadoc for the URL(URL, String) constructor for more info)
                 URL target = new URL(baseUrl, redirectUrl);
 
                 conn = (HttpURLConnection) target.openConnection();
@@ -95,7 +98,8 @@ final class ServiceApiRequest {
         }
     }
 
-    public static <REQUEST, RESPONSE> RESPONSE request(URL url, HttpMethod method, String sessionToken, REQUEST data, Class<RESPONSE> responseClass)
+    public static <REQUEST, RESPONSE> RESPONSE request(URL url, HttpMethod method, String sessionToken,
+                                                       REQUEST data, Class<RESPONSE> responseClass)
             throws IOException, StorageServiceException {
         return request((HttpURLConnection) url.openConnection(), method, sessionToken, data, responseClass);
     }

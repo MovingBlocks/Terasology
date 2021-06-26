@@ -130,7 +130,8 @@ public class BlockEntitySystem extends BaseComponentSystem {
         }
     }
 
-    private boolean shouldDropToWorld(CreateBlockDropsEvent event, Block block, BlockDamageModifierComponent blockDamageModifierComponent, EntityRef item) {
+    private boolean shouldDropToWorld(CreateBlockDropsEvent event, Block block,
+                                      BlockDamageModifierComponent blockDamageModifierComponent, EntityRef item) {
         return !isDirectPickup(block, blockDamageModifierComponent) || !giveItem(event, item);
     }
 
@@ -156,7 +157,8 @@ public class BlockEntitySystem extends BaseComponentSystem {
                 //      'CoreAssets' from the engine
                 EntityBuilder dustBuilder = entityManager.newBuilder("CoreAssets:dustEffect");
                 if (dustBuilder.hasComponent(LocationComponent.class)) {
-                    dustBuilder.getComponent(LocationComponent.class).setWorldPosition(entity.getComponent(LocationComponent.class).getWorldPosition(new Vector3f()));
+                    dustBuilder.getComponent(LocationComponent.class)
+                            .setWorldPosition(entity.getComponent(LocationComponent.class).getWorldPosition(new Vector3f()));
                     dustBuilder.build();
                 }
             }

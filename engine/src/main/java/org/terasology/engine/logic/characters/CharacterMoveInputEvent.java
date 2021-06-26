@@ -24,11 +24,13 @@ public class CharacterMoveInputEvent extends NetworkEvent {
     }
 
     @Deprecated
-    public CharacterMoveInputEvent(int sequence, float pitch, float yaw, Vector3fc movementDirection, boolean running, boolean jumping, long delta) {
+    public CharacterMoveInputEvent(int sequence, float pitch, float yaw, Vector3fc movementDirection,
+                                   boolean running, boolean jumping, long delta) {
         this(sequence, pitch, yaw, movementDirection, running, false, jumping, delta);
     }
 
-    public CharacterMoveInputEvent(int sequence, float pitch, float yaw, Vector3fc movementDirection, boolean running, boolean crouching, boolean jumping, long delta) {
+    public CharacterMoveInputEvent(int sequence, float pitch, float yaw, Vector3fc movementDirection,
+                                   boolean running, boolean crouching, boolean jumping, long delta) {
         this.delta = delta;
         this.pitch = pitch;
         this.yaw = yaw;

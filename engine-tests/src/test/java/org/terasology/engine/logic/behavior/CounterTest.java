@@ -23,15 +23,23 @@ public class CounterTest {
         assertRun("{ sequence:[ { print:{msg:A} }, { print:{msg:B} }  ] }", 1, "[A][B]");
         assertRun("{ sequence:[ { print:{msg:A} }, failure, { print:{msg:B} }  ] }", 1, "[A]");
 
-        assertRun("{ sequence:[ { counter:{ count=1, child:{ print:{msg:A} } } },{ print:{msg:B} } ] }", 1, "[A][B]");
-        assertRun("{ sequence:[ { counter:{ count=2, child:{ print:{msg:A} } } },{ print:{msg:B} } ] }", 1, "[A]");
-        assertRun("{ sequence:[ { counter:{ count=2, child:{ print:{msg:A} } } },{ print:{msg:B} } ] }", 2, "[A][A][B]");
-        assertRun("{ sequence:[ { counter:{ count=2, child:{ print:{msg:A} } } },{ print:{msg:B} } ] }", 4, "[A][A][B][A][A][B]");
+        assertRun("{ sequence:[ { counter:{ count=1, child:{ print:{msg:A} } } },{ print:{msg:B} } ] }",
+                1, "[A][B]");
+        assertRun("{ sequence:[ { counter:{ count=2, child:{ print:{msg:A} } } },{ print:{msg:B} } ] }",
+                1, "[A]");
+        assertRun("{ sequence:[ { counter:{ count=2, child:{ print:{msg:A} } } },{ print:{msg:B} } ] }",
+                2, "[A][A][B]");
+        assertRun("{ sequence:[ { counter:{ count=2, child:{ print:{msg:A} } } },{ print:{msg:B} } ] }",
+                4, "[A][A][B][A][A][B]");
 
-        assertRun("{ sequence:[ { counter:{ count=2, child:{ counter:{ count=2, child:{ print:{msg:A} } } } } },{ print:{msg:B} } ] }", 4, "[A][A][A][A][B]");
-        assertRun("{ sequence:[ { timeout:{ time=1, child:{ print:{msg:A} } } },{ print:{msg:B} } ] }", 2, "[A][B][A][B]");
-        assertRun("{ sequence:[ { timeout:{ time=2, child:{ print:{msg:A} } } },{ print:{msg:B} } ] }", 4, "[A][B][A][B][A][B][A][B]");
-        assertRun("{ sequence:[ { timeout:{ time=1, child:{ timeout:{ time=2, child:{ print:{msg:A} } } } } },{ print:{msg:B} } ] }", 2, "[A][B][A][B]");
+        assertRun("{ sequence:[ { counter:{ count=2, child:{ counter:{ count=2, child:{ print:{msg:A} } } } } },{ print:{msg:B} } ] }",
+                4, "[A][A][A][A][B]");
+        assertRun("{ sequence:[ { timeout:{ time=1, child:{ print:{msg:A} } } },{ print:{msg:B} } ] }",
+                2, "[A][B][A][B]");
+        assertRun("{ sequence:[ { timeout:{ time=2, child:{ print:{msg:A} } } },{ print:{msg:B} } ] }",
+                4, "[A][B][A][B][A][B][A][B]");
+        assertRun("{ sequence:[ { timeout:{ time=1, child:{ timeout:{ time=2, child:{ print:{msg:A} } } } } },{ print:{msg:B} } ] }",
+                2, "[A][B][A][B]");
     }
 
     @BeforeEach

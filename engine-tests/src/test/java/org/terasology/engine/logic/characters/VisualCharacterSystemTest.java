@@ -130,7 +130,8 @@ public class VisualCharacterSystemTest {
         List<Event> laterJoiningCharacterEntityEvents = new ArrayList<>();
         recordEntityEventsToList(laterJoiningCharacterEntity, laterJoiningCharacterEntityEvents);
         VisualCharacterComponent visualComponentOfLaterJoiningCharacter = new VisualCharacterComponent();
-        Mockito.when(laterJoiningCharacterEntity.getComponent(VisualCharacterComponent.class)).thenReturn(visualComponentOfLaterJoiningCharacter);
+        Mockito.when(laterJoiningCharacterEntity.getComponent(VisualCharacterComponent.class))
+                .thenReturn(visualComponentOfLaterJoiningCharacter);
 
         // Joined player is not properly linked but it should not matter:
         Mockito.when(laterJoiningCharacterEntity.getOwner()).thenReturn(EntityRef.NULL);
@@ -163,7 +164,8 @@ public class VisualCharacterSystemTest {
         clientEntityReturnedByLocalPlayer = clientEntity;
         Mockito.when(ownCharacterEntity.getOwner()).thenReturn(clientEntity);
         Mockito.when(otherCharacterEntity.getOwner()).thenReturn(otherClientEntity);
-        Mockito.when(entityManager.getEntitiesWith(VisualCharacterComponent.class)).thenReturn(Arrays.asList(otherCharacterEntity, ownCharacterEntity));
+        Mockito.when(entityManager.getEntitiesWith(VisualCharacterComponent.class))
+                .thenReturn(Arrays.asList(otherCharacterEntity, ownCharacterEntity));
 
     }
 

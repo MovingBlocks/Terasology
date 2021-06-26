@@ -77,7 +77,8 @@ public class PrivateIdentityCertificate {
             cipher.init(Cipher.DECRYPT_MODE, key);
             return cipher.doFinal(data);
         } catch (NoSuchAlgorithmException | NoSuchPaddingException e) {
-            throw new RuntimeException("Insufficient support for '" + IdentityConstants.CERTIFICATE_ALGORITHM + "', required for identity management", e);
+            throw new RuntimeException("Insufficient support for '" + IdentityConstants.CERTIFICATE_ALGORITHM
+                    + "', required for identity management", e);
         } catch (InvalidKeySpecException | InvalidKeyException e) {
             throw new RuntimeException("Unexpected error during encryption", e);
         } catch (BadPaddingException | IllegalBlockSizeException e) {

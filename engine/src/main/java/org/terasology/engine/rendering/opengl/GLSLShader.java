@@ -101,7 +101,8 @@ public class GLSLShader extends Shader {
     }
 
 
-    public static GLSLShader create(ResourceUrn urn, AssetType<?, ShaderData> assetType, ShaderData data, LwjglGraphicsProcessing graphicsProcessing) {
+    public static GLSLShader create(ResourceUrn urn, AssetType<?, ShaderData> assetType, ShaderData data,
+                                    LwjglGraphicsProcessing graphicsProcessing) {
         return new GLSLShader(urn, assetType, data, new GLSLShader.DisposalAction(urn, graphicsProcessing), graphicsProcessing);
     }
 
