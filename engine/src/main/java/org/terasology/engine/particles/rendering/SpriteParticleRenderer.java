@@ -56,11 +56,6 @@ public class SpriteParticleRenderer implements RenderSystem {
     }
 
     @Override
-    public void renderOpaque() {
-
-    }
-
-    @Override
     public void renderAlphaBlend() {
         if (!opengl33) {
             return;
@@ -77,16 +72,6 @@ public class SpriteParticleRenderer implements RenderSystem {
 
         particleSystemManager.getParticleEmittersByDataComponent(ParticleDataSpriteComponent.class)
             .forEach(particleSystem -> drawParticles(material, particleSystem));
-    }
-
-    @Override
-    public void renderOverlay() {
-
-    }
-
-    @Override
-    public void renderShadows() {
-
     }
 
     @Override
