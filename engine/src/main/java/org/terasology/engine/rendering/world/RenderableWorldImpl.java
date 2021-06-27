@@ -84,7 +84,7 @@ class RenderableWorldImpl implements RenderableWorld {
     private int statVisibleChunks;
     private int statIgnoredPhases;
 
-    private final Set<Vector3ic> chunkMeshProcessing = Sets.newHashSet();
+    private final Set<Vector3ic> chunkMeshProcessing = Sets.newConcurrentHashSet();
     private PublishSubject<Chunk> chunkMeshPublisher = PublishSubject.<Chunk>create();
 
     private static class ChunkMeshPayload {
@@ -121,7 +121,7 @@ class RenderableWorldImpl implements RenderableWorld {
             .parallel(4).runOn(Schedulers.computation()) // allocation is pretty heavy :/
             .<ChunkMeshPayload>mapOptional(c -> {
                 ChunkView chunkView = worldProvider.getLocalView(c.getPosition());
-                if (chunkView != null && chunkView.isValidView()) {
+                if (chunkView != null && chunkView.isValidView() && chunkMeshProcessing.remove(c.getPosition())) {
                     ChunkMesh newMesh = chunkTessellator.generateMesh(chunkView);
                     ChunkMonitor.fireChunkTessellated(new Vector3i(c.getPosition()), newMesh);
                     ChunkMeshPayload payload = new ChunkMeshPayload();
@@ -133,9 +133,6 @@ class RenderableWorldImpl implements RenderableWorld {
             })
             .sequential()
             .observeOn(GameThread.main())
-            .doOnNext(k -> {
-                chunkMeshProcessing.remove(k.chunk.getPosition());
-            })
             .subscribe(payload -> {
                 if (chunksInProximityOfCamera.contains(payload.chunk)) {
                     payload.mesh.generateVBOs();
@@ -174,6 +171,8 @@ class RenderableWorldImpl implements RenderableWorld {
 
     @Override
     public void onChunkUnloaded(Vector3ic chunkCoordinates) {
+        chunkMeshProcessing.remove(chunkCoordinates);
+
         if (renderableRegion.contains(chunkCoordinates)) {
             Chunk chunk;
             Iterator<Chunk> iterator = chunksInProximityOfCamera.iterator();
