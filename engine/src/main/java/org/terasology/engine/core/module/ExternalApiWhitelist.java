@@ -109,6 +109,7 @@ public final class ExternalApiWhitelist {
             .add("org.lwjgl")
             .add("org.terasology.jnlua")
             .add("org.joml")
+            .add("io.reactivex.rxjava3")
             .build();
 
     public static final Set<Class<?>> CLASSES = new ImmutableSet.Builder<Class<?>>()

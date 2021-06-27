@@ -47,6 +47,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.PropertyPermission;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -212,6 +213,19 @@ public class ModuleManager {
 
         permissionProviderFactory.getBasePermissionSet().grantPermission("com.google.gson", ReflectPermission.class);
         permissionProviderFactory.getBasePermissionSet().grantPermission("com.google.gson.internal", ReflectPermission.class);
+
+        permissionProviderFactory.getBasePermissionSet().grantPermission(new PropertyPermission("rx3.io-keep-alive-time", "read"));
+        permissionProviderFactory.getBasePermissionSet().grantPermission(new PropertyPermission("rx3.io-priority", "read"));
+        permissionProviderFactory.getBasePermissionSet().grantPermission(new PropertyPermission("rx3.io-scheduled-release", "read"));
+        permissionProviderFactory.getBasePermissionSet().grantPermission(new PropertyPermission("rx3.computation-threads", "read"));
+        permissionProviderFactory.getBasePermissionSet().grantPermission(new PropertyPermission("rx3.computation-priority", "read"));
+        permissionProviderFactory.getBasePermissionSet().grantPermission(new PropertyPermission("rx3.newthread-priority", "read"));
+        permissionProviderFactory.getBasePermissionSet().grantPermission(new PropertyPermission("rx3.single-priority", "read"));
+        permissionProviderFactory.getBasePermissionSet().grantPermission(new PropertyPermission("rx3.purge-enabled", "read"));
+        permissionProviderFactory.getBasePermissionSet().grantPermission(new PropertyPermission("rx3.purge-period-seconds", "read"));
+        permissionProviderFactory.getBasePermissionSet().grantPermission(new PropertyPermission("rx3.scheduler.use-nanotime", "read"));
+        permissionProviderFactory.getBasePermissionSet().grantPermission(new PropertyPermission("rx3.scheduler.drift-tolerance", "read"));
+        permissionProviderFactory.getBasePermissionSet().grantPermission(new PropertyPermission("rx3.scheduler.drift-tolerance-unit", "read"));
 
         Policy.setPolicy(new ModuleSecurityPolicy());
         System.setSecurityManager(new ModuleSecurityManager());

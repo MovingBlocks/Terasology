@@ -5,11 +5,16 @@ package org.terasology.engine;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.core.Scheduler;
+import io.reactivex.rxjava3.functions.Action;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.crashreporter.CrashReporter;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.config.SystemConfig;
+import org.terasology.engine.core.GameThread;
 import org.terasology.engine.core.LoggingContext;
 import org.terasology.engine.core.PathManager;
 import org.terasology.engine.core.StandardGameStatus;
@@ -20,7 +25,6 @@ import org.terasology.engine.core.modes.StateLoading;
 import org.terasology.engine.core.modes.StateMainMenu;
 import org.terasology.engine.core.subsystem.EngineSubsystem;
 import org.terasology.engine.core.subsystem.common.ConfigurationSubsystem;
-import org.terasology.engine.core.subsystem.common.ThreadManager;
 import org.terasology.engine.core.subsystem.common.hibernation.HibernationSubsystem;
 import org.terasology.engine.core.subsystem.config.BindsSubsystem;
 import org.terasology.engine.core.subsystem.headless.HeadlessAudio;
@@ -153,7 +157,7 @@ public final class Terasology {
                 engine.run(new StateHeadlessSetup());
             } else if (loadLastGame) {
                 engine.initialize(); //initialize the managers first
-                engine.getFromEngineContext(ThreadManager.class).submitTask("loadGame", () -> {
+                GameThread.io().scheduleDirect(() -> {
                     GameManifest gameManifest = getLatestGameManifest();
                     if (gameManifest != null) {
                         engine.changeState(new StateLoading(gameManifest, NetworkMode.NONE));
@@ -162,7 +166,7 @@ public final class Terasology {
             } else {
                 if (createLastGame) {
                     engine.initialize();
-                    engine.getFromEngineContext(ThreadManager.class).submitTask("createLastGame", () -> {
+                    GameThread.io().scheduleDirect(() -> {
                         GameManifest gameManifest = getLatestGameManifest();
                         if (gameManifest != null) {
                             String title = gameManifest.getTitle();

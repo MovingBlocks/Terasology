@@ -26,7 +26,6 @@ import org.terasology.engine.core.subsystem.common.MonitoringSubsystem;
 import org.terasology.engine.core.subsystem.common.NetworkSubsystem;
 import org.terasology.engine.core.subsystem.common.PhysicsSubsystem;
 import org.terasology.engine.core.subsystem.common.TelemetrySubSystem;
-import org.terasology.engine.core.subsystem.common.ThreadManagerSubsystem;
 import org.terasology.engine.core.subsystem.common.TimeSubsystem;
 import org.terasology.engine.core.subsystem.common.WorldGenerationSubsystem;
 import org.terasology.engine.core.subsystem.rendering.ModuleRenderingSubsystem;
@@ -166,7 +165,6 @@ public class TerasologyEngine implements GameEngine {
         this.allSubsystems.add(new ConfigurationSubsystem());
         this.allSubsystems.add(timeSubsystem);
         this.allSubsystems.addAll(subsystems);
-        this.allSubsystems.add(new ThreadManagerSubsystem());
         this.allSubsystems.add(new MonitoringSubsystem());
         this.allSubsystems.add(new PhysicsSubsystem());
         this.allSubsystems.add(new CommandSubsystem());
