@@ -118,7 +118,8 @@ public final class IdentityIOHelper {
                 try (BufferedWriter writer = Files.newBufferedWriter(path, StandardOpenOption.CREATE)) {
                     GSON.toJson(identities, MAP_TYPE, writer);
                     nuiManager.pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage(exportPopupTitle,
-                            String.format(translationSystem.translate("${engine:menu#identity-export-ok}"), identities.size(), path.toString()));
+                            String.format(translationSystem.translate("${engine:menu#identity-export-ok}"), identities.size(),
+                                    path.toString()));
                 } catch (IOException | JsonIOException ex) {
                     nuiManager.pushScreen(MessagePopup.ASSET_URI, MessagePopup.class)
                             .setMessage(translationSystem.translate("${engine:menu#identity-export-fail}"), ex.toString());
@@ -127,7 +128,8 @@ public final class IdentityIOHelper {
 
             if (Files.exists(path)) {
                 ConfirmPopup confirm = nuiManager.pushScreen(ConfirmPopup.ASSET_URI, ConfirmPopup.class);
-                confirm.setMessage(exportPopupTitle, String.format(translationSystem.translate("${engine:menu#existing-file-warning}"), path.toString()));
+                confirm.setMessage(exportPopupTitle, String.format(translationSystem.translate("${engine:menu#existing-file-warning}"),
+                        path.toString()));
                 confirm.setOkHandler(action);
             } else {
                 action.run();

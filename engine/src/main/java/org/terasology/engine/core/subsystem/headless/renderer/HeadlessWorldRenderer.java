@@ -29,7 +29,9 @@ import java.util.List;
 
 public class HeadlessWorldRenderer implements WorldRenderer {
 
-    private static final int MAX_CHUNKS = ViewDistance.MEGA.getChunkDistance().x() * ViewDistance.MEGA.getChunkDistance().y() * ViewDistance.MEGA.getChunkDistance().z();
+    private static final int MAX_CHUNKS = ViewDistance.MEGA.getChunkDistance().x()
+            * ViewDistance.MEGA.getChunkDistance().y()
+            * ViewDistance.MEGA.getChunkDistance().z();
 
     private WorldProvider worldProvider;
     private ChunkProvider chunkProvider;
@@ -193,20 +195,22 @@ public class HeadlessWorldRenderer implements WorldRenderer {
         boolean chunksCurrentlyPending = false;
         if (!newChunkPos.equals(chunkPos) || force || pendingChunks) {
             Vector3ic viewingDistance = config.getRendering().getViewDistance().getChunkDistance();
-            BlockRegion viewRegion = new BlockRegion(newChunkPos).expand(new org.joml.Vector3i(viewingDistance.x() / 2, viewingDistance.y() / 2, viewingDistance.z() / 2));
+            BlockRegion viewRegion = new BlockRegion(newChunkPos)
+                    .expand(new Vector3i(viewingDistance.x() / 2, viewingDistance.y() / 2, viewingDistance.z() / 2));
             if (chunksInProximity.size() == 0 || force || pendingChunks) {
                 // just add all visible chunks
                 chunksInProximity.clear();
                 for (Vector3ic chunkPosition : viewRegion) {
                     Chunk c = chunkProvider.getChunk(chunkPosition);
-                    if (c != null && worldProvider.getLocalView(c.getPosition(new org.joml.Vector3i())) != null) {
+                    if (c != null && worldProvider.getLocalView(c.getPosition(new Vector3i())) != null) {
                         chunksInProximity.add(c);
                     } else {
                         chunksCurrentlyPending = true;
                     }
                 }
             } else {
-                BlockRegion oldRegion = new BlockRegion(chunkPos).expand(new org.joml.Vector3i(viewingDistance.x() / 2, viewingDistance.y() / 2, viewingDistance.z() / 2));
+                BlockRegion oldRegion = new BlockRegion(chunkPos)
+                        .expand(new Vector3i(viewingDistance.x() / 2, viewingDistance.y() / 2, viewingDistance.z() / 2));
 
                 // remove
                 for (Vector3ic candidateForRemove : viewRegion) {
@@ -222,7 +226,7 @@ public class HeadlessWorldRenderer implements WorldRenderer {
                 // add
                 for (Vector3ic chunkPosition : viewRegion) {
                     Chunk c = chunkProvider.getChunk(chunkPosition);
-                    if (c != null && worldProvider.getLocalView(c.getPosition(new org.joml.Vector3i())) != null) {
+                    if (c != null && worldProvider.getLocalView(c.getPosition(new Vector3i())) != null) {
                         chunksInProximity.add(c);
                     } else {
                         chunksCurrentlyPending = true;

@@ -22,13 +22,16 @@ public class DateTimeHelperTest {
         assertEquals("01h 00m 00s", DateTimeHelper.getDeltaBetweenTimestamps(0, 60 * 1000 * 60));
         assertEquals("12h 34m 56s", DateTimeHelper.getDeltaBetweenTimestamps(0, 60 * 1000 * 60 * 12 + 60 * 1000 * 34 + 56 * 1000));
 
-        assertEquals("1 Days 01h 00m 00s", DateTimeHelper.getDeltaBetweenTimestamps(0, 60 * 1000 * 60 * 25));
-        assertEquals("1 Days 01h 20m 40s", DateTimeHelper.getDeltaBetweenTimestamps(0, 60 * 1000 * 60 * 24 + 60 * 1000 * 60 + 60 * 1000 * 20 + 40 * 1000));
+        assertEquals("1 Days 01h 00m 00s",
+                DateTimeHelper.getDeltaBetweenTimestamps(0, 60 * 1000 * 60 * 25));
+        assertEquals("1 Days 01h 20m 40s",
+                DateTimeHelper.getDeltaBetweenTimestamps(0, 60 * 1000 * 60 * 24 + 60 * 1000 * 60 + 60 * 1000 * 20 + 40 * 1000));
 
         assertEquals("00h 00m 00s", DateTimeHelper.getDeltaBetweenTimestamps(1000, 1000));
         assertEquals("00h 00m 00s", DateTimeHelper.getDeltaBetweenTimestamps(50000, 50000));
 
-        assertEquals("11h 01m 01s", DateTimeHelper.getDeltaBetweenTimestamps(1000 * 60 * 25, 1000 * 60 * 25 + 60 * 1000 * 60 * 11 + 60 * 1000 + 1000));
+        assertEquals("11h 01m 01s",
+                DateTimeHelper.getDeltaBetweenTimestamps(1000 * 60 * 25, 1000 * 60 * 25 + 60 * 1000 * 60 * 11 + 60 * 1000 + 1000));
     }
 
     @Test

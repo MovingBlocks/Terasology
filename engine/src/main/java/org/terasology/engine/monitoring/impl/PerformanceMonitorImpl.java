@@ -113,8 +113,12 @@ public class PerformanceMonitorImpl implements PerformanceMonitorInternal {
 
         if (!activityStack.isEmpty()) {
             ActivityInfo currentActivity = activityStack.peek();
-            currentActivity.ownTime += newActivity.startTime - ((currentActivity.resumeTime > 0) ? currentActivity.resumeTime : currentActivity.startTime);
-            currentActivity.ownMem += (currentActivity.startMem - newActivity.startMem > 0) ? currentActivity.startMem - newActivity.startMem : 0;
+            currentActivity.ownTime += newActivity.startTime - ((currentActivity.resumeTime > 0)
+                    ? currentActivity.resumeTime
+                    : currentActivity.startTime);
+            currentActivity.ownMem += (currentActivity.startMem - newActivity.startMem > 0)
+                    ? currentActivity.startMem - newActivity.startMem
+                    : 0;
         }
 
         activityStack.push(newActivity);
@@ -130,11 +134,15 @@ public class PerformanceMonitorImpl implements PerformanceMonitorInternal {
         ActivityInfo oldActivity = activityStack.pop();
 
         long endTime = timer.getRealTimeInMs();
-        long totalTime = (oldActivity.resumeTime > 0) ? oldActivity.ownTime + endTime - oldActivity.resumeTime : endTime - oldActivity.startTime;
+        long totalTime = (oldActivity.resumeTime > 0)
+                ? oldActivity.ownTime + endTime - oldActivity.resumeTime
+                : endTime - oldActivity.startTime;
         currentExecutionData.adjustOrPutValue(oldActivity.name, totalTime, totalTime);
         
         long endMem = Runtime.getRuntime().freeMemory();
-        long totalMem = (oldActivity.startMem - endMem > 0) ? oldActivity.startMem - endMem + oldActivity.ownMem : oldActivity.ownMem;
+        long totalMem = (oldActivity.startMem - endMem > 0)
+                ? oldActivity.startMem - endMem + oldActivity.ownMem
+                : oldActivity.ownMem;
         currentAllocationData.adjustOrPutValue(oldActivity.name, totalMem, totalMem);
 
         if (!activityStack.isEmpty()) {

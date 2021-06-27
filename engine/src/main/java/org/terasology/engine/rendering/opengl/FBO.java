@@ -91,12 +91,17 @@ public final class FBO {
      * Meanwhile shaders might output not just colors but additional per-pixel data. This method establishes on which
      * of an FBOs attachments, subsequent opengl commands and shaders will draw on.
      *
-     * @param renderToColorBuffer If True the color buffer is set as drawable. If false subsequent commands and shaders won't be able to draw on it.
-     * @param renderToNormalsBuffer If True the normal buffer is set as drawable. If false subsequent commands and shaders won't be able to draw on it.
-     * @param renderToLightBuffer If True the light buffer is set as drawable. If false subsequent commands and shaders won't be able to draw on it.
+     * @param renderToColorBuffer If True the color buffer is set as drawable.
+     * If false subsequent commands and shaders won't be able to draw on it.
+     * @param renderToNormalsBuffer If True the normal buffer is set as drawable.
+     * If false subsequent commands and shaders won't be able to draw on it.
+     * @param renderToLightBuffer If True the light buffer is set as drawable.
+     * If false subsequent commands and shaders won't be able to draw on it.
      */
     public void setRenderBufferMask(boolean renderToColorBuffer, boolean renderToNormalsBuffer, boolean renderToLightBuffer) {
-        if (this.writeToColorBuffer == renderToColorBuffer && this.writeToNormalsBuffer == renderToNormalsBuffer && this.writeToLightBuffer == renderToLightBuffer) {
+        if (this.writeToColorBuffer == renderToColorBuffer
+                && this.writeToNormalsBuffer == renderToNormalsBuffer
+                && this.writeToLightBuffer == renderToLightBuffer) {
             return;
         }
 
@@ -610,7 +615,8 @@ public final class FBO {
     }
 
     private static void allocateTexture(Dimensions dimensions, int internalFormat, int dataFormat, int dataType) {
-        GL30.glTexImage2D(GL11.GL_TEXTURE_2D, 0, internalFormat, dimensions.width, dimensions.height, 0, dataFormat, dataType, (ByteBuffer) null);
+        GL30.glTexImage2D(GL11.GL_TEXTURE_2D, 0, internalFormat, dimensions.width, dimensions.height,
+                0, dataFormat, dataType, (ByteBuffer) null);
     }
 
     /**

@@ -23,8 +23,10 @@ import java.util.Map;
 
 
 public class SecurityConfig {
-    public static final SecurityPermission PRIVATE_CERTIFICATE_ACCESS_PERMISSION = new SecurityPermission("PRIVATE_CERTIFICATE_ACCESS_PERMISSION");
-    public static final SecurityPermission CERTIFICATE_WRITE_PERMISSION = new SecurityPermission("CERTIFICATE_WRITE_PERMISSION");
+    public static final SecurityPermission PRIVATE_CERTIFICATE_ACCESS_PERMISSION =
+            new SecurityPermission("PRIVATE_CERTIFICATE_ACCESS_PERMISSION");
+    public static final SecurityPermission CERTIFICATE_WRITE_PERMISSION =
+            new SecurityPermission("CERTIFICATE_WRITE_PERMISSION");
 
     private PublicIdentityCertificate serverPublicCertificate;
     private PrivateIdentityCertificate serverPrivateCertificate;
@@ -76,14 +78,17 @@ public class SecurityConfig {
         public static final String CLIENT_IDENTITIES = "clientIdentities";
 
         @Override
-        public SecurityConfig deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+        public SecurityConfig deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
+                throws JsonParseException {
             SecurityConfig result = new SecurityConfig();
             JsonObject jsonObject = json.getAsJsonObject();
             if (jsonObject.has(SERVER_PUBLIC_CERTIFICATE)) {
-                result.serverPublicCertificate = context.deserialize(jsonObject.getAsJsonObject(SERVER_PUBLIC_CERTIFICATE), PublicIdentityCertificate.class);
+                result.serverPublicCertificate = context.deserialize(jsonObject.getAsJsonObject(SERVER_PUBLIC_CERTIFICATE),
+                        PublicIdentityCertificate.class);
             }
             if (jsonObject.has(SERVER_PRIVATE_CERTIFICATE)) {
-                result.serverPrivateCertificate = context.deserialize(jsonObject.getAsJsonObject(SERVER_PRIVATE_CERTIFICATE), PrivateIdentityCertificate.class);
+                result.serverPrivateCertificate = context.deserialize(jsonObject.getAsJsonObject(SERVER_PRIVATE_CERTIFICATE),
+                        PrivateIdentityCertificate.class);
             }
             if (jsonObject.has(CLIENT_IDENTITIES)) {
                 JsonArray clientArray = jsonObject.getAsJsonArray(CLIENT_IDENTITIES);

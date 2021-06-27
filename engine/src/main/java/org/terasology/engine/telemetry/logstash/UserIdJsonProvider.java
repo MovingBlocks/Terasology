@@ -13,8 +13,10 @@ import org.terasology.engine.telemetry.TelemetryParams;
 import java.io.IOException;
 
 /**
- * This class append the user id to error log. And then the {@link org.terasology.engine.telemetry.logstash.TelemetryLogstashAppender} will send logs to the server.
- * The user id is based on user's MAC address. Normally it differs from one to another.
+ * This class append the user id to error log.
+ * And then the {@link org.terasology.engine.telemetry.logstash.TelemetryLogstashAppender} will send logs to the server.
+ * The user id is based on user's MAC address.
+ * Normally it differs from one to another.
  */
 public class UserIdJsonProvider extends AbstractFieldJsonProvider<ILoggingEvent> implements FieldNamesAware<LogstashFieldNames> {
 

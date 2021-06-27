@@ -8,7 +8,8 @@ import org.terasology.engine.network.ReplicationCheck;
 import org.terasology.reflection.metadata.FieldMetadata;
 
 /**
- * Add this component to an entity for it to transmit light from its location.  By default the component is configured to act similarly to a placed torch block.
+ * Add this component to an entity for it to transmit light from its location.
+ * By default the component is configured to act similarly to a placed torch block.
  */
 // TODO: Split into multiple components? Point, Directional?
 public final class LightComponent implements VisualComponent, ReplicationCheck {
@@ -29,12 +30,15 @@ public final class LightComponent implements VisualComponent, ReplicationCheck {
     public float lightAmbientIntensity = 1.0f;
 
     /**
-     * This helps control how focused the specular light is. A smaller number will make a wider cone of light. A larger number will make a narrower cone of light.
+     * This helps control how focused the specular light is.
+     * A smaller number will make a wider cone of light.
+     * A larger number will make a narrower cone of light.
      */
     @Replicate
     public float lightSpecularPower = 80.0f;
     /**
-     * Light attenuation range used in the calculation of how light fades from the light source as it gets farther away.  It is use in the following calculation:
+     * Light attenuation range used in the calculation of how light fades from the light source as it gets farther away.
+     * It is use in the following calculation:
      * <p>
      * attenuation = 1 / (lightDist/lightAttenuationRange + 1)^2
      * <p>

@@ -29,7 +29,8 @@ final class APISession {
 
     static APISession createFromLogin(URL hostURL, String login, String password) throws IOException, StorageServiceException {
         SessionPostRequestData req = new SessionPostRequestData(login, password);
-        SessionPostResponseData res = ServiceApiRequest.request(new URL(hostURL, ENDPOINT_SESSION), HttpMethod.POST, null, req, SessionPostResponseData.class);
+        SessionPostResponseData res = ServiceApiRequest.request(new URL(hostURL, ENDPOINT_SESSION), HttpMethod.POST,
+                null, req, SessionPostResponseData.class);
         return new APISession(hostURL, res.token);
     }
 
@@ -52,7 +53,8 @@ final class APISession {
     }
 
     Map<PublicIdentityCertificate, ClientIdentity> getAllIdentities() throws IOException, StorageServiceException {
-        AllIdentitiesGetResponseData res = requestEndpoint(ENDPOINT_CLIENT_IDENTITY, null, HttpMethod.GET, null, AllIdentitiesGetResponseData.class);
+        AllIdentitiesGetResponseData res = requestEndpoint(ENDPOINT_CLIENT_IDENTITY, null, HttpMethod.GET,
+                null, AllIdentitiesGetResponseData.class);
         return IdentityBundle.listToMap(res.clientIdentities);
     }
 

@@ -37,8 +37,8 @@ public class HorizontalFamily extends AbstractBlockFamily implements SideDefined
         }
         for (Rotation rot : Rotation.horizontalRotations()) {
             Side side = rot.rotate(Side.FRONT);
-            Block block = blockBuilder.constructTransformedBlock(definition, shape, side.toString().toLowerCase(Locale.ENGLISH), rot,
-                    new BlockUri(uri, new Name(side.name())), this);
+            Block block = blockBuilder.constructTransformedBlock(definition, shape, side.toString().toLowerCase(Locale.ENGLISH),
+                    rot, new BlockUri(uri, new Name(side.name())), this);
             if (block == null) {
                 throw new IllegalArgumentException("Missing block for side: " + side.toString());
             }
@@ -53,7 +53,8 @@ public class HorizontalFamily extends AbstractBlockFamily implements SideDefined
         for (Rotation rot : Rotation.horizontalRotations()) {
             Side side = rot.rotate(Side.FRONT);
 
-            Block block = blockBuilder.constructTransformedBlock(definition, side.toString().toLowerCase(Locale.ENGLISH), rot, new BlockUri(uri, new Name(side.name())), this);
+            Block block = blockBuilder.constructTransformedBlock(definition, side.toString().toLowerCase(Locale.ENGLISH),
+                    rot, new BlockUri(uri, new Name(side.name())), this);
             if (block == null) {
                 throw new IllegalArgumentException("Missing block for side: " + side.toString());
             }
