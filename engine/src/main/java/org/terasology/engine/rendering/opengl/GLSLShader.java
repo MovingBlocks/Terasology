@@ -9,9 +9,10 @@ import com.google.common.io.CharStreams;
 import gnu.trove.iterator.TIntIntIterator;
 import gnu.trove.map.TIntIntMap;
 import gnu.trove.map.hash.TIntIntHashMap;
-import org.lwjgl.opengl.ARBShaderObjects;
 import org.lwjgl.opengl.GL20;
+import org.lwjgl.opengl.GL30;
 import org.lwjgl.opengl.GL32;
+import org.lwjgl.opengl.GL33;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.config.Config;
@@ -100,7 +101,8 @@ public class GLSLShader extends Shader {
     }
 
 
-    public static GLSLShader create(ResourceUrn urn, AssetType<?, ShaderData> assetType, ShaderData data, LwjglGraphicsProcessing graphicsProcessing) {
+    public static GLSLShader create(ResourceUrn urn, AssetType<?, ShaderData> assetType, ShaderData data,
+                                    LwjglGraphicsProcessing graphicsProcessing) {
         return new GLSLShader(urn, assetType, data, new GLSLShader.DisposalAction(urn, graphicsProcessing), graphicsProcessing);
     }
 
@@ -345,37 +347,17 @@ public class GLSLShader extends Shader {
         GL20.glShaderSource(shaderId, shader);
         GL20.glCompileShader(shaderId);
 
-        if (!compileSuccess(shaderId)) {
+        int[] compileStatus = new int[1];
+        GL30.glGetShaderiv(shaderId, GL30.GL_COMPILE_STATUS, compileStatus);
+        if (compileStatus[0] == GL33.GL_FALSE) {
             dumpCode(type, features, assembleShader(type, features));
 
             throw new RuntimeException(String.format("Shader '%s' failed to compile for features '%s'.%n%n"
                             + "Shader Info: %n%s%n",
-                    getUrn(), features, getLogInfo(shaderId)));
+                    getUrn(), features, GL30.glGetShaderInfoLog(shaderId)));
         }
 
         return shaderId;
-    }
-
-    private String getLogInfo(int shaderId) {
-        int length = ARBShaderObjects.glGetObjectParameteriARB(shaderId, ARBShaderObjects.GL_OBJECT_INFO_LOG_LENGTH_ARB);
-
-        if (length > 0) {
-            return ARBShaderObjects.glGetInfoLogARB(shaderId, length);
-        }
-
-        return "No Info";
-    }
-
-    private boolean compileSuccess(int shaderId) {
-        int compileStatus = ARBShaderObjects.glGetObjectParameteriARB(shaderId, ARBShaderObjects.GL_OBJECT_COMPILE_STATUS_ARB);
-        //int linkStatus = ARBShaderObjects.glGetObjectParameteriARB(shaderId, ARBShaderObjects.GL_OBJECT_LINK_STATUS_ARB);
-        //int validateStatus = ARBShaderObjects.glGetObjectParameteriARB(shaderId, ARBShaderObjects.GL_OBJECT_VALIDATE_STATUS_ARB);
-
-
-        /*|| linkStatus == 0 || validateStatus == 0*/
-        return compileStatus != 0;
-
-        //logger.info("Shader '{}' successfully compiled.", getURI());
     }
 
     @Override

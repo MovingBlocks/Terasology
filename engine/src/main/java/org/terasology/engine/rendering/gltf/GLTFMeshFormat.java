@@ -71,19 +71,24 @@ public class GLTFMeshFormat extends GLTFCommonFormat<MeshData> {
                     GLTFBufferView bufferView = gltf.getBufferViews().get(gltfAccessor.getBufferView());
                     switch (semantic) {
                         case Position:
-                            GLTFAttributeMapping.readVec3FBuffer(loadedBuffers.get(bufferView.getBuffer()), gltfAccessor, bufferView, meshData.position);
+                            GLTFAttributeMapping.readVec3FBuffer(loadedBuffers.get(bufferView.getBuffer()), gltfAccessor,
+                                    bufferView, meshData.position);
                             break;
                         case Normal:
-                            GLTFAttributeMapping.readVec3FBuffer(loadedBuffers.get(bufferView.getBuffer()), gltfAccessor, bufferView, meshData.normal);
+                            GLTFAttributeMapping.readVec3FBuffer(loadedBuffers.get(bufferView.getBuffer()), gltfAccessor,
+                                    bufferView, meshData.normal);
                             break;
                         case Texcoord_0:
-                            GLTFAttributeMapping.readVec2FBuffer(loadedBuffers.get(bufferView.getBuffer()), gltfAccessor, bufferView, meshData.uv0);
+                            GLTFAttributeMapping.readVec2FBuffer(loadedBuffers.get(bufferView.getBuffer()), gltfAccessor,
+                                    bufferView, meshData.uv0);
                             break;
                         case Texcoord_1:
-                            GLTFAttributeMapping.readVec2FBuffer(loadedBuffers.get(bufferView.getBuffer()), gltfAccessor, bufferView, meshData.uv1);
+                            GLTFAttributeMapping.readVec2FBuffer(loadedBuffers.get(bufferView.getBuffer()), gltfAccessor,
+                                    bufferView, meshData.uv1);
                             break;
                         case Color_0:
-                            GLTFAttributeMapping.readColor4FBuffer(loadedBuffers.get(bufferView.getBuffer()), gltfAccessor, bufferView, meshData.color0);
+                            GLTFAttributeMapping.readColor4FBuffer(loadedBuffers.get(bufferView.getBuffer()), gltfAccessor,
+                                    bufferView, meshData.color0);
                             break;
                     }
                 }

@@ -21,7 +21,8 @@ public class ReplicatedFieldMetadata<T, U> extends FieldMetadata<T, U> {
     private boolean replicated;
     private Replicate replicationInfo;
 
-    public ReplicatedFieldMetadata(ClassMetadata<T, ?> owner, Field field, CopyStrategyLibrary copyStrategyLibrary, ReflectFactory factory, boolean replicatedByDefault)
+    public ReplicatedFieldMetadata(ClassMetadata<T, ?> owner, Field field, CopyStrategyLibrary copyStrategyLibrary,
+                                   ReflectFactory factory, boolean replicatedByDefault)
             throws InaccessibleFieldException {
         super(owner, field, copyStrategyLibrary, factory);
         this.replicated = replicatedByDefault;

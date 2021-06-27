@@ -239,7 +239,8 @@ public final class Terasology {
         System.out.println();
         System.out.println("    terasology" + optText.toString());
         System.out.println();
-        System.out.println("By default Terasology saves data such as game saves and logs into subfolders of a platform-specific \"home directory\".");
+        System.out.println("By default Terasology saves data such as game saves and logs into subfolders of a platform-specific \"home " +
+                "directory\".");
         System.out.println("Saving can be explicitly disabled using the \"" + NO_SAVE_GAMES + "\" flag.");
         System.out.println("Optionally, the user can override the default by using one of the following launch arguments:");
         System.out.println();
@@ -264,7 +265,8 @@ public final class Terasology {
         System.out.println();
         System.out.println("To change the port the server is hosted on use the " + SERVER_PORT + " launch argument.");
         System.out.println();
-        System.out.println("To override the default generated config (useful for headless server) use the " + OVERRIDE_DEFAULT_CONFIG + " launch argument");
+        System.out.println("To override the default generated config (useful for headless server) use the " + OVERRIDE_DEFAULT_CONFIG +
+                " launch argument");
         System.out.println();
         System.out.println("Examples:");
         System.out.println();

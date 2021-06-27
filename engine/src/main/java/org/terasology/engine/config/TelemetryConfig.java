@@ -16,7 +16,9 @@ public class TelemetryConfig {
 
     private boolean telemetryEnabled;
 
-    private String telemetryDestination = TelemetryEmitter.getDefaultCollectorURL(DEFAULT_COLLECTOR_PROTOCOL, DEFAULT_COLLECTOR_HOST, DEFAULT_COLLECTOR_PORT).toString();
+    private String telemetryDestination = TelemetryEmitter
+            .getDefaultCollectorURL(DEFAULT_COLLECTOR_PROTOCOL, DEFAULT_COLLECTOR_HOST, DEFAULT_COLLECTOR_PORT)
+            .toString();
 
     private String telemetryServerName = TelemetryEmitter.DEFAULT_COLLECTOR_NAME;
 
@@ -24,7 +26,8 @@ public class TelemetryConfig {
 
     private boolean errorReportingEnabled;
 
-    private String errorReportingDestination = TelemetryLogstashAppender.DEFAULT_LOGSTASH_HOST + ":" + TelemetryLogstashAppender.DEFAULT_LOGSTASH_PORT;
+    private String errorReportingDestination = TelemetryLogstashAppender.DEFAULT_LOGSTASH_HOST
+            + ":" + TelemetryLogstashAppender.DEFAULT_LOGSTASH_PORT;
 
     private String errorReportingServerName = TelemetryLogstashAppender.DEFAULT_LOGSTASH_NAME;
 

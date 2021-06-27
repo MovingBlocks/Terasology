@@ -90,7 +90,7 @@ public class BlockSelectionRenderer {
         blockSelectionMat.enable();
         blockSelectionMat.activateFeature(ShaderProgramFeature.FEATURE_ALPHA_REJECT);
         blockSelectionMat.setMatrix4("projectionMatrix", camera.getProjectionMatrix());
-        blockSelectionMat.setTexture("texture", effectsTexture);
+        blockSelectionMat.setTexture("tex", effectsTexture);
         blockSelectionMat.bindTextures();
 
         glEnable(GL11.GL_BLEND);

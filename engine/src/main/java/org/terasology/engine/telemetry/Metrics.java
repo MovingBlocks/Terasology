@@ -92,7 +92,8 @@ public class Metrics {
     }
 
     /**
-     * Add a metric instance to Metrics. This method will only be used when a metric constructor needs specific other than {@link org.terasology.engine.context.Context}
+     * Add a metric instance to Metrics. This method will only be used when a metric constructor needs specific
+     * other than {@link org.terasology.engine.context.Context}
      * @param metric a new metric that constructor needs some arguments other than {@link org.terasology.engine.context.Context}
      */
     public void addMetric(Metric metric) {

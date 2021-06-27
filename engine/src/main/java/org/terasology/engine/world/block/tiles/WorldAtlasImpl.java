@@ -251,7 +251,8 @@ public class WorldAtlasImpl implements WorldAtlas {
         return createAtlasMipmaps(numMipMaps, initialColor, tileImages, screenshotName, Lists.newArrayList());
     }
 
-    private ByteBuffer[] createAtlasMipmaps(int numMipMaps, Color initialColor, List<BlockTile> tileImages, String screenshotName, List<BlockTile> alphaMaskTiles) {
+    private ByteBuffer[] createAtlasMipmaps(int numMipMaps, Color initialColor, List<BlockTile> tileImages,
+                                            String screenshotName, List<BlockTile> alphaMaskTiles) {
         ByteBuffer[] data = new ByteBuffer[numMipMaps];
         for (int i = 0; i < numMipMaps; ++i) {
             BufferedImage image = generateAtlas(i, tileImages, initialColor);
@@ -261,7 +262,8 @@ public class WorldAtlasImpl implements WorldAtlas {
             }
 
             if (i == 0) {
-                try (OutputStream stream = new BufferedOutputStream(Files.newOutputStream(PathManager.getInstance().getScreenshotPath().resolve(screenshotName)))) {
+                try (OutputStream stream = new BufferedOutputStream(Files.newOutputStream(
+                        PathManager.getInstance().getScreenshotPath().resolve(screenshotName)))) {
                     ImageIO.write(image, "png", stream);
                 } catch (IOException e) {
                     logger.warn("Failed to write atlas");
@@ -345,7 +347,8 @@ public class WorldAtlasImpl implements WorldAtlas {
                 for (int frameIndex = 0; frameIndex < tile.getLength(); frameIndex++) {
                     int posX = totalIndex % tilesPerDim;
                     int posY = totalIndex / tilesPerDim;
-                    g.drawImage(tile.getImage(frameIndex).getScaledInstance(textureSize, textureSize, Image.SCALE_SMOOTH), posX * textureSize, posY * textureSize, null);
+                    g.drawImage(tile.getImage(frameIndex).getScaledInstance(textureSize, textureSize, Image.SCALE_SMOOTH),
+                            posX * textureSize, posY * textureSize, null);
                     totalIndex++;
                 }
             }

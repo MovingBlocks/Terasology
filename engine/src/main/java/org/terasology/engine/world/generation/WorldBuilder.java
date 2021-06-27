@@ -254,7 +254,8 @@ public class WorldBuilder extends ProviderStore {
         }
 
         // then add all @Updates facet providers
-        providersList.stream().filter(provider -> updatesFacet(provider, facet) && (!scalable || provider instanceof ScalableFacetProvider)).forEach(provider -> {
+        providersList.stream().filter(provider -> updatesFacet(provider, facet)
+                && (!scalable || provider instanceof ScalableFacetProvider)).forEach(provider -> {
             Set<FacetProvider> localOrderedProviders = Sets.newLinkedHashSet();
             // add all required facets for updating provider
             for (Facet requirement : requiredFacets(provider)) {
@@ -326,7 +327,8 @@ public class WorldBuilder extends ProviderStore {
     // Ensure that rasterizers that must run after others are in the correct order. This ensures that blocks from
     // the dependent raterizer are not being overwritten by any antecedent rasterizer.
     // TODO: This will only handle first-order dependencies and does not check for circular dependencies
-    private List<WorldRasterizer> ensureRasterizerOrdering(ListMultimap<Class<? extends WorldFacet>, FacetProvider> providerChains, boolean scalable) {
+    private List<WorldRasterizer> ensureRasterizerOrdering(ListMultimap<Class<? extends WorldFacet>,
+            FacetProvider> providerChains, boolean scalable) {
         List<WorldRasterizer> orderedRasterizers = Lists.newArrayList();
 
         Set<Class<? extends WorldRasterizer>> addedRasterizers = new HashSet<>();

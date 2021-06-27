@@ -58,7 +58,8 @@ public class FlowParagraphRenderable implements ParagraphRenderable {
 
             for (FlowRenderable flowRenderable : line.getFlowRenderables()) {
                 int elementWidth = flowRenderable.getWidth(defaultStyle);
-                Rectanglei renderableRegion = RectUtility.createFromMinAndSize(insetXAdvance + leftIndent + alignOffset + startPos.x + x, y, elementWidth, lineHeight);
+                Rectanglei renderableRegion = RectUtility.createFromMinAndSize(insetXAdvance + leftIndent + alignOffset + startPos.x + x, y,
+                        elementWidth, lineHeight);
                 String hyperlink = flowRenderable.getAction();
                 if (hyperlink != null) {
                     hyperlinkRegister.registerHyperlink(renderableRegion, hyperlink);
@@ -81,7 +82,8 @@ public class FlowParagraphRenderable implements ParagraphRenderable {
         return height;
     }
 
-    private Iterable<LaidFlowLine<FlowRenderable>> updateCacheIfNeeded(ParagraphRenderStyle defaultStyle, int yStart, ContainerRenderSpace containerRenderSpace) {
+    private Iterable<LaidFlowLine<FlowRenderable>> updateCacheIfNeeded(ParagraphRenderStyle defaultStyle, int yStart,
+                                                                       ContainerRenderSpace containerRenderSpace) {
         // TODO introduce cache, once the RenderSpace gets stabilized and allows comparing
         return FlowLineBuilder.getLines(flowParagraphData, defaultStyle, yStart, containerRenderSpace);
     }

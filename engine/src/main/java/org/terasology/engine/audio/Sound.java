@@ -15,7 +15,8 @@ import org.terasology.gestalt.assets.ResourceUrn;
 public abstract class Sound<T extends AssetData> extends Asset<T> implements org.terasology.nui.asset.Sound {
 
     /**
-     * The constructor for an asset. It is suggested that implementing classes provide a constructor taking both the urn, and an initial AssetData to load.
+     * The constructor for an asset.
+     * It is suggested that implementing classes provide a constructor taking both the urn, and an initial AssetData to load.
      *
      * @param urn       The urn identifying the asset.
      * @param assetType The asset type this asset belongs to.
@@ -25,7 +26,8 @@ public abstract class Sound<T extends AssetData> extends Asset<T> implements org
     }
 
     /**
-     * The constructor for an asset. It is suggested that implementing classes provide a constructor taking both the urn, and an initial AssetData to load.
+     * The constructor for an asset.
+     * It is suggested that implementing classes provide a constructor taking both the urn, and an initial AssetData to load.
      *
      * @param urn       The urn identifying the asset.
      * @param assetType The asset type this asset belongs to.

@@ -59,7 +59,7 @@ public class FontMaterialProducer implements AssetDataProducer<MaterialData> {
             Optional<Texture> texture = assetManager.getAsset(new ResourceUrn(urn.getModuleName(), urn.getFragmentName()), Texture.class);
             if (texture.isPresent()) {
                 MaterialData materialData = new MaterialData(fontShader.get());
-                materialData.setParam("texture", texture.get());
+                materialData.setParam("tex", texture.get());
                 return Optional.of(materialData);
             }
         }

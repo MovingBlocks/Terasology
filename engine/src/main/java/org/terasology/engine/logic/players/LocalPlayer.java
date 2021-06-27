@@ -85,7 +85,9 @@ public class LocalPlayer {
 
     public boolean isValid() {
         EntityRef characterEntity = getCharacterEntity();
-        return characterEntity.exists() && characterEntity.hasComponent(LocationComponent.class) && characterEntity.hasComponent(CharacterComponent.class)
+        return characterEntity.exists()
+                && characterEntity.hasComponent(LocationComponent.class)
+                && characterEntity.hasComponent(CharacterComponent.class)
                 && characterEntity.hasComponent(CharacterMovementComponent.class);
     }
 
