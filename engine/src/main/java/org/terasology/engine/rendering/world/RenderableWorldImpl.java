@@ -118,7 +118,7 @@ class RenderableWorldImpl implements RenderableWorld {
         chunkMeshPublisher.toFlowable(BackpressureStrategy.BUFFER)
             .distinct(Chunk::getPosition, () -> chunkMeshProcessing)
             .doOnNext(k -> k.setDirty(false))
-            .parallel(4).runOn(Schedulers.computation())
+            .parallel(4).runOn(Schedulers.computation()) // allocation is pretty heavy :/
             .<ChunkMeshPayload>mapOptional(c -> {
                 ChunkView chunkView = worldProvider.getLocalView(c.getPosition());
                 if (chunkView != null && chunkView.isValidView()) {
