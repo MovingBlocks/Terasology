@@ -2,11 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.rendering.opengl;
 
-import io.reactivex.rxjava3.core.Flowable;
-import io.reactivex.rxjava3.core.Observable;
-import io.reactivex.rxjava3.core.Single;
-import io.reactivex.rxjava3.functions.Action;
-import io.reactivex.rxjava3.schedulers.Schedulers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.config.Config;
@@ -30,7 +25,6 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.concurrent.Callable;
 
 // TODO: Future work should not only "think" in terms of a DAG-like rendering pipeline
 // TODO: but actually implement one, see https://github.com/MovingBlocks/Terasology/issues/1741

@@ -214,6 +214,7 @@ public class ModuleManager {
         permissionProviderFactory.getBasePermissionSet().grantPermission("com.google.gson", ReflectPermission.class);
         permissionProviderFactory.getBasePermissionSet().grantPermission("com.google.gson.internal", ReflectPermission.class);
 
+        // reactive x property permission
         permissionProviderFactory.getBasePermissionSet().grantPermission(new PropertyPermission("rx3.io-keep-alive-time", "read"));
         permissionProviderFactory.getBasePermissionSet().grantPermission(new PropertyPermission("rx3.io-priority", "read"));
         permissionProviderFactory.getBasePermissionSet().grantPermission(new PropertyPermission("rx3.io-scheduled-release", "read"));
@@ -226,6 +227,8 @@ public class ModuleManager {
         permissionProviderFactory.getBasePermissionSet().grantPermission(new PropertyPermission("rx3.scheduler.use-nanotime", "read"));
         permissionProviderFactory.getBasePermissionSet().grantPermission(new PropertyPermission("rx3.scheduler.drift-tolerance", "read"));
         permissionProviderFactory.getBasePermissionSet().grantPermission(new PropertyPermission("rx3.scheduler.drift-tolerance-unit", "read"));
+        permissionProviderFactory.getBasePermissionSet().grantPermission(new PropertyPermission("rx3.buffer-size", "read"));
+        permissionProviderFactory.getBasePermissionSet().grantPermission(new PropertyPermission("jctools.spsc.max.lookahead.step", "read"));
 
         Policy.setPolicy(new ModuleSecurityPolicy());
         System.setSecurityManager(new ModuleSecurityManager());

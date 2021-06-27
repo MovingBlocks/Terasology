@@ -5,11 +5,10 @@ package org.terasology.engine.core;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Queues;
 import io.reactivex.rxjava3.core.Scheduler;
-import io.reactivex.rxjava3.plugins.RxJavaPlugins;
 import io.reactivex.rxjava3.schedulers.Schedulers;
+import org.terasology.gestalt.module.sandbox.API;
 
 import java.security.AccessController;
-import java.security.Permission;
 import java.security.PrivilegedAction;
 import java.util.List;
 import java.util.concurrent.BlockingDeque;
@@ -24,13 +23,19 @@ import java.util.concurrent.Semaphore;
  * </ul>
  *
  */
+@API
 public final class GameThread {
 
     private static volatile Thread gameThread;
     private static BlockingDeque<Runnable> pendingRunnables = Queues.newLinkedBlockingDeque();
+    private static final Scheduler MAIN = Schedulers.from(runnable -> pendingRunnables.add(runnable));
 
 
     private GameThread() {
+    }
+
+    public static Scheduler main() {
+        return MAIN;
     }
 
     public static Scheduler io() {
