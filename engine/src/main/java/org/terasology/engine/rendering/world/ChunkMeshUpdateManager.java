@@ -57,7 +57,7 @@ public final class ChunkMeshUpdateManager {
         this.tessellator = tessellator;
         this.worldProvider = worldProvider;
 
-        chunkUpdater = TaskMaster.createDynamicPriorityTaskMaster("Chunk-Updater", NUM_TASK_THREADS, new ChunkUpdaterComparator());
+        chunkUpdater = TaskMaster.createPriorityTaskMaster("Chunk-Updater", NUM_TASK_THREADS, 100, new ChunkUpdaterComparator());
     }
 
     /**
