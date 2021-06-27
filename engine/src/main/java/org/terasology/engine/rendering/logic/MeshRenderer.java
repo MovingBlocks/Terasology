@@ -130,6 +130,7 @@ public class MeshRenderer extends BaseComponentSystem implements RenderSystem {
         }
     }
 
+    @Override
     public void renderOpaque() {
         if (config.getRendering().isRenderNearest()) {
             renderEntities(Arrays.asList(opaqueMeshSorter.getNearest(config.getRendering().getMeshLimit())));
@@ -231,14 +232,6 @@ public class MeshRenderer extends BaseComponentSystem implements RenderSystem {
      */
     private boolean isRelevant(EntityRef entity, Vector3fc position) {
         return worldProvider.isBlockRelevant(position) || entity.isAlwaysRelevant();
-    }
-
-    @Override
-    public void renderOverlay() {
-    }
-
-    @Override
-    public void renderShadows() {
     }
 
     public int getLastRendered() {

@@ -472,19 +472,6 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
         return (float) java.lang.Math.sin((double) bobFactor * frequency + phaseOffset) * amplitude;
     }
 
-    @Override
-    public void renderOpaque() {
-
-    }
-
-    @Override
-    public void renderAlphaBlend() {
-
-    }
-
-    @Override
-    public void renderShadows() {
-    }
 
     /**
      * Special getter that fetches the client entity via the NetworkSystem instead of the LocalPlayer. This can be
