@@ -18,16 +18,16 @@ import org.terasology.engine.entitySystem.systems.RegisterMode;
 import org.terasology.engine.entitySystem.systems.RegisterSystem;
 import org.terasology.engine.entitySystem.systems.RenderSystem;
 import org.terasology.engine.logic.location.LocationComponent;
+import org.terasology.engine.registry.In;
 import org.terasology.engine.rendering.assets.font.Font;
 import org.terasology.engine.rendering.assets.font.FontMeshBuilder;
 import org.terasology.engine.rendering.assets.material.Material;
+import org.terasology.engine.rendering.assets.mesh.Mesh;
 import org.terasology.engine.rendering.cameras.Camera;
+import org.terasology.engine.world.WorldProvider;
 import org.terasology.gestalt.assets.management.AssetManager;
 import org.terasology.nui.Color;
 import org.terasology.nui.HorizontalAlign;
-import org.terasology.engine.registry.In;
-import org.terasology.engine.rendering.assets.mesh.Mesh;
-import org.terasology.engine.world.WorldProvider;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -35,7 +35,6 @@ import java.util.Map;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
 import static org.lwjgl.opengl.GL11.glDisable;
 import static org.lwjgl.opengl.GL11.glEnable;
-
 
 @RegisterSystem(RegisterMode.CLIENT)
 public class FloatingTextRenderer extends BaseComponentSystem implements RenderSystem {
@@ -155,27 +154,14 @@ public class FloatingTextRenderer extends BaseComponentSystem implements RenderS
     }
 
     @Override
-    public void renderOpaque() {
-    }
-
-    @Override
     public void renderAlphaBlend() {
         render(entityManager.getEntitiesWith(FloatingTextComponent.class, LocationComponent.class));
-    }
-
-    @Override
-    public void renderOverlay() {
-    }
-
-    @Override
-    public void renderShadows() {
     }
 
     @ReceiveEvent(components = FloatingTextComponent.class)
     public void onDisplayNameChange(OnChangedComponent event, EntityRef entity) {
         disposeCachedMeshOfEntity(entity);
     }
-
 
     @ReceiveEvent(components = FloatingTextComponent.class)
     public void onNameTagOwnerRemoved(BeforeDeactivateComponent event, EntityRef entity) {
