@@ -15,15 +15,12 @@ import org.slf4j.LoggerFactory;
 import org.terasology.engine.config.flexible.AutoConfigManager;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.core.module.ModuleManager;
-import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.entitySystem.metadata.ComponentLibrary;
 import org.terasology.engine.entitySystem.metadata.EntitySystemLibrary;
 import org.terasology.engine.entitySystem.metadata.EventLibrary;
-import org.terasology.engine.entitySystem.metadata.MetadataUtil;
 import org.terasology.engine.entitySystem.prefab.Prefab;
 import org.terasology.engine.entitySystem.prefab.internal.PrefabDeltaFormat;
 import org.terasology.engine.entitySystem.prefab.internal.PrefabFormat;
-import org.terasology.engine.entitySystem.systems.internal.DoNotAutoRegister;
 import org.terasology.engine.persistence.typeHandling.RegisterTypeHandler;
 import org.terasology.engine.persistence.typeHandling.RegisterTypeHandlerFactory;
 import org.terasology.engine.persistence.typeHandling.TypeHandlerLibraryImpl;
@@ -31,10 +28,8 @@ import org.terasology.engine.persistence.typeHandling.extensionTypes.CollisionGr
 import org.terasology.engine.physics.CollisionGroup;
 import org.terasology.engine.physics.CollisionGroupManager;
 import org.terasology.engine.registry.InjectionHelper;
-import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.gestalt.assets.module.ModuleAwareAssetTypeManager;
 import org.terasology.gestalt.module.ModuleEnvironment;
-import org.terasology.gestalt.naming.Name;
 import org.terasology.gestalt.util.reflection.GenericsUtil;
 import org.terasology.persistence.typeHandling.TypeHandler;
 import org.terasology.persistence.typeHandling.TypeHandlerFactory;
@@ -49,7 +44,7 @@ import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.Optional;
 
-import static com.google.common.base.Verify.verifyNotNull;
+import static org.terasology.engine.core.bootstrap.EntitySystemSetupUtil.registerComponents;
 
 /**
  * Handles an environment switch by updating the asset manager, component library, and other context objects.
@@ -186,17 +181,6 @@ public final class EnvironmentSwitchHandler {
                     .orElseThrow(() -> new RuntimeException("Cannot get Prefab Asset type")))
                     .removeDeltaFormat(registeredPrefabDeltaFormat);
             registeredPrefabDeltaFormat = null;
-        }
-    }
-
-
-    private static void registerComponents(ComponentLibrary library, ModuleEnvironment environment) {
-        for (Class<? extends Component> componentType : environment.getSubtypesOf(Component.class)) {
-            if (componentType.getAnnotation(DoNotAutoRegister.class) == null) {
-                String componentName = MetadataUtil.getComponentClassName(componentType);
-                Name componentModuleName = verifyNotNull(environment.getModuleProviding(componentType), "Could not find module for %s %s", componentName, componentType);
-                library.register(new ResourceUrn(componentModuleName.toString(), componentName), componentType);
-            }
         }
     }
 

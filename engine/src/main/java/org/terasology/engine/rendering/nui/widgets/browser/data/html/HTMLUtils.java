@@ -173,7 +173,8 @@ public final class HTMLUtils {
         return getStyleContainerInteger(attributes, groupName, "right", 1, 1, 1);
     }
 
-    private static ContainerInteger getStyleContainerInteger(Attributes attributes, String groupName, String sideName, int fourIndex, int threeIndex, int twoIndex) {
+    private static ContainerInteger getStyleContainerInteger(Attributes attributes, String groupName, String sideName,
+                                                             int fourIndex, int threeIndex, int twoIndex) {
         String elementStr = getStyleAttribute(attributes, groupName + "-" + sideName);
         if (elementStr != null) {
             return parseContainerInteger(elementStr);

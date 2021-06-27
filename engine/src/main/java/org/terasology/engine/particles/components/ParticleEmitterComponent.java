@@ -55,12 +55,14 @@ public class ParticleEmitterComponent implements Component {
     public boolean enabled = true;
 
     /**
-     * The remaining life time of this emitter in seconds, the emitter will auto-remove upon reaching 0 TODO: Implement emitter lifetime
+     * The remaining life time of this emitter in seconds, the emitter will auto-remove upon reaching 0
+     * TODO: Implement emitter lifetime
      */
     public float lifeTime = INDEFINITE_EMITTER_LIFETIME;
 
     /**
-     * The maximum amount of particle this emitter can emit before auto-removing, the emitter will auto-remove upon reaching 0 TODO: Implement emitter max spawns
+     * The maximum amount of particle this emitter can emit before auto-removing, the emitter will auto-remove upon reaching 0
+     * TODO: Implement emitter max spawns
      */
     public int particleSpawnsLeft = INFINITE_PARTICLE_SPAWNS;
 

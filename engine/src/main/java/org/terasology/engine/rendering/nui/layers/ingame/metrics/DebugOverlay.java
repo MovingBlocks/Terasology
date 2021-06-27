@@ -99,9 +99,6 @@ public class DebugOverlay extends CoreScreenLayer {
             debugLine3.bindText(new ReadOnlyBinding<String>() {
                 @Override
                 public String get() {
-                    if (!localPlayer.isValid()) {
-                        return "";
-                    }
                     Vector3f pos = localPlayer.getPosition(new Vector3f());
                     Vector3i chunkPos = Chunks.toChunkPos(pos, new Vector3i());
                     Vector3f rotation = localPlayer.getViewDirection(new Vector3f());
@@ -133,7 +130,8 @@ public class DebugOverlay extends CoreScreenLayer {
                             orientation = "NW";
                             break;
                     }
-                    return String.format(Locale.US, "Position: (%.2f, %.2f, %.2f), Chunk (%d, %d, %d), Eye (%.2f, %.2f, %.2f), Rot (%.2f, %.2f, %.2f) %s", pos.x, pos.y, pos.z,
+                    return String.format(Locale.US, "Position: (%.2f, %.2f, %.2f), Chunk (%d, %d, %d), " +
+                                    "Eye (%.2f, %.2f, %.2f), Rot (%.2f, %.2f, %.2f) %s", pos.x, pos.y, pos.z,
                             chunkPos.x, chunkPos.y, chunkPos.z,
                             cameraPos.x, cameraPos.y, cameraPos.z,
                             rotation.x, rotation.y, rotation.z, orientation);

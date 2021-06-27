@@ -4,7 +4,8 @@ package org.terasology.engine.entitySystem.systems;
 
 public interface ComponentSystem {
     /**
-     * Called to initialise the system. This occurs after injection, but before other systems are necessarily initialised, so they should not be interacted with.
+     * Called to initialise the system.
+     * This occurs after injection, but before other systems are necessarily initialised, so they should not be interacted with.
      */
     void initialise();
 

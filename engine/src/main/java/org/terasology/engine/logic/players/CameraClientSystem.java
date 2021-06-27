@@ -97,14 +97,16 @@ public class CameraClientSystem extends BaseComponentSystem {
     }
 
     @ReceiveEvent
-    public void mountCameraOnActivate(OnActivatedComponent event, EntityRef entityRef, AutoMountCameraComponent autoMountCameraComponent, ClientComponent clientComponent) {
+    public void mountCameraOnActivate(OnActivatedComponent event, EntityRef entityRef,
+                                      AutoMountCameraComponent autoMountCameraComponent, ClientComponent clientComponent) {
         if (localPlayer.getClientEntity().equals(entityRef) && clientComponent.camera.exists()) {
             mountCamera();
         }
     }
 
     @ReceiveEvent
-    public void mountCameraOnChange(OnChangedComponent event, EntityRef entityRef, AutoMountCameraComponent autoMountCameraComponent, ClientComponent clientComponent) {
+    public void mountCameraOnChange(OnChangedComponent event, EntityRef entityRef,
+                                    AutoMountCameraComponent autoMountCameraComponent, ClientComponent clientComponent) {
         if (localPlayer.getClientEntity().equals(entityRef) && clientComponent.camera.exists()) {
             mountCamera();
         }

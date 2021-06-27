@@ -62,7 +62,6 @@ public class RegionOutlineRenderer extends BaseComponentSystem implements Render
         mesh = Assets.generateAsset(meshData, Mesh.class);
     }
 
-
     @ReceiveEvent
     public void onRegionOutlineComponentActivation(OnActivatedComponent event, EntityRef entity,
                                                    RegionOutlineComponent component) {
@@ -74,7 +73,6 @@ public class RegionOutlineRenderer extends BaseComponentSystem implements Render
                                                      RegionOutlineComponent component) {
         entityToRegionOutlineMap.remove(entity);
     }
-
 
     @Override
     public void renderOverlay() {
@@ -154,17 +152,5 @@ public class RegionOutlineRenderer extends BaseComponentSystem implements Render
         mesh.reload(meshData);
         mesh.render();
         GL33.glDepthFunc(GL33.GL_LEQUAL);
-    }
-
-    @Override
-    public void renderOpaque() {
-    }
-
-    @Override
-    public void renderAlphaBlend() {
-    }
-
-    @Override
-    public void renderShadows() {
     }
 }

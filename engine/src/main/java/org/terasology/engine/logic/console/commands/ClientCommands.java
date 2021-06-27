@@ -81,14 +81,19 @@ public class ClientCommands extends BaseComponentSystem {
      * Sets the spawn location for the client to the current location
      * @return String containing debug information on the entity
      */
-    @Command(shortDescription = "Sets the spawn location for the client to the current location", runOnServer = true, requiredPermission = PermissionManager.CHEAT_PERMISSION)
+    @Command(shortDescription = "Sets the spawn location for the client to the current location",
+            runOnServer = true, requiredPermission = PermissionManager.CHEAT_PERMISSION)
     public String setSpawnLocation(@Sender EntityRef sender) {
         EntityRef clientInfo = sender.getComponent(ClientComponent.class).clientInfo;
         StaticSpawnLocationComponent staticSpawnLocationComponent = new StaticSpawnLocationComponent();
         if (clientInfo.hasComponent(StaticSpawnLocationComponent.class)) {
             staticSpawnLocationComponent = clientInfo.getComponent(StaticSpawnLocationComponent.class);
         }
-        staticSpawnLocationComponent.position = sender.getComponent(ClientComponent.class).character.getComponent(LocationComponent.class).getWorldPosition(new Vector3f());
+        staticSpawnLocationComponent.position = sender
+                .getComponent(ClientComponent.class)
+                .character
+                .getComponent(LocationComponent.class)
+                .getWorldPosition(new Vector3f());
         clientInfo.addOrSaveComponent(staticSpawnLocationComponent);
         return "Set spawn location to- " + staticSpawnLocationComponent.position;
     }

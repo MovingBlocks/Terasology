@@ -369,7 +369,8 @@ public class GameDetailsScreen extends CoreScreenLayer {
                         module = moduleManager.getRegistry().getLatestModuleVersion(nameVersion.getName());
                         if (module != null) {
                             logger.debug("Get the latest available version of module {} in your classpath", nameVersion.getName());
-                            errors.add(String.format("Can't find module %s:%s in your classpath; loaded description for the latest available version.",
+                            errors.add(String.format("Can't find module %s:%s in your classpath; " +
+                                            "loaded description for the latest available version.",
                                     nameVersion.getName(), nameVersion.getVersion()));
                             return ModuleSelectionInfo.latestVersion(module);
                         }
@@ -397,11 +398,14 @@ public class GameDetailsScreen extends CoreScreenLayer {
         if (wgi != null) {
             display = wgi.getDisplayName();
         }
-        return translationSystem.translate("${engine:menu#game-details-game-title} ") + theGameInfo.getManifest().getTitle() + '\n' + '\n' +
-                translationSystem.translate("${engine:menu#game-details-last-play}: ") + DATE_FORMAT.format(theGameInfo.getTimestamp()) + '\n' + '\n' +
-                translationSystem.translate("${engine:menu#game-details-game-duration} ") + DateTimeHelper
-                .getDeltaBetweenTimestamps(new Date(0).getTime(), theGameInfo.getManifest().getTime()) + '\n' + '\n' +
-                translationSystem.translate("${engine:menu#game-details-game-seed} ") + theGameInfo.getManifest().getSeed() + '\n' + '\n' +
+        return translationSystem.translate("${engine:menu#game-details-game-title} ")
+                + theGameInfo.getManifest().getTitle() + '\n' + '\n' +
+                translationSystem.translate("${engine:menu#game-details-last-play}: ")
+                + DATE_FORMAT.format(theGameInfo.getTimestamp()) + '\n' + '\n' +
+                translationSystem.translate("${engine:menu#game-details-game-duration} ")
+                + DateTimeHelper.getDeltaBetweenTimestamps(new Date(0).getTime(), theGameInfo.getManifest().getTime()) + '\n' + '\n' +
+                translationSystem.translate("${engine:menu#game-details-game-seed} ")
+                + theGameInfo.getManifest().getSeed() + '\n' + '\n' +
                 translationSystem.translate("${engine:menu#game-details-world-generator}: ") + '\t'
                 + display;
     }

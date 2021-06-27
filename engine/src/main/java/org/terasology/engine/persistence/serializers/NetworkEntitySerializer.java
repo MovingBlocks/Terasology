@@ -116,7 +116,8 @@ public class NetworkEntitySerializer {
         entity.setComponentFieldCounts(componentFieldCounts.toByteString());
 
         for (Component prefabComponent : prefab.iterateComponents()) {
-            if (!presentClasses.contains(prefabComponent.getClass()) && componentSerializeCheck.serialize(componentLibrary.getMetadata(prefabComponent.getClass()))) {
+            if (!presentClasses.contains(prefabComponent.getClass())
+                    && componentSerializeCheck.serialize(componentLibrary.getMetadata(prefabComponent.getClass()))) {
                 entity.addRemovedComponent(idTable.get(prefabComponent.getClass()));
             }
         }
@@ -124,7 +125,8 @@ public class NetworkEntitySerializer {
     }
 
     private void serializeComponentDelta(Component oldComponent, Component newComponent, FieldSerializeCheck<Component> fieldCheck,
-                                         EntityData.PackedEntity.Builder entityData, ByteString.Output entityFieldIds, ByteString.Output componentFieldCounts,
+                                         EntityData.PackedEntity.Builder entityData,
+                                         ByteString.Output entityFieldIds, ByteString.Output componentFieldCounts,
                                          boolean componentInitial) {
         ComponentMetadata<?> componentMetadata = componentLibrary.getMetadata(oldComponent.getClass());
         if (componentMetadata == null) {
@@ -158,7 +160,8 @@ public class NetworkEntitySerializer {
     }
 
     private void serializeComponentFull(Component component, boolean ignoreIfNoFields, FieldSerializeCheck<Component> fieldCheck,
-                                        EntityData.PackedEntity.Builder entityData, ByteString.Output entityFieldIds, ByteString.Output componentFieldCounts,
+                                        EntityData.PackedEntity.Builder entityData,
+                                        ByteString.Output entityFieldIds, ByteString.Output componentFieldCounts,
                                         boolean componentInitial) {
         ComponentMetadata<?> componentMetadata = componentLibrary.getMetadata(component.getClass());
         if (componentMetadata == null) {
@@ -264,12 +267,14 @@ public class NetworkEntitySerializer {
             if (component == null) {
                 logger.error("Non-existent component marked as added: {}", componentType);
             }
-            serializeComponentFull(entityRef.getComponent(componentType), false, fieldCheck, entity, fieldIds, componentFieldCounts, true);
+            serializeComponentFull(entityRef.getComponent(componentType), false, fieldCheck, entity, fieldIds,
+                    componentFieldCounts, true);
         }
         for (Class<? extends Component> componentType : changed) {
             Component comp = entityRef.getComponent(componentType);
             if (comp != null) {
-                serializeComponentFull(comp, true, fieldCheck, entity, fieldIds, componentFieldCounts, false);
+                serializeComponentFull(comp, true, fieldCheck, entity, fieldIds,
+                        componentFieldCounts, false);
             } else {
                 logger.error("Non-existent component marked as changed: {}", componentType);
             }

@@ -124,7 +124,8 @@ public class WorldPreGenerationScreen extends CoreScreenLayer implements UISlide
                 selectedWorld = value;
                 try {
                     if (findWorldByName(selectedWorld).getWorldGenerator() == null) {
-                        worldGenerator = WorldGeneratorManager.createWorldGenerator(findWorldByName(selectedWorld).getWorldGeneratorInfo().getUri(), context, environment);
+                        worldGenerator = WorldGeneratorManager.createWorldGenerator(findWorldByName(selectedWorld)
+                                .getWorldGeneratorInfo().getUri(), context, environment);
                         findWorldByName(selectedWorld).setWorldGenerator(worldGenerator);
                     } else {
                         worldGenerator = findWorldByName(selectedWorld).getWorldGenerator();
@@ -158,7 +159,8 @@ public class WorldPreGenerationScreen extends CoreScreenLayer implements UISlide
                     worldSetupScreen.setWorld(context, findWorldByName(selectedWorld), worldsDropdown);
                     triggerForwardAnimation(worldSetupScreen);
                 } else {
-                    getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Worlds List Empty!", "No world found to configure.");
+                    getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class)
+                            .setMessage("Worlds List Empty!", "No world found to configure.");
                 }
             } catch (UnresolvedWorldGeneratorException e) {
                 e.printStackTrace();
@@ -166,7 +168,8 @@ public class WorldPreGenerationScreen extends CoreScreenLayer implements UISlide
         });
 
         WidgetUtil.trySubscribe(this, "close", button -> {
-            final UniverseSetupScreen universeSetupScreen = getManager().createScreen(UniverseSetupScreen.ASSET_URI, UniverseSetupScreen.class);
+            final UniverseSetupScreen universeSetupScreen =
+                    getManager().createScreen(UniverseSetupScreen.ASSET_URI, UniverseSetupScreen.class);
             UIDropdownScrollable worldsDropdownOfUniverse = universeSetupScreen.find("worlds", UIDropdownScrollable.class);
             universeSetupScreen.refreshWorldDropdown(worldsDropdownOfUniverse);
             triggerBackAnimation();
@@ -183,7 +186,8 @@ public class WorldPreGenerationScreen extends CoreScreenLayer implements UISlide
 
         try {
             if (findWorldByName(selectedWorld).getWorldGenerator() == null) {
-                worldGenerator = WorldGeneratorManager.createWorldGenerator(findWorldByName(selectedWorld).getWorldGeneratorInfo().getUri(), context, environment);
+                worldGenerator = WorldGeneratorManager.createWorldGenerator(findWorldByName(selectedWorld)
+                        .getWorldGeneratorInfo().getUri(), context, environment);
                 findWorldByName(selectedWorld).setWorldGenerator(worldGenerator);
             } else {
                 worldGenerator = findWorldByName(selectedWorld).getWorldGenerator();
