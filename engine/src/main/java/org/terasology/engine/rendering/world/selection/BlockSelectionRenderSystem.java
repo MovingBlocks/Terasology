@@ -75,16 +75,4 @@ public class BlockSelectionRenderSystem extends BaseComponentSystem implements R
         selectionRenderer.endRenderOverlay();
 
     }
-
-    @Override
-    public void renderShadows() {
-    }
-
-    @Override
-    public void renderOpaque() {
-    }
-
-    @Override
-    public void renderAlphaBlend() {
-    }
 }
