@@ -72,13 +72,22 @@ public class PerlinNoise extends AbstractNoise implements Noise2D, Noise3D {
      */
     @Override
     public float noise(float posX, float posY, float posZ) {
-        int xInt = Math.floorMod(TeraMath.floorToInt(posX), permCount);
-        int yInt = Math.floorMod(TeraMath.floorToInt(posY), permCount);
-        int zInt = Math.floorMod(TeraMath.floorToInt(posZ), permCount);
 
-        float x = posX - TeraMath.fastFloor(posX);
-        float y = posY - TeraMath.fastFloor(posY);
-        float z = posZ - TeraMath.fastFloor(posZ);
+        // Domain rotation removes Perlin's characteristic square artifacts from the XZ planes, by pointing Y up the grid's main diagonal.
+        float xz = posX + posZ;
+        float s2 = xz * -0.211324865405187f;
+        float yy = posY * 0.577350269189626f;
+        float rPosX = posX + (s2 + yy);
+        float rPosY = xz * -0.577350269189626f + yy;
+        float rPosZ = posZ + (s2 + yy);
+
+        int xInt = Math.floorMod(TeraMath.floorToInt(rPosX), permCount);
+        int yInt = Math.floorMod(TeraMath.floorToInt(rPosY), permCount);
+        int zInt = Math.floorMod(TeraMath.floorToInt(rPosZ), permCount);
+
+        float x = rPosX - TeraMath.fastFloor(rPosX);
+        float y = rPosY - TeraMath.fastFloor(rPosY);
+        float z = rPosZ - TeraMath.fastFloor(rPosZ);
 
         float u = TeraMath.fadePerlin(x);
         float v = TeraMath.fadePerlin(y);
