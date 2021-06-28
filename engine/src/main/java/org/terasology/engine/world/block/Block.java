@@ -34,21 +34,6 @@ import java.util.Optional;
  */
 public final class Block {
 
-    // TODO: Use directional light(s) when rendering instead of this
-    private static final Map<BlockPart, Float> DIRECTION_LIT_LEVEL = Maps.newEnumMap(BlockPart.class);
-
-
-     // Initialize the LUTs
-    static {
-        DIRECTION_LIT_LEVEL.put(BlockPart.TOP, 0.9f);
-        DIRECTION_LIT_LEVEL.put(BlockPart.BOTTOM, 0.9f);
-        DIRECTION_LIT_LEVEL.put(BlockPart.FRONT, 1.0f);
-        DIRECTION_LIT_LEVEL.put(BlockPart.BACK, 1.0f);
-        DIRECTION_LIT_LEVEL.put(BlockPart.LEFT, 0.75f);
-        DIRECTION_LIT_LEVEL.put(BlockPart.RIGHT, 0.75f);
-        DIRECTION_LIT_LEVEL.put(BlockPart.CENTER, 0.8f);
-    }
-
     private short id;
     private BlockUri uri;
     private String displayName = "Untitled block";
@@ -63,7 +48,7 @@ public final class Block {
     private boolean replacementAllowed;
     private int hardness = 3;
     private boolean supportRequired;
-    private boolean[] fullSide = new boolean[Side.values().length];
+    private final boolean[] fullSide = new boolean[Side.values().length];
     private BlockSounds sounds;
 
     // Special rendering flags (TODO: clean this up)
@@ -102,8 +87,8 @@ public final class Block {
     private boolean stackable = true;
 
     private BlockAppearance primaryAppearance = new BlockAppearance();
-    private BlockMeshPart[] lowLiquidMesh = new BlockMeshPart[Side.values().length];
-    private BlockMeshPart[] topLiquidMesh = new BlockMeshPart[Side.values().length];
+    private final BlockMeshPart[] lowLiquidMesh = new BlockMeshPart[Side.values().length];
+    private final BlockMeshPart[] topLiquidMesh = new BlockMeshPart[Side.values().length];
 
     /* Collision */
     private CollisionShape collisionShape;
@@ -238,26 +223,6 @@ public final class Block {
     public void setMeshGenerator(BlockMeshGenerator meshGenerator) {
         Preconditions.checkNotNull(meshGenerator);
         this.meshGenerator = meshGenerator;
-    }
-
-    /**
-     * @return Whether this block needs to be rendered at all
-     * @deprecated Use getMeshGenerator()==null instead.
-     */
-    @Deprecated
-    public boolean isInvisible() {
-        return meshGenerator == null;
-    }
-
-    /**
-     * @param invisible Set if invisible
-     * @deprecated Use setMeshGenerator() instead.
-     */
-    @Deprecated
-    public void setInvisible(boolean invisible) {
-        if (invisible) {
-            this.meshGenerator = null;
-        }
     }
 
     /**
