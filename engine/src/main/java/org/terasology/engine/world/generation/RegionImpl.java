@@ -35,14 +35,16 @@ public class RegionImpl implements Region, GeneratingRegion {
     public <T extends WorldFacet> T getFacet(Class<T> dataType) {
         T facet = generatedFacets.getInstance(dataType);
         if (facet == null) {
-            facetProviderChains.get(dataType).stream().filter(provider -> !processedProviders.contains(provider)).forEach(provider -> {
-                if (scale == 1) {
-                    provider.process(this);
-                } else {
-                    ((ScalableFacetProvider) provider).process(this, scale);
+            for (FacetProvider provider : facetProviderChains.get(dataType)) {
+                if (!processedProviders.contains(provider)) {
+                    if (scale == 1) {
+                        provider.process(this);
+                    } else {
+                        ((ScalableFacetProvider) provider).process(this, scale);
+                    }
+                    processedProviders.add(provider);
                 }
-                processedProviders.add(provider);
-            });
+            }
             facet = generatingFacets.getInstance(dataType);
             generatedFacets.put(dataType, facet);
         }

@@ -23,17 +23,17 @@ import org.terasology.engine.entitySystem.systems.RegisterMode;
 import org.terasology.engine.entitySystem.systems.RegisterSystem;
 import org.terasology.engine.entitySystem.systems.RenderSystem;
 import org.terasology.engine.entitySystem.systems.UpdateSubscriberSystem;
+import org.terasology.engine.logic.location.Location;
+import org.terasology.engine.logic.location.LocationComponent;
+import org.terasology.engine.registry.In;
 import org.terasology.engine.rendering.assets.animation.MeshAnimation;
 import org.terasology.engine.rendering.assets.animation.MeshAnimationFrame;
 import org.terasology.engine.rendering.assets.material.Material;
 import org.terasology.engine.rendering.assets.skeletalmesh.Bone;
 import org.terasology.engine.rendering.opengl.OpenGLSkeletalMesh;
 import org.terasology.engine.rendering.world.WorldRenderer;
-import org.terasology.joml.geom.AABBf;
-import org.terasology.engine.logic.location.Location;
-import org.terasology.engine.logic.location.LocationComponent;
-import org.terasology.engine.registry.In;
 import org.terasology.engine.utilities.Assets;
+import org.terasology.joml.geom.AABBf;
 
 import java.nio.FloatBuffer;
 import java.util.Arrays;
@@ -168,11 +168,9 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
         entity.saveComponent(skeletalMeshComp);
     }
 
-
     private float getDurationOfAnimation(SkeletalMeshComponent skeletalMeshComp) {
         return skeletalMeshComp.animation.getTimePerFrame() * (skeletalMeshComp.animation.getFrameCount() - 1);
     }
-
 
     private static MeshAnimation randomAnimationData(SkeletalMeshComponent skeletalMeshComp, Random random) {
         List<MeshAnimation> animationPool = skeletalMeshComp.animationPool;
@@ -303,10 +301,6 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
     }
 
     @Override
-    public void renderAlphaBlend() {
-    }
-
-    @Override
     public void renderOverlay() {
         if (config.getRendering().getDebug().isRenderSkeletons()) {
             glDisable(GL_DEPTH_TEST);
@@ -348,10 +342,6 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
             }
             glEnable(GL_DEPTH_TEST);
         }
-    }
-
-    @Override
-    public void renderShadows() {
     }
 
     private void renderBoneOrientation(EntityRef boneEntity) {
