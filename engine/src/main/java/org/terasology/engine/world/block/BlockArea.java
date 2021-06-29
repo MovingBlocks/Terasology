@@ -73,6 +73,10 @@ public class BlockArea implements BlockAreac {
 
     // -- ITERABLE ---------------------------------------------------------------------------------------------------//
 
+    /**
+     * Iterates over each position in the BlockArea, in x-first order.
+     * For example: (0, 0), (1, 0), (2, 0), (0, 1), (1, 1), ...
+     */
     @Override
     public Iterator<Vector2ic> iterator() {
         return new Iterator<Vector2ic>() {
