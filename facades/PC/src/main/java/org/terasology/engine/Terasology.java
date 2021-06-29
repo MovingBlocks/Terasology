@@ -5,10 +5,7 @@ package org.terasology.engine;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
-import io.reactivex.rxjava3.core.Observable;
-import io.reactivex.rxjava3.core.Scheduler;
-import io.reactivex.rxjava3.functions.Action;
-import io.reactivex.rxjava3.schedulers.Schedulers;
+import io.reactivex.rxjava3.core.Completable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.crashreporter.CrashReporter;
@@ -157,16 +154,16 @@ public final class Terasology {
                 engine.run(new StateHeadlessSetup());
             } else if (loadLastGame) {
                 engine.initialize(); //initialize the managers first
-                GameThread.io().scheduleDirect(() -> {
+                Completable.fromRunnable(() -> {
                     GameManifest gameManifest = getLatestGameManifest();
                     if (gameManifest != null) {
                         engine.changeState(new StateLoading(gameManifest, NetworkMode.NONE));
                     }
-                });
+                }).subscribeOn(GameThread.io()).subscribe();
             } else {
                 if (createLastGame) {
                     engine.initialize();
-                    GameThread.io().scheduleDirect(() -> {
+                    Completable.fromRunnable(() -> {
                         GameManifest gameManifest = getLatestGameManifest();
                         if (gameManifest != null) {
                             String title = gameManifest.getTitle();
@@ -177,7 +174,7 @@ public final class Terasology {
                             }
                             engine.changeState(new StateLoading(gameManifest, NetworkMode.NONE));
                         }
-                    });
+                    }).subscribeOn(GameThread.io()).subscribe();
                 }
 
                 engine.run(new StateMainMenu());

@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.rendering.opengl;
 
+import io.reactivex.rxjava3.core.Completable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.config.Config;
@@ -102,10 +103,10 @@ public class ScreenGrabber {
         int height = sceneFinalFbo.height();
 
         if (savingGamePreview) {
-            GameThread.io().scheduleDirect(() -> saveGamePreviewTask(buffer, width, height));
+            Completable.fromRunnable(() -> saveGamePreviewTask(buffer, width, height)).subscribeOn(GameThread.io()).subscribe();
             this.savingGamePreview = false;
         } else {
-            GameThread.io().scheduleDirect(() -> saveScreenshotTask(buffer, width, height));
+            Completable.fromRunnable(() -> saveScreenshotTask(buffer, width, height)).subscribeOn(GameThread.io()).subscribe();
         }
 
         isTakingScreenshot = false;
