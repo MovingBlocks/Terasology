@@ -45,9 +45,12 @@ public class VoxelBlockWorld implements VoxelWorld {
 
         blockConsInf = new btRigidBody.btRigidBodyConstructionInfo(0, blockMotionState, worldShape, new Vector3f());
         rigidBody = new btRigidBody(blockConsInf);
-        rigidBody.setCollisionFlags(btCollisionObject.CollisionFlags.CF_STATIC_OBJECT | rigidBody.getCollisionFlags()); // voxel world is added to static collision flag
-        short mask = (short) (~(StandardCollisionGroup.STATIC.getFlag() | StandardCollisionGroup.LIQUID.getFlag())); // interacts with anything but static and liquid
-        discreteDynamicsWorld.addRigidBody(rigidBody, physics.combineGroups(StandardCollisionGroup.WORLD), mask); // adds rigid body to world
+        // voxel world is added to static collision flag
+        rigidBody.setCollisionFlags(btCollisionObject.CollisionFlags.CF_STATIC_OBJECT | rigidBody.getCollisionFlags());
+        // interacts with anything but static and liquid
+        short mask = (short) (~(StandardCollisionGroup.STATIC.getFlag() | StandardCollisionGroup.LIQUID.getFlag()));
+        // adds rigid body to world
+        discreteDynamicsWorld.addRigidBody(rigidBody, physics.combineGroups(StandardCollisionGroup.WORLD), mask);
 
     }
 

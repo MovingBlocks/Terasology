@@ -67,7 +67,8 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-public final class ReadWriteStorageManager extends AbstractStorageManager implements EntityDestroySubscriber, EntityChangeSubscriber, DelayedEntityRefFactory {
+public final class ReadWriteStorageManager extends AbstractStorageManager
+        implements EntityDestroySubscriber, EntityChangeSubscriber, DelayedEntityRefFactory {
     private static final Logger logger = LoggerFactory.getLogger(ReadWriteStorageManager.class);
 
     private final TaskMaster<Task> saveThreadManager;
@@ -111,9 +112,10 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
      */
     private ComponentLibrary entityRefReplacingComponentLibrary;
 
-    public ReadWriteStorageManager(Path savePath, ModuleEnvironment environment, EngineEntityManager entityManager, BlockManager blockManager
-            , ExtraBlockDataManager extraDataManager, RecordAndReplaySerializer recordAndReplaySerializer,
-                                   RecordAndReplayUtils recordAndReplayUtils, RecordAndReplayCurrentStatus recordAndReplayCurrentStatus) throws IOException {
+    public ReadWriteStorageManager(Path savePath, ModuleEnvironment environment, EngineEntityManager entityManager, BlockManager blockManager,
+                                   ExtraBlockDataManager extraDataManager, RecordAndReplaySerializer recordAndReplaySerializer,
+                                   RecordAndReplayUtils recordAndReplayUtils, RecordAndReplayCurrentStatus recordAndReplayCurrentStatus)
+            throws IOException {
         this(savePath, environment, entityManager, blockManager, extraDataManager,
             true, recordAndReplaySerializer, recordAndReplayUtils, recordAndReplayCurrentStatus);
     }

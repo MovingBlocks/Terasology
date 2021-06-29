@@ -26,6 +26,7 @@ import java.util.Objects;
 public final class LocationComponent implements Component<LocationComponent>, ReplicationCheck {
 
     public boolean replicateChanges = true;
+
     // Relative to
     @Replicate
     EntityRef parent = EntityRef.NULL;
@@ -44,7 +45,6 @@ public final class LocationComponent implements Component<LocationComponent>, Re
     @Replicate
     Quaternionf lastRotation = new Quaternionf();
     private boolean isDirty = false;
-
 
     public LocationComponent() {
     }

@@ -113,8 +113,7 @@ public class ThirdPersonRemoteClientSystem extends BaseComponentSystem implement
     }
 
     @Command(shortDescription = "Sets the held item mount point translation for remote characters")
-    public void setRemotePlayersHeldItemMountPointTranslations(@CommandParam("x") float x, @CommandParam("y") float y
-            , @CommandParam("z") float z) {
+    public void setRemotePlayersHeldItemMountPointTranslations(@CommandParam("x") float x, @CommandParam("y") float y, @CommandParam("z") float z) {
         for (EntityRef remotePlayer : entityManager.getEntitiesWith(RemotePersonHeldItemMountPointComponent.class)) {
             RemotePersonHeldItemMountPointComponent remoteMountPointComponent =
                     remotePlayer.getComponent(RemotePersonHeldItemMountPointComponent.class);

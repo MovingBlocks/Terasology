@@ -330,7 +330,8 @@ public class BlockCommands extends BaseComponentSystem {
         EntityRef playerEntity = client.getComponent(ClientComponent.class).character;
         int stackLimit = blockFamily.getArchetypeBlock().isStackable() ? 99 : 1;
 
-        for (int quantityLeft = quantity; quantityLeft > 0; quantityLeft = quantityLeft - stackLimit) {
+        int quantityLeft;
+        for (quantityLeft = quantity; quantityLeft > 0; quantityLeft = quantityLeft - stackLimit) {
             EntityRef item = blockItemFactory.newInstance(blockFamily, Math.min(quantity, stackLimit));
             if (!item.exists()) {
                 throw new IllegalArgumentException("Unknown block or item");
@@ -341,12 +342,11 @@ public class BlockCommands extends BaseComponentSystem {
 
             if (!giveItemEvent.isHandled()) {
                 item.destroy();
-                quantity -= quantityLeft;
                 break;
             }
         }
 
-        return "You received " + quantity + " blocks of " + blockFamily.getDisplayName();
+        return "You received " + (quantity - quantityLeft) + " blocks of " + blockFamily.getDisplayName();
     }
 
     private <T extends Comparable<T>> List<T> sortItems(Iterable<T> items) {

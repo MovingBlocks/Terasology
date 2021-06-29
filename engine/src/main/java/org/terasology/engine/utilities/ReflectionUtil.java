@@ -265,6 +265,9 @@ public final class ReflectionUtil {
         return (TypeInfo<E>) TypeInfo.of(elementType);
     }
 
+    @SuppressWarnings("checkstyle:ParameterAssignment")
+    // TODO: figure out whether the reassignment is necessary and/or whether it's a desired property of this method
+    //       until then, this is accepted and, thus, suppressed
     private static <T> Type getTypeParameterForSuperClass(Type target, Class<T> superClass, int index) {
         for (Class targetClass = getRawType(target);
              !Object.class.equals(targetClass);
@@ -774,7 +777,7 @@ public final class ReflectionUtil {
         }
     }
 
-    private static class GenericArrayTypeImpl implements GenericArrayType {
+    private static final class GenericArrayTypeImpl implements GenericArrayType {
         private final Type genericComponentType;
 
         private GenericArrayTypeImpl(Type genericComponentType) {
@@ -813,7 +816,7 @@ public final class ReflectionUtil {
         }
     }
 
-    private static class ParameterizedTypeImpl implements ParameterizedType {
+    private static final class ParameterizedTypeImpl implements ParameterizedType {
         private final Type[] actualTypeArguments;
         private final Class<?> rawType;
         private final Type ownerType;
@@ -890,9 +893,9 @@ public final class ReflectionUtil {
                 return true;
             }
 
-            return Objects.equals(this.ownerType, otherParameterizedType.getOwnerType()) &&
-                       Objects.equals(this.rawType, otherParameterizedType.getRawType()) &&
-                       Arrays.equals(this.actualTypeArguments, otherParameterizedType.getActualTypeArguments());
+            return Objects.equals(this.ownerType, otherParameterizedType.getOwnerType())
+                    && Objects.equals(this.rawType, otherParameterizedType.getRawType())
+                    && Arrays.equals(this.actualTypeArguments, otherParameterizedType.getActualTypeArguments());
         }
 
         public int hashCode() {

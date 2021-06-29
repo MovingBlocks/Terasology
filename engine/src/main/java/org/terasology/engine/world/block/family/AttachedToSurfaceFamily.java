@@ -38,7 +38,8 @@ public class AttachedToSurfaceFamily extends AbstractBlockFamily {
 
         Map<Side, Block> blockMap = Maps.newEnumMap(Side.class);
         if (definition.getData().hasSection("top")) {
-            Block block = blockBuilder.constructSimpleBlock(definition, "top", new BlockUri(definition.getUrn(), new Name(Side.TOP.name())), this);
+            Block block = blockBuilder.constructSimpleBlock(definition, "top", new BlockUri(definition.getUrn(),
+                    new Name(Side.TOP.name())), this);
             block.setRotation(Rotation.rotate(Pitch.CLOCKWISE_270));
             blockMap.put(Side.TOP, block);
         }
@@ -50,12 +51,13 @@ public class AttachedToSurfaceFamily extends AbstractBlockFamily {
             }
         }
         if (definition.getData().hasSection("bottom")) {
-            Block block = blockBuilder.constructSimpleBlock(definition, "bottom", new BlockUri(definition.getUrn(), new Name(Side.BOTTOM.name())), this);
+            Block block = blockBuilder.constructSimpleBlock(definition, "bottom", new BlockUri(definition.getUrn(),
+                    new Name(Side.BOTTOM.name())), this);
             block.setRotation(Rotation.rotate(Pitch.CLOCKWISE_90));
             blockMap.put(Side.BOTTOM, block);
         }
 
-        for (Side side : Side.getAllSides()) {
+        for (Side side : Side.values()) {
             Block block = blockMap.get(side);
             if (block != null) {
                 blocks.put(side, block);

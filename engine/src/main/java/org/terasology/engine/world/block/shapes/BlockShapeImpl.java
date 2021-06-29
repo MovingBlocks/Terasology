@@ -58,7 +58,7 @@ public class BlockShapeImpl extends BlockShape {
         for (BlockPart part : BlockPart.values()) {
             this.meshParts.put(part, data.getMeshPart(part));
         }
-        for (Side side : Side.getAllSides()) {
+        for (Side side : Side.values()) {
             this.fullSide[side.ordinal()] = data.isBlockingSide(side);
         }
         this.baseCollisionShape = data.getCollisionShape();
@@ -96,7 +96,9 @@ public class BlockShapeImpl extends BlockShape {
     }
 
     private Rotation applySymmetry(Rotation rot) {
-        return Rotation.rotate(yawSymmetric ? Yaw.NONE : rot.getYaw(), pitchSymmetric ? Pitch.NONE : rot.getPitch(), rollSymmetric ? Roll.NONE : rot.getRoll());
+        return Rotation.rotate(yawSymmetric ? Yaw.NONE : rot.getYaw(),
+                pitchSymmetric ? Pitch.NONE : rot.getPitch(),
+                rollSymmetric ? Roll.NONE : rot.getRoll());
     }
 
 }

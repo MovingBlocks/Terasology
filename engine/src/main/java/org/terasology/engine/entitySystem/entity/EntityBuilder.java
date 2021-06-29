@@ -151,9 +151,10 @@ public class EntityBuilder implements MutableComponentContainer {
         return component;
     }
 
-    public void addComponents(Iterable<? extends Component> components) {
-        components = (components == null) ? Collections.EMPTY_LIST : components;
-        components.forEach(this::addComponent);
+    public void addComponents(Iterable<? extends Component> maybeComponents) {
+        Optional.ofNullable(maybeComponents).ifPresent(comps -> {
+            comps.forEach(this::addComponent);
+        });
     }
 
     @Override

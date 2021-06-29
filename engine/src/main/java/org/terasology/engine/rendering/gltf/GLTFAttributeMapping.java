@@ -19,18 +19,20 @@ import org.terasology.nui.Colorc;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-public class GLTFAttributeMapping {
+public final class GLTFAttributeMapping {
     private GLTFAttributeMapping() {
 
     }
 
 
-    public static void readVec3FBuffer(byte[] buffer, GLTFAccessor accessor, GLTFBufferView bufferView, VertexAttributeBinding<Vector3fc, Vector3f> mapping) {
+    public static void readVec3FBuffer(byte[] buffer, GLTFAccessor accessor, GLTFBufferView bufferView,
+                                       VertexAttributeBinding<Vector3fc, Vector3f> mapping) {
         if (accessor.getComponentType() != GLTFComponentType.FLOAT) {
             return;
         }
 
-        ByteBuffer byteBuffer = ByteBuffer.wrap(buffer, bufferView.getByteOffset() + accessor.getByteOffset(), bufferView.getByteLength() - accessor.getByteOffset());
+        ByteBuffer byteBuffer = ByteBuffer.wrap(buffer, bufferView.getByteOffset() + accessor.getByteOffset(),
+                bufferView.getByteLength() - accessor.getByteOffset());
         byteBuffer.order(ByteOrder.LITTLE_ENDIAN);
 
         int gap = 0;
@@ -54,12 +56,14 @@ public class GLTFAttributeMapping {
     }
 
 
-    public static void readVec2FBuffer(byte[] buffer, GLTFAccessor accessor, GLTFBufferView bufferView, VertexAttributeBinding<Vector2fc, Vector2f> mapping) {
+    public static void readVec2FBuffer(byte[] buffer, GLTFAccessor accessor, GLTFBufferView bufferView,
+                                       VertexAttributeBinding<Vector2fc, Vector2f> mapping) {
         if (accessor.getComponentType() != GLTFComponentType.FLOAT) {
             return;
         }
 
-        ByteBuffer byteBuffer = ByteBuffer.wrap(buffer, bufferView.getByteOffset() + accessor.getByteOffset(), bufferView.getByteLength() - accessor.getByteOffset());
+        ByteBuffer byteBuffer = ByteBuffer.wrap(buffer, bufferView.getByteOffset() + accessor.getByteOffset(),
+                bufferView.getByteLength() - accessor.getByteOffset());
         byteBuffer.order(ByteOrder.LITTLE_ENDIAN);
 
         int gap = 0;
@@ -83,12 +87,14 @@ public class GLTFAttributeMapping {
     }
 
 
-    public static void readVec4FBuffer(byte[] buffer, GLTFAccessor accessor, GLTFBufferView bufferView, VertexAttributeBinding<Vector4fc, Vector4f> mapping) {
+    public static void readVec4FBuffer(byte[] buffer, GLTFAccessor accessor, GLTFBufferView bufferView,
+                                       VertexAttributeBinding<Vector4fc, Vector4f> mapping) {
         if (accessor.getComponentType() != GLTFComponentType.FLOAT) {
             return;
         }
 
-        ByteBuffer byteBuffer = ByteBuffer.wrap(buffer, bufferView.getByteOffset() + accessor.getByteOffset(), bufferView.getByteLength() - accessor.getByteOffset());
+        ByteBuffer byteBuffer = ByteBuffer.wrap(buffer, bufferView.getByteOffset() + accessor.getByteOffset(),
+                bufferView.getByteLength() - accessor.getByteOffset());
         byteBuffer.order(ByteOrder.LITTLE_ENDIAN);
 
         int gap = 0;
@@ -111,12 +117,14 @@ public class GLTFAttributeMapping {
         }
     }
 
-    public static void readColor4FBuffer(byte[] buffer, GLTFAccessor accessor, GLTFBufferView bufferView, VertexAttributeBinding<Colorc, Color> mapping) {
+    public static void readColor4FBuffer(byte[] buffer, GLTFAccessor accessor, GLTFBufferView bufferView,
+                                         VertexAttributeBinding<Colorc, Color> mapping) {
         if (accessor.getComponentType() != GLTFComponentType.FLOAT) {
             return;
         }
 
-        ByteBuffer byteBuffer = ByteBuffer.wrap(buffer, bufferView.getByteOffset() + accessor.getByteOffset(), bufferView.getByteLength() - accessor.getByteOffset());
+        ByteBuffer byteBuffer = ByteBuffer.wrap(buffer, bufferView.getByteOffset() + accessor.getByteOffset(),
+                bufferView.getByteLength() - accessor.getByteOffset());
         byteBuffer.order(ByteOrder.LITTLE_ENDIAN);
 
         int gap = 0;

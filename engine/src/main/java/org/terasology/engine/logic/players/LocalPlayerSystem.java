@@ -53,7 +53,6 @@ import org.terasology.engine.network.NetworkSystem;
 import org.terasology.engine.physics.engine.PhysicsEngine;
 import org.terasology.engine.registry.In;
 import org.terasology.engine.rendering.AABBRenderer;
-import org.terasology.engine.rendering.BlockOverlayRenderer;
 import org.terasology.engine.rendering.cameras.Camera;
 import org.terasology.engine.rendering.cameras.PerspectiveCamera;
 import org.terasology.engine.rendering.logic.MeshComponent;
@@ -473,19 +472,6 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
         return (float) java.lang.Math.sin((double) bobFactor * frequency + phaseOffset) * amplitude;
     }
 
-    @Override
-    public void renderOpaque() {
-
-    }
-
-    @Override
-    public void renderAlphaBlend() {
-
-    }
-
-    @Override
-    public void renderShadows() {
-    }
 
     /**
      * Special getter that fetches the client entity via the NetworkSystem instead of the LocalPlayer. This can be

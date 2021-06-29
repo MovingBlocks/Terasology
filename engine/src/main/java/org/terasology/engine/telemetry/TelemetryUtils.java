@@ -69,7 +69,8 @@ public final class TelemetryUtils {
      * @param nameSpace The name the class tracking this metric.
      * @param bindingMap the binding map contains fields who has user's permission.
      */
-    public static void fetchMetricAndSend(Metrics metrics, Class metricClass, Emitter emitter, String nameSpace, Map<String, Boolean> bindingMap) {
+    public static void fetchMetricAndSend(Metrics metrics, Class metricClass, Emitter emitter,
+                                          String nameSpace, Map<String, Boolean> bindingMap) {
         Optional<Metric> optional = metrics.getMetric(metricClass);
         if (optional.isPresent()) {
             Metric metric = optional.get();
@@ -89,7 +90,8 @@ public final class TelemetryUtils {
      * @param metric the Metric class instance that this event belongs to.
      * @param telemetryConfiguration the telemetryConfiguration adapter which could be used in modules.
      */
-    public static void trackMetric(Emitter emitter, String nameSpace, Unstructured event, Metric metric, TelemetryConfiguration telemetryConfiguration) {
+    public static void trackMetric(Emitter emitter, String nameSpace, Unstructured event,
+                                   Metric metric, TelemetryConfiguration telemetryConfiguration) {
         AccessController.doPrivileged((PrivilegedAction<Object>) () -> {
             Context context = CoreRegistry.get(Context.class);
             DisplayDevice display = context.get(DisplayDevice.class);
@@ -117,7 +119,8 @@ public final class TelemetryUtils {
      * @param metric the Metric class instance that this event belongs to.
      * @param bindingMap the binding map contains fields who has user's permission.
      */
-    public static void trackMetric(Emitter emitter, String nameSpace, Unstructured event, Metric metric, Map<String, Boolean> bindingMap) {
+    public static void trackMetric(Emitter emitter, String nameSpace, Unstructured event,
+                                   Metric metric, Map<String, Boolean> bindingMap) {
         AccessController.doPrivileged((PrivilegedAction<Object>) () -> {
             Context context = CoreRegistry.get(Context.class);
             DisplayDevice display = context.get(DisplayDevice.class);

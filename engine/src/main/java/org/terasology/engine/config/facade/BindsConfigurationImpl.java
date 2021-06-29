@@ -42,7 +42,7 @@ public class BindsConfigurationImpl implements BindsConfiguration {
     }
 
     @Override
-    public void setBinds(SimpleUri bindUri, Input ... inputs) {
+    public void setBinds(SimpleUri bindUri, Input... inputs) {
         config.getBinds().setBinds(bindUri, inputs);
     }
 

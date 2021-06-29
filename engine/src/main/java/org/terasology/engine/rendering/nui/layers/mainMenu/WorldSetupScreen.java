@@ -67,8 +67,10 @@ public class WorldSetupScreen extends CoreScreenLayer {
         setAnimationSystem(MenuAnimationSystems.createDefaultSwipeAnimation());
 
         WidgetUtil.trySubscribe(this, "close", button -> {
-            final UniverseSetupScreen universeSetupScreen = getManager().createScreen(UniverseSetupScreen.ASSET_URI, UniverseSetupScreen.class);
-            final WorldPreGenerationScreen worldPreGenerationScreen = getManager().createScreen(WorldPreGenerationScreen.ASSET_URI, WorldPreGenerationScreen.class);
+            final UniverseSetupScreen universeSetupScreen =
+                    getManager().createScreen(UniverseSetupScreen.ASSET_URI, UniverseSetupScreen.class);
+            final WorldPreGenerationScreen worldPreGenerationScreen =
+                    getManager().createScreen(WorldPreGenerationScreen.ASSET_URI, WorldPreGenerationScreen.class);
             UIText customWorldName = find("customisedWorldName", UIText.class);
 
             boolean goBack = false;
@@ -76,13 +78,15 @@ public class WorldSetupScreen extends CoreScreenLayer {
             //sanity checks on world name
             if (customWorldName.getText().isEmpty()) {
                 //name empty: display a popup, stay on the same screen
-                getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Name Cannot Be Empty!", "Please add a name for the world");
+                getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class)
+                        .setMessage("Name Cannot Be Empty!", "Please add a name for the world");
             } else if (customWorldName.getText().equalsIgnoreCase(world.getWorldName().toString())) {
                 //same name as before: go back to universe setup
                 goBack = true;
             } else if (universeSetupScreen.worldNameMatchesAnother(customWorldName.getText())) {
                 //if same name is already used, inform user with a  popup
-                getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Name Already Used!", "Please use a different name for this world");
+                getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class)
+                        .setMessage("Name Already Used!", "Please use a different name for this world");
             } else {
                 //no match found: go back to universe setup
                 goBack = true;
@@ -125,7 +129,8 @@ public class WorldSetupScreen extends CoreScreenLayer {
      * @param worldSelected the world whose configurations are to be changed.
      * @throws UnresolvedWorldGeneratorException
      */
-    public void setWorld(Context subContext, WorldSetupWrapper worldSelected, UIDropdownScrollable dropDown) throws UnresolvedWorldGeneratorException {
+    public void setWorld(Context subContext, WorldSetupWrapper worldSelected, UIDropdownScrollable dropDown)
+            throws UnresolvedWorldGeneratorException {
         world = worldSelected;
         context = subContext;
         worldsDropdown = dropDown;
@@ -190,6 +195,11 @@ public class WorldSetupScreen extends CoreScreenLayer {
             List<Property<?, ?>> properties = provider.createProperties(target);
             propLayout.addProperties(label, properties);
         }
+    }
+
+    @Override
+    public boolean isLowerLayerVisible() {
+        return false;
     }
 
     /**
@@ -268,10 +278,5 @@ public class WorldSetupScreen extends CoreScreenLayer {
                 ((Binding<Float>) binding).set(value);
             }
         }
-    }
-
-    @Override
-    public boolean isLowerLayerVisible() {
-        return false;
     }
 }

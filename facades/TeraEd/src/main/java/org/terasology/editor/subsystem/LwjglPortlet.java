@@ -99,9 +99,10 @@ public class LwjglPortlet extends BaseLwjglSubsystem {
 
         display.update();
         int frameLimit = context.get(Config.class).getRendering().getFrameLimit();
-        if (frameLimit > 0) {
+        // TODO: do we still need this?
+//        if (frameLimit > 0) {
 //            Lwjgl2Sync.sync(frameLimit);
-        }
+//        }
         if (display.isCloseRequested()) {
             engine.shutdown();
         }

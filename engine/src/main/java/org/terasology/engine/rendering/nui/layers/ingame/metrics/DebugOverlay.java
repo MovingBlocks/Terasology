@@ -32,7 +32,7 @@ import java.util.Locale;
  */
 public class DebugOverlay extends CoreScreenLayer {
 
-    public static double MB_SIZE = 1048576.0;
+    public static final double MB_SIZE = 1048576.0;
 
     @In
     private Config config;
@@ -130,7 +130,8 @@ public class DebugOverlay extends CoreScreenLayer {
                             orientation = "NW";
                             break;
                     }
-                    return String.format(Locale.US, "Position: (%.2f, %.2f, %.2f), Chunk (%d, %d, %d), Eye (%.2f, %.2f, %.2f), Rot (%.2f, %.2f, %.2f) %s", pos.x, pos.y, pos.z,
+                    return String.format(Locale.US, "Position: (%.2f, %.2f, %.2f), Chunk (%d, %d, %d), " +
+                                    "Eye (%.2f, %.2f, %.2f), Rot (%.2f, %.2f, %.2f) %s", pos.x, pos.y, pos.z,
                             chunkPos.x, chunkPos.y, chunkPos.z,
                             cameraPos.x, cameraPos.y, cameraPos.z,
                             rotation.x, rotation.y, rotation.z, orientation);

@@ -2,7 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 /**
- * This package provides a low-level system for describing classes and fields, with support for construction and field access. Essentially it is a simplified reflection
+ * This package provides a low-level system for describing classes and fields, with support for construction and field access.
+ * Essentially it is a simplified reflection
  * framework.
  * <br><br>
  * To support this functionality, a copy-strategy library is used to provide copying support for types. This is used instead of cloning because

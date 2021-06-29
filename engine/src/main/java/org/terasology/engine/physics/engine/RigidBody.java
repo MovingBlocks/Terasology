@@ -9,7 +9,8 @@ import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 /**
- * A rigid body is a physics object whose movement and location is controlled by the physics engine. Rigid bodies move under gravity and bounce off each other and the world.
+ * A rigid body is a physics object whose movement and location is controlled by the physics engine.
+ * Rigid bodies move under gravity and bounce off each other and the world.
  * <br><br>
  * After being removed from the physics engine this object is no longer valid and should not be used anymore.
  * <br><br>

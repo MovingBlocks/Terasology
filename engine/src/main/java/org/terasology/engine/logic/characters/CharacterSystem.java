@@ -56,7 +56,8 @@ import java.util.Optional;
 
 @RegisterSystem
 public class CharacterSystem extends BaseComponentSystem implements UpdateSubscriberSystem {
-    public static final CollisionGroup[] DEFAULTPHYSICSFILTER = {StandardCollisionGroup.DEFAULT, StandardCollisionGroup.WORLD, StandardCollisionGroup.CHARACTER};
+    public static final CollisionGroup[] DEFAULTPHYSICSFILTER =
+            {StandardCollisionGroup.DEFAULT, StandardCollisionGroup.WORLD, StandardCollisionGroup.CHARACTER};
     private static final Logger logger = LoggerFactory.getLogger(CharacterSystem.class);
 
     @In
@@ -87,7 +88,8 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
     private RecordAndReplayCurrentStatus recordAndReplayCurrentStatus;
 
     @ReceiveEvent
-    public void beforeDestroy(BeforeDestroyEvent event, EntityRef character, CharacterComponent characterComponent, AliveCharacterComponent aliveCharacterComponent) {
+    public void beforeDestroy(BeforeDestroyEvent event, EntityRef character,
+                              CharacterComponent characterComponent, AliveCharacterComponent aliveCharacterComponent) {
         if (character.hasComponent(PlayerCharacterComponent.class)) {
             // Consume the BeforeDestroyEvent so that the DoDestroy event is never sent for player entities
             event.consume();
@@ -350,7 +352,8 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
                 return false; // can happen if target existed on client
             }
 
-            HitResult result = physics.rayTrace(originPos, direction, characterComponent.interactionRange, Sets.newHashSet(character), DEFAULTPHYSICSFILTER);
+            HitResult result = physics.rayTrace(originPos, direction, characterComponent.interactionRange, Sets.newHashSet(character),
+                    DEFAULTPHYSICSFILTER);
             if (!result.isHit()) {
                 String msg = "Denied activation attempt by {} since at the authority there was nothing to activate at that place";
                 logger.info(msg, getPlayerNameFromCharacter(character));
@@ -461,7 +464,7 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
         // safely above ground.
         Optional.ofNullable(entity.getComponent(LocationComponent.class))
                 .map(k -> k.getWorldPosition(new org.joml.Vector3f()))
-                .map(location -> location.add(0,(event.getNewValue() - event.getOldValue()) / 2f,0))
+                .map(location -> location.add(0, (event.getNewValue() - event.getOldValue()) / 2f, 0))
                 .ifPresent(location -> entity.send(new CharacterTeleportEvent(location)));
     }
 

@@ -19,7 +19,8 @@ import java.util.Collection;
 import java.util.Map;
 
 /**
- * Field Metadata for the fields of components. In addition to the standard and replication metadata, has information on whether the field declares ownership over an entity.
+ * Field Metadata for the fields of components.
+ * In addition to the standard and replication metadata, has information on whether the field declares ownership over an entity.
  *
  */
 public class ComponentFieldMetadata<T extends Component, U> extends ReplicatedFieldMetadata<T, U> {
@@ -28,14 +29,16 @@ public class ComponentFieldMetadata<T extends Component, U> extends ReplicatedFi
 
     private final CopyStrategy<U> copyWithOwnedEntitiesStrategy;
 
-    public ComponentFieldMetadata(ClassMetadata<T, ?> owner, Field field, CopyStrategyLibrary copyStrategyLibrary, ReflectFactory factory, boolean replicatedByDefault)
+    public ComponentFieldMetadata(ClassMetadata<T, ?> owner, Field field, CopyStrategyLibrary copyStrategyLibrary,
+                                  ReflectFactory factory, boolean replicatedByDefault)
             throws InaccessibleFieldException {
         super(owner, field, copyStrategyLibrary, factory, replicatedByDefault);
         ownedReference = field.getAnnotation(Owns.class) != null && (EntityRef.class.isAssignableFrom(field.getType())
                 || isCollectionOf(EntityRef.class, field.getGenericType()));
         if (ownedReference) {
-            copyWithOwnedEntitiesStrategy =
-                    (CopyStrategy<U>) copyStrategyLibrary.createCopyOfLibraryWithStrategy(EntityRef.class, EntityCopyStrategy.INSTANCE).getStrategy(field.getGenericType());
+            copyWithOwnedEntitiesStrategy = (CopyStrategy<U>) copyStrategyLibrary
+                            .createCopyOfLibraryWithStrategy(EntityRef.class, EntityCopyStrategy.INSTANCE)
+                            .getStrategy(field.getGenericType());
         } else {
             copyWithOwnedEntitiesStrategy = copyStrategy;
         }

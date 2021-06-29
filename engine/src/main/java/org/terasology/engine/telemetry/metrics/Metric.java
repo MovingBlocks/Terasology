@@ -32,7 +32,8 @@ import java.util.Set;
  * All metric fields should be annotated {@link org.terasology.engine.telemetry.TelemetryField}.
  * An example is {@link org.terasology.engine.telemetry.metrics.SystemContextMetric}.
  * The metric will be instantiated automatically in {@link org.terasology.engine.telemetry.Metrics}
- * By convention, a new Metric can have only one constructor and constructor will need no arguments or only {@link org.terasology.engine.context.Context}.
+ * By convention, a new Metric can have only one constructor and constructor will need no arguments
+ * or only {@link org.terasology.engine.context.Context}.
  * If a Metric Constructor needs some specific arguments other than {@link org.terasology.engine.context.Context},
  * it should be instantiated and added to {@link org.terasology.engine.telemetry.Metrics} manually.
  */
@@ -57,7 +58,8 @@ public abstract class Metric {
     /**
      * Generates a snowplow unstructured event.
      * This method helps to implement abstract getUnstructuredMetric method.
-     * You can find example in {@link org.terasology.engine.telemetry.metrics.ModulesMetric} and {@link org.terasology.engine.telemetry.metrics.SystemContextMetric}
+     * You can find example in {@link org.terasology.engine.telemetry.metrics.ModulesMetric}
+     * and {@link org.terasology.engine.telemetry.metrics.SystemContextMetric}
      * @param schema the snowplow event register schema.
      * @param mapSentToServer the map that contains the data sent to the server.
      * @return Null option if the mapSentToServer doesn't contain data.
@@ -155,7 +157,8 @@ public abstract class Metric {
 
     /**
      * Add the new metric to {@link org.terasology.engine.telemetry.Metrics} instance.
-     * This method will only be used when a metric constructor needs some specific arguments other than {@link org.terasology.engine.context.Context}.
+     * This method will only be used when a metric constructor needs some specific arguments
+     * other than {@link org.terasology.engine.context.Context}.
      * @param metrics the metrics class instance in the game context.
      */
     public void addToMetrics(Metrics metrics) {

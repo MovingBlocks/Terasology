@@ -3,11 +3,8 @@
 package org.terasology.engine.rendering.primitives;
 
 import com.google.common.base.Stopwatch;
-import gnu.trove.iterator.TIntIterator;
 import org.joml.Vector3f;
-import org.lwjgl.BufferUtils;
 import org.terasology.engine.monitoring.PerformanceMonitor;
-import org.terasology.engine.rendering.RenderMath;
 import org.terasology.engine.world.ChunkView;
 import org.terasology.engine.world.block.Block;
 import org.terasology.engine.world.chunks.Chunks;
@@ -53,7 +50,7 @@ public final class ChunkTessellator {
             }
         }
 
-        if(border != 0) {
+        if (border != 0) {
             float totalScale = scale * Chunks.SIZE_X / (Chunks.SIZE_X - 2 * border);
             for (ChunkMesh.RenderType type : ChunkMesh.RenderType.values()) {
                 ChunkMesh.VertexElements elements = mesh.getVertexElements(type);

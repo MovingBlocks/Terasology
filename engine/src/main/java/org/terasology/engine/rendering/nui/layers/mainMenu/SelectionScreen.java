@@ -87,7 +87,10 @@ public abstract class SelectionScreen extends CoreScreenLayer {
         if (wgi != null) {
             mainWorldGenerator = wgi.getDisplayName();
         } else {
-            mainWorldGenerator = mainWorldGenerator + gameInfo.getManifest().getWorldInfo(TerasologyConstants.MAIN_WORLD).getWorldGenerator().toString() + " not found";
+            mainWorldGenerator = mainWorldGenerator + gameInfo.getManifest()
+                    .getWorldInfo(TerasologyConstants.MAIN_WORLD)
+                    .getWorldGenerator()
+                    .toString() + " not found";
         }
 
         final String commaSeparatedModules = gameInfo.getManifest()
@@ -99,7 +102,9 @@ public abstract class SelectionScreen extends CoreScreenLayer {
                 .collect(Collectors.joining(", "));
 
         worldGenerator.setText(mainWorldGenerator);
-        moduleNames.setText(commaSeparatedModules.length() > MODULES_LINE_LIMIT ? commaSeparatedModules.substring(0, MODULES_LINE_LIMIT) + "..." : commaSeparatedModules);
+        moduleNames.setText(commaSeparatedModules.length() > MODULES_LINE_LIMIT
+                ? commaSeparatedModules.substring(0, MODULES_LINE_LIMIT) + "..."
+                : commaSeparatedModules);
 
         loadPreviewImages(gameInfo);
     }
@@ -118,7 +123,8 @@ public abstract class SelectionScreen extends CoreScreenLayer {
                             logger.error("Converting preview image to texture data {} failed", e);
                             return null;
                         }
-                        return Assets.generateAsset(new ResourceUrn(PREVIEW_IMAGE_URI_PATTERN + bufferedImages.indexOf(buffImage)), textureData, Texture.class);
+                        return Assets.generateAsset(new ResourceUrn(PREVIEW_IMAGE_URI_PATTERN + bufferedImages.indexOf(buffImage)),
+                                textureData, Texture.class);
                     })
                     .filter(Objects::nonNull)
                     .collect(Collectors.toList());
@@ -145,7 +151,8 @@ public abstract class SelectionScreen extends CoreScreenLayer {
                 gameList.select(0);
             } catch (Exception e) {
                 logger.error("Failed to delete " + removeString, e);
-                getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Error Deleting Game", e.getMessage());
+                getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class)
+                        .setMessage("Error Deleting Game", e.getMessage());
             }
         }
     }

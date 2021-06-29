@@ -75,7 +75,8 @@ public class PrefabSerializer {
         // Delta off the parent
         for (Component component : prefab.iterateComponents()) {
             if (prefab.getParent() != null && prefab.getParent().hasComponent(component.getClass())) {
-                EntityData.Component serializedComponent = componentSerializer.serialize(prefab.getParent().getComponent(component.getClass()), component);
+                EntityData.Component serializedComponent =
+                        componentSerializer.serialize(prefab.getParent().getComponent(component.getClass()), component);
                 if (serializedComponent != null) {
                     prefabData.addComponent(serializedComponent);
                 }

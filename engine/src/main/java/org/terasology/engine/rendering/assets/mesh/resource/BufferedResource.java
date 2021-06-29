@@ -106,6 +106,7 @@ public abstract class BufferedResource {
         if (size > this.inSize) {
             this.inSize = size;
         }
+        buffer.limit(inSize);
     }
 
     /**
