@@ -124,18 +124,19 @@ class common {
         } else {
             itemsRetrieved << itemName
             def targetUrl = "https://github.com/${githubTargetHome}/${itemName}"
-            if (!isUrlValid(targetUrl)) {
-                println "Can't retrieve $itemType from $targetUrl - URL appears invalid. Typo? Not created yet?"
+            try {
+                println "Retrieving $itemType $itemName from $targetUrl"
+                if (githubTargetHome != githubDefaultHome) {
+                    println "Doing a retrieve from a custom remote: $githubTargetHome - will name it as such plus add the $githubDefaultHome remote as '$defaultRemote'"
+                    Grgit.clone dir: targetDir, uri: targetUrl, remote: githubTargetHome
+                    println "Primary clone operation complete, about to add the '$defaultRemote' remote for the $githubDefaultHome org address"
+                    addRemote(itemName, defaultRemote, "https://github.com/${githubDefaultHome}/${itemName}")
+                } else {
+                    Grgit.clone dir: targetDir, uri: targetUrl
+                }
+            } catch (GrgitException exception) {
+                println color("Unable to clone $itemName, Skipping: ${exception.getMessage()}", Ansi.RED)
                 return
-            }
-            println "Retrieving $itemType $itemName from $targetUrl"
-            if (githubTargetHome != githubDefaultHome) {
-                println "Doing a retrieve from a custom remote: $githubTargetHome - will name it as such plus add the $githubDefaultHome remote as '$defaultRemote'"
-                Grgit.clone dir: targetDir, uri: targetUrl, remote: githubTargetHome
-                println "Primary clone operation complete, about to add the '$defaultRemote' remote for the $githubDefaultHome org address"
-                addRemote(itemName, defaultRemote, "https://github.com/${githubDefaultHome}/${itemName}")
-            } else {
-                Grgit.clone dir: targetDir, uri: targetUrl
             }
 
             // This step allows the item type to check the newly cloned item and add in extra template stuff
