@@ -222,8 +222,8 @@ class common {
             def targetUrl = remotes.find {
                 it.name == defaultRemote
             }?.url
-            if (targetUrl == null || !isUrlValid(targetUrl)) {
-                println color("While updating $itemName found its '$defaultRemote' remote invalid or its URL unresponsive: $targetUrl", Ansi.RED)
+            if (targetUrl == null) {
+                println color("While updating $itemName remote `$defaultRemote` is not found.", Ansi.RED)
                 return
             }
 
