@@ -1,0 +1,39 @@
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
+apply plugin: 'groovy'
+
+group 'org.terasology.cli'
+
+repositories {
+    jcenter()
+}
+
+// Important note: These need to be in sync with the @Grab entries in the Groovy scripts if both have to work
+dependencies {
+    // These are potentially available inside the Gradle/Groovy jar files already present
+    compile 'org.codehaus.groovy:groovy-all:2.5.10'
+    compile 'info.picocli:picocli-groovy:4.3.2'
+    compile 'org.fusesource.jansi:jansi:1.18'
+
+    // Have to rely on these via 3rd party jars
+    compile 'org.ajoberstar:grgit:1.9.3'
+}
+
+// Ugly hack to allow Gradle and @Grab to get along. See https://github.com/gradle/gradle/issues/1031 - not sure if worth it?
+compileGroovy {
+    // Create temp file.
+    File temp = File.createTempFile("config", ".groovy");
+
+    // Delete temp file when program exits.
+    temp.deleteOnExit();
+
+    // Write to temp file
+    BufferedWriter out = new BufferedWriter(new FileWriter(temp));
+    out.write("""\
+        withConfig(configuration) {
+            configuration.setDisabledGlobalASTTransformations(['groovy.grape.GrabAnnotationTransformation'] as Set)
+        }
+    """.stripIndent());
+    out.close();
+    groovyOptions.configurationScript = temp
+}
