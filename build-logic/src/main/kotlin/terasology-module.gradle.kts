@@ -66,7 +66,8 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-params")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
 
-    testImplementation("org.mockito:mockito-junit-jupiter:3.7.7")
+    testImplementation("org.mockito:mockito-inline:3.11.2")
+    testImplementation("org.mockito:mockito-junit-jupiter:3.11.2")
 }
 
 
@@ -79,7 +80,7 @@ if (project.name == "ModuleTestingEnvironment") {
         }
         add("implementation", platform("org.junit:junit-bom:5.7.1"))
         implementation("org.junit.jupiter:junit-jupiter-api")
-        implementation("org.mockito:mockito-junit-jupiter:3.7.7")
+        implementation("org.mockito:mockito-junit-jupiter:3.11.2")
     }
 }
 
