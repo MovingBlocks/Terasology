@@ -4,10 +4,8 @@ package org.terasology.engine.rendering.world;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Queues;
 import com.google.common.collect.Sets;
-import io.reactivex.rxjava3.core.BackpressureStrategy;
-import io.reactivex.rxjava3.schedulers.Schedulers;
-import io.reactivex.rxjava3.subjects.PublishSubject;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.joml.Vector3i;
@@ -38,6 +36,9 @@ import org.terasology.engine.world.generator.ScalableWorldGenerator;
 import org.terasology.engine.world.generator.WorldGenerator;
 import org.terasology.joml.geom.AABBfc;
 import org.terasology.math.TeraMath;
+import reactor.core.publisher.Sinks;
+import reactor.core.publisher.SynchronousSink;
+import reactor.core.scheduler.Schedulers;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -85,7 +86,10 @@ class RenderableWorldImpl implements RenderableWorld {
     private int statIgnoredPhases;
 
     private final Set<Vector3ic> chunkMeshProcessing = Sets.newConcurrentHashSet();
-    private PublishSubject<Chunk> chunkMeshPublisher = PublishSubject.<Chunk>create();
+    private Sinks.Many<Chunk> chunkMeshPublisher = Sinks.many().unicast().onBackpressureBuffer(Queues.newArrayBlockingQueue(100));
+
+    private SynchronousSink<Chunk> chunkSink;
+
 
     private static class ChunkMeshPayload {
         Chunk chunk;
@@ -115,11 +119,11 @@ class RenderableWorldImpl implements RenderableWorld {
                 new PriorityQueue<>(MAX_LOADABLE_CHUNKS, new ChunkFrontToBackComparator()),
                 new PriorityQueue<>(MAX_LOADABLE_CHUNKS, new ChunkBackToFrontComparator()));
 
-        chunkMeshPublisher.toFlowable(BackpressureStrategy.BUFFER)
+        chunkMeshPublisher.asFlux()
             .distinct(Chunk::getPosition, () -> chunkMeshProcessing)
             .doOnNext(k -> k.setDirty(false))
-            .parallel(4).runOn(Schedulers.computation()) // allocation is pretty heavy :/
-            .<ChunkMeshPayload>mapOptional(c -> {
+            .parallel(6).runOn(Schedulers.boundedElastic())
+            .<Optional<ChunkMeshPayload>>map(c -> {
                 ChunkView chunkView = worldProvider.getLocalView(c.getPosition());
                 if (chunkView != null && chunkView.isValidView() && chunkMeshProcessing.remove(c.getPosition())) {
                     ChunkMesh newMesh = chunkTessellator.generateMesh(chunkView);
@@ -131,17 +135,19 @@ class RenderableWorldImpl implements RenderableWorld {
                 }
                 return Optional.empty();
             })
-            .sequential()
-            .observeOn(GameThread.main())
+            .sequential().publishOn(GameThread.main())
             .subscribe(payload -> {
-                if (chunksInProximityOfCamera.contains(payload.chunk)) {
-                    payload.mesh.generateVBOs();
-                    payload.mesh.discardData();
-                    if (payload.chunk.hasMesh()) {
-                        payload.chunk.getMesh().dispose();
+                payload.ifPresent(result -> {
+                    if (chunksInProximityOfCamera.contains(result.chunk)) {
+                        result.mesh.generateVBOs();
+                        result.mesh.discardData();
+                        if (result.chunk.hasMesh()) {
+                            result.chunk.getMesh().dispose();
+                        }
+                        result.chunk.setMesh(result.mesh);
                     }
-                    payload.chunk.setMesh(payload.mesh);
-                }
+                });
+
             }, throwable -> {
                 logger.error("Failed to build mesh {}", throwable);
             });
@@ -407,7 +413,7 @@ class RenderableWorldImpl implements RenderableWorld {
             for (Chunk chunk : chunksInProximityOfCamera) {
                 if (isChunkValidForRender(chunk) && chunk.isDirty()) {
                     statDirtyChunks++;
-                    chunkMeshPublisher.onNext(chunk);
+                    chunkMeshPublisher.tryEmitNext(chunk);
                 }
             }
         }

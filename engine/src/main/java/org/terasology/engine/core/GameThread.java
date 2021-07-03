@@ -4,8 +4,8 @@ package org.terasology.engine.core;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Queues;
-import io.reactivex.rxjava3.core.Scheduler;
-import io.reactivex.rxjava3.schedulers.Schedulers;
+import reactor.core.scheduler.Scheduler;
+import reactor.core.scheduler.Schedulers;
 
 import java.util.List;
 import java.util.concurrent.BlockingDeque;
@@ -28,7 +28,7 @@ public final class GameThread {
     private static final Scheduler MAIN;
 
     static {
-        MAIN = Schedulers.from(runnable -> pendingRunnables.add(runnable));
+        MAIN = Schedulers.fromExecutor(runnable -> pendingRunnables.add(runnable));
     }
 
     public static Scheduler main() {
