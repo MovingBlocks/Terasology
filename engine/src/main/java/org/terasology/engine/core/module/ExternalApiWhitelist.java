@@ -119,6 +119,7 @@ public final class ExternalApiWhitelist {
             .add("reactor.util.function")
             .add("reactor.util.retry")
             .add("reactor.adapter")
+            .add("java.time")
             .build();
 
     public static final Set<Class<?>> CLASSES = new ImmutableSet.Builder<Class<?>>()
