@@ -13,6 +13,7 @@ import org.terasology.engine.config.Config;
 import org.terasology.engine.config.SystemConfig;
 import org.terasology.engine.core.PathManager;
 import org.terasology.engine.core.TerasologyConstants;
+import org.terasology.engine.utilities.Jvm;
 import org.terasology.gestalt.module.Module;
 import org.terasology.gestalt.module.ModuleEnvironment;
 import org.terasology.gestalt.module.ModuleFactory;
@@ -40,10 +41,12 @@ import java.net.JarURLConnection;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.Policy;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -74,6 +77,9 @@ public class ModuleManager {
         engineModule = loadAndConfigureEngineModule(moduleFactory, classesOnClasspathsToAddToEngine);
         registry.add(engineModule);
 
+        if (isLoadingClasspathModules()) {
+            loadModulesFromClassPath();
+        }
         loadModulesFromApplicationPath(PathManager.getInstance());
 
         ensureModulesDependOnEngine();
@@ -91,11 +97,16 @@ public class ModuleManager {
         this(config.getNetwork().getMasterServer(), classesOnClasspathsToAddToEngine);
     }
 
+    protected static boolean isLoadingClasspathModules() {
+        return Boolean.getBoolean(LOAD_CLASSPATH_MODULES_PROPERTY);
+    };
+
     /** Create a ModuleFactory configured for Terasology modules. */
     private static ModuleFactory newModuleFactory(ModuleMetadataJsonAdapter metadataReader) {
         final ModuleFactory moduleFactory;
-        if (Boolean.getBoolean(LOAD_CLASSPATH_MODULES_PROPERTY)) {
+        if (isLoadingClasspathModules()) {
             moduleFactory = new ClasspathCompromisingModuleFactory();
+            Jvm.logClasspath(logger);
         } else {
             moduleFactory = new ModuleFactory();
         }
@@ -134,6 +145,56 @@ public class ModuleManager {
                 .map(Path::toFile)
                 .collect(Collectors.toList());
         scanner.scan(registry, paths);
+    }
+
+    private void loadModulesFromClassPath() {
+        for (String metadata_name : moduleFactory.getModuleMetadataLoaderMap().keySet()) {
+            Enumeration<URL> urls;
+            try {
+                urls = ClassLoader.getSystemResources(metadata_name);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            Path relativePathFromModuleRoot = Paths.get(moduleFactory.getDefaultCodeSubpath(), metadata_name);
+            int relativeDepth = relativePathFromModuleRoot.getNameCount();
+            while (urls.hasMoreElements()) {
+                URL url = urls.nextElement();
+                Path path;
+                try {
+                    path = Paths.get(url.toURI());
+                } catch (URISyntaxException e) {
+                    throw new RuntimeException(e);
+                }
+                logger.warn(" 🌷 Might be a module in U:{} P:{}", url, path);
+                // TODO: test case for metadata file in code subpath
+                if (path.endsWith(relativePathFromModuleRoot)) {
+                    Path parentPath = path.subpath(0, path.getNameCount() - relativeDepth);
+                    if (path.getRoot() != null) {
+                        parentPath = path.getRoot().resolve(parentPath);
+                    }
+                    if (parentPath.toFile().exists()) {
+                        logger.warn(" +-🌷 Could be built from here {}", parentPath);
+                        path = parentPath;
+                    } else {
+                        logger.warn(" +-🥀 Does this not exist? P:{} F:{}", parentPath, parentPath.toFile());
+                    }
+                } else {
+                    logger.warn(" +-🌷 does not seem to be in a build directory");
+                }
+                Module module;
+                try {
+                    module = moduleFactory.createModule(path.toFile());
+                } catch (IOException e) {
+                    logger.warn("Failed to create module from {}", path, e);
+                    continue;
+                }
+                if (registry.add(module)) {
+                    logger.info("Loaded {} from {}", module.getId(), path);
+                } else {
+                    logger.info("Module {} from {} was a duplicate; not registering this copy.", module.getId(), path);
+                }
+            }
+        }
     }
 
     /**
