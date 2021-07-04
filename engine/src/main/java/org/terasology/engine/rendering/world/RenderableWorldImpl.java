@@ -10,6 +10,7 @@ import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
+import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.config.Config;
@@ -37,9 +38,9 @@ import org.terasology.engine.world.generator.WorldGenerator;
 import org.terasology.joml.geom.AABBfc;
 import org.terasology.math.TeraMath;
 import reactor.core.publisher.Sinks;
-import reactor.core.publisher.SynchronousSink;
 import reactor.core.scheduler.Schedulers;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -88,9 +89,6 @@ class RenderableWorldImpl implements RenderableWorld {
     private final Set<Vector3ic> chunkMeshProcessing = Sets.newConcurrentHashSet();
     private Sinks.Many<Chunk> chunkMeshPublisher = Sinks.many().unicast().onBackpressureBuffer(Queues.newArrayBlockingQueue(100));
 
-    private SynchronousSink<Chunk> chunkSink;
-
-
     private static class ChunkMeshPayload {
         Chunk chunk;
         ChunkMesh mesh;
@@ -122,7 +120,14 @@ class RenderableWorldImpl implements RenderableWorld {
         chunkMeshPublisher.asFlux()
             .distinct(Chunk::getPosition, () -> chunkMeshProcessing)
             .doOnNext(k -> k.setDirty(false))
-            .parallel(6).runOn(Schedulers.boundedElastic())
+            .bufferTimeout(100, Duration.ofMillis(100))
+            .parallel().runOn(Schedulers.boundedElastic())
+            .<Chunk>flatMap(chunks -> (Publisher<Chunk>) res -> {
+                chunks.sort(new ChunkFrontToBackComparator());
+                for (Chunk c : chunks) {
+                    res.onNext(c);
+                }
+            })
             .<Optional<ChunkMeshPayload>>map(c -> {
                 ChunkView chunkView = worldProvider.getLocalView(c.getPosition());
                 if (chunkView != null && chunkView.isValidView() && chunkMeshProcessing.remove(c.getPosition())) {
@@ -134,8 +139,8 @@ class RenderableWorldImpl implements RenderableWorld {
                     return Optional.of(payload);
                 }
                 return Optional.empty();
-            })
-            .sequential().publishOn(GameThread.main())
+            }).sequential()
+            .publishOn(GameThread.main())
             .subscribe(payload -> {
                 payload.ifPresent(result -> {
                     if (chunksInProximityOfCamera.contains(result.chunk)) {
