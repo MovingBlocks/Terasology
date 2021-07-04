@@ -115,10 +115,9 @@ class RenderableWorldImpl implements RenderableWorld {
                 new PriorityQueue<>(MAX_LOADABLE_CHUNKS, new ChunkBackToFrontComparator()));
 
         chunkMeshPublisher.asFlux()
-                .subscribeOn(Schedulers.newSingle("chunk reactor"))
                 .distinct(Chunk::getPosition, () -> chunkMeshProcessing)
                 .doOnNext(k -> k.setDirty(false))
-                .parallel().runOn(Schedulers.parallel())
+                .parallel(5).runOn(Schedulers.parallel())
                 .<Optional<ChunkMeshPayload>>map(c -> {
                     ChunkView chunkView = worldProvider.getLocalView(c.getPosition());
                     if (chunkView != null && chunkView.isValidView() && chunkMeshProcessing.remove(c.getPosition())) {
