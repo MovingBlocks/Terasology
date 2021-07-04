@@ -4,13 +4,11 @@ package org.terasology.engine.rendering.world;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Queues;
 import com.google.common.collect.Sets;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
-import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.config.Config;
@@ -40,7 +38,6 @@ import org.terasology.math.TeraMath;
 import reactor.core.publisher.Sinks;
 import reactor.core.scheduler.Schedulers;
 
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -87,7 +84,7 @@ class RenderableWorldImpl implements RenderableWorld {
     private int statIgnoredPhases;
 
     private final Set<Vector3ic> chunkMeshProcessing = Sets.newConcurrentHashSet();
-    private Sinks.Many<Chunk> chunkMeshPublisher = Sinks.many().unicast().onBackpressureBuffer(Queues.newArrayBlockingQueue(100));
+    private Sinks.Many<Chunk> chunkMeshPublisher = Sinks.many().unicast().onBackpressureBuffer();
 
     private static class ChunkMeshPayload {
         Chunk chunk;
@@ -118,44 +115,38 @@ class RenderableWorldImpl implements RenderableWorld {
                 new PriorityQueue<>(MAX_LOADABLE_CHUNKS, new ChunkBackToFrontComparator()));
 
         chunkMeshPublisher.asFlux()
-            .distinct(Chunk::getPosition, () -> chunkMeshProcessing)
-            .doOnNext(k -> k.setDirty(false))
-            .bufferTimeout(100, Duration.ofMillis(100))
-            .parallel().runOn(Schedulers.boundedElastic())
-            .<Chunk>flatMap(chunks -> (Publisher<Chunk>) res -> {
-                chunks.sort(new ChunkFrontToBackComparator());
-                for (Chunk c : chunks) {
-                    res.onNext(c);
-                }
-            })
-            .<Optional<ChunkMeshPayload>>map(c -> {
-                ChunkView chunkView = worldProvider.getLocalView(c.getPosition());
-                if (chunkView != null && chunkView.isValidView() && chunkMeshProcessing.remove(c.getPosition())) {
-                    ChunkMesh newMesh = chunkTessellator.generateMesh(chunkView);
-                    ChunkMonitor.fireChunkTessellated(new Vector3i(c.getPosition()), newMesh);
-                    ChunkMeshPayload payload = new ChunkMeshPayload();
-                    payload.chunk = c;
-                    payload.mesh = newMesh;
-                    return Optional.of(payload);
-                }
-                return Optional.empty();
-            }).sequential()
-            .publishOn(GameThread.main())
-            .subscribe(payload -> {
-                payload.ifPresent(result -> {
-                    if (chunksInProximityOfCamera.contains(result.chunk)) {
-                        result.mesh.generateVBOs();
-                        result.mesh.discardData();
-                        if (result.chunk.hasMesh()) {
-                            result.chunk.getMesh().dispose();
-                        }
-                        result.chunk.setMesh(result.mesh);
+                .subscribeOn(Schedulers.newSingle("chunk reactor"))
+                .distinct(Chunk::getPosition, () -> chunkMeshProcessing)
+                .doOnNext(k -> k.setDirty(false))
+                .parallel().runOn(Schedulers.parallel())
+                .<Optional<ChunkMeshPayload>>map(c -> {
+                    ChunkView chunkView = worldProvider.getLocalView(c.getPosition());
+                    if (chunkView != null && chunkView.isValidView() && chunkMeshProcessing.remove(c.getPosition())) {
+                        ChunkMesh newMesh = chunkTessellator.generateMesh(chunkView);
+                        ChunkMonitor.fireChunkTessellated(new Vector3i(c.getPosition()), newMesh);
+                        ChunkMeshPayload payload = new ChunkMeshPayload();
+                        payload.chunk = c;
+                        payload.mesh = newMesh;
+                        return Optional.of(payload);
                     }
-                });
+                    return Optional.empty();
+                }).filter(Optional::isPresent).sequential()
+                .publishOn(GameThread.main())
+                .subscribe(payload -> {
+                    payload.ifPresent(result -> {
+                        if (chunksInProximityOfCamera.contains(result.chunk)) {
+                            result.mesh.generateVBOs();
+                            result.mesh.discardData();
+                            if (result.chunk.hasMesh()) {
+                                result.chunk.getMesh().dispose();
+                            }
+                            result.chunk.setMesh(result.mesh);
+                        }
+                    });
 
-            }, throwable -> {
-                logger.error("Failed to build mesh {}", throwable);
-            });
+                }, throwable -> {
+                    logger.error("Failed to build mesh {}", throwable);
+                });
     }
 
     @Override
