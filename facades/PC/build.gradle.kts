@@ -62,7 +62,7 @@ group = "org.terasology.facades"
 dependencies {
     implementation(project(":engine"))
     implementation(project(":subsystems:DiscordRPC"))
-    implementation("io.reactivex.rxjava3:rxjava:3.0.13")
+    implementation("io.projectreactor:reactor-core:3.4.7")
 
     // TODO: Consider whether we can move the CR dependency back here from the engine, where it is referenced from the main menu
     implementation(group = "org.terasology.crashreporter", name = "cr-terasology", version = "4.1.0")

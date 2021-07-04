@@ -5,16 +5,12 @@ package org.terasology.engine;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
-import io.reactivex.rxjava3.core.Observable;
-import io.reactivex.rxjava3.core.Scheduler;
-import io.reactivex.rxjava3.functions.Action;
-import io.reactivex.rxjava3.schedulers.Schedulers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.crashreporter.CrashReporter;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.config.SystemConfig;
-import org.terasology.engine.core.GameThread;
+import org.terasology.engine.core.GameScheduler;
 import org.terasology.engine.core.LoggingContext;
 import org.terasology.engine.core.PathManager;
 import org.terasology.engine.core.StandardGameStatus;
@@ -157,7 +153,7 @@ public final class Terasology {
                 engine.run(new StateHeadlessSetup());
             } else if (loadLastGame) {
                 engine.initialize(); //initialize the managers first
-                GameThread.io().scheduleDirect(() -> {
+                GameScheduler.boundedElastic().schedule(() -> {
                     GameManifest gameManifest = getLatestGameManifest();
                     if (gameManifest != null) {
                         engine.changeState(new StateLoading(gameManifest, NetworkMode.NONE));
@@ -166,7 +162,7 @@ public final class Terasology {
             } else {
                 if (createLastGame) {
                     engine.initialize();
-                    GameThread.io().scheduleDirect(() -> {
+                    GameScheduler.boundedElastic().schedule(() -> {
                         GameManifest gameManifest = getLatestGameManifest();
                         if (gameManifest != null) {
                             String title = gameManifest.getTitle();

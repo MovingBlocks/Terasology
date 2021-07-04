@@ -215,20 +215,12 @@ public class ModuleManager {
         permissionProviderFactory.getBasePermissionSet().grantPermission("com.google.gson.internal", ReflectPermission.class);
 
         // reactive x property permission
-        permissionProviderFactory.getBasePermissionSet().grantPermission(new PropertyPermission("rx3.io-keep-alive-time", "read"));
-        permissionProviderFactory.getBasePermissionSet().grantPermission(new PropertyPermission("rx3.io-priority", "read"));
-        permissionProviderFactory.getBasePermissionSet().grantPermission(new PropertyPermission("rx3.io-scheduled-release", "read"));
-        permissionProviderFactory.getBasePermissionSet().grantPermission(new PropertyPermission("rx3.computation-threads", "read"));
-        permissionProviderFactory.getBasePermissionSet().grantPermission(new PropertyPermission("rx3.computation-priority", "read"));
-        permissionProviderFactory.getBasePermissionSet().grantPermission(new PropertyPermission("rx3.newthread-priority", "read"));
-        permissionProviderFactory.getBasePermissionSet().grantPermission(new PropertyPermission("rx3.single-priority", "read"));
-        permissionProviderFactory.getBasePermissionSet().grantPermission(new PropertyPermission("rx3.purge-enabled", "read"));
-        permissionProviderFactory.getBasePermissionSet().grantPermission(new PropertyPermission("rx3.purge-period-seconds", "read"));
-        permissionProviderFactory.getBasePermissionSet().grantPermission(new PropertyPermission("rx3.scheduler.use-nanotime", "read"));
-        permissionProviderFactory.getBasePermissionSet().grantPermission(new PropertyPermission("rx3.scheduler.drift-tolerance", "read"));
-        permissionProviderFactory.getBasePermissionSet().grantPermission(new PropertyPermission("rx3.scheduler.drift-tolerance-unit", "read"));
-        permissionProviderFactory.getBasePermissionSet().grantPermission(new PropertyPermission("rx3.buffer-size", "read"));
-        permissionProviderFactory.getBasePermissionSet().grantPermission(new PropertyPermission("jctools.spsc.max.lookahead.step", "read"));
+        permissionProviderFactory.getBasePermissionSet().grantPermission(new PropertyPermission("reactor.bufferSize.x", "read"));
+        permissionProviderFactory.getBasePermissionSet().grantPermission(new PropertyPermission("reactor.bufferSize.small", "read"));
+        permissionProviderFactory.getBasePermissionSet().grantPermission(new PropertyPermission("reactor.trace.operatorStacktrace", "read"));
+        permissionProviderFactory.getBasePermissionSet().grantPermission(new PropertyPermission("reactor.schedulers.defaultPoolSize", "read"));
+        permissionProviderFactory.getBasePermissionSet().grantPermission(new PropertyPermission("reactor.schedulers.defaultBoundedElasticSize", "read"));
+        permissionProviderFactory.getBasePermissionSet().grantPermission(new PropertyPermission("reactor.schedulers.defaultBoundedElasticQueueSize", "read"));
 
         Policy.setPolicy(new ModuleSecurityPolicy());
         System.setSecurityManager(new ModuleSecurityManager());

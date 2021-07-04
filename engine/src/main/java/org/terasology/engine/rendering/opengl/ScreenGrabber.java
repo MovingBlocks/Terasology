@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.config.RenderingConfig;
 import org.terasology.engine.context.Context;
-import org.terasology.engine.core.GameThread;
+import org.terasology.engine.core.GameScheduler;
 import org.terasology.engine.core.PathManager;
 import org.terasology.engine.persistence.internal.GamePreviewImageProvider;
 import org.terasology.engine.registry.CoreRegistry;
@@ -102,10 +102,10 @@ public class ScreenGrabber {
         int height = sceneFinalFbo.height();
 
         if (savingGamePreview) {
-            GameThread.io().scheduleDirect(() -> saveGamePreviewTask(buffer, width, height));
+            GameScheduler.boundedElastic().schedule(() -> saveScreenshotTask(buffer, width, height));
             this.savingGamePreview = false;
         } else {
-            GameThread.io().scheduleDirect(() -> saveScreenshotTask(buffer, width, height));
+            GameScheduler.boundedElastic().schedule(() -> saveScreenshotTask(buffer, width, height));
         }
 
         isTakingScreenshot = false;
