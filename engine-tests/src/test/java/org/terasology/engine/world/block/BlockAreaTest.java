@@ -4,11 +4,13 @@
 package org.terasology.engine.world.block;
 
 import org.joml.Vector2i;
+import org.joml.Vector2ic;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import java.util.Iterator;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -18,6 +20,24 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class BlockAreaTest {
+
+    @Test
+    public void testIterator() {
+        BlockArea a = new BlockArea(0, 0, 2, 2);
+
+        // Make sure the iterator visits positions in the correct order, and that it works without calling hasNext() in between
+        Iterator<Vector2ic> i = a.iterator();
+        assertEquals(i.next(), new Vector2i(0, 0));
+        assertEquals(i.next(), new Vector2i(1, 0));
+        assertEquals(i.next(), new Vector2i(2, 0));
+        assertEquals(i.next(), new Vector2i(0, 1));
+        assertEquals(i.next(), new Vector2i(1, 1));
+        assertEquals(i.next(), new Vector2i(2, 1));
+        assertEquals(i.next(), new Vector2i(0, 2));
+        assertEquals(i.next(), new Vector2i(1, 2));
+        assertEquals(i.next(), new Vector2i(2, 2));
+        assertFalse(i.hasNext());
+    }
 
     @Test
     public void containsInvalid() {
