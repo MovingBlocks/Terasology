@@ -79,7 +79,11 @@ public class OpenGLMesh extends Mesh implements OpenGLMeshBase {
         if (!isDisposed()) {
             updateState(state);
             GL30.glBindVertexArray(disposalAction.vao);
-            GL30.glDrawElements(drawMode.glCall, this.indexCount, GL_UNSIGNED_INT, 0);
+            if(this.indexCount == 0) {
+                GL30.glDrawArrays(drawMode.glCall, 0, positions.elements());
+            } else {
+                GL30.glDrawElements(drawMode.glCall, this.indexCount, GL_UNSIGNED_INT, 0);
+            }
             GL30.glBindVertexArray(0);
         } else {
             logger.error("Attempted to render disposed mesh: {}", getUrn());
