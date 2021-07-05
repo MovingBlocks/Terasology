@@ -19,7 +19,11 @@ public enum BlockPart {
     CENTER;
 
     private static final List<BlockPart> HORIZONTAL_SIDES = ImmutableList.of(LEFT, RIGHT, FRONT, BACK);
-    private static final List<BlockPart> SIDES = ImmutableList.of(TOP, LEFT, RIGHT, FRONT, BACK, BOTTOM, CENTER);
+    /**
+     * Cached block parts in an immutable list.
+     * See https://dzone.com/articles/memory-hogging-enumvalues-method
+     */
+    private static final List<BlockPart> SIDES = ImmutableList.of(BlockPart.values());
     private Side side;
 
     BlockPart() {
