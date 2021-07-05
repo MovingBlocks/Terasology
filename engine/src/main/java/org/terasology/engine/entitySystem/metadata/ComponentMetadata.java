@@ -42,7 +42,8 @@ public class ComponentMetadata<T extends Component> extends ClassMetadata<T, Com
      * @param copyStrategies A copy strategy library
      * @throws NoSuchMethodException If the component has no default constructor
      */
-    public ComponentMetadata(ResourceUrn uri, Class<T> type, ReflectFactory factory, CopyStrategyLibrary copyStrategies) throws NoSuchMethodException {
+    public ComponentMetadata(ResourceUrn uri, Class<T> type, ReflectFactory factory, CopyStrategyLibrary copyStrategies)
+            throws NoSuchMethodException {
         super(uri.toString(), type, factory, copyStrategies, Predicates.<Field>alwaysTrue());
         persisted = type.getAnnotation(DoNotPersist.class) == null;
         replicated = type.getAnnotation(Replicate.class) != null;
@@ -69,7 +70,8 @@ public class ComponentMetadata<T extends Component> extends ClassMetadata<T, Com
     }
 
     @Override
-    protected ComponentFieldMetadata<T, ?> createField(Field field, CopyStrategyLibrary copyStrategyLibrary, ReflectFactory factory) throws InaccessibleFieldException {
+    protected ComponentFieldMetadata<T, ?> createField(Field field, CopyStrategyLibrary copyStrategyLibrary, ReflectFactory factory)
+            throws InaccessibleFieldException {
         return new ComponentFieldMetadata<>(this, field, copyStrategyLibrary, factory, false);
     }
 
@@ -135,7 +137,7 @@ public class ComponentMetadata<T extends Component> extends ClassMetadata<T, Com
     public T copyWithOwnedEntities(T object) {
         T result = constructor.construct();
         if (result != null) {
-            for (ComponentFieldMetadata<T,?> field : fields.values()) {
+            for (ComponentFieldMetadata<T, ?> field : fields.values()) {
                 field.setValue(result, field.getCopyOfValueWithOwnedEntities(object));
             }
         }

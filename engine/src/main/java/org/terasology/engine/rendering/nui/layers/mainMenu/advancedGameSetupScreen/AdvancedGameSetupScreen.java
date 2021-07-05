@@ -472,7 +472,8 @@ public class AdvancedGameSetupScreen extends CoreScreenLayer {
                         }
                     });
                     moduleDetails.subscribe(b -> {
-                        final ModuleDetailsScreen moduleDetailsScreen = getManager().createScreen(ModuleDetailsScreen.ASSET_URI, ModuleDetailsScreen.class);
+                        final ModuleDetailsScreen moduleDetailsScreen = getManager()
+                                .createScreen(ModuleDetailsScreen.ASSET_URI, ModuleDetailsScreen.class);
                         final Collection<Module> modules = sortedModules.stream()
                                 .map(ModuleSelectionInfo::getMetadata)
                                 .filter(Objects::nonNull)
@@ -495,7 +496,8 @@ public class AdvancedGameSetupScreen extends CoreScreenLayer {
         }
 
         WidgetUtil.trySubscribe(this, "createWorld", button -> {
-            final UniverseSetupScreen universeSetupScreen = getManager().createScreen(UniverseSetupScreen.ASSET_URI, UniverseSetupScreen.class);
+            final UniverseSetupScreen universeSetupScreen = getManager()
+                    .createScreen(UniverseSetupScreen.ASSET_URI, UniverseSetupScreen.class);
             universeWrapper.setSeed(seed.getText());
             saveConfiguration();
             universeSetupScreen.setEnvironment(universeWrapper);
@@ -504,15 +506,18 @@ public class AdvancedGameSetupScreen extends CoreScreenLayer {
 
         WidgetUtil.trySubscribe(this, "play", button -> {
             if (StringUtils.isBlank(seed.getText())) {
-                getManager().createScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Error", "Game seed cannot be empty!");
+                getManager().createScreen(MessagePopup.ASSET_URI, MessagePopup.class).
+                        setMessage("Error", "Game seed cannot be empty!");
             } else {
                 universeWrapper.setSeed(seed.getText());
                 saveConfiguration();
                 final GameManifest gameManifest = GameManifestProvider.createGameManifest(universeWrapper, moduleManager, config);
                 if (gameManifest != null) {
-                    gameEngine.changeState(new StateLoading(gameManifest, (universeWrapper.getLoadingAsServer()) ? NetworkMode.DEDICATED_SERVER : NetworkMode.NONE));
+                    gameEngine.changeState(new StateLoading(gameManifest,
+                            (universeWrapper.getLoadingAsServer()) ? NetworkMode.DEDICATED_SERVER : NetworkMode.NONE));
                 } else {
-                    getManager().createScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Error", "Can't create new game!");
+                    getManager().createScreen(MessagePopup.ASSET_URI, MessagePopup.class)
+                            .setMessage("Error", "Can't create new game!");
                 }
             }
         });
@@ -608,7 +613,8 @@ public class AdvancedGameSetupScreen extends CoreScreenLayer {
 
     private void filterText() {
         String newText = moduleSearch.getText();
-        sortedModules.removeIf(moduleSelectionInfo -> !moduleSelectionInfo.getMetadata().getDisplayName().toString().toLowerCase().contains(newText.toLowerCase()));
+        sortedModules.removeIf(moduleSelectionInfo -> !moduleSelectionInfo.getMetadata()
+                .getDisplayName().toString().toLowerCase().contains(newText.toLowerCase()));
     }
 
     private void startDownloadingNewestModulesRequiredFor(ModuleSelectionInfo moduleMetadata) {

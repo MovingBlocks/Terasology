@@ -9,7 +9,7 @@ import org.terasology.reflection.copy.CopyStrategy;
 /**
  * Provides a deep copy of an entity, including any owned entities recursively.
  */
-public class EntityCopyStrategy implements CopyStrategy<EntityRef> {
+public final class EntityCopyStrategy implements CopyStrategy<EntityRef> {
     public static final EntityCopyStrategy INSTANCE = new EntityCopyStrategy();
 
     private EntityCopyStrategy() {

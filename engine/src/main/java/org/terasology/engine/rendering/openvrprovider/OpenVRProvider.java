@@ -22,7 +22,6 @@ import org.slf4j.LoggerFactory;
 import org.terasology.engine.utilities.OS;
 
 import java.nio.IntBuffer;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 
 /**

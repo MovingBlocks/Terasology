@@ -59,7 +59,8 @@ public class ByteCodeReflectFactory implements ReflectFactory {
 
                 CtMethod method = CtNewMethod.make("public Object construct() { return new " + type.getName() + "();}", constructorClass);
                 constructorClass.addMethod(method);
-                return (ObjectConstructor<T>) (constructorClass.toClass(type.getClassLoader(), type.getProtectionDomain()).getConstructor().newInstance());
+                return (ObjectConstructor<T>) (constructorClass.toClass(type.getClassLoader(), type.getProtectionDomain())
+                        .getConstructor().newInstance());
             } catch (InstantiationException | IllegalAccessException | InvocationTargetException | CannotCompileException e) {
                 logger.error("Error instantiating constructor object for '{}', falling back on reflection", type, e);
                 return backupFactory.createConstructor(type);
@@ -118,7 +119,8 @@ public class ByteCodeReflectFactory implements ReflectFactory {
                 try {
                     fieldIndex = fieldAccess.getIndex(field.getName());
                 } catch (IllegalArgumentException e) {
-                    throw new InaccessibleFieldException("Failed to create accessor for field '" + field.getName() + "' of type '" + ownerType.getName() + "'", e);
+                    throw new InaccessibleFieldException("Failed to create accessor for field '" + field.getName()
+                            + "' of type '" + ownerType.getName() + "'", e);
                 }
             }
         }

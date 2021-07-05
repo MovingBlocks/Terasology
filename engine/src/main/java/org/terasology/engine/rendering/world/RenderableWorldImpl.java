@@ -218,7 +218,7 @@ class RenderableWorldImpl implements RenderableWorld {
             for (Vector3ic chunkPositionToRemove : renderableRegion) {
                 if (!newRenderableRegion.contains(chunkPositionToRemove)) {
                     Iterator<Chunk> nearbyChunks = chunksInProximityOfCamera.iterator();
-                    for (Iterator<Chunk> it = nearbyChunks; it.hasNext(); ) {
+                    for (Iterator<Chunk> it = nearbyChunks; it.hasNext();) {
                         chunk = it.next();
                         if (chunk.getPosition(new org.joml.Vector3i()).equals(chunkPositionToRemove)) {
                             chunk.disposeMesh();
@@ -338,7 +338,10 @@ class RenderableWorldImpl implements RenderableWorld {
             if (isChunkValidForRender(chunk)) {
                 mesh = chunk.getMesh();
 
-                if (isDynamicShadows && isFirstRenderingStageForCurrentFrame && chunkCounter < maxChunksForShadows && isChunkVisibleFromMainLight(chunk)) {
+                if (isDynamicShadows
+                        && isFirstRenderingStageForCurrentFrame
+                        && chunkCounter < maxChunksForShadows
+                        && isChunkVisibleFromMainLight(chunk)) {
                     if (triangleCount(mesh, ChunkMesh.RenderPhase.OPAQUE) > 0) {
                         renderQueues.chunksOpaqueShadow.add(chunk);
                     } else {

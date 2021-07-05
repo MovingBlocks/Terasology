@@ -33,7 +33,8 @@ public final class Chunks {
 
     public static final Vector3ic CHUNK_POWER = new Vector3i(POWER_X, POWER_Y, POWER_Z);
     public static final Vector3ic CHUNK_SIZE = new Vector3i(SIZE_X, SIZE_Y, SIZE_Z);
-    public static final Vector3ic INNER_CHUNK_POS_FILTER = new org.joml.Vector3i(INNER_CHUNK_POS_FILTER_X, INNER_CHUNK_POS_FILTER_Y, INNER_CHUNK_POS_FILTER_Z);
+    public static final Vector3ic INNER_CHUNK_POS_FILTER =
+            new org.joml.Vector3i(INNER_CHUNK_POS_FILTER_X, INNER_CHUNK_POS_FILTER_Y, INNER_CHUNK_POS_FILTER_Z);
     public static final BlockRegionc CHUNK_REGION = new BlockRegion(0, 0, 0).setSize(CHUNK_SIZE);
 
     public static final Vector3ic LOCAL_REGION_EXTENTS = new Vector3i(1, 1, 1);
@@ -354,7 +355,9 @@ public final class Chunks {
      * @return dest
      */
     public static Vector3i toRelative(int x, int y, int z, Vector3i dest) {
-        return dest.set(toRelative(x, INNER_CHUNK_POS_FILTER.x()), toRelative(y, INNER_CHUNK_POS_FILTER.y()), toRelative(z, INNER_CHUNK_POS_FILTER.z()));
+        return dest.set(toRelative(x, INNER_CHUNK_POS_FILTER.x()),
+                toRelative(y, INNER_CHUNK_POS_FILTER.y()),
+                toRelative(z, INNER_CHUNK_POS_FILTER.z()));
     }
 
     //-- checks ------------------------------------------------------------------------------------------------------//

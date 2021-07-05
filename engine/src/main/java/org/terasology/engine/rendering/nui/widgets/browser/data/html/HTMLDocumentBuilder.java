@@ -11,7 +11,6 @@ public interface HTMLDocumentBuilder {
      *
      * @param tag
      * @param attributes
-     * @return
      * @throws HTMLParseException
      */
     HTMLBlockBuilder startTag(String tag, Attributes attributes) throws HTMLParseException;

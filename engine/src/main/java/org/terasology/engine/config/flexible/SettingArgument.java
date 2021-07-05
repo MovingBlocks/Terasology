@@ -10,7 +10,7 @@ import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 
-public class SettingArgument<P, V> {
+public final class SettingArgument<P, V> {
     private P argument;
     private BiConsumer<SettingBuilder<V>, P> setter;
 

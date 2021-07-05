@@ -4,7 +4,6 @@ package org.terasology.engine.rendering;
 
 import com.google.common.collect.Sets;
 import org.lwjgl.Version;
-import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
@@ -12,7 +11,6 @@ import org.lwjgl.opengl.GL30;
 import org.lwjgl.system.Platform;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.engine.registry.CoreRegistry;
 import org.terasology.engine.rendering.assets.material.Material;
 import org.terasology.engine.rendering.assets.material.MaterialData;
@@ -20,6 +18,7 @@ import org.terasology.engine.rendering.assets.shader.Shader;
 import org.terasology.engine.rendering.assets.texture.Texture;
 import org.terasology.engine.rendering.opengl.GLSLMaterial;
 import org.terasology.engine.utilities.Assets;
+import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.gestalt.assets.management.AssetManager;
 
 import java.util.Optional;
@@ -44,32 +43,8 @@ public class ShaderManagerLwjgl implements ShaderManager {
     public void initShaders() {
         logCapabilities();
         addShaderProgram("default");
-
-        // TODO: Find a better way to do this
-        addShaderProgram("post");
-        addShaderProgram("ssao");
-        addShaderProgram("lightShafts");
-        addShaderProgram("sobel");
-        addShaderProgram("initialPost");
-        addShaderProgram("prePostComposite");
-        addShaderProgram("highPass");
-        addShaderProgram("blur");
-        addShaderProgram("vignette");
-        addShaderProgram("downSampler");
-        addShaderProgram("toneMapping");
-        addShaderProgram("sky");
-        addShaderProgram("chunk");
         addShaderProgram("blockSelection");
-        if (GL.createCapabilities().OpenGL33) { //TODO remove this "if" when rendering will use OpenGL3 by default
-            addShaderProgram("particle");
-        } else {
-            logger.warn("Your GPU or driver not supports OpenGL 3.3 , particles disabled");
-        }
-        addShaderProgram("shadowMap");
-        addShaderProgram("lightBufferPass");
-        addShaderProgram("lightGeometryPass");
-        addShaderProgram("ssaoBlur");
-        addShaderProgram("outputPass");
+        addShaderProgram("particle");
     }
 
     private void logCapabilities() {

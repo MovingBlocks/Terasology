@@ -125,7 +125,8 @@ public class ClientConnectionHandler extends ChannelInboundHandlerAdapter {
     }
 
     /**
-     * Attempts to receive a module from the server and push it to the client. Creates a file on the target machine and begins preparation to write to it.
+     * Attempts to receive a module from the server and push it to the client.
+     * Creates a file on the target machine and begins preparation to write to it.
      * @param channelHandlerContext
      * @param moduleDataHeader
      */

@@ -58,7 +58,8 @@ public class PhysicsSystem extends BaseComponentSystem implements UpdateSubscrib
 
     private static final Logger logger = LoggerFactory.getLogger(PhysicsSystem.class);
     private static final long TIME_BETWEEN_NETSYNCS = 500;
-    private static final CollisionGroup[] DEFAULT_COLLISION_GROUP = {StandardCollisionGroup.WORLD, StandardCollisionGroup.CHARACTER, StandardCollisionGroup.DEFAULT};
+    private static final CollisionGroup[] DEFAULT_COLLISION_GROUP =
+            {StandardCollisionGroup.WORLD, StandardCollisionGroup.CHARACTER, StandardCollisionGroup.DEFAULT};
     private static final float COLLISION_DAMPENING_MULTIPLIER = 0.5f;
     @In
     private Time time;
@@ -178,7 +179,7 @@ public class PhysicsSystem extends BaseComponentSystem implements UpdateSubscrib
             RigidBody body = physics.getRigidBody(entity);
 
             // force location component to update and sync trigger state
-            if(entity.hasComponent(TriggerComponent.class)) {
+            if (entity.hasComponent(TriggerComponent.class)) {
                 physics.updateTrigger(entity);
             }
 
@@ -206,13 +207,16 @@ public class PhysicsSystem extends BaseComponentSystem implements UpdateSubscrib
                             }
                             if (hitBlock.isPenetrable()) {
                                 if (!hitInfo.getEntity().hasComponent(BlockComponent.class)) {
-                                    entity.send(new EntityImpactEvent(hitInfo.getHitPoint(), hitInfo.getHitNormal(), comp.velocity, fDistanceThisFrame, hitInfo.getEntity()));
+                                    entity.send(new EntityImpactEvent(hitInfo.getHitPoint(), hitInfo.getHitNormal(), comp.velocity,
+                                            fDistanceThisFrame, hitInfo.getEntity()));
                                     break;
                                 }
-                                fDistanceThisFrame = fDistanceThisFrame - fTravelledDistance; // decrease the remaining distance to check if we hit a block
+                                // decrease the remaining distance to check if we hit a block
+                                fDistanceThisFrame = fDistanceThisFrame - fTravelledDistance;
                                 vLocation = hitInfo.getHitPoint();
                             } else {
-                                entity.send(new BlockImpactEvent(hitInfo.getHitPoint(), hitInfo.getHitNormal(), comp.velocity, fDistanceThisFrame, hitInfo.getEntity()));
+                                entity.send(new BlockImpactEvent(hitInfo.getHitPoint(), hitInfo.getHitNormal(), comp.velocity,
+                                        fDistanceThisFrame, hitInfo.getEntity()));
                                 break;
                             }
                         } else {

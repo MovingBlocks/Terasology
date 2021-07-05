@@ -7,7 +7,8 @@ import org.terasology.math.TeraMath;
 
 /**
  * Improved Perlin noise based on the reference implementation by Ken Perlin.
- * @deprecated Prefer using {@link SimplexNoise}, it is comparable to Perlin noise (fewer directional artifacts, lower computational overhead for higher dimensions).
+ * @deprecated Prefer using {@link SimplexNoise}, it is comparable to Perlin noise
+ * (fewer directional artifacts, lower computational overhead for higher dimensions).
  *
  */
 @Deprecated
@@ -30,7 +31,8 @@ public class PerlinNoise extends AbstractNoise implements Noise2D, Noise3D {
      * Supports tileable noise generation
      *
      * @param seed The seed value
-     * @param gridDim gridDim x gridDim will be the size of the perlin's grid of vectors, noise will be tiled if an input coordinate crosses a multiple of gridDim
+     * @param gridDim gridDim x gridDim will be the size of the perlin's grid of vectors,
+     * noise will be tiled if an input coordinate crosses a multiple of gridDim
      */
     public PerlinNoise(long seed, int gridDim) {
         FastRandom rand = new FastRandom(seed);

@@ -8,7 +8,8 @@ import gnu.trove.list.array.TIntArrayList;
 import javax.annotation.Nullable;
 
 /**
- * Describes a scene composed of glTF nodes. See https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#reference-scene for details.
+ * Describes a scene composed of glTF nodes.
+ * See https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#reference-scene for details.
  */
 public class GLTFScene {
     private String name = "";

@@ -9,7 +9,10 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.fail;
 
-public class Assertions {
+public final class Assertions {
+
+    private Assertions() { }
+
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     public static void assertNotEmpty(Optional<?> obj) {
         if (!obj.isPresent()) {

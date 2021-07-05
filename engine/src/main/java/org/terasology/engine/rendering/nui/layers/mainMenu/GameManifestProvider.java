@@ -26,7 +26,7 @@ import java.util.Map;
 /**
  * Generates new games manifest according to input data.
  */
-public class GameManifestProvider {
+public final class GameManifestProvider {
 
     private static final Logger logger = LoggerFactory.getLogger(GameManifestProvider.class);
 

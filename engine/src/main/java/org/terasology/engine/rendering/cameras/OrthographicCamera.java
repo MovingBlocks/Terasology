@@ -3,11 +3,6 @@
 package org.terasology.engine.rendering.cameras;
 
 import org.joml.FrustumIntersection;
-import org.lwjgl.BufferUtils;
-import org.lwjgl.opengl.GL11;
-
-import static org.lwjgl.opengl.GL11.GL_PROJECTION;
-import static org.lwjgl.opengl.GL11.glMatrixMode;
 
 /**
  * Simple default camera.
@@ -34,25 +29,6 @@ public class OrthographicCamera extends Camera {
     @Override
     public boolean isBobbingAllowed() {
         return false;
-    }
-
-    @Override
-    public void loadProjectionMatrix() {
-        glMatrixMode(GL_PROJECTION);
-        GL11.glLoadMatrixf(getProjectionMatrix().get(BufferUtils.createFloatBuffer(16)));
-        glMatrixMode(GL11.GL_MODELVIEW);
-    }
-
-    @Override
-    public void loadModelViewMatrix() {
-        glMatrixMode(GL11.GL_MODELVIEW);
-        GL11.glLoadMatrixf(getViewMatrix().get(BufferUtils.createFloatBuffer(16)));
-    }
-
-    @Override
-    public void loadNormalizedModelViewMatrix() {
-        glMatrixMode(GL11.GL_MODELVIEW);
-        GL11.glLoadMatrixf(getNormViewMatrix().get(BufferUtils.createFloatBuffer(16)));
     }
 
     @Override

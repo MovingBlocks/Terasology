@@ -6,8 +6,6 @@ import org.joml.FrustumIntersection;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector4f;
-import org.lwjgl.BufferUtils;
-import org.lwjgl.opengl.GL11;
 import org.terasology.engine.config.RenderingConfig;
 import org.terasology.engine.registry.CoreRegistry;
 import org.terasology.engine.rendering.openvrprovider.OpenVRProvider;
@@ -15,9 +13,6 @@ import org.terasology.engine.rendering.openvrprovider.OpenVRUtil;
 import org.terasology.engine.rendering.world.WorldRenderer;
 import org.terasology.engine.rendering.world.WorldRenderer.RenderingStage;
 import org.terasology.engine.world.WorldProvider;
-
-import static org.lwjgl.opengl.GL11.GL_PROJECTION;
-import static org.lwjgl.opengl.GL11.glMatrixMode;
 
 /**
  * Camera which can be used to render stereoscopic images of the scene for VR.
@@ -172,27 +167,6 @@ public class OpenVRStereoCamera extends SubmersibleCamera {
         return null;
     }
 
-    @Override
-    @Deprecated
-    public void loadProjectionMatrix() {
-        glMatrixMode(GL_PROJECTION);
-        GL11.glLoadMatrixf(getProjectionMatrix().get(BufferUtils.createFloatBuffer(16)));
-        glMatrixMode(GL11.GL_MODELVIEW);
-    }
-
-    @Override
-    @Deprecated
-    public void loadModelViewMatrix() {
-        glMatrixMode(GL11.GL_MODELVIEW);
-        GL11.glLoadMatrixf(getViewMatrix().get(BufferUtils.createFloatBuffer(16)));
-    }
-
-    @Override
-    @Deprecated
-    public void loadNormalizedModelViewMatrix() {
-        glMatrixMode(GL11.GL_MODELVIEW);
-        GL11.glLoadMatrixf(normViewMatrix.get(BufferUtils.createFloatBuffer(16)));
-    }
 
     @Override
     public void update(float deltaT) {

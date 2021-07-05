@@ -52,7 +52,7 @@ public class CollectiveInterpreter {
     }
 
     public void tick(float delta) {
-        for(Actor actor : this.actors) {
+        for (Actor actor : this.actors) {
             actor.setDelta(delta);
         }
         if (treeRunner == null && tree != null) {
@@ -78,7 +78,7 @@ public class CollectiveInterpreter {
     @Override
     public String toString() {
         String returnString = "";
-        for(Actor actor : this.actors) {
+        for (Actor actor : this.actors) {
             if (actor.hasComponent(DisplayNameComponent.class)) {
                 returnString = returnString + actor.getComponent(DisplayNameComponent.class).name
                         + System.lineSeparator();

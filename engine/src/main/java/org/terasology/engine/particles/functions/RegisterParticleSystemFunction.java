@@ -10,7 +10,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * This annotation is used to mark a {@link ParticleSystemFunction} to be registered in by the {@link org.terasology.engine.particles.updating.ParticleUpdater}.
+ * This annotation is used to mark a {@link ParticleSystemFunction} to be registered in
+ * by the {@link org.terasology.engine.particles.updating.ParticleUpdater}.
  */
 @API
 @Retention(RetentionPolicy.RUNTIME)

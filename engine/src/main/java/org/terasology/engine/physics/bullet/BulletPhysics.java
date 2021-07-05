@@ -36,7 +36,6 @@ import com.google.api.client.util.Maps;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import gnu.trove.iterator.TFloatIterator;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
@@ -66,6 +65,7 @@ import org.terasology.engine.physics.engine.PhysicsSystem;
 import org.terasology.engine.physics.engine.RigidBody;
 import org.terasology.engine.physics.engine.SweepCallback;
 import org.terasology.engine.registry.CoreRegistry;
+import org.terasology.engine.rendering.assets.mesh.resource.VertexAttributeBinding;
 import org.terasology.engine.world.BlockEntityRegistry;
 import org.terasology.joml.geom.AABBf;
 
@@ -552,7 +552,8 @@ public class BulletPhysics implements PhysicsEngine {
                 return true;
             }
         } else {
-            logger.warn("Trying to create trigger for entity without ShapeComponent or without LocationComponent or without TriggerComponent. Entity: {}", entity);
+            logger.warn("Trying to create trigger for entity without ShapeComponent or without LocationComponent " +
+                    "or without TriggerComponent. Entity: {}", entity);
             return false;
         }
     }
@@ -743,16 +744,17 @@ public class BulletPhysics implements PhysicsEngine {
         }
         HullShapeComponent hull = entityRef.getComponent(HullShapeComponent.class);
         if (hull != null) {
-            FloatBuffer buffer = BufferUtils.createFloatBuffer(hull.sourceMesh.getVertices().size());
-            TFloatIterator iterator = hull.sourceMesh.getVertices().iterator();
-            int numPoints = 0;
-            while (iterator.hasNext()) {
-                numPoints++;
-                buffer.put(iterator.next());
-                buffer.put(iterator.next());
-                buffer.put(iterator.next());
+            VertexAttributeBinding<Vector3fc, Vector3f> positions = hull.sourceMesh.vertices();
+            final int numVertices = hull.sourceMesh.elementCount();
+            FloatBuffer buffer = BufferUtils.createFloatBuffer(numVertices * 3);
+            Vector3f pos = new Vector3f();
+            for (int i = 0; i < numVertices; i++) {
+                positions.get(i, pos);
+                buffer.put(pos.x);
+                buffer.put(pos.y);
+                buffer.put(pos.z);
             }
-            return new btConvexHullShape(buffer, numPoints, 3 * Float.BYTES);
+            return new btConvexHullShape(buffer, numVertices, 3 * Float.BYTES);
         }
         CharacterMovementComponent characterMovementComponent =
                 entityRef.getComponent(CharacterMovementComponent.class);

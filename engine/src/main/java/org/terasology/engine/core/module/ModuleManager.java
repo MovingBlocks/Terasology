@@ -36,10 +36,15 @@ import org.terasology.gestalt.naming.Name;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.ReflectPermission;
+import java.net.JarURLConnection;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.file.Path;
 import java.security.Policy;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -54,10 +59,10 @@ public class ModuleManager {
     private final PermissionProviderFactory wrappingPermissionProviderFactory =
             new WarnOnlyProviderFactory(permissionProviderFactory);
 
-    private final ModuleRegistry registry;
+    private final ModuleRegistry registry = new TableModuleRegistry();
     private ModuleEnvironment environment;
-    private final ModuleMetadataJsonAdapter metadataReader;
-    private final ModuleFactory moduleFactory;
+    private final ModuleMetadataJsonAdapter metadataReader = newMetadataReader();
+    private final ModuleFactory moduleFactory = newModuleFactory(metadataReader);
     private final ModuleInstallManager installManager;
     private final Module engineModule;
 
@@ -66,25 +71,10 @@ public class ModuleManager {
     }
 
     public ModuleManager(String masterServerAddress, List<Class<?>> classesOnClasspathsToAddToEngine) {
-        PathManager pathManager = PathManager.getInstance();  // get early so if it needs to initialize, it does it now
+        engineModule = loadAndConfigureEngineModule(moduleFactory, classesOnClasspathsToAddToEngine);
+        registry.add(engineModule);
 
-        metadataReader = newMetadataReader();
-
-        if (Boolean.getBoolean(LOAD_CLASSPATH_MODULES_PROPERTY)) {
-            moduleFactory = new ClasspathCompromisingModuleFactory();
-        } else {
-            moduleFactory = new ModuleFactory();
-        }
-        moduleFactory.setDefaultLibsSubpath("build/libs");
-
-        Map<String, ModuleMetadataLoader> mmlm = moduleFactory.getModuleMetadataLoaderMap();
-        mmlm.put(TerasologyConstants.MODULE_INFO_FILENAME.toString(), metadataReader);
-
-        registry = new TableModuleRegistry();
-
-        engineModule = loadEngineModule(classesOnClasspathsToAddToEngine);
-
-        loadModulesFromApplicationPath(pathManager);
+        loadModulesFromApplicationPath(PathManager.getInstance());
 
         ensureModulesDependOnEngine();
 
@@ -101,11 +91,29 @@ public class ModuleManager {
         this(config.getNetwork().getMasterServer(), classesOnClasspathsToAddToEngine);
     }
 
+    /** Create a ModuleFactory configured for Terasology modules. */
+    private static ModuleFactory newModuleFactory(ModuleMetadataJsonAdapter metadataReader) {
+        final ModuleFactory moduleFactory;
+        if (Boolean.getBoolean(LOAD_CLASSPATH_MODULES_PROPERTY)) {
+            moduleFactory = new ClasspathCompromisingModuleFactory();
+        } else {
+            moduleFactory = new ModuleFactory();
+        }
+        moduleFactory.setDefaultLibsSubpath("build/libs");
+
+        Map<String, ModuleMetadataLoader> mmlm = moduleFactory.getModuleMetadataLoaderMap();
+        mmlm.put(TerasologyConstants.MODULE_INFO_FILENAME.toString(), metadataReader);
+        return moduleFactory;
+    }
+
     /**
-     * I wondered why this is important, and found MovingBlocks/Terasology#1450.
-     * It's not a worry that the engine module wouldn't be loaded without it.
-     * It's about ordering: some things run in an order derived from the dependency
-     * tree, and we want to make sure engine is at the root of it.
+     * Ensure all modules declare a dependency on the engine module.
+     * <p>
+     * This is to ensure that the set of modules is a graph with a single root.
+     * We need this to ensure the engine is loaded <em>before</em> other modules
+     * when things iterate over the module list in dependency order.
+     * <p>
+     * See <a href="https://github.com/MovingBlocks/Terasology/issues/1450">#1450</a>.
      */
     private void ensureModulesDependOnEngine() {
         DependencyInfo engineDep = new DependencyInfo();
@@ -128,40 +136,61 @@ public class ModuleManager {
         scanner.scan(registry, paths);
     }
 
-    private Module loadEngineModule(List<Class<?>> classesOnClasspathsToAddToEngine) {
+    /**
+     * Load and configure the engine module.
+     * <p>
+     * The engine module is the parts of the engine which are available to be called directly
+     * from other modules. Unlike other modules, engine classes are on the classpath and not
+     * restricted by the ModuleClassLoader.
+     * <p>
+     * This function is static so it can be tested without needing a ModuleManager instance.
+     *
+     * @param moduleFactory used to create the module
+     * @param classesOnClasspathsToAddToEngine added to the module's reflections manifest
+     */
+    static Module loadAndConfigureEngineModule(ModuleFactory moduleFactory, List<Class<?>> classesOnClasspathsToAddToEngine) {
+        // Start by creating a gestalt Module for the Java package `org.terasology.engine`.
         Module packageModule = moduleFactory.createPackageModule("org.terasology.engine");
 
         // We need to add reflections from our subsystems and other classes.
-        ConfigurationBuilder config = new ConfigurationBuilder();
         Reflections packageReflections = packageModule.getModuleManifest();
-        Set<Scanner> scanners = packageReflections.getConfiguration().getScanners();
-        config.setScanners(scanners.toArray(new Scanner[0]));
+        ConfigurationBuilder config = reflectionsConfigurationFrom(packageReflections);
 
+        Collection<File> classPaths = new HashSet<>(packageModule.getClasspaths());
         for (Class<?> aClass : classesOnClasspathsToAddToEngine) {
-            config.addUrls(ClasspathHelper.forClass(aClass));
+            URL url = ClasspathHelper.forClass(aClass);
+            config.addUrls(url);  // include this in reflections scan
+            classPaths.add(urlToFile(url));  // also include in Module.moduleClasspaths
         }
 
-        // TODO: is this using reflections.cache?
-        Reflections reflectionsWithSubsystems = new Reflections(config);
-        packageReflections.merge(reflectionsWithSubsystems);
+        if (!config.getUrls().isEmpty()) {
+            Reflections reflectionsWithSubsystems = new Reflections(config);
+            packageReflections.merge(reflectionsWithSubsystems);
+        }
 
         // We need the class predicate to include classes in subsystems and whatnot. We can't change it in an
-        // existing module, so make a new one based on the one from the moduleFactory.
-        Module engine = new Module(
+        // existing module, so make a new one based on the one from the factory.
+        // TODO: expand the ModuleFactory interface to make this whole thing less awkward
+        return new Module(
                 packageModule.getMetadata(),
                 packageModule.getResources(),
-                Collections.emptyList(),
+                classPaths,
                 packageReflections,
-                packageModule.getClassPredicate().or(clazz ->
-                        reflectionsWithSubsystems.getConfiguration()
-                                .getUrls().contains(ClasspathHelper.forClass(clazz)))
+                clazz ->
+                        packageModule.getClassPredicate().test(clazz)
+                                || config.getUrls().contains(ClasspathHelper.forClass(clazz))
         );
-
-        registry.add(engine);
-        return engine;
     }
 
-    private ModuleMetadataJsonAdapter newMetadataReader() {
+    /** Create a new ConfigurationBuilder from an existing Reflections instance. */
+    private static ConfigurationBuilder reflectionsConfigurationFrom(Reflections packageReflections) {
+        ConfigurationBuilder config = new ConfigurationBuilder();
+        Set<Scanner> scanners = packageReflections.getConfiguration().getScanners();
+        config.setScanners(scanners.toArray(new Scanner[0]));
+        return config;
+    }
+
+    private static ModuleMetadataJsonAdapter newMetadataReader() {
         final ModuleMetadataJsonAdapter metadataJsonAdapter = new ModuleMetadataJsonAdapter();
         for (ModuleExtension ext : StandardModuleExtension.values()) {
             metadataJsonAdapter.registerExtension(ext.getKey(), ext.getValueType());
@@ -255,8 +284,10 @@ public class ModuleManager {
         return newEnvironment;
     }
 
+    @Deprecated/*(since="4.4.0")*/
     public ModuleMetadataJsonAdapter getModuleMetadataReader() {
-        // FIXME: is this used anywhere? (MTE?)
+        // FIXME: This has one use in MTE. Give MTE a better interface to use and remove
+        //     the accessor for this.
         return metadataReader;
     }
 
@@ -265,6 +296,30 @@ public class ModuleManager {
     }
 
     public PermissionProvider getPermissionProvider(Module module) {
-        return permissionProviderFactory.createPermissionProviderFor(module, module.getClassPredicate());
+        // TODO: This has only one usage. Audit to see if it's worth keeping.
+        return permissionProviderFactory.createPermissionProviderFor(
+                module,
+                x -> false  // modules (other than engine) never contain classpath classes
+        );
+    }
+
+    /** Convert URL to File, with support for {@code jar} URLs. */
+    private static File urlToFile(URL url) {
+        URL fileUrl = url;
+        if (url.getProtocol().equals("jar")) {
+            try {
+                JarURLConnection connection = (JarURLConnection) url.openConnection();
+                fileUrl = connection.getJarFileURL();
+                // despite the method name, openConnection doesn't open anything unless we
+                // call connect(), so we needn't clean up anything here.
+            } catch (IOException e) {
+                throw new RuntimeException("Failed to get file from " + url);
+            }
+        }
+        try {
+            return new File(fileUrl.toURI());
+        } catch (URISyntaxException e) {
+            throw new RuntimeException("Failed to get file from " + url, e);
+        }
     }
 }

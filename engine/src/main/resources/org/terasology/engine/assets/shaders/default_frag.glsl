@@ -4,8 +4,12 @@
 
 in vec4 v_color0;
 
+layout(location = 0) out vec4 outColor;
+layout(location = 1) out vec4 outNormal;
+layout(location = 2) out vec4 outLight;
+
 void main() {
-    gl_FragData[0].rgba = v_color0;
-    gl_FragData[1].rgba = vec4(0.5, 1.0, 0.5, 1.0);
-    gl_FragData[2].rgba = vec4(0.0, 0.0, 0.0, 0.0);
+    outColor = v_color0;
+    outNormal = vec4(0.5, 1.0, 0.5, 1.0);
+    outLight = vec4(0.0, 0.0, 0.0, 0.0);
 }

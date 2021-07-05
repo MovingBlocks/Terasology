@@ -27,10 +27,12 @@ public final class IconMeshFactory {
         if (region instanceof Asset) {
             ResourceUrn urn = ((Asset<?>) region).getUrn();
             if (urn.getFragmentName().isEmpty()) {
-                return Assets.get(new ResourceUrn(urn.getModuleName(), IconMeshDataProducer.ICON_DISCRIMINATOR, urn.getResourceName()), Mesh.class).get();
+                return Assets.get(new ResourceUrn(urn.getModuleName(), IconMeshDataProducer.ICON_DISCRIMINATOR,
+                        urn.getResourceName()), Mesh.class).get();
             } else {
                 Name fragName = new Name(urn.getResourceName().toString() + ResourceUrn.FRAGMENT_SEPARATOR + urn.getFragmentName().toString());
-                return Assets.get(new ResourceUrn(urn.getModuleName(), IconMeshDataProducer.ICON_DISCRIMINATOR, fragName), Mesh.class).get();
+                return Assets.get(new ResourceUrn(urn.getModuleName(), IconMeshDataProducer.ICON_DISCRIMINATOR,
+                        fragName), Mesh.class).get();
             }
         } else {
             return generateIconMesh(region);
@@ -127,15 +129,18 @@ public final class IconMeshFactory {
                             }
 
                             if (newA < alphaLimit) {
-                                Vector4f cColor = new Vector4f(colorContour.x / 255f, colorContour.y / 255f, colorContour.z / 255f, colorContour.w);
-                                TessellatorHelper.addBlockMesh(tessellator, cColor, 0.125f, 1.0f, 0.5f, 2f * 0.0625f * newX - 0.5f, 0.125f * (15 - newY) - 1f, 0f);
+                                Vector4f cColor = new Vector4f(colorContour.x / 255f,
+                                        colorContour.y / 255f,
+                                        colorContour.z / 255f, colorContour.w);
+                                TessellatorHelper.addBlockMesh(tessellator, cColor, 0.125f, 1.0f, 0.5f,
+                                        2f * 0.0625f * newX - 0.5f, 0.125f * (15 - newY) - 1f, 0f);
                             }
                         }
                     }
                 }
             }
         }
-        return tessellator.generateMeshData();
+        return tessellator.buildMeshData();
     }
 
 }
