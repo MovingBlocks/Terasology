@@ -212,6 +212,10 @@ public class RemoteChunkProvider implements ChunkProvider {
         }
 
         private int score(PositionFuture<?> task) {
+            if (!localPlayer.isValid()) {
+                return 1;
+            }
+
             return (int) Chunks.toChunkPos(localPlayer.getPosition(new Vector3f()), new Vector3i()).distance(task.getPosition());
         }
     }
