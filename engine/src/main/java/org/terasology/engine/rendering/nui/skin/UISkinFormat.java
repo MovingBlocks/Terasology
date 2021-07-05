@@ -12,28 +12,28 @@ import com.google.gson.JsonParseException;
 import com.google.gson.stream.JsonReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.assets.ResourceUrn;
-import org.terasology.assets.format.AbstractAssetFileFormat;
-import org.terasology.assets.format.AssetDataFile;
-import org.terasology.assets.module.annotations.RegisterAssetFileFormat;
 import org.terasology.engine.core.module.ModuleContext;
-import org.terasology.nui.Color;
-import org.terasology.nui.UITextureRegion;
-import org.terasology.nui.UIWidget;
-import org.terasology.nui.asset.font.Font;
-import org.terasology.nui.skin.UISkin;
-import org.terasology.nui.skin.UISkinBuilder;
-import org.terasology.nui.skin.UISkinData;
-import org.terasology.nui.skin.UIStyleFragment;
 import org.terasology.engine.persistence.typeHandling.extensionTypes.ColorTypeHandler;
 import org.terasology.engine.persistence.typeHandling.gson.GsonTypeHandlerAdapterFactory;
-import org.terasology.reflection.metadata.ClassLibrary;
-import org.terasology.reflection.metadata.ClassMetadata;
 import org.terasology.engine.registry.CoreRegistry;
 import org.terasology.engine.rendering.nui.NUIManager;
 import org.terasology.engine.utilities.Assets;
 import org.terasology.engine.utilities.gson.AssetTypeAdapter;
 import org.terasology.engine.utilities.gson.CaseInsensitiveEnumTypeAdapterFactory;
+import org.terasology.gestalt.assets.ResourceUrn;
+import org.terasology.gestalt.assets.format.AbstractAssetFileFormat;
+import org.terasology.gestalt.assets.format.AssetDataFile;
+import org.terasology.gestalt.assets.module.annotations.RegisterAssetFileFormat;
+import org.terasology.nui.Color;
+import org.terasology.nui.UITextureRegion;
+import org.terasology.nui.UIWidget;
+import org.terasology.nui.asset.font.Font;
+import org.terasology.nui.reflection.WidgetLibrary;
+import org.terasology.nui.skin.UISkinAsset;
+import org.terasology.nui.skin.UISkinBuilder;
+import org.terasology.nui.skin.UISkinData;
+import org.terasology.nui.skin.UIStyleFragment;
+import org.terasology.reflection.metadata.ClassMetadata;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -42,8 +42,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-/**
- */
 @RegisterAssetFileFormat
 public class UISkinFormat extends AbstractAssetFileFormat<UISkinData> {
 
@@ -98,7 +96,7 @@ public class UISkinFormat extends AbstractAssetFileFormat<UISkinData> {
                 UISkinBuilder builder = new UISkinBuilder();
                 DefaultInfo defaultInfo = context.deserialize(json, DefaultInfo.class);
                 defaultInfo.apply(builder);
-                return builder.build();
+                return new UISkinData(builder.build());
             }
             return null;
         }
@@ -112,9 +110,9 @@ public class UISkinFormat extends AbstractAssetFileFormat<UISkinData> {
         public void apply(UISkinBuilder builder) {
             super.apply(builder);
             if (inherit != null) {
-                Optional<? extends UISkin> skin = Assets.get(inherit, UISkin.class);
+                Optional<? extends UISkinAsset> skin = Assets.get(inherit, UISkinAsset.class);
                 if (skin.isPresent()) {
-                    builder.setBaseSkin(skin.get());
+                    builder.setBaseSkin(skin.get().getSkin());
                 }
             }
             if (families != null) {
@@ -133,7 +131,7 @@ public class UISkinFormat extends AbstractAssetFileFormat<UISkinData> {
             super.apply(builder);
             if (elements != null) {
                 for (Map.Entry<String, ElementInfo> entry : elements.entrySet()) {
-                    ClassLibrary<UIWidget> library = CoreRegistry.get(NUIManager.class).getWidgetMetadataLibrary();
+                    WidgetLibrary library = CoreRegistry.get(NUIManager.class).getWidgetMetadataLibrary();
                     ClassMetadata<? extends UIWidget, ?> metadata = library.resolve(entry.getKey(), ModuleContext.getContext());
                     if (metadata != null) {
                         builder.setElementClass(metadata.getType());

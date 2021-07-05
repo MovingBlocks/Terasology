@@ -17,7 +17,6 @@ import org.terasology.engine.world.ChunkView;
 import org.terasology.engine.world.WorldProvider;
 import org.terasology.engine.world.chunks.Chunk;
 import org.terasology.engine.world.chunks.Chunks;
-import org.terasology.engine.world.chunks.RenderableChunk;
 import org.terasology.engine.world.chunks.pipeline.ChunkTask;
 import org.terasology.engine.world.chunks.pipeline.ShutdownChunkTask;
 
@@ -38,9 +37,9 @@ public final class ChunkMeshUpdateManager {
     private static final Logger logger = LoggerFactory.getLogger(ChunkMeshUpdateManager.class);
 
     /* CHUNK UPDATES */
-    private final Set<RenderableChunk> chunksProcessing = Collections.newSetFromMap(new ConcurrentHashMap<>());
+    private final Set<Chunk> chunksProcessing = Collections.newSetFromMap(new ConcurrentHashMap<>());
 
-    private final BlockingDeque<RenderableChunk> chunksComplete = Queues.newLinkedBlockingDeque();
+    private final BlockingDeque<Chunk> chunksComplete = Queues.newLinkedBlockingDeque();
 
     private TaskMaster<ChunkTask> chunkUpdater;
 
@@ -58,7 +57,7 @@ public final class ChunkMeshUpdateManager {
         this.tessellator = tessellator;
         this.worldProvider = worldProvider;
 
-        chunkUpdater = TaskMaster.createDynamicPriorityTaskMaster("Chunk-Updater", NUM_TASK_THREADS, new ChunkUpdaterComparator());
+        chunkUpdater = TaskMaster.createPriorityTaskMaster("Chunk-Updater", NUM_TASK_THREADS, 100, new ChunkUpdaterComparator());
     }
 
     /**
@@ -69,7 +68,7 @@ public final class ChunkMeshUpdateManager {
      * @return True if a chunk update was executed
      */
     // TODO: Review this system
-    public boolean queueChunkUpdate(RenderableChunk chunk) {
+    public boolean queueChunkUpdate(Chunk chunk) {
 
         if (!chunksProcessing.contains(chunk)) {
             executeChunkUpdate(chunk);
@@ -91,14 +90,14 @@ public final class ChunkMeshUpdateManager {
         cameraChunkPosZ = chunkPos.z;
     }
 
-    public List<RenderableChunk> availableChunksForUpdate() {
-        List<RenderableChunk> result = Lists.newArrayListWithExpectedSize(chunksComplete.size());
+    public List<Chunk> availableChunksForUpdate() {
+        List<Chunk> result = Lists.newArrayListWithExpectedSize(chunksComplete.size());
         chunksComplete.drainTo(result);
         chunksProcessing.removeAll(result);
         return result;
     }
 
-    private void executeChunkUpdate(final RenderableChunk c) {
+    private void executeChunkUpdate(final Chunk c) {
         chunksProcessing.add(c);
 
         ChunkUpdateTask task = new ChunkUpdateTask(c, tessellator, worldProvider, this);
@@ -109,7 +108,7 @@ public final class ChunkMeshUpdateManager {
         }
     }
 
-    private void finishedProcessing(RenderableChunk c) {
+    private void finishedProcessing(Chunk c) {
         chunksComplete.add(c);
     }
 
@@ -120,12 +119,12 @@ public final class ChunkMeshUpdateManager {
 
     private static class ChunkUpdateTask implements ChunkTask {
 
-        private RenderableChunk c;
+        private Chunk c;
         private ChunkTessellator tessellator;
         private WorldProvider worldProvider;
         private ChunkMeshUpdateManager chunkMeshUpdateManager;
 
-        ChunkUpdateTask(RenderableChunk chunk, ChunkTessellator tessellator, WorldProvider worldProvider, ChunkMeshUpdateManager chunkMeshUpdateManager) {
+        ChunkUpdateTask(Chunk chunk, ChunkTessellator tessellator, WorldProvider worldProvider, ChunkMeshUpdateManager chunkMeshUpdateManager) {
             this.chunkMeshUpdateManager = chunkMeshUpdateManager;
             this.c = chunk;
             this.tessellator = tessellator;

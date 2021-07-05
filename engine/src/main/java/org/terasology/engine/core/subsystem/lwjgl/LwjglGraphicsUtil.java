@@ -1,18 +1,5 @@
-/*
- * Copyright 2015 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.core.subsystem.lwjgl;
 
 import org.lwjgl.BufferUtils;
@@ -40,9 +27,7 @@ import static org.lwjgl.opengl.GL11.GL_REPEAT;
 import static org.lwjgl.opengl.GL11.glDepthFunc;
 import static org.lwjgl.opengl.GL11.glEnable;
 
-/**
- *
- */
+
 public final class LwjglGraphicsUtil {
     private LwjglGraphicsUtil() {
     }
@@ -127,20 +112,22 @@ public final class LwjglGraphicsUtil {
                 capabilities.OpenGL14,
                 capabilities.OpenGL15,
                 capabilities.OpenGL20,
-                capabilities.OpenGL21,   // needed as we use GLSL 1.20
+                capabilities.OpenGL21,
+                capabilities.OpenGL30,
+                capabilities.OpenGL32,
+                capabilities.OpenGL33,
+        };
 
-                capabilities.GL_ARB_framebuffer_object,  // Extensions eventually included in
-                capabilities.GL_ARB_texture_float,       // OpenGl 3.0 according to
-                capabilities.GL_ARB_half_float_pixel};   // http://en.wikipedia.org/wiki/OpenGL#OpenGL_3.0
-
-        String[] capabilityNames = {"OpenGL12",
+        String[] capabilityNames = {
+                "OpenGL12",
                 "OpenGL14",
                 "OpenGL15",
                 "OpenGL20",
                 "OpenGL21",
-                "GL_ARB_framebuffer_object",
-                "GL_ARB_texture_float",
-                "GL_ARB_half_float_pixel"};
+                "OpenGL30",
+                "OpenGL32",
+                "OpenGL33",
+        };
 
         boolean canRunTheGame = true;
         StringBuilder missingCapabilitiesMessage = new StringBuilder();

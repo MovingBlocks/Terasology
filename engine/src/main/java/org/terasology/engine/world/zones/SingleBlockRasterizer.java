@@ -2,10 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.world.zones;
 
-import org.terasology.engine.world.chunks.CoreChunk;
+import org.terasology.engine.world.chunks.Chunk;
 import org.terasology.engine.world.generation.Region;
 import org.terasology.engine.world.generation.WorldRasterizer;
-import org.terasology.module.sandbox.API;
+import org.terasology.gestalt.module.sandbox.API;
 import org.terasology.engine.registry.CoreRegistry;
 import org.terasology.engine.world.block.Block;
 import org.terasology.engine.world.block.BlockManager;
@@ -33,7 +33,7 @@ public class SingleBlockRasterizer implements WorldRasterizer {
     }
 
     @Override
-    public void generateChunk(CoreChunk chunk, Region chunkRegion) {
+    public void generateChunk(Chunk chunk, Region chunkRegion) {
         for (int chunkX = 0; chunkX < chunk.getChunkSizeX(); chunkX++) {
             for (int chunkZ = 0; chunkZ < chunk.getChunkSizeZ(); chunkZ++) {
                 for (int chunkY = 0; chunkY < chunk.getChunkSizeY(); chunkY++) {

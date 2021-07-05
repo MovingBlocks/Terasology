@@ -5,7 +5,7 @@ package org.terasology.engine.rendering.primitives;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
-import org.terasology.module.sandbox.API;
+import org.terasology.gestalt.module.sandbox.API;
 
 @API
 public final class TessellatorHelper {
@@ -13,7 +13,8 @@ public final class TessellatorHelper {
     private TessellatorHelper() {
     }
 
-    public static void addBlockMesh(Tessellator tessellator, Vector4f color, float size, float light1, float light2, float posX, float posY, float posZ) {
+    public static void addBlockMesh(Tessellator tessellator, Vector4f color, float size,
+                                    float light1, float light2, float posX, float posY, float posZ) {
         Vector2f defaultSize = new Vector2f(1.0f, 1.0f);
         Vector2f defaultOffset = new Vector2f(0.0f, 0.0f);
         addBlockMesh(tessellator, color, defaultOffset, defaultSize, size, light1, light2, posX, posY, posZ);

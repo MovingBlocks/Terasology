@@ -4,13 +4,13 @@
 package org.terasology.engine.input.internal;
 
 import com.google.common.collect.Lists;
+import org.joml.Vector3f;
+import org.joml.Vector3i;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.input.BindAxisEvent;
 import org.terasology.engine.input.BindAxisSubscriber;
 import org.terasology.engine.input.BindableAxis;
 import org.terasology.engine.input.SendEventMode;
-import org.joml.Vector3f;
-import org.joml.Vector3i;
 
 import java.util.List;
 

@@ -3,15 +3,15 @@
 package org.terasology.engine.logic.behavior.core;
 
 import org.terasology.engine.logic.behavior.BehaviorAction;
-import org.terasology.module.sandbox.API;
+import org.terasology.gestalt.module.sandbox.API;
 
 /**
  * BaseAction that uses BehaviorAction annotation as its name.
  */
 @API
 public abstract class BaseAction implements Action {
-    private transient int id;
     protected transient boolean constructed;
+    private transient int id;
 
     @Override
     public void setup() {

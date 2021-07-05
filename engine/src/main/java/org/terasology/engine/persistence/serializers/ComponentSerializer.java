@@ -16,7 +16,7 @@ import org.terasology.engine.entitySystem.metadata.ComponentMetadata;
 import org.terasology.engine.entitySystem.metadata.ReplicatedFieldMetadata;
 import org.terasology.engine.persistence.typeHandling.protobuf.ProtobufPersistedData;
 import org.terasology.engine.persistence.typeHandling.protobuf.ProtobufPersistedDataSerializer;
-import org.terasology.module.Module;
+import org.terasology.gestalt.module.Module;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.Serializer;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
@@ -153,7 +153,8 @@ public class ComponentSerializer {
      * @param context       The module this component is being deserialized from, or null if it isn't within a module
      * @return The target component.
      */
-    public Component deserializeOnto(Component target, EntityData.Component componentData, FieldSerializeCheck<Component> fieldCheck, Module context) {
+    public Component deserializeOnto(Component target, EntityData.Component componentData,
+                                     FieldSerializeCheck<Component> fieldCheck, Module context) {
         ComponentMetadata<? extends Component> componentMetadata = getComponentMetadata(componentData, context);
         if (componentMetadata != null) {
             return deserializeOnto(target, componentData, componentMetadata, fieldCheck);
@@ -178,7 +179,7 @@ public class ComponentSerializer {
             if (fieldInfo != null) {
                 dataMap.put(fieldInfo, new ProtobufPersistedData(field.getValue()));
             } else if (field.hasName()) {
-                logger.warn("Cannot deserialize unknown field '{}' onto '{}'", field.getName(), componentMetadata.getUri());
+                logger.warn("Cannot deserialize unknown field '{}' onto '{}'", field.getName(), componentMetadata.getId());
             }
         }
         serializer.deserializeOnto(targetComponent, dataMap, fieldCheck);
@@ -235,7 +236,7 @@ public class ComponentSerializer {
         if (compId != null) {
             componentMessage.setTypeIndex(compId);
         } else {
-            componentMessage.setType(componentMetadata.getUri().toString());
+            componentMessage.setType(componentMetadata.getId().toString());
         }
     }
 

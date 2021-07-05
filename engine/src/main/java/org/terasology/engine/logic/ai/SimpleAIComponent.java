@@ -2,11 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.logic.ai;
 
-import org.terasology.engine.entitySystem.Component;
 import org.joml.Vector3f;
+import org.terasology.engine.entitySystem.Component;
 
-/**
- */
 public final class SimpleAIComponent implements Component {
 
     public long lastChangeOfDirectionAt;

@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.rendering.nui.layers.mainMenu.gameDetailsScreen;
 
-import org.terasology.module.Module;
-import org.terasology.module.ModuleMetadata;
+import org.terasology.gestalt.module.Module;
+import org.terasology.gestalt.module.ModuleMetadata;
 
 /**
  * Contains objects that used by {@link GameDetailsScreen} to select a module on tab Modules.

@@ -5,10 +5,10 @@ package org.terasology.engine.rendering.nui.layers.mainMenu;
 import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.assets.ResourceUrn;
+import org.terasology.engine.core.module.ModuleManager;
+import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.context.Context;
-import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.engine.rendering.assets.texture.Texture;
 import org.terasology.engine.rendering.assets.texture.TextureData;
 import org.terasology.engine.rendering.nui.animation.MenuAnimationSystems;
@@ -16,8 +16,8 @@ import org.terasology.engine.rendering.nui.layers.mainMenu.preview.FacetLayerPre
 import org.terasology.engine.rendering.nui.layers.mainMenu.preview.PreviewGenerator;
 import org.terasology.engine.rendering.world.WorldSetupWrapper;
 import org.terasology.math.TeraMath;
-import org.terasology.module.ModuleEnvironment;
-import org.terasology.naming.Name;
+import org.terasology.gestalt.module.ModuleEnvironment;
+import org.terasology.gestalt.naming.Name;
 import org.terasology.nui.WidgetUtil;
 import org.terasology.nui.databinding.Binding;
 import org.terasology.nui.widgets.UIDropdownScrollable;
@@ -124,7 +124,8 @@ public class WorldPreGenerationScreen extends CoreScreenLayer implements UISlide
                 selectedWorld = value;
                 try {
                     if (findWorldByName(selectedWorld).getWorldGenerator() == null) {
-                        worldGenerator = WorldGeneratorManager.createWorldGenerator(findWorldByName(selectedWorld).getWorldGeneratorInfo().getUri(), context, environment);
+                        worldGenerator = WorldGeneratorManager.createWorldGenerator(findWorldByName(selectedWorld)
+                                .getWorldGeneratorInfo().getUri(), context, environment);
                         findWorldByName(selectedWorld).setWorldGenerator(worldGenerator);
                     } else {
                         worldGenerator = findWorldByName(selectedWorld).getWorldGenerator();
@@ -158,7 +159,8 @@ public class WorldPreGenerationScreen extends CoreScreenLayer implements UISlide
                     worldSetupScreen.setWorld(context, findWorldByName(selectedWorld), worldsDropdown);
                     triggerForwardAnimation(worldSetupScreen);
                 } else {
-                    getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Worlds List Empty!", "No world found to configure.");
+                    getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class)
+                            .setMessage("Worlds List Empty!", "No world found to configure.");
                 }
             } catch (UnresolvedWorldGeneratorException e) {
                 e.printStackTrace();
@@ -166,7 +168,8 @@ public class WorldPreGenerationScreen extends CoreScreenLayer implements UISlide
         });
 
         WidgetUtil.trySubscribe(this, "close", button -> {
-            final UniverseSetupScreen universeSetupScreen = getManager().createScreen(UniverseSetupScreen.ASSET_URI, UniverseSetupScreen.class);
+            final UniverseSetupScreen universeSetupScreen =
+                    getManager().createScreen(UniverseSetupScreen.ASSET_URI, UniverseSetupScreen.class);
             UIDropdownScrollable worldsDropdownOfUniverse = universeSetupScreen.find("worlds", UIDropdownScrollable.class);
             universeSetupScreen.refreshWorldDropdown(worldsDropdownOfUniverse);
             triggerBackAnimation();
@@ -183,7 +186,8 @@ public class WorldPreGenerationScreen extends CoreScreenLayer implements UISlide
 
         try {
             if (findWorldByName(selectedWorld).getWorldGenerator() == null) {
-                worldGenerator = WorldGeneratorManager.createWorldGenerator(findWorldByName(selectedWorld).getWorldGeneratorInfo().getUri(), context, environment);
+                worldGenerator = WorldGeneratorManager.createWorldGenerator(findWorldByName(selectedWorld)
+                        .getWorldGeneratorInfo().getUri(), context, environment);
                 findWorldByName(selectedWorld).setWorldGenerator(worldGenerator);
             } else {
                 worldGenerator = findWorldByName(selectedWorld).getWorldGenerator();
@@ -197,7 +201,7 @@ public class WorldPreGenerationScreen extends CoreScreenLayer implements UISlide
             e.printStackTrace();
         }
     }
-    
+
     /**
      * Set seletedWorld when configure from WorldPreGenerationScreen
      * @param newNameToSet

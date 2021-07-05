@@ -1,18 +1,5 @@
-/*
- * Copyright 2013 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.core.modes;
 
 import org.terasology.engine.audio.AudioManager;
@@ -32,12 +19,9 @@ import org.terasology.engine.identity.storageServiceClient.StorageServiceWorker;
 import org.terasology.engine.input.InputSystem;
 import org.terasology.engine.input.cameraTarget.CameraTargetSystem;
 import org.terasology.engine.logic.console.Console;
-import org.terasology.module.Module;
-import org.terasology.module.ModuleEnvironment;
 import org.terasology.engine.monitoring.PerformanceMonitor;
 import org.terasology.engine.network.NetworkMode;
 import org.terasology.engine.network.NetworkSystem;
-import org.terasology.nui.databinding.ReadOnlyBinding;
 import org.terasology.engine.persistence.StorageManager;
 import org.terasology.engine.physics.engine.PhysicsEngine;
 import org.terasology.engine.rendering.nui.NUIManager;
@@ -45,6 +29,9 @@ import org.terasology.engine.rendering.nui.layers.mainMenu.MessagePopup;
 import org.terasology.engine.rendering.world.WorldRenderer;
 import org.terasology.engine.rendering.world.WorldRenderer.RenderingStage;
 import org.terasology.engine.world.chunks.ChunkProvider;
+import org.terasology.gestalt.module.Module;
+import org.terasology.gestalt.module.ModuleEnvironment;
+import org.terasology.nui.databinding.ReadOnlyBinding;
 
 import java.util.Collections;
 

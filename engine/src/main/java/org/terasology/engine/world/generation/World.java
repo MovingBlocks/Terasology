@@ -3,12 +3,10 @@
 package org.terasology.engine.world.generation;
 
 import org.terasology.engine.world.block.BlockRegion;
-import org.terasology.engine.world.chunks.CoreChunk;
+import org.terasology.engine.world.chunks.Chunk;
 
 import java.util.Set;
 
-/**
- */
 public interface World {
 
     Region getWorldData(BlockRegion region, float scale);
@@ -23,9 +21,9 @@ public interface World {
      */
     int getSeaLevel();
 
-    void rasterizeChunk(CoreChunk chunk, EntityBuffer buffer);
+    void rasterizeChunk(Chunk chunk, EntityBuffer buffer);
 
-    void rasterizeChunk(CoreChunk chunk, float scale);
+    void rasterizeChunk(Chunk chunk, float scale);
 
     /**
      * @return a <b>new</b> set containing all facet classes

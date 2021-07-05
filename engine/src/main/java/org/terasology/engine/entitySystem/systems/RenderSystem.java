@@ -1,18 +1,5 @@
-/*
- * Copyright 2013 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.entitySystem.systems;
 
 /**
@@ -26,21 +13,21 @@ public interface RenderSystem extends ComponentSystem {
     /**
      * Called with an OpenGL state useful to the rendering of opaque objects. See OpaqueObjectsNode for more information.
      */
-    void renderOpaque();
+    default void renderOpaque() {};
 
     /**
      * Called with an OpenGL state useful to the rendering of alpha blended objects. See SimpleBlendMaterialsNode for more information.
      */
-    void renderAlphaBlend();
+    default void renderAlphaBlend() {};
 
     /**
      * Called with an OpenGL state useful to the rendering of overlays. See OverlaysNode for more information.
      */
-    void renderOverlay();
+    default void renderOverlay() {};
 
     /**
-     * Currently not used.
+     * @deprecated Currently not used.
      */
     @Deprecated
-    void renderShadows();
+    default void renderShadows() {};
 }

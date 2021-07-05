@@ -9,9 +9,7 @@ import org.terasology.nui.Colorc;
 
 import java.nio.FloatBuffer;
 
-/**
- *
- */
+
 public final class LineRenderer {
 
     private LineRenderer() {
@@ -199,7 +197,7 @@ public final class LineRenderer {
                     bRed, bGreen, bBlue,
                     bRed, bGreen, bBlue
                 };
-            GL11.glColorPointer(3, 0,0, wrap(lineColor));
+            GL11.glColorPointer(3, 0, 0, wrap(lineColor));
         } else {
             float[] lineColor =
                 {
@@ -212,7 +210,7 @@ public final class LineRenderer {
                     cRed, cGreen, cBlue, 0,
                     cRed, cGreen, cBlue, 0
                 };
-            GL11.glColorPointer(4, 0,0, wrap(lineColor));
+            GL11.glColorPointer(4, 0, 0, wrap(lineColor));
         }
 
         if ((Math.abs(dx) < epsilon || Math.abs(dy) < epsilon) && width <= 1.0) {

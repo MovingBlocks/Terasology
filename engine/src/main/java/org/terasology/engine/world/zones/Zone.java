@@ -4,8 +4,8 @@ package org.terasology.engine.world.zones;
 
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
+import org.terasology.engine.world.chunks.Chunk;
 import org.terasology.engine.world.chunks.Chunks;
-import org.terasology.engine.world.chunks.CoreChunk;
 import org.terasology.engine.world.generation.EntityBuffer;
 import org.terasology.engine.world.generation.EntityProvider;
 import org.terasology.engine.world.generation.FacetProvider;
@@ -14,7 +14,7 @@ import org.terasology.engine.world.generation.WorldBuilder;
 import org.terasology.engine.world.generation.WorldRasterizer;
 import org.terasology.engine.world.generator.WorldGenerator;
 import org.terasology.engine.world.viewer.layers.FacetLayer;
-import org.terasology.module.sandbox.API;
+import org.terasology.gestalt.module.sandbox.API;
 import org.terasology.engine.rendering.nui.layers.mainMenu.preview.FacetLayerPreview;
 import org.terasology.engine.rendering.nui.layers.mainMenu.preview.PreviewGenerator;
 import org.terasology.engine.world.block.Block;
@@ -104,10 +104,10 @@ public class Zone extends ProviderStore implements WorldRasterizer, EntityProvid
      *
      * This will only change blocks for which {@link #containsBlock(int, int, int, Region)} returns true.
      *
-     * @see WorldRasterizer#generateChunk(CoreChunk, Region)
+     * @see WorldRasterizer#generateChunk(Chunk, Region)
      */
     @Override
-    public void generateChunk(CoreChunk chunk, Region chunkRegion) {
+    public void generateChunk(Chunk chunk, Region chunkRegion) {
         Block[][][] savedBlocks = new Block[Chunks.SIZE_X][Chunks.SIZE_Y][Chunks.SIZE_Z];
         boolean changeAllBlocks = true;
         boolean saveAllBlocks = true;
@@ -118,7 +118,7 @@ public class Zone extends ProviderStore implements WorldRasterizer, EntityProvid
 
         //Save the blocks that aren't in the zone
         for (int x = 0; x < Chunks.SIZE_X; x++) {
-            for (int y = 0; y <Chunks.SIZE_Y; y++) {
+            for (int y = 0; y < Chunks.SIZE_Y; y++) {
                 for (int z = 0; z < Chunks.SIZE_Z; z++) {
                     if (!containsBlock(x + offsetX, y + offsetY, z + offsetZ, chunkRegion)) {
                         savedBlocks[x][y][z] = chunk.getBlock(x, y, z);

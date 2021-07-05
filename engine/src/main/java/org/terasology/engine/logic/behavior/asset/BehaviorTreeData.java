@@ -2,11 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.logic.behavior.asset;
 
-import org.terasology.assets.AssetData;
+import org.terasology.gestalt.assets.AssetData;
 import org.terasology.engine.logic.behavior.core.BehaviorNode;
 
-/**
- */
 public class BehaviorTreeData implements AssetData {
     private BehaviorNode root;
 

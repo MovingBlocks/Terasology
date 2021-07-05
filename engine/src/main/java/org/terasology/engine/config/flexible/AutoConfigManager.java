@@ -6,12 +6,12 @@ import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.context.Context;
+import org.terasology.engine.core.PathManager;
 import org.terasology.engine.core.SimpleUri;
 import org.terasology.engine.core.module.ModuleManager;
-import org.terasology.engine.core.paths.PathManager;
 import org.terasology.engine.registry.InjectionHelper;
 import org.terasology.engine.utilities.ReflectionUtil;
-import org.terasology.module.ModuleEnvironment;
+import org.terasology.gestalt.module.ModuleEnvironment;
 import org.terasology.persistence.serializers.Serializer;
 import org.terasology.reflection.TypeInfo;
 
@@ -26,13 +26,15 @@ import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
 
+import static com.google.common.base.Verify.verifyNotNull;
+
 /**
  * Loads, Saves and Stores {@link AutoConfig}s
  */
 public class AutoConfigManager {
     private static final Logger logger = LoggerFactory.getLogger(AutoConfigManager.class);
 
-    private final Set<AutoConfig> loadedConfigs = Sets.newHashSet();
+    private final Set<AutoConfig> loadedConfigs = Sets.newLinkedHashSet();
     private final Serializer<?> serializer;
 
     public AutoConfigManager(Serializer<?> serializer) {
@@ -48,7 +50,9 @@ public class AutoConfigManager {
                 continue;
             }
 
-            SimpleUri configId = ReflectionUtil.getFullyQualifiedSimpleUriFor(configClass, environment);
+            SimpleUri configId = verifyNotNull(ReflectionUtil.getFullyQualifiedSimpleUriFor(configClass, environment),
+                    "Could not find ID for %s", configClass.getSimpleName()
+            );
             loadConfig(configClass, configId, context);
         }
     }
@@ -80,7 +84,7 @@ public class AutoConfigManager {
         try (InputStream inputStream = Files.newInputStream(configPath, StandardOpenOption.READ)) {
             T loadedConfig = (T) serializer.deserialize(TypeInfo.of(configClass), inputStream).get();
             mergeConfig(configClass, loadedConfig, config);
-        } catch (IOException e) {
+        } catch (Exception e) {
             logger.error("Error while loading config {} from disk", config.getId(), e);
         }
     }
@@ -108,8 +112,9 @@ public class AutoConfigManager {
     private void saveConfigToDisk(AutoConfig config) {
         // TODO: Save when screen for config closed
         Path configPath = getConfigPath(config.getId());
-        try (OutputStream output = Files.newOutputStream(configPath, StandardOpenOption.CREATE)) {
-            serializer.serialize(config, TypeInfo.of(AutoConfig.class), output);
+        try (OutputStream output = Files.newOutputStream(configPath, StandardOpenOption.TRUNCATE_EXISTING,
+                StandardOpenOption.CREATE)) {
+            serializer.serialize(config, TypeInfo.of((Class<AutoConfig>) config.getClass()), output);
         } catch (IOException e) {
             logger.error("Error while saving config {} to disk", config.getId(), e);
         }

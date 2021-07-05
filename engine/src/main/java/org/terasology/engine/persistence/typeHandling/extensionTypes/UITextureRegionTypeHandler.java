@@ -4,7 +4,7 @@ package org.terasology.engine.persistence.typeHandling.extensionTypes;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.assets.Asset;
+import org.terasology.gestalt.assets.Asset;
 import org.terasology.engine.rendering.assets.texture.TextureRegionAsset;
 import org.terasology.engine.utilities.Assets;
 import org.terasology.nui.UITextureRegion;
@@ -12,8 +12,6 @@ import org.terasology.persistence.typeHandling.StringRepresentationTypeHandler;
 
 import java.util.Optional;
 
-/**
- */
 // NOTE: This is a copy of TextureRegionTypeHandler that is to be used with UITextureRegions
 public class UITextureRegionTypeHandler extends StringRepresentationTypeHandler<UITextureRegion> {
     private static final Logger logger = LoggerFactory.getLogger(UITextureRegionTypeHandler.class);

@@ -23,17 +23,17 @@ import org.terasology.engine.entitySystem.systems.RegisterMode;
 import org.terasology.engine.entitySystem.systems.RegisterSystem;
 import org.terasology.engine.entitySystem.systems.RenderSystem;
 import org.terasology.engine.entitySystem.systems.UpdateSubscriberSystem;
+import org.terasology.engine.logic.location.Location;
+import org.terasology.engine.logic.location.LocationComponent;
+import org.terasology.engine.registry.In;
 import org.terasology.engine.rendering.assets.animation.MeshAnimation;
 import org.terasology.engine.rendering.assets.animation.MeshAnimationFrame;
 import org.terasology.engine.rendering.assets.material.Material;
 import org.terasology.engine.rendering.assets.skeletalmesh.Bone;
 import org.terasology.engine.rendering.opengl.OpenGLSkeletalMesh;
 import org.terasology.engine.rendering.world.WorldRenderer;
-import org.terasology.joml.geom.AABBf;
-import org.terasology.engine.logic.location.Location;
-import org.terasology.engine.logic.location.LocationComponent;
-import org.terasology.engine.registry.In;
 import org.terasology.engine.utilities.Assets;
+import org.terasology.joml.geom.AABBf;
 
 import java.nio.FloatBuffer;
 import java.util.Arrays;
@@ -49,8 +49,6 @@ import static org.lwjgl.opengl.GL11.glPopMatrix;
 import static org.lwjgl.opengl.GL11.glPushMatrix;
 import static org.lwjgl.opengl.GL11.glVertex3f;
 
-/**
- */
 @RegisterSystem(RegisterMode.CLIENT)
 public class SkeletonRenderer extends BaseComponentSystem implements RenderSystem, UpdateSubscriberSystem {
 
@@ -170,11 +168,9 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
         entity.saveComponent(skeletalMeshComp);
     }
 
-
     private float getDurationOfAnimation(SkeletalMeshComponent skeletalMeshComp) {
         return skeletalMeshComp.animation.getTimePerFrame() * (skeletalMeshComp.animation.getFrameCount() - 1);
     }
-
 
     private static MeshAnimation randomAnimationData(SkeletalMeshComponent skeletalMeshComp, Random random) {
         List<MeshAnimation> animationPool = skeletalMeshComp.animationPool;
@@ -187,7 +183,8 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
         return animationPool.get(random.nextInt(animationPool.size()));
     }
 
-    private void updateSkeleton(SkeletalMeshComponent skeletalMeshComp, MeshAnimationFrame frameA, MeshAnimationFrame frameB, float interpolationVal) {
+    private void updateSkeleton(SkeletalMeshComponent skeletalMeshComp, MeshAnimationFrame frameA, MeshAnimationFrame frameB,
+                                float interpolationVal) {
         for (int i = 0; i < skeletalMeshComp.animation.getBoneCount(); ++i) {
             String boneName = skeletalMeshComp.animation.getBoneName(i);
             Bone bone = skeletalMeshComp.mesh.getBone(boneName);
@@ -222,7 +219,10 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
         for (EntityRef entity : entityManager.getEntitiesWith(SkeletalMeshComponent.class, LocationComponent.class)) {
 
             SkeletalMeshComponent skeletalMesh = entity.getComponent(SkeletalMeshComponent.class);
-            if (skeletalMesh.mesh == null || skeletalMesh.material == null || skeletalMesh.boneEntities == null || !skeletalMesh.material.isRenderable()) {
+            if (skeletalMesh.mesh == null
+                    || skeletalMesh.material == null
+                    || skeletalMesh.boneEntities == null
+                    || !skeletalMesh.material.isRenderable()) {
                 continue;
             }
             AABBf aabb;
@@ -255,7 +255,8 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
             skeletalMesh.material.enable();
             skeletalMesh.material.setFloat("sunlight", 1.0f, true);
             skeletalMesh.material.setFloat("blockLight", 1.0f, true);
-            skeletalMesh.material.setFloat3("colorOffset", skeletalMesh.color.rf(), skeletalMesh.color.gf(), skeletalMesh.color.bf(), true);
+            skeletalMesh.material.setFloat3("colorOffset", skeletalMesh.color.rf(),
+                    skeletalMesh.color.gf(), skeletalMesh.color.bf(), true);
 
             skeletalMesh.material.setMatrix4("projectionMatrix", worldRenderer.getActiveCamera().getProjectionMatrix());
             skeletalMesh.material.bindTextures();
@@ -268,7 +269,7 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
 
             Matrix4f modelViewMatrix = worldRenderer.getActiveCamera().getViewMatrix().mul(matrixCameraSpace, new Matrix4f());
             modelViewMatrix.get(tempMatrixBuffer44);
-            skeletalMesh.material.setMatrix4("worldViewMatrix", tempMatrixBuffer44, true);
+            skeletalMesh.material.setMatrix4("modelViewMatrix", tempMatrixBuffer44, true);
 
             modelViewMatrix.normal(new Matrix3f()).get(tempMatrixBuffer33);
             skeletalMesh.material.setMatrix3("normalMatrix", tempMatrixBuffer33, true);
@@ -300,10 +301,6 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
     }
 
     @Override
-    public void renderAlphaBlend() {
-    }
-
-    @Override
     public void renderOverlay() {
         if (config.getRendering().getDebug().isRenderSkeletons()) {
             glDisable(GL_DEPTH_TEST);
@@ -327,11 +324,12 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
                 Vector3f worldPositionCameraSpace = new Vector3f();
                 worldPositionCameraSpace.sub(worldPos, cameraPosition);
 
-                Matrix4f matrixCameraSpace = new Matrix4f().translation(worldPositionCameraSpace); //anew Quat4f(0, 0, 0, 1), worldPositionCameraSpace, 1);
+                //anew Quat4f(0, 0, 0, 1), worldPositionCameraSpace, 1);
+                Matrix4f matrixCameraSpace = new Matrix4f().translation(worldPositionCameraSpace);
 
                 Matrix4f modelViewMatrix = worldRenderer.getActiveCamera().getViewMatrix().mul(matrixCameraSpace, new Matrix4f());
                 modelViewMatrix.get(tempMatrixBuffer44);
-                material.setMatrix4("worldViewMatrix", tempMatrixBuffer44, true);
+                material.setMatrix4("modelViewMatrix", tempMatrixBuffer44, true);
 
                 modelViewMatrix.get3x3(new Matrix3f()).invert().get(tempMatrixBuffer33);
                 material.setMatrix3("normalMatrix", tempMatrixBuffer33, true);
@@ -344,10 +342,6 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
             }
             glEnable(GL_DEPTH_TEST);
         }
-    }
-
-    @Override
-    public void renderShadows() {
     }
 
     private void renderBoneOrientation(EntityRef boneEntity) {

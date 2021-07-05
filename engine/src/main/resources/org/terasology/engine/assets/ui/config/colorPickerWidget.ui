@@ -1,0 +1,15 @@
+{
+  "type": "ColumnLayout",
+  "horizontalSpacing": 10,
+  "contents": [
+    {
+      "type": "UISlider",
+      "id": "tone"
+    },
+    {
+      "type": "UIImage",
+      "skin": "framed_image",
+      "id": "image"
+    }
+  ]
+}

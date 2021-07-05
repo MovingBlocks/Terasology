@@ -1,4 +1,4 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.engine.core.modes;
@@ -7,10 +7,10 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Queues;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.crashreporter.CrashReporter;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.config.SystemConfig;
 import org.terasology.engine.context.Context;
-import org.terasology.crashreporter.CrashReporter;
 import org.terasology.engine.core.EngineTime;
 import org.terasology.engine.core.GameEngine;
 import org.terasology.engine.core.LoggingContext;
@@ -53,11 +53,11 @@ import org.terasology.engine.network.JoinStatus;
 import org.terasology.engine.network.NetworkMode;
 import org.terasology.engine.registry.CoreRegistry;
 import org.terasology.engine.rendering.nui.NUIManager;
-import org.terasology.nui.canvas.CanvasRenderer;
 import org.terasology.engine.rendering.nui.internal.NUIManagerInternal;
 import org.terasology.engine.rendering.nui.internal.TerasologyCanvasRenderer;
 import org.terasology.engine.rendering.nui.layers.mainMenu.loadingScreen.LoadingScreen;
 import org.terasology.engine.world.chunks.event.OnChunkLoaded;
+import org.terasology.nui.canvas.CanvasRenderer;
 
 import java.util.Queue;
 

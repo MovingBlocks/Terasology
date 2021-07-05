@@ -14,16 +14,14 @@ import org.terasology.engine.entitySystem.systems.RegisterSystem;
 import org.terasology.engine.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.engine.logic.characters.CharacterMoveInputEvent;
 import org.terasology.engine.logic.characters.CharacterMovementComponent;
+import org.terasology.engine.logic.characters.events.HorizontalCollisionEvent;
 import org.terasology.engine.logic.location.LocationComponent;
 import org.terasology.engine.logic.players.LocalPlayer;
-import org.terasology.engine.logic.characters.events.HorizontalCollisionEvent;
 import org.terasology.engine.registry.In;
 import org.terasology.engine.utilities.random.FastRandom;
 import org.terasology.engine.utilities.random.Random;
 import org.terasology.engine.world.WorldProvider;
 
-/**
- */
 @RegisterSystem(RegisterMode.AUTHORITY)
 public class SimpleAISystem extends BaseComponentSystem implements UpdateSubscriberSystem {
 
@@ -39,7 +37,8 @@ public class SimpleAISystem extends BaseComponentSystem implements UpdateSubscri
 
     @Override
     public void update(float delta) {
-        for (EntityRef entity : entityManager.getEntitiesWith(SimpleAIComponent.class, CharacterMovementComponent.class, LocationComponent.class)) {
+        for (EntityRef entity : entityManager.getEntitiesWith(SimpleAIComponent.class,
+                CharacterMovementComponent.class, LocationComponent.class)) {
             LocationComponent location = entity.getComponent(LocationComponent.class);
             Vector3f worldPos = location.getWorldPosition(new Vector3f());
 
@@ -63,7 +62,8 @@ public class SimpleAISystem extends BaseComponentSystem implements UpdateSubscri
                 } else {
                     // Random walk
                     if (time.getGameTimeInMs() - ai.lastChangeOfDirectionAt > 12000 || ai.followingPlayer) {
-                        ai.movementTarget.set(worldPos.x + random.nextFloat(-500.0f, 500.0f), worldPos.y, worldPos.z + random.nextFloat(-500.0f, 500.0f));
+                        ai.movementTarget.set(worldPos.x + random.nextFloat(-500.0f, 500.0f), worldPos.y,
+                                worldPos.z + random.nextFloat(-500.0f, 500.0f));
                         ai.lastChangeOfDirectionAt = time.getGameTimeInMs();
                         ai.followingPlayer = false;
                         entity.saveComponent(ai);
@@ -79,11 +79,12 @@ public class SimpleAISystem extends BaseComponentSystem implements UpdateSubscri
                 location.setLocalRotation(new Quaternionf().setAngleAxis(yaw, 0, 1, 0));
                 entity.saveComponent(location);
             }
-            entity.send(new CharacterMoveInputEvent(0, 0, 0, drive, false, false, false, time.getGameDeltaInMs()));
+            entity.send(new CharacterMoveInputEvent(0, 0, 0, drive,
+                    false, false, false, time.getGameDeltaInMs()));
         }
     }
 
-    @ReceiveEvent(components = {SimpleAIComponent.class})
+    @ReceiveEvent(components = SimpleAIComponent.class)
     public void onBump(HorizontalCollisionEvent event, EntityRef entity) {
         CharacterMovementComponent moveComp = entity.getComponent(CharacterMovementComponent.class);
         if (moveComp != null && moveComp.grounded) {

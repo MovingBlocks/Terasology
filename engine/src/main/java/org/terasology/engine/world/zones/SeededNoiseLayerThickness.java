@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.world.zones;
 
-import org.terasology.module.sandbox.API;
+import org.terasology.gestalt.module.sandbox.API;
 import org.terasology.engine.utilities.procedural.Noise;
 
 import java.util.function.LongFunction;
@@ -15,8 +15,8 @@ import java.util.function.LongFunction;
 @API
 public abstract class SeededNoiseLayerThickness implements LayerThickness {
 
-    private final LongFunction<Noise> seededNoiseFunction;
     protected Noise noise;
+    private final LongFunction<Noise> seededNoiseFunction;
 
     public SeededNoiseLayerThickness(LongFunction<Noise> seededNoiseFunction) {
         this.seededNoiseFunction = seededNoiseFunction;

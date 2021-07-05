@@ -6,46 +6,33 @@ import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.lwjgl.BufferUtils;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL13;
-import org.lwjgl.opengl.GL15;
+import org.lwjgl.opengl.GL30;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.assets.AssetType;
-import org.terasology.assets.ResourceUrn;
 import org.terasology.engine.core.GameThread;
-import org.terasology.engine.core.subsystem.lwjgl.GLBufferPool;
 import org.terasology.engine.core.subsystem.lwjgl.LwjglGraphicsProcessing;
-import org.terasology.joml.geom.AABBf;
-import org.terasology.engine.rendering.VertexBufferObjectUtil;
+import org.terasology.engine.rendering.assets.mesh.StandardMeshData;
 import org.terasology.engine.rendering.assets.skeletalmesh.Bone;
 import org.terasology.engine.rendering.assets.skeletalmesh.SkeletalMesh;
 import org.terasology.engine.rendering.assets.skeletalmesh.SkeletalMeshData;
+import org.terasology.gestalt.assets.AssetType;
+import org.terasology.gestalt.assets.DisposableResource;
+import org.terasology.gestalt.assets.ResourceUrn;
+import org.terasology.joml.geom.AABBf;
 
+import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.Collection;
 import java.util.List;
 
-import static org.lwjgl.opengl.GL11.GL_FLOAT;
-import static org.lwjgl.opengl.GL11.GL_NORMAL_ARRAY;
-import static org.lwjgl.opengl.GL11.GL_TEXTURE_COORD_ARRAY;
 import static org.lwjgl.opengl.GL11.GL_UNSIGNED_INT;
-import static org.lwjgl.opengl.GL11.GL_VERTEX_ARRAY;
-import static org.lwjgl.opengl.GL11.glDisableClientState;
-import static org.lwjgl.opengl.GL11.glEnableClientState;
-import static org.lwjgl.opengl.GL11.glNormalPointer;
-import static org.lwjgl.opengl.GL11.glTexCoordPointer;
-import static org.lwjgl.opengl.GL11.glVertexPointer;
 
-/**
- */
 public class OpenGLSkeletalMesh extends SkeletalMesh {
-
-    private static final int TEX_COORD_SIZE = 2;
-    private static final int VECTOR3_SIZE = 3;
-    private static final int STRIDE = 24;
-    private static final int NORMAL_OFFSET = VECTOR3_SIZE * 4;
+    private static final int VERTEX_SIZE = 3 * Float.BYTES;
+    private static final int NORMAL_SIZE = 3 * Float.BYTES;
+    private static final int UV_SIZE = 2 * Float.BYTES;
+    private static final int VERTEX_NORMAL_SIZE = (VERTEX_SIZE + NORMAL_SIZE);
 
     private static final Logger logger = LoggerFactory.getLogger(OpenGLSkeletalMesh.class);
 
@@ -56,15 +43,21 @@ public class OpenGLSkeletalMesh extends SkeletalMesh {
 
     private DisposalAction disposalAction;
 
-    public OpenGLSkeletalMesh(ResourceUrn urn, AssetType<?, SkeletalMeshData> assetType, GLBufferPool bufferPool,
-                              SkeletalMeshData data, LwjglGraphicsProcessing graphicsProcessing) {
-        super(urn, assetType);
-        disposalAction = new DisposalAction(urn, bufferPool);
-        getDisposalHook().setDisposeAction(disposalAction);
+    public OpenGLSkeletalMesh(ResourceUrn urn, AssetType<?, SkeletalMeshData> assetType,
+                              SkeletalMeshData data, LwjglGraphicsProcessing graphicsProcessing,
+                              OpenGLSkeletalMesh.DisposalAction disposalAction) {
+        super(urn, assetType, disposalAction);
+        this.disposalAction = disposalAction;
         graphicsProcessing.asynchToDisplayThread(() -> {
             reload(data);
         });
     }
+
+    public static OpenGLSkeletalMesh create(ResourceUrn urn, AssetType<?, SkeletalMeshData> assetType,
+                                            SkeletalMeshData data, LwjglGraphicsProcessing graphicsProcessing) {
+        return new OpenGLSkeletalMesh(urn, assetType, data, graphicsProcessing, new DisposalAction(urn));
+    }
+
 
     public void setScaleTranslate(org.joml.Vector3f newScale, org.joml.Vector3f newTranslate) {
         this.scale = newScale;
@@ -77,58 +70,57 @@ public class OpenGLSkeletalMesh extends SkeletalMesh {
             GameThread.synch(() -> {
                 this.data = newData;
 
-                if (disposalAction.vboPosNormBuffer == 0) {
-                    disposalAction.vboPosNormBuffer = disposalAction.bufferPool.get(getUrn().toString());
+                if (this.disposalAction.vao == 0) {
+                    this.disposalAction.vao = GL30.glGenVertexArrays();
+                    this.disposalAction.vbo = GL30.glGenBuffers();
+                    this.disposalAction.ebo = GL30.glGenBuffers();
                 }
+                // bind vertex array and buffer
+                GL30.glBindVertexArray(this.disposalAction.vao);
+                GL30.glBindBuffer(GL30.GL_ARRAY_BUFFER, this.disposalAction.vbo);
+
+                GL30.glEnableVertexAttribArray(StandardMeshData.VERTEX_INDEX);
+                GL30.glVertexAttribPointer(StandardMeshData.VERTEX_INDEX, 3, GL30.GL_FLOAT, false,
+                        VERTEX_NORMAL_SIZE, 0);
+
+                GL30.glEnableVertexAttribArray(StandardMeshData.NORMAL_INDEX);
+                GL30.glVertexAttribPointer(StandardMeshData.NORMAL_INDEX, 3, GL30.GL_FLOAT, false,
+                        VERTEX_NORMAL_SIZE, VERTEX_SIZE);
+
+                GL30.glEnableVertexAttribArray(StandardMeshData.UV0_INDEX);
+                GL30.glVertexAttribPointer(StandardMeshData.UV0_INDEX, 2, GL30.GL_FLOAT, false,
+                        UV_SIZE, (long) VERTEX_NORMAL_SIZE * newData.getVertexCount());
+
+                int payloadSize = (UV_SIZE + VERTEX_SIZE + NORMAL_SIZE) * newData.getVertexCount();
+                ByteBuffer buffer = BufferUtils.createByteBuffer(payloadSize);
+
+                buffer.position(newData.getVertexCount() * VERTEX_NORMAL_SIZE);
+
+                for (Vector2f uv : newData.getUVs()) {
+                    buffer.putFloat(uv.x);
+                    buffer.putFloat(uv.y);
+                }
+                buffer.flip();
+                GL30.glBufferData(GL30.GL_ARRAY_BUFFER, buffer, GL30.GL_DYNAMIC_DRAW);
 
                 IntBuffer indexBuffer = BufferUtils.createIntBuffer(newData.getIndices().size());
                 indexBuffer.put(newData.getIndices().toArray());
                 indexBuffer.flip();
-                if (disposalAction.vboIndexBuffer == 0) {
-                    disposalAction.vboIndexBuffer = disposalAction.bufferPool.get(getUrn().toString());
-                }
-                VertexBufferObjectUtil.bufferVboElementData(disposalAction.vboIndexBuffer, indexBuffer, GL15.GL_STATIC_DRAW);
+                GL30.glBindBuffer(GL30.GL_ELEMENT_ARRAY_BUFFER, this.disposalAction.ebo);
+                GL30.glBufferData(GL30.GL_ELEMENT_ARRAY_BUFFER, indexBuffer, GL30.GL_STATIC_DRAW);
 
-                FloatBuffer uvBuffer = BufferUtils.createFloatBuffer(newData.getUVs().size() * 2);
-                for (Vector2f uv : newData.getUVs()) {
-                    uvBuffer.put(uv.x);
-                    uvBuffer.put(uv.y);
-                }
-                uvBuffer.flip();
-
-                if (disposalAction.vboUVBuffer == 0) {
-                    disposalAction.vboUVBuffer = disposalAction.bufferPool.get(getUrn().toString());
-                }
-                VertexBufferObjectUtil.bufferVboData(disposalAction.vboUVBuffer, uvBuffer, GL15.GL_STATIC_DRAW);
+                GL30.glBindVertexArray(0);
             });
         } catch (InterruptedException e) {
             logger.error("Failed to reload {}", getUrn(), e);
         }
     }
 
-    public void preRender() {
-        glEnableClientState(GL_VERTEX_ARRAY);
-        glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-        glEnableClientState(GL_NORMAL_ARRAY);
-
-        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, disposalAction.vboUVBuffer);
-        GL13.glClientActiveTexture(GL13.GL_TEXTURE0);
-        glTexCoordPointer(2, GL11.GL_FLOAT, TEX_COORD_SIZE * 4, 0);
-
-        GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, disposalAction.vboIndexBuffer);
-    }
-
-    public void postRender() {
-        glDisableClientState(GL_NORMAL_ARRAY);
-        glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-        glDisableClientState(GL_VERTEX_ARRAY);
-
-        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
-        GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, 0);
-    }
 
     public void doRender(List<Vector3f> verts, List<Vector3f> normals) {
-        FloatBuffer vertBuffer = BufferUtils.createFloatBuffer(verts.size() * 6);
+        GL30.glBindVertexArray(disposalAction.vao);
+
+        FloatBuffer vertBuffer = BufferUtils.createFloatBuffer(verts.size() * VERTEX_NORMAL_SIZE);
         for (int i = 0; i < verts.size(); ++i) {
             Vector3f vert = verts.get(i);
             vertBuffer.put(vert.x * scale.x + translate.x);
@@ -140,27 +132,23 @@ public class OpenGLSkeletalMesh extends SkeletalMesh {
             vertBuffer.put(norm.z);
         }
         vertBuffer.flip();
-        VertexBufferObjectUtil.bufferVboData(disposalAction.vboPosNormBuffer, vertBuffer, GL15.GL_DYNAMIC_DRAW);
+        GL30.glBindBuffer(GL30.GL_ARRAY_BUFFER, this.disposalAction.vbo);
+        GL30.glBufferSubData(GL30.GL_ARRAY_BUFFER, 0, vertBuffer);
 
-        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, disposalAction.vboPosNormBuffer);
-        glVertexPointer(VECTOR3_SIZE, GL_FLOAT, STRIDE, 0);
-        glNormalPointer(GL_FLOAT, STRIDE, NORMAL_OFFSET);
-
-        GL11.glDrawElements(GL11.GL_TRIANGLES, data.getIndices().size(), GL_UNSIGNED_INT, 0);
-
-        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
+        GL30.glDrawElements(GL30.GL_TRIANGLES, data.getIndices().size(), GL_UNSIGNED_INT, 0);
+        GL30.glBindVertexArray(0);
     }
 
     public void render() {
-        preRender();
+//        preRender();
         doRender(data.getBindPoseVertexPositions(), data.getBindPoseVertexNormals());
-        postRender();
+//        postRender();
     }
 
     public void render(List<Matrix4f> boneTransforms) {
-        preRender();
+//        preRender();
         doRender(data.getVertexPositions(boneTransforms), data.getVertexNormals(boneTransforms));
-        postRender();
+//        postRender();
     }
 
     @Override
@@ -183,36 +171,38 @@ public class OpenGLSkeletalMesh extends SkeletalMesh {
         return data.getStaticAABB();
     }
 
-    private static class DisposalAction implements Runnable {
+    private static class DisposalAction implements DisposableResource {
 
         private final ResourceUrn urn;
-        private GLBufferPool bufferPool;
 
-        private int vboPosNormBuffer;
-        private int vboUVBuffer;
-        private int vboIndexBuffer;
+        private int vao = 0;
+        private int vbo = 0;
+        private int ebo = 0;
 
-         DisposalAction(ResourceUrn urn, GLBufferPool bufferPool) {
+        DisposalAction(ResourceUrn urn) {
             this.urn = urn;
-            this.bufferPool = bufferPool;
+        }
+
+        public void dispose() {
+            if (vao != 0) {
+                GL30.glDeleteVertexArrays(vao);
+            }
+            if (vbo != 0) {
+                GL30.glDeleteBuffers(vbo);
+            }
+            if (ebo != 0) {
+                GL30.glDeleteBuffers(ebo);
+            }
+            vao = 0;
+            vbo = 0;
+            ebo = 0;
         }
 
         @Override
-        public void run() {
+        public void close() {
             try {
                 GameThread.synch(() -> {
-                    if (vboIndexBuffer != 0) {
-                        bufferPool.dispose(vboIndexBuffer);
-                        vboIndexBuffer = 0;
-                    }
-                    if (vboPosNormBuffer != 0) {
-                        bufferPool.dispose(vboPosNormBuffer);
-                        vboPosNormBuffer = 0;
-                    }
-                    if (vboUVBuffer != 0) {
-                        bufferPool.dispose(vboUVBuffer);
-                        vboUVBuffer = 0;
-                    }
+                    dispose();
                 });
             } catch (InterruptedException e) {
                 logger.error("Failed to dispose {}", urn, e);

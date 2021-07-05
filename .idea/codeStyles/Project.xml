@@ -14,6 +14,7 @@
       <option name="CODE_STYLE_DEFAULTS" value="KOTLIN_OFFICIAL" />
     </JetCodeStyleSettings>
     <codeStyleSettings language="JAVA">
+      <option name="RIGHT_MARGIN" value="140" />
       <option name="WRAP_COMMENTS" value="true" />
       <option name="WRAP_LONG_LINES" value="true" />
     </codeStyleSettings>

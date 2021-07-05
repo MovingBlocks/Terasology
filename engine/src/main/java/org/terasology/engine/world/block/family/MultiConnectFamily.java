@@ -13,7 +13,7 @@ import org.terasology.engine.math.Side;
 import org.terasology.engine.math.SideBitFlag;
 import org.terasology.engine.world.block.loader.BlockFamilyDefinition;
 import org.terasology.engine.world.block.shapes.BlockShape;
-import org.terasology.naming.Name;
+import org.terasology.gestalt.naming.Name;
 import org.terasology.engine.registry.In;
 import org.terasology.engine.world.BlockEntityRegistry;
 import org.terasology.engine.world.WorldProvider;
@@ -100,14 +100,16 @@ public abstract class MultiConnectFamily extends AbstractBlockFamily implements 
      * @param rotations All of the ways the block should be rotated
      * @return All of the rotations possible for the block with the given sides
      */
-    public Set<Block> registerBlock(BlockUri root, BlockFamilyDefinition definition, BlockBuilderHelper blockBuilder, String name, byte sides, Iterable<Rotation> rotations) {
+    public Set<Block> registerBlock(BlockUri root, BlockFamilyDefinition definition, BlockBuilderHelper blockBuilder, String name,
+                                    byte sides, Iterable<Rotation> rotations) {
         Set<Block> result = Sets.newLinkedHashSet();
         for (Rotation rotation: rotations) {
             byte sideBits = 0;
             for (Side side : SideBitFlag.getSides(sides)) {
                 sideBits += SideBitFlag.getSide(rotation.rotate(side));
             }
-            Block block = blockBuilder.constructTransformedBlock(definition, name, rotation, new BlockUri(root, new Name(String.valueOf(sideBits))), this);
+            Block block = blockBuilder.constructTransformedBlock(definition, name,
+                    rotation, new BlockUri(root, new Name(String.valueOf(sideBits))), this);
 
             blocks.put(sideBits, block);
             result.add(block);
@@ -125,7 +127,8 @@ public abstract class MultiConnectFamily extends AbstractBlockFamily implements 
      * @param rotations All of the ways the block should be rotated
      * @return All of the rotations possible for the block with the given sides
      */
-    public Set<Block> registerBlock(BlockUri root, BlockFamilyDefinition definition, final BlockBuilderHelper blockBuilder, byte sides, Iterable<Rotation> rotations) {
+    public Set<Block> registerBlock(BlockUri root, BlockFamilyDefinition definition, final BlockBuilderHelper blockBuilder,
+                                    byte sides, Iterable<Rotation> rotations) {
         Set<Block> result = Sets.newLinkedHashSet();
         for (Rotation rotation: rotations) {
             byte sideBits = 0;

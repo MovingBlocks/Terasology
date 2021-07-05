@@ -2,10 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.world.block.loader;
 
-import org.terasology.module.sandbox.API;
+import org.terasology.gestalt.module.sandbox.API;
 
-/**
- */
 @API
 public class InventoryData {
     private boolean directPickup;

@@ -285,7 +285,8 @@ public class BehaviorEditor extends ZoomableLayout implements DefaultBehaviorTre
 
     public void layout(RenderableNode start) {
         LayoutTree layoutTree = new LayoutTree(start);
-        TreeLayout<RenderableNode> layout = new TreeLayout<>(layoutTree, new FixedNodeExtentProvider<RenderableNode>(10, 5), new DefaultConfiguration<RenderableNode>(4, 2));
+        TreeLayout<RenderableNode> layout = new TreeLayout<>(layoutTree, new FixedNodeExtentProvider<RenderableNode>(10, 5),
+                new DefaultConfiguration<RenderableNode>(4, 2));
         Map<RenderableNode, Rectangle2D.Double> bounds = layout.getNodeBounds();
         for (Map.Entry<RenderableNode, Rectangle2D.Double> entry : bounds.entrySet()) {
             RenderableNode node = entry.getKey();

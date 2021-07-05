@@ -8,8 +8,6 @@ import org.joml.Vector3fc;
 import org.terasology.engine.network.NetworkEvent;
 import org.terasology.engine.network.ServerEvent;
 
-/**
- */
 @ServerEvent
 public class CharacterMoveInputEvent extends NetworkEvent {
     private long delta;
@@ -17,7 +15,7 @@ public class CharacterMoveInputEvent extends NetworkEvent {
     private float yaw;
     private boolean running;
     private boolean crouching;
-    private boolean jumpRequested;
+    private boolean jumping;
     private Vector3f movementDirection = new Vector3f();
     private int sequenceNumber;
     private boolean firstRun = true;
@@ -26,17 +24,19 @@ public class CharacterMoveInputEvent extends NetworkEvent {
     }
 
     @Deprecated
-    public CharacterMoveInputEvent(int sequence, float pitch, float yaw, Vector3fc movementDirection, boolean running, boolean jumpRequested, long delta) {
-        this(sequence, pitch, yaw, movementDirection, running, false, jumpRequested, delta);
+    public CharacterMoveInputEvent(int sequence, float pitch, float yaw, Vector3fc movementDirection,
+                                   boolean running, boolean jumping, long delta) {
+        this(sequence, pitch, yaw, movementDirection, running, false, jumping, delta);
     }
 
-    public CharacterMoveInputEvent(int sequence, float pitch, float yaw, Vector3fc movementDirection, boolean running, boolean crouching, boolean jumpRequested, long delta) {
+    public CharacterMoveInputEvent(int sequence, float pitch, float yaw, Vector3fc movementDirection,
+                                   boolean running, boolean crouching, boolean jumping, long delta) {
         this.delta = delta;
         this.pitch = pitch;
         this.yaw = yaw;
         this.running = running;
         this.crouching = crouching;
-        this.jumpRequested = jumpRequested;
+        this.jumping = jumping;
         this.movementDirection.set(movementDirection);
         this.sequenceNumber = sequence;
     }
@@ -47,7 +47,7 @@ public class CharacterMoveInputEvent extends NetworkEvent {
         this.yaw = repeatInput.yaw;
         this.running = repeatInput.running;
         this.crouching = repeatInput.crouching;
-        this.jumpRequested = false;
+        this.jumping = repeatInput.jumping;
         this.movementDirection.set(repeatInput.movementDirection);
         this.sequenceNumber = repeatInput.sequenceNumber;
     }
@@ -80,8 +80,8 @@ public class CharacterMoveInputEvent extends NetworkEvent {
         return crouching;
     }
 
-    public boolean isJumpRequested() {
-        return jumpRequested;
+    public boolean isJumping() {
+        return jumping;
     }
 
     public int getSequenceNumber() {

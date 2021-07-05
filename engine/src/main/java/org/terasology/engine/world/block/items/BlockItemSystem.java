@@ -42,7 +42,7 @@ public class BlockItemSystem extends BaseComponentSystem {
      * Margin and other allowed penetration is also 0.03 or 0.04. Since precision is only float it needs to be that
      * high.
      */
-    private static final float ADDITIONAL_ALLOWED_PENETRATION = 0.4f;
+    private static final float ADDITIONAL_ALLOWED_PENETRATION = 0.04f;
 
     @In
     private WorldProvider worldProvider;
@@ -193,13 +193,13 @@ public class BlockItemSystem extends BaseComponentSystem {
             /*
              * Calculations aren't exact and in the corner cases it is better to let the user place the block.
              */
-            blockBounds.minX -= ADDITIONAL_ALLOWED_PENETRATION;
-            blockBounds.minY -= ADDITIONAL_ALLOWED_PENETRATION;
-            blockBounds.minZ -= ADDITIONAL_ALLOWED_PENETRATION;
+            blockBounds.minX += ADDITIONAL_ALLOWED_PENETRATION;
+            blockBounds.minY += ADDITIONAL_ALLOWED_PENETRATION;
+            blockBounds.minZ += ADDITIONAL_ALLOWED_PENETRATION;
 
-            blockBounds.maxX += ADDITIONAL_ALLOWED_PENETRATION;
-            blockBounds.maxY += ADDITIONAL_ALLOWED_PENETRATION;
-            blockBounds.maxZ += ADDITIONAL_ALLOWED_PENETRATION;
+            blockBounds.maxX -= ADDITIONAL_ALLOWED_PENETRATION;
+            blockBounds.maxY -= ADDITIONAL_ALLOWED_PENETRATION;
+            blockBounds.maxZ -= ADDITIONAL_ALLOWED_PENETRATION;
 
 
             return physics.scanArea(blockBounds, StandardCollisionGroup.DEFAULT, StandardCollisionGroup.CHARACTER).isEmpty();

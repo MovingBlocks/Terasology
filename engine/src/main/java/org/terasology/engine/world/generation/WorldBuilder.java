@@ -24,8 +24,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-/**
- */
 public class WorldBuilder extends ProviderStore {
 
     private static final Logger logger = LoggerFactory.getLogger(WorldBuilder.class);
@@ -94,17 +92,18 @@ public class WorldBuilder extends ProviderStore {
         List<WorldRasterizer> orderedRasterizers = ensureRasterizerOrdering(providerChains, false);
         List<WorldRasterizer> scalableRasterizers = ensureRasterizerOrdering(scalableProviderChains, true);
         return new WorldImpl(
-            providerChains,
-            scalableProviderChains,
-            orderedRasterizers,
-            scalableRasterizers,
-            entityProviders,
-            determineBorders(providerChains, orderedRasterizers),
-            seaLevel
+                providerChains,
+                scalableProviderChains,
+                orderedRasterizers,
+                scalableRasterizers,
+                entityProviders,
+                determineBorders(providerChains, orderedRasterizers),
+                seaLevel
         );
     }
 
-    private Map<Class<? extends WorldFacet>, Border3D> determineBorders(ListMultimap<Class<? extends WorldFacet>, FacetProvider> providerChains, List<WorldRasterizer> worldRasterizers) {
+    private Map<Class<? extends WorldFacet>, Border3D> determineBorders(ListMultimap<Class<? extends WorldFacet>,
+            FacetProvider> providerChains, List<WorldRasterizer> worldRasterizers) {
         List<FacetProvider> orderedProviders = new ArrayList<>();
         for (Class<? extends WorldFacet> facet : providerChains.keySet()) {
             for (FacetProvider provider : providerChains.get(facet)) {
@@ -201,7 +200,9 @@ public class WorldBuilder extends ProviderStore {
         return result;
     }
 
-    private void determineProviderChainFor(Class<? extends WorldFacet> facet, ListMultimap<Class<? extends WorldFacet>, FacetProvider> result, boolean scalable) {
+    private void determineProviderChainFor(Class<? extends WorldFacet> facet,
+                                           ListMultimap<Class<? extends WorldFacet>, FacetProvider> result,
+                                           boolean scalable) {
         if (result.containsKey(facet)) {
             return;
         }
@@ -253,7 +254,8 @@ public class WorldBuilder extends ProviderStore {
         }
 
         // then add all @Updates facet providers
-        providersList.stream().filter(provider -> updatesFacet(provider, facet) && (!scalable || provider instanceof ScalableFacetProvider)).forEach(provider -> {
+        providersList.stream().filter(provider -> updatesFacet(provider, facet)
+                && (!scalable || provider instanceof ScalableFacetProvider)).forEach(provider -> {
             Set<FacetProvider> localOrderedProviders = Sets.newLinkedHashSet();
             // add all required facets for updating provider
             for (Facet requirement : requiredFacets(provider)) {
@@ -325,7 +327,8 @@ public class WorldBuilder extends ProviderStore {
     // Ensure that rasterizers that must run after others are in the correct order. This ensures that blocks from
     // the dependent raterizer are not being overwritten by any antecedent rasterizer.
     // TODO: This will only handle first-order dependencies and does not check for circular dependencies
-    private List<WorldRasterizer> ensureRasterizerOrdering(ListMultimap<Class<? extends WorldFacet>, FacetProvider> providerChains, boolean scalable) {
+    private List<WorldRasterizer> ensureRasterizerOrdering(ListMultimap<Class<? extends WorldFacet>,
+            FacetProvider> providerChains, boolean scalable) {
         List<WorldRasterizer> orderedRasterizers = Lists.newArrayList();
 
         Set<Class<? extends WorldRasterizer>> addedRasterizers = new HashSet<>();
@@ -349,7 +352,7 @@ public class WorldBuilder extends ProviderStore {
 
                 // Then add this one
                 tryAddRasterizer(orderedRasterizers, rasterizer, providerChains, scalable);
-            } else if (!addedRasterizers.contains(rasterizer.getClass())) {
+            } else {
                 tryAddRasterizer(orderedRasterizers, rasterizer, providerChains, scalable);
                 addedRasterizers.add(rasterizer.getClass());
             }
@@ -357,7 +360,9 @@ public class WorldBuilder extends ProviderStore {
         return orderedRasterizers;
     }
 
-    private void tryAddRasterizer(List<WorldRasterizer> orderedRasterizers, WorldRasterizer rasterizer, ListMultimap<Class<? extends WorldFacet>, FacetProvider> providerChains, boolean scalable) {
+    private void tryAddRasterizer(List<WorldRasterizer> orderedRasterizers, WorldRasterizer rasterizer,
+                                  ListMultimap<Class<? extends WorldFacet>, FacetProvider> providerChains,
+                                  boolean scalable) {
         if (scalable && !(rasterizer instanceof ScalableWorldRasterizer)) {
             return;
         }

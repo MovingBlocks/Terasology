@@ -1,18 +1,5 @@
-/*
- * Copyright 2013 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.core.subsystem.headless.mode;
 
 import org.slf4j.Logger;
@@ -40,21 +27,21 @@ import org.terasology.engine.logic.console.ConsoleImpl;
 import org.terasology.engine.logic.console.ConsoleSystem;
 import org.terasology.engine.logic.console.commands.CoreCommands;
 import org.terasology.engine.logic.players.LocalPlayer;
-import org.terasology.module.Module;
-import org.terasology.naming.Name;
 import org.terasology.engine.network.ClientComponent;
 import org.terasology.engine.network.NetworkMode;
 import org.terasology.engine.recording.DirectionAndOriginPosRecorderList;
 import org.terasology.engine.recording.RecordAndReplayCurrentStatus;
 import org.terasology.engine.registry.CoreRegistry;
 import org.terasology.engine.rendering.nui.NUIManager;
-import org.terasology.nui.canvas.CanvasRenderer;
 import org.terasology.engine.rendering.nui.internal.NUIManagerInternal;
 import org.terasology.engine.rendering.nui.internal.TerasologyCanvasRenderer;
 import org.terasology.engine.rendering.nui.layers.mainMenu.savedGames.GameInfo;
 import org.terasology.engine.rendering.nui.layers.mainMenu.savedGames.GameProvider;
 import org.terasology.engine.world.internal.WorldInfo;
 import org.terasology.engine.world.time.WorldTime;
+import org.terasology.gestalt.module.Module;
+import org.terasology.gestalt.naming.Name;
+import org.terasology.nui.canvas.CanvasRenderer;
 
 import java.util.List;
 

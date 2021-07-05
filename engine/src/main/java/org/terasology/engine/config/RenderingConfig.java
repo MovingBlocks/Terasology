@@ -1,23 +1,10 @@
-/*
- * Copyright 2018 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.engine.config;
 
 import org.terasology.engine.core.subsystem.Resolution;
-import org.terasology.module.sandbox.API;
+import org.terasology.gestalt.module.sandbox.API;
 import org.terasology.engine.rendering.cameras.PerspectiveCameraSettings;
 import org.terasology.engine.rendering.nui.layers.mainMenu.videoSettings.DisplayModeSetting;
 import org.terasology.engine.rendering.nui.layers.mainMenu.videoSettings.ScreenshotSize;
@@ -465,7 +452,7 @@ public class RenderingConfig extends AbstractSubscribable {
         boolean oldValue = this.vrSupport;
         this.vrSupport = vrSupport;
         propertyChangeSupport.firePropertyChange(VR_SUPPORT, oldValue, this.vrSupport);
-    }    
+    }
 
     public int getMaxTextureAtlasResolution() {
         return maxTextureAtlasResolution;
@@ -505,7 +492,7 @@ public class RenderingConfig extends AbstractSubscribable {
         this.normalMapping = normalMapping;
         propertyChangeSupport.firePropertyChange(NORMAL_MAPPING, oldValue, this.normalMapping);
     }
-    
+
     public boolean isParallaxMapping() {
         return parallaxMapping;
     }
@@ -680,7 +667,7 @@ public class RenderingConfig extends AbstractSubscribable {
         this.dumpShaders = dumpShaders;
         propertyChangeSupport.firePropertyChange(DUMP_SHADERS, oldValue, this.dumpShaders);
     }
-    
+
     public boolean isVolumetricFog() {
         return volumetricFog;
     }

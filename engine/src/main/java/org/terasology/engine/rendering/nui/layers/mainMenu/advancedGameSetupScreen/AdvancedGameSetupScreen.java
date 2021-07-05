@@ -11,7 +11,6 @@ import org.codehaus.plexus.util.StringUtils;
 import org.joml.Vector2i;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.assets.ResourceUrn;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.config.ModuleConfig;
 import org.terasology.engine.config.SelectModulesConfig;
@@ -25,14 +24,26 @@ import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.engine.core.module.StandardModuleExtension;
 import org.terasology.engine.game.GameManifest;
 import org.terasology.engine.i18n.TranslationSystem;
-import org.terasology.engine.rendering.nui.animation.MenuAnimationSystems;
-import org.terasology.module.DependencyInfo;
-import org.terasology.module.DependencyResolver;
-import org.terasology.module.Module;
-import org.terasology.module.ModuleMetadata;
-import org.terasology.module.ResolutionResult;
-import org.terasology.naming.Name;
 import org.terasology.engine.network.NetworkMode;
+import org.terasology.engine.registry.In;
+import org.terasology.engine.rendering.nui.CoreScreenLayer;
+import org.terasology.engine.rendering.nui.animation.MenuAnimationSystems;
+import org.terasology.engine.rendering.nui.layers.mainMenu.ConfirmPopup;
+import org.terasology.engine.rendering.nui.layers.mainMenu.GameManifestProvider;
+import org.terasology.engine.rendering.nui.layers.mainMenu.MessagePopup;
+import org.terasology.engine.rendering.nui.layers.mainMenu.UniverseSetupScreen;
+import org.terasology.engine.rendering.nui.layers.mainMenu.UniverseWrapper;
+import org.terasology.engine.rendering.nui.layers.mainMenu.WaitPopup;
+import org.terasology.engine.rendering.nui.layers.mainMenu.moduleDetailsScreen.ModuleDetailsScreen;
+import org.terasology.engine.utilities.random.FastRandom;
+import org.terasology.engine.world.generator.internal.WorldGeneratorManager;
+import org.terasology.gestalt.assets.ResourceUrn;
+import org.terasology.gestalt.module.Module;
+import org.terasology.gestalt.module.ModuleMetadata;
+import org.terasology.gestalt.module.dependencyresolution.DependencyInfo;
+import org.terasology.gestalt.module.dependencyresolution.DependencyResolver;
+import org.terasology.gestalt.module.dependencyresolution.ResolutionResult;
+import org.terasology.gestalt.naming.Name;
 import org.terasology.nui.Canvas;
 import org.terasology.nui.WidgetUtil;
 import org.terasology.nui.databinding.Binding;
@@ -45,17 +56,6 @@ import org.terasology.nui.widgets.UICheckbox;
 import org.terasology.nui.widgets.UILabel;
 import org.terasology.nui.widgets.UIList;
 import org.terasology.nui.widgets.UIText;
-import org.terasology.engine.registry.In;
-import org.terasology.engine.rendering.nui.CoreScreenLayer;
-import org.terasology.engine.rendering.nui.layers.mainMenu.ConfirmPopup;
-import org.terasology.engine.rendering.nui.layers.mainMenu.GameManifestProvider;
-import org.terasology.engine.rendering.nui.layers.mainMenu.MessagePopup;
-import org.terasology.engine.rendering.nui.layers.mainMenu.UniverseSetupScreen;
-import org.terasology.engine.rendering.nui.layers.mainMenu.UniverseWrapper;
-import org.terasology.engine.rendering.nui.layers.mainMenu.WaitPopup;
-import org.terasology.engine.rendering.nui.layers.mainMenu.moduleDetailsScreen.ModuleDetailsScreen;
-import org.terasology.engine.utilities.random.FastRandom;
-import org.terasology.engine.world.generator.internal.WorldGeneratorManager;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -143,11 +143,9 @@ public class AdvancedGameSetupScreen extends CoreScreenLayer {
         sortedModules = Lists.newArrayList();
         for (Name moduleId : moduleManager.getRegistry().getModuleIds()) {
             Module latestVersion = moduleManager.getRegistry().getLatestModuleVersion(moduleId);
-            if (!latestVersion.isOnClasspath()) {
-                ModuleSelectionInfo info = ModuleSelectionInfo.local(latestVersion);
-                modulesLookup.put(info.getMetadata().getId(), info);
-                sortedModules.add(info);
-            }
+            ModuleSelectionInfo info = ModuleSelectionInfo.local(latestVersion);
+            modulesLookup.put(info.getMetadata().getId(), info);
+            sortedModules.add(info);
         }
 
         sortedModules.sort(moduleInfoComparator);
@@ -474,7 +472,8 @@ public class AdvancedGameSetupScreen extends CoreScreenLayer {
                         }
                     });
                     moduleDetails.subscribe(b -> {
-                        final ModuleDetailsScreen moduleDetailsScreen = getManager().createScreen(ModuleDetailsScreen.ASSET_URI, ModuleDetailsScreen.class);
+                        final ModuleDetailsScreen moduleDetailsScreen = getManager()
+                                .createScreen(ModuleDetailsScreen.ASSET_URI, ModuleDetailsScreen.class);
                         final Collection<Module> modules = sortedModules.stream()
                                 .map(ModuleSelectionInfo::getMetadata)
                                 .filter(Objects::nonNull)
@@ -497,7 +496,8 @@ public class AdvancedGameSetupScreen extends CoreScreenLayer {
         }
 
         WidgetUtil.trySubscribe(this, "createWorld", button -> {
-            final UniverseSetupScreen universeSetupScreen = getManager().createScreen(UniverseSetupScreen.ASSET_URI, UniverseSetupScreen.class);
+            final UniverseSetupScreen universeSetupScreen = getManager()
+                    .createScreen(UniverseSetupScreen.ASSET_URI, UniverseSetupScreen.class);
             universeWrapper.setSeed(seed.getText());
             saveConfiguration();
             universeSetupScreen.setEnvironment(universeWrapper);
@@ -506,15 +506,18 @@ public class AdvancedGameSetupScreen extends CoreScreenLayer {
 
         WidgetUtil.trySubscribe(this, "play", button -> {
             if (StringUtils.isBlank(seed.getText())) {
-                getManager().createScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Error", "Game seed cannot be empty!");
+                getManager().createScreen(MessagePopup.ASSET_URI, MessagePopup.class).
+                        setMessage("Error", "Game seed cannot be empty!");
             } else {
                 universeWrapper.setSeed(seed.getText());
                 saveConfiguration();
                 final GameManifest gameManifest = GameManifestProvider.createGameManifest(universeWrapper, moduleManager, config);
                 if (gameManifest != null) {
-                    gameEngine.changeState(new StateLoading(gameManifest, (universeWrapper.getLoadingAsServer()) ? NetworkMode.DEDICATED_SERVER : NetworkMode.NONE));
+                    gameEngine.changeState(new StateLoading(gameManifest,
+                            (universeWrapper.getLoadingAsServer()) ? NetworkMode.DEDICATED_SERVER : NetworkMode.NONE));
                 } else {
-                    getManager().createScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Error", "Can't create new game!");
+                    getManager().createScreen(MessagePopup.ASSET_URI, MessagePopup.class)
+                            .setMessage("Error", "Can't create new game!");
                 }
             }
         });
@@ -610,7 +613,8 @@ public class AdvancedGameSetupScreen extends CoreScreenLayer {
 
     private void filterText() {
         String newText = moduleSearch.getText();
-        sortedModules.removeIf(moduleSelectionInfo -> !moduleSelectionInfo.getMetadata().getDisplayName().toString().toLowerCase().contains(newText.toLowerCase()));
+        sortedModules.removeIf(moduleSelectionInfo -> !moduleSelectionInfo.getMetadata()
+                .getDisplayName().toString().toLowerCase().contains(newText.toLowerCase()));
     }
 
     private void startDownloadingNewestModulesRequiredFor(ModuleSelectionInfo moduleMetadata) {

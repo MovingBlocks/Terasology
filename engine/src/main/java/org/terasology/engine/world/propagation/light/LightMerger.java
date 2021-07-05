@@ -7,7 +7,6 @@ import com.google.common.collect.Lists;
 import org.joml.Vector3i;
 import org.terasology.engine.math.Side;
 import org.terasology.engine.world.chunks.Chunk;
-import org.terasology.engine.world.chunks.LitChunk;
 import org.terasology.engine.world.propagation.BatchPropagator;
 import org.terasology.engine.world.propagation.LocalChunkView;
 import org.terasology.engine.world.propagation.PropagationRules;
@@ -75,16 +74,16 @@ public class LightMerger {
 
         for (BatchPropagator propagator : propagators) {
             // Propagate Inwards
-            for (Side side : Side.getAllSides()) {
-                LitChunk adjChunk = localChunks[indexOf(side)];
+            for (Side side : Side.values()) {
+                Chunk adjChunk = localChunks[indexOf(side)];
                 if (adjChunk != null) {
                     propagator.propagateBetween(adjChunk, chunk, side.reverse(), false);
                 }
             }
 
             // Propagate Outwards
-            for (Side side : Side.getAllSides()) {
-                LitChunk adjChunk = localChunks[indexOf(side)];
+            for (Side side : Side.values()) {
+                Chunk adjChunk = localChunks[indexOf(side)];
                 if (adjChunk != null) {
                     propagator.propagateBetween(chunk, adjChunk, side, true);
                 }

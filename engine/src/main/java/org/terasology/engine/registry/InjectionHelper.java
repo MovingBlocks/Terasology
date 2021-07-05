@@ -1,26 +1,13 @@
-/*
- * Copyright 2014 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *  http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.registry;
 
 import org.reflections.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.context.Context;
-import org.terasology.util.reflection.ParameterProvider;
-import org.terasology.util.reflection.SimpleClassFactory;
+import org.terasology.gestalt.util.reflection.ParameterProvider;
+import org.terasology.gestalt.util.reflection.SimpleClassFactory;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -30,8 +17,6 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
-/**
- */
 public final class InjectionHelper {
     private static final Logger logger = LoggerFactory.getLogger(InjectionHelper.class);
 
@@ -67,6 +52,9 @@ public final class InjectionHelper {
                     } catch (IllegalAccessException e) {
                         logger.error("Failed to inject value {} into field {} of {}", value, field, object, e);
                     }
+                } else {
+                    logger.warn("{} wanted {} injected but CoreRegistry has none.",
+                            object.getClass().getSimpleName(), field.getType().getSimpleName());
                 }
             }
 
@@ -116,7 +104,8 @@ public final class InjectionHelper {
      * @param clazz The class to instantiate.
      * @param context The context to use for injection.
      * @return A new instance of the class to create.
-     * @throws NoSuchElementException if the injection failed, e.g. if no parameters were available on the context and a default constructor is missing.
+     * @throws NoSuchElementException if the injection failed,
+     * e.g. if no parameters were available on the context and a default constructor is missing.
      */
     public static <E> E createWithConstructorInjection(Class<? extends E> clazz, Context context) {
         return safeCreateWithConstructorInjection(clazz, context).get();

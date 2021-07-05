@@ -17,7 +17,6 @@ import com.google.common.collect.Sets;
 import org.reflections.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.assets.ResourceUrn;
 import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.event.AbstractConsumableEvent;
@@ -26,22 +25,9 @@ import org.terasology.engine.entitySystem.event.Event;
 import org.terasology.engine.entitySystem.event.EventPriority;
 import org.terasology.engine.entitySystem.event.PendingEvent;
 import org.terasology.engine.entitySystem.event.ReceiveEvent;
-import org.terasology.engine.entitySystem.metadata.EventLibrary;
-import org.terasology.engine.entitySystem.metadata.EventMetadata;
 import org.terasology.engine.entitySystem.systems.ComponentSystem;
 import org.terasology.engine.monitoring.PerformanceMonitor;
-import org.terasology.engine.network.BroadcastEvent;
-import org.terasology.engine.network.Client;
-import org.terasology.engine.network.NetworkComponent;
-import org.terasology.engine.network.NetworkEvent;
-import org.terasology.engine.network.NetworkMode;
-import org.terasology.engine.network.NetworkSystem;
-import org.terasology.engine.network.OwnerEvent;
-import org.terasology.engine.network.ServerEvent;
-import org.terasology.engine.recording.EventCatcher;
-import org.terasology.engine.recording.RecordAndReplayCurrentStatus;
-import org.terasology.engine.recording.RecordAndReplayStatus;
-import org.terasology.engine.world.block.BlockComponent;
+import org.terasology.gestalt.assets.ResourceUrn;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -148,16 +134,16 @@ public class EventSystemImpl implements EventSystem {
 
     @Override
     public void unregisterEventHandler(ComponentSystem handler) {
-        for (SetMultimap<Class<? extends Component>, EventHandlerInfo> eventHandlers :
-                componentSpecificHandlers.values()) {
-            Iterator<EventHandlerInfo> eventHandlerIterator = eventHandlers.values().iterator();
+        componentSpecificHandlers.values().stream()
+                .map(eventHandlers -> eventHandlers.values().iterator())
+                .forEach(eventHandlerIterator -> {
             while (eventHandlerIterator.hasNext()) {
                 EventHandlerInfo eventHandler = eventHandlerIterator.next();
                 if (eventHandler.getHandler().equals(handler)) {
                     eventHandlerIterator.remove();
                 }
             }
-        }
+        });
 
         Iterator<EventHandlerInfo> eventHandlerIterator = generalHandlers.values().iterator();
         while (eventHandlerIterator.hasNext()) {
@@ -373,27 +359,28 @@ public class EventSystemImpl implements EventSystem {
 
         @Override
         public void invoke(EntityRef entity, Event event) {
+            // 2021-05-28 We used to catch all kinds of exceptions here that occurred during event invokation. As most
+            // module logic depends on event handling, this basically covered ALL exceptions thrown in any system.
+            //
+            // There might be specific events that can be safely handled here. In that case, we should add the try-catch
+            // back in for the most specific exception type as possible.
+            Object[] params = new Object[2 + componentParams.size()];
+            params[0] = event;
+            params[1] = entity;
+            for (int i = 0; i < componentParams.size(); ++i) {
+                params[i + 2] = entity.getComponent(componentParams.get(i));
+            }
+
+
+            if (!activity.isEmpty()) {
+                PerformanceMonitor.startActivity(activity);
+            }
             try {
-                Object[] params = new Object[2 + componentParams.size()];
-                params[0] = event;
-                params[1] = entity;
-                for (int i = 0; i < componentParams.size(); ++i) {
-                    params[i + 2] = entity.getComponent(componentParams.get(i));
-                }
-
-
+                methodAccess.invoke(handler, methodIndex, params);
+            } finally {
                 if (!activity.isEmpty()) {
-                    PerformanceMonitor.startActivity(activity);
+                    PerformanceMonitor.endActivity();
                 }
-                try {
-                    methodAccess.invoke(handler, methodIndex, params);
-                } finally {
-                    if (!activity.isEmpty()) {
-                        PerformanceMonitor.endActivity();
-                    }
-                }
-            } catch (Exception ex) {
-                logger.error("Failed to invoke event", ex);
             }
         }
 

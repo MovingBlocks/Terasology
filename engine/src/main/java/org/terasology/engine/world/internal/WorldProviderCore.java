@@ -69,6 +69,12 @@ public interface WorldProviderCore {
     ChunkViewCore getWorldViewAround(Vector3ic chunk);
 
     /**
+     * @param region The region, in chunk coordinates, that needs to be covered.
+     * @return A world view of the chunks around the desired chunk, uncentered.
+     */
+    ChunkViewCore getWorldViewAround(BlockRegionc region);
+
+    /**
      * An active block is in a chunk that is available and fully generated.
      *
      * @param x

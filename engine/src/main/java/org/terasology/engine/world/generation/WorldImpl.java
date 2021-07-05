@@ -5,7 +5,7 @@ package org.terasology.engine.world.generation;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Sets;
 import org.terasology.engine.world.block.BlockRegion;
-import org.terasology.engine.world.chunks.CoreChunk;
+import org.terasology.engine.world.chunks.Chunk;
 
 import java.util.Collection;
 import java.util.LinkedHashSet;
@@ -13,8 +13,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-/**
- */
 public class WorldImpl implements World {
     private final ListMultimap<Class<? extends WorldFacet>, FacetProvider> facetProviderChains;
     private final ListMultimap<Class<? extends WorldFacet>, FacetProvider> scalableFacetProviderChains;
@@ -51,7 +49,7 @@ public class WorldImpl implements World {
     }
 
     @Override
-    public void rasterizeChunk(CoreChunk chunk, EntityBuffer buffer) {
+    public void rasterizeChunk(Chunk chunk, EntityBuffer buffer) {
         Region chunkRegion = getWorldData(new BlockRegion(chunk.getRegion()), 1);
         for (WorldRasterizer rasterizer : worldRasterizers) {
             rasterizer.generateChunk(chunk, chunkRegion);
@@ -62,7 +60,7 @@ public class WorldImpl implements World {
     }
 
     @Override
-    public void rasterizeChunk(CoreChunk chunk, float scale) {
+    public void rasterizeChunk(Chunk chunk, float scale) {
         Region chunkRegion = getWorldData(new BlockRegion(chunk.getRegion()), scale);
         for (WorldRasterizer rasterizer : scalableWorldRasterizers) {
             ((ScalableWorldRasterizer) rasterizer).generateChunk(chunk, chunkRegion, scale);

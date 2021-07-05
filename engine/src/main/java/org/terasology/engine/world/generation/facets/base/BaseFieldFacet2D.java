@@ -7,8 +7,6 @@ import org.joml.Vector2ic;
 import org.terasology.engine.world.block.BlockRegionc;
 import org.terasology.engine.world.generation.Border3D;
 
-/**
- */
 public abstract class BaseFieldFacet2D extends BaseFacet2D implements FieldFacet2D {
 
     private float[] data;

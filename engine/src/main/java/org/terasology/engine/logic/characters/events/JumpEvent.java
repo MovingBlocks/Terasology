@@ -4,7 +4,5 @@ package org.terasology.engine.logic.characters.events;
 
 import org.terasology.engine.entitySystem.event.Event;
 
-/**
- */
 public class JumpEvent implements Event {
 }

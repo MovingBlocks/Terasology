@@ -11,7 +11,6 @@ import org.terasology.engine.config.Config;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
 import org.terasology.engine.logic.players.LocalPlayer;
-import org.terasology.math.TeraMath;
 import org.terasology.engine.physics.CollisionGroup;
 import org.terasology.engine.physics.HitResult;
 import org.terasology.engine.physics.Physics;
@@ -20,11 +19,10 @@ import org.terasology.engine.registry.In;
 import org.terasology.engine.rendering.world.WorldRenderer;
 import org.terasology.engine.world.BlockEntityRegistry;
 import org.terasology.engine.world.block.BlockComponent;
+import org.terasology.math.TeraMath;
 
 import java.util.Arrays;
 
-/**
- */
 public class CameraTargetSystem extends BaseComponentSystem {
 
     @In

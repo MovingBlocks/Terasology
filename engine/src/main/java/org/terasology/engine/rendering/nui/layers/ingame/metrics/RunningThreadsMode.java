@@ -6,8 +6,6 @@ package org.terasology.engine.rendering.nui.layers.ingame.metrics;
 import org.terasology.engine.monitoring.ThreadMonitor;
 import org.terasology.engine.monitoring.impl.SingleThreadMonitor;
 
-/**
- */
 final class RunningThreadsMode extends MetricsMode {
 
      RunningThreadsMode() {

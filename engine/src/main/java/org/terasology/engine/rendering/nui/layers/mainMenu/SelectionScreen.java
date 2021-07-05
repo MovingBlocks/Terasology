@@ -4,27 +4,28 @@ package org.terasology.engine.rendering.nui.layers.mainMenu;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.assets.ResourceUrn;
+import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.engine.config.Config;
+import org.terasology.engine.config.PlayerConfig;
 import org.terasology.engine.core.TerasologyConstants;
 import org.terasology.engine.i18n.TranslationSystem;
+import org.terasology.engine.persistence.internal.GamePreviewImageProvider;
+import org.terasology.engine.registry.In;
 import org.terasology.engine.rendering.assets.texture.AWTTextureFormat;
 import org.terasology.engine.rendering.assets.texture.Texture;
 import org.terasology.engine.rendering.assets.texture.TextureData;
-import org.terasology.engine.rendering.nui.layers.mainMenu.savedGames.GameInfo;
-import org.terasology.naming.Name;
-import org.terasology.naming.NameVersion;
-import org.terasology.nui.widgets.UIImage;
-import org.terasology.nui.widgets.UIImageSlideshow;
-import org.terasology.nui.widgets.UILabel;
-import org.terasology.nui.widgets.UIList;
-import org.terasology.engine.persistence.internal.GamePreviewImageProvider;
-import org.terasology.engine.registry.In;
 import org.terasology.engine.rendering.nui.CoreScreenLayer;
+import org.terasology.engine.rendering.nui.layers.mainMenu.savedGames.GameInfo;
 import org.terasology.engine.utilities.Assets;
 import org.terasology.engine.utilities.FilesUtil;
 import org.terasology.engine.world.generator.internal.WorldGeneratorInfo;
 import org.terasology.engine.world.generator.internal.WorldGeneratorManager;
+import org.terasology.gestalt.naming.Name;
+import org.terasology.gestalt.naming.NameVersion;
+import org.terasology.nui.widgets.UIImage;
+import org.terasology.nui.widgets.UIImageSlideshow;
+import org.terasology.nui.widgets.UILabel;
+import org.terasology.nui.widgets.UIList;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -48,6 +49,9 @@ public abstract class SelectionScreen extends CoreScreenLayer {
 
     @In
     protected Config config;
+    @In
+    protected PlayerConfig playerConfig;
+
 
     @In
     protected WorldGeneratorManager worldGeneratorManager;
@@ -83,7 +87,10 @@ public abstract class SelectionScreen extends CoreScreenLayer {
         if (wgi != null) {
             mainWorldGenerator = wgi.getDisplayName();
         } else {
-            mainWorldGenerator = mainWorldGenerator + gameInfo.getManifest().getWorldInfo(TerasologyConstants.MAIN_WORLD).getWorldGenerator().toString() + " not found";
+            mainWorldGenerator = mainWorldGenerator + gameInfo.getManifest()
+                    .getWorldInfo(TerasologyConstants.MAIN_WORLD)
+                    .getWorldGenerator()
+                    .toString() + " not found";
         }
 
         final String commaSeparatedModules = gameInfo.getManifest()
@@ -95,7 +102,9 @@ public abstract class SelectionScreen extends CoreScreenLayer {
                 .collect(Collectors.joining(", "));
 
         worldGenerator.setText(mainWorldGenerator);
-        moduleNames.setText(commaSeparatedModules.length() > MODULES_LINE_LIMIT ? commaSeparatedModules.substring(0, MODULES_LINE_LIMIT) + "..." : commaSeparatedModules);
+        moduleNames.setText(commaSeparatedModules.length() > MODULES_LINE_LIMIT
+                ? commaSeparatedModules.substring(0, MODULES_LINE_LIMIT) + "..."
+                : commaSeparatedModules);
 
         loadPreviewImages(gameInfo);
     }
@@ -114,7 +123,8 @@ public abstract class SelectionScreen extends CoreScreenLayer {
                             logger.error("Converting preview image to texture data {} failed", e);
                             return null;
                         }
-                        return Assets.generateAsset(new ResourceUrn(PREVIEW_IMAGE_URI_PATTERN + bufferedImages.indexOf(buffImage)), textureData, Texture.class);
+                        return Assets.generateAsset(new ResourceUrn(PREVIEW_IMAGE_URI_PATTERN + bufferedImages.indexOf(buffImage)),
+                                textureData, Texture.class);
                     })
                     .filter(Objects::nonNull)
                     .collect(Collectors.toList());
@@ -141,7 +151,8 @@ public abstract class SelectionScreen extends CoreScreenLayer {
                 gameList.select(0);
             } catch (Exception e) {
                 logger.error("Failed to delete " + removeString, e);
-                getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Error Deleting Game", e.getMessage());
+                getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class)
+                        .setMessage("Error Deleting Game", e.getMessage());
             }
         }
     }

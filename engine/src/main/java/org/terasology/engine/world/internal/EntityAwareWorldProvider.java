@@ -52,7 +52,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator implements BlockEntityRegistry, UpdateSubscriberSystem, EntityChangeSubscriber {
+public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator
+        implements BlockEntityRegistry, UpdateSubscriberSystem, EntityChangeSubscriber {
     private static final Logger logger = LoggerFactory.getLogger(EntityAwareWorldProvider.class);
     private static final Set<Class<? extends Component>> COMMON_BLOCK_COMPONENTS =
         ImmutableSet.of(NetworkComponent.class, BlockComponent.class, LocationComponent.class);
@@ -164,7 +165,9 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
         } else if (oldType.isKeepActive() && isTemporaryBlock(blockEntity, type)) {
             temporaryBlockEntities.add(blockEntity);
         }
-        if (forceEntityUpdate || !(Objects.equal(oldType.getBlockFamily(), type.getBlockFamily()) && Objects.equal(oldType.getPrefab(), type.getPrefab()))) {
+        if (forceEntityUpdate
+                || !(Objects.equal(oldType.getBlockFamily(), type.getBlockFamily())
+                && Objects.equal(oldType.getPrefab(), type.getPrefab()))) {
             updateBlockEntityComponents(blockEntity, oldType, type, retainComponents);
         }
 
@@ -221,7 +224,9 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
     public EntityRef getBlockEntityAt(Vector3ic blockPosition) {
         if (GameThread.isCurrentThread()) {
             EntityRef blockEntity = getExistingBlockEntityAt(blockPosition);
-            if ((!blockEntity.exists() || !blockEntity.hasComponent(NetworkComponent.class)) && isBlockRelevant(blockPosition.x(), blockPosition.y(), blockPosition.z())) {
+            if ((!blockEntity.exists()
+                    || !blockEntity.hasComponent(NetworkComponent.class))
+                    && isBlockRelevant(blockPosition.x(), blockPosition.y(), blockPosition.z())) {
                 Block block = getBlock(blockPosition.x(), blockPosition.y(), blockPosition.z());
                 blockEntity = createBlockEntity(blockPosition, block);
             }
@@ -390,7 +395,7 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
         return false;
     }
 
-    @ReceiveEvent(components = {BlockComponent.class})
+    @ReceiveEvent(components = BlockComponent.class)
     public void onActivateBlock(OnActivatedComponent event, EntityRef entity) {
         BlockComponent block = entity.getComponent(BlockComponent.class);
         EntityRef oldEntity = blockEntityLookup.put(block.getPosition(new Vector3i()), entity);
@@ -400,7 +405,7 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
         }
     }
 
-    @ReceiveEvent(components = {BlockComponent.class})
+    @ReceiveEvent(components = BlockComponent.class)
     public void onDeactivateBlock(BeforeDeactivateComponent event, EntityRef entity) {
         BlockComponent block = entity.getComponent(BlockComponent.class);
         if (blockEntityLookup.get(block.getPosition()) == entity) {
@@ -408,7 +413,7 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
         }
     }
 
-    @ReceiveEvent(components = {BlockRegionComponent.class})
+    @ReceiveEvent(components = BlockRegionComponent.class)
     public void onBlockRegionActivated(OnActivatedComponent event, EntityRef entity) {
         BlockRegionComponent regionComp = entity.getComponent(BlockRegionComponent.class);
         blockRegions.put(entity, regionComp.region);
@@ -417,7 +422,7 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
         }
     }
 
-    @ReceiveEvent(components = {BlockRegionComponent.class})
+    @ReceiveEvent(components = BlockRegionComponent.class)
     public void onBlockRegionChanged(OnChangedComponent event, EntityRef entity) {
         BlockRegion oldRegion = blockRegions.get(entity);
         for (Vector3ic pos : oldRegion) {
@@ -430,7 +435,7 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
         }
     }
 
-    @ReceiveEvent(components = {BlockRegionComponent.class})
+    @ReceiveEvent(components = BlockRegionComponent.class)
     public void onBlockRegionDeactivated(BeforeDeactivateComponent event, EntityRef entity) {
         BlockRegion oldRegion = blockRegions.get(entity);
         for (Vector3ic pos : oldRegion) {

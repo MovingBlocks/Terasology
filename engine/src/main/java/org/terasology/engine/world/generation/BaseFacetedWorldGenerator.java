@@ -3,7 +3,7 @@
 package org.terasology.engine.world.generation;
 
 import org.terasology.engine.core.SimpleUri;
-import org.terasology.engine.world.chunks.CoreChunk;
+import org.terasology.engine.world.chunks.Chunk;
 import org.terasology.engine.world.generator.ScalableWorldGenerator;
 import org.terasology.engine.world.generator.WorldConfigurator;
 import org.terasology.engine.world.generator.WorldGenerator;
@@ -59,12 +59,12 @@ public abstract class BaseFacetedWorldGenerator implements ScalableWorldGenerato
     }
 
     @Override
-    public void createChunk(CoreChunk chunk, EntityBuffer buffer) {
+    public void createChunk(Chunk chunk, EntityBuffer buffer) {
         world.rasterizeChunk(chunk, buffer);
     }
 
     @Override
-    public void createChunk(CoreChunk chunk, float scale) {
+    public void createChunk(Chunk chunk, float scale) {
         world.rasterizeChunk(chunk, scale);
     }
 

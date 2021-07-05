@@ -10,25 +10,26 @@ import com.google.gson.JsonSyntaxException;
 import com.google.gson.stream.JsonReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.assets.ResourceUrn;
-import org.terasology.assets.exceptions.InvalidUrnException;
-import org.terasology.assets.format.AssetDataFile;
 import org.terasology.engine.core.module.ModuleManager;
+import org.terasology.engine.registry.In;
+import org.terasology.engine.rendering.nui.CoreScreenLayer;
 import org.terasology.engine.rendering.nui.editor.systems.AbstractEditorSystem;
 import org.terasology.engine.rendering.nui.layers.mainMenu.ConfirmPopup;
 import org.terasology.engine.rendering.nui.widgets.JsonEditorTreeView;
+import org.terasology.gestalt.assets.ResourceUrn;
+import org.terasology.gestalt.assets.exceptions.InvalidUrnException;
+import org.terasology.gestalt.assets.format.AssetDataFile;
+import org.terasology.gestalt.module.Module;
+import org.terasology.gestalt.module.resources.DirectoryFileSource;
+import org.terasology.gestalt.naming.Name;
 import org.terasology.input.Keyboard;
 import org.terasology.input.device.KeyboardDevice;
-import org.terasology.module.PathModule;
-import org.terasology.naming.Name;
 import org.terasology.nui.Canvas;
 import org.terasology.nui.events.NUIKeyEvent;
 import org.terasology.nui.widgets.UITextEntry;
 import org.terasology.nui.widgets.treeView.JsonTree;
 import org.terasology.nui.widgets.treeView.JsonTreeConverter;
 import org.terasology.nui.widgets.treeView.JsonTreeValue;
-import org.terasology.engine.registry.In;
-import org.terasology.engine.rendering.nui.CoreScreenLayer;
 
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
@@ -44,8 +45,11 @@ import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
+
+import static com.google.common.base.Verify.verifyNotNull;
 
 /**
  * A base screen for the NUI screen/skin editors.
@@ -326,17 +330,31 @@ public abstract class AbstractEditorScreen extends CoreScreenLayer {
         outputStream.write(jsonString.getBytes());
     }
 
+    /**
+     * Returns the file path to a given asset if the module providing the asset is present as source. The path will for
+     * instance be used by the editor to edit the asset. Editing files within module jars is not possible. Hence, we
+     * return `null` in case the module is not present as source.
+     *
+     * @param source asset file object to get the file path to
+     * @return path to asset or null if module not present as source
+     */
     protected Path getPath(AssetDataFile source) {
         List<String> path = source.getPath();
         Name moduleName = new Name(path.get(0));
-        if (moduleManager.getEnvironment().get(moduleName) instanceof PathModule) {
+        Module module = verifyNotNull(moduleManager.getEnvironment().get(moduleName),
+                "Module \"%s\" not found in current module environment.", moduleName);
+        // TODO: Checking whether the module is present as source should not be done in `getPath()` as this has no
+        //  knowledge about what the path will be used for (read vs write access)
+        if (module.getResources() instanceof DirectoryFileSource) {
             path.add(source.getFilename());
             String[] pathArray = path.toArray(new String[path.size()]);
 
             // Copy all the elements after the first to a separate array for getPath().
             String first = pathArray[0];
             String[] more = Arrays.copyOfRange(pathArray, 1, pathArray.length);
-            return moduleManager.getEnvironment().getFileSystem().getPath(first, more);
+            return Paths.get("", moduleManager.getEnvironment().getResources()
+                    .getFile(first, more)
+                    .orElseThrow(()-> new RuntimeException("Cannot get path for " + source.getFilename())).getPath().stream().toArray(String[]::new));
         }
         return null;
     }

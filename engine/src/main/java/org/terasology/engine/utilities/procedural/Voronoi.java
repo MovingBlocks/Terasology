@@ -8,8 +8,6 @@ import org.joml.Vector2f;
 
 import java.util.Random;
 
-/**
- */
 public class Voronoi {
 
     private static final float DENSITY_ADJUSTMENT = 0.39815f;
@@ -59,8 +57,10 @@ public class Voronoi {
         Vector2f cellPos = new Vector2f(at);
         cellPos.x -= cellX;
         cellPos.y -= cellY;
-        Vector2f distMax = new Vector2f(standardDistanceFunction(new Vector2f(1 - cellPos.x, 0)), standardDistanceFunction(new Vector2f(0, 1 - cellPos.y)));
-        Vector2f distMin = new Vector2f(standardDistanceFunction(new Vector2f(cellPos.x, 0)), standardDistanceFunction(new Vector2f(0, cellPos.y)));
+        Vector2f distMax = new Vector2f(standardDistanceFunction(new Vector2f(1 - cellPos.x, 0)),
+                standardDistanceFunction(new Vector2f(0, 1 - cellPos.y)));
+        Vector2f distMin = new Vector2f(standardDistanceFunction(new Vector2f(cellPos.x, 0)),
+                standardDistanceFunction(new Vector2f(0, cellPos.y)));
 
         // Test near cells
         if (distMin.x < results[results.length - 1].distance) {

@@ -6,8 +6,8 @@ package org.terasology.engine.world.propagation.light;
 import org.joml.Vector3i;
 import org.terasology.engine.math.Side;
 import org.terasology.engine.world.block.Block;
+import org.terasology.engine.world.chunks.Chunk;
 import org.terasology.engine.world.chunks.Chunks;
-import org.terasology.engine.world.chunks.LitChunk;
 import org.terasology.engine.world.propagation.BatchPropagator;
 import org.terasology.engine.world.propagation.PropagationRules;
 import org.terasology.engine.world.propagation.SingleChunkView;
@@ -25,11 +25,11 @@ public final class InternalLightProcessor {
     private InternalLightProcessor() {
     }
 
-    public static void generateInternalLighting(LitChunk chunk) {
+    public static void generateInternalLighting(Chunk chunk) {
         generateInternalLighting(chunk, 1);
     }
 
-    public static void generateInternalLighting(LitChunk chunk, int scale) {
+    public static void generateInternalLighting(Chunk chunk, int scale) {
         populateSunlightRegen(chunk, scale);
         populateSunlight(chunk, scale);
         populateLight(chunk, scale);
@@ -40,7 +40,7 @@ public final class InternalLightProcessor {
      *
      * @param chunk The chunk to populate through
      */
-    private static void populateLight(LitChunk chunk, int scale) {
+    private static void populateLight(Chunk chunk, int scale) {
         BatchPropagator lightPropagator = new StandardBatchPropagator(LIGHT_RULES, new SingleChunkView(LIGHT_RULES, chunk), scale);
         Vector3i pos = new Vector3i();
         for (int x = 0; x < Chunks.SIZE_X; x++) {
@@ -49,7 +49,7 @@ public final class InternalLightProcessor {
                     Block block = chunk.getBlock(x, y, z);
                     if (block.getLuminance() > 0) {
                         chunk.setLight(x, y, z, block.getLuminance());
-                        lightPropagator.propagateFrom(pos.set(x,y,z), block.getLuminance());
+                        lightPropagator.propagateFrom(pos.set(x, y, z), block.getLuminance());
                     }
                 }
             }
@@ -62,7 +62,7 @@ public final class InternalLightProcessor {
      *
      * @param chunk The chunk to set in
      */
-    private static void populateSunlight(LitChunk chunk, int scale) {
+    private static void populateSunlight(Chunk chunk, int scale) {
         PropagationRules sunlightRules = new SunlightPropagationRules(chunk);
         BatchPropagator lightPropagator = new StandardBatchPropagator(sunlightRules, new SingleChunkView(sunlightRules, chunk), scale);
 
@@ -89,7 +89,7 @@ public final class InternalLightProcessor {
      *
      * @param chunk The chunk to populate the regeneration values through
      */
-    private static void populateSunlightRegen(LitChunk chunk, int scale) {
+    private static void populateSunlightRegen(Chunk chunk, int scale) {
         int top = Chunks.SIZE_Y - 1;
         /* Scan through each column in the chunk & propagate light from the top down */
         for (int x = 0; x < Chunks.SIZE_X; x++) {

@@ -14,9 +14,9 @@ import org.terasology.engine.entitySystem.systems.RegisterSystem;
 import org.terasology.engine.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.engine.logic.characters.CharacterMoveInputEvent;
 import org.terasology.engine.logic.characters.CharacterMovementComponent;
+import org.terasology.engine.logic.characters.events.HorizontalCollisionEvent;
 import org.terasology.engine.logic.location.LocationComponent;
 import org.terasology.engine.logic.players.LocalPlayer;
-import org.terasology.engine.logic.characters.events.HorizontalCollisionEvent;
 import org.terasology.engine.registry.In;
 import org.terasology.engine.utilities.random.FastRandom;
 import org.terasology.engine.utilities.random.Random;
@@ -237,7 +237,7 @@ public class HierarchicalAISystem extends BaseComponentSystem implements UpdateS
     }
 
     //TODO change eating thingy to use this
-    @ReceiveEvent(components = {HierarchicalAIComponent.class})
+    @ReceiveEvent(components = HierarchicalAIComponent.class)
     public void onBump(HorizontalCollisionEvent event, EntityRef entity, CharacterMovementComponent moveComp) {
         if (moveComp != null && moveComp.grounded) {
             moveComp.jump = true;

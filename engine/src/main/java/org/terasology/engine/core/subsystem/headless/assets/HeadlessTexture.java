@@ -1,28 +1,16 @@
-/*
- * Copyright 2014 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.core.subsystem.headless.assets;
 
 import com.google.common.collect.Lists;
 import org.joml.Vector2i;
-import org.terasology.assets.AssetType;
-import org.terasology.assets.ResourceUrn;
-import org.terasology.joml.geom.Rectanglef;
-import org.terasology.joml.geom.Rectanglei;
 import org.terasology.engine.rendering.assets.texture.Texture;
 import org.terasology.engine.rendering.assets.texture.TextureData;
+import org.terasology.gestalt.assets.AssetType;
+import org.terasology.gestalt.assets.DisposableResource;
+import org.terasology.gestalt.assets.ResourceUrn;
+import org.terasology.joml.geom.Rectanglef;
+import org.terasology.joml.geom.Rectanglei;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -35,12 +23,16 @@ public class HeadlessTexture extends Texture {
     private int id;
     private final DisposalAction disposalAction;
 
-    public HeadlessTexture(ResourceUrn urn, AssetType<?, TextureData> assetType, TextureData data) {
-        super(urn, assetType);
-        disposalAction = new DisposalAction();
-        getDisposalHook().setDisposeAction(disposalAction);
+    public HeadlessTexture(ResourceUrn urn, AssetType<?, TextureData> assetType, TextureData data,
+                           DisposalAction disposableResource) {
+        super(urn, assetType, disposableResource);
+        disposalAction = disposableResource;
         reload(data);
         id = ID_COUNTER.getAndIncrement();
+    }
+
+    public static HeadlessTexture create(ResourceUrn urn, AssetType<?, TextureData> assetType, TextureData data) {
+        return new HeadlessTexture(urn, assetType, data, new DisposalAction());
     }
 
     @Override
@@ -123,22 +115,22 @@ public class HeadlessTexture extends Texture {
     }
 
     @Override
-    public synchronized void subscribeToDisposal(Runnable subscriber) {
+    public synchronized void subscribeToDisposal(DisposableResource subscriber) {
         disposalAction.disposalListeners.add(subscriber);
     }
 
     @Override
-    public synchronized void unsubscribeToDisposal(Runnable subscriber) {
+    public synchronized void unsubscribeToDisposal(DisposableResource subscriber) {
         disposalAction.disposalListeners.remove(subscriber);
     }
 
-    private static class DisposalAction implements Runnable {
+    public static class DisposalAction implements DisposableResource {
 
-        private final List<Runnable> disposalListeners = Lists.newArrayList();
+        private final List<DisposableResource> disposalListeners = Lists.newArrayList();
 
         @Override
-        public void run() {
-            disposalListeners.forEach(java.lang.Runnable::run);
+        public void close() {
+            disposalListeners.forEach(DisposableResource::close);
         }
     }
 }

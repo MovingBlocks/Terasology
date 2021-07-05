@@ -6,7 +6,6 @@ import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.assets.ResourceUrn;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.entitySystem.entity.EntityManager;
 import org.terasology.engine.entitySystem.entity.EntityRef;
@@ -16,22 +15,23 @@ import org.terasology.engine.entitySystem.systems.RegisterSystem;
 import org.terasology.engine.logic.characters.CharacterImpulseEvent;
 import org.terasology.engine.logic.characters.CharacterMovementComponent;
 import org.terasology.engine.logic.characters.CharacterTeleportEvent;
+import org.terasology.engine.logic.characters.GazeMountPointComponent;
 import org.terasology.engine.logic.characters.MovementMode;
+import org.terasology.engine.logic.characters.events.ScaleToRequest;
+import org.terasology.engine.logic.characters.events.SetMovementModeEvent;
 import org.terasology.engine.logic.common.DisplayNameComponent;
 import org.terasology.engine.logic.console.commandSystem.annotations.Command;
 import org.terasology.engine.logic.console.commandSystem.annotations.CommandParam;
 import org.terasology.engine.logic.console.commandSystem.annotations.Sender;
 import org.terasology.engine.logic.location.Location;
 import org.terasology.engine.logic.location.LocationComponent;
-import org.terasology.engine.logic.characters.GazeMountPointComponent;
-import org.terasology.engine.logic.characters.events.ScaleToRequest;
-import org.terasology.engine.logic.characters.events.SetMovementModeEvent;
 import org.terasology.engine.logic.permission.PermissionManager;
 import org.terasology.engine.network.ClientComponent;
 import org.terasology.engine.physics.engine.PhysicsEngine;
 import org.terasology.engine.registry.In;
 import org.terasology.engine.registry.Share;
 import org.terasology.engine.utilities.Assets;
+import org.terasology.gestalt.assets.ResourceUrn;
 
 import java.util.Optional;
 
@@ -283,7 +283,8 @@ public class MovementDebugCommands extends BaseComponentSystem {
 
     @Command(value = "teleport", shortDescription = "Teleports you to a location", runOnServer = true,
             requiredPermission = PermissionManager.CHEAT_PERMISSION)
-    public String teleportCommand(@Sender EntityRef sender, @CommandParam("x") float x, @CommandParam("y") float y, @CommandParam("z") float z) {
+    public String teleportCommand(@Sender EntityRef sender,
+                                  @CommandParam("x") float x, @CommandParam("y") float y, @CommandParam("z") float z) {
         ClientComponent clientComp = sender.getComponent(ClientComponent.class);
         clientComp.character.send(new CharacterTeleportEvent(new Vector3f(x, y, z)));
         return "Teleporting  to " + x + " " + y + " " + z;
@@ -443,7 +444,9 @@ public class MovementDebugCommands extends BaseComponentSystem {
                 clientComp.character.send(new CharacterTeleportEvent(vPlayerLocation));
 
                 CharacterMovementComponent characterMovementComponent = clientComp.character.getComponent(CharacterMovementComponent.class);
-                if (characterMovementComponent != null && playerMovementMode != MovementMode.NONE && playerMovementMode != characterMovementComponent.mode) {
+                if (characterMovementComponent != null
+                        && playerMovementMode != MovementMode.NONE
+                        && playerMovementMode != characterMovementComponent.mode) {
                     clientComp.character.send(new SetMovementModeEvent(playerMovementMode));
                 }
             }

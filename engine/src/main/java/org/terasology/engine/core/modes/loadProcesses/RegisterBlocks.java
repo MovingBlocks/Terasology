@@ -3,7 +3,6 @@
 
 package org.terasology.engine.core.modes.loadProcesses;
 
-import org.terasology.assets.management.AssetManager;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.core.modes.SingleStepLoadProcess;
@@ -19,11 +18,10 @@ import org.terasology.engine.world.block.family.BlockFamilyLibrary;
 import org.terasology.engine.world.block.internal.BlockManagerImpl;
 import org.terasology.engine.world.block.tiles.WorldAtlas;
 import org.terasology.engine.world.block.tiles.WorldAtlasImpl;
-import org.terasology.module.ModuleEnvironment;
+import org.terasology.gestalt.assets.management.AssetManager;
+import org.terasology.gestalt.module.ModuleEnvironment;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 
-/**
- */
 public class RegisterBlocks extends SingleStepLoadProcess {
     private final Context context;
     private final GameManifest gameManifest;

@@ -7,8 +7,8 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.assets.ResourceUrn;
 import org.terasology.engine.config.Config;
+import org.terasology.engine.config.PlayerConfig;
 import org.terasology.engine.config.ServerInfo;
 import org.terasology.engine.core.GameEngine;
 import org.terasology.engine.core.GameThread;
@@ -16,15 +16,20 @@ import org.terasology.engine.core.modes.StateLoading;
 import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.engine.i18n.TranslationSystem;
 import org.terasology.engine.identity.storageServiceClient.StorageServiceWorker;
-import org.terasology.engine.rendering.nui.animation.MenuAnimationSystems;
-import org.terasology.input.Keyboard;
-import org.terasology.module.ModuleRegistry;
-import org.terasology.naming.NameVersion;
 import org.terasology.engine.network.JoinStatus;
 import org.terasology.engine.network.NetworkSystem;
 import org.terasology.engine.network.PingService;
 import org.terasology.engine.network.ServerInfoMessage;
 import org.terasology.engine.network.ServerInfoService;
+import org.terasology.engine.registry.In;
+import org.terasology.engine.rendering.nui.CoreScreenLayer;
+import org.terasology.engine.rendering.nui.animation.MenuAnimationSystems;
+import org.terasology.engine.world.internal.WorldInfo;
+import org.terasology.engine.world.time.WorldTime;
+import org.terasology.gestalt.assets.ResourceUrn;
+import org.terasology.gestalt.module.ModuleRegistry;
+import org.terasology.gestalt.naming.NameVersion;
+import org.terasology.input.Keyboard;
 import org.terasology.nui.Color;
 import org.terasology.nui.FontColor;
 import org.terasology.nui.WidgetUtil;
@@ -38,10 +43,6 @@ import org.terasology.nui.widgets.ActivateEventListener;
 import org.terasology.nui.widgets.UIButton;
 import org.terasology.nui.widgets.UILabel;
 import org.terasology.nui.widgets.UIList;
-import org.terasology.engine.registry.In;
-import org.terasology.engine.rendering.nui.CoreScreenLayer;
-import org.terasology.engine.world.internal.WorldInfo;
-import org.terasology.engine.world.time.WorldTime;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -53,8 +54,6 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
-/**
- */
 public class JoinGameScreen extends CoreScreenLayer {
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:joinGameScreen");
 
@@ -62,6 +61,8 @@ public class JoinGameScreen extends CoreScreenLayer {
 
     @In
     private Config config;
+    @In
+    private PlayerConfig playerConfig;
 
     @In
     private NetworkSystem networkSystem;
@@ -148,7 +149,7 @@ public class JoinGameScreen extends CoreScreenLayer {
 
         infoService = new ServerInfoService();
 
-        if (!config.getPlayer().hasEnteredUsername()) {
+        if (playerConfig.playerName.getDefaultValue().equals(playerConfig.playerName.get())) {
             getManager().pushScreen(EnterUsernamePopup.ASSET_URI, EnterUsernamePopup.class);
         }
 
@@ -476,8 +477,9 @@ public class JoinGameScreen extends CoreScreenLayer {
             } catch (IOException e) {
                 String text = translationSystem.translate("${engine:menu#connection-failed}");
                 // Check if selection name is same as earlier when response is received before updating ping field
-                if (name.equals(visibleList.getSelection().getName()))
-                GameThread.asynch(() -> ping.setText(FontColor.getColored(text, Color.RED)));
+                if (name.equals(visibleList.getSelection().getName())) {
+                    GameThread.asynch(() -> ping.setText(FontColor.getColored(text, Color.RED)));
+                }
             }
         });
 

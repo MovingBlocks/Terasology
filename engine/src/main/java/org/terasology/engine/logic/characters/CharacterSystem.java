@@ -53,12 +53,11 @@ import org.terasology.engine.world.block.regions.ActAsBlockComponent;
 
 import java.util.Optional;
 
-/**
- *
- */
+
 @RegisterSystem
 public class CharacterSystem extends BaseComponentSystem implements UpdateSubscriberSystem {
-    public static final CollisionGroup[] DEFAULTPHYSICSFILTER = {StandardCollisionGroup.DEFAULT, StandardCollisionGroup.WORLD, StandardCollisionGroup.CHARACTER};
+    public static final CollisionGroup[] DEFAULTPHYSICSFILTER =
+            {StandardCollisionGroup.DEFAULT, StandardCollisionGroup.WORLD, StandardCollisionGroup.CHARACTER};
     private static final Logger logger = LoggerFactory.getLogger(CharacterSystem.class);
 
     @In
@@ -89,7 +88,8 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
     private RecordAndReplayCurrentStatus recordAndReplayCurrentStatus;
 
     @ReceiveEvent
-    public void beforeDestroy(BeforeDestroyEvent event, EntityRef character, CharacterComponent characterComponent, AliveCharacterComponent aliveCharacterComponent) {
+    public void beforeDestroy(BeforeDestroyEvent event, EntityRef character,
+                              CharacterComponent characterComponent, AliveCharacterComponent aliveCharacterComponent) {
         if (character.hasComponent(PlayerCharacterComponent.class)) {
             // Consume the BeforeDestroyEvent so that the DoDestroy event is never sent for player entities
             event.consume();
@@ -176,7 +176,7 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
         }
     }
 
-    @ReceiveEvent(components = {CharacterComponent.class}, netFilter = RegisterMode.CLIENT)
+    @ReceiveEvent(components = CharacterComponent.class, netFilter = RegisterMode.CLIENT)
     public void onAttackRequest(AttackButton event, EntityRef entity, CharacterHeldItemComponent characterHeldItemComponent) {
         if (!event.isDown()) {
             return;
@@ -213,13 +213,13 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
         if (!onItemUseEvent.isConsumed()) {
             EntityRef gazeEntity = GazeAuthoritySystem.getGazeEntityForCharacter(character);
             LocationComponent gazeLocation = gazeEntity.getComponent(LocationComponent.class);
-            org.joml.Vector3f direction = gazeLocation.getWorldDirection(new org.joml.Vector3f());
-            org.joml.Vector3f originPos = gazeLocation.getWorldPosition(new org.joml.Vector3f());
+            Vector3f direction = gazeLocation.getWorldDirection(new Vector3f());
+            Vector3f originPos = gazeLocation.getWorldPosition(new Vector3f());
             if (recordAndReplayCurrentStatus.getStatus() == RecordAndReplayStatus.RECORDING) {
                 directionAndOriginPosRecorderList.getAttackEventDirectionAndOriginPosRecorder().add(direction,
                     originPos);
             } else if (recordAndReplayCurrentStatus.getStatus() == RecordAndReplayStatus.REPLAYING) {
-                org.joml.Vector3f[] data =
+                Vector3f[] data =
                     directionAndOriginPosRecorderList.getAttackEventDirectionAndOriginPosRecorder().poll();
                 direction = data[0];
                 originPos = data[1];
@@ -234,7 +234,7 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
         }
     }
 
-    @ReceiveEvent(components = {CharacterComponent.class})
+    @ReceiveEvent(components = CharacterComponent.class)
     public void onItemUse(OnItemUseEvent event, EntityRef entity, CharacterHeldItemComponent characterHeldItemComponent) {
         long currentTime = time.getGameTimeInMs();
         if (characterHeldItemComponent.nextItemUseTime > currentTime) {
@@ -311,14 +311,14 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
         CharacterComponent characterComponent = character.getComponent(CharacterComponent.class);
         EntityRef camera = GazeAuthoritySystem.getGazeEntityForCharacter(character);
         LocationComponent location = camera.getComponent(LocationComponent.class);
-        org.joml.Vector3f direction = location.getWorldDirection(new org.joml.Vector3f());
+        Vector3f direction = location.getWorldDirection(new Vector3f());
         if (!(event.getDirection().equals(direction, 0.0001f))) {
             logger.error("Direction at client {} was different than direction at server {}", event.getDirection(), direction);
         }
         // Assume the exact same value in case there are rounding mistakes:
         direction = event.getDirection();
 
-        org.joml.Vector3f originPos = location.getWorldPosition(new org.joml.Vector3f());
+        Vector3f originPos = location.getWorldPosition(new Vector3f());
         if (!(event.getOrigin().equals(originPos, 0.0001f))) {
             String msg = "Player {} seems to have cheated: It stated that it performed an action from {} but the predicted position is {}";
             logger.info(msg, getPlayerNameFromCharacter(character), event.getOrigin(), originPos);
@@ -352,7 +352,8 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
                 return false; // can happen if target existed on client
             }
 
-            HitResult result = physics.rayTrace(originPos, direction, characterComponent.interactionRange, Sets.newHashSet(character), DEFAULTPHYSICSFILTER);
+            HitResult result = physics.rayTrace(originPos, direction, characterComponent.interactionRange, Sets.newHashSet(character),
+                    DEFAULTPHYSICSFILTER);
             if (!result.isHit()) {
                 String msg = "Denied activation attempt by {} since at the authority there was nothing to activate at that place";
                 logger.info(msg, getPlayerNameFromCharacter(character));
@@ -463,7 +464,7 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
         // safely above ground.
         Optional.ofNullable(entity.getComponent(LocationComponent.class))
                 .map(k -> k.getWorldPosition(new org.joml.Vector3f()))
-                .map(location -> location.add(0,(event.getNewValue() - event.getOldValue()) / 2f,0))
+                .map(location -> location.add(0, (event.getNewValue() - event.getOldValue()) / 2f, 0))
                 .ifPresent(location -> entity.send(new CharacterTeleportEvent(location)));
     }
 

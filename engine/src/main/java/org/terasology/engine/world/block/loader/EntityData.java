@@ -3,10 +3,8 @@
 package org.terasology.engine.world.block.loader;
 
 import org.terasology.engine.entitySystem.prefab.Prefab;
-import org.terasology.module.sandbox.API;
+import org.terasology.gestalt.module.sandbox.API;
 
-/**
- */
 @API
 public class EntityData {
     private Prefab prefab;

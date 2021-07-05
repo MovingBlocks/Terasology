@@ -2,12 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.rendering.assets.texture.subtexture;
 
-import org.terasology.assets.AssetData;
+import org.terasology.gestalt.assets.AssetData;
 import org.terasology.joml.geom.Rectanglef;
 import org.terasology.engine.rendering.assets.texture.Texture;
 
-/**
- */
 public class SubtextureData implements AssetData {
     private Texture texture;
     private Rectanglef region;

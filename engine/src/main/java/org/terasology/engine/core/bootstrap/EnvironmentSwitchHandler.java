@@ -2,22 +2,25 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.core.bootstrap;
 
+import com.google.common.collect.ImmutableList;
+import org.joml.Quaternionf;
+import org.joml.Vector2f;
+import org.joml.Vector2i;
+import org.joml.Vector3f;
+import org.joml.Vector3i;
+import org.joml.Vector4f;
+import org.joml.Vector4i;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.assets.ResourceUrn;
-import org.terasology.assets.module.ModuleAwareAssetTypeManager;
 import org.terasology.engine.config.flexible.AutoConfigManager;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.core.module.ModuleManager;
-import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.entitySystem.metadata.ComponentLibrary;
 import org.terasology.engine.entitySystem.metadata.EntitySystemLibrary;
 import org.terasology.engine.entitySystem.metadata.EventLibrary;
-import org.terasology.engine.entitySystem.metadata.MetadataUtil;
 import org.terasology.engine.entitySystem.prefab.Prefab;
 import org.terasology.engine.entitySystem.prefab.internal.PrefabDeltaFormat;
 import org.terasology.engine.entitySystem.prefab.internal.PrefabFormat;
-import org.terasology.engine.entitySystem.systems.internal.DoNotAutoRegister;
 import org.terasology.engine.persistence.typeHandling.RegisterTypeHandler;
 import org.terasology.engine.persistence.typeHandling.RegisterTypeHandlerFactory;
 import org.terasology.engine.persistence.typeHandling.TypeHandlerLibraryImpl;
@@ -25,24 +28,23 @@ import org.terasology.engine.persistence.typeHandling.extensionTypes.CollisionGr
 import org.terasology.engine.physics.CollisionGroup;
 import org.terasology.engine.physics.CollisionGroupManager;
 import org.terasology.engine.registry.InjectionHelper;
-import org.terasology.engine.utilities.ReflectionUtil;
-import org.terasology.module.ModuleEnvironment;
-import org.terasology.naming.Name;
+import org.terasology.gestalt.assets.module.ModuleAwareAssetTypeManager;
+import org.terasology.gestalt.module.ModuleEnvironment;
+import org.terasology.gestalt.util.reflection.GenericsUtil;
 import org.terasology.persistence.typeHandling.TypeHandler;
 import org.terasology.persistence.typeHandling.TypeHandlerFactory;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
+import org.terasology.reflection.ModuleTypeRegistry;
 import org.terasology.reflection.TypeInfo;
-import org.terasology.reflection.TypeRegistry;
 import org.terasology.reflection.copy.CopyStrategy;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
-import org.terasology.reflection.copy.RegisterCopyStrategy;
 import org.terasology.reflection.reflect.ReflectFactory;
-import org.terasology.util.reflection.GenericsUtil;
 
 import java.lang.reflect.Type;
+import java.util.Collection;
 import java.util.Optional;
 
-import static com.google.common.base.Verify.verifyNotNull;
+import static org.terasology.engine.core.bootstrap.EntitySystemSetupUtil.registerComponents;
 
 /**
  * Handles an environment switch by updating the asset manager, component library, and other context objects.
@@ -53,29 +55,31 @@ public final class EnvironmentSwitchHandler {
     private PrefabFormat registeredPrefabFormat;
     private PrefabDeltaFormat registeredPrefabDeltaFormat;
 
+    private final Collection<CopyStrategyEntry<?>> typesWithCopyConstructors = ImmutableList.of(
+            new CopyStrategyEntry<>(Quaternionf.class, Quaternionf::new),
+            new CopyStrategyEntry<>(Vector2f.class, Vector2f::new),
+            new CopyStrategyEntry<>(Vector2i.class, Vector2i::new),
+            new CopyStrategyEntry<>(Vector3f.class, Vector3f::new),
+            new CopyStrategyEntry<>(Vector3i.class, Vector3i::new),
+            new CopyStrategyEntry<>(Vector4f.class, Vector4f::new),
+            new CopyStrategyEntry<>(Vector4i.class, Vector4i::new)
+    );
+
     public EnvironmentSwitchHandler() {
     }
 
-    @SuppressWarnings("unchecked")
     public void handleSwitchToGameEnvironment(Context context) {
         ModuleManager moduleManager = context.get(ModuleManager.class);
         ModuleEnvironment environment = moduleManager.getEnvironment();
 
-        TypeRegistry typeRegistry = context.get(TypeRegistry.class);
+        ModuleTypeRegistry typeRegistry = context.get(ModuleTypeRegistry.class);
         typeRegistry.reload(environment);
 
         CopyStrategyLibrary copyStrategyLibrary = context.get(CopyStrategyLibrary.class);
         copyStrategyLibrary.clear();
-        for (Class<? extends CopyStrategy> copyStrategy : environment.getSubtypesOf(CopyStrategy.class)) {
-            if (copyStrategy.getAnnotation(RegisterCopyStrategy.class) == null) {
-                continue;
-            }
-            Type targetType = ReflectionUtil.getTypeParameterForSuper(copyStrategy, CopyStrategy.class, 0);
-            if (targetType instanceof Class) {
-                registerCopyStrategy(copyStrategyLibrary, (Class<?>) targetType, copyStrategy);
-            } else {
-                logger.error("Cannot register CopyStrategy '{}' - unable to determine target type", copyStrategy);
-            }
+
+        for (CopyStrategyEntry<?> entry : typesWithCopyConstructors) {
+            entry.registerWith(copyStrategyLibrary);
         }
 
         //TODO: find a permanent fix over just creating a new typehandler
@@ -113,20 +117,19 @@ public final class EnvironmentSwitchHandler {
          */
         unregisterPrefabFormats(assetTypeManager);
         registeredPrefabFormat = new PrefabFormat(componentLibrary, typeHandlerLibrary);
-        assetTypeManager.registerCoreFormat(Prefab.class, registeredPrefabFormat);
+        assetTypeManager.getAssetFileDataProducer(assetTypeManager
+                .getAssetType(Prefab.class)
+                .orElseThrow(() -> new RuntimeException("Cannot get Prefab Asset typee")))
+                .addAssetFormat(registeredPrefabFormat);
         registeredPrefabDeltaFormat = new PrefabDeltaFormat(componentLibrary, typeHandlerLibrary);
-        assetTypeManager.registerCoreDeltaFormat(Prefab.class, registeredPrefabDeltaFormat);
+        assetTypeManager.getAssetFileDataProducer(assetTypeManager
+                .getAssetType(Prefab.class)
+                .orElseThrow(() -> new RuntimeException("Cannot get Prefab Asset type")))
+                .addDeltaFormat(registeredPrefabDeltaFormat);
 
         assetTypeManager.switchEnvironment(environment);
+        assetTypeManager.reloadAssets();
 
-    }
-
-    private <T, U extends CopyStrategy<T>> void registerCopyStrategy(CopyStrategyLibrary copyStrategyLibrary, Class<T> type, Class<U> strategy) {
-        try {
-            copyStrategyLibrary.register(type, strategy.newInstance());
-        } catch (InstantiationException | IllegalAccessException e) {
-            logger.error("Cannot register CopyStrategy '{}' - failed to instantiate", strategy, e);
-        }
     }
 
     /**
@@ -166,23 +169,18 @@ public final class EnvironmentSwitchHandler {
 
     private void unregisterPrefabFormats(ModuleAwareAssetTypeManager assetTypeManager) {
         if (registeredPrefabFormat != null) {
-            assetTypeManager.removeCoreFormat(Prefab.class, registeredPrefabFormat);
+            assetTypeManager.getAssetFileDataProducer(assetTypeManager
+                    .getAssetType(Prefab.class)
+                    .orElseThrow(() -> new RuntimeException("Cannot get Prefab Asset type")))
+                    .removeAssetFormat(registeredPrefabFormat);
             registeredPrefabFormat = null;
         }
         if (registeredPrefabDeltaFormat != null) {
-            assetTypeManager.removeCoreDeltaFormat(Prefab.class, registeredPrefabDeltaFormat);
+            assetTypeManager.getAssetFileDataProducer(assetTypeManager
+                    .getAssetType(Prefab.class)
+                    .orElseThrow(() -> new RuntimeException("Cannot get Prefab Asset type")))
+                    .removeDeltaFormat(registeredPrefabDeltaFormat);
             registeredPrefabDeltaFormat = null;
-        }
-    }
-
-
-    private static void registerComponents(ComponentLibrary library, ModuleEnvironment environment) {
-        for (Class<? extends Component> componentType : environment.getSubtypesOf(Component.class)) {
-            if (componentType.getAnnotation(DoNotAutoRegister.class) == null) {
-                String componentName = MetadataUtil.getComponentClassName(componentType);
-                Name componentModuleName = verifyNotNull(environment.getModuleProviding(componentType), "Could not find module for %s %s", componentName, componentType);
-                library.register(new ResourceUrn(componentModuleName.toString(), componentName), componentType);
-            }
         }
     }
 
@@ -208,6 +206,23 @@ public final class EnvironmentSwitchHandler {
             TypeHandlerFactory instance = InjectionHelper.createWithConstructorInjection(clazz, context);
             InjectionHelper.inject(instance, context);
             library.addTypeHandlerFactory(instance);
+        }
+    }
+
+    // FIXME: Move this class to a more appropriate package.
+    static class CopyStrategyEntry<T> {
+        final Class<T> type;
+        final CopyStrategy<T> copyStrategy;
+
+        CopyStrategyEntry(Class<T> type, CopyStrategy<T> copyStrategy) {
+            this.type = type;
+            this.copyStrategy = copyStrategy;
+        }
+
+        void registerWith(CopyStrategyLibrary copyStrategyLibrary) {
+            // I tried to inline this at the call site, but Java didn't seem to want to believe
+            // these were compatible types unless I put this in a method of this generic class.
+            copyStrategyLibrary.register(type, copyStrategy);
         }
     }
 }

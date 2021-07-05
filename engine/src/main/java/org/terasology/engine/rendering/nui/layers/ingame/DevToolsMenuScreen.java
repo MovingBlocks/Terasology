@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.rendering.nui.layers.ingame;
 
-import org.terasology.assets.ResourceUrn;
+import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.engine.rendering.nui.animation.MenuAnimationSystems;
 import org.terasology.nui.WidgetUtil;
 import org.terasology.engine.registry.In;
@@ -10,9 +10,7 @@ import org.terasology.engine.rendering.nui.CoreScreenLayer;
 import org.terasology.engine.rendering.nui.editor.systems.NUIEditorSystem;
 import org.terasology.engine.rendering.nui.editor.systems.NUISkinEditorSystem;
 
-/**
- *
- */
+
 public class DevToolsMenuScreen extends CoreScreenLayer {
 
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:devToolsMenuScreen");

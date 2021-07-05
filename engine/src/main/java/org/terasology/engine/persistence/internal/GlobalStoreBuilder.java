@@ -1,18 +1,5 @@
-/*
- * Copyright 2013 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.persistence.internal;
 
 import com.google.common.collect.Maps;
@@ -22,6 +9,7 @@ import org.terasology.engine.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.engine.entitySystem.metadata.ComponentMetadata;
 import org.terasology.engine.entitySystem.prefab.Prefab;
 import org.terasology.engine.persistence.serializers.EntitySerializer;
+import org.terasology.engine.persistence.serializers.PersistenceComponentSerializeCheck;
 import org.terasology.engine.persistence.serializers.PrefabSerializer;
 import org.terasology.protobuf.EntityData;
 
@@ -29,8 +17,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-/**
- */
 final class GlobalStoreBuilder {
 
     private final long nextEntityId;
@@ -46,7 +32,7 @@ final class GlobalStoreBuilder {
 
         Map<Class<? extends Component>, Integer> componentIdTable = Maps.newHashMap();
         for (ComponentMetadata<?> componentMetadata : entityManager.getComponentLibrary().iterateComponentMetadata()) {
-            store.addComponentClass(componentMetadata.getUri().toString());
+            store.addComponentClass(componentMetadata.getId().toString());
             componentIdTable.put(componentMetadata.getType(), componentIdTable.size());
         }
         prefabSerializer.setComponentIdMapping(componentIdTable);
@@ -66,6 +52,7 @@ final class GlobalStoreBuilder {
         }
 
         EntitySerializer entitySerializer = new EntitySerializer(entityManager);
+        entitySerializer.setComponentSerializeCheck(new PersistenceComponentSerializeCheck());
         entitySerializer.setComponentIdMapping(componentIdTable);
         for (EntityRef entity: entities) {
             if (entity.isPersistent()) {

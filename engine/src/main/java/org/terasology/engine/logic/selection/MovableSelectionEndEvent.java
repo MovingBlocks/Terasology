@@ -3,7 +3,7 @@
 package org.terasology.engine.logic.selection;
 
 import org.terasology.engine.entitySystem.event.Event;
-import org.terasology.module.sandbox.API;
+import org.terasology.gestalt.module.sandbox.API;
 import org.terasology.engine.world.block.BlockRegion;
 
 /**

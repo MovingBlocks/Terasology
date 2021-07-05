@@ -85,7 +85,7 @@ public class NeighbourBlockFamilyUpdateSystem extends BaseComponentSystem implem
         largeBlockUpdateCount--;
     }
 
-    @ReceiveEvent(components = {BlockComponent.class})
+    @ReceiveEvent(components = BlockComponent.class)
     public void blockUpdate(OnChangedBlock event, EntityRef blockEntity) {
         if (largeBlockUpdateCount > 0) {
             blocksUpdatedInLargeBlockUpdate.add(event.getBlockPosition());
@@ -96,7 +96,7 @@ public class NeighbourBlockFamilyUpdateSystem extends BaseComponentSystem implem
     }
 
     private void processUpdateForBlockLocation(Vector3ic blockLocation) {
-        for (Side side : Side.getAllSides()) {
+        for (Side side : Side.values()) {
             Vector3i neighborLocation = blockLocation.add(side.direction(), new Vector3i());
             if (worldProvider.isBlockRelevant(neighborLocation)) {
                 Block neighborBlock = worldProvider.getBlock(neighborLocation);

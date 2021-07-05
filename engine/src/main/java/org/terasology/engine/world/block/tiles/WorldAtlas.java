@@ -4,11 +4,9 @@
 package org.terasology.engine.world.block.tiles;
 
 import org.joml.Vector2f;
-import org.terasology.assets.ResourceUrn;
-import org.terasology.module.sandbox.API;
+import org.terasology.gestalt.assets.ResourceUrn;
+import org.terasology.gestalt.module.sandbox.API;
 
-/**
- */
 @API
 public interface WorldAtlas {
 

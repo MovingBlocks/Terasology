@@ -8,8 +8,6 @@ import org.terasology.nui.widgets.UILoadBar;
 import org.terasology.engine.registry.In;
 import org.terasology.engine.rendering.nui.CoreScreenLayer;
 
-/**
- */
 public class LoadingScreen extends CoreScreenLayer {
 
     private UILabel messageLabel;

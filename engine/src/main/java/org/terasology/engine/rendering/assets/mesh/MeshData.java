@@ -2,47 +2,45 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.rendering.assets.mesh;
 
-import gnu.trove.list.TFloatList;
-import gnu.trove.list.TIntList;
-import gnu.trove.list.array.TFloatArrayList;
-import gnu.trove.list.array.TIntArrayList;
-import org.terasology.assets.AssetData;
+import org.joml.Vector3f;
+import org.joml.Vector3fc;
+import org.terasology.engine.rendering.assets.mesh.resource.AllocationType;
+import org.terasology.engine.rendering.assets.mesh.resource.DrawingMode;
+import org.terasology.engine.rendering.assets.mesh.resource.IndexResource;
+import org.terasology.engine.rendering.assets.mesh.resource.VertexAttributeBinding;
+import org.terasology.engine.rendering.assets.mesh.resource.VertexResource;
+import org.terasology.gestalt.assets.AssetData;
 
-/**
- */
-public class MeshData implements AssetData {
-
-    private TFloatList vertices = new TFloatArrayList();
-    private TFloatList texCoord0 = new TFloatArrayList();
-    private TFloatList texCoord1 = new TFloatArrayList();
-    private TFloatList normals = new TFloatArrayList();
-    private TFloatList colors = new TFloatArrayList();
-    private TIntList indices = new TIntArrayList();
+public abstract class MeshData implements AssetData {
+    private DrawingMode mode;
+    private AllocationType allocationType;
 
     public MeshData() {
+        this(DrawingMode.TRIANGLES, AllocationType.STATIC);
     }
 
-    public TFloatList getVertices() {
-        return vertices;
+    public MeshData(DrawingMode mode, AllocationType allocationType) {
+        this.mode = mode;
+        this.allocationType = allocationType;
     }
 
-    public TFloatList getTexCoord0() {
-        return texCoord0;
+    public DrawingMode getMode() {
+        return mode;
     }
 
-    public TFloatList getTexCoord1() {
-        return texCoord1;
+    public AllocationType allocationType() {
+        return allocationType;
     }
 
-    public TFloatList getNormals() {
-        return normals;
+    public void setDrawMode(DrawingMode drawMode) {
+        this.mode = drawMode;
     }
 
-    public TFloatList getColors() {
-        return colors;
+    public void setAllocationType(AllocationType allocationType) {
+        this.allocationType = allocationType;
     }
 
-    public TIntList getIndices() {
-        return indices;
-    }
+    public abstract VertexAttributeBinding<Vector3fc, Vector3f> positions();
+    public abstract VertexResource[] vertexResources();
+    public abstract IndexResource indexResource();
 }

@@ -3,11 +3,11 @@
 package org.terasology.engine.world.block.loader;
 
 import com.google.common.base.Preconditions;
-import org.terasology.assets.Asset;
-import org.terasology.assets.AssetType;
-import org.terasology.assets.ResourceUrn;
+import org.terasology.gestalt.assets.Asset;
+import org.terasology.gestalt.assets.AssetType;
+import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.engine.world.block.shapes.BlockShape;
-import org.terasology.module.sandbox.API;
+import org.terasology.gestalt.module.sandbox.API;
 import org.terasology.engine.world.block.BlockBuilderHelper;
 import org.terasology.engine.world.block.family.BlockFamily;
 import org.terasology.engine.world.block.family.BlockFamilyLibrary;

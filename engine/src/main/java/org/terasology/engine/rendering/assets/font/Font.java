@@ -4,14 +4,12 @@
 package org.terasology.engine.rendering.assets.font;
 
 import org.joml.Vector2i;
-import org.terasology.assets.Asset;
-import org.terasology.assets.AssetType;
-import org.terasology.assets.ResourceUrn;
+import org.terasology.gestalt.assets.Asset;
+import org.terasology.gestalt.assets.AssetType;
+import org.terasology.gestalt.assets.ResourceUrn;
 
 import java.util.List;
 
-/**
- */
 public abstract class Font extends Asset<FontData> implements org.terasology.nui.asset.font.Font {
 
     protected Font(ResourceUrn urn, AssetType<?, FontData> assetType) {

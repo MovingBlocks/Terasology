@@ -5,11 +5,9 @@ package org.terasology.engine.logic.common;
 import org.joml.Vector3f;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.event.AbstractConsumableEvent;
-import org.terasology.engine.logic.location.LocationComponent;
 import org.terasology.engine.logic.characters.events.ActivationRequest;
+import org.terasology.engine.logic.location.LocationComponent;
 
-/**
- */
 // TODO: This should not be consumable. Instead have a consumable BeforeActivate event to allow cancellation
 public class ActivateEvent extends AbstractConsumableEvent {
     private EntityRef instigator;

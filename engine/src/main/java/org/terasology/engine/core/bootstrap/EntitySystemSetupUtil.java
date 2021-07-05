@@ -3,7 +3,6 @@
 
 package org.terasology.engine.core.bootstrap;
 
-import org.terasology.assets.ResourceUrn;
 import org.terasology.engine.audio.events.PlaySoundEvent;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.core.module.ModuleManager;
@@ -39,8 +38,9 @@ import org.terasology.engine.recording.RecordAndReplayStatus;
 import org.terasology.engine.recording.RecordAndReplayUtils;
 import org.terasology.engine.recording.RecordedEventStore;
 import org.terasology.engine.recording.RecordingEventSystemDecorator;
-import org.terasology.module.ModuleEnvironment;
-import org.terasology.naming.Name;
+import org.terasology.gestalt.assets.ResourceUrn;
+import org.terasology.gestalt.module.ModuleEnvironment;
+import org.terasology.gestalt.naming.Name;
 import org.terasology.nui.properties.OneOfProviderFactory;
 import org.terasology.persistence.typeHandling.TypeHandlerLibrary;
 import org.terasology.reflection.TypeRegistry;
@@ -57,7 +57,6 @@ import static com.google.common.base.Verify.verifyNotNull;
  * Provides static methods that can be used to put entity system related objects into a {@link Context} instance.
  */
 public final class EntitySystemSetupUtil {
-
 
     private EntitySystemSetupUtil() {
         // static utility class, no instance needed
@@ -129,7 +128,9 @@ public final class EntitySystemSetupUtil {
         CharacterStateEventPositionMap characterStateEventPositionMap = context.get(CharacterStateEventPositionMap.class);
         DirectionAndOriginPosRecorderList directionAndOriginPosRecorderList = context.get(DirectionAndOriginPosRecorderList.class);
         RecordedEventStore recordedEventStore = new RecordedEventStore();
-        RecordAndReplaySerializer recordAndReplaySerializer = new RecordAndReplaySerializer(entityManager, recordedEventStore, recordAndReplayUtils, characterStateEventPositionMap, directionAndOriginPosRecorderList, moduleManager, context.get(TypeRegistry.class));
+        RecordAndReplaySerializer recordAndReplaySerializer =
+                new RecordAndReplaySerializer(entityManager, recordedEventStore, recordAndReplayUtils, characterStateEventPositionMap,
+                        directionAndOriginPosRecorderList, moduleManager, context.get(TypeRegistry.class));
         context.put(RecordAndReplaySerializer.class, recordAndReplaySerializer);
 
 
@@ -145,9 +146,13 @@ public final class EntitySystemSetupUtil {
         registerEvents(entityManager.getEventSystem(), environment);
     }
 
-    private static EventSystem createEventSystem(NetworkSystem networkSystem, PojoEntityManager entityManager, EntitySystemLibrary library,
-                                                 RecordedEventStore recordedEventStore, RecordAndReplaySerializer recordAndReplaySerializer,
-                                                 RecordAndReplayUtils recordAndReplayUtils, RecordAndReplayCurrentStatus recordAndReplayCurrentStatus) {
+    private static EventSystem createEventSystem(NetworkSystem networkSystem,
+                                                 PojoEntityManager entityManager,
+                                                 EntitySystemLibrary library,
+                                                 RecordedEventStore recordedEventStore,
+                                                 RecordAndReplaySerializer recordAndReplaySerializer,
+                                                 RecordAndReplayUtils recordAndReplayUtils,
+                                                 RecordAndReplayCurrentStatus recordAndReplayCurrentStatus) {
         EventSystem eventSystem;
         List<Class<?>> selectedClassesToRecord = createSelectedClassesToRecordList();
         if (recordAndReplayCurrentStatus.getStatus() == RecordAndReplayStatus.PREPARING_REPLAY) {
@@ -162,11 +167,12 @@ public final class EntitySystemSetupUtil {
         return eventSystem;
     }
 
-    private static void registerComponents(ComponentLibrary library, ModuleEnvironment environment) {
+    static void registerComponents(ComponentLibrary library, ModuleEnvironment environment) {
         for (Class<? extends Component> componentType : environment.getSubtypesOf(Component.class)) {
             if (componentType.getAnnotation(DoNotAutoRegister.class) == null) {
                 String componentName = MetadataUtil.getComponentClassName(componentType);
-                Name componentModuleName = verifyNotNull(environment.getModuleProviding(componentType), "Could not find module for %s %s", componentName, componentType);
+                Name componentModuleName = verifyNotNull(environment.getModuleProviding(componentType),
+                        "Could not find module for %s %s", componentName, componentType);
                 library.register(new ResourceUrn(componentModuleName.toString(), componentName), componentType);
             }
         }
@@ -175,7 +181,9 @@ public final class EntitySystemSetupUtil {
     private static void registerEvents(EventSystem eventSystem, ModuleEnvironment environment) {
         for (Class<? extends Event> type : environment.getSubtypesOf(Event.class)) {
             if (type.getAnnotation(DoNotAutoRegister.class) == null) {
-                eventSystem.registerEvent(new ResourceUrn(environment.getModuleProviding(type).toString(), type.getSimpleName()), type);
+                Name module = verifyNotNull(environment.getModuleProviding(type),
+                        "Environment has no module for %s", type.getSimpleName());
+                eventSystem.registerEvent(new ResourceUrn(module.toString(), type.getSimpleName()), type);
             }
         }
     }

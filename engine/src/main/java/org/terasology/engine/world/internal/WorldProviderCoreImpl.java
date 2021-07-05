@@ -13,6 +13,14 @@ import org.terasology.engine.context.Context;
 import org.terasology.engine.core.SimpleUri;
 import org.terasology.engine.entitySystem.entity.EntityManager;
 import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.world.WorldChangeListener;
+import org.terasology.engine.world.WorldComponent;
+import org.terasology.engine.world.block.Block;
+import org.terasology.engine.world.block.BlockRegion;
+import org.terasology.engine.world.block.BlockRegionc;
+import org.terasology.engine.world.chunks.Chunk;
+import org.terasology.engine.world.chunks.ChunkProvider;
+import org.terasology.engine.world.chunks.Chunks;
 import org.terasology.engine.world.propagation.BatchPropagator;
 import org.terasology.engine.world.propagation.BlockChange;
 import org.terasology.engine.world.propagation.PropagationRules;
@@ -25,18 +33,6 @@ import org.terasology.engine.world.propagation.light.SunlightPropagationRules;
 import org.terasology.engine.world.propagation.light.SunlightRegenPropagationRules;
 import org.terasology.engine.world.propagation.light.SunlightRegenWorldView;
 import org.terasology.engine.world.propagation.light.SunlightWorldView;
-import org.terasology.engine.world.WorldChangeListener;
-import org.terasology.engine.world.WorldComponent;
-import org.terasology.engine.world.block.Block;
-import org.terasology.engine.world.block.BlockRegion;
-import org.terasology.engine.world.block.BlockRegionc;
-import org.terasology.engine.world.chunks.Chunk;
-import org.terasology.engine.world.chunks.ChunkProvider;
-import org.terasology.engine.world.chunks.Chunks;
-import org.terasology.engine.world.chunks.CoreChunk;
-import org.terasology.engine.world.chunks.LitChunk;
-import org.terasology.engine.world.chunks.ManagedChunk;
-import org.terasology.engine.world.chunks.RenderableChunk;
 import org.terasology.engine.world.time.WorldTime;
 import org.terasology.engine.world.time.WorldTimeImpl;
 
@@ -48,9 +44,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-/**
- *
- */
+
 public class WorldProviderCoreImpl implements WorldProviderCore {
 
     private String title;
@@ -148,12 +142,18 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
 
     @Override
     public ChunkViewCore getLocalView(Vector3ic chunkPos) {
-        return chunkProvider.getLocalView(chunkPos);
+        BlockRegion region = new BlockRegion(chunkPos).expand(Chunks.LOCAL_REGION_EXTENTS);
+        return chunkProvider.getSubview(region, new Vector3i(1, 1, 1));
     }
 
     @Override
-    public ChunkViewCore getWorldViewAround(Vector3ic chunk) {
-        return chunkProvider.getSubviewAroundChunk(chunk);
+    public ChunkViewCore getWorldViewAround(Vector3ic chunkPos) {
+        return getWorldViewAround(new BlockRegion(chunkPos).expand(Chunks.LOCAL_REGION_EXTENTS));
+    }
+
+    @Override
+    public ChunkViewCore getWorldViewAround(BlockRegionc region) {
+        return chunkProvider.getSubview(region, region.getMin(new Vector3i()).mul(-1));
     }
 
     @Override
@@ -178,7 +178,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
          * command "showSCreen BenchmarkScreen".
          */
         Vector3i chunkPos = Chunks.toChunkPos(worldPos, new Vector3i());
-        CoreChunk chunk = chunkProvider.getChunk(chunkPos);
+        Chunk chunk = chunkProvider.getChunk(chunkPos);
         if (chunk != null) {
             Vector3i blockPos = Chunks.toRelative(worldPos, new Vector3i());
             Block oldBlockType = chunk.setBlock(blockPos, type);
@@ -212,7 +212,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
         for (Map.Entry<? extends Vector3ic, Block> entry : blocks.entrySet()) {
             Vector3ic worldPos = entry.getKey();
             Chunks.toChunkPos(worldPos, chunkPos);
-            CoreChunk chunk = chunkProvider.getChunk(chunkPos);
+            Chunk chunk = chunkProvider.getChunk(chunkPos);
 
             if (chunk != null) {
                 Block type = entry.getValue();
@@ -244,7 +244,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
     private void setDirtyChunksNear(Vector3ic worldPos) {
         BlockRegion tmpRegion = new BlockRegion(worldPos).expand(1, 1, 1);
         for (Vector3ic pos : Chunks.toChunkRegion(tmpRegion, tmpRegion)) {
-            RenderableChunk dirtiedChunk = chunkProvider.getChunk(pos);
+            Chunk dirtiedChunk = chunkProvider.getChunk(pos);
             if (dirtiedChunk != null) {
                 dirtiedChunk.setDirty(true);
             }
@@ -272,7 +272,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
 
     @Override
     public Block getBlock(int x, int y, int z) {
-        CoreChunk chunk = chunkProvider.getChunk(Chunks.toChunkPos(x, y, z, new Vector3i()));
+        Chunk chunk = chunkProvider.getChunk(Chunks.toChunkPos(x, y, z, new Vector3i()));
         if (chunk != null) {
             return chunk.getBlock(Chunks.toRelativeX(x), Chunks.toRelativeY(y), Chunks.toRelativeZ(z));
         }
@@ -282,7 +282,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
     @Override
     public byte getLight(int x, int y, int z) {
         Vector3i chunkPos = Chunks.toChunkPos(x, y, z, new Vector3i());
-        LitChunk chunk = chunkProvider.getChunk(chunkPos);
+        Chunk chunk = chunkProvider.getChunk(chunkPos);
         if (chunk != null) {
             Vector3i blockPos = Chunks.toRelative(x, y, z, new Vector3i());
             return chunk.getLight(blockPos);
@@ -293,7 +293,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
     @Override
     public byte getSunlight(int x, int y, int z) {
         Vector3i chunkPos = Chunks.toChunkPos(x, y, z, new Vector3i());
-        LitChunk chunk = chunkProvider.getChunk(chunkPos);
+        Chunk chunk = chunkProvider.getChunk(chunkPos);
         if (chunk != null) {
             Vector3i blockPos = Chunks.toRelative(x, y, z, new Vector3i());
             return chunk.getSunlight(blockPos);
@@ -304,7 +304,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
     @Override
     public byte getTotalLight(int x, int y, int z) {
         Vector3i chunkPos = Chunks.toChunkPos(x, y, z, new Vector3i());
-        LitChunk chunk = chunkProvider.getChunk(chunkPos);
+        Chunk chunk = chunkProvider.getChunk(chunkPos);
         if (chunk != null) {
             Vector3i blockPos = Chunks.toRelative(x, y, z, new Vector3i());
             return (byte) Math.max(chunk.getSunlight(blockPos), chunk.getLight(blockPos));
@@ -314,7 +314,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
 
     @Override
     public int getExtraData(int index, int x, int y, int z) {
-        CoreChunk chunk = chunkProvider.getChunk(Chunks.toChunkPos(x, y, z, new Vector3i()));
+        Chunk chunk = chunkProvider.getChunk(Chunks.toChunkPos(x, y, z, new Vector3i()));
         if (chunk != null) {
             return chunk.getExtraData(index, Chunks.toRelative(x, y, z, new Vector3i()));
         }
@@ -324,7 +324,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
     @Override
     public int setExtraData(int index, Vector3ic worldPos, int value) {
         Vector3i chunkPos = Chunks.toChunkPos(worldPos, new Vector3i());
-        CoreChunk chunk = chunkProvider.getChunk(chunkPos);
+        Chunk chunk = chunkProvider.getChunk(chunkPos);
         if (chunk != null) {
             Vector3i blockPos = Chunks.toRelative(worldPos, new Vector3i());
             int oldValue = chunk.getExtraData(index, blockPos.x, blockPos.y, blockPos.z);
@@ -352,8 +352,8 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
     @Override
     public Collection<BlockRegionc> getRelevantRegions() {
         Collection<Chunk> chunks = chunkProvider.getAllChunks();
-        Predicate<Chunk> isReady = ManagedChunk::isReady;
+        Predicate<Chunk> isReady = Chunk::isReady;
 
-        return FluentIterable.from(chunks).filter(isReady).transform(CoreChunk::getRegion).toList();
+        return FluentIterable.from(chunks).filter(isReady).transform(Chunk::getRegion).toList();
     }
 }

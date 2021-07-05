@@ -6,10 +6,10 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.assets.ResourceUrn;
+import org.terasology.engine.core.module.ModuleManager;
+import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.core.SimpleUri;
-import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.engine.rendering.assets.material.Material;
 import org.terasology.engine.rendering.dag.dependencyConnections.BufferPair;
 import org.terasology.engine.rendering.dag.dependencyConnections.BufferPairConnection;
@@ -19,7 +19,7 @@ import org.terasology.engine.rendering.dag.dependencyConnections.RunOrderConnect
 import org.terasology.engine.rendering.opengl.BaseFboManager;
 import org.terasology.engine.rendering.opengl.FBO;
 import org.terasology.engine.rendering.opengl.FboConfig;
-import org.terasology.naming.Name;
+import org.terasology.gestalt.naming.Name;
 import org.terasology.engine.utilities.Assets;
 
 import javax.annotation.Nullable;
@@ -205,14 +205,16 @@ public abstract class AbstractNode implements Node {
                 logger.debug("data propagated.\n");
             }
 
-            if(localBufferPairConnection.getData() != null) {
+            if (localBufferPairConnection.getData() != null) {
                 logger.warn("Adding output buffer pair to slot id " + id
                         + " of " + this.nodeUri + "node overwrites data of existing connection: " + localBufferPairConnection.toString());
             }
             localBufferPairConnection.setData(bufferPair);
             success = true;
         } else {
-            DependencyConnection localBufferPairConnection = new BufferPairConnection(BufferPairConnection.getConnectionName(id, this.nodeUri), DependencyConnection.Type.OUTPUT, bufferPair, this.getUri());
+            DependencyConnection localBufferPairConnection =
+                    new BufferPairConnection(BufferPairConnection.getConnectionName(id, this.nodeUri),
+                            DependencyConnection.Type.OUTPUT, bufferPair, this.getUri());
             success = addOutputConnection(localBufferPairConnection);
         }
         return success;
@@ -240,7 +242,7 @@ public abstract class AbstractNode implements Node {
                 logger.info("data propagated.\n");
             }
 
-            if(localBufferPairConnection.getData() != null) {
+            if (localBufferPairConnection.getData() != null) {
                 logger.warn("Adding output buffer pair connection " + from.toString() + "\n to slot id " + id
                         + " of " + this.nodeUri + "node overwrites data of existing connection: " + localBufferPairConnection.toString());
             }
@@ -248,14 +250,18 @@ public abstract class AbstractNode implements Node {
 
             success = true;
         } else {
-            DependencyConnection localBufferPairConnection = new BufferPairConnection(BufferPairConnection.getConnectionName(id, this.nodeUri), DependencyConnection.Type.OUTPUT, from.getData(), this.getUri());
+            DependencyConnection localBufferPairConnection =
+                    new BufferPairConnection(BufferPairConnection.getConnectionName(id, this.nodeUri),
+                            DependencyConnection.Type.OUTPUT, from.getData(), this.getUri());
             success = addOutputConnection(localBufferPairConnection);
         }
         return success;
     }
 
     public boolean addOutputBufferPairConnection(int id) {
-        DependencyConnection localBufferPairConnection = new BufferPairConnection(BufferPairConnection.getConnectionName(id, this.nodeUri), DependencyConnection.Type.OUTPUT, this.getUri());
+        DependencyConnection localBufferPairConnection =
+                new BufferPairConnection(BufferPairConnection.getConnectionName(id, this.nodeUri),
+                        DependencyConnection.Type.OUTPUT, this.getUri());
         return addOutputConnection(localBufferPairConnection);
     }
 
@@ -266,7 +272,9 @@ public abstract class AbstractNode implements Node {
      * @return true if inserted, false otherwise
      */
     protected boolean addInputFboConnection(int id, FboConnection from) {
-        DependencyConnection fboConnection = new FboConnection(FboConnection.getConnectionName(id, this.nodeUri), DependencyConnection.Type.INPUT, from.getData(), this.getUri());
+        DependencyConnection fboConnection =
+                new FboConnection(FboConnection.getConnectionName(id, this.nodeUri),
+                        DependencyConnection.Type.INPUT, from.getData(), this.getUri());
         fboConnection.setConnectedConnection(from); // must remember where I'm connected from
         return addInputConnection(fboConnection);
     }
@@ -278,7 +286,9 @@ public abstract class AbstractNode implements Node {
      * @return true if inserted, false otherwise
      */
     public boolean addInputFboConnection(int id, FBO fboData) {
-        DependencyConnection fboConnection = new FboConnection(FboConnection.getConnectionName(id, this.nodeUri), DependencyConnection.Type.INPUT, fboData, this.getUri());
+        DependencyConnection fboConnection =
+                new FboConnection(FboConnection.getConnectionName(id, this.nodeUri),
+                        DependencyConnection.Type.INPUT, fboData, this.getUri());
         return addInputConnection(fboConnection);
     }
 
@@ -294,7 +304,7 @@ public abstract class AbstractNode implements Node {
         if (outputConnections.containsKey(connectionUri)) {
             FboConnection fboConnection = (FboConnection) outputConnections.get(connectionUri);
 
-            if(fboConnection.getData() != null) {
+            if (fboConnection.getData() != null) {
                 logger.warn("Adding output fbo data to slot id " + id
                         + " of " + this.nodeUri + "node overwrites data of existing connection: " + fboConnection.toString());
             }
@@ -312,14 +322,18 @@ public abstract class AbstractNode implements Node {
 
             success = true;
         } else {
-            DependencyConnection fboConnection = new FboConnection(FboConnection.getConnectionName(id, this.nodeUri), DependencyConnection.Type.OUTPUT, fboData, this.getUri());
+            DependencyConnection fboConnection =
+                    new FboConnection(FboConnection.getConnectionName(id, this.nodeUri),
+                            DependencyConnection.Type.OUTPUT, fboData, this.getUri());
             success = addOutputConnection(fboConnection);
         }
         return success;
     }
 
     public boolean addOutputFboConnection(int id) {
-        DependencyConnection fboConnection = new FboConnection(FboConnection.getConnectionName(id, this.nodeUri), DependencyConnection.Type.OUTPUT, this.getUri());
+        DependencyConnection fboConnection =
+                new FboConnection(FboConnection.getConnectionName(id, this.nodeUri),
+                        DependencyConnection.Type.OUTPUT, this.getUri());
         return addOutputConnection(fboConnection);
     }
 
@@ -609,8 +623,7 @@ public abstract class AbstractNode implements Node {
      * @throws RuntimeException if the material couldn't be resolved through the asset system.
      */
     public static Material getMaterial(ResourceUrn materialUrn) {
-        String materialName = materialUrn.toString();
-        return Assets.getMaterial(materialName).orElseThrow(() ->
-                new RuntimeException("Failed to resolve required asset: '" + materialName + "'"));
+       return Assets.get(materialUrn, Material.class).orElseThrow(() ->
+               new RuntimeException("Failed to resolve required asset: '" + materialUrn.toString() + "'"));
     }
 }

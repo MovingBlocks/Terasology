@@ -1,4 +1,4 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.engine;
@@ -11,13 +11,13 @@ import org.terasology.crashreporter.CrashReporter;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.config.SystemConfig;
 import org.terasology.engine.core.LoggingContext;
+import org.terasology.engine.core.PathManager;
 import org.terasology.engine.core.StandardGameStatus;
 import org.terasology.engine.core.TerasologyConstants;
 import org.terasology.engine.core.TerasologyEngine;
 import org.terasology.engine.core.TerasologyEngineBuilder;
 import org.terasology.engine.core.modes.StateLoading;
 import org.terasology.engine.core.modes.StateMainMenu;
-import org.terasology.engine.core.paths.PathManager;
 import org.terasology.engine.core.subsystem.EngineSubsystem;
 import org.terasology.engine.core.subsystem.common.ConfigurationSubsystem;
 import org.terasology.engine.core.subsystem.common.ThreadManager;
@@ -239,7 +239,8 @@ public final class Terasology {
         System.out.println();
         System.out.println("    terasology" + optText.toString());
         System.out.println();
-        System.out.println("By default Terasology saves data such as game saves and logs into subfolders of a platform-specific \"home directory\".");
+        System.out.println("By default Terasology saves data such as game saves and logs into subfolders of a platform-specific \"home " +
+                "directory\".");
         System.out.println("Saving can be explicitly disabled using the \"" + NO_SAVE_GAMES + "\" flag.");
         System.out.println("Optionally, the user can override the default by using one of the following launch arguments:");
         System.out.println();
@@ -264,7 +265,8 @@ public final class Terasology {
         System.out.println();
         System.out.println("To change the port the server is hosted on use the " + SERVER_PORT + " launch argument.");
         System.out.println();
-        System.out.println("To override the default generated config (useful for headless server) use the " + OVERRIDE_DEFAULT_CONFIG + " launch argument");
+        System.out.println("To override the default generated config (useful for headless server) use the " + OVERRIDE_DEFAULT_CONFIG +
+                " launch argument");
         System.out.println();
         System.out.println("Examples:");
         System.out.println();

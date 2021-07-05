@@ -6,8 +6,8 @@ package org.terasology.engine.world.block.entity;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import org.joml.Vector3f;
-import org.terasology.assets.ResourceUrn;
-import org.terasology.assets.management.AssetManager;
+import org.terasology.gestalt.assets.ResourceUrn;
+import org.terasology.gestalt.assets.management.AssetManager;
 import org.terasology.engine.entitySystem.entity.EntityManager;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.prefab.PrefabManager;
@@ -330,7 +330,8 @@ public class BlockCommands extends BaseComponentSystem {
         EntityRef playerEntity = client.getComponent(ClientComponent.class).character;
         int stackLimit = blockFamily.getArchetypeBlock().isStackable() ? 99 : 1;
 
-        for (int quantityLeft = quantity; quantityLeft > 0; quantityLeft = quantityLeft - stackLimit) {
+        int quantityLeft;
+        for (quantityLeft = quantity; quantityLeft > 0; quantityLeft = quantityLeft - stackLimit) {
             EntityRef item = blockItemFactory.newInstance(blockFamily, Math.min(quantity, stackLimit));
             if (!item.exists()) {
                 throw new IllegalArgumentException("Unknown block or item");
@@ -341,12 +342,11 @@ public class BlockCommands extends BaseComponentSystem {
 
             if (!giveItemEvent.isHandled()) {
                 item.destroy();
-                quantity -= quantityLeft;
                 break;
             }
         }
 
-        return "You received " + quantity + " blocks of " + blockFamily.getDisplayName();
+        return "You received " + (quantity - quantityLeft) + " blocks of " + blockFamily.getDisplayName();
     }
 
     private <T extends Comparable<T>> List<T> sortItems(Iterable<T> items) {

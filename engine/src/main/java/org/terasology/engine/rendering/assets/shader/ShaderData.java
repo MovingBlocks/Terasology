@@ -3,14 +3,12 @@
 package org.terasology.engine.rendering.assets.shader;
 
 import com.google.common.collect.ImmutableList;
-import org.terasology.assets.AssetData;
+import org.terasology.gestalt.assets.AssetData;
 
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/**
- */
 public class ShaderData implements AssetData {
 
     private static final String DEFAULT_VERSION = "120";

@@ -4,10 +4,10 @@
 package org.terasology.engine.world.block.tiles;
 
 import com.google.common.math.IntMath;
-import org.terasology.assets.ResourceUrn;
-import org.terasology.assets.format.AbstractAssetFileFormat;
-import org.terasology.assets.format.AssetDataFile;
-import org.terasology.assets.module.annotations.RegisterAssetFileFormat;
+import org.terasology.gestalt.assets.ResourceUrn;
+import org.terasology.gestalt.assets.format.AbstractAssetFileFormat;
+import org.terasology.gestalt.assets.format.AssetDataFile;
+import org.terasology.gestalt.assets.module.annotations.RegisterAssetFileFormat;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -34,13 +34,12 @@ public class TileFormat extends AbstractAssetFileFormat<TileData> {
             if (!IntMath.isPowerOfTwo(image.getHeight()) || image.getWidth() % image.getHeight() != 0 || image.getWidth() == 0) {
                 throw new IOException("Invalid tile - must be horizontal row of power-of-two sized squares");
             }
-            BufferedImage[] frames = new BufferedImage[image.getWidth()/image.getHeight()];
-            for (int i=0; i<frames.length; i++) {
+            BufferedImage[] frames = new BufferedImage[image.getWidth() / image.getHeight()];
+            for (int i = 0; i < frames.length; i++) {
                 frames[i] = new BufferedImage(image.getHeight(), image.getHeight(), BufferedImage.TYPE_INT_ARGB);
                 frames[i].createGraphics().drawImage(image, -image.getHeight() * i, 0, null);
             }
             return new TileData(frames, auto);
         }
     }
-
 }

@@ -3,12 +3,10 @@
 
 package org.terasology.engine.world.generator;
 
-import org.terasology.engine.world.chunks.CoreChunk;
+import org.terasology.engine.world.chunks.Chunk;
 
 import java.util.Map;
 
-/**
- */
 public interface ChunkGenerationPass {
 
     void setWorldSeed(String seed);
@@ -23,6 +21,6 @@ public interface ChunkGenerationPass {
      *
      * @param chunk
      */
-    void generateChunk(CoreChunk chunk);
+    void generateChunk(Chunk chunk);
 
 }

@@ -1,25 +1,13 @@
-/*
- * Copyright 2013 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.entitySystem.metadata;
 
 import com.google.common.base.Predicates;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import org.terasology.assets.ResourceUrn;
+import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.engine.entitySystem.Component;
+import org.terasology.engine.entitySystem.DoNotPersist;
 import org.terasology.engine.network.Replicate;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.metadata.ClassMetadata;
@@ -38,6 +26,7 @@ import java.util.List;
  */
 public class ComponentMetadata<T extends Component> extends ClassMetadata<T, ComponentFieldMetadata<T, ?>> {
 
+    private boolean persisted;
     private boolean replicated;
     private boolean replicatedFromOwner;
     private boolean referenceOwner;
@@ -53,8 +42,10 @@ public class ComponentMetadata<T extends Component> extends ClassMetadata<T, Com
      * @param copyStrategies A copy strategy library
      * @throws NoSuchMethodException If the component has no default constructor
      */
-    public ComponentMetadata(ResourceUrn uri, Class<T> type, ReflectFactory factory, CopyStrategyLibrary copyStrategies) throws NoSuchMethodException {
-        super(uri, type, factory, copyStrategies, Predicates.<Field>alwaysTrue());
+    public ComponentMetadata(ResourceUrn uri, Class<T> type, ReflectFactory factory, CopyStrategyLibrary copyStrategies)
+            throws NoSuchMethodException {
+        super(uri.toString(), type, factory, copyStrategies, Predicates.<Field>alwaysTrue());
+        persisted = type.getAnnotation(DoNotPersist.class) == null;
         replicated = type.getAnnotation(Replicate.class) != null;
         blockLifecycleEventsRequired = type.getAnnotation(RequiresBlockLifecycleEvents.class) != null;
         ForceBlockActive forceBlockActiveAnnotation = type.getAnnotation(ForceBlockActive.class);
@@ -79,8 +70,16 @@ public class ComponentMetadata<T extends Component> extends ClassMetadata<T, Com
     }
 
     @Override
-    protected ComponentFieldMetadata<T, ?> createField(Field field, CopyStrategyLibrary copyStrategyLibrary, ReflectFactory factory) throws InaccessibleFieldException {
+    protected ComponentFieldMetadata<T, ?> createField(Field field, CopyStrategyLibrary copyStrategyLibrary, ReflectFactory factory)
+            throws InaccessibleFieldException {
         return new ComponentFieldMetadata<>(this, field, copyStrategyLibrary, factory, false);
+    }
+
+    /**
+     * @return Whether this component should be stored upon serialization of an entity.
+     */
+    public boolean isPersisted() {
+        return persisted;
     }
 
     /**
@@ -138,7 +137,7 @@ public class ComponentMetadata<T extends Component> extends ClassMetadata<T, Com
     public T copyWithOwnedEntities(T object) {
         T result = constructor.construct();
         if (result != null) {
-            for (ComponentFieldMetadata<T,?> field : fields.values()) {
+            for (ComponentFieldMetadata<T, ?> field : fields.values()) {
                 field.setValue(result, field.getCopyOfValueWithOwnedEntities(object));
             }
         }

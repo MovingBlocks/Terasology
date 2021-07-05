@@ -1,24 +1,12 @@
-/*
- * Copyright 2013 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.engine.audio.system;
 
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
-import org.terasology.engine.utilities.Assets;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.engine.audio.AudioManager;
 import org.terasology.engine.audio.events.PlaySoundEvent;
 import org.terasology.engine.audio.events.PlaySoundForOwnerEvent;
@@ -36,12 +24,14 @@ import org.terasology.engine.logic.players.LocalPlayer;
 import org.terasology.engine.network.ClientComponent;
 import org.terasology.engine.network.NetworkSystem;
 import org.terasology.engine.registry.In;
+import org.terasology.engine.utilities.Assets;
 
 /**
  * This system handles receiving the PlaySound events and activating the AudioManager to play them
  */
 @RegisterSystem
 public class AudioSystem extends BaseComponentSystem implements UpdateSubscriberSystem {
+    private static final Logger logger = LoggerFactory.getLogger(AudioSystem.class);
 
     @In
     private NetworkSystem networkSystem;
@@ -49,6 +39,11 @@ public class AudioSystem extends BaseComponentSystem implements UpdateSubscriber
     private LocalPlayer localPlayer;
     @In
     private AudioManager audioManager;
+
+    // reuse same vector and quaternion instances when updating listeners during delta update.
+    private final Vector3f playerPosition = new Vector3f();
+    private final Vector3f playerVelocity = new Vector3f();
+    private final Quaternionf playerViewRotation = new Quaternionf();
 
     /**
      * Toggles the muting of sounds.
@@ -70,10 +65,11 @@ public class AudioSystem extends BaseComponentSystem implements UpdateSubscriber
      * @param zOffset The z axis offset from the player to play the sound at.
      */
     @Command(shortDescription = "Plays a test sound")
-    public void playTestSound(@Sender EntityRef sender, @CommandParam("xOffset") float xOffset, @CommandParam("zOffset") float zOffset) {
-Vector3f position = localPlayer.getPosition(new Vector3f());
-        position.x += xOffset;
-        position.z += zOffset;
+    public void playTestSound(@Sender EntityRef sender,
+                              @CommandParam("xOffset") float xOffset,
+                              @CommandParam("zOffset") float zOffset) {
+        Vector3f position = localPlayer.getPosition(new Vector3f());
+        position.add(xOffset, 0, zOffset);
         audioManager.playSound(Assets.getSound("engine:dig").get(), position);
     }
 
@@ -91,6 +87,8 @@ Vector3f position = localPlayer.getPosition(new Vector3f());
             if (pos.isFinite()) {
                 audioManager.playSound(playSoundEvent.getSound(), pos, playSoundEvent.getVolume(), AudioManager.PRIORITY_NORMAL);
                 return;
+            } else {
+                logger.warn("Can't play sound with non-finite position/rotation?! Entity: {}", entity);
             }
         }
         audioManager.playSound(playSoundEvent.getSound(), playSoundEvent.getVolume());
@@ -114,9 +112,13 @@ Vector3f position = localPlayer.getPosition(new Vector3f());
 
     @Override
     public void update(float delta) {
+        if (!localPlayer.isValid()) {
+            // localplayer is invalid so no audio
+            return;
+        }
         audioManager.updateListener(
-            localPlayer.getPosition(new Vector3f()),
-            localPlayer.getViewRotation(new Quaternionf()),
-            localPlayer.getVelocity(new Vector3f()));
+                localPlayer.getPosition(playerPosition),
+                localPlayer.getViewRotation(playerViewRotation),
+                localPlayer.getVelocity(playerVelocity));
     }
 }

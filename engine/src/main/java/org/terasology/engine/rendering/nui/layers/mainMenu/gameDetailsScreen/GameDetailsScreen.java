@@ -8,18 +8,27 @@ import org.codehaus.plexus.util.StringUtils;
 import org.joml.Vector2i;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.assets.ResourceUrn;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.core.SimpleUri;
 import org.terasology.engine.core.TerasologyConstants;
 import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.engine.i18n.TranslationSystem;
+import org.terasology.engine.registry.In;
+import org.terasology.engine.rendering.nui.CoreScreenLayer;
 import org.terasology.engine.rendering.nui.animation.MenuAnimationSystems;
+import org.terasology.engine.rendering.nui.layers.mainMenu.MessagePopup;
+import org.terasology.engine.rendering.nui.layers.mainMenu.SelectGameScreen;
 import org.terasology.engine.rendering.nui.layers.mainMenu.moduleDetailsScreen.ModuleDetailsScreen;
-import org.terasology.module.DependencyInfo;
-import org.terasology.module.Module;
-import org.terasology.module.ModuleMetadata;
-import org.terasology.naming.NameVersion;
+import org.terasology.engine.rendering.nui.layers.mainMenu.savedGames.GameInfo;
+import org.terasology.engine.utilities.time.DateTimeHelper;
+import org.terasology.engine.world.generator.internal.WorldGeneratorInfo;
+import org.terasology.engine.world.generator.internal.WorldGeneratorManager;
+import org.terasology.engine.world.internal.WorldInfo;
+import org.terasology.gestalt.assets.ResourceUrn;
+import org.terasology.gestalt.module.Module;
+import org.terasology.gestalt.module.ModuleMetadata;
+import org.terasology.gestalt.module.dependencyresolution.DependencyInfo;
+import org.terasology.gestalt.naming.NameVersion;
 import org.terasology.nui.Canvas;
 import org.terasology.nui.databinding.Binding;
 import org.terasology.nui.databinding.ReadOnlyBinding;
@@ -31,15 +40,6 @@ import org.terasology.nui.widgets.UILabel;
 import org.terasology.nui.widgets.UIList;
 import org.terasology.nui.widgets.UITabBox;
 import org.terasology.nui.widgets.UIText;
-import org.terasology.engine.registry.In;
-import org.terasology.engine.rendering.nui.CoreScreenLayer;
-import org.terasology.engine.rendering.nui.layers.mainMenu.MessagePopup;
-import org.terasology.engine.rendering.nui.layers.mainMenu.SelectGameScreen;
-import org.terasology.engine.rendering.nui.layers.mainMenu.savedGames.GameInfo;
-import org.terasology.engine.utilities.time.DateTimeHelper;
-import org.terasology.engine.world.generator.internal.WorldGeneratorInfo;
-import org.terasology.engine.world.generator.internal.WorldGeneratorManager;
-import org.terasology.engine.world.internal.WorldInfo;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -245,10 +245,14 @@ public class GameDetailsScreen extends CoreScreenLayer {
         } else {
             gameTitle = worldInfo.getCustomTitle();
         }
-        return translationSystem.translate("${engine:menu#game-details-game-title} ") + gameTitle + '\n' + '\n' +
-                translationSystem.translate("${engine:menu#game-details-game-seed} ") + worldInfo.getSeed() + '\n' + '\n' +
-                translationSystem.translate("${engine:menu#game-details-world-generator}: ") + worldGeneratorManager.getWorldGeneratorInfo(worldInfo.getWorldGenerator()).getDisplayName() + '\n' + '\n' +
-                translationSystem.translate("${engine:menu#game-details-game-duration} ")
+        return translationSystem.translate("${engine:menu#game-details-game-title} ") + gameTitle
+                + '\n' + '\n'
+                + translationSystem.translate("${engine:menu#game-details-game-seed} ") + worldInfo.getSeed()
+                + '\n' + '\n'
+                + translationSystem.translate("${engine:menu#game-details-world-generator}: ")
+                + worldGeneratorManager.getWorldGeneratorInfo(worldInfo.getWorldGenerator()).getDisplayName()
+                + '\n' + '\n'
+                + translationSystem.translate("${engine:menu#game-details-game-duration} ")
                 + DateTimeHelper.getDeltaBetweenTimestamps(new Date(0).getTime(), worldInfo.getTime());
     }
 
@@ -365,7 +369,8 @@ public class GameDetailsScreen extends CoreScreenLayer {
                         module = moduleManager.getRegistry().getLatestModuleVersion(nameVersion.getName());
                         if (module != null) {
                             logger.debug("Get the latest available version of module {} in your classpath", nameVersion.getName());
-                            errors.add(String.format("Can't find module %s:%s in your classpath; loaded description for the latest available version.",
+                            errors.add(String.format("Can't find module %s:%s in your classpath; " +
+                                            "loaded description for the latest available version.",
                                     nameVersion.getName(), nameVersion.getVersion()));
                             return ModuleSelectionInfo.latestVersion(module);
                         }
@@ -393,11 +398,14 @@ public class GameDetailsScreen extends CoreScreenLayer {
         if (wgi != null) {
             display = wgi.getDisplayName();
         }
-        return translationSystem.translate("${engine:menu#game-details-game-title} ") + theGameInfo.getManifest().getTitle() + '\n' + '\n' +
-                translationSystem.translate("${engine:menu#game-details-last-play}: ") + DATE_FORMAT.format(theGameInfo.getTimestamp()) + '\n' + '\n' +
-                translationSystem.translate("${engine:menu#game-details-game-duration} ") + DateTimeHelper
-                .getDeltaBetweenTimestamps(new Date(0).getTime(), theGameInfo.getManifest().getTime()) + '\n' + '\n' +
-                translationSystem.translate("${engine:menu#game-details-game-seed} ") + theGameInfo.getManifest().getSeed() + '\n' + '\n' +
+        return translationSystem.translate("${engine:menu#game-details-game-title} ")
+                + theGameInfo.getManifest().getTitle() + '\n' + '\n' +
+                translationSystem.translate("${engine:menu#game-details-last-play}: ")
+                + DATE_FORMAT.format(theGameInfo.getTimestamp()) + '\n' + '\n' +
+                translationSystem.translate("${engine:menu#game-details-game-duration} ")
+                + DateTimeHelper.getDeltaBetweenTimestamps(new Date(0).getTime(), theGameInfo.getManifest().getTime()) + '\n' + '\n' +
+                translationSystem.translate("${engine:menu#game-details-game-seed} ")
+                + theGameInfo.getManifest().getSeed() + '\n' + '\n' +
                 translationSystem.translate("${engine:menu#game-details-world-generator}: ") + '\t'
                 + display;
     }

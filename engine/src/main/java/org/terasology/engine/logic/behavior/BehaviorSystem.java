@@ -5,9 +5,7 @@ package org.terasology.engine.logic.behavior;
 import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.assets.ResourceUrn;
-import org.terasology.assets.management.AssetManager;
-import org.terasology.engine.core.paths.PathManager;
+import org.terasology.engine.core.PathManager;
 import org.terasology.engine.entitySystem.entity.EntityManager;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
@@ -23,9 +21,11 @@ import org.terasology.engine.logic.behavior.asset.BehaviorTreeData;
 import org.terasology.engine.logic.behavior.asset.BehaviorTreeFormat;
 import org.terasology.engine.logic.behavior.core.Actor;
 import org.terasology.engine.logic.behavior.core.BehaviorNode;
-import org.terasology.naming.Name;
 import org.terasology.engine.registry.In;
 import org.terasology.engine.registry.Share;
+import org.terasology.gestalt.assets.ResourceUrn;
+import org.terasology.gestalt.assets.management.AssetManager;
+import org.terasology.gestalt.naming.Name;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -100,7 +100,8 @@ public class BehaviorSystem extends BaseComponentSystem implements UpdateSubscri
     public BehaviorTree createTree(String name, BehaviorNode root) {
         BehaviorTreeData data = new BehaviorTreeData();
         data.setRoot(root);
-        BehaviorTree behaviorTree = assetManager.loadAsset(new ResourceUrn(BEHAVIORS, new Name(name.replaceAll("\\W+", ""))), data, BehaviorTree.class);
+        BehaviorTree behaviorTree = assetManager.loadAsset(
+                new ResourceUrn(BEHAVIORS, new Name(name.replaceAll("\\W+", ""))), data, BehaviorTree.class);
         trees.add(behaviorTree);
         save(behaviorTree);
         return behaviorTree;

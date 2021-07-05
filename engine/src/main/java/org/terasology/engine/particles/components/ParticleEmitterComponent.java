@@ -1,24 +1,11 @@
-/*
- * Copyright 2016 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.particles.components;
 
 import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.logic.location.LocationComponent;
-import org.terasology.module.sandbox.API;
+import org.terasology.gestalt.module.sandbox.API;
 import org.terasology.engine.particles.ParticlePool;
 import org.terasology.engine.particles.functions.affectors.AffectorFunction;
 import org.terasology.engine.particles.functions.generators.GeneratorFunction;
@@ -68,12 +55,14 @@ public class ParticleEmitterComponent implements Component {
     public boolean enabled = true;
 
     /**
-     * The remaining life time of this emitter in seconds, the emitter will auto-remove upon reaching 0 TODO: Implement emitter lifetime
+     * The remaining life time of this emitter in seconds, the emitter will auto-remove upon reaching 0
+     * TODO: Implement emitter lifetime
      */
     public float lifeTime = INDEFINITE_EMITTER_LIFETIME;
 
     /**
-     * The maximum amount of particle this emitter can emit before auto-removing, the emitter will auto-remove upon reaching 0 TODO: Implement emitter max spawns
+     * The maximum amount of particle this emitter can emit before auto-removing, the emitter will auto-remove upon reaching 0
+     * TODO: Implement emitter max spawns
      */
     public int particleSpawnsLeft = INFINITE_PARTICLE_SPAWNS;
 

@@ -6,8 +6,6 @@ import org.joml.Vector2f;
 import org.joml.Vector3fc;
 import org.terasology.engine.rendering.dag.nodes.RefractiveReflectiveBlocksNodeProxy;
 
-/**
- */
 public final class RenderHelper {
 
     // Parameters which are also defined on shader side
@@ -62,8 +60,9 @@ public final class RenderHelper {
         float timeFactor = RefractiveReflectiveBlocksNodeProxy.waveSpeed;
 
         for (int i = 0; i < OCEAN_OCTAVES; ++i) {
-            height += (float) (smoothTriangleWave(timeToTick(days,
-                    timeFactor) + position.x() * OCEAN_WAVE_DIRECTIONS[i].x * waveSize + position.z() * OCEAN_WAVE_DIRECTIONS[i].y * waveSize) * 2.0 - 1.0) * waveIntensity;
+            height += (float) (smoothTriangleWave(timeToTick(days, timeFactor)
+                    + position.x() * OCEAN_WAVE_DIRECTIONS[i].x * waveSize
+                    + position.z() * OCEAN_WAVE_DIRECTIONS[i].y * waveSize) * 2.0 - 1.0) * waveIntensity;
 
             waveSize *= RefractiveReflectiveBlocksNodeProxy.waveSizeFalloff;
             waveIntensity *= RefractiveReflectiveBlocksNodeProxy.waveIntensityFalloff;

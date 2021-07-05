@@ -5,12 +5,12 @@ package org.terasology.engine.logic.chat;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.assets.ResourceUrn;
 import org.terasology.engine.entitySystem.entity.EntityManager;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.event.ReceiveEvent;
 import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
 import org.terasology.engine.entitySystem.systems.RegisterSystem;
+import org.terasology.engine.input.binds.general.ChatButton;
 import org.terasology.engine.logic.common.DisplayNameComponent;
 import org.terasology.engine.logic.console.ConsoleColors;
 import org.terasology.engine.logic.console.CoreMessageType;
@@ -21,20 +21,18 @@ import org.terasology.engine.logic.console.commandSystem.annotations.CommandPara
 import org.terasology.engine.logic.console.commandSystem.annotations.Sender;
 import org.terasology.engine.logic.console.suggesters.OnlineUsernameSuggester;
 import org.terasology.engine.logic.console.ui.NotificationOverlay;
-import org.terasology.input.ButtonState;
-import org.terasology.engine.input.binds.general.ChatButton;
 import org.terasology.engine.logic.permission.PermissionManager;
 import org.terasology.engine.network.ClientComponent;
-import org.terasology.nui.FontColor;
 import org.terasology.engine.registry.In;
 import org.terasology.engine.rendering.nui.NUIManager;
+import org.terasology.gestalt.assets.ResourceUrn;
+import org.terasology.input.ButtonState;
+import org.terasology.nui.FontColor;
 
 import java.util.Arrays;
 
 import static java.util.stream.Collectors.joining;
 
-/**
- */
 @RegisterSystem
 public class ChatSystem extends BaseComponentSystem {
     private static final Logger logger = LoggerFactory.getLogger(ChatSystem.class);

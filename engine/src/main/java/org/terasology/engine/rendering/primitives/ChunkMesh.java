@@ -2,36 +2,23 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.rendering.primitives;
 
-import com.google.common.collect.Maps;
-import gnu.trove.list.TFloatList;
-import gnu.trove.list.TIntList;
-import gnu.trove.list.array.TFloatArrayList;
-import gnu.trove.list.array.TIntArrayList;
+import org.joml.Vector2f;
+import org.joml.Vector2fc;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL15;
-import org.terasology.engine.core.subsystem.lwjgl.GLBufferPool;
-import org.terasology.module.sandbox.API;
-import org.terasology.engine.rendering.VertexBufferObjectUtil;
+import org.lwjgl.opengl.GL30;
 import org.terasology.engine.rendering.assets.material.Material;
-import org.terasology.engine.world.chunks.Chunks;
+import org.terasology.engine.rendering.assets.mesh.resource.GLAttributes;
+import org.terasology.engine.rendering.assets.mesh.resource.IndexResource;
+import org.terasology.engine.rendering.assets.mesh.resource.VertexAttributeBinding;
+import org.terasology.engine.rendering.assets.mesh.resource.VertexFloatAttributeBinding;
+import org.terasology.engine.rendering.assets.mesh.resource.VertexIntegerAttributeBinding;
+import org.terasology.engine.rendering.assets.mesh.resource.VertexResource;
+import org.terasology.engine.rendering.assets.mesh.resource.VertexResourceBuilder;
+import org.terasology.gestalt.module.sandbox.API;
 
-import java.nio.IntBuffer;
-import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
-
-import static org.lwjgl.opengl.GL11.GL_COLOR_ARRAY;
-import static org.lwjgl.opengl.GL11.GL_NORMAL_ARRAY;
-import static org.lwjgl.opengl.GL11.GL_TEXTURE_COORD_ARRAY;
-import static org.lwjgl.opengl.GL11.GL_VERTEX_ARRAY;
-import static org.lwjgl.opengl.GL11.glColorPointer;
-import static org.lwjgl.opengl.GL11.glDisableClientState;
-import static org.lwjgl.opengl.GL11.glEnableClientState;
-import static org.lwjgl.opengl.GL11.glNormalPointer;
-import static org.lwjgl.opengl.GL11.glTexCoordPointer;
-import static org.lwjgl.opengl.GL11.glVertexPointer;
 
 /**
  * Chunk meshes store, manipulate and render the vertex data of tessellated chunks.
@@ -67,32 +54,17 @@ public class ChunkMesh {
         Z_PRE_PASS
     }
 
-    // some constants
-    private static final int SIZE_VERTEX = 3;   // vertices have 3 positional components, x,y,z
-    private static final int SIZE_TEX0 = 4;     // the first texture has 4 components, u,v, flags, animation frame count
-    private static final int SIZE_TEX1 = 3;     // the second texture stores lighting, with components: light, block light, ambient occlusion
-    private static final int SIZE_COLOR = 1;    // the color field's 4 components are packed into 1 float-sized field.
-    private static final int SIZE_NORMAL = 3;   // normals are 3-dimensional vectors with u,v,t components
-
-    // offset to the beginning of each data field, from the start of the data regarding an individual vertex
-    private static final int OFFSET_VERTEX = 0;
-    private static final int OFFSET_TEX_0 = OFFSET_VERTEX + SIZE_VERTEX * 4;
-    private static final int OFFSET_TEX_1 = OFFSET_TEX_0 + SIZE_TEX0 * 4;
-    private static final int OFFSET_COLOR = OFFSET_TEX_1 + SIZE_TEX1 * 4;
-    private static final int OFFSET_NORMAL = OFFSET_COLOR + SIZE_COLOR * 4;
-    private static final int STRIDE = OFFSET_NORMAL + SIZE_NORMAL * 4;
-    // the STRIDE, above, is the gap between the beginnings of the data regarding two consecutive vertices
-
     /* VERTEX DATA */
-    private final int[] vertexBuffers = new int[4];
-    private final int[] idxBuffers = new int[4];
-    private final int[] vertexCount = new int[4];
+    public final int[] vertexBuffers = new int[4];
+    public final int[] idxBuffers = new int[4];
+    public final int[] vertexCount = new int[4];
+    public final int[] vaoCount = new int[4];
 
     /* STATS */
     private int triangleCount = -1;
 
     /* TEMPORARY DATA */
-    private Map<RenderType, VertexElements> vertexElements = Maps.newEnumMap(RenderType.class);
+    private VertexElements[] vertexElements = new VertexElements[RenderType.values().length];
 
     private boolean disposed;
 
@@ -103,21 +75,18 @@ public class ChunkMesh {
     private int timeToGenerateBlockVertices;
     private int timeToGenerateOptimizedBuffers;
 
-    private GLBufferPool bufferPool;
-
-    public ChunkMesh(GLBufferPool bufferPool) {
-        this.bufferPool = bufferPool;
+    public ChunkMesh() {
         for (RenderType type : RenderType.values()) {
-            vertexElements.put(type, new VertexElements());
+            vertexElements[type.ordinal()] = new VertexElements();
         }
     }
 
     public VertexElements getVertexElements(RenderType renderType) {
-        return vertexElements.get(renderType);
+        return vertexElements[renderType.ordinal()];
     }
 
-    public boolean isGenerated() {
-        return vertexElements == null;
+    public boolean hasVertexElements() {
+        return vertexElements != null;
     }
 
     /**
@@ -133,12 +102,14 @@ public class ChunkMesh {
                     return false;
                 }
 
+                // Make sure that if it has already been generated, the previous buffers are freed
+                dispose();
+                disposed = false;
+
                 for (RenderType type : RenderType.values()) {
                     generateVBO(type);
                 }
 
-                // Free unused space on the heap
-                vertexElements = null;
                 // Calculate the final amount of triangles
                 triangleCount = (vertexCount[0] + vertexCount[1] + vertexCount[2] + vertexCount[3]) / 3;
             } finally {
@@ -152,21 +123,51 @@ public class ChunkMesh {
     }
 
     private void generateVBO(RenderType type) {
-        VertexElements elements = vertexElements.get(type);
+        VertexElements elements = vertexElements[type.ordinal()];
         int id = type.getIndex();
-        if (!disposed && elements.finalIndices.limit() > 0 && elements.finalVertices.limit() > 0) {
-            vertexBuffers[id] = bufferPool.get("chunkMesh");
-            idxBuffers[id] = bufferPool.get("chunkMesh");
-            vertexCount[id] = elements.finalIndices.limit();
+        if (!disposed && elements.buffer.elements() > 0) {
+            vertexBuffers[id] = GL15.glGenBuffers();
+            idxBuffers[id] = GL15.glGenBuffers();
+            vaoCount[id] = GL30.glGenVertexArrays();
 
-            VertexBufferObjectUtil.bufferVboElementData(idxBuffers[id], elements.finalIndices, GL15.GL_STATIC_DRAW);
-            VertexBufferObjectUtil.bufferVboData(vertexBuffers[id], elements.finalVertices, GL15.GL_STATIC_DRAW);
+            GL30.glBindVertexArray(vaoCount[id]);
+
+            GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vertexBuffers[id]);
+            elements.buffer.writeBuffer(buffer -> {
+                GL15.glBufferData(GL15.GL_ARRAY_BUFFER, buffer, GL30.GL_STATIC_DRAW);
+            });
+
+            for (VertexResource.VertexDefinition definition : elements.buffer.definitions()) {
+                GL30.glEnableVertexAttribArray(definition.location);
+                if (definition.location == VertexElements.FLAGS_INDEX) {
+                    GL30.glVertexAttribIPointer(definition.location, definition.attribute.count,
+                            definition.attribute.mapping.glType, elements.buffer.inStride(), definition.offset);
+                } else {
+                    GL30.glVertexAttribPointer(definition.location, definition.attribute.count,
+                            definition.attribute.mapping.glType, false, elements.buffer.inStride(), definition.offset);
+                }
+            }
+
+            GL30.glBindBuffer(GL30.GL_ELEMENT_ARRAY_BUFFER, idxBuffers[id]);
+            elements.indices.writeBuffer((buffer) -> GL30.glBufferData(GL30.GL_ELEMENT_ARRAY_BUFFER, buffer, GL30.GL_STATIC_DRAW));
+            vertexCount[id] = elements.indices.indices();
+
+            GL30.glBindVertexArray(0);
+
         } else {
             vertexBuffers[id] = 0;
             idxBuffers[id] = 0;
             vertexCount[id] = 0;
         }
+    }
 
+    /**
+     * Save space by removing the data that was used to construct the mesh, but
+     * after discardData is called, the mesh can't be serialized, so it shouldn't
+     * be used in contexts where that might be necessary.
+     */
+    public void discardData() {
+        vertexElements = null;
     }
 
     private void renderVbo(int id) {
@@ -176,37 +177,9 @@ public class ChunkMesh {
                     return;
                 }
 
-                glEnableClientState(GL_VERTEX_ARRAY);
-                glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-                glEnableClientState(GL_COLOR_ARRAY);
-                glEnableClientState(GL_NORMAL_ARRAY);
-
-                GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, idxBuffers[id]);
-                GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vertexBuffers[id]);
-
-                glVertexPointer(SIZE_VERTEX, GL11.GL_FLOAT, STRIDE, OFFSET_VERTEX);
-
-                GL13.glClientActiveTexture(GL13.GL_TEXTURE0);
-                glTexCoordPointer(SIZE_TEX0, GL11.GL_FLOAT, STRIDE, OFFSET_TEX_0);
-
-                GL13.glClientActiveTexture(GL13.GL_TEXTURE1);
-                glTexCoordPointer(SIZE_TEX1, GL11.GL_FLOAT, STRIDE, OFFSET_TEX_1);
-
-                glColorPointer(SIZE_COLOR * 4, GL11.GL_UNSIGNED_BYTE, STRIDE, OFFSET_COLOR);
-
-                glNormalPointer(GL11.GL_FLOAT, STRIDE, OFFSET_NORMAL);
-
-                GL11.glDrawElements(GL11.GL_TRIANGLES, vertexCount[id], GL11.GL_UNSIGNED_INT, 0);
-
-
-                GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
-                GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, 0);
-
-                glDisableClientState(GL_NORMAL_ARRAY);
-                glDisableClientState(GL_COLOR_ARRAY);
-                glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-                glDisableClientState(GL_VERTEX_ARRAY);
-
+                GL30.glBindVertexArray(vaoCount[id]);
+                GL30.glDrawElements(GL30.GL_TRIANGLES, vertexCount[id], GL30.GL_UNSIGNED_INT, 0);
+                GL30.glBindVertexArray(0);
             } finally {
                 lock.unlock();
             }
@@ -221,41 +194,8 @@ public class ChunkMesh {
      * @param chunkIsAnimated a boolean: true if the chunk is animated, false otherwise
      */
     public void updateMaterial(Material chunkMaterial, Vector3fc chunkPosition, boolean chunkIsAnimated) {
-        chunkMaterial.setFloat3("chunkPositionWorld",
-                chunkPosition.x() * Chunks.SIZE_X,
-                chunkPosition.y() * Chunks.SIZE_Y,
-                chunkPosition.z() * Chunks.SIZE_Z,
-                true);
+        chunkMaterial.setFloat3("chunkPositionWorld", chunkPosition, true);
         chunkMaterial.setFloat("animated", chunkIsAnimated ? 1.0f : 0.0f, true);
-    }
-
-    /**
-     * Renders the phase-appropriate mesh of the chunk. I.e. if the RenderPhase is OPAQUE only the opaque mesh
-     * is rendered: other meshes stored in an instance of this class are rendered in separate rendering steps.
-     *
-     * @param phase a RenderPhase value
-     * @param chunkPosition a Vector3f storing the world position of the chunk.
-     * @param cameraPosition a Vector3f storing the world position of the point of view from which the chunk is rendered.
-     * @return Returns an integer representing the number of triangles rendered.
-     * @deprecated This method uses legacy calls for opengl fixed function pipleine. transform will be set by the shader
-     *  use {@link #render(RenderPhase)}
-     */
-    @Deprecated
-    public int render(ChunkMesh.RenderPhase phase, Vector3fc chunkPosition, Vector3fc cameraPosition) {
-        GL11.glPushMatrix();
-
-        // chunkPositionRelativeToCamera = chunkCoordinates * chunkDimensions - cameraCoordinate
-        final Vector3f chunkPositionRelativeToCamera =
-                new Vector3f(chunkPosition.x() * Chunks.SIZE_X - cameraPosition.x(),
-                        chunkPosition.y() * Chunks.SIZE_Y - cameraPosition.y(),
-                        chunkPosition.z() * Chunks.SIZE_Z - cameraPosition.z());
-        GL11.glTranslatef(chunkPositionRelativeToCamera.x, chunkPositionRelativeToCamera.y, chunkPositionRelativeToCamera.z);
-
-        render(phase);  // this is where the chunk is actually rendered
-
-        GL11.glPopMatrix();
-
-        return triangleCount();
     }
 
     public int render(RenderPhase type) {
@@ -289,19 +229,24 @@ public class ChunkMesh {
                 for (int i = 0; i < vertexBuffers.length; i++) {
                     int id = vertexBuffers[i];
                     if (id != 0) {
-                        bufferPool.dispose(id);
+                        GL15.glDeleteBuffers(id);
                         vertexBuffers[i] = 0;
                     }
 
                     id = idxBuffers[i];
                     if (id != 0) {
-                        bufferPool.dispose(id);
+                        GL15.glDeleteBuffers(id);
                         idxBuffers[i] = 0;
+                    }
+
+                    id = vaoCount[i];
+                    if (id != 0) {
+                        GL30.glDeleteVertexArrays(id);
+                        vaoCount[i] = 0;
                     }
                 }
 
                 disposed = true;
-                vertexElements = null;
             }
         } finally {
             lock.unlock();
@@ -356,27 +301,50 @@ public class ChunkMesh {
      */
     public static class VertexElements {
 
-        public final TFloatList normals;
-        public final TFloatList vertices;
-        public final TFloatList tex;
-        public final TFloatList color;
-        public final TIntList indices;
-        public final TIntList flags;
-        public final TIntList frames;
-        public int vertexCount;
+        public static final int VERTEX_INDEX = 0; // vec3
+        public static final int NORMAL_INDEX = 1;  // vec3
+        public static final int UV0_INDEX = 2;  // vec3
 
-        public IntBuffer finalVertices;
-        public IntBuffer finalIndices;
+        public static final int FLAGS_INDEX = 3;  // int
+        public static final int FRAME_INDEX = 4; // float
+
+        public static final int SUNLIGHT_INDEX = 5; // float
+        public static final int BLOCK_INDEX = 6; // float
+        public static final int AMBIENT_OCCLUSION_INDEX = 7; // float
+
+        public final VertexResource buffer;
+        public final IndexResource indices = new IndexResource();
+
+        public final VertexAttributeBinding<Vector3fc, Vector3f> position;
+        public final VertexAttributeBinding<Vector3fc, Vector3f> normals;
+        public final VertexAttributeBinding<Vector2fc, Vector2f> uv0;
+
+        // color data is unused something to consider later
+        // public final VertexAttributeBinding<Colorc, Color> color;
+
+        public final VertexIntegerAttributeBinding flags;
+        public final VertexIntegerAttributeBinding frames;
+
+        public final VertexFloatAttributeBinding sunlight;         // this could be changed to a single byte
+        public final VertexFloatAttributeBinding blockLight;       // this could be changed to a single byte
+        public final VertexFloatAttributeBinding ambientOcclusion; // this could be changed to a single byte
+        public  int vertexCount;
+
 
         VertexElements() {
-            vertexCount = 0;
-            normals = new TFloatArrayList();
-            vertices = new TFloatArrayList();
-            tex = new TFloatArrayList();
-            color = new TFloatArrayList();
-            indices = new TIntArrayList();
-            flags = new TIntArrayList();
-            frames = new TIntArrayList();
+            VertexResourceBuilder builder = new VertexResourceBuilder();
+            position = builder.add(VERTEX_INDEX, GLAttributes.VECTOR_3_F_VERTEX_ATTRIBUTE);
+            normals = builder.add(NORMAL_INDEX, GLAttributes.VECTOR_3_F_VERTEX_ATTRIBUTE);
+            uv0 = builder.add(UV0_INDEX, GLAttributes.VECTOR_2_F_VERTEX_ATTRIBUTE);
+
+            flags = builder.add(FLAGS_INDEX, GLAttributes.BYTE_1_VERTEX_ATTRIBUTE);
+            frames = builder.add(FRAME_INDEX, GLAttributes.BYTE_1_VERTEX_ATTRIBUTE);
+
+            sunlight = builder.add(SUNLIGHT_INDEX, GLAttributes.FLOAT_1_VERTEX_ATTRIBUTE);
+            blockLight = builder.add(BLOCK_INDEX, GLAttributes.FLOAT_1_VERTEX_ATTRIBUTE);
+            ambientOcclusion = builder.add(AMBIENT_OCCLUSION_INDEX, GLAttributes.FLOAT_1_VERTEX_ATTRIBUTE);
+
+            buffer = builder.build();
         }
     }
 }

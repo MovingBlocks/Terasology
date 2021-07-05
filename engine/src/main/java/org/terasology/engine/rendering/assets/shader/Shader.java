@@ -3,13 +3,16 @@
 
 package org.terasology.engine.rendering.assets.shader;
 
-import org.terasology.assets.Asset;
-import org.terasology.assets.AssetType;
-import org.terasology.assets.ResourceUrn;
+import org.terasology.gestalt.assets.Asset;
+import org.terasology.gestalt.assets.AssetType;
+import org.terasology.gestalt.assets.DisposableResource;
+import org.terasology.gestalt.assets.ResourceUrn;
 
-/**
- */
 public abstract class Shader extends Asset<ShaderData> {
+
+    protected Shader(ResourceUrn urn, AssetType<?, ShaderData> assetType, DisposableResource resource) {
+        super(urn, assetType, resource);
+    }
 
     protected Shader(ResourceUrn urn, AssetType<?, ShaderData> assetType) {
         super(urn, assetType);

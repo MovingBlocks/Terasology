@@ -10,8 +10,8 @@ import org.terasology.engine.math.Side;
 import org.terasology.engine.world.block.Block;
 import org.terasology.engine.world.block.BlockRegion;
 import org.terasology.engine.world.block.BlockRegionc;
+import org.terasology.engine.world.chunks.Chunk;
 import org.terasology.engine.world.chunks.Chunks;
-import org.terasology.engine.world.chunks.LitChunk;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -44,7 +44,7 @@ public class StandardBatchPropagator implements BatchPropagator {
         this.rules = rules;
         this.scale = scale;
 
-        for (Side side : Side.getAllSides()) {
+        for (Side side : Side.values()) {
             Vector3i delta = new Vector3i(side.direction());
             if (delta.x < 0) {
                 delta.x += Chunks.SIZE_X;
@@ -112,7 +112,7 @@ public class StandardBatchPropagator implements BatchPropagator {
 
         /* Process propagation out to other blocks */
         Vector3i adjPos = new Vector3i();
-        for (Side side : Side.getAllSides()) {
+        for (Side side : Side.values()) {
             PropagationComparison comparison = rules.comparePropagation(blockChange.getTo(), blockChange.getFrom(),
                     side);
 
@@ -160,7 +160,7 @@ public class StandardBatchPropagator implements BatchPropagator {
         }
 
         Vector3i adjPos = new Vector3i();
-        for (Side side : Side.getAllSides()) {
+        for (Side side : Side.values()) {
             /* Handle this value being reset to the default by updating sides as needed */
             byte expectedValue = rules.propagateValue(oldValue, side, block, scale);
             if (rules.canSpreadOutOf(block, side)) {
@@ -229,7 +229,7 @@ public class StandardBatchPropagator implements BatchPropagator {
     private void push(Vector3ic pos, byte value) {
         Block block = world.getBlockAt(pos);
         Vector3i adjPos = new Vector3i();
-        for (Side side : Side.getAllSides()) {
+        for (Side side : Side.values()) {
             byte propagatedValue = rules.propagateValue(value, side, block, scale);
 
             if (rules.canSpreadOutOf(block, side)) {
@@ -294,7 +294,7 @@ public class StandardBatchPropagator implements BatchPropagator {
     }
 
     @Override
-    public void propagateBetween(LitChunk chunk, LitChunk adjChunk, Side side, boolean propagateExternal) {
+    public void propagateBetween(Chunk chunk, Chunk adjChunk, Side side, boolean propagateExternal) {
         Function<Vector3ic, Integer> indexProvider = createIndexProvider(side);
 
         BlockRegion edgeRegion = new BlockRegion(0, 0, 0)
@@ -307,7 +307,7 @@ public class StandardBatchPropagator implements BatchPropagator {
         propagateDepth(adjChunk, side, propagateExternal, indexProvider, edgeRegion, depth);
     }
 
-    private void propagateDepth(LitChunk adjChunk, Side side, boolean propagateExternal,
+    private void propagateDepth(Chunk adjChunk, Side side, boolean propagateExternal,
                                 Function<Vector3ic, Integer> indexProvider,
                                 BlockRegion edgeRegion, int[] depths) {
         Vector3i adjPos = new Vector3i();
@@ -344,7 +344,7 @@ public class StandardBatchPropagator implements BatchPropagator {
         }
     }
 
-    private void propagateSide(LitChunk chunk, LitChunk adjChunk, Side side, Function<Vector3ic, Integer> indexProvider,
+    private void propagateSide(Chunk chunk, Chunk adjChunk, Side side, Function<Vector3ic, Integer> indexProvider,
                                BlockRegionc edgeRegion, int[] depths) {
         Vector3i adjPos = new Vector3i();
         for (Vector3ic pos : edgeRegion) {

@@ -3,14 +3,12 @@
 
 package org.terasology.engine.rendering.assets.animation;
 
-import org.terasology.assets.Asset;
-import org.terasology.assets.AssetType;
-import org.terasology.assets.ResourceUrn;
+import org.terasology.gestalt.assets.Asset;
+import org.terasology.gestalt.assets.AssetType;
+import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.engine.rendering.assets.skeletalmesh.SkeletalMesh;
 import org.terasology.joml.geom.AABBf;
 
-/**
- */
 public abstract class MeshAnimation extends Asset<MeshAnimationData> {
 
     protected MeshAnimation(ResourceUrn urn, AssetType<?, MeshAnimationData> assetType) {

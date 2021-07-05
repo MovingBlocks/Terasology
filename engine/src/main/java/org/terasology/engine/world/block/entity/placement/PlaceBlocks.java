@@ -11,8 +11,6 @@ import org.terasology.engine.world.block.Block;
 import java.util.Collections;
 import java.util.Map;
 
-/**
- */
 public class PlaceBlocks extends AbstractConsumableEvent {
     private Map<Vector3i, Block> blocks;
     private EntityRef instigator;

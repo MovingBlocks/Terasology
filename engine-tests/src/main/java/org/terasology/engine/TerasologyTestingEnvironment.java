@@ -8,19 +8,20 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.io.TempDir;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.core.ComponentSystemManager;
 import org.terasology.engine.core.EngineTime;
+import org.terasology.engine.core.PathManager;
 import org.terasology.engine.core.Time;
 import org.terasology.engine.core.bootstrap.EntitySystemSetupUtil;
 import org.terasology.engine.core.modes.loadProcesses.LoadPrefabs;
 import org.terasology.engine.core.module.ModuleManager;
-import org.terasology.engine.core.paths.PathManager;
 import org.terasology.engine.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.engine.game.Game;
 import org.terasology.engine.logic.console.Console;
 import org.terasology.engine.logic.console.ConsoleImpl;
-import org.terasology.naming.Name;
 import org.terasology.engine.network.NetworkSystem;
 import org.terasology.engine.network.internal.NetworkSystemImpl;
 import org.terasology.engine.persistence.StorageManager;
@@ -31,9 +32,10 @@ import org.terasology.engine.recording.RecordAndReplayCurrentStatus;
 import org.terasology.engine.recording.RecordAndReplaySerializer;
 import org.terasology.engine.recording.RecordAndReplayUtils;
 import org.terasology.engine.recording.RecordedEventStore;
-import org.terasology.reflection.TypeRegistry;
 import org.terasology.engine.world.block.BlockManager;
 import org.terasology.engine.world.chunks.blockdata.ExtraBlockDataManager;
+import org.terasology.gestalt.naming.Name;
+import org.terasology.reflection.TypeRegistry;
 
 import java.nio.file.Path;
 
@@ -41,22 +43,24 @@ import static org.mockito.Mockito.mock;
 
 /**
  * A base class for unit test classes to inherit to run in a Terasology environment - with LWJGL set up and so forth
- *
  */
 public abstract class TerasologyTestingEnvironment {
     protected static Context context;
+
+    private static final Logger logger = LoggerFactory.getLogger(TerasologyTestingEnvironment.class);
 
     private static ModuleManager moduleManager;
 
     private static HeadlessEnvironment env;
 
     protected EngineTime mockTime;
+
     private EngineEntityManager engineEntityManager;
 
     @BeforeAll
     public static void setupEnvironment(@TempDir Path tempHome) throws Exception {
         PathManager.getInstance().useOverrideHomePath(tempHome);
-        Bullet.init(true,false);
+        Bullet.init(true, false);
 
         /*
          * Create at least for each class a new headless environment as it is fast and prevents side effects
@@ -91,12 +95,15 @@ public abstract class TerasologyTestingEnvironment {
         context.put(CharacterStateEventPositionMap.class, characterStateEventPositionMap);
         DirectionAndOriginPosRecorderList directionAndOriginPosRecorderList = new DirectionAndOriginPosRecorderList();
         context.put(DirectionAndOriginPosRecorderList.class, directionAndOriginPosRecorderList);
-        RecordAndReplaySerializer recordAndReplaySerializer = new RecordAndReplaySerializer(engineEntityManager, recordedEventStore, recordAndReplayUtils, characterStateEventPositionMap, directionAndOriginPosRecorderList, moduleManager, context.get(TypeRegistry.class));
+        RecordAndReplaySerializer recordAndReplaySerializer = new RecordAndReplaySerializer(engineEntityManager,
+                recordedEventStore, recordAndReplayUtils, characterStateEventPositionMap,
+                directionAndOriginPosRecorderList, moduleManager, context.get(TypeRegistry.class));
         context.put(RecordAndReplaySerializer.class, recordAndReplaySerializer);
 
         Path savePath = PathManager.getInstance().getSavePath("world1");
         context.put(StorageManager.class, new ReadWriteStorageManager(savePath, moduleManager.getEnvironment(),
-                engineEntityManager, mockBlockManager, extraDataManager, recordAndReplaySerializer, recordAndReplayUtils, recordAndReplayCurrentStatus));
+                engineEntityManager, mockBlockManager, extraDataManager, recordAndReplaySerializer,
+                recordAndReplayUtils, recordAndReplayCurrentStatus));
 
         ComponentSystemManager componentSystemManager = new ComponentSystemManager(context);
         context.put(ComponentSystemManager.class, componentSystemManager);
@@ -113,7 +120,11 @@ public abstract class TerasologyTestingEnvironment {
 
     @AfterAll
     public static void tearDown() throws Exception {
-        env.close();
+        if (env != null) {
+            env.close();
+        } else {
+            logger.warn("TTE.env unexpectedly null during tearDown");
+        }
     }
 
 

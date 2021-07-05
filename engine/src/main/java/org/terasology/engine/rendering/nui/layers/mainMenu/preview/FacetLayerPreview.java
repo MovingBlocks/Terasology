@@ -10,7 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.rendering.assets.texture.TextureData;
 import org.terasology.joml.geom.Rectanglei;
-import org.terasology.module.ModuleEnvironment;
+import org.terasology.gestalt.module.ModuleEnvironment;
 import org.terasology.engine.rendering.nui.layers.mainMenu.ProgressListener;
 import org.terasology.engine.world.block.BlockRegion;
 import org.terasology.engine.world.chunks.Chunks;

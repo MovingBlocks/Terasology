@@ -7,8 +7,6 @@ import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.event.AbstractConsumableEvent;
 import org.terasology.engine.logic.location.LocationComponent;
 
-/**
- */
 public class ActivationPredicted extends AbstractConsumableEvent {
 
     private EntityRef instigator;

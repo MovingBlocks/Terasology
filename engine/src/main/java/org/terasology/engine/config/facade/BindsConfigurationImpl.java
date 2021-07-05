@@ -1,3 +1,5 @@
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.engine.config.facade;
 
@@ -40,7 +42,7 @@ public class BindsConfigurationImpl implements BindsConfiguration {
     }
 
     @Override
-    public void setBinds(SimpleUri bindUri, Input ... inputs) {
+    public void setBinds(SimpleUri bindUri, Input... inputs) {
         config.getBinds().setBinds(bindUri, inputs);
     }
 

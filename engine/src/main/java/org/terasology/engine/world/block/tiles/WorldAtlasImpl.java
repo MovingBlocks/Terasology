@@ -12,11 +12,7 @@ import gnu.trove.map.hash.TObjectIntHashMap;
 import org.joml.Vector2f;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.assets.ResourceUrn;
-import org.terasology.engine.core.paths.PathManager;
-import org.terasology.joml.geom.Rectanglef;
-import org.terasology.math.TeraMath;
-import org.terasology.naming.Name;
+import org.terasology.engine.core.PathManager;
 import org.terasology.engine.rendering.assets.atlas.Atlas;
 import org.terasology.engine.rendering.assets.atlas.AtlasData;
 import org.terasology.engine.rendering.assets.material.Material;
@@ -25,6 +21,10 @@ import org.terasology.engine.rendering.assets.texture.Texture;
 import org.terasology.engine.rendering.assets.texture.TextureData;
 import org.terasology.engine.rendering.assets.texture.subtexture.SubtextureData;
 import org.terasology.engine.utilities.Assets;
+import org.terasology.gestalt.assets.ResourceUrn;
+import org.terasology.gestalt.naming.Name;
+import org.terasology.joml.geom.Rectanglef;
+import org.terasology.math.TeraMath;
 
 import javax.imageio.ImageIO;
 import java.awt.Color;
@@ -44,8 +44,6 @@ import java.util.Optional;
 import java.util.concurrent.BlockingQueue;
 import java.util.function.Consumer;
 
-/**
- */
 public class WorldAtlasImpl implements WorldAtlas {
     private static final Logger logger = LoggerFactory.getLogger(WorldAtlasImpl.class);
 
@@ -253,7 +251,8 @@ public class WorldAtlasImpl implements WorldAtlas {
         return createAtlasMipmaps(numMipMaps, initialColor, tileImages, screenshotName, Lists.newArrayList());
     }
 
-    private ByteBuffer[] createAtlasMipmaps(int numMipMaps, Color initialColor, List<BlockTile> tileImages, String screenshotName, List<BlockTile> alphaMaskTiles) {
+    private ByteBuffer[] createAtlasMipmaps(int numMipMaps, Color initialColor, List<BlockTile> tileImages,
+                                            String screenshotName, List<BlockTile> alphaMaskTiles) {
         ByteBuffer[] data = new ByteBuffer[numMipMaps];
         for (int i = 0; i < numMipMaps; ++i) {
             BufferedImage image = generateAtlas(i, tileImages, initialColor);
@@ -263,7 +262,8 @@ public class WorldAtlasImpl implements WorldAtlas {
             }
 
             if (i == 0) {
-                try (OutputStream stream = new BufferedOutputStream(Files.newOutputStream(PathManager.getInstance().getScreenshotPath().resolve(screenshotName)))) {
+                try (OutputStream stream = new BufferedOutputStream(Files.newOutputStream(
+                        PathManager.getInstance().getScreenshotPath().resolve(screenshotName)))) {
                     ImageIO.write(image, "png", stream);
                 } catch (IOException e) {
                     logger.warn("Failed to write atlas");
@@ -347,7 +347,8 @@ public class WorldAtlasImpl implements WorldAtlas {
                 for (int frameIndex = 0; frameIndex < tile.getLength(); frameIndex++) {
                     int posX = totalIndex % tilesPerDim;
                     int posY = totalIndex / tilesPerDim;
-                    g.drawImage(tile.getImage(frameIndex).getScaledInstance(textureSize, textureSize, Image.SCALE_SMOOTH), posX * textureSize, posY * textureSize, null);
+                    g.drawImage(tile.getImage(frameIndex).getScaledInstance(textureSize, textureSize, Image.SCALE_SMOOTH),
+                            posX * textureSize, posY * textureSize, null);
                     totalIndex++;
                 }
             }

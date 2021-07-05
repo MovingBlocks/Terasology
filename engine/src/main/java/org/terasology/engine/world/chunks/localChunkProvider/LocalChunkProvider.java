@@ -23,12 +23,6 @@ import org.terasology.engine.monitoring.PerformanceMonitor;
 import org.terasology.engine.monitoring.chunk.ChunkMonitor;
 import org.terasology.engine.persistence.ChunkStore;
 import org.terasology.engine.persistence.StorageManager;
-import org.terasology.engine.world.generation.impl.EntityBufferImpl;
-import org.terasology.engine.world.generator.WorldGenerator;
-import org.terasology.engine.world.internal.ChunkViewCore;
-import org.terasology.engine.world.internal.ChunkViewCoreImpl;
-import org.terasology.engine.world.propagation.light.InternalLightProcessor;
-import org.terasology.engine.world.propagation.light.LightMerger;
 import org.terasology.engine.utilities.concurrency.TaskMaster;
 import org.terasology.engine.world.BlockEntityRegistry;
 import org.terasology.engine.world.block.BeforeDeactivateBlocks;
@@ -41,8 +35,6 @@ import org.terasology.engine.world.block.OnAddedBlocks;
 import org.terasology.engine.world.chunks.Chunk;
 import org.terasology.engine.world.chunks.ChunkBlockIterator;
 import org.terasology.engine.world.chunks.ChunkProvider;
-import org.terasology.engine.world.chunks.Chunks;
-import org.terasology.engine.world.chunks.ManagedChunk;
 import org.terasology.engine.world.chunks.blockdata.ExtraBlockDataManager;
 import org.terasology.engine.world.chunks.event.BeforeChunkUnload;
 import org.terasology.engine.world.chunks.event.OnChunkGenerated;
@@ -52,6 +44,12 @@ import org.terasology.engine.world.chunks.internal.ChunkImpl;
 import org.terasology.engine.world.chunks.internal.ChunkRelevanceRegion;
 import org.terasology.engine.world.chunks.pipeline.ChunkProcessingPipeline;
 import org.terasology.engine.world.chunks.pipeline.stages.ChunkTaskProvider;
+import org.terasology.engine.world.generation.impl.EntityBufferImpl;
+import org.terasology.engine.world.generator.WorldGenerator;
+import org.terasology.engine.world.internal.ChunkViewCore;
+import org.terasology.engine.world.internal.ChunkViewCoreImpl;
+import org.terasology.engine.world.propagation.light.InternalLightProcessor;
+import org.terasology.engine.world.propagation.light.LightMerger;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -145,34 +143,13 @@ public class LocalChunkProvider implements ChunkProvider {
     }
 
     @Override
-    public ChunkViewCore getLocalView(Vector3ic centerChunkPos) {
-        BlockRegion region = new BlockRegion(centerChunkPos).expand(Chunks.LOCAL_REGION_EXTENTS);
-        if (getChunk(centerChunkPos) != null) {
-            return createWorldView(region, new Vector3i(1, 1, 1));
-        }
-        return null;
-    }
-
-    @Override
-    public ChunkViewCore getSubviewAroundBlock(Vector3ic blockPos, int extent) {
-        BlockRegion region = Chunks.toChunkRegion(new BlockRegion(blockPos).expand(extent, extent, extent));
-        return createWorldView(region, new Vector3i(-region.minX(), -region.minY(), -region.minZ()));
-    }
-
-    @Override
-    public ChunkViewCore getSubviewAroundChunk(Vector3ic chunkPos) {
-        BlockRegion region = new BlockRegion(chunkPos).expand(Chunks.LOCAL_REGION_EXTENTS);
-        if (getChunk(chunkPos) != null) {
-            return createWorldView(region, new Vector3i(-region.minX(), -region.minY(), -region.minZ()));
-        }
-        return null;
-    }
-
-    private ChunkViewCore createWorldView(BlockRegionc region, Vector3ic offset) {
+    public ChunkViewCore getSubview(BlockRegionc region, Vector3ic offset) {
         Chunk[] chunks = new Chunk[region.volume()];
         for (Vector3ic chunkPos : region) {
             Chunk chunk = chunkCache.get(chunkPos);
-            int index = (chunkPos.x() - region.minX()) + region.getSizeX() * ((chunkPos.z() - region.minZ()) + region.getSizeZ()  * (chunkPos.y() - region.minY()));
+            int index = (chunkPos.x() - region.minX()) + region.getSizeX()
+                    * ((chunkPos.z() - region.minZ()) + region.getSizeZ()
+                    * (chunkPos.y() - region.minY()));
             chunks[index] = chunk;
         }
         return new ChunkViewCoreImpl(chunks, region, offset, blockManager.getBlock(BlockManager.AIR_ID));
@@ -185,14 +162,15 @@ public class LocalChunkProvider implements ChunkProvider {
 
 
     private void processReadyChunk(final Chunk chunk) {
-        if (chunkCache.get(chunk.getPosition(new Vector3i())) != null) {
+        Vector3ic chunkPos = chunk.getPosition();
+        if (chunkCache.get(chunkPos) != null) {
             return; // TODO move it in pipeline;
         }
-        chunkCache.put(chunk.getPosition(new Vector3i()), chunk);
+        chunkCache.put(new Vector3i(chunkPos), chunk);
         chunk.markReady();
         //TODO, it is not clear if the activate/addedBlocks event logic is correct.
         //See https://github.com/MovingBlocks/Terasology/issues/3244
-        ChunkStore store = this.storageManager.loadChunkStore(chunk.getPosition(new Vector3i()));
+        ChunkStore store = this.storageManager.loadChunkStore(chunkPos);
         TShortObjectMap<TIntList> mappings = createBatchBlockEventMappings(chunk);
         if (store != null) {
             store.restoreEntities();
@@ -206,7 +184,6 @@ public class LocalChunkProvider implements ChunkProvider {
             });
             PerformanceMonitor.endActivity();
 
-
             // send on activate
             PerformanceMonitor.startActivity("Sending OnActivateBlocks");
 
@@ -219,7 +196,7 @@ public class LocalChunkProvider implements ChunkProvider {
             PerformanceMonitor.endActivity();
         } else {
             PerformanceMonitor.startActivity("Generating queued Entities");
-            generateQueuedEntities.remove(chunk.getPosition(new Vector3i())).forEach(this::generateQueuedEntities);
+            generateQueuedEntities.remove(chunkPos).forEach(this::generateQueuedEntities);
             PerformanceMonitor.endActivity();
 
             // send on activate
@@ -234,9 +211,9 @@ public class LocalChunkProvider implements ChunkProvider {
             PerformanceMonitor.endActivity();
 
 
-            worldEntity.send(new OnChunkGenerated(chunk.getPosition(new Vector3i())));
+            worldEntity.send(new OnChunkGenerated(chunkPos));
         }
-        worldEntity.send(new OnChunkLoaded(chunk.getPosition(new Vector3i())));
+        worldEntity.send(new OnChunkLoaded(chunkPos));
     }
 
     private void generateQueuedEntities(EntityStore store) {
@@ -385,7 +362,7 @@ public class LocalChunkProvider implements ChunkProvider {
         shutdown();
 
         for (Chunk chunk : getAllChunks()) {
-            unloadChunkInternal(chunk.getPosition(new Vector3i()));
+            unloadChunkInternal(chunk.getPosition());
             chunk.dispose();
         }
         chunkCache.clear();
@@ -416,7 +393,7 @@ public class LocalChunkProvider implements ChunkProvider {
         ChunkMonitor.fireChunkProviderDisposed(this);
         loadingPipeline.shutdown();
         unloadRequestTaskMaster.shutdown(new ChunkUnloadRequest(), true);
-        getAllChunks().stream().filter(ManagedChunk::isReady).forEach(chunk -> {
+        getAllChunks().stream().filter(Chunk::isReady).forEach(chunk -> {
             worldEntity.send(new BeforeChunkUnload(chunk.getPosition(new Vector3i())));
             storageManager.deactivateChunk(chunk);
             chunk.dispose();
@@ -432,8 +409,8 @@ public class LocalChunkProvider implements ChunkProvider {
             .addStage(ChunkTaskProvider.create("Chunk deflate", Chunk::deflate))
             .addStage(ChunkTaskProvider.createMulti("Light merging",
                 chunks -> {
-                    Chunk[] localchunks = chunks.toArray(new Chunk[0]);
-                    return new LightMerger().merge(localchunks);
+                    Chunk[] localChunks = chunks.toArray(new Chunk[0]);
+                    return new LightMerger().merge(localChunks);
                 },
                 pos -> StreamSupport.stream(new BlockRegion(pos).expand(1, 1, 1).spliterator(), false)
                     .map(Vector3i::new)
@@ -470,8 +447,8 @@ public class LocalChunkProvider implements ChunkProvider {
             .addStage(ChunkTaskProvider.create("Chunk deflate", Chunk::deflate))
             .addStage(ChunkTaskProvider.createMulti("Light merging",
                 chunks -> {
-                    Chunk[] localchunks = chunks.toArray(new Chunk[0]);
-                    return new LightMerger().merge(localchunks);
+                    Chunk[] localChunks = chunks.toArray(new Chunk[0]);
+                    return new LightMerger().merge(localChunks);
                 },
                 pos -> StreamSupport.stream(new BlockRegion(pos).expand(1, 1, 1).spliterator(), false)
                     .map(Vector3i::new)

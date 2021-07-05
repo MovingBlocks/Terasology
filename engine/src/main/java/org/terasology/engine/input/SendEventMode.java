@@ -3,8 +3,6 @@
 
 package org.terasology.engine.input;
 
-/**
- */
 public enum SendEventMode {
     /**
      * Send an event every update/frame with the current axis value

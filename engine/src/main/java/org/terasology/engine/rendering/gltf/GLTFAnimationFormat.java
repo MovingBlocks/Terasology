@@ -12,10 +12,7 @@ import gnu.trove.map.TIntIntMap;
 import gnu.trove.map.hash.TIntIntHashMap;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
-import org.terasology.assets.ResourceUrn;
-import org.terasology.assets.format.AssetDataFile;
-import org.terasology.assets.management.AssetManager;
-import org.terasology.assets.module.annotations.RegisterAssetFileFormat;
+import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.engine.rendering.assets.animation.MeshAnimationBundleData;
 import org.terasology.engine.rendering.assets.animation.MeshAnimationData;
 import org.terasology.engine.rendering.assets.animation.MeshAnimationFrame;
@@ -26,6 +23,9 @@ import org.terasology.engine.rendering.gltf.model.GLTFAnimation;
 import org.terasology.engine.rendering.gltf.model.GLTFAnimationSampler;
 import org.terasology.engine.rendering.gltf.model.GLTFBufferView;
 import org.terasology.engine.rendering.gltf.model.GLTFChannel;
+import org.terasology.gestalt.assets.format.AssetDataFile;
+import org.terasology.gestalt.assets.management.AssetManager;
+import org.terasology.gestalt.assets.module.annotations.RegisterAssetFileFormat;
 import org.terasology.joml.geom.AABBf;
 import org.terasology.engine.rendering.gltf.model.GLTFSkin;
 
@@ -93,8 +93,8 @@ public class GLTFAnimationFormat extends GLTFCommonFormat<MeshAnimationBundleDat
     }
 
     private MeshAnimationData loadAnimation(GLTF gltf, GLTFAnimation animation, List<byte[]> loadedBuffers,
-                                            TIntIntMap boneIndexMapping, List<String> boneNames, TIntList boneParents
-        , List<Bone> bones) throws IOException {
+                                            TIntIntMap boneIndexMapping, List<String> boneNames,
+                                            TIntList boneParents, List<Bone> bones) throws IOException {
         List<ChannelReader> channelReaders = new ArrayList<>();
 
         for (GLTFChannel channel : animation.getChannels()) {
@@ -106,20 +106,20 @@ public class GLTFAnimationFormat extends GLTFCommonFormat<MeshAnimationBundleDat
                 case TRANSLATION: {
                     List<Vector3f> data = getVector3fs(gltf, loadedBuffers, sampler.getOutput());
 
-                    channelReaders.add(new BufferChannelReader<>(times, data, sampler.getInterpolation()::interpolate
-                        , x -> x.getPosition(bone)));
+                    channelReaders.add(new BufferChannelReader<>(times, data, sampler.getInterpolation()::interpolate,
+                            x -> x.getPosition(bone)));
                     break;
                 }
                 case ROTATION: {
                     List<Quaternionf> data = getQuat4fs(gltf, loadedBuffers, sampler.getOutput());
-                    channelReaders.add(new BufferChannelReader<>(times, data, sampler.getInterpolation()::interpolate
-                        , x -> x.getRotation(bone)));
+                    channelReaders.add(new BufferChannelReader<>(times, data, sampler.getInterpolation()::interpolate,
+                            x -> x.getRotation(bone)));
                     break;
                 }
                 case SCALE: {
                     List<Vector3f> data = getVector3fs(gltf, loadedBuffers, sampler.getOutput());
-                    channelReaders.add(new BufferChannelReader<>(times, data, sampler.getInterpolation()::interpolate
-                        , x -> x.getBoneScale(bone)));
+                    channelReaders.add(new BufferChannelReader<>(times, data, sampler.getInterpolation()::interpolate,
+                            x -> x.getBoneScale(bone)));
                     break;
                 }
                 default:

@@ -2,11 +2,11 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.logic.behavior.asset;
 
-import org.terasology.assets.Asset;
-import org.terasology.assets.AssetType;
-import org.terasology.assets.ResourceUrn;
+import org.terasology.gestalt.assets.Asset;
+import org.terasology.gestalt.assets.AssetType;
+import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.engine.logic.behavior.core.BehaviorNode;
-import org.terasology.module.sandbox.API;
+import org.terasology.gestalt.module.sandbox.API;
 
 /**
  * Behavior tree asset. Can be loaded and saved into json. Actors should never run the nodes behind a asset directly.
@@ -18,7 +18,8 @@ public class BehaviorTree extends Asset<BehaviorTreeData> {
     private BehaviorTreeData data;
 
     /**
-     * The constructor for an asset. It is suggested that implementing classes provide a constructor taking both the urn, and an initial AssetData to load.
+     * The constructor for an asset. It is suggested that implementing classes provide a constructor taking both the urn,
+     * and an initial AssetData to load.
      *
      * @param urn       The urn identifying the asset.
      * @param assetType The asset type this asset belongs to.

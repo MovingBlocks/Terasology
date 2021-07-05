@@ -3,7 +3,7 @@
 package org.terasology.engine.logic.console.suggesters;
 
 import com.google.common.collect.Sets;
-import org.terasology.assets.management.AssetManager;
+import org.terasology.gestalt.assets.management.AssetManager;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.prefab.Prefab;
 import org.terasology.engine.logic.console.commandSystem.CommandParameterSuggester;

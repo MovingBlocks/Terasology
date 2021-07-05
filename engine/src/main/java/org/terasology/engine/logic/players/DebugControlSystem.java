@@ -10,43 +10,35 @@ import org.terasology.engine.entitySystem.event.ReceiveEvent;
 import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
 import org.terasology.engine.entitySystem.systems.RegisterMode;
 import org.terasology.engine.entitySystem.systems.RegisterSystem;
-import org.terasology.engine.logic.characters.CharacterComponent;
-import org.terasology.engine.logic.players.event.WorldtimeResetEvent;
-import org.terasology.input.Keyboard;
 import org.terasology.engine.input.binds.general.HideHUDButton;
-import org.terasology.input.device.MouseDevice;
 import org.terasology.engine.input.events.KeyDownEvent;
 import org.terasology.engine.input.events.KeyEvent;
 import org.terasology.engine.input.events.MouseAxisEvent;
-import org.terasology.engine.logic.debug.DebugProperties;
+import org.terasology.engine.logic.characters.CharacterComponent;
+import org.terasology.engine.logic.players.event.WorldtimeResetEvent;
 import org.terasology.engine.network.ClientComponent;
 import org.terasology.engine.registry.In;
 import org.terasology.engine.rendering.nui.NUIManager;
 import org.terasology.engine.rendering.nui.layers.ingame.metrics.DebugOverlay;
 import org.terasology.engine.world.WorldProvider;
+import org.terasology.input.Keyboard;
 
 
 @RegisterSystem(RegisterMode.CLIENT)
 public class DebugControlSystem extends BaseComponentSystem {
 
     private static final String DEBUG_INFO_URN = "engine:DebugInfo";
-
     @In
     private WorldProvider world;
-    
     @In
     private Config config;
     @In
     private SystemConfig systemConfig;
-
     @In
     private NUIManager nuiManager;
 
-    @In
-    private MouseDevice mouseDevice;
-    
     private DebugOverlay overlay;
-    
+
     private boolean mouseGrabbed = true;
 
     @Override
@@ -58,7 +50,8 @@ public class DebugControlSystem extends BaseComponentSystem {
     public void onHideHUD(HideHUDButton event, EntityRef entity) {
         if (event.isDown()) {
             // Make sure both are either visible or hidden
-            final boolean hide = !(config.getRendering().getDebug().isHudHidden() && config.getRendering().getDebug().isFirstPersonElementsHidden());
+            final boolean hide =
+                    !(config.getRendering().getDebug().isHudHidden() && config.getRendering().getDebug().isFirstPersonElementsHidden());
 
             config.getRendering().getDebug().setFirstPersonElementsHidden(hide);
             config.getRendering().getDebug().setHudHidden(hide);
@@ -69,9 +62,9 @@ public class DebugControlSystem extends BaseComponentSystem {
 
 
     /**
-     * Creates illusion of time flying by if corresponding key is held down.
-     * Up / Down : Increases / Decreases time of day by 0.005 per keystroke.
-     * Right / left : Increases / Decreases time of day by 0.02 per keystroke.
+     * Creates illusion of time flying by if corresponding key is held down. Up / Down : Increases / Decreases time of
+     * day by 0.005 per keystroke. Right / left : Increases / Decreases time of day by 0.02 per keystroke.
+     *
      * @param entity The player entity that triggered the time change.
      */
     @ReceiveEvent(components = ClientComponent.class)
@@ -87,7 +80,7 @@ public class DebugControlSystem extends BaseComponentSystem {
                     timeTravel(entity, event, -0.005f);
                     break;
                 case Keyboard.KeyId.RIGHT:
-                	timeTravel(entity, event, 0.02f);
+                    timeTravel(entity, event, 0.02f);
                     break;
                 case Keyboard.KeyId.LEFT:
                     timeTravel(entity, event, -0.02f);
@@ -97,7 +90,7 @@ public class DebugControlSystem extends BaseComponentSystem {
             }
         }
     }
-    
+
     @ReceiveEvent(components = ClientComponent.class)
     public void onKeyDown(KeyDownEvent event, EntityRef entity) {
         boolean debugEnabled = systemConfig.debugEnabled.get();
@@ -126,13 +119,6 @@ public class DebugControlSystem extends BaseComponentSystem {
         }
 
         switch (event.getKey().getId()) {
-            case Keyboard.KeyId.F11:
-                mouseGrabbed = !mouseGrabbed;
-                DebugProperties debugProperties = (DebugProperties) nuiManager.getHUD().getHUDElement("engine:DebugProperties");
-                debugProperties.setVisible(!mouseGrabbed);
-                mouseDevice.setGrabbed(mouseGrabbed);
-                event.consume();
-                break;
             case Keyboard.KeyId.F3:
                 systemConfig.debugEnabled.set(!systemConfig.debugEnabled.get());
                 event.consume();
@@ -153,17 +139,17 @@ public class DebugControlSystem extends BaseComponentSystem {
             event.consume();
         }
     }
-    
+
     /**
-     * Ensures every player on the server has their time updated when
-     * a KeyEvent is triggered in Debug mode.
+     * Ensures every player on the server has their time updated when a KeyEvent is triggered in Debug mode.
+     *
      * @param entity The player entity that triggered the time change.
      * @param event The KeyEvent which triggered the time change.
      * @param timeDiff The time (in days) to add/retrieve.
      */
     private void timeTravel(EntityRef entity, KeyEvent event, float timeDiff) {
-    	float timeInDays = world.getTime().getDays();
-    	entity.send(new WorldtimeResetEvent(timeInDays + timeDiff));
+        float timeInDays = world.getTime().getDays();
+        entity.send(new WorldtimeResetEvent(timeInDays + timeDiff));
         event.consume();
     }
 

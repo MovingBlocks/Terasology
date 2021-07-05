@@ -1,18 +1,5 @@
-/*
- * Copyright 2017 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.core.subsystem.lwjgl;
 
 import org.lwjgl.glfw.GLFW;
@@ -22,17 +9,17 @@ import org.lwjgl.opengl.GL43;
 import org.lwjgl.system.MemoryUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.assets.module.ModuleAwareAssetTypeManager;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.config.RenderingConfig;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.core.GameEngine;
 import org.terasology.engine.core.modes.GameState;
 import org.terasology.engine.core.subsystem.DisplayDevice;
-import org.terasology.nui.canvas.CanvasRenderer;
 import org.terasology.engine.rendering.ShaderManager;
 import org.terasology.engine.rendering.ShaderManagerLwjgl;
 import org.terasology.engine.rendering.nui.internal.LwjglCanvasRenderer;
+import org.terasology.gestalt.assets.module.ModuleAwareAssetTypeManager;
+import org.terasology.nui.canvas.CanvasRenderer;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -108,14 +95,16 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
                 int[] xBuffer = new int[1];
                 int[] yBuffer = new int[1];
                 GLFW.glfwGetWindowPos(window, xBuffer, yBuffer);
-                config.setWindowPosX(xBuffer[0]);
-                config.setWindowPosY(yBuffer[0]);
-
                 int[] widthBuffer = new int[1];
                 int[] heightBuffer = new int[1];
                 GLFW.glfwGetWindowSize(window, widthBuffer, heightBuffer);
-                config.setWindowWidth(widthBuffer[0]);
-                config.setWindowHeight(heightBuffer[0]);
+
+                if (widthBuffer[0] > 0 && heightBuffer[0] > 0 && xBuffer[0] > 0 && yBuffer[0] > 0) {
+                    config.setWindowWidth(widthBuffer[0]);
+                    config.setWindowHeight(heightBuffer[0]);
+                    config.setWindowPosX(xBuffer[0]);
+                    config.setWindowPosY(yBuffer[0]);
+                }
             }
         }
     }
@@ -146,11 +135,18 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
     private void initWindow() {
         logger.info("Initializing display (if last line in log then likely the game crashed from an issue with your " +
                 "video card)");
+
+        // set opengl core profile to 3.3
+        GLFW.glfwWindowHint(GLFW.GLFW_CONTEXT_VERSION_MAJOR, 3);
+        GLFW.glfwWindowHint(GLFW.GLFW_CONTEXT_VERSION_MINOR, 3);
+        GLFW.glfwWindowHint(GLFW.GLFW_OPENGL_PROFILE, GLFW.GLFW_OPENGL_CORE_PROFILE);
+
         long window = GLFW.glfwCreateWindow(
                 config.getWindowWidth(), config.getWindowHeight(), "Terasology Alpha", 0, 0);
         if (window == 0) {
             throw new RuntimeException("Failed to create window");
         }
+
         GLFW.glfwMakeContextCurrent(window);
 
         if (!config.isVSync()) {
@@ -158,7 +154,7 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
         }
 
         try {
-            String root = "org/terasology/icons/";
+            String root = "org/terasology/engine/icons/";
             ClassLoader classLoader = getClass().getClassLoader();
 
             BufferedImage icon16 = ImageIO.read(classLoader.getResourceAsStream(root + "gooey_sweet_16.png"));

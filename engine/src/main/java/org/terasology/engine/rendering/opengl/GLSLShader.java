@@ -9,27 +9,29 @@ import com.google.common.io.CharStreams;
 import gnu.trove.iterator.TIntIntIterator;
 import gnu.trove.map.TIntIntMap;
 import gnu.trove.map.hash.TIntIntHashMap;
-import org.lwjgl.opengl.ARBShaderObjects;
 import org.lwjgl.opengl.GL20;
+import org.lwjgl.opengl.GL30;
 import org.lwjgl.opengl.GL32;
+import org.lwjgl.opengl.GL33;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.assets.AssetType;
-import org.terasology.assets.ResourceUrn;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.config.RenderingConfig;
 import org.terasology.engine.core.GameThread;
+import org.terasology.engine.core.PathManager;
 import org.terasology.engine.core.TerasologyConstants;
-import org.terasology.engine.core.paths.PathManager;
 import org.terasology.engine.core.subsystem.lwjgl.LwjglGraphicsProcessing;
 import org.terasology.engine.registry.CoreRegistry;
-import org.terasology.engine.rendering.primitives.ChunkVertexFlag;
 import org.terasology.engine.rendering.assets.shader.Shader;
 import org.terasology.engine.rendering.assets.shader.ShaderData;
 import org.terasology.engine.rendering.assets.shader.ShaderParameterMetadata;
 import org.terasology.engine.rendering.assets.shader.ShaderProgramFeature;
+import org.terasology.engine.rendering.primitives.ChunkVertexFlag;
 import org.terasology.engine.rendering.world.WorldRenderer;
 import org.terasology.engine.world.block.tiles.WorldAtlas;
+import org.terasology.gestalt.assets.AssetType;
+import org.terasology.gestalt.assets.DisposableResource;
+import org.terasology.gestalt.assets.ResourceUrn;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -49,13 +51,10 @@ import java.util.Set;
  * </p>
  */
 public class GLSLShader extends Shader {
+    // TODO this should be handled another way, we need to get ssao parameters here
+    public static int ssaoNoiseSize = 4;
 
     private static final Logger logger = LoggerFactory.getLogger(GLSLShader.class);
-    private final LwjglGraphicsProcessing graphicsProcessing;
-
-    // TODO this should be handled another way, we need to get ssao parameters here
-    public int ssaoKernelElements = 32;
-    public static int ssaoNoiseSize = 4;
 
     private static String includedFunctionsVertex = "";
     private static String includedFunctionsFragment = "";
@@ -64,10 +63,10 @@ public class GLSLShader extends Shader {
 
     static {
         try (
-                InputStreamReader vertStream = getInputStreamReaderFromResource("org/terasology/include/globalFunctionsVertIncl.glsl");
-                InputStreamReader fragStream = getInputStreamReaderFromResource("org/terasology/include/globalFunctionsFragIncl.glsl");
-                InputStreamReader uniformsStream = getInputStreamReaderFromResource("org/terasology/include/globalUniformsIncl.glsl");
-                InputStreamReader definesStream = getInputStreamReaderFromResource("org/terasology/include/globalDefinesIncl.glsl")
+                InputStreamReader vertStream = getInputStreamReaderFromResource("org/terasology/engine/include/globalFunctionsVertIncl.glsl");
+                InputStreamReader fragStream = getInputStreamReaderFromResource("org/terasology/engine/include/globalFunctionsFragIncl.glsl");
+                InputStreamReader uniformsStream = getInputStreamReaderFromResource("org/terasology/engine/include/globalUniformsIncl.glsl");
+                InputStreamReader definesStream = getInputStreamReaderFromResource("org/terasology/engine/include/globalDefinesIncl.glsl")
         ) {
             includedFunctionsVertex = CharStreams.toString(vertStream);
             includedFunctionsFragment = CharStreams.toString(fragStream);
@@ -78,23 +77,33 @@ public class GLSLShader extends Shader {
         }
     }
 
-    private EnumSet<ShaderProgramFeature> availableFeatures = Sets.newEnumSet(Collections.emptyList(), ShaderProgramFeature.class);
+    // TODO this should be handled another way, we need to get ssao parameters here
+    public int ssaoKernelElements = 32;
 
+    private EnumSet<ShaderProgramFeature> availableFeatures = Sets.newEnumSet(Collections.emptyList(), ShaderProgramFeature.class);
     private ShaderData shaderProgramBase;
+    private final LwjglGraphicsProcessing graphicsProcessing;
     private Map<String, ShaderParameterMetadata> parameters = Maps.newHashMap();
 
     private Config config = CoreRegistry.get(Config.class);
 
     private DisposalAction disposalAction;
 
-    public GLSLShader(ResourceUrn urn, AssetType<?, ShaderData> assetType, ShaderData data, LwjglGraphicsProcessing graphicsProcessing) {
-        super(urn, assetType);
+
+    public GLSLShader(ResourceUrn urn, AssetType<?, ShaderData> assetType, ShaderData data,
+                      DisposalAction disposalAction, LwjglGraphicsProcessing graphicsProcessing) {
+        super(urn, assetType, disposalAction);
+        this.disposalAction = disposalAction;
         this.graphicsProcessing = graphicsProcessing;
-        disposalAction = new DisposalAction(urn, graphicsProcessing);
-        getDisposalHook().setDisposeAction(disposalAction);
         graphicsProcessing.asynchToDisplayThread(() -> {
             reload(data);
         });
+    }
+
+
+    public static GLSLShader create(ResourceUrn urn, AssetType<?, ShaderData> assetType, ShaderData data,
+                                    LwjglGraphicsProcessing graphicsProcessing) {
+        return new GLSLShader(urn, assetType, data, new GLSLShader.DisposalAction(urn, graphicsProcessing), graphicsProcessing);
     }
 
     private static InputStreamReader getInputStreamReaderFromResource(String resource) {
@@ -124,14 +133,10 @@ public class GLSLShader extends Shader {
     @Override
     public void recompile() {
         graphicsProcessing.asynchToDisplayThread(() -> {
-            recompileInt();
+            registerAllShaderPermutations();
         });
     }
 
-    private void recompileInt() {
-        registerAllShaderPermutations();
-        // TODO: reload materials
-    }
 
     @Override
     public ShaderParameterMetadata getParameter(String desc) {
@@ -342,39 +347,17 @@ public class GLSLShader extends Shader {
         GL20.glShaderSource(shaderId, shader);
         GL20.glCompileShader(shaderId);
 
-        if (!compileSuccess(shaderId)) {
+        int[] compileStatus = new int[1];
+        GL30.glGetShaderiv(shaderId, GL30.GL_COMPILE_STATUS, compileStatus);
+        if (compileStatus[0] == GL33.GL_FALSE) {
             dumpCode(type, features, assembleShader(type, features));
 
             throw new RuntimeException(String.format("Shader '%s' failed to compile for features '%s'.%n%n"
                             + "Shader Info: %n%s%n",
-                    getUrn(), features, getLogInfo(shaderId)));
+                    getUrn(), features, GL30.glGetShaderInfoLog(shaderId)));
         }
 
         return shaderId;
-    }
-
-    private String getLogInfo(int shaderId) {
-        int length = ARBShaderObjects.glGetObjectParameteriARB(shaderId, ARBShaderObjects.GL_OBJECT_INFO_LOG_LENGTH_ARB);
-
-        if (length > 0) {
-            return ARBShaderObjects.glGetInfoLogARB(shaderId, length);
-        }
-
-        return "No Info";
-    }
-
-    private boolean compileSuccess(int shaderId) {
-        int compileStatus = ARBShaderObjects.glGetObjectParameteriARB(shaderId, ARBShaderObjects.GL_OBJECT_COMPILE_STATUS_ARB);
-        //int linkStatus = ARBShaderObjects.glGetObjectParameteriARB(shaderId, ARBShaderObjects.GL_OBJECT_LINK_STATUS_ARB);
-        //int validateStatus = ARBShaderObjects.glGetObjectParameteriARB(shaderId, ARBShaderObjects.GL_OBJECT_VALIDATE_STATUS_ARB);
-
-
-        if (compileStatus == 0 /*|| linkStatus == 0 || validateStatus == 0*/) {
-            return false;
-        }
-
-        //logger.info("Shader '{}' successfully compiled.", getURI());
-        return true;
     }
 
     @Override
@@ -391,7 +374,7 @@ public class GLSLShader extends Shader {
                 }
                 updateAvailableFeatures();
                 try {
-                    recompileInt();
+                    registerAllShaderPermutations();
                 } catch (RuntimeException e) {
                     logger.warn(e.getMessage());
                 }
@@ -401,7 +384,7 @@ public class GLSLShader extends Shader {
         }
     }
 
-    private static class DisposalAction implements Runnable {
+    public static class DisposalAction implements DisposableResource {
 
         private final ResourceUrn urn;
         private final LwjglGraphicsProcessing graphicsProcessing;
@@ -411,19 +394,9 @@ public class GLSLShader extends Shader {
         private final TIntIntMap geometryPrograms = new TIntIntHashMap();
 
         // made package-private after CheckStyle's suggestion
-        DisposalAction(ResourceUrn urn, LwjglGraphicsProcessing graphicsProcessing) {
+        public DisposalAction(ResourceUrn urn, LwjglGraphicsProcessing graphicsProcessing) {
             this.urn = urn;
             this.graphicsProcessing = graphicsProcessing;
-        }
-
-        @Override
-        public void run() {
-            logger.debug("Disposing shader {}.", urn);
-            try {
-                GameThread.synch(this::disposeData);
-            } catch (InterruptedException e) {
-                logger.error("Failed to dispose {}", urn, e);
-            }
         }
 
         private void disposeData() {
@@ -438,10 +411,20 @@ public class GLSLShader extends Shader {
                 TIntIntIterator it = disposedPrograms.iterator();
                 while (it.hasNext()) {
                     it.advance();
-                        GL20.glDeleteShader(it.value());
+                    GL20.glDeleteShader(it.value());
                 }
             });
             programs.clear();
+        }
+
+        @Override
+        public void close() {
+            logger.debug("Disposing shader {}.", urn);
+            try {
+                GameThread.synch(this::disposeData);
+            } catch (InterruptedException e) {
+                logger.error("Failed to dispose {}", urn, e);
+            }
         }
     }
 }

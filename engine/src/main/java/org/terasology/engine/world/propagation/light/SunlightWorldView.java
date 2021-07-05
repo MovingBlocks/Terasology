@@ -3,8 +3,8 @@
 package org.terasology.engine.world.propagation.light;
 
 import org.joml.Vector3ic;
+import org.terasology.engine.world.chunks.Chunk;
 import org.terasology.engine.world.chunks.ChunkProvider;
-import org.terasology.engine.world.chunks.LitChunk;
 import org.terasology.engine.world.propagation.AbstractFullWorldView;
 
 /**
@@ -19,12 +19,12 @@ public class SunlightWorldView extends AbstractFullWorldView {
     }
 
     @Override
-    protected byte getValueAt(LitChunk chunk, Vector3ic pos) {
+    protected byte getValueAt(Chunk chunk, Vector3ic pos) {
         return chunk.getSunlight(pos);
     }
 
     @Override
-    protected void setValueAt(LitChunk chunk, Vector3ic pos, byte value) {
+    protected void setValueAt(Chunk chunk, Vector3ic pos, byte value) {
         chunk.setSunlight(pos, value);
     }
 

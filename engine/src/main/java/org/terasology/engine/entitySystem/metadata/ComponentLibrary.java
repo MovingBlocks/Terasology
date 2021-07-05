@@ -1,38 +1,25 @@
-/*
- * Copyright 2013 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.entitySystem.metadata;
 
 import com.google.common.collect.Iterables;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.assets.ResourceUrn;
+import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.engine.entitySystem.Component;
-import org.terasology.module.Module;
-import org.terasology.module.ModuleEnvironment;
-import org.terasology.naming.Name;
+import org.terasology.gestalt.module.ModuleEnvironment;
+import org.terasology.gestalt.module.Module;
+import org.terasology.gestalt.naming.Name;
 import org.terasology.reflection.copy.CopyStrategy;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
-import org.terasology.reflection.metadata.AbstractClassLibrary;
 import org.terasology.reflection.metadata.ClassMetadata;
+import org.terasology.reflection.metadata.ModuleClassLibrary;
 import org.terasology.reflection.reflect.ReflectFactory;
 
 /**
  * The library for metadata about components (and their fields).
  */
-public class ComponentLibrary extends AbstractClassLibrary<Component> {
+public class ComponentLibrary extends ModuleClassLibrary<Component> {
 
     private static final Logger logger = LoggerFactory.getLogger(ComponentLibrary.class);
 
@@ -53,7 +40,8 @@ public class ComponentLibrary extends AbstractClassLibrary<Component> {
     }
 
     @Override
-    protected <C extends Component> ClassMetadata<C, ?> createMetadata(Class<C> type, ReflectFactory factory, CopyStrategyLibrary copyStrategies, ResourceUrn uri) {
+    protected <C extends Component> ClassMetadata<C, ?> createMetadata(Class<C> type, ReflectFactory factory,
+                                                                       CopyStrategyLibrary copyStrategies, ResourceUrn uri) {
         ComponentMetadata<C> info;
         try {
             info = new ComponentMetadata<>(uri, type, factory, copyStrategies);

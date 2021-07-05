@@ -1,35 +1,18 @@
-/*
- * Copyright 2017 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.telemetry;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.core.module.ModuleManager;
-import org.terasology.module.DependencyResolver;
-import org.terasology.module.Module;
-import org.terasology.module.ModuleEnvironment;
-import org.terasology.module.ResolutionResult;
-import org.terasology.module.predicates.FromModule;
-import org.terasology.module.sandbox.API;
-import org.terasology.naming.Name;
+import org.terasology.gestalt.module.ModuleEnvironment;
+import org.terasology.gestalt.module.sandbox.API;
 import org.terasology.engine.telemetry.metrics.Metric;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -49,28 +32,19 @@ public class Metrics {
 
     public void initialise(Context context) {
 
-        Set<Class> metricsClassSet = fetchMetricsClassFromEnvironemnt(context);
+        Set<Class> metricsClassSet = fetchMetricsClassFromEngineOnlyEnvironment(context);
         initializeMetrics(metricsClassSet, context);
     }
 
-    private Set<Class> fetchMetricsClassFromEnvironemnt(Context context) {
-
+    private Set<Class> fetchMetricsClassFromEngineOnlyEnvironment(Context context) {
         ModuleManager moduleManager = context.get(ModuleManager.class);
         Set<Class> metricsClassSet = new HashSet<>();
-        DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
-        for (Name moduleId : moduleManager.getRegistry().getModuleIds()) {
-            Module module = moduleManager.getRegistry().getLatestModuleVersion(moduleId);
-            if (module.isCodeModule()) {
-                ResolutionResult result = resolver.resolve(moduleId);
-                if (result.isSuccess()) {
-                    try (ModuleEnvironment environment = moduleManager.loadEnvironment(result.getModules(), false)) {
-                        for (Class<?> holdingType : environment.getTypesAnnotatedWith(TelemetryCategory.class, new FromModule(environment, moduleId))) {
-                            metricsClassSet.add(holdingType);
-                        }
-                    }
-                }
+        try (ModuleEnvironment environment = moduleManager.loadEnvironment(Collections.emptySet(), false)) {
+            for (Class<?> holdingType : environment.getTypesAnnotatedWith(TelemetryCategory.class)) {
+                metricsClassSet.add(holdingType);
             }
         }
+
         return metricsClassSet;
     }
 
@@ -118,7 +92,8 @@ public class Metrics {
     }
 
     /**
-     * Add a metric instance to Metrics. This method will only be used when a metric constructor needs specific other than {@link org.terasology.engine.context.Context}
+     * Add a metric instance to Metrics. This method will only be used when a metric constructor needs specific
+     * other than {@link org.terasology.engine.context.Context}
      * @param metric a new metric that constructor needs some arguments other than {@link org.terasology.engine.context.Context}
      */
     public void addMetric(Metric metric) {

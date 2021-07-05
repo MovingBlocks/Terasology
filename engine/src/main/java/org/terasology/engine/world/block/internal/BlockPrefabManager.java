@@ -12,8 +12,6 @@ import org.terasology.engine.world.block.family.BlockFamily;
 
 import java.util.Optional;
 
-/**
- */
 public class BlockPrefabManager implements BlockRegistrationListener {
 
     private EntityManager entityManager;

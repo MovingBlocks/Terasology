@@ -8,7 +8,7 @@ import org.terasology.input.MouseInput;
 import org.terasology.engine.logic.console.Console;
 import org.terasology.engine.logic.console.CoreMessageType;
 import org.terasology.engine.logic.console.Message;
-import org.terasology.naming.Name;
+import org.terasology.gestalt.naming.Name;
 import org.terasology.nui.BaseInteractionListener;
 import org.terasology.nui.InteractionListener;
 import org.terasology.engine.registry.In;

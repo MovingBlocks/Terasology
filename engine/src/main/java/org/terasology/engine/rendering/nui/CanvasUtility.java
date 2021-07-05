@@ -5,7 +5,7 @@ package org.terasology.engine.rendering.nui;
 import org.joml.Quaternionfc;
 import org.joml.Vector2ic;
 import org.joml.Vector3fc;
-import org.terasology.assets.ResourceUrn;
+import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.engine.rendering.assets.material.Material;
 import org.terasology.engine.rendering.assets.mesh.Mesh;
 import org.terasology.engine.rendering.assets.texture.Texture;
@@ -23,7 +23,8 @@ public final class CanvasUtility {
     private CanvasUtility() {
     }
 
-    public static void drawMesh(Canvas canvas, Mesh mesh, Texture texture, Rectanglei region, Quaternionfc rotation, Vector3fc offset, float scale) {
+    public static void drawMesh(Canvas canvas, Mesh mesh, Texture texture, Rectanglei region, Quaternionfc rotation,
+                                Vector3fc offset, float scale) {
         // TODO: Find a way to abstractly implement drawMesh in NUI
 
         if (!(canvas instanceof TerasologyCanvasImpl)) {
@@ -33,7 +34,8 @@ public final class CanvasUtility {
         ((TerasologyCanvasImpl) canvas).drawMesh(mesh, texture, region, rotation, offset, scale);
     }
 
-    public static void drawMesh(Canvas canvas, Mesh mesh, Material material, Rectanglei region, Quaternionfc rotation, Vector3fc offset, float scale) {
+    public static void drawMesh(Canvas canvas, Mesh mesh, Material material, Rectanglei region, Quaternionfc rotation,
+                                Vector3fc offset, float scale) {
         // TODO: Find a way to abstractly implement drawMesh in NUI
 
         if (!(canvas instanceof TerasologyCanvasImpl)) {

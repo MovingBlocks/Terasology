@@ -4,14 +4,14 @@
 package org.terasology.engine.rendering.assets.font;
 
 import com.google.common.base.Charsets;
-import org.terasology.assets.ResourceUrn;
-import org.terasology.assets.format.AbstractAssetFileFormat;
-import org.terasology.assets.format.AssetDataFile;
-import org.terasology.assets.management.AssetManager;
-import org.terasology.assets.module.annotations.RegisterAssetFileFormat;
 import org.terasology.engine.rendering.assets.material.Material;
 import org.terasology.engine.rendering.assets.texture.Texture;
-import org.terasology.naming.Name;
+import org.terasology.gestalt.assets.ResourceUrn;
+import org.terasology.gestalt.assets.format.AbstractAssetFileFormat;
+import org.terasology.gestalt.assets.format.AssetDataFile;
+import org.terasology.gestalt.assets.management.AssetManager;
+import org.terasology.gestalt.assets.module.annotations.RegisterAssetFileFormat;
+import org.terasology.gestalt.naming.Name;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -21,8 +21,6 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/**
- */
 @RegisterAssetFileFormat
 public class FontFormat extends AbstractAssetFileFormat<FontData> {
 

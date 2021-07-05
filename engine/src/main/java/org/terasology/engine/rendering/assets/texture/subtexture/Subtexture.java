@@ -3,9 +3,10 @@
 package org.terasology.engine.rendering.assets.texture.subtexture;
 
 import org.joml.Vector2i;
-import org.terasology.assets.Asset;
-import org.terasology.assets.AssetType;
-import org.terasology.assets.ResourceUrn;
+import org.terasology.gestalt.assets.Asset;
+import org.terasology.gestalt.assets.AssetType;
+import org.terasology.gestalt.assets.DisposableResource;
+import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.joml.geom.Rectanglef;
 import org.terasology.joml.geom.Rectanglei;
 import org.terasology.math.TeraMath;
@@ -14,13 +15,11 @@ import org.terasology.engine.rendering.assets.texture.TextureRegionAsset;
 
 import java.util.Optional;
 
-/**
- */
 public class Subtexture extends TextureRegionAsset<SubtextureData> {
 
     private Texture texture;
     private Rectanglef subregion;
-    private Runnable disposalAction;
+    private DisposableResource disposalAction;
 
     public Subtexture(ResourceUrn urn, AssetType<?, SubtextureData> assetType, SubtextureData data) {
         super(urn, assetType);
@@ -57,7 +56,7 @@ public class Subtexture extends TextureRegionAsset<SubtextureData> {
     public Rectanglei getPixelRegion() {
         return new Rectanglei(
                 TeraMath.floorToInt(subregion.minX() * texture.getWidth()),
-                TeraMath.floorToInt(subregion.minY() * texture.getHeight())).setSize( getWidth(), getHeight());
+                TeraMath.floorToInt(subregion.minY() * texture.getHeight())).setSize(getWidth(), getHeight());
     }
 
     @Override
