@@ -23,7 +23,7 @@ public enum BlockPart {
      * Cached block parts in an immutable list.
      * See https://dzone.com/articles/memory-hogging-enumvalues-method
      */
-    private static final List<BlockPart> SIDES = ImmutableList.of(BlockPart.values());
+    private static final List<BlockPart> ALL_PARTS = ImmutableList.of(TOP, LEFT, RIGHT, FRONT, BACK, BOTTOM, CENTER);
     private Side side;
 
     BlockPart() {
@@ -54,12 +54,12 @@ public enum BlockPart {
     /**
      * @return The horizontal sides
      */
-    public static List<BlockPart> getHorizontal() {
+    public static List<BlockPart> allHorizontalParts() {
         return HORIZONTAL_SIDES;
     }
 
-    public static List<BlockPart> getAll() {
-        return SIDES;
+    public static List<BlockPart> allParts() {
+        return ALL_PARTS;
     }
 
     public boolean isSide() {

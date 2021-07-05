@@ -31,13 +31,13 @@ public class BlockMeshGeneratorSingleShape implements BlockMeshGenerator {
         }
 
         // Gather adjacent blocks
-        Block[] adjacentBlocks = new Block[Side.getAllSides().size()];
-        for (Side side : Side.getAllSides()) {
+        Block[] adjacentBlocks = new Block[Side.allSides().size()];
+        for (Side side : Side.allSides()) {
             Vector3ic offset = side.direction();
             Block blockToCheck = view.getBlock(x + offset.x(), y + offset.y(), z + offset.z());
             adjacentBlocks[side.ordinal()] = blockToCheck;
         }
-        for (final Side side : Side.getAllSides()) {
+        for (final Side side : Side.allSides()) {
             if (isSideVisibleForBlockTypes(adjacentBlocks[side.ordinal()], block, side)) {
                 final ChunkMesh.RenderType renderType = getRenderType(block);
                 final ChunkVertexFlag vertexFlag = getChunkVertexFlag(view, x, y, z, block);
