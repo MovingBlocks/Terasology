@@ -26,6 +26,7 @@ public class BlockMeshGeneratorSingleShape implements BlockMeshGenerator {
     public void generateChunkMesh(ChunkView view, ChunkMesh chunkMesh, int x, int y, int z) {
         final BlockAppearance blockAppearance = block.getPrimaryAppearance();
         if (!blockAppearance.hasAppearance()) {
+            // perf: Skip mesh generation for blocks without appearance, e.g., air blocks.
             return;
         }
 
