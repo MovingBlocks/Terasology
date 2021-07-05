@@ -44,9 +44,8 @@ public enum BlockPart {
             case TOP:
                 return TOP;
             default:
-                break;
+                throw new IllegalArgumentException();
         }
-        return null;
     }
     /**
      * @return The horizontal sides
