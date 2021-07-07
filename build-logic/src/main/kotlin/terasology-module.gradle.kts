@@ -44,7 +44,7 @@ configurations {
 // Set dependencies. Note that the dependency information from module.txt is used for other Terasology modules
 dependencies {
     implementation(group = "org.terasology.engine", name = "engine", version = moduleMetadata.engineVersion())
-    implementation(group = "org.terasology.engine", name = "engine-tests", version = moduleMetadata.engineVersion())
+    testImplementation(group = "org.terasology.engine", name = "engine-tests", version = moduleMetadata.engineVersion())
 
     for ((gradleDep, optional) in moduleMetadata.moduleDependencies()) {
         if (optional) {
@@ -74,6 +74,7 @@ dependencies {
 if (project.name == "ModuleTestingEnvironment") {
     dependencies {
         // MTE is a special snowflake, it gets these things as non-test dependencies
+        implementation(group = "org.terasology.engine", name = "engine-tests", version = moduleMetadata.engineVersion())
         implementation("ch.qos.logback:logback-classic:1.2.3")
         runtimeOnly("org.codehaus.janino:janino:3.1.3") {
             because("logback filters")
