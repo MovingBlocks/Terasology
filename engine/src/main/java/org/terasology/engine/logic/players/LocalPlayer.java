@@ -10,6 +10,7 @@ import org.terasology.engine.logic.characters.CharacterComponent;
 import org.terasology.engine.logic.characters.CharacterMovementComponent;
 import org.terasology.engine.logic.characters.CharacterSystem;
 import org.terasology.engine.logic.common.ActivateEvent;
+import org.terasology.engine.logic.common.RangeComponent;
 import org.terasology.engine.logic.location.LocationComponent;
 import org.terasology.engine.logic.characters.events.ActivationPredicted;
 import org.terasology.engine.logic.characters.events.ActivationRequest;
@@ -236,23 +237,26 @@ public class LocalPlayer {
         boolean ownedEntityUsage = usedOwnedEntity.exists();
         int activationId = nextActivationId++;
         Physics physics = CoreRegistry.get(Physics.class);
-        HitResult result = physics.rayTrace(originPos, direction, characterComponent.interactionRange,
+
+        float interactionRange;
+        if (ownedEntityUsage && usedOwnedEntity.hasComponent(RangeComponent.class)) {
+            interactionRange = Math.max(usedOwnedEntity.getComponent(RangeComponent.class).value, characterComponent.interactionRange);
+        } else {
+            interactionRange = characterComponent.interactionRange;
+        }
+
+        HitResult result = physics.rayTrace(originPos, direction, interactionRange,
                 Sets.newHashSet(character), CharacterSystem.DEFAULTPHYSICSFILTER);
         boolean eventWithTarget = result.isHit();
-        if (eventWithTarget) {
+
+        if (ownedEntityUsage || eventWithTarget) {
             EntityRef activatedObject = usedOwnedEntity.exists() ? usedOwnedEntity : result.getEntity();
             activatedObject.send(new ActivationPredicted(character, result.getEntity(), originPos, direction,
                     result.getHitPoint(), result.getHitNormal(), activationId));
+
             character.send(new ActivationRequest(character, ownedEntityUsage, usedOwnedEntity, eventWithTarget,
                     result.getEntity(),
                     originPos, direction, result.getHitPoint(), result.getHitNormal(), activationId));
-            return true;
-        } else if (ownedEntityUsage) {
-            usedOwnedEntity.send(new ActivationPredicted(character, EntityRef.NULL, originPos, direction,
-                    originPos, new Vector3f(), activationId));
-            character.send(new ActivationRequest(character, ownedEntityUsage, usedOwnedEntity, eventWithTarget,
-                    EntityRef.NULL,
-                    originPos, direction, originPos, new Vector3f(), activationId));
             return true;
         }
         return false;
