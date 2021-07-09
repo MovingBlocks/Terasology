@@ -6,12 +6,22 @@ import org.terasology.engine.utilities.random.FastRandom;
 import org.terasology.math.TeraMath;
 
 /**
- * Improved Perlin noise based on the reference implementation by Ken Perlin.
- * @deprecated Prefer using {@link SimplexNoise}, it is comparable to Perlin noise
- * (fewer directional artifacts, lower computational overhead for higher dimensions).
+ * Domain-rotated Perlin noise. Based on reference implementation by Ken Perlin, with domain rotation by K.jpg
  *
+ * Perlin noise is an older form of noise designed without isotropy in mind. It produces significant square-aligned
+ * directional artifacts, when evaluated on planes aligned to its internal coordinate grid. However, when used for
+ * 2D-focused use-cases of 3D such as flat-world voxel terrain with overhangs, its results can be greatly improved
+ * by using a rotated coordinate space. Here in this implementation, Y is rotated to point up the main diagonal of
+ * the noise grid, while X and Z span the planes perpendicular to that. Square bias is effectively hidden, and
+ * visible directional bias is greatly reduced.
+ *
+ * It is worthwhile to note that this technique results in different input coordinates being differently useful
+ * for different purposes. When using the noise in 2D-based 3D voxel world, Y should be the vertical direction.
+ * For a 2D animation, Y should be the time variable. To generate 2D-only noise, use X and Z only, with Y fixed.
+ * This enables best utilization of the orientation of the noise grid.
+ *
+ * Note that this technique requires the 3D noise to produce nice 2D results.
  */
-@Deprecated
 public class PerlinNoise extends AbstractNoise implements Noise2D, Noise3D {
 
     private final int[] noisePermutations;
@@ -28,16 +38,14 @@ public class PerlinNoise extends AbstractNoise implements Noise2D, Noise3D {
 
     /**
      * Init. a new generator with a given seed value and grid dimension.
-     * Supports tileable noise generation
      *
      * @param seed The seed value
-     * @param gridDim gridDim x gridDim will be the size of the perlin's grid of vectors,
-     * noise will be tiled if an input coordinate crosses a multiple of gridDim
+     * @param permCount The size of the permutation table.
      */
-    public PerlinNoise(long seed, int gridDim) {
+    public PerlinNoise(long seed, int permCount) {
         FastRandom rand = new FastRandom(seed);
 
-        permCount = gridDim;
+        this.permCount = permCount;
         noisePermutations = new int[permCount * 2];
         int[] noiseTable = new int[permCount];
 
@@ -63,22 +71,41 @@ public class PerlinNoise extends AbstractNoise implements Noise2D, Noise3D {
     }
 
     /**
-     * Returns the noise value at the given position.
+     * Returns the domain-rotated noise value at the given position.
+     * If generating noise with a clearly defined vertical direction, assign that to Y. {@code noise(horz0, vert, horz1)}
+     * If generating noise to animate a 2D plane, use Y as your time variable. {@code noise(horz0, time, horz1)}
+     * If generating 2D-only noise, use X and Z, with Y set to a constant value. {@code noise(horz0, const, horz1)}
+     * Y should always be the "different" direction in whatever your use case is.
+     * The way the noise changes along Y is slightly different from its behavior in X/Z.
      *
-     * @param posX Position on the x-axis
-     * @param posY Position on the y-axis
-     * @param posZ Position on the z-axis
+     * @param posX Position on the x-axis (horizontal)
+     * @param posY Position on the y-axis (vertical, time, or fixed)
+     * @param posZ Position on the z-axis (horizontal)
      * @return The noise value
      */
     @Override
     public float noise(float posX, float posY, float posZ) {
-        int xInt = Math.floorMod(TeraMath.floorToInt(posX), permCount);
-        int yInt = Math.floorMod(TeraMath.floorToInt(posY), permCount);
-        int zInt = Math.floorMod(TeraMath.floorToInt(posZ), permCount);
 
-        float x = posX - TeraMath.fastFloor(posX);
-        float y = posY - TeraMath.fastFloor(posY);
-        float z = posZ - TeraMath.fastFloor(posZ);
+        // Domain rotation removes Perlin's characteristic square artifacts from the XZ planes, by pointing Y up the grid's main diagonal.
+        // Ordinarily, X can be said to move in the unit vector direction <1, 0, 0>, Y in <0, 1, 0>, and Z in <0, 0, 1>. With this rotation,
+        // moving along the input for Y now moves in the unit direction <0.577, 0.577, 0.577> in the noise's internal coordinate space.
+        // Perpendicular to that, X and Z move in the directions <0.789, -0.577, -0.211> and <-0.211, -0.577, 0.789>. These vectors form a
+        // rotation matrix. The code is a simplification of the multiplication of this rotation matrix by the input coordinate, taking
+        // advantage of the many repetitions of 0.577 and the fact that 0.789 = 1-0.211.
+        float xz = posX + posZ;
+        float s2 = xz * -0.211324865405187f;
+        float yy = posY * 0.577350269189626f;
+        float rPosX = posX + (s2 + yy);
+        float rPosY = xz * -0.577350269189626f + yy;
+        float rPosZ = posZ + (s2 + yy);
+
+        int xInt = Math.floorMod(TeraMath.floorToInt(rPosX), permCount);
+        int yInt = Math.floorMod(TeraMath.floorToInt(rPosY), permCount);
+        int zInt = Math.floorMod(TeraMath.floorToInt(rPosZ), permCount);
+
+        float x = rPosX - TeraMath.fastFloor(rPosX);
+        float y = rPosY - TeraMath.fastFloor(rPosY);
+        float z = rPosZ - TeraMath.fastFloor(rPosZ);
 
         float u = TeraMath.fadePerlin(x);
         float v = TeraMath.fadePerlin(y);
