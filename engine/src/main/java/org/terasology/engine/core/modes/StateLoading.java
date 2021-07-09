@@ -8,7 +8,6 @@ import com.google.common.collect.Queues;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.crashreporter.CrashReporter;
-import org.terasology.engine.config.Config;
 import org.terasology.engine.config.SystemConfig;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.core.EngineTime;
@@ -66,9 +65,9 @@ public class StateLoading implements GameState {
     private static final Logger logger = LoggerFactory.getLogger(StateLoading.class);
 
     private Context context;
-    private GameManifest gameManifest;
-    private NetworkMode netMode;
-    private Queue<LoadProcess> loadProcesses = Queues.newArrayDeque();
+    private final GameManifest gameManifest;
+    private final NetworkMode netMode;
+    private final Queue<LoadProcess> loadProcesses = Queues.newArrayDeque();
     private LoadProcess current;
     private JoinStatus joinStatus;
 
@@ -76,7 +75,6 @@ public class StateLoading implements GameState {
 
     private LoadingScreen loadingScreen;
 
-    private Config config;
     private SystemConfig systemConfig;
 
     private int progress;
@@ -109,7 +107,6 @@ public class StateLoading implements GameState {
         this.context = engine.createChildContext();
         CoreRegistry.setContext(context);
 
-        config = context.get(Config.class);
         systemConfig = context.get(SystemConfig.class);
 
         this.nuiManager = new NUIManagerInternal((TerasologyCanvasRenderer) context.get(CanvasRenderer.class), context);
