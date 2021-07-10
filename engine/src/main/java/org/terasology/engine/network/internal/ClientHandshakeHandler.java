@@ -63,12 +63,17 @@ public class ClientHandshakeHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         NetData.NetMessage message = (NetData.NetMessage) msg;
-        if (message.hasHandshakeHello()) {
-            processServerHello(message.getHandshakeHello(), ctx);
+        if (message.hasHandShakeMessage()) {
+            NetData.HandshakeMessage handshakeMessage = message.getHandShakeMessage();
+            if (handshakeMessage.hasHandshakeHello()) {
+                processServerHello(handshakeMessage.getHandshakeHello(), ctx);
+            }
+            if (handshakeMessage.hasHandshakeVerification()) {
+                processHandshakeVerification(handshakeMessage.getHandshakeVerification(), ctx);
+            }
+
         } else if (message.hasProvisionIdentity()) {
             processNewIdentity(message.getProvisionIdentity(), ctx);
-        } else if (message.hasHandshakeVerification()) {
-            processHandshakeVerification(message.getHandshakeVerification(), ctx);
         } else {
             super.channelRead(ctx, msg);
         }
@@ -233,9 +238,8 @@ public class ClientHandshakeHandler extends ChannelInboundHandlerAdapter {
         byte[] signature = identity.getPlayerPrivateCertificate().sign(dataToSign);
 
         ctx.channel().writeAndFlush(NetData.NetMessage.newBuilder()
-                .setHandshakeHello(clientHello)
-                .setHandshakeVerification(NetData.HandshakeVerification.newBuilder()
-                        .setSignature(ByteString.copyFrom(signature)))
+                .setHandShakeMessage(NetData.HandshakeMessage.newBuilder().setHandshakeHello(clientHello)
+                                .setHandshakeVerification(NetData.HandshakeVerification.newBuilder().setSignature(ByteString.copyFrom(signature))).build())
                 .build());
     }
 

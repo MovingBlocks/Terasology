@@ -275,8 +275,9 @@ public class ClientConnectionHandler extends ChannelInboundHandlerAdapter {
         } else {
             joinStatus.setCurrentActivity("Requesting missing modules");
             NetData.NetMessage.Builder builder = NetData.NetMessage.newBuilder();
+            NetData.ModuleMessage.Builder moduleRequestBuilder = builder.getModuleMessageBuilder();
             for (String module : missingModules) {
-                builder.addModuleRequest(NetData.ModuleRequest.newBuilder().setModuleId(module));
+                moduleRequestBuilder.addModuleRequest(NetData.ModuleRequest.newBuilder().setModuleId(module).build());
             }
             channelHandlerContext.channel().writeAndFlush(builder.build());
         }

@@ -1,3 +1,4 @@
+syntax = "proto3";
 option java_package = "org.terasology.protobuf";
 option java_outer_classname = "EntityData";
 option optimize_for = SPEED;
@@ -12,16 +13,8 @@ message Value {
     optional bytes bytes = 7;
     repeated Value value = 8;
     repeated NameValue name_value = 9; // For string maps
-    // repeated ValuePair value_value = 10; // For other maps
-    extensions 5000 to max;
 }
 
-/*
-message ValuePair {
-    optional Value key = 1;
-    optional Value value = 2;
-}
-*/
 
 message NameValue {
     optional string name = 1;
@@ -34,7 +27,6 @@ message Component {
     optional string type = 15; // The name of the type. Not needed if index provided
     repeated NameValue field = 2;
 
-    extensions 5000 to max;
 }
 
 message Entity {
@@ -52,8 +44,6 @@ message Entity {
         CHUNK = 2;
     }
     optional Scope scope = 7;
-
-    extensions 5000 to max;
 }
 
 message PackedEntity {
@@ -65,29 +55,22 @@ message PackedEntity {
     repeated int32 removedComponent = 6 [packed=true];
     optional int64 owner = 7;
     optional string parentPrefabUri = 16;
-
-    extensions 5000 to max;
 }
 
 message Prefab {
     optional int32 name_index = 1;
     repeated Component component = 2;
-    repeated int32 deprecated = 3 [packed=true];
-    optional bool persisted = 4 [default=true];
+    optional bool persisted = 4;
     repeated string removedComponent = 5;
     optional bool alwaysRelevant = 6;
     optional string name = 15;
     optional string parent_name = 16;
-
-    extensions 5000 to max;
 }
 
 message Event {
     optional int32 type = 1;
     optional bytes fieldIds = 2;
     repeated Value fieldValue = 3;
-
-    extensions 5000 to max;
 }
 
 message EntityStore {
@@ -98,10 +81,10 @@ message EntityStore {
     repeated string entityName = 2;
     repeated int64  entityNamed = 4 [packed = true];
 
-    extensions 5000 to max;
 }
 
 enum StoreType {
+    NoneType                  = 0;
     PlayerStoreType           = 1;
     ChunkStoreType            = 2;
 }
@@ -112,8 +95,6 @@ message PlayerStore {
     optional float characterPosY = 16;
     optional float characterPosZ = 17;
     optional bool hasCharacter = 18;
-
-    extensions 5000 to max;
 }
 
 message ChunkStore {
@@ -122,34 +103,21 @@ message ChunkStore {
     optional sint32    y             = 3;
     optional sint32    z             = 4;
 
-    optional int32 deprecated_data_3    = 5;
-
-    optional bytes deprecated_data_4 = 6;
-    optional bytes deprecated_data_1 = 7;
-    optional bytes deprecated_data_2 = 8;
-    optional bytes deprecated_data_5 = 9;
-
     optional RunLengthEncoding8 deprecated_data_6 = 11;
     optional RunLengthEncoding16 deprecated_data_7 = 12;
 
     optional RunLengthEncoding16 block_data = 10;
     repeated RunLengthEncoding16 extra_data = 13;
-
-    extensions 5000 to max;
 }
 
 message RunLengthEncoding16 {
     repeated sint32 runLengths = 1 [packed=true];
     repeated sint32 values = 2 [packed=true];
-
-    extensions 5000 to max;
 }
 
 message RunLengthEncoding8 {
     repeated sint32 runLengths = 1 [packed=true];
     optional bytes values = 2;
-
-    extensions 5000 to max;
 }
 
 message GlobalStore {
@@ -158,9 +126,5 @@ message GlobalStore {
     repeated string component_class = 3;
 
     optional int64 next_entity_id = 16;
-    repeated int64 deprecated_data_17 = 17 [packed=true];
-    repeated string prefab_name = 18; // Table of prefabs, the index of which corresponds to Prefab's type_index
-    // deprecated repeated entityStoreMetadata deprecated_data_19 = 19;
-
-    extensions 5000 to max;
+    repeated string prefab_name = 18;
 }

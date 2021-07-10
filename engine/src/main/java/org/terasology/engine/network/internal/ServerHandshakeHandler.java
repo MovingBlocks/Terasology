@@ -51,8 +51,7 @@ public class ServerHandshakeHandler extends ChannelInboundHandlerAdapter {
                 .setTimestamp(System.currentTimeMillis())
                 .build();
 
-        ctx.channel().writeAndFlush(NetData.NetMessage.newBuilder()
-                .setHandshakeHello(serverHello)
+        ctx.channel().writeAndFlush(NetData.NetMessage.newBuilder().setHandShakeMessage(NetData.HandshakeMessage.newBuilder().setHandshakeHello(serverHello).build())
                 .build());
     }
 
@@ -61,8 +60,11 @@ public class ServerHandshakeHandler extends ChannelInboundHandlerAdapter {
         NetData.NetMessage message = (NetData.NetMessage) msg;
         if (message.hasNewIdentityRequest()) {
             processNewIdentityRequest(message.getNewIdentityRequest(), ctx);
-        } else if (message.hasHandshakeHello() && message.hasHandshakeVerification()) {
-            processClientHandshake(message.getHandshakeHello(), message.getHandshakeVerification(), ctx);
+        } else if (message.hasHandShakeMessage()) {
+            NetData.HandshakeMessage handshakeMessage = message.getHandShakeMessage();
+            if (handshakeMessage.hasHandshakeHello() && handshakeMessage.hasHandshakeVerification()) {
+                processClientHandshake(handshakeMessage.getHandshakeHello(), handshakeMessage.getHandshakeVerification(), ctx);
+            }
         }
     }
 
@@ -87,9 +89,8 @@ public class ServerHandshakeHandler extends ChannelInboundHandlerAdapter {
 
         logger.info("Sending server verification");
         byte[] serverSignature = config.getSecurity().getServerPrivateCertificate().sign(signatureData);
-        ctx.channel().writeAndFlush(NetData.NetMessage.newBuilder()
-                .setHandshakeVerification(NetData.HandshakeVerification.newBuilder()
-                        .setSignature(ByteString.copyFrom(serverSignature))).build());
+        ctx.channel().writeAndFlush(NetData.NetMessage.newBuilder().setHandShakeMessage(NetData.HandshakeMessage.newBuilder().setHandshakeVerification(NetData.HandshakeVerification.newBuilder()
+                .setSignature(ByteString.copyFrom(serverSignature))).build()));
 
         // Identity has been established, inform the server handler and withdraw from the pipeline
         ctx.pipeline().remove(this);

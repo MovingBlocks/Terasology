@@ -54,8 +54,8 @@ public class ServerConnectionHandler extends ChannelInboundHandlerAdapter {
             ctx.channel().writeAndFlush(NetData.NetMessage.newBuilder().setServerInfo(serverInfo).setTime(serverInfo.getTime()).build());
         } else if (message.hasJoin()) {
             receivedConnect(message.getJoin());
-        } else if (message.getModuleRequestCount() > 0) {
-            sendModules(message.getModuleRequestList());
+        } else if (message.hasModuleMessage()) {
+            sendModules(message.getModuleMessage().getModuleRequestList());
         } else {
             super.channelRead(ctx, msg);
             logger.error("Received unexpected message");

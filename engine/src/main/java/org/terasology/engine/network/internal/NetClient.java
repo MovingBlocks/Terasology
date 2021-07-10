@@ -207,19 +207,21 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
         if (netTick) {
             NetData.NetMessage.Builder message = NetData.NetMessage.newBuilder();
             message.setTime(time.getGameTimeInMs());
-            sendRegisteredBlocks(message);
-            sendChunkInvalidations(message);
-            sendNewChunks(message);
-            sendRemovedEntities(message);
-            sendInitialEntities(message);
-            sendDirtyEntities(message);
-            sendEvents(message);
+            NetData.EntityDataMessage.Builder dataMessageBuilder = message.getEntityDataMessageBuilder();
+            sendRegisteredBlocks(dataMessageBuilder);
+            sendChunkInvalidations(dataMessageBuilder);
+            sendNewChunks(dataMessageBuilder);
+            sendRemovedEntities(dataMessageBuilder);
+            sendInitialEntities(dataMessageBuilder);
+            sendDirtyEntities(dataMessageBuilder);
+            sendEvents(dataMessageBuilder);
+
             send(message.build());
         }
         processReceivedMessages();
     }
 
-    private void sendRegisteredBlocks(NetData.NetMessage.Builder message) {
+    private void sendRegisteredBlocks(NetData.EntityDataMessage.Builder message) {
         synchronized (newlyRegisteredFamilies) {
             for (BlockFamily family : newlyRegisteredFamilies) {
                 NetData.BlockFamilyRegisteredMessage.Builder blockRegMessage = NetData.BlockFamilyRegisteredMessage.newBuilder();
@@ -233,7 +235,7 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
         }
     }
 
-    private void sendNewChunks(NetData.NetMessage.Builder message) {
+    private void sendNewChunks(NetData.EntityDataMessage.Builder message) {
         if (!readyChunks.isEmpty()) {
             chunkSendCounter += chunkSendRate * NET_TICK_RATE * networkSystem.getBandwidthPerClient();
             if (chunkSendCounter > 1.0f) {
@@ -265,7 +267,7 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
         }
     }
 
-    private void sendChunkInvalidations(NetData.NetMessage.Builder message) {
+    private void sendChunkInvalidations(NetData.EntityDataMessage.Builder message) {
         Iterator<Vector3i> i = invalidatedChunks.iterator();
         while (i.hasNext()) {
             Vector3i pos = i.next();
@@ -423,7 +425,7 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
         }
     }
 
-    private void sendEvents(NetData.NetMessage.Builder message) {
+    private void sendEvents(NetData.EntityDataMessage.Builder message) {
         List<NetData.BlockChangeMessage> blockChanges = Lists.newArrayListWithExpectedSize(queuedOutgoingBlockChanges.size());
         queuedOutgoingBlockChanges.drainTo(blockChanges);
         message.addAllBlockChange(blockChanges);
@@ -437,17 +439,18 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
     }
 
     private void processEntityUpdates(NetData.NetMessage message) {
-        for (NetData.UpdateEntityMessage updateMessage : message.getUpdateEntityList()) {
-
-            EntityRef currentEntity = networkSystem.getEntity(updateMessage.getNetId());
-            if (networkSystem.getOwner(currentEntity) == this) {
-                entitySerializer.deserializeOnto(currentEntity, updateMessage.getEntity(),
-                        new ServerComponentFieldCheck(false, true));
+        if (message.hasEntityDataMessage()) {
+            for (NetData.UpdateEntityMessage updateMessage : message.getEntityDataMessage().getUpdateEntityList()) {
+                EntityRef currentEntity = networkSystem.getEntity(updateMessage.getNetId());
+                if (networkSystem.getOwner(currentEntity) == this) {
+                    entitySerializer.deserializeOnto(currentEntity, updateMessage.getEntity(),
+                            new ServerComponentFieldCheck(false, true));
+                }
             }
         }
     }
 
-    private void sendDirtyEntities(NetData.NetMessage.Builder message) {
+    private void sendDirtyEntities(NetData.EntityDataMessage.Builder message) {
         TIntIterator dirtyIterator = netDirty.iterator();
         while (dirtyIterator.hasNext()) {
             int netId = dirtyIterator.next();
@@ -469,7 +472,7 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
         dirtyComponents.clear();
     }
 
-    private void sendRemovedEntities(NetData.NetMessage.Builder message) {
+    private void sendRemovedEntities(NetData.EntityDataMessage.Builder message) {
         TIntIterator initialIterator = netRemoved.iterator();
         while (initialIterator.hasNext()) {
             message.addRemoveEntity(NetData.RemoveEntityMessage.newBuilder().setNetId(initialIterator.next()));
@@ -477,7 +480,7 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
         netRemoved.clear();
     }
 
-    private void sendInitialEntities(NetData.NetMessage.Builder message) {
+    private void sendInitialEntities(NetData.EntityDataMessage.Builder message) {
         int[] initial = netInitial.toArray();
         netInitial.clear();
         Arrays.sort(initial);
@@ -504,40 +507,42 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
 
     private void processEvents(NetData.NetMessage message) {
         boolean lagCompensated = false;
-        PredictionSystem predictionSystem = CoreRegistry.get(PredictionSystem.class);
-        for (NetData.EventMessage eventMessage : message.getEventList()) {
-            try {
-                Event event = eventSerializer.deserialize(eventMessage.getEvent());
-                EventMetadata<?> metadata = eventLibrary.getMetadata(event.getClass());
-                if (metadata.getNetworkEventType() != NetworkEventType.SERVER) {
-                    logger.warn("Received non-server event '{}' from client '{}'", metadata, getName());
-                    continue;
-                }
-                if (!lagCompensated && metadata.isLagCompensated()) {
-                    if (predictionSystem != null) {
-                        predictionSystem.lagCompensate(getEntity(), lastReceivedTime);
+        if(message.hasEntityDataMessage()) {
+            PredictionSystem predictionSystem = CoreRegistry.get(PredictionSystem.class);
+            for (NetData.EventMessage eventMessage : message.getEntityDataMessage().getEventList()) {
+                try {
+                    Event event = eventSerializer.deserialize(eventMessage.getEvent());
+                    EventMetadata<?> metadata = eventLibrary.getMetadata(event.getClass());
+                    if (metadata.getNetworkEventType() != NetworkEventType.SERVER) {
+                        logger.warn("Received non-server event '{}' from client '{}'", metadata, getName());
+                        continue;
                     }
-                    lagCompensated = true;
-                }
-                EntityRef target = EntityRef.NULL;
-                if (eventMessage.hasTargetId()) {
-                    target = networkSystem.getEntity(eventMessage.getTargetId());
-                }
-                if (target.exists()) {
-                    if (Objects.equal(networkSystem.getOwner(target), this)) {
-                        target.send(event);
-                    } else {
-                        logger.warn("Received event {} for non-owned entity {} from {}", event, target, this);
+                    if (!lagCompensated && metadata.isLagCompensated()) {
+                        if (predictionSystem != null) {
+                            predictionSystem.lagCompensate(getEntity(), lastReceivedTime);
+                        }
+                        lagCompensated = true;
                     }
+                    EntityRef target = EntityRef.NULL;
+                    if (eventMessage.hasTargetId()) {
+                        target = networkSystem.getEntity(eventMessage.getTargetId());
+                    }
+                    if (target.exists()) {
+                        if (Objects.equal(networkSystem.getOwner(target), this)) {
+                            target.send(event);
+                        } else {
+                            logger.warn("Received event {} for non-owned entity {} from {}", event, target, this);
+                        }
+                    }
+                } catch (DeserializationException e) {
+                    logger.error("Failed to deserialize event", e);
+                } catch (RuntimeException e) {
+                    logger.error("Error processing event", e);
                 }
-            } catch (DeserializationException e) {
-                logger.error("Failed to deserialize event", e);
-            } catch (RuntimeException e) {
-                logger.error("Error processing event", e);
             }
-        }
-        if (lagCompensated && predictionSystem != null) {
-            predictionSystem.restoreToPresent();
+            if (lagCompensated && predictionSystem != null) {
+                predictionSystem.restoreToPresent();
+            }
         }
     }
 

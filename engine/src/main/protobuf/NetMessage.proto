@@ -1,3 +1,4 @@
+syntax = "proto3";
 import "EntityData.proto";
 
 option java_package = "org.terasology.protobuf";
@@ -5,67 +6,77 @@ option java_outer_classname = "NetData";
 option optimize_for = SPEED;
 
 message NetMessage {
-    repeated ChunkStore chunkInfo = 2;
+    optional int64 time = 9;
+    oneof message {
+        JoinMessage join = 18;
+        // Authentication
+        HandshakeMessage handShakeMessage = 105;
+        NewIdentityRequest newIdentityRequest = 101;
+        ProvisionIdentity provisionIdentity = 102;
+
+        ModuleDataHeader moduleDataHeader = 20;
+        ModuleData moduleData = 21;
+        JoinCompleteMessage joinComplete = 22;
+        ServerInfoRequest serverInfoRequest = 15;
+        ServerInfoMessage serverInfo = 16;
+        ModuleMessage moduleMessage = 17;
+        EntityDataMessage entityDataMessage = 30;
+    }
+}
+
+message EntityDataMessage {
     repeated InvalidateChunkMessage invalidateChunk = 3;
-    repeated BlockChangeMessage blockChange = 4;
     repeated CreateEntityMessage createEntity = 5;
     repeated RemoveEntityMessage removeEntity = 6;
-    repeated UpdateEntityMessage updateEntity = 7;
     repeated EventMessage event = 8;
-    optional int64 time = 9;
-    repeated ExtraDataChangeMessage extraDataChange = 11;
-
-    optional ServerInfoRequest serverInfoRequest = 15;
-    optional ServerInfoMessage serverInfo = 16;
+    repeated UpdateEntityMessage updateEntity = 7;
     repeated BlockFamilyRegisteredMessage blockFamilyRegistered = 17;
+    repeated BlockChangeMessage blockChange = 4;
+    repeated ChunkStore chunkInfo = 2;
+    repeated ExtraDataChangeMessage extraDataChange = 11;
+}
 
-    optional JoinMessage join = 18;
-    repeated ModuleRequest moduleRequest = 19;
-    optional ModuleDataHeader moduleDataHeader = 20;
-    optional ModuleData moduleData = 21;
-    optional JoinCompleteMessage joinComplete = 22;
-
-    // Authentication
+message HandshakeMessage {
     optional HandshakeHello handshakeHello = 100;
-    optional NewIdentityRequest newIdentityRequest = 101;
-    optional ProvisionIdentity provisionIdentity = 102;
     optional HandshakeVerification handshakeVerification = 103;
+}
 
-    extensions 5000 to max;
+message EventMessage {
+    optional int32 targetId = 1;
+    optional Event event = 2;
+    optional Vector3iData targetBlockPos = 3;
+}
+
+message ModuleMessage {
+    repeated ModuleRequest moduleRequest = 19;
+}
+
+message ModuleRequest {
+    optional string moduleId = 1;
 }
 
 message HandshakeHello {
     optional bytes random = 1;
     optional Certificate certificate = 2;
     optional sint64 timestamp = 3;
-
-    extensions 5000 to max;
 }
 
 message NewIdentityRequest {
     optional bytes preMasterSecret = 1;
     optional bytes random = 2;
-
-    extensions 5000 to max;
 }
 
 message ProvisionIdentity {
     optional bytes encryptedCertificates = 1;
-
-    extensions 5000 to max;
 }
 
 message CertificateSet {
     optional Certificate publicCertificate = 1;
     optional bytes privateExponent = 2;
-
-    extensions 5000 to max;
 }
 
 message HandshakeVerification {
     optional bytes signature = 1;
-
-    extensions 5000 to max;
 }
 
 message Certificate {
@@ -73,36 +84,26 @@ message Certificate {
     optional bytes modulus = 2;
     optional bytes exponent = 3;
     optional bytes signature = 4;
-
-    extensions 5000 to max;
 }
 
 message BlockFamilyRegisteredMessage {
     repeated string blockUri = 1;
     repeated int32 blockId = 2;
-
-    extensions 5000 to max;
 }
 
 message InvalidateChunkMessage {
     optional Vector3iData pos = 1;
-
-    extensions 5000 to max;
 }
 
 message BlockChangeMessage {
     optional Vector3iData pos = 1;
     optional int32 newBlock = 2;
-
-    extensions 5000 to max;
 }
 
 message ExtraDataChangeMessage {
     optional int32 index = 1;
     optional Vector3iData pos = 2;
     optional int32 newData = 3;
-    
-    extensions 5000 to max;
 }
 
 message Vector3iData {
@@ -113,7 +114,6 @@ message Vector3iData {
 
 message ServerInfoRequest {
 
-    extensions 5000 to max;
 }
 
 message JoinMessage {
@@ -121,8 +121,6 @@ message JoinMessage {
     optional string version = 2;
     optional sint32 viewDistanceLevel = 3;
     optional Color color = 4;
-
-    extensions 5000 to max;
 }
 
 message Color {
@@ -131,8 +129,6 @@ message Color {
 
 message JoinCompleteMessage {
     optional int32 clientId = 1;
-
-    extensions 5000 to max;
 }
 
 message ServerInfoMessage {
@@ -153,15 +149,11 @@ message ServerInfoMessage {
     optional float reflectionHeight = 18;
     optional string MOTD = 19;
     optional int32 onlinePlayersAmount = 20;
-
-    extensions 5000 to max;
 }
 
 message WorldInfo {
     optional string title = 1;
     optional int64 time = 2;
-
-    extensions 5000 to max;
 }
 
 message SerializationInfo {
@@ -169,68 +161,39 @@ message SerializationInfo {
     optional int32 id = 2;
     repeated string fieldName = 3;
     optional bytes fieldIds = 4;
-
-    extensions 5000 to max;
 }
 
 message ModuleInfo {
     optional string moduleId = 1;
     optional string moduleVersion = 2;
-
-    extensions 5000 to max;
 }
 
-message ModuleRequest {
-    optional string moduleId = 1;
-
-    extensions 5000 to max;
-}
 
 message ModuleDataHeader {
     optional string id = 1;
     optional string version = 2;
     optional int64 size = 3;
     optional string error = 15;
-
-    extensions 5000 to max;
 }
 
 message ModuleData {
     optional bytes module = 1;
-
-    extensions 5000 to max;
 }
 
 message ModuleSendError {
     optional string message = 1;
-
-    extensions 5000 to max;
 }
 
 message CreateEntityMessage {
     optional PackedEntity entity = 1;
     optional Vector3iData blockPos = 2;
-
-    extensions 5000 to max;
 }
 
 message UpdateEntityMessage {
     optional PackedEntity entity = 1;
     optional int32 netId = 2;
-
-    extensions 5000 to max;
 }
 
 message RemoveEntityMessage {
     optional int32 netId = 1;
-
-    extensions 5000 to max;
-}
-
-message EventMessage {
-    optional int32 targetId = 1;
-    optional Event event = 2;
-    optional Vector3iData targetBlockPos = 3;
-
-    extensions 5000 to max;
 }

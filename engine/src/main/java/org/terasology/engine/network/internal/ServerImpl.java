@@ -161,13 +161,14 @@ public class ServerImpl implements Server {
             if (netTick) {
                 NetData.NetMessage.Builder message = NetData.NetMessage.newBuilder();
                 message.setTime(time.getGameTimeInMs());
-                sendEntities(message);
-                sendEvents(message);
+                NetData.EntityDataMessage.Builder builder = message.getEntityDataMessageBuilder();
+                sendEntities(builder);
+                sendEvents(builder);
                 send(message.build());
             } else if (!queuedOutgoingEvents.isEmpty()) {
                 NetData.NetMessage.Builder message = NetData.NetMessage.newBuilder();
                 message.setTime(time.getGameTimeInMs());
-                sendEvents(message);
+                sendEvents(message.getEntityDataMessageBuilder());
                 send(message.build());
             }
 
@@ -175,7 +176,7 @@ public class ServerImpl implements Server {
         }
     }
 
-    private void sendEvents(NetData.NetMessage.Builder message) {
+    private void sendEvents(NetData.EntityDataMessage.Builder message) {
         queuedOutgoingEvents.forEach(message::addEvent);
         queuedOutgoingEvents.clear();
     }
@@ -195,7 +196,7 @@ public class ServerImpl implements Server {
         channel.writeAndFlush(data);
     }
 
-    private void sendEntities(NetData.NetMessage.Builder message) {
+    private void sendEntities(NetData.EntityDataMessage.Builder message) {
         TIntIterator dirtyIterator = netDirty.iterator();
         while (dirtyIterator.hasNext()) {
             int netId = dirtyIterator.next();
@@ -250,25 +251,27 @@ public class ServerImpl implements Server {
             if (message.hasTime()) {
                 time.updateTimeFromServer(message.getTime());
             }
-            processBlockRegistrations(message);
-            processReceivedChunks(message);
-            processInvalidatedChunks(message);
-            processBlockChanges(message);
-            processExtraDataChanges(message);
-            processRemoveEntities(message);
-            message.getCreateEntityList().forEach(this::createEntityMessage);
-            message.getUpdateEntityList().forEach(this::updateEntity);
-            for (NetData.EventMessage event : message.getEventList()) {
-                try {
-                    processEvent(event);
-                } catch (RuntimeException e) {
-                    logger.error("Error processing server event", e);
+            if (message.hasEntityDataMessage()) {
+                processBlockRegistrations(message.getEntityDataMessage());
+                processReceivedChunks(message.getEntityDataMessage());
+                processInvalidatedChunks(message.getEntityDataMessage());
+                processBlockChanges(message.getEntityDataMessage());
+                processExtraDataChanges(message.getEntityDataMessage());
+                processRemoveEntities(message.getEntityDataMessage());
+                message.getEntityDataMessage().getCreateEntityList().forEach(this::createEntityMessage);
+                message.getEntityDataMessage().getUpdateEntityList().forEach(this::updateEntity);
+                for (NetData.EventMessage event : message.getEntityDataMessage().getEventList()) {
+                    try {
+                        processEvent(event);
+                    } catch (RuntimeException e) {
+                        logger.error("Error processing server event", e);
+                    }
                 }
             }
         }
     }
 
-    private void processRemoveEntities(NetData.NetMessage message) {
+    private void processRemoveEntities(NetData.EntityDataMessage message) {
         for (NetData.RemoveEntityMessage removeEntity : message.getRemoveEntityList()) {
             int netId = removeEntity.getNetId();
             EntityRef entity = networkSystem.getEntity(netId);
@@ -283,7 +286,7 @@ public class ServerImpl implements Server {
     /**
      * Apply the block changes from the message to the local world.
      */
-    private void processBlockChanges(NetData.NetMessage message) {
+    private void processBlockChanges(NetData.EntityDataMessage message) {
         for (NetData.BlockChangeMessage blockChange : message.getBlockChangeList()) {
             Block newBlock = blockManager.getBlock((short) blockChange.getNewBlock());
             logger.debug("Received block change to {}", newBlock);
@@ -301,7 +304,7 @@ public class ServerImpl implements Server {
     /**
      * Apply the extra-data changes from the message to the local world.
      */
-    private void processExtraDataChanges(NetData.NetMessage message) {
+    private void processExtraDataChanges(NetData.EntityDataMessage message) {
         for (NetData.ExtraDataChangeMessage extraDataChange : message.getExtraDataChangeList()) {
             WorldProvider worldProvider = CoreRegistry.get(WorldProvider.class);
             Vector3i pos = NetMessageUtil.convert(extraDataChange.getPos());
@@ -313,7 +316,7 @@ public class ServerImpl implements Server {
         }
     }
 
-    private void processInvalidatedChunks(NetData.NetMessage message) {
+    private void processInvalidatedChunks(NetData.EntityDataMessage message) {
         for (NetData.InvalidateChunkMessage chunk : message.getInvalidateChunkList()) {
             Vector3i chunkPos = NetMessageUtil.convert(chunk.getPos());
             remoteWorldProvider.invalidateChunks(chunkPos);
@@ -322,14 +325,14 @@ public class ServerImpl implements Server {
         }
     }
 
-    private void processReceivedChunks(NetData.NetMessage message) {
+    private void processReceivedChunks(NetData.EntityDataMessage message) {
         for (EntityData.ChunkStore chunkInfo : message.getChunkInfoList()) {
             Chunk chunk = ChunkSerializer.decode(chunkInfo, blockManager, extraDataManager);
             chunkQueue.offer(chunk);
         }
     }
 
-    private void processBlockRegistrations(NetData.NetMessage message) {
+    private void processBlockRegistrations(NetData.EntityDataMessage message) {
         for (NetData.BlockFamilyRegisteredMessage blockFamily : message.getBlockFamilyRegisteredList()) {
             if (blockFamily.getBlockIdCount() != blockFamily.getBlockUriCount()) {
                 logger.error("Received block registration with mismatched id<->uri mapping");
