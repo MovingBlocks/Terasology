@@ -50,12 +50,10 @@ public enum Side {
     }
 
     /**
-     * This provides a static EnumSet of all Sides defined in the enumeration. The result contains the same values as
+     * This provides a static List of all Sides defined in the enumeration. The result contains the same values as
      * calling {@code Side#values} but this does not create a new copy on every call. <br/>
-     * <b>Warning:</b> Do not change the content of the returned enum set! It will be reflected on all calls to this
-     * method.
      *
-     * @return All available sides'
+     * @return All available sides
      */
     public static List<Side> allSides() {
         return ALL_SIDES;
