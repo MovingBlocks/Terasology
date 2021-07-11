@@ -14,4 +14,9 @@ public class GetterSetterComponent implements Component<GetterSetterComponent> {
     public int getValue() {
         return value;
     }
+
+    @Override
+    public void copy(GetterSetterComponent other) {
+        this.value = other.value;
+    }
 }
