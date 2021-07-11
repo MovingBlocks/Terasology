@@ -17,6 +17,6 @@ public class RegionOutlineComponent implements VisualComponent<RegionOutlineComp
     public void copy(RegionOutlineComponent other) {
         this.corner1 = new Vector3i(other.corner1);
         this.corner2 = new Vector3i(other.corner2);
-        this.color = other.color;
+        this.color = new Color(other.color);
     }
 }

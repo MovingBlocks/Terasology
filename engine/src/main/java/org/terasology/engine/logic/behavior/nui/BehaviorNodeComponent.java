@@ -35,8 +35,8 @@ public class BehaviorNodeComponent implements Component<BehaviorNodeComponent> {
         this.displayName = other.displayName;
         this.category = other.category;
         this.shape = other.shape;
-        this.color = other.color;
-        this.textColor = other.textColor;
+        this.color = new Color(other.color);
+        this.textColor = new Color(other.textColor);
         this.description = other.description;
     }
 }

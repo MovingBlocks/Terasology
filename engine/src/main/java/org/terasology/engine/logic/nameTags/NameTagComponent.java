@@ -34,7 +34,7 @@ public class NameTagComponent implements Component<NameTagComponent> {
     public void copy(NameTagComponent other) {
         this.yOffset = other.yOffset;
         this.text = other.text;
-        this.textColor = other.textColor;
+        this.textColor = new Color(other.textColor);
         this.scale = other.scale;
     }
 }

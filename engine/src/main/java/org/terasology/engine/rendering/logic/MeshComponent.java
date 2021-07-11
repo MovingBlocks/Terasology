@@ -40,6 +40,6 @@ public final class MeshComponent implements VisualComponent<MeshComponent> {
         this.translucent = other.translucent;
         this.selfLuminance = other.selfLuminance;
         this.hideFromOwner = other.hideFromOwner;
-        this.color = other.color;
+        this.color = new Color(other.color);
     }
 }

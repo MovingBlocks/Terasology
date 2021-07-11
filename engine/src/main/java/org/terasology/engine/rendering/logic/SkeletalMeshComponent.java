@@ -72,6 +72,6 @@ public class SkeletalMeshComponent implements VisualComponent<SkeletalMeshCompon
         this.animationTime = other.animationTime;
         this.scale = new Vector3f(other.scale);
         this.translate = new Vector3f(other.translate);
-        this.color = other.color;
+        this.color = new Color(other.color);
     }
 }
