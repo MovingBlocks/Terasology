@@ -193,9 +193,12 @@ public final class EnvironmentSwitchHandler {
 
     private static void registerComponents(ComponentLibrary library, ModuleEnvironment environment) {
         for (Class<? extends Component> componentType : environment.getSubtypesOf(Component.class)) {
-            if (componentType.getAnnotation(DoNotAutoRegister.class) == null && !componentType.isInterface() && !Modifier.isAbstract(componentType.getModifiers())) {
+            if (componentType.getAnnotation(DoNotAutoRegister.class) == null
+                    && !componentType.isInterface()
+                    && !Modifier.isAbstract(componentType.getModifiers())) {
                 String componentName = MetadataUtil.getComponentClassName(componentType);
-                Name componentModuleName = verifyNotNull(environment.getModuleProviding(componentType), "Could not find module for %s %s", componentName, componentType);
+                Name componentModuleName = verifyNotNull(environment.getModuleProviding(componentType),
+                        "Could not find module for %s %s", componentName, componentType);
                 library.register(new ResourceUrn(componentModuleName.toString(), componentName), componentType);
             }
         }
