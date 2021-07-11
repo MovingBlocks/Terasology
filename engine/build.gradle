@@ -51,6 +51,15 @@ configurations {
     }
 }
 
+configurations.all {
+    resolutionStrategy {
+        // always pick reflections fork
+        dependencySubstitution {
+            substitute(module("org.reflections:reflections")).using(module("org.terasology:reflections:0.9.12-MB"))
+        }
+    }
+}
+
 // Primary dependencies definition
 dependencies {
     // Storage and networking
