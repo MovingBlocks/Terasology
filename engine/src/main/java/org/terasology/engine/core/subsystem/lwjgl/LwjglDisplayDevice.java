@@ -36,6 +36,10 @@ public class LwjglDisplayDevice extends AbstractSubscribable implements DisplayD
     private RenderingConfig config;
     private DisplayDeviceInfo displayDeviceInfo = new DisplayDeviceInfo("unknown");
 
+    private int windowWidth = 0;
+    private int windowHeight = 0;
+    private boolean isWindowDirty = true;
+
     public LwjglDisplayDevice(Context context) {
         this.config = context.get(Config.class).getRendering();
     }
@@ -132,16 +136,25 @@ public class LwjglDisplayDevice extends AbstractSubscribable implements DisplayD
 
     @Override
     public int getWidth() {
-        int[] width = new int[1];
-        GLFW.glfwGetWindowSize(GLFW.glfwGetCurrentContext(), width, new int[1]);
-        return width[0];
+        updateWindow();
+        return this.windowWidth;
     }
 
     @Override
     public int getHeight() {
-        int[] height = new int[1];
-        GLFW.glfwGetWindowSize(GLFW.glfwGetCurrentContext(), new int[1], height);
-        return height[0];
+        updateWindow();
+        return this.windowHeight;
+    }
+
+    private void updateWindow() {
+        if (isWindowDirty) {
+            int[] windowWidth = new int[1];
+            int[] windowHeight = new int[1];
+            GLFW.glfwGetWindowSize(GLFW.glfwGetCurrentContext(), windowWidth, windowHeight);
+            this.windowWidth = windowWidth[0];
+            this.windowHeight = windowHeight[0];
+            isWindowDirty = false;
+        }
     }
 
     @Override
@@ -177,6 +190,8 @@ public class LwjglDisplayDevice extends AbstractSubscribable implements DisplayD
     public void update() {
         processMessages();
         GLFW.glfwSwapBuffers(GLFW.glfwGetCurrentContext());
+        isWindowDirty = true;
+
     }
 
     private void updateViewport() {
