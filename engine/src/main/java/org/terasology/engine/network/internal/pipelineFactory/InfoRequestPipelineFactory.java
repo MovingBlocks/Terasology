@@ -7,7 +7,9 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
-import io.netty.handler.codec.compression.JdkZlibDecoder;
+import io.netty.handler.codec.LengthFieldPrepender;
+import io.netty.handler.codec.compression.Lz4FrameDecoder;
+import io.netty.handler.codec.compression.Lz4FrameEncoder;
 import io.netty.handler.codec.protobuf.ProtobufDecoder;
 import io.netty.handler.codec.protobuf.ProtobufEncoder;
 import io.netty.handler.codec.protobuf.ProtobufVarint32FrameDecoder;
@@ -31,12 +33,15 @@ public class InfoRequestPipelineFactory extends ChannelInitializer {
         p.addLast(MetricRecordingHandler.NAME, new MetricRecordingHandler());
 
         p.addLast("lengthFrameDecoder", new LengthFieldBasedFrameDecoder(8388608, 0, 3, 0, 3));
-        p.addLast("inflateDecoder", new JdkZlibDecoder());
+        p.addLast("inflateDecoder", new Lz4FrameDecoder());
         p.addLast("frameDecoder", new ProtobufVarint32FrameDecoder());
         p.addLast("protobufDecoder", new ProtobufDecoder(NetData.NetMessage.getDefaultInstance()));
 
+        p.addLast("frameLengthEncoder", new LengthFieldPrepender(3));
+        p.addLast("deflateEncoder", new Lz4FrameEncoder());
         p.addLast("frameEncoder", new ProtobufVarint32LengthFieldPrepender());
         p.addLast("protobufEncoder", new ProtobufEncoder());
+
         p.addLast("authenticationHandler", new ClientHandshakeHandler(joinStatus));
         p.addLast("connectionHandler", new ServerInfoRequestHandler());
     }
