@@ -35,6 +35,6 @@ public class GamePlayStatsComponent implements Component<GamePlayStatsComponent>
         this.blockPlacedMap = Maps.newHashMap(other.blockPlacedMap);
         this.distanceTraveled = other.distanceTraveled;
         this.playTimeMinute = other.playTimeMinute;
-        this.creatureKilled = other.creatureKilled;
+        this.creatureKilled = Maps.newHashMap(other.creatureKilled);
     }
 }

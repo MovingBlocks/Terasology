@@ -34,23 +34,23 @@ public final class CharacterSoundComponent implements Component<CharacterSoundCo
 
     @Override
     public void copy(CharacterSoundComponent other) {
-        this.footstepSounds = other.footstepSounds;
-                this.damageSounds = other.damageSounds;
-        this.landingSounds = other.landingSounds;
-                this.jumpSounds = other.jumpSounds;
-        this.deathSounds = other.deathSounds;
-                this.respawnSounds = other.respawnSounds;
-        this.swimSounds = other.swimSounds;
-                this.enterWaterSounds = other.enterWaterSounds;
-        this.leaveWaterSounds = other.leaveWaterSounds;
-                this.footstepVolume = other.footstepVolume;
+        this.footstepSounds = Lists.newArrayList(other.footstepSounds);
+        this.damageSounds = Lists.newArrayList(other.damageSounds);
+        this.landingSounds = Lists.newArrayList(other.landingSounds);
+        this.jumpSounds = Lists.newArrayList(other.jumpSounds);
+        this.deathSounds = Lists.newArrayList(other.deathSounds);
+        this.respawnSounds = Lists.newArrayList(other.respawnSounds);
+        this.swimSounds = Lists.newArrayList(other.swimSounds);
+        this.enterWaterSounds = Lists.newArrayList(other.enterWaterSounds);
+        this.leaveWaterSounds = Lists.newArrayList(other.leaveWaterSounds);
+        this.footstepVolume = other.footstepVolume;
         this.damageVolume = other.damageVolume;
-                this.jumpVolume = other.jumpVolume;
+        this.jumpVolume = other.jumpVolume;
         this.landingVolume = other.landingVolume;
-                this.deathVolume = other.deathVolume;
+        this.deathVolume = other.deathVolume;
         this.respawnVolume = other.respawnVolume;
-                this.swimmingVolume = other.swimmingVolume;
+        this.swimmingVolume = other.swimmingVolume;
         this.diveVolume = other.diveVolume;
-                this.lastSoundTime = other.lastSoundTime;
+        this.lastSoundTime = other.lastSoundTime;
     }
 }
