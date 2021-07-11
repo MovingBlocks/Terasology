@@ -17,17 +17,24 @@ public class ListOfObjectComponent implements Component<ListOfObjectComponent> {
     @Override
     public void copy(ListOfObjectComponent other) {
         this.shortName = other.shortName;
-        this.elements = other.elements.stream().map((subElement -> {
-            SubElement newSub = new SubElement();
-            newSub.id = subElement.id;
-            newSub.type = subElement.type;
-            return newSub;
-        })).collect(Collectors.toList());
+        this.elements = other.elements.stream()
+                .map(SubElement::new)
+                .collect(Collectors.toList());
     }
 
     @MappedContainer
     public static class SubElement {
         public String id;
         public String type;
+
+        public SubElement() {
+
+        }
+
+        public SubElement(SubElement other) {
+            this();
+            this.id = other.id;
+            this.type = other.type;
+        }
     }
 }
