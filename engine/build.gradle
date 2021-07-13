@@ -8,6 +8,7 @@ plugins {
     id "org.jetbrains.gradle.plugin.idea-ext"
 }
 
+apply plugin: 'com.google.protobuf'
 // Grab all the common stuff like plugins to use, artifact repositories, code analysis config, etc
 apply from: "$rootDir/config/gradle/publish.gradle"
 
@@ -37,8 +38,15 @@ ext {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 sourceSets {
-    // Adjust output path (changed with the Gradle 6 upgrade, this puts it back)
-    main.java.outputDir = new File("$buildDir/classes")
+    main {
+        proto {
+            srcDir 'src/main/protobuf'
+        }
+        java {
+            // Adjust output path (changed with the Gradle 6 upgrade, this puts it back)
+            outputDir = new File("$buildDir/classes")
+        }
+    }
 }
 
 // Customizations for the main compilation configuration
@@ -136,6 +144,14 @@ dependencies {
     implementation group: 'org.terasology.crashreporter', name: 'cr-terasology', version: '4.1.0'
 
     api(project(":subsystems:TypeHandlerLibrary"))
+}
+
+protobuf {
+    protoc {
+        artifact = 'com.google.protobuf:protoc:3.17.0'
+    }
+    plugins {
+    }
 }
 
 // Instructions for packaging a jar file for the engine
