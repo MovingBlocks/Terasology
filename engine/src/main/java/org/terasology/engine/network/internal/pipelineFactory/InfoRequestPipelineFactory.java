@@ -12,8 +12,6 @@ import io.netty.handler.codec.compression.Lz4FrameDecoder;
 import io.netty.handler.codec.compression.Lz4FrameEncoder;
 import io.netty.handler.codec.protobuf.ProtobufDecoder;
 import io.netty.handler.codec.protobuf.ProtobufEncoder;
-import io.netty.handler.codec.protobuf.ProtobufVarint32FrameDecoder;
-import io.netty.handler.codec.protobuf.ProtobufVarint32LengthFieldPrepender;
 import org.terasology.engine.network.internal.ClientHandshakeHandler;
 import org.terasology.engine.network.internal.JoinStatusImpl;
 import org.terasology.engine.network.internal.MetricRecordingHandler;
@@ -32,14 +30,12 @@ public class InfoRequestPipelineFactory extends ChannelInitializer {
         ChannelPipeline p = ch.pipeline();
         p.addLast(MetricRecordingHandler.NAME, new MetricRecordingHandler());
 
-        p.addLast("lengthFrameDecoder", new LengthFieldBasedFrameDecoder(8388608, 0, 3, 0, 3));
         p.addLast("inflateDecoder", new Lz4FrameDecoder());
-        p.addLast("frameDecoder", new ProtobufVarint32FrameDecoder());
+        p.addLast("lengthFrameDecoder", new LengthFieldBasedFrameDecoder(8388608, 0, 3, 0, 3));
         p.addLast("protobufDecoder", new ProtobufDecoder(NetData.NetMessage.getDefaultInstance()));
 
+        p.addLast("deflateEncoder", new Lz4FrameEncoder(true));
         p.addLast("frameLengthEncoder", new LengthFieldPrepender(3));
-        p.addLast("deflateEncoder", new Lz4FrameEncoder());
-        p.addLast("frameEncoder", new ProtobufVarint32LengthFieldPrepender());
         p.addLast("protobufEncoder", new ProtobufEncoder());
 
         p.addLast("authenticationHandler", new ClientHandshakeHandler(joinStatus));
