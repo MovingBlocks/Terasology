@@ -6,7 +6,6 @@ package org.terasology.engine.world.chunks.remoteChunkProvider;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
-import org.joml.Vector3f;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.slf4j.Logger;
@@ -14,28 +13,26 @@ import org.slf4j.LoggerFactory;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.logic.players.LocalPlayer;
 import org.terasology.engine.monitoring.chunk.ChunkMonitor;
+import org.terasology.engine.world.block.BlockManager;
+import org.terasology.engine.world.block.BlockRegion;
 import org.terasology.engine.world.block.BlockRegionc;
+import org.terasology.engine.world.chunks.Chunk;
+import org.terasology.engine.world.chunks.ChunkProvider;
+import org.terasology.engine.world.chunks.event.BeforeChunkUnload;
+import org.terasology.engine.world.chunks.event.OnChunkLoaded;
+import org.terasology.engine.world.chunks.pipeline.ChunkProcessingPipeline;
+import org.terasology.engine.world.chunks.pipeline.stages.ChunkTaskProvider;
 import org.terasology.engine.world.internal.ChunkViewCore;
 import org.terasology.engine.world.internal.ChunkViewCoreImpl;
 import org.terasology.engine.world.propagation.light.InternalLightProcessor;
 import org.terasology.engine.world.propagation.light.LightMerger;
-import org.terasology.engine.world.block.BlockManager;
-import org.terasology.engine.world.block.BlockRegion;
-import org.terasology.engine.world.chunks.Chunk;
-import org.terasology.engine.world.chunks.ChunkProvider;
-import org.terasology.engine.world.chunks.Chunks;
-import org.terasology.engine.world.chunks.event.BeforeChunkUnload;
-import org.terasology.engine.world.chunks.event.OnChunkLoaded;
-import org.terasology.engine.world.chunks.pipeline.ChunkProcessingPipeline;
-import org.terasology.engine.world.chunks.pipeline.PositionFuture;
-import org.terasology.engine.world.chunks.pipeline.stages.ChunkTaskProvider;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.FluxSink;
 
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.Future;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -61,11 +58,11 @@ public class RemoteChunkProvider implements ChunkProvider {
     private final ChunkProcessingPipeline loadingPipeline;
     private EntityRef worldEntity = EntityRef.NULL;
     private ChunkReadyListener listener;
+    private FluxSink<Chunk> chunkSink;
 
     public RemoteChunkProvider(BlockManager blockManager, LocalPlayer localPlayer) {
         this.blockManager = blockManager;
-        loadingPipeline = new ChunkProcessingPipeline(this::getChunk,
-            new LocalPlayerRelativeChunkComparator(localPlayer));
+        loadingPipeline = new ChunkProcessingPipeline(this::getChunk, Flux.push(sink -> chunkSink = sink));
 
         loadingPipeline.addStage(
             ChunkTaskProvider.create("Chunk generate internal lightning",
@@ -91,7 +88,7 @@ public class RemoteChunkProvider implements ChunkProvider {
 
 
     public void receiveChunk(final Chunk chunk) {
-        loadingPipeline.invokePipeline(chunk);
+        chunkSink.next(chunk);
     }
 
     public void invalidateChunks(Vector3ic pos) {
@@ -197,22 +194,5 @@ public class RemoteChunkProvider implements ChunkProvider {
     @Override
     public void setWorldEntity(EntityRef entity) {
         this.worldEntity = entity;
-    }
-
-    private final class LocalPlayerRelativeChunkComparator implements Comparator<Future<Chunk>> {
-        private final LocalPlayer localPlayer;
-
-        private LocalPlayerRelativeChunkComparator(LocalPlayer localPlayer) {
-            this.localPlayer = localPlayer;
-        }
-
-        @Override
-        public int compare(Future<Chunk> o1, Future<Chunk> o2) {
-            return score((PositionFuture<?>) o1) - score((PositionFuture<?>) o2);
-        }
-
-        private int score(PositionFuture<?> task) {
-            return (int) Chunks.toChunkPos(localPlayer.getPosition(new Vector3f()), new Vector3i()).distance(task.getPosition());
-        }
     }
 }
