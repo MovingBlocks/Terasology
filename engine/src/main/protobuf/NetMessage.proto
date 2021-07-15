@@ -133,11 +133,11 @@ message JoinCompleteMessage {
 
 message ServerInfoMessage {
     repeated ModuleInfo module = 1;
-    repeated sint32 blockId = 2 [packed=true];
+    repeated sint32 blockId = 2;
     repeated string blockName = 3;
     repeated SerializationInfo component = 4;
     repeated SerializationInfo event = 5;
-    repeated int32 assetId = 6 [packed=true];
+    repeated int32 assetId = 6;
     repeated string assetUri = 7;
     repeated string registerBlockFamily = 8;
     repeated WorldInfo worldInfo = 9;

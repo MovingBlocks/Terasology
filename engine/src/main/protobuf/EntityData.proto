@@ -4,11 +4,11 @@ option java_outer_classname = "EntityData";
 option optimize_for = SPEED;
 
 message Value {
-    repeated double double = 1 [packed=true];
-    repeated float float = 2 [packed=true];
-    repeated sint32 integer = 3 [packed=true];
-    repeated sint64 long = 4 [packed=true];
-    repeated bool boolean = 5 [packed=true];
+    repeated double double = 1;
+    repeated float float = 2;
+    repeated sint32 integer = 3;
+    repeated sint64 long = 4;
+    repeated bool boolean = 5;
     repeated string string = 6;
     optional bytes bytes = 7;
     repeated Value value = 8;
@@ -32,7 +32,7 @@ message Component {
 message Entity {
     optional int64 id = 1;
     repeated Component component = 2;
-    repeated int32 removed_component_index = 3 [packed=true];
+    repeated int32 removed_component_index = 3;
     optional string parent_prefab = 4;
     optional bool alwaysRelevant = 5;
     optional int64 owner = 6;
@@ -48,11 +48,11 @@ message Entity {
 
 message PackedEntity {
     optional int64 id = 1;
-    repeated int32 componentId = 2 [packed=true];
+    repeated int32 componentId = 2;
     optional bytes componentFieldCounts = 3;
     optional bytes fieldIds = 4;
     repeated Value fieldValue = 5;
-    repeated int32 removedComponent = 6 [packed=true];
+    repeated int32 removedComponent = 6;
     optional int64 owner = 7;
     optional string parentPrefabUri = 16;
 }
@@ -79,7 +79,7 @@ message EntityStore {
 
     // These are paired, with entityNamed referencing entity id
     repeated string entityName = 2;
-    repeated int64  entityNamed = 4 [packed = true];
+    repeated int64  entityNamed = 4;
 
 }
 
@@ -111,12 +111,12 @@ message ChunkStore {
 }
 
 message RunLengthEncoding16 {
-    repeated sint32 runLengths = 1 [packed=true];
-    repeated sint32 values = 2 [packed=true];
+    repeated sint32 runLengths = 1;
+    repeated sint32 values = 2;
 }
 
 message RunLengthEncoding8 {
-    repeated sint32 runLengths = 1 [packed=true];
+    repeated sint32 runLengths = 1;
     optional bytes values = 2;
 }
 
