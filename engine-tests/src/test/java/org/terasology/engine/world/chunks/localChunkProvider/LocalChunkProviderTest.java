@@ -44,7 +44,7 @@ import static org.mockito.Mockito.when;
 
 class LocalChunkProviderTest {
 
-    private static final int WAIT_CHUNK_IS_READY_IN_SECONDS = 5;
+    private static final int WAIT_CHUNK_IS_READY_IN_SECONDS = 30;
 
     private LocalChunkProvider chunkProvider;
     private EntityManager entityManager;
