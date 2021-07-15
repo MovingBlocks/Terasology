@@ -157,11 +157,9 @@ class LocalChunkProviderTest {
         final ArgumentCaptor<Event> blockEventCaptor = ArgumentCaptor.forClass(Event.class);
         verify(blockAtBlockManager.getEntity(), atLeast(1)).send(blockEventCaptor.capture());
 
-        Event mustBeOnActivatedBlocks = blockEventCaptor.getAllValues().get(0);
-        Assertions.assertTrue(mustBeOnActivatedBlocks instanceof OnActivatedBlocks,
-                "First block event must be OnActivatedBlocks");
-        Assertions.assertTrue(((OnActivatedBlocks) mustBeOnActivatedBlocks).blockCount() > 0,
-                "Block count on activate must be non zero");
+        Assertions.assertTrue(blockEventCaptor.getAllValues().stream().anyMatch(x ->
+                x instanceof OnActivatedBlocks && ((OnActivatedBlocks) x).blockCount() > 0
+        ), "Must be OnActivatedBlocks event for chunk");
     }
 
     @Test
