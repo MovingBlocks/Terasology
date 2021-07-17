@@ -9,10 +9,8 @@ import org.terasology.engine.world.chunks.pipeline.stages.ChunkTask;
 import org.terasology.engine.world.chunks.pipeline.stages.ChunkTaskProvider;
 
 import java.util.List;
-import java.util.concurrent.locks.ReentrantLock;
 
 public final class ChunkProcessingInfo {
-    public final ReentrantLock lock = new ReentrantLock();
 
     private final Vector3ic position;
 
