@@ -122,13 +122,13 @@ public class ChunkProcessingPipeline {
     }
 
     private void processingInfoReactor() {
-        Queue<ChunkProcessingInfo> defer = Queues.newArrayDeque();
+        List<ChunkProcessingInfo> defer = Lists.newArrayList();
         ChunkProcessingInfo info;
         while ((info = processing.poll()) != null) {
             ChunkTask task = info.getChunkTask();
             if (task != null) {
-                List<Chunk> providedChunks = new ArrayList<>();
                 boolean satisfied = true;
+                List<Chunk> providedChunks = new ArrayList<>(10);
                 for (Vector3ic pos : task.getRequirements()) {
                     Chunk chunk = getChunkBy(info.getChunkTaskProvider(), pos);
                     // If we don't have all the requirements generated yet, skip it
