@@ -258,7 +258,7 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
     }
 
     @ReceiveEvent(components = CharacterComponent.class)
-    public void updateDirection(UpdateDirectionEvent event, EntityRef entity) {
+    public void setRotation(SetDirectionEvent event, EntityRef entity) {
         if (localPlayer.getCharacterEntity().equals(entity)) {
             lookPitch = event.getPitch();
             lookYaw = event.getYaw();

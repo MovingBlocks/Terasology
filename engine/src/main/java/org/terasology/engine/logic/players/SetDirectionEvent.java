@@ -5,15 +5,18 @@ package org.terasology.engine.logic.players;
 import org.terasology.engine.entitySystem.event.Event;
 import org.terasology.engine.network.OwnerEvent;
 
+/**
+ * Trigger event that sets the direction a player is facing.
+ */
 @OwnerEvent
-public class UpdateDirectionEvent implements Event {
+public class SetDirectionEvent implements Event {
     private float yaw;
     private float pitch;
 
-    protected UpdateDirectionEvent() {
+    protected SetDirectionEvent() {
     }
 
-    public UpdateDirectionEvent(float yaw, float pitch) {
+    public SetDirectionEvent(float yaw, float pitch) {
         this.yaw = yaw;
         this.pitch = pitch;
     }
