@@ -6,6 +6,7 @@ package org.terasology.engine.world.chunks.remoteChunkProvider;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
+import org.joml.Vector3f;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.slf4j.Logger;
@@ -18,6 +19,7 @@ import org.terasology.engine.world.block.BlockRegion;
 import org.terasology.engine.world.block.BlockRegionc;
 import org.terasology.engine.world.chunks.Chunk;
 import org.terasology.engine.world.chunks.ChunkProvider;
+import org.terasology.engine.world.chunks.Chunks;
 import org.terasology.engine.world.chunks.event.BeforeChunkUnload;
 import org.terasology.engine.world.chunks.event.OnChunkLoaded;
 import org.terasology.engine.world.chunks.pipeline.ChunkProcessingPipeline;
@@ -27,12 +29,13 @@ import org.terasology.engine.world.internal.ChunkViewCoreImpl;
 import org.terasology.engine.world.propagation.light.InternalLightProcessor;
 import org.terasology.engine.world.propagation.light.LightMerger;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.FluxSink;
 
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.PriorityBlockingQueue;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -58,11 +61,21 @@ public class RemoteChunkProvider implements ChunkProvider {
     private final ChunkProcessingPipeline loadingPipeline;
     private EntityRef worldEntity = EntityRef.NULL;
     private ChunkReadyListener listener;
-    private FluxSink<Chunk> chunkSink;
+    private BlockingQueue<Chunk> receivedChunks;
 
     public RemoteChunkProvider(BlockManager blockManager, LocalPlayer localPlayer) {
         this.blockManager = blockManager;
-        loadingPipeline = new ChunkProcessingPipeline(this::getChunk, Flux.push(sink -> chunkSink = sink));
+        loadingPipeline = new ChunkProcessingPipeline(this::getChunk, Flux.create(sink -> sink.onRequest(num -> {
+            try {
+                for (int i = 0; i < num; i++) {
+                    Chunk chunk = receivedChunks.take();
+                    sink.next(chunk);
+                }
+            } catch (InterruptedException e) {
+                sink.error(e);
+            }
+        })));
+        receivedChunks = new PriorityBlockingQueue<>(64, new LocalPlayerRelativeChunkComparator(localPlayer));
 
         loadingPipeline.addStage(
             ChunkTaskProvider.create("Chunk generate internal lightning",
@@ -88,7 +101,7 @@ public class RemoteChunkProvider implements ChunkProvider {
 
 
     public void receiveChunk(final Chunk chunk) {
-        chunkSink.next(chunk);
+        receivedChunks.add(chunk);
     }
 
     public void invalidateChunks(Vector3ic pos) {
@@ -194,5 +207,22 @@ public class RemoteChunkProvider implements ChunkProvider {
     @Override
     public void setWorldEntity(EntityRef entity) {
         this.worldEntity = entity;
+    }
+
+    private static final class LocalPlayerRelativeChunkComparator implements Comparator<Chunk> {
+        private final LocalPlayer localPlayer;
+
+        private LocalPlayerRelativeChunkComparator(LocalPlayer localPlayer) {
+            this.localPlayer = localPlayer;
+        }
+
+        @Override
+        public int compare(Chunk o1, Chunk o2) {
+            return score(o1) - score(o2);
+        }
+
+        private int score(Chunk chunk) {
+            return (int) Chunks.toChunkPos(localPlayer.getPosition(new Vector3f()), new Vector3i()).distance(chunk.getPosition());
+        }
     }
 }
