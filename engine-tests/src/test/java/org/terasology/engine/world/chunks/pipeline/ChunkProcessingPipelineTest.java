@@ -50,7 +50,7 @@ class ChunkProcessingPipelineTest extends TerasologyTestingEnvironment {
 
     @Test
     void simpleProcessingSuccess() throws InterruptedException {
-        pipeline = new ChunkProcessingPipeline((p) -> null, Flux.create(sink -> {
+        pipeline = new ChunkProcessingPipeline((p) -> null, Flux.push(sink -> {
             chunkSink = sink;
         }));
 
@@ -73,7 +73,7 @@ class ChunkProcessingPipelineTest extends TerasologyTestingEnvironment {
 
     @Test
     void simpleStopProcessingSuccess() {
-        pipeline = new ChunkProcessingPipeline((p) -> null, Flux.create(sink -> {
+        pipeline = new ChunkProcessingPipeline((p) -> null, Flux.push(sink -> {
             chunkSink = sink;
         }));
 
@@ -111,7 +111,7 @@ class ChunkProcessingPipelineTest extends TerasologyTestingEnvironment {
                                 Function.identity()
                         ));
 
-        pipeline = new ChunkProcessingPipeline(chunkCache::get, Flux.create(sink -> {
+        pipeline = new ChunkProcessingPipeline(chunkCache::get, Flux.push(sink -> {
             chunkSink = sink;
         }));
         pipeline.addStage(ChunkTaskProvider.createMulti(
@@ -149,7 +149,7 @@ class ChunkProcessingPipelineTest extends TerasologyTestingEnvironment {
                         .map(this::createChunkAt)
                         .collect(Collectors.toList());
 
-        pipeline = new ChunkProcessingPipeline((p) -> null, Flux.create(sink -> {
+        pipeline = new ChunkProcessingPipeline((p) -> null, Flux.push(sink -> {
             chunkSink = sink;
         }));
         pipeline.addStage(ChunkTaskProvider.createMulti(
@@ -184,7 +184,7 @@ class ChunkProcessingPipelineTest extends TerasologyTestingEnvironment {
     void emulateEntityMoving() throws InterruptedException {
         final AtomicReference<Vector3ic> position = new AtomicReference<>();
         Map<Vector3ic, Chunk> chunkCache = Maps.newConcurrentMap();
-        pipeline = new ChunkProcessingPipeline(chunkCache::get, Flux.create(sink -> {
+        pipeline = new ChunkProcessingPipeline(chunkCache::get, Flux.push(sink -> {
             chunkSink = sink;
         }));
         pipeline.addStage(ChunkTaskProvider.createMulti(

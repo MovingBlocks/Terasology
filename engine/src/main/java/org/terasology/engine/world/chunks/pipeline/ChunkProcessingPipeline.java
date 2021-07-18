@@ -77,8 +77,11 @@ public class ChunkProcessingPipeline {
                 @Override
                 public void hookOnComplete() {
                     processNewChunks(buffer);
-                    synchronized (completeSignal) {
-                        completeSignal.notifyAll();
+                    subs.remove(sub);
+                    if (subs.isEmpty()) {
+                        synchronized (completeSignal) {
+                            completeSignal.notifyAll();
+                        }
                     }
                 }
             });
