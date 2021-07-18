@@ -105,7 +105,6 @@ public class ChunkProcessingPipeline {
     }
 
     private void processNewChunks(List<Chunk> chunks) {
-//        Queue<ChunkProcessingInfo> processing = Queues.newArrayDeque();
         for (Chunk chunk : chunks) {
             Vector3ic position = chunk.getPosition();
             if (chunkProcessingInfoMap.containsKey(position)) {
@@ -124,8 +123,8 @@ public class ChunkProcessingPipeline {
 
     private void processingInfoReactor() {
         Queue<ChunkProcessingInfo> defer = Queues.newArrayDeque();
-        while (processing.size() > 0) {
-            ChunkProcessingInfo info = processing.remove();
+        ChunkProcessingInfo info;
+        while ((info = processing.poll()) != null) {
             ChunkTask task = info.getChunkTask();
             if (task != null) {
                 List<Chunk> providedChunks = new ArrayList<>();
