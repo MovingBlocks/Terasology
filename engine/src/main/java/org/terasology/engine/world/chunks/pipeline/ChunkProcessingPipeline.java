@@ -111,7 +111,7 @@ public class ChunkProcessingPipeline {
         for (Chunk chunk : chunks) {
             Vector3ic position = chunk.getPosition();
             if (chunkProcessingInfoMap.containsKey(position)) {
-                logger.error("DUPLICATE CHUNK!!!!");
+                logger.warn("Requested processing chunk that was already processing");
             }
 
             ChunkProcessingInfo chunkProcessingInfo = new ChunkProcessingInfo(position);

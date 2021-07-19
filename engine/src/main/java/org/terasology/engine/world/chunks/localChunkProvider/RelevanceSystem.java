@@ -117,6 +117,9 @@ public class RelevanceSystem implements UpdateSubscriberSystem {
         }
     }
 
+    /**
+     * @return All chunks in the relevant regions which haven't been generated yet.
+     */
     public Stream<Vector3i> neededChunks() {
         return regions.values()
                 .stream()

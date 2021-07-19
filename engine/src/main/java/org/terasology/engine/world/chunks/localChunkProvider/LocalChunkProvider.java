@@ -410,10 +410,10 @@ public class LocalChunkProvider implements ChunkProvider {
     }
 
     private void updateList() {
+        chunksInRange.removeIf(x -> !relevanceSystem.isChunkInRegions(x) || isChunkReady(x));
         relevanceSystem.neededChunks()
                 .filter(pos -> !chunksInRange.contains(pos))
                 .forEach(chunksInRange::add);
-        chunksInRange.removeIf(x -> !relevanceSystem.isChunkInRegions(x) || isChunkReady(x));
         chunksInRange.sort(relevanceSystem.createChunkPosComparator().reversed());
     }
 
@@ -435,11 +435,16 @@ public class LocalChunkProvider implements ChunkProvider {
         return anyChanged;
     }
 
+    /**
+     * Loads a chunk if possible, otherwise generates it.
+     *
+     * @return The chunk at `pos`, ready for submitting to the ChunkProcessingPipeline.
+     */
     private Chunk genChunk(Vector3ic pos) {
         ChunkStore chunkStore = storageManager.loadChunkStore(pos);
         Chunk chunk;
-        EntityBufferImpl buffer = new EntityBufferImpl();
         if (chunkStore == null) {
+            EntityBufferImpl buffer = new EntityBufferImpl();
             chunk = new ChunkImpl(pos, blockManager, extraDataManager);
             generator.createChunk(chunk, buffer);
             generateQueuedEntities.put(chunk.getPosition(), buffer.getAll());
@@ -451,37 +456,35 @@ public class LocalChunkProvider implements ChunkProvider {
 
     private Flux<Chunk> chunkFlux() {
         Set<Vector3ic> currentlyProcessing = new HashSet<>();
-        return Flux.create(sink -> {
-            sink.onRequest(numChunks -> {
-                // Figuring out the positions to generate needs to be synchronized
-                List<Vector3ic> positionsPending = new ArrayList<>();
-                synchronized (this) {
-                    if (checkForUpdate()) {
-                        updateList();
+        return Flux.create(sink -> sink.onRequest(numChunks -> {
+            // Figuring out the positions to generate needs to be synchronized
+            List<Vector3ic> positionsPending = new ArrayList<>();
+            synchronized (this) {
+                if (checkForUpdate()) {
+                    updateList();
+                }
+
+                currentlyProcessing.removeAll(loadingPipeline.getProcessingPositions());
+
+                while (positionsPending.size() < numChunks && !chunksInRange.isEmpty()) {
+                    Vector3ic pos = chunksInRange.remove(chunksInRange.size() - 1);
+                    if (currentlyProcessing.contains(pos) || loadingPipeline.isPositionProcessing(pos)) {
+                        continue;
                     }
 
-                    currentlyProcessing.removeAll(loadingPipeline.getProcessingPositions());
-
-                    while (positionsPending.size() < numChunks && !chunksInRange.isEmpty()) {
-                        Vector3ic pos = chunksInRange.remove(chunksInRange.size() - 1);
-                        if (currentlyProcessing.contains(pos) || loadingPipeline.isPositionProcessing(pos)) {
-                            continue;
-                        }
-
-                        positionsPending.add(pos);
-                        currentlyProcessing.add(pos);
-                    }
+                    positionsPending.add(pos);
+                    currentlyProcessing.add(pos);
                 }
+            }
 
-                // Generating the actual chunks can be done completely asynchronously
-                for (Vector3ic pos : positionsPending) {
-                    sink.next(genChunk(pos));
-                }
-                if (shouldComplete && chunksInRange.isEmpty()) {
-                    sink.complete();
-                }
-            });
-        });
+            // Generating the actual chunks can be done completely asynchronously
+            for (Vector3ic pos : positionsPending) {
+                sink.next(genChunk(pos));
+            }
+            if (shouldComplete && chunksInRange.isEmpty()) {
+                sink.complete();
+            }
+        }));
     }
 
     /**
