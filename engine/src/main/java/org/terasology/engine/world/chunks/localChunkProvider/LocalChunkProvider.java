@@ -458,13 +458,11 @@ public class LocalChunkProvider implements ChunkProvider {
         Set<Vector3ic> currentlyProcessing = new HashSet<>();
         return Flux.create(sink -> sink.onRequest(numChunks -> {
             // Figuring out the positions to generate needs to be synchronized
-            List<Vector3ic> positionsPending = new ArrayList<>();
+            List<Vector3ic> positionsPending = new ArrayList<>((int) numChunks);
             synchronized (this) {
                 if (checkForUpdate()) {
                     updateList();
                 }
-
-                currentlyProcessing.removeAll(loadingPipeline.getProcessingPositions());
 
                 while (positionsPending.size() < numChunks && !chunksInRange.isEmpty()) {
                     Vector3ic pos = chunksInRange.remove(chunksInRange.size() - 1);
@@ -479,6 +477,10 @@ public class LocalChunkProvider implements ChunkProvider {
 
             // Generating the actual chunks can be done completely asynchronously
             for (Vector3ic pos : positionsPending) {
+                currentlyProcessing.remove(pos);
+                // The first time the onRequest lambda is called, when it submits its last chunk, this call to next() won't return
+                // because Reactor puts the event loop logic inside the next() function and the pipeline keeps requesting more chunks.
+                // So removing the position from currentlyProcessing and anything else that needs to happen must come before this call.
                 sink.next(genChunk(pos));
             }
             if (shouldComplete && chunksInRange.isEmpty()) {

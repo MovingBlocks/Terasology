@@ -232,6 +232,7 @@ public class ChunkProcessingPipeline {
         if (removed == null) {
             return;
         }
+        processing.remove(removed);
 
         Chunk chunk = removed.getChunk();
         if (chunk != null) {
