@@ -53,10 +53,19 @@ public class ChunkProcessingPipeline {
      * Create ChunkProcessingPipeline.
      */
     public ChunkProcessingPipeline(Function<Vector3ic, Chunk> chunkProvider, Flux<Chunk> chunkStream) {
+        this(chunkProvider, chunkStream, true);
+    }
+
+    /**
+     * @param threaded Whether to use worker threads to generate chunks. If it's false, all processing will be done on the main thread.
+     * It should be set to false in tests that request processing of specific chunks.
+     * Always true in a real game.
+     */
+    protected ChunkProcessingPipeline(Function<Vector3ic, Chunk> chunkProvider, Flux<Chunk> chunkStream, boolean threaded) {
         this.chunkProvider = chunkProvider;
         scheduler = Schedulers.newParallel("chunk processing", NUM_TASK_THREADS);
-        Flux<Chunk> stream = chunkStream.subscribeOn(scheduler);
-        for (int i = 0; i < NUM_TASK_THREADS; i++) {
+        Flux<Chunk> stream = threaded ? chunkStream.subscribeOn(scheduler) : chunkStream;
+        for (int i = 0; i < (threaded ? NUM_TASK_THREADS : 1); i++) {
             stream.subscribe(new BaseSubscriber<Chunk>() {
                 private final List<Chunk> buffer = new ArrayList<>();
                 private Subscription sub;
@@ -65,6 +74,9 @@ public class ChunkProcessingPipeline {
                 public void hookOnSubscribe(Subscription sub) {
                     this.sub = sub;
                     subs.add(sub);
+                    if (!threaded) {
+                        sub.request(CHUNKS_AT_ONCE);
+                    }
                 }
 
                 @Override

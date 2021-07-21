@@ -94,7 +94,7 @@ class LocalChunkProviderTest {
         playerEntity = mock(EntityRef.class);
         when(playerEntity.exists()).thenReturn(true);
         when(playerEntity.getComponent(LocationComponent.class)).thenReturn(new LocationComponent(new Vector3f(chunkPosition)));
-        Vector3i distance = new Vector3i(radius * 2, radius * 2, radius * 2);
+        Vector3i distance = new Vector3i(radius, radius, radius);
         relevanceSystem.addRelevanceEntity(playerEntity, distance, null);
         chunkProvider.notifyRelevanceChanged();
     }
