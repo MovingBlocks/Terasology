@@ -19,9 +19,6 @@ import org.terasology.engine.rendering.nui.widgets.JsonEditorTreeView;
 import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.gestalt.assets.exceptions.InvalidUrnException;
 import org.terasology.gestalt.assets.format.AssetDataFile;
-import org.terasology.gestalt.module.Module;
-import org.terasology.gestalt.module.resources.DirectoryFileSource;
-import org.terasology.gestalt.naming.Name;
 import org.terasology.input.Keyboard;
 import org.terasology.input.device.KeyboardDevice;
 import org.terasology.nui.Canvas;
@@ -46,10 +43,9 @@ import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import static com.google.common.base.Verify.verifyNotNull;
 
 /**
  * A base screen for the NUI screen/skin editors.
@@ -339,24 +335,16 @@ public abstract class AbstractEditorScreen extends CoreScreenLayer {
      * @return path to asset or null if module not present as source
      */
     protected Path getPath(AssetDataFile source) {
-        List<String> path = source.getPath();
-        Name moduleName = new Name(path.get(0));
-        Module module = verifyNotNull(moduleManager.getEnvironment().get(moduleName),
-                "Module \"%s\" not found in current module environment.", moduleName);
-        // TODO: Checking whether the module is present as source should not be done in `getPath()` as this has no
-        //  knowledge about what the path will be used for (read vs write access)
-        if (module.getResources() instanceof DirectoryFileSource) {
-            path.add(source.getFilename());
-            String[] pathArray = path.toArray(new String[path.size()]);
+        List<String> path = new ArrayList<>(source.getPath());
+        path.add(source.getFilename());
+        String[] pathArray = path.toArray(new String[path.size()]);
 
-            // Copy all the elements after the first to a separate array for getPath().
-            String first = pathArray[0];
-            String[] more = Arrays.copyOfRange(pathArray, 1, pathArray.length);
-            return Paths.get("", moduleManager.getEnvironment().getResources()
-                    .getFile(first, more)
-                    .orElseThrow(()-> new RuntimeException("Cannot get path for " + source.getFilename())).getPath().stream().toArray(String[]::new));
-        }
-        return null;
+        // Copy all the elements after the first to a separate array for getPath().
+        String first = pathArray[0];
+        String[] more = Arrays.copyOfRange(pathArray, 1, pathArray.length);
+        return Paths.get("", moduleManager.getEnvironment().getResources()
+                .getFile(first, more)
+                .orElseThrow(()-> new RuntimeException("Cannot get path for " + source.getFilename())).getPath().stream().toArray(String[]::new));
     }
 
     /**
