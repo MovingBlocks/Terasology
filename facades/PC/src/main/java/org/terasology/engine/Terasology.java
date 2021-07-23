@@ -41,6 +41,7 @@ import org.terasology.engine.rendering.nui.layers.mainMenu.savedGames.GameProvid
 import org.terasology.splash.SplashScreen;
 import org.terasology.splash.SplashScreenBuilder;
 import org.terasology.subsystem.discordrpc.DiscordRPCSubSystem;
+import reactor.core.publisher.Mono;
 
 import java.awt.GraphicsEnvironment;
 import java.io.IOException;
@@ -153,16 +154,18 @@ public final class Terasology {
                 engine.run(new StateHeadlessSetup());
             } else if (loadLastGame) {
                 engine.initialize(); //initialize the managers first
-                GameScheduler.boundedElastic().schedule(() -> {
+
+                Mono.fromRunnable(() -> {
                     GameManifest gameManifest = getLatestGameManifest();
                     if (gameManifest != null) {
                         engine.changeState(new StateLoading(gameManifest, NetworkMode.NONE));
                     }
-                });
+                }).subscribeOn(GameScheduler.boundedElastic()).subscribe();
+
             } else {
                 if (createLastGame) {
                     engine.initialize();
-                    GameScheduler.boundedElastic().schedule(() -> {
+                    Mono.fromRunnable(() -> {
                         GameManifest gameManifest = getLatestGameManifest();
                         if (gameManifest != null) {
                             String title = gameManifest.getTitle();
@@ -173,7 +176,7 @@ public final class Terasology {
                             }
                             engine.changeState(new StateLoading(gameManifest, NetworkMode.NONE));
                         }
-                    });
+                    }).subscribeOn(GameScheduler.boundedElastic()).subscribe();
                 }
 
                 engine.run(new StateMainMenu());

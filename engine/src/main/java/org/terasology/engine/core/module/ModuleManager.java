@@ -214,7 +214,7 @@ public class ModuleManager {
         permissionProviderFactory.getBasePermissionSet().grantPermission("com.google.gson", ReflectPermission.class);
         permissionProviderFactory.getBasePermissionSet().grantPermission("com.google.gson.internal", ReflectPermission.class);
 
-        // reactive x property permission
+        // reactor property permission
         permissionProviderFactory.getBasePermissionSet().grantPermission(new PropertyPermission("reactor.bufferSize.x", "read"));
         permissionProviderFactory.getBasePermissionSet().grantPermission(new PropertyPermission("reactor.bufferSize.small", "read"));
         permissionProviderFactory.getBasePermissionSet().grantPermission(new PropertyPermission("reactor.trace.operatorStacktrace", "read"));
