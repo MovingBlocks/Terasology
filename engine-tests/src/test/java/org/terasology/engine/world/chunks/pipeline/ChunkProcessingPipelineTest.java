@@ -22,8 +22,11 @@ import org.terasology.engine.world.chunks.blockdata.ExtraBlockDataManager;
 import org.terasology.engine.world.chunks.internal.ChunkImpl;
 import org.terasology.engine.world.chunks.pipeline.stages.ChunkTaskProvider;
 import org.terasology.gestalt.assets.management.AssetManager;
+import reactor.core.Disposable;
+import reactor.core.Disposables;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
+import reactor.core.scheduler.Scheduler;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -48,11 +51,36 @@ class ChunkProcessingPipelineTest extends TerasologyTestingEnvironment {
     private ChunkProcessingPipeline pipeline;
     private FluxSink<Chunk> chunkSink;
 
+    void initPipeline(Function<Vector3ic, Chunk> getCached) {
+        // Use a custom scheduler which runs everything immediately, on the same thread
+        pipeline = new ChunkProcessingPipeline(getCached, Flux.push(sink -> chunkSink = sink), new Scheduler() {
+            @Override
+            public Disposable schedule(Runnable task) {
+                task.run();
+                return Disposables.single();
+            }
+
+            @Override
+            public Worker createWorker() {
+                return new Worker() {
+                    @Override
+                    public Disposable schedule(Runnable task) {
+                        task.run();
+                        return Disposables.single();
+                    }
+
+                    @Override
+                    public void dispose() {
+
+                    }
+                };
+            }
+        });
+    }
+
     @Test
     void simpleProcessingSuccess() throws InterruptedException {
-        pipeline = new ChunkProcessingPipeline((p) -> null, Flux.push(sink -> {
-            chunkSink = sink;
-        }), false);
+        initPipeline(p -> null);
 
         Vector3i chunkPos = new Vector3i(0, 0, 0);
         Chunk chunk = createChunkAt(chunkPos);
@@ -63,6 +91,7 @@ class ChunkProcessingPipelineTest extends TerasologyTestingEnvironment {
 
         chunkSink.next(chunk);
         chunkSink.complete();
+        pipeline.notifyUpdate();
 
         Chunk chunkAfterProcessing = result.get(0);
 
@@ -72,9 +101,7 @@ class ChunkProcessingPipelineTest extends TerasologyTestingEnvironment {
 
     @Test
     void simpleStopProcessingSuccess() {
-        pipeline = new ChunkProcessingPipeline((p) -> null, Flux.push(sink -> {
-            chunkSink = sink;
-        }), false);
+        initPipeline(p -> null);
 
         Vector3i position = new Vector3i(0, 0, 0);
         Chunk chunk = createChunkAt(position);
@@ -89,6 +116,7 @@ class ChunkProcessingPipelineTest extends TerasologyTestingEnvironment {
 
         chunkSink.next(chunk);
         chunkSink.complete();
+        pipeline.notifyUpdate();
 
         pipeline.stopProcessingAt(position);
         Assertions.assertFalse(pipeline.isPositionProcessing(position));
@@ -110,9 +138,7 @@ class ChunkProcessingPipelineTest extends TerasologyTestingEnvironment {
                                 Function.identity()
                         ));
 
-        pipeline = new ChunkProcessingPipeline(chunkCache::get, Flux.push(sink -> {
-            chunkSink = sink;
-        }), false);
+        initPipeline(chunkCache::get);
         pipeline.addStage(ChunkTaskProvider.createMulti(
                 "flat merging task",
                 (chunks) -> chunks.stream()
@@ -127,6 +153,7 @@ class ChunkProcessingPipelineTest extends TerasologyTestingEnvironment {
 
         chunkSink.next(chunk);
         chunkSink.complete();
+        pipeline.notifyUpdate();
 
         Chunk chunkAfterProcessing = result.get(0);
 
@@ -147,9 +174,7 @@ class ChunkProcessingPipelineTest extends TerasologyTestingEnvironment {
                         .map(this::createChunkAt)
                         .collect(Collectors.toList());
 
-        pipeline = new ChunkProcessingPipeline((p) -> null, Flux.push(sink -> {
-            chunkSink = sink;
-        }), false);
+        initPipeline(p -> null);
         pipeline.addStage(ChunkTaskProvider.createMulti(
                 "flat merging task",
                 (chunks) -> chunks.stream()
@@ -170,6 +195,7 @@ class ChunkProcessingPipelineTest extends TerasologyTestingEnvironment {
 
         chunkToGenerate.forEach(chunkSink::next);
         chunkSink.complete();
+        pipeline.notifyUpdate();
 
         Chunk chunkAfterProcessing = result.get(0);
 
@@ -181,9 +207,7 @@ class ChunkProcessingPipelineTest extends TerasologyTestingEnvironment {
     void emulateEntityMoving() throws InterruptedException {
         final AtomicReference<Vector3ic> position = new AtomicReference<>();
         Map<Vector3ic, Chunk> chunkCache = Maps.newConcurrentMap();
-        pipeline = new ChunkProcessingPipeline(chunkCache::get, Flux.push(sink -> {
-            chunkSink = sink;
-        }), false);
+        initPipeline(chunkCache::get);
         pipeline.addStage(ChunkTaskProvider.createMulti(
                 "flat merging task",
                 (chunks) -> chunks.stream()
@@ -217,6 +241,8 @@ class ChunkProcessingPipelineTest extends TerasologyTestingEnvironment {
                     }
             );
             relativeRegion = newRegion;
+
+            pipeline.notifyUpdate();
 
             Assertions.assertTrue(Sets.difference(chunkCache.keySet(), relativeRegion).isEmpty(), "We must haven't " +
                     "chunks not related to relativeRegion");
