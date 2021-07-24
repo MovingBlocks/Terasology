@@ -104,7 +104,7 @@ public class StateIngame implements GameState {
         chunkProvider.dispose();
 
         boolean save = networkSystem.getMode().isAuthority();
-        if (save) {
+        if (save && storageManager != null) {
             storageManager.waitForCompletionOfPreviousSaveAndStartSaving();
         }
 
