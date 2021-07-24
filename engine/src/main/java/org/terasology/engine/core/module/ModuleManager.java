@@ -41,7 +41,6 @@ import java.net.JarURLConnection;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.security.Policy;
 import java.util.Arrays;
 import java.util.Collection;
@@ -148,6 +147,7 @@ public class ModuleManager {
     }
 
     private void loadModulesFromClassPath() {
+        ClasspathCompromisingModuleFactory moduleFactory = (ClasspathCompromisingModuleFactory) this.moduleFactory;
         for (String metadata_name : moduleFactory.getModuleMetadataLoaderMap().keySet()) {
             Enumeration<URL> urls;
             try {
@@ -155,32 +155,10 @@ public class ModuleManager {
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-            Path relativePathFromModuleRoot = Paths.get(moduleFactory.getDefaultCodeSubpath(), metadata_name);
-            int relativeDepth = relativePathFromModuleRoot.getNameCount();
             while (urls.hasMoreElements()) {
                 URL url = urls.nextElement();
-                Path path;
-                try {
-                    path = Paths.get(url.toURI());
-                } catch (URISyntaxException e) {
-                    throw new RuntimeException(e);
-                }
-                logger.warn(" 🌷 Might be a module in U:{} P:{}", url, path);
-                // TODO: test case for metadata file in code subpath
-                if (path.endsWith(relativePathFromModuleRoot)) {
-                    Path parentPath = path.subpath(0, path.getNameCount() - relativeDepth);
-                    if (path.getRoot() != null) {
-                        parentPath = path.getRoot().resolve(parentPath);
-                    }
-                    if (parentPath.toFile().exists()) {
-                        logger.warn(" +-🌷 Could be built from here {}", parentPath);
-                        path = parentPath;
-                    } else {
-                        logger.warn(" +-🥀 Does this not exist? P:{} F:{}", parentPath, parentPath.toFile());
-                    }
-                } else {
-                    logger.warn(" +-🌷 does not seem to be in a build directory");
-                }
+                logger.debug("Probably a module in U:{}", url);
+                Path path = moduleFactory.canonicalModuleLocation(metadata_name, url);
                 Module module;
                 try {
                     module = moduleFactory.createModule(path.toFile());
