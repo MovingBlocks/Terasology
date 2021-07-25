@@ -135,7 +135,7 @@ class ClasspathCompromisingModuleFactory extends ModuleFactory {
             }
             return Optional.of(parentPath);
         } else {
-            logger.warn(" +- does not seem to be in a build directory {}", path);
+            logger.warn("does not seem to be in a build directory {}", path);
             return Optional.empty();
         }
     }
