@@ -31,6 +31,9 @@ import org.terasology.fixtures.TestBlockManager;
 import org.terasology.fixtures.TestChunkStore;
 import org.terasology.fixtures.TestStorageManager;
 import org.terasology.fixtures.TestWorldGenerator;
+import reactor.core.Disposable;
+import reactor.core.Disposables;
+import reactor.core.scheduler.Scheduler;
 
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
@@ -82,7 +85,30 @@ class LocalChunkProviderTest {
         chunkProvider.setBlockEntityRegistry(blockEntityRegistry);
         chunkProvider.setWorldEntity(worldEntity);
         relevanceSystem = new RelevanceSystem(chunkProvider);
-        chunkProvider.setRelevanceSystem(relevanceSystem); // workaround. initialize loading pipeline
+        // workaround. initialize loading pipeline
+        chunkProvider.setRelevanceSystem(relevanceSystem, new Scheduler() {
+            @Override
+            public Disposable schedule(Runnable task) {
+                task.run();
+                return Disposables.single();
+            }
+
+            @Override
+            public Worker createWorker() {
+                return new Worker() {
+                    @Override
+                    public Disposable schedule(Runnable task) {
+                        task.run();
+                        return Disposables.single();
+                    }
+
+                    @Override
+                    public void dispose() {
+
+                    }
+                };
+            }
+        });
     }
 
     @AfterEach
@@ -103,15 +129,11 @@ class LocalChunkProviderTest {
         requestCreatingOrLoadingArea(chunkPosition, 2);
     }
 
-    private void waitForChunks() throws InterruptedException {
-        chunkProvider.testMarkCompleteAndWait(WAIT_CHUNK_IS_READY_IN_SECONDS * 1000);
-    }
-
     @Test
-    void testGenerateSingleChunk() throws InterruptedException {
+    void testGenerateSingleChunk() {
         Vector3i chunkPosition = new Vector3i(0, 0, 0);
         requestCreatingOrLoadingArea(chunkPosition);
-        waitForChunks();
+        chunkProvider.markComplete();
         chunkProvider.update();
 
         final ArgumentCaptor<Event> eventArgumentCaptor = ArgumentCaptor.forClass(Event.class);
@@ -130,12 +152,12 @@ class LocalChunkProviderTest {
     }
 
     @Test
-    void testGenerateSingleChunkWithBlockLifeCycle() throws InterruptedException {
+    void testGenerateSingleChunkWithBlockLifeCycle() {
         Vector3i chunkPosition = new Vector3i(0, 0, 0);
         blockAtBlockManager.setLifecycleEventsRequired(true);
         blockAtBlockManager.setEntity(mock(EntityRef.class));
         requestCreatingOrLoadingArea(chunkPosition);
-        waitForChunks();
+        chunkProvider.markComplete();
         chunkProvider.update();
 
         final ArgumentCaptor<Event> worldEventCaptor = ArgumentCaptor.forClass(Event.class);
@@ -163,14 +185,14 @@ class LocalChunkProviderTest {
     }
 
     @Test
-    void testLoadSingleChunk() throws InterruptedException {
+    void testLoadSingleChunk() {
         Vector3i chunkPosition = new Vector3i(0, 0, 0);
         Chunk chunk = new ChunkImpl(chunkPosition, blockManager, extraDataManager);
         generator.createChunk(chunk, null);
         storageManager.add(chunk);
 
         requestCreatingOrLoadingArea(chunkPosition);
-        waitForChunks();
+        chunkProvider.markComplete();
         chunkProvider.update();
 
         Assertions.assertTrue(((TestChunkStore) storageManager.loadChunkStore(chunkPosition)).isEntityRestored(),
@@ -184,7 +206,7 @@ class LocalChunkProviderTest {
     }
 
     @Test
-    void testLoadSingleChunkWithBlockLifecycle() throws InterruptedException {
+    void testLoadSingleChunkWithBlockLifecycle() {
         Vector3i chunkPosition = new Vector3i(0, 0, 0);
         Chunk chunk = new ChunkImpl(chunkPosition, blockManager, extraDataManager);
         generator.createChunk(chunk, null);
@@ -193,7 +215,7 @@ class LocalChunkProviderTest {
         blockAtBlockManager.setEntity(mock(EntityRef.class));
 
         requestCreatingOrLoadingArea(chunkPosition);
-        waitForChunks();
+        chunkProvider.markComplete();
         chunkProvider.update();
 
         Assertions.assertTrue(((TestChunkStore) storageManager.loadChunkStore(chunkPosition)).isEntityRestored(),
@@ -224,13 +246,13 @@ class LocalChunkProviderTest {
     }
 
     @Test
-    void testUnloadChunkAndDeactivationBlock() throws InterruptedException {
+    void testUnloadChunkAndDeactivationBlock() {
         Vector3i chunkPosition = new Vector3i(0, 0, 0);
         blockAtBlockManager.setLifecycleEventsRequired(true);
         blockAtBlockManager.setEntity(mock(EntityRef.class));
 
         requestCreatingOrLoadingArea(chunkPosition);
-        waitForChunks();
+        chunkProvider.markComplete();
         relevanceSystem.removeRelevanceEntity(playerEntity);
         chunkProvider.notifyRelevanceChanged();
 

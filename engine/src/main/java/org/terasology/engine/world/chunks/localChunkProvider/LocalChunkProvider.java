@@ -51,6 +51,7 @@ import org.terasology.engine.world.internal.ChunkViewCoreImpl;
 import org.terasology.engine.world.propagation.light.InternalLightProcessor;
 import org.terasology.engine.world.propagation.light.LightMerger;
 import reactor.core.publisher.Flux;
+import reactor.core.scheduler.Scheduler;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -490,21 +491,29 @@ public class LocalChunkProvider implements ChunkProvider {
     }
 
     /**
-     * Tells the ChunkProcessingPipeline that no more chunks are coming, then waits for chunk processing to finish.
+     * Tells the ChunkProcessingPipeline that no more chunks are coming after what's currently queued.
      * Intended for use in tests.
      */
-    protected void testMarkCompleteAndWait(long timeoutMillis) throws InterruptedException {
+    protected void markComplete() {
         shouldComplete = true;
-        loadingPipeline.waitUntilComplete(timeoutMillis);
+        loadingPipeline.notifyUpdate();
+    }
+
+    public void setRelevanceSystem(RelevanceSystem relevanceSystem) {
+        setRelevanceSystem(relevanceSystem, null);
     }
 
     // TODO: move loadingPipeline initialization into constructor.
-    public void setRelevanceSystem(RelevanceSystem relevanceSystem) {
+    public void setRelevanceSystem(RelevanceSystem relevanceSystem, Scheduler scheduler) {
         if (loadingPipeline != null) {
             loadingPipeline.shutdown();
         }
         this.relevanceSystem = relevanceSystem;
-        loadingPipeline = new ChunkProcessingPipeline(this::getChunk, chunkFlux());
+        if (scheduler != null) {
+            loadingPipeline = new ChunkProcessingPipeline(this::getChunk, chunkFlux(), scheduler);
+        } else {
+            loadingPipeline = new ChunkProcessingPipeline(this::getChunk, chunkFlux());
+        }
         loadingPipeline.addStage(
             ChunkTaskProvider.create("Chunk generate internal lightning",
                 (Consumer<Chunk>) InternalLightProcessor::generateInternalLighting))

@@ -79,7 +79,7 @@ class ChunkProcessingPipelineTest extends TerasologyTestingEnvironment {
     }
 
     @Test
-    void simpleProcessingSuccess() throws InterruptedException {
+    void simpleProcessingSuccess() {
         initPipeline(p -> null);
 
         Vector3i chunkPos = new Vector3i(0, 0, 0);
@@ -126,7 +126,7 @@ class ChunkProcessingPipelineTest extends TerasologyTestingEnvironment {
      * Imagine that we have task, which requires neighbors with same Z level. neighbors chunk already in chunk cache.
      */
     @Test
-    void multiRequirementsChunksExistsSuccess() throws InterruptedException {
+    void multiRequirementsChunksExistsSuccess() {
         Vector3i positionToGenerate = new Vector3i(0, 0, 0);
         Map<Vector3ic, Chunk> chunkCache =
                 getNearChunkPositions(positionToGenerate)

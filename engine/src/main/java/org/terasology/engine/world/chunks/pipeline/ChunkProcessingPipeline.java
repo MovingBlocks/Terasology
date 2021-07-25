@@ -59,7 +59,7 @@ public class ChunkProcessingPipeline {
     /**
      * @param scheduler The scheduler to use for running chunk processing threads.
      */
-    protected ChunkProcessingPipeline(Function<Vector3ic, Chunk> chunkProvider, Flux<Chunk> chunkStream, Scheduler scheduler) {
+    public ChunkProcessingPipeline(Function<Vector3ic, Chunk> chunkProvider, Flux<Chunk> chunkStream, Scheduler scheduler) {
         this.chunkProvider = chunkProvider;
         this.scheduler = scheduler;
         Flux<Chunk> stream = chunkStream.subscribeOn(scheduler);
@@ -95,13 +95,6 @@ public class ChunkProcessingPipeline {
                     }
                 }
             });
-        }
-    }
-
-    public void waitUntilComplete(long timeoutMillis) throws InterruptedException {
-        notifyUpdate();
-        synchronized (completeSignal) {
-            completeSignal.wait(timeoutMillis);
         }
     }
 
