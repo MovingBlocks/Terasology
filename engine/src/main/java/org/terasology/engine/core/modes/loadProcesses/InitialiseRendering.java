@@ -7,10 +7,10 @@ import org.terasology.engine.context.Context;
 import org.terasology.engine.core.modes.SingleStepLoadProcess;
 import org.terasology.engine.core.module.rendering.RenderingModuleRegistry;
 
-public class InitializeRendering extends SingleStepLoadProcess {
+public class InitialiseRendering extends SingleStepLoadProcess {
     private final Context context;
 
-    public InitializeRendering(Context context) {
+    public InitialiseRendering(Context context) {
         this.context = context;
     }
 
