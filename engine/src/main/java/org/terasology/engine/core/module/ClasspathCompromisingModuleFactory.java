@@ -94,17 +94,18 @@ class ClasspathCompromisingModuleFactory extends ModuleFactory {
         return findModuleRoot(relativePathFromModuleRoot, path).orElse(path);
     }
 
-    private Path modulePathFromMetadataJarUrl(URL url) {
-        checkArgument(url.getProtocol().equals("jar"), "Not a jar URL: %s", url);
+    private Path modulePathFromMetadataJarUrl(URL jarUrl) {
+        checkArgument(jarUrl.getProtocol().equals("jar"), "Not a jar URL: %s", jarUrl);
+        URL fileUrl;
         try {
-            JarURLConnection connection = (JarURLConnection) url.openConnection();
-            url = connection.getJarFileURL();
+            JarURLConnection connection = (JarURLConnection) jarUrl.openConnection();
+            fileUrl = connection.getJarFileURL();
             // despite the method name, openConnection doesn't open anything unless we
             // call connect(), so we needn't clean up anything here.
         } catch (IOException e) {
-            throw new RuntimeException("Failed to get file from " + url, e);
+            throw new RuntimeException("Failed to get file from " + jarUrl, e);
         }
-        Path path = fromUrl(url);
+        Path path = fromUrl(fileUrl);
         // We are considering the location of a jar file, so compare it to the libs path.
         Path relativePathFromModuleRoot = Paths.get(getDefaultLibsSubpath());
         // Assume jars would be directly in the libs path (not in a subdirectory).
