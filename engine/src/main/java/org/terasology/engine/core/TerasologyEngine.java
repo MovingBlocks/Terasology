@@ -174,7 +174,6 @@ public class TerasologyEngine implements GameEngine {
         this.allSubsystems.add(new GameSubsystem());
         this.allSubsystems.add(new I18nSubsystem());
         this.allSubsystems.add(new TelemetrySubSystem());
-//        this.allSubsystems.add(new ModuleRenderingSubsystem());
 
         // add all subsystem as engine module part. (needs for ECS classes loaded from external subsystems)
         allSubsystems.stream().map(Object::getClass).forEach(this::addToClassesOnClasspathsToAddToEngine);
@@ -488,7 +487,6 @@ public class TerasologyEngine implements GameEngine {
         }
 
         Iterator<Float> updateCycles = timeSubsystem.getEngineTime().tick();
-//        CoreRegistry.setContext(currentState.getContext());
         rootContext.get(NetworkSystem.class).setContext(currentState.getContext());
 
         for (EngineSubsystem subsystem : allSubsystems) {
