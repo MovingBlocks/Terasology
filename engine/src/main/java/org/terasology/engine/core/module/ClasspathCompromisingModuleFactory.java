@@ -86,11 +86,11 @@ class ClasspathCompromisingModuleFactory extends ModuleFactory {
         }
     }
 
-    private Path modulePathFromMetadataFileUrl(String metadata_name, URL url) {
+    private Path modulePathFromMetadataFileUrl(String metadataName, URL url) {
         Path path = fromUrl(url);
         // We are considering the location of a resource file, so compare it to the code path.
-        // Include the metadata_name in case it has path components of its own.
-        Path relativePathFromModuleRoot = Paths.get(getDefaultCodeSubpath(), metadata_name);
+        // Include the metadata name in case it has path components of its own.
+        Path relativePathFromModuleRoot = Paths.get(getDefaultCodeSubpath(), metadataName);
         return findModuleRoot(relativePathFromModuleRoot, path).orElse(path);
     }
 

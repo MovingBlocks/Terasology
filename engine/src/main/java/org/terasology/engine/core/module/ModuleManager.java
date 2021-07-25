@@ -148,17 +148,17 @@ public class ModuleManager {
 
     private void loadModulesFromClassPath() {
         ClasspathCompromisingModuleFactory moduleFactory = (ClasspathCompromisingModuleFactory) this.moduleFactory;
-        for (String metadata_name : moduleFactory.getModuleMetadataLoaderMap().keySet()) {
+        for (String metadataName : moduleFactory.getModuleMetadataLoaderMap().keySet()) {
             Enumeration<URL> urls;
             try {
-                urls = ClassLoader.getSystemResources(metadata_name);
+                urls = ClassLoader.getSystemResources(metadataName);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
             while (urls.hasMoreElements()) {
                 URL url = urls.nextElement();
                 logger.debug("Probably a module in U:{}", url);
-                Path path = moduleFactory.canonicalModuleLocation(metadata_name, url);
+                Path path = moduleFactory.canonicalModuleLocation(metadataName, url);
                 Module module;
                 try {
                     module = moduleFactory.createModule(path.toFile());
