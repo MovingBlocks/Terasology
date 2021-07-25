@@ -19,6 +19,10 @@ public enum DefaultColorSource implements BlockColorSource {
         public Colorc calcColor(int x, int y, int z) {
             if (colorProvider == null) {
                 colorProvider = CoreRegistry.get(ColorProvider.class);
+                // Return white as default if there aren't any color providers
+                if (colorProvider == null) {
+                    return Color.white;
+                }
             }
             return colorProvider.colorLut(x, y, z);
         }
@@ -28,6 +32,10 @@ public enum DefaultColorSource implements BlockColorSource {
         public Colorc calcColor(int x, int y, int z) {
             if (colorProvider == null) {
                 colorProvider = CoreRegistry.get(ColorProvider.class);
+                // Return white as default if there aren't any color providers
+                if (colorProvider == null) {
+                    return Color.white;
+                }
             }
             return colorProvider.foliageLut(x, y, z);
         }
