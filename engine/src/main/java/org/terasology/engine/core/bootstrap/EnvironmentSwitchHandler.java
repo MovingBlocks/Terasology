@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.config.flexible.AutoConfigManager;
 import org.terasology.engine.context.Context;
+import org.terasology.engine.core.TerasologyConstants;
 import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.engine.entitySystem.metadata.ComponentLibrary;
 import org.terasology.engine.entitySystem.metadata.EntitySystemLibrary;
@@ -28,6 +29,13 @@ import org.terasology.engine.persistence.typeHandling.extensionTypes.CollisionGr
 import org.terasology.engine.physics.CollisionGroup;
 import org.terasology.engine.physics.CollisionGroupManager;
 import org.terasology.engine.registry.InjectionHelper;
+import org.terasology.engine.rendering.assets.atlas.Atlas;
+import org.terasology.engine.rendering.assets.texture.Texture;
+import org.terasology.engine.rendering.assets.texture.TextureRegionAsset;
+import org.terasology.engine.world.block.loader.BlockFamilyDefinition;
+import org.terasology.gestalt.assets.Asset;
+import org.terasology.gestalt.assets.AssetType;
+import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.gestalt.assets.module.ModuleAwareAssetTypeManager;
 import org.terasology.gestalt.module.ModuleEnvironment;
 import org.terasology.gestalt.util.reflection.GenericsUtil;
@@ -99,6 +107,7 @@ public final class EnvironmentSwitchHandler {
         context.put(EventLibrary.class, library.getEventLibrary());
         context.put(ClassMetaLibrary.class, new ClassMetaLibraryImpl(context));
 
+
         registerComponents(componentLibrary, environment);
         registerTypeHandlers(context, typeHandlerLibrary, environment);
 
@@ -107,7 +116,6 @@ public final class EnvironmentSwitchHandler {
         autoConfigManager.loadConfigsIn(context);
 
         ModuleAwareAssetTypeManager assetTypeManager = context.get(ModuleAwareAssetTypeManager.class);
-
         /*
          * The registering of the prefab formats is done in this method, because it needs to be done before
          * the environment of the asset manager gets changed.
@@ -116,6 +124,16 @@ public final class EnvironmentSwitchHandler {
          * existing then yet.
          */
         unregisterPrefabFormats(assetTypeManager);
+        assetTypeManager.getAssetTypes().forEach(k -> {
+            for (ResourceUrn urn : k.getLoadedAssetUrns()) {
+                if (!urn.getModuleName().equals(TerasologyConstants.ENGINE_MODULE)) {
+                    k.getAsset(urn).ifPresent(Asset::dispose);
+                }
+            }
+        });
+        assetTypeManager.getAssetType(BlockFamilyDefinition.class).ifPresent(AssetType::disposeAll);
+        assetTypeManager.getAssetType(Prefab.class).ifPresent(AssetType::disposeAll);
+
         registeredPrefabFormat = new PrefabFormat(componentLibrary, typeHandlerLibrary);
         assetTypeManager.getAssetFileDataProducer(assetTypeManager
                 .getAssetType(Prefab.class)
