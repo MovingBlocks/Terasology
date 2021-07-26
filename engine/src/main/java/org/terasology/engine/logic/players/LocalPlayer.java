@@ -238,6 +238,8 @@ public class LocalPlayer {
         int activationId = nextActivationId++;
         Physics physics = CoreRegistry.get(Physics.class);
 
+        //FIXME This is the same code as in CharacterSystem#isPredictionOfEventCorrect to derive the actual interaction range from the
+        //      player's character component and the used item's range component...
         float interactionRange;
         if (ownedEntityUsage && usedOwnedEntity.hasComponent(RangeComponent.class)) {
             interactionRange = Math.max(usedOwnedEntity.getComponent(RangeComponent.class).range, characterComponent.interactionRange);
