@@ -14,5 +14,5 @@ public class RangeComponent implements Component {
     /**
      * The range measured in in-game blocks.
      */
-    public float value;
+    public float range;
 }

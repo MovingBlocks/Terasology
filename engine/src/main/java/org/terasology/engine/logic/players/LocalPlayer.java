@@ -240,7 +240,7 @@ public class LocalPlayer {
 
         float interactionRange;
         if (ownedEntityUsage && usedOwnedEntity.hasComponent(RangeComponent.class)) {
-            interactionRange = Math.max(usedOwnedEntity.getComponent(RangeComponent.class).value, characterComponent.interactionRange);
+            interactionRange = Math.max(usedOwnedEntity.getComponent(RangeComponent.class).range, characterComponent.interactionRange);
         } else {
             interactionRange = characterComponent.interactionRange;
         }

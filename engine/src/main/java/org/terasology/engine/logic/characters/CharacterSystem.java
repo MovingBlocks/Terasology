@@ -357,7 +357,7 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
             //      player's character component and the used item's range component...
             float interactionRange;
             if (event.isOwnedEntityUsage() && event.getUsedOwnedEntity().hasComponent(RangeComponent.class)) {
-                interactionRange = Math.max(event.getUsedOwnedEntity().getComponent(RangeComponent.class).value,
+                interactionRange = Math.max(event.getUsedOwnedEntity().getComponent(RangeComponent.class).range,
                         characterComponent.interactionRange);
             } else {
                 interactionRange = characterComponent.interactionRange;
