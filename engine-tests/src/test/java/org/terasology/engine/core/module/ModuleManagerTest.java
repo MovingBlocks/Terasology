@@ -16,7 +16,6 @@ import org.terasology.engine.core.PathManagerProvider;
 import org.terasology.engine.core.subsystem.EngineSubsystem;
 import org.terasology.engine.logic.permission.PermissionSetComponent;
 import org.terasology.engine.world.block.structure.AttachSupportRequiredComponent;
-import org.terasology.gestalt.entitysystem.component.Component;
 import org.terasology.gestalt.module.Module;
 import org.terasology.gestalt.module.ModuleEnvironment;
 import org.terasology.gestalt.module.ModuleMetadata;
@@ -104,7 +103,6 @@ public class ModuleManagerTest {
      */
     @ParameterizedTest
     @ValueSource(classes = {
-            Component.class,
             AttachSupportRequiredComponent.class,
             PermissionSetComponent.class
     })
