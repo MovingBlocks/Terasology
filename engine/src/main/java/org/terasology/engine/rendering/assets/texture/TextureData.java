@@ -75,11 +75,12 @@ public class TextureData implements AssetData {
     /**
      * Look up the color of a given pixel in the base mipmap level.
      */
-    public Colorc getPixel(int x, int y) {
+    public Colorc getPixel(int x, int y, Color result) {
         ByteBuffer baseMipmap = data[0];
         int idx = BYTES_PER_PIXEL * (x + y * width);
         int pixel = baseMipmap.getInt(idx);
-        return new Color(pixel);
+        result.set(pixel);
+        return result;
     }
 
     public int getWidth() {

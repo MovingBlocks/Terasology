@@ -30,6 +30,7 @@ public class BlockMeshGeneratorSingleShape implements BlockMeshGenerator {
         final Block selfBlock = view.getBlock(x, y, z);
         Vector3i pos = new Vector3i(x, y, z);
         pos = view.toWorldPos(pos);
+        Color colorCache = new Color();
 
         // Gather adjacent blocks
         Block[] adjacentBlocks = new Block[Side.values().length];
@@ -77,9 +78,11 @@ public class BlockMeshGeneratorSingleShape implements BlockMeshGenerator {
                     }
                     Colorc colorOffset = selfBlock.getColorOffset(BlockPart.fromSide(side));
                     Colorc colorSource = selfBlock.getColorSource(BlockPart.fromSide(side)).calcColor(pos.x, pos.y, pos.z);
-                    Color colorResult = new Color(colorSource.rf() * colorOffset.rf(), colorSource.gf() * colorOffset.gf(),
-                            colorSource.bf() * colorOffset.bf(), colorSource.af() * colorOffset.af());
-                    blockMeshPart.appendTo(chunkMesh, view, x, y, z, renderType, colorResult, sideVertexFlag);
+                    colorCache.setRed(colorSource.rf() * colorOffset.rf())
+                            .setGreen(colorSource.gf() * colorOffset.gf())
+                            .setBlue(colorSource.bf() * colorOffset.bf())
+                            .setAlpha(colorSource.af() * colorOffset.af());
+                    blockMeshPart.appendTo(chunkMesh, view, x, y, z, renderType, colorCache, sideVertexFlag);
                 }
             }
         }
@@ -87,9 +90,11 @@ public class BlockMeshGeneratorSingleShape implements BlockMeshGenerator {
         if (isRendered && blockAppearance.getPart(BlockPart.CENTER) != null) {
             Colorc colorOffset = selfBlock.getColorOffset(BlockPart.CENTER);
             Colorc colorSource = selfBlock.getColorSource(BlockPart.CENTER).calcColor(pos.x, pos.y, pos.z);
-            Color colorResult = new Color(colorSource.rf() * colorOffset.rf(), colorSource.gf() * colorOffset.gf(),
-                    colorSource.bf() * colorOffset.bf(), colorSource.af() * colorOffset.af());
-            blockAppearance.getPart(BlockPart.CENTER).appendTo(chunkMesh, view, x, y, z, renderType, colorResult, vertexFlag);
+            colorCache.setRed(colorSource.rf() * colorOffset.rf())
+                    .setGreen(colorSource.gf() * colorOffset.gf())
+                    .setBlue(colorSource.bf() * colorOffset.bf())
+                    .setAlpha(colorSource.af() * colorOffset.af());
+            blockAppearance.getPart(BlockPart.CENTER).appendTo(chunkMesh, view, x, y, z, renderType, colorCache, vertexFlag);
         }
     }
 
