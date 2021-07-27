@@ -57,6 +57,8 @@ import org.terasology.gestalt.module.ModuleEnvironment;
 import java.io.IOException;
 import java.nio.file.Path;
 
+import static com.google.common.base.Verify.verify;
+
 public class InitialiseWorld extends SingleStepLoadProcess {
 
     private static final Logger logger = LoggerFactory.getLogger(InitialiseWorld.class);
@@ -83,6 +85,7 @@ public class InitialiseWorld extends SingleStepLoadProcess {
         context.put(WorldGeneratorPluginLibrary.class, new DefaultWorldGeneratorPluginLibrary(environment, context));
 
         WorldInfo worldInfo = gameManifest.getWorldInfo(TerasologyConstants.MAIN_WORLD);
+        verify(worldInfo.getWorldGenerator().isValid(), "Game manifest did not specify world type.");
         if (worldInfo.getSeed() == null || worldInfo.getSeed().isEmpty()) {
             FastRandom random = new FastRandom();
             worldInfo.setSeed(random.nextString(16));
