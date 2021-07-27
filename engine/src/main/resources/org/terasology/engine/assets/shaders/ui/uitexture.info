@@ -1,0 +1,8 @@
+{
+    "params": [
+        {
+            "name": "tex",
+            "type": "sampler2D"
+        }
+    ]
+}

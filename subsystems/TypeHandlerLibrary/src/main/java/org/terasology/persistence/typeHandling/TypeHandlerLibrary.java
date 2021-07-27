@@ -66,11 +66,7 @@ public class TypeHandlerLibrary {
         TypeHandlerLibrary.populateBuiltInHandlers(this);
         addTypeHandlerFactory(new CollectionTypeHandlerFactory(constructorLibrary));
     }
-
-
-    /**
-     *
-     */
+    
     public TypeHandlerLibrary(Reflections reflections) {
         this(new ReflectionsSandbox(reflections));
     }
@@ -213,7 +209,7 @@ public class TypeHandlerLibrary {
      * @param type The {@link Type} describing the type for which to retrieve the {@link TypeHandler}.
      * @return The {@link TypeHandler} for the specified type, if available.
      */
-    @SuppressWarnings({"unchecked"})
+    @SuppressWarnings("unchecked")
     public Optional<TypeHandler<?>> getTypeHandler(Type type) {
         TypeInfo typeInfo = TypeInfo.of(type);
         return (Optional<TypeHandler<?>>) getTypeHandler(typeInfo);
@@ -322,7 +318,7 @@ public class TypeHandlerLibrary {
             if (handler.isPresent()) {
                 handlerMap.put(field, handler.get());
             } else {
-                logger.error("Unsupported field: '{}.{}'", type.getUri(), field.getName());
+                logger.error("Unsupported field: '{}.{}'", type.getId(), field.getName());
             }
         }
         return handlerMap;

@@ -23,7 +23,7 @@ ext {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // Read the internal version out of the engine-tests module.txt
-def moduleFile = file('src/main/resources/module.txt')
+def moduleFile = file('src/main/resources/org/terasology/unittest/module.txt')
 
 if (!moduleFile.exists()) {
     println "Failed to find module.txt for engine-tests"
@@ -46,9 +46,6 @@ sourceSets {
     // Adjust output path (changed with the Gradle 6 upgrade, this puts it back)
     main.java.outputDir = new File("$buildDir/classes")
     test.java.outputDir = new File("$buildDir/testClasses")
-
-    main.java.srcDirs = ["src/main/java/org/terasology"]
-    test.java.srcDirs = ["src/test/java/org/terasology"]
 }
 
 // Primary dependencies definition
@@ -71,10 +68,14 @@ dependencies {
     implementation("org.junit.jupiter:junit-jupiter-api")
     implementation("org.junit.jupiter:junit-jupiter-params")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
+    testImplementation("org.mockito:mockito-inline:3.11.2")
 
-    implementation("org.mockito:mockito-junit-jupiter:3.7.7")
+    implementation("org.mockito:mockito-junit-jupiter:3.11.2")
 
     implementation("org.terasology.joml-ext:joml-test:0.1.0")
+
+    testImplementation("com.google.truth:truth:1.1.2")
+    testImplementation("com.google.truth.extensions:truth-java8-extension:1.1.2")
 }
 
 task copyResourcesToClasses(type:Copy) {
@@ -82,9 +83,43 @@ task copyResourcesToClasses(type:Copy) {
     into sourceSets.main.output.classesDirs.first()
 }
 
-//TODO: Remove it  when gestalt will can to handle ProtectionDomain without classes (Resources)
-test.dependsOn copyResourcesToClasses
-test.dependsOn rootProject.extractNatives
+test {
+    //TODO: Remove it  when gestalt will can to handle ProtectionDomain without classes (Resources)
+    dependsOn copyResourcesToClasses
+    dependsOn rootProject.extractNatives
+
+    description("Runs all tests (slow)")
+
+    systemProperty("junit.jupiter.execution.timeout.default", "4m")
+}
+
+task unitTest(type: Test) {
+    //TODO: Remove it  when gestalt will can to handle ProtectionDomain without classes (Resources)
+    dependsOn copyResourcesToClasses
+    dependsOn rootProject.extractNatives
+
+    group "Verification"
+    description("Runs unit tests (fast)")
+
+    useJUnitPlatform {
+        excludeTags "MteTest", "TteTest"
+    }
+    systemProperty("junit.jupiter.execution.timeout.default", "1m")
+}
+
+task integrationTest(type: Test) {
+    //TODO: Remove it  when gestalt will can to handle ProtectionDomain without classes (Resources)
+    dependsOn copyResourcesToClasses
+    dependsOn rootProject.extractNatives
+
+    group "Verification"
+    description("Runs integration tests (slow) tagged with 'MteTest' or 'TteTest'")
+
+    useJUnitPlatform {
+        includeTags "MteTest", "TteTest"
+    }
+    systemProperty("junit.jupiter.execution.timeout.default", "5m")
+}
 
 idea {
     module {
@@ -93,10 +128,5 @@ idea {
         outputDir = file('build/classes')
         testOutputDir = file('build/testClasses')
         downloadSources = true
-
-        settings {
-            packagePrefix["src/main/java/org/terasology"] = "org.terasology.engine";
-            packagePrefix["src/test/java/org/terasology"] = "org.terasology.engine";
-        }
     }
 }
