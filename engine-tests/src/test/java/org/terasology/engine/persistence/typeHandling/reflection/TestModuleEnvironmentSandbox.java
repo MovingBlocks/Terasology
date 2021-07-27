@@ -11,7 +11,7 @@ import org.terasology.engine.core.PathManager;
 import org.terasology.engine.core.PathManagerProvider;
 import org.terasology.engine.core.module.ModuleManager;
 import org.terasology.engine.testUtil.ModuleManagerFactory;
-import org.terasology.gestalt.entitysystem.component.Component;
+import org.terasology.engine.world.block.family.BlockFamily;
 import org.terasology.gestalt.module.ModuleEnvironment;
 import org.terasology.reflection.ModuleTypeRegistry;
 import org.terasology.reflection.TypeRegistry;
@@ -53,7 +53,7 @@ public class TestModuleEnvironmentSandbox {
 
     @Test
     public void findSubtypeOfEngineClass() {
-        assertNotEmpty(sandbox.findSubTypeOf("engine:BlockComponent", Component.class));
+        assertNotEmpty(sandbox.findSubTypeOf("engine:AbstractBlockFamily", BlockFamily.class));
     }
 
     @Test
