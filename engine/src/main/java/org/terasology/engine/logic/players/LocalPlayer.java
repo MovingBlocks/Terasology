@@ -5,8 +5,6 @@ package org.terasology.engine.logic.players;
 import com.google.common.collect.Sets;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.logic.characters.CharacterComponent;
 import org.terasology.engine.logic.characters.CharacterMovementComponent;
@@ -14,6 +12,7 @@ import org.terasology.engine.logic.characters.CharacterSystem;
 import org.terasology.engine.logic.characters.events.ActivationPredicted;
 import org.terasology.engine.logic.characters.events.ActivationRequest;
 import org.terasology.engine.logic.common.ActivateEvent;
+import org.terasology.engine.logic.common.RangeComponent;
 import org.terasology.engine.logic.location.LocationComponent;
 import org.terasology.engine.math.Direction;
 import org.terasology.engine.network.ClientComponent;
@@ -203,23 +202,28 @@ public class LocalPlayer {
         boolean ownedEntityUsage = usedOwnedEntity.exists();
         int activationId = nextActivationId++;
         Physics physics = CoreRegistry.get(Physics.class);
-        HitResult result = physics.rayTrace(originPos, direction, characterComponent.interactionRange,
+
+        //FIXME This is the same code as in CharacterSystem#isPredictionOfEventCorrect to derive the actual interaction range from the
+        //      player's character component and the used item's range component...
+        float interactionRange;
+        if (ownedEntityUsage && usedOwnedEntity.hasComponent(RangeComponent.class)) {
+            interactionRange = Math.max(usedOwnedEntity.getComponent(RangeComponent.class).range, characterComponent.interactionRange);
+        } else {
+            interactionRange = characterComponent.interactionRange;
+        }
+
+        HitResult result = physics.rayTrace(originPos, direction, interactionRange,
                 Sets.newHashSet(character), CharacterSystem.DEFAULTPHYSICSFILTER);
         boolean eventWithTarget = result.isHit();
-        if (eventWithTarget) {
+
+        if (ownedEntityUsage || eventWithTarget) {
             EntityRef activatedObject = usedOwnedEntity.exists() ? usedOwnedEntity : result.getEntity();
             activatedObject.send(new ActivationPredicted(character, result.getEntity(), originPos, direction,
                     result.getHitPoint(), result.getHitNormal(), activationId));
+
             character.send(new ActivationRequest(character, ownedEntityUsage, usedOwnedEntity, eventWithTarget,
                     result.getEntity(),
                     originPos, direction, result.getHitPoint(), result.getHitNormal(), activationId));
-            return true;
-        } else if (ownedEntityUsage) {
-            usedOwnedEntity.send(new ActivationPredicted(character, EntityRef.NULL, originPos, direction,
-                    originPos, new Vector3f(), activationId));
-            character.send(new ActivationRequest(character, ownedEntityUsage, usedOwnedEntity, eventWithTarget,
-                    EntityRef.NULL,
-                    originPos, direction, originPos, new Vector3f(), activationId));
             return true;
         }
         return false;
