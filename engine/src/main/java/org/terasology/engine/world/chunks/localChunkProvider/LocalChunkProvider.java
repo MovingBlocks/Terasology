@@ -51,6 +51,7 @@ import org.terasology.engine.world.internal.ChunkViewCoreImpl;
 import org.terasology.engine.world.propagation.light.InternalLightProcessor;
 import org.terasology.engine.world.propagation.light.LightMerger;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.FluxSink;
 import reactor.core.scheduler.Scheduler;
 
 import java.util.ArrayList;
@@ -112,6 +113,7 @@ public class LocalChunkProvider implements ChunkProvider {
     private BlockRegion[] lastRegions;
 
     private volatile boolean shouldComplete = false;
+    private final Set<Vector3ic> currentlyProcessing = new HashSet<>();
 
     public LocalChunkProvider(StorageManager storageManager, EntityManager entityManager, WorldGenerator generator,
                               BlockManager blockManager, ExtraBlockDataManager extraDataManager,
@@ -455,26 +457,36 @@ public class LocalChunkProvider implements ChunkProvider {
         return chunk;
     }
 
-    private Flux<Chunk> chunkFlux() {
-        Set<Vector3ic> currentlyProcessing = new HashSet<>();
-        return Flux.create(sink -> sink.onRequest(numChunks -> {
-            // Figuring out the positions to generate needs to be synchronized
-            List<Vector3ic> positionsPending = new ArrayList<>((int) numChunks);
-            synchronized (this) {
-                if (checkForUpdate()) {
-                    updateList();
-                }
+    /**
+     * Computes the next `numChunks` chunks to generate.
+     * This must be synchronized.
+     */
+    private synchronized List<Vector3ic> chunksToGenerate(int numChunks) {
+        List<Vector3ic> chunks = new ArrayList<>(numChunks);
 
-                while (positionsPending.size() < numChunks && !chunksInRange.isEmpty()) {
-                    Vector3ic pos = chunksInRange.remove(chunksInRange.size() - 1);
-                    if (currentlyProcessing.contains(pos) || loadingPipeline.isPositionProcessing(pos)) {
-                        continue;
-                    }
+        if (checkForUpdate()) {
+            updateList();
+        }
 
-                    positionsPending.add(pos);
-                    currentlyProcessing.add(pos);
-                }
+        while (chunks.size() < numChunks && !chunksInRange.isEmpty()) {
+            Vector3ic pos = chunksInRange.remove(chunksInRange.size() - 1);
+            if (currentlyProcessing.contains(pos) || loadingPipeline.isPositionProcessing(pos)) {
+                continue;
             }
+
+            chunks.add(pos);
+            currentlyProcessing.add(pos);
+        }
+
+        return chunks;
+    }
+
+    /**
+     * This method runs once per chunk processing thread to set up the request callback.
+     */
+    private void onSubscribe(FluxSink<Chunk> sink) {
+        sink.onRequest(numChunks -> {
+            List<Vector3ic> positionsPending = chunksToGenerate((int) numChunks);
 
             // Generating the actual chunks can be done completely asynchronously
             for (Vector3ic pos : positionsPending) {
@@ -487,7 +499,7 @@ public class LocalChunkProvider implements ChunkProvider {
             if (shouldComplete && chunksInRange.isEmpty()) {
                 sink.complete();
             }
-        }));
+        });
     }
 
     /**
@@ -510,9 +522,9 @@ public class LocalChunkProvider implements ChunkProvider {
         }
         this.relevanceSystem = relevanceSystem;
         if (scheduler != null) {
-            loadingPipeline = new ChunkProcessingPipeline(this::getChunk, chunkFlux(), scheduler);
+            loadingPipeline = new ChunkProcessingPipeline(this::getChunk, Flux.create(this::onSubscribe), scheduler);
         } else {
-            loadingPipeline = new ChunkProcessingPipeline(this::getChunk, chunkFlux());
+            loadingPipeline = new ChunkProcessingPipeline(this::getChunk, Flux.create(this::onSubscribe));
         }
         loadingPipeline.addStage(
             ChunkTaskProvider.create("Chunk generate internal lightning",
