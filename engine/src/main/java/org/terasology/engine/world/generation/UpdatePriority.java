@@ -25,17 +25,17 @@ public final class UpdatePriority {
     public static String priorityString(int priority) {
         switch (priority) {
             case PRIORITY_PRODUCES:
-                return "PRIORITY_PRODUCES";
+                return "PRIORITY_PRODUCES (" + priority + ")";
             case PRIORITY_CRITICAL:
-                return "PRIORITY_CRITICAL";
+                return "PRIORITY_CRITICAL (" + priority + ")";
             case PRIORITY_HIGH:
-                return "PRIORITY_HIGH";
+                return "PRIORITY_HIGH (" + priority + ")";
             case PRIORITY_NORMAL:
-                return "PRIORITY_NORMAL";
+                return "PRIORITY_NORMAL (" + priority + ")";
             case PRIORITY_LOW:
-                return "PRIORITY_LOW";
+                return "PRIORITY_LOW (" + priority + ")";
             case PRIORITY_REQUIRES:
-                return "PRIORITY_REQUIRES";
+                return "PRIORITY_REQUIRES (" + priority + ")";
             default:
                 return Integer.toString(priority);
         }

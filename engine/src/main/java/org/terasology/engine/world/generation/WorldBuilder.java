@@ -241,36 +241,37 @@ public class WorldBuilder extends ProviderStore {
             return;
         }
 
-        Stream.of(updatedFacets(provider), requiredFacets(provider)).flatMap(Arrays::stream).forEachOrdered(r -> {
-            if (r.value() != providedFacet) {
-                FacetProvider last = requiredBy.put(r.value(), provider);
+        Stream.of(updatedFacets(provider), requiredFacets(provider))
+                .flatMap(Arrays::stream)
+                .filter(r -> r.value() != providedFacet)
+                .forEachOrdered(r -> {
+                    FacetProvider last = requiredBy.put(r.value(), provider);
 
-                // Detect circular dependencies
-                if (last != null && updatePriority(last, r.value()) <= updatePriority(provider, r.value())) {
-                    FacetProvider other = providedBy.get(r.value());
-                    String help = "";
-                    if (updatesFacet(other, r.value())) {
-                        help = "\nMaybe the priority of " + other.getClass().getSimpleName() + " could be adjusted below "
-                                + UpdatePriority.priorityString(updatePriority(provider, r.value()));
-                    } else if (updatesFacet(provider, providedFacet)) {
-                        help = "\nMaybe the priority of " + provider.getClass().getSimpleName() + " could be adjusted below "
-                                + UpdatePriority.priorityString(updatePriority(other, providedFacet));
+                    // Detect circular dependencies
+                    if (last != null && updatePriority(last, r.value()) <= updatePriority(provider, r.value())) {
+                        FacetProvider other = providedBy.get(r.value());
+                        String help = "";
+                        if (updatesFacet(other, r.value())) {
+                            help = "\nMaybe the priority of " + other.getClass().getSimpleName() + " could be adjusted below "
+                                    + UpdatePriority.priorityString(updatePriority(provider, r.value()));
+                        } else if (updatesFacet(provider, providedFacet)) {
+                            help = "\nMaybe the priority of " + provider.getClass().getSimpleName() + " could be adjusted below "
+                                    + UpdatePriority.priorityString(updatePriority(other, providedFacet));
+                        }
+                        throw new RuntimeException("Circular dependency detected:\n- " + provider.getClass().getSimpleName() + " provides "
+                                + providedFacet.getSimpleName() + " and requires " + r.value().getSimpleName()
+                                + "\n- " + other.getClass().getSimpleName() + " provides " + r.value().getSimpleName() + " and requires "
+                                + providedFacet.getSimpleName() + help);
                     }
-                    throw new RuntimeException("Circular dependency detected:\n- " + provider.getClass().getSimpleName() + " provides "
-                            + providedFacet.getSimpleName() + " and requires " + r.value().getSimpleName()
-                            + "\n- " + other.getClass().getSimpleName() + " provides " + r.value().getSimpleName() + " and requires "
-                            + providedFacet.getSimpleName() + help);
-                }
 
-                addProviderChain(r.value(), scalable, updatePriority(provider, r.value()), orderedProviders);
+                    addProviderChain(r.value(), scalable, updatePriority(provider, r.value()), orderedProviders);
 
-                if (last != null) {
-                    requiredBy.put(r.value(), last);
-                } else {
-                    requiredBy.remove(r.value());
-                }
-            }
-        });
+                    if (last != null) {
+                        requiredBy.put(r.value(), last);
+                    } else {
+                        requiredBy.remove(r.value());
+                    }
+                });
     }
 
     private Facet[] requiredFacets(FacetProvider provider) {
