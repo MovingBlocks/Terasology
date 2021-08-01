@@ -101,7 +101,8 @@ import static org.mockito.Mockito.when;
 /**
  * Setup a headless ( = no graphics ) environment.
  * Based on TerasologyTestingEnvironment code.
- *
+ * <p>
+ * <b>Deprecated</b> for use outside of {@code engine-tests}; modules should use ModuleTestingEnvironment.
  */
 public class HeadlessEnvironment extends Environment {
 

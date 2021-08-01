@@ -17,7 +17,10 @@ public class ActivationPredicted extends AbstractConsumableEvent {
     private Vector3f hitNormal;
     private int activationId;
 
-    public ActivationPredicted() {
+    /**
+     * INTERNAL: required for serialization.
+     */
+    protected ActivationPredicted() {
     }
 
     public ActivationPredicted(EntityRef instigator, EntityRef target, Vector3f origin, Vector3f direction,
@@ -35,6 +38,9 @@ public class ActivationPredicted extends AbstractConsumableEvent {
         return instigator;
     }
 
+    /**
+     * @return the entity that is hit, or {@link EntityRef#NULL} if the activation has no target
+     */
     public EntityRef getTarget() {
         return target;
     }
@@ -47,10 +53,16 @@ public class ActivationPredicted extends AbstractConsumableEvent {
         return direction;
     }
 
+    /**
+     * @return the hit position if {@link #getTarget()} exists, {@code null} otherwise
+     */
     public Vector3f getHitPosition() {
         return hitPosition;
     }
 
+    /**
+     * @return the hit normal if {@link #getTarget()} exists, {@code null} otherwise
+     */
     public Vector3f getHitNormal() {
         return hitNormal;
     }
@@ -59,6 +71,9 @@ public class ActivationPredicted extends AbstractConsumableEvent {
         return activationId;
     }
 
+    /**
+     * @return the target location if {@link #getTarget()} exists and has a location, {@code null} otherwise
+     */
     public Vector3f getTargetLocation() {
         LocationComponent loc = target.getComponent(LocationComponent.class);
         if (loc != null) {

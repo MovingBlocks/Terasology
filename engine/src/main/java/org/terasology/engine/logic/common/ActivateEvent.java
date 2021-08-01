@@ -43,6 +43,9 @@ public class ActivateEvent extends AbstractConsumableEvent {
         return instigator;
     }
 
+    /**
+     * @return the entity that is targeted, or {@link EntityRef#NULL} if the activation has no target
+     */
     public EntityRef getTarget() {
         return target;
     }
@@ -55,10 +58,16 @@ public class ActivateEvent extends AbstractConsumableEvent {
         return direction;
     }
 
+    /**
+     * @return the hit position if {@link #getTarget()} exists, {@code null} otherwise
+     */
     public Vector3f getHitPosition() {
         return hitPosition;
     }
 
+    /**
+     * @return the hit normal if {@link #getTarget()} exists, {@code null} otherwise
+     */
     public Vector3f getHitNormal() {
         return hitNormal;
     }
@@ -67,6 +76,9 @@ public class ActivateEvent extends AbstractConsumableEvent {
         return activationId;
     }
 
+    /**
+     * @return the target location if {@link #getTarget()} exists and has a location, {@code null} otherwise
+     */
     public Vector3f getTargetLocation() {
         LocationComponent loc = target.getComponent(LocationComponent.class);
         if (loc != null) {
@@ -89,5 +101,18 @@ public class ActivateEvent extends AbstractConsumableEvent {
             return result;
         }
         return new Vector3f();
+    }
+
+    @Override
+    public String toString() {
+        return "ActivateEvent{" +
+                "instigator=" + instigator +
+                ", target=" + target +
+                ", origin=" + origin +
+                ", direction=" + direction +
+                ", hitPosition=" + hitPosition +
+                ", hitNormal=" + hitNormal +
+                ", activationId=" + activationId +
+                '}';
     }
 }
