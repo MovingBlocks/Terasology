@@ -30,6 +30,7 @@ import org.terasology.engine.logic.characters.events.PlayerDeathEvent;
 import org.terasology.engine.logic.characters.interactions.InteractionUtil;
 import org.terasology.engine.logic.common.ActivateEvent;
 import org.terasology.engine.logic.common.DisplayNameComponent;
+import org.terasology.engine.logic.common.RangeComponent;
 import org.terasology.engine.logic.health.BeforeDestroyEvent;
 import org.terasology.engine.logic.health.DestroyEvent;
 import org.terasology.engine.logic.health.EngineDamageTypes;
@@ -352,7 +353,17 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
                 return false; // can happen if target existed on client
             }
 
-            HitResult result = physics.rayTrace(originPos, direction, characterComponent.interactionRange, Sets.newHashSet(character),
+            //FIXME This is the same code as in LocalPlayer#activateTargetOrOwnedEntity to derive the actual interaction range from the
+            //      player's character component and the used item's range component...
+            float interactionRange;
+            if (event.isOwnedEntityUsage() && event.getUsedOwnedEntity().hasComponent(RangeComponent.class)) {
+                interactionRange = Math.max(event.getUsedOwnedEntity().getComponent(RangeComponent.class).range,
+                        characterComponent.interactionRange);
+            } else {
+                interactionRange = characterComponent.interactionRange;
+            }
+
+            HitResult result = physics.rayTrace(originPos, direction, interactionRange, Sets.newHashSet(character),
                     DEFAULTPHYSICSFILTER);
             if (!result.isHit()) {
                 String msg = "Denied activation attempt by {} since at the authority there was nothing to activate at that place";
@@ -383,8 +394,13 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
                 logger.info(msg, getPlayerNameFromCharacter(character));
                 return false;
             }
-            if (!(event.getHitPosition().equals(originPos, 0.0001f))) {
-                String msg = "Denied activation attempt by {} since the event was not properly labeled as having a hit postion";
+            if (event.getHitPosition() != null) {
+                String msg = "Denied activation attempt by {} since the event was not properly labeled as having a hit position";
+                logger.info(msg, getPlayerNameFromCharacter(character));
+                return false;
+            }
+            if (event.getHitNormal() != null) {
+                String msg = "Denied activation attempt by {} since the event was not properly labeled as having a hit delta";
                 logger.info(msg, getPlayerNameFromCharacter(character));
                 return false;
             }

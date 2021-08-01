@@ -13,6 +13,7 @@ import org.terasology.engine.config.Config;
 import org.terasology.engine.config.SystemConfig;
 import org.terasology.engine.core.PathManager;
 import org.terasology.engine.core.TerasologyConstants;
+import org.terasology.engine.utilities.Jvm;
 import org.terasology.gestalt.module.Module;
 import org.terasology.gestalt.module.ModuleEnvironment;
 import org.terasology.gestalt.module.ModuleFactory;
@@ -44,6 +45,7 @@ import java.security.Policy;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -74,6 +76,9 @@ public class ModuleManager {
         engineModule = loadAndConfigureEngineModule(moduleFactory, classesOnClasspathsToAddToEngine);
         registry.add(engineModule);
 
+        if (isLoadingClasspathModules()) {
+            loadModulesFromClassPath();
+        }
         loadModulesFromApplicationPath(PathManager.getInstance());
 
         ensureModulesDependOnEngine();
@@ -91,11 +96,16 @@ public class ModuleManager {
         this(config.getNetwork().getMasterServer(), classesOnClasspathsToAddToEngine);
     }
 
+    protected static boolean isLoadingClasspathModules() {
+        return Boolean.getBoolean(LOAD_CLASSPATH_MODULES_PROPERTY);
+    };
+
     /** Create a ModuleFactory configured for Terasology modules. */
     private static ModuleFactory newModuleFactory(ModuleMetadataJsonAdapter metadataReader) {
         final ModuleFactory moduleFactory;
-        if (Boolean.getBoolean(LOAD_CLASSPATH_MODULES_PROPERTY)) {
+        if (isLoadingClasspathModules()) {
             moduleFactory = new ClasspathCompromisingModuleFactory();
+            Jvm.logClasspath(logger);
         } else {
             moduleFactory = new ModuleFactory();
         }
@@ -134,6 +144,35 @@ public class ModuleManager {
                 .map(Path::toFile)
                 .collect(Collectors.toList());
         scanner.scan(registry, paths);
+    }
+
+    private void loadModulesFromClassPath() {
+        ClasspathCompromisingModuleFactory moduleFactory = (ClasspathCompromisingModuleFactory) this.moduleFactory;
+        for (String metadataName : moduleFactory.getModuleMetadataLoaderMap().keySet()) {
+            Enumeration<URL> urls;
+            try {
+                urls = ClassLoader.getSystemResources(metadataName);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            while (urls.hasMoreElements()) {
+                URL url = urls.nextElement();
+                logger.debug("Probably a module in U:{}", url);
+                Path path = moduleFactory.canonicalModuleLocation(metadataName, url);
+                Module module;
+                try {
+                    module = moduleFactory.createModule(path.toFile());
+                } catch (IOException e) {
+                    logger.warn("Failed to create module from {}", path, e);
+                    continue;
+                }
+                if (registry.add(module)) {
+                    logger.info("Loaded {} from {}", module.getId(), path);
+                } else {
+                    logger.info("Module {} from {} was a duplicate; not registering this copy.", module.getId(), path);
+                }
+            }
+        }
     }
 
     /**
