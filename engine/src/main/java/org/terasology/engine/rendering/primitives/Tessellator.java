@@ -99,8 +99,8 @@ public class Tessellator {
         }
         if (doubleSided) {
             for (int i = 0; i < part.indicesSize(); i += 3) {
-                meshData.indices.put(nextIndex + part.getIndex(i));
                 meshData.indices.put(nextIndex + part.getIndex(i + 1));
+                meshData.indices.put(nextIndex + part.getIndex(i));
                 meshData.indices.put(nextIndex + part.getIndex(i + 2));
             }
         }
