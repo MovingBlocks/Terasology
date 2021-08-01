@@ -25,6 +25,7 @@ import org.terasology.engine.utilities.gson.CaseInsensitiveEnumTypeAdapterFactor
 import org.terasology.engine.utilities.gson.Vector3fTypeAdapter;
 import org.terasology.engine.utilities.gson.Vector4fTypeAdapter;
 import org.terasology.engine.world.block.BlockPart;
+import org.terasology.engine.world.block.DefaultColorSource;
 import org.terasology.engine.world.block.family.BlockFamily;
 import org.terasology.engine.world.block.family.BlockFamilyLibrary;
 import org.terasology.engine.world.block.family.FreeformFamily;
@@ -183,6 +184,8 @@ public class BlockFamilyDefinitionFormat extends AbstractAssetFileFormat<BlockFa
             setObject(data::setTint, jsonObject, "tint", Vector3f.class, context);
 
             readBlockPartMap(jsonObject, "tile", "tiles", data::getBlockTiles, BlockTile.class, context);
+            readBlockPartMap(jsonObject, "colorSource", "colorSources", data::getColorSources, DefaultColorSource.class, context);
+            readBlockPartMap(jsonObject, "colorOffset", "colorOffsets", data::getColorOffsets, Vector4f.class, context);
 
             setFloat(data::setMass, jsonObject, "mass");
             setBoolean(data::setDebrisOnDestroy, jsonObject, "debrisOnDestroy");
