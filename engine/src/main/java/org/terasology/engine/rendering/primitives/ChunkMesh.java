@@ -17,6 +17,8 @@ import org.terasology.engine.rendering.assets.mesh.resource.VertexIntegerAttribu
 import org.terasology.engine.rendering.assets.mesh.resource.VertexResource;
 import org.terasology.engine.rendering.assets.mesh.resource.VertexResourceBuilder;
 import org.terasology.gestalt.module.sandbox.API;
+import org.terasology.nui.Color;
+import org.terasology.nui.Colorc;
 
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -291,6 +293,8 @@ public class ChunkMesh {
         public static final int BLOCK_INDEX = 6; // float
         public static final int AMBIENT_OCCLUSION_INDEX = 7; // float
 
+        public static final int COLOR_INDEX = 8; // vec4
+
         public final VertexResource buffer;
         public final IndexResource indices = new IndexResource();
 
@@ -298,8 +302,7 @@ public class ChunkMesh {
         public final VertexAttributeBinding<Vector3fc, Vector3f> normals;
         public final VertexAttributeBinding<Vector2fc, Vector2f> uv0;
 
-        // color data is unused something to consider later
-        // public final VertexAttributeBinding<Colorc, Color> color;
+        public final VertexAttributeBinding<Colorc, Color> color;
 
         public final VertexIntegerAttributeBinding flags;
         public final VertexIntegerAttributeBinding frames;
@@ -322,6 +325,8 @@ public class ChunkMesh {
             sunlight = builder.add(SUNLIGHT_INDEX, GLAttributes.FLOAT_1_VERTEX_ATTRIBUTE);
             blockLight = builder.add(BLOCK_INDEX, GLAttributes.FLOAT_1_VERTEX_ATTRIBUTE);
             ambientOcclusion = builder.add(AMBIENT_OCCLUSION_INDEX, GLAttributes.FLOAT_1_VERTEX_ATTRIBUTE);
+
+            color = builder.add(COLOR_INDEX, GLAttributes.COLOR_4_F_VERTEX_ATTRIBUTE);
 
             buffer = builder.build();
         }

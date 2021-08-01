@@ -37,7 +37,14 @@ configure<SourceSetContainer> {
 
 configurations {
     all {
-        resolutionStrategy.preferProjectModules()
+        resolutionStrategy {
+            preferProjectModules()
+            // always pick reflections fork
+            dependencySubstitution {
+                @Suppress("UnstableApiUsage")
+                substitute(module("org.reflections:reflections")).using(module("org.terasology:reflections:0.9.12-MB"))
+            }
+        }
     }
 }
 
