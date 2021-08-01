@@ -28,15 +28,17 @@ final class RunningThreadsMode extends MetricsMode implements AutoCloseable {
 
             HistogramSnapshot snapshot = k.takeSnapshot();
             long count = snapshot.count();
-            double throughput = (count / (double) DisplayMetricsMonitor.captureDuration.toMillis());
-            builder.append(k.getId().getName());
-            builder.append(" : ");
-            builder.append(" throughput: ");
-            builder.append(Double.isNaN(throughput) ? "NAN" : String.format("%,10.4f", throughput)).append(" /s");
-            builder.append(" mean: ").append(String.format("%,10.4f",k.mean(TimeUnit.MILLISECONDS))).append(" ms");
-            builder.append(" max: ").append(String.format("%,10.4f",k.max(TimeUnit.MILLISECONDS))).append(" ms");
 
-            builder.append("\n");
+            if (count > 0) {
+                double throughput = (count / (double) DisplayMetricsMonitor.captureDuration.toMillis());
+                builder.append(k.getId().getName());
+                builder.append(" : ");
+                builder.append(" throughput: ");
+                builder.append(Double.isNaN(throughput) ? "NAN" : String.format("%,10.4f", throughput)).append(" /s");
+                builder.append(" mean: ").append(String.format("%,10.4f", k.mean(TimeUnit.MILLISECONDS))).append(" ms");
+                builder.append(" max: ").append(String.format("%,10.4f", k.max(TimeUnit.MILLISECONDS))).append(" ms");
+                builder.append("\n");
+            }
         });
         return builder.toString();
     }
