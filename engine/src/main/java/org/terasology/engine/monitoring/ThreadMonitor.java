@@ -8,11 +8,13 @@ import com.google.common.collect.Maps;
 import com.google.common.eventbus.EventBus;
 import io.micrometer.core.instrument.Tag;
 import io.micrometer.core.instrument.Tags;
+import io.micrometer.core.instrument.logging.LoggingRegistryConfig;
 import org.terasology.engine.monitoring.impl.SingleThreadMonitor;
 import org.terasology.engine.monitoring.impl.SingleThreadMonitorImpl;
 import org.terasology.engine.monitoring.impl.ThreadActivityInternal;
 import org.terasology.engine.monitoring.impl.ThreadMonitorEvent;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 
@@ -20,6 +22,8 @@ public final class ThreadMonitor {
 
     private static final EventBus EVENT_BUS = new EventBus("ThreadMonitor");
     private static final Map<Thread, SingleThreadMonitor> THREAD_INFO_BY_ID = Maps.newConcurrentMap();
+
+
 
     private ThreadMonitor() {
     }
