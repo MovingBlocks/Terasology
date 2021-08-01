@@ -42,8 +42,6 @@ import org.terasology.splash.SplashScreen;
 import org.terasology.splash.SplashScreenBuilder;
 import org.terasology.subsystem.discordrpc.DiscordRPCSubSystem;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
-import reactor.util.Metrics;
 
 import java.awt.GraphicsEnvironment;
 import java.io.IOException;
@@ -114,7 +112,6 @@ public final class Terasology {
     }
 
     public static void main(String[] args) {
-
 
         handlePrintUsageRequest(args);
         handleLaunchArguments(args);
