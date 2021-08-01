@@ -20,7 +20,10 @@ import java.util.Map;
 
 @ForceBlockActive
 public class SkeletalMeshComponent implements VisualComponent {
+    @Replicate
     public SkeletalMesh mesh;
+
+    @Replicate
     public Material material;
 
     /**
