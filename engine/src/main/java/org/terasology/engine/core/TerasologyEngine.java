@@ -7,6 +7,8 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.Queues;
 import com.google.common.collect.Sets;
+import io.micrometer.core.instrument.Metrics;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.config.Config;
@@ -67,6 +69,7 @@ import org.terasology.reflection.TypeRegistry;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.reflect.ReflectFactory;
 import org.terasology.reflection.reflect.ReflectionReflectFactory;
+import reactor.core.scheduler.Schedulers;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -136,6 +139,9 @@ public class TerasologyEngine implements GameEngine {
      * @param subsystems other typical subsystems, e.g., graphics, audio and input subsystems.
      */
     public TerasologyEngine(TimeSubsystem timeSubsystem, Collection<EngineSubsystem> subsystems) {
+        Metrics.addRegistry(new SimpleMeterRegistry());
+        Schedulers.enableMetrics();
+
         // configure native paths
         PathManager.getInstance();
         Bullet.init(true, false);

@@ -82,7 +82,7 @@ dependencies {
     implementation "org.terasology:reflections:0.9.12-MB"
     implementation group: 'org.javassist', name: 'javassist', version: '3.27.0-GA'
     implementation group: 'com.esotericsoftware', name: 'reflectasm', version: '1.11.9'
-   
+
     // Graphics, 3D, UI, etc
     api platform("org.lwjgl:lwjgl-bom:$LwjglVersion")
     api "org.lwjgl:lwjgl"
@@ -91,7 +91,8 @@ dependencies {
     implementation "org.lwjgl:lwjgl-openal"
     api "org.lwjgl:lwjgl-opengl"
     implementation "org.lwjgl:lwjgl-stb"
-    
+
+    implementation 'io.micrometer:micrometer-core:1.7.2'
     api group: 'io.projectreactor', name: 'reactor-core', version: '3.4.7'
     api group: 'org.joml', name: 'joml', version: '1.10.0'
     api group: 'org.terasology.joml-ext', name: 'joml-geometry', version: '0.1.0'

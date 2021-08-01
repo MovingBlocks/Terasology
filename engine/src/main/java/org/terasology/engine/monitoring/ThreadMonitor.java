@@ -6,6 +6,8 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.eventbus.EventBus;
+import io.micrometer.core.instrument.Tag;
+import io.micrometer.core.instrument.Tags;
 import org.terasology.engine.monitoring.impl.SingleThreadMonitor;
 import org.terasology.engine.monitoring.impl.SingleThreadMonitorImpl;
 import org.terasology.engine.monitoring.impl.ThreadActivityInternal;

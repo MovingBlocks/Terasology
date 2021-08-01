@@ -10,11 +10,17 @@ import com.google.common.collect.Queues;
 import com.google.common.collect.Sets;
 import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
+import io.micrometer.core.instrument.Clock;
+import io.micrometer.core.instrument.Metrics;
+import io.micrometer.core.instrument.Tag;
+import io.micrometer.core.instrument.Timer;
 
 import java.lang.ref.WeakReference;
+import java.util.Collections;
 import java.util.Deque;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 public class SingleThreadMonitorImpl implements SingleThreadMonitor {
 
@@ -29,6 +35,8 @@ public class SingleThreadMonitorImpl implements SingleThreadMonitor {
 
     private boolean active;
     private String lastTask = "";
+    private long startTime = -1L;
+    private Timer taskTimer = null;
 
     public SingleThreadMonitorImpl(Thread thread) {
         Preconditions.checkNotNull(thread, "The parameter 'thread' must not be null");
@@ -102,12 +110,19 @@ public class SingleThreadMonitorImpl implements SingleThreadMonitor {
         if (taskCounters.adjustOrPutValue(task, 1, 1) == 1) {
             tasks.add(task);
         }
+        startTime = Clock.SYSTEM.monotonicTime();
+        this.taskTimer = Timer.builder(task)
+                .tags(Collections.singletonList(Tag.of("monitor", "display-metric")))
+                .register(Metrics.globalRegistry);
         active = true;
         lastTask = task;
     }
 
     @Override
     public final synchronized void endTask() {
+        if (this.taskTimer != null) {
+            this.taskTimer.record(Clock.SYSTEM.monotonicTime() - startTime, TimeUnit.NANOSECONDS);
+        }
         active = false;
     }
 
