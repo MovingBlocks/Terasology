@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.rendering.primitives;
 
+import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.engine.math.Side;
@@ -12,6 +13,8 @@ import org.terasology.engine.world.block.BlockAppearance;
 import org.terasology.engine.world.block.BlockManager;
 import org.terasology.engine.world.block.BlockPart;
 import org.terasology.engine.world.block.shapes.BlockMeshPart;
+import org.terasology.nui.Color;
+import org.terasology.nui.Colorc;
 
 public class BlockMeshGeneratorSingleShape implements BlockMeshGenerator {
 
@@ -24,11 +27,16 @@ public class BlockMeshGeneratorSingleShape implements BlockMeshGenerator {
 
     @Override
     public void generateChunkMesh(ChunkView view, ChunkMesh chunkMesh, int x, int y, int z) {
+
         final BlockAppearance blockAppearance = block.getPrimaryAppearance();
         if (!blockAppearance.hasAppearance()) {
             // perf: Skip mesh generation for blocks without appearance, e.g., air blocks.
             return;
         }
+
+        Vector3i pos = new Vector3i(x, y, z);
+        pos = view.toWorldPos(pos);
+        Color colorCache = new Color();
 
         // Gather adjacent blocks
         Block[] adjacentBlocks = new Block[Side.allSides().size()];
@@ -37,14 +45,14 @@ public class BlockMeshGeneratorSingleShape implements BlockMeshGenerator {
             Block blockToCheck = view.getBlock(x + offset.x(), y + offset.y(), z + offset.z());
             adjacentBlocks[side.ordinal()] = blockToCheck;
         }
+
+        final ChunkMesh.RenderType renderType = getRenderType(block);
+        final ChunkVertexFlag vertexFlag = getChunkVertexFlag(view, x, y, z, block);
+        boolean isRendered = false;
+
         for (final Side side : Side.allSides()) {
             if (isSideVisibleForBlockTypes(adjacentBlocks[side.ordinal()], block, side)) {
-                final ChunkMesh.RenderType renderType = getRenderType(block);
-                final ChunkVertexFlag vertexFlag = getChunkVertexFlag(view, x, y, z, block);
-
-                if (blockAppearance.getPart(BlockPart.CENTER) != null) {
-                    blockAppearance.getPart(BlockPart.CENTER).appendTo(chunkMesh, view, x, y, z, renderType, vertexFlag);
-                }
+                isRendered = true;
 
                 BlockMeshPart blockMeshPart = blockAppearance.getPart(BlockPart.fromSide(side));
 
@@ -73,9 +81,25 @@ public class BlockMeshGeneratorSingleShape implements BlockMeshGenerator {
                     if (block.isGrass() && side != Side.TOP && side != Side.BOTTOM) {
                         sideVertexFlag = ChunkVertexFlag.COLOR_MASK;
                     }
-                    blockMeshPart.appendTo(chunkMesh, view, x, y, z, renderType, sideVertexFlag);
+                    Colorc colorOffset = block.getColorOffset(BlockPart.fromSide(side));
+                    Colorc colorSource = block.getColorSource(BlockPart.fromSide(side)).calcColor(pos.x, pos.y, pos.z);
+                    colorCache.setRed(colorSource.rf() * colorOffset.rf())
+                            .setGreen(colorSource.gf() * colorOffset.gf())
+                            .setBlue(colorSource.bf() * colorOffset.bf())
+                            .setAlpha(colorSource.af() * colorOffset.af());
+                    blockMeshPart.appendTo(chunkMesh, view, x, y, z, renderType, colorCache, sideVertexFlag);
                 }
             }
+        }
+
+        if (isRendered && blockAppearance.getPart(BlockPart.CENTER) != null) {
+            Colorc colorOffset = block.getColorOffset(BlockPart.CENTER);
+            Colorc colorSource = block.getColorSource(BlockPart.CENTER).calcColor(pos.x, pos.y, pos.z);
+            colorCache.setRed(colorSource.rf() * colorOffset.rf())
+                    .setGreen(colorSource.gf() * colorOffset.gf())
+                    .setBlue(colorSource.bf() * colorOffset.bf())
+                    .setAlpha(colorSource.af() * colorOffset.af());
+            blockAppearance.getPart(BlockPart.CENTER).appendTo(chunkMesh, view, x, y, z, renderType, colorCache, vertexFlag);
         }
     }
 
@@ -98,6 +122,7 @@ public class BlockMeshGeneratorSingleShape implements BlockMeshGenerator {
 
     /**
      * Determine the render process of the block.
+     *
      * @return The render process for the block
      */
     private ChunkMesh.RenderType getRenderType(final Block selfBlock) {
