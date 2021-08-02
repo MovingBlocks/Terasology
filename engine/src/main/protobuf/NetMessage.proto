@@ -6,7 +6,6 @@ option java_outer_classname = "NetData";
 option optimize_for = SPEED;
 
 message NetMessage {
-    optional int64 time = 9;
     oneof message {
         JoinMessage join = 18;
         // Authentication
@@ -20,20 +19,28 @@ message NetMessage {
         ServerInfoRequest serverInfoRequest = 15;
         ServerInfoMessage serverInfo = 16;
         ModuleMessage moduleMessage = 17;
-        EntityDataMessage entityDataMessage = 30;
+
+        EventMessage eventMessage = 35;
+        BlockEventMessage blockEventMessage = 37;
+
+        HeartBeatMessage heartBeat = 36;
+        InvalidateChunkMessage invalidateChunk = 3;
+        CreateEntityMessage createEntity = 5;
+        RemoveEntityMessage removeEntity = 6;
+        UpdateEntityMessage updateEntity = 7;
+        BlockFamilyRegisteredMessage blockFamilyRegistered = 25;
+        BlockChangeMessage blockChange = 4;
+        ChunkStore chunkInfo = 2;
+        ExtraDataChangeMessage extraDataChange = 11;
     }
 }
 
-message EntityDataMessage {
-    repeated InvalidateChunkMessage invalidateChunk = 3;
-    repeated CreateEntityMessage createEntity = 5;
-    repeated RemoveEntityMessage removeEntity = 6;
-    repeated EventMessage event = 8;
-    repeated UpdateEntityMessage updateEntity = 7;
-    repeated BlockFamilyRegisteredMessage blockFamilyRegistered = 17;
-    repeated BlockChangeMessage blockChange = 4;
-    repeated ChunkStore chunkInfo = 2;
-    repeated ExtraDataChangeMessage extraDataChange = 11;
+message ServerInfoRequest {
+
+}
+
+message HeartBeatMessage {
+    int64 time = 9;
 }
 
 message HandshakeMessage {
@@ -41,10 +48,14 @@ message HandshakeMessage {
     optional HandshakeVerification handshakeVerification = 103;
 }
 
+message BlockEventMessage {
+    Event event = 2;
+    Vector3iData targetBlockPos = 3;
+}
+
 message EventMessage {
-    optional int32 targetId = 1;
-    optional Event event = 2;
-    optional Vector3iData targetBlockPos = 3;
+    Event event = 2;
+    int32 targetId = 1;
 }
 
 message ModuleMessage {
@@ -92,28 +103,24 @@ message BlockFamilyRegisteredMessage {
 }
 
 message InvalidateChunkMessage {
-    optional Vector3iData pos = 1;
+    Vector3iData pos = 1;
 }
 
 message BlockChangeMessage {
-    optional Vector3iData pos = 1;
-    optional int32 newBlock = 2;
+    Vector3iData pos = 1;
+    int32 newBlock = 2;
 }
 
 message ExtraDataChangeMessage {
-    optional int32 index = 1;
-    optional Vector3iData pos = 2;
-    optional int32 newData = 3;
+    int32 index = 1;
+    int32 newData = 3;
+    Vector3iData pos = 2;
 }
 
 message Vector3iData {
-    optional int32 x = 1;
-    optional int32 y = 2;
-    optional int32 z = 3;
-}
-
-message ServerInfoRequest {
-
+    int32 x = 1;
+    int32 y = 2;
+    int32 z = 3;
 }
 
 message JoinMessage {
@@ -124,7 +131,7 @@ message JoinMessage {
 }
 
 message Color {
-	optional uint32 rgba = 1;
+    uint32 rgba = 1;
 }
 
 message JoinCompleteMessage {
@@ -168,7 +175,6 @@ message ModuleInfo {
     optional string moduleVersion = 2;
 }
 
-
 message ModuleDataHeader {
     optional string id = 1;
     optional string version = 2;
@@ -177,23 +183,23 @@ message ModuleDataHeader {
 }
 
 message ModuleData {
-    optional bytes module = 1;
+    bytes module = 1;
 }
 
 message ModuleSendError {
-    optional string message = 1;
+    string message = 1;
 }
 
 message CreateEntityMessage {
-    optional PackedEntity entity = 1;
-    optional Vector3iData blockPos = 2;
+    PackedEntity entity = 1;
+//    optional Vector3iData blockPos = 2;
 }
 
 message UpdateEntityMessage {
-    optional PackedEntity entity = 1;
-    optional int32 netId = 2;
+    PackedEntity entity = 1;
+    int32 netId = 2;
 }
 
 message RemoveEntityMessage {
-    optional int32 netId = 1;
+    repeated int32 netId = 1;
 }

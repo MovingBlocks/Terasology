@@ -51,7 +51,7 @@ public class ServerConnectionHandler extends ChannelInboundHandlerAdapter {
         NetData.NetMessage message = (NetData.NetMessage) msg;
         if (message.hasServerInfoRequest()) {
             NetData.ServerInfoMessage serverInfo = networkSystem.getServerInfoMessage();
-            ctx.channel().writeAndFlush(NetData.NetMessage.newBuilder().setServerInfo(serverInfo).setTime(serverInfo.getTime()).build());
+            ctx.channel().writeAndFlush(NetData.NetMessage.newBuilder().setServerInfo(serverInfo).build());
         } else if (message.hasJoin()) {
             receivedConnect(message.getJoin());
         } else if (message.hasModuleMessage()) {

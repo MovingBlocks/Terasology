@@ -29,6 +29,7 @@ import org.terasology.engine.network.NetworkComponent;
 import org.terasology.engine.network.Server;
 import org.terasology.engine.network.ServerInfoMessage;
 import org.terasology.engine.network.serialization.ClientComponentFieldCheck;
+import org.terasology.engine.persistence.ChunkStore;
 import org.terasology.engine.persistence.serializers.EventSerializer;
 import org.terasology.engine.persistence.serializers.NetworkEntitySerializer;
 import org.terasology.engine.registry.CoreRegistry;
@@ -71,7 +72,6 @@ public class ServerImpl implements Server {
     private Channel channel;
     private NetMetricSource metricsSource;
     private BlockingQueue<NetData.NetMessage> queuedMessages = Queues.newLinkedBlockingQueue();
-    private List<NetData.EventMessage> queuedOutgoingEvents = Lists.newArrayList();
     private NetData.ServerInfoMessage serverInfo;
 
     private EngineEntityManager entityManager;
@@ -89,7 +89,6 @@ public class ServerImpl implements Server {
     private ListMultimap<Vector3i, NetData.ExtraDataChangeMessage> awaitingChunkReadyExtraDataUpdates = ArrayListMultimap.create();
 
     private EngineTime time;
-
 
     public ServerImpl(NetworkSystemImpl system, Channel channel) {
         this.channel = channel;
@@ -145,9 +144,11 @@ public class ServerImpl implements Server {
         NetworkComponent netComp = target.getComponent(NetworkComponent.class);
         if (netComp != null) {
             try {
-                queuedOutgoingEvents.add(NetData.EventMessage.newBuilder()
-                        .setEvent(eventSerializer.serialize(event))
-                        .setTargetId(netComp.getNetworkId()).build());
+                NetData.NetMessage.Builder message = NetData.NetMessage.newBuilder();
+                message.getEventMessageBuilder()
+                        .setTargetId(netComp.getNetworkId())
+                        .setEvent(eventSerializer.serialize(event));
+                send(message.build());
             } catch (SerializationException e) {
                 logger.error("Failed to serialize event", e);
             }
@@ -159,33 +160,43 @@ public class ServerImpl implements Server {
         processReceivedChunks();
         if (entityManager != null) {
             if (netTick) {
-                NetData.NetMessage.Builder message = NetData.NetMessage.newBuilder();
-                message.setTime(time.getGameTimeInMs());
-                NetData.EntityDataMessage.Builder builder = message.getEntityDataMessageBuilder();
-                sendEntities(builder);
-                sendEvents(builder);
-                send(message.build());
-            } else if (!queuedOutgoingEvents.isEmpty()) {
-                NetData.NetMessage.Builder message = NetData.NetMessage.newBuilder();
-                message.setTime(time.getGameTimeInMs());
-                sendEvents(message.getEntityDataMessageBuilder());
-                send(message.build());
+                sendHeartBeat();
+                sendEntities();
             }
-
             processMessages();
         }
     }
 
-    private void sendEvents(NetData.EntityDataMessage.Builder message) {
-        queuedOutgoingEvents.forEach(message::addEvent);
-        queuedOutgoingEvents.clear();
+    private void sendEntities() {
+        TIntIterator dirtyIterator = netDirty.iterator();
+        while (dirtyIterator.hasNext()) {
+            int netId = dirtyIterator.next();
+            EntityRef entity = networkSystem.getEntity(netId);
+            if (getClientEntity().equals(networkSystem.getOwner(entity))) {
+                Set<Class<? extends Component>> emptyComponentClassSet = Collections.emptySet();
+                EntityData.PackedEntity entityData = entitySerializer.serialize(entity, emptyComponentClassSet, changedComponents.get(netId),
+                        emptyComponentClassSet, new ClientComponentFieldCheck());
+                if (entityData != null) {
+                    NetData.NetMessage.Builder message = NetData.NetMessage.newBuilder();
+                    message.getUpdateEntityBuilder().setEntity(entityData).setNetId(netId);
+                    send(message.build());
+                }
+            }
+        }
+        netDirty.clear();
+    }
+
+
+    private void  sendHeartBeat() {
+        NetData.NetMessage.Builder message = NetData.NetMessage.newBuilder();
+        message.getHeartBeatBuilder().setTime(time.getGameTimeInMs());
+        send(message.build());
     }
 
     private void processReceivedChunks() {
         if (remoteWorldProvider != null) {
-            List<Chunk> chunks = Lists.newArrayListWithExpectedSize(chunkQueue.size());
-            chunkQueue.drainTo(chunks);
-            for (Chunk chunk : chunks) {
+            Chunk chunk = null;
+            while ((chunk = chunkQueue.poll()) != null) {
                 remoteWorldProvider.receiveChunk(chunk);
             }
         }
@@ -196,38 +207,47 @@ public class ServerImpl implements Server {
         channel.writeAndFlush(data);
     }
 
-    private void sendEntities(NetData.EntityDataMessage.Builder message) {
-        TIntIterator dirtyIterator = netDirty.iterator();
-        while (dirtyIterator.hasNext()) {
-            int netId = dirtyIterator.next();
-            EntityRef entity = networkSystem.getEntity(netId);
-            if (isOwned(entity)) {
-                Set<Class<? extends Component>> emptyComponentClassSet = Collections.emptySet();
-                EntityData.PackedEntity entityData = entitySerializer.serialize(entity, emptyComponentClassSet, changedComponents.get(netId),
-                        emptyComponentClassSet, new ClientComponentFieldCheck());
-                if (entityData != null) {
-                    message.addUpdateEntity(NetData.UpdateEntityMessage.newBuilder().setEntity(entityData).setNetId(netId));
-                }
+
+
+    void setRemoteWorldProvider(RemoteChunkProvider remoteWorldProvider) {
+        this.remoteWorldProvider = remoteWorldProvider;
+        remoteWorldProvider.subscribe(this);
+    }
+
+    private void processMessages() {
+        NetData.NetMessage message = null;
+        while ((message = queuedMessages.poll()) != null) {
+            if (message.hasHeartBeat()) {
+                time.updateTimeFromServer(message.getHeartBeat().getTime());
+            } else if (message.hasBlockFamilyRegistered()) {
+                processBlockFamilyRegistered(message.getBlockFamilyRegistered());
+            } else if (message.hasChunkInfo()) {
+                Chunk chunk = ChunkSerializer.decode(message.getChunkInfo(), blockManager, extraDataManager);
+                chunkQueue.offer(chunk);
+            } else if (message.hasExtraDataChange()) {
+                processExtraDataChanged(message.getExtraDataChange());
+            } else if (message.hasCreateEntity()) {
+                entitySerializer.deserialize(message.getCreateEntity().getEntity());
+            } else if (message.hasInvalidateChunk()) {
+                processInvalidChunks(message.getInvalidateChunk());
+            } else if (message.hasUpdateEntity()) {
+                processUpdateEntity(message.getUpdateEntity());
+            } else if (message.hasRemoveEntity()) {
+                processRemoveEntity(message.getRemoveEntity());
+            } else if (message.hasBlockChange()) {
+                processBlockChange(message.getBlockChange());
+            } else if (message.hasEventMessage()) {
+                processEvent(message.getEventMessage());
+            } else if (message.hasBlockEventMessage()) {
+                processBlockEvent(message.getBlockEventMessage());
             }
         }
-        netDirty.clear();
     }
 
-    private boolean isOwned(EntityRef entity) {
-        EntityRef owner = networkSystem.getOwnerEntity(entity);
-        return getClientEntity().equals(owner);
-    }
-
-
-    private void processEvent(NetData.EventMessage message) {
+    private void processEvent(NetData.EventMessage pkt) {
         try {
-            Event event = eventSerializer.deserialize(message.getEvent());
-            EntityRef target = EntityRef.NULL;
-            if (message.hasTargetBlockPos()) {
-                target = blockEntityRegistry.getBlockEntityAt(NetMessageUtil.convert(message.getTargetBlockPos()));
-            } else if (message.hasTargetId()) {
-                target = networkSystem.getEntity(message.getTargetId());
-            }
+            Event event = eventSerializer.deserialize(pkt.getEvent());
+            EntityRef target = networkSystem.getEntity(pkt.getTargetId());
             if (target.exists()) {
                 target.send(event);
             } else {
@@ -238,42 +258,37 @@ public class ServerImpl implements Server {
         }
     }
 
-    void setRemoteWorldProvider(RemoteChunkProvider remoteWorldProvider) {
-        this.remoteWorldProvider = remoteWorldProvider;
-        remoteWorldProvider.subscribe(this);
-    }
-
-    private void processMessages() {
-        List<NetData.NetMessage> messages = Lists.newArrayListWithExpectedSize(queuedMessages.size());
-        queuedMessages.drainTo(messages);
-
-        for (NetData.NetMessage message : messages) {
-            if (message.hasTime()) {
-                time.updateTimeFromServer(message.getTime());
+    private void processBlockEvent(NetData.BlockEventMessage pkt) {
+        try {
+            Event event = eventSerializer.deserialize(pkt.getEvent());
+            EntityRef target = blockEntityRegistry.getBlockEntityAt(NetMessageUtil.convert(pkt.getTargetBlockPos()));
+            if (target.exists()) {
+                target.send(event);
+            } else {
+                logger.info("Dropping event {} for unavailable entity {}", event.getClass().getSimpleName(), target);
             }
-            if (message.hasEntityDataMessage()) {
-                processBlockRegistrations(message.getEntityDataMessage());
-                processReceivedChunks(message.getEntityDataMessage());
-                processInvalidatedChunks(message.getEntityDataMessage());
-                processBlockChanges(message.getEntityDataMessage());
-                processExtraDataChanges(message.getEntityDataMessage());
-                processRemoveEntities(message.getEntityDataMessage());
-                message.getEntityDataMessage().getCreateEntityList().forEach(this::createEntityMessage);
-                message.getEntityDataMessage().getUpdateEntityList().forEach(this::updateEntity);
-                for (NetData.EventMessage event : message.getEntityDataMessage().getEventList()) {
-                    try {
-                        processEvent(event);
-                    } catch (RuntimeException e) {
-                        logger.error("Error processing server event", e);
-                    }
-                }
-            }
+        } catch (DeserializationException e) {
+            logger.error("Failed to deserialize event", e);
         }
     }
 
-    private void processRemoveEntities(NetData.EntityDataMessage message) {
-        for (NetData.RemoveEntityMessage removeEntity : message.getRemoveEntityList()) {
-            int netId = removeEntity.getNetId();
+
+
+    private void processBlockChange(NetData.BlockChangeMessage pkt) {
+        Block newBlock = blockManager.getBlock((short) pkt.getNewBlock());
+        logger.debug("Received block change to {}", newBlock);
+        // TODO: Store changes to blocks that aren't ready to be modified (the surrounding chunks aren't available)
+        WorldProvider worldProvider = CoreRegistry.get(WorldProvider.class);
+        Vector3i pos = NetMessageUtil.convert(pkt.getPos());
+        if (worldProvider.isBlockRelevant(pos)) {
+            worldProvider.setBlock(pos, newBlock);
+        } else {
+            awaitingChunkReadyBlockUpdates.put(Chunks.toChunkPos(pos), pkt);
+        }
+    }
+
+    private void processRemoveEntity(NetData.RemoveEntityMessage pkt) {
+        for (int netId : pkt.getNetIdList()) {
             EntityRef entity = networkSystem.getEntity(netId);
             if (entity.exists()) {
                 logger.info("Destroying entity: {}", entity);
@@ -283,100 +298,63 @@ public class ServerImpl implements Server {
         }
     }
 
-    /**
-     * Apply the block changes from the message to the local world.
-     */
-    private void processBlockChanges(NetData.EntityDataMessage message) {
-        for (NetData.BlockChangeMessage blockChange : message.getBlockChangeList()) {
-            Block newBlock = blockManager.getBlock((short) blockChange.getNewBlock());
-            logger.debug("Received block change to {}", newBlock);
-            // TODO: Store changes to blocks that aren't ready to be modified (the surrounding chunks aren't available)
-            WorldProvider worldProvider = CoreRegistry.get(WorldProvider.class);
-            Vector3i pos = NetMessageUtil.convert(blockChange.getPos());
-            if (worldProvider.isBlockRelevant(pos)) {
-                worldProvider.setBlock(pos, newBlock);
-            } else {
-                awaitingChunkReadyBlockUpdates.put(Chunks.toChunkPos(pos), blockChange);
-            }
-        }
-    }
-
-    /**
-     * Apply the extra-data changes from the message to the local world.
-     */
-    private void processExtraDataChanges(NetData.EntityDataMessage message) {
-        for (NetData.ExtraDataChangeMessage extraDataChange : message.getExtraDataChangeList()) {
-            WorldProvider worldProvider = CoreRegistry.get(WorldProvider.class);
-            Vector3i pos = NetMessageUtil.convert(extraDataChange.getPos());
-            if (worldProvider.isBlockRelevant(pos)) {
-                worldProvider.setExtraData(extraDataChange.getIndex(), pos, extraDataChange.getNewData());
-            } else {
-                awaitingChunkReadyExtraDataUpdates.put(Chunks.toChunkPos(pos), extraDataChange);
-            }
-        }
-    }
-
-    private void processInvalidatedChunks(NetData.EntityDataMessage message) {
-        for (NetData.InvalidateChunkMessage chunk : message.getInvalidateChunkList()) {
-            Vector3i chunkPos = NetMessageUtil.convert(chunk.getPos());
-            remoteWorldProvider.invalidateChunks(chunkPos);
-            awaitingChunkReadyBlockUpdates.removeAll(chunkPos);
-            awaitingChunkReadyExtraDataUpdates.removeAll(chunkPos);
-        }
-    }
-
-    private void processReceivedChunks(NetData.EntityDataMessage message) {
-        for (EntityData.ChunkStore chunkInfo : message.getChunkInfoList()) {
-            Chunk chunk = ChunkSerializer.decode(chunkInfo, blockManager, extraDataManager);
-            chunkQueue.offer(chunk);
-        }
-    }
-
-    private void processBlockRegistrations(NetData.EntityDataMessage message) {
-        for (NetData.BlockFamilyRegisteredMessage blockFamily : message.getBlockFamilyRegisteredList()) {
-            if (blockFamily.getBlockIdCount() != blockFamily.getBlockUriCount()) {
-                logger.error("Received block registration with mismatched id<->uri mapping");
-            } else if (blockFamily.getBlockUriCount() == 0) {
-                logger.error("Received empty block registration");
-            } else {
-                try {
-                    BlockUri family = new BlockUri(blockFamily.getBlockUri(0)).getFamilyUri();
-                    Map<String, Integer> registrationMap = Maps.newHashMap();
-                    for (int i = 0; i < blockFamily.getBlockIdCount(); ++i) {
-                        registrationMap.put(blockFamily.getBlockUri(i), blockFamily.getBlockId(i));
-                    }
-                    blockManager.receiveFamilyRegistration(family, registrationMap);
-                } catch (BlockUriParseException e) {
-                    logger.error("Received invalid block uri {}", blockFamily.getBlockUri(0));
-                }
-            }
-        }
-    }
-
-    private void updateEntity(NetData.UpdateEntityMessage updateEntity) {
-        EntityRef currentEntity = networkSystem.getEntity(updateEntity.getNetId());
+    private void processUpdateEntity(NetData.UpdateEntityMessage pkt) {
+        EntityRef currentEntity = networkSystem.getEntity(pkt.getNetId());
         if (currentEntity.exists()) {
             NetworkComponent netComp = currentEntity.getComponent(NetworkComponent.class);
             if (netComp == null) {
-                logger.error("Updating entity with no network component: {}, expected netId {}", currentEntity, updateEntity.getNetId());
+                logger.error("Updating entity with no network component: {}, expected netId {}", currentEntity, pkt.getNetId());
                 return;
             }
-            if (netComp.getNetworkId() != updateEntity.getNetId()) {
+            if (netComp.getNetworkId() != pkt.getNetId()) {
                 logger.error("Network ID wrong before update");
             }
             boolean blockEntityBefore = currentEntity.hasComponent(BlockComponent.class);
-            entitySerializer.deserializeOnto(currentEntity, updateEntity.getEntity());
+            entitySerializer.deserializeOnto(currentEntity, pkt.getEntity());
             BlockComponent blockComponent = currentEntity.getComponent(BlockComponent.class);
             if (blockComponent != null && !blockEntityBefore) {
                 if (!blockEntityRegistry.getExistingBlockEntityAt(blockComponent.getPosition()).equals(currentEntity)) {
                     logger.error("Failed to associated new block entity");
                 }
             }
-            if (netComp.getNetworkId() != updateEntity.getNetId()) {
-                logger.error("Network ID lost in update: {}, {} -> {}", currentEntity, updateEntity.getNetId(), netComp.getNetworkId());
+            if (netComp.getNetworkId() != pkt.getNetId()) {
+                logger.error("Network ID lost in update: {}, {} -> {}", currentEntity, pkt.getNetId(), netComp.getNetworkId());
             }
         } else {
-            logger.warn("Received update for non-existent entity {}", updateEntity.getNetId());
+            logger.warn("Received update for non-existent entity {}", pkt.getNetId());
+        }
+    }
+
+    private void processInvalidChunks(NetData.InvalidateChunkMessage pkt) {
+        Vector3i chunkPos = NetMessageUtil.convert(pkt.getPos());
+        remoteWorldProvider.invalidateChunks(chunkPos);
+        awaitingChunkReadyBlockUpdates.removeAll(chunkPos);
+        awaitingChunkReadyExtraDataUpdates.removeAll(chunkPos);
+    }
+
+    private void processExtraDataChanged(NetData.ExtraDataChangeMessage pkt) {
+        WorldProvider worldProvider = CoreRegistry.get(WorldProvider.class);
+        Vector3i pos = NetMessageUtil.convert(pkt.getPos());
+        if (worldProvider.isBlockRelevant(pos)) {
+            worldProvider.setExtraData(pkt.getIndex(), pos, pkt.getNewData());
+        } else {
+            awaitingChunkReadyExtraDataUpdates.put(Chunks.toChunkPos(pos), pkt);
+        }
+    }
+
+
+    private void processBlockFamilyRegistered(NetData.BlockFamilyRegisteredMessage pkt) {
+        if (pkt.getBlockIdCount() != pkt.getBlockUriCount()) {
+            logger.error("Received block registration with mismatched id<->uri mapping");
+        } else if (pkt.getBlockUriCount() == 0) {
+            logger.error("Received empty block registration");
+        } else {
+            BlockUri family = new BlockUri(pkt.getBlockUri(0)).getFamilyUri();
+            Map<String, Integer> registrationMap = Maps.newHashMap();
+            for (int i = 0; i < pkt.getBlockIdCount(); i++) {
+                registrationMap.put(pkt.getBlockUri(i), pkt.getBlockId(i));
+            }
+            blockManager.receiveFamilyRegistration(family, registrationMap);
         }
     }
 

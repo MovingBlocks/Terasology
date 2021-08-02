@@ -101,9 +101,6 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
     private PublicIdentityCertificate identity;
 
     // Outgoing messages
-    private BlockingQueue<NetData.BlockChangeMessage> queuedOutgoingBlockChanges = Queues.newLinkedBlockingQueue();
-    private BlockingQueue<NetData.ExtraDataChangeMessage> queuedOutgoingExtraDataChanges = Queues.newLinkedBlockingQueue();
-    private List<NetData.EventMessage> queuedOutgoingEvents = Lists.newArrayList();
     private final List<BlockFamily> newlyRegisteredFamilies = Lists.newArrayList();
 
     private Map<Vector3i, Chunk> readyChunks = Maps.newLinkedHashMap();
@@ -205,37 +202,40 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
     @Override
     public void update(boolean netTick) {
         if (netTick) {
-            NetData.NetMessage.Builder message = NetData.NetMessage.newBuilder();
-            message.setTime(time.getGameTimeInMs());
-            NetData.EntityDataMessage.Builder dataMessageBuilder = message.getEntityDataMessageBuilder();
-            sendRegisteredBlocks(dataMessageBuilder);
-            sendChunkInvalidations(dataMessageBuilder);
-            sendNewChunks(dataMessageBuilder);
-            sendRemovedEntities(dataMessageBuilder);
-            sendInitialEntities(dataMessageBuilder);
-            sendDirtyEntities(dataMessageBuilder);
-            sendEvents(dataMessageBuilder);
-
-            send(message.build());
+            sendHeartBeat();
+            sendRegisteredBlocks();
+            sendNewChunks();
+            sendChunkInvalidations();
+            sendRemovedEntities();
+            sendInitialEntities();
+            sendDirtyEntities();
         }
         processReceivedMessages();
     }
 
-    private void sendRegisteredBlocks(NetData.EntityDataMessage.Builder message) {
+    private void  sendHeartBeat() {
+        NetData.NetMessage.Builder message = NetData.NetMessage.newBuilder();
+        message.getHeartBeatBuilder().setTime(time.getGameTimeInMs());
+        send(message.build());
+    }
+
+
+    private void sendRegisteredBlocks() {
         synchronized (newlyRegisteredFamilies) {
             for (BlockFamily family : newlyRegisteredFamilies) {
-                NetData.BlockFamilyRegisteredMessage.Builder blockRegMessage = NetData.BlockFamilyRegisteredMessage.newBuilder();
+                NetData.NetMessage.Builder message = NetData.NetMessage.newBuilder();
+                NetData.BlockFamilyRegisteredMessage.Builder pkt = message.getBlockFamilyRegisteredBuilder();
                 for (Block block : family.getBlocks()) {
-                    blockRegMessage.addBlockUri(block.getURI().toString());
-                    blockRegMessage.addBlockId(block.getId());
+                    pkt.addBlockUri(block.getURI().toString());
+                    pkt.addBlockId(block.getId());
                 }
-                message.addBlockFamilyRegistered(blockRegMessage);
+                send(message.build());
             }
             newlyRegisteredFamilies.clear();
         }
     }
 
-    private void sendNewChunks(NetData.EntityDataMessage.Builder message) {
+    private void sendNewChunks() {
         if (!readyChunks.isEmpty()) {
             chunkSendCounter += chunkSendRate * NET_TICK_RATE * networkSystem.getBandwidthPerClient();
             if (chunkSendCounter > 1.0f) {
@@ -260,20 +260,25 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
                 }
                 Chunk chunk = readyChunks.remove(pos);
                 relevantChunks.add(pos);
-                message.addChunkInfo(chunk.encode());
+                NetData.NetMessage.Builder message = NetData.NetMessage.newBuilder();
+                message.setChunkInfo(chunk.encode());
+                send(message.build());
             }
         } else {
             chunkSendCounter = 1.0f;
         }
     }
 
-    private void sendChunkInvalidations(NetData.EntityDataMessage.Builder message) {
+    private void sendChunkInvalidations() {
         Iterator<Vector3i> i = invalidatedChunks.iterator();
         while (i.hasNext()) {
             Vector3i pos = i.next();
             i.remove();
             relevantChunks.remove(pos);
-            message.addInvalidateChunk(NetData.InvalidateChunkMessage.newBuilder().setPos(NetMessageUtil.convert(pos)));
+
+            NetData.NetMessage.Builder message = NetData.NetMessage.newBuilder();
+            message.getInvalidateChunkBuilder().setPos(NetMessageUtil.convert(pos));
+            send(message.build());
         }
         invalidatedChunks.clear();
     }
@@ -335,22 +340,25 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
     public void send(Event event, EntityRef target) {
         try {
             BlockComponent blockComp = target.getComponent(BlockComponent.class);
+            NetData.NetMessage.Builder message = NetData.NetMessage.newBuilder();
+
             if (blockComp != null) {
                 if (relevantChunks.contains(Chunks.toChunkPos(blockComp.getPosition(), new Vector3i()))) {
-                    queuedOutgoingEvents.add(NetData.EventMessage.newBuilder()
-                        .setTargetBlockPos(NetMessageUtil.convert(blockComp.getPosition()))
-                        .setEvent(eventSerializer.serialize(event)).build());
+                    message.getBlockEventMessageBuilder()
+                            .setTargetBlockPos(NetMessageUtil.convert(blockComp.getPosition()))
+                            .setEvent(eventSerializer.serialize(event));
                 }
             } else {
                 NetworkComponent networkComponent = target.getComponent(NetworkComponent.class);
                 if (networkComponent != null) {
                     if (netRelevant.contains(networkComponent.getNetworkId()) || netInitial.contains(networkComponent.getNetworkId())) {
-                        queuedOutgoingEvents.add(NetData.EventMessage.newBuilder()
-                            .setTargetId(networkComponent.getNetworkId())
-                            .setEvent(eventSerializer.serialize(event)).build());
+                        message.getEventMessageBuilder()
+                                .setTargetId(networkComponent.getNetworkId())
+                                .setEvent(eventSerializer.serialize(event));
                     }
                 }
             }
+            send(message.build());
         } catch (SerializationException e) {
             logger.error("Failed to serialize event", e);
         }
@@ -390,67 +398,85 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
 
     @Override
     public void onBlockChanged(Vector3ic pos, Block newBlock, Block originalBlock) {
-        org.joml.Vector3i chunkPos = Chunks.toChunkPos(pos, new org.joml.Vector3i());
+        Vector3i chunkPos = Chunks.toChunkPos(pos, new Vector3i());
+
         if (relevantChunks.contains(chunkPos)) {
-            queuedOutgoingBlockChanges.add(NetData.BlockChangeMessage.newBuilder()
-                .setPos(NetMessageUtil.convert(pos))
-                .setNewBlock(newBlock.getId())
-                .build());
+            NetData.NetMessage.Builder message = NetData.NetMessage.newBuilder();
+            message.getBlockChangeBuilder()
+                    .setPos(NetMessageUtil.convert(pos))
+                    .setNewBlock(newBlock.getId());
+            send(message.build());
         }
     }
 
     @Override
     public void onExtraDataChanged(int i, Vector3ic pos, int newData, int oldData) {
-        org.joml.Vector3i chunkPos = Chunks.toChunkPos(pos, new org.joml.Vector3i());
+        Vector3i chunkPos = Chunks.toChunkPos(pos, new Vector3i());
         if (relevantChunks.contains(chunkPos)) {
-            queuedOutgoingExtraDataChanges.add(NetData.ExtraDataChangeMessage.newBuilder()
-                .setIndex(i)
-                .setPos(NetMessageUtil.convert(pos))
-                .setNewData(newData)
-                .build());
+            NetData.NetMessage.Builder message = NetData.NetMessage.newBuilder();
+            message.getExtraDataChangeBuilder()
+                    .setIndex(i)
+                    .setPos(NetMessageUtil.convert(pos))
+                    .setNewData(newData);
         }
     }
+
 
 
     private void processReceivedMessages() {
-        List<NetData.NetMessage> messages = Lists.newArrayListWithExpectedSize(queuedIncomingMessage.size());
-        queuedIncomingMessage.drainTo(messages);
-        for (NetData.NetMessage message : messages) {
-            if (message.hasTime() && message.getTime() > lastReceivedTime) {
-                lastReceivedTime = message.getTime();
+        NetData.NetMessage message = null;
+        while ((message = queuedIncomingMessage.poll()) != null) {
+            if (message.hasHeartBeat()) {
+                processHeartbeatMessage(message.getHeartBeat());
+            } else if (message.hasEventMessage()) {
+                processNetEventMessage(message.getEventMessage());
+            } else if (message.hasUpdateEntity()) {
+                processUpdateMessage(message.getUpdateEntity());
             }
-            processEntityUpdates(message);
-            processEvents(message);
-
+        }
+    }
+    private void processUpdateMessage(NetData.UpdateEntityMessage pkt) {
+        EntityRef currentEntity = networkSystem.getEntity(pkt.getNetId());
+        if (networkSystem.getOwner(currentEntity) == this) {
+            entitySerializer.deserializeOnto(currentEntity, pkt.getEntity(),
+                    new ServerComponentFieldCheck(false, true));
+        }
+    }
+    private void processHeartbeatMessage(NetData.HeartBeatMessage  pkt) {
+        PredictionSystem predictionSystem = CoreRegistry.get(PredictionSystem.class);
+        if (pkt.getTime() > lastReceivedTime) {
+            lastReceivedTime = pkt.getTime();
+        }
+        if (predictionSystem != null) {
+            predictionSystem.restoreToPresent();
         }
     }
 
-    private void sendEvents(NetData.EntityDataMessage.Builder message) {
-        List<NetData.BlockChangeMessage> blockChanges = Lists.newArrayListWithExpectedSize(queuedOutgoingBlockChanges.size());
-        queuedOutgoingBlockChanges.drainTo(blockChanges);
-        message.addAllBlockChange(blockChanges);
-
-        List<NetData.ExtraDataChangeMessage> extraDataChanges = Lists.newArrayListWithExpectedSize(queuedOutgoingExtraDataChanges.size());
-        queuedOutgoingExtraDataChanges.drainTo(extraDataChanges);
-        message.addAllExtraDataChange(extraDataChanges);
-
-        message.addAllEvent(queuedOutgoingEvents);
-        queuedOutgoingEvents.clear();
-    }
-
-    private void processEntityUpdates(NetData.NetMessage message) {
-        if (message.hasEntityDataMessage()) {
-            for (NetData.UpdateEntityMessage updateMessage : message.getEntityDataMessage().getUpdateEntityList()) {
-                EntityRef currentEntity = networkSystem.getEntity(updateMessage.getNetId());
-                if (networkSystem.getOwner(currentEntity) == this) {
-                    entitySerializer.deserializeOnto(currentEntity, updateMessage.getEntity(),
-                            new ServerComponentFieldCheck(false, true));
+    private void  processNetEventMessage(NetData.EventMessage pkt) {
+        try {
+            Event event = eventSerializer.deserialize(pkt.getEvent());
+            EventMetadata<?> metadata = eventLibrary.getMetadata(event.getClass());
+            if (metadata.getNetworkEventType() != NetworkEventType.SERVER) {
+                logger.warn("Received non-server event '{}' from client '{}'", metadata, getName());
+                return;
+            }
+            EntityRef target = networkSystem.getEntity(pkt.getTargetId());
+            if (target.exists()) {
+                if (Objects.equal(networkSystem.getOwner(target), this)) {
+                    target.send(event);
+                } else {
+                    logger.warn("Received event {} for non-owned entity {} from {}", event, target, this);
                 }
             }
+        } catch (DeserializationException e) {
+            logger.error("Failed to deserialize event", e);
+        } catch (RuntimeException e) {
+            logger.error("Error processing event", e);
         }
     }
 
-    private void sendDirtyEntities(NetData.EntityDataMessage.Builder message) {
+
+    private void sendDirtyEntities() {
         TIntIterator dirtyIterator = netDirty.iterator();
         while (dirtyIterator.hasNext()) {
             int netId = dirtyIterator.next();
@@ -463,7 +489,9 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
                     dirtyComponents.get(netId), removedComponents.get(netId),
                     new ServerComponentFieldCheck(isOwner, false));
             if (entityData != null) {
-                message.addUpdateEntity(NetData.UpdateEntityMessage.newBuilder().setEntity(entityData).setNetId(netId));
+                NetData.NetMessage.Builder message = NetData.NetMessage.newBuilder();
+                message.getUpdateEntityBuilder().setEntity(entityData).setNetId(netId);
+                send(message.build());
             }
         }
         netDirty.clear();
@@ -472,15 +500,18 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
         dirtyComponents.clear();
     }
 
-    private void sendRemovedEntities(NetData.EntityDataMessage.Builder message) {
+    private void sendRemovedEntities() {
+        NetData.NetMessage.Builder message = NetData.NetMessage.newBuilder();
+        NetData.RemoveEntityMessage.Builder pkt = message.getRemoveEntityBuilder();
+
         TIntIterator initialIterator = netRemoved.iterator();
         while (initialIterator.hasNext()) {
-            message.addRemoveEntity(NetData.RemoveEntityMessage.newBuilder().setNetId(initialIterator.next()));
+            pkt.addNetId(initialIterator.next());
         }
         netRemoved.clear();
     }
 
-    private void sendInitialEntities(NetData.EntityDataMessage.Builder message) {
+    private void sendInitialEntities() {
         int[] initial = netInitial.toArray();
         netInitial.clear();
         Arrays.sort(initial);
@@ -495,56 +526,18 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
             Client owner = networkSystem.getOwner(entity);
             EntityData.PackedEntity entityData = entitySerializer.serialize(entity, true,
                     new ServerComponentFieldCheck(owner == this, true)).build();
-            NetData.CreateEntityMessage.Builder createMessage = NetData.CreateEntityMessage.newBuilder().setEntity(entityData);
+            NetData.NetMessage.Builder message = NetData.NetMessage.newBuilder();
+            NetData.CreateEntityMessage.Builder pkt = message.getCreateEntityBuilder()
+                    .setEntity(entityData);
             BlockComponent blockComponent = entity.getComponent(BlockComponent.class);
             if (blockComponent != null) {
-                createMessage.setBlockPos(NetMessageUtil.convert(blockComponent.getPosition()));
+                pkt.setBlockPos(NetMessageUtil.convert(blockComponent.getPosition()));
             }
-            message.addCreateEntity(createMessage);
-        }
-
-    }
-
-    private void processEvents(NetData.NetMessage message) {
-        boolean lagCompensated = false;
-        if(message.hasEntityDataMessage()) {
-            PredictionSystem predictionSystem = CoreRegistry.get(PredictionSystem.class);
-            for (NetData.EventMessage eventMessage : message.getEntityDataMessage().getEventList()) {
-                try {
-                    Event event = eventSerializer.deserialize(eventMessage.getEvent());
-                    EventMetadata<?> metadata = eventLibrary.getMetadata(event.getClass());
-                    if (metadata.getNetworkEventType() != NetworkEventType.SERVER) {
-                        logger.warn("Received non-server event '{}' from client '{}'", metadata, getName());
-                        continue;
-                    }
-                    if (!lagCompensated && metadata.isLagCompensated()) {
-                        if (predictionSystem != null) {
-                            predictionSystem.lagCompensate(getEntity(), lastReceivedTime);
-                        }
-                        lagCompensated = true;
-                    }
-                    EntityRef target = EntityRef.NULL;
-                    if (eventMessage.hasTargetId()) {
-                        target = networkSystem.getEntity(eventMessage.getTargetId());
-                    }
-                    if (target.exists()) {
-                        if (Objects.equal(networkSystem.getOwner(target), this)) {
-                            target.send(event);
-                        } else {
-                            logger.warn("Received event {} for non-owned entity {} from {}", event, target, this);
-                        }
-                    }
-                } catch (DeserializationException e) {
-                    logger.error("Failed to deserialize event", e);
-                } catch (RuntimeException e) {
-                    logger.error("Error processing event", e);
-                }
-            }
-            if (lagCompensated && predictionSystem != null) {
-                predictionSystem.restoreToPresent();
-            }
+            send(message.build());
         }
     }
+
+
 
     public void messageReceived(NetData.NetMessage message) {
         int serializedSize = message.getSerializedSize();
@@ -567,6 +560,4 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
             newlyRegisteredFamilies.add(family);
         }
     }
-
-
 }
