@@ -478,38 +478,42 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
 
 
     private void sendDirtyEntities() {
-        TIntIterator dirtyIterator = netDirty.iterator();
-        while (dirtyIterator.hasNext()) {
-            int netId = dirtyIterator.next();
-            EntityRef entity = networkSystem.getEntity(netId);
-            if (!entity.exists()) {
-                logger.error("Sending non-existent entity update for netId {}", netId);
+        if (netDirty.size() > 0) {
+            TIntIterator dirtyIterator = netDirty.iterator();
+            while (dirtyIterator.hasNext()) {
+                int netId = dirtyIterator.next();
+                EntityRef entity = networkSystem.getEntity(netId);
+                if (!entity.exists()) {
+                    logger.error("Sending non-existent entity update for netId {}", netId);
+                }
+                boolean isOwner = networkSystem.getOwner(entity) == this;
+                EntityData.PackedEntity entityData = entitySerializer.serialize(entity, addedComponents.get(netId),
+                        dirtyComponents.get(netId), removedComponents.get(netId),
+                        new ServerComponentFieldCheck(isOwner, false));
+                if (entityData != null) {
+                    NetData.NetMessage.Builder message = NetData.NetMessage.newBuilder();
+                    message.getUpdateEntityBuilder().setEntity(entityData).setNetId(netId);
+                    send(message.build());
+                }
             }
-            boolean isOwner = networkSystem.getOwner(entity) == this;
-            EntityData.PackedEntity entityData = entitySerializer.serialize(entity, addedComponents.get(netId),
-                    dirtyComponents.get(netId), removedComponents.get(netId),
-                    new ServerComponentFieldCheck(isOwner, false));
-            if (entityData != null) {
-                NetData.NetMessage.Builder message = NetData.NetMessage.newBuilder();
-                message.getUpdateEntityBuilder().setEntity(entityData).setNetId(netId);
-                send(message.build());
-            }
+            netDirty.clear();
         }
-        netDirty.clear();
         addedComponents.clear();
         removedComponents.clear();
         dirtyComponents.clear();
     }
 
     private void sendRemovedEntities() {
-        NetData.NetMessage.Builder message = NetData.NetMessage.newBuilder();
-        NetData.RemoveEntityMessage.Builder pkt = message.getRemoveEntityBuilder();
-
-        TIntIterator initialIterator = netRemoved.iterator();
-        while (initialIterator.hasNext()) {
-            pkt.addNetId(initialIterator.next());
+        if (netRemoved.size() > 0) {
+            NetData.NetMessage.Builder message = NetData.NetMessage.newBuilder();
+            NetData.RemoveEntityMessage.Builder pkt = message.getRemoveEntityBuilder();
+            TIntIterator initialIterator = netRemoved.iterator();
+            while (initialIterator.hasNext()) {
+                pkt.addNetId(initialIterator.next());
+            }
+            send(message.build());
+            netRemoved.clear();
         }
-        netRemoved.clear();
     }
 
     private void sendInitialEntities() {
@@ -530,10 +534,10 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
             NetData.NetMessage.Builder message = NetData.NetMessage.newBuilder();
             NetData.CreateEntityMessage.Builder pkt = message.getCreateEntityBuilder()
                     .setEntity(entityData);
-            BlockComponent blockComponent = entity.getComponent(BlockComponent.class);
-            if (blockComponent != null) {
-                pkt.setBlockPos(NetMessageUtil.convert(blockComponent.getPosition()));
-            }
+//            BlockComponent blockComponent = entity.getComponent(BlockComponent.class);
+//            if (blockComponent != null) {
+//                pkt.setBlockPos(NetMessageUtil.convert(blockComponent.getPosition()));
+//            }
             send(message.build());
         }
     }

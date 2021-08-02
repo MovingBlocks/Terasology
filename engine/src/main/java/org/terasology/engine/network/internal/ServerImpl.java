@@ -6,7 +6,6 @@ package org.terasology.engine.network.internal;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ListMultimap;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
 import com.google.common.collect.SetMultimap;
@@ -29,7 +28,6 @@ import org.terasology.engine.network.NetworkComponent;
 import org.terasology.engine.network.Server;
 import org.terasology.engine.network.ServerInfoMessage;
 import org.terasology.engine.network.serialization.ClientComponentFieldCheck;
-import org.terasology.engine.persistence.ChunkStore;
 import org.terasology.engine.persistence.serializers.EventSerializer;
 import org.terasology.engine.persistence.serializers.NetworkEntitySerializer;
 import org.terasology.engine.registry.CoreRegistry;
@@ -39,7 +37,6 @@ import org.terasology.engine.world.block.Block;
 import org.terasology.engine.world.block.BlockComponent;
 import org.terasology.engine.world.block.BlockManager;
 import org.terasology.engine.world.block.BlockUri;
-import org.terasology.engine.world.block.BlockUriParseException;
 import org.terasology.engine.world.block.internal.BlockManagerImpl;
 import org.terasology.engine.world.chunks.Chunk;
 import org.terasology.engine.world.chunks.Chunks;
@@ -82,7 +79,6 @@ public class ServerImpl implements Server {
 
     private BlockEntityRegistry blockEntityRegistry;
     private RemoteChunkProvider remoteWorldProvider;
-    private BlockingQueue<Chunk> chunkQueue = Queues.newLinkedBlockingQueue();
     private TIntSet netDirty = new TIntHashSet();
     private SetMultimap<Integer, Class<? extends Component>> changedComponents = HashMultimap.create();
     private ListMultimap<Vector3i, NetData.BlockChangeMessage> awaitingChunkReadyBlockUpdates = ArrayListMultimap.create();
@@ -157,7 +153,6 @@ public class ServerImpl implements Server {
 
     @Override
     public void update(boolean netTick) {
-        processReceivedChunks();
         if (entityManager != null) {
             if (netTick) {
                 sendHeartBeat();
@@ -194,15 +189,6 @@ public class ServerImpl implements Server {
         send(message.build());
     }
 
-    private void processReceivedChunks() {
-        if (remoteWorldProvider != null) {
-            Chunk chunk = null;
-            while ((chunk = chunkQueue.poll()) != null) {
-                remoteWorldProvider.receiveChunk(chunk);
-            }
-        }
-    }
-
     private void send(NetData.NetMessage data) {
         logger.trace("Sending with size {}", data.getSerializedSize());
         channel.write(data);
@@ -224,7 +210,7 @@ public class ServerImpl implements Server {
                 processBlockFamilyRegistered(message.getBlockFamilyRegistered());
             } else if (message.hasChunkInfo()) {
                 Chunk chunk = ChunkSerializer.decode(message.getChunkInfo(), blockManager, extraDataManager);
-                chunkQueue.offer(chunk);
+                remoteWorldProvider.receiveChunk(chunk);
             } else if (message.hasExtraDataChange()) {
                 processExtraDataChanged(message.getExtraDataChange());
             } else if (message.hasCreateEntity()) {
