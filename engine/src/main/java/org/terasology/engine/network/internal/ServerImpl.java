@@ -162,6 +162,7 @@ public class ServerImpl implements Server {
             if (netTick) {
                 sendHeartBeat();
                 sendEntities();
+                this.channel.flush();
             }
             processMessages();
         }
@@ -204,7 +205,7 @@ public class ServerImpl implements Server {
 
     private void send(NetData.NetMessage data) {
         logger.trace("Sending with size {}", data.getSerializedSize());
-        channel.writeAndFlush(data);
+        channel.write(data);
     }
 
 

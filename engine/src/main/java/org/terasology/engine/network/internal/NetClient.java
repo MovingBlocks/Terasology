@@ -209,6 +209,7 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
             sendRemovedEntities();
             sendInitialEntities();
             sendDirtyEntities();
+            this.channel.flush();
         }
         processReceivedMessages();
     }
@@ -378,7 +379,7 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
         logger.trace("Sending packet with size {}", data.getSerializedSize());
         sentMessages.incrementAndGet();
         sentBytes.addAndGet(data.getSerializedSize());
-        channel.writeAndFlush(data);
+        channel.write(data);
     }
 
     @Override
