@@ -168,7 +168,7 @@ public class ServerImpl implements Server {
         while (dirtyIterator.hasNext()) {
             int netId = dirtyIterator.next();
             EntityRef entity = networkSystem.getEntity(netId);
-            if (getClientEntity().equals(networkSystem.getOwner(entity))) {
+            if (getClientEntity().equals(networkSystem.getOwnerEntity(entity))) {
                 Set<Class<? extends Component>> emptyComponentClassSet = Collections.emptySet();
                 EntityData.PackedEntity entityData = entitySerializer.serialize(entity, emptyComponentClassSet, changedComponents.get(netId),
                         emptyComponentClassSet, new ClientComponentFieldCheck());
