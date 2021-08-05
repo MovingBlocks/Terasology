@@ -21,6 +21,7 @@ import org.terasology.engine.world.block.shapes.BlockMeshPart;
 import org.terasology.engine.world.block.shapes.BlockShape;
 import org.terasology.engine.world.block.tiles.BlockTile;
 import org.terasology.engine.world.block.tiles.WorldAtlas;
+import org.terasology.nui.Color;
 
 import java.util.Map;
 
@@ -124,6 +125,11 @@ public class BlockBuilder implements BlockBuilderHelper {
         block.setPrimaryAppearance(createAppearance(shape, section.getBlockTiles(), rotation));
         setBlockFullSides(block, shape, rotation);
         block.setCollision(shape.getCollisionOffset(rotation), shape.getCollisionShape(rotation));
+
+        for (BlockPart part : BlockPart.values()) {
+            block.setColorSource(part, section.getColorSources().get(part));
+            block.setColorOffset(part, new Color().set(section.getColorOffsets().get(part)));
+        }
 
         block.setUri(uri);
         block.setBlockFamily(blockFamily);
