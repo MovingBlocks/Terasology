@@ -345,9 +345,6 @@ public class ServerImpl implements Server {
         }
     }
 
-    private void createEntityMessage(NetData.CreateEntityMessage message) {
-        entitySerializer.deserialize(message.getEntity());
-    }
 
     @Override
     public void queueMessage(NetData.NetMessage message) {
