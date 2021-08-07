@@ -19,24 +19,24 @@ import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
+import org.terasology.engine.world.block.DefaultColorSource;
+import org.terasology.gestalt.assets.Asset;
+import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.engine.entitySystem.prefab.Prefab;
 import org.terasology.engine.registry.CoreRegistry;
+import org.terasology.engine.world.block.shapes.BlockShape;
+import org.terasology.engine.world.block.sounds.BlockSounds;
 import org.terasology.engine.utilities.gson.CaseInsensitiveEnumTypeAdapterFactory;
 import org.terasology.engine.utilities.gson.Vector3fTypeAdapter;
 import org.terasology.engine.utilities.gson.Vector4fTypeAdapter;
 import org.terasology.engine.world.block.BlockPart;
-import org.terasology.engine.world.block.DefaultColorSource;
 import org.terasology.engine.world.block.family.BlockFamily;
 import org.terasology.engine.world.block.family.BlockFamilyLibrary;
 import org.terasology.engine.world.block.family.FreeformFamily;
 import org.terasology.engine.world.block.family.HorizontalFamily;
 import org.terasology.engine.world.block.family.MultiSection;
 import org.terasology.engine.world.block.family.SymmetricFamily;
-import org.terasology.engine.world.block.shapes.BlockShape;
-import org.terasology.engine.world.block.sounds.BlockSounds;
 import org.terasology.engine.world.block.tiles.BlockTile;
-import org.terasology.gestalt.assets.Asset;
-import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.gestalt.assets.format.AbstractAssetFileFormat;
 import org.terasology.gestalt.assets.format.AssetDataFile;
 import org.terasology.gestalt.assets.management.AssetManager;
@@ -318,6 +318,7 @@ public class BlockFamilyDefinitionFormat extends AbstractAssetFileFormat<BlockFa
         @Override
         public Class<? extends BlockFamily> deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
                 throws JsonParseException {
+
             BlockFamilyLibrary library = CoreRegistry.get(BlockFamilyLibrary.class);
             return library.getBlockFamily(json.getAsString());
         }

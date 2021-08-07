@@ -7,6 +7,9 @@ import org.terasology.engine.context.Context;
 import org.terasology.engine.core.modes.SingleStepLoadProcess;
 import org.terasology.engine.core.module.rendering.RenderingModuleRegistry;
 
+/**
+ * Add {@link RenderingModuleRegistry} to the game {@link Context}.
+ */
 public class InitialiseRendering extends SingleStepLoadProcess {
     private final Context context;
 
