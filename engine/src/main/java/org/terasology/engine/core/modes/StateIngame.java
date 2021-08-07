@@ -112,10 +112,10 @@ public class StateIngame implements GameState {
         chunkProvider.dispose();
 
         AssetTypeManager assetTypeManager = context.get(ModuleAwareAssetTypeManager.class);
-        assetTypeManager.getAssetTypes().forEach(k -> {
-            for (ResourceUrn urn : k.getLoadedAssetUrns()) {
+        assetTypeManager.getAssetTypes().forEach(assetType -> {
+            for (ResourceUrn urn : assetType.getLoadedAssetUrns()) {
                 if (!urn.getModuleName().equals(TerasologyConstants.ENGINE_MODULE)) {
-                    k.getAsset(urn).ifPresent(Asset::dispose);
+                    assetType.getAsset(urn).ifPresent(Asset::dispose);
                 }
             }
         });
