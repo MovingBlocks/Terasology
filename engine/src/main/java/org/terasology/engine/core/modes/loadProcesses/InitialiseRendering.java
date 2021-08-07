@@ -9,6 +9,12 @@ import org.terasology.engine.core.module.rendering.RenderingModuleRegistry;
 
 /**
  * Add {@link RenderingModuleRegistry} to the game {@link Context}.
+ * 
+ * The rendering system is required whenever a client starts or joins a game. As rendering may fail to re-initialise
+ * correctly when it has previously been constructed, this loading process will populate the {@link Context} with a
+ * freshly created rendering system.
+ * 
+ * When switching the game state, the rendering system can just be disposed with the old state.
  */
 public class InitialiseRendering extends SingleStepLoadProcess {
     private final Context context;
