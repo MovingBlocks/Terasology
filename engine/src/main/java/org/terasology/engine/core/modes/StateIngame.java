@@ -119,8 +119,10 @@ public class StateIngame implements GameState {
                 }
             }
         });
+        // dispose engine assets that should not be kept when switching game states
         assetTypeManager.getAssetType(BlockFamilyDefinition.class).ifPresent(AssetType::disposeAll);
         assetTypeManager.getAssetType(Prefab.class).ifPresent(AssetType::disposeAll);
+
         boolean save = networkSystem.getMode().isAuthority();
         if (save) {
             storageManager.waitForCompletionOfPreviousSaveAndStartSaving();
