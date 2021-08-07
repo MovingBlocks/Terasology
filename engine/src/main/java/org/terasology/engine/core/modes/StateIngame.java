@@ -121,8 +121,6 @@ public class StateIngame implements GameState {
         });
         assetTypeManager.getAssetType(BlockFamilyDefinition.class).ifPresent(AssetType::disposeAll);
         assetTypeManager.getAssetType(Prefab.class).ifPresent(AssetType::disposeAll);
-
-
         boolean save = networkSystem.getMode().isAuthority();
         if (save) {
             storageManager.waitForCompletionOfPreviousSaveAndStartSaving();
