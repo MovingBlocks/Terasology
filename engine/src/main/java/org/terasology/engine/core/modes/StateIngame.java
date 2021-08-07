@@ -159,7 +159,6 @@ public class StateIngame implements GameState {
         console.dispose();
         GameThread.clearWaitingProcesses();
 
-
         /*
          * Clear the binding as otherwise the complete ingame state would be
          * referenced.
