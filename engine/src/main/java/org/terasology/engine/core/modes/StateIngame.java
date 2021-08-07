@@ -109,9 +109,9 @@ public class StateIngame implements GameState {
     @Override
     public void dispose(boolean shuttingDown) {
         ChunkProvider chunkProvider = context.get(ChunkProvider.class);
-        AssetTypeManager assetTypeManager = context.get(ModuleAwareAssetTypeManager.class);
         chunkProvider.dispose();
 
+        AssetTypeManager assetTypeManager = context.get(ModuleAwareAssetTypeManager.class);
         assetTypeManager.getAssetTypes().forEach(k -> {
             for (ResourceUrn urn : k.getLoadedAssetUrns()) {
                 if (!urn.getModuleName().equals(TerasologyConstants.ENGINE_MODULE)) {
