@@ -112,6 +112,7 @@ public class StateIngame implements GameState {
         chunkProvider.dispose();
 
         AssetTypeManager assetTypeManager = context.get(ModuleAwareAssetTypeManager.class);
+        // dispose all module assets
         assetTypeManager.getAssetTypes().forEach(assetType -> {
             for (ResourceUrn urn : assetType.getLoadedAssetUrns()) {
                 if (!urn.getModuleName().equals(TerasologyConstants.ENGINE_MODULE)) {
