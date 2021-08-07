@@ -99,7 +99,6 @@ public final class EnvironmentSwitchHandler {
         context.put(EventLibrary.class, library.getEventLibrary());
         context.put(ClassMetaLibrary.class, new ClassMetaLibraryImpl(context));
 
-
         registerComponents(componentLibrary, environment);
         registerTypeHandlers(context, typeHandlerLibrary, environment);
 
