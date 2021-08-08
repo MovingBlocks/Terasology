@@ -103,6 +103,7 @@ public class GLSLMaterial extends BaseMaterial {
         for (int slot : textureMap.keys()) {
             Texture texture = textureMap.get(slot);
             if (texture.isDisposed()) {
+                textureMap.remove(slot);
                 logger.error("Attempted to bind disposed texture {}", texture);
             } else {
                 shaderManager.bindTexture(slot, texture);
