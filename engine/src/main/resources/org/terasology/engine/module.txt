@@ -1,6 +1,6 @@
 {
     "id" : "engine",
-    "version" : "5.1.0-SNAPSHOT",
+    "version" : "5.1.0",
     "displayName" : "Terasology Engine",
     "description" : "Core engine content"
 }
