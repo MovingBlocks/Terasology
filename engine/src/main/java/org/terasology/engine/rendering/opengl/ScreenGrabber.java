@@ -102,10 +102,10 @@ public class ScreenGrabber {
         int height = sceneFinalFbo.height();
 
         if (savingGamePreview) {
-            GameScheduler.getScheduler().schedule(() -> saveGamePreviewTask(buffer, width, height));
+            GameScheduler.parallel().schedule(() -> saveGamePreviewTask(buffer, width, height));
             this.savingGamePreview = false;
         } else {
-            GameScheduler.getScheduler().schedule(() -> saveScreenshotTask(buffer, width, height));
+            GameScheduler.parallel().schedule(() -> saveScreenshotTask(buffer, width, height));
         }
 
         isTakingScreenshot = false;

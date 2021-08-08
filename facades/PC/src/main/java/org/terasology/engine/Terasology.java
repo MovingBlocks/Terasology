@@ -160,7 +160,7 @@ public final class Terasology {
                     if (gameManifest != null) {
                         engine.changeState(new StateLoading(gameManifest, NetworkMode.NONE));
                     }
-                }).subscribeOn(GameScheduler.getScheduler()).subscribe();
+                }).subscribeOn(GameScheduler.parallel()).subscribe();
 
             } else {
                 if (createLastGame) {
@@ -176,7 +176,7 @@ public final class Terasology {
                             }
                             engine.changeState(new StateLoading(gameManifest, NetworkMode.NONE));
                         }
-                    }).subscribeOn(GameScheduler.getScheduler()).subscribe();
+                    }).subscribeOn(GameScheduler.parallel()).subscribe();
                 }
 
                 engine.run(new StateMainMenu());

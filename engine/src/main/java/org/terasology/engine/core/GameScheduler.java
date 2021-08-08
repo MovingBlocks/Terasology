@@ -47,7 +47,7 @@ public class GameScheduler {
      * @return (singleton)
      * @see <a href="https://projectreactor.io/docs/core/release/reference/#core-features">Reactor Core Features</a>
      */
-    public static Scheduler getScheduler() {
+    public static Scheduler parallel() {
         return AccessController.doPrivileged((PrivilegedAction<Scheduler>) Schedulers::parallel);
     }
 }
