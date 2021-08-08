@@ -36,6 +36,7 @@ public class IndexResource extends BufferedResource {
 
     public void rewind() {
         posIndex = 0;
+        inIndices = 0;
     }
 
     public void put(int value) {

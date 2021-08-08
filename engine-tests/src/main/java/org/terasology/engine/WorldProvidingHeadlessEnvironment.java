@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine;
 
-import org.terasology.gestalt.naming.Name;
 import org.terasology.engine.registry.CoreRegistry;
 import org.terasology.engine.world.BlockEntityRegistry;
 import org.terasology.engine.world.WorldProvider;
@@ -12,10 +11,14 @@ import org.terasology.engine.world.generator.WorldGenerator;
 import org.terasology.engine.world.internal.EntityAwareWorldProvider;
 import org.terasology.engine.world.internal.WorldProviderCore;
 import org.terasology.engine.world.internal.WorldProviderWrapper;
+import org.terasology.gestalt.naming.Name;
 
 /**
  * Environment with a MapWorldProvider and BlockManager. Useful to get headless environment with a generated world.
+ *
+ * @deprecated Use ModuleTestingEnvironment.
  */
+@Deprecated
 public class WorldProvidingHeadlessEnvironment extends HeadlessEnvironment {
 
     public WorldProvidingHeadlessEnvironment(Name... modules) {

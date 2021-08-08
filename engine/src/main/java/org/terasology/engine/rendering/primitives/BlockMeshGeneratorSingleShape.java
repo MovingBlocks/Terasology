@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.rendering.primitives;
 
+import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.engine.math.Side;
@@ -12,6 +13,8 @@ import org.terasology.engine.world.block.BlockAppearance;
 import org.terasology.engine.world.block.BlockManager;
 import org.terasology.engine.world.block.BlockPart;
 import org.terasology.engine.world.block.shapes.BlockMeshPart;
+import org.terasology.nui.Color;
+import org.terasology.nui.Colorc;
 
 public class BlockMeshGeneratorSingleShape implements BlockMeshGenerator {
 
@@ -25,6 +28,9 @@ public class BlockMeshGeneratorSingleShape implements BlockMeshGenerator {
     @Override
     public void generateChunkMesh(ChunkView view, ChunkMesh chunkMesh, int x, int y, int z) {
         final Block selfBlock = view.getBlock(x, y, z);
+        Vector3i pos = new Vector3i(x, y, z);
+        pos = view.toWorldPos(pos);
+        Color colorCache = new Color();
 
         // Gather adjacent blocks
         Block[] adjacentBlocks = new Block[Side.values().length];
@@ -33,15 +39,15 @@ public class BlockMeshGeneratorSingleShape implements BlockMeshGenerator {
             Block blockToCheck = view.getBlock(x + offset.x(), y + offset.y(), z + offset.z());
             adjacentBlocks[side.ordinal()] = blockToCheck;
         }
+
+        final ChunkMesh.RenderType renderType = getRenderType(selfBlock);
+        final BlockAppearance blockAppearance = selfBlock.getPrimaryAppearance();
+        final ChunkVertexFlag vertexFlag = getChunkVertexFlag(view, x, y, z, selfBlock);
+        boolean isRendered = false;
+
         for (final Side side : Side.values()) {
             if (isSideVisibleForBlockTypes(adjacentBlocks[side.ordinal()], selfBlock, side)) {
-                final ChunkMesh.RenderType renderType = getRenderType(selfBlock);
-                final BlockAppearance blockAppearance = selfBlock.getPrimaryAppearance();
-                final ChunkVertexFlag vertexFlag = getChunkVertexFlag(view, x, y, z, selfBlock);
-
-                if (blockAppearance.getPart(BlockPart.CENTER) != null) {
-                    blockAppearance.getPart(BlockPart.CENTER).appendTo(chunkMesh, view, x, y, z, renderType, vertexFlag);
-                }
+                isRendered = true;
 
                 BlockMeshPart blockMeshPart = blockAppearance.getPart(BlockPart.fromSide(side));
 
@@ -70,9 +76,25 @@ public class BlockMeshGeneratorSingleShape implements BlockMeshGenerator {
                     if (selfBlock.isGrass() && side != Side.TOP && side != Side.BOTTOM) {
                         sideVertexFlag = ChunkVertexFlag.COLOR_MASK;
                     }
-                    blockMeshPart.appendTo(chunkMesh, view, x, y, z, renderType, sideVertexFlag);
+                    Colorc colorOffset = selfBlock.getColorOffset(BlockPart.fromSide(side));
+                    Colorc colorSource = selfBlock.getColorSource(BlockPart.fromSide(side)).calcColor(pos.x, pos.y, pos.z);
+                    colorCache.setRed(colorSource.rf() * colorOffset.rf())
+                            .setGreen(colorSource.gf() * colorOffset.gf())
+                            .setBlue(colorSource.bf() * colorOffset.bf())
+                            .setAlpha(colorSource.af() * colorOffset.af());
+                    blockMeshPart.appendTo(chunkMesh, view, x, y, z, renderType, colorCache, sideVertexFlag);
                 }
             }
+        }
+
+        if (isRendered && blockAppearance.getPart(BlockPart.CENTER) != null) {
+            Colorc colorOffset = selfBlock.getColorOffset(BlockPart.CENTER);
+            Colorc colorSource = selfBlock.getColorSource(BlockPart.CENTER).calcColor(pos.x, pos.y, pos.z);
+            colorCache.setRed(colorSource.rf() * colorOffset.rf())
+                    .setGreen(colorSource.gf() * colorOffset.gf())
+                    .setBlue(colorSource.bf() * colorOffset.bf())
+                    .setAlpha(colorSource.af() * colorOffset.af());
+            blockAppearance.getPart(BlockPart.CENTER).appendTo(chunkMesh, view, x, y, z, renderType, colorCache, vertexFlag);
         }
     }
 
