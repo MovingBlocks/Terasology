@@ -24,16 +24,7 @@ public class GameScheduler {
         return MAIN;
     }
 
-    public static Scheduler boundedElastic() {
-        return AccessController.doPrivileged((PrivilegedAction<Scheduler>) Schedulers::boundedElastic);
-    }
-
-    public static Scheduler parallel() {
+    public static Scheduler getScheduler() {
         return AccessController.doPrivileged((PrivilegedAction<Scheduler>) Schedulers::parallel);
     }
-
-    public static Scheduler immediate() {
-        return AccessController.doPrivileged((PrivilegedAction<Scheduler>) Schedulers::immediate);
-    }
-
 }
