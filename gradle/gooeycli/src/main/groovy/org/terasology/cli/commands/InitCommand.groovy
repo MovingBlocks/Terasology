@@ -30,14 +30,15 @@ class InitCommand extends BaseCommandType implements Runnable {
 
     void run() {
         println Ansi.AUTO.string("@|bold,green,underline Time to initialize $distro !|@")
-        def targetDistroURL = "https://raw.githubusercontent.com/$githubOrg/Index/master/distros/$distro/gradle.properties"
+        String origin = gitOptions.resolveOrigin()
+        def targetDistroURL = "https://raw.githubusercontent.com/$origin/Index/master/distros/$distro/gradle.properties"
         URL distroContent = new URL(targetDistroURL)
         Properties property = new Properties()
         distroContent.withInputStream { strm ->
             property.load(strm)
         }
 
-        if (property.contains("extraModules")) {
+        if (property.containsKey("extraModules")) {
             String modules = property.get("extraModules")
             parent.get(gitOptions, true, modules.split(",").toList())
         } else {
