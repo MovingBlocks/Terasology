@@ -29,6 +29,7 @@ import org.terasology.engine.core.modes.loadProcesses.InitialiseRemoteWorld;
 import org.terasology.engine.core.modes.loadProcesses.InitialiseSystems;
 import org.terasology.engine.core.modes.loadProcesses.InitialiseWorld;
 import org.terasology.engine.core.modes.loadProcesses.InitialiseWorldGenerator;
+import org.terasology.engine.core.modes.loadProcesses.InitialiseRendering;
 import org.terasology.engine.core.modes.loadProcesses.JoinServer;
 import org.terasology.engine.core.modes.loadProcesses.LoadEntities;
 import org.terasology.engine.core.modes.loadProcesses.LoadExtraBlockData;
@@ -141,6 +142,7 @@ public class StateLoading implements GameState {
 
     private void initClient() {
         loadProcesses.add(new JoinServer(context, gameManifest, joinStatus));
+        loadProcesses.add(new InitialiseRendering(context));
         loadProcesses.add(new InitialiseEntitySystem(context));
         loadProcesses.add(new RegisterBlocks(context, gameManifest));
         loadProcesses.add(new InitialiseGraphics(context));
@@ -165,6 +167,9 @@ public class StateLoading implements GameState {
 
     private void initHost() {
         loadProcesses.add(new RegisterMods(context, gameManifest));
+        if(netMode.hasLocalClient()) {
+            loadProcesses.add(new InitialiseRendering(context));
+        }
         loadProcesses.add(new InitialiseEntitySystem(context));
         loadProcesses.add(new RegisterBlocks(context, gameManifest));
         loadProcesses.add(new InitialiseGraphics(context));
