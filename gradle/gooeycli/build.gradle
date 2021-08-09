@@ -1,6 +1,7 @@
 // Copyright 2020 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 apply plugin: 'groovy'
+apply plugin: 'ivy-publish'
 
 group 'org.terasology.cli'
 
@@ -14,9 +15,8 @@ dependencies {
     compile 'org.codehaus.groovy:groovy-all:2.5.10'
     compile 'info.picocli:picocli-groovy:4.3.2'
     compile 'org.fusesource.jansi:jansi:1.18'
+    compile 'org.eclipse.jgit:org.eclipse.jgit:5.9.0.202009080501-r'
 
-    // Have to rely on these via 3rd party jars
-    compile 'org.ajoberstar:grgit:1.9.3'
 }
 
 // Ugly hack to allow Gradle and @Grab to get along. See https://github.com/gradle/gradle/issues/1031 - not sure if worth it?
