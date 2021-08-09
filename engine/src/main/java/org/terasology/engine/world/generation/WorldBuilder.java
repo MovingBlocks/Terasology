@@ -209,6 +209,9 @@ public class WorldBuilder extends ProviderStore {
         return result;
     }
 
+    /**
+     * Adds all facet providers and updaters for {@code facet} which have priority greater than {@code minPriority} to {@code orderedProviders}.
+     */
     private void addProviderChain(Class<? extends WorldFacet> facet, boolean scalable, int minPriority,
                                   Set<FacetProvider> orderedProviders) {
         FacetProvider producer = null;
@@ -219,7 +222,6 @@ public class WorldBuilder extends ProviderStore {
                 }
                 providedBy.put(facet, provider);
                 addRequirements(facet, provider, scalable, orderedProviders);
-                orderedProviders.add(provider);
                 producer = provider;
             }
         }
@@ -229,12 +231,15 @@ public class WorldBuilder extends ProviderStore {
                 if (updatePriority(provider, facet) > minPriority) {
                     providedBy.put(facet, provider);
                     addRequirements(facet, provider, scalable, orderedProviders);
-                    orderedProviders.add(provider);
                 }
             }
         }
     }
 
+    /**
+     * Adds {@code provider} and all its dependencies (calculated by calling {@link #addProviderChain} to {@code orderedProviders} in the proper order.
+     * Doesn't consider dependencies through {@code providedFacet}, because that's already required by something else.
+     */
     private void addRequirements(Class<? extends WorldFacet> providedFacet, FacetProvider provider, boolean scalable,
                                  Set<FacetProvider> orderedProviders) {
         if (orderedProviders.contains(provider)) {
@@ -272,6 +277,8 @@ public class WorldBuilder extends ProviderStore {
                         requiredBy.remove(r.value());
                     }
                 });
+
+        orderedProviders.add(provider);
     }
 
     private Facet[] requiredFacets(FacetProvider provider) {
@@ -310,6 +317,11 @@ public class WorldBuilder extends ProviderStore {
         return false;
     }
 
+    /**
+     * @return the priority in which {@code provider} reads {@code facet}. If {@code provider} updates {@code facet}, it's the update priority;
+     * if {@code provider} requires {@code facet}, it's {@link UpdatePriority#PRIORITY_REQUIRES};
+     * otherwise, it's {@link UpdatePriority#PRIORITY_PRODUCES}.
+     */
     private int updatePriority(FacetProvider provider, Class<? extends WorldFacet> facet) {
         Updates updates = provider.getClass().getAnnotation(Updates.class);
         if (updates != null) {
