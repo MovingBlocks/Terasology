@@ -56,9 +56,8 @@ class ModuleCommand extends ItemCommand {
         File moduleManifest = new File(targetDir, 'module.txt')
         if (!moduleManifest.exists()) {
             def moduleText = new File("templates/module.txt").text
-
             moduleManifest << moduleText.replaceAll('MODULENAME', targetDir.name)
-            println "WARNING: the module ${targetDir.name} did not have a module.txt! One was created, please review and submit to GitHub"
+            println CommandLine.Help.Ansi.AUTO.string("@|red WARNING: the module ${targetDir.name} did not have a module.txt! One was created, please review and submit to GitHub|@")
         }
 
     }
@@ -85,27 +84,26 @@ class ModuleCommand extends ItemCommand {
         String origin = options.resolveOrigin()
         for (module in items) {
             File targetDir = new File(Constants.ModuleDirectory, module)
-            if (targetDir.exists()) {
-                println "That $module already had an existing directory locally. If something is wrong with it please delete and try again"
+            def targetUrl = "https://github.com/${origin}/${module}"
+            if (fetchedModules.contains(targetUrl)) {
                 continue
-            } else {
-                def targetUrl = "https://github.com/${origin}/${module}"
-                if (fetchedModules.contains(targetUrl)) {
-                    println "We already retrieved $module - skipping"
-                    continue
-                }
-                try {
-                    Git.cloneRepository()
-                            .setURI(targetUrl)
-                            .setDirectory(targetDir)
-                            .call()
-                    println "Retrieving module $module from $targetUrl"
-                    fetchedModules << targetUrl;
-                } catch (Exception ex) {
-                    println CommandLine.Help.Ansi.AUTO.string("@|red Unable to clone $module, Skipping: ${ex.getMessage()} |@");
-                    continue
-                }
             }
+            if (targetDir.exists()) {
+                println CommandLine.Help.Ansi.AUTO.string("@|yellow already retrieved $module - skipping|@")
+                continue
+            }
+            try {
+                Git.cloneRepository()
+                        .setURI(targetUrl)
+                        .setDirectory(targetDir)
+                        .call()
+                println CommandLine.Help.Ansi.AUTO.string("@|green Retrieving module $module from ${targetUrl}|@")
+                fetchedModules << targetUrl;
+            } catch (Exception ex) {
+                println CommandLine.Help.Ansi.AUTO.string("@|red Unable to clone $module, Skipping: ${ex.getMessage()} |@");
+                continue
+            }
+
             copyInTemplates(targetDir)
             if (recurse) {
                 def dependencies = getDependencies(targetDir)
