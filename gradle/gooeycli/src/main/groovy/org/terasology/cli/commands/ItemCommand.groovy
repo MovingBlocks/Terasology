@@ -8,7 +8,10 @@ import picocli.CommandLine
 
 abstract class ItemCommand extends BaseCommandType {
     abstract void get(GitOptions options, boolean recurse, List<String> items);
+
     abstract void copyInTemplates(File targetDir);
+
     abstract String[] getDependencies(File targetDir, boolean respectExcludedItems = true);
 
+    abstract void updateAll();
 }

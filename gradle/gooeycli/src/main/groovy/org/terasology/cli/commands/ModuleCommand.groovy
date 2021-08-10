@@ -7,6 +7,7 @@ import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.api.PullResult
 import org.eclipse.jgit.diff.DiffEntry
 import org.eclipse.jgit.diff.DiffFormatter
+import org.eclipse.jgit.diff.RawTextComparator
 import org.eclipse.jgit.lib.ObjectId
 import org.terasology.cli.options.GitOptions
 import org.terasology.cli.util.Constants
@@ -118,11 +119,12 @@ class ModuleCommand extends ItemCommand {
         }
     }
 
-    @Command(name = "update-all", description = "Gets one or more items directly")
+    @Override
+    @Command(name = "update-all", description = "update all dependenices")
     void updateAll() {
         Constants.ModuleDirectory.eachDir { dir ->
             String itemName = dir.getName()
-            if (!Constants.ExcludeModule.contains(dependency.id)) {
+            if (!Constants.ExcludeModule.contains(itemName)) {
                 update([itemName])
             }
         }
@@ -134,21 +136,35 @@ class ModuleCommand extends ItemCommand {
             File targetDir = new File(Constants.ModuleDirectory, module)
             Git git = Git.open(targetDir);
             ObjectId oldTree = git.getRepository().resolve("HEAD^{tree}");
-            PullResult result = git.pull().call()
-            if (result.isSuccessful()) {
-                println "Successfully update with un-commited changes"
-                ObjectId newTree = git.getRepository().resolve("HEAD^{tree}");
-                DiffFormatter df = new DiffFormatter(new ByteArrayOutputStream());
-                List<DiffEntry> entries = df.scan(oldTree, newTree)
-                for (DiffEntry entry : entries) {
-                    println entry;
+            try {
+                PullResult result = git.pull().call()
+
+                DiffFormatter df = new DiffFormatter(System.out);
+                df.setDiffComparator(RawTextComparator.DEFAULT)
+                df.setRepository(git.getRepository())
+                df.setBinaryFileThreshold(1000);
+                df.setDetectRenames(true)
+
+                if (result.isSuccessful()) {
+                    ObjectId newTree = git.getRepository().resolve("HEAD^{tree}");
+                    List<DiffEntry> diffs = df.scan(oldTree, newTree);
+                    if(diffs.size() > 0) {
+                        println CommandLine.Help.Ansi.AUTO.string("@|green Successfully update $module |@")
+                    } else {
+                        println CommandLine.Help.Ansi.AUTO.string("@|yellow Already updatead $module - Skipping |@")
+                    }
+                    for(DiffEntry entry : diffs) {
+                        df.format(entry)
+                    }
+                } else {
+                    println CommandLine.Help.Ansi.AUTO.string("@|red unable to update with un-commited changes |@")
+                    for(DiffEntry entry :git.diff().call()) {
+                        df.format(entry)
+                    }
                 }
-            } else {
-                println CommandLine.Help.Ansi.AUTO.string("@|red unable to update with un-commited changes |@")
-                List<DiffEntry> entries = git.diff().call()
-                for (DiffEntry entry : entries) {
-                    println entry;
-                }
+                df.close()
+            } catch(Exception ex) {
+                println CommandLine.Help.Ansi.AUTO.string("@|red Unable to update $module, Skipping: ${ex.getMessage()} |@");
             }
         }
     }
