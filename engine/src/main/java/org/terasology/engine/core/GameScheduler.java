@@ -3,7 +3,10 @@
 
 package org.terasology.engine.core;
 
+import org.terasology.engine.monitoring.ThreadActivity;
+import org.terasology.engine.monitoring.ThreadMonitor;
 import org.terasology.gestalt.module.sandbox.API;
+import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Scheduler;
@@ -49,5 +52,21 @@ public class GameScheduler {
      */
     public static Scheduler parallel() {
         return AccessController.doPrivileged((PrivilegedAction<Scheduler>) Schedulers::parallel);
+    }
+
+    /**
+     * Run a task asynchronously, named for monitoring.
+     * <p>
+     * The task will be run on the {@link #parallel()} scheduler.
+     */
+    @SuppressWarnings("UnusedReturnValue")
+    public static Disposable scheduleParallel(String name, Runnable task) {
+        Mono<?> mono = Mono.using(
+                        () -> ThreadMonitor.startThreadActivity(name),
+                        activity -> Mono.fromRunnable(task),
+                        ThreadActivity::close
+                )
+            .subscribeOn(Schedulers.parallel());
+        return mono.subscribe();
     }
 }

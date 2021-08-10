@@ -101,13 +101,15 @@ public class ScreenGrabber {
         int width = sceneFinalFbo.width();
         int height = sceneFinalFbo.height();
 
+        Runnable task;
         if (savingGamePreview) {
-            GameScheduler.parallel().schedule(() -> saveGamePreviewTask(buffer, width, height));
+            task = () -> saveGamePreviewTask(buffer, width, height);
             this.savingGamePreview = false;
         } else {
-            GameScheduler.parallel().schedule(() -> saveScreenshotTask(buffer, width, height));
+            task = () -> saveScreenshotTask(buffer, width, height);
         }
 
+        GameScheduler.scheduleParallel("Write screenshot", task);
         isTakingScreenshot = false;
     }
 
