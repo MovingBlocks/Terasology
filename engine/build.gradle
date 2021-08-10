@@ -82,7 +82,7 @@ dependencies {
     implementation "org.terasology:reflections:0.9.12-MB"
     implementation group: 'org.javassist', name: 'javassist', version: '3.27.0-GA'
     implementation group: 'com.esotericsoftware', name: 'reflectasm', version: '1.11.9'
-   
+
     // Graphics, 3D, UI, etc
     api platform("org.lwjgl:lwjgl-bom:$LwjglVersion")
     api "org.lwjgl:lwjgl"
