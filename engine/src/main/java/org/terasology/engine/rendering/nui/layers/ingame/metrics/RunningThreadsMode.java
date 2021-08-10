@@ -9,9 +9,9 @@ import org.terasology.engine.monitoring.DisplayMetricsMonitor;
 
 import java.util.concurrent.TimeUnit;
 
-final class RunningThreadsMode extends MetricsMode {
+final class RunningThreadsMode extends MetricsMode implements AutoCloseable {
 
-    RunningThreadsMode() {
+     RunningThreadsMode() {
         super("\n- Task Metrics -");
     }
 
@@ -23,7 +23,7 @@ final class RunningThreadsMode extends MetricsMode {
         builder.append("\n");
 
         Search.in(DisplayMetricsMonitor.metricRegistry)
-                .tag("monitor", "display-metric")
+                .tag("monitor","display-metric")
                 .timers().forEach(k -> {
 
             HistogramSnapshot snapshot = k.takeSnapshot();
@@ -53,4 +53,8 @@ final class RunningThreadsMode extends MetricsMode {
         return false;
     }
 
+    @Override
+    public void close() throws Exception {
+
+    }
 }
