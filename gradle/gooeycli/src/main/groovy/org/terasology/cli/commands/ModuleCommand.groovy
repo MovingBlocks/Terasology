@@ -31,6 +31,7 @@ class ModuleCommand extends ItemCommand {
 
     // This is an example of a subcommand via method - used here so we can directly hit ManagedModule for something module-specific
     // If in an external Refresh.groovy it _could_ specify ManagedModule, but it then could be added later to a non-module and break
+    @Override
     @Command(name = "refresh", description = "Refreshes all build.gradle files in module directories")
     void refresh() {
         Constants.ModuleDirectory.eachDir { dir ->
@@ -45,8 +46,7 @@ class ModuleCommand extends ItemCommand {
         }
     }
 
-    @Override
-    void copyInTemplates(File targetDir) {
+    private void copyInTemplates(File targetDir) {
         // Copy in the template build.gradle for modules
         println "In copyInTemplateFiles for module $targetDir.name - copying in a build.gradle then next checking for module.txt"
         File targetBuildGradle = new File(targetDir, 'build.gradle')
@@ -130,6 +130,7 @@ class ModuleCommand extends ItemCommand {
         }
     }
 
+    @Override
     @Command(name = "update", description = "Gets one or more items directly")
     void update(@Parameters(paramLabel = "items", arity = "1", description = "Target item(s) to get") List<String> items) {
         for (module in items) {
