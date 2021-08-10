@@ -3,12 +3,10 @@
 
 package org.terasology.engine.rendering.nui.layers.ingame.metrics;
 
-import io.micrometer.core.instrument.Metrics;
-import io.micrometer.core.instrument.search.Search;
+import org.terasology.engine.monitoring.ThreadMonitor;
+import org.terasology.engine.monitoring.impl.SingleThreadMonitor;
 
-import java.util.concurrent.TimeUnit;
-
-final class RunningThreadsMode extends MetricsMode implements AutoCloseable {
+final class RunningThreadsMode extends MetricsMode {
 
      RunningThreadsMode() {
         super("\n- Running Threads -");
@@ -16,17 +14,13 @@ final class RunningThreadsMode extends MetricsMode implements AutoCloseable {
 
     @Override
     public String getMetrics() {
-
         StringBuilder builder = new StringBuilder();
         builder.append(getName());
         builder.append("\n");
-
-        Search.in(Metrics.globalRegistry)
-                .tag("monitor","display-metric")
-                .timers().forEach(k -> {
-            builder.append(k.getId().getName());
-            builder.append(" : ");
-            builder.append(k.mean(TimeUnit.MILLISECONDS));
+        ThreadMonitor.getThreadMonitors(true).stream().filter(SingleThreadMonitor::isActive).forEach(threads -> {
+            builder.append(threads.getName());
+            builder.append(" - ");
+            builder.append(threads.getLastTask());
             builder.append("\n");
         });
         return builder.toString();
@@ -40,10 +34,5 @@ final class RunningThreadsMode extends MetricsMode implements AutoCloseable {
     @Override
     public boolean isPerformanceManagerMode() {
         return false;
-    }
-
-    @Override
-    public void close() throws Exception {
-
     }
 }

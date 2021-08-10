@@ -16,7 +16,7 @@ import java.security.PrivilegedAction;
 @API
 public class GameScheduler {
 
-    private static final Scheduler MAIN;
+     private static final Scheduler MAIN;
 
     static {
         MAIN = Schedulers.fromExecutor(runnable -> GameThread.asynch(runnable));
@@ -28,7 +28,7 @@ public class GameScheduler {
      * <b>⚠</b> Use this only when necessary, as anything executed on the main thread will delay the core game loop.
      */
     public static Scheduler gameMain() {
-        return MAIN;
+        return  MAIN;
     }
 
     /**
