@@ -4,7 +4,6 @@
 package org.terasology.cli.commands
 
 import org.terasology.cli.options.GitOptions
-import picocli.CommandLine
 
 abstract class ItemCommand extends BaseCommandType {
     abstract void get(GitOptions options, boolean recurse, List<String> items);

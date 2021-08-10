@@ -2,15 +2,13 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.cli.commands
 
-import org.eclipse.jgit.api.Git
+
 import org.terasology.cli.options.GitOptions
-import org.terasology.cli.util.Constants
 import picocli.CommandLine.Command
 import picocli.CommandLine.Help.Ansi
 import picocli.CommandLine.Mixin
 import picocli.CommandLine.Parameters
 import picocli.CommandLine.ParentCommand
-
 // Is in use, IDE may think the Groovy-supplied is in use below and mark this unused
 
 @Command(name = "init", description = "Initializes a workspace with some useful things")
