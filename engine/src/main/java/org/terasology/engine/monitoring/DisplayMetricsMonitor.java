@@ -26,7 +26,6 @@ public class DisplayMetricsMonitor extends StepMeterRegistry {
 
             @Override
             public String get(String key) {
-                // This part of the API seems to only be for some config validation thing we don't use?
                 return null;
             }
 
