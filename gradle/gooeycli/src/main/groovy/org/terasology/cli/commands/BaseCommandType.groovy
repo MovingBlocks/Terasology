@@ -2,10 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.cli.commands
 
-import org.terasology.cli.options.GitOptions
-import picocli.CommandLine
-import picocli.CommandLine.Command
 
+import picocli.CommandLine.Command
 /**
  * Simple super class for commands with global style options
  */
