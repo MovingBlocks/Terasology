@@ -4,8 +4,8 @@
 package org.terasology.engine.monitoring;
 
 import io.micrometer.core.instrument.Clock;
+import io.micrometer.core.instrument.logging.LoggingRegistryConfig;
 import io.micrometer.core.instrument.step.StepMeterRegistry;
-import io.micrometer.core.instrument.step.StepRegistryConfig;
 
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;
@@ -15,15 +15,7 @@ public class DisplayMetricsMonitor extends StepMeterRegistry {
     public static final Duration captureDuration = Duration.ofSeconds(1);
 
     public DisplayMetricsMonitor() {
-        // micrometer doesn't provide concrete implementations of these Config classes.
-        // We don't need to vary this configuration or load it from an external source,
-        // so we define it using an anonymous class here.
-        super(new StepRegistryConfig() {
-            @Override
-            public String prefix() {
-                return "display";
-            }
-
+        super(new LoggingRegistryConfig() {
             @Override
             public String get(String key) {
                 return null;
@@ -38,7 +30,7 @@ public class DisplayMetricsMonitor extends StepMeterRegistry {
 
     @Override
     protected void publish() {
-        // We don't need to push records anywhere. The view polls the current values; past steps are discarded.
+
     }
 
     @Override
