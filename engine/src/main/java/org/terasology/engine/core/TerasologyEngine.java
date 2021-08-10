@@ -7,9 +7,8 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.Queues;
 import com.google.common.collect.Sets;
-import io.micrometer.core.instrument.Clock;
 import io.micrometer.core.instrument.Metrics;
-import io.micrometer.core.instrument.logging.LoggingMeterRegistry;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.config.Config;
@@ -37,9 +36,7 @@ import org.terasology.engine.i18n.I18nSubsystem;
 import org.terasology.engine.input.InputSystem;
 import org.terasology.engine.logic.behavior.asset.BehaviorTree;
 import org.terasology.engine.monitoring.Activity;
-import org.terasology.engine.monitoring.DisplayMetricsMonitor;
 import org.terasology.engine.monitoring.PerformanceMonitor;
-import org.terasology.engine.monitoring.ThreadMonitor;
 import org.terasology.engine.network.NetworkSystem;
 import org.terasology.engine.persistence.typeHandling.TypeHandlerLibraryImpl;
 import org.terasology.engine.recording.CharacterStateEventPositionMap;
@@ -141,7 +138,7 @@ public class TerasologyEngine implements GameEngine {
      * @param subsystems other typical subsystems, e.g., graphics, audio and input subsystems.
      */
     public TerasologyEngine(TimeSubsystem timeSubsystem, Collection<EngineSubsystem> subsystems) {
-        Metrics.addRegistry(DisplayMetricsMonitor.metricRegistry);
+        Metrics.addRegistry(new SimpleMeterRegistry());
         Schedulers.enableMetrics();
 
         // configure native paths
