@@ -117,7 +117,7 @@ public class ComponentSystemManager {
      * @param id id of system.
      */
     private void rollbackLoading(ComponentSystem system, String id) {
-        if (system != null  // system creates, needs to cleanup.
+        if (system != null  // system was created, needs cleanup.
                 && store.remove(namedLookup.remove(id))// remove system from lookup and store, if already registered.
         ) {
             //TODO unshare if system is shared by InjectionHelper#share()
