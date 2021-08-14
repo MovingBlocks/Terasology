@@ -16,7 +16,7 @@ public class AutoCreateComponent implements Component<AutoCreateComponent> {
     public boolean createClientSide;
 
     @Override
-    public void copy(AutoCreateComponent other) {
+    public void copyFrom(AutoCreateComponent other) {
         this.createClientSide = other.createClientSide;
     }
 }

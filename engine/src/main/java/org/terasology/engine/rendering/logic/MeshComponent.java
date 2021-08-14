@@ -34,7 +34,7 @@ public final class MeshComponent implements VisualComponent<MeshComponent> {
     public Color color = Color.WHITE;
 
     @Override
-    public void copy(MeshComponent other) {
+    public void copyFrom(MeshComponent other) {
         this.mesh = other.mesh;
         this.material = other.material;
         this.translucent = other.translucent;

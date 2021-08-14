@@ -11,7 +11,7 @@ public class RemotePersonHeldItemTransformComponent implements VisualComponent<R
     public float scale = 1f;
 
     @Override
-    public void copy(RemotePersonHeldItemTransformComponent other) {
+    public void copyFrom(RemotePersonHeldItemTransformComponent other) {
         this.rotateDegrees = new Vector3f(other.rotateDegrees);
         this.translate = new Vector3f(other.translate);
         this.scale = other.scale;

@@ -12,7 +12,7 @@ public class MappedContainerComponent implements Component<MappedContainerCompon
     public Set<Cont> containers;
 
     @Override
-    public void copy(MappedContainerComponent other) {
+    public void copyFrom(MappedContainerComponent other) {
         this.containers = other.containers.stream().map((cont)-> {
             Cont newCont = new Cont();
             newCont.value = cont.value;

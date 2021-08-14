@@ -22,7 +22,7 @@ public class WalkComponent implements Component<WalkComponent> {
     public List<MeshAnimation> animationPool = Lists.newArrayList();
 
     @Override
-    public void copy(WalkComponent other) {
+    public void copyFrom(WalkComponent other) {
         this.animationPool = Lists.newArrayList(other.animationPool);
     }
 }

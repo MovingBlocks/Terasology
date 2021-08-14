@@ -67,7 +67,7 @@ public final class CharacterComponent implements Component<CharacterComponent> {
     public EntityRef controller = EntityRef.NULL;
 
     @Override
-    public void copy(CharacterComponent other) {
+    public void copyFrom(CharacterComponent other) {
         this.nameTagOffset = other.nameTagOffset;
         this.interactionRange = other.interactionRange;
         this.authorizedInteractionTarget = other.authorizedInteractionTarget;

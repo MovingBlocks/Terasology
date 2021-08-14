@@ -16,7 +16,7 @@ public class BehaviorComponent implements Component<BehaviorComponent> {
     public transient Interpreter interpreter;
 
     @Override
-    public void copy(BehaviorComponent other) {
+    public void copyFrom(BehaviorComponent other) {
         this.tree = other.tree;
         this.interpreter = other.interpreter;
     }

@@ -13,7 +13,7 @@ public class UnsupportedTypeComponent implements Component<UnsupportedTypeCompon
     public UnsupportedType3 value3;
 
     @Override
-    public void copy(UnsupportedTypeComponent other) {
+    public void copyFrom(UnsupportedTypeComponent other) {
         this.value = other.value;
         this.value2 = other.value2;
         this.value3 = other.value3;

@@ -18,7 +18,7 @@ public class EntityRefComponent implements Component<EntityRefComponent> {
     }
 
     @Override
-    public void copy(EntityRefComponent other) {
+    public void copyFrom(EntityRefComponent other) {
         this.entityRef = other.entityRef;
     }
 }

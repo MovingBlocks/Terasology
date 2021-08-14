@@ -15,7 +15,7 @@ public class OwnedCollectionComponent implements Component<OwnedCollectionCompon
 
 
     @Override
-    public void copy(OwnedCollectionComponent other) {
+    public void copyFrom(OwnedCollectionComponent other) {
         this.items = Lists.newArrayList(other.items);
     }
 }

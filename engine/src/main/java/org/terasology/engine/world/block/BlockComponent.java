@@ -56,7 +56,7 @@ public final class BlockComponent implements Component<BlockComponent> {
     }
 
     @Override
-    public void copy(BlockComponent other) {
+    public void copyFrom(BlockComponent other) {
         this.position = new Vector3i(other.position);
         this.block = other.block;
     }

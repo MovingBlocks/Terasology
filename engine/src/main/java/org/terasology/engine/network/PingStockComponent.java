@@ -44,7 +44,7 @@ public final class PingStockComponent implements Component<PingStockComponent> {
     }
 
     @Override
-    public void copy(PingStockComponent other) {
+    public void copyFrom(PingStockComponent other) {
         this.setValues(other.getValues());
     }
 }

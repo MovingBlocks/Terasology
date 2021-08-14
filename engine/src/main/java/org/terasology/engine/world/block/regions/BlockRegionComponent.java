@@ -23,7 +23,7 @@ public class BlockRegionComponent implements Component<BlockRegionComponent> {
     }
 
     @Override
-    public void copy(BlockRegionComponent other) {
+    public void copyFrom(BlockRegionComponent other) {
         this.region = new BlockRegion(region);
     }
 }

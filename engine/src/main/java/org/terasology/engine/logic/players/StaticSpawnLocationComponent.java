@@ -14,7 +14,7 @@ public class StaticSpawnLocationComponent implements Component<StaticSpawnLocati
     public Vector3f position;
 
     @Override
-    public void copy(StaticSpawnLocationComponent other) {
+    public void copyFrom(StaticSpawnLocationComponent other) {
         this.position = new Vector3f(other.position);
     }
 }

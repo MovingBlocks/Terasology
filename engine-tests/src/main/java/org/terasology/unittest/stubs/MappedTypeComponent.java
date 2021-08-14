@@ -12,7 +12,7 @@ public class MappedTypeComponent implements Component<MappedTypeComponent> {
     public Number number = 2;
 
     @Override
-    public void copy(MappedTypeComponent other) {
+    public void copyFrom(MappedTypeComponent other) {
         this.val = other.val;
         this.number = other.number;
     }

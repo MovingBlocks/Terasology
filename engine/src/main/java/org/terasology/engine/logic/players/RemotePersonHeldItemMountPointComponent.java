@@ -21,7 +21,7 @@ public class RemotePersonHeldItemMountPointComponent implements Component<Remote
     public float scale = 1f;
 
     @Override
-    public void copy(RemotePersonHeldItemMountPointComponent other) {
+    public void copyFrom(RemotePersonHeldItemMountPointComponent other) {
         this.mountPointEntity = other.mountPointEntity;
         this.rotateDegrees = new Vector3f(other.rotateDegrees);
         this.translate = new Vector3f(other.translate);

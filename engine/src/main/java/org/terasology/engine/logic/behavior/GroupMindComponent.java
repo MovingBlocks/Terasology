@@ -31,7 +31,7 @@ public class GroupMindComponent implements Component<GroupMindComponent> {
     public Set<EntityRef> groupMembers = new HashSet<>();
 
     @Override
-    public void copy(GroupMindComponent other) {
+    public void copyFrom(GroupMindComponent other) {
         this.groupLabel = other.groupLabel;
         this.behavior = other.behavior;
         this.groupMembers = Sets.newHashSet(other.groupMembers);

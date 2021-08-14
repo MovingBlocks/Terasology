@@ -43,7 +43,7 @@ public final class StringComponent implements Component<StringComponent>{
     }
 
     @Override
-    public void copy(StringComponent other) {
+    public void copyFrom(StringComponent other) {
         this.value = other.value;
     }
 }

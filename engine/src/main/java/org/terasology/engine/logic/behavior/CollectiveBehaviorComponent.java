@@ -16,7 +16,7 @@ public class CollectiveBehaviorComponent implements Component<CollectiveBehavior
     public transient CollectiveInterpreter collectiveInterpreter;
 
     @Override
-    public void copy(CollectiveBehaviorComponent other) {
+    public void copyFrom(CollectiveBehaviorComponent other) {
         this.tree = other.tree;
         this.collectiveInterpreter = other.collectiveInterpreter;
     }

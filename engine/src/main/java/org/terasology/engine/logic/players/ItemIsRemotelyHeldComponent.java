@@ -12,7 +12,7 @@ public class ItemIsRemotelyHeldComponent implements Component<ItemIsRemotelyHeld
     public EntityRef remotePlayer = EntityRef.NULL;
 
     @Override
-    public void copy(ItemIsRemotelyHeldComponent other) {
+    public void copyFrom(ItemIsRemotelyHeldComponent other) {
         this.remotePlayer = other.remotePlayer;
     }
 }

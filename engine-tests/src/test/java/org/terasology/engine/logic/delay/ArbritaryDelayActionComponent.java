@@ -8,7 +8,7 @@ public class ArbritaryDelayActionComponent implements Component<ArbritaryDelayAc
     public int value = 1;
 
     @Override
-    public void copy(ArbritaryDelayActionComponent other) {
+    public void copyFrom(ArbritaryDelayActionComponent other) {
         this.value = other.value;
     }
 }

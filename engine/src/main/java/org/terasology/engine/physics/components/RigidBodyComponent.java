@@ -50,7 +50,7 @@ public class RigidBodyComponent implements Component<RigidBodyComponent> {
                     StandardCollisionGroup.KINEMATIC);
 
     @Override
-    public void copy(RigidBodyComponent other) {
+    public void copyFrom(RigidBodyComponent other) {
         this.mass = other.mass;
         this.kinematic = other.kinematic;
         this.velocity = new Vector3f(other.velocity);

@@ -16,7 +16,7 @@ public class GetterSetterComponent implements Component<GetterSetterComponent> {
     }
 
     @Override
-    public void copy(GetterSetterComponent other) {
+    public void copyFrom(GetterSetterComponent other) {
         this.value = other.value;
     }
 }

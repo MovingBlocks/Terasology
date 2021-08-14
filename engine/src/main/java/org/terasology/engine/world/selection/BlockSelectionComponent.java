@@ -50,7 +50,7 @@ public class BlockSelectionComponent implements Component<BlockSelectionComponen
     public boolean isMovable = false;
 
     @Override
-    public void copy(BlockSelectionComponent other) {
+    public void copyFrom(BlockSelectionComponent other) {
         this.startPosition = new Vector3i(other.startPosition);
         this.currentSelection = new BlockRegion(other.currentSelection);
         this.shouldRender = other.shouldRender;

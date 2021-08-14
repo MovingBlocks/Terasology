@@ -33,7 +33,7 @@ public final class CharacterSoundComponent implements Component<CharacterSoundCo
     public long lastSoundTime;
 
     @Override
-    public void copy(CharacterSoundComponent other) {
+    public void copyFrom(CharacterSoundComponent other) {
         this.footstepSounds = Lists.newArrayList(other.footstepSounds);
         this.damageSounds = Lists.newArrayList(other.damageSounds);
         this.landingSounds = Lists.newArrayList(other.landingSounds);

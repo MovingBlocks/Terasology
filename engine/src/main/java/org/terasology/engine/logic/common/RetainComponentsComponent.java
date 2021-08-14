@@ -20,7 +20,7 @@ public class RetainComponentsComponent implements Component<RetainComponentsComp
     public Set<Class<? extends Component>> components = Sets.newHashSet();
 
     @Override
-    public void copy(RetainComponentsComponent other) {
+    public void copyFrom(RetainComponentsComponent other) {
         this.components = Sets.newHashSet(other.components); // TODO Investigate, needs to deep-copy or not!
     }
 }

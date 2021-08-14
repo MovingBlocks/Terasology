@@ -12,7 +12,7 @@ public class BoxShapeComponent implements Component<BoxShapeComponent> {
     public Vector3f extents = new Vector3f(1, 1, 1);
 
     @Override
-    public void copy(BoxShapeComponent other) {
+    public void copyFrom(BoxShapeComponent other) {
         this.extents = new Vector3f(other.extents);
     }
 }

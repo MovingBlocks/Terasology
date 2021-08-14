@@ -27,7 +27,7 @@ public class VisualCharacterComponent implements Component<VisualCharacterCompon
     public EntityRef visualCharacter = EntityRef.NULL;
 
     @Override
-    public void copy(VisualCharacterComponent other) {
+    public void copyFrom(VisualCharacterComponent other) {
         this.visualCharacter = other.visualCharacter;
     }
 }

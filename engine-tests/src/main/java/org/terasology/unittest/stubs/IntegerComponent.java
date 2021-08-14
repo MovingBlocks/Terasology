@@ -38,7 +38,7 @@ public final class IntegerComponent implements Component<IntegerComponent> {
     }
 
     @Override
-    public void copy(IntegerComponent other) {
+    public void copyFrom(IntegerComponent other) {
         this.value = other.value;
     }
 }

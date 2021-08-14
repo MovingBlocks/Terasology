@@ -30,7 +30,7 @@ public class GamePlayStatsComponent implements Component<GamePlayStatsComponent>
     public Map<String, Integer> creatureKilled = new HashMap<>();
 
     @Override
-    public void copy(GamePlayStatsComponent other) {
+    public void copyFrom(GamePlayStatsComponent other) {
         this.blockDestroyedMap = Maps.newHashMap(other.blockDestroyedMap);
         this.blockPlacedMap = Maps.newHashMap(other.blockPlacedMap);
         this.distanceTraveled = other.distanceTraveled;

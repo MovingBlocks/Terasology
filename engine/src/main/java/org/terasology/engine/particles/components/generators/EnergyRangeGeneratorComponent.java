@@ -20,7 +20,7 @@ public class EnergyRangeGeneratorComponent implements Component<EnergyRangeGener
     }
 
     @Override
-    public void copy(EnergyRangeGeneratorComponent other) {
+    public void copyFrom(EnergyRangeGeneratorComponent other) {
         this.minEnergy = other.minEnergy;
         this.maxEnergy = other.maxEnergy;
     }

@@ -31,7 +31,7 @@ public class NameTagComponent implements Component<NameTagComponent> {
     public float scale = 1f;
 
     @Override
-    public void copy(NameTagComponent other) {
+    public void copyFrom(NameTagComponent other) {
         this.yOffset = other.yOffset;
         this.text = other.text;
         this.textColor = new Color(other.textColor);

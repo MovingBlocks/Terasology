@@ -66,7 +66,7 @@ public final class HierarchicalAIComponent implements Component<HierarchicalAICo
     public int damageFrequency = 500;
 
     @Override
-    public void copy(HierarchicalAIComponent other) {
+    public void copyFrom(HierarchicalAIComponent other) {
         this.updateFrequency = other.updateFrequency;
         this.lastProgressedUpdateAt = other.lastProgressedUpdateAt;
         this.movementTarget = new Vector3f(other.movementTarget);

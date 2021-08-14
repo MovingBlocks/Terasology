@@ -10,7 +10,7 @@ public class HullShapeComponent implements Component<HullShapeComponent> {
     public Mesh sourceMesh;
 
     @Override
-    public void copy(HullShapeComponent other) {
+    public void copyFrom(HullShapeComponent other) {
         this.sourceMesh = other.sourceMesh;
     }
 }

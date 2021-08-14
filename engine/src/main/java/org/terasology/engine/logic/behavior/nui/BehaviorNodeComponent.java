@@ -29,7 +29,7 @@ public class BehaviorNodeComponent implements Component<BehaviorNodeComponent> {
     }
 
     @Override
-    public void copy(BehaviorNodeComponent other) {
+    public void copyFrom(BehaviorNodeComponent other) {
         this.action = other.action;
         this.name = other.name;
         this.displayName = other.displayName;

@@ -35,7 +35,7 @@ public class GazeMountPointComponent implements Component<GazeMountPointComponen
     public Vector3f translate = new Vector3f(0, 0, 0);
 
     @Override
-    public void copy(GazeMountPointComponent other) {
+    public void copyFrom(GazeMountPointComponent other) {
         this.gazeEntity = other.gazeEntity;
         this.translate = new Vector3f(other.translate);
     }

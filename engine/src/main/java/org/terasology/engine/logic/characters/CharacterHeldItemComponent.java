@@ -18,7 +18,7 @@ public class CharacterHeldItemComponent implements Component<CharacterHeldItemCo
     public long nextItemUseTime;
 
     @Override
-    public void copy(CharacterHeldItemComponent other) {
+    public void copyFrom(CharacterHeldItemComponent other) {
         this.selectedItem = other.selectedItem;
         this.lastItemUsedTime = other.lastItemUsedTime;
         this.nextItemUseTime = other.nextItemUseTime;

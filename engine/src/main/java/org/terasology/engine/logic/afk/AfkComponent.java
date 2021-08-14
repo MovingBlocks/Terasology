@@ -11,7 +11,7 @@ public class AfkComponent implements Component<AfkComponent> {
     public boolean afk;
 
     @Override
-    public void copy(AfkComponent other) {
+    public void copyFrom(AfkComponent other) {
         this.afk = other.afk;
     }
 }

@@ -16,7 +16,7 @@ public class InspectionToolComponent implements Component<InspectionToolComponen
     public EntityRef inspectedEntity = EntityRef.NULL;
 
     @Override
-    public void copy(InspectionToolComponent other) {
+    public void copyFrom(InspectionToolComponent other) {
         this.inspectedEntity = other.inspectedEntity;
     }
 }

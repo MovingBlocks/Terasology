@@ -22,7 +22,7 @@ public final class LightFadeComponent implements VisualComponent<LightFadeCompon
     public float ambientFadeRate = 2.0f;
 
     @Override
-    public void copy(LightFadeComponent other) {
+    public void copyFrom(LightFadeComponent other) {
         this.targetDiffuseIntensity = other.targetDiffuseIntensity;
         this.targetAmbientIntensity = other.targetAmbientIntensity;
         this.removeLightAfterFadeComplete = other.removeLightAfterFadeComplete;

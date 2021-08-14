@@ -63,7 +63,7 @@ public class TextureOffsetGeneratorComponent implements Component<TextureOffsetG
     }
 
     @Override
-    public void copy(TextureOffsetGeneratorComponent other) {
+    public void copyFrom(TextureOffsetGeneratorComponent other) {
         this.validOffsets = other.validOffsets.stream()
                 .map(Vector2f::new)
                 .collect(Collectors.toList());

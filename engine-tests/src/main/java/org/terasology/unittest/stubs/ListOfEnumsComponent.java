@@ -13,7 +13,7 @@ public class ListOfEnumsComponent implements Component<ListOfEnumsComponent> {
     public List<Side> elements = new ArrayList<>();
 
     @Override
-    public void copy(ListOfEnumsComponent other) {
+    public void copyFrom(ListOfEnumsComponent other) {
         this.elements = Lists.newArrayList(other.elements);
     }
 }

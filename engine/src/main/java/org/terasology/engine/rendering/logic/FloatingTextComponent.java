@@ -15,7 +15,7 @@ public class FloatingTextComponent implements VisualComponent<FloatingTextCompon
     public boolean isOverlay;
 
     @Override
-    public void copy(FloatingTextComponent other) {
+    public void copyFrom(FloatingTextComponent other) {
         this.text = other.text;
         this.textColor = new Color(other.textColor);
         this.textShadowColor = new Color(other.textShadowColor);

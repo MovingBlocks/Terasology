@@ -29,7 +29,7 @@ public final class ClientInfoComponent implements Component<ClientInfoComponent>
     public EntityRef client = EntityRef.NULL;
 
     @Override
-    public void copy(ClientInfoComponent other) {
+    public void copyFrom(ClientInfoComponent other) {
         this.playerId = other.playerId;
         this.client = other.client;
     }

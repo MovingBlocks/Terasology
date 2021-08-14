@@ -42,7 +42,7 @@ public class GroupTagComponent implements Component<GroupTagComponent> {
     public Interpreter backupRunningState;
 
     @Override
-    public void copy(GroupTagComponent other) {
+    public void copyFrom(GroupTagComponent other) {
         this.groups = Lists.newArrayList(other.groups);
         this.backupBT = other.backupBT;
         this.backupRunningState = other.backupRunningState;

@@ -20,7 +20,7 @@ public class SideBlockSupportRequiredComponent implements Component<SideBlockSup
     public long dropDelay;
 
     @Override
-    public void copy(SideBlockSupportRequiredComponent other) {
+    public void copyFrom(SideBlockSupportRequiredComponent other) {
         this.topAllowed = other.topAllowed;
         this.sideAllowed = other.sideAllowed;
         this.bottomAllowed = other.bottomAllowed;

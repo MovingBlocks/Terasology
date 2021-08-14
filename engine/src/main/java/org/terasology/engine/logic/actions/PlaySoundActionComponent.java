@@ -30,7 +30,7 @@ public class PlaySoundActionComponent implements Component<PlaySoundActionCompon
     }
 
     @Override
-    public void copy(PlaySoundActionComponent other) {
+    public void copyFrom(PlaySoundActionComponent other) {
         this.sounds = Lists.newArrayList(other.sounds);
         this.volume = other.volume;
         this.relativeTo = other.relativeTo;

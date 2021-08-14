@@ -14,7 +14,7 @@ public class InteractionScreenComponent implements Component<InteractionScreenCo
     public String screen;
 
     @Override
-    public void copy(InteractionScreenComponent other) {
+    public void copyFrom(InteractionScreenComponent other) {
         this.screen = other.screen;
     }
 }

@@ -84,7 +84,7 @@ public final class CharacterMovementComponent implements Component<CharacterMove
     }
 
     @Override
-    public void copy(CharacterMovementComponent other) {
+    public void copyFrom(CharacterMovementComponent other) {
         this.height = other.height;
         this.radius = other.radius;
         this.collisionGroup = other.collisionGroup;

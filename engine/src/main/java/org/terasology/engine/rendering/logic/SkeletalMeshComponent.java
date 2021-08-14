@@ -62,7 +62,7 @@ public class SkeletalMeshComponent implements VisualComponent<SkeletalMeshCompon
     public Color color = Color.WHITE;
 
     @Override
-    public void copy(SkeletalMeshComponent other) {
+    public void copyFrom(SkeletalMeshComponent other) {
         this.mesh = other.mesh;
         this.material = other.material;
         this.animation = other.animation;

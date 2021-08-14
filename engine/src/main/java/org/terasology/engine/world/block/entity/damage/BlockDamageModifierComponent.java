@@ -16,7 +16,7 @@ public class BlockDamageModifierComponent implements Component<BlockDamageModifi
     public float impulsePower;
 
     @Override
-    public void copy(BlockDamageModifierComponent other) {
+    public void copyFrom(BlockDamageModifierComponent other) {
         this.materialDamageMultiplier = Maps.newHashMap(other.materialDamageMultiplier);
         this.blockAnnihilationChance = other.blockAnnihilationChance;
         this.skipPerBlockEffects = other.skipPerBlockEffects;

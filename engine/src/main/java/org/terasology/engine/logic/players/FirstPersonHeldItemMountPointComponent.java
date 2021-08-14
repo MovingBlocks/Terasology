@@ -44,7 +44,7 @@ public class FirstPersonHeldItemMountPointComponent implements Component<FirstPe
     }
 
     @Override
-    public void copy(FirstPersonHeldItemMountPointComponent other) {
+    public void copyFrom(FirstPersonHeldItemMountPointComponent other) {
         this.mountPointEntity = other.mountPointEntity;
         this.rotateDegrees = new Vector3f(other.rotateDegrees);
         this.translate = new Vector3f(other.translate);

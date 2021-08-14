@@ -57,7 +57,7 @@ public class SectorSimulationComponent implements Component<SectorSimulationComp
     }
 
     @Override
-    public void copy(SectorSimulationComponent other) {
+    public void copyFrom(SectorSimulationComponent other) {
         this.lastSimulationTime = other.lastSimulationTime;
         this.loadedMaxDelta = other.loadedMaxDelta;
         this.unloadedMaxDelta = other.unloadedMaxDelta;

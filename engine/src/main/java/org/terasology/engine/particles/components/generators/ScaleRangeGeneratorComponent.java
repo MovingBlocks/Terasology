@@ -23,7 +23,7 @@ public class ScaleRangeGeneratorComponent implements Component<ScaleRangeGenerat
     }
 
     @Override
-    public void copy(ScaleRangeGeneratorComponent other) {
+    public void copyFrom(ScaleRangeGeneratorComponent other) {
         this.minScale = new Vector3f(other.minScale);
         this.maxScale = new Vector3f(other.maxScale);
     }

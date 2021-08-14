@@ -11,7 +11,7 @@ public class OwnerComponent implements Component<OwnerComponent> {
     public EntityRef child = EntityRef.NULL;
 
     @Override
-    public void copy(OwnerComponent other) {
+    public void copyFrom(OwnerComponent other) {
         this.child = other.child;
     }
 }

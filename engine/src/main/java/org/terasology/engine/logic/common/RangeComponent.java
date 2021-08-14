@@ -17,7 +17,7 @@ public class RangeComponent implements Component<RangeComponent> {
     public float range;
 
     @Override
-    public void copy(RangeComponent other) {
+    public void copyFrom(RangeComponent other) {
         this.range = other.range;
     }
 }

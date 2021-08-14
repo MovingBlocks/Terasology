@@ -64,7 +64,7 @@ public final class LightComponent implements VisualComponent<LightComponent>, Re
     public boolean simulateFading;
 
     @Override
-    public void copy(LightComponent other) {
+    public void copyFrom(LightComponent other) {
         this.lightColorDiffuse = new Vector3f(other.lightColorDiffuse);
         this.lightColorAmbient = new Vector3f(other.lightColorAmbient);
         this.lightDiffuseIntensity = other.lightDiffuseIntensity;

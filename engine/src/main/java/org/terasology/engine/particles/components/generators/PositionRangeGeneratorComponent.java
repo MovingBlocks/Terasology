@@ -24,7 +24,7 @@ public class PositionRangeGeneratorComponent implements Component<PositionRangeG
     }
 
     @Override
-    public void copy(PositionRangeGeneratorComponent other) {
+    public void copyFrom(PositionRangeGeneratorComponent other) {
         this.minPosition = new Vector3f(other.minPosition);
         this.maxPosition = new Vector3f(other.maxPosition);
     }

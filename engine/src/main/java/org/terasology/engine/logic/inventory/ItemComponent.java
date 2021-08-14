@@ -75,7 +75,7 @@ public final class ItemComponent implements Component<ItemComponent> {
     public int cooldownTime = 200;
 
     @Override
-    public void copy(ItemComponent other) {
+    public void copyFrom(ItemComponent other) {
         this.icon = other.icon;
         this.stackId = other.stackId;
         this.maxStackSize = other.maxStackSize;

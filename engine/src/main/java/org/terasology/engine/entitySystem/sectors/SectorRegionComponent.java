@@ -27,7 +27,7 @@ public class SectorRegionComponent implements Component<SectorRegionComponent> {
     public Set<Vector3i> chunks = new HashSet<>();
 
     @Override
-    public void copy(SectorRegionComponent other) {
+    public void copyFrom(SectorRegionComponent other) {
         this.chunks = other.chunks.stream()
                 .map(Vector3i::new)
                 .collect(Collectors.toSet());

@@ -24,7 +24,7 @@ public class ColorRangeGeneratorComponent implements Component<ColorRangeGenerat
     }
 
     @Override
-    public void copy(ColorRangeGeneratorComponent other) {
+    public void copyFrom(ColorRangeGeneratorComponent other) {
         this.minColorComponents = new Vector4f(other.minColorComponents);
         this.maxColorComponents = new Vector4f(other.maxColorComponents);
     }

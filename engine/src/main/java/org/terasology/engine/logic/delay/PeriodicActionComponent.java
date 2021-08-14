@@ -80,7 +80,7 @@ public final class PeriodicActionComponent implements Component<PeriodicActionCo
     }
 
     @Override
-    public void copy(PeriodicActionComponent other) {
+    public void copyFrom(PeriodicActionComponent other) {
         this.actionIdsPeriod = Maps.newHashMap(other.actionIdsPeriod);
         this.actionIdsWakeUp = Maps.newHashMap(other.actionIdsPeriod);
         this.lowestWakeUp = other.lowestWakeUp;

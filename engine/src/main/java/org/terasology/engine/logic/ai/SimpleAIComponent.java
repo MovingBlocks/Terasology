@@ -12,7 +12,7 @@ public final class SimpleAIComponent implements Component<SimpleAIComponent> {
     public boolean followingPlayer;
 
     @Override
-    public void copy(SimpleAIComponent other) {
+    public void copyFrom(SimpleAIComponent other) {
         this.lastChangeOfDirectionAt = other.lastChangeOfDirectionAt;
         this.movementTarget = new Vector3f(other.movementTarget);
         this.followingPlayer = other.followingPlayer;

@@ -10,7 +10,7 @@ public class SpawnPrefabActionComponent implements Component<SpawnPrefabActionCo
     public ActionTarget spawnLocationRelativeTo = ActionTarget.Target;
 
     @Override
-    public void copy(SpawnPrefabActionComponent other) {
+    public void copyFrom(SpawnPrefabActionComponent other) {
         this.prefab = other.prefab;
         this.spawnLocationRelativeTo = other.spawnLocationRelativeTo;
     }

@@ -21,7 +21,7 @@ public class TriggerComponent implements Component<TriggerComponent> {
     public List<CollisionGroup> detectGroups = Lists.<CollisionGroup>newArrayList(StandardCollisionGroup.DEFAULT);
 
     @Override
-    public void copy(TriggerComponent other) {
+    public void copyFrom(TriggerComponent other) {
         this.collisionGroup = other.collisionGroup;
         this.detectGroups = Lists.newArrayList(other.detectGroups);
     }

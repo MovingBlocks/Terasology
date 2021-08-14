@@ -12,7 +12,7 @@ public class ModuleConfigComponent implements Component<ModuleConfigComponent> {
     public Map<String, String> properties;
 
     @Override
-    public void copy(ModuleConfigComponent other) {
+    public void copyFrom(ModuleConfigComponent other) {
         this.moduleName = other.moduleName;
         this.properties = Maps.newHashMap(other.properties);
     }

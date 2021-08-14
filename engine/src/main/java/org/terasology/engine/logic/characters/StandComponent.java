@@ -22,7 +22,7 @@ public class StandComponent implements Component<StandComponent> {
     public List<MeshAnimation> animationPool = Lists.newArrayList();
 
     @Override
-    public void copy(StandComponent other) {
+    public void copyFrom(StandComponent other) {
         this.animationPool = Lists.newArrayList(other.animationPool);
     }
 }

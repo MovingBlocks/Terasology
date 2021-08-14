@@ -13,7 +13,7 @@ public class NetworkComponent implements Component<NetworkComponent> {
     private int networkId;
 
     @Override
-    public void copy(NetworkComponent other) {
+    public void copyFrom(NetworkComponent other) {
         this.networkId = other.networkId;
         this.replicateMode = other.replicateMode;
     }

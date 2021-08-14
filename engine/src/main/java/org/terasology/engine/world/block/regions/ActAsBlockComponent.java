@@ -15,7 +15,7 @@ public final class ActAsBlockComponent implements Component<ActAsBlockComponent>
     public boolean dropBlocksInRegion;
 
     @Override
-    public void copy(ActAsBlockComponent other) {
+    public void copyFrom(ActAsBlockComponent other) {
         this.block = other.block;
         this.dropBlocksInRegion = other.dropBlocksInRegion;
     }

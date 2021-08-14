@@ -11,7 +11,7 @@ public class PermissionSetComponent implements Component<PermissionSetComponent>
     public Set<String> permissions;
 
     @Override
-    public void copy(PermissionSetComponent other) {
+    public void copyFrom(PermissionSetComponent other) {
         this.permissions = Sets.newHashSet(other.permissions);
     }
 }

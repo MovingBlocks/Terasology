@@ -25,7 +25,7 @@ public class LifespanComponent implements Component<LifespanComponent> {
     }
 
     @Override
-    public void copy(LifespanComponent other) {
+    public void copyFrom(LifespanComponent other) {
         this.lifespan = other.lifespan;
         this.deathTime = other.deathTime;
     }

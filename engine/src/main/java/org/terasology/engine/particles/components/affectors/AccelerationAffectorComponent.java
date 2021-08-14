@@ -23,7 +23,7 @@ public class AccelerationAffectorComponent implements Component<AccelerationAffe
     }
 
     @Override
-    public void copy(AccelerationAffectorComponent other) {
+    public void copyFrom(AccelerationAffectorComponent other) {
         this.acceleration = new Vector3f(other.acceleration);
     }
 }

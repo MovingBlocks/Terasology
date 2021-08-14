@@ -112,7 +112,7 @@ public class ParticleEmitterComponent implements Component<ParticleEmitterCompon
     public int collisionUpdateIteration;
 
     @Override
-    public void copy(ParticleEmitterComponent other) {
+    public void copyFrom(ParticleEmitterComponent other) {
         this.maxParticles = other.maxParticles;
         this.particleCollision = other.particleCollision;
         this.spawnRateMax = other.spawnRateMax;
@@ -128,7 +128,7 @@ public class ParticleEmitterComponent implements Component<ParticleEmitterCompon
         this.affectorFunctionMap.clear();
         this.affectorFunctionMap.putAll(other.affectorFunctionMap);
         this.locationComponent = new LocationComponent();
-        this.locationComponent.copy(other.locationComponent); // TODO check this
+        this.locationComponent.copyFrom(other.locationComponent); // TODO check this
         this.nextEmission = other.nextEmission;
         this.collisionUpdateIteration = other.collisionUpdateIteration;
     }

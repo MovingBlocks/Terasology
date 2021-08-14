@@ -15,7 +15,7 @@ public class ColorComponent implements Component<ColorComponent> {
     public Color color;
 
     @Override
-    public void copy(ColorComponent other) {
+    public void copyFrom(ColorComponent other) {
         this.color = new Color(other.color);
     }
 }

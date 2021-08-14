@@ -10,7 +10,7 @@ public class CylinderShapeComponent implements Component<CylinderShapeComponent>
     public float height = 1.0f;
 
     @Override
-    public void copy(CylinderShapeComponent other) {
+    public void copyFrom(CylinderShapeComponent other) {
         this.radius = other.radius;
         this.height = other.height;
     }

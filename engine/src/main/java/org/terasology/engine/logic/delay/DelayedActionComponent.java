@@ -71,7 +71,7 @@ public final class DelayedActionComponent implements Component<DelayedActionComp
     }
 
     @Override
-    public void copy(DelayedActionComponent other) {
+    public void copyFrom(DelayedActionComponent other) {
         this.actionIdsWakeUp = Maps.newHashMap(other.actionIdsWakeUp);
         this.lowestWakeUp = other.lowestWakeUp;
     }

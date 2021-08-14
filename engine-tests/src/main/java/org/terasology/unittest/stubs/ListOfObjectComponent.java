@@ -15,7 +15,7 @@ public class ListOfObjectComponent implements Component<ListOfObjectComponent> {
     public List<SubElement> elements = new ArrayList<>();
 
     @Override
-    public void copy(ListOfObjectComponent other) {
+    public void copyFrom(ListOfObjectComponent other) {
         this.shortName = other.shortName;
         this.elements = other.elements.stream()
                 .map(SubElement::new)

@@ -26,7 +26,7 @@ public class VelocityRangeGeneratorComponent implements Component<VelocityRangeG
     }
 
     @Override
-    public void copy(VelocityRangeGeneratorComponent other) {
+    public void copyFrom(VelocityRangeGeneratorComponent other) {
         this.minVelocity = new Vector3f(other.minVelocity);
         this.maxVelocity = new Vector3f(other.maxVelocity);
     }

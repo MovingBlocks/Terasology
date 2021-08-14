@@ -9,7 +9,7 @@ public class SphereShapeComponent implements Component<SphereShapeComponent> {
     public float radius = 0.5f;
 
     @Override
-    public void copy(SphereShapeComponent other) {
+    public void copyFrom(SphereShapeComponent other) {
         this.radius = other.radius;
     }
 }

@@ -23,7 +23,7 @@ public final class BlockItemComponent implements Component<BlockItemComponent> {
     }
 
     @Override
-    public void copy(BlockItemComponent other) {
+    public void copyFrom(BlockItemComponent other) {
         this.blockFamily = other.blockFamily;
     }
 }

@@ -44,7 +44,7 @@ public class EntityInfoComponent implements Component<EntityInfoComponent> {
     }
 
     @Override
-    public void copy(EntityInfoComponent other) {
+    public void copyFrom(EntityInfoComponent other) {
         this.persisted = other.persisted;
         this.parentPrefab = other.parentPrefab;
         this.alwaysRelevant = other.alwaysRelevant;

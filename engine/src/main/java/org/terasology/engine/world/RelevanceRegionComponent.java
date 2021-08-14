@@ -10,7 +10,7 @@ public class RelevanceRegionComponent implements Component<RelevanceRegionCompon
     public Vector3i distance = new Vector3i(1, 1, 1);
 
     @Override
-    public void copy(RelevanceRegionComponent other) {
+    public void copyFrom(RelevanceRegionComponent other) {
         this.distance = new Vector3i(other.distance);
     }
 }

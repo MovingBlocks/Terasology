@@ -12,7 +12,7 @@ public class PickupComponent implements Component<PickupComponent> {
     public long timeDropped;
 
     @Override
-    public void copy(PickupComponent other) {
+    public void copyFrom(PickupComponent other) {
         this.timeToPickUp = other.timeToPickUp;
         this.timeDropped = other.timeDropped;
     }

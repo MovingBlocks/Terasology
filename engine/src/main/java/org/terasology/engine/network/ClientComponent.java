@@ -24,7 +24,7 @@ public class ClientComponent implements Component<ClientComponent> {
 
 
     @Override
-    public void copy(ClientComponent other) {
+    public void copyFrom(ClientComponent other) {
         this.local = other.local;
         this.clientInfo = other.clientInfo;
         this.character = other.character;

@@ -21,7 +21,7 @@ public class ParticleDataSpriteComponent implements Component<ParticleDataSprite
     public Vector2f textureSize = new Vector2f(1.0f, 1.0f);
 
     @Override
-    public void copy(ParticleDataSpriteComponent other) {
+    public void copyFrom(ParticleDataSpriteComponent other) {
         this.texture = other.texture;
         this.textureSize = new Vector2f(other.textureSize);
     }

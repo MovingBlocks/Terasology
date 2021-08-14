@@ -11,7 +11,7 @@ public final class OrderedMapTestComponent implements Component<OrderedMapTestCo
     public Map<String, Long> orderedMap;
 
     @Override
-    public void copy(OrderedMapTestComponent other) {
+    public void copyFrom(OrderedMapTestComponent other) {
         this.orderedMap = Maps.newHashMap(other.orderedMap);
     }
 }

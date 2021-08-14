@@ -276,7 +276,7 @@ public final class LocationComponent implements Component<LocationComponent>, Re
 
 
     @Override
-    public void copy(LocationComponent other) {
+    public void copyFrom(LocationComponent other) {
         this.replicateChanges = other.replicateChanges;
         this.isDirty = other.isDirty;
         this.parent = other.parent;

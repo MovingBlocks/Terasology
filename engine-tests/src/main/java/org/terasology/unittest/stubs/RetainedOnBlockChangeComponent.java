@@ -17,7 +17,7 @@ public class RetainedOnBlockChangeComponent implements Component<RetainedOnBlock
     }
 
     @Override
-    public void copy(RetainedOnBlockChangeComponent other) {
+    public void copyFrom(RetainedOnBlockChangeComponent other) {
         this.value = other.value;
     }
 }

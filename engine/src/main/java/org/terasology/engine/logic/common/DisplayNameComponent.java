@@ -21,7 +21,7 @@ public class DisplayNameComponent implements Component<DisplayNameComponent> {
     }
 
     @Override
-    public void copy(DisplayNameComponent other) {
+    public void copyFrom(DisplayNameComponent other) {
         this.name = other.name;
         this.description = other.description;
     }

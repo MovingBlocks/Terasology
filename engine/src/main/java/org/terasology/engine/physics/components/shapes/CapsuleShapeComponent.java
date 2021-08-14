@@ -10,7 +10,7 @@ public class CapsuleShapeComponent implements Component<CapsuleShapeComponent> {
     public float height = 1.0f;
 
     @Override
-    public void copy(CapsuleShapeComponent other) {
+    public void copyFrom(CapsuleShapeComponent other) {
         this.radius = other.radius;
         this.height = other.height;
     }
