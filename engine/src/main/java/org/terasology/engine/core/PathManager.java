@@ -160,7 +160,7 @@ public final class PathManager {
      * @throws IOException Thrown when required directories cannot be accessed.
      */
     public void useOverrideHomePath(Path rootPath) throws IOException {
-        this.homePath = rootPath.toAbsolutePath();
+        this.homePath = rootPath.toRealPath();
         updateDirs();
     }
 
