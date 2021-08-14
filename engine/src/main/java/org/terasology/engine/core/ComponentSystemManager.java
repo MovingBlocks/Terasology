@@ -82,17 +82,76 @@ public class ComponentSystemManager {
             for (Class<?> system : systemsByModule.get(module.getId())) {
                 String id = module.getId() + ":" + system.getSimpleName();
                 logger.debug("Registering system {}", id);
-                try {
-                    ComponentSystem newSystem = (ComponentSystem) system.newInstance();
-                    InjectionHelper.share(newSystem);
-                    register(newSystem, id);
-                    logger.debug("Loaded system {}", id);
-                } catch (RuntimeException | IllegalAccessException | InstantiationException
-                        | NoClassDefFoundError e) {
-                    logger.error("Failed to load system {}", id, e);
+                if (checkOptionalDependenciesPresent(system)) {
+                    tryToLoadSystem(system, id);
+                } else {
+                    logger.warn("Skip system {} for loading - possibly missing optional dependencies", id);
                 }
             }
         }
+    }
+
+    /**
+     * Try to load system. try to rollback changes, when fails.
+     *
+     * @param system system's class for creation and loading.
+     * @param id id of system.
+     */
+    private void tryToLoadSystem(Class<?> system, String id) {
+        ComponentSystem newSystem = null;
+        try {
+            newSystem = (ComponentSystem) system.newInstance();
+            InjectionHelper.share(newSystem);
+            register(newSystem, id);
+            logger.debug("Loaded system {}", id);
+
+        } catch (RuntimeException | InstantiationException | IllegalAccessException e) {
+            logger.error("Failed to load system {}", id, e);
+            rollbackLoading(newSystem, id);
+        }
+    }
+
+    /**
+     * Rollback changes which made loading before fail.
+     * @param system system to rollback.
+     * @param id id of system.
+     */
+    private void rollbackLoading(ComponentSystem system, String id) {
+        if (system != null  // system was created, needs cleanup.
+                && store.remove(namedLookup.remove(id))// remove system from lookup and store, if already registered.
+        ) {
+            //TODO unshare if system is shared by InjectionHelper#share()
+
+            // rollback this#register
+            if (system instanceof UpdateSubscriberSystem) {
+                updateSubscribers.remove((UpdateSubscriberSystem) system);
+            }
+            if (system instanceof RenderSystem) {
+                renderSubscribers.remove((RenderSystem) system);
+            }
+        }
+    }
+
+    /**
+     * Check system for meeting optional dependencies.
+     * <p/>
+     * Hacky-way: check fields and methods for non-throwing {@link NoClassDefFoundError}.
+     *
+     * @param system system's class to check.
+     * @return {@code true} if optional dependencies presents, {@code false} otherwise.
+     */
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    private boolean checkOptionalDependenciesPresent(Class<?> system) {
+        try {
+            // Check that fields haven't absent classes.
+            system.getDeclaredFields();
+            // Check that method signatures haven't absent classes.
+            system.getDeclaredMethods();
+            return true;
+        } catch (NoClassDefFoundError e) {
+            return false;
+        }
+
     }
 
     private boolean areOptionalRequirementsContained(RegisterSystem registerSystem, ModuleEnvironment environment) {
