@@ -7,6 +7,8 @@ import groovy.json.JsonSlurper
 import org.terasology.cli.util.Constants
 
 class ModuleItem {
+    public static String ModuleCfg = "module.txt"
+
     private String module;
     private File dir
 
@@ -15,7 +17,7 @@ class ModuleItem {
         this.dir = new File(Constants.ModuleDirectory, module)
     }
 
-    String getModule() {
+    String name() {
         return this.module
     }
 
@@ -23,10 +25,13 @@ class ModuleItem {
         return this.dir
     }
 
+    boolean isValidModule() {
+        return this.dir.exists()
+    }
 
-    ModuleItem[] dependencies(File targetDir, boolean respectExcludedItems = true) {
+    ModuleItem[] dependencies(boolean respectExcludedItems = true) {
         def dependencies = []
-        File moduleFile = new File(targetDir, "module.txt")
+        File moduleFile = new File(this.directory, ModuleCfg)
         def slurper = new JsonSlurper()
         def moduleConfig = slurper.parseText(moduleFile.text)
         for (dependency in moduleConfig.dependencies) {
@@ -39,7 +44,7 @@ class ModuleItem {
 
     @Override
     int hashCode() {
-        return this.module.hashCode()
+        return this.dir.hashCode()
     }
 
     @Override
