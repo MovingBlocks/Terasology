@@ -1,6 +1,0 @@
-{
-    "id" : "unittest",
-    "version" : "3.3.0",
-    "displayName" : "Terasology Engine Test",
-    "description" : "Engine unit test content"
-}

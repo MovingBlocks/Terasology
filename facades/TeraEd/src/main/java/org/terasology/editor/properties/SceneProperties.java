@@ -1,27 +1,13 @@
-/*
- * Copyright 2016 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.editor.properties;
 
 import com.google.common.collect.Lists;
-import org.terasology.context.Context;
-import org.terasology.engine.TerasologyEngine;
-import org.terasology.engine.modes.GameState;
-import org.terasology.engine.modes.StateIngame;
-import org.terasology.rendering.backdrop.BackdropProvider;
-import org.terasology.rendering.backdrop.BackdropRenderer;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.core.TerasologyEngine;
+import org.terasology.engine.core.modes.GameState;
+import org.terasology.engine.core.modes.StateIngame;
+import org.terasology.engine.rendering.backdrop.BackdropProvider;
 
 import java.util.List;
 
@@ -47,10 +33,6 @@ public class SceneProperties implements PropertyProvider {
         BackdropProvider backdropProvider = ingameContext.get(BackdropProvider.class);
         if (backdropProvider != null) {
             result.addAll(new ReflectionProvider(backdropProvider, ingameContext).getProperties());
-        }
-        BackdropRenderer backdropRenderer = ingameContext.get(BackdropRenderer.class);
-        if (backdropRenderer != null) {
-            result.addAll(new ReflectionProvider(backdropRenderer, ingameContext).getProperties());
         }
 
         // TODO: fix this

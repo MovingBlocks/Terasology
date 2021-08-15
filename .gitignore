@@ -9,6 +9,9 @@
 !.gitignore
 !.github
 
+# Ignore generated code
+/engine/src/jmh/generated
+
 # Ignore subdirs with their own Git roots. PC Facade and Core module are bundled with the main repo.
 extensions
 /facades/*
@@ -62,9 +65,6 @@ Icon
 ehthumbs.db
 Thumbs.db
 
-# Ignore Terasology build output
-/engine/src/main/resources/Credits.md
-
 # Ignore Terasology output
 *.log
 /saves/
@@ -72,11 +72,13 @@ Thumbs.db
 /configs/
 /screenshots/
 /logs/
+/cachedModules/
 /terasology-server/
 /terasology-2ndclient/
 /terasology-3rdclient/
 config.cfg
 entityDump.txt
+*entityDump*.json
 nuiEditorAutosave.json
 
 # Historical Output

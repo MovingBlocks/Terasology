@@ -4,9 +4,9 @@ For more details on how to play Terasology, keep reading!
 
 If you hit issues look for the game log files. By default they go into your user home directory, for instance `C:\Users\[username]\Saved Games\Terasology\logs` on Windows.
 
-You can run the game with `-homedir` to instead store all game data in the directory you ran from. Or just use the [Launcher](https://github.com/MovingBlocks/TerasologyLauncher/releases) - it handles all that stuff!
+You can run the game with `--homedir=.` to instead store all game data in the directory you ran from. Or just use the [Launcher](https://github.com/MovingBlocks/TerasologyLauncher/releases) - it handles all that stuff!
 
-Report issues in the [support forum](http://forum.terasology.org/forum/support.20) or ask on [IRC](https://github.com/MovingBlocks/Terasology/wiki/Using-IRC) (`#terasology` on Freenode)
+Report issues on [GitHub](https://github.com/MovingBlocks/Terasology/issues/new) or ask on [Discord](https://discord.com/channels/270264625419911192/713903952764207164).
 
 ## Controls
 
@@ -85,7 +85,9 @@ Press the `F1` or `grave` key (usually the \` key immediately above `tab`) to sh
 
 ## Multiplayer
 
-To name yourself for a multiplayer game use Settings / Player. You can also pick a color, which will affect your placeholder monkey head player avatar, name in chat, and floating name tag.
+_A note on stability: while generally Terasology multiplayer is stable enough for us to run play tests on the first Saturday of each month there are regularly recurring bugs that will get in the way (still "Alpha" level software after all). Expect for it to be difficult to keep a server stable over the long term until Beta. The game client may also leave an orphaned process after trying to exit that you may need to close manually via task manager._ 
+
+To name yourself for a multiplayer game use Settings / Player. You can also pick a color for your name in chat and floating name tag.
 
 You can host a local server using the game client and have friends connect to your IP. Game port is 25777 which needs to be open and forwarded to your PC.
 
@@ -93,13 +95,11 @@ Unlike in single player in a multiplayer setting permissions are enforced for co
 
 ### Headless Server
 
-You can also run a headless server, but this is harder to configure at the moment. You need to launch the game via command line, for example with a downloaded version:
+You can also run a headless server, but need to do so via command line, for example with a downloaded version:
 
-*Note: This changed to include the `/libs` after stable 49. The name of the .exe also may differ*
+`java -jar libs/Terasology.jar --headless --homedir=server`
 
-`java -jar libs/Terasology.jar -headless -homedir=server`
-
-This will launch the server and store game files in the "server" subdir at the place you launch from (otherwise it'll use the default path, which could clash with a client on the same system). You can add `-serverPort=#####` to run on a different port than default 25777.
+This will launch the server and store game files in the "server" subdir at the place you launch from (otherwise it'll use the default path, which could clash with a client on the same system). You can add `--server-port=#####` to run on a different port than default 25777.
 
 In this case *there is no default player with rights beyond "chat"*. You need to gain admin powers yourself using the `oneTimeAuthorizationKey` that generates in the server's `config.cfg`. This gives you all permission types except "debug"
 
@@ -113,7 +113,7 @@ With *server* rights you can terminate the server gracefully via `shutdownServer
 
 Finally to get modules configured for a headless server you either have to manually edit in a list of modules to the `defaultModSelection` section, and `defaultGenerator` for your chosen world, then delete the `saves` dir for the server and restart it. Start a single player world and look at the `config.cfg` that generates for hints.
 
-It is also possible to provide a configuration file which overrides the default configuration on startup. This file can be passed using the `-overrideDefaultConfig=<pathToFile>`. Settings from this file will be copied to the generated `config.cfg`. After that changes in the `config.cfg` have priority, so further modifications in the override file will not modify the server values. It not required to pass an entire configuration file. A typical example would be:
+It is also possible to provide a configuration file which overrides the default configuration on startup. This file can be passed using the `--override-default-config=<pathToFile>`. Settings from this file will be copied to the generated `config.cfg`. After that changes in the `config.cfg` have priority, so further modifications in the override file will not modify the server values. It not required to pass an entire configuration file. A typical example would be:
 
 ```
 {
@@ -164,4 +164,3 @@ See all available images at https://hub.docker.com/r/qwick/terasology/tags/
 Example: `docker pull qwick/terasology:latest`
 
 The Docker server starts with no extra modules configured, you would have to go update the game server's config accordingly if desired.
-

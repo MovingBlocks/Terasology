@@ -1,3 +1,5 @@
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.engine;
 
@@ -11,18 +13,19 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.slf4j.LoggerFactory;
-import org.terasology.context.Context;
-import org.terasology.entitySystem.entity.EntityManager;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.event.internal.EventSystem;
-import org.terasology.entitySystem.systems.BaseComponentSystem;
-import org.terasology.entitySystem.systems.RenderSystem;
-import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
-import org.terasology.logic.console.Console;
-import org.terasology.logic.console.commandSystem.MethodCommand;
-import org.terasology.logic.console.commandSystem.annotations.Command;
-import org.terasology.logic.console.commandSystem.annotations.CommandParam;
-import org.terasology.logic.console.commandSystem.annotations.Sender;
+import org.terasology.engine.context.Context;
+import org.terasology.engine.core.ComponentSystemManager;
+import org.terasology.engine.entitySystem.entity.EntityManager;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.entitySystem.event.internal.EventSystem;
+import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
+import org.terasology.engine.entitySystem.systems.RenderSystem;
+import org.terasology.engine.entitySystem.systems.UpdateSubscriberSystem;
+import org.terasology.engine.logic.console.Console;
+import org.terasology.engine.logic.console.commandSystem.MethodCommand;
+import org.terasology.engine.logic.console.commandSystem.annotations.Command;
+import org.terasology.engine.logic.console.commandSystem.annotations.CommandParam;
+import org.terasology.engine.logic.console.commandSystem.annotations.Sender;
 
 import java.util.List;
 
@@ -140,14 +143,14 @@ public class ComponentSystemManagerTest {
     }
 
     private static class SystemWithValidCommand extends BaseComponentSystem {
-        @Command()
+        @Command
         public String validCommandName(@CommandParam(value = "parameter") String value, @Sender EntityRef sender) {
             return value;
         }
     }
 
     private static class SystemWithCommandMissingSenderAnnotation extends BaseComponentSystem {
-        @Command()
+        @Command
         public String commandWithoutSenderAnnotation(@CommandParam(value = "parameter") String value, EntityRef sender) {
             return value;
         }

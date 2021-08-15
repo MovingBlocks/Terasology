@@ -1,0 +1,22 @@
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
+
+subprojects {
+    // Hack for getting sourcesSets.main.output there.
+    plugins.apply('java')
+    plugins.apply('idea')
+
+    def sourceSets = project.getConvention().getPlugin(JavaPluginConvention.class).sourceSets
+
+
+    sourceSets.main.java.outputDir = new File("$buildDir/classes")
+    idea {
+        module {
+            // Change around the output a bit
+            inheritOutputDirs = false
+            outputDir = file('build/classes')
+            testOutputDir = file('build/testClasses')
+            downloadSources = true
+        }
+    }
+}

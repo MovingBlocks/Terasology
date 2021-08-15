@@ -1,0 +1,33 @@
+{
+  "skeletalMesh": {
+    "mesh": "floatingCube",
+    "heightOffset": 0.5,
+    "material": "floatingCubeSkin",
+    "loop": true,
+    "scale": [
+      0.25,
+      0.25,
+      0.25
+    ]
+  },
+  "persisted": false,
+  "location": {},
+  "Network": {},
+  "Health": {
+    "destroyEntityOnNoHealth": true,
+    "currentHealth": 7
+  },
+  "BoxShape": {
+    "extents": [
+      1.5,
+      1.5,
+      1.5
+    ]
+  },
+  "Trigger": {
+    "detectGroups": [
+      "engine:debris",
+      "engine:sensor"
+    ]
+  }
+}

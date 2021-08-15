@@ -1,0 +1,12 @@
+{
+    "location": {
+        "scale" : 5
+    },
+    "BoxShape": {
+        "extents": [0.2, 0.2, 0.2]
+    },
+    "Mesh": {
+        "mesh": "engine:glTFBoxTextured",
+        "material": "engine:avocado"
+    }
+}

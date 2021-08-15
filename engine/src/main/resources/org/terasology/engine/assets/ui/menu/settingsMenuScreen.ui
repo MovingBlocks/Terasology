@@ -1,0 +1,82 @@
+{
+    "type": "engine:SettingsMenuScreen",
+    "skin": "mainmenu",
+    "contents": {
+        "type": "relativeLayout",
+        "contents": [
+            {
+                "type": "UILabel",
+                "text": "${engine:menu#settings-title}",
+                "family": "title",
+                "id": "title",
+                "layoutInfo": {
+                    "height": 48,
+                    "position-horizontal-center": {},
+                    "position-top": {
+                        "target": "TOP",
+                        "offset": 48
+                    }
+                }
+            },
+            {
+                "type": "columnLayout",
+                "verticalSpacing": 8,
+                "family": "menu-options",
+                "layoutInfo": {
+                    "width": 280,
+                    "height": 288,
+                    "position-horizontal-center": {},
+                    "position-top": {
+                        "target": "BOTTOM",
+                        "offset": 16,
+                        "widget": "title"
+                    },
+                    "position-bottom": {
+                        "offset": 32
+                    }
+                },
+                "contents": [
+                    {
+                        "type": "UIButton",
+                        "id": "player",
+                        "text": "${engine:menu#player-settings}"
+                    },
+                    {
+                        "type": "UISpace",
+                        "size": [1, 16]
+                    },
+                    {
+                        "type": "UIButton",
+                        "id": "video",
+                        "text": "${engine:menu#video-settings}"
+                    },
+                    {
+                        "type": "UIButton",
+                        "id": "audio",
+                        "text": "${engine:menu#audio-settings}"
+                    },
+                    {
+                        "type": "UIButton",
+                        "id": "input",
+                        "text": "${engine:menu#input-settings}"
+                    },
+                    {
+                        "type": "UIButton",
+                        "id": "auto",
+                        "text": "autoconfig"
+                    },
+                    {
+                        "type": "UISpace",
+                        "size": [1, 104]
+                    },
+
+                    {
+                        "type": "UIButton",
+                        "id": "close",
+                        "text": "${engine:menu#back}"
+                    }
+                ]
+            }
+        ]
+    }
+}

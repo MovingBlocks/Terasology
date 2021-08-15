@@ -1,19 +1,18 @@
-// Copyright 2020 The Terasology Foundation
+// Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
 // The engine build is the primary Java project and has the primary list of dependencies
 
 plugins {
     id "java-library"
+    id "org.jetbrains.gradle.plugin.idea-ext"
 }
 
 // Grab all the common stuff like plugins to use, artifact repositories, code analysis config, etc
 apply from: "$rootDir/config/gradle/publish.gradle"
 
+
 import groovy.json.JsonSlurper
-import org.reflections.Reflections
-import org.reflections.scanners.SubTypesScanner
-import org.reflections.scanners.TypeAnnotationsScanner
 
 import java.text.SimpleDateFormat
 
@@ -29,20 +28,8 @@ ext {
 
     // Stuff for our automatic version file setup
     startDateTimeString = dateTimeFormat.format(new Date())
-    versionInfoFileDir = new File(buildDir, 'classes/org/terasology/version')
-    versionInfoFile = new File(versionInfoFileDir, 'versionInfo.properties')
-    versionFileName = 'VERSION'
     versionBase = new File(templatesDir, "version.txt").text.trim()
     displayVersion = versionBase
-}
-
-def convertGitBranch = { gitBranch ->
-    if (gitBranch != null) {
-        // Remove "origin/" from "origin/develop"
-        gitBranch.substring(gitBranch.lastIndexOf("/") + 1)
-    } else {
-        ""
-    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -50,13 +37,6 @@ def convertGitBranch = { gitBranch ->
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 sourceSets {
-    main.java {
-        // dev/ holds things that are neither unit tests nor application code.
-        // For notes about whether it should be its own source set, see
-        // see https://github.com/MovingBlocks/Terasology/pull/4021
-        srcDir("src/dev/java")
-    }
-
     // Adjust output path (changed with the Gradle 6 upgrade, this puts it back)
     main.java.outputDir = new File("$buildDir/classes")
 }
@@ -71,23 +51,25 @@ configurations {
     }
 }
 
-// TODO: Remove when we don't need to rely on snapshots. Wonder why modules respected this set in root project, engine not so much
 configurations.all {
-    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+    resolutionStrategy {
+        // always pick reflections fork
+        dependencySubstitution {
+            substitute(module("org.reflections:reflections")).using(module("org.terasology:reflections:0.9.12-MB"))
+        }
+    }
 }
 
 // Primary dependencies definition
 dependencies {
-    // white list packages {@see ExternalApiWhiteList class} should use `api` config
-
     // Storage and networking
-    api group: 'com.google.guava', name: 'guava', version: '23.0'
-    api group: 'com.google.code.gson', name: 'gson', version: '2.6.2'
+    api group: 'com.google.guava', name: 'guava', version: '30.1-jre'
+    api group: 'com.google.code.gson', name: 'gson', version: '2.8.6'
     api group: 'net.sf.trove4j', name: 'trove4j', version: '3.0.3'
-    implementation group: 'io.netty', name: 'netty', version: '3.10.5.Final'
+    implementation group: 'io.netty', name: 'netty-all', version: '4.1.65.Final'
     implementation group: 'com.google.protobuf', name: 'protobuf-java', version: '2.6.1'
+    implementation group: 'org.lz4', name: 'lz4-java', version: '1.8.0'
     implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.2'
-
     // Javax for protobuf due to @Generated - needed on Java 9 or newer Javas
     // TODO: Can likely replace with protobuf Gradle task and omit the generated source files instead
     implementation group: 'javax.annotation', name: 'javax.annotation-api', version: '1.3.2'
@@ -96,25 +78,26 @@ dependencies {
     api group: 'org.codehaus.plexus', name: 'plexus-utils', version: '1.5.6'
 
     // Java magic
-    implementation group: 'net.java.dev.jna', name: 'jna-platform', version: '4.5.2'
-    implementation group: 'org.reflections', name: 'reflections', version: '0.9.10'
-    implementation group: 'org.javassist', name: 'javassist', version: '3.20.0-GA'
-    implementation group: 'com.esotericsoftware', name: 'reflectasm', version: '1.11.1'
+    implementation group: 'net.java.dev.jna', name: 'jna-platform', version: '5.6.0'
+    implementation "org.terasology:reflections:0.9.12-MB"
+    implementation group: 'org.javassist', name: 'javassist', version: '3.27.0-GA'
+    implementation group: 'com.esotericsoftware', name: 'reflectasm', version: '1.11.9'
 
     // Graphics, 3D, UI, etc
-    api group: 'org.lwjgl.lwjgl', name: 'lwjgl', version: LwjglVersion
-    api group: 'org.lwjgl.lwjgl', name: 'lwjgl_util', version: LwjglVersion
-    api group: 'java3d', name: 'vecmath', version: '1.3.1'
-    api group: 'org.joml', name: 'joml', version: '1.9.25'
+    api platform("org.lwjgl:lwjgl-bom:$LwjglVersion")
+    api "org.lwjgl:lwjgl"
+    implementation "org.lwjgl:lwjgl-assimp"
+    api "org.lwjgl:lwjgl-glfw"
+    implementation "org.lwjgl:lwjgl-openal"
+    api "org.lwjgl:lwjgl-opengl"
+    implementation "org.lwjgl:lwjgl-stb"
+
+    api group: 'org.joml', name: 'joml', version: '1.10.0'
+    api group: 'org.terasology.joml-ext', name: 'joml-geometry', version: '0.1.0'
+
     implementation group: 'org.abego.treelayout', name: 'org.abego.treelayout.core', version: '1.0.3'
     api group: 'com.miglayout', name: 'miglayout-core', version: '5.0'
     implementation group: 'de.matthiasmann.twl', name: 'PNGDecoder', version: '1111'
-
-    // Assembly & Bytecode
-    implementation group: 'org.ow2.asm', name: 'asm', version: '5.0.3'
-    implementation group: 'org.ow2.asm', name: 'asm-tree', version: '5.0.4'
-    implementation group: 'org.ow2.asm', name: 'asm-util', version: '5.0.4'
-    implementation group: 'org.ow2.asm', name: 'asm-commons', version: '5.0.4'
 
     // Logging and audio
     implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.21'
@@ -122,7 +105,6 @@ dependencies {
 
     // Small-time 3rd party libs we've stored in our Artifactory for access
     implementation group: 'ec.util', name: 'MersenneTwister', version: '20'
-    implementation group: 'org.eaxy', name: 'eaxy', version: '0.1'
 
     // telemetry
     implementation(group: 'com.snowplowanalytics', name: 'snowplow-java-tracker', version: '0.9.0') {
@@ -130,19 +112,19 @@ dependencies {
     }
     implementation group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '4.10'
 
-    // Discord RPC
-    api 'com.jagrosh:DiscordIPC:0.4'
-
     // Our developed libs
-    api group: 'org.terasology', name: 'gestalt-module', version: '5.1.5'
-    api group: 'org.terasology', name: 'gestalt-util', version: '5.1.5'
-    api group: 'org.terasology', name: 'gestalt-asset-core', version: '5.1.5'
+    api group: 'org.terasology.gestalt', name: 'gestalt-asset-core', version: '7.1.0'
+    api group: 'org.terasology.gestalt', name: 'gestalt-module', version: '7.1.0'
+    api group: 'org.terasology.gestalt', name: 'gestalt-util', version: '7.1.0'
+
     api group: 'org.terasology', name: 'TeraMath', version: '1.5.0'
-    api group: 'org.terasology.bullet', name: 'tera-bullet', version: '1.3.2'
-    api group: 'org.terasology', name: 'splash-screen', version: '1.0.2'
+    api group: 'org.terasology', name: 'splash-screen', version: '1.1.1'
     api group: 'org.terasology.jnlua', name: 'JNLua', version: '0.1.0-SNAPSHOT'
-    api group: 'org.terasology.nui', name: 'nui', version: '1.2.0'
-    api group: 'org.terasology.nui', name: 'nui-reflect', version: '1.2.0'
+    api group: 'org.terasology.jnbullet', name: 'JNBullet', version: '1.0.2'
+    api group: 'org.terasology.nui', name: 'nui', version: '3.0.0'
+    api group: 'org.terasology.nui', name: 'nui-reflect', version: '3.0.0'
+    api group: 'org.terasology.nui', name: 'nui-gestalt7', version: '3.0.0'
+
 
     // Wildcard dependency to catch any libs provided with the project (remote repo preferred instead)
     api fileTree(dir: 'libs', include: '*.jar')
@@ -152,25 +134,8 @@ dependencies {
 
     // TODO: Consider moving this back to the PC Facade instead of having the engine rely on it?
     implementation group: 'org.terasology.crashreporter', name: 'cr-terasology', version: '4.1.0'
-}
 
-task cacheReflections {
-    description = 'Caches reflection output to make regular startup faster. May go stale and need cleanup at times.'
-    inputs.files sourceSets.main.output.classesDirs,
-            // getClassesDir from all sourceSets (for any jvm (seems) language)
-            configurations."${sourceSets.main.runtimeClasspathConfigurationName}"
-
-    outputs.upToDateWhen(classes.outputs.upToDateSpec)
-    outputs.file("$buildDir/resources/main/reflections.cache")
-    dependsOn classes
-
-    doLast {
-        // Without the .mkdirs() we might hit a scenario where the classes dir doesn't exist yet
-        Reflections reflections = new org.reflections.Reflections(new org.reflections.util.ConfigurationBuilder()
-            .addUrls(inputs.files.collect { it.toURI().toURL() })
-            .setScanners(new TypeAnnotationsScanner(), new SubTypesScanner()))
-        reflections.save("$buildDir/classes/reflections.cache")
-    }
+    api(project(":subsystems:TypeHandlerLibrary"))
 }
 
 // Instructions for packaging a jar file for the engine
@@ -178,44 +143,55 @@ jar {
     // Unlike the content modules Gradle grabs the assets as they're in a resources directory. Need to avoid dupes tho
     duplicatesStrategy = "EXCLUDE"
 
-    from(tasks.getByName("cacheReflections").outputs)
-
-    manifest {
-        def manifestClasspath = "$subDirLibs/" + configurations."${sourceSets.main.runtimeClasspathConfigurationName}".collect {
-            it.getName()
-        }.join(" $subDirLibs/")
-        attributes("Class-Path": manifestClasspath, "Implementation-Title": "Terasology-" + project.name, "Implementation-Version": env.BUILD_NUMBER + ", " + convertGitBranch(env.GIT_BRANCH) + ", " + env.BUILD_ID + ", " + displayVersion)
+    doFirst {
+        manifest {
+            def manifestClasspath = "$subDirLibs/" + configurations."${sourceSets.main.runtimeClasspathConfigurationName}".collect {
+                it.getName()
+            }.join(" $subDirLibs/")
+            attributes("Class-Path": manifestClasspath, "Implementation-Title": "Terasology", "Implementation-Version": displayVersion + ", engine v" + project.version + " , build number " + env.BUILD_NUMBER)
+        }
     }
 }
 
-task cleanReflections(type: Delete) {
-    description = 'Cleans the reflection cache. Useful in cases where it has gone stale and needs regeneration.'
-    delete cacheReflections.outputs.files
+// JMH related tasks
+
+sourceSets {
+    jmh {
+        java.srcDirs = ['src/jmh/java']
+        resources.srcDirs = ['src/jmh/resources']
+        compileClasspath += sourceSets.main.runtimeClasspath
+    }
+}
+
+task jmh(type: JavaExec, dependsOn: jmhClasses) {
+    main = 'org.openjdk.jmh.Main'
+    classpath = sourceSets.jmh.compileClasspath + sourceSets.jmh.runtimeClasspath
+}
+
+dependencies {
+    jmhAnnotationProcessor group: 'org.openjdk.jmh', name: 'jmh-generator-annprocess', version: '1.27'
+    jmhImplementation 'org.openjdk.jmh:jmh-core:1.27'
+    jmhImplementation 'org.openjdk.jmh:jmh-generator-annprocess:1.27'
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Version file stuff                                                                                                //
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// First read the internal version out of the engine's engine-module.txt
-def moduleFile = file('src/main/resources/engine-module.txt')
+// First read the internal version out of the engine's module.txt
+def moduleFile = file('src/main/resources/org/terasology/engine/module.txt')
 
 if (!moduleFile.exists()) {
-    println "Failed to find engine-module.txt for engine"
-    throw new GradleException("Failed to find engine-module.txt for engine")
+    println "Failed to find module.txt for engine"
+    throw new GradleException("Failed to find module.txt for engine")
 }
 
-println "Scanning for version in engine-module.txt for engine"
+println "Scanning for version in module.txt for engine"
 def slurper = new JsonSlurper()
 def moduleConfig = slurper.parseText(moduleFile.text)
 
 // Gradle uses the magic version variable when creating the jar name (unless explicitly set differently)
 version = moduleConfig.version
-
-// The only case in which we make non-snapshots is when BRANCH_NAME exists and contains "master" - otherwise snapshots
-if (env.BRANCH_NAME == null || !env.BRANCH_NAME.equals("master")) {
-    version += "-SNAPSHOT"
-}
 
 // Jenkins-Artifactory integration catches on to this as part of the Maven-type descriptor
 group = 'org.terasology.engine'
@@ -223,39 +199,51 @@ group = 'org.terasology.engine'
 println "Version for $project.name loaded as $version for group $group"
 
 // This version info file actually goes inside the built jar and can be used at runtime
-task createVersionInfoFile {
-    inputs.property('dateTime', startDateTimeString)
-    onlyIf { env.BUILD_URL != null }
-    doLast {
-        versionInfoFileDir.mkdirs()
-        ant.propertyfile(file: versionInfoFile) {
-            ant.entry(key: 'buildNumber', value: env.BUILD_NUMBER)
-            ant.entry(key: 'buildId', value: env.BUILD_ID)
-            ant.entry(key: 'buildTag', value: env.BUILD_TAG)
-            ant.entry(key: 'buildUrl', value: env.BUILD_URL)
-            ant.entry(key: 'jobName', value: env.JOB_NAME)
-            ant.entry(key: 'gitBranch', value: convertGitBranch(env.GIT_BRANCH))
-            ant.entry(key: 'gitCommit', value: env.GIT_COMMIT)
-            ant.entry(key: 'dateTime', value: startDateTimeString)
-            ant.entry(key: 'displayVersion', value: displayVersion)
-            ant.entry(key: 'engineVersion', value: version)
-        }
+def createVersionInfoFile = tasks.register("createVersionInfoFile", WriteProperties) {
+    //noinspection GroovyAssignabilityCheck
+    properties([
+            buildNumber: env.BUILD_NUMBER,
+            buildId: env.BUILD_ID,
+            buildTag: env.BUILD_TAG,
+            buildUrl: env.BUILD_URL,
+            jobName: env.JOB_NAME,
+            gitCommit: env.GIT_COMMIT,
+            displayVersion: displayVersion,
+            engineVersion: version
+    ].findAll { it.value != null })
+    if (env.JOB_NAME != null) {
+        // Only set the dateTime property when there is a Jenkins JOB_NAME.
+        // It is a value we can always get (on Jenkins or otherwise) but we don't want local builds
+        // to invalidate their cache whenever the time changes.
+        // TODO: after upgrading to Gradle 6.8, see if we can have it ignore this property specifically:
+        //     https://docs.gradle.org/current/userguide/more_about_tasks.html#sec:property_file_normalization
+        property("dateTime", startDateTimeString)
+    }
+
+    outputFile = "$buildDir/createVersionInfoFile/versionInfo.properties"
+}
+
+tasks.named("processResources", Copy) {
+    from(createVersionInfoFile) {
+        into("org/terasology/engine/version/")
+    }
+    from("$rootDir/docs") {
+        include("Credits.md")
     }
 }
 
-
-//TODO: Remove it  when gestalt will can to handle ProtectionDomain without classes (Resources)
-task copyResourcesToClasses(type:Copy) {
+//TODO: Remove this when gestalt can handle ProtectionDomain without classes (Resources)
+task copyResourcesToClasses(type: Copy) {
     from sourceSets.main.output.resourcesDir
     into sourceSets.main.output.classesDirs.first()
 
     dependsOn processResources
     mustRunAfter compileJava
-    classes.dependsOn copyResourcesToClasses
 }
 
-jar.dependsOn createVersionInfoFile
-jar.dependsOn cacheReflections
+tasks.named("classes") {
+    dependsOn(tasks.named("copyResourcesToClasses"))
+}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // General IDE customization                                                                                         //
