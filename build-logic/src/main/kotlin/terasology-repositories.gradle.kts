@@ -22,6 +22,11 @@ repositories {
         }
     }
 
+    maven {
+        name = "JBoss Public Maven Repository Group"
+        url = URI("https://repository.jboss.org/nexus/content/repositories/public/")
+    }
+
     // MovingBlocks Artifactory instance for libs not readily available elsewhere plus our own libs
     maven {
         val repoViaEnv = System.getenv()["RESOLUTION_REPO"]
