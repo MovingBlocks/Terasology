@@ -18,6 +18,6 @@
   </root>
 
   <logger name="org.terasology" level="${logOverrideLevel:-info}" />
-  <logger name="org.reflections.Reflections" level="${logOverrideLevel:-warn}" />
+  <logger name="org.reflections.Reflections" level="warn" />
 
 </configuration>
