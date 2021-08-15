@@ -10,7 +10,7 @@ package org.terasology.cli
 
 import org.fusesource.jansi.AnsiConsole
 import org.terasology.cli.commands.BaseCommandType
-import org.terasology.cli.commands.ModuleCommand
+import org.terasology.cli.commands.module.ModuleCommand
 import picocli.CommandLine
 import picocli.CommandLine.Command
 import picocli.CommandLine.HelpCommand
