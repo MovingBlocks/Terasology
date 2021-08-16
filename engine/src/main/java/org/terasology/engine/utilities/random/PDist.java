@@ -3,6 +3,9 @@
 
 package org.terasology.engine.utilities.random;
 
+import org.terasology.gestalt.module.sandbox.API;
+
+@API
 public class PDist {
     /**
      * average value

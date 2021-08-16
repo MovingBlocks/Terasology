@@ -3,6 +3,8 @@
 
 package org.terasology.engine.utilities.random;
 
+import org.terasology.gestalt.module.sandbox.API;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,6 +12,7 @@ import java.util.List;
  * A group of objects with associated probabilities, with the ability to sample an object at random from those probabilities.
  * The probabilities are {@code double}s with no inherent scale, only measured relative to each other.
  */
+@API
 public class DiscreteDistribution<T> {
     private final List<T> entries = new ArrayList<>();
     private final List<Double> cumulativeChances = new ArrayList<>();
@@ -22,6 +25,10 @@ public class DiscreteDistribution<T> {
     }
 
     public T sample(Random rand) {
+        if (entries.isEmpty()) {
+            return null;
+        }
+
         double n = rand.nextDouble(0, chanceSum);
 
         // Do a binary search to find the first element with a cumulative probability greater than n
