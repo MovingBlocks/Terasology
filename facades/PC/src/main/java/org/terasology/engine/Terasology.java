@@ -88,6 +88,12 @@ public final class Terasology implements Callable<Integer> {
     )
     Long maxDataSize;
 
+    @Option(names = "--oom-score",
+            description = "Adjust out-of-memory score [Linux only]",
+            paramLabel = "<score>"
+    )
+    Integer outOfMemoryScore;
+
     @Option(names = "--crash-report", defaultValue = "true", negatable = true, description = "Enable crash reporting")
     private boolean crashReportEnabled;
 
@@ -123,7 +129,6 @@ public final class Terasology implements Callable<Integer> {
 
     public static void main(String[] args) {
         new CommandLine(new Terasology()).execute(args);
-        adjustOutOfMemoryScore(200);  // TODO: make arg
     }
 
     @Override
@@ -219,6 +224,9 @@ public final class Terasology implements Callable<Integer> {
     }
 
     private void handleLaunchArguments() throws IOException {
+        if (outOfMemoryScore!= null) {
+            adjustOutOfMemoryScore(outOfMemoryScore);
+        }
         if (maxDataSize != null) {
             setMemoryLimit(maxDataSize);
         }
@@ -336,7 +344,7 @@ public final class Terasology implements Callable<Integer> {
             Files.write(procFile, String.valueOf(adjustment).getBytes(),
                     StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("Failed to adjust out-of-memory score.", e);
         }
     }
 }
