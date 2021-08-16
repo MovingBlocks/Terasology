@@ -14,7 +14,7 @@ import picocli.CommandLine.Parameters
 
 @Command(name = "get", description = "get module ")
 class GetCommand implements Runnable{
-    private Set<String> fetchedModules = [];
+    private Set<ModuleItem> fetchedModules = []
 
     @Mixin
     GitOptions gitOptions
@@ -28,10 +28,9 @@ class GetCommand implements Runnable{
     @Override
     void run() {
         String origin = gitOptions.resolveOrigin()
-
         for (module in items.collect({k -> new ModuleItem(k)})) {
             def targetUrl = "https://github.com/${origin}/${module.name()}"
-            if (fetchedModules.contains(targetUrl)) {
+            if (fetchedModules.contains(module)) {
                 continue
             }
             if (module.getDirectory().exists()) {
@@ -44,7 +43,7 @@ class GetCommand implements Runnable{
                         .setDirectory(module.getDirectory())
                         .call()
                 println CommandLine.Help.Ansi.AUTO.string("@|green Retrieving module ${module.name()} from ${targetUrl}|@")
-                fetchedModules << module;
+                fetchedModules << module
             } catch (Exception ex) {
                 println CommandLine.Help.Ansi.AUTO.string("@|red Unable to clone ${module.name()}, Skipping: ${ex.getMessage()} |@");
                 continue
@@ -52,15 +51,16 @@ class GetCommand implements Runnable{
 
             ModuleItem.copyInTemplates(module)
             if (recurse) {
-                String[] dependencies = module.dependencies()*.name()
+                ModuleItem[] dependencies = module.dependencies()
                 if (dependencies.length > 0) {
-                    String[] uniqueDependencies = dependencies - fetchedModules
-                    println "After removing dupes already retrieved we have the remaining dependencies left: $uniqueDependencies"
+                    ModuleItem[] uniqueDependencies = dependencies - fetchedModules
+                    println "After removing dupes already retrieved we have the remaining dependencies left: ${uniqueDependencies*.name()}"
                     if (uniqueDependencies.length > 0) {
                         GetCommand cmd = new GetCommand();
                         cmd.gitOptions = this.gitOptions
-                        cmd.items = uniqueDependencies.toList()
+                        cmd.items = uniqueDependencies*.name()
                         cmd.recurse = true
+                        cmd.fetchedModules = fetchedModules
                         cmd.run()
                     }
                 }
