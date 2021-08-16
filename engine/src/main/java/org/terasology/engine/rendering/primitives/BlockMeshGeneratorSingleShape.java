@@ -28,8 +28,6 @@ public class BlockMeshGeneratorSingleShape implements BlockMeshGenerator {
     @Override
     public void generateChunkMesh(ChunkView view, ChunkMesh chunkMesh, int x, int y, int z) {
         final Block selfBlock = view.getBlock(x, y, z);
-        Vector3i pos = new Vector3i(x, y, z);
-        pos = view.toWorldPos(pos);
         Color colorCache = new Color();
 
         // Gather adjacent blocks
@@ -77,7 +75,7 @@ public class BlockMeshGeneratorSingleShape implements BlockMeshGenerator {
                         sideVertexFlag = ChunkVertexFlag.COLOR_MASK;
                     }
                     Colorc colorOffset = selfBlock.getColorOffset(BlockPart.fromSide(side));
-                    Colorc colorSource = selfBlock.getColorSource(BlockPart.fromSide(side)).calcColor(pos.x, pos.y, pos.z);
+                    Colorc colorSource = selfBlock.getColorSource(BlockPart.fromSide(side)).calcColor(view, x, y, z);
                     colorCache.setRed(colorSource.rf() * colorOffset.rf())
                             .setGreen(colorSource.gf() * colorOffset.gf())
                             .setBlue(colorSource.bf() * colorOffset.bf())
@@ -89,7 +87,7 @@ public class BlockMeshGeneratorSingleShape implements BlockMeshGenerator {
 
         if (isRendered && blockAppearance.getPart(BlockPart.CENTER) != null) {
             Colorc colorOffset = selfBlock.getColorOffset(BlockPart.CENTER);
-            Colorc colorSource = selfBlock.getColorSource(BlockPart.CENTER).calcColor(pos.x, pos.y, pos.z);
+            Colorc colorSource = selfBlock.getColorSource(BlockPart.CENTER).calcColor(view, x, y, z);
             colorCache.setRed(colorSource.rf() * colorOffset.rf())
                     .setGreen(colorSource.gf() * colorOffset.gf())
                     .setBlue(colorSource.bf() * colorOffset.bf())
