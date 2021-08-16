@@ -7,10 +7,10 @@ import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.lib.Repository
 
 class SnapshotModule {
-    public static String Version = "1.0"
     private ModuleItem module
     private String commit
     private String branch
+    private String remote;
 
     /**
      * captures the current snapshot of the module
@@ -21,31 +21,44 @@ class SnapshotModule {
         Repository repository = Git.open(this.module.getDirectory()).getRepository()
         this.commit = repository.getRefDatabase().findRef("HEAD").objectId.getName()
         this.branch = repository.getBranch()
+        this.remote = repository.getRemoteName("origin")
     }
 
-    private SnapshotModule() {
+    SnapshotModule(Object data, int version) {
+        switch (version) {
+            case 1:
+                this.module = new ModuleItem(data.module.name)
+                this.commit = data.commit
+                this.branch = data.branch
+                this.remote = data.remote
+                break
+        }
+    }
 
+    String getCommit() {
+        return commit
+    }
+
+    String getBranch() {
+        return branch
+    }
+
+    String getRemote() {
+        return remote
     }
 
     ModuleItem getModule() {
         return module
     }
 
-    static SnapshotModule decode(Object obj) {
-        SnapshotModule snapshot = new SnapshotModule()
-        snapshot.module = new ModuleItem(obj.module.name)
-        return snapshot
-    }
-
-    static Map encode(SnapshotModule snapshot) {
+    Map encode() {
         return [
             module: [
-                name: snapshot.module.name()
+                name: module.name()
             ],
-            commit: snapshot.commit,
-            branch: snapshot.branch
+            remote: remote,
+            commit: commit,
+            branch: branch
         ]
     }
-
-
 }
