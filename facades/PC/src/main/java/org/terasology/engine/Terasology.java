@@ -75,7 +75,7 @@ public final class Terasology implements Callable<Integer> {
     @CommandLine.Spec CommandLine.Model.CommandSpec spec;
 
     @SuppressWarnings("unused")
-    @Option(names = {"--help", "-help", "/help", "-h", "/h", "-?", "/?"}, usageHelp = true, description = "show help")
+    @Option(names = {"--help", "-help", "/help", "-h", "/h", "-?", "/?"}, usageHelp = true, description = "Show help")
     private boolean helpRequested;
 
     @Option(names = "--headless", description = "Start headless (no graphics)")
