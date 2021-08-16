@@ -3,16 +3,15 @@
 
 package org.terasology.cli.commands.module
 
-import org.terasology.cli.commands.ModuleUtil
+import org.terasology.cli.ModuleItem
 import picocli.CommandLine.Command
 
 @Command(name = "update-all", description = "update all dependenices")
 class UpdateAllCommand implements Runnable {
-
     @Override
     void run() {
         UpdateCommand cmd = new UpdateCommand();
-        cmd.items = ModuleUtil.downloadedModules().collect { it -> it.name()}
+        cmd.items = ModuleItem.downloadedModules().collect { it -> it.name()}
         cmd.run()
     }
 }
