@@ -4,14 +4,13 @@
 package org.terasology.cli.commands.module
 
 import org.eclipse.jgit.api.Git
-import org.terasology.cli.commands.ModuleItem
-import org.terasology.cli.commands.ModuleUtil
+import org.terasology.cli.ModuleItem
 import org.terasology.cli.options.GitOptions
 import picocli.CommandLine
+import picocli.CommandLine.Command
 import picocli.CommandLine.Mixin
 import picocli.CommandLine.Option
 import picocli.CommandLine.Parameters
-import picocli.CommandLine.Command
 
 @Command(name = "get", description = "get module ")
 class GetCommand implements Runnable{
@@ -51,7 +50,7 @@ class GetCommand implements Runnable{
                 continue
             }
 
-            ModuleUtil.copyInTemplates(module)
+            ModuleItem.copyInTemplates(module)
             if (recurse) {
                 def dependencies = module.dependencies()
                 if (dependencies.length > 0) {

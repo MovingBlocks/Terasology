@@ -3,15 +3,14 @@
 
 package org.terasology.cli.commands.module
 
-import org.terasology.cli.commands.ModuleItem
-import org.terasology.cli.commands.ModuleUtil
+import org.terasology.cli.ModuleItem
 import picocli.CommandLine.Command
 
 @Command(name = "refresh", description = "Refreshes all build.gradle files in module directories")
 class RefreshCommand implements Runnable {
     @Override
     void run() {
-        ModuleUtil.downloadedModules().each { it ->
+        ModuleItem.downloadedModules().each { it ->
             if (!new File(it.getDirectory(), ModuleItem.ModuleCfg).exists()) {
                 println "${it.name()} has no module.txt, it must not want a fresh build.gradle"
                 return

@@ -9,15 +9,21 @@ import org.eclipse.jgit.diff.DiffEntry
 import org.eclipse.jgit.diff.DiffFormatter
 import org.eclipse.jgit.diff.RawTextComparator
 import org.eclipse.jgit.lib.ObjectId
-import org.terasology.cli.commands.ModuleItem
+import org.terasology.cli.ModuleItem
 import picocli.CommandLine
 import picocli.CommandLine.Command
 import picocli.CommandLine.Parameters
 
 @Command(name = "update", description = "Gets one or more items directly")
 class UpdateCommand implements Runnable {
-    @Parameters(paramLabel = "items", arity = "1", description = "Target item(s) to get")
+    @Parameters(paramLabel = "items", arity = "1..*", description = "Target item(s) to get")
     List<String> items = []
+
+    @Parameters(paramLabel = "force", description = "dismiss all local changes")
+    boolean force;
+
+    @Parameters(paramLabel = "force", description = "reset back to the default upstream branch (develop)")
+    boolean reset;
 
     @Override
     void run() {
@@ -37,9 +43,9 @@ class UpdateCommand implements Runnable {
                     ObjectId newTree = git.getRepository().resolve("HEAD^{tree}");
                     List<DiffEntry> diffs = df.scan(oldTree, newTree);
                     if(diffs.size() > 0) {
-                        println CommandLine.Help.Ansi.AUTO.string("@|green Successfully update $module |@")
+                        println CommandLine.Help.Ansi.AUTO.string("@|green Successfully update ${module.name()} |@")
                     } else {
-                        println CommandLine.Help.Ansi.AUTO.string("@|yellow Already updatead $module - Skipping |@")
+                        println CommandLine.Help.Ansi.AUTO.string("@|yellow Already updatead ${module.name()} - Skipping |@")
                     }
                     for(DiffEntry entry : diffs) {
                         df.format(entry)
@@ -52,7 +58,7 @@ class UpdateCommand implements Runnable {
                 }
                 df.close()
             } catch(Exception ex) {
-                println CommandLine.Help.Ansi.AUTO.string("@|red Unable to update $module, Skipping: ${ex.getMessage()} |@");
+                println CommandLine.Help.Ansi.AUTO.string("@|red Unable to update ${module.name()}, Skipping: ${ex.getMessage()} |@");
             }
         }
     }
