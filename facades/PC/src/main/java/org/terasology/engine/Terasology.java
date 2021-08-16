@@ -81,6 +81,13 @@ public final class Terasology implements Callable<Integer> {
     @Option(names = "--headless", description = "Start headless (no graphics)")
     private boolean isHeadless;
 
+    @Option(names = "--max-data-size",
+            description = "Set maximum process data size [Linux only]",
+            paramLabel = "<size>",
+            converter = DataSizeConverter.class
+    )
+    Long maxDataSize;
+
     @Option(names = "--crash-report", defaultValue = "true", negatable = true, description = "Enable crash reporting")
     private boolean crashReportEnabled;
 
@@ -116,7 +123,6 @@ public final class Terasology implements Callable<Integer> {
 
     public static void main(String[] args) {
         new CommandLine(new Terasology()).execute(args);
-        setMemoryLimit(1024 * 8);  // TODO: make arg
         adjustOutOfMemoryScore(200);  // TODO: make arg
     }
 
@@ -213,6 +219,10 @@ public final class Terasology implements Callable<Integer> {
     }
 
     private void handleLaunchArguments() throws IOException {
+        if (maxDataSize != null) {
+            setMemoryLimit(maxDataSize);
+        }
+
         if (homeDir != null) {
             logger.info("homeDir is {}", homeDir);
             PathManager.getInstance().useOverrideHomePath(homeDir);
@@ -306,16 +316,17 @@ public final class Terasology implements Callable<Integer> {
         return Integer.parseInt(str.substring(positionOfLastDigit));
     }
 
-    private static void setMemoryLimit(long maxMegabytes) {
+    private static void setMemoryLimit(long bytes) {
         // Memory-limiting techniques are highly platform-specific.
         if (Platform.isLinux()) {
             final LibC.Rlimit dataLimit = new LibC.Rlimit();
-            long maxBytes = maxMegabytes * 1024 * 1024;
-            dataLimit.rlim_cur = maxBytes;
-            dataLimit.rlim_max = maxBytes;
+            dataLimit.rlim_cur = bytes;
+            dataLimit.rlim_max = bytes;
             // Under Linux ≥ 4.7, we can limit the maximum size of the process's data segment, which includes its
             // heap. Note we cannot directly limit its resident set size, see setrlimit(3).
             LibC.INSTANCE.setrlimit(LibC.RLIMIT_DATA, dataLimit);
+        } else {
+            logger.warn("--max-data-size is not supported on platform {}", Platform.RESOURCE_PREFIX);
         }
     }
 

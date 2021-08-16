@@ -69,6 +69,16 @@ dependencies {
 
     // TODO: Consider whether we can move the CR dependency back here from the engine, where it is referenced from the main menu
     implementation(group = "org.terasology.crashreporter", name = "cr-terasology", version = "4.1.0")
+
+    implementation(platform("org.junit:junit-bom:5.7.1")) {
+        // junit-bom will set version numbers for the other org.junit dependencies.
+    }
+    implementation("org.junit.jupiter:junit-jupiter-api")
+    implementation("org.junit.jupiter:junit-jupiter-params")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
+
+    testImplementation("com.google.truth:truth:1.1.2")
+    testImplementation("com.google.truth.extensions:truth-java8-extension:1.1.2")
 }
 
 tasks.named<JavaCompile>("compileJava") {
