@@ -28,7 +28,7 @@ class ModuleItem {
         return this.dir
     }
 
-    boolean isValidModule() {
+    boolean validModule() {
         return this.dir.exists()
     }
 
@@ -66,6 +66,7 @@ class ModuleItem {
         })
         return result
     }
+
 
     static void copyInTemplates(ModuleItem target) {
         // Copy in the template build.gradle for modules

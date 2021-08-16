@@ -3,19 +3,20 @@
 
 package org.terasology.cli.commands.workspace
 
-import groovy.json.JsonOutput
+
 import org.terasology.cli.ModuleItem
 import org.terasology.cli.Snapshot
 import org.terasology.cli.SnapshotModule
-import picocli.CommandLine.Parameters
+import picocli.CommandLine
 import picocli.CommandLine.Command
+import picocli.CommandLine.Option
 
 @Command(name = "snapshot",
     description = "captures a snapshot of all the modules and the associated commit")
 class SnapshotCommand implements Runnable {
 
-    @Parameters(paramLabel = "name", description = "tag snapshot with name", defaultValue = "")
-    String name;
+    @Option(names = ["-tag", "-t"], description = "tag snapshot with name", required = false)
+    String tag = ""
 
     @Override
     void run() {
@@ -25,12 +26,17 @@ class SnapshotCommand implements Runnable {
                 return
             }
         }
-        Snapshot snapshot = new Snapshot()
+        File file = new File(Snapshot.SnapshotDirectory,"${snapshot.captured.toString()}.snapshot")
+
+        Snapshot snapshot = new Snapshot(file)
+        snapshot.tag = tag
         ModuleItem.downloadedModules().each { module ->
             snapshot.addModuleSnapshot(new SnapshotModule(module))
         }
-
-        File file = new File(Snapshot.SnapshotDirectory,"${snapshot.captureDate.toString()}.snapshot")
-        file.write(JsonOutput.toJson(Snapshot.encode(snapshot)))
+        try {
+            snapshot.save()
+        } catch(Exception ex) {
+            println CommandLine.Help.Ansi.AUTO.string("@|red Unable to create Snapshot: ${ex.getMessage()} |@");
+        }
     }
 }

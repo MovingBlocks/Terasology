@@ -13,7 +13,7 @@ import picocli.CommandLine.HelpCommand
         InitCommand.class,
         GetCommand.class,
         RefreshCommand.class,
-        ExecuteAllCommand.class,
+        ExecuteCommand.class,
         UpdateAllCommand.class,
     ], // Note that these Groovy classes *must* start with a capital letter for some reason
 description = "Sub command for interacting with modules")
