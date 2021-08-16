@@ -52,7 +52,7 @@ class GetCommand implements Runnable{
 
             ModuleItem.copyInTemplates(module)
             if (recurse) {
-                def dependencies = module.dependencies()
+                String[] dependencies = module.dependencies()*.name()
                 if (dependencies.length > 0) {
                     String[] uniqueDependencies = dependencies - fetchedModules
                     println "After removing dupes already retrieved we have the remaining dependencies left: $uniqueDependencies"
