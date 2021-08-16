@@ -3,6 +3,9 @@
 
 package org.terasology.cli.util
 
+import java.nio.file.Path
+import java.nio.file.Paths
+
 class Constants {
 
     public static final File ModuleDirectory;
@@ -23,7 +26,10 @@ class Constants {
 
     public static final String[] DefaultModule = ["CoreSampleGameplay"]
 
+    public static final Path ConfigurationPath;
+
     static {
+        ConfigurationPath = Paths.get(System.getProperty("user.home")).resolve(".terasology")
         GradlePropertyFile = new File("gradle.properties")
         FacadeDirectory = new File("facade");
         ModuleDirectory = new File("modules");
