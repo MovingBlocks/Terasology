@@ -13,6 +13,7 @@ class ModuleItem {
 
     private String module;
     private File dir
+    private Object moduleConfig = null;
 
     ModuleItem(String module) {
         this.module = module
@@ -29,6 +30,19 @@ class ModuleItem {
 
     boolean isValidModule() {
         return this.dir.exists()
+    }
+
+    private Object fetchConfig() {
+        if(moduleConfig == null) {
+            def slurper = new JsonSlurper()
+            this.moduleConfig = slurper.parseText(moduleFile.text)
+            return this.moduleConfig
+        }
+        return this.moduleConfig
+    }
+
+    public String version() {
+
     }
 
     ModuleItem[] dependencies(boolean respectExcludedItems = true) {
