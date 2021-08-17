@@ -18,7 +18,7 @@ class OpenCommand implements Runnable {
     void run() {
         Desktop desktop = Desktop.getDesktop();
         Snapshot.find(name).ifPresentOrElse({it ->
-            desktop.open(it.snapshotFile)
+            desktop.open(it.file)
         }, {
             println "failed to resolve snapshot: ${name}"
         })
