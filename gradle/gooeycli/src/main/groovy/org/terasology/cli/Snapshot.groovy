@@ -14,15 +14,15 @@ class Snapshot {
 
     int index = 0;
     private List<SnapshotModule> modules = []
-    File snapshotFile;
+    File file
     Date captured = new Date()
     String tag = ""
 
     Snapshot(File target) {
-        snapshotFile = target
-        if (snapshotFile.exists()) {
+        this.file = target
+        if (this.file.exists()) {
             JsonSlurper slurper = new JsonSlurper()
-            def data = slurper.parse(snapshotFile)
+            def data = slurper.parse(this.file)
             int version = data.version
             switch (version) {
                 case 1:
@@ -34,6 +34,9 @@ class Snapshot {
             }
         }
     }
+    Snapshot() {
+
+    }
 
     void addModuleSnapshot(SnapshotModule snapshot) {
         modules.add(snapshot)
@@ -44,7 +47,7 @@ class Snapshot {
     }
 
     void save() {
-        this.snapshotFile.write(JsonOutput.toJson([
+        this.file.write(JsonOutput.toJson([
             version : Version,
             tag     : this.tag,
             index   : this.index,
@@ -55,12 +58,16 @@ class Snapshot {
 
     static Optional<Snapshot> find(String name) {
         List<Snapshot> snapshots = currentSnapshots()
+        File target = new File(name)
+        if(target.exists()) {
+            return Optional.of(new Snapshot(target))
+        }
+
         try {
             int index = Integer.parseInt(name)
             if (index < snapshots.size() && index >= 0) {
                 return Optional.of(snapshots[index])
             }
-
         } catch (NumberFormatException ex) {
             // skip
         }
@@ -69,6 +76,7 @@ class Snapshot {
                 return Optional.of(snap)
             }
         }
+
         return Optional.empty()
 
     }

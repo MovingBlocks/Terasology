@@ -13,7 +13,8 @@ import picocli.CommandLine.Command
         SnapshotCommand.class,
         OpenCommand.class,
         HelpCommand.class,
-        RestoreCommand.class
+        RestoreCommand.class,
+        LoadCommand.class
     ],
     description = "workspace command")
 class WorkspaceCommand extends BaseCommandType {
