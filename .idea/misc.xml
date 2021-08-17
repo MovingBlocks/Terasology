@@ -7,6 +7,7 @@
     </list>
     <writeAnnotations>
       <writeAnnotation name="org.terasology.engine.registry.In" />
+      <writeAnnotation name="picocli.CommandLine.Option" />
     </writeAnnotations>
   </component>
   <component name="ExternalStorageConfigurationManager" enabled="true" />
