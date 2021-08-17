@@ -28,11 +28,17 @@ class Constants {
 
     public static final Path ConfigurationPath;
 
+    public static final File ModuleCacheFile
+
+    public static final String ModuleIndexUrl = 'http://meta.terasology.org/modules/list/latest'
+
     static {
         ConfigurationPath = Paths.get(System.getProperty("user.home")).resolve(".terasology")
         GradlePropertyFile = new File("gradle.properties")
         FacadeDirectory = new File("facade");
         ModuleDirectory = new File("modules");
+
+        ModuleCacheFile = new File(".moduleCache")
 
         File propertyFile = new File("gradle.properties")
         if (propertyFile.exists()) {
