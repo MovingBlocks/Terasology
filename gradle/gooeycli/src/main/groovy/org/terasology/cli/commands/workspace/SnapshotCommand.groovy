@@ -27,7 +27,7 @@ class SnapshotCommand implements Runnable {
             }
         }
         Snapshot snapshot = new Snapshot()
-        snapshot.file = new File(Snapshot.SnapshotDirectory,"${snapshot.captured.toString()}.snapshot")
+        snapshot.file = new File(Snapshot.SnapshotDirectory,"${snapshot.captured.epochSecond}.snapshot")
         snapshot.tag = tag
         ModuleItem.downloadedModules().each { module ->
             snapshot.addModuleSnapshot(new SnapshotModule(module))
