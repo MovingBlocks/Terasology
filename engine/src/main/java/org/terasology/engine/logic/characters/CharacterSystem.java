@@ -64,9 +64,6 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
     private Physics physics;
 
     @In
-    private Physics physicsEngine;
-
-    @In
     private NetworkSystem networkSystem;
 
     @In
@@ -472,8 +469,8 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
         entity.saveComponent(character);
 
         // refresh the entity collider - by retrieving the character collider after removing it we force recreation
-        physicsEngine.removeCharacterCollider(entity);
-        physicsEngine.getCharacterCollider(entity);
+        physics.removeCharacterCollider(entity);
+        physics.getCharacterCollider(entity);
 
         // Scaling a character up will grow them into the ground. We would need to adjust the vertical position to be
         // safely above ground.
