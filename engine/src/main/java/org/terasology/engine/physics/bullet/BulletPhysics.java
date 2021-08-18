@@ -97,7 +97,7 @@ import java.util.Set;
  */
 @RegisterSystem
 @Share(Physics.class)
-public class BulletPhysics extends PhysicsSystem implements Physics, RenderSystem {
+public class BulletPhysics extends PhysicsSystem implements Physics {
     public static final int AABB_SIZE = Integer.MAX_VALUE;
 
     public static final float SIMD_EPSILON = 1.1920929E-7F;
@@ -122,18 +122,12 @@ public class BulletPhysics extends PhysicsSystem implements Physics, RenderSyste
 
     private final btGhostPairCallback ghostPairCallback;
 
-    private StandardMeshData meshData = new StandardMeshData(DrawingMode.LINES, AllocationType.STREAM);
-    private Mesh mesh;
-    private Material material;
-
     @In
     protected BlockEntityRegistry blockEntityRegistry;
     @In
     protected Config config;
     @In
     protected AssetManager assetManager;
-    @In
-    private WorldRenderer worldRenderer;
 
     /**
      * Creates a Collider for the given entity based on the LocationComponent and CharacterMovementComponent. All
@@ -147,9 +141,6 @@ public class BulletPhysics extends PhysicsSystem implements Physics, RenderSyste
     @Override
     public void initialise() {
         super.initialise();
-
-        material = assetManager.getAsset("engine:white", Material.class).get();
-        mesh = Assets.generateAsset(meshData, Mesh.class);
     }
 
     public BulletPhysics() {
@@ -216,78 +207,6 @@ public class BulletPhysics extends PhysicsSystem implements Physics, RenderSyste
 
         });
         return index + 8;
-    }
-
-    @Override
-    public void renderOverlay() {
-        if (config.getRendering().getDebug().isRenderingEntityColliders()) {
-            GL33.glDepthFunc(GL33.GL_ALWAYS);
-            Vector3f cameraPosition = worldRenderer.getActiveCamera().getPosition();
-
-            Vector3f worldPos = new Vector3f();
-            Vector3f worldPositionCameraSpace = new Vector3f();
-            worldPos.sub(cameraPosition, worldPositionCameraSpace);
-            Matrix4f matrixCameraSpace = new Matrix4f().translationRotateScale(worldPositionCameraSpace, new Quaternionf(), 1.0f);
-            Matrix4f modelViewMatrix = new Matrix4f(worldRenderer.getActiveCamera().getViewMatrix()).mul(matrixCameraSpace);
-            material.setMatrix4("projectionMatrix", worldRenderer.getActiveCamera().getProjectionMatrix());
-            material.setMatrix4("modelViewMatrix", modelViewMatrix, true);
-
-            int index = 0;
-            meshData.reallocate(0, 0);
-            meshData.indices.rewind();
-            meshData.position.rewind();
-            meshData.color0.rewind();
-
-            Vector3f worldPosition = new Vector3f();
-            Quaternionf worldRot = new Quaternionf();
-            Matrix4f transform = new Matrix4f();
-            AABBf bounds = new AABBf(0, 0, 0, 0, 0, 0);
-
-            for (EntityRef entity : entityRigidBodies.keySet()) {
-                LocationComponent location = entity.getComponent(LocationComponent.class);
-                location.getWorldPosition(worldPosition);
-                location.getWorldRotation(worldRot);
-
-                BoxShapeComponent boxShapeComponent = entity.getComponent(BoxShapeComponent.class);
-                if (boxShapeComponent != null) {
-                    bounds.set(0, 0, 0, 0, 0, 0);
-                    bounds.expand(new Vector3f(boxShapeComponent.extents).div(2.0f));
-                    transform.translationRotateScale(worldPosition, worldRot, location.getWorldScale());
-                    bounds.transform(transform);
-                    index = addRenderBound(meshData, bounds, index);
-                }
-                CapsuleShapeComponent capsuleComponent = entity.getComponent(CapsuleShapeComponent.class);
-                if (capsuleComponent != null) {
-                    bounds.set(0, 0, 0, 0, 0, 0);
-                    bounds.expand(new Vector3f(capsuleComponent.radius, capsuleComponent.height / 2.0f, capsuleComponent.radius).div(2.0f));
-                    transform.translationRotateScale(worldPosition, worldRot, location.getWorldScale());
-                    bounds.transform(transform);
-                    index = addRenderBound(meshData, bounds, index);
-                }
-                CylinderShapeComponent cylinderShapeComponent = entity.getComponent(CylinderShapeComponent.class);
-                if (cylinderShapeComponent != null) {
-                    bounds.set(0, 0, 0, 0, 0, 0);
-                    bounds.expand(new Vector3f(cylinderShapeComponent.radius, cylinderShapeComponent.height / 2.0f,
-                            cylinderShapeComponent.radius).div(2.0f));
-                    transform.translationRotateScale(worldPosition, worldRot, location.getWorldScale());
-                    bounds.transform(transform);
-                    index = addRenderBound(meshData, bounds, index);
-                }
-                SphereShapeComponent sphereShapeComponent = entity.getComponent(SphereShapeComponent.class);
-                if (sphereShapeComponent != null) {
-                    bounds.set(0, 0, 0, 0, 0, 0);
-                    bounds.expand(new Vector3f(sphereShapeComponent.radius).div(2.0f));
-                    transform.translationRotateScale(worldPosition, worldRot, location.getWorldScale());
-                    bounds.transform(transform);
-                    index = addRenderBound(meshData, bounds, index);
-                }
-            }
-
-            material.enable();
-            mesh.reload(meshData);
-            mesh.render();
-            GL33.glDepthFunc(GL33.GL_LEQUAL);
-        }
     }
 
     @Override
