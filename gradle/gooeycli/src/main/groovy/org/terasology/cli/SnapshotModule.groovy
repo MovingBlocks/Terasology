@@ -21,7 +21,7 @@ class SnapshotModule {
         Repository repository = Git.open(this.module.getDirectory()).getRepository()
         this.commit = repository.getRefDatabase().findRef("HEAD").objectId.getName()
         this.branch = repository.getBranch()
-        this.remote = repository.getRemoteName("origin")
+        this.remote = repository.getConfig().getString("remote", "origin", "url");
     }
 
     SnapshotModule(Object data, int version) {
