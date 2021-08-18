@@ -240,8 +240,6 @@ public class PhysicsSystem extends BaseComponentSystem implements UpdateSubscrib
         return index + 8;
     }
 
-
-
     @Override
     public void renderOverlay() {
         if (config.getRendering().getDebug().isRenderingEntityColliders()) {
@@ -267,7 +265,7 @@ public class PhysicsSystem extends BaseComponentSystem implements UpdateSubscrib
             Matrix4f transform = new Matrix4f();
             AABBf bounds = new AABBf(0, 0, 0, 0, 0, 0);
 
-            for (EntityRef entity : entityManager.getEntitiesWith(RigidBodyComponent.class)) {
+            for (EntityRef entity : entityManager.getEntitiesWith(LocationComponent.class)) {
                 LocationComponent location = entity.getComponent(LocationComponent.class);
                 location.getWorldPosition(worldPosition);
                 location.getWorldRotation(worldRot);
