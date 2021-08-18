@@ -485,6 +485,7 @@ public class TerasologyEngine implements GameEngine {
         }
 
         Iterator<Float> updateCycles = timeSubsystem.getEngineTime().tick();
+        CoreRegistry.setContext(currentState.getContext());
         rootContext.get(NetworkSystem.class).setContext(currentState.getContext());
 
         for (EngineSubsystem subsystem : allSubsystems) {

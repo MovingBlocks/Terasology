@@ -60,12 +60,20 @@ logger.info("PC VERSION: {}", version)
 group = "org.terasology.facades"
 
 dependencies {
+    implementation(group = "info.picocli", name = "picocli", version = "4.5.2")
+    annotationProcessor("info.picocli:picocli-codegen:4.5.2")
+
     implementation(project(":engine"))
     implementation(project(":subsystems:DiscordRPC"))
     implementation("io.projectreactor:reactor-core:3.4.7")
 
     // TODO: Consider whether we can move the CR dependency back here from the engine, where it is referenced from the main menu
     implementation(group = "org.terasology.crashreporter", name = "cr-terasology", version = "4.1.0")
+}
+
+tasks.named<JavaCompile>("compileJava") {
+    // according to https://picocli.info/#_gradle_2
+    options.compilerArgs.add("-Aproject=${project.group}/${project.name}")
 }
 
 /****************************************
@@ -94,14 +102,14 @@ tasks.register<RunTerasology>("debug") {
 tasks.register<RunTerasology>("permissiveNatives") {
     description = "Run 'Terasology' with security set to permissive and natives loading a second way (for KComputers)"
 
-    args("-permissiveSecurity")
+    args("--permissive-security")
     systemProperty("java.library.path", rootProject.file(dirNatives + "/" + nativeSubdirectoryName()))
 }
 
 // TODO: Make a task to reset server / game data
 tasks.register<RunTerasology>("server") {
     description = "Starts a headless multiplayer server with data stored in [project-root]/$localServerDataPath"
-    args("-headless", "-homedir=$localServerDataPath")
+    args("--headless", "--homedir=$localServerDataPath")
 }
 
 

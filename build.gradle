@@ -265,7 +265,7 @@ idea {
 
     project.settings.delegateActions {
         delegateBuildRunToGradle = false
-        testRunner = ActionDelegationConfig.TestRunner.PLATFORM
+        testRunner = ActionDelegationConfig.TestRunner.CHOOSE_PER_TEST
     }
 }
 
