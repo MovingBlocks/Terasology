@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.physics;
 
+import org.terasology.engine.physics.engine.CharacterCollider;
 import org.terasology.joml.geom.AABBf;
 import org.joml.Vector3f;
 import org.terasology.engine.entitySystem.entity.EntityRef;
@@ -10,6 +11,8 @@ import java.util.List;
 import java.util.Set;
 
 public interface Physics {
+    float GRAVITY = 15f;
+
     /**
      * Executes a rayTrace on the physics engine.
      *
@@ -69,4 +72,41 @@ public interface Physics {
      *         given collision groups.
      */
     List<EntityRef> scanArea(AABBf area, Iterable<CollisionGroup> collisionFilter);
+
+    /**
+     * The epsilon value is the value that is considered to be so small that it
+     * could just as well be zero. Objects that are closer together than this
+     * value are assumes to be colliding.
+     *
+     * @return The simulation epsilon.
+     */
+    float getEpsilon();
+
+    /**
+     * Get the character collider for the given entity. Will create a new
+     * CharacterCollider if non exists and return that one.
+     *
+     * @param entity
+     * @return true if the given entity has a CharacterCollider associated to it.
+     */
+    CharacterCollider getCharacterCollider(EntityRef entity);
+
+    /**
+     * Removes the CharacterCollider associated with the given entity from the
+     * physics engine. The collider object of this entity will no longer be
+     * valid.
+     * <br><br>
+     * If no CharacterCollider was attached to the entity, a warning is logged
+     * and this method return false.
+     * <br><br>
+     * Make sure not to make another call to getCharacterCollider() if you are
+     * destroying the entity, as this will create a new CharacterCollider for
+     * the entity.
+     *
+     * @param entity the entity to remove the rigid body of.
+     * @return true if this entity had a character collider attached to it,
+     *         false otherwise.
+     */
+    boolean removeCharacterCollider(EntityRef entity);
+
 }

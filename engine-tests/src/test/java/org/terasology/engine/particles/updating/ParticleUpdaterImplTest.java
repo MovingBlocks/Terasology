@@ -12,7 +12,6 @@ import org.terasology.engine.particles.components.ParticleEmitterComponent;
 import org.terasology.engine.particles.components.affectors.VelocityAffectorComponent;
 import org.terasology.engine.particles.components.generators.EnergyRangeGeneratorComponent;
 import org.terasology.engine.physics.Physics;
-import org.terasology.engine.physics.engine.PhysicsEngine;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -31,7 +30,7 @@ public class ParticleUpdaterImplTest {
 
     @BeforeEach
     public void setUp() throws Exception {
-        Physics physics = mock(PhysicsEngine.class);
+        Physics physics = mock(Physics.class);
         ModuleManager moduleManager = mock(ModuleManager.class);
         particleUpdater = new ParticleUpdaterImpl(physics, moduleManager);
     }

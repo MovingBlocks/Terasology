@@ -9,15 +9,15 @@ import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.logic.location.LocationComponent;
 import org.terasology.math.TeraMath;
 import org.terasology.engine.physics.engine.CharacterCollider;
-import org.terasology.engine.physics.engine.PhysicsEngine;
+import org.terasology.engine.physics.Physics;
 
 /**
  * Contains logic used by both {@link ClientCharacterPredictionSystem} and {@link ServerCharacterPredictionSystem}.
  */
 public final class CharacterMovementSystemUtility {
-    private final PhysicsEngine physics;
+    private final Physics physics;
 
-    public CharacterMovementSystemUtility(PhysicsEngine physicsEngine) {
+    public CharacterMovementSystemUtility(Physics physicsEngine) {
         this.physics = physicsEngine;
     }
 

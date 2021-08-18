@@ -23,7 +23,6 @@ import org.terasology.engine.core.modes.loadProcesses.InitialiseCommandSystem;
 import org.terasology.engine.core.modes.loadProcesses.InitialiseComponentSystemManager;
 import org.terasology.engine.core.modes.loadProcesses.InitialiseEntitySystem;
 import org.terasology.engine.core.modes.loadProcesses.InitialiseGraphics;
-import org.terasology.engine.core.modes.loadProcesses.InitialisePhysics;
 import org.terasology.engine.core.modes.loadProcesses.InitialiseRecordAndReplay;
 import org.terasology.engine.core.modes.loadProcesses.InitialiseRemoteWorld;
 import org.terasology.engine.core.modes.loadProcesses.InitialiseSystems;
@@ -154,7 +153,6 @@ public class StateLoading implements GameState {
         loadProcesses.add(new RegisterSystems(context, netMode));
         loadProcesses.add(new InitialiseCommandSystem(context));
         loadProcesses.add(new InitialiseRemoteWorld(context, gameManifest));
-        loadProcesses.add(new InitialisePhysics(context));
         loadProcesses.add(new InitialiseSystems(context));
         loadProcesses.add(new PreBeginSystems(context));
         loadProcesses.add(new CreateRemoteWorldEntity(context));
@@ -183,7 +181,6 @@ public class StateLoading implements GameState {
         loadProcesses.add(new InitialiseWorld(gameManifest, context));
         loadProcesses.add(new RegisterBlockFamilies(context));
         loadProcesses.add(new EnsureSaveGameConsistency(context));
-        loadProcesses.add(new InitialisePhysics(context));
         loadProcesses.add(new InitialiseSystems(context));
         loadProcesses.add(new PreBeginSystems(context));
         loadProcesses.add(new LoadEntities(context));

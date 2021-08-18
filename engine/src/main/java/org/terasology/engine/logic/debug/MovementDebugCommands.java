@@ -27,7 +27,7 @@ import org.terasology.engine.logic.location.Location;
 import org.terasology.engine.logic.location.LocationComponent;
 import org.terasology.engine.logic.permission.PermissionManager;
 import org.terasology.engine.network.ClientComponent;
-import org.terasology.engine.physics.engine.PhysicsEngine;
+import org.terasology.engine.physics.Physics;
 import org.terasology.engine.registry.In;
 import org.terasology.engine.registry.Share;
 import org.terasology.engine.utilities.Assets;
@@ -42,7 +42,7 @@ public class MovementDebugCommands extends BaseComponentSystem {
     private static final Logger logger = LoggerFactory.getLogger(MovementDebugCommands.class);
 
     @In
-    private PhysicsEngine physics;
+    private Physics physics;
 
     @In
     private EntityManager entityManager;

@@ -17,7 +17,6 @@ import org.terasology.engine.entitySystem.event.EventPriority;
 import org.terasology.engine.entitySystem.event.ReceiveEvent;
 import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
 import org.terasology.engine.entitySystem.systems.RegisterMode;
-import org.terasology.engine.entitySystem.systems.RegisterSystem;
 import org.terasology.engine.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.engine.logic.location.LocationComponent;
 import org.terasology.engine.logic.location.LocationResynchEvent;
@@ -26,6 +25,7 @@ import org.terasology.engine.network.NetworkComponent;
 import org.terasology.engine.network.NetworkSystem;
 import org.terasology.engine.physics.CollisionGroup;
 import org.terasology.engine.physics.HitResult;
+import org.terasology.engine.physics.Physics;
 import org.terasology.engine.physics.StandardCollisionGroup;
 import org.terasology.engine.physics.components.RigidBodyComponent;
 import org.terasology.engine.physics.components.TriggerComponent;
@@ -53,8 +53,7 @@ import java.util.List;
  * method of the PhysicsEngine every frame.
  *
  */
-@RegisterSystem
-public class PhysicsSystem extends BaseComponentSystem implements UpdateSubscriberSystem {
+public abstract class PhysicsSystem extends BaseComponentSystem implements UpdateSubscriberSystem, PhysicsEngine, Physics {
 
     private static final Logger logger = LoggerFactory.getLogger(PhysicsSystem.class);
     private static final long TIME_BETWEEN_NETSYNCS = 500;
@@ -62,15 +61,11 @@ public class PhysicsSystem extends BaseComponentSystem implements UpdateSubscrib
             {StandardCollisionGroup.WORLD, StandardCollisionGroup.CHARACTER, StandardCollisionGroup.DEFAULT};
     private static final float COLLISION_DAMPENING_MULTIPLIER = 0.5f;
     @In
-    private Time time;
+    protected Time time;
     @In
-    private NetworkSystem networkSystem;
+    protected NetworkSystem networkSystem;
     @In
-    private EntityManager entityManager;
-    @In
-    private PhysicsEngine physics;
-    @In
-    private WorldProvider worldProvider;
+    protected WorldProvider worldProvider;
 
     private long lastNetsync;
 
@@ -82,63 +77,63 @@ public class PhysicsSystem extends BaseComponentSystem implements UpdateSubscrib
     @ReceiveEvent(components = {RigidBodyComponent.class, LocationComponent.class}, priority = EventPriority.PRIORITY_NORMAL)
     public void newRigidBody(OnActivatedComponent event, EntityRef entity) {
         //getter also creates the rigid body
-        physics.getRigidBody(entity);
+        getRigidBody(entity);
     }
 
     @ReceiveEvent(components = {TriggerComponent.class, LocationComponent.class})
     //update also creates the trigger
     public void newTrigger(OnActivatedComponent event, EntityRef entity) {
-        physics.updateTrigger(entity);
+        updateTrigger(entity);
     }
 
     @ReceiveEvent(components = RigidBodyComponent.class)
     public void onImpulse(ImpulseEvent event, EntityRef entity) {
-        physics.getRigidBody(entity).applyImpulse(event.getImpulse());
+        getRigidBody(entity).applyImpulse(event.getImpulse());
     }
 
     @ReceiveEvent(components = RigidBodyComponent.class)
     public void onForce(ForceEvent event, EntityRef entity) {
-        physics.getRigidBody(entity).applyForce(event.getForce());
+        getRigidBody(entity).applyForce(event.getForce());
     }
 
     @ReceiveEvent(components = RigidBodyComponent.class)
     public void onChangeVelocity(ChangeVelocityEvent event, EntityRef entity) {
         if (event.getAngularVelocity() != null) {
-            physics.getRigidBody(entity).setAngularVelocity(event.getAngularVelocity());
+            getRigidBody(entity).setAngularVelocity(event.getAngularVelocity());
         }
         if (event.getLinearVelocity() != null) {
-            physics.getRigidBody(entity).setLinearVelocity(event.getLinearVelocity());
+            getRigidBody(entity).setLinearVelocity(event.getLinearVelocity());
         }
     }
 
     @ReceiveEvent(components = {RigidBodyComponent.class, LocationComponent.class})
     public void removeRigidBody(BeforeDeactivateComponent event, EntityRef entity) {
-        physics.removeRigidBody(entity);
+        removeRigidBody(entity);
     }
 
     @ReceiveEvent(components = {TriggerComponent.class, LocationComponent.class})
     public void removeTrigger(BeforeDeactivateComponent event, EntityRef entity) {
-        physics.removeTrigger(entity);
+        removeTrigger(entity);
     }
 
     @ReceiveEvent(components = {TriggerComponent.class, LocationComponent.class})
     public void updateTrigger(OnChangedComponent event, EntityRef entity) {
-        physics.updateTrigger(entity);
+        updateTrigger(entity);
     }
 
     @ReceiveEvent(components = {RigidBodyComponent.class, LocationComponent.class})
     public void updateRigidBody(OnChangedComponent event, EntityRef entity) {
-        physics.updateRigidBody(entity);
+        updateRigidBody(entity);
     }
 
     @ReceiveEvent(components = BlockComponent.class)
     public void onBlockAltered(OnChangedBlock event, EntityRef entity) {
-        physics.awakenArea(new Vector3f(event.getBlockPosition()), 0.6f);
+        awakenArea(new Vector3f(event.getBlockPosition()), 0.6f);
     }
 
     @ReceiveEvent
     public void onItemImpact(ImpactEvent event, EntityRef entity) {
-        RigidBody rigidBody = physics.getRigidBody(entity);
+        RigidBody rigidBody = getRigidBody(entity);
         if (rigidBody != null) {
             Vector3f vImpactNormal = new Vector3f(event.getImpactNormal());
             Vector3f vImpactPoint = new Vector3f(event.getImpactPoint());
@@ -166,21 +161,16 @@ public class PhysicsSystem extends BaseComponentSystem implements UpdateSubscrib
 
     @Override
     public void update(float delta) {
-
-        PerformanceMonitor.startActivity("Physics Renderer");
-        physics.update(time.getGameDelta());
-        PerformanceMonitor.endActivity();
-
         //Update the velocity from physics engine bodies to Components:
-        Iterator<EntityRef> iter = physics.physicsEntitiesIterator();
+        Iterator<EntityRef> iter = physicsEntitiesIterator();
         while (iter.hasNext()) {
             EntityRef entity = iter.next();
             RigidBodyComponent comp = entity.getComponent(RigidBodyComponent.class);
-            RigidBody body = physics.getRigidBody(entity);
+            RigidBody body = getRigidBody(entity);
 
             // force location component to update and sync trigger state
             if (entity.hasComponent(TriggerComponent.class)) {
-                physics.updateTrigger(entity);
+                updateTrigger(entity);
             }
 
             if (body.isActive()) {
@@ -196,7 +186,7 @@ public class PhysicsSystem extends BaseComponentSystem implements UpdateSubscrib
                 fDistanceThisFrame = fDistanceThisFrame * delta;
 
                 while (true) {
-                    HitResult hitInfo = physics.rayTrace(vLocation, vDirection, fDistanceThisFrame + 0.5f, DEFAULT_COLLISION_GROUP);
+                    HitResult hitInfo = rayTrace(vLocation, vDirection, fDistanceThisFrame + 0.5f, DEFAULT_COLLISION_GROUP);
                     if (hitInfo.isHit()) {
                         Block hitBlock = worldProvider.getBlock(hitInfo.getBlockPosition());
                         if (hitBlock != null) {
@@ -234,7 +224,7 @@ public class PhysicsSystem extends BaseComponentSystem implements UpdateSubscrib
             lastNetsync = time.getGameTimeInMs();
         }
 
-        List<CollisionPair> collisionPairs = physics.getCollisionPairs();
+        List<CollisionPair> collisionPairs = getCollisionPairs();
 
         for (CollisionPair pair : collisionPairs) {
             if (pair.b.exists()) {
@@ -287,12 +277,12 @@ public class PhysicsSystem extends BaseComponentSystem implements UpdateSubscrib
     }
 
     private void sendSyncMessages() {
-        Iterator<EntityRef> iter = physics.physicsEntitiesIterator();
+        Iterator<EntityRef> iter = physicsEntitiesIterator();
         while (iter.hasNext()) {
             EntityRef entity = iter.next();
             if (entity.hasComponent(NetworkComponent.class)) {
                 //TODO after implementing rigidbody interface
-                RigidBody body = physics.getRigidBody(entity);
+                RigidBody body = getRigidBody(entity);
                 if (body.isActive()) {
                     entity.send(new LocationResynchEvent(body.getLocation(new Vector3f()), body.getOrientation(new Quaternionf())));
                     entity.send(new PhysicsResynchEvent(body.getLinearVelocity(new Vector3f()), body.getAngularVelocity(new Vector3f())));
@@ -304,14 +294,14 @@ public class PhysicsSystem extends BaseComponentSystem implements UpdateSubscrib
     @ReceiveEvent(components = {RigidBodyComponent.class, LocationComponent.class}, netFilter = RegisterMode.REMOTE_CLIENT)
     public void resynchPhysics(PhysicsResynchEvent event, EntityRef entity) {
         logger.debug("Received resynch event");
-        RigidBody body = physics.getRigidBody(entity);
+        RigidBody body = getRigidBody(entity);
         body.setVelocity(event.getVelocity(), event.getAngularVelocity());
     }
 
     @ReceiveEvent(components = {RigidBodyComponent.class, LocationComponent.class}, netFilter = RegisterMode.REMOTE_CLIENT)
     public void resynchLocation(LocationResynchEvent event, EntityRef entity) {
         logger.debug("Received location resynch event");
-        RigidBody body = physics.getRigidBody(entity);
+        RigidBody body = getRigidBody(entity);
         body.setTransform(event.getPosition(), event.getRotation());
     }
 

@@ -18,8 +18,7 @@ import java.util.Set;
  * TODO: Move physics methods that should only be used by the engine/physics implementing system into another interface that inherits this.
  *
  */
-public interface PhysicsEngine extends Physics {
-    float GRAVITY = 15f;
+public interface PhysicsEngine {
 
 
     /**
@@ -47,12 +46,6 @@ public interface PhysicsEngine extends Physics {
     short combineGroups(Iterable<CollisionGroup> groups);
 
     /**
-     * Disposes this physics engine. Afterwards this physics engine cannot be
-     * used anymore.
-     */
-    void dispose();
-
-    /**
      * Return a list with all CollisionPairs created since the last call to this
      * method. A collisionPair is created when a Trigger hits an other object.
      * Therefore, one of the entities in the CollisionPair should have a Trigger
@@ -63,28 +56,11 @@ public interface PhysicsEngine extends Physics {
     List<PhysicsSystem.CollisionPair> getCollisionPairs();
 
     /**
-     * The epsilon value is the value that is considered to be so small that it
-     * could just as well be zero. Objects that are closer together than this
-     * value are assumes to be colliding.
-     *
-     * @return The simulation epsilon.
-     */
-    float getEpsilon();
-
-    /**
      * @return A set with all entities that have a rigidBody that is active in
      *         the physics engine. A new set is created that is not backed by this class.
      */
     Set<EntityRef> getPhysicsEntities();
 
-    /**
-     * Get the character collider for the given entity. Will create a new
-     * CharacterCollider if non exists and return that one.
-     *
-     * @param entity
-     * @return true if the given entity has a CharacterCollider associated to it.
-     */
-    CharacterCollider getCharacterCollider(EntityRef entity);
 
     /**
      * Returns the rigid body associated with the given entity. If no such
@@ -135,24 +111,6 @@ public interface PhysicsEngine extends Physics {
      *         and are active in the physics engine.
      */
     Iterator<EntityRef> physicsEntitiesIterator();
-
-    /**
-     * Removes the CharacterCollider associated with the given entity from the
-     * physics engine. The collider object of this entity will no longer be
-     * valid.
-     * <br><br>
-     * If no CharacterCollider was attached to the entity, a warning is logged
-     * and this method return false.
-     * <br><br>
-     * Make sure not to make another call to getCharacterCollider() if you are
-     * destroying the entity, as this will create a new CharacterCollider for
-     * the entity.
-     *
-     * @param entity the entity to remove the rigid body of.
-     * @return true if this entity had a character collider attached to it,
-     *         false otherwise.
-     */
-    boolean removeCharacterCollider(EntityRef entity);
 
     /**
      * Removes the rigid body associated with the given entity from the physics

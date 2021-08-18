@@ -43,7 +43,6 @@ import org.terasology.engine.physics.CollisionGroup;
 import org.terasology.engine.physics.HitResult;
 import org.terasology.engine.physics.Physics;
 import org.terasology.engine.physics.StandardCollisionGroup;
-import org.terasology.engine.physics.engine.PhysicsEngine;
 import org.terasology.engine.recording.DirectionAndOriginPosRecorderList;
 import org.terasology.engine.recording.RecordAndReplayCurrentStatus;
 import org.terasology.engine.recording.RecordAndReplayStatus;
@@ -65,7 +64,7 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
     private Physics physics;
 
     @In
-    private PhysicsEngine physicsEngine;
+    private Physics physicsEngine;
 
     @In
     private NetworkSystem networkSystem;

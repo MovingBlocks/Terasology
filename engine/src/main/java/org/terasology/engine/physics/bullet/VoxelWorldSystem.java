@@ -11,7 +11,7 @@ import org.terasology.engine.entitySystem.systems.RegisterSystem;
 import org.terasology.engine.physics.bullet.world.VoxelBlockFluidWorld;
 import org.terasology.engine.physics.bullet.world.VoxelBlockWorld;
 import org.terasology.engine.physics.bullet.world.VoxelWorld;
-import org.terasology.engine.physics.engine.PhysicsEngine;
+import org.terasology.engine.physics.Physics;
 import org.terasology.engine.registry.In;
 import org.terasology.engine.world.OnChangedBlock;
 import org.terasology.engine.world.WorldComponent;
@@ -34,7 +34,7 @@ import java.util.List;
 public class VoxelWorldSystem extends BaseComponentSystem {
 
     @In
-    private PhysicsEngine physics;
+    private Physics physics;
     @In
     private ChunkProvider chunkProvider;
 
