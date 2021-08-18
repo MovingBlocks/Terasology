@@ -21,7 +21,7 @@ class LoadCommand implements Runnable{
             return
         }
         Snapshot snapshot = new Snapshot(file)
-        snapshot.file = new File(Snapshot.SnapshotDirectory,"${snapshot.captured.toString()}.snapshot")
+        snapshot.file = new File(Snapshot.SnapshotDirectory,"${snapshot.captured.epochSecond}.snapshot")
         snapshot.save()
 
     }

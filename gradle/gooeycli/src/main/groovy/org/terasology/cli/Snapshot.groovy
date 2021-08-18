@@ -7,6 +7,9 @@ import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
 import org.terasology.cli.util.Constants
 
+import java.time.Instant
+import java.time.temporal.ChronoUnit
+
 class Snapshot {
     public static final int Version = 1
     public static final String SnapshotFolder = "snapshots"
@@ -15,7 +18,7 @@ class Snapshot {
     int index = 0;
     private List<SnapshotModule> modules = []
     File file
-    Date captured = new Date()
+    Instant captured = Instant.now().truncatedTo(ChronoUnit.SECONDS)
     String tag = ""
 
     Snapshot(File target) {
@@ -26,7 +29,7 @@ class Snapshot {
             int version = data.version
             switch (version) {
                 case 1:
-                    this.captured = new Date(data.captured)
+                    this.captured = Instant.parse(data.captured)
                     this.modules.addAll(data.modules.collect({ m -> new SnapshotModule(m, version) }))
                     this.tag = data.tag
                     this.index = data.index
@@ -34,8 +37,8 @@ class Snapshot {
             }
         }
     }
-    Snapshot() {
 
+    Snapshot() {
     }
 
     void addModuleSnapshot(SnapshotModule snapshot) {
@@ -48,18 +51,18 @@ class Snapshot {
 
     void save() {
         this.file.write(JsonOutput.toJson([
-            version : Version,
-            tag     : this.tag,
-            index   : this.index,
-            captured: this.captured.toString(),
-            modules : this.modules.collect({ m -> m.encode() })
+                version : Version,
+                tag     : this.tag,
+                index   : this.index,
+                captured: this.captured.toString(),
+                modules : this.modules.collect({ m -> m.encode() })
         ]))
     }
 
     static Optional<Snapshot> find(String name) {
         List<Snapshot> snapshots = currentSnapshots()
         File target = new File(name)
-        if(target.exists()) {
+        if (target.exists()) {
             return Optional.of(new Snapshot(target))
         }
 
