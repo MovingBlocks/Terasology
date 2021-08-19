@@ -3,12 +3,14 @@
 package org.terasology.engine.math;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Sets;
 import org.joml.Vector3fc;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.terasology.math.TeraMath;
 
 import java.util.EnumSet;
+import java.util.List;
 
 /**
  * The six sides of a block and a slew of related utility.
@@ -33,8 +35,7 @@ public enum Side {
     public static final ImmutableList<Side> Y_VERTICAL_SIDE = ImmutableList.of(TOP, BOTTOM);
     public static final ImmutableList<Side> Z_VERTICAL_SIDE = ImmutableList.of(FRONT, BACK);
 
-    private static final EnumSet<Side> ALL_SIDES = EnumSet.allOf(Side.class);
-
+    private static final ImmutableList<Side> ALL_SIDES = ImmutableList.of(TOP ,BOTTOM ,LEFT ,RIGHT ,FRONT ,BACK);
     private final Vector3ic direction;
 
     Side(Vector3i vector3i) {
@@ -44,14 +45,24 @@ public enum Side {
     /**
      * @return The horizontal sides, for iteration
      */
-    public static ImmutableList<Side> horizontalSides() {
+    public static List<Side> horizontalSides() {
         return Y_TANGENT_SIDE;
+    }
+
+    /**
+     * This provides a static List of all Sides defined in the enumeration. The result contains the same values as
+     * calling {@code Side#values} but this does not create a new copy on every call. <br/>
+     *
+     * @return All available sides
+     */
+    public static List<Side> allSides() {
+        return ALL_SIDES;
     }
 
     /**
      * @return The vertical sides, for iteration
      */
-    public static ImmutableList<Side> verticalSides() {
+    public static List<Side> verticalSides() {
         return Y_VERTICAL_SIDE;
     }
 
@@ -109,19 +120,6 @@ public enum Side {
         return (z > 0) ? BACK : FRONT;
     }
 
-    /**
-     * This provides a static EnumSet of all Sides defined in the enumeration. The result contains the same values as
-     * calling {@code Side#values} but this does not create a new copy on every call. <br/>
-     * <b>Warning:</b> Do not change the content of the returned enum set! It will be reflected on all calls to this
-     * method.
-     *
-     * @return All available sides'
-     * @deprecated use {@link Side#values()}
-     */
-    @Deprecated
-    public static EnumSet<Side> getAllSides() {
-        return ALL_SIDES;
-    }
 
     /**
      * the normal vector in the direction of the side
