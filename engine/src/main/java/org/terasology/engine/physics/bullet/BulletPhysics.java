@@ -42,18 +42,17 @@ import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.joml.Vector3i;
 import org.lwjgl.BufferUtils;
-import org.lwjgl.opengl.GL33;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.systems.RegisterSystem;
-import org.terasology.engine.entitySystem.systems.RenderSystem;
 import org.terasology.engine.logic.characters.CharacterMovementComponent;
 import org.terasology.engine.logic.location.LocationComponent;
 import org.terasology.engine.monitoring.PerformanceMonitor;
 import org.terasology.engine.physics.CollisionGroup;
 import org.terasology.engine.physics.HitResult;
+import org.terasology.engine.physics.Physics;
 import org.terasology.engine.physics.StandardCollisionGroup;
 import org.terasology.engine.physics.components.RigidBodyComponent;
 import org.terasology.engine.physics.components.TriggerComponent;
@@ -63,24 +62,15 @@ import org.terasology.engine.physics.components.shapes.CylinderShapeComponent;
 import org.terasology.engine.physics.components.shapes.HullShapeComponent;
 import org.terasology.engine.physics.components.shapes.SphereShapeComponent;
 import org.terasology.engine.physics.engine.CharacterCollider;
-import org.terasology.engine.physics.Physics;
 import org.terasology.engine.physics.engine.PhysicsSystem;
 import org.terasology.engine.physics.engine.RigidBody;
 import org.terasology.engine.physics.engine.SweepCallback;
 import org.terasology.engine.registry.In;
 import org.terasology.engine.registry.Share;
-import org.terasology.engine.rendering.assets.material.Material;
-import org.terasology.engine.rendering.assets.mesh.Mesh;
-import org.terasology.engine.rendering.assets.mesh.StandardMeshData;
-import org.terasology.engine.rendering.assets.mesh.resource.AllocationType;
-import org.terasology.engine.rendering.assets.mesh.resource.DrawingMode;
 import org.terasology.engine.rendering.assets.mesh.resource.VertexAttributeBinding;
-import org.terasology.engine.rendering.world.WorldRenderer;
-import org.terasology.engine.utilities.Assets;
 import org.terasology.engine.world.BlockEntityRegistry;
 import org.terasology.gestalt.assets.management.AssetManager;
 import org.terasology.joml.geom.AABBf;
-import org.terasology.nui.Color;
 
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
@@ -162,52 +152,6 @@ public class BulletPhysics extends PhysicsSystem implements Physics {
         return discreteDynamicsWorld;
     }
     //*****************Physics Interface methods******************\\
-
-
-    private int addRenderBound(StandardMeshData meshData, AABBf bounds, int index) {
-        Vector3f pos = new Vector3f();
-        meshData.position.put(pos.set(bounds.minX, bounds.minY, bounds.minZ));
-        meshData.position.put(pos.set(bounds.maxX, bounds.minY, bounds.minZ));
-        meshData.position.put(pos.set(bounds.maxX, bounds.minY, bounds.maxZ));
-        meshData.position.put(pos.set(bounds.minX, bounds.minY, bounds.maxZ));
-
-        meshData.position.put(pos.set(bounds.minX, bounds.maxY, bounds.minZ));
-        meshData.position.put(pos.set(bounds.maxX, bounds.maxY, bounds.minZ));
-        meshData.position.put(pos.set(bounds.maxX, bounds.maxY, bounds.maxZ));
-        meshData.position.put(pos.set(bounds.minX, bounds.maxY, bounds.maxZ));
-
-        meshData.color0.put(Color.black);
-        meshData.color0.put(Color.black);
-        meshData.color0.put(Color.black);
-        meshData.color0.put(Color.black);
-
-        meshData.color0.put(Color.black);
-        meshData.color0.put(Color.black);
-        meshData.color0.put(Color.black);
-        meshData.color0.put(Color.black);
-
-        meshData.indices.putAll(new int[]{
-                // top loop
-                index, index + 1,
-                index + 1, index + 2,
-                index + 2, index + 3,
-                index + 3, index,
-
-                // connecting edges between top and bottom
-                index, index + 4,
-                index + 1, index + 5,
-                index + 2, index + 6,
-                index + 3, index + 7,
-
-                // bottom loop
-                index + 4, index + 5,
-                index + 5, index + 6,
-                index + 6, index + 7,
-                index + 7, index + 4,
-
-        });
-        return index + 8;
-    }
 
     @Override
     public List<PhysicsSystem.CollisionPair> getCollisionPairs() {
