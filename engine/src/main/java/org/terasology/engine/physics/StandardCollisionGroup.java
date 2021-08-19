@@ -19,7 +19,7 @@ public enum StandardCollisionGroup implements CollisionGroup {
 
     private short flag;
 
-     StandardCollisionGroup(short flag) {
+    StandardCollisionGroup(short flag) {
         this.flag = flag;
     }
 

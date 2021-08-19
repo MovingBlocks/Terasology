@@ -12,6 +12,10 @@ import java.util.Set;
 
 public interface Physics {
     float GRAVITY = 15f;
+    long TIME_BETWEEN_NETSYNCS = 500;
+    CollisionGroup[] DEFAULT_COLLISION_GROUP =
+            {StandardCollisionGroup.WORLD, StandardCollisionGroup.CHARACTER, StandardCollisionGroup.DEFAULT};
+    float COLLISION_DAMPENING_MULTIPLIER = 0.5f;
 
     /**
      * Executes a rayTrace on the physics engine.

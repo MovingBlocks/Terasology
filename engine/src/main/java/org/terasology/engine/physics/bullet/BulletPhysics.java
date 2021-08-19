@@ -45,11 +45,18 @@ import org.lwjgl.BufferUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.config.Config;
+import org.terasology.engine.core.Time;
 import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
+import org.terasology.engine.entitySystem.event.EventPriority;
+import org.terasology.engine.entitySystem.event.ReceiveEvent;
+import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
 import org.terasology.engine.entitySystem.systems.RegisterSystem;
+import org.terasology.engine.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.engine.logic.characters.CharacterMovementComponent;
 import org.terasology.engine.logic.location.LocationComponent;
 import org.terasology.engine.monitoring.PerformanceMonitor;
+import org.terasology.engine.network.NetworkSystem;
 import org.terasology.engine.physics.CollisionGroup;
 import org.terasology.engine.physics.HitResult;
 import org.terasology.engine.physics.Physics;
@@ -69,6 +76,7 @@ import org.terasology.engine.registry.In;
 import org.terasology.engine.registry.Share;
 import org.terasology.engine.rendering.assets.mesh.resource.VertexAttributeBinding;
 import org.terasology.engine.world.BlockEntityRegistry;
+import org.terasology.engine.world.WorldProvider;
 import org.terasology.gestalt.assets.management.AssetManager;
 import org.terasology.joml.geom.AABBf;
 
@@ -80,14 +88,16 @@ import java.util.Deque;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 
 /**
  * Physics engine implementation using TeraBullet (a customised version of JBullet).
  */
 @RegisterSystem
 @Share(Physics.class)
-public class BulletPhysics extends PhysicsSystem implements Physics {
+public class BulletPhysics extends BaseComponentSystem implements UpdateSubscriberSystem, Physics {
     public static final int AABB_SIZE = Integer.MAX_VALUE;
 
     public static final float SIMD_EPSILON = 1.1920929E-7F;
@@ -112,12 +122,20 @@ public class BulletPhysics extends PhysicsSystem implements Physics {
 
     private final btGhostPairCallback ghostPairCallback;
 
+    private long lastNetsync;
+
     @In
     protected BlockEntityRegistry blockEntityRegistry;
     @In
     protected Config config;
     @In
     protected AssetManager assetManager;
+    @In
+    protected Time time;
+    @In
+    protected NetworkSystem networkSystem;
+    @In
+    protected WorldProvider worldProvider;
 
     /**
      * Creates a Collider for the given entity based on the LocationComponent and CharacterMovementComponent. All
@@ -131,6 +149,7 @@ public class BulletPhysics extends PhysicsSystem implements Physics {
     @Override
     public void initialise() {
         super.initialise();
+        lastNetsync = 0;
     }
 
     public BulletPhysics() {
@@ -148,12 +167,24 @@ public class BulletPhysics extends PhysicsSystem implements Physics {
 
     }
 
+    @ReceiveEvent(components = {RigidBodyComponent.class, LocationComponent.class}, priority = EventPriority.PRIORITY_NORMAL)
+    public void newRigidBody(OnActivatedComponent event, EntityRef entity) {
+        //getter also creates the rigid body
+//        getRigidBody(entity);
+        if (!entityRigidBodies.containsKey(entity)) {
+            createRigidBody(entity).ifPresent(rb -> {
+                discreteDynamicsWorld.
+            });
+        }
+
+    }
+
     public btDiscreteDynamicsWorld getWorld() {
         return discreteDynamicsWorld;
     }
     //*****************Physics Interface methods******************\\
 
-    @Override
+//    @Override
     public List<PhysicsSystem.CollisionPair> getCollisionPairs() {
         List<PhysicsSystem.CollisionPair> temp = collisions;
         collisions = new ArrayList<>();
@@ -171,19 +202,19 @@ public class BulletPhysics extends PhysicsSystem implements Physics {
         this.ghostPairCallback.dispose();
     }
 
-    @Override
-    public short combineGroups(CollisionGroup... groups) {
-        return combineGroups(Arrays.asList(groups));
-    }
-
-    @Override
-    public short combineGroups(Iterable<CollisionGroup> groups) {
-        short flags = 0;
-        for (CollisionGroup group : groups) {
-            flags |= group.getFlag();
-        }
-        return flags;
-    }
+//    @Override
+//    public short combineGroups(CollisionGroup... groups) {
+//        return combineGroups(Arrays.asList(groups));
+//    }
+//
+//    @Override
+//    public short combineGroups(Iterable<CollisionGroup> groups) {
+//        short flags = 0;
+//        for (CollisionGroup group : groups) {
+//            flags |= group.getFlag();
+//        }
+//        return flags;
+//    }
 
     @Override
     public List<EntityRef> scanArea(AABBf area, CollisionGroup... collisionFilter) {
@@ -200,7 +231,8 @@ public class BulletPhysics extends PhysicsSystem implements Physics {
         btBoxShape shape = new btBoxShape(extent);
         btGhostObject scanObject = createCollider(new Vector3f(area.minX, area.minY, area.minZ).add(extent), shape,
                 StandardCollisionGroup.SENSOR.getFlag(),
-                combineGroups(collisionFilter), btCollisionObject.CollisionFlags.CF_NO_CONTACT_RESPONSE);
+                CollisionGroup.combineGroups(collisionFilter), btCollisionObject.CollisionFlags.CF_NO_CONTACT_RESPONSE);
+
 
         // This in particular is overkill
         broadphase.calculateOverlappingPairs(dispatcher);
@@ -223,7 +255,7 @@ public class BulletPhysics extends PhysicsSystem implements Physics {
         to.mul(distance);
         to.add(from);
 
-        short filter = combineGroups(collisionGroups);
+        short filter = CollisionGroup.combineGroups(collisionGroups);
 
         ClosestRayResultCallback callback = new ClosestRayResultCallback(from, to);
         callback.setCollisionFilterGroup(StandardCollisionGroup.ALL.getFlag());
@@ -276,7 +308,7 @@ public class BulletPhysics extends PhysicsSystem implements Physics {
         to.mul(distance);
         to.add(from);
 
-        short filter = combineGroups(collisionGroups);
+        short filter = CollisionGroup.combineGroups(collisionGroups);
 
         // lookup all the collision item ids for these entities
         Set<Integer> excludedCollisionIds = Sets.newHashSet();
@@ -348,14 +380,13 @@ public class BulletPhysics extends PhysicsSystem implements Physics {
         collisions.addAll(getNewCollisionPairs());
         PerformanceMonitor.endActivity();
 
-        super.update(delta);
     }
 
     public btDiscreteDynamicsWorld getDiscreteDynamicsWorld() {
         return this.discreteDynamicsWorld;
     }
 
-    @Override
+//    @Override
     public boolean removeRigidBody(EntityRef entity) {
         BulletRigidBody rigidBody = entityRigidBodies.remove(entity);
         if (rigidBody != null) {
@@ -375,7 +406,7 @@ public class BulletPhysics extends PhysicsSystem implements Physics {
         }
     }
 
-    @Override
+//    @Override
     public boolean updateRigidBody(EntityRef entity) {
         LocationComponent location = entity.getComponent(LocationComponent.class);
         RigidBodyComponent rb = entity.getComponent(RigidBodyComponent.class);
@@ -389,7 +420,7 @@ public class BulletPhysics extends PhysicsSystem implements Physics {
         } else if (rigidBody != null) {
             float scale = location.getWorldScale();
             if (Math.abs(rigidBody.rb.getCollisionShape().getLocalScaling().x - scale) > this.getEpsilon()
-                    || rigidBody.collidesWith != combineGroups(rb.collidesWith)) {
+                    || rigidBody.collidesWith != CollisionGroup.combineGroups(rb.collidesWith)) {
                 removeRigidBody(rigidBody);
                 newRigidBody(entity);
             } else {
@@ -415,12 +446,12 @@ public class BulletPhysics extends PhysicsSystem implements Physics {
         // TODO: update if mass or collision groups change
     }
 
-    @Override
+//    @Override
     public boolean hasRigidBody(EntityRef entity) {
         return entityRigidBodies.containsKey(entity);
     }
 
-    @Override
+//    @Override
     public RigidBody getRigidBody(EntityRef entity) {
         RigidBody rb = entityRigidBodies.get(entity);
         if (rb == null) {
@@ -429,7 +460,7 @@ public class BulletPhysics extends PhysicsSystem implements Physics {
         return rb;
     }
 
-    @Override
+//    @Override
     public boolean removeTrigger(EntityRef entity) {
         btGhostObject ghost = entityTriggers.remove(entity);
         if (ghost != null) {
@@ -440,7 +471,7 @@ public class BulletPhysics extends PhysicsSystem implements Physics {
         }
     }
 
-    @Override
+//    @Override
     //TODO: update if detectGroups changed
     public boolean updateTrigger(EntityRef entity) {
         LocationComponent location = entity.getComponent(LocationComponent.class);
@@ -472,7 +503,7 @@ public class BulletPhysics extends PhysicsSystem implements Physics {
         }
     }
 
-    @Override
+//    @Override
     public boolean hasTrigger(EntityRef entity) {
         return entityTriggers.containsKey(entity);
     }
@@ -499,22 +530,22 @@ public class BulletPhysics extends PhysicsSystem implements Physics {
         return cc;
     }
 
-    @Override
+//    @Override
     public boolean hasCharacterCollider(EntityRef entity) {
         return entityColliders.containsKey(entity);
     }
 
-    @Override
+//    @Override
     public Set<EntityRef> getPhysicsEntities() {
         return ImmutableSet.copyOf(entityRigidBodies.keySet());
     }
 
-    @Override
+//    @Override
     public Iterator<EntityRef> physicsEntitiesIterator() {
         return entityRigidBodies.keySet().iterator();
     }
 
-    @Override
+//    @Override
     public void awakenArea(Vector3fc pos, float radius) {
         btPairCachingGhostObject ghost = new btPairCachingGhostObject();
         btSphereShape shape = new btSphereShape(radius);
@@ -529,7 +560,7 @@ public class BulletPhysics extends PhysicsSystem implements Physics {
         discreteDynamicsWorld.removeCollisionObject(ghost);
     }
 
-    @Override
+//    @Override
     public float getEpsilon() {
         //TODO: figure out how access this from libgdx
         return 1.19209290e-07f;
@@ -556,7 +587,7 @@ public class BulletPhysics extends PhysicsSystem implements Physics {
                     location.getWorldPosition(new Vector3f()),
                     shape,
                     collisionGroup.getFlag(),
-                    combineGroups(detectGroups),
+                    CollisionGroup.combineGroups(detectGroups),
                     btCollisionObject.CollisionFlags.CF_NO_CONTACT_RESPONSE);
 
             triggerObj.userData = entity;
@@ -591,8 +622,42 @@ public class BulletPhysics extends PhysicsSystem implements Physics {
         shapes.add(shape);
         shape.setMargin(0.1f);
         return createCustomCollider(pos, shape, movementComp.collisionGroup.getFlag(),
-                combineGroups(movementComp.collidesWith),
+                CollisionGroup.combineGroups(movementComp.collidesWith),
                 btCollisionObject.CollisionFlags.CF_CHARACTER_OBJECT, owner);
+    }
+
+    private Optional<BulletRigidBody> createRigidBody(EntityRef entity) {
+        LocationComponent location = entity.getComponent(LocationComponent.class);
+        RigidBodyComponent rigidBody = entity.getComponent(RigidBodyComponent.class);
+        btCollisionShape shape = getShapeFor(entity);
+        if (location != null && rigidBody != null && shape != null) {
+            float scale = location.getWorldScale();
+            shape.setLocalScaling(new Vector3f(scale, scale, scale));
+
+            if (rigidBody.mass < 1) {
+                logger.warn("RigidBodyComponent.mass is set to less than 1.0, this can lead to strange behaviour, " +
+                        "such as the objects moving through walls. " +
+                        "Entity: {}", entity);
+            }
+            Vector3f inertia = new Vector3f();
+            shape.calculateLocalInertia(rigidBody.mass, inertia);
+
+            btRigidBody.btRigidBodyConstructionInfo info =
+                    new btRigidBody.btRigidBodyConstructionInfo(rigidBody.mass, new EntityMotionState(entity), shape, inertia);
+            BulletRigidBody collider = new BulletRigidBody(info);
+            collider.rb.userData = entity;
+            collider.rb.setAngularFactor(rigidBody.angularFactor);
+            collider.rb.setLinearFactor(rigidBody.linearFactor);
+            collider.rb.setFriction(rigidBody.friction);
+            collider.collidesWith = CollisionGroup.combineGroups(rigidBody.collidesWith);
+            collider.setVelocity(rigidBody.velocity, rigidBody.angularVelocity);
+            collider.setTransform(location.getWorldPosition(new Vector3f()),
+                    location.getWorldRotation(new Quaternionf()));
+            updateKinematicSettings(rigidBody, collider);
+            return Optional.of(collider);
+        }
+
+        return Optional.empty();
     }
 
     private RigidBody newRigidBody(EntityRef entity) {
@@ -618,7 +683,7 @@ public class BulletPhysics extends PhysicsSystem implements Physics {
             collider.rb.setAngularFactor(rigidBody.angularFactor);
             collider.rb.setLinearFactor(rigidBody.linearFactor);
             collider.rb.setFriction(rigidBody.friction);
-            collider.collidesWith = combineGroups(rigidBody.collidesWith);
+            collider.collidesWith = CollisionGroup.combineGroups(rigidBody.collidesWith);
             collider.setVelocity(rigidBody.velocity, rigidBody.angularVelocity);
             collider.setTransform(location.getWorldPosition(new Vector3f()),
                     location.getWorldRotation(new Quaternionf()));
@@ -720,7 +785,7 @@ public class BulletPhysics extends PhysicsSystem implements Physics {
     }
 
     private void addRigidBody(BulletRigidBody body, List<CollisionGroup> groups, List<CollisionGroup> filter) {
-        insertionQueue.add(new RigidBodyRequest(body, combineGroups(groups), combineGroups(filter)));
+        insertionQueue.add(new RigidBodyRequest(body, CollisionGroup.combineGroups(groups), CollisionGroup.combineGroups(filter)));
     }
 
     private void addRigidBody(BulletRigidBody body, short groups, short filter) {
@@ -1038,7 +1103,7 @@ public class BulletPhysics extends PhysicsSystem implements Physics {
 
         private BulletCharacterMoverCollider(Vector3f pos, btConvexShape shape, List<CollisionGroup> groups,
                                              List<CollisionGroup> filters, int collisionFlags, EntityRef owner) {
-            this(pos, shape, combineGroups(groups), combineGroups(filters), collisionFlags, owner);
+            this(pos, shape, CollisionGroup.combineGroups(groups), CollisionGroup.combineGroups(filters), collisionFlags, owner);
         }
 
         private BulletCharacterMoverCollider(Vector3f pos, btConvexShape shape, short groups, short filters,
