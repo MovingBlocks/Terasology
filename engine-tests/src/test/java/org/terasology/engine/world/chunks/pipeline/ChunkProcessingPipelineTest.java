@@ -22,11 +22,9 @@ import org.terasology.engine.world.chunks.blockdata.ExtraBlockDataManager;
 import org.terasology.engine.world.chunks.internal.ChunkImpl;
 import org.terasology.engine.world.chunks.pipeline.stages.ChunkTaskProvider;
 import org.terasology.gestalt.assets.management.AssetManager;
-import reactor.core.Disposable;
-import reactor.core.Disposables;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
-import reactor.core.scheduler.Scheduler;
+import reactor.core.scheduler.Schedulers;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -53,29 +51,7 @@ class ChunkProcessingPipelineTest extends TerasologyTestingEnvironment {
 
     void initPipeline(Function<Vector3ic, Chunk> getCached) {
         // Use a custom scheduler which runs everything immediately, on the same thread
-        pipeline = new ChunkProcessingPipeline(getCached, Flux.push(sink -> chunkSink = sink), new Scheduler() {
-            @Override
-            public Disposable schedule(Runnable task) {
-                task.run();
-                return Disposables.single();
-            }
-
-            @Override
-            public Worker createWorker() {
-                return new Worker() {
-                    @Override
-                    public Disposable schedule(Runnable task) {
-                        task.run();
-                        return Disposables.single();
-                    }
-
-                    @Override
-                    public void dispose() {
-
-                    }
-                };
-            }
-        });
+        pipeline = new ChunkProcessingPipeline(getCached, Flux.push(sink -> chunkSink = sink), Schedulers.immediate());
     }
 
     @Test

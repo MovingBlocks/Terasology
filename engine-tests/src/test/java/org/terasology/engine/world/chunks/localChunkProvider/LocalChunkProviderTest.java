@@ -31,9 +31,7 @@ import org.terasology.fixtures.TestBlockManager;
 import org.terasology.fixtures.TestChunkStore;
 import org.terasology.fixtures.TestStorageManager;
 import org.terasology.fixtures.TestWorldGenerator;
-import reactor.core.Disposable;
-import reactor.core.Disposables;
-import reactor.core.scheduler.Scheduler;
+import reactor.core.scheduler.Schedulers;
 
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
@@ -86,29 +84,7 @@ class LocalChunkProviderTest {
         chunkProvider.setWorldEntity(worldEntity);
         relevanceSystem = new RelevanceSystem(chunkProvider);
         // workaround. initialize loading pipeline
-        chunkProvider.setRelevanceSystem(relevanceSystem, new Scheduler() {
-            @Override
-            public Disposable schedule(Runnable task) {
-                task.run();
-                return Disposables.single();
-            }
-
-            @Override
-            public Worker createWorker() {
-                return new Worker() {
-                    @Override
-                    public Disposable schedule(Runnable task) {
-                        task.run();
-                        return Disposables.single();
-                    }
-
-                    @Override
-                    public void dispose() {
-
-                    }
-                };
-            }
-        });
+        chunkProvider.setRelevanceSystem(relevanceSystem, Schedulers.immediate());
     }
 
     @AfterEach
