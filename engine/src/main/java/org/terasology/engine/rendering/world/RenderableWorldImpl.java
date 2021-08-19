@@ -46,7 +46,6 @@ import java.util.PriorityQueue;
 class RenderableWorldImpl implements RenderableWorld {
 
     private static final int MAX_ANIMATED_CHUNKS = 64;
-    private static final int MAX_BILLBOARD_CHUNKS = 64;
     private static final int MAX_LOADABLE_CHUNKS =
             ViewDistance.MEGA.getChunkDistance().x() * ViewDistance.MEGA.getChunkDistance().y() * ViewDistance.MEGA.getChunkDistance().z();
     private static final Vector3fc CHUNK_CENTER_OFFSET = new Vector3f(Chunks.CHUNK_SIZE).div(2);
@@ -362,7 +361,7 @@ class RenderableWorldImpl implements RenderableWorld {
                         statIgnoredPhases++;
                     }
 
-                    if (triangleCount(mesh, ChunkMesh.RenderPhase.ALPHA_REJECT) > 0 && chunkCounter < MAX_BILLBOARD_CHUNKS) {
+                    if (triangleCount(mesh, ChunkMesh.RenderPhase.ALPHA_REJECT) > 0) {
                         renderQueues.chunksAlphaReject.add(chunk);
                     } else {
                         statIgnoredPhases++;
