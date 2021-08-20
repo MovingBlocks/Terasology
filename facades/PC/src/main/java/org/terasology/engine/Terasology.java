@@ -67,8 +67,16 @@ import java.util.concurrent.TimeUnit;
  *
  */
 
-@CommandLine.Command(name = "terasology", usageHelpAutoWidth = true,
-footer = "%nAlternatively use our standalone Launcher from%n https://github.com/MovingBlocks/TerasologyLauncher/releases")
+@CommandLine.Command(
+        name = "terasology",
+        usageHelpAutoWidth = true,
+        footer = "%n" +
+                "For details, see%n" +
+                " https://github.com/MovingBlocks/Terasology/wiki/Advanced-Options%n" +
+                "%n" +
+                "Alternatively use our standalone Launcher from%n" +
+                " https://github.com/MovingBlocks/TerasologyLauncher/releases"
+)
 public final class Terasology implements Callable<Integer> {
     private static final Logger logger = LoggerFactory.getLogger(Terasology.class);
 
