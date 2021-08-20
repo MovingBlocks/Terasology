@@ -217,7 +217,7 @@ class RenderableWorldImpl implements RenderableWorld {
             for (Vector3ic chunkPositionToRemove : renderableRegion) {
                 if (!newRenderableRegion.contains(chunkPositionToRemove)) {
                     Iterator<Chunk> nearbyChunks = chunksInProximityOfCamera.iterator();
-                    for (Iterator<Chunk> it = nearbyChunks; it.hasNext();) {
+                    for (Iterator<Chunk> it = nearbyChunks; it.hasNext(); ) {
                         chunk = it.next();
                         if (chunk.getPosition(new org.joml.Vector3i()).equals(chunkPositionToRemove)) {
                             chunk.disposeMesh();
@@ -326,6 +326,7 @@ class RenderableWorldImpl implements RenderableWorld {
 
         ChunkMesh mesh;
         boolean isDynamicShadows = renderingConfig.isDynamicShadows();
+        int billboardLimit = (int) renderingConfig.getBillboardLimit();
 
         List<RenderableChunk> allChunks = new ArrayList<>(chunksInProximityOfCamera);
         allChunks.addAll(chunkMeshRenderer.getRenderableChunks());
@@ -361,7 +362,8 @@ class RenderableWorldImpl implements RenderableWorld {
                         statIgnoredPhases++;
                     }
 
-                    if (triangleCount(mesh, ChunkMesh.RenderPhase.ALPHA_REJECT) > 0) {
+                    if (triangleCount(mesh, ChunkMesh.RenderPhase.ALPHA_REJECT) > 0
+                            && (billboardLimit == 0 || chunkCounter < billboardLimit)) {
                         renderQueues.chunksAlphaReject.add(chunk);
                     } else {
                         statIgnoredPhases++;

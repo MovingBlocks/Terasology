@@ -150,6 +150,23 @@ public class VideoSettingsScreen extends CoreScreenLayer {
             chunkLodSlider.bindValue(BindHelper.bindBeanProperty("chunkLods", config.getRendering(), Float.TYPE));
         }
 
+        final UISlider billboardLimitSlider = find("billboardLimit", UISlider.class);
+        if (billboardLimitSlider != null) {
+            billboardLimitSlider.setIncrement(32);
+            billboardLimitSlider.setPrecision(0);
+            billboardLimitSlider.setMinimum(0);
+            billboardLimitSlider.setRange(512);
+            // Billboard limit == 0 means no limit
+            billboardLimitSlider.setLabelFunction(input -> {
+                if (input == 0) {
+                    return "No limit";
+                } else {
+                    return String.valueOf(input.intValue());
+                }
+            });
+            billboardLimitSlider.bindValue(BindHelper.bindBeanProperty("billboardLimit", config.getRendering(), Float.TYPE));
+        }
+
         final UISlider frameLimitSlider = find("frameLimit", UISlider.class);
         if (frameLimitSlider != null) {
             frameLimitSlider.setIncrement(5.0f);
