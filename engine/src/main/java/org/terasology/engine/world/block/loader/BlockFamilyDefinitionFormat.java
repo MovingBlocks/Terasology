@@ -229,7 +229,7 @@ public class BlockFamilyDefinitionFormat extends AbstractAssetFileFormat<BlockFa
                 }
                 if (partsObject.has("sides")) {
                     T value = context.deserialize(partsObject.get("sides"), type);
-                    for (BlockPart blockPart : BlockPart.horizontalSides()) {
+                    for (BlockPart blockPart : BlockPart.allHorizontalParts()) {
                         supplier.get().put(blockPart, value);
                     }
                 }
