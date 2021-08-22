@@ -107,7 +107,6 @@ public final class EnvironmentSwitchHandler {
         autoConfigManager.loadConfigsIn(context);
 
         ModuleAwareAssetTypeManager assetTypeManager = context.get(ModuleAwareAssetTypeManager.class);
-
         /*
          * The registering of the prefab formats is done in this method, because it needs to be done before
          * the environment of the asset manager gets changed.
@@ -116,6 +115,7 @@ public final class EnvironmentSwitchHandler {
          * existing then yet.
          */
         unregisterPrefabFormats(assetTypeManager);
+
         registeredPrefabFormat = new PrefabFormat(componentLibrary, typeHandlerLibrary);
         assetTypeManager.getAssetFileDataProducer(assetTypeManager
                 .getAssetType(Prefab.class)
