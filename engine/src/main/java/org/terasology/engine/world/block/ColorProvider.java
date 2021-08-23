@@ -3,6 +3,7 @@
 
 package org.terasology.engine.world.block;
 
+import org.terasology.engine.world.ChunkView;
 import org.terasology.nui.Colorc;
 
 /**
@@ -10,12 +11,12 @@ import org.terasology.nui.Colorc;
  */
 public interface ColorProvider {
     /**
-     * Looks up the color for grass at a given position.
+     * Looks up the color for grass at a given position relative to {@code view}.
      */
-    Colorc colorLut(int x, int y, int z);
+    Colorc colorLut(ChunkView view, int x, int y, int z);
 
     /**
-     * Looks up the color for foliage at a given position.
+     * Looks up the color for foliage at a given position relative to {@code view}.
      */
-    Colorc foliageLut(int x, int y, int z);
+    Colorc foliageLut(ChunkView view, int x, int y, int z);
 }
