@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.physics;
 
+import com.badlogic.gdx.physics.bullet.dynamics.btDiscreteDynamicsWorld;
+import org.joml.Vector3fc;
 import org.terasology.engine.physics.engine.CharacterCollider;
 import org.terasology.joml.geom.AABBf;
 import org.joml.Vector3f;
@@ -16,6 +18,15 @@ public interface Physics {
     CollisionGroup[] DEFAULT_COLLISION_GROUP =
             {StandardCollisionGroup.WORLD, StandardCollisionGroup.CHARACTER, StandardCollisionGroup.DEFAULT};
     float COLLISION_DAMPENING_MULTIPLIER = 0.5f;
+
+
+    /**
+     * Wakes up any rigid bodies that are in a box around the given position.
+     *
+     * @param pos    The position around which to wake up objects.
+     * @param radius the half-length of the sides of the square.
+     */
+    void awakenArea(Vector3fc pos, float radius);
 
     /**
      * Executes a rayTrace on the physics engine.
@@ -112,5 +123,6 @@ public interface Physics {
      *         false otherwise.
      */
     boolean removeCharacterCollider(EntityRef entity);
+
 
 }

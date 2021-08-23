@@ -32,4 +32,5 @@ public enum StandardCollisionGroup implements CollisionGroup {
     public String getName() {
         return "engine:" + toString().toLowerCase(Locale.ENGLISH);
     }
+
 }

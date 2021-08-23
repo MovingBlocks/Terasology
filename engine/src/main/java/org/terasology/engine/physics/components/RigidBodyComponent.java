@@ -4,7 +4,6 @@
 package org.terasology.engine.physics.components;
 
 import com.google.common.collect.Lists;
-
 import org.joml.Vector3f;
 import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.network.Replicate;
@@ -16,6 +15,7 @@ import java.util.List;
 
 @ForceBlockActive
 public class RigidBodyComponent implements Component {
+
     @Replicate
     public float mass = 10.0f;
     @Replicate
@@ -48,4 +48,5 @@ public class RigidBodyComponent implements Component {
     @Replicate
     public List<CollisionGroup> collidesWith =
             Lists.<CollisionGroup>newArrayList(StandardCollisionGroup.DEFAULT, StandardCollisionGroup.WORLD, StandardCollisionGroup.KINEMATIC);
+
 }

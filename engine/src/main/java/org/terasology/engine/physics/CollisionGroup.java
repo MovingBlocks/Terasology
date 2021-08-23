@@ -22,4 +22,5 @@ public interface CollisionGroup {
         return flags;
     }
 
+
 }

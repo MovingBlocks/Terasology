@@ -12,17 +12,17 @@ import org.terasology.engine.entitySystem.event.AbstractConsumableEvent;
  * TODO Have a CollideRequest before the CollideEvent?
  */
 public class CollideEvent extends AbstractConsumableEvent {
-    private EntityRef otherEntity;
-    private Vector3f entityContactPoint;
-    private Vector3f otherEntityContactPoint;
-    private float penetration;
-    private Vector3f normal;
+    private EntityRef otherEntity = EntityRef.NULL;
+    private Vector3f entityContactPoint = new Vector3f();
+    private Vector3f otherEntityContactPoint = new Vector3f();
+    private float penetration = 0.0f;
+    private Vector3f normal = new Vector3f();
 
     public CollideEvent(EntityRef other, Vector3f entityContactPoint, Vector3f otherEntityContactPoint, float penetration, Vector3f normal) {
         this.otherEntity = other;
-        this.normal = normal;
-        this.entityContactPoint = entityContactPoint;
-        this.otherEntityContactPoint = otherEntityContactPoint;
+        this.normal.set(normal);
+        this.entityContactPoint.set(entityContactPoint);
+        this.otherEntityContactPoint.set(otherEntityContactPoint);
         this.penetration = penetration;
     }
 
