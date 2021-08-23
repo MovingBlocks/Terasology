@@ -42,9 +42,9 @@ public class VoxelWorldSystem extends BaseComponentSystem {
 
     @Override
     public void initialise() {
-        if (physics instanceof BulletPhysics) {
-            colliders.add(new VoxelBlockWorld((BulletPhysics) physics));
-            colliders.add(new VoxelBlockFluidWorld((BulletPhysics) physics));
+        if (physics instanceof BulletPhysicsSystem) {
+            colliders.add(new VoxelBlockWorld((BulletPhysicsSystem) physics));
+            colliders.add(new VoxelBlockFluidWorld((BulletPhysicsSystem) physics));
         }
         super.initialise();
     }

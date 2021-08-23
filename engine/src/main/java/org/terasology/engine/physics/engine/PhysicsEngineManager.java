@@ -4,7 +4,7 @@ package org.terasology.engine.physics.engine;
 
 import org.terasology.engine.context.Context;
 import org.terasology.engine.physics.Physics;
-import org.terasology.engine.physics.bullet.BulletPhysics;
+import org.terasology.engine.physics.bullet.BulletPhysicsSystem;
 import org.terasology.engine.physics.bullet.shapes.BulletCollisionShapeFactory;
 import org.terasology.engine.physics.shapes.CollisionShape;
 import org.terasology.engine.physics.shapes.CollisionShapeFactory;
@@ -29,6 +29,6 @@ public final class PhysicsEngineManager {
      * @return The created {@link Physics} instance.
      */
     public static Physics getNewPhysicsEngine(Context context) {
-        return new BulletPhysics();
+        return new BulletPhysicsSystem();
     }
 }

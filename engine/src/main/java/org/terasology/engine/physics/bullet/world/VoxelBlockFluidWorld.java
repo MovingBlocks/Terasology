@@ -15,7 +15,7 @@ import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector3ic;
 import org.terasology.engine.physics.StandardCollisionGroup;
-import org.terasology.engine.physics.bullet.BulletPhysics;
+import org.terasology.engine.physics.bullet.BulletPhysicsSystem;
 import org.terasology.engine.physics.bullet.shapes.BulletCollisionShape;
 import org.terasology.engine.world.block.Block;
 import org.terasology.engine.world.chunks.Chunk;
@@ -23,7 +23,7 @@ import org.terasology.engine.world.chunks.Chunks;
 
 import java.nio.ShortBuffer;
 
-import static org.terasology.engine.physics.bullet.BulletPhysics.AABB_SIZE;
+import static org.terasology.engine.physics.bullet.BulletPhysicsSystem.AABB_SIZE;
 
 public class VoxelBlockFluidWorld implements VoxelWorld {
     private final boolean[] registered = new boolean[Short.MAX_VALUE];
@@ -32,7 +32,7 @@ public class VoxelBlockFluidWorld implements VoxelWorld {
     private final btVoxelShape worldShape;
     private final btRigidBody rigidBody;
 
-    public VoxelBlockFluidWorld(BulletPhysics physics) {
+    public VoxelBlockFluidWorld(BulletPhysicsSystem physics) {
         btDiscreteDynamicsWorld discreteDynamicsWorld = physics.getDiscreteDynamicsWorld();
 
         wrapper = new VoxelCollisionAlgorithmWrapper(Chunks.SIZE_X, Chunks.SIZE_Y,
