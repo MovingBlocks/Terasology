@@ -43,6 +43,13 @@ public class DataSizeConverter implements CommandLine.ITypeConverter<Long> {
         }
     }
 
+    protected static final Pattern pattern = Pattern.compile(
+            "(?<n>\\d+([.,]\\d*)?)" + // digits, maybe also a decimal part
+                    "\\s*" +
+                    "(?<suffix>\\p{Alpha})?b?",  // a suffix character, optionally followed by B
+            Pattern.CASE_INSENSITIVE
+    );
+
     @Override
     public Long convert(String value) {
         if (value == null) {
@@ -61,11 +68,4 @@ public class DataSizeConverter implements CommandLine.ITypeConverter<Long> {
         }
         return n.toBigInteger().longValueExact();
     }
-
-    protected final static Pattern pattern = Pattern.compile(
-            "(?<n>\\d+([.,]\\d*)?)" + // digits, maybe also a decimal part
-                    "\\s*" +
-                    "(?<suffix>\\p{Alpha})?b?",  // a suffix character, optionally followed by B
-            Pattern.CASE_INSENSITIVE
-    );
 }
