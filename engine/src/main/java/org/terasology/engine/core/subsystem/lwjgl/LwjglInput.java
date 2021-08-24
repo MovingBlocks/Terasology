@@ -6,6 +6,7 @@ import org.lwjgl.glfw.GLFW;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.config.ControllerConfig;
 import org.terasology.engine.context.Context;
+import org.terasology.engine.core.GameScheduler;
 import org.terasology.engine.core.modes.GameState;
 import org.terasology.engine.core.subsystem.config.BindsManager;
 import org.terasology.engine.input.InputSystem;
@@ -51,9 +52,12 @@ public class LwjglInput extends BaseLwjglSubsystem {
         LwjglControllerDevice controllerDevice = new LwjglControllerDevice(controllerConfig);
         inputSystem.setControllerDevice(controllerDevice);
 
-        long window = GLFW.glfwGetCurrentContext();
-        ((LwjglKeyboardDevice) inputSystem.getKeyboard()).registerToLwjglWindow(window);
-        ((LwjglMouseDevice) inputSystem.getMouseDevice()).registerToLwjglWindow(window);
+
+        GameScheduler.runOnGraphics("register input callbacks", () -> {
+            long window = GLFW.glfwGetCurrentContext();
+            ((LwjglKeyboardDevice) inputSystem.getKeyboard()).registerToLwjglWindow(window);
+            ((LwjglMouseDevice) inputSystem.getMouseDevice()).registerToLwjglWindow(window);
+        });
     }
 
     private void updateInputConfig() {

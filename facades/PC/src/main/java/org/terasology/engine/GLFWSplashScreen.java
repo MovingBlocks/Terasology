@@ -6,6 +6,8 @@ package org.terasology.engine;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.system.MemoryUtil;
+import org.terasology.engine.core.GameScheduler;
 import org.terasology.engine.core.TerasologyEngineStatus;
 import org.terasology.splash.SplashScreen;
 import org.terasology.splash.glfw.graphics.Color;
@@ -17,25 +19,22 @@ import org.terasology.splash.glfw.widgets.AnimatedBoxRow;
 import org.terasology.splash.glfw.widgets.BorderedRectangle;
 import org.terasology.splash.glfw.widgets.Image;
 import org.terasology.splash.glfw.widgets.Widget;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.time.Duration;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
 
 public class GLFWSplashScreen implements SplashScreen, Runnable {
-
-    private final CountDownLatch countDownLatch;
     private final List<Widget> widgets = new LinkedList<>();
     private Texture pixel;
     private Window window;
     private String message = "Loading...";
     private boolean isClosing;
 
-    public GLFWSplashScreen(CountDownLatch countDownLatch) {
-        this.countDownLatch = countDownLatch;
-    }
 
     @Override
     public void post(String msg) {
@@ -55,6 +54,47 @@ public class GLFWSplashScreen implements SplashScreen, Runnable {
 
     @Override
     public void run() {
+        Renderer renderer = Mono.just(0)
+                .subscribeOn(GameScheduler.graphics())
+                .doOnNext(n -> initWindow())
+                .map((n) -> new Renderer())
+                .doOnNext(Renderer::init)
+                .doOnNext(r -> GL11.glClearColor(0f, 0f, 0f, 0f))
+                .block();
+
+        final long contextId = GameScheduler.runBlockingGraphics("steal context", GLFW::glfwGetCurrentContext);
+
+
+        Flux.interval(Duration.ofMillis(100))
+                .onBackpressureDrop()
+                .map(n -> GLFW.glfwGetTime())
+                .buffer(2)
+                .map(times -> times.get(1) - times.get(0))
+                .publishOn(GameScheduler.graphics())
+                .takeUntil(dTime -> isClosing || window.isClosing())
+                .doOnNext(dTime -> {
+                    GLFW.glfwMakeContextCurrent(contextId);
+                    renderer.clear();
+                    widgets.forEach(widget -> widget.update(dTime));
+                    widgets.forEach(i -> i.render(renderer));
+                    renderer.drawText(message, 30, 25, Color.BLACK);
+                    window.update();
+                    GLFW.glfwMakeContextCurrent(MemoryUtil.NULL);
+                })
+                .doFinally(type -> {
+                    GLFW.glfwMakeContextCurrent(contextId);
+                    widgets.stream()
+                            .filter(w -> w instanceof Image)
+                            .map(w -> (Image) w)
+                            .forEach(Image::delete);
+                    pixel.delete();
+                    renderer.dispose();
+                    window.destroy();
+                    GLFW.glfwMakeContextCurrent(MemoryUtil.NULL);
+                }).subscribe();
+    }
+
+    private void initWindow() {
         if (!GLFW.glfwInit()) {
             throw new RuntimeException("Cannot init GLFW!");
         }
@@ -96,32 +136,6 @@ public class GLFWSplashScreen implements SplashScreen, Runnable {
             widgets.add(new AnimatedBoxRow(pixel, 20 + 450 + 10, 20, 600 - 450 - 20, 30));
         } catch (IOException e) {
             throw new RuntimeException("Cannot load splash image resources");
-        }
-
-
-        Renderer renderer = new Renderer();
-        renderer.init();
-        countDownLatch.countDown();
-        GL11.glClearColor(0f, 0f, 0f, 0f);
-        double last = GLFW.glfwGetTime();
-        try {
-            while (!isClosing && !window.isClosing()) {
-                double dTime = GLFW.glfwGetTime() - last;
-                last = GLFW.glfwGetTime();
-                renderer.clear();
-                widgets.forEach(widget -> widget.update(dTime));
-                widgets.forEach(i -> i.render(renderer));
-                renderer.drawText(message, 30, 25, Color.BLACK);
-                window.update();
-            }
-        } finally {
-            widgets.stream()
-                    .filter(w -> w instanceof Image)
-                    .map(w -> (Image) w)
-                    .forEach(Image::delete);
-            pixel.delete();
-            renderer.dispose();
-            window.destroy();
         }
     }
 }

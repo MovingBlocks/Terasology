@@ -17,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.config.RenderingConfig;
+import org.terasology.engine.core.GameScheduler;
 import org.terasology.engine.core.GameThread;
 import org.terasology.engine.core.PathManager;
 import org.terasology.engine.core.TerasologyConstants;
@@ -95,9 +96,7 @@ public class GLSLShader extends Shader {
         super(urn, assetType, disposalAction);
         this.disposalAction = disposalAction;
         this.graphicsProcessing = graphicsProcessing;
-        graphicsProcessing.asynchToDisplayThread(() -> {
-            reload(data);
-        });
+        reload(data);
     }
 
 
@@ -118,16 +117,18 @@ public class GLSLShader extends Shader {
 
     // made package-private after CheckStyle suggestion
     int linkShaderProgram(int featureHash) {
-        int shaderProgram = GL20.glCreateProgram();
+        return GameScheduler.runBlockingGraphics("link shader program", () -> {
+            int shaderProgram = GL20.glCreateProgram();
 
-        GL20.glAttachShader(shaderProgram, disposalAction.fragmentPrograms.get(featureHash));
-        GL20.glAttachShader(shaderProgram, disposalAction.vertexPrograms.get(featureHash));
-        if (shaderProgramBase.getGeometryProgram() != null) {
-            GL20.glAttachShader(shaderProgram, disposalAction.geometryPrograms.get(featureHash));
-        }
-        GL20.glLinkProgram(shaderProgram);
-        GL20.glValidateProgram(shaderProgram);
-        return shaderProgram;
+            GL20.glAttachShader(shaderProgram, disposalAction.fragmentPrograms.get(featureHash));
+            GL20.glAttachShader(shaderProgram, disposalAction.vertexPrograms.get(featureHash));
+            if (shaderProgramBase.getGeometryProgram() != null) {
+                GL20.glAttachShader(shaderProgram, disposalAction.geometryPrograms.get(featureHash));
+            }
+            GL20.glLinkProgram(shaderProgram);
+            GL20.glValidateProgram(shaderProgram);
+            return shaderProgram;
+        });
     }
 
     @Override
@@ -266,16 +267,17 @@ public class GLSLShader extends Shader {
 
         for (Set<ShaderProgramFeature> permutation : allPermutations) {
             int featureHash = ShaderProgramFeature.getBitset(permutation);
+            GameScheduler.runBlockingGraphics("Lwjgl post-update", () -> {
+                        int fragShaderId = compileShader(GL20.GL_FRAGMENT_SHADER, permutation);
+                        int vertShaderId = compileShader(GL20.GL_VERTEX_SHADER, permutation);
+                        if (shaderProgramBase.getGeometryProgram() != null) {
+                            int geomShaderId = compileShader(GL32.GL_GEOMETRY_SHADER, permutation);
+                            disposalAction.geometryPrograms.put(featureHash, geomShaderId);
+                        }
 
-            int fragShaderId = compileShader(GL20.GL_FRAGMENT_SHADER, permutation);
-            int vertShaderId = compileShader(GL20.GL_VERTEX_SHADER, permutation);
-            if (shaderProgramBase.getGeometryProgram() != null) {
-                int geomShaderId = compileShader(GL32.GL_GEOMETRY_SHADER, permutation);
-                disposalAction.geometryPrograms.put(featureHash, geomShaderId);
-            }
-
-            disposalAction.fragmentPrograms.put(featureHash, fragShaderId);
-            disposalAction.vertexPrograms.put(featureHash, vertShaderId);
+                        disposalAction.fragmentPrograms.put(featureHash, fragShaderId);
+                        disposalAction.vertexPrograms.put(featureHash, vertShaderId);
+                    });
         }
 
         logger.debug("Compiled {} permutations for {}.", allPermutations.size(), getUrn());
@@ -362,26 +364,24 @@ public class GLSLShader extends Shader {
 
     @Override
     protected void doReload(ShaderData data) {
-        try {
-            GameThread.synch(() -> {
-                logger.debug("Recompiling shader {}.", getUrn());
 
-                disposalAction.disposeData();
-                shaderProgramBase = data;
-                parameters.clear();
-                for (ShaderParameterMetadata metadata : shaderProgramBase.getParameterMetadata()) {
-                    parameters.put(metadata.getName(), metadata);
-                }
-                updateAvailableFeatures();
-                try {
-                    registerAllShaderPermutations();
-                } catch (RuntimeException e) {
-                    logger.warn(e.getMessage());
-                }
-            });
-        } catch (InterruptedException e) {
-            logger.error("Failed to reload {}", getUrn(), e);
+        logger.debug("Recompiling shader {}.", getUrn());
+
+        disposalAction.disposeData();
+
+        shaderProgramBase = data;
+        parameters.clear();
+        for (ShaderParameterMetadata metadata : shaderProgramBase.getParameterMetadata()) {
+            parameters.put(metadata.getName(), metadata);
         }
+        updateAvailableFeatures();
+        try {
+
+            registerAllShaderPermutations();
+        } catch (RuntimeException e) {
+            logger.warn(e.getMessage());
+        }
+
     }
 
     public static class DisposalAction implements DisposableResource {

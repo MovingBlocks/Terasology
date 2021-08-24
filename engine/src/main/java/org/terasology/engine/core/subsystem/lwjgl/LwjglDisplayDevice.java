@@ -9,6 +9,7 @@ import org.lwjgl.system.MemoryUtil;
 import org.terasology.engine.config.Config;
 import org.terasology.engine.config.RenderingConfig;
 import org.terasology.engine.context.Context;
+import org.terasology.engine.core.GameScheduler;
 import org.terasology.engine.core.subsystem.DisplayDevice;
 import org.terasology.engine.core.subsystem.DisplayDeviceInfo;
 import org.terasology.engine.core.subsystem.Resolution;
@@ -46,17 +47,19 @@ public class LwjglDisplayDevice extends AbstractSubscribable implements DisplayD
 
     @Override
     public boolean hasFocus() {
-        return GLFW.GLFW_TRUE == GLFW.glfwGetWindowAttrib(GLFW.glfwGetCurrentContext(), GLFW.GLFW_FOCUSED);
+        return GameScheduler.runBlockingGraphics("hasFocus",
+                () -> GLFW.GLFW_TRUE == GLFW.glfwGetWindowAttrib(GLFW.glfwGetCurrentContext(), GLFW.GLFW_FOCUSED));
     }
 
     @Override
     public boolean isCloseRequested() {
-        return GLFW.glfwWindowShouldClose(GLFW.glfwGetCurrentContext());
+        return
+                GameScheduler.runBlockingGraphics("isCloseRequested",()-> GLFW.glfwWindowShouldClose(GLFW.glfwGetCurrentContext()));
     }
 
     @Override
     public boolean isFullscreen() {
-        return MemoryUtil.NULL != GLFW.glfwGetWindowMonitor(GLFW.glfwGetCurrentContext());
+        return  GameScheduler.runBlockingGraphics("isFullscreen",()-> MemoryUtil.NULL != GLFW.glfwGetWindowMonitor(GLFW.glfwGetCurrentContext()));
     }
 
     @Override
@@ -79,43 +82,45 @@ public class LwjglDisplayDevice extends AbstractSubscribable implements DisplayD
     }
 
     public void setDisplayModeSetting(DisplayModeSetting displayModeSetting, boolean resize) {
-        long window = GLFW.glfwGetCurrentContext();
-        switch (displayModeSetting) {
-            case FULLSCREEN:
-                updateFullScreenDisplay();
-                config.setDisplayModeSetting(displayModeSetting);
-                config.setFullscreen(true);
-                break;
-            case WINDOWED_FULLSCREEN:
-                GLFWVidMode vidMode = desktopResolution.get();
-                GLFW.glfwSetWindowMonitor(window,
-                        MemoryUtil.NULL,
-                        0,
-                        0,
-                        vidMode.width(),
-                        vidMode.height(),
-                        GLFW.GLFW_DONT_CARE);
-                GLFW.glfwSetWindowAttrib(window, GLFW.GLFW_DECORATED, GLFW.GLFW_FALSE);
-                config.setDisplayModeSetting(displayModeSetting);
-                config.setWindowedFullscreen(true);
-                break;
-            case WINDOWED:
-                GLFW.glfwSetWindowAttrib(window, GLFW.GLFW_DECORATED, GLFW.GLFW_TRUE);
-                GLFW.glfwSetWindowAttrib(window, GLFW.GLFW_RESIZABLE, GLFW.GLFW_TRUE);
-                GLFW.glfwSetWindowMonitor(window,
-                        MemoryUtil.NULL,
-                        config.getWindowPosX(),
-                        config.getWindowPosY(),
-                        config.getWindowWidth(),
-                        config.getWindowHeight(),
-                        GLFW.GLFW_DONT_CARE);
-                config.setDisplayModeSetting(displayModeSetting);
-                config.setFullscreen(false);
-                break;
-        }
-        if (resize) {
-            updateViewport();
-        }
+        GameScheduler.runBlockingGraphics("setDisplayModeSetting", ()-> {
+            long window = GLFW.glfwGetCurrentContext();
+            switch (displayModeSetting) {
+                case FULLSCREEN:
+                    updateFullScreenDisplay();
+                    config.setDisplayModeSetting(displayModeSetting);
+                    config.setFullscreen(true);
+                    break;
+                case WINDOWED_FULLSCREEN:
+                    GLFWVidMode vidMode = desktopResolution.get();
+                    GLFW.glfwSetWindowMonitor(window,
+                            MemoryUtil.NULL,
+                            0,
+                            0,
+                            vidMode.width(),
+                            vidMode.height(),
+                            GLFW.GLFW_DONT_CARE);
+                    GLFW.glfwSetWindowAttrib(window, GLFW.GLFW_DECORATED, GLFW.GLFW_FALSE);
+                    config.setDisplayModeSetting(displayModeSetting);
+                    config.setWindowedFullscreen(true);
+                    break;
+                case WINDOWED:
+                    GLFW.glfwSetWindowAttrib(window, GLFW.GLFW_DECORATED, GLFW.GLFW_TRUE);
+                    GLFW.glfwSetWindowAttrib(window, GLFW.GLFW_RESIZABLE, GLFW.GLFW_TRUE);
+                    GLFW.glfwSetWindowMonitor(window,
+                            MemoryUtil.NULL,
+                            config.getWindowPosX(),
+                            config.getWindowPosY(),
+                            config.getWindowWidth(),
+                            config.getWindowHeight(),
+                            GLFW.GLFW_DONT_CARE);
+                    config.setDisplayModeSetting(displayModeSetting);
+                    config.setFullscreen(false);
+                    break;
+            }
+            if (resize) {
+                updateViewport();
+            }
+        });
     }
 
     @Override
@@ -148,12 +153,14 @@ public class LwjglDisplayDevice extends AbstractSubscribable implements DisplayD
 
     private void updateWindow() {
         if (isWindowDirty) {
-            int[] windowWidth = new int[1];
-            int[] windowHeight = new int[1];
-            GLFW.glfwGetWindowSize(GLFW.glfwGetCurrentContext(), windowWidth, windowHeight);
-            this.windowWidth = windowWidth[0];
-            this.windowHeight = windowHeight[0];
-            isWindowDirty = false;
+            GameScheduler.runBlockingGraphics("updateWindowBounds",()-> {
+                int[] windowWidth = new int[1];
+                int[] windowHeight = new int[1];
+                GLFW.glfwGetWindowSize(GLFW.glfwGetCurrentContext(), windowWidth, windowHeight);
+                this.windowWidth = windowWidth[0];
+                this.windowHeight = windowHeight[0];
+                isWindowDirty = false;
+            });
         }
     }
 
@@ -161,14 +168,16 @@ public class LwjglDisplayDevice extends AbstractSubscribable implements DisplayD
     public void setResolution(Resolution resolution) {
         config.setResolution(resolution);
         if (DisplayModeSetting.FULLSCREEN == config.getDisplayModeSetting()) {
-            updateFullScreenDisplay();
-            updateViewport();
+            GameScheduler.runBlockingGraphics("isFullscreen", () -> {
+                updateFullScreenDisplay();
+                updateViewport();
+            });
         }
     }
 
     @Override
     public void processMessages() {
-        GLFW.glfwPollEvents();
+        GameScheduler.runBlockingGraphics("pollEvents", GLFW::glfwPollEvents);
     }
 
     @Override
@@ -178,12 +187,15 @@ public class LwjglDisplayDevice extends AbstractSubscribable implements DisplayD
 
     @Override
     public void prepareToRender() {
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        GameScheduler.runBlockingGraphics("prepareToRender",
+                ()-> glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
+
     }
 
     @Override
     public DisplayDeviceInfo getInfo() {
-        LwjglGraphicsUtil.updateDisplayDeviceInfo(displayDeviceInfo);
+        GameScheduler.runBlockingGraphics("updateDisplayDevice",
+                () -> LwjglGraphicsUtil.updateDisplayDeviceInfo(displayDeviceInfo));
         return displayDeviceInfo;
     }
 
@@ -199,7 +211,10 @@ public class LwjglDisplayDevice extends AbstractSubscribable implements DisplayD
     }
 
     protected void updateViewport(int width, int height) {
-        glViewport(0, 0, width, height);
+        GameScheduler.runBlockingGraphics("isFullscreen", () ->
+                glViewport(0, 0, width, height)
+        );
+
         propertyChangeSupport.firePropertyChange(DISPLAY_RESOLUTION_CHANGE, 0, 1);
     }
 
@@ -226,7 +241,9 @@ public class LwjglDisplayDevice extends AbstractSubscribable implements DisplayD
 
 
     private static Supplier<GLFWVidMode> createDesktopResolutionSupplier() {
-        return Suppliers.memoize(() -> GLFW.glfwGetVideoMode(GLFW.glfwGetPrimaryMonitor()));
+        return Suppliers.memoize(() ->
+                GameScheduler.runBlockingGraphics("isFullscreen",
+                        ()-> GLFW.glfwGetVideoMode(GLFW.glfwGetPrimaryMonitor())));
     }
 
     private Optional<GLFWVidMode> getGLFWVidMode(LwjglResolution resolution) {
@@ -237,13 +254,15 @@ public class LwjglDisplayDevice extends AbstractSubscribable implements DisplayD
     }
 
     private static Supplier<List<GLFWVidMode>> createAvailableResolutionSupplier() {
-        return Suppliers.memoize(() -> GLFW.glfwGetVideoModes(GLFW.glfwGetPrimaryMonitor())
-                .stream()
-                .sorted(Comparator
-                        .comparing(GLFWVidMode::width)
-                        .thenComparing(GLFWVidMode::width)
-                        .thenComparing(GLFWVidMode::refreshRate)
-                )
-                .collect(Collectors.toList()));
+        return GameScheduler.runBlockingGraphics("getAvailableResolution", () ->
+                Suppliers.memoize(() -> GLFW.glfwGetVideoModes(GLFW.glfwGetPrimaryMonitor())
+                        .stream()
+                        .sorted(Comparator
+                                .comparing(GLFWVidMode::width)
+                                .thenComparing(GLFWVidMode::width)
+                                .thenComparing(GLFWVidMode::refreshRate)
+                        )
+                        .collect(Collectors.toList()))
+        );
     }
 }

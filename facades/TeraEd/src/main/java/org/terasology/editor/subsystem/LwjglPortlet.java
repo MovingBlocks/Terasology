@@ -70,7 +70,6 @@ public class LwjglPortlet extends BaseLwjglSubsystem {
         this.context = rootContext;
         this.config = context.get(Config.class).getRendering();
 
-        graphics.setThreadMode(LwjglGraphicsManager.ThreadMode.DISPLAY_THREAD);
         display = new LwjglPortletDisplayDevice(canvas, graphics);
         context.put(DisplayDevice.class, display);
         logger.info("Initial initialization complete");
@@ -111,7 +110,6 @@ public class LwjglPortlet extends BaseLwjglSubsystem {
     public void setupThreads() {
         GameThread.reset();
         GameThread.setToCurrentThread();
-        graphics.setThreadMode(LwjglGraphicsManager.ThreadMode.GAME_THREAD);
 
         EventSystem eventSystem = CoreRegistry.get(EventSystem.class);
         if (eventSystem != null) {

@@ -13,6 +13,7 @@ import org.terasology.engine.config.Config;
 import org.terasology.engine.config.RenderingConfig;
 import org.terasology.engine.context.Context;
 import org.terasology.engine.core.GameEngine;
+import org.terasology.engine.core.GameScheduler;
 import org.terasology.engine.core.modes.GameState;
 import org.terasology.engine.core.subsystem.DisplayDevice;
 import org.terasology.engine.rendering.ShaderManager;
@@ -28,6 +29,7 @@ import java.io.IOException;
 public class LwjglGraphics extends BaseLwjglSubsystem {
     private static final Logger logger = LoggerFactory.getLogger(LwjglGraphics.class);
 
+    public static long windowId; // TODO make non static!!!
     private Context context;
     private RenderingConfig config;
 
@@ -59,11 +61,13 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
 
     @Override
     public void postInitialise(Context rootContext) {
-        graphics.registerRenderingSubsystem(context);
+        GameScheduler.runBlockingGraphics("Init window/OpenGl", () -> {
+            graphics.registerRenderingSubsystem(context);
 
-        initGLFW();
-        initWindow();
-        initOpenGL();
+            initGLFW();
+            initWindow();
+            initOpenGL();
+        });
 
         context.put(ShaderManager.class, new ShaderManagerLwjgl());
         context.put(CanvasRenderer.class, new LwjglCanvasRenderer(context));
@@ -71,47 +75,51 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
 
     @Override
     public void postUpdate(GameState currentState, float delta) {
-        graphics.processActions();
+        GameScheduler.runBlockingGraphics("Lwjgl post-update", () -> {
+                    graphics.processActions();
+                    currentState.render();
+                    lwjglDisplay.update();
 
-        currentState.render();
-
-        lwjglDisplay.update();
-        int frameLimit = context.get(Config.class).getRendering().getFrameLimit();
-        if (frameLimit > 0) {
-            Lwjgl2Sync.sync(frameLimit);
-        }
-        if (lwjglDisplay.isCloseRequested()) {
-            engine.shutdown();
-        }
+                    //TODO. needs there, or not?
+                    int frameLimit = context.get(Config.class).getRendering().getFrameLimit();
+                    if (frameLimit > 0) {
+                        Lwjgl2Sync.sync(frameLimit);
+                    }
+                    if (lwjglDisplay.isCloseRequested()) {
+                        engine.shutdown();
+                    }
+                });
     }
 
     @Override
     public void preShutdown() {
-        long window = GLFW.glfwGetCurrentContext();
-        if (window != MemoryUtil.NULL) {
-            boolean isVisible = GLFW.glfwGetWindowAttrib(window, GLFW.GLFW_VISIBLE) == GLFW.GLFW_TRUE;
-            boolean isFullScreen = lwjglDisplay.isFullscreen();
-            if (!isFullScreen && isVisible) {
-                int[] xBuffer = new int[1];
-                int[] yBuffer = new int[1];
-                GLFW.glfwGetWindowPos(window, xBuffer, yBuffer);
-                int[] widthBuffer = new int[1];
-                int[] heightBuffer = new int[1];
-                GLFW.glfwGetWindowSize(window, widthBuffer, heightBuffer);
+        GameScheduler.runBlockingGraphics("Lwjgl pre-shutdown", () -> {
+            long window = GLFW.glfwGetCurrentContext();
+            if (window != MemoryUtil.NULL) {
+                boolean isVisible = GLFW.glfwGetWindowAttrib(window, GLFW.GLFW_VISIBLE) == GLFW.GLFW_TRUE;
+                boolean isFullScreen = lwjglDisplay.isFullscreen();
+                if (!isFullScreen && isVisible) {
+                    int[] xBuffer = new int[1];
+                    int[] yBuffer = new int[1];
+                    GLFW.glfwGetWindowPos(window, xBuffer, yBuffer);
+                    int[] widthBuffer = new int[1];
+                    int[] heightBuffer = new int[1];
+                    GLFW.glfwGetWindowSize(window, widthBuffer, heightBuffer);
 
-                if (widthBuffer[0] > 0 && heightBuffer[0] > 0 && xBuffer[0] > 0 && yBuffer[0] > 0) {
-                    config.setWindowWidth(widthBuffer[0]);
-                    config.setWindowHeight(heightBuffer[0]);
-                    config.setWindowPosX(xBuffer[0]);
-                    config.setWindowPosY(yBuffer[0]);
+                    if (widthBuffer[0] > 0 && heightBuffer[0] > 0 && xBuffer[0] > 0 && yBuffer[0] > 0) {
+                        config.setWindowWidth(widthBuffer[0]);
+                        config.setWindowHeight(heightBuffer[0]);
+                        config.setWindowPosX(xBuffer[0]);
+                        config.setWindowPosY(yBuffer[0]);
+                    }
                 }
             }
-        }
+        });
     }
 
     @Override
     public void shutdown() {
-        GLFW.glfwTerminate();
+        GameScheduler.runBlockingGraphics("Lwjgl shutdown", GLFW::glfwTerminate);
     }
 
     private void initGLFW() {
@@ -147,6 +155,7 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
             throw new RuntimeException("Failed to create window");
         }
 
+        this.windowId = window;
         GLFW.glfwMakeContextCurrent(window);
 
         if (!config.isVSync()) {

@@ -8,6 +8,7 @@ import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL30;
+import org.terasology.engine.core.GameScheduler;
 import org.terasology.engine.rendering.assets.material.Material;
 import org.terasology.engine.rendering.assets.mesh.resource.GLAttributes;
 import org.terasology.engine.rendering.assets.mesh.resource.IndexResource;
@@ -97,31 +98,32 @@ public class ChunkMesh {
      * @return True if something was generated
      */
     public boolean generateVBOs() {
-        if (lock.tryLock()) {
-            try {
-                // IMPORTANT: A mesh can only be generated once.
-                if (vertexElements == null || disposed) {
-                    return false;
+        return GameScheduler.runBlockingGraphics("generate VBOs", () -> {
+            if (lock.tryLock()) {
+                try {
+                    // IMPORTANT: A mesh can only be generated once.
+                    if (vertexElements == null || disposed) {
+                        return false;
+                    }
+
+                    // Make sure that if it has already been generated, the previous buffers are freed
+                    dispose();
+                    disposed = false;
+
+                    for (RenderType type : RenderType.values()) {
+                        generateVBO(type);
+                    }
+
+                    // Calculate the final amount of triangles
+                    triangleCount = (vertexCount[0] + vertexCount[1] + vertexCount[2] + vertexCount[3]) / 3;
+                } finally {
+                    lock.unlock();
                 }
 
-                // Make sure that if it has already been generated, the previous buffers are freed
-                dispose();
-                disposed = false;
-
-                for (RenderType type : RenderType.values()) {
-                    generateVBO(type);
-                }
-
-                // Calculate the final amount of triangles
-                triangleCount = (vertexCount[0] + vertexCount[1] + vertexCount[2] + vertexCount[3]) / 3;
-            } finally {
-                lock.unlock();
+                return true;
             }
-
-            return true;
-        }
-
-        return false;
+            return false;
+        });
     }
 
     private void generateVBO(RenderType type) {
@@ -201,20 +203,22 @@ public class ChunkMesh {
     }
 
     public int render(RenderPhase type) {
-        switch (type) {
-            case OPAQUE:
-                renderVbo(0);
-                break;
-            case ALPHA_REJECT:
-                renderVbo(1);
-                renderVbo(2);
-                break;
-            case REFRACTIVE:
-                renderVbo(3);
-                break;
-            default:
-                break;
-        }
+        GameScheduler.runBlockingGraphics("renderVbo", ()-> {
+            switch (type) {
+                case OPAQUE:
+                    renderVbo(0);
+                    break;
+                case ALPHA_REJECT:
+                    renderVbo(1);
+                    renderVbo(2);
+                    break;
+                case REFRACTIVE:
+                    renderVbo(3);
+                    break;
+                default:
+                    break;
+            }
+        });
         return triangleCount();
     }
 
@@ -225,34 +229,36 @@ public class ChunkMesh {
      * ChunkMesh instances cannot be un-disposed.
      */
     public void dispose() {
-        lock.lock();
-        try {
-            if (!disposed) {
-                for (int i = 0; i < vertexBuffers.length; i++) {
-                    int id = vertexBuffers[i];
-                    if (id != 0) {
-                        GL15.glDeleteBuffers(id);
-                        vertexBuffers[i] = 0;
+        GameScheduler.runBlockingGraphics("dispose mesh", ()-> {
+            lock.lock();
+            try {
+                if (!disposed) {
+                    for (int i = 0; i < vertexBuffers.length; i++) {
+                        int id = vertexBuffers[i];
+                        if (id != 0) {
+                            GL15.glDeleteBuffers(id);
+                            vertexBuffers[i] = 0;
+                        }
+
+                        id = idxBuffers[i];
+                        if (id != 0) {
+                            GL15.glDeleteBuffers(id);
+                            idxBuffers[i] = 0;
+                        }
+
+                        id = vaoCount[i];
+                        if (id != 0) {
+                            GL30.glDeleteVertexArrays(id);
+                            vaoCount[i] = 0;
+                        }
                     }
 
-                    id = idxBuffers[i];
-                    if (id != 0) {
-                        GL15.glDeleteBuffers(id);
-                        idxBuffers[i] = 0;
-                    }
-
-                    id = vaoCount[i];
-                    if (id != 0) {
-                        GL30.glDeleteVertexArrays(id);
-                        vaoCount[i] = 0;
-                    }
+                    disposed = true;
                 }
-
-                disposed = true;
+            } finally {
+                lock.unlock();
             }
-        } finally {
-            lock.unlock();
-        }
+        });
     }
 
     public boolean isDisposed() {

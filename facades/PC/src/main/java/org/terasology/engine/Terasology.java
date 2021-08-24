@@ -14,6 +14,7 @@ import org.terasology.engine.core.StandardGameStatus;
 import org.terasology.engine.core.TerasologyConstants;
 import org.terasology.engine.core.TerasologyEngine;
 import org.terasology.engine.core.TerasologyEngineBuilder;
+import org.terasology.engine.core.ThreadCaptureScheduler;
 import org.terasology.engine.core.modes.StateLoading;
 import org.terasology.engine.core.modes.StateMainMenu;
 import org.terasology.engine.core.subsystem.EngineSubsystem;
@@ -112,7 +113,22 @@ public final class Terasology implements Callable<Integer> {
     }
 
     public static void main(String[] args) {
-        new CommandLine(new Terasology()).execute(args);
+        ThreadCaptureScheduler graphics = (ThreadCaptureScheduler) GameScheduler.graphics();
+
+        Thread thread = new Thread(()-> {
+            try{
+                new CommandLine(new Terasology()).execute(args);
+            } finally {
+                 graphics.dispose();
+            }
+        },
+            "MAIN_LOGIC"
+        );
+        thread.start();
+
+        Thread.currentThread().setName("GRAPHICS");
+        graphics.setCapturedThread(Thread.currentThread());
+        graphics.start();
     }
 
     @Override
@@ -122,18 +138,8 @@ public final class Terasology implements Callable<Integer> {
 
         SplashScreen splashScreen;
         if (splashEnabled) {
-            CountDownLatch splashInitLatch = new CountDownLatch(1);
-            GLFWSplashScreen glfwSplash = new GLFWSplashScreen(splashInitLatch);
-            Thread thread = new Thread(glfwSplash, "splashscreen-loop");
-            thread.setDaemon(true);
-            thread.start();
-            try {
-                // wait splash initialize... we will lose some post messages otherwise.
-                //noinspection ResultOfMethodCallIgnored
-                splashInitLatch.await(1, TimeUnit.SECONDS);
-            } catch (InterruptedException e) {
-                // ignore
-            }
+            GLFWSplashScreen glfwSplash = new GLFWSplashScreen();
+            glfwSplash.run();
             splashScreen = glfwSplash;
         } else {
             splashScreen = SplashScreenBuilder.createStub();

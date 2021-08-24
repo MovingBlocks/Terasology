@@ -19,7 +19,7 @@ import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.engine.core.GameThread;
+import org.terasology.engine.core.GameScheduler;
 import org.terasology.engine.core.subsystem.lwjgl.LwjglGraphicsProcessing;
 import org.terasology.engine.registry.CoreRegistry;
 import org.terasology.engine.rendering.ShaderManager;
@@ -70,9 +70,7 @@ public class GLSLMaterial extends BaseMaterial {
         this.disposalAction = disposalAction;
         this.materialData = data;
         shaderManager = CoreRegistry.get(ShaderManager.class);
-        graphicsProcessing.asynchToDisplayThread(() -> {
-            reload(data);
-        });
+        reload(data);
     }
 
     public static GLSLMaterial create(ResourceUrn urn, LwjglGraphicsProcessing graphicsProcessing,
@@ -123,11 +121,14 @@ public class GLSLMaterial extends BaseMaterial {
 
     @Override
     public void recompile() {
-        TIntIntIterator it = disposalAction.shaderPrograms.iterator();
-        while (it.hasNext()) {
-            it.advance();
-            GL20.glDeleteProgram(it.value());
-        }
+        GameScheduler.runBlockingGraphics("recompile shaders : delete shaders from GL", () -> {
+                    TIntIntIterator it = disposalAction.shaderPrograms.iterator();
+                    while (it.hasNext()) {
+                        it.advance();
+                        GL20.glDeleteProgram(it.value());
+                    }
+        });
+
         disposalAction.shaderPrograms.clear();
         uniformLocationMap.clear();
         bindMap.clear();
@@ -141,23 +142,18 @@ public class GLSLMaterial extends BaseMaterial {
         //resolves #966
         //Some of the uniforms are not updated constantly between frames
         //this function will rebind any uniforms that are not bound
-        rebindVariables(materialData);
+        GameScheduler.runBlockingGraphics("recompile shaders : rebind variables material data", () -> {
+            rebindVariables(materialData);
+        });
     }
 
     @Override
     public final void doReload(MaterialData data) {
-        try {
-            GameThread.synch(() -> {
-                disposalAction.close();
-                uniformLocationMap.clear();
+        disposalAction.close();
+        uniformLocationMap.clear();
 
-                shader = (GLSLShader) data.getShader();
-                recompile();
-                rebindVariables(data);
-            });
-        } catch (InterruptedException e) {
-            logger.error("Failed to reload {}", getUrn(), e);
-        }
+        shader = (GLSLShader) data.getShader();
+        recompile();
     }
 
     private void rebindVariables(MaterialData data) {
@@ -647,22 +643,18 @@ public class GLSLMaterial extends BaseMaterial {
 
         @Override
         public void close() {
-            try {
-                GameThread.synch(() -> {
-                    logger.debug("Disposing material {}.", urn);
-                    final TIntIntMap deletedPrograms = new TIntIntHashMap(shaderPrograms);
-                    graphicsProcessing.asynchToDisplayThread(() -> {
-                        TIntIntIterator it = deletedPrograms.iterator();
-                        while (it.hasNext()) {
-                            it.advance();
-                            GL20.glDeleteProgram(it.value());
-                        }
-                    });
-                    shaderPrograms.clear();
+            GameScheduler.runBlockingGraphics("dispose material", () -> {
+                logger.debug("Disposing material {}.", urn);
+                final TIntIntMap deletedPrograms = new TIntIntHashMap(shaderPrograms);
+                graphicsProcessing.asynchToDisplayThread(() -> {
+                    TIntIntIterator it = deletedPrograms.iterator();
+                    while (it.hasNext()) {
+                        it.advance();
+                        GL20.glDeleteProgram(it.value());
+                    }
                 });
-            } catch (InterruptedException e) {
-                logger.error("Failed to dispose {}", urn, e);
-            }
+                shaderPrograms.clear();
+            });
         }
     }
 }

@@ -8,6 +8,7 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
+import org.terasology.engine.core.GameScheduler;
 import org.terasology.engine.entitySystem.systems.RegisterMode;
 import org.terasology.engine.entitySystem.systems.RegisterSystem;
 import org.terasology.engine.entitySystem.systems.RenderSystem;
@@ -76,7 +77,7 @@ public class SpriteParticleRenderer implements RenderSystem {
 
     @Override
     public void initialise() {
-        opengl33 = GL.createCapabilities().OpenGL33;
+        opengl33 = GameScheduler.runBlockingGraphics("get opengl33 cap",  ()-> GL.createCapabilities().OpenGL33);
     }
 
     @Override

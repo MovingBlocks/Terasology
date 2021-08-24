@@ -3,6 +3,9 @@
 
 package org.terasology.engine.core;
 
+import org.lwjgl.glfw.GLFW;
+import org.lwjgl.system.MemoryUtil;
+import org.terasology.engine.core.subsystem.lwjgl.LwjglGraphics;
 import org.terasology.engine.monitoring.ThreadActivity;
 import org.terasology.engine.monitoring.ThreadMonitor;
 import org.terasology.gestalt.module.sandbox.API;
@@ -14,15 +17,18 @@ import reactor.core.scheduler.Schedulers;
 
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.util.concurrent.Callable;
 
 /** Schedulers to asynchronously run tasks on other threads. */
 @API
 public class GameScheduler {
 
     private static final Scheduler MAIN;
+    private static ThreadCaptureScheduler GRAPHICS;
 
     static {
         MAIN = Schedulers.fromExecutor(runnable -> GameThread.asynch(runnable));
+        GRAPHICS = new ThreadCaptureScheduler();
     }
 
     /**
@@ -32,6 +38,10 @@ public class GameScheduler {
      */
     public static Scheduler gameMain() {
         return MAIN;
+    }
+
+    public static Scheduler graphics() {
+        return GRAPHICS;
     }
 
     /**
@@ -61,12 +71,69 @@ public class GameScheduler {
      */
     @SuppressWarnings("UnusedReturnValue")
     public static Disposable scheduleParallel(String name, Runnable task) {
-        Mono<?> mono = Mono.using(
-                        () -> ThreadMonitor.startThreadActivity(name),
-                        activity -> Mono.fromRunnable(task),
-                        ThreadActivity::close
-                )
-            .subscribeOn(Schedulers.parallel());
+        return wrapActivity(name, Mono.fromRunnable(task))
+                .subscribeOn(parallel())
+                .subscribe();
+    }
+
+    public static <T> Mono<T> wrapActivity(String name, Mono<T> mono) {
+        return Mono.using(
+                () -> ThreadMonitor.startThreadActivity(name),
+                activity -> mono,
+                ThreadActivity::close
+        );
+    }
+
+    public static <T> Flux<T> wrapActivity(Scheduler scheduler, String name, Flux<T> mono) {
+        return Flux.using(
+                () -> ThreadMonitor.startThreadActivity(name),
+                activity -> mono,
+                ThreadActivity::close
+        );
+    }
+
+    public static <T> T runBlockingGraphics(String name, Callable<T> callable) {
+        Mono<T> mono = wrapActivity(name, Mono.fromCallable(callable));
+        if (GRAPHICS.getCapturedThread() != Thread.currentThread()) {
+            mono = mono
+                    .doOnSubscribe(s-> GLFW.glfwMakeContextCurrent(LwjglGraphics.windowId))
+                    .doFinally(f -> GLFW.glfwMakeContextCurrent(MemoryUtil.NULL))
+                    .subscribeOn(GRAPHICS);
+        }
+        return mono .block();
+    }
+
+    public static void runBlockingGraphics(String name, Runnable callable) {
+        Mono<?> mono = wrapActivity(name, Mono.fromRunnable(callable));
+        if (GRAPHICS.getCapturedThread() != Thread.currentThread()) {
+            mono = mono
+                    .doOnSubscribe(s-> GLFW.glfwMakeContextCurrent(LwjglGraphics.windowId))
+                    .doFinally(f -> GLFW.glfwMakeContextCurrent(MemoryUtil.NULL))
+                    .subscribeOn(GRAPHICS);
+        }
+        mono.block();
+    }
+
+    public static Disposable runOnGraphics(String name, Runnable callable) {
+        Mono<?> mono = wrapActivity(name, Mono.fromRunnable(callable));
+        if (GRAPHICS.getCapturedThread() != Thread.currentThread()) {
+            mono = mono
+                    .doOnSubscribe(s-> GLFW.glfwMakeContextCurrent(LwjglGraphics.windowId))
+                    .doFinally(f -> GLFW.glfwMakeContextCurrent(MemoryUtil.NULL))
+                    .subscribeOn(GRAPHICS);
+        }
+        return mono.subscribe();
+    }
+
+    // TODO idk what to with returned value..
+    public static <T> Disposable runOnGraphics(String name, Callable<T> callable) {
+        Mono<T> mono = wrapActivity(name, Mono.fromCallable(callable));
+        if (GRAPHICS.getCapturedThread() != Thread.currentThread()) {
+            mono = mono
+                    .doOnSubscribe(s-> GLFW.glfwMakeContextCurrent(LwjglGraphics.windowId))
+                    .doFinally(f -> GLFW.glfwMakeContextCurrent(MemoryUtil.NULL))
+                    .subscribeOn(GRAPHICS);
+        }
         return mono.subscribe();
     }
 }
