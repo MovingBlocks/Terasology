@@ -2,9 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.terasology.engine.rendering.primitives;
 
-import org.joml.Vector3i;
 import org.joml.Vector3ic;
-import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.engine.math.Side;
 import org.terasology.engine.rendering.assets.mesh.Mesh;
 import org.terasology.engine.world.ChunkView;
@@ -13,6 +11,7 @@ import org.terasology.engine.world.block.BlockAppearance;
 import org.terasology.engine.world.block.BlockManager;
 import org.terasology.engine.world.block.BlockPart;
 import org.terasology.engine.world.block.shapes.BlockMeshPart;
+import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.nui.Color;
 import org.terasology.nui.Colorc;
 
@@ -27,15 +26,12 @@ public class BlockMeshGeneratorSingleShape implements BlockMeshGenerator {
 
     @Override
     public void generateChunkMesh(ChunkView view, ChunkMesh chunkMesh, int x, int y, int z) {
-
         final BlockAppearance blockAppearance = block.getPrimaryAppearance();
         if (!blockAppearance.hasAppearance()) {
             // perf: Skip mesh generation for blocks without appearance, e.g., air blocks.
             return;
         }
 
-        Vector3i pos = new Vector3i(x, y, z);
-        pos = view.toWorldPos(pos);
         Color colorCache = new Color();
 
         // Gather adjacent blocks
@@ -82,7 +78,7 @@ public class BlockMeshGeneratorSingleShape implements BlockMeshGenerator {
                         sideVertexFlag = ChunkVertexFlag.COLOR_MASK;
                     }
                     Colorc colorOffset = block.getColorOffset(BlockPart.fromSide(side));
-                    Colorc colorSource = block.getColorSource(BlockPart.fromSide(side)).calcColor(pos.x, pos.y, pos.z);
+                    Colorc colorSource = block.getColorSource(BlockPart.fromSide(side)).calcColor(view, x, y, z);
                     colorCache.setRed(colorSource.rf() * colorOffset.rf())
                             .setGreen(colorSource.gf() * colorOffset.gf())
                             .setBlue(colorSource.bf() * colorOffset.bf())
@@ -94,7 +90,7 @@ public class BlockMeshGeneratorSingleShape implements BlockMeshGenerator {
 
         if (isRendered && blockAppearance.getPart(BlockPart.CENTER) != null) {
             Colorc colorOffset = block.getColorOffset(BlockPart.CENTER);
-            Colorc colorSource = block.getColorSource(BlockPart.CENTER).calcColor(pos.x, pos.y, pos.z);
+            Colorc colorSource = block.getColorSource(BlockPart.CENTER).calcColor(view, x, y, z);
             colorCache.setRed(colorSource.rf() * colorOffset.rf())
                     .setGreen(colorSource.gf() * colorOffset.gf())
                     .setBlue(colorSource.bf() * colorOffset.bf())
